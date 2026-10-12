@@ -1349,7 +1349,7 @@ function drawCompHud(){
   const c=CM&&CMG===G&&!c0hidden()?CM:null, pip=!!G.pip;
   if(!c&&!pip) return;
   const L=SAFE.l+14, T=SAFE.t+14, M=MINI_R(), pw=Math.min(250,M.x-L-10), R=c?21:16;
-  let cx, cy; if(M.x-(L+pw)>=R*2+26){ cx=L+pw+12+R; cy=T+R+3; } else { cx=M.x+M.r; cy=M.y+M.r*2+38+R; }
+  let cx, cy; const rx=Math.max(L+pw+4,HUD_RX); if(M.x-rx>=R*2+26){ cx=rx+8+R; cy=T+R+3; HUD_RX=cx+R+12; } else { cx=M.x+M.r; cy=M.y+M.r*2+38+R; }
   const id=c?c.id:'pip', down=!!c&&c.down>0, k=c?clamp(c.hp/c.maxHp,0,1):1, t=G.time;
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle='rgba(10,8,6,.62)'; ctx.beginPath(); ctx.arc(cx,cy,R+4,0,TAU); ctx.fill();

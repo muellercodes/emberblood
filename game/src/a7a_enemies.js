@@ -86,7 +86,7 @@ function separate(){
       const dx=b.x-a.x, dy=b.y-a.y, m=a.r+b.r, d2=dx*dx+dy*dy;
       if(d2<m*m&&d2>0.0001){ const d=Math.sqrt(d2), o=m-d, wa=(b.r*b.r)/(a.r*a.r+b.r*b.r), wb=1-wa; a.x-=dx/d*o*wa; a.y-=dy/d*o*wa; b.x+=dx/d*o*wb; b.y+=dy/d*o*wb; }
     }
-    if(a.flying||p.dead||a.alpha<0.5) continue;
+    if(a.flying||p.dead||a.alpha<0.5||p.flying||(p.z||0)>12) continue;
     const dx=p.x-a.x, dy=p.y-a.y, m=a.r+p.r, d2=dx*dx+dy*dy;
     if(d2<m*m&&d2>0.0001){
       const d=Math.sqrt(d2), o=m-d;

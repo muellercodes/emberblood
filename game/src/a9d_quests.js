@@ -79,6 +79,7 @@ function dropCoins(x,y,n){ for(let i=0;i<n;i++) G.pickups.push({x,y,vx:rand(-90,
 function qAvail(id){
   const d=QDEFS[id]; if(G.quests[id]) return false; if(!reached(d.min)) return false;
   if(d.after&&!(G.quests[d.after]&&G.quests[d.after].done)) return false;
+  if(d.ab&&!hasAbil(d.ab)) return false;
   if(d.errand){ const to=d.steps[0].npc; if(!npcPresent(to)||!npcPresent(d.giver)) return false; if(Object.values(G.quests).filter(q=>!q.done&&q.errand).length>=3) return false; }
   if(id==='lure'&&!G.bossDone.gloamjaw) return false;
   if(id==='gate'&&!G.flags.gateHint) return false;

@@ -7614,6 +7614,8 @@ const inRect=(r,x,y)=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
 let TRACK_R=null;
 // HUD_HITS: modules push {x,y,w,h,fn} while drawing the HUD each frame (cleared at the start of drawHUD)
 const HUD_HITS=[];
+// HUD_RX: the next free x to the right of the vitals panel; chips that sit there use it and move it along
+let HUD_RX=0;
 function hudClick(x,y){
   for(const h of HUD_HITS) if(inRect(h,x,y)){ h.fn(); return true; }
   if(inRect(PAUSE_R(),x,y)){ pauseGame(); return true; }
@@ -8159,7 +8161,7 @@ function ovBack(root){
 }
 function navTab(root,d){
   if(root.id==='mapov'){ if(typeof mapCycle==='function') mapCycle(d); return; }
-  const bar=Array.from(root.querySelectorAll('[data-tabs],.jtabs,#acTabs,[role="tablist"]')).find(vis); if(!bar) return;
+  const bar=Array.from(root.querySelectorAll('[data-tabs],.jtabs,.sktabs,#acTabs,[role="tablist"]')).find(vis); if(!bar) return;
   const bs=Array.from(bar.querySelectorAll('button')).filter(b=>!b.disabled&&!b.hidden&&vis(b)); if(bs.length<2) return;
   let i=bs.findIndex(b=>b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true'||b.classList.contains('on')); if(i<0) i=0;
   const n=bs[(i+d+bs.length)%bs.length], keep=bar.contains(document.activeElement)||!navItems(root).includes(document.activeElement);
@@ -9160,13 +9162,14 @@ function drawWeaponHud(){
   const L=SAFE.l+14, T=SAFE.t+14, MR=MINI_R(), pw=Math.min(250,MR.x-L-10), cur=curWeapon(), n=own.length, pulse=WS.pulse;
   const keysOn=!usingTouch&&!padActive(), big=38, mini=18, gap=5, cw=8+big+10+n*(mini+gap)-gap+9, chh=52;
   const bossTop=usingTouch&&W>=720&&G.boss&&!G.boss.dead;
-  let x=L+pw+8, y=T, hx, hy;
+  let x=Math.max(L+pw+8,HUD_RX), y=T, hx, hy;
   ctx.save(); ctx.textBaseline='middle';
   if(x+cw+8<=MR.x&&!bossTop){
     wPanel(x,y,cw,chh);
     wChipIcon(x+8+big/2,y+chh/2,big,cur,pulse);
     if(keysOn){ ctx.font=`800 8px ${UIF}`; ctx.fillStyle='rgba(20,12,6,.9)'; rr(x+5,y+4,11,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.textAlign='center'; ctx.fillText('X',x+10.5,y+10); }
     HUD_HITS.push({x,y,w:8+big+5,h:chh,fn:()=>cycleWeapon(1)});
+    HUD_RX=x+cw+8;
     let mx=x+8+big+10;
     for(let i=0;i<n;i++){
       const id=own[i], on=id===cur, ix=mx+mini/2, iy=y+(keysOn?chh/2-5:chh/2);
@@ -9987,7 +9990,7 @@ function separate(){
       const dx=b.x-a.x, dy=b.y-a.y, m=a.r+b.r, d2=dx*dx+dy*dy;
       if(d2<m*m&&d2>0.0001){ const d=Math.sqrt(d2), o=m-d, wa=(b.r*b.r)/(a.r*a.r+b.r*b.r), wb=1-wa; a.x-=dx/d*o*wa; a.y-=dy/d*o*wa; b.x+=dx/d*o*wb; b.y+=dy/d*o*wb; }
     }
-    if(a.flying||p.dead||a.alpha<0.5) continue;
+    if(a.flying||p.dead||a.alpha<0.5||p.flying||(p.z||0)>12) continue;
     const dx=p.x-a.x, dy=p.y-a.y, m=a.r+p.r, d2=dx*dx+dy*dy;
     if(d2<m*m&&d2>0.0001){
       const d=Math.sqrt(d2), o=m-d;
@@ -10709,7 +10712,7 @@ function trialBossFx(dt){
     z.t+=dt;
     if(z.kind==='sweep'){ if(z.t>=z.delay&&z.t<z.delay+z.dur){ const k=(z.t-z.delay)/z.dur, ang=lerp(z.a0,z.a1,k), d=dist(z.x,z.y,p.x,p.y); if(!z.sfx){ z.sfx=1; SFX.play('slash3'); G.ripples.push({x:z.x,y:z.y,t:0,max:0.8,r:30,splash:true}); } if(alive&&!z.hit&&d<z.r+p.r*0.5&&d>20&&Math.abs(angDiff(ang,angTo(z.x,z.y,p.x,p.y)))<0.3){ if(air){ if(!z.hopped){ z.hopped=true; ftext(p.x,p.y-30,'Hop!','#c8ffb0',13); } } else if(hurtPlayer(z.dmg,z.x,z.y,420)){ z.hit=true; trialShove(); } } } if(z.t>z.delay+z.dur+0.2) z.done=true; }
     else if(z.kind==='whirl'){ const d=dist(z.x,z.y,p.x,p.y), k=clamp(Math.min(z.t/0.6,(z.dur-z.t)/0.6),0,1); if(alive&&d<z.r&&!p.flying&&!air){ const a=angTo(p.x,p.y,z.x,z.y), pull=(110+150*(1-d/z.r))*k; tNudge(p,Math.cos(a)*pull*dt+Math.cos(a+Math.PI/2)*60*k*dt,Math.sin(a)*pull*dt+Math.sin(a+Math.PI/2)*60*k*dt); z.tick=(z.tick||0)-dt; if(d<70&&z.tick<=0){ z.tick=0.5; hurtPlayer(z.dmg,z.x,z.y,0); } } if(Math.random()<dt*20) G.ripples.push({x:z.x+rand(-z.r,z.r)*0.7,y:z.y+rand(-z.r,z.r)*0.6,t:0,max:0.9,r:rand(10,24)}); if(z.t>=z.dur) z.done=true; }
-    else if(z.kind==='bolt'){ if(z.t>=z.delay&&!z.struck){ z.struck=true; T.bolts.push({x:z.x,y:z.y,t:0}); SFX.play('thunder'); shake(5); flashA=Math.max(flashA,0.12); flashCol='220,230,255'; emit(z.x,z.y,16,{col:'200,220,255',smin:60,smax:200,lmin:.2,lmax:.5,zmin:2,zmax:4}); if(alive&&dist(z.x,z.y,p.x,p.y)<z.r+p.r*0.5) hurtPlayer(z.dmg,z.x,z.y,260); } if(z.t>z.delay+0.35) z.done=true; }
+    else if(z.kind==='bolt'){ if(z.t>=z.delay&&!z.struck){ z.struck=true; T.bolts.push({x:z.x,y:z.y,t:0}); SFX.play('thunder'); shake(5); flashA=Math.max(flashA,0.12); flashCol='220,230,255'; emit(z.x,z.y,16,{col:'200,220,255',smin:60,smax:200,lmin:.2,lmax:.5,zmin:2,zmax:4}); if(alive&&dist(z.x,z.y,p.x,p.y)<z.r+p.r*0.5){ HURT_SRC='air'; hurtPlayer(z.dmg,z.x,z.y,260); HURT_SRC=''; } } if(z.t>z.delay+0.35) z.done=true; }
   }
   T.zones=T.zones.filter(z=>!z.done);
   for(const b of T.bolts) b.t+=dt; T.bolts=T.bolts.filter(b=>b.t<0.35);
@@ -11671,6 +11674,7 @@ function dropCoins(x,y,n){ for(let i=0;i<n;i++) G.pickups.push({x,y,vx:rand(-90,
 function qAvail(id){
   const d=QDEFS[id]; if(G.quests[id]) return false; if(!reached(d.min)) return false;
   if(d.after&&!(G.quests[d.after]&&G.quests[d.after].done)) return false;
+  if(d.ab&&!hasAbil(d.ab)) return false;
   if(d.errand){ const to=d.steps[0].npc; if(!npcPresent(to)||!npcPresent(d.giver)) return false; if(Object.values(G.quests).filter(q=>!q.done&&q.errand).length>=3) return false; }
   if(id==='lure'&&!G.bossDone.gloamjaw) return false;
   if(id==='gate'&&!G.flags.gateHint) return false;
@@ -12716,12 +12720,12 @@ function drawSkillHud(){
     ctx.globalAlpha=a*(1-ring); ctx.strokeStyle='#ffe08a'; ctx.lineWidth=2; rr(cx-3-ring*8,cy-3-ring*8,cw+6+ring*16,ch+6+ring*16,10+ring*8); ctx.stroke(); ctx.globalAlpha=a;
     const title=sp>1?`You have ${sp} skill points!`:'You earned a skill point!', body=skCtrlHint();
     ctx.font=`800 12px ${UIF}`; const w1=ctx.measureText(title).width; ctx.font=`500 12px ${UIF}`; const w2=ctx.measureText(body).width;
-    const bw=Math.min(Math.max(w1,w2)+26,W-L-SAFE.r-12), bh=46, room=MINI_R().x-(L+pw)-18;
+    const bw=Math.min(Math.max(w1,w2)+26,W-L-SAFE.r-12), bh=46, hx0=Math.max(L+pw+12,HUD_RX+4), room=MINI_R().x-hx0-8;
     let bx,by,side;
-    if(room>=bw+10){ bx=L+pw+12; by=Math.max(SAFE.t+4,cy+ch/2-bh/2); side='l'; } else { bx=clamp(cx+cw/2-bw+40,L,W-SAFE.r-bw-8); by=T+90; side='u'; }
+    if(room>=bw+10){ bx=hx0; by=Math.max(SAFE.t+4,cy+ch/2-bh/2); side='l'; } else { bx=clamp(cx+cw/2-bw+40,L,W-SAFE.r-bw-8); by=T+90; side='u'; }
     ctx.fillStyle='rgba(22,11,7,.95)'; ctx.strokeStyle='rgba(255,210,120,.9)'; ctx.lineWidth=1.5;
     ctx.beginPath();
-    if(side==='l'){ const ay=cy+ch/2; ctx.moveTo(L+pw-2,ay); ctx.lineTo(bx+1,ay-7); ctx.lineTo(bx+1,ay+7); }
+    if(side==='l'){ const ay=cy+ch/2; ctx.moveTo(bx-12,ay); ctx.lineTo(bx+1,ay-7); ctx.lineTo(bx+1,ay+7); }
     else { const ax=cx+cw/2; ctx.moveTo(ax,by-9); ctx.lineTo(ax-8,by+1); ctx.lineTo(ax+8,by+1); }
     ctx.closePath(); ctx.fill(); ctx.stroke();
     rr(bx,by,bw,bh,10); ctx.fill(); ctx.stroke();
@@ -14598,7 +14602,7 @@ function drawCompHud(){
   const c=CM&&CMG===G&&!c0hidden()?CM:null, pip=!!G.pip;
   if(!c&&!pip) return;
   const L=SAFE.l+14, T=SAFE.t+14, M=MINI_R(), pw=Math.min(250,M.x-L-10), R=c?21:16;
-  let cx, cy; if(M.x-(L+pw)>=R*2+26){ cx=L+pw+12+R; cy=T+R+3; } else { cx=M.x+M.r; cy=M.y+M.r*2+38+R; }
+  let cx, cy; const rx=Math.max(L+pw+4,HUD_RX); if(M.x-rx>=R*2+26){ cx=rx+8+R; cy=T+R+3; HUD_RX=cx+R+12; } else { cx=M.x+M.r; cy=M.y+M.r*2+38+R; }
   const id=c?c.id:'pip', down=!!c&&c.down>0, k=c?clamp(c.hp/c.maxHp,0,1):1, t=G.time;
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle='rgba(10,8,6,.62)'; ctx.beginPath(); ctx.arc(cx,cy,R+4,0,TAU); ctx.fill();
@@ -16308,7 +16312,7 @@ function drawHUD(){
   const p=player, L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story';
   ctx.textBaseline='middle';
   // vitals panel
-  const pw=Math.min(250,MINI_R().x-L-10);
+  const pw=Math.min(250,MINI_R().x-L-10); HUD_RX=L+pw+8;
   ctx.fillStyle='rgba(10,8,6,.58)'; rr(L,T,pw,story?80:68,10); ctx.fill(); ctx.strokeStyle='rgba(255,220,180,.16)'; ctx.lineWidth=1; ctx.stroke();
   const bx=L+12, bw=pw-62;
   let y=T+12;
@@ -16380,7 +16384,7 @@ function drawHUD(){
   if(G.prompt&&scene==='play'){
     drawPromptPill(b);
   }
-  drawWeaponHud(); drawMoveHud(); if(story){ drawSkillHud(); drawCompHud(); }
+  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawSkillHud();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
     drawHintText(b);

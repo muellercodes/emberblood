@@ -5,7 +5,7 @@ function drawHUD(){
   const p=player, L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story';
   ctx.textBaseline='middle';
   // vitals panel
-  const pw=Math.min(250,MINI_R().x-L-10);
+  const pw=Math.min(250,MINI_R().x-L-10); HUD_RX=L+pw+8;
   ctx.fillStyle='rgba(10,8,6,.58)'; rr(L,T,pw,story?80:68,10); ctx.fill(); ctx.strokeStyle='rgba(255,220,180,.16)'; ctx.lineWidth=1; ctx.stroke();
   const bx=L+12, bw=pw-62;
   let y=T+12;
@@ -77,7 +77,7 @@ function drawHUD(){
   if(G.prompt&&scene==='play'){
     drawPromptPill(b);
   }
-  drawWeaponHud(); drawMoveHud(); if(story){ drawSkillHud(); drawCompHud(); }
+  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawSkillHud();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
     drawHintText(b);

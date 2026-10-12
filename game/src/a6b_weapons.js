@@ -561,13 +561,14 @@ function drawWeaponHud(){
   const L=SAFE.l+14, T=SAFE.t+14, MR=MINI_R(), pw=Math.min(250,MR.x-L-10), cur=curWeapon(), n=own.length, pulse=WS.pulse;
   const keysOn=!usingTouch&&!padActive(), big=38, mini=18, gap=5, cw=8+big+10+n*(mini+gap)-gap+9, chh=52;
   const bossTop=usingTouch&&W>=720&&G.boss&&!G.boss.dead;
-  let x=L+pw+8, y=T, hx, hy;
+  let x=Math.max(L+pw+8,HUD_RX), y=T, hx, hy;
   ctx.save(); ctx.textBaseline='middle';
   if(x+cw+8<=MR.x&&!bossTop){
     wPanel(x,y,cw,chh);
     wChipIcon(x+8+big/2,y+chh/2,big,cur,pulse);
     if(keysOn){ ctx.font=`800 8px ${UIF}`; ctx.fillStyle='rgba(20,12,6,.9)'; rr(x+5,y+4,11,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.textAlign='center'; ctx.fillText('X',x+10.5,y+10); }
     HUD_HITS.push({x,y,w:8+big+5,h:chh,fn:()=>cycleWeapon(1)});
+    HUD_RX=x+cw+8;
     let mx=x+8+big+10;
     for(let i=0;i<n;i++){
       const id=own[i], on=id===cur, ix=mx+mini/2, iy=y+(keysOn?chh/2-5:chh/2);

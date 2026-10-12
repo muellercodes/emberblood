@@ -178,12 +178,12 @@ function drawSkillHud(){
     ctx.globalAlpha=a*(1-ring); ctx.strokeStyle='#ffe08a'; ctx.lineWidth=2; rr(cx-3-ring*8,cy-3-ring*8,cw+6+ring*16,ch+6+ring*16,10+ring*8); ctx.stroke(); ctx.globalAlpha=a;
     const title=sp>1?`You have ${sp} skill points!`:'You earned a skill point!', body=skCtrlHint();
     ctx.font=`800 12px ${UIF}`; const w1=ctx.measureText(title).width; ctx.font=`500 12px ${UIF}`; const w2=ctx.measureText(body).width;
-    const bw=Math.min(Math.max(w1,w2)+26,W-L-SAFE.r-12), bh=46, room=MINI_R().x-(L+pw)-18;
+    const bw=Math.min(Math.max(w1,w2)+26,W-L-SAFE.r-12), bh=46, hx0=Math.max(L+pw+12,HUD_RX+4), room=MINI_R().x-hx0-8;
     let bx,by,side;
-    if(room>=bw+10){ bx=L+pw+12; by=Math.max(SAFE.t+4,cy+ch/2-bh/2); side='l'; } else { bx=clamp(cx+cw/2-bw+40,L,W-SAFE.r-bw-8); by=T+90; side='u'; }
+    if(room>=bw+10){ bx=hx0; by=Math.max(SAFE.t+4,cy+ch/2-bh/2); side='l'; } else { bx=clamp(cx+cw/2-bw+40,L,W-SAFE.r-bw-8); by=T+90; side='u'; }
     ctx.fillStyle='rgba(22,11,7,.95)'; ctx.strokeStyle='rgba(255,210,120,.9)'; ctx.lineWidth=1.5;
     ctx.beginPath();
-    if(side==='l'){ const ay=cy+ch/2; ctx.moveTo(L+pw-2,ay); ctx.lineTo(bx+1,ay-7); ctx.lineTo(bx+1,ay+7); }
+    if(side==='l'){ const ay=cy+ch/2; ctx.moveTo(bx-12,ay); ctx.lineTo(bx+1,ay-7); ctx.lineTo(bx+1,ay+7); }
     else { const ax=cx+cw/2; ctx.moveTo(ax,by-9); ctx.lineTo(ax-8,by+1); ctx.lineTo(ax+8,by+1); }
     ctx.closePath(); ctx.fill(); ctx.stroke();
     rr(bx,by,bw,bh,10); ctx.fill(); ctx.stroke();

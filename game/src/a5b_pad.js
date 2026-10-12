@@ -416,7 +416,7 @@ function ovBack(root){
 }
 function navTab(root,d){
   if(root.id==='mapov'){ if(typeof mapCycle==='function') mapCycle(d); return; }
-  const bar=Array.from(root.querySelectorAll('[data-tabs],.jtabs,#acTabs,[role="tablist"]')).find(vis); if(!bar) return;
+  const bar=Array.from(root.querySelectorAll('[data-tabs],.jtabs,.sktabs,#acTabs,[role="tablist"]')).find(vis); if(!bar) return;
   const bs=Array.from(bar.querySelectorAll('button')).filter(b=>!b.disabled&&!b.hidden&&vis(b)); if(bs.length<2) return;
   let i=bs.findIndex(b=>b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true'||b.classList.contains('on')); if(i<0) i=0;
   const n=bs[(i+d+bs.length)%bs.length], keep=bar.contains(document.activeElement)||!navItems(root).includes(document.activeElement);

@@ -85,6 +85,8 @@ const inRect=(r,x,y)=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
 let TRACK_R=null;
 // HUD_HITS: modules push {x,y,w,h,fn} while drawing the HUD each frame (cleared at the start of drawHUD)
 const HUD_HITS=[];
+// HUD_RX: the next free x to the right of the vitals panel; chips that sit there use it and move it along
+let HUD_RX=0;
 function hudClick(x,y){
   for(const h of HUD_HITS) if(inRect(h,x,y)){ h.fn(); return true; }
   if(inRect(PAUSE_R(),x,y)){ pauseGame(); return true; }
