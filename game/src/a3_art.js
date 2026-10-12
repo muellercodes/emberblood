@@ -1139,7 +1139,7 @@ function drawStruct(s,t){
       ctx.save(); ctx.translate(s.x,s.y); ctx.fillStyle='#3a2816';
       for(let i=0;i<6;i++){ const a=i/6*TAU+0.3; ctx.beginPath(); ctx.moveTo(Math.cos(a-0.25)*14,Math.sin(a-0.25)*14); ctx.quadraticCurveTo(Math.cos(a)*30,Math.sin(a)*30,Math.cos(a)*40,Math.sin(a)*40); ctx.quadraticCurveTo(Math.cos(a)*26,Math.sin(a)*26,Math.cos(a+0.25)*14,Math.sin(a+0.25)*14); ctx.fill(); }
       const gr=ctx.createRadialGradient(-5,-5,2,0,0,22); gr.addColorStop(0,'#6a4a2a'); gr.addColorStop(1,'#2e1e10'); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(0,0,21,0,TAU); ctx.fill();
-      ctx.restore(); break; }
+      ctx.restore(); bigOakTrunk(s); break; }
     case 'forge':{
       drawHouseStruct(s,t);
       const L=s.L; if(L&&L.hearth){ const [hx,hy,hw]=L.hearth, gl=hzGlow(); ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.32+0.12*Math.sin(t*7.3)+0.07*Math.sin(t*17.1); ctx.drawImage(gl,s.x+hx-hw*1.3,s.y+hy-hw,hw*2.6,hw*2); ctx.restore();
@@ -1196,6 +1196,7 @@ function drawWall(){
   const x0=Math.max(0,cam.x-100), x1=Math.min(WORLD.w,cam.x+W/zoom+100);
   if(WALL_Y+80<cam.y||WALL_Y-80>cam.y+H/zoom) return;
   ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(x0,WALL_Y+26,x1-x0,26);
+  if(DV.on){ drawWallDepth(x0,x1); return; }
   ctx.fillStyle=wallPattern;
   const seg=(a,b)=>{ if(b<x0||a>x1) return; ctx.fillRect(Math.max(a,x0),WALL_Y-26,Math.min(b,x1)-Math.max(a,x0),52); };
   seg(0,GATE_X0-80); seg(GATE_X1+80,WORLD.w);
