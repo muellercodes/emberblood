@@ -266,6 +266,7 @@ function restAtShrine(s){
   emit(s.x,s.y,40,{col:'255,200,120',ang:-Math.PI/2,spread:1.2,smin:30,smax:140,lmin:.6,lmax:1.2,zmin:1.5,zmax:3,rise:20});
   saveGame(true); setBanner('Rested','Health and draughts restored. Game saved.',2.2);
   if(G.pendingBless>0) later(0.6,offerPending);
+  dreamHook('shrine');
 }
 function openChest(c){
   c.open=true; G.chestsOpened[c.id]=true; SFX.play('chest');
