@@ -34,7 +34,7 @@ function placeHouses(cx,cy,n,r0,r1,rng,avoid,roofs,list){
     const hs={k:'house',x,y,w,h,vert,roof:pick(roofs),burnt:list.burnt?rng()<list.burnt:false,seed:Math.floor(rng()*1e9),town:list.town,snow:!!list.snow};
     HOUSES.push(hs); STRUCTS.push(hs); made++;
     addCol({t:'r',x0:x-w/2,y0:y-h/2,x1:x+w/2,y1:y+h/2});
-    const tx=x+(vert?(w/2+12):-w*0.32), ty=y+(vert?-h*0.32:h/2+12);
+    const tx=x-Math.max(30,w*0.34), ty=y+h/2+12;
     STRUCTS.push({k:'torch',x:tx,y:ty}); LIGHTS.push({x:tx,y:ty,r:170,i:0.75,fire:true,night:true});
   }
 }

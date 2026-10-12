@@ -1172,7 +1172,7 @@ function placeHouses(cx,cy,n,r0,r1,rng,avoid,roofs,list){
     const hs={k:'house',x,y,w,h,vert,roof:pick(roofs),burnt:list.burnt?rng()<list.burnt:false,seed:Math.floor(rng()*1e9),town:list.town,snow:!!list.snow};
     HOUSES.push(hs); STRUCTS.push(hs); made++;
     addCol({t:'r',x0:x-w/2,y0:y-h/2,x1:x+w/2,y1:y+h/2});
-    const tx=x+(vert?(w/2+12):-w*0.32), ty=y+(vert?-h*0.32:h/2+12);
+    const tx=x-Math.max(30,w*0.34), ty=y+h/2+12;
     STRUCTS.push({k:'torch',x:tx,y:ty}); LIGHTS.push({x:tx,y:ty,r:170,i:0.75,fire:true,night:true});
   }
 }
@@ -1374,7 +1374,7 @@ const STYLE_OF={baker:'baker',lamps:'lamps',herbalist:'herbalist',kid:'kid',fidd
 function spotOK(x,y,r){ if(blockedAt(x,y)) return false; if(segsDist(x,y,ROAD_SEGS)<(r||40)) return false; return true; }
 function nudge(x,y,r){ if(spotOK(x,y,r)) return [x,y]; for(let d=40;d<600;d+=40) for(let a=0;a<TAU;a+=0.5){ const nx=x+Math.cos(a)*d, ny=y+Math.sin(a)*d; if(spotOK(nx,ny,r)) return [nx,ny]; } return [x,y]; }
 function addLandmark(o){ if(!o.noNudge){ const [x,y]=nudge(o.x,o.y,o.rr||50); o.x=x; o.y=y; } LANDMARKS.push(o); if(o.r) o.colRef=addCol({t:'c',x:o.x,y:o.y,r:o.r}); return o; }
-function doorOf(hs){ return hs.vert?{x:hs.x+hs.w/2+16,y:hs.y,outY:0,side:'e'}:{x:hs.x,y:hs.y+hs.h/2+16,outY:16,side:'s'}; }
+function doorOf(hs){ return {x:hs.x,y:hs.y+hs.h/2+16,outY:16,side:'s'}; }
 function buildPlaces(){
   // ---- cave mouths
   for(const s of CAVE_SITES){
@@ -2028,7 +2028,7 @@ function drawCaveMouth(s,t){
 }
 function drawColumn(s){ const r=16*s.s; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(s.x+6,s.y+6,r+4,r,0,0,TAU); ctx.fill(); ctx.fillStyle=grad(s.x-r,s.y-r,s.x+r,s.y+r,'#c8c0b0','#6a645a'); ctx.beginPath(); ctx.arc(s.x,s.y,r,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(60,50,40,.35)'; ctx.lineWidth=1.5; for(let a=0;a<TAU;a+=0.8){ ctx.beginPath(); ctx.moveTo(s.x+Math.cos(a)*r*0.4,s.y+Math.sin(a)*r*0.4); ctx.lineTo(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r); ctx.stroke(); } if(s.broken){ ctx.fillStyle='#8a8478'; ctx.beginPath(); ctx.ellipse(s.x+r*1.6,s.y+r*0.6,r*1.1,r*0.5,0.5,0,TAU); ctx.fill(); } }
 function drawGlowShroom(s,t){ for(let i=0;i<4;i++){ const x=s.x+Math.cos(i*1.6)*9*s.s, y=s.y+Math.sin(i*1.6)*7*s.s; ctx.fillStyle='#d8e8f0'; ctx.fillRect(x-1,y,2,4); ctx.fillStyle='#7ad8e8'; ctx.beginPath(); ctx.ellipse(x,y,5*s.s,3.4*s.s,0,0,TAU); ctx.fill(); } glowAt(s.x,s.y,22*s.s,'120,220,240',0.25+0.1*Math.sin(t*2+s.x)); }
-function drawDoor(d){ if(!d.hs) return; const h=d.hs; ctx.fillStyle='#3a2414'; if(h.vert) ctx.fillRect(h.x+h.w/2-3,h.y-13,8,26); else ctx.fillRect(h.x-13,h.y+h.h/2-4,26,8); ctx.fillStyle='#d8b04a'; if(h.vert){ ctx.beginPath(); ctx.arc(h.x+h.w/2+2,h.y+6,1.6,0,TAU); ctx.fill(); } else { ctx.beginPath(); ctx.arc(h.x+7,h.y+h.h/2,1.6,0,TAU); ctx.fill(); } }
+function drawDoor(d){ if(!d.hs||d.hs.facade) return; const h=d.hs; ctx.fillStyle='#3a2414'; ctx.fillRect(h.x-13,h.y+h.h/2-4,26,8); ctx.fillStyle='#d8b04a'; ctx.beginPath(); ctx.arc(h.x+7,h.y+h.h/2,1.6,0,TAU); ctx.fill(); }
 function drawMarker(x,y,m,t){
   const bob=Math.sin(t*4)*2.5, c=m==='!'?'#ffcf4a':m==='?'?'#7fe0ff':'#b8b0a0';
   ctx.save(); ctx.translate(x,y+bob);

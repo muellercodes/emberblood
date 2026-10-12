@@ -10,7 +10,7 @@ const STYLE_OF={baker:'baker',lamps:'lamps',herbalist:'herbalist',kid:'kid',fidd
 function spotOK(x,y,r){ if(blockedAt(x,y)) return false; if(segsDist(x,y,ROAD_SEGS)<(r||40)) return false; return true; }
 function nudge(x,y,r){ if(spotOK(x,y,r)) return [x,y]; for(let d=40;d<600;d+=40) for(let a=0;a<TAU;a+=0.5){ const nx=x+Math.cos(a)*d, ny=y+Math.sin(a)*d; if(spotOK(nx,ny,r)) return [nx,ny]; } return [x,y]; }
 function addLandmark(o){ if(!o.noNudge){ const [x,y]=nudge(o.x,o.y,o.rr||50); o.x=x; o.y=y; } LANDMARKS.push(o); if(o.r) o.colRef=addCol({t:'c',x:o.x,y:o.y,r:o.r}); return o; }
-function doorOf(hs){ return hs.vert?{x:hs.x+hs.w/2+16,y:hs.y,outY:0,side:'e'}:{x:hs.x,y:hs.y+hs.h/2+16,outY:16,side:'s'}; }
+function doorOf(hs){ return {x:hs.x,y:hs.y+hs.h/2+16,outY:16,side:'s'}; }
 function buildPlaces(){
   // ---- cave mouths
   for(const s of CAVE_SITES){
