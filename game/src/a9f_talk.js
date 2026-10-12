@@ -37,9 +37,10 @@ function giveTalkReward(r){
 }
 // what someone will say about the world, chosen by friendship and time
 function greetLine(id){
-  const c=CASTBY[id], f=friendOf(id), T=TALK[id]||{}, night=isNight();
+  const c=CASTBY[id]||SPECIAL[id]||{name:personName(id)}, f=friendOf(id), T=TALK[id]||{}, night=isNight();
   const first=!(G.seenTalk&&G.seenTalk['met_'+id]);
   if(first&&id!=='maren'&&id!=='yara') return c.generic?`Oh, hello! You're Ash, aren't you? I'm ${c.name}. I live just here.`:`Oh! You must be Ash, Maren's kid. I'm ${c.name}. Nice to meet you properly.`;
+  const dg=deedGreet(id); if(dg) return dg;
   if(f>=5) return pick([`Ash! My favorite person. What do you need?`,`There's my best friend! Sit, sit.`,`You again! Good. I was hoping.`]);
   if(f>=3) return pick([`Hello, Ash. Always nice to see you.`,`Ash! Got a minute?`,`Good to see you.`]);
   if(night) return pick([`Out late, Ash? Keep your fire close.`,`It's late. The wolves are louder tonight.`,`Can't sleep either?`]);
@@ -98,6 +99,7 @@ function talkHub(n,pre){
       const tie=c.lines&&c.lines[0]; if(tie) o.push({t:'Know anyone around the valley?',key:'tie_'+id,then:[[id,tie]],back:true});
       const gr=GENERIC_RUMORS[Math.abs(hashStr(id))%GENERIC_RUMORS.length]; o.push({t:'Heard any rumors?',key:'rum_'+id,fn:()=>markHint(gr[1]),then:[[id,gr[0]]],back:true});
     }
+    o.push(...compTalkOpts(id,n));
     const gifts=giftsHeld();
     if(gifts.length&&(!G.gifted||G.gifted[id]!==dayNow())&&!SPECIAL[id]) o.push({t:'I brought you something.',tag:'gift',then:()=>[ch(id,`Ooh, what is it?`,gifts.map(k=>({t:`${GIFTS[k]} (you have ${G.items[k]})`,then:()=>[[id,giftReact(id,k)]]})).concat([{t:'Never mind',then:[[id,`A mystery gift! My favorite kind. Maybe next time.`]]}]))],back:true});
     o.push({t:'Goodbye',end:true,then:[[id,friendOf(id)>=3?pick([`See you soon, Ash.`,`Come back any time.`,`Be careful out there.`]):pick([`Bye, Ash.`,`See you.`,`Mind your tail.`])]]});
