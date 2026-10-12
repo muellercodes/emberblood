@@ -10,8 +10,13 @@ A thousand years ago the dragon Vorlaxis, the First Flame, ruled the valley of E
 
 You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney sweep, and the first in a thousand years born with horns, a tail and real fire. It's the thousandth Lantern Day, the night the binding runs out. Kobolds just crashed the festival, somebody left the north gate open for them, and a cult called the Scaled Oath is snuffing the Wards so your great-great-great-great-great-great-great-great-great-great-great-great-great-grandfather wakes up strong and takes his fire back from you.
 
-- **Story Mode**: a 14,000 × 11,000 valley with seven regions, seven bosses and five Wards to relight. Seven towns and hamlets with about 45 houses you can walk into, each full of things to poke at. Seven caves to explore (with puzzles, treasure and lost pages). A cast of named villagers whose stories tie into each other across the map, 13 side quests, a dozen cross-valley errands, ten lost pages of the Wardens' Account to collect, shops, fishing, hats, a talking tree with riddles, a baby dragon named Pip and a goat with opinions.
+- **Story Mode**: a 14,000 × 11,000 valley with seven regions, seven bosses and five Wards to relight. Seven towns and hamlets with about 45 houses you can walk into, and a dozen of them have an upstairs, a cellar or a secret room behind a loose brick, a bookcase or a painting. Seven caves built as small puzzle dungeons: push-block plates, crystal switches, torch-order murals, timed braziers, dark rooms, mazes, locked doors with small keys and cracked walls that hide treasure rooms.
+- **Side quests that play differently**: 20 of them. Chase down a purse thief, play hide and seek with the village kids, guard a pumpkin patch, race Elka through six flags, play back lost songs note by note, solve the case of the Mayor's missing pie (ask around, then accuse someone) and trade one wheel of cheese up into a piece of a fallen star.
+- **People to talk to**: every named villager has a talk menu with chat, gifts, rumors and quest topics. How you answer (kind, brave or silly) changes how they feel about you, and friendship hearts open up new lines, discounts and favors.
 - **Choices matter**: what you do with the High Priest, the lamp-maker who betrayed the village, the great wolf and the knight at the gate changes who helps you in the last fight and how the epilogue plays out. There are four endings, and one of them only opens up if you've been kind and paid attention to the old pages.
+- **Quest journal**: track up to three quests at once on screen, pick which one the compass follows, and read the full log of active and finished quests, people, secrets and collectibles.
+- **Three save slots**, each with its own chapter, playtime and level shown. Slots sync to the cloud when you're signed in.
+- **Music**: a synthesized score that changes with the place and the moment (each town, the wilds, night, houses, the inn, caves and puzzle rooms, combat, bosses, the final fight), with little stingers for new quests, secrets and level-ups. Nothing is downloaded; it's all generated in the browser.
 - **Normal Mode**: endless waves in the Proving Grounds, with a leaderboard.
 
 ## Controls
@@ -26,9 +31,13 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 | Q | Dragon Roar |
 | R | Healing draught |
 | E | Talk, open, rest |
-| M / Tab | Map, journal and fast travel |
+| M / Tab | Map and fast travel |
+| I | Quest journal |
+| T | Switch which tracked quest the compass follows |
+| N | Mute or unmute |
+| Esc / P | Pause and settings |
 
-Touch controls appear automatically on phones and tablets.
+Touch controls appear automatically on phones and tablets. In Settings you can pick a two-thumb layout (stick on the left, a thumb arc of buttons on the right) or a one-handed layout for either hand, turn on auto-attack, and resize the buttons.
 
 ## Accounts and cloud saves
 
