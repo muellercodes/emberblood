@@ -16042,7 +16042,7 @@ function foKobold(e,fl,kind){
   }
   if(stun){ wob=Math.sin(t*7)*0.24; lean=0.22; jaw=0.5; pull=-1.5; }
   // the war chief's moves
-  const ch={lH:null};
+  let bombUp=false;
   if(chief){
     lean=0.06*mv; jaw=0.35+0.15*Math.sin(t*2);
     if(st==='cleave'){ const p=foSm(clamp(1-e.st/0.45,0,1)); lean=-0.32*p; crouch=1.5*p; tailUp=p; jaw=0.3+0.7*p; }
@@ -16141,12 +16141,12 @@ function foKobold(e,fl,kind){
       else if(st==='spinW'){ const p=foSm(clamp(1-e.st/0.65,0,1)); H[0]=lerp(2,-2.5,p); H[1]=sd*lerp(6.8,10.5,p); H[2]=lerp(10.6,14.5,p); D[0]=lerp(0.75,-0.7,p); D[1]=sd*0.55*p; D[2]=lerp(-0.55,0,p); E[0]=0; E[1]=0; E[2]=1; }
       else if(spin){ H[0]=0.5; H[1]=sd*12; H[2]=14.6; D[0]=0.1; D[1]=sd; D[2]=0.05; E[0]=-sd*1; E[1]=0; E[2]=0.2; }
       else if(dz){ H[0]=1.5; H[1]=sd*7.4; H[2]=7.6+Math.sin(t*5+sd)*0.8; D[0]=0.2; D[1]=0; D[2]=-1; E[0]=1; E[1]=0; E[2]=0; }
-      else if(st==='bombs'&&sd<0){ const p=foSm(clamp(1-e.st/0.5,0,1)); H[0]=lerp(2,-3.4,p); H[1]=-lerp(6.8,6.4,p); H[2]=lerp(10.6,25,p); hold=false; ch.lH=1; }
+      else if(st==='bombs'&&sd<0){ const p=foSm(clamp(1-e.st/0.5,0,1)); H[0]=lerp(2,-3.4,p); H[1]=-lerp(6.8,6.4,p); H[2]=lerp(10.6,25,p); hold=false; bombUp=true; }
       else if(st==='recover'&&e._pst==='bombs'&&inS<0.4&&sd<0){ H[0]=10; H[1]=-4; H[2]=17; hold=false; }
       else if(stun){ H[2]=8.6; D[0]=0.3; D[2]=-0.95; }
       foL(0.4,sd*4.8,15.6,H[0],H[1],H[2],1.9,sk,1.6); foB(H[0],H[1],H[2],1.8,sk,0.03);
       if(hold){ foNorm(D); const dd=E[0]*D[0]+E[1]*D[1]+E[2]*D[2]; E[0]-=dd*D[0]; E[1]-=dd*D[1]; E[2]-=dd*D[2]; foNorm(E); foCleaver(H[0],H[1],H[2],D[0],D[1],D[2],E[0],E[1],E[2]); }
-      else if(ch.lH){ // a fizzing bomb held up and back
+      else if(bombUp){ // a fizzing bomb held up and back
         foB(H[0]-0.6,H[1],H[2]+2.4,2.7,'#2a2a32',0.04); foD(H[0]-1.6,H[1]-1,H[2]+3.6,0.7,'#8a8a96',0.06);
         foN(H[0]-0.6,H[1],H[2]+5,H[0]-1.6,H[1],H[2]+6.4,0.6,'#c8a060',0.05);
         const fz=0.6+0.4*Math.sin(t*40); foGlow(H[0]-1.6,H[1],H[2]+6.6,4*fz,'255,210,90',0.9); foD(H[0]-1.6,H[1],H[2]+6.6,0.8,'#fff4b0',0.07);
@@ -16566,10 +16566,10 @@ function foGust(e,fl){
   const g=foG(), dt=foDt(e), t=e.t||0, st=e.state, k=e.r/12, face=t3Turn(e,e.face,10), fx=e.x, fy=e.y+e.r*0.45;
   foSt(e);
   const ch=e.cheeks||0, blow=st==='blow', z=13+Math.sin(t*2.4)*3, pf=1+ch*0.22;
-  foShadow(fx,fy,11*k,0.2);
+  foShadow(fx,fy,11*k,0.32);
   foBegin(fx,fy,face,k,fl,z);
   foSet(FOB,0,blow?0.12:-0.05*ch,Math.sin(t*1.6)*0.08,0);
-  for(const q of FOGU){ const sc=q[4]?pf:1+ch*0.06; foB(q[0]*(q[4]?1+ch*0.15:1),q[1]*(q[4]?1+ch*0.2:1),q[2],q[3]*sc,fl?'#ffffff':q[2]>1?'#f6faff':q[2]<-1?'#b4c8e4':'#dae6f4'); }
+  for(const q of FOGU){ const sc=q[4]?pf:1+ch*0.06; foB(q[0]*(q[4]?1+ch*0.15:1),q[1]*(q[4]?1+ch*0.2:1),q[2],q[3]*sc,fl?'#ffffff':q[2]>1?'#f6faff':q[2]<-1?'#a4b8da':'#d4e2f4'); }
   // a curly tail of little puffs
   for(let i=1;i<=4;i++){ const a=t*3+i*0.9; foB(-6.4-i*2.2,Math.sin(a)*1.6*i/4+i*1.1,-1.4+Math.cos(a)*1.2,3.5-i*0.6,'#dce8f4'); }
   // face
