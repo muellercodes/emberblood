@@ -2710,7 +2710,7 @@ function lavaAt(x,y,rdd){ return lavaS(x,y,rdd)>0.5; }
 function bogS(x,y,rdd){ const n=fbm(x*0.0032+13,y*0.0032-7,3); return clamp((n-0.1)/0.08,0,1)*clamp((rdd-45)/40,0,1); }
 function T(x,y,o){
   o=o||SAMPLE;
-  o.out=(x<0||y<0||x>WORLD.w||y>WORLD.h)?1:0;
+  o.out=outOfMap(x,y,0)?1:0;
   biomeInfo(x,y,o);
   o.n=fbm(x*0.004,y*0.004,3);
   const rdd=segsDist(x,y,ROAD_SEGS); o.roadAng=lastSeg?lastSeg.ang:0; o.roadD=rdd;
@@ -2730,7 +2730,7 @@ function T(x,y,o){
 }
 function blockedAt(x,y){
   if(x>=IZX-50) return areaBlocked(x,y);
-  if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return true;
+  if(outOfMap(x,y,30)) return true;
   const rdd=segsDist(x,y,ROAD_SEGS);
   if(rdd<34) return false;
   if(x>6430&&x<6810&&Math.abs(y-7400)<26) return false;
@@ -2787,9 +2787,9 @@ function collideObs(e){
 function colAt(x,y,r){ let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)||c.noProj) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return hit; }
 function boundE(e){
   if(AREA&&e.x>=IZX-100){ const m=e.r+2; if(e.x<AREA.x0+m){e.x=AREA.x0+m;e.hitWall=true;} if(e.x>AREA.x1-m){e.x=AREA.x1-m;e.hitWall=true;} if(e.y<AREA.y0+m){e.y=AREA.y0+m;e.hitWall=true;} if(e.y>AREA.y1-m){e.y=AREA.y1-m;e.hitWall=true;} return; }
-  const m=e.r+30;
-  if(e.x<m){e.x=m;e.hitWall=true;} if(e.x>WORLD.w-m){e.x=WORLD.w-m;e.hitWall=true;}
-  if(e.y<m){e.y=m;e.hitWall=true;} if(e.y>WORLD.h-m){e.y=WORLD.h-m;e.hitWall=true;}
+  const m=e.r+30, M=mapOfY(e.y), y0=M.y0, y1=M.y0+M.h;
+  if(e.x<m){e.x=m;e.hitWall=true;} if(e.x>M.w-m){e.x=M.w-m;e.hitWall=true;}
+  if(e.y<y0+m){e.y=y0+m;e.hitWall=true;} if(e.y>y1-m){e.y=y1-m;e.hitWall=true;}
   if(G&&G.arena){ const A=G.arena, d=dist(e.x,e.y,A.x,A.y), lim=A.r-e.r; if(d>lim){ const a=angTo(A.x,A.y,e.x,e.y); e.x=A.x+Math.cos(a)*lim; e.y=A.y+Math.sin(a)*lim; e.hitWall=true; } }
 }
 // move with terrain blocking (water, lava) for walkers
@@ -2820,15 +2820,15 @@ function segInter(a,b){
   return {x:a.ax+a.dx*t,y:a.ay+a.dy*t};
 }
 function inClearing(x,y,extra){
-  const e=extra||0;
+  const e=extra||0, mk=mapAt(y);
   for(const k in POI){ const p=POI[k]; if(dist2(x,y,p.x,p.y)<(p.r+30+e)**2) return true; }
-  for(const s of SHRINES) if(dist2(x,y,s.x,s.y)<(90+e)**2) return true;
-  for(const c of CAMPS) if(dist2(x,y,c.x,c.y)<(140+e)**2) return true;
-  for(const c of CHESTS) if(dist2(x,y,c.x,c.y)<(40+e)**2) return true;
-  for(const l of LANDMARKS) if(dist2(x,y,l.x,l.y)<((l.k==='ribs'?150:l.k==='hotspring'?70:40)+e)**2) return true;
-  for(const m of CAVEMOUTHS) if(dist2(x,y,m.x,m.y)<(110+e)**2) return true;
-  for(const o of ORES) if(dist2(x,y,o.x,o.y)<(60+e)**2) return true;
-  for(const l of LILIES) if(dist2(x,y,l.x,l.y)<(30+e)**2) return true;
+  for(const s of mapList(SHRINES,mk)) if(dist2(x,y,s.x,s.y)<(90+e)**2) return true;
+  for(const c of mapList(CAMPS,mk)) if(dist2(x,y,c.x,c.y)<(140+e)**2) return true;
+  for(const c of mapList(CHESTS,mk)) if(dist2(x,y,c.x,c.y)<(40+e)**2) return true;
+  for(const l of mapList(LANDMARKS,mk)) if(dist2(x,y,l.x,l.y)<((l.clr||(l.k==='ribs'?150:l.k==='hotspring'?70:40))+e)**2) return true;
+  for(const m of mapList(CAVEMOUTHS,mk)) if(dist2(x,y,m.x,m.y)<(110+e)**2) return true;
+  for(const o of mapList(ORES,mk)) if(dist2(x,y,o.x,o.y)<(60+e)**2) return true;
+  for(const l of mapList(LILIES,mk)) if(dist2(x,y,l.x,l.y)<(30+e)**2) return true;
   return false;
 }
 function placeHouses(cx,cy,n,r0,r1,rng,avoid,roofs,list){
@@ -8937,7 +8937,7 @@ function updateCam(dt,snap){
   // little way along the way Ash walks
   if(aimMode==='mouse'&&!usingTouch&&scene==='play'&&(settings.mouseAim||padActive())){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
   else if(!snap){ const mv=scene==='play'&&player.moving&&!usingTouch, k=1-Math.exp(-dt*2.2); camLead.x+=((mv?Math.cos(player.facing)*34:0)-camLead.x)*k; camLead.y+=((mv?Math.sin(player.facing)*24:0)-camLead.y)*k; fx+=camLead.x; fy+=camLead.y; }
-  let tx=clamp(fx-vw/2,-200,WORLD.w-vw+200), ty=clamp(fy-vh/2,-200,WORLD.h-vh+200);
+  const CM=mapOfY(fy); let tx=clamp(fx-vw/2,-200,CM.w-vw+200), ty=clamp(fy-vh/2,CM.y0-200,CM.y0+CM.h-vh+200);
   if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
   if(snap){ cam.x=tx; cam.y=ty; return; }
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
@@ -9648,12 +9648,13 @@ function updatePlayer(dt,inp){
     [vx,vy]=movesAirVel(dt,inp); p.slowT=(p.slowT||0)-dt;
   }else{
     const here=T(p.x,p.y,PT); p.slowT=(p.slowT||0)-dt;
-    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1);
+    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1)*terrSpeed(here);
     const skim=p.onWater&&hasSkill('skimmer');
     if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55*(p.onWater?(skim?1.22:1.1):1); if(!skim){ p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); } }
     vx=inp.mx*spd; vy=inp.my*spd;
     // cave ice: Ash slides
     if(AREA&&AREA.cave&&AREA.cave.typ){ const c=AREA.cave, i=Math.floor((p.x-AREA.x0)/c.cell), j=Math.floor((p.y-AREA.y0)/c.cell); if(c.typ[j*c.w+i]===2){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else { p.ivx=vx; p.ivy=vy; } }
+    else if(!AREA&&here.ice>0.5){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else if(!AREA&&p.y>=BAND){ p.ivx=vx; p.ivy=vy; }
   }
   if(!air) movesTryJump(vx,vy,inp);
   for(const g of p.ghosts) g.a-=dt*3; if(p.ghosts.length) p.ghosts=p.ghosts.filter(g=>g.a>0);
@@ -9663,7 +9664,7 @@ function updatePlayer(dt,inp){
   collideObs(p); boundE(p); terrainFix(p,ox,oy);
   movesPost(dt,ox,oy,inp);
   if(G.noSwordT>0) G.noSwordT-=dt;
-  p.moving=moving&&!(p.z>0)&&!p.flying; if(p.moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if(PT.b===5&&PT.road<=0&&!p.onWater) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting&&!p.onWater) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
+  p.moving=moving&&!(p.z>0)&&!p.flying; if(p.moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if((PT.b===5||footKind(PT))&&PT.road<=0&&!p.onWater) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting&&!p.onWater) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
   // sword and the other weapons (switching, swings, the hammer, the bow and the boomerang): a6b_weapons.js
   updateWeapon(dt,inp);
   // breath
@@ -9945,7 +9946,7 @@ function segD(px,py,ax,ay,bx,by){ const dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy||1, t
 function wColAt(x,y,r){ let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)||c.noProj||c.low) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return hit; }
 function wWall(x,y){
   if(AREA) return areaBlocked(x,y)||wColAt(x,y,2);
-  if(x<20||y<20||x>WORLD.w-20||y>WORLD.h-20) return true;
+  if(outOfMap(x,y,20)) return true;
   return wColAt(x,y,2);
 }
 function inBreath(x,y,r){ const p=player; if(!p.breathing) return false; const f=p.facing; return inArcC(p.x+Math.cos(f)*16,p.y+Math.sin(f)*16,f,175,0.45,{x,y,r:r||4}); }
@@ -10899,7 +10900,7 @@ function landed(p,slam){
   if(slam) slamImpact(p);
 }
 function landBad(x,y){
-  if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return null;
+  if(outOfMap(x,y,30)) return null;
   if(!blockedAt(x,y)) return null;
   if(y<2850&&lavaAt(x,y,segsDist(x,y,ROAD_SEGS))) return 'lava';
   if(canWalkWater()) return null;
@@ -10941,7 +10942,7 @@ function lavaSpot(x,y){ return y<2850&&lavaAt(x,y,segsDist(x,y,ROAD_SEGS)); }
 function playerBlocked(x,y){
   const p=player;
   if(x>=IZX-50) return areaBlocked(x,y);
-  if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return true;
+  if(outOfMap(x,y,30)) return true;
   if(p&&(p.flying||(p.z||0)>0)) return false;      // water and lava never block in the air
   if(!blockedAt(x,y)) return false;
   if(!canWalkWater()) return true;
@@ -10950,7 +10951,7 @@ function playerBlocked(x,y){
 function landOK(x,y){
   if(x>=IZX-50){ if(areaBlocked(x,y)) return false; if(AREA&&AREA.tri&&AREA.cave){ const k=tCell(x,y); if(!(tGround(k)||(canWalkWater()&&tWet(k)))) return false; } }
   else{
-    if(x<40||y<40||x>WORLD.w-40||y>WORLD.h-40) return false;
+    if(outOfMap(x,y,40)) return false;
     if(Math.abs(y-WALL_Y)<70) return false;
     if(blockedAt(x,y)&&!(canWalkWater()&&!lavaSpot(x,y))) return false;
   }
@@ -11223,13 +11224,13 @@ function countType(t){ let n=0; for(const e of G.enemies) if(!e.dead&&e.type===t
 function freeSpot(x,y,r){ return !blockedAt(x,y)&&!colAt(x,y,r||20); }
 function spotNear(x,y,r0,r1,avoidPlayer){
   for(let i=0;i<30;i++){
-    const a=rand(0,TAU), r=rand(r0,r1), px=clamp(x+Math.cos(a)*r,60,WORLD.w-60), py=clamp(y+Math.sin(a)*r,60,WORLD.h-60);
+    const a=rand(0,TAU), r=rand(r0,r1), [px,py]=clampMap(x+Math.cos(a)*r,y+Math.sin(a)*r,60,y);
     if(G.arena&&dist(px,py,G.arena.x,G.arena.y)>G.arena.r-40) continue;
     if(avoidPlayer&&dist(px,py,player.x,player.y)<avoidPlayer) continue;
     if(!freeSpot(px,py)) continue;
     return {x:px,y:py};
   }
-  return {x:clamp(x,60,WORLD.w-60),y:clamp(y,60,WORLD.h-60)};
+  const [qx,qy]=clampMap(x,y,60); return {x:qx,y:qy};
 }
 function spawnRune(type,x,y,opt,delay){ G.hazards.push({kind:'spawn',x,y,t:0,delay:delay||0.85,type,opt:opt||{},big:EDEF[type].boss}); }
 function steer(e,tx,ty,spd){
@@ -11383,11 +11384,11 @@ function spawnCritters(){
   if(AREA) return;
   if(G.mode!=='story'||G.critters.length>=7||!isDay()) return;
   const p=player, a=rand(0,TAU), r=rand(650,1100), x=p.x+Math.cos(a)*r, y=p.y+Math.sin(a)*r;
-  if(x<100||y<100||x>WORLD.w-100||y>WORLD.h-100||y<WALL_Y+100) return;
-  const s=T(x,y,{}); if((s.b>1&&s.b!==5)||s.water||s.road>0||s.bog>0.2||inClearing(x,y)) return;
+  if(outOfMap(x,y,100)||y<WALL_Y+100) return;
+  const s=T(x,y,{}), ck=critterKinds(s.b); if(!ck||s.water||s.road>0||s.bog>0.2||inClearing(x,y)) return;
   if(!freeSpot(x,y)) return;
   const deer=Math.random()<0.55, n=deer?randi(2,4):randi(1,2);
-  for(let i=0;i<n;i++){ const sx=x+rand(-50,50), sy=y+rand(-50,50); if(!freeSpot(sx,sy)) continue; G.critters.push({type:deer?'deer':'rabbit',x:sx,y:sy,r:deer?12:5,face:rand(0,TAU),t:rand(0,9),wt:rand(0,3),dx:0,dy:0,flee:0,strafe:1,flying:false,antlers:Math.random()<0.4}); }
+  for(let i=0;i<n;i++){ const sx=x+rand(-50,50), sy=y+rand(-50,50); if(!freeSpot(sx,sy)) continue; G.critters.push({type:critterType(ck,deer),x:sx,y:sy,r:deer?12:5,face:rand(0,TAU),t:rand(0,9),wt:rand(0,3),dx:0,dy:0,flee:0,strafe:1,flying:false,antlers:Math.random()<0.4}); }
 }
 function updateBirds(dt){
   if(AREA){ G.birds=[]; return; }
@@ -11500,7 +11501,7 @@ AI.grizzlefang=(e,dt)=>{
     case 'dizzy': e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=rand(0.8,1.4); } break;
     case 'bombs':
       e.st-=dt;
-      if(e.st<=0){ const n=e.hp<e.maxHp*0.5?5:3; for(let i=0;i<n;i++){ const tx=clamp(p.x+rand(-90,90),30,WORLD.w-30), ty=clamp(p.y+rand(-90,90),30,WORLD.h-30); blast(tx,ty,55,0.9+i*0.15,ed(15),{lob:true,fx:e.x,fy:e.y}); } toRecover(e,0.6); }
+      if(e.st<=0){ const n=e.hp<e.maxHp*0.5?5:3; for(let i=0;i<n;i++){ const [tx,ty]=clampMap(p.x+rand(-90,90),p.y+rand(-90,90),30,p.y); blast(tx,ty,55,0.9+i*0.15,ed(15),{lob:true,fx:e.x,fy:e.y}); } toRecover(e,0.6); }
       break;
     case 'recover': steer(e,p.x,p.y,e.speed*0.3); e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=rand(0.9,1.6); } break;
     default: e.state='chase';
@@ -11638,7 +11639,7 @@ AI.gloamjaw=(e,dt)=>{
       if(!e.hitP){ const tx=e.x+Math.cos(e.face)*(e.r+e.tongue), ty=e.y+Math.sin(e.face)*(e.r+e.tongue); if(dist(tx,ty,p.x,p.y)<p.r+16){ if(hurtPlayer(ed(11),tx,ty,0)){ e.hitP=true; const pa=angTo(p.x,p.y,e.x,e.y); p.kvx+=Math.cos(pa)*620; p.kvy+=Math.sin(pa)*620; ftext(p.x,p.y-30,'Yoink!','#ff9ac0',14); } } }
       if(e.st<=0){ e.tongue=0; toRecover(e,0.5); }
       break; }
-    case 'spitW': e.face=turnTo(e.face,a,4*dt); e.st-=dt; if(e.st<=0){ const n=angry?5:3; for(let i=0;i<n;i++){ const tx=clamp(p.x+rand(-110,110),40,WORLD.w-40), ty=clamp(p.y+rand(-110,110),40,WORLD.h-40); blast(tx,ty,46,0.85+i*0.14,ed(10),{lob:true,fx:e.x,fy:e.y,toxic:true,pool:true}); } SFX.play('cast'); toRecover(e,0.5); } break;
+    case 'spitW': e.face=turnTo(e.face,a,4*dt); e.st-=dt; if(e.st<=0){ const n=angry?5:3; for(let i=0;i<n;i++){ const [tx,ty]=clampMap(p.x+rand(-110,110),p.y+rand(-110,110),40,p.y); blast(tx,ty,46,0.85+i*0.14,ed(10),{lob:true,fx:e.x,fy:e.y,toxic:true,pool:true}); } SFX.play('cast'); toRecover(e,0.5); } break;
     case 'diveDown': e.st-=dt; e.alpha=Math.max(0.12,e.st/0.5); e.sub=true; if(e.st<=0){ e.state='under'; e.st=angry?1.3:1.7; } break;
     case 'under':
       steer(e,p.x,p.y,angry?300:250); e.alpha=0.12; e.st-=dt;
@@ -12135,7 +12136,7 @@ function updateProjectiles(dt){
     if(Math.random()<0.7) emit(pr.x,pr.y,1,pr.kind==='ice'?{col:'200,230,255',smin:5,smax:30,lmin:.2,lmax:.35,zmin:2,zmax:4,grow:-4,drag:2}:pr.kind==='orb'?{col:'200,120,255',smin:5,smax:30,lmin:.2,lmax:.35,zmin:2,zmax:4,grow:-4,drag:2}:{kind:'fire',smin:5,smax:30,lmin:.2,lmax:.35,zmin:pr.r*0.4,zmax:pr.r*0.7,grow:-4,drag:2});
     if(pr.kind!=='wave'&&colAt(pr.x,pr.y,pr.r*0.5)){ pr.dead=true; smallBoom(pr.x,pr.y); }
     if(AREA&&AREA.kind==='cave'&&areaBlocked(pr.x,pr.y)){ pr.dead=true; smallBoom(pr.x,pr.y); }
-    if(!AREA&&(pr.x<-20||pr.y<-20||pr.x>WORLD.w+20||pr.y>WORLD.h+20)) pr.dead=true;
+    if(!AREA&&outOfMap(pr.x,pr.y,-20)) pr.dead=true;
     if(pr.dead) continue;
     if(pr.owner==='enemy'){
       if(!p.dead&&dist2(pr.x,pr.y,p.x,p.y)<(pr.r+p.r*0.8)**2){ HURT_SRC='proj'; const hit=hurtPlayer(pr.dmg,pr.x,pr.y,140); HURT_SRC=''; if(hit){ pr.dead=true; smallBoom(pr.x,pr.y); } }
@@ -12225,7 +12226,7 @@ function updatePickups(dt){
     const d=dist(k.x,k.y,p.x,p.y);
     if(d<120&&!p.dead){ const a=angTo(k.x,k.y,p.x,p.y), s=(1-d/120)*900*dt; k.vx+=Math.cos(a)*s; k.vy+=Math.sin(a)*s; }
     const f=Math.exp(-dt*3); k.vx*=f; k.vy*=f; k.x+=k.vx*dt; k.y+=k.vy*dt;
-    if(!AREA){ k.x=clamp(k.x,10,WORLD.w-10); k.y=clamp(k.y,10,WORLD.h-10); }
+    if(!AREA){ const q=clampMap(k.x,k.y,10); k.x=q[0]; k.y=q[1]; }
     if(k.coin&&d<p.r+12&&!p.dead){ k.life=0; addCoins(k.coin); continue; }
     if(d<p.r+10&&!p.dead){ k.life=0; heal(k.amt*G.diff.heal); SFX.play('pickup'); emit(k.x,k.y,10,{col:'140,255,150',smin:40,smax:140,lmin:.3,lmax:.5,zmin:1.5,zmax:3}); }
   }
@@ -12310,7 +12311,7 @@ function ambientEmit(dt){
   for(const r of G.ripples) r.t+=dt;
   if(G.ripples.length) G.ripples=G.ripples.filter(r=>r.t<r.max);
   // smoke from chimneys and vents
-  for(const h of HOUSES){ if(h.chim&&inView(h.x,h.y,200)&&Math.random()<dt*(h.burnt?6:2)) emit(h.chim[0],h.chim[1],1,{alpha:0.45,col:h.burnt?'50,45,42':'160,160,160',glow:false,ang:-Math.PI/2+0.4,spread:0.3,smin:15,smax:35,lmin:2,lmax:3.5,zmin:4,zmax:7,grow:9,drag:0.3}); }
+  for(const h of mapList(HOUSES,curMap())){ if(h.chim&&inView(h.x,h.y,200)&&Math.random()<dt*(h.burnt?6:2)) emit(h.chim[0],h.chim[1],1,{alpha:0.45,col:h.burnt?'50,45,42':'160,160,160',glow:false,ang:-Math.PI/2+0.4,spread:0.3,smin:15,smax:35,lmin:2,lmax:3.5,zmin:4,zmax:7,grow:9,drag:0.3}); }
 }
 
 // ================= run state
@@ -12389,13 +12390,13 @@ function spawnGroup(units,cx,cy,opt){
 }
 function updateCamps(){
   if(AREA) return;
-  for(const c of CAMPS){
+  for(const c of mapList(CAMPS,curMap())){
     const st=G.campState[c.id]||(G.campState[c.id]={id:c.id,active:false,alive:0});
     const d=dist(player.x,player.y,c.x,c.y);
     if(!st.active&&d<1500&&d>420){
       const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue;
       const lvl=regionAt(c.x,c.y).level;
-      st.alive=spawnGroup(c.units,c.x,c.y,{level:lvl,aggro:false,camp:st,homeX:c.x,homeY:c.y,elite:undefined,snowy:biomeInfo(c.x,c.y,{}).b===5});
+      st.alive=spawnGroup(c.units,c.x,c.y,{level:lvl,aggro:false,camp:st,homeX:c.x,homeY:c.y,elite:undefined,snowy:snowyAt(c.x,c.y)});
       st.active=true;
     }else if(st.active&&d>2700){
       for(const e of G.enemies) if(e.camp===st) e.dead=true;
@@ -13399,17 +13400,18 @@ function updateInteractions(dt){
     for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
     const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
   }else{
-    for(const s of SHRINES){
+    const mk=curMap();
+    for(const s of mapList(SHRINES,mk)){
       const d=dist(p.x,p.y,s.x,s.y);
       if(!G.shrines[s.id]&&d<260){ G.shrines[s.id]=true; SFX.play('shrine'); setBanner('Shrine found',s.name,2.4); fogReveal(s.x,s.y,900); }
       if(d<64) offer(d,`Rest at ${s.name}`,()=>restAtShrine(s),s.x,s.y);
     }
-    for(const c of CHESTS) if(!c.open){ const d=dist(p.x,p.y,c.x,c.y); if(d<48) offer(d,'Open the chest',()=>openChest(c),c.x,c.y,true); }
+    for(const c of mapList(CHESTS,mk)) if(!c.open){ const d=dist(p.x,p.y,c.x,c.y); if(d<48) offer(d,'Open the chest',()=>openChest(c),c.x,c.y,true); }
     for(const n of G.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<70) offer(d,`Talk to ${n.name.replace(', your mom','')}`,()=>talkTo(n),n.x,n.y); }
-    for(const o of ORES) if(!G.ores[o.id]){ const d=dist(p.x,p.y,o.x,o.y); if(d<60) offer(d,'Chip out the star-iron',()=>mineOre(o),o.x,o.y,true); }
-    for(const l of LILIES) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
-    for(const o of LANDMARKS){ if(!o.prompt||(o.hidden&&o.hidden())) continue; if(o.k==='kettle'&&G.items.kettle) continue; const d=dist(p.x,p.y,o.x,o.y); if(d<(o.r||20)+46) offer(d,o.prompt,()=>lmAct(o),o.x,o.y,o.k==='kettle'); }
-    for(const dr of DOORS){ const d=dist(p.x,p.y,dr.x,dr.y); if(d<46) offer(d-6,dr.label,()=>enterArea(dr.area,dr),dr.x,dr.y); }
+    for(const o of mapList(ORES,mk)) if(!G.ores[o.id]){ const d=dist(p.x,p.y,o.x,o.y); if(d<60) offer(d,'Chip out the star-iron',()=>mineOre(o),o.x,o.y,true); }
+    for(const l of mapList(LILIES,mk)) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
+    for(const o of mapList(LANDMARKS,mk)){ if(!o.prompt||(o.hidden&&o.hidden())) continue; if(o.k==='kettle'&&G.items.kettle) continue; const d=dist(p.x,p.y,o.x,o.y); if(d<(o.r||20)+46) offer(d,o.prompt,()=>lmAct(o),o.x,o.y,o.k==='kettle'); }
+    for(const dr of mapList(DOORS,mk)){ const d=dist(p.x,p.y,dr.x,dr.y); if(d<46) offer(d-6,dr.label,()=>enterArea(dr.area,dr),dr.x,dr.y); }
     miniPrompts(offer);
     if(G.goat&&G.side.duchess!=='home'&&G.side.duchess!=='follow'){ const d=dist(p.x,p.y,G.goat.x,G.goat.y); if(d<70) offer(d,'Talk to the goat',talkGoat,G.goat.x,G.goat.y); }
   }
@@ -16081,7 +16083,7 @@ function evLevel(x,y){ return Math.max(1,(regionAt(x,y)||{}).level||1); }
 // a spot near Ash for an event (ahead of him, so he sees it): free of colliders, water, towns, camps and other things
 function evFree(x,y,r,o){
   o=o||{};
-  if(x<220||y<220||x>WORLD.w-220||y>WORLD.h-220) return false;
+  if(outOfMap(x,y,220)) return false;
   if(!o.north&&y<WALL_Y+160) return false;
   if(!freeSpot(x,y,r)) return false;
   const s=T(x,y,{}); if(s.water||s.lava||s.bog>0.25||s.bridge) return false;
@@ -21796,7 +21798,7 @@ function render(){
   if(!inA&&D3.on){ if(!DSKIP.shadow) shadowLayer(sun,props); }
   else if(!inA){
     for(const p of props){ if(p.taken) continue; const tall=TALL.has(p.k), k=tall?1.6:0.5, R=tall?p.R*1.05:p.R*0.9; ctx.globalAlpha=sun.a*(tall?1:0.8); ctx.drawImage(SPR.shadow,p.x+sun.dx*k-R,p.y+sun.dy*k-R*0.85,R*2,R*1.7); }
-    for(const h of HOUSES) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
+    for(const h of mapList(HOUSES,curMap())) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
   }
   ctx.globalAlpha=sun.a*0.9;
   const ent=[player,...G.enemies.filter(e=>!e.dead&&!e.frozen&&e.type!=='vorlaxis'&&e.alpha>0.2),...npcs.filter(n=>inView(n.x,n.y,60)),...G.critters];
@@ -21806,17 +21808,17 @@ function render(){
   if(inA){ for(const o of AREA.objs) if(inView(o.x,o.y,(o.w||40)+30)) drawFurn(o,t); }
   else{
     for(const p of props){ if(TALL.has(p.k)||p.taken) continue; const sp=propSprite(p); drawSprite(sp,p.x,p.y,p.s,p.k==='herb'?0:p.rot*0.3); if(p.k==='vent'&&Math.random()<0.15) emit(p.x,p.y,1,{col:'70,62,60',glow:false,ang:-Math.PI/2,spread:0.5,smin:15,smax:40,lmin:1.2,lmax:2,zmin:4,zmax:8,grow:10,drag:0.5}); if(p.k==='herb'){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.25+0.15*Math.sin(t*3+p.ph); ctx.drawImage(SPR.shadow,p.x-10,p.y-10,20,20); ctx.restore(); } }
-    for(const s of STRUCTS){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue;
+    const mk=curMap(); for(const s of mapList(STRUCTS,mk)){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue;
       if(D3.on&&s.k==='stone'){ drawStoneLean(s,t); continue; }
       const lf=D3.on?LEAN_S[s.k]:0; if(lf) leanOn(s.x,leanBase(s),lf);
       if(s.k==='cavemouth') drawCaveMouth(s,t); else if(s.k==='column') drawColumn(s); else if(s.k==='glowshroom') drawGlowShroom(s,t); else drawStruct(s,t);
       if(lf) leanOff(); }
-    for(const d of DOORS) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
-    for(const o of LANDMARKS) if(inView(o.x,o.y,160)){ const lf=D3.on?LEAN_S[o.k]:0; if(lf) leanOn(o.x,o.y,lf); drawLandmark(o,t); if(lf) leanOff(); }
+    for(const d of mapList(DOORS,mk)) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
+    for(const o of mapList(LANDMARKS,mk)) if(inView(o.x,o.y,160)){ const lf=D3.on?LEAN_S[o.k]:0; if(lf) leanOn(o.x,o.y,lf); drawLandmark(o,t); if(lf) leanOff(); }
     if(G.mini) drawMiniWorld(t);
     drawWall();
-    for(const c of CHESTS) if(inView(c.x,c.y,40)) drawChest(c,t);
-    for(const l of LILIES) if(inView(l.x,l.y,40)) drawLily(l,t);
+    for(const c of mapList(CHESTS,mk)) if(inView(c.x,c.y,40)) drawChest(c,t);
+    for(const l of mapList(LILIES,mk)) if(inView(l.x,l.y,40)) drawLily(l,t);
   }
   for(const e of G.enemies) if(!e.dead&&!e.frozen) drawTele(e);
   drawPickups();
@@ -21946,12 +21948,12 @@ window.__ebX=Object.assign(window.__ebX||{},{occ(on){ if(on!=null) OCC_ON=!!on; 
     return true; }});
 function drawLights(){
   const dl=daylight(), inA=!!AREA, rk=inA?0:G.rainK*(player.y>WALL_Y?1:0), cinder=!inA&&player.y<2700;
-  let dk=(1-dl)*0.46+rk*0.06; if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;
+  let dk=(1-dl)*0.46+rk*0.06+mapNight(); if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;
   if(cinder) dk=Math.max(0,dk-0.12);
   if(inA) dk=AREA.kind==='cave'?AREA.dark:AREA.dark+(1-dl)*0.3;
   const lw=lightCvs.width, lh=lightCvs.height, s=zoom*0.5, t=G.time;
   const lightList=[];
-  const src=inA?AREA.lights:LIGHTS;
+  const src=inA?AREA.lights:mapList(LIGHTS,curMap());
   for(const L of src){ if(L.night&&dl>0.6) continue; if(L.i<=0.01) continue; if(!inView(L.x,L.y,L.r)) continue; const fl=L.fire?1+0.06*Math.sin(t*9+L.x)+0.04*Math.sin(t*23+L.y):1; if(L.shrine&&!G.shrines[L.shrine.id]) continue; lightList.push([L.x,L.y,L.r*fl,L.i,L.fire]); }
   if(dk>0.02){
     lctx.setTransform(1,0,0,1,0,0); lctx.globalCompositeOperation='source-over'; lctx.clearRect(0,0,lw,lh);
@@ -21966,7 +21968,7 @@ function drawLights(){
     for(const pl of G.pools) Lt(pl.x,pl.y,pl.r*2.4,0.6);
     for(const e of G.enemies){ if(e.dead||e.frozen) continue; if(e.type==='vorlaxis'){ if(e.alpha>0.2){ Lt(e.x,e.y,260,0.5); if(e.mouthGlow>0) Lt(e.mouthX,e.mouthY,320,0.9); } } else if(e.burnT>0) Lt(e.x,e.y,70,0.5); else if(e.state==='cast'||e.state==='breath') Lt(e.x,e.y,90,0.5); }
     for(const h of G.hazards) if(h.kind==='blast'||h.big) Lt(h.x,h.y,(h.r||60)*1.5,0.4);
-    if(!inA&&player.y<3300){ lctx.globalAlpha=0.85; for(let cx=Math.floor(cam.x/CH);cx<=Math.floor((cam.x+W/zoom)/CH);cx++) for(let cy=Math.floor(cam.y/CH);cy<=Math.floor((cam.y+H/zoom)/CH);cy++){ const ch=CHUNKS.get(ckey(cx,cy)); if(ch&&ch.glow) lctx.drawImage(ch.glow,(cx*CH-cam.x)*s-20*s,(cy*CH-cam.y)*s-20*s,(CH+40)*s,(CH+40)*s); } lctx.globalAlpha=1; }
+    if(!inA&&(player.y<3300||mapLavaGlow())){ lctx.globalAlpha=0.85; for(let cx=Math.floor(cam.x/CH);cx<=Math.floor((cam.x+W/zoom)/CH);cx++) for(let cy=Math.floor(cam.y/CH);cy<=Math.floor((cam.y+H/zoom)/CH);cy++){ const ch=CHUNKS.get(ckey(cx,cy)); if(ch&&ch.glow) lctx.drawImage(ch.glow,(cx*CH-cam.x)*s-20*s,(cy*CH-cam.y)*s-20*s,(CH+40)*s,(CH+40)*s); } lctx.globalAlpha=1; }
     lctx.globalCompositeOperation='source-over';
     ctx.drawImage(lightCvs,0,0,cvs.width,cvs.height);
   }
@@ -21987,8 +21989,8 @@ function drawRain(){
 const FLAKES=[]; for(let i=0;i<160;i++) FLAKES.push({x:Math.random(),y:Math.random(),s:0.6+Math.random()*1.8,v:0.4+Math.random()*0.8,ph:Math.random()*TAU});
 let snowK=0, mistK=0;
 function drawSnowMist(){
-  const b=G.region?G.region.key:'', snowy=b==='b5'||b==='frost'||b==='farm', misty=b==='b6'||b==='mire'||b==='mosshut';
-  snowK+=((snowy?1:0)-snowK)*0.02; mistK+=((misty?1:0)-mistK)*0.02;
+  const b=G.region?G.region.key:'', am=ambHere(), snowy=b==='b5'||b==='frost'||b==='farm'?1:am?am.snow||0:0, misty=b==='b6'||b==='mire'||b==='mosshut'?1:am?am.mist||0:0;
+  snowK+=(snowy-snowK)*0.02; mistK+=(misty-mistK)*0.02;
   if(snowK>0.02){
     ctx.fillStyle=`rgba(245,248,252,${0.75*snowK})`; const t=G.time;
     for(const f of FLAKES){ const x=((f.x*W+Math.sin(t*f.v+f.ph)*30-cam.x*zoom*0.15)%W+W)%W, y=((f.y*H+t*40*f.v-cam.y*zoom*0.15)%H+H)%H; ctx.fillRect(x,y,f.s*1.4,f.s*1.4); }
@@ -22196,7 +22198,8 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     T(0,0); g.globalAlpha=0.9; g.drawImage(SH,b.x-40,b.y-24,80,48); }
   // houses: the footprint pushed along the sun (a box of the house height), softened by the low resolution
   T(0,0); g.globalAlpha=1; g.fillStyle='#000';
-  for(const h of HOUSES){
+  const mk=curMap();
+  for(const h of mapList(HOUSES,mk)){
     if(!inR(h.x,h.y,h.w+120)) continue;
     const hh=(h.k==='library'?62:h.k==='forge'?54:h.vert?58:48), dx=ux*hh, dy=uy*hh, X0=h.x-h.w/2-2, X1=h.x+h.w/2+2, Y0=h.y-h.h/2, Y1=h.y+h.h/2+3;
     const P=hull([[X0,Y0],[X1,Y0],[X1,Y1],[X0,Y1],[X0+dx,Y0+dy],[X1+dx,Y0+dy],[X1+dx,Y1+dy],[X0+dx,Y1+dy]]); mark(Math.min(X0,X0+dx)-20,Math.min(Y0,Y0+dy)-8,Math.max(X1,X1+dx)+20,Math.max(Y1,Y1+dy)+20);
@@ -22205,13 +22208,13 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
   }
   // posts, lanterns, standing stones, columns, statues
   g.lineWidth=4; g.beginPath();
-  for(const s of STRUCTS){
+  for(const s of mapList(STRUCTS,mk)){
     if(!inR(s.x,s.y,80)) continue;
     if(s.k==='torch'){ g.moveTo(s.x,s.y+2); g.lineTo(s.x+ux*30,s.y+2+uy*30); }
     else if(s.k==='lantern'){ g.moveTo(s.x,s.y+12); g.lineTo(s.x+ux*16,s.y+12+uy*16); }
   }
   g.stroke();
-  for(const s of STRUCTS){
+  for(const s of mapList(STRUCTS,mk)){
     if(!inR(s.x,s.y,80)) continue;
     if(s.k==='torch'||s.k==='lantern'||s.k==='stone'||s.k==='column'||s.k==='pillar'||s.k==='ward') markS(s.x,s.y,40,56);
     if(s.k==='torch'){ g.drawImage(SH,s.x+ux*30-8,s.y+uy*30-6,16,12); g.drawImage(SH,s.x-7,s.y-2,14,8); }
@@ -22220,7 +22223,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     else if(s.k==='column'){ const k=s.s||1, h=(s.broken?24:54)*k; g.beginPath(); g.moveTo(s.x,s.y); g.lineTo(s.x+ux*h,s.y+uy*h); g.lineWidth=28*k; g.stroke(); g.lineWidth=4; }
     else if(s.k==='pillar'||s.k==='ward'){ g.drawImage(SH,s.x+ux*14-34,s.y+uy*14-30,68,60); }
   }
-  for(const o of LANDMARKS){
+  for(const o of mapList(LANDMARKS,mk)){
     if(!inR(o.x,o.y,90)) continue;
     const h=o.k==='statue'?90:o.k==='facetree'?110:o.k==='scarecrow'?44:o.k==='snowman'?40:o.k==='grave'||o.k==='sign'?24:0;
     if(!h) continue;
@@ -22531,12 +22534,12 @@ function drawMinimap(obj){
     if(AREA.mini){ const c=AREA.cave, k=c.cell; ctx.imageSmoothingEnabled=false; ctx.drawImage(AREA.mini,cx+(AREA.x0-p.x)*sc,cy+(AREA.y0-p.y)*sc,c.w*k*sc,c.h*k*sc); }
     else { ctx.fillStyle='#5a3e28'; const [x,y]=toM(AREA.rx,AREA.ry); ctx.fillRect(x,y,AREA.rw*sc,AREA.rh*sc); }
     const [ex,ey]=toM(AREA.exit.x,AREA.exit.y); ctx.fillStyle='#8fe08a'; ctx.beginPath(); ctx.arc(ex,ey,4,0,TAU); ctx.fill();
-  } else if(OV.cv){ const ow=span*2/OV.s; ctx.imageSmoothingEnabled=true; ctx.drawImage(OV.cv,p.x/OV.s-ow/2,p.y/OV.s-ow/2,ow,ow,cx-r,cy-r,r*2,r*2); }
-  if(G.mode==='story'){
-    for(const s of SHRINES){ const [x,y]=toM(s.x,s.y); ctx.fillStyle=G.shrines[s.id]?'#7fd0ff':'#6b6f7a'; ctx.beginPath(); ctx.arc(x,y,3,0,TAU); ctx.fill(); }
-    for(const c of CHESTS) if(!c.open&&dist2(c.x,c.y,p.x,p.y)<700*700){ const [x,y]=toM(c.x,c.y); ctx.fillStyle='#ffd27a'; ctx.fillRect(x-2,y-1.5,4,3); }
+  } else { const O=ovOf(curMap()); if(O.cv){ const ow=span*2/O.s; ctx.imageSmoothingEnabled=true; ctx.drawImage(O.cv,p.x/O.s-ow/2,(p.y-O.y0)/O.s-ow/2,ow,ow,cx-r,cy-r,r*2,r*2); } }
+  if(G.mode==='story'){ const mk=curMap();
+    for(const s of mapList(SHRINES,mk)){ const [x,y]=toM(s.x,s.y); ctx.fillStyle=G.shrines[s.id]?'#7fd0ff':'#6b6f7a'; ctx.beginPath(); ctx.arc(x,y,3,0,TAU); ctx.fill(); }
+    for(const c of mapList(CHESTS,mk)) if(!c.open&&dist2(c.x,c.y,p.x,p.y)<700*700){ const [x,y]=toM(c.x,c.y); ctx.fillStyle='#ffd27a'; ctx.fillRect(x-2,y-1.5,4,3); }
     if(!AREA){ for(const n of G.npcs){ const m=npcMarker(n.id); if(!m||m==='…'||m==='✉'||dist2(n.x,n.y,p.x,p.y)>span*span) continue; const [x,y]=toM(n.x,n.y); ctx.fillStyle=m==='!'?'#ffcf4a':'#7fe0ff'; ctx.font=`900 10px ${UIF}`; ctx.textAlign='center'; ctx.fillText(m,x,y); }
-      for(const m of CAVEMOUTHS){ if(dist2(m.x,m.y,p.x,p.y)>span*span) continue; const [x,y]=toM(m.x,m.y); ctx.fillStyle='#1a1410'; ctx.strokeStyle='#c8b8a0'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(x,y,3.5,Math.PI,TAU); ctx.lineTo(x+3.5,y+2); ctx.lineTo(x-3.5,y+2); ctx.closePath(); ctx.fill(); ctx.stroke(); } }
+      for(const m of mapList(CAVEMOUTHS,mk)){ if(dist2(m.x,m.y,p.x,p.y)>span*span) continue; const [x,y]=toM(m.x,m.y); ctx.fillStyle='#1a1410'; ctx.strokeStyle='#c8b8a0'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(x,y,3.5,Math.PI,TAU); ctx.lineTo(x+3.5,y+2); ctx.lineTo(x-3.5,y+2); ctx.closePath(); ctx.fill(); ctx.stroke(); } }
     if(!AREA) for(const q of questTargets()){ let [x,y]=toM(q.x,q.y); const d=dist(x,y,cx,cy); if(d>r-6){ const a=Math.atan2(y-cy,x-cx); x=cx+Math.cos(a)*(r-6); y=cy+Math.sin(a)*(r-6); } ctx.save(); ctx.translate(x,y); ctx.rotate(Math.PI/4); ctx.fillStyle='#7fe0ff'; ctx.strokeStyle='#08303a'; ctx.lineWidth=1.2; ctx.fillRect(-3,-3,6,6); ctx.strokeRect(-3,-3,6,6); ctx.restore(); }
   }
   for(const e of G.enemies) if(!e.dead&&!e.frozen&&(e.aggro||e.boss)&&dist2(e.x,e.y,p.x,p.y)<span*span){ const [x,y]=toM(e.x,e.y); ctx.fillStyle=e.boss?'#ff9a3a':'#ff5a40'; ctx.beginPath(); ctx.arc(x,y,e.boss?3.5:2,0,TAU); ctx.fill(); }
@@ -24546,6 +24549,1034 @@ function logJourWire(el){
 window.__ebX=Object.assign(window.__ebX||{},{openLog,closeLog,logAdd,logFilter:f=>logSetFilter(f),
   log:()=>LOG.items.map(e=>({k:e.k,who:e.who,text:e.text,sub:e.sub,n:e.n,sk:e.sk})), logOpen:()=>LOG.open, logClear(){ LOG.items.length=0; LOG.cur=null; }});
 
+// ================= v9 multi-map engine (wave 1): maps, bounds, per-map fog and overview, towns, crossings, saves
+// Map k is a y band: x in [0,w], y in [k*BAND, k*BAND+h]. Embermere is map 0 and keeps its own terrain code in
+// a2_world.js; maps 1 and up are sampled by e2_terrain.js from the `terrain` data of their definition.
+// Interiors, caves and dungeons stay at x >= IZX-50 and belong to no map. Everything uses ABSOLUTE coordinates.
+// See scratchpad/MAPS.md for the API with examples and a step by step guide for building a map.
+const BAND=20000;
+const MAPS=[];
+// runtime state: the map Ash was on last frame, debug switches
+const MAPST={cur:0,debug:false,built:false,frame:0};
+MAPS[0]={k:0,id:'embermere',name:'Embermere',y0:0,w:14000,h:11000,ov:OV,builtin:true,music:'meadow',ambient:{}};
+OV.y0=0; OV.k=0;
+// defineMap(k,def): def {id,name,w,h,terrain:{...},ambient:{...},music,sky?,onEnter?(fromK),build?(B),crossings?:[...],
+//   spawn?:{x,y},chests?:n,placeholder?}. A later call replaces the whole definition (its overview and fog stay).
+// Map 0 (Embermere) only takes the non-terrain fields (name, ambient, music, sky, onEnter, build, crossings).
+function defineMap(k,def){
+  def=def||{};
+  if(k===0){ const M=MAPS[0]; for(const f of ['name','ambient','music','sky','onEnter','build','crossings','spawn']) if(def[f]!==undefined) M[f]=def[f]; return M; }
+  const old=MAPS[k]||{};
+  const M=Object.assign({ambient:{},music:'meadow',w:14000,h:11000},def,{k,y0:k*BAND,ov:old.ov||null,fogBits:old.fogBits||null,fogV:null,tz:null,fit:null});
+  if(old.ov&&(old.ov.w!==Math.ceil(M.w/25)||old.ov.h!==Math.ceil(M.h/25))) M.ov=null;
+  if(old.fogBits&&(old.fw!==Math.ceil(M.w/100)||old.fh!==Math.ceil(M.h/100))) M.fogBits=null; else { M.fw=old.fw; M.fh=old.fh; }
+  MAPS[k]=M;
+  for(let i=0;i<k;i++) if(!MAPS[i]) MAPS[i]=null;
+  return M;
+}
+// ---------- bounds
+// the map index for an outdoor y: the band it is in, and in a gap the nearer of the two maps
+function mapAt(y){ const k=Math.floor((y+4500)/BAND); return k>0?(k<MAPS.length?k:MAPS.length-1):0; }
+function mapOfY(y){ return MAPS[mapAt(y)]||MAPS[0]; }
+// the map of a world object (-1 for anything inside an area)
+function itemMap(o){ return o.x>=IZX-50?-1:typeof o.y==='number'?mapAt(o.y):0; }
+// the map Ash is on (inside an area: the map of the door he came in by)
+function curMap(){
+  if(!player) return 0;
+  if(AREA||player.x>=IZX-50){ const o=G&&G.ow; return o?mapAt(o.y):MAPST.cur; }
+  return mapAt(player.y);
+}
+// true within m px of the edge of the map, outside it, or in a gap between maps (m may be negative)
+function outOfMap(x,y,m){ const M=MAPS[mapAt(y)]; return !M||x<m||y<M.y0+m||x>M.w-m||y>M.y0+M.h-m; }
+// clamp a point into its map with a margin m; refY picks the map (for example the y of the thrower)
+function clampMap(x,y,m,refY){ const M=MAPS[mapAt(refY==null?y:refY)]||MAPS[0]; return [x<m?m:x>M.w-m?M.w-m:x,y<M.y0+m?M.y0+m:y>M.y0+M.h-m?M.y0+M.h-m:y]; }
+// ---------- per-map views of the global arrays, so loops can skip other maps cheaply
+// mapList(arr,k) returns the items of arr on map k (rebuilt when the array grows, shrinks or its last item changes)
+const ML=new Map(), ML_EMPTY=[];
+function mapList(arr,k){
+  let c=ML.get(arr); const n=arr.length;
+  if(!c||c.n!==n||c.last!==arr[n-1]){
+    c={n,last:arr[n-1],l:[]};
+    for(let i=0;i<n;i++){ const o=arr[i], m=itemMap(o); if(m<0) continue; (c.l[m]||(c.l[m]=[])).push(o); }
+    ML.set(arr,c);
+  }
+  return c.l[k]||ML_EMPTY;
+}
+function mapListsReset(){ ML.clear(); }
+
+// ---------- fog of war per map (map 0 keeps FOG from a4_ground.js; other maps get their own grid of 100 px cells)
+const FOGV0={bits:null,w:FOG.w,h:FOG.h,cs:FOG.cs,y0:0};
+function fogOf(k){
+  if(!k){ FOGV0.bits=FOG.bits; return FOGV0; }
+  const M=MAPS[k]; if(!M) return null;
+  if(!M.fogBits){ M.fw=Math.ceil(M.w/100); M.fh=Math.ceil(M.h/100); M.fogBits=new Uint8Array(M.fw*M.fh); M.fogV=null; }
+  if(!M.fogV) M.fogV={bits:M.fogBits,w:M.fw,h:M.fh,cs:100,y0:M.y0};
+  return M.fogV;
+}
+function fogSeen(k,x,y){ const F=fogOf(k); if(!F||!F.bits) return 0; return F.bits[clamp(Math.floor((y-F.y0)/F.cs),0,F.h-1)*F.w+clamp(Math.floor(x/F.cs),0,F.w-1)]; }
+// saves: 8 cells to a byte, then runs of equal bytes as (count,byte) pairs when that is shorter ('r64:'), else the
+// bytes as they are ('b64:'), in base64. Old saves hold a '0'/'1' string for map 0, which still loads.
+function fogPack(bits){
+  const n=(bits.length+7)>>3, b=new Uint8Array(n); for(let i=0;i<bits.length;i++) if(bits[i]) b[i>>3]|=1<<(i&7);
+  const r=[]; for(let i=0;i<n;){ const v=b[i]; let j=i+1; while(j<n&&b[j]===v&&j-i<255) j++; r.push(j-i,v); i=j; }
+  const L=r.length<n?r:b; let s=''; for(let i=0;i<L.length;i++) s+=String.fromCharCode(L[i]);
+  return (L===r?'r64:':'b64:')+btoa(s);
+}
+function fogUnpack(str,bits){
+  str=String(str); let s=''; try{ s=atob(str.slice(4)); }catch(e){ s=''; }
+  if(str.startsWith('r64:')){ let o=''; for(let i=0;i+1<s.length;i+=2) o+=s[i+1].repeat(s.charCodeAt(i)); s=o; }
+  for(let i=0;i<bits.length;i++) bits[i]=((s.charCodeAt(i>>3)||0)>>(i&7))&1;
+}
+const fogPacked=s=>typeof s==='string'&&(s.startsWith('b64:')||s.startsWith('r64:'));
+{ const base=fogInit; fogInit=function(str){
+  for(const M of MAPS) if(M&&M.k>0&&M.fogBits) M.fogBits.fill(0);
+  if(fogPacked(str)){ base(''); fogUnpack(str,FOG.bits); } else base(str);
+}; }
+{ const base=fogReveal; fogReveal=function(x,y,r){
+  if(x>=IZX-50) return;
+  const k=mapAt(y); if(!k) return base(x,y,r);
+  const F=fogOf(k); if(!F) return; const ly=y-F.y0, cs=F.cs;
+  const c0=Math.max(0,Math.floor((x-r)/cs)), c1=Math.min(F.w-1,Math.floor((x+r)/cs)), r0=Math.max(0,Math.floor((ly-r)/cs)), r1=Math.min(F.h-1,Math.floor((ly+r)/cs));
+  for(let cx=c0;cx<=c1;cx++) for(let cy=r0;cy<=r1;cy++){ if(dist2((cx+0.5)*cs,(cy+0.5)*cs,x,ly)<r*r) F.bits[cy*F.w+cx]=1; }
+}; }
+{ const base=fogStr; fogStr=function(){ return FOG.bits?fogPack(FOG.bits):base(); }; }
+
+// ---------- overview image per map (1 px per 25 world px), built a few rows a frame, only for the map in use
+function ovOf(k){
+  if(!k) return OV;
+  const M=MAPS[k]; if(!M) return OV;
+  if(!M.ov) M.ov={s:25,w:Math.ceil(M.w/25),h:Math.ceil(M.h/25),cv:null,g:null,img:null,row:0,done:false,y0:M.y0,k};
+  return M.ov;
+}
+function ovStepMap(O,rows){
+  if(O.done) return;
+  if(!O.cv){ O.cv=mkCanvas(O.w,O.h); O.g=O.cv.getContext('2d'); O.img=O.g.createImageData(O.w,O.h); }
+  const s={}, d=O.img.data;
+  for(let n=0;n<rows&&O.row<O.h;n++,O.row++){
+    const j=O.row;
+    for(let i=0;i<O.w;i++){
+      const x=(i+0.5)*O.s, y=O.y0+(j+0.5)*O.s; T(x,y,s);
+      let c=groundRGB(s,x,y);
+      if(s.road>0.3) c=mixRGB(c,[200,170,120],0.55);
+      if(s.bridge===1) c=[120,90,60];
+      if(s.bog>0.5) c=mixRGB(c,[40,52,36],0.4);
+      const k=(j*O.w+i)*4; d[k]=c[0]; d[k+1]=c[1]; d[k+2]=c[2]; d[k+3]=255;
+    }
+  }
+  O.g.putImageData(O.img,0,0);
+  if(O.row>=O.h) O.done=true;
+}
+{ const base=overviewStep; overviewStep=function(rows){
+  const onMap=scene==='map', k=onMap?MAPUI.view:curMap(), O=ovOf(k);
+  if(O.done) return;
+  const n=onMap?24:rows;
+  if(!k) base(n); else ovStepMap(O,n);
+  if(onMap&&(O.done||(O.row%48)<n)) drawMapScreen();
+}; }
+
+// ---------- the map screen: which map is shown, how it fits the canvas, tabs for every map Ash has found
+const MAPUI={view:0,tabs:null,fogCv:[]};
+function mapFit(k){
+  const M=MAPS[k]||MAPS[0], cw=mapCv.width, ch=mapCv.height;
+  if(M.fit&&M.fit.cw===cw&&M.fit.ch===ch) return M.fit;
+  const s=Math.min(cw/M.w,ch/M.h);
+  M.fit={cw,ch,s,ox:(cw-M.w*s)/2,oy:(ch-M.h*s)/2,w:M.w*s,h:M.h*s,y0:M.y0};
+  return M.fit;
+}
+// canvas px on the map screen to world coordinates on the viewed map
+function mapInv(cx,cy){ const F=mapFit(MAPUI.view); return [(cx-F.ox)/F.s,F.y0+(cy-F.oy)/F.s]; }
+function fogCanvas(k){ const F=fogOf(k); let c=MAPUI.fogCv[k]; if(!c||c.width!==F.w||c.height!==F.h){ c=mkCanvas(F.w,F.h); MAPUI.fogCv[k]=c; } return c; }
+function mapsSeenList(){ const out=[]; for(const M of MAPS) if(M&&(M.k===0||(G&&G.mapsSeen&&G.mapsSeen[M.k]))) out.push(M.k); return out; }
+function mapInfoText(){
+  const k=MAPUI.view, M=MAPS[k]||MAPS[0], sh=mapList(SHRINES,k), found=sh.filter(s=>G.shrines[s.id]).length;
+  const r=G.region||regionAt(player.x,player.y), here=curMap()===k;
+  return `${here?(AREA?'Inside '+AREA.name:r.name):M.name} · Level ${player.level} · ${G.coins||0} coins · ${found} of ${sh.length} shrines`;
+}
+function mapTabsSync(){
+  const list=mapsSeenList();
+  let el=MAPUI.tabs;
+  if(!el){
+    el=document.createElement('div'); el.className='seg jtabs'; el.id='mapTabs'; el.setAttribute('role','group'); el.setAttribute('aria-label',S('Maps','Maps'));
+    const wrap=document.querySelector('#mapov .mapwrap'); if(wrap&&wrap.parentElement) wrap.parentElement.insertBefore(el,wrap);
+    MAPUI.tabs=el;
+  }
+  el.hidden=list.length<2;
+  const want=list.join(',');
+  if(el.dataset.maps!==want){
+    el.dataset.maps=want; el.innerHTML='';
+    for(const k of list){ const b=document.createElement('button'); b.type='button'; b.dataset.m=k; b.textContent=simplify((MAPS[k]||{}).name||'Map '+k); b.addEventListener('click',()=>mapView(k)); el.appendChild(b); }
+  }
+  for(const b of el.querySelectorAll('button')) b.setAttribute('aria-pressed',String(+b.dataset.m===MAPUI.view));
+}
+function mapView(k){
+  if(scene!=='map'||!MAPS[k]) return;
+  MAPUI.view=k; mapSel=null; $('#bTravel').hidden=true; mapHintSet();
+  $('#mapInfo').textContent=mapInfoText(); mapTabsSync(); drawMapScreen(); SFX.play('ui');
+}
+// step through the tabs: , and . (or Page Up and Page Down) on the map screen; on a controller the tabs are buttons
+// the D-pad reaches, and the bumpers keep cycling the shrines of the map on show
+function mapViewStep(d){ const L=mapsSeenList(); if(L.length<2) return false; const i=L.indexOf(MAPUI.view); mapView(L[(i+d+L.length)%L.length]); return true; }
+addEventListener('keydown',e=>{ if(scene!=='map') return; const c=e.code; if(c==='Comma'||c==='PageUp'){ e.preventDefault(); mapViewStep(-1); } else if(c==='Period'||c==='PageDown'){ e.preventDefault(); mapViewStep(1); } });
+
+// ---------- towns on new maps: names, music, events, house look, homes
+const TOWNS={}, TOWN_ORDER=[];
+// defineTown(key,{name, music:'town', hz?(hs,L)->fields, generics?:true|false|{ties:[...]}})
+// key must also be a POI key (POI[key]={x,y,r,name,level,town:true}) so music, events and homes know where it is.
+function defineTown(key,def){
+  def=Object.assign({music:'town',generics:true},def||{});
+  if(!TOWNS[key]) TOWN_ORDER.push(key);
+  TOWNS[key]=def;
+  TOWN_NAME[key]=def.name||key;
+  TOWN_KEYS[key]=def.music||'town';
+  if(!EVTOWNS.includes(key)) EVTOWNS.push(key);
+  if(def.generics&&def.generics.ties) TIE_NAMES[key]=def.generics.ties;
+  return def;
+}
+{ const base=hzPlan; hzPlan=function(hs){
+  if(hs.L) return hs.L;
+  const T=TOWNS[hs.town]; if(!T||!T.hz) return base(hs);
+  const L=base(hs); let r=null; try{ r=T.hz(hs,L); }catch(e){ r=null; }
+  if(r&&r!==L) for(const f in r) L[f]=(f==='wc'||f==='rc'||f==='gc'||f==='beam'||f==='trim')&&typeof r[f]==='string'?hexRGB(r[f]):r[f];
+  return L;
+}; }
+// homes for the new towns, in defineTown order, after the stock towns: owners are CAST people with town:key and
+// home:true (in CAST order), then generic neighbours n_<town>_<i>. House and generic ids are save keys.
+function assignHomesNew(){
+  let gi=CAST.filter(c=>c.generic).length;
+  const rng=mulberry32(778);
+  for(const town of TOWN_ORDER){
+    const T=TOWNS[town], P=POI[town]||T.at||{x:0,y:0};
+    const hs=HOUSES.filter(h=>h.town===town&&h.k==='house'&&!h.area).sort((a,b)=>dist2(a.x,a.y,P.x,P.y)-dist2(b.x,b.y,P.x,P.y));
+    const owners=[];
+    for(const c of CAST) if(c.town===town&&c.home&&!c.generic) owners.push({id:c.id,house:c.house,style:STYLE_OF[c.job]||c.style||'home'});
+    let n=0;
+    hs.forEach((h,i)=>{
+      const o=owners[i], door=doorOf(h); let def;
+      if(o){ def=defHouse('h_'+o.id,{name:o.house||'House',owner:o.id,style:o.style,seed:1000+i+town.length*31,painting:i,egg:i+3,w:o.style==='inn'||o.style==='lodge'?680:560,h:o.style==='inn'?460:400,town}); if(INDOOR[o.id]&&CASTBY[o.id]) CASTBY[o.id].inside=def.id; h.owner=o.id; }
+      else{
+        if(T.generics===false) return;
+        const first=FIRST[(gi*7+3)%FIRST.length], last=LAST[(gi*5+1)%LAST.length], nm=`${first} ${last}`;
+        const ties=TIE_NAMES[town]||TIE_NAMES.village, tie=ties[gi%ties.length], nid='n_'+town+'_'+n;
+        CAST.push({id:nid,name:nm,town,generic:true,col:pick2({x:gi,y:3},['#d8c3a0','#cfd6e0','#e0c0a0','#c0d8b0','#e0b0c0']),look:{shirt:pick2({x:gi,y:1},['#6a4a8a','#3a6a8a','#8a5a3a','#5a7a3a','#7a3a3a','#3a5a5a']),hair:pick2({x:gi,y:2},['#2a1a10','#6a4a2a','#b8a070','#1a1a1a','#8a3a1a','#e8e4dc']),hat:gi%5===0?'straw':gi%7===0?'cap':null,beard:gi%4===1,glasses:gi%6===2},
+          lines:[NEIGHBOR_LINES[gi%NEIGHBOR_LINES.length](tie),NEIGHBOR_ODD[gi%NEIGHBOR_ODD.length]]});
+        CASTBY[nid]=CAST[CAST.length-1];
+        def=defHouse('h_'+nid,{name:`${first}’s House`,owner:nid,style:'home',seed:3000+gi+Math.floor(rng()*97),egg:gi,painting:gi+2,note:`${nm}’s diary: "${NEIGHBOR_ODD[(gi+3)%NEIGHBOR_ODD.length]}"`,w:520,h:380,town});
+        h.owner=nid; gi++; n++;
+      }
+      h.area=def.id; h.door=door;
+      DOORS.push({x:door.x,y:door.y,area:def.id,label:`Enter ${def.name}`,outY:door.outY||0,hs:h,owner:def.owner});
+    });
+  }
+}
+
+// ---------- world building for the new maps: B, the builder handed to def.build(B)
+// Everything is in absolute coordinates. Shrines, camps, ores and caves added here get the same structs,
+// colliders and lights that initWorld and buildPlaces give the Embermere ones.
+function mapBuilder(M){
+  const B={
+    M, k:M.k, y0:M.y0, rng:mulberry32(5150+M.k*977),
+    poi(key,p){ POI[key]=Object.assign({level:1},p); return POI[key]; },
+    shrine(s){ SHRINES.push(s); STRUCTS.push({k:'shrine',x:s.x,y:s.y,ref:s}); addCol({t:'c',x:s.x,y:s.y,r:16}); LIGHTS.push({x:s.x,y:s.y,r:150,i:0.6,shrine:s}); return s; },
+    camp(c){ CAMPS.push(c); STRUCTS.push({k:'campfire',x:c.x,y:c.y,small:true}); LIGHTS.push({x:c.x,y:c.y,r:200,i:0.8,fire:true});
+      for(let i=0;i<2;i++) LANDMARKS.push({id:`cpot_${c.id}_${i}`,k:i?'barrel':'pot',x:c.x+Math.cos(i*2+1)*80,y:c.y+Math.sin(i*2+1)*80,breakable:true}); return c; },
+    ore(o){ ORES.push(o); STRUCTS.push({k:'ore',ref:o,x:o.x,y:o.y}); addCol({t:'c',x:o.x,y:o.y,r:16,low:true}); LIGHTS.push({x:o.x,y:o.y,r:120,i:0.5,ore:o}); return o; },
+    // one house: {x,y,w,h,roof,town,snow?,vert?}
+    house(o){ const hs={k:'house',x:o.x,y:o.y,w:o.w||120,h:o.h||80,vert:!!o.vert,roof:o.roof||'#6e5a48',burnt:!!o.burnt,seed:o.seed!=null?o.seed:Math.floor(B.rng()*1e9),snow:!!o.snow,town:o.town};
+      HOUSES.push(hs); STRUCTS.push(hs); addCol({t:'r',x0:hs.x-hs.w/2,y0:hs.y-hs.h/2,x1:hs.x+hs.w/2,y1:hs.y+hs.h/2});
+      if(o.torch!==false){ const tx=hs.x-hs.w*0.32, ty=hs.y+hs.h/2+12; STRUCTS.push({k:'torch',x:tx,y:ty}); LIGHTS.push({x:tx,y:ty,r:170,i:0.75,fire:true,night:true}); }
+      return hs; },
+    // n houses on a ring r0..r1 around (cx,cy), off this map's roads: {town, roofs:[...], avoid:[[x,y,r],...], snow?, burnt?, seed?}
+    houses(cx,cy,n,r0,r1,o){ o=o||{}; return mapHouses(cx,cy,n,r0,r1,mulberry32(o.seed||(cx*7+cy*13)|0),o.avoid||[],o.roofs||['#5c6470','#8a6a3a','#8e4a34','#6e5a48','#7a3a2a'],o); },
+    // a cave or dungeon mouth that opens AREADEFS[area] (define the area first)
+    cave(o){ const def=AREADEFS[o.area]||{name:o.name||o.area,theme:o.theme}; const [x,y]=o.noNudge?[o.x,o.y]:nudge(o.x,o.y,80);
+      const m={area:o.area,x,y,name:o.name||def.name}; CAVEMOUTHS.push(m); STRUCTS.push({k:'cavemouth',x,y,ref:m,theme:o.theme||def.theme});
+      for(let a=Math.PI*1.1;a<=Math.PI*1.9+0.01;a+=Math.PI*0.2) addCol({t:'c',x:x+Math.cos(a)*58,y:y+Math.sin(a)*46,r:26});
+      DOORS.push({x,y:y+14,area:o.area,label:o.label||`Enter ${m.name}`,outY:46,cave:true}); return m; },
+    landmark(o){ return addLandmark(o); },
+    sign(id,x,y,text){ return addLandmark({id,k:'sign',x,y,r:8,text,prompt:'Read the sign',noNudge:true}); },
+    light(L){ LIGHTS.push(L); return L; },
+    struct(s){ STRUCTS.push(s); return s; },
+    decal(d){ DECALS.push(d); return d; },
+    col(c){ return addCol(c); },
+    door(d){ DOORS.push(d); return d; },
+    crossing(def){ return buildCrossing(def); },
+    town(key,def){ return defineTown(key,def); },
+  };
+  return B;
+}
+// placeHouses (a2c_build.js) with every draw from the seeded rng: the same rules (off this map's roads, not blocked,
+// clear of the avoid discs, shrines and other houses), the same house, collider, torch and night light
+function mapHouses(cx,cy,n,r0,r1,rng,avoid,roofs,list){
+  const out=[];
+  for(let tries=0;tries<600&&out.length<n;tries++){
+    const a=rng()*TAU, rr=r0+rng()*(r1-r0), x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr;
+    const vert=rng()<0.5, w=vert?70+rng()*18:100+rng()*30, h=vert?100+rng()*30:70+rng()*18;
+    if(segsDist(x,y,ROAD_SEGS)<Math.max(w,h)*0.6+28) continue;
+    if(blockedAt(x,y)||blockedAt(x-w/2,y-h/2)||blockedAt(x+w/2,y+h/2)||blockedAt(x-w/2,y+h/2)||blockedAt(x+w/2,y-h/2)) continue;
+    if(avoid.some(([ax,ay,ar])=>dist(x,y,ax,ay)<ar+Math.max(w,h)/2)) continue;
+    if(mapList(SHRINES,mapAt(y)).some(s=>dist(x,y,s.x,s.y)<150)) continue;
+    if(HOUSES.some(o=>Math.abs(o.x-x)<(o.w+w)/2+50&&Math.abs(o.y-y)<(o.h+h)/2+50)) continue;
+    const hs={k:'house',x,y,w,h,vert,roof:roofs[Math.floor(rng()*roofs.length)],burnt:list.burnt?rng()<list.burnt:false,seed:Math.floor(rng()*1e9),town:list.town,snow:!!list.snow};
+    HOUSES.push(hs); STRUCTS.push(hs); out.push(hs);
+    addCol({t:'r',x0:x-w/2,y0:y-h/2,x1:x+w/2,y1:y+h/2});
+    const tx=x-Math.max(30,w*0.34), ty=y+h/2+12;
+    STRUCTS.push({k:'torch',x:tx,y:ty}); LIGHTS.push({x:tx,y:ty,r:170,i:0.75,fire:true,night:true});
+  }
+  return out;
+}
+// random chests per map: quotas from each biome's `chests` (default 3), at most def.chests in all, 700 px apart
+function scatterChests(M){
+  const rng=mulberry32(9100+M.k*131), tmp={}, have={}, max=M.chests!=null?M.chests:28; let n=0;
+  for(let tries=0;tries<9000&&n<max;tries++){
+    const x=250+rng()*(M.w-500), y=M.y0+250+rng()*(M.h-500);
+    T(x,y,tmp); const b=tmp.b, Bd=typeof BIOMES!=='undefined'?BIOMES[b]:null, q=Bd&&Bd.chests!=null?Bd.chests:3;
+    if((have[b]||0)>=q||tmp.out||tmp.water||tmp.lava||tmp.road>0||tmp.shore>0||tmp.bridge||tmp.bog>0.3||blockedAt(x,y)) continue;
+    if(inClearing(x,y,60)) continue;
+    if(mapList(CHESTS,M.k).some(c=>dist2(c.x,c.y,x,y)<700*700)) continue;
+    have[b]=(have[b]||0)+1; CHESTS.push({id:'m'+M.k+'ch'+n,x,y,b,open:false}); n++;
+  }
+}
+// Nothing here draws from Math.random (B.houses has its own seeded copy of placeHouses), so the new maps come out the
+// same on every load and Embermere's own random draws (chests, chunk decor) stay exactly as they were. (Do not swap
+// Math.random out: writing to the Math object makes every Math call in the noise code about twice as slow.)
+function buildMaps(){
+  for(const M of MAPS) if(M&&M.k>0&&typeof mapTerrainInit==='function') mapTerrainInit(M);
+  for(const M of MAPS){
+    if(!M) continue;
+    const B=mapBuilder(M);
+    if(M.build) try{ M.build(B); }catch(e){ console.error('map build',M.k,e); }
+    for(const c of M.crossings||[]) buildCrossing(c);
+    if(M.k>0) scatterChests(M);
+  }
+  for(const id in CROSSINGS) buildCrossing(CROSSINGS[id]);
+  assignHomesNew(); registerSpeakers();
+  if(typeof mapBiomeMusic==='function') mapBiomeMusic();
+  MAPST.built=true; mapListsReset(); BIGOAKS=null; OCCS=null;
+}
+// the maps are built after Embermere (and after its random chests, so Embermere's random sequence is untouched)
+{ const base=initWorld; initWorld=function(){ base(); buildMaps(); }; }
+
+// ---------- crossings: travel points between maps
+// defineCrossing({id,x,y,to:{x,y},label:'Take the Southern Pass',name?,need?:()=>bool,locked?:'text',kind:'pass'|'dock'|'bridge'|'stair',
+//   dir?:angle (which way the path, pier or stair runs, default toward the destination edge),hidden?:()=>bool,arrive?:'banner text',onTravel?()})
+const CROSSINGS={};
+function defineCrossing(def){ CROSSINGS[def.id]=def; if(MAPST.built) buildCrossing(def); return def; }
+function buildCrossing(def){
+  if(def._lm) return def._lm;
+  const k=mapAt(def.y), tk=mapAt(def.to.y);
+  if(def.dir==null) def.dir=tk===k?0:(tk>k?Math.PI/2:-Math.PI/2);
+  def.kind=def.kind||'pass';
+  // a placeholder crossing leaves no trace on the ground (no path, post collider or cleared props) so a map it sits on
+  // looks exactly as before while the crossing is hidden; real crossings clear the props around them (def.clear px)
+  const ph=!!def.placeholder;
+  const lm={id:'xing_'+def.id,k:'crossing',x:def.x,y:def.y,r:0,clr:ph?0.001:def.clear!=null?def.clear:150,noNudge:true,always:false,prompt:def.label||'Travel',xing:def,
+    hidden:()=>!!(def.hidden&&def.hidden()),draw:(o,t)=>{ if(!(def.hidden&&def.hidden())) drawCrossing(def,t); },act:()=>useCrossing(def)};
+  LANDMARKS.push(lm); def._lm=lm; (XBY[k]||(XBY[k]=[])).push(def);
+  if(!ph){ if(def.kind==='pass') DECALS.push({k:'dirt',x:def.x+Math.cos(def.dir)*40,y:def.y+Math.sin(def.dir)*40,r:110}); addCol({t:'c',x:def.x-30,y:def.y-6,r:7,low:true}); }
+  // a dock's pier (and a bridge's deck) can be walked on when it runs straight north, south, east or west
+  if(!ph&&(def.kind==='dock'||def.kind==='bridge')&&def.walk!==false){
+    const c=Math.cos(def.dir), s=Math.sin(def.dir);
+    if(Math.abs(c)<0.01||Math.abs(s)<0.01){ const ex=def.x+c*118, ey=def.y+s*118, hw=26, wk={x0:Math.min(def.x,ex)-(Math.abs(s)>0.5?hw:0),x1:Math.max(def.x,ex)+(Math.abs(s)>0.5?hw:0),y0:Math.min(def.y,ey)-(Math.abs(c)>0.5?hw:0),y1:Math.max(def.y,ey)+(Math.abs(c)>0.5?hw:0)};
+      const M=MAPS[k]; if(k>0&&M&&M.tz) M.tz.walkways.push(wk); else if(!k) WALKWAYS.push(wk); }
+  }
+  return lm;
+}
+function useCrossing(def){
+  if(def.need&&!def.need()){ SFX.play('ui'); setBanner(def.name||def.label||'',def.locked||S('The way is shut for now.','It is shut.'),3); return; }
+  if(G.inCombat||(G.boss&&!G.boss.dead)){ setBanner(def.name||def.label||'',S('You can’t travel while enemies are close.','Enemies are close!'),2.4); return; }
+  if(def.onTravel) try{ def.onTravel(); }catch(e){}
+  mapTravel(def.to.x,def.to.y,{banner:def.arrive});
+}
+// what travelTo does, for any point on any map: fade, move Ash, Pip, the companions and the goat, then save
+function mapTravel(x,y,o){
+  o=o||{};
+  closeMap(true);
+  if(AREA) exitArea(true);
+  const s=typeof nearestLand==='function'?(nearestLand(x,y)||{x,y}):{x,y};
+  player.x=s.x; player.y=s.y; player.kvx=player.kvy=0; player.iframes=1; player.flying=false; player.landing=false; player.gliding=false; player.z=0; player.vz=0;
+  for(const e of G.enemies) if(!e.boss&&dist(e.x,e.y,player.x,player.y)<500) e.aggro=false;
+  if(G.fightSite) resetBoss();
+  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
+  if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
+  updateCam(0,true); G.chunkBurst=16; G.fade=1; SFX.play('shrine');
+  mapTick(o.banner);
+  if(!o.noSave) saveGame();
+}
+// the crossings that start on map k (for the map screen, routing and tests)
+const XBY=[];
+function crossingsOn(k){ return XBY[k]||ML_EMPTY; }
+// where to point Ash for a target on another map: the nearest crossing on this map that starts the shortest route there
+// (hidden crossings do not count; locked ones do, so the compass shows the way to the gate that still needs opening)
+const xOpen=c=>!(c.hidden&&c.hidden());
+const ROUTEC={t:-1,x:0,y:0,from:-1,c:null};
+function mapRoute(tx,ty){
+  const from=curMap(), to=mapAt(ty);
+  if(from===to||tx>=IZX-50) return null;
+  if(G&&ROUTEC.t===G.time&&ROUTEC.x===tx&&ROUTEC.y===ty&&ROUTEC.from===from) return ROUTEC.c;
+  const c=mapRouteNow(from,to);
+  if(G){ ROUTEC.t=G.time; ROUTEC.x=tx; ROUTEC.y=ty; ROUTEC.from=from; ROUTEC.c=c; }
+  return c;
+}
+function mapRouteNow(from,to){
+  const via=new Map([[from,null]]), q=[from];
+  while(q.length&&!via.has(to)){ const m=q.shift(); for(const c of crossingsOn(m)){ if(!xOpen(c)) continue; const n=mapAt(c.to.y); if(via.has(n)) continue; via.set(n,m===from?c:via.get(m)); q.push(n); } }
+  const c0=via.get(to); if(!c0) return null;
+  const nxt=mapAt(c0.to.y), p=player; let best=c0, bd=dist2(p.x,p.y,c0.x,c0.y);
+  for(const c of crossingsOn(from)) if(xOpen(c)&&mapAt(c.to.y)===nxt){ const d=dist2(p.x,p.y,c.x,c.y); if(d<bd){ bd=d; best=c; } }
+  return best;
+}
+// the compass, minimap and quest line point at the crossing when the goal is on another map
+function routeObj(o){
+  if(!o||o.x==null||AREA) return o;
+  const c=mapRoute(o.x,o.y); if(!c) return o;
+  const M=MAPS[mapAt(o.y)];
+  return Object.assign({},o,{x:c.x,y:c.y,via:c.id,text:o.text+(M?simplify(` (${M.name}: ${c.name||c.label})`):'')});
+}
+{ const base=questObjective; questObjective=function(){ return routeObj(base()); }; }
+{ const base=focusObjective; focusObjective=function(){ return routeObj(base()); }; }
+// ---------- crossing art (cached sprites, a little live sparkle on top)
+function drawCrossing(def,t){
+  const x=def.x, y=def.y, a=def.dir, k=def.kind, key='xing_'+k+'_'+Math.round(a*10);
+  if(k==='dock'){
+    const sp=rSpr(key,260,260,130,130,g=>{ g.rotate(a-Math.PI/2);
+      g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(-26,6,56,120);
+      g.fillStyle='#6a4a2c'; g.fillRect(-28,-10,56,128);
+      for(let i=0;i<16;i++){ g.fillStyle=i%2?'#86603a':'#7a5634'; g.fillRect(-28,-10+i*8,56,7); }
+      g.fillStyle='#3a2614'; g.fillRect(-31,-10,5,128); g.fillRect(26,-10,5,128);
+      for(const yy of [0,40,80,114]) for(const xx of [-30,30]){ g.fillStyle='#2a1a0c'; g.beginPath(); g.arc(xx,yy,5,0,TAU); g.fill(); g.fillStyle='#5a3e24'; g.beginPath(); g.arc(xx,yy,3,0,TAU); g.fill(); }
+      g.strokeStyle='#c8b080'; g.lineWidth=1.5; g.beginPath(); g.moveTo(-30,114); g.quadraticCurveTo(-46,128,-40,140); g.stroke(); });
+    rPut(sp,x,y);
+    const bx=x+Math.cos(a)*122, by=y+Math.sin(a)*122+Math.sin(t*1.6)*1.5;
+    ctx.save(); ctx.translate(bx,by); ctx.rotate(a+Math.sin(t*1.1)*0.04);
+    ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(3,5,34,12,0,0,TAU); ctx.fill();
+    ctx.fillStyle='#5a3a20'; ctx.beginPath(); ctx.ellipse(0,0,34,12,0,0,TAU); ctx.fill(); ctx.fillStyle='#8a6038'; ctx.beginPath(); ctx.ellipse(0,-1,29,8.5,0,0,TAU); ctx.fill();
+    ctx.fillStyle='#3a2614'; ctx.fillRect(-2,-26,3,26); ctx.fillStyle='#efe6d0'; ctx.beginPath(); ctx.moveTo(1,-25); ctx.lineTo(17,-6); ctx.lineTo(1,-6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }else if(k==='stair'){
+    const sp=rSpr(key,200,220,100,120,g=>{ g.rotate(a+Math.PI/2);
+      for(let i=0;i<7;i++){ const w=70-i*3, yy=40-i*14; g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(-w/2+3,yy+4,w,12); g.fillStyle=i%2?'#9c968c':'#aaa294'; g.fillRect(-w/2,yy,w,12); g.fillStyle='rgba(255,250,235,.25)'; g.fillRect(-w/2,yy,w,3); g.strokeStyle='rgba(40,36,30,.5)'; g.lineWidth=1; g.strokeRect(-w/2,yy,w,12); }
+      for(const sx of [-1,1]){ g.fillStyle='#7d6d5c'; g.fillRect(sx*40-6,-56,12,108); g.fillStyle='#958a7c'; g.fillRect(sx*40-6,-56,12,6); } });
+    rPut(sp,x,y);
+  }else if(k==='bridge'){
+    const sp=rSpr(key,260,260,130,130,g=>{ g.rotate(a-Math.PI/2);
+      g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(-30,0,64,130);
+      const gr=g.createLinearGradient(-30,0,30,0); gr.addColorStop(0,'#3a3060'); gr.addColorStop(0.5,'#8a7ad8'); gr.addColorStop(1,'#3a3060'); g.fillStyle=gr; g.fillRect(-30,-6,60,132);
+      g.strokeStyle='rgba(220,210,255,.7)'; g.lineWidth=2; for(let i=0;i<9;i++){ g.beginPath(); g.moveTo(-30,i*15); g.lineTo(30,i*15); g.stroke(); }
+      g.fillStyle='#2a2440'; g.fillRect(-36,-8,8,136); g.fillRect(28,-8,8,136); });
+    rPut(sp,x,y);
+    const n=0.5+0.5*Math.sin(t*2); glowAt(x+Math.cos(a)*60,y+Math.sin(a)*60,70,'170,150,255',0.25+0.2*n);
+  }
+  // the signpost (every kind has one, so the way is easy to spot)
+  const sp=rSpr('xing_post',90,110,45,92,g=>{
+    g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(4,2,14,5,0,0,TAU); g.fill();
+    g.fillStyle='#4a3020'; g.fillRect(-3,-80,6,82); g.fillStyle='#62442a'; g.fillRect(-3,-80,2,82);
+    g.fillStyle='#b8894e'; g.beginPath(); g.moveTo(-26,-74); g.lineTo(20,-74); g.lineTo(30,-64); g.lineTo(20,-54); g.lineTo(-26,-54); g.closePath(); g.fill();
+    g.strokeStyle='#4a3020'; g.lineWidth=2; g.stroke();
+    g.fillStyle='#a8794a'; g.beginPath(); g.moveTo(24,-46); g.lineTo(-22,-46); g.lineTo(-32,-37); g.lineTo(-22,-28); g.lineTo(24,-28); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle='#3a2614'; for(let i=0;i<4;i++) g.fillRect(-18+i*10,-66,6,3); for(let i=0;i<3;i++) g.fillRect(-12+i*10,-39,6,3);
+    for(const [sx,sy,r] of [[-14,-2,7],[12,0,6],[-2,4,8]]){ g.fillStyle='#8e8c86'; g.beginPath(); g.arc(sx,sy,r,0,TAU); g.fill(); g.fillStyle='rgba(255,250,235,.25)'; g.beginPath(); g.arc(sx-2,sy-2,r*0.5,0,TAU); g.fill(); } });
+  rPut(sp,x-30,y-6);
+  const near=player&&dist2(player.x,player.y,x,y)<260*260;
+  if(near) glowAt(x-30,y-70,26,'255,210,140',0.18+0.12*Math.sin(t*3));
+}
+
+// ---------- map changes: discovery, banners, freeing the props and house art of other maps
+function mapTick(banner){
+  if(!G||!player||(G.mode!=='story'&&G.mode!=='normal')) return;
+  MAPST.frame++;
+  const k=curMap(); let fresh=false;
+  if(G.mapsSeen&&!G.mapsSeen[k]){ G.mapsSeen[k]=true; fresh=true; if(scene==='map') mapTabsSync(); }
+  if(k!==MAPST.cur){ const old=MAPST.cur; MAPST.cur=k; mapChanged(old,k,banner||(fresh?S('A new land!','A new land!'):'')); }
+}
+function mapChanged(old,k,banner){
+  mapEvict(k);
+  // camps and their foes stay with their own map
+  for(const c of CAMPS){ const st=G.campState[c.id]; if(st&&st.active&&itemMap(c)!==k){ for(const e of G.enemies) if(e.camp===st) e.dead=true; st.active=false; } }
+  for(const e of G.enemies) if(!e.boss&&!e.inArea&&!e.dead&&itemMap(e)>=0&&itemMap(e)!==k) e.dead=true;
+  const M=MAPS[k]; if(!M) return;
+  if(G.mode==='story'&&(scene==='play'||scene==='map')) setBanner(M.name,banner||'',2.6,'region');
+  G.region=null; G.regionT=0;
+  if(M.onEnter) try{ M.onEnter(old); }catch(e){ console.error(e); }
+}
+// props regenerate the same from their seed, so the chunks of other maps are dropped (with their colliders)
+function mapEvict(keep){
+  let n=0;
+  for(const [key,arr] of PROPS){
+    const cy=((key%1000)+1000)%1000; if(mapAt(cy*CH+CH/2)===keep) continue;
+    for(const p of arr) if(p.col) removeCol(p.col);
+    PROPS.delete(key); n++;
+  }
+  for(const hs of [...SCACHE.keys()]) if(hs&&typeof hs==='object'&&itemMap(hs)!==keep&&itemMap(hs)>=0) SCACHE.delete(hs);
+  MAPST.evicted=(MAPST.evicted||0)+n;
+  return n;
+}
+{ const base=update; update=function(dt){ mapTick(); return base(dt); }; }
+
+// ---------- saves: fog for every map (bit packed), the maps Ash has found
+{ const base=newRun; newRun=function(mode){ base(mode); G.mapsSeen={0:true}; MAPST.cur=curMap(); }; }
+{ const base=saveData; saveData=function(){
+  const s=base(), fm={};
+  for(const M of MAPS) if(M&&M.k>0&&M.fogBits&&M.fogBits.indexOf(1)>=0) fm[M.k]=fogPack(M.fogBits);
+  s.fogM=fm; s.maps=Object.assign({},G.mapsSeen||{0:true});
+  return s;
+}; }
+{ const base=loadGame; loadGame=function(s){
+  base(s);
+  if(s.fogM) for(const k in s.fogM){ const F=fogOf(+k); if(F) fogUnpack(s.fogM[k],F.bits); }
+  G.mapsSeen=Object.assign({0:true},s.maps||{});
+  const k=mapAt(s.y||0); if(s.x<IZX-50) G.mapsSeen[k]=true;
+}; }
+
+// ---------- debug hooks
+window.__ebX=Object.assign(window.__ebX||{},{
+  MAPS, BAND, CROSSINGS, mapAt, curMap, outOfMap, clampMap, mapList, itemMap, fogOf, fogSeen, ovOf, mapFit, mapRoute, crossingsOn, mapEvict,
+  mapsDebug(on){ MAPST.debug=on==null?!MAPST.debug:!!on; return MAPST.debug; },
+  goMap(k,x,y){ const M=MAPS[k]; if(!M) return false; let p=x!=null?{x,y}:M.spawn;
+    if(!p){ const sh=mapList(SHRINES,k)[0]; p=sh?{x:sh.x+40,y:sh.y+50}:{x:M.w/2,y:M.y0+M.h/2}; }
+    G.mapsSeen=G.mapsSeen||{}; G.mapsSeen[k]=true; mapTravel(p.x,p.y,{noSave:true}); return {k,x:player.x,y:player.y}; },
+  useCrossing(id){ const c=XBY.flat().find(q=>q&&q.id===id); if(c) useCrossing(c); return !!c; },
+  mapView, mapViewStep, MAPUI, defineCrossing, defineMap, questObj:()=>questObjective(), routeOf:(x,y)=>{ const c=mapRoute(x,y); return c?c.id:null; },
+  mapInfo(){ const byMap=(m,key)=>{ let n=0; for(const kk of m.keys()) if(mapAt((((kk%1000)+1000)%1000)*CH+CH/2)===key) n++; return n; };
+    return {cur:curMap(),built:MAPST.built,seen:Object.assign({},G&&G.mapsSeen||{}),props:PROPS.size,grid:GRID.size,evicted:MAPST.evicted||0,scache:SCACHE.size,
+    maps:MAPS.filter(Boolean).map(M=>({k:M.k,id:M.id,name:M.name,y0:M.y0,w:M.w,h:M.h,placeholder:!!M.placeholder,ovRows:(ovOf(M.k)||{}).row,ovDone:!!(ovOf(M.k)||{}).done,
+      chunks:byMap(CHUNKS,M.k),propChunks:byMap(PROPS,M.k),propsN:[...PROPS].filter(([kk])=>mapAt((((kk%1000)+1000)%1000)*CH+CH/2)===M.k).reduce((a,[,v])=>a+v.length,0),
+      fogSeen:(()=>{ const F=fogOf(M.k); let n=0; if(F&&F.bits) for(const b of F.bits) n+=b; return n; })(),shrines:mapList(SHRINES,M.k).length,chests:mapList(CHESTS,M.k).length,
+      camps:mapList(CAMPS,M.k).length,houses:mapList(HOUSES,M.k).length,landmarks:mapList(LANDMARKS,M.k).length,crossings:crossingsOn(M.k).map(c=>c.id)}))}; },
+  bench(n){ n=n||60; const now=window.__realNow||(()=>performance.now()); let t0=now(); for(let i=0;i<n;i++) render(); const r=(now()-t0)/n; t0=now(); for(let i=0;i<n;i++) update(1/60); const u=(now()-t0)/n; return {render:r,update:u}; },
+  benchT(n){ n=n||200000; const now=window.__realNow||(()=>performance.now()); const o={}; let t0=now(), s=0; for(let i=0;i<n;i++){ T((i*37)%14000,(i*53)%11000,o); s+=o.b; } const t=(now()-t0)/n*1000; t0=now(); for(let i=0;i<n;i++){ if(blockedAt((i*37)%14000,(i*53)%11000)) s++; } return {T_us:t,blocked_us:(now()-t0)/n*1000,s}; },
+  benchTy(n,y0){ n=n||200000; const now=window.__realNow||(()=>performance.now()); const o={}; let t0=now(), s=0; for(let i=0;i<n;i++){ T((i*37)%14000,y0+(i*53)%11000,o); s+=o.b; } const t=(now()-t0)/n*1000; t0=now(); for(let i=0;i<n;i++){ if(blockedAt((i*37)%14000,y0+(i*53)%11000)) s++; } return {T_us:t,blocked_us:(now()-t0)/n*1000,s}; },
+  benchChunk(n,cy0){ n=n||20; cy0=cy0||10; const now=window.__realNow||(()=>performance.now()); let t0=now(); for(let i=0;i<n;i++) genChunk(5+i%10,cy0+(i>>3)); const c=(now()-t0)/n; t0=now(); for(let i=0;i<n;i++){ genProps(3+i%12,cy0-2+(i%5)); } return {chunk_ms:c,props_ms:(now()-t0)/n}; }
+});
+
+// ================= placeholder maps 1 to 4 (wave 2 replaces each one by calling defineMap(k,{...}) again)
+// One placeholder biome each (10, 20, 30, 40, defined in e2_terrain.js), a road, water, a test shrine and test crossings.
+// The crossings that start in Embermere only show with __eb.mapsDebug(true), so a shipped game never offers a placeholder.
+const PH_DBG=()=>!MAPST.debug;
+defineMap(1,{id:'coast',name:'Clockwork Coast',placeholder:true,music:'meadow',spawn:{x:7000,y:20700},
+  ambient:{wind:0.5,birds:true},
+  terrain:{seeds:[[3000,23000,10],[10500,23500,10],[7000,26500,10],[2500,28000,10],[11500,28500,10]],
+    roads:[[[7000,20300],[7100,22000],[6800,24000],[7000,26000],[7400,27600],[7400,28200]],[[6800,24000],[4800,24600],[3000,25400]]],
+    rivers:[{pts:[[1200,21500],[2600,23000],[3400,24800],[3600,26600],[3300,28400]],w:56}],
+    sea:{land:[[-200,19800],[14200,19800],[14200,28200],[12000,28900],[9600,28600],[7600,28300],[5600,28900],[3200,29300],[1200,28800],[-200,29000]]}},
+  build(B){
+    B.shrine({id:'s_pm1',x:7350,y:21300,name:'Test Shrine (Coast)'});
+    B.poi('pm_port',{x:6900,y:23400,r:420,name:'Placeholder Port',level:9,town:true});
+    B.town('pm_port',{name:'Placeholder Port',music:'town',hz:(hs,L)=>({wc:'#e8dcc0',rc:'#4a6a8a'})});
+    B.houses(6900,23400,4,220,420,{town:'pm_port',seed:4201,roofs:['#4a6a8a','#5c6470']});
+    B.camp({id:'pm1_camp',x:10200,y:24600,units:[['kobold',3]]});
+    B.sign('pm1_sign',7180,20620,'PLACEHOLDER: the Clockwork Coast is built in wave 2.');
+  },
+  crossings:[
+    {id:'pm_pass_0',x:3350,y:10800,to:{x:7000,y:20560},label:'Take the Southern Pass (test)',name:'The Southern Pass',kind:'pass',hidden:PH_DBG,placeholder:true},
+    {id:'pm_pass_1',x:7000,y:20330,to:{x:3350,y:10640},label:'Climb back to Embermere',name:'The Southern Pass',kind:'pass'},
+    {id:'pm_dock_1',x:7400,y:28290,to:{x:3330,y:60760},label:'Sail east to Moonfall (test)',name:'Gearhaven Dock',kind:'dock',dir:Math.PI/2}
+  ]});
+defineMap(2,{id:'frost',name:'Frostreach',placeholder:true,music:'frost',spawn:{x:7000,y:50400},
+  ambient:{snow:1,wind:0.6},
+  terrain:{seeds:[[3000,43000,20],[10000,43500,20],[7000,47500,20],[3500,49000,20],[11000,49500,20]],
+    roads:[[[7000,50700],[7200,48800],[6600,46800],[7000,44200],[7600,41500]]],
+    lakes:[{x:9200,y:46200,r:700}]},
+  build(B){
+    B.shrine({id:'s_pm2',x:7350,y:49600,name:'Test Shrine (Frost)'});
+    B.sign('pm2_sign',7200,50300,'PLACEHOLDER: Frostreach is built in wave 2.');
+  },
+  crossings:[
+    {id:'pm_stair_0',x:950,y:3250,to:{x:7000,y:50450},label:'Climb the high pass (test)',name:'The High Pass',kind:'stair',hidden:PH_DBG,dir:-Math.PI/2,placeholder:true},
+    {id:'pm_stair_2',x:7000,y:50720,to:{x:950,y:3400},label:'Go down to Embermere',name:'The High Pass',kind:'stair',dir:Math.PI/2}
+  ]});
+defineMap(3,{id:'moon',name:'Moonfall',placeholder:true,music:'night',spawn:{x:4200,y:61000},
+  ambient:{wind:0.3,night:0.1},
+  terrain:{seeds:[[3000,63000,30],[9000,62000,30],[11500,66500,30],[8000,69000,30]],
+    roads:[[[3300,60720],[4200,60900],[6500,63000],[9000,65000],[12600,65400]]],
+    sea:{land:[[3400,59800],[14200,59800],[14200,71200],[3400,71200],[2800,68000],[4300,65000],[2600,62600]]},
+    isles:[{x:1500,y:64000,r:260}]},
+  build(B){
+    B.shrine({id:'s_pm3',x:4700,y:61300,name:'Test Shrine (Moonfall)'});
+    B.sign('pm3_sign',4400,60700,'PLACEHOLDER: Moonfall is built in wave 2.');
+  },
+  crossings:[
+    {id:'pm_dock_3',x:3190,y:60700,to:{x:7400,y:28150},label:'Sail back to the Coast',name:'Moonfall Dock',kind:'dock',dir:Math.PI},
+    {id:'pm_bridge_3',x:12800,y:65400,to:{x:4500,y:90300},label:'Cross the moonfire bridge (test)',name:'The Moonfire Bridge',kind:'bridge',dir:0}
+  ]});
+defineMap(4,{id:'nightfall',name:'Nightfall Peak',placeholder:true,music:'night',w:9000,h:11000,spawn:{x:4500,y:90200},
+  ambient:{embers:0.6,night:0.15,wind:0.4},sky:{tint:'#8a70c8',k:0.18},
+  terrain:{seeds:[[2500,82500,40],[6500,83500,40],[4500,87500,40]],
+    roads:[[[4500,90600],[4300,88000],[4700,85500],[4500,82600]]],
+    lavaFields:[{x:2200,y:85500,r:520},{x:6900,y:86600,r:420}],
+    lava:[{pts:[[600,88500],[2200,88200],[3600,88900],[5600,88500]],w:44}]},
+  build(B){
+    B.shrine({id:'s_pm4',x:4850,y:89700,name:'Test Shrine (Nightfall)'});
+    B.sign('pm4_sign',4700,90400,'PLACEHOLDER: Nightfall Peak is built in wave 2.');
+  },
+  crossings:[
+    {id:'pm_bridge_4',x:4500,y:90750,to:{x:12600,y:65400},label:'Cross back to Moonfall',name:'The Moonfire Bridge',kind:'bridge',dir:Math.PI/2}
+  ]});
+
+// ================= v9 terrain for maps 1 and up (wave 1): biome and prop registries, the shared sampler
+// Embermere (map 0) keeps T, blockedAt and the rest from a2_world.js exactly as they were; every wrapper below
+// sends y < BAND straight to the old code. Maps 1 and up are sampled from their `terrain` data (see defineMap in
+// e1_maps.js), compiled once per map into M.tz with a coarse grid for road, river and lava segments so a sample
+// never scans another map's (or far away) segments. See scratchpad/MAPS.md.
+
+// ---------- biomes (ids 10 and up; map k uses k*10 .. k*10+9)
+const BIOMES={};
+// defineBiome(id,{name,level,col:[base,light,dark],road,water:{deep,shallow,lip?},shore,props(rng,x,y,s,grove),decor(g,rng,x,y,s),
+//   music,ambient:{snow,mist,rain,wind,embers,ash,birds,night,lava},critters:[...]|false,speed,footprints:'snow'|'sand'|null,chests,
+//   roadW?,bog?,like?:embermereBiomeId,events?:{id:weight|false|fn},rgb?(c,s,x,y)->c})   A later call replaces the biome.
+function defineBiome(id,def){
+  if(!(id>=10)){ console.warn('defineBiome: ids 0 to 9 belong to Embermere'); return null; }
+  def=Object.assign({level:1,col:['#6f8a48','#86a058','#56703a'],road:'#8a7a5a',water:{},shore:'#bfb08a',speed:1,chests:3,critters:false,footprints:null,ambient:{}},def);
+  const W=def.water||{};
+  def._road=hexRGB(def.road); def._shore=hexRGB(def.shore);
+  def._water=[hexRGB(W.shallow||'#4a7a76'),hexRGB(W.deep||'#163446'),hexRGB(W.lip||'#bec8be')];
+  def._crit=null; def._amb=null;
+  BIOMES[id]=def; BCOL[id]=def.col.map(hexRGB);
+  BIOME_NAME[id]=def.name||'the wilds'; BIOME_LEVEL[id]=def.level;
+  if(def.music) MUSIC_BIOME[id]=def.music;
+  AMBM.clear();
+  return def;
+}
+// biomes without their own music play their map's theme
+function mapBiomeMusic(){ for(const id in BIOMES) if(!BIOMES[id].music){ const M=MAPS[Math.floor(id/10)]; MUSIC_BIOME[id]=(M&&M.music)||'meadow'; } }
+
+// ---------- prop kinds: new tree, rock and plant sprites
+// definePropKind(kind,{n:variants, make(seed,v)->canvas (use spriteOf), tall?, R?:radius, col?:{r,low?}, h?:depth height, rot?:false})
+const PROPK={};
+function definePropKind(kind,def){
+  def=Object.assign({n:3,R:14},def); PROPK[kind]=def;
+  if(def.tall){ TALL.add(kind); TREEK[kind]=[def.R||44,(def.col&&def.col.r)||10]; TREEH[kind]=def.h||64; }
+  if(SPR.shadow) propKindSprites(kind);
+  return def;
+}
+function propKindSprites(kind){
+  const d=PROPK[kind], L=[]; let h=0; for(let i=0;i<kind.length;i++) h=(h*31+kind.charCodeAt(i))|0;
+  for(let v=0;v<d.n;v++){ let c=null; try{ c=d.make((h&0xffff)+v*131,v); }catch(e){ console.error('prop kind',kind,e); } if(c){ if(!c.half) c.half=c.width/4; L.push(c); } }
+  if(L.length) SPR[kind]=L;
+}
+{ const base=buildSprites; buildSprites=function(){ base(); for(const k in PROPK) propKindSprites(k); }; }
+// critters other than deer and rabbits: defineCritter(type,{r,draw(c)}) (they move like rabbits)
+const CRITTERS={};
+function defineCritter(type,def){ CRITTERS[type]=def; return def; }
+
+// ---------- compiled terrain per map
+let TZL=null;   // the nearest segment of the last grid query (like lastSeg for segsDist)
+function tzOf(M){ return M.tz||(M.tz=tzCompile(M)); }
+function mapTerrainInit(M){ tzOf(M); if(!M.tz.bridged){ M.tz.bridged=true; mapBridges(M); } }
+function tzCompile(M){
+  const t=M.terrain||{}, okSeg=s=>s.l2>0;
+  const rivW=(t.rivers||[]).reduce((a,r)=>Math.max(a,r.w||62),62), lavW=(t.lava||[]).reduce((a,r)=>Math.max(a,r.w||48),48);
+  const Z={M,y0:M.y0,w:M.w,h:M.h,
+    seeds:t.seeds&&t.seeds.length?t.seeds:[[M.w/2,M.y0+M.h/2,M.k*10]],
+    roads:mkSegs(t.roads||[],90).filter(okSeg), rivers:mkSegs(t.rivers||[],rivW+110).filter(okSeg), lava:mkSegs(t.lava||[],lavW+110).filter(okSeg),
+    lakes:(t.lakes||[]).map(L=>({x:L.x,y:L.y,r:L.r,amp:L.amp!=null?L.amp:Math.min(130,L.r*0.22)})),
+    ponds:(t.ponds||[]).slice(), isles:(t.isles||[]).slice(), walkways:(t.walkways||[]).slice(), lavaFields:(t.lavaFields||[]).slice(), lavaClear:(t.lavaClear||[]).slice(),
+    extra:t.extra||null, block:t.block||null, sea:null};
+  Z.roadG=segGrid(Z.roads,M); Z.rivG=segGrid(Z.rivers,M); Z.lavaG=segGrid(Z.lava,M);
+  Z.hasLava=Z.lava.length>0||Z.lavaFields.length>0;
+  if(t.sea){ const S=t.sea; Z.sea={shore:S.shore||60,shelf:S.shelf||170,stride:!!S.stride,noise:S.noise!=null?S.noise:110,fn:S.landD||null,sdf:S.land&&!S.landD?polySDF(S.land,M,80):null}; }
+  return Z;
+}
+function segGrid(segs,M,cs){
+  cs=cs||512; const nx=Math.ceil(M.w/cs)+1, ny=Math.ceil(M.h/cs)+1, cells=new Array(nx*ny).fill(null);
+  for(const s of segs){
+    const i0=Math.max(0,Math.floor(s.minx/cs)), i1=Math.min(nx-1,Math.floor(s.maxx/cs)), j0=Math.max(0,Math.floor((s.miny-M.y0)/cs)), j1=Math.min(ny-1,Math.floor((s.maxy-M.y0)/cs));
+    for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const k=j*nx+i; (cells[k]||(cells[k]=[])).push(s); }
+  }
+  return {cs,nx,ny,y0:M.y0,cells,n:segs.length};
+}
+function gsDist(x,y,G){
+  if(!G.n){ TZL=null; return 1e9; }
+  const i=Math.floor(x/G.cs), j=Math.floor((y-G.y0)/G.cs);
+  if(i<0||j<0||i>=G.nx||j>=G.ny){ TZL=null; return 1e9; }
+  const L=G.cells[j*G.nx+i]; if(!L){ TZL=null; return 1e9; }
+  let best=1e18, bs=null;
+  for(let n=0;n<L.length;n++){
+    const s=L[n]; if(x<s.minx||x>s.maxx||y<s.miny||y>s.maxy) continue;
+    let t=((x-s.ax)*s.dx+(y-s.ay)*s.dy)/s.l2; t=t<0?0:t>1?1:t;
+    const px=s.ax+s.dx*t-x, py=s.ay+s.dy*t-y, d=px*px+py*py;
+    if(d<best){ best=d; bs=s; }
+  }
+  TZL=bs; return bs?Math.sqrt(best):1e9;
+}
+// the sea: a signed distance grid of the land polygon (positive on land), sampled bilinearly, plus a noisy coastline
+function polySD(P,x,y){
+  let inside=false, best=1e18;
+  for(let i=0,j=P.length-1;i<P.length;j=i++){
+    const ax=P[j][0], ay=P[j][1], bx=P[i][0], by=P[i][1];
+    if(((ay>y)!==(by>y))&&(x<(bx-ax)*(y-ay)/(by-ay)+ax)) inside=!inside;
+    const dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy||1; let t=((x-ax)*dx+(y-ay)*dy)/l2; t=t<0?0:t>1?1:t;
+    const px=ax+dx*t-x, py=ay+dy*t-y, d=px*px+py*py; if(d<best) best=d;
+  }
+  const s=Math.sqrt(best); return inside?s:-s;
+}
+function polySDF(P,M,cs){
+  const nx=Math.ceil(M.w/cs)+2, ny=Math.ceil(M.h/cs)+2, d=new Float32Array(nx*ny);
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++) d[j*nx+i]=polySD(P,i*cs,M.y0+j*cs);
+  return {cs,nx,ny,y0:M.y0,d};
+}
+function sdfAt(S,x,y){
+  let fx=x/S.cs, fy=(y-S.y0)/S.cs; if(fx<0) fx=0; if(fy<0) fy=0; if(fx>S.nx-1.001) fx=S.nx-1.001; if(fy>S.ny-1.001) fy=S.ny-1.001;
+  const i=fx|0, j=fy|0, u=fx-i, v=fy-j, k=j*S.nx+i, d=S.d;
+  return (d[k]*(1-u)+d[k+1]*u)*(1-v)+(d[k+S.nx]*(1-u)+d[k+S.nx+1]*u)*v;
+}
+function zLandD(x,y,Z){
+  const S=Z.sea; if(S.fn) return S.fn(x,y);
+  const d=sdfAt(S.sdf,x,y), A=S.noise;
+  if(d>A*1.3+260||d<-A*1.3-500) return d;
+  return d+fbm(x*0.0022+17,y*0.0022-5,3)*A+fbm(x*0.012,y*0.012,2)*A*0.12;
+}
+// signed distance to water (negative is water); ZW.sea says the nearest water is the sea
+const ZW={sea:0};
+function zWaterD(x,y,Z){
+  let wd=1e9; ZW.sea=0;
+  if(Z.rivG.n){ const d=gsDist(x,y,Z.rivG); if(d<1e8){ const w=TZL.w||62; wd=d-w-(d<w+170?fbm(x*0.004,y*0.004,2)*20:0); } }
+  const LK=Z.lakes; for(let i=0;i<LK.length;i++){ const L=LK[i], dx=x-L.x, dy=y-L.y, R=L.r+L.amp+170; if(dx*dx+dy*dy>R*R) continue; const v=Math.sqrt(dx*dx+dy*dy)-(L.r+fbm(x*0.003+3,y*0.003-4,2)*L.amp); if(v<wd) wd=v; }
+  const PD=Z.ponds; for(let i=0;i<PD.length;i++){ const p=PD[i], dx=x-p.x, dy=y-p.y; if(dx*dx+dy*dy>(p.r+200)*(p.r+200)) continue; const d=Math.sqrt(dx*dx+dy*dy), n=fbm(x*0.01+p.x*0.1,y*0.01,2)*14; const v=p.inner?Math.max(d-(p.r+n),(p.inner-n)-d):d-(p.r+n); if(v<wd) wd=v; }
+  if(Z.sea){ const ld=zLandD(x,y,Z); if(ld<wd){ wd=ld; ZW.sea=1; } }
+  if(Z.isles.length&&wd<120){ let id=1e9; for(const s of Z.isles){ const d=dist(x,y,s.x,s.y)-(s.r+fbm(x*0.012+s.x,y*0.012-s.y,2)*s.r*0.12); if(d<id) id=d; } if(id<160) wd=Math.max(wd,-id); }
+  return wd;
+}
+function zLavaS(x,y,Z){
+  let s=0;
+  if(Z.lavaG.n){ const d=gsDist(x,y,Z.lavaG); if(d<1e8){ const w=TZL.w||48; s=clamp((w+fbm(x*0.005,y*0.005,2)*16-d)/16,0,1); } }
+  const LF=Z.lavaFields; for(let i=0;i<LF.length;i++){ const F=LF[i], dx=x-F.x, dy=y-F.y, R=F.r*1.25+40; if(dx*dx+dy*dy>R*R) continue; const v=clamp((F.r+fbm(x*0.004+F.x*0.01,y*0.004,3)*F.r*0.22-Math.sqrt(dx*dx+dy*dy))/20,0,1); if(v>s) s=v; }
+  if(s>0) for(const c of Z.lavaClear){ const d=dist(x,y,c[0],c[1]); if(d<c[2]+80) s=Math.min(s,clamp((d-c[2])/80,0,1)); }
+  return s;
+}
+function zBiome(x,y,o,Z){
+  const wx=x+fbm(x*0.0005,y*0.0005,3)*640, wy=y+fbm(x*0.0005+40,y*0.0005-20,3)*640, S=Z.seeds;
+  let d1=1e18,d2=1e18,b1=S[0][2],b2=S[0][2];
+  for(let i=0;i<S.length;i++){ const s=S[i], dx=wx-s[0], dy=wy-s[1], d=dx*dx+dy*dy; if(d<d1){ d2=d1; b2=b1; d1=d; b1=s[2]; } else if(d<d2){ d2=d; b2=s[2]; } }
+  if(d2>=1e18){ b2=b1; d2=d1+280*280*4; }
+  o.b=b1; o.b2=b2; o.t=0.5+0.5*clamp((Math.sqrt(d2)-Math.sqrt(d1))/280,0,1);
+  return o;
+}
+function tOut(o,M){
+  const b=M&&M.tz?M.tz.seeds[0][2]:M?M.k*10:0;
+  // same field order as T in a2_world.js plus its wrapper below, so every sample object keeps one shape (fast)
+  o.out=1; o.b=b; o.b2=b; o.t=1; o.n=0; o.roadAng=0; o.roadD=1e9; o.water=0; o.depth=0; o.shore=0; o.road=0; o.bridge=0; o.lava=0; o.bog=0; o.lavaS=0;
+  o.ice=0; o.sand=0; o.snow=0; o.sea=0; o.deep=0; o.seaD=0;
+  return o;
+}
+// the sample for maps 1 and up: the same fields as T in a2_world.js, plus ice, sand, snow (0 unless `extra` sets them),
+// sea (water that is sea), deep (sea past the shelf: blocks even Water Stride) and seaD (0..1 how far out to sea)
+function mapT(x,y,o){
+  const M=MAPS[mapAt(y)];
+  if(!M||x<0||y<M.y0||x>M.w||y>M.y0+M.h) return tOut(o,M);
+  const Z=M.tz||tzOf(M);
+  o.out=0;
+  zBiome(x,y,o,Z);
+  o.n=fbm(x*0.004,y*0.004,3);
+  const rdd=gsDist(x,y,Z.roadG); o.roadAng=TZL?TZL.ang:0; o.roadD=rdd;
+  const wd=zWaterD(x,y,Z), sea=ZW.sea;
+  o.water=wd<0?1:0; o.depth=clamp(-wd/70,0,1);
+  const sw=sea?Z.sea.shore:30; o.shore=wd>=0&&wd<sw?1-wd/sw:0;
+  const B=BIOMES[o.b], roadW=B&&B.roadW||19;
+  o.road=rdd<roadW?1:rdd<roadW+10?1-(rdd-roadW)/10:0;
+  o.bridge=0; o.lava=0; o.bog=0;
+  if(o.water&&rdd<34) o.bridge=1;
+  o.lavaS=Z.hasLava?zLavaS(x,y,Z):0;
+  o.ice=0; o.sand=0; o.snow=0;
+  o.sea=o.water&&sea?1:0; o.deep=o.sea&&-wd>Z.sea.shelf?1:0; o.seaD=o.sea?clamp(-wd/420,0,1):0;
+  if(o.lavaS>0.5){ if(rdd<36){ o.bridge=2; o.lavaS=0; } else o.lava=1; }
+  if(rdd<36) o.lavaS=Math.min(o.lavaS,0.45);
+  if(B&&B.bog&&!o.water&&o.t>0.6) o.bog=bogS(x,y,rdd)*clamp((o.t-0.6)/0.2,0,1);
+  if(Z.extra) Z.extra(x,y,o);
+  return o;
+}
+// walker blocking on maps 1 and up: the `block` hook, then roads (always pass, they are bridges), walkways, water, lava
+function mapBlocked(x,y){
+  const M=MAPS[mapAt(y)];
+  if(!M||x<30||y<M.y0+30||x>M.w-30||y>M.y0+M.h-30) return true;
+  const Z=M.tz||tzOf(M);
+  if(Z.block&&Z.block(x,y)) return true;
+  if(gsDist(x,y,Z.roadG)<34) return false;
+  const WK=Z.walkways; for(let i=0;i<WK.length;i++){ const w=WK[i]; if(x>=w.x0&&x<=w.x1&&y>=w.y0&&y<=w.y1) return false; }
+  if(zWaterD(x,y,Z)<0) return true;
+  if(Z.hasLava&&zLavaS(x,y,Z)>0.5) return true;
+  return false;
+}
+// what still blocks Ash with Water Stride: the block hook, lava, and the deep sea (unless the map's sea says stride:true)
+function mapStrideBlocked(x,y){
+  const M=MAPS[mapAt(y)];
+  if(!M||x<30||y<M.y0+30||x>M.w-30||y>M.y0+M.h-30) return true;
+  const Z=M.tz||tzOf(M);
+  if(Z.block&&Z.block(x,y)) return true;
+  if(gsDist(x,y,Z.roadG)<34) return false;
+  const WK=Z.walkways; for(let i=0;i<WK.length;i++){ const w=WK[i]; if(x>=w.x0&&x<=w.x1&&y>=w.y0&&y<=w.y1) return false; }
+  if(Z.hasLava&&zLavaS(x,y,Z)>0.5) return true;
+  if(Z.sea&&!Z.sea.stride){ const wd=zWaterD(x,y,Z); if(ZW.sea&&-wd>Z.sea.shelf) return true; }
+  return false;
+}
+function mapLavaHere(x,y){ const M=MAPS[mapAt(y)]; if(!M||!M.k) return false; const Z=M.tz||tzOf(M); return Z.hasLava&&gsDist(x,y,Z.roadG)>=36&&zLavaS(x,y,Z)>0.5; }
+// bridges where a map's roads cross its water or lava: walk each road and drop a bridge on every wet run
+function mapBridges(M){
+  const Z=tzOf(M), s={};
+  for(const r of Z.roads){
+    const L=Math.sqrt(r.l2), n=Math.ceil(L/14); let run=-1, kind='wood';
+    for(let i=0;i<=n+1;i++){
+      let wet=false, lava=false;
+      if(i<=n){ const t=i/n, x=r.ax+r.dx*t, y=r.ay+r.dy*t; wet=zWaterD(x,y,Z)<0; lava=!wet&&Z.hasLava&&zLavaS(x,y,Z)>0.5; }
+      if((wet||lava)&&run<0){ run=i; kind=lava?'stone':'wood'; }
+      else if(!(wet||lava)&&run>=0){
+        const t0=Math.max(0,(run-1)/n), t1=Math.min(1,(i)/n), tm=(t0+t1)/2, len=(t1-t0)*L+40;
+        BRIDGES.push({x:r.ax+r.dx*tm,y:r.ay+r.dy*tm,ang:r.ang,len:Math.max(len,120),w:kind==='wood'?58:62,kind,map:M.k}); run=-1;
+      }
+    }
+  }
+  // terrain walkways get plank decks (draw:false for one that is drawn some other way)
+  for(const w of Z.walkways){ if(w.draw===false) continue; const ww=w.x1-w.x0, hh=w.y1-w.y0, v=hh>ww;
+    BRIDGES.push({x:(w.x0+w.x1)/2,y:(w.y0+w.y1)/2,ang:v?Math.PI/2:0,len:v?hh:ww,w:(v?ww:hh)+4,kind:w.kind||'wood',map:M.k}); }
+}
+
+// ---------- the dispatch: Embermere keeps the stock code, the other maps use the sampler above
+{ const base=T; T=function(x,y,o){ o=o||SAMPLE; if(y<BAND){ base(x,y,o); o.ice=0; o.sand=0; o.snow=0; o.sea=0; o.deep=0; o.seaD=0; return o; } return mapT(x,y,o); }; }
+{ const base=blockedAt; blockedAt=function(x,y){ if(y<BAND||x>=IZX-50) return base(x,y); return mapBlocked(x,y); }; }
+{ const base=biomeInfo; biomeInfo=function(x,y,o){ if(y<BAND) return base(x,y,o); const M=MAPS[mapAt(y)]; if(!M){ o.b=o.b2=0; o.t=1; return o; } return zBiome(x,y,o,M.tz||tzOf(M)); }; }
+// segsDist(x,y,ROAD_SEGS) (and RIVER_SEGS, LAVA_SEGS) on another map measures that map's own roads, so placeHouses,
+// addLandmark (nudge, spotOK) and any copied Embermere pattern keep off the right roads
+{ const base=segsDist; segsDist=function(x,y,segs){
+  if(y<BAND||x>=IZX-50) return base(x,y,segs);
+  const M=MAPS[mapAt(y)]; if(!M){ lastSeg=null; return 1e9; }
+  const Z=M.tz||tzOf(M), G=segs===ROAD_SEGS?Z.roadG:segs===RIVER_SEGS?Z.rivG:segs===LAVA_SEGS?Z.lavaG:null;
+  if(!G) return base(x,y,segs);
+  const d=gsDist(x,y,G); lastSeg=TZL; return d;
+}; }
+{ const base=gapsFor; gapsFor=function(cx,cy){ if(cy<BAND) return base(cx,cy); const M=MAPS[mapAt(cy)]; if(!M) return []; const g=[]; for(const s of tzOf(M).roads){ for(const [px,py] of [[s.ax,s.ay],[s.bx,s.by]]){ const d=dist(px,py,cx,cy); if(d>150&&d<800) g.push(angTo(cx,cy,px,py)); } } return g; }; }
+{ const base=regionAt; regionAt=function(x,y){ const r=base(x,y); if(r&&r.name==null){ r.name=mapOfY(y).name; } if(r&&r.level==null) r.level=1; return r; }; }
+{ const base=lavaSpot; lavaSpot=function(x,y){ if(y<BAND||x>=IZX-50) return base(x,y); return mapStrideBlocked(x,y); }; }
+{ const base=landBad; landBad=function(x,y){
+  if(y<BAND||x>=IZX-50) return base(x,y);
+  if(outOfMap(x,y,30)) return null;
+  if(!blockedAt(x,y)) return null;
+  if(mapLavaHere(x,y)) return 'lava';
+  const M=MAPS[mapAt(y)], Z=tzOf(M);
+  if(Z.block&&Z.block(x,y)) return 'block';
+  if(canWalkWater()&&!mapStrideBlocked(x,y)) return null;
+  return T(x,y,{}).water?'water':null;
+}; }
+// a jump that lands on a `block` spot (deep snow wall, glass spikes) hops Ash back without a splash or a burn
+{ const base=backToSafe; backToSafe=function(p,bad){
+  if(bad!=='block') return base(p,bad);
+  let sx=p.safeX, sy=p.safeY;
+  if(sx==null||dist(sx,sy,p.x,p.y)>900||playerBlocked(sx,sy)){ const s=nearestLand(p.x,p.y); if(s){ sx=s.x; sy=s.y; } }
+  if(sx!=null){ p.x=sx; p.y=sy; }
+  p.avx=p.avy=0; p.kvx=p.kvy=0; MV.lx=p.x; MV.ly=p.y; p.iframes=Math.max(p.iframes,0.5);
+  emit(p.x,p.y+5,10,{col:'150,130,110',glow:false,smin:30,smax:100,lmin:.25,lmax:.5,zmin:2,zmax:4,grow:7});
+}; }
+
+// ---------- ground chunks, colours and props for maps 1 and up
+const chunkMapOf=cy=>mapAt(cy*CH+CH/2);
+function groundRGBMap(s,x,y){
+  if(s.out) return [12,16,10];
+  const B=BIOMES[s.b]||BDEF, M=MAPS[mapAt(y)];
+  const m=fbm(x*0.0011+11,y*0.0011-7,2);
+  let c=BCOL[s.b]?biomeRGB(s.b,s.n,m):[90,110,60];
+  if(s.b2!==s.b&&s.t<1&&BCOL[s.b2]) c=mixRGB(biomeRGB(s.b2,s.n,m),c,s.t);
+  if(s.sand>0) c=mixRGB(c,B._sand||[214,190,134],clamp(s.sand,0,1)*0.8);
+  if(s.snow>0) c=mixRGB(c,[236,241,246],clamp(s.snow,0,1)*0.85);
+  if(s.ice>0) c=mixRGB(c,mixRGB([176,214,234],[214,236,246],clamp(s.n+0.5,0,1)),clamp(s.ice,0,1)*0.85);
+  if(s.shore>0) c=mixRGB(c,B._shore,s.shore*0.75);
+  if(s.bog>0) c=mixRGB(c,mixRGB([58,70,46],[30,40,30],clamp(s.n+0.5,0,1)),smooth(clamp(s.bog*1.4-0.15,0,1))*0.92);
+  if(s.road>0) c=mixRGB(c,mixRGB(B._road,[0,0,0],Math.max(0,s.n)*0.15),s.road*0.92);
+  if(s.water){ const Wc=B._water; c=mixRGB(Wc[0],Wc[1],smooth(s.depth)); if(s.seaD>0) c=mixRGB(c,mixRGB(Wc[1],[6,14,28],0.55),smooth(s.seaD)*0.8); if(s.depth<0.15) c=mixRGB(Wc[2],c,s.depth/0.15*0.7+0.3); }
+  if(s.lavaS>0) c=mixRGB(c,mixRGB([255,138,40],[170,44,12],clamp(0.5+s.n,0,1)),smooth(clamp(s.lavaS*1.6-0.3,0,1)));
+  if(B.rgb){ const r=B.rgb(c,s,x,y); if(r) c=r; }
+  if(M){ const ed=Math.min(x,y-M.y0,M.w-x,M.y0+M.h-y); if(ed<160) c=mixRGB([10,12,8],c,clamp(ed/160,0,1)); }
+  return c;
+}
+const BDEF={_road:[128,106,74],_shore:[170,154,112],_water:[[74,122,118],[22,52,70],[190,200,190]]};
+function genChunkMap(cx,cy){
+  const x0=cx*CH, y0=cy*CH, N=65, step=CH/(N-1);
+  const small=mkCanvas(N,N), sg=small.getContext('2d'), img=sg.createImageData(N,N), d=img.data;
+  const glowS=mkCanvas(N,N), gg=glowS.getContext('2d'), gimg=gg.createImageData(N,N), gd=gimg.data;
+  const grid=new Array(N*N); let hasLava=false, hasWater=false;
+  for(let j=0;j<N;j++) for(let i=0;i<N;i++){
+    const x=x0+i*step, y=y0+j*step, s=T(x,y,{});
+    grid[j*N+i]=s;
+    const c=groundRGB(s,x,y), k=(j*N+i)*4;
+    d[k]=c[0]; d[k+1]=c[1]; d[k+2]=c[2]; d[k+3]=255;
+    if(s.lavaS>0){ hasLava=true; gd[k]=255; gd[k+1]=120; gd[k+2]=30; gd[k+3]=Math.round(clamp(s.lavaS*1.4-0.2,0,1)*210); }
+    if(s.water) hasWater=true;
+  }
+  sg.putImageData(img,0,0);
+  const cv=mkCanvas(CPX,CPX), g=cv.getContext('2d');
+  g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
+  g.drawImage(small,0,0,N,N,-CPX/(N-1)/2,-CPX/(N-1)/2,CPX+CPX/(N-1),CPX+CPX/(N-1));
+  g.setTransform(RES,0,0,RES,-x0*RES,-y0*RES);
+  const at=(x,y)=>{ const i=clamp(Math.round((x-x0)/step),0,N-1), j=clamp(Math.round((y-y0)/step),0,N-1); return grid[j*N+i]; };
+  const rng=mulberry32(((cx*92821)^(cy*68917)^7)|0);
+  g.lineCap='round'; g.lineWidth=1.1;
+  for(let i=0;i<1500;i++){
+    const x=x0+rng()*CH, y=y0+rng()*CH, s=at(x,y), r=rng();
+    if(s.out||s.water||s.lava) continue;
+    if(s.road>0.5){ if(r<0.25){ g.fillStyle=rng()<0.5?'rgba(60,50,40,.35)':'rgba(200,190,170,.25)'; g.beginPath(); g.arc(x,y,0.8+rng()*1.6,0,TAU); g.fill(); } continue; }
+    const b=s.t<0.75&&rng()<0.5?s.b2:s.b, B=BIOMES[b];
+    if(B&&B.decor){ try{ B.decor(g,rng,x,y,s,r); }catch(e){} g.lineWidth=1.1; }
+  }
+  for(const dc of DECALS){ if(dc.x+(dc.r||dc.w||300)<x0||dc.x-(dc.r||dc.w||300)>x0+CH||dc.y+(dc.r||dc.h||300)<y0||dc.y-(dc.r||dc.h||300)>y0+CH) continue; drawDecal(g,dc); }
+  for(const br of BRIDGES){ if(br.x+200<x0||br.x-200>x0+CH||br.y+200<y0||br.y-200>y0+CH) continue; drawBridge(g,br); }
+  let glow=null;
+  if(hasLava){ gg.putImageData(gimg,0,0); glow=mkCanvas(CPX/4,CPX/4); const g2=glow.getContext('2d'); g2.imageSmoothingEnabled=true; g2.drawImage(glowS,0,0,N,N,-CPX/4/(N-1)/2,-CPX/4/(N-1)/2,CPX/4+CPX/4/(N-1),CPX/4+CPX/4/(N-1)); }
+  return {cv,g,glow,hasWater,used:chunkTick};
+}
+// colliders, radius and flags for a prop, by kind (the same rules genProps uses for the stock kinds)
+function finishProp(p,x,y,rng){
+  p.x=x; p.y=y; p.s=p.s||0.8+rng()*0.5; p.v=p.v!=null?p.v:Math.floor(rng()*997); p.ph=rng()*TAU; p.rot=p.rot!=null?p.rot:rng()*TAU;
+  const K=PROPK[p.k], tk=TREEK[p.k], sc=p.s;
+  if(K){ if(K.rot===false) p.rot=0; p.R=(K.R||14)*sc; if(K.tall) p.tall=true; if(K.col) p.col={t:'c',x,y,r:K.col.r*sc,low:!!K.col.low}; }
+  else if(tk){ p.tall=true; p.R=tk[0]*sc; p.col={t:'c',x,y,r:tk[1]*sc}; }
+  else if(p.k==='rock'||p.k==='obsid'||p.k==='srock'){ p.R=16*sc; p.col={t:'c',x,y,r:13*sc,low:true}; }
+  else if(p.k==='crag'){ p.R=26*sc; p.col={t:'c',x,y,r:22*sc}; }
+  else if(p.k==='spike'){ p.R=18*sc; p.col={t:'c',x,y,r:12*sc}; }
+  else if(p.k==='stump'){ p.R=12*sc; p.col={t:'c',x,y,r:9*sc,low:true}; }
+  else p.R=14*sc;
+  return p;
+}
+function genPropsMap(cx,cy){
+  const out=[], x0=cx*CH, y0=cy*CH, M=MAPS[chunkMapOf(cy)];
+  if(!M||cx<0||x0>M.w||y0>M.y0+M.h||y0+CH<M.y0) return out;
+  const rng=mulberry32(((cx*73856093)^(cy*19349663)^0x5bd1e995)|0), step=40, s={};
+  for(let gy=0;gy<CH;gy+=step) for(let gx=0;gx<CH;gx+=step){
+    const x=x0+gx+rng()*step, y=y0+gy+rng()*step, pick=rng();
+    if(x<25||y<M.y0+25||x>M.w-25||y>M.y0+M.h-25) continue;
+    if(inClearing(x,y)) continue;
+    T(x,y,s);
+    if(s.out||s.water||s.lava||s.bridge||s.road>0||s.roadD<30||s.shore>0.1) continue;
+    const b=s.t<0.62&&pick<0.5?s.b2:s.b, B=BIOMES[b];
+    if(!B||!B.props) continue;
+    const grove=fbm(x*0.0016+7,y*0.0016-3,3);
+    let p=null; try{ p=B.props(rng,x,y,s,grove); }catch(e){ p=null; }
+    if(!p||!p.k) continue;
+    out.push(finishProp(p,x,y,rng));
+  }
+  for(const p of out) if(p.col) addCol(p.col);
+  return out;
+}
+{ const base=genChunk; genChunk=function(cx,cy){ return chunkMapOf(cy)>0?genChunkMap(cx,cy):base(cx,cy); }; }
+{ const base=genProps; genProps=function(cx,cy){ return chunkMapOf(cy)>0?genPropsMap(cx,cy):base(cx,cy); }; }
+{ const base=groundRGB; groundRGB=function(s,x,y){ return y<BAND?base(s,x,y):groundRGBMap(s,x,y); }; }
+
+// ---------- ambience on maps 1 and up: the biome's ambient over the map's (Embermere keeps its own rules)
+const AMBM=new Map(), AMB_O={}, AMBC={t:-1,a:null};
+function ambOf(k,b){ const key=k*1000+b; let a=AMBM.get(key); if(!a){ const M=MAPS[k], B=BIOMES[b]; a=Object.assign({},M&&M.ambient||{},B&&B.ambient||{}); AMBM.set(key,a); } return a; }
+// what the air is like where Ash is (null on Embermere and inside areas)
+function ambHere(){
+  if(!G||!player) return null;
+  if(AMBC.t===G.time&&AMBC.g===G) return AMBC.a;
+  AMBC.t=G.time; AMBC.g=G;
+  const k=curMap(); if(!k||AREA){ AMBC.a=null; return null; }
+  biomeInfo(player.x,player.y,AMB_O); AMBC.a=ambOf(k,AMB_O.b); return AMBC.a;
+}
+function mapNight(){ const a=ambHere(); return a&&a.night||0; }
+function mapLavaGlow(){ const k=curMap(); if(!k||AREA) return false; const M=MAPS[k]; return !!(M&&M.tz&&M.tz.hasLava); }
+function snowyAt(x,y){ const b=biomeInfo(x,y,{}).b; if(b<10) return b===5; const B=BIOMES[b]; return !!(B&&B.ambient&&B.ambient.snow>0.5); }
+{ const base=updateWeather; updateWeather=function(dt){
+  const a=ambHere(); if(!a) return base(dt);
+  const w=G.weather; w.t-=dt;
+  if(w.t<=0){ if(w.type==='clear'&&Math.random()<0.45){ w.type='rain'; w.t=rand(60,130); } else { w.type='clear'; w.t=rand(120,280); } }
+  const target=(w.type==='rain'?1:0)*(a.rain||0); G.rainK+=(target-G.rainK)*Math.min(1,dt*0.25);
+  if(G.rainK>0.75&&a.thunder!==false&&Math.random()<dt*0.03){ flashA=Math.max(flashA,0.35); flashCol='220,230,255'; later(rand(0.6,1.6),()=>SFX.play('thunder')); }
+}; }
+{ const base=updateAmbience; updateAmbience=function(dt){
+  if(!G||G.mode==='menu'||AREA) return base(dt);
+  const a=ambHere(); if(!a) return base(dt);
+  const rk=G.rainK;
+  SFX.ambient({wind:0.035+(a.wind||0)*0.035+rk*0.04,rain:0.12*rk,lava:(a.lava!=null?a.lava:a.embers||0)*0.12});
+  G.chirpT=(G.chirpT||0)-dt;
+  if(G.chirpT<=0){
+    if(isNight()){ G.chirpT=rand(0.4,0.9); if(a.birds&&rk<0.3) SFX.play('cricket'); }
+    else{ G.chirpT=rand(1.2,4); if(a.birds&&rk<0.3&&isDay()) SFX.play('bird',0.8); }
+  }
+}; }
+{ const base=ambientEmit; ambientEmit=function(dt){
+  base(dt);
+  if(!G||AREA) return; const a=ambHere(); if(!a) return;
+  const vx=cam.x, vy=cam.y, vw=W/zoom, vh=H/zoom;
+  if(a.embers&&Math.random()<dt*14*a.embers) emit(rand(vx,vx+vw),rand(vy,vy+vh),1,{col:'255,140,50',ang:-Math.PI/2,spread:0.8,smin:10,smax:40,lmin:2,lmax:4,zmin:0.8,zmax:1.8,drag:0.1,rise:4});
+  if(a.ash&&Math.random()<dt*12*a.ash) emit(rand(vx,vx+vw),rand(vy,vy+vh),1,{col:'190,185,180',glow:false,ang:0.6,spread:0.4,smin:20,smax:50,lmin:3,lmax:5,zmin:1,zmax:2.2,drag:0.05});
+}; }
+{ const base=ambientTint; ambientTint=function(){
+  const c=base(); if(!G||!player||AREA) return c;
+  const k=curMap(); if(!k) return c; const s=MAPS[k]&&MAPS[k].sky; if(!s||!s.tint) return c;
+  if(!s._t) s._t=hexRGB(s.tint); return mixRGB(c,s._t,s.k!=null?s.k:0.2);
+}; }
+
+// ---------- feel underfoot: biome speed, deep snow, ice, footprints
+function terrSpeed(s){
+  if(s.b<10&&!s.snow) return 1;
+  const B=BIOMES[s.b]; let k=B&&B.speed!=null&&s.road<=0?B.speed:1;
+  if(s.snow>0&&s.road<=0) k*=1-0.35*clamp(s.snow,0,1);
+  return k;
+}
+function footKind(s){ if(s.snow>0.3) return 'snow'; if(s.b<10) return null; const B=BIOMES[s.b]; return B&&B.footprints||null; }
+{ const base=footprint; footprint=function(x,y,f,wt){
+  const k=y<BAND?null:footKind(PT); if(!k||k==='snow') return base(x,y,f,wt);
+  const c=CHUNKS.get(ckey(Math.floor(x/CH),Math.floor(y/CH))); if(!c) return;
+  const side=Math.sin(wt*10)>0?1:-1, px=x+Math.cos(f+Math.PI/2)*4*side, py=y+Math.sin(f+Math.PI/2)*4*side;
+  const g=c.g; g.save(); g.translate(px,py); g.rotate(f); g.fillStyle=k==='sand'?'rgba(120,92,52,.32)':'rgba(40,30,20,.28)'; g.beginPath(); g.ellipse(0,0,4,2.4,0,0,TAU); g.fill(); g.restore();
+}; }
+// ---------- critters per biome
+const CRIT_EMBER=['deer','rabbit'];
+function critterKinds(b){
+  if(b<10) return (b>1&&b!==5)?null:CRIT_EMBER;
+  const B=BIOMES[b]; if(!B||!B.critters) return null;
+  if(!B._crit) B._crit=B.critters.filter(t=>t==='deer'||t==='rabbit'||CRITTERS[t]);
+  return B._crit.length?B._crit:null;
+}
+function critterType(ck,deer){ return ck.length===2?(deer?ck[0]:ck[1]):ck.length===1?ck[0]:ck[Math.floor(Math.random()*ck.length)]; }
+{ const base=spawnCritters; spawnCritters=function(){
+  const n0=G&&G.critters?G.critters.length:0; base();
+  if(!G||!G.critters) return;
+  for(let i=n0;i<G.critters.length;i++){ const c=G.critters[i], D=CRITTERS[c.type]; if(D&&!c.draw){ c.r=D.r||c.r; c.draw=()=>D.draw(c); }
+    // a fresh critter has no wander target yet, and steering to undefined turns its position into NaN (the stock
+    // Embermere critters have this bug too; it is fixed here for the new maps only so Embermere stays as it was)
+    if(c.y>=BAND&&c.tx==null){ c.tx=c.x; c.ty=c.y; } }
+}; }
+// ---------- world events on new biomes: allowed by default (the best weight the event has in any Embermere biome),
+// unless the biome says otherwise with like:<embermere id> or events:{id:weight|false|fn}
+function evWAny(d,c){ let w=0; for(let b=0;b<=6;b++){ let v=0; try{ v=d.w(Object.assign({},c,{b}))||0; }catch(e){ v=0; } if(v>w) w=v; } return w; }
+{ const base=evPick; evPick=function(c){
+  if(!(c&&c.b>=10)) return base(c);
+  const B=BIOMES[c.b]||{}, E=B.events||{}, cand=[]; let tot=0;
+  for(const id in EVD){
+    const d=EVD[id]; if(!reached(d.min)) continue;
+    let w=0;
+    try{ const e=E[id]; w=e===false?0:typeof e==='function'?e(c):typeof e==='number'?e:B.like!=null?d.w(Object.assign({},c,{b:B.like})):evWAny(d,c); }catch(er){ w=0; }
+    if(!(w>0)) continue; if(!d.tk&&!d.chain) w*=evRep(id); cand.push([id,w]); tot+=w;
+  }
+  const out=[]; while(cand.length){ let r=Math.random()*tot, i=0; for(;i<cand.length-1;i++){ r-=cand[i][1]; if(r<=0) break; } const [id,w]=cand.splice(i,1)[0]; tot-=w; out.push(id); }
+  return out;
+}; }
+window.__ebX=Object.assign(window.__ebX||{},{BIOMES,PROPK,mapT:(x,y)=>T(x,y,{}),mapBlocked,mapStrideBlocked,tzOf,ambHere,terrSpeed,blockedAt:(x,y)=>blockedAt(x,y),
+  probeMap(x,y){ const s=T(x,y,{}); return {b:s.b,b2:s.b2,t:+s.t.toFixed(2),out:s.out,water:s.water,sea:s.sea,deep:s.deep,road:+s.road.toFixed(2),bridge:s.bridge,lava:s.lava,shore:+s.shore.toFixed(2),ice:s.ice,snow:s.snow,sand:s.sand,blocked:blockedAt(x,y),stride:y>=BAND?mapStrideBlocked(x,y):null,region:regionAt(x,y).name}; }});
+
+// ================= placeholder biomes and prop kinds for maps 1 to 4 (wave 2 replaces them with defineBiome(id,...))
+const PH=true;
+definePropKind('pm_palm',{placeholder:PH,n:3,tall:true,R:40,col:{r:8},h:70,make(seed){ const rng=mulberry32(seed), R=40; return spriteOf(R,g=>{
+  g.fillStyle='#6a4a2c'; g.beginPath(); g.arc(0,0,6,0,TAU); g.fill();
+  for(let i=0;i<7;i++){ const a=i/7*TAU+rng()*0.4, L=R*(0.75+rng()*0.25); g.strokeStyle=i%2?'#3e7a2a':'#5a9a34'; g.lineWidth=7; g.lineCap='round'; g.beginPath(); g.moveTo(0,0); g.quadraticCurveTo(Math.cos(a+0.3)*L*0.5,Math.sin(a+0.3)*L*0.5,Math.cos(a)*L,Math.sin(a)*L); g.stroke(); }
+  g.fillStyle='#8a6a3a'; for(let i=0;i<3;i++){ g.beginPath(); g.arc((rng()-0.5)*8,(rng()-0.5)*8,3,0,TAU); g.fill(); } }); }});
+definePropKind('pm_crystal',{placeholder:PH,n:3,R:16,col:{r:12},make(seed){ const rng=mulberry32(seed), R=16; return spriteOf(R,g=>{
+  for(let i=0;i<4;i++){ const a=rng()*TAU, L=8+rng()*8; g.fillStyle=i%2?'#7a5ad8':'#a88af0'; g.beginPath(); g.moveTo(Math.cos(a+1.6)*4,Math.sin(a+1.6)*4); g.lineTo(Math.cos(a)*L,Math.sin(a)*L); g.lineTo(Math.cos(a-1.6)*4,Math.sin(a-1.6)*4); g.closePath(); g.fill(); }
+  g.fillStyle='rgba(240,230,255,.7)'; g.beginPath(); g.arc(0,0,2.5,0,TAU); g.fill(); }); }});
+defineBiome(10,{placeholder:PH,name:'the Chalk Downs (placeholder)',level:9,col:['#8fa65a','#a8b870','#6e8a48'],road:'#cfc6ad',water:{deep:'#174a6a',shallow:'#3f9aaa',lip:'#e8f0ea'},shore:'#e2d8b4',
+  ambient:{wind:0.5,birds:true,rain:0.6},critters:['rabbit'],chests:4,
+  props(rng,x,y,s,grove){ const r=rng(); if(grove>0.15&&r<0.16) return {k:'pm_palm'}; if(r<0.05) return {k:'bush'}; if(r<0.08) return {k:'rock'}; return null; },
+  decor(g,rng,x,y,s,r){ if(r<0.5) grassTuft(g,x,y,'rgba(70,100,40,.5)',5+rng()*3,rng); else if(r<0.54){ g.fillStyle='#f2efe4'; g.beginPath(); g.arc(x,y,1.3,0,TAU); g.fill(); } }});
+defineBiome(20,{placeholder:PH,name:'the Frozen Steppe (placeholder)',level:13,col:['#dfe6ee','#f4f7fa','#b4c2d0'],road:'#b8b4b0',water:{deep:'#284a66',shallow:'#7aa6c0',lip:'#eef4f8'},shore:'#cdd6de',
+  ambient:{snow:1,wind:0.7},footprints:'snow',speed:0.93,critters:['rabbit'],chests:4,
+  props(rng,x,y,s,grove){ const r=rng(); if(r<0.12+Math.max(0,grove)*0.4) return {k:'spine'}; if(r<0.2) return {k:'srock'}; if(r<0.24) return {k:'fshrub'}; return null; },
+  decor(g,rng,x,y,s,r){ if(r<0.2){ g.fillStyle='rgba(150,170,195,.28)'; g.beginPath(); g.ellipse(x,y,5+rng()*12,2+rng()*5,rng()*3,0,TAU); g.fill(); } else if(r<0.35){ g.fillStyle='rgba(255,255,255,.7)'; g.beginPath(); g.arc(x,y,0.8,0,TAU); g.fill(); } }});
+defineBiome(30,{placeholder:PH,name:'the Moon Dunes (placeholder)',level:17,col:['#c8b48a','#dccaa0','#a8946a'],road:'#9a8a6a',water:{deep:'#141e44',shallow:'#2f4a8a',lip:'#c8d0f0'},shore:'#e6d6a8',
+  ambient:{wind:0.3,night:0.1},footprints:'sand',chests:3,
+  props(rng,x,y,s,grove){ const r=rng(); if(r<0.03) return {k:'dead'}; if(r<0.07) return {k:'rock'}; if(r<0.08) return {k:'bones'}; return null; },
+  decor(g,rng,x,y,s,r){ if(r<0.25){ g.strokeStyle='rgba(150,120,80,.3)'; g.beginPath(); g.moveTo(x-8,y); g.quadraticCurveTo(x,y-3,x+8,y); g.stroke(); } }});
+defineBiome(40,{placeholder:PH,name:'the Black Glass (placeholder)',level:21,col:['#2a2430','#3a3240','#18141c'],road:'#4a4048',water:{deep:'#0e0a1a',shallow:'#2a2248'},shore:'#3a3444',
+  ambient:{embers:0.6,night:0.15,wind:0.4},chests:3,roadW:24,
+  props(rng,x,y,s,grove){ const r=rng(); if(r<0.05) return {k:'spike'}; if(r<0.1) return {k:'pm_crystal'}; if(r<0.115) return {k:'vent'}; return null; },
+  decor(g,rng,x,y,s,r){ if(r<0.25){ g.strokeStyle='rgba(150,110,255,.25)'; g.beginPath(); let px=x,py=y,a=rng()*TAU; g.moveTo(px,py); for(let k=0;k<3;k++){ a+=(rng()-0.5)*1.2; px+=Math.cos(a)*(6+rng()*8); py+=Math.sin(a)*(6+rng()*8); g.lineTo(px,py); } g.stroke(); } }});
+
 // ================= blessings
 let upChoices=null, upCb=null;
 function offerUpgrades(cb,title,sub){
@@ -24579,7 +25610,7 @@ function openMap(){
   if(!G||G.mode!=='story'||scene!=='play') return;
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
   mapSel=null; $('#bTravel').hidden=true; mapHintSet();
-  const r=G.region||regionAt(player.x,player.y); $('#mapInfo').textContent=`${AREA?'Inside '+AREA.name:r.name} · Level ${player.level} · ${G.coins||0} coins · ${Object.keys(G.shrines).length} of ${SHRINES.length} shrines`;
+  MAPUI.view=curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
   drawMapScreen(); renderJournal(); show('mapov');
 }
 const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
@@ -24649,34 +25680,35 @@ function renderJour(){
   for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
 }
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
-function mapXY(x,y){ return [x/WORLD.w*mapCv.width,y/WORLD.h*mapCv.height]; }
+function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
-  const g=mapG, w=mapCv.width, h=mapCv.height;
+  const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
   g.setTransform(1,0,0,1,0,0); g.fillStyle='#0e0a08'; g.fillRect(0,0,w,h);
-  if(OV.cv){ g.imageSmoothingEnabled=true; g.drawImage(OV.cv,0,0,w,h); }
-  const img=fogG.createImageData(FOG.w,FOG.h);
-  for(let i=0;i<FOG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FOG.bits[i]?0:235; }
-  fogG.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(fogCv,0,0,w,h);
-  const seen=(x,y)=>FOG.bits[clamp(Math.floor(y/FOG.cs),0,FOG.h-1)*FOG.w+clamp(Math.floor(x/FOG.cs),0,FOG.w-1)];
+  if(O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,MF.ox,MF.oy,MF.w,MF.h); }
+  const fcv=fogCanvas(V), fcg=fcv.getContext('2d'), img=fcg.createImageData(FG.w,FG.h);
+  for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
+  fcg.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(fcv,MF.ox,MF.oy,FG.w*FG.cs*MF.s,FG.h*FG.cs*MF.s);
+  const seen=(x,y)=>fogSeen(V,x,y);
   g.textAlign='center'; g.textBaseline='middle';
-  g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(0,wy); g.lineTo(w,wy); g.stroke();
-  for(const k in POI){ const p=POI[k]; if(!seen(p.x,p.y)) continue; const [x,y]=mapXY(p.x,p.y); g.font='700 21px Cinzel, Georgia, serif'; g.lineWidth=5; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(p.name,x,y-22); g.fillStyle='#f2e2c4'; g.fillText(p.name,x,y-22); g.fillStyle='#e8d0a0'; g.beginPath(); g.arc(x,y,6,0,TAU); g.fill(); }
-  for(const c of CAMPS){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
-  for(const s of SHRINES){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
-  for(const o of objectiveList()){ if(o.x==null) continue; const [x,y]=mapXY(o.x,o.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#ffb547'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.fillRect(-11,-11,22,22); g.strokeRect(-11,-11,22,22); g.restore(); }
-  for(const q of questTargets()){ const [x,y]=mapXY(q.x,q.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#7fe0ff'; g.strokeStyle='#08303a'; g.lineWidth=3; g.fillRect(-8,-8,16,16); g.strokeRect(-8,-8,16,16); g.restore(); }
+  if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(0,wy); g.lineTo(w,wy); g.stroke(); }
+  for(const k in POI){ const p=POI[k]; if(!on(p)||!seen(p.x,p.y)) continue; const [x,y]=mapXY(p.x,p.y); g.font='700 21px Cinzel, Georgia, serif'; g.lineWidth=5; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(p.name,x,y-22); g.fillStyle='#f2e2c4'; g.fillText(p.name,x,y-22); g.fillStyle='#e8d0a0'; g.beginPath(); g.arc(x,y,6,0,TAU); g.fill(); }
+  for(const c of mapList(CAMPS,V)){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
+  for(const s of mapList(SHRINES,V)){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
+  for(const o of objectiveList()){ if(o.x==null||!on(o)) continue; const [x,y]=mapXY(o.x,o.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#ffb547'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.fillRect(-11,-11,22,22); g.strokeRect(-11,-11,22,22); g.restore(); }
+  for(const q of questTargets()){ if(!on(q)) continue; const [x,y]=mapXY(q.x,q.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#7fe0ff'; g.strokeStyle='#08303a'; g.lineWidth=3; g.fillRect(-8,-8,16,16); g.strokeRect(-8,-8,16,16); g.restore(); }
   const jm=!!G.items.juniper_map;
-  for(const m of CAVEMOUTHS){ if(!jm&&!seen(m.x,m.y)) continue; const [x,y]=mapXY(m.x,m.y); g.fillStyle='#120c08'; g.strokeStyle='#e8d0a0'; g.lineWidth=2.5; g.beginPath(); g.arc(x,y,10,Math.PI,TAU); g.lineTo(x+10,y+6); g.lineTo(x-10,y+6); g.closePath(); g.fill(); g.stroke(); if(G.found['seen_'+m.area]||jm){ g.font='600 15px Rubik, system-ui, sans-serif'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(m.name,x,y+22); g.fillStyle='#e8d8c0'; g.fillText(m.name,x,y+22); } }
-  for(const o of LANDMARKS){ if(o.k==='pot'||o.k==='barrel'||o.k==='fishspot'||o.k==='sign'||o.k==='frostberry'||o.k==='beehive'||(o.hidden&&o.hidden())) continue; if(!jm&&!seen(o.x,o.y)) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle=o.k==='xmark'?'#ff5a3a':'#d8c8f0'; g.beginPath(); g.arc(x,y,o.k==='xmark'?7:4.5,0,TAU); g.fill(); }
-  if(G.flags.chart) for(const o of ORES){ if(G.ores[o.id]) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle='#7ab8ff'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+7,y); g.lineTo(x,y+9); g.lineTo(x-7,y); g.closePath(); g.fill(); }
-  for(const id in WARDS){ if(!seen(WARDS[id].x,WARDS[id].y)) continue; const [x,y]=mapXY(WARDS[id].x,WARDS[id].y); g.fillStyle=G.wards[id]?'#ffcf6a':'#7a8aa8'; g.strokeStyle='#1a1008'; g.lineWidth=2; g.beginPath(); for(let i=0;i<6;i++){ const a=i/6*TAU+Math.PI/6; i?g.lineTo(x+Math.cos(a)*9,y+Math.sin(a)*9):g.moveTo(x+Math.cos(a)*9,y+Math.sin(a)*9); } g.closePath(); g.fill(); g.stroke(); }
-  const pp=AREA&&G.ow?G.ow:player; const [px,py]=mapXY(pp.x,pp.y); g.save(); g.translate(px,py); g.rotate(player.facing); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.beginPath(); g.moveTo(17,0); g.lineTo(-11,-11); g.lineTo(-5,0); g.lineTo(-11,11); g.closePath(); g.fill(); g.stroke(); g.restore();
+  for(const m of mapList(CAVEMOUTHS,V)){ if(!jm&&!seen(m.x,m.y)) continue; const [x,y]=mapXY(m.x,m.y); g.fillStyle='#120c08'; g.strokeStyle='#e8d0a0'; g.lineWidth=2.5; g.beginPath(); g.arc(x,y,10,Math.PI,TAU); g.lineTo(x+10,y+6); g.lineTo(x-10,y+6); g.closePath(); g.fill(); g.stroke(); if(G.found['seen_'+m.area]||jm){ g.font='600 15px Rubik, system-ui, sans-serif'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(m.name,x,y+22); g.fillStyle='#e8d8c0'; g.fillText(m.name,x,y+22); } }
+  for(const o of mapList(LANDMARKS,V)){ if(o.k==='pot'||o.k==='crossing'||o.k==='barrel'||o.k==='fishspot'||o.k==='sign'||o.k==='frostberry'||o.k==='beehive'||(o.hidden&&o.hidden())) continue; if(!jm&&!seen(o.x,o.y)) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle=o.k==='xmark'?'#ff5a3a':'#d8c8f0'; g.beginPath(); g.arc(x,y,o.k==='xmark'?7:4.5,0,TAU); g.fill(); }
+  for(const c of crossingsOn(V)){ if((c.hidden&&c.hidden())||!seen(c.x,c.y)) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=2.5; g.beginPath(); g.moveTo(x-8,y-6); g.lineTo(x+6,y-6); g.lineTo(x+11,y-1); g.lineTo(x+6,y+4); g.lineTo(x-8,y+4); g.closePath(); g.fill(); g.stroke(); g.font='600 15px Rubik, system-ui, sans-serif'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; const nm=simplify(c.name||c.label||''); g.strokeText(nm,x,y+20); g.fillStyle='#ffe2a8'; g.fillText(nm,x,y+20); }
+  if(G.flags.chart) for(const o of mapList(ORES,V)){ if(G.ores[o.id]) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle='#7ab8ff'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+7,y); g.lineTo(x,y+9); g.lineTo(x-7,y); g.closePath(); g.fill(); }
+  for(const id in WARDS){ if(!on(WARDS[id])||!seen(WARDS[id].x,WARDS[id].y)) continue; const [x,y]=mapXY(WARDS[id].x,WARDS[id].y); g.fillStyle=G.wards[id]?'#ffcf6a':'#7a8aa8'; g.strokeStyle='#1a1008'; g.lineWidth=2; g.beginPath(); for(let i=0;i<6;i++){ const a=i/6*TAU+Math.PI/6; i?g.lineTo(x+Math.cos(a)*9,y+Math.sin(a)*9):g.moveTo(x+Math.cos(a)*9,y+Math.sin(a)*9); } g.closePath(); g.fill(); g.stroke(); }
+  const pp=AREA&&G.ow?G.ow:player; if(curMap()===V){ const [px,py]=mapXY(pp.x,pp.y); g.save(); g.translate(px,py); g.rotate(player.facing); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.beginPath(); g.moveTo(17,0); g.lineTo(-11,-11); g.lineTo(-5,0); g.lineTo(-11,11); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   g.font='600 20px Rubik, system-ui, sans-serif'; g.fillStyle='rgba(240,225,200,.7)'; g.textAlign='left'; g.fillText('N ↑',16,22);
 }
 mapCv.addEventListener('click',e=>{
   if(scene!=='map') return;
-  const r=mapCv.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*WORLD.w, y=(e.clientY-r.top)/r.height*WORLD.h;
-  let best=null,bd=420*420; for(const s of SHRINES){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
+  const r=mapCv.getBoundingClientRect(), [x,y]=mapInv((e.clientX-r.left)/r.width*mapCv.width,(e.clientY-r.top)/r.height*mapCv.height);
+  let best=null,bd=420*420; for(const s of mapList(SHRINES,MAPUI.view)){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
   mapSelect(best);
 });
 function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there.`; else h.textContent='Tap a blue shrine you have found to fast travel there.'; }
@@ -24689,7 +25721,7 @@ function mapSelect(best){
 // controller and keyboard ([ and ]): step through the shrines you have found, west to east
 function mapCycle(d){
   if(scene!=='map') return;
-  const list=SHRINES.filter(s=>G.shrines[s.id]).sort((a,b)=>a.x-b.x); if(!list.length) return;
+  const list=mapList(SHRINES,MAPUI.view).filter(s=>G.shrines[s.id]).sort((a,b)=>a.x-b.x); if(!list.length) return;
   let i=list.indexOf(mapSel);
   if(i<0){ const pp=AREA&&G.ow?G.ow:player; let bd=1e18; list.forEach((s,k)=>{ const q=dist2(s.x,s.y,pp.x,pp.y); if(q<bd){ bd=q; i=k; } }); }
   else i=(i+d+list.length)%list.length;
@@ -24862,7 +25894,7 @@ function frame(now){
     else if(scene==='dialogue'){ updateDialogue(dt); liteUpdate(dt); }
     else if(scene!=='paused'&&scene!=='map'&&scene!=='journal'&&!(scene==='log'&&LOG.from==='paused')) liteUpdate(dt);
     musicUpdate(dt); if(scene==='play') perkUpdate(dt);
-    if(!OV.done) overviewStep(scene==='menu'?14:6);
+    overviewStep(scene==='menu'?14:6);
     render();
   }catch(err){ console.error(err); }
   pressed.clear(); touch.pressed={};
