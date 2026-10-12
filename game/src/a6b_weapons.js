@@ -656,7 +656,9 @@ function drawWeaponFx(){
     ctx.strokeStyle=`rgba(255,180,90,${0.45*a*(0.4+f.ch)})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(f.x,f.y,r*0.72,0,TAU); ctx.stroke();
     if(k<0.6){ ctx.strokeStyle=`rgba(40,26,16,${0.55*(1-k/0.6)})`; ctx.lineWidth=1.6; for(let i=0;i<7;i++){ const b=i*TAU/7+f.x*0.01, r0=8, r1=f.r*(0.35+0.12*((i*37)%5)/5); ctx.beginPath(); ctx.moveTo(f.x+Math.cos(b)*r0,f.y+Math.sin(b)*r0); ctx.lineTo(f.x+Math.cos(b+0.2)*r1*0.6,f.y+Math.sin(b+0.2)*r1*0.6); ctx.lineTo(f.x+Math.cos(b)*r1,f.y+Math.sin(b)*r1); ctx.stroke(); } }
   }
+  const t3=T3.on&&typeof t3FlyArrow==='function';   // 3D characters on: arrows and the boomerang fly at hand height (a10c_t3ash.js)
   for(const s of G.wstuck){
+    if(t3){ t3StuckArrow(s); continue; }
     const a=clamp((s.life-s.t)/0.3,0,1), wob=s.ground?0:Math.sin(s.t*45)*0.16*Math.max(0,1-s.t*4);
     ctx.save(); ctx.globalAlpha=a; ctx.translate(s.x,s.y); ctx.rotate(s.a+wob);
     if(s.ground){ ctx.globalAlpha=a*0.85; drawArrowShape(15,false,false); }
@@ -665,12 +667,14 @@ function drawWeaponFx(){
   }
   for(const a of G.wproj){
     if(a.k==='arrow'){
+      if(t3){ t3FlyArrow(a); continue; }
       ctx.save(); ctx.translate(a.x,a.y); ctx.rotate(a.a);
       if(a.full||a.fire){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createLinearGradient(-46,0,0,0); g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(1,a.fire?'rgba(255,150,60,.55)':'rgba(220,240,255,.45)'); ctx.strokeStyle=g; ctx.lineWidth=a.fire?4:2.4; ctx.beginPath(); ctx.moveTo(-46,0); ctx.lineTo(0,0); ctx.stroke(); ctx.restore(); }
       drawArrowShape(15,a.fire,a.full);
       if(a.fire){ ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(6,0,0,6,0,12); g.addColorStop(0,'rgba(255,230,160,.9)'); g.addColorStop(1,'rgba(255,110,30,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(6,0,12,0,TAU); ctx.fill(); }
       ctx.restore();
     }else if(a.k==='rang'){
+      if(t3){ t3FlyRang(a); continue; }
       for(let i=0;i<a.trail.length;i+=2){ ctx.save(); ctx.globalAlpha=0.12+0.06*i; ctx.translate(a.trail[i],a.trail[i+1]); ctx.rotate(a.spin-0.5*(a.trail.length-i)); drawRangShape(ctx,1.2,a.fire); ctx.restore(); }
       ctx.save(); ctx.translate(a.x,a.y); ctx.rotate(a.spin);
       if(a.fire){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(0,0,0,0,0,18); g.addColorStop(0,'rgba(255,220,140,.7)'); g.addColorStop(1,'rgba(255,110,30,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,18,0,TAU); ctx.fill(); ctx.restore(); }
