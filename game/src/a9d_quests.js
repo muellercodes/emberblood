@@ -113,6 +113,7 @@ function giveReward(r){
   if(r.stamina){ player.maxStamina+=r.stamina; player.stamina=player.maxStamina; }
   if(r.fn==='quillchart') G.flags.chart=true;
   if(r.fn==='reforge') reforgeIron();
+  if(r.weapon) giveWeapon(r.weapon); if(r.abil) grantAbility(r.abil); if(r.sp) giveSkillPoint(r.sp);
 }
 function advanceQuest(id){
   const q=G.quests[id], d=QDEFS[id], st=d.steps[q.step];

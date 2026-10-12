@@ -49,7 +49,10 @@ const MUTE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+60,w:40,h:40});
 const MINI_R=()=>{ const r=W<560?52:70; return {x:W-SAFE.r-68-r*2,y:SAFE.t+14,w:r*2,h:r*2,r}; };
 const inRect=(r,x,y)=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
 let TRACK_R=null;
+// HUD_HITS: modules push {x,y,w,h,fn} while drawing the HUD each frame (cleared at the start of drawHUD)
+const HUD_HITS=[];
 function hudClick(x,y){
+  for(const h of HUD_HITS) if(inRect(h,x,y)){ h.fn(); return true; }
   if(inRect(PAUSE_R(),x,y)){ pauseGame(); return true; }
   if(TRACK_R&&G&&G.mode==='story'&&inRect(TRACK_R,x,y)){ openJournal(); return true; }
   if(inRect(MUTE_R(),x,y)){ toggleAllSound(); return true; }

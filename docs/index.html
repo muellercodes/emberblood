@@ -1416,7 +1416,9 @@ const RIVERS=[
 ];
 const LAKE={x:6000,y:7200,r:600};
 // islands carved out of rivers and the lake ({x,y,r}), and plank walkways over water ({x0,y0,x1,y1}); feature modules push to these at load
-const ISLES=[], WALKWAYS=[];
+const ISLES=[], WALKWAYS=[], PONDS=[];
+// PONDS: extra water, a disc {x,y,r} or a ring moat {x,y,r,inner}; returns signed distance (negative is water)
+function pondD(x,y){ let best=1e9; for(const p of PONDS){ const d=dist(x,y,p.x,p.y), n=fbm(x*0.01+p.x*0.1,y*0.01,2)*14; const v=p.inner?Math.max(d-(p.r+n),(p.inner-n)-d):d-(p.r+n); if(v<best) best=v; } return best; }
 function isleD(x,y){ let best=1e9; for(const s of ISLES){ const d=dist(x,y,s.x,s.y)-(s.r+fbm(x*0.012+s.x,y*0.012-s.y,2)*s.r*0.12); if(d<best) best=d; } return best; }
 function onWalkway(x,y){ for(const w of WALKWAYS) if(x>=w.x0&&x<=w.x1&&y>=w.y0&&y<=w.y1) return w; return null; }
 const ROADS=[
@@ -1522,7 +1524,7 @@ function T(x,y,o){
   const rdd=segsDist(x,y,ROAD_SEGS); o.roadAng=lastSeg?lastSeg.ang:0; o.roadD=rdd;
   const rv=segsDist(x,y,RIVER_SEGS)-riverW(x,y);
   const lk=dist(x,y,LAKE.x,LAKE.y)-lakeR(x,y);
-  let wd=Math.min(rv,lk); if(ISLES.length&&wd<120){ const id=isleD(x,y); if(id<160) wd=Math.max(wd,-id); }
+  let wd=Math.min(rv,lk); if(PONDS.length) wd=Math.min(wd,pondD(x,y)); if(ISLES.length&&wd<120){ const id=isleD(x,y); if(id<160) wd=Math.max(wd,-id); }
   o.water=wd<0?1:0; o.depth=clamp(-wd/70,0,1); o.shore=wd>=0&&wd<30?1-wd/30:0;
   const roadW=o.b===4?26:19;
   o.road=rdd<roadW?1:rdd<roadW+10?1-(rdd-roadW)/10:0;
@@ -1542,6 +1544,7 @@ function blockedAt(x,y){
   if(x>6430&&x<6810&&Math.abs(y-7400)<26) return false;
   if(WALKWAYS.length&&onWalkway(x,y)) return false;
   if(ISLES.length&&isleD(x,y)<0) return false;
+  if(PONDS.length&&pondD(x,y)<0) return true;
   if(segsDist(x,y,RIVER_SEGS)<riverW(x,y)) return true;
   if(dist2(x,y,LAKE.x,LAKE.y)<(LAKE.r+140)**2&&dist(x,y,LAKE.x,LAKE.y)<lakeR(x,y)) return true;
   if(y<2850&&lavaAt(x,y,rdd)) return true;
@@ -5631,7 +5634,10 @@ const MUTE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+60,w:40,h:40});
 const MINI_R=()=>{ const r=W<560?52:70; return {x:W-SAFE.r-68-r*2,y:SAFE.t+14,w:r*2,h:r*2,r}; };
 const inRect=(r,x,y)=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
 let TRACK_R=null;
+// HUD_HITS: modules push {x,y,w,h,fn} while drawing the HUD each frame (cleared at the start of drawHUD)
+const HUD_HITS=[];
 function hudClick(x,y){
+  for(const h of HUD_HITS) if(inRect(h,x,y)){ h.fn(); return true; }
   if(inRect(PAUSE_R(),x,y)){ pauseGame(); return true; }
   if(TRACK_R&&G&&G.mode==='story'&&inRect(TRACK_R,x,y)){ openJournal(); return true; }
   if(inRect(MUTE_R(),x,y)){ toggleAllSound(); return true; }
@@ -7565,6 +7571,7 @@ function giveReward(r){
   if(r.stamina){ player.maxStamina+=r.stamina; player.stamina=player.maxStamina; }
   if(r.fn==='quillchart') G.flags.chart=true;
   if(r.fn==='reforge') reforgeIron();
+  if(r.weapon) giveWeapon(r.weapon); if(r.abil) grantAbility(r.abil); if(r.sp) giveSkillPoint(r.sp);
 }
 function advanceQuest(id){
   const q=G.quests[id], d=QDEFS[id], st=d.steps[q.step];
@@ -8139,6 +8146,7 @@ function giveTalkReward(r){
   if(r.bless){ G.pendingBless+=r.bless; later(1.2,offerPending); }
   if(r.lantern) G.items.lantern=1;
   if(r.item) giveItems({[r.item]:1});
+  if(r.weapon) giveWeapon(r.weapon); if(r.abil) grantAbility(r.abil); if(r.sp) giveSkillPoint(r.sp);
   if(r.hat){ G.hats=G.hats||{}; G.hats[r.hat]=true; G.hat=r.hat; }
   for(const k of ['regen','freeinn','discount','lure','snow','bog']) if(r[k]) G.flags['perk_'+k]=true;
   if(r.reveal){ for(const k in POI) fogReveal(POI[k].x,POI[k].y,700); for(const m of CAVEMOUTHS) fogReveal(m.x,m.y,400); }
@@ -9641,6 +9649,7 @@ function flask(x,y,full){ ctx.fillStyle=full?'#5ad88a':'rgba(255,255,255,.12)'; 
 
 // ================= HUD
 function drawHUD(){
+  HUD_HITS.length=0;
   const p=player, L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story';
   ctx.textBaseline='middle';
   // vitals panel

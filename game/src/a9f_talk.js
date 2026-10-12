@@ -29,6 +29,7 @@ function giveTalkReward(r){
   if(r.bless){ G.pendingBless+=r.bless; later(1.2,offerPending); }
   if(r.lantern) G.items.lantern=1;
   if(r.item) giveItems({[r.item]:1});
+  if(r.weapon) giveWeapon(r.weapon); if(r.abil) grantAbility(r.abil); if(r.sp) giveSkillPoint(r.sp);
   if(r.hat){ G.hats=G.hats||{}; G.hats[r.hat]=true; G.hat=r.hat; }
   for(const k of ['regen','freeinn','discount','lure','snow','bog']) if(r[k]) G.flags['perk_'+k]=true;
   if(r.reveal){ for(const k in POI) fogReveal(POI[k].x,POI[k].y,700); for(const m of CAVEMOUTHS) fogReveal(m.x,m.y,400); }

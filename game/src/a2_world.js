@@ -17,7 +17,9 @@ const RIVERS=[
 ];
 const LAKE={x:6000,y:7200,r:600};
 // islands carved out of rivers and the lake ({x,y,r}), and plank walkways over water ({x0,y0,x1,y1}); feature modules push to these at load
-const ISLES=[], WALKWAYS=[];
+const ISLES=[], WALKWAYS=[], PONDS=[];
+// PONDS: extra water, a disc {x,y,r} or a ring moat {x,y,r,inner}; returns signed distance (negative is water)
+function pondD(x,y){ let best=1e9; for(const p of PONDS){ const d=dist(x,y,p.x,p.y), n=fbm(x*0.01+p.x*0.1,y*0.01,2)*14; const v=p.inner?Math.max(d-(p.r+n),(p.inner-n)-d):d-(p.r+n); if(v<best) best=v; } return best; }
 function isleD(x,y){ let best=1e9; for(const s of ISLES){ const d=dist(x,y,s.x,s.y)-(s.r+fbm(x*0.012+s.x,y*0.012-s.y,2)*s.r*0.12); if(d<best) best=d; } return best; }
 function onWalkway(x,y){ for(const w of WALKWAYS) if(x>=w.x0&&x<=w.x1&&y>=w.y0&&y<=w.y1) return w; return null; }
 const ROADS=[
@@ -123,7 +125,7 @@ function T(x,y,o){
   const rdd=segsDist(x,y,ROAD_SEGS); o.roadAng=lastSeg?lastSeg.ang:0; o.roadD=rdd;
   const rv=segsDist(x,y,RIVER_SEGS)-riverW(x,y);
   const lk=dist(x,y,LAKE.x,LAKE.y)-lakeR(x,y);
-  let wd=Math.min(rv,lk); if(ISLES.length&&wd<120){ const id=isleD(x,y); if(id<160) wd=Math.max(wd,-id); }
+  let wd=Math.min(rv,lk); if(PONDS.length) wd=Math.min(wd,pondD(x,y)); if(ISLES.length&&wd<120){ const id=isleD(x,y); if(id<160) wd=Math.max(wd,-id); }
   o.water=wd<0?1:0; o.depth=clamp(-wd/70,0,1); o.shore=wd>=0&&wd<30?1-wd/30:0;
   const roadW=o.b===4?26:19;
   o.road=rdd<roadW?1:rdd<roadW+10?1-(rdd-roadW)/10:0;
@@ -143,6 +145,7 @@ function blockedAt(x,y){
   if(x>6430&&x<6810&&Math.abs(y-7400)<26) return false;
   if(WALKWAYS.length&&onWalkway(x,y)) return false;
   if(ISLES.length&&isleD(x,y)<0) return false;
+  if(PONDS.length&&pondD(x,y)<0) return true;
   if(segsDist(x,y,RIVER_SEGS)<riverW(x,y)) return true;
   if(dist2(x,y,LAKE.x,LAKE.y)<(LAKE.r+140)**2&&dist(x,y,LAKE.x,LAKE.y)<lakeR(x,y)) return true;
   if(y<2850&&lavaAt(x,y,rdd)) return true;

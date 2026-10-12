@@ -1,6 +1,7 @@
 
 // ================= HUD
 function drawHUD(){
+  HUD_HITS.length=0;
   const p=player, L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story';
   ctx.textBaseline='middle';
   // vitals panel
