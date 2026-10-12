@@ -137,7 +137,7 @@ function drawSkillHud(){
   // the level-up banner (set right after onLevelUp) learns about the new point
   const lv=SK.lv;
   if(lv&&lv.pend){ lv.pend=false; const bn=G.banner;
-    if(bn&&bn.text===`Level ${lv.level}`){ const n=lv.n; bn.sub=`Health and strength up. +${n} skill point${n>1?'s':''}${G.pendingBless>0?', and a blessing awaits':''}!${tipsOn()?' '+skCtrlHint():''}`; bn.dur=Math.max(bn.dur,3.4); } }
+    if(bn&&bn.text===`Level ${lv.level}`){ const n=lv.n; bn.sub=simplify(`Health and strength up. +${n} skill point${n>1?'s':''}${G.pendingBless>0?', and a blessing awaits':''}!${tipsOn()?' '+skCtrlHint():''}`); bn.dur=Math.max(bn.dur,3.4); } }
   const sp=G.sp|0, t=G.time;
   if(sp>0&&!G.flags.sk_hint&&scene==='play'){ G.flags.sk_hint=1; SK.hintEnd=t+10; }
   // star burst over Ash
@@ -574,6 +574,7 @@ function skSetTab(id,focus){
   if(focus){ const b=$(`#skTabs button[data-br="${id}"]`); if(b&&document.activeElement!==b&&!usingTouch) b.focus({preventScroll:true}); }
 }
 function skToast(t){
+  t=simplify(t);
   const el=$('#skToast'); if(!el) return; clearTimeout(SK.toastT);
   if(!t){ el.classList.remove('on'); return; }
   el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),readT(t,3,7)*1000); logAdd({k:'tip',text:t});

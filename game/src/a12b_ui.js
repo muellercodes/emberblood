@@ -3,14 +3,14 @@
 let upChoices=null, upCb=null;
 function offerUpgrades(cb,title,sub){
   scene='upgrade'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  $('#upTitle').textContent=title||'Choose a Blessing'; $('#upSub').textContent=sub||'The fire in your blood grows stronger. Pick one.';
+  $('#upTitle').textContent=simplify(title||'Choose a Blessing'); $('#upSub').textContent=simplify(sub||'The fire in your blood grows stronger. Pick one.');
   const pool=UPGRADES.filter(u=>!(u.once&&player.ups[u.id]));
   upChoices=shuffle(pool.slice()).slice(0,3); upCb=cb;
   const wrap=$('#cards'); wrap.innerHTML='';
   upChoices.forEach((u,i)=>{
     const b=document.createElement('button'); b.type='button'; b.className='card';
     const lv=player.ups[u.id]||0;
-    b.innerHTML=`<span class="k">${i+1}</span><span class="ico" aria-hidden="true">${u.icon}</span><span class="txt"><span class="nm">${u.name}</span><span class="ds">${u.desc}</span>${lv?`<span class="lv">Level ${lv+1}</span>`:''}</span>`;
+    b.innerHTML=`<span class="k">${i+1}</span><span class="ico" aria-hidden="true">${u.icon}</span><span class="txt"><span class="nm">${simplify(u.name)}</span><span class="ds">${simplify(u.desc)}</span>${lv?`<span class="lv">Level ${lv+1}</span>`:''}</span>`;
     b.addEventListener('click',()=>chooseUpgrade(i)); wrap.appendChild(b);
   });
   show('upgrade');
@@ -56,7 +56,7 @@ function closeJournal(){ if(scene!=='journal') return; scene='play'; hideAll(); 
 function giverLine(d){ const g=d.giver; if(!g) return ''; const w=personWhere(g); return `From ${personName(g)}${w?', '+w:''}`; }
 function renderJour(){
   for(const b of document.querySelectorAll('#jTabs button')) b.setAttribute('aria-pressed',String(b.dataset.t===jTab));
-  const el=$('#jBody'), rows=[], E=escapeHtml;
+  const el=$('#jBody'), rows=[], E=t=>escapeHtml(simplify(t));
   if(jTab==='quests'){
     const o=questObjectiveWorld(), sf=!G.focus;
     rows.push(`<div class="jq${sf?' foc':''}"><div class="qt">${sf?'◆ ':''}${E(CHAPTER[G.stage]||'The story')}<small>Main story</small></div><div class="qs">${E(o?o.text:'')}</div><div class="row">${sf?'<button class="btn c sm" disabled>Following</button>':'<button class="btn c sm hot" data-f="">Follow</button>'}</div></div>`);

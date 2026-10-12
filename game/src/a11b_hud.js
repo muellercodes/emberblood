@@ -72,7 +72,7 @@ function drawHUD(){
     bar(bx2,by-8,bw2,12,clamp(b.hp/b.maxHp,0,1),b.invuln?'#8a5a3a':'#b8281e','rgba(30,6,4,.9)');
     ctx.strokeStyle='rgba(255,200,150,.3)'; ctx.lineWidth=1; rr(bx2,by-8,bw2,12,6); ctx.stroke();
     if(b.type==='vorlaxis'){ ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fillRect(bx2+bw2*0.66-1,by-8,2,12); ctx.fillRect(bx2+bw2*0.33-1,by-8,2,12); }
-    ctx.font=`500 11px ${UIF}`; ctx.fillStyle='#d2b898'; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; ctx.fillText(sub,W/2,by+15);
+    ctx.font=`500 11px ${UIF}`; ctx.fillStyle='#d2b898'; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; ctx.fillText(simplify(sub),W/2,by+15);
   }
   // prompt
   if(G.prompt&&scene==='play'){
@@ -196,7 +196,7 @@ let PROMPT_R=null;
 // where the prompt pill and the hint box start on touch: a little above the buttons (short screens: along the bottom)
 function touchBase(){ const B=H-SAFE.b; return B-SAFE.t<600?B-30:Math.min(B-300,touchTopOver(0,W)-30); }
 function drawPromptPill(b){
-  const dev=curDevice(), t=G.prompt.text;
+  const dev=curDevice(), t=simplify(G.prompt.text);
   // the key that does it: E (or the controller's top button); the left-handed keyboard shows Enter when it will
   // talk or open, and \ when a foe is close (Enter attacks then)
   const lk=dev==='kb'&&lefty()&&!useMode()?'\\':'';
@@ -209,7 +209,8 @@ function drawPromptPill(b){
   if(gw){ drawBtnGlyph(ctx,'use',x+gw/2,py,11,dev,lk); x+=gw+9; }
   ctx.font=`600 14px ${UIF}`; ctx.fillStyle='#ffe6c0'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(t,x,py);
 }
-function hintText(){
+function hintText(){ return simplify(hintTextRaw()); }
+function hintTextRaw(){
   const dev=curDevice(), K=a=>btnLabel(a,dev), jump=G.mode!=='story'||hasAbil('jump'), L=lefty();
   if(dev==='touch'){
     // a phone on its side has little room: one short line

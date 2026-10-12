@@ -1,347 +1,347 @@
 {
- "1rpjlbx": "Drag on the left to move (far to run) · Buttons fight, breathe fire, roll and roar · Tap bottles to drink · Tap the map or quests to open them",
- "8hgian": "Drag low to move · Ash swings by himself · Tap fire to breathe fire · More in Settings",
- "1n90uxn": {
-  "o": "Left stick move, push it all the way to sprint · {1} or {2} attack · {3} fire · {4} roll{5} · {6} talk and open · {7} drink · {8} map",
-  "s": "Left stick move, push far to run · {1} or {2} attack · {3} fire · {4} roll{5} · {6} talk · {7} drink · {8} map"
- },
- "956c0b": {
-  "o": "WASD move, Ash faces the way he walks · Shift sprint · Click or J attack · Right click or K fire (both lock on to a foe in front) · {1} roll{2} · {3} drink · {4} use · {5} map",
-  "s": "WASD move · Shift run · Click or J attack · Right click or K fire · {1} roll{2} · {3} drink · {4} use · {5} map"
- },
- "1fssfpi": "Easier foes and better healing. Great for the story.",
- "n9dx70": "A fair fight. Just right.",
- "x8u62u": "Tough, mean foes. For true Emberbloods!",
- "jc12vl": "Kobold Chief",
- "18a9lvr": "Leader of the Scaled Oath",
- "g1350": "Leader of the Frostpine Wolves",
- "rsuq08": "Guard of the Obsidian Gate",
- "zjlsea": "Your great-great-great grandpa",
- "1qapuwu": "Sword hits do 20% more damage.",
- "1yyq3ih": "+20 max health and a full heal.",
- "10z5xyd": "Fire breath is 25% hotter and lasts longer.",
- "jafonh": "Move 8% faster. Rolls tire you less.",
- "1i3tz0i": "Beat a foe, heal 2 health.",
- "14ryhxp": "Rolling leaves fire behind you.",
- "1o7qnes": "Every third hit in a row shoots fire!",
- "1bgifym": "Fall? Pop back up with half health! (Once per rest.)",
- "19o0enj": "An old dragon is laughing. Get back up!",
- "bnenhf": "Even dragons fall. The good ones get back up.",
- "1fvg09": "Your fire is not out yet.",
- "1ywhohw": "Elder Yara says: roll more. She is usually right.",
- "1qoq3uq": "Mom says: eat a snack, then try again.",
- "7oeenq": "Grandma said you were dragons once. She was right!",
- "1k3dh27": "Be careful at night. Wolves come out of Whisperwood.",
- "41zm8v": "Your mom fixed my plow and door in one day. Wow!",
- "opftm": "Welcome to Brindlecross! The best fish. Also the only fish.",
- "1ra6scs": "Sister Wren? She's in the big building full of books. Knock loud!",
- "f6jqnu": "The Oath scared all the traders off the Ashen Road.",
- "5hqa9p": "Granny Moss lives in the Mirefen. Lost? Follow the smell of tea.",
- "1x3zaeq": "A Frostpine farmer lost his goat. He put up eleven signs!",
- "zlv1nk": "The Obsidian Gate? Shut for a thousand years, they say.",
- "ijvsrm": "More health and power, and a blessing!",
- "1aq5n8w": "More health, power and stamina!",
- "ndfoga": "Three quick swings. The last one is big!",
- "7v3rp8": "Fast little stabs. Extra damage from behind!",
- "1ucono2": "Long reach. Pokes and pushes a whole line of foes.",
- "oboktj": "Slow and HUGE. Hold attack to power up. Smashes shields and walls.",
- "j1numb": "Hold attack, let go to shoot. Hold longer to shoot through foes.",
- "1g1196n": "Tap WEAPON or the weapon icons to switch.",
- "fthr5s": {
-  "o": "Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Press X or a number key to switch weapons."
- },
- "1l49vsg": {
-  "o": "{1} of {2} braziers lit",
-  "s": "{1} of {2} fires lit"
- },
- "17b9ve": "Your arrow went through your fire. Now it burns!",
- "yeatvu": "Okay. Come back any time. The hammer will wait.",
- "lrwnyo": "Bring me one star-iron or 150 coins, and it's yours.",
- "x96cbq": {
-  "o": "{1} to jump over rocks and shockwaves.",
-  "s": "{1} to hop over rocks and rings."
- },
- "10ev197": "Strong winds push you back!",
- "1q91vjd": "The wind over the Wall is too strong. Open the gate first.",
- "fsmy90": {
-  "o": "You can jump! {1} to hop over fences, rocks, gaps and shockwaves.",
-  "s": "You can jump! {1} to hop over things."
- },
- "1k7q317": {
-  "o": "Jump with {1}. Sprint first to jump farther. Jumping over water is fine. Landing in it is not!",
-  "s": "Jump with {1}. Run first to jump farther. Do not land in water!"
- },
- "1j12vt0": "Your fire is so hot, you can walk on water!",
- "l4pcw9": "Just walk onto the water. Run to go faster. Find the islands!",
- "18u7jv": {
-  "o": "You have wings! Jump, then {1} again in the air to fly.",
-  "s": "You have wings! Jump, then {1} again to fly."
- },
- "dgukvf": {
-  "o": "Fly: jump, then {1} again in the air (or hold {2}). {3} once more to land. Your wings tire, so watch the wing meter.",
-  "s": "To fly, jump, then {1} again (or hold {2}). {3} again to land. Watch the wing meter!"
- },
- "18sxves": "Get the kid, boys!",
- "1qt1yww": "Rise up, my Oath followers!",
- "lilfmt": "Hatch, babies! Dinner time!",
- "9yiw91": "I stood here a thousand years. No kid will beat me!",
- "1u7sftb": "The sky is mine, child!",
- "14myfvi": "Welcome back!",
- "18ha35": "Fight wave after wave in the Proving Grounds",
- "1akrr2g": "Big boss coming!",
- "1u74zai": {
-  "o": "You've found {1} of 4 endings. Different choices along the way lead to different endings.",
-  "s": "You found {1} of 4 endings. Make other choices to find more!"
- },
- "16si3sf": "You found every ending! The Wardens would be proud.",
- "1tnglon": "Next I'm mapping the caves. Don't worry, I'll bring two lanterns!",
- "xhs8gr": "Rook says you saved me. And that you're super tall!",
- "exwh38": {
-  "o": "{1} ({2}/10 found, {3} delivered)",
-  "s": "{1} ({2}/10 found, {3} given)"
- },
- "84g6h5": {
-  "o": "Blade reforged · tier {1}",
-  "s": "Stronger weapons! Tier {1}"
- },
- "133961k": "Morrow's in the cell. He put it in ABC order. Weird.",
- "1vv9f46": "Bertram visited with a bun! We cried. It blew up. We laughed.",
- "7wq9wv": "Juniper lets me carry her maps now. I'm basically a knight!",
- "162dqvo": {
-  "o": "{1} pages of the Wardens' Account found. Wren must be dancing. Badly.",
-  "s": "{1} pages found. Wren must be dancing. Badly."
- },
- "gpslz4": "Kobolds, Ash! Chase them out first. Then we talk.",
- "16229xm": "Your mom is waiting at the forge, Ash.",
- "tzewb2": "Light three lanterns on the green. Gently! I'm counting.",
- "f86yxr": "Grandma’s sword",
- "1kvkk3z": "I’ll guard the forge. You get the kobolds. Go!",
- "1gme7b4": "Ash? ASH! Bats took my lantern. I've mapped by smell for three days!",
- "vttwam": "It smells like bats. My map just says \"Bats.\"",
- "1ld5teb": "The dragon made big promises. Osric gives me meals and a blanket. I like Osric.",
- "1kzljnm": "I've started reading. Some books aren't about dragons at all!",
- "1itq348": "Pumpkins, Ash! Pumpkins that aren't on fire! Who knew?",
- "1ruh1ha": "Granny Moss says I'm good at gardening. And talking too much.",
- "xr5eqc": "Morrow put us in ABC order. I'm under F.",
- "tgp0bn": "Ah, the hero of my new song! Want to hear it? Too late, I'm singing!",
- "9j8nnr": "🎵 The lamp-man lied and he went to the cell, where he shines lamps so well...",
- "1tvqpje": "🎵 ...that's all so far. Go do hero stuff!",
- "1qij3ml": "Iska sat on my shell to think. She was heavy! Shh, don't tell her.",
- "1tpdwto": "A fish? For me? I haven't had a fish in two hundred years!",
- "1lvma8y": "I'm Shellby. I'm 1,041 years old! When I was tiny, Warden Bram stepped on me. He said sorry for a week.",
- "x3t4k0": "Iska hid a page under my shell. I forgot for 900 years. Here!",
- "h2r55b": "I'm Shellby. Old and hungry. Bring me a fish, and I'll tell you a Warden story.",
- "1vrvq7e": "You found a lost page from the Wardens!",
- "1dvwc5r": "Show it to Sister Wren in Brindlecross.",
- "1eg09uf": {
-  "o": "{1}! Of the Wardens' Account! Oh, oh, oh. Let me look.",
-  "s": "{1}! From the Wardens' book! Oh, oh! Let me see."
- },
- "120l4tc": "All ten! The whole book! You gave the valley its story back, Ash. I have no words. And I always have words!",
- "v0nk0x": {
-  "o": "That's {1} now! This deserves more than coins. Here.",
-  "s": "That's {1} now! Here's something better than coins."
- },
- "tfp8pl": {
-  "o": "{1} to go. They could be anywhere. Caves, attics, under turtles. You never know.",
-  "s": "{1} to go. They could be anywhere. Caves, attics, under turtles!"
- },
- "1kwgbps": "Drinks refilled",
- "1mhayjp": "Your bottles are already full.",
- "xkfkhc": "One Pike! Pointy end at the monster. Pointy end. At. The monster.",
- "1hkb0hn": "It keeps big things far from your face. I like that.",
- "d4s7g": "Sleep here tonight",
- "1gbw4tz": "Fish are jumping here! You need a rod. Ask Dell the fisherman in Brindlecross.",
- "9dymnf": "ISKA, WHO MADE THE FIRST LANTERN. \"Always light one more.\"",
- "sex31u": "ORIEL, WHO TALKED TO DRAGONS. \"Most dragons are just hungry.\"",
- "u0pvd2": "A paper is stuck under the statue's feet!",
- "8y91e4": "No coins to wish with. The well looks sad.",
- "1nijpn0": "You toss in a coin. Four coins fly back out! The well says \"keep the change.\"",
- "1pa8cpf": {
-  "o": "You toss in a coin and make a wish. A voice from the bottom says: \"{1}\"",
-  "s": "You toss in a coin and wish. A voice says: \"{1}\""
- },
- "17wi7dn": "You step into the ring. Tiny lights dance. You feel very lucky!",
- "mhykkg": "Just mushrooms now. They look proud of themselves.",
- "1sguqpf": "Just mushrooms. Very round ones. Come back at night?",
- "1bsfm0p": "Something huge lived here long ago. Something bigger didn't like that. You find old coins in the bones.",
- "s0ehva": "An old empty wagon. Inside: turnips, a broken umbrella and a note.",
- "wtj68p": "\"Pell, the kettle is gone again. Also, I buried my money by the big rock east of Brindlecross. I drew a map. Then I lost it. Hob.\"",
- "u880w0": "The scarecrow, Sir Strawsworth, knights you. You are now Sir Ash, Knight of the Turnips!",
- "jj8m7o": "Sir Strawsworth guards the turnips. He never lost one. He lost lots of hats.",
- "1sxtrn4": "An explorer is frozen in this ice! He gives you a thumbs-up. Try some fire?",
- "1di1cf9": "Ahhhhh. A hot bath for your tail. So nice.",
- "caappq": "The Soggy Biscuit Two is done! A bit crooked, but beautiful.",
- "r43m1g": "A half-built boat. A sign says: SOGGY BISCUIT TWO. (SIX YEARS SO FAR.)",
- "3s7un6": "Sooty footprints go from the Ward stone to the north gate. They smell like lamp oil.",
- "lyb8k8": "Sir Cindervane's helmet sits on the steps, with flowers. The gate is open.",
- "k7in7m": "Greymane rolls over for belly rubs. A giant wolf, belly up!",
- "17wypw1": "Greymane's wolves watch. One of them wants a turn!",
- "9cbedz": "A proud snowman. Its carrot nose looks special. Don't melt it! (Or do.)",
- "tnrsxb": "BZZZZ. Go away, say the bees. Smoke would calm them.",
- "z2r9b8": "You dig up a chest! 60 coins and a note: \"Nib was here.\"",
- "4nlc26": "You dig up Hob's money jar! A note: \"Have a stew on me.\" 50 coins.",
- "shel85": "You dig up a Warden treasure! 40 coins and a warm feeling.",
- "1rerp40": "The old tree opens one huge eye. \"Hrrrm. Answer my three riddles, little dragon, for a gift.\"",
- "1stti86": "The last snowman melts. Its carrot falls into your claws. It glows! It's the Carrot of Destiny. Nobody knows what it does.",
- "e9hmmg": "Something shiny in the ashes!",
- "uuctmz": "Your bed. It's a little burnt, like all your beds.",
- "s0bg71": "Mom's bed. Made perfectly neat. Don't sit on it.",
- "y6fpra": "A soft inn bed. Ask the owner to sleep here.",
- "7blhow": "Not your bed. You fluff the pillow anyway, to be nice.",
- "16zjz1i": "An old page is stuck between two books!",
- "1mnpj15": "Jars of stuff. One says \"DO NOT.\" Another says \"OKAY, MAYBE.\"",
- "68rccg": "Bread, rolls, and a round bun: \"DO NOT BREATHE ON.\"",
- "oih1rl": "Lots of lamps. A sign says: \"NO BREATHING FIRE ON THE LAMPS.\"",
- "y8fcpl": "Cloth in every color. One is plaid. It's very loud.",
- "vabupk": "Osric's letter: \"Dear Mum, thanks for the sweater. Only a little itchy...\"",
- "1vh8m3c": "Tiny notes: \"More smoke on Cinder Mountain every night. Is it breathing? Do NOT ask the mountain.\"",
- "jxud5c": "A speech: \"Why Brindlecross Is Named After Me (Well, Kind Of)\".",
- "qqmt1y": "BOUNTY BOARD. Someone drew a little dragon by every finished job.",
- "1eyxnfd": "The mountain top glows. Something huge is up there.",
- "sn8w8v": "A star map. Three spots say \"star-iron?\" in excited writing.",
- "4aom4c": "Old deer antlers. Ulf swears the deer died of old age.",
- "1sg58wi": "A gold trophy: \"BEST MAYOR.\" Given by: the Mayor.",
- "g5z38g": "Thirteen family pictures. Great-great-great Grandpa's frame just has a scary cloud in it. Next to it is a girl with horns, holding a lantern.",
- "dtn6r6": "Grandma's old chest. Under her scarf is a very old letter, folded with care.",
- "19p2wpp": "Height marks: \"Ash, age 4.\" \"Ash, age 6.\" \"Ash, age 8 (burn mark).\"",
- "3rrn6a": "Pebble the crow steals a button off you. Pebble is very pleased.",
- "16333wn": "Juniper's maps. A new one has a big X: \"where Ash saved me.\"",
- "17qq51n": "Juniper's maps of the valley. The caves are still blank.",
- "wfnvgu": "Nana's rocking chair. It creaks a song by itself.",
- "6xi4jf": "A cart of plain rocks. Gorran says they're \"good for you.\"",
- "6407mt": "Under the wicks: a little badge shaped like a dragon scale. The Scaled Oath badge!",
- "1ckfq7g": "Mayor Brindle the First. Like the mayor now, but a worse mustache.",
- "1fednvs": "Mayor Brindle the Second. Like the mayor now, but a better mustache.",
- "sfec73": "Mayor Brindle the Fourth (the mayor now). It's huge. He paid for it.",
- "1nixqzn": "The Watch House cell. Very clean. Sorted in ABC order.",
- "1v4nsf8": "A magic mark locks this chest. Light the fire bowls in this cave!",
- "1tlqd0c": "The fire burns bright.",
- "197myci": "Cold fire bowl. It wants fire. You have fire.",
- "1l6w9hy": "A sunken boat, the SOGGY BISCUIT. You take the fishing box inside. Dell will want it.",
- "19ubi92": "A table of maps of the five Wards. Each one is crossed out in red. On top: the Oath's secret plans!",
- "fckj28": "A big chunk of it! Take it to Mom.",
- "1729q2h": "On a stone shelf, wrapped in cloth: an old cloak with five little flames on it. The Warden's Mantle!",
- "199wbso": "Check the shelf",
- "1jrww5y": "Sniff the pot",
- "18pl3dg": "Look at the family pictures",
- "72g08h": "Check the fire bowl",
- "ximznh": "Dig out the star-iron",
- "1kvthwx": "A loud howl! Greymane is here to help!",
- "85xmax": "I'll guard the stairs, Emberblood! Fight!",
- "xesotx": "Nobody gets past!",
- "1erzj7j": {
-  "o": "Delete Journey {1}? This can't be undone.",
-  "s": "Delete Journey {1}? It's gone forever."
- },
- "19zr1x0": "Talk to them to try again.",
- "vh2m6k": "Every one! Hal is happy-crying.",
- "19fzopm": {
-  "o": "Ooh, close! That one was {1}. Let's try that round again.",
-  "s": "Ooh, close! That one was {1}. Let's try again."
- },
- "el8izk": {
-  "o": "Almost! The next note was {1}. From the top.",
-  "s": "Almost! The next note was {1}. Start again!"
- },
- "192iviu": "That’s the whole song! Ash, you’re great at this!",
- "1lz2ke3": "Wendel has a huge smile.",
- "1ircqth": "Hotter fire and a really loud roar.",
- "5wjgg5": "More health, more healing and better friends.",
- "yzald9": "+8% chance of a super hit",
- "1gl9o0z": "End your sword, dagger or spear combos with a big spin!",
- "1kvglp0": "Arrows catch fire, burn foes and light fire bowls. Not the hay!",
- "10c7bmx": "Your boomerang flies 50% farther and grabs coins on the way back.",
- "vtm8bo": "Hotter breath. Run, marshmallows!",
- "ji8613": "Breathe fire for longer before you run out.",
- "1k0miv8": "+25% roar power. Roar fills 10% faster.",
- "1e6idsx": "Rolls tire you 15% less, and +4% speed",
- "15kds2t": "Jump again in the air. Who needs the ground?",
- "1p4os5r": "Run fast on water without getting tired. Skip like a stone!",
- "927zov": "Carry one more healing drink. Mom packed extra.",
- "90amcu": "+1 healing drink",
- "1pv2hfi": "Beating a foe heals you a little.",
- "1l821li": "Get hurt less. Like wearing a frying pan, but cooler.",
- "p023d5": "Fallen friends get up twice as fast. Their cheers heal you.",
- "1v2cio8": "You already have fire rolls from a blessing",
- "6pbczk": {
-  "o": "{1} is mastered. It is as good as it gets!",
-  "s": "{1} is as good as it gets!"
- },
- "s7b7y5": {
-  "o": "Health and strength up. +{1} skill point{2}{3}! {4}",
-  "s": "More health and power! +{1} skill point{2}{3}! {4}"
- },
- "1tp3kv9": {
-  "o": "Level {1}. You earn 1 point every level, and 1 more for each Trial you beat.",
-  "s": "Level {1}. Get 1 point each level, and 1 for each Trial."
- },
- "iqqyui": "Super hits",
- "hqltg0": "Press C to jump gaps and fences. Run to jump farther.",
- "18rehzz": "Press the bottom button to jump gaps, fences and rocks.",
- "1mh56ly": "Walk right onto lakes and rivers. Run to go faster.",
- "1pwr4yv": "Jump, then press C again to fly. Press C once more to land. Watch the wing meter.",
- "y1apts": "Jump, then tap JUMP again to fly. Tap it again to land.",
- "bskz5g": "Jump, then press jump again to fly. Press it again to land.",
- "18dfiey": "Your great-great-great (and on and on) grandpa",
- "sys_pages_step": {
-  "o": "Find the lost pages of the Wardens’ Account and bring them to Sister Wren ({1}/10 found, {2} delivered)",
-  "s": "Find the lost pages. Bring them to Sister Wren. ({1}/10 found, {2} given)"
- },
- "sys_pie_step": {
-  "o": "Find clues about the missing pie: ask around Brindlecross and look in the Mayor’s house ({1}/{2} clues)",
-  "s": "Find pie clues. Ask around Brindlecross. Check the Mayor’s house. ({1}/{2} clues)"
- },
- "sys_shop_draughts": {
-  "o": "Refill your healing draughts · {1} coins",
-  "s": "Refill your healing drinks · {1} coins"
- },
- "sys_shop_lantern": {
-  "o": "A cave lantern (see farther underground) · {1} coins",
-  "s": "A cave lantern (for dark caves) · {1} coins"
- },
- "sys_lvl_bless": {
-  "o": "Health and strength up. +{1} skill point{2}, and a blessing awaits! {3}",
-  "s": "More health and power! +{1} skill point{2} and a blessing! {3}"
- },
- "sys_shop_bed": {
-  "o": "Rent a bed for the night · {1} coins",
-  "s": "Sleep here tonight · {1} coins"
- },
- "dlt32": "Three quick swings. The last one is big! Tap WEAPON or the weapon icons to switch.",
- "b7s7iw": "Three quick swings. The last one is big! Press R1 (RB on Xbox, R on Switch) to switch weapons.",
- "sys_wpn_ndfoga_key": {
-  "o": "Three quick swings, and the third one is big. Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Three quick swings. The last one is big! Press X or a number key to switch weapons."
- },
- "lq3d2s": "Fast little stabs. Extra damage from behind! Tap WEAPON or the weapon icons to switch.",
- "1lhvga6": "Fast little stabs. Extra damage from behind! Press R1 (RB on Xbox, R on Switch) to switch weapons.",
- "sys_wpn_7v3rp8_key": {
-  "o": "Very fast little stabs. Hit a foe from behind for extra damage. Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Fast little stabs. Extra damage from behind! Press X or a number key to switch weapons."
- },
- "jmmwkm": "Long reach. Pokes and pushes a whole line of foes. Tap WEAPON or the weapon icons to switch.",
- "vztog0": "Long reach. Pokes and pushes a whole line of foes. Press R1 (RB on Xbox, R on Switch) to switch weapons.",
- "sys_wpn_1ucono2_key": {
-  "o": "Long reach. It pokes through a whole line of foes and pushes them back. Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Long reach. Pokes and pushes a whole line of foes. Press X or a number key to switch weapons."
- },
- "1cy3073": "Slow and HUGE. Hold attack to power up. Smashes shields and walls. Tap WEAPON or the weapon icons to switch.",
- "1c8bscp": "Slow and HUGE. Hold attack to power up. Smashes shields and walls. Press R1 (RB on Xbox, R on Switch) to switch weapons.",
- "sys_wpn_oboktj_key": {
-  "o": "Slow and HUGE. Hold attack to charge. It stuns, breaks shields and cracks walls. Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Slow and HUGE. Hold attack to power up. Smashes shields and walls. Press X or a number key to switch weapons."
- },
- "ak6n1v": "Hold attack, let go to shoot. Hold longer to shoot through foes. Tap WEAPON or the weapon icons to switch.",
- "1yii2px": "Hold attack, let go to shoot. Hold longer to shoot through foes. Press R1 (RB on Xbox, R on Switch) to switch weapons.",
- "sys_wpn_j1numb_key": {
-  "o": "Hold attack to pull back, let go to shoot. A full pull shoots right through foes. Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Hold attack, let go to shoot. Hold longer to shoot through foes. Press X or a number key to switch weapons."
- },
- "1jy2jsj": "Throw it and it comes back. It stuns whatever it hits. Tap WEAPON or the weapon icons to switch.",
- "sys_wpn_1gs8s3n_key": {
-  "o": "Throw it and it comes back. It stuns whatever it hits. Press X to switch weapons, or the number keys 1 to {1}.",
-  "s": "Throw it and it comes back. It stuns whatever it hits. Press X or a number key to switch weapons."
- }
+"1rpjlbx": "Drag on the left to move (far to run) · Buttons fight, breathe fire, roll and roar · Tap bottles to drink · Tap the map or quests to open them",
+"8hgian": "Drag low to move · Ash swings by himself · Tap fire to breathe fire · More in Settings",
+"1n90uxn": {
+"o": "Left stick move, push it all the way to sprint · {1} or {2} attack · {3} fire · {4} roll{5} · {6} talk and open · {7} drink · {8} map",
+"s": "Left stick move, push far to run · {1} or {2} attack · {3} fire · {4} roll{5} · {6} talk · {7} drink · {8} map"
+},
+"956c0b": {
+"o": "WASD move, Ash faces the way he walks · Shift sprint · Click or J attack · Right click or K fire (both lock on to a foe in front) · {1} roll{2} · {3} drink · {4} use · {5} map",
+"s": "WASD move · Shift run · Click or J attack · Right click or K fire · {1} roll{2} · {3} drink · {4} use · {5} map"
+},
+"1fssfpi": "Easier foes and better healing. Great for the story.",
+"n9dx70": "A fair fight. Just right.",
+"x8u62u": "Tough, mean foes. For true Emberbloods!",
+"jc12vl": "Kobold Chief",
+"18a9lvr": "Leader of the Scaled Oath",
+"g1350": "Leader of the Frostpine Wolves",
+"rsuq08": "Guard of the Obsidian Gate",
+"zjlsea": "Your great-great-great grandpa",
+"1qapuwu": "Sword hits do 20% more damage.",
+"1yyq3ih": "+20 max health and a full heal.",
+"10z5xyd": "Fire breath is 25% hotter and lasts longer.",
+"jafonh": "Move 8% faster. Rolls tire you less.",
+"1i3tz0i": "Beat a foe, heal 2 health.",
+"14ryhxp": "Rolling leaves fire behind you.",
+"1o7qnes": "Every third hit in a row shoots fire!",
+"1bgifym": "Fall? Pop back up with half health! (Once per rest.)",
+"19o0enj": "An old dragon is laughing. Get back up!",
+"bnenhf": "Even dragons fall. The good ones get back up.",
+"1fvg09": "Your fire is not out yet.",
+"1ywhohw": "Elder Yara says: roll more. She is usually right.",
+"1qoq3uq": "Mom says: eat a snack, then try again.",
+"7oeenq": "Grandma said you were dragons once. She was right!",
+"1k3dh27": "Be careful at night. Wolves come out of Whisperwood.",
+"41zm8v": "Your mom fixed my plow and door in one day. Wow!",
+"opftm": "Welcome to Brindlecross! The best fish. Also the only fish.",
+"1ra6scs": "Sister Wren? She's in the big building full of books. Knock loud!",
+"f6jqnu": "The Oath scared all the traders off the Ashen Road.",
+"5hqa9p": "Granny Moss lives in the Mirefen. Lost? Follow the smell of tea.",
+"1x3zaeq": "A Frostpine farmer lost his goat. He put up eleven signs!",
+"zlv1nk": "The Obsidian Gate? Shut for a thousand years, they say.",
+"ijvsrm": "More health and power, and a blessing!",
+"1aq5n8w": "More health, power and stamina!",
+"ndfoga": "Three quick swings. The last one is big!",
+"7v3rp8": "Fast little stabs. Extra damage from behind!",
+"1ucono2": "Long reach. Pokes and pushes a whole line of foes.",
+"oboktj": "Slow and HUGE. Hold attack to power up. Smashes shields and walls.",
+"j1numb": "Hold attack, let go to shoot. Hold longer to shoot through foes.",
+"1g1196n": "Tap WEAPON or the weapon icons to switch.",
+"fthr5s": {
+"o": "Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Press X or a number key to switch weapons."
+},
+"1l49vsg": {
+"o": "{1} of {2} braziers lit",
+"s": "{1} of {2} fires lit"
+},
+"17b9ve": "Your arrow went through your fire. Now it burns!",
+"yeatvu": "Okay. Come back any time. The hammer will wait.",
+"lrwnyo": "Bring me one star-iron or 150 coins, and it's yours.",
+"x96cbq": {
+"o": "{1} to jump over rocks and shockwaves.",
+"s": "{1} to hop over rocks and rings."
+},
+"10ev197": "Strong winds push you back!",
+"1q91vjd": "The wind over the Wall is too strong. Open the gate first.",
+"fsmy90": {
+"o": "You can jump! {1} to hop over fences, rocks, gaps and shockwaves.",
+"s": "You can jump! {1} to hop over things."
+},
+"1k7q317": {
+"o": "Jump with {1}. Sprint first to jump farther. Jumping over water is fine. Landing in it is not!",
+"s": "Jump with {1}. Run first to jump farther. Do not land in water!"
+},
+"1j12vt0": "Your fire is so hot, you can walk on water!",
+"l4pcw9": "Just walk onto the water. Run to go faster. Find the islands!",
+"18u7jv": {
+"o": "You have wings! Jump, then {1} again in the air to fly.",
+"s": "You have wings! Jump, then {1} again to fly."
+},
+"dgukvf": {
+"o": "Fly: jump, then {1} again in the air (or hold {2}). {3} once more to land. Your wings tire, so watch the wing meter.",
+"s": "To fly, jump, then {1} again (or hold {2}). {3} again to land. Watch the wing meter!"
+},
+"18sxves": "Get the kid, boys!",
+"1qt1yww": "Rise up, my Oath followers!",
+"lilfmt": "Hatch, babies! Dinner time!",
+"9yiw91": "I stood here a thousand years. No kid will beat me!",
+"1u7sftb": "The sky is mine, child!",
+"14myfvi": "Welcome back!",
+"18ha35": "Fight wave after wave in the Proving Grounds",
+"1akrr2g": "Big boss coming!",
+"1u74zai": {
+"o": "You've found {1} of 4 endings. Different choices along the way lead to different endings.",
+"s": "You found {1} of 4 endings. Make other choices to find more!"
+},
+"16si3sf": "You found every ending! The Wardens would be proud.",
+"1tnglon": "Next I'm mapping the caves. Don't worry, I'll bring two lanterns!",
+"xhs8gr": "Rook says you saved me. And that you're super tall!",
+"exwh38": {
+"o": "{1} ({2}/10 found, {3} delivered)",
+"s": "{1} ({2}/10 found, {3} given)"
+},
+"84g6h5": {
+"o": "Blade reforged · tier {1}",
+"s": "Stronger weapons! Tier {1}"
+},
+"133961k": "Morrow's in the cell. He put it in ABC order. Weird.",
+"1vv9f46": "Bertram visited with a bun! We cried. It blew up. We laughed.",
+"7wq9wv": "Juniper lets me carry her maps now. I'm basically a knight!",
+"162dqvo": {
+"o": "{1} pages of the Wardens' Account found. Wren must be dancing. Badly.",
+"s": "{1} pages found. Wren must be dancing. Badly."
+},
+"gpslz4": "Kobolds, Ash! Chase them out first. Then we talk.",
+"16229xm": "Your mom is waiting at the forge, Ash.",
+"tzewb2": "Light three lanterns on the green. Gently! I'm counting.",
+"f86yxr": "Grandma’s sword",
+"1kvkk3z": "I’ll guard the forge. You get the kobolds. Go!",
+"1gme7b4": "Ash? ASH! Bats took my lantern. I've mapped by smell for three days!",
+"vttwam": "It smells like bats. My map just says \"Bats.\"",
+"1ld5teb": "The dragon made big promises. Osric gives me meals and a blanket. I like Osric.",
+"1kzljnm": "I've started reading. Some books aren't about dragons at all!",
+"1itq348": "Pumpkins, Ash! Pumpkins that aren't on fire! Who knew?",
+"1ruh1ha": "Granny Moss says I'm good at gardening. And talking too much.",
+"xr5eqc": "Morrow put us in ABC order. I'm under F.",
+"tgp0bn": "Ah, the hero of my new song! Want to hear it? Too late, I'm singing!",
+"9j8nnr": "🎵 The lamp-man lied and he went to the cell, where he shines lamps so well...",
+"1tvqpje": "🎵 ...that's all so far. Go do hero stuff!",
+"1qij3ml": "Iska sat on my shell to think. She was heavy! Shh, don't tell her.",
+"1tpdwto": "A fish? For me? I haven't had a fish in two hundred years!",
+"1lvma8y": "I'm Shellby. I'm 1,041 years old! When I was tiny, Warden Bram stepped on me. He said sorry for a week.",
+"x3t4k0": "Iska hid a page under my shell. I forgot for 900 years. Here!",
+"h2r55b": "I'm Shellby. Old and hungry. Bring me a fish, and I'll tell you a Warden story.",
+"1vrvq7e": "You found a lost page from the Wardens!",
+"1dvwc5r": "Show it to Sister Wren in Brindlecross.",
+"1eg09uf": {
+"o": "{1}! Of the Wardens' Account! Oh, oh, oh. Let me look.",
+"s": "{1}! From the Wardens' book! Oh, oh! Let me see."
+},
+"120l4tc": "All ten! The whole book! You gave the valley its story back, Ash. I have no words. And I always have words!",
+"v0nk0x": {
+"o": "That's {1} now! This deserves more than coins. Here.",
+"s": "That's {1} now! Here's something better than coins."
+},
+"tfp8pl": {
+"o": "{1} to go. They could be anywhere. Caves, attics, under turtles. You never know.",
+"s": "{1} to go. They could be anywhere. Caves, attics, under turtles!"
+},
+"1kwgbps": "Drinks refilled",
+"1mhayjp": "Your bottles are already full.",
+"xkfkhc": "One Pike! Pointy end at the monster. Pointy end. At. The monster.",
+"1hkb0hn": "It keeps big things far from your face. I like that.",
+"d4s7g": "Sleep here tonight",
+"1gbw4tz": "Fish are jumping here! You need a rod. Ask Dell the fisherman in Brindlecross.",
+"9dymnf": "ISKA, WHO MADE THE FIRST LANTERN. \"Always light one more.\"",
+"sex31u": "ORIEL, WHO TALKED TO DRAGONS. \"Most dragons are just hungry.\"",
+"u0pvd2": "A paper is stuck under the statue's feet!",
+"8y91e4": "No coins to wish with. The well looks sad.",
+"1nijpn0": "You toss in a coin. Four coins fly back out! The well says \"keep the change.\"",
+"1pa8cpf": {
+"o": "You toss in a coin and make a wish. A voice from the bottom says: \"{1}\"",
+"s": "You toss in a coin and wish. A voice says: \"{1}\""
+},
+"17wi7dn": "You step into the ring. Tiny lights dance. You feel very lucky!",
+"mhykkg": "Just mushrooms now. They look proud of themselves.",
+"1sguqpf": "Just mushrooms. Very round ones. Come back at night?",
+"1bsfm0p": "Something huge lived here long ago. Something bigger didn't like that. You find old coins in the bones.",
+"s0ehva": "An old empty wagon. Inside: turnips, a broken umbrella and a note.",
+"wtj68p": "\"Pell, the kettle is gone again. Also, I buried my money by the big rock east of Brindlecross. I drew a map. Then I lost it. Hob.\"",
+"u880w0": "The scarecrow, Sir Strawsworth, knights you. You are now Sir Ash, Knight of the Turnips!",
+"jj8m7o": "Sir Strawsworth guards the turnips. He never lost one. He lost lots of hats.",
+"1sxtrn4": "An explorer is frozen in this ice! He gives you a thumbs-up. Try some fire?",
+"1di1cf9": "Ahhhhh. A hot bath for your tail. So nice.",
+"caappq": "The Soggy Biscuit Two is done! A bit crooked, but beautiful.",
+"r43m1g": "A half-built boat. A sign says: SOGGY BISCUIT TWO. (SIX YEARS SO FAR.)",
+"3s7un6": "Sooty footprints go from the Ward stone to the north gate. They smell like lamp oil.",
+"lyb8k8": "Sir Cindervane's helmet sits on the steps, with flowers. The gate is open.",
+"k7in7m": "Greymane rolls over for belly rubs. A giant wolf, belly up!",
+"17wypw1": "Greymane's wolves watch. One of them wants a turn!",
+"9cbedz": "A proud snowman. Its carrot nose looks special. Don't melt it! (Or do.)",
+"tnrsxb": "BZZZZ. Go away, say the bees. Smoke would calm them.",
+"z2r9b8": "You dig up a chest! 60 coins and a note: \"Nib was here.\"",
+"4nlc26": "You dig up Hob's money jar! A note: \"Have a stew on me.\" 50 coins.",
+"shel85": "You dig up a Warden treasure! 40 coins and a warm feeling.",
+"1rerp40": "The old tree opens one huge eye. \"Hrrrm. Answer my three riddles, little dragon, for a gift.\"",
+"1stti86": "The last snowman melts. Its carrot falls into your claws. It glows! It's the Carrot of Destiny. Nobody knows what it does.",
+"e9hmmg": "Something shiny in the ashes!",
+"uuctmz": "Your bed. It's a little burnt, like all your beds.",
+"s0bg71": "Mom's bed. Made perfectly neat. Don't sit on it.",
+"y6fpra": "A soft inn bed. Ask the owner to sleep here.",
+"7blhow": "Not your bed. You fluff the pillow anyway, to be nice.",
+"16zjz1i": "An old page is stuck between two books!",
+"1mnpj15": "Jars of stuff. One says \"DO NOT.\" Another says \"OKAY, MAYBE.\"",
+"68rccg": "Bread, rolls, and a round bun: \"DO NOT BREATHE ON.\"",
+"oih1rl": "Lots of lamps. A sign says: \"NO BREATHING FIRE ON THE LAMPS.\"",
+"y8fcpl": "Cloth in every color. One is plaid. It's very loud.",
+"vabupk": "Osric's letter: \"Dear Mum, thanks for the sweater. Only a little itchy...\"",
+"1vh8m3c": "Tiny notes: \"More smoke on Cinder Mountain every night. Is it breathing? Do NOT ask the mountain.\"",
+"jxud5c": "A speech: \"Why Brindlecross Is Named After Me (Well, Kind Of)\".",
+"qqmt1y": "BOUNTY BOARD. Someone drew a little dragon by every finished job.",
+"1eyxnfd": "The mountain top glows. Something huge is up there.",
+"sn8w8v": "A star map. Three spots say \"star-iron?\" in excited writing.",
+"4aom4c": "Old deer antlers. Ulf swears the deer died of old age.",
+"1sg58wi": "A gold trophy: \"BEST MAYOR.\" Given by: the Mayor.",
+"g5z38g": "Thirteen family pictures. Great-great-great Grandpa's frame just has a scary cloud in it. Next to it is a girl with horns, holding a lantern.",
+"dtn6r6": "Grandma's old chest. Under her scarf is a very old letter, folded with care.",
+"19p2wpp": "Height marks: \"Ash, age 4.\" \"Ash, age 6.\" \"Ash, age 8 (burn mark).\"",
+"3rrn6a": "Pebble the crow steals a button off you. Pebble is very pleased.",
+"16333wn": "Juniper's maps. A new one has a big X: \"where Ash saved me.\"",
+"17qq51n": "Juniper's maps of the valley. The caves are still blank.",
+"wfnvgu": "Nana's rocking chair. It creaks a song by itself.",
+"6xi4jf": "A cart of plain rocks. Gorran says they're \"good for you.\"",
+"6407mt": "Under the wicks: a little badge shaped like a dragon scale. The Scaled Oath badge!",
+"1ckfq7g": "Mayor Brindle the First. Like the mayor now, but a worse mustache.",
+"1fednvs": "Mayor Brindle the Second. Like the mayor now, but a better mustache.",
+"sfec73": "Mayor Brindle the Fourth (the mayor now). It's huge. He paid for it.",
+"1nixqzn": "The Watch House cell. Very clean. Sorted in ABC order.",
+"1v4nsf8": "A magic mark locks this chest. Light the fire bowls in this cave!",
+"1tlqd0c": "The fire burns bright.",
+"197myci": "Cold fire bowl. It wants fire. You have fire.",
+"1l6w9hy": "A sunken boat, the SOGGY BISCUIT. You take the fishing box inside. Dell will want it.",
+"19ubi92": "A table of maps of the five Wards. Each one is crossed out in red. On top: the Oath's secret plans!",
+"fckj28": "A big chunk of it! Take it to Mom.",
+"1729q2h": "On a stone shelf, wrapped in cloth: an old cloak with five little flames on it. The Warden's Mantle!",
+"199wbso": "Check the shelf",
+"1jrww5y": "Sniff the pot",
+"18pl3dg": "Look at the family pictures",
+"72g08h": "Check the fire bowl",
+"ximznh": "Dig out the star-iron",
+"1kvthwx": "A loud howl! Greymane is here to help!",
+"85xmax": "I'll guard the stairs, Emberblood! Fight!",
+"xesotx": "Nobody gets past!",
+"1erzj7j": {
+"o": "Delete Journey {1}? This can't be undone.",
+"s": "Delete Journey {1}? It's gone forever."
+},
+"19zr1x0": "Talk to them to try again.",
+"vh2m6k": "Every one! Hal is happy-crying.",
+"19fzopm": {
+"o": "Ooh, close! That one was {1}. Let's try that round again.",
+"s": "Ooh, close! That one was {1}. Let's try again."
+},
+"el8izk": {
+"o": "Almost! The next note was {1}. From the top.",
+"s": "Almost! The next note was {1}. Start again!"
+},
+"192iviu": "That’s the whole song! Ash, you’re great at this!",
+"1lz2ke3": "Wendel has a huge smile.",
+"1ircqth": "Hotter fire and a really loud roar.",
+"5wjgg5": "More health, more healing and better friends.",
+"yzald9": "+8% chance of a super hit",
+"1gl9o0z": "End your sword, dagger or spear combos with a big spin!",
+"1kvglp0": "Arrows catch fire, burn foes and light fire bowls. Not the hay!",
+"10c7bmx": "Your boomerang flies 50% farther and grabs coins on the way back.",
+"vtm8bo": "Hotter breath. Run, marshmallows!",
+"ji8613": "Breathe fire for longer before you run out.",
+"1k0miv8": "+25% roar power. Roar fills 10% faster.",
+"1e6idsx": "Rolls tire you 15% less, and +4% speed",
+"15kds2t": "Jump again in the air. Who needs the ground?",
+"1p4os5r": "Run fast on water without getting tired. Skip like a stone!",
+"927zov": "Carry one more healing drink. Mom packed extra.",
+"90amcu": "+1 healing drink",
+"1pv2hfi": "Beating a foe heals you a little.",
+"1l821li": "Get hurt less. Like wearing a frying pan, but cooler.",
+"p023d5": "Fallen friends get up twice as fast. Their cheers heal you.",
+"1v2cio8": "You already have fire rolls from a blessing",
+"6pbczk": {
+"o": "{1} is mastered. It is as good as it gets!",
+"s": "{1} is as good as it gets!"
+},
+"s7b7y5": {
+"o": "Health and strength up. +{1} skill point{2}{3}! {4}",
+"s": "More health and power! +{1} skill point{2}{3}! {4}"
+},
+"1tp3kv9": {
+"o": "Level {1}. You earn 1 point every level, and 1 more for each Trial you beat.",
+"s": "Level {1}. Get 1 point each level, and 1 for each Trial."
+},
+"iqqyui": "Super hits",
+"hqltg0": "Press C to jump gaps and fences. Run to jump farther.",
+"18rehzz": "Press the bottom button to jump gaps, fences and rocks.",
+"1mh56ly": "Walk right onto lakes and rivers. Run to go faster.",
+"1pwr4yv": "Jump, then press C again to fly. Press C once more to land. Watch the wing meter.",
+"y1apts": "Jump, then tap JUMP again to fly. Tap it again to land.",
+"bskz5g": "Jump, then press jump again to fly. Press it again to land.",
+"18dfiey": "Your great-great-great (and on and on) grandpa",
+"sys_pages_step": {
+"o": "Find the lost pages of the Wardens’ Account and bring them to Sister Wren ({1}/10 found, {2} delivered)",
+"s": "Find the lost pages. Bring them to Sister Wren. ({1}/10 found, {2} given)"
+},
+"sys_pie_step": {
+"o": "Find clues about the missing pie: ask around Brindlecross and look in the Mayor’s house ({1}/{2} clues)",
+"s": "Find pie clues. Ask around Brindlecross. Check the Mayor’s house. ({1}/{2} clues)"
+},
+"sys_shop_draughts": {
+"o": "Refill your healing draughts · {1} coins",
+"s": "Refill your healing drinks · {1} coins"
+},
+"sys_shop_lantern": {
+"o": "A cave lantern (see farther underground) · {1} coins",
+"s": "A cave lantern (for dark caves) · {1} coins"
+},
+"sys_lvl_bless": {
+"o": "Health and strength up. +{1} skill point{2}, and a blessing awaits! {3}",
+"s": "More health and power! +{1} skill point{2} and a blessing! {3}"
+},
+"sys_shop_bed": {
+"o": "Rent a bed for the night · {1} coins",
+"s": "Sleep here tonight · {1} coins"
+},
+"dlt32": "Three quick swings. The last one is big! Tap WEAPON or the weapon icons to switch.",
+"b7s7iw": "Three quick swings. The last one is big! Press R1 (RB on Xbox, R on Switch) to switch weapons.",
+"sys_wpn_ndfoga_key": {
+"o": "Three quick swings, and the third one is big. Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Three quick swings. The last one is big! Press X or a number key to switch weapons."
+},
+"lq3d2s": "Fast little stabs. Extra damage from behind! Tap WEAPON or the weapon icons to switch.",
+"1lhvga6": "Fast little stabs. Extra damage from behind! Press R1 (RB on Xbox, R on Switch) to switch weapons.",
+"sys_wpn_7v3rp8_key": {
+"o": "Very fast little stabs. Hit a foe from behind for extra damage. Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Fast little stabs. Extra damage from behind! Press X or a number key to switch weapons."
+},
+"jmmwkm": "Long reach. Pokes and pushes a whole line of foes. Tap WEAPON or the weapon icons to switch.",
+"vztog0": "Long reach. Pokes and pushes a whole line of foes. Press R1 (RB on Xbox, R on Switch) to switch weapons.",
+"sys_wpn_1ucono2_key": {
+"o": "Long reach. It pokes through a whole line of foes and pushes them back. Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Long reach. Pokes and pushes a whole line of foes. Press X or a number key to switch weapons."
+},
+"1cy3073": "Slow and HUGE. Hold attack to power up. Smashes shields and walls. Tap WEAPON or the weapon icons to switch.",
+"1c8bscp": "Slow and HUGE. Hold attack to power up. Smashes shields and walls. Press R1 (RB on Xbox, R on Switch) to switch weapons.",
+"sys_wpn_oboktj_key": {
+"o": "Slow and HUGE. Hold attack to charge. It stuns, breaks shields and cracks walls. Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Slow and HUGE. Hold attack to power up. Smashes shields and walls. Press X or a number key to switch weapons."
+},
+"ak6n1v": "Hold attack, let go to shoot. Hold longer to shoot through foes. Tap WEAPON or the weapon icons to switch.",
+"1yii2px": "Hold attack, let go to shoot. Hold longer to shoot through foes. Press R1 (RB on Xbox, R on Switch) to switch weapons.",
+"sys_wpn_j1numb_key": {
+"o": "Hold attack to pull back, let go to shoot. A full pull shoots right through foes. Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Hold attack, let go to shoot. Hold longer to shoot through foes. Press X or a number key to switch weapons."
+},
+"1jy2jsj": "Throw it and it comes back. It stuns whatever it hits. Tap WEAPON or the weapon icons to switch.",
+"sys_wpn_1gs8s3n_key": {
+"o": "Throw it and it comes back. It stuns whatever it hits. Press X to switch weapons, or the number keys 1 to {1}.",
+"s": "Throw it and it comes back. It stuns whatever it hits. Press X or a number key to switch weapons."
+}
 }

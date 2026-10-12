@@ -304,7 +304,7 @@ const FISHES=['a Mirrow trout','a grumpy perch','a lantern minnow','a speckled p
 function startFishing(spot){
   if(!G.items.rod){ runDialogue([['narr',`Fish are jumping here. If only you had a rod. Dell the fisherman in Brindlecross might lend you one.`]],()=>{ scene='play'; }); return; }
   let wx=spot.x, wy=spot.y; for(let a=0;a<TAU;a+=0.3){ const x=spot.x+Math.cos(a)*70, y=spot.y+Math.sin(a)*70; if(T(x,y,{}).water){ wx=x; wy=y; break; } }
-  G.fishing={spot,wx,wy,t:rand(2,5)*(G.flags.perk_lure?0.55:1),bite:0,px:player.x,py:player.y}; player.facing=angTo(player.x,player.y,wx,wy); SFX.play('roll'); setBanner('Fishing','Press E when the bobber splashes',1.6);
+  G.fishing={spot,wx,wy,t:rand(2,5)*(G.flags.perk_lure?0.55:1),bite:0,px:player.x,py:player.y}; player.facing=angTo(player.x,player.y,wx,wy); SFX.play('roll'); setBanner('Fishing',(curDevice()==='touch'?'Tap SLASH when':'Press '+btnLabel('use')+' when')+' the bobber splashes',1.6);
 }
 function updateFishing(dt,inp){
   const F=G.fishing; if(!F) return;

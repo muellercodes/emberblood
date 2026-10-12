@@ -281,6 +281,7 @@ function breathFly(dt){
 // a tip pill that stays up long enough to read and goes in the log; the same tip again just stays up longer.
 // id names it for the X that closes it for good (controls build); Settings > Tips: Off keeps them all away (still logged)
 function mvTip(title,text,dur,id){
+  title=simplify(title); text=simplify(text);
   const d=Math.max(dur||0,readT(text,4,10));
   if(MV.tip&&MV.tip.text===text){ MV.tip.dur=Math.max(MV.tip.dur,MV.tip.t+d); return; }
   logAdd({k:'tip',text:title,sub:text,key:'tip:'+text});

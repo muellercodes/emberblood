@@ -1,0 +1,47 @@
+{
+"2unjwt": {
+"o": "Drag on the {1} to move · SLASH attacks, talks and opens · Tap flasks to drink",
+"s": "Drag on the {1} to walk · SLASH hits and talks · Tap a bottle to drink"
+},
+"6l06bq": {
+"o": "Drag on the {1} to move, push all the way to sprint · SLASH attacks, and says TALK or OPEN when it will do that instead · Tap the flasks to drink, the minimap for the map, the quest list for the journal",
+"s": "Drag on the {1} to walk. Push far to run · SLASH hits, talks and opens · Tap a bottle to drink"
+},
+"y56mcn": "Drag low on the screen to walk · Ash swings by himself · SLASH talks to people",
+"mtpb4b": {
+"o": "WASD move, Ash faces the way he walks · Shift sprint · Click or J attack, and talk or open when no foe is near · Right click or K fire · {1} roll{2} · {3} drink · {4} use · L log · {5} map",
+"s": "WASD walk · Shift run · Click or J to hit or talk · Right click or K for fire · {1} roll{2} · {3} drink · {5} map"
+},
+"j5luoh": {
+"o": "WASD move · Shift sprint · Mouse aim · Left click slash, or talk and open when no foe is near · Right click fire · {1} roll{2} · {3} drink · {4} use · {5} map",
+"s": "WASD walk · Shift run · Click to hit or talk · Right click for fire · {1} roll{2} · {3} drink · {5} map"
+},
+"1etm70": {
+"o": "Arrow keys move · Right Shift sprint · Click or Enter attack, and talk or open when no foe is near · Right click or ' fire · Right Ctrl roll{1} · . drink · ; roar · L log · M map",
+"s": "Arrow keys walk · Right Shift run · Click or Enter to hit or talk · Right click for fire · Right Ctrl roll{1} · . drink · M map"
+},
+"6z2d7a": {
+"o": "{1} move, push it all the way to sprint · {2} or {3} attack (it talks and opens when no foe is near) · {4} fire · {5} roll{6} · {7} talk and open · {8} drink · {9} map{10}",
+"s": "{1} walk · {2} or {3} hit or talk · {4} fire · {5} roll{6} · {8} drink · {9} map{10}"
+},
+"2e2xce": "...Thanks for being honest.",
+"1y2x6jx": "...I knew it. Thank you.",
+"17xzhtr": "...So nice. I'll tell her.",
+"1ca729f": "...That's awful. I love it.",
+"59ee7w": "...My dad said that too. Thanks.",
+"dcsab8": "...A bird DOES live there. His name is Gerald.",
+"1mvedqm": "...Yes. Small, but not alone.",
+"1qr250g": "...Yes! Thanks for seeing that.",
+"dm0g5q": "...Hmm. Biscuit is up to something.",
+"18935u9": "...Our mom said that too. Thanks.",
+"62cfzc": "...That's a monster, Ash. A great one.",
+"1f5dgup": "...Maybe in spring. It's warm then.",
+"jdpihv": "...Good nose. Don't eat that part.",
+"n9myso": "...Good question! I'm Brisket. I'll be at Frostpine Lodge. Staying warm!",
+"1eq1cyb": "Press ] or [ to switch weapons.",
+"1cuax97": "Now you can jump over fences, rocks and gaps!",
+"193pmnz": {
+"o": "Health and strength up. +{1} skill point{2}{3}!{4}",
+"s": "You got stronger! +{1} skill point{2}{3}!{4}"
+}
+}
