@@ -9,7 +9,7 @@ ALLOWED_ORIGINS = "https://muellercodes.github.io"
 [[d1_databases]]
 binding = "DB"
 database_name = "emberblood"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "57d702d0-52d6-486f-9061-a99b5cb50e6f"
 
 [triggers]
 crons = ["17 4 * * *"]

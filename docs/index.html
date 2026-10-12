@@ -4373,7 +4373,7 @@ function faceWarden(g,who){
 }
 
 // ================= cloud accounts and saves (Cloudflare Worker + D1)
-const API_BASE='__API_BASE__';
+const API_BASE='https://emberblood-api.muellercodes.workers.dev';
 const Cloud=(()=>{
   const base=(API_BASE.startsWith('http')?API_BASE:'').replace(/\/$/,'');
   let token=store.get('eb_token',null), user=store.get('eb_user',null), online=null, pending=null, pushT=null, lastPush=0, busy=false, lastErr='';

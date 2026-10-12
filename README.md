@@ -65,7 +65,7 @@ npx wrangler d1 execute emberblood --remote --file=schema.sql
 npx wrangler deploy
 ```
 
-Put the `*.workers.dev` URL it prints into `game/config.json`, rebuild, and push. Allowed browser origins are set by `ALLOWED_ORIGINS` in `wrangler.toml` (localhost is always allowed for testing).
+Put the `*.workers.dev` URL it prints into `game/config.json`, rebuild, and push. The live game uses `https://emberblood-api.muellercodes.workers.dev`. Allowed browser origins are set by `ALLOWED_ORIGINS` in `wrangler.toml` (localhost is always allowed for testing).
 
 ## License
 
