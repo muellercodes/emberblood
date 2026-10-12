@@ -5,12 +5,14 @@
 const SK_BR=[
   {id:'blade',name:'Blade',col:'#d6e6f6',deep:'#2a4562',blurb:'Hit harder, swing faster and look cool doing it.'},
   {id:'flame',name:'Flame',col:'#ffa24c',deep:'#7a2a0e',blurb:'Hotter breath and a roar that rattles teeth.'},
-  {id:'wings',name:'Wings',col:'#92defe',deep:'#174a64',blurb:'Light feet, double jumps and longer flights.'},
+  {id:'wings',name:'Wings',col:'#92defe',deep:'#174a64',blurb:'Light feet, longer flights and better powers.'},
   {id:'heart',name:'Heart',col:'#ff9aaa',deep:'#6c1e30',blurb:'More health, more draughts and better friends.'}
 ];
 const SK_BRBY={}; for(const b of SK_BR) SK_BRBY[b.id]=b;
-const SK_ROW_NEED=[0,2,4];
-const SK_TRIAL={jump:'Unlocks with the Trial of the Leap',stride:'Unlocks with the Trial of the Tide',wings:'Unlocks with the Trial of the Sky'};
+// v9: four rows per branch (row 4 needs 7 points in the branch). Double Jump, Skimmer and Meteor Slam left the tree: they
+// are powers now (ABIL_DEFS, e6_balance.js). Each new power opens one skill here (n.abil); the power helpers read hasSkill(id).
+const SK_ROW_NEED=[0,2,4,7];
+const SK_ROWS=SK_ROW_NEED.length;
 const SK_WPN_FROM={bow:'the Trial of the Tide',boomerang:'the Trial of the Leap'};
 const SK_RESET_COST=30;
 const skPct=(m,r)=>Math.round((Math.pow(m,r)-1)*100);
@@ -25,6 +27,11 @@ const SKILL_TREE=[
   {id:'spin',br:'blade',row:1,max:1,name:'Whirlwind',desc:'The last hit of a sword, dagger or spear combo becomes a big spin that hits everything around you. Dizzy, but worth it.'},
   {id:'firearrow',br:'blade',row:2,max:1,name:'Fire Arrows',weapon:'bow',desc:'Arrows catch fire, set foes burning and light braziers. Please aim away from the haystacks.'},
   {id:'longthrow',br:'blade',row:2,max:1,name:'Long Throw',weapon:'boomerang',desc:'Your boomerang flies 50% farther and fetches coins and pickups on the way back. Good boomerang.'},
+  {id:'pound2',br:'blade',row:2,max:2,name:'Earthshaker',abil:'pound',desc:S('Your Ground Pound shakes a much wider circle and leaves foes dizzy for longer.','Your ground pound hits a bigger circle.'),each:'+30% Ground Pound size and stun',now:r=>`+${30*r}%`},
+  {id:'reach',br:'blade',row:3,max:2,name:'Long Reach',desc:S('Swing a little wider and reach a little farther. Dragon arms, finally.','Your swings reach farther.'),each:'+8% weapon reach',now:r=>`+${skPct(1.08,r)}%`,
+    fx:p=>{ p.stats.range*=1.08; },un:p=>{ p.stats.range/=1.08; }},
+  {id:'master',br:'blade',row:3,max:3,name:'Weapon Master',desc:S('Every weapon feels like an old friend in your claws.','Every weapon hits harder.'),each:'+6% weapon damage and +2% critical hits',now:r=>`+${6*r}%`,
+    fx:p=>{ p.stats.wpnMul+=0.06; p.stats.critCh+=0.02; },un:p=>{ p.stats.wpnMul-=0.06; p.stats.critCh=Math.max(0,p.stats.critCh-0.02); }},
   // Flame
   {id:'hot',br:'flame',row:0,max:3,name:'Hotter Fire',desc:'Spicier breath. Marshmallows, beware.',each:'+12% fire damage',now:r=>`+${skPct(1.12,r)}%`,
     fx:p=>{ p.stats.fire*=1.12; },un:p=>{ p.stats.fire/=1.12; }},
@@ -32,31 +39,50 @@ const SKILL_TREE=[
     fx:p=>{ p.stats.fireCost*=0.88; },un:p=>{ p.stats.fireCost/=0.88; }},
   {id:'thunder',br:'flame',row:1,max:2,name:'Thunder Roar',desc:'A roar so loud the fish complain.',each:'+25% roar damage, and the roar fills 10% faster',now:r=>`+${skPct(1.25,r)}% roar damage`,
     fx:p=>{ p.stats.roarDmg*=1.25; p.stats.roarRate*=1.1; },un:p=>{ p.stats.roarDmg/=1.25; p.stats.roarRate/=1.1; }},
+  {id:'blaze2',br:'flame',row:1,max:2,name:'White Fire',abil:'blaze',desc:S('Blaze Breath heats up faster and burns hot enough for the oldest ice.','Blaze Breath gets hot faster.'),each:'Blaze Breath heats 25% faster and burns 15% hotter',now:r=>`+${25*r}% faster`},
   {id:'trail',br:'flame',row:2,max:1,name:'Ember Trail',desc:'Rolling leaves a trail of fire behind you. Very cool. Well, very hot.',
     fx:p=>{ p.stats.emberDash=true; if(!p.ups.emberdash){ p.ups.emberdash=1; G.flags.sk_trailUps=1; } },
     un:p=>{ if(G.flags.sk_trailUps){ delete p.ups.emberdash; delete G.flags.sk_trailUps; p.stats.emberDash=false; } }},
+  {id:'moon2',br:'flame',row:2,max:2,name:'Full Moon',abil:'moonfire',desc:S('Moonfire burns brighter and lingers longer.','Moonfire burns brighter.'),each:'+25% Moonfire damage and length',now:r=>`+${25*r}%`},
+  {id:'stoke',br:'flame',row:3,max:2,name:'Stoked Embers',desc:S('A bigger fire meter that refills faster. Your belly is basically a furnace.','More fire, and it comes back faster.'),each:'+20 fire meter, refills 15% faster',now:r=>`+${20*r} fire`,
+    fx:p=>{ p.maxEnergy+=20; p.energy+=20; p.stats.energyRegen*=1.15; },un:p=>{ p.maxEnergy-=20; p.energy=Math.min(p.energy,p.maxEnergy); p.stats.energyRegen/=1.15; }},
+  {id:'inferno',br:'flame',row:3,max:2,name:'Inferno',desc:S('Fire breath burns hotter, and your roar fills faster in a fight.','Hotter fire. Your roar fills faster.'),each:'+10% fire damage, and the roar fills 10% faster',now:r=>`+${skPct(1.1,r)}% fire`,
+    fx:p=>{ p.stats.fire*=1.1; p.stats.roarRate*=1.1; },un:p=>{ p.stats.fire/=1.1; p.stats.roarRate/=1.1; }},
   // Wings
   {id:'light',br:'wings',row:0,max:2,name:'Light Feet',desc:'Tiptoe like a dragon who skipped dinner.',each:'Rolls cost 15% less stamina, and +4% speed',now:r=>`+${skPct(1.04,r)}% speed`,
     fx:p=>{ p.stats.rollCost*=0.85; p.stats.speed*=1.04; },un:p=>{ p.stats.rollCost/=0.85; p.stats.speed/=1.04; }},
-  {id:'dbljump',br:'wings',row:0,max:1,name:'Double Jump',abil:'jump',desc:'Jump again in midair. Gravity is more of a suggestion.'},
-  {id:'slam',br:'wings',row:1,max:1,name:'Meteor Slam',abil:'jump',desc:'Attack in midair to crash down and bonk everything nearby.'},
-  {id:'skimmer',br:'wings',row:1,max:1,name:'Skimmer',abil:'stride',desc:'Sprint across water for free, and faster. Skip like a stone!'},
+  {id:'sprinter',br:'wings',row:0,max:2,name:'Sprinter',desc:S('Run like the wind and puff a lot less doing it.','Run fast and puff less.'),each:'Sprinting costs 20% less stamina',now:r=>`${-skPct(0.8,r)}% less`,
+    fx:p=>{ p.stats.sprintK*=0.8; },un:p=>{ p.stats.sprintK/=0.8; }},
+  {id:'climb2',br:'wings',row:0,max:2,name:'Quick Claws',abil:'claws',desc:S('Climb cliffs faster and hang on longer. Rocks are just big stairs.','Climb cliffs faster.'),each:'+30% climbing speed',now:r=>`+${30*r}%`},
+  {id:'second',br:'wings',row:1,max:1,name:'Second Wind',desc:S('More stamina, and it comes back faster after a big run.','More stamina, back faster.'),each:'+20 stamina, refills 20% faster',
+    fx:p=>{ p.maxStamina+=20; p.stamina+=20; p.stats.staminaRegen*=1.2; },un:p=>{ p.maxStamina-=20; p.stamina=Math.min(p.stamina,p.maxStamina); p.stats.staminaRegen/=1.2; }},
+  {id:'hook2',br:'wings',row:1,max:2,name:'Long Tail',abil:'grapple',desc:S('Your Grapple Tail reaches farther and pulls you in faster.','Your tail grabs from farther away.'),each:'+25% grapple reach',now:r=>`+${25*r}%`},
+  {id:'dash2',br:'wings',row:1,max:2,name:'Shadow Strike',abil:'shadow',desc:S('Shadow Dash goes farther and singes every foe you dash through.','Your shadow dash goes far and hurts foes.'),each:'+20% dash length, and it burns foes',now:r=>`+${20*r}%`},
   {id:'strongwings',br:'wings',row:2,max:2,name:'Strong Wings',abil:'wings',desc:'Fly longer before your wings get wobbly.',each:'+40% flight time',now:r=>`+${40*r}%`,
     fx:p=>{ p.stats.flyMax+=0.4; },un:p=>{ p.stats.flyMax-=0.4; }},
+  {id:'wind2',br:'wings',row:2,max:2,name:'Wind Whisperer',abil:'windride',desc:S('Ride the wind longer, and steer it where you want.','Ride the wind for longer.'),each:'+30% wind riding time',now:r=>`+${30*r}%`},
+  {id:'burrow2',br:'wings',row:2,max:2,name:'Mole Claws',abil:'burrow',desc:S('Dig faster, and burst out of the sand in a spray that knocks foes back.','Dig faster. Pop out and push foes!'),each:'+25% burrow speed',now:r=>`+${25*r}%`},
+  {id:'tailwind',br:'wings',row:3,max:2,name:'Tailwind',desc:S('Your rolls carry you farther. Whoosh.','Your rolls go farther.'),each:'Rolls go 10% farther',now:r=>`+${skPct(1.1,r)}%`,
+    fx:p=>{ p.stats.rollK*=1.1; },un:p=>{ p.stats.rollK/=1.1; }},
   // Heart
   {id:'tough',br:'heart',row:0,max:3,name:'Tough Scales',desc:'Thicker scales. Hugs hurt a little less too.',each:'+12 max health',now:r=>`+${12*r}`,
     fx:p=>{ p.maxHp+=12; p.hp+=12; },un:p=>{ p.maxHp-=12; p.hp=Math.min(p.hp,p.maxHp); p.hpShow=Math.min(p.hpShow,p.maxHp); }},
-  {id:'flask',br:'heart',row:0,max:1,name:'Bigger Flasks',desc:'Carry one more healing draught. Mom packed extra.',each:'+1 healing draught',
+  {id:'flask',br:'heart',row:0,max:2,name:'Bigger Flasks',desc:'Carry one more healing draught. Mom packed extra.',each:'+1 healing draught',
     fx:p=>{ p.potionsMax+=1; p.potions+=1; },un:p=>{ p.potionsMax-=1; p.potions=Math.min(p.potions,p.potionsMax); }},
   {id:'ember',br:'heart',row:1,max:1,name:'Ember Heart',desc:'Every foe you beat warms you up a little.',each:'Heal 2 health for each foe you beat',
     fx:p=>{ p.stats.killHeal+=2; },un:p=>{ p.stats.killHeal=Math.max(0,p.stats.killHeal-2); }},
   {id:'hide',br:'heart',row:1,max:2,name:'Iron Hide',desc:'Take less damage. Like wearing a frying pan, but stylish.',each:'Take 8% less damage',now:r=>`${-skPct(0.92,r)}% less`,
     fx:p=>{ p.stats.armor*=0.92; },un:p=>{ p.stats.armor/=0.92; }},
+  {id:'dive2',br:'heart',row:1,max:2,name:'Long Breath',abil:'dive',desc:S('Hold your breath longer underwater. The fish are jealous.','Stay under the water longer.'),each:'+35% breath underwater',now:r=>`+${35*r}%`},
   {id:'pipbond',br:'heart',row:2,max:1,name:'Pip’s Best Friend',pip:true,desc:'Pip attacks faster and sometimes heals you. Mip!'},
-  {id:'rally',br:'heart',row:2,max:1,name:'Rally',desc:'Knocked-down friends get back up twice as fast, and cheer you on for a small heal.'}
+  {id:'rally',br:'heart',row:2,max:1,name:'Rally',desc:'Knocked-down friends get back up twice as fast, and cheer you on for a small heal.'},
+  {id:'heartier',br:'heart',row:3,max:3,name:'Dragon Heart',desc:S('A bigger, braver heart. Literally.','A bigger heart. More health!'),each:'+15 max health',now:r=>`+${15*r}`,
+    fx:p=>{ p.maxHp+=15; p.hp+=15; },un:p=>{ p.maxHp-=15; p.hp=Math.min(p.hp,p.maxHp); p.hpShow=Math.min(p.hpShow,p.maxHp); }},
+  {id:'brew',br:'heart',row:3,max:2,name:'Strong Brew',desc:S('Your healing draughts heal more. Mom’s recipe, with extra.','Your draughts heal more.'),each:'Draughts heal 15% more',now:r=>`+${skPct(1.15,r)}%`,
+    fx:p=>{ p.stats.drinkMul=(p.stats.drinkMul||1)*1.15; },un:p=>{ p.stats.drinkMul=(p.stats.drinkMul||1)/1.15; }}
 ];
 const SKN={}; for(const n of SKILL_TREE) SKN[n.id]=n;
-const SK_STAT0={wpnMul:1,critCh:0,flyMax:1,jumpK:1,atkSpeed:1,fire:1,fireCost:32,roarDmg:45,roarRate:1,rollCost:24,speed:200,killHeal:0,armor:1};
+const SK_STAT0={wpnMul:1,critCh:0,flyMax:1,jumpK:1,atkSpeed:1,fire:1,fireCost:32,roarDmg:45,roarRate:1,rollCost:24,speed:200,killHeal:0,armor:1,sprintK:1,rollK:1,range:60,energyRegen:24,staminaRegen:34};
 const SK={tab:null,from:'play',hintEnd:0,lv:null,fx:[],pl:null,arm:0,toastT:0,just:null,built:false,ic:{}};
 
 // ---------- rules
@@ -64,8 +90,10 @@ function skStats(){ if(!player) return; const s=player.stats; for(const k in SK_
 const skRank=id=>hasSkill(id);
 function skSpent(br){ let n=0; for(const q of SKILL_TREE) if(!br||q.br===br) n+=skRank(q.id); return n; }
 function wpnName(id){ return (typeof WEAPONS!=='undefined'&&WEAPONS[id]&&WEAPONS[id].name)||id; }
+// a skill that needs a power from a later act stays a mystery until the power is found
+function skSecret(n){ const A=n.abil&&typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; return !!A&&(A.act||1)>1&&!hasAbil(n.abil); }
 function skNeedTxt(n){
-  if(n.abil&&!hasAbil(n.abil)) return SK_TRIAL[n.abil];
+  if(n.abil&&!hasAbil(n.abil)){ const A=typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; if(!A||(A.act||1)>1) return 'Opens when you find a new power'; return `Needs ${A.name}. ${A.where||''}`.trim(); }
   if(n.weapon&&!(G.weapons&&G.weapons[n.weapon])) return `Needs the ${wpnName(n.weapon)} from ${SK_WPN_FROM[n.weapon]}`;
   if(n.pip&&!(G.flags&&G.flags.pip)) return 'Unlocks once Pip joins you';
   if(n.id==='trail'&&player&&player.stats.emberDash&&!skRank('trail')) return 'You already roll in flames, thanks to a blessing';
@@ -98,7 +126,7 @@ function resetSkills(){
   if(!G||!player) return 0;
   const spent=skSpent(); skStats();
   for(const n of SKILL_TREE){ const r=skRank(n.id); for(let i=0;i<r;i++) if(n.un) n.un(player); }
-  const s=player.stats; for(const k of ['atkSpeed','fire','fireCost','roarDmg','roarRate','rollCost','speed','armor','wpnMul','critCh','flyMax']) if(typeof s[k]==='number') s[k]=Math.round(s[k]*1e6)/1e6;
+  const s=player.stats; for(const k of ['atkSpeed','fire','fireCost','roarDmg','roarRate','rollCost','speed','armor','wpnMul','critCh','flyMax','sprintK','rollK','range','energyRegen','staminaRegen','drinkMul']) if(typeof s[k]==='number') s[k]=Math.round(s[k]*1e6)/1e6;
   G.skills={}; G.sp=(G.sp|0)+spent; saveGame();
   return spent;
 }
@@ -340,8 +368,85 @@ function skSym(g,id,pal){
     case 'w_hammer': g.save(); g.rotate(-Math.PI/5); skLine(g,skP('M0 38 L0 -10'),'#a06a3a',6); skInk(g,skP('M-20 -30 L20 -30 L20 -10 L-20 -10 Z'),'#9aa4ae'); g.fillStyle='rgba(255,255,255,.35)'; g.fillRect(-16,-27,32,4); g.restore(); break;
     case 'w_bow': { const p=new Path2D(); p.arc(-30,0,40,-1.05,1.05); skLine(g,p,'#b07a44',6); g.strokeStyle='#f2ece0'; g.lineWidth=1.8; g.beginPath(); g.moveTo(-30+Math.cos(-1.05)*40,Math.sin(-1.05)*40); g.lineTo(-30+Math.cos(1.05)*40,Math.sin(1.05)*40); g.stroke(); skLine(g,skP('M-12 0 L30 0'),'#d8c098',3); skInk(g,skP('M36 0 L26 -6 L26 6 Z'),'#dfe4ea',3); break; }
     case 'w_boomerang': skLine(g,skP('M-28 16 Q-6 -34 26 -6'),'#d9a066',11); g.strokeStyle='rgba(255,255,255,.4)'; g.lineWidth=2; g.stroke(skP('M-22 8 Q-6 -26 18 -8')); break;
-    default: skInk(g,skCirc(0,0,14),C);
+    default: if(!skSym2(g,id,pal)) skInk(g,skCirc(0,0,14),C);
   }
+}
+// v9 symbols: the new powers (a_*), their upgrade skills (a power symbol with a plus), the late general skills, the
+// mystery slot and the Powers tab. A power defined with icon:(g,pal)=>{} draws itself (id 'fn_'+power id).
+const SK_UPG={climb2:'a_claws',hook2:'a_grapple',dash2:'a_shadow',blaze2:'a_blaze',wind2:'a_windride',pound2:'slam',dive2:'a_dive',burrow2:'a_burrow',moon2:'a_moonfire'};
+function skPlus(g,ac){ skInk(g,skCirc(27,-27,11),ac||'#ffd27a',4); g.strokeStyle='#2a1208'; g.lineWidth=3.4; g.lineCap='round'; g.beginPath(); g.moveTo(27,-32.5); g.lineTo(27,-21.5); g.moveTo(21.5,-27); g.lineTo(32.5,-27); g.stroke(); }
+function skSym2(g,id,pal){
+  const C='#fff3dc', ac=pal.col||'#ffd27a';
+  if(id.startsWith('fn_')){ const A=typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[id.slice(3)]; if(A&&typeof A.icon==='function'){ try{ A.icon(g,pal); }catch(e){} return true; } return false; }
+  if(SK_UPG[id]){ g.save(); g.translate(-4,5); g.scale(0.84,0.84); skSym(g,SK_UPG[id],pal); g.restore(); skPlus(g,ac); return true; }
+  switch(id){
+    case 'qmark': skLine(g,skP('M-15 -13 Q-15 -33 1 -33 Q18 -33 18 -17 Q18 -5 3 1 Q0 3 0 10 L0 12'),'#e8d8c0',8); skInk(g,skCirc(0,27,6),'#e8d8c0',4); return true;
+    case 'a_claws':
+      skInk(g,skP('M-42 32 L-34 0 L-16 -16 L2 -8 L20 -26 L42 -14 L42 32 Z'),'#9a7c5e',5);
+      g.strokeStyle='rgba(60,40,24,.6)'; g.lineWidth=2; g.beginPath(); g.moveTo(-30,24); g.lineTo(-20,6); g.moveTo(28,26); g.lineTo(32,4); g.stroke();
+      for(const dx of [-15,0,15]) skLine(g,skP(`M${dx-5} -24 Q${dx+8} 2 ${dx-3} 26`),C,4.5);
+      return true;
+    case 'a_grapple':
+      g.save(); g.setLineDash([5,5]); skLine(g,skP('M-36 30 Q-24 -24 14 -18'),'#d8b878',3); g.restore();
+      skInk(g,skCirc(-36,30,6),'#c8703a',3);
+      skLine(g,skP('M14 -18 Q28 -40 36 -24 Q40 -10 26 -10'),'#e2b04c',5.5);
+      skInk(g,skP('M24 -14 L30 -6 L20 -6 Z'),'#e2b04c',3);
+      return true;
+    case 'a_shadow':
+      for(const [y,w,al] of [[-18,30,.5],[0,40,.85],[18,30,.5]]){ g.globalAlpha=al; skLine(g,skP(`M-42 ${y} L${-42+w} ${y}`),'#b48cff',4); } g.globalAlpha=1;
+      skInk(g,skP('M-8 -28 Q30 -22 38 0 Q30 22 -8 28 Q8 0 -8 -28 Z'),'#3e2860',5);
+      g.fillStyle='#e0c8ff'; g.fill(skCirc(22,-5,3.6)); g.fillStyle='rgba(200,170,255,.35)'; g.fill(skEll(8,-12,8,3));
+      return true;
+    case 'a_blaze':
+      skInk(g,skFlameP(0,36,22,72),'#8fd8ff',5); g.fillStyle='#e6f7ff'; g.fill(skFlameP(0,32,14,50)); g.fillStyle='#ffffff'; g.fill(skFlameP(0,28,7,28));
+      skSpark(g,-27,-20,8,'#ffffff'); skSpark(g,27,-6,6,'#dff4ff'); return true;
+    case 'a_windride':
+      skLine(g,skP('M-40 -8 Q-12 -30 12 -14 Q24 -4 12 4 Q2 8 -2 0'),'#d8f2ff',4.5);
+      skLine(g,skP('M-38 14 Q-2 -2 32 10'),'#a8dcf4',4);
+      skLine(g,skP('M-32 30 Q4 18 38 28'),'#8fc8f0',3.5);
+      g.save(); g.translate(20,-24); g.scale(0.42,0.42); skWing(g,'#ffe2b0'); g.restore(); return true;
+    case 'a_dive':
+      skLine(g,skP('M-40 -24 Q-30 -32 -20 -24 T0 -24 T20 -24 T40 -24'),'#bfe8ff',4.5);
+      skLine(g,skP('M0 -10 L0 24'),'#8fc8f0',6); skInk(g,skP('M-12 16 L0 34 L12 16 Z'),'#8fc8f0',4);
+      g.strokeStyle='#e6f6ff'; g.lineWidth=2.6; for(const [x,y,r] of [[-22,2,5],[-17,19,3.5],[21,-2,4],[24,15,6]]) g.stroke(skCirc(x,y,r));
+      return true;
+    case 'a_burrow':
+      skInk(g,skP('M-42 32 Q-20 -2 0 -6 Q20 -2 42 32 Z'),'#e2c27a',5);
+      g.fillStyle='rgba(120,80,30,.55)'; for(const [x,y] of [[-18,18],[-4,8],[12,20],[24,26],[-28,28],[4,26]]) g.fill(skCirc(x,y,2.3));
+      skLine(g,skP('M0 -38 L0 -16'),C,5); skInk(g,skP('M-9 -22 L0 -9 L9 -22 Z'),C,3.5); return true;
+    case 'a_moonfire':
+      skInk(g,skP('M1.9 -31.9 A32 32 0 1 0 30.2 10.5 A26 26 0 1 1 1.9 -31.9 Z'),'#e8ecff',5);
+      g.fillStyle='rgba(150,160,220,.45)'; g.fill(skCirc(-16,8,4)); g.fill(skCirc(-8,-16,2.6));
+      skInk(g,skFlameP(18,30,8,30),'#b8c4ff',4); g.fillStyle='#ffffff'; g.fill(skFlameP(18,27,4,16)); skSpark(g,32,-22,6,'#ffffff'); return true;
+    case 'reach':
+      skSword(g,-Math.PI/4,0.86,-8,8);
+      skLine(g,skP('M10 -10 L30 -30'),ac,4); skInk(g,skP('M36 -36 L22 -32 L32 -22 Z'),ac,3.5); return true;
+    case 'master': skSword(g,-Math.PI/4,0.82,-4,2); skSword(g,Math.PI/4,0.82,4,2); skSpark(g,0,-30,10,'#ffffff'); return true;
+    case 'stoke':
+      skFlame(g,-8,36,18,60);
+      skLine(g,skP('M20 4 L29 -6 L38 4'),C,4.5); skLine(g,skP('M20 20 L29 10 L38 20'),C,4.5); return true;
+    case 'inferno':
+      for(const sg of [-1,1]){ const p=new Path2D(), m=sg>0?0:Math.PI; p.arc(0,4,36,m-0.5,m+0.5); skLine(g,p,ac,4); }
+      skFlame(g,0,36,22,72); return true;
+    case 'sprinter':
+      for(const [y,w] of [[-14,22],[0,30],[14,22]]) skLine(g,skP(`M-40 ${y} L${-40+w} ${y}`),ac,3.5);
+      skInk(g,skEll(6,-12,9,13),C,4); skInk(g,skEll(22,14,9,13),C,4);
+      g.fillStyle='rgba(120,90,60,.45)'; g.fill(skEll(6,-12,3.5,6)); g.fill(skEll(22,14,3.5,6)); return true;
+    case 'second':
+      skLine(g,skP('M-38 -12 Q-28 -22 -18 -12 T2 -12'),C,4.5); skLine(g,skP('M-40 6 Q-30 -4 -20 6 T0 6'),C,4.5); skLine(g,skP('M-38 24 Q-28 14 -18 24 T2 24'),C,4.5);
+      skArrowArc(g,18,-2.4,1.4,ac); return true;
+    case 'tailwind':
+      g.fillStyle='rgba(0,0,0,.3)'; g.fill(skEll(0,34,26,5));
+      skArrowArc(g,24,-2.8,0.9,ac);
+      skLine(g,skP('M-40 -30 L-22 -30'),C,3.5); skLine(g,skP('M-44 -18 L-30 -18'),C,3.5); return true;
+    case 'heartier': skInk(g,skP(SK_HEART),'#e8445a'); g.fillStyle='rgba(255,255,255,.3)'; g.fill(skEll(-16,-14,7,4)); skPlus(g,'#ffd27a'); return true;
+    case 'brew': g.save(); g.translate(-4,2); skSym(g,'flask',pal); g.restore(); skSpark(g,-26,-26,9,'#ffffff'); skSpark(g,30,18,6,'#ffffff'); return true;
+    case 'br_powers': {
+      g.save(); g.shadowColor='rgba(255,190,60,.8)'; g.shadowBlur=10;
+      const rays=new Path2D(); for(let i=0;i<8;i++){ const a=i/8*TAU-Math.PI/2; rays.moveTo(Math.cos(a)*44,Math.sin(a)*44); rays.lineTo(Math.cos(a+0.34)*18,Math.sin(a+0.34)*18); rays.lineTo(Math.cos(a-0.34)*18,Math.sin(a-0.34)*18); rays.closePath(); }
+      skInk(g,rays,'#ffcf3a',5); g.restore(); skInk(g,skCirc(0,0,20),'#fff2a8',5); skFlame(g,0,14,8,26); return true; }
+  }
+  return false;
 }
 function skMedal(g,pal,lock){
   g.fillStyle='rgba(0,0,0,.45)'; g.fill(skCirc(0,3,47));
@@ -399,6 +504,18 @@ const SK_CSS=`
 .skprog{display:inline-flex;gap:4px;margin-left:2px}.skprog i{width:7px;height:7px;transform:rotate(45deg);background:rgba(255,255,255,.16);display:inline-block}.skprog i.on{background:var(--ac)}
 .skrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .skrow.one{grid-template-columns:minmax(0,1fr);max-width:calc(50% - 5px);margin:0 auto}
+.skrow.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.skrow.three .skn{grid-template-columns:50px minmax(0,1fr);column-gap:10px;padding:10px}
+.skrow.three .skic,.skrow.three .skic img{width:50px;height:50px}
+.pwrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pwtier{margin-bottom:12px}
+.pwn{position:relative;display:grid;grid-template-columns:60px minmax(0,1fr);column-gap:12px;padding:11px 12px;border-radius:12px;background:linear-gradient(180deg,#24120c,#170b08);border:1px dashed rgba(255,140,70,.22)}
+.pwn.own{background:linear-gradient(180deg,#36190e,#200f09);border:1px solid rgba(255,200,110,.5);box-shadow:0 0 0 1px rgba(255,200,110,.1)}
+.pwn:not(.own) .sknm{color:#a89480;letter-spacing:.2em}
+.pwn:not(.own) .skic img{opacity:.75}
+.pwup{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:12.5px;color:#ffe08a}
+.pwup svg{flex:none}
+@media (max-width:900px){.skrow.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .skcn{height:18px;display:flex;justify-content:center}.skcn i{width:2px;height:100%;background:var(--ac);opacity:.6}.skcn.shut i{opacity:.35;background:repeating-linear-gradient(180deg,var(--ac) 0 3px,transparent 3px 7px)}
 .skn{position:relative;display:grid;grid-template-columns:60px minmax(0,1fr);grid-template-rows:1fr auto;column-gap:12px;row-gap:9px;padding:11px 12px;border-radius:12px;background:linear-gradient(180deg,#2e150d,#1c0d09);border:1px solid var(--edge)}
 .skic{grid-row:1/3;position:relative;width:60px;height:60px}
@@ -450,7 +567,9 @@ const SK_CSS=`
   #skills .skp{padding:14px 12px 12px}
   .skhd{gap:8px}.skhd h2{font-size:24px!important}
   .skpts{padding-right:10px}.skpts span{font-size:12px}
-  .skrow,.skrow.one{grid-template-columns:minmax(0,1fr);max-width:none}
+  .skrow,.skrow.one,.skrow.three,.pwrow{grid-template-columns:minmax(0,1fr);max-width:none}
+  .skrow.three .skn{grid-template-columns:52px minmax(0,1fr)}.skrow.three .skic,.skrow.three .skic img{width:52px;height:52px}
+  .pwn{grid-template-columns:52px minmax(0,1fr);column-gap:10px;padding:10px}
   .sktabs button{flex-direction:column;gap:2px;padding:6px 2px 7px;font-size:12px}
   .sktabs .skc{position:absolute;top:3px;right:4px;font-size:10px;padding:0 4px;min-width:0}
   .sktabs .dot{top:5px;right:auto;left:6px}
@@ -545,7 +664,30 @@ function skPauseLabel(){
 function skBuildTabs(){
   if(SK.built) return; SK.built=true;
   $('#skStar').src=skIcon('star',{k:'star',bare:true},30);
-  $('#skTabs').innerHTML=SK_BR.map(b=>`<button type="button" tabindex="0" data-br="${b.id}" style="--ac:${b.col}" aria-pressed="false"><img src="${skIcon('br_'+b.id,Object.assign({bare:true},b),22)}" alt="" width="22" height="22"><span>${b.name}</span><span class="skc">0</span><span class="dot" hidden></span></button>`).join('');
+  $('#skTabs').innerHTML=SK_BR.concat([SK_POW]).map(b=>`<button type="button" tabindex="0" data-br="${b.id}" style="--ac:${b.col}" aria-pressed="false"><img src="${skIcon('br_'+b.id,Object.assign({bare:true},b),22)}" alt="" width="22" height="22"><span>${b.name}</span><span class="skc">0</span><span class="dot" hidden></span></button>`).join('');
+}
+// the Powers page (a fifth tab): every power Ash has and how to use it, and a ??? slot for each one still out there
+const SK_POW={id:'powers',name:'Powers',col:'#ffd27a',deep:'#5a3a10'};
+const SK_TABS=['blade','flame','wings','heart','powers'];
+const SK_DIM={k:'dim',col:'#8a7a6a',deep:'#2a1c14'};
+function skPowIcon(A){ return typeof A.icon==='function'?'fn_'+A.id:(A.icon||'qmark'); }
+function skPowerCard(id){
+  const A=ABIL_DEFS[id], own=hasAbil(id), E=t=>escapeHtml(simplify(t));
+  const sk=A.skill&&SKN[A.skill], r=sk?skRank(sk.id):0;
+  const txt=own?abilHow(id):(A.act===1&&A.where?A.where:'A power you have not found yet.');
+  let up='';
+  if(own&&sk){ const pips=Array.from({length:sk.max},(_,i)=>`<i class="${i<r?'on':''}"></i>`).join(''); up=`<div class="pwup">${SK_SVG.star}<span>${E(`Upgrade: ${sk.name}, in ${SK_BRBY[sk.br].name}`)}</span><span class="skpip" role="img" aria-label="Rank ${r} of ${sk.max}">${pips}</span></div>`; }
+  return `<div class="pwn${own?' own':''}" data-pow="${id}"><div class="skic"><img src="${skIcon(own?skPowIcon(A):'qmark',own?SK_GOLD:SK_DIM,60)}" alt="" width="60" height="60"></div><div class="sktx"><div class="sknm">${E(own?A.name:'???')}${own?'<span class="hrok">Yours</span>':''}</div><div class="skds">${E(txt)}</div>${up}</div></div>`;
+}
+function skPowersHtml(){
+  const ids=typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[], own=ids.filter(hasAbil).length, R=['','I','II','III','IV'];
+  const out=[`<div class="skbh"><b>Powers</b><span>${escapeHtml(simplify('Powers are gifts you find on your journey. They never cost skill points, and many open a new skill.'))} ${own} of ${ids.length} found.</span></div>`];
+  for(let act=1;act<=4;act++){
+    const L=ids.filter(id=>(ABIL_DEFS[id].act||1)===act); if(!L.length) continue;
+    const known=act===1||L.some(hasAbil), title=known?((typeof BAL_ACTS!=='undefined'&&BAL_ACTS[act])||`Act ${R[act]}`):`Act ${R[act]} · ???`;
+    out.push(`<div class="sktier pwtier"><div class="sktl"><span class="sktn">${escapeHtml(title)}</span><span class="ln"></span></div><div class="pwrow">${L.map(skPowerCard).join('')}</div></div>`);
+  }
+  return out.join('');
 }
 function openSkills(){
   if(!G||G.mode!=='story'||!player) return;
@@ -557,7 +699,7 @@ function openSkills(){
   skRender(); $('#skBody').scrollTop=0;
   for(const e of document.querySelectorAll('#skills [data-focus]')) e.removeAttribute('data-focus');
   const f=$('#skBody .sklrn:not([aria-disabled])')||$(`#skTabs button[data-br="${SK.tab}"]`); if(f) f.setAttribute('data-focus','');
-  $('#skKeys').innerHTML=skCtrl()==='key'?'<kbd>Arrows</kbd> move · <kbd>Enter</kbd> learn · <kbd>Q</kbd> <kbd>E</kbd> branch · <kbd>Esc</kbd> close':'';
+  $('#skKeys').innerHTML=skCtrl()==='key'?'<kbd>Arrows</kbd> move · <kbd>Enter</kbd> learn · <kbd>Q</kbd> <kbd>E</kbd> branch and Powers · <kbd>Esc</kbd> close':'';
   show('skills');
 }
 function closeSkills(){
@@ -569,7 +711,7 @@ function closeSkills(){
   SFX.play('ui'); saveGame();
 }
 function skSetTab(id,focus){
-  if(!SK_BRBY[id]) return; const ch=SK.tab!==id; SK.tab=id; SK.arm=0;
+  if(!SK_BRBY[id]&&id!=='powers') return; const ch=SK.tab!==id; SK.tab=id; SK.arm=0;
   skRender(); if(ch){ $('#skBody').scrollTop=0; SFX.play('ui'); }
   if(focus){ const b=$(`#skTabs button[data-br="${id}"]`); if(b&&document.activeElement!==b&&!usingTouch) b.focus({preventScroll:true}); }
 }
@@ -580,29 +722,31 @@ function skToast(t){
   el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),readT(t,3,7)*1000); logAdd({k:'tip',text:t});
 }
 function skCard(n,br){
-  const E=escapeHtml, r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), needT=max?'':skNeedTxt(n);
+  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), needT=max?'':skNeedTxt(n);
+  if(skSecret(n)) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
   const pips=Array.from({length:n.max},(_,i)=>`<i class="${i<r?'on':''}${SK.just===n.id&&i===r-1?' new':''}"></i>`).join('');
   const eff=n.each?`<div class="skef">${n.max>1?'Each rank: ':''}${E(n.each)}${r&&n.max>1&&n.now?` · <em>Total ${E(n.now(r))}</em>`:''}</div>`:'';
   const rq=needT?`<div class="skrq">${SK_SVG.lock}<span>${E(needT)}</span></div>`:'';
   const lab=can?`${r?'Rank up':'Learn'} <b>${SK_SVG.star}1</b>`:why.k==='sp'?'Need a skill point':why.k==='row'?`${SK_SVG.lock} Row ${n.row+1} is locked`:`${SK_SVG.lock} Locked`;
   const btn=max?`<span class="skmx">${SK_SVG.check}Mastered</span>`:`<button type="button" tabindex="0" class="btn c sm sklrn${can?' hot':' off'}" data-learn="${n.id}"${can?'':' aria-disabled="true"'} aria-label="${E(n.name)}: ${can?(r?'rank up':'learn'):E(why.t)}">${lab}</button>`;
-  return `<div class="skn${can?' can':''}${max?' max':''}${lock?' lock':''}" data-id="${n.id}"><div class="skic"><img src="${skIcon(n.id,br,60)}" alt="" width="60" height="60">${lock?`<span class="sklk">${SK_SVG.lock}</span>`:''}</div><div class="sktx"><div class="sknm">${E(n.name)}<span class="skpip" role="img" aria-label="Rank ${r} of ${n.max}">${pips}</span></div><div class="skds">${E(n.desc)}</div>${eff}${rq}</div>${btn}</div>`;
+  return `<div class="skn${can?' can':''}${max?' max':''}${lock?' lock':''}" data-id="${n.id}"><div class="skic"><img src="${skIcon(n.ico||n.id,br,60)}" alt="" width="60" height="60">${lock?`<span class="sklk">${SK_SVG.lock}</span>`:''}</div><div class="sktx"><div class="sknm">${E(n.name)}<span class="skpip" role="img" aria-label="Rank ${r} of ${n.max}">${pips}</span></div><div class="skds">${E(n.desc)}</div>${eff}${rq}</div>${btn}</div>`;
 }
 function skRender(){
   if(!player) return;
-  const sp=G.sp|0, br=SK_BRBY[SK.tab]||SK_BR[0], spent=skSpent(br.id), body=$('#skBody');
+  const pow=SK.tab==='powers', sp=G.sp|0, br=pow?SK_POW:(SK_BRBY[SK.tab]||SK_BR[0]), spent=pow?0:skSpent(br.id), body=$('#skBody');
   const act=document.activeElement, keep=act&&body.contains(act)?(act.dataset.learn||(act.dataset.res?'_res':'')):null;
   $('#skSp').textContent=sp; $('#skSpL').textContent=sp===1?'point to spend':'points to spend'; $('#skPts').classList.toggle('none',!sp);
   $('#skSub').textContent=`Level ${player.level}. You earn 1 point every level, and 1 more for each Trial you beat.`;
-  for(const b of document.querySelectorAll('#skTabs button')){ const id=b.dataset.br; b.setAttribute('aria-pressed',String(id===br.id)); const k=skSpent(id), sc=b.querySelector('.skc'); sc.textContent=k; sc.hidden=!k; b.querySelector('.dot').hidden=!skCanAny(id); }
+  for(const b of document.querySelectorAll('#skTabs button')){ const id=b.dataset.br; b.setAttribute('aria-pressed',String(id===br.id)); const k=id==='powers'?(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER.filter(hasAbil).length:0):skSpent(id), sc=b.querySelector('.skc'); sc.textContent=k; sc.hidden=!k; b.querySelector('.dot').hidden=id==='powers'||!skCanAny(id); }
   $('#skPanel').style.setProperty('--ac',br.col);
-  const out=[`<div class="skbh"><b>${br.name}</b><span>${escapeHtml(br.blurb)} ${spent} point${spent===1?'':'s'} spent here.</span></div>`];
-  for(let row=0;row<3;row++){
+  if(pow){ body.innerHTML=skPowersHtml(); SK.just=null; return; }
+  const out=[`<div class="skbh"><b>${br.name}</b><span>${escapeHtml(simplify(br.blurb))} ${spent} point${spent===1?'':'s'} spent here.</span></div>`];
+  for(let row=0;row<SK_ROWS;row++){
     const nodes=SKILL_TREE.filter(n=>n.br===br.id&&n.row===row), need=SK_ROW_NEED[row], open=spent>=need;
     if(row) out.push(`<div class="skcn${open?'':' shut'}"><i></i></div>`);
     const prog=Array.from({length:need},(_,i)=>`<i class="${i<spent?'on':''}"></i>`).join('');
     const label=open?'':`<span>${SK_SVG.lock} Spend ${need} points in ${br.name} to open<span class="skprog">${prog}</span></span>`;
-    out.push(`<div class="sktier${open?'':' shut'}"><div class="sktl"><span class="sktn">Row ${row+1}</span>${label}<span class="ln"></span></div><div class="skrow${nodes.length===1?' one':''}">${nodes.map(n=>skCard(n,br)).join('')}</div></div>`);
+    out.push(`<div class="sktier${open?'':' shut'}"><div class="sktl"><span class="sktn">Row ${row+1}</span>${label}<span class="ln"></span></div><div class="skrow${nodes.length===1?' one':nodes.length===3?' three':''}">${nodes.map(n=>skCard(n,br)).join('')}</div></div>`);
   }
   const all=skSpent();
   if(all){
@@ -631,7 +775,7 @@ function skTryReset(b){
   const pts=$('#skPts'); pts.classList.remove('bump'); void pts.offsetWidth; pts.classList.add('bump');
   skToast(`Yara taps you on the nose. Your skills are fresh again, and ${n} point${n>1?'s are':' is'} back!`);
 }
-// keyboard: arrows move between buttons by where they sit on screen, Q and E (or 1 to 4) pick a branch, Escape or U closes
+// keyboard: arrows move between buttons by where they sit on screen, Q and E (or 1 to 5) pick a branch or Powers, Escape or U closes
 function skNav(dx,dy){
   const all=[...document.querySelectorAll('#skills button')].filter(b=>b.offsetParent!==null&&!b.hidden);
   const cur=document.activeElement;
@@ -657,10 +801,10 @@ addEventListener('keydown',e=>{
   if(c==='Escape'||c==='KeyU'||c==='Backspace'){ stop(); if(!e.repeat) closeSkills(); return; }
   const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],KeyA:[-1,0],KeyD:[1,0],KeyW:[0,-1],KeyS:[0,1]}[c];
   if(d){ stop(); skNav(d[0],d[1]); return; }
-  const i=SK_BR.findIndex(b=>b.id===SK.tab);
-  if(c==='KeyQ'||c==='PageUp'||c==='BracketLeft'){ stop(); skSetTab(SK_BR[(i+3)%4].id,true); return; }
-  if(c==='KeyE'||c==='PageDown'||c==='BracketRight'){ stop(); skSetTab(SK_BR[(i+1)%4].id,true); return; }
-  const n={Digit1:0,Digit2:1,Digit3:2,Digit4:3}[c]; if(n!=null){ stop(); skSetTab(SK_BR[n].id,true); return; }
+  const i=Math.max(0,SK_TABS.indexOf(SK.tab)), nt=SK_TABS.length;
+  if(c==='KeyQ'||c==='PageUp'||c==='BracketLeft'){ stop(); skSetTab(SK_TABS[(i+nt-1)%nt],true); return; }
+  if(c==='KeyE'||c==='PageDown'||c==='BracketRight'){ stop(); skSetTab(SK_TABS[(i+1)%nt],true); return; }
+  const n={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4}[c]; if(n!=null){ stop(); skSetTab(SK_TABS[n],true); return; }
   if(c==='KeyN'||c==='KeyP'||c==='KeyM'||c==='KeyI'||c==='Tab') return;
   if(c!=='Enter'&&c!=='Space'&&c!=='NumpadEnter') e.stopPropagation();
 },true);
@@ -673,7 +817,7 @@ function heroTabHtml(){
   skStats();
   const p=player, s=p.stats, E=escapeHtml, need=xpNeed(p.level), xp=Math.floor(p.xp), sp=G.sp|0, ctl=skCtrl();
   const o=[];
-  o.push(`<div class="hr"><div class="hrtop"><div class="hrlv"><small>Level</small><b>${p.level}</b></div><div class="hrxp"><div class="hrxpt"><span>Experience</span><span>${xp} / ${need}</span></div><div class="hrbar"><i style="width:${(clamp(xp/need,0,1)*100).toFixed(1)}%"></i></div><small>${Math.max(0,need-xp)} more to reach level ${p.level+1}. Each level makes you tougher and gives a skill point.</small></div></div>`);
+  o.push(`<div class="hr"><div class="hrtop"><div class="hrlv"><small>Level</small><b>${p.level}</b></div><div class="hrxp"><div class="hrxpt"><span>Experience</span><span>${xp} / ${need}</span></div><div class="hrbar"><i style="width:${(clamp(xp/need,0,1)*100).toFixed(1)}%"></i></div><small>${p.level>=BAL.maxLevel?'You reached the highest level. Legendary!':`${Math.max(0,need-xp)} more to reach level ${p.level+1}. Each level makes you tougher and gives a skill point.`}</small></div></div>`);
   o.push(`<div class="hrsp${sp?' on':''}"><img src="${skIcon('star',{k:'star',bare:true},30)}" alt=""><span>${sp?`<b>${sp} skill point${sp>1?'s':''}</b> ready to spend.`:'No skill points right now. You get one every level.'}</span><button type="button" tabindex="0" class="btn c sm${sp?' hot':''}" data-sk="1">Open Skills</button></div>`);
   const tile=(v,l,up)=>`<div><b${up?' class="up"':''}>${E(v)}</b><span>${E(l)}</span></div>`;
   const dmg=s.dmgMul*(s.wpnMul||1)*((s.slash||15)/15), arm=s.armor||1;
@@ -683,12 +827,10 @@ function heroTabHtml(){
     tile(s.critCh>0?`${Math.round(s.critCh*100)}%`:'None yet','Critical hits',s.critCh>0),tile(arm<0.995?`${Math.round((1-arm)*100)}% less`:'Normal','Damage taken',arm<0.995),
     tile(skStatTxt((s.speed||200)/200),'Move speed',(s.speed||200)>201),tile(s.killHeal>0?`+${s.killHeal}`:'None yet','Heal per foe',s.killHeal>0)
   ].join('')+'</div>');
-  const how={
-    jump:{key:'Press C to jump over gaps, fences and small rocks. Sprint first to jump farther.',touch:'Tap JUMP to hop over gaps, fences and small rocks. Run first to jump farther.',pad:'Press the bottom face button to jump over gaps, fences and small rocks.'}[ctl],
-    stride:'Walk right onto lakes and rivers. Sprinting on water is a little faster.',
-    wings:{key:'Jump, then press C again in the air to take off. Press C once more to land. Keep an eye on the flight meter.',touch:'Jump, then tap JUMP again in the air to take off. Tap it once more to land.',pad:'Jump, then press jump again in the air to take off. Press it once more to land.'}[ctl]};
-  const AB=[['jump','Jump','a_jump','Waiting in the Trial of the Leap, deep in Whisperwood.'],['stride','Water Stride','a_stride','Waiting in the Trial of the Tide, on an island in Lake Mirrow.'],['wings','Wings','a_wings','Waiting in the Trial of the Sky, up in the Drakeling Crags.']];
-  o.push('<div class="jh2">Abilities</div><div class="hrab">'+AB.map(([id,nm,ic,where])=>{ const own=hasAbil(id); return `<div class="hrabi${own?' own':''}"><img src="${skIcon(ic,SK_GOLD,44)}" alt=""><div><b>${nm}</b>${own?'<span class="hrok">Yours</span>':''}<small>${E(own?how[id]:where)}</small></div></div>`; }).join('')+'</div>');
+  // powers, from the registry (e6_balance.js): yours with how to use them, the rest as ??? slots
+  const PW=typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[], nPw=PW.filter(hasAbil).length;
+  o.push(`<div class="jh2">Powers · ${nPw} of ${PW.length}</div><div class="hrab">`+PW.map(id=>{ const A=ABIL_DEFS[id], own=hasAbil(id), t=own?abilHow(id):simplify(A.act===1&&A.where?A.where:'A power you have not found yet.');
+    return `<div class="hrabi${own?' own':''}"><img src="${skIcon(own?skPowIcon(A):'qmark',own?SK_GOLD:SK_DIM,44)}" alt=""><div><b>${E(own?A.name:'???')}</b>${own?'<span class="hrok">Yours</span>':''}<small>${E(t)}</small></div></div>`; }).join('')+'</div>');
   const ids=typeof WEAPON_IDS!=='undefined'?WEAPON_IDS:['sword'], has=id=>!!(G.weapons&&G.weapons[id])&&!(id==='sword'&&!G.flags.forge), cur=typeof curWeapon==='function'?curWeapon():'sword';
   const nOwn=ids.filter(has).length;
   o.push(`<div class="jh2">Weapons · ${nOwn} of ${ids.length}</div><div class="hrwp">`+ids.map(id=>{ const own=has(id), eq=own&&cur===id, W0=(typeof WEAPONS!=='undefined'&&WEAPONS[id])||{};

@@ -13,7 +13,7 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 - **Story Mode**: a 14,000 × 11,000 valley with seven regions, seven bosses and five Wards to relight. Seven towns and hamlets with about 45 houses you can walk into, and a dozen of them have an upstairs, a cellar or a secret room behind a loose brick, a bookcase or a painting. Seven caves built as small puzzle dungeons: push-block plates, crystal switches, torch-order murals, timed braziers, dark rooms, mazes, locked doors with small keys and cracked walls that hide treasure rooms.
 - **Ember's Trials**: three big dungeons built by Ash's ancestor. Each has a gift you earn halfway through and need for the rest, a weapon in a big chest, a boss key and a boss: Old Gnarl the root giant (Trial of the Leap, you learn to **jump**), the Mirrow Serpent (Trial of the Tide, you learn to **walk on water**), and Skrae the Storm Wyvern, fought in the air (Trial of the Sky, you grow **wings and fly**). The new moves open up islands, broken bridges, lava islands and sky nests all over the valley.
 - **Six weapons**: the Ember Blade, Twin Fangs (fast daggers, sneak attacks), a Pike that skewers a whole line, a Forge Hammer that smashes guards and cracked walls, the Ash Bow (shoot through your own fire breath for fire arrows) and the Wing-rang, a boomerang that stuns and fetches coins. Mom forges every one of them stronger with star-iron.
-- **Skill tree**: a skill point every level and one more for each Trial, spent across four branches (Blade, Flame, Wings, Heart): double jump, meteor slam, whirlwind spins, fire arrows, tougher scales and more.
+- **Skill tree and powers**: a skill point every level (up to level 25) and one more for each Trial, spent across four branches (Blade, Flame, Wings, Heart) of four rows each: whirlwind spins, fire arrows, longer flights, tougher scales and an upgrade for every power. Powers (jump, Water Stride, wings, Double Jump, Skimmer and the ones still out there) are found, never bought, and the Powers page in the Skills screen shows how to use each one.
 - **Companions**: Pip the baby dragon, plus friends who follow you and fight: Duchess the goat (head-butts), Brisket the adventurer you thaw out of the ice, Juniper the mapmaker and, if you spared him, Greymane the wolf. Villagers notice what you've done and say so, and they chat with each other.
 - **Side quests that play differently**: 27 of them. Chase down a purse thief, play hide and seek with the village kids, guard a pumpkin patch, race Elka through six flags, play back lost songs note by note, solve the case of the Mayor's missing pie (ask around, then accuse someone) and trade one wheel of cheese up into a piece of a fallen star.
 - **People to talk to**: every named villager has a talk menu with chat, gifts, rumors and quest topics. How you answer (kind, brave or silly) changes how they feel about you, and friendship hearts open up new lines, discounts and favors.
@@ -25,7 +25,7 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 - **More story**: little adventures pop up while you explore (a wagon stuck in the mud, a kitten up a tree, falling stars, a ghost who lost his hat, a hungry mimic, a goat stampede, a frog choir and more), Tikka the runaway kobold baker has a story of her own across the chapters, and resting at a shrine or an inn can bring a dream from Ember's past.
 - **Simple words**: Settings has Words: Full or Simple. Simple swaps the talks, quests, bubbles and messages for short versions in easy words for younger players.
 - **Never miss a line**: messages stay up long enough to read and queue up instead of replacing each other, and the Log (a button on the dialogue box, the pause menu, or the Journal) keeps everything anyone said, every choice you picked and every message.
-- **Normal Mode**: endless waves in the Proving Grounds with every weapon, and a leaderboard.
+- **Arena**: endless waves in the Proving Grounds with every weapon, and a leaderboard. (Easy, Normal and Hard are the difficulty, picked on the title screen, for the story and the Arena alike.)
 
 ## Controls
 
@@ -72,7 +72,7 @@ Touch controls appear automatically on phones and tablets. In Settings you can p
 
 ## Accounts and cloud saves
 
-Saves always live in your browser. If you make an account, your story also syncs to the cloud so you can pick it up on another device, and your Normal Mode best goes on the leaderboard.
+Saves always live in your browser. If you make an account, your story also syncs to the cloud so you can pick it up on another device, and your Arena best goes on the leaderboard.
 
 The backend is a tiny [Cloudflare Worker](worker/src/index.js) with a [D1](https://developers.cloudflare.com/d1/) (SQLite) database. It fits in Cloudflare's free tier and, unlike some free databases, it doesn't pause or get deleted when nobody plays for a while. Passwords are hashed with PBKDF2-SHA256, sessions are random tokens stored only as hashes, and there's no email or personal info.
 

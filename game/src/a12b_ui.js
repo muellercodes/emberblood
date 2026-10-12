@@ -175,9 +175,9 @@ function refreshMenu(){
   if(sum){ cont.hidden=false; $('#contSub').textContent=`Journey ${li+1} · ${sum}`; $('#bStory').classList.remove('hot'); $('#storySub').textContent='Pick a journey: three save slots.'; }
   else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#storySub').textContent='An open world to explore. One very old grandfather.'; }
   for(const b of document.querySelectorAll('.seg button[data-d]')) b.setAttribute('aria-pressed',String(+b.dataset.d===diffIdx));
-  $('#diffNote').textContent=DIFFS[diffIdx].note;
+  $('#diffNote').textContent=simplify(DIFFS[diffIdx].note);
   const best=store.get('eb_best_'+diffIdx,null);
-  $('#bestLine').textContent=best&&best.score?`Normal Mode best on ${DIFFS[diffIdx].name}: wave ${best.wave}, ${fmt(best.score)} points`:'';
+  $('#bestLine').textContent=best&&best.score?simplify(`Arena best on ${DIFFS[diffIdx].name}: wave ${best.wave}, ${fmt(best.score)} points`):'';
   refreshSoundLabels(); acctLabel();
 }
 function toMenu(){

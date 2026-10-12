@@ -6,7 +6,7 @@
 // Play:  left stick move (all the way for a moment sprints, L3 toggles sprint) · right stick aim
 //        bottom jump · right roll · left attack (held) · top use/talk · R2 attack · L2 fire breath
 //        R1/L1 next/previous weapon · R3 or L1+R1 together Roar · d-pad up drink · d-pad down companion
-//        d-pad left/right previous/next followed quest (Normal Mode: previous/next weapon)
+//        d-pad left/right previous/next followed quest (Arena: previous/next weapon)
 //        Back/View/Share/minus: map, hold for the journal · Start/Menu/Options/plus: pause, hold for skills
 // Menus: d-pad or left stick moves the focus · bottom picks · right goes back (swappable in Settings)
 //        L1/R1 switch tabs (on the world map they pick a shrine) · right stick scrolls · Start closes pause
@@ -589,7 +589,7 @@ function padHelpRows(k){
     [`${c(PB.R3)} or ${padChip(PB.L1,k)}+${padChip(PB.R1,k)}`,'Dragon Roar, once the meter is full'],
     [c(PB.UP),'Drink a healing draught'],
     [c(PB.DN),'Call your companion'],
-    [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in Normal Mode: switch weapons)'],
+    [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in the Arena: switch weapons)'],
     [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
     [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs.`],

@@ -1,7 +1,12 @@
+// v9 balance (numbers and reasoning: scratchpad BALANCE.md). hp: foe health x, dmg: damage Ash takes x, heal: heal orbs,
+// herbs and cheers x, pot: healing draughts x, wind: foe wind-up (telegraph) time x, rec: foe recovery time x, cad: how fast
+// foe attack cooldowns run x, spd: foe move speed x, aggro: how far foes notice Ash x, elite: story elite chance,
+// bossHp: boss health x, still: seconds Ash may stand still in a boss fight before the ground erupts under him,
+// cap: the most one hit can take, as a share of Ash's max health (a safety net for a player far below a region's level).
 const DIFFS=[
-  {name:'Easy',hp:0.75,dmg:0.5,heal:1.5,note:'Gentler enemies and stronger healing. Great for enjoying the story.'},
-  {name:'Normal',hp:1,dmg:1,heal:1,note:'The fight the way the fire intended.'},
-  {name:'Hard',hp:1.3,dmg:1.45,heal:0.8,note:'Tougher, meaner enemies. For true Emberbloods.'}
+  {name:'Easy',hp:0.95,dmg:0.75,heal:1.25,pot:1.2,wind:1,rec:1,cad:1,spd:1,aggro:1,elite:0.04,bossHp:0.8,still:3.4,cap:0.3,note:'Kinder foes and stronger healing. Foes still bite, so keep moving!'},
+  {name:'Normal',hp:1.1,dmg:1.2,heal:1,pot:1,wind:0.88,rec:0.85,cad:1.15,spd:1.05,aggro:1.12,elite:0.08,bossHp:1,still:2.6,cap:0.45,note:'A real fight. Quick foes, tough bosses, the way the fire intended.'},
+  {name:'Hard',hp:1.25,dmg:1.55,heal:0.8,pot:0.8,wind:0.78,rec:0.72,cad:1.3,spd:1.12,aggro:1.25,elite:0.14,bossHp:1.25,still:1.9,cap:0.6,note:'Faster, meaner foes and much tougher bosses. For true Emberbloods.'}
 ];
 const GREATS='great-'.repeat(13);
 const EDEF={

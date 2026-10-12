@@ -6,7 +6,7 @@ function onBossDefeated(e){
   for(const pr of G.projectiles) if(pr.owner==='enemy') pr.dead=true;
   G.hazards=G.hazards.filter(h=>h.kind!=='spawn'&&!h.meteor);
   G.rings=G.rings.filter(r=>r.owner==='player'); G.pools=G.pools.filter(p=>p.owner==='player');
-  if(G.mode==='story'){ for(const o of G.enemies) if(!o.dead&&((G.fightSite&&o.camp===G.siteGuards[G.fightSite])||o.type==='egg'||o.questTag||(o.type==='drakeling'&&dist(o.x,o.y,e.x,e.y)<900))){ o.dead=true; deathFx(o); } }
+  if(G.mode==='story'){ for(const o of G.enemies) if(!o.dead&&((G.fightSite&&o.camp===G.siteGuards[G.fightSite])||o.type==='egg'||o.questTag||(o.type==='drakeling'&&dist(o.x,o.y,e.x,e.y)<900))){ o.dead=true; deathFx(o); if(o.type!=='egg'&&o!==e) gainXp(foeXp(o)); } }
   else { for(const o of G.enemies) if(o!==e&&!o.dead){ o.dead=true; deathFx(o); } G.queue=[]; G.phase='bossDead'; }
   if(e.type==='vorlaxis') for(let i=0;i<8;i++) later(0.15+i*0.22,()=>{ const x=e.x+rand(-90,90), y=e.y+rand(-70,70); emit(x,y,30,{kind:'fire',smin:80,smax:340,lmin:.4,lmax:.8,zmin:5,zmax:11,grow:12}); SFX.play('boom'); shake(10); });
   later(e.type==='vorlaxis'?2.8:1.9,()=>{ player.iframes=0.5; if(G.mode==='story') storyBossDone(); else normalBossDone(); });
@@ -70,12 +70,12 @@ function travelTo(s){
   setBanner(s.name,'Fast travel',1.8); saveGame();
 }
 
-// ================= normal mode (Proving Grounds)
+// ================= the Arena (internal mode id 'normal'): endless waves in the Proving Grounds
 function startNormal(){
   SFX.init(); newRun('normal'); const P=POI.proving;
   G.arena={x:P.x,y:P.y,r:600}; G.tod=0.74; for(const k in SHRINES) G.shrines[SHRINES[k].id]=true;
   player.x=P.x; player.y=P.y+120; updateCam(0,true); G.chunkBurst=16;
-  scene='play'; hideAll(); setBanner('Normal Mode','Survive the endless horde in the Proving Grounds',2.4); G.hintT=14;
+  scene='play'; hideAll(); setBanner('Arena','Survive the endless horde in the Proving Grounds',2.4); G.hintT=14;
   later(2.4,nextNormalWave);
 }
 function genWave(n){

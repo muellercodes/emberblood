@@ -56,7 +56,7 @@ function drawHUD(){
     if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+2,ly+6); ly+=14; }
     TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
   }else if(G.mode==='normal'){
-    ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`NORMAL MODE · ${G.diff.name.toUpperCase()}`,L+2,qy);
+    ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`ARENA · ${G.diff.name.toUpperCase()}`,L+2,qy);
     ctx.font=`800 18px ${TF}`; ctx.fillStyle='#fff3dc'; ctx.fillText(G.wave>0?`Wave ${G.wave}`:'Get ready',L+2,qy+20);
     ctx.font=`700 13px ${UIF}`; ctx.fillStyle='#f2e6d4'; ctx.fillText(`Score ${fmt(G.score)}`,L+2,qy+40);
     if(G.combo>=2){ const m=comboMult(); ctx.fillStyle=m>1?'#ffcf5a':'#d8c4a4'; ctx.fillText(`${G.combo} streak${m>1?'  ×'+m:''}`,L+2,qy+57); }
