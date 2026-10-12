@@ -102,12 +102,13 @@ function updatePlayer(dt,inp){
     [vx,vy]=movesAirVel(dt,inp); p.slowT=(p.slowT||0)-dt;
   }else{
     const here=T(p.x,p.y,PT); p.slowT=(p.slowT||0)-dt;
-    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1);
+    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1)*terrSpeed(here);
     const skim=p.onWater&&hasSkill('skimmer');
     if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55*(p.onWater?(skim?1.22:1.1):1); if(!skim){ p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); } }
     vx=inp.mx*spd; vy=inp.my*spd;
     // cave ice: Ash slides
     if(AREA&&AREA.cave&&AREA.cave.typ){ const c=AREA.cave, i=Math.floor((p.x-AREA.x0)/c.cell), j=Math.floor((p.y-AREA.y0)/c.cell); if(c.typ[j*c.w+i]===2){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else { p.ivx=vx; p.ivy=vy; } }
+    else if(!AREA&&here.ice>0.5){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else if(!AREA&&p.y>=BAND){ p.ivx=vx; p.ivy=vy; }
   }
   if(!air) movesTryJump(vx,vy,inp);
   for(const g of p.ghosts) g.a-=dt*3; if(p.ghosts.length) p.ghosts=p.ghosts.filter(g=>g.a>0);
@@ -117,7 +118,7 @@ function updatePlayer(dt,inp){
   collideObs(p); boundE(p); terrainFix(p,ox,oy);
   movesPost(dt,ox,oy,inp);
   if(G.noSwordT>0) G.noSwordT-=dt;
-  p.moving=moving&&!(p.z>0)&&!p.flying; if(p.moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if(PT.b===5&&PT.road<=0&&!p.onWater) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting&&!p.onWater) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
+  p.moving=moving&&!(p.z>0)&&!p.flying; if(p.moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if((PT.b===5||footKind(PT))&&PT.road<=0&&!p.onWater) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting&&!p.onWater) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
   // sword and the other weapons (switching, swings, the hammer, the bow and the boomerang): a6b_weapons.js
   updateWeapon(dt,inp);
   // breath

@@ -32,13 +32,13 @@ function countType(t){ let n=0; for(const e of G.enemies) if(!e.dead&&e.type===t
 function freeSpot(x,y,r){ return !blockedAt(x,y)&&!colAt(x,y,r||20); }
 function spotNear(x,y,r0,r1,avoidPlayer){
   for(let i=0;i<30;i++){
-    const a=rand(0,TAU), r=rand(r0,r1), px=clamp(x+Math.cos(a)*r,60,WORLD.w-60), py=clamp(y+Math.sin(a)*r,60,WORLD.h-60);
+    const a=rand(0,TAU), r=rand(r0,r1), [px,py]=clampMap(x+Math.cos(a)*r,y+Math.sin(a)*r,60,y);
     if(G.arena&&dist(px,py,G.arena.x,G.arena.y)>G.arena.r-40) continue;
     if(avoidPlayer&&dist(px,py,player.x,player.y)<avoidPlayer) continue;
     if(!freeSpot(px,py)) continue;
     return {x:px,y:py};
   }
-  return {x:clamp(x,60,WORLD.w-60),y:clamp(y,60,WORLD.h-60)};
+  const [qx,qy]=clampMap(x,y,60); return {x:qx,y:qy};
 }
 function spawnRune(type,x,y,opt,delay){ G.hazards.push({kind:'spawn',x,y,t:0,delay:delay||0.85,type,opt:opt||{},big:EDEF[type].boss}); }
 function steer(e,tx,ty,spd){
@@ -192,11 +192,11 @@ function spawnCritters(){
   if(AREA) return;
   if(G.mode!=='story'||G.critters.length>=7||!isDay()) return;
   const p=player, a=rand(0,TAU), r=rand(650,1100), x=p.x+Math.cos(a)*r, y=p.y+Math.sin(a)*r;
-  if(x<100||y<100||x>WORLD.w-100||y>WORLD.h-100||y<WALL_Y+100) return;
-  const s=T(x,y,{}); if((s.b>1&&s.b!==5)||s.water||s.road>0||s.bog>0.2||inClearing(x,y)) return;
+  if(outOfMap(x,y,100)||y<WALL_Y+100) return;
+  const s=T(x,y,{}), ck=critterKinds(s.b); if(!ck||s.water||s.road>0||s.bog>0.2||inClearing(x,y)) return;
   if(!freeSpot(x,y)) return;
   const deer=Math.random()<0.55, n=deer?randi(2,4):randi(1,2);
-  for(let i=0;i<n;i++){ const sx=x+rand(-50,50), sy=y+rand(-50,50); if(!freeSpot(sx,sy)) continue; G.critters.push({type:deer?'deer':'rabbit',x:sx,y:sy,r:deer?12:5,face:rand(0,TAU),t:rand(0,9),wt:rand(0,3),dx:0,dy:0,flee:0,strafe:1,flying:false,antlers:Math.random()<0.4}); }
+  for(let i=0;i<n;i++){ const sx=x+rand(-50,50), sy=y+rand(-50,50); if(!freeSpot(sx,sy)) continue; G.critters.push({type:critterType(ck,deer),x:sx,y:sy,r:deer?12:5,face:rand(0,TAU),t:rand(0,9),wt:rand(0,3),dx:0,dy:0,flee:0,strafe:1,flying:false,antlers:Math.random()<0.4}); }
 }
 function updateBirds(dt){
   if(AREA){ G.birds=[]; return; }

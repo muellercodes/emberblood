@@ -99,7 +99,7 @@ AI.grizzlefang=(e,dt)=>{
     case 'dizzy': e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=rand(0.8,1.4); } break;
     case 'bombs':
       e.st-=dt;
-      if(e.st<=0){ const n=e.hp<e.maxHp*0.5?5:3; for(let i=0;i<n;i++){ const tx=clamp(p.x+rand(-90,90),30,WORLD.w-30), ty=clamp(p.y+rand(-90,90),30,WORLD.h-30); blast(tx,ty,55,0.9+i*0.15,ed(15),{lob:true,fx:e.x,fy:e.y}); } toRecover(e,0.6); }
+      if(e.st<=0){ const n=e.hp<e.maxHp*0.5?5:3; for(let i=0;i<n;i++){ const [tx,ty]=clampMap(p.x+rand(-90,90),p.y+rand(-90,90),30,p.y); blast(tx,ty,55,0.9+i*0.15,ed(15),{lob:true,fx:e.x,fy:e.y}); } toRecover(e,0.6); }
       break;
     case 'recover': steer(e,p.x,p.y,e.speed*0.3); e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=rand(0.9,1.6); } break;
     default: e.state='chase';
@@ -237,7 +237,7 @@ AI.gloamjaw=(e,dt)=>{
       if(!e.hitP){ const tx=e.x+Math.cos(e.face)*(e.r+e.tongue), ty=e.y+Math.sin(e.face)*(e.r+e.tongue); if(dist(tx,ty,p.x,p.y)<p.r+16){ if(hurtPlayer(ed(11),tx,ty,0)){ e.hitP=true; const pa=angTo(p.x,p.y,e.x,e.y); p.kvx+=Math.cos(pa)*620; p.kvy+=Math.sin(pa)*620; ftext(p.x,p.y-30,'Yoink!','#ff9ac0',14); } } }
       if(e.st<=0){ e.tongue=0; toRecover(e,0.5); }
       break; }
-    case 'spitW': e.face=turnTo(e.face,a,4*dt); e.st-=dt; if(e.st<=0){ const n=angry?5:3; for(let i=0;i<n;i++){ const tx=clamp(p.x+rand(-110,110),40,WORLD.w-40), ty=clamp(p.y+rand(-110,110),40,WORLD.h-40); blast(tx,ty,46,0.85+i*0.14,ed(10),{lob:true,fx:e.x,fy:e.y,toxic:true,pool:true}); } SFX.play('cast'); toRecover(e,0.5); } break;
+    case 'spitW': e.face=turnTo(e.face,a,4*dt); e.st-=dt; if(e.st<=0){ const n=angry?5:3; for(let i=0;i<n;i++){ const [tx,ty]=clampMap(p.x+rand(-110,110),p.y+rand(-110,110),40,p.y); blast(tx,ty,46,0.85+i*0.14,ed(10),{lob:true,fx:e.x,fy:e.y,toxic:true,pool:true}); } SFX.play('cast'); toRecover(e,0.5); } break;
     case 'diveDown': e.st-=dt; e.alpha=Math.max(0.12,e.st/0.5); e.sub=true; if(e.st<=0){ e.state='under'; e.st=angry?1.3:1.7; } break;
     case 'under':
       steer(e,p.x,p.y,angry?300:250); e.alpha=0.12; e.st-=dt;

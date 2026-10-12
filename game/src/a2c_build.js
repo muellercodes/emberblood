@@ -10,15 +10,15 @@ function segInter(a,b){
   return {x:a.ax+a.dx*t,y:a.ay+a.dy*t};
 }
 function inClearing(x,y,extra){
-  const e=extra||0;
+  const e=extra||0, mk=mapAt(y);
   for(const k in POI){ const p=POI[k]; if(dist2(x,y,p.x,p.y)<(p.r+30+e)**2) return true; }
-  for(const s of SHRINES) if(dist2(x,y,s.x,s.y)<(90+e)**2) return true;
-  for(const c of CAMPS) if(dist2(x,y,c.x,c.y)<(140+e)**2) return true;
-  for(const c of CHESTS) if(dist2(x,y,c.x,c.y)<(40+e)**2) return true;
-  for(const l of LANDMARKS) if(dist2(x,y,l.x,l.y)<((l.k==='ribs'?150:l.k==='hotspring'?70:40)+e)**2) return true;
-  for(const m of CAVEMOUTHS) if(dist2(x,y,m.x,m.y)<(110+e)**2) return true;
-  for(const o of ORES) if(dist2(x,y,o.x,o.y)<(60+e)**2) return true;
-  for(const l of LILIES) if(dist2(x,y,l.x,l.y)<(30+e)**2) return true;
+  for(const s of mapList(SHRINES,mk)) if(dist2(x,y,s.x,s.y)<(90+e)**2) return true;
+  for(const c of mapList(CAMPS,mk)) if(dist2(x,y,c.x,c.y)<(140+e)**2) return true;
+  for(const c of mapList(CHESTS,mk)) if(dist2(x,y,c.x,c.y)<(40+e)**2) return true;
+  for(const l of mapList(LANDMARKS,mk)) if(dist2(x,y,l.x,l.y)<((l.clr||(l.k==='ribs'?150:l.k==='hotspring'?70:40))+e)**2) return true;
+  for(const m of mapList(CAVEMOUTHS,mk)) if(dist2(x,y,m.x,m.y)<(110+e)**2) return true;
+  for(const o of mapList(ORES,mk)) if(dist2(x,y,o.x,o.y)<(60+e)**2) return true;
+  for(const l of mapList(LILIES,mk)) if(dist2(x,y,l.x,l.y)<(30+e)**2) return true;
   return false;
 }
 function placeHouses(cx,cy,n,r0,r1,rng,avoid,roofs,list){

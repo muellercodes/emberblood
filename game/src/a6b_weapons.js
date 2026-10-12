@@ -98,7 +98,7 @@ function segD(px,py,ax,ay,bx,by){ const dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy||1, t
 function wColAt(x,y,r){ let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)||c.noProj||c.low) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return hit; }
 function wWall(x,y){
   if(AREA) return areaBlocked(x,y)||wColAt(x,y,2);
-  if(x<20||y<20||x>WORLD.w-20||y>WORLD.h-20) return true;
+  if(outOfMap(x,y,20)) return true;
   return wColAt(x,y,2);
 }
 function inBreath(x,y,r){ const p=player; if(!p.breathing) return false; const f=p.facing; return inArcC(p.x+Math.cos(f)*16,p.y+Math.sin(f)*16,f,175,0.45,{x,y,r:r||4}); }

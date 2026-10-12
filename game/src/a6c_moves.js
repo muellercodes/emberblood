@@ -183,7 +183,7 @@ function landed(p,slam){
   if(slam) slamImpact(p);
 }
 function landBad(x,y){
-  if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return null;
+  if(outOfMap(x,y,30)) return null;
   if(!blockedAt(x,y)) return null;
   if(y<2850&&lavaAt(x,y,segsDist(x,y,ROAD_SEGS))) return 'lava';
   if(canWalkWater()) return null;
@@ -225,7 +225,7 @@ function lavaSpot(x,y){ return y<2850&&lavaAt(x,y,segsDist(x,y,ROAD_SEGS)); }
 function playerBlocked(x,y){
   const p=player;
   if(x>=IZX-50) return areaBlocked(x,y);
-  if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return true;
+  if(outOfMap(x,y,30)) return true;
   if(p&&(p.flying||(p.z||0)>0)) return false;      // water and lava never block in the air
   if(!blockedAt(x,y)) return false;
   if(!canWalkWater()) return true;
@@ -234,7 +234,7 @@ function playerBlocked(x,y){
 function landOK(x,y){
   if(x>=IZX-50){ if(areaBlocked(x,y)) return false; if(AREA&&AREA.tri&&AREA.cave){ const k=tCell(x,y); if(!(tGround(k)||(canWalkWater()&&tWet(k)))) return false; } }
   else{
-    if(x<40||y<40||x>WORLD.w-40||y>WORLD.h-40) return false;
+    if(outOfMap(x,y,40)) return false;
     if(Math.abs(y-WALL_Y)<70) return false;
     if(blockedAt(x,y)&&!(canWalkWater()&&!lavaSpot(x,y))) return false;
   }
