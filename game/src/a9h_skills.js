@@ -574,7 +574,7 @@ function skSetTab(id,focus){
 function skToast(t){
   const el=$('#skToast'); if(!el) return; clearTimeout(SK.toastT);
   if(!t){ el.classList.remove('on'); return; }
-  el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),2800);
+  el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),readT(t,3,7)*1000); logAdd({k:'tip',text:t});
 }
 function skCard(n,br){
   const E=escapeHtml, r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), needT=max?'':skNeedTxt(n);
