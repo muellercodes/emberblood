@@ -15,7 +15,7 @@ function onBossDefeated(e){
 // ================= story start, death, travel
 function startStory(fromSave){
   SFX.init();
-  const s=fromSave?store.get(SAVE_KEY,null):null;
+  const s=fromSave?slotSave(curSlot):null;
   if(s&&s.v===3){ loadGame(s); scene='play'; hideAll(); updateCam(0,true); G.chunkBurst=16; setBanner(regionAt(player.x,player.y).name,'Journey resumed',2.2); return; }
   newRun('story'); clearStatic(); fogInit('');
   player.x=POI.village.x+60; player.y=POI.village.y+150; player.facing=-Math.PI/2;
@@ -186,4 +186,7 @@ function pauseGame(){
 }
 function resumeGame(){ if(scene!=='paused') return; scene='play'; hideAll(); }
 function toggleMute(){ SFX.init(); SFX.toggle(); refreshSoundLabels(); }
-function refreshSoundLabels(){ const t='Sound: '+(SFX.muted?'Off':'On'); $('#bSound').textContent=t; $('#bPauseSound').textContent=t; $('#bNums').textContent='Damage numbers: '+(settings.nums?'On':'Off'); }
+// the speaker button on the HUD mutes or unmutes everything at once
+function toggleAllSound(){ SFX.init(); const anyOn=!SFX.muted||!Music.muted; if(anyOn){ if(!SFX.muted) SFX.toggle(); if(!Music.muted) Music.toggle(); } else { SFX.toggle(); Music.toggle(); mLast=null; } refreshSoundLabels(); }
+function allMuted(){ return SFX.muted&&Music.muted; }
+function refreshSoundLabels(){ if($('#settings').classList.contains('on')) renderSettings(); }

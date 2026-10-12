@@ -46,6 +46,7 @@ const SFX=(()=>{
       noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
       const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
     }catch(e){ ac=null; }
+    try{ Music.init(); }catch(e){}
   }
   function tone(type,f0,f1,dur,vol,delay=0){
     const t=ac.currentTime+delay, o=ac.createOscillator(), g=ac.createGain();

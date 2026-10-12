@@ -40,15 +40,18 @@ const Cloud=(()=>{
   return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},
     check,auth,logout,pull,push,queueSave,flush,submitScore,board,onChange:f=>listeners.add(f)};
 })();
-// merge cloud and device saves: whichever is newer wins
+// merge cloud and device saves slot by slot: whichever is newer wins (deleted slots carry a dated marker)
 async function syncSaves(){
   if(!Cloud.signedIn) return 'none';
-  let remote=null; try{ remote=await Cloud.pull(); }catch(e){ return 'offline'; }
-  const local=store.get(SAVE_KEY,null);
-  const rv=remote&&remote.v===3?remote:null, lv=local&&local.v===3?local:null;
-  if(rv&&(!lv||(rv.at||0)>(lv.at||0))){ store.set(SAVE_KEY,rv); if(scene==='menu') refreshMenu(); return 'pulled'; }
-  if(lv&&(!rv||(lv.at||0)>(rv.at||0))){ try{ await Cloud.push(lv); }catch(e){ return 'offline'; } return 'pushed'; }
-  return 'same';
+  let blob=null; try{ blob=await Cloud.pull(); }catch(e){ return 'offline'; }
+  const remote=unpackSaves(blob); let pulled=false, push=false;
+  for(let i=0;i<3;i++){
+    const L=slotRaw(i), R=remote[i], la=(L&&L.v===3&&L.at)||0, ra=(R&&R.v===3&&R.at)||0;
+    if(ra>la){ store.set(SLOT_KEYS[i],R); pulled=true; } else if(la>ra) push=true;
+  }
+  if(pulled&&scene==='menu') refreshMenu();
+  if(push){ try{ await Cloud.push(packSaves()); }catch(e){ return 'offline'; } }
+  return pulled&&push?'merged':pulled?'pulled':push?'pushed':'same';
 }
 // ---------- account panel
 let acTab='login';
@@ -91,7 +94,7 @@ async function acctSubmit(){
   try{
     await Cloud.auth(acTab,name,pass); $('#acPass').value='';
     const r=await syncSaves();
-    $('#acStatus').textContent=r==='pulled'?'Loaded your cloud save.':r==='pushed'?'Uploaded the save from this device.':'You are all set.';
+    $('#acStatus').textContent=r==='pulled'?'Loaded your cloud saves.':r==='pushed'?'Uploaded the saves from this device.':r==='merged'?'Synced your journeys both ways.':'You are all set.';
     SFX.play('quest');
   }catch(e){ err.textContent=e.offline?'Could not reach the server. Try again in a moment.':e.message; }
   go.disabled=false; renderAcct(); acctLabel(); refreshMenu(); loadBoard();
@@ -100,6 +103,6 @@ $('#acGo').addEventListener('click',acctSubmit);
 for(const id of ['#acName','#acPass']) $(id).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); acctSubmit(); } });
 for(const b of document.querySelectorAll('#acTabs button')) b.addEventListener('click',()=>{ acTab=b.dataset.t; $('#acErr').textContent=''; renderAcct(); });
 $('#acOut').addEventListener('click',async()=>{ await Cloud.logout(); $('#acStatus').textContent=''; renderAcct(); acctLabel(); });
-$('#acSync').addEventListener('click',async()=>{ const s=$('#acStatus'); s.textContent='Syncing…'; const r=await syncSaves(); s.textContent=r==='offline'?'Could not reach the server.':r==='pulled'?'Loaded your cloud save.':r==='pushed'?'Uploaded the save from this device.':'Already up to date.'; refreshMenu(); });
+$('#acSync').addEventListener('click',async()=>{ const s=$('#acStatus'); s.textContent='Syncing…'; const r=await syncSaves(); s.textContent=r==='offline'?'Could not reach the server.':r==='pulled'?'Loaded your cloud saves.':r==='pushed'?'Uploaded the saves from this device.':r==='merged'?'Synced your journeys both ways.':'Already up to date.'; refreshMenu(); });
 $('#acClose').addEventListener('click',()=>{ show('menu'); acctLabel(); });
 Cloud.onChange(acctLabel);

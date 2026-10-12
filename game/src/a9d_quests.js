@@ -90,10 +90,19 @@ function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.t==='camps'
 function startQuest(id){
   const d=QDEFS[id]; G.quests[id]={step:0,camps0:G.stats.camps||0,errand:!!d.errand};
   if(d.give) giveItems(d.give,true);
-  SFX.play('quest'); setBanner(d.errand?'New errand':'New side quest',stepText(id),3.2); G.lastQ=id;
+  onQuestStarted(id); setBanner(d.errand?'New errand':'New side quest',`${d.title.replace('Errand: ','')}: ${stepText(id)}`,3.2); G.lastQ=id;
   questPoke(); saveGame();
 }
-function offerQuest(id){ const d=QDEFS[id]; runDialogue(d.offer,()=>{ scene='play'; startQuest(id); }); }
+function offerQuest(id){
+  const d=QDEFS[id], g=d.giver; let ok=false;
+  const lines=d.offer.slice();
+  lines.push(ch('ash',d.errand?'Will you take it?':'Will you help?',[
+    {t:d.errand?'Sure, I can carry that.':`Of course I'll help.`,tone:'kind',fn:()=>{ ok=true; befriend(g,0.25,true); },then:[[g,d.errand?pick([`Thank you, Ash!`,`You're a star.`]):pick([`Thank you, Ash. Really.`,`I knew I could count on you.`,`Oh, thank goodness.`])]]},
+    {t:d.errand?'On my way.':'Leave it to me.',tone:'brave',fn:()=>{ ok=true; },then:[[g,pick([`Ha! That's the spirit.`,`Be careful out there.`])]]},
+    {t:'Not right now, sorry.',fn:()=>{ G.declined=G.declined||{}; G.declined[id]=dayNow(); },then:[[g,`That's all right. Come back if you change your mind.`]]}
+  ]));
+  runDialogue(lines,()=>{ scene='play'; if(ok) startQuest(id); else saveGame(); });
+}
 function giveReward(r){
   if(!r) return;
   if(r.coins) addCoins(r.coins,player.x,player.y);
@@ -110,7 +119,7 @@ function advanceQuest(id){
   q.step++;
   if(st.reward) giveReward(st.reward);
   if(id==='mine'&&q.step===3) reforgeIron();
-  if(q.step>=d.steps.length){ q.done=true; SFX.play('upgrade'); setBanner(d.errand?'Errand done':'Quest complete',d.title.replace('Errand: ',''),2.6); G.stats.quests=(G.stats.quests||0)+1; }
+  if(q.step>=d.steps.length){ q.done=true; onQuestDone(id); setBanner(d.errand?'Errand done':'Quest complete',d.title.replace('Errand: ',''),2.6); G.stats.quests=(G.stats.quests||0)+1; if(d.giver) befriend(d.giver,d.errand?0.5:1.5); }
   else{ q.camps0=G.stats.camps||0; setBanner(d.title,stepText(id),2.8); SFX.play('quest'); }
   G.lastQ=id; questPoke(); saveGame();
 }
@@ -150,21 +159,25 @@ function storyMarker(id){
   if(id==='wren'&&st==='wren') return true;
   return false;
 }
+function questSpot(spec,npc){
+  if(!spec&&npc) spec='npc:'+npc;
+  if(!spec) return null;
+  const [k,v]=spec.split(':');
+  if(k==='npc'){ const c=CASTBY[v]; if(c&&c.inside){ const d=DOORS.find(q=>q.area===c.inside); return d?{x:d.x,y:d.y}:null; } const n=G.npcs.find(q=>q.id===v); if(n) return {x:n.x,y:n.y}; if(c&&c.inside2){ const d=DOORS.find(q=>q.area===c.inside2); return d?{x:d.x,y:d.y}:null; } return null; }
+  if(k==='poi') return POI[v]?{x:POI[v].x,y:POI[v].y}:null;
+  if(k==='cave'){ const m=CAVEMOUTHS.find(q=>q.area===v); return m?{x:m.x,y:m.y}:null; }
+  if(k==='area'){ const d=DOORS.find(q=>q.area===v); return d?{x:d.x,y:d.y}:null; }
+  if(k==='lm'){ const l=LANDMARKS.find(q=>q.id===v); return l?{x:l.x,y:l.y}:null; }
+  if(k==='xy'){ const [x,y]=v.split(',').map(Number); return {x,y}; }
+  if(k==='goat') return G.goat?{x:G.goat.x,y:G.goat.y}:null;
+  if(k==='mini') return G.mini&&G.mini.target?G.mini.target():null;
+  return null;
+}
+function questTargetOf(id){ const st=stepOf(id); if(!st) return null; const at=typeof st.at==='function'?st.at():st.at; return questSpot(at,st.t==='talk'?st.npc:null); }
 function questTargets(){
   // map + compass positions for every active side quest step
   const out=[];
-  const at=(spec,npc)=>{
-    if(!spec&&npc) spec='npc:'+npc;
-    if(!spec) return null;
-    const [k,v]=spec.split(':');
-    if(k==='npc'){ const c=CASTBY[v]; if(c&&c.inside){ const d=DOORS.find(q=>q.area===c.inside); return d?{x:d.x,y:d.y}:null; } const n=G.npcs.find(q=>q.id===v); return n?{x:n.x,y:n.y}:null; }
-    if(k==='poi') return POI[v]?{x:POI[v].x,y:POI[v].y}:null;
-    if(k==='cave'){ const m=CAVEMOUTHS.find(q=>q.area===v); return m?{x:m.x,y:m.y}:null; }
-    if(k==='lm'){ const l=LANDMARKS.find(q=>q.id===v); return l?{x:l.x,y:l.y}:null; }
-    if(k==='goat') return G.goat?{x:G.goat.x,y:G.goat.y}:null;
-    return null;
-  };
-  for(const id in G.quests){ const st=stepOf(id); if(!st) continue; const p=at(st.at,st.t==='talk'?st.npc:null); if(p) out.push(Object.assign(p,{id,text:stepText(id)})); }
+  for(const id in G.quests){ const p=questTargetOf(id); if(p) out.push(Object.assign({},p,{id,text:stepText(id)})); }
   return out;
 }
 // ---------- talking
@@ -173,14 +186,8 @@ function talkTo(n){
   if(storyTalk(n)) return;
   for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id){ if(haveAll(st.take)){ runQuestLines(qid,st); return; } } }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)){ deliverPages(); return; }
-  const av=availableFrom(id); if(av){ offerQuest(av); return; }
-  if(SHOPTALK[id]){ SHOPTALK[id](n); return; }
-  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id){ runDialogue([[id,`Come back when you have everything. I'll be right here. ${st.take?'You still need: '+Object.keys(st.take).map(k=>ITEM_NAMES[k]||k).join(', ')+'.':''}`]],done); return; } }
-  const c=CASTBY[id]||SPECIAL[id];
-  const lines=(c&&c.lines&&c.lines.length)?c.lines:[`Hello, Ash.`];
-  const extra=moodLine(id);
-  const t=extra&&n.li%3===2?extra:lines[n.li%lines.length]; n.li++;
-  runDialogue([[id,t]],done);
+  const av=availableFrom(id); if(av&&!(G.declined&&G.declined[av]===dayNow())){ offerQuest(av); return; }
+  talkHub(n);
 }
 function moodLine(id){
   const c=G.choices;
@@ -253,13 +260,14 @@ function deliverPages(){
   if(have>=10) lines.push(['wren',`That's all ten. The whole book. You've given the valley back its own story, Ash. I don't know what to say. I'm a librarian. I always know what to say.`]);
   else if(bless) lines.push(['wren',`That's ${have} now! This deserves more than coins. Here.`]);
   else lines.push(['wren',`${10-have} to go. They could be anywhere. Caves, attics, under turtles. You never know.`]);
-  runDialogue(lines,()=>{ scene='play'; G.pagesGiven=have; addCoins(coins,player.x,player.y); gainXp(40*n); if(bless){ G.pendingBless+=bless; later(1.2,offerPending); } if(have>=10&&G.quests.pages){ G.quests.pages.done=true; setBanner('Quest complete','The Wardens’ Account',2.6); } saveGame(); });
+  runDialogue(lines,()=>{ scene='play'; G.pagesGiven=have; addCoins(coins,player.x,player.y); gainXp(40*n); if(bless){ G.pendingBless+=bless; later(1.2,offerPending); } if(have>=10&&G.quests.pages&&!G.quests.pages.done){ G.quests.pages.done=true; onQuestDone('pages'); setBanner('Quest complete','The Wardens’ Account',2.6); } saveGame(); });
 }
 // ---------- shops and inns
 const HATS=[['party','Party Hat',15],['wizard','Wizard Hat',30],['crown','Flower Crown',20],['top','Top Hat',40]];
-function shopOpts(list){ return list.map(([label,price,fn,ok])=>({t:price?`${label} · ${price} coins`:label,fn:()=>{ if(price&&(G.coins||0)<price){ G.shopMsg='Not enough coins.'; return; } if(ok&&ok()!==true){ G.shopMsg=ok(); return; } if(price) G.coins-=price; fn(); SFX.play(price?'chest':'ui'); }})); }
+let shopWho=null;
+function shopOpts(list){ return list.map(([label,price0,fn,ok])=>{ const price=price0&&shopWho==='pell'&&G.flags.perk_discount?Math.ceil(price0*0.8):price0; return {t:price?`${label} · ${price} coins`:label,fn:()=>{ if(price&&(G.coins||0)<price){ G.shopMsg='Not enough coins.'; return; } if(ok&&ok()!==true){ G.shopMsg=ok(); return; } if(price) G.coins-=price; fn(); SFX.play(price?'chest':'ui'); }}; }); }
 function runShop(who,greet,list){
-  G.shopMsg=null;
+  G.shopMsg=null; shopWho=who;
   const opts=shopOpts(list).concat([{t:'Just looking',fn:()=>{}}]);
   runDialogue([ch(who,`${greet} You have ${G.coins||0} coins.`,opts)],()=>{ scene='play'; if(G.shopMsg) setBanner(G.shopMsg,'',1.6); saveGame(); });
 }
@@ -278,7 +286,7 @@ const SHOPTALK={
     ['Rent a bed for the night',6,()=>{ innRest(); }]
   ]),
   tilly:()=>runShop('tilly','The Sleepy Salmon Inn. Soft beds, mostly-soup soup.',[
-    ['Rent a bed for the night',5,()=>{ innRest(); }],
+    ['Rent a bed for the night',G.flags.perk_freeinn?0:5,()=>{ innRest(); }],
     ['A slice of pie (heal)',4,()=>{ player.hp=Math.min(player.maxHp,player.hp+60); setBanner('Pie','Crust burnt, the way Bertram likes it.',1.6); }]
   ]),
   cookie:()=>runShop('cookie','Rock Soup! Now with fewer rocks!',[['A bowl of Rock Soup (heal, crunchy)',3,()=>{ player.hp=Math.min(player.maxHp,player.hp+45); setBanner('Rock Soup','Crunchy.',1.4); }]])
@@ -290,7 +298,7 @@ const FISHES=['a Mirrow trout','a grumpy perch','a lantern minnow','a speckled p
 function startFishing(spot){
   if(!G.items.rod){ runDialogue([['narr',`Fish are jumping here. If only you had a rod. Dell the fisherman in Brindlecross might lend you one.`]],()=>{ scene='play'; }); return; }
   let wx=spot.x, wy=spot.y; for(let a=0;a<TAU;a+=0.3){ const x=spot.x+Math.cos(a)*70, y=spot.y+Math.sin(a)*70; if(T(x,y,{}).water){ wx=x; wy=y; break; } }
-  G.fishing={spot,wx,wy,t:rand(2,5),bite:0,px:player.x,py:player.y}; player.facing=angTo(player.x,player.y,wx,wy); SFX.play('roll'); setBanner('Fishing','Press E when the bobber splashes',1.6);
+  G.fishing={spot,wx,wy,t:rand(2,5)*(G.flags.perk_lure?0.55:1),bite:0,px:player.x,py:player.y}; player.facing=angTo(player.x,player.y,wx,wy); SFX.play('roll'); setBanner('Fishing','Press E when the bobber splashes',1.6);
 }
 function updateFishing(dt,inp){
   const F=G.fishing; if(!F) return;

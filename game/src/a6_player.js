@@ -59,7 +59,7 @@ function updatePlayer(dt,inp){
     emit(p.x,p.y,8,{col:'150,130,110',glow:false,smin:30,smax:90,lmin:.3,lmax:.6,zmin:2,zmax:5,grow:7});
   }
   // drink
-  if(inp.drink&&p.potions>0&&p.drinkT<=0&&p.dashT<=0&&p.hp<p.maxHp){ p.potions--; p.drinkT=0.9; p.drinkPool=p.maxHp*0.45*G.diff.heal; SFX.play('drink'); }
+  if(inp.drink&&p.potions>0&&p.drinkT<=0&&p.dashT<=0&&p.hp<p.maxHp){ p.potions--; p.drinkT=0.9; p.drinkPool=p.maxHp*0.45*G.diff.heal*(p.stats.drinkMul||1); SFX.play('drink'); }
   if(p.drinkT>0){ const k=Math.min(dt,p.drinkT)/0.9; heal(p.drinkPool*k,true); p.drinkT-=dt; if(Math.random()<0.4) emit(p.x+rand(-8,8),p.y+rand(-8,8),1,{col:'140,255,170',ang:-Math.PI/2,spread:0.5,smin:20,smax:50,lmin:.4,lmax:.7,zmin:1.5,zmax:2.5,rise:20}); }
   let vx=0,vy=0;
   p.sprinting=false;
@@ -69,7 +69,7 @@ function updatePlayer(dt,inp){
     if(st.emberDash){ p.emberT-=dt; if(p.emberT<=0){ p.emberT=0.06; G.pools.push({x:p.x,y:p.y,r:22,life:1.6,max:1.6,owner:'player',tick:0}); } }
   }else{
     const here=T(p.x,p.y,PT); p.slowT=(p.slowT||0)-dt;
-    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?0.72:1)*(here.b===5&&here.road<=0?0.93:1)*(p.slowT>0?0.6:1);
+    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1);
     if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55; p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); }
     vx=inp.mx*spd; vy=inp.my*spd;
   }

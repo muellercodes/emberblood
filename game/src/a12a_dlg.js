@@ -14,56 +14,68 @@ function showCard(num,name){
 
 // ================= dialogue
 let DLG=null;
-function runDialogue(lines,done){
+function runDialogue(lines,done,opt){
   scene='dialogue'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  DLG={lines,i:0,chars:0,shown:-1,done};
+  const cp=l=>Array.isArray(l)?l:Object.assign({},l); DLG={lines:lines.map(cp),i:0,chars:0,shown:-1,done,mood:opt&&opt.mood||null};
   $('#dlgNext').textContent=usingTouch?'Tap ▸':'Click or Space ▸';
+  try{ Music.duck(true); }catch(e){}
   show('dialogue'); setLine();
 }
-function lineParts(l){ return Array.isArray(l)?{who:l[0],text:l[1]}:l; }
+function lineParts(l){ return Array.isArray(l)?{who:l[0],text:l[1],opts:l[2]}:l; }
+function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d(); }
 function setLine(){
-  const L=lineParts(DLG.lines[DLG.i]), who=L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
+  const L=lineParts(DLG.lines[DLG.i]), who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
+  if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; }
+  if(L.mood) DLG.mood=L.mood;
+  DLG.text=String(typeof L.text==='function'?L.text():L.text);
+  if(L.skipIf&&L.skipIf()){ DLG.i++; if(DLG.i>=DLG.lines.length) endDialogue(); else setLine(); return; }
   $('#dlgWho').textContent=s.name; $('#dlgWho').style.color=s.col;
   $('#dlgBox').classList.toggle('narr',who==='narr');
   drawPortrait(who); DLG.chars=0; DLG.shown=-1; $('#dlgSay').textContent='';
   const box=$('#dlgOpts'); box.innerHTML=''; DLG.opts=null; box.hidden=true; $('#dlgNext').hidden=false;
-  if(L.opts){ DLG.opts=L.opts; }
+  if(L.opts){ let o=typeof L.opts==='function'?L.opts():L.opts; o=o.filter(q=>q&&(!q.cond||q.cond())); if(o.length) DLG.opts=o; DLG.hub=L; }
 }
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'; b.innerHTML=`<span class="k">${i+1}</span>${o.t}`; b.addEventListener('click',e=>{ e.stopPropagation(); chooseOpt(i); }); box.appendChild(b); });
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); chooseOpt(i); }); box.appendChild(b); });
   box.hidden=false; $('#dlgNext').hidden=true;
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }
 function chooseOpt(i){
   if(!DLG||!DLG.opts||!DLG.opts[i]) return;
-  const o=DLG.opts[i]; DLG.opts=null; SFX.play('ui');
-  if(o.fn) o.fn();
-  if(o.then&&o.then.length) DLG.lines=DLG.lines.slice(0,DLG.i+1).concat(o.then,DLG.lines.slice(DLG.i+1));
+  const o=DLG.opts[i], hub=DLG.hub; DLG.opts=null; SFX.play('ui');
+  if(o.key&&G){ G.seenTalk=G.seenTalk||{}; G.seenTalk[o.key]=1; }
+  const cur=DLG; if(o.fn) o.fn();
+  if(!DLG||DLG!==cur) return;
+  let then=typeof o.then==='function'?o.then():o.then; then=(then||[]).map(l=>Array.isArray(l)?l:Object.assign({},l));
+  if(o.back&&hub){ const H=Object.assign({},lineParts(hub),{_ran:true}); if(H.again) H.text=H.again; then.push(H); }
+  const rest=o.end?[]:DLG.lines.slice(DLG.i+1);
+  DLG.lines=DLG.lines.slice(0,DLG.i+1).concat(then,rest);
   DLG.i++;
-  if(DLG.i>=DLG.lines.length){ const d=DLG.done; DLG=null; hideAll(); if(d) d(); } else setLine();
+  if(DLG.i>=DLG.lines.length) endDialogue(); else setLine();
 }
 function updateDialogue(dt){
   if(!DLG) return;
-  const text=lineParts(DLG.lines[DLG.i]).text;
+  const text=DLG.text||'';
   if(DLG.opts&&DLG.chars>=text.length) showOpts();
   DLG.chars=Math.min(text.length,DLG.chars+dt*60);
   const n=Math.floor(DLG.chars); if(n!==DLG.shown){ DLG.shown=n; $('#dlgSay').textContent=text.slice(0,n); }
 }
 function advanceDialogue(){
   if(!DLG) return;
-  const text=lineParts(DLG.lines[DLG.i]).text;
+  const text=DLG.text||'';
   if(DLG.chars<text.length){ DLG.chars=text.length; return; }
   if(DLG.opts) return;
   SFX.play('ui'); DLG.i++;
-  if(DLG.i>=DLG.lines.length){ const d=DLG.done; DLG=null; hideAll(); if(d) d(); }
+  if(DLG.i>=DLG.lines.length) endDialogue();
   else setLine();
 }
 function skipDialogue(){
   if(!DLG) return;
   // skipping fast-forwards to the next choice, so you never skip a decision by accident
-  for(let i=DLG.i;i<DLG.lines.length;i++){ if(lineParts(DLG.lines[i]).opts){ if(i===DLG.i&&DLG.opts){ DLG.chars=1e9; return; } DLG.i=i; setLine(); DLG.chars=1e9; return; } }
-  const d=DLG.done; DLG=null; hideAll(); if(d) d();
+  if(DLG.opts){ DLG.chars=1e9; return; }
+  for(let i=DLG.i+1;i<DLG.lines.length;i++){ const L=lineParts(DLG.lines[i]); if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; } if(L.opts){ DLG.i=i; setLine(); if(DLG) DLG.chars=1e9; return; } }
+  endDialogue();
 }
 $('#dialogue').addEventListener('click',()=>{ SFX.init(); advanceDialogue(); });
 $('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); skipDialogue(); });

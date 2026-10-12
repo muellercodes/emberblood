@@ -40,6 +40,40 @@ input{-webkit-user-select:text;user-select:text}
 .opt{font:inherit;font-size:16px;font-weight:600;text-align:left;color:var(--ink);background:linear-gradient(180deg,var(--btn-hi),var(--btn));border:1px solid var(--edge);border-radius:10px;padding:11px 14px;cursor:pointer}
 .opt:hover,.opt:focus-visible{border-color:var(--gold);outline:none}
 .opt .k{display:inline-block;min-width:22px;color:var(--gold);font-weight:800}
+.slots{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.slot{background:rgba(0,0,0,.28);border:1px solid rgba(255,140,70,.18);border-radius:12px;padding:12px 14px;text-align:left}
+.slot.cur{border-color:rgba(255,200,110,.55)}
+.slot.warn{border-color:#ff8a5a}
+.slot .sn{font-family:var(--f-display);font-weight:800;color:var(--gold);letter-spacing:.06em;display:flex;justify-content:space-between;gap:8px}
+.slot .sn span{font-family:inherit;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:0}
+.slot .sh{margin:4px 0 0;color:var(--ink);font-size:15px}
+.slot .sd{margin:2px 0 10px;color:var(--muted);font-size:13px}
+.slot .row{display:flex;gap:8px;flex-wrap:wrap}
+.slot .row .btn{width:auto;flex:1;min-width:110px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,140,70,.12);text-align:left}
+.setrow>span{font-size:15px;color:var(--ink)}
+.setrow small{display:block;color:var(--muted);font-size:12px}
+.setrow .seg{flex:none}
+.setrow .seg button{padding:8px 11px;font-size:13px}
+#jour .panel{max-width:760px;width:100%}
+.jtabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.jtabs button{flex:1;min-width:80px}
+.jbody{max-height:60vh;overflow-y:auto;text-align:left;font-size:14px;line-height:1.5;color:var(--muted);padding-right:4px}
+.jbody p{margin:0 0 8px}
+.jq{background:rgba(0,0,0,.25);border:1px solid rgba(255,140,70,.15);border-radius:10px;padding:10px 12px;margin:0 0 8px}
+.jq.foc{border-color:rgba(255,200,110,.7)}
+.jq .qt{color:var(--ink);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.jq .qt small{color:var(--muted);font-weight:500}
+.jq .qs{color:#bfe8f2;margin:3px 0 8px}
+.jq .row{display:flex;gap:6px;flex-wrap:wrap}
+.jq .row .btn{width:auto;padding:7px 12px;font-size:13px}
+.jh2{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);margin:12px 0 6px}
+.ppl{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.ppl div{background:rgba(0,0,0,.22);border-radius:9px;padding:8px 10px}
+.ppl b{color:var(--ink)} .ppl .hz{color:#ff8aa0;letter-spacing:2px} .ppl small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.opt.seen{opacity:.72}
+.opt .tag{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,200,120,.14);color:#f0cf98;font-weight:700;vertical-align:2px}
+.opt.t-kind .k{color:#9fe0a0} .opt.t-brave .k{color:#ffb070} .opt.t-silly .k{color:#d0a0ff}
 </style>
 
 <canvas id="game" aria-label="Emberblood game world"></canvas>
@@ -59,9 +93,8 @@ input{-webkit-user-select:text;user-select:text}
         </div>
       </div>
       <p class="note" id="diffNote"></p>
-      <div class="row"><button class="btn c sm" id="bHow">How to Play</button><button class="btn c sm" id="bSound">Sound: On</button></div>
+      <div class="row"><button class="btn c sm" id="bHow">How to Play</button><button class="btn c sm" id="bSettings">Settings</button></div>
       <button class="btn sm" id="bAcct">Account<small>Checking the cloud…</small></button>
-      <button class="btn c sm" id="bNums">Damage numbers: Off</button>
     </div>
     <div class="best" id="bestLine"></div>
   </div>
@@ -135,7 +168,7 @@ input{-webkit-user-select:text;user-select:text}
     <div class="mapwrap"><canvas id="mapcv" width="1120" height="880"></canvas></div>
     <div class="legend"><span><i style="background:#ffd27a"></i>You</span><span><i style="background:#ffb547;border-radius:2px"></i>Quest</span><span><i style="background:#7fd0ff"></i>Shrine you found</span><span><i style="background:#6b6f7a"></i>Shrine not found</span><span><i style="background:#ff6a4a"></i>Enemy camp</span><span><i style="background:#ffcf6a;border-radius:2px"></i>Ward burning</span><span><i style="background:#7a8aa8;border-radius:2px"></i>Ward dark</span></div>
     <div class="journal" id="journal"></div>
-    <div class="mapfoot"><p id="mapHint">Tap a blue shrine to fast travel there.</p><button class="btn c hot" id="bTravel" hidden>Travel</button><button class="btn c" id="bMapClose">Close</button></div>
+    <div class="mapfoot"><p id="mapHint">Tap a blue shrine to fast travel there.</p><button class="btn c hot" id="bTravel" hidden>Travel</button><button class="btn c" id="bMapJournal">Journal</button><button class="btn c" id="bMapClose">Close</button></div>
   </div>
 </div>
 
@@ -144,10 +177,11 @@ input{-webkit-user-select:text;user-select:text}
     <h2>Paused</h2>
     <div class="stack" style="margin-top:14px">
       <button class="btn c hot" id="bResume">Resume</button>
+      <button class="btn c" id="bPauseJournal">Journal</button>
       <button class="btn c" id="bPauseMap">World map</button>
       <button class="btn c" id="bRestart">Restart run</button>
       <button class="btn c" id="bPauseHow">How to Play</button>
-      <button class="btn c" id="bPauseSound">Sound: On</button>
+      <button class="btn c" id="bPauseSettings">Settings</button>
       <button class="btn c" id="bQuit">Save and quit to menu</button>
     </div>
   </div>
@@ -198,5 +232,36 @@ input{-webkit-user-select:text;user-select:text}
     <h3>Normal Mode leaderboard · <span id="acBoardDiff">Normal</span></h3>
     <div id="acBoard"></div>
     <div style="margin-top:16px"><button class="btn c" id="acClose" type="button">Close</button></div>
+  </div>
+</div>
+
+<div id="slots" class="ov dim">
+  <div class="panel">
+    <h2>Your Journeys</h2>
+    <p class="muted">Three save slots. Each journey keeps its own progress, and they all sync to the cloud when you're signed in.</p>
+    <div class="slots" id="slotList"></div>
+    <div style="margin-top:14px"><button class="btn c" id="bSlotsClose" type="button">Back</button></div>
+  </div>
+</div>
+
+<div id="settings" class="ov dim">
+  <div class="panel">
+    <h2>Settings</h2>
+    <div class="setrow"><span>Sound effects</span><div class="seg" id="setSfx" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow"><span>Music</span><div class="seg" id="setMusic" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow"><span>Damage numbers</span><div class="seg" id="setNums" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow"><span>Touch controls<small>For phones and tablets. One-hand mode puts everything under one thumb.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" aria-pressed="false">One hand: right</button><button type="button" data-v="left" aria-pressed="false">One hand: left</button></div></div>
+    <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>
+    <div class="setrow"><span>Auto-attack<small>Ash swings at enemies in reach by himself. On by default in one-hand mode.</small></span><div class="seg" id="setAuto" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div style="margin-top:16px"><button class="btn c hot" id="bSettingsClose" type="button">Done</button></div>
+  </div>
+</div>
+
+<div id="jour" class="ov dim">
+  <div class="panel">
+    <h2>Journal</h2>
+    <div class="seg jtabs" id="jTabs" role="group" aria-label="Journal sections"><button type="button" data-t="quests" aria-pressed="true">Quests</button><button type="button" data-t="story" aria-pressed="false">Story</button><button type="button" data-t="people" aria-pressed="false">People</button><button type="button" data-t="bag" aria-pressed="false">Satchel</button><button type="button" data-t="secrets" aria-pressed="false">Secrets</button></div>
+    <div class="jbody" id="jBody"></div>
+    <div style="margin-top:14px"><button class="btn c hot" id="bJourClose" type="button">Close</button></div>
   </div>
 </div>

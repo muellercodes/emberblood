@@ -149,6 +149,40 @@ input{-webkit-user-select:text;user-select:text}
 .opt{font:inherit;font-size:16px;font-weight:600;text-align:left;color:var(--ink);background:linear-gradient(180deg,var(--btn-hi),var(--btn));border:1px solid var(--edge);border-radius:10px;padding:11px 14px;cursor:pointer}
 .opt:hover,.opt:focus-visible{border-color:var(--gold);outline:none}
 .opt .k{display:inline-block;min-width:22px;color:var(--gold);font-weight:800}
+.slots{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.slot{background:rgba(0,0,0,.28);border:1px solid rgba(255,140,70,.18);border-radius:12px;padding:12px 14px;text-align:left}
+.slot.cur{border-color:rgba(255,200,110,.55)}
+.slot.warn{border-color:#ff8a5a}
+.slot .sn{font-family:var(--f-display);font-weight:800;color:var(--gold);letter-spacing:.06em;display:flex;justify-content:space-between;gap:8px}
+.slot .sn span{font-family:inherit;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:0}
+.slot .sh{margin:4px 0 0;color:var(--ink);font-size:15px}
+.slot .sd{margin:2px 0 10px;color:var(--muted);font-size:13px}
+.slot .row{display:flex;gap:8px;flex-wrap:wrap}
+.slot .row .btn{width:auto;flex:1;min-width:110px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,140,70,.12);text-align:left}
+.setrow>span{font-size:15px;color:var(--ink)}
+.setrow small{display:block;color:var(--muted);font-size:12px}
+.setrow .seg{flex:none}
+.setrow .seg button{padding:8px 11px;font-size:13px}
+#jour .panel{max-width:760px;width:100%}
+.jtabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.jtabs button{flex:1;min-width:80px}
+.jbody{max-height:60vh;overflow-y:auto;text-align:left;font-size:14px;line-height:1.5;color:var(--muted);padding-right:4px}
+.jbody p{margin:0 0 8px}
+.jq{background:rgba(0,0,0,.25);border:1px solid rgba(255,140,70,.15);border-radius:10px;padding:10px 12px;margin:0 0 8px}
+.jq.foc{border-color:rgba(255,200,110,.7)}
+.jq .qt{color:var(--ink);font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.jq .qt small{color:var(--muted);font-weight:500}
+.jq .qs{color:#bfe8f2;margin:3px 0 8px}
+.jq .row{display:flex;gap:6px;flex-wrap:wrap}
+.jq .row .btn{width:auto;padding:7px 12px;font-size:13px}
+.jh2{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);margin:12px 0 6px}
+.ppl{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.ppl div{background:rgba(0,0,0,.22);border-radius:9px;padding:8px 10px}
+.ppl b{color:var(--ink)} .ppl .hz{color:#ff8aa0;letter-spacing:2px} .ppl small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.opt.seen{opacity:.72}
+.opt .tag{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,200,120,.14);color:#f0cf98;font-weight:700;vertical-align:2px}
+.opt.t-kind .k{color:#9fe0a0} .opt.t-brave .k{color:#ffb070} .opt.t-silly .k{color:#d0a0ff}
 </style>
 </head>
 <body>
@@ -171,9 +205,8 @@ input{-webkit-user-select:text;user-select:text}
         </div>
       </div>
       <p class="note" id="diffNote"></p>
-      <div class="row"><button class="btn c sm" id="bHow">How to Play</button><button class="btn c sm" id="bSound">Sound: On</button></div>
+      <div class="row"><button class="btn c sm" id="bHow">How to Play</button><button class="btn c sm" id="bSettings">Settings</button></div>
       <button class="btn sm" id="bAcct">Account<small>Checking the cloud…</small></button>
-      <button class="btn c sm" id="bNums">Damage numbers: Off</button>
     </div>
     <div class="best" id="bestLine"></div>
   </div>
@@ -247,7 +280,7 @@ input{-webkit-user-select:text;user-select:text}
     <div class="mapwrap"><canvas id="mapcv" width="1120" height="880"></canvas></div>
     <div class="legend"><span><i style="background:#ffd27a"></i>You</span><span><i style="background:#ffb547;border-radius:2px"></i>Quest</span><span><i style="background:#7fd0ff"></i>Shrine you found</span><span><i style="background:#6b6f7a"></i>Shrine not found</span><span><i style="background:#ff6a4a"></i>Enemy camp</span><span><i style="background:#ffcf6a;border-radius:2px"></i>Ward burning</span><span><i style="background:#7a8aa8;border-radius:2px"></i>Ward dark</span></div>
     <div class="journal" id="journal"></div>
-    <div class="mapfoot"><p id="mapHint">Tap a blue shrine to fast travel there.</p><button class="btn c hot" id="bTravel" hidden>Travel</button><button class="btn c" id="bMapClose">Close</button></div>
+    <div class="mapfoot"><p id="mapHint">Tap a blue shrine to fast travel there.</p><button class="btn c hot" id="bTravel" hidden>Travel</button><button class="btn c" id="bMapJournal">Journal</button><button class="btn c" id="bMapClose">Close</button></div>
   </div>
 </div>
 
@@ -256,10 +289,11 @@ input{-webkit-user-select:text;user-select:text}
     <h2>Paused</h2>
     <div class="stack" style="margin-top:14px">
       <button class="btn c hot" id="bResume">Resume</button>
+      <button class="btn c" id="bPauseJournal">Journal</button>
       <button class="btn c" id="bPauseMap">World map</button>
       <button class="btn c" id="bRestart">Restart run</button>
       <button class="btn c" id="bPauseHow">How to Play</button>
-      <button class="btn c" id="bPauseSound">Sound: On</button>
+      <button class="btn c" id="bPauseSettings">Settings</button>
       <button class="btn c" id="bQuit">Save and quit to menu</button>
     </div>
   </div>
@@ -313,6 +347,37 @@ input{-webkit-user-select:text;user-select:text}
   </div>
 </div>
 
+<div id="slots" class="ov dim">
+  <div class="panel">
+    <h2>Your Journeys</h2>
+    <p class="muted">Three save slots. Each journey keeps its own progress, and they all sync to the cloud when you're signed in.</p>
+    <div class="slots" id="slotList"></div>
+    <div style="margin-top:14px"><button class="btn c" id="bSlotsClose" type="button">Back</button></div>
+  </div>
+</div>
+
+<div id="settings" class="ov dim">
+  <div class="panel">
+    <h2>Settings</h2>
+    <div class="setrow"><span>Sound effects</span><div class="seg" id="setSfx" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow"><span>Music</span><div class="seg" id="setMusic" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow"><span>Damage numbers</span><div class="seg" id="setNums" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow"><span>Touch controls<small>For phones and tablets. One-hand mode puts everything under one thumb.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" aria-pressed="false">One hand: right</button><button type="button" data-v="left" aria-pressed="false">One hand: left</button></div></div>
+    <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>
+    <div class="setrow"><span>Auto-attack<small>Ash swings at enemies in reach by himself. On by default in one-hand mode.</small></span><div class="seg" id="setAuto" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div style="margin-top:16px"><button class="btn c hot" id="bSettingsClose" type="button">Done</button></div>
+  </div>
+</div>
+
+<div id="jour" class="ov dim">
+  <div class="panel">
+    <h2>Journal</h2>
+    <div class="seg jtabs" id="jTabs" role="group" aria-label="Journal sections"><button type="button" data-t="quests" aria-pressed="true">Quests</button><button type="button" data-t="story" aria-pressed="false">Story</button><button type="button" data-t="people" aria-pressed="false">People</button><button type="button" data-t="bag" aria-pressed="false">Satchel</button><button type="button" data-t="secrets" aria-pressed="false">Secrets</button></div>
+    <div class="jbody" id="jBody"></div>
+    <div style="margin-top:14px"><button class="btn c hot" id="bJourClose" type="button">Close</button></div>
+  </div>
+</div>
+
 <script>
 (()=>{
 'use strict';
@@ -362,6 +427,7 @@ const SFX=(()=>{
       noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
       const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
     }catch(e){ ac=null; }
+    try{ Music.init(); }catch(e){}
   }
   function tone(type,f0,f1,dur,vol,delay=0){
     const t=ac.currentTime+delay, o=ac.createOscillator(), g=ac.createGain();
@@ -936,6 +1002,324 @@ const PAGES={
   p10:{title:'Page Ten: The Last Page',text:[`If you are reading this, the thousand years are nearly done. We could only write the beginning of this story.`,`Whoever you are, Emberblood: the ending is yours to write. Be brave. Be kind. Those are not always the same thing. Try for both. Iska.`]}
 };
 const PAGE_SPOTS={p2:'shellby',p3:'h_yara',p7:'st_iska',p9:'h_ash'};
+
+// ================= conversations: what each villager will talk about, what they like, and what friendship unlocks
+// about: topics about someone else in the valley (the ties that send Ash across the map)
+// rumor: a hint about something hidden; hint:'id' marks it on the map once heard
+// loves/hates: gift reactions. deep: unlocked at 2 hearts. secret: at 3 hearts. best: at 5 hearts.
+// chat: a one-time moment with three ways to answer (kind, brave, silly); each person values one of them most
+const GIFTS={fish:'Fish',honey:'Honey',frostberry:'Frostberry',moonlily:'Moonlily'};
+const TALK={
+  maren:{bio:'Your mom. Blacksmith. Reforged Grandmother’s sword.',
+    about:{gorran:`Gorran Flint taught me to read ore when I was your age. He talks to rocks. The rocks, I think, talk back.`,yara:`Yara was my teacher too. She made me copy the Wardens' names a hundred times. I still dream about Bram's spelling.`},
+    rumor:{t:`When your grandmother was little she found a trapdoor under the rug at home. She never told me what was down there. She just winked. Your family winks a lot.`,hint:'sec_h_ash'},
+    loves:['honey'],hates:['moonlily'],
+    deep:`When you were born, the midwife screamed. Not because of the horns. Because you sneezed and her apron caught fire. I've never been prouder.`,
+    secret:{t:`Here. Your grandmother's whetstone. Run your blade along it before a fight. Don't tell Gorran I gave it away. He made it.`,reward:{dmg:0.06}},
+    best:{t:`You're braver than I ever was, Ash. And you still eat your vegetables. Mostly. Take this, I made it at night when you were asleep.`,reward:{maxhp:20}},
+    chat:{q:`Ash. Be honest. Do you think I worry too much?`,opts:[
+      {t:`You worry exactly the right amount.`,tone:'kind',r:`That's the nicest lie anyone's ever told me. Come here.`,f:1},
+      {t:`A little. But I'll be careful. I promise.`,tone:'brave',r:`...Thank you for being honest. Promise me twice.`,f:0.5},
+      {t:`You worry so much your eyebrows have muscles.`,tone:'silly',r:`They DO have muscles. From frowning at you. Go on, get out of here.`,f:0.5}],best:'kind'}},
+  yara:{bio:'The village elder. Knows the old stories. Her crow is Pebble.',
+    about:{wren:`Wren was my student. She asked "why" four hundred times a day. Now she's the one with the answers. I'm only a little jealous.`,mayor:`Brindle's mayor asked me to cut the ribbon on his new bridge. It has two hundred and twelve planks. I counted. He didn't like that.`},
+    rumor:{t:`Pebble hides her treasures upstairs in my house. Buttons, spoons, a whole key once. If you find her nest, she won't mind sharing. Much.`,hint:'sec_h_yara'},
+    loves:['moonlily','honey'],hates:['fish'],
+    deep:`I was eight when I lit my first lantern. I burned my thumb. Iska's statue was right there, and I swear it smiled. I've been counting lanterns ever since.`,
+    secret:{t:`The Wardens wrote their names on the underside of the old bridge stones in Brindlecross. Look closely at the ruins too. They loved hiding things.`,reward:{coins:40}},
+    best:{t:`You remind me of the stories, Ash. Not the dragon part. The part where someone small decides to be brave. Take my lantern charm. It glows brighter in the dark.`,reward:{lantern:true}},
+    chat:{q:`Do you ever wish you were just an ordinary child, Ash?`,opts:[
+      {t:`Sometimes. But then I'd never have met all of you.`,tone:'kind',r:`Oh, you'll make an old woman cry. Pebble, look away.`,f:1},
+      {t:`No. Somebody has to do this. Might as well be me.`,tone:'brave',r:`Spoken like a Warden. They said almost exactly that.`,f:1},
+      {t:`Ordinary children can't toast marshmallows with their face.`,tone:'silly',r:`Ha! A fair point. A very warm point.`,f:0.5}],best:'brave'}},
+  bertram:{bio:'Baker of Emberhollow. Sister Tilly runs the inn in Brindlecross.',
+    about:{tilly:`Tilly says I ruined the Lantern Bun. I say she added too much nutmeg. We were both wrong. It was the oven exploding.`,mayor:`The Mayor orders three dozen buns every week. For "official tasting." He has no officials.`},
+    rumor:{t:`Grandma Crumb kept her secret recipes in the cellar, behind a shelf of flour sacks. One sack says NOT FLOUR. I've never been brave enough to pull it.`,hint:'sec_h_bertram'},
+    loves:['frostberry','honey'],hates:['fish'],
+    deep:`When I was little, Grandma Crumb told me bread is just patience you can eat. I've been impatient my whole life. My bread is very fast.`,
+    secret:{t:`Take one of these Lantern Buns. They're warm all the way through. If you're ever about to fall, eat it. You'll feel better. Probably.`,reward:{potmax:1}},
+    best:{t:`You're my favorite customer, Ash. You've never paid, and you've burned my bakery down twice, and you're still my favorite. Here. The chef's hat. Wear it with flour.`,reward:{hat:'chef'}},
+    chat:{q:`Be honest. Do I smell like burnt bread?`,opts:[
+      {t:`You smell like fresh bread. The best smell.`,tone:'kind',r:`Oh! Oh, Ash. I'm going to bake you something. Nothing explosive.`,f:1},
+      {t:`A little crispy, yes.`,tone:'brave',r:`...I knew it. Thank you. Nobody else would tell me.`,f:0.5},
+      {t:`You smell like a hero. A hero made of toast.`,tone:'silly',r:`A toast hero! I'd read that book.`,f:0.5}],best:'kind'}},
+  fennick:{bio:'Lamp-maker of Emberhollow. Cousin of Hob at the Smoky Kettle.',
+    about:{hob:`Hob is my cousin. He makes a soup so smoky you can hear it. We used to race lamp boats on the river. He always cheated. I always lost. It was the most fun I've ever had.`},
+    rumor:{t:`There's a room under my shop. I, um, held some meetings there. Bad meetings. The trapdoor is under the rug behind the counter. Maybe there's something down there you should see.`,hint:'sec_h_fennick',need:()=>G.choices.fennick==='forgive'},
+    loves:['moonlily'],hates:['honey'],
+    deep:`My lamps were the best in the valley once. Then everyone started using Iska's old lantern designs and nobody needed me. That's when the Oath found me. They said I was important.`,
+    secret:{t:`Here. The brightest lamp oil I ever made. Keep it in your satchel. Your fire breath will burn longer.`,reward:{energy:20}},
+    best:{t:`You gave me a second chance. Nobody's ever done that. Every lantern in this village is lit for you now, Ash.`,reward:{bless:1}},
+    chat:{q:`Do you think people will ever trust me again?`,opts:[
+      {t:`They will. One lantern at a time.`,tone:'kind',r:`One lantern at a time. I'm writing that on my wall.`,f:1},
+      {t:`Only if you keep showing up and doing the right thing.`,tone:'brave',r:`...Yes. You're right. Every day.`,f:1},
+      {t:`Start with the goats. Goats forgive anything.`,tone:'silly',r:`Duchess bit me last week. I don't think that's true.`,f:0.25}],best:'brave'},
+    need:()=>!!G.choices.fennick},
+  mabel:{bio:'Herbalist. Granddaughter of Granny Moss in the Mirefen.',
+    about:{moss:`Gran lives out in the Mirefen with a cauldron and a frog named Sir Croaksley. He is not a knight. She insists.`},
+    rumor:{t:`Little purple flowers grow under the trees everywhere. They heal you. And in the hot spring up north, the water heals everything. Gran swears by it.`,hint:'lm_spring'},
+    loves:['moonlily','frostberry'],hates:['fish'],
+    deep:`I wanted to be a knight, actually. But knights get hurt, and someone has to fix them. So now I fix knights. It's better. Less armor.`,
+    secret:{t:`My best healing recipe. Fold it up and keep it. Your draughts will heal more now.`,reward:{heal:0.15}},
+    best:{t:`A flower crown, made from every flower in the valley. It won't wilt. Gran helped. Well, she yelled at the flowers until they agreed.`,reward:{hat:'crown'}},
+    chat:{q:`Do you think plants have feelings?`,opts:[
+      {t:`Definitely. That's why I say sorry when I pick them.`,tone:'kind',r:`You DO? Oh, Gran is going to love you.`,f:1},
+      {t:`If they do, the thorny ones are angry.`,tone:'brave',r:`Ha! The thorny ones are very angry. You're right.`,f:0.5},
+      {t:`The turnips told me they're fine.`,tone:'silly',r:`You talk to turnips too? We should start a club.`,f:0.75}],best:'kind'}},
+  rook:{bio:'A kid who wants to be a knight, or a dragon. Brother of Juniper.',
+    about:{juniper:`Juniper is the best. She can draw a map of anywhere just by walking there once. She also bites. Not very hard.`,elka:`Elka writes to me from the Frostpine Lodge. Her letters are mostly drawings of wolves. Very scary wolves. I love them.`},
+    rumor:{t:`Juniper says Whisperwood Hollow has a cracked wall that sounds hollow when you yell at it. I yelled at it. Nothing happened. You should ROAR at it.`,hint:'cave_whisper'},
+    loves:['honey','frostberry'],hates:['moonlily'],
+    deep:`I'm not scared of anything. Except the dark. And geese. And when Juniper doesn't come home. But mostly not scared.`,
+    secret:{t:`This is my best stick. It's a sword. Okay it's a stick. But it's a lucky stick. Keep it.`,reward:{crit:0.05}},
+    best:{t:`You're my best friend. Even more than Elka. Don't tell Elka. Here's my knight's badge. I made it myself. You're a knight now.`,reward:{bless:1}},
+    chat:{q:`Can you teach me to be a dragon?`,opts:[
+      {t:`You're already brave like one. That's the hardest part.`,tone:'kind',r:`REALLY?! I'm going to tell everyone. EVERYONE.`,f:1},
+      {t:`First rule: never run from a fight you can win.`,tone:'brave',r:`Never run. Got it. Second rule?`,f:0.75},
+      {t:`Step one: eat a lot of spicy peppers.`,tone:'silly',r:`I'll do it! Mom! MOM! WHERE ARE THE PEPPERS?`,f:1}],best:'silly'}},
+  wendel:{bio:'Emberhollow’s only fiddler. Cousin of Dell the fisherman.',
+    about:{dell:`Dell thinks fish are friendly. Fish are rude. A fish once stole my sandwich. Out of my hand. From the water.`,tamsin:`Tamsin at the Smoky Kettle is the best bard in the valley. She plays the lute like it owes her money.`},
+    rumor:{t:`If you play a tune near the old Warden statues, they hum along. I've only heard it once. Maybe I dreamed it.`},
+    loves:['honey'],hates:['fish'],
+    deep:`I lost my three best songs. The sheets blew away in the raid. I can't remember how they go. It's like losing three friends who were also noises.`,
+    secret:{t:`Here, a lullaby I wrote. Hum it to yourself and you'll rest easier at shrines.`,reward:{regen:true}},
+    best:{t:`I finished the song about you! It rhymes "Ash" with "flash" now. And "dash." And one "moustache," for the Mayor.`,reward:{coins:80}},
+    chat:{q:`Do you want to hear my newest song? It's about cheese.`,opts:[
+      {t:`I'd love to hear it.`,tone:'kind',r:`🎵 Oh cheese, oh cheese, you're yellow and fine... I'll stop. You're smiling. That's enough.`,f:1},
+      {t:`Only if it's actually good.`,tone:'brave',r:`It's... honestly, it's not. Thank you. I'll write a better one.`,f:0.5},
+      {t:`Only if I can dance.`,tone:'silly',r:`Yes! Dance! That's the spirit of cheese!`,f:1}],best:'silly'}},
+  nana:{bio:'Knits sweaters for the whole village. Mother of Captain Osric.',
+    about:{osric:`My Osric is Captain of the Watch. He wears every sweater I send him. I know because his dogs write to me.`,marigold:`Marigold Vane learned to knit from me. Now she makes hats. Fancy hats. With feathers. I'm proud, and a little suspicious of the feathers.`},
+    rumor:{t:`Every house has a hiding spot. Mine's a loose floorboard by the rocking chair. That's where I keep the emergency cookies. Don't you dare. ...Okay, one.`,hint:'sec_h_nana'},
+    loves:['honey','frostberry'],hates:[],
+    deep:`My husband was a Watch captain too. He used to say "a warm person is a brave person." That's why I knit. So everyone stays brave.`,
+    secret:{t:`A scarf! It's warm and it's red and it matches your tail. You'll run longer in the cold.`,reward:{stamina:15}},
+    best:{t:`You're family now, dear. Here, the good mittens. Nobody gets the good mittens.`,reward:{maxhp:15}},
+    chat:{q:`You look thin. Have you eaten today?`,opts:[
+      {t:`Not yet. Would you make me something?`,tone:'kind',r:`WOULD I. Sit. Sit down this instant.`,f:1},
+      {t:`I'm fine, Nana. Really.`,tone:'brave',r:`That's what Osric says. And then he faints. Eat.`,f:0.25},
+      {t:`I ate a whole candle. Does that count?`,tone:'silly',r:`Ash! ...Was it a good candle?`,f:0.5}],best:'kind'}},
+  hal:{bio:'Farmer and cheese maker. Writes to Ulf at Frostpine Lodge.',
+    about:{ulf:`Ulf Hollis and I write about cheese. Very serious letters. Twelve pages on the smell of a good cheddar.`,hollis:`Farmer Hollis loves goats. I love cows. We don't talk about it at parties.`},
+    rumor:{t:`Sir Strawsworth the scarecrow wears a hat with something rattling inside it. I've never checked. He looks like he'd mind.`},
+    loves:['frostberry'],hates:['moonlily'],
+    deep:`Moo-rgaret saved my life once. A wolf came at night, and she sat on it. Just sat on it. I owe that cow everything.`,
+    secret:{t:`The good cheese. Aged ten years. Keep it for the worst day. (It heals you a lot.)`,reward:{potmax:1}},
+    best:{t:`A cheese named after you! The Ashmore. It's a little spicy. Like you.`,reward:{coins:60}},
+    chat:{q:`Do you think Moo-rgaret knows she's a cow?`,opts:[
+      {t:`She knows she's loved. That's what counts.`,tone:'kind',r:`...That's beautiful. I'm going to tell her.`,f:1},
+      {t:`She definitely knows. And she's proud of it.`,tone:'brave',r:`She IS proud. Look at her. Look at that posture.`,f:0.75},
+      {t:`I think she thinks she's a dragon.`,tone:'silly',r:`She did breathe on me once. It was just grass breath. But it was intense.`,f:1}],best:'silly'}},
+  wren:{bio:'The librarian of Brindlecross. Studies the Wardens.',
+    about:{quill:`Quill and I argue every Tuesday about whether the Wardens were heroes or just stubborn. She's wrong. They were both.`,yara:`Yara taught me my letters. I still can't spell "Wardens" without thinking of her ruler. She used it to point. Only to point.`},
+    rumor:{t:`Upstairs in the library there's a shelf of books that aren't books. One of them is a handle. Iska loved secret rooms. I've never found which one.`,hint:'sec_h_library'},
+    loves:['moonlily'],hates:['fish'],
+    deep:`I'm a librarian because I was afraid of everything outside. Books don't bite. Then I met you, and now I'm reading about dragons who DO bite. Life is funny.`,
+    secret:{t:`I copied the Wardens' map of the valley. All the old places are marked. Keep it.`,reward:{reveal:true}},
+    best:{t:`I'm writing the last chapter of the Wardens' Account myself. About you. You get your own page. Here's a bookmark. It's enchanted. Probably.`,reward:{bless:1}},
+    chat:{q:`If you could ask a Warden one question, what would it be?`,opts:[
+      {t:`Were you scared?`,tone:'kind',r:`I think they were. Terrified. That's what made it brave.`,f:1},
+      {t:`How do I finish what you started?`,tone:'brave',r:`...That's the question, isn't it. I think you're already answering it.`,f:1},
+      {t:`Did Bram ever learn to spell?`,tone:'silly',r:`He did NOT. There's a page where he spells "dragon" four different ways.`,f:0.5}],best:'brave'}},
+  tilly:{bio:'Runs the Sleepy Salmon Inn. Sister of Bertram the baker.',
+    about:{bertram:`My brother Bertram is a good baker and a terrible listener. I said "less nutmeg." He heard "more fire."`,quill:`Professor Quill lives upstairs from the stars, basically. She comes down for soup and complaints.`},
+    rumor:{t:`Some of my guests say they hear music upstairs at night. Room 3. Nobody's in Room 3. I'd check, but I'm a coward with a soup ladle.`,hint:'sec_h_tilly'},
+    loves:['fish','honey'],hates:[],
+    deep:`I named the inn after a salmon I saw fall asleep in the river. It just floated there, so peaceful. Then a bear ate it. I kept the name anyway.`,
+    secret:{t:`A room key. Any time you come by, the bed's yours for free. And soup. Mostly soup.`,reward:{freeinn:true}},
+    best:{t:`My brother and I made up, because of you. I can't thank you enough. Take Grandma Crumb's apron. It's lucky. It never burns.`,reward:{armor:0.05}},
+    chat:{q:`Do you think I should open a second inn? In the Mirefen?`,opts:[
+      {t:`If anyone can make a swamp cozy, it's you.`,tone:'kind',r:`You're sweet. I'd call it the Soggy Salmon.`,f:1},
+      {t:`Only if you fight off the frogs first.`,tone:'brave',r:`I would fight a frog. I would fight ten frogs.`,f:0.5},
+      {t:`Call it the Swamp Sandwich.`,tone:'silly',r:`...That's terrible. I love it.`,f:0.75}],best:'kind'}},
+  osric:{bio:'Captain of the Brindlecross Watch. The Watch is him and two dogs.',
+    about:{nana:`Mum sends me a sweater every year. I have eleven. I wear them all at once in winter. I'm very warm and can't bend my arms.`},
+    rumor:{t:`The Watch House cellar has an old tunnel. Bricked up a hundred years ago. One of the bricks is loose. I keep meaning to fix it. I keep not fixing it.`,hint:'sec_h_osric'},
+    loves:['fish'],hates:['moonlily'],
+    deep:`I'm not really brave. I just stand in front of things. Turns out that's most of the job.`,
+    secret:{t:`Take this old Watch shield badge. Stand behind it. It's small, but it believes in you.`,reward:{armor:0.05}},
+    best:{t:`I'm making you an honorary member of the Watch. That's me, two dogs, and now you. The dogs voted yes. One of them woke up to do it.`,reward:{bless:1}},
+    chat:{q:`Do you think I'm a good captain?`,opts:[
+      {t:`The best. Even the dogs think so.`,tone:'kind',r:`They DO seem to think so. Thank you, Ash.`,f:0.75},
+      {t:`You stand in front of danger. That's what matters.`,tone:'brave',r:`...That's what my father used to say. Thank you.`,f:1},
+      {t:`You'd be better with three dogs.`,tone:'silly',r:`I've been saying that for years! The budget won't allow it.`,f:0.75}],best:'brave'}},
+  pell:{bio:'A travelling peddler with a wagon full of wonderful things.',
+    about:{hob:`Hob at the Smoky Kettle pays me in soup. I've got a cellar full of soup. Want some soup? It's very smoky soup.`},
+    rumor:{t:`I'll tell you a secret for free, because I like your face. There are three treasure maps in this valley. Find the maps, find the X's. Dig.`,hint:'xmarks'},
+    loves:['honey','fish','frostberry','moonlily'],hates:[],
+    deep:`I wasn't always a peddler. I was a pirate. On a lake. It was a very small lake, and a very small boat. I retired when the ducks unionized.`,
+    secret:{t:`From now on, everything in my wagon costs a little less for you. Don't tell anyone. Especially Hob.`,reward:{discount:true}},
+    best:{t:`My lucky top hat. It's been on six adventures and one wedding. Now it's yours.`,reward:{hat:'top'}},
+    chat:{q:`I've got a magic bean here. Want to trade your sword for it?`,opts:[
+      {t:`No thank you, but it's a very nice bean.`,tone:'kind',r:`It IS a nice bean. You've got manners. Rare in a dragon.`,f:0.75},
+      {t:`Absolutely not. Nice try.`,tone:'brave',r:`Ha! Sharp kid. Sharper than the sword. I respect it.`,f:1},
+      {t:`Only if the bean can dance.`,tone:'silly',r:`It can! Watch. ...It's not dancing. Okay, it's a normal bean.`,f:0.5}],best:'brave'}},
+  dell:{bio:'Fisherman on Lake Mirrow. Lost his boat in the Mirefen.',
+    about:{wendel:`My cousin Wendel says fish are rude. Fish are wonderful. Wendel is rude. To fish.`,shellby:`There's a turtle in Mirrow Grotto older than the lake. Old Sal says it talks. Old Sal says a lot of things.`},
+    rumor:{t:`There's a fishing spot in the Frostpine, a hole in the ice. The fish up there are so cold they're crunchy. Bring me one and I'll owe you.`},
+    loves:['fish'],hates:['moonlily'],
+    deep:`I proposed to my wife on the Soggy Biscuit. She said yes, and then the boat sank a little. Not all the way. Just enough to be romantic.`,
+    secret:{t:`My second-best lure. Fish bite faster with it. Trust me.`,reward:{lure:true}},
+    best:{t:`I named a fish after you. A big orange one. It bites everything. It's perfect.`,reward:{coins:60}},
+    chat:{q:`What do you think fish dream about?`,opts:[
+      {t:`Warm water and no hooks.`,tone:'kind',r:`...Oh. Oh, that's a little sad. I'm going to be gentler.`,f:1},
+      {t:`Biting fishermen.`,tone:'brave',r:`HA! They'd try. They'd try.`,f:0.5},
+      {t:`Being birds.`,tone:'silly',r:`Flying fish! They exist, you know. They're just very ambitious.`,f:0.75}],best:'kind'}},
+  marigold:{bio:'Hat maker of Brindlecross. Twin sister of Hob.',
+    about:{hob:`My twin Hob loses a scarf a week. I've knitted him twenty. He says the wind takes them. The wind is him.`,nana:`Nana Pettibone taught me to knit. She also taught me that every gift needs a pocket. I put pockets in hats now.`},
+    rumor:{t:`I once hid a feathered cap somewhere in the Frostpine Lodge attic, as a surprise for Ulf. He never found it. He never looks up.`,hint:'sec_h_ulf'},
+    loves:['honey','moonlily'],hates:['fish'],
+    deep:`I make hats because when I was little I was very small, and a hat made me taller. Now I make everyone a little taller.`,
+    secret:{t:`I made you a feathered cap. It's very dashing. Dash in it.`,reward:{hat:'feather'}},
+    best:{t:`A crown. A real one. Well. Real paper. With real glitter. For a real hero.`,reward:{hat:'crown2'}},
+    chat:{q:`Be honest. Is this hat too much?`,opts:[
+      {t:`It's perfect. It's very you.`,tone:'kind',r:`Oh good. Because I made four more.`,f:0.75},
+      {t:`It's a lot of hat. But you wear it well.`,tone:'brave',r:`A lot of hat! That's exactly right! Thank you!`,f:1},
+      {t:`I think a bird lives in it.`,tone:'silly',r:`...A bird DOES live in it. His name is Gerald.`,f:0.75}],best:'brave'}},
+  quill:{bio:'Professor of stars at the Observatory. Writes to Gorran about rocks.',
+    about:{gorran:`Gorran sends me rocks. I send him star charts. He says stars are "just rocks with lights." He's not wrong. Don't tell him.`,wren:`Wren has every book. I have every star. Between us we have everything except dinner.`},
+    rumor:{t:`On clear nights, look through my telescope upstairs. I've spotted three stars that fell into the valley. Star-iron, every one.`,hint:'chart'},
+    loves:['moonlily'],hates:['honey'],
+    deep:`I wanted to be an astronaut. That's someone who travels to the stars. Nobody knew what I meant. I'm still working on the "how."`,
+    secret:{t:`A little lens. If you hold it up at night, you can see a bit farther in the dark.`,reward:{lantern:true}},
+    best:{t:`I've named a star after you. It's very bright and slightly orange and it never stays still. Here's the certificate. I made the certificate.`,reward:{bless:1}},
+    chat:{q:`Do you ever look up and feel very small?`,opts:[
+      {t:`Small, but not alone.`,tone:'kind',r:`...Yes. That's it exactly. Small, but not alone.`,f:1},
+      {t:`No. I feel like I could reach them.`,tone:'brave',r:`Ha! With those wings? Someday, maybe.`,f:0.75},
+      {t:`I feel like a crumb on a very big blanket.`,tone:'silly',r:`A cosmic crumb! I'm writing that down.`,f:0.75}],best:'kind'}},
+  mayor:{bio:'Mayor of Brindlecross. Very proud of his mustache and his ancestors.',
+    about:{yara:`Elder Yara counted the planks on my bridge. Then she counted my buttons. She's thorough. It's terrifying.`,bertram:`Bertram's buns are essential to the running of this town. I eat them for the town. It's a sacrifice.`},
+    rumor:{t:`My great-great-great-great grandfather Brindle kept a vault upstairs, behind his portrait. Nobody knows the trick. I've tried asking the painting nicely.`,hint:'sec_h_mayor'},
+    loves:['honey','frostberry'],hates:['fish'],
+    deep:`Between you and me, I'm not sure I'm a good mayor. I just like ribbons. And ceremonies. And having a reason to wear the hat.`,
+    secret:{t:`The Key to the City! It doesn't open anything. But it's very shiny. And it means you're important.`,reward:{coins:50}},
+    best:{t:`By order of the Mayor, today is Ash Day. It will be every year. There will be ribbons.`,reward:{bless:1}},
+    chat:{q:`What do you think of my mustache?`,opts:[
+      {t:`It's the finest mustache in the valley.`,tone:'kind',r:`It IS! It has won awards! I gave them to it!`,f:1},
+      {t:`It's bigger than your face.`,tone:'brave',r:`...That's the point. Thank you for noticing.`,f:0.5},
+      {t:`Does it have a name?`,tone:'silly',r:`It's called Reginald. Reginald says hello.`,f:0.75}],best:'kind'}},
+  nib:{bio:'A kid who sells "treasure maps" of mostly cats.',
+    about:{rook:`Rook's sister makes real maps. I make cat maps. Mine have more cats.`},
+    rumor:{t:`I buried my best treasure under a big X. I drew a map so I wouldn't forget. Then I sold the map. I forget to who.`,hint:'xmarks'},
+    loves:['honey'],hates:['moonlily'],
+    deep:`I don't have a real house. I sleep at the inn when Tilly lets me. She always lets me. Don't tell anyone, she pretends she's grumpy.`,
+    secret:{t:`Here. A real map. Not a cat. Okay there's a small cat in the corner.`,reward:{item:'map_x1'}},
+    best:{t:`You're the coolest person in the world. Even cooler than cats. Here's all my coins. All four.`,reward:{coins:4,bless:1}},
+    chat:{q:`Wanna buy a map? It's a map of my cat.`,opts:[
+      {t:`I'd love a map of your cat.`,tone:'kind',r:`You would?! Here, it's free. The cat's name is Biscuit.`,f:1},
+      {t:`Only if it leads to treasure.`,tone:'brave',r:`It leads to Biscuit. Biscuit IS treasure.`,f:0.5},
+      {t:`Does the cat have a map of you?`,tone:'silly',r:`...I never thought of that. Biscuit is up to something.`,f:0.75}],best:'kind'}},
+  gorran:{bio:'Old foreman of the Coppergulch Mine. Old friend of Maren.',
+    about:{maren:`Your mom could swing a hammer before she could walk. I taught her to read ore. She taught me to not put my beard in the forge.`,quill:`Quill writes to me about stars. Stars are rocks that think they're special. Like Quill.`},
+    rumor:{t:`The deep part of my mine has an old shaft. We sealed it with a stone door that only opens if you put the cart on the plate. Push it. Carts like being pushed.`,hint:'cave_mine'},
+    loves:['honey'],hates:['moonlily'],
+    deep:`I lost my eye to a falling rock forty years ago. Kept the rock. It's on my mantel. We've made our peace.`,
+    secret:{t:`A good pickaxe head. Take it to your mom. She'll know what to do. (Your blade will hit harder.)`,reward:{dmg:0.06}},
+    best:{t:`You're as stubborn as your mother. That's the highest praise a rock can give.`,reward:{maxhp:20}},
+    chat:{q:`Think the mine will ever be safe again?`,opts:[
+      {t:`I'll make it safe. I promise.`,tone:'brave',r:`HA! That's Maren's kid all right.`,f:1},
+      {t:`It'll be safe because you'll be there.`,tone:'kind',r:`Bah. Flattery. ...Keep going.`,f:0.75},
+      {t:`Only if the rocks behave.`,tone:'silly',r:`The rocks never behave. That's why I love them.`,f:0.5}],best:'brave'}},
+  cookie:{bio:'Cook of Coppergulch. Famous for Rock Soup.',
+    about:{tilly:`Tilly Crumb says my Rock Soup is a crime. She's never been hungry in a mine. Rocks are filling. Technically.`},
+    rumor:{t:`There's a ghost in the Smoky Kettle cellar. Hob says it's friendly. It took one of my ladles. A friendly thief.`,hint:'sec_h_hob'},
+    loves:['fish','frostberry'],hates:['honey'],
+    deep:`Rock Soup was my grandmother's recipe. During the long winter, it was all anyone had. So we made it taste like hope. And rocks.`,
+    secret:{t:`A bowl of the real soup. No rocks. Warms you right up. You'll heal faster resting.`,reward:{regen:true}},
+    best:{t:`My ladle. My lucky ladle. It's seen things. Now it'll see you.`,reward:{coins:50}},
+    chat:{q:`Try the Rock Soup. Be honest.`,opts:[
+      {t:`It's... very filling. Thank you.`,tone:'kind',r:`Filling! That's the word! You're a good kid.`,f:0.75},
+      {t:`I think I chipped a tooth.`,tone:'brave',r:`HA! Everybody does! It's tradition!`,f:1},
+      {t:`I can taste the rock's whole life story.`,tone:'silly',r:`That one was a pebble from the river. Very adventurous pebble.`,f:0.75}],best:'brave'}},
+  pick:{bio:'Twin miners who are now officially scared of the mine.',
+    about:{gorran:`Gorran's the boss. He talks to the rocks. We don't. They might answer.`},
+    rumor:{t:`We heard the drakelings stole something shiny and took it to the deepest room. Behind a door that needs a key. We ran. Twice.`},
+    loves:['honey','fish'],hates:[],
+    deep:`We've never been apart. Not once. When one of us gets a cold, the other one sneezes.`,
+    secret:{t:`Our lucky lamp. It's two lamps taped together. It's very bright.`,reward:{lantern:true}},
+    best:{t:`We wrote you a song. It's in two parts. We each sing one word at a time. It takes a while.`,reward:{coins:40}},
+    chat:{q:`Which one of us is Pick?`,opts:[
+      {t:`You're both important. That's what matters.`,tone:'kind',r:`...That's what our mum used to say. Thanks.`,f:1},
+      {t:`You. Definitely you.`,tone:'brave',r:`HA! Wrong! ...Or right. We don't know either.`,f:0.75},
+      {t:`I'm Pick. You're both Shovel.`,tone:'silly',r:`That's... that's actually possible.`,f:1}],best:'silly'}},
+  hollis:{bio:'Goat farmer in the Frostpine. Brother of Ulf.',
+    about:{ulf:`My brother Ulf likes sheep. Sheep! Sheep can't climb a fence. Duchess climbed a tree once. Sheep could never.`,hal:`Hal Burrows writes to my brother about cheese. They've never invited me. I make GOAT cheese. It's better.`},
+    rumor:{t:`Duchess likes to wander up to the high snow. There's a frozen fellow up there in a block of ice. She licks the ice. I think she's trying to help.`,hint:'lm_brisket'},
+    loves:['frostberry'],hates:['fish'],
+    deep:`Duchess was the runt. Nobody wanted her. I fed her with a bottle every night for a month. Now she's queen of the farm. And she knows it.`,
+    secret:{t:`A goat bell. Duchess wants you to have it. Well, she didn't bite me when I took it off her. Same thing.`,reward:{stamina:15}},
+    best:{t:`Duchess has decided you're family. That means she'll ignore you, like the rest of us.`,reward:{bless:1}},
+    chat:{q:`Goats or sheep? Choose carefully.`,opts:[
+      {t:`Goats. Obviously goats.`,tone:'brave',r:`HA! Finally, someone with sense! Tell my brother!`,f:1},
+      {t:`Both are wonderful in their own way.`,tone:'kind',r:`That's what diplomats say. Hmph. Fine.`,f:0.25},
+      {t:`Dragons.`,tone:'silly',r:`...Dragons don't give milk, Ash.`,f:0.5}],best:'brave'}},
+  ulf:{bio:'Hunter at the Frostpine Lodge. Prefers sheep. Brother of Hollis.',
+    about:{hollis:`My brother keeps goats. Goats eat your boots. Sheep never ate a boot in their lives. Their lives are boot-free.`,hal:`Hal sends me cheese. The best cheese. We write about cheese every month. My letters are longer.`},
+    rumor:{t:`My grandfather's hunting map is up in the lodge attic somewhere. He marked every secret path in the high snow. I'm scared of the attic. There's a moose head up there.`,hint:'sec_h_ulf'},
+    loves:['fish','honey'],hates:['frostberry'],
+    deep:`I'm loud because the mountains are big. If you talk quietly up here, the snow takes your words away.`,
+    secret:{t:`My grandfather's fur cloak. Warm as a bear. You'll take less damage.`,reward:{armor:0.06}},
+    best:{t:`You're welcome at the lodge forever. Your mug has your name on it. I carved it. It says "ASH." And a little sheep.`,reward:{maxhp:20}},
+    chat:{q:`Goats or sheep? Think hard.`,opts:[
+      {t:`Sheep. Clearly.`,tone:'brave',r:`YES! A WISE DRAGON! Wait until my brother hears!`,f:1},
+      {t:`I like all animals.`,tone:'kind',r:`Hmph. Diplomatic. Fine. You can stay.`,f:0.25},
+      {t:`Sheep with goat horns.`,tone:'silly',r:`...That's a monster, Ash. A wonderful monster.`,f:0.75}],best:'brave'}},
+  elka:{bio:'Sled racer at the Frostpine Lodge. Pen pal of Rook.',
+    about:{rook:`Rook wants to be a dragon. I told him to start small. Like a lizard. Or a very angry newt.`},
+    rumor:{t:`If you slide down the big hill north of the lodge, you'll find a cave full of icicles. Ulf says don't. Ulf says don't to everything.`,hint:'cave_icefang'},
+    loves:['frostberry','honey'],hates:['fish'],
+    deep:`My mom raced sleds too. She was the fastest in the valley. I'm going to be faster. I already am, on Tuesdays.`,
+    secret:{t:`My second-fastest sled wax. Rub it on your boots. You'll run faster on snow.`,reward:{snow:true}},
+    best:{t:`You're officially my racing partner. Here's my mom's racing goggles. Don't scratch them.`,reward:{stamina:20}},
+    chat:{q:`Bet you can't beat me in a race!`,opts:[
+      {t:`You're probably faster. But I'll try my best.`,tone:'kind',r:`I AM faster. But you're nice about it.`,f:0.5},
+      {t:`You're on.`,tone:'brave',r:`YES! Talk to me when you're ready to lose!`,f:1},
+      {t:`I'll race you if I can use my wings.`,tone:'silly',r:`Those aren't wings, those are flaps! Flaps don't count!`,f:0.75}],best:'brave'}},
+  brisket:{bio:'A retired adventurer, recently unfrozen.',
+    about:{ulf:`Ulf let me stay at the lodge. He keeps asking if I'm "a sheep person." I'm a warm person. That's all I want to be.`},
+    rumor:{t:`Before I got frozen, I saw cultists carrying crates into the Ember Deep up north. Heavy ones. Glowing ones. I'd stay away. I'm staying away. Forever.`,hint:'cave_deep'},
+    loves:['honey','fish'],hates:['frostberry'],
+    deep:`I was a famous adventurer once. Brisket the Bold. Then I got frozen. Now I'm Brisket the Warm. It's a better title.`,
+    secret:{t:`My old adventuring boots. They're a little frosty, but you'll roll faster in them.`,reward:{roll:true}},
+    best:{t:`My helmet. I'm retired. You're not. Go be bold for me.`,reward:{armor:0.05}},
+    chat:{q:`Do you think I should go back to adventuring?`,opts:[
+      {t:`You've earned your rest. Be warm.`,tone:'kind',r:`Thank you. I needed someone to say that. Warmth forever.`,f:1},
+      {t:`The world needs you, Brisket the Bold!`,tone:'brave',r:`...Maybe in spring. Spring is warm.`,f:0.5},
+      {t:`Only if you adventure inside a blanket.`,tone:'silly',r:`A blanket fort adventurer. That's... actually my dream.`,f:0.75}],best:'kind'}},
+  hob:{bio:'Runs the Smoky Kettle on the Ashen Road. Twin of Marigold, cousin of Fennick.',
+    about:{marigold:`My twin Marigold makes hats. She thinks I lose my scarves. I donate them. To the wind.`,fennick:`My cousin Fennick came through here with a pocket full of gold a while back. Fennick never has gold. Fennick has lint.`},
+    rumor:{t:`There's a cellar under the Kettle where I keep my sauce. And a ghost. The ghost is very nice. He likes it when you hum.`,hint:'sec_h_hob'},
+    loves:['fish','frostberry'],hates:[],
+    deep:`I built the Smoky Kettle with my own hands. Then the roof fell in. Then I built it again with my own hands, but smarter hands.`,
+    secret:{t:`The house special, free, forever. Every time you rest here, you'll get the stew.`,reward:{regen:true}},
+    best:{t:`My spare kettle! I bought a spare in case of thieves. It whistles in the key of friendship.`,reward:{potmax:1}},
+    chat:{q:`Smell this stew. What's in it?`,opts:[
+      {t:`Love. And carrots.`,tone:'kind',r:`HA! Mostly carrots! But yes, love.`,f:1},
+      {t:`Something that's still moving.`,tone:'brave',r:`...Good nose. Don't eat that bit.`,f:0.75},
+      {t:`A boot. A whole boot.`,tone:'silly',r:`That was ONE time, and it was a very clean boot.`,f:1}],best:'silly'}},
+  tamsin:{bio:'The bard of the Smoky Kettle. Writes a song about everything you do.',
+    about:{wendel:`Wendel's a good fiddler and a terrible poet. "Ash" and "crash." Twice. Amateur.`},
+    rumor:{t:`They say the old tree Barkley in Whisperwood knows three riddles. Answer them all and he'll bless you. The answers? A river, footsteps, a candle. You didn't hear it from me.`,hint:'lm_barkley'},
+    loves:['honey'],hates:['fish'],
+    deep:`I wasn't always a bard. I was a very bad knight. I kept stopping fights to write songs about them.`,
+    secret:{t:`A verse just for you. Hum it in a fight and you'll feel braver. (Your roar fills faster.)`,reward:{roar:true}},
+    best:{t:`I'm writing an opera about you. It's twelve hours long. You're in every scene. Here, a front-row ticket. Forever.`,reward:{bless:1}},
+    chat:{q:`Give me a word that rhymes with "dragon."`,opts:[
+      {t:`"Wagon." A wagon full of friends.`,tone:'kind',r:`A wagon full of friends! That's going in the chorus!`,f:1},
+      {t:`"Flagon." Raised to the brave.`,tone:'brave',r:`Ooh, very heroic. Very tavern. I like it.`,f:0.75},
+      {t:`"Draggin'." Like my tail.`,tone:'silly',r:`HA! Draggin' his tail, the dragon went waggin'! Brilliant!`,f:1}],best:'silly'}},
+  moss:{bio:'Herbalist of the Mirefen. Grandmother of Mabel. Has a frog.',
+    about:{mabel:`My Mabel worries. Gets it from her mother. Her mother got it from me. I've stopped. It took sixty years.`},
+    rumor:{t:`The Sunken Grotto has a pool that glows at the bottom. Old things sink there. Old boats. Old secrets. Old frogs. Sir Croaksley came from there.`,hint:'cave_grotto'},
+    loves:['moonlily','frostberry'],hates:['honey'],
+    deep:`I knew Sedge's great-great-grandson. He was never dry either. Runs in the family. Like stubbornness. And frogs.`,
+    secret:{t:`A sprig of bogmint. Chew it and poison won't stay long. The swamp's kinder to you now.`,reward:{bog:true}},
+    best:{t:`You're my second grandchild now. Don't tell Mabel. She'll knit you something out of spite.`,reward:{maxhp:20}},
+    chat:{q:`Would you like to meet Sir Croaksley?`,opts:[
+      {t:`It would be an honor, sir.`,tone:'kind',r:`He likes you. He blinked. That's a lot, for him.`,f:1},
+      {t:`Is he dangerous?`,tone:'brave',r:`Only to flies. And one heron, once. It was a fair fight.`,f:0.5},
+      {t:`Does he do tricks?`,tone:'silly',r:`He sits. It's his only trick. He's very good at it.`,f:0.75}],best:'kind'}}
+};
 
 // ================= world layout (the valley of Embermere)
 const WORLD={w:14000,h:11000};
@@ -4304,9 +4688,11 @@ const PAUSE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+14,w:40,h:40});
 const MUTE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+60,w:40,h:40});
 const MINI_R=()=>{ const r=W<560?52:70; return {x:W-SAFE.r-68-r*2,y:SAFE.t+14,w:r*2,h:r*2,r}; };
 const inRect=(r,x,y)=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
+let TRACK_R=null;
 function hudClick(x,y){
   if(inRect(PAUSE_R(),x,y)){ pauseGame(); return true; }
-  if(inRect(MUTE_R(),x,y)){ toggleMute(); return true; }
+  if(TRACK_R&&G&&G.mode==='story'&&inRect(TRACK_R,x,y)){ openJournal(); return true; }
+  if(inRect(MUTE_R(),x,y)){ toggleAllSound(); return true; }
   if(G&&G.mode==='story'&&inRect(MINI_R(),x,y)){ openMap(); return true; }
   return false;
 }
@@ -4363,14 +4749,18 @@ function readInput(dt){
 }
 function onKey(e){
   const c=e.code;
-  if(c==='KeyN'&&!e.repeat&&scene!=='dialogue'){ toggleMute(); return; }
+  if(c==='KeyN'&&!e.repeat&&scene!=='dialogue'){ toggleAllSound(); return; }
   if(scene==='play'){
     if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(c)) e.preventDefault();
     if(c==='Escape'||c==='KeyP') pauseGame();
     else if((c==='KeyM'||c==='Tab')&&G.mode==='story') openMap();
+    else if(c==='KeyI'&&G.mode==='story') openJournal();
+    else if(c==='KeyT'&&G.mode==='story') cycleFocus();
     if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
+  }else if(scene==='journal'){
+    if(c==='Escape'||c==='KeyI'){ e.preventDefault(); closeJournal(); }
   }else if(scene==='paused'){
     if((c==='Escape'||c==='KeyP')&&!$('#how').classList.contains('on')){ e.preventDefault(); resumeGame(); }
     else if(c==='Escape') closeHow();
@@ -4461,7 +4851,7 @@ function updatePlayer(dt,inp){
     emit(p.x,p.y,8,{col:'150,130,110',glow:false,smin:30,smax:90,lmin:.3,lmax:.6,zmin:2,zmax:5,grow:7});
   }
   // drink
-  if(inp.drink&&p.potions>0&&p.drinkT<=0&&p.dashT<=0&&p.hp<p.maxHp){ p.potions--; p.drinkT=0.9; p.drinkPool=p.maxHp*0.45*G.diff.heal; SFX.play('drink'); }
+  if(inp.drink&&p.potions>0&&p.drinkT<=0&&p.dashT<=0&&p.hp<p.maxHp){ p.potions--; p.drinkT=0.9; p.drinkPool=p.maxHp*0.45*G.diff.heal*(p.stats.drinkMul||1); SFX.play('drink'); }
   if(p.drinkT>0){ const k=Math.min(dt,p.drinkT)/0.9; heal(p.drinkPool*k,true); p.drinkT-=dt; if(Math.random()<0.4) emit(p.x+rand(-8,8),p.y+rand(-8,8),1,{col:'140,255,170',ang:-Math.PI/2,spread:0.5,smin:20,smax:50,lmin:.4,lmax:.7,zmin:1.5,zmax:2.5,rise:20}); }
   let vx=0,vy=0;
   p.sprinting=false;
@@ -4471,7 +4861,7 @@ function updatePlayer(dt,inp){
     if(st.emberDash){ p.emberT-=dt; if(p.emberT<=0){ p.emberT=0.06; G.pools.push({x:p.x,y:p.y,r:22,life:1.6,max:1.6,owner:'player',tick:0}); } }
   }else{
     const here=T(p.x,p.y,PT); p.slowT=(p.slowT||0)-dt;
-    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?0.72:1)*(here.b===5&&here.road<=0?0.93:1)*(p.slowT>0?0.6:1);
+    let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1);
     if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55; p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); }
     vx=inp.mx*spd; vy=inp.my*spd;
   }
@@ -5497,7 +5887,7 @@ function newRun(mode){
     stage:'wake',flags:{},wards:{hollow:true},wardReady:{},wardHeat:{},wardHeatT:{},wardMsgT:0,bossDone:{},side:{},ores:{},iron:0,tier:0,lilyN:0,lanterns:{},
     fightSite:null,fightIntro:false,siteGuards:{},pip:null,goat:null,spirit:null,questKills:0,done:false,pendingBless:0,blessDelay:0,prompt:null,region:null,regionT:0,
     inCombat:false,arena:null,autoSaveT:60,wolfT:20,critterT:3,fogT:0,herbs:{},eliteChance:mode==='story'?0.06:0,
-    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null};
+    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null,track:[],focus:null,friends:{},seenTalk:{},secrets:{},miniDone:{},mini:null};
   if(AREA) exitArea(true);
   player=makePlayer();
 }
@@ -5562,7 +5952,7 @@ function onBossDefeated(e){
 // ================= story start, death, travel
 function startStory(fromSave){
   SFX.init();
-  const s=fromSave?store.get(SAVE_KEY,null):null;
+  const s=fromSave?slotSave(curSlot):null;
   if(s&&s.v===3){ loadGame(s); scene='play'; hideAll(); updateCam(0,true); G.chunkBurst=16; setBanner(regionAt(player.x,player.y).name,'Journey resumed',2.2); return; }
   newRun('story'); clearStatic(); fogInit('');
   player.x=POI.village.x+60; player.y=POI.village.y+150; player.facing=-Math.PI/2;
@@ -5733,7 +6123,10 @@ function pauseGame(){
 }
 function resumeGame(){ if(scene!=='paused') return; scene='play'; hideAll(); }
 function toggleMute(){ SFX.init(); SFX.toggle(); refreshSoundLabels(); }
-function refreshSoundLabels(){ const t='Sound: '+(SFX.muted?'Off':'On'); $('#bSound').textContent=t; $('#bPauseSound').textContent=t; $('#bNums').textContent='Damage numbers: '+(settings.nums?'On':'Off'); }
+// the speaker button on the HUD mutes or unmutes everything at once
+function toggleAllSound(){ SFX.init(); const anyOn=!SFX.muted||!Music.muted; if(anyOn){ if(!SFX.muted) SFX.toggle(); if(!Music.muted) Music.toggle(); } else { SFX.toggle(); Music.toggle(); mLast=null; } refreshSoundLabels(); }
+function allMuted(){ return SFX.muted&&Music.muted; }
+function refreshSoundLabels(){ if($('#settings').classList.contains('on')) renderSettings(); }
 
 // ================= story progression: stages, boss sites, wards, side quests
 const STAGES=['wake','lanterns','raid','lore','hollow','warcamp','wren','oath','three','gate','summit','done'];
@@ -6010,25 +6403,27 @@ function openChest(c){
 }
 
 // ================= save / load (v3)
-const SAVE_KEY='eb_world3';
 function saveData(){
   return {v:3,at:Date.now(),diff:diffIdx,x:Math.round(player.x),y:Math.round(player.y),shrine:G.lastShrine,p:snapshotPlayer(),hp:Math.round(player.hp),potions:player.potions,
     stage:G.stage,flags:G.flags,wards:G.wards,ready:G.wardReady,bosses:G.bossDone,side:G.side,ores:G.ores,iron:G.iron,tier:G.tier,
     lilies:LILIES.filter(l=>l.taken).map(l=>l.id),lilyN:G.lilyN,lan:G.lanterns,qk:G.questKills,goat:G.goat?{x:Math.round(G.goat.x),y:Math.round(G.goat.y)}:null,
     shrines:G.shrines,camps:G.campsCleared,chests:G.chestsOpened,tod:G.tod,wt:G.worldTime,kills:G.kills,deaths:G.deaths,time:G.playTime,done:G.done,fog:fogStr(),pend:G.pendingBless,
-    rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared};
+    rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared,
+    rev:5,slot:curSlot,track:G.track||[],focus:G.focus||null,friends:G.friends||{},talk:G.seenTalk||{},secrets:G.secrets||{},mini:G.miniDone||{}};
 }
 function saveGame(now){
   if(!G||G.mode!=='story') return;
-  const s=saveData(); if(AREA&&G.ow){ s.x=Math.round(G.ow.x); s.y=Math.round(G.ow.y); } store.set(SAVE_KEY,s);
-  Cloud.queueSave(s,now);
+  const s=saveData(); if(AREA&&G.ow){ s.x=Math.round(G.ow.x); s.y=Math.round(G.ow.y); } store.set(SLOT_KEYS[curSlot],s);
+  Cloud.queueSave(packSaves(),now);
 }
 function loadGame(s){
   diffIdx=clamp(s.diff|0,0,2); newRun('story'); clearStatic();
   player=restorePlayer(s.p); player.x=s.x; player.y=s.y; player.hp=Math.max(1,s.hp||player.maxHp); player.hpShow=player.hp; player.potions=s.potions!=null?s.potions:player.potionsMax;
   Object.assign(G,{stage:s.stage||'wake',flags:s.flags||{},wards:s.wards||{hollow:true},wardReady:s.ready||{},bossDone:s.bosses||{},side:s.side||{},ores:s.ores||{},iron:s.iron||0,tier:s.tier||0,lilyN:s.lilyN||0,lanterns:s.lan||{},questKills:s.qk||0,
     shrines:s.shrines||{},lastShrine:s.shrine||'s_village',campsCleared:s.camps||{},chestsOpened:s.chests||{},tod:s.tod!=null?s.tod:0.32,worldTime:s.wt||0,kills:s.kills||0,deaths:s.deaths||0,playTime:s.time||0,done:!!s.done,pendingBless:s.pend||0,
-    coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{}});
+    coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{},
+    track:s.track||[],focus:s.focus||null,friends:s.friends||{},seenTalk:s.talk||{},secrets:s.secrets||{},miniDone:s.mini||{}});
+  if(!s.track){ G.track=Object.keys(G.quests).filter(k=>!G.quests[k].done).slice(-3).reverse(); }
   if(!s.rev){ if(G.side.moss==='done'&&!G.quests.moss) G.quests.moss={step:4,done:true}; if(G.side.duchess==='home'&&!G.quests.duchess) G.quests.duchess={step:4,done:true}; if(reached('warcamp')) G.flags.gateHint=true; }
   for(const c of CHESTS) c.open=!!G.chestsOpened[c.id];
   for(const L of LANTERNS) L.lit=!!G.lanterns[L.id];
@@ -6041,7 +6436,7 @@ function loadGame(s){
 }
 function clearStatic(){ for(const c of CHESTS) c.open=false; for(const L of LANTERNS) L.lit=false; for(const l of LILIES) l.taken=false; if(GATE_COL) GATE_COL.off=false; for(const [,a] of PROPS) for(const p of a) p.taken=false; }
 function saveSummary(s){
-  if(!s||s.v!==3) return null;
+  if(!s||s.v!==3||s.deleted) return null;
   return `Level ${(s.p&&s.p.level)||1} · ${s.done?'Free roam':CHAPTER[s.stage]||'Lantern Day'} · ${DIFFS[clamp(s.diff|0,0,2)].name}`;
 }
 
@@ -6136,10 +6531,19 @@ function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.t==='camps'
 function startQuest(id){
   const d=QDEFS[id]; G.quests[id]={step:0,camps0:G.stats.camps||0,errand:!!d.errand};
   if(d.give) giveItems(d.give,true);
-  SFX.play('quest'); setBanner(d.errand?'New errand':'New side quest',stepText(id),3.2); G.lastQ=id;
+  onQuestStarted(id); setBanner(d.errand?'New errand':'New side quest',`${d.title.replace('Errand: ','')}: ${stepText(id)}`,3.2); G.lastQ=id;
   questPoke(); saveGame();
 }
-function offerQuest(id){ const d=QDEFS[id]; runDialogue(d.offer,()=>{ scene='play'; startQuest(id); }); }
+function offerQuest(id){
+  const d=QDEFS[id], g=d.giver; let ok=false;
+  const lines=d.offer.slice();
+  lines.push(ch('ash',d.errand?'Will you take it?':'Will you help?',[
+    {t:d.errand?'Sure, I can carry that.':`Of course I'll help.`,tone:'kind',fn:()=>{ ok=true; befriend(g,0.25,true); },then:[[g,d.errand?pick([`Thank you, Ash!`,`You're a star.`]):pick([`Thank you, Ash. Really.`,`I knew I could count on you.`,`Oh, thank goodness.`])]]},
+    {t:d.errand?'On my way.':'Leave it to me.',tone:'brave',fn:()=>{ ok=true; },then:[[g,pick([`Ha! That's the spirit.`,`Be careful out there.`])]]},
+    {t:'Not right now, sorry.',fn:()=>{ G.declined=G.declined||{}; G.declined[id]=dayNow(); },then:[[g,`That's all right. Come back if you change your mind.`]]}
+  ]));
+  runDialogue(lines,()=>{ scene='play'; if(ok) startQuest(id); else saveGame(); });
+}
 function giveReward(r){
   if(!r) return;
   if(r.coins) addCoins(r.coins,player.x,player.y);
@@ -6156,7 +6560,7 @@ function advanceQuest(id){
   q.step++;
   if(st.reward) giveReward(st.reward);
   if(id==='mine'&&q.step===3) reforgeIron();
-  if(q.step>=d.steps.length){ q.done=true; SFX.play('upgrade'); setBanner(d.errand?'Errand done':'Quest complete',d.title.replace('Errand: ',''),2.6); G.stats.quests=(G.stats.quests||0)+1; }
+  if(q.step>=d.steps.length){ q.done=true; onQuestDone(id); setBanner(d.errand?'Errand done':'Quest complete',d.title.replace('Errand: ',''),2.6); G.stats.quests=(G.stats.quests||0)+1; if(d.giver) befriend(d.giver,d.errand?0.5:1.5); }
   else{ q.camps0=G.stats.camps||0; setBanner(d.title,stepText(id),2.8); SFX.play('quest'); }
   G.lastQ=id; questPoke(); saveGame();
 }
@@ -6196,21 +6600,25 @@ function storyMarker(id){
   if(id==='wren'&&st==='wren') return true;
   return false;
 }
+function questSpot(spec,npc){
+  if(!spec&&npc) spec='npc:'+npc;
+  if(!spec) return null;
+  const [k,v]=spec.split(':');
+  if(k==='npc'){ const c=CASTBY[v]; if(c&&c.inside){ const d=DOORS.find(q=>q.area===c.inside); return d?{x:d.x,y:d.y}:null; } const n=G.npcs.find(q=>q.id===v); if(n) return {x:n.x,y:n.y}; if(c&&c.inside2){ const d=DOORS.find(q=>q.area===c.inside2); return d?{x:d.x,y:d.y}:null; } return null; }
+  if(k==='poi') return POI[v]?{x:POI[v].x,y:POI[v].y}:null;
+  if(k==='cave'){ const m=CAVEMOUTHS.find(q=>q.area===v); return m?{x:m.x,y:m.y}:null; }
+  if(k==='area'){ const d=DOORS.find(q=>q.area===v); return d?{x:d.x,y:d.y}:null; }
+  if(k==='lm'){ const l=LANDMARKS.find(q=>q.id===v); return l?{x:l.x,y:l.y}:null; }
+  if(k==='xy'){ const [x,y]=v.split(',').map(Number); return {x,y}; }
+  if(k==='goat') return G.goat?{x:G.goat.x,y:G.goat.y}:null;
+  if(k==='mini') return G.mini&&G.mini.target?G.mini.target():null;
+  return null;
+}
+function questTargetOf(id){ const st=stepOf(id); if(!st) return null; const at=typeof st.at==='function'?st.at():st.at; return questSpot(at,st.t==='talk'?st.npc:null); }
 function questTargets(){
   // map + compass positions for every active side quest step
   const out=[];
-  const at=(spec,npc)=>{
-    if(!spec&&npc) spec='npc:'+npc;
-    if(!spec) return null;
-    const [k,v]=spec.split(':');
-    if(k==='npc'){ const c=CASTBY[v]; if(c&&c.inside){ const d=DOORS.find(q=>q.area===c.inside); return d?{x:d.x,y:d.y}:null; } const n=G.npcs.find(q=>q.id===v); return n?{x:n.x,y:n.y}:null; }
-    if(k==='poi') return POI[v]?{x:POI[v].x,y:POI[v].y}:null;
-    if(k==='cave'){ const m=CAVEMOUTHS.find(q=>q.area===v); return m?{x:m.x,y:m.y}:null; }
-    if(k==='lm'){ const l=LANDMARKS.find(q=>q.id===v); return l?{x:l.x,y:l.y}:null; }
-    if(k==='goat') return G.goat?{x:G.goat.x,y:G.goat.y}:null;
-    return null;
-  };
-  for(const id in G.quests){ const st=stepOf(id); if(!st) continue; const p=at(st.at,st.t==='talk'?st.npc:null); if(p) out.push(Object.assign(p,{id,text:stepText(id)})); }
+  for(const id in G.quests){ const p=questTargetOf(id); if(p) out.push(Object.assign({},p,{id,text:stepText(id)})); }
   return out;
 }
 // ---------- talking
@@ -6219,14 +6627,8 @@ function talkTo(n){
   if(storyTalk(n)) return;
   for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id){ if(haveAll(st.take)){ runQuestLines(qid,st); return; } } }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)){ deliverPages(); return; }
-  const av=availableFrom(id); if(av){ offerQuest(av); return; }
-  if(SHOPTALK[id]){ SHOPTALK[id](n); return; }
-  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id){ runDialogue([[id,`Come back when you have everything. I'll be right here. ${st.take?'You still need: '+Object.keys(st.take).map(k=>ITEM_NAMES[k]||k).join(', ')+'.':''}`]],done); return; } }
-  const c=CASTBY[id]||SPECIAL[id];
-  const lines=(c&&c.lines&&c.lines.length)?c.lines:[`Hello, Ash.`];
-  const extra=moodLine(id);
-  const t=extra&&n.li%3===2?extra:lines[n.li%lines.length]; n.li++;
-  runDialogue([[id,t]],done);
+  const av=availableFrom(id); if(av&&!(G.declined&&G.declined[av]===dayNow())){ offerQuest(av); return; }
+  talkHub(n);
 }
 function moodLine(id){
   const c=G.choices;
@@ -6299,13 +6701,14 @@ function deliverPages(){
   if(have>=10) lines.push(['wren',`That's all ten. The whole book. You've given the valley back its own story, Ash. I don't know what to say. I'm a librarian. I always know what to say.`]);
   else if(bless) lines.push(['wren',`That's ${have} now! This deserves more than coins. Here.`]);
   else lines.push(['wren',`${10-have} to go. They could be anywhere. Caves, attics, under turtles. You never know.`]);
-  runDialogue(lines,()=>{ scene='play'; G.pagesGiven=have; addCoins(coins,player.x,player.y); gainXp(40*n); if(bless){ G.pendingBless+=bless; later(1.2,offerPending); } if(have>=10&&G.quests.pages){ G.quests.pages.done=true; setBanner('Quest complete','The Wardens’ Account',2.6); } saveGame(); });
+  runDialogue(lines,()=>{ scene='play'; G.pagesGiven=have; addCoins(coins,player.x,player.y); gainXp(40*n); if(bless){ G.pendingBless+=bless; later(1.2,offerPending); } if(have>=10&&G.quests.pages&&!G.quests.pages.done){ G.quests.pages.done=true; onQuestDone('pages'); setBanner('Quest complete','The Wardens’ Account',2.6); } saveGame(); });
 }
 // ---------- shops and inns
 const HATS=[['party','Party Hat',15],['wizard','Wizard Hat',30],['crown','Flower Crown',20],['top','Top Hat',40]];
-function shopOpts(list){ return list.map(([label,price,fn,ok])=>({t:price?`${label} · ${price} coins`:label,fn:()=>{ if(price&&(G.coins||0)<price){ G.shopMsg='Not enough coins.'; return; } if(ok&&ok()!==true){ G.shopMsg=ok(); return; } if(price) G.coins-=price; fn(); SFX.play(price?'chest':'ui'); }})); }
+let shopWho=null;
+function shopOpts(list){ return list.map(([label,price0,fn,ok])=>{ const price=price0&&shopWho==='pell'&&G.flags.perk_discount?Math.ceil(price0*0.8):price0; return {t:price?`${label} · ${price} coins`:label,fn:()=>{ if(price&&(G.coins||0)<price){ G.shopMsg='Not enough coins.'; return; } if(ok&&ok()!==true){ G.shopMsg=ok(); return; } if(price) G.coins-=price; fn(); SFX.play(price?'chest':'ui'); }}; }); }
 function runShop(who,greet,list){
-  G.shopMsg=null;
+  G.shopMsg=null; shopWho=who;
   const opts=shopOpts(list).concat([{t:'Just looking',fn:()=>{}}]);
   runDialogue([ch(who,`${greet} You have ${G.coins||0} coins.`,opts)],()=>{ scene='play'; if(G.shopMsg) setBanner(G.shopMsg,'',1.6); saveGame(); });
 }
@@ -6324,7 +6727,7 @@ const SHOPTALK={
     ['Rent a bed for the night',6,()=>{ innRest(); }]
   ]),
   tilly:()=>runShop('tilly','The Sleepy Salmon Inn. Soft beds, mostly-soup soup.',[
-    ['Rent a bed for the night',5,()=>{ innRest(); }],
+    ['Rent a bed for the night',G.flags.perk_freeinn?0:5,()=>{ innRest(); }],
     ['A slice of pie (heal)',4,()=>{ player.hp=Math.min(player.maxHp,player.hp+60); setBanner('Pie','Crust burnt, the way Bertram likes it.',1.6); }]
   ]),
   cookie:()=>runShop('cookie','Rock Soup! Now with fewer rocks!',[['A bowl of Rock Soup (heal, crunchy)',3,()=>{ player.hp=Math.min(player.maxHp,player.hp+45); setBanner('Rock Soup','Crunchy.',1.4); }]])
@@ -6336,7 +6739,7 @@ const FISHES=['a Mirrow trout','a grumpy perch','a lantern minnow','a speckled p
 function startFishing(spot){
   if(!G.items.rod){ runDialogue([['narr',`Fish are jumping here. If only you had a rod. Dell the fisherman in Brindlecross might lend you one.`]],()=>{ scene='play'; }); return; }
   let wx=spot.x, wy=spot.y; for(let a=0;a<TAU;a+=0.3){ const x=spot.x+Math.cos(a)*70, y=spot.y+Math.sin(a)*70; if(T(x,y,{}).water){ wx=x; wy=y; break; } }
-  G.fishing={spot,wx,wy,t:rand(2,5),bite:0,px:player.x,py:player.y}; player.facing=angTo(player.x,player.y,wx,wy); SFX.play('roll'); setBanner('Fishing','Press E when the bobber splashes',1.6);
+  G.fishing={spot,wx,wy,t:rand(2,5)*(G.flags.perk_lure?0.55:1),bite:0,px:player.x,py:player.y}; player.facing=angTo(player.x,player.y,wx,wy); SFX.play('roll'); setBanner('Fishing','Press E when the bobber splashes',1.6);
 }
 function updateFishing(dt,inp){
   const F=G.fishing; if(!F) return;
@@ -6537,6 +6940,273 @@ function updateAllies(dt){
       if(a.cd<=0){ a.cd=3.2; const dr=G.enemies.find(e=>!e.dead&&e.type==='drakeling'); if(dr){ killEnemy(dr); emit(dr.x,dr.y,10,{col:'255,200,140',smin:60,smax:180,lmin:.2,lmax:.4,zmin:2,zmax:4}); if(Math.random()<0.3) taunt('cinder',pick(['None shall pass!','Not while I stand!','Ha! Too slow, lizard!'])); } }
     }
   }
+}
+
+// ================= meta systems: music direction, quest tracking, save slots, settings
+Object.assign(settings,{
+  touch:['two','right','left'].includes(store.get('eb_touch','two'))?store.get('eb_touch','two'):'two',
+  btn:clamp(+store.get('eb_btn',1)||1,0.85,1.2),
+  auto:store.get('eb_auto',null)
+});
+const autoAttackOn=()=>settings.auto==null?settings.touch!=='two'&&usingTouch:!!settings.auto;
+
+// ---------- music direction
+const MUSIC_BIOME=['meadow','forest','road','crags','cinder','frost','mire'];
+const TOWN_KEYS={village:'village',brindle:'town',copper:'town',lodge:'town',way:'town',farm:'town'};
+let mHeat=0, mCombat=false, mLast=null;
+function musicMood(dt){
+  if(!G||scene==='menu') return 'menu';
+  if(scene==='dead'||scene==='dying') return 'dead';
+  if(scene==='victory') return 'victory';
+  if(DLG&&DLG.mood) return DLG.mood;
+  const b=G.boss&&!G.boss.dead?G.boss:null;
+  if(b) return b.type==='vorlaxis'?'final':'boss';
+  if(G.mode==='normal') return 'arena';
+  if(G.mini&&G.mini.music) return G.mini.music;
+  let n=0;
+  if(G.inCombat) for(const e of G.enemies) if(!e.dead&&e.aggro&&e.type!=='egg'&&dist2(e.x,e.y,player.x,player.y)<620*620) n++;
+  mHeat=clamp(mHeat+((n>=2||(n&&mCombat))?dt:-dt*0.35),0,3);
+  if(!mCombat&&mHeat>0.8) mCombat=true; else if(mCombat&&mHeat<=0) mCombat=false;
+  if(mCombat) return 'combat';
+  if(AREA){
+    if(AREA.kind==='cave') return AREA.def.id==='deep'?'deep':(AREA.puzzleOn?'puzzle':'cave');
+    const st=AREA.def.style; return st==='inn'||st==='cook'?'inn':'house';
+  }
+  for(const k in TOWN_KEYS){ const p=POI[k]; if(p&&dist2(player.x,player.y,p.x,p.y)<(p.r+80)**2) return isNight()?'night':TOWN_KEYS[k]; }
+  if(isNight()) return 'night';
+  return MUSIC_BIOME[biomeInfo(player.x,player.y,{}).b]||'meadow';
+}
+function musicUpdate(dt){
+  let m; try{ m=musicMood(dt); }catch(e){ m=mLast; }
+  if(m!==mLast){ mLast=m; try{ Music.setTheme(m); }catch(e){} }
+}
+// musical cue when music is on, a plain sound effect otherwise
+function jingle(name,sfx){ let ok=false; try{ ok=!Music.muted&&!!SFX.ac; if(ok) Music.stinger(name); }catch(e){ ok=false; } if(!ok&&sfx) SFX.play(sfx); }
+
+// ---------- quest tracking: up to three quests shown on screen, one "followed" by the compass
+const TRACK_MAX=3;
+function activeQuests(){ return Object.keys(G.quests||{}).filter(id=>!G.quests[id].done&&QDEFS[id]); }
+function tracked(){ G.track=(G.track||[]).filter(id=>G.quests[id]&&!G.quests[id].done); return G.track; }
+function isTracked(id){ return tracked().includes(id); }
+function trackQuest(id,quiet){
+  const t=tracked().filter(q=>q!==id); t.unshift(id); G.track=t.slice(0,TRACK_MAX);
+  if(!quiet) setBanner('Tracking',QDEFS[id].title.replace('Errand: ',''),1.4);
+}
+function untrackQuest(id){ G.track=tracked().filter(q=>q!==id); if(G.focus===id) G.focus=null; }
+function toggleTrack(id){ if(isTracked(id)) untrackQuest(id); else trackQuest(id,true); }
+function followQuest(id){ G.focus=id||null; if(id&&!isTracked(id)) trackQuest(id,true); setBanner(id?'Following':'Following the story',id?QDEFS[id].title.replace('Errand: ',''):(questObjectiveWorld()||{}).text||'',1.6); }
+function cycleFocus(){
+  const list=[null].concat(tracked()); let i=list.indexOf(G.focus||null); i=(i+1)%list.length;
+  followQuest(list[i]); SFX.play('ui');
+}
+function onQuestStarted(id){ trackQuest(id,true); jingle('quest','quest'); }
+function onQuestDone(id){ untrackQuest(id); jingle('complete','upgrade'); }
+// where the compass points: the followed side quest, or the story
+function focusObjective(){
+  const id=G.focus;
+  if(id&&G.quests[id]&&!G.quests[id].done){
+    const t=questTargetOf(id);
+    if(t){
+      if(AREA&&t.x<IZX-50){ if(AREA.exit) return {title:QDEFS[id].title,text:stepText(id)+' (leave here first)',x:AREA.exit.x,y:AREA.exit.y,side:true}; }
+      return {title:QDEFS[id].title,text:stepText(id),x:t.x,y:t.y,side:true};
+    }
+  }
+  return questObjective();
+}
+
+// ---------- save slots: three journeys, each its own save; the cloud keeps all three
+const SLOT_KEYS=['eb_world3','eb_slot2','eb_slot3'];
+let curSlot=clamp(store.get('eb_cur_slot',0)|0,0,2);
+function slotRaw(i){ return store.get(SLOT_KEYS[i],null); }
+function slotSave(i){ const s=slotRaw(i); return s&&s.v===3&&!s.deleted?s:null; }
+function setSlot(i){ curSlot=clamp(i|0,0,2); store.set('eb_cur_slot',curSlot); }
+function latestSlot(){ let best=-1,bt=-1; for(let i=0;i<3;i++){ const s=slotSave(i); if(s&&(s.at||0)>bt){ bt=s.at||0; best=i; } } return best; }
+function deleteSlot(i){ store.set(SLOT_KEYS[i],{v:3,at:Date.now(),deleted:true}); try{ Cloud.queueSave(packSaves(),true); }catch(e){} }
+// the cloud blob is the newest journey at the top level (older game versions read that), with every slot in `slots`
+function packSaves(){
+  const slots=[0,1,2].map(slotRaw);
+  let top=null; for(const s of slots) if(s&&!s.deleted&&s.v===3&&(!top||(s.at||0)>(top.at||0))) top=s;
+  const at=Math.max(0,...slots.map(s=>(s&&s.at)||0));
+  return Object.assign({},top||{empty:true},{v:3,at,slots});
+}
+function unpackSaves(blob){
+  if(!blob||blob.v!==3) return [null,null,null];
+  if(Array.isArray(blob.slots)) return [0,1,2].map(i=>blob.slots[i]||null);
+  return [blob.empty?null:blob,null,null];
+}
+function fmtPlay(t){ t=Math.floor(t||0); const h=Math.floor(t/3600), m=Math.floor(t%3600/60); return h?`${h}h ${m}m`:`${m}m`; }
+function fmtAgo(at){ if(!at) return ''; const d=(Date.now()-at)/1000; if(d<90) return 'just now'; if(d<3600) return `${Math.round(d/60)} min ago`; if(d<86400) return `${Math.round(d/3600)} h ago`; const n=Math.round(d/86400); return n===1?'yesterday':`${n} days ago`; }
+function slotDetail(s){
+  const q=s.quests?Object.values(s.quests).filter(x=>x.done).length:0, pg=s.pages?Object.keys(s.pages).length:0;
+  return {head:`Level ${(s.p&&s.p.level)||1} · ${s.done?'Free roam':CHAPTER[s.stage]||'Lantern Day'}`,
+    sub:`${DIFFS[clamp(s.diff|0,0,2)].name} · ${fmtPlay(s.time)} played · ${q} quests · ${pg}/10 pages`, ago:fmtAgo(s.at)};
+}
+let slotConfirm=null;
+function openSlots(){ slotConfirm=null; renderSlots(); show('slots'); }
+function renderSlots(){
+  const el=$('#slotList'); if(!el) return;
+  el.innerHTML=[0,1,2].map(i=>{
+    const s=slotSave(i), d=s&&slotDetail(s);
+    if(slotConfirm&&slotConfirm.i===i){
+      const msg=slotConfirm.kind==='delete'?`Delete Journey ${i+1}? This can't be undone.`:`Start Journey ${i+1} over? The old one will be gone.`;
+      return `<div class="slot warn"><div class="sn">Journey ${i+1}</div><p class="sd">${msg}</p><div class="row"><button class="btn c sm hot" data-a="yes" data-i="${i}">${slotConfirm.kind==='delete'?'Yes, delete it':'Yes, start over'}</button><button class="btn c sm" data-a="no" data-i="${i}">Keep it</button></div></div>`;
+    }
+    if(!s) return `<div class="slot empty"><div class="sn">Journey ${i+1}</div><p class="sd">An empty page. A brand new story.</p><div class="row"><button class="btn c sm hot" data-a="new" data-i="${i}">Start a new journey</button></div></div>`;
+    return `<div class="slot${i===latestSlot()?' cur':''}"><div class="sn">Journey ${i+1}<span>${escapeHtml(d.ago)}</span></div><p class="sh">${escapeHtml(d.head)}</p><p class="sd">${escapeHtml(d.sub)}</p><div class="row"><button class="btn c sm hot" data-a="play" data-i="${i}">Continue</button><button class="btn c sm" data-a="over" data-i="${i}">Start over</button><button class="btn c sm" data-a="del" data-i="${i}">Delete</button></div></div>`;
+  }).join('');
+  for(const b of el.querySelectorAll('button')) b.addEventListener('click',()=>slotAction(b.dataset.a,+b.dataset.i));
+}
+function slotAction(a,i){
+  SFX.init(); SFX.play('ui');
+  if(a==='play'){ setSlot(i); startStory(true); return; }
+  if(a==='new'){ setSlot(i); startStory(false); return; }
+  if(a==='over'){ slotConfirm={i,kind:'over'}; renderSlots(); return; }
+  if(a==='del'){ slotConfirm={i,kind:'delete'}; renderSlots(); return; }
+  if(a==='no'){ slotConfirm=null; renderSlots(); return; }
+  if(a==='yes'){ const k=slotConfirm&&slotConfirm.kind; slotConfirm=null; if(k==='delete'){ deleteSlot(i); renderSlots(); refreshMenu(); } else { setSlot(i); startStory(false); } }
+}
+
+// ---------- settings screen
+let settingsFrom='menu';
+function openSettings(from){ settingsFrom=from||'menu'; renderSettings(); show('settings'); }
+function closeSettings(){ show(settingsFrom==='pause'?'pause':'menu'); if(settingsFrom==='menu') refreshMenu(); }
+function renderSettings(){
+  const seg=(id,val)=>{ for(const b of document.querySelectorAll(`#${id} button`)) b.setAttribute('aria-pressed',String(b.dataset.v===String(val))); };
+  seg('setSfx',SFX.muted?'off':'on'); seg('setMusic',Music.muted?'off':'on'); seg('setNums',settings.nums?'on':'off');
+  seg('setTouch',settings.touch); seg('setBtn',settings.btn<0.95?'s':settings.btn>1.05?'l':'m'); seg('setAuto',autoAttackOn()?'on':'off');
+}
+function applySetting(id,v){
+  if(id==='setSfx'){ if((v==='off')!==SFX.muted) toggleMute(); }
+  else if(id==='setMusic'){ if((v==='off')!==Music.muted){ Music.toggle(); if(!Music.muted){ mLast=null; } } }
+  else if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
+  else if(id==='setTouch'){ settings.touch=v; store.set('eb_touch',v); }
+  else if(id==='setBtn'){ settings.btn=v==='s'?0.88:v==='l'?1.16:1; store.set('eb_btn',settings.btn); }
+  else if(id==='setAuto'){ settings.auto=v==='on'; store.set('eb_auto',settings.auto); }
+  renderSettings(); refreshSoundLabels();
+}
+// ---------- small always-on perks from friendships
+function perkUpdate(dt){
+  if(!G||G.mode!=='story'||!player||player.dead) return;
+  if(G.flags.perk_regen&&!G.inCombat&&player.hp<player.maxHp&&G.time-player.lastHurt>4) player.hp=Math.min(player.maxHp,player.hp+dt*1.4);
+}
+
+// ================= conversations, friendship and gifts
+function shortName(id){ if(id==='shellby') return 'the old turtle'; if(id==='maren') return 'Mom'; const n=personName(id).replace(', your mom',''), w=n.split(' '); return ['Sister','Captain','Mayor','Professor','Farmer','Granny','Elder','Old','Nana'].includes(w[0])?w.slice(0,2).join(' '):w[0]; }
+const dayNow=()=>Math.floor((G.worldTime||0)/540);
+function friendOf(id){ return clamp((G.friends&&G.friends[id])||0,0,5); }
+function befriend(id,n,quiet){
+  if(!id||!CASTBY[id]||!n) return;
+  G.friends=G.friends||{}; const before=friendOf(id);
+  G.friends[id]=clamp(before+n,0,5); const after=friendOf(id);
+  const who=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id);
+  if(who&&!quiet) ftext(who.x,who.y-34,n>0?'♥':'💔','#ff8aa0',16);
+  if(Math.floor(after)>Math.floor(before)&&!quiet){ setBanner(`${personName(id).replace(', your mom','')}  ${'♥'.repeat(Math.floor(after))}${'♡'.repeat(5-Math.floor(after))}`,after>=5?'Best friends!':after>=3?'Good friends. They might share a secret.':'You are getting along.',2.2); SFX.play('quest'); }
+}
+function hearts(id){ const f=Math.floor(friendOf(id)); return '♥'.repeat(f)+'♡'.repeat(5-f); }
+function giveTalkReward(r){
+  if(!r) return;
+  const p=player;
+  if(r.coins) addCoins(r.coins,p.x,p.y);
+  if(r.dmg) p.stats.slash*=1+r.dmg;
+  if(r.crit) p.stats.slash*=1+r.crit;
+  if(r.maxhp){ p.maxHp+=r.maxhp; p.hp=p.maxHp; }
+  if(r.potmax){ p.potionsMax+=r.potmax; p.potions=p.potionsMax; }
+  if(r.stamina){ p.maxStamina+=r.stamina; p.stamina=p.maxStamina; }
+  if(r.energy){ p.maxEnergy+=r.energy; p.energy=p.maxEnergy; }
+  if(r.armor) p.stats.armor=(p.stats.armor||1)*(1-r.armor);
+  if(r.heal) p.stats.drinkMul=(p.stats.drinkMul||1)*(1+r.heal);
+  if(r.roll) p.stats.rollCost*=0.8;
+  if(r.roar) p.stats.roarRate*=1.2;
+  if(r.bless){ G.pendingBless+=r.bless; later(1.2,offerPending); }
+  if(r.lantern) G.items.lantern=1;
+  if(r.item) giveItems({[r.item]:1});
+  if(r.hat){ G.hats=G.hats||{}; G.hats[r.hat]=true; G.hat=r.hat; }
+  for(const k of ['regen','freeinn','discount','lure','snow','bog']) if(r[k]) G.flags['perk_'+k]=true;
+  if(r.reveal){ for(const k in POI) fogReveal(POI[k].x,POI[k].y,700); for(const m of CAVEMOUTHS) fogReveal(m.x,m.y,400); }
+  SFX.play('chest');
+}
+// what someone will say about the world, chosen by friendship and time
+function greetLine(id){
+  const c=CASTBY[id], f=friendOf(id), T=TALK[id]||{}, night=isNight();
+  const first=!(G.seenTalk&&G.seenTalk['met_'+id]);
+  if(first&&id!=='maren'&&id!=='yara') return c.generic?`Oh, hello! You're Ash, aren't you? I'm ${c.name}. I live just here.`:`Oh! You must be Ash, Maren's kid. I'm ${c.name}. Nice to meet you properly.`;
+  if(f>=5) return pick([`Ash! My favorite person. What do you need?`,`There's my best friend! Sit, sit.`,`You again! Good. I was hoping.`]);
+  if(f>=3) return pick([`Hello, Ash. Always nice to see you.`,`Ash! Got a minute?`,`Good to see you.`]);
+  if(night) return pick([`Out late, Ash? Keep your fire close.`,`It's late. The wolves are louder tonight.`,`Can't sleep either?`]);
+  return pick([`Hello, Ash.`,`Oh, hi Ash.`,`Morning, Ash. Or afternoon. I lose track.`,`Ash! What's new?`]);
+}
+const GENERIC_RUMORS=[
+  [`They say if you breathe fire on a snowman, something good falls out. Something orange.`,'lm_snowman'],
+  [`The old tree in Whisperwood talks. It tells riddles. Very bad riddles.`,'lm_barkley'],
+  [`Bees hate smoke. And dragons make smoke. Just saying.`,null],
+  [`Somebody buried treasure under a big X out in the wilds. More than one somebody, actually.`,'xmarks'],
+  [`There's a hot spring up in the Frostpine. Heals anything. Except bad jokes.`,'lm_spring'],
+  [`At night, a ring of mushrooms in the forest starts to glow. Step inside for luck.`,'lm_fairy'],
+  [`I heard some houses here have cellars. Old houses love secrets. Look under the rugs.`,null],
+  [`Caves have cracked walls sometimes. A good roar can bring them down.`,null],
+  [`The Wardens hid pages of their book all over the valley. Sister Wren in Brindlecross pays for them.`,null]
+];
+function markHint(h){ if(!h) return; G.hints=G.hints||{}; G.hints[h]=true; G.secrets=G.secrets||{}; }
+function giftsHeld(){ return Object.keys(GIFTS).filter(k=>(G.items[k]||0)>0); }
+function giftReact(id,item){
+  const T=TALK[id]||{}, c=CASTBY[id];
+  G.gifted=G.gifted||{}; G.gifted[id]=dayNow();
+  takeItems({[item]:1});
+  if((T.loves||[]).includes(item)){ befriend(id,1.5); return pick([`${GIFTS[item]}! How did you know? This is my favorite thing in the whole valley.`,`Oh, Ash. ${GIFTS[item]}. You remembered. I love it.`]); }
+  if((T.hates||[]).includes(item)){ befriend(id,-0.5); return pick([`Oh. ${GIFTS[item]}. That's... thank you. I'll put it somewhere. Far away.`,`A ${GIFTS[item].toLowerCase()}! I'm, um, allergic. A bit. It's the thought that counts.`]); }
+  befriend(id,c&&c.generic?0.5:0.75); return pick([`For me? Thank you, Ash. That's very kind.`,`Oh, how nice. Thank you!`,`${GIFTS[item]}? Lovely. Thank you.`]);
+}
+// the conversation menu
+function talkHub(n,pre){
+  const id=n.id, c=CASTBY[id]||SPECIAL[id]||{}, T=TALK[id]||{};
+  const lines=(pre||[]).slice();
+  G.seenTalk=G.seenTalk||{};
+  const firstMeet=!G.seenTalk['met_'+id];
+  if(!firstMeet&&G.talkDay&&G.talkDay[id]!==dayNow()) befriend(id,0.2,true);
+  G.talkDay=G.talkDay||{}; G.talkDay[id]=dayNow();
+  // friendship gifts arrive on their own
+  const f=friendOf(id);
+  if(T.secret&&f>=3&&!G.seenTalk['sec_'+id]&&(!T.need||T.need())){ G.seenTalk['sec_'+id]=1; lines.push([id,`Ash, I've been meaning to give you something. We're friends now, so.`],[id,T.secret.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.secret.reward); return true; }}); }
+  if(T.best&&f>=5&&!G.seenTalk['best_'+id]){ G.seenTalk['best_'+id]=1; lines.push([id,T.best.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.best.reward); return true; }}); }
+  const greet=greetLine(id);
+  G.seenTalk['met_'+id]=1;
+  const hub=ch(id,greet,()=>{
+    const o=[];
+    const shop=SHOPTALK[id];
+    if(shop) o.push({t:id==='marigold'?'Show me your hats':id==='tilly'||id==='hob'?'A bed, or something to eat?':'What are you selling?',tag:'shop',fn:()=>shop(n),end:true});
+    // quest step that needs more items: remind
+    for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id&&!haveAll(st.take)) o.push({t:`About ${QDEFS[qid].title.replace('Errand: ','')}...`,tag:'quest',then:[[id,`You still need: ${Object.keys(st.take||{}).map(k=>ITEM_NAMES[k]||k).join(', ')}. I'll be right here.`]],back:true}); }
+    o.push({t:'What’s new?',key:`new_${id}_${dayNow()}`,then:()=>{ const L=(c.lines&&c.lines.length)?c.lines:[`Not much. The valley's quiet. Too quiet, my gran would say.`]; const m=moodLine(id); const t=m&&n.li%3===2?m:L[n.li%L.length]; n.li=(n.li||0)+1; return [[id,t]]; },back:true});
+    if(T.chat&&!G.seenTalk['chat_'+id]&&(!T.need||T.need())) o.push({t:'You look like something’s on your mind.',tag:'new',then:()=>[ch(id,T.chat.q,T.chat.opts.map(a=>({t:a.t,tone:a.tone,fn:()=>{ G.seenTalk['chat_'+id]=1; befriend(id,a.f+(a.tone===T.chat.best?0.25:0)); },then:[[id,a.r]]})))],back:true});
+    if(T.deep&&friendOf(id)>=2) o.push({t:'Tell me about yourself.',key:'deep_'+id,then:[[id,T.deep]],back:true});
+    for(const who in (T.about||{})) o.push({t:`What about ${shortName(who)}?`,key:`ab_${id}_${who}`,then:[[id,T.about[who]]],back:true});
+    if(T.rumor&&(!T.rumor.need||T.rumor.need())) o.push({t:'Heard any rumors?',key:'rum_'+id,fn:()=>markHint(T.rumor.hint),then:[[id,T.rumor.t]],back:true});
+    if(c.generic){
+      const tie=c.lines&&c.lines[0]; if(tie) o.push({t:'Know anyone around the valley?',key:'tie_'+id,then:[[id,tie]],back:true});
+      const gr=GENERIC_RUMORS[Math.abs(hashStr(id))%GENERIC_RUMORS.length]; o.push({t:'Heard any rumors?',key:'rum_'+id,fn:()=>markHint(gr[1]),then:[[id,gr[0]]],back:true});
+    }
+    const gifts=giftsHeld();
+    if(gifts.length&&(!G.gifted||G.gifted[id]!==dayNow())&&!SPECIAL[id]) o.push({t:'I brought you something.',tag:'gift',then:()=>[ch(id,`Ooh, what is it?`,gifts.map(k=>({t:`${GIFTS[k]} (you have ${G.items[k]})`,then:()=>[[id,giftReact(id,k)]]})).concat([{t:'Never mind',then:[[id,`A mystery gift! My favorite kind. Maybe next time.`]]}]))],back:true});
+    o.push({t:'Goodbye',end:true,then:[[id,friendOf(id)>=3?pick([`See you soon, Ash.`,`Come back any time.`,`Be careful out there.`]):pick([`Bye, Ash.`,`See you.`,`Mind your tail.`])]]});
+    return o;
+  });
+  hub.again=()=>pick(['Anything else?','What else is on your mind?','Mm? Anything else?','Go on.']);
+  lines.push(hub);
+  runDialogue(lines,()=>{ scene='play'; saveGame(); });
+}
+// a tally for the journal's Secrets tab
+function secretTally(){
+  const F=G.found||{}, S=G.secrets||{};
+  const out=[['Lost pages of the Wardens’ Account',Object.keys(G.pages).length,10]];
+  if(typeof SECRET_ROOMS!=='undefined') out.push(['Secret rooms in houses',Object.keys(S).filter(k=>k.startsWith('sec_')).length,SECRET_ROOMS.length]);
+  if(typeof CAVE_SECRETS!=='undefined') out.push(['Hidden rooms in caves',Object.keys(S).filter(k=>k.startsWith('cs_')).length,CAVE_SECRETS]);
+  out.push(['Buried treasure',['x1','x2','x3'].filter(k=>F[k]).length,3]);
+  out.push(['Snowmen melted',LANDMARKS.filter(o=>o.k==='snowman'&&F[o.id]).length,LANDMARKS.filter(o=>o.k==='snowman').length]);
+  out.push(['Beehives calmed',LANDMARKS.filter(o=>o.k==='beehive'&&F[o.id]).length,LANDMARKS.filter(o=>o.k==='beehive').length]);
+  out.push(['Riddles of Old Barkley',F.barkley?1:0,1]);
+  out.push(['Fairy ring blessing',F.fairy?1:0,1]);
+  out.push(['Best friends',CAST.filter(c=>!c.generic&&friendOf(c.id)>=5).length,Object.keys(TALK).length]);
+  return out;
 }
 
 // ================= drawing: effects
@@ -7805,17 +8475,33 @@ function drawHUD(){
   ctx.strokeStyle=full?`rgb(255,${200+Math.sin(G.time*10)*40|0},90)`:'#e07a34'; ctx.beginPath(); ctx.arc(rx,ry,R,-Math.PI/2,-Math.PI/2+TAU*clamp(p.roar/100,0,1)); ctx.stroke();
   ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText('Q',rx,ry+9); }
   // quest tracker / wave info
-  let qy=T+(story?92:80);
-  const obj=questObjective();
+  let qy=T+(story?92:80); TRACK_R=null;
+  const obj=questObjective(), fo=story?focusObjective():null;
   if(obj){
-    ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(obj.title.toUpperCase(),L+2,qy);
+    const maxW=Math.min(300,W*0.5), small=H<600||W<520, sideStory=!(fo&&fo.side);
+    const txt=(t,x,y)=>{ ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(t,x,y); ctx.fillText(t,x,y); };
+    ctx.textAlign='left';
+    ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; txt((sideStory?'◆ ':'')+obj.title.toUpperCase(),L+2,qy);
     ctx.font=`500 12px ${UIF}`; ctx.fillStyle='#f2e6d4';
-    ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.strokeText(obj.title.toUpperCase(),L+2,qy); ctx.fillText(obj.title.toUpperCase(),L+2,qy); ctx.font=`500 12px ${UIF}`; ctx.fillStyle='#f2e6d4';
-    const lines=wrapText(obj.text,Math.min(300,W*0.5)); lines.forEach((l,i)=>{ ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText(l,L+2,qy+16+i*15); ctx.fillText(l,L+2,qy+16+i*15); });
+    const lines=wrapText(obj.text,maxW).slice(0,small?2:3); lines.forEach((l,i)=>txt(l,L+2,qy+16+i*15));
     let ly=qy+18+lines.length*15;
-    if(obj.x!=null){ const d=dist(p.x,p.y,obj.x,obj.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; ctx.fillText(`${Math.round(d)} m`,L+2,ly); ly+=16; }
-    const sq=G.lastQ&&G.quests[G.lastQ]&&!G.quests[G.lastQ].done?G.lastQ:Object.keys(G.quests).find(k=>!G.quests[k].done);
-    if(sq&&H>460){ ctx.font=`700 10px ${TF}`; ctx.fillStyle='#7fe0ff'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; const tt=(QDEFS[sq].errand?'ERRAND':'SIDE QUEST')+' · '+QDEFS[sq].title.replace('Errand: ','').toUpperCase(); ctx.strokeText(tt,L+2,ly+4); ctx.fillText(tt,L+2,ly+4); ctx.font=`500 11px ${UIF}`; ctx.fillStyle='#d8eef4'; const sl=wrapText(stepText(sq),Math.min(300,W*0.5)).slice(0,2); sl.forEach((l,i)=>{ ctx.strokeText(l,L+2,ly+19+i*14); ctx.fillText(l,L+2,ly+19+i*14); }); }
+    if(sideStory&&obj.x!=null){ const d=dist(p.x,p.y,obj.x,obj.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; txt(`${Math.round(d)} m`,L+2,ly); ly+=14; }
+    const tq=tracked(), room=H-ly-(usingTouch?330:120);
+    let shown=0;
+    for(const id of tq){
+      if(room<40+shown*44) break;
+      const d=QDEFS[id], foc=G.focus===id;
+      ly+=6; ctx.font=`700 10px ${TF}`; ctx.fillStyle=foc?'#ffcf7a':d.errand?'#b8e8c8':'#7fe0ff';
+      txt((foc?'◆ ':'')+(d.errand?'ERRAND · ':'')+d.title.replace('Errand: ','').toUpperCase(),L+2,ly+4);
+      ctx.font=`500 11px ${UIF}`; ctx.fillStyle=foc?'#fff0d8':'#d8eef4';
+      const sl=wrapText(stepText(id),maxW).slice(0,small?1:2); sl.forEach((l,i)=>txt(l,L+2,ly+18+i*14));
+      ly+=18+sl.length*14;
+      if(foc&&fo&&fo.x!=null){ const dd=dist(p.x,p.y,fo.x,fo.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; txt(`${Math.round(dd)} m`,L+2,ly); ly+=13; }
+      shown++;
+    }
+    const more=activeQuests().length-shown;
+    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':'(I)'}`,L+2,ly+6); ly+=14; }
+    TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
   }else if(G.mode==='normal'){
     ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`NORMAL MODE · ${G.diff.name.toUpperCase()}`,L+2,qy);
     ctx.font=`800 18px ${TF}`; ctx.fillStyle='#fff3dc'; ctx.fillText(G.wave>0?`Wave ${G.wave}`:'Get ready',L+2,qy+20);
@@ -7823,8 +8509,8 @@ function drawHUD(){
     if(G.combo>=2){ const m=comboMult(); ctx.fillStyle=m>1?'#ffcf5a':'#d8c4a4'; ctx.fillText(`${G.combo} streak${m>1?'  ×'+m:''}`,L+2,qy+57); }
   }
   // minimap + buttons
-  drawIconBtn(PAUSE_R(),'pause'); drawIconBtn(MUTE_R(),SFX.muted?'muted':'sound');
-  drawMinimap(obj);
+  drawIconBtn(PAUSE_R(),'pause'); drawIconBtn(MUTE_R(),allMuted()?'muted':'sound');
+  drawMinimap(fo||obj);
   // boss bar
   const b=G.boss;
   if(b&&!b.dead){
@@ -7841,7 +8527,7 @@ function drawHUD(){
     ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
     ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
   }
-  drawBanner(); drawTaunt(); drawCompass(obj);
+  drawBanner(); drawTaunt(); drawCompass(fo||obj);
   if(G.hintT>0&&scene==='play'){
     const a=Math.min(1,G.hintT/1.5);
     const txt=usingTouch?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the minimap for the world map':'WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · Space roll · R drink · E use · M map';
@@ -7972,56 +8658,68 @@ function showCard(num,name){
 
 // ================= dialogue
 let DLG=null;
-function runDialogue(lines,done){
+function runDialogue(lines,done,opt){
   scene='dialogue'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  DLG={lines,i:0,chars:0,shown:-1,done};
+  const cp=l=>Array.isArray(l)?l:Object.assign({},l); DLG={lines:lines.map(cp),i:0,chars:0,shown:-1,done,mood:opt&&opt.mood||null};
   $('#dlgNext').textContent=usingTouch?'Tap ▸':'Click or Space ▸';
+  try{ Music.duck(true); }catch(e){}
   show('dialogue'); setLine();
 }
-function lineParts(l){ return Array.isArray(l)?{who:l[0],text:l[1]}:l; }
+function lineParts(l){ return Array.isArray(l)?{who:l[0],text:l[1],opts:l[2]}:l; }
+function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d(); }
 function setLine(){
-  const L=lineParts(DLG.lines[DLG.i]), who=L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
+  const L=lineParts(DLG.lines[DLG.i]), who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
+  if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; }
+  if(L.mood) DLG.mood=L.mood;
+  DLG.text=String(typeof L.text==='function'?L.text():L.text);
+  if(L.skipIf&&L.skipIf()){ DLG.i++; if(DLG.i>=DLG.lines.length) endDialogue(); else setLine(); return; }
   $('#dlgWho').textContent=s.name; $('#dlgWho').style.color=s.col;
   $('#dlgBox').classList.toggle('narr',who==='narr');
   drawPortrait(who); DLG.chars=0; DLG.shown=-1; $('#dlgSay').textContent='';
   const box=$('#dlgOpts'); box.innerHTML=''; DLG.opts=null; box.hidden=true; $('#dlgNext').hidden=false;
-  if(L.opts){ DLG.opts=L.opts; }
+  if(L.opts){ let o=typeof L.opts==='function'?L.opts():L.opts; o=o.filter(q=>q&&(!q.cond||q.cond())); if(o.length) DLG.opts=o; DLG.hub=L; }
 }
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'; b.innerHTML=`<span class="k">${i+1}</span>${o.t}`; b.addEventListener('click',e=>{ e.stopPropagation(); chooseOpt(i); }); box.appendChild(b); });
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); chooseOpt(i); }); box.appendChild(b); });
   box.hidden=false; $('#dlgNext').hidden=true;
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }
 function chooseOpt(i){
   if(!DLG||!DLG.opts||!DLG.opts[i]) return;
-  const o=DLG.opts[i]; DLG.opts=null; SFX.play('ui');
-  if(o.fn) o.fn();
-  if(o.then&&o.then.length) DLG.lines=DLG.lines.slice(0,DLG.i+1).concat(o.then,DLG.lines.slice(DLG.i+1));
+  const o=DLG.opts[i], hub=DLG.hub; DLG.opts=null; SFX.play('ui');
+  if(o.key&&G){ G.seenTalk=G.seenTalk||{}; G.seenTalk[o.key]=1; }
+  const cur=DLG; if(o.fn) o.fn();
+  if(!DLG||DLG!==cur) return;
+  let then=typeof o.then==='function'?o.then():o.then; then=(then||[]).map(l=>Array.isArray(l)?l:Object.assign({},l));
+  if(o.back&&hub){ const H=Object.assign({},lineParts(hub),{_ran:true}); if(H.again) H.text=H.again; then.push(H); }
+  const rest=o.end?[]:DLG.lines.slice(DLG.i+1);
+  DLG.lines=DLG.lines.slice(0,DLG.i+1).concat(then,rest);
   DLG.i++;
-  if(DLG.i>=DLG.lines.length){ const d=DLG.done; DLG=null; hideAll(); if(d) d(); } else setLine();
+  if(DLG.i>=DLG.lines.length) endDialogue(); else setLine();
 }
 function updateDialogue(dt){
   if(!DLG) return;
-  const text=lineParts(DLG.lines[DLG.i]).text;
+  const text=DLG.text||'';
   if(DLG.opts&&DLG.chars>=text.length) showOpts();
   DLG.chars=Math.min(text.length,DLG.chars+dt*60);
   const n=Math.floor(DLG.chars); if(n!==DLG.shown){ DLG.shown=n; $('#dlgSay').textContent=text.slice(0,n); }
 }
 function advanceDialogue(){
   if(!DLG) return;
-  const text=lineParts(DLG.lines[DLG.i]).text;
+  const text=DLG.text||'';
   if(DLG.chars<text.length){ DLG.chars=text.length; return; }
   if(DLG.opts) return;
   SFX.play('ui'); DLG.i++;
-  if(DLG.i>=DLG.lines.length){ const d=DLG.done; DLG=null; hideAll(); if(d) d(); }
+  if(DLG.i>=DLG.lines.length) endDialogue();
   else setLine();
 }
 function skipDialogue(){
   if(!DLG) return;
   // skipping fast-forwards to the next choice, so you never skip a decision by accident
-  for(let i=DLG.i;i<DLG.lines.length;i++){ if(lineParts(DLG.lines[i]).opts){ if(i===DLG.i&&DLG.opts){ DLG.chars=1e9; return; } DLG.i=i; setLine(); DLG.chars=1e9; return; } }
-  const d=DLG.done; DLG=null; hideAll(); if(d) d();
+  if(DLG.opts){ DLG.chars=1e9; return; }
+  for(let i=DLG.i+1;i<DLG.lines.length;i++){ const L=lineParts(DLG.lines[i]); if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; } if(L.opts){ DLG.i=i; setLine(); if(DLG) DLG.chars=1e9; return; } }
+  endDialogue();
 }
 $('#dialogue').addEventListener('click',()=>{ SFX.init(); advanceDialogue(); });
 $('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); skipDialogue(); });
@@ -8262,15 +8960,18 @@ const Cloud=(()=>{
   return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},
     check,auth,logout,pull,push,queueSave,flush,submitScore,board,onChange:f=>listeners.add(f)};
 })();
-// merge cloud and device saves: whichever is newer wins
+// merge cloud and device saves slot by slot: whichever is newer wins (deleted slots carry a dated marker)
 async function syncSaves(){
   if(!Cloud.signedIn) return 'none';
-  let remote=null; try{ remote=await Cloud.pull(); }catch(e){ return 'offline'; }
-  const local=store.get(SAVE_KEY,null);
-  const rv=remote&&remote.v===3?remote:null, lv=local&&local.v===3?local:null;
-  if(rv&&(!lv||(rv.at||0)>(lv.at||0))){ store.set(SAVE_KEY,rv); if(scene==='menu') refreshMenu(); return 'pulled'; }
-  if(lv&&(!rv||(lv.at||0)>(rv.at||0))){ try{ await Cloud.push(lv); }catch(e){ return 'offline'; } return 'pushed'; }
-  return 'same';
+  let blob=null; try{ blob=await Cloud.pull(); }catch(e){ return 'offline'; }
+  const remote=unpackSaves(blob); let pulled=false, push=false;
+  for(let i=0;i<3;i++){
+    const L=slotRaw(i), R=remote[i], la=(L&&L.v===3&&L.at)||0, ra=(R&&R.v===3&&R.at)||0;
+    if(ra>la){ store.set(SLOT_KEYS[i],R); pulled=true; } else if(la>ra) push=true;
+  }
+  if(pulled&&scene==='menu') refreshMenu();
+  if(push){ try{ await Cloud.push(packSaves()); }catch(e){ return 'offline'; } }
+  return pulled&&push?'merged':pulled?'pulled':push?'pushed':'same';
 }
 // ---------- account panel
 let acTab='login';
@@ -8313,7 +9014,7 @@ async function acctSubmit(){
   try{
     await Cloud.auth(acTab,name,pass); $('#acPass').value='';
     const r=await syncSaves();
-    $('#acStatus').textContent=r==='pulled'?'Loaded your cloud save.':r==='pushed'?'Uploaded the save from this device.':'You are all set.';
+    $('#acStatus').textContent=r==='pulled'?'Loaded your cloud saves.':r==='pushed'?'Uploaded the saves from this device.':r==='merged'?'Synced your journeys both ways.':'You are all set.';
     SFX.play('quest');
   }catch(e){ err.textContent=e.offline?'Could not reach the server. Try again in a moment.':e.message; }
   go.disabled=false; renderAcct(); acctLabel(); refreshMenu(); loadBoard();
@@ -8322,7 +9023,7 @@ $('#acGo').addEventListener('click',acctSubmit);
 for(const id of ['#acName','#acPass']) $(id).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); acctSubmit(); } });
 for(const b of document.querySelectorAll('#acTabs button')) b.addEventListener('click',()=>{ acTab=b.dataset.t; $('#acErr').textContent=''; renderAcct(); });
 $('#acOut').addEventListener('click',async()=>{ await Cloud.logout(); $('#acStatus').textContent=''; renderAcct(); acctLabel(); });
-$('#acSync').addEventListener('click',async()=>{ const s=$('#acStatus'); s.textContent='Syncing…'; const r=await syncSaves(); s.textContent=r==='offline'?'Could not reach the server.':r==='pulled'?'Loaded your cloud save.':r==='pushed'?'Uploaded the save from this device.':'Already up to date.'; refreshMenu(); });
+$('#acSync').addEventListener('click',async()=>{ const s=$('#acStatus'); s.textContent='Syncing…'; const r=await syncSaves(); s.textContent=r==='offline'?'Could not reach the server.':r==='pulled'?'Loaded your cloud saves.':r==='pushed'?'Uploaded the saves from this device.':r==='merged'?'Synced your journeys both ways.':'Already up to date.'; refreshMenu(); });
 $('#acClose').addEventListener('click',()=>{ show('menu'); acctLabel(); });
 Cloud.onChange(acctLabel);
 
@@ -9401,24 +10102,61 @@ const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom ha
   gate:'All five Wards burn. The Obsidian Gate will open for their fire, if you can get past its guardian.',summit:'The gate is open. Your grandfather is waiting at the Throne of Cinders.',done:'Vorlaxis is quiet at last. Lantern Day will never be the same.'};
 function renderJournal(){
   const el=$('#journal'); if(!el) return;
-  const o=questObjective(), rows=[];
-  rows.push(`<div class="jh">${escapeHtml(CHAPTER[G.stage]||'')}</div><p>${escapeHtml(SO_FAR[G.stage]||'')}</p>`);
-  if(o) rows.push(`<div class="jq">◆ ${escapeHtml(o.text)}</div>`);
-  const side=[];
-  if(G.side.moss==='active') side.push(`Granny Moss wants five moonlilies from the Mirefen (${Math.min(G.lilyN,5)}/5)`); else if(G.side.moss==='done') side.push('✓ Granny Moss’s moonlilies');
-  if(G.side.duchess==='lost') side.push('Find Duchess the goat in the high snow, north of Hollis Farm'); else if(G.side.duchess==='follow') side.push('Bring Duchess home to Hollis Farm'); else if(G.side.duchess==='home') side.push('✓ Duchess is home');
-  if(G.flags.ironHint||G.tier||G.iron) side.push(`Star-iron for Mom: ${Object.keys(G.ores).length} of 3 found · blade tier ${G.tier+1}${G.iron?' · bring it to the forge':''}`);
-  if(G.flags.pip) side.push('Pip is with you. Mip!');
-  for(const id in G.quests){ const q=G.quests[id], d=QDEFS[id]; if(!q.done) side.push(`${d.errand?'Errand':'◆'} ${d.title.replace('Errand: ','')}: ${stepText(id)}`); }
-  const done=Object.keys(G.quests).filter(id=>G.quests[id].done).map(id=>QDEFS[id].title.replace('Errand: ',''));
-  if(side.length) rows.push('<div class="jh2">Side quests and errands</div><ul>'+side.map(t=>`<li>${escapeHtml(t)}</li>`).join('')+'</ul>');
-  else rows.push('<div class="jh2">Side quests</div><p>Look for people with a gold <b style="color:#ffcf4a">!</b> over their heads. Some are inside their houses. Walk up to any door and press E to go in.</p>');
-  if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${escapeHtml(done.join(' · '))}</p>`);
-  const inv=Object.keys(G.items).filter(k=>G.items[k]>0).map(k=>`${ITEM_NAMES[k]||k}${G.items[k]>1?' ×'+G.items[k]:''}`);
-  rows.push(`<div class="jh2">Satchel</div><p>${G.coins||0} coins${inv.length?' · '+escapeHtml(inv.join(' · ')):''}</p>`);
-  rows.push(`<div class="jh2">The Wardens’ Account</div><p>${Object.keys(G.pages).length} of 10 lost pages found.${Object.keys(G.pages).length?' '+escapeHtml(Object.keys(G.pages).sort().map(k=>PAGES[k].title.split(':')[1].trim()).join(' · ')):''}</p>`);
-  const seen=store.get('eb_endings',{}); const ne=Object.keys(seen).length; if(ne) rows.push(`<div class="jh2">Endings found</div><p>${ne} of 4: ${escapeHtml(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · '))}</p>`);
+  const o=questObjective(), n=activeQuests().length;
+  el.innerHTML=`<div class="jh">${escapeHtml(CHAPTER[G.stage]||'')}</div>${o?`<div class="jq">◆ ${escapeHtml(o.text)}</div>`:''}<p style="margin-top:6px">${n?`${n} side quest${n>1?'s':''} on the go. Blue diamonds on the map show where they lead.`:'No side quests yet. Look for a gold ! over people’s heads.'} Open the Journal to choose which ones to follow.</p>`;
+}
+// ---------- journal
+let jTab='quests';
+function openJournal(){
+  if(!G||G.mode!=='story'||scene!=='play') return;
+  scene='journal'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; SFX.play('ui');
+  renderJour(); show('jour');
+}
+function closeJournal(){ if(scene!=='journal') return; scene='play'; hideAll(); SFX.play('ui'); }
+function giverLine(d){ const g=d.giver; if(!g) return ''; const w=personWhere(g); return `From ${personName(g)}${w?', '+w:''}`; }
+function renderJour(){
+  for(const b of document.querySelectorAll('#jTabs button')) b.setAttribute('aria-pressed',String(b.dataset.t===jTab));
+  const el=$('#jBody'), rows=[], E=escapeHtml;
+  if(jTab==='quests'){
+    const o=questObjectiveWorld(), sf=!G.focus;
+    rows.push(`<div class="jq${sf?' foc':''}"><div class="qt">${sf?'◆ ':''}${E(CHAPTER[G.stage]||'The story')}<small>Main story</small></div><div class="qs">${E(o?o.text:'')}</div><div class="row">${sf?'<button class="btn c sm" disabled>Following</button>':'<button class="btn c sm hot" data-f="">Follow</button>'}</div></div>`);
+    const act=activeQuests(), side=act.filter(id=>!QDEFS[id].errand), err=act.filter(id=>QDEFS[id].errand);
+    const card=id=>{ const d=QDEFS[id], f=G.focus===id, t=isTracked(id);
+      return `<div class="jq${f?' foc':''}"><div class="qt">${f?'◆ ':''}${E(d.title.replace('Errand: ',''))}<small>${E(giverLine(d))}</small></div><div class="qs">${E(stepText(id))}</div><div class="row">${f?'<button class="btn c sm" disabled>Following</button>':`<button class="btn c sm hot" data-f="${id}">Follow</button>`}<button class="btn c sm" data-t="${id}">${t?'Hide from screen':'Show on screen'}</button></div></div>`; };
+    rows.push(`<div class="jh2">Side quests (${side.length})</div>`);
+    rows.push(side.length?side.map(card).join(''):'<p>Look for people with a gold <b style="color:#ffcf4a">!</b> over their heads. Some of them are inside their houses.</p>');
+    if(err.length){ rows.push(`<div class="jh2">Errands (${err.length})</div>`); rows.push(err.map(card).join('')); }
+    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':'Press T to switch which quest you follow, I to open the journal.'}</p>`);
+    const done=Object.keys(G.quests).filter(id=>G.quests[id].done&&QDEFS[id]);
+    if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${E(done.map(id=>QDEFS[id].title.replace('Errand: ','')).join(' · '))}</p>`);
+  }else if(jTab==='story'){
+    rows.push(`<div class="jh2">${E(CHAPTER[G.stage]||'')}</div><p>${E(SO_FAR[G.stage]||'')}</p>`);
+    const c=G.choices, ch=[];
+    if(c.morrow) ch.push(c.morrow==='free'?'You let High Priest Morrow go home.':'You took High Priest Morrow to the Watch House.');
+    if(c.fennick) ch.push(c.fennick==='forgive'?'You forgave Fennick Wick.':'You turned Fennick Wick in to Captain Osric.');
+    if(c.greymane) ch.push(c.greymane==='home'?'You sent Greymane home to his pack.':'Greymane promised to stand with you.');
+    if(c.cinder) ch.push(c.cinder==='rest'?'Sir Cindervane finally rests.':'Sir Cindervane will hold the stairs for you.');
+    for(const k in (G.choices.extra||{})) ch.push(G.choices.extra[k]);
+    if(ch.length) rows.push(`<div class="jh2">Choices you made</div><ul>${ch.map(t=>`<li>${E(t)}</li>`).join('')}</ul>`);
+    rows.push(`<div class="jh2">The Wardens’ Account</div><p>${Object.keys(G.pages).length} of 10 lost pages found.</p>`+Object.keys(G.pages).sort((a,b)=>+a.slice(1)-+b.slice(1)).map(k=>`<p><b style="color:var(--ink)">${E(PAGES[k].title)}</b><br>${E(PAGES[k].text.join(' '))}</p>`).join(''));
+    const seen=store.get('eb_endings',{}), ne=Object.keys(seen).length;
+    rows.push(`<div class="jh2">Endings found</div><p>${ne} of 4${ne?': '+E(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · ')):''}. Different choices lead to different endings.</p>`);
+  }else if(jTab==='people'){
+    const met=CAST.filter(c=>!c.generic&&(G.seenTalk&&G.seenTalk['met_'+c.id]));
+    rows.push(`<p>People you've met: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
+    rows.push('<div class="ppl">'+met.map(c=>{ const f=friendOf(c.id), h='♥'.repeat(Math.floor(f))+'♡'.repeat(5-Math.floor(f)); const T=TALK[c.id]||{}; return `<div><b>${E(c.name.replace(', your mom',''))}</b> <span class="hz">${h}</span><small>${E(TOWN_NAME[c.town]||'')}${T.bio?' · '+E(T.bio):''}</small></div>`; }).join('')+'</div>');
+  }else if(jTab==='bag'){
+    const inv=Object.keys(G.items).filter(k=>G.items[k]>0).map(k=>`${ITEM_NAMES[k]||k}${G.items[k]>1?' ×'+G.items[k]:''}`);
+    rows.push(`<div class="jh2">Satchel</div><p>${G.coins||0} coins</p><ul>${inv.map(t=>`<li>${E(t)}</li>`).join('')||'<li>Nothing yet</li>'}</ul>`);
+    const hats=Object.keys(G.hats||{}); if(hats.length) rows.push(`<div class="jh2">Hats</div><p>${E(hats.map(h=>(HATS.find(x=>x[0]===h)||[h,h])[1]).join(' · '))}${G.hat?' (wearing one)':''}</p>`);
+    rows.push(`<div class="jh2">Blade</div><p>Tier ${G.tier+1}. Bring star-iron to Mom at the forge to sharpen it.</p>`);
+  }else if(jTab==='secrets'){
+    const S=secretTally();
+    rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
+  }
   el.innerHTML=rows.join('');
+  for(const b of el.querySelectorAll('button[data-f]')) b.addEventListener('click',()=>{ followQuest(b.dataset.f||null); SFX.play('ui'); renderJour(); });
+  for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
 }
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
 function mapXY(x,y){ return [x/WORLD.w*mapCv.width,y/WORLD.h*mapCv.height]; }
@@ -9475,9 +10213,9 @@ function menuUpdate(dt){
   if(Math.random()<dt*0.4) SFX.play('bird',0.6);
 }
 function refreshMenu(){
-  const s=store.get(SAVE_KEY,null), cont=$('#bContinue'), sum=saveSummary(s);
-  if(sum){ cont.hidden=false; $('#contSub').textContent=sum; $('#bStory').classList.remove('hot'); $('#bStory').firstChild.textContent='New Journey'; }
-  else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#bStory').firstChild.textContent='Story Mode'; }
+  const li=latestSlot(), s=li>=0?slotSave(li):null, cont=$('#bContinue'), sum=saveSummary(s);
+  if(sum){ cont.hidden=false; $('#contSub').textContent=`Journey ${li+1} · ${sum}`; $('#bStory').classList.remove('hot'); $('#storySub').textContent='Pick a journey: three save slots.'; }
+  else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#storySub').textContent='An open world to explore. One very old grandfather.'; }
   for(const b of document.querySelectorAll('.seg button[data-d]')) b.setAttribute('aria-pressed',String(+b.dataset.d===diffIdx));
   $('#diffNote').textContent=DIFFS[diffIdx].note;
   const best=store.get('eb_best_'+diffIdx,null);
@@ -9491,18 +10229,24 @@ function toMenu(){
 let howFrom='menu';
 function openHow(from){ howFrom=from; show('how'); }
 function closeHow(){ show(howFrom==='pause'?'pause':'menu'); }
-$('#bStory').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); const s=store.get(SAVE_KEY,null); if(saveSummary(s)&&!confirmNew()) return; startStory(false); });
+$('#bStory').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSlots(); });
 let newArmed=0;
 function confirmNew(){ if(Date.now()-newArmed<4000) return true; newArmed=Date.now(); $('#bStory').firstChild.textContent='Tap again to start over'; setTimeout(()=>{ if(scene==='menu') refreshMenu(); },4000); return false; }
 $('#bAcct').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openAcct(); });
-$('#bContinue').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); startStory(true); });
+$('#bContinue').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); const li=latestSlot(); if(li<0){ openSlots(); return; } setSlot(li); startStory(true); });
 $('#bNormal').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); startNormal(); });
 for(const b of document.querySelectorAll('.seg button[data-d]')) b.addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); diffIdx=+b.dataset.d; store.set('eb_diff',diffIdx); refreshMenu(); });
 $('#bHow').addEventListener('click',()=>{ SFX.init(); openHow('menu'); });
 $('#bHowClose').addEventListener('click',closeHow);
-$('#bSound').addEventListener('click',toggleMute);
-$('#bNums').addEventListener('click',()=>{ settings.nums=!settings.nums; store.set('eb_nums',settings.nums); refreshSoundLabels(); });
-$('#bPauseSound').addEventListener('click',toggleMute);
+$('#bSettings').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSettings('menu'); });
+$('#bPauseSettings').addEventListener('click',()=>{ SFX.play('ui'); openSettings('pause'); });
+$('#bSettingsClose').addEventListener('click',()=>{ SFX.play('ui'); closeSettings(); });
+for(const id of ['setSfx','setMusic','setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
+$('#bSlotsClose').addEventListener('click',()=>{ SFX.play('ui'); show('menu'); refreshMenu(); });
+$('#bPauseJournal').addEventListener('click',()=>{ scene='play'; hideAll(); openJournal(); });
+$('#bMapJournal').addEventListener('click',()=>{ closeMap(true); openJournal(); });
+$('#bJourClose').addEventListener('click',()=>closeJournal());
+for(const b of document.querySelectorAll('#jTabs button')) b.addEventListener('click',()=>{ jTab=b.dataset.t; SFX.play('ui'); renderJour(); });
 $('#bPauseHow').addEventListener('click',()=>openHow('pause'));
 $('#bPauseMap').addEventListener('click',()=>{ scene='play'; hideAll(); openMap(); });
 $('#bResume').addEventListener('click',resumeGame);
@@ -9532,7 +10276,8 @@ function frame(now){
     else if(scene==='play'){ updateTimers(dt); if(scene==='play'){ if(G.slowT>0){ G.slowT-=dt; if(G.slowT<=0) G.timeScale=1; } update(dt*G.timeScale); } }
     else if(scene==='dying'){ dyingT-=dt; liteUpdate(dt); if(dyingT<=0) showDeath(); }
     else if(scene==='dialogue'){ updateDialogue(dt); liteUpdate(dt); }
-    else if(scene!=='paused'&&scene!=='map') liteUpdate(dt);
+    else if(scene!=='paused'&&scene!=='map'&&scene!=='journal') liteUpdate(dt);
+    musicUpdate(dt); if(scene==='play') perkUpdate(dt);
     if(!OV.done) overviewStep(scene==='menu'?14:6);
     render();
   }catch(err){ console.error(err); }
@@ -9544,7 +10289,7 @@ resize(); setupMenuScene(); refreshMenu();
 Cloud.check().then(ok=>{ if(ok&&Cloud.signedIn) syncSaves(); acctLabel(); });
 requestAnimationFrame(t=>{ last=t; frame(t); });
 window.__eb={god:false,get G(){return G;},get player(){return player;},get scene(){return scene;},
-  startStory,startNormal,skipDialogue,advanceDialogue,chooseUpgrade,toMenu,openMap,closeMap,
+  startStory,startNormal,newStory(i){ setSlot(i||0); startStory(false); },openSlots,openJournal,closeJournal,openSettings,cycleFocus,followQuest,tracked,slotSave,latestSlot,talkHub,befriend,friendOf,secretTally,get Music(){return Music;},skipDialogue,advanceDialogue,chooseUpgrade,toMenu,openMap,closeMap,
   tp(x,y){ player.x=x; player.y=y; updateCam(0,true); G.chunkBurst=16; },
   setStage(st){ G.stage=st; if(stageAt(st)>=stageAt('lanterns')) G.flags.forge=true; if(stageAt(st)>stageAt('raid')) for(const L of LANTERNS) L.lit=true; if(stageAt(st)>=stageAt('summit')){ G.flags.gate=true; GATE_COL.off=true; } setupNPCs(); },
   lightWard, wardReady(id){ G.wardReady[id]=true; }, enterArea:(id)=>{ const d=DOORS.find(q=>q.area===id); enterArea(id,d||{x:player.x,y:player.y}); }, exitArea, get AREA(){return AREA;}, DOORS, CAVEMOUTHS, LANDMARKS, QDEFS, CAST, startQuest, giveItems, npcMarker, talkTo, findPage, questPoke, lmAct, areaObjAct,

@@ -32,9 +32,11 @@ const PAUSE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+14,w:40,h:40});
 const MUTE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+60,w:40,h:40});
 const MINI_R=()=>{ const r=W<560?52:70; return {x:W-SAFE.r-68-r*2,y:SAFE.t+14,w:r*2,h:r*2,r}; };
 const inRect=(r,x,y)=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
+let TRACK_R=null;
 function hudClick(x,y){
   if(inRect(PAUSE_R(),x,y)){ pauseGame(); return true; }
-  if(inRect(MUTE_R(),x,y)){ toggleMute(); return true; }
+  if(TRACK_R&&G&&G.mode==='story'&&inRect(TRACK_R,x,y)){ openJournal(); return true; }
+  if(inRect(MUTE_R(),x,y)){ toggleAllSound(); return true; }
   if(G&&G.mode==='story'&&inRect(MINI_R(),x,y)){ openMap(); return true; }
   return false;
 }
@@ -91,14 +93,18 @@ function readInput(dt){
 }
 function onKey(e){
   const c=e.code;
-  if(c==='KeyN'&&!e.repeat&&scene!=='dialogue'){ toggleMute(); return; }
+  if(c==='KeyN'&&!e.repeat&&scene!=='dialogue'){ toggleAllSound(); return; }
   if(scene==='play'){
     if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(c)) e.preventDefault();
     if(c==='Escape'||c==='KeyP') pauseGame();
     else if((c==='KeyM'||c==='Tab')&&G.mode==='story') openMap();
+    else if(c==='KeyI'&&G.mode==='story') openJournal();
+    else if(c==='KeyT'&&G.mode==='story') cycleFocus();
     if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
+  }else if(scene==='journal'){
+    if(c==='Escape'||c==='KeyI'){ e.preventDefault(); closeJournal(); }
   }else if(scene==='paused'){
     if((c==='Escape'||c==='KeyP')&&!$('#how').classList.contains('on')){ e.preventDefault(); resumeGame(); }
     else if(c==='Escape') closeHow();

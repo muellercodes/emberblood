@@ -25,17 +25,33 @@ function drawHUD(){
   ctx.strokeStyle=full?`rgb(255,${200+Math.sin(G.time*10)*40|0},90)`:'#e07a34'; ctx.beginPath(); ctx.arc(rx,ry,R,-Math.PI/2,-Math.PI/2+TAU*clamp(p.roar/100,0,1)); ctx.stroke();
   ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText('Q',rx,ry+9); }
   // quest tracker / wave info
-  let qy=T+(story?92:80);
-  const obj=questObjective();
+  let qy=T+(story?92:80); TRACK_R=null;
+  const obj=questObjective(), fo=story?focusObjective():null;
   if(obj){
-    ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(obj.title.toUpperCase(),L+2,qy);
+    const maxW=Math.min(300,W*0.5), small=H<600||W<520, sideStory=!(fo&&fo.side);
+    const txt=(t,x,y)=>{ ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(t,x,y); ctx.fillText(t,x,y); };
+    ctx.textAlign='left';
+    ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; txt((sideStory?'◆ ':'')+obj.title.toUpperCase(),L+2,qy);
     ctx.font=`500 12px ${UIF}`; ctx.fillStyle='#f2e6d4';
-    ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.strokeText(obj.title.toUpperCase(),L+2,qy); ctx.fillText(obj.title.toUpperCase(),L+2,qy); ctx.font=`500 12px ${UIF}`; ctx.fillStyle='#f2e6d4';
-    const lines=wrapText(obj.text,Math.min(300,W*0.5)); lines.forEach((l,i)=>{ ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText(l,L+2,qy+16+i*15); ctx.fillText(l,L+2,qy+16+i*15); });
+    const lines=wrapText(obj.text,maxW).slice(0,small?2:3); lines.forEach((l,i)=>txt(l,L+2,qy+16+i*15));
     let ly=qy+18+lines.length*15;
-    if(obj.x!=null){ const d=dist(p.x,p.y,obj.x,obj.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; ctx.fillText(`${Math.round(d)} m`,L+2,ly); ly+=16; }
-    const sq=G.lastQ&&G.quests[G.lastQ]&&!G.quests[G.lastQ].done?G.lastQ:Object.keys(G.quests).find(k=>!G.quests[k].done);
-    if(sq&&H>460){ ctx.font=`700 10px ${TF}`; ctx.fillStyle='#7fe0ff'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; const tt=(QDEFS[sq].errand?'ERRAND':'SIDE QUEST')+' · '+QDEFS[sq].title.replace('Errand: ','').toUpperCase(); ctx.strokeText(tt,L+2,ly+4); ctx.fillText(tt,L+2,ly+4); ctx.font=`500 11px ${UIF}`; ctx.fillStyle='#d8eef4'; const sl=wrapText(stepText(sq),Math.min(300,W*0.5)).slice(0,2); sl.forEach((l,i)=>{ ctx.strokeText(l,L+2,ly+19+i*14); ctx.fillText(l,L+2,ly+19+i*14); }); }
+    if(sideStory&&obj.x!=null){ const d=dist(p.x,p.y,obj.x,obj.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; txt(`${Math.round(d)} m`,L+2,ly); ly+=14; }
+    const tq=tracked(), room=H-ly-(usingTouch?330:120);
+    let shown=0;
+    for(const id of tq){
+      if(room<40+shown*44) break;
+      const d=QDEFS[id], foc=G.focus===id;
+      ly+=6; ctx.font=`700 10px ${TF}`; ctx.fillStyle=foc?'#ffcf7a':d.errand?'#b8e8c8':'#7fe0ff';
+      txt((foc?'◆ ':'')+(d.errand?'ERRAND · ':'')+d.title.replace('Errand: ','').toUpperCase(),L+2,ly+4);
+      ctx.font=`500 11px ${UIF}`; ctx.fillStyle=foc?'#fff0d8':'#d8eef4';
+      const sl=wrapText(stepText(id),maxW).slice(0,small?1:2); sl.forEach((l,i)=>txt(l,L+2,ly+18+i*14));
+      ly+=18+sl.length*14;
+      if(foc&&fo&&fo.x!=null){ const dd=dist(p.x,p.y,fo.x,fo.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; txt(`${Math.round(dd)} m`,L+2,ly); ly+=13; }
+      shown++;
+    }
+    const more=activeQuests().length-shown;
+    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':'(I)'}`,L+2,ly+6); ly+=14; }
+    TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
   }else if(G.mode==='normal'){
     ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`NORMAL MODE · ${G.diff.name.toUpperCase()}`,L+2,qy);
     ctx.font=`800 18px ${TF}`; ctx.fillStyle='#fff3dc'; ctx.fillText(G.wave>0?`Wave ${G.wave}`:'Get ready',L+2,qy+20);
@@ -43,8 +59,8 @@ function drawHUD(){
     if(G.combo>=2){ const m=comboMult(); ctx.fillStyle=m>1?'#ffcf5a':'#d8c4a4'; ctx.fillText(`${G.combo} streak${m>1?'  ×'+m:''}`,L+2,qy+57); }
   }
   // minimap + buttons
-  drawIconBtn(PAUSE_R(),'pause'); drawIconBtn(MUTE_R(),SFX.muted?'muted':'sound');
-  drawMinimap(obj);
+  drawIconBtn(PAUSE_R(),'pause'); drawIconBtn(MUTE_R(),allMuted()?'muted':'sound');
+  drawMinimap(fo||obj);
   // boss bar
   const b=G.boss;
   if(b&&!b.dead){
@@ -61,7 +77,7 @@ function drawHUD(){
     ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
     ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
   }
-  drawBanner(); drawTaunt(); drawCompass(obj);
+  drawBanner(); drawTaunt(); drawCompass(fo||obj);
   if(G.hintT>0&&scene==='play'){
     const a=Math.min(1,G.hintT/1.5);
     const txt=usingTouch?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the minimap for the world map':'WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · Space roll · R drink · E use · M map';

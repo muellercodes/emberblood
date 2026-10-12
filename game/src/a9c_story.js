@@ -274,25 +274,27 @@ function openChest(c){
 }
 
 // ================= save / load (v3)
-const SAVE_KEY='eb_world3';
 function saveData(){
   return {v:3,at:Date.now(),diff:diffIdx,x:Math.round(player.x),y:Math.round(player.y),shrine:G.lastShrine,p:snapshotPlayer(),hp:Math.round(player.hp),potions:player.potions,
     stage:G.stage,flags:G.flags,wards:G.wards,ready:G.wardReady,bosses:G.bossDone,side:G.side,ores:G.ores,iron:G.iron,tier:G.tier,
     lilies:LILIES.filter(l=>l.taken).map(l=>l.id),lilyN:G.lilyN,lan:G.lanterns,qk:G.questKills,goat:G.goat?{x:Math.round(G.goat.x),y:Math.round(G.goat.y)}:null,
     shrines:G.shrines,camps:G.campsCleared,chests:G.chestsOpened,tod:G.tod,wt:G.worldTime,kills:G.kills,deaths:G.deaths,time:G.playTime,done:G.done,fog:fogStr(),pend:G.pendingBless,
-    rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared};
+    rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared,
+    rev:5,slot:curSlot,track:G.track||[],focus:G.focus||null,friends:G.friends||{},talk:G.seenTalk||{},secrets:G.secrets||{},mini:G.miniDone||{}};
 }
 function saveGame(now){
   if(!G||G.mode!=='story') return;
-  const s=saveData(); if(AREA&&G.ow){ s.x=Math.round(G.ow.x); s.y=Math.round(G.ow.y); } store.set(SAVE_KEY,s);
-  Cloud.queueSave(s,now);
+  const s=saveData(); if(AREA&&G.ow){ s.x=Math.round(G.ow.x); s.y=Math.round(G.ow.y); } store.set(SLOT_KEYS[curSlot],s);
+  Cloud.queueSave(packSaves(),now);
 }
 function loadGame(s){
   diffIdx=clamp(s.diff|0,0,2); newRun('story'); clearStatic();
   player=restorePlayer(s.p); player.x=s.x; player.y=s.y; player.hp=Math.max(1,s.hp||player.maxHp); player.hpShow=player.hp; player.potions=s.potions!=null?s.potions:player.potionsMax;
   Object.assign(G,{stage:s.stage||'wake',flags:s.flags||{},wards:s.wards||{hollow:true},wardReady:s.ready||{},bossDone:s.bosses||{},side:s.side||{},ores:s.ores||{},iron:s.iron||0,tier:s.tier||0,lilyN:s.lilyN||0,lanterns:s.lan||{},questKills:s.qk||0,
     shrines:s.shrines||{},lastShrine:s.shrine||'s_village',campsCleared:s.camps||{},chestsOpened:s.chests||{},tod:s.tod!=null?s.tod:0.32,worldTime:s.wt||0,kills:s.kills||0,deaths:s.deaths||0,playTime:s.time||0,done:!!s.done,pendingBless:s.pend||0,
-    coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{}});
+    coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{},
+    track:s.track||[],focus:s.focus||null,friends:s.friends||{},seenTalk:s.talk||{},secrets:s.secrets||{},miniDone:s.mini||{}});
+  if(!s.track){ G.track=Object.keys(G.quests).filter(k=>!G.quests[k].done).slice(-3).reverse(); }
   if(!s.rev){ if(G.side.moss==='done'&&!G.quests.moss) G.quests.moss={step:4,done:true}; if(G.side.duchess==='home'&&!G.quests.duchess) G.quests.duchess={step:4,done:true}; if(reached('warcamp')) G.flags.gateHint=true; }
   for(const c of CHESTS) c.open=!!G.chestsOpened[c.id];
   for(const L of LANTERNS) L.lit=!!G.lanterns[L.id];
@@ -305,6 +307,6 @@ function loadGame(s){
 }
 function clearStatic(){ for(const c of CHESTS) c.open=false; for(const L of LANTERNS) L.lit=false; for(const l of LILIES) l.taken=false; if(GATE_COL) GATE_COL.off=false; for(const [,a] of PROPS) for(const p of a) p.taken=false; }
 function saveSummary(s){
-  if(!s||s.v!==3) return null;
+  if(!s||s.v!==3||s.deleted) return null;
   return `Level ${(s.p&&s.p.level)||1} · ${s.done?'Free roam':CHAPTER[s.stage]||'Lantern Day'} · ${DIFFS[clamp(s.diff|0,0,2)].name}`;
 }
