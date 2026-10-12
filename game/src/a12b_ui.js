@@ -195,7 +195,7 @@ function howTabs(){
   for(const s of document.querySelectorAll('#how .hsec')) s.hidden=s.dataset.h!==howTab;
 }
 function renderHow(){
-  howTabs();
+  howTabs(); if(typeof handSync==='function') handSync();
   const hb=$('#how .hbody'); if(hb) hb.scrollTop=0;
   if(howTab!=='pad') return;
   const k=howKind||(PAD.idx>=0?PAD.kind:'xbox');
@@ -242,6 +242,40 @@ function uxSyncRows(){
     for(const b of aim.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setMouseAim(b.dataset.v==='on'); SFX.play('ui'); });
     for(const b of chars.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setChars(b.dataset.v); SFX.play('ui'); });
     uxSyncRows();
+  }catch(e){}
+})();
+// ---------- "Handed" and "Tips" (controls build), injected the same way
+// Handed: Left mirrors the touch buttons (the one-hand layout follows the hand), shows the left-handed keys and makes
+// controllers southpaw. Tips: Off hides the how-to tips and the first-play help; switching them back on brings back
+// any that were closed with their X.
+function setHand(v){
+  v=v==='left'?'left':'right'; settings.hand=v; store.set('eb_hand',v);
+  if(settings.touch&&settings.touch!=='two'&&settings.touch!==v) applySetting('setTouch',v);
+  handSync(); try{ padRenderSettings(); }catch(e){}
+  return v;
+}
+function setTips(on){ const was=settings.tips; settings.tips=!!on; store.set('eb_tips',settings.tips); if(on&&!was) tipsReset(); handSync(); return settings.tips; }
+function handSync(){
+  for(const b of document.querySelectorAll('#setHand button,#howHand button')) b.setAttribute('aria-pressed',String(b.dataset.v===settings.hand));
+  for(const b of document.querySelectorAll('#setTips button')) b.setAttribute('aria-pressed',String(b.dataset.v===(settings.tips?'on':'off')));
+  const one=$('#setTouchOne'); if(one){ one.dataset.v=settings.touch&&settings.touch!=='two'?settings.touch:settings.hand; one.setAttribute('aria-pressed',String(settings.touch===one.dataset.v)); }
+  for(const el of document.querySelectorAll('#how [data-hand]')) el.hidden=el.dataset.hand!==settings.hand;
+}
+(function handRows(){
+  try{
+    const panel=document.querySelector('#settings .panel'); if(!panel||$('#setHand')) return;
+    const mk=(html)=>{ const r=document.createElement('div'); r.className='setrow'; r.innerHTML=html; return r; };
+    const hand=mk('<span>Handed<small>Left: the touch buttons go under your left thumb, the keyboard uses the arrow keys with the mouse in your left hand, and controllers swap the sticks (southpaw).</small></span><div class="seg" id="setHand" role="group" aria-label="Handed"><button type="button" data-v="right" aria-pressed="false">Right</button><button type="button" data-v="left" aria-pressed="false">Left</button></div>');
+    const tips=mk('<span>Tips<small>How-to tips and the first-play help. Each one has an X to close it. Turning tips back on brings back the ones you closed.</small></span><div class="seg" id="setTips" role="group" aria-label="Tips"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div>');
+    const tr=$('#setTouch')&&$('#setTouch').closest('.setrow'); if(tr) tr.before(hand); else panel.appendChild(hand);
+    const ar=($('#setAim')||$('#setNums')); const arr=ar&&ar.closest('.setrow'); if(arr) arr.after(tips); else hand.before(tips);
+    for(const b of hand.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setHand(b.dataset.v); SFX.play('ui'); });
+    for(const b of tips.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setTips(b.dataset.v==='on'); SFX.play('ui'); });
+    for(const b of document.querySelectorAll('#howHand button')) b.addEventListener('click',()=>{ SFX.init(); setHand(b.dataset.v); SFX.play('ui'); });
+    // the settings screen redraws its rows when it opens or a row changes: keep these in step
+    for(const id of ['#bSettings','#bPauseSettings']){ const b=$(id); if(b) b.addEventListener('click',()=>handSync()); }
+    for(const b of document.querySelectorAll('#setTouch button')) b.addEventListener('click',()=>handSync());
+    handSync();
   }catch(e){}
 })();
 $('#bSlotsClose').addEventListener('click',()=>{ SFX.play('ui'); show('menu'); refreshMenu(); });
@@ -303,7 +337,7 @@ window.__eb={god:false,get G(){return G;},get player(){return player;},get scene
   face(a){ player.facing=a; }, WARDS, POI, LANTERNS, NPCSPOT, SITES, LILIES, ORES, bossDone(b){ G.bossDone[b]=true; }, Cloud, syncSaves, objectiveList,
   travel(id){ const s=SHRINES.find(z=>z.id===id); G.shrines[id]=true; scene='map'; travelTo(s); },
   setTime(t){ G.tod=t; }, rain(on){ G.weather.type=on?'rain':'clear'; G.weather.t=999; G.rainK=on?1:0; }};
-window.__ebX=Object.assign(window.__ebX||{},{setChars,setMouseAim,T3,readT,setBanner,taunt,bannerSkip,dlgNext,dlgChoose,dlgAskSkip,
+window.__ebX=Object.assign(window.__ebX||{},{setHand,setTips,useMode:()=>useMode(),promptKind,tipsShut:()=>Object.keys(TIPS_SHUT),atkPress:()=>ATK.press,hudHits:()=>HUD_HITS.map(h=>({x:h.x,y:h.y,w:h.w,h:h.h,tipx:!!h.tipx})),hintText:()=>hintText(),setChars,setMouseAim,T3,readT,setBanner,taunt,bannerSkip,dlgNext,dlgChoose,dlgAskSkip,
   aimInfo:()=>({facing:player.facing,goal:player.faceGoal,aim:player.aim,mouseAim:settings.mouseAim,aimMode}),
   banner:()=>G.banner?{text:G.banner.text,sub:G.banner.sub,t:G.banner.t,dur:G.banner.dur,q:(G.bannerQ||[]).map(b=>b.text)}:{q:(G.bannerQ||[]).map(b=>b.text)},
   dlgState:()=>DLG?{i:DLG.i,text:DLG.text,chars:DLG.chars,opts:!!DLG.opts,skipArm:DLG.skipArm}:null,

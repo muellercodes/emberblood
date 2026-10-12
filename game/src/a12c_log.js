@@ -2,7 +2,8 @@
 // logAdd() is called by the dialogue (lines, narration, the choice picked, and lines a skip jumps over), banners and
 // chapter cards, taunts, speech bubbles, floating hints, ability tips and controller toasts. It lives in memory
 // only (about 300 entries) and is not saved. It opens as an overlay from the dialogue box (the Log button, the
-// L key or the controller's View / Share / minus button) and from the pause menu, and as a Log tab in the Journal.
+// L key or the controller's View / Share / minus button), from the pause menu, with L during play (controls build), and
+// as a Log tab in the Journal.
 const LOG={items:[],max:300,filter:'all',from:null,focus:null,open:false,timer:0,seq:0,cur:null};
 // which entries count as Dialogue (somebody said it); everything else is a Message
 const LOG_DLG={line:1,narr:1,choice:1,taunt:1,bubble:1,sep:1};
@@ -153,7 +154,9 @@ function dlgLogLabel(dev){
 function coarsePtr(){ try{ return matchMedia('(pointer: coarse)').matches; }catch(e){ return false; } }
 // ---------- open and close (an overlay on top of the dialogue or the pause menu, which stay just as they were)
 function openLog(){
-  if(LOG.open||(scene!=='dialogue'&&scene!=='paused')) return;
+  // from a conversation, the pause menu, or (key L, controls build) straight from play: the world waits while it is open
+  if(LOG.open||(scene!=='dialogue'&&scene!=='paused'&&scene!=='play')) return;
+  if(scene==='play'){ SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; }
   LOG.from=scene; LOG.focus=document.activeElement; LOG.open=true; scene='log';
   try{ SFX.play('ui'); }catch(e){}
   LOG.filter=LOG.filter||'all';

@@ -1,14 +1,39 @@
 
 // ================= input
 const keys=new Set(), pressed=new Set();
+// keys that went down outside play (the Enter or J that closed a conversation): they do not attack until let go
+const OFFK=new Set();
 const mouse={x:0,y:0,l:false,r:false};
 const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0,fireT:0};
 // keyboard and mouse: Ash faces the way he walks and attacks lock on to a foe in front (a6b_weapons.js aimAssist).
 // Settings > "Aim with the mouse" brings back the twin-stick style where he faces the pointer.
 settings.mouseAim=store.get('eb_mouseaim',false)===true;
-addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); onKey(e); });
-addEventListener('keyup',e=>{ keys.delete(e.code); });
-addEventListener('blur',()=>{ keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
+// Settings > "Handed" (controls build). Left mirrors the touch buttons (under the left thumb, the stick on the right),
+// shows the left-handed keyboard (mouse in the left hand, the right hand on the arrows) and makes controllers southpaw.
+// The left-handed keys always work; the setting changes which keys the game shows and how controllers are laid out.
+settings.hand=store.get('eb_hand','right')==='left'?'left':'right';
+const lefty=()=>settings.hand==='left';
+// on a touch screen, even before the first touch on the game itself (a phone taps the menus, then the tip is written)
+const COARSE=(()=>{ try{ return matchMedia('(pointer: coarse)').matches; }catch(e){ return false; } })();
+const touchy=()=>usingTouch||(COARSE&&typeof PAD!=='undefined'&&PAD.dev!=='kb'&&PAD.dev!=='pad');
+// Settings > "Tips": how-to tips and the first-play help. Each one has a small X that closes it for good on this device.
+settings.tips=store.get('eb_tips',true)!==false;
+const TIPS_SHUT=(()=>{ const v=store.get('eb_tipshut',null); return v&&typeof v==='object'&&!Array.isArray(v)?v:{}; })();
+const tipsOn=()=>settings.tips;
+function tipOn(id){ return settings.tips&&!(id&&TIPS_SHUT[id]); }
+function tipShut(id){ if(id&&!TIPS_SHUT[id]){ TIPS_SHUT[id]=1; store.set('eb_tipshut',TIPS_SHUT); } try{ SFX.play('ui'); }catch(e){} }
+function tipsReset(){ for(const k in TIPS_SHUT) delete TIPS_SHUT[k]; store.set('eb_tipshut',null); }
+// the X in the corner of a canvas tip (cx,cy is its centre); taps and clicks reach fn through HUD_HITS
+function tipX(cx,cy,fn,r){
+  r=r||9; const g=ctx; g.save();
+  g.fillStyle='rgba(40,24,14,.96)'; g.strokeStyle='rgba(255,214,150,.75)'; g.lineWidth=1.2; g.beginPath(); g.arc(cx,cy,r,0,TAU); g.fill(); g.stroke();
+  const q=r*0.38; g.strokeStyle='#ffe6c0'; g.lineWidth=1.8; g.lineCap='round'; g.beginPath(); g.moveTo(cx-q,cy-q); g.lineTo(cx+q,cy+q); g.moveTo(cx+q,cy-q); g.lineTo(cx-q,cy+q); g.stroke();
+  g.restore();
+  const h=usingTouch?44:Math.max(24,r*2+8); HUD_HITS.push({x:cx-h/2,y:cy-h/2,w:h,h,fn,tipx:true});
+}
+addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); if(scene!=='play') OFFK.add(e.code); else if(!e.repeat) OFFK.delete(e.code); onKey(e); });
+addEventListener('keyup',e=>{ keys.delete(e.code); OFFK.delete(e.code); });
+addEventListener('blur',()=>{ keys.clear(); OFFK.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
 document.addEventListener('visibilitychange',()=>{ if(document.hidden&&scene==='play') pauseGame(); });
 cvs.addEventListener('mousemove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; if(!usingTouch) aimMode='mouse'; });
 cvs.addEventListener('mousedown',e=>{
@@ -20,68 +45,155 @@ cvs.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
-// touch layout. Two thumbs: SLASH in the corner, an inner ring (FIRE, JUMP, ROLL, DRINK) and an outer ring (USE, ROAR,
-// WEAPON) that climbs up on tall screens and swings left on short ones, plus a small CALL button further out.
-// One hand: columns hugging the edge, filled bottom to top, at most four buttons high and never under the HUD.
-// Every button keeps its spot when others come and go (USE only shows with a prompt, JUMP once Ash can jump,
-// WEAPON with two or more weapons, CALL with a companion), so thumbs can learn where things are.
+// touch layout (controls build). SLASH is the biggest button, right under the thumb, and it also talks, opens and
+// picks things up (it says TALK, OPEN and so on when it will). Two thumbs: JUMP, FIRE and ROLL on an inner arc around
+// SLASH, then a smaller outer arc (ROAR, WEAPON, DRINK, CALL) that climbs on tall screens and leans left on short ones.
+// One hand: columns hugging the edge, filled bottom to top. Settings > Handed: Left mirrors all of it.
+// Every button keeps its spot when others come and go (JUMP once Ash can jump, WEAPON with two or more weapons,
+// CALL with a companion), so thumbs learn where things are. Hit areas reach past the drawn circles but never overlap.
 const TBTN_LABEL={attack:'SLASH',fire:'FIRE',roll:'ROLL',roar:'ROAR',drink:'DRINK',use:'USE',weapon:'WEAPON',whistle:'CALL'};
 function jumpLabel(){ return player&&player.flying?'LAND':(hasAbil('wings')&&airborne()?'FLY':'JUMP'); }
-function tLayout(){
-  const mode=settings.touch||'two', s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1), B=H-SAFE.b, L=[];
-  const right=mode!=='left', sx=v=>right?W-SAFE.r-v:SAFE.l+v;
-  const g=G||{}, story=g.mode==='story', mr=MINI_R();
-  const has={use:!!g.prompt, jump:!!G&&(!story||hasAbil('jump')), weapon:Object.keys(g.weapons||{}).filter(k=>g.weapons[k]).length>=2, whistle:story&&!!g.comp};
-  const add=(id,x,y,r)=>{ if(id in has&&!has[id]) return; L.push({id,x,y,r,label:id==='jump'?jumpLabel():TBTN_LABEL[id]}); };
-  // keep clear of the minimap and its labels, the pause and sound buttons and the vitals panel
+const TL={key:'',all:[],out:[],side:true};
+// which side the buttons are on: true for the right edge
+function touchRight(){ const m=settings.touch||'two'; return m==='two'?!lefty():m!=='left'; }
+// the HUD a button must never sit on (fixed boxes, so buttons do not move when the HUD text changes)
+function touchKeep(){
+  const mr=MINI_R(), story=!!G&&G.mode==='story', qy=SAFE.t+14+(story?92:80);
+  return [
+    {x:mr.x-10,y:mr.y,w:mr.w+20,h:mr.h+34},                                  // minimap, its clock and the place name
+    {x:W-SAFE.r-56,y:SAFE.t+12,w:44,h:156},                                  // pause, sound, the small weapon chip under them
+    {x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:84},           // vitals
+    {x:SAFE.l+6,y:qy-12,w:Math.min(312,W*0.5+12),h:70}                       // the quest goal (or the wave and score)
+  ];
+}
+function tLayoutBuild(mode,right,s){
+  // the HUD boxes and their mirror images, so the left-handed layout is an exact mirror of the right-handed one
+  const B=H-SAFE.b, keep0=touchKeep(), keep=keep0.concat(keep0.map(R=>({x:W-R.x-R.w,y:R.y,w:R.w,h:R.h}))), P=[], gap=11*s;
+  const ex=v=>right?W-SAFE.r-v:SAFE.l+v;
   const hudFree=(x,y,r)=>{
-    if(x-r<SAFE.l+2||x+r>W-SAFE.r-2||y-r<SAFE.t+2||y+r>B-2) return false;
-    const hit=(R)=>{ const nx=clamp(x,R.x,R.x+R.w), ny=clamp(y,R.y,R.y+R.h); return Math.hypot(x-nx,y-ny)<r+6; };
-    return !hit({x:mr.x-10,y:mr.y,w:mr.w+20,h:mr.h+34})&&!hit({x:W-SAFE.r-56,y:SAFE.t+12,w:44,h:92})&&!hit({x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:84});
+    if(x-r<SAFE.l+4||x+r>W-SAFE.r-4||y-r<SAFE.t+4||y+r>B-3) return false;
+    for(const R of keep){ const nx=clamp(x,R.x,R.x+R.w), ny=clamp(y,R.y,R.y+R.h); if(Math.hypot(x-nx,y-ny)<r+7) return false; }
+    return true;
   };
+  const free=(x,y,r,extra)=>hudFree(x,y,r)&&(!extra||extra(x,y,r))&&P.every(q=>Math.hypot(x-q.x,y-q.y)>=q.r+r+gap-0.5);
   if(mode==='two'){
-    // tall screens stack the outer ring upward; short (phone landscape) screens swing it left along the bottom
-    const R1=126*s, R2=214*s, R3=292*s, top=SAFE.t+14+mr.h+34;
-    const up=B-90*s-R2-38*s>top, ax=sx(82*s), ay=B-(up?90:84)*s;
+    // the anchor: SLASH sits a thumb's width in from the corner; a little lower on short screens to leave room above
+    const short=B-SAFE.t<600, rS=54*s, ax=ex(88*s), ay=short?B-rS-14*s:B-96*s;
+    const R1=rS+(short?62:70)*s, R2=R1+80*s, R3=R2+72*s;
     const pos=(deg,rad)=>{ const a=deg*Math.PI/180; return [ax+Math.cos(a)*rad*(right?1:-1),ay+Math.sin(a)*rad]; };
-    const at=(deg,rad,id,r)=>{ const [x,y]=pos(deg,rad); add(id,x,y,r); };
-    add('attack',ax,ay,50*s);
-    if(up){
-      at(179,R1,'fire',34*s); at(214,R1,'jump',38*s); at(249,R1,'roll',31*s); at(284,R1,'drink',24*s);
-      at(221,R2,'use',35*s); at(246,R2,'roar',30*s); at(271,R2,'weapon',30*s);
-      // the companion call goes high on the arc if there is room, else under the sound button
-      let [wx,wy]=pos(256,R3); if(!hudFree(wx,wy,23*s)) [wx,wy]=pos(236,R3);
-      if(!hudFree(wx,wy,23*s)){ wx=W-SAFE.r-34; wy=SAFE.t+130; }
-      add('whistle',wx,wy,Math.min(23*s,20));
-    }else{
-      at(168,R1,'fire',34*s); at(203,R1,'jump',38*s); at(237,R1,'roll',31*s);
-      at(165,R2,'drink',24*s); at(182,R2,'roar',30*s); at(201,R2,'use',35*s);
-      at(182,R3,'weapon',30*s); at(204,R3,'whistle',23*s);
+    // keep the half of the screen the other thumb moves on clear, and the ghost stick's spot
+    const gx=right?SAFE.l+100:W-SAFE.r-100, gy=B-110;
+    const side=(x,y,r)=>(right?x-r>=W*0.3:x+r<=W*0.7)&&Math.hypot(x-gx,y-gy)>r+66;
+    P.push({id:'attack',x:ax,y:ay,r:rS});
+    // [id, radius, ring, preferred angle]: 180 is toward the middle of the screen, 270 straight up
+    // short screens (a phone on its side) fan out to the left along the bottom, tall ones climb
+    const want=short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['weapon',28,R2,207],['whistle',23,R3,185],['drink',25,R3,205]]
+                    :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['weapon',28,R2,229],['whistle',23,R2,254],['drink',25,R2,279]];
+    for(const [id,r0,ring,deg] of want){
+      const r=r0*s; let got=null;
+      for(const rad of ring===R1?[R1,R2,R3]:ring===R2?[R2,R3,R3+72*s]:[R3,R3+72*s]){
+        for(let d=0;d<=84&&!got;d+=3) for(const sg of d?[-1,1]:[1]){ const [x,y]=pos(deg+sg*d,rad); if(free(x,y,r,side)){ got={x,y}; break; } }
+        if(got) break;
+      }
+      if(!got){ const [x,y]=pos(deg,ring); got={x,y}; }
+      P.push({id,x:got.x,y:got.y,r});
     }
   }else{
-    // one hand: columns from the edge, filled bottom to top; the stick floats anywhere low that is not a button
-    const order=[['attack',40],['jump',34],['roll',31],['fire',31],['use',34],['drink',26],['roar',27],['weapon',28],['whistle',22]];
-    const colX=k=>sx((46+82*k)*s), y0=B-66*s;
-    const lim=k=>{
-      if(!right) return Math.max(B-322,SAFE.t+205);
-      const x=colX(k); if(x>mr.x-46&&x<mr.x+mr.w+46) return mr.y+mr.h+36;
-      return x>W-SAFE.r-80?SAFE.t+108:SAFE.t+40;
-    };
+    // one hand: columns from the edge, filled bottom to top (at most four high); the stick floats anywhere low that is not a button
+    const order=[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['weapon',28],['drink',26],['whistle',24]];
+    const colX=k=>ex((51+86*k)*s), y0=B-62*s, qtop=B-330;
     let k=0,j=0,y=y0,pr=0;
     for(const [id,r0] of order){
       const r=r0*s;
-      if(j>0) y-=pr+r+8*s;
-      if(j>=4||(j>0&&y-r<lim(k))){ k++; j=0; y=y0; }
-      add(id,colX(k),y,r); j++; pr=r;
+      for(let tries=0;tries<8;tries++){
+        if(j>0) y-=pr+r+gap;
+        const x=colX(k), ok=j<4&&free(x,y,r,(x2,y2,r2)=>right||y2-r2>=qtop);
+        if(ok){ P.push({id,x,y,r}); j++; pr=r; break; }
+        k++; j=0; y=y0; pr=0;
+      }
     }
   }
+  // hit areas: past the drawn circle, halfway to the nearest neighbour at most
+  for(const b of P){
+    let g2=1e9; for(const q of P) if(q!==b) g2=Math.min(g2,Math.hypot(b.x-q.x,b.y-q.y)-b.r-q.r);
+    b.hr=b.r+Math.max(4,Math.min((b.id==='attack'?22:16)*s,g2/2-1));
+  }
+  return P;
+}
+function tLayout(){
+  const mode=settings.touch||'two', right=touchRight(), s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1);
+  const key=[W,H,SAFE.l,SAFE.r,SAFE.t,SAFE.b,mode,right,s.toFixed(3),!!G&&G.mode].join('|');
+  if(TL.key!==key){ TL.key=key; TL.all=tLayoutBuild(mode,right,s); TL.side=right; }
+  const g=G||{}, story=g.mode==='story';
+  const has={jump:!!G&&(!story||hasAbil('jump')), weapon:Object.keys(g.weapons||{}).filter(k=>g.weapons[k]).length>=2, whistle:story&&!!g.comp};
+  const L=TL.out; L.length=0;
+  for(const b of TL.all){ if(b.id in has&&!has[b.id]) continue; b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; L.push(b); }
   return L;
 }
+// the highest point the buttons reach over the x range x0..x1 (the quest list on that side stops above it)
+function touchTopOver(x0,x1){ let t=H; for(const b of tLayout()) if(b.x+b.r>x0&&b.x-b.r<x1) t=Math.min(t,b.y-b.r); return t; }
 function stickZone(x,y){
   const mode=settings.touch||'two';
-  if(mode==='two') return x<W*0.58;
+  if(mode==='two') return touchRight()?x<W*0.58:x>W*0.42;
   return y>H*0.42;
 }
+// ---------- one button for attack and use (controls build)
+// When there is something to talk to, open, read, enter or pick up and no foe close by, an attack press (SLASH, J, Enter,
+// left click, the controller's attack buttons) does that instead of swinging. Foes near: attack attacks. A press that
+// started as a swing never turns into a talk, attack stays attack for 0.4 s after a swing, and a key still held from a
+// conversation or a menu does nothing until it is let go (OFFK). E, F and the controller's top button stay a dedicated use.
+const ATK={press:'',swingT:-9,g:null};
+const PROMPT_KINDS=[
+  [/^(talk|chat|ask|speak|greet)/i,'talk','TALK'],
+  [/^(open|unlock)/i,'open','OPEN'],
+  [/^read/i,'read','READ'],
+  [/^(enter|go in)/i,'enter','ENTER'],
+  [/^(leave|exit|go out)/i,'leave','LEAVE'],
+  [/^go (back )?(up|down)/i,'stairs','GO'],
+  [/^(rest|sleep|sit|nap)/i,'rest','REST'],
+  [/^(pick|take|grab|collect|gather|get|chip|dig|mine|fill)/i,'take','TAKE'],
+  [/^(fish|cast)/i,'fish','FISH'],
+  [/^(pet|hug|cuddle|feed|say hi)/i,'pet','PET'],
+  [/^help/i,'help','HELP'],
+  [/^(look|browse|examine|search|peek|check|count|sniff|rummage|inspect|watch|study|knock)/i,'look','LOOK'],
+  [/^(play|wind|ring|try)/i,'play','PLAY']
+];
+const PK_LABEL={talk:'TALK',open:'OPEN',read:'READ',enter:'ENTER',leave:'LEAVE',stairs:'GO',rest:'REST',take:'TAKE',fish:'FISH',pet:'PET',help:'HELP',look:'LOOK',play:'PLAY',use:'USE',reel:'REEL',wait:'WAIT'};
+const PK_CACHE=new Map();
+// what a prompt does, as a short word for the SLASH button: a kind set on the prompt wins, else its first words
+function promptKind(pr){
+  if(!pr) return null;
+  if(pr.kind&&PK_LABEL[pr.kind]) return {k:pr.kind,label:PK_LABEL[pr.kind]};
+  const t=String(pr.text||'').trim();
+  let r=PK_CACHE.get(t);
+  if(!r){ r={k:'use',label:'USE'}; for(const [re,k,l] of PROMPT_KINDS) if(re.test(t)){ r={k,label:l}; break; } if(PK_CACHE.size>300) PK_CACHE.clear(); PK_CACHE.set(t,r); }
+  return r;
+}
+// a foe close enough that attack should stay attack: anything angry within R, any foe right next to Ash, or a boss fight
+function foeNear(R){
+  const p=player; if(!p||!G) return false;
+  if(G.boss&&!G.boss.dead) return true;
+  for(const e of G.enemies){
+    if(e.dead||e.passive||e.frozen||e.alpha<0.3) continue;
+    const d=dist(p.x,p.y,e.x,e.y)-(e.r||0);
+    if(d<(e.aggro?R:90)) return true;
+  }
+  return false;
+}
+// what an attack press would do right now instead of attacking (null: it attacks)
+function useMode(){
+  if(scene!=='play'||!G||!player||player.dead) return null;
+  const p=player;
+  if(G.fishing) return G.inCombat?null:(G.fishing.bite>0?{k:'reel',label:'REEL',hot:true}:{k:'wait',label:'WAIT'});
+  if(!G.prompt||p.flying) return null;
+  const since=G.time-ATK.swingT;
+  if(p.swingT>0||p.ham||p.bow||p.dashT>0||(ATK.g===G&&since>=0&&since<0.4)) return null;
+  if(foeNear(220)) return null;
+  return promptKind(G.prompt);
+}
+// the left-handed keyboard (mouse in the left hand): arrows move, the action keys sit around them and the number pad
+const LEFT_KEYS={roll:['ControlRight','Numpad0'],jump:['Slash','Numpad1'],fire:['Quote','Numpad2'],drink:['Period','Numpad3'],use:['Backslash','NumpadEnter'],roar:['Semicolon'],wNext:['BracketRight'],wPrev:['BracketLeft'],whistle:['Comma']};
+const PLAY_KEYS=new Set(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab','Enter','NumpadEnter','Slash','Quote','Backslash','Semicolon','Period','Comma','BracketLeft','BracketRight','ControlRight','ShiftRight','Numpad0','Numpad1','Numpad2','Numpad3']);
 const PAUSE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+14,w:40,h:40});
 const MUTE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+60,w:40,h:40});
 const MINI_R=()=>{ const r=W<560?52:70; return {x:W-SAFE.r-68-r*2,y:SAFE.t+14,w:r*2,h:r*2,r}; };
@@ -106,7 +218,7 @@ cvs.addEventListener('touchstart',e=>{
   for(const t of e.changedTouches){
     const x=t.clientX,y=t.clientY;
     if(hudClick(x,y)) continue;
-    let hit=null, hd=1e9; for(const b of tLayout()){ const d=dist(x,y,b.x,b.y)-b.r; if(d<14&&d<hd){ hd=d; hit=b; } }
+    let hit=null, hd=1e9; for(const b of tLayout()){ const d=dist(x,y,b.x,b.y)/(b.hr||b.r+14); if(d<1&&d<hd){ hd=d; hit=b; } }
     if(hit){ touch.btn[t.identifier]=hit.id; touch.held[hit.id]=true; touch.pressed[hit.id]=true; if(hit.id==='fire'&&settings.touch!=='two') touch.fireT=1.1; }
     else if(touch.stickId===null&&stickZone(x,y)){ touch.stickId=t.identifier; touch.ox=touch.sx=x; touch.oy=touch.sy=y; touch.full=0; }
   }
@@ -144,18 +256,26 @@ function readInput(dt){
   if(touch.fireT>0) touch.fireT-=dt;
   const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5};
   let wSel=-1; for(const k in WSEL) if(pressed.has(k)) wSel=WSEL[k];
+  const K=c=>keys.has(c), P=c=>pressed.has(c), LP=a=>LEFT_KEYS[a].some(P), LH=a=>LEFT_KEYS[a].some(K), KA=c=>(K(c)||P(c))&&!OFFK.has(c);
   const o={mx,my,
-    attack:keys.has('KeyJ')||mouse.l||!!touch.held.attack||autoSwing(),
-    fire:keys.has('KeyK')||mouse.r||!!touch.held.fire||(touch.fireT>0),
-    roll:pressed.has('Space')||!!touch.pressed.roll,
-    roar:pressed.has('KeyQ')||pressed.has('KeyL')||!!touch.pressed.roar,
-    drink:pressed.has('KeyR')||!!touch.pressed.drink,
-    use:pressed.has('KeyE')||pressed.has('KeyF')||!!touch.pressed.use,
-    sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')||stickFull,
-    jump:pressed.has('KeyC')||!!touch.pressed.jump, jumpHeld:keys.has('KeyC')||!!touch.held.jump,
-    wNext:pressed.has('KeyX')||!!touch.pressed.weapon, wPrev:pressed.has('KeyZ'), wSel,
-    whistle:pressed.has('KeyG')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
+    attack:KA('KeyJ')||KA('Enter')||mouse.l||!!touch.held.attack||!!touch.pressed.attack,
+    fire:K('KeyK')||LH('fire')||mouse.r||!!touch.held.fire||(touch.fireT>0),
+    roll:P('Space')||LP('roll')||!!touch.pressed.roll,
+    roar:P('KeyQ')||LP('roar')||!!touch.pressed.roar,
+    drink:P('KeyR')||LP('drink')||!!touch.pressed.drink,
+    use:P('KeyE')||P('KeyF')||LP('use')||!!touch.pressed.use,
+    sprint:K('ShiftLeft')||K('ShiftRight')||stickFull,
+    jump:P('KeyC')||LP('jump')||!!touch.pressed.jump, jumpHeld:K('KeyC')||LH('jump')||!!touch.held.jump,
+    wNext:P('KeyX')||LP('wNext')||!!touch.pressed.weapon, wPrev:P('KeyZ')||LP('wPrev'), wSel,
+    whistle:P('KeyG')||LP('whistle')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
   padInput(o,dt);
+  // one button for attack and use: decided once, when the press starts (see useMode)
+  if(!o.attack) ATK.press='';
+  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; }
+  if(ATK.press==='use') o.attack=false;
+  const p=player;
+  if((ATK.press==='atk'&&o.attack)||(p&&(p.swingT>0||p.ham||p.bow))){ ATK.swingT=G.time; ATK.g=G; }
+  if(!o.attack&&ATK.press!=='use'&&autoSwing()) o.attack=true;
   if(o.use) bannerSkip();
   return o;
 }
@@ -163,13 +283,15 @@ function onKey(e){
   const c=e.code;
   if(c==='KeyN'&&!e.repeat&&scene!=='dialogue'){ toggleAllSound(); return; }
   if(scene==='play'){
-    if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(c)) e.preventDefault();
+    // (the left-handed keys too: in Firefox / and ' open the find bar, and Enter would press a focused button)
+    if(PLAY_KEYS.has(c)) e.preventDefault();
     if(c==='Escape'||c==='KeyP') pauseGame();
     else if((c==='KeyM'||c==='Tab')&&G.mode==='story') openMap();
     else if(c==='KeyI'&&G.mode==='story') openJournal();
     else if(c==='KeyT'&&G.mode==='story') cycleFocus();
     else if(c==='KeyU'&&G.mode==='story') openSkills();
-    if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
+    else if(c==='KeyL'&&!e.repeat) openLog();
+    if((c==='KeyJ'||c==='KeyK'||c==='Enter'||c==='Quote')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
     else if(c==='BracketLeft'||c==='BracketRight'){ e.preventDefault(); mapCycle(c==='BracketLeft'?-1:1); }
@@ -188,7 +310,7 @@ function onKey(e){
     const dn={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3}[c];
     if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); if(!e.repeat) dlgChoose(dn); return; }
     if(navKey(e)) return;
-    if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){
+    if(c==='Space'||c==='Enter'||c==='NumpadEnter'||c==='KeyJ'||c==='KeyE'){
       e.preventDefault(); if(e.repeat) return;
       const f=document.activeElement;
       if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else dlgNext();

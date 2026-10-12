@@ -16,8 +16,8 @@ function canFlyHere(){
 // what to call the jump control on this device
 function jumpCtl(){
   if(typeof padActive==='function'&&padActive()) return {k:'A',v:'press A (Cross on PlayStation)'};
-  if(usingTouch) return {k:'JUMP',v:'tap JUMP'};
-  return {k:'C',v:'press C'};
+  if(touchy()) return {k:'JUMP',v:'tap JUMP'};
+  const k=btnLabel('jump','kb')||'C'; return {k,v:'press '+k};
 }
 const capF=s=>s.charAt(0).toUpperCase()+s.slice(1);
 function mvEnsure(p){ if(p.z==null){ p.z=0; p.vz=0; p.flying=false; p.onWater=false; } if(p.flyE==null) p.flyE=flyMax(); if(p.wingO==null) p.wingO=0; }
@@ -49,7 +49,7 @@ function mvSnd(kind,v){
 function movesPre(dt,inp){
   const p=player; mvEnsure(p);
   if(!MV.late){ MV.late=true; reachLate(); }   // place things that need the finished world (a1j_quests4.js)
-  if(MV.lastG!==G){ MV.lastG=G; moveReset(p); p.flyE=flyMax(); MV.tip=null; MV.zoomK=1; if(G.mode==='normal') mvTip('Jump',`${capF(jumpCtl().v)} to jump over rocks and shockwaves.`,8); }
+  if(MV.lastG!==G){ MV.lastG=G; moveReset(p); p.flyE=flyMax(); MV.tip=null; MV.zoomK=1; if(G.mode==='normal') mvTip('Jump',`${capF(jumpCtl().v)} to jump over rocks and shockwaves.`,8,'mv_jump'); }
   // a teleport (fast travel, a door, a respawn) drops Ash out of the sky
   if(MV.lx!=null&&dist2(p.x,p.y,MV.lx,MV.ly)>420*420) moveReset(p);
   if(inp.jump) MV.jumpBuf=0.14; else MV.jumpBuf-=dt;
@@ -131,7 +131,7 @@ function movesPost(dt,ox,oy,inp){
     if(!AREA&&!G.flags.gate&&p.y<WALL_Y+170){
       const k=clamp((WALL_Y+170-p.y)/110,0,1); p.avy=Math.max(p.avy,320*k); p.y=Math.max(p.y,WALL_Y+64);
       if(Math.random()<0.6) emit(p.x+rand(-160,160),p.y-p.z-rand(20,120),1,{col:'230,236,245',glow:false,ang:Math.PI/2,spread:0.15,smin:300,smax:480,lmin:.25,lmax:.45,zmin:1,zmax:1.8,drag:0.5,alpha:0.5});
-      MV.gustT-=dt; if(MV.gustT<=0){ MV.gustT=3.5; mvSnd('gust'); ftext(p.x,p.y-p.z-34,'The Wall’s storm winds push you back!','#e6eef8',13); mvTip('The Obsidian Wall','The winds over the Wall are too strong to fly through. The gate has to open first.',5); }
+      MV.gustT-=dt; if(MV.gustT<=0){ MV.gustT=3.5; mvSnd('gust'); ftext(p.x,p.y-p.z-34,'The Wall’s storm winds push you back!','#e6eef8',13); mvTip('The Obsidian Wall','The winds over the Wall are too strong to fly through. The gate has to open first.',5,'mv_wall'); }
     }
     // wingtip embers
     MV.emberT-=dt; if(MV.emberT<=0){ MV.emberT=0.08; const s=Math.random()<0.5?-1:1, f=p.facing, lx=-14, ly=52*s; emit(p.x+Math.cos(f)*lx-Math.sin(f)*ly,p.y-p.z+Math.sin(f)*lx+Math.cos(f)*ly,1,{col:'255,170,90',smin:5,smax:25,lmin:.3,lmax:.6,zmin:1,zmax:2,drag:2,rise:-30}); }
@@ -278,25 +278,28 @@ function breathFly(dt){
     }
   }
 }
-// a tip pill that stays up long enough to read and goes in the log; the same tip again just stays up longer
-function mvTip(title,text,dur){
+// a tip pill that stays up long enough to read and goes in the log; the same tip again just stays up longer.
+// id names it for the X that closes it for good (controls build); Settings > Tips: Off keeps them all away (still logged)
+function mvTip(title,text,dur,id){
   const d=Math.max(dur||0,readT(text,4,10));
   if(MV.tip&&MV.tip.text===text){ MV.tip.dur=Math.max(MV.tip.dur,MV.tip.t+d); return; }
-  MV.tip={title,text,t:0,dur:d}; logAdd({k:'tip',text:title,sub:text,key:'tip:'+text});
+  logAdd({k:'tip',text:title,sub:text,key:'tip:'+text});
+  id=id||'mv:'+title; if(!tipOn(id)) return;
+  MV.tip={title,text,t:0,dur:d,id};
 }
 // ---------- getting a new gift (the Trials call this)
 const ABIL_INFO={
-  jump:{name:'The Ember Leap',sub:c=>`You can jump! ${capF(c.v)} to hop over fences, rocks, gaps and shockwaves.`,tip:c=>`Jump with ${c.k}. Sprint first to jump farther. Jumping over water is fine. Landing in it is not!`},
+  jump:{name:'The Ember Leap',sub:c=>`You can jump! ${capF(c.v)} to hop over fences, rocks, gaps and shockwaves.`,plain:'You can jump over fences, rocks, gaps and shockwaves!',tip:c=>`Jump with ${c.k}. Sprint first to jump farther. Jumping over water is fine. Landing in it is not!`},
   stride:{name:'The Tide Stride',sub:()=>`Your fire runs so hot the water holds you up. Walk right across rivers and lakes!`,tip:c=>`Just walk onto the water. Sprint on it to skim even faster. Islands are waiting out there.`},
-  wings:{name:'The Ember Wings',sub:c=>`You have wings! Jump, then ${c.v} again in the air to fly.`,tip:c=>`Fly: jump, then ${c.k} again in the air (or hold ${c.k}). ${c.k} once more to land. Your wings tire, so watch the wing meter.`}
+  wings:{name:'The Ember Wings',sub:c=>`You have wings! Jump, then ${c.v} again in the air to fly.`,plain:'You have wings! Now you can fly.',tip:c=>`Fly: jump, then ${c.k} again in the air (or hold ${c.k}). ${c.k} once more to land. Your wings tire, so watch the wing meter.`}
 };
 function grantAbility(id){
   G.abil=G.abil||{}; const had=!!G.abil[id]; G.abil[id]=true;
   if(had||!player) return;
   const I=ABIL_INFO[id]||{name:id,sub:()=>'New ability',tip:()=>''}, c=jumpCtl(), p=player;
-  setBanner(I.name,I.sub(c),4.2);
+  setBanner(I.name,!tipsOn()&&I.plain?I.plain:I.sub(c),4.2);
   try{ jingle('chapter','quest'); }catch(e){}
-  mvTip('New ability',I.tip(c),10);
+  mvTip('New ability',I.tip(c),10,'abil_'+id);
   flashA=0.3; flashCol='255,200,130'; shake(5);
   emit(p.x,p.y,46,{col:id==='stride'?'170,220,255':'255,200,120',ang:-Math.PI/2,spread:1.6,smin:40,smax:220,lmin:.5,lmax:1.2,zmin:1.5,zmax:3.5,rise:30});
   if(id==='wings'){ MV.showWings=3; p.flyE=flyMax(); }
@@ -437,7 +440,7 @@ function drawMoveHud(){
     // a tiny wing glyph inside
     ctx.fillStyle=low?'#ffb080':'#ffe2b0'; ctx.beginPath(); ctx.moveTo(cx-5,cy+2.5); ctx.quadraticCurveTo(cx-3,cy-5,cx+5,cy-4.5); ctx.quadraticCurveTo(cx+2,cy-2.5,cx+3.5,cy-0.5); ctx.quadraticCurveTo(cx+0.5,cy-0.5,cx+1.5,cy+2); ctx.quadraticCurveTo(cx-1.5,cy+1.2,cx-5,cy+2.5); ctx.fill();
     let hint=''; const c=jumpCtl();
-    if(p.flying){ if(MV.hover) hint='Finding a spot to land'; else if(p.gliding) hint='Gliding down'; else if(p.landing) hint='Landing'; else if(low) hint='Landing soon'; else if(MV.landHintT>0) hint=`${c.k} to land`; }
+    if(p.flying){ if(MV.hover) hint='Finding a spot to land'; else if(p.gliding) hint='Gliding down'; else if(p.landing) hint='Landing'; else if(low) hint='Landing soon'; else if(MV.landHintT>0&&tipsOn()) hint=`${c.k} to land`; }
     if(hint){ ctx.font=`700 11px ${UIF}`; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(hint,cx+R+7,cy); ctx.fillStyle='#fff1dc'; ctx.fillText(hint,cx+R+7,cy); }
     ctx.restore();
   }
@@ -448,12 +451,17 @@ function drawMoveHud(){
       ctx.save(); ctx.globalAlpha=a; ctx.textBaseline='middle';
       ctx.font=`500 13px ${UIF}`; const maxW=Math.min(520,W-60), lines=wrapText(tp.text,maxW-36).slice(0,3);
       let tw=0; for(const l of lines) tw=Math.max(tw,ctx.measureText(l).width); ctx.font=`800 10px ${UIF}`; tw=Math.max(tw,ctx.measureText(tp.title.toUpperCase()).width);
-      const bw=tw+40, bh=26+lines.length*17, bx=W/2-bw/2, by=H-SAFE.b-(usingTouch?300:(G.prompt?150:104))-bh;
+      // room on the right for the X that closes it (controls build); on touch it sits above the buttons
+      const bw=tw+62, bh=26+lines.length*17;
+      let bx=W/2-bw/2, by=H-SAFE.b-(G.prompt?150:104)-bh;
+      if(usingTouch){ const at=touchClear(bw,bh,touchBase()-40-bh/2); bx=at.x-bw/2; by=at.y-bh/2; }
+      by=Math.max(SAFE.t+110,by);
       ctx.fillStyle='rgba(14,9,6,.78)'; rr(bx,by,bw,bh,12); ctx.fill(); ctx.strokeStyle='rgba(255,190,110,.45)'; ctx.lineWidth=1.2; ctx.stroke();
       ctx.fillStyle='rgba(255,150,70,.9)'; rr(bx+10,by+9,3,bh-18,1.5); ctx.fill();
       ctx.textAlign='left'; ctx.font=`800 10px ${UIF}`; ctx.fillStyle='#ffc66a'; ctx.fillText(tp.title.toUpperCase(),bx+22,by+13);
       ctx.font=`500 13px ${UIF}`; ctx.fillStyle='#f6ead8'; lines.forEach((l,i)=>ctx.fillText(l,bx+22,by+30+i*17));
       ctx.restore();
+      if(a>0.3) tipX(bx+bw-16,by+15,()=>{ if(MV.tip===tp){ tipShut(tp.id); MV.tip=null; } },usingTouch?11:9);
     }
   }
 }

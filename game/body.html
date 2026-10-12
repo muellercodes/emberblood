@@ -32,6 +32,8 @@ body.padnav .dlg:focus{outline:none;animation:none}
 .how .hbody{max-height:min(60vh,560px);overflow-y:auto;padding-right:6px;text-align:left}
 .how .hbody h3:first-child,.how .cols h3{margin-top:4px}
 .how .hnote{font-size:13px;margin:12px 0 0}
+.handtop{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin:0 0 10px;font-size:13px;color:var(--muted)}
+.handtop .seg button{padding:6px 10px;font-size:13px}
 .padtop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 6px}
 .padtop p{margin:0!important;color:var(--ink)!important;font-size:14px}
 #howPadCv{display:block;width:100%;max-width:720px;height:auto;margin:0 auto 8px}
@@ -142,13 +144,14 @@ input{-webkit-user-select:text;user-select:text}
     <div class="seg jtabs htabs" id="howTabs" data-tabs role="group" aria-label="How to Play sections"><button type="button" data-h="keys" aria-pressed="true">Keyboard</button><button type="button" data-h="touch" aria-pressed="false">Touch</button><button type="button" data-h="pad" aria-pressed="false">Controller</button><button type="button" data-h="new" aria-pressed="false">What's new</button><button type="button" data-h="tips" aria-pressed="false">Tips</button></div>
     <div class="hbody">
       <section class="hsec" data-h="keys">
-        <div class="cols">
+        <div class="handtop"><span>Mouse in my</span><div class="seg" id="howHand" role="group" aria-label="Which hand holds the mouse"><button type="button" data-v="right" aria-pressed="true">Right hand</button><button type="button" data-v="left" aria-pressed="false">Left hand</button></div></div>
+        <div class="cols" data-hand="right">
           <div>
             <h3>Move and fight</h3>
             <div class="keys">
               <kbd>WASD / Arrows</kbd><span>Move. Ash faces the way he walks.</span>
               <kbd>Shift</kbd><span>Sprint (uses stamina)</span>
-              <kbd>Left click / J</kbd><span>Attack. Hold for a combo. Ash turns to the closest foe in front of him.</span>
+              <kbd>Left click / J</kbd><span>Attack. Hold for a combo. Ash turns to the closest foe in front of him. Next to someone or something you can use, with no foe close, it talks or opens instead.</span>
               <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter. It finds the foe in front of you too.</span>
               <kbd>Space</kbd><span>Dodge roll. Nothing hits you mid-roll.</span>
               <kbd>C</kbd><span>Jump, once Ash learns how. With wings, jump again in the air to fly.</span>
@@ -159,7 +162,7 @@ input{-webkit-user-select:text;user-select:text}
           <div>
             <h3>Everything else</h3>
             <div class="keys">
-              <kbd>E</kbd><span>Talk, open, rest at a shrine</span>
+              <kbd>E</kbd><span>Talk, open, rest at a shrine. It never swings.</span>
               <kbd>X / Z</kbd><span>Next or previous weapon</span>
               <kbd>1 to 6</kbd><span>Pick a weapon</span>
               <kbd>G</kbd><span>Call your companion</span>
@@ -167,11 +170,42 @@ input{-webkit-user-select:text;user-select:text}
               <kbd>M / Tab</kbd><span>World map and fast travel</span>
               <kbd>I</kbd><span>Journal</span>
               <kbd>T</kbd><span>Switch which quest you follow</span>
+              <kbd>L</kbd><span>The log: everything people said, and every tip</span>
               <kbd>N</kbd><span>Sound on or off</span>
               <kbd>Esc / P</kbd><span>Pause</span>
-              <kbd>L</kbd><span>In a conversation: the log of everything that was said</span>
             </div>
             <p class="hnote">In menus the arrow keys move, Enter picks and Esc goes back. Like aiming with the mouse? Turn on <b>Aim with the mouse</b> in Settings.</p>
+          </div>
+        </div>
+        <div class="cols" data-hand="left" hidden>
+          <div>
+            <h3>Move and fight</h3>
+            <div class="keys">
+              <kbd>Arrow keys</kbd><span>Move. Ash faces the way he walks.</span>
+              <kbd>Right Shift</kbd><span>Sprint (uses stamina)</span>
+              <kbd>Left click / Enter</kbd><span>Attack. Hold for a combo. Next to someone or something you can use, with no foe close, it talks or opens instead.</span>
+              <kbd>Right click / '</kbd><span>Fire breath. Uses your fire meter.</span>
+              <kbd>Right Ctrl</kbd><span>Dodge roll. Space works too.</span>
+              <kbd>/</kbd><span>Jump, once Ash learns how. With wings, jump again in the air to fly.</span>
+              <kbd>;</kbd><span>Dragon Roar, once the meter is full</span>
+              <kbd>.</kbd><span>Drink a healing draught</span>
+            </div>
+          </div>
+          <div>
+            <h3>Everything else</h3>
+            <div class="keys">
+              <kbd>\</kbd><span>Talk, open, rest at a shrine. It never swings.</span>
+              <kbd>] / [</kbd><span>Next or previous weapon</span>
+              <kbd>,</kbd><span>Call your companion</span>
+              <kbd>U</kbd><span>Skills</span>
+              <kbd>M</kbd><span>World map and fast travel</span>
+              <kbd>I</kbd><span>Journal</span>
+              <kbd>T</kbd><span>Switch which quest you follow</span>
+              <kbd>L</kbd><span>The log: everything people said, and every tip</span>
+              <kbd>N</kbd><span>Sound on or off</span>
+              <kbd>P / Esc</kbd><span>Pause</span>
+            </div>
+            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
           </div>
         </div>
       </section>
@@ -180,13 +214,12 @@ input{-webkit-user-select:text;user-select:text}
           <div>
             <h3>Two thumbs</h3>
             <ul class="tips">
-              <li>Drag on the left side to move. Push the stick all the way to sprint.</li>
-              <li><b>SLASH</b> attacks. Hold it for a combo.</li>
+              <li>Drag on the left side to move (the right side if Settings has <b>Handed: Left</b>). Push the stick all the way to sprint.</li>
+              <li><b>SLASH</b> attacks. Hold it for a combo. Next to someone or something you can use, with no foe close, it glows and says <b>TALK</b>, <b>OPEN</b>, <b>READ</b>, <b>ENTER</b> or <b>TAKE</b>. Tap it to do that.</li>
               <li><b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
               <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>ROAR</b> works when its ring is full.</li>
               <li><b>DRINK</b> heals. You can also tap the green flasks at the top.</li>
               <li><b>WEAPON</b> switches weapons once you have two or more.</li>
-              <li><b>USE</b> pops up when you can talk, open something or go inside.</li>
               <li><b>CALL</b> calls your companion.</li>
             </ul>
           </div>
@@ -196,7 +229,9 @@ input{-webkit-user-select:text;user-select:text}
               <li>Tap the minimap for the world map. Tap the quest list for the journal.</li>
               <li>Missed what someone said? Tap <b>Log</b> above the talking box. The pause menu has it too.</li>
               <li>The pause button is at the top right.</li>
+              <li>Left-handed? <b>Handed: Left</b> in Settings puts the buttons under your left thumb.</li>
               <li>One-hand mode in Settings puts every button under one thumb, and Ash swings by himself.</li>
+              <li>Tips have a little X to close them. Settings can turn tips off.</li>
               <li>Settings can make the buttons bigger or smaller.</li>
             </ul>
           </div>
@@ -211,6 +246,9 @@ input{-webkit-user-select:text;user-select:text}
       <section class="hsec" data-h="new" hidden>
         <h3>New in this version</h3>
         <ul class="tips news">
+          <li><b>One button.</b> Attack also talks, opens doors and chests and picks things up when no foe is close. On touch, SLASH says what it will do.</li>
+          <li><b>Left-handed play.</b> Settings has <b>Handed: Left</b>: mirrored touch buttons, a left-handed keyboard and southpaw controllers.</li>
+          <li><b>Tips you can close.</b> Every tip has an X, and Settings can turn them off.</li>
           <li><b>More weapons.</b> Twin daggers, a spear, a forge hammer, a boomerang and a bow. Each one fights in its own way.</li>
           <li><b>Ember's Trials.</b> Three old dungeons built long ago by Ember, one of Ash's ancestors. Each one wakes a gift in your blood.</li>
           <li><b>Jump.</b> Win it in the Trial of the Leap in Whisperwood. Hop over gaps, fences and pits.</li>
@@ -349,7 +387,7 @@ input{-webkit-user-select:text;user-select:text}
     <div class="setrow"><span>Sound effects</span><div class="seg" id="setSfx" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Music</span><div class="seg" id="setMusic" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Damage numbers</span><div class="seg" id="setNums" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
-    <div class="setrow"><span>Touch controls<small>For phones and tablets. One-hand mode puts everything under one thumb.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" aria-pressed="false">One hand: right</button><button type="button" data-v="left" aria-pressed="false">One hand: left</button></div></div>
+    <div class="setrow"><span>Touch controls<small>For phones and tablets. One hand puts every button under one thumb, on the side set by Handed.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" id="setTouchOne" aria-pressed="false">One hand</button></div></div>
     <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>
     <div class="setrow"><span>Auto-attack<small>Ash swings at enemies in reach by himself. On by default in one-hand mode.</small></span><div class="seg" id="setAuto" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div style="margin-top:16px"><button class="btn c hot" id="bSettingsClose" type="button">Done</button></div>

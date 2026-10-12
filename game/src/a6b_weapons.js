@@ -32,8 +32,9 @@ function cycleWeapon(d){
 }
 function switchTip(){
   const n=ownedWeapons().length;
-  if(usingTouch) return 'Tap the WEAPON button, or the weapon icons at the top, to switch.';
-  if(padActive()) return 'Press R1 (RB on Xbox, R on Switch) to switch weapons.';
+  if(touchy()) return 'Tap the WEAPON button, or the weapon icons at the top, to switch.';
+  if(padActive()) return `Press ${btnLabel('weapon','pad')} to switch weapons.`;
+  if(lefty()) return 'Press ] or [ to switch weapons, or tap the weapon icons at the top.';
   return `Press X to switch weapons, or the number keys 1 to ${Math.max(2,n)}.`;
 }
 function giveWeapon(id,quiet){
@@ -50,7 +51,8 @@ function weaponMoment(id,n){
   const b=G.banner;
   if(n<14&&((b&&!b.wpn&&b.dur-b.t>0.5)||(G.bannerQ&&G.bannerQ.length))){ later(0.35,()=>weaponMoment(id,n+1)); return; }
   const D=WEAPONS[id];
-  setBanner('New weapon: '+D.name,D.desc+' '+switchTip(),4.2).wpn=true;
+  setBanner('New weapon: '+D.name,D.desc,4.2).wpn=true;
+  if(ownedWeapons().length>=2) later(1.2,()=>mvTip('Switch weapons',switchTip(),8,'wpn_switch'));
   jingle('item','chest'); WS.get={id,t:0}; WS.pulse=1; shake(3);
   const p=player; emit(p.x,p.y-20,34,{col:'255,220,140',ang:-Math.PI/2,spread:1.6,smin:40,smax:190,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
 }
@@ -586,7 +588,7 @@ function drawWeaponHud(){
   if(x+cw+8<=MR.x&&!bossTop){
     wPanel(x,y,cw,chh);
     wChipIcon(x+8+big/2,y+chh/2,big,cur,pulse);
-    if(keysOn){ ctx.font=`800 8px ${UIF}`; ctx.fillStyle='rgba(20,12,6,.9)'; rr(x+5,y+4,11,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.textAlign='center'; ctx.fillText('X',x+10.5,y+10); }
+    if(keysOn){ ctx.font=`800 8px ${UIF}`; ctx.fillStyle='rgba(20,12,6,.9)'; rr(x+5,y+4,11,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.textAlign='center'; ctx.fillText(actKey('weapon'),x+10.5,y+10); }
     HUD_HITS.push({x,y,w:8+big+5,h:chh,fn:()=>cycleWeapon(1)});
     HUD_RX=x+cw+8;
     let mx=x+8+big+10;
@@ -607,8 +609,8 @@ function drawWeaponHud(){
     HUD_HITS.push({x,y,w:w2,h:h2,fn:()=>cycleWeapon(1)});
     hx=null; hy=y+h2+12;
   }
-  if(G.mode==='normal'&&G.time<16&&scene==='play'){
-    const a=clamp((16-G.time)/1.5,0,1), txt=usingTouch?'Tap a weapon to switch':padActive()?'R1 / RB: switch weapon':'Try every weapon: X or 1 to 6';
+  if(G.mode==='normal'&&G.time<16&&scene==='play'&&tipOn('wpn_try')){
+    const a=clamp((16-G.time)/1.5,0,1), txt=usingTouch?'Tap a weapon to switch':padActive()?`${btnLabel('weapon','pad')}: switch weapon`:lefty()?'Try every weapon: ] or [':'Try every weapon: X or 1 to 6';
     ctx.globalAlpha=a; ctx.font=`600 11px ${UIF}`; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.fillStyle='#ffe0b0';
     if(hx!=null){ ctx.textAlign='left'; ctx.strokeText(txt,hx+2,hy); ctx.fillText(txt,hx+2,hy); }
     else{ ctx.textAlign='right'; ctx.strokeText(txt,W-SAFE.r-14,hy); ctx.fillText(txt,W-SAFE.r-14,hy); }
