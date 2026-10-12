@@ -37,7 +37,14 @@ const CAVEMAP={
   deep:{rooms:{a:{at:[1,4],kind:'start',sign:'Here lies the Ember Deep. Whoever reads this: the Wardens left their last gift at the very top.'},b:{at:[1,3],kind:'fight',foes:[['cultist',2],['drakeling',2]]},c:{at:[0,3],kind:'maze',dark:true,reward:'key'},d:{at:[2,3],kind:'crystal',tpl:'crys2',loot:['chest']},e:{at:[1,2],kind:'blocks',tpl:'block2'},f:{at:[1,1],kind:'torches',tpl:'torch4',foes:[['slime',3]]},g:{at:[1,0],kind:'boss',boss:['knight','The Ember Knight'],foes:[['cultist',2]],loot:['relic']},h:{at:[0,1],kind:'treasure',loot:['chest','page:p10']},i:{at:[2,2],kind:'secret',loot:['coins','treat']}},
     links:[['a','b','open'],['b','c','open'],['b','d','open'],['b','e','red'],['e','f','gate:e'],['f','g','gate:f'],['f','h','lock'],['e','i','crack']]}
 };
-const CAVE_SECRETS=Object.values(CAVEMAP).reduce((n,m)=>n+Object.values(m.rooms).filter(r=>r.kind==='secret').length,0);
+// the Trials (a2h_dungeons.js) add their own maps later, so the tally is recounted after they load
+const countCaveSecrets=()=>Object.values(CAVEMAP).reduce((n,m)=>n+Object.values(m.rooms).filter(r=>r.kind==='secret').length,0);
+let CAVE_SECRETS=countCaveSecrets();
+// cell types in cave.typ: 0 floor, 1 water pool (blocks), 2 ice; the Trials add these (see a2h_dungeons.js)
+const TY={deep:3,pit:4,crumble:5,spike:6,chasm:7,current:8,basin:9,stones:10,rune:12};
+// template letters for them: w deep channel, o pit, k crumbling tile, ^ spikes, : chasm, 1-4 current (north, east, south, west),
+// h basin (water at high tide), p stepping stones (dry at high tide), g rune floor
+const TY_CH={w:3,o:4,k:5,'^':6,':':7,'1':8,'2':8,'3':8,'4':8,h:9,p:10,g:12};
 const TORCH_SYMS=['Sun','Moon','Star','Leaf'];
 const PUZZLE_KINDS={braziers:1,torches:1,blocks:1,crystal:1,dark:1,maze:1,lever:1};
 const SEAL_KINDS={braziers:1,torches:1,blocks:1,dark:1,maze:1};
@@ -46,53 +53,56 @@ const cf=(k)=>G.found[k];
 // ---------- building the grid
 function genCaveRooms(def){
   const M=CAVEMAP[def.id], rng=mulberry32(def.seed*977+5);
-  let mxMax=0,myMax=0; for(const k in M.rooms){ const [mx,my]=M.rooms[k].at; mxMax=Math.max(mxMax,mx); myMax=Math.max(myMax,my); }
+  let mxMax=0,myMax=0; for(const k in M.rooms){ const R=M.rooms[k], [mx,my]=R.at, sp=R.span||[1,1]; mxMax=Math.max(mxMax,mx+sp[0]-1); myMax=Math.max(myMax,my+sp[1]-1); }
   const w=(mxMax+1)*RSX+1, h=(myMax+1)*RSY+1;
-  const g=new Uint8Array(w*h).fill(1), typ=new Uint8Array(w*h); // typ: 0 floor, 1 water, 2 ice
+  const g=new Uint8Array(w*h).fill(1), typ=new Uint8Array(w*h), flow=new Int8Array(w*h).fill(-1); // typ: see TY; flow: current direction 0..3
   const rooms={}, marks=[];
   for(const k in M.rooms){
-    const R=Object.assign({id:k},M.rooms[k]); const [mx,my]=R.at; R.ox=mx*RSX; R.oy=my*RSY; rooms[k]=R; R.links=[];
-    let tpl=R.tpl?CAVE_TPL[R.tpl].slice():null;
+    const R=Object.assign({id:k},M.rooms[k]); const [mx,my]=R.at, sp=R.span||[1,1]; R.ox=mx*RSX; R.oy=my*RSY; R.sw=sp[0]; R.sh=sp[1]; R.iw=sp[0]*RSX-1; R.ih=sp[1]*RSY-1; rooms[k]=R; R.links=[];
+    let tpl=R.tpl?(Array.isArray(R.tpl)?R.tpl:CAVE_TPL[R.tpl]).slice():null;
     if(R.kind==='maze') tpl=mazeTpl(rng);
-    for(let r=0;r<RIH;r++) for(let c=0;c<RIW;c++){
-      const i=R.ox+1+c, j=R.oy+1+r, k2=j*w+i, ch=tpl?tpl[r][c]:'.';
+    for(let r=0;r<R.ih;r++) for(let c=0;c<R.iw;c++){
+      const i=R.ox+1+c, j=R.oy+1+r, k2=j*w+i, ch=tpl?(tpl[r]&&tpl[r][c])||'.':'.';
       if(ch==='#'){ g[k2]=1; continue; }
       g[k2]=0;
       if(ch==='~'){ g[k2]=1; typ[k2]=1; continue; }
-      if(ch==='I') typ[k2]=2;
-      if(ch!=='.'&&ch!=='I') marks.push({room:k,ch,i,j,c,r});
+      if(ch==='I'){ typ[k2]=2; continue; }
+      if(TY_CH[ch]!=null){ typ[k2]=TY_CH[ch]; if(ch>='1'&&ch<='4') flow[k2]=ch.charCodeAt(0)-49; continue; }
+      if(ch!=='.') marks.push({room:k,ch,i,j,c,r});
     }
-    if(!tpl&&R.kind!=='secret') scatterRocks(R,g,w,rng);
+    if(!tpl&&R.kind!=='secret'&&!R.trial) scatterRocks(R,g,w,rng);
   }
-  // door gaps
+  // door gaps: on the wall two rooms share (rooms can span several grid cells)
   const gaps=[];
-  M.links.forEach(([a,b,type],li)=>{
-    const A=rooms[a], B=rooms[b], vertical=A.at[0]===B.at[0];
-    const top=vertical?(A.at[1]<B.at[1]?A:B):null, left=!vertical?(A.at[0]<B.at[0]?A:B):null;
+  M.links.forEach(([a,b,type,opt],li)=>{
+    const A=rooms[a], B=rooms[b];
+    const ax0=A.at[0], ax1=ax0+A.sw-1, ay0=A.at[1], ay1=ay0+A.sh-1, bx0=B.at[0], bx1=bx0+B.sw-1, by0=B.at[1], by1=by0+B.sh-1;
+    const vertical=(ay1+1===by0||by1+1===ay0)&&Math.max(ax0,bx0)<=Math.min(ax1,bx1);
     const cells=[];
-    if(vertical){ const j=top.oy+RSY; for(let i=top.ox+7;i<=top.ox+9;i++) cells.push(j*w+i); }
-    else{ const i=left.ox+RSX; for(let j=left.oy+5;j<=left.oy+7;j++) cells.push(j*w+i); }
-    for(const k2 of cells) g[k2]=0;
-    // keep the floor right next to every door clear, so templates can never wall one in
-    for(const k2 of cells){ const ci=k2%w, cj=(k2-ci)/w; for(const [dx,dy] of vertical?[[0,-1],[0,1]]:[[-1,0],[1,0]]){ const q=(cj+dy)*w+ci+dx; if(typ[q]!==1){ g[q]=0; } } }
+    if(vertical){ const top=ay1<by0?A:B, col=opt&&opt.at!=null?opt.at:Math.max(ax0,bx0), j=(top.at[1]+top.sh)*RSY; for(let i=col*RSX+7;i<=col*RSX+9;i++) cells.push(j*w+i); }
+    else{ const left=ax1<bx0?A:B, row=opt&&opt.at!=null?opt.at:Math.max(ay0,by0), i=(left.at[0]+left.sw)*RSX; for(let j=row*RSY+5;j<=row*RSY+7;j++) cells.push(j*w+i); }
+    for(const k2 of cells){ g[k2]=0; typ[k2]=0; }
+    // keep the floor right next to every door clear, so templates can never wall one in (or put a pit there)
+    for(const k2 of cells){ const ci=k2%w, cj=(k2-ci)/w; for(const [dx,dy] of vertical?[[0,-1],[0,1]]:[[-1,0],[1,0]]){ const q=(cj+dy)*w+ci+dx; if(typ[q]!==1){ g[q]=0; if(typ[q]!==2) typ[q]=0; } } }
     const L={i:li,a,b,type,vertical,cells,cx:0,cy:0};
     const ci=cells[1]%w, cj=(cells[1]-ci)/w; L.ci=ci; L.cj=cj;
     gaps.push(L); A.links.push(L); B.links.push(L);
   });
   // the way out: the south door of the start room
   const S=Object.values(rooms).find(r=>r.kind==='start');
-  const ej=S.oy+RSY; for(let i=S.ox+7;i<=S.ox+9;i++) g[ej*w+i]=0;
-  for(let i=S.ox+7;i<=S.ox+9;i++){ g[(ej-1)*w+i]=0; }
-  return {w,h,grid:g,typ,cell:def.cell,rooms,links:gaps,marks,start:S,ex:S.ox+8,ey:ej};
+  const ej=S.oy+S.sh*RSY; for(let i=S.ox+7;i<=S.ox+9;i++){ g[ej*w+i]=0; typ[ej*w+i]=0; }
+  for(let i=S.ox+7;i<=S.ox+9;i++){ g[(ej-1)*w+i]=0; typ[(ej-1)*w+i]=0; }
+  return {w,h,grid:g,typ,flow,cell:def.cell,rooms,links:gaps,marks,start:S,ex:S.ox+8,ey:ej};
 }
 function scatterRocks(R,g,w,rng){
   // a few boulders, never on the cross-shaped lanes between doors
+  const iw=R.iw||RIW, ih=R.ih||RIH, mc=iw>>1, mr=ih>>1;
   const n=R.kind==='fight'||R.kind==='boss'?3+Math.floor(rng()*3):1+Math.floor(rng()*2);
   for(let t=0,made=0;t<40&&made<n;t++){
-    const c=1+Math.floor(rng()*(RIW-2)), r=1+Math.floor(rng()*(RIH-2));
-    if(Math.abs(c-7)<=2||Math.abs(r-5)<=2) continue;
+    const c=1+Math.floor(rng()*(iw-2)), r=1+Math.floor(rng()*(ih-2));
+    if(Math.abs(c-mc)<=2||Math.abs(r-mr)<=2) continue;
     const big=rng()<0.4;
-    for(let dy=0;dy<=(big?1:0);dy++) for(let dx=0;dx<=(big?1:0);dx++){ const cc=c+dx, rr=r+dy; if(cc>=RIW-1||rr>=RIH-1||Math.abs(cc-7)<=2||Math.abs(rr-5)<=2) continue; g[(R.oy+1+rr)*w+R.ox+1+cc]=1; }
+    for(let dy=0;dy<=(big?1:0);dy++) for(let dx=0;dx<=(big?1:0);dx++){ const cc=c+dx, rr=r+dy; if(cc>=iw-1||rr>=ih-1||Math.abs(cc-mc)<=2||Math.abs(rr-mr)<=2) continue; g[(R.oy+1+rr)*w+R.ox+1+cc]=1; }
     made++;
   }
 }
@@ -131,14 +141,18 @@ function buildCaveRooms(A,def){
     addGate(o,L.cells);
     o.prompt=()=>caveGatePrompt(o);
   }
+  // great doors and item-sealed doors in the Trials get a drawn overlay
+  if(def.trial) for(const o of A.gates) if(o.type==='boss'||o.type==='gate') A.objs.push({k:'tdoor',ref:o,x:o.x,y:o.y,id:o.id+'_d'});
   // the marks from room templates
   const byRoom={}; for(const m of c.marks) (byRoom[m.room]=byRoom[m.room]||[]).push(m);
   let torchN=0;
   for(const k in c.rooms){
-    const R=c.rooms[k], ms=byRoom[k]||[], cen=P(R.ox+8,R.oy+6); R.cx=cen.x; R.cy=cen.y; R.solved=!!cf('cv_'+def.id+'_'+k+'_solved'); R.enemies=[];
-    R.x0=x0+(R.ox+1)*cs; R.y0=y0+(R.oy+1)*cs; R.x1=R.x0+RIW*cs; R.y1=R.y0+RIH*cs;
+    const R=c.rooms[k], ms=byRoom[k]||[], mci=R.ox+1+(R.iw>>1), mcj=R.oy+1+(R.ih>>1), cen=P(mci,mcj); R.cx=cen.x; R.cy=cen.y; R.solved=!!cf('cv_'+def.id+'_'+k+'_solved'); R.enemies=[];
+    R.x0=x0+(R.ox+1)*cs; R.y0=y0+(R.oy+1)*cs; R.x1=R.x0+R.iw*cs; R.y1=R.y0+R.ih*cs;
+    if(R.kind==='free'&&!R.solved){ R.solved=true; }
     const spot=(ch)=>{ const m=ms.find(q=>q.ch===ch); return m?P(m.i,m.j):null; };
-    const freeSpot=()=>{ for(let t=0;t<80;t++){ const i=R.ox+2+Math.floor(rng()*(RIW-2)), j=R.oy+2+Math.floor(rng()*(RIH-2)); if(c.grid[j*c.w+i]===0&&!c.dyn[j*c.w+i]&&(Math.abs(i-(R.ox+8))>1||Math.abs(j-(R.oy+6))>1)) return P(i,j); } return cen; };
+    const okCell=(q)=>c.grid[q]===0&&!c.dyn[q]&&(c.typ[q]===0||c.typ[q]===2||c.typ[q]===TY.rune);
+    const freeSpot=()=>{ for(let t=0;t<80;t++){ const i=R.ox+2+Math.floor(rng()*(R.iw-2)), j=R.oy+2+Math.floor(rng()*(R.ih-2)); if(okCell(j*c.w+i)&&(Math.abs(i-mci)>1||Math.abs(j-mcj)>1)) return P(i,j); } return cen; };
     // puzzle pieces
     let symOrder=null;
     if(R.kind==='torches'){ symOrder=shuffle([0,1,2,3].slice()); R.order=symOrder; R.seq=[]; }
@@ -172,36 +186,40 @@ function buildCaveRooms(A,def){
     }
     if(R.reward==='key'){ R.keyAt=X; if(R.solved&&!cf(`cv_${def.id}_${k}_keytaken`)) spawnKey(A,def,R); }
     if(R.npc) A.npcHere={id:R.npc,x:(spot('N')||P(R.ox+8,R.oy+4)).x,y:(spot('N')||P(R.ox+8,R.oy+4)).y};
-    if(R.sign){ const p=P(R.ox+4,R.oy+9); A.objs.push({k:'csign',x:p.x,y:p.y,id:`cv_${def.id}_sign`,text:R.sign,r:12}); }
+    if(R.sign){ const p=spot('s')||P(R.ox+4,R.oy+R.ih-2); A.objs.push({k:'csign',x:p.x,y:p.y,id:`cv_${def.id}_sign_${k}`,text:R.sign,r:12}); }
+    if(R.trial) trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng);
     // decoration and pots along the walls
-    const dec=CAVE_DECOR[def.theme]||'shroom', nd=R.kind==='secret'?6:3;
-    for(let n=0;n<nd;n++){ const side=Math.floor(rng()*4); let i,j; if(side===0){ i=R.ox+1+Math.floor(rng()*RIW); j=R.oy+1; } else if(side===1){ i=R.ox+1+Math.floor(rng()*RIW); j=R.oy+RIH; } else if(side===2){ i=R.ox+1; j=R.oy+1+Math.floor(rng()*RIH); } else { i=R.ox+RIW; j=R.oy+1+Math.floor(rng()*RIH); }
-      if(c.grid[j*c.w+i]!==0||c.dyn[j*c.w+i]) continue; if(Math.abs(i-(R.ox+8))<=2||Math.abs(j-(R.oy+6))<=2) continue; const p=P(i,j);
+    const dec=CAVE_DECOR[def.theme]||'shroom', nd=R.kind==='secret'?6:R.noDecor?0:3;
+    for(let n=0;n<nd;n++){ const side=Math.floor(rng()*4); let i,j; if(side===0){ i=R.ox+1+Math.floor(rng()*R.iw); j=R.oy+1; } else if(side===1){ i=R.ox+1+Math.floor(rng()*R.iw); j=R.oy+R.ih; } else if(side===2){ i=R.ox+1; j=R.oy+1+Math.floor(rng()*R.ih); } else { i=R.ox+R.iw; j=R.oy+1+Math.floor(rng()*R.ih); }
+      if(!okCell(j*c.w+i)) continue; if(Math.abs(i-mci)<=2||Math.abs(j-mcj)<=2) continue; const p=P(i,j);
       const o={k:'decor',dk:dec,x:p.x+rand(-10,10),y:p.y+rand(-10,10),s:0.7+rng()*0.6,id:`d_${k}_${n}`}; A.objs.push(o); if(n%2===0) A.lights.push({x:o.x,y:o.y,r:dec==='lamp'?190:130,i:dec==='lamp'?0.65:0.45,tint:dec}); }
-    const np=R.kind==='secret'?2:R.kind==='start'||R.kind==='treasure'?3:1;
-    for(let n=0;n<np;n++){ const i=R.ox+(rng()<0.5?2:RIW-1), j=R.oy+(rng()<0.5?2:RIH-1); if(c.grid[j*c.w+i]!==0||c.dyn[j*c.w+i]) continue; const p=P(i,j); A.objs.push({k:rng()<0.5?'pot':'barrel',x:p.x+rand(-8,8),y:p.y+rand(-8,8),id:`bp_${k}_${n}`,breakable:true,r:14}); }
+    const np=R.noPots?0:R.kind==='secret'?2:R.kind==='start'||R.kind==='treasure'?3:1;
+    for(let n=0;n<np;n++){ const i=R.ox+(rng()<0.5?2:R.iw-1), j=R.oy+(rng()<0.5?2:R.ih-1); if(!okCell(j*c.w+i)) continue; const p=P(i,j); A.objs.push({k:rng()<0.5?'pot':'barrel',x:p.x+rand(-8,8),y:p.y+rand(-8,8),id:`bp_${k}_${n}`,breakable:true,r:14}); }
   }
   // enemies sleep in their rooms until you walk in
   const cl=G.caveCleared[def.id];
+  const okFoe=(q,type)=>{ if(c.grid[q]!==0||c.dyn[q]) return false; const t=c.typ[q]; if(EDEF[type]&&EDEF[type].swim) return t===TY.deep||t===TY.current; return t===0||t===2||t===TY.rune; };
   if(!(cl!=null&&G.worldTime-cl<420)){
     A.camp={id:'cave_'+def.id,alive:0,cave:def.id};
     for(const k in c.rooms){
       const R=c.rooms[k];
       const list=(R.foes||[]).slice(); if(R.boss) list.unshift([R.boss[0],1,true]);
-      if(R.kind==='boss'&&R.solved) continue;
+      if((R.kind==='boss'||R.kind==='miniboss')&&R.solved) continue;
+      if(R.kind==='tboss') continue;
       for(const [type,n,boss] of list) for(let q=0;q<n;q++){
-        let p=null; for(let t=0;t<60&&!p;t++){ const i=R.ox+2+Math.floor(rng()*(RIW-2)), j=R.oy+2+Math.floor(rng()*(RIH-3)); if(c.grid[j*c.w+i]===0&&!c.dyn[j*c.w+i]&&c.typ[j*c.w+i]!==1) p=P(i,j); }
+        let p=null; for(let t=0;t<60&&!p;t++){ const i=R.ox+2+Math.floor(rng()*(R.iw-2)), j=R.oy+2+Math.floor(rng()*(R.ih-3)), q2=j*c.w+i; if(okFoe(q2,type)) p=P(i,j); }
         if(!p) p={x:R.cx,y:R.cy};
-        const e=makeEnemy(type,p.x,p.y,{level:def.level+(boss?1:0),aggro:false,homeX:p.x,homeY:p.y,leash:520,camp:A.camp,face:rand(0,TAU),snowy:def.theme==='ice',elite:!!boss,hpScale:boss?2.6:undefined});
-        e.inArea=true; e.room=k; if(boss){ e.r*=1.35; e.caveBoss=R.boss[1]; e.dmg*=1.2; } R.enemies.push(e); A.camp.alive++;
+        const e=makeEnemy(type,p.x,p.y,{level:def.level+(boss?1:0),aggro:false,homeX:p.x,homeY:p.y,leash:520,camp:A.camp,face:rand(0,TAU),snowy:def.theme==='ice',elite:!!boss,hpScale:boss?2.6:undefined,tint:R.tint});
+        e.inArea=true; e.room=k; if(boss){ e.r*=EDEF[type].boss||EDEF[type].mini?1:1.35; e.caveBoss=R.boss[1]; e.dmg*=1.2; } R.enemies.push(e); A.camp.alive++;
       }
     }
   }
+  if(def.trial) A.objs.push({k:'tfx',x:0,y:0,w:1e6,id:'tfx'});
   refreshCaveGates();
   renderCaveRooms(A,def);
   A.curRoom=null;
 }
-const CAVE_DECOR={crystal:'crystal',bog:'shroom',ice:'icicle',ember:'magma',mine:'lamp',earth:'shroom'};
+const CAVE_DECOR={crystal:'crystal',bog:'shroom',ice:'icicle',ember:'magma',mine:'lamp',earth:'shroom',leap:'fern',tide:'shell',sky:'chime'};
 function spawnKey(A,def,R){ if(A.objs.some(o=>o.k==='smallkey'&&o.room===R.id)) return; const p=R.keyAt||{x:R.cx,y:R.cy}; A.objs.push({k:'smallkey',x:p.x,y:p.y,id:`cv_${def.id}_${R.id}_keytaken`,room:R.id,live:true}); }
 function caveRoomSolved(R){ return R.solved; }
 function refreshCaveGates(){
@@ -215,6 +233,7 @@ function refreshCaveGates(){
     else if(o.type==='crack') cl=!o.opened;
     else if(o.type==='red') cl=A.crys===0;
     else if(o.type==='blue') cl=A.crys===1;
+    else if(o.type==='boss'||o.type==='roots') cl=!o.opened;
     if(o.tmp) cl=true;
     // never raise a pillar or close a door on top of Ash
     if(cl&&!o.closed&&o.cells.some(k=>{ const i=k%A.cave.w, j=(k-i)/A.cave.w, x=A.x0+(i+0.5)*A.cave.cell, y=A.y0+(j+0.5)*A.cave.cell; return Math.abs(player.x-x)<A.cave.cell*0.5+player.r&&Math.abs(player.y-y)<A.cave.cell*0.5+player.r; })) cl=false;
@@ -234,7 +253,7 @@ function solveRoom(R,quiet){
 function caveRoomAt(x,y){
   const A=AREA; if(!A||!A.rooms) return null;
   const i=Math.floor((x-A.x0)/A.cave.cell), j=Math.floor((y-A.y0)/A.cave.cell);
-  for(const k in A.rooms){ const R=A.rooms[k]; if(i>R.ox&&i<=R.ox+RIW&&j>R.oy&&j<=R.oy+RIH) return R; }
+  for(const k in A.rooms){ const R=A.rooms[k]; if(i>R.ox&&i<=R.ox+R.iw&&j>R.oy&&j<=R.oy+R.ih) return R; }
   return null;
 }
 function caveInterior(R,x,y){ const A=AREA, cs=A.cave.cell; return x>R.x0+cs*0.9&&x<R.x1-cs*0.9&&y>R.y0+cs*0.9&&y<R.y1-cs*0.9; }
@@ -252,9 +271,9 @@ function updateCaveRooms(dt){
   // fights lock the doors until the room is clear
   if(R&&caveInterior(R,p.x,p.y)){
     const alive=R.enemies.filter(e=>!e.dead).length;
-    if(alive&&(R.kind==='fight'||R.kind==='boss')&&!R.locked){ R.locked=true; for(const L of R.links){ const o=A.gates.find(g=>g.link===L); if(o) o.tmp=true; } refreshCaveGates(); SFX.play('block'); }
+    if(alive&&(R.kind==='fight'||R.kind==='boss'||R.kind==='miniboss'||R.kind==='tboss'||R.lockFight)&&!R.locked){ R.locked=true; for(const L of R.links){ const o=A.gates.find(g=>g.link===L); if(o) o.tmp=true; } refreshCaveGates(); SFX.play('block'); }
   }
-  for(const k in A.rooms){ const Q=A.rooms[k]; if(Q.locked&&!Q.enemies.some(e=>!e.dead)){ Q.locked=false; for(const L of Q.links){ const o=A.gates.find(g=>g.link===L); if(o) o.tmp=false; } if(Q.kind==='boss'&&!Q.solved) solveRoom(Q,true); refreshCaveGates(); jingle('complete','upgrade'); setBanner('Room cleared','The doors swing open.',1.8); } }
+  for(const k in A.rooms){ const Q=A.rooms[k]; if(Q.locked&&!Q.enemies.some(e=>!e.dead)){ Q.locked=false; for(const L of Q.links){ const o=A.gates.find(g=>g.link===L); if(o) o.tmp=false; } if((Q.kind==='boss'||Q.kind==='miniboss'||Q.solveOnClear)&&!Q.solved) solveRoom(Q,true); refreshCaveGates(); if(Q.kind!=='tboss'){ jingle('complete','upgrade'); setBanner(Q.kind==='miniboss'?'The guardian falls':'Room cleared',Q.kind==='miniboss'?'Somewhere, a heavy door grinds open.':'The doors swing open.',1.8); } } }
   // puzzles
   for(const k in A.rooms){
     const Q=A.rooms[k]; if(Q.solved) continue;
@@ -265,6 +284,10 @@ function updateCaveRooms(dt){
   }
   // timed braziers burn out
   for(const o of A.objs) if(o.k==='brazier'&&o.timed&&o.lit&&!A.rooms[o.room].solved){ o.burn=(o.burn==null?o.timed:o.burn)-dt; if(o.burn<=0){ o.lit=false; o.burn=null; emit(o.x,o.y,10,{col:'120,120,120',glow:false,ang:-Math.PI/2,spread:0.6,smin:20,smax:50,lmin:.6,lmax:1,zmin:3,zmax:6,grow:6}); } }
+  // pools: Ash can stride or jump over them; landing in one without Water Stride puts him back on the last dry floor
+  { const c=A.cave, k=Math.floor((p.y-A.y0)/c.cell)*c.w+Math.floor((p.x-A.x0)/c.cell);
+    if(c.typ[k]===1&&c.grid[k]===1){ if(!airborne()&&!canWalkWater()&&!p.dead){ const s=A.dry||A.spawn; G.ripples.push({x:p.x,y:p.y,t:0,max:0.9,r:22,splash:true}); emit(p.x,p.y,14,{col:'180,220,255',glow:false,ang:-Math.PI/2,spread:1.3,smin:40,smax:140,lmin:.3,lmax:.6,zmin:2,zmax:4}); SFX.play('pop'); p.x=s.x; p.y=s.y; p.kvx=p.kvy=0; } }
+    else if(!airborne()&&c.grid[k]===0&&(c.typ[k]===0||c.typ[k]===2||c.typ[k]===TY.rune)) A.dry={x:p.x,y:p.y}; }
   // dark rooms swallow the light until their lamps are lit
   const dark=R&&((R.kind==='dark'||R.dark)&&!R.solved);
   A.dark=dark?0.97:def.dark; A.plr=dark?(G.items.lantern?210:150):0;
@@ -282,6 +305,7 @@ function updateCaveRooms(dt){
       saveGame();
     }
   }
+  if(def.trial) trialUpdate(dt,R);
   // the pillars and doors may have been waiting for Ash to step off them
   if(A.gates.some(o=>!o.closed&&o.k==='pillar')||A.gates.some(o=>o.tmp&&!o.closed)) refreshCaveGates();
 }
@@ -299,16 +323,18 @@ function pushBlocks(dt){
     if(b.push<0.28) continue;
     b.push=0;
     const ni=b.ci+di, nj=b.cj+dj, k=nj*c.w+ni, R=A.rooms[b.room];
-    const inRoom=ni>R.ox&&ni<=R.ox+RIW&&nj>R.oy&&nj<=R.oy+RIH;
-    if(!inRoom||c.grid[k]!==0||c.typ[k]===1||caveBlockedAt(k)||A.objs.some(o=>(o.k==='resetstone'||o.k==='cchest'||o.k==='crystal')&&Math.abs(o.x-(A.x0+(ni+0.5)*cs))<cs*0.6&&Math.abs(o.y-(A.y0+(nj+0.5)*cs))<cs*0.6)){ SFX.play('block',0.5); continue; }
+    const inRoom=ni>R.ox&&ni<=R.ox+R.iw&&nj>R.oy&&nj<=R.oy+R.ih;
+    if(inRoom&&c.grid[k]===0&&!caveBlockedAt(k)&&typeof trialBlockInto==='function'&&trialBlockInto(b,ni,nj,k)) continue;
+    if(!inRoom||c.grid[k]!==0||c.typ[k]===1||caveBlockedAt(k)||(c.typ[k]>=3&&c.typ[k]!==TY.rune)||A.objs.some(o=>(o.k==='resetstone'||o.k==='cchest'||o.k==='crystal')&&Math.abs(o.x-(A.x0+(ni+0.5)*cs))<cs*0.6&&Math.abs(o.y-(A.y0+(nj+0.5)*cs))<cs*0.6)){ SFX.play('block',0.5); continue; }
     b.fx=b.x; b.fy=b.y; b.ci=ni; b.cj=nj; b.anim=0.2; SFX.play('roll',0.7); shake(1);
   }
 }
-function resetBlocks(room){ for(const b of AREA.blocks) if(b.room===room){ b.ci=b.si; b.cj=b.sj; b.anim=0; } SFX.play('ui'); emit(player.x,player.y,10,{col:'200,220,255',smin:30,smax:90,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); }
+function resetBlocks(room){ for(const b of AREA.blocks) if(b.room===room){ b.ci=b.si; b.cj=b.sj; b.anim=0; b.sunk=false; b.sinking=false; } SFX.play('ui'); emit(player.x,player.y,10,{col:'200,220,255',smin:30,smax:90,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); }
 
 // ---------- hooks from fire, sword and roar
 function caveBreath(hit,dt){
   const A=AREA; if(!A||!A.rooms) return;
+  if(A.def.trial) trialBreath(hit,dt);
   for(const o of A.objs){
     if(o.k==='ctorch'&&!o.lit&&hit(o.x,o.y,14)){ o.lit=true; SFX.play('pickup'); const R=A.rooms[o.room]; if(R.solved) continue; R.seq.push(o.sym); const want=R.order.slice(0,R.seq.length); if(R.seq.join()!==want.join()){ setBanner('Wrong order','The flames gutter out.',1.4); SFX.play('hurt'); later(0.6,()=>{ for(const q of A.objs) if(q.k==='ctorch'&&q.room===o.room) q.lit=false; R.seq=[]; }); } else if(R.seq.length===4) solveRoom(R); else ftext(o.x,o.y-26,TORCH_SYMS[o.sym],'#ffe0a0',13); }
     if(o.k==='lamp2'&&!o.lit&&hit(o.x,o.y,14)){ o.lit=true; SFX.play('pickup'); }
@@ -318,6 +344,7 @@ function caveBreath(hit,dt){
 }
 function caveSwing(px,py,dir,range,half){
   const A=AREA; if(!A||!A.rooms) return;
+  if(A.def.trial) trialSwing(px,py,dir,range,half);
   for(const o of A.objs) if(o.k==='crystal'&&o.cd<=0&&inArcC(px,py,dir,range+10,half,{x:o.x,y:o.y,r:18})) hitCrystal(o);
 }
 function caveRoar(x,y,r){
@@ -336,6 +363,8 @@ function breakCrack(o){
 }
 function caveGatePrompt(o){
   if(o.type==='lock'&&!o.opened) return AREA.keys()>0?`Unlock the door (${AREA.keys()} small key${AREA.keys()>1?'s':''})`:'Locked. A small key would open it.';
+  if(o.type==='boss'&&!o.opened) return G.found['bkey_'+AREA.def.id]?'Open the great door with the Guardian Key':'Look at the great door';
+  if(o.type==='roots'&&!o.opened) return 'Look at the roots';
   if(o.type==='crack'&&!o.opened) return 'Look at the cracked wall';
   if(o.type==='gate'&&o.closed&&!o.tmp) return 'Look at the sealed door';
   if((o.type==='red'||o.type==='blue')&&o.closed) return 'Look at the pillars';
@@ -343,10 +372,13 @@ function caveGatePrompt(o){
 }
 function caveObjAct(o){
   const A=AREA, say=(t)=>runDialogue([['narr',t]],()=>{ scene='play'; saveGame(); });
+  if(o.tobj) return trialObjAct(o);
   if(o.k==='cgate'){
+    if(o.type==='boss'&&!o.opened){ if(G.found['bkey_'+A.def.id]){ o.opened=true; G.found[o.id]=true; refreshCaveGates(); jingle('secret','chest'); shake(6); setBanner('The great door opens','Something enormous is waiting inside.',2.4); saveGame(); } else say(`A great door, carved with the face of a sleeping dragon. Its lock is shaped like a flame. The Guardian Key for it is hidden somewhere in this Trial.`); return true; }
+    if(o.type==='roots'&&!o.opened){ say(`Thick old roots grow right across the way. They look very dry. Very, very burnable.`); return true; }
     if(o.type==='lock'&&!o.opened){ if(A.keys()>0){ G.found['keys_'+A.def.id]=A.keys()-1; o.opened=true; G.found[o.id]=true; refreshCaveGates(); SFX.play('chest'); setBanner('Unlocked','',1.4); saveGame(); } else say(`A heavy door with a keyhole. Somewhere in this cave there's a small key that fits it.`); return true; }
     if(o.type==='crack'){ say(`Cracks run all through this wall, and a cold draft whistles out of them. A good roar might bring it down. Or a lot of fire.`); return true; }
-    if(o.type==='gate'){ const R=A.rooms[o.gateRoom]; say(`A sealed stone door. ${R?({blocks:'Something about blocks and the plates on the floor in another room.',braziers:'Carved flames run around the frame. Light every brazier in the next room.',torches:'Four little symbols are carved into it. Light the torches in the right order.',dark:'It needs light.',lever:'There must be a lever somewhere.',boss:'It opens when the guardian falls.'}[R.kind]||''):''}`); return true; }
+    if(o.type==='gate'){ const R=A.rooms[o.gateRoom]; say(`A sealed stone door. ${R?({blocks:'Something about blocks and the plates on the floor in another room.',braziers:'Carved flames run around the frame. Light every brazier in the next room.',torches:'Four little symbols are carved into it. Light the torches in the right order.',dark:'It needs light.',lever:'There must be a lever somewhere.',boss:'It opens when the guardian falls.',miniboss:'It opens when the guardian falls.',tboss:'It opens when the guardian of the Trial falls.',switches:R.need?`A crystal switch is carved on it. You will need ${R.need} to reach the switches.`:'A crystal switch is carved on it. Strike every switch in that room.',eyes:'A stone eye is carved on it. Wake every eye in that room with an arrow.',tide:'Waves are carved on it. The water in that room holds the answer.',vents:'A little cloud is carved on it.'}[R.kind]||''):''}`); return true; }
     if(o.type==='red'||o.type==='blue') { say(`Glowing ${o.type==='red'?'pink':'blue'} pillars block the way. There's a crystal somewhere in this cave that changes which ones are up. Hit it.`); return true; }
   }
   if(o.k==='lever'){ if(!o.on){ o.on=true; solveRoom(A.rooms[o.room]); SFX.play('block'); } else say('The lever is down. It took some pulling.'); return true; }
@@ -367,7 +399,11 @@ const CAVE_STYLE={
   mine:{floor:'#3e3224',floor2:'#362a1e',top:'#7e6648',face:'#3a2a1a',edge:'#b8925e',water:'#223030',accent:'#ffd27a'},
   bog:{floor:'#2c3422',floor2:'#262e1e',top:'#5e6a44',face:'#262e1a',edge:'#98a870',water:'#22361e',accent:'#b8e070'},
   ice:{floor:'#4a5a6a',floor2:'#425262',top:'#aac0d4',face:'#3e4e5c',edge:'#f0faff',water:'#20406a',accent:'#cfe6ff'},
-  ember:{floor:'#2e1c18',floor2:'#281814',top:'#6a4238',face:'#2a1410',edge:'#c87048',water:'#5a1a08',accent:'#ff8a3a'}
+  ember:{floor:'#2e1c18',floor2:'#281814',top:'#6a4238',face:'#2a1410',edge:'#c87048',water:'#5a1a08',accent:'#ff8a3a'},
+  // Ember's Trials: mossy old stone, sea-blue tile, white and gold marble
+  leap:{floor:'#4e5a3a',floor2:'#485434',top:'#7a8462',face:'#2e3622',edge:'#c8e08a',water:'#1e4a44',accent:'#c8f070'},
+  tide:{floor:'#628ca4',floor2:'#5a849c',top:'#a8c8d6',face:'#2a4a5c',edge:'#eefaff',water:'#1a4f78',accent:'#7ae0ff'},
+  sky:{floor:'#e2dac8',floor2:'#d8d0bc',top:'#f6f1e4',face:'#a8987a',edge:'#ffe6a0',water:'#3a6aa8',accent:'#ffd860'}
 };
 function renderCaveRooms(A,def){
   const c=A.cave, S=0.5, cs=c.cell, W2=c.w*cs, H2=c.h*cs, cv=mkCanvas(W2*S,H2*S), g=cv.getContext('2d'), st=CAVE_STYLE[def.theme]||CAVE_STYLE.earth, rng=mulberry32(def.seed);
@@ -380,6 +416,7 @@ function renderCaveRooms(A,def){
     const k=j*c.w+i; if(c.grid[k]!==0&&!water(i,j)) continue;
     const x=i*cs, y=j*cs;
     if(water(i,j)){ g.fillStyle=st.water; g.fillRect(x,y,cs,cs); g.strokeStyle='rgba(255,255,255,.08)'; g.lineWidth=2; g.beginPath(); g.moveTo(x+6,y+cs*0.4+rng()*8); g.quadraticCurveTo(x+cs/2,y+cs*0.3,x+cs-6,y+cs*0.45); g.stroke(); continue; }
+    if(def.trial&&trialPaintCell(g,c,k,i,j,x,y,cs,st,rng,def)) continue;
     const ice=c.typ[k]===2;
     g.fillStyle=ice?'#b8d0e4':((i+j)%2?st.floor:st.floor2); g.fillRect(x,y,cs,cs);
     g.fillStyle=ice?'rgba(255,255,255,.35)':'rgba(255,255,255,.035)'; g.fillRect(x+2,y+2,cs-4,3);
@@ -396,6 +433,10 @@ function renderCaveRooms(A,def){
   }
   // puzzle floor sigils and cart rails
   for(const k in c.rooms){ const R=c.rooms[k]; if(R.kind==='torches'||R.kind==='braziers'||R.kind==='crystal'){ const x=(R.ox+8.5)*cs, y=(R.oy+6.5)*cs; g.strokeStyle=`rgba(${hexRGB(st.accent).join(',')},.18)`; g.lineWidth=4; g.beginPath(); g.arc(x,y,cs*2.2,0,TAU); g.stroke(); g.beginPath(); g.arc(x,y,cs*1.4,0,TAU); g.stroke(); for(let a=0;a<6;a++){ g.beginPath(); g.moveTo(x+Math.cos(a)*cs*1.4,y+Math.sin(a)*cs*1.4); g.lineTo(x+Math.cos(a)*cs*2.2,y+Math.sin(a)*cs*2.2); g.stroke(); } }
+    if(R.kind==='tboss'&&def.trial&&def.theme!=='sky'){ const x=(R.ox+1+R.iw/2)*cs, y=(R.oy+1+R.ih/2)*cs, P=TPAL[def.theme], col=P.rune; g.save(); g.lineCap='round';
+      for(const [rr,w,a] of [[cs*7.6,10,0.3],[cs*7.6,3,0.7],[cs*6.6,2,0.5],[cs*2.4,3,0.6]]){ g.strokeStyle=a>0.5?`rgba(${col},${a})`:`rgba(0,0,0,${a})`; g.lineWidth=w; g.beginPath(); g.ellipse(x,y,rr,rr*0.78,0,0,TAU); g.stroke(); }
+      for(let k=0;k<12;k++){ const an=k/12*TAU; g.strokeStyle=`rgba(${col},.45)`; g.lineWidth=2.4; g.beginPath(); g.moveTo(x+Math.cos(an)*cs*2.4,y+Math.sin(an)*cs*2.4*0.78); g.lineTo(x+Math.cos(an)*cs*6.6,y+Math.sin(an)*cs*6.6*0.78); g.stroke(); g.fillStyle=`rgba(${col},.75)`; g.beginPath(); const qx=x+Math.cos(an)*cs*7.1, qy=y+Math.sin(an)*cs*7.1*0.78; g.moveTo(qx,qy-7); g.lineTo(qx+7,qy); g.lineTo(qx,qy+7); g.lineTo(qx-7,qy); g.closePath(); g.fill(); }
+      g.restore(); }
     if(R.cart){ const ms=c.marks.filter(m=>m.room===k&&(m.ch==='B'||m.ch==='P')); if(ms.length===2){ const [a,b]=ms; g.strokeStyle='#5a4a3a'; g.lineWidth=4; for(const off of [-10,10]){ g.beginPath(); g.moveTo((a.i+0.5)*cs+off,(a.j+0.5)*cs); g.lineTo((b.i+0.5)*cs+off,(b.j+0.5)*cs); g.stroke(); } g.fillStyle='#4a3420'; for(let y=Math.min(a.j,b.j);y<=Math.max(a.j,b.j);y++) for(let t=0;t<2;t++) g.fillRect((a.i+0.5)*cs-16,(y+t*0.5)*cs+20,32,5); } } }
   // walls in three-quarter view: a lit top, and a darker front face where a floor lies to the south
   for(let j=0;j<c.h;j++) for(let i=0;i<c.w;i++){
@@ -418,6 +459,7 @@ function renderCaveRooms(A,def){
     if(open(i-1,j)&&!face){ g.fillStyle='rgba(255,255,255,.05)'; g.fillRect(x,y,4,cs); }
     if(rng()<0.25){ g.fillStyle='rgba(0,0,0,.2)'; g.beginPath(); g.arc(x+rng()*cs,y+rng()*th,2+rng()*3,0,TAU); g.fill(); }
     if(def.theme==='crystal'&&rng()<0.08){ g.fillStyle=st.accent; g.globalAlpha=0.6; g.beginPath(); g.moveTo(x+cs*0.5,y+2); g.lineTo(x+cs*0.65,y+cs*0.3); g.lineTo(x+cs*0.5,y+cs*0.45); g.lineTo(x+cs*0.35,y+cs*0.3); g.closePath(); g.fill(); g.globalAlpha=1; }
+    if(def.trial) trialPaintWall(g,c,i,j,x,y,cs,st,rng,def,face,th);
     if(def.theme==='ice'&&face&&rng()<0.4){ g.fillStyle='rgba(230,245,255,.8)'; g.beginPath(); g.moveTo(x+cs*0.3,y+cs*0.95); g.lineTo(x+cs*0.38,y+cs*1.15); g.lineTo(x+cs*0.46,y+cs*0.95); g.fill(); }
   }
   A.canvas=cv; A.canvasS=S;
@@ -426,11 +468,12 @@ function renderCaveRooms(A,def){
 function renderCaveMini(A){
   const c=A.cave, def=A.def, st=CAVE_STYLE[def.theme]||CAVE_STYLE.earth;
   const mm=A.mini||mkCanvas(c.w,c.h), mg=mm.getContext('2d'), im=mg.createImageData(c.w,c.h), fl=hexRGB(st.top).map(q=>q*0.8);
-  const seen=new Set(Object.keys(c.rooms).filter(k=>G.found[`cv_${def.id}_v_${k}`]||(G.items.juniper_map&&c.rooms[k].kind!=='secret')));
+  const mapped=G.items.juniper_map||(def.trial&&G.found['tmap_'+def.id]);
+  const seen=new Set(Object.keys(c.rooms).filter(k=>G.found[`cv_${def.id}_v_${k}`]||(mapped&&c.rooms[k].kind!=='secret')));
   for(let j=0;j<c.h;j++) for(let i=0;i<c.w;i++){
     const k=j*c.w+i; let v=[10,8,6], a=255;
-    let r=null; for(const id in c.rooms){ const R=c.rooms[id]; if(i>=R.ox&&i<=R.ox+RSX&&j>=R.oy&&j<=R.oy+RSY){ if(seen.has(id)){ r=R; break; } } }
-    if(r){ v=c.grid[k]===0?fl:c.typ[k]===1?[40,70,100]:[26,20,16]; if(!G.found[`cv_${def.id}_v_${r.id}`]) v=v.map(q=>q*0.55); }
+    let r=null; for(const id in c.rooms){ const R=c.rooms[id]; if(i>=R.ox&&i<=R.ox+R.iw+1&&j>=R.oy&&j<=R.oy+R.ih+1){ if(seen.has(id)){ r=R; break; } } }
+    if(r){ const t=c.typ[k]; v=c.grid[k]===0?(t===TY.pit||t===TY.chasm?[14,12,18]:t===TY.deep||t===TY.current||t===TY.basin?[50,96,150]:t===TY.spike?[120,96,90]:fl):t===1?[40,70,100]:[26,20,16]; if(!G.found[`cv_${def.id}_v_${r.id}`]) v=v.map(q=>q*0.55); if(r.kind==='tboss'&&c.grid[k]===0) v=[v[0]*1.2+30,v[1]*0.8,v[2]*0.8]; }
     im.data[k*4]=v[0]; im.data[k*4+1]=v[1]; im.data[k*4+2]=v[2]; im.data[k*4+3]=a;
   }
   mg.putImageData(im,0,0); A.mini=mm;

@@ -37,7 +37,10 @@ function removeCol(c){
 function areaBlocked(x,y){
   const A=AREA; if(!A) return true;
   if(x<A.x0||y<A.y0||x>A.x1||y>A.y1) return true;
-  if(A.kind==='cave'){ const c=A.cave, i=Math.floor((x-A.x0)/c.cell), j=Math.floor((y-A.y0)/c.cell); if(i<0||j<0||i>=c.w||j>=c.h) return true; const k=j*c.w+i; return c.grid[k]===1||(!!c.dyn&&caveBlockedAt(k)); }
+  if(A.kind==='cave'){ const c=A.cave, i=Math.floor((x-A.x0)/c.cell), j=Math.floor((y-A.y0)/c.cell); if(i<0||j<0||i>=c.w||j>=c.h) return true; const k=j*c.w+i;
+    // pools stop everyone, except Ash with Water Stride or Ash in the air (only his own moves test his exact x or y)
+    if(c.grid[k]===1){ if(c.typ&&c.typ[k]===1&&player&&(x===player.x||y===player.y)&&(canWalkWater()||airborne())) return false; return true; }
+    return !!c.dyn&&caveBlockedAt(k); }
   return false;
 }
 // ---------- houses
@@ -195,6 +198,7 @@ function areaBlockedRaw(c,x0,y0,x,y){ const i=Math.floor((x-x0)/c.cell), j=Math.
 // ---------- enter / exit
 function enterArea(id,door){
   const def=AREADEFS[id]; if(!def) return;
+  if(def.trial&&!trialOpen(def.trial)){ runDialogue(STORY['trial_'+def.trial+'_sealed']||[['narr','The great stone doors will not move.']],()=>{ scene='play'; }); return; }
   if(def.locked&&!G.items[def.locked]&&!G.found[def.id+'_unlocked']){ runDialogue([['narr',def.lockText||'The way is sealed with an iron door and a very big lock. There’s a scale stamped on it.']],()=>{ scene='play'; }); return; }
   if(def.locked&&!G.found[def.id+'_unlocked']){ G.found[def.id+'_unlocked']=true; setBanner('Unlocked',def.name,1.8); }
   G.ow={x:door.x,y:door.y+(door.outY||40)};
@@ -208,7 +212,8 @@ function enterArea(id,door){
   if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x+30; G.goat.y=player.y+30; }
   updateCam(0,true); G.fade=1; SFX.play('ui');
-  if(!G.found['seen_'+id]){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,`A cave · Danger level ${def.level}`,2.6,'region'); } }
+  if(def.trial){ const sh=TRIALS[def.trial].shrine; G.shrines[sh.id]=true; G.lastShrine=sh.id; }
+  if(!G.found['seen_'+id]){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,def.trial?`One of Ember’s Trials · Danger level ${def.level}`:`A cave · Danger level ${def.level}`,2.6,'region'); } }
   else if(def.kind==='cave') setBanner(def.name,'',1.6,'region');
   if(def.kind==='house'&&def.owner) setBanner(def.name,'',1.4,'region');
   questPoke();
@@ -231,13 +236,14 @@ function areaNPCs(){
   for(const c of CAST){ if(c.inside===A.id&&npcPresent(c.id)){ A.npcs.push(mkNPC(c,A.rx+A.rw*(c.ix||0.5),A.ry+A.rh*(c.iy||0.5))); } }
   for(const p of PRISONERS()){ if(p.area===A.id){ const o=A.objs.find(q=>q.k==='cell'); if(o){ const n=mkNPC(CASTBY[p.id]||{id:p.id,name:p.name,col:'#ccc',look:{}},o.x+p.dx,o.y+20); n.prisoner=true; A.npcs.push(n); } } }
   if(A.npcHere){ const h=A.npcHere; if(h.id==='juniper'&&!G.flags.juniper_found) A.npcs.push(mkNPC(SPECIAL.juniper,h.x,h.y)); if(h.id==='shellby') A.npcs.push(mkNPC(SPECIAL.shellby,h.x,h.y)); }
+  if(A.trialNpcs) for(const t of A.trialNpcs) if(SPECIAL[t.id]&&trialNpcHere(t.id)) A.npcs.push(mkNPC(SPECIAL[t.id],t.x,t.y));
 }
 // ---------- per-frame
 function updateArea(dt){
   const A=AREA, p=player;
   if(!A.exit.none&&dist(p.x,p.y,A.exit.x,A.exit.y)<A.exit.r&&p.y>A.exit.y-20&&scene==='play'){ exitArea(); return; }
   if(A.rooms) updateCaveRooms(dt);
-  if(A.camp&&A.camp.alive<=0&&!A.camp.done){ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime; setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; }
+  if(A.camp&&A.camp.alive<=0&&!A.camp.done){ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime; if(!A.def.trial){ setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; } }
   for(const L of A.lights){ if(L.obj) L.i=L.obj.lit?0.9:0; if(L.win) L.i=0.35*daylight(); }
   for(const n of A.npcs){ n.t+=dt; n.face=turnTo(n.face,angTo(n.x,n.y,p.x,p.y),dist(n.x,n.y,p.x,p.y)<240?3*dt:0); }
   if(A.def.kind==='cave'&&Math.random()<dt*0.25) SFX.play('step',0.4);
