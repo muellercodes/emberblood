@@ -119,6 +119,42 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family
 .mapfoot .btn{width:auto}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+/* controls build: a glowing focus ring for controller and keyboard (never for mouse or touch), button chips, the controller toast, How to Play tabs */
+body.padnav #game{cursor:none}
+body.padnav :focus{outline:none}
+body.padnav button:focus,body.padnav input:focus,body.padnav a:focus,body.padnav [tabindex]:focus,body .btn:focus-visible,body .opt:focus-visible,body .card:focus-visible,body .skip:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-color:var(--gold);animation:ringPulse 1.6s ease-in-out infinite}
+body.padnav .seg button:focus,body .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:-3px;color:var(--ink);box-shadow:inset 0 0 16px rgba(255,170,60,.6);animation:none}
+body.padnav .card:focus{transform:translateY(-3px)}
+body.padnav .dlg:focus{outline:none;animation:none}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 0 5px rgba(255,195,90,.12),0 0 16px 2px rgba(255,140,50,.3)}50%{box-shadow:0 0 0 7px rgba(255,195,90,.24),0 0 28px 6px rgba(255,150,60,.55)}}
+@media (prefers-reduced-motion:reduce){body.padnav :focus,body :focus-visible{animation:none!important;box-shadow:0 0 0 6px rgba(255,195,90,.2)}}
+.pg{display:inline-flex;align-items:center;justify-content:center;min-width:1.8em;height:1.8em;padding:0 .45em;margin:0 .08em;border-radius:999px;font:800 .78em/1 var(--f-ui);font-style:normal;vertical-align:middle;color:#f6ead8;background:#2e2622;border:1px solid rgba(255,236,210,.38);box-shadow:0 2px 0 rgba(0,0,0,.4);white-space:nowrap;letter-spacing:0;text-transform:none}
+.pg.f{padding:0;width:1.8em;font-size:.86em}
+.pg.s{border-radius:7px;font-size:.72em}
+.pg.k{border-radius:6px;background:#6a3c24;border-color:rgba(255,220,180,.5)}
+.pg.d{padding:0;width:1.9em;height:1.9em;border:0;box-shadow:none;color:#ffd27a;font-size:.84em;background:linear-gradient(#3a302b,#3a302b) center/36% 100% no-repeat,linear-gradient(#3a302b,#3a302b) center/100% 36% no-repeat}
+#padToast{position:fixed;left:50%;top:max(14px,env(safe-area-inset-top,0px));z-index:9;display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 20px 12px;border-radius:14px;background:rgba(22,11,9,.95);border:1px solid var(--edge);box-shadow:0 14px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,195,90,.12) inset;color:var(--ink);text-align:center;max-width:calc(100vw - 32px);pointer-events:none;opacity:0;transform:translate(-50%,-130%);transition:transform .4s cubic-bezier(.2,.9,.3,1.15),opacity .3s}
+#padToast.on{opacity:1;transform:translate(-50%,0)}
+#padToast b{font-family:var(--f-display);font-weight:800;color:var(--gold);letter-spacing:.04em;font-size:15px}
+#padToast span{color:var(--muted);font-size:13px}
+.how .htabs{margin:8px 0 12px}
+.how .hbody{max-height:min(60vh,560px);overflow-y:auto;padding-right:6px;text-align:left}
+.how .hbody h3:first-child,.how .cols h3{margin-top:4px}
+.how .hnote{font-size:13px;margin:12px 0 0}
+.padtop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 6px}
+.padtop p{margin:0!important;color:var(--ink)!important;font-size:14px}
+#howPadCv{display:block;width:100%;max-width:720px;height:auto;margin:0 auto 8px}
+.padkeys{grid-template-columns:auto 1fr;gap:8px 14px}
+.padkeys .pk{white-space:nowrap;text-align:right;font-size:15px}
+.padkeys .mn{grid-column:1/-1;margin-top:4px;color:var(--ink)}
+.news li b{color:var(--ink)}
+.setsec{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);margin:18px 0 0;text-align:left}
+#setPadBox .setrow .btn{width:auto;flex:none}
+#settings .setrow{flex-wrap:wrap}
+#settings .setrow>span{flex:1 1 150px;min-width:0}
+#settings .setrow>.seg,#settings .setrow>.btn{margin-left:auto}
+#setPadBox .setnote{margin:6px 0 2px;font-size:13px;text-align:left;color:var(--muted)}
+@media (max-width:600px){#howPadCv{display:none}.padkeys .pk{text-align:left}}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
 input{-webkit-user-select:text;user-select:text}
 .fld{display:block;margin:0 0 12px}
@@ -213,28 +249,90 @@ input{-webkit-user-select:text;user-select:text}
 </div>
 
 <div id="how" class="ov dim">
-  <div class="panel w">
+  <div class="panel w how">
     <h2>How to Play</h2>
-    <div class="cols">
-      <div>
-        <h3>Keyboard and mouse</h3>
-        <div class="keys">
-          <kbd>WASD / Arrows</kbd><span>Move</span>
-          <kbd>Shift</kbd><span>Sprint (uses stamina)</span>
-          <kbd>Mouse</kbd><span>Aim</span>
-          <kbd>Left click / J</kbd><span>Sword. Hold for a 3-hit combo.</span>
-          <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter.</span>
-          <kbd>Space</kbd><span>Dodge roll. Nothing hits you mid-roll.</span>
-          <kbd>Q</kbd><span>Dragon Roar, once the meter is full</span>
-          <kbd>R</kbd><span>Drink a healing draught</span>
-          <kbd>E</kbd><span>Talk, open, rest at a shrine</span>
-          <kbd>M / Tab</kbd><span>World map and fast travel</span>
-          <kbd>Esc / P</kbd><span>Pause</span>
+    <div class="seg jtabs htabs" id="howTabs" data-tabs role="group" aria-label="How to Play sections"><button type="button" data-h="keys" aria-pressed="true">Keyboard</button><button type="button" data-h="touch" aria-pressed="false">Touch</button><button type="button" data-h="pad" aria-pressed="false">Controller</button><button type="button" data-h="new" aria-pressed="false">What's new</button><button type="button" data-h="tips" aria-pressed="false">Tips</button></div>
+    <div class="hbody">
+      <section class="hsec" data-h="keys">
+        <div class="cols">
+          <div>
+            <h3>Move and fight</h3>
+            <div class="keys">
+              <kbd>WASD / Arrows</kbd><span>Move</span>
+              <kbd>Shift</kbd><span>Sprint (uses stamina)</span>
+              <kbd>Mouse</kbd><span>Aim</span>
+              <kbd>Left click / J</kbd><span>Attack. Hold for a combo.</span>
+              <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter.</span>
+              <kbd>Space</kbd><span>Dodge roll. Nothing hits you mid-roll.</span>
+              <kbd>C</kbd><span>Jump, once Ash learns how. With wings, jump again in the air to fly.</span>
+              <kbd>Q</kbd><span>Dragon Roar, once the meter is full</span>
+              <kbd>R</kbd><span>Drink a healing draught</span>
+            </div>
+          </div>
+          <div>
+            <h3>Everything else</h3>
+            <div class="keys">
+              <kbd>E</kbd><span>Talk, open, rest at a shrine</span>
+              <kbd>X / Z</kbd><span>Next or previous weapon</span>
+              <kbd>1 to 6</kbd><span>Pick a weapon</span>
+              <kbd>G</kbd><span>Call your companion</span>
+              <kbd>U</kbd><span>Skills</span>
+              <kbd>M / Tab</kbd><span>World map and fast travel</span>
+              <kbd>I</kbd><span>Journal</span>
+              <kbd>T</kbd><span>Switch which quest you follow</span>
+              <kbd>N</kbd><span>Sound on or off</span>
+              <kbd>Esc / P</kbd><span>Pause</span>
+            </div>
+            <p class="hnote">In menus the arrow keys move, Enter picks and Esc goes back.</p>
+          </div>
         </div>
-      </div>
-      <div>
-        <h3>Touch</h3>
-        <p>Drag on the left side to move. Push the stick all the way to sprint. Buttons on the right attack, breathe fire, roll and roar. Tap the minimap for the world map.</p>
+      </section>
+      <section class="hsec" data-h="touch" hidden>
+        <div class="cols">
+          <div>
+            <h3>Two thumbs</h3>
+            <ul class="tips">
+              <li>Drag on the left side to move. Push the stick all the way to sprint.</li>
+              <li><b>SLASH</b> attacks. Hold it for a combo.</li>
+              <li><b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
+              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>ROAR</b> works when its ring is full.</li>
+              <li><b>DRINK</b> heals. You can also tap the green flasks at the top.</li>
+              <li><b>WEAPON</b> switches weapons once you have two or more.</li>
+              <li><b>USE</b> pops up when you can talk, open something or go inside.</li>
+              <li><b>CALL</b> calls your companion.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>The screen</h3>
+            <ul class="tips">
+              <li>Tap the minimap for the world map. Tap the quest list for the journal.</li>
+              <li>The pause button is at the top right.</li>
+              <li>One-hand mode in Settings puts every button under one thumb, and Ash swings by himself.</li>
+              <li>Settings can make the buttons bigger or smaller.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <section class="hsec" data-h="pad" hidden>
+        <div class="padtop"><p id="howPadName"></p><div class="seg" id="howPadKind" role="group" aria-label="Controller type"><button type="button" data-k="xbox" aria-pressed="true">Xbox</button><button type="button" data-k="ps" aria-pressed="false">PlayStation</button><button type="button" data-k="nin" aria-pressed="false">Nintendo</button></div></div>
+        <canvas id="howPadCv" width="1440" height="600" aria-hidden="true"></canvas>
+        <div class="keys padkeys" id="howPadKeys"></div>
+        <p class="hnote">Playing in Edge on an Xbox? Hold the Menu button and pick <b>Use game controls</b>, so the stick moves Ash and not a mouse pointer. Settings has a fullscreen button for the TV.</p>
+      </section>
+      <section class="hsec" data-h="new" hidden>
+        <h3>New in this version</h3>
+        <ul class="tips news">
+          <li><b>More weapons.</b> Twin daggers, a spear, a forge hammer, a boomerang and a bow. Each one fights in its own way.</li>
+          <li><b>Ember's Trials.</b> Three old dungeons built long ago by Ember, one of Ash's ancestors. Each one wakes a gift in your blood.</li>
+          <li><b>Jump.</b> Win it in the Trial of the Leap in Whisperwood. Hop over gaps, fences and pits.</li>
+          <li><b>Water stride.</b> The Trial of the Tide on Lake Mirrow. Walk right across the water.</li>
+          <li><b>Wings.</b> The Trial of the Sky in the Drakeling Crags. Jump, then jump again in the air to fly.</li>
+          <li><b>Skills.</b> Every level gives you a skill point. Spend it on Blade, Flame, Wings or Heart.</li>
+          <li><b>Companions.</b> Friends can join you. They follow you, fight with you and chat. People in town notice what you do.</li>
+          <li><b>Controllers.</b> PlayStation, Xbox and Nintendo controllers work everywhere, even in menus. Settings can go fullscreen for a TV.</li>
+        </ul>
+      </section>
+      <section class="hsec" data-h="tips" hidden>
         <h3>Surviving the wild</h3>
         <ul class="tips">
           <li>Follow the gold marker on the minimap and compass to your quest.</li>
@@ -243,14 +341,14 @@ input{-webkit-user-select:text;user-select:text}
           <li>Red shapes on the ground show where an attack will land.</li>
           <li>Hold fire breath on lanterns and Ward stones to light them. Fire also melts snowmen, smokes out bees, and lights fireplaces.</li>
           <li>A gold <b>!</b> means someone has a quest for you. A blue <b>?</b> means they're waiting for something you have.</li>
-          <li>Walk up to any door or cave and press E to go inside. Smash pots for coins.</li>
+          <li>Walk up to any door or cave and use it to go inside. Smash pots for coins.</li>
           <li>Night is darker and wolves hunt. Chests hold experience for leveling up.</li>
           <li>Bog water slows you down. Snow slows you a little too.</li>
           <li>Slash a fire bolt to send it back. Knights block from the front.</li>
         </ul>
-      </div>
+      </section>
     </div>
-    <div style="margin-top:18px"><button class="btn c hot" id="bHowClose">Got it</button></div>
+    <div style="margin-top:16px"><button class="btn c hot" id="bHowClose">Got it</button></div>
   </div>
 </div>
 
@@ -7446,26 +7544,60 @@ cvs.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
-// touch layout: a thumb arc around a big slash button, mirrored for lefties; one-hand mode stacks everything on one side
+// touch layout. Two thumbs: SLASH in the corner, an inner ring (FIRE, JUMP, ROLL, DRINK) and an outer ring (USE, ROAR,
+// WEAPON) that climbs up on tall screens and swings left on short ones, plus a small CALL button further out.
+// One hand: columns hugging the edge, filled bottom to top, at most four buttons high and never under the HUD.
+// Every button keeps its spot when others come and go (USE only shows with a prompt, JUMP once Ash can jump,
+// WEAPON with two or more weapons, CALL with a companion), so thumbs can learn where things are.
+const TBTN_LABEL={attack:'SLASH',fire:'FIRE',roll:'ROLL',roar:'ROAR',drink:'DRINK',use:'USE',weapon:'WEAPON',whistle:'CALL'};
+function jumpLabel(){ return player&&player.flying?'LAND':(hasAbil('wings')&&airborne()?'FLY':'JUMP'); }
 function tLayout(){
   const mode=settings.touch||'two', s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1), B=H-SAFE.b, L=[];
   const right=mode!=='left', sx=v=>right?W-SAFE.r-v:SAFE.l+v;
-  const prompt=!!(G&&G.prompt);
+  const g=G||{}, story=g.mode==='story', mr=MINI_R();
+  const has={use:!!g.prompt, jump:!!G&&(!story||hasAbil('jump')), weapon:Object.keys(g.weapons||{}).filter(k=>g.weapons[k]).length>=2, whistle:story&&!!g.comp};
+  const add=(id,x,y,r)=>{ if(id in has&&!has[id]) return; L.push({id,x,y,r,label:id==='jump'?jumpLabel():TBTN_LABEL[id]}); };
+  // keep clear of the minimap and its labels, the pause and sound buttons and the vitals panel
+  const hudFree=(x,y,r)=>{
+    if(x-r<SAFE.l+2||x+r>W-SAFE.r-2||y-r<SAFE.t+2||y+r>B-2) return false;
+    const hit=(R)=>{ const nx=clamp(x,R.x,R.x+R.w), ny=clamp(y,R.y,R.y+R.h); return Math.hypot(x-nx,y-ny)<r+6; };
+    return !hit({x:mr.x-10,y:mr.y,w:mr.w+20,h:mr.h+34})&&!hit({x:W-SAFE.r-56,y:SAFE.t+12,w:44,h:92})&&!hit({x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:84});
+  };
   if(mode==='two'){
-    const ax=sx(82*s), ay=B-90*s, R1=120*s;
-    const at=(deg,rad,id,r,label)=>{ const a=deg*Math.PI/180; L.push({id,x:ax+Math.cos(a)*rad*(right?1:-1),y:ay+Math.sin(a)*rad,r,label}); };
-    L.push({id:'attack',x:ax,y:ay,r:50*s,label:'SLASH'});
-    at(181,R1,'fire',37*s,'FIRE'); at(217,R1,'roll',33*s,'ROLL'); at(252,R1,'roar',30*s,'ROAR'); at(286,R1-6*s,'drink',27*s,'DRINK');
-    if(prompt) at(226,R1+104*s,'use',37*s,'USE');
+    // tall screens stack the outer ring upward; short (phone landscape) screens swing it left along the bottom
+    const R1=126*s, R2=214*s, R3=292*s, top=SAFE.t+14+mr.h+34;
+    const up=B-90*s-R2-38*s>top, ax=sx(82*s), ay=B-(up?90:84)*s;
+    const pos=(deg,rad)=>{ const a=deg*Math.PI/180; return [ax+Math.cos(a)*rad*(right?1:-1),ay+Math.sin(a)*rad]; };
+    const at=(deg,rad,id,r)=>{ const [x,y]=pos(deg,rad); add(id,x,y,r); };
+    add('attack',ax,ay,50*s);
+    if(up){
+      at(179,R1,'fire',34*s); at(214,R1,'jump',38*s); at(249,R1,'roll',31*s); at(284,R1,'drink',24*s);
+      at(221,R2,'use',35*s); at(246,R2,'roar',30*s); at(271,R2,'weapon',30*s);
+      // the companion call goes high on the arc if there is room, else under the sound button
+      let [wx,wy]=pos(256,R3); if(!hudFree(wx,wy,23*s)) [wx,wy]=pos(236,R3);
+      if(!hudFree(wx,wy,23*s)){ wx=W-SAFE.r-34; wy=SAFE.t+130; }
+      add('whistle',wx,wy,Math.min(23*s,20));
+    }else{
+      at(168,R1,'fire',34*s); at(203,R1,'jump',38*s); at(237,R1,'roll',31*s);
+      at(165,R2,'drink',24*s); at(182,R2,'roar',30*s); at(201,R2,'use',35*s);
+      at(182,R3,'weapon',30*s); at(204,R3,'whistle',23*s);
+    }
   }else{
-    // one hand: a column hugging the edge, the stick floats anywhere in the lower half
-    const x=sx(48*s); let y=B-70*s;
-    L.push({id:'attack',x,y,r:38*s,label:'SLASH'}); y-=86*s;
-    L.push({id:'roll',x,y,r:32*s,label:'ROLL'}); y-=76*s;
-    L.push({id:'fire',x,y,r:32*s,label:'FIRE'}); y-=74*s;
-    L.push({id:'drink',x,y,r:27*s,label:'DRINK'}); y-=66*s;
-    L.push({id:'roar',x,y,r:27*s,label:'ROAR'});
-    if(prompt) L.push({id:'use',x:sx(140*s),y:B-196*s,r:36*s,label:'USE'});
+    // one hand: columns from the edge, filled bottom to top; the stick floats anywhere low that is not a button
+    const order=[['attack',40],['jump',34],['roll',31],['fire',31],['use',34],['drink',26],['roar',27],['weapon',28],['whistle',22]];
+    const colX=k=>sx((46+82*k)*s), y0=B-66*s;
+    const lim=k=>{
+      if(!right) return Math.max(B-322,SAFE.t+205);
+      const x=colX(k); if(x>mr.x-46&&x<mr.x+mr.w+46) return mr.y+mr.h+36;
+      return x>W-SAFE.r-80?SAFE.t+108:SAFE.t+40;
+    };
+    let k=0,j=0,y=y0,pr=0;
+    for(const [id,r0] of order){
+      const r=r0*s;
+      if(j>0) y-=pr+r+8*s;
+      if(j>=4||(j>0&&y-r<lim(k))){ k++; j=0; y=y0; }
+      add(id,colX(k),y,r); j++; pr=r;
+    }
   }
   return L;
 }
@@ -7561,21 +7693,36 @@ function onKey(e){
     if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
+    else if(c==='BracketLeft'||c==='BracketRight'){ e.preventDefault(); mapCycle(c==='BracketLeft'?-1:1); }
+    else navKey(e);
   }else if(scene==='journal'){
     if(c==='Escape'||c==='KeyI'){ e.preventDefault(); closeJournal(); }
+    else navKey(e);
   }else if(scene==='paused'){
-    if((c==='Escape'||c==='KeyP')&&!$('#how').classList.contains('on')){ e.preventDefault(); resumeGame(); }
-    else if(c==='Escape') closeHow();
+    // Escape backs out one screen (settings or How to Play go back to the pause menu), P resumes from the pause menu
+    const r=navRoot();
+    if(c==='Escape'){ e.preventDefault(); if(r&&['pause','settings','how'].includes(r.id)) ovBack(r); else if(!r) resumeGame(); }
+    else if(c==='KeyP'&&r&&r.id==='pause'){ e.preventDefault(); resumeGame(); }
+    else navKey(e);
   }else if(scene==='dialogue'){
     const dn={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3}[c];
     if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); chooseOpt(dn); return; }
-    if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){ e.preventDefault(); if(!e.repeat) advanceDialogue(); }
+    if(navKey(e)) return;
+    if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){
+      e.preventDefault(); if(e.repeat) return;
+      const f=document.activeElement;
+      if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else advanceDialogue();
+    }
     else if(c==='Escape'){ e.preventDefault(); skipDialogue(); }
   }else if(scene==='upgrade'){
     const n={Digit1:0,Digit2:1,Digit3:2,Numpad1:0,Numpad2:1,Numpad3:2}[c];
     if(n!=null){ e.preventDefault(); chooseUpgrade(n); }
-  }else if(scene==='menu'){
-    if(c==='Escape'&&$('#how').classList.contains('on')) closeHow();
+    else navKey(e);
+  }else{
+    // title menu, save slots, settings, account, How to Play, game over and victory
+    const r=navRoot();
+    if(c==='Escape'){ if(r&&['how','settings','slots','acct'].includes(r.id)){ e.preventDefault(); ovBack(r); } }
+    else navKey(e);
   }
 }
 function toWorld(sx,sy){ return {x:sx/zoom+cam.x,y:sy/zoom+cam.y}; }
@@ -7593,10 +7740,586 @@ function updateCam(dt,snap){
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
 }
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
-// ================= gamepads (STUB: the controls build replaces this file)
-function padPoll(dt){}
-function padInput(o,dt){}
-function padActive(){ return false; }
+// ================= gamepads: PlayStation, Xbox and Nintendo controllers through the browser Gamepad API (controls build)
+// Buttons are read by physical position (the "standard" mapping): 0 bottom face, 1 right face, 2 left face, 3 top face,
+// 4 L1/LB/L, 5 R1/RB/R, 6 L2/LT/ZL, 7 R2/RT/ZR, 8 Back/View/Share/Create/minus, 9 Start/Menu/Options/plus,
+// 10 L3, 11 R3, 12 to 15 d-pad up/down/left/right, 16 home, 17 touchpad. So on a Nintendo pad the bottom button (B) jumps.
+//
+// Play:  left stick move (all the way for a moment sprints, L3 toggles sprint) · right stick aim
+//        bottom jump · right roll · left attack (held) · top use/talk · R2 attack · L2 fire breath
+//        R1/L1 next/previous weapon · R3 or L1+R1 together Roar · d-pad up drink · d-pad down companion
+//        d-pad left/right previous/next followed quest (Normal Mode: previous/next weapon)
+//        Back/View/Share/minus: map, hold for the journal · Start/Menu/Options/plus: pause, hold for skills
+// Menus: d-pad or left stick moves the focus · bottom picks · right goes back (swappable in Settings)
+//        L1/R1 switch tabs (on the world map they pick a shrine) · right stick scrolls · Start closes pause
+const PB={S:0,E:1,W:2,N:3,L1:4,R1:5,L2:6,R2:7,SEL:8,ST:9,L3:10,R3:11,UP:12,DN:13,LF:14,RT:15,HOME:16,TP:17}, NPB=18;
+Object.assign(settings,{rumble:store.get('eb_rumble',true)!==false, padOk:['auto','south','east'].includes(store.get('eb_padok','auto'))?store.get('eb_padok','auto'):'auto'});
+const PADK={
+  xbox:{name:'Xbox controller',short:'Xbox',face:['A','B','X','Y'],bg:['#3e9a36','#cc3b2d','#2c6ecf','#e3ae25'],fg:['#fff','#fff','#fff','#2b1c00'],sh:['LB','RB','LT','RT'],sel:'View',st:'Menu',l3:'LS',r3:'RS'},
+  ps:{name:'PlayStation controller',short:'PlayStation',face:['✕','○','□','△'],bg:['#1c2230','#1c2230','#1c2230','#1c2230'],fg:['#8fb4ff','#ff7b7b','#f39ad9','#45dcb0'],sh:['L1','R1','L2','R2'],sel:'Create',st:'Options',l3:'L3',r3:'R3'},
+  nin:{name:'Nintendo controller',short:'Nintendo',face:['B','A','Y','X'],bg:['#35373d','#35373d','#35373d','#35373d'],fg:['#fff','#fff','#fff','#fff'],sh:['L','R','ZL','ZR'],sel:'−',st:'+',l3:'L stick',r3:'R stick'}
+};
+const PAD={idx:-1,id:'',kind:'xbox',gen:false,sel:null,dev:'kb',known:new Map(),st:new Map(),s:null,ui:false,q:{},full:0,latch:false,still:0,
+  sh:[-1,-1],chord:false,nav:{d:'',t:0},stickBlock:false,scene:'',toastT:0,rum:{until:0,str:0},rw:{G:null,hp:0,lvl:0,hs:0,sk:0,dead:false},lastBtn:'',mem:{},rootId:''};
+try{ if('gamepadInputEmulation' in navigator) navigator.gamepadInputEmulation='gamepad'; }catch(e){}
+function padKindOf(id){
+  const s=String(id||'').toLowerCase();
+  if(/045e|xbox|xinput/.test(s)) return 'xbox';
+  if(/054c|dualsense|dualshock|playstation|sony|wireless controller/.test(s)) return 'ps';
+  if(/057e|nintendo|pro controller|joy-con|switch/.test(s)) return 'nin';
+  return 'gen';
+}
+const padK=k=>PADK[k==='gen'?'xbox':k]||PADK.xbox;
+// the name of physical button i on pad kind k
+function padBtnName(i,k){
+  k=k||PAD.kind; const K=padK(k);
+  if(i<4) return K.face[i];
+  if(i<8) return K.sh[i-4];
+  if(i===8) return k===PAD.kind&&PAD.sel?PAD.sel:K.sel;
+  if(i===9) return K.st;
+  if(i===10) return K.l3; if(i===11) return K.r3;
+  if(i>=12&&i<=15) return 'D-pad '+['↑','↓','←','→'][i-12];
+  return i===17?'Touchpad':'Home';
+}
+const curDevice=()=>padActive()?'pad':usingTouch?'touch':'kb';
+function padActive(){ return PAD.idx>=0&&PAD.dev==='pad'; }
+function padDev(d){
+  if(PAD.dev===d) return; PAD.dev=d;
+  try{ document.body.classList.toggle('padnav',d==='pad'); }catch(e){}
+  if(d==='pad'){ usingTouch=false; if(aimMode==='touch'||aimMode==='mouse') aimMode='pad'; }
+}
+addEventListener('keydown',e=>{ if(!/^Gamepad/.test(e.key||'')&&!/^Gamepad/.test(e.code||'')) padDev('kb'); },true); // some browsers echo pad buttons as Gamepad* keys
+addEventListener('mousedown',()=>padDev('mouse'),true);
+addEventListener('mousemove',e=>{ if(Math.abs(e.movementX||0)+Math.abs(e.movementY||0)>3) padDev('mouse'); },true);
+addEventListener('touchstart',()=>padDev('touch'),{capture:true,passive:true});
+
+// ---------- button labels for whatever the player is using right now
+// btnLabel(action[,dev]): action is attack, fire, roll, jump, use, drink, roar, map, journal, pause, weapon, whistle or skills.
+// dev is 'kb', 'touch' or 'pad' (default: the device used last). Pad labels follow the detected controller.
+const ACT_KEY={attack:'J',fire:'K',roll:'Space',jump:'C',use:'E',drink:'R',roar:'Q',map:'M',journal:'I',pause:'Esc',weapon:'X',whistle:'G',skills:'U'};
+const ACT_TOUCH={attack:'the SLASH button',fire:'the FIRE button',roll:'the ROLL button',jump:'the JUMP button',use:'the USE button',drink:'the DRINK button',roar:'the ROAR button',map:'the minimap',journal:'the quest list',pause:'the pause button',weapon:'the WEAPON button',whistle:'the CALL button',skills:'Skills in the pause menu'};
+const ACT_PAD={attack:PB.W,fire:PB.L2,roll:PB.E,jump:PB.S,use:PB.N,drink:PB.UP,roar:PB.R3,map:PB.SEL,journal:PB.SEL,pause:PB.ST,weapon:PB.R1,whistle:PB.DN,skills:PB.ST};
+const ACT_HOLD={journal:1,skills:1};
+function btnLabel(action,dev){
+  dev=dev||curDevice();
+  if(dev==='pad'){ const i=ACT_PAD[action]; if(i==null) return ''; return (ACT_HOLD[action]?'Hold ':'')+padBtnName(i); }
+  if(dev==='touch') return ACT_TOUCH[action]||'';
+  return ACT_KEY[action]||'';
+}
+// the same thing as a little HTML chip (styles .pg in body.html)
+function btnHTML(action,dev){
+  dev=dev||curDevice();
+  if(dev==='pad'){ const i=ACT_PAD[action]; if(i==null) return ''; return (ACT_HOLD[action]?'hold ':'')+padChip(i); }
+  if(dev==='touch') return escapeHtml(ACT_TOUCH[action]||'');
+  return `<kbd class="pg k">${escapeHtml(ACT_KEY[action]||'')}</kbd>`;
+}
+function padChip(i,k){
+  k=k||PAD.kind; const K=padK(k), t=escapeHtml(padBtnName(i,k).replace('D-pad ',''));
+  if(i<4) return `<i class="pg f" style="background:${K.bg[i]};color:${K.fg[i]}">${t}</i>`;
+  if(i>=12&&i<=15) return `<i class="pg d" title="D-pad">${t}</i>`;
+  return `<i class="pg s">${t}</i>`;
+}
+// canvas glyph for physical button i (pad kind k) centred at x,y with radius r; returns the width used
+function drawPadGlyph(g,i,k,x,y,r){
+  k=k||PAD.kind; const K=padK(k);
+  g.save(); g.textAlign='center'; g.textBaseline='middle';
+  let w=r*2;
+  if(i<4){
+    g.fillStyle='rgba(0,0,0,.35)'; g.beginPath(); g.arc(x,y+r*0.12,r,0,TAU); g.fill();
+    g.fillStyle=K.bg[i]; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill();
+    g.strokeStyle='rgba(255,255,255,.38)'; g.lineWidth=Math.max(1,r*0.1); g.stroke();
+    const fg=K.fg[i];
+    if(k==='ps'){
+      const q=r*0.44; g.strokeStyle=fg; g.lineWidth=Math.max(1.4,r*0.17); g.lineCap='round'; g.lineJoin='round'; g.beginPath();
+      if(i===0){ g.moveTo(x-q,y-q); g.lineTo(x+q,y+q); g.moveTo(x+q,y-q); g.lineTo(x-q,y+q); }
+      else if(i===1) g.arc(x,y,q*1.02,0,TAU);
+      else if(i===2) g.rect(x-q*0.86,y-q*0.86,q*1.72,q*1.72);
+      else { g.moveTo(x,y-q*1.05); g.lineTo(x+q*1.02,y+q*0.72); g.lineTo(x-q*1.02,y+q*0.72); g.closePath(); }
+      g.stroke();
+    }else{ g.fillStyle=fg; g.font=`800 ${Math.round(r*1.15)}px ${UIF}`; g.fillText(K.face[i],x,y+r*0.07); }
+  }else if(i>=12&&i<=15){
+    const a=r*0.98, t=r*0.6;
+    g.fillStyle='#2b2521'; rrect(g,x-t/2,y-a,t,a*2,t*0.25); g.fill(); rrect(g,x-a,y-t/2,a*2,t,t*0.25); g.fill();
+    g.strokeStyle='rgba(255,255,255,.35)'; g.lineWidth=1; rrect(g,x-t/2,y-a,t,a*2,t*0.25); g.stroke(); rrect(g,x-a,y-t/2,a*2,t,t*0.25); g.stroke();
+    const d=[[0,-1],[0,1],[-1,0],[1,0]][i-12]; g.fillStyle='#ffd27a';
+    g.beginPath(); g.arc(x+d[0]*a*0.55,y+d[1]*a*0.55,t*0.34,0,TAU); g.fill();
+  }else{
+    const t=padBtnName(i,k); g.font=`800 ${Math.round(r*0.92)}px ${UIF}`;
+    const tw=g.measureText(t).width, h=r*1.72; w=Math.max(r*2,tw+r*1.1);
+    g.fillStyle='rgba(0,0,0,.35)'; rrect(g,x-w/2,y-h/2+r*0.12,w,h,i===6||i===7?h*0.32:h/2); g.fill();
+    g.fillStyle='#2e2622'; rrect(g,x-w/2,y-h/2,w,h,i===6||i===7?h*0.32:h/2); g.fill();
+    g.strokeStyle='rgba(255,236,210,.45)'; g.lineWidth=1; g.stroke();
+    g.fillStyle='#f6ead8'; g.fillText(t,x,y+r*0.06);
+  }
+  g.restore(); return w;
+}
+// glyph for an action on the current device (pad button, or a key cap); returns the width used, 0 on touch
+function drawBtnGlyph(g,action,x,y,r,dev){
+  dev=dev||curDevice();
+  if(dev==='pad'){ const i=ACT_PAD[action]; return i==null?0:drawPadGlyph(g,i,PAD.kind,x,y,r); }
+  if(dev==='touch') return 0;
+  const t=ACT_KEY[action]||'?'; g.save(); g.font=`800 ${Math.round(r*1.05)}px ${UIF}`; g.textAlign='center'; g.textBaseline='middle';
+  const w=Math.max(r*2,g.measureText(t).width+r*0.9), h=r*2;
+  g.fillStyle='#4a2a1a'; rrect(g,x-w/2,y-h/2+2,w,h,r*0.45); g.fill();
+  g.fillStyle='#6a3c24'; rrect(g,x-w/2,y-h/2,w,h,r*0.45); g.fill(); g.strokeStyle='rgba(255,220,180,.5)'; g.lineWidth=1; g.stroke();
+  g.fillStyle='#fff2de'; g.fillText(t,x,y+0.5); g.restore(); return w;
+}
+
+// ---------- reading the pads
+function padDz(x,y,d){ const m=Math.hypot(x,y); if(m<d) return [0,0,0]; const k=Math.min(1,(m-d)/(1-d-0.06)); return [x/m*k,y/m*k,k]; }
+function padRead(gp,dt){
+  let s=PAD.st.get(gp.index);
+  if(!s){ s={cur:[],prev:[],val:[],hold:[],block:[],ed:[],tap:[],arm:[],fired:[],ax:[0,0,0,0],act:0,first:true};
+    for(let i=0;i<NPB;i++){ s.cur[i]=s.prev[i]=s.block[i]=s.ed[i]=s.tap[i]=s.arm[i]=s.fired[i]=false; s.val[i]=s.hold[i]=0; }
+    PAD.st.set(gp.index,s); }
+  const B=gp.buttons||[], A=gp.axes||[]; let busy=false;
+  for(let i=0;i<NPB;i++){
+    const b=B[i]; let v=0,p=false;
+    if(b!=null){ if(typeof b==='object'){ v=+b.value||0; p=!!b.pressed; } else { v=+b||0; p=v>0.5; } }
+    if(i===PB.L2||i===PB.R2) p=v>0.35||(p&&!(v>0));
+    s.prev[i]=s.cur[i]; s.cur[i]=p; s.val[i]=v;
+  }
+  // some non-standard pads put the d-pad on a hat axis
+  if(gp.mapping!=='standard'&&B.length<16&&A.length>=8){ const hx=+A[6]||0, hy=+A[7]||0; s.cur[12]=hy<-0.5; s.cur[13]=hy>0.5; s.cur[14]=hx<-0.5; s.cur[15]=hx>0.5; }
+  for(let i=0;i<NPB;i++){
+    const c=s.cur[i], p=s.prev[i];
+    if(!c) s.block[i]=false;
+    s.ed[i]=c&&!p&&!s.block[i]&&!s.first;
+    if(s.ed[i]){ s.arm[i]=true; busy=true; }
+    s.tap[i]=!c&&p&&s.arm[i]&&!s.fired[i]&&s.hold[i]<0.5;
+    if(!c){ s.arm[i]=false; s.fired[i]=false; }
+    s.hold[i]=c?s.hold[i]+dt:0;
+  }
+  s.ax=[+A[0]||0,+A[1]||0,+A[2]||0,+A[3]||0];
+  if(Math.hypot(s.ax[0],s.ax[1])>0.5||Math.hypot(s.ax[2],s.ax[3])>0.5||s.val[6]>0.3||s.val[7]>0.3) busy=true;
+  if(s.first){ for(let i=0;i<NPB;i++) s.block[i]=s.cur[i]; s.first=false; }
+  s.busy=busy; return s;
+}
+// the topmost visible overlay: menus, pause, settings, journal, map, dialogue, skills and so on
+const vis=el=>!!el&&el.getClientRects().length>0;
+function navRoot(){
+  let best=null, bz=-1e9;
+  for(const o of document.querySelectorAll('.ov.on,#skills')){
+    if(o.id==='card'||!vis(o)) continue;
+    if(o.id==='skills'&&!o.classList.contains('on')&&!Array.from(o.querySelectorAll('button')).some(vis)) continue;
+    const z=parseFloat(getComputedStyle(o).zIndex)||0; if(z>=bz){ bz=z; best=o; }
+  }
+  return best;
+}
+function padPoll(dt){
+  PAD.q={}; PAD.ui=false;
+  let list=[]; try{ list=navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[]; }catch(e){ list=[]; }
+  const seen=new Set(); let act=null;
+  for(const gp of list){
+    if(!gp||gp.connected===false) continue;
+    seen.add(gp.index);
+    if(PAD.known.get(gp.index)!==gp.id){ PAD.known.set(gp.index,gp.id); PAD.st.delete(gp.index); padHello(gp); }
+    const s=padRead(gp,dt);
+    if(s.busy) s.act=performance.now();
+    if(!act||s.act>act.s.act) act={gp,s};
+  }
+  for(const [i,id] of Array.from(PAD.known)) if(!seen.has(i)){ PAD.known.delete(i); PAD.st.delete(i); padBye(i,id); }
+  const s=act?act.s:null;
+  if(act){ const gp=act.gp; if(PAD.idx!==gp.index||PAD.id!==gp.id){ PAD.idx=gp.index; PAD.id=gp.id; padSetKind(gp.id); } PAD.s=s; if(s.busy){ padDev('pad'); SFX.init(); } }
+  else if(PAD.idx>=0){ PAD.idx=-1; PAD.s=null; }
+  padLabels();
+  // a new screen: buttons still held from the last one do nothing until they are let go,
+  // and backing out of a sub-screen puts the focus back on the button that opened it
+  const root=navRoot(), key=scene+'|'+(root?root.id:''), ae=document.activeElement;
+  if(key===PAD.scene&&root&&ae&&ae!==document.body&&root.contains(ae)&&!PAD.restoring) PAD.mem[root.id]=ae;
+  if(key!==PAD.scene){
+    const first=!PAD.scene, from=PAD.rootId; PAD.scene=key; PAD.rootId=root?root.id:'';
+    if(!first){
+      if(s){ for(let i=0;i<NPB;i++){ if(s.cur[i]){ s.block[i]=true; s.arm[i]=false; } s.ed[i]=false; s.tap[i]=false; } PAD.stickBlock=Math.hypot(s.ax[0],s.ax[1])>0.4; }
+      PAD.nav.d=''; PAD.sh=[-1,-1];
+      if(root&&['settings','how','slots','acct'].includes(from)&&['menu','pause'].includes(root.id)) navRestore(root);
+      else if(root&&PAD.dev==='pad'&&root.id!=='dialogue') setTimeout(()=>{ if(navRoot()===root&&PAD.dev==='pad'){ const it=navItems(root); if(it.length&&!it.includes(document.activeElement)) navFocus(navDefault(root,it)); } },90);
+    }
+  }
+  if(!s) return;
+  rumbleWatch();
+  if(PAD.stickBlock&&Math.hypot(s.ax[0],s.ax[1])<0.3) PAD.stickBlock=false;
+  if(PAD.dev!=='pad') return;
+  if(root) padMenu(root,s,dt);
+  else if(scene==='play') padPlayUI(s,dt);
+}
+function padSetKind(id){
+  const k=padKindOf(id); PAD.gen=k==='gen'; PAD.kind=k==='gen'?'xbox':k;
+  PAD.sel=PAD.kind==='ps'?(/0ce6|0df2|dualsense/i.test(id)?'Create':'Share'):null;
+  padRenderSettings();
+}
+const padName=id=>{ const k=padKindOf(id); return k==='gen'?'Controller':PADK[k].name; };
+function padHello(gp){
+  const k=padKindOf(gp.id), kk=k==='gen'?'xbox':k, ok=padOkBtn(kk), back=ok?0:1;
+  padToast(`${padName(gp.id)} connected`, scene==='play'?`${padChip(PB.ST,kk)} pauses · ${padChip(PB.SEL,kk)} opens the map`:`${padChip(ok,kk)} picks · ${padChip(back,kk)} goes back`);
+  padRenderSettings();
+}
+function padBye(i,id){
+  if(i!==PAD.idx&&PAD.known.size) return;
+  padToast('Controller disconnected','Plug it back in, or keep going with the keyboard.');
+  if(PAD.dev==='pad'){ PAD.dev=''; padDev('kb'); }
+  PAD.idx=-1; PAD.s=null;
+  if(scene==='play') pauseGame();
+  padRenderSettings();
+}
+function padToast(title,sub){
+  let el=document.getElementById('padToast');
+  if(!el){ el=document.createElement('div'); el.id='padToast'; el.setAttribute('role','status'); el.setAttribute('aria-live','polite'); document.body.appendChild(el); }
+  el.innerHTML=`<b>${escapeHtml(title)}</b>${sub?`<span>${sub}</span>`:''}`;
+  el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+  clearTimeout(PAD.toastT); PAD.toastT=setTimeout(()=>el.classList.remove('on'),3400);
+}
+// which face button picks things in menus: the bottom one, or the right one (Nintendo style)
+function padOkBtn(k){ const v=settings.padOk; if(v==='south') return PB.S; if(v==='east') return PB.E; return (k||PAD.kind)==='nin'?PB.E:PB.S; }
+
+// ---------- in the world: pause, map, journal, skills and quest focus (the rest is merged in readInput by padInput)
+function padPlayUI(s,dt){
+  const story=G&&G.mode==='story';
+  // both sticks clicked in together also pause (Edge on an Xbox keeps the Menu button for itself)
+  if(s.cur[PB.L3]&&s.cur[PB.R3]&&(s.ed[PB.L3]||s.ed[PB.R3])){ PAD.ui=true; PAD.latch=false; pauseGame(); return; }
+  if(story){
+    if(s.cur[PB.ST]&&s.arm[PB.ST]&&!s.fired[PB.ST]&&s.hold[PB.ST]>=0.5){ s.fired[PB.ST]=true; PAD.ui=true; openSkills(); }
+    else if(s.tap[PB.ST]){ PAD.ui=true; pauseGame(); }
+    for(const i of [PB.SEL,PB.TP]){
+      if(s.cur[i]&&s.arm[i]&&!s.fired[i]&&s.hold[i]>=0.5){ s.fired[i]=true; PAD.ui=true; openJournal(); }
+      else if(s.tap[i]){ PAD.ui=true; openMap(); }
+    }
+    if(s.ed[PB.RT]) cycleFocus();
+    if(s.ed[PB.LF]) focusPrev();
+  }else{
+    if(s.ed[PB.ST]){ PAD.ui=true; pauseGame(); }
+    if(s.ed[PB.RT]) PAD.q.wN=true;
+    if(s.ed[PB.LF]) PAD.q.wP=true;
+  }
+  // shoulders: a tap switches weapons, both together roar
+  for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(s.ed[i]) PAD.sh[j]=0; else if(PAD.sh[j]>=0) PAD.sh[j]+=dt; }
+  if(s.cur[PB.L1]&&s.cur[PB.R1]&&(PAD.sh[0]>=0||PAD.sh[1]>=0)&&!PAD.chord){ PAD.chord=true; PAD.q.roar=true; PAD.sh=[-1,-1]; }
+  if(!s.cur[PB.L1]&&!s.cur[PB.R1]) PAD.chord=false;
+  for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(PAD.sh[j]>=0&&(!s.cur[i]||PAD.sh[j]>0.12)){ if(!PAD.chord){ if(j) PAD.q.wN=true; else PAD.q.wP=true; } PAD.sh[j]=-1; } }
+}
+function focusPrev(){
+  const list=[null].concat(tracked()); let i=list.indexOf(G.focus||null); i=(i-1+list.length)%list.length;
+  followQuest(list[i]); SFX.play('ui');
+}
+function padInput(o,dt){
+  const s=PAD.s; if(!s||!padActive()||PAD.ui) return;
+  const h=i=>s.cur[i]&&!s.block[i], e=i=>s.ed[i];
+  // left stick: analog walking; all the way out for a moment sprints, like the touch stick
+  const [lx,ly,lm]=PAD.stickBlock?[0,0,0]:padDz(s.ax[0],s.ax[1],0.17);
+  if(lm>0&&Math.hypot(o.mx,o.my)<0.05){ o.mx=lx; o.my=ly; }
+  if(lm>0.93) PAD.full+=dt; else if(lm<0.85) PAD.full=0;
+  if(e(PB.L3)) PAD.latch=!PAD.latch;
+  if(lm<0.2){ PAD.still+=dt; if(PAD.still>0.25) PAD.latch=false; } else PAD.still=0;
+  if(PAD.full>0.3||(PAD.latch&&lm>0.2)) o.sprint=true;
+  if(h(PB.W)||h(PB.R2)) o.attack=true;
+  if(h(PB.L2)) o.fire=true;
+  if(e(PB.E)) o.roll=true;
+  if(e(PB.S)) o.jump=true;
+  if(h(PB.S)) o.jumpHeld=true;
+  if(e(PB.N)) o.use=true;
+  if(e(PB.UP)) o.drink=true;
+  if(e(PB.DN)) o.whistle=true;
+  if(e(PB.R3)||PAD.q.roar) o.roar=true;
+  if(PAD.q.wN) o.wNext=true;
+  if(PAD.q.wP) o.wPrev=true;
+  // right stick aims; without it Ash faces where he walks, with a gentle nudge toward a close enemy while attacking
+  const [rx,ry,rm]=padDz(s.ax[2],s.ax[3],0.22);
+  if(rm>0){ o.aimX=rx; o.aimY=ry; }
+  let ang=rm>0.15?Math.atan2(ry,rx):null;
+  if(ang==null&&(o.attack||o.fire)){ const t=padAssist(o); if(t) ang=Math.atan2(t.y-player.y,t.x-player.x); }
+  if(ang!=null&&player){ aimMode='mouse'; const k=150; mouse.x=(player.x-cam.x)*zoom+Math.cos(ang)*k; mouse.y=(player.y-cam.y)*zoom+Math.sin(ang)*k; }
+  else if(aimMode==='mouse') aimMode='pad';
+  o.pad=s.busy||lm>0||rm>0||s.cur.some(Boolean);
+  if(PAD.dbg) for(const k of ['jump','jumpHeld','roll','use','drink','whistle','roar','wNext','wPrev','attack','fire','sprint']) if(o[k]) PAD.dbg[k]=(PAD.dbg[k]||0)+1;
+}
+function padAssist(o){
+  const p=player; if(!p||!G) return null;
+  const base=Math.hypot(o.mx,o.my)>0.2?Math.atan2(o.my,o.mx):p.facing; let best=null, bd=200*200;
+  for(const e of G.enemies){
+    if(e.dead||e.passive||e.alpha<0.3||e.spawnIn>0) continue;
+    const d=dist2(p.x,p.y,e.x,e.y); if(d>=bd) continue;
+    const da=Math.abs(((Math.atan2(e.y-p.y,e.x-p.x)-base)%TAU+TAU*1.5)%TAU-Math.PI);
+    if(da<1.15){ bd=d; best=e; }
+  }
+  return best;
+}
+// labels in the DOM that name buttons (the dialogue "next" and "skip" hints), kept in step with the device
+function padLabels(){
+  if(scene!=='dialogue') return;
+  const n=$('#dlgNext'), sk=$('#dlgSkip'); if(!n||!sk) return;
+  if(curDevice()==='pad'){
+    const ok=padOkBtn(), bk=ok===PB.S?PB.E:PB.S, key=PAD.kind+ok;
+    if(n.dataset.pad!==key||!n.querySelector('.pg')){ n.dataset.pad=key; n.innerHTML=`${padChip(ok)} next &#9656;`; sk.innerHTML=`Skip scene ${padChip(bk)}`; }
+  }else if(n.querySelector('.pg')){ n.dataset.pad=''; n.textContent=usingTouch?'Tap ▸':'Click or Space ▸'; sk.innerHTML='Skip scene &#9197;'; }
+}
+
+// ---------- menus and overlays: a focus ring you move with the d-pad or stick
+const NAV_SEL='button,input:not([type=hidden]),select,textarea,a[href],[tabindex]';
+function navItems(root){
+  if(!root) return [];
+  if(root.id==='dialogue') return Array.from(root.querySelectorAll('#dlgOpts button')).filter(vis);
+  return Array.from(root.querySelectorAll(NAV_SEL)).filter(el=>!el.disabled&&!el.hidden&&el.tabIndex>=0&&!el.classList.contains('dlg')&&!el.closest('[hidden]')&&vis(el));
+}
+function navFocus(el){
+  if(!el) return;
+  try{ el.focus({preventScroll:true}); }catch(e){ try{ el.focus(); }catch(e2){} }
+  try{ el.scrollIntoView({block:'nearest',inline:'nearest'}); }catch(e){}
+}
+function navRestore(root){
+  const el=PAD.mem[root.id]; if(!el||!el.isConnected||usingTouch) return;
+  PAD.restoring=true;
+  setTimeout(()=>{ PAD.restoring=false; if(navRoot()===root&&navItems(root).includes(el)) navFocus(el); },60);
+}
+function navDefault(root,items){ return items.find(el=>el.matches('[data-focus]'))||items[0]; }
+function navNear(root,r){
+  const items=navItems(root); if(!items.length) return; const cx=(r.left+r.right)/2, cy=(r.top+r.bottom)/2; let best=null,bd=1e12;
+  for(const el of items){ const b=el.getBoundingClientRect(), d=((b.left+b.right)/2-cx)**2+((b.top+b.bottom)/2-cy)**2; if(d<bd){ bd=d; best=el; } }
+  navFocus(best);
+}
+function isScroll(n){ if(!n||n.scrollHeight<=n.clientHeight+4) return false; const oy=getComputedStyle(n).overflowY; return oy==='auto'||oy==='scroll'; }
+function navScroller(root,el){
+  for(let n=el&&el.parentElement;n&&n!==document.body;n=n.parentElement){ if(n!==root&&isScroll(n)) return n; if(n===root) break; }
+  const inner=Array.from(root.querySelectorAll('.jbody,.hbody,[data-scroll]')).find(isScroll); if(inner) return inner;
+  return isScroll(root)?root:null;
+}
+const canScroll=(sc,sg)=>sg>0?sc.scrollTop+sc.clientHeight<sc.scrollHeight-3:sc.scrollTop>2;
+function navMove(root,dir){
+  const items=navItems(root), cur=document.activeElement, V=dir==='u'||dir==='d', sg=(dir==='d'||dir==='r')?1:-1;
+  const sc=navScroller(root,items.includes(cur)?cur:null);
+  if(!items.length){ if(sc&&V) sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
+  if(!items.includes(cur)){ navFocus(navDefault(root,items)); return; }
+  const a=cur.getBoundingClientRect(), acx=(a.left+a.right)/2, acy=(a.top+a.bottom)/2;
+  let best=null,bs=1e9;
+  for(const el of items){
+    if(el===cur) continue;
+    const b=el.getBoundingClientRect(), bcx=(b.left+b.right)/2, bcy=(b.top+b.bottom)/2;
+    let main,off,cross;
+    if(V){ if((bcy-acy)*sg<=2) continue; main=sg>0?b.top-a.bottom:a.top-b.bottom; if(main<-Math.min(a.height,b.height)*0.5) continue; off=Math.max(0,b.left-a.right,a.left-b.right); cross=Math.abs(bcx-acx); }
+    else { if((bcx-acx)*sg<=2) continue; main=sg>0?b.left-a.right:a.left-b.right; if(main<-Math.min(a.width,b.width)*0.5) continue; off=Math.max(0,b.top-a.bottom,a.top-b.bottom); if(off>0) continue; cross=Math.abs(bcy-acy); }
+    const sc2=Math.max(0,main)+off*3+cross*0.12+(off>0?30:0);
+    if(sc2<bs){ bs=sc2; best=el; }
+  }
+  // inside a scrolling box, scroll to read the rest before jumping out of it
+  if(V&&sc&&canScroll(sc,sg)&&(!best||!sc.contains(best))){ sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
+  if(!best&&V&&items.length>2){
+    // wrap around: the far end, nearest in x
+    let ex=null, ev=sg>0?1e9:-1e9;
+    for(const el of items){ const b=el.getBoundingClientRect(), v=sg>0?b.top:b.bottom; if(sg>0?v<ev-2:v>ev+2){ ev=v; ex=el; } else if(Math.abs(v-ev)<=2&&ex){ const e0=ex.getBoundingClientRect(); if(Math.abs((b.left+b.right)/2-acx)<Math.abs((e0.left+e0.right)/2-acx)) ex=el; } }
+    best=ex;
+  }
+  if(!best) return;
+  // stepping into a row of toggles lands on the one that is switched on
+  const seg=best.parentElement;
+  if(V&&seg&&seg.classList.contains('seg')&&!seg.contains(cur)){ const on=Array.from(seg.children).find(b=>b.getAttribute('aria-pressed')==='true'&&items.includes(b)); if(on) best=on; }
+  navFocus(best); SFX.play('ui',0.35);
+}
+function navOk(root){
+  if(root.id==='dialogue'){
+    const opts=navItems(root);
+    if(opts.length){ const f=opts.includes(document.activeElement)?document.activeElement:opts[0]; f.click(); }
+    else advanceDialogue();
+    return;
+  }
+  const items=navItems(root), el=document.activeElement;
+  if(!items.includes(el)){ navFocus(navDefault(root,items)); return; }
+  if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){ try{ el.focus(); el.click(); }catch(e){} return; }
+  const r=el.getBoundingClientRect(); SFX.init(); el.click();
+  // the click may rebuild this screen (journal, save slots): keep the ring close to where it was
+  const r2=navRoot(); if(r2===root&&!navItems(root).includes(document.activeElement)) navNear(root,r);
+}
+// "back" for each screen: the same as Escape there; every screen has a way out
+const DLG_EXIT=/^(goodbye|bye|see you|just looking|not right now|not now|maybe later|give me a minute|no thanks|never mind|i'll come back)/i;
+function ovBack(root){
+  const id=root&&root.id; if(!id) return;
+  const click=s=>{ const b=$(s); if(b&&vis(b)){ b.click(); return true; } return false; };
+  if(id==='dialogue'){
+    // with choices up, back moves to the way-out choice (Goodbye, Just looking...), and a second press takes it;
+    // story decisions have no way-out choice, so back never makes one by accident
+    const opts=navItems(root), ex=opts.slice().reverse().find(b=>DLG_EXIT.test(b.textContent.replace(/^\s*\d+/,'').trim()));
+    if(ex){ if(document.activeElement===ex) ex.click(); else { navFocus(ex); SFX.play('ui',0.35); } }
+    else skipDialogue();
+  }
+  else if(id==='how') closeHow();
+  else if(id==='settings') closeSettings();
+  else if(id==='slots'){ if(slotConfirm){ slotConfirm=null; renderSlots(); SFX.play('ui'); } else click('#bSlotsClose'); }
+  else if(id==='acct') click('#acClose');
+  else if(id==='pause') resumeGame();
+  else if(id==='mapov') closeMap();
+  else if(id==='jour') closeJournal();
+  else if(id==='dead') click('#bRetry');
+  else if(id==='victory') click('#bWinExplore');
+  else if(id==='menu'||id==='upgrade') return;
+  else {
+    // a screen from another module (skills and so on): its close button, or Escape
+    const b=Array.from(root.querySelectorAll('button')).find(x=>vis(x)&&(/close|back|done/i.test(x.id)||/^\s*(close|done|back|got it|resume)\b/i.test(x.textContent)));
+    if(b) b.click();
+    else { for(const t of ['keydown','keyup']) dispatchEvent(new KeyboardEvent(t,{key:'Escape',code:'Escape',bubbles:true})); }
+  }
+}
+function navTab(root,d){
+  if(root.id==='mapov'){ if(typeof mapCycle==='function') mapCycle(d); return; }
+  const bar=Array.from(root.querySelectorAll('[data-tabs],.jtabs,#acTabs,[role="tablist"]')).find(vis); if(!bar) return;
+  const bs=Array.from(bar.querySelectorAll('button')).filter(b=>!b.disabled&&!b.hidden&&vis(b)); if(bs.length<2) return;
+  let i=bs.findIndex(b=>b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true'||b.classList.contains('on')); if(i<0) i=0;
+  const n=bs[(i+d+bs.length)%bs.length], keep=bar.contains(document.activeElement)||!navItems(root).includes(document.activeElement);
+  n.click(); if(keep) navFocus(n);
+}
+function padMenu(root,s,dt){
+  PAD.ui=true;
+  const ok=padOkBtn(), back=ok===PB.S?PB.E:PB.S, h=i=>s.cur[i]&&!s.block[i];
+  let d='';
+  if(h(PB.UP)) d='u'; else if(h(PB.DN)) d='d'; else if(h(PB.LF)) d='l'; else if(h(PB.RT)) d='r';
+  if(!d&&!PAD.stickBlock){ const x=s.ax[0], y=s.ax[1]; if(Math.hypot(x,y)>0.55) d=Math.abs(x)>Math.abs(y)?(x>0?'r':'l'):(y>0?'d':'u'); }
+  const N=PAD.nav;
+  if(d&&d!==N.d){ N.d=d; N.t=0.42; navMove(root,d); }
+  else if(d){ N.t-=dt; if(N.t<=0){ N.t=0.12; navMove(root,d); } }
+  else N.d='';
+  if(s.ed[ok]) navOk(root);
+  else if(s.ed[back]) ovBack(root);
+  else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) advanceDialogue();
+  if(s.ed[PB.L1]) navTab(root,-1);
+  if(s.ed[PB.R1]) navTab(root,1);
+  if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
+  if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
+  // right stick scrolls long pages
+  const ry=s.ax[3]; if(Math.abs(ry)>0.25){ const sc=navScroller(root,document.activeElement); if(sc) sc.scrollTop+=Math.sign(ry)*(Math.abs(ry)-0.2)*1100*dt; }
+}
+// keyboard: the arrow keys move the same focus ring on menu screens
+function navKey(e){
+  const dir={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r'}[e.code]; if(!dir) return false;
+  const root=navRoot(); if(!root) return false;
+  e.preventDefault(); navMove(root,dir); return true;
+}
+
+// ---------- rumble
+function rumble(strong,weak,ms){
+  if(!settings.rumble||!padActive()) return false;
+  let gp=null; try{ gp=navigator.getGamepads()[PAD.idx]; }catch(e){}
+  if(!gp) return false;
+  const now=performance.now(), R=PAD.rum;
+  if(now<R.until&&Math.max(strong,weak)<R.str*0.85) return false;
+  R.until=now+ms; R.str=Math.max(strong,weak);
+  try{
+    const va=gp.vibrationActuator;
+    if(va&&va.playEffect){ const p=va.playEffect('dual-rumble',{startDelay:0,duration:ms,weakMagnitude:clamp(weak,0,1),strongMagnitude:clamp(strong,0,1)}); if(p&&p.catch) p.catch(()=>{}); return true; }
+    const ha=gp.hapticActuators&&gp.hapticActuators[0]; if(ha&&ha.pulse){ ha.pulse(clamp(Math.max(strong,weak),0,1),ms); return true; }
+  }catch(e){}
+  return false;
+}
+// rumble follows the game: Ash gets hurt, big hits land (hitstop), the ground shakes (boss stomps), level ups
+function rumbleWatch(){
+  const W0=PAD.rw;
+  if(!G||!player||!(scene==='play'||scene==='dying')){ W0.G=null; return; }
+  if(W0.G!==G){ W0.G=G; W0.hp=player.hp; W0.lvl=player.level; W0.hs=hitstop; W0.sk=shakeMag; W0.dead=player.dead; return; }
+  let st=0, wk=0, ms=0;
+  const ask=(a,b,m)=>{ if(Math.max(a,b)>Math.max(st,wk)){ st=a; wk=b; ms=m; } };
+  if(player.hp<W0.hp-0.5){ const f=clamp((W0.hp-player.hp)/player.maxHp*5,0.25,1); ask(0.3+0.6*f,0.75,130+f*140); }
+  if(hitstop>W0.hs+0.02) ask(hitstop>0.06?0.32:0.12,hitstop>0.06?0.55:0.32,hitstop>0.06?90:55);
+  if(shakeMag>W0.sk+5&&shakeMag>=9) ask(clamp(shakeMag/18,0.4,1),0.45,170+shakeMag*7);
+  if(player.dead&&!W0.dead) ask(1,1,480);
+  if(player.level>W0.lvl){ rumble(0.15,0.55,110); setTimeout(()=>rumble(0.55,0.9,240),190); }
+  if(ms) rumble(st,wk,ms);
+  W0.hp=player.hp; W0.lvl=player.level; W0.hs=hitstop; W0.sk=shakeMag; W0.dead=player.dead;
+}
+
+// ---------- settings: controller, vibration, confirm button and fullscreen (built here so the rows sit in one place)
+const fsOn=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+const fsCan=()=>!!(document.fullscreenEnabled||document.webkitFullscreenEnabled);
+function toggleFullscreen(){
+  try{
+    let p;
+    if(fsOn()) p=(document.exitFullscreen||document.webkitExitFullscreen).call(document);
+    else { const el=document.documentElement; p=(el.requestFullscreen||el.webkitRequestFullscreen).call(el); }
+    if(p&&p.catch) p.catch(()=>{ const n=$('#setFullNote'); if(n) n.textContent='The browser said no. Try its own fullscreen button, or F11.'; });
+  }catch(e){}
+}
+function padSettingsInit(){
+  const done=$('#bSettingsClose'); if(!done||$('#setPadBox')) return;
+  const box=document.createElement('div'); box.id='setPadBox';
+  box.innerHTML=`<div class="setsec">Controller and screen</div>
+<p class="setnote" id="setPadName"></p>
+<div class="setrow"><span>Vibration<small>The controller rumbles when you get hit, land big blows and level up.</small></span><div class="seg" id="setRumble" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+<div class="setrow"><span>Menu confirm button<small>Auto uses the right button on Nintendo controllers and the bottom one on the others.</small></span><div class="seg" id="setPadOk" role="group"><button type="button" data-v="auto" aria-pressed="false">Auto</button><button type="button" data-v="south" aria-pressed="false">Bottom</button><button type="button" data-v="east" aria-pressed="false">Right</button></div></div>
+<div class="setrow"><span>Fullscreen<small id="setFullNote">Great on a TV, a tablet or an Xbox.</small></span><button type="button" class="btn c sm" id="bFull">Go fullscreen</button></div>`;
+  done.parentElement.before(box);
+  for(const b of box.querySelectorAll('#setRumble button')) b.addEventListener('click',()=>{ settings.rumble=b.dataset.v==='on'; store.set('eb_rumble',settings.rumble); SFX.play('ui'); padRenderSettings(); if(settings.rumble) rumble(0.4,0.7,160); });
+  for(const b of box.querySelectorAll('#setPadOk button')) b.addEventListener('click',()=>{ settings.padOk=b.dataset.v; store.set('eb_padok',settings.padOk); SFX.play('ui'); PAD.lastBtn=''; padRenderSettings(); });
+  $('#bFull').addEventListener('click',()=>{ SFX.play('ui'); toggleFullscreen(); });
+  for(const ev of ['fullscreenchange','webkitfullscreenchange']) document.addEventListener(ev,padRenderSettings);
+  padRenderSettings();
+}
+function padRenderSettings(){
+  const nm=$('#setPadName'); if(!nm) return;
+  const any=PAD.known.size>0, id=PAD.idx>=0?PAD.id:(any?Array.from(PAD.known.values())[0]:'');
+  nm.innerHTML=any?`${escapeHtml(padName(id))} found. ${padChip(padOkBtn(padKindOf(id)==='gen'?'xbox':padKindOf(id)),padKindOf(id)==='gen'?'xbox':padKindOf(id))} picks in menus.`:'None found yet. Plug one in or pair it, then press any button.';
+  const seg=(sel,v)=>{ for(const b of document.querySelectorAll(sel+' button')) b.setAttribute('aria-pressed',String(b.dataset.v===v)); };
+  seg('#setRumble',settings.rumble?'on':'off'); seg('#setPadOk',settings.padOk);
+  const fb=$('#bFull'); if(fb){ fb.textContent=fsOn()?'Leave fullscreen':'Go fullscreen'; fb.hidden=!fsCan(); }
+  const how=$('#how'); if(how&&how.classList.contains('on')&&typeof renderHow==='function') renderHow();
+}
+padSettingsInit();
+
+// ---------- the controller picture on the How to Play page
+function drawPadDiagram(cv,k){
+  const K=padK(k), g=cv.getContext('2d'), Wd=720, Hd=300, sc=cv.width/Wd;
+  g.setTransform(sc,0,0,sc,0,0); g.clearRect(0,0,Wd,Hd);
+  // body
+  const body=()=>{ g.beginPath(); g.moveTo(272,74); g.lineTo(448,74); g.bezierCurveTo(500,74,522,110,532,160); g.bezierCurveTo(546,230,540,272,506,274); g.bezierCurveTo(480,276,466,252,452,228);
+    g.bezierCurveTo(441,210,422,206,402,206); g.lineTo(318,206); g.bezierCurveTo(298,206,279,210,268,228); g.bezierCurveTo(254,252,240,276,214,274); g.bezierCurveTo(180,272,174,230,188,160); g.bezierCurveTo(198,110,220,74,272,74); g.closePath(); };
+  // shoulders and triggers
+  for(const [x,i] of [[262,6],[458,7]]){ g.fillStyle='#2a2320'; rrect(g,x-34,30,68,30,10); g.fill(); }
+  for(const [x,i] of [[262,4],[458,5]]){ g.fillStyle='#3a302b'; rrect(g,x-40,56,80,22,9); g.fill(); }
+  g.save(); g.shadowColor='rgba(0,0,0,.5)'; g.shadowBlur=18; g.shadowOffsetY=8; body(); g.fillStyle=k==='ps'?'#e9e6e1':k==='nin'?'#2f3136':'#3a3d42'; g.fill(); g.restore();
+  body(); g.strokeStyle='rgba(255,255,255,.25)'; g.lineWidth=2; g.stroke();
+  const light=k==='ps';
+  const stick=(x,y)=>{ g.fillStyle=light?'#2a2b30':'#1f2023'; g.beginPath(); g.arc(x,y,24,0,TAU); g.fill(); g.fillStyle=light?'#43454c':'#33353a'; g.beginPath(); g.arc(x,y,17,0,TAU); g.fill(); g.strokeStyle='rgba(255,255,255,.18)'; g.lineWidth=2; g.beginPath(); g.arc(x,y,12,0,TAU); g.stroke(); };
+  const P=k==='ps'?{dp:[262,128],ls:[318,176],rs:[402,176],fb:[458,128]}:{ls:[262,128],dp:[318,176],rs:[402,176],fb:[458,128]};
+  stick(...P.ls); stick(...P.rs);
+  const [dx,dy]=P.dp; g.fillStyle=light?'#2a2b30':'#1f2023'; rrect(g,dx-9,dy-28,18,56,4); g.fill(); rrect(g,dx-28,dy-9,56,18,4); g.fill();
+  g.fillStyle='#ffd27a'; for(const [ax,ay] of [[0,-1],[0,1],[-1,0],[1,0]]){ g.save(); g.translate(dx+ax*19,dy+ay*19); g.rotate(Math.atan2(ay,ax)); g.beginPath(); g.moveTo(5,0); g.lineTo(-3,-5); g.lineTo(-3,5); g.closePath(); g.fill(); g.restore(); }
+  const [fx,fy]=P.fb; const fp=[[fx,fy+24],[fx+24,fy],[fx-24,fy],[fx,fy-24]];
+  for(let i=0;i<4;i++) drawPadGlyph(g,i,k,fp[i][0],fp[i][1],12);
+  const MB=k==='ps'?[[300,104],[420,104]]:[[326,112],[394,112]];
+  if(k==='ps'){ g.fillStyle='#d6d3ce'; rrect(g,326,80,68,34,8); g.fill(); g.strokeStyle='rgba(0,0,0,.12)'; g.lineWidth=1; g.stroke(); }
+  drawPadGlyph(g,8,k,MB[0][0],MB[0][1],k==='ps'?7:8); drawPadGlyph(g,9,k,MB[1][0],MB[1][1],k==='ps'?7:8);
+  for(const [x,i] of [[262,6],[458,7]]) drawPadGlyph(g,i,k,x,40,9);
+  for(const [x,i] of [[262,4],[458,5]]) drawPadGlyph(g,i,k,x,67,8);
+  // small labels on the body for the middle buttons and the left face button, callouts for the rest
+  const tcol=light?'#3a3330':'#e9dcc8';
+  g.textAlign='center'; g.textBaseline='middle'; g.font=`700 11px ${UIF}`; g.fillStyle=tcol;
+  g.fillText('Map',MB[0][0],MB[0][1]-16); g.fillText('Pause',MB[1][0],MB[1][1]-16);
+  g.textAlign='right'; g.fillText('Attack',fp[2][0]-16,fp[2][1]);
+  const L=[[262,40,22,'Fire breath'],[262,67,40,'Previous weapon'],[P.ls[0],P.ls[1],24,'Move, click: sprint'],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← → switch quest']].sort((a,b)=>a[1]-b[1]);
+  const R=[[458,40,22,'Attack'],[458,67,40,'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,'Aim, click: Roar']];
+  const line=(x0,y0,x1,y1)=>{ g.strokeStyle='rgba(255,200,140,.6)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); g.fillStyle='#ffc35a'; g.beginPath(); g.arc(x0,y0,2.4,0,TAU); g.fill(); g.beginPath(); g.arc(x1,y1,1.6,0,TAU); g.fill(); };
+  const label=(t,x,y,al)=>{ g.font=`600 13px ${UIF}`; g.textAlign=al; g.fillStyle='#f3e4cc'; const ls=t.split('\n'); ls.forEach((s,i)=>g.fillText(s,x,y+(i-(ls.length-1)/2)*16)); };
+  let prev=-1e9; for(const [x,y,r,t] of L){ const ly=Math.max(y,prev+36); prev=ly; line(x-r,y,178,ly); label(t,172,ly,'right'); }
+  prev=-1e9; for(const [x,y,r,t] of R){ const ly=Math.max(y,prev+24); prev=ly; line(x+r,y,542,ly); label(t,548,ly,'left'); }
+}
+// the controller table on the How to Play page, for the pad kind k
+function padHelpRows(k){
+  const c=i=>padChip(i,k), ok=padOkBtn(k), bk=ok===PB.S?PB.E:PB.S, chip=t=>`<i class="pg s">${t}</i>`;
+  return [
+    [chip('Left stick'),`Move. Push it all the way to sprint, or click it (${escapeHtml(padBtnName(PB.L3,k))}).`],
+    [chip('Right stick'),'Aim. Without it Ash faces where he walks.'],
+    [c(PB.S),'Jump, once Ash learns how. With wings, jump again in the air to fly.'],
+    [`${c(PB.W)} ${c(PB.R2)}`,'Attack. Hold for a combo.'],
+    [c(PB.L2),'Fire breath'],
+    [c(PB.E),'Dodge roll'],
+    [c(PB.N),'Talk, open, rest at a shrine'],
+    [`${c(PB.R1)} ${c(PB.L1)}`,'Next or previous weapon'],
+    [`${c(PB.R3)} or ${c(PB.L1)}+${c(PB.R1)}`,'Dragon Roar, once the meter is full'],
+    [c(PB.UP),'Drink a healing draught'],
+    [c(PB.DN),'Call your companion'],
+    [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in Normal Mode: switch weapons)'],
+    [c(PB.SEL),'World map. Hold it for the journal.'],
+    [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
+    [`${c(ok)} ${c(bk)}`,'In menus: pick, go back. The d-pad or left stick moves, L1 and R1 switch tabs.'.replace('L1 and R1',`${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)}`)]
+  ];
+}
+window.__ebX=Object.assign(window.__ebX||{},{btnLabel,btnHTML,rumble,toggleFullscreen,padActive,curDevice,padKindOf,
+  padInfo:()=>({idx:PAD.idx,kind:PAD.kind,dev:PAD.dev,id:PAD.id,known:PAD.known.size,rumble:settings.rumble,padOk:settings.padOk,aimMode,usingTouch,root:(navRoot()||{}).id||null,focus:document.activeElement&&(document.activeElement.id||document.activeElement.textContent.trim().slice(0,40))}),
+  padSeen(){ const d=PAD.dbg||{}; PAD.dbg={}; return d; }, touchLayout(){ return {btn:tLayout(),mini:MINI_R(),pause:PAUSE_R(),mute:MUTE_R(),prompt:PROMPT_R,W,H}; }, offerUpgrades(){ offerUpgrades(null); }, killPlayer(){ playerDied(); }});
 
 // ================= player
 function makePlayer(){
@@ -15179,12 +15902,13 @@ function drawHUD(){
   bar(bx,y,bw,6,p.stamina/p.maxStamina,p.stamina<p.maxStamina*0.25?'#a8a040':'#7cc456','rgba(30,40,20,.9)'); y+=10;
   bar(bx,y,bw*0.8,5,p.energy/p.maxEnergy,p.exhausted?'#7c5530':'#f0a030','rgba(60,34,10,.9)'); y+=11;
   for(let i=0;i<p.potionsMax;i++) flask(bx+5+i*13,y+1,i<p.potions);
+  HUD_HITS.push({x:bx-6,y:y-12,w:p.potionsMax*13+10,h:26,fn:()=>{ touch.pressed.drink=true; }}); // tap the flasks to drink
   if(story){ const cx=bx+8+p.potionsMax*13+8; ctx.fillStyle='#ffd84a'; ctx.beginPath(); ctx.arc(cx,y+1,5,0,TAU); ctx.fill(); ctx.strokeStyle='#8a6a1a'; ctx.lineWidth=1.2; ctx.stroke(); ctx.font=`700 10px ${UIF}`; ctx.fillStyle='#ffe9a0'; ctx.textAlign='left'; ctx.fillText(String(G.coins||0),cx+8,y+1.5); }
   const rx=L+pw-26, ry=T+(story?42:36), R=16, full=p.roar>=100;
   if(full){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(rx,ry,0,rx,ry,30); g.addColorStop(0,'rgba(255,170,70,.4)'); g.addColorStop(1,'rgba(255,120,40,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(rx,ry,30,0,TAU); ctx.fill(); ctx.restore(); }
   ctx.lineWidth=4; ctx.strokeStyle='rgba(50,22,12,.95)'; ctx.beginPath(); ctx.arc(rx,ry,R,0,TAU); ctx.stroke();
   ctx.strokeStyle=full?`rgb(255,${200+Math.sin(G.time*10)*40|0},90)`:'#e07a34'; ctx.beginPath(); ctx.arc(rx,ry,R,-Math.PI/2,-Math.PI/2+TAU*clamp(p.roar/100,0,1)); ctx.stroke();
-  ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText('Q',rx,ry+9); }
+  ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText(btnLabel('roar'),rx,ry+9); }
   // quest tracker / wave info
   let qy=T+(story?92:80); TRACK_R=null;
   const obj=questObjective(), fo=story?focusObjective():null;
@@ -15211,7 +15935,7 @@ function drawHUD(){
       shown++;
     }
     const more=activeQuests().length-shown;
-    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':'(I)'}`,L+2,ly+6); ly+=14; }
+    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+2,ly+6); ly+=14; }
     TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
   }else if(G.mode==='normal'){
     ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`NORMAL MODE · ${G.diff.name.toUpperCase()}`,L+2,qy);
@@ -15234,19 +15958,12 @@ function drawHUD(){
   }
   // prompt
   if(G.prompt&&scene==='play'){
-    ctx.font=`600 14px ${UIF}`; const txt=(usingTouch?'':'[E]  ')+G.prompt.text, tw=ctx.measureText(txt).width+30, py=H-SAFE.b-(usingTouch?300:(b&&!b.dead?96:70));
-    ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
-    ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
+    drawPromptPill(b);
   }
   drawWeaponHud(); drawMoveHud(); if(story){ drawSkillHud(); drawCompHud(); }
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
-    const a=Math.min(1,G.hintT/1.5);
-    const txt=usingTouch?(settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts'):'WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · Space roll · R drink · E use · M map';
-    ctx.font=`500 13px ${UIF}`; const lines=wrapText(txt,Math.min(660,W-40)), y0=H-SAFE.b-(usingTouch?290:(b&&!b.dead?110:34))-(lines.length-1)*18-(G.prompt&&!usingTouch?72:0);
-    ctx.globalAlpha=a; ctx.textAlign='center'; const bw3=Math.max(...lines.map(l=>ctx.measureText(l).width))+28;
-    ctx.fillStyle='rgba(12,9,6,.7)'; rr(W/2-bw3/2,y0-14,bw3,lines.length*18+10,8); ctx.fill();
-    ctx.fillStyle='#ead8bf'; lines.forEach((l,i)=>ctx.fillText(l,W/2,y0+i*18)); ctx.globalAlpha=1;
+    drawHintText(b);
   }
   drawOffscreen(); drawTouch();
 }
@@ -15329,43 +16046,106 @@ function drawOffscreen(){
     ctx.save(); ctx.translate(ex,ey); ctx.rotate(a); ctx.fillStyle=e.boss?'#ff9a3a':'rgba(255,80,60,.85)'; ctx.beginPath(); ctx.moveTo(s,0); ctx.lineTo(-s*0.7,-s*0.7); ctx.lineTo(-s*0.7,s*0.7); ctx.closePath(); ctx.fill(); ctx.restore();
   }
 }
-function touchIcon(id,x,y,r,col){
+// ---------- prompt pill and first-play hints (controls build): they name the right button for the device in use
+// find a spot for a box (centre x,y) that clears the touch buttons: nudge it up a little, else slide it sideways, else lift it above them
+function touchClear(w,h,y){
+  if(!usingTouch) return {x:W/2,y};
+  const L=tLayout(), x0=SAFE.l+10+w/2, x1=W-SAFE.r-10-w/2;
+  const free=(x,y)=>!L.some(b=>Math.abs(b.x-x)<w/2+b.r+6&&Math.abs(b.y-y)<h/2+b.r+6);
+  for(let it=0;it<8;it++){
+    for(let dy=0;dy<=80;dy+=8) if(free(W/2,y-dy)) return {x:W/2,y:y-dy};
+    let best=null; for(let x=x0;x<=x1;x+=8) if(free(x,y)&&(best==null||Math.abs(x-W/2)<Math.abs(best-W/2))) best=x;
+    if(best!=null) return {x:best,y};
+    let top=1e9; for(const b of L) if(Math.abs(b.y-y)<h/2+b.r+6) top=Math.min(top,b.y-b.r);
+    y=top-h/2-8;
+  }
+  return {x:W/2,y};
+}
+let PROMPT_R=null;
+function drawPromptPill(b){
+  const dev=curDevice(), t=G.prompt.text; ctx.font=`600 14px ${UIF}`;
+  const gw=dev==='touch'?0:22, tw=ctx.measureText(t).width+30+(gw?gw+9:0);
+  const at=touchClear(tw,32,H-SAFE.b-(usingTouch?300:(b&&!b.dead?96:70))), py=at.y, px=at.x; PROMPT_R={x:px-tw/2,y:py-16,w:tw,h:32};
+  ctx.fillStyle='rgba(12,9,6,.8)'; rr(px-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle=dev==='pad'?'rgba(255,214,140,.65)':'rgba(255,210,150,.4)'; ctx.lineWidth=1; ctx.stroke();
+  let x=px-tw/2+15;
+  if(gw){ drawBtnGlyph(ctx,'use',x+gw/2,py,11,dev); x+=gw+9; }
+  ctx.font=`600 14px ${UIF}`; ctx.fillStyle='#ffe6c0'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(t,x,py);
+}
+function hintText(){
+  const dev=curDevice(), K=a=>btnLabel(a,dev), jump=G.mode!=='story'||hasAbil('jump');
+  if(dev==='touch') return settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the flasks to drink, the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts';
+  if(dev==='pad') return `Left stick move, push it all the way to sprint · ${K('attack')} or ${padBtnName(PB.R2)} attack · ${padBtnName(PB.L2)} fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('use')} talk and open · ${K('drink')} drink · ${K('map')} map`;
+  return `WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
+}
+function drawHintText(b){
+  const a=Math.min(1,G.hintT/1.5);
+  ctx.font=`500 13px ${UIF}`; const lines=wrapText(hintText(),Math.min(660,W-40)), bh=lines.length*18+10;
+  let y0=H-SAFE.b-(usingTouch?290:(b&&!b.dead?110:34))-(lines.length-1)*18-(G.prompt&&!usingTouch?72:0);
+  const bw3=Math.max(...lines.map(l=>ctx.measureText(l).width))+28;
+  let cx=W/2;
+  if(usingTouch){ let top=y0-14; if(G.prompt&&PROMPT_R) top=Math.min(top,PROMPT_R.y-bh-10); const at=touchClear(bw3,bh,top+bh/2); cx=at.x; y0=at.y-bh/2+14; }
+  ctx.globalAlpha=a; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(12,9,6,.7)'; rr(cx-bw3/2,y0-14,bw3,bh,8); ctx.fill();
+  ctx.fillStyle='#ead8bf'; lines.forEach((l,i)=>ctx.fillText(l,cx,y0+i*18)); ctx.globalAlpha=1;
+}
+// ---------- touch buttons
+const WICON_STUB=/\{\s*\}\s*$/.test(String(drawWeaponIcon));
+function touchIcon(id,x,y,r,col,label){
   ctx.save(); ctx.translate(x,y); const k=r/34; ctx.scale(k,k); ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
   if(id==='attack'){ ctx.rotate(-0.8); ctx.beginPath(); ctx.moveTo(-14,0); ctx.lineTo(16,0); ctx.stroke(); ctx.beginPath(); ctx.moveTo(16,0); ctx.lineTo(10,-4); ctx.lineTo(10,4); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(-8,-7); ctx.lineTo(-8,7); ctx.stroke(); ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(-15,0); ctx.lineTo(-11,0); ctx.stroke(); }
   else if(id==='fire'){ ctx.beginPath(); ctx.moveTo(0,-15); ctx.quadraticCurveTo(12,-2,9,7); ctx.quadraticCurveTo(6,14,0,14); ctx.quadraticCurveTo(-6,14,-9,7); ctx.quadraticCurveTo(-12,-2,0,-15); ctx.fill(); ctx.fillStyle='rgba(20,10,6,.6)'; ctx.beginPath(); ctx.moveTo(0,-3); ctx.quadraticCurveTo(5,4,3,8); ctx.quadraticCurveTo(0,11,-3,8); ctx.quadraticCurveTo(-5,4,0,-3); ctx.fill(); }
   else if(id==='roll'){ ctx.beginPath(); ctx.arc(0,0,11,-2.6,1.9); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-5,-13); ctx.lineTo(-11,-8); ctx.lineTo(-3,-6); ctx.closePath(); ctx.fill(); }
   else if(id==='roar'){ ctx.beginPath(); ctx.arc(-8,0,4,0,TAU); ctx.fill(); for(const rr of [8,14]){ ctx.beginPath(); ctx.arc(-8,0,rr,-0.8,0.8); ctx.stroke(); } }
   else if(id==='drink'){ ctx.beginPath(); ctx.moveTo(-3,-14); ctx.lineTo(3,-14); ctx.lineTo(3,-6); ctx.quadraticCurveTo(11,-2,10,6); ctx.quadraticCurveTo(8,14,0,14); ctx.quadraticCurveTo(-8,14,-10,6); ctx.quadraticCurveTo(-11,-2,-3,-6); ctx.closePath(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-8,4); ctx.quadraticCurveTo(0,1,8,4); ctx.quadraticCurveTo(7,12,0,12); ctx.quadraticCurveTo(-7,12,-8,4); ctx.fill(); }
-  else if(id==='use'){ ctx.font=`900 22px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('E',0,1); ctx.beginPath(); ctx.arc(0,0,15,0,TAU); ctx.stroke(); }
+  else if(id==='use'){ ctx.beginPath(); ctx.arc(0,0,4.5,0,TAU); ctx.fill(); ctx.beginPath(); ctx.arc(0,0,10,0,TAU); ctx.stroke(); ctx.globalAlpha=0.6; for(let i=0;i<4;i++){ const a=i*Math.PI/2+Math.PI/4; ctx.beginPath(); ctx.moveTo(Math.cos(a)*14,Math.sin(a)*14); ctx.lineTo(Math.cos(a)*18,Math.sin(a)*18); ctx.stroke(); } }
+  else if(id==='jump'){
+    if(label==='JUMP'){ ctx.lineWidth=3.6; ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(0,-10); ctx.lineTo(10,0); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-10,9); ctx.lineTo(0,-1); ctx.lineTo(10,9); ctx.stroke(); ctx.globalAlpha=0.55; ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(-12,16); ctx.lineTo(12,16); ctx.stroke(); }
+    else { // a wing: FLY in the air, LAND while flying
+      ctx.beginPath(); ctx.moveTo(-15,8); ctx.quadraticCurveTo(-8,-15,15,-13); ctx.quadraticCurveTo(8,-7,11,-4); ctx.quadraticCurveTo(3,-2,7,2); ctx.quadraticCurveTo(-1,4,1,8); ctx.quadraticCurveTo(-7,7,-15,8); ctx.closePath(); ctx.fill();
+      if(label==='LAND'){ ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(-4,11); ctx.lineTo(0,16); ctx.lineTo(4,11); ctx.stroke(); }
+    }
+  }
+  else if(id==='weapon'){ // two arrows chasing each other: switch weapons
+    ctx.lineWidth=2.4; ctx.globalAlpha=0.85;
+    for(const s of [0,Math.PI]){ ctx.beginPath(); ctx.arc(0,0,17,s-2.3,s-0.75); ctx.stroke(); const a=s-0.75, ex=Math.cos(a)*17, ey=Math.sin(a)*17; ctx.save(); ctx.translate(ex,ey); ctx.rotate(a+Math.PI/2); ctx.beginPath(); ctx.moveTo(4,0); ctx.lineTo(-2,-4); ctx.lineTo(-2,4); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  }
+  else if(id==='whistle'){ ctx.beginPath(); ctx.arc(-4,4,8,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-4,-4); ctx.lineTo(11,-4); ctx.lineTo(11,2); ctx.lineTo(3,2); ctx.stroke(); ctx.beginPath(); ctx.arc(-4,4,2.6,0,TAU); ctx.fill(); ctx.lineWidth=2.2; for(const q of [0,1]){ ctx.beginPath(); ctx.arc(10,-9,4+q*5,-1.9,-0.3); ctx.stroke(); } }
   ctx.restore();
 }
 function drawTouch(){
   if(!usingTouch||scene!=='play') return;
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  const mode=settings.touch||'two';
+  const mode=settings.touch||'two', L=tLayout();
   if(touch.stickId!==null){
     ctx.fillStyle='rgba(255,255,255,.07)'; ctx.strokeStyle=touch.full>0.35?'rgba(140,230,120,.6)':'rgba(255,220,180,.35)'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(touch.ox,touch.oy,58,0,TAU); ctx.fill(); ctx.stroke();
     ctx.fillStyle='rgba(255,200,150,.4)'; ctx.beginPath(); ctx.arc(touch.sx,touch.sy,26,0,TAU); ctx.fill();
   }else{
-    const right=mode!=='left';
-    const gx=mode==='two'?SAFE.l+100:(right?W-SAFE.r-190:SAFE.l+190), gy=H-SAFE.b-(mode==='two'?110:120);
+    // a ghost stick where the thumb will land: left side for two thumbs, the free side of the buttons for one hand
+    const right=mode!=='left'; let gx=SAFE.l+100;
+    if(mode!=='two'){ let e=right?W:0; for(const b of L) e=right?Math.min(e,b.x-b.r):Math.max(e,b.x+b.r); gx=right?clamp(e/2,SAFE.l+70,e-70):clamp((e+W)/2,e+70,W-SAFE.r-70); }
+    const gy=H-SAFE.b-(mode==='two'?110:120);
     ctx.strokeStyle='rgba(255,220,180,.2)'; ctx.setLineDash([6,6]); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(gx,gy,54,0,TAU); ctx.stroke(); ctx.setLineDash([]);
     ctx.font=`700 11px ${UIF}`; ctx.fillStyle='rgba(255,230,200,.4)'; ctx.fillText(mode==='two'?'MOVE':'DRAG TO MOVE',gx,gy);
   }
-  for(const b of tLayout()){
-    const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1;
+  for(const b of L){
+    const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1, ring=true;
     if(b.id==='roar'){ prog=player.roar/100; ready=prog>=1; }
     else if(b.id==='roll'){ prog=player.stamina/player.maxStamina; ready=player.stamina>=player.stats.rollCost*0.5; }
     else if(b.id==='fire'){ prog=player.energy/player.maxEnergy; ready=!player.exhausted; }
     else if(b.id==='drink'){ prog=player.potions/player.potionsMax; ready=player.potions>0; }
-    const use=b.id==='use';
+    else ring=false;
+    const use=b.id==='use', big=b.id==='jump';
     if(use){ const pu=0.5+0.5*Math.sin(G.time*5); ctx.fillStyle=`rgba(255,190,90,${0.12+pu*0.12})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+8,0,TAU); ctx.fill(); }
-    ctx.fillStyle=held?'rgba(255,150,70,.45)':use?'rgba(60,34,14,.72)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
-    ctx.lineWidth=2.5; ctx.strokeStyle=use?'rgba(255,210,120,.95)':ready?'rgba(255,220,180,.7)':'rgba(140,120,100,.5)'; ctx.stroke();
-    if(b.id!=='attack'&&!use){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
-    const col=ready?'#fff0dc':'rgba(255,240,220,.5)';
-    touchIcon(b.id,b.x,b.y-b.r*0.12,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':col);
+    ctx.fillStyle=held?'rgba(255,150,70,.45)':use?'rgba(60,34,14,.72)':big?'rgba(26,18,12,.58)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
+    ctx.lineWidth=big?3:2.5; ctx.strokeStyle=use?'rgba(255,210,120,.95)':big?'rgba(150,215,255,.75)':ready?'rgba(255,220,180,.7)':'rgba(140,120,100,.5)'; ctx.stroke();
+    if(ring){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
+    const col=ready?'#fff0dc':'rgba(255,240,220,.5)', iy=b.y-b.r*0.12;
+    if(b.id==='weapon'){
+      touchIcon('weapon',b.x,iy,b.r*0.62,'rgba(255,220,170,.75)');
+      if(WICON_STUB){ touchIcon('attack',b.x,iy,b.r*0.42,col); } else drawWeaponIcon(ctx,curWeapon(),b.x,iy,b.r*0.95);
+    }
+    else touchIcon(b.id,b.x,iy,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':big?'#d8f0ff':col,b.label);
     ctx.fillStyle=col; ctx.font=`800 ${Math.max(8,Math.round(b.r*0.22))}px ${UIF}`; ctx.fillText(b.id==='attack'&&autoAttackOn()?'AUTO':b.label,b.x,b.y+b.r*0.58);
   }
   ctx.restore();
@@ -16894,7 +17674,7 @@ const fogCv=mkCanvas(FOG.w,FOG.h), fogG=fogCv.getContext('2d');
 function openMap(){
   if(!G||G.mode!=='story'||scene!=='play') return;
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  mapSel=null; $('#bTravel').hidden=true; $('#mapHint').textContent='Tap a blue shrine you have found to fast travel there.';
+  mapSel=null; $('#bTravel').hidden=true; mapHintSet();
   const r=G.region||regionAt(player.x,player.y); $('#mapInfo').textContent=`${AREA?'Inside '+AREA.name:r.name} · Level ${player.level} · ${G.coins||0} coins · ${Object.keys(G.shrines).length} of ${SHRINES.length} shrines`;
   drawMapScreen(); renderJournal(); show('mapov');
 }
@@ -16929,7 +17709,7 @@ function renderJour(){
     rows.push(`<div class="jh2">Side quests (${side.length})</div>`);
     rows.push(side.length?side.map(card).join(''):'<p>Look for people with a gold <b style="color:#ffcf4a">!</b> over their heads. Some of them are inside their houses.</p>');
     if(err.length){ rows.push(`<div class="jh2">Errands (${err.length})</div>`); rows.push(err.map(card).join('')); }
-    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':'Press T to switch which quest you follow, I to open the journal.'}</p>`);
+    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':padActive()?`Press ${padChip(PB.LF)} or ${padChip(PB.RT)} to switch which quest you follow. ${btnHTML('journal')} opens the journal.`:'Press T to switch which quest you follow, I to open the journal.'}</p>`);
     const done=Object.keys(G.quests).filter(id=>G.quests[id].done&&QDEFS[id]);
     if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${E(done.map(id=>QDEFS[id].title.replace('Errand: ','')).join(' · '))}</p>`);
   }else if(jTab==='story'){
@@ -16991,11 +17771,25 @@ mapCv.addEventListener('click',e=>{
   if(scene!=='map') return;
   const r=mapCv.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*WORLD.w, y=(e.clientY-r.top)/r.height*WORLD.h;
   let best=null,bd=420*420; for(const s of SHRINES){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
+  mapSelect(best);
+});
+function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there.`; else h.textContent='Tap a blue shrine you have found to fast travel there.'; }
+function mapSelect(best){
   mapSel=best; const bt=$('#bTravel');
   if(best){ if(G.inCombat||(G.boss&&!G.boss.dead)){ bt.hidden=true; $('#mapHint').textContent='You can’t fast travel while enemies are close.'; } else { bt.hidden=false; bt.textContent=`Travel to ${best.name}`; $('#mapHint').textContent=best.name; } }
-  else{ bt.hidden=true; $('#mapHint').textContent='Tap a blue shrine you have found to fast travel there.'; }
+  else{ bt.hidden=true; mapHintSet(); }
   drawMapScreen();
-});
+}
+// controller and keyboard ([ and ]): step through the shrines you have found, west to east
+function mapCycle(d){
+  if(scene!=='map') return;
+  const list=SHRINES.filter(s=>G.shrines[s.id]).sort((a,b)=>a.x-b.x); if(!list.length) return;
+  let i=list.indexOf(mapSel);
+  if(i<0){ const pp=AREA&&G.ow?G.ow:player; let bd=1e18; list.forEach((s,k)=>{ const q=dist2(s.x,s.y,pp.x,pp.y); if(q<bd){ bd=q; i=k; } }); }
+  else i=(i+d+list.length)%list.length;
+  mapSelect(list[i]); SFX.play('ui');
+  const bt=$('#bTravel'); if(!bt.hidden) navFocus(bt);
+}
 $('#bTravel').addEventListener('click',()=>{ if(mapSel) travelTo(mapSel); });
 $('#bMapClose').addEventListener('click',()=>closeMap());
 
@@ -17030,9 +17824,29 @@ function toMenu(){
   if(G&&G.mode==='story'&&!player.dead) saveGame(true);
   SFX.setFire(false); SFX.ambient({}); DLG=null; setupMenuScene(); scene='menu'; show('menu'); refreshMenu();
 }
-let howFrom='menu';
-function openHow(from){ howFrom=from; show('how'); }
+let howFrom='menu', howTab='keys', howKind=null;
+// How to Play opens on the page for the device in use: Keyboard, Touch or Controller
+function openHow(from){
+  let coarse=false; try{ coarse=matchMedia('(pointer: coarse)').matches; }catch(e){}
+  howFrom=from; howTab=padActive()?'pad':(usingTouch||PAD.dev==='touch'||(coarse&&PAD.dev!=='kb'))?'touch':'keys'; howKind=null; howTabs(); show('how'); renderHow();
+}
 function closeHow(){ show(howFrom==='pause'?'pause':'menu'); }
+function howTabs(){
+  for(const b of document.querySelectorAll('#howTabs button')){ const on=b.dataset.h===howTab; b.setAttribute('aria-pressed',String(on)); if(on) b.setAttribute('data-focus',''); else b.removeAttribute('data-focus'); }
+  for(const s of document.querySelectorAll('#how .hsec')) s.hidden=s.dataset.h!==howTab;
+}
+function renderHow(){
+  howTabs();
+  const hb=$('#how .hbody'); if(hb) hb.scrollTop=0;
+  if(howTab!=='pad') return;
+  const k=howKind||(PAD.idx>=0?PAD.kind:'xbox');
+  for(const b of document.querySelectorAll('#howPadKind button')) b.setAttribute('aria-pressed',String(b.dataset.k===k));
+  $('#howPadName').innerHTML=PAD.idx>=0?`<b>${escapeHtml(padName(PAD.id))}</b> found. Here is what every button does.`:'No controller yet. Plug one in or pair it, then press any button. PlayStation, Xbox and Nintendo Switch Pro controllers all work.';
+  const cv=$('#howPadCv'); if(cv&&vis(cv)) drawPadDiagram(cv,k);
+  $('#howPadKeys').innerHTML=padHelpRows(k).map(([c,t])=>`<div class="pk">${c}</div><span>${t}</span>`).join('');
+}
+for(const b of document.querySelectorAll('#howTabs button')) b.addEventListener('click',()=>{ howTab=b.dataset.h; SFX.play('ui'); renderHow(); });
+for(const b of document.querySelectorAll('#howPadKind button')) b.addEventListener('click',()=>{ howKind=b.dataset.k; SFX.play('ui'); renderHow(); });
 $('#bStory').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSlots(); });
 let newArmed=0;
 function confirmNew(){ if(Date.now()-newArmed<4000) return true; newArmed=Date.now(); $('#bStory').firstChild.textContent='Tap again to start over'; setTimeout(()=>{ if(scene==='menu') refreshMenu(); },4000); return false; }
