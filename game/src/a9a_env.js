@@ -77,8 +77,52 @@ function updateTimers(dt){
   const due=[]; G.timers=G.timers.filter(tm=>{ tm.t-=dt; if(tm.t<=0){ due.push(tm); return false; } return true; });
   for(const tm of due) if(tm.gen===G.gen) tm.fn();
 }
-function setBanner(text,sub,dur,style){ G.banner={text,sub:sub||'',t:0,dur:dur||2,style:style||''}; }
-function taunt(who,text){ const s=SPK[who]; G.taunt={who:s.name,col:s.col,text,t:0,dur:3.6}; }
+// ================= messages people can read: banners, taunts and floating hints (the UX build)
+// How long a message stays up: about 1.5 s plus 0.07 s a letter, at least lo (3 s) and at most hi (9 s).
+function readT(text,lo,hi){ const n=String(text==null?'':text).length; return clamp(1.5+0.07*n,lo==null?3:lo,hi==null?9:hi); }
+// A count like "2 of 4 braziers lit" and "3 of 4 braziers lit" is the same banner, so it updates in place.
+const bannerKey=s=>String(s==null?'':s).replace(/\d+/g,'#');
+// Banners wait their turn instead of replacing each other (G.bannerQ, drawn as a small "+1" by drawBanner).
+// A level up goes first (the skills build adds its skill point line to it right away) and the banner it
+// pushed aside comes back afterwards with all of its reading time. Returns the banner object.
+function setBanner(text,sub,dur,style){
+  text=String(text==null?'':text); sub=sub?String(sub):'';
+  const b={text,sub,t:0,dur:Math.max(dur||2,readT(text+' '+sub)),style:style||'',len:text.length+sub.length,key:bannerKey(text)};
+  b.log=logAdd({k:'banner',text,sub,style:b.style,key:'b:'+b.key});
+  if(!G) return b;
+  const cur=G.banner, Q=G.bannerQ||(G.bannerQ=[]);
+  if(!cur||cur.t>=cur.dur-0.05){ if(Q.length){ Q.push(b); G.banner=Q.shift(); } else G.banner=b; return b; }
+  if(cur.key===b.key){ cur.text=text; cur.sub=sub; cur.len=b.len; cur.log=b.log; cur.dur=Math.max(cur.dur,cur.t+b.dur*0.8); return cur; }
+  const qi=Q.findIndex(q=>q.key===b.key); if(qi>=0){ Q[qi]=b; return b; }
+  if(/^Level \d+$/.test(text)||cur.style==='region'){
+    if(cur.style!=='region'||cur.t<1.5){ cur.dur=Math.max(1.5,cur.dur-cur.t)+0.25; cur.t=0; Q.unshift(cur); }
+    G.banner=b;
+  }else Q.push(b);
+  while(Q.length>6){ const r=Q.findIndex(q=>q.style==='region'); Q.splice(r>=0?r:0,1); }
+  return b;
+}
+// a click or the use button lets the banner go early (once it has been up long enough to see)
+function bannerSkip(){ const b=G&&G.banner; if(b&&b.t>0.6&&b.dur-b.t>0.4){ b.dur=b.t+0.4; return true; } return false; }
+function taunt(who,text){
+  const s=SPK[who]||{name:'',col:'#d8c3a0'}; text=String(text==null?'':text);
+  const t={who:s.name,col:s.col,text,t:0,dur:readT(text,3.4,8)};
+  logAdd({k:'taunt',who:s.name,col:s.col,text});
+  if(!G) return;
+  const cur=G.taunt;
+  if(cur&&cur.t<cur.dur-0.5){ const Q=G.tauntQ||(G.tauntQ=[]); Q.push(t); if(Q.length>3) Q.shift(); return; }
+  G.taunt=t;
+}
+// Floating words over the world: a hint like "Mom has your sword at the forge" stays up long enough to read
+// and goes in the log. Damage numbers and short callouts ("BLOCK", "Hop!", "STUNNED!") stay quick.
+// ftext itself lives in a8_systems.js; this wraps it (every module shares one scope, so callers get the wrapper).
+const ftextQuick=ftext;
+ftext=function(x,y,txt,col,size){
+  ftextQuick(x,y,txt,col,size);
+  const s=String(txt); if(s.length<10||!/[a-z]{2}/.test(s)||!/\s/.test(s)) return;
+  const t=G.texts[G.texts.length-1]; if(!t||t.txt!==s) return;
+  t.life=t.max=clamp(1.1+0.065*s.length,2,4.5); t.vy=-34; t.vx*=0.3;
+  if(s.length>=14) logAdd({k:'hint',text:s,col});
+};
 
 // ================= camps, roaming wolves
 function spawnGroup(units,cx,cy,opt){

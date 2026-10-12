@@ -36,8 +36,10 @@ function bubble(a,text,o){
   if(!a||!text) return null; o=o||{}; text=String(text);
   for(let i=BUB.length-1;i>=0;i--) if(BUB[i].a===a) BUB.splice(i,1);
   const kind=o.kind||(/^[(*]/.test(text)?'narr':'say');
-  const b={a,text,t:0,dur:o.dur||clamp(1.8+text.length*0.055,2.3,5.6),who:o.who||'',col:o.col||null,kind,dy:o.dy!=null?o.dy:-34,ax:a.x,ay:a.y,area:!!AREA};
+  // long enough to read (UX build): about 1.5 s plus 0.07 s a letter, 3 to 8 s; a quick sound bubble (Fweet!) stays quick
+  const b={a,text,t:0,dur:o.dur&&o.dur<1.5?o.dur:Math.max(o.dur||0,readT(text,3,8)),who:o.who||'',col:o.col||null,kind,dy:o.dy!=null?o.dy:-34,ax:a.x,ay:a.y,area:!!AREA};
   BUB.push(b); while(BUB.length>7) BUB.shift();
+  logBubble(a,text,o,kind);
   if(kind!=='far') csfx('pop');
   return b;
 }

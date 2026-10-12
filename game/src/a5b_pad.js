@@ -225,7 +225,10 @@ function padToast(title,sub){
   if(!el){ el=document.createElement('div'); el.id='padToast'; el.setAttribute('role','status'); el.setAttribute('aria-live','polite'); document.body.appendChild(el); }
   el.innerHTML=`<b>${escapeHtml(title)}</b>${sub?`<span>${sub}</span>`:''}`;
   el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
-  clearTimeout(PAD.toastT); PAD.toastT=setTimeout(()=>el.classList.remove('on'),3400);
+  // up long enough to read, and kept in the log (UX build)
+  const plain=String(sub||'').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+  logAdd({k:'toast',text:title,sub:plain});
+  clearTimeout(PAD.toastT); PAD.toastT=setTimeout(()=>el.classList.remove('on'),readT(title+' '+plain,3.5,9)*1000);
 }
 // which face button picks things in menus: the bottom one, or the right one (Nintendo style)
 function padOkBtn(k){ const v=settings.padOk; if(v==='south') return PB.S; if(v==='east') return PB.E; return (k||PAD.kind)==='nin'?PB.E:PB.S; }
@@ -305,10 +308,12 @@ function padAssist(o){
 function padLabels(){
   if(scene!=='dialogue') return;
   const n=$('#dlgNext'), sk=$('#dlgSkip'); if(!n||!sk) return;
-  if(curDevice()==='pad'){
+  const dev=curDevice();
+  if(dev==='pad'){
     const ok=padOkBtn(), bk=ok===PB.S?PB.E:PB.S, key=PAD.kind+ok;
     if(n.dataset.pad!==key||!n.querySelector('.pg')){ n.dataset.pad=key; n.innerHTML=`${padChip(ok)} next &#9656;`; sk.innerHTML=`Skip scene ${padChip(bk)}`; }
   }else if(n.querySelector('.pg')){ n.dataset.pad=''; n.textContent=usingTouch?'Tap ▸':'Click or Space ▸'; sk.innerHTML='Skip scene &#9197;'; }
+  dlgLogLabel(dev);
 }
 
 // ---------- menus and overlays: a focus ring you move with the d-pad or stick
@@ -375,7 +380,7 @@ function navOk(root){
   if(root.id==='dialogue'){
     const opts=navItems(root);
     if(opts.length){ const f=opts.includes(document.activeElement)?document.activeElement:opts[0]; f.click(); }
-    else advanceDialogue();
+    else dlgNext();
     return;
   }
   const items=navItems(root), el=document.activeElement;
@@ -395,7 +400,7 @@ function ovBack(root){
     // story decisions have no way-out choice, so back never makes one by accident
     const opts=navItems(root), ex=opts.slice().reverse().find(b=>DLG_EXIT.test(b.textContent.replace(/^\s*\d+/,'').trim()));
     if(ex){ if(document.activeElement===ex) ex.click(); else { navFocus(ex); SFX.play('ui',0.35); } }
-    else skipDialogue();
+    else dlgAskSkip('pad');
   }
   else if(id==='how') closeHow();
   else if(id==='settings') closeSettings();
@@ -434,11 +439,11 @@ function padMenu(root,s,dt){
   else N.d='';
   if(s.ed[ok]) navOk(root);
   else if(s.ed[back]) ovBack(root);
-  else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) advanceDialogue();
+  else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) dlgNext();
   if(s.ed[PB.L1]) navTab(root,-1);
   if(s.ed[PB.R1]) navTab(root,1);
   if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
-  if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
+  if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); else if(root.id==='dialogue') openLog(); else if(root.id==='logov') closeLog(); }
   // right stick scrolls long pages
   const ry=s.ax[3]; if(Math.abs(ry)>0.25){ const sc=navScroller(root,document.activeElement); if(sc) sc.scrollTop+=Math.sign(ry)*(Math.abs(ry)-0.2)*1100*dt; }
 }
@@ -570,7 +575,7 @@ function padHelpRows(k){
     [c(PB.UP),'Drink a healing draught'],
     [c(PB.DN),'Call your companion'],
     [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in Normal Mode: switch weapons)'],
-    [c(PB.SEL),'World map. Hold it for the journal.'],
+    [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
     [`${c(ok)} ${c(bk)}`,'In menus: pick, go back. The d-pad or left stick moves, L1 and R1 switch tabs.'.replace('L1 and R1',`${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)}`)]
   ];

@@ -258,11 +258,10 @@ input{-webkit-user-select:text;user-select:text}
           <div>
             <h3>Move and fight</h3>
             <div class="keys">
-              <kbd>WASD / Arrows</kbd><span>Move</span>
+              <kbd>WASD / Arrows</kbd><span>Move. Ash faces the way he walks.</span>
               <kbd>Shift</kbd><span>Sprint (uses stamina)</span>
-              <kbd>Mouse</kbd><span>Aim</span>
-              <kbd>Left click / J</kbd><span>Attack. Hold for a combo.</span>
-              <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter.</span>
+              <kbd>Left click / J</kbd><span>Attack. Hold for a combo. Ash turns to the closest foe in front of him.</span>
+              <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter. It finds the foe in front of you too.</span>
               <kbd>Space</kbd><span>Dodge roll. Nothing hits you mid-roll.</span>
               <kbd>C</kbd><span>Jump, once Ash learns how. With wings, jump again in the air to fly.</span>
               <kbd>Q</kbd><span>Dragon Roar, once the meter is full</span>
@@ -282,8 +281,9 @@ input{-webkit-user-select:text;user-select:text}
               <kbd>T</kbd><span>Switch which quest you follow</span>
               <kbd>N</kbd><span>Sound on or off</span>
               <kbd>Esc / P</kbd><span>Pause</span>
+              <kbd>L</kbd><span>In a conversation: the log of everything that was said</span>
             </div>
-            <p class="hnote">In menus the arrow keys move, Enter picks and Esc goes back.</p>
+            <p class="hnote">In menus the arrow keys move, Enter picks and Esc goes back. Like aiming with the mouse? Turn on <b>Aim with the mouse</b> in Settings.</p>
           </div>
         </div>
       </section>
@@ -306,6 +306,7 @@ input{-webkit-user-select:text;user-select:text}
             <h3>The screen</h3>
             <ul class="tips">
               <li>Tap the minimap for the world map. Tap the quest list for the journal.</li>
+              <li>Missed what someone said? Tap <b>Log</b> above the talking box. The pause menu has it too.</li>
               <li>The pause button is at the top right.</li>
               <li>One-hand mode in Settings puts every button under one thumb, and Ash swings by himself.</li>
               <li>Settings can make the buttons bigger or smaller.</li>
@@ -7737,6 +7738,9 @@ function fogStr(){ let s=''; for(let i=0;i<FOG.bits.length;i++) s+=FOG.bits[i]?'
 const keys=new Set(), pressed=new Set();
 const mouse={x:0,y:0,l:false,r:false};
 const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0,fireT:0};
+// keyboard and mouse: Ash faces the way he walks and attacks lock on to a foe in front (a6b_weapons.js aimAssist).
+// Settings > "Aim with the mouse" brings back the twin-stick style where he faces the pointer.
+settings.mouseAim=store.get('eb_mouseaim',false)===true;
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); });
 addEventListener('blur',()=>{ keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
@@ -7746,6 +7750,7 @@ cvs.addEventListener('mousedown',e=>{
   SFX.init(); mouse.x=e.clientX; mouse.y=e.clientY;
   if(scene==='play'&&hudClick(e.clientX,e.clientY)) return;
   usingTouch=false; aimMode='mouse';
+  if(scene==='play') bannerSkip();
   if(e.button===0) mouse.l=true; if(e.button===2) mouse.r=true;
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
@@ -7886,6 +7891,7 @@ function readInput(dt){
     wNext:pressed.has('KeyX')||!!touch.pressed.weapon, wPrev:pressed.has('KeyZ'), wSel,
     whistle:pressed.has('KeyG')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
   padInput(o,dt);
+  if(o.use) bannerSkip();
   return o;
 }
 function onKey(e){
@@ -7913,15 +7919,23 @@ function onKey(e){
     else if(c==='KeyP'&&r&&r.id==='pause'){ e.preventDefault(); resumeGame(); }
     else navKey(e);
   }else if(scene==='dialogue'){
+    // a held key never skips more than one line (repeats are ignored), and Escape asks before it skips
     const dn={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3}[c];
-    if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); chooseOpt(dn); return; }
+    if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); if(!e.repeat) dlgChoose(dn); return; }
     if(navKey(e)) return;
     if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){
       e.preventDefault(); if(e.repeat) return;
       const f=document.activeElement;
-      if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else advanceDialogue();
+      if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else dlgNext();
     }
-    else if(c==='Escape'){ e.preventDefault(); skipDialogue(); }
+    else if(c==='Escape'){ e.preventDefault(); if(!e.repeat) dlgAskSkip('key'); }
+    else if(c==='KeyL'){ e.preventDefault(); if(!e.repeat) openLog(); }
+  }else if(scene==='log'){
+    // the log overlay (a12c_log.js): Escape or L closes it, the arrow keys move between the filters
+    if(c==='Escape'||c==='KeyL'){ e.preventDefault(); if(!e.repeat) closeLog(); }
+    else if(c==='BracketLeft'||c==='BracketRight'||c==='KeyQ'||c==='KeyE'){ e.preventDefault(); logFilterStep(c==='BracketLeft'||c==='KeyQ'?-1:1); }
+    else if(c==='PageUp'||c==='PageDown'||c==='Home'||c==='End'){ e.preventDefault(); logScroll(c); }
+    else navKey(e);
   }else if(scene==='upgrade'){
     const n={Digit1:0,Digit2:1,Digit3:2,Numpad1:0,Numpad2:1,Numpad3:2}[c];
     if(n!=null){ e.preventDefault(); chooseUpgrade(n); }
@@ -7934,6 +7948,7 @@ function onKey(e){
   }
 }
 function toWorld(sx,sy){ return {x:sx/zoom+cam.x,y:sy/zoom+cam.y}; }
+const camLead={x:0,y:0};
 function updateCam(dt,snap){
   if(!player) return;
   moveZoom(dt);   // zooms out a little while Ash flies (a6c_moves.js)
@@ -7941,7 +7956,10 @@ function updateCam(dt,snap){
   let fx=player.x, fy=player.y;
   const b=G&&G.boss;
   if(b&&!b.dead&&!b.noClip){ fx+=clamp((b.x-player.x)*0.3,-160,160); fy+=clamp((b.y-player.y)*0.3,-120,120); }
-  if(aimMode==='mouse'&&!usingTouch&&scene==='play'){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
+  // look ahead: toward the pointer with mouse aim (or the right stick, which steers the same pointer), else a
+  // little way along the way Ash walks
+  if(aimMode==='mouse'&&!usingTouch&&scene==='play'&&(settings.mouseAim||padActive())){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
+  else if(!snap){ const mv=scene==='play'&&player.moving&&!usingTouch, k=1-Math.exp(-dt*2.2); camLead.x+=((mv?Math.cos(player.facing)*34:0)-camLead.x)*k; camLead.y+=((mv?Math.sin(player.facing)*24:0)-camLead.y)*k; fx+=camLead.x; fy+=camLead.y; }
   let tx=clamp(fx-vw/2,-200,WORLD.w-vw+200), ty=clamp(fy-vh/2,-200,WORLD.h-vh+200);
   if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
   if(snap){ cam.x=tx; cam.y=ty; return; }
@@ -8175,7 +8193,10 @@ function padToast(title,sub){
   if(!el){ el=document.createElement('div'); el.id='padToast'; el.setAttribute('role','status'); el.setAttribute('aria-live','polite'); document.body.appendChild(el); }
   el.innerHTML=`<b>${escapeHtml(title)}</b>${sub?`<span>${sub}</span>`:''}`;
   el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
-  clearTimeout(PAD.toastT); PAD.toastT=setTimeout(()=>el.classList.remove('on'),3400);
+  // up long enough to read, and kept in the log (UX build)
+  const plain=String(sub||'').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+  logAdd({k:'toast',text:title,sub:plain});
+  clearTimeout(PAD.toastT); PAD.toastT=setTimeout(()=>el.classList.remove('on'),readT(title+' '+plain,3.5,9)*1000);
 }
 // which face button picks things in menus: the bottom one, or the right one (Nintendo style)
 function padOkBtn(k){ const v=settings.padOk; if(v==='south') return PB.S; if(v==='east') return PB.E; return (k||PAD.kind)==='nin'?PB.E:PB.S; }
@@ -8255,10 +8276,12 @@ function padAssist(o){
 function padLabels(){
   if(scene!=='dialogue') return;
   const n=$('#dlgNext'), sk=$('#dlgSkip'); if(!n||!sk) return;
-  if(curDevice()==='pad'){
+  const dev=curDevice();
+  if(dev==='pad'){
     const ok=padOkBtn(), bk=ok===PB.S?PB.E:PB.S, key=PAD.kind+ok;
     if(n.dataset.pad!==key||!n.querySelector('.pg')){ n.dataset.pad=key; n.innerHTML=`${padChip(ok)} next &#9656;`; sk.innerHTML=`Skip scene ${padChip(bk)}`; }
   }else if(n.querySelector('.pg')){ n.dataset.pad=''; n.textContent=usingTouch?'Tap ▸':'Click or Space ▸'; sk.innerHTML='Skip scene &#9197;'; }
+  dlgLogLabel(dev);
 }
 
 // ---------- menus and overlays: a focus ring you move with the d-pad or stick
@@ -8325,7 +8348,7 @@ function navOk(root){
   if(root.id==='dialogue'){
     const opts=navItems(root);
     if(opts.length){ const f=opts.includes(document.activeElement)?document.activeElement:opts[0]; f.click(); }
-    else advanceDialogue();
+    else dlgNext();
     return;
   }
   const items=navItems(root), el=document.activeElement;
@@ -8345,7 +8368,7 @@ function ovBack(root){
     // story decisions have no way-out choice, so back never makes one by accident
     const opts=navItems(root), ex=opts.slice().reverse().find(b=>DLG_EXIT.test(b.textContent.replace(/^\s*\d+/,'').trim()));
     if(ex){ if(document.activeElement===ex) ex.click(); else { navFocus(ex); SFX.play('ui',0.35); } }
-    else skipDialogue();
+    else dlgAskSkip('pad');
   }
   else if(id==='how') closeHow();
   else if(id==='settings') closeSettings();
@@ -8384,11 +8407,11 @@ function padMenu(root,s,dt){
   else N.d='';
   if(s.ed[ok]) navOk(root);
   else if(s.ed[back]) ovBack(root);
-  else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) advanceDialogue();
+  else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) dlgNext();
   if(s.ed[PB.L1]) navTab(root,-1);
   if(s.ed[PB.R1]) navTab(root,1);
   if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
-  if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
+  if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); else if(root.id==='dialogue') openLog(); else if(root.id==='logov') closeLog(); }
   // right stick scrolls long pages
   const ry=s.ax[3]; if(Math.abs(ry)>0.25){ const sc=navScroller(root,document.activeElement); if(sc) sc.scrollTop+=Math.sign(ry)*(Math.abs(ry)-0.2)*1100*dt; }
 }
@@ -8520,7 +8543,7 @@ function padHelpRows(k){
     [c(PB.UP),'Drink a healing draught'],
     [c(PB.DN),'Call your companion'],
     [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in Normal Mode: switch weapons)'],
-    [c(PB.SEL),'World map. Hold it for the journal.'],
+    [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
     [`${c(ok)} ${c(bk)}`,'In menus: pick, go back. The d-pad or left stick moves, L1 and R1 switch tabs.'.replace('L1 and R1',`${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)}`)]
   ];
@@ -8575,14 +8598,39 @@ function updatePlayer(dt,inp){
   const p=player, st=p.stats;
   p.t+=dt; p.dashCd-=dt; p.iframes-=dt; p.hurtFlash-=dt; p.atkCd-=dt; p.comboTimer-=dt; G.dashBuf-=dt; G.roarBuf-=dt;
   const moving=Math.abs(inp.mx)+Math.abs(inp.my)>0.05; p.inMx=inp.mx; p.inMy=inp.my;
-  let aim=p.facing; const wpn=curWeapon(), ranged=wpn==='bow'||wpn==='boomerang', stickAim=Math.hypot(inp.aimX||0,inp.aimY||0)>0.3;
+  // aim (UX build): keyboard and mouse face the way Ash walks (WASD or arrows) and keep that facing when he stops;
+  // attacks and fire breath turn toward the best foe in a 45 degree cone in front (aimAssist in a6b_weapons.js).
+  // Settings "Aim with the mouse" faces the pointer instead. Controllers aim with the right stick, touch auto-aims.
+  const wpn=curWeapon(), ranged=wpn==='bow'||wpn==='boomerang', stickAim=Math.hypot(inp.aimX||0,inp.aimY||0)>0.3;
+  const mouseAim=settings.mouseAim&&!usingTouch&&!inp.pad&&aimMode==='mouse';
+  // something else turned Ash (the bow and hammer turn toward the aim, cutscenes, debug hooks): he keeps that facing
+  if(p.faceGoal==null||(p.fOut!=null&&p.facing!==p.fOut&&!moving)) p.faceGoal=p.facing;
+  if(moving&&!stickAim){
+    // releasing a diagonal (W+D) lets go of one key a frame before the other: keep the diagonal, not the last key
+    const a=Math.atan2(inp.my,inp.mx);
+    if(p.mvDir==null||Math.abs(angDiff(p.mvDir,a))>0.05){ p.mvPrev=p.mvDir; p.mvDir=a; p.mvT=0; } else p.mvT+=dt;
+    p.faceGoal=a;
+  }else if(p.mvDir!=null){ if(!stickAim&&!inp.pad&&!usingTouch&&p.mvT<0.09&&p.mvPrev!=null) p.faceGoal=p.mvPrev; p.mvDir=null; p.mvPrev=null; }
+  let aim=p.faceGoal;
   if(stickAim) aim=Math.atan2(inp.aimY,inp.aimX);
-  else if(usingTouch){ const tg=nearestEnemy(p.x,p.y,ranged?430:320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); else if(moving) aim=Math.atan2(inp.my,inp.mx); }
-  else if(aimMode==='mouse'&&!inp.pad){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
-  else if(moving) aim=Math.atan2(inp.my,inp.mx);
-  if(ranged&&!usingTouch&&(aimMode!=='mouse'||inp.pad)) aim=wAimAssist(aim);
+  else if(usingTouch){ const tg=nearestEnemy(p.x,p.y,ranged?430:320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); }
+  else if(mouseAim){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
+  const fighting=inp.attack||inp.fire||p.breathing||!!p.bow||!!p.ham;
+  if(!usingTouch&&!mouseAim){
+    if(stickAim){ if(ranged) aim=wAimAssist(aim); }
+    else if(fighting) aim=aimAssist(aim,inp.fire||p.breathing?'breath':wpn);
+  }
   p.aim=aim;
-  if(p.swingT<=0) p.facing=p.breathing?turnTo(p.facing,aim,9*dt):(p.sprinting&&moving?turnTo(p.facing,Math.atan2(inp.my,inp.mx),12*dt):aim);
+  if(stickAim||(usingTouch&&!moving)) p.faceGoal=aim;   // letting go of the right stick (or a touch target) keeps that facing
+  if(p.swingT<=0){
+    const free=inp.attack&&p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0;
+    if(p.breathing) p.facing=turnTo(p.facing,aim,9*dt);
+    else if(mouseAim||free) p.facing=aim;   // a swing or throw goes exactly where it is aimed
+    else if(p.sprinting&&moving&&!stickAim) p.facing=turnTo(p.facing,aim,14*dt);
+    else p.facing+=angDiff(p.facing,aim)*(1-Math.exp(-dt*24));   // a fast ease, never a snap
+    if(!moving&&fighting) p.faceGoal=p.facing;   // standing still, he keeps facing the foe he turned to
+  }
+  p.fOut=p.facing;
   // stamina
   if(p.stamDelay>0) p.stamDelay-=dt; else p.stamina=Math.min(p.maxStamina,p.stamina+st.staminaRegen*dt);
   // roll
@@ -8819,6 +8867,8 @@ const WEAPONS={
 };
 const WS={paused:false,pop:null,get:null,pulse:0,area:undefined,side:1,flyT:0,backT:0,whirT:0};
 const BOW_FULL=0.6;
+// how long the switch pill (the weapon's name) and the big "new weapon" pose stay up
+const WPOP_T=2.1, WGET_T=2.8;
 function ownedWeapons(){ return WEAPON_IDS.filter(id=>id==='sword'||!!(G&&G.weapons&&G.weapons[id])); }
 function curWeapon(){ if(!G) return 'sword'; const w=G.weapon; return w&&WEAPONS[w]&&(w==='sword'||(G.weapons&&G.weapons[w]))?w:'sword'; }
 function equipWeapon(id,quiet){
@@ -8852,9 +8902,9 @@ function giveWeapon(id,quiet){
 // the "you got a new weapon" moment waits politely for any banner that is already up (quest complete, chest, and so on)
 function weaponMoment(id,n){
   const b=G.banner;
-  if(n<14&&b&&!b.wpn&&b.dur-b.t>0.5){ later(0.35,()=>weaponMoment(id,n+1)); return; }
+  if(n<14&&((b&&!b.wpn&&b.dur-b.t>0.5)||(G.bannerQ&&G.bannerQ.length))){ later(0.35,()=>weaponMoment(id,n+1)); return; }
   const D=WEAPONS[id];
-  setBanner('New weapon: '+D.name,D.desc+' '+switchTip(),4.2); G.banner.wpn=true;
+  setBanner('New weapon: '+D.name,D.desc+' '+switchTip(),4.2).wpn=true;
   jingle('item','chest'); WS.get={id,t:0}; WS.pulse=1; shake(3);
   const p=player; emit(p.x,p.y-20,34,{col:'255,220,140',ang:-Math.PI/2,spread:1.6,smin:40,smax:190,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
 }
@@ -8927,6 +8977,24 @@ function wIgnite(x,y,r,heat){
     }
   }
 }
+// keyboard and controller aim assist (UX build): attacks and fire breath turn toward the best foe in a cone of
+// 45 degrees either side of where Ash faces. The closest one wins and bosses count as closer, so fights feel
+// easy without a mouse. kind is the weapon id, or 'breath'. Returns the aim angle.
+const AIM_CONE=Math.PI/4;
+function aimAssist(aim,kind){
+  const p=player; if(!p||!G) return aim;
+  const R=kind==='breath'?240:kind==='bow'||kind==='boomerang'?620:Math.max(170,wReach(kind)+110);
+  let best=null, bs=1e9;
+  for(const e of G.enemies){
+    if(!wFoeOk(e)||e.frozen||e.alpha<0.3) continue;
+    const d=Math.max(0,dist(p.x,p.y,e.x,e.y)-(e.r||10)*0.6); if(d>R) continue;
+    const da=Math.abs(angDiff(aim,angTo(p.x,p.y,e.x,e.y))); if(da>AIM_CONE) continue;
+    let s=(d+20)*(1+da*0.9); if(e.boss) s*=0.5;
+    if(s<bs){ bs=s; best=e; }
+  }
+  return best?angTo(p.x,p.y,best.x,best.y):aim;
+}
+// the narrow assist for the bow and boomerang when a controller aims with the right stick
 function wAimAssist(aim){
   const p=player; let best=null,bs=1e9;
   for(const e of G.enemies){
@@ -8957,17 +9025,17 @@ function updateWeapon(dt,inp){
     if(inp.wNext) cycleWeapon(1); else if(inp.wPrev) cycleWeapon(-1);
     else if(inp.wSel!=null&&inp.wSel>=0){ const own=ownedWeapons(); if(own[inp.wSel]) equipWeapon(own[inp.wSel]); }
   }
-  if(WS.pop){ WS.pop.t+=dt; if(WS.pop.t>1.3) WS.pop=null; }
-  if(WS.get){ WS.get.t+=dt; if(WS.get.t>2.3) WS.get=null; }
+  if(WS.pop){ WS.pop.t+=dt; if(WS.pop.t>WPOP_T) WS.pop=null; }
+  if(WS.get){ WS.get.t+=dt; if(WS.get.t>WGET_T) WS.get=null; }
   if(WS.pulse>0) WS.pulse=Math.max(0,WS.pulse-dt*3);
   if(WS.flyT>0) WS.flyT-=dt; if(WS.backT>0) WS.backT-=dt;
   if(p.wEquipT>0) p.wEquipT-=dt; if(p.throwT>0) p.throwT-=dt; if(p.bowSnap>0) p.bowSnap-=dt;
   const w=curWeapon(), atk=!!inp.attack, free=p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0;
-  if(atk&&!armed){ if(!(G.noSwordT>0)){ G.noSwordT=2.5; ftext(p.x,p.y-28,'Mom has your sword at the forge','#ffd9a0',13); } }
+  if(atk&&!armed){ if(!(G.noSwordT>0)){ G.noSwordT=3.6; ftext(p.x,p.y-28,'Mom has your sword at the forge','#ffd9a0',13); } }
   else if(armed){
     if(w==='bow') updateBow(dt,atk);
     else if(w==='boomerang'){ if(atk&&free) throwRang(); }
-    else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(atk&&!(WS.flyT>0)){ WS.flyT=3; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
+    else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(atk&&!(WS.flyT>0)){ WS.flyT=4.6; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
     else if(airborne()&&hasSkill('slam')){ /* attack in the air is Meteor Slam (abilities build) */ }
     else if(w==='hammer') hammerInput(atk,free);
     else if(atk&&free){
@@ -9407,14 +9475,14 @@ function drawWeaponPopups(){
   const p=player; if(!p||p.dead||scene==='menu') return;
   const sx=(p.x-cam.x)*zoom, sy=(p.y-cam.y)*zoom, zk=Math.max(zoom,0.8);
   if(WS.get){
-    const t=WS.get.t, a=clamp(Math.min(t/0.2,(2.3-t)/0.5),0,1), lift=1-Math.pow(1-Math.min(1,t/0.35),3), y=sy-(40+lift*14)*zk, s=46*(0.6+0.4*lift);
+    const t=WS.get.t, a=clamp(Math.min(t/0.2,(WGET_T-t)/0.5),0,1), lift=1-Math.pow(1-Math.min(1,t/0.35),3), y=sy-(40+lift*14)*zk, s=46*(0.6+0.4*lift);
     ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(sx,y);
     const gl=ctx.createRadialGradient(0,0,0,0,0,56); gl.addColorStop(0,`rgba(255,220,140,${0.55*a})`); gl.addColorStop(1,'rgba(255,160,60,0)'); ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(0,0,56,0,TAU); ctx.fill();
     ctx.rotate(t*0.7); ctx.fillStyle=`rgba(255,215,140,${0.16*a})`; for(let i=0;i<10;i++){ const b=i*TAU/10; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,60,b,b+0.17); ctx.closePath(); ctx.fill(); }
     ctx.restore();
     ctx.globalAlpha=a; drawWeaponIcon(ctx,WS.get.id,sx,y,s); ctx.globalAlpha=1;
   }else if(WS.pop){
-    const t=WS.pop.t, a=clamp(Math.min(t/0.1,(1.3-t)/0.35),0,1), y=sy-38*zk-t*12, D=WEAPONS[WS.pop.id];
+    const t=WS.pop.t, a=clamp(Math.min(t/0.1,(WPOP_T-t)/0.35),0,1), y=sy-38*zk-Math.min(t,1.3)*12, D=WEAPONS[WS.pop.id];
     ctx.save(); ctx.globalAlpha=a; ctx.font=`700 12px ${UIF}`; ctx.textBaseline='middle';
     const w=ctx.measureText(D.name).width+40, h=26;
     ctx.fillStyle='rgba(12,9,6,.8)'; rr(sx-w/2,y-h/2,w,h,13); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.5)'; ctx.lineWidth=1; ctx.stroke();
@@ -9698,7 +9766,7 @@ function mvSnd(kind,v){
 function movesPre(dt,inp){
   const p=player; mvEnsure(p);
   if(!MV.late){ MV.late=true; reachLate(); }   // place things that need the finished world (a1j_quests4.js)
-  if(MV.lastG!==G){ MV.lastG=G; moveReset(p); p.flyE=flyMax(); MV.tip=null; MV.zoomK=1; if(G.mode==='normal') MV.tip={title:'Jump',text:`${capF(jumpCtl().v)} to jump over rocks and shockwaves.`,t:0,dur:8}; }
+  if(MV.lastG!==G){ MV.lastG=G; moveReset(p); p.flyE=flyMax(); MV.tip=null; MV.zoomK=1; if(G.mode==='normal') mvTip('Jump',`${capF(jumpCtl().v)} to jump over rocks and shockwaves.`,8); }
   // a teleport (fast travel, a door, a respawn) drops Ash out of the sky
   if(MV.lx!=null&&dist2(p.x,p.y,MV.lx,MV.ly)>420*420) moveReset(p);
   if(inp.jump) MV.jumpBuf=0.14; else MV.jumpBuf-=dt;
@@ -9780,7 +9848,7 @@ function movesPost(dt,ox,oy,inp){
     if(!AREA&&!G.flags.gate&&p.y<WALL_Y+170){
       const k=clamp((WALL_Y+170-p.y)/110,0,1); p.avy=Math.max(p.avy,320*k); p.y=Math.max(p.y,WALL_Y+64);
       if(Math.random()<0.6) emit(p.x+rand(-160,160),p.y-p.z-rand(20,120),1,{col:'230,236,245',glow:false,ang:Math.PI/2,spread:0.15,smin:300,smax:480,lmin:.25,lmax:.45,zmin:1,zmax:1.8,drag:0.5,alpha:0.5});
-      MV.gustT-=dt; if(MV.gustT<=0){ MV.gustT=3.5; mvSnd('gust'); ftext(p.x,p.y-p.z-34,'The Wall’s storm winds push you back!','#e6eef8',13); MV.tip={title:'The Obsidian Wall',text:'The winds over the Wall are too strong to fly through. The gate has to open first.',t:0,dur:5}; }
+      MV.gustT-=dt; if(MV.gustT<=0){ MV.gustT=3.5; mvSnd('gust'); ftext(p.x,p.y-p.z-34,'The Wall’s storm winds push you back!','#e6eef8',13); mvTip('The Obsidian Wall','The winds over the Wall are too strong to fly through. The gate has to open first.',5); }
     }
     // wingtip embers
     MV.emberT-=dt; if(MV.emberT<=0){ MV.emberT=0.08; const s=Math.random()<0.5?-1:1, f=p.facing, lx=-14, ly=52*s; emit(p.x+Math.cos(f)*lx-Math.sin(f)*ly,p.y-p.z+Math.sin(f)*lx+Math.cos(f)*ly,1,{col:'255,170,90',smin:5,smax:25,lmin:.3,lmax:.6,zmin:1,zmax:2,drag:2,rise:-30}); }
@@ -9927,6 +9995,12 @@ function breathFly(dt){
     }
   }
 }
+// a tip pill that stays up long enough to read and goes in the log; the same tip again just stays up longer
+function mvTip(title,text,dur){
+  const d=Math.max(dur||0,readT(text,4,10));
+  if(MV.tip&&MV.tip.text===text){ MV.tip.dur=Math.max(MV.tip.dur,MV.tip.t+d); return; }
+  MV.tip={title,text,t:0,dur:d}; logAdd({k:'tip',text:title,sub:text,key:'tip:'+text});
+}
 // ---------- getting a new gift (the Trials call this)
 const ABIL_INFO={
   jump:{name:'The Ember Leap',sub:c=>`You can jump! ${capF(c.v)} to hop over fences, rocks, gaps and shockwaves.`,tip:c=>`Jump with ${c.k}. Sprint first to jump farther. Jumping over water is fine. Landing in it is not!`},
@@ -9939,7 +10013,7 @@ function grantAbility(id){
   const I=ABIL_INFO[id]||{name:id,sub:()=>'New ability',tip:()=>''}, c=jumpCtl(), p=player;
   setBanner(I.name,I.sub(c),4.2);
   try{ jingle('chapter','quest'); }catch(e){}
-  MV.tip={title:'New ability',text:I.tip(c),t:0,dur:10};
+  mvTip('New ability',I.tip(c),10);
   flashA=0.3; flashCol='255,200,130'; shake(5);
   emit(p.x,p.y,46,{col:id==='stride'?'170,220,255':'255,200,120',ang:-Math.PI/2,spread:1.6,smin:40,smax:220,lmin:.5,lmax:1.2,zmin:1.5,zmax:3.5,rise:30});
   if(id==='wings'){ MV.showWings=3; p.flyE=flyMax(); }
@@ -11251,8 +11325,52 @@ function updateTimers(dt){
   const due=[]; G.timers=G.timers.filter(tm=>{ tm.t-=dt; if(tm.t<=0){ due.push(tm); return false; } return true; });
   for(const tm of due) if(tm.gen===G.gen) tm.fn();
 }
-function setBanner(text,sub,dur,style){ G.banner={text,sub:sub||'',t:0,dur:dur||2,style:style||''}; }
-function taunt(who,text){ const s=SPK[who]; G.taunt={who:s.name,col:s.col,text,t:0,dur:3.6}; }
+// ================= messages people can read: banners, taunts and floating hints (the UX build)
+// How long a message stays up: about 1.5 s plus 0.07 s a letter, at least lo (3 s) and at most hi (9 s).
+function readT(text,lo,hi){ const n=String(text==null?'':text).length; return clamp(1.5+0.07*n,lo==null?3:lo,hi==null?9:hi); }
+// A count like "2 of 4 braziers lit" and "3 of 4 braziers lit" is the same banner, so it updates in place.
+const bannerKey=s=>String(s==null?'':s).replace(/\d+/g,'#');
+// Banners wait their turn instead of replacing each other (G.bannerQ, drawn as a small "+1" by drawBanner).
+// A level up goes first (the skills build adds its skill point line to it right away) and the banner it
+// pushed aside comes back afterwards with all of its reading time. Returns the banner object.
+function setBanner(text,sub,dur,style){
+  text=String(text==null?'':text); sub=sub?String(sub):'';
+  const b={text,sub,t:0,dur:Math.max(dur||2,readT(text+' '+sub)),style:style||'',len:text.length+sub.length,key:bannerKey(text)};
+  b.log=logAdd({k:'banner',text,sub,style:b.style,key:'b:'+b.key});
+  if(!G) return b;
+  const cur=G.banner, Q=G.bannerQ||(G.bannerQ=[]);
+  if(!cur||cur.t>=cur.dur-0.05){ if(Q.length){ Q.push(b); G.banner=Q.shift(); } else G.banner=b; return b; }
+  if(cur.key===b.key){ cur.text=text; cur.sub=sub; cur.len=b.len; cur.log=b.log; cur.dur=Math.max(cur.dur,cur.t+b.dur*0.8); return cur; }
+  const qi=Q.findIndex(q=>q.key===b.key); if(qi>=0){ Q[qi]=b; return b; }
+  if(/^Level \d+$/.test(text)||cur.style==='region'){
+    if(cur.style!=='region'||cur.t<1.5){ cur.dur=Math.max(1.5,cur.dur-cur.t)+0.25; cur.t=0; Q.unshift(cur); }
+    G.banner=b;
+  }else Q.push(b);
+  while(Q.length>6){ const r=Q.findIndex(q=>q.style==='region'); Q.splice(r>=0?r:0,1); }
+  return b;
+}
+// a click or the use button lets the banner go early (once it has been up long enough to see)
+function bannerSkip(){ const b=G&&G.banner; if(b&&b.t>0.6&&b.dur-b.t>0.4){ b.dur=b.t+0.4; return true; } return false; }
+function taunt(who,text){
+  const s=SPK[who]||{name:'',col:'#d8c3a0'}; text=String(text==null?'':text);
+  const t={who:s.name,col:s.col,text,t:0,dur:readT(text,3.4,8)};
+  logAdd({k:'taunt',who:s.name,col:s.col,text});
+  if(!G) return;
+  const cur=G.taunt;
+  if(cur&&cur.t<cur.dur-0.5){ const Q=G.tauntQ||(G.tauntQ=[]); Q.push(t); if(Q.length>3) Q.shift(); return; }
+  G.taunt=t;
+}
+// Floating words over the world: a hint like "Mom has your sword at the forge" stays up long enough to read
+// and goes in the log. Damage numbers and short callouts ("BLOCK", "Hop!", "STUNNED!") stay quick.
+// ftext itself lives in a8_systems.js; this wraps it (every module shares one scope, so callers get the wrapper).
+const ftextQuick=ftext;
+ftext=function(x,y,txt,col,size){
+  ftextQuick(x,y,txt,col,size);
+  const s=String(txt); if(s.length<10||!/[a-z]{2}/.test(s)||!/\s/.test(s)) return;
+  const t=G.texts[G.texts.length-1]; if(!t||t.txt!==s) return;
+  t.life=t.max=clamp(1.1+0.065*s.length,2,4.5); t.vy=-34; t.vx*=0.3;
+  if(s.length>=14) logAdd({k:'hint',text:s,col});
+};
 
 // ================= camps, roaming wolves
 function spawnGroup(units,cx,cy,opt){
@@ -13494,8 +13612,10 @@ function bubble(a,text,o){
   if(!a||!text) return null; o=o||{}; text=String(text);
   for(let i=BUB.length-1;i>=0;i--) if(BUB[i].a===a) BUB.splice(i,1);
   const kind=o.kind||(/^[(*]/.test(text)?'narr':'say');
-  const b={a,text,t:0,dur:o.dur||clamp(1.8+text.length*0.055,2.3,5.6),who:o.who||'',col:o.col||null,kind,dy:o.dy!=null?o.dy:-34,ax:a.x,ay:a.y,area:!!AREA};
+  // long enough to read (UX build): about 1.5 s plus 0.07 s a letter, 3 to 8 s; a quick sound bubble (Fweet!) stays quick
+  const b={a,text,t:0,dur:o.dur&&o.dur<1.5?o.dur:Math.max(o.dur||0,readT(text,3,8)),who:o.who||'',col:o.col||null,kind,dy:o.dy!=null?o.dy:-34,ax:a.x,ay:a.y,area:!!AREA};
   BUB.push(b); while(BUB.length>7) BUB.shift();
+  logBubble(a,text,o,kind);
   if(kind!=='far') csfx('pop');
   return b;
 }
@@ -15992,8 +16112,9 @@ function render(){
   if(G.allies) for(const a of G.allies) if(inView(a.x,a.y,60)) list.push(a);
   if(!player.dead&&!player.flying) list.push(player);
   compsForRender(list);
+  if(!inA) addOccluders(list);
   list.sort((a,b)=>a.y-b.y);
-  for(const e of list){ if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
+  for(const e of list){ if(e.occ){ drawOcc(e,t); continue; } if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
   if(G.fishing){ const F=G.fishing, bob=Math.sin(t*4)*1.5+(F.bite>0?3:0); ctx.strokeStyle='rgba(240,240,240,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(player.x+Math.cos(player.facing)*24,player.y+Math.sin(player.facing)*24); ctx.quadraticCurveTo((player.x+F.wx)/2,(player.y+F.wy)/2-20,F.wx,F.wy+bob); ctx.stroke(); ctx.fillStyle='#c8322a'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob,4,0,TAU); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob-2,2,0,TAU); ctx.fill(); if(F.bite>0) drawMarker(F.wx,F.wy-26,'!',t); }
   if(G.corpse&&G.corpse.type!=='vorlaxis'&&G.corpse.deathT<0.6){ ctx.save(); ctx.globalAlpha=1-G.corpse.deathT/0.6; const c=G.corpse; c.flash=1; drawEnemy(Object.assign({},c,{dead:false,alpha:1,spawnIn:0,boss:true})); ctx.restore(); }
   if(G.spirit&&!inA) drawSpirit(G.spirit);
@@ -16029,6 +16150,83 @@ function render(){
   if(G.fade>0){ ctx.fillStyle=`rgba(0,0,0,${clamp(G.fade,0,1)})`; ctx.fillRect(0,0,W,H); }
   if(scene!=='menu') drawHUD();
 }
+// ---------- characters behind houses (UX build). The 3D figures are tall, so somebody standing just north of a
+// house used to draw over its roof. Houses (and columns) are still drawn where they were, under everything; for
+// each one with a figure behind it, an occluder sorts into the entity list at the house's front (south) edge and
+// draws the house again, clipped to those figures' boxes, over them. Figures in front of the house draw after it.
+// Cheap: only houses with somebody behind them, and only inside those boxes. The lean (a11c_depth.js) is the same.
+const OCC_K={house:1,forge:1,library:1,column:1};
+let OCCS=null; const OCCL=[];
+function occFront(s){ return s.k==='column'?s.y:s.y+s.h/2; }
+// the world box the structure is drawn in, widened by its lean
+function occBox(s,o){
+  if(s.k==='column'){ const k=s.s||1, r=16*k, H=s.broken?30:44*k; o[0]=s.x-r-6; o[2]=s.x+r+10; o[1]=s.y-H-14; o[3]=s.y+10; }
+  else{ const c=houseSprite(s); o[0]=s.x-c.ox; o[1]=s.y-c.oy; o[2]=o[0]+c.width/HSC; o[3]=o[1]+c.height/HSC; }
+  if(DV.on){ const f=LEAN_S[s.k]||0, by=occFront(s), h=by-o[1], dx=(s.x-DV.cx)*DV.k*f*h, dy=(by-DV.cy)*DV.k*DV.vf*f*h; if(dx<0) o[0]+=dx; else o[2]+=dx; if(dy<0) o[1]+=dy; }
+  return o;
+}
+// a figure's box on screen, in world units: feet a little below e.y, the head up to _t3top (set by the 3D figures)
+function figBox(e,o){
+  const r=e.r||12, z=e===player?(player.z||0):(e.z||0), w=Math.max(18,r*1.6);
+  const top=e._t3top!=null&&e._t3top<e.y&&e._t3top>e.y-400?e._t3top:e.y-(e===player?46:e.kind?44:r*2.4+18)-z;
+  o[0]=e.x-w; o[2]=e.x+w; o[1]=top-6; o[3]=e.y+r*0.8+8;
+  return o;
+}
+let OCC_ON=true, OCC_F=0;
+function addOccluders(list){
+  OCC_F++; if(!OCC_ON) return;
+  if(!OCCS) OCCS=STRUCTS.filter(s=>OCC_K[s.k]);
+  const n=list.length, fb=[0,0,0,0], hb=[0,0,0,0];
+  for(const s of OCCS){
+    if(!inView(s.x,s.y,(s.w||60)+140)) continue;
+    const front=occFront(s); let o=null, hbOk=false;
+    for(let i=0;i<n;i++){
+      const e=list[i]; if(e.y>=front||e.y<front-420||e.x==null) continue;
+      if(!hbOk){ occBox(s,hb); hbOk=true; }
+      if(e.x<hb[0]-60||e.x>hb[2]+60) continue;
+      figBox(e,fb);
+      if(fb[2]<hb[0]||fb[0]>hb[2]||fb[3]<hb[1]||fb[1]>hb[3]) continue;
+      if(!o){ o=OCCL.find(q=>q.occ===s); if(!o){ o={occ:s,clips:[],pool:[],x:s.x,y:0,hasP:false}; OCCL.push(o); } o.clips.length=0; o.y=front-0.001; o.hasP=false; }
+      const c=o.pool[o.clips.length]||(o.pool[o.clips.length]=[0,0,0,0]);
+      c[0]=Math.max(fb[0],hb[0]); c[1]=Math.max(fb[1],hb[1]); c[2]=Math.min(fb[2],hb[2]); c[3]=Math.min(fb[3],hb[3]); o.clips.push(c);
+      if(e===player) o.hasP=true;
+    }
+    if(o){ o.f=OCC_F; list.push(o); }
+  }
+}
+function drawOcc(o,t){
+  const s=o.occ;
+  ctx.save(); ctx.beginPath(); for(const c of o.clips) ctx.rect(c[0],c[1],c[2]-c[0],c[3]-c[1]); ctx.clip();
+  const lf=DV.on?LEAN_S[s.k]:0; if(lf) leanOn(s.x,leanBase(s),lf);
+  if(s.k==='column') drawColumn(s); else drawHouseStruct(s,t);
+  ctx.restore();
+  // Ash really hidden behind a roof (his body or head under the house's pixels): a soft glow shows where he is
+  o.hid=false;
+  if(o.hasP&&!player.dead){ const p=player, top=p._t3top!=null&&p._t3top<p.y?p._t3top:p.y-30-(p.z||0);
+    if(occOpaque(s,p.x,p.y-8-(p.z||0))||occOpaque(s,p.x,top+7)){ o.hid=true; glowAt(p.x,(p.y+top)/2,(p.r||14)*1.7,'255,205,130',0.26+0.06*Math.sin(G.time*5)); } }
+}
+// is the house drawn at world point (x,y)? Reads a cached alpha mask of its sprite, undoing the lean
+const OCCA=new WeakMap();
+function occOpaque(s,wx,wy){
+  if(s.k==='column') return false;
+  const c=houseSprite(s); let m=OCCA.get(c);
+  if(m===undefined){ m=null; try{ const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; m=new Uint8Array(c.width*c.height); for(let i=0;i<m.length;i++) m[i]=d[i*4+3]; }catch(e){ m=null; } OCCA.set(c,m); }
+  if(!m) return false;
+  let x=wx, y=wy;
+  if(DV.on){ const f=LEAN_S[s.k]||0, by=occFront(s), kx=(s.x-DV.cx)*DV.k*f, ky=(by-DV.cy)*DV.k*DV.vf*f; y=(wy-ky*by)/(1-ky); x=wx-kx*(by-y); }
+  const px=Math.floor((x-(s.x-c.ox))*HSC), py=Math.floor((y-(s.y-c.oy))*HSC);
+  return px>=0&&py>=0&&px<c.width&&py<c.height&&m[py*c.width+px]>140;
+}
+// debug: switch the occluders off for a comparison, list the ones drawn last frame, and stand in a plain 3D
+// reference figure for Ash and the villagers (only when a test asks; the character builds fill T3X themselves)
+window.__ebX=Object.assign(window.__ebX||{},{occ(on){ if(on!=null) OCC_ON=!!on; return OCC_ON; },
+  occOpaqueAt(hx,hy,wx,wy){ const s=STRUCTS.find(q=>OCC_K[q.k]&&Math.abs(q.x-hx)<1&&Math.abs(q.y-hy)<1); return !!s&&occOpaque(s,wx,wy); },
+  occLast:()=>OCCL.filter(o=>o.f===OCC_F).map(o=>({k:o.occ.k,x:o.occ.x,y:o.occ.y,w:o.occ.w,h:o.occ.h,front:occFront(o.occ),clips:o.clips.length,rects:o.clips.map(c=>c.slice()),ash:o.hasP,hid:!!o.hid})),
+  houses:()=>STRUCTS.filter(s=>OCC_K[s.k]&&s.k!=='column').map(s=>{ const c=houseSprite(s); return {k:s.k,x:s.x,y:s.y,w:s.w,h:s.h,top:s.y-c.oy,vert:!!s.vert}; }),
+  t3TestFigs(){
+    if(!T3X.ash) T3X.ash=p=>{ ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(p.x,p.y+6,11,5,0,0,TAU); ctx.fill(); t3Begin(p.x,p.y+6,t3Turn(p,p.facing,12),{k:0.95,z:p.z||0}); t3RefPerson({walk:p.walkT*11,move:p.moving?1:0,shirt:'#b8402a',hair:'#3a1a10',pants:'#3a2a24'}); t3End(); p._t3top=p.y+6-(p.z||0)-40*0.95*T3.st; };
+    if(!T3X.npc) T3X.npc=n=>{ t3Begin(n.x,n.y+6,t3Turn(n,n.face||0,10),{k:1}); t3RefPerson({walk:(n.t||0)*9,move:n.walk?1:0}); t3End(); n._t3top=n.y+6-40*T3.st; return true; };
+    return true; }});
 function drawLights(){
   const dl=daylight(), inA=!!AREA, rk=inA?0:G.rainK*(player.y>WALL_Y?1:0), cinder=!inA&&player.y<2700;
   let dk=(1-dl)*0.46+rk*0.06; if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;
@@ -16648,20 +16846,33 @@ function drawCompass(obj){
   ctx.save(); ctx.translate(ex,ey); ctx.rotate(a); ctx.fillStyle='#ffb547'; ctx.strokeStyle='#3a2208'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(13,0); ctx.lineTo(-7,-8); ctx.lineTo(-3,0); ctx.lineTo(-7,8); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
 }
 function drawBanner(){
+  // the next banner in line steps up when the last one is done (setBanner in a9a_env.js queues them)
+  if(!G.banner&&G.bannerQ&&G.bannerQ.length) G.banner=G.bannerQ.shift();
   const bn=G.banner; if(!bn) return;
+  // another module may grow the text after the fact (the skills build adds the skill point line): more time to read it
+  const len=bn.text.length+bn.sub.length; if(len!==bn.len){ bn.len=len; bn.dur=Math.max(bn.dur,bn.t+readT(bn.text+' '+bn.sub)*0.8); if(bn.log) bn.log.sub=bn.sub; }
   const a=clamp(Math.min(bn.t/0.25,(bn.dur-bn.t)/0.5),0,1); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.lineJoin='round';
   const y=H*(bn.style==='region'?0.2:(usingTouch&&bn.style==='boss'?0.42:0.26));
+  let tw=0, bot=y;
   if(bn.style==='boss'){
-    ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y);
-    ctx.font=`500 13px ${UIF}`; const ls=wrapText(bn.sub,W-48); ctx.fillStyle='#f0dcc0'; ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+32+i*17); ctx.fillText(l,W/2,y+32+i*17); });
+    ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
+    ctx.font=`500 13px ${UIF}`; const ls=wrapText(bn.sub,W-48); ctx.fillStyle='#f0dcc0'; ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+32+i*17); ctx.fillText(l,W/2,y+32+i*17); }); bot=y+32+ls.length*17;
   }else{
-    ctx.font=`${bn.style==='region'?'600':'800'} ${W<560?22:bn.style==='region'?30:32}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle=bn.style==='region'?'#f6e9d6':'#ffd27a'; ctx.fillText(bn.text,W/2,y);
-    if(bn.sub){ ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,W-48); ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+30+i*18); ctx.fillStyle='#f0dcc0'; ctx.fillText(l,W/2,y+30+i*18); }); }
+    ctx.font=`${bn.style==='region'?'600':'800'} ${W<560?22:bn.style==='region'?30:32}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle=bn.style==='region'?'#f6e9d6':'#ffd27a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
+    if(bn.sub){ ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,W-48); ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+30+i*18); ctx.fillStyle='#f0dcc0'; ctx.fillText(l,W/2,y+30+i*18); }); bot=y+30+ls.length*18; }
   }
+  // more waiting: a small "+1" chip beside the title
+  const nq=G.bannerQ?G.bannerQ.length:0;
+  if(nq){ const t=`+${nq}`; ctx.font=`800 12px ${UIF}`; const cw=ctx.measureText(t).width+14, cx=Math.min(W-SAFE.r-cw-6,W/2+tw/2+10), cy=y-11;
+    ctx.fillStyle='rgba(14,9,6,.82)'; rr(cx,cy,cw,22,11); ctx.fill(); ctx.strokeStyle='rgba(255,200,120,.6)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='#ffd27a'; ctx.textBaseline='middle'; ctx.fillText(t,cx+cw/2,cy+11.5); }
   ctx.restore();
+  // touch: tap the banner to let it go (with a mouse any click does it, see the mousedown handler in a5_input.js)
+  if(usingTouch&&scene==='play'&&bn.t>0.3){ const bw=Math.min(W-24,Math.max(tw,200)+40); HUD_HITS.push({x:W/2-bw/2,y:y-26,w:bw,h:bot-y+34,fn:bannerSkip}); }
 }
 function drawTaunt(){
+  if(!G.taunt&&G.tauntQ&&G.tauntQ.length) G.taunt=G.tauntQ.shift();
   const t=G.taunt; if(!t) return;
   const a=clamp(Math.min(t.t/0.2,(t.dur-t.t)/0.4),0,1); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center';
@@ -16714,7 +16925,8 @@ function hintText(){
   const dev=curDevice(), K=a=>btnLabel(a,dev), jump=G.mode!=='story'||hasAbil('jump');
   if(dev==='touch') return settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the flasks to drink, the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts';
   if(dev==='pad') return `Left stick move, push it all the way to sprint · ${K('attack')} or ${padBtnName(PB.R2)} attack · ${padBtnName(PB.L2)} fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('use')} talk and open · ${K('drink')} drink · ${K('map')} map`;
-  return `WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
+  if(settings.mouseAim) return `WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
+  return `WASD move, Ash faces the way he walks · Shift sprint · Click or J attack · Right click or K fire (both lock on to a foe in front) · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
 }
 function drawHintText(b){
   const a=Math.min(1,G.hintT/1.5);
@@ -16802,14 +17014,16 @@ function showCard(num,name){
   const c=$('#card'); $('#cardNum').textContent=num; $('#cardName').textContent=name;
   c.classList.remove('on'); void c.offsetWidth; c.classList.add('on');
   clearTimeout(cardTimer); cardTimer=setTimeout(()=>c.classList.remove('on'),2850);
+  logAdd({k:'banner',text:`${num}: ${name}`,sub:'',key:'card:'+num+name});
 }
 
 // ================= dialogue
 let DLG=null;
 function runDialogue(lines,done,opt){
   scene='dialogue'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  const cp=l=>Array.isArray(l)?l:Object.assign({},l); DLG={lines:lines.map(cp),i:0,chars:0,shown:-1,done,mood:opt&&opt.mood||null};
-  $('#dlgNext').textContent=usingTouch?'Tap ▸':'Click or Space ▸';
+  const cp=l=>Array.isArray(l)?l:Object.assign({},l); DLG={lines:lines.map(cp),i:0,chars:0,shown:-1,done,mood:opt&&opt.mood||null,fullAt:0,lockT:0,optsAt:0,skipArm:0};
+  $('#dlgNext').textContent=usingTouch||PAD.dev==='touch'||coarsePtr()?'Tap ▸':'Click or Space ▸';
+  logAdd({k:'sep'}); dlgSkipLabel();
   try{ Music.duck(true); }catch(e){}
   show('dialogue'); setLine();
 }
@@ -16822,6 +17036,8 @@ function setLine(){
   DLG.text=String(typeof L.text==='function'?L.text():L.text);
   if(L.skipIf&&L.skipIf()){ DLG.i++; if(DLG.i>=DLG.lines.length) endDialogue(); else setLine(); return; }
   $('#dlgWho').textContent=s.name; $('#dlgWho').style.color=s.col;
+  logAdd({k:who==='narr'?'narr':'line',who:s.name,col:s.col,text:DLG.text});
+  DLG.fullAt=0; DLG.optsAt=0;
   $('#dlgBox').classList.toggle('narr',who==='narr');
   drawPortrait(who); DLG.chars=0; DLG.shown=-1; $('#dlgSay').textContent='';
   const box=$('#dlgOpts'); box.innerHTML=''; DLG.opts=null; box.hidden=true; $('#dlgNext').hidden=false;
@@ -16829,13 +17045,14 @@ function setLine(){
 }
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); chooseOpt(i); }); box.appendChild(b); });
-  box.hidden=false; $('#dlgNext').hidden=true;
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
+  box.hidden=false; $('#dlgNext').hidden=true; DLG.optsAt=performance.now();
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }
 function chooseOpt(i){
   if(!DLG||!DLG.opts||!DLG.opts[i]) return;
   const o=DLG.opts[i], hub=DLG.hub; DLG.opts=null; SFX.play('ui');
+  logAdd({k:'choice',who:'You',col:SPK.ash.col,text:String(typeof o.t==='function'?o.t():o.t)});
   if(o.key&&G){ G.seenTalk=G.seenTalk||{}; G.seenTalk[o.key]=1; }
   const cur=DLG; if(o.fn) o.fn();
   if(!DLG||DLG!==cur) return;
@@ -16851,12 +17068,14 @@ function updateDialogue(dt){
   const text=DLG.text||'';
   if(DLG.opts&&DLG.chars>=text.length) showOpts();
   DLG.chars=Math.min(text.length,DLG.chars+dt*60);
+  if(DLG.chars>=text.length&&!DLG.fullAt) DLG.fullAt=performance.now();
   const n=Math.floor(DLG.chars); if(n!==DLG.shown){ DLG.shown=n; $('#dlgSay').textContent=text.slice(0,n); }
 }
+// __eb.advanceDialogue (tests) and the old callers: finish the typing, else go on at once
 function advanceDialogue(){
   if(!DLG) return;
   const text=DLG.text||'';
-  if(DLG.chars<text.length){ DLG.chars=text.length; return; }
+  if(DLG.chars<text.length){ DLG.chars=text.length; DLG.fullAt=performance.now(); return; }
   if(DLG.opts) return;
   SFX.play('ui'); DLG.i++;
   if(DLG.i>=DLG.lines.length) endDialogue();
@@ -16864,13 +17083,58 @@ function advanceDialogue(){
 }
 function skipDialogue(){
   if(!DLG) return;
+  DLG.skipArm=0; dlgSkipLabel();
   // skipping fast-forwards to the next choice, so you never skip a decision by accident
   if(DLG.opts){ DLG.chars=1e9; return; }
-  for(let i=DLG.i+1;i<DLG.lines.length;i++){ const L=lineParts(DLG.lines[i]); if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; } if(L.opts){ DLG.i=i; setLine(); if(DLG) DLG.chars=1e9; return; } }
+  for(let i=DLG.i+1;i<DLG.lines.length;i++){ const L=lineParts(DLG.lines[i]); if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; } if(L.opts){ DLG.i=i; setLine(); if(DLG) DLG.chars=1e9; return; } dlgLogSkipped(L); }
   endDialogue();
 }
-$('#dialogue').addEventListener('click',()=>{ SFX.init(); advanceDialogue(); });
-$('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); skipDialogue(); });
+// lines a skip jumps over still go in the log, so they can be read later
+function dlgLogSkipped(L){
+  try{ if(L.skipIf&&L.skipIf()) return; const who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
+    logAdd({k:who==='narr'?'narr':'line',who:s.name,col:s.col,text:String(typeof L.text==='function'?L.text():L.text),sk:true}); }catch(e){}
+}
+// ---------- dialogue input from people (clicks, taps, keys, controller): nothing gets skipped by accident (UX build)
+// A click first finishes the typing. The next one goes on only once the whole line has been up for 0.4 s, and a
+// double click never moves more than one line. Choices wait 0.35 s after they appear. Escape (and the controller's
+// back button, and the Skip button) asks once before it skips the conversation.
+const DLG_FULL=400, DLG_LOCK=220, DLG_OPTS=350;
+function dlgNext(){
+  if(!DLG) return;
+  const now=performance.now(), text=DLG.text||'';
+  if(now<DLG.lockT) return;
+  if(DLG.chars<text.length){ DLG.chars=text.length; DLG.fullAt=now; return; }
+  if(DLG.opts) return;
+  if(now-(DLG.fullAt||now)<DLG_FULL) return;
+  DLG.lockT=now+DLG_LOCK; advanceDialogue();
+}
+function dlgChoose(i){
+  if(!DLG||!DLG.opts) return;
+  const text=DLG.text||'';
+  if(DLG.chars<text.length||!DLG.optsAt){ DLG.chars=text.length; DLG.fullAt=performance.now(); return; }
+  if(performance.now()-DLG.optsAt<DLG_OPTS) return;
+  chooseOpt(i);
+}
+function dlgAskSkip(src){
+  if(!DLG) return;
+  // at a choice there is nothing to skip (a skip never makes a decision): just show the choices
+  if(DLG.opts){ skipDialogue(); return; }
+  const now=performance.now(); DLG.skipKey=src||'key';
+  if(DLG.skipArm&&now-DLG.skipArm<3500){ skipDialogue(); return; }
+  DLG.skipArm=now; dlgSkipLabel(); SFX.play('ui',0.5);
+  const d=DLG; setTimeout(()=>{ if(DLG===d&&d.skipArm&&performance.now()-d.skipArm>=3400){ d.skipArm=0; dlgSkipLabel(); } },3500);
+}
+// the Skip button says what to do while a skip is waiting for the second press
+function dlgSkipLabel(){
+  const sk=$('#dlgSkip'); if(!sk) return;
+  const dev=curDevice(), arm=!!(DLG&&DLG.skipArm);
+  sk.classList.toggle('arm',arm);
+  if(arm){ const again=dev==='pad'?`Press ${padChip(padOkBtn()===PB.S?PB.E:PB.S)} again`:usingTouch||PAD.dev==='touch'||coarsePtr()?'Tap again':(DLG.skipKey==='key'?'Press Esc again':'Click again'); sk.innerHTML=`Skip this conversation? <b>${again}</b>`; }
+  else if(dev==='pad') sk.innerHTML=`Skip scene ${padChip(padOkBtn()===PB.S?PB.E:PB.S)}`;
+  else sk.innerHTML='Skip scene &#9197;';
+}
+$('#dialogue').addEventListener('click',()=>{ SFX.init(); dlgNext(); });
+$('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); dlgAskSkip('click'); });
 
 // ================= portraits
 function faceDragon(g,o){
@@ -18280,6 +18544,244 @@ const Music=(()=>{
     _stats:()=>({dk:C?+C.dk.gain.value.toFixed(3):0,tb:C?+C.tb.gain.value.toFixed(3):0,out:C?+C.out.gain.value.toFixed(3):0,vis:C?+C.vis.gain.value.toFixed(3):0,live:C?C.live:0,made:C?C.made:0,drop:C?C.drop:0,insts:live.length,stings:stings.length,state:C?C.ac.state:'none'})};
 })();
 window.__ebDbg=Object.assign(window.__ebDbg||{},{Music});
+// ================= the log: everything people said and every message, so a missed line is one tap away (UX build)
+// logAdd() is called by the dialogue (lines, narration, the choice picked, and lines a skip jumps over), banners and
+// chapter cards, taunts, speech bubbles, floating hints, ability tips and controller toasts. It lives in memory
+// only (about 300 entries) and is not saved. It opens as an overlay from the dialogue box (the Log button, the
+// L key or the controller's View / Share / minus button) and from the pause menu, and as a Log tab in the Journal.
+const LOG={items:[],max:300,filter:'all',from:null,focus:null,open:false,timer:0,seq:0,cur:null};
+// which entries count as Dialogue (somebody said it); everything else is a Message
+const LOG_DLG={line:1,narr:1,choice:1,taunt:1,bubble:1,sep:1};
+const LOG_FILTERS=[['all','All'],['dlg','Dialogue'],['msg','Messages']];
+function logAdd(o){
+  try{
+    if(!o) return null;
+    const L=LOG.items, now=Date.now();
+    if(o.k==='sep'){ const last=L[L.length-1]; if(!last||last.k==='sep') return null; }
+    else{
+      const text=String(o.text==null?'':o.text).trim(); if(!text&&!o.sub) return null; o.text=text;
+      // the same thing said again soon after: move it to the bottom with a count instead of a new row
+      const same=q=>q.k===o.k&&(o.key?q.key===o.key:(q.who||'')===(o.who||'')&&q.text===text&&(q.sub||'')===(o.sub||''));
+      if(o.k==='line'||o.k==='narr'){ const last=L[L.length-1]; if(last&&same(last)){ last.n++; last.t=now; return last; } }
+      else if(o.k!=='choice'){
+        for(let i=L.length-1,j=0;i>=0&&j<12;i--,j++){ const q=L[i]; if(now-q.t>90000) break;
+          if(same(q)){ L.splice(i,1); const e=Object.assign(q,o,{t:now,n:q.text===text?q.n+1:1}); L.push(e); logChanged(); return e; } }
+      }
+    }
+    const e={id:++LOG.seq,t:now,k:o.k,who:o.who||'',col:o.col||'',text:o.text||'',sub:o.sub||'',key:o.key||'',style:o.style||'',sk:!!o.sk,n:1};
+    L.push(e); while(L.length>LOG.max) L.shift();
+    if(o.k==='line'||o.k==='narr') LOG.cur=e;
+    logChanged(); return e;
+  }catch(err){ return null; }
+}
+// a speech bubble (a9i_comps.js bubble()): Pip and Ash have no name tag on their bubbles, so name them here
+function logBubble(a,text,o,kind){
+  let who=(o&&o.who)||'', col=(o&&o.col)||'';
+  if(G&&a===G.pip){ who='Pip'; col=SPK.pip.col; }
+  else if(a===player&&!who&&kind!=='narr'){ who='Ash'; col=SPK.ash.col; }
+  if(who==='???') col=col||'#e0d0b0';
+  logAdd({k:kind==='narr'||kind==='far'?'narr':'bubble',who:kind==='narr'||kind==='far'?'':who,col,text,bub:1});
+}
+let logDirty=0;
+function logChanged(){ if(LOG.open&&!logDirty){ logDirty=requestAnimationFrame(()=>{ logDirty=0; if(LOG.open) logRender(logAtEnd()); }); } }
+
+// ---------- how it looks: the journal and skills panels' style (this file builds its own DOM, body.html stays as is)
+const LOG_SVG={
+  log:'<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.5h7.5a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 12.5V3.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.6 6h5M5.6 8.5h5M5.6 11h3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  x:'<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  pick:'<svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M5 3l6 5-6 5z" fill="currentColor"/></svg>'
+};
+const LOG_CSS=`
+#logov{z-index:7}
+#logov .lgp{max-width:760px;width:100%;max-height:100%;display:flex;flex-direction:column;padding:16px 18px 14px;overflow:hidden;background:rgba(22,11,9,.985)}
+.lghd{display:flex;align-items:center;gap:12px;flex:none}
+.lghd h2{margin:0!important;flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:10px}
+.lghd h2 svg{width:24px;height:24px;color:var(--ember)}
+.lgx{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--edge);background:linear-gradient(180deg,var(--btn-hi),var(--btn));color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.lgx:hover{border-color:var(--ember)}.lgx:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.lgsub{margin:4px 0 10px!important;font-size:13px;flex:none}
+.lgtabs{margin:0 0 6px;flex:none}
+.lgtabs button,.lgf button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600}
+.lgtabs button i,.lgf button i{font-style:normal;font-size:11px;font-weight:700;min-width:18px;padding:1px 6px;border-radius:9px;background:rgba(0,0,0,.35);color:var(--muted);font-variant-numeric:tabular-nums}
+.lgtabs button[aria-pressed="true"] i,.lgf button[aria-pressed="true"] i{color:var(--ink)}
+.lglist{flex:1 1 auto;min-height:120px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;text-align:left;padding:8px 4px 6px 2px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 10px,#000 calc(100% - 6px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 10px,#000 calc(100% - 6px),transparent 100%)}
+.lglist:focus{outline:none}
+.lge{position:relative;padding:8px 12px 9px 16px;margin:0 0 6px;border-radius:10px;background:rgba(0,0,0,.24);border:1px solid rgba(255,140,70,.11);--c:#d8c3a0}
+.lge::before{content:'';position:absolute;left:5px;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--c);opacity:.85}
+.lgh{display:flex;align-items:baseline;gap:8px;min-height:15px}
+.lgw{font-family:var(--f-display);font-weight:800;font-size:12.5px;letter-spacing:.08em;color:var(--c);text-transform:uppercase;line-height:1.2}
+.lgtag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:1px 6px;border-radius:5px;background:rgba(255,200,120,.12);color:#e8c898;font-weight:700}
+.lgn{font-size:11px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.lgtm{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;opacity:.85}
+.lgt{font-size:15.5px;line-height:1.45;color:var(--ink);margin-top:2px;overflow-wrap:anywhere}
+.lge.k-narr{background:rgba(0,0,0,.14);--c:#7a6656}
+.lge.k-narr .lgt{font-style:italic;color:#e8d8bf}
+.lge.k-taunt .lgt{font-style:italic}
+.lge.k-bubble{background:rgba(255,240,215,.05)}
+.lge.k-bubble .lgt{font-size:14.5px}
+.lge.k-choice{margin-left:28px;background:linear-gradient(90deg,rgba(120,60,20,.32),rgba(0,0,0,.18));border-color:rgba(255,195,90,.32)}
+.lge.k-choice .lgt{color:var(--gold);font-weight:600;display:flex;gap:7px;align-items:baseline}
+.lge.k-choice .lgt svg{flex:none;position:relative;top:1px}
+.lge.msg{--c:var(--gold);background:rgba(60,30,10,.28);border-style:dashed;border-color:rgba(255,195,90,.24)}
+.lge.msg .lgt b{font-family:var(--f-display);font-weight:800;color:var(--gold);letter-spacing:.03em;font-size:15px}
+.lge.msg .lgs{display:block;color:var(--muted);font-size:13.5px;line-height:1.45;margin-top:1px}
+.lge.k-hint .lgt{font-size:14.5px;color:#f0dcc0}
+.lge.sk{opacity:.72}
+.lge.cur{border-color:rgba(255,200,110,.7);box-shadow:0 0 0 1px rgba(255,200,110,.2),0 6px 22px rgba(255,140,50,.12)}
+.lgsep{display:flex;align-items:center;gap:10px;margin:12px 0 8px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember)}
+.lgsep::before,.lgsep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,140,70,0),rgba(255,140,70,.35),rgba(255,140,70,0))}
+.lgsep:first-child{margin-top:0}
+.lgsep b{font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:none;font-size:11px}
+.lgempty{padding:30px 10px;text-align:center;color:var(--muted);font-size:14px}
+.lgft{display:flex;gap:12px;align-items:center;justify-content:flex-end;margin-top:10px;flex:none}
+.lgkeys{flex:1;font-size:12px;color:var(--muted);text-align:left}
+.lgkeys kbd{font-family:var(--f-ui);font-weight:700;color:var(--ink);background:#3a1a10;border:1px solid var(--edge);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:11px}
+.lgft .btn{width:auto;min-width:150px;text-align:center}
+.lgf{margin:2px 0 10px}
+.skip.dlglog{right:auto;left:0;display:inline-flex;align-items:center;gap:7px}
+.skip.dlglog svg{color:var(--gold)}
+.skip.dlglog .pg{font-size:.8em}
+.skip.arm{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 3px rgba(255,195,90,.14),0 0 18px rgba(255,150,60,.35)}
+.skip.arm b{color:var(--ink);font-weight:700}
+@media (max-width:640px){
+  #logov.ov{padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+  #logov .lgp{padding:14px 12px 12px}
+  .lghd h2{font-size:24px!important}
+  .lge{padding:7px 10px 8px 14px}
+  .lge.k-choice{margin-left:14px}
+  .lgt{font-size:15px}
+  .lgkeys{display:none}.lgft .btn{flex:1}
+}
+@media (max-height:520px){
+  #logov.ov{padding-top:max(6px,env(safe-area-inset-top,0px));padding-bottom:max(6px,env(safe-area-inset-bottom,0px))}
+  #logov .lgp{padding:10px 14px 8px}
+  .lgsub,.lgkeys{display:none}
+  .lghd h2{font-size:22px!important}
+  .lgx{width:36px;height:36px}
+}
+`;
+(function logBuildDom(){
+  const st=document.createElement('style'); st.id='logCss'; st.textContent=LOG_CSS; document.body.appendChild(st);
+  const ov=document.createElement('div'); ov.id='logov'; ov.className='ov dim';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','logTitle');
+  ov.innerHTML=`<div class="panel lgp" id="logPanel">
+    <div class="lghd"><h2 id="logTitle">${LOG_SVG.log}Log</h2><button type="button" class="lgx" id="logX" aria-label="Close the log">${LOG_SVG.x}</button></div>
+    <p class="lgsub">Everything people said and every message, newest at the bottom.</p>
+    <div class="seg jtabs lgtabs" id="logTabs" data-tabs role="group" aria-label="What to show">${LOG_FILTERS.map(([v,t])=>`<button type="button" data-lf="${v}" aria-pressed="${v==='all'}">${t}<i>0</i></button>`).join('')}</div>
+    <div class="lglist" id="logList" data-scroll aria-live="off"></div>
+    <div class="lgft"><span class="lgkeys" id="logKeys"></span><button type="button" class="btn c hot" id="logClose" data-focus>Back</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{ if(e.target===ov) closeLog(); });
+  $('#logX').addEventListener('click',()=>closeLog());
+  $('#logClose').addEventListener('click',()=>closeLog());
+  $('#logTabs').addEventListener('click',e=>{ const b=e.target.closest('button[data-lf]'); if(b) logSetFilter(b.dataset.lf); });
+  // the Log button in the dialogue box, top left (the Skip button is top right, far from it)
+  const box=$('#dlgBox');
+  if(box){ const b=document.createElement('button'); b.type='button'; b.id='dlgLog'; b.className='skip dlglog'; b.setAttribute('aria-label','Log: everything that was said');
+    b.addEventListener('click',e=>{ e.stopPropagation(); openLog(); }); box.appendChild(b); dlgLogLabel(); }
+  // Log in the pause menu, under Journal (and Skills)
+  const after=$('#bPauseSkills')||$('#bPauseJournal');
+  if(after){ const b=document.createElement('button'); b.type='button'; b.className='btn c'; b.id='bPauseLog'; b.textContent='Log';
+    after.insertAdjacentElement('afterend',b); b.addEventListener('click',()=>{ if(scene==='paused') openLog(); }); }
+  // a Log tab in the Journal (a12b_ui binds every #jTabs button when it loads, after this file)
+  const jt=$('#jTabs'); if(jt&&!jt.querySelector('[data-t="log"]')){ const b=document.createElement('button'); b.type='button'; b.dataset.t='log'; b.setAttribute('aria-pressed','false'); b.textContent='Log'; jt.appendChild(b); }
+})();
+// the dialogue box's Log button names the key or controller button that opens it
+function dlgLogLabel(dev){
+  const b=$('#dlgLog'); if(!b) return;
+  dev=dev||curDevice(); if(dev==='kb'&&(PAD.dev==='touch'||coarsePtr())) dev='touch';
+  const key=dev+(dev==='pad'?PAD.kind:'');
+  if(b.dataset.dev===key) return; b.dataset.dev=key;
+  b.innerHTML=`${LOG_SVG.log}<span>Log</span>${dev==='pad'?padChip(PB.SEL):dev==='kb'||dev==='mouse'?'<kbd class="pg k">L</kbd>':''}`;
+}
+
+function coarsePtr(){ try{ return matchMedia('(pointer: coarse)').matches; }catch(e){ return false; } }
+// ---------- open and close (an overlay on top of the dialogue or the pause menu, which stay just as they were)
+function openLog(){
+  if(LOG.open||(scene!=='dialogue'&&scene!=='paused')) return;
+  LOG.from=scene; LOG.focus=document.activeElement; LOG.open=true; scene='log';
+  try{ SFX.play('ui'); }catch(e){}
+  LOG.filter=LOG.filter||'all';
+  $('#logov').classList.add('on'); logRender(true);
+  requestAnimationFrame(()=>{ const el=$('#logList'); if(LOG.open&&el) el.scrollTop=el.scrollHeight; });
+  $('#logKeys').innerHTML=curDevice()==='kb'||curDevice()==='mouse'?'<kbd>Q</kbd> <kbd>E</kbd> show · <kbd>PgUp</kbd> <kbd>PgDn</kbd> scroll · <kbd>Esc</kbd> or <kbd>L</kbd> back':'';
+  if(!usingTouch&&curDevice()!=='pad') setTimeout(()=>{ if(LOG.open) try{ $('#logClose').focus({preventScroll:true}); }catch(e){} },30);
+  clearInterval(LOG.timer); LOG.timer=setInterval(()=>{ if(LOG.open) logRender(logAtEnd()); },20000);
+}
+function closeLog(){
+  if(!LOG.open) return;
+  LOG.open=false; clearInterval(LOG.timer);
+  $('#logov').classList.remove('on');
+  scene=LOG.from==='paused'?'paused':DLG?'dialogue':'play';
+  try{ SFX.play('ui'); }catch(e){}
+  if(scene==='play') hideAll();
+  let f=LOG.focus; LOG.focus=null;
+  if(f&&f.id==='dlgLog') f=$('#dlgBox');   // back on the talking box itself, not on its Log button
+  if(f&&f.isConnected&&f!==document.body&&!usingTouch) setTimeout(()=>{ try{ f.focus({preventScroll:true}); }catch(e){} },20);
+}
+function logSetFilter(f){
+  if(!LOG_FILTERS.some(q=>q[0]===f)) return;
+  const ch=LOG.filter!==f; LOG.filter=f; logRender(true);
+  if(ch) try{ SFX.play('ui'); }catch(e){}
+}
+function logFilterStep(d){ const i=LOG_FILTERS.findIndex(q=>q[0]===LOG.filter); const f=LOG_FILTERS[(i+d+LOG_FILTERS.length)%LOG_FILTERS.length][0]; logSetFilter(f); const b=$(`#logTabs button[data-lf="${f}"]`); if(b&&!usingTouch) try{ b.focus({preventScroll:true}); }catch(e){} }
+function logScroll(c){ const el=$('#logList'); if(!el) return; const h=el.clientHeight*0.85; if(c==='PageUp') el.scrollTop-=h; else if(c==='PageDown') el.scrollTop+=h; else if(c==='Home') el.scrollTop=0; else el.scrollTop=el.scrollHeight; }
+function logAtEnd(){ const el=$('#logList'); return !el||el.scrollTop+el.clientHeight>=el.scrollHeight-24; }
+
+// ---------- the rows
+function logAgo(t){
+  const s=(Date.now()-t)/1000;
+  if(s<45) return 'just now';
+  if(s<90) return '1 min ago';
+  if(s<3600) return `${Math.round(s/60)} min ago`;
+  const h=Math.floor(s/3600); return h===1?'1 hour ago':`${h} hours ago`;
+}
+const logShow=(e,f)=>f==='all'||(f==='dlg'?!!LOG_DLG[e.k]:!LOG_DLG[e.k]);
+function logCount(f){ let n=0; for(const e of LOG.items) if(e.k!=='sep'&&logShow(e,f)) n++; return n; }
+function logRowsHtml(f){
+  const E=escapeHtml, out=[]; let last='', prevSep=false;
+  const list=LOG.items.filter(e=>logShow(e,f));
+  for(let i=0;i<list.length;i++){
+    const e=list[i];
+    if(e.k==='sep'){ if(prevSep||i===list.length-1||list[i+1].k==='sep') continue; const ago=logAgo(list[i+1].t); last=ago; prevSep=true; out.push(`<div class="lgsep"><span>Conversation <b>${E(ago)}</b></span></div>`); continue; }
+    prevSep=false;
+    const ago=logAgo(e.t), tm=ago!==last?`<span class="lgtm">${E(ago)}</span>`:''; last=ago;
+    const n=e.n>1?`<span class="lgn">×${e.n}</span>`:'', sk=e.sk?'<span class="lgtag">skipped</span>':'';
+    const col=e.col||(e.k==='choice'?SPK.ash.col:'#d8c3a0'), cur=LOG.from==='dialogue'&&e===LOG.cur&&DLG?' cur':'';
+    if(e.k==='banner'||e.k==='tip'||e.k==='toast'||e.k==='hint'){
+      const tag=e.k==='tip'?'<span class="lgtag">Tip</span>':e.k==='toast'?'<span class="lgtag">Controller</span>':e.k==='hint'?'<span class="lgtag">Hint</span>':'';
+      const body=e.k==='hint'?E(e.text):`<b>${E(e.text)}</b>${e.sub?`<span class="lgs">${E(e.sub)}</span>`:''}`;
+      out.push(`<div class="lge msg k-${e.k}"${e.k==='hint'&&e.col?` style="--c:${E(e.col)}"`:''}>${tag||tm||n?`<div class="lgh">${tag}${n}${tm}</div>`:''}<div class="lgt">${body}</div></div>`);
+      continue;
+    }
+    if(e.k==='narr'){ out.push(`<div class="lge k-narr${e.sk?' sk':''}${cur}">${tm||n||sk?`<div class="lgh">${sk}${n}${tm}</div>`:''}<div class="lgt">${E(e.text)}</div></div>`); continue; }
+    if(e.k==='choice'){ out.push(`<div class="lge k-choice" style="--c:${E(col)}"><div class="lgh"><span class="lgw">You chose</span>${tm}</div><div class="lgt">${LOG_SVG.pick}<span>${E(e.text)}</span></div></div>`); continue; }
+    const nm=e.who?`<span class="lgw">${E(e.who)}</span>`:'', tag=e.k==='bubble'?'<span class="lgtag">nearby</span>':'';
+    const txt=e.k==='taunt'?`“${E(e.text)}”`:E(e.text);
+    out.push(`<div class="lge k-${e.k}${e.sk?' sk':''}${cur}" style="--c:${E(col)}"><div class="lgh">${nm}${tag}${sk}${n}${tm}</div><div class="lgt">${txt}</div></div>`);
+  }
+  if(!out.length) out.push(`<div class="lgempty">${f==='msg'?'No messages yet.':'Nothing yet. Talk to someone, and what they say shows up here.'}</div>`);
+  return out.join('');
+}
+function logRender(toEnd){
+  const el=$('#logList'); if(!el) return;
+  const keep=el.scrollTop;
+  for(const b of document.querySelectorAll('#logTabs button')){ b.setAttribute('aria-pressed',String(b.dataset.lf===LOG.filter)); const i=b.querySelector('i'); if(i) i.textContent=String(logCount(b.dataset.lf)); }
+  el.innerHTML=logRowsHtml(LOG.filter);
+  if(toEnd) el.scrollTop=el.scrollHeight; else el.scrollTop=keep;
+}
+// the Journal's Log tab (renderJour in a12b_ui.js): the same rows, with the filter as small buttons on top
+function logJourHtml(){
+  return `<div class="seg lgf" role="group" aria-label="What to show">${LOG_FILTERS.map(([v,t])=>`<button type="button" data-lf="${v}" aria-pressed="${v===LOG.filter}">${t}<i>${logCount(v)}</i></button>`).join('')}</div>${logRowsHtml(LOG.filter)}`;
+}
+function logJourWire(el){
+  for(const b of el.querySelectorAll('button[data-lf]')) b.addEventListener('click',()=>{ LOG.filter=b.dataset.lf; try{ SFX.play('ui'); }catch(e){} renderJour(); const nb=$(`#jBody button[data-lf="${LOG.filter}"]`); if(nb&&!usingTouch) try{ nb.focus({preventScroll:true}); }catch(e){} });
+  // the journal may still be hidden on the first render: scroll once it shows
+  el.scrollTop=el.scrollHeight; requestAnimationFrame(()=>{ if(jTab==='log') el.scrollTop=el.scrollHeight; });
+}
+window.__ebX=Object.assign(window.__ebX||{},{openLog,closeLog,logAdd,logFilter:f=>logSetFilter(f),
+  log:()=>LOG.items.map(e=>({k:e.k,who:e.who,text:e.text,sub:e.sub,n:e.n,sk:e.sk})), logOpen:()=>LOG.open, logClear(){ LOG.items.length=0; LOG.cur=null; }});
 
 // ================= blessings
 let upChoices=null, upCb=null;
@@ -18376,8 +18878,10 @@ function renderJour(){
     const S=secretTally();
     rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
   }else if(jTab==='hero') rows.push(heroTabHtml());
+  else if(jTab==='log') rows.push(logJourHtml());
   el.innerHTML=rows.join('');
   if(jTab==='hero') heroTabWire(el);
+  if(jTab==='log') logJourWire(el);
   for(const b of el.querySelectorAll('button[data-f]')) b.addEventListener('click',()=>{ followQuest(b.dataset.f||null); SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
 }
@@ -18499,6 +19003,31 @@ $('#bSettings').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openS
 $('#bPauseSettings').addEventListener('click',()=>{ SFX.play('ui'); openSettings('pause'); });
 $('#bSettingsClose').addEventListener('click',()=>{ SFX.play('ui'); closeSettings(); });
 for(const id of ['setSfx','setMusic','setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
+// ---------- two more rows (UX build), injected like the depth row so body.html stays as it is:
+// "Aim with the mouse" (off: Ash faces the way he walks) and "Characters" (3D toy figures or the classic flat art)
+// (a3e_toy3d.js reads eb_chars at load; this flips it live)
+function setChars(v){ v=v==='classic'?'classic':'3d'; T3.on=v==='3d'; store.set('eb_chars',v); uxSyncRows(); return v; }
+function setMouseAim(on){ settings.mouseAim=!!on; store.set('eb_mouseaim',settings.mouseAim); if(!on&&player) player.faceGoal=player.facing; uxSyncRows(); return settings.mouseAim; }
+function uxSyncRows(){
+  for(const b of document.querySelectorAll('#setChars button')) b.setAttribute('aria-pressed',String(b.dataset.v===(T3.on?'3d':'classic')));
+  for(const b of document.querySelectorAll('#setAim button')) b.setAttribute('aria-pressed',String(b.dataset.v===(settings.mouseAim?'on':'off')));
+}
+(function uxRows(){
+  try{
+    const panel=document.querySelector('#settings .panel'); if(!panel||$('#setChars')) return;
+    const mk=(html)=>{ const r=document.createElement('div'); r.className='setrow'; r.innerHTML=html; return r; };
+    const aim=mk('<span>Aim with the mouse<small>Off: Ash faces where he walks, and attacks find the foe in front. On: he faces the pointer.</small></span><div class="seg" id="setAim" role="group" aria-label="Aim with the mouse"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div>');
+    const chars=mk('<span>Characters<small>3D toy figures that turn to face every way, or the classic flat look.</small></span><div class="seg" id="setChars" role="group" aria-label="Characters"><button type="button" data-v="3d" aria-pressed="false">3D</button><button type="button" data-v="classic" aria-pressed="false">Classic</button></div>');
+    // the aim row sits under Damage numbers; Characters goes just above the 3D depth row (or the end of the list)
+    const nums=$('#setNums'), nr=nums&&nums.closest('.setrow');
+    if(nr) nr.after(aim); else panel.prepend(aim);
+    const dep=$('#setDepth'), dr=dep&&dep.closest('.setrow'), done=$('#bSettingsClose'); let ref=dr||done; while(ref&&ref.parentElement!==panel) ref=ref.parentElement;
+    if(ref) panel.insertBefore(chars,ref); else panel.appendChild(chars);
+    for(const b of aim.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setMouseAim(b.dataset.v==='on'); SFX.play('ui'); });
+    for(const b of chars.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setChars(b.dataset.v); SFX.play('ui'); });
+    uxSyncRows();
+  }catch(e){}
+})();
 $('#bSlotsClose').addEventListener('click',()=>{ SFX.play('ui'); show('menu'); refreshMenu(); });
 $('#bPauseJournal').addEventListener('click',()=>{ scene='play'; hideAll(); openJournal(); });
 $('#bMapJournal').addEventListener('click',()=>{ closeMap(true); openJournal(); });
@@ -18534,7 +19063,7 @@ function frame(now){
     else if(scene==='play'){ updateTimers(dt); if(scene==='play'){ if(G.slowT>0){ G.slowT-=dt; if(G.slowT<=0) G.timeScale=1; } update(dt*G.timeScale); } }
     else if(scene==='dying'){ dyingT-=dt; liteUpdate(dt); if(dyingT<=0) showDeath(); }
     else if(scene==='dialogue'){ updateDialogue(dt); liteUpdate(dt); }
-    else if(scene!=='paused'&&scene!=='map'&&scene!=='journal') liteUpdate(dt);
+    else if(scene!=='paused'&&scene!=='map'&&scene!=='journal'&&!(scene==='log'&&LOG.from==='paused')) liteUpdate(dt);
     musicUpdate(dt); if(scene==='play') perkUpdate(dt);
     if(!OV.done) overviewStep(scene==='menu'?14:6);
     render();
@@ -18558,6 +19087,11 @@ window.__eb={god:false,get G(){return G;},get player(){return player;},get scene
   face(a){ player.facing=a; }, WARDS, POI, LANTERNS, NPCSPOT, SITES, LILIES, ORES, bossDone(b){ G.bossDone[b]=true; }, Cloud, syncSaves, objectiveList,
   travel(id){ const s=SHRINES.find(z=>z.id===id); G.shrines[id]=true; scene='map'; travelTo(s); },
   setTime(t){ G.tod=t; }, rain(on){ G.weather.type=on?'rain':'clear'; G.weather.t=999; G.rainK=on?1:0; }};
+window.__ebX=Object.assign(window.__ebX||{},{setChars,setMouseAim,T3,readT,setBanner,taunt,bannerSkip,dlgNext,dlgChoose,dlgAskSkip,
+  aimInfo:()=>({facing:player.facing,goal:player.faceGoal,aim:player.aim,mouseAim:settings.mouseAim,aimMode}),
+  banner:()=>G.banner?{text:G.banner.text,sub:G.banner.sub,t:G.banner.t,dur:G.banner.dur,q:(G.bannerQ||[]).map(b=>b.text)}:{q:(G.bannerQ||[]).map(b=>b.text)},
+  dlgState:()=>DLG?{i:DLG.i,text:DLG.text,chars:DLG.chars,opts:!!DLG.opts,skipArm:DLG.skipArm}:null,
+  say:(id,t)=>{ const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); return n?!!npcBubble(n,t):false; }, view:()=>({x:cam.x,y:cam.y,zoom,W,H})});
 // debug hooks from feature modules: each one adds to window.__ebX
 if(window.__ebX) Object.defineProperties(window.__eb,Object.getOwnPropertyDescriptors(window.__ebX));
 })();

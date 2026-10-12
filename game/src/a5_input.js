@@ -3,6 +3,9 @@
 const keys=new Set(), pressed=new Set();
 const mouse={x:0,y:0,l:false,r:false};
 const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0,fireT:0};
+// keyboard and mouse: Ash faces the way he walks and attacks lock on to a foe in front (a6b_weapons.js aimAssist).
+// Settings > "Aim with the mouse" brings back the twin-stick style where he faces the pointer.
+settings.mouseAim=store.get('eb_mouseaim',false)===true;
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); });
 addEventListener('blur',()=>{ keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
@@ -12,6 +15,7 @@ cvs.addEventListener('mousedown',e=>{
   SFX.init(); mouse.x=e.clientX; mouse.y=e.clientY;
   if(scene==='play'&&hudClick(e.clientX,e.clientY)) return;
   usingTouch=false; aimMode='mouse';
+  if(scene==='play') bannerSkip();
   if(e.button===0) mouse.l=true; if(e.button===2) mouse.r=true;
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
@@ -152,6 +156,7 @@ function readInput(dt){
     wNext:pressed.has('KeyX')||!!touch.pressed.weapon, wPrev:pressed.has('KeyZ'), wSel,
     whistle:pressed.has('KeyG')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
   padInput(o,dt);
+  if(o.use) bannerSkip();
   return o;
 }
 function onKey(e){
@@ -179,15 +184,23 @@ function onKey(e){
     else if(c==='KeyP'&&r&&r.id==='pause'){ e.preventDefault(); resumeGame(); }
     else navKey(e);
   }else if(scene==='dialogue'){
+    // a held key never skips more than one line (repeats are ignored), and Escape asks before it skips
     const dn={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3}[c];
-    if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); chooseOpt(dn); return; }
+    if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); if(!e.repeat) dlgChoose(dn); return; }
     if(navKey(e)) return;
     if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){
       e.preventDefault(); if(e.repeat) return;
       const f=document.activeElement;
-      if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else advanceDialogue();
+      if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else dlgNext();
     }
-    else if(c==='Escape'){ e.preventDefault(); skipDialogue(); }
+    else if(c==='Escape'){ e.preventDefault(); if(!e.repeat) dlgAskSkip('key'); }
+    else if(c==='KeyL'){ e.preventDefault(); if(!e.repeat) openLog(); }
+  }else if(scene==='log'){
+    // the log overlay (a12c_log.js): Escape or L closes it, the arrow keys move between the filters
+    if(c==='Escape'||c==='KeyL'){ e.preventDefault(); if(!e.repeat) closeLog(); }
+    else if(c==='BracketLeft'||c==='BracketRight'||c==='KeyQ'||c==='KeyE'){ e.preventDefault(); logFilterStep(c==='BracketLeft'||c==='KeyQ'?-1:1); }
+    else if(c==='PageUp'||c==='PageDown'||c==='Home'||c==='End'){ e.preventDefault(); logScroll(c); }
+    else navKey(e);
   }else if(scene==='upgrade'){
     const n={Digit1:0,Digit2:1,Digit3:2,Numpad1:0,Numpad2:1,Numpad3:2}[c];
     if(n!=null){ e.preventDefault(); chooseUpgrade(n); }
@@ -200,6 +213,7 @@ function onKey(e){
   }
 }
 function toWorld(sx,sy){ return {x:sx/zoom+cam.x,y:sy/zoom+cam.y}; }
+const camLead={x:0,y:0};
 function updateCam(dt,snap){
   if(!player) return;
   moveZoom(dt);   // zooms out a little while Ash flies (a6c_moves.js)
@@ -207,7 +221,10 @@ function updateCam(dt,snap){
   let fx=player.x, fy=player.y;
   const b=G&&G.boss;
   if(b&&!b.dead&&!b.noClip){ fx+=clamp((b.x-player.x)*0.3,-160,160); fy+=clamp((b.y-player.y)*0.3,-120,120); }
-  if(aimMode==='mouse'&&!usingTouch&&scene==='play'){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
+  // look ahead: toward the pointer with mouse aim (or the right stick, which steers the same pointer), else a
+  // little way along the way Ash walks
+  if(aimMode==='mouse'&&!usingTouch&&scene==='play'&&(settings.mouseAim||padActive())){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
+  else if(!snap){ const mv=scene==='play'&&player.moving&&!usingTouch, k=1-Math.exp(-dt*2.2); camLead.x+=((mv?Math.cos(player.facing)*34:0)-camLead.x)*k; camLead.y+=((mv?Math.sin(player.facing)*24:0)-camLead.y)*k; fx+=camLead.x; fy+=camLead.y; }
   let tx=clamp(fx-vw/2,-200,WORLD.w-vw+200), ty=clamp(fy-vh/2,-200,WORLD.h-vh+200);
   if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
   if(snap){ cam.x=tx; cam.y=ty; return; }

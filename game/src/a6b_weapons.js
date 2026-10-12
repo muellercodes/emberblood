@@ -13,6 +13,8 @@ const WEAPONS={
 };
 const WS={paused:false,pop:null,get:null,pulse:0,area:undefined,side:1,flyT:0,backT:0,whirT:0};
 const BOW_FULL=0.6;
+// how long the switch pill (the weapon's name) and the big "new weapon" pose stay up
+const WPOP_T=2.1, WGET_T=2.8;
 function ownedWeapons(){ return WEAPON_IDS.filter(id=>id==='sword'||!!(G&&G.weapons&&G.weapons[id])); }
 function curWeapon(){ if(!G) return 'sword'; const w=G.weapon; return w&&WEAPONS[w]&&(w==='sword'||(G.weapons&&G.weapons[w]))?w:'sword'; }
 function equipWeapon(id,quiet){
@@ -46,9 +48,9 @@ function giveWeapon(id,quiet){
 // the "you got a new weapon" moment waits politely for any banner that is already up (quest complete, chest, and so on)
 function weaponMoment(id,n){
   const b=G.banner;
-  if(n<14&&b&&!b.wpn&&b.dur-b.t>0.5){ later(0.35,()=>weaponMoment(id,n+1)); return; }
+  if(n<14&&((b&&!b.wpn&&b.dur-b.t>0.5)||(G.bannerQ&&G.bannerQ.length))){ later(0.35,()=>weaponMoment(id,n+1)); return; }
   const D=WEAPONS[id];
-  setBanner('New weapon: '+D.name,D.desc+' '+switchTip(),4.2); G.banner.wpn=true;
+  setBanner('New weapon: '+D.name,D.desc+' '+switchTip(),4.2).wpn=true;
   jingle('item','chest'); WS.get={id,t:0}; WS.pulse=1; shake(3);
   const p=player; emit(p.x,p.y-20,34,{col:'255,220,140',ang:-Math.PI/2,spread:1.6,smin:40,smax:190,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
 }
@@ -121,6 +123,24 @@ function wIgnite(x,y,r,heat){
     }
   }
 }
+// keyboard and controller aim assist (UX build): attacks and fire breath turn toward the best foe in a cone of
+// 45 degrees either side of where Ash faces. The closest one wins and bosses count as closer, so fights feel
+// easy without a mouse. kind is the weapon id, or 'breath'. Returns the aim angle.
+const AIM_CONE=Math.PI/4;
+function aimAssist(aim,kind){
+  const p=player; if(!p||!G) return aim;
+  const R=kind==='breath'?240:kind==='bow'||kind==='boomerang'?620:Math.max(170,wReach(kind)+110);
+  let best=null, bs=1e9;
+  for(const e of G.enemies){
+    if(!wFoeOk(e)||e.frozen||e.alpha<0.3) continue;
+    const d=Math.max(0,dist(p.x,p.y,e.x,e.y)-(e.r||10)*0.6); if(d>R) continue;
+    const da=Math.abs(angDiff(aim,angTo(p.x,p.y,e.x,e.y))); if(da>AIM_CONE) continue;
+    let s=(d+20)*(1+da*0.9); if(e.boss) s*=0.5;
+    if(s<bs){ bs=s; best=e; }
+  }
+  return best?angTo(p.x,p.y,best.x,best.y):aim;
+}
+// the narrow assist for the bow and boomerang when a controller aims with the right stick
 function wAimAssist(aim){
   const p=player; let best=null,bs=1e9;
   for(const e of G.enemies){
@@ -151,17 +171,17 @@ function updateWeapon(dt,inp){
     if(inp.wNext) cycleWeapon(1); else if(inp.wPrev) cycleWeapon(-1);
     else if(inp.wSel!=null&&inp.wSel>=0){ const own=ownedWeapons(); if(own[inp.wSel]) equipWeapon(own[inp.wSel]); }
   }
-  if(WS.pop){ WS.pop.t+=dt; if(WS.pop.t>1.3) WS.pop=null; }
-  if(WS.get){ WS.get.t+=dt; if(WS.get.t>2.3) WS.get=null; }
+  if(WS.pop){ WS.pop.t+=dt; if(WS.pop.t>WPOP_T) WS.pop=null; }
+  if(WS.get){ WS.get.t+=dt; if(WS.get.t>WGET_T) WS.get=null; }
   if(WS.pulse>0) WS.pulse=Math.max(0,WS.pulse-dt*3);
   if(WS.flyT>0) WS.flyT-=dt; if(WS.backT>0) WS.backT-=dt;
   if(p.wEquipT>0) p.wEquipT-=dt; if(p.throwT>0) p.throwT-=dt; if(p.bowSnap>0) p.bowSnap-=dt;
   const w=curWeapon(), atk=!!inp.attack, free=p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0;
-  if(atk&&!armed){ if(!(G.noSwordT>0)){ G.noSwordT=2.5; ftext(p.x,p.y-28,'Mom has your sword at the forge','#ffd9a0',13); } }
+  if(atk&&!armed){ if(!(G.noSwordT>0)){ G.noSwordT=3.6; ftext(p.x,p.y-28,'Mom has your sword at the forge','#ffd9a0',13); } }
   else if(armed){
     if(w==='bow') updateBow(dt,atk);
     else if(w==='boomerang'){ if(atk&&free) throwRang(); }
-    else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(atk&&!(WS.flyT>0)){ WS.flyT=3; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
+    else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(atk&&!(WS.flyT>0)){ WS.flyT=4.6; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
     else if(airborne()&&hasSkill('slam')){ /* attack in the air is Meteor Slam (abilities build) */ }
     else if(w==='hammer') hammerInput(atk,free);
     else if(atk&&free){
@@ -601,14 +621,14 @@ function drawWeaponPopups(){
   const p=player; if(!p||p.dead||scene==='menu') return;
   const sx=(p.x-cam.x)*zoom, sy=(p.y-cam.y)*zoom, zk=Math.max(zoom,0.8);
   if(WS.get){
-    const t=WS.get.t, a=clamp(Math.min(t/0.2,(2.3-t)/0.5),0,1), lift=1-Math.pow(1-Math.min(1,t/0.35),3), y=sy-(40+lift*14)*zk, s=46*(0.6+0.4*lift);
+    const t=WS.get.t, a=clamp(Math.min(t/0.2,(WGET_T-t)/0.5),0,1), lift=1-Math.pow(1-Math.min(1,t/0.35),3), y=sy-(40+lift*14)*zk, s=46*(0.6+0.4*lift);
     ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(sx,y);
     const gl=ctx.createRadialGradient(0,0,0,0,0,56); gl.addColorStop(0,`rgba(255,220,140,${0.55*a})`); gl.addColorStop(1,'rgba(255,160,60,0)'); ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(0,0,56,0,TAU); ctx.fill();
     ctx.rotate(t*0.7); ctx.fillStyle=`rgba(255,215,140,${0.16*a})`; for(let i=0;i<10;i++){ const b=i*TAU/10; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,60,b,b+0.17); ctx.closePath(); ctx.fill(); }
     ctx.restore();
     ctx.globalAlpha=a; drawWeaponIcon(ctx,WS.get.id,sx,y,s); ctx.globalAlpha=1;
   }else if(WS.pop){
-    const t=WS.pop.t, a=clamp(Math.min(t/0.1,(1.3-t)/0.35),0,1), y=sy-38*zk-t*12, D=WEAPONS[WS.pop.id];
+    const t=WS.pop.t, a=clamp(Math.min(t/0.1,(WPOP_T-t)/0.35),0,1), y=sy-38*zk-Math.min(t,1.3)*12, D=WEAPONS[WS.pop.id];
     ctx.save(); ctx.globalAlpha=a; ctx.font=`700 12px ${UIF}`; ctx.textBaseline='middle';
     const w=ctx.measureText(D.name).width+40, h=26;
     ctx.fillStyle='rgba(12,9,6,.8)'; rr(sx-w/2,y-h/2,w,h,13); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.5)'; ctx.lineWidth=1; ctx.stroke();
