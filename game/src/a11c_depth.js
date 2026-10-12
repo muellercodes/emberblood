@@ -4,21 +4,22 @@
 //  * tall things lean away from the screen centre (trees, houses, posts, statues, the wall), drawn with a shear
 //    or an offset anchored at their base, so the ground and collisions never move
 //  * one soft shadow layer per view (canopy shaped tree shadows, house footprints pushed along the sun, contact
-//    blobs), drawn at low resolution so it is soft, and only redrawn when the camera crosses a 64 px step or the
-//    sun moves
+//    blobs), drawn at low resolution so it is soft, and only redrawn when the camera crosses a 128 px step or the
+//    sun moves; between redraws each frame is a plain copy of the tiles that hold shadows
 //  * tilt-shift blur at the top and bottom of the screen from a downscaled copy of the frame, masked by gradients
-//  * a warm grade by day, a soft local contrast lift (full), bloom on lamps, windows and fire
-// Light is the phone setting: one blur level, no full screen glow passes.
+//  * a warm grade by day, a soft local contrast lift (full), bloom on lamps, windows and fire, water sparkle (full)
+// Light is the phone setting: one blur level, no full screen glow passes, the blur copy refreshed every fourth frame.
+// Off draws exactly the old way. A frame pacing guard steps the heavy passes down on slow devices.
 const DEPTH_MODES=['off','light','full'];
 const DEPTH_LABEL={off:'Off',light:'Light',full:'Full'};
 function depthPhone(){ try{ return matchMedia('(pointer: coarse)').matches&&Math.min(screen.width,screen.height)<900; }catch(e){ return false; } }
 const DSKIP={};
 const DEPTH={mode:(()=>{ const v=store.get('eb_depth',null); return DEPTH_MODES.includes(v)?v:(depthPhone()?'light':'full'); })()};
-function setDepth(m){ if(!DEPTH_MODES.includes(m)) return DEPTH.mode; DEPTH.mode=m; GOV.lvl=0; GOV.n=GOV.slow=0; store.set('eb_depth',m); SHL.key=''; vigKey=''; depthSyncRow(); return m; }
+function setDepth(m){ if(!DEPTH_MODES.includes(m)) return DEPTH.mode; DEPTH.mode=m; GOV.lvl=0; GOV.n=GOV.slow=0; store.set('eb_depth',m); SHL.key=''; DP.ok=false; vigKey=''; depthSyncRow(); return m; }
 function getDepth(){ return DEPTH.mode; }
 // per-frame view state: camera centre, world matrix, lean strength
 const LEAN_D=2400, LEAN_VF=0.55;
-const DV={on:false,full:false,cx:0,cy:0,k:1/LEAN_D,vf:LEAN_VF,Z:1,tx:0,ty:0,top:0,bot:0,last:0,ashY:0};
+const DV={on:false,full:false,lite:false,cx:0,cy:0,k:1/LEAN_D,vf:LEAN_VF,Z:1,tx:0,ty:0,last:0,ashY:0};
 const TREEH={oak:64,birch:58,pine:76,spine:76,dead:52,willow:54};
 // frame pacing guard: if most frames over a two second window take longer than about 21 ms while playing,
 // the heaviest passes switch off one step at a time (the saved setting is not touched)
@@ -62,7 +63,7 @@ function leanBase(s){
   switch(s.k){ case 'house': case 'forge': case 'library': return s.y+s.h/2; case 'torch': return s.y+2; case 'lantern': return s.y+12; case 'stone': return s.y+18*(s.s||1); case 'cavemouth': return s.y+12; }
   return s.y;
 }
-// ---------- soft shadow layer (static things: trees, houses, posts), cached per 64 px camera step and sun angle
+// ---------- soft shadow layer (static things: trees, houses, posts), cached per 128 px camera step and sun angle
 const SHL={cv:null,g:null,ox:0,oy:0,q:0.3,key:'',redraws:0,ups:0,big:null,bg:null,bigOK:false,bigZ:0,zLast:0,zStable:0};
 function silOf(sp){
   if(sp._sil) return sp._sil;
@@ -89,42 +90,41 @@ function shadowLayer(sun,props){
   const ox=Math.floor((cam.x-M)/STW)*STW, oy=Math.floor((cam.y-M)/STW)*STW;
   const ntx=Math.ceil((cam.x+vw+M-ox)/STW)+1, nty=Math.ceil((cam.y+vh+M-oy)/STW)+1, lw=ntx*STW*q, lh=nty*STW*q;
   if(!SHL.cv||SHL.cv.width!==lw||SHL.cv.height!==lh||SHL.q!==q){ SHL.cv=mkCanvas(lw,lh); SHL.g=SHL.cv.getContext('2d'); SHL.q=q; SHL.key=''; }
-  const ux=Math.round(sun.dx*2)/80, uy=Math.round(sun.dy*2)/80;
+  const ux=Math.round(sun.dx)/40, uy=Math.round(sun.dy)/40;
   const key=ox+','+oy+','+ux+','+uy+','+lw+','+lh;
   if(key!==SHL.key){ SHL.key=key; SHL.ox=ox; SHL.oy=oy; SHL.ntx=ntx; SHL.nty=nty; SHL.tiles=new Uint8Array(ntx*nty); SHL.redraws++; drawShadowLayer(SHL.g,lw,lh,ox,oy,q,ux,uy); SHL.bigOK=false; }
   // daylight shadows, fading to faint moon shadows at night, weaker under rain clouds
   const dl=daylight(), rk=G.rainK*(player.y>WALL_Y?1:0);
-  const a=(0.07+0.27*dl)*(1-0.55*rk);
+  const a=(0.07+0.27*dl)*(1-0.55*rk), aq=Math.round(a*60)/60;
+  if(a<0.095) return; // deep night: moon shadows are too faint to be worth a pass
   // low props (bushes, rocks): small blobs straight onto the ground, they rarely overlap
   const SH=SPR.shadow; ctx.globalAlpha=a*0.85;
-  for(const p of props){ if(p.taken||TREEH[p.k]||p.k==='herb'||p.k==='vent') continue; const h=p.k==='crag'?16:p.k==='bush'||p.k==='shrub'||p.k==='fshrub'||p.k==='mbush'?10:7, r=p.R*0.95; ctx.drawImage(SH,p.x+ux*h-r,p.y+uy*h-r*0.8,r*2,r*1.6); }
+  if(!DSKIP.lowp) for(const p of props){ if(p.taken||TREEH[p.k]||p.k==='herb'||p.k==='vent') continue; const h=p.k==='crag'?16:p.k==='bush'||p.k==='shrub'||p.k==='fshrub'||p.k==='mbush'?10:7, r=p.R*0.95; ctx.drawImage(SH,p.x+ux*h-r,p.y+uy*h-r*0.8,r*2,r*1.6); }
   // the soft layer is scaled up once into a canvas at screen resolution, so each frame is a plain 1:1 copy
-  // (when the zoom is changing, or the screen is very large, it is scaled on the fly); only tiles that hold
-  // a shadow are copied
+  // (when the zoom is changing, or the screen is very large, it is scaled on the fly)
   const Zd=DV.Z, bw=Math.ceil(lw/q*Zd), bh=Math.ceil(lh/q*Zd);
   if(Zd!==SHL.zLast){ SHL.zLast=Zd; SHL.zStable=0; } else SHL.zStable++;
   const useBig=bw*bh<=3.4e6&&SHL.zStable>2;
-  if(useBig&&(!SHL.bigOK||SHL.bigZ!==Zd)){
+  if(useBig&&(!SHL.bigOK||SHL.bigZ!==Zd||SHL.bigA!==aq)){
     if(!SHL.big||SHL.big.width!==bw||SHL.big.height!==bh){ SHL.big=mkCanvas(bw,bh); SHL.bg=SHL.big.getContext('2d'); }
-    const g=SHL.bg; g.globalCompositeOperation='copy'; g.imageSmoothingEnabled=true; g.drawImage(SHL.cv,0,0,lw,lh,0,0,bw,bh); g.globalCompositeOperation='source-over';
-    SHL.bigOK=true; SHL.bigZ=Zd; SHL.ups++;
+    // the shadow strength is baked in too, so the copy each frame is a plain blit (it is redone when the light changes)
+    const g=SHL.bg; g.globalCompositeOperation='copy'; g.globalAlpha=aq; g.imageSmoothingEnabled=true; g.drawImage(SHL.cv,0,0,lw,lh,0,0,bw,bh); g.globalCompositeOperation='source-over'; g.globalAlpha=1;
+    SHL.bigOK=true; SHL.bigZ=Zd; SHL.bigA=aq; SHL.ups++;
   }
-  ctx.globalAlpha=a;
-  const big=useBig&&SHL.bigOK, T=SHL.tiles, tq=STW*q, bx=Math.round(ox*Zd+DV.tx), by=Math.round(oy*Zd+DV.ty), P=v=>Math.round(v*STW*Zd);
-  const tx0=Math.max(0,Math.floor((cam.x-ox)/STW)), tx1=Math.min(ntx-1,Math.floor((cam.x+vw-ox)/STW)), ty0=Math.max(0,Math.floor((cam.y-oy)/STW)), ty1=Math.min(nty-1,Math.floor((cam.y+vh-oy)/STW));
-  if(big) ctx.setTransform(1,0,0,1,0,0);
-  let n=0;
-  for(let ty=ty0;ty<=ty1;ty++){
-    for(let tx=tx0;tx<=tx1;tx++){
+  const big=useBig&&SHL.bigOK; let n=0;
+  if(big){ ctx.globalAlpha=1; ctx.setTransform(1,0,0,1,0,0); if(!DSKIP.shcomp) ctx.drawImage(SHL.big,Math.round(ox*Zd+DV.tx),Math.round(oy*Zd+DV.ty)); leanOff(); n=1; }
+  else{
+    // scaled on the fly: copy only the runs of tiles that hold a shadow
+    ctx.globalAlpha=a;
+    const T=SHL.tiles, tq=STW*q, tx0=Math.max(0,Math.floor((cam.x-ox)/STW)), tx1=Math.min(ntx-1,Math.floor((cam.x+vw-ox)/STW)), ty0=Math.max(0,Math.floor((cam.y-oy)/STW)), ty1=Math.min(nty-1,Math.floor((cam.y+vh-oy)/STW));
+    if(!DSKIP.shcomp) for(let ty=ty0;ty<=ty1;ty++) for(let tx=tx0;tx<=tx1;tx++){
       if(!T[ty*ntx+tx]) continue;
       let e=tx; while(e+1<=tx1&&T[ty*ntx+e+1]) e++;
-      if(big){ const sx=P(tx), sy=P(ty), sw=P(e+1)-sx, sh=P(ty+1)-sy; ctx.drawImage(SHL.big,sx,sy,sw,sh,bx+sx,by+sy,sw,sh); }
-      else ctx.drawImage(SHL.cv,tx*tq,ty*tq,(e-tx+1)*tq,tq,ox+tx*STW,oy+ty*STW,(e-tx+1)*STW,STW);
+      ctx.drawImage(SHL.cv,tx*tq,ty*tq,(e-tx+1)*tq,tq,ox+tx*STW,oy+ty*STW,(e-tx+1)*STW,STW);
       n++; tx=e;
     }
   }
   SHL.runs=n;
-  if(big) leanOff();
   ctx.globalAlpha=1;
 }
 function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
@@ -325,10 +325,10 @@ function depthPost(){
   const te=clamp(Math.min(H*(full?0.34:0.27),DV.ashY-H*0.15),H*0.06,H*0.4), bs=clamp(Math.max(H*(full?0.7:0.77),DV.ashY+H*0.17),H*0.55,H*0.94);
   const A=DP.A, a=DP.a, aw=DP.aw, ah=DP.ah, k=aw/cw, B=DP.B, bw=DP.bw, bh=DP.bh, kk=bw/cw;
   // 1) downscale the finished world (the whole frame for full, the bands plus a margin for light). This is the
-  // costly step, so it runs every other frame (every third in light); in between, the last copy is shifted by how far the camera moved
+  // costly step, so it runs every other frame (every fourth in light); in between, the last copy is shifted by how far the camera moved
   DP.fr++;
   const tx=DV.tx, ty=DV.ty, mg=40*s, far=Math.abs(tx-DP.ctx)>mg*0.7||Math.abs(ty-DP.cty)>mg*0.7;
-  const need=DSKIP.every||!DP.ok||DP.fr-DP.cfr>=(DV.full?2:GOV.lvl?4:3)||DP.cz!==DV.Z||DP.cfull!==full||DP.cA!==inA||far||Math.abs(te-DP.cte)>12||Math.abs(bs-DP.cbs)>12;
+  const need=DSKIP.every||!DP.ok||DP.fr-DP.cfr>=(DV.full?2:GOV.lvl?5:4)||DP.cz!==DV.Z||DP.cfull!==full||DP.cA!==inA||far||Math.abs(te-DP.cte)>12||Math.abs(bs-DP.cbs)>12;
   if(need){
     // two exact halvings (a 4x4 box filter) of just the rows that are needed: cheaper than mipmaps, and steady in motion
     const h=DP.h, hw=DP.hw, hh=DP.hh, t1=full?ch:Math.min(ch,Math.ceil(te*s+mg)), b0=full?ch:Math.max(0,Math.floor(bs*s-mg));
@@ -340,7 +340,11 @@ function depthPost(){
     if(full){ const b=DP.b, c=DP.c, o=DP.o; b.globalCompositeOperation='copy'; b.drawImage(A,0,0,aw,ah,0,0,bw,bh); b.globalCompositeOperation='source-over';
       c.globalCompositeOperation='copy'; c.drawImage(B,0,0); c.globalCompositeOperation='multiply'; c.drawImage(B,0,0); c.globalCompositeOperation='source-over';
       // the source for the toy grade: the blurred frame, warmed a little (this is where the daytime warmth comes from)
-      const d=inA?0.4:daylight(); o.globalCompositeOperation='copy'; o.drawImage(A,0,0); o.globalCompositeOperation='multiply'; o.fillStyle=`rgb(255,${Math.round(255-14*d)},${Math.round(255-46*d)})`; o.fillRect(0,0,aw,ah); o.globalCompositeOperation='source-over'; }
+      const d=inA?0.4:daylight(); o.globalCompositeOperation='copy'; o.drawImage(A,0,0); o.globalCompositeOperation='multiply'; o.fillStyle=`rgb(255,${Math.round(255-14*d)},${Math.round(255-46*d)})`; o.fillRect(0,0,aw,ah); o.globalCompositeOperation='source-over';
+      // it fades out smoothly into the blurred bands (a hard edge there would show as a line)
+      const gr=o.createLinearGradient(0,0,0,ah), r0=te*s*k*0.3, r1=te*s*k, r2=bs*s*k, r3=(bs*s+(ch-bs*s)*0.75)*k, S=5;
+      for(let i=0;i<=S;i++){ const u=i/S; gr.addColorStop(clamp((r0+(r1-r0)*u)/ah,0,1),`rgba(0,0,0,${smooth(u).toFixed(3)})`); gr.addColorStop(clamp((r2+(r3-r2)*u)/ah,0,1),`rgba(0,0,0,${(1-smooth(u)).toFixed(3)})`); }
+      o.globalCompositeOperation='destination-in'; o.fillStyle=gr; o.fillRect(0,0,aw,ah); o.globalCompositeOperation='source-over'; }
     DP.ok=true; DP.cfr=DP.fr; DP.ctx=tx; DP.cty=ty; DP.cz=DV.Z; DP.cfull=full; DP.cA=inA; DP.cte=te; DP.cbs=bs; DP.caps++;
   }
   const dx=tx-DP.ctx, dy=ty-DP.cty;
@@ -349,7 +353,7 @@ function depthPost(){
   // Only the sharp middle needs it: the bands drawn next cover the rest with blur
   if(full){
     const dl=inA?0.5:daylight(), rk=inA?0:G.rainK, ko=cave?0:(inA?0.14:0.36*dl*(1-0.5*rk));
-    if(ko>0.02&&!DSKIP.orton&&!DV.lite){ const y0=Math.floor(te*s*0.45), y1=Math.ceil(bs*s+(ch-bs*s)*0.55); ctx.globalCompositeOperation='soft-light'; ctx.globalAlpha=ko; ctx.drawImage(DP.O,0,y0*k-dy*k,aw,(y1-y0)*k,dx,y0,cw,y1-y0); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1; }
+    if(ko>0.02&&!DSKIP.orton&&!DV.lite){ const y0=Math.floor(te*s*0.3), y1=Math.ceil(bs*s+(ch-bs*s)*0.75); ctx.globalCompositeOperation='soft-light'; ctx.globalAlpha=ko; ctx.drawImage(DP.O,0,y0*k-dy*k,aw,(y1-y0)*k,dx,y0,cw,y1-y0); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1; }
   }
   // 3) tilt-shift: the mild level over the whole band, the strong level near the very edges (full)
   const am=DP.am; if(!DSKIP.amc){ am.globalCompositeOperation='copy'; am.drawImage(A,dx*k,dy*k); } if(!DSKIP.mask) dpMask(am,aw,ah,str,te*s*k,bs*s*k,str*(full?0.8:0.72));
@@ -362,7 +366,7 @@ function depthPost(){
     const tB=Math.ceil(te2*s*kk)+1, bB=Math.floor(bs2*s*kk)-1;
     ctx.drawImage(DP.Bm,0,0,bw,tB,0,0,cw,tB/kk); ctx.drawImage(DP.Bm,0,bB,bw,bh-bB,0,bB/kk,cw,(bh-bB)/kk);
     // 4) bloom: the strong blur squared (so only bright things glow), added on top at dusk, night and in caves
-    const dl=inA?0.5:daylight(), kb=cave?0.55:inA?0.08+0.25*(1-dl):(1-dl)*0.62;
+    const dl=inA?0.5:daylight(), kb=cave?0.35:inA?0.08+0.25*(1-dl):(1-dl)*0.62;
     if(kb>0.03&&!DSKIP.bloom&&!DV.lite){ ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=kb; ctx.drawImage(DP.C,0,0,bw,bh,dx,dy,cw,ch); }
   }
   ctx.restore();
@@ -374,13 +378,13 @@ function depthGrade(tint){
   // noon warmth from the toy grade in depthPost instead)
   if(tint[0]>=253&&tint[1]>=253&&tint[2]>=253) return tint;
   const d=daylight(), k=(DV.full?1:0.7)*d;
-  return [tint[0]*(1-0.0*k),tint[1]*(1-0.03*k),tint[2]*(1-0.085*k)];
+  return [tint[0],tint[1]*(1-0.03*k),tint[2]*(1-0.085*k)];
 }
 // bloom halos for lamps and fires (cheap cached sprites); full also gets the screen bloom in depthPost
 function depthGlows(list,k){
-  if(!DV.on||!list.length) return;
+  if(!DV.on||!list.length||DSKIP.glow) return;
   const m=DV.full&&!DV.lite?0.5:0.9;
-  for(const l of list){ if(!l[4]) continue; glowAt(l[0],l[1],l[2]*0.42,'255,190,110',0.32*k*m); glowAt(l[0],l[1],l[2]*0.12,'255,236,190',0.5*k*m); }
+  for(const l of list){ if(!l[4]||!inView(l[0],l[1],l[2]*0.3)) continue; glowAt(l[0],l[1],l[2]*0.28,'255,190,110',0.36*k*m); glowAt(l[0],l[1],l[2]*0.08,'255,236,190',0.55*k*m); }
 }
 // ---------- settings row (injected into the Settings panel so body.html stays untouched)
 function depthSyncRow(){ for(const b of document.querySelectorAll('#setDepth button')) b.setAttribute('aria-pressed',String(b.dataset.v===DEPTH.mode)); }
@@ -398,4 +402,4 @@ function depthRow(){
 }
 depthRow();
 window.__ebX=Object.assign(window.__ebX||{},{setDepth,getDepth,depthAuto(on){ GOV.off=!on; GOV.lvl=0; GOV.n=GOV.slow=0; return !GOV.off; },depthStats(){ return {mode:DEPTH.mode,auto:GOV.off?'off':GOV.lvl,shadowRedraws:SHL.redraws,shadowUpscales:SHL.ups,captures:DP.caps,frames:DP.fr}; }});
-window.__ebDbg=Object.assign(window.__ebDbg||{},{render:()=>render(),DV,DSKIP,SHL,DEPTH,depthPost});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{render:()=>render(),DV,DSKIP,SHL,DP,DEPTH,depthPost});
