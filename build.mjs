@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
 const ORDER = ['a1_core','a1b_data','a1c_state','a1d_story','a1e_people','a1f_qdata','a1g_talk','a1h_quests2','a1i_quests3','a1j_quests4','a2_world','a2b_cols','a2c_build','a2d_places','a2e_interiors','a2f_caves','a2g_floors','a2h_dungeons','a2i_reach','a3_art','a3b_art2','a3c_art3','a3d_art4','a3e_toy3d','a4_ground','a5_input','a5b_pad','a6_player','a6b_weapons','a6c_moves',
-  'a7a_enemies','a7b_ai','a7c_bosses','a8_systems','a9a_env','a9b_flow','a9c_story','a9d_quests','a9e_meta','a9f_talk','a9g_mini','a9h_skills','a9i_comps','a10a_fx','a10b_chars','a10c_t3ash','a11_render','a11c_depth','a11b_hud','a12a_dlg','a13_cloud','a14_music','a12c_log','a12b_ui'];
+  'a7a_enemies','a7b_ai','a7c_bosses','a8_systems','a9a_env','a9b_flow','a9c_story','a9d_quests','a9e_meta','a9f_talk','a9g_mini','a9h_skills','a9i_comps','a10a_fx','a10b_chars','a10c_t3ash','a10d_t3people','a11_render','a11c_depth','a11b_hud','a12a_dlg','a13_cloud','a14_music','a12c_log','a12b_ui'];
 const cfg = JSON.parse(readFileSync('game/config.json', 'utf8'));
 const api = process.env.API_BASE || cfg.apiBase || '';
 const js = ORDER.map((f) => readFileSync(`game/src/${f}.js`, 'utf8')).join('').replaceAll('__API_BASE__', api);
