@@ -1,7 +1,7 @@
 
 // ================= render
 const UIF='Rubik,system-ui,sans-serif', TF='Cinzel,Georgia,serif';
-let vigKey='', vigGrad=null;
+let vigKey='', vigGrad=null, vigCv=null;
 const TALL=new Set(['oak','pine','birch','dead','spine','willow']);
 let BIGOAKS=null;
 function visibleProps(m){
@@ -14,7 +14,8 @@ function render(){
   if(!G||!player) return;
   chunkTick++;
   const ox=(Math.random()*2-1)*shakeMag, oy=(Math.random()*2-1)*shakeMag, Z=DPR*zoom, t=G.time, inA=!!AREA;
-  const setWorld=()=>ctx.setTransform(Z,0,0,Z,(-cam.x*zoom+ox)*DPR,(-cam.y*zoom+oy)*DPR);
+  const wtx=(-cam.x*zoom+ox)*DPR, wty=(-cam.y*zoom+oy)*DPR, D3=depthFrame(Z,wtx,wty);
+  const setWorld=()=>ctx.setTransform(Z,0,0,Z,wtx,wty);
   setWorld();
   if(inA) drawAreaBase();
   else{
@@ -34,12 +35,13 @@ function render(){
     if(glows.length){ ctx.save(); ctx.globalCompositeOperation='lighter'; for(const [cx,cy,gl] of glows){ ctx.globalAlpha=0.3+0.18*Math.sin(t*1.7+cx*1.3+cy); ctx.drawImage(gl,cx*CH,cy*CH,CH,CH); } ctx.restore(); }
   }
   ctx.lineWidth=1;
-  for(const r of G.ripples){ const k=r.t/r.max; if(r.glint){ ctx.fillStyle=`rgba(255,255,240,${0.5*(1-k)})`; ctx.fillRect(r.x-r.r*0.4,r.y,r.r*0.8,1.2); } else { ctx.strokeStyle=`rgba(220,230,240,${(r.splash?0.45:0.35)*(1-k)})`; ctx.beginPath(); ctx.ellipse(r.x,r.y,r.r*(0.3+k),r.r*(0.3+k)*0.6,0,0,TAU); ctx.stroke(); } }
+  for(const r of G.ripples){ const k=r.t/r.max; if(r.glint){ ctx.fillStyle=`rgba(255,255,240,${0.5*(1-k)})`; ctx.fillRect(r.x-r.r*0.4,r.y,r.r*0.8,1.2); if(D3.full) glowAt(r.x,r.y,r.r*0.9,'255,248,225',0.4*Math.sin(Math.PI*k)); } else { ctx.strokeStyle=`rgba(220,230,240,${(r.splash?0.45:0.35)*(1-k)})`; ctx.beginPath(); ctx.ellipse(r.x,r.y,r.r*(0.3+k),r.r*(0.3+k)*0.6,0,0,TAU); ctx.stroke(); } }
   drawPools(); drawHazards();
-  const sun=inA?{dx:4,dy:6,a:0.28}:sunInfo(), props=inA?[]:visibleProps(60);
+  const sun=inA?{dx:4,dy:6,a:0.28}:D3.on?depthSun():sunInfo(), props=inA?[]:visibleProps(60);
   const npcs=inA?AREA.npcs:G.npcs;
   ctx.save();
-  if(!inA){
+  if(!inA&&D3.on){ if(!DSKIP.shadow) shadowLayer(sun,props); }
+  else if(!inA){
     for(const p of props){ if(p.taken) continue; const tall=TALL.has(p.k), k=tall?1.6:0.5, R=tall?p.R*1.05:p.R*0.9; ctx.globalAlpha=sun.a*(tall?1:0.8); ctx.drawImage(SPR.shadow,p.x+sun.dx*k-R,p.y+sun.dy*k-R*0.85,R*2,R*1.7); }
     for(const h of HOUSES) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
   }
@@ -51,9 +53,13 @@ function render(){
   if(inA){ for(const o of AREA.objs) if(inView(o.x,o.y,(o.w||40)+30)) drawFurn(o,t); }
   else{
     for(const p of props){ if(TALL.has(p.k)||p.taken) continue; const sp=propSprite(p); drawSprite(sp,p.x,p.y,p.s,p.k==='herb'?0:p.rot*0.3); if(p.k==='vent'&&Math.random()<0.15) emit(p.x,p.y,1,{col:'70,62,60',glow:false,ang:-Math.PI/2,spread:0.5,smin:15,smax:40,lmin:1.2,lmax:2,zmin:4,zmax:8,grow:10,drag:0.5}); if(p.k==='herb'){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.25+0.15*Math.sin(t*3+p.ph); ctx.drawImage(SPR.shadow,p.x-10,p.y-10,20,20); ctx.restore(); } }
-    for(const s of STRUCTS){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue; if(s.k==='cavemouth') drawCaveMouth(s,t); else if(s.k==='column') drawColumn(s); else if(s.k==='glowshroom') drawGlowShroom(s,t); else drawStruct(s,t); }
+    for(const s of STRUCTS){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue;
+      if(D3.on&&s.k==='stone'){ drawStoneLean(s,t); continue; }
+      const lf=D3.on?LEAN_S[s.k]:0; if(lf) leanOn(s.x,leanBase(s),lf);
+      if(s.k==='cavemouth') drawCaveMouth(s,t); else if(s.k==='column') drawColumn(s); else if(s.k==='glowshroom') drawGlowShroom(s,t); else drawStruct(s,t);
+      if(lf) leanOff(); }
     for(const d of DOORS) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
-    for(const o of LANDMARKS) if(inView(o.x,o.y,160)) drawLandmark(o,t);
+    for(const o of LANDMARKS) if(inView(o.x,o.y,160)){ const lf=D3.on?LEAN_S[o.k]:0; if(lf) leanOn(o.x,o.y,lf); drawLandmark(o,t); if(lf) leanOff(); }
     if(G.mini) drawMiniWorld(t);
     drawWall();
     for(const c of CHESTS) if(inView(c.x,c.y,40)) drawChest(c,t);
@@ -71,16 +77,17 @@ function render(){
   if(!player.dead&&!player.flying) list.push(player);
   compsForRender(list);
   list.sort((a,b)=>a.y-b.y);
-  for(const e of list){ if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
+  for(const e of list){ if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
   if(G.fishing){ const F=G.fishing, bob=Math.sin(t*4)*1.5+(F.bite>0?3:0); ctx.strokeStyle='rgba(240,240,240,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(player.x+Math.cos(player.facing)*24,player.y+Math.sin(player.facing)*24); ctx.quadraticCurveTo((player.x+F.wx)/2,(player.y+F.wy)/2-20,F.wx,F.wy+bob); ctx.stroke(); ctx.fillStyle='#c8322a'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob,4,0,TAU); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob-2,2,0,TAU); ctx.fill(); if(F.bite>0) drawMarker(F.wx,F.wy-26,'!',t); }
   if(G.corpse&&G.corpse.type!=='vorlaxis'&&G.corpse.deathT<0.6){ ctx.save(); ctx.globalAlpha=1-G.corpse.deathT/0.6; const c=G.corpse; c.flash=1; drawEnemy(Object.assign({},c,{dead:false,alpha:1,spawnIn:0,boss:true})); ctx.restore(); }
   if(G.spirit&&!inA) drawSpirit(G.spirit);
   if(!inA){
     const bossE=G.boss&&!G.boss.dead?G.boss:null;
     if(!BIGOAKS) BIGOAKS=STRUCTS.filter(s=>s.k==='bigoak');
-    for(const b of BIGOAKS){ if(!inView(b.x,b.y,b.R*1.4)) continue; const dp=dist(b.x,b.y,player.x,player.y); ctx.globalAlpha=dp<b.R?0.4+0.5*clamp((dp-b.R*0.4)/(b.R*0.6),0,1):1; drawSprite(SPR.bigoak,b.x,b.y,b.R/48,Math.sin(t*0.5)*0.015); }
+    if(D3.on){ for(const b of BIGOAKS) if(inView(b.x,b.y,b.R*1.4)) drawBigOakLean(b,t); drawTallProps(props,t,bossE); }
+    else for(const b of BIGOAKS){ if(!inView(b.x,b.y,b.R*1.4)) continue; const dp=dist(b.x,b.y,player.x,player.y); ctx.globalAlpha=dp<b.R?0.4+0.5*clamp((dp-b.R*0.4)/(b.R*0.6),0,1):1; drawSprite(SPR.bigoak,b.x,b.y,b.R/48,Math.sin(t*0.5)*0.015); }
     ctx.globalAlpha=1;
-    for(const p of props){
+    if(!D3.on) for(const p of props){
       if(!TALL.has(p.k)) continue;
       let a=1; const dp=dist(p.x,p.y,player.x,player.y); if(dp<p.R*0.95) a=0.35+0.5*clamp((dp-p.R*0.45)/(p.R*0.5),0,1);
       if(bossE&&dist(p.x,p.y,bossE.x,bossE.y)<p.R) a=Math.min(a,0.4);
@@ -96,8 +103,9 @@ function render(){
   if(!inA) drawBirds();
   drawProjectiles(); drawWeaponFx(); drawParticles(); drawRings();
   ctx.setTransform(1,0,0,1,0,0);
-  if(!inA){ const tint=ambientTint(); if(tint[0]<253||tint[1]<253||tint[2]<253){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${tint.map(Math.round)})`; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.globalCompositeOperation='source-over'; } }
+  if(!inA){ const tint=depthGrade(ambientTint()); if(tint[0]<253||tint[1]<253||tint[2]<253){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${tint.map(Math.round)})`; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.globalCompositeOperation='source-over'; } }
   drawLights();
+  if(D3.on) depthPost();
   setWorld(); drawTexts();
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(!inA){ drawRain(); drawSnowMist(); }
@@ -135,6 +143,7 @@ function drawLights(){
     ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.setTransform(DPR*zoom,0,0,DPR*zoom,-cam.x*zoom*DPR,-cam.y*zoom*DPR);
     const k=inA?0.6:(1-dl);
     for(const l of lightList){ if(!l[4]) continue; const g=ctx.createRadialGradient(l[0],l[1],0,l[0],l[1],l[2]*0.8); g.addColorStop(0,`rgba(255,150,60,${0.22*k})`); g.addColorStop(1,'rgba(255,110,30,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(l[0],l[1],l[2]*0.8,0,TAU); ctx.fill(); }
+    depthGlows(lightList,k);
     ctx.restore();
   }
 }
@@ -160,9 +169,15 @@ function drawSnowMist(){
   }
 }
 function drawVignette(){
-  const key=W+'x'+H;
-  if(vigKey!==key){ vigKey=key; const g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.42)'); vigGrad=g; }
-  ctx.fillStyle=vigGrad; ctx.fillRect(0,0,W,H);
+  // the gradient is painted once per size into a screen sized canvas, then copied 1:1 each frame (much cheaper than a gradient fill)
+  const dm=DV.on?DEPTH.mode:'off', key=cvs.width+'x'+cvs.height+dm;
+  if(vigKey!==key){ vigKey=key;
+    if(!vigCv||vigCv.width!==cvs.width||vigCv.height!==cvs.height) vigCv=mkCanvas(cvs.width,cvs.height);
+    const vg=vigCv.getContext('2d'); vg.setTransform(1,0,0,1,0,0); vg.clearRect(0,0,vigCv.width,vigCv.height); vg.setTransform(DPR,0,0,DPR,0,0);
+    if(dm==='off'){ const g=vg.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.42)'); vigGrad=g; }
+    else{ const g=vg.createRadialGradient(W/2,H*0.52,Math.min(W,H)*0.3,W/2,H*0.52,Math.max(W,H)*0.74); g.addColorStop(0,'rgba(18,10,4,0)'); g.addColorStop(0.55,'rgba(18,10,4,.14)'); g.addColorStop(1,`rgba(14,8,4,${dm==='full'?0.52:0.46})`); vigGrad=g; }
+    vg.fillStyle=vigGrad; vg.fillRect(0,0,W,H); }
+  ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(vigCv,0,0); ctx.setTransform(DPR,0,0,DPR,0,0);
   if(G.mode!=='menu'&&player&&!player.dead){
     let a=0; if(player.hp/player.maxHp<0.3) a=0.2+0.1*Math.sin(G.time*6);
     a=Math.max(a,(G.hurtVig||0)*0.55);
