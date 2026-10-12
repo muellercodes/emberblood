@@ -61,9 +61,14 @@ function drawHero(x,y,f,p,ghost){
 }
 function drawPlayer(){
   const p=player; if(p.dead) return;
+  // jumping or flying: a shadow that shrinks with height, then Ash lifted by z (a touch bigger, closer to the camera)
+  const z=(p.z||0)+(p.flying?Math.sin(p.t*2.6)*2.2:0);
+  if(z>0.5||p.flying) drawMoveShadow(p);
   for(const g of p.ghosts){ ctx.globalAlpha=g.a*0.5; drawHero(g.x,g.y,g.f,p,true); }
   ctx.globalAlpha=(p.iframes>0&&p.iframes<5&&p.dashT<=0&&Math.floor(p.t*18)%2===0)?0.55:1;
-  drawHero(p.x,p.y,p.facing,p,false);
+  const sq=p.sqT>0&&p.sqD?p.sqA*Math.sin(p.sqT/p.sqD*Math.PI):0;   // + squashes (landing), - stretches (take-off)
+  if(z>0.3||sq){ const s=1+Math.max(0,z)/240; ctx.save(); ctx.translate(p.x,p.y-Math.max(0,z)); ctx.scale(s*(1+sq),s*(1-sq)); drawHero(0,0,p.facing,p,false); ctx.restore(); }
+  else drawHero(p.x,p.y,p.facing,p,false);
   ctx.globalAlpha=1;
 }
 // ---------- foes

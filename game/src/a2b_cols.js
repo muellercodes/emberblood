@@ -14,8 +14,12 @@ function forCols(x,y,r,fn){
 }
 const colActive=c=>!c.off&&(!c.normalOnly||(G&&G.mode==='normal'));
 function collideObs(e){
+  // Ash in the air: a jump clears colliders marked low (fences, hedges, small rocks); flight clears everything on the valley floor
+  const pl=e===player&&!!player, air=pl&&airborne();
+  if(pl&&player.flying&&e.x<IZX-100) return;
   forCols(e.x,e.y,e.r+4,c=>{
     if(!colActive(c)) return;
+    if(air&&c.low) return;
     if(c.t==='c'){
       const dx=e.x-c.x, dy=e.y-c.y, m=c.r+e.r, d2=dx*dx+dy*dy;
       if(d2<m*m){ const d=Math.sqrt(d2)||0.01; e.x=c.x+dx/d*m; e.y=c.y+dy/d*m; e.hitWall=true; }
@@ -39,6 +43,12 @@ function boundE(e){
 }
 // move with terrain blocking (water, lava) for walkers
 function terrainFix(e,ox,oy){
+  if(e===player&&player){
+    // Ash only: water stops blocking with stride, and nothing blocks in the air (see playerBlocked in a6c_moves.js)
+    if(!playerBlocked(e.x,e.y)) return;
+    if(!playerBlocked(e.x,oy)){ e.y=oy; } else if(!playerBlocked(ox,e.y)){ e.x=ox; } else { e.x=ox; e.y=oy; }
+    e.hitWall=true; return;
+  }
   if(e.noClip||(e.flying&&!e.inArea)) return;
   if(!blockedAt(e.x,e.y)) return;
   if(!blockedAt(e.x,oy)){ e.y=oy; }

@@ -56,7 +56,7 @@ function updatePlayer(dt,inp){
   // stamina
   if(p.stamDelay>0) p.stamDelay-=dt; else p.stamina=Math.min(p.maxStamina,p.stamina+st.staminaRegen*dt);
   // roll
-  if(G.dashBuf>0&&p.dashCd<=0&&p.dashT<=0&&p.drinkT<=0&&useStamina(st.rollCost)){
+  if(G.dashBuf>0&&p.dashCd<=0&&p.dashT<=0&&p.drinkT<=0&&!airborne()&&!((p.z||0)>0)&&useStamina(st.rollCost)){
     G.dashBuf=0; p.dashDir=moving?Math.atan2(inp.my,inp.mx):p.facing; p.dashT=0.3; p.dashCd=0.38;
     p.iframes=Math.max(p.iframes,0.32); p.swingT=0; SFX.play('roll');
     emit(p.x,p.y,8,{col:'150,130,110',glow:false,smin:30,smax:90,lmin:.3,lmax:.6,zmin:2,zmax:5,grow:7});
@@ -66,25 +66,33 @@ function updatePlayer(dt,inp){
   if(p.drinkT>0){ const k=Math.min(dt,p.drinkT)/0.9; heal(p.drinkPool*k,true); p.drinkT-=dt; if(Math.random()<0.4) emit(p.x+rand(-8,8),p.y+rand(-8,8),1,{col:'140,255,170',ang:-Math.PI/2,spread:0.5,smin:20,smax:50,lmin:.4,lmax:.7,zmin:1.5,zmax:2.5,rise:20}); }
   let vx=0,vy=0;
   p.sprinting=false;
+  // jump, double jump, take off, land, slam (a6c_moves.js)
+  const air=movesPre(dt,inp);
   if(p.dashT>0){
     p.dashT-=dt; const k=0.55+0.45*(p.dashT/0.3); vx=Math.cos(p.dashDir)*560*k; vy=Math.sin(p.dashDir)*560*k;
     p.ghostT-=dt; if(p.ghostT<=0){ p.ghostT=0.05; p.ghosts.push({x:p.x,y:p.y,f:p.facing,a:0.6}); }
     if(st.emberDash){ p.emberT-=dt; if(p.emberT<=0){ p.emberT=0.06; G.pools.push({x:p.x,y:p.y,r:22,life:1.6,max:1.6,owner:'player',tick:0}); } }
+  }else if(air){
+    // in the air: a jump keeps its momentum, flight is fast; no bog, no snow drag, no sprint cost
+    [vx,vy]=movesAirVel(dt,inp); p.slowT=(p.slowT||0)-dt;
   }else{
     const here=T(p.x,p.y,PT); p.slowT=(p.slowT||0)-dt;
     let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1);
-    if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55; p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); }
+    const skim=p.onWater&&hasSkill('skimmer');
+    if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55*(p.onWater?(skim?1.22:1.1):1); if(!skim){ p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); } }
     vx=inp.mx*spd; vy=inp.my*spd;
     // cave ice: Ash slides
     if(AREA&&AREA.cave&&AREA.cave.typ){ const c=AREA.cave, i=Math.floor((p.x-AREA.x0)/c.cell), j=Math.floor((p.y-AREA.y0)/c.cell); if(c.typ[j*c.w+i]===2){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else { p.ivx=vx; p.ivy=vy; } }
   }
+  if(!air) movesTryJump(vx,vy,inp);
   for(const g of p.ghosts) g.a-=dt*3; if(p.ghosts.length) p.ghosts=p.ghosts.filter(g=>g.a>0);
   const kd=Math.exp(-dt*9); p.kvx*=kd; p.kvy*=kd;
   const ox=p.x, oy=p.y;
   p.x+=(vx+p.kvx)*dt; p.y+=(vy+p.kvy)*dt;
   collideObs(p); boundE(p); terrainFix(p,ox,oy);
+  movesPost(dt,ox,oy,inp);
   if(G.noSwordT>0) G.noSwordT-=dt;
-  p.moving=moving; if(moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if(PT.b===5&&PT.road<=0) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
+  p.moving=moving&&!(p.z>0)&&!p.flying; if(p.moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if(PT.b===5&&PT.road<=0&&!p.onWater) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting&&!p.onWater) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
   // sword and the other weapons (switching, swings, the hammer, the bow and the boomerang): a6b_weapons.js
   updateWeapon(dt,inp);
   // breath
@@ -152,6 +160,7 @@ function reflectProj(pr){
   SFX.play('block'); emit(pr.x,pr.y,8,{col:'140,230,255',smin:80,smax:220,lmin:.15,lmax:.3,zmin:1.5,zmax:3,drag:5});
 }
 function doBreath(dt){
+  if(player.flying) return breathFly(dt);   // from the sky the fire pours down (a6c_moves.js)
   const p=player, ang=p.facing, mx=p.x+Math.cos(ang)*16, my=p.y+Math.sin(ang)*16;
   emit(mx,my,4,{kind:'fire',ang,spread:0.28,smin:360,smax:460,lmin:.35,lmax:.48,zmin:3,zmax:6,grow:22,drag:1});
   if(Math.random()<0.3) emit(mx+Math.cos(ang)*120,my+Math.sin(ang)*120,1,{col:'70,60,55',glow:false,ang:-Math.PI/2,spread:0.6,smin:10,smax:40,lmin:.8,lmax:1.4,zmin:4,zmax:8,grow:10,drag:1});
@@ -187,6 +196,7 @@ function heal(amt,quiet){
 function hurtPlayer(amt,sx,sy,kb){
   const p=player;
   if(!p||p.dead||p.iframes>0||scene!=='play'||(window.__eb&&window.__eb.god)) return false;
+  if(p.flying&&!airHitOK(sx,sy)) return false;   // ground melee cannot reach Ash in the sky (projectiles and flying foes can)
   const dmg=Math.max(1,Math.round(amt*G.diff.dmg*(p.stats.armor||1)));
   p.hp-=dmg; p.iframes=0.6; p.hurtFlash=0.12; G.hurtVig=0.6; G.combo=0; p.lastHurt=G.time; p.drinkT=0;
   if(kb){ const a=angTo(sx,sy,p.x,p.y); p.kvx+=Math.cos(a)*kb; p.kvy+=Math.sin(a)*kb; }
