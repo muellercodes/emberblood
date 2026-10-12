@@ -202,13 +202,15 @@ function updateFollowers(dt){
   const p=player;
   if(G.pip){
     const q=G.pip; q.t+=dt; q.cd-=dt; q.chirp-=dt;
-    const tx=p.x-Math.cos(p.facing)*34+Math.cos(q.t*1.3)*14, ty=p.y-Math.sin(p.facing)*34+Math.sin(q.t*1.7)*10-8;
-    const d=dist(q.x,q.y,tx,ty); if(d>1400){ q.x=tx; q.y=ty; }
-    const k=1-Math.exp(-dt*(d>200?6:3)); q.x+=(tx-q.x)*k; q.y+=(ty-q.y)*k;
+    let tx=p.x-Math.cos(p.facing)*34+Math.cos(q.t*1.3)*14, ty=p.y-Math.sin(p.facing)*34+Math.sin(q.t*1.7)*10-8;
     let tgt=null,bd=330*330; for(const e of G.enemies){ if(e.dead||!e.aggro||e.invuln||e.spawnIn>0||e.alpha<0.5) continue; const dd=dist2(e.x,e.y,q.x,q.y); if(dd<bd){ bd=dd; tgt=e; } }
-    q.face=turnTo(q.face,tgt?angTo(q.x,q.y,tgt.x,tgt.y):angTo(q.x,q.y,tx+Math.cos(p.facing)*40,ty+Math.sin(p.facing)*40),6*dt);
-    if(tgt&&q.cd<=0){ q.cd=2.4*Math.pow(0.8,G.pipTreats||0); shoot(q.x,q.y,angTo(q.x,q.y,tgt.x,tgt.y),430,6,(5+player.level*1.6)*player.stats.fire,'pip','player',{life:0.9}); SFX.play('cast'); }
-    if(q.chirp<=0){ q.chirp=rand(35,70); if(!G.inCombat&&scene==='play') taunt('pip',pick(['Mip!','Mip mip!','Mrrp?','Mip! Mip!'])); }
+    // errands of his own (fetching coins, chirping at secrets) pull him off his spot for a moment (a9i_comps.js)
+    const go=pipExtras(q,dt,tgt); if(go){ tx=go.x; ty=go.y; }
+    const d=dist(q.x,q.y,tx,ty); if(d>1400){ q.x=tx; q.y=ty; }
+    const k=1-Math.exp(-dt*(go?4.5:d>200?6:3)); q.x+=(tx-q.x)*k; q.y+=(ty-q.y)*k;
+    q.face=turnTo(q.face,tgt?angTo(q.x,q.y,tgt.x,tgt.y):go?angTo(q.x,q.y,tx,ty):angTo(q.x,q.y,tx+Math.cos(p.facing)*40,ty+Math.sin(p.facing)*40),6*dt);
+    if(tgt&&q.cd<=0){ q.cd=2.4*Math.pow(0.8,G.pipTreats||0)*pipCd(); shoot(q.x,q.y,angTo(q.x,q.y,tgt.x,tgt.y),430,6,(5+player.level*1.6)*player.stats.fire,'pip','player',{life:0.9}); SFX.play('cast'); }
+    if(q.chirp<=0){ q.chirp=rand(35,70); if(!G.inCombat&&scene==='play') pipChirp(q); }
   }
   const gt=G.goat; if(!gt) return;
   gt.t+=dt;
