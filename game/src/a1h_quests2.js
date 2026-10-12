@@ -6,7 +6,7 @@ Object.assign(QDEFS,{
     offer:[['pell',`Ash! A kobold sneak just grabbed my coin purse and ran! It's fast, it's sneaky, and it's laughing at me!`],['pell',`It can't have gone far. Catch it and I'll make it worth your while.`]],
     steps:[
       {t:'flag',flag:'purse_caught',npc:'pell',mini:'chase',text:'Catch the kobold sneak before it gets away (talk to Pell to start)',ready:[['pell',`There it goes! Behind the stalls! Ready?`]]},
-      {t:'talk',npc:'pell',text:'Bring the purse back to Pell',take:{purse:1},lines:[['pell',`My purse! And it's only a little chewed. You're faster than a kobold, Ash. That's saying something.`]],reward:{coins:40,xp:60}}
+      {t:'talk',npc:'pell',text:'Bring the purse back to Pell',take:{purse:1},lines:[['pell',`My purse! And it's only a little chewed. You're faster than a kobold, Ash. That's saying something.`],['pell',`Oh, and the sneak dropped its knives when you caught it. Two little curved ones. Twin Fangs, it called them. I don't want them, they're sticky. You keep them.`]],reward:{coins:40,xp:60,weapon:'daggers'}}
     ]},
   seek:{title:'Hide and Seek',giver:'nib',min:'lore',
     offer:[['nib',`Wanna play hide and seek? Me and three friends will hide somewhere in Brindlecross. You have two minutes to find us all.`],['nib',`Listen for giggling. Jem giggles like a goose.`]],

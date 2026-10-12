@@ -45,10 +45,13 @@ function updatePlayer(dt,inp){
   const p=player, st=p.stats;
   p.t+=dt; p.dashCd-=dt; p.iframes-=dt; p.hurtFlash-=dt; p.atkCd-=dt; p.comboTimer-=dt; G.dashBuf-=dt; G.roarBuf-=dt;
   const moving=Math.abs(inp.mx)+Math.abs(inp.my)>0.05; p.inMx=inp.mx; p.inMy=inp.my;
-  let aim=p.facing;
-  if(usingTouch){ const tg=nearestEnemy(p.x,p.y,320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); else if(moving) aim=Math.atan2(inp.my,inp.mx); }
-  else if(aimMode==='mouse'){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
+  let aim=p.facing; const wpn=curWeapon(), ranged=wpn==='bow'||wpn==='boomerang', stickAim=Math.hypot(inp.aimX||0,inp.aimY||0)>0.3;
+  if(stickAim) aim=Math.atan2(inp.aimY,inp.aimX);
+  else if(usingTouch){ const tg=nearestEnemy(p.x,p.y,ranged?430:320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); else if(moving) aim=Math.atan2(inp.my,inp.mx); }
+  else if(aimMode==='mouse'&&!inp.pad){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
   else if(moving) aim=Math.atan2(inp.my,inp.mx);
+  if(ranged&&!usingTouch&&(aimMode!=='mouse'||inp.pad)) aim=wAimAssist(aim);
+  p.aim=aim;
   if(p.swingT<=0) p.facing=p.breathing?turnTo(p.facing,aim,9*dt):(p.sprinting&&moving?turnTo(p.facing,Math.atan2(inp.my,inp.mx),12*dt):aim);
   // stamina
   if(p.stamDelay>0) p.stamDelay-=dt; else p.stamina=Math.min(p.maxStamina,p.stamina+st.staminaRegen*dt);
@@ -82,10 +85,8 @@ function updatePlayer(dt,inp){
   collideObs(p); boundE(p); terrainFix(p,ox,oy);
   if(G.noSwordT>0) G.noSwordT-=dt;
   p.moving=moving; if(moving){ p.walkT+=dt*(p.sprinting?1.5:1); p.stepT-=dt*(p.sprinting?1.6:1); if(p.stepT<=0){ p.stepT=0.32; SFX.play('step',p.sprinting?1.4:1); if(PT.b===5&&PT.road<=0) footprint(p.x,p.y,p.facing,p.walkT); if(PT.bog>0.4&&Math.random()<0.5) G.ripples.push({x:p.x,y:p.y+4,t:0,max:0.8,r:10}); if(p.sprinting) emit(p.x,p.y+6,2,{col:'140,120,95',glow:false,smin:10,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:5}); } }
-  // sword
-  if(inp.attack&&G.mode==='story'&&!G.flags.forge){ if(!(G.noSwordT>0)){ G.noSwordT=2.5; ftext(p.x,p.y-28,'Mom has your sword at the forge','#ffd9a0',13); } }
-  else if(inp.attack&&p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0){ const fin=(p.comboTimer>0?(p.combo+1)%3:0)===2; if(useStamina(fin?14:9)) startSwing(); else p.atkCd=0.2; }
-  if(p.swingT>0){ p.swingT-=dt; swingHits(); }
+  // sword and the other weapons (switching, swings, the hammer, the bow and the boomerang): a6b_weapons.js
+  updateWeapon(dt,inp);
   // breath
   if(p.exhausted&&p.energy>=25) p.exhausted=false;
   const want=inp.fire&&p.dashT<=0&&p.swingT<=0&&!p.exhausted&&p.drinkT<=0;
@@ -100,18 +101,20 @@ function updatePlayer(dt,inp){
   if(G.time-p.lastHurt>6&&!G.inCombat&&p.hp<p.maxHp) p.hp=Math.min(p.maxHp,p.hp+1.6*dt);
 }
 function startSwing(){
-  const p=player, st=p.stats;
-  p.combo=p.comboTimer>0?(p.combo+1)%3:0;
-  const fin=p.combo===2;
-  p.swingFin=fin; p.swingDur=fin?0.22:0.15; p.swingT=p.swingDur; p.swingDir=p.facing; p.swingSide=p.combo===1?-1:1;
-  p.swingHit=new Set(); p.swingHitstop=false;
-  p.atkCd=(fin?0.44:0.27)/st.atkSpeed; p.comboTimer=p.atkCd+0.4;
-  const lunge=fin?220:110; p.kvx+=Math.cos(p.facing)*lunge; p.kvy+=Math.sin(p.facing)*lunge;
+  const p=player, st=p.stats, w=curWeapon();
+  if(w!=='sword') return startWeaponSwing(w);
+  p.combo=p.comboTimer>0&&p.comboW==='sword'?(p.combo+1)%3:0; p.comboW='sword'; p.swingW='sword';
+  const fin=p.combo===2, spin=fin&&hasSkill('spin')>0;
+  p.swingFin=fin; p.swingSpin=spin; p.swingDur=spin?0.3:fin?0.22:0.15; p.swingT=p.swingDur; p.swingDir=p.facing; p.swingSide=p.combo===1?-1:1;
+  p.swingHit=new Set(); p.swingHitstop=false; p.swingObj=false;
+  p.atkCd=(spin?0.5:fin?0.44:0.27)/st.atkSpeed; p.comboTimer=p.atkCd+0.4;
+  const lunge=spin?80:fin?220:110; p.kvx+=Math.cos(p.facing)*lunge; p.kvy+=Math.sin(p.facing)*lunge;
   SFX.play(fin?'slash3':'slash');
-  if(fin&&st.flameEdge) shoot(p.x+Math.cos(p.facing)*20,p.y+Math.sin(p.facing)*20,p.facing,520,18,st.slash*1.3*st.dmgMul,'wave','player',{life:0.75,pierce:true});
+  if(fin&&st.flameEdge) shoot(p.x+Math.cos(p.facing)*20,p.y+Math.sin(p.facing)*20,p.facing,520,18,st.slash*1.3*st.dmgMul*(st.wpnMul||1),'wave','player',{life:0.75,pierce:true});
 }
 function swingHits(){
-  const p=player, st=p.stats, fin=p.swingFin, range=st.range*(fin?1.25:1), half=fin?1.3:1.05;
+  const p=player; if(p.swingW&&p.swingW!=='sword') return weaponSwingHits();
+  const st=p.stats, fin=p.swingFin, spin=p.swingSpin, range=st.range*(spin?1.2:fin?1.25:1), half=spin?Math.PI:fin?1.3:1.05;
   let any=false;
   for(const e of G.enemies){
     if(e.dead||p.swingHit.has(e.id)||e.invuln||e.spawnIn>0||e.passive) continue;
@@ -119,10 +122,11 @@ function swingHits(){
     for(const c of hitCircles(e)) if(inArcC(p.x,p.y,p.swingDir,range,half,c)&&(!best||c.m>best.m)) best=c;
     if(!best) continue;
     p.swingHit.add(e.id); any=true;
-    damageEnemy(e,st.slash*st.dmgMul*(fin?1.8:1)*rand(0.9,1.1),{src:'slash',mult:best.m,crit:best.m>1,kb:fin?380:170,ka:p.swingDir});
+    wStrike(e,best,spin?1.7:fin?1.8:1,'sword',{kb:spin?340:fin?380:170,ka:spin?angTo(p.x,p.y,e.x,e.y):p.swingDir});
     const a=angTo(best.x,best.y,p.x,p.y);
     emit(best.x+Math.cos(a)*best.r,best.y+Math.sin(a)*best.r,fin?14:7,{col:'255,235,200',smin:120,smax:340,lmin:.1,lmax:.22,zmin:1.2,zmax:2.6,drag:6});
   }
+  if(!p.swingObj){ p.swingObj=true; areaObjHit(p.x+Math.cos(p.swingDir)*range*0.6,p.y+Math.sin(p.swingDir)*range*0.6,spin?range:range*0.55,'slash'); }
   if(G.mode==='story') swingBreakables(p.x,p.y,p.swingDir,range,half);
   if(any&&!p.swingHitstop){ p.swingHitstop=true; hitstop=Math.max(hitstop,fin?0.07:0.035); shake(fin?5:2); SFX.play('hit'); }
   for(const pr of G.projectiles){
@@ -143,7 +147,7 @@ function aimTarget(){
 function reflectProj(pr){
   const t=aimTarget(), sp=Math.max(430,Math.hypot(pr.vx,pr.vy)*1.5);
   const a=t?angTo(pr.x,pr.y,t.type==='vorlaxis'?t.headX:t.x,t.type==='vorlaxis'?t.headY:t.y):player.facing;
-  pr.owner='player'; pr.vx=Math.cos(a)*sp; pr.vy=Math.sin(a)*sp; pr.dmg=Math.max(18,pr.dmg*2.5)*player.stats.dmgMul; pr.life=2; pr.homing=0; pr.reflected=true;
+  pr.owner='player'; pr.vx=Math.cos(a)*sp; pr.vy=Math.sin(a)*sp; pr.dmg=Math.max(18,pr.dmg*2.5)*player.stats.dmgMul*(player.stats.wpnMul||1); pr.life=2; pr.homing=0; pr.reflected=true;
   if(settings.nums) ftext(pr.x,pr.y-10,'REFLECT','#8fe6ff',12);
   SFX.play('block'); emit(pr.x,pr.y,8,{col:'140,230,255',smin:80,smax:220,lmin:.15,lmax:.3,zmin:1.5,zmax:3,drag:5});
 }
