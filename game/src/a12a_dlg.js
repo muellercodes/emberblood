@@ -30,7 +30,7 @@ function setLine(){
   const L=lineParts(DLG.lines[DLG.i]), who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
   if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; }
   if(L.mood) DLG.mood=L.mood;
-  DLG.text=String(typeof L.text==='function'?L.text():L.text);
+  DLG.text=simplify(String(typeof L.text==='function'?L.text():L.text));
   if(L.skipIf&&L.skipIf()){ DLG.i++; if(DLG.i>=DLG.lines.length) endDialogue(); else setLine(); return; }
   $('#dlgWho').textContent=s.name; $('#dlgWho').style.color=s.col;
   logAdd({k:who==='narr'?'narr':'line',who:s.name,col:s.col,text:DLG.text});
@@ -42,7 +42,7 @@ function setLine(){
 }
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(simplify(typeof o.t==='function'?o.t():o.t))}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
   box.hidden=false; $('#dlgNext').hidden=true; DLG.optsAt=performance.now();
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }

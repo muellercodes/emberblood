@@ -33,7 +33,7 @@ function csfx(name,vol){
 // ---------- speech bubbles (world anchored, drawn on the HUD layer so night never hides them)
 const BUB=[];
 function bubble(a,text,o){
-  if(!a||!text) return null; o=o||{}; text=String(text);
+  if(!a||!text) return null; o=o||{}; text=simplify(String(text));
   for(let i=BUB.length-1;i>=0;i--) if(BUB[i].a===a) BUB.splice(i,1);
   const kind=o.kind||(/^[(*]/.test(text)?'narr':'say');
   // long enough to read (UX build): about 1.5 s plus 0.07 s a letter, 3 to 8 s; a quick sound bubble (Fweet!) stays quick

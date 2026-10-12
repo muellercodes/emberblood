@@ -86,7 +86,7 @@ const bannerKey=s=>String(s==null?'':s).replace(/\d+/g,'#');
 // A level up goes first (the skills build adds its skill point line to it right away) and the banner it
 // pushed aside comes back afterwards with all of its reading time. Returns the banner object.
 function setBanner(text,sub,dur,style){
-  text=String(text==null?'':text); sub=sub?String(sub):'';
+  text=simplify(String(text==null?'':text)); sub=sub?simplify(String(sub)):'';
   const b={text,sub,t:0,dur:Math.max(dur||2,readT(text+' '+sub)),style:style||'',len:text.length+sub.length,key:bannerKey(text)};
   b.log=logAdd({k:'banner',text,sub,style:b.style,key:'b:'+b.key});
   if(!G) return b;
@@ -104,7 +104,7 @@ function setBanner(text,sub,dur,style){
 // a click or the use button lets the banner go early (once it has been up long enough to see)
 function bannerSkip(){ const b=G&&G.banner; if(b&&b.t>0.6&&b.dur-b.t>0.4){ b.dur=b.t+0.4; return true; } return false; }
 function taunt(who,text){
-  const s=SPK[who]||{name:'',col:'#d8c3a0'}; text=String(text==null?'':text);
+  const s=SPK[who]||{name:'',col:'#d8c3a0'}; text=simplify(String(text==null?'':text));
   const t={who:s.name,col:s.col,text,t:0,dur:readT(text,3.4,8)};
   logAdd({k:'taunt',who:s.name,col:s.col,text});
   if(!G) return;
@@ -117,6 +117,7 @@ function taunt(who,text){
 // ftext itself lives in a8_systems.js; this wraps it (every module shares one scope, so callers get the wrapper).
 const ftextQuick=ftext;
 ftext=function(x,y,txt,col,size){
+  if(typeof txt==='string'&&txt.length>=10) txt=simplify(txt);
   ftextQuick(x,y,txt,col,size);
   const s=String(txt); if(s.length<10||!/[a-z]{2}/.test(s)||!/\s/.test(s)) return;
   const t=G.texts[G.texts.length-1]; if(!t||t.txt!==s) return;

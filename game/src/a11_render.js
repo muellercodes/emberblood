@@ -75,7 +75,7 @@ function render(){
   if(G.goat&&inView(G.goat.x,G.goat.y,40)&&(!inA||G.side.duchess==='follow')){ G.goat.kind='goat'; list.push(G.goat); }
   if(G.allies) for(const a of G.allies) if(inView(a.x,a.y,60)) list.push(a);
   if(!player.dead&&!player.flying) list.push(player);
-  compsForRender(list);
+  compsForRender(list); eventsForRender(list);
   if(!inA) addOccluders(list);
   list.sort((a,b)=>a.y-b.y);
   for(const e of list){ if(e.occ){ drawOcc(e,t); continue; } if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }

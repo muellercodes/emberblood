@@ -146,3 +146,8 @@ function perkUpdate(dt){
   if(!G||G.mode!=='story'||!player||player.dead) return;
   if(G.flags.perk_regen&&!G.inCombat&&player.hp<player.maxHp&&G.time-player.lastHurt>4) player.hp=Math.min(player.maxHp,player.hp+dt*1.4);
 }
+
+// simple words for quest steps and objectives (a1k_simple.js); the full text stays in the quest data
+{ const _st=stepText; stepText=function(id){ return simplify(_st(id)); };
+  const _qo=questObjective; questObjective=function(){ const o=_qo(); return o&&SIMPLE.on&&o.text?Object.assign({},o,{text:simplify(o.text)}):o; };
+  const _fo=focusObjective; focusObjective=function(){ const o=_fo(); return o&&SIMPLE.on&&o.text?Object.assign({},o,{text:simplify(o.text)}):o; }; }

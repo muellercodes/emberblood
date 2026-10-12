@@ -693,6 +693,55 @@ const ed=x=>x*((G&&G.dmgMul)||1);
 const hasAbil=id=>!!(G&&G.abil&&G.abil[id]);
 const hasSkill=id=>(G&&G.skills&&G.skills[id])|0;
 const airborne=()=>!!player&&(((player.z||0)>3)||!!player.flying);
+const SIMPLE_DATA={};
+// ================= Simple words: a reading level for younger players (Settings > Words: Full or Simple)
+// The game keeps its full text. When Simple is on, any line shown to the player (dialogue, choices, speech bubbles,
+// banners, taunts, quest steps, hints) is swapped for a shorter version written in easy words, if one exists.
+// The simple versions live in game/simple/*.json; build.mjs bakes them into SIMPLE_DATA:
+//   "id": "simple text"                          for plain strings (id = h32 of the exact full text)
+//   "id": {"o":"full text with {1}", "s":"..."}  for text built from a template ({1}, {2} stand for the parts that change)
+// New writing can carry its own simple version inline: S(`full text`, `simple text`) returns the full text and
+// registers the simple one.
+const SIMPLE={on:false,map:Object.create(null),tpl:[],ready:false};
+function h32(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h.toString(36); }
+function S(full,simple){ if(simple!=null&&full!=null) SIMPLE.map[h32(String(full))]=String(simple); return full; }
+function simpleInit(){
+  if(SIMPLE.ready) return; SIMPLE.ready=true;
+  const D=typeof SIMPLE_DATA!=='undefined'?SIMPLE_DATA:{};
+  const esc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  for(const k in D){
+    const v=D[k];
+    if(typeof v==='string'){ if(!(k in SIMPLE.map)) SIMPLE.map[k]=v; }
+    else if(v&&v.o&&v.s!=null){
+      const parts=v.o.split(/\{(\d+)\}/); let re='^', fixed=0;
+      for(let i=0;i<parts.length;i++){ if(i%2) re+='([\\s\\S]*?)'; else { re+=esc(parts[i]); fixed+=parts[i].length; } }
+      if(fixed>=6) SIMPLE.tpl.push({re:new RegExp(re+'$'),s:v.s,fixed});
+    }
+  }
+  SIMPLE.tpl.sort((a,b)=>b.fixed-a.fixed);
+}
+function simplify(s){
+  if(!SIMPLE.on||s==null) return s;
+  const str=String(s); if(str.length<4) return s;
+  simpleInit();
+  const v=SIMPLE.map[h32(str)]; if(v!=null) return v;
+  for(const t of SIMPLE.tpl){ const m=t.re.exec(str); if(m) return t.s.replace(/\{(\d+)\}/g,(_,i)=>m[+i]!=null?m[+i]:''); }
+  return str;
+}
+function setReading(v){ v=v==='simple'?'simple':'full'; SIMPLE.on=v==='simple'; store.set('eb_reading',v); for(const b of document.querySelectorAll('#setReading button')) b.setAttribute('aria-pressed',String(b.dataset.v===v)); return v; }
+SIMPLE.on=store.get('eb_reading','full')==='simple';
+// Settings row, injected so body.html stays as it is
+(function readingRow(){
+  try{
+    const panel=document.querySelector('#settings .panel'); if(!panel||document.getElementById('setReading')) return;
+    const r=document.createElement('div'); r.className='setrow';
+    r.innerHTML='<span>Words<small>Simple uses short, easy words in talks, quests and messages. Great for younger players.</small></span><div class="seg" id="setReading" role="group" aria-label="Words"><button type="button" data-v="full" aria-pressed="false">Full</button><button type="button" data-v="simple" aria-pressed="false">Simple</button></div>';
+    const first=panel.querySelector('.setrow'); if(first) first.before(r); else panel.prepend(r);
+    for(const b of r.querySelectorAll('button')) b.addEventListener('click',()=>{ setReading(b.dataset.v); try{ SFX.play('ui'); }catch(e){} });
+    setReading(SIMPLE.on?'simple':'full');
+  }catch(e){}
+})();
+window.__ebX=Object.assign(window.__ebX||{},{simplify,setReading,h32,simpleCount:()=>{ simpleInit(); return Object.keys(SIMPLE.map).length+SIMPLE.tpl.length; }});
 
 // ================= story script
 // Lines are [speaker, text]. A line can also be {who, text, opts:[{t, fn, then:[lines]}]} for a choice.
@@ -1738,6 +1787,7 @@ function drawSkyHoops(M,t){
     ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.font=`800 11px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(i+1),h.x,hy-44);
   });
 }
+// ================= more story: world events, a recurring rival, shrine dreams (STUB: the story build fills this file)
 
 // ================= world layout (the valley of Embermere)
 const WORLD={w:14000,h:11000};
@@ -11342,7 +11392,7 @@ const bannerKey=s=>String(s==null?'':s).replace(/\d+/g,'#');
 // A level up goes first (the skills build adds its skill point line to it right away) and the banner it
 // pushed aside comes back afterwards with all of its reading time. Returns the banner object.
 function setBanner(text,sub,dur,style){
-  text=String(text==null?'':text); sub=sub?String(sub):'';
+  text=simplify(String(text==null?'':text)); sub=sub?simplify(String(sub)):'';
   const b={text,sub,t:0,dur:Math.max(dur||2,readT(text+' '+sub)),style:style||'',len:text.length+sub.length,key:bannerKey(text)};
   b.log=logAdd({k:'banner',text,sub,style:b.style,key:'b:'+b.key});
   if(!G) return b;
@@ -11360,7 +11410,7 @@ function setBanner(text,sub,dur,style){
 // a click or the use button lets the banner go early (once it has been up long enough to see)
 function bannerSkip(){ const b=G&&G.banner; if(b&&b.t>0.6&&b.dur-b.t>0.4){ b.dur=b.t+0.4; return true; } return false; }
 function taunt(who,text){
-  const s=SPK[who]||{name:'',col:'#d8c3a0'}; text=String(text==null?'':text);
+  const s=SPK[who]||{name:'',col:'#d8c3a0'}; text=simplify(String(text==null?'':text));
   const t={who:s.name,col:s.col,text,t:0,dur:readT(text,3.4,8)};
   logAdd({k:'taunt',who:s.name,col:s.col,text});
   if(!G) return;
@@ -11373,6 +11423,7 @@ function taunt(who,text){
 // ftext itself lives in a8_systems.js; this wraps it (every module shares one scope, so callers get the wrapper).
 const ftextQuick=ftext;
 ftext=function(x,y,txt,col,size){
+  if(typeof txt==='string'&&txt.length>=10) txt=simplify(txt);
   ftextQuick(x,y,txt,col,size);
   const s=String(txt); if(s.length<10||!/[a-z]{2}/.test(s)||!/\s/.test(s)) return;
   const t=G.texts[G.texts.length-1]; if(!t||t.txt!==s) return;
@@ -11544,7 +11595,7 @@ function simUpdate(dt){
     return;
   }
   updateAllies(dt);
-  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateComps(dt); villagerBarks(dt); updateWeather(dt);
+  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateComps(dt); villagerBarks(dt); updateEvents(dt); updateWeather(dt);
   if(G.spirit){ G.spirit.t+=dt; if(!G.spirit.on){ G.spirit.fade=(G.spirit.fade||0)+dt; if(G.spirit.fade>1.5) G.spirit=null; } }
   G.critterT-=dt; if(G.critterT<=0){ G.critterT=rand(2,4); spawnCritters(); }
   G.fogT-=dt; if(G.fogT<=0){ G.fogT=0.3; fogReveal(player.x,player.y,650); }
@@ -12587,6 +12638,11 @@ function perkUpdate(dt){
   if(G.flags.perk_regen&&!G.inCombat&&player.hp<player.maxHp&&G.time-player.lastHurt>4) player.hp=Math.min(player.maxHp,player.hp+dt*1.4);
 }
 
+// simple words for quest steps and objectives (a1k_simple.js); the full text stays in the quest data
+{ const _st=stepText; stepText=function(id){ return simplify(_st(id)); };
+  const _qo=questObjective; questObjective=function(){ const o=_qo(); return o&&SIMPLE.on&&o.text?Object.assign({},o,{text:simplify(o.text)}):o; };
+  const _fo=focusObjective; focusObjective=function(){ const o=_fo(); return o&&SIMPLE.on&&o.text?Object.assign({},o,{text:simplify(o.text)}):o; }; }
+
 // ================= conversations, friendship and gifts
 function shortName(id){ if(id==='shellby') return 'the old turtle'; if(id==='maren') return 'Mom'; const n=personName(id).replace(', your mom',''), w=n.split(' '); return ['Sister','Captain','Mayor','Professor','Farmer','Granny','Elder','Old','Nana'].includes(w[0])?w.slice(0,2).join(' '):w[0]; }
 const dayNow=()=>Math.floor((G.worldTime||0)/540);
@@ -13617,7 +13673,7 @@ function csfx(name,vol){
 // ---------- speech bubbles (world anchored, drawn on the HUD layer so night never hides them)
 const BUB=[];
 function bubble(a,text,o){
-  if(!a||!text) return null; o=o||{}; text=String(text);
+  if(!a||!text) return null; o=o||{}; text=simplify(String(text));
   for(let i=BUB.length-1;i>=0;i--) if(BUB[i].a===a) BUB.splice(i,1);
   const kind=o.kind||(/^[(*]/.test(text)?'narr':'say');
   // long enough to read (UX build): about 1.5 s plus 0.07 s a letter, 3 to 8 s; a quick sound bubble (Fweet!) stays quick
@@ -14979,6 +15035,9 @@ window.__ebX=Object.assign(window.__ebX||{},{
   portraitURL(id){ return compPortrait(id).toDataURL('image/png'); },
   placeGoat(){ placeGoat(); }, spawnPip(){ G.flags.pip=true; spawnPip(); }, setZoom(k){ zoom=ZOOM0*(k||1); updateCam(0,true); }, goat(){ return G.goat?{x:Math.round(G.goat.x),y:Math.round(G.goat.y)}:null; }
 });
+// ================= world events runtime (STUB: the story build fills this file)
+function updateEvents(dt){}
+function eventsForRender(list){}  // push {x,y,draw()} objects for anything the events put in the world
 
 // ================= drawing: effects
 function rr(x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
@@ -19845,7 +19904,7 @@ function render(){
   if(G.goat&&inView(G.goat.x,G.goat.y,40)&&(!inA||G.side.duchess==='follow')){ G.goat.kind='goat'; list.push(G.goat); }
   if(G.allies) for(const a of G.allies) if(inView(a.x,a.y,60)) list.push(a);
   if(!player.dead&&!player.flying) list.push(player);
-  compsForRender(list);
+  compsForRender(list); eventsForRender(list);
   if(!inA) addOccluders(list);
   list.sort((a,b)=>a.y-b.y);
   for(const e of list){ if(e.occ){ drawOcc(e,t); continue; } if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
@@ -20767,7 +20826,7 @@ function setLine(){
   const L=lineParts(DLG.lines[DLG.i]), who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
   if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; }
   if(L.mood) DLG.mood=L.mood;
-  DLG.text=String(typeof L.text==='function'?L.text():L.text);
+  DLG.text=simplify(String(typeof L.text==='function'?L.text():L.text));
   if(L.skipIf&&L.skipIf()){ DLG.i++; if(DLG.i>=DLG.lines.length) endDialogue(); else setLine(); return; }
   $('#dlgWho').textContent=s.name; $('#dlgWho').style.color=s.col;
   logAdd({k:who==='narr'?'narr':'line',who:s.name,col:s.col,text:DLG.text});
@@ -20779,7 +20838,7 @@ function setLine(){
 }
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(simplify(typeof o.t==='function'?o.t():o.t))}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
   box.hidden=false; $('#dlgNext').hidden=true; DLG.optsAt=performance.now();
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }
