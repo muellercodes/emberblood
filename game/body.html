@@ -35,6 +35,11 @@ input{-webkit-user-select:text;user-select:text}
 .journal .jh2{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);margin:10px 0 4px}
 .journal .jq{color:var(--ink)}
 .journal ul{margin:0;padding-left:18px}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:12px;width:100%}
+.dlg{flex-wrap:wrap}
+.opt{font:inherit;font-size:16px;font-weight:600;text-align:left;color:var(--ink);background:linear-gradient(180deg,var(--btn-hi),var(--btn));border:1px solid var(--edge);border-radius:10px;padding:11px 14px;cursor:pointer}
+.opt:hover,.opt:focus-visible{border-color:var(--gold);outline:none}
+.opt .k{display:inline-block;min-width:22px;color:var(--gold);font-weight:800}
 </style>
 
 <canvas id="game" aria-label="Emberblood game world"></canvas>
@@ -91,7 +96,9 @@ input{-webkit-user-select:text;user-select:text}
           <li>Rest at dragon shrines to heal, refill draughts and save. You can fast travel between shrines you have found.</li>
           <li>Swings, rolls and sprinting cost stamina. Back off and let it refill.</li>
           <li>Red shapes on the ground show where an attack will land.</li>
-          <li>Hold fire breath on lanterns and Ward stones to light them.</li>
+          <li>Hold fire breath on lanterns and Ward stones to light them. Fire also melts snowmen, smokes out bees, and lights fireplaces.</li>
+          <li>A gold <b>!</b> means someone has a quest for you. A blue <b>?</b> means they're waiting for something you have.</li>
+          <li>Walk up to any door or cave and press E to go inside. Smash pots for coins.</li>
           <li>Night is darker and wolves hunt. Chests hold experience for leveling up.</li>
           <li>Bog water slows you down. Snow slows you a little too.</li>
           <li>Slash a fire bolt to send it back. Knights block from the front.</li>
@@ -107,6 +114,7 @@ input{-webkit-user-select:text;user-select:text}
     <canvas id="portrait" width="176" height="176"></canvas>
     <div class="dtext"><div class="who" id="dlgWho"></div><div class="say" id="dlgSay" aria-live="polite"></div></div>
     <div class="next" id="dlgNext">Click or Space &#9656;</div>
+    <div class="opts" id="dlgOpts" hidden></div>
     <button class="skip" id="dlgSkip" type="button">Skip scene &#9197;</button>
   </div>
 </div>
@@ -159,9 +167,9 @@ input{-webkit-user-select:text;user-select:text}
 
 <div id="victory" class="ov dim">
   <div class="panel center">
-    <div style="font-family:var(--f-display);letter-spacing:.4em;color:var(--gold);font-size:13px;text-transform:uppercase">The End</div>
-    <h2 style="font-size:32px;margin-top:6px">Vorlaxis has fallen</h2>
-    <p>The fire belongs to the Emberbloods now. The world is still yours to explore.</p>
+    <div style="font-family:var(--f-display);letter-spacing:.4em;color:var(--gold);font-size:13px;text-transform:uppercase" id="winTag">The End</div>
+    <h2 style="font-size:32px;margin-top:6px" id="winTitle">The First Flame Falls</h2>
+    <p id="winMsg">The world is still yours to explore.</p>
     <div class="stats" id="winStats"></div>
     <div class="stack">
       <button class="btn c hot" id="bWinExplore">Keep exploring</button>

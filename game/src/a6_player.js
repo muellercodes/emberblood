@@ -34,6 +34,7 @@ function footprint(x,y,f,wt){
   const side=Math.sin(wt*10)>0?1:-1, px=x+Math.cos(f+Math.PI/2)*4*side, py=y+Math.sin(f+Math.PI/2)*4*side;
   const g=c.g; g.save(); g.translate(px,py); g.rotate(f); g.fillStyle='rgba(120,140,170,.35)'; g.beginPath(); g.ellipse(0,0,4,2.4,0,0,TAU); g.fill(); g.restore();
 }
+function drawAshHat(){ if(G&&G.hat) drawHatShape(9,0,G.hat,0.95); }
 function useStamina(n){ const p=player; if(p.stamina<n*0.5) return false; p.stamina=Math.max(0,p.stamina-n); p.stamDelay=p.stamina<=0?1.0:0.55; return true; }
 function nearestEnemy(x,y,maxD){
   let best=null,bd=maxD*maxD;
@@ -91,7 +92,8 @@ function updatePlayer(dt,inp){
   if(!p.breathing){ if(p.regenDelay>0) p.regenDelay-=dt; else p.energy=Math.min(p.maxEnergy,p.energy+st.energyRegen*dt); }
   SFX.setFire(p.breathing);
   if(G.roarBuf>0&&p.roar>=100){ G.roarBuf=0; doRoar(false); }
-  if(inp.use&&G.prompt){ const pr=G.prompt; G.prompt=null; pr.act(); }
+  if(G.fishing) updateFishing(dt,inp);
+  else if(inp.use&&G.prompt){ const pr=G.prompt; G.prompt=null; pr.act(); }
   // out-of-combat recovery
   if(G.time-p.lastHurt>6&&!G.inCombat&&p.hp<p.maxHp) p.hp=Math.min(p.maxHp,p.hp+1.6*dt);
 }
@@ -119,6 +121,7 @@ function swingHits(){
     const a=angTo(best.x,best.y,p.x,p.y);
     emit(best.x+Math.cos(a)*best.r,best.y+Math.sin(a)*best.r,fin?14:7,{col:'255,235,200',smin:120,smax:340,lmin:.1,lmax:.22,zmin:1.2,zmax:2.6,drag:6});
   }
+  if(G.mode==='story') swingBreakables(p.x,p.y,p.swingDir,range,half);
   if(any&&!p.swingHitstop){ p.swingHitstop=true; hitstop=Math.max(hitstop,fin?0.07:0.035); shake(fin?5:2); SFX.play('hit'); }
   for(const pr of G.projectiles){
     if(pr.owner!=='enemy'||pr.dead) continue;
@@ -234,7 +237,9 @@ function killEnemy(e){
   if(G.mode==='normal'){ G.score+=Math.round(e.value*comboMult()); if(Math.random()<0.12*G.diff.heal) dropHeal(e.x,e.y,14); }
   gainXp(Math.round(e.boss?e.value:e.value*(1+0.25*((e.level||1)-1))));
   if(player.stats.killHeal&&e.type!=='egg') heal(player.stats.killHeal,true);
-  if(e.camp){ e.camp.alive--; if(e.camp.alive<=0){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story') setBanner('Camp cleared','',1.6); } }
+  if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; if(e.camp) e.camp.alive++; } }
+  if(e.camp){ e.camp.alive--; if(e.camp.alive<=0&&!e.camp.cave){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story'){ setBanner('Camp cleared','',1.6); G.stats.camps=(G.stats.camps||0)+1; questPoke(); } } }
+  if(G.mode==='story'&&e.type!=='egg'){ if(e.boss) dropCoins(e.x,e.y,20); else if(Math.random()<(e.elite?0.9:0.35)) dropCoins(e.x,e.y,e.elite?randi(3,5):randi(1,2)); }
   if(e.questTag) G.questKills++;
   deathFx(e); SFX.play(e.boss?'boom':'pop');
   if(e.boss) onBossDefeated(e);

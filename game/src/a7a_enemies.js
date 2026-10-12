@@ -5,7 +5,7 @@ function makeEnemy(type,x,y,opt){
   const d=EDEF[type], lvl=opt.level||1, lk=1+0.26*(lvl-1);
   const hs=opt.hpScale!=null?opt.hpScale:(G.hpMul||1);
   const elite=!d.boss&&type!=='egg'&&(opt.elite!=null?opt.elite:Math.random()<(G.eliteChance||0));
-  const hp=d.hp*G.diff.hp*hs*lk*(elite?1.6:1);
+  const hp=d.hp*G.diff.hp*hs*lk*(elite?1.6:1)*(opt.small?0.35:1);
   const e={id:++EID,type,x,y,r:d.r*(elite?1.12:1),hp,maxHp:hp,speed:d.speed*rand(0.92,1.08),level:lvl,
     dmg:d.dmg*(G.dmgMul||1)*(1+0.15*(lvl-1))*(elite?1.25:1),value:d.value*(elite?2:1),elite,
     flying:!!d.flying,shield:!!d.shield,kbRes:d.kbRes!=null?d.kbRes:1,boss:!!d.boss,
@@ -14,7 +14,8 @@ function makeEnemy(type,x,y,opt){
     orbit:angTo(player.x,player.y,x,y),orbitDir:Math.random()<0.5?-1:1,strafe:Math.random()<0.5?-1:1,
     summonT:8,eggT:5,hitWall:false,lastBlocked:false,
     homeX:opt.homeX!=null?opt.homeX:x,homeY:opt.homeY!=null?opt.homeY:y,leash:opt.leash||850,
-    aggro:opt.aggro!=null?opt.aggro:true,camp:opt.camp||null,questTag:!!opt.questTag,snowy:!!opt.snowy};
+    aggro:opt.aggro!=null?opt.aggro:true,camp:opt.camp||null,questTag:!!opt.questTag,snowy:!!opt.snowy,small:!!opt.small,tint:opt.tint||null};
+  if(opt.small){ e.r*=0.62; e.value*=0.4; e.dmg*=0.6; }
   if(type==='egg'){ e.hatch=opt.hatch||4; e.state='egg'; }
   if(d.boss){ e.cd=1.2; e.aggro=true; }
   if(type==='gloamjaw'){ e.state='chase'; e.sub=false; e.cd=1.6; }
@@ -44,7 +45,7 @@ function steer(e,tx,ty,spd){
   let ax=tx-e.x, ay=ty-e.y; const d=Math.hypot(ax,ay);
   if(d<1){ e.dx=e.dy=0; return; }
   ax/=d; ay/=d;
-  if(!e.flying){
+  if(!e.flying||e.inArea){
     forCols(e.x,e.y,e.r+60,c=>{
       if(c.t!=='c'||!colActive(c)) return;
       const ox=c.x-e.x, oy=c.y-e.y, od=Math.hypot(ox,oy)||1, rr=c.r+e.r+18;
@@ -188,6 +189,7 @@ function updateCritters(dt){
   if(G.critters.some(c=>c.gone)) G.critters=G.critters.filter(c=>!c.gone);
 }
 function spawnCritters(){
+  if(AREA) return;
   if(G.mode!=='story'||G.critters.length>=7||!isDay()) return;
   const p=player, a=rand(0,TAU), r=rand(650,1100), x=p.x+Math.cos(a)*r, y=p.y+Math.sin(a)*r;
   if(x<100||y<100||x>WORLD.w-100||y>WORLD.h-100||y<WALL_Y+100) return;
@@ -197,6 +199,7 @@ function spawnCritters(){
   for(let i=0;i<n;i++){ const sx=x+rand(-50,50), sy=y+rand(-50,50); if(!freeSpot(sx,sy)) continue; G.critters.push({type:deer?'deer':'rabbit',x:sx,y:sy,r:deer?12:5,face:rand(0,TAU),t:rand(0,9),wt:rand(0,3),dx:0,dy:0,flee:0,strafe:1,flying:false,antlers:Math.random()<0.4}); }
 }
 function updateBirds(dt){
+  if(AREA){ G.birds=[]; return; }
   if(G.mode==='story'&&isDay()&&Math.random()<dt*0.05&&G.birds.length<2){
     const a=rand(0,TAU), cx=player.x-Math.cos(a)*900, cy=player.y-Math.sin(a)*700, n=randi(4,8), birds=[];
     for(let i=0;i<n;i++) birds.push({ox:rand(-50,50),oy:rand(-40,40),ph:rand(0,TAU)});

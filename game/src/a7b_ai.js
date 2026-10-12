@@ -70,8 +70,8 @@ AI.knight=(e,dt)=>{
   }
 };
 AI.egg=(e,dt)=>{
-  e.dx=e.dy=0; e.hatch-=dt;
-  if(e.hatch<=0){ e.dead=true; emit(e.x,e.y,12,{col:'235,225,200',glow:false,smin:40,smax:120,lmin:.3,lmax:.6,zmin:2,zmax:3}); const k=makeEnemy('drakeling',e.x,e.y); k.cd=1.2; }
+  e.dx=e.dy=0; if(e.inArea&&dist2(e.x,e.y,player.x,player.y)>420*420) return; e.hatch-=dt;
+  if(e.hatch<=0){ e.dead=true; emit(e.x,e.y,12,{col:'235,225,200',glow:false,smin:40,smax:120,lmin:.3,lmax:.6,zmin:2,zmax:3}); const k=makeEnemy('drakeling',e.x,e.y,{level:e.level,camp:e.camp,aggro:true,homeX:e.homeX,homeY:e.homeY}); k.cd=1.2; k.inArea=e.inArea; }
 };
 AI.grizzlefang=(e,dt)=>{
   const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
@@ -292,5 +292,19 @@ AI.greymane=(e,dt)=>{
     case 'recover': steer(e,e.x-(p.x-e.x),e.y-(p.y-e.y),e.speed*0.35); e.face=turnTo(e.face,a,3*dt); e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=rand(0.5,1.1)*(angry?0.7:1); } break;
     default: e.state='chase';
   }
+};
+AI.bat=(e,dt)=>{
+  const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
+  e.cd-=dt; e.dx=e.dy=0;
+  if(e.state==='swoop'){ e.dx=Math.cos(e.face)*430; e.dy=Math.sin(e.face)*430; if(!e.hitP&&d<e.r+p.r+4){ if(hurtPlayer(e.dmg,e.x,e.y,120)) e.hitP=true; } e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=rand(1,2.2); } return; }
+  e.orbit+=dt*2.2*e.orbitDir; const rr=110+Math.sin(e.t*3)*34; steer(e,p.x+Math.cos(e.orbit)*rr,p.y+Math.sin(e.orbit)*rr,e.speed);
+  if(Math.hypot(e.dx,e.dy)>5) e.face=turnTo(e.face,Math.atan2(e.dy,e.dx),8*dt);
+  if(e.cd<=0&&d<260){ e.state='swoop'; e.st=0.34; e.face=a; e.hitP=false; }
+};
+AI.slime=(e,dt)=>{
+  const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
+  e.cd-=dt; e.dx=e.dy=0; if(e.hopT>0) e.hopT-=dt;
+  if(e.cd<=0){ e.cd=rand(0.75,1.25); e.hopT=0.25; const sp=e.small?240:190; e.vx+=Math.cos(a)*sp; e.vy+=Math.sin(a)*sp; e.face=a; }
+  e.touchCd=(e.touchCd||0)-dt; if(e.touchCd<=0&&d<e.r+p.r){ if(hurtPlayer(e.dmg,e.x,e.y,160)) e.touchCd=0.8; }
 };
 AI.wolf=AIW.wolf;

@@ -49,6 +49,7 @@ function showDeath(){
 }
 function respawn(){
   const p=player, sh=SHRINES.find(s=>s.id===G.lastShrine)||SHRINES[0];
+  if(AREA) exitArea(true);
   if(G.fightSite) resetBoss();
   for(const e of G.enemies){ if(e.roam) e.dead=true; else if(e.camp&&!Object.values(G.siteGuards).includes(e.camp)){ e.dead=true; } else { e.aggro=false; e.returning=true; e.hp=e.maxHp; } }
   for(const k in G.campState) G.campState[k].active=false;
@@ -59,6 +60,7 @@ function respawn(){
 }
 function travelTo(s){
   closeMap(true);
+  if(AREA) exitArea(true);
   player.x=s.x+40; player.y=s.y+50; player.kvx=player.kvy=0; player.iframes=1;
   for(const e of G.enemies) if(!e.boss&&dist(e.x,e.y,player.x,player.y)<500){ e.aggro=false; }
   if(G.fightSite) resetBoss();
@@ -116,12 +118,21 @@ function normalBossDone(){ G.phase='inter'; G.boss=null; G.score+=G.wave*250; SF
 // ================= main update
 function simUpdate(dt){
   if(G.mode!=='story') return;
+  if(G.fade>0) G.fade=Math.max(0,G.fade-dt*2.5);
+  if(AREA){
+    updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateWeather(dt);
+    if(G.spirit){ G.spirit.t+=dt; }
+    G.regionT-=dt; if(G.regionT<=0){ G.regionT=0.6; G.region=regionAt(player.x,player.y); }
+    if(G.pendingBless>0&&!G.inCombat&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
+    return;
+  }
+  updateAllies(dt);
   updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
   if(G.spirit){ G.spirit.t+=dt; if(!G.spirit.on){ G.spirit.fade=(G.spirit.fade||0)+dt; if(G.spirit.fade>1.5) G.spirit=null; } }
   G.critterT-=dt; if(G.critterT<=0){ G.critterT=rand(2,4); spawnCritters(); }
   G.fogT-=dt; if(G.fogT<=0){ G.fogT=0.3; fogReveal(player.x,player.y,650); }
   G.regionT-=dt;
-  if(G.regionT<=0){ G.regionT=0.6; const r=regionAt(player.x,player.y); if(!G.region||r.key!==G.region.key){ const first=!G.region; G.region=r; if(!first&&!G.banner) setBanner(r.name,`Danger level ${r.level}`,2.2,'region'); } }
+  if(G.regionT<=0){ G.regionT=0.6; const r=regionAt(player.x,player.y); if(!G.region||r.key!==G.region.key){ const first=!G.region||String(G.region.key).startsWith('area_'); G.region=r; if(!first&&!G.banner){ const help=CAST.filter(c=>c.town===r.key&&npcMarker(c.id)==='!').length; setBanner(r.name,help?`${help} ${help===1?'person here could':'people here could'} use your help`:`Danger level ${r.level}`,2.4,'region'); } } }
   if(G.pendingBless>0&&!G.inCombat&&!(G.boss&&!G.boss.dead)&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
   G.autoSaveT-=dt; if(G.autoSaveT<=0){ G.autoSaveT=60; if(!G.inCombat) saveGame(); }
 }
@@ -160,7 +171,10 @@ function liteUpdate(dt){
 function victory(){
   scene='victory'; SFX.play('win');
   const m=Math.floor(G.playTime/60), s=Math.floor(G.playTime%60);
-  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${fmt(G.kills)}</b><span>Enemies defeated</span></div><div class="stat"><b>${G.deaths}</b><span>Times you fell</span></div>`;
+  const E=ENDINGS[G.choices.ending||'hero'], seen=store.get('eb_endings',{});
+  $('#winTag').textContent=`Ending ${E.n} of 4`; $('#winTitle').textContent=E.title;
+  $('#winMsg').textContent=Object.keys(seen).length<4?`You've found ${Object.keys(seen).length} of 4 endings. Different choices along the way lead to different endings.`:'You found every ending. The Wardens would be proud. Iska would want a word.';
+  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div><div class="stat"><b>${Object.keys(G.pages).length}/10</b><span>Lost pages</span></div>`;
   show('victory');
 }
 function pauseGame(){

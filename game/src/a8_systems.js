@@ -128,7 +128,8 @@ function updateProjectiles(dt){
     pr.x+=pr.vx*dt; pr.y+=pr.vy*dt;
     if(Math.random()<0.7) emit(pr.x,pr.y,1,pr.kind==='ice'?{col:'200,230,255',smin:5,smax:30,lmin:.2,lmax:.35,zmin:2,zmax:4,grow:-4,drag:2}:pr.kind==='orb'?{col:'200,120,255',smin:5,smax:30,lmin:.2,lmax:.35,zmin:2,zmax:4,grow:-4,drag:2}:{kind:'fire',smin:5,smax:30,lmin:.2,lmax:.35,zmin:pr.r*0.4,zmax:pr.r*0.7,grow:-4,drag:2});
     if(pr.kind!=='wave'&&colAt(pr.x,pr.y,pr.r*0.5)){ pr.dead=true; smallBoom(pr.x,pr.y); }
-    if(pr.x<-20||pr.y<-20||pr.x>WORLD.w+20||pr.y>WORLD.h+20) pr.dead=true;
+    if(AREA&&AREA.kind==='cave'&&areaBlocked(pr.x,pr.y)){ pr.dead=true; smallBoom(pr.x,pr.y); }
+    if(!AREA&&(pr.x<-20||pr.y<-20||pr.x>WORLD.w+20||pr.y>WORLD.h+20)) pr.dead=true;
     if(pr.dead) continue;
     if(pr.owner==='enemy'){
       if(!p.dead&&dist2(pr.x,pr.y,p.x,p.y)<(pr.r+p.r*0.8)**2){ if(hurtPlayer(pr.dmg,pr.x,pr.y,140)){ pr.dead=true; smallBoom(pr.x,pr.y); } }
@@ -218,7 +219,8 @@ function updatePickups(dt){
     const d=dist(k.x,k.y,p.x,p.y);
     if(d<120&&!p.dead){ const a=angTo(k.x,k.y,p.x,p.y), s=(1-d/120)*900*dt; k.vx+=Math.cos(a)*s; k.vy+=Math.sin(a)*s; }
     const f=Math.exp(-dt*3); k.vx*=f; k.vy*=f; k.x+=k.vx*dt; k.y+=k.vy*dt;
-    k.x=clamp(k.x,10,WORLD.w-10); k.y=clamp(k.y,10,WORLD.h-10);
+    if(!AREA){ k.x=clamp(k.x,10,WORLD.w-10); k.y=clamp(k.y,10,WORLD.h-10); }
+    if(k.coin&&d<p.r+12&&!p.dead){ k.life=0; addCoins(k.coin); continue; }
     if(d<p.r+10&&!p.dead){ k.life=0; heal(k.amt*G.diff.heal); SFX.play('pickup'); emit(k.x,k.y,10,{col:'140,255,150',smin:40,smax:140,lmin:.3,lmax:.5,zmin:1.5,zmax:3}); }
   }
   G.pickups=G.pickups.filter(k=>k.life>0);

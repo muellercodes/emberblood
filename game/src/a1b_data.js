@@ -11,6 +11,8 @@ const EDEF={
   knight:{r:19,hp:125,speed:68,dmg:16,value:38,shield:true,kbRes:0.25},
   wolf:{r:13,hp:32,speed:185,dmg:9,value:14},
   egg:{r:12,hp:26,speed:0,dmg:0,value:2,kbRes:0},
+  bat:{r:9,hp:16,speed:210,dmg:6,value:8,flying:true,kbRes:1.4},
+  slime:{r:13,hp:30,speed:90,dmg:8,value:9,kbRes:1.1},
   grizzlefang:{r:24,hp:520,speed:118,dmg:13,value:220,boss:true,kbRes:0.3,name:'Grizzlefang',title:'Kobold Chieftain'},
   morrow:{r:19,hp:640,speed:95,dmg:10,value:320,boss:true,kbRes:0.4,name:'High Priest Morrow',title:'Voice of the Scaled Oath'},
   broodmother:{r:32,hp:820,speed:125,dmg:16,value:420,boss:true,flying:true,kbRes:0.15,name:'The Brood Mother',title:'Queen of the Drakeling Nests'},
@@ -51,6 +53,6 @@ const DEATH_LINES=[
   'Elder Yara would tell you to roll more. Elder Yara is usually right.',
   'Mom would say: eat something, then try again.'
 ];
-const DCOL={kobold:'190,160,90',cultist:'170,100,220',drakeling:'240,140,70',knight:'230,140,60',wolf:'170,170,170',egg:'230,220,195',grizzlefang:'220,190,110',morrow:'190,120,240',broodmother:'230,90,140',gloamjaw:'120,150,80',greymane:'220,225,235',cindervane:'250,160,80',vorlaxis:'255,120,40'};
+const DCOL={kobold:'190,160,90',cultist:'170,100,220',drakeling:'240,140,70',knight:'230,140,60',wolf:'170,170,170',egg:'230,220,195',bat:'70,50,70',slime:'120,200,80',grizzlefang:'220,190,110',morrow:'190,120,240',broodmother:'230,90,140',gloamjaw:'120,150,80',greymane:'220,225,235',cindervane:'250,160,80',vorlaxis:'255,120,40'};
 const VILLAGER_LINES=['Thank you, Ash. My chickens are safe again.','The smoke is coming from the mountain. Everyone can see it.','My grandmother said the Emberbloods were dragons once. I always thought she was joking.','Watch yourself out there after dark. The wolves come down from Whisperwood.','Elder Yara has been counting things on her fingers all morning.','We rebuilt the bakery. Twice. Please be careful near it.','Your mom fixed my plow and my door hinge in the same afternoon. She never sleeps.'];
 const TOWN_LINES=['Welcome to Brindlecross! Best fish on Lake Mirrow. Only fish on Lake Mirrow, actually.','Sister Wren? Big building with all the books. Knock loudly, she reads with her ears closed.','Caravans stopped coming down the Ashen Road. The cult has the whole road spooked.','Granny Moss lives out in the Mirefen. If you get lost, follow the smell of tea.','A farmer up in the Frostpine lost his goat. He has posted eleven signs about it.','They say the Obsidian Gate hasn’t opened in a thousand years. I say they say a lot of things.'];

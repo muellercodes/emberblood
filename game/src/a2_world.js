@@ -25,7 +25,10 @@ const ROADS=[
   [[2600,9300],[2300,8600],[2000,7800],[2100,7000],[2400,6200],[2600,5400],[2500,4700],[2400,4200]],
   [[7300,7500],[7000,6500],[6800,5600],[6900,4700],[7000,3800],[7000,3100],[7000,2700],[6950,2000],[6800,1500],[7000,950]],
   [[2600,5400],[3300,5180],[4600,4900],[5800,4700],[6900,4700]],
-  [[4400,9300],[4700,9800],[5000,10200]]
+  [[4400,9300],[4700,9800],[5000,10200]],
+  [[12200,4300],[12600,5400],[12900,6500]],
+  [[2400,4200],[1900,3750],[1500,3400]],
+  [[6620,7400],[6800,7400],[7300,7500]]
 ];
 const LAVAS=[{pts:[[800,2200],[2000,1900],[3200,2200],[4400,1800],[5600,2000],[6600,1700],[7600,1800],[8800,1600],[10000,2000],[11400,1700],[13200,2100]],w:50}];
 const POI={
@@ -40,7 +43,10 @@ const POI={
   farm:{x:3300,y:5180,r:260,name:'Hollis Farm',level:6},
   gate:{x:7000,y:3150,r:380,name:'The Obsidian Gate',level:8},
   summit:{x:7000,y:950,r:600,name:'The Throne of Cinders',level:10},
-  proving:{x:5000,y:10200,r:640,name:'The Proving Grounds',level:3}
+  proving:{x:5000,y:10200,r:640,name:'The Proving Grounds',level:3},
+  copper:{x:12900,y:6500,r:420,name:'Coppergulch',level:6,town:true},
+  lodge:{x:1500,y:3400,r:330,name:'Frostpine Lodge',level:7,town:true},
+  way:{x:8100,y:6500,r:300,name:'The Smoky Kettle',level:3,town:true}
 };
 const SHRINES=[
   {id:'s_village',x:2950,y:9150,name:'Emberhollow Shrine'},{id:'s_wood',x:2350,y:7300,name:'Whisperwood Shrine'},
@@ -48,15 +54,16 @@ const SHRINES=[
   {id:'s_ash',x:8300,y:5200,name:'Ashen Road Shrine'},{id:'s_crag',x:11000,y:5050,name:'Crag Shrine'},
   {id:'s_mire',x:10600,y:8550,name:'Mirefen Shrine'},{id:'s_frost',x:2950,y:4550,name:'Frostpine Shrine'},
   {id:'s_north',x:4300,y:3450,name:'Highland Shrine'},{id:'s_gate',x:7350,y:3500,name:'Gatewatch Shrine'},
-  {id:'s_cinder',x:7350,y:2300,name:'Cinder Shrine'},{id:'s_proving',x:5650,y:10550,name:'Proving Shrine'}
+  {id:'s_cinder',x:7350,y:2300,name:'Cinder Shrine'},{id:'s_proving',x:5650,y:10550,name:'Proving Shrine'},
+  {id:'s_copper',x:12450,y:6950,name:'Coppergulch Shrine'},{id:'s_lodge',x:1950,y:3650,name:'Lodge Shrine'},{id:'s_way',x:8450,y:6800,name:'Kettle Shrine'}
 ];
 const CAMPS=[
   {id:'c1',x:4200,y:10350,units:[['kobold',4]]},{id:'c2',x:6400,y:9600,units:[['kobold',5]]},{id:'c3',x:1300,y:10200,units:[['kobold',4]]},{id:'c4',x:7700,y:10400,units:[['kobold',3],['wolf',2]]},
   {id:'c5',x:1500,y:6600,units:[['kobold',3],['wolf',2]]},{id:'c6',x:3800,y:6800,units:[['wolf',4]]},{id:'c7',x:1200,y:8400,units:[['kobold',4]]},{id:'c8',x:4600,y:6000,units:[['kobold',3],['cultist',2]]},
   {id:'c9',x:7900,y:4500,units:[['cultist',3],['kobold',3]]},{id:'c10',x:9800,y:6600,units:[['cultist',4]]},{id:'c11',x:8600,y:3800,units:[['cultist',3],['kobold',4]]},{id:'c12',x:10400,y:5600,units:[['drakeling',2],['cultist',2]]},
-  {id:'c13',x:12800,y:5600,units:[['drakeling',4]]},{id:'c14',x:11300,y:3500,units:[['drakeling',3],['cultist',2]]},{id:'c15',x:13200,y:3200,units:[['drakeling',5]]},{id:'c16',x:11800,y:6400,units:[['drakeling',3],['kobold',3]]},
+  {id:'c13',x:13400,y:5150,units:[['drakeling',4]]},{id:'c14',x:11300,y:3500,units:[['drakeling',3],['cultist',2]]},{id:'c15',x:13200,y:3200,units:[['drakeling',5]]},{id:'c16',x:11800,y:6400,units:[['drakeling',3],['kobold',3]]},
   {id:'c17',x:10000,y:10200,units:[['kobold',4],['cultist',2]]},{id:'c18',x:12500,y:8200,units:[['cultist',3],['kobold',2]]},{id:'c19',x:13300,y:9400,units:[['kobold',5]]},{id:'c20',x:12100,y:10700,units:[['kobold',4],['drakeling',2]]},
-  {id:'c21',x:1600,y:3600,units:[['wolf',4]]},{id:'c22',x:3300,y:3900,units:[['kobold',3],['wolf',3]]},{id:'c23',x:900,y:5000,units:[['wolf',3],['kobold',2]]},{id:'c24',x:4600,y:4200,units:[['wolf',2],['kobold',3]]},
+  {id:'c21',x:4300,y:5300,units:[['wolf',3],['kobold',2]]},{id:'c22',x:3300,y:3900,units:[['kobold',3],['wolf',3]]},{id:'c23',x:900,y:5000,units:[['wolf',3],['kobold',2]]},{id:'c24',x:4600,y:4200,units:[['wolf',2],['kobold',3]]},
   {id:'c25',x:6200,y:3500,units:[['knight',2],['cultist',2]]},{id:'c26',x:7900,y:3400,units:[['knight',2],['kobold',3]]},
   {id:'c27',x:5200,y:2350,units:[['knight',2],['drakeling',3]]},{id:'c28',x:8800,y:2300,units:[['knight',3],['drakeling',2]]},{id:'c29',x:6000,y:1300,units:[['knight',2],['drakeling',2]]},{id:'c30',x:8200,y:1100,units:[['drakeling',4]]}
 ];
@@ -125,6 +132,7 @@ function T(x,y,o){
   return o;
 }
 function blockedAt(x,y){
+  if(x>=IZX-50) return areaBlocked(x,y);
   if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return true;
   const rdd=segsDist(x,y,ROAD_SEGS);
   if(rdd<34) return false;
@@ -135,6 +143,7 @@ function blockedAt(x,y){
   return false;
 }
 function regionAt(x,y){
+  if(x>=IZX-50&&AREA) return {name:AREA.name,level:AREA.level,key:'area_'+AREA.id};
   for(const k in POI){ const p=POI[k]; if(dist2(x,y,p.x,p.y)<(p.r+120)**2) return {name:p.name,level:p.level,key:k}; }
   if(dist2(x,y,LAKE.x,LAKE.y)<(LAKE.r+260)**2) return {name:'Lake Mirrow',level:2,key:'lake'};
   const b=biomeInfo(x,y,{}).b;

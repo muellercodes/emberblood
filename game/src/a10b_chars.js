@@ -52,6 +52,7 @@ function drawHero(x,y,f,p,ghost){
   ctx.fillStyle='#5e1a10'; for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(6-i*2.8,-1.2); ctx.lineTo(3-i*2.8,0); ctx.lineTo(6-i*2.8,1.2); ctx.closePath(); ctx.fill(); }
   for(const s of [-1,1]){ const g=ctx.createLinearGradient(8,s*4,-7,s*11); g.addColorStop(0,'#f6ecd0'); g.addColorStop(1,'#9a8a6a'); ctx.strokeStyle=g; ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(8,s*4); ctx.quadraticCurveTo(2,s*9.5,-7,s*10.5); ctx.stroke(); }
   ctx.fillStyle='#ffd34d'; for(const s of [-1,1]){ ctx.beginPath(); ctx.ellipse(13,s*3.1,1.5,0.9,0,0,TAU); ctx.fill(); }
+  if(!ghost) drawAshHat();
   // weapon
   const st=p.stats;
   const armed=!(G&&G.mode==='story'&&!G.flags.forge);
@@ -163,7 +164,7 @@ function drawKnight(e,k,fl,champ){
   }else{ ctx.lineWidth=6; ctx.strokeStyle='#1a1a20'; ctx.beginPath(); ctx.arc(0,0,20,-2.5,-1.4); ctx.stroke(); }
   ctx.restore();
 }
-function drawWolf(e,fl,k,alpha){
+function drawWolf(e,fl,k,alpha,friendly){
   ctx.save(); ctx.translate(e.x,e.y); ctx.rotate(e.face); if(k) ctx.scale(k,k);
   const L=lightLocal(e.face), run=Math.hypot(e.dx,e.dy)>20, g=e.t*(run?16:6), fur=fl?['#fff','#eee','#ccc']:alpha?['#f4f6f8','#bcc6d0','#6a7480']:e.snowy?['#d8dde2','#9aa2aa','#4a5058']:['#9a9a96','#5e5e5a','#2a2a28'];
   if(alpha){ ctx.fillStyle='rgba(255,255,255,.18)'; ctx.beginPath(); ctx.ellipse(2,0,15,8.5,0,0,TAU); ctx.fill(); }
@@ -175,7 +176,7 @@ function drawWolf(e,fl,k,alpha){
   ctx.beginPath(); ctx.moveTo(15,-2.2); ctx.lineTo(21,0); ctx.lineTo(15,2.2); ctx.closePath(); ctx.fill();
   ctx.fillStyle='#1a1a18'; ctx.beginPath(); ctx.arc(21,0,1,0,TAU); ctx.fill();
   for(const s of [-1,1]){ ctx.fillStyle=fur[2]; ctx.beginPath(); ctx.moveTo(10,s*2.5); ctx.lineTo(8,s*6); ctx.lineTo(12,s*4); ctx.closePath(); ctx.fill(); }
-  if(alpha){ ctx.save(); ctx.shadowColor='#ff8a1a'; ctx.shadowBlur=6; ctx.fillStyle='#ff9a2a'; for(const s of [-1,1]){ ctx.beginPath(); ctx.arc(15,s*1.7,1.1,0,TAU); ctx.fill(); } ctx.restore();
+  if(alpha){ ctx.save(); ctx.shadowColor=friendly?'#7ac8ff':'#ff8a1a'; ctx.shadowBlur=6; ctx.fillStyle=friendly?'#9fd8ff':'#ff9a2a'; for(const s of [-1,1]){ ctx.beginPath(); ctx.arc(15,s*1.7,1.1,0,TAU); ctx.fill(); } ctx.restore();
     if(e.state==='frost'||e.state==='frostW'){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g2=ctx.createRadialGradient(21,0,0,21,0,8); g2.addColorStop(0,'rgba(220,240,255,.9)'); g2.addColorStop(1,'rgba(140,200,255,0)'); ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(21,0,8,0,TAU); ctx.fill(); ctx.restore(); } }
   else { ctx.fillStyle=isNight()?'#ffe066':'#c8a040'; for(const s of [-1,1]){ ctx.beginPath(); ctx.arc(15,s*1.7,0.8,0,TAU); ctx.fill(); } }
   ctx.restore();
@@ -218,6 +219,7 @@ function drawEnemy(e){
     case 'knight': drawKnight(e,1,fl,false); break; case 'cindervane': drawKnight(e,1.42,fl,true); break;
     case 'wolf': drawWolf(e,fl); break; case 'egg': drawEgg(e,fl); break;
     case 'greymane': drawWolf(e,fl,2.05,true); break; case 'gloamjaw': drawGloam(e,fl); break;
+    case 'bat': drawBat(e,fl); break; case 'slime': drawSlime(e,fl); break;
   }
   ctx.restore();
   if(!e.boss&&e.hp<e.maxHp&&e.type!=='egg'&&e.aggro){
@@ -249,19 +251,21 @@ function drawCritter(c){
   ctx.restore();
 }
 function drawPerson(n,L,o){
-  const c=hexRGB(o.col), c0=`rgb(${mixRGB(c,[255,255,255],0.3).map(Math.round)})`, c2=`rgb(${mixRGB(c,[0,0,0],0.55).map(Math.round)})`;
+  const shirt=o.col||o.shirt||n.col||'#6a5a4a', c=hexRGB(shirt), c0=`rgb(${mixRGB(c,[255,255,255],0.3).map(Math.round)})`, c2=`rgb(${mixRGB(c,[0,0,0],0.55).map(Math.round)})`;
   if(o.cape){ ctx.fillStyle=o.cape; ctx.beginPath(); ctx.moveTo(2,-11); ctx.quadraticCurveTo(-18,-12,-16,0); ctx.quadraticCurveTo(-18,12,2,11); ctx.closePath(); ctx.fill(); }
-  ctx.fillStyle=rg(-1,0,11,L,c0,o.col,c2); ctx.beginPath(); ctx.ellipse(-1,0,8.5*(o.wide||1),10.5*(o.wide||1),0,0,TAU); ctx.fill();
-  if(o.apron){ ctx.fillStyle='#5a3a22'; ctx.beginPath(); ctx.ellipse(2,0,5,8,0,-Math.PI/2,Math.PI/2); ctx.fill(); }
+  ctx.fillStyle=rg(-1,0,11,L,c0,shirt,c2); ctx.beginPath(); ctx.ellipse(-1,0,8.5*(o.wide||1),10.5*(o.wide||1),0,0,TAU); ctx.fill();
+  if(o.apron){ ctx.fillStyle=o.apron===true?'#e8e0d0':o.apron; ctx.beginPath(); ctx.ellipse(2,0,5,8,0,-Math.PI/2,Math.PI/2); ctx.fill(); }
   ell(4,-8.5,3,2.4,o.skin||'#d8a888'); ell(4,8.5,3,2.4,o.skin||'#d8a888');
   if(o.hammer){ ctx.fillStyle='#4a3420'; ctx.fillRect(4,8,14,2.2); ctx.fillStyle='#5a5a62'; ctx.fillRect(16,5,6,8); }
   if(o.book){ ctx.fillStyle='#6a2a22'; ctx.fillRect(7,-4,7,9); ctx.fillStyle='#efe2c4'; ctx.fillRect(8,-3,5,7); }
   if(o.cane){ ctx.strokeStyle='#5a4428'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(4,10); ctx.lineTo(20,12); ctx.stroke(); }
   ctx.fillStyle=rg(2,0,5.5,L,'#e2b898','#c08a6a','#7a5040'); ctx.beginPath(); ctx.arc(2,0,5.5,0,TAU); ctx.fill();
+  if(o.beard){ ctx.fillStyle=o.hair||'#6a4a2a'; ctx.beginPath(); ctx.arc(4.5,0,4.2,-Math.PI/2.2,Math.PI/2.2); ctx.fill(); }
   if(o.hood){ ctx.fillStyle=o.hood; ctx.beginPath(); ctx.arc(0.5,0,6.6,Math.PI*0.35,Math.PI*1.65); ctx.fill(); }
-  else { ctx.fillStyle=o.hair||n.hair||'#2a1a10'; ctx.beginPath(); ctx.arc(0.5,0,5.3,Math.PI*0.45,Math.PI*1.55); ctx.fill(); }
+  else if(!o.hat&&!o.helm){ ctx.fillStyle=o.hair||n.hair||'#2a1a10'; ctx.beginPath(); ctx.arc(0.5,0,5.3,Math.PI*0.45,Math.PI*1.55); ctx.fill(); }
   if(o.bun){ ctx.fillStyle=o.hair; ctx.beginPath(); ctx.arc(-4.5,0,3,0,TAU); ctx.fill(); }
-  if(o.hat){ ctx.fillStyle='#c8a85a'; ctx.beginPath(); ctx.arc(1,0,9,0,TAU); ctx.fill(); ctx.fillStyle='#a8883a'; ctx.beginPath(); ctx.arc(1,0,5,0,TAU); ctx.fill(); ctx.strokeStyle='#6a4a20'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(1,0,5.5,0,TAU); ctx.stroke(); }
+  if(o.glasses){ ctx.strokeStyle='#2a2a2a'; ctx.lineWidth=0.9; ctx.beginPath(); ctx.arc(6,-2,1.6,0,TAU); ctx.arc(6,2,1.6,0,TAU); ctx.stroke(); }
+  if(o.hat) drawHatShape(1,0,o.hat,0.85); else if(o.helm) drawHatShape(1,0,'helm',0.9);
 }
 function drawGoat(n){
   ctx.save(); ctx.translate(n.x,n.y); ctx.rotate(n.face);
@@ -296,7 +300,9 @@ function drawSpirit(sp){
 }
 function drawNPC(n){
   if(n.kind==='goat') return drawGoat(n);
+  if(n.turtle) return drawTurtle(n);
   ctx.save(); ctx.translate(n.x,n.y); ctx.rotate(n.face);
+  const c=CASTBY[n.id]||SPECIAL[n.id]; if(c&&c.kid) ctx.scale(0.8,0.8);
   const L=lightLocal(n.face), sw=n.moving?Math.sin(n.t*9)*3:0;
   ell(2+sw,-5,3.6,2.4,'#2a2018'); ell(2-sw,5,3.6,2.4,'#2a2018');
   if(n.kind==='yara'){
@@ -305,12 +311,21 @@ function drawNPC(n){
     ctx.strokeStyle='#5a3a20'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(4,11); ctx.lineTo(22,11); ctx.stroke();
     ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(23,11,0,23,11,8); g.addColorStop(0,'rgba(255,220,140,.95)'); g.addColorStop(1,'rgba(255,120,40,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(23,11,8,0,TAU); ctx.fill(); ctx.restore();
   }
-  else if(n.kind==='maren') drawPerson(n,L,{col:'#8a4a2a',apron:true,hammer:true,hair:'#b8401a',bun:true,wide:1.08});
-  else if(n.kind==='wren') drawPerson(n,L,{col:'#3a5a9a',hood:'#2a4278',book:true,cape:'#22345e'});
+  else if(n.kind==='maren') drawPerson(n,L,{col:'#8a4a2a',apron:'#5a3a22',hammer:true,hair:'#b8401a',bun:true,wide:1.08});
+  else if(n.kind==='wren') drawPerson(n,L,{col:'#3a5a9a',hood:'#2a4278',book:true,cape:'#22345e',glasses:true});
   else if(n.kind==='moss') drawPerson(n,L,{col:'#5a7a3a',hood:'#6a8a4a',cane:true,cape:'#3e5a2a'});
-  else if(n.kind==='hollis') drawPerson(n,L,{col:'#8a6a3a',hat:true,hair:'#6a4a2a',wide:1.1});
-  else drawPerson(n,L,{col:n.col,hair:n.hair});
+  else if(n.kind==='hollis') drawPerson(n,L,{col:'#8a6a3a',hat:'straw',hair:'#6a4a2a',wide:1.1,beard:true});
+  else drawPerson(n,L,Object.assign({col:(n.look&&n.look.shirt)||n.col},n.look||{}));
   ctx.restore();
+}
+function drawMarkers(t){
+  if(G.mode!=='story') return;
+  const list=AREA?AREA.npcs:G.npcs;
+  for(const n of list){ if(!inView(n.x,n.y,40)) continue; const m=npcMarker(n.id); if(m) drawMarker(n.x,n.y-30,m,t); }
+  if(!AREA){
+    for(const d of DOORS){ if(!inView(d.x,d.y,60)) continue; const def=AREADEFS[d.area]; const c=CAST.find(q=>q.inside===d.area); if(c){ const m=npcMarker(c.id); if(m){ drawMarker(d.x,d.y-34,m,t); continue; } } if(d.cave){ const qs=questTargets().some(q=>q.x===CAVEMOUTHS.find(m=>m.area===d.area).x); if(qs) drawMarker(d.x,d.y-70,'?',t); } }
+    if(G.goat&&G.side.duchess==='lost'&&inView(G.goat.x,G.goat.y,40)&&G.quests.duchess) drawMarker(G.goat.x,G.goat.y-26,'?',t);
+  }
 }
 function drawBirds(){
   for(const f of G.birds){

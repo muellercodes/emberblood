@@ -31,6 +31,7 @@ function collideObs(e){
 }
 function colAt(x,y,r){ let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)||c.noProj) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return hit; }
 function boundE(e){
+  if(AREA&&e.x>=IZX-100){ const m=e.r+2; if(e.x<AREA.x0+m){e.x=AREA.x0+m;e.hitWall=true;} if(e.x>AREA.x1-m){e.x=AREA.x1-m;e.hitWall=true;} if(e.y<AREA.y0+m){e.y=AREA.y0+m;e.hitWall=true;} if(e.y>AREA.y1-m){e.y=AREA.y1-m;e.hitWall=true;} return; }
   const m=e.r+30;
   if(e.x<m){e.x=m;e.hitWall=true;} if(e.x>WORLD.w-m){e.x=WORLD.w-m;e.hitWall=true;}
   if(e.y<m){e.y=m;e.hitWall=true;} if(e.y>WORLD.h-m){e.y=WORLD.h-m;e.hitWall=true;}
@@ -38,7 +39,7 @@ function boundE(e){
 }
 // move with terrain blocking (water, lava) for walkers
 function terrainFix(e,ox,oy){
-  if(e.flying||e.noClip) return;
+  if(e.noClip||(e.flying&&!e.inArea)) return;
   if(!blockedAt(e.x,e.y)) return;
   if(!blockedAt(e.x,oy)){ e.y=oy; }
   else if(!blockedAt(ox,e.y)){ e.x=ox; }

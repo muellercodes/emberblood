@@ -32,7 +32,7 @@ function objectiveList(){
   else if(st==='raid') out.push({text:`Drive the kobolds out of Emberhollow (${Math.min(G.questKills,8)}/8)`,x:POI.village.x,y:POI.village.y,near:true});
   else if(st==='lore'){ const y=npcOf('yara'); out.push({text:'Talk to Elder Yara by the well',x:y?y.x:POI.village.x,y:y?y.y:POI.village.y}); }
   else if(st==='hollow') out.push({text:'Relight the Hollow Ward under the old oak. Hold your fire breath on it.',...wardTarget('hollow')});
-  else if(st==='wren'){ const w=npcOf('wren'); out.push({text:'Find Sister Wren at the Brindlecross library',x:w?w.x:NPCSPOT.wren[0],y:w?w.y:NPCSPOT.wren[1]}); }
+  else if(st==='wren'){ const d=DOORS.find(q=>q.area==='h_library'); out.push({text:'Find Sister Wren inside the Brindlecross library',x:d?d.x:NPCSPOT.wren[0],y:d?d.y:NPCSPOT.wren[1],area:'h_library',npc:'wren'}); }
   if(G.fightSite&&G.boss&&!G.boss.dead){ out.length=0; out.push({text:`Defeat ${EDEF[G.boss.type].name.split(',')[0]}`,x:G.boss.x,y:G.boss.y,fight:true}); return out; }
   for(const k in SITES){
     const s=SITES[k];
@@ -43,12 +43,23 @@ function objectiveList(){
 }
 function questObjective(){
   if(G.mode!=='story') return null;
+  if(AREA){
+    const o=questObjectiveWorld(); if(!o) return o;
+    const here=AREA.npcs.find(n=>n.id===o.npc);
+    if(o.area===AREA.id&&here) return Object.assign({},o,{x:here.x,y:here.y});
+    if(AREA.camp&&AREA.camp.alive>0&&AREA.kind==='cave') return {title:AREA.name,text:`Explore ${AREA.name}. ${AREA.camp.alive} ${AREA.camp.alive===1?'enemy':'enemies'} left. The way out is at the bottom.`,x:AREA.exit.x,y:AREA.exit.y};
+    return Object.assign({},o,{text:o.text+(o.x!=null&&o.x<IZX?' (leave here first)':''),x:AREA.exit.x,y:AREA.exit.y});
+  }
+  return questObjectiveWorld();
+}
+function questObjectiveWorld(){
+  if(G.mode!=='story') return null;
   if(G.done) return {title:'Free roam',text:'Explore the valley. Camps, chests, shrines and star-iron are still out there.'};
   const list=objectiveList(); if(!list.length) return {title:CHAPTER[G.stage]||'',text:'Explore the valley.'};
   let o=list.length>1?nearestOf(list):list[0];
   let text=o.text;
   if(G.stage==='three'&&!o.fight){ const left=threeLeft(); text=`${o.text} · ${3-left.length}/3 lit`; }
-  return {title:CHAPTER[G.stage],text,x:o.x,y:o.y,near:o.near};
+  return {title:CHAPTER[G.stage],text,x:o.x,y:o.y,near:o.near,area:o.area,npc:o.npc};
 }
 function questUpdated(){ SFX.play('quest'); const o=questObjective(); if(o) setBanner('Quest updated',o.text,2.6); }
 function spawnRaid(n){
@@ -57,7 +68,7 @@ function spawnRaid(n){
 }
 function setStage(s,card){ G.stage=s; if(card) showCard(card[0],card[1]); }
 function updateStory(dt){
-  if(G.done) return;
+  if(G.done||AREA) { if(!AREA) updateFollowers(dt); return; }
   const p=player;
   if(G.stage==='lanterns'&&LANTERNS.every(l=>l.lit)&&scene==='play'){
     G.stage='raid';
@@ -112,9 +123,10 @@ function resetBoss(){
 function storyBossDone(){
   const k=G.fightSite, site=SITES[k]; if(!site) return;
   G.fightSite=null; G.boss=null; G.bossDone[site.boss]=true; delete G.siteGuards[k];
+  if(site.boss==='vorlaxis'){ finalChoice(); return; }
   runDialogue(STORY.bosses[site.boss].outro,()=>{
     scene='play';
-    if(site.boss==='vorlaxis'){ G.stage='done'; G.done=true; saveGame(); victory(); return; }
+    if(site.boss==='morrow'){ giveItems({oath_letter:1},true); G.flags.clue_letter=true; G.flags.gateHint=true; questPoke(); if(G.choices.morrow==='jail') setupNPCs(); }
     G.pendingBless++;
     if(k==='warcamp'){ setStage('wren',['Chapter 3','The Lorekeeper']); }
     else if(k==='gate'){ G.flags.gate=true; GATE_COL.off=true; setStage('summit',['Final Chapter','The First Flame']); shake(8); SFX.play('boom'); later(3.2,()=>setBanner('The Obsidian Gate is open','The road to the summit is clear.',2.6)); }
@@ -127,6 +139,7 @@ function storyBossDone(){
 function wardCanLight(id){ return id==='hollow'?reached('hollow'):!!G.wardReady[id]; }
 function breathIgnite(mx,my,ang,dt){
   if(G.mode!=='story') return;
+  breathWorld(mx,my,ang,dt); if(AREA) return;
   for(const L of LANTERNS){
     if(L.lit||!inArcC(mx,my,ang,175,0.45,{x:L.x,y:L.y,r:12})) continue;
     if(!G.flags.forge){ if(!(G.wardMsgT>0)){ G.wardMsgT=2.5; ftext(L.x,L.y-26,'Visit Mom first','#ffd9a0',13); } continue; }
@@ -150,6 +163,24 @@ function lightWard(id){
   player.hp=player.maxHp; player.potions=player.potionsMax;
   G.spirit={id,x:w.x+46,y:w.y-30,t:0,on:true};
   later(1.0,()=>runDialogue(STORY['ward_'+id],()=>afterWard(id)));
+}
+function finalChoice(){
+  const kind=Object.values(G.choices).filter(v=>v==='free'||v==='forgive'||v==='home').length, pages=Object.keys(G.pages).length;
+  const canLantern=pages>=5&&kind>=2&&G.pages.p9;
+  const pickEnd=k=>()=>{ G.choices.ending=k; };
+  const opts=[{t:'End it. For the valley.',fn:pickEnd('hero')},{t:'Bind him again, forever. Become the Sixth Warden.',fn:pickEnd('warden')},{t:'Take his fire for yourself.',fn:pickEnd('heir')}];
+  if(canLantern) opts.splice(1,0,{t:'Light a lantern for him, like Ember did.',fn:pickEnd('lantern')});
+  const lines=[['vor',`Impossible... the fire... it chose you...`],['narr',`The First Flame flickers on the mountaintop, small and tired. For the first time in a thousand years, it's your move.`]];
+  if(!canLantern&&pages>=3) lines.push(['narr',`You remember something from the Wardens' pages. Something about lanterns. You can't quite put it together.`]);
+  lines.push(ch('ash',`What will you do?`,opts));
+  runDialogue(lines,()=>{
+    const E=ENDINGS[G.choices.ending||'hero'];
+    runDialogue(E.lines.concat([['narr',`Emberhollow held the biggest Lantern Day in a thousand years. Maren made a speech. Yara counted the lanterns twice.`]],EPILOGUE_FMT()),()=>{
+      scene='play'; G.stage='done'; G.done=true;
+      const seen=store.get('eb_endings',{}); seen[G.choices.ending||'hero']=true; store.set('eb_endings',seen);
+      saveGame(true); victory();
+    });
+  });
 }
 function afterWard(id){
   scene='play'; if(G.spirit) G.spirit.on=false;
@@ -175,7 +206,7 @@ function updateFollowers(dt){
     const k=1-Math.exp(-dt*(d>200?6:3)); q.x+=(tx-q.x)*k; q.y+=(ty-q.y)*k;
     let tgt=null,bd=330*330; for(const e of G.enemies){ if(e.dead||!e.aggro||e.invuln||e.spawnIn>0||e.alpha<0.5) continue; const dd=dist2(e.x,e.y,q.x,q.y); if(dd<bd){ bd=dd; tgt=e; } }
     q.face=turnTo(q.face,tgt?angTo(q.x,q.y,tgt.x,tgt.y):angTo(q.x,q.y,tx+Math.cos(p.facing)*40,ty+Math.sin(p.facing)*40),6*dt);
-    if(tgt&&q.cd<=0){ q.cd=2.4; shoot(q.x,q.y,angTo(q.x,q.y,tgt.x,tgt.y),430,6,(5+player.level*1.6)*player.stats.fire,'pip','player',{life:0.9}); SFX.play('cast'); }
+    if(tgt&&q.cd<=0){ q.cd=2.4*Math.pow(0.8,G.pipTreats||0); shoot(q.x,q.y,angTo(q.x,q.y,tgt.x,tgt.y),430,6,(5+player.level*1.6)*player.stats.fire,'pip','player',{life:0.9}); SFX.play('cast'); }
     if(q.chirp<=0){ q.chirp=rand(35,70); if(!G.inCombat&&scene==='play') taunt('pip',pick(['Mip!','Mip mip!','Mrrp?','Mip! Mip!'])); }
   }
   const gt=G.goat; if(!gt) return;
@@ -184,7 +215,7 @@ function updateFollowers(dt){
     const d=dist(gt.x,gt.y,p.x,p.y);
     if(d>1500){ gt.x=p.x-40; gt.y=p.y+30; }
     if(d>70){ const a=angTo(gt.x,gt.y,p.x,p.y), sp=Math.min(260,d*2); gt.face=turnTo(gt.face,a,8*dt); const ox=gt.x,oy=gt.y; gt.x+=Math.cos(a)*sp*dt; gt.y+=Math.sin(a)*sp*dt; collideObs(gt); terrainFix(gt,ox,oy); gt.moving=true; } else gt.moving=false;
-    const H=NPCSPOT.hollis; if(dist(gt.x,gt.y,H[0],H[1])<260&&dist(p.x,p.y,H[0],H[1])<300&&scene==='play'&&!G.inCombat){ G.side.duchess='home'; runDialogue(STORY.hollis.done,()=>{ scene='play'; G.pendingBless++; setBanner('Duchess is home','Farmer Hollis gave you his lucky charm. A blessing awaits.',2.8); saveGame(); }); }
+    const H=NPCSPOT.hollis; if(!AREA&&dist(gt.x,gt.y,H[0],H[1])<260&&dist(p.x,p.y,H[0],H[1])<320&&scene==='play'){ G.side.duchess='home'; G.flags.duchess_home=true; const P=POI.farm; gt.hx=P.x+60; gt.hy=P.y+150; setBanner('Duchess is home!','Talk to Farmer Hollis.',2.4); questPoke(); saveGame(); }
   }else{
     gt.wt=(gt.wt||0)-dt;
     if(gt.wt<=0){ gt.wt=rand(2,5); gt.tx=gt.hx+rand(-40,40); gt.ty=gt.hy+rand(-30,30); }
@@ -197,58 +228,17 @@ function placeGoat(){
   else if(st==='follow'){ G.goat={x:player.x-40,y:player.y+30,hx:0,hy:0,face:0,t:0,r:10}; }
   else G.goat={x:GOAT_SPOT[0],y:GOAT_SPOT[1],hx:GOAT_SPOT[0],hy:GOAT_SPOT[1],face:0,t:0,r:10};
 }
-// ---------- NPCs
-function setupNPCs(){
-  const V=POI.village, raid=G.stage==='raid';
-  const mk=(kind,x,y,extra)=>Object.assign({kind,x,y,face:Math.PI/2,t:rand(0,9),home:[x,y],wt:0},extra||{});
-  G.npcs=[mk('yara',...NPCSPOT.yara),mk('maren',...NPCSPOT.maren),mk('wren',...NPCSPOT.wren),mk('moss',...NPCSPOT.moss),mk('hollis',...NPCSPOT.hollis)];
-  if(!raid) for(let i=0;i<4;i++){ const s=spotNear(V.x,V.y,140,420); G.npcs.push(mk('villager',s.x,s.y,{face:rand(0,TAU),col:pick(['#6a4a8a','#3a6a8a','#8a5a3a','#5a7a3a']),hair:pick(['#2a1a10','#6a4a2a','#b8a070','#1a1a1a']),walker:true})); }
-  for(const [x,y] of NPCSPOT.town) G.npcs.push(mk('townsfolk',x,y,{face:rand(0,TAU),col:pick(['#3a5a8a','#8a3a3a','#6a6a3a','#4a7a7a','#7a4a6a']),hair:pick(['#2a1a10','#6a4a2a','#b8a070','#1a1a1a','#8a3a1a']),walker:true}));
-}
-function updateNPCs(dt){
-  for(const n of G.npcs){
-    if(dist2(n.x,n.y,player.x,player.y)>1800*1800) continue;
-    n.t+=dt;
-    if(n.walker){
-      n.wt-=dt; if(n.wt<=0){ n.wt=rand(3,7); n.tx=n.home[0]+rand(-120,120); n.ty=n.home[1]+rand(-120,120); n.walk=Math.random()<0.6; }
-      if(dist(n.x,n.y,player.x,player.y)<90){ n.walk=false; n.face=turnTo(n.face,angTo(n.x,n.y,player.x,player.y),4*dt); }
-      if(n.walk&&dist(n.x,n.y,n.tx,n.ty)>10){ const a=angTo(n.x,n.y,n.tx,n.ty); n.face=turnTo(n.face,a,4*dt); const ox=n.x,oy=n.y; n.x+=Math.cos(n.face)*40*dt; n.y+=Math.sin(n.face)*40*dt; n.r=10; collideObs(n); terrainFix(n,ox,oy); n.moving=true; } else n.moving=false;
-    }else{ n.face=turnTo(n.face,angTo(n.x,n.y,player.x,player.y),dist(n.x,n.y,player.x,player.y)<220?3*dt:0); }
-  }
-}
-const NPC_LABEL={yara:'Talk to Elder Yara',maren:'Talk to Mom',wren:'Talk to Sister Wren',moss:'Talk to Granny Moss',hollis:'Talk to Farmer Hollis'};
-function updateInteractions(dt){
-  const p=player; let best=null, bd=1e9;
-  const offer=(d,text,act,x,y,always)=>{ if(d<bd){ bd=d; best={text,act,x,y,always}; } };
-  for(const s of SHRINES){
-    const d=dist(p.x,p.y,s.x,s.y);
-    if(!G.shrines[s.id]&&d<260){ G.shrines[s.id]=true; SFX.play('shrine'); setBanner('Shrine found',s.name,2.4); fogReveal(s.x,s.y,900); }
-    if(d<64) offer(d,`Rest at ${s.name}`,()=>restAtShrine(s),s.x,s.y);
-  }
-  for(const c of CHESTS) if(!c.open){ const d=dist(p.x,p.y,c.x,c.y); if(d<48) offer(d,'Open the chest',()=>openChest(c),c.x,c.y,true); }
-  for(const n of G.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<70) offer(d,NPC_LABEL[n.kind]||'Talk',()=>talkTo(n),n.x,n.y); }
-  for(const o of ORES) if(!G.ores[o.id]){ const d=dist(p.x,p.y,o.x,o.y); if(d<60) offer(d,'Chip out the star-iron',()=>mineOre(o),o.x,o.y,true); }
-  for(const l of LILIES) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
-  if(G.goat&&G.side.duchess!=='home'&&G.side.duchess!=='follow'){ const d=dist(p.x,p.y,G.goat.x,G.goat.y); if(d<70) offer(d,'Talk to the goat',talkGoat,G.goat.x,G.goat.y); }
-  G.prompt=best&&(!G.inCombat||best.always)?best:null;
-  // healing herbs
-  if(p.hp<p.maxHp){
-    const cx=Math.floor(p.x/CH), cy=Math.floor(p.y/CH), props=PROPS.get(ckey(cx,cy));
-    if(props) for(const pr of props) if(pr.k==='herb'&&!pr.taken&&dist2(pr.x,pr.y,p.x,p.y)<22*22){ pr.taken=true; heal(18*G.diff.heal); SFX.play('pickup'); emit(pr.x,pr.y,10,{col:'200,170,255',smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.2,zmax:2.4}); setBanner('Healing herb','+HP',1.1); }
-  }
-}
 function mineOre(o){
   G.ores[o.id]=true; G.iron++; SFX.play('chest'); shake(3);
   emit(o.x,o.y,30,{col:'150,200,255',smin:60,smax:200,lmin:.3,lmax:.8,zmin:1.5,zmax:3});
   setBanner('Star-iron',G.flags.forge?'Take it to Mom at the forge in Emberhollow.':'It hums in your claws.',2.6); saveGame();
 }
 function pickLily(l){
-  l.taken=true; G.lilyN++; SFX.play('pickup');
+  l.taken=true; G.lilyN++; G.items.moonlily=(G.items.moonlily||0)+1; questPoke(); SFX.play('pickup');
   emit(l.x,l.y,18,{col:'170,210,255',ang:-Math.PI/2,spread:1,smin:30,smax:100,lmin:.4,lmax:.8,zmin:1.2,zmax:2.6,rise:12});
-  setBanner(`Moonlily ${Math.min(G.lilyN,5)} of 5`,G.side.moss==='active'?(G.lilyN>=5?'Bring them to Granny Moss.':''):'Someone in the Mirefen might want these.',2);
+  setBanner(`Moonlily ×${G.items.moonlily||0}`,G.quests.moss?((G.items.moonlily||0)>=5?'Bring them to Granny Moss.':'Granny Moss needs five.'):'Someone in the Mirefen might want these.',2);
   saveGame();
 }
-function talkGoat(){ runDialogue(STORY.duchess,()=>{ scene='play'; G.side.duchess='follow'; setBanner('Duchess is following you','Bring her home to Hollis Farm.',2.6); saveGame(); }); }
 function hintLine(){
   if(G.done) return STORY.yaraHints.done;
   const st=G.stage;
@@ -260,39 +250,6 @@ function hintLine(){
   if(st==='summit') return STORY.yaraHints.summit;
   if(st==='hollow') return 'The Hollow Ward, Ash. Under the old oak. Breathe on it and keep breathing.';
   return 'Happy Lantern Day, Ash.';
-}
-function talkTo(n){
-  const done=()=>{ scene='play'; };
-  const st=G.stage;
-  switch(n.kind){
-    case 'yara':
-      if(st==='lore'){ runDialogue(STORY.lore,()=>{ scene='play'; G.stage='hollow'; G.shrines.s_village=true; questUpdated(); saveGame(); }); return; }
-      if(st==='raid'){ runDialogue([['yara','Kobolds, Ash! Drive them out first. We can talk after.']],done); return; }
-      if(st==='wake'||st==='lanterns'){ runDialogue([['yara',st==='wake'?'Your mother is waiting at the forge, Ash. Go on.':'Three lanterns on the green. Gently, now. I am counting.']],done); return; }
-      runDialogue([['yara',hintLine()]],done); return;
-    case 'maren':
-      if(st==='wake'){ runDialogue(STORY.forge,()=>{ scene='play'; G.flags.forge=true; G.stage='lanterns'; setBanner('Grandmother’s sword','You can fight now. Left click or J to slash.',3); questUpdated(); saveGame(); }); return; }
-      if(G.iron>0){ const lines=STORY.maren.reforge.slice(); runDialogue(lines,()=>{ scene='play'; while(G.iron>0){ G.iron--; G.tier++; player.stats.slash*=1.15; } setBanner(`Blade reforged · tier ${G.tier+1}`,'Your sword hits 15% harder for each star-iron.',2.8); SFX.play('upgrade'); saveGame(); }); return; }
-      if(reached('wren')&&!G.flags.ironHint&&G.tier<3){ G.flags.ironHint=true; runDialogue(STORY.maren.hint,()=>{ scene='play'; saveGame(); }); return; }
-      runDialogue([['maren',st==='raid'?'I’ve got the forge, you’ve got the kobolds. Go!':pick(STORY.maren.idle)[1]]],done); return;
-    case 'wren':
-      if(st==='wren'){ runDialogue(STORY.wren,()=>{ scene='play'; setStage('oath',['Chapter 4','The Ash Ward']); G.shrines.s_brindle=true; questUpdated(); saveGame(); }); return; }
-      runDialogue([['wren',reached('oath')?hintLine():'Oh! A visitor. I am very busy reading. Come back when the world is ending. Not before.']],done); return;
-    case 'moss':
-      if(!G.side.moss){ runDialogue(STORY.moss.start,()=>{ scene='play'; G.side.moss='active'; if(G.lilyN>=5) later(0.2,()=>talkTo(n)); else setBanner('Side quest','Find five moonlilies in the Mirefen',2.6); saveGame(); }); return; }
-      if(G.side.moss==='active'){
-        if(G.lilyN>=5){ runDialogue(STORY.moss.done,()=>{ scene='play'; G.side.moss='done'; player.potionsMax++; player.potions=player.potionsMax; setBanner('New flask','You can carry one more healing draught.',2.6); SFX.play('upgrade'); saveGame(); }); return; }
-        runDialogue([['moss',`${STORY.moss.wait[0][1]} You have ${G.lilyN}.`]],done); return;
-      }
-      runDialogue(STORY.moss.after,done); return;
-    case 'hollis':
-      if(!G.side.duchess){ runDialogue(STORY.hollis.start,()=>{ scene='play'; G.side.duchess='lost'; setBanner('Side quest','Find Duchess the goat in the high snow',2.6); saveGame(); }); return; }
-      if(G.side.duchess==='lost'){ runDialogue(STORY.hollis.wait,done); return; }
-      if(G.side.duchess==='follow'){ runDialogue([['hollis','Is that... DUCHESS! Bring her over here!']],done); return; }
-      runDialogue(STORY.hollis.after,done); return;
-    case 'townsfolk': runDialogue([['townsfolk',pick(TOWN_LINES)]],done); return;
-    default: runDialogue([['villager',reached('raid')?pick(VILLAGER_LINES):pick(FEST_LINES)]],done);
-  }
 }
 function offerPending(){
   if(G.pendingBless<=0||scene!=='play') return;
@@ -309,7 +266,7 @@ function restAtShrine(s){
 }
 function openChest(c){
   c.open=true; G.chestsOpened[c.id]=true; SFX.play('chest');
-  const lvl=regionAt(c.x,c.y).level, xp=30+15*lvl;
+  const lvl=regionAt(c.x,c.y).level, xp=30+15*lvl; addCoins(8+4*lvl,c.x,c.y);
   emit(c.x,c.y,30,{col:'255,210,120',ang:-Math.PI/2,spread:1,smin:40,smax:160,lmin:.5,lmax:1,zmin:1.5,zmax:3,rise:15});
   if(player.potions<player.potionsMax){ player.potions++; setBanner('Ember cache',`+${xp} experience and a healing draught`,2.4); }
   else setBanner('Ember cache',`+${xp} experience`,2.2);
@@ -322,18 +279,21 @@ function saveData(){
   return {v:3,at:Date.now(),diff:diffIdx,x:Math.round(player.x),y:Math.round(player.y),shrine:G.lastShrine,p:snapshotPlayer(),hp:Math.round(player.hp),potions:player.potions,
     stage:G.stage,flags:G.flags,wards:G.wards,ready:G.wardReady,bosses:G.bossDone,side:G.side,ores:G.ores,iron:G.iron,tier:G.tier,
     lilies:LILIES.filter(l=>l.taken).map(l=>l.id),lilyN:G.lilyN,lan:G.lanterns,qk:G.questKills,goat:G.goat?{x:Math.round(G.goat.x),y:Math.round(G.goat.y)}:null,
-    shrines:G.shrines,camps:G.campsCleared,chests:G.chestsOpened,tod:G.tod,wt:G.worldTime,kills:G.kills,deaths:G.deaths,time:G.playTime,done:G.done,fog:fogStr(),pend:G.pendingBless};
+    shrines:G.shrines,camps:G.campsCleared,chests:G.chestsOpened,tod:G.tod,wt:G.worldTime,kills:G.kills,deaths:G.deaths,time:G.playTime,done:G.done,fog:fogStr(),pend:G.pendingBless,
+    rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared};
 }
 function saveGame(now){
   if(!G||G.mode!=='story') return;
-  const s=saveData(); store.set(SAVE_KEY,s);
+  const s=saveData(); if(AREA&&G.ow){ s.x=Math.round(G.ow.x); s.y=Math.round(G.ow.y); } store.set(SAVE_KEY,s);
   Cloud.queueSave(s,now);
 }
 function loadGame(s){
   diffIdx=clamp(s.diff|0,0,2); newRun('story'); clearStatic();
   player=restorePlayer(s.p); player.x=s.x; player.y=s.y; player.hp=Math.max(1,s.hp||player.maxHp); player.hpShow=player.hp; player.potions=s.potions!=null?s.potions:player.potionsMax;
   Object.assign(G,{stage:s.stage||'wake',flags:s.flags||{},wards:s.wards||{hollow:true},wardReady:s.ready||{},bossDone:s.bosses||{},side:s.side||{},ores:s.ores||{},iron:s.iron||0,tier:s.tier||0,lilyN:s.lilyN||0,lanterns:s.lan||{},questKills:s.qk||0,
-    shrines:s.shrines||{},lastShrine:s.shrine||'s_village',campsCleared:s.camps||{},chestsOpened:s.chests||{},tod:s.tod!=null?s.tod:0.32,worldTime:s.wt||0,kills:s.kills||0,deaths:s.deaths||0,playTime:s.time||0,done:!!s.done,pendingBless:s.pend||0});
+    shrines:s.shrines||{},lastShrine:s.shrine||'s_village',campsCleared:s.camps||{},chestsOpened:s.chests||{},tod:s.tod!=null?s.tod:0.32,worldTime:s.wt||0,kills:s.kills||0,deaths:s.deaths||0,playTime:s.time||0,done:!!s.done,pendingBless:s.pend||0,
+    coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{}});
+  if(!s.rev){ if(G.side.moss==='done'&&!G.quests.moss) G.quests.moss={step:4,done:true}; if(G.side.duchess==='home'&&!G.quests.duchess) G.quests.duchess={step:4,done:true}; if(reached('warcamp')) G.flags.gateHint=true; }
   for(const c of CHESTS) c.open=!!G.chestsOpened[c.id];
   for(const L of LANTERNS) L.lit=!!G.lanterns[L.id];
   const lt=new Set(s.lilies||[]); for(const l of LILIES) l.taken=lt.has(l.id);

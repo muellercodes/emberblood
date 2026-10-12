@@ -32,7 +32,7 @@ function openMap(){
   if(!G||G.mode!=='story'||scene!=='play') return;
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
   mapSel=null; $('#bTravel').hidden=true; $('#mapHint').textContent='Tap a blue shrine you have found to fast travel there.';
-  const r=G.region||regionAt(player.x,player.y); $('#mapInfo').textContent=`${r.name} · Level ${player.level} · ${Object.keys(G.shrines).length} of ${SHRINES.length} shrines found`;
+  const r=G.region||regionAt(player.x,player.y); $('#mapInfo').textContent=`${AREA?'Inside '+AREA.name:r.name} · Level ${player.level} · ${G.coins||0} coins · ${Object.keys(G.shrines).length} of ${SHRINES.length} shrines`;
   drawMapScreen(); renderJournal(); show('mapov');
 }
 const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
@@ -50,7 +50,15 @@ function renderJournal(){
   if(G.side.duchess==='lost') side.push('Find Duchess the goat in the high snow, north of Hollis Farm'); else if(G.side.duchess==='follow') side.push('Bring Duchess home to Hollis Farm'); else if(G.side.duchess==='home') side.push('✓ Duchess is home');
   if(G.flags.ironHint||G.tier||G.iron) side.push(`Star-iron for Mom: ${Object.keys(G.ores).length} of 3 found · blade tier ${G.tier+1}${G.iron?' · bring it to the forge':''}`);
   if(G.flags.pip) side.push('Pip is with you. Mip!');
-  if(side.length) rows.push('<div class="jh2">Side quests</div><ul>'+side.map(t=>`<li>${escapeHtml(t)}</li>`).join('')+'</ul>');
+  for(const id in G.quests){ const q=G.quests[id], d=QDEFS[id]; if(!q.done) side.push(`${d.errand?'Errand':'◆'} ${d.title.replace('Errand: ','')}: ${stepText(id)}`); }
+  const done=Object.keys(G.quests).filter(id=>G.quests[id].done).map(id=>QDEFS[id].title.replace('Errand: ',''));
+  if(side.length) rows.push('<div class="jh2">Side quests and errands</div><ul>'+side.map(t=>`<li>${escapeHtml(t)}</li>`).join('')+'</ul>');
+  else rows.push('<div class="jh2">Side quests</div><p>Look for people with a gold <b style="color:#ffcf4a">!</b> over their heads. Some are inside their houses. Walk up to any door and press E to go in.</p>');
+  if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${escapeHtml(done.join(' · '))}</p>`);
+  const inv=Object.keys(G.items).filter(k=>G.items[k]>0).map(k=>`${ITEM_NAMES[k]||k}${G.items[k]>1?' ×'+G.items[k]:''}`);
+  rows.push(`<div class="jh2">Satchel</div><p>${G.coins||0} coins${inv.length?' · '+escapeHtml(inv.join(' · ')):''}</p>`);
+  rows.push(`<div class="jh2">The Wardens’ Account</div><p>${Object.keys(G.pages).length} of 10 lost pages found.${Object.keys(G.pages).length?' '+escapeHtml(Object.keys(G.pages).sort().map(k=>PAGES[k].title.split(':')[1].trim()).join(' · ')):''}</p>`);
+  const seen=store.get('eb_endings',{}); const ne=Object.keys(seen).length; if(ne) rows.push(`<div class="jh2">Endings found</div><p>${ne} of 4: ${escapeHtml(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · '))}</p>`);
   el.innerHTML=rows.join('');
 }
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
@@ -69,8 +77,13 @@ function drawMapScreen(){
   for(const c of CAMPS){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
   for(const s of SHRINES){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
   for(const o of objectiveList()){ if(o.x==null) continue; const [x,y]=mapXY(o.x,o.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#ffb547'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.fillRect(-11,-11,22,22); g.strokeRect(-11,-11,22,22); g.restore(); }
+  for(const q of questTargets()){ const [x,y]=mapXY(q.x,q.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#7fe0ff'; g.strokeStyle='#08303a'; g.lineWidth=3; g.fillRect(-8,-8,16,16); g.strokeRect(-8,-8,16,16); g.restore(); }
+  const jm=!!G.items.juniper_map;
+  for(const m of CAVEMOUTHS){ if(!jm&&!seen(m.x,m.y)) continue; const [x,y]=mapXY(m.x,m.y); g.fillStyle='#120c08'; g.strokeStyle='#e8d0a0'; g.lineWidth=2.5; g.beginPath(); g.arc(x,y,10,Math.PI,TAU); g.lineTo(x+10,y+6); g.lineTo(x-10,y+6); g.closePath(); g.fill(); g.stroke(); if(G.found['seen_'+m.area]||jm){ g.font='600 15px Rubik, system-ui, sans-serif'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(m.name,x,y+22); g.fillStyle='#e8d8c0'; g.fillText(m.name,x,y+22); } }
+  for(const o of LANDMARKS){ if(o.k==='pot'||o.k==='barrel'||o.k==='fishspot'||o.k==='sign'||o.k==='frostberry'||o.k==='beehive'||(o.hidden&&o.hidden())) continue; if(!jm&&!seen(o.x,o.y)) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle=o.k==='xmark'?'#ff5a3a':'#d8c8f0'; g.beginPath(); g.arc(x,y,o.k==='xmark'?7:4.5,0,TAU); g.fill(); }
+  if(G.flags.chart) for(const o of ORES){ if(G.ores[o.id]) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle='#7ab8ff'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+7,y); g.lineTo(x,y+9); g.lineTo(x-7,y); g.closePath(); g.fill(); }
   for(const id in WARDS){ if(!seen(WARDS[id].x,WARDS[id].y)) continue; const [x,y]=mapXY(WARDS[id].x,WARDS[id].y); g.fillStyle=G.wards[id]?'#ffcf6a':'#7a8aa8'; g.strokeStyle='#1a1008'; g.lineWidth=2; g.beginPath(); for(let i=0;i<6;i++){ const a=i/6*TAU+Math.PI/6; i?g.lineTo(x+Math.cos(a)*9,y+Math.sin(a)*9):g.moveTo(x+Math.cos(a)*9,y+Math.sin(a)*9); } g.closePath(); g.fill(); g.stroke(); }
-  const [px,py]=mapXY(player.x,player.y); g.save(); g.translate(px,py); g.rotate(player.facing); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.beginPath(); g.moveTo(17,0); g.lineTo(-11,-11); g.lineTo(-5,0); g.lineTo(-11,11); g.closePath(); g.fill(); g.stroke(); g.restore();
+  const pp=AREA&&G.ow?G.ow:player; const [px,py]=mapXY(pp.x,pp.y); g.save(); g.translate(px,py); g.rotate(player.facing); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.beginPath(); g.moveTo(17,0); g.lineTo(-11,-11); g.lineTo(-5,0); g.lineTo(-11,11); g.closePath(); g.fill(); g.stroke(); g.restore();
   g.font='600 20px Rubik, system-ui, sans-serif'; g.fillStyle='rgba(240,225,200,.7)'; g.textAlign='left'; g.fillText('N ↑',16,22);
 }
 mapCv.addEventListener('click',e=>{
@@ -175,7 +188,8 @@ window.__eb={god:false,get G(){return G;},get player(){return player;},get scene
   startStory,startNormal,skipDialogue,advanceDialogue,chooseUpgrade,toMenu,openMap,closeMap,
   tp(x,y){ player.x=x; player.y=y; updateCam(0,true); G.chunkBurst=16; },
   setStage(st){ G.stage=st; if(stageAt(st)>=stageAt('lanterns')) G.flags.forge=true; if(stageAt(st)>stageAt('raid')) for(const L of LANTERNS) L.lit=true; if(stageAt(st)>=stageAt('summit')){ G.flags.gate=true; GATE_COL.off=true; } setupNPCs(); },
-  lightWard, wardReady(id){ G.wardReady[id]=true; },
+  lightWard, wardReady(id){ G.wardReady[id]=true; }, enterArea:(id)=>{ const d=DOORS.find(q=>q.area===id); enterArea(id,d||{x:player.x,y:player.y}); }, exitArea, get AREA(){return AREA;}, DOORS, CAVEMOUTHS, LANDMARKS, QDEFS, CAST, startQuest, giveItems, npcMarker, talkTo, findPage, questPoke, lmAct, areaObjAct,
+  bossWin(k){ G.fightSite=k; storyBossDone(); }, breath(n){ for(let i=0;i<(n||60);i++) breathIgnite(player.x+Math.cos(player.facing)*20,player.y+Math.sin(player.facing)*20,player.facing,1/30); }, finalChoice, setupNPCs, saveGame,
   killQuest(){ for(const e of G.enemies) if(!e.dead&&e.questTag) killEnemy(e); },
   killBoss(){ if(G.boss&&!G.boss.dead) killEnemy(G.boss); },
   hurtBoss(f){ if(G.boss&&!G.boss.dead){ G.boss.hp=G.boss.maxHp*f; } },

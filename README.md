@@ -6,11 +6,12 @@ A top-down, open-world action game you play in the browser. No install, no downl
 
 ## The story
 
-A thousand years ago the dragon Vorlaxis, the First Flame, ruled the valley of Embermere. Five Wardens chained him under Cinder Mountain and lit five Ward-fires to keep him asleep. Those fires only stay lit with Emberblood fire, the dragon's own blood, carried down through one family.
+A thousand years ago the dragon Vorlaxis, the First Flame, ruled the valley of Embermere. His daughter Ember loved the valley more than she feared him, so she joined five ordinary people (Iska, Bram, Oriel, Sedge and Tove) and together they split his fire in two. Half put him to sleep under Cinder Mountain. Half went into Ember, and it has passed down her family ever since. That family is the Emberbloods, and the five Ward-fires that keep the binding strong only relight with Emberblood fire.
 
-You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney sweep, and the only one in a thousand years born with horns, a tail and real fire. It's the thousandth Lantern Day, kobolds just crashed the festival, and a cult called the Scaled Oath is snuffing the Wards one by one. Somewhere under the mountain, your great-great-great-great-great-great-great-great-great-great-great-great-great-grandfather is waking up.
+You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney sweep, and the first in a thousand years born with horns, a tail and real fire. It's the thousandth Lantern Day, the night the binding runs out. Kobolds just crashed the festival, somebody left the north gate open for them, and a cult called the Scaled Oath is snuffing the Wards so your great-great-great-great-great-great-great-great-great-great-great-great-great-grandfather wakes up strong and takes his fire back from you.
 
-- **Story Mode**: a 14,000 × 11,000 valley with seven regions (meadows, Whisperwood, the Ashen Road, the Drakeling Crags, the Mirefen, the Frostpine Highlands and the Cinderlands), seven bosses, five Wards to relight, side quests, a baby dragon named Pip, and a goat with opinions.
+- **Story Mode**: a 14,000 × 11,000 valley with seven regions, seven bosses and five Wards to relight. Seven towns and hamlets with about 45 houses you can walk into, each full of things to poke at. Seven caves to explore (with puzzles, treasure and lost pages). A cast of named villagers whose stories tie into each other across the map, 13 side quests, a dozen cross-valley errands, ten lost pages of the Wardens' Account to collect, shops, fishing, hats, a talking tree with riddles, a baby dragon named Pip and a goat with opinions.
+- **Choices matter**: what you do with the High Priest, the lamp-maker who betrayed the village, the great wolf and the knight at the gate changes who helps you in the last fight and how the epilogue plays out. There are four endings, and one of them only opens up if you've been kind and paid attention to the old pages.
 - **Normal Mode**: endless waves in the Proving Grounds, with a leaderboard.
 
 ## Controls

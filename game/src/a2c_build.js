@@ -15,6 +15,8 @@ function inClearing(x,y,extra){
   for(const s of SHRINES) if(dist2(x,y,s.x,s.y)<(90+e)**2) return true;
   for(const c of CAMPS) if(dist2(x,y,c.x,c.y)<(140+e)**2) return true;
   for(const c of CHESTS) if(dist2(x,y,c.x,c.y)<(40+e)**2) return true;
+  for(const l of LANDMARKS) if(dist2(x,y,l.x,l.y)<((l.k==='ribs'?150:l.k==='hotspring'?70:40)+e)**2) return true;
+  for(const m of CAVEMOUTHS) if(dist2(x,y,m.x,m.y)<(110+e)**2) return true;
   for(const o of ORES) if(dist2(x,y,o.x,o.y)<(60+e)**2) return true;
   for(const l of LILIES) if(dist2(x,y,l.x,l.y)<(30+e)**2) return true;
   return false;
@@ -29,10 +31,10 @@ function placeHouses(cx,cy,n,r0,r1,rng,avoid,roofs,list){
     if(avoid.some(([ax,ay,ar])=>dist(x,y,ax,ay)<ar+Math.max(w,h)/2)) continue;
     if(SHRINES.some(s=>dist(x,y,s.x,s.y)<150)) continue;
     if(HOUSES.some(o=>Math.abs(o.x-x)<(o.w+w)/2+50&&Math.abs(o.y-y)<(o.h+h)/2+50)) continue;
-    const hs={k:'house',x,y,w,h,vert,roof:pick(roofs),burnt:list.burnt?rng()<list.burnt:false,seed:Math.floor(rng()*1e9)};
+    const hs={k:'house',x,y,w,h,vert,roof:pick(roofs),burnt:list.burnt?rng()<list.burnt:false,seed:Math.floor(rng()*1e9),town:list.town,snow:!!list.snow};
     HOUSES.push(hs); STRUCTS.push(hs); made++;
     addCol({t:'r',x0:x-w/2,y0:y-h/2,x1:x+w/2,y1:y+h/2});
-    const tx=x+(vert?(w/2+12):0), ty=y+(vert?0:h/2+12);
+    const tx=x+(vert?(w/2+12):-w*0.32), ty=y+(vert?-h*0.32:h/2+12);
     STRUCTS.push({k:'torch',x:tx,y:ty}); LIGHTS.push({x:tx,y:ty,r:170,i:0.75,fire:true,night:true});
   }
 }
@@ -64,7 +66,7 @@ function initWorld(){
   for(const [i,x,y] of [[0,V.x-80,V.y+60],[1,V.x+300,V.y+130],[2,V.x-200,V.y-300]]){ const L={id:'lan'+i,x,y,lit:false}; LANTERNS.push(L); STRUCTS.push({k:'lantern',ref:L,x,y}); addCol({t:'c',x,y,r:7}); LIGHTS.push({x,y,r:180,i:0.8,lantern:L}); }
   const forge={k:'forge',x:V.x-300,y:V.y+220,w:120,h:84,roof:'#3e3834',seed:55,vert:false}; STRUCTS.push(forge); HOUSES.push(forge); addCol({t:'r',x0:V.x-360,y0:V.y+178,x1:V.x-240,y1:V.y+262}); LIGHTS.push({x:V.x-300,y:V.y+275,r:220,i:0.85,fire:true});
   NPCSPOT.maren=[V.x-300,V.y+300]; NPCSPOT.yara=[V.x+90,V.y+40];
-  placeHouses(V.x,V.y,12,230,600,rng,[[V.x,V.y,170],[V.x-40,V.y-190,120],[V.x+30,V.y-230,110],[V.x-300,V.y+220,120],[V.x-80,V.y+60,60],[V.x+300,V.y+130,60],[V.x-200,V.y-300,60]],roofs,{burnt:0.2});
+  placeHouses(V.x,V.y,12,230,600,rng,[[V.x,V.y,170],[V.x-40,V.y-190,120],[V.x+30,V.y-230,110],[V.x-300,V.y+220,120],[V.x-80,V.y+60,60],[V.x+300,V.y+130,60],[V.x-200,V.y-300,60]],roofs,{burnt:0.2,town:'village'});
   for(let i=0;i<4;i++){ const a=Math.PI*0.55+i*0.42, x=V.x+Math.cos(a)*820, y=V.y+Math.sin(a)*820*0.75; if(segsDist(x,y,ROAD_SEGS)<160) continue; DECALS.push({k:'field',x,y,w:220+rng()*80,h:150+rng()*50,rot:rng()*0.6-0.3,crop:pick(['#9a8a3a','#6f8a35','#a8913f'])}); }
   // ---- war camp
   const C=POI.warcamp;
@@ -80,7 +82,7 @@ function initWorld(){
   DECALS.push({k:'flagstone',x:B.x-20,y:B.y+40,r:170});
   for(let i=0;i<6;i++){ const a=i/6*TAU+0.3, x=B.x-20+Math.cos(a)*120, y=B.y+40+Math.sin(a)*120; STRUCTS.push({k:'stall',x,y,a,col:pick(['#b8432e','#2e6ab8','#d9a43a','#3a8a5a'])}); addCol({t:'c',x,y,r:18}); }
   STRUCTS.push({k:'well',x:B.x-20,y:B.y+40,r:22}); addCol({t:'c',x:B.x-20,y:B.y+40,r:22});
-  placeHouses(B.x,B.y,15,260,600,rng,[[B.x+150,B.y-250,160],[B.x-20,B.y+40,210]],roofs,{});
+  placeHouses(B.x,B.y,15,260,600,rng,[[B.x+150,B.y-250,160],[B.x-20,B.y+40,210]],roofs,{town:'brindle'});
   BRIDGES.push({x:6620,y:7400,ang:0,len:360,w:56,kind:'wood'});
   NPCSPOT.town=[]; for(let i=0;i<5;i++){ const a=rng()*TAU, r=180+rng()*250; NPCSPOT.town.push([B.x+Math.cos(a)*r,B.y+Math.sin(a)*r]); }
   // ---- Ash Ward (Shrine of the Scaled Oath)
@@ -111,10 +113,19 @@ function initWorld(){
   NPCSPOT.moss=[H.x+60,H.y+90];
   // ---- Hollis Farm
   const Fa=POI.farm;
-  for(const [dx,dy,w,h,roof] of [[-120,-110,110,78,'#6e5a48'],[140,-120,140,96,'#8a2e22']]){ const hs={k:'house',x:Fa.x+dx,y:Fa.y+dy,w,h,vert:false,roof,burnt:false,seed:Math.floor(rng()*1e9),snow:true}; HOUSES.push(hs); STRUCTS.push(hs); addCol({t:'r',x0:hs.x-w/2,y0:hs.y-h/2,x1:hs.x+w/2,y1:hs.y+h/2}); }
+  for(const [dx,dy,w,h,roof] of [[-120,-110,110,78,'#6e5a48'],[140,-120,140,96,'#8a2e22']]){ const hs={k:'house',x:Fa.x+dx,y:Fa.y+dy,w,h,vert:false,roof,burnt:false,seed:Math.floor(rng()*1e9),snow:true,town:'farm'}; HOUSES.push(hs); STRUCTS.push(hs); addCol({t:'r',x0:hs.x-w/2,y0:hs.y-h/2,x1:hs.x+w/2,y1:hs.y+h/2}); }
   DECALS.push({k:'pen',x:Fa.x+60,y:Fa.y+150,w:170,h:110});
   NPCSPOT.hollis=[Fa.x-40,Fa.y+70];
   LIGHTS.push({x:Fa.x-120,y:Fa.y-60,r:160,i:0.7,fire:true,night:true});
+  // ---- Coppergulch, Frostpine Lodge, the Smoky Kettle
+  const manual=(x,y,w,h,roof,town,snow)=>{ const hs={k:'house',x,y,w,h,vert:false,roof,burnt:false,seed:Math.floor(rng()*1e9),snow:!!snow,town}; HOUSES.push(hs); STRUCTS.push(hs); addCol({t:'r',x0:x-w/2,y0:y-h/2,x1:x+w/2,y1:y+h/2}); STRUCTS.push({k:'torch',x:x-w*0.32,y:y+h/2+12}); LIGHTS.push({x:x-w*0.32,y:y+h/2+12,r:170,i:0.75,fire:true,night:true}); return hs; };
+  const Cg=POI.copper; DECALS.push({k:'dirt',x:Cg.x,y:Cg.y,r:400});
+  manual(Cg.x-40,Cg.y-120,150,90,'#5a4a3a','copper'); manual(Cg.x+200,Cg.y-30,120,80,'#6e5a48','copper'); manual(Cg.x-230,Cg.y+40,120,80,'#4a4038','copper');
+  STRUCTS.push({k:'campfire',x:Cg.x+20,y:Cg.y+60}); LIGHTS.push({x:Cg.x+20,y:Cg.y+60,r:240,i:0.9,fire:true});
+  const Lg=POI.lodge; manual(Lg.x,Lg.y-40,210,130,'#5a3a24','lodge',true); manual(Lg.x+230,Lg.y+90,100,74,'#6e5a48','lodge',true);
+  DECALS.push({k:'flagstone',x:Lg.x,y:Lg.y+80,r:120,snow:true});
+  const Wy=POI.way; manual(Wy.x-150,Wy.y-120,200,120,'#8a4a2a','way'); manual(Wy.x+180,Wy.y+120,110,76,'#6e5a48','way');
+  DECALS.push({k:'dirt',x:Wy.x-120,y:Wy.y-20,r:150});
   // ---- Obsidian Gate courtyard
   const Gt=POI.gate;
   DECALS.push({k:'paving',x:Gt.x,y:Gt.y+20,w:600,h:520});
@@ -145,6 +156,8 @@ function initWorld(){
     if(LILIES.some(l=>dist2(l.x,l.y,x,y)<350*350)) continue;
     LILIES.push({id:'li'+LILIES.length,x,y,taken:false});
   }
+  buildPlaces(); assignHomes(); registerSpeakers();
+  for(const h of HOUSES) if(h.owner&&!(CASTBY[h.owner]||{}).generic) h.burnt=false;
   // ---- chests
   const quota=[5,5,4,4,3,5,4], have=[0,0,0,0,0,0,0];
   for(let tries=0;tries<9000&&CHESTS.length<30;tries++){

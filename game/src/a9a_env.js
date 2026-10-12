@@ -27,6 +27,7 @@ function updateWeather(dt){
 }
 function updateAmbience(dt){
   if(G.mode==='menu') return;
+  if(AREA){ SFX.ambient({wind:AREA.kind==='cave'?0.05:0.005,rain:0,lava:AREA.def.theme==='ember'?0.08:0}); return; }
   const reg=G.region?G.region.key:'', cinder=player.y<2700, rk=G.rainK*(cinder?0:1);
   SFX.ambient({wind:(reg==='b3'||cinder?0.07:0.035)+rk*0.04,rain:0.12*rk,lava:cinder?0.12:0});
   G.chirpT=(G.chirpT||0)-dt;
@@ -38,6 +39,7 @@ function updateAmbience(dt){
 }
 function ambientEmit(dt){
   if(!G||!player) return;
+  if(AREA){ for(const r of G.ripples) r.t+=dt; if(G.ripples.length) G.ripples=G.ripples.filter(r=>r.t<r.max); if(AREA.kind==='cave'&&Math.random()<dt*3) emit(rand(cam.x,cam.x+W/zoom),rand(cam.y,cam.y+H/zoom),1,{col:AREA.def.theme==='ember'?'255,140,60':'200,200,220',glow:AREA.def.theme==='ember',ang:Math.PI/2,spread:0.3,smin:5,smax:20,lmin:2,lmax:4,zmin:0.6,zmax:1.4,drag:0.1}); return; }
   const vx=cam.x, vy=cam.y, vw=W/zoom, vh=H/zoom, py=player.y;
   if(py<2750&&Math.random()<dt*14) emit(rand(vx,vx+vw),rand(vy,vy+vh),1,{col:'255,140,50',ang:-Math.PI/2,spread:0.8,smin:10,smax:40,lmin:2,lmax:4,zmin:0.8,zmax:1.8,drag:0.1,rise:4});
   if(G.region&&G.region.key==='b2'&&Math.random()<dt*12) emit(rand(vx,vx+vw),rand(vy,vy+vh),1,{col:'190,185,180',glow:false,ang:0.6,spread:0.4,smin:20,smax:50,lmin:3,lmax:5,zmin:1,zmax:2.2,drag:0.05});
@@ -63,7 +65,9 @@ function newRun(mode){
     tod:0.32,rainK:0,weather:{type:'clear',t:rand(100,220)},shrines:{},lastShrine:'s_village',campsCleared:{},campState:{},chestsOpened:{},
     stage:'wake',flags:{},wards:{hollow:true},wardReady:{},wardHeat:{},wardHeatT:{},wardMsgT:0,bossDone:{},side:{},ores:{},iron:0,tier:0,lilyN:0,lanterns:{},
     fightSite:null,fightIntro:false,siteGuards:{},pip:null,goat:null,spirit:null,questKills:0,done:false,pendingBless:0,blessDelay:0,prompt:null,region:null,regionT:0,
-    inCombat:false,arena:null,autoSaveT:60,wolfT:20,critterT:3,fogT:0,herbs:{},eliteChance:mode==='story'?0.06:0};
+    inCombat:false,arena:null,autoSaveT:60,wolfT:20,critterT:3,fogT:0,herbs:{},eliteChance:mode==='story'?0.06:0,
+    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null};
+  if(AREA) exitArea(true);
   player=makePlayer();
 }
 function later(t,fn){ G.timers.push({t,fn,gen:G.gen}); }
@@ -82,6 +86,7 @@ function spawnGroup(units,cx,cy,opt){
   return n;
 }
 function updateCamps(){
+  if(AREA) return;
   for(const c of CAMPS){
     const st=G.campState[c.id]||(G.campState[c.id]={id:c.id,active:false,alive:0});
     const d=dist(player.x,player.y,c.x,c.y);
@@ -97,7 +102,7 @@ function updateCamps(){
   }
 }
 function updateWolves(dt){
-  G.wolfT-=dt; if(G.wolfT>0) return; G.wolfT=rand(25,45);
+  G.wolfT-=dt; if(G.wolfT>0||AREA) return; G.wolfT=rand(25,45);
   if(!isNight()||player.y<WALL_Y+100) return;
   const b=biomeInfo(player.x,player.y,{}).b; if(b!==1&&b!==5&&b!==0) return;
   if(inClearing(player.x,player.y,300)) return;
