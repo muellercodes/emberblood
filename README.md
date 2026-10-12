@@ -21,16 +21,17 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 - **Quest journal**: track up to three quests at once on screen, pick which one the compass follows, and read the full log of active and finished quests, people, secrets and collectibles.
 - **Three save slots**, each with its own chapter, playtime and level shown. Slots sync to the cloud when you're signed in.
 - **Music**: a synthesized score that changes with the place and the moment (each town, the wilds, night, houses, the inn, caves and puzzle rooms, combat, bosses, the final fight), with little stingers for new quests, secrets and level-ups. Nothing is downloaded; it's all generated in the browser.
-- **Looks 3D**: a toy diorama look in the style of the Link's Awakening remake, with tilt-shift blur, trees and houses that lean with the camera, sun shadows that move through the day, and soft bloom. Settings has Off, Light and Full.
+- **Looks 3D**: a toy diorama look in the style of the Link's Awakening remake. Every character (Ash, all the villagers, animals, enemies and bosses) is a little 3D toy figure that turns smoothly to face any direction, with walk cycles and a pose for every attack. Tilt-shift blur, trees and houses that lean with the camera, houses that hide whoever stands behind them, sun shadows that move through the day, and soft bloom. Settings has 3D depth (Off, Light, Full) and Characters (3D or Classic).
+- **Never miss a line**: messages stay up long enough to read and queue up instead of replacing each other, and the Log (a button on the dialogue box, the pause menu, or the Journal) keeps everything anyone said, every choice you picked and every message.
 - **Normal Mode**: endless waves in the Proving Grounds with every weapon, and a leaderboard.
 
 ## Controls
 
 | Keyboard and mouse | |
 | --- | --- |
-| WASD / arrows | Move |
+| WASD / arrows | Move (Ash faces the way he walks) |
 | Shift | Sprint |
-| Left click / J | Sword (hold for a 3-hit combo) |
+| Left click / J | Attack with the current weapon (it locks onto a foe in front of you) |
 | Right click / K | Fire breath (also lights lanterns and Wards) |
 | Space | Dodge roll |
 | C | Jump (press again in the air to fly, once you have wings) |
@@ -45,6 +46,9 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 | T | Switch which tracked quest the compass follows |
 | N | Mute or unmute |
 | Esc / P | Pause and settings |
+| L | In a conversation: open the Log |
+
+Mouse aiming (Ash faces the pointer) is an option in Settings: Aim with the mouse.
 
 | Controller (PlayStation, Xbox or Nintendo) | |
 | --- | --- |
