@@ -369,9 +369,11 @@ function breathWorld(mx,my,ang,dt){
     if(G.choices.fennick==='forgive') {}
     return;
   }
+  caveBreath(hit,dt);
   for(const o of AREA.objs){
     if((o.k==='fireplace'||o.k==='brazier')&&!o.lit&&hit(o.x,o.y)){ o.lit=true; SFX.play('pickup'); emit(o.x,o.y,14,{kind:'fire',ang:-Math.PI/2,spread:0.6,smin:20,smax:80,lmin:.4,lmax:.8,zmin:3,zmax:6,grow:5});
-      if(o.k==='brazier'){ const br=AREA.objs.filter(q=>q.k==='brazier'); if(br.every(q=>q.lit)){ G.found[AREA.def.id+'_solved']=true; for(const c of AREA.objs) if(c.k==='cchest') c.sealed=false; setBanner('The seal breaks','The treasure chest is open.',2.2); SFX.play('shrine'); } else setBanner(`${br.filter(q=>q.lit).length} of ${br.length} braziers lit`,'',1.2); }
+      if(o.k==='brazier'&&o.room){ const br=AREA.objs.filter(q=>q.k==='brazier'&&q.room===o.room); if(!br.every(q=>q.lit)) setBanner(`${br.filter(q=>q.lit).length} of ${br.length} braziers lit`,o.timed?'Quick, before they burn out!':'',1.2); }
+      else if(o.k==='brazier'){ const br=AREA.objs.filter(q=>q.k==='brazier'); if(br.every(q=>q.lit)){ G.found[AREA.def.id+'_solved']=true; for(const c of AREA.objs) if(c.k==='cchest') c.sealed=false; setBanner('The seal breaks','The treasure chest is open.',2.2); SFX.play('shrine'); } else setBanner(`${br.filter(q=>q.lit).length} of ${br.length} braziers lit`,'',1.2); }
       if(o.k==='fireplace'&&once2(o.id)) { addCoins(3,o.x,o.y+20); setBanner('Something glints in the ashes','',1.4); } }
     if(o.k==='oven'&&hit(o.x,o.y,30)){ if(stepOf('bun')&&stepOf('bun').flag==='oven_lit'){ o.heat=(o.heat||0)+dt; if(o.heat>1.4){ G.flags.oven_lit=true; o.lit=true; questPoke(); } } else if(!o.warned){ o.warned=true; ftext(o.x,o.y-30,'Bertram looks VERY nervous','#ffd9a0',13); } }
   }
@@ -380,6 +382,7 @@ function once2(k){ if(G.found[k]) return false; G.found[k]=true; return true; }
 // ---------- breakables
 function activeBreakables(){ if(AREA) return AREA.objs.filter(o=>o.breakable&&!o.broken); return LANDMARKS.filter(o=>o.breakable&&(!o.broken||G.worldTime-o.brokenT>300)&&dist2(o.x,o.y,player.x,player.y)<200*200); }
 function swingBreakables(px,py,dir,range,half){
+  if(AREA&&AREA.rooms) caveSwing(px,py,dir,range,half);
   for(const o of activeBreakables()){
     if(o.broken&&G.worldTime-o.brokenT>300) o.broken=false;
     if(o.broken||!inArcC(px,py,dir,range,half,{x:o.x,y:o.y,r:14})) continue;
@@ -443,6 +446,8 @@ function areaObjAct(o){
       G.found[o.id]=true; giveItems({[o.item]:1}); SFX.play('shrine'); saveGame(); return;
     case 'page': findPage(o.page); return;
     case 'cave_ore': if(G.found[o.id]) return; G.found[o.id]=true; G.iron++; SFX.play('chest'); setBanner('Star-iron','A big vein of it. Take it to Mom.',2.2); saveGame(); return;
+    case 'stairs': case 'trig': case 'hchest': case 'nest': case 'recipebook': case 'musicbox': case 'ghost': case 'moosehead': case 'telescope2': case 'mousehole': case 'crate': case 'cobweb': case 'banner': case 'candles': floorObjAct(o); return;
+    case 'cgate': case 'lever': case 'mural': case 'resetstone': case 'csign': case 'plate': case 'block': case 'crystal': caveObjAct(o); return;
     case 'relic': if(G.found[o.id]) return; G.found[o.id]=true; runDialogue([['narr',`On a stone shelf, wrapped in cloth that hasn't rotted in a thousand years: a cloak stitched with five small flames. The Warden's Mantle.`],['narr',`You put it on. It's warm, and it fits, like it was waiting for you. (You take 15% less damage.)`]],()=>{ scene='play'; G.items.relic=1; player.stats.armor=(player.stats.armor||1)*0.85; saveGame(); }); return;
   }
 }
@@ -453,12 +458,12 @@ function updateInteractions(dt){
   const offer=(d,text,act,x,y,always)=>{ if(d<bd){ bd=d; best={text,act,x,y,always}; } };
   if(AREA){
     for(const o of AREA.objs){
-      const lab=o.k==='qitem'?(G.items[o.item]||G.found[o.id]?null:`Look at ${o.label}`):o.k==='bed'&&o.home?'Sleep in your bed (heal and save)':o.egg&&o.k!=='drawer'?o.egg.label:FURN_LABEL[o.k];
+      const lab=o.prompt?o.prompt():FLOOR_LABEL[o.k]?FLOOR_LABEL[o.k](o):CAVE_LABEL[o.k]!==undefined?CAVE_LABEL[o.k]:o.k==='qitem'?(G.items[o.item]||G.found[o.id]?null:`Look at ${o.label}`):o.k==='bed'&&o.home?'Sleep in your bed (heal and save)':o.egg&&o.k!=='drawer'?o.egg.label:FURN_LABEL[o.k];
       if(!lab||o.broken) continue; if(o.k==='page'&&G.pages[o.page]) continue; if((o.k==='cave_ore'||o.k==='relic')&&G.found[o.id]) continue;
       const reach=(o.w?Math.max(o.w,o.h||0)/2:o.r||16)+34; const d=dist(p.x,p.y,o.x,o.y); if(d<reach) offer(d-reach,lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
     }
     for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
-    const e=AREA.exit; if(dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
+    const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
   }else{
     for(const s of SHRINES){
       const d=dist(p.x,p.y,s.x,s.y);

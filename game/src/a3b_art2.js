@@ -245,11 +245,13 @@ function r2Frame(g,R){
   side(x0-28,28,false); side(x0+W,28,true);
   if(log){ for(let y=y0-38;y<y0+28;y+=11) for(const ex of [x0-6,x0+W+6]){ r2o(g,ex,y+5.5,6,'#8a6440'); g.strokeStyle='rgba(60,35,15,.6)'; g.lineWidth=0.6; g.beginPath(); g.arc(ex,y+5.5,3.5,0,TAU); g.stroke(); g.beginPath(); g.arc(ex,y+5.5,1.5,0,TAU); g.stroke(); } }
   // front wall with the doorway
-  const fy=y0+H, dx0=x0+W/2-35, dx1=x0+W/2+35;
+  const fy=y0+H, shut=!!(R.A&&R.A.def&&R.A.def.noExit), dx0=shut?x0+W/2:x0+W/2-35, dx1=shut?x0+W/2:x0+W/2+35;
   for(const [a,b] of [[x0-28,dx0],[dx1,x0+W+28]]){ g.fillStyle=cap; g.fillRect(a,fy,b-a,28); if(stone){ for(let yy=fy;yy<fy+28;yy+=9) for(let xx=a+((yy-fy)/9%2?6:0);xx<b;xx+=18){ g.fillStyle='rgba(0,0,0,.22)'; g.fillRect(xx,yy,1,9); g.fillRect(a,yy,b-a,1); } } else { g.strokeStyle='rgba(255,230,190,.05)'; g.lineWidth=1; for(let yy=fy+5;yy<fy+26;yy+=6){ g.beginPath(); g.moveTo(a,yy); g.lineTo(b,yy); g.stroke(); } } g.fillStyle='rgba(255,230,190,.12)'; g.fillRect(a,fy,b-a,2); g.fillStyle='rgba(0,0,0,.35)'; g.fillRect(a,fy+24,b-a,4); }
   // threshold and door posts
+  if(!shut){
   r2rr(g,dx0,fy+2,70,24,0,R.wl.k==='stone'||R.fl==='flags'?'#6a6460':'#5a3e26'); g.fillStyle='rgba(255,240,210,.12)'; g.fillRect(dx0,fy+2,70,1.5); g.fillStyle='rgba(0,0,0,.3)'; for(let x=dx0+12;x<dx1;x+=14) g.fillRect(x,fy+2,1,24);
   for(const px of [dx0-6,dx1]){ r2wood(g,px,fy-2,6,30,R.wl.k==='stone'?'#4a4448':'#6a4428',r,30,1); }
+  }
   // the top crown over the side walls
   g.fillStyle=r2c(cap,-0.2); g.fillRect(x0-28,y0-50,W+56,4);
 }
@@ -330,7 +332,7 @@ function r2Base(A){
   r2Floor(g,R); r2Wall(g,R); r2Decor(g,R);
   const post=[], bake=(o)=>{ g.save(); try{ FB[o.k](g,o,R); }catch(err){ console.warn('furn',o.k,err); } g.restore(); };
   for(const o of A.objs){ if(!r2Bakes(o)) continue; if(o.k==='heights'){ post.push(o); continue; } bake(o); }
-  r2Clutter(g,R,A); r2Frame(g,R); r2Mat(g,R); r2DecorPost(g,R); for(const o of post) bake(o);
+  r2Clutter(g,R,A); r2Frame(g,R); if(!A.def.noExit) r2Mat(g,R); r2DecorPost(g,R); for(const o of post) bake(o);
   R.baking=false;
   e={key,cv,bx,by,bw,bh,flames:R.flames,glows:R.glows}; R2.base.unshift(e); if(R2.base.length>2) R2.base.length=2;
   A._base=e; return e;
@@ -397,7 +399,7 @@ function drawAreaBase(){
     if(sky.d>0.02){ ctx.globalAlpha=pa*0.45*sky.d*(1-sky.w*0.6); ctx.drawImage(lp.day,lx,ly,150*sc,200); if(sky.w>0.05){ ctx.globalAlpha=pa*0.5*sky.w; ctx.drawImage(lp.dusk,lx,ly,150*sc,200); } }
     else { ctx.globalAlpha=pa*0.28; ctx.drawImage(lp.moon,lx,ly,150*sc,200); } }
   ctx.globalAlpha=pa; ctx.globalCompositeOperation=pc;
-  const dl=sky.d, doorC=dl>0.2?'255,226,170':'140,160,230'; glowAt(A.rx+A.rw/2,A.ry+A.rh+10,58,doorC,0.10+0.16*dl);
+  const dl=sky.d, doorC=dl>0.2?'255,226,170':'140,160,230'; if(!A.def.noExit) glowAt(A.rx+A.rw/2,A.ry+A.rh+10,58,doorC,0.10+0.16*dl);
   // candles and lamps recorded in the cached room
   const night=dl<0.6;
   for(const L of A._r2L) L.i=night?0.5:0;

@@ -37,7 +37,7 @@ function removeCol(c){
 function areaBlocked(x,y){
   const A=AREA; if(!A) return true;
   if(x<A.x0||y<A.y0||x>A.x1||y>A.y1) return true;
-  if(A.kind==='cave'){ const c=A.cave, i=Math.floor((x-A.x0)/c.cell), j=Math.floor((y-A.y0)/c.cell); if(i<0||j<0||i>=c.w||j>=c.h) return true; return c.grid[j*c.w+i]===1; }
+  if(A.kind==='cave'){ const c=A.cave, i=Math.floor((x-A.x0)/c.cell), j=Math.floor((y-A.y0)/c.cell); if(i<0||j<0||i>=c.w||j>=c.h) return true; const k=j*c.w+i; return c.grid[k]===1||(!!c.dyn&&caveBlockedAt(k)); }
   return false;
 }
 // ---------- houses
@@ -77,6 +77,7 @@ function houseLayout(def){
   if(def.egg!=null){ const e=EGGS[def.egg%EGGS.length]; put(e.k,W*0.18+rng()*W*0.2,H*0.82,{egg:e}); }
   if(def.note) put('note',W*0.8,H*0.82,{text:def.note});
   if(def.painting!=null) put('painting',W*0.5+(rng()-0.5)*80,wallY*0.45,{caption:PAINTINGS[def.painting%PAINTINGS.length]});
+  floorExtras(def,items,put,W,H,rng,wallY);
   return {W,H,items};
 }
 function buildHouse(A,def){
@@ -86,9 +87,11 @@ function buildHouse(A,def){
   addAreaCol({t:'r',x0:x0-wt,y0:y0-wt,x1:x0+W+wt,y1:y0+34});
   addAreaCol({t:'r',x0:x0-wt,y0:y0-wt,x1:x0,y1:y0+H+wt});
   addAreaCol({t:'r',x0:x0+W,y0:y0-wt,x1:x0+W+wt,y1:y0+H+wt});
+  if(def.noExit){ addAreaCol({t:'r',x0:x0-wt,y0:y0+H,x1:x0+W+wt,y1:y0+H+wt}); A.exit={x:dx,y:y0+H-56,r:0,none:true}; A.spawn={x:dx,y:y0+H-110}; }
+  else{
   addAreaCol({t:'r',x0:x0-wt,y0:y0+H,x1:dx-dw/2,y1:y0+H+wt});
   addAreaCol({t:'r',x0:dx+dw/2,y0:y0+H,x1:x0+W+wt,y1:y0+H+wt});
-  A.exit={x:dx,y:y0+H+30,r:40}; A.spawn={x:dx,y:y0+H-34};
+  A.exit={x:dx,y:y0+H+30,r:40}; A.spawn={x:dx,y:y0+H-34}; }
   for(const it of L.items){
     const o=Object.assign({},it,{x:x0+it.x,y:y0+it.y,id:def.id+'_'+it.k+'_'+Math.round(it.x)+'_'+Math.round(it.y)});
     furnCollider(o); A.objs.push(o);
@@ -104,6 +107,8 @@ function furnCollider(o){
     case 'shelf': o.col=R(o.w||110,o.free?30:24); o.h=o.free?30:24; break;
     case 'fireplace': o.col=R(80,30); break; case 'oven': o.col=R(100,50); break;
     case 'bunk': o.col=R(62,100); break; case 'cell': o.col=null; o.bars=[R(o.w,10)]; break;
+    case 'stairs': if(!(o.hidden&&!G.found[o.hidden])) o.col=R(o.w,o.h); break;
+    case 'hchest': case 'crate': case 'musicbox': case 'telescope2': o.r=o.r||18; o.col=addAreaCol({t:'c',x:o.x,y:o.y,r:o.r}); break;
     case 'barrel': case 'pot': case 'chair': case 'sack': case 'cauldron': case 'telescope': case 'hatstand': case 'planter': case 'trophy': case 'rocker': case 'cart': case 'hay': case 'perch': case 'gchest': case 'toybox': case 'rack': case 'abacus':
       o.r=o.k==='chair'?11:o.k==='cauldron'?(o.small?16:24):o.k==='cart'||o.k==='hay'?26:o.k==='gchest'||o.k==='toybox'?20:16; o.col=addAreaCol({t:'c',x:o.x,y:o.y,r:o.r}); break;
   }
@@ -197,7 +202,7 @@ function enterArea(id,door){
   G.projectiles=[]; G.hazards=[]; G.pools=[]; G.rings=[]; G.pickups=[]; G.critters=[];
   AREA={def,id,kind:def.kind,name:def.name,cols:[],objs:[],lights:[],npcs:[],dark:def.dark,level:def.level||1};
   G.area=id;
-  if(def.kind==='house') buildHouse(AREA,def); else buildCave(AREA,def);
+  if(def.kind==='house') buildHouse(AREA,def); else if(CAVEMAP[def.id]) buildCaveRooms(AREA,def); else buildCave(AREA,def);
   areaNPCs();
   player.x=AREA.spawn.x; player.y=AREA.spawn.y; player.kvx=player.kvy=0; player.facing=-Math.PI/2;
   if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; }
@@ -230,7 +235,8 @@ function areaNPCs(){
 // ---------- per-frame
 function updateArea(dt){
   const A=AREA, p=player;
-  if(dist(p.x,p.y,A.exit.x,A.exit.y)<A.exit.r&&p.y>A.exit.y-20&&scene==='play'){ exitArea(); return; }
+  if(!A.exit.none&&dist(p.x,p.y,A.exit.x,A.exit.y)<A.exit.r&&p.y>A.exit.y-20&&scene==='play'){ exitArea(); return; }
+  if(A.rooms) updateCaveRooms(dt);
   if(A.camp&&A.camp.alive<=0&&!A.camp.done){ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime; setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; }
   for(const L of A.lights){ if(L.obj) L.i=L.obj.lit?0.9:0; if(L.win) L.i=0.35*daylight(); }
   for(const n of A.npcs){ n.t+=dt; n.face=turnTo(n.face,angTo(n.x,n.y,p.x,p.y),dist(n.x,n.y,p.x,p.y)<240?3*dt:0); }

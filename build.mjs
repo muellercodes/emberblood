@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
-const ORDER = ['a1_core','a1b_data','a1c_state','a1d_story','a1e_people','a1f_qdata','a1g_talk','a2_world','a2b_cols','a2c_build','a2d_places','a2e_interiors','a3_art','a3b_art2','a4_ground','a5_input','a6_player',
+const ORDER = ['a1_core','a1b_data','a1c_state','a1d_story','a1e_people','a1f_qdata','a1g_talk','a2_world','a2b_cols','a2c_build','a2d_places','a2e_interiors','a2f_caves','a2g_floors','a3_art','a3b_art2','a3c_art3','a4_ground','a5_input','a6_player',
   'a7a_enemies','a7b_ai','a8_systems','a9a_env','a9b_flow','a9c_story','a9d_quests','a9e_meta','a9f_talk','a10a_fx','a10b_chars','a11_render','a11b_hud','a12a_dlg','a13_cloud','a14_music','a12b_ui'];
 const cfg = JSON.parse(readFileSync('game/config.json', 'utf8'));
 const api = process.env.API_BASE || cfg.apiBase || '';

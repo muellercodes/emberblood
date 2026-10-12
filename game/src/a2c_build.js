@@ -156,7 +156,7 @@ function initWorld(){
     if(LILIES.some(l=>dist2(l.x,l.y,x,y)<350*350)) continue;
     LILIES.push({id:'li'+LILIES.length,x,y,taken:false});
   }
-  buildPlaces(); assignHomes(); registerSpeakers();
+  buildPlaces(); assignHomes(); defineFloors(); registerSpeakers();
   for(const h of HOUSES) if(h.owner&&!(CASTBY[h.owner]||{}).generic) h.burnt=false;
   // ---- chests
   const quota=[5,5,4,4,3,5,4], have=[0,0,0,0,0,0,0];

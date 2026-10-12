@@ -44,7 +44,7 @@ function nearestEnemy(x,y,maxD){
 function updatePlayer(dt,inp){
   const p=player, st=p.stats;
   p.t+=dt; p.dashCd-=dt; p.iframes-=dt; p.hurtFlash-=dt; p.atkCd-=dt; p.comboTimer-=dt; G.dashBuf-=dt; G.roarBuf-=dt;
-  const moving=Math.abs(inp.mx)+Math.abs(inp.my)>0.05;
+  const moving=Math.abs(inp.mx)+Math.abs(inp.my)>0.05; p.inMx=inp.mx; p.inMy=inp.my;
   let aim=p.facing;
   if(usingTouch){ const tg=nearestEnemy(p.x,p.y,320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); else if(moving) aim=Math.atan2(inp.my,inp.mx); }
   else if(aimMode==='mouse'){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
@@ -72,6 +72,8 @@ function updatePlayer(dt,inp){
     let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1);
     if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55; p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); }
     vx=inp.mx*spd; vy=inp.my*spd;
+    // cave ice: Ash slides
+    if(AREA&&AREA.cave&&AREA.cave.typ){ const c=AREA.cave, i=Math.floor((p.x-AREA.x0)/c.cell), j=Math.floor((p.y-AREA.y0)/c.cell); if(c.typ[j*c.w+i]===2){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else { p.ivx=vx; p.ivy=vy; } }
   }
   for(const g of p.ghosts) g.a-=dt*3; if(p.ghosts.length) p.ghosts=p.ghosts.filter(g=>g.a>0);
   const kd=Math.exp(-dt*9); p.kvx*=kd; p.kvy*=kd;
@@ -169,6 +171,7 @@ function doRoar(free){
   const p=player; if(!free) p.roar=0;
   SFX.play('roar'); shake(14); flashA=0.25; flashCol='255,170,80'; p.iframes=Math.max(p.iframes,0.5);
   G.rings.push({x:p.x,y:p.y,rad:16,max:270,speed:950,thick:34,owner:'player',hit:new Set(),dmg:p.stats.roarDmg*p.stats.dmgMul});
+  if(AREA&&AREA.rooms) caveRoar(p.x,p.y,270);
   for(const pr of G.projectiles) if(pr.owner==='enemy'&&dist(p.x,p.y,pr.x,pr.y)<300){ pr.dead=true; emit(pr.x,pr.y,5,{col:'255,200,120',smin:40,smax:120,lmin:.2,lmax:.4}); }
   emit(p.x,p.y,40,{col:'255,190,100',smin:200,smax:520,lmin:.3,lmax:.6,zmin:2,zmax:5});
 }

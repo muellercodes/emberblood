@@ -47,6 +47,7 @@ function questObjective(){
     const o=questObjectiveWorld(); if(!o) return o;
     const here=AREA.npcs.find(n=>n.id===o.npc);
     if(o.area===AREA.id&&here) return Object.assign({},o,{x:here.x,y:here.y});
+    if(AREA.kind==='cave'&&AREA.rooms&&!(o.area===AREA.id)) return {title:AREA.name,text:`Explore ${AREA.name}. ${caveProgressText()}. The way out is the south door of the first room.`,x:AREA.exit.x,y:AREA.exit.y};
     if(AREA.camp&&AREA.camp.alive>0&&AREA.kind==='cave') return {title:AREA.name,text:`Explore ${AREA.name}. ${AREA.camp.alive} ${AREA.camp.alive===1?'enemy':'enemies'} left. The way out is at the bottom.`,x:AREA.exit.x,y:AREA.exit.y};
     return Object.assign({},o,{text:o.text+(o.x!=null&&o.x<IZX?' (leave here first)':''),x:AREA.exit.x,y:AREA.exit.y});
   }
