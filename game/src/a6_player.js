@@ -24,7 +24,7 @@ function gainXp(n){
   while(p.xp>=xpNeed(p.level)){
     p.xp-=xpNeed(p.level); p.level++; p.maxHp+=6; p.stats.dmgMul*=1.04; p.maxStamina+=3; p.hp=p.maxHp;
     const bless=p.level%2===1; if(bless) G.pendingBless++;
-    SFX.play('level'); setBanner(`Level ${p.level}`,bless?'Health and strength increased. A blessing awaits.':'Health, strength and stamina increased.',2.4);
+    jingle('levelup','level'); setBanner(`Level ${p.level}`,bless?'Health and strength increased. A blessing awaits.':'Health, strength and stamina increased.',2.4);
     emit(p.x,p.y,40,{col:'255,210,120',ang:-Math.PI/2,spread:1.4,smin:40,smax:200,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
   }
 }

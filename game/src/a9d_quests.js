@@ -248,7 +248,7 @@ function talkShellby(){
 // ---------- the Wardens' pages
 function findPage(id){
   if(G.pages[id]) return;
-  G.pages[id]=true; SFX.play('shrine'); const P=PAGES[id];
+  G.pages[id]=true; jingle('item','shrine'); const P=PAGES[id];
   const lines=[['narr',`You found a lost page of the Wardens' Account.`],['narr',`${P.title}`]].concat(P.text.map(t=>['narr',t]));
   runDialogue(lines,()=>{ scene='play'; setBanner(`${Object.keys(G.pages).length} of 10 pages found`,G.quests.pages?'Bring them to Sister Wren in Brindlecross.':'Sister Wren in Brindlecross would love to see this.',2.6); saveGame(); });
 }

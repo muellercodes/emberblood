@@ -7,6 +7,7 @@ function show(id){
 function hideAll(){ show(null); if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); }
 let cardTimer=null;
 function showCard(num,name){
+  try{ jingle('chapter',null); }catch(e){}
   const c=$('#card'); $('#cardNum').textContent=num; $('#cardName').textContent=name;
   c.classList.remove('on'); void c.offsetWidth; c.classList.add('on');
   clearTimeout(cardTimer); cardTimer=setTimeout(()=>c.classList.remove('on'),2850);

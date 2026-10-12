@@ -2,7 +2,14 @@
 // ================= input
 const keys=new Set(), pressed=new Set();
 const mouse={x:0,y:0,l:false,r:false};
-const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0};
+const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0,fireT:0};
+// auto-attack: swing when an enemy (or a pot, in a cave) is within reach
+function autoSwing(){
+  if(scene!=='play'||!player||!autoAttackOn()||(G.mode==='story'&&!G.flags.forge)) return false;
+  const p=player, reach=(p.stats.range||60)+22;
+  for(const e of G.enemies){ if(e.dead||e.alpha<0.4) continue; const d=dist(p.x,p.y,e.x,e.y)-e.r; if(d<reach&&(e.aggro||e.boss||d<reach*0.7)) return true; }
+  return false;
+}
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); });
 addEventListener('blur',()=>{ keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
@@ -16,17 +23,33 @@ cvs.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
+// touch layout: a thumb arc around a big slash button, mirrored for lefties; one-hand mode stacks everything on one side
 function tLayout(){
-  const s=clamp(Math.min(W,H)/430,0.78,1.15), R=W-SAFE.r, B=H-SAFE.b;
-  const L=[
-    {id:'attack',x:R-82*s,y:B-96*s,r:48*s,label:'SLASH'},
-    {id:'fire',x:R-192*s,y:B-62*s,r:35*s,label:'FIRE'},
-    {id:'roll',x:R-74*s,y:B-208*s,r:33*s,label:'ROLL'},
-    {id:'roar',x:R-178*s,y:B-170*s,r:30*s,label:'ROAR'},
-    {id:'drink',x:R-266*s,y:B-140*s,r:25*s,label:'DRINK'}
-  ];
-  if(G&&G.prompt) L.push({id:'use',x:R-150*s,y:B-268*s,r:30*s,label:'USE'});
+  const mode=settings.touch||'two', s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1), B=H-SAFE.b, L=[];
+  const right=mode!=='left', sx=v=>right?W-SAFE.r-v:SAFE.l+v;
+  const prompt=!!(G&&G.prompt);
+  if(mode==='two'){
+    const ax=sx(82*s), ay=B-90*s, R1=120*s;
+    const at=(deg,rad,id,r,label)=>{ const a=deg*Math.PI/180; L.push({id,x:ax+Math.cos(a)*rad*(right?1:-1),y:ay+Math.sin(a)*rad,r,label}); };
+    L.push({id:'attack',x:ax,y:ay,r:50*s,label:'SLASH'});
+    at(181,R1,'fire',37*s,'FIRE'); at(217,R1,'roll',33*s,'ROLL'); at(252,R1,'roar',30*s,'ROAR'); at(286,R1-6*s,'drink',27*s,'DRINK');
+    if(prompt) at(226,R1+104*s,'use',37*s,'USE');
+  }else{
+    // one hand: a column hugging the edge, the stick floats anywhere in the lower half
+    const x=sx(48*s); let y=B-70*s;
+    L.push({id:'attack',x,y,r:38*s,label:'SLASH'}); y-=86*s;
+    L.push({id:'roll',x,y,r:32*s,label:'ROLL'}); y-=76*s;
+    L.push({id:'fire',x,y,r:32*s,label:'FIRE'}); y-=74*s;
+    L.push({id:'drink',x,y,r:27*s,label:'DRINK'}); y-=66*s;
+    L.push({id:'roar',x,y,r:27*s,label:'ROAR'});
+    if(prompt) L.push({id:'use',x:sx(140*s),y:B-196*s,r:36*s,label:'USE'});
+  }
   return L;
+}
+function stickZone(x,y){
+  const mode=settings.touch||'two';
+  if(mode==='two') return x<W*0.58;
+  return y>H*0.42;
 }
 const PAUSE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+14,w:40,h:40});
 const MUTE_R=()=>({x:W-SAFE.r-54,y:SAFE.t+60,w:40,h:40});
@@ -47,9 +70,9 @@ cvs.addEventListener('touchstart',e=>{
   for(const t of e.changedTouches){
     const x=t.clientX,y=t.clientY;
     if(hudClick(x,y)) continue;
-    let hit=null; for(const b of tLayout()) if(dist(x,y,b.x,b.y)<b.r+12){hit=b;break;}
-    if(hit){ touch.btn[t.identifier]=hit.id; touch.held[hit.id]=true; touch.pressed[hit.id]=true; }
-    else if(touch.stickId===null&&x<W*0.6){ touch.stickId=t.identifier; touch.ox=touch.sx=x; touch.oy=touch.sy=y; touch.full=0; }
+    let hit=null, hd=1e9; for(const b of tLayout()){ const d=dist(x,y,b.x,b.y)-b.r; if(d<14&&d<hd){ hd=d; hit=b; } }
+    if(hit){ touch.btn[t.identifier]=hit.id; touch.held[hit.id]=true; touch.pressed[hit.id]=true; if(hit.id==='fire'&&settings.touch!=='two') touch.fireT=1.1; }
+    else if(touch.stickId===null&&stickZone(x,y)){ touch.stickId=t.identifier; touch.ox=touch.sx=x; touch.oy=touch.sy=y; touch.full=0; }
   }
 },{passive:false});
 cvs.addEventListener('touchmove',e=>{
@@ -82,9 +105,10 @@ function readInput(dt){
     if(m>=62){ touch.full+=dt; stickFull=touch.full>0.35; } else touch.full=0;
   }
   const l=Math.hypot(mx,my); if(l>1){mx/=l;my/=l;}
+  if(touch.fireT>0) touch.fireT-=dt;
   return {mx,my,
-    attack:keys.has('KeyJ')||mouse.l||!!touch.held.attack,
-    fire:keys.has('KeyK')||mouse.r||!!touch.held.fire,
+    attack:keys.has('KeyJ')||mouse.l||!!touch.held.attack||autoSwing(),
+    fire:keys.has('KeyK')||mouse.r||!!touch.held.fire||(touch.fireT>0),
     roll:pressed.has('Space')||!!touch.pressed.roll,
     roar:pressed.has('KeyQ')||pressed.has('KeyL')||!!touch.pressed.roar,
     drink:pressed.has('KeyR')||!!touch.pressed.drink,

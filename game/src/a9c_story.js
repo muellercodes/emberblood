@@ -112,7 +112,7 @@ function startBossFight(k){
   const done3=['crag','mire','frost'].filter(q=>G.bossDone[SITES[q].boss]).length;
   spawnRune(boss,s.x,s.y,{homeX:P.x,homeY:P.y,hpScale:site.stage==='three'?1+0.12*done3:1,level:1},1.5);
   const g=G.siteGuards[k]; if(g) for(const e of G.enemies) if(e.camp===g) e.aggro=true;
-  const d=EDEF[boss]; setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss');
+  const d=EDEF[boss]; setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); jingle('boss_intro',null);
 }
 function resetBoss(){
   if(G.boss&&!G.boss.dead) G.boss.dead=true;
