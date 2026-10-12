@@ -823,7 +823,7 @@ function drawSpirit(sp){
 function drawMarkers(t){
   if(G.mode!=='story') return;
   const list=AREA?AREA.npcs:G.npcs;
-  for(const n of list){ if(!inView(n.x,n.y,40)) continue; const m=npcMarker(n.id); if(m) drawMarker(n.x,n.y-30,m,t); }
+  for(const n of list){ if(!inView(n.x,n.y,40)) continue; const m=npcMarker(n.id); if(m) drawMarker(n.x,T3.on&&n._t3top!=null?Math.min(n.y-30,n._t3top-15):n.y-30,m,t); }
   if(!AREA){
     for(const d of DOORS){ if(!inView(d.x,d.y,60)) continue; const def=AREADEFS[d.area]; const c=CAST.find(q=>q.inside===d.area); if(c){ const m=npcMarker(c.id); if(m){ drawMarker(d.x,d.y-34,m,t); continue; } } if(d.cave){ const qs=questTargets().some(q=>q.x===CAVEMOUTHS.find(m=>m.area===d.area).x); if(qs) drawMarker(d.x,d.y-70,'?',t); } }
     if(G.goat&&G.side.duchess==='lost'&&inView(G.goat.x,G.goat.y,40)&&G.quests.duchess) drawMarker(G.goat.x,G.goat.y-26,'?',t);

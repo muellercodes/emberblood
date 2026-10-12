@@ -52,7 +52,8 @@ function drawBubbles(){
   ctx.save(); ctx.textBaseline='middle'; ctx.textAlign='left'; ctx.lineJoin='round';
   const maxW=W<560?138:176, placed=[];
   const list=[];
-  for(const b of BUB){ const sx=(b.ax-cam.x)*zoom, sy=(b.ay+b.dy-cam.y)*zoom; if(sx>-140&&sx<W+140&&sy>-60&&sy<H+80) list.push({b,sx,sy}); }
+  for(const b of BUB){ const a3=b.a, up=T3.on&&a3&&a3._t3pp&&a3._t3top!=null&&b.kind!=='far'?Math.min(0,a3._t3top-a3.y+(b.dy<=-40?15:31)):0; // 3D heads are taller
+    const sx=(b.ax-cam.x)*zoom, sy=(b.ay+b.dy+up-cam.y)*zoom; if(sx>-140&&sx<W+140&&sy>-60&&sy<H+80) list.push({b,sx,sy}); }
   list.sort((p,q)=>q.sy-p.sy);
   for(const q of list){
     const b=q.b, narr=b.kind==='narr', far=b.kind==='far', bang=b.kind==='bang', pipk=b.kind==='pip';
