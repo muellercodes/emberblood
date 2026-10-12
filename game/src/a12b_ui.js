@@ -93,8 +93,9 @@ function renderJour(){
   }else if(jTab==='secrets'){
     const S=secretTally();
     rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
-  }
+  }else if(jTab==='hero') rows.push(heroTabHtml());
   el.innerHTML=rows.join('');
+  if(jTab==='hero') heroTabWire(el);
   for(const b of el.querySelectorAll('button[data-f]')) b.addEventListener('click',()=>{ followQuest(b.dataset.f||null); SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
 }
