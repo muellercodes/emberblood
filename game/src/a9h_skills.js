@@ -137,7 +137,7 @@ function drawSkillHud(){
   // the level-up banner (set right after onLevelUp) learns about the new point
   const lv=SK.lv;
   if(lv&&lv.pend){ lv.pend=false; const bn=G.banner;
-    if(bn&&bn.text===`Level ${lv.level}`){ const n=lv.n; bn.sub=`Health and strength up. +${n} skill point${n>1?'s':''}${G.pendingBless>0?', and a blessing awaits':''}! ${skCtrlHint()}`; bn.dur=Math.max(bn.dur,3.4); } }
+    if(bn&&bn.text===`Level ${lv.level}`){ const n=lv.n; bn.sub=`Health and strength up. +${n} skill point${n>1?'s':''}${G.pendingBless>0?', and a blessing awaits':''}!${tipsOn()?' '+skCtrlHint():''}`; bn.dur=Math.max(bn.dur,3.4); } }
   const sp=G.sp|0, t=G.time;
   if(sp>0&&!G.flags.sk_hint&&scene==='play'){ G.flags.sk_hint=1; SK.hintEnd=t+10; }
   // star burst over Ash
@@ -172,13 +172,14 @@ function drawSkillHud(){
   ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillStyle='#fff1c4'; ctx.fillText(String(sp),cx+17,cy+8.5);
   if(key){ const kx=cx+19+nw; ctx.fillStyle='rgba(255,230,180,.16)'; rr(kx,cy+3,10,10,2.5); ctx.fill(); ctx.font=`800 7.5px ${UIF}`; ctx.fillStyle='#f4dfb8'; ctx.textAlign='center'; ctx.fillText('U',kx+5,cy+8.5); }
   // the first time: say where to spend it
-  const left=SK.hintEnd-t;
+  // (Settings > Tips: Off hides it, and its X closes it for good)
+  const left=tipOn('skills')?SK.hintEnd-t:0;
   if(left>0){
     const a=clamp(Math.min((10-left)/0.3,left/0.6),0,1), ring=(t*1.4)%1;
     ctx.globalAlpha=a*(1-ring); ctx.strokeStyle='#ffe08a'; ctx.lineWidth=2; rr(cx-3-ring*8,cy-3-ring*8,cw+6+ring*16,ch+6+ring*16,10+ring*8); ctx.stroke(); ctx.globalAlpha=a;
     const title=sp>1?`You have ${sp} skill points!`:'You earned a skill point!', body=skCtrlHint();
     ctx.font=`800 12px ${UIF}`; const w1=ctx.measureText(title).width; ctx.font=`500 12px ${UIF}`; const w2=ctx.measureText(body).width;
-    const bw=Math.min(Math.max(w1,w2)+26,W-L-SAFE.r-12), bh=46, hx0=Math.max(L+pw+12,HUD_RX+4), room=MINI_R().x-hx0-8;
+    const bw=Math.min(Math.max(w1,w2)+48,W-L-SAFE.r-12), bh=46, hx0=Math.max(L+pw+12,HUD_RX+4), room=MINI_R().x-hx0-8;
     let bx,by,side;
     if(room>=bw+10){ bx=hx0; by=Math.max(SAFE.t+4,cy+ch/2-bh/2); side='l'; } else { bx=clamp(cx+cw/2-bw+40,L,W-SAFE.r-bw-8); by=T+90; side='u'; }
     ctx.fillStyle='rgba(22,11,7,.95)'; ctx.strokeStyle='rgba(255,210,120,.9)'; ctx.lineWidth=1.5;
@@ -191,6 +192,7 @@ function drawSkillHud(){
     ctx.strokeStyle='rgba(22,11,7,1)'; ctx.lineWidth=3; ctx.stroke();
     ctx.textAlign='left'; ctx.font=`800 12px ${UIF}`; ctx.fillStyle='#ffd27a'; ctx.fillText(title,bx+13,by+15);
     ctx.font=`500 12px ${UIF}`; ctx.fillStyle='#f2e6d4'; ctx.fillText(body,bx+13,by+32);
+    tipX(bx+bw-14,by+15,()=>{ SK.hintEnd=0; tipShut('skills'); },usingTouch?11:9);
     HUD_HITS.push({x:bx,y:by,w:bw,h:bh,fn:()=>openSkills()});
   }
   ctx.restore();

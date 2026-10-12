@@ -10,7 +10,14 @@
 //        Back/View/Share/minus: map, hold for the journal · Start/Menu/Options/plus: pause, hold for skills
 // Menus: d-pad or left stick moves the focus · bottom picks · right goes back (swappable in Settings)
 //        L1/R1 switch tabs (on the world map they pick a shrine) · right stick scrolls · Start closes pause
+// Southpaw (Settings > Handed: Left): the sticks swap (right stick moves, left stick aims, their clicks too), and so do
+//        the triggers (L2 attacks, R2 breathes fire) and the bumpers (L1 next weapon, R1 previous). padSw maps them.
 const PB={S:0,E:1,W:2,N:3,L1:4,R1:5,L2:6,R2:7,SEL:8,ST:9,L3:10,R3:11,UP:12,DN:13,LF:14,RT:15,HOME:16,TP:17}, NPB=18;
+const PSWAP={4:5,5:4,6:7,7:6,10:11,11:10};
+// the button that does the right-handed button i's job (southpaw swaps left and right)
+const padSw=i=>lefty()&&PSWAP[i]!=null?PSWAP[i]:i;
+// the move stick and the aim stick, as axis indexes [x,y]
+const padMoveAx=()=>lefty()?[2,3]:[0,1], padAimAx=()=>lefty()?[0,1]:[2,3];
 Object.assign(settings,{rumble:store.get('eb_rumble',true)!==false, padOk:['auto','south','east'].includes(store.get('eb_padok','auto'))?store.get('eb_padok','auto'):'auto'});
 const PADK={
   xbox:{name:'Xbox controller',short:'Xbox',face:['A','B','X','Y'],bg:['#3e9a36','#cc3b2d','#2c6ecf','#e3ae25'],fg:['#fff','#fff','#fff','#2b1c00'],sh:['LB','RB','LT','RT'],sel:'View',st:'Menu',l3:'LS',r3:'RS'},
@@ -54,22 +61,26 @@ addEventListener('touchstart',()=>padDev('touch'),{capture:true,passive:true});
 // ---------- button labels for whatever the player is using right now
 // btnLabel(action[,dev]): action is attack, fire, roll, jump, use, drink, roar, map, journal, pause, weapon, whistle or skills.
 // dev is 'kb', 'touch' or 'pad' (default: the device used last). Pad labels follow the detected controller.
-const ACT_KEY={attack:'J',fire:'K',roll:'Space',jump:'C',use:'E',drink:'R',roar:'Q',map:'M',journal:'I',pause:'Esc',weapon:'X',whistle:'G',skills:'U'};
-const ACT_TOUCH={attack:'the SLASH button',fire:'the FIRE button',roll:'the ROLL button',jump:'the JUMP button',use:'the USE button',drink:'the DRINK button',roar:'the ROAR button',map:'the minimap',journal:'the quest list',pause:'the pause button',weapon:'the WEAPON button',whistle:'the CALL button',skills:'Skills in the pause menu'};
-const ACT_PAD={attack:PB.W,fire:PB.L2,roll:PB.E,jump:PB.S,use:PB.N,drink:PB.UP,roar:PB.R3,map:PB.SEL,journal:PB.SEL,pause:PB.ST,weapon:PB.R1,whistle:PB.DN,skills:PB.ST};
+// keys: the usual set, and the left-handed one (mouse in the left hand, the right hand on the arrow keys; see LEFT_KEYS in a5_input.js)
+const ACT_KEY_R={attack:'J',fire:'K',roll:'Space',jump:'C',use:'E',drink:'R',roar:'Q',map:'M',journal:'I',pause:'Esc',weapon:'X',whistle:'G',skills:'U',log:'L',sprint:'Shift',move:'WASD'};
+const ACT_KEY_L={attack:'Enter',fire:"'",roll:'R Ctrl',jump:'/',use:'Enter',drink:'.',roar:';',map:'M',journal:'I',pause:'P',weapon:']',whistle:',',skills:'U',log:'L',sprint:'R Shift',move:'Arrows'};
+const actKey=a=>(lefty()?ACT_KEY_L:ACT_KEY_R)[a]||'';
+const ACT_TOUCH={attack:'the SLASH button',fire:'the FIRE button',roll:'the ROLL button',jump:'the JUMP button',use:'the SLASH button',drink:'the DRINK button',roar:'the ROAR button',map:'the minimap',journal:'the quest list',pause:'the pause button',weapon:'the WEAPON button',whistle:'the CALL button',skills:'Skills in the pause menu',log:'Log in the pause menu'};
+const ACT_PAD_R={attack:PB.W,fire:PB.L2,roll:PB.E,jump:PB.S,use:PB.N,drink:PB.UP,roar:PB.R3,map:PB.SEL,journal:PB.SEL,pause:PB.ST,weapon:PB.R1,whistle:PB.DN,skills:PB.ST};
+const actPad=a=>{ const i=ACT_PAD_R[a]; return i==null?null:padSw(i); };
 const ACT_HOLD={journal:1,skills:1};
 function btnLabel(action,dev){
   dev=dev||curDevice();
-  if(dev==='pad'){ const i=ACT_PAD[action]; if(i==null) return ''; return (ACT_HOLD[action]?'Hold ':'')+padBtnName(i); }
+  if(dev==='pad'){ const i=actPad(action); if(i==null) return ''; return (ACT_HOLD[action]?'Hold ':'')+padBtnName(i); }
   if(dev==='touch') return ACT_TOUCH[action]||'';
-  return ACT_KEY[action]||'';
+  return actKey(action);
 }
 // the same thing as a little HTML chip (styles .pg in body.html)
 function btnHTML(action,dev){
   dev=dev||curDevice();
-  if(dev==='pad'){ const i=ACT_PAD[action]; if(i==null) return ''; return (ACT_HOLD[action]?'hold ':'')+padChip(i); }
+  if(dev==='pad'){ const i=actPad(action); if(i==null) return ''; return (ACT_HOLD[action]?'hold ':'')+padChip(i); }
   if(dev==='touch') return escapeHtml(ACT_TOUCH[action]||'');
-  return `<kbd class="pg k">${escapeHtml(ACT_KEY[action]||'')}</kbd>`;
+  return `<kbd class="pg k">${escapeHtml(actKey(action))}</kbd>`;
 }
 function padChip(i,k){
   k=k||PAD.kind; const K=padK(k), t=escapeHtml(padBtnName(i,k).replace('D-pad ',''));
@@ -112,11 +123,11 @@ function drawPadGlyph(g,i,k,x,y,r){
   g.restore(); return w;
 }
 // glyph for an action on the current device (pad button, or a key cap); returns the width used, 0 on touch
-function drawBtnGlyph(g,action,x,y,r,dev){
+function drawBtnGlyph(g,action,x,y,r,dev,txt){
   dev=dev||curDevice();
-  if(dev==='pad'){ const i=ACT_PAD[action]; return i==null?0:drawPadGlyph(g,i,PAD.kind,x,y,r); }
+  if(dev==='pad'){ const i=actPad(action); return i==null?0:drawPadGlyph(g,i,PAD.kind,x,y,r); }
   if(dev==='touch') return 0;
-  const t=ACT_KEY[action]||'?'; g.save(); g.font=`800 ${Math.round(r*1.05)}px ${UIF}`; g.textAlign='center'; g.textBaseline='middle';
+  const t=txt||actKey(action)||'?'; g.save(); g.font=`800 ${Math.round(r*1.05)}px ${UIF}`; g.textAlign='center'; g.textBaseline='middle';
   const w=Math.max(r*2,g.measureText(t).width+r*0.9), h=r*2;
   g.fillStyle='#4a2a1a'; rrect(g,x-w/2,y-h/2+2,w,h,r*0.45); g.fill();
   g.fillStyle='#6a3c24'; rrect(g,x-w/2,y-h/2,w,h,r*0.45); g.fill(); g.strokeStyle='rgba(255,220,180,.5)'; g.lineWidth=1; g.stroke();
@@ -188,7 +199,7 @@ function padPoll(dt){
   if(key!==PAD.scene){
     const first=!PAD.scene, from=PAD.rootId; PAD.scene=key; PAD.rootId=root?root.id:'';
     if(!first){
-      if(s){ for(let i=0;i<NPB;i++){ if(s.cur[i]){ s.block[i]=true; s.arm[i]=false; } s.ed[i]=false; s.tap[i]=false; } PAD.stickBlock=Math.hypot(s.ax[0],s.ax[1])>0.4; }
+      if(s){ for(let i=0;i<NPB;i++){ if(s.cur[i]){ s.block[i]=true; s.arm[i]=false; } s.ed[i]=false; s.tap[i]=false; } const [mi,mj]=padMoveAx(); PAD.stickBlock=Math.hypot(s.ax[mi],s.ax[mj])>0.4; }
       PAD.nav.d=''; PAD.sh=[-1,-1];
       if(root&&['settings','how','slots','acct'].includes(from)&&['menu','pause'].includes(root.id)) navRestore(root);
       else if(root&&PAD.dev==='pad'&&root.id!=='dialogue') setTimeout(()=>{ if(navRoot()===root&&PAD.dev==='pad'){ const it=navItems(root); if(it.length&&!it.includes(document.activeElement)) navFocus(navDefault(root,it)); } },90);
@@ -196,7 +207,7 @@ function padPoll(dt){
   }
   if(!s) return;
   rumbleWatch();
-  if(PAD.stickBlock&&Math.hypot(s.ax[0],s.ax[1])<0.3) PAD.stickBlock=false;
+  { const [mi,mj]=padMoveAx(); if(PAD.stickBlock&&Math.hypot(s.ax[mi],s.ax[mj])<0.3) PAD.stickBlock=false; }
   if(PAD.dev!=='pad') return;
   if(root) padMenu(root,s,dt);
   else if(scene==='play') padPlayUI(s,dt);
@@ -209,7 +220,7 @@ function padSetKind(id){
 const padName=id=>{ const k=padKindOf(id); return k==='gen'?'Controller':PADK[k].name; };
 function padHello(gp){
   const k=padKindOf(gp.id), kk=k==='gen'?'xbox':k, ok=padOkBtn(kk), back=ok?0:1;
-  padToast(`${padName(gp.id)} connected`, scene==='play'?`${padChip(PB.ST,kk)} pauses · ${padChip(PB.SEL,kk)} opens the map`:`${padChip(ok,kk)} picks · ${padChip(back,kk)} goes back`);
+  padToast(`${padName(gp.id)} connected`, !tipsOn()?'':scene==='play'?`${padChip(PB.ST,kk)} pauses · ${padChip(PB.SEL,kk)} opens the map`:`${padChip(ok,kk)} picks · ${padChip(back,kk)} goes back`);
   padRenderSettings();
 }
 function padBye(i,id){
@@ -256,7 +267,7 @@ function padPlayUI(s,dt){
   for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(s.ed[i]) PAD.sh[j]=0; else if(PAD.sh[j]>=0) PAD.sh[j]+=dt; }
   if(s.cur[PB.L1]&&s.cur[PB.R1]&&(PAD.sh[0]>=0||PAD.sh[1]>=0)&&!PAD.chord){ PAD.chord=true; PAD.q.roar=true; PAD.sh=[-1,-1]; }
   if(!s.cur[PB.L1]&&!s.cur[PB.R1]) PAD.chord=false;
-  for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(PAD.sh[j]>=0&&(!s.cur[i]||PAD.sh[j]>0.12)){ if(!PAD.chord){ if(j) PAD.q.wN=true; else PAD.q.wP=true; } PAD.sh[j]=-1; } }
+  for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(PAD.sh[j]>=0&&(!s.cur[i]||PAD.sh[j]>0.12)){ if(!PAD.chord){ if(padSw(i)===PB.R1) PAD.q.wN=true; else PAD.q.wP=true; } PAD.sh[j]=-1; } }
 }
 function focusPrev(){
   const list=[null].concat(tracked()); let i=list.indexOf(G.focus||null); i=(i-1+list.length)%list.length;
@@ -266,25 +277,26 @@ function padInput(o,dt){
   const s=PAD.s; if(!s||!padActive()||PAD.ui) return;
   const h=i=>s.cur[i]&&!s.block[i], e=i=>s.ed[i];
   // left stick: analog walking; all the way out for a moment sprints, like the touch stick
-  const [lx,ly,lm]=PAD.stickBlock?[0,0,0]:padDz(s.ax[0],s.ax[1],0.17);
+  const [mi,mj]=padMoveAx(), [ai,aj]=padAimAx();
+  const [lx,ly,lm]=PAD.stickBlock?[0,0,0]:padDz(s.ax[mi],s.ax[mj],0.17);
   if(lm>0&&Math.hypot(o.mx,o.my)<0.05){ o.mx=lx; o.my=ly; }
   if(lm>0.93) PAD.full+=dt; else if(lm<0.85) PAD.full=0;
-  if(e(PB.L3)) PAD.latch=!PAD.latch;
+  if(e(padSw(PB.L3))) PAD.latch=!PAD.latch;
   if(lm<0.2){ PAD.still+=dt; if(PAD.still>0.25) PAD.latch=false; } else PAD.still=0;
   if(PAD.full>0.3||(PAD.latch&&lm>0.2)) o.sprint=true;
-  if(h(PB.W)||h(PB.R2)) o.attack=true;
-  if(h(PB.L2)) o.fire=true;
+  if(h(PB.W)||h(padSw(PB.R2))) o.attack=true;
+  if(h(padSw(PB.L2))) o.fire=true;
   if(e(PB.E)) o.roll=true;
   if(e(PB.S)) o.jump=true;
   if(h(PB.S)) o.jumpHeld=true;
   if(e(PB.N)) o.use=true;
   if(e(PB.UP)) o.drink=true;
   if(e(PB.DN)) o.whistle=true;
-  if(e(PB.R3)||PAD.q.roar) o.roar=true;
+  if(e(padSw(PB.R3))||PAD.q.roar) o.roar=true;
   if(PAD.q.wN) o.wNext=true;
   if(PAD.q.wP) o.wPrev=true;
   // right stick aims; without it Ash faces where he walks, with a gentle nudge toward a close enemy while attacking
-  const [rx,ry,rm]=padDz(s.ax[2],s.ax[3],0.22);
+  const [rx,ry,rm]=padDz(s.ax[ai],s.ax[aj],0.22);
   if(rm>0){ o.aimX=rx; o.aimY=ry; }
   let ang=rm>0.15?Math.atan2(ry,rx):null;
   if(ang==null&&(o.attack||o.fire)){ const t=padAssist(o); if(t) ang=Math.atan2(t.y-player.y,t.x-player.x); }
@@ -432,7 +444,8 @@ function padMenu(root,s,dt){
   const ok=padOkBtn(), back=ok===PB.S?PB.E:PB.S, h=i=>s.cur[i]&&!s.block[i];
   let d='';
   if(h(PB.UP)) d='u'; else if(h(PB.DN)) d='d'; else if(h(PB.LF)) d='l'; else if(h(PB.RT)) d='r';
-  if(!d&&!PAD.stickBlock){ const x=s.ax[0], y=s.ax[1]; if(Math.hypot(x,y)>0.55) d=Math.abs(x)>Math.abs(y)?(x>0?'r':'l'):(y>0?'d':'u'); }
+  const [mi,mj]=padMoveAx();
+  if(!d&&!PAD.stickBlock){ const x=s.ax[mi], y=s.ax[mj]; if(Math.hypot(x,y)>0.55) d=Math.abs(x)>Math.abs(y)?(x>0?'r':'l'):(y>0?'d':'u'); }
   const N=PAD.nav;
   if(d&&d!==N.d){ N.d=d; N.t=0.42; navMove(root,d); }
   else if(d){ N.t-=dt; if(N.t<=0){ N.t=0.12; navMove(root,d); } }
@@ -445,7 +458,7 @@ function padMenu(root,s,dt){
   if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
   if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); else if(root.id==='dialogue') openLog(); else if(root.id==='logov') closeLog(); }
   // right stick scrolls long pages
-  const ry=s.ax[3]; if(Math.abs(ry)>0.25){ const sc=navScroller(root,document.activeElement); if(sc) sc.scrollTop+=Math.sign(ry)*(Math.abs(ry)-0.2)*1100*dt; }
+  const ry=s.ax[padAimAx()[1]]; if(Math.abs(ry)>0.25){ const sc=navScroller(root,document.activeElement); if(sc) sc.scrollTop+=Math.sign(ry)*(Math.abs(ry)-0.2)*1100*dt; }
 }
 // keyboard: the arrow keys move the same focus ring on menu screens
 function navKey(e){
@@ -552,8 +565,10 @@ function drawPadDiagram(cv,k){
   g.textAlign='center'; g.textBaseline='middle'; g.font=`700 11px ${UIF}`; g.fillStyle=tcol;
   g.fillText('Map',MB[0][0],MB[0][1]-16); g.fillText('Pause',MB[1][0],MB[1][1]-16);
   g.textAlign='right'; g.fillText('Attack',fp[2][0]-16,fp[2][1]);
-  const L=[[262,40,22,'Fire breath'],[262,67,40,'Previous weapon'],[P.ls[0],P.ls[1],24,'Move, click: sprint'],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← → switch quest']].sort((a,b)=>a[1]-b[1]);
-  const R=[[458,40,22,'Attack'],[458,67,40,'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,'Aim, click: Roar']];
+  // southpaw (Settings > Handed: Left) swaps what the sticks, triggers and bumpers do
+  const sp=lefty(), mv='Move, click: sprint', am='Aim, click: Roar';
+  const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← → switch quest']].sort((a,b)=>a[1]-b[1]);
+  const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]];
   const line=(x0,y0,x1,y1)=>{ g.strokeStyle='rgba(255,200,140,.6)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); g.fillStyle='#ffc35a'; g.beginPath(); g.arc(x0,y0,2.4,0,TAU); g.fill(); g.beginPath(); g.arc(x1,y1,1.6,0,TAU); g.fill(); };
   const label=(t,x,y,al)=>{ g.font=`600 13px ${UIF}`; g.textAlign=al; g.fillStyle='#f3e4cc'; const ls=t.split('\n'); ls.forEach((s,i)=>g.fillText(s,x,y+(i-(ls.length-1)/2)*16)); };
   let prev=-1e9; for(const [x,y,r,t] of L){ const ly=Math.max(y,prev+36); prev=ly; line(x-r,y,178,ly); label(t,172,ly,'right'); }
@@ -561,23 +576,24 @@ function drawPadDiagram(cv,k){
 }
 // the controller table on the How to Play page, for the pad kind k
 function padHelpRows(k){
-  const c=i=>padChip(i,k), ok=padOkBtn(k), bk=ok===PB.S?PB.E:PB.S, chip=t=>`<i class="pg s">${t}</i>`;
+  const c=i=>padChip(padSw(i),k), ok=padOkBtn(k), bk=ok===PB.S?PB.E:PB.S, chip=t=>`<i class="pg s">${t}</i>`, sp=lefty();
   return [
-    [chip('Left stick'),`Move. Push it all the way to sprint, or click it (${escapeHtml(padBtnName(PB.L3,k))}).`],
-    [chip('Right stick'),'Aim. Without it Ash faces where he walks.'],
+    [chip(sp?'Right stick':'Left stick'),`Move. Push it all the way to sprint, or click it (${escapeHtml(padBtnName(padSw(PB.L3),k))}).`],
+    [chip(sp?'Left stick':'Right stick'),'Aim. Without it Ash faces where he walks.'],
     [c(PB.S),'Jump, once Ash learns how. With wings, jump again in the air to fly.'],
-    [`${c(PB.W)} ${c(PB.R2)}`,'Attack. Hold for a combo.'],
+    [`${c(PB.W)} ${c(PB.R2)}`,'Attack. Hold for a combo. With someone to talk to (or something to open) and no foe close, it does that instead.'],
     [c(PB.L2),'Fire breath'],
     [c(PB.E),'Dodge roll'],
-    [c(PB.N),'Talk, open, rest at a shrine'],
+    [padChip(PB.N,k),'Talk, open, rest at a shrine (only that, never a swing)'],
     [`${c(PB.R1)} ${c(PB.L1)}`,'Next or previous weapon'],
-    [`${c(PB.R3)} or ${c(PB.L1)}+${c(PB.R1)}`,'Dragon Roar, once the meter is full'],
+    [`${c(PB.R3)} or ${padChip(PB.L1,k)}+${padChip(PB.R1,k)}`,'Dragon Roar, once the meter is full'],
     [c(PB.UP),'Drink a healing draught'],
     [c(PB.DN),'Call your companion'],
     [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in Normal Mode: switch weapons)'],
     [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
-    [`${c(ok)} ${c(bk)}`,'In menus: pick, go back. The d-pad or left stick moves, L1 and R1 switch tabs.'.replace('L1 and R1',`${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)}`)]
+    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs.`],
+    [chip(sp?'Southpaw':'Left-handed?'),sp?'On: the sticks, triggers and bumpers are swapped. Settings > Handed changes it back.':'Settings > Handed: Left swaps the sticks, triggers and bumpers (southpaw).']
   ];
 }
 window.__ebX=Object.assign(window.__ebX||{},{btnLabel,btnHTML,rumble,toggleFullscreen,padActive,curDevice,padKindOf,
