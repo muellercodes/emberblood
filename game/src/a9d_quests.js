@@ -297,7 +297,7 @@ const SHOPTALK={
   ]),
   cookie:()=>runShop('cookie','Rock Soup! Now with fewer rocks!',[['A bowl of Rock Soup (heal, crunchy)',3,()=>{ player.hp=Math.min(player.maxHp,player.hp+45); setBanner('Rock Soup','Crunchy.',1.4); }]])
 };
-function innRest(){ player.hp=player.maxHp; player.potions=player.potionsMax; player.stamina=player.maxStamina; player.energy=player.maxEnergy; player.stats.phoenix=player.stats.phoenixMax||0; G.tod=0.3; flashA=0.6; flashCol='20,10,30'; later(0.4,()=>setBanner('Good morning','Fully rested. Game saved.',2)); saveGame(true); }
+function innRest(){ player.hp=player.maxHp; player.potions=player.potionsMax; player.stamina=player.maxStamina; player.energy=player.maxEnergy; player.stats.phoenix=player.stats.phoenixMax||0; G.tod=0.3; flashA=0.6; flashCol='20,10,30'; later(0.4,()=>setBanner('Good morning','Fully rested. Game saved.',2)); saveGame(true); dreamHook('inn'); }
 function restHome(){ innRest(); setBanner('Home sweet home','Fully rested. Game saved.',2); }
 // ---------- fishing
 const FISHES=['a Mirrow trout','a grumpy perch','a lantern minnow','a speckled pike','a very surprised carp','an old boot (it’s not a fish)'];

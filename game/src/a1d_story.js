@@ -205,6 +205,7 @@ const EPILOGUE_FMT=()=>{
   if(q('lure')) L.push(['narr',`Dell sailed the Soggy Biscuit Two across Lake Mirrow, wearing his ring, catching nothing, perfectly happy.`]);
   if(q('duchess')) L.push(['narr',`Duchess the goat lived a long life full of opinions.`]);
   if(G.flags.pip) L.push(['pip',`Mip!`]);
+  { const ev2=evEpilogue(); if(ev2) L.push(ev2); }
   L.push(['narr',`And the last of the Emberblood line never, ever had to say "great" thirteen times again.`]);
   return L;
 };
