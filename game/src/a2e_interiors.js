@@ -205,7 +205,7 @@ function enterArea(id,door){
   if(def.kind==='house') buildHouse(AREA,def); else if(CAVEMAP[def.id]) buildCaveRooms(AREA,def); else buildCave(AREA,def);
   areaNPCs();
   player.x=AREA.spawn.x; player.y=AREA.spawn.y; player.kvx=player.kvy=0; player.facing=-Math.PI/2;
-  if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; }
+  if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x+30; G.goat.y=player.y+30; }
   updateCam(0,true); G.fade=1; SFX.play('ui');
   if(!G.found['seen_'+id]){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,`A cave · Danger level ${def.level}`,2.6,'region'); } }
@@ -221,7 +221,7 @@ function exitArea(silent){
   const ow=G.ow||{x:POI.village.x,y:POI.village.y+150};
   AREA=null; G.area=null;
   player.x=ow.x; player.y=ow.y; player.kvx=player.kvy=0; player.facing=Math.PI/2;
-  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; }
+  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
   updateCam(0,true); G.chunkBurst=16; if(!silent){ G.fade=1; SFX.play('ui'); }
   G.regionT=0;

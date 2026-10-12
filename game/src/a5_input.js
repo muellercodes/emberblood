@@ -3,13 +3,6 @@
 const keys=new Set(), pressed=new Set();
 const mouse={x:0,y:0,l:false,r:false};
 const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0,fireT:0};
-// auto-attack: swing when an enemy (or a pot, in a cave) is within reach
-function autoSwing(){
-  if(scene!=='play'||!player||!autoAttackOn()||(G.mode==='story'&&!G.flags.forge)) return false;
-  const p=player, reach=(p.stats.range||60)+22;
-  for(const e of G.enemies){ if(e.dead||e.alpha<0.4) continue; const d=dist(p.x,p.y,e.x,e.y)-e.r; if(d<reach&&(e.aggro||e.boss||d<reach*0.7)) return true; }
-  return false;
-}
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); });
 addEventListener('blur',()=>{ keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
@@ -106,14 +99,21 @@ function readInput(dt){
   }
   const l=Math.hypot(mx,my); if(l>1){mx/=l;my/=l;}
   if(touch.fireT>0) touch.fireT-=dt;
-  return {mx,my,
+  const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5};
+  let wSel=-1; for(const k in WSEL) if(pressed.has(k)) wSel=WSEL[k];
+  const o={mx,my,
     attack:keys.has('KeyJ')||mouse.l||!!touch.held.attack||autoSwing(),
     fire:keys.has('KeyK')||mouse.r||!!touch.held.fire||(touch.fireT>0),
     roll:pressed.has('Space')||!!touch.pressed.roll,
     roar:pressed.has('KeyQ')||pressed.has('KeyL')||!!touch.pressed.roar,
     drink:pressed.has('KeyR')||!!touch.pressed.drink,
     use:pressed.has('KeyE')||pressed.has('KeyF')||!!touch.pressed.use,
-    sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')||stickFull};
+    sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')||stickFull,
+    jump:pressed.has('KeyC')||!!touch.pressed.jump, jumpHeld:keys.has('KeyC')||!!touch.held.jump,
+    wNext:pressed.has('KeyX')||!!touch.pressed.weapon, wPrev:pressed.has('KeyZ'), wSel,
+    whistle:pressed.has('KeyG')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
+  padInput(o,dt);
+  return o;
 }
 function onKey(e){
   const c=e.code;
@@ -124,6 +124,7 @@ function onKey(e){
     else if((c==='KeyM'||c==='Tab')&&G.mode==='story') openMap();
     else if(c==='KeyI'&&G.mode==='story') openJournal();
     else if(c==='KeyT'&&G.mode==='story') cycleFocus();
+    else if(c==='KeyU'&&G.mode==='story') openSkills();
     if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }

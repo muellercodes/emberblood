@@ -121,7 +121,7 @@ function goFloor(o){
   G.area=to; buildHouse(AREA,def); areaNPCs();
   const st=AREA.objs.find(q=>q.k==='stairs'&&q.to===from)||AREA.objs.find(q=>q.k==='stairs');
   if(st){ player.x=st.x; player.y=st.y>AREA.ry+AREA.rh/2?st.y-st.h/2-30:st.y+st.h/2+26; } else { player.x=AREA.spawn.x; player.y=AREA.spawn.y; }
-  player.kvx=player.kvy=0; if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+20; }
+  player.kvx=player.kvy=0; if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+20; } compsOnMove();
   G.ow=ow; updateCam(0,true); G.fade=1;
   if(!G.found['seen_'+to]){ G.found['seen_'+to]=true; if(def.secret){ G.secrets=G.secrets||{}; G.secrets['sec_'+to]=1; } }
   setBanner(def.name,'',1.4,'region'); saveGame();

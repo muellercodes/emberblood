@@ -281,7 +281,8 @@ function saveData(){
     lilies:LILIES.filter(l=>l.taken).map(l=>l.id),lilyN:G.lilyN,lan:G.lanterns,qk:G.questKills,goat:G.goat?{x:Math.round(G.goat.x),y:Math.round(G.goat.y)}:null,
     shrines:G.shrines,camps:G.campsCleared,chests:G.chestsOpened,tod:G.tod,wt:G.worldTime,kills:G.kills,deaths:G.deaths,time:G.playTime,done:G.done,fog:fogStr(),pend:G.pendingBless,
     rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared,
-    rev:5,slot:curSlot,track:G.track||[],focus:G.focus||null,friends:G.friends||{},talk:G.seenTalk||{},secrets:G.secrets||{},mini:G.miniDone||{}};
+    rev:5,slot:curSlot,track:G.track||[],focus:G.focus||null,friends:G.friends||{},talk:G.seenTalk||{},secrets:G.secrets||{},mini:G.miniDone||{},
+    rev:6,weapons:G.weapons,weapon:G.weapon,abil:G.abil,skills:G.skills,sp:G.sp,comp:G.comp,comps:G.comps,deeds:G.deeds};
 }
 function saveGame(now){
   if(!G||G.mode!=='story') return;
@@ -294,7 +295,8 @@ function loadGame(s){
   Object.assign(G,{stage:s.stage||'wake',flags:s.flags||{},wards:s.wards||{hollow:true},wardReady:s.ready||{},bossDone:s.bosses||{},side:s.side||{},ores:s.ores||{},iron:s.iron||0,tier:s.tier||0,lilyN:s.lilyN||0,lanterns:s.lan||{},questKills:s.qk||0,
     shrines:s.shrines||{},lastShrine:s.shrine||'s_village',campsCleared:s.camps||{},chestsOpened:s.chests||{},tod:s.tod!=null?s.tod:0.32,worldTime:s.wt||0,kills:s.kills||0,deaths:s.deaths||0,playTime:s.time||0,done:!!s.done,pendingBless:s.pend||0,
     coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{},
-    track:s.track||[],focus:s.focus||null,friends:s.friends||{},seenTalk:s.talk||{},secrets:s.secrets||{},miniDone:s.mini||{}});
+    track:s.track||[],focus:s.focus||null,friends:s.friends||{},seenTalk:s.talk||{},secrets:s.secrets||{},miniDone:s.mini||{},
+    weapons:s.weapons||{sword:true},weapon:s.weapon||'sword',abil:s.abil||{},skills:s.skills||{},sp:s.sp!=null?s.sp:Math.max(0,(player.level||1)-1),comp:s.comp||null,comps:s.comps||{},deeds:s.deeds||{}});
   if(!s.track){ G.track=Object.keys(G.quests).filter(k=>!G.quests[k].done).slice(-3).reverse(); }
   if(!s.rev){ if(G.side.moss==='done'&&!G.quests.moss) G.quests.moss={step:4,done:true}; if(G.side.duchess==='home'&&!G.quests.duchess) G.quests.duchess={step:4,done:true}; if(reached('warcamp')) G.flags.gateHint=true; }
   for(const c of CHESTS) c.open=!!G.chestsOpened[c.id];

@@ -64,7 +64,7 @@ function travelTo(s){
   player.x=s.x+40; player.y=s.y+50; player.kvx=player.kvy=0; player.iframes=1;
   for(const e of G.enemies) if(!e.boss&&dist(e.x,e.y,player.x,player.y)<500){ e.aggro=false; }
   if(G.fightSite) resetBoss();
-  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; }
+  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
   G.lastShrine=s.id; updateCam(0,true); G.chunkBurst=16; flashA=0.6; flashCol='255,220,170'; SFX.play('shrine');
   setBanner(s.name,'Fast travel',1.8); saveGame();
@@ -120,14 +120,14 @@ function simUpdate(dt){
   if(G.mode!=='story') return;
   if(G.fade>0) G.fade=Math.max(0,G.fade-dt*2.5);
   if(AREA){
-    updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateWeather(dt);
+    updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateComps(dt); villagerBarks(dt); updateWeather(dt);
     if(G.spirit){ G.spirit.t+=dt; }
     G.regionT-=dt; if(G.regionT<=0){ G.regionT=0.6; G.region=regionAt(player.x,player.y); }
     if(G.pendingBless>0&&!G.inCombat&&!G.mini&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
     return;
   }
   updateAllies(dt);
-  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
+  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateComps(dt); villagerBarks(dt); updateWeather(dt);
   if(G.spirit){ G.spirit.t+=dt; if(!G.spirit.on){ G.spirit.fade=(G.spirit.fade||0)+dt; if(G.spirit.fade>1.5) G.spirit=null; } }
   G.critterT-=dt; if(G.critterT<=0){ G.critterT=rand(2,4); spawnCritters(); }
   G.fogT-=dt; if(G.fogT<=0){ G.fogT=0.3; fogReveal(player.x,player.y,650); }

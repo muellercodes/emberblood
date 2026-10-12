@@ -6,3 +6,7 @@ let aimMode='keys', usingTouch=false, diffIdx=clamp(store.get('eb_diff',1)|0,0,2
 const settings={nums:!!store.get('eb_nums',false)};
 const shake=m=>{ shakeMag=Math.max(shakeMag,reduceMotion?m*0.3:m); };
 const ed=x=>x*((G&&G.dmgMul)||1);
+// v6 shared helpers: abilities (jump, stride, wings), skill ranks, airborne check
+const hasAbil=id=>!!(G&&G.abil&&G.abil[id]);
+const hasSkill=id=>(G&&G.skills&&G.skills[id])|0;
+const airborne=()=>!!player&&(((player.z||0)>3)||!!player.flying);

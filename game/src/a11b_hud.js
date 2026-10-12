@@ -77,6 +77,7 @@ function drawHUD(){
     ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
     ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
   }
+  drawWeaponHud(); drawMoveHud(); if(story){ drawSkillHud(); drawCompHud(); }
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
     const a=Math.min(1,G.hintT/1.5);

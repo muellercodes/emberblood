@@ -202,7 +202,7 @@ function resize(){
   DPR=Math.min(window.devicePixelRatio||1,2); W=Math.max(320,window.innerWidth); H=Math.max(320,window.innerHeight);
   cvs.width=Math.round(W*DPR); cvs.height=Math.round(H*DPR);
   lightCvs.width=Math.ceil(W/2); lightCvs.height=Math.ceil(H/2);
-  zoom=clamp(Math.min(W/900,H/620),0.6,1.3); readSafe(); vigKey='';
+  zoom=clamp(Math.min(W/900,H/620),0.6,1.3); ZOOM0=zoom; readSafe(); vigKey='';
   if(G&&player){ if(scene==='menu') menuCam(0,true); else updateCam(0,true); }
   if(scene==='map') drawMapScreen();
 }
@@ -212,6 +212,7 @@ function frame(now){
   let dt=(now-last)/1000; last=now; if(!(dt>0)) dt=0; dt=Math.min(dt,0.05);
   shakeMag=Math.max(0,shakeMag-dt*30); flashA=Math.max(0,flashA-dt*1.6);
   try{
+    padPoll(dt);
     if(scene==='menu') menuUpdate(dt);
     else if(scene==='play'){ updateTimers(dt); if(scene==='play'){ if(G.slowT>0){ G.slowT-=dt; if(G.slowT<=0) G.timeScale=1; } update(dt*G.timeScale); } }
     else if(scene==='dying'){ dyingT-=dt; liteUpdate(dt); if(dyingT<=0) showDeath(); }
@@ -240,4 +241,6 @@ window.__eb={god:false,get G(){return G;},get player(){return player;},get scene
   face(a){ player.facing=a; }, WARDS, POI, LANTERNS, NPCSPOT, SITES, LILIES, ORES, bossDone(b){ G.bossDone[b]=true; }, Cloud, syncSaves, objectiveList,
   travel(id){ const s=SHRINES.find(z=>z.id===id); G.shrines[id]=true; scene='map'; travelTo(s); },
   setTime(t){ G.tod=t; }, rain(on){ G.weather.type=on?'rain':'clear'; G.weather.t=999; G.rainK=on?1:0; }};
+// debug hooks from feature modules: each one adds to window.__ebX
+if(window.__ebX) Object.defineProperties(window.__eb,Object.getOwnPropertyDescriptors(window.__ebX));
 })();

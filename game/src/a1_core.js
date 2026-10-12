@@ -133,6 +133,7 @@ const SFX=(()=>{
 // ================= canvas
 const cvs=$('#game'), ctx=cvs.getContext('2d');
 const lightCvs=document.createElement('canvas'), lctx=lightCvs.getContext('2d');
+let ZOOM0=1;
 let W=800,H=600,DPR=1,zoom=1,SAFE={t:0,r:0,b:0,l:0};
 function readSafe(){
   const el=$('#safe'); if(!el) return;

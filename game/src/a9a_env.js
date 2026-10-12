@@ -66,7 +66,8 @@ function newRun(mode){
     stage:'wake',flags:{},wards:{hollow:true},wardReady:{},wardHeat:{},wardHeatT:{},wardMsgT:0,bossDone:{},side:{},ores:{},iron:0,tier:0,lilyN:0,lanterns:{},
     fightSite:null,fightIntro:false,siteGuards:{},pip:null,goat:null,spirit:null,questKills:0,done:false,pendingBless:0,blessDelay:0,prompt:null,region:null,regionT:0,
     inCombat:false,arena:null,autoSaveT:60,wolfT:20,critterT:3,fogT:0,herbs:{},eliteChance:mode==='story'?0.06:0,
-    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null,track:[],focus:null,friends:{},seenTalk:{},secrets:{},miniDone:{},mini:null};
+    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null,track:[],focus:null,friends:{},seenTalk:{},secrets:{},miniDone:{},mini:null,
+    weapons:{sword:true},weapon:'sword',abil:{},skills:{},sp:0,comp:null,comps:{},deeds:{}};
   if(AREA) exitArea(true);
   player=makePlayer();
 }

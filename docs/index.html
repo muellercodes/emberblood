@@ -514,6 +514,7 @@ const SFX=(()=>{
 // ================= canvas
 const cvs=$('#game'), ctx=cvs.getContext('2d');
 const lightCvs=document.createElement('canvas'), lctx=lightCvs.getContext('2d');
+let ZOOM0=1;
 let W=800,H=600,DPR=1,zoom=1,SAFE={t:0,r:0,b:0,l:0};
 function readSafe(){
   const el=$('#safe'); if(!el) return;
@@ -589,6 +590,10 @@ let aimMode='keys', usingTouch=false, diffIdx=clamp(store.get('eb_diff',1)|0,0,2
 const settings={nums:!!store.get('eb_nums',false)};
 const shake=m=>{ shakeMag=Math.max(shakeMag,reduceMotion?m*0.3:m); };
 const ed=x=>x*((G&&G.dmgMul)||1);
+// v6 shared helpers: abilities (jump, stride, wings), skill ranks, airborne check
+const hasAbil=id=>!!(G&&G.abil&&G.abil[id]);
+const hasSkill=id=>(G&&G.skills&&G.skills[id])|0;
+const airborne=()=>!!player&&(((player.z||0)>3)||!!player.flying);
 
 // ================= story script
 // Lines are [speaker, text]. A line can also be {who, text, opts:[{t, fn, then:[lines]}]} for a choice.
@@ -1390,6 +1395,8 @@ STORY.pieAccuse=[
     {t:'You did, Mayor. In your sleep.',cond:()=>true,fn:()=>{ G.choices.extra=G.choices.extra||{}; G.choices.extra.pie='You proved the Mayor ate his own pie in his sleep.'; },then:()=>[['mayor',`ME? Preposterous! I would never... I...`],['narr',`The Mayor touches his mustache. A crumb falls out. Then another. Then a small piece of crust.`],['mayor',`...Oh no. Oh, I sleepwalk. I SLEEP-BAKE-WALK. Ash, you're a genius. A terrible, embarrassing genius.`],['mayor',`Here, your reward. And please, please don't tell the town.`],{who:'narr',text:'',skipIf:()=>{ giveReward({coins:60,xp:100}); befriend('mayor',1.5); return true; }}]}
   ])
 ];
+// ================= dungeon quests (STUB: the dungeons build fills this file)
+// ================= ability quests and world content quests (STUB: the abilities build fills this file)
 
 // ================= world layout (the valley of Embermere)
 const WORLD={w:14000,h:11000};
@@ -1408,6 +1415,10 @@ const RIVERS=[
   {pts:[[11800,3000],[11200,3700],[10600,4300],[10000,4900],[9800,5700],[9200,6300],[8300,6700],[7300,6900],[6550,7050]],w:58}
 ];
 const LAKE={x:6000,y:7200,r:600};
+// islands carved out of rivers and the lake ({x,y,r}), and plank walkways over water ({x0,y0,x1,y1}); feature modules push to these at load
+const ISLES=[], WALKWAYS=[];
+function isleD(x,y){ let best=1e9; for(const s of ISLES){ const d=dist(x,y,s.x,s.y)-(s.r+fbm(x*0.012+s.x,y*0.012-s.y,2)*s.r*0.12); if(d<best) best=d; } return best; }
+function onWalkway(x,y){ for(const w of WALKWAYS) if(x>=w.x0&&x<=w.x1&&y>=w.y0&&y<=w.y1) return w; return null; }
 const ROADS=[
   [[2600,9300],[2800,8800],[3000,8300],[3100,7850]],
   [[2600,9300],[3400,9500],[4400,9300],[5200,8900],[5900,8400],[6600,8000],[7100,7700],[7300,7500]],
@@ -1511,7 +1522,7 @@ function T(x,y,o){
   const rdd=segsDist(x,y,ROAD_SEGS); o.roadAng=lastSeg?lastSeg.ang:0; o.roadD=rdd;
   const rv=segsDist(x,y,RIVER_SEGS)-riverW(x,y);
   const lk=dist(x,y,LAKE.x,LAKE.y)-lakeR(x,y);
-  const wd=Math.min(rv,lk);
+  let wd=Math.min(rv,lk); if(ISLES.length&&wd<120){ const id=isleD(x,y); if(id<160) wd=Math.max(wd,-id); }
   o.water=wd<0?1:0; o.depth=clamp(-wd/70,0,1); o.shore=wd>=0&&wd<30?1-wd/30:0;
   const roadW=o.b===4?26:19;
   o.road=rdd<roadW?1:rdd<roadW+10?1-(rdd-roadW)/10:0;
@@ -1529,6 +1540,8 @@ function blockedAt(x,y){
   const rdd=segsDist(x,y,ROAD_SEGS);
   if(rdd<34) return false;
   if(x>6430&&x<6810&&Math.abs(y-7400)<26) return false;
+  if(WALKWAYS.length&&onWalkway(x,y)) return false;
+  if(ISLES.length&&isleD(x,y)<0) return false;
   if(segsDist(x,y,RIVER_SEGS)<riverW(x,y)) return true;
   if(dist2(x,y,LAKE.x,LAKE.y)<(LAKE.r+140)**2&&dist(x,y,LAKE.x,LAKE.y)<lakeR(x,y)) return true;
   if(y<2850&&lavaAt(x,y,rdd)) return true;
@@ -2121,7 +2134,7 @@ function enterArea(id,door){
   if(def.kind==='house') buildHouse(AREA,def); else if(CAVEMAP[def.id]) buildCaveRooms(AREA,def); else buildCave(AREA,def);
   areaNPCs();
   player.x=AREA.spawn.x; player.y=AREA.spawn.y; player.kvx=player.kvy=0; player.facing=-Math.PI/2;
-  if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; }
+  if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x+30; G.goat.y=player.y+30; }
   updateCam(0,true); G.fade=1; SFX.play('ui');
   if(!G.found['seen_'+id]){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,`A cave · Danger level ${def.level}`,2.6,'region'); } }
@@ -2137,7 +2150,7 @@ function exitArea(silent){
   const ow=G.ow||{x:POI.village.x,y:POI.village.y+150};
   AREA=null; G.area=null;
   player.x=ow.x; player.y=ow.y; player.kvx=player.kvy=0; player.facing=Math.PI/2;
-  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; }
+  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
   updateCam(0,true); G.chunkBurst=16; if(!silent){ G.fade=1; SFX.play('ui'); }
   G.regionT=0;
@@ -2723,7 +2736,7 @@ function goFloor(o){
   G.area=to; buildHouse(AREA,def); areaNPCs();
   const st=AREA.objs.find(q=>q.k==='stairs'&&q.to===from)||AREA.objs.find(q=>q.k==='stairs');
   if(st){ player.x=st.x; player.y=st.y>AREA.ry+AREA.rh/2?st.y-st.h/2-30:st.y+st.h/2+26; } else { player.x=AREA.spawn.x; player.y=AREA.spawn.y; }
-  player.kvx=player.kvy=0; if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+20; }
+  player.kvx=player.kvy=0; if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+20; } compsOnMove();
   G.ow=ow; updateCam(0,true); G.fade=1;
   if(!G.found['seen_'+to]){ G.found['seen_'+to]=true; if(def.secret){ G.secrets=G.secrets||{}; G.secrets['sec_'+to]=1; } }
   setBanner(def.name,'',1.4,'region'); saveGame();
@@ -2782,6 +2795,11 @@ function floorObjAct(o){
   return false;
 }
 const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
+// ================= dungeons (STUB: the dungeons build replaces this file)
+// Contract: areaObjHit(x,y,r,src) is called by weapons for projectiles, slams and swings that touch area objects.
+// src is 'arrow', 'boomerang', 'hammer', 'slash', 'spear', 'daggers' or 'fire'. Return true if something reacted.
+function areaObjHit(x,y,r,src){ return false; }
+// ================= places only jumping, water striding or flying can reach (STUB: the abilities build fills this file)
 
 // ================= art: cached sprites for props and structures
 const SS=2;
@@ -5355,6 +5373,7 @@ function drawFurnHouseX(o,t){
   }
   return false;
 }
+// ================= dungeon art (STUB: the dungeons build fills this file)
 
 // ================= ground chunks
 const RES=1.25, CPX=Math.round(CH*RES), MAX_CHUNKS=34, CHUNKS=new Map();
@@ -5566,13 +5585,6 @@ function fogStr(){ let s=''; for(let i=0;i<FOG.bits.length;i++) s+=FOG.bits[i]?'
 const keys=new Set(), pressed=new Set();
 const mouse={x:0,y:0,l:false,r:false};
 const touch={stickId:null,ox:0,oy:0,sx:0,sy:0,btn:{},held:{},pressed:{},full:0,fireT:0};
-// auto-attack: swing when an enemy (or a pot, in a cave) is within reach
-function autoSwing(){
-  if(scene!=='play'||!player||!autoAttackOn()||(G.mode==='story'&&!G.flags.forge)) return false;
-  const p=player, reach=(p.stats.range||60)+22;
-  for(const e of G.enemies){ if(e.dead||e.alpha<0.4) continue; const d=dist(p.x,p.y,e.x,e.y)-e.r; if(d<reach&&(e.aggro||e.boss||d<reach*0.7)) return true; }
-  return false;
-}
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); });
 addEventListener('blur',()=>{ keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
@@ -5669,14 +5681,21 @@ function readInput(dt){
   }
   const l=Math.hypot(mx,my); if(l>1){mx/=l;my/=l;}
   if(touch.fireT>0) touch.fireT-=dt;
-  return {mx,my,
+  const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5};
+  let wSel=-1; for(const k in WSEL) if(pressed.has(k)) wSel=WSEL[k];
+  const o={mx,my,
     attack:keys.has('KeyJ')||mouse.l||!!touch.held.attack||autoSwing(),
     fire:keys.has('KeyK')||mouse.r||!!touch.held.fire||(touch.fireT>0),
     roll:pressed.has('Space')||!!touch.pressed.roll,
     roar:pressed.has('KeyQ')||pressed.has('KeyL')||!!touch.pressed.roar,
     drink:pressed.has('KeyR')||!!touch.pressed.drink,
     use:pressed.has('KeyE')||pressed.has('KeyF')||!!touch.pressed.use,
-    sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')||stickFull};
+    sprint:keys.has('ShiftLeft')||keys.has('ShiftRight')||stickFull,
+    jump:pressed.has('KeyC')||!!touch.pressed.jump, jumpHeld:keys.has('KeyC')||!!touch.held.jump,
+    wNext:pressed.has('KeyX')||!!touch.pressed.weapon, wPrev:pressed.has('KeyZ'), wSel,
+    whistle:pressed.has('KeyG')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
+  padInput(o,dt);
+  return o;
 }
 function onKey(e){
   const c=e.code;
@@ -5687,6 +5706,7 @@ function onKey(e){
     else if((c==='KeyM'||c==='Tab')&&G.mode==='story') openMap();
     else if(c==='KeyI'&&G.mode==='story') openJournal();
     else if(c==='KeyT'&&G.mode==='story') cycleFocus();
+    else if(c==='KeyU'&&G.mode==='story') openSkills();
     if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
@@ -5721,6 +5741,10 @@ function updateCam(dt,snap){
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
 }
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
+// ================= gamepads (STUB: the controls build replaces this file)
+function padPoll(dt){}
+function padInput(o,dt){}
+function padActive(){ return false; }
 
 // ================= player
 function makePlayer(){
@@ -5746,7 +5770,7 @@ function gainXp(n){
   p.xp+=n;
   while(p.xp>=xpNeed(p.level)){
     p.xp-=xpNeed(p.level); p.level++; p.maxHp+=6; p.stats.dmgMul*=1.04; p.maxStamina+=3; p.hp=p.maxHp;
-    const bless=p.level%2===1; if(bless) G.pendingBless++;
+    const bless=p.level%2===1; if(bless) G.pendingBless++; onLevelUp(p.level);
     jingle('levelup','level'); setBanner(`Level ${p.level}`,bless?'Health and strength increased. A blessing awaits.':'Health, strength and stamina increased.',2.4);
     emit(p.x,p.y,40,{col:'255,210,120',ang:-Math.PI/2,spread:1.4,smin:40,smax:200,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
   }
@@ -5983,6 +6007,43 @@ function deathFx(e){
   scorch(e.x,e.y,e.r*1.6);
 }
 function dropHeal(x,y,amt){ G.pickups.push({x,y,vx:rand(-70,70),vy:rand(-70,70),amt,t:0,life:15}); }
+// ================= weapons (STUB: the weapons build replaces this file)
+// Contract: G.weapons {id:true}, G.weapon (current id). Ids: sword, daggers, spear, hammer, bow, boomerang.
+const WEAPON_IDS=['sword','daggers','spear','hammer','bow','boomerang'];
+const WEAPONS={sword:{name:'Ember Blade'},daggers:{name:'Twin Fangs'},spear:{name:'Pike'},hammer:{name:'Forge Hammer'},bow:{name:'Ash Bow'},boomerang:{name:'Wing-rang'}};
+function giveWeapon(id,quiet){ G.weapons=G.weapons||{}; G.weapons[id]=true; if(!quiet) setBanner(WEAPONS[id]?WEAPONS[id].name:id,'New weapon',2); }
+function curWeapon(){ return (G&&G.weapon)||'sword'; }
+function drawWeaponIcon(g,id,x,y,s){}
+function drawWeaponHud(){}
+function drawWeaponFx(){}  // world-space weapon projectiles and effects (arrows, boomerang), drawn after projectiles
+// auto-attack: swing when an enemy (or a pot, in a cave) is within reach
+function autoSwing(){
+  if(scene!=='play'||!player||!autoAttackOn()||(G.mode==='story'&&!G.flags.forge)) return false;
+  const p=player, reach=(p.stats.range||60)+22;
+  for(const e of G.enemies){ if(e.dead||e.alpha<0.4) continue; const d=dist(p.x,p.y,e.x,e.y)-e.r; if(d<reach&&(e.aggro||e.boss||d<reach*0.7)) return true; }
+  return false;
+}
+// Ash's held weapon, drawn inside drawHero (already translated to Ash and rotated to his facing)
+function drawHeroWeapon(p){
+  const st=p.stats;
+  const armed=!(G&&G.mode==='story'&&!G.flags.forge);
+  if(!armed){ if(p.drinkT>0){ ctx.fillStyle='rgba(120,255,160,.85)'; ctx.beginPath(); ctx.arc(15,7,3,0,TAU); ctx.fill(); } }
+  else if(p.drinkT>0){ ctx.fillStyle='rgba(120,255,160,.85)'; ctx.beginPath(); ctx.arc(15,7,3,0,TAU); ctx.fill(); ctx.strokeStyle='#d8e8e0'; ctx.lineWidth=1; ctx.stroke(); drawHeroBlade(0,30,false,true); }
+  else if(p.swingT>0){
+    const pr=1-p.swingT/p.swingDur, ez=1-Math.pow(1-pr,2.2), span=p.swingFin?1.4:1.15, a0=-p.swingSide*span, a1=p.swingSide*span, a=lerp(a0,a1,ez);
+    const R=st.range*(p.swingFin?1.25:1), lo=Math.min(a0,a), hi=Math.max(a0,a);
+    const g=ctx.createRadialGradient(0,0,R*0.3,0,0,R); g.addColorStop(0,'rgba(255,240,220,0)'); g.addColorStop(0.8,p.swingFin?'rgba(255,190,110,.42)':'rgba(240,244,250,.3)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,R,lo,hi); ctx.arc(0,0,R*0.3,hi,lo,true); ctx.closePath(); ctx.fill();
+    drawHeroBlade(a,R*0.92,p.swingFin,false);
+  }else drawHeroBlade(0,30,false,true);
+}
+// ================= jump, water stride, wings (STUB: the abilities build replaces this file)
+// Contract: player.z (height in px), player.vz, player.flying, player.onWater. grantAbility('jump'|'stride'|'wings').
+function grantAbility(id){ G.abil=G.abil||{}; G.abil[id]=true; setBanner(id,'New ability',2); }
+function canWalkWater(){ return hasAbil('stride'); }
+function drawWingsHook(p,L,fl){}
+function drawMoveHud(){}
+function drawAirborneHook(){ if(player&&player.flying&&!player.dead) drawPlayer(); }  // world space, after trees and flying enemies
 
 // ================= enemies
 function makeEnemy(type,x,y,opt){
@@ -6514,6 +6575,7 @@ AI.sneak=(e,dt)=>{
   steer(e,e.x+Math.cos(a)*80,e.y+Math.sin(a)*80,spd); e.face=turnTo(e.face,a,10*dt);
   if(Math.random()<dt*0.6) ftext(e.x,e.y-18,pick(['hee hee!','nyah!','can’t catch me!','mine now!']),'#e8d080',11);
 };
+// ================= dungeon bosses (STUB: the dungeons build fills this file)
 
 // ================= Vorlaxis, the First Flame
 function phaseShift(e,n){
@@ -6832,7 +6894,8 @@ function newRun(mode){
     stage:'wake',flags:{},wards:{hollow:true},wardReady:{},wardHeat:{},wardHeatT:{},wardMsgT:0,bossDone:{},side:{},ores:{},iron:0,tier:0,lilyN:0,lanterns:{},
     fightSite:null,fightIntro:false,siteGuards:{},pip:null,goat:null,spirit:null,questKills:0,done:false,pendingBless:0,blessDelay:0,prompt:null,region:null,regionT:0,
     inCombat:false,arena:null,autoSaveT:60,wolfT:20,critterT:3,fogT:0,herbs:{},eliteChance:mode==='story'?0.06:0,
-    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null,track:[],focus:null,friends:{},seenTalk:{},secrets:{},miniDone:{},mini:null};
+    coins:0,items:{},quests:{},choices:{},found:{},pages:{},pagesGiven:0,stats:{},hat:null,hats:{},pipTreats:0,caveCleared:{},area:null,ow:null,fishing:null,allies:null,fade:0,lastQ:null,track:[],focus:null,friends:{},seenTalk:{},secrets:{},miniDone:{},mini:null,
+    weapons:{sword:true},weapon:'sword',abil:{},skills:{},sp:0,comp:null,comps:{},deeds:{}};
   if(AREA) exitArea(true);
   player=makePlayer();
 }
@@ -6946,7 +7009,7 @@ function travelTo(s){
   player.x=s.x+40; player.y=s.y+50; player.kvx=player.kvy=0; player.iframes=1;
   for(const e of G.enemies) if(!e.boss&&dist(e.x,e.y,player.x,player.y)<500){ e.aggro=false; }
   if(G.fightSite) resetBoss();
-  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; }
+  if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
   G.lastShrine=s.id; updateCam(0,true); G.chunkBurst=16; flashA=0.6; flashCol='255,220,170'; SFX.play('shrine');
   setBanner(s.name,'Fast travel',1.8); saveGame();
@@ -7002,14 +7065,14 @@ function simUpdate(dt){
   if(G.mode!=='story') return;
   if(G.fade>0) G.fade=Math.max(0,G.fade-dt*2.5);
   if(AREA){
-    updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateWeather(dt);
+    updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateComps(dt); villagerBarks(dt); updateWeather(dt);
     if(G.spirit){ G.spirit.t+=dt; }
     G.regionT-=dt; if(G.regionT<=0){ G.regionT=0.6; G.region=regionAt(player.x,player.y); }
     if(G.pendingBless>0&&!G.inCombat&&!G.mini&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
     return;
   }
   updateAllies(dt);
-  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
+  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateComps(dt); villagerBarks(dt); updateWeather(dt);
   if(G.spirit){ G.spirit.t+=dt; if(!G.spirit.on){ G.spirit.fade=(G.spirit.fade||0)+dt; if(G.spirit.fade>1.5) G.spirit=null; } }
   G.critterT-=dt; if(G.critterT<=0){ G.critterT=rand(2,4); spawnCritters(); }
   G.fogT-=dt; if(G.fogT<=0){ G.fogT=0.3; fogReveal(player.x,player.y,650); }
@@ -7355,7 +7418,8 @@ function saveData(){
     lilies:LILIES.filter(l=>l.taken).map(l=>l.id),lilyN:G.lilyN,lan:G.lanterns,qk:G.questKills,goat:G.goat?{x:Math.round(G.goat.x),y:Math.round(G.goat.y)}:null,
     shrines:G.shrines,camps:G.campsCleared,chests:G.chestsOpened,tod:G.tod,wt:G.worldTime,kills:G.kills,deaths:G.deaths,time:G.playTime,done:G.done,fog:fogStr(),pend:G.pendingBless,
     rev:4,coins:G.coins,items:G.items,quests:G.quests,choices:G.choices,found:G.found,pages:G.pages,pgiven:G.pagesGiven||0,stats:G.stats,hat:G.hat,hats:G.hats,treats:G.pipTreats||0,caves:G.caveCleared,
-    rev:5,slot:curSlot,track:G.track||[],focus:G.focus||null,friends:G.friends||{},talk:G.seenTalk||{},secrets:G.secrets||{},mini:G.miniDone||{}};
+    rev:5,slot:curSlot,track:G.track||[],focus:G.focus||null,friends:G.friends||{},talk:G.seenTalk||{},secrets:G.secrets||{},mini:G.miniDone||{},
+    rev:6,weapons:G.weapons,weapon:G.weapon,abil:G.abil,skills:G.skills,sp:G.sp,comp:G.comp,comps:G.comps,deeds:G.deeds};
 }
 function saveGame(now){
   if(!G||G.mode!=='story') return;
@@ -7368,7 +7432,8 @@ function loadGame(s){
   Object.assign(G,{stage:s.stage||'wake',flags:s.flags||{},wards:s.wards||{hollow:true},wardReady:s.ready||{},bossDone:s.bosses||{},side:s.side||{},ores:s.ores||{},iron:s.iron||0,tier:s.tier||0,lilyN:s.lilyN||0,lanterns:s.lan||{},questKills:s.qk||0,
     shrines:s.shrines||{},lastShrine:s.shrine||'s_village',campsCleared:s.camps||{},chestsOpened:s.chests||{},tod:s.tod!=null?s.tod:0.32,worldTime:s.wt||0,kills:s.kills||0,deaths:s.deaths||0,playTime:s.time||0,done:!!s.done,pendingBless:s.pend||0,
     coins:s.coins||0,items:s.items||{},quests:s.quests||{},choices:s.choices||{},found:s.found||{},pages:s.pages||{},pagesGiven:s.pgiven||0,stats:s.stats||{},hat:s.hat||null,hats:s.hats||{},pipTreats:s.treats||0,caveCleared:s.caves||{},
-    track:s.track||[],focus:s.focus||null,friends:s.friends||{},seenTalk:s.talk||{},secrets:s.secrets||{},miniDone:s.mini||{}});
+    track:s.track||[],focus:s.focus||null,friends:s.friends||{},seenTalk:s.talk||{},secrets:s.secrets||{},miniDone:s.mini||{},
+    weapons:s.weapons||{sword:true},weapon:s.weapon||'sword',abil:s.abil||{},skills:s.skills||{},sp:s.sp!=null?s.sp:Math.max(0,(player.level||1)-1),comp:s.comp||null,comps:s.comps||{},deeds:s.deeds||{}});
   if(!s.track){ G.track=Object.keys(G.quests).filter(k=>!G.quests[k].done).slice(-3).reverse(); }
   if(!s.rev){ if(G.side.moss==='done'&&!G.quests.moss) G.quests.moss={step:4,done:true}; if(G.side.duchess==='home'&&!G.quests.duchess) G.quests.duchess={step:4,done:true}; if(reached('warcamp')) G.flags.gateHint=true; }
   for(const c of CHESTS) c.open=!!G.chestsOpened[c.id];
@@ -8325,6 +8390,18 @@ function drawMiniHUD(){
   ctx.fillStyle='#ffe2b0'; ctx.fillText(txt,W/2,y+1); ctx.restore();
 }
 function drawMiniWorld(t){ const M=G.mini; if(M&&MINI[M.kind].draw) MINI[M.kind].draw(M,t); }
+// ================= skill tree (STUB: the skills build replaces this file)
+function onLevelUp(level){ G.sp=(G.sp||0)+1; }
+function giveSkillPoint(n){ G.sp=(G.sp||0)+(n||1); }
+function openSkills(){}
+function drawSkillHud(){}
+// ================= companions and villagers who notice things (STUB: the companions build replaces this file)
+function updateComps(dt){}
+function compsForRender(list){}
+function compsOnMove(){}
+function villagerBarks(dt){}
+function drawCompHud(){}
+function deed(id){ G.deeds=G.deeds||{}; G.deeds[id]=true; }
 
 // ================= drawing: effects
 function rr(x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
@@ -8541,6 +8618,7 @@ function drawHero(x,y,f,p,ghost){
   const ts=Math.sin(p.t*2.2+p.walkT*6)*0.5;
   ctx.strokeStyle='#5e1a10'; ctx.lineWidth=7.5; ctx.beginPath(); ctx.moveTo(-8,0); ctx.quadraticCurveTo(-22,-ts*10,-34,ts*14); ctx.stroke();
   ctx.strokeStyle=fl?'#fff':'#9a3420'; ctx.lineWidth=4.5; ctx.stroke();
+  drawWingsHook(p,L,fl);
   // boots
   ell(3+sw*4,-6,4.6,3,'#2a1c12'); ell(3-sw*4,6,4.6,3,'#2a1c12');
   // cloak
@@ -8564,18 +8642,8 @@ function drawHero(x,y,f,p,ghost){
   for(const s of [-1,1]){ const g=ctx.createLinearGradient(8,s*4,-7,s*11); g.addColorStop(0,'#f6ecd0'); g.addColorStop(1,'#9a8a6a'); ctx.strokeStyle=g; ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(8,s*4); ctx.quadraticCurveTo(2,s*9.5,-7,s*10.5); ctx.stroke(); }
   ctx.fillStyle='#ffd34d'; for(const s of [-1,1]){ ctx.beginPath(); ctx.ellipse(13,s*3.1,1.5,0.9,0,0,TAU); ctx.fill(); }
   if(!ghost) drawAshHat();
-  // weapon
-  const st=p.stats;
-  const armed=!(G&&G.mode==='story'&&!G.flags.forge);
-  if(!armed){ if(p.drinkT>0){ ctx.fillStyle='rgba(120,255,160,.85)'; ctx.beginPath(); ctx.arc(15,7,3,0,TAU); ctx.fill(); } }
-  else if(p.drinkT>0){ ctx.fillStyle='rgba(120,255,160,.85)'; ctx.beginPath(); ctx.arc(15,7,3,0,TAU); ctx.fill(); ctx.strokeStyle='#d8e8e0'; ctx.lineWidth=1; ctx.stroke(); drawHeroBlade(0,30,false,true); }
-  else if(p.swingT>0){
-    const pr=1-p.swingT/p.swingDur, ez=1-Math.pow(1-pr,2.2), span=p.swingFin?1.4:1.15, a0=-p.swingSide*span, a1=p.swingSide*span, a=lerp(a0,a1,ez);
-    const R=st.range*(p.swingFin?1.25:1), lo=Math.min(a0,a), hi=Math.max(a0,a);
-    const g=ctx.createRadialGradient(0,0,R*0.3,0,0,R); g.addColorStop(0,'rgba(255,240,220,0)'); g.addColorStop(0.8,p.swingFin?'rgba(255,190,110,.42)':'rgba(240,244,250,.3)'); g.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,R,lo,hi); ctx.arc(0,0,R*0.3,hi,lo,true); ctx.closePath(); ctx.fill();
-    drawHeroBlade(a,R*0.92,p.swingFin,false);
-  }else drawHeroBlade(0,30,false,true);
+  // weapon (drawn by the weapons module)
+  drawHeroWeapon(p);
   if(p.breathing){ const g=ctx.createRadialGradient(22,0,0,22,0,16); g.addColorStop(0,'rgba(255,240,180,.95)'); g.addColorStop(1,'rgba(255,120,40,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(22,0,16,0,TAU); ctx.fill(); }
   ctx.restore();
 }
@@ -9453,9 +9521,10 @@ function render(){
   for(const c of G.critters) if(inView(c.x,c.y,40)) list.push(c);
   if(G.goat&&inView(G.goat.x,G.goat.y,40)&&(!inA||G.side.duchess==='follow')){ G.goat.kind='goat'; list.push(G.goat); }
   if(G.allies) for(const a of G.allies) if(inView(a.x,a.y,60)) list.push(a);
-  if(!player.dead) list.push(player);
+  if(!player.dead&&!player.flying) list.push(player);
+  compsForRender(list);
   list.sort((a,b)=>a.y-b.y);
-  for(const e of list){ if(e===player) drawPlayer(); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
+  for(const e of list){ if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
   if(G.fishing){ const F=G.fishing, bob=Math.sin(t*4)*1.5+(F.bite>0?3:0); ctx.strokeStyle='rgba(240,240,240,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(player.x+Math.cos(player.facing)*24,player.y+Math.sin(player.facing)*24); ctx.quadraticCurveTo((player.x+F.wx)/2,(player.y+F.wy)/2-20,F.wx,F.wy+bob); ctx.stroke(); ctx.fillStyle='#c8322a'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob,4,0,TAU); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob-2,2,0,TAU); ctx.fill(); if(F.bite>0) drawMarker(F.wx,F.wy-26,'!',t); }
   if(G.corpse&&G.corpse.type!=='vorlaxis'&&G.corpse.deathT<0.6){ ctx.save(); ctx.globalAlpha=1-G.corpse.deathT/0.6; const c=G.corpse; c.flash=1; drawEnemy(Object.assign({},c,{dead:false,alpha:1,spawnIn:0,boss:true})); ctx.restore(); }
   if(G.spirit&&!inA) drawSpirit(G.spirit);
@@ -9474,10 +9543,11 @@ function render(){
     ctx.globalAlpha=1;
   }
   for(const e of G.enemies) if(!e.dead&&!e.frozen&&e.flying&&inView(e.x,e.y,80)) drawEnemy(e);
+  drawAirborneHook();
   if(G.pip) drawPip(G.pip);
   drawMarkers(t);
   if(!inA) drawBirds();
-  drawProjectiles(); drawParticles(); drawRings();
+  drawProjectiles(); drawWeaponFx(); drawParticles(); drawRings();
   ctx.setTransform(1,0,0,1,0,0);
   if(!inA){ const tint=ambientTint(); if(tint[0]<253||tint[1]<253||tint[2]<253){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${tint.map(Math.round)})`; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.globalCompositeOperation='source-over'; } }
   drawLights();
@@ -9567,6 +9637,7 @@ function drawIconBtn(r,kind){
     else{ ctx.beginPath(); ctx.arc(cx+1,cy,5,-0.9,0.9); ctx.stroke(); ctx.beginPath(); ctx.arc(cx+1,cy,9,-0.9,0.9); ctx.stroke(); } }
 }
 function flask(x,y,full){ ctx.fillStyle=full?'#5ad88a':'rgba(255,255,255,.12)'; ctx.beginPath(); ctx.arc(x,y+2,4.5,0,TAU); ctx.fill(); ctx.fillRect(x-1.6,y-5,3.2,4); ctx.strokeStyle='rgba(230,240,235,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(x,y+2,4.5,0,TAU); ctx.stroke(); }
+// ================= depth: diorama look (STUB: the depth build fills this file)
 
 // ================= HUD
 function drawHUD(){
@@ -9646,6 +9717,7 @@ function drawHUD(){
     ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
     ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
   }
+  drawWeaponHud(); drawMoveHud(); if(story){ drawSkillHud(); drawCompHud(); }
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
     const a=Math.min(1,G.hintT/1.5);
@@ -11472,7 +11544,7 @@ function resize(){
   DPR=Math.min(window.devicePixelRatio||1,2); W=Math.max(320,window.innerWidth); H=Math.max(320,window.innerHeight);
   cvs.width=Math.round(W*DPR); cvs.height=Math.round(H*DPR);
   lightCvs.width=Math.ceil(W/2); lightCvs.height=Math.ceil(H/2);
-  zoom=clamp(Math.min(W/900,H/620),0.6,1.3); readSafe(); vigKey='';
+  zoom=clamp(Math.min(W/900,H/620),0.6,1.3); ZOOM0=zoom; readSafe(); vigKey='';
   if(G&&player){ if(scene==='menu') menuCam(0,true); else updateCam(0,true); }
   if(scene==='map') drawMapScreen();
 }
@@ -11482,6 +11554,7 @@ function frame(now){
   let dt=(now-last)/1000; last=now; if(!(dt>0)) dt=0; dt=Math.min(dt,0.05);
   shakeMag=Math.max(0,shakeMag-dt*30); flashA=Math.max(0,flashA-dt*1.6);
   try{
+    padPoll(dt);
     if(scene==='menu') menuUpdate(dt);
     else if(scene==='play'){ updateTimers(dt); if(scene==='play'){ if(G.slowT>0){ G.slowT-=dt; if(G.slowT<=0) G.timeScale=1; } update(dt*G.timeScale); } }
     else if(scene==='dying'){ dyingT-=dt; liteUpdate(dt); if(dyingT<=0) showDeath(); }
@@ -11510,6 +11583,8 @@ window.__eb={god:false,get G(){return G;},get player(){return player;},get scene
   face(a){ player.facing=a; }, WARDS, POI, LANTERNS, NPCSPOT, SITES, LILIES, ORES, bossDone(b){ G.bossDone[b]=true; }, Cloud, syncSaves, objectiveList,
   travel(id){ const s=SHRINES.find(z=>z.id===id); G.shrines[id]=true; scene='map'; travelTo(s); },
   setTime(t){ G.tod=t; }, rain(on){ G.weather.type=on?'rain':'clear'; G.weather.t=999; G.rainK=on?1:0; }};
+// debug hooks from feature modules: each one adds to window.__ebX
+if(window.__ebX) Object.defineProperties(window.__eb,Object.getOwnPropertyDescriptors(window.__ebX));
 })();
 
 </script>
