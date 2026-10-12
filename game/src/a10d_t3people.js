@@ -452,7 +452,7 @@ function t3pBuildPerson(P){
 }
 // draws P with its feet below (x,y); returns the sprite. ex: extra state for companions ({key,...})
 function t3pDraw(n,P,face,ht,wk,ph,breath,x,y,ex,noShadow){
-  const Q=pq3(P), fb=ex&&ex.down?t3pBucket(face):t3pBucket(face), hb=ex&&ex.down?0:clamp(Math.round(ht/(TAU/32)),-3,3);
+  const Q=pq3(P), fb=ex&&ex.down?t3pBucket(face):t3pBucket(face), hb=ex&&ex.down?0:clamp(Math.round(ht/(TAU/32)),-4,4);
   const wf=ex&&ex.down?-1:wk<0.35?-1:Math.floor(((ph%TAU)+TAU)%TAU/TAU*8)%8;
   let bf=0; if(P.hold2==='fiddle'&&!(ex&&ex.down)) bf=((Math.floor((n.t||0)*5.5/TAU*6)%6)+6)%6;
   const key=P.sig+'|'+fb+'|'+hb+'|'+wf+'|'+bf+(ex?ex.key:'');
