@@ -442,7 +442,7 @@ const SFX=(()=>{
     }catch(e){ fireNode=null; fireGain=null; }
   }
   function toggle(){ muted=!muted; store.set('eb_muted',muted); if(master) master.gain.value=muted?0:0.45; if(muted) setFire(false); return muted; }
-  return {init,play,setFire,toggle,ambient,get muted(){return muted;}};
+  return {init,play,setFire,toggle,ambient,get muted(){return muted;},get ac(){return ac;},get noise(){return noiseBuf;}};
 })();
 
 // ================= canvas
@@ -5884,6 +5884,19 @@ $('#acOut').addEventListener('click',async()=>{ await Cloud.logout(); $('#acStat
 $('#acSync').addEventListener('click',async()=>{ const s=$('#acStatus'); s.textContent='Syncing…'; const r=await syncSaves(); s.textContent=r==='offline'?'Could not reach the server.':r==='pulled'?'Loaded your cloud save.':r==='pushed'?'Uploaded the save from this device.':'Already up to date.'; refreshMenu(); });
 $('#acClose').addEventListener('click',()=>{ show('menu'); acctLabel(); });
 Cloud.onChange(acctLabel);
+
+// ================= music (procedural score, WebAudio)
+// Interface used by the rest of the game:
+//   Music.init()            call after a user gesture (SFX.init() first)
+//   Music.setTheme(name)    crossfade to a theme; same name again is a no-op
+//   Music.stinger(name)     one-shot musical cue over the current theme
+//   Music.toggle()          returns new muted state; persisted in localStorage 'eb_music_off'
+//   Music.muted             true when music is off
+//   Music.duck(on)          lower music while dialogue is open
+const Music=(()=>{
+  let theme=null;
+  return {init(){},setTheme(n){ theme=n; },stinger(){},toggle(){ return true; },duck(){},get muted(){ return true; },get theme(){ return theme; }};
+})();
 
 // ================= blessings
 let upChoices=null, upCb=null;

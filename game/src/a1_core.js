@@ -126,7 +126,7 @@ const SFX=(()=>{
     }catch(e){ fireNode=null; fireGain=null; }
   }
   function toggle(){ muted=!muted; store.set('eb_muted',muted); if(master) master.gain.value=muted?0:0.45; if(muted) setFire(false); return muted; }
-  return {init,play,setFire,toggle,ambient,get muted(){return muted;}};
+  return {init,play,setFire,toggle,ambient,get muted(){return muted;},get ac(){return ac;},get noise(){return noiseBuf;}};
 })();
 
 // ================= canvas
