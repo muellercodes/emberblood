@@ -6953,14 +6953,16 @@ function drawAirborneHook(){
   if(!p.flying||p.dead) return;
   drawPlayer();
   const sp=Math.hypot(p.avx||0,p.avy||0); if(sp<60) return;
-  const a=Math.atan2(p.avy,p.avx), vw=W/zoom, vh=H/zoom, t=G.time, n=12, k=clamp((sp-60)/260,0,1);
-  ctx.save(); ctx.strokeStyle=`rgba(235,242,250,${0.22*k})`; ctx.lineWidth=1.3; ctx.beginPath();
+  // short streaks of wind rushing past Ash (in a box around him, fading toward its edges)
+  const a=Math.atan2(p.avy,p.avx), ca=Math.cos(a), sa=Math.sin(a), t=G.time, n=14, k=clamp((sp-60)/260,0,1), B=260, cx=p.x, cy=p.y-p.z;
+  ctx.save(); ctx.lineWidth=1.2; ctx.lineCap='round';
   for(let i=0;i<n;i++){
-    const h1=((i*7919)%1000)/1000, h2=((i*104729)%1000)/1000, len=40+h2*60;
-    const u=((h1*vw-t*sp*0.9*Math.cos(a))%vw+vw)%vw, v=((h2*vh-t*sp*0.9*Math.sin(a))%vh+vh)%vh;
-    const x=cam.x+u, y=cam.y+v; ctx.moveTo(x,y); ctx.lineTo(x-Math.cos(a)*len,y-Math.sin(a)*len);
+    const h1=((i*7919)%1000)/1000, h2=((i*104729)%1000)/1000, len=16+h2*26;
+    const u=((h1*B*2-t*sp*1.1*ca)%(B*2)+B*2)%(B*2)-B, v=((h2*B*2-t*sp*1.1*sa)%(B*2)+B*2)%(B*2)-B, f=Math.max(0,1-Math.hypot(u,v)/B);
+    if(f<0.05) continue;
+    ctx.strokeStyle=`rgba(240,246,252,${0.3*k*f})`; ctx.beginPath(); ctx.moveTo(cx+u,cy+v); ctx.lineTo(cx+u-ca*len,cy+v-sa*len); ctx.stroke();
   }
-  ctx.stroke(); ctx.restore();
+  ctx.restore();
 }
 // the wing meter (a slim ring beside Ash), landing hints and the new-ability tip
 function drawMoveHud(){
