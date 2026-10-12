@@ -45,14 +45,39 @@ function updatePlayer(dt,inp){
   const p=player, st=p.stats;
   p.t+=dt; p.dashCd-=dt; p.iframes-=dt; p.hurtFlash-=dt; p.atkCd-=dt; p.comboTimer-=dt; G.dashBuf-=dt; G.roarBuf-=dt;
   const moving=Math.abs(inp.mx)+Math.abs(inp.my)>0.05; p.inMx=inp.mx; p.inMy=inp.my;
-  let aim=p.facing; const wpn=curWeapon(), ranged=wpn==='bow'||wpn==='boomerang', stickAim=Math.hypot(inp.aimX||0,inp.aimY||0)>0.3;
+  // aim (UX build): keyboard and mouse face the way Ash walks (WASD or arrows) and keep that facing when he stops;
+  // attacks and fire breath turn toward the best foe in a 45 degree cone in front (aimAssist in a6b_weapons.js).
+  // Settings "Aim with the mouse" faces the pointer instead. Controllers aim with the right stick, touch auto-aims.
+  const wpn=curWeapon(), ranged=wpn==='bow'||wpn==='boomerang', stickAim=Math.hypot(inp.aimX||0,inp.aimY||0)>0.3;
+  const mouseAim=settings.mouseAim&&!usingTouch&&!inp.pad&&aimMode==='mouse';
+  // something else turned Ash (the bow and hammer turn toward the aim, cutscenes, debug hooks): he keeps that facing
+  if(p.faceGoal==null||(p.fOut!=null&&p.facing!==p.fOut&&!moving)) p.faceGoal=p.facing;
+  if(moving&&!stickAim){
+    // releasing a diagonal (W+D) lets go of one key a frame before the other: keep the diagonal, not the last key
+    const a=Math.atan2(inp.my,inp.mx);
+    if(p.mvDir==null||Math.abs(angDiff(p.mvDir,a))>0.05){ p.mvPrev=p.mvDir; p.mvDir=a; p.mvT=0; } else p.mvT+=dt;
+    p.faceGoal=a;
+  }else if(p.mvDir!=null){ if(!stickAim&&!inp.pad&&!usingTouch&&p.mvT<0.09&&p.mvPrev!=null) p.faceGoal=p.mvPrev; p.mvDir=null; p.mvPrev=null; }
+  let aim=p.faceGoal;
   if(stickAim) aim=Math.atan2(inp.aimY,inp.aimX);
-  else if(usingTouch){ const tg=nearestEnemy(p.x,p.y,ranged?430:320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); else if(moving) aim=Math.atan2(inp.my,inp.mx); }
-  else if(aimMode==='mouse'&&!inp.pad){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
-  else if(moving) aim=Math.atan2(inp.my,inp.mx);
-  if(ranged&&!usingTouch&&(aimMode!=='mouse'||inp.pad)) aim=wAimAssist(aim);
+  else if(usingTouch){ const tg=nearestEnemy(p.x,p.y,ranged?430:320); if(tg) aim=angTo(p.x,p.y,tg.x,tg.y); }
+  else if(mouseAim){ const w=toWorld(mouse.x,mouse.y); aim=Math.atan2(w.y-p.y,w.x-p.x); }
+  const fighting=inp.attack||inp.fire||p.breathing||!!p.bow||!!p.ham;
+  if(!usingTouch&&!mouseAim){
+    if(stickAim){ if(ranged) aim=wAimAssist(aim); }
+    else if(fighting) aim=aimAssist(aim,inp.fire||p.breathing?'breath':wpn);
+  }
   p.aim=aim;
-  if(p.swingT<=0) p.facing=p.breathing?turnTo(p.facing,aim,9*dt):(p.sprinting&&moving?turnTo(p.facing,Math.atan2(inp.my,inp.mx),12*dt):aim);
+  if(stickAim||(usingTouch&&!moving)) p.faceGoal=aim;   // letting go of the right stick (or a touch target) keeps that facing
+  if(p.swingT<=0){
+    const free=inp.attack&&p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0;
+    if(p.breathing) p.facing=turnTo(p.facing,aim,9*dt);
+    else if(mouseAim||free) p.facing=aim;   // a swing or throw goes exactly where it is aimed
+    else if(p.sprinting&&moving&&!stickAim) p.facing=turnTo(p.facing,aim,14*dt);
+    else p.facing+=angDiff(p.facing,aim)*(1-Math.exp(-dt*24));   // a fast ease, never a snap
+    if(!moving&&fighting) p.faceGoal=p.facing;   // standing still, he keeps facing the foe he turned to
+  }
+  p.fOut=p.facing;
   // stamina
   if(p.stamDelay>0) p.stamDelay-=dt; else p.stamina=Math.min(p.maxStamina,p.stamina+st.staminaRegen*dt);
   // roll

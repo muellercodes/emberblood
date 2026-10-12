@@ -94,8 +94,10 @@ function renderJour(){
     const S=secretTally();
     rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
   }else if(jTab==='hero') rows.push(heroTabHtml());
+  else if(jTab==='log') rows.push(logJourHtml());
   el.innerHTML=rows.join('');
   if(jTab==='hero') heroTabWire(el);
+  if(jTab==='log') logJourWire(el);
   for(const b of el.querySelectorAll('button[data-f]')) b.addEventListener('click',()=>{ followQuest(b.dataset.f||null); SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
 }
@@ -217,6 +219,31 @@ $('#bSettings').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openS
 $('#bPauseSettings').addEventListener('click',()=>{ SFX.play('ui'); openSettings('pause'); });
 $('#bSettingsClose').addEventListener('click',()=>{ SFX.play('ui'); closeSettings(); });
 for(const id of ['setSfx','setMusic','setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
+// ---------- two more rows (UX build), injected like the depth row so body.html stays as it is:
+// "Aim with the mouse" (off: Ash faces the way he walks) and "Characters" (3D toy figures or the classic flat art)
+// (a3e_toy3d.js reads eb_chars at load; this flips it live)
+function setChars(v){ v=v==='classic'?'classic':'3d'; T3.on=v==='3d'; store.set('eb_chars',v); uxSyncRows(); return v; }
+function setMouseAim(on){ settings.mouseAim=!!on; store.set('eb_mouseaim',settings.mouseAim); if(!on&&player) player.faceGoal=player.facing; uxSyncRows(); return settings.mouseAim; }
+function uxSyncRows(){
+  for(const b of document.querySelectorAll('#setChars button')) b.setAttribute('aria-pressed',String(b.dataset.v===(T3.on?'3d':'classic')));
+  for(const b of document.querySelectorAll('#setAim button')) b.setAttribute('aria-pressed',String(b.dataset.v===(settings.mouseAim?'on':'off')));
+}
+(function uxRows(){
+  try{
+    const panel=document.querySelector('#settings .panel'); if(!panel||$('#setChars')) return;
+    const mk=(html)=>{ const r=document.createElement('div'); r.className='setrow'; r.innerHTML=html; return r; };
+    const aim=mk('<span>Aim with the mouse<small>Off: Ash faces where he walks, and attacks find the foe in front. On: he faces the pointer.</small></span><div class="seg" id="setAim" role="group" aria-label="Aim with the mouse"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div>');
+    const chars=mk('<span>Characters<small>3D toy figures that turn to face every way, or the classic flat look.</small></span><div class="seg" id="setChars" role="group" aria-label="Characters"><button type="button" data-v="3d" aria-pressed="false">3D</button><button type="button" data-v="classic" aria-pressed="false">Classic</button></div>');
+    // the aim row sits under Damage numbers; Characters goes just above the 3D depth row (or the end of the list)
+    const nums=$('#setNums'), nr=nums&&nums.closest('.setrow');
+    if(nr) nr.after(aim); else panel.prepend(aim);
+    const dep=$('#setDepth'), dr=dep&&dep.closest('.setrow'), done=$('#bSettingsClose'); let ref=dr||done; while(ref&&ref.parentElement!==panel) ref=ref.parentElement;
+    if(ref) panel.insertBefore(chars,ref); else panel.appendChild(chars);
+    for(const b of aim.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setMouseAim(b.dataset.v==='on'); SFX.play('ui'); });
+    for(const b of chars.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setChars(b.dataset.v); SFX.play('ui'); });
+    uxSyncRows();
+  }catch(e){}
+})();
 $('#bSlotsClose').addEventListener('click',()=>{ SFX.play('ui'); show('menu'); refreshMenu(); });
 $('#bPauseJournal').addEventListener('click',()=>{ scene='play'; hideAll(); openJournal(); });
 $('#bMapJournal').addEventListener('click',()=>{ closeMap(true); openJournal(); });
@@ -252,7 +279,7 @@ function frame(now){
     else if(scene==='play'){ updateTimers(dt); if(scene==='play'){ if(G.slowT>0){ G.slowT-=dt; if(G.slowT<=0) G.timeScale=1; } update(dt*G.timeScale); } }
     else if(scene==='dying'){ dyingT-=dt; liteUpdate(dt); if(dyingT<=0) showDeath(); }
     else if(scene==='dialogue'){ updateDialogue(dt); liteUpdate(dt); }
-    else if(scene!=='paused'&&scene!=='map'&&scene!=='journal') liteUpdate(dt);
+    else if(scene!=='paused'&&scene!=='map'&&scene!=='journal'&&!(scene==='log'&&LOG.from==='paused')) liteUpdate(dt);
     musicUpdate(dt); if(scene==='play') perkUpdate(dt);
     if(!OV.done) overviewStep(scene==='menu'?14:6);
     render();
@@ -276,6 +303,11 @@ window.__eb={god:false,get G(){return G;},get player(){return player;},get scene
   face(a){ player.facing=a; }, WARDS, POI, LANTERNS, NPCSPOT, SITES, LILIES, ORES, bossDone(b){ G.bossDone[b]=true; }, Cloud, syncSaves, objectiveList,
   travel(id){ const s=SHRINES.find(z=>z.id===id); G.shrines[id]=true; scene='map'; travelTo(s); },
   setTime(t){ G.tod=t; }, rain(on){ G.weather.type=on?'rain':'clear'; G.weather.t=999; G.rainK=on?1:0; }};
+window.__ebX=Object.assign(window.__ebX||{},{setChars,setMouseAim,T3,readT,setBanner,taunt,bannerSkip,dlgNext,dlgChoose,dlgAskSkip,
+  aimInfo:()=>({facing:player.facing,goal:player.faceGoal,aim:player.aim,mouseAim:settings.mouseAim,aimMode}),
+  banner:()=>G.banner?{text:G.banner.text,sub:G.banner.sub,t:G.banner.t,dur:G.banner.dur,q:(G.bannerQ||[]).map(b=>b.text)}:{q:(G.bannerQ||[]).map(b=>b.text)},
+  dlgState:()=>DLG?{i:DLG.i,text:DLG.text,chars:DLG.chars,opts:!!DLG.opts,skipArm:DLG.skipArm}:null,
+  say:(id,t)=>{ const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); return n?!!npcBubble(n,t):false; }, view:()=>({x:cam.x,y:cam.y,zoom,W,H})});
 // debug hooks from feature modules: each one adds to window.__ebX
 if(window.__ebX) Object.defineProperties(window.__eb,Object.getOwnPropertyDescriptors(window.__ebX));
 })();

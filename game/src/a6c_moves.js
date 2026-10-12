@@ -49,7 +49,7 @@ function mvSnd(kind,v){
 function movesPre(dt,inp){
   const p=player; mvEnsure(p);
   if(!MV.late){ MV.late=true; reachLate(); }   // place things that need the finished world (a1j_quests4.js)
-  if(MV.lastG!==G){ MV.lastG=G; moveReset(p); p.flyE=flyMax(); MV.tip=null; MV.zoomK=1; if(G.mode==='normal') MV.tip={title:'Jump',text:`${capF(jumpCtl().v)} to jump over rocks and shockwaves.`,t:0,dur:8}; }
+  if(MV.lastG!==G){ MV.lastG=G; moveReset(p); p.flyE=flyMax(); MV.tip=null; MV.zoomK=1; if(G.mode==='normal') mvTip('Jump',`${capF(jumpCtl().v)} to jump over rocks and shockwaves.`,8); }
   // a teleport (fast travel, a door, a respawn) drops Ash out of the sky
   if(MV.lx!=null&&dist2(p.x,p.y,MV.lx,MV.ly)>420*420) moveReset(p);
   if(inp.jump) MV.jumpBuf=0.14; else MV.jumpBuf-=dt;
@@ -131,7 +131,7 @@ function movesPost(dt,ox,oy,inp){
     if(!AREA&&!G.flags.gate&&p.y<WALL_Y+170){
       const k=clamp((WALL_Y+170-p.y)/110,0,1); p.avy=Math.max(p.avy,320*k); p.y=Math.max(p.y,WALL_Y+64);
       if(Math.random()<0.6) emit(p.x+rand(-160,160),p.y-p.z-rand(20,120),1,{col:'230,236,245',glow:false,ang:Math.PI/2,spread:0.15,smin:300,smax:480,lmin:.25,lmax:.45,zmin:1,zmax:1.8,drag:0.5,alpha:0.5});
-      MV.gustT-=dt; if(MV.gustT<=0){ MV.gustT=3.5; mvSnd('gust'); ftext(p.x,p.y-p.z-34,'The Wall’s storm winds push you back!','#e6eef8',13); MV.tip={title:'The Obsidian Wall',text:'The winds over the Wall are too strong to fly through. The gate has to open first.',t:0,dur:5}; }
+      MV.gustT-=dt; if(MV.gustT<=0){ MV.gustT=3.5; mvSnd('gust'); ftext(p.x,p.y-p.z-34,'The Wall’s storm winds push you back!','#e6eef8',13); mvTip('The Obsidian Wall','The winds over the Wall are too strong to fly through. The gate has to open first.',5); }
     }
     // wingtip embers
     MV.emberT-=dt; if(MV.emberT<=0){ MV.emberT=0.08; const s=Math.random()<0.5?-1:1, f=p.facing, lx=-14, ly=52*s; emit(p.x+Math.cos(f)*lx-Math.sin(f)*ly,p.y-p.z+Math.sin(f)*lx+Math.cos(f)*ly,1,{col:'255,170,90',smin:5,smax:25,lmin:.3,lmax:.6,zmin:1,zmax:2,drag:2,rise:-30}); }
@@ -278,6 +278,12 @@ function breathFly(dt){
     }
   }
 }
+// a tip pill that stays up long enough to read and goes in the log; the same tip again just stays up longer
+function mvTip(title,text,dur){
+  const d=Math.max(dur||0,readT(text,4,10));
+  if(MV.tip&&MV.tip.text===text){ MV.tip.dur=Math.max(MV.tip.dur,MV.tip.t+d); return; }
+  MV.tip={title,text,t:0,dur:d}; logAdd({k:'tip',text:title,sub:text,key:'tip:'+text});
+}
 // ---------- getting a new gift (the Trials call this)
 const ABIL_INFO={
   jump:{name:'The Ember Leap',sub:c=>`You can jump! ${capF(c.v)} to hop over fences, rocks, gaps and shockwaves.`,tip:c=>`Jump with ${c.k}. Sprint first to jump farther. Jumping over water is fine. Landing in it is not!`},
@@ -290,7 +296,7 @@ function grantAbility(id){
   const I=ABIL_INFO[id]||{name:id,sub:()=>'New ability',tip:()=>''}, c=jumpCtl(), p=player;
   setBanner(I.name,I.sub(c),4.2);
   try{ jingle('chapter','quest'); }catch(e){}
-  MV.tip={title:'New ability',text:I.tip(c),t:0,dur:10};
+  mvTip('New ability',I.tip(c),10);
   flashA=0.3; flashCol='255,200,130'; shake(5);
   emit(p.x,p.y,46,{col:id==='stride'?'170,220,255':'255,200,120',ang:-Math.PI/2,spread:1.6,smin:40,smax:220,lmin:.5,lmax:1.2,zmin:1.5,zmax:3.5,rise:30});
   if(id==='wings'){ MV.showWings=3; p.flyE=flyMax(); }

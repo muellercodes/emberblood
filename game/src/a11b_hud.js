@@ -126,20 +126,33 @@ function drawCompass(obj){
   ctx.save(); ctx.translate(ex,ey); ctx.rotate(a); ctx.fillStyle='#ffb547'; ctx.strokeStyle='#3a2208'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(13,0); ctx.lineTo(-7,-8); ctx.lineTo(-3,0); ctx.lineTo(-7,8); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
 }
 function drawBanner(){
+  // the next banner in line steps up when the last one is done (setBanner in a9a_env.js queues them)
+  if(!G.banner&&G.bannerQ&&G.bannerQ.length) G.banner=G.bannerQ.shift();
   const bn=G.banner; if(!bn) return;
+  // another module may grow the text after the fact (the skills build adds the skill point line): more time to read it
+  const len=bn.text.length+bn.sub.length; if(len!==bn.len){ bn.len=len; bn.dur=Math.max(bn.dur,bn.t+readT(bn.text+' '+bn.sub)*0.8); if(bn.log) bn.log.sub=bn.sub; }
   const a=clamp(Math.min(bn.t/0.25,(bn.dur-bn.t)/0.5),0,1); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.lineJoin='round';
   const y=H*(bn.style==='region'?0.2:(usingTouch&&bn.style==='boss'?0.42:0.26));
+  let tw=0, bot=y;
   if(bn.style==='boss'){
-    ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y);
-    ctx.font=`500 13px ${UIF}`; const ls=wrapText(bn.sub,W-48); ctx.fillStyle='#f0dcc0'; ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+32+i*17); ctx.fillText(l,W/2,y+32+i*17); });
+    ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
+    ctx.font=`500 13px ${UIF}`; const ls=wrapText(bn.sub,W-48); ctx.fillStyle='#f0dcc0'; ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+32+i*17); ctx.fillText(l,W/2,y+32+i*17); }); bot=y+32+ls.length*17;
   }else{
-    ctx.font=`${bn.style==='region'?'600':'800'} ${W<560?22:bn.style==='region'?30:32}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle=bn.style==='region'?'#f6e9d6':'#ffd27a'; ctx.fillText(bn.text,W/2,y);
-    if(bn.sub){ ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,W-48); ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+30+i*18); ctx.fillStyle='#f0dcc0'; ctx.fillText(l,W/2,y+30+i*18); }); }
+    ctx.font=`${bn.style==='region'?'600':'800'} ${W<560?22:bn.style==='region'?30:32}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle=bn.style==='region'?'#f6e9d6':'#ffd27a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
+    if(bn.sub){ ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,W-48); ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+30+i*18); ctx.fillStyle='#f0dcc0'; ctx.fillText(l,W/2,y+30+i*18); }); bot=y+30+ls.length*18; }
   }
+  // more waiting: a small "+1" chip beside the title
+  const nq=G.bannerQ?G.bannerQ.length:0;
+  if(nq){ const t=`+${nq}`; ctx.font=`800 12px ${UIF}`; const cw=ctx.measureText(t).width+14, cx=Math.min(W-SAFE.r-cw-6,W/2+tw/2+10), cy=y-11;
+    ctx.fillStyle='rgba(14,9,6,.82)'; rr(cx,cy,cw,22,11); ctx.fill(); ctx.strokeStyle='rgba(255,200,120,.6)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='#ffd27a'; ctx.textBaseline='middle'; ctx.fillText(t,cx+cw/2,cy+11.5); }
   ctx.restore();
+  // touch: tap the banner to let it go (with a mouse any click does it, see the mousedown handler in a5_input.js)
+  if(usingTouch&&scene==='play'&&bn.t>0.3){ const bw=Math.min(W-24,Math.max(tw,200)+40); HUD_HITS.push({x:W/2-bw/2,y:y-26,w:bw,h:bot-y+34,fn:bannerSkip}); }
 }
 function drawTaunt(){
+  if(!G.taunt&&G.tauntQ&&G.tauntQ.length) G.taunt=G.tauntQ.shift();
   const t=G.taunt; if(!t) return;
   const a=clamp(Math.min(t.t/0.2,(t.dur-t.t)/0.4),0,1); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center';
@@ -192,7 +205,8 @@ function hintText(){
   const dev=curDevice(), K=a=>btnLabel(a,dev), jump=G.mode!=='story'||hasAbil('jump');
   if(dev==='touch') return settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the flasks to drink, the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts';
   if(dev==='pad') return `Left stick move, push it all the way to sprint · ${K('attack')} or ${padBtnName(PB.R2)} attack · ${padBtnName(PB.L2)} fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('use')} talk and open · ${K('drink')} drink · ${K('map')} map`;
-  return `WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
+  if(settings.mouseAim) return `WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
+  return `WASD move, Ash faces the way he walks · Shift sprint · Click or J attack · Right click or K fire (both lock on to a foe in front) · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
 }
 function drawHintText(b){
   const a=Math.min(1,G.hintT/1.5);

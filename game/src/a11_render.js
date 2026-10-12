@@ -76,8 +76,9 @@ function render(){
   if(G.allies) for(const a of G.allies) if(inView(a.x,a.y,60)) list.push(a);
   if(!player.dead&&!player.flying) list.push(player);
   compsForRender(list);
+  if(!inA) addOccluders(list);
   list.sort((a,b)=>a.y-b.y);
-  for(const e of list){ if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
+  for(const e of list){ if(e.occ){ drawOcc(e,t); continue; } if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
   if(G.fishing){ const F=G.fishing, bob=Math.sin(t*4)*1.5+(F.bite>0?3:0); ctx.strokeStyle='rgba(240,240,240,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(player.x+Math.cos(player.facing)*24,player.y+Math.sin(player.facing)*24); ctx.quadraticCurveTo((player.x+F.wx)/2,(player.y+F.wy)/2-20,F.wx,F.wy+bob); ctx.stroke(); ctx.fillStyle='#c8322a'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob,4,0,TAU); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob-2,2,0,TAU); ctx.fill(); if(F.bite>0) drawMarker(F.wx,F.wy-26,'!',t); }
   if(G.corpse&&G.corpse.type!=='vorlaxis'&&G.corpse.deathT<0.6){ ctx.save(); ctx.globalAlpha=1-G.corpse.deathT/0.6; const c=G.corpse; c.flash=1; drawEnemy(Object.assign({},c,{dead:false,alpha:1,spawnIn:0,boss:true})); ctx.restore(); }
   if(G.spirit&&!inA) drawSpirit(G.spirit);
@@ -113,6 +114,83 @@ function render(){
   if(G.fade>0){ ctx.fillStyle=`rgba(0,0,0,${clamp(G.fade,0,1)})`; ctx.fillRect(0,0,W,H); }
   if(scene!=='menu') drawHUD();
 }
+// ---------- characters behind houses (UX build). The 3D figures are tall, so somebody standing just north of a
+// house used to draw over its roof. Houses (and columns) are still drawn where they were, under everything; for
+// each one with a figure behind it, an occluder sorts into the entity list at the house's front (south) edge and
+// draws the house again, clipped to those figures' boxes, over them. Figures in front of the house draw after it.
+// Cheap: only houses with somebody behind them, and only inside those boxes. The lean (a11c_depth.js) is the same.
+const OCC_K={house:1,forge:1,library:1,column:1};
+let OCCS=null; const OCCL=[];
+function occFront(s){ return s.k==='column'?s.y:s.y+s.h/2; }
+// the world box the structure is drawn in, widened by its lean
+function occBox(s,o){
+  if(s.k==='column'){ const k=s.s||1, r=16*k, H=s.broken?30:44*k; o[0]=s.x-r-6; o[2]=s.x+r+10; o[1]=s.y-H-14; o[3]=s.y+10; }
+  else{ const c=houseSprite(s); o[0]=s.x-c.ox; o[1]=s.y-c.oy; o[2]=o[0]+c.width/HSC; o[3]=o[1]+c.height/HSC; }
+  if(DV.on){ const f=LEAN_S[s.k]||0, by=occFront(s), h=by-o[1], dx=(s.x-DV.cx)*DV.k*f*h, dy=(by-DV.cy)*DV.k*DV.vf*f*h; if(dx<0) o[0]+=dx; else o[2]+=dx; if(dy<0) o[1]+=dy; }
+  return o;
+}
+// a figure's box on screen, in world units: feet a little below e.y, the head up to _t3top (set by the 3D figures)
+function figBox(e,o){
+  const r=e.r||12, z=e===player?(player.z||0):(e.z||0), w=Math.max(18,r*1.6);
+  const top=e._t3top!=null&&e._t3top<e.y&&e._t3top>e.y-400?e._t3top:e.y-(e===player?46:e.kind?44:r*2.4+18)-z;
+  o[0]=e.x-w; o[2]=e.x+w; o[1]=top-6; o[3]=e.y+r*0.8+8;
+  return o;
+}
+let OCC_ON=true, OCC_F=0;
+function addOccluders(list){
+  OCC_F++; if(!OCC_ON) return;
+  if(!OCCS) OCCS=STRUCTS.filter(s=>OCC_K[s.k]);
+  const n=list.length, fb=[0,0,0,0], hb=[0,0,0,0];
+  for(const s of OCCS){
+    if(!inView(s.x,s.y,(s.w||60)+140)) continue;
+    const front=occFront(s); let o=null, hbOk=false;
+    for(let i=0;i<n;i++){
+      const e=list[i]; if(e.y>=front||e.y<front-420||e.x==null) continue;
+      if(!hbOk){ occBox(s,hb); hbOk=true; }
+      if(e.x<hb[0]-60||e.x>hb[2]+60) continue;
+      figBox(e,fb);
+      if(fb[2]<hb[0]||fb[0]>hb[2]||fb[3]<hb[1]||fb[1]>hb[3]) continue;
+      if(!o){ o=OCCL.find(q=>q.occ===s); if(!o){ o={occ:s,clips:[],pool:[],x:s.x,y:0,hasP:false}; OCCL.push(o); } o.clips.length=0; o.y=front-0.001; o.hasP=false; }
+      const c=o.pool[o.clips.length]||(o.pool[o.clips.length]=[0,0,0,0]);
+      c[0]=Math.max(fb[0],hb[0]); c[1]=Math.max(fb[1],hb[1]); c[2]=Math.min(fb[2],hb[2]); c[3]=Math.min(fb[3],hb[3]); o.clips.push(c);
+      if(e===player) o.hasP=true;
+    }
+    if(o){ o.f=OCC_F; list.push(o); }
+  }
+}
+function drawOcc(o,t){
+  const s=o.occ;
+  ctx.save(); ctx.beginPath(); for(const c of o.clips) ctx.rect(c[0],c[1],c[2]-c[0],c[3]-c[1]); ctx.clip();
+  const lf=DV.on?LEAN_S[s.k]:0; if(lf) leanOn(s.x,leanBase(s),lf);
+  if(s.k==='column') drawColumn(s); else drawHouseStruct(s,t);
+  ctx.restore();
+  // Ash really hidden behind a roof (his body or head under the house's pixels): a soft glow shows where he is
+  o.hid=false;
+  if(o.hasP&&!player.dead){ const p=player, top=p._t3top!=null&&p._t3top<p.y?p._t3top:p.y-30-(p.z||0);
+    if(occOpaque(s,p.x,p.y-8-(p.z||0))||occOpaque(s,p.x,top+7)){ o.hid=true; glowAt(p.x,(p.y+top)/2,(p.r||14)*1.7,'255,205,130',0.26+0.06*Math.sin(G.time*5)); } }
+}
+// is the house drawn at world point (x,y)? Reads a cached alpha mask of its sprite, undoing the lean
+const OCCA=new WeakMap();
+function occOpaque(s,wx,wy){
+  if(s.k==='column') return false;
+  const c=houseSprite(s); let m=OCCA.get(c);
+  if(m===undefined){ m=null; try{ const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; m=new Uint8Array(c.width*c.height); for(let i=0;i<m.length;i++) m[i]=d[i*4+3]; }catch(e){ m=null; } OCCA.set(c,m); }
+  if(!m) return false;
+  let x=wx, y=wy;
+  if(DV.on){ const f=LEAN_S[s.k]||0, by=occFront(s), kx=(s.x-DV.cx)*DV.k*f, ky=(by-DV.cy)*DV.k*DV.vf*f; y=(wy-ky*by)/(1-ky); x=wx-kx*(by-y); }
+  const px=Math.floor((x-(s.x-c.ox))*HSC), py=Math.floor((y-(s.y-c.oy))*HSC);
+  return px>=0&&py>=0&&px<c.width&&py<c.height&&m[py*c.width+px]>140;
+}
+// debug: switch the occluders off for a comparison, list the ones drawn last frame, and stand in a plain 3D
+// reference figure for Ash and the villagers (only when a test asks; the character builds fill T3X themselves)
+window.__ebX=Object.assign(window.__ebX||{},{occ(on){ if(on!=null) OCC_ON=!!on; return OCC_ON; },
+  occOpaqueAt(hx,hy,wx,wy){ const s=STRUCTS.find(q=>OCC_K[q.k]&&Math.abs(q.x-hx)<1&&Math.abs(q.y-hy)<1); return !!s&&occOpaque(s,wx,wy); },
+  occLast:()=>OCCL.filter(o=>o.f===OCC_F).map(o=>({k:o.occ.k,x:o.occ.x,y:o.occ.y,w:o.occ.w,h:o.occ.h,front:occFront(o.occ),clips:o.clips.length,rects:o.clips.map(c=>c.slice()),ash:o.hasP,hid:!!o.hid})),
+  houses:()=>STRUCTS.filter(s=>OCC_K[s.k]&&s.k!=='column').map(s=>{ const c=houseSprite(s); return {k:s.k,x:s.x,y:s.y,w:s.w,h:s.h,top:s.y-c.oy,vert:!!s.vert}; }),
+  t3TestFigs(){
+    if(!T3X.ash) T3X.ash=p=>{ ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(p.x,p.y+6,11,5,0,0,TAU); ctx.fill(); t3Begin(p.x,p.y+6,t3Turn(p,p.facing,12),{k:0.95,z:p.z||0}); t3RefPerson({walk:p.walkT*11,move:p.moving?1:0,shirt:'#b8402a',hair:'#3a1a10',pants:'#3a2a24'}); t3End(); p._t3top=p.y+6-(p.z||0)-40*0.95*T3.st; };
+    if(!T3X.npc) T3X.npc=n=>{ t3Begin(n.x,n.y+6,t3Turn(n,n.face||0,10),{k:1}); t3RefPerson({walk:(n.t||0)*9,move:n.walk?1:0}); t3End(); n._t3top=n.y+6-40*T3.st; return true; };
+    return true; }});
 function drawLights(){
   const dl=daylight(), inA=!!AREA, rk=inA?0:G.rainK*(player.y>WALL_Y?1:0), cinder=!inA&&player.y<2700;
   let dk=(1-dl)*0.46+rk*0.06; if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;

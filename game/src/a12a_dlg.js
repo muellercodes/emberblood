@@ -11,14 +11,16 @@ function showCard(num,name){
   const c=$('#card'); $('#cardNum').textContent=num; $('#cardName').textContent=name;
   c.classList.remove('on'); void c.offsetWidth; c.classList.add('on');
   clearTimeout(cardTimer); cardTimer=setTimeout(()=>c.classList.remove('on'),2850);
+  logAdd({k:'banner',text:`${num}: ${name}`,sub:'',key:'card:'+num+name});
 }
 
 // ================= dialogue
 let DLG=null;
 function runDialogue(lines,done,opt){
   scene='dialogue'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  const cp=l=>Array.isArray(l)?l:Object.assign({},l); DLG={lines:lines.map(cp),i:0,chars:0,shown:-1,done,mood:opt&&opt.mood||null};
-  $('#dlgNext').textContent=usingTouch?'Tap ▸':'Click or Space ▸';
+  const cp=l=>Array.isArray(l)?l:Object.assign({},l); DLG={lines:lines.map(cp),i:0,chars:0,shown:-1,done,mood:opt&&opt.mood||null,fullAt:0,lockT:0,optsAt:0,skipArm:0};
+  $('#dlgNext').textContent=usingTouch||PAD.dev==='touch'||coarsePtr()?'Tap ▸':'Click or Space ▸';
+  logAdd({k:'sep'}); dlgSkipLabel();
   try{ Music.duck(true); }catch(e){}
   show('dialogue'); setLine();
 }
@@ -31,6 +33,8 @@ function setLine(){
   DLG.text=String(typeof L.text==='function'?L.text():L.text);
   if(L.skipIf&&L.skipIf()){ DLG.i++; if(DLG.i>=DLG.lines.length) endDialogue(); else setLine(); return; }
   $('#dlgWho').textContent=s.name; $('#dlgWho').style.color=s.col;
+  logAdd({k:who==='narr'?'narr':'line',who:s.name,col:s.col,text:DLG.text});
+  DLG.fullAt=0; DLG.optsAt=0;
   $('#dlgBox').classList.toggle('narr',who==='narr');
   drawPortrait(who); DLG.chars=0; DLG.shown=-1; $('#dlgSay').textContent='';
   const box=$('#dlgOpts'); box.innerHTML=''; DLG.opts=null; box.hidden=true; $('#dlgNext').hidden=false;
@@ -38,13 +42,14 @@ function setLine(){
 }
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); chooseOpt(i); }); box.appendChild(b); });
-  box.hidden=false; $('#dlgNext').hidden=true;
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(typeof o.t==='function'?o.t():o.t)}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
+  box.hidden=false; $('#dlgNext').hidden=true; DLG.optsAt=performance.now();
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }
 function chooseOpt(i){
   if(!DLG||!DLG.opts||!DLG.opts[i]) return;
   const o=DLG.opts[i], hub=DLG.hub; DLG.opts=null; SFX.play('ui');
+  logAdd({k:'choice',who:'You',col:SPK.ash.col,text:String(typeof o.t==='function'?o.t():o.t)});
   if(o.key&&G){ G.seenTalk=G.seenTalk||{}; G.seenTalk[o.key]=1; }
   const cur=DLG; if(o.fn) o.fn();
   if(!DLG||DLG!==cur) return;
@@ -60,12 +65,14 @@ function updateDialogue(dt){
   const text=DLG.text||'';
   if(DLG.opts&&DLG.chars>=text.length) showOpts();
   DLG.chars=Math.min(text.length,DLG.chars+dt*60);
+  if(DLG.chars>=text.length&&!DLG.fullAt) DLG.fullAt=performance.now();
   const n=Math.floor(DLG.chars); if(n!==DLG.shown){ DLG.shown=n; $('#dlgSay').textContent=text.slice(0,n); }
 }
+// __eb.advanceDialogue (tests) and the old callers: finish the typing, else go on at once
 function advanceDialogue(){
   if(!DLG) return;
   const text=DLG.text||'';
-  if(DLG.chars<text.length){ DLG.chars=text.length; return; }
+  if(DLG.chars<text.length){ DLG.chars=text.length; DLG.fullAt=performance.now(); return; }
   if(DLG.opts) return;
   SFX.play('ui'); DLG.i++;
   if(DLG.i>=DLG.lines.length) endDialogue();
@@ -73,13 +80,58 @@ function advanceDialogue(){
 }
 function skipDialogue(){
   if(!DLG) return;
+  DLG.skipArm=0; dlgSkipLabel();
   // skipping fast-forwards to the next choice, so you never skip a decision by accident
   if(DLG.opts){ DLG.chars=1e9; return; }
-  for(let i=DLG.i+1;i<DLG.lines.length;i++){ const L=lineParts(DLG.lines[i]); if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; } if(L.opts){ DLG.i=i; setLine(); if(DLG) DLG.chars=1e9; return; } }
+  for(let i=DLG.i+1;i<DLG.lines.length;i++){ const L=lineParts(DLG.lines[i]); if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; } if(L.opts){ DLG.i=i; setLine(); if(DLG) DLG.chars=1e9; return; } dlgLogSkipped(L); }
   endDialogue();
 }
-$('#dialogue').addEventListener('click',()=>{ SFX.init(); advanceDialogue(); });
-$('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); skipDialogue(); });
+// lines a skip jumps over still go in the log, so they can be read later
+function dlgLogSkipped(L){
+  try{ if(L.skipIf&&L.skipIf()) return; const who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
+    logAdd({k:who==='narr'?'narr':'line',who:s.name,col:s.col,text:String(typeof L.text==='function'?L.text():L.text),sk:true}); }catch(e){}
+}
+// ---------- dialogue input from people (clicks, taps, keys, controller): nothing gets skipped by accident (UX build)
+// A click first finishes the typing. The next one goes on only once the whole line has been up for 0.4 s, and a
+// double click never moves more than one line. Choices wait 0.35 s after they appear. Escape (and the controller's
+// back button, and the Skip button) asks once before it skips the conversation.
+const DLG_FULL=400, DLG_LOCK=220, DLG_OPTS=350;
+function dlgNext(){
+  if(!DLG) return;
+  const now=performance.now(), text=DLG.text||'';
+  if(now<DLG.lockT) return;
+  if(DLG.chars<text.length){ DLG.chars=text.length; DLG.fullAt=now; return; }
+  if(DLG.opts) return;
+  if(now-(DLG.fullAt||now)<DLG_FULL) return;
+  DLG.lockT=now+DLG_LOCK; advanceDialogue();
+}
+function dlgChoose(i){
+  if(!DLG||!DLG.opts) return;
+  const text=DLG.text||'';
+  if(DLG.chars<text.length||!DLG.optsAt){ DLG.chars=text.length; DLG.fullAt=performance.now(); return; }
+  if(performance.now()-DLG.optsAt<DLG_OPTS) return;
+  chooseOpt(i);
+}
+function dlgAskSkip(src){
+  if(!DLG) return;
+  // at a choice there is nothing to skip (a skip never makes a decision): just show the choices
+  if(DLG.opts){ skipDialogue(); return; }
+  const now=performance.now(); DLG.skipKey=src||'key';
+  if(DLG.skipArm&&now-DLG.skipArm<3500){ skipDialogue(); return; }
+  DLG.skipArm=now; dlgSkipLabel(); SFX.play('ui',0.5);
+  const d=DLG; setTimeout(()=>{ if(DLG===d&&d.skipArm&&performance.now()-d.skipArm>=3400){ d.skipArm=0; dlgSkipLabel(); } },3500);
+}
+// the Skip button says what to do while a skip is waiting for the second press
+function dlgSkipLabel(){
+  const sk=$('#dlgSkip'); if(!sk) return;
+  const dev=curDevice(), arm=!!(DLG&&DLG.skipArm);
+  sk.classList.toggle('arm',arm);
+  if(arm){ const again=dev==='pad'?`Press ${padChip(padOkBtn()===PB.S?PB.E:PB.S)} again`:usingTouch||PAD.dev==='touch'||coarsePtr()?'Tap again':(DLG.skipKey==='key'?'Press Esc again':'Click again'); sk.innerHTML=`Skip this conversation? <b>${again}</b>`; }
+  else if(dev==='pad') sk.innerHTML=`Skip scene ${padChip(padOkBtn()===PB.S?PB.E:PB.S)}`;
+  else sk.innerHTML='Skip scene &#9197;';
+}
+$('#dialogue').addEventListener('click',()=>{ SFX.init(); dlgNext(); });
+$('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); dlgAskSkip('click'); });
 
 // ================= portraits
 function faceDragon(g,o){
