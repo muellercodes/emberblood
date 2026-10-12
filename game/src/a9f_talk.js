@@ -85,6 +85,9 @@ function talkHub(n,pre){
     if(shop) o.push({t:id==='marigold'?'Show me your hats':id==='tilly'||id==='hob'?'A bed, or something to eat?':'What are you selling?',tag:'shop',fn:()=>shop(n),end:true});
     // quest step that needs more items: remind
     for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id&&!haveAll(st.take)) o.push({t:`About ${QDEFS[qid].title.replace('Errand: ','')}...`,tag:'quest',then:[[id,`You still need: ${Object.keys(st.take||{}).map(k=>ITEM_NAMES[k]||k).join(', ')}. I'll be right here.`]],back:true}); }
+    for(const qid in G.quests){ const T=QDEFS[qid].topics, q=G.quests[qid]; if(!T||!T[id]||q.done||q.step!==0||G.flags[T[id].flag]) continue; const tp=T[id]; o.push({t:tp.t,tag:'quest',fn:()=>{ G.flags[tp.flag]=true; later(0.2,questPoke); },then:tp.lines,back:true}); }
+    const av=availableFrom(id); if(av&&QDEFS[av].errand) o.push({t:'Need anything carried somewhere?',tag:'errand',fn:()=>offerQuest(av),end:true});
+    if(id==='tamsin') o.push({t:'Sing me your song about me!',key:'song_'+id+'_'+dayNow(),then:()=>tamsinSong().slice(1),back:true});
     o.push({t:'What’s new?',key:`new_${id}_${dayNow()}`,then:()=>{ const L=(c.lines&&c.lines.length)?c.lines:[`Not much. The valley's quiet. Too quiet, my gran would say.`]; const m=moodLine(id); const t=m&&n.li%3===2?m:L[n.li%L.length]; n.li=(n.li||0)+1; return [[id,t]]; },back:true});
     if(T.chat&&!G.seenTalk['chat_'+id]&&(!T.need||T.need())) o.push({t:'You look like something’s on your mind.',tag:'new',then:()=>[ch(id,T.chat.q,T.chat.opts.map(a=>({t:a.t,tone:a.tone,fn:()=>{ G.seenTalk['chat_'+id]=1; befriend(id,a.f+(a.tone===T.chat.best?0.25:0)); },then:[[id,a.r]]})))],back:true});
     if(T.deep&&friendOf(id)>=2) o.push({t:'Tell me about yourself.',key:'deep_'+id,then:[[id,T.deep]],back:true});

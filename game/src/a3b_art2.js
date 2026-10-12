@@ -1123,7 +1123,7 @@ function drawColumn(s){ const k=(s.broken?1:0)+'_'+Math.round(s.s*10); r2put(r2S
 function drawGlowShroom(s,t){ for(let i=0;i<4;i++){ const x=s.x+Math.cos(i*1.6)*9*s.s, y=s.y+Math.sin(i*1.6)*7*s.s; ctx.fillStyle='#d8e8f0'; ctx.fillRect(x-1,y,2,4); ctx.fillStyle='#7ad8e8'; ctx.beginPath(); ctx.ellipse(x,y,5*s.s,3.4*s.s,0,0,TAU); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.ellipse(x-1.2*s.s,y-1.2*s.s,1.6*s.s,0.9*s.s,0,0,TAU); ctx.fill(); } glowAt(s.x,s.y,22*s.s,'120,220,240',0.25+0.1*Math.sin(t*2+s.x)); }
 function drawDoor(d){ if(!d.hs||d.hs.facade) return; const h=d.hs; ctx.fillStyle='#3a2414'; ctx.fillRect(h.x-13,h.y+h.h/2-4,26,8); ctx.fillStyle='#d8b04a'; ctx.beginPath(); ctx.arc(h.x+7,h.y+h.h/2,1.6,0,TAU); ctx.fill(); }
 function drawMarker(x,y,m,t){
-  const bob=Math.sin(t*4)*2.5, c=m==='!'?'#ffcf4a':m==='?'?'#7fe0ff':'#b8b0a0';
+  const bob=Math.sin(t*4)*2.5, c=m==='!'?'#ffcf4a':m==='?'?'#7fe0ff':m==='✉'?'#c8e8b8':'#b8b0a0';
   ctx.save(); ctx.translate(x,y+bob);
   ctx.fillStyle='rgba(10,8,6,.75)'; ctx.beginPath(); ctx.arc(0,0,9,0,TAU); ctx.fill(); ctx.strokeStyle=c; ctx.lineWidth=2; ctx.stroke();
   ctx.fillStyle=c; ctx.font=`900 13px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(m==='…'?'…':m,0,0.5);

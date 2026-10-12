@@ -71,7 +71,7 @@ AI.knight=(e,dt)=>{
 };
 AI.egg=(e,dt)=>{
   e.dx=e.dy=0; if(e.inArea&&dist2(e.x,e.y,player.x,player.y)>420*420) return; e.hatch-=dt;
-  if(e.hatch<=0){ e.dead=true; emit(e.x,e.y,12,{col:'235,225,200',glow:false,smin:40,smax:120,lmin:.3,lmax:.6,zmin:2,zmax:3}); const k=makeEnemy('drakeling',e.x,e.y,{level:e.level,camp:e.camp,aggro:true,homeX:e.homeX,homeY:e.homeY}); k.cd=1.2; k.inArea=e.inArea; }
+  if(e.hatch<=0){ e.dead=true; emit(e.x,e.y,12,{col:'235,225,200',glow:false,smin:40,smax:120,lmin:.3,lmax:.6,zmin:2,zmax:3}); const k=makeEnemy('drakeling',e.x,e.y,{level:e.level,camp:e.camp,aggro:true,homeX:e.homeX,homeY:e.homeY}); k.cd=1.2; k.inArea=e.inArea; k.room=e.room; if(e.room&&AREA&&AREA.rooms&&AREA.rooms[e.room]) AREA.rooms[e.room].enemies.push(k); }
 };
 AI.grizzlefang=(e,dt)=>{
   const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
@@ -302,9 +302,20 @@ AI.bat=(e,dt)=>{
   if(e.cd<=0&&d<260){ e.state='swoop'; e.st=0.34; e.face=a; e.hitP=false; }
 };
 AI.slime=(e,dt)=>{
-  const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
+  const p=player, d=dist(e.x,e.y,p.x,p.y), ct=e.cropTarget&&!e.cropTarget.eaten&&d>150?e.cropTarget:null, a=ct?angTo(e.x,e.y,ct.x,ct.y):angTo(e.x,e.y,p.x,p.y);
   e.cd-=dt; e.dx=e.dy=0; if(e.hopT>0) e.hopT-=dt;
   if(e.cd<=0){ e.cd=rand(0.75,1.25); e.hopT=0.25; const sp=e.small?240:190; e.vx+=Math.cos(a)*sp; e.vy+=Math.sin(a)*sp; e.face=a; }
   e.touchCd=(e.touchCd||0)-dt; if(e.touchCd<=0&&d<e.r+p.r){ if(hurtPlayer(e.dmg,e.x,e.y,160)) e.touchCd=0.8; }
 };
 AI.wolf=AIW.wolf;
+// the purse thief: keeps away from Ash, zig-zags, never fights
+AI.sneak=(e,dt)=>{
+  const p=player, d=dist(e.x,e.y,p.x,p.y);
+  e.zig=(e.zig||0)-dt; if(e.zig<=0){ e.zig=rand(0.5,1.1); e.zdir=rand(-0.9,0.9); }
+  const away=angTo(p.x,p.y,e.x,e.y)+e.zdir, home=e.homeX!=null?dist(e.x,e.y,e.homeX,e.homeY):0;
+  let a=away; if(home>620) a=angTo(e.x,e.y,e.homeX,e.homeY)+e.zdir*0.6;
+  const spd=e.speed*(d<160?1.15:d>420?0.55:0.9)*(e.tired>0?0.6:1);
+  if(e.tired>0) e.tired-=dt; else if(Math.random()<dt*0.12) e.tired=1.2;
+  steer(e,e.x+Math.cos(a)*80,e.y+Math.sin(a)*80,spd); e.face=turnTo(e.face,a,10*dt);
+  if(Math.random()<dt*0.6) ftext(e.x,e.y-18,pick(['hee hee!','nyah!','can’t catch me!','mine now!']),'#e8d080',11);
+};

@@ -84,9 +84,9 @@ function qAvail(id){
   if(id==='gate'&&!G.flags.gateHint) return false;
   return true;
 }
-function availableFrom(id){ for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)) return k; return null; }
+function availableFrom(id){ let err=null; for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)){ if(!QDEFS[k].errand) return k; if(!err) err=k; } return err; }
 function stepOf(id){ const q=G.quests[id]; return q&&!q.done?QDEFS[id].steps[q.step]:null; }
-function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.t==='camps'){ const q=G.quests[id]; return `${st.text} (${Math.min(st.n,(G.stats.camps||0)-q.camps0)}/${st.n})`; } if(st.t==='item'&&st.n>1) return `${fmtNames(st.text)} (${Math.min(st.n,G.items[st.item]||0)}/${st.n})`; if(st.t==='pages') return `${st.text} (${Object.keys(G.pages).length}/10 found, ${G.pagesGiven||0} delivered)`; return fmtNames(st.text); }
+function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.mini&&G.mini&&G.mini.qid===id&&MINI[G.mini.kind].hud){ const h=MINI[G.mini.kind].hud(G.mini); if(h) return h; } if(st.t==='camps'){ const q=G.quests[id]; return `${st.text} (${Math.min(st.n,(G.stats.camps||0)-q.camps0)}/${st.n})`; } if(st.t==='item'&&st.n>1) return `${fmtNames(st.text)} (${Math.min(st.n,G.items[st.item]||0)}/${st.n})`; if(st.t==='pages') return `${st.text} (${Object.keys(G.pages).length}/10 found, ${G.pagesGiven||0} delivered)`; if(st.t==='flags') return `${fmtNames(st.text)} (${st.flags.filter(f=>G.flags[f]).length}/${st.n} clues)`; return fmtNames(st.text); }
 function startQuest(id){
   const d=QDEFS[id]; G.quests[id]={step:0,camps0:G.stats.camps||0,errand:!!d.errand};
   if(d.give) giveItems(d.give,true);
@@ -137,6 +137,7 @@ function questPoke(){
       if(st.t==='item') ok=(G.items[st.item]||0)>=st.n;
       else if(st.t==='flag') ok=!!G.flags[st.flag];
       else if(st.t==='camps') ok=(G.stats.camps||0)-q.camps0>=st.n;
+      else if(st.t==='flags') ok=st.flags.filter(f=>G.flags[f]).length>=st.n;
       if(ok){ advanceQuest(id); changed=true; }
     }
     if(!changed) break;
@@ -146,10 +147,11 @@ function questPoke(){
 function reforgeIron(){ if(G.iron<=0) return; while(G.iron>0){ G.iron--; G.tier++; player.stats.slash*=1.15; } setBanner(`Blade reforged · tier ${G.tier+1}`,'Each star-iron makes your sword hit 15% harder.',2.8); SFX.play('upgrade'); }
 // markers: ! = has a quest for you, ? = waiting on you
 function npcMarker(id){
-  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id) return haveAll(st.take)?'?':'…'; }
+  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id) return haveAll(st.take)?'?':'…'; if(st&&st.mini&&st.npc===id&&!G.mini) return '?'; const T=QDEFS[qid].topics; if(st&&T&&T[id]&&!G.flags[T[id].flag]&&G.quests[qid].step===0) return '?'; }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)) return '?';
-  if(availableFrom(id)) return '!';
+  const av=availableFrom(id); if(av&&!QDEFS[av].errand) return '!';
   if(storyMarker(id)) return '!';
+  if(av) return '✉';
   return null;
 }
 function storyMarker(id){
@@ -173,7 +175,7 @@ function questSpot(spec,npc){
   if(k==='mini') return G.mini&&G.mini.target?G.mini.target():null;
   return null;
 }
-function questTargetOf(id){ const st=stepOf(id); if(!st) return null; const at=typeof st.at==='function'?st.at():st.at; return questSpot(at,st.t==='talk'?st.npc:null); }
+function questTargetOf(id){ const st=stepOf(id); if(!st) return null; if(st.mini){ if(G.mini&&G.mini.qid===id){ const f=MINI[G.mini.kind].target; return f?f(G.mini):null; } return questSpot(null,st.npc); } const at=typeof st.at==='function'?st.at():st.at; return questSpot(at,st.t==='talk'?st.npc:null); }
 function questTargets(){
   // map + compass positions for every active side quest step
   const out=[];
@@ -184,9 +186,10 @@ function questTargets(){
 function talkTo(n){
   const id=n.id, done=()=>{ scene='play'; };
   if(storyTalk(n)) return;
+  if(miniTalk(n)) return;
   for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id){ if(haveAll(st.take)){ runQuestLines(qid,st); return; } } }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)){ deliverPages(); return; }
-  const av=availableFrom(id); if(av&&!(G.declined&&G.declined[av]===dayNow())){ offerQuest(av); return; }
+  const av=availableFrom(id); if(av&&!QDEFS[av].errand&&!(G.declined&&G.declined[av]===dayNow())){ offerQuest(av); return; }
   talkHub(n);
 }
 function moodLine(id){
@@ -220,7 +223,6 @@ function storyTalk(n){
   if(id==='wren'&&st==='wren'){ runDialogue(STORY.wren,()=>{ scene='play'; setStage('oath',['Chapter 4','The Ash Ward']); G.shrines.s_brindle=true; questUpdated(); saveGame(); }); return true; }
   if(id==='juniper'&&AREA&&!G.flags.juniper_found){ runDialogue([['juniper',`Ash? ASH! Oh thank goodness. The bats took my lantern and I've been mapping by smell for three days.`],['juniper',`It smells like bats in here. That's my whole map. "Bats."`],['ash',`Rook's worried sick. Come on, the way out is clear.`],['juniper',`Race you! No wait, you're faster. I'll see you at home!`]],()=>{ scene='play'; G.flags.juniper_found=true; AREA.npcs=AREA.npcs.filter(q=>q.id!=='juniper'); questPoke(); setupNPCs(); saveGame(); }); return true; }
   if(id==='shellby'){ talkShellby(); return true; }
-  if(id==='tamsin'){ runDialogue(tamsinSong(),done); return true; }
   if(id==='morrow'&&n.prisoner){ runDialogue([['morrow',pick([`The dragon promised me youth. Captain Osric promised me three meals and a blanket. Osric keeps his promises.`,`If you see Fennick, tell him to stop humming. Oh. He's in the next cell. FENNICK.`,`I've started reading. Did you know there are books that don't mention dragons at all?`])]],done); return true; }
   if(id==='morrow'){ runDialogue([['morrow',pick([`Pumpkins, Ash! Pumpkins that aren't on fire! I didn't know they came that way.`,`Granny Moss says I have a gift for gardening. Also for talking too much. Both true.`])]],done); return true; }
   if(id==='fennick'&&n.prisoner){ runDialogue([['fennick',pick([`I polish Osric's lamps now. It's honest work. Shiny, honest work.`,`Morrow alphabetized the cell. I'm under F. It's very orderly.`])]],done); return true; }
@@ -446,7 +448,7 @@ function areaObjAct(o){
       G.found[o.id]=true; giveItems({[o.item]:1}); SFX.play('shrine'); saveGame(); return;
     case 'page': findPage(o.page); return;
     case 'cave_ore': if(G.found[o.id]) return; G.found[o.id]=true; G.iron++; SFX.play('chest'); setBanner('Star-iron','A big vein of it. Take it to Mom.',2.2); saveGame(); return;
-    case 'stairs': case 'trig': case 'hchest': case 'nest': case 'recipebook': case 'musicbox': case 'ghost': case 'moosehead': case 'telescope2': case 'mousehole': case 'crate': case 'cobweb': case 'banner': case 'candles': floorObjAct(o); return;
+    case 'stairs': case 'trig': case 'hchest': case 'nest': case 'recipebook': case 'musicbox': case 'ghost': case 'moosehead': case 'telescope2': case 'mousehole': case 'crate': case 'cobweb': case 'banner': case 'candles': case 'piedish': floorObjAct(o); return;
     case 'cgate': case 'lever': case 'mural': case 'resetstone': case 'csign': case 'plate': case 'block': case 'crystal': caveObjAct(o); return;
     case 'relic': if(G.found[o.id]) return; G.found[o.id]=true; runDialogue([['narr',`On a stone shelf, wrapped in cloth that hasn't rotted in a thousand years: a cloak stitched with five small flames. The Warden's Mantle.`],['narr',`You put it on. It's warm, and it fits, like it was waiting for you. (You take 15% less damage.)`]],()=>{ scene='play'; G.items.relic=1; player.stats.armor=(player.stats.armor||1)*0.85; saveGame(); }); return;
   }
@@ -476,6 +478,7 @@ function updateInteractions(dt){
     for(const l of LILIES) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
     for(const o of LANDMARKS){ if(!o.prompt||(o.hidden&&o.hidden())) continue; if(o.k==='kettle'&&G.items.kettle) continue; const d=dist(p.x,p.y,o.x,o.y); if(d<(o.r||20)+46) offer(d,o.prompt,()=>lmAct(o),o.x,o.y,o.k==='kettle'); }
     for(const dr of DOORS){ const d=dist(p.x,p.y,dr.x,dr.y); if(d<46) offer(d-6,dr.label,()=>enterArea(dr.area,dr),dr.x,dr.y); }
+    miniPrompts(offer);
     if(G.goat&&G.side.duchess!=='home'&&G.side.duchess!=='follow'){ const d=dist(p.x,p.y,G.goat.x,G.goat.y); if(d<70) offer(d,'Talk to the goat',talkGoat,G.goat.x,G.goat.y); }
   }
   G.prompt=best&&(!G.inCombat||best.always)?best:null;

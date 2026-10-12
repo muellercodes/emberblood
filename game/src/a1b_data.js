@@ -13,6 +13,7 @@ const EDEF={
   egg:{r:12,hp:26,speed:0,dmg:0,value:2,kbRes:0},
   bat:{r:9,hp:16,speed:210,dmg:6,value:8,flying:true,kbRes:1.4},
   slime:{r:13,hp:30,speed:90,dmg:8,value:9,kbRes:1.1},
+  sneak:{r:10,hp:22,speed:205,dmg:0,value:12,kbRes:1.6},
   grizzlefang:{r:24,hp:520,speed:118,dmg:13,value:220,boss:true,kbRes:0.3,name:'Grizzlefang',title:'Kobold Chieftain'},
   morrow:{r:19,hp:640,speed:95,dmg:10,value:320,boss:true,kbRes:0.4,name:'High Priest Morrow',title:'Voice of the Scaled Oath'},
   broodmother:{r:32,hp:820,speed:125,dmg:16,value:420,boss:true,flying:true,kbRes:0.15,name:'The Brood Mother',title:'Queen of the Drakeling Nests'},

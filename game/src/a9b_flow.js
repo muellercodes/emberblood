@@ -123,17 +123,17 @@ function simUpdate(dt){
     updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateWeather(dt);
     if(G.spirit){ G.spirit.t+=dt; }
     G.regionT-=dt; if(G.regionT<=0){ G.regionT=0.6; G.region=regionAt(player.x,player.y); }
-    if(G.pendingBless>0&&!G.inCombat&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
+    if(G.pendingBless>0&&!G.inCombat&&!G.mini&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
     return;
   }
   updateAllies(dt);
-  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
+  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
   if(G.spirit){ G.spirit.t+=dt; if(!G.spirit.on){ G.spirit.fade=(G.spirit.fade||0)+dt; if(G.spirit.fade>1.5) G.spirit=null; } }
   G.critterT-=dt; if(G.critterT<=0){ G.critterT=rand(2,4); spawnCritters(); }
   G.fogT-=dt; if(G.fogT<=0){ G.fogT=0.3; fogReveal(player.x,player.y,650); }
   G.regionT-=dt;
   if(G.regionT<=0){ G.regionT=0.6; const r=regionAt(player.x,player.y); if(!G.region||r.key!==G.region.key){ const first=!G.region||String(G.region.key).startsWith('area_'); G.region=r; if(!first&&!G.banner){ const help=CAST.filter(c=>c.town===r.key&&npcMarker(c.id)==='!').length; setBanner(r.name,help?`${help} ${help===1?'person here could':'people here could'} use your help`:`Danger level ${r.level}`,2.4,'region'); } } }
-  if(G.pendingBless>0&&!G.inCombat&&!(G.boss&&!G.boss.dead)&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
+  if(G.pendingBless>0&&!G.inCombat&&!G.mini&&!(G.boss&&!G.boss.dead)&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
   G.autoSaveT-=dt; if(G.autoSaveT<=0){ G.autoSaveT=60; if(!G.inCombat) saveGame(); }
 }
 function update(dt){

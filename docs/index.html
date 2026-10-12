@@ -537,6 +537,7 @@ const EDEF={
   egg:{r:12,hp:26,speed:0,dmg:0,value:2,kbRes:0},
   bat:{r:9,hp:16,speed:210,dmg:6,value:8,flying:true,kbRes:1.4},
   slime:{r:13,hp:30,speed:90,dmg:8,value:9,kbRes:1.1},
+  sneak:{r:10,hp:22,speed:205,dmg:0,value:12,kbRes:1.6},
   grizzlefang:{r:24,hp:520,speed:118,dmg:13,value:220,boss:true,kbRes:0.3,name:'Grizzlefang',title:'Kobold Chieftain'},
   morrow:{r:19,hp:640,speed:95,dmg:10,value:320,boss:true,kbRes:0.4,name:'High Priest Morrow',title:'Voice of the Scaled Oath'},
   broodmother:{r:32,hp:820,speed:125,dmg:16,value:420,boss:true,flying:true,kbRes:0.15,name:'The Brood Mother',title:'Queen of the Drakeling Nests'},
@@ -1321,6 +1322,75 @@ const TALK={
       {t:`Does he do tricks?`,tone:'silly',r:`He sits. It's his only trick. He's very good at it.`,f:0.75}],best:'kind'}}
 };
 
+// ================= quests that play differently: chases, hide and seek, defending a field, a race, a song, a mystery and a trading chain
+Object.assign(ITEM_NAMES,{purse:'Pell’s coin purse',sheet1:'Song sheet: The Lantern Waltz',sheet2:'Song sheet: Hob’s Stew Shanty',sheet3:'Song sheet: Over Cinder Mountain',cheese:'A wheel of Burrows cheese',yarn:'Wolf-fur yarn',scarf:'A fancy scarf',feather:'A peacock feather',songscroll:'Tamsin’s song scroll',starmap:'Quill’s star map',stariron2:'A chunk of star-iron'});
+Object.assign(QDEFS,{
+  thief:{title:'Stop, Thief!',giver:'pell',min:'wren',
+    offer:[['pell',`Ash! A kobold sneak just grabbed my coin purse and ran! It's fast, it's sneaky, and it's laughing at me!`],['pell',`It can't have gone far. Catch it and I'll make it worth your while.`]],
+    steps:[
+      {t:'flag',flag:'purse_caught',npc:'pell',mini:'chase',text:'Catch the kobold sneak before it gets away (talk to Pell to start)',ready:[['pell',`There it goes! Behind the stalls! Ready?`]]},
+      {t:'talk',npc:'pell',text:'Bring the purse back to Pell',take:{purse:1},lines:[['pell',`My purse! And it's only a little chewed. You're faster than a kobold, Ash. That's saying something.`]],reward:{coins:40,xp:60}}
+    ]},
+  seek:{title:'Hide and Seek',giver:'nib',min:'lore',
+    offer:[['nib',`Wanna play hide and seek? Me and three friends will hide somewhere in Brindlecross. You have two minutes to find us all.`],['nib',`Listen for giggling. Jem giggles like a goose.`]],
+    steps:[
+      {t:'flag',flag:'seek_won',npc:'nib',mini:'seek',text:'Find all four hidden kids in Brindlecross (talk to Nib to start)',ready:[['nib',`Close your eyes and count to ten! No peeking! ...Okay GO!`]]},
+      {t:'talk',npc:'nib',text:'Tell Nib you found everyone',lines:[['nib',`You found ALL of us! Even Jem, and Jem hid in a barrel! Here, my best treasure map. It's a real one. Mostly.`]],give:{map_x2:1},reward:{coins:20,xp:50}}
+    ]},
+  pumpkins:{title:'Pumpkin Patrol',giver:'hal',min:'wren',
+    offer:[['hal',`Ash, the slimes have found my pumpkin patch. They come out of the hedges and eat everything. EVERYTHING.`],['hal',`Guard the patch with me for one minute. Every pumpkin you save is a pie for the festival.`]],
+    steps:[
+      {t:'flag',flag:'pumpkins_saved',npc:'hal',mini:'defend',text:'Guard Hal’s pumpkin patch from the slimes for one minute (talk to Hal to start)',ready:[['hal',`Here they come! Don't let them eat the big one. Her name is Gertrude.`]]},
+      {t:'talk',npc:'hal',text:'Tell Hal how the pumpkins did',lines:[['hal',`You saved them! Well, most of them. Here, a little something from the farm.`]],reward:{coins:30,xp:70,bless:1}}
+    ]},
+  race:{title:'The Frostpine Dash',giver:'elka',min:'wren',
+    offer:[['elka',`Race me! Through all six flags around the lodge. If you win, you get my second-best racing scarf.`],['elka',`If I win, you have to say "Elka is the fastest in the valley" really loud. In front of Ulf.`]],
+    steps:[
+      {t:'flag',flag:'race_won',npc:'elka',mini:'race',text:'Beat Elka through the six flags around Frostpine Lodge (talk to Elka to start)',ready:[['elka',`On your marks... get set... GO!`]]},
+      {t:'talk',npc:'elka',text:'Collect your prize from Elka',lines:[['elka',`You beat me! Nobody beats me! ...Okay, you beat me. Here's the scarf. It's fast. You'll see.`]],reward:{stamina:20,xp:80}}
+    ]},
+  song:{title:'The Lost Songs',giver:'wendel',min:'lore',
+    offer:[['wendel',`The raid blew my three best songs right out the window. The sheets could be anywhere. Somebody said one landed on the roof of the Sleepy Salmon Inn.`],['wendel',`Bring them back and we'll play them together. I'll even let you choose the notes.`]],
+    steps:[
+      {t:'item',item:'sheet1',n:1,text:'Find the Lantern Waltz sheet (it blew into the guest rooms of the Sleepy Salmon Inn)',at:'area:h_tilly'},
+      {t:'item',item:'sheet2',n:1,text:'Find the Stew Shanty sheet (somewhere in the Smoky Kettle)',at:'area:h_hob'},
+      {t:'item',item:'sheet3',n:1,text:'Find the Cinder Mountain sheet (in the Brindlecross Library archive)',at:'area:h_library'},
+      {t:'flag',flag:'song_played',npc:'wendel',mini:'simon',text:'Play the songs back with Wendel in Emberhollow',ready:[['wendel',`All three! Let's play. I play the notes, you play them back. Ready?`]]},
+      {t:'talk',npc:'wendel',text:'Talk to Wendel',take:{sheet1:1,sheet2:1,sheet3:1},lines:[['wendel',`That was beautiful. You have the ears of a dragon. Which, I suppose, you do.`],['wendel',`Take this. Every song I finish, I'll play it for you.`]],reward:{bless:1,xp:80}}
+    ]},
+  pie:{title:'The Case of the Missing Pie',giver:'mayor',min:'wren',
+    offer:[['mayor',`Ash! A crime has been committed! My prize pie, the one for the Lantern Day judging, has been EATEN. In the night. By a FIEND.`],['mayor',`Find the culprit. Ask around. Leave no crumb unturned!`]],
+    topics:{
+      nib:{t:'Did you see who ate the Mayor’s pie?',flag:'clue_nib',lines:[['nib',`Not me! I was hiding from the Mayor's dog all night. But I DID see someone walking around in pajamas at midnight. They had a really big mustache.`]]},
+      tilly:{t:'Was anyone up late last night?',flag:'clue_tilly',lines:[['tilly',`The Mayor came in at midnight in his nightcap, asking for "more crust, more crust." His eyes were closed. I gave him a bread roll and he walked home.`]]},
+      cookie:{t:'Did you take a pie from the Mayor?',flag:'clue_cookie',lines:[['cookie',`A pie? From Brindlecross? I've been in Coppergulch all week stirring rocks. Do I look like I eat pie? ...Don't answer that.`]]}
+    },
+    steps:[
+      {t:'flags',flags:['clue_nib','clue_tilly','clue_dish'],n:2,text:'Find clues about the missing pie: ask around Brindlecross and look in the Mayor’s house',at:'poi:brindle'},
+      {t:'talk',npc:'mayor',text:'Tell the Mayor who ate his pie',lines:'pieAccuse'}
+    ]},
+  swap:{title:'The Great Swap',giver:'hal',min:'three',give:{cheese:1},
+    offer:[['hal',`I made too much cheese. Way too much. Take a wheel. Ulf at the Frostpine Lodge would trade his own boots for it.`],['hal',`Who knows? Swap it for something, then swap that, and see where you end up. That's how my grandpa got a cow.`]],
+    steps:[
+      {t:'talk',npc:'ulf',text:'Trade the cheese with Ulf at Frostpine Lodge',take:{cheese:1},give:{yarn:1},lines:[['ulf',`HAL'S CHEESE. Oh, you beautiful wheel. Here, take this wolf-fur yarn. My brother says it's for goats. It's for SHEEP.`]]},
+      {t:'talk',npc:'nana',text:'Nana Pettibone in Emberhollow knits. Show her the yarn.',take:{yarn:1},give:{scarf:1},lines:[['nana',`Wolf-fur yarn! Oh, it's so soft. Give me one minute. ...There. A fancy scarf. Too fancy for me. Maybe Marigold would like it.`]]},
+      {t:'talk',npc:'marigold',text:'Show the fancy scarf to Marigold in Brindlecross',take:{scarf:1},give:{feather:1},lines:[['marigold',`A scarf for my brother Hob! He'll lose it by Tuesday, but he'll look wonderful. Here, a peacock feather. Tamsin at the Smoky Kettle has been begging me for one.`]]},
+      {t:'talk',npc:'tamsin',text:'Bring the feather to Tamsin the Bard at the Smoky Kettle',take:{feather:1},give:{songscroll:1},lines:[['tamsin',`A peacock feather for my cap! I'm unstoppable! Take this song scroll. Professor Quill asked me for a song "the stars might like." Give it to her.`]]},
+      {t:'talk',npc:'quill',text:'Give Tamsin’s song to Professor Quill in Brindlecross',take:{songscroll:1},give:{starmap:1},lines:[['quill',`A song for the stars! I'll sing it at them tonight. They can't stop me. Here, my old star map. Gorran Flint at Coppergulch has wanted it for years.`]]},
+      {t:'talk',npc:'gorran',text:'Bring the star map to Gorran at Coppergulch',take:{starmap:1},give:{star_iron:1},lines:[['gorran',`Quill's star map! The old rock lady finally let it go. Here, a chunk of star-iron from where one of these fell. Take it to your mom.`],['narr',`From one wheel of cheese to a piece of a fallen star. Hal's grandpa would be proud.`]],reward:{xp:150,coins:40}}
+    ]}
+});
+// the end of the pie mystery is a choice
+STORY.pieAccuse=[
+  ['mayor',`Well? Who is the fiend? WHO ATE MY PIE?`],
+  ch('ash',`It was...`,[
+    {t:'Nib did it.',fn:()=>{ befriend('nib',-0.5,true); },then:[['mayor',`Nib? Little Nib? ...Nib has clean hands and an alibi involving my dog. Think harder, Ash.`],{who:'ash',text:'Hmm.',opts:()=>STORY.pieAccuse[1].opts}]},
+    {t:'Cookie from Coppergulch.',fn:()=>{ befriend('cookie',-0.5,true); },then:[['mayor',`Cookie hates pie. Everyone knows Cookie hates pie. It's the rocks. Think harder!`],{who:'ash',text:'Hmm.',opts:()=>STORY.pieAccuse[1].opts}]},
+    {t:'A goat. Probably Duchess.',then:[['mayor',`Duchess is a two-day walk away and, I'm told, very busy being rude. Think harder!`],{who:'ash',text:'Hmm.',opts:()=>STORY.pieAccuse[1].opts}]},
+    {t:'You did, Mayor. In your sleep.',cond:()=>true,fn:()=>{ G.choices.extra=G.choices.extra||{}; G.choices.extra.pie='You proved the Mayor ate his own pie in his sleep.'; },then:()=>[['mayor',`ME? Preposterous! I would never... I...`],['narr',`The Mayor touches his mustache. A crumb falls out. Then another. Then a small piece of crust.`],['mayor',`...Oh no. Oh, I sleepwalk. I SLEEP-BAKE-WALK. Ash, you're a genius. A terrible, embarrassing genius.`],['mayor',`Here, your reward. And please, please don't tell the town.`],{who:'narr',text:'',skipIf:()=>{ giveReward({coins:60,xp:100}); befriend('mayor',1.5); return true; }}]}
+  ])
+];
+
 // ================= world layout (the valley of Embermere)
 const WORLD={w:14000,h:11000};
 const BIOME_NAME=['the Southern Meadows','Whisperwood','the Ashen Road','the Drakeling Crags','the Cinderlands','the Frostpine Highlands','the Mirefen'];
@@ -1680,6 +1750,8 @@ function initWorld(){
   }
   buildPlaces(); assignHomes(); defineFloors(); registerSpeakers();
   for(const h of HOUSES) if(h.owner&&!(CASTBY[h.owner]||{}).generic) h.burnt=false;
+  // the raid left its mark: two ordinary homes in Emberhollow are scorched
+  { const gen=HOUSES.filter(h=>h.town==='village'&&h.owner&&(CASTBY[h.owner]||{}).generic); gen.forEach((h,i)=>{ h.burnt=i<2; }); }
   // ---- chests
   const quota=[5,5,4,4,3,5,4], have=[0,0,0,0,0,0,0];
   for(let tries=0;tries<9000&&CHESTS.length<30;tries++){
@@ -2590,8 +2662,11 @@ function freeIn(items,W,H,cands,fw,fh){
   return cands[cands.length-1];
 }
 const STAIR_SPOTS=(W,H)=>[[W-70,H*0.72],[70,H*0.72],[W-70,150],[70,160],[W*0.8,H*0.42],[W*0.2,H*0.42],[W*0.65,H*0.8],[W*0.35,H*0.8]];
+const SONG_SHEETS={h_tilly_up:'sheet1',h_hob:'sheet2',h_library_up:'sheet3'};
 function floorExtras(def,items,put,W,H,rng,wallY){
   const F=FLOORS[def.id]||{};
+  const sh=SONG_SHEETS[def.id]; if(sh&&G&&G.quests&&G.quests.song&&!G.quests.song.done&&!G.items[sh]){ const [x,y]=freeIn(items,W,H,[[W*0.3,H*0.62],[W*0.7,H*0.62],[W*0.5,H*0.3]],40,40); put('qitem',x,y,{item:sh,label:'a song sheet'}); }
+  if(def.id==='h_mayor_up'&&G&&G.quests&&G.quests.pie&&G.quests.pie.step===0&&!G.flags.clue_dish){ const [x,y]=freeIn(items,W,H,[[W*0.75,H*0.55],[W*0.25,H*0.55]],40,40); put('piedish',x,y,{}); }
   // the way back down (or up) on an extra floor
   if(def.floorOf){
     // cellars have no windows; attics keep one; everybody loses the generic rug in a vault
@@ -2702,10 +2777,11 @@ function floorObjAct(o){
     case 'cobweb': say('A spider has written something in the web. It might say "hello." It might say "go away." Spider handwriting is hard.'); return true;
     case 'banner': say('A banner with the Scaled Oath’s scale on it. Someone has drawn a little frowny face on the scale.'); return true;
     case 'candles': say('Candles, burned down low. Someone sat here a long time.'); return true;
+    case 'piedish': if(!G.flags.clue_dish){ say('An empty pie dish, licked clean, hidden under a display case. Stuck to the rim: one long, curly mustache hair.',()=>{ G.flags.clue_dish=true; questPoke(); }); } else say('The pie dish. The evidence.'); return true;
   }
   return false;
 }
-const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles'};
+const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
 
 // ================= art: cached sprites for props and structures
 const SS=2;
@@ -3803,7 +3879,7 @@ function drawStruct(s,t){
   switch(s.k){
     case 'house': drawHouseStruct(s,t); break;
     case 'well':{ const gr=ctx.createRadialGradient(s.x-6,s.y-6,4,s.x,s.y,24); gr.addColorStop(0,'#a59c90'); gr.addColorStop(1,'#5a544c'); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(s.x,s.y,24,0,TAU); ctx.fill(); ctx.fillStyle='#1d3440'; ctx.beginPath(); ctx.arc(s.x,s.y,14,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1; for(let a=0;a<TAU;a+=0.5){ ctx.beginPath(); ctx.moveTo(s.x+Math.cos(a)*15,s.y+Math.sin(a)*15); ctx.lineTo(s.x+Math.cos(a)*24,s.y+Math.sin(a)*24); ctx.stroke(); } ctx.fillStyle='#5a3a22'; ctx.fillRect(s.x-26,s.y-3,52,6); break; }
-    case 'torch':{ ctx.fillStyle='#3a2a1a'; ctx.beginPath(); ctx.arc(s.x,s.y,4,0,TAU); ctx.fill(); if(G&&isNight()&&Math.random()<0.4) emit(s.x,s.y-2,1,{kind:'fire',ang:-Math.PI/2,spread:0.4,smin:15,smax:40,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:3,drag:1}); break; }
+    case 'torch':{ const nt=G&&isNight(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(s.x+3,s.y+3,6,3,0,0,TAU); ctx.fill(); ctx.fillStyle='#3a2a1a'; ctx.fillRect(s.x-2,s.y-16,4,18); ctx.fillStyle='#2a2a30'; ctx.fillRect(s.x-5,s.y-26,10,11); ctx.fillStyle=nt?'#ffd27a':'#7a6a50'; ctx.fillRect(s.x-3,s.y-24,6,7); ctx.fillStyle='#1a1a20'; ctx.beginPath(); ctx.moveTo(s.x-6,s.y-26); ctx.lineTo(s.x,s.y-31); ctx.lineTo(s.x+6,s.y-26); ctx.fill(); if(nt){ glowAt(s.x,s.y-20,26,'255,200,110',0.45); if(Math.random()<0.15) emit(s.x,s.y-22,1,{kind:'fire',ang:-Math.PI/2,spread:0.3,smin:8,smax:20,lmin:.2,lmax:.4,zmin:1.5,zmax:2.5,grow:2,drag:1}); } break; }
     case 'stake':{ ctx.fillStyle='#4a3420'; ctx.beginPath(); ctx.arc(s.x,s.y,9,0,TAU); ctx.fill(); ctx.fillStyle='#8a6a42'; ctx.beginPath(); ctx.arc(s.x-1.5,s.y-1.5,5,0,TAU); ctx.fill(); ctx.fillStyle='#2a1c10'; ctx.beginPath(); ctx.arc(s.x,s.y,1.8,0,TAU); ctx.fill(); break; }
     case 'tent':{ ctx.save(); ctx.translate(s.x,s.y); const gr=ctx.createRadialGradient(-10,-10,4,0,0,s.r); gr.addColorStop(0,'#b08a5a'); gr.addColorStop(1,'#5a4026'); ctx.fillStyle=gr; ctx.beginPath(); for(let i=0;i<8;i++){ const a=i/8*TAU+s.a; i?ctx.lineTo(Math.cos(a)*s.r,Math.sin(a)*s.r):ctx.moveTo(Math.cos(a)*s.r,Math.sin(a)*s.r); } ctx.closePath(); ctx.fill(); ctx.strokeStyle='rgba(40,25,10,.55)'; ctx.lineWidth=1.5; for(let i=0;i<8;i++){ const a=i/8*TAU+s.a; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*s.r,Math.sin(a)*s.r); ctx.stroke(); } ctx.fillStyle='#2a1c10'; ctx.beginPath(); ctx.arc(0,0,4,0,TAU); ctx.fill(); ctx.restore(); break; }
     case 'campfire':{ const r=s.small?14:22; ctx.fillStyle='#4a4440'; for(let a=0;a<TAU;a+=0.7){ ctx.beginPath(); ctx.arc(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r,4,0,TAU); ctx.fill(); } ctx.strokeStyle='#3a2414'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(s.x-r*0.6,s.y-r*0.3); ctx.lineTo(s.x+r*0.6,s.y+r*0.3); ctx.moveTo(s.x-r*0.5,s.y+r*0.4); ctx.lineTo(s.x+r*0.5,s.y-r*0.4); ctx.stroke(); const gl=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,r); gl.addColorStop(0,'rgba(255,200,90,.9)'); gl.addColorStop(1,'rgba(255,90,20,0)'); ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(s.x,s.y,r,0,TAU); ctx.fill(); if(Math.random()<0.5) emit(s.x+rand(-5,5),s.y+rand(-5,5),1,{kind:'fire',ang:-Math.PI/2,spread:0.5,smin:20,smax:60,lmin:.4,lmax:.7,zmin:3,zmax:6,grow:5,drag:1}); break; }
@@ -5046,7 +5122,7 @@ function drawColumn(s){ const k=(s.broken?1:0)+'_'+Math.round(s.s*10); r2put(r2S
 function drawGlowShroom(s,t){ for(let i=0;i<4;i++){ const x=s.x+Math.cos(i*1.6)*9*s.s, y=s.y+Math.sin(i*1.6)*7*s.s; ctx.fillStyle='#d8e8f0'; ctx.fillRect(x-1,y,2,4); ctx.fillStyle='#7ad8e8'; ctx.beginPath(); ctx.ellipse(x,y,5*s.s,3.4*s.s,0,0,TAU); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.ellipse(x-1.2*s.s,y-1.2*s.s,1.6*s.s,0.9*s.s,0,0,TAU); ctx.fill(); } glowAt(s.x,s.y,22*s.s,'120,220,240',0.25+0.1*Math.sin(t*2+s.x)); }
 function drawDoor(d){ if(!d.hs||d.hs.facade) return; const h=d.hs; ctx.fillStyle='#3a2414'; ctx.fillRect(h.x-13,h.y+h.h/2-4,26,8); ctx.fillStyle='#d8b04a'; ctx.beginPath(); ctx.arc(h.x+7,h.y+h.h/2,1.6,0,TAU); ctx.fill(); }
 function drawMarker(x,y,m,t){
-  const bob=Math.sin(t*4)*2.5, c=m==='!'?'#ffcf4a':m==='?'?'#7fe0ff':'#b8b0a0';
+  const bob=Math.sin(t*4)*2.5, c=m==='!'?'#ffcf4a':m==='?'?'#7fe0ff':m==='✉'?'#c8e8b8':'#b8b0a0';
   ctx.save(); ctx.translate(x,y+bob);
   ctx.fillStyle='rgba(10,8,6,.75)'; ctx.beginPath(); ctx.arc(0,0,9,0,TAU); ctx.fill(); ctx.strokeStyle=c; ctx.lineWidth=2; ctx.stroke();
   ctx.fillStyle=c; ctx.font=`900 13px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(m==='…'?'…':m,0,0.5);
@@ -5274,6 +5350,7 @@ function drawFurnHouseX(o,t){
     case 'ghost':{ const b=Math.sin(t*2)*4; ctx.save(); ctx.globalAlpha=0.55+0.15*Math.sin(t*3); ctx.fillStyle='#d8f0ff'; ctx.beginPath(); ctx.arc(x,y-14+b,12,Math.PI,0); ctx.lineTo(x+12,y+8+b); for(let i=0;i<4;i++) ctx.lineTo(x+12-(i+0.5)*6,y+(i%2?4:10)+b); ctx.lineTo(x-12,y+8+b); ctx.closePath(); ctx.fill(); ctx.fillStyle='#1a2a3a'; ctx.beginPath(); ctx.arc(x-4,y-15+b,2,0,TAU); ctx.arc(x+4,y-15+b,2,0,TAU); ctx.fill(); ctx.fillStyle='#f4f2ea'; ctx.beginPath(); ctx.arc(x,y-27+b,7,0,TAU); ctx.fill(); ctx.restore(); glowAt(x,y-8,40,'200,230,255',0.25); return true; }
     case 'moosehead':{ ctx.fillStyle='#5a3a24'; ctx.beginPath(); ctx.ellipse(x,y+6,12,16,0,0,TAU); ctx.fill(); ctx.fillStyle='#3a2414'; ctx.beginPath(); ctx.ellipse(x,y+18,8,6,0,0,TAU); ctx.fill(); ctx.strokeStyle='#d8c8a8'; ctx.lineWidth=4; for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(x+s*8,y-4); ctx.quadraticCurveTo(x+s*24,y-12,x+s*30,y-2); ctx.moveTo(x+s*20,y-8); ctx.lineTo(x+s*22,y-18); ctx.moveTo(x+s*26,y-6); ctx.lineTo(x+s*32,y-14); ctx.stroke(); } ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x-5,y+2,2,0,TAU); ctx.arc(x+5,y+2,2,0,TAU); ctx.fill(); return true; }
     case 'telescope2':{ ctx.fillStyle='#3a3a4a'; ctx.beginPath(); ctx.arc(x,y,16,0,TAU); ctx.fill(); ctx.save(); ctx.translate(x,y); ctx.rotate(-0.9); ctx.fillStyle=grad(0,-7,0,7,'#e8c060','#8a6a1a'); ctx.fillRect(-8,-7,60,14); ctx.fillStyle='#1a1a2a'; ctx.beginPath(); ctx.arc(52,0,7,0,TAU); ctx.fill(); ctx.restore(); if(isNight()) glowAt(x,y,30,'180,200,255',0.25); return true; }
+    case 'piedish':{ if(G.flags.clue_dish) return true; ctx.fillStyle='#d8d0c0'; ctx.beginPath(); ctx.ellipse(x,y,14,9,0,0,TAU); ctx.fill(); ctx.fillStyle='#b88a5a'; ctx.beginPath(); ctx.ellipse(x,y,10,6,0,0,TAU); ctx.fill(); ctx.strokeStyle='#3a2a1a'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x-6,y-2); ctx.quadraticCurveTo(x,y-8,x+7,y-1); ctx.stroke(); glowAt(x,y,24,'255,230,170',0.2+0.1*Math.sin(t*3)); return true; }
     case 'mousehole':{ ctx.fillStyle='#1a0e08'; ctx.beginPath(); ctx.arc(x,y,9,Math.PI,0); ctx.lineTo(x+9,y+6); ctx.lineTo(x-9,y+6); ctx.fill(); ctx.fillStyle='#8a5a2a'; ctx.fillRect(x-4,y-3,8,9); ctx.fillStyle='#d8b04a'; ctx.beginPath(); ctx.arc(x+2,y+2,1,0,TAU); ctx.fill(); return true; }
   }
   return false;
@@ -5886,7 +5963,7 @@ function killEnemy(e){
   if(G.mode==='normal'){ G.score+=Math.round(e.value*comboMult()); if(Math.random()<0.12*G.diff.heal) dropHeal(e.x,e.y,14); }
   gainXp(Math.round(e.boss?e.value:e.value*(1+0.25*((e.level||1)-1))));
   if(player.stats.killHeal&&e.type!=='egg') heal(player.stats.killHeal,true);
-  if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; if(e.camp) e.camp.alive++; } }
+  if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; k.room=e.room; k.cropTarget=e.cropTarget; k.mini=e.mini; if(e.room&&AREA&&AREA.rooms&&AREA.rooms[e.room]) AREA.rooms[e.room].enemies.push(k); if(e.camp) e.camp.alive++; } }
   if(e.camp){ e.camp.alive--; if(e.camp.alive<=0&&!e.camp.cave){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story'){ setBanner('Camp cleared','',1.6); G.stats.camps=(G.stats.camps||0)+1; questPoke(); } } }
   if(G.mode==='story'&&e.type!=='egg'){ if(e.boss) dropCoins(e.x,e.y,20); else if(Math.random()<(e.elite?0.9:0.35)) dropCoins(e.x,e.y,e.elite?randi(3,5):randi(1,2)); }
   if(e.questTag) G.questKills++;
@@ -6189,7 +6266,7 @@ AI.knight=(e,dt)=>{
 };
 AI.egg=(e,dt)=>{
   e.dx=e.dy=0; if(e.inArea&&dist2(e.x,e.y,player.x,player.y)>420*420) return; e.hatch-=dt;
-  if(e.hatch<=0){ e.dead=true; emit(e.x,e.y,12,{col:'235,225,200',glow:false,smin:40,smax:120,lmin:.3,lmax:.6,zmin:2,zmax:3}); const k=makeEnemy('drakeling',e.x,e.y,{level:e.level,camp:e.camp,aggro:true,homeX:e.homeX,homeY:e.homeY}); k.cd=1.2; k.inArea=e.inArea; }
+  if(e.hatch<=0){ e.dead=true; emit(e.x,e.y,12,{col:'235,225,200',glow:false,smin:40,smax:120,lmin:.3,lmax:.6,zmin:2,zmax:3}); const k=makeEnemy('drakeling',e.x,e.y,{level:e.level,camp:e.camp,aggro:true,homeX:e.homeX,homeY:e.homeY}); k.cd=1.2; k.inArea=e.inArea; k.room=e.room; if(e.room&&AREA&&AREA.rooms&&AREA.rooms[e.room]) AREA.rooms[e.room].enemies.push(k); }
 };
 AI.grizzlefang=(e,dt)=>{
   const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
@@ -6420,12 +6497,23 @@ AI.bat=(e,dt)=>{
   if(e.cd<=0&&d<260){ e.state='swoop'; e.st=0.34; e.face=a; e.hitP=false; }
 };
 AI.slime=(e,dt)=>{
-  const p=player, d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y);
+  const p=player, d=dist(e.x,e.y,p.x,p.y), ct=e.cropTarget&&!e.cropTarget.eaten&&d>150?e.cropTarget:null, a=ct?angTo(e.x,e.y,ct.x,ct.y):angTo(e.x,e.y,p.x,p.y);
   e.cd-=dt; e.dx=e.dy=0; if(e.hopT>0) e.hopT-=dt;
   if(e.cd<=0){ e.cd=rand(0.75,1.25); e.hopT=0.25; const sp=e.small?240:190; e.vx+=Math.cos(a)*sp; e.vy+=Math.sin(a)*sp; e.face=a; }
   e.touchCd=(e.touchCd||0)-dt; if(e.touchCd<=0&&d<e.r+p.r){ if(hurtPlayer(e.dmg,e.x,e.y,160)) e.touchCd=0.8; }
 };
 AI.wolf=AIW.wolf;
+// the purse thief: keeps away from Ash, zig-zags, never fights
+AI.sneak=(e,dt)=>{
+  const p=player, d=dist(e.x,e.y,p.x,p.y);
+  e.zig=(e.zig||0)-dt; if(e.zig<=0){ e.zig=rand(0.5,1.1); e.zdir=rand(-0.9,0.9); }
+  const away=angTo(p.x,p.y,e.x,e.y)+e.zdir, home=e.homeX!=null?dist(e.x,e.y,e.homeX,e.homeY):0;
+  let a=away; if(home>620) a=angTo(e.x,e.y,e.homeX,e.homeY)+e.zdir*0.6;
+  const spd=e.speed*(d<160?1.15:d>420?0.55:0.9)*(e.tired>0?0.6:1);
+  if(e.tired>0) e.tired-=dt; else if(Math.random()<dt*0.12) e.tired=1.2;
+  steer(e,e.x+Math.cos(a)*80,e.y+Math.sin(a)*80,spd); e.face=turnTo(e.face,a,10*dt);
+  if(Math.random()<dt*0.6) ftext(e.x,e.y-18,pick(['hee hee!','nyah!','can’t catch me!','mine now!']),'#e8d080',11);
+};
 
 // ================= Vorlaxis, the First Flame
 function phaseShift(e,n){
@@ -6917,17 +7005,17 @@ function simUpdate(dt){
     updateArea(dt); if(!AREA) return; updateNPCs(dt); updateInteractions(dt); updateFollowers(dt); updateWeather(dt);
     if(G.spirit){ G.spirit.t+=dt; }
     G.regionT-=dt; if(G.regionT<=0){ G.regionT=0.6; G.region=regionAt(player.x,player.y); }
-    if(G.pendingBless>0&&!G.inCombat&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
+    if(G.pendingBless>0&&!G.inCombat&&!G.mini&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
     return;
   }
   updateAllies(dt);
-  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
+  updateCamps(); updateWolves(dt); cullFar(); updateNPCs(dt); if(G.mode==='story') miniUpdate(dt); updateStory(dt); updateInteractions(dt); updateWeather(dt);
   if(G.spirit){ G.spirit.t+=dt; if(!G.spirit.on){ G.spirit.fade=(G.spirit.fade||0)+dt; if(G.spirit.fade>1.5) G.spirit=null; } }
   G.critterT-=dt; if(G.critterT<=0){ G.critterT=rand(2,4); spawnCritters(); }
   G.fogT-=dt; if(G.fogT<=0){ G.fogT=0.3; fogReveal(player.x,player.y,650); }
   G.regionT-=dt;
   if(G.regionT<=0){ G.regionT=0.6; const r=regionAt(player.x,player.y); if(!G.region||r.key!==G.region.key){ const first=!G.region||String(G.region.key).startsWith('area_'); G.region=r; if(!first&&!G.banner){ const help=CAST.filter(c=>c.town===r.key&&npcMarker(c.id)==='!').length; setBanner(r.name,help?`${help} ${help===1?'person here could':'people here could'} use your help`:`Danger level ${r.level}`,2.4,'region'); } } }
-  if(G.pendingBless>0&&!G.inCombat&&!(G.boss&&!G.boss.dead)&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
+  if(G.pendingBless>0&&!G.inCombat&&!G.mini&&!(G.boss&&!G.boss.dead)&&scene==='play'){ G.blessDelay-=dt; if(G.blessDelay<=0){ G.blessDelay=2; offerPending(); } } else G.blessDelay=2;
   G.autoSaveT-=dt; if(G.autoSaveT<=0){ G.autoSaveT=60; if(!G.inCombat) saveGame(); }
 }
 function update(dt){
@@ -7383,9 +7471,9 @@ function qAvail(id){
   if(id==='gate'&&!G.flags.gateHint) return false;
   return true;
 }
-function availableFrom(id){ for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)) return k; return null; }
+function availableFrom(id){ let err=null; for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)){ if(!QDEFS[k].errand) return k; if(!err) err=k; } return err; }
 function stepOf(id){ const q=G.quests[id]; return q&&!q.done?QDEFS[id].steps[q.step]:null; }
-function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.t==='camps'){ const q=G.quests[id]; return `${st.text} (${Math.min(st.n,(G.stats.camps||0)-q.camps0)}/${st.n})`; } if(st.t==='item'&&st.n>1) return `${fmtNames(st.text)} (${Math.min(st.n,G.items[st.item]||0)}/${st.n})`; if(st.t==='pages') return `${st.text} (${Object.keys(G.pages).length}/10 found, ${G.pagesGiven||0} delivered)`; return fmtNames(st.text); }
+function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.mini&&G.mini&&G.mini.qid===id&&MINI[G.mini.kind].hud){ const h=MINI[G.mini.kind].hud(G.mini); if(h) return h; } if(st.t==='camps'){ const q=G.quests[id]; return `${st.text} (${Math.min(st.n,(G.stats.camps||0)-q.camps0)}/${st.n})`; } if(st.t==='item'&&st.n>1) return `${fmtNames(st.text)} (${Math.min(st.n,G.items[st.item]||0)}/${st.n})`; if(st.t==='pages') return `${st.text} (${Object.keys(G.pages).length}/10 found, ${G.pagesGiven||0} delivered)`; if(st.t==='flags') return `${fmtNames(st.text)} (${st.flags.filter(f=>G.flags[f]).length}/${st.n} clues)`; return fmtNames(st.text); }
 function startQuest(id){
   const d=QDEFS[id]; G.quests[id]={step:0,camps0:G.stats.camps||0,errand:!!d.errand};
   if(d.give) giveItems(d.give,true);
@@ -7436,6 +7524,7 @@ function questPoke(){
       if(st.t==='item') ok=(G.items[st.item]||0)>=st.n;
       else if(st.t==='flag') ok=!!G.flags[st.flag];
       else if(st.t==='camps') ok=(G.stats.camps||0)-q.camps0>=st.n;
+      else if(st.t==='flags') ok=st.flags.filter(f=>G.flags[f]).length>=st.n;
       if(ok){ advanceQuest(id); changed=true; }
     }
     if(!changed) break;
@@ -7445,10 +7534,11 @@ function questPoke(){
 function reforgeIron(){ if(G.iron<=0) return; while(G.iron>0){ G.iron--; G.tier++; player.stats.slash*=1.15; } setBanner(`Blade reforged · tier ${G.tier+1}`,'Each star-iron makes your sword hit 15% harder.',2.8); SFX.play('upgrade'); }
 // markers: ! = has a quest for you, ? = waiting on you
 function npcMarker(id){
-  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id) return haveAll(st.take)?'?':'…'; }
+  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id) return haveAll(st.take)?'?':'…'; if(st&&st.mini&&st.npc===id&&!G.mini) return '?'; const T=QDEFS[qid].topics; if(st&&T&&T[id]&&!G.flags[T[id].flag]&&G.quests[qid].step===0) return '?'; }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)) return '?';
-  if(availableFrom(id)) return '!';
+  const av=availableFrom(id); if(av&&!QDEFS[av].errand) return '!';
   if(storyMarker(id)) return '!';
+  if(av) return '✉';
   return null;
 }
 function storyMarker(id){
@@ -7472,7 +7562,7 @@ function questSpot(spec,npc){
   if(k==='mini') return G.mini&&G.mini.target?G.mini.target():null;
   return null;
 }
-function questTargetOf(id){ const st=stepOf(id); if(!st) return null; const at=typeof st.at==='function'?st.at():st.at; return questSpot(at,st.t==='talk'?st.npc:null); }
+function questTargetOf(id){ const st=stepOf(id); if(!st) return null; if(st.mini){ if(G.mini&&G.mini.qid===id){ const f=MINI[G.mini.kind].target; return f?f(G.mini):null; } return questSpot(null,st.npc); } const at=typeof st.at==='function'?st.at():st.at; return questSpot(at,st.t==='talk'?st.npc:null); }
 function questTargets(){
   // map + compass positions for every active side quest step
   const out=[];
@@ -7483,9 +7573,10 @@ function questTargets(){
 function talkTo(n){
   const id=n.id, done=()=>{ scene='play'; };
   if(storyTalk(n)) return;
+  if(miniTalk(n)) return;
   for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id){ if(haveAll(st.take)){ runQuestLines(qid,st); return; } } }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)){ deliverPages(); return; }
-  const av=availableFrom(id); if(av&&!(G.declined&&G.declined[av]===dayNow())){ offerQuest(av); return; }
+  const av=availableFrom(id); if(av&&!QDEFS[av].errand&&!(G.declined&&G.declined[av]===dayNow())){ offerQuest(av); return; }
   talkHub(n);
 }
 function moodLine(id){
@@ -7519,7 +7610,6 @@ function storyTalk(n){
   if(id==='wren'&&st==='wren'){ runDialogue(STORY.wren,()=>{ scene='play'; setStage('oath',['Chapter 4','The Ash Ward']); G.shrines.s_brindle=true; questUpdated(); saveGame(); }); return true; }
   if(id==='juniper'&&AREA&&!G.flags.juniper_found){ runDialogue([['juniper',`Ash? ASH! Oh thank goodness. The bats took my lantern and I've been mapping by smell for three days.`],['juniper',`It smells like bats in here. That's my whole map. "Bats."`],['ash',`Rook's worried sick. Come on, the way out is clear.`],['juniper',`Race you! No wait, you're faster. I'll see you at home!`]],()=>{ scene='play'; G.flags.juniper_found=true; AREA.npcs=AREA.npcs.filter(q=>q.id!=='juniper'); questPoke(); setupNPCs(); saveGame(); }); return true; }
   if(id==='shellby'){ talkShellby(); return true; }
-  if(id==='tamsin'){ runDialogue(tamsinSong(),done); return true; }
   if(id==='morrow'&&n.prisoner){ runDialogue([['morrow',pick([`The dragon promised me youth. Captain Osric promised me three meals and a blanket. Osric keeps his promises.`,`If you see Fennick, tell him to stop humming. Oh. He's in the next cell. FENNICK.`,`I've started reading. Did you know there are books that don't mention dragons at all?`])]],done); return true; }
   if(id==='morrow'){ runDialogue([['morrow',pick([`Pumpkins, Ash! Pumpkins that aren't on fire! I didn't know they came that way.`,`Granny Moss says I have a gift for gardening. Also for talking too much. Both true.`])]],done); return true; }
   if(id==='fennick'&&n.prisoner){ runDialogue([['fennick',pick([`I polish Osric's lamps now. It's honest work. Shiny, honest work.`,`Morrow alphabetized the cell. I'm under F. It's very orderly.`])]],done); return true; }
@@ -7745,7 +7835,7 @@ function areaObjAct(o){
       G.found[o.id]=true; giveItems({[o.item]:1}); SFX.play('shrine'); saveGame(); return;
     case 'page': findPage(o.page); return;
     case 'cave_ore': if(G.found[o.id]) return; G.found[o.id]=true; G.iron++; SFX.play('chest'); setBanner('Star-iron','A big vein of it. Take it to Mom.',2.2); saveGame(); return;
-    case 'stairs': case 'trig': case 'hchest': case 'nest': case 'recipebook': case 'musicbox': case 'ghost': case 'moosehead': case 'telescope2': case 'mousehole': case 'crate': case 'cobweb': case 'banner': case 'candles': floorObjAct(o); return;
+    case 'stairs': case 'trig': case 'hchest': case 'nest': case 'recipebook': case 'musicbox': case 'ghost': case 'moosehead': case 'telescope2': case 'mousehole': case 'crate': case 'cobweb': case 'banner': case 'candles': case 'piedish': floorObjAct(o); return;
     case 'cgate': case 'lever': case 'mural': case 'resetstone': case 'csign': case 'plate': case 'block': case 'crystal': caveObjAct(o); return;
     case 'relic': if(G.found[o.id]) return; G.found[o.id]=true; runDialogue([['narr',`On a stone shelf, wrapped in cloth that hasn't rotted in a thousand years: a cloak stitched with five small flames. The Warden's Mantle.`],['narr',`You put it on. It's warm, and it fits, like it was waiting for you. (You take 15% less damage.)`]],()=>{ scene='play'; G.items.relic=1; player.stats.armor=(player.stats.armor||1)*0.85; saveGame(); }); return;
   }
@@ -7775,6 +7865,7 @@ function updateInteractions(dt){
     for(const l of LILIES) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
     for(const o of LANDMARKS){ if(!o.prompt||(o.hidden&&o.hidden())) continue; if(o.k==='kettle'&&G.items.kettle) continue; const d=dist(p.x,p.y,o.x,o.y); if(d<(o.r||20)+46) offer(d,o.prompt,()=>lmAct(o),o.x,o.y,o.k==='kettle'); }
     for(const dr of DOORS){ const d=dist(p.x,p.y,dr.x,dr.y); if(d<46) offer(d-6,dr.label,()=>enterArea(dr.area,dr),dr.x,dr.y); }
+    miniPrompts(offer);
     if(G.goat&&G.side.duchess!=='home'&&G.side.duchess!=='follow'){ const d=dist(p.x,p.y,G.goat.x,G.goat.y); if(d<70) offer(d,'Talk to the goat',talkGoat,G.goat.x,G.goat.y); }
   }
   G.prompt=best&&(!G.inCombat||best.always)?best:null;
@@ -8039,6 +8130,9 @@ function talkHub(n,pre){
     if(shop) o.push({t:id==='marigold'?'Show me your hats':id==='tilly'||id==='hob'?'A bed, or something to eat?':'What are you selling?',tag:'shop',fn:()=>shop(n),end:true});
     // quest step that needs more items: remind
     for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id&&!haveAll(st.take)) o.push({t:`About ${QDEFS[qid].title.replace('Errand: ','')}...`,tag:'quest',then:[[id,`You still need: ${Object.keys(st.take||{}).map(k=>ITEM_NAMES[k]||k).join(', ')}. I'll be right here.`]],back:true}); }
+    for(const qid in G.quests){ const T=QDEFS[qid].topics, q=G.quests[qid]; if(!T||!T[id]||q.done||q.step!==0||G.flags[T[id].flag]) continue; const tp=T[id]; o.push({t:tp.t,tag:'quest',fn:()=>{ G.flags[tp.flag]=true; later(0.2,questPoke); },then:tp.lines,back:true}); }
+    const av=availableFrom(id); if(av&&QDEFS[av].errand) o.push({t:'Need anything carried somewhere?',tag:'errand',fn:()=>offerQuest(av),end:true});
+    if(id==='tamsin') o.push({t:'Sing me your song about me!',key:'song_'+id+'_'+dayNow(),then:()=>tamsinSong().slice(1),back:true});
     o.push({t:'What’s new?',key:`new_${id}_${dayNow()}`,then:()=>{ const L=(c.lines&&c.lines.length)?c.lines:[`Not much. The valley's quiet. Too quiet, my gran would say.`]; const m=moodLine(id); const t=m&&n.li%3===2?m:L[n.li%L.length]; n.li=(n.li||0)+1; return [[id,t]]; },back:true});
     if(T.chat&&!G.seenTalk['chat_'+id]&&(!T.need||T.need())) o.push({t:'You look like something’s on your mind.',tag:'new',then:()=>[ch(id,T.chat.q,T.chat.opts.map(a=>({t:a.t,tone:a.tone,fn:()=>{ G.seenTalk['chat_'+id]=1; befriend(id,a.f+(a.tone===T.chat.best?0.25:0)); },then:[[id,a.r]]})))],back:true});
     if(T.deep&&friendOf(id)>=2) o.push({t:'Tell me about yourself.',key:'deep_'+id,then:[[id,T.deep]],back:true});
@@ -8071,6 +8165,166 @@ function secretTally(){
   out.push(['Best friends',CAST.filter(c=>!c.generic&&friendOf(c.id)>=5).length,Object.keys(TALK).length]);
   return out;
 }
+
+// ================= minigames for side quests: chase, hide and seek, defend the patch, the race, and Wendel's song
+const MINI={};
+function startMini(kind,qid){
+  const M=MINI[kind]; if(!M||G.mini) return;
+  const step=stepOf(qid);
+  G.mini=Object.assign({kind,qid,flag:step&&step.flag,t:0,ox:player.x,oy:player.y},M.start(qid)||{});
+  if(G.mini&&G.mini.kind) { jingle('quest',null); }
+}
+function miniEnd(win,title,sub){
+  const M=G.mini; if(!M) return; G.mini=null;
+  if(MINI[M.kind].end) MINI[M.kind].end(M,win);
+  if(win){ if(M.flag) G.flags[M.flag]=true; jingle('complete','upgrade'); questPoke(); }
+  else SFX.play('warn');
+  setBanner(title||(win?'You did it!':'Not this time'),sub||(win?'':'Talk to them again to have another go.'),2.6);
+  saveGame();
+}
+function miniUpdate(dt){
+  const M=G.mini; if(!M) return;
+  if(AREA&&M.kind!=='simon'){ miniEnd(false,'Game over','You went inside. Talk to them again to start over.'); return; }
+  M.t+=dt;
+  MINI[M.kind].update(M,dt);
+}
+function miniTalk(n){
+  // a quest step that starts a minigame when you talk to its person
+  for(const qid in G.quests){
+    const st=stepOf(qid);
+    if(st&&st.mini&&st.npc===n.id&&!G.mini&&!G.flags[st.flag]){
+      const lines=(st.ready||[[n.id,'Ready?']]).slice(0,-1);
+      const last=(st.ready||[[n.id,'Ready?']]).slice(-1)[0];
+      lines.push(ch(last[0],last[1],[{t:'Let’s go!',tone:'brave',fn:()=>{ later(0.05,()=>startMini(st.mini,qid)); }},{t:'Give me a minute.',then:[[n.id,`Okay. I'll be right here.`]]}]));
+      runDialogue(lines,()=>{ scene='play'; });
+      return true;
+    }
+  }
+  return false;
+}
+function miniPrompts(offer){
+  const M=G.mini; if(!M||!MINI[M.kind].prompts) return;
+  MINI[M.kind].prompts(M,offer);
+}
+function freeAround(x,y,r0,r1,tries){ for(let t=0;t<(tries||80);t++){ const a=rand(0,TAU), r=rand(r0,r1), px=x+Math.cos(a)*r, py=y+Math.sin(a)*r; if(!blockedAt(px,py)&&!blockedAt(px+16,py)&&!blockedAt(px-16,py)&&!blockedAt(px,py+16)&&!blockedAt(px,py-16)) return {x:px,y:py}; } return {x:x+r0,y:y}; }
+
+// ---------- Stop, Thief!
+MINI.chase={
+  start(){ const p=freeAround(player.x,player.y,140,220); const e=makeEnemy('sneak',p.x,p.y,{level:2,aggro:true,homeX:player.x,homeY:player.y,leash:99999}); e.mini=true; e.invulnT=0; return {e,limit:75,music:'combat'}; },
+  update(M){
+    if(M.e.dead){ giveItems({purse:1}); miniEnd(true,'Got it!','The sneak drops Pell’s purse and runs off crying.'); return; }
+    if(M.t>M.limit){ M.e.dead=true; deathFx(M.e); miniEnd(false,'It got away!','Talk to Pell to try again.'); }
+  },
+  target:M=>M.e&&!M.e.dead?{x:M.e.x,y:M.e.y}:null,
+  hud:M=>`Catch the sneak! ${Math.max(0,Math.ceil(M.limit-M.t))}s`,
+  end(M){ if(M.e&&!M.e.dead){ M.e.dead=true; } }
+};
+// ---------- Hide and Seek
+MINI.seek={
+  start(){
+    const B=POI.brindle, hs=HOUSES.filter(h=>h.town==='brindle'&&h.k==='house');
+    const spots=[], kinds=['barrel','bush','cart','crates'], names=['Jem','Pip-squeak','Moll','Nib'];
+    shuffle(hs.slice()).slice(0,8).forEach(h=>{ if(spots.length>=4) return; const side=Math.random()<0.5?-1:1; const x=h.x+side*(h.w/2+26), y=h.y+rand(-h.h*0.2,h.h*0.25); if(blockedAt(x,y)) return; spots.push({x,y,k:kinds[spots.length],name:names[spots.length],found:false}); });
+    while(spots.length<4){ const p=freeAround(B.x,B.y,200,520); spots.push({x:p.x,y:p.y,k:kinds[spots.length],name:names[spots.length],found:false}); }
+    return {spots,limit:120,music:'puzzle'};
+  },
+  update(M){
+    for(const s of M.spots){ if(s.found) continue; const d=dist(player.x,player.y,s.x,s.y); if(d<240&&Math.random()<0.012) ftext(s.x,s.y-24,pick(['hee hee','*giggle*','shhh!','snrk']),'#ffe0b0',11); }
+    if(M.spots.every(s=>s.found)){ miniEnd(true,'Found everyone!','Go tell Nib.'); return; }
+    if(M.t>M.limit) miniEnd(false,'Time’s up!','The kids pop out laughing. Talk to Nib to play again.');
+  },
+  prompts(M,offer){ for(const s of M.spots){ if(s.found) continue; const d=dist(player.x,player.y,s.x,s.y); if(d<62) offer(d-40,`Peek behind the ${s.k==='bush'?'bush':s.k==='cart'?'cart':s.k==='crates'?'crates':'barrel'}`,()=>{ s.found=true; SFX.play('pop'); emit(s.x,s.y,10,{col:'255,230,180',smin:30,smax:90,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); setBanner(`Found ${s.name}!`,`${M.spots.filter(q=>q.found).length} of 4`,1.4); },s.x,s.y,true); } },
+  target:M=>{ const s=M.spots.filter(q=>!q.found).sort((a,b)=>dist2(a.x,a.y,player.x,player.y)-dist2(b.x,b.y,player.x,player.y))[0]; return s&&dist(s.x,s.y,player.x,player.y)>400?{x:POI.brindle.x,y:POI.brindle.y}:null; },
+  hud:M=>`Hide and seek: ${M.spots.filter(q=>q.found).length}/4 found · ${Math.max(0,Math.ceil(M.limit-M.t))}s`,
+  draw(M,t){ for(const s of M.spots){ if(!inView(s.x,s.y,60)) continue; drawSeekProp(s,t); } }
+};
+function drawSeekProp(s,t){
+  const x=s.x, y=s.y;
+  if(s.found){ ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(x,y+8,10,5,0,0,TAU); ctx.fill(); ctx.fillStyle='#e8b090'; ctx.beginPath(); ctx.arc(x,y-4+Math.sin(t*8)*2,7,0,TAU); ctx.fill(); ctx.fillStyle='#5a3a20'; ctx.beginPath(); ctx.arc(x,y-7+Math.sin(t*8)*2,7,Math.PI,TAU); ctx.fill(); }
+  if(s.k==='barrel'){ drawPot(x+(s.found?16:0),y,'barrel'); }
+  else if(s.k==='bush'){ ctx.fillStyle='#2f5a1d'; ctx.beginPath(); ctx.arc(x+(s.found?18:0),y,18,0,TAU); ctx.fill(); ctx.fillStyle='#4d7f2c'; ctx.beginPath(); ctx.arc(x-4+(s.found?18:0),y-4,12,0,TAU); ctx.fill(); }
+  else if(s.k==='cart'){ ctx.fillStyle='#6a4a2a'; ctx.fillRect(x-20+(s.found?20:0),y-12,40,24); ctx.fillStyle='#3a2a1a'; ctx.beginPath(); ctx.arc(x-12+(s.found?20:0),y+12,6,0,TAU); ctx.arc(x+12+(s.found?20:0),y+12,6,0,TAU); ctx.fill(); }
+  else { for(const [dx,dy] of [[-10,0],[10,0],[0,-14]]){ ctx.fillStyle='#8a6a42'; ctx.fillRect(x+dx-10+(s.found?20:0),y+dy-10,20,20); ctx.strokeStyle='#5a4228'; ctx.lineWidth=2; ctx.strokeRect(x+dx-10+(s.found?20:0),y+dy-10,20,20); } }
+  if(!s.found&&Math.sin(t*3+x)>0.92){ ctx.fillStyle='#ffe0b0'; ctx.beginPath(); ctx.arc(x+8,y-14,2,0,TAU); ctx.fill(); }
+}
+// ---------- Pumpkin Patrol
+MINI.defend={
+  start(){
+    const c=CASTBY.hal, door=DOORS.find(d=>d.owner==='hal')||{x:POI.village.x,y:POI.village.y};
+    const cx=door.x+(door.x<POI.village.x?-160:160), cy=door.y+60, crops=[];
+    for(let i=0;i<8;i++){ const x=cx+((i%4)-1.5)*46, y=cy+(Math.floor(i/4)-0.5)*46; crops.push({x,y,eaten:false,big:i===5}); }
+    return {cx,cy,crops,limit:60,wave:0,music:'combat'};
+  },
+  update(M,dt){
+    M.spawnT=(M.spawnT||1)-dt;
+    if(M.spawnT<=0&&M.t<M.limit-4){ M.spawnT=Math.max(1.6,4.2-M.t*0.05); const n=2+Math.floor(M.t/20);
+      for(let i=0;i<n;i++){ const a=rand(0,TAU), x=M.cx+Math.cos(a)*420, y=M.cy+Math.sin(a)*360; if(blockedAt(x,y)) continue; const live=M.crops.filter(q=>!q.eaten); if(!live.length) break; const e=makeEnemy('slime',x,y,{level:2,aggro:true,homeX:M.cx,homeY:M.cy,leash:99999,tint:'#9ad04a'}); e.mini=true; e.cropTarget=pick(live); e.spawnIn=0.3; } }
+    for(const e of G.enemies){ if(e.dead||!e.mini||!e.cropTarget) continue; const c=e.cropTarget; if(c.eaten){ const live=M.crops.filter(q=>!q.eaten); e.cropTarget=live.length?pick(live):null; continue; } if(dist(e.x,e.y,c.x,c.y)<22){ c.eaten=true; SFX.play('pop'); ftext(c.x,c.y-20,'CHOMP','#ffb070',13); emit(c.x,c.y,12,{col:'230,130,40',glow:false,smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); } }
+    const left=M.crops.filter(q=>!q.eaten).length;
+    if(!left){ miniEnd(false,'The slimes ate everything!','Talk to Hal to try again.'); return; }
+    if(M.t>=M.limit){ M.saved=left; addCoins(left*4,player.x,player.y); miniEnd(true,`${left} pumpkins saved!`,left===8?'Every single one. Hal is weeping.':'Go tell Hal.'); }
+  },
+  end(M){ for(const e of G.enemies) if(e.mini&&!e.dead){ e.dead=true; deathFx(e); } },
+  target:M=>({x:M.cx,y:M.cy}),
+  hud:M=>`Guard the pumpkins! ${M.crops.filter(q=>!q.eaten).length}/8 left · ${Math.max(0,Math.ceil(M.limit-M.t))}s`,
+  draw(M,t){ for(const c of M.crops){ if(c.eaten){ ctx.fillStyle='rgba(120,70,20,.5)'; ctx.beginPath(); ctx.ellipse(c.x,c.y,9,5,0,0,TAU); ctx.fill(); continue; } const r=c.big?15:11; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(c.x+2,c.y+r*0.6,r,r*0.45,0,0,TAU); ctx.fill(); ctx.fillStyle='#e8782a'; ctx.beginPath(); ctx.ellipse(c.x,c.y,r,r*0.82,0,0,TAU); ctx.fill(); ctx.strokeStyle='#b8521a'; ctx.lineWidth=1.5; for(const k of [-0.5,0,0.5]){ ctx.beginPath(); ctx.ellipse(c.x+k*r*0.6,c.y,r*0.35,r*0.8,0,0,TAU); ctx.stroke(); } ctx.fillStyle='#4a7a2a'; ctx.fillRect(c.x-1.5,c.y-r-3,3,6); } }
+};
+// ---------- The Frostpine Dash
+MINI.race={
+  start(){
+    const L=POI.lodge, flags=[]; let a0=rand(0,TAU);
+    for(let i=0;i<6;i++){ const a=a0+i*TAU/6, r=360+(i%2)*120; let x=L.x+Math.cos(a)*r, y=L.y+Math.sin(a)*r; for(let k=0;k<20&&blockedAt(x,y);k++){ x+=rand(-60,60); y+=rand(-60,60); } flags.push({x,y}); }
+    let len=dist(L.x,L.y,flags[0].x,flags[0].y); for(let i=1;i<6;i++) len+=dist(flags[i-1].x,flags[i-1].y,flags[i].x,flags[i].y);
+    return {flags,i:0,limit:75,elkaT:len/150,len,music:'arena',sx:player.x,sy:player.y};
+  },
+  update(M){
+    const f=M.flags[M.i];
+    if(dist(player.x,player.y,f.x,f.y)<48){ M.i++; SFX.play('pickup'); emit(f.x,f.y,14,{col:'255,220,120',smin:30,smax:100,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); if(M.i>=M.flags.length){ if(M.t<=M.elkaT) miniEnd(true,'You win!','You beat Elka to the last flag.'); else miniEnd(false,'Elka wins!','So close. Talk to Elka for a rematch.'); return; } }
+    // Elka runs the course too
+    const n=G.npcs.find(q=>q.id==='elka');
+    if(n){ const p=raceAt(M,Math.min(1,M.t/M.elkaT)); n.x=p.x; n.y=p.y; n.face=p.a; n.moving=true; n.t+=0.05; }
+    if(M.t>M.elkaT+1.5){ miniEnd(false,'Elka wins!','Talk to Elka for a rematch.'); }
+  },
+  end(){ const n=G.npcs.find(q=>q.id==='elka'); if(n){ n.x=n.home[0]; n.y=n.home[1]; n.moving=false; } },
+  target:M=>M.flags[M.i],
+  hud:M=>`Race! Flag ${M.i+1} of 6 · Elka is ${M.t<M.elkaT?Math.round(Math.min(1,M.t/M.elkaT)*100)+'% around':'done'}`,
+  draw(M,t){ M.flags.forEach((f,i)=>{ if(!inView(f.x,f.y,60)) return; const next=i===M.i, done=i<M.i; ctx.fillStyle='#4a3420'; ctx.fillRect(f.x-1.5,f.y-30,3,32); ctx.fillStyle=done?'#6a6a6a':next?'#ff5a3a':'#c84a3a'; ctx.beginPath(); ctx.moveTo(f.x+1,f.y-30); ctx.lineTo(f.x+20,f.y-24+Math.sin(t*6+i)*2); ctx.lineTo(f.x+1,f.y-18); ctx.fill(); ctx.fillStyle='#fff'; ctx.font=`800 10px ${UIF}`; ctx.textAlign='center'; ctx.fillText(String(i+1),f.x+9,f.y-22); if(next){ ctx.strokeStyle=`rgba(255,200,120,${0.4+0.3*Math.sin(t*5)})`; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(f.x,f.y,40,0,TAU); ctx.stroke(); } }); }
+};
+function raceAt(M,k){
+  const pts=[{x:M.sx,y:M.sy}].concat(M.flags); let want=k*M.len, acc=0;
+  for(let i=1;i<pts.length;i++){ const d=dist(pts[i-1].x,pts[i-1].y,pts[i].x,pts[i].y); if(acc+d>=want){ const u=(want-acc)/d; return {x:lerp(pts[i-1].x,pts[i].x,u),y:lerp(pts[i-1].y,pts[i].y,u),a:angTo(pts[i-1].x,pts[i-1].y,pts[i].x,pts[i].y)}; } acc+=d; }
+  const L=pts[pts.length-1]; return {x:L.x,y:L.y,a:0};
+}
+// ---------- Wendel's song: listen, then play it back
+const NOTES=[['Do',262],['Re',294],['Mi',330],['So',392]];
+function playNote(i,delay){ try{ const ac=SFX.ac; if(!ac||SFX.muted) return; const t=ac.currentTime+(delay||0), o=ac.createOscillator(), g=ac.createGain(); o.type='triangle'; o.frequency.value=NOTES[i][1]; g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.12,t+0.02); g.gain.exponentialRampToValueAtTime(0.001,t+0.5); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+0.55); }catch(e){} }
+MINI.simon={
+  start(){ later(0.1,()=>{ if(G.mini&&G.mini.kind==='simon') simonRound(G.mini); }); return {round:0,pos:0,rounds:[[0,2],[0,2,3],[3,2,0,1],[1,3,2,0,2]],music:'house'}; },
+  update(){},
+  hud:()=>null
+};
+function simonListen(S){ const seq=S.rounds[S.round]; S.pos=0; return {who:'wendel',text:`Round ${S.round+1} of ${S.rounds.length}. Listen: ${seq.map(i=>NOTES[i][0]).join(', ')}.`,fn:()=>seq.forEach((n,i)=>playNote(n,0.2+i*0.45))}; }
+function simonAsk(S){ const seq=S.rounds[S.round]; return ch('ash',`Your turn. Note ${S.pos+1} of ${seq.length}.`,NOTES.map(([nm],i)=>({t:`♪ ${nm}`,fn:()=>{ playNote(i,0); if(i===seq[S.pos]) S.pos++; else S.wrong=true; },then:()=>simonNext(S)}))); }
+function simonNext(S){
+  const seq=S.rounds[S.round];
+  if(S.wrong){ S.wrong=false; const want=NOTES[seq[S.pos]][0]; return [['wendel',pick([`Ooh, close! That one was ${want}. Let's try that round again.`,`Almost! The next note was ${want}. From the top.`])],simonListen(S),simonAsk(S)]; }
+  if(S.pos<seq.length) return [simonAsk(S)];
+  S.round++;
+  if(S.round>=S.rounds.length){ S.won=true; return [['wendel','That’s it! That’s the whole song! Ash, you’re a natural.']]; }
+  return [['wendel',pick(['Perfect! The next one is longer.','Lovely. Now this one.','Yes! Keep going.'])],simonListen(S),simonAsk(S)];
+}
+function simonRound(S){
+  runDialogue([simonListen(S),simonAsk(S)],()=>{ scene='play'; if(G.mini===S) miniEnd(!!S.won,S.won?'Song complete!':'Maybe later',S.won?'Wendel is grinning from ear to ear.':'Talk to Wendel to play again.'); },{mood:'tender'});
+}
+// HUD and world drawing hooks
+function drawMiniHUD(){
+  const M=G.mini; if(!M||!MINI[M.kind].hud) return; const txt=MINI[M.kind].hud(M); if(!txt) return;
+  ctx.save(); ctx.font=`800 15px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  const w=ctx.measureText(txt).width+34, y=SAFE.t+(W<720?196:26);
+  ctx.fillStyle='rgba(14,8,6,.8)'; rr(W/2-w/2,y-16,w,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,200,120,.55)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='#ffe2b0'; ctx.fillText(txt,W/2,y+1); ctx.restore();
+}
+function drawMiniWorld(t){ const M=G.mini; if(M&&MINI[M.kind].draw) MINI[M.kind].draw(M,t); }
 
 // ================= drawing: effects
 function rr(x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
@@ -8477,6 +8731,7 @@ function drawEnemy(e){
     case 'wolf': drawWolf(e,fl); break; case 'egg': drawEgg(e,fl); break;
     case 'greymane': drawWolf(e,fl,2.05,true); break; case 'gloamjaw': drawGloam(e,fl); break;
     case 'bat': drawBat(e,fl); break; case 'slime': drawSlime(e,fl); break;
+    case 'sneak': drawKobold(e,0.92,fl,false); ctx.fillStyle='#c8a050'; ctx.beginPath(); ctx.arc(e.x-Math.cos(e.face)*9,e.y-Math.sin(e.face)*9,6,0,TAU); ctx.fill(); ctx.fillStyle='#8a6a2a'; ctx.fillRect(e.x-Math.cos(e.face)*9-1,e.y-Math.sin(e.face)*9-7,2,4); break;
   }
   ctx.restore();
   if(!e.boss&&e.hp<e.maxHp&&e.type!=='egg'&&e.aggro){
@@ -9171,7 +9426,7 @@ function render(){
   ctx.save();
   if(!inA){
     for(const p of props){ if(p.taken) continue; const tall=TALL.has(p.k), k=tall?1.6:0.5, R=tall?p.R*1.05:p.R*0.9; ctx.globalAlpha=sun.a*(tall?1:0.8); ctx.drawImage(SPR.shadow,p.x+sun.dx*k-R,p.y+sun.dy*k-R*0.85,R*2,R*1.7); }
-    for(const h of HOUSES) if(inView(h.x,h.y,200)){ ctx.globalAlpha=sun.a*0.9; ctx.fillStyle='#000'; ctx.fillRect(h.x-h.w/2+sun.dx*1.2,h.y-h.h/2+sun.dy*1.2,h.w+4,h.h+4); }
+    for(const h of HOUSES) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
   }
   ctx.globalAlpha=sun.a*0.9;
   const ent=[player,...G.enemies.filter(e=>!e.dead&&!e.frozen&&e.type!=='vorlaxis'&&e.alpha>0.2),...npcs.filter(n=>inView(n.x,n.y,60)),...G.critters];
@@ -9184,6 +9439,7 @@ function render(){
     for(const s of STRUCTS){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue; if(s.k==='cavemouth') drawCaveMouth(s,t); else if(s.k==='column') drawColumn(s); else if(s.k==='glowshroom') drawGlowShroom(s,t); else drawStruct(s,t); }
     for(const d of DOORS) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
     for(const o of LANDMARKS) if(inView(o.x,o.y,160)) drawLandmark(o,t);
+    if(G.mini) drawMiniWorld(t);
     drawWall();
     for(const c of CHESTS) if(inView(c.x,c.y,40)) drawChest(c,t);
     for(const l of LILIES) if(inView(l.x,l.y,40)) drawLily(l,t);
@@ -9390,7 +9646,7 @@ function drawHUD(){
     ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
     ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
   }
-  drawBanner(); drawTaunt(); drawCompass(fo||obj);
+  drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
     const a=Math.min(1,G.hintT/1.5);
     const txt=usingTouch?(settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts'):'WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · Space roll · R drink · E use · M map';
@@ -9414,7 +9670,7 @@ function drawMinimap(obj){
   if(G.mode==='story'){
     for(const s of SHRINES){ const [x,y]=toM(s.x,s.y); ctx.fillStyle=G.shrines[s.id]?'#7fd0ff':'#6b6f7a'; ctx.beginPath(); ctx.arc(x,y,3,0,TAU); ctx.fill(); }
     for(const c of CHESTS) if(!c.open&&dist2(c.x,c.y,p.x,p.y)<700*700){ const [x,y]=toM(c.x,c.y); ctx.fillStyle='#ffd27a'; ctx.fillRect(x-2,y-1.5,4,3); }
-    if(!AREA){ for(const n of G.npcs){ const m=npcMarker(n.id); if(!m||m==='…'||dist2(n.x,n.y,p.x,p.y)>span*span) continue; const [x,y]=toM(n.x,n.y); ctx.fillStyle=m==='!'?'#ffcf4a':'#7fe0ff'; ctx.font=`900 10px ${UIF}`; ctx.textAlign='center'; ctx.fillText(m,x,y); }
+    if(!AREA){ for(const n of G.npcs){ const m=npcMarker(n.id); if(!m||m==='…'||m==='✉'||dist2(n.x,n.y,p.x,p.y)>span*span) continue; const [x,y]=toM(n.x,n.y); ctx.fillStyle=m==='!'?'#ffcf4a':'#7fe0ff'; ctx.font=`900 10px ${UIF}`; ctx.textAlign='center'; ctx.fillText(m,x,y); }
       for(const m of CAVEMOUTHS){ if(dist2(m.x,m.y,p.x,p.y)>span*span) continue; const [x,y]=toM(m.x,m.y); ctx.fillStyle='#1a1410'; ctx.strokeStyle='#c8b8a0'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(x,y,3.5,Math.PI,TAU); ctx.lineTo(x+3.5,y+2); ctx.lineTo(x-3.5,y+2); ctx.closePath(); ctx.fill(); ctx.stroke(); } }
     if(!AREA) for(const q of questTargets()){ let [x,y]=toM(q.x,q.y); const d=dist(x,y,cx,cy); if(d>r-6){ const a=Math.atan2(y-cy,x-cx); x=cx+Math.cos(a)*(r-6); y=cy+Math.sin(a)*(r-6); } ctx.save(); ctx.translate(x,y); ctx.rotate(Math.PI/4); ctx.fillStyle='#7fe0ff'; ctx.strokeStyle='#08303a'; ctx.lineWidth=1.2; ctx.fillRect(-3,-3,6,6); ctx.strokeRect(-3,-3,6,6); ctx.restore(); }
   }
@@ -11169,7 +11425,7 @@ resize(); setupMenuScene(); refreshMenu();
 Cloud.check().then(ok=>{ if(ok&&Cloud.signedIn) syncSaves(); acctLabel(); });
 requestAnimationFrame(t=>{ last=t; frame(t); });
 window.__eb={god:false,get G(){return G;},get player(){return player;},get scene(){return scene;},
-  startStory,startNormal,newStory(i){ setSlot(i||0); startStory(false); },openSlots,openJournal,closeJournal,openSettings,cycleFocus,followQuest,tracked,slotSave,latestSlot,talkHub,befriend,friendOf,secretTally,get Music(){return Music;},CAVEMAP,solveRoom,FLOORS,SECRET_ROOMS,goFloor,floorObjAct,AREADEFS,refreshCaveGates,caveRoomAt,hitCrystal,breakCrack,caveObjAct,resetBlocks,skipDialogue,advanceDialogue,chooseUpgrade,toMenu,openMap,closeMap,
+  startStory,startNormal,newStory(i){ setSlot(i||0); startStory(false); },openSlots,openJournal,closeJournal,openSettings,cycleFocus,followQuest,tracked,slotSave,latestSlot,talkHub,befriend,friendOf,secretTally,get Music(){return Music;},CAVEMAP,MINI,startMini,miniEnd,get mini(){return G.mini;},solveRoom,FLOORS,SECRET_ROOMS,goFloor,floorObjAct,AREADEFS,refreshCaveGates,caveRoomAt,hitCrystal,breakCrack,caveObjAct,resetBlocks,skipDialogue,advanceDialogue,chooseUpgrade,toMenu,openMap,closeMap,
   tp(x,y){ player.x=x; player.y=y; updateCam(0,true); G.chunkBurst=16; },
   setStage(st){ G.stage=st; if(stageAt(st)>=stageAt('lanterns')) G.flags.forge=true; if(stageAt(st)>stageAt('raid')) for(const L of LANTERNS) L.lit=true; if(stageAt(st)>=stageAt('summit')){ G.flags.gate=true; GATE_COL.off=true; } setupNPCs(); },
   lightWard, wardReady(id){ G.wardReady[id]=true; }, enterArea:(id)=>{ const d=DOORS.find(q=>q.area===id); enterArea(id,d||{x:player.x,y:player.y}); }, exitArea, get AREA(){return AREA;}, DOORS, CAVEMOUTHS, LANDMARKS, QDEFS, CAST, startQuest, giveItems, npcMarker, talkTo, findPage, questPoke, lmAct, areaObjAct,

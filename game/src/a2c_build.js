@@ -158,6 +158,8 @@ function initWorld(){
   }
   buildPlaces(); assignHomes(); defineFloors(); registerSpeakers();
   for(const h of HOUSES) if(h.owner&&!(CASTBY[h.owner]||{}).generic) h.burnt=false;
+  // the raid left its mark: two ordinary homes in Emberhollow are scorched
+  { const gen=HOUSES.filter(h=>h.town==='village'&&h.owner&&(CASTBY[h.owner]||{}).generic); gen.forEach((h,i)=>{ h.burnt=i<2; }); }
   // ---- chests
   const quota=[5,5,4,4,3,5,4], have=[0,0,0,0,0,0,0];
   for(let tries=0;tries<9000&&CHESTS.length<30;tries++){

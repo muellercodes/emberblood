@@ -77,7 +77,7 @@ function drawHUD(){
     ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
     ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
   }
-  drawBanner(); drawTaunt(); drawCompass(fo||obj);
+  drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
     const a=Math.min(1,G.hintT/1.5);
     const txt=usingTouch?(settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts'):'WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · Space roll · R drink · E use · M map';
@@ -101,7 +101,7 @@ function drawMinimap(obj){
   if(G.mode==='story'){
     for(const s of SHRINES){ const [x,y]=toM(s.x,s.y); ctx.fillStyle=G.shrines[s.id]?'#7fd0ff':'#6b6f7a'; ctx.beginPath(); ctx.arc(x,y,3,0,TAU); ctx.fill(); }
     for(const c of CHESTS) if(!c.open&&dist2(c.x,c.y,p.x,p.y)<700*700){ const [x,y]=toM(c.x,c.y); ctx.fillStyle='#ffd27a'; ctx.fillRect(x-2,y-1.5,4,3); }
-    if(!AREA){ for(const n of G.npcs){ const m=npcMarker(n.id); if(!m||m==='…'||dist2(n.x,n.y,p.x,p.y)>span*span) continue; const [x,y]=toM(n.x,n.y); ctx.fillStyle=m==='!'?'#ffcf4a':'#7fe0ff'; ctx.font=`900 10px ${UIF}`; ctx.textAlign='center'; ctx.fillText(m,x,y); }
+    if(!AREA){ for(const n of G.npcs){ const m=npcMarker(n.id); if(!m||m==='…'||m==='✉'||dist2(n.x,n.y,p.x,p.y)>span*span) continue; const [x,y]=toM(n.x,n.y); ctx.fillStyle=m==='!'?'#ffcf4a':'#7fe0ff'; ctx.font=`900 10px ${UIF}`; ctx.textAlign='center'; ctx.fillText(m,x,y); }
       for(const m of CAVEMOUTHS){ if(dist2(m.x,m.y,p.x,p.y)>span*span) continue; const [x,y]=toM(m.x,m.y); ctx.fillStyle='#1a1410'; ctx.strokeStyle='#c8b8a0'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(x,y,3.5,Math.PI,TAU); ctx.lineTo(x+3.5,y+2); ctx.lineTo(x-3.5,y+2); ctx.closePath(); ctx.fill(); ctx.stroke(); } }
     if(!AREA) for(const q of questTargets()){ let [x,y]=toM(q.x,q.y); const d=dist(x,y,cx,cy); if(d>r-6){ const a=Math.atan2(y-cy,x-cx); x=cx+Math.cos(a)*(r-6); y=cy+Math.sin(a)*(r-6); } ctx.save(); ctx.translate(x,y); ctx.rotate(Math.PI/4); ctx.fillStyle='#7fe0ff'; ctx.strokeStyle='#08303a'; ctx.lineWidth=1.2; ctx.fillRect(-3,-3,6,6); ctx.strokeRect(-3,-3,6,6); ctx.restore(); }
   }

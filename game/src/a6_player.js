@@ -240,7 +240,7 @@ function killEnemy(e){
   if(G.mode==='normal'){ G.score+=Math.round(e.value*comboMult()); if(Math.random()<0.12*G.diff.heal) dropHeal(e.x,e.y,14); }
   gainXp(Math.round(e.boss?e.value:e.value*(1+0.25*((e.level||1)-1))));
   if(player.stats.killHeal&&e.type!=='egg') heal(player.stats.killHeal,true);
-  if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; if(e.camp) e.camp.alive++; } }
+  if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; k.room=e.room; k.cropTarget=e.cropTarget; k.mini=e.mini; if(e.room&&AREA&&AREA.rooms&&AREA.rooms[e.room]) AREA.rooms[e.room].enemies.push(k); if(e.camp) e.camp.alive++; } }
   if(e.camp){ e.camp.alive--; if(e.camp.alive<=0&&!e.camp.cave){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story'){ setBanner('Camp cleared','',1.6); G.stats.camps=(G.stats.camps||0)+1; questPoke(); } } }
   if(G.mode==='story'&&e.type!=='egg'){ if(e.boss) dropCoins(e.x,e.y,20); else if(Math.random()<(e.elite?0.9:0.35)) dropCoins(e.x,e.y,e.elite?randi(3,5):randi(1,2)); }
   if(e.questTag) G.questKills++;

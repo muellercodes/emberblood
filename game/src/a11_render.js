@@ -41,7 +41,7 @@ function render(){
   ctx.save();
   if(!inA){
     for(const p of props){ if(p.taken) continue; const tall=TALL.has(p.k), k=tall?1.6:0.5, R=tall?p.R*1.05:p.R*0.9; ctx.globalAlpha=sun.a*(tall?1:0.8); ctx.drawImage(SPR.shadow,p.x+sun.dx*k-R,p.y+sun.dy*k-R*0.85,R*2,R*1.7); }
-    for(const h of HOUSES) if(inView(h.x,h.y,200)){ ctx.globalAlpha=sun.a*0.9; ctx.fillStyle='#000'; ctx.fillRect(h.x-h.w/2+sun.dx*1.2,h.y-h.h/2+sun.dy*1.2,h.w+4,h.h+4); }
+    for(const h of HOUSES) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
   }
   ctx.globalAlpha=sun.a*0.9;
   const ent=[player,...G.enemies.filter(e=>!e.dead&&!e.frozen&&e.type!=='vorlaxis'&&e.alpha>0.2),...npcs.filter(n=>inView(n.x,n.y,60)),...G.critters];
@@ -54,6 +54,7 @@ function render(){
     for(const s of STRUCTS){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue; if(s.k==='cavemouth') drawCaveMouth(s,t); else if(s.k==='column') drawColumn(s); else if(s.k==='glowshroom') drawGlowShroom(s,t); else drawStruct(s,t); }
     for(const d of DOORS) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
     for(const o of LANDMARKS) if(inView(o.x,o.y,160)) drawLandmark(o,t);
+    if(G.mini) drawMiniWorld(t);
     drawWall();
     for(const c of CHESTS) if(inView(c.x,c.y,40)) drawChest(c,t);
     for(const l of LILIES) if(inView(l.x,l.y,40)) drawLily(l,t);

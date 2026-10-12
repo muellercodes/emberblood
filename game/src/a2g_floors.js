@@ -60,8 +60,11 @@ function freeIn(items,W,H,cands,fw,fh){
   return cands[cands.length-1];
 }
 const STAIR_SPOTS=(W,H)=>[[W-70,H*0.72],[70,H*0.72],[W-70,150],[70,160],[W*0.8,H*0.42],[W*0.2,H*0.42],[W*0.65,H*0.8],[W*0.35,H*0.8]];
+const SONG_SHEETS={h_tilly_up:'sheet1',h_hob:'sheet2',h_library_up:'sheet3'};
 function floorExtras(def,items,put,W,H,rng,wallY){
   const F=FLOORS[def.id]||{};
+  const sh=SONG_SHEETS[def.id]; if(sh&&G&&G.quests&&G.quests.song&&!G.quests.song.done&&!G.items[sh]){ const [x,y]=freeIn(items,W,H,[[W*0.3,H*0.62],[W*0.7,H*0.62],[W*0.5,H*0.3]],40,40); put('qitem',x,y,{item:sh,label:'a song sheet'}); }
+  if(def.id==='h_mayor_up'&&G&&G.quests&&G.quests.pie&&G.quests.pie.step===0&&!G.flags.clue_dish){ const [x,y]=freeIn(items,W,H,[[W*0.75,H*0.55],[W*0.25,H*0.55]],40,40); put('piedish',x,y,{}); }
   // the way back down (or up) on an extra floor
   if(def.floorOf){
     // cellars have no windows; attics keep one; everybody loses the generic rug in a vault
@@ -172,7 +175,8 @@ function floorObjAct(o){
     case 'cobweb': say('A spider has written something in the web. It might say "hello." It might say "go away." Spider handwriting is hard.'); return true;
     case 'banner': say('A banner with the Scaled Oath’s scale on it. Someone has drawn a little frowny face on the scale.'); return true;
     case 'candles': say('Candles, burned down low. Someone sat here a long time.'); return true;
+    case 'piedish': if(!G.flags.clue_dish){ say('An empty pie dish, licked clean, hidden under a display case. Stuck to the rim: one long, curly mustache hair.',()=>{ G.flags.clue_dish=true; questPoke(); }); } else say('The pie dish. The evidence.'); return true;
   }
   return false;
 }
-const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles'};
+const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
