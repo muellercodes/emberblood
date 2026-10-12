@@ -124,6 +124,7 @@ function drawTexts(){
 
 
 function drawVorlaxis(e){
+  if(T3.on&&T3X.vorlaxis){ T3X.vorlaxis(e); return; }
   const fl=e.flash>0, alt=e.alt||0, sc=e.scale||1, dying=e.dead&&e.deathT!=null;
   const sh=1-alt/500;
   ctx.fillStyle=`rgba(0,0,0,${0.35*sh})`; ctx.beginPath(); ctx.ellipse(e.x,e.y+10,130*sh,90*sh,e.face,0,TAU); ctx.fill();

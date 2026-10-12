@@ -1202,7 +1202,8 @@ function drawComp(c,alpha){
   v.x=c.x; v.y=c.y; v.face=c.face; v.t=c.t!=null?c.t:G.time; v.moving=!!c.moving||(c.t==null);
   ctx.save(); if(alpha<1) ctx.globalAlpha*=alpha;
   if(c.flash>0) glowAt(c.x,c.y,c.r*2.2,'255,70,50',0.5*c.flash/0.14);
-  if(id==='brisket') drawBrisketC(c,v,down);
+  if(T3.on&&T3C[id]) T3C[id](c,v,down);
+  else if(id==='brisket') drawBrisketC(c,v,down);
   else if(id==='juniper') drawJuniperC(c,v,down);
   else if(id==='duchess') drawDuchessC(c,v,down);
   else if(id==='greymane') drawGreyC(c,v,down);
@@ -1304,6 +1305,7 @@ function drawCFX(f){
   else if(f.k==='ember'){ glowAt(f.x,f.y,12,'255,170,80',0.8); ctx.fillStyle='#ffe2a0'; ctx.beginPath(); ctx.arc(f.x,f.y,2.6,0,TAU); ctx.fill(); }
 }
 function drawGreyWait(){
+  if(T3.on&&T3C.greywait){ T3C.greywait(GREYW); return; }
   const t=G.time, b=Math.sin(t*1.6)*0.02;
   ctx.drawImage(pShadow(),GREYW.x-27,GREYW.y-17,54,34);
   GREYW.t=t; ctx.save(); ctx.translate(GREYW.x,GREYW.y); ctx.scale(1+b,1-b); const x=GREYW.x, y=GREYW.y; GREYW.x=0; GREYW.y=0; drawWolf(GREYW,false,1.55,true,true); GREYW.x=x; GREYW.y=y; ctx.restore();

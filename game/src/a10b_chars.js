@@ -61,6 +61,7 @@ function drawHero(x,y,f,p,ghost){
 }
 function drawPlayer(){
   const p=player; if(p.dead) return;
+  if(T3.on&&T3X.ash){ T3X.ash(p); return; }
   // jumping or flying: a shadow that shrinks with height, then Ash lifted by z (a touch bigger, closer to the camera)
   const z=(p.z||0)+(p.flying?Math.sin(p.t*2.6)*2.2:0);
   if(z>0.5||p.flying) drawMoveShadow(p);
@@ -208,7 +209,7 @@ function drawEnemy(e){
   ctx.save();
   ctx.globalAlpha=(e.spawnIn>0?1-e.spawnIn/0.2:1)*e.alpha;
   if(e.elite){ ctx.strokeStyle='rgba(255,200,80,.45)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(e.x,e.y,e.r+5,0,TAU); ctx.stroke(); }
-  switch(e.type){
+  if(T3.on&&T3E[e.type]) T3E[e.type](e,fl); else switch(e.type){
     case 'kobold': drawKobold(e,1,fl,false); break; case 'grizzlefang': drawKobold(e,2.2,fl,true); break;
     case 'cultist': drawCultist(e,1,fl,false); break; case 'morrow': drawCultist(e,1.45,fl,true); break;
     case 'drakeling': drawDrake(e,1,fl,false); break; case 'broodmother': drawDrake(e,2.45,fl,true); break;
@@ -221,14 +222,16 @@ function drawEnemy(e){
     case 'sneak': drawKobold(e,0.92,fl,false); ctx.fillStyle='#c8a050'; ctx.beginPath(); ctx.arc(e.x-Math.cos(e.face)*9,e.y-Math.sin(e.face)*9,6,0,TAU); ctx.fill(); ctx.fillStyle='#8a6a2a'; ctx.fillRect(e.x-Math.cos(e.face)*9-1,e.y-Math.sin(e.face)*9-7,2,4); break;
   }
   ctx.restore();
+  const topY=(T3.on&&e._t3top!=null)?e._t3top:e.y-e.r;  // 3D drawers set e._t3top to the top of the head (world y)
   if(!e.boss&&e.hp<e.maxHp&&e.type!=='egg'&&e.aggro){
-    const w=e.r*2+6, x=e.x-w/2, y=e.y-e.r-9;
+    const w=e.r*2+6, x=e.x-w/2, y=topY-9;
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x,y,w,3); ctx.fillStyle=e.elite?'#e8b84a':'#c8402e'; ctx.fillRect(x,y,w*clamp(e.hp/e.maxHp,0,1),3);
   }
-  if(e.stun>0||(e.type==='grizzlefang'&&e.state==='dizzy')){ for(let i=0;i<3;i++){ const a=G.time*5+i*TAU/3; ctx.fillStyle='#ffe066'; ctx.beginPath(); ctx.arc(e.x+Math.cos(a)*e.r*0.8,e.y-e.r-4+Math.sin(a)*3,2,0,TAU); ctx.fill(); } }
+  if(e.stun>0||(e.type==='grizzlefang'&&e.state==='dizzy')){ for(let i=0;i<3;i++){ const a=G.time*5+i*TAU/3; ctx.fillStyle='#ffe066'; ctx.beginPath(); ctx.arc(e.x+Math.cos(a)*e.r*0.8,topY-4+Math.sin(a)*3,2,0,TAU); ctx.fill(); } }
 }
 // ---------- wildlife and people
 function drawCritter(c){
+  if(T3.on&&T3B[c.type]){ T3B[c.type](c); return; }
   ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.face);
   const L=lightLocal(c.face), mv=c.moving||c.flee>0, g=c.t*(c.flee>0?17:7);
   ctx.lineCap='round'; ctx.lineJoin='round';
@@ -715,8 +718,9 @@ function pDraw(n,P,face,ht,wk,ph,breath,cx,cy){
 }
 function drawPerson(n,L,o){ const P=n._ppx&&n._ppx.src===o?n._ppx:(n._ppx=Object.assign(pResolve(String(n.id||n.kind||'p')+'~',Object.assign({},o),false,null),{src:o})); pDraw(n,P,0,0,0,0,0,0,0); }
 function drawNPC(n){
-  if(n.kind==='goat') return drawGoat(n);
-  if(n.turtle) return drawTurtle(n);
+  if(n.kind==='goat') return (T3.on&&T3B.goat)?T3B.goat(n):drawGoat(n);
+  if(n.turtle) return (T3.on&&T3B.turtle)?T3B.turtle(n):drawTurtle(n);
+  if(T3.on&&T3X.npc&&T3X.npc(n)) return;
   const P=pProfile(n);
   const now=performance.now(); if(now-PBUD_T>8) PBT=now+2.5; PBUD_T=now;
   // movement: walking when flagged or when the position changed since the last frame
@@ -772,6 +776,7 @@ function drawGoat(n){
   ctx.restore();
 }
 function drawPip(q){
+  if(T3.on&&T3B.pip){ T3B.pip(q); return; }
   const t=q.t||0, alt=8+Math.sin(t*5)*3;
   ctx.fillStyle='rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(q.x+4,q.y+alt,7,4,0,0,TAU); ctx.fill();
   ctx.save(); ctx.translate(q.x,q.y-alt*0.4); ctx.rotate(q.face); ctx.scale(0.66,0.66);
@@ -807,6 +812,7 @@ function drawPip(q){
   ctx.restore();
 }
 function drawSpirit(sp){
+  if(T3.on&&T3X.spirit){ T3X.spirit(sp); return; }
   const k=sp.on?clamp(sp.t/0.8,0,1):clamp(1-(sp.fade||0)/1.5,0,1); if(k<=0) return;
   ctx.save(); ctx.translate(sp.x,sp.y+Math.sin(G.time*2)*3); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=k*0.85;
   const g=ctx.createRadialGradient(0,0,0,0,0,44); g.addColorStop(0,'rgba(255,220,150,.55)'); g.addColorStop(1,'rgba(255,170,80,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,44,0,TAU); ctx.fill();
@@ -824,6 +830,7 @@ function drawMarkers(t){
   }
 }
 function drawBirds(){
+  if(T3.on&&T3B.birds){ T3B.birds(); return; }
   for(const f of G.birds){
     for(const b of f.birds){
       const x=f.x+b.ox, y=f.y+b.oy, fl=Math.sin(f.t*12+b.ph);
