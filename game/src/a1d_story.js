@@ -208,3 +208,8 @@ const EPILOGUE_FMT=()=>{
   L.push(['narr',`And the last of the Emberblood line never, ever had to say "great" thirteen times again.`]);
   return L;
 };
+// v6 weapons: Mom offers to forge a hammer (forgeHammerTalk in a6b_weapons.js)
+Object.assign(STORY.maren,{
+  hammerOffer:[['maren',`Ash. Come here. I've had an idea, and it's heavy.`],['maren',`Grandma's blade is lovely. But some things in this valley need hitting with something less lovely. Cracked walls. Knights with big shields. Rocks that look at you funny.`],['maren',`I can forge you a hammer. One star-iron, or 150 coins for the good iron. What do you say?`]],
+  hammerMade:[['narr',`Sparks fly. Mom hums. The forge roars. CLANG. CLANG. CLANG. It takes about four seconds, because Mom is very, very good at this.`],['maren',`There. The Forge Hammer. Hold the attack button to wind up a bigger smash. Smash walls. Smash shields. Do not smash the house.`]]
+});
