@@ -232,7 +232,7 @@ function playerBlocked(x,y){
   return lavaSpot(x,y);
 }
 function landOK(x,y){
-  if(x>=IZX-50){ if(areaBlocked(x,y)) return false; }
+  if(x>=IZX-50){ if(areaBlocked(x,y)) return false; if(AREA&&AREA.tri&&AREA.cave){ const k=tCell(x,y); if(!(tGround(k)||(canWalkWater()&&tWet(k)))) return false; } }
   else{
     if(x<40||y<40||x>WORLD.w-40||y>WORLD.h-40) return false;
     if(Math.abs(y-WALL_Y)<70) return false;

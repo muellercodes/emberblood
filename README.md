@@ -11,13 +11,18 @@ A thousand years ago the dragon Vorlaxis, the First Flame, ruled the valley of E
 You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney sweep, and the first in a thousand years born with horns, a tail and real fire. It's the thousandth Lantern Day, the night the binding runs out. Kobolds just crashed the festival, somebody left the north gate open for them, and a cult called the Scaled Oath is snuffing the Wards so your great-great-great-great-great-great-great-great-great-great-great-great-great-grandfather wakes up strong and takes his fire back from you.
 
 - **Story Mode**: a 14,000 × 11,000 valley with seven regions, seven bosses and five Wards to relight. Seven towns and hamlets with about 45 houses you can walk into, and a dozen of them have an upstairs, a cellar or a secret room behind a loose brick, a bookcase or a painting. Seven caves built as small puzzle dungeons: push-block plates, crystal switches, torch-order murals, timed braziers, dark rooms, mazes, locked doors with small keys and cracked walls that hide treasure rooms.
-- **Side quests that play differently**: 20 of them. Chase down a purse thief, play hide and seek with the village kids, guard a pumpkin patch, race Elka through six flags, play back lost songs note by note, solve the case of the Mayor's missing pie (ask around, then accuse someone) and trade one wheel of cheese up into a piece of a fallen star.
+- **Ember's Trials**: three big dungeons built by Ash's ancestor. Each has a gift you earn halfway through and need for the rest, a weapon in a big chest, a boss key and a boss: Old Gnarl the root giant (Trial of the Leap, you learn to **jump**), the Mirrow Serpent (Trial of the Tide, you learn to **walk on water**), and Skrae the Storm Wyvern, fought in the air (Trial of the Sky, you grow **wings and fly**). The new moves open up islands, broken bridges, lava islands and sky nests all over the valley.
+- **Six weapons**: the Ember Blade, Twin Fangs (fast daggers, sneak attacks), a Pike that skewers a whole line, a Forge Hammer that smashes guards and cracked walls, the Ash Bow (shoot through your own fire breath for fire arrows) and the Wing-rang, a boomerang that stuns and fetches coins. Mom forges every one of them stronger with star-iron.
+- **Skill tree**: a skill point every level and one more for each Trial, spent across four branches (Blade, Flame, Wings, Heart): double jump, meteor slam, whirlwind spins, fire arrows, tougher scales and more.
+- **Companions**: Pip the baby dragon, plus friends who follow you and fight: Duchess the goat (head-butts), Brisket the adventurer you thaw out of the ice, Juniper the mapmaker and, if you spared him, Greymane the wolf. Villagers notice what you've done and say so, and they chat with each other.
+- **Side quests that play differently**: 27 of them. Chase down a purse thief, play hide and seek with the village kids, guard a pumpkin patch, race Elka through six flags, play back lost songs note by note, solve the case of the Mayor's missing pie (ask around, then accuse someone) and trade one wheel of cheese up into a piece of a fallen star.
 - **People to talk to**: every named villager has a talk menu with chat, gifts, rumors and quest topics. How you answer (kind, brave or silly) changes how they feel about you, and friendship hearts open up new lines, discounts and favors.
 - **Choices matter**: what you do with the High Priest, the lamp-maker who betrayed the village, the great wolf and the knight at the gate changes who helps you in the last fight and how the epilogue plays out. There are four endings, and one of them only opens up if you've been kind and paid attention to the old pages.
 - **Quest journal**: track up to three quests at once on screen, pick which one the compass follows, and read the full log of active and finished quests, people, secrets and collectibles.
 - **Three save slots**, each with its own chapter, playtime and level shown. Slots sync to the cloud when you're signed in.
 - **Music**: a synthesized score that changes with the place and the moment (each town, the wilds, night, houses, the inn, caves and puzzle rooms, combat, bosses, the final fight), with little stingers for new quests, secrets and level-ups. Nothing is downloaded; it's all generated in the browser.
-- **Normal Mode**: endless waves in the Proving Grounds, with a leaderboard.
+- **Looks 3D**: a toy diorama look in the style of the Link's Awakening remake, with tilt-shift blur, trees and houses that lean with the camera, sun shadows that move through the day, and soft bloom. Settings has Off, Light and Full.
+- **Normal Mode**: endless waves in the Proving Grounds with every weapon, and a leaderboard.
 
 ## Controls
 
@@ -28,6 +33,10 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 | Left click / J | Sword (hold for a 3-hit combo) |
 | Right click / K | Fire breath (also lights lanterns and Wards) |
 | Space | Dodge roll |
+| C | Jump (press again in the air to fly, once you have wings) |
+| X / Z / 1 to 6 | Next weapon / previous weapon / pick a weapon |
+| G | Call your companion (twice: wait here) |
+| U | Skills |
 | Q | Dragon Roar |
 | R | Healing draught |
 | E | Talk, open, rest |
@@ -36,6 +45,22 @@ You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney 
 | T | Switch which tracked quest the compass follows |
 | N | Mute or unmute |
 | Esc / P | Pause and settings |
+
+| Controller (PlayStation, Xbox or Nintendo) | |
+| --- | --- |
+| Left stick | Move (push all the way to sprint, click to toggle sprint) |
+| Right stick | Aim |
+| Bottom button (A, ✕, B) | Jump, fly |
+| Right button (B, ○, A) | Roll |
+| Left button (X, □, Y) | Attack |
+| Top button (Y, △, X) | Talk, open, use |
+| RT / R2 and LT / L2 | Attack and fire breath |
+| RB / R1 and LB / L1 | Next and previous weapon (both together: Roar) |
+| D-pad | Up: drink. Down: call your companion. Left and right: switch the followed quest |
+| Start / Menu | Pause (hold: Skills) |
+| View / Select | Map (hold: Journal) |
+
+Menus, dialogue and the skill tree all work with a controller too. On an Xbox the game runs in the Edge browser.
 
 Touch controls appear automatically on phones and tablets. In Settings you can pick a two-thumb layout (stick on the left, a thumb arc of buttons on the right) or a one-handed layout for either hand, turn on auto-attack, and resize the buttons.
 
