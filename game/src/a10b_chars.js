@@ -211,6 +211,8 @@ function drawEnemy(e){
     case 'wolf': drawWolf(e,fl); break; case 'egg': drawEgg(e,fl); break;
     case 'greymane': drawWolf(e,fl,2.05,true); break; case 'gloamjaw': drawGloam(e,fl); break;
     case 'bat': drawBat(e,fl); break; case 'slime': drawSlime(e,fl); break;
+    case 'gnarl': drawGnarl(e,fl); break; case 'serpent': drawSerpent(e,fl); break; case 'skrae': drawSkrae(e,fl); break; case 'knot': break;
+    case 'bramble': drawBramble(e,fl); break; case 'crab': drawCrab(e,fl); break; case 'eel': drawEel(e,fl); break; case 'gust': drawGust(e,fl); break;
     case 'sneak': drawKobold(e,0.92,fl,false); ctx.fillStyle='#c8a050'; ctx.beginPath(); ctx.arc(e.x-Math.cos(e.face)*9,e.y-Math.sin(e.face)*9,6,0,TAU); ctx.fill(); ctx.fillStyle='#8a6a2a'; ctx.fillRect(e.x-Math.cos(e.face)*9-1,e.y-Math.sin(e.face)*9-7,2,4); break;
   }
   ctx.restore();

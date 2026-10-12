@@ -59,6 +59,8 @@ function buildPlaces(){
   [['x1',5200,6400],['x2',10300,7400],['x3',1800,6000]].forEach(([id,x,y])=>addLandmark({id,k:'xmark',x,y,prompt:'Dig here',hidden:()=>!G.items['map_'+id]||G.found[id]}));
   // glowing mushrooms in the Mirefen
   for(let i=0;i<14;i++){ const a=i*2.4, r=600+((i*137)%900), x=POI.mire.x+Math.cos(a)*r, y=POI.mire.y+Math.sin(a)*r*0.8; if(blockedAt(x,y)) continue; STRUCTS.push({k:'glowshroom',x,y,s:0.8+(i%3)*0.25}); LIGHTS.push({x,y,r:120,i:0.5,shroom:true,night:true}); }
+  // Ember's three Trials (a2h_dungeons.js)
+  buildTrialGates();
 }
 // ---------- homes: who lives where
 function assignHomes(){
