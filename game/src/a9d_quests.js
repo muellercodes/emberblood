@@ -471,17 +471,18 @@ function updateInteractions(dt){
     for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
     const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
   }else{
-    for(const s of SHRINES){
+    const mk=curMap();
+    for(const s of mapList(SHRINES,mk)){
       const d=dist(p.x,p.y,s.x,s.y);
       if(!G.shrines[s.id]&&d<260){ G.shrines[s.id]=true; SFX.play('shrine'); setBanner('Shrine found',s.name,2.4); fogReveal(s.x,s.y,900); }
       if(d<64) offer(d,`Rest at ${s.name}`,()=>restAtShrine(s),s.x,s.y);
     }
-    for(const c of CHESTS) if(!c.open){ const d=dist(p.x,p.y,c.x,c.y); if(d<48) offer(d,'Open the chest',()=>openChest(c),c.x,c.y,true); }
+    for(const c of mapList(CHESTS,mk)) if(!c.open){ const d=dist(p.x,p.y,c.x,c.y); if(d<48) offer(d,'Open the chest',()=>openChest(c),c.x,c.y,true); }
     for(const n of G.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<70) offer(d,`Talk to ${n.name.replace(', your mom','')}`,()=>talkTo(n),n.x,n.y); }
-    for(const o of ORES) if(!G.ores[o.id]){ const d=dist(p.x,p.y,o.x,o.y); if(d<60) offer(d,'Chip out the star-iron',()=>mineOre(o),o.x,o.y,true); }
-    for(const l of LILIES) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
-    for(const o of LANDMARKS){ if(!o.prompt||(o.hidden&&o.hidden())) continue; if(o.k==='kettle'&&G.items.kettle) continue; const d=dist(p.x,p.y,o.x,o.y); if(d<(o.r||20)+46) offer(d,o.prompt,()=>lmAct(o),o.x,o.y,o.k==='kettle'); }
-    for(const dr of DOORS){ const d=dist(p.x,p.y,dr.x,dr.y); if(d<46) offer(d-6,dr.label,()=>enterArea(dr.area,dr),dr.x,dr.y); }
+    for(const o of mapList(ORES,mk)) if(!G.ores[o.id]){ const d=dist(p.x,p.y,o.x,o.y); if(d<60) offer(d,'Chip out the star-iron',()=>mineOre(o),o.x,o.y,true); }
+    for(const l of mapList(LILIES,mk)) if(!l.taken){ const d=dist(p.x,p.y,l.x,l.y); if(d<46) offer(d,'Pick the moonlily',()=>pickLily(l),l.x,l.y,true); }
+    for(const o of mapList(LANDMARKS,mk)){ if(!o.prompt||(o.hidden&&o.hidden())) continue; if(o.k==='kettle'&&G.items.kettle) continue; const d=dist(p.x,p.y,o.x,o.y); if(d<(o.r||20)+46) offer(d,o.prompt,()=>lmAct(o),o.x,o.y,o.k==='kettle'); }
+    for(const dr of mapList(DOORS,mk)){ const d=dist(p.x,p.y,dr.x,dr.y); if(d<46) offer(d-6,dr.label,()=>enterArea(dr.area,dr),dr.x,dr.y); }
     miniPrompts(offer);
     if(G.goat&&G.side.duchess!=='home'&&G.side.duchess!=='follow'){ const d=dist(p.x,p.y,G.goat.x,G.goat.y); if(d<70) offer(d,'Talk to the goat',talkGoat,G.goat.x,G.goat.y); }
   }

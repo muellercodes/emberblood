@@ -54,7 +54,7 @@ function ambientEmit(dt){
   for(const r of G.ripples) r.t+=dt;
   if(G.ripples.length) G.ripples=G.ripples.filter(r=>r.t<r.max);
   // smoke from chimneys and vents
-  for(const h of HOUSES){ if(h.chim&&inView(h.x,h.y,200)&&Math.random()<dt*(h.burnt?6:2)) emit(h.chim[0],h.chim[1],1,{alpha:0.45,col:h.burnt?'50,45,42':'160,160,160',glow:false,ang:-Math.PI/2+0.4,spread:0.3,smin:15,smax:35,lmin:2,lmax:3.5,zmin:4,zmax:7,grow:9,drag:0.3}); }
+  for(const h of mapList(HOUSES,curMap())){ if(h.chim&&inView(h.x,h.y,200)&&Math.random()<dt*(h.burnt?6:2)) emit(h.chim[0],h.chim[1],1,{alpha:0.45,col:h.burnt?'50,45,42':'160,160,160',glow:false,ang:-Math.PI/2+0.4,spread:0.3,smin:15,smax:35,lmin:2,lmax:3.5,zmin:4,zmax:7,grow:9,drag:0.3}); }
 }
 
 // ================= run state
@@ -133,13 +133,13 @@ function spawnGroup(units,cx,cy,opt){
 }
 function updateCamps(){
   if(AREA) return;
-  for(const c of CAMPS){
+  for(const c of mapList(CAMPS,curMap())){
     const st=G.campState[c.id]||(G.campState[c.id]={id:c.id,active:false,alive:0});
     const d=dist(player.x,player.y,c.x,c.y);
     if(!st.active&&d<1500&&d>420){
       const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue;
       const lvl=regionAt(c.x,c.y).level;
-      st.alive=spawnGroup(c.units,c.x,c.y,{level:lvl,aggro:false,camp:st,homeX:c.x,homeY:c.y,elite:undefined,snowy:biomeInfo(c.x,c.y,{}).b===5});
+      st.alive=spawnGroup(c.units,c.x,c.y,{level:lvl,aggro:false,camp:st,homeX:c.x,homeY:c.y,elite:undefined,snowy:snowyAt(c.x,c.y)});
       st.active=true;
     }else if(st.active&&d>2700){
       for(const e of G.enemies) if(e.camp===st) e.dead=true;

@@ -90,7 +90,7 @@ function evLevel(x,y){ return Math.max(1,(regionAt(x,y)||{}).level||1); }
 // a spot near Ash for an event (ahead of him, so he sees it): free of colliders, water, towns, camps and other things
 function evFree(x,y,r,o){
   o=o||{};
-  if(x<220||y<220||x>WORLD.w-220||y>WORLD.h-220) return false;
+  if(outOfMap(x,y,220)) return false;
   if(!o.north&&y<WALL_Y+160) return false;
   if(!freeSpot(x,y,r)) return false;
   const s=T(x,y,{}); if(s.water||s.lava||s.bog>0.25||s.bridge) return false;

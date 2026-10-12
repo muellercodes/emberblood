@@ -119,7 +119,7 @@ function lavaAt(x,y,rdd){ return lavaS(x,y,rdd)>0.5; }
 function bogS(x,y,rdd){ const n=fbm(x*0.0032+13,y*0.0032-7,3); return clamp((n-0.1)/0.08,0,1)*clamp((rdd-45)/40,0,1); }
 function T(x,y,o){
   o=o||SAMPLE;
-  o.out=(x<0||y<0||x>WORLD.w||y>WORLD.h)?1:0;
+  o.out=outOfMap(x,y,0)?1:0;
   biomeInfo(x,y,o);
   o.n=fbm(x*0.004,y*0.004,3);
   const rdd=segsDist(x,y,ROAD_SEGS); o.roadAng=lastSeg?lastSeg.ang:0; o.roadD=rdd;
@@ -139,7 +139,7 @@ function T(x,y,o){
 }
 function blockedAt(x,y){
   if(x>=IZX-50) return areaBlocked(x,y);
-  if(x<30||y<30||x>WORLD.w-30||y>WORLD.h-30) return true;
+  if(outOfMap(x,y,30)) return true;
   const rdd=segsDist(x,y,ROAD_SEGS);
   if(rdd<34) return false;
   if(x>6430&&x<6810&&Math.abs(y-7400)<26) return false;

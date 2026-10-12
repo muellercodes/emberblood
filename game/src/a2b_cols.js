@@ -36,9 +36,9 @@ function collideObs(e){
 function colAt(x,y,r){ let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)||c.noProj) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return hit; }
 function boundE(e){
   if(AREA&&e.x>=IZX-100){ const m=e.r+2; if(e.x<AREA.x0+m){e.x=AREA.x0+m;e.hitWall=true;} if(e.x>AREA.x1-m){e.x=AREA.x1-m;e.hitWall=true;} if(e.y<AREA.y0+m){e.y=AREA.y0+m;e.hitWall=true;} if(e.y>AREA.y1-m){e.y=AREA.y1-m;e.hitWall=true;} return; }
-  const m=e.r+30;
-  if(e.x<m){e.x=m;e.hitWall=true;} if(e.x>WORLD.w-m){e.x=WORLD.w-m;e.hitWall=true;}
-  if(e.y<m){e.y=m;e.hitWall=true;} if(e.y>WORLD.h-m){e.y=WORLD.h-m;e.hitWall=true;}
+  const m=e.r+30, M=mapOfY(e.y), y0=M.y0, y1=M.y0+M.h;
+  if(e.x<m){e.x=m;e.hitWall=true;} if(e.x>M.w-m){e.x=M.w-m;e.hitWall=true;}
+  if(e.y<y0+m){e.y=y0+m;e.hitWall=true;} if(e.y>y1-m){e.y=y1-m;e.hitWall=true;}
   if(G&&G.arena){ const A=G.arena, d=dist(e.x,e.y,A.x,A.y), lim=A.r-e.r; if(d>lim){ const a=angTo(A.x,A.y,e.x,e.y); e.x=A.x+Math.cos(a)*lim; e.y=A.y+Math.sin(a)*lim; e.hitWall=true; } }
 }
 // move with terrain blocking (water, lava) for walkers

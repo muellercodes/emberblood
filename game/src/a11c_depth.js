@@ -164,7 +164,8 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     T(0,0); g.globalAlpha=0.9; g.drawImage(SH,b.x-40,b.y-24,80,48); }
   // houses: the footprint pushed along the sun (a box of the house height), softened by the low resolution
   T(0,0); g.globalAlpha=1; g.fillStyle='#000';
-  for(const h of HOUSES){
+  const mk=curMap();
+  for(const h of mapList(HOUSES,mk)){
     if(!inR(h.x,h.y,h.w+120)) continue;
     const hh=(h.k==='library'?62:h.k==='forge'?54:h.vert?58:48), dx=ux*hh, dy=uy*hh, X0=h.x-h.w/2-2, X1=h.x+h.w/2+2, Y0=h.y-h.h/2, Y1=h.y+h.h/2+3;
     const P=hull([[X0,Y0],[X1,Y0],[X1,Y1],[X0,Y1],[X0+dx,Y0+dy],[X1+dx,Y0+dy],[X1+dx,Y1+dy],[X0+dx,Y1+dy]]); mark(Math.min(X0,X0+dx)-20,Math.min(Y0,Y0+dy)-8,Math.max(X1,X1+dx)+20,Math.max(Y1,Y1+dy)+20);
@@ -173,13 +174,13 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
   }
   // posts, lanterns, standing stones, columns, statues
   g.lineWidth=4; g.beginPath();
-  for(const s of STRUCTS){
+  for(const s of mapList(STRUCTS,mk)){
     if(!inR(s.x,s.y,80)) continue;
     if(s.k==='torch'){ g.moveTo(s.x,s.y+2); g.lineTo(s.x+ux*30,s.y+2+uy*30); }
     else if(s.k==='lantern'){ g.moveTo(s.x,s.y+12); g.lineTo(s.x+ux*16,s.y+12+uy*16); }
   }
   g.stroke();
-  for(const s of STRUCTS){
+  for(const s of mapList(STRUCTS,mk)){
     if(!inR(s.x,s.y,80)) continue;
     if(s.k==='torch'||s.k==='lantern'||s.k==='stone'||s.k==='column'||s.k==='pillar'||s.k==='ward') markS(s.x,s.y,40,56);
     if(s.k==='torch'){ g.drawImage(SH,s.x+ux*30-8,s.y+uy*30-6,16,12); g.drawImage(SH,s.x-7,s.y-2,14,8); }
@@ -188,7 +189,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     else if(s.k==='column'){ const k=s.s||1, h=(s.broken?24:54)*k; g.beginPath(); g.moveTo(s.x,s.y); g.lineTo(s.x+ux*h,s.y+uy*h); g.lineWidth=28*k; g.stroke(); g.lineWidth=4; }
     else if(s.k==='pillar'||s.k==='ward'){ g.drawImage(SH,s.x+ux*14-34,s.y+uy*14-30,68,60); }
   }
-  for(const o of LANDMARKS){
+  for(const o of mapList(LANDMARKS,mk)){
     if(!inR(o.x,o.y,90)) continue;
     const h=o.k==='statue'?90:o.k==='facetree'?110:o.k==='scarecrow'?44:o.k==='snowman'?40:o.k==='grave'||o.k==='sign'?24:0;
     if(!h) continue;

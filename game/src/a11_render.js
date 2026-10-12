@@ -43,7 +43,7 @@ function render(){
   if(!inA&&D3.on){ if(!DSKIP.shadow) shadowLayer(sun,props); }
   else if(!inA){
     for(const p of props){ if(p.taken) continue; const tall=TALL.has(p.k), k=tall?1.6:0.5, R=tall?p.R*1.05:p.R*0.9; ctx.globalAlpha=sun.a*(tall?1:0.8); ctx.drawImage(SPR.shadow,p.x+sun.dx*k-R,p.y+sun.dy*k-R*0.85,R*2,R*1.7); }
-    for(const h of HOUSES) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
+    for(const h of mapList(HOUSES,curMap())) if(inView(h.x,h.y,200)){ const sw=Math.min(36,Math.abs(sun.dx)*2.4+8), side=sun.dx>=0?1:-1; ctx.fillStyle='#000'; ctx.globalAlpha=sun.a*0.7; ctx.beginPath(); if(side>0){ ctx.moveTo(h.x+h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x+h.w/2+sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x+h.w/2+sw,h.y+h.h/2+4); ctx.lineTo(h.x+h.w/2,h.y+h.h/2); } else { ctx.moveTo(h.x-h.w/2,h.y-h.h/2+8); ctx.lineTo(h.x-h.w/2-sw,h.y-h.h/2+8+sw*0.6); ctx.lineTo(h.x-h.w/2-sw,h.y+h.h/2+4); ctx.lineTo(h.x-h.w/2,h.y+h.h/2); } ctx.closePath(); ctx.fill(); ctx.globalAlpha=sun.a*0.45; ctx.fillRect(h.x-h.w/2-2,h.y+h.h/2-2,h.w+4,7); }
   }
   ctx.globalAlpha=sun.a*0.9;
   const ent=[player,...G.enemies.filter(e=>!e.dead&&!e.frozen&&e.type!=='vorlaxis'&&e.alpha>0.2),...npcs.filter(n=>inView(n.x,n.y,60)),...G.critters];
@@ -53,17 +53,17 @@ function render(){
   if(inA){ for(const o of AREA.objs) if(inView(o.x,o.y,(o.w||40)+30)) drawFurn(o,t); }
   else{
     for(const p of props){ if(TALL.has(p.k)||p.taken) continue; const sp=propSprite(p); drawSprite(sp,p.x,p.y,p.s,p.k==='herb'?0:p.rot*0.3); if(p.k==='vent'&&Math.random()<0.15) emit(p.x,p.y,1,{col:'70,62,60',glow:false,ang:-Math.PI/2,spread:0.5,smin:15,smax:40,lmin:1.2,lmax:2,zmin:4,zmax:8,grow:10,drag:0.5}); if(p.k==='herb'){ ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.25+0.15*Math.sin(t*3+p.ph); ctx.drawImage(SPR.shadow,p.x-10,p.y-10,20,20); ctx.restore(); } }
-    for(const s of STRUCTS){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue;
+    const mk=curMap(); for(const s of mapList(STRUCTS,mk)){ if(s.k==='wall') continue; if(!inView(s.x,s.y,(s.w||s.r||60)+40)) continue;
       if(D3.on&&s.k==='stone'){ drawStoneLean(s,t); continue; }
       const lf=D3.on?LEAN_S[s.k]:0; if(lf) leanOn(s.x,leanBase(s),lf);
       if(s.k==='cavemouth') drawCaveMouth(s,t); else if(s.k==='column') drawColumn(s); else if(s.k==='glowshroom') drawGlowShroom(s,t); else drawStruct(s,t);
       if(lf) leanOff(); }
-    for(const d of DOORS) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
-    for(const o of LANDMARKS) if(inView(o.x,o.y,160)){ const lf=D3.on?LEAN_S[o.k]:0; if(lf) leanOn(o.x,o.y,lf); drawLandmark(o,t); if(lf) leanOff(); }
+    for(const d of mapList(DOORS,mk)) if(d.hs&&inView(d.x,d.y,40)) drawDoor(d);
+    for(const o of mapList(LANDMARKS,mk)) if(inView(o.x,o.y,160)){ const lf=D3.on?LEAN_S[o.k]:0; if(lf) leanOn(o.x,o.y,lf); drawLandmark(o,t); if(lf) leanOff(); }
     if(G.mini) drawMiniWorld(t);
     drawWall();
-    for(const c of CHESTS) if(inView(c.x,c.y,40)) drawChest(c,t);
-    for(const l of LILIES) if(inView(l.x,l.y,40)) drawLily(l,t);
+    for(const c of mapList(CHESTS,mk)) if(inView(c.x,c.y,40)) drawChest(c,t);
+    for(const l of mapList(LILIES,mk)) if(inView(l.x,l.y,40)) drawLily(l,t);
   }
   for(const e of G.enemies) if(!e.dead&&!e.frozen) drawTele(e);
   drawPickups();
@@ -193,12 +193,12 @@ window.__ebX=Object.assign(window.__ebX||{},{occ(on){ if(on!=null) OCC_ON=!!on; 
     return true; }});
 function drawLights(){
   const dl=daylight(), inA=!!AREA, rk=inA?0:G.rainK*(player.y>WALL_Y?1:0), cinder=!inA&&player.y<2700;
-  let dk=(1-dl)*0.46+rk*0.06; if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;
+  let dk=(1-dl)*0.46+rk*0.06+mapNight(); if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;
   if(cinder) dk=Math.max(0,dk-0.12);
   if(inA) dk=AREA.kind==='cave'?AREA.dark:AREA.dark+(1-dl)*0.3;
   const lw=lightCvs.width, lh=lightCvs.height, s=zoom*0.5, t=G.time;
   const lightList=[];
-  const src=inA?AREA.lights:LIGHTS;
+  const src=inA?AREA.lights:mapList(LIGHTS,curMap());
   for(const L of src){ if(L.night&&dl>0.6) continue; if(L.i<=0.01) continue; if(!inView(L.x,L.y,L.r)) continue; const fl=L.fire?1+0.06*Math.sin(t*9+L.x)+0.04*Math.sin(t*23+L.y):1; if(L.shrine&&!G.shrines[L.shrine.id]) continue; lightList.push([L.x,L.y,L.r*fl,L.i,L.fire]); }
   if(dk>0.02){
     lctx.setTransform(1,0,0,1,0,0); lctx.globalCompositeOperation='source-over'; lctx.clearRect(0,0,lw,lh);
@@ -213,7 +213,7 @@ function drawLights(){
     for(const pl of G.pools) Lt(pl.x,pl.y,pl.r*2.4,0.6);
     for(const e of G.enemies){ if(e.dead||e.frozen) continue; if(e.type==='vorlaxis'){ if(e.alpha>0.2){ Lt(e.x,e.y,260,0.5); if(e.mouthGlow>0) Lt(e.mouthX,e.mouthY,320,0.9); } } else if(e.burnT>0) Lt(e.x,e.y,70,0.5); else if(e.state==='cast'||e.state==='breath') Lt(e.x,e.y,90,0.5); }
     for(const h of G.hazards) if(h.kind==='blast'||h.big) Lt(h.x,h.y,(h.r||60)*1.5,0.4);
-    if(!inA&&player.y<3300){ lctx.globalAlpha=0.85; for(let cx=Math.floor(cam.x/CH);cx<=Math.floor((cam.x+W/zoom)/CH);cx++) for(let cy=Math.floor(cam.y/CH);cy<=Math.floor((cam.y+H/zoom)/CH);cy++){ const ch=CHUNKS.get(ckey(cx,cy)); if(ch&&ch.glow) lctx.drawImage(ch.glow,(cx*CH-cam.x)*s-20*s,(cy*CH-cam.y)*s-20*s,(CH+40)*s,(CH+40)*s); } lctx.globalAlpha=1; }
+    if(!inA&&(player.y<3300||mapLavaGlow())){ lctx.globalAlpha=0.85; for(let cx=Math.floor(cam.x/CH);cx<=Math.floor((cam.x+W/zoom)/CH);cx++) for(let cy=Math.floor(cam.y/CH);cy<=Math.floor((cam.y+H/zoom)/CH);cy++){ const ch=CHUNKS.get(ckey(cx,cy)); if(ch&&ch.glow) lctx.drawImage(ch.glow,(cx*CH-cam.x)*s-20*s,(cy*CH-cam.y)*s-20*s,(CH+40)*s,(CH+40)*s); } lctx.globalAlpha=1; }
     lctx.globalCompositeOperation='source-over';
     ctx.drawImage(lightCvs,0,0,cvs.width,cvs.height);
   }
@@ -234,8 +234,8 @@ function drawRain(){
 const FLAKES=[]; for(let i=0;i<160;i++) FLAKES.push({x:Math.random(),y:Math.random(),s:0.6+Math.random()*1.8,v:0.4+Math.random()*0.8,ph:Math.random()*TAU});
 let snowK=0, mistK=0;
 function drawSnowMist(){
-  const b=G.region?G.region.key:'', snowy=b==='b5'||b==='frost'||b==='farm', misty=b==='b6'||b==='mire'||b==='mosshut';
-  snowK+=((snowy?1:0)-snowK)*0.02; mistK+=((misty?1:0)-mistK)*0.02;
+  const b=G.region?G.region.key:'', am=ambHere(), snowy=b==='b5'||b==='frost'||b==='farm'?1:am?am.snow||0:0, misty=b==='b6'||b==='mire'||b==='mosshut'?1:am?am.mist||0:0;
+  snowK+=(snowy-snowK)*0.02; mistK+=(misty-mistK)*0.02;
   if(snowK>0.02){
     ctx.fillStyle=`rgba(245,248,252,${0.75*snowK})`; const t=G.time;
     for(const f of FLAKES){ const x=((f.x*W+Math.sin(t*f.v+f.ph)*30-cam.x*zoom*0.15)%W+W)%W, y=((f.y*H+t*40*f.v-cam.y*zoom*0.15)%H+H)%H; ctx.fillRect(x,y,f.s*1.4,f.s*1.4); }
