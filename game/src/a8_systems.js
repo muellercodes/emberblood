@@ -132,7 +132,7 @@ function updateProjectiles(dt){
     if(!AREA&&(pr.x<-20||pr.y<-20||pr.x>WORLD.w+20||pr.y>WORLD.h+20)) pr.dead=true;
     if(pr.dead) continue;
     if(pr.owner==='enemy'){
-      if(!p.dead&&dist2(pr.x,pr.y,p.x,p.y)<(pr.r+p.r*0.8)**2){ if(hurtPlayer(pr.dmg,pr.x,pr.y,140)){ pr.dead=true; smallBoom(pr.x,pr.y); } }
+      if(!p.dead&&dist2(pr.x,pr.y,p.x,p.y)<(pr.r+p.r*0.8)**2){ HURT_SRC='proj'; const hit=hurtPlayer(pr.dmg,pr.x,pr.y,140); HURT_SRC=''; if(hit){ pr.dead=true; smallBoom(pr.x,pr.y); } }
     }else{
       for(const e of G.enemies){
         if(e.dead||e.invuln||e.spawnIn>0) continue;
@@ -150,7 +150,7 @@ function updateProjectiles(dt){
 // ================= hazards (delayed blasts, spawn runes), rings, pools, pickups
 function blast(x,y,r,delay,dmg,o){ G.hazards.push(Object.assign({kind:'blast',x,y,r,t:0,delay,dmg},o||{})); }
 function explode(h){
-  if(!player.dead&&dist(h.x,h.y,player.x,player.y)<h.r+player.r*0.6) hurtPlayer(h.dmg,h.x,h.y,300);
+  if(!player.dead&&!airborne()&&dist(h.x,h.y,player.x,player.y)<h.r+player.r*0.6) hurtPlayer(h.dmg,h.x,h.y,300);   // jump or fly over ground blasts
   if(h.toxic){ emit(h.x,h.y,18,{col:'130,200,70',smin:40,smax:h.r*3,lmin:.3,lmax:.6,zmin:3,zmax:7,grow:6,drag:3}); SFX.play('hit'); G.pools.push({x:h.x,y:h.y,r:h.r*0.85,life:4,max:4,owner:'enemy',kind:'toxic',dmg:ed(5),tick:0}); return; }
   emit(h.x,h.y,Math.min(40,h.r*0.6),{kind:'fire',smin:60,smax:h.r*4,lmin:.3,lmax:.6,zmin:4,zmax:9,grow:10,drag:3});
   emit(h.x,h.y,10,{col:'80,70,70',glow:false,smin:20,smax:80,lmin:.6,lmax:1,zmin:5,zmax:9,grow:8});
@@ -188,7 +188,7 @@ function updateRings(dt){
         damageEnemy(e,R.dmg,{src:'roar',kb:520,ka:angTo(R.x,R.y,e.x,e.y)});
         stunEnemy(e,1.4);
       }
-    }else if(!p.dead&&!R.hitP){
+    }else if(!p.dead&&!R.hitP&&!airborne()){   // shockwaves roll along the ground: jump them
       const d=dist(R.x,R.y,p.x,p.y);
       if(Math.abs(d-R.rad)<R.thick/2+p.r*0.6){
         if(R.dmg>0){ if(hurtPlayer(R.dmg,R.x,R.y,300)) R.hitP=true; }
@@ -204,7 +204,7 @@ function updatePools(dt){
     pl.life-=dt;
     if(pl.kind==='toxic'){ if(Math.random()<dt*pl.r*0.15) emit(pl.x+rand(-pl.r,pl.r)*0.6,pl.y+rand(-pl.r,pl.r)*0.6,1,{col:'170,230,110',glow:false,ang:-Math.PI/2,spread:0.3,smin:5,smax:20,lmin:.4,lmax:.8,zmin:2,zmax:4,grow:2,drag:1}); }
     else if(Math.random()<dt*pl.r*0.25) emit(pl.x+rand(-pl.r,pl.r)*0.7,pl.y+rand(-pl.r,pl.r)*0.7,1,{kind:'fire',ang:-Math.PI/2,spread:0.3,smin:20,smax:60,lmin:.3,lmax:.6,zmin:3,zmax:6,grow:6,drag:1});
-    if(pl.owner==='enemy'){ if(!p.dead&&dist(pl.x,pl.y,p.x,p.y)<pl.r+p.r*0.4){ if(pl.kind==='toxic') p.slowT=Math.max(p.slowT||0,0.4); hurtPlayer(pl.dmg,pl.x,pl.y,0); } }
+    if(pl.owner==='enemy'){ if(!p.dead&&!airborne()&&dist(pl.x,pl.y,p.x,p.y)<pl.r+p.r*0.4){ if(pl.kind==='toxic') p.slowT=Math.max(p.slowT||0,0.4); hurtPlayer(pl.dmg,pl.x,pl.y,0); } }
     else{
       pl.tick-=dt;
       if(pl.tick<=0){ pl.tick=0.3; for(const e of G.enemies){ if(e.dead||e.flying||e.invuln) continue; if(dist(pl.x,pl.y,e.x,e.y)<pl.r+e.r){ damageEnemy(e,5*p.stats.fire,{src:'ember'}); if(!e.dead){ e.burnT=Math.max(e.burnT,1.5); e.burnDps=Math.max(e.burnDps,4*p.stats.fire); } } } }

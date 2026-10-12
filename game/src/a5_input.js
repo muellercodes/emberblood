@@ -151,6 +151,7 @@ function onKey(e){
 function toWorld(sx,sy){ return {x:sx/zoom+cam.x,y:sy/zoom+cam.y}; }
 function updateCam(dt,snap){
   if(!player) return;
+  moveZoom(dt);   // zooms out a little while Ash flies (a6c_moves.js)
   const vw=W/zoom, vh=H/zoom;
   let fx=player.x, fy=player.y;
   const b=G&&G.boss;

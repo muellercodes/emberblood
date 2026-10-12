@@ -48,7 +48,7 @@ function buildPlaces(){
   signs.forEach(([x,y,t],i)=>addLandmark({id:'sign'+i,k:'sign',x,y,r:8,text:t,prompt:'Read the sign'}));
   // ruins with breakable pots
   const ruins=[[8700,4700],[11000,4000],[12300,8600],[2900,6600],[6300,3900],[5000,8200]];
-  ruins.forEach(([x0,y0],ri)=>{ const [x,y]=nudge(x0,y0,120); for(let i=0;i<6;i++){ const a=i/6*TAU+ri, cx=x+Math.cos(a)*90, cy=y+Math.sin(a)*70; STRUCTS.push({k:'column',x:cx,y:cy,broken:(i+ri)%3!==0,s:0.8+((i*7)%5)/10}); addCol({t:'c',x:cx,y:cy,r:18}); }
+  ruins.forEach(([x0,y0],ri)=>{ const [x,y]=nudge(x0,y0,120); for(let i=0;i<6;i++){ const a=i/6*TAU+ri, cx=x+Math.cos(a)*90, cy=y+Math.sin(a)*70; STRUCTS.push({k:'column',x:cx,y:cy,broken:(i+ri)%3!==0,s:0.8+((i*7)%5)/10}); addCol({t:'c',x:cx,y:cy,r:18,low:(i+ri)%3!==0}); }
     for(let i=0;i<3;i++) LANDMARKS.push({id:`rpot${ri}_${i}`,k:'pot',x:x+rand(-40,40),y:y+rand(-30,30),breakable:true}); });
   // pots in camps
   CAMPS.forEach((c,ci)=>{ for(let i=0;i<2;i++) LANDMARKS.push({id:`cpot${ci}_${i}`,k:i?'barrel':'pot',x:c.x+Math.cos(ci+i*2)*80,y:c.y+Math.sin(ci+i*2)*80,breakable:true}); });

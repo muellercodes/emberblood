@@ -60,7 +60,7 @@ function initWorld(){
   const roofs=['#5c6470','#8a6a3a','#8e4a34','#6e5a48','#7a3a2a'];
   // ---- Emberhollow
   const V=POI.village;
-  STRUCTS.push({k:'well',x:V.x,y:V.y,r:22}); addCol({t:'c',x:V.x,y:V.y,r:22});
+  STRUCTS.push({k:'well',x:V.x,y:V.y,r:22}); addCol({t:'c',x:V.x,y:V.y,r:22,low:true});
   addWard('hollow',V.x-40,V.y-190);
   STRUCTS.push({k:'bigoak',x:V.x+30,y:V.y-230,R:95}); addCol({t:'c',x:V.x+30,y:V.y-230,r:20});
   for(const [i,x,y] of [[0,V.x-80,V.y+60],[1,V.x+300,V.y+130],[2,V.x-200,V.y-300]]){ const L={id:'lan'+i,x,y,lit:false}; LANTERNS.push(L); STRUCTS.push({k:'lantern',ref:L,x,y}); addCol({t:'c',x,y,r:7}); LIGHTS.push({x,y,r:180,i:0.8,lantern:L}); }
@@ -72,7 +72,7 @@ function initWorld(){
   const C=POI.warcamp;
   DECALS.push({k:'dirt',x:C.x,y:C.y,r:340});
   const cg=gapsFor(C.x,C.y);
-  for(let a=0;a<TAU;a+=0.12){ if(cg.some(g=>Math.abs(angDiff(a,g))<0.4)) continue; const x=C.x+Math.cos(a)*330, y=C.y+Math.sin(a)*330; STRUCTS.push({k:'stake',x,y,a}); addCol({t:'c',x,y,r:9}); }
+  for(let a=0;a<TAU;a+=0.12){ if(cg.some(g=>Math.abs(angDiff(a,g))<0.4)) continue; const x=C.x+Math.cos(a)*330, y=C.y+Math.sin(a)*330; STRUCTS.push({k:'stake',x,y,a}); addCol({t:'c',x,y,r:9,low:true}); }
   for(const a of [3.6,4.6,5.6,0.6]){ const x=C.x+Math.cos(a)*190, y=C.y+Math.sin(a)*190; STRUCTS.push({k:'tent',x,y,r:38,a}); addCol({t:'c',x,y,r:34}); }
   STRUCTS.push({k:'campfire',x:C.x,y:C.y}); LIGHTS.push({x:C.x,y:C.y,r:260,i:0.9,fire:true});
   // ---- Brindlecross
@@ -81,7 +81,7 @@ function initWorld(){
   NPCSPOT.wren=[B.x+150,B.y-160];
   DECALS.push({k:'flagstone',x:B.x-20,y:B.y+40,r:170});
   for(let i=0;i<6;i++){ const a=i/6*TAU+0.3, x=B.x-20+Math.cos(a)*120, y=B.y+40+Math.sin(a)*120; STRUCTS.push({k:'stall',x,y,a,col:pick(['#b8432e','#2e6ab8','#d9a43a','#3a8a5a'])}); addCol({t:'c',x,y,r:18}); }
-  STRUCTS.push({k:'well',x:B.x-20,y:B.y+40,r:22}); addCol({t:'c',x:B.x-20,y:B.y+40,r:22});
+  STRUCTS.push({k:'well',x:B.x-20,y:B.y+40,r:22}); addCol({t:'c',x:B.x-20,y:B.y+40,r:22,low:true});
   placeHouses(B.x,B.y,15,260,600,rng,[[B.x+150,B.y-250,160],[B.x-20,B.y+40,210]],roofs,{town:'brindle'});
   BRIDGES.push({x:6620,y:7400,ang:0,len:360,w:56,kind:'wood'});
   NPCSPOT.town=[]; for(let i=0;i<5;i++){ const a=rng()*TAU, r=180+rng()*250; NPCSPOT.town.push([B.x+Math.cos(a)*r,B.y+Math.sin(a)*r]); }
@@ -98,7 +98,7 @@ function initWorld(){
   addWard('crag',N.x,N.y);
   // ---- Sunken Ward (Mirefen)
   const M=POI.mire, mg=gapsFor(M.x,M.y);
-  for(let a=0;a<TAU;a+=0.22){ if(mg.some(g=>Math.abs(angDiff(a,g))<0.35)) continue; const x=M.x+Math.cos(a)*(330+rng()*30), y=M.y+Math.sin(a)*(330+rng()*30); STRUCTS.push({k:'post',x,y,a:rng()*TAU}); addCol({t:'c',x,y,r:9}); }
+  for(let a=0;a<TAU;a+=0.22){ if(mg.some(g=>Math.abs(angDiff(a,g))<0.35)) continue; const x=M.x+Math.cos(a)*(330+rng()*30), y=M.y+Math.sin(a)*(330+rng()*30); STRUCTS.push({k:'post',x,y,a:rng()*TAU}); addCol({t:'c',x,y,r:9,low:true}); }
   DECALS.push({k:'mudring',x:M.x,y:M.y,r:200});
   addWard('mire',M.x,M.y);
   // ---- Frost Ward
@@ -109,7 +109,7 @@ function initWorld(){
   // ---- Granny Moss's hut
   const H=POI.mosshut;
   STRUCTS.push({k:'hut',x:H.x,y:H.y,r:46}); addCol({t:'c',x:H.x,y:H.y,r:44});
-  STRUCTS.push({k:'cauldron',x:H.x+80,y:H.y+40}); addCol({t:'c',x:H.x+80,y:H.y+40,r:14}); LIGHTS.push({x:H.x+80,y:H.y+40,r:200,i:0.85,fire:true});
+  STRUCTS.push({k:'cauldron',x:H.x+80,y:H.y+40}); addCol({t:'c',x:H.x+80,y:H.y+40,r:14,low:true}); LIGHTS.push({x:H.x+80,y:H.y+40,r:200,i:0.85,fire:true});
   NPCSPOT.moss=[H.x+60,H.y+90];
   // ---- Hollis Farm
   const Fa=POI.farm;
@@ -147,7 +147,7 @@ function initWorld(){
   // ---- shrines, camps, ores
   for(const s of SHRINES){ STRUCTS.push({k:'shrine',x:s.x,y:s.y,ref:s}); addCol({t:'c',x:s.x,y:s.y,r:16}); LIGHTS.push({x:s.x,y:s.y,r:150,i:0.6,shrine:s}); }
   for(const c of CAMPS){ STRUCTS.push({k:'campfire',x:c.x,y:c.y,small:true}); LIGHTS.push({x:c.x,y:c.y,r:200,i:0.8,fire:true}); }
-  for(const o of ORES){ STRUCTS.push({k:'ore',ref:o,x:o.x,y:o.y}); addCol({t:'c',x:o.x,y:o.y,r:16}); LIGHTS.push({x:o.x,y:o.y,r:120,i:0.5,ore:o}); }
+  for(const o of ORES){ STRUCTS.push({k:'ore',ref:o,x:o.x,y:o.y}); addCol({t:'c',x:o.x,y:o.y,r:16,low:true}); LIGHTS.push({x:o.x,y:o.y,r:120,i:0.5,ore:o}); }
   // ---- moonlilies in the Mirefen
   const tmp={};
   for(let tries=0;tries<4000&&LILIES.length<7;tries++){
@@ -212,10 +212,10 @@ function genProps(cx,cy){
     p.x=x; p.y=y; p.s=sc; p.v=Math.floor(v*997); p.ph=rng()*TAU; p.rot=rng()*TAU;
     const tk=TREEK[p.k];
     if(tk){ p.tall=true; p.R=tk[0]*sc; p.col={t:'c',x,y,r:tk[1]*sc}; }
-    else if(p.k==='rock'||p.k==='obsid'||p.k==='srock'){ p.R=16*sc; p.col={t:'c',x,y,r:13*sc}; }
+    else if(p.k==='rock'||p.k==='obsid'||p.k==='srock'){ p.R=16*sc; p.col={t:'c',x,y,r:13*sc,low:true}; }
     else if(p.k==='crag'){ p.R=26*sc; p.col={t:'c',x,y,r:22*sc}; }
     else if(p.k==='spike'){ p.R=18*sc; p.col={t:'c',x,y,r:12*sc}; }
-    else if(p.k==='stump'){ p.R=12*sc; p.col={t:'c',x,y,r:9*sc}; }
+    else if(p.k==='stump'){ p.R=12*sc; p.col={t:'c',x,y,r:9*sc,low:true}; }
     else p.R=14*sc;
     out.push(p);
   }
