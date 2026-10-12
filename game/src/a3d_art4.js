@@ -264,6 +264,7 @@ FL.tnest=(o,t)=>{
 };
 // Puff the drakeling hatchling
 function drawHatchling(x,y,face,t,sleep){
+  if(T3.on&&T3B.hatchling){ T3B.hatchling(x,y,face,t,sleep); return; }
   ctx.save(); ctx.translate(x,y); ctx.rotate(face);
   const L=lightLocal(face), flap=sleep?0:Math.sin(t*14)*0.5+0.5;
   for(const s of [-1,1]){ ctx.fillStyle='rgba(200,110,60,.85)'; ctx.beginPath(); ctx.moveTo(1,s*2); ctx.lineTo(-3,s*(5+flap*5)); ctx.lineTo(-7,s*(3+flap*3)); ctx.closePath(); ctx.fill(); }

@@ -49,6 +49,7 @@ function cloverAct(o){
 }
 // a fluffy sheep with a red collar and a bell (z lifts her for a hop)
 function drawSheep(x,y,t,z,face){
+  if(T3.on&&T3B.sheep){ T3B.sheep(x,y,t,z,face); return; }
   ctx.save(); ctx.translate(x,y);
   ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(2,4,14-z*0.2,7-z*0.1,0,0,TAU); ctx.fill();
   ctx.translate(0,-z); ctx.rotate(face||0);
@@ -68,6 +69,7 @@ function drawSheep(x,y,t,z,face){
 }
 // ---------- the Lake King: big ripples, a huge shadow with a crown fin, and a three-tug catch
 function drawLakeKing(o,t){
+  if(T3.on&&T3B.lakeking){ T3B.lakeking(o,t); return; }
   const x=o.x, y=o.y;
   ctx.lineWidth=1.3;
   for(let k=0;k<3;k++){ const r=10+((t*14+k*16)%48), a=0.4*(1-r/58); ctx.strokeStyle=`rgba(225,238,248,${a})`; ctx.beginPath(); ctx.ellipse(x,y,r*1.3,r*0.75,0,0,TAU); ctx.stroke(); }
