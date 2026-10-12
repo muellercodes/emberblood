@@ -1,0 +1,15 @@
+name = "emberblood-api"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://muellercodes.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "emberblood"
+database_id = "REPLACE_WITH_D1_ID"
+
+[triggers]
+crons = ["17 4 * * *"]

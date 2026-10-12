@@ -1,0 +1,43 @@
+// Builds the single-file game into docs/index.html (served by GitHub Pages).
+// Usage: node build.mjs            (uses game/config.json)
+//        API_BASE=https://... node build.mjs
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+
+const ORDER = ['a1_core','a1b_data','a1c_state','a1d_story','a2_world','a2b_cols','a2c_build','a3_art','a4_ground','a5_input','a6_player',
+  'a7a_enemies','a7b_ai','a8_systems','a9a_env','a9b_flow','a9c_story','a10a_fx','a10b_chars','a11_render','a11b_hud','a12a_dlg','a13_cloud','a12b_ui'];
+const cfg = JSON.parse(readFileSync('game/config.json', 'utf8'));
+const api = process.env.API_BASE || cfg.apiBase || '';
+const js = ORDER.map((f) => readFileSync(`game/src/${f}.js`, 'utf8')).join('').replaceAll('__API_BASE__', api);
+mkdirSync('dist', { recursive: true });
+writeFileSync('dist/game.js', js);
+execFileSync(process.execPath, ['--check', 'dist/game.js'], { stdio: 'inherit' });
+
+const head = readFileSync('game/head.html', 'utf8');
+const body = readFileSync('game/body.html', 'utf8');
+const cut = body.indexOf('</style>') + '</style>'.length;
+const page = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Emberblood: a top-down open-world action game. Ash, the last Emberblood, has to relight five Ward-fires and face a very old grandfather.">
+<meta name="theme-color" content="#0b0607">
+<meta property="og:title" content="Emberblood">
+<meta property="og:description" content="Relight the Wards. Face your great ×13 grandfather.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+${head}${body.slice(0, cut)}
+</head>
+<body>
+${body.slice(cut)}
+<script>
+${js}
+</script>
+</body>
+</html>
+`;
+mkdirSync('docs', { recursive: true });
+writeFileSync('docs/index.html', page);
+// artifact flavor: no document wrapper (the host adds one)
+writeFileSync('dist/artifact.html', `${head}${body}\n<script>\n${js}\n</script>\n`);
+console.log(`built docs/index.html (${(page.length / 1024).toFixed(0)} KB) with API ${api.startsWith('http') ? api : '(offline)'}`);
