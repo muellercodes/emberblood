@@ -19,12 +19,13 @@ function drawHUD(){
   bar(bx,y,bw,6,p.stamina/p.maxStamina,p.stamina<p.maxStamina*0.25?'#a8a040':'#7cc456','rgba(30,40,20,.9)'); y+=10;
   bar(bx,y,bw*0.8,5,p.energy/p.maxEnergy,p.exhausted?'#7c5530':'#f0a030','rgba(60,34,10,.9)'); y+=11;
   for(let i=0;i<p.potionsMax;i++) flask(bx+5+i*13,y+1,i<p.potions);
+  HUD_HITS.push({x:bx-6,y:y-12,w:p.potionsMax*13+10,h:26,fn:()=>{ touch.pressed.drink=true; }}); // tap the flasks to drink
   if(story){ const cx=bx+8+p.potionsMax*13+8; ctx.fillStyle='#ffd84a'; ctx.beginPath(); ctx.arc(cx,y+1,5,0,TAU); ctx.fill(); ctx.strokeStyle='#8a6a1a'; ctx.lineWidth=1.2; ctx.stroke(); ctx.font=`700 10px ${UIF}`; ctx.fillStyle='#ffe9a0'; ctx.textAlign='left'; ctx.fillText(String(G.coins||0),cx+8,y+1.5); }
   const rx=L+pw-26, ry=T+(story?42:36), R=16, full=p.roar>=100;
   if(full){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(rx,ry,0,rx,ry,30); g.addColorStop(0,'rgba(255,170,70,.4)'); g.addColorStop(1,'rgba(255,120,40,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(rx,ry,30,0,TAU); ctx.fill(); ctx.restore(); }
   ctx.lineWidth=4; ctx.strokeStyle='rgba(50,22,12,.95)'; ctx.beginPath(); ctx.arc(rx,ry,R,0,TAU); ctx.stroke();
   ctx.strokeStyle=full?`rgb(255,${200+Math.sin(G.time*10)*40|0},90)`:'#e07a34'; ctx.beginPath(); ctx.arc(rx,ry,R,-Math.PI/2,-Math.PI/2+TAU*clamp(p.roar/100,0,1)); ctx.stroke();
-  ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText('Q',rx,ry+9); }
+  ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText(btnLabel('roar'),rx,ry+9); }
   // quest tracker / wave info
   let qy=T+(story?92:80); TRACK_R=null;
   const obj=questObjective(), fo=story?focusObjective():null;
@@ -51,7 +52,7 @@ function drawHUD(){
       shown++;
     }
     const more=activeQuests().length-shown;
-    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':'(I)'}`,L+2,ly+6); ly+=14; }
+    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+2,ly+6); ly+=14; }
     TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
   }else if(G.mode==='normal'){
     ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`NORMAL MODE · ${G.diff.name.toUpperCase()}`,L+2,qy);
@@ -74,19 +75,12 @@ function drawHUD(){
   }
   // prompt
   if(G.prompt&&scene==='play'){
-    ctx.font=`600 14px ${UIF}`; const txt=(usingTouch?'':'[E]  ')+G.prompt.text, tw=ctx.measureText(txt).width+30, py=H-SAFE.b-(usingTouch?300:(b&&!b.dead?96:70));
-    ctx.fillStyle='rgba(12,9,6,.78)'; rr(W/2-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.4)'; ctx.stroke();
-    ctx.fillStyle='#ffe6c0'; ctx.textAlign='center'; ctx.fillText(txt,W/2,py);
+    drawPromptPill(b);
   }
   drawWeaponHud(); drawMoveHud(); if(story){ drawSkillHud(); drawCompHud(); }
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'){
-    const a=Math.min(1,G.hintT/1.5);
-    const txt=usingTouch?(settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts'):'WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · Space roll · R drink · E use · M map';
-    ctx.font=`500 13px ${UIF}`; const lines=wrapText(txt,Math.min(660,W-40)), y0=H-SAFE.b-(usingTouch?290:(b&&!b.dead?110:34))-(lines.length-1)*18-(G.prompt&&!usingTouch?72:0);
-    ctx.globalAlpha=a; ctx.textAlign='center'; const bw3=Math.max(...lines.map(l=>ctx.measureText(l).width))+28;
-    ctx.fillStyle='rgba(12,9,6,.7)'; rr(W/2-bw3/2,y0-14,bw3,lines.length*18+10,8); ctx.fill();
-    ctx.fillStyle='#ead8bf'; lines.forEach((l,i)=>ctx.fillText(l,W/2,y0+i*18)); ctx.globalAlpha=1;
+    drawHintText(b);
   }
   drawOffscreen(); drawTouch();
 }
@@ -169,43 +163,106 @@ function drawOffscreen(){
     ctx.save(); ctx.translate(ex,ey); ctx.rotate(a); ctx.fillStyle=e.boss?'#ff9a3a':'rgba(255,80,60,.85)'; ctx.beginPath(); ctx.moveTo(s,0); ctx.lineTo(-s*0.7,-s*0.7); ctx.lineTo(-s*0.7,s*0.7); ctx.closePath(); ctx.fill(); ctx.restore();
   }
 }
-function touchIcon(id,x,y,r,col){
+// ---------- prompt pill and first-play hints (controls build): they name the right button for the device in use
+// find a spot for a box (centre x,y) that clears the touch buttons: nudge it up a little, else slide it sideways, else lift it above them
+function touchClear(w,h,y){
+  if(!usingTouch) return {x:W/2,y};
+  const L=tLayout(), x0=SAFE.l+10+w/2, x1=W-SAFE.r-10-w/2;
+  const free=(x,y)=>!L.some(b=>Math.abs(b.x-x)<w/2+b.r+6&&Math.abs(b.y-y)<h/2+b.r+6);
+  for(let it=0;it<8;it++){
+    for(let dy=0;dy<=80;dy+=8) if(free(W/2,y-dy)) return {x:W/2,y:y-dy};
+    let best=null; for(let x=x0;x<=x1;x+=8) if(free(x,y)&&(best==null||Math.abs(x-W/2)<Math.abs(best-W/2))) best=x;
+    if(best!=null) return {x:best,y};
+    let top=1e9; for(const b of L) if(Math.abs(b.y-y)<h/2+b.r+6) top=Math.min(top,b.y-b.r);
+    y=top-h/2-8;
+  }
+  return {x:W/2,y};
+}
+let PROMPT_R=null;
+function drawPromptPill(b){
+  const dev=curDevice(), t=G.prompt.text; ctx.font=`600 14px ${UIF}`;
+  const gw=dev==='touch'?0:22, tw=ctx.measureText(t).width+30+(gw?gw+9:0);
+  const at=touchClear(tw,32,H-SAFE.b-(usingTouch?300:(b&&!b.dead?96:70))), py=at.y, px=at.x; PROMPT_R={x:px-tw/2,y:py-16,w:tw,h:32};
+  ctx.fillStyle='rgba(12,9,6,.8)'; rr(px-tw/2,py-16,tw,32,16); ctx.fill(); ctx.strokeStyle=dev==='pad'?'rgba(255,214,140,.65)':'rgba(255,210,150,.4)'; ctx.lineWidth=1; ctx.stroke();
+  let x=px-tw/2+15;
+  if(gw){ drawBtnGlyph(ctx,'use',x+gw/2,py,11,dev); x+=gw+9; }
+  ctx.font=`600 14px ${UIF}`; ctx.fillStyle='#ffe6c0'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(t,x,py);
+}
+function hintText(){
+  const dev=curDevice(), K=a=>btnLabel(a,dev), jump=G.mode!=='story'||hasAbil('jump');
+  if(dev==='touch') return settings.touch==='two'?'Drag on the left to move, push all the way to sprint · Buttons attack, breathe fire, roll and roar · Tap the flasks to drink, the minimap for the map, the quest list for the journal':'Drag anywhere low on the screen to move · Ash swings by himself · Tap fire for a burst of flame · Settings has more layouts';
+  if(dev==='pad') return `Left stick move, push it all the way to sprint · ${K('attack')} or ${padBtnName(PB.R2)} attack · ${padBtnName(PB.L2)} fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('use')} talk and open · ${K('drink')} drink · ${K('map')} map`;
+  return `WASD move · Shift sprint · Mouse aim · Left click slash · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
+}
+function drawHintText(b){
+  const a=Math.min(1,G.hintT/1.5);
+  ctx.font=`500 13px ${UIF}`; const lines=wrapText(hintText(),Math.min(660,W-40)), bh=lines.length*18+10;
+  let y0=H-SAFE.b-(usingTouch?290:(b&&!b.dead?110:34))-(lines.length-1)*18-(G.prompt&&!usingTouch?72:0);
+  const bw3=Math.max(...lines.map(l=>ctx.measureText(l).width))+28;
+  let cx=W/2;
+  if(usingTouch){ let top=y0-14; if(G.prompt&&PROMPT_R) top=Math.min(top,PROMPT_R.y-bh-10); const at=touchClear(bw3,bh,top+bh/2); cx=at.x; y0=at.y-bh/2+14; }
+  ctx.globalAlpha=a; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(12,9,6,.7)'; rr(cx-bw3/2,y0-14,bw3,bh,8); ctx.fill();
+  ctx.fillStyle='#ead8bf'; lines.forEach((l,i)=>ctx.fillText(l,cx,y0+i*18)); ctx.globalAlpha=1;
+}
+// ---------- touch buttons
+const WICON_STUB=/\{\s*\}\s*$/.test(String(drawWeaponIcon));
+function touchIcon(id,x,y,r,col,label){
   ctx.save(); ctx.translate(x,y); const k=r/34; ctx.scale(k,k); ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
   if(id==='attack'){ ctx.rotate(-0.8); ctx.beginPath(); ctx.moveTo(-14,0); ctx.lineTo(16,0); ctx.stroke(); ctx.beginPath(); ctx.moveTo(16,0); ctx.lineTo(10,-4); ctx.lineTo(10,4); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(-8,-7); ctx.lineTo(-8,7); ctx.stroke(); ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(-15,0); ctx.lineTo(-11,0); ctx.stroke(); }
   else if(id==='fire'){ ctx.beginPath(); ctx.moveTo(0,-15); ctx.quadraticCurveTo(12,-2,9,7); ctx.quadraticCurveTo(6,14,0,14); ctx.quadraticCurveTo(-6,14,-9,7); ctx.quadraticCurveTo(-12,-2,0,-15); ctx.fill(); ctx.fillStyle='rgba(20,10,6,.6)'; ctx.beginPath(); ctx.moveTo(0,-3); ctx.quadraticCurveTo(5,4,3,8); ctx.quadraticCurveTo(0,11,-3,8); ctx.quadraticCurveTo(-5,4,0,-3); ctx.fill(); }
   else if(id==='roll'){ ctx.beginPath(); ctx.arc(0,0,11,-2.6,1.9); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-5,-13); ctx.lineTo(-11,-8); ctx.lineTo(-3,-6); ctx.closePath(); ctx.fill(); }
   else if(id==='roar'){ ctx.beginPath(); ctx.arc(-8,0,4,0,TAU); ctx.fill(); for(const rr of [8,14]){ ctx.beginPath(); ctx.arc(-8,0,rr,-0.8,0.8); ctx.stroke(); } }
   else if(id==='drink'){ ctx.beginPath(); ctx.moveTo(-3,-14); ctx.lineTo(3,-14); ctx.lineTo(3,-6); ctx.quadraticCurveTo(11,-2,10,6); ctx.quadraticCurveTo(8,14,0,14); ctx.quadraticCurveTo(-8,14,-10,6); ctx.quadraticCurveTo(-11,-2,-3,-6); ctx.closePath(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-8,4); ctx.quadraticCurveTo(0,1,8,4); ctx.quadraticCurveTo(7,12,0,12); ctx.quadraticCurveTo(-7,12,-8,4); ctx.fill(); }
-  else if(id==='use'){ ctx.font=`900 22px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('E',0,1); ctx.beginPath(); ctx.arc(0,0,15,0,TAU); ctx.stroke(); }
+  else if(id==='use'){ ctx.beginPath(); ctx.arc(0,0,4.5,0,TAU); ctx.fill(); ctx.beginPath(); ctx.arc(0,0,10,0,TAU); ctx.stroke(); ctx.globalAlpha=0.6; for(let i=0;i<4;i++){ const a=i*Math.PI/2+Math.PI/4; ctx.beginPath(); ctx.moveTo(Math.cos(a)*14,Math.sin(a)*14); ctx.lineTo(Math.cos(a)*18,Math.sin(a)*18); ctx.stroke(); } }
+  else if(id==='jump'){
+    if(label==='JUMP'){ ctx.lineWidth=3.6; ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(0,-10); ctx.lineTo(10,0); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-10,9); ctx.lineTo(0,-1); ctx.lineTo(10,9); ctx.stroke(); ctx.globalAlpha=0.55; ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(-12,16); ctx.lineTo(12,16); ctx.stroke(); }
+    else { // a wing: FLY in the air, LAND while flying
+      ctx.beginPath(); ctx.moveTo(-15,8); ctx.quadraticCurveTo(-8,-15,15,-13); ctx.quadraticCurveTo(8,-7,11,-4); ctx.quadraticCurveTo(3,-2,7,2); ctx.quadraticCurveTo(-1,4,1,8); ctx.quadraticCurveTo(-7,7,-15,8); ctx.closePath(); ctx.fill();
+      if(label==='LAND'){ ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(-4,11); ctx.lineTo(0,16); ctx.lineTo(4,11); ctx.stroke(); }
+    }
+  }
+  else if(id==='weapon'){ // two arrows chasing each other: switch weapons
+    ctx.lineWidth=2.4; ctx.globalAlpha=0.85;
+    for(const s of [0,Math.PI]){ ctx.beginPath(); ctx.arc(0,0,17,s-2.3,s-0.75); ctx.stroke(); const a=s-0.75, ex=Math.cos(a)*17, ey=Math.sin(a)*17; ctx.save(); ctx.translate(ex,ey); ctx.rotate(a+Math.PI/2); ctx.beginPath(); ctx.moveTo(4,0); ctx.lineTo(-2,-4); ctx.lineTo(-2,4); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  }
+  else if(id==='whistle'){ ctx.beginPath(); ctx.arc(-4,4,8,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-4,-4); ctx.lineTo(11,-4); ctx.lineTo(11,2); ctx.lineTo(3,2); ctx.stroke(); ctx.beginPath(); ctx.arc(-4,4,2.6,0,TAU); ctx.fill(); ctx.lineWidth=2.2; for(const q of [0,1]){ ctx.beginPath(); ctx.arc(10,-9,4+q*5,-1.9,-0.3); ctx.stroke(); } }
   ctx.restore();
 }
 function drawTouch(){
   if(!usingTouch||scene!=='play') return;
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  const mode=settings.touch||'two';
+  const mode=settings.touch||'two', L=tLayout();
   if(touch.stickId!==null){
     ctx.fillStyle='rgba(255,255,255,.07)'; ctx.strokeStyle=touch.full>0.35?'rgba(140,230,120,.6)':'rgba(255,220,180,.35)'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(touch.ox,touch.oy,58,0,TAU); ctx.fill(); ctx.stroke();
     ctx.fillStyle='rgba(255,200,150,.4)'; ctx.beginPath(); ctx.arc(touch.sx,touch.sy,26,0,TAU); ctx.fill();
   }else{
-    const right=mode!=='left';
-    const gx=mode==='two'?SAFE.l+100:(right?W-SAFE.r-190:SAFE.l+190), gy=H-SAFE.b-(mode==='two'?110:120);
+    // a ghost stick where the thumb will land: left side for two thumbs, the free side of the buttons for one hand
+    const right=mode!=='left'; let gx=SAFE.l+100;
+    if(mode!=='two'){ let e=right?W:0; for(const b of L) e=right?Math.min(e,b.x-b.r):Math.max(e,b.x+b.r); gx=right?clamp(e/2,SAFE.l+70,e-70):clamp((e+W)/2,e+70,W-SAFE.r-70); }
+    const gy=H-SAFE.b-(mode==='two'?110:120);
     ctx.strokeStyle='rgba(255,220,180,.2)'; ctx.setLineDash([6,6]); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(gx,gy,54,0,TAU); ctx.stroke(); ctx.setLineDash([]);
     ctx.font=`700 11px ${UIF}`; ctx.fillStyle='rgba(255,230,200,.4)'; ctx.fillText(mode==='two'?'MOVE':'DRAG TO MOVE',gx,gy);
   }
-  for(const b of tLayout()){
-    const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1;
+  for(const b of L){
+    const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1, ring=true;
     if(b.id==='roar'){ prog=player.roar/100; ready=prog>=1; }
     else if(b.id==='roll'){ prog=player.stamina/player.maxStamina; ready=player.stamina>=player.stats.rollCost*0.5; }
     else if(b.id==='fire'){ prog=player.energy/player.maxEnergy; ready=!player.exhausted; }
     else if(b.id==='drink'){ prog=player.potions/player.potionsMax; ready=player.potions>0; }
-    const use=b.id==='use';
+    else ring=false;
+    const use=b.id==='use', big=b.id==='jump';
     if(use){ const pu=0.5+0.5*Math.sin(G.time*5); ctx.fillStyle=`rgba(255,190,90,${0.12+pu*0.12})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+8,0,TAU); ctx.fill(); }
-    ctx.fillStyle=held?'rgba(255,150,70,.45)':use?'rgba(60,34,14,.72)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
-    ctx.lineWidth=2.5; ctx.strokeStyle=use?'rgba(255,210,120,.95)':ready?'rgba(255,220,180,.7)':'rgba(140,120,100,.5)'; ctx.stroke();
-    if(b.id!=='attack'&&!use){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
-    const col=ready?'#fff0dc':'rgba(255,240,220,.5)';
-    touchIcon(b.id,b.x,b.y-b.r*0.12,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':col);
+    ctx.fillStyle=held?'rgba(255,150,70,.45)':use?'rgba(60,34,14,.72)':big?'rgba(26,18,12,.58)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
+    ctx.lineWidth=big?3:2.5; ctx.strokeStyle=use?'rgba(255,210,120,.95)':big?'rgba(150,215,255,.75)':ready?'rgba(255,220,180,.7)':'rgba(140,120,100,.5)'; ctx.stroke();
+    if(ring){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
+    const col=ready?'#fff0dc':'rgba(255,240,220,.5)', iy=b.y-b.r*0.12;
+    if(b.id==='weapon'){
+      touchIcon('weapon',b.x,iy,b.r*0.62,'rgba(255,220,170,.75)');
+      if(WICON_STUB){ touchIcon('attack',b.x,iy,b.r*0.42,col); } else drawWeaponIcon(ctx,curWeapon(),b.x,iy,b.r*0.95);
+    }
+    else touchIcon(b.id,b.x,iy,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':big?'#d8f0ff':col,b.label);
     ctx.fillStyle=col; ctx.font=`800 ${Math.max(8,Math.round(b.r*0.22))}px ${UIF}`; ctx.fillText(b.id==='attack'&&autoAttackOn()?'AUTO':b.label,b.x,b.y+b.r*0.58);
   }
   ctx.restore();

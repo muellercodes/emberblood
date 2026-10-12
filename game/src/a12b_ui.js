@@ -31,7 +31,7 @@ const fogCv=mkCanvas(FOG.w,FOG.h), fogG=fogCv.getContext('2d');
 function openMap(){
   if(!G||G.mode!=='story'||scene!=='play') return;
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
-  mapSel=null; $('#bTravel').hidden=true; $('#mapHint').textContent='Tap a blue shrine you have found to fast travel there.';
+  mapSel=null; $('#bTravel').hidden=true; mapHintSet();
   const r=G.region||regionAt(player.x,player.y); $('#mapInfo').textContent=`${AREA?'Inside '+AREA.name:r.name} · Level ${player.level} · ${G.coins||0} coins · ${Object.keys(G.shrines).length} of ${SHRINES.length} shrines`;
   drawMapScreen(); renderJournal(); show('mapov');
 }
@@ -66,7 +66,7 @@ function renderJour(){
     rows.push(`<div class="jh2">Side quests (${side.length})</div>`);
     rows.push(side.length?side.map(card).join(''):'<p>Look for people with a gold <b style="color:#ffcf4a">!</b> over their heads. Some of them are inside their houses.</p>');
     if(err.length){ rows.push(`<div class="jh2">Errands (${err.length})</div>`); rows.push(err.map(card).join('')); }
-    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':'Press T to switch which quest you follow, I to open the journal.'}</p>`);
+    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':padActive()?`Press ${padChip(PB.LF)} or ${padChip(PB.RT)} to switch which quest you follow. ${btnHTML('journal')} opens the journal.`:'Press T to switch which quest you follow, I to open the journal.'}</p>`);
     const done=Object.keys(G.quests).filter(id=>G.quests[id].done&&QDEFS[id]);
     if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${E(done.map(id=>QDEFS[id].title.replace('Errand: ','')).join(' · '))}</p>`);
   }else if(jTab==='story'){
@@ -127,11 +127,25 @@ mapCv.addEventListener('click',e=>{
   if(scene!=='map') return;
   const r=mapCv.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*WORLD.w, y=(e.clientY-r.top)/r.height*WORLD.h;
   let best=null,bd=420*420; for(const s of SHRINES){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
+  mapSelect(best);
+});
+function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there.`; else h.textContent='Tap a blue shrine you have found to fast travel there.'; }
+function mapSelect(best){
   mapSel=best; const bt=$('#bTravel');
   if(best){ if(G.inCombat||(G.boss&&!G.boss.dead)){ bt.hidden=true; $('#mapHint').textContent='You can’t fast travel while enemies are close.'; } else { bt.hidden=false; bt.textContent=`Travel to ${best.name}`; $('#mapHint').textContent=best.name; } }
-  else{ bt.hidden=true; $('#mapHint').textContent='Tap a blue shrine you have found to fast travel there.'; }
+  else{ bt.hidden=true; mapHintSet(); }
   drawMapScreen();
-});
+}
+// controller and keyboard ([ and ]): step through the shrines you have found, west to east
+function mapCycle(d){
+  if(scene!=='map') return;
+  const list=SHRINES.filter(s=>G.shrines[s.id]).sort((a,b)=>a.x-b.x); if(!list.length) return;
+  let i=list.indexOf(mapSel);
+  if(i<0){ const pp=AREA&&G.ow?G.ow:player; let bd=1e18; list.forEach((s,k)=>{ const q=dist2(s.x,s.y,pp.x,pp.y); if(q<bd){ bd=q; i=k; } }); }
+  else i=(i+d+list.length)%list.length;
+  mapSelect(list[i]); SFX.play('ui');
+  const bt=$('#bTravel'); if(!bt.hidden) navFocus(bt);
+}
 $('#bTravel').addEventListener('click',()=>{ if(mapSel) travelTo(mapSel); });
 $('#bMapClose').addEventListener('click',()=>closeMap());
 
@@ -166,9 +180,29 @@ function toMenu(){
   if(G&&G.mode==='story'&&!player.dead) saveGame(true);
   SFX.setFire(false); SFX.ambient({}); DLG=null; setupMenuScene(); scene='menu'; show('menu'); refreshMenu();
 }
-let howFrom='menu';
-function openHow(from){ howFrom=from; show('how'); }
+let howFrom='menu', howTab='keys', howKind=null;
+// How to Play opens on the page for the device in use: Keyboard, Touch or Controller
+function openHow(from){
+  let coarse=false; try{ coarse=matchMedia('(pointer: coarse)').matches; }catch(e){}
+  howFrom=from; howTab=padActive()?'pad':(usingTouch||PAD.dev==='touch'||(coarse&&PAD.dev!=='kb'))?'touch':'keys'; howKind=null; howTabs(); show('how'); renderHow();
+}
 function closeHow(){ show(howFrom==='pause'?'pause':'menu'); }
+function howTabs(){
+  for(const b of document.querySelectorAll('#howTabs button')){ const on=b.dataset.h===howTab; b.setAttribute('aria-pressed',String(on)); if(on) b.setAttribute('data-focus',''); else b.removeAttribute('data-focus'); }
+  for(const s of document.querySelectorAll('#how .hsec')) s.hidden=s.dataset.h!==howTab;
+}
+function renderHow(){
+  howTabs();
+  const hb=$('#how .hbody'); if(hb) hb.scrollTop=0;
+  if(howTab!=='pad') return;
+  const k=howKind||(PAD.idx>=0?PAD.kind:'xbox');
+  for(const b of document.querySelectorAll('#howPadKind button')) b.setAttribute('aria-pressed',String(b.dataset.k===k));
+  $('#howPadName').innerHTML=PAD.idx>=0?`<b>${escapeHtml(padName(PAD.id))}</b> found. Here is what every button does.`:'No controller yet. Plug one in or pair it, then press any button. PlayStation, Xbox and Nintendo Switch Pro controllers all work.';
+  const cv=$('#howPadCv'); if(cv&&vis(cv)) drawPadDiagram(cv,k);
+  $('#howPadKeys').innerHTML=padHelpRows(k).map(([c,t])=>`<div class="pk">${c}</div><span>${t}</span>`).join('');
+}
+for(const b of document.querySelectorAll('#howTabs button')) b.addEventListener('click',()=>{ howTab=b.dataset.h; SFX.play('ui'); renderHow(); });
+for(const b of document.querySelectorAll('#howPadKind button')) b.addEventListener('click',()=>{ howKind=b.dataset.k; SFX.play('ui'); renderHow(); });
 $('#bStory').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSlots(); });
 let newArmed=0;
 function confirmNew(){ if(Date.now()-newArmed<4000) return true; newArmed=Date.now(); $('#bStory').firstChild.textContent='Tap again to start over'; setTimeout(()=>{ if(scene==='menu') refreshMenu(); },4000); return false; }

@@ -16,26 +16,60 @@ cvs.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
-// touch layout: a thumb arc around a big slash button, mirrored for lefties; one-hand mode stacks everything on one side
+// touch layout. Two thumbs: SLASH in the corner, an inner ring (FIRE, JUMP, ROLL, DRINK) and an outer ring (USE, ROAR,
+// WEAPON) that climbs up on tall screens and swings left on short ones, plus a small CALL button further out.
+// One hand: columns hugging the edge, filled bottom to top, at most four buttons high and never under the HUD.
+// Every button keeps its spot when others come and go (USE only shows with a prompt, JUMP once Ash can jump,
+// WEAPON with two or more weapons, CALL with a companion), so thumbs can learn where things are.
+const TBTN_LABEL={attack:'SLASH',fire:'FIRE',roll:'ROLL',roar:'ROAR',drink:'DRINK',use:'USE',weapon:'WEAPON',whistle:'CALL'};
+function jumpLabel(){ return player&&player.flying?'LAND':(hasAbil('wings')&&airborne()?'FLY':'JUMP'); }
 function tLayout(){
   const mode=settings.touch||'two', s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1), B=H-SAFE.b, L=[];
   const right=mode!=='left', sx=v=>right?W-SAFE.r-v:SAFE.l+v;
-  const prompt=!!(G&&G.prompt);
+  const g=G||{}, story=g.mode==='story', mr=MINI_R();
+  const has={use:!!g.prompt, jump:!!G&&(!story||hasAbil('jump')), weapon:Object.keys(g.weapons||{}).filter(k=>g.weapons[k]).length>=2, whistle:story&&!!g.comp};
+  const add=(id,x,y,r)=>{ if(id in has&&!has[id]) return; L.push({id,x,y,r,label:id==='jump'?jumpLabel():TBTN_LABEL[id]}); };
+  // keep clear of the minimap and its labels, the pause and sound buttons and the vitals panel
+  const hudFree=(x,y,r)=>{
+    if(x-r<SAFE.l+2||x+r>W-SAFE.r-2||y-r<SAFE.t+2||y+r>B-2) return false;
+    const hit=(R)=>{ const nx=clamp(x,R.x,R.x+R.w), ny=clamp(y,R.y,R.y+R.h); return Math.hypot(x-nx,y-ny)<r+6; };
+    return !hit({x:mr.x-10,y:mr.y,w:mr.w+20,h:mr.h+34})&&!hit({x:W-SAFE.r-56,y:SAFE.t+12,w:44,h:92})&&!hit({x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:84});
+  };
   if(mode==='two'){
-    const ax=sx(82*s), ay=B-90*s, R1=120*s;
-    const at=(deg,rad,id,r,label)=>{ const a=deg*Math.PI/180; L.push({id,x:ax+Math.cos(a)*rad*(right?1:-1),y:ay+Math.sin(a)*rad,r,label}); };
-    L.push({id:'attack',x:ax,y:ay,r:50*s,label:'SLASH'});
-    at(181,R1,'fire',37*s,'FIRE'); at(217,R1,'roll',33*s,'ROLL'); at(252,R1,'roar',30*s,'ROAR'); at(286,R1-6*s,'drink',27*s,'DRINK');
-    if(prompt) at(226,R1+104*s,'use',37*s,'USE');
+    // tall screens stack the outer ring upward; short (phone landscape) screens swing it left along the bottom
+    const R1=126*s, R2=214*s, R3=292*s, top=SAFE.t+14+mr.h+34;
+    const up=B-90*s-R2-38*s>top, ax=sx(82*s), ay=B-(up?90:84)*s;
+    const pos=(deg,rad)=>{ const a=deg*Math.PI/180; return [ax+Math.cos(a)*rad*(right?1:-1),ay+Math.sin(a)*rad]; };
+    const at=(deg,rad,id,r)=>{ const [x,y]=pos(deg,rad); add(id,x,y,r); };
+    add('attack',ax,ay,50*s);
+    if(up){
+      at(179,R1,'fire',34*s); at(214,R1,'jump',38*s); at(249,R1,'roll',31*s); at(284,R1,'drink',24*s);
+      at(221,R2,'use',35*s); at(246,R2,'roar',30*s); at(271,R2,'weapon',30*s);
+      // the companion call goes high on the arc if there is room, else under the sound button
+      let [wx,wy]=pos(256,R3); if(!hudFree(wx,wy,23*s)) [wx,wy]=pos(236,R3);
+      if(!hudFree(wx,wy,23*s)){ wx=W-SAFE.r-34; wy=SAFE.t+130; }
+      add('whistle',wx,wy,Math.min(23*s,20));
+    }else{
+      at(168,R1,'fire',34*s); at(203,R1,'jump',38*s); at(237,R1,'roll',31*s);
+      at(165,R2,'drink',24*s); at(182,R2,'roar',30*s); at(201,R2,'use',35*s);
+      at(182,R3,'weapon',30*s); at(204,R3,'whistle',23*s);
+    }
   }else{
-    // one hand: a column hugging the edge, the stick floats anywhere in the lower half
-    const x=sx(48*s); let y=B-70*s;
-    L.push({id:'attack',x,y,r:38*s,label:'SLASH'}); y-=86*s;
-    L.push({id:'roll',x,y,r:32*s,label:'ROLL'}); y-=76*s;
-    L.push({id:'fire',x,y,r:32*s,label:'FIRE'}); y-=74*s;
-    L.push({id:'drink',x,y,r:27*s,label:'DRINK'}); y-=66*s;
-    L.push({id:'roar',x,y,r:27*s,label:'ROAR'});
-    if(prompt) L.push({id:'use',x:sx(140*s),y:B-196*s,r:36*s,label:'USE'});
+    // one hand: columns from the edge, filled bottom to top; the stick floats anywhere low that is not a button
+    const order=[['attack',40],['jump',34],['roll',31],['fire',31],['use',34],['drink',26],['roar',27],['weapon',28],['whistle',22]];
+    const colX=k=>sx((46+82*k)*s), y0=B-66*s;
+    const lim=k=>{
+      if(!right) return Math.max(B-322,SAFE.t+205);
+      const x=colX(k); if(x>mr.x-46&&x<mr.x+mr.w+46) return mr.y+mr.h+36;
+      return x>W-SAFE.r-80?SAFE.t+108:SAFE.t+40;
+    };
+    let k=0,j=0,y=y0,pr=0;
+    for(const [id,r0] of order){
+      const r=r0*s;
+      if(j>0) y-=pr+r+8*s;
+      if(j>=4||(j>0&&y-r<lim(k))){ k++; j=0; y=y0; }
+      add(id,colX(k),y,r); j++; pr=r;
+    }
   }
   return L;
 }
@@ -131,21 +165,36 @@ function onKey(e){
     if((c==='KeyJ'||c==='KeyK')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
+    else if(c==='BracketLeft'||c==='BracketRight'){ e.preventDefault(); mapCycle(c==='BracketLeft'?-1:1); }
+    else navKey(e);
   }else if(scene==='journal'){
     if(c==='Escape'||c==='KeyI'){ e.preventDefault(); closeJournal(); }
+    else navKey(e);
   }else if(scene==='paused'){
-    if((c==='Escape'||c==='KeyP')&&!$('#how').classList.contains('on')){ e.preventDefault(); resumeGame(); }
-    else if(c==='Escape') closeHow();
+    // Escape backs out one screen (settings or How to Play go back to the pause menu), P resumes from the pause menu
+    const r=navRoot();
+    if(c==='Escape'){ e.preventDefault(); if(r&&['pause','settings','how'].includes(r.id)) ovBack(r); else if(!r) resumeGame(); }
+    else if(c==='KeyP'&&r&&r.id==='pause'){ e.preventDefault(); resumeGame(); }
+    else navKey(e);
   }else if(scene==='dialogue'){
     const dn={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Numpad1:0,Numpad2:1,Numpad3:2,Numpad4:3}[c];
     if(dn!=null&&DLG&&DLG.opts){ e.preventDefault(); chooseOpt(dn); return; }
-    if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){ e.preventDefault(); if(!e.repeat) advanceDialogue(); }
+    if(navKey(e)) return;
+    if(c==='Space'||c==='Enter'||c==='KeyJ'||c==='KeyE'){
+      e.preventDefault(); if(e.repeat) return;
+      const f=document.activeElement;
+      if(DLG&&DLG.opts&&f&&f.closest&&f.closest('#dlgOpts')) f.click(); else advanceDialogue();
+    }
     else if(c==='Escape'){ e.preventDefault(); skipDialogue(); }
   }else if(scene==='upgrade'){
     const n={Digit1:0,Digit2:1,Digit3:2,Numpad1:0,Numpad2:1,Numpad3:2}[c];
     if(n!=null){ e.preventDefault(); chooseUpgrade(n); }
-  }else if(scene==='menu'){
-    if(c==='Escape'&&$('#how').classList.contains('on')) closeHow();
+    else navKey(e);
+  }else{
+    // title menu, save slots, settings, account, How to Play, game over and victory
+    const r=navRoot();
+    if(c==='Escape'){ if(r&&['how','settings','slots','acct'].includes(r.id)){ e.preventDefault(); ovBack(r); } }
+    else navKey(e);
   }
 }
 function toWorld(sx,sy){ return {x:sx/zoom+cam.x,y:sy/zoom+cam.y}; }
