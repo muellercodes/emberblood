@@ -150,7 +150,8 @@ function drawBanner(){
   // more waiting: a small "+1" chip beside the title
   const nq=G.bannerQ?G.bannerQ.length:0;
   if(nq){ const t=`+${nq}`; ctx.font=`800 12px ${UIF}`; const cw=ctx.measureText(t).width+14, cx=Math.min(W-SAFE.r-cw-6,W/2+tw/2+10), cy=y-11;
-    ctx.fillStyle='rgba(14,9,6,.82)'; rr(cx,cy,cw,22,11); ctx.fill(); ctx.strokeStyle='rgba(255,200,120,.6)'; ctx.lineWidth=1; ctx.stroke();
+    if(LOOK.sb) sbPill(cx,cy,cw,22); else{ ctx.fillStyle='rgba(14,9,6,.82)'; rr(cx,cy,cw,22,11); ctx.fill(); ctx.strokeStyle='rgba(255,200,120,.6)'; ctx.lineWidth=1; ctx.stroke(); }
+    if(LOOK.sb) ctx.fillStyle=SBC.outline; else
     ctx.fillStyle='#ffd27a'; ctx.textBaseline='middle'; ctx.fillText(t,cx+cw/2,cy+11.5); }
   ctx.restore();
   // touch: tap the banner to let it go (with a mouse any click does it, see the mousedown handler in a5_input.js)

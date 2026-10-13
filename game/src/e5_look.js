@@ -8,7 +8,8 @@
 // prop sprites, house sprites, landmark sprites, struct sprites below), never redone per frame.
 // The style guide for new maps is scratchpad/STYLE.md (palettes, outline widths, the helpers exported here).
 // LOOK is a var (not const) so the drawing code in earlier modules can read it at any time without a TDZ error.
-var LOOK={sb:store.get('eb_look','storybook')!=='classic', gen:0, spr:new Map(), houses:new Map(), graded:new WeakMap(), cloud:null};
+var LOOK={sb:store.get('eb_look','storybook')!=='classic', gen:0, spr:new Map(), houses:new Map(), graded:new WeakMap(), cloud:null, off:{}};
+// LOOK.off (debug, for measuring): {foam:true, clouds:true, structs:true, houses:true} switches a Storybook pass off
 
 // ---------- palette: the shared colours of the look (helpers use these; see STYLE.md)
 const SBC={
@@ -247,19 +248,18 @@ function lookChunkLines(g,grid,N,st,x0,y0,ch){
   }
   g.lineWidth=1.1; g.lineCap='round';
 }
-// the animated pass along the shores in view: two rings that roll out from the foam line and fade, very cheap
+// the animated pass along the shores in view: a dashed ring (every other segment of the foam line) rolls out from
+// the shore and fades, then the next one starts; segments outside the view are skipped
 function lookFoam(vis,t){
-  const u0=(t*0.32)%1;
-  ctx.save(); ctx.lineCap='round'; ctx.strokeStyle='#ffffff';
-  for(let ring=0;ring<2;ring++){
-    const u=(u0+ring*0.5)%1, d=3+u*13, a=0.55*(1-u)*Math.min(1,u*5);
-    if(a<0.02) continue;
-    ctx.globalAlpha=a; ctx.lineWidth=2.6-u*1.2; ctx.beginPath(); let n=0;
-    for(const v of vis){ const ch=CHUNKS.get(ckey(v[0],v[1])); const L=ch&&ch.foam; if(!L) continue;
-      for(let i=0;i<L.length;i+=6){ const nx=L[i+4]*d, ny=L[i+5]*d; ctx.moveTo(L[i]+nx,L[i+1]+ny); ctx.lineTo(L[i+2]+nx,L[i+3]+ny); } n++; }
-    if(n) ctx.stroke();
-  }
-  ctx.restore();
+  if(LOOK.off.foam) return;
+  const u=(t*0.42)%1, d=3+u*14, a=0.62*(1-u)*Math.min(1,u*6), x0=cam.x-20, y0=cam.y-20, x1=cam.x+W/zoom+20, y1=cam.y+H/zoom+20;
+  if(a<0.03) return;
+  const odd=Math.floor(t*0.42)%2?6:0;
+  let started=false;
+  for(const v of vis){ const ch=CHUNKS.get(ckey(v[0],v[1])); const L=ch&&ch.foam; if(!L) continue;
+    if(!started){ started=true; ctx.save(); ctx.lineCap='butt'; ctx.strokeStyle='#ffffff'; ctx.globalAlpha=a; ctx.lineWidth=2.6-u*1.2; ctx.beginPath(); }
+    for(let i=odd;i<L.length;i+=12){ const ax=L[i], ay=L[i+1]; if(ax<x0||ax>x1||ay<y0||ay>y1) continue; const nx=L[i+4]*d, ny=L[i+5]*d; ctx.moveTo(ax+nx,ay+ny); ctx.lineTo(L[i+2]+nx,L[i+3]+ny); } }
+  if(started){ ctx.stroke(); ctx.restore(); }
 }
 // a water glint in this look: a crisp little four point sparkle that swells and fades (no glow)
 function lookGlint(r,k){ const a=Math.sin(Math.PI*k), s=r.r*0.55*a+0.6; if(a<0.05) return; ctx.fillStyle=`rgba(255,255,255,${0.85*a})`; ctx.beginPath(); ctx.moveTo(r.x,r.y-s); ctx.quadraticCurveTo(r.x,r.y,r.x+s*0.8,r.y); ctx.quadraticCurveTo(r.x,r.y,r.x,r.y+s); ctx.quadraticCurveTo(r.x,r.y,r.x-s*0.8,r.y); ctx.quadraticCurveTo(r.x,r.y,r.x,r.y-s); ctx.fill(); }
@@ -271,7 +271,12 @@ function lookDecor(g,rng,at,x0,y0){
   g.lineCap='round'; g.lineJoin='round';
   for(let i=0;i<340;i++){
     const x=x0+rng()*CH, y=y0+rng()*CH, s=at(x,y), r=rng();
-    if(s.out||s.lava) continue;
+    if(s.out) continue;
+    if(s.lava){ if(s.lavaS<0.8) continue;
+      if(r<0.42){ g.strokeStyle=rng()<0.5?'rgba(255,232,140,.9)':'rgba(255,190,80,.95)'; g.lineWidth=2.2+rng()*2; g.beginPath(); const a=rng()*TAU; g.arc(x,y,5+rng()*9,a,a+1.1+rng()*1.4); g.stroke(); }
+      else if(r<0.5){ g.fillStyle='rgba(255,246,200,.9)'; g.beginPath(); g.arc(x,y,1.6+rng()*2,0,TAU); g.fill(); }
+      else if(r<0.53){ const q=4+rng()*5; g.fillStyle='#5a2a26'; g.beginPath(); g.ellipse(x,y,q*1.3,q,rng()*3,0,TAU); g.fill(); g.strokeStyle='rgba(59,34,51,.9)'; g.lineWidth=1.4; g.stroke(); g.fillStyle='#7a3a30'; g.beginPath(); g.ellipse(x-q*0.3,y-q*0.3,q*0.6,q*0.4,0,0,TAU); g.fill(); }
+      continue; }
     if(s.water){ if(s.depth>0.75&&!s.bridge&&r<0.09){ g.strokeStyle='rgba(255,255,255,.26)'; g.lineWidth=1.8; g.beginPath(); g.arc(x-4,y,4,0.3,Math.PI-0.3); g.arc(x+4,y,4,0.3,Math.PI-0.3); g.stroke(); } continue; }
     if(s.road>0.5){ if(r<0.08) sbPebble(g,x,y,1.4+rng(),'rgba(170,140,100,.8)'); continue; }
     if(s.shore>0.35){ if(r<0.05) sbPebble(g,x,y,1.3+rng()*0.8,'#e6cf98'); continue; }
@@ -294,7 +299,7 @@ function lookDecor(g,rng,at,x0,y0){
       else if(r<0.3){ g.strokeStyle='rgba(140,82,48,.45)'; g.lineWidth=1.6; g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x+8,y+rng()*6-3,x+16,y+rng()*6-3); g.stroke(); }
       else if(r<0.36) sbTuft(g,x,y,'rgba(176,150,80,.65)',0.85);
     }else if(b===4){
-      if(r<0.18){ g.strokeStyle='rgba(30,20,22,.6)'; g.lineWidth=2.2; g.beginPath(); let px=x,py=y,a=rng()*TAU; g.moveTo(px,py); const P=[[px,py]]; for(let k=0;k<3;k++){ a+=(rng()-0.5)*1.2; px+=Math.cos(a)*(6+rng()*7); py+=Math.sin(a)*(6+rng()*7); g.lineTo(px,py); P.push([px,py]); } g.stroke(); g.strokeStyle='rgba(255,128,48,.55)'; g.lineWidth=0.9; g.beginPath(); P.forEach((q,k)=>k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1])); g.stroke(); }
+      if(r<0.08){ g.strokeStyle='rgba(30,20,22,.6)'; g.lineWidth=2.2; g.beginPath(); let px=x,py=y,a=rng()*TAU; g.moveTo(px,py); const P=[[px,py]]; for(let k=0;k<3;k++){ a+=(rng()-0.5)*1.2; px+=Math.cos(a)*(6+rng()*7); py+=Math.sin(a)*(6+rng()*7); g.lineTo(px,py); P.push([px,py]); } g.stroke(); g.strokeStyle='rgba(255,128,48,.55)'; g.lineWidth=0.9; g.beginPath(); P.forEach((q,k)=>k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1])); g.stroke(); }
       else if(r<0.32) sbPebble(g,x,y,1.3+rng()*1.4,'#3e3234');
     }else if(b===5){
       if(r<0.16){ g.fillStyle='rgba(160,186,224,.32)'; g.beginPath(); g.ellipse(x,y,6+rng()*10,2.4+rng()*3,0,0,TAU); g.fill(); }
@@ -536,9 +541,11 @@ function sbBuildSprites(){
   SPR.willow=[1,2,3].map(i=>sbMkWillow(3200+i)); SPR.reed=[1,2,3].map(i=>sbMkReed(8300+i)); SPR.mbush=[1,2,3].map(i=>sbMkBush(7300+i,'mbush'));
   SPR.bigoak=(()=>{ const rng=mulberry32(1777), R=48; return outlineSprite(spriteOf(R,g=>sbCanopy(g,R*0.95,rng,SBPAL.oak,11,4)),SBC.outline,1.8,{force:true}); })();
   SPR.stump=[1,2].map(i=>sbMkStump(8000+i)); SPR.bones=[1,2].map(i=>sbMkBones(8100+i)); SPR.herb=[sbMkHerb(8200)]; SPR.vent=[sbMkVent()];
-  SPR.shadow=mkShadow();
+  SPR.shadow=sbShadow();
   return true;
 }
+// the soft round shadow under props and figures, in plum (the Classic one is black)
+function sbShadow(){ const c=mkCanvas(64,64), g=c.getContext('2d'); const gr=g.createRadialGradient(32,32,4,32,32,32); gr.addColorStop(0,'rgba(46,22,58,.58)'); gr.addColorStop(0.6,'rgba(46,22,58,.32)'); gr.addColorStop(1,'rgba(46,22,58,0)'); g.fillStyle=gr; g.fillRect(0,0,64,64); return c; }
 // prop kinds from definePropKind (new maps) get the outline automatically in this look (def.outline:false skips it,
 // def.ow sets the width in world px; the default follows the kind's radius)
 { const base=propKindSprites; propKindSprites=function(kind){
@@ -557,7 +564,7 @@ function sbHouseCanvas(b){
   return o;
 }
 { const base=houseSprite; houseSprite=function(hs){
-  if(!LOOK.sb) return base(hs);
+  if(!LOOK.sb||LOOK.off.houses) return base(hs);
   let c=LOOK.houses.get(hs);
   if(c&&c.burnt===!!hs.burnt&&c.snow===!!hs.snow) return c;
   const b=base(hs); c=sbHouseCanvas(b); LOOK.houses.set(hs,c);
@@ -672,7 +679,14 @@ const SB_STRUCT={
     g.strokeStyle=on?'#ffcf5a':'#a8c8e0'; g.lineWidth=2.4; g.beginPath(); g.moveTo(-6,0); g.quadraticCurveTo(0,-7,6,0); g.quadraticCurveTo(0,7,-6,0); g.stroke();
   },1.8); }
 };
-function sbPut(sp,x,y,rot){ drawSprite(sp,x,y,1,rot||0); }
+// a struct sprite at x,y; a rotated one is turned once per angle and kept, so every frame is a plain blit
+function sbPut(sp,x,y,rot){
+  if(!rot){ drawSprite(sp,x,y,1,0); return; }
+  const k=Math.round(((rot%TAU)+TAU)%TAU*40); let m=sp._rot; if(!m) m=sp._rot=new Map();
+  let c=m.get(k);
+  if(!c){ const a=k/40, S=Math.ceil(sp.width*1.42), q=mkCanvas(S,S), g=q.getContext('2d'); g.translate(S/2,S/2); g.rotate(a); g.drawImage(sp,-sp.width/2,-sp.height/2); q.half=sp.half*S/sp.width; c=q; if(m.size<160) m.set(k,c); }
+  drawSprite(c,x,y,1,0);
+}
 // the Storybook drawer for a struct; returns false for kinds it leaves to the old code
 function lookStruct(s,t){
   switch(s.k){
@@ -714,7 +728,7 @@ function lookStruct(s,t){
   }
   return false;
 }
-{ const base=drawStruct; drawStruct=function(s,t){ if(LOOK.sb&&lookStruct(s,t)) return; return base(s,t); }; }
+{ const base=drawStruct; drawStruct=function(s,t){ if(LOOK.sb&&!LOOK.off.structs&&lookStruct(s,t)) return; return base(s,t); }; }
 
 // ================= ground decals and bridges (painted into the chunks): clean shapes with an edge line
 function lookDecal(g,dc){
@@ -792,21 +806,29 @@ function lookBridge(g,br){
 { const base=drawBridge; drawBridge=function(g,br){ if(LOOK.sb){ lookBridge(g,br); return; } return base(g,br); }; }
 
 // ================= atmosphere: drifting cloud shadows, a friendly day, a blue readable night
-// one small soft tileable texture of cloud blobs, stretched over 2600 world px, drifting slowly; one pass a frame
-const SB_CLOUD_TILE=2600;
-function lookCloudTex(){
-  if(LOOK.cloud) return LOOK.cloud;
-  const S=192, c=mkCanvas(S,S), g=c.getContext('2d'), rng=mulberry32(4242);
-  const blob=(x,y,r,a)=>{ for(const ox of [-S,0,S]) for(const oy of [-S,0,S]){ const gr=g.createRadialGradient(x+ox,y+oy,0,x+ox,y+oy,r); gr.addColorStop(0,`rgba(44,40,96,${a})`); gr.addColorStop(0.55,`rgba(44,40,96,${a*0.8})`); gr.addColorStop(1,'rgba(44,40,96,0)'); g.fillStyle=gr; g.fillRect(x+ox-r,y+oy-r,r*2,r*2); } };
-  for(let i=0;i<5;i++){ const x=rng()*S, y=rng()*S, r=S*(0.1+rng()*0.06); for(let k=0;k<6;k++) blob(x+(rng()-0.5)*r*2.4,y+(rng()-0.5)*r*1.1,r*(0.55+rng()*0.5),0.45); }
-  LOOK.cloud=c; return c;
+// a few soft cloud sprites drift over the land in a slowly moving grid of 1150 px cells (about half the cells hold a
+// cloud of about 560 by 350 px); only the clouds in view are drawn, so a frame paints a small part of the screen
+const SB_CLOUD_CELL=1150;
+function lookCloudTex(v){
+  if(!LOOK.cloud) LOOK.cloud=[];
+  if(LOOK.cloud[v]) return LOOK.cloud[v];
+  const S=128, c=mkCanvas(S,S*0.62), g=c.getContext('2d'), rng=mulberry32(4242+v*977);
+  for(let k=0;k<7;k++){ const x=S*(0.22+rng()*0.56), y=S*0.62*(0.3+rng()*0.4), r=S*(0.14+rng()*0.1);
+    const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,'rgba(44,40,96,.5)'); gr.addColorStop(0.6,'rgba(44,40,96,.38)'); gr.addColorStop(1,'rgba(44,40,96,0)'); g.fillStyle=gr; g.fillRect(x-r,y-r,r*2,r*2); }
+  LOOK.cloud[v]=c; return c;
 }
 function lookClouds(t){
+  if(LOOK.off.clouds) return;
   const dl=daylight(); if(dl<0.05) return;
-  const tex=lookCloudTex(), TS=SB_CLOUD_TILE, ox=((t*16)%TS+TS)%TS, oy=((t*7)%TS+TS)%TS, vw=W/zoom, vh=H/zoom;
-  const i0=Math.floor((cam.x-ox)/TS), i1=Math.floor((cam.x+vw-ox)/TS), j0=Math.floor((cam.y-oy)/TS), j1=Math.floor((cam.y+vh-oy)/TS);
-  ctx.save(); ctx.globalAlpha=0.2*dl*(1-0.6*(G?G.rainK:0)); ctx.imageSmoothingEnabled=true;
-  for(let i=i0;i<=i1;i++) for(let j=j0;j<=j1;j++) ctx.drawImage(tex,ox+i*TS,oy+j*TS,TS,TS);
+  const C=SB_CLOUD_CELL, ox=t*16, oy=t*7, vw=W/zoom, vh=H/zoom, cw=560, chh=350;
+  const i0=Math.floor((cam.x-ox-cw)/C), i1=Math.floor((cam.x+vw-ox)/C), j0=Math.floor((cam.y-oy-chh)/C), j1=Math.floor((cam.y+vh-oy)/C);
+  ctx.save(); ctx.globalAlpha=0.32*dl*(1-0.6*(G?G.rainK:0)); ctx.imageSmoothingEnabled=true;
+  for(let i=i0;i<=i1;i++) for(let j=j0;j<=j1;j++){
+    const h=hash2(i*7+3,j*13+5); if(h>0.5) continue;
+    const k=0.75+hash2(i,j+91)*0.5, x=ox+i*C+hash2(i+17,j)*(C-cw*0.6), y=oy+j*C+hash2(i,j+29)*(C-chh*0.6), w=cw*k, hh=chh*k;
+    if(x>cam.x+vw||y>cam.y+vh||x+w<cam.x||y+hh<cam.y) continue;
+    ctx.drawImage(lookCloudTex(Math.floor(h*7)%3),x,y,w,hh);
+  }
   ctx.restore();
 }
 { const base=ambientTint; ambientTint=function(){
@@ -850,22 +872,33 @@ function lookChest(c,t){
 { const base=drawChest; drawChest=function(c,t){ if(LOOK.sb){ lookChest(c,t); return; } return base(c,t); }; }
 
 // ================= HUD pieces drawn on the canvas (a11b_hud.js and a11_render.js call these in this look)
-// a chunky plum panel with a cream rim, a plum edge and a little drop under it (screen px, ctx in screen space)
-function sbPanel(x,y,w,h,r){
-  ctx.save();
-  ctx.fillStyle='rgba(59,34,51,.5)'; rr(x,y+3,w,h,r); ctx.fill();
-  ctx.fillStyle='rgba(59,34,51,.84)'; rr(x,y,w,h,r); ctx.fill();
-  ctx.lineWidth=3.2; ctx.strokeStyle=SBC.outline; ctx.stroke();
-  ctx.lineWidth=1.6; ctx.strokeStyle='rgba(255,243,214,.9)'; rr(x+2.4,y+2.4,w-4.8,h-4.8,Math.max(2,r-2.4)); ctx.stroke();
-  ctx.restore();
+// a chunky plum panel with a cream rim, a plum edge and a little drop under it (screen px, ctx in screen space);
+// panels and pills are painted once per size into a small canvas and blitted
+const SBPN=new Map();
+function sbHudSpr(kind,w,h,r,draw){
+  w=Math.round(w); h=Math.round(h); const key=kind+w+'x'+h+'x'+r+'x'+DPR; let c=SBPN.get(key);
+  if(!c){ if(SBPN.size>80) SBPN.clear(); const P=4; c=mkCanvas((w+P*2)*DPR,(h+P*2+4)*DPR); const g=c.getContext('2d'); g.scale(DPR,DPR); g.translate(P,P); draw(g,w,h,r); c.P=P; c.w0=w; c.h0=h; SBPN.set(key,c); }
+  return c;
 }
+function sbPanel(x,y,w,h,r){
+  const c=sbHudSpr('p',w,h,r,(g,w,h,r)=>{
+    g.fillStyle='rgba(59,34,51,.5)'; rrect(g,0,3,w,h,r); g.fill();
+    g.fillStyle='rgba(59,34,51,.84)'; rrect(g,0,0,w,h,r); g.fill();
+    g.lineWidth=3.2; g.strokeStyle=SBC.outline; g.stroke();
+    g.lineWidth=1.6; g.strokeStyle='rgba(255,243,214,.9)'; rrect(g,2.4,2.4,w-4.8,h-4.8,Math.max(2,r-2.4)); g.stroke();
+  });
+  ctx.drawImage(c,x-c.P,y-c.P,c.w0+c.P*2,c.h0+c.P*2+4);
+}
+// the weapon bar's panel (a6b_weapons.js) matches the vitals panel
+{ const base=wPanel; wPanel=function(x,y,w,h){ if(LOOK.sb) return sbPanel(x,y,w,h,13); return base(x,y,w,h); }; }
 // a parchment pill (the use prompt)
 function sbPill(x,y,w,h){
-  ctx.save();
-  ctx.fillStyle=SBC.outline; rr(x,y+3,w,h,h/2); ctx.fill();
-  ctx.fillStyle='#fff3d6'; rr(x,y,w,h,h/2); ctx.fill(); ctx.lineWidth=2.6; ctx.strokeStyle=SBC.outline; ctx.stroke();
-  ctx.fillStyle='rgba(255,255,255,.6)'; rr(x+h*0.4,y+3,w-h*0.8,4,2); ctx.fill();
-  ctx.restore();
+  const c=sbHudSpr('l',w,h,0,(g,w,h)=>{
+    g.fillStyle=SBC.outline; rrect(g,0,3,w,h,h/2); g.fill();
+    g.fillStyle='#fff3d6'; rrect(g,0,0,w,h,h/2); g.fill(); g.lineWidth=2.6; g.strokeStyle=SBC.outline; g.stroke();
+    g.fillStyle='rgba(255,255,255,.6)'; rrect(g,h*0.4,3,w-h*0.8,4,2); g.fill();
+  });
+  ctx.drawImage(c,x-c.P,y-c.P,c.w0+c.P*2,c.h0+c.P*2+4);
 }
 // a ribbon banner behind a title, centred on cx,cy: a red band with folded tails
 function sbRibbon(cx,cy,w,h,col){
@@ -903,4 +936,30 @@ function lookPortraitFinish(who,face){
   return c;
 }; }
 
-window.__ebX=Object.assign(window.__ebX||{},{setLook,getLook:()=>LOOK.sb?'storybook':'classic',LOOK,outlineSprite,celFill,celBall,celTones,sbTone,gradeCanvas,lookRebuild,sbSprite});
+// ================= debug: the cost of each live Storybook pass next to the Classic one (best of 9 runs, real clock)
+function lookBench(n){
+  n=n||20; const now=window.__realNow||(()=>performance.now()), r={}, sb0=LOOK.sb, t=G?G.time:0;
+  // canvas drawing is deferred: a 1 px readback makes the browser really paint before the clock stops
+  const flush=()=>{ try{ ctx.getImageData(0,0,1,1); }catch(e){} };
+  const tm=(f,k)=>{ let best=1e9; flush(); for(let rep=0;rep<9;rep++){ const t0=now(); for(let i=0;i<k;i++) f(); flush(); best=Math.min(best,(now()-t0)/k); } return +best.toFixed(3); };
+  const world=()=>ctx.setTransform(DPR*zoom,0,0,DPR*zoom,-cam.x*zoom*DPR,-cam.y*zoom*DPR);
+  const vis=[]; for(let cx=Math.floor(cam.x/CH);cx<=Math.floor((cam.x+W/zoom)/CH);cx++) for(let cy=Math.floor(cam.y/CH);cy<=Math.floor((cam.y+H/zoom)/CH);cy++) vis.push([cx,cy]);
+  ctx.save(); world();
+  r.clouds=tm(()=>lookClouds(t),n);
+  r.foam=tm(()=>lookFoam(vis,t),n);
+  const sts=STRUCTS.filter(s=>s.k!=='wall'&&inView(s.x,s.y,100)&&!['house','forge','library','cavemouth','column','glowshroom'].includes(s.k));
+  r.structs_n=sts.length;
+  LOOK.sb=true; r.structs_sb=tm(()=>{ for(const s of sts) drawStruct(s,t); },n);
+  LOOK.off.structs=true; r.structs_classic=tm(()=>{ for(const s of sts) drawStruct(s,t); },n); LOOK.off.structs=false;
+  LOOK.sb=true; T3.ol=true; r.figs40_sb=tm(()=>t3Bench(40),3); T3.ol=false; r.figs40_sb_no_outline=tm(()=>t3Bench(40),3); T3.ol=true;
+  LOOK.sb=false; r.figs40_classic=tm(()=>t3Bench(40),3);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  LOOK.sb=true; r.hud_sb=tm(()=>drawHUD(),n); LOOK.sb=false; r.hud_classic=tm(()=>drawHUD(),n);
+  LOOK.sb=sb0; ctx.restore();
+  r.render=tm(()=>render(),3);
+  return r;
+}
+// debug: one whole frame, painted for real (best of 9)
+function lookRenderBench(n){ const now=window.__realNow||(()=>performance.now()), fl=()=>{ try{ ctx.getImageData(0,0,1,1); }catch(e){} }; let best=1e9; fl(); for(let r=0;r<9;r++){ const t0=now(); for(let i=0;i<(n||3);i++) render(); fl(); best=Math.min(best,(now()-t0)/(n||3)); } return +best.toFixed(2); }
+
+window.__ebX=Object.assign(window.__ebX||{},{setLook,getLook:()=>LOOK.sb?'storybook':'classic',LOOK,outlineSprite,celFill,celBall,celTones,sbTone,gradeCanvas,lookRebuild,sbSprite,lookBench,lookRenderBench});

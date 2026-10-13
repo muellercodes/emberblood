@@ -68,7 +68,7 @@ const SHL={cv:null,g:null,ox:0,oy:0,q:0.3,key:'',redraws:0,ups:0,big:null,bg:nul
 function silOf(sp){
   if(sp._sil) return sp._sil;
   const c=mkCanvas(sp.width*0.25,sp.height*0.25), g=c.getContext('2d');
-  g.drawImage(sp,0,0,c.width,c.height); g.globalCompositeOperation='source-in'; g.fillStyle='#000'; g.fillRect(0,0,c.width,c.height);
+  g.drawImage(sp,0,0,c.width,c.height); g.globalCompositeOperation='source-in'; g.fillStyle=LOOK.sb?'#2e1838':'#000'; g.fillRect(0,0,c.width,c.height);
   sp._sil=c; return c;
 }
 function hull(P){
@@ -146,7 +146,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     for(const p of arr){ if(p.taken||!TREEH[p.k]||!inR(p.x,p.y,p.R+90)) continue; trees.push(p); }
   }
   // tree trunks (one path), then canopy shaped shadows stretched along the sun
-  g.globalAlpha=0.85; g.strokeStyle='#000'; g.lineCap='round';
+  g.globalAlpha=0.85; g.strokeStyle=LOOK.sb?'#2e1838':'#000'; g.lineCap='round';
   g.beginPath(); for(const p of trees){ const h=TREEH[p.k]*p.s*0.8; g.moveTo(p.x,p.y); g.lineTo(p.x+ux*h,p.y+uy*h); } g.lineWidth=7; g.stroke();
   g.globalAlpha=1;
   for(const p of trees){
@@ -163,7 +163,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     const m=stretchM(phi,e,0); g.globalAlpha=1; g.setTransform(q*m[0],q*m[1],q*m[2],q*m[3],(sx-ox)*q,(sy-oy)*q); g.drawImage(sil,-hh,-hh,hh*2,hh*2);
     T(0,0); g.globalAlpha=0.9; g.drawImage(SH,b.x-40,b.y-24,80,48); }
   // houses: the footprint pushed along the sun (a box of the house height), softened by the low resolution
-  T(0,0); g.globalAlpha=1; g.fillStyle='#000';
+  T(0,0); g.globalAlpha=1; g.fillStyle=LOOK.sb?'#2e1838':'#000';
   const mk=curMap();
   for(const h of mapList(HOUSES,mk)){
     if(!inR(h.x,h.y,h.w+120)) continue;

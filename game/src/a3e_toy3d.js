@@ -158,11 +158,12 @@ function t3End(){
 // round stroke. Inner borders stay clean, only the outside of the toy gets the bold line. T3.ow is the width in world px.
 T3.ow=1.25;
 function t3Outline(g,list,n,m,ox,oy,k){
-  const w=T3.ow*k, ct=T3.ct; let polys=false;
+  const w=T3.ow*k, ct=T3.ct, tiny=1.7*k; let polys=false;
   g.setTransform(m); g.fillStyle=SBC.outline; g.beginPath();
   for(let i=0;i<n;i++){
     const p=list[i];
-    if(p.t===0){ const cx=ox+p.sx, cy=oy+p.sy, rx=p.s1+w, ry=p.s2+w; g.moveTo(cx+Math.cos(p.ang)*rx,cy+Math.sin(p.ang)*rx); g.ellipse(cx,cy,rx,ry,p.ang,0,TAU); }
+    // tiny blobs (cheeks, studs, knuckles) sit inside bigger parts: they add nothing to the silhouette, so skip them
+    if(p.t===0){ if(p.s1<tiny) continue; const cx=ox+p.sx, cy=oy+p.sy, rx=p.s1+w, ry=p.s2+w; g.moveTo(cx+Math.cos(p.ang)*rx,cy+Math.sin(p.ang)*rx); g.ellipse(cx,cy,rx,ry,p.ang,0,TAU); }
     else if(p.t===1||p.t===5){
       const ax=ox+p.ax, ay=oy+p.ay, bx=ox+p.bx, by=oy+p.by, dx=bx-ax, dy=by-ay, len=Math.hypot(dx,dy), an=Math.atan2(dy,dx);
       const r1=p.r1+w, r2=(p.t===5?p.r1:p.r2)+w;
