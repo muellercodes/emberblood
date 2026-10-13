@@ -1282,13 +1282,17 @@ function gloomAI(e,dt,p){
   // phase 1: flying; the moonbeam from the mirrors knocks it down
   e.z=lerp(e.z,60,Math.min(1,dt*2));
   if(R&&R.beam&&e.beamCd<=0){ for(const s of R.beam){ if(segD(e.x,e.y,s[0],s[1],s[2],s[3])<e.r){ gloomDown(e,byDiff(3.4,3,2.6),S('The moonbeam! It falls!','The moonlight got it!')); return; } } }
+  // moths love light: once the moonbeam runs all the way round, it cannot keep away from it for long
+  const full=R&&R.beam&&R.beam.length>=5; e.lureT=full?(e.lureT||0)+dt:0;
+  if(full&&e.lureT>byDiff(8,11,14)&&!e.mv&&e.state==='chase'){ const s=R.beam[1+((e.lureN=(e.lureN||0)+1)%(R.beam.length-1))]; e.lureT=0; e.lure={x:(s[0]+s[2])/2,y:(s[1]+s[3])/2,t:4}; }
+  if(e.lure){ e.lure.t-=dt; if(e.lure.t<=0) e.lure=null; }
   GLOOM_BRAIN(e,dt,p);
-  if(!e.mv&&e.state==='chase') gloomOrbit(e,dt,R,C,0.8);
+  if(!e.mv&&e.state==='chase'){ if(e.lure){ steer(e,e.lure.x,e.lure.y,e.speed*0.9*foeDiff().spd); e.noClip=true; if(Math.hypot(e.dx,e.dy)>5) e.face=turnTo(e.face,Math.atan2(e.dy,e.dx),3*dt); } else gloomOrbit(e,dt,R,C,0.8); }
   bossCad(e,1);
 }
 function gloomOrbit(e,dt,R,C,k){ const D=foeDiff(), cx=R?R.R.cx:C.cx, cy=R?R.R.cy:C.cy, dx=R?R.dx:C.R*0.6, dy=R?R.dy:C.R*0.5;
   e.orb+=dt*0.55*D.spd; const rr=0.7+0.6*(0.5+0.5*Math.sin(e.orb*1.7)); steer(e,cx+Math.cos(e.orb)*dx*rr,cy+Math.sin(e.orb)*dy*rr,e.speed*k*D.spd); if(Math.hypot(e.dx,e.dy)>5) e.face=turnTo(e.face,Math.atan2(e.dy,e.dx),3*dt); e.noClip=true; }
-function gloomDown(e,t,txt){ e.gates=e.gates||[0,0,0]; e.gates[e.bph||0]++; e.mv=null; e.tele=null; e.downT=t; e.sunk=false; e.state='stuck'; shake(9); SFX.play('boom'); c1Txt(e,txt,'#ffe066',16); emit(e.x,e.y,30,{col:'230,225,245',glow:false,smin:40,smax:200,lmin:.5,lmax:1,zmin:2,zmax:5,grow:6}); }
+function gloomDown(e,t,txt){ e.gates=e.gates||[0,0,0]; e.gates[e.bph||0]++; e.lure=null; e.lureT=0; e.mv=null; e.tele=null; e.downT=t; e.sunk=false; e.state='stuck'; shake(9); SFX.play('boom'); c1Txt(e,txt,'#ffe066',16); emit(e.x,e.y,30,{col:'230,225,245',glow:false,smin:40,smax:200,lmin:.5,lmax:1,zmin:2,zmax:5,grow:6}); }
 // phase 2: sink into the shadow, move under the glass, rise with a swipe; a Shadow Dash into the shadow knocks it out
 function gloomShadow(e,dt,d,a,R,C){
   const p=player, D=foeDiff(); e.mst=(e.mst||0)+dt;
