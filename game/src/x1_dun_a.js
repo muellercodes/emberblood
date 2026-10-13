@@ -133,7 +133,7 @@ const D1A_G={
   k:['##......:::::##','#.......:::::::','#.......::ⅱⅱⅱ::','#..X....::ⅱHⅱ::','........::ⅱⅱⅱ::','........:::::::','........:::::::','##......:::::##','###..ⅲ³³³ⅲ..###','###..ⅲⅲⅲⅲⅲ..###','####.ⅲⅲⅲⅲⅲ.####'],
   l:['###ⅱⅱⅱⅱYⅱⅱⅱ####','###ⅱⅱⅱⅱⅱⅱⅱⅱ####','##...........##','#..aaa...aaa..#','#..aYa...aYa...','#..aaa.X.aaa...','#..............','#.....²²²......','##....²²²....##','###.........###','####.......####'],
   m:['####.......####','###..=====..###','##..==X====..##','#...===/===...#','...............','.......00......','.......00......','#.............#','##.*.......*.##','###.........###','####.......####'],
-  z:['####.......####','###...*.*...###','##...........##','#.............#','.......u......#','...............','..............#','#.............#','##..¶.....◎..##','###.........###','####.......####']
+  z:['####.......####','###...*.*...###','##...........##','#.............#','.......u......#','...............','..............#','#......X......#','##..¶.....◎..##','###.........###','####.......####']
 };
 // the Drowned Lagoon: x1_foes' lagoon (climbable ledges for the surge) with a rope up to the Crab Pools in the corner
 const D1A_GB=(typeof C1_TPL!=='undefined'&&C1_TPL.lagoon?C1_TPL.lagoon:Array.from({length:23},()=>'.'.repeat(31))).map((r,j)=>j===21?r.slice(0,1)+'}'+r.slice(2):r);
@@ -152,7 +152,7 @@ const D1A_W={
   l:['###############','##◐###◐####◐###','##o###o####o###','#.............#','#.♨...♨....♨...','#..............','#..............','#..###...###..#','#..#s#...#.#..#','#.............#','###############'],
   m:['####ⅱⅱⅱXⅱⅱⅱ####','...‗ⅱⅱⅱⅱⅱⅱⅱ#...','...#ⅱⅱⅱⅱⅱⅱⅱ#...','...ooooooooo...','...ooooooooo...','...ooooooooo...','...ooooooooo...','...ooooooooo...','...ooooooooo...','...............','...............'],
   n:['####.......####','###.........###','##..*.....*..##','#.............#','#....s........#','#.............#','#.............#','#.............#','##...........##','###.........###','###############'],
-  z:['###############','#...*.....*...#','#.............#','#.....u.......#','...............','...............','...........¶...','#.............#','#..◎..........#','#.............#','###############']
+  z:['###############','#...*.....*...#','#.............#','#.....u.......#','...............','...............','......X....¶...','#.............#','#..◎..........#','#.............#','###############']
 };
 // the Drive Pit: x1_foes' open round pit, with the long stair up to the Great Boilers
 const D1A_WB=(typeof C1_TPL!=='undefined'&&C1_TPL.pit?C1_TPL.pit:Array.from({length:23},()=>'.'.repeat(31))).map((r,j)=>j===8?r.slice(0,29)+'<'+r.slice(30):r);
@@ -175,14 +175,14 @@ defineDungeon('c_gullcrag',{name:S('The Gullcrag Caves','The Gullcrag Caves'),le
     {id:'2',name:S('The High Galleries','The High Galleries'),map:{rooms:{
       h:{at:[1,1],kind:'free',tpl:D1A_G.h,foes:[['c_gull',3]],deep:true,climbTo:'c_gullcrag',climbDir:'down',climbArrive:'g',noPots:true,noDecor:true,sign:null},
       i:{at:[0,1],kind:'miniboss',c1boss:'c_brute',tpl:D1A_G.i,noPots:true,noDecor:true},
-      l:{at:[0,0],kind:'eyes',tpl:D1A_G.l,loot:['heart'],sealChest:true,highEye:[7,0],noPots:true,sealText:S(`The chest is held shut by three stone eyes. Wake them all with arrows.`,`Wake the three eyes with arrows.`)},
+      l:{at:[0,0],kind:'eyes',tpl:D1A_G.l,loot:['treasure+potion'],sealChest:true,highEye:[7,0],noPots:true,sealText:S(`The chest is held shut by three stone eyes. Wake them all with arrows.`,`Wake the three eyes with arrows.`)},
       m:{at:[1,0],kind:'d1atilt',tpl:D1A_G.m,loot:['bkey'],tilt:['j','l'],hatch:true,below:'c_gullcrag_0',noPots:true,sealText:S(`The great chest is jammed on the high side of the tilted wreck. It will not budge. Something needs to level this old ship.`,`It is stuck on the tilted ship.`)},
       j:{at:[2,1],kind:'d1acistern',tpl:D1A_G.j,bell:'high',cistern:true,deep:true,climbTo:'c_gullcrag',climbDir:'down',climbArrive:'e',acc:['slash','spear','hammer','daggers'],noPots:true,noDecor:true},
       k:{at:[2,0],kind:'switches',tpl:D1A_G.k,loot:['dmap'],acc:['boomerang','whip'],window:true,noPots:true,sign:null}},
       links:[['h','i','open',{lvl:3}],['i','l','gate:i'],['l','m','open'],['h','j','open',{lvl:3}],['j','k','gate:j',{lvl:3}],['k','m','gate:k']]}},
     {id:'0',name:S('The Drowned Lagoon','The Drowned Lagoon'),map:{rooms:{
       B:{at:[0,0],span:[2,2],kind:'boss',c1boss:'c_pinch',tpl:D1A_GB,noPots:true,noDecor:true,climbTo:'c_gullcrag',climbDir:'up',climbArrive:'c',climbCell:[6,8]},
-      z:{at:[2,1],kind:'reward',tpl:D1A_G.z,page:2,cradle:true,noPots:true}},
+      z:{at:[2,1],kind:'reward',tpl:D1A_G.z,loot:['heart'],page:2,cradle:true,noPots:true}},
       links:[['B','z','gate:B']]}}
   ]});
 defineDungeon('c_brassworks',{name:S('The Brassworks','The Brassworks'),level:11,theme:'c_brass',seed:5203,save:'c_brassworks',dark:0.35,
@@ -205,14 +205,14 @@ defineDungeon('c_brassworks',{name:S('The Brassworks','The Brassworks'),level:11
         pistons:[{at:[1,5],dir:'e',len:3,per:3.4,ph:0},{at:[13,8],dir:'w',len:3,per:3.4,ph:1.7}],rings:[{at:[7,5]}],noPots:true,noDecor:true}},
       links:[['e','f','open'],['e','g','lock'],['g','h','gate:g'],['h','i','gate:h'],['e','i','gate:h'],['i','j','gate:i']]}},
     {id:'1',name:S('The Boiler Deck','The Boiler Deck'),map:{rooms:{
-      k:{at:[1,0],kind:'free',tpl:D1A_W.k,loot:['heart'],stairGate:{type:'boss',look:'stair'},boiler:{face:[[8,2],[9,2],[10,2]],top:[9,1]},trolley:{a:[1.5,3.4],b:[13.5,3.4],per:7,to:[9,1],near:1.2},noPots:true,noDecor:true},
+      k:{at:[1,0],kind:'free',tpl:D1A_W.k,loot:['treasure+potion'],stairGate:{type:'boss',look:'stair'},boiler:{face:[[8,2],[9,2],[10,2]],top:[9,1]},trolley:{a:[1.5,3.4],b:[13.5,3.4],per:7,to:[9,1],near:1.2},noPots:true,noDecor:true},
       l:{at:[0,0],kind:'d1apipes',tpl:D1A_W.l,code:['L','R','L'],jets:[{v:0,when:'R'},{v:1,when:'L'},{v:2,when:'R'}],acc:['boomerang','arrow','whip'],noPots:true,noDecor:true,sign:S(`A dented lunch box with a name on the lid: "PEARL". Painted inside: "MONDAY: LEFT, RIGHT, LEFT." Under it, smaller: "Tuesday: soup."`,`A lunch box. Inside: "MONDAY: LEFT, RIGHT, LEFT."`)},
       m:{at:[2,0],kind:'free',tpl:D1A_W.m,loot:['bkey'],wheel:{c:[7,5.7],r:3.6,n:4,per:13},noPots:true,noDecor:true},
       n:{at:[2,1],kind:'secret',tpl:D1A_W.n,loot:['ore','coins'],soldier:true,sign:S(`An old tin soldier, sitting very straight. A note is pinned to his chest: "The third Bob was here. He went funny. - A friend."`,`A tin soldier. A note: "The third Bob went funny."`)}},
       links:[['k','l','open'],['k','m','gate:l'],['m','n','crack']]}},
     {id:'0',name:S('The Deep','The Deep'),map:{rooms:{
       B:{at:[0,0],span:[2,2],kind:'boss',c1boss:'c_ticktock',tpl:D1A_WB,noPots:true,noDecor:true},
-      z:{at:[2,1],kind:'reward',tpl:D1A_W.z,page:4,workshop:true,noPots:true}},
+      z:{at:[2,1],kind:'reward',tpl:D1A_W.z,loot:['heart'],page:4,workshop:true,noPots:true}},
       links:[['B','z','gate:B']]}}
   ]});
 STORY.trial_c_gullcrag_shrine=null; STORY.trial_c_brassworks_shrine=null;   // Pearl's shrine story is played by d1aOnRoom / the shrine itself
@@ -323,6 +323,11 @@ function d1aBuild(A,def){
   }
   d1aBeltCache(A);
   d1aDecor(A,def);
+  // Pearl's statue, cushion, cradle and lever (the Trials' prompts talk about Ember's flame)
+  const gull=root==='c_gullcrag', SH=D1A_SHRINE[root];
+  for(const o of A.objs){
+    if(o.tobj==='shrine') o.prompt=()=>!hasAbil(SH.abil)?(gull?S(`Touch the statue's hand`,`Touch the statue's hand`):S('Look at the velvet cushion','Look at the cushion')):(gull?S(`Rest by Pearl's statue`,`Rest by the statue`):S(`Rest by Pearl's cushion`,`Rest by the cushion`));
+    if(o.tobj==='altar') o.prompt=()=>trialDone(root)?(gull?S(`Look at Pearl's cradle`,`Look at the cradle`):S('Look at the great lever','Look at the lever')):(gull?S(`Touch Pearl's cradle`,`Touch the cradle`):S('Pull the great lever','Pull the lever')); }
   refreshCaveGates();
   // after Pearl's statue gave the claws, arriving on the High Galleries opens the grate in the Tide Hall for good
   if(root==='c_gullcrag'&&def.floor==='2'&&hasAbil('claws')) G.found['cv_c_gullcrag_g_solved']=true;
@@ -619,7 +624,12 @@ function d1aWarp(A,o){
 { const base=taunt; taunt=function(who,text){ if(who==='ember'&&d1aIn()&&AREA.rooms&&(AREA.curRoom||{}).kind==='reward') return base('c_pearl',pick([S(`Well done, dear. The altar's yours. Go on.`,`Well done! Touch the altar.`),S(`That's the hard part over. Mostly.`,`The hard part is over. Mostly.`)])); return base(who,text); }; }
 { const base=showCard; showCard=function(num,name){ if(d1aIn()&&String(num)==='Trial complete') num=S('Dungeon complete','Done!'); return base(num,name); }; }
 { const base=trialObjAct; trialObjAct=function(o){
-    const A=AREA; if(A&&A.d1a&&o&&o.tobj==='shrine'){ const SH=D1A_SHRINE[dunRoot(A.def.id)];
+    const A=AREA;
+    // the end chest first: the altar (and the Brassworks lever, which carries Ash outside) waits for the Heart Ember
+    if(A&&A.d1a&&o&&o.tobj==='altar'&&!trialDone(A.d1a.root)){ const ch=A.objs.find(q=>q.tobj==='dchest'&&q.kind==='heart'&&q.room===o.room&&!G.found[q.id]);
+      if(ch){ d1aSay([['c_pearl',S(`Not so fast, dear. Open the big chest first. It's yours.`,`Open the big chest first! It's yours.`)]]); return true; } }
+    if(A&&A.d1a&&o&&o.tobj==='altar'&&trialDone(A.d1a.root)){ d1aSay([A.d1a.root==='c_gullcrag'?S(`Pearl's cradle rocks gently, all by itself. The warp by the wall still glows, whenever you are ready to go.`,`The cradle rocks gently. The warp still glows.`):S(`The great lever is down and the drive hums. Far above, the Great Clock ticks. The warp in the corner still glows.`,`The lever is down. The clock is awake! The warp still glows.`)]); return true; }
+    if(A&&A.d1a&&o&&o.tobj==='shrine'){ const SH=D1A_SHRINE[dunRoot(A.def.id)];
       if(SH&&!hasAbil(SH.abil)&&!d1aSeen(SH.key)&&STORY[SH.key]){ d1aPlay(SH.key,()=>{ scene='play'; base(o); }); return true; } const TI=trialInfo(dunRoot(A.def.id)); if(TI&&TI.abil&&hasAbil(TI.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine');
       d1aSay([A.d1a.root==='c_gullcrag'?S(`Pearl's statue holds out her stone hand. It feels warm, somehow. (Health and draughts restored.)`,`The statue's hand is warm. (You feel better!)`):S(`Pearl's velvet cushion. It smells of oil and old adventures. (Health and draughts restored.)`,`A soft cushion. (You feel better!)`)]); return true; } }
     return base.apply(this,arguments); }; }
@@ -727,6 +737,14 @@ function d1aPaint(A,def){
       g.strokeStyle=d1aOL(); g.lineWidth=3; rrect(g,x,y,ww,hh,10); g.stroke(); g.strokeStyle='#5c7486'; g.lineWidth=2; g.beginPath(); g.moveTo(x+ww/2,y); g.lineTo(x+ww/2,y+hh); g.stroke(); }
     if(R.nests) for(let n=0;n<5;n++){ const i=R.ox+1+Math.floor(rng()*R.iw), j=R.oy+1+Math.floor(rng()*R.ih), k=j*w+i; if(c.typ[k]!==TY.high) continue; const x=i*cs+cs/2, y=j*cs+cs/2; g.fillStyle='#8a6a3a'; g.beginPath(); g.ellipse(x,y,13,8,0,0,TAU); g.fill(); g.strokeStyle='#5a4220'; g.lineWidth=1.5; for(let s=0;s<6;s++){ g.beginPath(); g.moveTo(x-12+s*4,y-5); g.lineTo(x-8+s*4,y+6); g.stroke(); } g.fillStyle='#f4f0e4'; for(const dx of [-4,3]){ g.beginPath(); g.ellipse(x+dx,y-1,3.4,4.2,0,0,TAU); g.fill(); } }
     if(R.workshop){ for(let n=0;n<3;n++){ const x=X0+cs*(2+n*4), y=Y0-cs*0.85; g.fillStyle='#f4ecd8'; g.fillRect(x,y,cs*1.4,cs*0.7); g.strokeStyle='#6a4a2a'; g.lineWidth=1.5; g.strokeRect(x,y,cs*1.4,cs*0.7); g.strokeStyle='#3a5a8a'; g.lineWidth=1.4; g.beginPath(); if(n===0){ g.arc(x+cs*0.7,y+cs*0.35,10,0,TAU); g.moveTo(x+cs*0.7,y+cs*0.35); g.lineTo(x+cs*0.7,y+cs*0.18); } else if(n===1){ g.moveTo(x+cs*0.5,y+cs*0.6); g.lineTo(x+cs*0.7,y+cs*0.1); g.lineTo(x+cs*0.9,y+cs*0.6); } else { g.moveTo(x+12,y+cs*0.5); g.quadraticCurveTo(x+cs*0.7,y,x+cs*1.2,y+cs*0.45); } g.stroke(); } }
+    if(R.kind==='d1atilt'){ // the wreck jammed into the roof: its deck is the raised floor, its ribs hang from the north wall
+      for(let j=R.oy+1;j<=R.oy+R.ih;j++) for(let i=R.ox+1;i<=R.ox+R.iw;i++){ const k=j*w+i; if(c.grid[k]!==0||H(k)<1) continue; const x=i*cs, y=j*cs;
+        g.fillStyle=(i+j)%2?'#9a6a3c':'#93643a'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(58,30,20,.45)'; for(let n=1;n<4;n++) g.fillRect(x,y+n*cs/4-0.7,cs,1.4);
+        g.fillStyle='rgba(255,226,170,.16)'; for(let n=0;n<4;n++) g.fillRect(x+2,y+n*cs/4+1,cs-4,1.4); g.fillStyle='#4a3020'; for(let n=0;n<4;n++){ g.beginPath(); g.arc(x+((n*13+i*7)%cs),y+n*cs/4+cs/8,1.3,0,TAU); g.fill(); }
+        for(const [q,side] of [[k-w,'n'],[k-1,'w'],[k+1,'e']]){ if(H(q)>=1) continue; g.fillStyle='#5a3a22'; if(side==='n') g.fillRect(x,y,cs,6); else if(side==='w') g.fillRect(x,y,6,cs); else g.fillRect(x+cs-6,y,6,cs); g.fillStyle='#c89a5a'; if(side==='n') g.fillRect(x,y,cs,2); else if(side==='w') g.fillRect(x,y,2,cs); else g.fillRect(x+cs-2,y,2,cs); } }
+      g.lineCap='round'; for(let n=0;n<6;n++){ const x=X0+cs*(3.4+n*1.6), y=Y0-cs*0.9; for(const [lw,col] of [[9,'#2a1a12'],[5.5,'#7a5030']]){ g.strokeStyle=col; g.lineWidth=lw; g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x+(n<3?-10:10),y+cs*0.55,x+(n<3?-4:4),y+cs*1.05); g.stroke(); } }
+      const mx=X0+cs*9.5, my=Y0+cs*1.4; g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(mx+4,my+8,16,7,0,0,TAU); g.fill(); g.fillStyle='#5a3a22'; g.beginPath(); g.ellipse(mx,my,13,9,0,0,TAU); g.fill(); g.fillStyle='#8a5a32'; g.beginPath(); g.ellipse(mx,my-3,11,7,0,0,TAU); g.fill(); g.strokeStyle='#4a3020'; g.lineWidth=1.2; for(let r=3;r<10;r+=3){ g.beginPath(); g.ellipse(mx,my-3,r,r*0.6,0,0,TAU); g.stroke(); }
+      g.strokeStyle='#c8b080'; g.lineWidth=2.4; g.beginPath(); for(let a=0;a<TAU*2.2;a+=0.3){ const rr=4+a*1.6; g.lineTo(X0+cs*4.4+Math.cos(a)*rr,Y0+cs*1.6+Math.sin(a)*rr*0.6); } g.stroke(); }
     if(R.c1boss==='c_pinch'){ const W0=R.iw*cs, H0=R.ih*cs;
       for(let n=0;n<5;n++){ let px=X0+W0*(0.12+n*0.19), py=Y0+H0*0.18; g.strokeStyle='rgba(110,84,52,.32)'; g.lineWidth=16+rng()*10; g.lineCap='round'; g.beginPath(); g.moveTo(px,py); for(let q=0;q<5;q++){ px+=(rng()-0.5)*90; py+=H0*0.15; g.lineTo(px,py); } g.stroke(); g.strokeStyle='rgba(220,236,236,.18)'; g.lineWidth=2; g.stroke(); }
       for(let n=0;n<9;n++){ const px=X0+W0*(0.1+rng()*0.8), py=Y0+H0*(0.2+rng()*0.7); g.fillStyle='rgba(60,110,140,.35)'; g.beginPath(); g.ellipse(px,py,18+rng()*26,8+rng()*10,rng()*0.6,0,TAU); g.fill(); g.fillStyle='rgba(230,248,255,.35)'; g.beginPath(); g.ellipse(px-6,py-3,8,2,0,0,TAU); g.fill(); }
@@ -763,6 +781,11 @@ function d1aFloor(A,t){
     for(let n=0;n<6;n++){ const x=R.x0+((t*40+n*97)%(R.x1-R.x0)), y=R.y0+60+((n*53)%Math.max(60,R.y1-R.y0-90)); ctx.strokeStyle=`rgba(220,245,255,${0.25*a})`; ctx.lineWidth=1.5; ctx.beginPath(); ctx.ellipse(x,y,18,4,0,0,TAU); ctx.stroke(); } }
   // high water swirls in the round rooms
   if(hi) for(const id in A.rooms){ const R=A.rooms[id]; if(!R.swirl||!inView(R.cx,R.cy,400)) continue; for(let n=0;n<10;n++){ const a=t*0.5+n*TAU/10, rr=150+((n*37)%120); ctx.strokeStyle=`rgba(220,245,255,${0.22*tf})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(R.cx,R.cy,rr,a,a+0.5); ctx.stroke(); } }
+  // the tilted wreck: until it levels, its deck slopes into shadow and two ropes creak from the roof
+  for(const id in A.rooms){ const R=A.rooms[id]; if(R.kind!=='d1atilt'||!inView(R.cx,R.cy,500)) continue; const f=R.solved?Math.max(0,1-(X.tiltT||0)):1; if(f<=0.01) continue;
+    const x0=A.x0+(R.ox+1+3)*cs, x1=A.x0+(R.ox+1+12)*cs, y0=A.y0+(R.oy+1)*cs, y1=A.y0+(R.oy+1+3)*cs, gr=ctx.createLinearGradient(x0,0,x1,0); gr.addColorStop(0,'rgba(255,240,200,0)'); gr.addColorStop(1,`rgba(40,20,30,${0.42*f})`); ctx.fillStyle=gr; ctx.fillRect(x0,y0,x1-x0,y1-y0);
+    for(const [rx,ph] of [[x0+cs*1.4,0],[x1-cs*1.2,1.7]]){ const sw=Math.sin(t*1.3+ph)*6*f, by=y0+cs*1.6+(rx>x0+cs*3?cs*0.35*f:0); ctx.strokeStyle=d1aOL(); ctx.lineWidth=3.4; ctx.beginPath(); ctx.moveTo(rx,y0-cs*0.6); ctx.quadraticCurveTo(rx+sw,y0+cs*0.4,rx+sw*0.5,by); ctx.stroke(); ctx.strokeStyle='#d8c090'; ctx.lineWidth=1.8; ctx.beginPath(); ctx.moveTo(rx,y0-cs*0.6); ctx.quadraticCurveTo(rx+sw,y0+cs*0.4,rx+sw*0.5,by); ctx.stroke(); }
+    if(!R.solved&&Math.random()<0.02) emit(x0+rand(0,x1-x0),y0+rand(0,cs),1,{col:'150,120,90',glow:false,ang:Math.PI/2,spread:0.3,smin:20,smax:50,lmin:.4,lmax:.8,zmin:2,zmax:4}); }
   // the gear bridge
   if(X.gear&&inView(X.gear.x,X.gear.y,300)) d1aDrawGear(X.gear,t,cs);
   // steam vents and pipe jets
