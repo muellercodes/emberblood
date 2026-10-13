@@ -160,8 +160,10 @@ function dunPendingFloor(A){
 }
 
 // ---------- 6. building: rails through doorways, the new template marks, link options, guards and lifts
+// caves rebuilt by e9b_caves2.js (C2.ids) run their own mechanics; the dungeon layer leaves them alone
+function dunOwns(def){ return !(def&&typeof C2!=='undefined'&&C2.ids&&C2.ids[def.id]); }
 { const base=genCaveRooms; genCaveRooms=function(def){
-    const c=base.apply(this,arguments), w=c.w;
+    const c=base.apply(this,arguments), w=c.w; if(!dunOwns(def)) return c;
     // a mark (chest, crystal, mirror...) takes the floor around it: on a raised dais it is raised, in a basin it is basin.
     // A mine cart always stands on a rail.
     const INH=[DTY.high,DTY.basin0,DTY.terrace];
@@ -175,7 +177,7 @@ function dunPendingFloor(A){
       if(ra&&rb) for(let s=-1;s<=1;s++) c.typ[(j+s*dv[1])*w+(i+s*dv[0])]=DTY.rail;
       else { if(ra) c.typ[(j-dv[1])*w+(i-dv[0])]=DTY.rail; if(rb) c.typ[(j+dv[1])*w+(i+dv[0])]=DTY.rail; } }
     return c; }; }
-{ const base=trialBuildRoom; trialBuildRoom=function(A,def,R,ms,P,spot,freeSpot,rng){ base.apply(this,arguments); dunBuildRoom(A,def,R,ms,P,spot,freeSpot,rng); }; }
+{ const base=trialBuildRoom; trialBuildRoom=function(A,def,R,ms,P,spot,freeSpot,rng){ base.apply(this,arguments); if(dunOwns(def)) dunBuildRoom(A,def,R,ms,P,spot,freeSpot,rng); }; }
 const TIDE_TXT=[S('Strike the tide crystal (low water)','Hit the crystal (low water)'),S('Strike the tide crystal (middle water)','Hit the crystal (middle water)'),S('Strike the tide crystal (high water)','Hit the crystal (high water)')];
 function railNb(c,k){ const out=[], i=k%c.w; for(let d=0;d<4;d++){ const ni=i+DIRS[d][0]; if(ni<0||ni>=c.w) continue; const q=k+DIRS[d][0]+DIRS[d][1]*c.w; if(q>=0&&q<c.w*c.h&&isRail(c.typ[q])) out.push(d); } return out; }
 function pointPairs(nb){ const P=[]; for(const [a,b] of [[0,2],[1,3]]) if(nb.includes(a)&&nb.includes(b)) P.push([a,b]); for(let x=0;x<nb.length;x++) for(let y=x+1;y<nb.length;y++){ const a=nb[x], b=nb[y]; if((a+2)%4===b) continue; P.push([a,b]); } return P; }
@@ -219,7 +221,7 @@ function dChest(A,R,p,id,kind,gifts){
   return o;
 }
 function dChestSealed(o){ const R=AREA.rooms[o.room]; return !!(R&&(R.sealChest||SEAL_KINDS[R.kind])&&!R.solved); }
-{ const base=buildCaveRooms; buildCaveRooms=function(A,def){ base.apply(this,arguments); dunAfterBuild(A,def); }; }
+{ const base=buildCaveRooms; buildCaveRooms=function(A,def){ base.apply(this,arguments); if(dunOwns(def)) dunAfterBuild(A,def); }; }
 function rootRegrowOf(A,o){ const D=A.dn.D, rs=o.link?[A.rooms[o.link.a],A.rooms[o.link.b]]:[caveRoomAt(o.x,o.y)]; let r=null; for(const R of rs) if(R&&R.regrow!=null) r=Math.max(r||0,R.regrow); return r!=null?r:(D&&D.regrow)||0; }
 function dunAfterBuild(A,def){
   const dn=dunState(A), c=A.cave, M=CAVEMAP[def.id]||{links:[]}, cs=c.cell;

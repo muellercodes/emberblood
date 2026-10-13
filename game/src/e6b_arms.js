@@ -56,9 +56,9 @@ const asnd=(()=>{
   };
 })();
 // cached sprites
-const ASPR=new Map();
+const ARMSPR=new Map();
 // (drawn at twice the size so they stay crisp when zoomed or on sharp screens; aPut draws one at its own size)
-function aSpr(key,w,h,fn){ let c=ASPR.get(key); if(!c){ c=mkCanvas(w*2,h*2); c._w=w; c._h=h; const g=c.getContext('2d'); g.scale(2,2); g.lineJoin='round'; g.lineCap='round'; fn(g,w,h); ASPR.set(key,c); } return c; }
+function aSpr(key,w,h,fn){ let c=ARMSPR.get(key); if(!c){ c=mkCanvas(w*2,h*2); c._w=w; c._h=h; const g=c.getContext('2d'); g.scale(2,2); g.lineJoin='round'; g.lineCap='round'; fn(g,w,h); ARMSPR.set(key,c); } return c; }
 function aPut(c,x,y){ ctx.drawImage(c,x,y,c._w,c._h); }
 
 // ================================================================== Chain Whip

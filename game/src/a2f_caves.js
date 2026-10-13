@@ -294,7 +294,7 @@ function buildCaveRooms(A,def){
     if(R.reward==='key'){ R.keyAt=X; if(R.solved&&!cf(`cv_${SK}_${k}_keytaken`)) spawnKey(A,def,R); }
     if(R.npc) A.npcHere={id:R.npc,x:(spot('N')||P(R.ox+8,R.oy+4)).x,y:(spot('N')||P(R.ox+8,R.oy+4)).y};
     if(R.sign){ const p=spot('s')||P(R.ox+4,R.oy+R.ih-2); A.objs.push({k:'csign',x:p.x,y:p.y,id:`cv_${SK}_sign_${k}`,text:R.sign,r:12}); }
-    trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng);   // Trial cells and objects work in every cave
+    if(R.trial||typeof dunOwns!=='function'||dunOwns(def)) trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng);   // Trial cells and objects work in every cave (not in the e9b_caves2 caves, which bring their own)
     // decoration and pots along the walls
     const dec=CAVE_DECOR[def.theme]||'shroom', nd=R.kind==='secret'?6:R.noDecor?0:3;
     for(let n=0;n<nd;n++){ const side=Math.floor(rng()*4); let i,j; if(side===0){ i=R.ox+1+Math.floor(rng()*R.iw); j=R.oy+1; } else if(side===1){ i=R.ox+1+Math.floor(rng()*R.iw); j=R.oy+R.ih; } else if(side===2){ i=R.ox+1; j=R.oy+1+Math.floor(rng()*R.ih); } else { i=R.ox+R.iw; j=R.oy+1+Math.floor(rng()*R.ih); }
