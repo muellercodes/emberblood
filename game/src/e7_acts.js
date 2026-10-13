@@ -318,16 +318,16 @@ const FW_PLAN=[[1.6,-220,250,1],[2.0,190,300,2],[2.5,-60,330,3],[2.9,260,220,4],
 function rocketLaunch(){
   if(HS.phase!=='rocket') return;
   HS.phase='show'; HS.t=0; HS.fwNext=0; HS.crash=false; G.banner=null; G.bannerQ=[];
-  HS.rockets.push({x:HV.rocket.x,y:HV.rocket.y-26,h:0,top:fwTop(HV.rocket.y-26,0.2),v:520,col:'255,214,120',big:true,t:0});
+  HS.rockets.push({x:HV.rocket.x,y:HV.rocket.y-26,h:0,top:fwTop(HV.rocket.y-26,0.26),v:520,col:'255,214,120',big:true,t:0});
   try{ SFX.play('cast'); SFX.play('roar',0.4); }catch(e){} shake(3);
   emit(HV.rocket.x,HV.rocket.y-20,24,{col:'255,190,90',ang:-Math.PI/2,spread:0.5,smin:60,smax:220,lmin:.3,lmax:.7,zmin:1.5,zmax:3});
   const y=G.npcs.find(n=>n.id==='yara'); if(y) npcBubble(y,S(`Here we go!`,`Here we go!`));
 }
 // how high a rocket climbs so that it bursts in the upper part of the screen
-function fwTop(y0,k){ const vh=H/zoom, ty=cam.y+vh*(k!=null?k:rand(0.12,0.34)); return clamp(y0-ty,120,560); }
+function fwTop(y0,k){ const vh=H/zoom, ty=cam.y+vh*(k!=null?k:rand(0.2,0.4)); return clamp(y0-ty,120,560); }
 function fwBurst(x,y,col,big){
-  const n=big?96:64, sp=big?290:215;
-  for(let i=0;i<n;i++){ const a=i/n*TAU+rand(-0.05,0.05), s=sp*(0.75+Math.random()*0.35); HS.fw.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(1.2,1.8),max:1.8,col:i%7===0?'255,250,235':col,sz:big?4.4:3.4,gl:i%3===0}); }
+  const n=big?80:52, sp=big?290:215;
+  for(let i=0;i<n;i++){ const a=i/n*TAU+rand(-0.05,0.05), s=sp*(0.75+Math.random()*0.35); HS.fw.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(1.2,1.8),max:1.8,col:i%7===0?'255,250,235':col,sz:big?4.6:3.6,gl:i%5===0}); }
   if(big) for(let i=0;i<26;i++){ const a=rand(0,TAU), s=rand(20,90); HS.fw.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(1.4,2.2),max:2.2,col:'255,240,200',sz:2.4,tw:true}); }
   HS.pops.push({x,y,col,t:0,r:big?150:105});
   HS.flash.push({x,y:y+180,r:big?520:380,i:big?0.75:0.55,t:0,life:0.6});
@@ -477,8 +477,8 @@ function leapStart(){
 }
 function leapTick(dt){
   const T=HS.thief; HS.t+=dt;
-  if(T&&T.mode==='dive'){ T.u+=dt/1.6; const u=Math.min(1,T.u); T.x=lerp(T.ax,T.bx,u); T.y=lerp(T.ay,T.by,u); T.z=Math.sin(Math.PI*u)*60+(1-u)*6; if(u>=1){ T.onShip=true; T.mode='ship'; try{ SFX.play('block',0.5); }catch(e){} } }
-  if(HS.ship&&T&&T.onShip&&HS.t>2.1) HS.ship.vx=Math.min(95,(HS.ship.vx||0)+dt*40);
+  if(T&&T.mode==='dive'){ T.u+=dt/1.6; const u=Math.min(1,T.u); T.x=lerp(T.ax,T.bx,u); T.y=lerp(T.ay,T.by,u); T.z=Math.sin(Math.PI*u)*60+(1-u)*6; if(u>=1){ T.onShip=true; T.mode='ship'; try{ SFX.play('block',0.5); }catch(e){} bubble(T,S(`Bye bye, little dragon! Say hello to your mum!`,`Bye bye, little dragon!`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-70}); } }
+  if(HS.ship&&T&&T.onShip){ if(HS.t>2.1) HS.ship.vx=Math.min(95,(HS.ship.vx||0)+dt*40); T.x=HS.ship.x-6; T.y=HS.ship.y-12; }
   if(HS.t>2.2&&HS.t-dt<=2.2) setBanner(S(`She's gone`,`She's gone`),S('Something small and shiny rolled to your feet.','Something shiny is by your feet.'),3);
   if(HS.gear&&HS.gear.landed&&HS.t>1.2&&HS.phase==='leap') HS.phase='gear';
   HS.cam=HS.t<4?{x:2840,y:11010,k:0.55}:null;
@@ -962,7 +962,7 @@ function cliffCanvas(){
   CLIFF_CV=c; return c;
 }
 let CLIFF_COL=null;
-{ const base=genProps; genProps=function(cx,cy){ let out=base(cx,cy); if(cy*CH+CH<10000||cx*CH>CL.x1||cx*CH+CH<CL.x0) return out;
+{ const base=genProps; genProps=function(cx,cy){ let out=base(cx,cy); if(cy*CH+CH<10000||cy*CH>11000||cx*CH>CL.x1||cx*CH+CH<CL.x0) return out;
   const B=HROUTE.find(n=>n.hide).hide;
   return out.filter(p=>{ const cliff=p.y>CL.lip-34&&p.x>CL.x0+250&&p.x<CL.x1-250, hay=B.some(([x,y])=>dist2(p.x,p.y,x,y)<70*70); if(cliff||hay){ if(p.col) p.col.off=true; return false; } return true; }); }; }
 { const base=initWorld; initWorld=function(){ base(); if(!CLIFF_COL) CLIFF_COL=addCol({t:'r',x0:CL.x0+330,y0:CL.lip-4,x1:CL.x1-330,y1:11000}); }; }
