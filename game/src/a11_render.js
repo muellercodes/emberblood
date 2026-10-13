@@ -209,8 +209,8 @@ function drawLights(){
     lctx.globalCompositeOperation='destination-out';
     const Lt=(x,y,r,i)=>{ const sx=(x-cam.x)*s, sy=(y-cam.y)*s, sr=r*s; if(sx<-sr||sy<-sr||sx>lw+sr||sy>lh+sr) return; const g=lctx.createRadialGradient(sx,sy,0,sx,sy,sr); g.addColorStop(0,`rgba(0,0,0,${i})`); g.addColorStop(1,'rgba(0,0,0,0)'); lctx.fillStyle=g; lctx.fillRect(sx-sr,sy-sr,sr*2,sr*2); };
     const pr0=inA&&AREA.kind==='cave'?(AREA.plr||(G.items.lantern?470:330)):300;
-    if(!player.dead) Lt(player.x,player.y,player.breathing?pr0+80:pr0,0.95);
-    if(G.pip) Lt(G.pip.x,G.pip.y,90,0.5);
+    if(!player.dead) Lt(player.x,player.y,(player.breathing?pr0+80:pr0)*moonGlowK(),0.95);   // moonGlowK, pipGlowR: e7b_threads.js (the moon)
+    if(G.pip) Lt(G.pip.x,G.pip.y,pipGlowR(),pipGlowI());
     for(const l of lightList) Lt(l[0],l[1],l[2],l[3]);
     for(const pr of G.projectiles) Lt(pr.x,pr.y,80,0.7);
     for(const pl of G.pools) Lt(pl.x,pl.y,pl.r*2.4,0.6);
