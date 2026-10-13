@@ -88,7 +88,15 @@ function t3Grad(col,qx,qy,mode){
   const key=col+'|'+qx+'|'+qy+'|'+mode; let gr=T3G.get(key); if(gr) return gr;
   if(T3G.size>6000) T3G.clear();
   const g=ctx;
-  if(mode===0){ // ellipsoid in a unit circle
+  if(mode===2){ // Storybook ellipsoid: flat cel bands (a highlight spot, the base, a shadow crescent leaning to plum)
+    const hx=qx/10, hy=qy/10, hl=sbTone(col,0.36), sh=sbTone(col,-0.3);
+    gr=g.createRadialGradient(hx,hy,0.02,hx*0.25,hy*0.25,1.04);
+    gr.addColorStop(0,hl); gr.addColorStop(0.15,hl); gr.addColorStop(0.17,col); gr.addColorStop(0.69,col); gr.addColorStop(0.71,sh); gr.addColorStop(1,sh);
+  }else if(mode===3){ // Storybook limb: a lit stripe, the base, a shadow side
+    const R=qx/2, s=qy, hl=sbTone(col,0.32), sh=sbTone(col,-0.3);
+    gr=g.createLinearGradient(0,-R*s,0,R*s);
+    gr.addColorStop(0,hl); gr.addColorStop(0.24,hl); gr.addColorStop(0.26,col); gr.addColorStop(0.62,col); gr.addColorStop(0.64,sh); gr.addColorStop(1,sh);
+  }else if(mode===0){ // ellipsoid in a unit circle
     const hx=qx/10, hy=qy/10;
     gr=g.createRadialGradient(hx,hy,0.02,hx*0.25,hy*0.25,1.04);
     gr.addColorStop(0,t3Shade(col,0.5)); gr.addColorStop(0.2,t3Shade(col,0.2)); gr.addColorStop(0.62,col); gr.addColorStop(0.9,t3Shade(col,-0.32)); gr.addColorStop(1,t3Shade(col,-0.5));
@@ -104,21 +112,22 @@ function t3End(){
   // insertion sort (lists are short) back to front
   for(let i=1;i<n;i++){ const p=list[i]; let j=i-1; while(j>=0&&list[j].d>p.d){ list[j+1]=list[j]; j--; } list[j+1]=p; }
   const a0=g.globalAlpha; if(R.alpha!==1) g.globalAlpha=a0*R.alpha;
-  const ox=R.x, oy=R.y, fl=R.flash;
+  const ox=R.x, oy=R.y, fl=R.flash, cel=LOOK.sb;
+  if(cel&&T3.ol!==false) t3Outline(g,list,n,m,ox,oy,R.k);
   for(let i=0;i<n;i++){
     const p=list[i];
     if(p.t===0){ // ellipsoid
       const c=Math.cos(p.ang), s=Math.sin(p.ang), mr=Math.sqrt(p.s1*p.s2);
       g.setTransform(m); g.transform(c*p.s1,s*p.s1,-s*p.s2,c*p.s2,ox+p.sx,oy+p.sy);
       let hx=(c*L[0]+s*L[1])*0.46*mr/p.s1, hy=(-s*L[0]+c*L[1])*0.46*mr/p.s2; const hl=Math.hypot(hx,hy); if(hl>0.62){ hx*=0.62/hl; hy*=0.62/hl; }
-      g.fillStyle=fl?'#ffffff':t3Grad(p.col,Math.round(hx*10),Math.round(hy*10),0);
+      g.fillStyle=fl?'#ffffff':t3Grad(p.col,Math.round(hx*10),Math.round(hy*10),cel?2:0);
       g.beginPath(); g.arc(0,0,1,0,TAU); g.fill();
     }else if(p.t===1||p.t===5){ // limb, cone or line
       const dx=p.bx-p.ax, dy=p.by-p.ay, len=Math.hypot(dx,dy), an=Math.atan2(dy,dx), c=Math.cos(an), s=Math.sin(an);
       g.setTransform(m); g.transform(c,s,-s,c,ox+p.ax,oy+p.ay);
       if(p.t===5){ g.strokeStyle=fl?'#fff':p.col; g.lineWidth=p.r1*2; g.lineCap='round'; g.beginPath(); g.moveTo(0,0); g.lineTo(len,0); g.stroke(); continue; }
       const side=(-s*L[0]+c*L[1])<0?1:-1, rm=Math.max(p.r1,p.r2);
-      g.fillStyle=fl?'#ffffff':t3Grad(p.col,Math.max(1,Math.round(rm*2)),side,1);
+      g.fillStyle=fl?'#ffffff':t3Grad(p.col,Math.max(1,Math.round(rm*2)),side,cel?3:1);
       g.beginPath();
       if(len<0.5){ g.arc(0,0,rm,0,TAU); }
       else if(p.cone){ g.moveTo(0,-p.r1); g.lineTo(len,0); g.lineTo(0,p.r1); g.arc(0,0,p.r1,Math.PI/2,Math.PI*1.5); }
@@ -129,12 +138,13 @@ function t3End(){
       g.closePath(); g.fill();
     }else if(p.t===2){ // upright cylinder or frustum
       g.setTransform(m); const x=ox+p.ax, yb=oy+p.ay, yt=oy+p.by, r1=p.r1, r2=p.r2, e1=r1*T3.ct, e2=r2*T3.ct, rm=Math.max(r1,r2);
-      if(!fl){ const key=p.col+'|cyl|'+Math.round(rm); let gr=T3G.get(key); if(!gr){ gr=g.createLinearGradient(-rm,0,rm,0); gr.addColorStop(0,t3Shade(p.col,0.3)); gr.addColorStop(0.35,t3Shade(p.col,0.08)); gr.addColorStop(0.75,p.col); gr.addColorStop(1,t3Shade(p.col,-0.45)); T3G.set(key,gr); } g.translate(x,0); g.fillStyle=gr; }
+      if(!fl&&cel){ const key=p.col+'|cylc|'+Math.round(rm); let gr=T3G.get(key); if(!gr){ const hl=sbTone(p.col,0.32), sh=sbTone(p.col,-0.3); gr=g.createLinearGradient(-rm,0,rm,0); gr.addColorStop(0,hl); gr.addColorStop(0.2,hl); gr.addColorStop(0.22,p.col); gr.addColorStop(0.66,p.col); gr.addColorStop(0.68,sh); gr.addColorStop(1,sh); T3G.set(key,gr); } g.translate(x,0); g.fillStyle=gr; }
+      else if(!fl){ const key=p.col+'|cyl|'+Math.round(rm); let gr=T3G.get(key); if(!gr){ gr=g.createLinearGradient(-rm,0,rm,0); gr.addColorStop(0,t3Shade(p.col,0.3)); gr.addColorStop(0.35,t3Shade(p.col,0.08)); gr.addColorStop(0.75,p.col); gr.addColorStop(1,t3Shade(p.col,-0.45)); T3G.set(key,gr); } g.translate(x,0); g.fillStyle=gr; }
       else{ g.translate(x,0); g.fillStyle='#fff'; }
       g.beginPath(); g.moveTo(-r1,yb); g.ellipse(0,yb,r1,e1,0,Math.PI,0,true); g.lineTo(r2,yt); g.ellipse(0,yt,r2,e2,0,0,Math.PI,true); g.closePath(); g.fill();
-      if(!p.open){ g.fillStyle=fl?'#fff':(p.top||t3Shade(p.col,0.22)); g.beginPath(); g.ellipse(0,yt,r2,e2,0,0,TAU); g.fill(); }
+      if(!p.open){ g.fillStyle=fl?'#fff':(p.top||(cel?sbTone(p.col,0.26):t3Shade(p.col,0.22))); g.beginPath(); g.ellipse(0,yt,r2,e2,0,0,TAU); g.fill(); }
     }else if(p.t===3){ // panel
-      g.setTransform(m); g.fillStyle=fl?'#fff':(p.lk?t3Shade(p.col,clamp(p.lk,-0.5,0.4)):p.col);
+      g.setTransform(m); g.fillStyle=fl?'#fff':cel?(p.lk>0.1?sbTone(p.col,0.24):p.lk<-0.12?sbTone(p.col,-0.26):p.col):(p.lk?t3Shade(p.col,clamp(p.lk,-0.5,0.4)):p.col);
       const q=p.pts; g.beginPath(); g.moveTo(ox+q[0],oy+q[1]); for(let k=2;k<q.length;k+=2) g.lineTo(ox+q[k],oy+q[k+1]); g.closePath(); g.fill();
       if(p.edge){ g.strokeStyle=p.edge; g.lineWidth=0.8*R.k; g.lineJoin='round'; g.stroke(); }
     }else if(p.t===4){ // dot
@@ -142,6 +152,32 @@ function t3End(){
     }
   }
   g.setTransform(m); g.globalAlpha=a0;
+}
+// Storybook outline (e5_look): every part's silhouette grown by w goes into ONE path (all subpaths wind the same way,
+// so the nonzero fill is their union) and is filled once in the plum outline colour under the figure; flat panels get a
+// round stroke. Inner borders stay clean, only the outside of the toy gets the bold line. T3.ow is the width in world px.
+T3.ow=1.25;
+function t3Outline(g,list,n,m,ox,oy,k){
+  const w=T3.ow*k, ct=T3.ct; let polys=false;
+  g.setTransform(m); g.fillStyle=SBC.outline; g.beginPath();
+  for(let i=0;i<n;i++){
+    const p=list[i];
+    if(p.t===0){ const cx=ox+p.sx, cy=oy+p.sy, rx=p.s1+w, ry=p.s2+w; g.moveTo(cx+Math.cos(p.ang)*rx,cy+Math.sin(p.ang)*rx); g.ellipse(cx,cy,rx,ry,p.ang,0,TAU); }
+    else if(p.t===1||p.t===5){
+      const ax=ox+p.ax, ay=oy+p.ay, bx=ox+p.bx, by=oy+p.by, dx=bx-ax, dy=by-ay, len=Math.hypot(dx,dy), an=Math.atan2(dy,dx);
+      const r1=p.r1+w, r2=(p.t===5?p.r1:p.r2)+w;
+      if(len<0.5){ const r=Math.max(r1,r2); g.moveTo(ax+r,ay); g.arc(ax,ay,r,0,TAU); }
+      else if(p.cone){ const s0=an+Math.PI/2; g.moveTo(ax+Math.cos(s0)*r1,ay+Math.sin(s0)*r1); g.arc(ax,ay,r1,s0,an+Math.PI*1.5); g.lineTo(bx+Math.cos(an)*w*1.6,by+Math.sin(an)*w*1.6); g.closePath(); }
+      else{ const sn=clamp((r1-r2)/len,-0.95,0.95), al=Math.asin(sn), s0=an+Math.PI/2+al; g.moveTo(ax+Math.cos(s0)*r1,ay+Math.sin(s0)*r1); g.arc(ax,ay,r1,s0,an+Math.PI*1.5-al); g.arc(bx,by,r2,an-Math.PI/2-al,an+Math.PI/2+al); g.closePath(); }
+    }
+    else if(p.t===2){ const x=ox+p.ax, yb=oy+p.ay, yt=oy+p.by, R1=p.r1+w, R2=p.r2+w, E1=p.r1*ct+w, E2=p.r2*ct+w;
+      g.moveTo(x+R1,yb); g.ellipse(x,yb,R1,E1,0,0,Math.PI); g.lineTo(x-R2,yt); g.ellipse(x,yt,R2,E2,0,Math.PI,TAU); g.closePath(); }
+    else if(p.t===3) polys=true;
+  }
+  g.fill();
+  if(polys){ g.strokeStyle=SBC.outline; g.lineWidth=w*2; g.lineJoin='round'; g.beginPath();
+    for(let i=0;i<n;i++){ const p=list[i]; if(p.t!==3) continue; const q=p.pts; g.moveTo(ox+q[0],oy+q[1]); for(let j=2;j<q.length;j+=2) g.lineTo(ox+q[j],oy+q[j+1]); g.closePath(); }
+    g.stroke(); }
 }
 // registries: each character module adds its own drawers here (only used while T3.on)
 // T3X.ash(p)          Ash (the whole drawPlayer)            T3X.npc(n) -> true if drawn (people)

@@ -321,7 +321,7 @@ function r2Dec1(g,k,x,y0,R,r,fab){
 // objects that go into the cached room: anything with a static body that is not flagged live
 function r2Bakes(o){ return !!FB[o.k]&&!o.live; }
 function r2Base(A){
-  const S=clamp(Math.ceil(DPR*zoom*2)/2,1,2), key=A.id+'|'+S+'|'+A.rw+'x'+A.rh+'|'+A.objs.length;
+  const S=clamp(Math.ceil(DPR*zoom*2)/2,1,2), key=A.id+'|'+S+'|'+A.rw+'x'+A.rh+'|'+A.objs.length+(LOOK.sb?'|sb':'');
   if(A._r2key!==key){ A._r2key=key; for(const o of A.objs) o._r2b=r2Bakes(o); }
   if(A._base&&A._base.key===key) return A._base;
   let e=R2.base.find(q=>q.key===key);
@@ -334,6 +334,7 @@ function r2Base(A){
   for(const o of A.objs){ if(!r2Bakes(o)) continue; if(o.k==='heights'){ post.push(o); continue; } bake(o); }
   r2Clutter(g,R,A); r2Frame(g,R); if(!A.def.noExit) r2Mat(g,R); r2DecorPost(g,R); for(const o of post) bake(o);
   R.baking=false;
+  if(LOOK.sb) lookRoom(cv);
   e={key,cv,bx,by,bw,bh,flames:R.flames,glows:R.glows}; R2.base.unshift(e); if(R2.base.length>2) R2.base.length=2;
   A._base=e; return e;
 }
@@ -384,7 +385,7 @@ function r2LightSpr(){
 function drawAreaBase(){
   const A=AREA;
   ctx.fillStyle='#050403'; ctx.fillRect(A.x0-800,A.y0-800,(A.x1-A.x0)+1600,(A.y1-A.y0)+1600);
-  if(A.kind==='cave'){ ctx.drawImage(A.canvas,A.x0,A.y0,A.canvas.width/A.canvasS,A.canvas.height/A.canvasS); if(A.tri) drawTrialFloor(A,G.time); return; }
+  if(A.kind==='cave'){ ctx.drawImage(LOOK.sb?lookCave(A):A.canvas,A.x0,A.y0,A.canvas.width/A.canvasS,A.canvas.height/A.canvasS); if(A.tri) drawTrialFloor(A,G.time); return; }
   const R=r2Room(A), e=r2Base(A), t=G.time, sky=r2Sky();
   A._bk=true;
   if(!A._r2L){ A._r2L=[]; for(const f of e.flames.slice(0,4)){ const L={x:f.x,y:f.y+6,r:110,i:0,fire:true}; A.lights.push(L); A._r2L.push(L); } }

@@ -151,7 +151,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
   g.globalAlpha=1;
   for(const p of trees){
     const sp=propSprite(p), sil=silOf(sp), h=TREEH[p.k]*p.s, sx=p.x+ux*h, sy=p.y+uy*h, hh=sp.half*p.s*(p.k==='dead'?0.95:0.9);
-    const m=stretchM(phi,e,p.rot); markS(p.x,p.y,hh*e,h);
+    const m=stretchM(phi,e,LOOK.sb?0:p.rot); markS(p.x,p.y,hh*e,h);
     g.setTransform(q*m[0],q*m[1],q*m[2],q*m[3],(sx-ox)*q,(sy-oy)*q); g.drawImage(sil,-hh,-hh,hh*2,hh*2);
   }
   // contact blobs at the trunks
@@ -213,8 +213,9 @@ function drawTallLean(p,a,rot){
   ctx.globalAlpha=a;
   if(p.k==='dead'||Math.abs(dx)+Math.abs(dy)>6){
     const w0=(p.k==='dead'?8:7)*p.s, w1=w0*0.7, L=Math.hypot(dx,dy)||1, nx=-dy/L, ny=dx/L;
-    ctx.fillStyle=p.k==='dead'?(p.y<3000?'#1c1614':'#4e463c'):'#3a2a18';
+    ctx.fillStyle=LOOK.sb?(p.k==='dead'?(p.y<3000?'#4e3a38':'#8a6a4e'):'#8a5e3c'):p.k==='dead'?(p.y<3000?'#1c1614':'#4e463c'):'#3a2a18';
     ctx.beginPath(); ctx.moveTo(p.x+nx*w0,p.y+ny*w0); ctx.lineTo(p.x+dx+nx*w1,p.y+dy+ny*w1); ctx.lineTo(p.x+dx-nx*w1,p.y+dy-ny*w1); ctx.lineTo(p.x-nx*w0,p.y-ny*w0); ctx.closePath(); ctx.fill();
+    if(LOOK.sb){ ctx.strokeStyle=SBC.outline; ctx.lineWidth=1.8; ctx.lineJoin='round'; ctx.stroke(); }
   }
   drawSprite(sp,p.x+dx,p.y+dy,p.s,rot);
 }
@@ -231,7 +232,7 @@ function drawTallProps(props,t,bossE){
   TALLS.sort((a,b)=>a.y-b.y);
   const halo=DV.full&&!DV.lite&&!DSKIP.halo, ha=AREA?0:0.16+0.1*daylight();
   for(const p of TALLS){
-    const h=TREEH[p.k]*p.s, dx=leanDX(p.x,h), dy=leanDY(p.y,h), a=tallFade(p,dx,dy,bossE), rot=Math.sin(t*0.8+p.ph)*0.025*(1+G.rainK*1.5)+p.rot;
+    const h=TREEH[p.k]*p.s, dx=leanDX(p.x,h), dy=leanDY(p.y,h), a=tallFade(p,dx,dy,bossE), rot=Math.sin(t*0.8+p.ph)*0.025*(1+G.rainK*1.5)+(LOOK.sb?0:p.rot);
     if(halo&&a>0.9&&p.k!=='dead'){ const sp=propSprite(p), sil=silOf(sp), hh=sp.half*p.s*1.04; ctx.globalAlpha=ha; ctx.drawImage(sil,p.x+dx-hh+3,p.y+dy-hh+7,hh*2,hh*2); }
     drawTallLean(p,a,rot);
   }
@@ -255,9 +256,9 @@ function bigOakTrunk(s){
 function drawStoneLean(s,t){
   const k=s.s||1, h=34*k, dx=leanDX(s.x,h), dy=leanDY(s.y,h)-h*0.32;
   ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(s.a);
-  ctx.fillStyle='#3a3630'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill();
+  ctx.fillStyle=LOOK.sb?'#6c6862':'#3a3630'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); if(LOOK.sb){ ctx.strokeStyle=SBC.outline; ctx.lineWidth=1.8; ctx.stroke(); }
   ctx.restore();
-  ctx.save(); ctx.translate(s.x+dx*0.5,s.y+dy*0.5); ctx.rotate(s.a); ctx.fillStyle='#4a453e'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.translate(s.x+dx*0.5,s.y+dy*0.5); ctx.rotate(s.a); ctx.fillStyle=LOOK.sb?'#7c7872':'#4a453e'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); ctx.restore();
   drawStruct(Object.assign({},s,{x:s.x+dx,y:s.y+dy}),t);
 }
 // ---------- the Obsidian Wall: a stone face below its top, the top pushed back and splayed by the lean
@@ -353,7 +354,7 @@ function depthPost(){
   // 2) toy grade (full): a soft-light pass of the warmed, blurred frame lifts local contrast and colour by day.
   // Only the sharp middle needs it: the bands drawn next cover the rest with blur
   if(full){
-    const dl=inA?0.5:daylight(), rk=inA?0:G.rainK, ko=cave?0:(inA?0.14:0.36*dl*(1-0.5*rk));
+    const dl=inA?0.5:daylight(), rk=inA?0:G.rainK, ko=(cave?0:(inA?0.14:0.36*dl*(1-0.5*rk)))*(LOOK.sb?0.55:1);
     if(ko>0.02&&!DSKIP.orton&&!DV.lite){ const y0=Math.floor(te*s*0.3), y1=Math.ceil(bs*s+(ch-bs*s)*0.75); ctx.globalCompositeOperation='soft-light'; ctx.globalAlpha=ko; ctx.drawImage(DP.O,0,y0*k-dy*k,aw,(y1-y0)*k,dx,y0,cw,y1-y0); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1; }
   }
   // 3) tilt-shift: the mild level over the whole band, the strong level near the very edges (full)
@@ -367,7 +368,7 @@ function depthPost(){
     const tB=Math.ceil(te2*s*kk)+1, bB=Math.floor(bs2*s*kk)-1;
     ctx.drawImage(DP.Bm,0,0,bw,tB,0,0,cw,tB/kk); ctx.drawImage(DP.Bm,0,bB,bw,bh-bB,0,bB/kk,cw,(bh-bB)/kk);
     // 4) bloom: the strong blur squared (so only bright things glow), added on top at dusk, night and in caves
-    const dl=inA?0.5:daylight(), kb=cave?0.35:inA?0.08+0.25*(1-dl):(1-dl)*0.62;
+    const dl=inA?0.5:daylight(), kb=(cave?0.35:inA?0.08+0.25*(1-dl):(1-dl)*0.62)*(LOOK.sb?0.35:1);
     if(kb>0.03&&!DSKIP.bloom&&!DV.lite){ ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=kb; ctx.drawImage(DP.C,0,0,bw,bh,dx,dy,cw,ch); }
   }
   ctx.restore();

@@ -47,7 +47,7 @@ function genChunk(cx,cy){
   const at=(x,y)=>{ const i=clamp(Math.round((x-x0)/step),0,N-1), j=clamp(Math.round((y-y0)/step),0,N-1); return grid[j*N+i]; };
   const rng=mulberry32(((cx*92821)^(cy*68917)^7)|0);
   g.lineCap='round'; g.lineWidth=1.1;
-  for(let i=0;i<1500;i++){
+  if(LOOK.sb) lookDecor(g,rng,at,x0,y0); else for(let i=0;i<1500;i++){
     const x=x0+rng()*CH, y=y0+rng()*CH, s=at(x,y), r=rng();
     if(s.out||s.water||s.lava) continue;
     if(s.road>0.5){ if(r<0.25){ g.fillStyle=rng()<0.5?'rgba(60,50,40,.35)':'rgba(200,190,170,.25)'; g.beginPath(); g.arc(x,y,0.8+rng()*1.6,0,TAU); g.fill(); } continue; }
@@ -88,11 +88,12 @@ function genChunk(cx,cy){
       else if(r<0.45){ g.fillStyle=rng()<0.6?'rgba(90,80,76,.35)':'rgba(10,8,8,.4)'; g.beginPath(); g.arc(x,y,1+rng()*2,0,TAU); g.fill(); }
     }
   }
+  const lk=LOOK.sb?{}:null; if(lk) lookChunkLines(g,grid,N,step,x0,y0,lk);
   for(const dc of DECALS){ if(dc.x+(dc.r||dc.w||300)<x0||dc.x-(dc.r||dc.w||300)>x0+CH||dc.y+(dc.r||dc.h||300)<y0||dc.y-(dc.r||dc.h||300)>y0+CH) continue; drawDecal(g,dc); }
   for(const br of BRIDGES){ if(br.x+200<x0||br.x-200>x0+CH||br.y+200<y0||br.y-200>y0+CH) continue; drawBridge(g,br); }
   let glow=null;
   if(hasLava){ gg.putImageData(gimg,0,0); glow=mkCanvas(CPX/4,CPX/4); const g2=glow.getContext('2d'); g2.imageSmoothingEnabled=true; g2.drawImage(glowS,0,0,N,N,-CPX/4/(N-1)/2,-CPX/4/(N-1)/2,CPX/4+CPX/4/(N-1),CPX/4+CPX/4/(N-1)); }
-  return {cv,g,glow,hasWater,used:chunkTick};
+  return {cv,g,glow,hasWater,used:chunkTick,foam:lk?lk.foam:null};
 }
 function drawBridge(g,br){
   g.save(); g.translate(br.x,br.y); g.rotate(br.ang);
