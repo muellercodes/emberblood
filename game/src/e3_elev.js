@@ -24,7 +24,7 @@ function elvStyle(name){ return ELEV_STYLES[name]||ELEV_STYLES.rock; }
 function elvRGB(h){ return typeof h==='string'?hexRGB(h):h; }
 function elvLook(top,k,face){ const key=top+'|'+k+'|'+face; let i=ELV.lookKey.get(key); if(i==null){ i=ELV.looks.length; ELV.looks.push({top:elvRGB(top),k,face:elvRGB(face)}); ELV.lookKey.set(key,i); } return i; }
 // one elevation record per map (index k)
-function elvM(k){ let E=ELV.maps[k]; if(!E) E=ELV.maps[k]={k,plats:[],ramps:[],ledges:[],vents:[],nofly:[],posts:[],clears:[],falls:[],dirty:true,G:null}; return E; }
+function elvM(k){ let E=ELV.maps[k]; if(!E) E=ELV.maps[k]={k,plats:[],ramps:[],ledges:[],vents:[],nofly:[],posts:[],clears:[],falls:[],paths:[],dirty:true,G:null}; return E; }
 function elvDirty(E){
   E.dirty=true; E.pbb=null;
   // anything already drawn or sampled from the old grid is redrawn (only matters for features added after the start)
@@ -106,6 +106,9 @@ const ELEV={
   clear(def){ const [ax,ay]=elvAnchor(def), E=elvM(def.k!=null?def.k:elvMapOf(ax,ay)), z=elvZone(def); if(z){ E.clears.push(z); E.pbb=null; } return z; },
   // water or lava pouring over the face below (x,y): {x,y,w:28,kind:'water'|'lava'}
   fall(def){ const E=elvM(def.k!=null?def.k:elvMapOf(def.x,def.y)); const f=Object.assign({w:28,kind:'water'},def); E.falls.push(f); elvDirty(E); return f; },
+  // a trail painted on a terrace (gravel and stepping stones), kept clear of props and drawn on the maps:
+  // {pts:[[x,y],...], w:36, lvl?: the level it is painted at (default: the level under its first point)}
+  path(def){ const p0=def.pts[0], E=elvM(def.k!=null?def.k:elvMapOf(p0[0],p0[1])); const p=Object.assign({w:36},def,{i:(E.paths=E.paths||[]).length}); let b=[1e9,1e9,-1e9,-1e9]; for(const q of p.pts){ b[0]=Math.min(b[0],q[0]); b[1]=Math.min(b[1],q[1]); b[2]=Math.max(b[2],q[0]); b[3]=Math.max(b[3],q[1]); } p.bb=[b[0]-p.w,b[1]-p.w,b[2]+p.w,b[3]+p.w]; E.paths.push(p); ELEV.clear({k:E.k,path:{pts:p.pts,w:p.w*0.5+14}}); elvDirty(E); return p; },
   // extra ground art painted into the chunks over the cliffs: {k, bb:[x0,y0,x1,y1], lvl, paint(g,x0,y0,x1,y1,chunk)}
   deco(d){ ELV.deco.push(d); const E=elvM(d.k||0); elvDirty(E); return d; },
   style(name,def){ ELEV_STYLES[name]=Object.assign({},ELEV_STYLES.rock,def); return ELEV_STYLES[name]; },
@@ -243,6 +246,7 @@ function elvBuild(E){
   for(const P of E.plats) for(const r of P.rings){ r.noLean=new Uint8Array(r.n); for(let i=0;i<r.n;i++){ if(!r.front[i]) continue; const q=(i+1)%r.n, mx=(r.x[i]+r.x[q])/2, my=(r.y[i]+r.y[q])/2; for(const rp of E.ramps) if(rp.ax0!=null&&mx>rp.ax0-6&&mx<rp.ax1+6&&my>rp.ay0-30&&my<rp.ay1) r.noLean[i]=1; } }
   for(const l of E.ledges){ l.segs=[]; for(const P of E.plats) for(const r of P.rings) for(let i=0;i<r.n;i++){ if(!r.front[i]) continue; const q=(i+1)%r.n, mx=(r.x[i]+r.x[q])/2, my=(r.y[i]+r.y[q])/2; if(mx>=l.x0-10&&mx<=l.x1+10&&my>=l.y0-24&&my<=l.y1+10){ l.segs.push([P,r,i]); r.noLean[i]=1; } } }
   for(const v of E.vents){ const c=ci(v.x,v.y); v.lvl=v.lvl!=null?v.lvl:c<0?0:L[c]; }
+  for(const p of E.paths){ if(p.lvl==null){ const c=ci(p.pts[0][0],p.pts[0][1]); p.lvl=c<0?0:L[c]; } }
   for(const p of E.posts){ const c=ci(p.x,p.y+2); if(p.lvl==null) p.lvl=c<0?0:L[c]; }
   for(const f of E.falls){
     let y=f.y, top=null, bot=null; for(let s=0;s<60;s++,y+=cs){ const c=ci(f.x,y); if(c<0) break; const fc=F[c]&EF.FACE&&!(F[c]&EF.RIM); if(fc&&top==null) top=y; if(top!=null&&!fc){ bot=y; break; } }
@@ -657,6 +661,19 @@ function elvPaintFall(g,f){
   g.strokeStyle=lava?'#3a1004':'#1a3448'; g.lineWidth=2; g.beginPath(); g.moveTo(x-w/2-2,y0); g.quadraticCurveTo(x-w/2-4,y0+h*0.6,x-w/2-6,y1+4); g.moveTo(x+w/2+2,y0); g.quadraticCurveTo(x+w/2+4,y0+h*0.6,x+w/2+6,y1+4); g.stroke();
   g.restore();
 }
+// a trail: a dark edge, a lighter gravel bed with a worn middle, and flat stepping stones
+function elvPaintPath(g,p,x0,y0,x1,y1){
+  if(p.bb[2]<x0||p.bb[0]>x1||p.bb[3]<y0||p.bb[1]>y1) return;
+  const pts=p.pts, w=p.w, C=p.look||{};
+  g.save(); g.lineCap='round'; g.lineJoin='round';
+  const line=()=>{ g.beginPath(); g.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) g.lineTo(pts[i][0],pts[i][1]); };
+  line(); g.strokeStyle=C.edge||'rgba(30,20,16,.30)'; g.lineWidth=w+8; g.stroke();
+  line(); g.strokeStyle=C.bed||'rgba(150,124,104,.55)'; g.lineWidth=w; g.stroke();
+  line(); g.strokeStyle=C.mid||'rgba(186,160,136,.35)'; g.lineWidth=w*0.5; g.stroke();
+  const rng=mulberry32(Math.floor(pts[0][0]*3+pts[0][1]*7));
+  for(let i=0;i<pts.length-1;i++){ const a=pts[i], b=pts[i+1], L=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.floor(L/26); for(let k=0;k<n;k++){ const t=(k+0.5)/n, x=lerp(a[0],b[0],t)+(rng()-0.5)*w*0.55, y=lerp(a[1],b[1],t)+(rng()-0.5)*w*0.4, r=4+rng()*4; if(x<x0-20||x>x1+20||y<y0-20||y>y1+20) continue; g.fillStyle=C.stone||'#b6a08c'; g.beginPath(); g.ellipse(x,y,r,r*0.7,0,0,TAU); g.fill(); g.strokeStyle=C.out||'#2a1c18'; g.lineWidth=1.4; g.stroke(); } }
+  g.restore();
+}
 // the ground mark under a vent: a ring of rock round glowing cracks
 function elvPaintVent(g,v){
   const R=Math.min(46,v.r*0.55), rng=mulberry32(v.i*913+77);
@@ -683,6 +700,7 @@ function elvPaintChunk(ch,cx,cy){
   for(const l of E.ledges) if(l.x0<x1+40&&l.x1>x0-40&&l.y0<y1+60&&l.y1>y0-60) items.push([99,2,0,()=>elvPaintLedge(g,E,l)]);
   for(const f of E.falls) if(f.bb&&f.bb[0]<x1&&f.bb[2]>x0&&f.bb[1]<y1&&f.bb[3]>y0) items.push([f.lvl,3,0,()=>elvPaintFall(g,f)]);
   for(const v of E.vents) if(v.x+80>x0&&v.x-80<x1&&v.y+60>y0&&v.y-60<y1) items.push([v.lvl||0,4,v.i,()=>elvPaintVent(g,v)]);
+  for(const p of E.paths) if(p.bb[0]<x1&&p.bb[2]>x0&&p.bb[1]<y1&&p.bb[3]>y0) items.push([(p.lvl||0)+0.1,0,p.i,()=>elvPaintPath(g,p,x0,y0,x1,y1)]);
   for(const d of decos) items.push([d.lvl!=null?d.lvl:99,d.order!=null?d.order:5,0,()=>d.paint(g,x0,y0,x1,y1,ch)]);
   if(!items.length) return;
   items.sort((a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2]);
@@ -822,8 +840,10 @@ function elvDebugDraw(E){
   let any=false;
   for(let j=r0;j<O.row;j++){
     const wy=y0+(j+0.5)*s; if(wy<g.y0||wy>g.y0+g.h*g.cs) continue;
+    const rowPaths=E.paths.filter(p=>wy>=p.bb[1]&&wy<=p.bb[3]);
     for(let i=0;i<O.w;i++){
       const wx=(i+0.5)*s; if(wx<g.x0||wx>g.x0+g.w*g.cs) continue;
+      if(rowPaths.length){ let on=false; for(const p of rowPaths) if(wx>=p.bb[0]&&wx<=p.bb[2]&&elvPathD(p.pts,wx,wy)<p.w*0.5+4){ on=true; break; } if(on){ const kk=(j*O.w+i)*4; d[kk]=lerp(d[kk],206,0.6); d[kk+1]=lerp(d[kk+1],178,0.6); d[kk+2]=lerp(d[kk+2],134,0.6); any=true; continue; } }
       const lv=elevLvl(wx,wy), up=elevLvl(wx,wy-s), lf=elevLvl(wx-s,wy), f=elevFace(wx,wy);
       if(!lv&&!up&&!lf) continue;
       const kk=(j*O.w+i)*4; let m=1, add=0;
@@ -846,6 +866,14 @@ window.__ebX=Object.assign(window.__ebX||{},{
   elevTestShot(x,y,a,spd,n){ shoot(x,y,a,spd||300,8,1,'fireball','enemy',{life:3}); const pr=G.projectiles[G.projectiles.length-1], lv=pr.elv; if(window.__step) window.__step(n||60); return {x:Math.round(pr.x),y:Math.round(pr.y),dead:pr.dead,elv:lv}; },
   elevLastArrow:()=>ELV.lastArrow||null,
   elevColLine(x,y0,y1){ for(let y=y0;y<=y1;y+=6) if(colAt(x,y,6)) return false; return true; },
+  // what the elevation adds to a frame where Ash stands (ms), and a terrain sample on the mountain (us)
+  elevBench(n){ n=n||100; const now=window.__realNow||(()=>performance.now()), E=elvLiveE(); let t0=now();
+    for(let i=0;i<n;i++){ if(E) elvDepthLean(E); } const lean=(now()-t0)/n; t0=now();
+    for(let i=0;i<n;i++) drawHazards(); const haz=(now()-t0)/n; t0=now();
+    for(let i=0;i<n;i++) elvFlight(player,0); const fl=(now()-t0)/n;
+    const o={}; t0=now(); for(let i=0;i<n*100;i++) T(5600+(i*37)%2800,300+(i*53)%2500,o); const tm=(now()-t0)/(n*100)*1000;
+    t0=now(); for(let i=0;i<n*100;i++) blockedAt(5600+(i*37)%2800,300+(i*53)%2500); const bm=(now()-t0)/(n*100)*1000;
+    return {lean_ms:lean,hazards_ms:haz,flight_ms:fl,T_us_mountain:tm,blocked_us_mountain:bm}; },
   ELEV, ELV,
   elev(x,y){ if(x==null&&player){ x=player.x; y=player.y; } const f=elevFace(x,y), z=elvNoFly(x,y), v=elvVentAt(x,y), r=elvRampAt(x,y); return {lvl:elevLvl(x,y),face:f,faceBits:{face:!!(f&1),climb:!!(f&2),ledge:!!(f&4),ramp:!!(f&8),step:!!(f&16)},blocked:blockedAt(x,y),noFly:z?z.why:null,vent:v?{x:v.x,y:v.y,lvl:v.lvl,lift:v.lift}:null,ramp:r?{lo:r.lo,hi:r.hi,dir:r.dir,kind:r.kind}:null}; },
   elevDebug(on){ ELV.debug=on==null?!ELV.debug:!!on; return ELV.debug; },

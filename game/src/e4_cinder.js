@@ -47,13 +47,13 @@ ELEV.style('cinder',{face:'#644a42',lit:'#87655a',dark:'#33221f',lip:'#f0c49c',o
   P({poly:C.T2,lvl:2,style:'cinder',noise:16,seed:42,id:'cm_t2',top:'#8a7266',topK:0.12});
   P({poly:C.T3,lvl:3,style:'cinder',noise:14,seed:43,id:'cm_t3',top:'#927a6c',topK:0.12});
   P({poly:C.T4,lvl:4,style:'cinder',noise:14,seed:44,id:'cm_t4',top:'#927a6c',topK:0.115});
-  P({poly:C.T5,lvl:6,style:'cinder',noise:14,seed:45,id:'cm_t5',top:'#9a8274',topK:0.1});
+  P({poly:C.T5,lvl:6,style:'cinder',noise:14,seed:45,id:'cm_t5',top:'#9a8274',topK:0.085});
   // the crater: the floor, then the rim wall all round it but for the south mouth
   const [fx,fy,frx,fry]=C.floor, [orx,ory]=C.rimR;
-  P({disc:[fx,fy,frx+30,fry+28],lvl:7,style:'cinder',noise:10,seed:46,id:'cm_floor',top:'#a08878',topK:0.085});
+  P({disc:[fx,fy,frx+30,fry+28],lvl:7,style:'cinder',noise:10,seed:46,id:'cm_floor',top:'#6e5046',topK:0.06});
   const arc=(a0,a1,rIn,rOut)=>{ const o=[], st=Math.ceil((a1-a0)/0.06); for(let i=0;i<=st;i++){ const a=a0+(a1-a0)*i/st; o.push([fx+Math.cos(a)*rOut[0],fy+Math.sin(a)*rOut[1]]); } for(let i=st;i>=0;i--){ const a=a0+(a1-a0)*i/st; o.push([fx+Math.cos(a)*rIn[0],fy+Math.sin(a)*rIn[1]]); } return o; };
   const D=Math.PI/180;
-  P({poly:arc(101*D,439*D,[frx,fry],[orx,ory]),lvl:8,style:'cinder',noise:9,seed:47,id:'cm_rim',top:'#a89080',topK:0.08});
+  P({poly:arc(101*D,439*D,[frx,fry],[orx,ory]),lvl:8,style:'cinder',noise:9,seed:47,id:'cm_rim',top:'#bea292',topK:0.075});
   // Double Jump steps: the main one from T2 up to T3 (east end), and the little mesa with the chest on T2's east landing
   if(C.opts.dblOnPath) P({rect:[7880,2170,8010,2296],lvl:3,style:'cinder',step:true,noise:5,seed:51,id:'cm_step'});
   else ELEV.ramp({x0:7900,y0:2205,x1:7990,y1:2262,dir:'n',kind:'stairs'});
@@ -64,8 +64,8 @@ ELEV.style('cinder',{face:'#644a42',lit:'#87655a',dark:'#33221f',lip:'#f0c49c',o
   ELEV.ramp({x0:6950,y0:2690,x1:7050,y1:2752,dir:'n',kind:'stairs'});          // forecourt -> T1, the grand stairs
   ELEV.ramp({x0:5965,y0:2440,x1:6040,y1:2500,dir:'n',kind:'stairs'});          // T1 -> T2
   ELEV.ramp({x0:6092,y0:1985,x1:6128,y1:2040,dir:'n',kind:'ladder'});          // T3 -> T4
-  ELEV.ramp({x0:6676,y0:405,x1:6730,y1:470,dir:'n',kind:'stairs'});            // crater floor -> the rim (west perch)
-  ELEV.ramp({x0:7270,y0:405,x1:7324,y1:470,dir:'n',kind:'stairs'});            // crater floor -> the rim (east perch)
+  ELEV.ramp({x0:6676,y0:405,x1:6730,y1:470,dir:'n',kind:'stairs',foes:false}); // crater floor -> the rim (west perch), not for Vorlaxis
+  ELEV.ramp({x0:7270,y0:405,x1:7324,y1:470,dir:'n',kind:'stairs',foes:false}); // crater floor -> the rim (east perch)
   // vents: T4 -> T5 (the last cliffs need Wings), T5 -> the crater, and the pillar
   ELEV.vent({x:7768,y:1906,r:72,lift:1});
   ELEV.vent({x:7000,y:1612,r:72,lift:1});
@@ -89,8 +89,7 @@ ELEV.style('cinder',{face:'#644a42',lit:'#87655a',dark:'#33221f',lip:'#f0c49c',o
   ELEV.fall({x:6470,y:2700,w:22,kind:'lava'});
   // the winds: no flying over the mountain, only in the updrafts
   ELEV.noFly({poly:C.T1.map(([x,y])=>[x+(x-7000)*0.04,y+(y>2600?50:0)]),why:S('The mountain winds are too strong to fly.','Too windy to fly here!')});
-  // keep the trails, ramps and vents clear of spikes and rocks
-  for(const t of C.trails) ELEV.clear({path:{pts:t,w:48}});
+  // keep the forecourt clear of spikes and rocks (the trails clear their own way)
   ELEV.clear({disc:[7000,2790,170,90]});
 })();
 // ---------- lava on the mountain: only these pools and streams (the noise lakes and the river stop at its foot)
@@ -110,23 +109,8 @@ function cinderLava(x,y){
   return Math.max(s,cinderLava(x,y));
 }; }
 
-// ---------- the trail art (lighter cinder gravel, a dark edge, stepping stones), painted into the chunks
-function cinderTrail(g,pts,x0,y0,x1,y1){
-  let bx0=1e9,by0=1e9,bx1=-1e9,by1=-1e9; for(const p of pts){ bx0=Math.min(bx0,p[0]); by0=Math.min(by0,p[1]); bx1=Math.max(bx1,p[0]); by1=Math.max(by1,p[1]); }
-  if(bx1+40<x0||bx0-40>x1||by1+40<y0||by0-40>y1) return;
-  g.save(); g.lineCap='round'; g.lineJoin='round';
-  const line=()=>{ g.beginPath(); g.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) g.lineTo(pts[i][0],pts[i][1]); };
-  line(); g.strokeStyle='rgba(30,20,16,.30)'; g.lineWidth=44; g.stroke();
-  line(); g.strokeStyle='rgba(150,124,104,.55)'; g.lineWidth=36; g.stroke();
-  line(); g.strokeStyle='rgba(186,160,136,.35)'; g.lineWidth=18; g.stroke();
-  const rng=mulberry32(Math.floor(pts[0][0]*3+pts[0][1]*7));
-  for(let i=0;i<pts.length-1;i++){ const a=pts[i], b=pts[i+1], L=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.floor(L/26); for(let k=0;k<n;k++){ const t=(k+0.5)/n, x=lerp(a[0],b[0],t)+(rng()-0.5)*20, y=lerp(a[1],b[1],t)+(rng()-0.5)*14; if(x<x0-20||x>x1+20||y<y0-20||y>y1+20){ rng(); continue; } const r=4+rng()*4; g.fillStyle='#b6a08c'; g.beginPath(); g.ellipse(x,y,r,r*0.7,0,0,TAU); g.fill(); g.strokeStyle='#2a1c18'; g.lineWidth=1.4; g.stroke(); } }
-  g.restore();
-}
-ELEV.deco({k:0,bb:[5400,0,8600,2880],lvl:0.5,order:0,paint(g,x0,y0,x1,y1){
-  // each trail is painted at its own level, so a higher terrace's face covers the end of the trail below it
-}});
-CINDER.trails.forEach((t,i)=>{ const lv=[0,1,2,3,4,6,7][i]; ELEV.deco({k:0,bb:[Math.min(...t.map(p=>p[0]))-40,Math.min(...t.map(p=>p[1]))-40,Math.max(...t.map(p=>p[0]))+40,Math.max(...t.map(p=>p[1]))+40],lvl:lv+0.1,order:9,paint(g,x0,y0,x1,y1){ cinderTrail(g,t,x0,y0,x1,y1); }}); });
+// ---------- the trails (gravel and stepping stones from ramp to ramp), each painted at its terrace's level
+CINDER.trails.forEach((t,i)=>ELEV.path({k:0,pts:t,w:36,lvl:[0,1,2,3,4,6,7][i]}));
 
 // ---------- places: the Crater Shrine, camps on the terraces, the star-iron, signs, braziers, the chest, the lookout
 { const base=initWorld; initWorld=function(){
@@ -158,8 +142,8 @@ function cinderPlaces(){
   sign('a1_cm_sign0',7130,2830,'Cinder Mountain. The Throne of Cinders is at the very top. Stairs and ramps go up; the edges you can hop down are the quick way back.','Cinder Mountain. Climb to the top!');
   sign('a1_cm_sign1',7830,2330,'The winds are too strong for wings here. Hot air vents carry you up, so look for the glowing cracks. Also: the low ledge to the north wants a Double Jump.','No flying here. Look for vents. Double Jump the low ledge!');
   sign('a1_cm_sign2',7640,1940,'Step into the vent, jump and spread your wings. Ride the hot air up!','Jump in the vent and fly up!');
-  if(typeof reachChest==='function') reachChest('a1_cm_chest',8240,2318,{coins:70,xp:240,title:'The mesa chest',sub:'70 coins, and a fine view of the stairs',say:[`A little flat-topped rock with a chest on it. Only a double jump gets up here.`,`Inside: 70 coins and a note. "If you can read this, you can jump twice. Show-off." Ha.`]});
-  addLandmark({id:'a1_cm_view',k:'reach',x:7240,y:330,noNudge:true,prompt:'Look out',always:false,hidden:()=>false,draw:cinderViewDraw,act:cinderView});
+  if(typeof reachChest==='function') reachChest('a1_cm_chest',8240,2318,{coins:70,xp:240,title:S('The mesa chest','Mesa chest'),sub:S('70 coins, and a fine view of the stairs','70 coins!'),say:[S(`A little flat-topped rock with a chest on it. Only a double jump gets up here.`,`A rock with a chest on top. Two jumps got you here!`),S(`Inside: 70 coins and a note. "If you can read this, you can jump twice. Show-off." Ha.`,`70 coins and a note: "Show-off!" Ha.`)]});
+  addLandmark({id:'a1_cm_view',k:'reach',x:7240,y:330,noNudge:true,prompt:S('Look out','Look'),always:false,hidden:()=>false,draw:cinderViewDraw,act:cinderView});
 }
 function cinderViewDraw(o,t){
   ctx.save(); ctx.translate(o.x,o.y);
