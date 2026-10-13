@@ -398,8 +398,11 @@ function skSym2(g,id,pal){
       g.fillStyle='#e0c8ff'; g.fill(skCirc(22,-5,3.6)); g.fillStyle='rgba(200,170,255,.35)'; g.fill(skEll(8,-12,8,3));
       return true;
     case 'a_blaze':
-      skInk(g,skFlameP(0,36,22,72),'#8fd8ff',5); g.fillStyle='#e6f7ff'; g.fill(skFlameP(0,32,14,50)); g.fillStyle='#ffffff'; g.fill(skFlameP(0,28,7,28));
-      skSpark(g,-27,-20,8,'#ffffff'); skSpark(g,27,-6,6,'#dff4ff'); return true;
+      skFlame(g,0,36,23,74);
+      g.save(); g.shadowColor='rgba(255,255,255,.95)'; g.shadowBlur=12; g.fillStyle='#ffffff'; g.fill(skFlameP(0,31,13,46)); g.restore();
+      g.fillStyle='#d8f2ff'; g.fill(skFlameP(0,27,6,24));
+      skInk(g,skP('M-31 34 L-37 22 L-31 10 L-25 22 Z'),'#bfe8ff',3); skInk(g,skP('M31 34 L26 25 L31 16 L36 25 Z'),'#bfe8ff',3);
+      return true;
     case 'a_windride':
       skLine(g,skP('M-40 -8 Q-12 -30 12 -14 Q24 -4 12 4 Q2 8 -2 0'),'#d8f2ff',4.5);
       skLine(g,skP('M-38 14 Q-2 -2 32 10'),'#a8dcf4',4);
