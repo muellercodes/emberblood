@@ -1,0 +1,6 @@
+{
+"_about": "e7b_threads.js: templates for the shared threads (the moon, the Shards, Pebble's coin)",
+"thr_moon_bites": {"o":"The moon: {1} bites gone.","s":"{1} bites gone."},
+"thr_shards": {"o":"The Heart was cracked into three Shards. You have {1} of the 3 Shards. They are warm, and they tug gently toward the last one.","s":"You have {1} of 3 Shards."},
+"thr_pebble_coins": {"o":"Pebble took {1} shiny coins.","s":"Pebble took {1} coins."}
+}
