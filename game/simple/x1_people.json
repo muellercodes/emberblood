@@ -1,0 +1,35 @@
+{
+ "_about": "Simple words for x1_people (Act II people and side quests on the Clockwork Coast): templates for text built with numbers or places. Lines written with S() in the code carry their own simple words.",
+ "618olk": {
+  "o": "Pick 3 sea peppers in the Rockpools tide pools ({1}/3)",
+  "s": "Pick 3 sea peppers on the Rockpools ({1}/3)"
+ },
+ "fmj88e": {
+  "o": "Get 3 spring cores from Steam Rams (they only drop one when beaten while dizzy) ({1}/3)",
+  "s": "Get 3 springs from dizzy Steam Rams ({1}/3)"
+ },
+ "1iahdmz": {
+  "o": "Find the Moth Mask’s other note drops: the Gull’s Rest chimney, the top of a harbor crane, behind the Cogwater Falls ({1}/3)",
+  "s": "Find 3 notes: a chimney, a crane, behind the falls ({1}/3)"
+ },
+ "j1l74m": {
+  "o": "{1} of Pearl's six pages, back on the shelf. Wren is beside herself. By post.",
+  "s": "Pearl's pages are coming home!"
+ },
+ "1002bs8": {
+  "o": "Pearl’s Logbook: {1} of 6 pages",
+  "s": "Pearl’s pages: {1} of 6"
+ },
+ "1yw6gr8": {
+  "o": "Regatta! Buoy {1}/8 · Jo {2}%",
+  "s": "Buoy {1}/8 · Jo {2}%"
+ },
+ "1378tkw": {
+  "o": "The Chalk Dragon {1}/40 · {2}s",
+  "s": "Chalk Dragon {1}/40 · {2}s"
+ },
+ "9v4iz3": {
+  "o": "Row me to {1}",
+  "s": "Go to {1}"
+ }
+}
