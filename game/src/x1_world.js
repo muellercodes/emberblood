@@ -375,17 +375,19 @@ function c1Extra(x,y,o){
   if(C1WT.snow&&!o.water&&o.road<0.5) o.snow=clamp(0.16+o.n*0.5,0,0.34);
 }
 // skimming: Ash sprints across water with the Skimmer (a rip current lets only that through)
-function c1Skim(){ const p=player; return !!(p&&p.sprinting&&p.onWater&&typeof canSkim==='function'&&canSkim()); }
+// (sprinting with the Skimmer counts from the first step: off a causeway pad or a beach straight into the rip)
+function c1Skim(){ const p=player; return !!(p&&p.sprinting&&typeof canSkim==='function'&&canSkim()); }
 function c1RipAt(x,y){
   if(c1InR(C1G.mouth,x,y)) return true;
   if(c1InR(C1G.sealRip,x,y)) return true;
   if(C1WT.spire&&c1InR(C1G.causewayRip,x,y)) return true;
   return false;
 }
-function c1Block(x,y){
+function c1Block(x,y,land){
   if(x>9562&&x<9800&&y>25820&&y<28330) return true;                                         // the Cut
   if(!C1WT.low&&x>1180&&x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)) return true;              // high tide on the sands
-  if(c1RipAt(x,y)&&!c1Skim()) return true;                                                  // rips: skim only
+  // rips: skim only (on water; the causeway's land where a rip rect overlaps its pads is where the skim starts)
+  if(!land&&c1RipAt(x,y)&&!c1Skim()) return true;
   return false;
 }
 // calm water: the harbor and the skim lanes do not count as deep sea for Water Stride
@@ -1384,7 +1386,7 @@ function c1HouseHands(t){
 // regions everywhere on the coast follow the cliffs (music, ambience, events, banners)
 { const base=biomeInfo; biomeInfo=function(x,y,o){ const r=base(x,y,o); if(C1WD.built&&y>=20000&&y<=31000&&x<IZX-50){ const b=c1Region(x,y,elevLvl(x,y),0); o.b=b; o.b2=b; o.t=1; } return r; }; }
 // the risen Spire Rock and the causeway are land, the harbor and the skim lanes are calm water
-{ const base=mapBlocked; mapBlocked=function(x,y){ if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y); } return base(x,y); }; }
+{ const base=mapBlocked; mapBlocked=function(x,y){ if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y,true); } return base(x,y); }; }
 { const base=mapStrideBlocked; mapStrideBlocked=function(x,y){
   if(y>=20000&&y<=31000&&x>30&&x<13970){ if((C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y))||c1wCalm(x,y)) return !!c1Block(x,y); }
   return base(x,y); }; }

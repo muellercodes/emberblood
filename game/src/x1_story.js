@@ -1294,7 +1294,7 @@ function c1RWin(){
   });
 }
 function c1RLose(){
-  G.flags.c_chase_lost=(G.flags.c_chase_lost|0)+1;
+  G.flags.c_chase_lost=(G.flags.c_chase_lost|0)+1; C1ST.chaseRetryAt=G.time+4;
   later(0.05,()=>{ miniEnd(false,S('She got away!','She got away!'),S('Wait by Whirligig Manor to try again.','Wait by the manor. Try again!')); c1RDown(true); });
 }
 // back down to the street (a safe spot near the end, or near the manor after a loss)
@@ -1308,6 +1308,8 @@ function c1ChaseWatch(dt){
   const F=G.flags;
   if(!F.c_hester||G.mini||!c1Out()||scene!=='play'||!isNight()||F.c_chase_won) return;
   if(dist(player.x,player.y,C1P.manor.x,C1P.manor.y)>380) return;
+  // after a loss Ash is set down by the manor: a few seconds to breathe (or walk off) before round two starts by itself
+  if(G.time<(C1ST.chaseRetryAt||0)) return;
   const S0=c1SightAt(C1R.L[0].x0+40,C1R.L[0].y0-10,'wait'); S0.face=1;
   C1ST.cam={x:C1R.L[0].x0,y:C1R.L[0].y0,k:0.6}; c1ChaseLights(true); C1ST.preRoof=true;
   c1Play(c1Seen('c_chase_start')?STORY.c_chase_retry:'c_chase_start',()=>{ C1ST.sight=null; C1ST.preRoof=false; later(0.1,()=>startMini('c_roofchase',null)); });
