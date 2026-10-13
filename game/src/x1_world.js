@@ -9,7 +9,7 @@
 // the harbor chain is up, the lighthouse lens turns), c_spire_up (Spire Rock, the causeway, the Breakwater Shrine),
 // c_snow (snow in summer on the whole coast). Doc for the people, story and dungeon helpers: scratchpad/C1WORLD.md.
 // All coordinates are absolute. Every id uses the c_ prefix. Every player-facing line goes through S(full, simple).
-const C1={k:1,y0:20000,objs:[],bk:new Map(),bs:512,st:{},dyn:[],doorsDyn:[],shrDyn:[],built:false,t:0,sndT:{},belts:[],vents:[],rips:[],calm:[],hard:[],land:[],lamps:[],lift:null,hz:[],homes:[]};
+const C1WD={k:1,y0:20000,objs:[],bk:new Map(),bs:512,st:{},dyn:[],doorsDyn:[],shrDyn:[],built:false,t:0,sndT:{},belts:[],vents:[],rips:[],calm:[],hard:[],land:[],lamps:[],lift:null,hz:[],homes:[]};
 const C1F=k=>!!(G&&G.flags&&G.flags[k]);
 // ---------- small geometry helpers (shapes are plain arrays so the terrain hooks stay cheap)
 function c1Poly(P){ const o={P,bb:[1e9,1e9,-1e9,-1e9]}; for(const p of P){ o.bb[0]=Math.min(o.bb[0],p[0]); o.bb[1]=Math.min(o.bb[1],p[1]); o.bb[2]=Math.max(o.bb[2],p[0]); o.bb[3]=Math.max(o.bb[3],p[1]); } return o; }
@@ -83,7 +83,7 @@ function c1Snd(kind,v){
 const C1S=new Map();
 function c1Spr(key,R,draw){ const k=(LOOK.sb?'s:':'c:')+key; let c=C1S.get(k); if(c) return c; c=LOOK.sb?sbSprite('c1_'+key,R,draw):spriteOf(R,draw); C1S.set(k,c); return c; }
 // a cached tall sprite drawn from a base point (w x h world px, base at bx,by inside it)
-function c1Tall(key,w,h,bx,by,draw,ow){
+function c1wTall(key,w,h,bx,by,draw,ow){
   const k=(LOOK.sb?'s:':'c:')+key; let c=C1S.get(k); if(c) return c;
   const sc=2, cv=mkCanvas(Math.ceil(w*sc),Math.ceil(h*sc)), g=cv.getContext('2d'); g.scale(sc,sc); g.translate(bx,by); g.lineCap='round'; g.lineJoin='round'; draw(g);
   cv.ox=bx; cv.oy=by; cv.w2=w; cv.h2=h;
@@ -354,7 +354,7 @@ function c1Region(x,y,lv,n){
   return 10;
 }
 // the dynamic layers: are the sands under the sea, is the spire up, is it snowing
-const C1T={low:false,spire:false,snow:false,clock:false};
+const C1WT={low:false,spire:false,snow:false,clock:false};
 function c1DynLand(x,y){
   if(c1InD(C1G.spire,x,y)) return true;
   // the causeway: a rock spit with ragged sides, not a box
@@ -367,32 +367,32 @@ function c1Extra(x,y,o){
   const lv=elevLvl(x,y), b=c1Region(x,y,lv,o.n);
   o.b=b; o.b2=b; o.t=1;
   if(x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)){
-    if(!C1T.low){ o.water=1; o.depth=0.7; o.sea=1; o.deep=0; o.seaD=0.22; o.shore=0; o.road=0; o.bridge=0; }
+    if(!C1WT.low){ o.water=1; o.depth=0.7; o.sea=1; o.deep=0; o.seaD=0.22; o.shore=0; o.road=0; o.bridge=0; }
     else{ o.water=0; o.depth=0; o.sea=0; o.deep=0; o.seaD=0; o.sand=0.42; o.shore=0; }
   }
-  if(C1T.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)){ o.water=0; o.depth=0; o.sea=0; o.deep=0; o.seaD=0; o.shore=0; o.b=19; o.b2=19; }
+  if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)){ o.water=0; o.depth=0; o.sea=0; o.deep=0; o.seaD=0; o.shore=0; o.b=19; o.b2=19; }
   if(o.water&&x>9540&&x<9830&&y>25800&&y<28400){ o.seaD=0.55+0.25*clamp(o.depth,0,1); o.depth=1; }
-  if(C1T.snow&&!o.water&&o.road<0.5) o.snow=clamp(0.16+o.n*0.5,0,0.34);
+  if(C1WT.snow&&!o.water&&o.road<0.5) o.snow=clamp(0.16+o.n*0.5,0,0.34);
 }
 // skimming: Ash sprints across water with the Skimmer (a rip current lets only that through)
 function c1Skim(){ const p=player; return !!(p&&p.sprinting&&p.onWater&&typeof canSkim==='function'&&canSkim()); }
 function c1RipAt(x,y){
   if(c1InR(C1G.mouth,x,y)) return true;
   if(c1InR(C1G.sealRip,x,y)) return true;
-  if(C1T.spire&&c1InR(C1G.causewayRip,x,y)) return true;
+  if(C1WT.spire&&c1InR(C1G.causewayRip,x,y)) return true;
   return false;
 }
 function c1Block(x,y){
   if(x>9562&&x<9800&&y>25820&&y<28330) return true;                                         // the Cut
-  if(!C1T.low&&x>1180&&x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)) return true;              // high tide on the sands
+  if(!C1WT.low&&x>1180&&x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)) return true;              // high tide on the sands
   if(c1RipAt(x,y)&&!c1Skim()) return true;                                                  // rips: skim only
   return false;
 }
 // calm water: the harbor and the skim lanes do not count as deep sea for Water Stride
-function c1Calm(x,y){
+function c1wCalm(x,y){
   if(c1InP(C1G.harborP,x,y)) return true;
   if(c1InR(C1G.sealLane,x,y)) return true;
-  if(C1T.spire&&y>28940&&y<29960&&x>7140&&x<7470) return true;
+  if(C1WT.spire&&y>28940&&y<29960&&x>7140&&x<7470) return true;
   return false;
 }
 // ---------- the roads (bible 1.5, routed round the cliffs; ramps carry them over the faces)
@@ -435,39 +435,39 @@ const C1SEEDS=[[4000,21000,10],[9000,22000,10],[12500,22500,10],[1300,21800,18],
 
 // ================= 5. standing things of the coast: drawn sorted with the figures (so Ash walks behind a lighthouse),
 // each body painted once into a cached outlined sprite, only the live parts (sails, lamps, steam, hands) per frame
-function c1Obj(k,x,y,o){
+function c1wObj(k,x,y,o){
   o=Object.assign({k,x,y},o||{}); const D=C1K[k]||{};
   o.R=o.R||D.R||60; o.base=o.base!=null?o.base:y+(D.by||0);
   if(D.col&&o.col!==false){ const c=typeof D.col==='function'?D.col(o):D.col; for(const q of [].concat(c)) addCol(Object.assign({},q,q.t==='r'?{x0:x+q.x0,y0:y+q.y0,x1:x+q.x1,y1:y+q.y1}:{x:x+(q.dx||0),y:y+(q.dy||0)})); }
   if(D.light) for(const L of [].concat(D.light(o))) LIGHTS.push(L);
-  C1.objs.push(o); const key=Math.floor(x/C1.bs)+'|'+Math.floor(y/C1.bs); let b=C1.bk.get(key); if(!b) C1.bk.set(key,b=[]); b.push(o);
+  C1WD.objs.push(o); const key=Math.floor(x/C1WD.bs)+'|'+Math.floor(y/C1WD.bs); let b=C1WD.bk.get(key); if(!b) C1WD.bk.set(key,b=[]); b.push(o);
   return o;
 }
 function c1ObjsInView(fn){
-  const s=C1.bs, x0=Math.floor((cam.x-260)/s), x1=Math.floor((cam.x+W/zoom+260)/s), y0=Math.floor((cam.y-200)/s), y1=Math.floor((cam.y+H/zoom+700)/s);
-  for(let i=x0;i<=x1;i++) for(let j=y0;j<=y1;j++){ const b=C1.bk.get(i+'|'+j); if(b) for(const o of b) fn(o); }
+  const s=C1WD.bs, x0=Math.floor((cam.x-260)/s), x1=Math.floor((cam.x+W/zoom+260)/s), y0=Math.floor((cam.y-200)/s), y1=Math.floor((cam.y+H/zoom+700)/s);
+  for(let i=x0;i<=x1;i++) for(let j=y0;j<=y1;j++){ const b=C1WD.bk.get(i+'|'+j); if(b) for(const o of b) fn(o); }
 }
 const C1DAY=()=>G&&!isNight();
 // a brass and white stone palette for Gearhaven, plum outlines from the look
 const C1C={chalk:'#f2ede0',stone:'#c8bea8',stoneD:'#a89c84',brass:'#d8a440',brassD:'#a07428',slate:'#4a6a8a',teal:'#3a8a8a',red:'#c8503a',wood:'#8e6a40',woodD:'#6a4a2c',iron:'#5a5e68'};
 const C1K={
   lamp:{R:50,by:0,col:{t:'c',r:5,low:false},light:o=>({x:o.x,y:o.y-30,r:170,i:0.7,night:true,fire:true}),
-    draw(o,t){ const nt=G&&daylight()<0.45; c1Put(c1Tall('lamp'+(nt?1:0),20,52,10,48,g=>c1LampArt(g,nt)),o.x,o.y); if(nt){ glowAt(o.x,o.y-32,30,'255,214,130',0.5); glowAt(o.x,o.y-32,9,'255,246,200',0.7); } }},
+    draw(o,t){ const nt=G&&daylight()<0.45; c1Put(c1wTall('lamp'+(nt?1:0),20,52,10,48,g=>c1LampArt(g,nt)),o.x,o.y); if(nt){ glowAt(o.x,o.y-32,30,'255,214,130',0.5); glowAt(o.x,o.y-32,9,'255,246,200',0.7); } }},
   wall:{R:90,by:6,col:o=>({t:'r',x0:-o.w/2,y0:-6,x1:o.w/2,y1:8}),
-    draw(o){ c1Put(c1Tall('wall'+o.w,o.w+8,70,o.w/2+4,60,g=>{ const w=o.w;
+    draw(o){ c1Put(c1wTall('wall'+o.w,o.w+8,70,o.w/2+4,60,g=>{ const w=o.w;
       c1Ell(g,0,6,w/2+4,6,'rgba(50,30,40,.25)'); c1Shade(g,-w/2,-34,w,40,C1C.chalk);
       g.strokeStyle='rgba(150,140,120,.6)'; g.lineWidth=1; for(let y=-26;y<4;y+=10){ g.beginPath(); g.moveTo(-w/2,y); g.lineTo(w/2,y); g.stroke(); for(let x=-w/2+((y/10)%2?10:0);x<w/2;x+=20){ g.beginPath(); g.moveTo(x,y); g.lineTo(x,y+10); g.stroke(); } }
       for(let x=-w/2;x<w/2-4;x+=18){ c1Shade(g,x,-44,12,11,C1C.chalk); }
       c1Rect(g,-w/2,-35,w,3,C1C.brass); }),o.x,o.y); }},
   gate:{R:120,by:8,col:[{t:'c',dx:-74,r:20},{t:'c',dx:74,r:20}],
-    draw(o,t){ c1Put(c1Tall('gate',200,150,100,138,g=>{
+    draw(o,t){ c1Put(c1wTall('gate',200,150,100,138,g=>{
       c1Ell(g,0,8,96,10,'rgba(50,30,40,.25)');
       for(const s of [-1,1]){ c1Shade(g,s*74-22,-100,44,106,C1C.chalk); c1Rect(g,s*74-26,-108,52,10,C1C.slate,2); g.fillStyle=C1C.slate; g.beginPath(); g.moveTo(s*74-26,-108); g.lineTo(s*74,-130); g.lineTo(s*74+26,-108); g.fill(); c1Ell(g,s*74,-74,9,9,C1C.brassD); c1Ell(g,s*74,-74,7,7,'#fff6dc'); }
       c1Shade(g,-52,-104,104,20,C1C.chalk); c1Rect(g,-52,-86,104,4,C1C.brass);
       g.fillStyle='#3b2a2a'; g.font=`900 9px ${UIF}`; g.textAlign='center'; g.fillText('GEARHAVEN',0,-91);
       g.strokeStyle=C1C.brass; g.lineWidth=3; g.beginPath(); g.arc(0,-6,46,Math.PI,TAU); g.stroke(); }),o.x,o.y); }},
   crane:{R:150,by:0,col:{t:'c',r:16},
-    draw(o,t){ c1Put(c1Tall('crane'+(o.flip?1:0),210,240,100,226,g=>{ const f=o.flip?-1:1;
+    draw(o,t){ c1Put(c1wTall('crane'+(o.flip?1:0),210,240,100,226,g=>{ const f=o.flip?-1:1;
       c1Ell(g,0,6,30,10,'rgba(40,30,40,.3)'); c1Shade(g,-22,-14,44,20,C1C.stoneD);
       for(const s of [-1,1]){ g.strokeStyle='#6a4a2c'; g.lineWidth=5; g.beginPath(); g.moveTo(s*16,-10); g.lineTo(s*6,-170); g.stroke(); }
       g.strokeStyle='#8e6a40'; g.lineWidth=2.4; for(let y=-30;y>-170;y-=22){ g.beginPath(); g.moveTo(-14+(-y)*0.06,y); g.lineTo(14-(-y)*0.06,y-18); g.stroke(); }
@@ -475,7 +475,7 @@ const C1K={
       g.strokeStyle='#5a3e22'; g.lineWidth=6; g.beginPath(); g.moveTo(0,-182); g.lineTo(f*95,-204); g.stroke(); g.strokeStyle='#8e6a40'; g.lineWidth=2.6; g.beginPath(); g.moveTo(0,-186); g.lineTo(f*95,-208); g.stroke();
       g.strokeStyle='#3a3030'; g.lineWidth=1.2; g.beginPath(); g.moveTo(f*90,-204); g.lineTo(f*90,-120); g.stroke(); c1Shade(g,f*90-10,-122,20,14,C1C.wood); }),o.x,o.y); }},
   tideclock:{R:110,by:6,col:{t:'r',x0:-30,y0:-14,x1:30,y1:8},
-    draw(o,t){ c1Put(c1Tall('tideclock',100,190,50,180,g=>{
+    draw(o,t){ c1Put(c1wTall('tideclock',100,190,50,180,g=>{
       c1Ell(g,0,6,40,9,'rgba(40,30,30,.3)');
       for(const s of [-1,1]){ c1Rect(g,s*26-3,-10,6,18,'#5a3e22'); }
       c1Shade(g,-30,-110,60,104,'#a0784a'); g.strokeStyle='rgba(70,46,26,.55)'; g.lineWidth=1; for(let y=-100;y<-6;y+=12){ g.beginPath(); g.moveTo(-30,y); g.lineTo(30,y); g.stroke(); }
@@ -484,9 +484,9 @@ const C1K={
       g.fillStyle='#3b2a2a'; g.font=`900 8px ${UIF}`; g.textAlign='center'; g.fillText('HIGH',0,-83); g.fillText('LOW',0,-59);
       c1Rect(g,-9,-26,18,22,'#4a3020',2); c1Ell(g,5,-15,1.6,1.6,'#d8b04a'); }),o.x,o.y);
       // the big hand: HIGH until the clock is fixed, then LOW
-      const low=C1T.low, a=low?Math.PI/2:-Math.PI/2+Math.sin(t*3)*0.04; ctx.strokeStyle='#3b2233'; ctx.lineWidth=3.2; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(o.x,o.y-74); ctx.lineTo(o.x+Math.cos(a)*15,o.y-74+Math.sin(a)*15); ctx.stroke(); ctx.fillStyle='#c8963a'; ctx.beginPath(); ctx.arc(o.x,o.y-74,2.6,0,TAU); ctx.fill(); }},
+      const low=C1WT.low, a=low?Math.PI/2:-Math.PI/2+Math.sin(t*3)*0.04; ctx.strokeStyle='#3b2233'; ctx.lineWidth=3.2; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(o.x,o.y-74); ctx.lineTo(o.x+Math.cos(a)*15,o.y-74+Math.sin(a)*15); ctx.stroke(); ctx.fillStyle='#c8963a'; ctx.beginPath(); ctx.arc(o.x,o.y-74,2.6,0,TAU); ctx.fill(); }},
   windmill:{R:150,by:4,col:{t:'c',r:26},
-    draw(o,t){ c1Put(c1Tall('windmill',120,170,60,160,g=>{
+    draw(o,t){ c1Put(c1wTall('windmill',120,170,60,160,g=>{
       c1Ell(g,0,6,40,11,'rgba(40,40,30,.3)');
       celFill(g,(q,dx,dy)=>{ q.moveTo(-34+dx,4+dy); q.lineTo(-22+dx,-104+dy); q.lineTo(22+dx,-104+dy); q.lineTo(34+dx,4+dy); q.closePath(); },'#f2ece0',{r:30});
       g.fillStyle='#8a4a3a'; g.beginPath(); g.moveTo(-28,-100); g.quadraticCurveTo(0,-140,28,-100); g.closePath(); g.fill(); g.fillStyle='#a85a46'; g.beginPath(); g.moveTo(-28,-100); g.quadraticCurveTo(-8,-134,0,-122); g.lineTo(0,-100); g.closePath(); g.fill();
@@ -497,7 +497,7 @@ const C1K={
       for(let i=0;i<4;i++){ const a=a0+i*Math.PI/2; ctx.save(); ctx.rotate(a); ctx.fillStyle=LOOK.sb?SBC.outline:'#3a2a20'; ctx.fillRect(-3.2,-2,6.4,-62); ctx.fillStyle='#7a5634'; ctx.fillRect(-2,-2,4,-60); ctx.fillStyle=LOOK.sb?SBC.outline:'#3a2a20'; ctx.fillRect(2,-60,15,46); ctx.fillStyle='#f6efe0'; ctx.fillRect(3.2,-58.8,12.6,43.6); ctx.strokeStyle='rgba(120,100,80,.6)'; ctx.lineWidth=1; for(let y=-50;y>-58;y-=10){ } ctx.beginPath(); for(let y=-52;y<-16;y+=9){ ctx.moveTo(3,y); ctx.lineTo(16,y); } ctx.stroke(); ctx.restore(); }
       ctx.fillStyle=LOOK.sb?SBC.outline:'#2a1a10'; ctx.beginPath(); ctx.arc(0,0,6.5,0,TAU); ctx.fill(); ctx.fillStyle='#c8963a'; ctx.beginPath(); ctx.arc(0,0,4.5,0,TAU); ctx.fill(); ctx.restore(); }},
   lighthouse:{R:260,by:8,col:{t:'c',r:40},light:o=>({x:o.x,y:o.y-220,r:420,i:0.9,night:true,lh:true}),
-    draw(o,t){ c1Put(c1Tall('lighthouse',150,320,75,306,g=>{
+    draw(o,t){ c1Put(c1wTall('lighthouse',150,320,75,306,g=>{
       c1Ell(g,0,8,62,14,'rgba(30,30,50,.32)'); c1Shade(g,-56,-16,112,24,'#9a9488');
       const top=-232; celFill(g,(q,dx,dy)=>{ q.moveTo(-42+dx,0+dy); q.lineTo(-26+dx,top+dy); q.lineTo(26+dx,top+dy); q.lineTo(42+dx,0+dy); q.closePath(); },'#f4f0e6',{r:40});
       g.save(); g.beginPath(); g.moveTo(-42,0); g.lineTo(-26,top); g.lineTo(26,top); g.lineTo(42,0); g.closePath(); g.clip();
@@ -509,36 +509,36 @@ const C1K={
       const lit=C1F('c_lamp')||reached('c_spire'), nt=G&&daylight()<0.5, ly=o.y-252;
       if(lit){ glowAt(o.x,ly,nt?70:30,'255,236,160',nt?0.75:0.35); glowAt(o.x,ly,16,'255,255,230',0.9); }
       // the lens turns (with the Great Clock running); at night the lit lamp throws a turning beam out to sea
-      if(C1T.clock){ const a=t*0.55; ctx.fillStyle='rgba(255,250,220,.65)'; ctx.fillRect(o.x-16+((Math.sin(a)*0.5+0.5)*28),ly-14,4,28); }
-      if(lit&&nt&&C1T.clock){ const a=t*0.45; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(o.x,ly); ctx.rotate(a); const gr=ctx.createLinearGradient(0,0,620,0); gr.addColorStop(0,'rgba(255,240,180,.35)'); gr.addColorStop(1,'rgba(255,240,180,0)'); ctx.fillStyle=gr; ctx.beginPath(); ctx.moveTo(0,-8); ctx.lineTo(620,-70); ctx.lineTo(620,70); ctx.lineTo(0,8); ctx.closePath(); ctx.fill(); ctx.restore(); } }},
+      if(C1WT.clock){ const a=t*0.55; ctx.fillStyle='rgba(255,250,220,.65)'; ctx.fillRect(o.x-16+((Math.sin(a)*0.5+0.5)*28),ly-14,4,28); }
+      if(lit&&nt&&C1WT.clock){ const a=t*0.45; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(o.x,ly); ctx.rotate(a); const gr=ctx.createLinearGradient(0,0,620,0); gr.addColorStop(0,'rgba(255,240,180,.35)'); gr.addColorStop(1,'rgba(255,240,180,0)'); ctx.fillStyle=gr; ctx.beginPath(); ctx.moveTo(0,-8); ctx.lineTo(620,-70); ctx.lineTo(620,70); ctx.lineTo(0,8); ctx.closePath(); ctx.fill(); ctx.restore(); } }},
   stall:{R:70,by:10,col:{t:'r',x0:-34,y0:-10,x1:34,y1:12},
-    draw(o){ const v=o.v||0; c1Put(c1Tall('stall'+v,96,90,48,80,g=>{ const cA=['#d8503a','#3a8a8a','#e0a030','#6a5aa8'][v%4];
+    draw(o){ const v=o.v||0; c1Put(c1wTall('stall'+v,96,90,48,80,g=>{ const cA=['#d8503a','#3a8a8a','#e0a030','#6a5aa8'][v%4];
       c1Ell(g,0,10,44,8,'rgba(40,30,30,.3)'); c1Shade(g,-36,-18,72,28,C1C.wood); for(let i=0;i<5;i++) celBall(g,-24+i*12,-20,4.5,['#e8503a','#f0c040','#7ac04a','#e88a3a','#b05ad0'][(i+v)%5]);
       for(const s of [-1,1]) c1Rect(g,s*33-2,-58,4,48,C1C.woodD);
       for(let i=0;i<6;i++){ g.fillStyle=i%2?'#fff6e6':cA; g.beginPath(); g.moveTo(-40+i*13.4,-58); g.lineTo(-40+(i+1)*13.4,-58); g.lineTo(-38+(i+1)*13.4,-44); g.lineTo(-38+i*13.4,-44); g.closePath(); g.fill(); }
       for(let i=0;i<6;i++){ g.fillStyle=i%2?'#fff6e6':cA; g.beginPath(); g.arc(-33+i*13.4,-44,6.7,0,Math.PI); g.fill(); } }),o.x,o.y); }},
   board:{R:60,by:6,col:{t:'r',x0:-26,y0:-6,x1:26,y1:8},
-    draw(o){ c1Put(c1Tall('board',80,90,40,82,g=>{
+    draw(o){ c1Put(c1wTall('board',80,90,40,82,g=>{
       c1Ell(g,0,6,30,6,'rgba(40,30,30,.3)'); for(const s of [-1,1]) c1Rect(g,s*24-2,-62,4,66,C1C.woodD);
       c1Shade(g,-30,-66,60,44,'#8e6a40'); c1Rect(g,-27,-63,54,38,'#f2e6c6',2);
       g.fillStyle='#3b2a2a'; g.font=`900 6.5px ${UIF}`; g.textAlign='center'; g.fillText('MOTH MASK',0,-55); g.fillText('WATCH',0,-48);
       for(let i=0;i<3;i++){ c1Rect(g,-22+i*16,-44,12,13,['#fff','#ffe8c8','#e8f0ff'][i]); g.fillStyle='#6a5aa8'; g.beginPath(); g.ellipse(-16+i*16,-37,4,2.4,0,0,TAU); g.fill(); }
       c1Ell(g,18,-58,3,3,'#d8503a'); }),o.x,o.y); }},
   fountain:{R:70,by:0,col:{t:'c',r:34},
-    draw(o,t){ c1Put(c1Tall('fountain',110,96,55,62,g=>{
+    draw(o,t){ c1Put(c1wTall('fountain',110,96,55,62,g=>{
       c1Ell(g,0,8,48,16,'rgba(40,30,40,.3)'); c1Ell(g,0,0,46,22,C1C.stoneD); c1Ell(g,0,-3,43,19,C1C.chalk); c1Ell(g,0,-1,37,15,'#5cbcd0'); c1Ell(g,-10,-6,14,5,'rgba(255,255,255,.4)');
       celFill(g,(q,dx,dy)=>sbStar(q,10,15,11.5,0.15,dx,dy-22),C1C.brass,{r:15}); c1Ell(g,0,-22,5,5,C1C.brassD); c1Rect(g,-4,-22,8,20,C1C.brassD); }),o.x,o.y);
       for(let i=0;i<3;i++){ const k=((t*1.2+i/3)%1); ctx.fillStyle=`rgba(200,240,255,${0.7*(1-k)})`; ctx.beginPath(); ctx.arc(o.x+Math.cos(i*2.1)*k*26,o.y-22-Math.sin(k*Math.PI)*16+k*20,2,0,TAU); ctx.fill(); } }},
   telescope:{R:40,by:4,col:{t:'c',r:8},
-    draw(o){ c1Put(c1Tall('scope',60,60,30,52,g=>{ c1Ell(g,0,4,14,5,'rgba(40,30,30,.3)'); g.strokeStyle='#5a3e22'; g.lineWidth=2.4; for(const s of [-1,0,1]){ g.beginPath(); g.moveTo(s*9,2); g.lineTo(0,-22); g.stroke(); }
+    draw(o){ c1Put(c1wTall('scope',60,60,30,52,g=>{ c1Ell(g,0,4,14,5,'rgba(40,30,30,.3)'); g.strokeStyle='#5a3e22'; g.lineWidth=2.4; for(const s of [-1,0,1]){ g.beginPath(); g.moveTo(s*9,2); g.lineTo(0,-22); g.stroke(); }
       g.save(); g.translate(0,-24); g.rotate(-0.4); c1Shade(g,-4,-5,26,10,C1C.brass); c1Rect(g,20,-6,5,12,C1C.brassD,1); c1Rect(g,-8,-3.5,5,7,C1C.brassD,1); g.restore(); }),o.x,o.y); }},
   bridgepost:{R:60,by:4,col:{t:'c',r:9},
-    draw(o){ c1Put(c1Tall('bpost'+(o.flip?1:0),90,90,45,80,g=>{ const f=o.flip?-1:1;
+    draw(o){ c1Put(c1wTall('bpost'+(o.flip?1:0),90,90,45,80,g=>{ const f=o.flip?-1:1;
       for(const dy of [-22,14]){ c1Shade(g,-5,dy-46,10,50,'#7a5634'); c1Ell(g,0,dy-46,5,2.6,'#9a7a50'); }
       g.strokeStyle='#c8b080'; g.lineWidth=2; g.beginPath(); g.moveTo(0,-60); g.quadraticCurveTo(f*20,-30,f*14,-4); g.moveTo(0,-26); g.quadraticCurveTo(f*22,-6,f*18,20); g.stroke();
       for(let i=0;i<3;i++){ g.save(); g.translate(f*(8+i*5),-6+i*9); g.rotate(f*(0.9+i*0.2)); c1Shade(g,-12,-3,24,6,'#9a7a50'); g.restore(); } }),o.x,o.y); }},
   wreck:{R:170,by:20,col:[{t:'c',dx:-60,dy:4,r:30},{t:'c',dx:10,dy:8,r:34},{t:'c',dx:76,dy:4,r:26}],
-    draw(o){ c1Put(c1Tall('wreck',300,220,150,160,g=>{
+    draw(o){ c1Put(c1wTall('wreck',300,220,150,160,g=>{
       c1Ell(g,0,18,140,26,'rgba(40,30,30,.3)');
       g.save(); g.rotate(-0.12);
       celFill(g,(q,dx,dy)=>{ q.moveTo(-130+dx,0+dy); q.quadraticCurveTo(-60+dx,40+dy,90+dx,24+dy); q.lineTo(130+dx,-20+dy); q.quadraticCurveTo(20+dx,-30+dy,-130+dx,0+dy); q.closePath(); },'#6a4a2c',{r:60});
@@ -549,18 +549,18 @@ const C1K={
       g.fillStyle='#3b2a2a'; g.font=`900 9px ${UIF}`; g.fillText('SAUCY GULL',-70,14);
       g.restore(); }),o.x,o.y); }},
   standing:{R:40,by:6,col:{t:'c',r:12},
-    draw(o){ c1Put(c1Tall('stand'+(o.v||0),50,70,25,62,g=>{ const h=40+(o.v||0)*6; c1Ell(g,4,4,14,5,'rgba(40,40,60,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-11+dx,4+dy); q.lineTo(-9+dx,-h+dy); q.quadraticCurveTo(dx,-h-6+dy,9+dx,-h+2+dy); q.lineTo(12+dx,4+dy); q.closePath(); },o.pale?'#dcd8e8':'#9a9aa6',{r:14}); c1Ell(g,-2,-h*0.5,4,3,o.pale?'#b8b0d8':'#a8b880'); }),o.x,o.y);
+    draw(o){ c1Put(c1wTall('stand'+(o.v||0),50,70,25,62,g=>{ const h=40+(o.v||0)*6; c1Ell(g,4,4,14,5,'rgba(40,40,60,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-11+dx,4+dy); q.lineTo(-9+dx,-h+dy); q.quadraticCurveTo(dx,-h-6+dy,9+dx,-h+2+dy); q.lineTo(12+dx,4+dy); q.closePath(); },o.pale?'#dcd8e8':'#9a9aa6',{r:14}); c1Ell(g,-2,-h*0.5,4,3,o.pale?'#b8b0d8':'#a8b880'); }),o.x,o.y);
       if(o.pale&&isNight()) glowAt(o.x,o.y-30,26,'200,190,255',0.25); }},
   chimney:{R:50,by:2,col:false,
-    draw(o,t){ c1Put(c1Tall('chim',40,70,20,62,g=>{ c1Shade(g,-9,-46,18,48,'#a85a46'); c1Rect(g,-11,-50,22,6,'#5a5e68',1); c1Ell(g,0,-50,6,2.2,'#2a2228'); }),o.x,o.y); }},
+    draw(o,t){ c1Put(c1wTall('chim',40,70,20,62,g=>{ c1Shade(g,-9,-46,18,48,'#a85a46'); c1Rect(g,-11,-50,22,6,'#5a5e68',1); c1Ell(g,0,-50,6,2.2,'#2a2228'); }),o.x,o.y); }},
   shed:{R:120,by:30,col:{t:'r',x0:-70,y0:-40,x1:70,y1:34},
-    draw(o){ c1Put(c1Tall('shed',170,150,85,112,g=>{
+    draw(o){ c1Put(c1wTall('shed',170,150,85,112,g=>{
       c1Ell(g,0,36,80,10,'rgba(40,30,30,.3)'); c1Shade(g,-70,-40,140,74,'#7a8a9a'); g.strokeStyle='rgba(50,60,70,.5)'; g.lineWidth=1; for(let x=-60;x<70;x+=12){ g.beginPath(); g.moveTo(x,-40); g.lineTo(x,34); g.stroke(); }
       g.fillStyle='#c8503a'; g.beginPath(); g.moveTo(-80,-38); g.lineTo(0,-86); g.lineTo(80,-38); g.closePath(); g.fill(); g.fillStyle='#e0684a'; g.beginPath(); g.moveTo(-80,-38); g.lineTo(0,-86); g.lineTo(0,-38); g.closePath(); g.fill();
       c1Rect(g,-40,-10,80,44,'#3a3030',3); c1Ell(g,0,24,34,8,'#2a6aa0'); c1Ell(g,0,22,30,6,'#4a8ac0');
       g.fillStyle='#fff6e6'; g.font=`900 9px ${UIF}`; g.textAlign='center'; g.fillText("JO'S BOATS",0,-48); }),o.x,o.y); }},
   works:{R:240,by:40,col:{t:'r',x0:-170,y0:-60,x1:150,y1:40},
-    draw(o,t){ c1Put(c1Tall('works',380,260,190,200,g=>{
+    draw(o,t){ c1Put(c1wTall('works',380,260,190,200,g=>{
       c1Ell(g,0,42,180,16,'rgba(40,30,30,.32)');
       c1Shade(g,-170,-60,320,100,'#a85a3e'); g.strokeStyle='rgba(70,36,24,.45)'; g.lineWidth=1; for(let y=-50;y<40;y+=10){ g.beginPath(); g.moveTo(-170,y); g.lineTo(150,y); g.stroke(); }
       g.fillStyle='#5a5e68'; g.beginPath(); for(let i=0;i<5;i++){ const x=-170+i*64; g.moveTo(x,-60); g.lineTo(x+32,-96); g.lineTo(x+64,-60); } g.closePath(); g.fill(); g.fillStyle='#7a7e88'; for(let i=0;i<5;i++){ const x=-170+i*64; g.beginPath(); g.moveTo(x,-60); g.lineTo(x+32,-96); g.lineTo(x+32,-60); g.closePath(); g.fill(); }
@@ -571,11 +571,11 @@ const C1K={
       // the gate stays jammed with moth dust until the Brassworks is beaten from inside
       if(!C1F('c_brass_gate')){ for(let i=0;i<4;i++){ const a=t*0.7+i*1.6; glowAt(o.x+60+Math.cos(a)*20,o.y+16+Math.sin(a*1.3)*12,4,'220,210,255',0.5); } } }},
   gantry:{R:140,by:0,col:false,
-    draw(o){ c1Put(c1Tall('gantry'+o.w,o.w+30,140,o.w/2+15,120,g=>{ const w=o.w;
+    draw(o){ c1Put(c1wTall('gantry'+o.w,o.w+30,140,o.w/2+15,120,g=>{ const w=o.w;
       for(const s of [-1,1]){ g.strokeStyle='#5a5e68'; g.lineWidth=5; g.beginPath(); g.moveTo(s*w/2,0); g.lineTo(s*w/2,-66); g.stroke(); }
       c1Shade(g,-w/2-6,-76,w+12,14,'#7a7e88'); g.strokeStyle='#c8a050'; g.lineWidth=1.6; for(let x=-w/2;x<w/2;x+=16){ g.beginPath(); g.moveTo(x,-62); g.lineTo(x+16,-76); g.stroke(); } }),o.x,o.y); }},
   spire:{R:420,by:10,col:{t:'r',x0:-70,y0:-120,x1:70,y1:6},
-    draw(o,t){ if(!C1T.spire) return; c1Put(c1Tall('spire',260,560,130,540,g=>{
+    draw(o,t){ if(!C1WT.spire) return; c1Put(c1wTall('spire',260,560,130,540,g=>{
       c1Ell(g,0,10,110,24,'rgba(10,6,20,.4)');
       celFill(g,(q,dx,dy)=>{ q.moveTo(-74+dx,6+dy); q.lineTo(-40+dx,-260+dy); q.lineTo(-12+dx,-470+dy); q.lineTo(0+dx,-520+dy); q.lineTo(14+dx,-460+dy); q.lineTo(44+dx,-250+dy); q.lineTo(76+dx,6+dy); q.closePath(); },'#3c3650',{r:70,tones:['#6a5c8a','#3c3650','#221e30']});
       for(let i=0;i<6;i++){ const y=-60-i*72; c1Rect(g,-12+i*1.2,y-14,24-i*2.4,14,'#9a7ae0',3); g.fillStyle='rgba(255,240,255,.35)'; g.fillRect(-10+i,y-13,6,4); }
@@ -584,38 +584,38 @@ const C1K={
       for(let i=0;i<5;i++){ const a=t*0.4+i*1.3; glowAt(o.x+Math.cos(a)*60,o.y-200-i*60+Math.sin(a*1.7)*20,5,'200,170,255',0.5); }
       glowAt(o.x,o.y-520,40,'170,140,255',0.25+0.1*Math.sin(t*2)); }},
   shoal:{R:90,by:4,col:false,
-    draw(o){ c1Put(c1Tall('shoal'+(o.v||0),120,150,60,130,g=>{ const h=70+(o.v||0)*18, w=22+(o.v||0)*4; c1Ell(g,0,4,w+10,8,'rgba(200,190,255,.25)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-w+dx,4+dy); q.lineTo(-w*0.3+dx,-h*0.6+dy); q.lineTo(2+dx,-h+dy); q.lineTo(w*0.4+dx,-h*0.5+dy); q.lineTo(w+dx,4+dy); q.closePath(); },'#3c3650',{r:w,tones:['#6a5c8a','#3c3650','#221e30']}); }),o.x,o.y); }},
+    draw(o){ c1Put(c1wTall('shoal'+(o.v||0),120,150,60,130,g=>{ const h=70+(o.v||0)*18, w=22+(o.v||0)*4; c1Ell(g,0,4,w+10,8,'rgba(200,190,255,.25)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-w+dx,4+dy); q.lineTo(-w*0.3+dx,-h*0.6+dy); q.lineTo(2+dx,-h+dy); q.lineTo(w*0.4+dx,-h*0.5+dy); q.lineTo(w+dx,4+dy); q.closePath(); },'#3c3650',{r:w,tones:['#6a5c8a','#3c3650','#221e30']}); }),o.x,o.y); }},
   buoy:{R:30,by:2,col:false,
-    draw(o,t){ const b=Math.sin(t*2+o.x)*1.5; c1Put(c1Tall('buoy',30,40,15,30,g=>{ c1Ell(g,0,2,9,4,'rgba(255,255,255,.4)'); celFill(g,(q,dx,dy)=>q.ellipse(dx,dy-6,7,9,0,0,TAU),'#e0503a',{r:8}); c1Rect(g,-7,-8,14,4,'#fff6e6'); c1Rect(g,-1,-22,2,8,'#5a5e68'); }),o.x,o.y+b); }},
+    draw(o,t){ const b=Math.sin(t*2+o.x)*1.5; c1Put(c1wTall('buoy',30,40,15,30,g=>{ c1Ell(g,0,2,9,4,'rgba(255,255,255,.4)'); celFill(g,(q,dx,dy)=>q.ellipse(dx,dy-6,7,9,0,0,TAU),'#e0503a',{r:8}); c1Rect(g,-7,-8,14,4,'#fff6e6'); c1Rect(g,-1,-22,2,8,'#5a5e68'); }),o.x,o.y+b); }},
   fold:{R:150,by:-40,col:false,
-    draw(o){ c1Put(c1Tall('fold',300,200,150,110,g=>{ g.strokeStyle='#8a8a86'; g.lineWidth=14; g.lineCap='round'; g.beginPath(); g.ellipse(0,0,130,80,0,0.35,TAU-0.35); g.stroke(); g.strokeStyle='#b0b0aa'; g.lineWidth=9; g.stroke(); g.strokeStyle='rgba(80,80,76,.6)'; g.lineWidth=1; for(let a=0.4;a<TAU-0.4;a+=0.18){ g.beginPath(); g.moveTo(Math.cos(a)*126,Math.sin(a)*76); g.lineTo(Math.cos(a)*134,Math.sin(a)*84); g.stroke(); } }),o.x,o.y); }},
+    draw(o){ c1Put(c1wTall('fold',300,200,150,110,g=>{ g.strokeStyle='#8a8a86'; g.lineWidth=14; g.lineCap='round'; g.beginPath(); g.ellipse(0,0,130,80,0,0.35,TAU-0.35); g.stroke(); g.strokeStyle='#b0b0aa'; g.lineWidth=9; g.stroke(); g.strokeStyle='rgba(80,80,76,.6)'; g.lineWidth=1; for(let a=0.4;a<TAU-0.4;a+=0.18){ g.beginPath(); g.moveTo(Math.cos(a)*126,Math.sin(a)*76); g.lineTo(Math.cos(a)*134,Math.sin(a)*84); g.stroke(); } }),o.x,o.y); }},
   cabbage:{R:40,by:4,col:{t:'c',r:14,low:true},
-    draw(o){ c1Put(c1Tall('cab'+(o.big?1:0),o.big?90:30,o.big?80:28,o.big?45:15,o.big?62:20,g=>{ const r=o.big?30:9; c1Ell(g,2,r*0.4,r,r*0.4,'rgba(40,40,30,.3)'); sbCanopy(g,r,mulberry32(o.big?7:3),['#5a8a3a','#8ac25a','#c8ea8a'],o.big?9:5,2); }),o.x,o.y); }},
+    draw(o){ c1Put(c1wTall('cab'+(o.big?1:0),o.big?90:30,o.big?80:28,o.big?45:15,o.big?62:20,g=>{ const r=o.big?30:9; c1Ell(g,2,r*0.4,r,r*0.4,'rgba(40,40,30,.3)'); sbCanopy(g,r,mulberry32(o.big?7:3),['#5a8a3a','#8ac25a','#c8ea8a'],o.big?9:5,2); }),o.x,o.y); }},
   barrel2:{R:20,by:2,col:{t:'c',r:9,low:true},draw(o){ drawSprite(propSprite({k:'c_barrel',v:o.v||0}),o.x,o.y,1,0); }},
   crate2:{R:20,by:2,col:{t:'c',r:10,low:true},draw(o){ drawSprite(propSprite({k:'c_crate',v:o.v||0}),o.x,o.y,1,0); }},
   planter:{R:30,by:4,col:{t:'r',x0:-18,y0:-6,x1:18,y1:6},
-    draw(o){ c1Put(c1Tall('planter'+(o.v||0),50,40,25,24,g=>{ c1Ell(g,2,5,20,5,'rgba(40,30,30,.3)'); c1Shade(g,-18,-8,36,13,o.v?'#6a8aa0':'#a85a3e'); c1Rect(g,-19,-10,38,3,'#d8a440',1);
+    draw(o){ c1Put(c1wTall('planter'+(o.v||0),50,40,25,24,g=>{ c1Ell(g,2,5,20,5,'rgba(40,30,30,.3)'); c1Shade(g,-18,-8,36,13,o.v?'#6a8aa0':'#a85a3e'); c1Rect(g,-19,-10,38,3,'#d8a440',1);
       const cols=o.v?['#f4d040','#ffffff','#f08ab4']:['#e8403a','#f4d040','#b070e0']; for(let i=0;i<6;i++){ celBall(g,-14+i*5.6,-13-(i%2)*3,3.2,'#5a9a44'); celBall(g,-14+i*5.6,-15-(i%2)*3,2.2,cols[i%3]); } }),o.x,o.y); }},
   bench:{R:30,by:2,col:{t:'r',x0:-20,y0:-6,x1:20,y1:5},
-    draw(o){ c1Put(c1Tall('bench',54,40,27,28,g=>{ c1Ell(g,2,5,22,5,'rgba(40,30,30,.3)'); for(const s of [-1,1]) c1Rect(g,s*16-2,-10,4,14,'#3a3e48'); c1Shade(g,-22,-12,44,6,'#8e6a40'); c1Shade(g,-22,-20,44,5,'#8e6a40'); for(const s of [-1,1]) c1Rect(g,s*16-1.5,-22,3,10,'#3a3e48'); }),o.x,o.y); }},
+    draw(o){ c1Put(c1wTall('bench',54,40,27,28,g=>{ c1Ell(g,2,5,22,5,'rgba(40,30,30,.3)'); for(const s of [-1,1]) c1Rect(g,s*16-2,-10,4,14,'#3a3e48'); c1Shade(g,-22,-12,44,6,'#8e6a40'); c1Shade(g,-22,-20,44,5,'#8e6a40'); for(const s of [-1,1]) c1Rect(g,s*16-1.5,-22,3,10,'#3a3e48'); }),o.x,o.y); }},
   line:{R:80,by:0,col:false,
     draw(o,t){ const w=o.w||100, x0=o.x-w/2, x1=o.x+w/2, y=o.y; ctx.save(); for(const x of [x0,x1]){ ctx.fillStyle=SBC.outline; ctx.fillRect(x-2.6,y-40,5.2,42); ctx.fillStyle='#8e6a40'; ctx.fillRect(x-1.4,y-39,2.8,40); }
       ctx.strokeStyle='#e8e2d2'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(x0,y-36); ctx.quadraticCurveTo(o.x,y-24,x1,y-36); ctx.stroke();
       const cols=['#e8503a','#6a8ac8','#f4d040','#ffffff','#7ac04a']; for(let i=0;i<5;i++){ const k=(i+0.7)/5.6, x=lerp(x0,x1,k), yy=y-36+Math.sin(k*Math.PI)*12, sw=Math.sin(t*2+i)*1.5; ctx.fillStyle=SBC.outline; ctx.fillRect(x-5.6+sw,yy-1,11.2,13); ctx.fillStyle=cols[i]; ctx.fillRect(x-4.4+sw,yy,8.8,11); }
       ctx.restore(); }},
   sheep:{R:20,by:2,col:{t:'c',r:10,low:true},
-    draw(o,t){ const c={x:o.x,y:o.y,face:o.f>0?0:Math.PI,moving:false}; const k=Math.sin(t*0.8+o.x)*0.6; c.y+=k*0; CRITTERS.c_sheep.draw(c); if(Math.sin(t*0.3+o.x*0.1)>0.995&&!C1.baaT){ C1.baaT=1; later(2,()=>{ C1.baaT=0; }); if(dist2(player.x,player.y,o.x,o.y)<400*400) c1Snd('baa',0.6); } }},
+    draw(o,t){ const c={x:o.x,y:o.y,face:o.f>0?0:Math.PI,moving:false}; const k=Math.sin(t*0.8+o.x)*0.6; c.y+=k*0; CRITTERS.c_sheep.draw(c); if(Math.sin(t*0.3+o.x*0.1)>0.995&&!C1WD.baaT){ C1WD.baaT=1; later(2,()=>{ C1WD.baaT=0; }); if(dist2(player.x,player.y,o.x,o.y)<400*400) c1Snd('baa',0.6); } }},
   bell:{R:50,by:2,col:{t:'c',r:8},
-    draw(o,t){ c1Put(c1Tall('bell',60,90,30,82,g=>{ c1Ell(g,0,4,16,5,'rgba(40,30,30,.3)'); for(const s of [-1,1]) c1Rect(g,s*16-2.5,-66,5,70,'#6a4a2c'); c1Rect(g,-20,-70,40,6,'#8e6a40',2);
+    draw(o,t){ c1Put(c1wTall('bell',60,90,30,82,g=>{ c1Ell(g,0,4,16,5,'rgba(40,30,30,.3)'); for(const s of [-1,1]) c1Rect(g,s*16-2.5,-66,5,70,'#6a4a2c'); c1Rect(g,-20,-70,40,6,'#8e6a40',2);
       celFill(g,(q,dx,dy)=>{ q.moveTo(-11+dx,-34+dy); q.quadraticCurveTo(-11+dx,-58+dy,dx,-58+dy); q.quadraticCurveTo(11+dx,-58+dy,11+dx,-34+dy); q.lineTo(14+dx,-30+dy); q.lineTo(-14+dx,-30+dy); q.closePath(); },'#d8a440',{r:12}); c1Ell(g,0,-28,3,3,'#8a6420'); }),o.x,o.y); }},
   trailer:{R:50,by:6,col:{t:'r',x0:-34,y0:-10,x1:34,y1:10},
-    draw(o){ c1Put(c1Tall('trailer',90,60,45,36,g=>{ c1Ell(g,0,8,38,7,'rgba(40,30,30,.3)'); for(const s of [-1,1]){ celBall(g,s*22,4,7,'#3a3e48'); celBall(g,s*22,4,3,'#8a8e98'); } c1Shade(g,-32,-8,64,8,'#8e6a40'); c1Rect(g,30,-6,12,3,'#5a3e22');
+    draw(o){ c1Put(c1wTall('trailer',90,60,45,36,g=>{ c1Ell(g,0,8,38,7,'rgba(40,30,30,.3)'); for(const s of [-1,1]){ celBall(g,s*22,4,7,'#3a3e48'); celBall(g,s*22,4,3,'#8a8e98'); } c1Shade(g,-32,-8,64,8,'#8e6a40'); c1Rect(g,30,-6,12,3,'#5a3e22');
       celFill(g,(q,dx,dy)=>q.ellipse(dx,dy-16,34,11,0,0,TAU),'#3a8aa8',{r:20}); g.strokeStyle='rgba(255,250,230,.6)'; g.lineWidth=1.2; g.beginPath(); g.ellipse(0,-17,27,6,0,0,TAU); g.stroke(); }),o.x,o.y); }},
   mill:{R:170,by:4,col:{t:'c',r:22},
-    draw(o){ c1Put(c1Tall('mill',70,180,35,170,g=>{ c1Ell(g,0,4,28,8,'rgba(40,30,30,.3)'); c1Shade(g,-26,-18,52,22,'#7a7e88'); celFill(g,(q,dx,dy)=>{ q.moveTo(-18+dx,-16+dy); q.lineTo(-12+dx,-150+dy); q.lineTo(12+dx,-150+dy); q.lineTo(18+dx,-16+dy); q.closePath(); },'#a85a3e',{r:16});
+    draw(o){ c1Put(c1wTall('mill',70,180,35,170,g=>{ c1Ell(g,0,4,28,8,'rgba(40,30,30,.3)'); c1Shade(g,-26,-18,52,22,'#7a7e88'); celFill(g,(q,dx,dy)=>{ q.moveTo(-18+dx,-16+dy); q.lineTo(-12+dx,-150+dy); q.lineTo(12+dx,-150+dy); q.lineTo(18+dx,-16+dy); q.closePath(); },'#a85a3e',{r:16});
       g.strokeStyle='rgba(70,36,24,.45)'; g.lineWidth=1; for(let y=-140;y<-20;y+=10){ g.beginPath(); g.moveTo(-17,y); g.lineTo(17,y); g.stroke(); } c1Rect(g,-15,-158,30,10,'#5a5e68',2); c1Rect(g,-14,-60,28,5,'#d8a440'); c1Rect(g,-15,-110,30,5,'#d8a440'); c1Ell(g,0,-158,11,3,'#2a2228'); }),o.x,o.y); }},
   gearpile:{R:40,by:4,col:{t:'c',r:18,low:true},
-    draw(o){ c1Put(c1Tall('gearpile',80,60,40,40,g=>{ c1Ell(g,2,6,34,9,'rgba(40,30,30,.3)'); for(const [x,y,r,c] of [[-14,-4,13,'#a4643a'],[10,-8,11,'#c8963a'],[2,4,9,'#8a7a6a'],[-2,-16,8,'#a4643a']]){ celFill(g,(q,dx,dy)=>sbStar(q,9,r,r*0.78,x*0.1,dx+x,dy+y),c,{r}); celBall(g,x,y,r*0.32,'#4a3418'); } }),o.x,o.y); }},
+    draw(o){ c1Put(c1wTall('gearpile',80,60,40,40,g=>{ c1Ell(g,2,6,34,9,'rgba(40,30,30,.3)'); for(const [x,y,r,c] of [[-14,-4,13,'#a4643a'],[10,-8,11,'#c8963a'],[2,4,9,'#8a7a6a'],[-2,-16,8,'#a4643a']]){ celFill(g,(q,dx,dy)=>sbStar(q,9,r,r*0.78,x*0.1,dx+x,dy+y),c,{r}); celBall(g,x,y,r*0.32,'#4a3418'); } }),o.x,o.y); }},
   prop:{R:40,by:2,col:o=>{ const K=PROPK[o.pk]; return K&&K.col&&o.col!==false?{t:'c',r:K.col.r*(o.s||1),low:!!K.col.low}:[]; },
     draw(o){ drawSprite(propSprite({k:o.pk,v:o.v||0}),o.x,o.y,o.s||1,0); }},
   skiff:{R:60,by:0,col:false,
@@ -719,7 +719,7 @@ function c1Elev(){
   rp({x0:9130,y0:24730,x1:9250,y1:24820,dir:'n',kind:'ladder'});
   // grapple posts (bible 1.4) and the causeway posts (only with c_spire_up, see c1Posts)
   for(const [x,y,l] of [[9532,26950,2],[9826,26950,2],[6700,24448,4],[4250,25790,3]]) ELEV.grapple({k,x,y,lvl:l});
-  for(const [x,y] of [[7300,29250],[7350,29500],[7300,29750],[7400,29950]]) ELEV.grapple({k,x,y,lvl:0,when:()=>C1T.spire});
+  for(const [x,y] of [[7300,29250],[7350,29500],[7300,29750],[7400,29950]]) ELEV.grapple({k,x,y,lvl:0,when:()=>C1WT.spire});
   // vents (wings): the cliff updraft to Gull Isle, the Lantern Point updraft (the Chalk Dragon's Breath is added by c1Sync)
   ELEV.vent({k,x:3900,y:28300,r:70,lift:1}); ELEV.vent({k,x:12000,y:29250,r:70,lift:1});
   // no flying over Lantern Point and the Cut (the Grapple Tail is the way in) or over the Shadow Shoals
@@ -748,7 +748,7 @@ function c1House(B,o){
   if(o.want) hs.want=o.want; if(o.walk) hs.c1roof=true; if(o.stilts) hs.c1stilts=true; if(o.extra) hs.c1x=o.extra;
   HOUSES.push(hs); STRUCTS.push(hs);
   if(!o.walk) addCol({t:'r',x0:hs.x-hs.w/2,y0:hs.y-hs.h/2,x1:hs.x+hs.w/2,y1:hs.y+hs.h/2});
-  if(o.lamp!==false){ const lx=hs.x-Math.max(30,hs.w*0.36), ly=hs.y+hs.h/2+14; if(o.town==='c_gearhaven') c1Obj('lamp',lx,ly); else { STRUCTS.push({k:'torch',x:lx,y:ly}); LIGHTS.push({x:lx,y:ly,r:170,i:0.75,fire:true,night:true}); } }
+  if(o.lamp!==false){ const lx=hs.x-Math.max(30,hs.w*0.36), ly=hs.y+hs.h/2+14; if(o.town==='c_gearhaven') c1wObj('lamp',lx,ly); else { STRUCTS.push({k:'torch',x:lx,y:ly}); LIGHTS.push({x:lx,y:ly,r:170,i:0.75,fire:true,night:true}); } }
   return hs;
 }
 // foes the Act II foes helper defines; until it lands, similar stock foes stand in (so nothing ever crashes)
@@ -766,11 +766,11 @@ const C1AREAS={c_gullcrag:[S('The Gullcrag Caves','The Gullcrag Caves'),11],c_br
   c_spire:[S('The Shadow Spire','The Shadow Spire'),13],c_tidehouse:[S('The Tide House','The Tide House'),9],c_mothnest:[S("The Moth's Nest","The Moth's Nest"),10]};
 const C1PH_TPL=['...............','...............','...............','.....s.........','...............','...............','...............','...............','...............','...............','...............'];
 function c1Placeholders(){
-  C1.ph=[];
+  C1WD.ph=[];
   for(const id in C1AREAS){ if(AREADEFS[id]) continue; const [name,level]=C1AREAS[id];
     try{ defineDungeon(id,{name,level,theme:'earth',seed:7700+id.length*13,save:id,placeholder:true,dark:0.2,noJuniper:true,
-      floors:[{id:'1',name,map:{rooms:{a:{at:[0,0],kind:'start',tpl:C1PH_TPL,noPots:true,sign:S(`PLACEHOLDER: ${name} is being built. Come back soon!`,`${name} is not built yet.`)}},links:[]}}]}); C1.ph.push(id); }
-    catch(e){ defCave(id,{name,level,theme:'earth',seed:7700,enemies:[],placeholder:true}); C1.ph.push(id); }
+      floors:[{id:'1',name,map:{rooms:{a:{at:[0,0],kind:'start',tpl:C1PH_TPL,noPots:true,sign:S(`PLACEHOLDER: ${name} is being built. Come back soon!`,`${name} is not built yet.`)}},links:[]}}]}); C1WD.ph.push(id); }
+    catch(e){ defCave(id,{name,level,theme:'earth',seed:7700,enemies:[],placeholder:true}); C1WD.ph.push(id); }
   }
   if(!AREADEFS.c_smugglers) defineDungeon('c_smugglers',{name:S("The Smugglers' Cove","The Smugglers' Cove"),level:10,theme:'earth',seed:7741,save:'c_smugglers',dark:0.3,noJuniper:true,dunKind:S('A cove','A cove'),
     floors:[{id:'1',name:S("The Smugglers' Cove","The Smugglers' Cove"),map:{rooms:{a:{at:[0,0],kind:'start',tpl:['...............','.###.......###.','.#...........#.','.#.....X.....#.','.#...........#.','...............','..s............','...............','.#...........#.','.###.......###.','...............'],
@@ -785,11 +785,11 @@ function c1Doors(B){
   B.door({x:2250,y:26332,area:'c_tidehouse',label:S('Enter the Tide House','Go in the Tide House'),outY:28});
   B.door({x:7200,y:24565,area:'c_mothnest',label:S('Open the hatch in the clock roof','Open the hatch'),outY:30});
   B.door({x:3700,y:27900,area:'c_smugglers',label:S("Go into the Smugglers' Cove","Go in the cove"),outY:34,need:()=>!!G.found.c_kelp_burnt,locked:S('A thick curtain of dry kelp hangs over a crack in the cliff. Something smells of old coins behind it. Kelp burns nicely, they say.','Dry kelp covers a crack. Kelp burns!')});
-  C1.spireDoor={x:7400,y:30040,area:'c_spire',label:S('Enter the Shadow Spire','Go in the Spire'),outY:30};
+  C1WD.spireDoor={x:7400,y:30040,area:'c_spire',label:S('Enter the Shadow Spire','Go in the Spire'),outY:30};
   const sm={area:'c_smugglers',x:3700,y:27880,name:S("The Smugglers' Cove","The Smugglers' Cove")}; CAVEMOUTHS.push(sm); STRUCTS.push({k:'cavemouth',x:sm.x,y:sm.y,ref:sm,theme:'c_sea'});
 }
 function c1Build(B){
-  C1.built=true; C1.B=B;
+  C1WD.built=true; C1WD.B=B;
   c1Elev();
   c1Placeholders();
   // ---- places (bible 10.1 POIs)
@@ -809,7 +809,7 @@ function c1Build(B){
   const GH='c_gearhaven';
   C1ROOF.houses.forEach(([x,y,w,h,want],i)=>c1House(B,{x,y,w,h,town:GH,want,walk:true,seed:6100+i*37}));
   for(const [x,y,w,h] of [[6400,24300,130,90],[6350,24720,120,100],[8250,24420,140,100],[8250,24700,120,90],[6560,25090,120,70],[8130,25090,130,70],[7350,24872,120,80],[8320,24890,120,90]]) c1House(B,{x,y,w,h,town:GH});
-  C1.homes.push({want:'c_ambrose',town:GH,door:{x:7200,y:24846,outY:20},name:S("Ambrose's Workshop","Ambrose's Workshop")});
+  C1WD.homes.push({want:'c_ambrose',town:GH,door:{x:7200,y:24846,outY:20},name:S("Ambrose's Workshop","Ambrose's Workshop")});
   // the Lower Town and the harbor
   for(const [x,y,w,h,want] of [[6600,25750,170,110,'c_hettie'],[7700,25800,180,110,'c_ingrid'],[7300,26180,210,120,'c_fig'],[8100,26340,150,100,'c_mo']]) c1House(B,{x,y,w,h,town:GH,want});
   for(const [x,y,w,h] of [[6520,25420,120,80],[6780,25440,110,80],[7300,25470,120,80],[7980,25440,120,80],[8300,25560,110,90],[6480,26080,110,90],[6680,26180,100,80],[7600,26080,110,90],
@@ -828,8 +828,8 @@ function c1Build(B){
   B.shrine({id:'c_s_gull',x:2300,y:28260,name:S('Gullcrag Shrine','Gullcrag Shrine')});
   B.shrine({id:'c_s_brass',x:9600,y:25300,name:S('Brass Yards Shrine','Brass Yards Shrine')});
   B.shrine({id:'c_s_lantern',x:11500,y:27700,name:S('Lantern Point Shrine','Lantern Point Shrine')});
-  C1.shrDyn=[{s:{id:'c_s_chalk',x:6950,y:21700,name:S('Chalk Dragon Shrine','Chalk Dragon Shrine')},when:()=>c1ChalkDone()},
-    {s:{id:'c_s_break',x:7150,y:28950,name:S('Breakwater Shrine','Breakwater Shrine')},when:()=>C1T.spire}];
+  C1WD.shrDyn=[{s:{id:'c_s_chalk',x:6950,y:21700,name:S('Chalk Dragon Shrine','Chalk Dragon Shrine')},when:()=>c1ChalkDone()},
+    {s:{id:'c_s_break',x:7150,y:28950,name:S('Breakwater Shrine','Breakwater Shrine')},when:()=>C1WT.spire}];
   // ---- camps (bible 1.8); from Chapter 5 the moth camps grow by two dusk moths each
   for(const [id,x,y,units,moths] of C1CAMPS){
     const base=units.map(([t,n])=>[c1Foe(t),n]), c={id:'c_'+id,x,y,want:units};
@@ -874,99 +874,99 @@ defineCrossing({id:'c_dock_moon',x:8350,y:27150,to:{x:1150,y:64800},label:S('Sai
 const c1Reached=s=>typeof reached==='function'&&!!STAGEDEF[s]&&reached(s);
 const c1QDone=q=>!!(G&&G.quests&&G.quests[q]&&G.quests[q].done);
 const c1ChalkDone=()=>C1F('c_chalk_eye')||c1QDone('c_chalk');
-const c1Say=(lines,cb)=>runDialogue(lines.map(l=>Array.isArray(l)?l:['narr',l]),()=>{ scene='play'; if(cb) cb(); saveGame(); });
+const c1wSay=(lines,cb)=>runDialogue(lines.map(l=>Array.isArray(l)?l:['narr',l]),()=>{ scene='play'; if(cb) cb(); saveGame(); });
 function c1LM(B,o){ o.noNudge=true; if(o.clr==null) o.clr=60; return B.landmark(o); }
 const C1QUAY={x0:6620,x1:8330,y:26468};
 function c1Places(B){
   const GH='c_gearhaven';
   // ---- the Upper Town wall and the Upper Gate, the culvert where the Cogwater goes under the town
-  for(let x=6220;x<8440;x+=120){ if(x>6820&&x<7080) continue; c1Obj('wall',x,24104,{w:120}); }
-  c1Obj('gate',6950,24108);
-  c1LM(B,{id:'c_lm_culvert',k:'c_lm',x:7380,y:24070,r:0,prompt:S('Read the sign on the grate','Read the sign'),draw:()=>{},act:()=>c1Say([S('The Cogwater runs into a tunnel under the Clock Quarter. A brass sign on the grate says: NO SWIMMING. NO FISHING. NO BOATS. NO YOU.','The river goes under the town. The sign says: NO YOU.')])});
+  for(let x=6220;x<8440;x+=120){ if(x>6820&&x<7080) continue; c1wObj('wall',x,24104,{w:120}); }
+  c1wObj('gate',6950,24108);
+  c1LM(B,{id:'c_lm_culvert',k:'c_lm',x:7380,y:24070,r:0,prompt:S('Read the sign on the grate','Read the sign'),draw:()=>{},act:()=>c1wSay([S('The Cogwater runs into a tunnel under the Clock Quarter. A brass sign on the grate says: NO SWIMMING. NO FISHING. NO BOATS. NO YOU.','The river goes under the town. The sign says: NO YOU.')])});
   // ---- lamps along the streets of both towns
-  for(let x=6980;x<=8150;x+=235) c1Obj('lamp',x,24960);
-  for(const [x,y] of [[6990,24260],[6880,24560],[6600,24930],[7090,25120],[7740,25120],[7100,25520],[6960,25760],[7180,26080],[7560,26300],[7900,26290],[8250,26300],[7750,25560],[6800,25960],[7480,25960],[8040,25480],[8040,26000],[2120,26520],[1990,26880],[2440,26690],[4400,25960],[12230,28620]]) c1Obj('lamp',x,y);
+  for(let x=6980;x<=8150;x+=235) c1wObj('lamp',x,24960);
+  for(const [x,y] of [[6990,24260],[6880,24560],[6600,24930],[7090,25120],[7740,25120],[7100,25520],[6960,25760],[7180,26080],[7560,26300],[7900,26290],[8250,26300],[7750,25560],[6800,25960],[7480,25960],[8040,25480],[8040,26000],[2120,26520],[1990,26880],[2440,26690],[4400,25960],[12230,28620]]) c1wObj('lamp',x,y);
   // ---- the Great Clock (its face is the elevation; the dial hands and the stuck time are live), the square, the lift
-  c1LM(B,{id:'c_lm_clock',k:'c_lm',x:7000,y:24850,r:0,clr:10,prompt:S('Look at the Great Clock','Look at the clock'),draw:(o,t)=>c1DrawClock(t),act:()=>c1Say([C1T.clock?S('The Great Clock ticks again. TICK. TOCK. The pigeons approve.','The Great Clock ticks again!'):S('The Great Clock. All four faces say one minute to midnight. It is not midnight. It is not even close.','The clock says one minute to midnight. It is wrong.')])});
-  c1Obj('fountain',6990,24880); c1Obj('vane',6700,24448);
-  for(const [x,y] of [[7060,24370],[7110,24400],[7170,24360],[7230,24410],[7290,24375],[7400,24400],[7520,24420],[7600,24680],[7760,24780],[7840,24800]]) c1Obj('chimney',x,y);
+  c1LM(B,{id:'c_lm_clock',k:'c_lm',x:7000,y:24850,r:0,clr:10,prompt:S('Look at the Great Clock','Look at the clock'),draw:(o,t)=>c1DrawClock(t),act:()=>c1wSay([C1WT.clock?S('The Great Clock ticks again. TICK. TOCK. The pigeons approve.','The Great Clock ticks again!'):S('The Great Clock. All four faces say one minute to midnight. It is not midnight. It is not even close.','The clock says one minute to midnight. It is wrong.')])});
+  c1wObj('fountain',6990,24880); c1wObj('vane',6700,24448);
+  for(const [x,y] of [[7060,24370],[7110,24400],[7170,24360],[7230,24410],[7290,24375],[7400,24400],[7520,24420],[7600,24680],[7760,24780],[7840,24800]]) c1wObj('chimney',x,y);
   for(const [x,y] of [[7060,24340],[7110,24370],[7170,24330],[7230,24380],[7290,24345]]) C1CHIMS.push([x,y-46]);
-  c1Obj('line',6825,24350,{w:110});
+  c1wObj('line',6825,24350,{w:110});
   c1LiftBuild(B);
   c1Furnish(B);
   // ---- the Lower Town: the market belt, the stalls, the Moth Mask Watch, Jo's boat shed, the cranes and the chain
-  C1.belts.push({id:'market',x0:6600,y0:25878,x1:7600,y1:25922,dx:1,dy:0},{id:'quay',x0:7978,y0:25500,x1:8022,y1:26300,dx:0,dy:1});
+  C1WD.belts.push({id:'market',x0:6600,y0:25878,x1:7600,y1:25922,dx:1,dy:0},{id:'quay',x0:7978,y0:25500,x1:8022,y1:26300,dx:0,dy:1});
   c1LM(B,{id:'c_lm_belts',k:'c_lm',x:7300,y:25900,r:0,clr:10,draw:(o,t)=>c1DrawBelts(t)});
-  for(const [x,y,v] of [[6720,25850,0],[6900,25848,1],[7260,25850,3],[7420,25848,0],[6820,25960,2],[7300,25965,1]]) c1Obj('stall',x,y,{v});
-  c1Obj('board',7110,25975);
-  c1LM(B,{id:'c_lm_watch',k:'c_lm',x:7110,y:25990,r:0,clr:10,prompt:S('Read the Moth Mask Watch','Read the board'),draw:()=>{},act:()=>c1Say(c1WatchLines())});
-  c1Obj('shed',6500,26390);
-  c1Obj('crane',7700,26745); c1Obj('crane',8100,26945,{flip:1});
+  for(const [x,y,v] of [[6720,25850,0],[6900,25848,1],[7260,25850,3],[7420,25848,0],[6820,25960,2],[7300,25965,1]]) c1wObj('stall',x,y,{v});
+  c1wObj('board',7110,25975);
+  c1LM(B,{id:'c_lm_watch',k:'c_lm',x:7110,y:25990,r:0,clr:10,prompt:S('Read the Moth Mask Watch','Read the board'),draw:()=>{},act:()=>c1wSay(c1WatchLines())});
+  c1wObj('shed',6500,26390);
+  c1wObj('crane',7700,26745); c1wObj('crane',8100,26945,{flip:1});
   c1LM(B,{id:'c_lm_chain',k:'c_lm',x:7610,y:28900,r:0,clr:10,draw:(o,t)=>c1DrawChain(t)});
-  for(const [x,y,v] of [[6640,25560,0],[6700,25570,1],[7860,26200,0],[8200,26420,1],[8230,26405,0],[7520,26420,1]]) c1Obj(v?'barrel2':'crate2',x,y,{v});
+  for(const [x,y,v] of [[6640,25560,0],[6700,25570,1],[7860,26200,0],[8200,26420,1],[8230,26405,0],[7520,26420,1]]) c1wObj(v?'barrel2':'crate2',x,y,{v});
   // the Cogwater Falls viewpoint on the Great Stair landing, and the shadow alcove behind the falls
-  c1LM(B,{id:'c_lm_falls',k:'c_lm',x:7280,y:25270,r:0,clr:20,prompt:S('Look at the Cogwater Falls','Look at the falls'),draw:()=>{},act:()=>c1Say([S('The Cogwater Falls. The whole river jumps off the cliff into the canal below. Behind the water there is a dark gap in the rock. A shadow could slip in there.','The river falls off the cliff. There is a dark gap behind the water.')])});
+  c1LM(B,{id:'c_lm_falls',k:'c_lm',x:7280,y:25270,r:0,clr:20,prompt:S('Look at the Cogwater Falls','Look at the falls'),draw:()=>{},act:()=>c1wSay([S('The Cogwater Falls. The whole river jumps off the cliff into the canal below. Behind the water there is a dark gap in the rock. A shadow could slip in there.','The river falls off the cliff. There is a dark gap behind the water.')])});
   p2Add('shadowlane',{id:'c_lane_falls',pts:[[7300,25262],[7395,25268],[7490,25270]],w:44});
   CHESTS.push({id:'c_ch_falls',x:7520,y:25262,b:12,open:false});
   // ---- Saltmarsh: the Tide Clock, the bell, nets and pots, the jetty
-  c1Obj('tideclock',2250,26318);
-  c1LM(B,{id:'c_lm_tideclock',k:'c_lm',x:2200,y:26360,r:0,clr:10,prompt:S('Look at the Tide Clock','Look at the Tide Clock'),draw:()=>{},act:()=>c1Say([C1T.low?S('The Tide Clock says LOW. The sands at Gullcrag are open, and the crabs are furious about it.','The Tide Clock says LOW!'):S('The Tide Clock says HIGH. Its big hand is stuck. Seaweed pokes out of the works, and everything is dusted with silver.','The Tide Clock is stuck on HIGH.')])});
-  for(const [x,y] of [[2080,26400],[1990,26420]]) c1Obj('lamp',x,y);
-  c1Obj('bell',2180,26430);
+  c1wObj('tideclock',2250,26318);
+  c1LM(B,{id:'c_lm_tideclock',k:'c_lm',x:2200,y:26360,r:0,clr:10,prompt:S('Look at the Tide Clock','Look at the Tide Clock'),draw:()=>{},act:()=>c1wSay([C1WT.low?S('The Tide Clock says LOW. The sands at Gullcrag are open, and the crabs are furious about it.','The Tide Clock says LOW!'):S('The Tide Clock says HIGH. Its big hand is stuck. Seaweed pokes out of the works, and everything is dusted with silver.','The Tide Clock is stuck on HIGH.')])});
+  for(const [x,y] of [[2080,26400],[1990,26420]]) c1wObj('lamp',x,y);
+  c1wObj('bell',2180,26430);
   for(const [pk,x,y,v] of [['c_netpole',2330,26420,0],['c_netpole',1640,26420,1],['c_crabpot',2050,26895,0],['c_crabpot',2075,26905,1],['c_crabpot',1745,26575,0],['c_crabpot',2470,26770,1],['c_mooring',2140,26530,1],['c_mooring',1900,26530,0],['c_mooring',1440,27640,1],['c_mooring',1700,26890,0],
-    ['c_boat',2560,26420,0],['c_boat',1550,26420,1],['c_netpole',2700,26640,0],['c_barrel',1960,26880,1],['c_barrel',2260,26380,0],['c_crate',2290,26395,1],['c_boat',1300,27420,1],['c_crabpot',1510,27320,0]]) c1Obj('prop',x,y,{pk,v});
-  for(const [x,y,a,c,sail] of [[1810,26780,0.3,'#4a7aa0',0],[2190,26640,-0.2,'#c8503a',0],[1470,27560,1.4,'#e0a030',0]]) c1Obj('skiff',x,y,{a,c,sail});
-  for(const [x,y,a,c,sail] of [[6900,26560,0.1,'#c8503a',1],[7250,26700,-0.15,'#3a7a8a',1],[8250,26760,0.25,'#e0a030',1],[7520,27100,0.05,'#4a6a94',1],[6820,27300,-0.3,'#c8503a',0],[8000,27500,0.4,'#7a5a3a',0],[7900,26560,0,'#3a8a8a',0],[6700,26560,0.2,'#a85a3e',0]]) c1Obj('skiff',x,y,{a,c,sail}); c1Obj('bench',2040,26495); c1Obj('bench',2230,26500);
+    ['c_boat',2560,26420,0],['c_boat',1550,26420,1],['c_netpole',2700,26640,0],['c_barrel',1960,26880,1],['c_barrel',2260,26380,0],['c_crate',2290,26395,1],['c_boat',1300,27420,1],['c_crabpot',1510,27320,0]]) c1wObj('prop',x,y,{pk,v});
+  for(const [x,y,a,c,sail] of [[1810,26780,0.3,'#4a7aa0',0],[2190,26640,-0.2,'#c8503a',0],[1470,27560,1.4,'#e0a030',0]]) c1wObj('skiff',x,y,{a,c,sail});
+  for(const [x,y,a,c,sail] of [[6900,26560,0.1,'#c8503a',1],[7250,26700,-0.15,'#3a7a8a',1],[8250,26760,0.25,'#e0a030',1],[7520,27100,0.05,'#4a6a94',1],[6820,27300,-0.3,'#c8503a',0],[8000,27500,0.4,'#7a5a3a',0],[7900,26560,0,'#3a8a8a',0],[6700,26560,0.2,'#a85a3e',0]]) c1wObj('skiff',x,y,{a,c,sail}); c1wObj('bench',2040,26495); c1wObj('bench',2230,26500);
   // ---- the Gull's Rest: the telescope, the flag on the roof
-  c1Obj('telescope',4440,25935); c1Obj('flag',4250,25790);
-  c1LM(B,{id:'c_lm_telescope',k:'c_lm',x:4440,y:25945,r:0,clr:10,prompt:S('Look through the telescope','Look through it'),draw:()=>{},act:()=>c1Say([C1T.spire||c1Reached('c_spire')?S('Out past the harbor, at night, a black spire stands where there was no spire before.','A black spire stands out at sea!'):S('Just sea. Lovely sea. Sea sea sea.','Sea. Lovely sea.')])});
+  c1wObj('telescope',4440,25935); c1wObj('flag',4250,25790);
+  c1LM(B,{id:'c_lm_telescope',k:'c_lm',x:4440,y:25945,r:0,clr:10,prompt:S('Look through the telescope','Look through it'),draw:()=>{},act:()=>c1wSay([C1WT.spire||c1Reached('c_spire')?S('Out past the harbor, at night, a black spire stands where there was no spire before.','A black spire stands out at sea!'):S('Just sea. Lovely sea. Sea sea sea.','Sea. Lovely sea.')])});
   // ---- the Downs: the pass stair, the fold, the windmills, the Chalk Dragon, the dew pond
   c1LM(B,{id:'c_lm_passstair',k:'c_lm',x:3400,y:20330,r:0,clr:150,draw:(o,t)=>c1DrawPassStair()});
-  c1Obj('fold',3900,21100); for(const [x,y,f] of [[3840,21080,1],[3930,21130,-1],[3990,21060,1],[3870,21150,-1],[3960,21000,1]]) c1Obj('sheep',x,y,{f}); STRUCTS.push({k:'campfire',x:4010,y:21180,small:true}); LIGHTS.push({x:4010,y:21180,r:160,i:0.6,fire:true});
-  for(const [x,y] of [[3780,21180],[3700,21070],[4120,21020]]) c1Obj('crate2',x,y,{v:1});
-  c1Obj('bench',4080,21250);
-  c1LM(B,{id:'c_lm_fold',k:'c_lm',x:3900,y:21000,r:0,clr:200,prompt:S("Look at Old Barley's sheepfold","Look at the sheep"),draw:()=>{},act:()=>{ c1Snd('baa'); c1Say([S('A round stone fold full of sheep. There are twelve of them. Every single one is named Gerald.','Twelve sheep. They are all named Gerald.')]); }});
-  c1Obj('windmill',6252,21340,{base:21170}); c1Obj('windmill',9700,22345,{base:22175,col:false});
+  c1wObj('fold',3900,21100); for(const [x,y,f] of [[3840,21080,1],[3930,21130,-1],[3990,21060,1],[3870,21150,-1],[3960,21000,1]]) c1wObj('sheep',x,y,{f}); STRUCTS.push({k:'campfire',x:4010,y:21180,small:true}); LIGHTS.push({x:4010,y:21180,r:160,i:0.6,fire:true});
+  for(const [x,y] of [[3780,21180],[3700,21070],[4120,21020]]) c1wObj('crate2',x,y,{v:1});
+  c1wObj('bench',4080,21250);
+  c1LM(B,{id:'c_lm_fold',k:'c_lm',x:3900,y:21000,r:0,clr:200,prompt:S("Look at Old Barley's sheepfold","Look at the sheep"),draw:()=>{},act:()=>{ c1Snd('baa'); c1wSay([S('A round stone fold full of sheep. There are twelve of them. Every single one is named Gerald.','Twelve sheep. They are all named Gerald.')]); }});
+  c1wObj('windmill',6252,21340,{base:21170}); c1wObj('windmill',9700,22345,{base:22175,col:false});
   CHESTS.push({id:'c_ch_dragonmill',x:6252,y:21200,b:10,open:false,c1top:true},{id:'c_ch_millcap',x:9700,y:22206,b:10,open:false,c1top:true});
-  c1LM(B,{id:'c_lm_dragon',k:'c_lm',x:6600,y:22560,r:0,clr:30,prompt:S('Look at the shape on the hill','Look at the hill'),draw:()=>{},act:()=>c1Say([C1F('c_chalk_drawn')?S('The Chalk Dragon blazes white across the hill. Its tail curls. Its wings spread. It is waving.','The Chalk Dragon is white again. It is waving!'):S('A huge grey shape is cut into the hill, under grass and moth dust. It might be a dragon. It might be a very long sausage.','A big grey shape on the hill. A dragon? A sausage?')])});
-  c1LM(B,{id:'c_lm_sealed',k:'c_lm',x:6950,y:21700,r:0,clr:90,hidden:()=>c1ChalkDone(),prompt:S('Look at the stone in the eye','Look at the stone'),draw:(o,t)=>{ if(!c1ChalkDone()) c1DrawSealed(o,t); },act:()=>c1Say([S('A shrine stone, sealed with old chalk. It is cold. Maybe the dragon needs to see again first.','A sealed shrine. The dragon must wake up first.')])});
+  c1LM(B,{id:'c_lm_dragon',k:'c_lm',x:6600,y:22560,r:0,clr:30,prompt:S('Look at the shape on the hill','Look at the hill'),draw:()=>{},act:()=>c1wSay([C1F('c_chalk_drawn')?S('The Chalk Dragon blazes white across the hill. Its tail curls. Its wings spread. It is waving.','The Chalk Dragon is white again. It is waving!'):S('A huge grey shape is cut into the hill, under grass and moth dust. It might be a dragon. It might be a very long sausage.','A big grey shape on the hill. A dragon? A sausage?')])});
+  c1LM(B,{id:'c_lm_sealed',k:'c_lm',x:6950,y:21700,r:0,clr:90,hidden:()=>c1ChalkDone(),prompt:S('Look at the stone in the eye','Look at the stone'),draw:(o,t)=>{ if(!c1ChalkDone()) c1DrawSealed(o,t); },act:()=>c1wSay([S('A shrine stone, sealed with old chalk. It is cold. Maybe the dragon needs to see again first.','A sealed shrine. The dragon must wake up first.')])});
   // ---- the Moth Wood: the Moon Ring, the hollow birch
-  for(let i=0;i<7;i++){ const a=i/7*TAU-Math.PI/2; c1Obj('standing',1350+Math.cos(a)*130,22750+Math.sin(a)*96,{v:i%3,pale:true}); }
-  c1LM(B,{id:'c_lm_moonring',k:'c_lm',x:1350,y:22760,r:0,clr:140,prompt:S('Look at the Moon Ring','Look at the stones'),draw:(o,t)=>{ if(isNight()) glowAt(1350,22750,120,'190,180,255',0.12+0.05*Math.sin(t)); },act:()=>c1Say([isNight()?S('The seven stones hum, very softly. Silver dust lies thick in the middle of the ring, as if something big and soft sat here not long ago.','The stones hum. Something big sat here.'):S('Seven pale stones in a ring. Moths sleep on them by day, wings folded, painted eyes open.','Seven pale stones. Moths sleep on them.')])});
-  c1LM(B,{id:'c_lm_birch',k:'c_lm',x:880,y:22180,r:22,clr:70,prompt:S('Look at the hollow birch','Look at the old tree'),draw:(o,t)=>c1DrawBirch(o,t),act:()=>c1Say([G.found.c_birch_cracked?S('The old birch is split open. It looks relieved.','The tree is open now.'):S('A huge old birch with a crack down its trunk. Something glints deep inside. A good hard whack might open it.','Something shines inside the crack. Hit it hard!')])});
+  for(let i=0;i<7;i++){ const a=i/7*TAU-Math.PI/2; c1wObj('standing',1350+Math.cos(a)*130,22750+Math.sin(a)*96,{v:i%3,pale:true}); }
+  c1LM(B,{id:'c_lm_moonring',k:'c_lm',x:1350,y:22760,r:0,clr:140,prompt:S('Look at the Moon Ring','Look at the stones'),draw:(o,t)=>{ if(isNight()) glowAt(1350,22750,120,'190,180,255',0.12+0.05*Math.sin(t)); },act:()=>c1wSay([isNight()?S('The seven stones hum, very softly. Silver dust lies thick in the middle of the ring, as if something big and soft sat here not long ago.','The stones hum. Something big sat here.'):S('Seven pale stones in a ring. Moths sleep on them by day, wings folded, painted eyes open.','Seven pale stones. Moths sleep on them.')])});
+  c1LM(B,{id:'c_lm_birch',k:'c_lm',x:880,y:22180,r:22,clr:70,prompt:S('Look at the hollow birch','Look at the old tree'),draw:(o,t)=>c1DrawBirch(o,t),act:()=>c1wSay([G.found.c_birch_cracked?S('The old birch is split open. It looks relieved.','The tree is open now.'):S('A huge old birch with a crack down its trunk. Something glints deep inside. A good hard whack might open it.','Something shines inside the crack. Hit it hard!')])});
   // ---- the Rockpools: the wreck, the kelp curtain, Gull Isle
-  c1Obj('wreck',4600,28300);
-  c1LM(B,{id:'c_lm_wreck',k:'c_lm',x:4600,y:28360,r:0,clr:200,prompt:S('Look at the wreck','Look at the old ship'),draw:()=>{},act:()=>c1Say([S('The wreck of the Saucy Gull. A plank on the beach says: CAPTAIN SALTBEARD. NO REFUNDS.','The wreck of the Saucy Gull. NO REFUNDS.')])});
+  c1wObj('wreck',4600,28300);
+  c1LM(B,{id:'c_lm_wreck',k:'c_lm',x:4600,y:28360,r:0,clr:200,prompt:S('Look at the wreck','Look at the old ship'),draw:()=>{},act:()=>c1wSay([S('The wreck of the Saucy Gull. A plank on the beach says: CAPTAIN SALTBEARD. NO REFUNDS.','The wreck of the Saucy Gull. NO REFUNDS.')])});
   c1LM(B,{id:'c_lm_kelp',k:'c_lm',x:3700,y:27880,r:0,clr:120,draw:(o,t)=>{ if(!G.found.c_kelp_burnt) c1DrawKelp(o,t); }});
   c1LM(B,{id:'c_lm_page6',k:'c_lm',x:4160,y:29660,r:0,clr:60,hidden:()=>!!G.found.c_lm_page6,prompt:S('Pick up the old page','Pick up the page'),draw:(o,t)=>{ if(!G.found.c_lm_page6) c1DrawPage(o,t); },act:()=>c1Page6()});
   CHESTS.push({id:'c_ch_gullisle',x:4040,y:29745,b:15,open:false});
-  for(const [x,y] of [[4060,29640],[4180,29760],[3990,29700]]) c1Obj('crate2',x,y,{col:false});
+  for(const [x,y] of [[4060,29640],[4180,29760],[3990,29700]]) c1wObj('crate2',x,y,{col:false});
   // ---- the Cut and its broken rope bridge
-  c1Obj('bridgepost',9535,26935); c1Obj('bridgepost',9832,26962,{flip:1});
-  c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,prompt:S('Look at the broken bridge','Look at the bridge'),draw:(o,t)=>c1DrawCut(t),act:()=>c1Say([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
+  c1wObj('bridgepost',9535,26935); c1wObj('bridgepost',9832,26962,{flip:1});
+  c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,prompt:S('Look at the broken bridge','Look at the bridge'),draw:(o,t)=>c1DrawCut(t),act:()=>c1wSay([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
   // ---- the Brass Yards: the Brassworks, the stack, the gantries
-  c1Obj('works',10140,24800); c1Obj('gantry',11730,24250,{w:700}); c1Obj('gantry',9190,24770,{w:460});
-  for(const [x,y] of [[9800,24300],[11050,25300],[12000,24700],[9150,25250]]){ c1Obj('mill',x,y); C1CHIMS.push([x,y-150]); }
-  for(const [x,y] of [[10500,24950],[11500,24600],[9500,24100],[10900,25600],[11900,25000]]) c1Obj('gearpile',x,y);
+  c1wObj('works',10140,24800); c1wObj('gantry',11730,24250,{w:700}); c1wObj('gantry',9190,24770,{w:460});
+  for(const [x,y] of [[9800,24300],[11050,25300],[12000,24700],[9150,25250]]){ c1wObj('mill',x,y); C1CHIMS.push([x,y-150]); }
+  for(const [x,y] of [[10500,24950],[11500,24600],[9500,24100],[10900,25600],[11900,25000]]) c1wObj('gearpile',x,y);
   c1LM(B,{id:'c_lm_stack',k:'c_lm',x:10360,y:24520,r:0,clr:20,draw:(o,t)=>c1DrawStack(t)});
   CHESTS.push({id:'c_ch_gantry',x:11900,y:24050,b:13,open:false},{id:'c_ch_heightse',x:10320,y:26400,b:11,open:false});
   B.sign('c_sign_works',10000,24900,S('THE BRASSWORKS. CLOSED UNTIL THE MOTHS GO AWAY. (They have not gone away.)','THE BRASSWORKS. CLOSED. Moths inside.'));
   // ---- Lantern Point: the lighthouse, the keeper's garden, the seal lane, Seal Rocks
-  c1Obj('lighthouse',12880,29020);
-  for(const [x,y] of [[12380,28610],[12420,28650],[12450,28600],[12350,28660],[12490,28640]]) c1Obj('cabbage',x,y);
-  c1Obj('cabbage',12530,28690,{big:1}); c1Obj('barrel2',12200,28560,{v:0}); c1Obj('trailer',12140,28640);
-  c1LM(B,{id:'c_lm_cabbage',k:'c_lm',x:12530,y:28700,r:0,clr:30,prompt:S('Look at the enormous cabbage','Look at the big cabbage'),draw:()=>{},act:()=>c1Say([S('The biggest cabbage you have ever seen. A sign: PRIZE CABBAGE. PLEASE DO NOT EAT. - AGATHA. Someone has taken one tiny bite.','A giant cabbage. DO NOT EAT. Someone took a bite.')])});
-  for(let y=29230;y<30080;y+=140){ c1Obj('buoy',11690,y); c1Obj('buoy',11910,y+70); }
+  c1wObj('lighthouse',12880,29020);
+  for(const [x,y] of [[12380,28610],[12420,28650],[12450,28600],[12350,28660],[12490,28640]]) c1wObj('cabbage',x,y);
+  c1wObj('cabbage',12530,28690,{big:1}); c1wObj('barrel2',12200,28560,{v:0}); c1wObj('trailer',12140,28640);
+  c1LM(B,{id:'c_lm_cabbage',k:'c_lm',x:12530,y:28700,r:0,clr:30,prompt:S('Look at the enormous cabbage','Look at the big cabbage'),draw:()=>{},act:()=>c1wSay([S('The biggest cabbage you have ever seen. A sign: PRIZE CABBAGE. PLEASE DO NOT EAT. - AGATHA. Someone has taken one tiny bite.','A giant cabbage. DO NOT EAT. Someone took a bite.')])});
+  for(let y=29230;y<30080;y+=140){ c1wObj('buoy',11690,y); c1wObj('buoy',11910,y+70); }
   c1LM(B,{id:'c_lm_seal',k:'c_lm',x:11800,y:30180,r:26,clr:60,prompt:S('Wake the seal','Wake the seal'),draw:(o,t)=>c1DrawSeal(o,t),act:()=>c1Seal()});
   CHESTS.push({id:'c_ch_seal',x:11800,y:30215,b:15,open:false});
   // ---- the Shadow Shoals: black spires in the sea, Spire Rock and its tower (only when it has risen)
-  for(const [x,y,v] of [[6300,29700,2],[8800,29900,2],[6800,30500,1],[8250,30650,1],[5900,30250,0],[9100,30450,1],[6550,29420,0],[8500,29450,0],[7000,30800,2],[9400,30100,0],[5700,29600,1]]) c1Obj('shoal',x,y,{v});
-  c1Obj('spire',7400,30000);
+  for(const [x,y,v] of [[6300,29700,2],[8800,29900,2],[6800,30500,1],[8250,30650,1],[5900,30250,0],[9100,30450,1],[6550,29420,0],[8500,29450,0],[7000,30800,2],[9400,30100,0],[5700,29600,1]]) c1wObj('shoal',x,y,{v});
+  c1wObj('spire',7400,30000);
   c1LM(B,{id:'c_lm_causeway',k:'c_lm',x:7300,y:29400,r:0,clr:10,draw:(o,t)=>c1DrawCauseway(t)});
   // ---- treasure (Madame Ravel's map, c_map): three X marks, dug with the stock dig code
   for(const [id,x,y,coins,gift] of [['c_x_downs',8400,23000,60,'treat'],['c_x_pools',3100,28500,70,null],['c_x_lantern',13600,28200,80,'potion']])
     c1LM(B,{id,k:'xmark',x,y,r:0,clr:40,prompt:S('Dig here','Dig here'),hidden:()=>!G.items.c_map||!!G.found[id],act:o=>{ if(G.found[id]) return; G.found[id]=true; SFX.play('chest'); shake(3);
-      c1Say([S(`You dig up a little chest of the smugglers' sort. Inside: ${coins} coins and a note: "If found, this is not ours."`,`You dig up a chest! ${coins} coins inside.`)],()=>{ addCoins(coins,x,y); if(gift==='treat') G.pipTreats=(G.pipTreats||0)+1; if(gift==='potion'&&player.potionsMax!=null){ player.potionsMax++; player.potions=player.potionsMax; setBanner(S('A new flask!','A new flask!'),S('You can carry one more healing draught.','One more drink!'),2.4); } }); }});
+      c1wSay([S(`You dig up a little chest of the smugglers' sort. Inside: ${coins} coins and a note: "If found, this is not ours."`,`You dig up a chest! ${coins} coins inside.`)],()=>{ addCoins(coins,x,y); if(gift==='treat') G.pipTreats=(G.pipTreats||0)+1; if(gift==='potion'&&player.potionsMax!=null){ player.potionsMax++; player.potions=player.potionsMax; setBanner(S('A new flask!','A new flask!'),S('You can carry one more healing draught.','One more drink!'),2.4); } }); }});
   // ---- the cliff shelves (Climbing Claws): a chest on each
   for(const x of C1SHELVES){ const y=c1CliffEdge(x); CHESTS.push({id:'c_ch_shelf_'+x,x,y:y+62,b:15,open:false}); }
   CHESTS.push({id:'c_ch_gullspur',x:2140,y:28420,b:17,open:false});
@@ -984,32 +984,32 @@ function c1Furnish(B){
   const rng=mulberry32(4411), kinds=['planter','planter','bench','crate2','barrel2','planter','barrel2'];
   const ok=(x,y,lv)=>{ if(segsDist(x,y,ROAD_SEGS)<52||blockedAt(x,y)||elevLvl(x,y)!==lv||elevFace(x,y+12)) return false;
     for(const h of mapList(HOUSES,1)) if(Math.abs(h.x-x)<h.w/2+46&&Math.abs(h.y-y)<h.h/2+46) return false;
-    for(const b of C1.belts) if(x>b.x0-50&&x<b.x1+50&&y>b.y0-50&&y<b.y1+50) return false;
-    for(const o of C1.objs) if(dist2(o.x,o.y,x,y)<60*60) return false;
+    for(const b of C1WD.belts) if(x>b.x0-50&&x<b.x1+50&&y>b.y0-50&&y<b.y1+50) return false;
+    for(const o of C1WD.objs) if(dist2(o.x,o.y,x,y)<60*60) return false;
     for(const l of mapList(LANDMARKS,1)) if(dist2(l.x,l.y,x,y)<70*70) return false;
     for(const s of mapList(SHRINES,1)) if(dist2(s.x,s.y,x,y)<120*120) return false;
     return true; };
   for(const [x0,y0,x1,y1,lv] of [[6200,24180,8420,25150,2],[6400,25420,8450,26420,0]])
-    for(let y=y0;y<y1;y+=64) for(let x=x0;x<x1;x+=64){ if(rng()>0.16) continue; const px=x+rng()*40, py=y+rng()*40; if(!ok(px,py,lv)) continue; c1Obj(kinds[Math.floor(rng()*kinds.length)],px,py,{v:Math.floor(rng()*2)}); }
+    for(let y=y0;y<y1;y+=64) for(let x=x0;x<x1;x+=64){ if(rng()>0.16) continue; const px=x+rng()*40, py=y+rng()*40; if(!ok(px,py,lv)) continue; c1wObj(kinds[Math.floor(rng()*kinds.length)],px,py,{v:Math.floor(rng()*2)}); }
 }
 // ---------- the clock: hands stuck at 11:59 until the Great Clock runs again, then the real time of day
-function c1ClockHands(){ if(!C1T.clock) return {h:11,m:59}; const t=((G.tod||0)*24+24)%24; return {h:Math.floor(t)%12,m:(t%1)*60}; }
+function c1ClockHands(){ if(!C1WT.clock) return {h:11,m:59}; const t=((G.tod||0)*24+24)%24; return {h:Math.floor(t)%12,m:(t%1)*60}; }
 function c1DrawClock(t){
   if(!inView(7200,24700,260)) return;
   const {h,m}=c1ClockHands(), cx=7200, cy=24742, R=40;
   // hour and minute hands on the big south face (the dial is painted on the cliff of the tower)
   ctx.save(); ctx.lineCap='round';
-  const ah=(h+m/60)/12*TAU-Math.PI/2, am=m/60*TAU-Math.PI/2+(C1T.clock?0:Math.sin(t*9)*0.012*(Math.sin(t*0.7)>0.9?1:0));
+  const ah=(h+m/60)/12*TAU-Math.PI/2, am=m/60*TAU-Math.PI/2+(C1WT.clock?0:Math.sin(t*9)*0.012*(Math.sin(t*0.7)>0.9?1:0));
   ctx.strokeStyle='#3b2233'; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ah)*R*0.52,cy+Math.sin(ah)*R*0.52); ctx.stroke();
   ctx.lineWidth=3.6; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(am)*R*0.82,cy+Math.sin(am)*R*0.82); ctx.stroke();
   ctx.strokeStyle='#d8a440'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ah)*R*0.5,cy+Math.sin(ah)*R*0.5); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(am)*R*0.8,cy+Math.sin(am)*R*0.8); ctx.stroke();
   ctx.fillStyle='#d8a440'; ctx.beginPath(); ctx.arc(cx,cy,4,0,TAU); ctx.fill(); ctx.restore();
   if(isNight()) glowAt(cx,cy,48,'255,236,180',0.25);
   // the bell loft on top: a little brass cupola and the hatch
-  c1Put(c1Tall('cupola',90,90,45,70,g=>{ c1Ell(g,0,6,30,8,'rgba(40,30,40,.3)'); for(const s of [-1,1]) c1Rect(g,s*22-3,-34,6,36,'#d8a440'); c1Rect(g,-26,-38,52,6,'#a07428',2); celFill(g,(q,dx,dy)=>{ q.moveTo(-28+dx,-38+dy); q.quadraticCurveTo(dx,-72+dy,28+dx,-38+dy); q.closePath(); },'#3a7a8a',{r:24}); c1Ell(g,0,-64,4,4,'#d8a440'); c1Ell(g,0,-14,10,12,'#c8963a'); c1Ell(g,0,-12,7,8,'#a07428'); }),7200,24600);
-  c1Put(c1Tall('hatch',50,30,25,15,g=>{ c1Shade(g,-18,-9,36,18,'#6a4a2c'); g.strokeStyle='#3a2414'; g.lineWidth=1.2; for(let x=-12;x<18;x+=8){ g.beginPath(); g.moveTo(x,-9); g.lineTo(x,9); g.stroke(); } c1Ell(g,10,0,2,2,'#d8a440'); }),7200,24560);
+  c1Put(c1wTall('cupola',90,90,45,70,g=>{ c1Ell(g,0,6,30,8,'rgba(40,30,40,.3)'); for(const s of [-1,1]) c1Rect(g,s*22-3,-34,6,36,'#d8a440'); c1Rect(g,-26,-38,52,6,'#a07428',2); celFill(g,(q,dx,dy)=>{ q.moveTo(-28+dx,-38+dy); q.quadraticCurveTo(dx,-72+dy,28+dx,-38+dy); q.closePath(); },'#3a7a8a',{r:24}); c1Ell(g,0,-64,4,4,'#d8a440'); c1Ell(g,0,-14,10,12,'#c8963a'); c1Ell(g,0,-12,7,8,'#a07428'); }),7200,24600);
+  c1Put(c1wTall('hatch',50,30,25,15,g=>{ c1Shade(g,-18,-9,36,18,'#6a4a2c'); g.strokeStyle='#3a2414'; g.lineWidth=1.2; for(let x=-12;x<18;x+=8){ g.beginPath(); g.moveTo(x,-9); g.lineTo(x,9); g.stroke(); } c1Ell(g,10,0,2,2,'#d8a440'); }),7200,24560);
   // tick, every second, once the clock runs
-  if(C1T.clock&&dist2(player.x,player.y,cx,cy)<700*700){ const s=Math.floor(G.time); if(s!==C1.tick){ C1.tick=s; c1Snd('tick',0.7); } }
+  if(C1WT.clock&&dist2(player.x,player.y,cx,cy)<700*700){ const s=Math.floor(G.time); if(s!==C1WD.tick){ C1WD.tick=s; c1Snd('tick',0.7); } }
 }
 // ---------- the Moth Mask Watch: Penny's board points at the main story (and at the notes)
 function c1WatchLines(){
@@ -1028,12 +1028,12 @@ function c1WatchLines(){
 }
 // ---------- the Clockwork Lift between the Lower Town and the Upper Town (x 7700)
 function c1LiftBuild(B){
-  const L=C1.lift={x:7700,top:{x:7700,y:25150},bot:{x:7700,y:25350},pos:0,ride:null};
+  const L=C1WD.lift={x:7700,top:{x:7700,y:25150},bot:{x:7700,y:25350},pos:0,ride:null};
   c1LM(B,{id:'c_lm_lifttop',k:'c_lm',x:7700,y:25150,r:0,clr:30,prompt:S('Ride the Clockwork Lift down','Ride the lift down'),draw:(o,t)=>c1DrawLift(t),act:()=>c1LiftRide(1)});
   c1LM(B,{id:'c_lm_liftbot',k:'c_lm',x:7700,y:25352,r:0,clr:30,prompt:S('Ride the Clockwork Lift up','Ride the lift up'),draw:()=>{},act:()=>c1LiftRide(0)});
 }
 function c1LiftRide(to){
-  const L=C1.lift; if(L.ride||player.hop) return;
+  const L=C1WD.lift; if(L.ride||player.hop) return;
   const tgt=to?L.bot:L.top; L.ride={t:0,from:L.pos,to}; c1Snd('clank');
   ELEV.hopTo(tgt.x,tgt.y+(to?8:-4),to?'down':'up');
 }
@@ -1042,11 +1042,11 @@ function c1Page6(){
   if(G.found.c_lm_page6) return; G.found.c_lm_page6=true;
   if(typeof ITEM_NAMES!=='undefined'&&!ITEM_NAMES.c_page6) ITEM_NAMES.c_page6=S("Pearl's Logbook, page 6","Pearl's Logbook, page 6");
   SFX.play('quest');
-  c1Say([S('Under a stone, wrapped in oilcloth: an old page in neat, loopy writing. "A moth came to my lighthouse tonight. A big one, with a voice like a lullaby..."','An old page! It talks about a big moth.'),
+  c1wSay([S('Under a stone, wrapped in oilcloth: an old page in neat, loopy writing. "A moth came to my lighthouse tonight. A big one, with a voice like a lullaby..."','An old page! It talks about a big moth.'),
     S('The rest is about soup, and warm windows. Archivist Inkwell in Gearhaven would want to see this.','Take it to the library in Gearhaven.')],()=>giveItems({c_page6:1}));
 }
 function c1Seal(){
-  if(G.found.c_seal_awake){ c1Say([G.found.c_seal_awake==='huff'?S('Sir Blubbington has his back to you. He is still in a huff. He will get over it. Probably.','The seal is still grumpy.'):S('Sir Blubbington waves a flipper. He looks very pleased with himself.','The seal waves at you!')]); return; }
+  if(G.found.c_seal_awake){ c1wSay([G.found.c_seal_awake==='huff'?S('Sir Blubbington has his back to you. He is still in a huff. He will get over it. Probably.','The seal is still grumpy.'):S('Sir Blubbington waves a flipper. He looks very pleased with himself.','The seal waves at you!')]); return; }
   const fish=(G.items.fish||0)>0;
   runDialogue([['narr',S('A very large seal is fast asleep on top of a chest. A little brass plate on the chest says SIR BLUBBINGTON. The seal is snoring.','A big seal sleeps on a chest. It snores.')],
     ch('ash',S('How do you wake a sleeping seal?','How do I wake him?'),[
@@ -1103,7 +1103,7 @@ function c1PaintQuay(g){
 }
 function c1PaintCulvert(g){ g.save(); const x=7380, y=24080; g.fillStyle=SBC.outline; rrect(g,x-62,y-18,124,34,8); g.fill(); g.fillStyle='#a8a090'; rrect(g,x-58,y-15,116,28,7); g.fill(); g.fillStyle='#1a2a34'; rrect(g,x-46,y-10,92,20,6); g.fill(); g.strokeStyle='#d8a440'; g.lineWidth=3; for(let k=-38;k<=38;k+=12){ g.beginPath(); g.moveTo(x+k,y-10); g.lineTo(x+k,y+10); g.stroke(); } g.restore(); }
 function c1PaintCauseway(g){
-  if(!C1T.spire) return; g.save(); const rng=mulberry32(77);
+  if(!C1WT.spire) return; g.save(); const rng=mulberry32(77);
   for(const r of C1G.causeway){ for(let y=r.y0+10;y<r.y1;y+=34){ for(let x=r.x0+14;x<r.x1;x+=40){ const rx=16+rng()*8, ry=11+rng()*5, px=x+(rng()-0.5)*10, py=y+(rng()-0.5)*8;
     g.fillStyle='rgba(200,190,255,.35)'; g.beginPath(); g.ellipse(px,py+4,rx+5,ry+4,0,0,TAU); g.fill();
     g.fillStyle=SBC.outline; g.beginPath(); g.ellipse(px,py,rx+1.6,ry+1.6,0,0,TAU); g.fill(); g.fillStyle='#2a2638'; g.beginPath(); g.ellipse(px,py,rx,ry,0,0,TAU); g.fill(); g.fillStyle='#4c4662'; g.beginPath(); g.ellipse(px-2,py-2,rx*0.8,ry*0.7,0,0,TAU); g.fill(); g.fillStyle='rgba(190,170,255,.4)'; g.beginPath(); g.ellipse(px-rx*0.35,py-ry*0.4,rx*0.3,ry*0.2,0,0,TAU); g.fill(); } } }
@@ -1153,8 +1153,8 @@ function c1PaintClockFace(g){
 }
 // ---------- live ground pieces (drawn every frame under the figures)
 function c1DrawBelts(t){
-  const run=C1T.clock, ph=run?t*90:(Math.floor(t/2.4)*24+(t%2.4<0.45?(t%2.4)/0.45*24:24));
-  for(const b of C1.belts){ if(!inView((b.x0+b.x1)/2,(b.y0+b.y1)/2,Math.max(b.x1-b.x0,b.y1-b.y0)/2+60)) continue;
+  const run=C1WT.clock, ph=run?t*90:(Math.floor(t/2.4)*24+(t%2.4<0.45?(t%2.4)/0.45*24:24));
+  for(const b of C1WD.belts){ if(!inView((b.x0+b.x1)/2,(b.y0+b.y1)/2,Math.max(b.x1-b.x0,b.y1-b.y0)/2+60)) continue;
     ctx.save(); ctx.fillStyle=SBC.outline; rrect(ctx,b.x0-3,b.y0-3,b.x1-b.x0+6,b.y1-b.y0+6,6); ctx.fill(); ctx.fillStyle='#4a4650'; rrect(ctx,b.x0,b.y0,b.x1-b.x0,b.y1-b.y0,5); ctx.fill();
     ctx.beginPath(); ctx.rect(b.x0+2,b.y0+2,b.x1-b.x0-4,b.y1-b.y0-4); ctx.clip(); ctx.fillStyle='#6a6670';
     if(b.dx){ const o=ph%24; for(let x=b.x0-24+o;x<b.x1;x+=24){ ctx.fillRect(x,b.y0+2,10,b.y1-b.y0-4); } }
@@ -1163,7 +1163,7 @@ function c1DrawBelts(t){
 }
 function c1DrawChain(t){
   const a={x:7322,y:28990}, b={x:7898,y:28800}; if(!inView((a.x+b.x)/2,(a.y+b.y)/2,420)) return;
-  const up=C1T.clock, n=24; ctx.save();
+  const up=C1WT.clock, n=24; ctx.save();
   for(let i=0;i<=n;i++){ const k=i/n, x=lerp(a.x,b.x,k), sag=up?Math.sin(k*Math.PI)*10:Math.sin(k*Math.PI)*46, y=lerp(a.y,b.y,k)+sag+(up?Math.sin(t*2+k*6)*1.2:0);
     if(!up&&k>0.12&&k<0.88){ ctx.fillStyle='rgba(30,40,60,.35)'; ctx.beginPath(); ctx.ellipse(x,y,5,2.6,0,0,TAU); ctx.fill(); continue; }
     ctx.strokeStyle=SBC.outline; ctx.lineWidth=4.4; ctx.beginPath(); ctx.ellipse(x,y,6,3.6,i%2?0:Math.PI/2,0,TAU); ctx.stroke(); ctx.strokeStyle='#8a8e98'; ctx.lineWidth=2.2; ctx.stroke(); }
@@ -1173,20 +1173,20 @@ function c1DrawChain(t){
   ctx.restore();
 }
 function c1DrawPassStair(){
-  c1Put(c1Tall('passstair',220,380,110,360,g=>{
+  c1Put(c1wTall('passstair',220,380,110,360,g=>{
     for(let i=0;i<11;i++){ const y=-i*30, w=120-i*4; g.fillStyle='rgba(40,30,40,.25)'; g.fillRect(-w/2+4,y+4,w,22); g.fillStyle=i%2?'#e8e2d2':'#f2ede0'; g.fillRect(-w/2,y,w,22); g.fillStyle='rgba(255,255,255,.5)'; g.fillRect(-w/2,y,w,4); g.fillStyle='rgba(120,110,90,.4)'; g.fillRect(-w/2,y+18,w,4); }
     for(const s of [-1,1]){ g.fillStyle='#b8b0a0'; g.beginPath(); g.moveTo(s*62,20); g.lineTo(s*44,-310); g.lineTo(s*36,-310); g.lineTo(s*54,20); g.closePath(); g.fill(); } }),3400,20330);
 }
-function c1DrawSealed(o,t){ c1Put(c1Tall('sealed',60,70,30,60,g=>{ c1Ell(g,0,4,22,7,'rgba(40,40,30,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-16+dx,4+dy); q.lineTo(-12+dx,-40+dy); q.quadraticCurveTo(dx,-50+dy,12+dx,-40+dy); q.lineTo(16+dx,4+dy); q.closePath(); },'#e4e0d2',{r:16}); g.strokeStyle='#a8a090'; g.lineWidth=2; g.beginPath(); g.moveTo(-8,-30); g.lineTo(8,-12); g.moveTo(8,-30); g.lineTo(-8,-12); g.stroke(); }),o.x,o.y); }
-function c1DrawBirch(o,t){ const open=G.found.c_birch_cracked; c1Put(c1Tall('birch'+(open?1:0),90,120,45,100,g=>{
+function c1DrawSealed(o,t){ c1Put(c1wTall('sealed',60,70,30,60,g=>{ c1Ell(g,0,4,22,7,'rgba(40,40,30,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-16+dx,4+dy); q.lineTo(-12+dx,-40+dy); q.quadraticCurveTo(dx,-50+dy,12+dx,-40+dy); q.lineTo(16+dx,4+dy); q.closePath(); },'#e4e0d2',{r:16}); g.strokeStyle='#a8a090'; g.lineWidth=2; g.beginPath(); g.moveTo(-8,-30); g.lineTo(8,-12); g.moveTo(8,-30); g.lineTo(-8,-12); g.stroke(); }),o.x,o.y); }
+function c1DrawBirch(o,t){ const open=G.found.c_birch_cracked; c1Put(c1wTall('birch'+(open?1:0),90,120,45,100,g=>{
   c1Ell(g,4,6,34,10,'rgba(40,40,50,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-26+dx,6+dy); q.lineTo(-20+dx,-80+dy); q.lineTo(20+dx,-80+dy); q.lineTo(26+dx,6+dy); q.closePath(); },'#ece8f2',{r:24});
   for(const [x,y] of [[-10,-60],[8,-40],[-6,-20],[12,-70]]){ c1Ell(g,x,y,5,2.4,'#3a3044'); }
   g.fillStyle='#2a2030'; g.beginPath(); g.moveTo(-3,-70); g.lineTo(4,-50); g.lineTo(-2,-34); g.lineTo(5,-12); g.lineTo(-1,0); g.lineTo(-7,-14); g.lineTo(-3,-34); g.lineTo(-8,-52); g.closePath(); g.fill();
   if(open){ g.fillStyle='#140e1a'; g.beginPath(); g.ellipse(0,-36,12,26,0,0,TAU); g.fill(); } }),o.x,o.y);
   if(!open){ const k=0.5+0.5*Math.sin(t*3); glowAt(o.x,o.y-34,8,'200,220,255',0.3+0.3*k); } }
-function c1DrawKelp(o,t){ c1Put(c1Tall('kelp',120,110,60,96,g=>{ for(let i=0;i<14;i++){ const x=-46+i*7, L=70+((i*37)%30); g.strokeStyle=i%2?'#6a6a2a':'#8a7a34'; g.lineWidth=6; g.lineCap='round'; g.beginPath(); g.moveTo(x,-86); g.quadraticCurveTo(x+(i%3-1)*8,-40,x+(i%2?4:-4),-86+L); g.stroke(); } g.strokeStyle='#4a4a1a'; g.lineWidth=4; g.beginPath(); g.moveTo(-52,-88); g.lineTo(52,-88); g.stroke(); }),o.x,o.y+12);
+function c1DrawKelp(o,t){ c1Put(c1wTall('kelp',120,110,60,96,g=>{ for(let i=0;i<14;i++){ const x=-46+i*7, L=70+((i*37)%30); g.strokeStyle=i%2?'#6a6a2a':'#8a7a34'; g.lineWidth=6; g.lineCap='round'; g.beginPath(); g.moveTo(x,-86); g.quadraticCurveTo(x+(i%3-1)*8,-40,x+(i%2?4:-4),-86+L); g.stroke(); } g.strokeStyle='#4a4a1a'; g.lineWidth=4; g.beginPath(); g.moveTo(-52,-88); g.lineTo(52,-88); g.stroke(); }),o.x,o.y+12);
   if(G.found.c_kelp_heat>0) glowAt(o.x,o.y-30,40,'255,140,60',0.3); }
-function c1DrawPage(o,t){ const b=Math.sin(t*2)*1.5; c1Put(c1Tall('page',30,30,15,20,g=>{ c1Ell(g,0,4,10,4,'rgba(40,30,30,.3)'); c1Rect(g,-9,-12,18,14,'#f2e6c6',2); g.strokeStyle='#8a7a5a'; g.lineWidth=0.8; for(let y=-9;y<0;y+=3){ g.beginPath(); g.moveTo(-6,y); g.lineTo(6,y); g.stroke(); } }),o.x,o.y+b); glowAt(o.x,o.y-6,16,'255,236,170',0.25+0.1*Math.sin(t*3)); }
+function c1DrawPage(o,t){ const b=Math.sin(t*2)*1.5; c1Put(c1wTall('page',30,30,15,20,g=>{ c1Ell(g,0,4,10,4,'rgba(40,30,30,.3)'); c1Rect(g,-9,-12,18,14,'#f2e6c6',2); g.strokeStyle='#8a7a5a'; g.lineWidth=0.8; for(let y=-9;y<0;y+=3){ g.beginPath(); g.moveTo(-6,y); g.lineTo(6,y); g.stroke(); } }),o.x,o.y+b); glowAt(o.x,o.y-6,16,'255,236,170',0.25+0.1*Math.sin(t*3)); }
 function c1DrawCut(t){ if(!inView(9690,26960,700)) return;
   // the Cut churns: white water streaming round, foam against the walls, rocks sticking up
   ctx.save(); ctx.lineCap='round';
@@ -1194,7 +1194,7 @@ function c1DrawCut(t){ if(!inView(9690,26960,700)) return;
   for(const sx of [9572,9790]) for(let y=26000;y<27900;y+=46){ if(!inView(sx,y,30)) continue; const f=0.5+0.5*Math.sin(t*3+y*0.05); ctx.fillStyle=`rgba(255,255,255,${0.35+0.35*f})`; ctx.beginPath(); ctx.ellipse(sx+(sx<9700?6:-6),y,6+4*f,10,0,0,TAU); ctx.fill(); }
   for(const [x,y,r] of [[9630,26420,14],[9745,26760,16],[9650,27220,12],[9730,27560,15],[9620,26060,11]]){ if(!inView(x,y,40)) continue; ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.ellipse(x,y+4,r+6,r*0.6+4,0,0,TAU); ctx.fill(); ctx.fillStyle=SBC.outline; ctx.beginPath(); ctx.ellipse(x,y,r+1.6,r*0.75+1.6,0,0,TAU); ctx.fill(); ctx.fillStyle='#5a5f66'; ctx.beginPath(); ctx.ellipse(x,y,r,r*0.75,0,0,TAU); ctx.fill(); ctx.fillStyle='#7c8088'; ctx.beginPath(); ctx.ellipse(x-r*0.25,y-r*0.25,r*0.5,r*0.35,0,0,TAU); ctx.fill(); }
   ctx.restore(); }
-function c1DrawStack(t){ if(!inView(10360,24560,300)) return; c1Put(c1Tall('stackcap',140,40,70,20,g=>{ g.strokeStyle=SBC.outline; g.lineWidth=5; g.strokeRect(-58,-12,116,24); g.strokeStyle='#d8a440'; g.lineWidth=3; g.strokeRect(-58,-12,116,24); c1Shade(g,-18,-9,36,18,'#5a5e68'); g.strokeStyle='#3a3e48'; g.lineWidth=1.2; for(let x=-12;x<18;x+=8){ g.beginPath(); g.moveTo(x,-9); g.lineTo(x,9); g.stroke(); } }),10360,24560);
+function c1DrawStack(t){ if(!inView(10360,24560,300)) return; c1Put(c1wTall('stackcap',140,40,70,20,g=>{ g.strokeStyle=SBC.outline; g.lineWidth=5; g.strokeRect(-58,-12,116,24); g.strokeStyle='#d8a440'; g.lineWidth=3; g.strokeRect(-58,-12,116,24); c1Shade(g,-18,-9,36,18,'#5a5e68'); g.strokeStyle='#3a3e48'; g.lineWidth=1.2; for(let x=-12;x<18;x+=8){ g.beginPath(); g.moveTo(x,-9); g.lineTo(x,9); g.stroke(); } }),10360,24560);
   if(Math.random()<0.25&&!AREA) emit(10360+rand(-30,30),24530,1,{col:'120,110,110',glow:false,ang:-Math.PI/2,spread:0.4,smin:15,smax:40,lmin:2,lmax:3.4,zmin:6,zmax:12,grow:14,drag:0.4}); }
 function c1DrawSeal(o,t){ const awake=G.found.c_seal_awake, x=awake?o.x+60:o.x, y=awake?o.y+30:o.y-10, br=awake?0:Math.sin(t*1.4)*1.4;
   ctx.save(); ctx.translate(x,y); if(awake==='huff') ctx.scale(-1,1);
@@ -1204,9 +1204,9 @@ function c1DrawSeal(o,t){ const awake=G.found.c_seal_awake, x=awake?o.x+60:o.x, 
   ctx.fillStyle='#8a8e98'; ctx.beginPath(); ctx.arc(26,-8,12,0,TAU); ctx.fill(); ctx.fillStyle='#2a2a30'; if(awake){ ctx.beginPath(); ctx.arc(30,-11,2,0,TAU); ctx.fill(); } else { ctx.fillRect(27,-11,6,1.6); }
   ctx.fillStyle='#4a4a54'; ctx.beginPath(); ctx.arc(36,-6,2.6,0,TAU); ctx.fill(); ctx.restore();
   if(!awake&&Math.sin(t*1.4)>0.95) ftext(o.x+20,o.y-40,'z','#e6eef8',12); }
-function c1DrawCauseway(t){ if(!C1T.spire||!inView(7300,29400,620)) return; for(let i=0;i<6;i++){ const k=((t*0.4+i/6)%1); ctx.strokeStyle=`rgba(220,210,255,${0.45*Math.sin(k*Math.PI)})`; ctx.lineWidth=2; const x=7280+(i*31)%140, y=29610+k*110; ctx.beginPath(); ctx.moveTo(x,y); ctx.quadraticCurveTo(x+16,y+8,x+30,y); ctx.stroke(); } }
+function c1DrawCauseway(t){ if(!C1WT.spire||!inView(7300,29400,620)) return; for(let i=0;i<6;i++){ const k=((t*0.4+i/6)%1); ctx.strokeStyle=`rgba(220,210,255,${0.45*Math.sin(k*Math.PI)})`; ctx.lineWidth=2; const x=7280+(i*31)%140, y=29610+k*110; ctx.beginPath(); ctx.moveTo(x,y); ctx.quadraticCurveTo(x+16,y+8,x+30,y); ctx.stroke(); } }
 function c1DrawLift(t){
-  const L=C1.lift; if(!L||!inView(L.x,25250,200)) return;
+  const L=C1WD.lift; if(!L||!inView(L.x,25250,200)) return;
   // the shaft: two brass rails down the Cliff Wall, the cage riding between them
   ctx.save(); for(const s of [-1,1]){ ctx.fillStyle=SBC.outline; ctx.fillRect(L.x+s*24-3,25120,6,240); ctx.fillStyle='#d8a440'; ctx.fillRect(L.x+s*24-1.6,25120,3.2,240); }
   let k=L.pos; if(L.ride){ L.ride.t+=1/60; const f=clamp(L.ride.t/0.55,0,1); k=lerp(L.ride.from,L.ride.to,f*f*(3-2*f)); if(f>=1){ L.pos=L.ride.to; L.ride=null; c1Snd('clank',0.6); } }
@@ -1252,12 +1252,12 @@ function c1ShrineSet(d,on){
 const C1CURT=[{id:'c_moth_cw1',x:7255,y:29150,w:150,h:16},{id:'c_moth_cw2',x:7355,y:29540,w:150,h:16},{id:'c_moth_cw3',x:7325,y:29800,w:150,h:16}];
 function c1SpireSet(on){
   if(on){
-    if(!C1.spireObjs){ C1.spireObjs=C1CURT.map(o=>p2Add('mothcurtain',Object.assign({},o))); }
-    if(!DOORS.includes(C1.spireDoor)) DOORS.push(C1.spireDoor);
+    if(!C1WD.spireObjs){ C1WD.spireObjs=C1CURT.map(o=>p2Add('mothcurtain',Object.assign({},o))); }
+    if(!DOORS.includes(C1WD.spireDoor)) DOORS.push(C1WD.spireDoor);
     POI.c_spirerock={x:7400,y:30200,r:300,name:S('Spire Rock','Spire Rock'),level:13};
   }else{
-    if(C1.spireObjs){ for(const o of C1.spireObjs){ for(const A of [LANDMARKS,P2.out]){ const i=A.indexOf(o); if(i>=0) A.splice(i,1); } if(o.col) removeCol(o.col); } C1.spireObjs=null; }
-    const i=DOORS.indexOf(C1.spireDoor); if(i>=0) DOORS.splice(i,1);
+    if(C1WD.spireObjs){ for(const o of C1WD.spireObjs){ for(const A of [LANDMARKS,P2.out]){ const i=A.indexOf(o); if(i>=0) A.splice(i,1); } if(o.col) removeCol(o.col); } C1WD.spireObjs=null; }
+    const i=DOORS.indexOf(C1WD.spireDoor); if(i>=0) DOORS.splice(i,1);
     delete POI.c_spirerock;
   }
 }
@@ -1269,28 +1269,28 @@ function c1SnowSet(on){
 // ---------- the Chalk Dragon's Breath: an updraft on the hill once the dragon's eye is open (bible 7.9)
 function c1BreathSet(on){
   const E=ELV.maps[1]; if(!E) return;
-  if(on&&!C1.breath){ C1.breath={x:6400,y:21700,r:70,lift:1,lvl:2,i:E.vents.length,c1:true}; E.vents.push(C1.breath); LIGHTS.push(C1.breathL={x:6400,y:21700,r:150,i:0.75,fire:true}); c1Redraw([[6300,21600,6500,21800]]); }
-  else if(!on&&C1.breath){ const i=E.vents.indexOf(C1.breath); if(i>=0) E.vents.splice(i,1); const j=LIGHTS.indexOf(C1.breathL); if(j>=0) LIGHTS.splice(j,1); C1.breath=null; c1Redraw([[6300,21600,6500,21800]]); }
+  if(on&&!C1WD.breath){ C1WD.breath={x:6400,y:21700,r:70,lift:1,lvl:2,i:E.vents.length,c1:true}; E.vents.push(C1WD.breath); LIGHTS.push(C1WD.breathL={x:6400,y:21700,r:150,i:0.75,fire:true}); c1Redraw([[6300,21600,6500,21800]]); }
+  else if(!on&&C1WD.breath){ const i=E.vents.indexOf(C1WD.breath); if(i>=0) E.vents.splice(i,1); const j=LIGHTS.indexOf(C1WD.breathL); if(j>=0) LIGHTS.splice(j,1); C1WD.breath=null; c1Redraw([[6300,21600,6500,21800]]); }
 }
 // ---------- read the flags every frame (cheap) and switch the world to match
 function c1Sync(force){
-  if(!G||!G.flags||!C1.built) return;
+  if(!G||!G.flags||!C1WD.built) return;
   const boxes=[];
-  const low=C1F('c_lowtide'); if(low!==C1T.low){ C1T.low=low; const q=C1G.sandsP.bb; boxes.push([q[0]-60,q[1]-60,q[2]+60,q[3]+60]); }
-  const sp=C1F('c_spire_up'); if(sp!==C1T.spire){ C1T.spire=sp; c1SpireSet(sp); boxes.push([7050,28880,7760,30560]); }
-  const sn=C1F('c_snow'); if(sn!==C1T.snow){ C1T.snow=sn; c1SnowSet(sn); boxes.push('all'); }
-  C1T.clock=C1F('c_clock_on');
-  const dr=C1F('c_chalk_drawn'); if(dr!==!!C1.drawn){ C1.drawn=dr; boxes.push([5860,21460,7300,22460]); }
-  const ch=c1ChalkDone(); if(ch!==!!C1.chalk){ C1.chalk=ch; c1BreathSet(ch); }
-  for(const d of C1.shrDyn) c1ShrineSet(d,!!d.when());
+  const low=C1F('c_lowtide'); if(low!==C1WT.low){ C1WT.low=low; const q=C1G.sandsP.bb; boxes.push([q[0]-60,q[1]-60,q[2]+60,q[3]+60]); }
+  const sp=C1F('c_spire_up'); if(sp!==C1WT.spire){ C1WT.spire=sp; c1SpireSet(sp); boxes.push([7050,28880,7760,30560]); }
+  const sn=C1F('c_snow'); if(sn!==C1WT.snow){ C1WT.snow=sn; c1SnowSet(sn); boxes.push('all'); }
+  C1WT.clock=C1F('c_clock_on');
+  const dr=C1F('c_chalk_drawn'); if(dr!==!!C1WD.drawn){ C1WD.drawn=dr; boxes.push([5860,21460,7300,22460]); }
+  const ch=c1ChalkDone(); if(ch!==!!C1WD.chalk){ C1WD.chalk=ch; c1BreathSet(ch); }
+  for(const d of C1WD.shrDyn) c1ShrineSet(d,!!d.when());
   if(boxes.length) c1Redraw(boxes);
 }
 // ---------- the conveyor streets carry Ash (jerky while the Great Clock is stopped, smooth once it runs)
 function c1Belts(dt){
   const p=player; if(!p||p.flying||(p.z||0)>0.5||p.hop||p.dead||curMap()!==1) return;
-  let v=0; if(C1T.clock) v=105; else { const ph=G.time%2.4; v=ph<0.45?150:0; }
+  let v=0; if(C1WT.clock) v=105; else { const ph=G.time%2.4; v=ph<0.45?150:0; }
   if(!v) return;
-  for(const b of C1.belts){ if(p.x<b.x0||p.x>b.x1||p.y<b.y0-6||p.y>b.y1+6) continue;
+  for(const b of C1WD.belts){ if(p.x<b.x0||p.x>b.x1||p.y<b.y0-6||p.y>b.y1+6) continue;
     const nx=p.x+b.dx*v*dt, ny=p.y+b.dy*v*dt; if(!playerBlocked(nx,ny)){ p.x=nx; p.y=ny; } break; }
 }
 // ---------- the life of the coast: steam, smoke, sparks, moths, gulls, waves
@@ -1305,17 +1305,17 @@ function c1Life(dt){
   for(const [x,y] of C1CHIMS){ if(!inView(x,y,60)) continue; const ph=(t*0.8+x*0.002)%2.5; if(ph<0.6&&Math.random()<dt*16) emit(x+rand(-3,3),y,1,{col:'235,235,235',glow:false,ang:-Math.PI/2,spread:0.3,smin:40,smax:90,lmin:.6,lmax:1.1,zmin:3,zmax:6,grow:8,drag:0.5,alpha:0.65}); }
   // Professor Sprocket's chimney puffs coloured smoke, the Bright Anvil rings and sparks
   if(inView(6560,25680,120)&&Math.random()<dt*5) emit(6560+rand(-4,4),25660,1,{col:pick(['255,120,200','120,200,255','255,220,90','150,255,150']),glow:false,ang:-Math.PI/2,spread:0.4,smin:15,smax:35,lmin:1.6,lmax:2.6,zmin:4,zmax:8,grow:10,drag:0.4,alpha:0.7});
-  if(dist2(player.x,player.y,7700,25860)<380*380){ C1.anvilT=(C1.anvilT||0)-dt; if(C1.anvilT<=0){ C1.anvilT=rand(0.9,1.8); SFX.play('block'); emit(7700+rand(-14,14),25870,6,{col:'255,190,90',ang:-Math.PI/2,spread:1.2,smin:40,smax:120,lmin:.2,lmax:.45,zmin:1,zmax:2}); } }
+  if(dist2(player.x,player.y,7700,25860)<380*380){ C1WD.anvilT=(C1WD.anvilT||0)-dt; if(C1WD.anvilT<=0){ C1WD.anvilT=rand(0.9,1.8); SFX.play('block'); emit(7700+rand(-14,14),25870,6,{col:'255,190,90',ang:-Math.PI/2,spread:1.2,smin:40,smax:120,lmin:.2,lmax:.45,zmin:1,zmax:2}); } }
   // moths drift in the Moth Wood and over the shoals
   if(a.moths&&Math.random()<dt*6*a.moths){ const x=rand(cam.x,cam.x+W/zoom), y=rand(cam.y,cam.y+H/zoom); emit(x,y,1,{col:'214,206,236',glow:false,ang:rand(0,TAU),spread:1,smin:10,smax:30,lmin:2,lmax:3.6,zmin:1.4,zmax:2.2,drag:0.2,alpha:0.85}); }
   // gulls: cries by day, a few gliding overhead
   const gl=a.gulls||0;
-  if(gl>0&&isDay()){ C1.gullT=(C1.gullT||rand(2,6))-dt; if(C1.gullT<=0){ C1.gullT=rand(2.5,8)/Math.max(0.2,gl); c1Snd('gull',0.4+0.4*gl); }
+  if(gl>0&&isDay()){ C1WD.gullT=(C1WD.gullT||rand(2,6))-dt; if(C1WD.gullT<=0){ C1WD.gullT=rand(2.5,8)/Math.max(0.2,gl); c1Snd('gull',0.4+0.4*gl); }
     if(C1GULLS.length<Math.round(gl*4)&&Math.random()<dt*0.4){ const s=Math.random()<0.5?-1:1, y=cam.y+rand(0.1,0.9)*H/zoom; C1GULLS.push({x:s<0?cam.x-60:cam.x+W/zoom+60,y,vx:-s*rand(70,120),vy:rand(-14,14),ph:rand(0,TAU),life:30}); } }
   for(const g of C1GULLS){ g.x+=g.vx*dt; g.y+=g.vy*dt+Math.sin(t*0.8+g.ph)*4*dt; g.ph+=dt; g.life-=dt; }
   for(let i=C1GULLS.length-1;i>=0;i--){ const g=C1GULLS[i]; if(g.life<=0||g.x<cam.x-200||g.x>cam.x+W/zoom+200) C1GULLS.splice(i,1); }
   // waves on the shore
-  if(a.waves){ C1.waveT=(C1.waveT||0)-dt; if(C1.waveT<=0){ C1.waveT=rand(3.5,6.5); const d=c1LandD(player.x,player.y); if(d<420) c1Snd('wave',(0.5+0.5*a.waves)*clamp(1-d/420,0.2,1)); } }
+  if(a.waves){ C1WD.waveT=(C1WD.waveT||0)-dt; if(C1WD.waveT<=0){ C1WD.waveT=rand(3.5,6.5); const d=c1LandD(player.x,player.y); if(d<420) c1Snd('wave',(0.5+0.5*a.waves)*clamp(1-d/420,0.2,1)); } }
 }
 function c1DrawGulls(){
   if(!C1GULLS.length) return; const t=G.time;
@@ -1370,7 +1370,7 @@ function c1HouseHands(t){
     for(const town of TOWN_ORDER){ if(!town.startsWith('c_')) continue;
       const owners=CAST.filter(c=>c.town===town&&c.home&&!c.generic);
       for(const h of HOUSES){ if(h.town!==town||h.k!=='house'||h.area||!h.want) continue; const i=owners.findIndex(c=>c.id===h.want&&c.home); if(i>=0) give(town,owners[i],i,h,doorOf(h)); }
-      for(const v of C1.homes){ if(v.town!==town) continue; const i=owners.findIndex(c=>c.id===v.want&&c.home); if(i>=0){ give(town,owners[i],i,null,v.door); if(!owners[i].house) AREADEFS['h_'+owners[i].id].name=v.name; } }
+      for(const v of C1WD.homes){ if(v.town!==town) continue; const i=owners.findIndex(c=>c.id===v.want&&c.home); if(i>=0){ give(town,owners[i],i,null,v.door); if(!owners[i].house) AREADEFS['h_'+owners[i].id].name=v.name; } }
     }
   }catch(e){ console.error('c1 homes',e); }
   try{ base(); } finally { for(const o of off) o.home=true; }
@@ -1378,22 +1378,22 @@ function c1HouseHands(t){
 // doors with a gate (the Brassworks front gate, the Smugglers' Cove behind the kelp)
 { const base=enterArea; enterArea=function(id,door){ if(door&&door.need&&!door.need()){ SFX.play('ui'); runDialogue([['narr',door.locked||S('It will not open.','It is shut.')]],()=>{ scene='play'; }); return; } return base(id,door); }; }
 // the causeway posts exist only while Spire Rock is up
-{ const bp=ELEV.posts, C={sp:null,src:null,l:null}; ELEV.posts=function(k){ const L=bp(k); if(k!==1) return L; if(C.src===L&&C.sp===C1T.spire&&C.n===L.length) return C.l; C.src=L; C.sp=C1T.spire; C.n=L.length; C.l=L.filter(q=>!q.when||q.when()); return C.l; }; }
+{ const bp=ELEV.posts, C={sp:null,src:null,l:null}; ELEV.posts=function(k){ const L=bp(k); if(k!==1) return L; if(C.src===L&&C.sp===C1WT.spire&&C.n===L.length) return C.l; C.src=L; C.sp=C1WT.spire; C.n=L.length; C.l=L.filter(q=>!q.when||q.when()); return C.l; }; }
 // regions everywhere on the coast follow the cliffs (music, ambience, events, banners)
-{ const base=biomeInfo; biomeInfo=function(x,y,o){ const r=base(x,y,o); if(C1.built&&y>=20000&&y<=31000&&x<IZX-50){ const b=c1Region(x,y,elevLvl(x,y),0); o.b=b; o.b2=b; o.t=1; } return r; }; }
+{ const base=biomeInfo; biomeInfo=function(x,y,o){ const r=base(x,y,o); if(C1WD.built&&y>=20000&&y<=31000&&x<IZX-50){ const b=c1Region(x,y,elevLvl(x,y),0); o.b=b; o.b2=b; o.t=1; } return r; }; }
 // the risen Spire Rock and the causeway are land, the harbor and the skim lanes are calm water
-{ const base=mapBlocked; mapBlocked=function(x,y){ if(C1T.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y); } return base(x,y); }; }
+{ const base=mapBlocked; mapBlocked=function(x,y){ if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y); } return base(x,y); }; }
 { const base=mapStrideBlocked; mapStrideBlocked=function(x,y){
-  if(y>=20000&&y<=31000&&x>30&&x<13970){ if((C1T.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y))||c1Calm(x,y)) return !!c1Block(x,y); }
+  if(y>=20000&&y<=31000&&x>30&&x<13970){ if((C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y))||c1wCalm(x,y)) return !!c1Block(x,y); }
   return base(x,y); }; }
 // standing things sorted with the figures; the gulls overhead
-{ const base=eventsForRender; eventsForRender=function(list){ base(list); if(!G||AREA||!player||curMap()!==1||!C1.built) return; const t=G.time;
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); if(!G||AREA||!player||curMap()!==1||!C1WD.built) return; const t=G.time;
   c1ObjsInView(o=>{ const D=C1K[o.k]; if(!D||!inView(o.x,o.y-(o.R*0.5),o.R)) return; list.push({x:o.x,y:o.base,r:8,flying:true,draw:()=>{ try{ D.draw(o,t); }catch(e){} if(o.k==='windmill') for(const c of mapList(CHESTS,1)) if(c.c1top&&!c.open&&Math.abs(c.x-o.x)<40&&Math.abs(c.y-o.y)<200) drawChest(c,t); }}); }); }; }
 { const base=drawDoor; drawDoor=function(d){ base(d); if(d&&d.hs&&d.hs.town==='c_gearhaven'&&d.hs.L&&d.hs.want!=='c_ottoline') c1HandsOf(d.hs); }; }
 { const base=drawBirds; drawBirds=function(){ base(); if(!AREA&&curMap()===1) c1DrawGulls(); }; }
 { const base=update; update=function(dt){ try{ c1Sync(); }catch(e){ console.error('c1 sync',e); } const r=base(dt); try{ if(scene==='play'&&G&&G.mode!=='menu'){ c1Belts(dt); c1Life(dt); } }catch(e){ console.error('c1 life',e); } return r; }; }
 // the seal's chest, the kelp curtain, the hollow birch
-{ const base=openChest; openChest=function(c){ if(c&&c.id==='c_ch_seal'&&!G.found.c_seal_awake){ c1Say([S('A very large seal is asleep on this chest. It is not your chest right now. It is a seal bed.','A seal is asleep on it!')]); return; } return base(c); }; }
+{ const base=openChest; openChest=function(c){ if(c&&c.id==='c_ch_seal'&&!G.found.c_seal_awake){ c1wSay([S('A very large seal is asleep on this chest. It is not your chest right now. It is a seal bed.','A seal is asleep on it!')]); return; } return base(c); }; }
 { const base=breathIgnite; breathIgnite=function(mx,my,ang,dt){ base(mx,my,ang,dt); try{ if(!AREA&&!G.found.c_kelp_burnt&&curMap()===1&&inArcC(mx,my,ang,175,0.45,{x:3700,y:27850,r:46})){ G.found.c_kelp_heat=(G.found.c_kelp_heat||0)+dt; if(Math.random()<0.5) emit(3700+rand(-40,40),27840+rand(-30,20),1,{kind:'fire',ang:-Math.PI/2,spread:0.6,smin:20,smax:60,lmin:.3,lmax:.6,zmin:2,zmax:4});
   if(G.found.c_kelp_heat>0.7){ G.found.c_kelp_burnt=true; delete G.found.c_kelp_heat; SFX.play('pop'); emit(3700,27840,24,{col:'90,80,40',glow:false,ang:-Math.PI/2,spread:1,smin:20,smax:80,lmin:.8,lmax:1.6,zmin:3,zmax:7,grow:8}); setBanner(S('The kelp burns away','The kelp burns!'),S('A crack in the cliff: the Smugglers\' Cove!','A secret cave!'),2.6); saveGame(); } } }catch(e){} }; }
 { const base=swingBreakables; swingBreakables=function(px,py,dir,range,half){ base(px,py,dir,range,half); try{ if(!AREA&&curMap()===1&&!G.found.c_birch_cracked&&player.swingW==='hammer'&&inArcC(px,py,dir,range+20,half,{x:880,y:22150,r:26})){ G.found.c_birch_cracked=true; shake(4); SFX.play('boom');
@@ -1402,7 +1402,7 @@ function c1HouseHands(t){
 if(typeof P2_SB!=='undefined'&&!P2_SB.built){ P2_SB.x=3700; P2_SB.y=24450; }
 // ---------- debug hooks
 window.__ebX=Object.assign(window.__ebX||{},{
-  c1:{C1,C1G,C1T,C1ROOF,C1K,sync:c1Sync,region:(x,y)=>c1Region(x,y,elevLvl(x,y),0),landD:c1LandD,
+  c1:{C1WD,C1G,C1WT,C1ROOF,C1K,sync:c1Sync,region:(x,y)=>c1Region(x,y,elevLvl(x,y),0),landD:c1LandD,
     set(flag,v){ G.flags[flag]=v===undefined?true:v; c1Sync(); return {flag,v:G.flags[flag]}; },
     spots:{pass:[3400,20520],downgate:[3190,20900],fold:[3900,21260],dragon:[6600,22560],mill:[9700,22420],gate:[6950,24300],square:[6900,24870],clock:[7200,24860],library:[7700,24520],manor:[7900,25000],
       stairTop:[7070,25150],stairBot:[7070,25420],lift:[7700,25360],market:[7000,25960],teapot:[7300,26290],quay:[7600,26440],pier:[8500,27150],heights:[9200,26700],cut:[9510,26960],cutE:[9860,26985],
@@ -1410,13 +1410,13 @@ window.__ebX=Object.assign(window.__ebX||{},{
       oona:[1150,27150],sands:[1600,28600],gullcrag:[1400,29470],gullshrine:[2340,28330],mothwood:[1350,22900],moonring:[1350,22900],lantern:[11500,27760],lighthouse:[12880,29100],cottage:[12300,28620],seal:[11800,29200],
       breakwater:[7150,28960],spire:[7400,30080],valley:[4000,24500],east:[13200,24200]},
     go(name){ const s=this.spots[name]; if(!s) return null; return window.__ebX.goMap(1,s[0],s[1]); },
-    objs:()=>C1.objs.length, belts:()=>C1.belts, homes:()=>C1.homes, ph:()=>C1.ph, gulls:()=>C1GULLS.length,
+    objs:()=>C1WD.objs.length, belts:()=>C1WD.belts, homes:()=>C1WD.homes, ph:()=>C1WD.ph, gulls:()=>C1GULLS.length,
     SHRINES, HOUSES, DOORS, AREADEFS, save:()=>saveGame(), door:(area,i)=>{ const d=DOORS.filter(q=>q.area===area)[i||0]; if(d) enterArea(d.area,d); return !!AREA; }, stride:(x,y)=>mapStrideBlocked(x,y), blocked:(x,y)=>blockedAt(x,y),
     // reachability on foot (8 px cells, the engine's own blocking; o.stride lets Water Stride count)
     flood(sx,sy,o){ o=o||{}; const cs=o.cs||8, bb=o.bb||[0,20000,14000,31000], x0=bb[0], y0=bb[1], w=Math.ceil((bb[2]-bb[0])/cs), h=Math.ceil((bb[3]-bb[1])/cs), seen=new Uint8Array(w*h), q=[];
       const pass=(x,y)=>{ if(outOfMap(x,y,30)) return false; if(colAt(x,y,5)) return false; if(!blockedAt(x,y)) return true; return !!(o.stride&&!(elevFace(x,y)&1)&&!mapStrideBlocked(x,y)); };
       if(!pass(sx,sy)) return {fail:'start blocked'}; const k0=Math.floor((sy-y0)/cs)*w+Math.floor((sx-x0)/cs); seen[k0]=1; q.push(k0);
       while(q.length){ const c=q.pop(), i=c%w, j=(c/w)|0; for(let d=0;d<4;d++){ const a=i+(d===0?1:d===1?-1:0), b=j+(d===2?1:d===3?-1:0); if(a<0||b<0||a>=w||b>=h) continue; const k=b*w+a; if(seen[k]) continue; if(!pass(x0+(a+0.5)*cs,y0+(b+0.5)*cs)) continue; seen[k]=1; q.push(k); } }
-      C1.flood={seen,w,h,x0,y0,cs}; let n=0; for(const v of seen) n+=v; return {n}; },
-    at(x,y){ const F=C1.flood; if(!F) return false; const i=Math.floor((x-F.x0)/F.cs), j=Math.floor((y-F.y0)/F.cs); for(let dj=-2;dj<=2;dj++) for(let di=-2;di<=2;di++){ const a=i+di,b=j+dj; if(a>=0&&b>=0&&a<F.w&&b<F.h&&F.seen[b*F.w+a]) return true; } return false; }}
+      C1WD.flood={seen,w,h,x0,y0,cs}; let n=0; for(const v of seen) n+=v; return {n}; },
+    at(x,y){ const F=C1WD.flood; if(!F) return false; const i=Math.floor((x-F.x0)/F.cs), j=Math.floor((y-F.y0)/F.cs); for(let dj=-2;dj<=2;dj++) for(let di=-2;di<=2;di++){ const a=i+di,b=j+dj; if(a>=0&&b>=0&&a<F.w&&b<F.h&&F.seen[b*F.w+a]) return true; } return false; }}
 });

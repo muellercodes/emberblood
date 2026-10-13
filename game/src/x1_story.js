@@ -11,7 +11,7 @@
 // Lines are [speaker, S(full, simple)]; Pip is "he"; no em dash anywhere.
 
 // ---------- 0. small helpers
-const C1={cam:null,glide:null,sight:null,trustSeen:null,q:[],boss:null,lights:[],silk:null,goat:null,fallen:0,dbg:{}};
+const C1ST={cam:null,glide:null,sight:null,trustSeen:null,q:[],boss:null,lights:[],silk:null,goat:null,fallen:0,dbg:{}};
 const c1Easy=()=>!!(G&&G.diff&&G.diff.name==='Easy');
 const c1Hard=()=>!!(G&&G.diff&&G.diff.name==='Hard');
 const c1On=()=>!!G&&G.mode==='story'&&!G.done&&actOf(G.stage)===2;
@@ -19,26 +19,26 @@ const c1Out=()=>!AREA&&curMap()===1;
 // once-only scenes: every main script starts with a silent mark, so a scene played by any route (a dungeon's own
 // story hook, a fallback, a debug call) is never played twice
 function c1Seen(k){ const s=G&&G.flags&&G.flags.c_sn; return !!(s&&s[k]); }
-function c1Mark(k){ if(!G||!G.flags) return; (G.flags.c_sn=G.flags.c_sn||{})[k]=1; }
-function c1Def(key,lines){ STORY[key]=[xdo(()=>c1Mark(key))].concat(lines); return STORY[key]; }
+function c1sMark(k){ if(!G||!G.flags) return; (G.flags.c_sn=G.flags.c_sn||{})[k]=1; }
+function c1Def(key,lines){ STORY[key]=[xdo(()=>c1sMark(key))].concat(lines); return STORY[key]; }
 const c1If=(who,f,s,cond)=>({who,text:S(f,s),skipIf:()=>!cond()});
 const c1Pip=(f,s)=>({who:'pip',text:S(f,s||f),skipIf:()=>!(G.flags&&G.flags.pip)});
 // play a STORY key (or a list of lines); done runs after the scene closes
 function c1Play(key,done,opt){
   const L0=typeof key==='string'?STORY[key]:key, L=typeof L0==='function'?L0():L0;
   if(!L||!L.length){ if(done) try{ done(); }catch(e){ console.error(e); } return false; }
-  runDialogue(L,()=>{ scene='play'; C1.cam=null; if(done) try{ done(); }catch(e){ console.error(e); } try{ saveGame(); }catch(e){} },opt);
+  runDialogue(L,()=>{ scene='play'; C1ST.cam=null; if(done) try{ done(); }catch(e){ console.error(e); } try{ saveGame(); }catch(e){} },opt);
   return true;
 }
 // play several keys in a row (keys already seen are skipped when skipSeen)
 function c1Chain(keys,done,opt){ const L=[]; for(const k of keys){ if(opt&&opt.skipSeen&&c1Seen(k)) continue; const v=STORY[k]; const a=typeof v==='function'?v():v; if(a&&a.length) L.push(...a); } return c1Play(L,done,opt); }
 // a beat that waits for a calm moment (playing, no dialogue, no fight, no minigame): c1When(id, cond, fn)
-function c1When(id,cond,fn){ if(C1.q.some(q=>q.id===id)) return; C1.q.push({id,cond,fn}); }
-function c1Calm(){ return scene==='play'&&!DLG&&!G.mini&&!(G.boss&&!G.boss.dead)&&!player.dead; }
+function c1When(id,cond,fn){ if(C1ST.q.some(q=>q.id===id)) return; C1ST.q.push({id,cond,fn}); }
+function c1sCalm(){ return scene==='play'&&!DLG&&!G.mini&&!(G.boss&&!G.boss.dead)&&!player.dead; }
 function c1Queue(){
-  if(!C1.q.length||!c1Calm()) return;
-  for(let i=0;i<C1.q.length;i++){ const q=C1.q[i]; let ok=false; try{ ok=!q.cond||q.cond(); }catch(e){ console.error(e); }
-    if(ok){ C1.q.splice(i,1); try{ q.fn(); }catch(e){ console.error(e); } return; } }
+  if(!C1ST.q.length||!c1sCalm()) return;
+  for(let i=0;i<C1ST.q.length;i++){ const q=C1ST.q[i]; let ok=false; try{ ok=!q.cond||q.cond(); }catch(e){ console.error(e); }
+    if(ok){ C1ST.q.splice(i,1); try{ q.fn(); }catch(e){ console.error(e); } return; } }
 }
 // where a person is: outdoors near the story, inside their house (the door), or the bible spot
 function c1Who(id,x,y){
@@ -46,19 +46,19 @@ function c1Who(id,x,y){
   const c=CASTBY[id];
   if(c&&c.inside&&AREADEFS[c.inside]){ if(AREA&&AREA.id===c.inside){ const m=AREA.npcs.find(q=>q.id===id); if(m) return {x:m.x,y:m.y,npc:id,area:AREA.id}; }
     const d=DOORS.find(q=>q.area===c.inside); if(d) return {x:d.x,y:d.y,area:c.inside,npc:id}; }
-  if(C1.fb[id]&&C1.fbAt[id]) return {x:C1.fbAt[id][0],y:C1.fbAt[id][1],npc:id};
+  if(C1ST.fb[id]&&C1ST.fbAt[id]) return {x:C1ST.fbAt[id][0],y:C1ST.fbAt[id][1],npc:id};
   return {x,y,npc:id};
 }
-const c1Obj=(f,s,at,extra)=>Object.assign({text:S(f,s),x:at.x,y:at.y},at.area?{area:at.area}:{},at.npc?{npc:at.npc}:{},extra||{});
+const c1sObj=(f,s,at,extra)=>Object.assign({text:S(f,s),x:at.x,y:at.y},at.area?{area:at.area}:{},at.npc?{npc:at.npc}:{},extra||{});
 // world time to the evening (the "Wait until dark" offers): a fade, then 21:00
 function c1WaitDark(){ G.fade=1; G.tod=0.875; later(0.3,()=>setBanner(S('Night falls','Night falls'),S('The brass lamps flicker on, one by one.','The lamps come on.'),2.6)); saveGame(); }
 // trust: side quests and scenes may also just add to G.flags.c_trust; a watcher shows the banner either way
 function c1Trust(n){ G.flags.c_trust=clamp((G.flags.c_trust||0)+(n==null?1:n),0,7); }
 function c1TrustTick(){
   const F=G.flags, t=clamp(F.c_trust|0,0,7); if((F.c_trust|0)!==t) F.c_trust=t;
-  if(C1.trustSeen==null){ C1.trustSeen=t; return; }
-  if(t<C1.trustSeen){ C1.trustSeen=t; return; }
-  if(t>C1.trustSeen&&scene==='play'){ C1.trustSeen=t; setBanner(S('Vesper trusts you a little more.','Vesper trusts you more.'),'●'.repeat(t)+'○'.repeat(7-t),3.2); try{ SFX.play('shrine'); }catch(e){} }
+  if(C1ST.trustSeen==null){ C1ST.trustSeen=t; return; }
+  if(t<C1ST.trustSeen){ C1ST.trustSeen=t; return; }
+  if(t>C1ST.trustSeen&&scene==='play'){ C1ST.trustSeen=t; setBanner(S('Vesper trusts you a little more.','Vesper trusts you more.'),'●'.repeat(t)+'○'.repeat(7-t),3.2); try{ SFX.play('shrine'); }catch(e){} }
 }
 function c1Moon(p){ if(typeof moonSet==='function') moonSet(p); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,p); }
 const c1Friend=()=>typeof vesperFriend==='function'?!!vesperFriend():G.choices.c_vesper==='friend';
@@ -78,7 +78,7 @@ const C1_VLOOK={skin:'#e0b090',hair:'#2a2430',hairdo:'pony',hood:'#5a4a6a',cape:
 const C1_VOUT={skin:'#e6b896',hair:'#2a2430',hairdo:'pony',shirt:'#e8c03a',outfit:'coat',low:'#2a2436',trim:'#c8c0d8',freckles:true,build:'slim',scarf:'#6a5a7a',hold:'clasp'};
 if(!SPECIAL.c_vesper) SPECIAL.c_vesper={id:'c_vesper',name:'Vesper',col:'#b8a8e8',inside:'ev',kid:true,look:C1_VOUT,lines:[S(`Somebody has to make sure you don't climb anything stupid.`,`Don't climb anything silly.`)]};
 // people the main story needs: x1_people owns them (CAST, homes, talk). If a run has no x1_people yet, the story
-// puts a stand-in at the bible's spot so the main path still works (C1.fb); x1_people replaces them automatically.
+// puts a stand-in at the bible's spot so the main path still works (C1ST.fb); x1_people replaces them automatically.
 const C1_PEOPLE={
   c_barley:{name:'Old Barley',col:'#d8d4cc',at:[3900,21100],look:{skin:'#d39f78',hair:'#d8d4cc',beard:true,beardc:'#d8d4cc',hat:'straw',outfit:'tunic',shirt:'#e8e0c8',low:'#6a5a3a',belt:'#5a3a1e',build:'old',hold:'staff',pipe:true}},
   c_bobs:{name:'Constables Bob and Bob',col:'#3a6ac8',at:[6990,24300],look:{skin:'#c8ccd8',hair:'#8a8e98',helm:true,plume:'#3a6ac8',outfit:'armor',shirt:'#a8acb8',low:'#7a7e8a',trim:'#e0b84a',hold:'spear',twin:true,build:'tall'}},
@@ -94,10 +94,10 @@ const C1_PEOPLE={
   c_agatha:{name:'Keeper Agatha Brightwater',col:'#e8c03a',at:[12300,28560],look:{skin:'#e6b494',hair:'#efeae0',hairdo:'bun',outfit:'coat',shirt:'#24345e',low:'#3a3a4a',trim:'#e8c03a',glasses:true,build:'strong',hold2:'lantern'}},
   c_fig:{name:'Auntie Fig',col:'#c86a8a',at:[7300,26260],look:{skin:'#b07a56',hair:'#efeae0',hairdo:'curly',outfit:'dress',shirt:'#c86a8a',low:'#8a3a5a',pattern:'dots',patc:'#f0d0dc',apron:true,shawl:'#e0b0c0',build:'wide',blush:true,hold2:'kettle'}}
 };
-C1.fb={}; C1.fbAt={};
+C1ST.fb={}; C1ST.fbAt={};
 for(const id in C1_PEOPLE){ const P=C1_PEOPLE[id]; if(CASTBY[id]||SPECIAL[id]) continue;
   SPECIAL[id]={id,name:P.name,col:P.col,inside:'ev',kid:!!P.kid,look:P.look,lines:[S('Busy day. Busy, busy day.','Busy day!')]};
-  if(!SPK[id]) SPK[id]={name:P.name,col:P.col}; C1.fb[id]=true; C1.fbAt[id]=P.at; }
+  if(!SPK[id]) SPK[id]={name:P.name,col:P.col}; C1ST.fb[id]=true; C1ST.fbAt[id]=P.at; }
 // where the stand-ins stand (some move as the story goes on)
 function c1FbSpot(id){
   const P=C1_PEOPLE[id]; if(!P) return null; const st=G.stage;
@@ -238,7 +238,7 @@ c1Def('c_chase_end',[
       xdo(()=>{ if(!G.items.c_birdclock) giveItems({c_birdclock:1},true); })]})
   ]),
   xl('ash',`HEY! That's not fair! You can't just climb up a CLOCK!`,`HEY! You can't just climb up a CLOCK!`),
-  {who:'narr',text:S(`She vanishes into the dark at the top of the tower. Something flutters down and lands on your nose. A note.`,`She is gone at the top. A note flutters down onto your nose.`),fn:()=>{ C1.sight=null; }}
+  {who:'narr',text:S(`She vanishes into the dark at the top of the tower. Something flutters down and lands on your nose. A note.`,`She is gone at the top. A note flutters down onto your nose.`),fn:()=>{ C1ST.sight=null; }}
 ]);
 c1Def('c_note1',[
   xl('narr',`The note says: "Go home, little ember. This isn't your story. - M."`,`The note says: "Go home, little ember. This isn't your story. M."`),
@@ -425,7 +425,7 @@ c1Def('c_choice',[
   xc('narr',`She raises her moth hooks one more time.`,`She lifts her hooks one more time.`,[
     xo(`Finish the fight (she will remember this)`,`Finish the fight`,{tone:'brave',fn:()=>{ G.choices.c_vesper='foe'; },then:()=>STORY.c_end_fought.concat(STORY.c_truth,STORY.c_nyxara,STORY.c_snowfall)}),
     xo(`Lower your sword. "Why are you doing this?"`,`Lower your sword. "Why?"`,{tone:'kind',cond:()=>(G.flags.c_trust||0)>=4,fn:()=>{ G.choices.c_vesper='friend'; },then:()=>STORY.c_end_ally.concat(STORY.c_truth,STORY.c_nyxara,STORY.c_snowfall)}),
-    xo(`"Pearl wrote a letter. To you. To all of you."`,`"Pearl wrote you a letter."`,{tone:'kind',cond:()=>(G.flags.c_trust||0)===3&&!!((G.quests.c_logbook&&G.quests.c_logbook.done)||G.flags.c_logbook_done),fn:()=>{ G.flags.c_trust=4; C1.trustSeen=4; G.choices.c_vesper='friend'; },then:()=>STORY.c_end_pearl.concat(STORY.c_truth,STORY.c_nyxara,STORY.c_snowfall)})
+    xo(`"Pearl wrote a letter. To you. To all of you."`,`"Pearl wrote you a letter."`,{tone:'kind',cond:()=>(G.flags.c_trust||0)===3&&!!((G.quests.c_logbook&&G.quests.c_logbook.done)||G.flags.c_logbook_done),fn:()=>{ G.flags.c_trust=4; C1ST.trustSeen=4; G.choices.c_vesper='friend'; },then:()=>STORY.c_end_pearl.concat(STORY.c_truth,STORY.c_nyxara,STORY.c_snowfall)})
   ])
 ]);
 c1Def('c_end_fought',[
@@ -703,8 +703,8 @@ defineStages(2,[
     objectives(){
       const F=G.flags;
       if(G.mini&&G.mini.kind==='c_roofchase'){ const M=G.mini; return [{text:S('Chase the Moth Mask over the rooftops!','Chase the Moth Mask!'),x:M.mx||C1P.hall.x,y:M.my||C1P.hall.y,near:true}]; }
-      if(!F.c_hettie) return [c1Obj('Show the gear to Professor Sprocket in the Lower Town','Show the gear to Professor Sprocket',c1Who('c_hettie',C1P.hettie.x,C1P.hettie.y))];
-      if(!F.c_hester) return [c1Obj('Tell Captain Ticklebrass at the Clockwatch Hall','Tell the Captain at Clockwatch Hall',c1Who('c_hester',C1P.hester.x,C1P.hester.y))];
+      if(!F.c_hettie) return [c1sObj('Show the gear to Professor Sprocket in the Lower Town','Show the gear to Professor Sprocket',c1Who('c_hettie',C1P.hettie.x,C1P.hettie.y))];
+      if(!F.c_hester) return [c1sObj('Tell Captain Ticklebrass at the Clockwatch Hall','Tell the Captain at Clockwatch Hall',c1Who('c_hester',C1P.hester.x,C1P.hester.y))];
       if(!isNight()) return [{text:S('Wait for night by Whirligig Manor (the Captain or Lord Whirligig can help you wait)','Wait for night by Whirligig Manor'),x:C1P.manor.x,y:C1P.manor.y}];
       return [{text:S('Watch the roof of Whirligig Manor','Watch the roof of Whirligig Manor'),x:C1P.manor.x,y:C1P.manor.y}];
     },
@@ -723,7 +723,7 @@ defineStages(2,[
   {id:'c_salt',chapter:S('The Girl from Saltmarsh','The Girl from Saltmarsh'),card:['Act II · Chapter 5',S('The Girl from Saltmarsh','The Girl from Saltmarsh')],at:{x:C1P.library.x,y:C1P.library.y+120},
     objectives(){
       const F=G.flags;
-      if(!F.c_ottoline&&!F.c_mina) return [c1Obj('Ask at the Turning Library how anyone climbs a clock','Ask at the library how to climb a clock',c1Who('c_ottoline',C1P.library.x,C1P.library.y))];
+      if(!F.c_ottoline&&!F.c_mina) return [c1sObj('Ask at the Turning Library how anyone climbs a clock','Ask at the library how to climb a clock',c1Who('c_ottoline',C1P.library.x,C1P.library.y))];
       if(!F.c_mina) return [{text:S('Follow the Coast Road west to Saltmarsh','Go west to Saltmarsh'),x:C1P.salt.x,y:C1P.salt.y}];
       if(c1InArea('c_tidehouse')) return [{text:S('Fix the Tide Clock: burn the kelp, lift the weight, free the big hand','Fix the Tide Clock'),x:player.x,y:player.y,area:AREA.id}];
       return [{text:S('Fix the Tide Clock (inside the Tide House)','Fix the Tide Clock in the Tide House'),x:C1P.tide.x,y:C1P.tide.y,area:'c_tidehouse'}];
@@ -754,7 +754,7 @@ defineStages(2,[
       const F=G.flags;
       if(c1InArea('c_mothnest')) return [{text:S('Look around the bell loft','Look around the bell loft'),x:player.x,y:player.y,area:AREA.id}];
       if(!F.c_nest) return [{text:S('Climb the Great Clock to the very top','Climb to the top of the Great Clock'),x:C1P.clock.x,y:C1P.clock.y}];
-      if(!F.c_ambrose) return [c1Obj('Ask Clockkeeper Ambrose why the Great Clock stopped','Ask the Clockkeeper why the clock stopped',c1Who('c_ambrose',C1P.ambrose.x,C1P.ambrose.y))];
+      if(!F.c_ambrose) return [c1sObj('Ask Clockkeeper Ambrose why the Great Clock stopped','Ask the Clockkeeper why the clock stopped',c1Who('c_ambrose',C1P.ambrose.x,C1P.ambrose.y))];
       if(c1InArea('c_brassworks')) return [{text:S('Restart the Great Clock from the Brassworks','Restart the Great Clock'),x:player.x,y:player.y,area:AREA.id}];
       if(!G.found.seen_c_brassworks) return [{text:S('Climb the Brassworks smokestack in the Brass Yards','Climb the smokestack in the Brass Yards'),x:C1P.stack.x,y:C1P.stack.y}];
       return [{text:S('Restart the Great Clock from the Brassworks','Restart the Great Clock'),x:C1P.stack.x,y:C1P.stack.y,area:'c_brassworks'}];
@@ -766,7 +766,7 @@ defineStages(2,[
     talk(n){
       const F=G.flags;
       if(n.id==='c_ambrose'&&!F.c_ambrose){ if(!F.c_nest){ c1Play([xl('c_ambrose',`Eh? The clock? Yes, she's stopped. Tick. Somebody lives up in her bell loft, you know. Climbs up the outside. Tick.`,`The clock stopped. Somebody lives in the bell loft. Tick.`)]); return true; } c1Play('c_ambrose',()=>questUpdated()); return true; }
-      if(n.id==='c_whirligig'&&!F.c_clock_on&&!c1Seen('c_whirl_brass_t')){ c1Mark('c_whirl_brass_t'); c1Play('c_whirl_brass'); return true; }
+      if(n.id==='c_whirligig'&&!F.c_clock_on&&!c1Seen('c_whirl_brass_t')){ c1sMark('c_whirl_brass_t'); c1Play('c_whirl_brass'); return true; }
       return false;
     },
     update(dt){ const F=G.flags;
@@ -777,7 +777,7 @@ defineStages(2,[
       if(!F.c_squawk) return [{text:S('Go back down to the Gear Market. Something is happening there.','Go to the Gear Market'),x:C1P.market.x,y:C1P.market.y}];
       if(c1InArea('c_lighthouse')) return [{text:S('Climb the Spinning Lighthouse and relight the lamp','Relight the lighthouse lamp'),x:player.x,y:player.y,area:AREA.id}];
       if(!F.c_cut&&!F.c_agatha) return [{text:S('Follow the Lantern Road east and cross the Cut (swing on the old bridge posts)','Go east and swing over the Cut'),x:C1P.cut.x,y:C1P.cut.y}];
-      if(!F.c_agatha) return [c1Obj('Find Keeper Agatha on Lantern Point','Find Keeper Agatha',c1Who('c_agatha',C1P.agatha.x,C1P.agatha.y))];
+      if(!F.c_agatha) return [c1sObj('Find Keeper Agatha on Lantern Point','Find Keeper Agatha',c1Who('c_agatha',C1P.agatha.x,C1P.agatha.y))];
       return [{text:S('Climb the Spinning Lighthouse and relight the lamp','Relight the lighthouse lamp'),x:C1P.light.x,y:C1P.light.y,area:'c_lighthouse'}];
     },
     hint:()=>STORY.c_hints.c_light,
@@ -834,13 +834,13 @@ function c1TalkOpts(id,o){
 
 // ---------- 5. the big beats (each one is safe to call twice)
 // Vesper's sightings: masked, drawn with the heist's thief sprite (drawThief): {x,y,z,face,mode:'wait'|'move'|'dive',alpha}
-function c1GlideStart(){ const p=player; C1.glide={x:p.x-170,y:p.y-150,vx:105,vy:62,t:0,life:9}; C1.cam={x:p.x+120,y:p.y+30,k:0.45}; }
-function c1SightAt(x,y,mode){ C1.sight={x,y,z:mode==='sit'?0:0,face:1,mode:mode||'wait',heart:false,alpha:1,t:0}; return C1.sight; }
-function c1SightLeap(){ const S0=C1.sight||c1SightAt(C1P.hall.x+30,C1P.hall.y,'wait'); S0.go={x:C1P.clock.x-20,y:C1P.clock.y-60,t:0,d:1.2}; S0.mode='dive'; C1.cam={x:(C1P.hall.x+C1P.clock.x)/2,y:C1P.clock.y-20,k:0.75}; }
-function c1SightGlideAway(tx,ty){ const S0=C1.sight; if(!S0) return; S0.mode='dive'; S0.away={vx:(tx-S0.x)/Math.max(1,dist(S0.x,S0.y,tx,ty))*190,vy:(ty-S0.y)/Math.max(1,dist(S0.x,S0.y,tx,ty))*190,t:0}; S0.face=tx<S0.x?-1:1; }
-function c1SightPoof(){ const S0=C1.sight; if(!S0) return; emit(S0.x,S0.y-20,24,{col:'90,70,130',glow:false,smin:30,smax:120,lmin:.4,lmax:.8,zmin:2,zmax:4,grow:6}); C1.sight=null; }
+function c1GlideStart(){ const p=player; C1ST.glide={x:p.x-170,y:p.y-150,vx:105,vy:62,t:0,life:9}; C1ST.cam={x:p.x+120,y:p.y+30,k:0.45}; }
+function c1SightAt(x,y,mode){ C1ST.sight={x,y,z:mode==='sit'?0:0,face:1,mode:mode||'wait',heart:false,alpha:1,t:0}; return C1ST.sight; }
+function c1SightLeap(){ const S0=C1ST.sight||c1SightAt(C1P.hall.x+30,C1P.hall.y,'wait'); S0.go={x:C1P.clock.x-20,y:C1P.clock.y-60,t:0,d:1.2}; S0.mode='dive'; C1ST.cam={x:(C1P.hall.x+C1P.clock.x)/2,y:C1P.clock.y-20,k:0.75}; }
+function c1SightGlideAway(tx,ty){ const S0=C1ST.sight; if(!S0) return; S0.mode='dive'; S0.away={vx:(tx-S0.x)/Math.max(1,dist(S0.x,S0.y,tx,ty))*190,vy:(ty-S0.y)/Math.max(1,dist(S0.x,S0.y,tx,ty))*190,t:0}; S0.face=tx<S0.x?-1:1; }
+function c1SightPoof(){ const S0=C1ST.sight; if(!S0) return; emit(S0.x,S0.y-20,24,{col:'90,70,130',glow:false,smin:30,smax:120,lmin:.4,lmax:.8,zmin:2,zmax:4,grow:6}); C1ST.sight=null; }
 // the moth storm around her in the Lamp Room: fire scatters it (dive: she dodges through it to the far side)
-function c1MothsOff(dive){ const S0=C1.sight; if(!S0) return; S0.moths=false;
+function c1MothsOff(dive){ const S0=C1ST.sight; if(!S0) return; S0.moths=false;
   emit(S0.x,S0.y-30,dive?14:30,{col:'200,196,214',glow:false,smin:80,smax:260,lmin:.5,lmax:1,zmin:2,zmax:4,grow:2,drag:1});
   if(dive){ S0.go={x:S0.x-200,y:S0.y+10,t:0,d:0.8}; S0.mode='dive'; }
   else emit(player.x,player.y-20,24,{kind:'fire',ang:Math.atan2(S0.y-player.y,S0.x-player.x),spread:0.5,smin:120,smax:320,lmin:.3,lmax:.6,zmin:2,zmax:4,grow:5}); }
@@ -853,15 +853,15 @@ function c1DrawMoths(S0,t){
   ctx.restore();
 }
 function c1SightTick(dt){
-  const S0=C1.sight; if(S0){ S0.t+=dt;
+  const S0=C1ST.sight; if(S0){ S0.t+=dt;
     if(S0.go){ const g=S0.go; g.t+=dt; const k=Math.min(1,g.t/g.d); if(!g.x0){ g.x0=S0.x; g.y0=S0.y; } S0.x=lerp(g.x0,g.x,k); S0.y=lerp(g.y0,g.y,k); S0.z=Math.sin(k*Math.PI)*70; if(k>=1){ S0.go=null; S0.mode='wait'; S0.z=0; } }
-    if(S0.away){ S0.away.t+=dt; S0.x+=S0.away.vx*dt; S0.y+=S0.away.vy*dt; S0.z=Math.min(90,(S0.z||0)+dt*30); S0.alpha=Math.max(0,1-S0.away.t/4); if(S0.alpha<=0) C1.sight=null; } }
-  const g=C1.glide; if(g){ g.t+=dt; g.x+=g.vx*dt; g.y+=g.vy*dt; if(g.t>g.life) C1.glide=null; }
+    if(S0.away){ S0.away.t+=dt; S0.x+=S0.away.vx*dt; S0.y+=S0.away.vy*dt; S0.z=Math.min(90,(S0.z||0)+dt*30); S0.alpha=Math.max(0,1-S0.away.t/4); if(S0.alpha<=0) C1ST.sight=null; } }
+  const g=C1ST.glide; if(g){ g.t+=dt; g.x+=g.vx*dt; g.y+=g.vy*dt; if(g.t>g.life) C1ST.glide=null; }
 }
 // the cliff top after the Gullcrag Caves: she is sitting on the edge
 function c1CliffScene(){
   // (placed when the scene's first line shows, wherever the warp has put Ash by then)
-  const at=xdo(()=>{ const p=player; c1SightAt(p.x+110,p.y-30,'wait').face=-1; C1.cam={x:p.x+60,y:p.y-20,k:0.5}; });
+  const at=xdo(()=>{ const p=player; c1SightAt(p.x+110,p.y-30,'wait').face=-1; C1ST.cam={x:p.x+60,y:p.y-20,k:0.5}; });
   c1Play([at,...STORY.c_cliff],()=>{ G.flags.c_gull_done=1; gainXp(200); goStage('c_brass'); });
 }
 // the Great Clock starts again (the end of the Brassworks): inside, the freight lift carries Ash out of the front gate
@@ -880,9 +880,9 @@ function c1LampScene(){
   const L=[];
   if(!c1Seen('c_light_end')) L.push(...STORY.c_light_end);
   // Vesper against the lamp, in a storm of moths
-  L.push(xdo(()=>{ const S0=c1SightAt(player.x+96,player.y-70,'wait'); S0.face=-1; S0.moths=true; C1.cam={x:player.x+48,y:player.y-30,k:0.55}; }),...STORY.c_lamp_vesper);
+  L.push(xdo(()=>{ const S0=c1SightAt(player.x+96,player.y-70,'wait'); S0.face=-1; S0.moths=true; C1ST.cam={x:player.x+48,y:player.y-30,k:0.55}; }),...STORY.c_lamp_vesper);
   c1Play(L,()=>{
-    C1.sight=null; const F=G.flags; F.c_spire_up=true; F.c_bridge=1; F.c_light_done=1; gainXp(300);
+    C1ST.sight=null; const F=G.flags; F.c_spire_up=true; F.c_bridge=1; F.c_light_done=1; gainXp(300);
     if(AREA&&c1InArea('c_lighthouse')){ G.ow={x:C1P.agatha.x+40,y:C1P.agatha.y+90}; exitArea(); }
     later(0.8,()=>{ setBanner(S('The Shadow Spire','The Shadow Spire'),S('A black tower stands in the sea past the harbor. Its path shows only at night.','A black tower in the sea. The path shows at night.'),4); });
     later(1.2,()=>goStage('c_spire'));
@@ -890,15 +890,15 @@ function c1LampScene(){
 }
 // the Vesper fight pauses at 10 percent (x1_foes calls this; a watcher calls it if nobody does)
 function c1SpireChoice(e){
-  if(G.flags.c_choice_done||C1.choiceRun) return false;
-  C1.choiceRun=true;
+  if(G.flags.c_choice_done||C1ST.choiceRun) return false;
+  C1ST.choiceRun=true;
   if(e){ e.invuln=true; e.passive=true; e.tele=null; e.vx=e.vy=0; }
   // no fight on screen (the beat was called without her): she kneels in front of Ash for the scene
-  else { const S0=c1SightAt(player.x+92,player.y-36,'wait'); S0.face=-1; C1.cam={x:player.x+46,y:player.y-18,k:0.6}; }
+  else { const S0=c1SightAt(player.x+92,player.y-36,'wait'); S0.face=-1; C1ST.cam={x:player.x+46,y:player.y-18,k:0.6}; }
   for(const o of G.enemies) if(o!==e&&!o.dead&&(o.type==='c_mothclone'||o.clone)) o.dead=true;
   G.projectiles=(G.projectiles||[]).filter(p=>p.owner!=='enemy');
   c1Play('c_choice',()=>{
-    G.flags.c_choice_done=1; C1.choiceRun=false; C1.sight=null;
+    G.flags.c_choice_done=1; C1ST.choiceRun=false; C1ST.sight=null;
     if(e&&!e.dead){ e.dead=true; if(G.boss===e) G.boss=null; }
     const v=(EDEF.c_mothmask&&EDEF.c_mothmask.value)||2500; if(!G.flags.c_mask_xp){ G.flags.c_mask_xp=1; gainXp(v); }
     later(0.8,()=>c1SpireOut());
@@ -913,7 +913,7 @@ function c1SpireOut(){
   });
 }
 function c1SpireWatch(dt){
-  const F=G.flags; if(F.c_choice_done||C1.choiceRun) return;
+  const F=G.flags; if(F.c_choice_done||C1ST.choiceRun) return;
   const b=G.boss&&G.boss.type==='c_mothmask'?G.boss:(AREA?G.enemies.find(e=>e.type==='c_mothmask'):null);
   if(b&&!b.dead&&b.hp<=b.maxHp*0.1&&scene==='play') c1SpireChoice(b);
   else if(b&&b.dead&&scene==='play') c1SpireChoice(null);
@@ -930,11 +930,11 @@ function c1EndAct(){
 const C1_BOSS={c_pinch:{intro:'c_pinch_intro',won:'c_gull_won'},c_ticktock:{intro:'c_ticktock_intro',won:'c_brass_won'},c_gloomwing:{intro:'c_gloomwing_intro',won:'c_light_won'},
   c_shadowash:{intro:'c_shadowash',won:'c_shadowash_won'},c_mothmask:{intro:'c_roof_intro'}};
 function c1BossTick(dt){
-  C1.bt=(C1.bt||0)-dt; if(C1.bt>0) return; C1.bt=0.25;
+  C1ST.bt=(C1ST.bt||0)-dt; if(C1ST.bt>0) return; C1ST.bt=0.25;
   let b=G.boss&&C1_BOSS[G.boss.type]?G.boss:null;
   if(!b&&AREA) b=G.enemies.find(e=>!e.dead&&C1_BOSS[e.type])||null;
-  if(b&&!b.dead){ C1.boss=b; const B=C1_BOSS[b.type]; if(B.intro&&!c1Seen(B.intro)&&scene==='play'&&!DLG) c1Play(B.intro); return; }
-  const o=C1.boss; if(o&&(o.dead||o.hp<=0)){ C1.boss=null; const B=C1_BOSS[o.type]; if(B&&B.won&&!c1Seen(B.won)) later(2.6,()=>c1When('won_'+o.type,()=>!c1Seen(B.won),()=>c1Play(B.won))); }
+  if(b&&!b.dead){ C1ST.boss=b; const B=C1_BOSS[b.type]; if(B.intro&&!c1Seen(B.intro)&&scene==='play'&&!DLG) c1Play(B.intro); return; }
+  const o=C1ST.boss; if(o&&(o.dead||o.hp<=0)){ C1ST.boss=null; const B=C1_BOSS[o.type]; if(B&&B.won&&!c1Seen(B.won)) later(2.6,()=>c1When('won_'+o.type,()=>!c1Seen(B.won),()=>c1Play(B.won))); }
 }
 // ---------- the Great Clock's hatch (into the Moth's Nest) and Duchess on the roof cap
 function c1ClockTop(){ try{ return typeof elevLvl==='function'&&elevLvl(C1P.clock.x,C1P.clock.y-30)>=4; }catch(e){ return false; } }
@@ -972,22 +972,22 @@ function c1Tick(dt){
 // (also: a fade that a scene starts under, like "wait here until dark", clears while the Act II scene plays)
 { const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'){ c1SightTick(dt); if(scene==='dialogue'&&G.fade>0&&actOf(G.stage)===2) G.fade=Math.max(0,G.fade-dt*1.4); } }catch(e){ console.error(e); } }; }
 { const base=simUpdate; simUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story') c1SightTick(dt); }catch(e){ console.error(e); } }; }
-// the camera leans toward a scene (C1.cam = {x,y,k})
+// the camera leans toward a scene (C1ST.cam = {x,y,k})
 { const base=updateCam; updateCam=function(dt,snap){
-  const C=C1.cam; if(!C||AREA||!player||!G||G.mode!=='story') return base(dt,snap);
-  if(scene!=='dialogue'&&!(G.mini&&G.mini.kind==='c_roofchase')){ C1.cam=null; return base(dt,snap); }
+  const C=C1ST.cam; if(!C||AREA||!player||!G||G.mode!=='story') return base(dt,snap);
+  if(scene!=='dialogue'&&!(G.mini&&G.mini.kind==='c_roofchase')){ C1ST.cam=null; return base(dt,snap); }
   const px=player.x, py=player.y; player.x=px+(C.x-px)*C.k; player.y=py+(C.y-py)*C.k; try{ base(dt,snap); }finally{ player.x=px; player.y=py; } }; }
 // ---------- people: the stand-ins (when x1_people is not there) and Vesper on the Clockwatch roof in the snow
 { const base=setupNPCs; setupNPCs=function(){ base(); try{ if(G&&G.mode==='story') c1People(); }catch(e){ console.error(e); } }; }
 function c1People(){
   if(actOf(G.stage)<2) return;
-  for(const id in C1.fb){ const at=c1FbSpot(id); if(!at||!SPECIAL[id]) continue; if(G.npcs.some(n=>n.id===id)) continue; const n=mkNPC(SPECIAL[id],at[0],at[1]); n.walker=false; G.npcs.push(n); }
+  for(const id in C1ST.fb){ const at=c1FbSpot(id); if(!at||!SPECIAL[id]) continue; if(G.npcs.some(n=>n.id===id)) continue; const n=mkNPC(SPECIAL[id],at[0],at[1]); n.walker=false; G.npcs.push(n); }
   if(G.stage==='c_snow'&&c1Friend()&&!G.npcs.some(n=>n.id==='c_vesper')){ const n=mkNPC(SPECIAL.c_vesper,C1P.hall.x+40,C1P.hall.y+90); n.walker=false; n.c1roof=true; G.npcs.push(n); }
 }
 onTalk(n=>{
   if(n.id!=='c_vesper'||!c1On()) return false;
   const L=[xl('c_vesper',`Gran made me sit by her stove for an hour. AN HOUR. Then she made me eat soup. It was warm. Don't tell anyone.`,`Gran made me sit by her stove. Then soup. It was warm.`)];
-  if(G.flags.dr_seen_c_twins&&!c1Seen('c_vesper_twins')) L.push(xdo(()=>c1Mark('c_vesper_twins')),xl('c_vesper',`Granny says "fire isn't the only warm thing" every single night. How do YOU know that?`,`Granny says that every night! How do you know it?`));
+  if(G.flags.dr_seen_c_twins&&!c1Seen('c_vesper_twins')) L.push(xdo(()=>c1sMark('c_vesper_twins')),xl('c_vesper',`Granny says "fire isn't the only warm thing" every single night. How do YOU know that?`,`Granny says that every night! How do you know it?`));
   c1Play(L); return true;
 });
 // ---------- drawing: the glide, the sightings, Duchess, the hatch, the Tide House door, the scrap of silk
@@ -997,20 +997,20 @@ const C1_SL=[];
 function c1SightLights(){
   for(const L of C1_SL){ const i=LIGHTS.indexOf(L); if(i>=0) LIGHTS.splice(i,1); } C1_SL.length=0;
   if(AREA) return; const add=(x,y,r,i)=>{ const L={x,y,r,i,c1:true}; C1_SL.push(L); LIGHTS.push(L); };
-  const S0=C1.sight; if(S0) add(S0.x,S0.y-30-(S0.z||0),170,0.8*(S0.alpha==null?1:S0.alpha));
-  const g=C1.glide; if(g) add(g.x,g.y-30,160,0.7);
+  const S0=C1ST.sight; if(S0) add(S0.x,S0.y-30-(S0.z||0),170,0.8*(S0.alpha==null?1:S0.alpha));
+  const g=C1ST.glide; if(g) add(g.x,g.y-30,160,0.7);
 }
 function c1Render(list){
   c1SightLights(); c1RoofPreview(list);
   // the arrival glide: high up (small, with her shadow far below on the ground)
-  const g=C1.glide; if(g&&!AREA) list.push({x:g.x,y:g.y+120,draw:()=>{ if(typeof drawThief!=='function') return; const a=Math.min(1,(g.life-g.t)/1.5);
+  const g=C1ST.glide; if(g&&!AREA) list.push({x:g.x,y:g.y+120,draw:()=>{ if(typeof drawThief!=='function') return; const a=Math.min(1,(g.life-g.t)/1.5);
     ctx.save(); ctx.globalAlpha=0.22*a; ctx.fillStyle='#000'; ctx.beginPath(); ctx.ellipse(g.x+10,g.y+110,26,8,0,0,TAU); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(g.x,g.y); ctx.scale(0.62,0.62); ctx.translate(-g.x,-g.y); drawThief({x:g.x,y:g.y,z:0,face:1,mode:'dive',alpha:a*0.9,heart:false}); ctx.restore(); }});
-  const S0=C1.sight; if(S0&&inView(S0.x,S0.y,140)){ list.push({x:S0.x,y:S0.y+(S0.z>4?40:0),draw:()=>{ if(typeof drawThief==='function') drawThief(S0); }}); if(S0.moths) list.push({x:S0.x,y:S0.y+(S0.z>4?41:1),draw:()=>c1DrawMoths(S0,G.time)}); }
+  const S0=C1ST.sight; if(S0&&inView(S0.x,S0.y,140)){ list.push({x:S0.x,y:S0.y+(S0.z>4?40:0),draw:()=>{ if(typeof drawThief==='function') drawThief(S0); }}); if(S0.moths) list.push({x:S0.x,y:S0.y+(S0.z>4?41:1),draw:()=>c1DrawMoths(S0,G.time)}); }
   if(AREA||curMap()!==1||actOf(G.stage)<2) return;
   if(reached('c_brass')){ const h=c1Hatch();
     if(inView(h.x,h.y,90)) list.push({x:h.x,y:h.y-6,draw:()=>c1DrawHatch(h)});
-    if(h.top&&reached('c_brass')&&inView(h.x+46,h.y,80)){ const D=C1.goat||(C1.goat={x:h.x+52,y:h.y+8,hx:h.x+52,hy:h.y+8,face:Math.PI,t:0,r:10,kind:'goat'}); D.t+=0.016; list.push({x:D.x,y:D.y,draw:()=>{ try{ drawNPC(D); }catch(e){} }}); } }
+    if(h.top&&reached('c_brass')&&inView(h.x+46,h.y,80)){ const D=C1ST.goat||(C1ST.goat={x:h.x+52,y:h.y+8,hx:h.x+52,hy:h.y+8,face:Math.PI,t:0,r:10,kind:'goat'}); D.t+=0.016; list.push({x:D.x,y:D.y,draw:()=>{ try{ drawNPC(D); }catch(e){} }}); } }
   if(!c1TideDoor()&&inView(C1P.tide.x,C1P.tide.y,90)) list.push({x:C1P.tide.x,y:C1P.tide.y,draw:c1DrawTideDoor});
   if(G.stage==='c_snow'&&!c1Friend()&&G.choices.c_vesper==='foe'&&inView(C1P.hall.x,C1P.hall.y,80)) list.push({x:C1P.hall.x+30,y:C1P.hall.y+70,draw:()=>c1DrawSilk(C1P.hall.x+30,C1P.hall.y+60)});
 }
@@ -1037,7 +1037,7 @@ function c1DrawSilk(x,y){ const t=G.time; ctx.save(); ctx.translate(x,y); ctx.ro
 // ---------- the snow: every coast biome gets ambient snow 0.6 once G.flags.c_snow is set (x1_world dusts the ground)
 // snow lying on the ground of the coast once it has fallen (drawn over the ground, under everything standing on it)
 { const base=drawPools; drawPools=function(){ base(); try{ if(G&&G.mode==='story'&&!AREA&&G.flags&&G.flags.c_snow&&curMap()===1){ ctx.fillStyle='rgba(238,243,250,.4)'; ctx.fillRect(cam.x-40,cam.y-40,W/zoom+80,H/zoom+80); } }catch(e){} }; }
-{ const base=ambHere; ambHere=function(){ const a=base(); try{ if(a&&G&&G.flags&&G.flags.c_snow&&curMap()===1&&(a.snow||0)<0.6){ if(C1.ambSrc!==a){ C1.ambSrc=a; C1.amb=Object.assign({},a,{snow:0.6}); } return C1.amb; } }catch(e){} return a; }; }
+{ const base=ambHere; ambHere=function(){ const a=base(); try{ if(a&&G&&G.flags&&G.flags.c_snow&&curMap()===1&&(a.snow||0)<0.6){ if(C1ST.ambSrc!==a){ C1ST.ambSrc=a; C1ST.amb=Object.assign({},a,{snow:0.6}); } return C1ST.amb; } }catch(e){} return a; }; }
 // ---------- rests: Vesper's fish on Granny Oona's step (the Chowder Pot), the Warden's whisper ('warden' ending)
 { const base=innRest; innRest=function(){ base(); try{ c1Rested('inn'); }catch(e){ console.error(e); } }; }
 { const base=restAtShrine; restAtShrine=function(s){ base(s); try{ c1Rested('shrine'); }catch(e){ console.error(e); } }; }
@@ -1053,7 +1053,7 @@ STORY.c_warden_whisper=[
   xdo(()=>{ G.flags.c_warden_whisper=1; })
 ];
 // ---------- saves: transient state resets on a new run or a load (all story state lives in G.flags / G.choices)
-function c1Reset(){ C1.cam=null; C1.glide=null; C1.sight=null; C1.trustSeen=null; C1.q=[]; C1.boss=null; C1.goat=null; C1.choiceRun=false; C1.preRoof=false; c1ChaseLights(false); }
+function c1Reset(){ C1ST.cam=null; C1ST.glide=null; C1ST.sight=null; C1ST.trustSeen=null; C1ST.q=[]; C1ST.boss=null; C1ST.goat=null; C1ST.choiceRun=false; C1ST.preRoof=false; c1ChaseLights(false); }
 { const base=newRun; newRun=function(mode){ base(mode); try{ c1Reset(); }catch(e){} }; }
 { const base=loadGame; loadGame=function(s){ base(s); try{ c1Reset(); c1Migrate(); }catch(e){ console.error(e); } }; }
 // starting Act II at a later stage (a test save, or a jump from a menu) gets the same implied world flags
@@ -1062,12 +1062,12 @@ function c1Reset(){ C1.cam=null; C1.glide=null; C1.sight=null; C1.trustSeen=null
 function c1Migrate(){
   const F=G.flags; if(actOf(G.stage)!==2) return;
   const at=s=>reached(s);
-  if(at('c_gear')){ c1Mark('c_arrive'); }
-  if(at('c_salt')){ for(const k of ['c_gate','c_hettie','c_hester','c_chase_start','c_chase_end','c_note1']) c1Mark(k); F.c_hettie=F.c_hester=1; }
-  if(at('c_claws')){ c1Mark('c_mina'); c1Mark('c_lowtide'); F.c_mina=1; F.c_lowtide=true; F.c_tide_fixed=1; }
-  if(at('c_brass')){ c1Mark('c_cliff'); F.c_gull_done=1; }
-  if(at('c_light')){ for(const k of ['c_nest','c_ambrose','c_clock_bong']) c1Mark(k); F.c_nest=F.c_ambrose=1; F.c_clock_on=true; }
-  if(at('c_spire')){ for(const k of ['c_squawk','c_agatha','c_lamp_vesper']) c1Mark(k); F.c_squawk=F.c_agatha=F.c_cut=1; F.c_spire_up=true; F.c_bridge=1; }
+  if(at('c_gear')){ c1sMark('c_arrive'); }
+  if(at('c_salt')){ for(const k of ['c_gate','c_hettie','c_hester','c_chase_start','c_chase_end','c_note1']) c1sMark(k); F.c_hettie=F.c_hester=1; }
+  if(at('c_claws')){ c1sMark('c_mina'); c1sMark('c_lowtide'); F.c_mina=1; F.c_lowtide=true; F.c_tide_fixed=1; }
+  if(at('c_brass')){ c1sMark('c_cliff'); F.c_gull_done=1; }
+  if(at('c_light')){ for(const k of ['c_nest','c_ambrose','c_clock_bong']) c1sMark(k); F.c_nest=F.c_ambrose=1; F.c_clock_on=true; }
+  if(at('c_spire')){ for(const k of ['c_squawk','c_agatha','c_lamp_vesper']) c1sMark(k); F.c_squawk=F.c_agatha=F.c_cut=1; F.c_spire_up=true; F.c_bridge=1; }
   if(at('c_snow')){ F.c_choice_done=1; F.c_snow=true; F.c_shard1=true; if(!G.items.c_shard1) G.items.c_shard1=1; if(!G.choices.c_vesper) G.choices.c_vesper='foe'; c1Moon(95); }
 }
 // ---------- the journal: Vesper's card with her trust as moths (once her name is learned)
@@ -1277,8 +1277,8 @@ function c1RWin(){
   later(0.05,()=>{
     miniEnd(true,S('Caught up!','Caught up!'),S('The roofs end at the Clockwatch Hall.','The roofs end here.'));
     const p=player, S0=c1SightAt(p.x+46,p.y-26,'wait'); S0.face=1;
-    C1.cam={x:(p.x+C1P.clock.x)/2,y:p.y,k:0.6};
-    c1Chain(['c_chase_end','c_note1'],()=>{ C1.sight=null; gainXp(600); addCoins(60); c1RDown(); goStage('c_salt'); });
+    C1ST.cam={x:(p.x+C1P.clock.x)/2,y:p.y,k:0.6};
+    c1Chain(['c_chase_end','c_note1'],()=>{ C1ST.sight=null; gainXp(600); addCoins(60); c1RDown(); goStage('c_salt'); });
   });
 }
 function c1RLose(){
@@ -1297,19 +1297,19 @@ function c1ChaseWatch(dt){
   if(!F.c_hester||G.mini||!c1Out()||scene!=='play'||!isNight()||F.c_chase_won) return;
   if(dist(player.x,player.y,C1P.manor.x,C1P.manor.y)>380) return;
   const S0=c1SightAt(C1R.L[0].x0+40,C1R.L[0].y0-10,'wait'); S0.face=1;
-  C1.cam={x:C1R.L[0].x0,y:C1R.L[0].y0,k:0.6}; c1ChaseLights(true); C1.preRoof=true;
-  c1Play(c1Seen('c_chase_start')?STORY.c_chase_retry:'c_chase_start',()=>{ C1.sight=null; C1.preRoof=false; later(0.1,()=>startMini('c_roofchase',null)); });
+  C1ST.cam={x:C1R.L[0].x0,y:C1R.L[0].y0,k:0.6}; c1ChaseLights(true); C1ST.preRoof=true;
+  c1Play(c1Seen('c_chase_start')?STORY.c_chase_retry:'c_chase_start',()=>{ C1ST.sight=null; C1ST.preRoof=false; later(0.1,()=>startMini('c_roofchase',null)); });
 }
 // lights along the route while it runs (the night is dark)
 function c1ChaseLights(on){
-  for(const L of C1.lights){ const i=LIGHTS.indexOf(L); if(i>=0) LIGHTS.splice(i,1); } C1.lights.length=0;
+  for(const L of C1ST.lights){ const i=LIGHTS.indexOf(L); if(i>=0) LIGHTS.splice(i,1); } C1ST.lights.length=0;
   if(!on) return;
-  for(let s=60;s<C1R.total;s+=200){ const q=c1RAt(s); const L={x:q.x,y:q.y-30,r:260,i:0.7,fire:true,c1:true}; C1.lights.push(L); LIGHTS.push(L); }
+  for(let s=60;s<C1R.total;s+=200){ const q=c1RAt(s); const L={x:q.x,y:q.y-30,r:260,i:0.7,fire:true,c1:true}; C1ST.lights.push(L); LIGHTS.push(L); }
 }
 // the roofs drawn while she waits on the manor roof (the chase-start scene), so she stands on something
 const C1_ROOF0={bombs:[],stepUp:false,lurch:0,lurchT:0,swing:0,ms:0,as:0,mx:0,my:0,mz:0,face:1,wait:0,stepS:0};
 function c1RoofPreview(list){
-  if(!C1.preRoof||G.mini||AREA) return;
+  if(!C1ST.preRoof||G.mini||AREA) return;
   if(!C1_ROOF0.stepS){ const st=C1R.L.find(g=>g.k==='step'); C1_ROOF0.stepS=st.s0+st.len*0.5; }
   list.push({x:C1R.L[0].x0,y:-1e9,draw:()=>c1RDraw(C1_ROOF0,G.time,true)});
 }
@@ -1527,7 +1527,7 @@ function c1Beat(name,arg){
 // __eb.actStart(2,'<stage>') also gets the world flags implied by the stages before it (the same as an old save)
 { const base=window.__ebX&&window.__ebX.actStart; if(typeof base==='function') window.__ebX.actStart=function(n,w){ const r=base(n,w); try{ if((n|0)===2&&G.mode==='story'){ c1Migrate(); setupNPCs(); } }catch(e){ console.error(e); } return r; }; }
 window.__ebX=Object.assign(window.__ebX||{},{c1:{
-  C1,C1R,C1P,play:c1Play,chain:c1Chain,seen:c1Seen,mark:c1Mark,trust:c1Trust,beat:c1Beat,spireChoice:c1SpireChoice,endAct:c1EndAct,dunStory:c1DunStory,taunts:C1_TAUNTS,
+  C1ST,C1R,C1P,play:c1Play,chain:c1Chain,seen:c1Seen,mark:c1sMark,trust:c1Trust,beat:c1Beat,spireChoice:c1SpireChoice,endAct:c1EndAct,dunStory:c1DunStory,taunts:C1_TAUNTS,
   proj:(x,y)=>{ const P=c1RProj(x,y); return {s:Math.round(P.s),d:Math.round(P.d),k:P.g.k}; },
   at:s=>{ const q=c1RAt(s); return {x:Math.round(q.x),y:Math.round(q.y),k:q.g.k}; },
   route:()=>C1R.L.map(g=>({k:g.k,s0:Math.round(g.s0),s1:Math.round(g.s1),x0:g.x0,y0:g.y0,x1:g.x1,y1:g.y1})),
@@ -1543,6 +1543,6 @@ window.__ebX=Object.assign(window.__ebX||{},{c1:{
   // a test fallback for very slow machines: put Ash at the end of the roofs (the win still runs the normal way)
   chaseSkip:()=>{ const M=G.mini; if(!M||M.kind!=='c_roofchase') return false; const q=c1RAt(C1R.total-30); player.x=q.x; player.y=q.y; player.z=0; M.stepUp=true; M.ms=C1R.total-30; M.safeS=C1R.total-40; return true; },
   state:()=>({stage:G.stage,act:G.act,trust:G.flags.c_trust|0,vesper:G.choices.c_vesper||null,moon:G.flags.moon==null?100:G.flags.moon,shard:!!G.items.c_shard1,
-    lowtide:!!G.flags.c_lowtide,clock:!!G.flags.c_clock_on,spire:!!G.flags.c_spire_up,snow:!!G.flags.c_snow,done:!!G.flags.c_done,seen:Object.keys(G.flags.c_sn||{}),q:C1.q.map(q=>q.id),fb:Object.keys(C1.fb),
+    lowtide:!!G.flags.c_lowtide,clock:!!G.flags.c_clock_on,spire:!!G.flags.c_spire_up,snow:!!G.flags.c_snow,done:!!G.flags.c_done,seen:Object.keys(G.flags.c_sn||{}),q:C1ST.q.map(q=>q.id),fb:Object.keys(C1ST.fb),
     obj:(()=>{ try{ const o=questObjective(); return o?{text:o.text,x:Math.round(o.x||0),y:Math.round(o.y||0)}:null; }catch(e){ return String(e); } })()})
 }});
