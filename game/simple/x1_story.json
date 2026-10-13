@@ -1,0 +1,6 @@
+{
+  "_about": "Simple-words templates for text x1_story.js builds at runtime (its fixed lines carry their simple version inline with S()).",
+  "c1_gears": {"o": "{1} of {2} gears are turning.", "s": "{1} of {2} gears turn."},
+  "c1_trust": {"o": "Vesper trusts you a little more. ({1} of 7)", "s": "Vesper trusts you more. ({1} of 7)"},
+  "c1_moon": {"o": "The moon: {1} bite gone.", "s": "{1} bite gone."}
+}
