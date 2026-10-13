@@ -254,7 +254,7 @@ function readInput(dt){
   }
   const l=Math.hypot(mx,my); if(l>1){mx/=l;my/=l;}
   if(touch.fireT>0) touch.fireT-=dt;
-  const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5};
+  const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5,Digit7:6,Digit8:7,Digit9:8};
   let wSel=-1; for(const k in WSEL) if(pressed.has(k)) wSel=WSEL[k];
   const K=c=>keys.has(c), P=c=>pressed.has(c), LP=a=>LEFT_KEYS[a].some(P), LH=a=>LEFT_KEYS[a].some(K), KA=c=>(K(c)||P(c))&&!OFFK.has(c);
   const o={mx,my,

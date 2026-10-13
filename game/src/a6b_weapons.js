@@ -11,6 +11,22 @@ const WEAPONS={
   bow:{name:'Ash Bow',short:'Bow',desc:'Hold attack to pull back, let go to shoot. A full pull shoots right through foes.',melee:false,crit:0.08},
   boomerang:{name:'Wing-rang',short:'Boomerang',desc:'Throw it and it comes back. It stuns whatever it hits.',melee:false,crit:0}
 };
+// ---------- the weapon registry (v9): every weapon, old and new, goes through these hooks (see scratchpad ARMS.md)
+// defineWeapon(id,{name,short,desc,crit,melee,flyOK,stamina,reach,aimR,icon(g,tier),input(dt,atk,free,p),startSwing(p,n),
+//   swingHits(p),update(dt,equipped),proj:{kind:{step,draw,clear}},drawFx(t3),draw2d(p),pose3d(p,W,bz,sw),draw3d(p,W,pal,t,tier),
+//   chip(p)->{prog,away,count,low},auto(p),unequip(p),reset(),moment(),acts:[srcs a switch may count it as],hitObj(o,src,x,y,r),hint,how})
+const WPK={};   // flying weapon kinds in G.wproj (k -> {step(a,dt),draw(a,t3),clear(a)})
+function defineWeapon(id,def){
+  const D=WEAPONS[id]=Object.assign(WEAPONS[id]||{},def); D.id=id;
+  if(!WEAPON_IDS.includes(id)) WEAPON_IDS.push(id);
+  if(def.proj) Object.assign(WPK,def.proj);
+  return D;
+}
+const wDef=id=>WEAPONS[id]||WEAPONS.sword;
+// the six first weapons, through the same hooks (their code lives below)
+Object.assign(WEAPONS.bow,{flyOK:true,input:(dt,atk)=>updateBow(dt,atk),chip:p=>({prog:p.bow?p.bow.k:0})});
+Object.assign(WEAPONS.boomerang,{flyOK:true,input:(dt,atk,free)=>{ if(atk&&free) throwRang(); },chip:()=>({away:!!(G.wproj&&G.wproj.some(q=>q.k==='rang'))})});
+Object.assign(WEAPONS.hammer,{input:(dt,atk,free)=>hammerInput(atk,free),chip:p=>({prog:p.ham&&p.ham.ph==='hold'?p.ham.ch:0})});
 const WS={paused:false,pop:null,get:null,pulse:0,area:undefined,side:1,flyT:0,backT:0,whirT:0};
 const BOW_FULL=0.6;
 // how long the switch pill (the weapon's name) and the big "new weapon" pose stay up
@@ -21,7 +37,7 @@ function equipWeapon(id,quiet){
   if(!G||!WEAPONS[id]||(id!=='sword'&&!(G.weapons&&G.weapons[id]))) return false;
   const p=player, was=curWeapon();
   G.weapon=id;
-  if(p){ p.bow=null; if(p.ham){ p.ham=null; p.swingT=0; } p.comboTimer=0; if(id!==was) p.wEquipT=0.35; }
+  if(p){ p.bow=null; if(p.ham){ p.ham=null; p.swingT=0; } p.comboTimer=0; if(id!==was){ p.wEquipT=0.35; if(WEAPONS[was].unequip) WEAPONS[was].unequip(p); } }
   if(!quiet&&id!==was){ WS.pop={id,t:0}; WS.pulse=1; wsnd('equip'); SFX.play('ui'); }
   return true;
 }
@@ -54,7 +70,9 @@ function weaponMoment(id,n){
   setBanner('New weapon: '+D.name,D.desc,4.2).wpn=true;
   if(ownedWeapons().length>=2) later(1.2,()=>mvTip('Switch weapons',switchTip(),8,'wpn_switch'));
   jingle('item','chest'); WS.get={id,t:0}; WS.pulse=1; shake(3);
-  const p=player; emit(p.x,p.y-20,34,{col:'255,220,140',ang:-Math.PI/2,spread:1.6,smin:40,smax:190,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
+  const p=player; emit(p.x,p.y-20,34,{col:D.mcol||'255,220,140',ang:-Math.PI/2,spread:1.6,smin:40,smax:190,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
+  if(D.moment) D.moment();
+  if(D.how) later(5.6,()=>mvTip(D.name,typeof D.how==='function'?D.how():D.how,9,'wpn_how_'+id));
 }
 
 // ---------- little sounds of our own (bow twang, arrow thunk, boomerang whirr), played through the same audio context as SFX
@@ -131,7 +149,7 @@ function wIgnite(x,y,r,heat){
 const AIM_CONE=Math.PI/4;
 function aimAssist(aim,kind){
   const p=player; if(!p||!G) return aim;
-  const R=kind==='breath'?240:kind==='bow'||kind==='boomerang'?620:Math.max(170,wReach(kind)+110);
+  const R=kind==='breath'?240:kind==='bow'||kind==='boomerang'?620:WEAPONS[kind]&&WEAPONS[kind].aimR?WEAPONS[kind].aimR:Math.max(170,wReach(kind)+110);
   let best=null, bs=1e9;
   for(const e of G.enemies){
     if(!wFoeOk(e)||e.frozen||e.alpha<0.3) continue;
@@ -153,12 +171,13 @@ function wAimAssist(aim){
   }
   return best?angTo(p.x,p.y,best.x,best.y):aim;
 }
-function wReach(w){ const K=wReachK(), st=player.stats; return w==='daggers'?48*K:w==='spear'?100*K:w==='hammer'?76*K:(st.range||60); }
+function wReach(w){ const K=wReachK(), st=player.stats, D=WEAPONS[w]; if(D&&D.reach!=null) return typeof D.reach==='function'?D.reach():D.reach; return w==='daggers'?48*K:w==='spear'?100*K:w==='hammer'?76*K:(st.range||60); }
 function nextCombo(w){ const p=player, n=w==='daggers'?4:3; return p.comboTimer>0&&p.comboW===w?(p.combo+1)%n:0; }
 function wClearFlight(){
   if(!G.wproj) return;
-  for(const a of G.wproj) if(a.k==='rang') for(const k of a.carry){ k.x=player.x; k.y=player.y; k.rang=null; }
+  for(const a of G.wproj){ if(a.k==='rang') for(const k of a.carry){ k.x=player.x; k.y=player.y; k.rang=null; } if(WPK[a.k]&&WPK[a.k].clear) WPK[a.k].clear(a); }
   G.wproj.length=0; G.wstuck.length=0; G.wfx.length=0;
+  for(const id of WEAPON_IDS) if(WEAPONS[id].reset) WEAPONS[id].reset();
 }
 
 // ---------- the update (called from updatePlayer in place of the old sword lines)
@@ -178,14 +197,13 @@ function updateWeapon(dt,inp){
   if(WS.pulse>0) WS.pulse=Math.max(0,WS.pulse-dt*3);
   if(WS.flyT>0) WS.flyT-=dt; if(WS.backT>0) WS.backT-=dt;
   if(p.wEquipT>0) p.wEquipT-=dt; if(p.throwT>0) p.throwT-=dt; if(p.bowSnap>0) p.bowSnap-=dt;
-  const w=curWeapon(), atk=!!inp.attack, free=p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0;
+  const w=curWeapon(), D=wDef(w), atk=!!inp.attack, free=p.atkCd<=0&&p.dashT<=0&&p.drinkT<=0;
   if(atk&&!armed){ if(!(G.noSwordT>0)){ G.noSwordT=3.6; ftext(p.x,p.y-28,'Mom has your sword at the forge','#ffd9a0',13); } }
   else if(armed){
-    if(w==='bow') updateBow(dt,atk);
-    else if(w==='boomerang'){ if(atk&&free) throwRang(); }
-    else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(atk&&!(WS.flyT>0)){ WS.flyT=4.6; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
+    if(D.flyOK&&D.input) D.input(dt,atk,free,p);   // the bow, the boomerang, bombs and the glaive work in the air too
+    else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(D.unequip&&D.input) D.unequip(p); if(atk&&!(WS.flyT>0)){ WS.flyT=4.6; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
     else if(airborne()&&hasSkill('slam')){ /* attack in the air is Meteor Slam (abilities build) */ }
-    else if(w==='hammer') hammerInput(atk,free);
+    else if(D.input) D.input(dt,atk,free,p);
     else if(atk&&free){
       const n=nextCombo(w), fin=n===(w==='daggers'?3:2), cost=w==='daggers'?(fin?6:3):w==='spear'?(fin?13:8):(fin?14:9);
       if(useStamina(cost)) startSwing(); else p.atkCd=0.2;
@@ -194,13 +212,15 @@ function updateWeapon(dt,inp){
   if(p.swingT>0){ p.swingT-=dt; swingHits(); }
   updateHammer(dt);
   updateWProj(dt);
+  for(const id of WEAPON_IDS){ const Dw=WEAPONS[id]; if(Dw.update) Dw.update(dt,armed&&id===w); }
 }
 
 // ---------- melee: daggers and spear (the sword lives in startSwing/swingHits in a6_player.js)
 function startWeaponSwing(w){
   const p=player, st=p.stats, n=nextCombo(w), dir=p.facing;
   p.combo=n; p.comboW=w; p.swingW=w; p.swingDir=dir; p.swingHit=new Set(); p.swingHitstop=false; p.swingObj=false;
-  if(w==='daggers'){
+  if(WEAPONS[w].startSwing) WEAPONS[w].startSwing(p,n);
+  else if(w==='daggers'){
     const fin=n===3, spin=fin&&hasSkill('spin')>0;
     p.swingFin=fin; p.swingSpin=spin; p.swingSide=n%2===0?1:-1;
     p.swingDur=spin?0.26:fin?0.16:0.09; p.atkCd=(spin?0.42:fin?0.3:0.13)/st.atkSpeed; p.comboTimer=p.atkCd+0.32;
@@ -220,6 +240,7 @@ function spearExt(pr){ return pr<0.35?1-Math.pow(1-pr/0.35,3):pr<0.68?1:Math.max
 function weaponSwingHits(){
   const p=player, w=p.swingW, K=wReachK(), dir=p.swingDir, pr=1-p.swingT/p.swingDur;
   let any=false;
+  if(WEAPONS[w]&&WEAPONS[w].swingHits) return WEAPONS[w].swingHits(p,pr);
   if(w==='daggers'){
     const fin=p.swingFin, spin=p.swingSpin, R=44*K*(spin?1.45:fin?1.3:1), half=spin?Math.PI:fin?0.5:0.85;
     for(const e of G.enemies){
@@ -433,7 +454,7 @@ function stepRang(r,dt){
   if(r.fire&&Math.random()<0.7) emit(r.x,r.y,1,{kind:'fire',smin:5,smax:30,lmin:.15,lmax:.3,zmin:1.5,zmax:3,grow:-3,drag:2});
 }
 function updateWProj(dt){
-  for(const a of G.wproj){ if(a.dead) continue; if(a.k==='arrow') stepArrow(a,dt); else if(a.k==='rang') stepRang(a,dt); }
+  for(const a of G.wproj){ if(a.dead) continue; if(a.k==='arrow') stepArrow(a,dt); else if(a.k==='rang') stepRang(a,dt); else if(WPK[a.k]) WPK[a.k].step(a,dt); }
   if(G.wproj.some(a=>a.dead)) G.wproj=G.wproj.filter(a=>!a.dead);
   for(const s of G.wstuck) s.t+=dt; if(G.wstuck.length&&G.wstuck[0].t>G.wstuck[0].life) G.wstuck=G.wstuck.filter(s=>s.t<s.life);
   for(const f of G.wfx) f.t+=dt; if(G.wfx.length) G.wfx=G.wfx.filter(f=>f.t<f.dur);
@@ -443,6 +464,7 @@ function updateWProj(dt){
 function autoSwing(){
   if(scene!=='play'||!player||!autoAttackOn()||(G.mode==='story'&&!G.flags.forge)) return false;
   const p=player, w=curWeapon();
+  if(WEAPONS[w].auto) return !!WEAPONS[w].auto(p);
   if(w==='bow'||w==='boomerang'){
     if(w==='boomerang'&&G.wproj&&G.wproj.some(q=>q.k==='rang')) return false;
     const t=nearestEnemy(p.x,p.y,350); if(!t||!(t.aggro||t.boss)) return false;
@@ -549,6 +571,7 @@ const WICON={
 };
 const WICACHE=new Map();
 function drawWeaponIcon(g,id,x,y,s){
+  if(!WICON[id]&&WEAPONS[id]&&WEAPONS[id].icon) WICON[id]=WEAPONS[id].icon;
   if(!WICON[id]||!g||!(s>0)) return;
   let sc=DPR; try{ const m=g.getTransform(); sc=Math.hypot(m.a,m.b)||DPR; }catch(e){}
   const raw=s*sc, q=raw<32?2:4, px=Math.max(8,Math.min(256,Math.ceil(raw/q)*q)), tier=Math.min(3,(G&&G.tier)||0), key=id+'|'+px+'|'+tier;
@@ -568,10 +591,18 @@ function wChipIcon(cx,cy,size,id,pulse){
   ctx.fillStyle='rgba(44,26,14,.92)'; ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.fill();
   ctx.lineWidth=2; ctx.strokeStyle=`rgba(255,${190+Math.round(50*pulse)},120,${0.55+0.45*pulse})`; ctx.stroke();
   let prog=0, col='#ffb060';
-  if(id==='bow'&&p.bow) prog=p.bow.k; else if(id==='hammer'&&p.ham&&p.ham.ph==='hold') prog=p.ham.ch;
+  const cs=WEAPONS[id]&&WEAPONS[id].chip?WEAPONS[id].chip(p)||{}:{}; prog=cs.prog||0;
   if(prog>0){ ctx.lineWidth=3; ctx.strokeStyle=prog>=1?'#ffe08a':col; ctx.beginPath(); ctx.arc(cx,cy,r-2.5,-Math.PI/2,-Math.PI/2+TAU*prog); ctx.stroke(); }
-  const away=id==='boomerang'&&G.wproj&&G.wproj.some(q=>q.k==='rang');
-  ctx.globalAlpha=away?0.35:1; drawWeaponIcon(ctx,id,cx,cy,size*0.8*(1+0.18*pulse)); ctx.globalAlpha=1;
+  ctx.globalAlpha=cs.away?0.35:1; drawWeaponIcon(ctx,id,cx,cy,size*0.8*(1+0.18*pulse)); ctx.globalAlpha=1;
+  if(cs.count!=null) wCount(cx+r*0.62,cy+r*0.62,cs.count,cs.low,size>=34);
+}
+// a little number badge (bombs left), on the chip and the touch WEAPON button
+function wCount(x,y,n,low,big){
+  const s=String(n), f=big?10:8, w=Math.max(f+5,s.length*f*0.62+7), h=f+5;
+  ctx.save(); ctx.font=`900 ${f}px ${UIF}`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle=low?'rgba(150,30,20,.95)':'rgba(24,14,8,.95)'; rr(x-w/2,y-h/2,w,h,h/2); ctx.fill();
+  ctx.strokeStyle=low?'#ffb0a0':'rgba(255,214,150,.85)'; ctx.lineWidth=1.2; ctx.stroke();
+  ctx.fillStyle=low?'#ffe2da':'#ffe6b8'; ctx.fillText(s,x,y+0.5); ctx.restore();
 }
 function wPanel(x,y,w,h){ ctx.fillStyle='rgba(10,8,6,.58)'; rr(x,y,w,h,10); ctx.fill(); ctx.strokeStyle='rgba(255,220,180,.16)'; ctx.lineWidth=1; ctx.stroke(); }
 function drawWeaponHud(){
@@ -596,7 +627,7 @@ function drawWeaponHud(){
       const id=own[i], on=id===cur, ix=mx+mini/2, iy=y+(keysOn?chh/2-5:chh/2);
       if(on){ ctx.fillStyle='rgba(255,190,110,.22)'; ctx.beginPath(); ctx.arc(ix,iy,mini*0.62,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(255,210,140,.8)'; ctx.lineWidth=1.2; ctx.stroke(); }
       ctx.globalAlpha=on?1:0.6; drawWeaponIcon(ctx,id,ix,iy,mini); ctx.globalAlpha=1;
-      if(keysOn){ ctx.font=`700 9px ${UIF}`; ctx.fillStyle=on?'#ffe0a0':'rgba(230,215,190,.55)'; ctx.textAlign='center'; ctx.fillText(String(i+1),ix,y+chh-8); }
+      if(keysOn&&i<9){ ctx.font=`700 9px ${UIF}`; ctx.fillStyle=on?'#ffe0a0':'rgba(230,215,190,.55)'; ctx.textAlign='center'; ctx.fillText(String(i+1),ix,y+chh-8); }
       HUD_HITS.push({x:mx-gap/2,y,w:mini+gap,h:chh,fn:()=>equipWeapon(id)});
       mx+=mini+gap;
     }
@@ -605,12 +636,13 @@ function drawWeaponHud(){
     // narrow screens: a small chip under the pause and sound buttons
     const M=MUTE_R(), w2=44, h2=56; x=M.x+M.w/2-w2/2; y=M.y+M.h+8;
     wPanel(x,y,w2,h2); wChipIcon(x+w2/2,y+22,32,cur,pulse);
-    for(let i=0;i<n;i++){ const on=own[i]===cur; ctx.fillStyle=on?'#ffcf7a':'rgba(230,215,190,.45)'; ctx.beginPath(); ctx.arc(x+w2/2+(i-(n-1)/2)*6.4,y+h2-8,on?2.6:1.8,0,TAU); ctx.fill(); }
+    const dsp=Math.min(6.4,(w2-8)/Math.max(1,n-1));
+    for(let i=0;i<n;i++){ const on=own[i]===cur; ctx.fillStyle=on?'#ffcf7a':'rgba(230,215,190,.45)'; ctx.beginPath(); ctx.arc(x+w2/2+(i-(n-1)/2)*dsp,y+h2-8,on?2.6:Math.min(1.8,dsp*0.36),0,TAU); ctx.fill(); }
     HUD_HITS.push({x,y,w:w2,h:h2,fn:()=>cycleWeapon(1)});
     hx=null; hy=y+h2+12;
   }
   if(G.mode==='normal'&&G.time<16&&scene==='play'&&tipOn('wpn_try')){
-    const a=clamp((16-G.time)/1.5,0,1), txt=usingTouch?'Tap a weapon to switch':padActive()?`${btnLabel('weapon','pad')}: switch weapon`:lefty()?'Try every weapon: ] or [':'Try every weapon: X or 1 to 6';
+    const a=clamp((16-G.time)/1.5,0,1), txt=usingTouch?'Tap a weapon to switch':padActive()?`${btnLabel('weapon','pad')}: switch weapon`:lefty()?'Try every weapon: ] or [':`Try every weapon: X or 1 to ${Math.min(9,n)}`;
     ctx.globalAlpha=a; ctx.font=`600 11px ${UIF}`; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.fillStyle='#ffe0b0';
     if(hx!=null){ ctx.textAlign='left'; ctx.strokeText(txt,hx+2,hy); ctx.fillText(txt,hx+2,hy); }
     else{ ctx.textAlign='right'; ctx.strokeText(txt,W-SAFE.r-14,hy); ctx.fillText(txt,W-SAFE.r-14,hy); }
@@ -675,7 +707,8 @@ function drawWeaponFx(){
       drawArrowShape(15,a.fire,a.full);
       if(a.fire){ ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(6,0,0,6,0,12); g.addColorStop(0,'rgba(255,230,160,.9)'); g.addColorStop(1,'rgba(255,110,30,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(6,0,12,0,TAU); ctx.fill(); }
       ctx.restore();
-    }else if(a.k==='rang'){
+    }else if(WPK[a.k]){ if(WPK[a.k].draw) WPK[a.k].draw(a,t3); }
+    else if(a.k==='rang'){
       if(t3){ t3FlyRang(a); continue; }
       for(let i=0;i<a.trail.length;i+=2){ ctx.save(); ctx.globalAlpha=0.12+0.06*i; ctx.translate(a.trail[i],a.trail[i+1]); ctx.rotate(a.spin-0.5*(a.trail.length-i)); drawRangShape(ctx,1.2,a.fire); ctx.restore(); }
       ctx.save(); ctx.translate(a.x,a.y); ctx.rotate(a.spin);
@@ -683,6 +716,7 @@ function drawWeaponFx(){
       drawRangShape(ctx,1.25,a.fire); ctx.restore();
     }
   }
+  for(const id of WEAPON_IDS) if(WEAPONS[id].drawFx) WEAPONS[id].drawFx(t3);
   // aim line while the bow is drawn
   if(p&&p.bow&&p.bow.k>0.2&&!p.dead){
     const k=p.bow.k, f=p.facing, L0=26, L1=L0+160+440*k, fire=hasSkill('firearrow')>0||p.breathing;
@@ -844,7 +878,8 @@ function heroRang(p){
   ctx.save(); ctx.translate(11+t*8,14-t*3); ctx.rotate(0.75-t*0.75); drawRangShape(ctx,1.2,false); ctx.restore();
 }
 function heroIdle(w,p){
-  if(w==='daggers') heroDaggers(p); else if(w==='spear') pikeIdle();
+  if(WEAPONS[w]&&WEAPONS[w].draw2d) WEAPONS[w].draw2d(p,true);
+  else if(w==='daggers') heroDaggers(p); else if(w==='spear') pikeIdle();
   else if(w==='hammer') drawHammerAt(HAM_IDLE,0); else if(w==='bow'){ ctx.save(); ctx.translate(5,-14); ctx.rotate(-Math.PI/2+0.32); ctx.scale(0.9,0.9); drawAshBow(0,false,0,false); ctx.restore(); }
   else if(w==='boomerang') heroRang(p); else drawHeroBlade(0,30,false,true);
 }
@@ -855,7 +890,8 @@ function drawHeroWeapon(p){
   if(!armed) return;
   const pk=p.wEquipT>0?Math.sin(clamp(p.wEquipT/0.35,0,1)*Math.PI):0;
   if(pk>0){ ctx.save(); ctx.translate(6,10); ctx.scale(1+0.28*pk,1+0.28*pk); ctx.translate(-6,-10); }
-  if(w==='daggers') heroDaggers(p); else if(w==='spear') heroSpear(p); else if(w==='hammer') heroHammer(p);
+  if(WEAPONS[w]&&WEAPONS[w].draw2d) WEAPONS[w].draw2d(p,false);
+  else if(w==='daggers') heroDaggers(p); else if(w==='spear') heroSpear(p); else if(w==='hammer') heroHammer(p);
   else if(w==='bow') heroBow(p); else if(w==='boomerang') heroRang(p); else heroSword(p);
   if(pk>0){ ctx.restore(); ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.strokeStyle=`rgba(255,220,150,${0.6*pk})`; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(8,10,10+12*(1-pk),0,TAU); ctx.stroke(); ctx.restore(); }
 }
