@@ -130,7 +130,7 @@ function p4CanSurface(x,y){
 function p2InRectP4(o,x,y,m){ m=m||0; return x>o.x-o.w/2-m&&x<o.x+o.w/2+m&&y>o.y-o.h/2-m&&y<o.y+o.h/2+m; }
 // land a surfacing or popping Ash can stand on
 function p4StandOK(x,y){
-  if(x>=IZX-50){ const A=AREA; if(!A||!A.cave) return !areaBlocked(x,y); const k=tCell(x,y); if(k<0) return false; if(!(tGround(k)||(tWet(k)&&(canWalkWater()||canDive())))) return false; if(caveBlockedAt(k)||A.cave.grid[k]===1) return false; return !colAt(x,y,10); }
+  if(x>=IZX-50){ const A=AREA; if(!A||!A.cave||!A.cave.typ) return !areaBlocked(x,y); const k=tCell(x,y); if(k<0) return false; if(!(tGround(k)||(tWet(k)&&(canWalkWater()||canDive())))) return false; if(caveBlockedAt(k)||A.cave.grid[k]===1) return false; return !colAt(x,y,10); }
   if(outOfMap(x,y,40)) return false;
   if(elevFace(x,y)&EF.FACE) return false;
   if(blockedAt(x,y)&&!(canDive()&&p4SwimAt(x,y))&&!(canWalkWater()&&!lavaSpot(x,y))) return false;
@@ -455,7 +455,7 @@ function p4SinkTick(p,dt,moving){
   if(P4.sinkT>=P4N.sinkT){ P4.sinkT=0; p4Sunk(p); }
   else if(P4.sinkT>0.4) p4Tip('sink',S('Quicksand!','Quicksand!'),S('Keep moving! Standing still in quicksand pulls you under.','Keep moving!'),2);
 }
-function p4SafeNote(p){ if(AREA){ if(!AREA.cave||!AREA.cave.grid) return; const k=tCell(p.x,p.y); if(k>=0&&tGround(k)&&!AREA.cave.grid[k]) P4.safe={x:p.x,y:p.y,a:AREA}; } else if(!playerBlocked(p.x,p.y)&&!(P4.glass.length&&p4GlassSolidAt(p.x,p.y))) P4.safe={x:p.x,y:p.y,a:null}; }
+function p4SafeNote(p){ if(AREA){ if(!AREA.cave||!AREA.cave.grid||!AREA.cave.typ) return; const k=tCell(p.x,p.y); if(k>=0&&tGround(k)&&!AREA.cave.grid[k]) P4.safe={x:p.x,y:p.y,a:AREA}; } else if(!playerBlocked(p.x,p.y)&&!(P4.glass.length&&p4GlassSolidAt(p.x,p.y))) P4.safe={x:p.x,y:p.y,a:null}; }
 function p4Sunk(p){
   P4.mode=null; P4.mv=null; p4Snd('sink'); p4SandFx(p.x,p.y,22);
   const s=P4.safe&&P4.safe.a===AREA?P4.safe:(AREA&&AREA.tri&&AREA.tri.safe)||{x:p.safeX||p.x,y:p.safeY||p.y};
