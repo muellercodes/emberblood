@@ -646,8 +646,8 @@ n_victory:{g:1.303,key:'E',mode:'ion',bpm:96,meter:4,step:4,intro:['F','A'],form
       mute:['harp','bass','choir'],dr:{crash:'X...............|................|................|X...............'}},
     A:{ch:MS_LMC,b1:msX(MS_LM1+' | '+MS_LM2,2),str:msX(MS_LM1+' | '+MS_LM2,2),timp:'R:16',
       dr:{kick:'x.......x.......',snare:'x..gx.g.x..gx.gg',crash:msHit('x',64)}},
-    G:{ch:LS4C,fl:msX(LS4,2),vol:{pad:.5,harp:.55,bass:.6},mute:['choir']},
-    H:{ch:MS_LMC,cel:msX(MS_LM1+' | '+MS_LM2,2),vol:{pad:.5,harp:.55,bass:.6},mute:['choir']}
+    G:{ch:LS4C,fl:msX(LS4,2),vol:{fl:.72,pad:.5,harp:.5,bass:.55},mute:['choir']},
+    H:{ch:MS_LMC,cel:msX(MS_LM1+' | '+MS_LM2,2),vol:{cel:.75,pad:.5,harp:.5,bass:.55},mute:['choir']}
   }}
 });
 
