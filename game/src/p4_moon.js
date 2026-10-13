@@ -455,7 +455,7 @@ function p4SinkTick(p,dt,moving){
   if(P4.sinkT>=P4N.sinkT){ P4.sinkT=0; p4Sunk(p); }
   else if(P4.sinkT>0.4) p4Tip('sink',S('Quicksand!','Quicksand!'),S('Keep moving! Standing still in quicksand pulls you under.','Keep moving!'),2);
 }
-function p4SafeNote(p){ if(AREA){ const k=tCell(p.x,p.y); if(k>=0&&tGround(k)&&!AREA.cave.grid[k]) P4.safe={x:p.x,y:p.y,a:AREA}; } else if(!playerBlocked(p.x,p.y)&&!(P4.glass.length&&p4GlassSolidAt(p.x,p.y))) P4.safe={x:p.x,y:p.y,a:null}; }
+function p4SafeNote(p){ if(AREA){ if(!AREA.cave||!AREA.cave.grid) return; const k=tCell(p.x,p.y); if(k>=0&&tGround(k)&&!AREA.cave.grid[k]) P4.safe={x:p.x,y:p.y,a:AREA}; } else if(!playerBlocked(p.x,p.y)&&!(P4.glass.length&&p4GlassSolidAt(p.x,p.y))) P4.safe={x:p.x,y:p.y,a:null}; }
 function p4Sunk(p){
   P4.mode=null; P4.mv=null; p4Snd('sink'); p4SandFx(p.x,p.y,22);
   const s=P4.safe&&P4.safe.a===AREA?P4.safe:(AREA&&AREA.tri&&AREA.tri.safe)||{x:p.safeX||p.x,y:p.safeY||p.y};
@@ -705,7 +705,7 @@ function p4CaveTick(A,dt){
 // what Ash does in his modes, after the engine moved him
 function p4DiveAfter(p,dt,inp){
   P4.diveT+=dt; P4.air-=dt; p.onWater=false;
-  const k=AREA?tCell(p.x,p.y):-1;
+  const k=AREA&&AREA.cave?tCell(p.x,p.y):-1;
   if(!p4DeepAt(p.x,p.y)){ if(p4Surface(p,true)) return; }
   // currents push a diver too (Water Stride's push is the engine's own)
   if(AREA&&AREA.cave&&k>=0&&AREA.cave.typ[k]===TY.current&&!canWalkWater()){ const d=FLOW[AREA.cave.flow[k]]||FLOW[1]; tNudge(p,d[0]*175*dt,d[1]*175*dt); }

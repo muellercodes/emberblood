@@ -71,7 +71,7 @@ function p3Snd(kind,v){
 // ---------- 2. geometry (the polyline helpers come from p2_coast.js: p2PolyD, p2PolyAt, p2PolyLen)
 function p3Bb(pts,m){ const b=[1e9,1e9,-1e9,-1e9]; for(const q of pts){ b[0]=Math.min(b[0],q[0]); b[1]=Math.min(b[1],q[1]); b[2]=Math.max(b[2],q[0]); b[3]=Math.max(b[3],q[1]); } return [b[0]-m,b[1]-m,b[2]+m,b[3]+m]; }
 const p3InBb=(b,x,y)=>x>b[0]&&x<b[2]&&y>b[1]&&y<b[3];
-function p3Lvl(x,y){ if(AREA){ const k=tCell(x,y); return k<0?0:Math.max(0,dunH(k)); } return elevLvl(x,y); }
+function p3Lvl(x,y){ if(AREA){ if(!AREA.cave) return 0; const k=tCell(x,y); return k<0?0:Math.max(0,dunH(k)); } return elevLvl(x,y); }
 
 // ---------- 3. Blaze Breath
 // The jet: J={ox,oy (on the ground, at the mouth), ang, L (stops at walls, faces and ice), t}. Hit test: a point within

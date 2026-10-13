@@ -1187,6 +1187,10 @@ const c1RChase=()=>!!(G&&G.mini&&G.mini.kind==='c_roofchase');
 { const base=terrainFix; terrainFix=function(e,ox,oy){ if(e===player&&c1RChase()) return c1RConfine(e,ox,oy); return base(e,ox,oy); }; }
 { const base=landOK; landOK=function(x,y){ if(c1RChase()&&x<IZX-50) return c1RProj(x,y).d<C1R.w/2+4; return base(x,y); }; }
 { const base=addOccluders; addOccluders=function(list){ if(c1RChase()) return; return base(list); }; }
+// x1_world gives the Clock Quarter real height (level 2 streets, level 3 roofs, towers): the chase runs on its own roof
+// layer, so while it runs the faces underneath neither stop, climb nor hop Ash; the route's edges are the only walls
+{ const base=updatePlayer; updatePlayer=function(dt,inp){ if(c1RChase()&&!AREA&&typeof ELV!=='undefined'){ ELV.ign++; try{ return base(dt,inp); } finally{ ELV.ign--; } } return base(dt,inp); }; }
+{ const base=playerBlocked; playerBlocked=function(x,y){ if(c1RChase()&&x<IZX-50) return c1RBlocked(x,y,G.mini); return base(x,y); }; }
 function c1RBlocked(x,y,M){
   const P=c1RProj(x,y); if(P.d>C1R.w/2) return true;
   // the step: a short wall across the roof that only a Double Jump (high enough) or the ladder gets over
@@ -1526,8 +1530,8 @@ function c1Beat(name,arg){
 // ---------- 9. debug hooks (tests: scratchpad/b_c1s/t_c1s.py)
 // __eb.actStart(2,'<stage>') also gets the world flags implied by the stages before it (the same as an old save)
 { const base=window.__ebX&&window.__ebX.actStart; if(typeof base==='function') window.__ebX.actStart=function(n,w){ const r=base(n,w); try{ if((n|0)===2&&G.mode==='story'){ c1Migrate(); setupNPCs(); } }catch(e){ console.error(e); } return r; }; }
-window.__ebX=Object.assign(window.__ebX||{},{c1:{
-  C1ST,C1R,C1P,play:c1Play,chain:c1Chain,seen:c1Seen,mark:c1sMark,trust:c1Trust,beat:c1Beat,spireChoice:c1SpireChoice,endAct:c1EndAct,dunStory:c1DunStory,taunts:C1_TAUNTS,
+const C1S_DBG={
+  C1ST,C1:C1ST,C1R,C1P,play:c1Play,chain:c1Chain,seen:c1Seen,mark:c1sMark,trust:c1Trust,beat:c1Beat,spireChoice:c1SpireChoice,endAct:c1EndAct,dunStory:c1DunStory,taunts:C1_TAUNTS,
   proj:(x,y)=>{ const P=c1RProj(x,y); return {s:Math.round(P.s),d:Math.round(P.d),k:P.g.k}; },
   at:s=>{ const q=c1RAt(s); return {x:Math.round(q.x),y:Math.round(q.y),k:q.g.k}; },
   route:()=>C1R.L.map(g=>({k:g.k,s0:Math.round(g.s0),s1:Math.round(g.s1),x0:g.x0,y0:g.y0,x1:g.x1,y1:g.y1})),
@@ -1545,4 +1549,5 @@ window.__ebX=Object.assign(window.__ebX||{},{c1:{
   state:()=>({stage:G.stage,act:G.act,trust:G.flags.c_trust|0,vesper:G.choices.c_vesper||null,moon:G.flags.moon==null?100:G.flags.moon,shard:!!G.items.c_shard1,
     lowtide:!!G.flags.c_lowtide,clock:!!G.flags.c_clock_on,spire:!!G.flags.c_spire_up,snow:!!G.flags.c_snow,done:!!G.flags.c_done,seen:Object.keys(G.flags.c_sn||{}),q:C1ST.q.map(q=>q.id),fb:Object.keys(C1ST.fb),
     obj:(()=>{ try{ const o=questObjective(); return o?{text:o.text,x:Math.round(o.x||0),y:Math.round(o.y||0)}:null; }catch(e){ return String(e); } })()})
-}});
+};
+window.__ebX=Object.assign(window.__ebX||{},{c1s:C1S_DBG,c1:Object.assign({},(window.__ebX&&window.__ebX.c1)||{},C1S_DBG)});

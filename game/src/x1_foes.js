@@ -1995,10 +1995,13 @@ for(const t in C1DUN){ const d=C1DUN[t]; c1Site(t,d.k,{boss:t,at:{x:IZX+200,y:IZ
   spawn:P=>({x:P.x,y:P.y+(d.dy||-120)}),onWin(){ c1Won(t); }}); }
 // Captain Saltbeard: outdoors, on the wreck of the Saucy Gull. The site opens at night while Ash carries the Ghost Pepper
 // Chowder (c_chowder), or whenever G.flags.c_saltbeard_call is set (the quest helper sets it when the bowl goes on the deck).
+// When the quest module (x1_people, loaded first) already defined this site, its quest decides when the ghost rises
+// (the chowder set on the deck at night at low tide) and its onWin gives the chain and the sock: both are kept.
+{ const Q=BOSSES.c_saucygull&&BOSSES.c_saucygull.boss==='c_saltbeard'?BOSSES.c_saucygull:null;
 c1Site('c_saltbeard','c_saucygull',{boss:'c_saltbeard',at:{x:4600,y:28300,r:430,name:S('The Wreck of the Saucy Gull','The old wreck'),level:10},stage:null,
-  open:()=>!G.flags.c_saltbeard_won&&(!!G.flags.c_saltbeard_call||(isNight()&&!!(G.items&&G.items.c_chowder))),
+  open:()=>!G.flags.c_saltbeard_won&&(!!G.flags.c_saltbeard_call||(Q&&Q.open?!!Q.open():(isNight()&&!!(G.items&&G.items.c_chowder)))),
   arena:{shape:'ring',r:330,style:'c_reef',props:[{k:'c1deck',dx:0,dy:-10}]},flyOK:false,spawn:P=>({x:P.x,y:P.y-70}),
-  onWin(){ G.flags.c_saltbeard_won=true; G.flags.c_saltbeard_call=false; if(G.items&&G.items.c_chowder){ G.items.c_chowder--; if(G.items.c_chowder<=0) delete G.items.c_chowder; } c1Won('c_saltbeard'); }});
+  onWin(){ G.flags.c_saltbeard_won=true; G.flags.c_saltbeard_call=false; if(!Q&&G.items&&G.items.c_chowder){ G.items.c_chowder--; if(G.items.c_chowder<=0) delete G.items.c_chowder; } if(Q&&Q.onWin) try{ Q.onWin(); }catch(err){ console.error(err); } c1Won('c_saltbeard'); }}); }
 // start a boss fight now: in a dungeon room (R = AREA.rooms[id]) or at its outdoor site. o: {intro:false, level}
 function c1BossStart(type,R,o){
   o=o||{}; const k=C1SITE[type]; if(!k||G.mode!=='story'||G.fightSite) return null; const s=SITES[k], P=POI[s.poi], d=C1DUN[type];
@@ -2199,9 +2202,7 @@ function c1BotPlan(e,dt,swing){
     c1BotNear(e,e.r+34,(C1B.t*1.1)%TAU); swing(1); return false; }
   c1BotNear(e,e.r+40); swing(1); return false;
 }
-window.__ebX=Object.assign(window.__ebX||{},{
-  c1Test,
-  c1:{C1,C1B,C1DUN,C1SITE,C1ROOM,C1_TPL,FOES,c1BossStart,tickYankDown,gloomShadowHit,vesperShadowHit,
+const C1F_DBG={C1,C1B,C1DUN,C1SITE,C1ROOM,C1_TPL,FOES,c1BossStart,tickYankDown,gloomShadowHit,vesperShadowHit,
     bot(type,o){ o=o||{}; Object.assign(C1B,{on:true,type,mech:o.mech!==false,heal:o.heal!==false,t:0,hitT:0,heals:0,pullT:0,yankT:0,mirT:0,fireT:0,hamT:0,ev:{},dealt:0,zt:0,tx:null,ty:null,dodges:0}); C1.bot=c1BotFrame; return true; },
     stop(){ C1B.on=false; C1.bot=null; C1B.tx=null; },
     state(){ const e=G.boss, D=e&&c1RoomOf(e); return {scene,site:G.fightSite,intro:G.fightIntro,done:Object.assign({},G.bossDone),dmg:Math.round(C1.dmg),hits:C1.hits,heals:C1B.heals,dodges:C1B.dodges||0,src:Object.fromEntries(Object.entries(C1.bySrc).map(([k,v])=>[k,Math.round(v)])),ev:Object.assign({},C1B.ev),dealt:Math.round(C1B.dealt||0),t:+C1B.t.toFixed(1),
@@ -2213,5 +2214,5 @@ window.__ebX=Object.assign(window.__ebX||{},{
     choose(i){ if(typeof chooseOpt==='function'&&DLG&&DLG.opts){ DLG.chars=1e9; chooseOpt(i||0); return true; } return false; },
     dlg(){ return DLG?{who:lineParts(DLG.lines[DLG.i]).who,opts:DLG.opts?DLG.opts.length:0,i:DLG.i,n:DLG.lines.length}:null; },
     rooms(){ return C1.rooms.map(D=>({type:D.type,room:D.R.id,cx:D.R.cx,cy:D.R.cy})); },
-    run(sec,dt){ return window.__eb.foes.step(sec,dt||1/30); }}
-});
+    run(sec,dt){ return window.__eb.foes.step(sec,dt||1/30); }};
+window.__ebX=Object.assign(window.__ebX||{},{c1Test,c1f:C1F_DBG,c1:Object.assign({},(window.__ebX&&window.__ebX.c1)||{},C1F_DBG)});

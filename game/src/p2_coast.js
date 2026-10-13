@@ -262,7 +262,7 @@ function p2CaveTick(A,dt){
 
 // ---------- 6. grapple targets
 // a target: {kind:'zip'|'hang'|'pull'|'yank', x,y (its foot on the ground), h (how high the ring is drawn), lvl, o, src}
-function p2Lvl(x,y){ if(AREA){ const k=tCell(x,y); return k<0?0:Math.max(0,dunH(k)); } return elevLvl(x,y); }
+function p2Lvl(x,y){ if(AREA){ if(!AREA.cave) return 0; const k=tCell(x,y); return k<0?0:Math.max(0,dunH(k)); } return elevLvl(x,y); }
 function p2StandOK(x,y,lvl){
   if(AREA){ const A=AREA, c=A.cave, k=tCell(x,y); if(k<0||!A.tri) return false;
     if(!tGround(k)||caveBlockedAt(k)||tHole(k)) return false;

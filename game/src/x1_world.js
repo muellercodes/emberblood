@@ -1401,8 +1401,9 @@ function c1HouseHands(t){
 // the Power Lab's outdoor sandbox (p2_coast debug) moves off the Downs to a flat lowland spot (the Downs are level 1 now)
 if(typeof P2_SB!=='undefined'&&!P2_SB.built){ P2_SB.x=3700; P2_SB.y=24450; }
 // ---------- debug hooks
-window.__ebX=Object.assign(window.__ebX||{},{
-  c1:{C1WD,C1G,C1WT,C1ROOF,C1K,sync:c1Sync,region:(x,y)=>c1Region(x,y,elevLvl(x,y),0),landD:c1LandD,
+// Debug keys: each Act II module has its own (__eb.c1w world, __eb.c1f foes, __eb.c1s story); __eb.c1 is all three
+// merged (the story's state/choose/dlg/at win name clashes, as before the split).
+const C1W_DBG={C1WD,C1:C1WD,C1T:C1WT,C1G,C1WT,C1ROOF,C1K,sync:c1Sync,region:(x,y)=>c1Region(x,y,elevLvl(x,y),0),landD:c1LandD,
     set(flag,v){ G.flags[flag]=v===undefined?true:v; c1Sync(); return {flag,v:G.flags[flag]}; },
     spots:{pass:[3400,20520],downgate:[3190,20900],fold:[3900,21260],dragon:[6600,22560],mill:[9700,22420],gate:[6950,24300],square:[6900,24870],clock:[7200,24860],library:[7700,24520],manor:[7900,25000],
       stairTop:[7070,25150],stairBot:[7070,25420],lift:[7700,25360],market:[7000,25960],teapot:[7300,26290],quay:[7600,26440],pier:[8500,27150],heights:[9200,26700],cut:[9510,26960],cutE:[9860,26985],
@@ -1418,5 +1419,5 @@ window.__ebX=Object.assign(window.__ebX||{},{
       if(!pass(sx,sy)) return {fail:'start blocked'}; const k0=Math.floor((sy-y0)/cs)*w+Math.floor((sx-x0)/cs); seen[k0]=1; q.push(k0);
       while(q.length){ const c=q.pop(), i=c%w, j=(c/w)|0; for(let d=0;d<4;d++){ const a=i+(d===0?1:d===1?-1:0), b=j+(d===2?1:d===3?-1:0); if(a<0||b<0||a>=w||b>=h) continue; const k=b*w+a; if(seen[k]) continue; if(!pass(x0+(a+0.5)*cs,y0+(b+0.5)*cs)) continue; seen[k]=1; q.push(k); } }
       C1WD.flood={seen,w,h,x0,y0,cs}; let n=0; for(const v of seen) n+=v; return {n}; },
-    at(x,y){ const F=C1WD.flood; if(!F) return false; const i=Math.floor((x-F.x0)/F.cs), j=Math.floor((y-F.y0)/F.cs); for(let dj=-2;dj<=2;dj++) for(let di=-2;di<=2;di++){ const a=i+di,b=j+dj; if(a>=0&&b>=0&&a<F.w&&b<F.h&&F.seen[b*F.w+a]) return true; } return false; }}
-});
+    at(x,y){ const F=C1WD.flood; if(!F) return false; const i=Math.floor((x-F.x0)/F.cs), j=Math.floor((y-F.y0)/F.cs); for(let dj=-2;dj<=2;dj++) for(let di=-2;di<=2;di++){ const a=i+di,b=j+dj; if(a>=0&&b>=0&&a<F.w&&b<F.h&&F.seen[b*F.w+a]) return true; } return false; }};
+window.__ebX=Object.assign(window.__ebX||{},{c1w:C1W_DBG,c1:Object.assign({},(window.__ebX&&window.__ebX.c1)||{},C1W_DBG)});
