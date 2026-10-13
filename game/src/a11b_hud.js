@@ -71,7 +71,11 @@ function drawHUD(){
     ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(EDEF[b.type].name,W/2,by-20); ctx.fillText(EDEF[b.type].name,W/2,by-20);
     bar(bx2,by-8,bw2,12,clamp(b.hp/b.maxHp,0,1),b.invuln?'#8a5a3a':'#b8281e','rgba(30,6,4,.9)');
     ctx.strokeStyle='rgba(255,200,150,.3)'; ctx.lineWidth=1; rr(bx2,by-8,bw2,12,6); ctx.stroke();
-    if(b.type==='vorlaxis'){ ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fillRect(bx2+bw2*0.66-1,by-8,2,12); ctx.fillRect(bx2+bw2*0.33-1,by-8,2,12); }
+    // phase marks on the bar and one pip per phase (lit up to the phase the fight is in); bossPhase (e8_foes.js) sets b.phases and b.bph
+    const th=b.phases||(b.type==='vorlaxis'?[0.66,0.33]:null);
+    if(th){ ctx.fillStyle='rgba(255,255,255,.55)'; for(const f of th) ctx.fillRect(bx2+bw2*f-1,by-8,2,12);
+      const ph=b.type==='vorlaxis'?(b.phase||1)-1:(b.bph||0), n=th.length+1;
+      for(let i=0;i<n;i++){ const x=bx2+bw2-6-(n-1-i)*15, y=by-20; ctx.beginPath(); ctx.moveTo(x,y-5); ctx.lineTo(x+5,y); ctx.lineTo(x,y+5); ctx.lineTo(x-5,y); ctx.closePath(); ctx.fillStyle=i<=ph?'#ff9a3a':'rgba(40,20,14,.85)'; ctx.fill(); ctx.strokeStyle='rgba(255,215,170,.75)'; ctx.lineWidth=1; ctx.stroke(); } }
     ctx.font=`500 11px ${UIF}`; ctx.fillStyle='#d2b898'; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; ctx.fillText(simplify(sub),W/2,by+15);
   }
   // prompt
