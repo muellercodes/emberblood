@@ -96,15 +96,15 @@ function c1Rect(g,x,y,w,h,col,r){ g.fillStyle=col; if(r){ rrect(g,x,y,w,h,r); g.
 function c1Shade(g,x,y,w,h,col){ const T=celTones(col); c1Rect(g,x,y,w,h,T[2]); c1Rect(g,x,y,w-Math.max(1.5,w*0.18),h-Math.max(1,h*0.06),T[1]); c1Rect(g,x+1,y+1,Math.max(1,w*0.22),h-2,T[0]); }
 
 // ================= 1. prop kinds (Storybook: cel tones from the top left, a plum outline is added by the engine)
-const C1PAL={mothleaf:['#5e5a78','#837ea2','#b8b2d2'],birch:['#5f9a3e','#86bf4c','#b8e06a'],pine:['#2c6e52','#3f925e','#6cba6e'],seapine:['#2a6450','#3c8660','#68ae72'],
+const C1PAL={mothleaf:['#625e86','#8e88b4','#cac4e6'],birch:['#5f9a3e','#86bf4c','#b8e06a'],pine:['#2c6e52','#3f925e','#6cba6e'],seapine:['#2a6450','#3c8660','#68ae72'],
   gorse:['#3c7a34','#559a3e','#86c25a'],heath:['#6a3e78','#9a5aa8','#c88ad2'],haw:['#3e7a3a','#5a9a44','#8cc65a'],rock:['#8a8478','#b4ae9e','#e2ddcc'],chalk:['#b8b2a0','#e4e0d2','#fffdf4'],
   black:['#262232','#3c3650','#7a6c9a'],rust:['#7a4a2e','#a4643a','#d08a52'],brass:['#8a6420','#c8963a','#f2cc6a'],wood:['#6a4a2c','#8e6a40','#b89060'],drift:['#9a8c78','#c6b8a0','#ece2cc']};
 const c1Tones=p=>[p[2],p[1],p[0]];
 function c1Blob(g,R,rng,pal,n){ const v=sbRockPts(R,rng); celFill(g,(q,dx,dy)=>sbRoundPoly(q,v,dx,dy),pal[1],{r:R,tones:c1Tones(pal),hi:R*0.14,lo:R*0.24}); return v; }
 definePropKind('c_mothbirch',{n:4,tall:true,R:44,col:{r:9},h:78,rot:false,make(seed,v){ const rng=mulberry32(seed), R=44; return spriteOf(R,g=>{
   // pale bark peeking out under the crown (the white trunk with dark "eyes")
-  for(let i=0;i<3;i++){ const a=0.9+i*1.9+rng()*0.4, x=Math.cos(a)*R*0.62, y=Math.sin(a)*R*0.6; celFill(g,(q,dx,dy)=>{ q.moveTo(x+dx-3,y+dy-6); q.lineTo(x+dx+3,y+dy-6); q.lineTo(x+dx+4,y+dy+8); q.lineTo(x+dx-4,y+dy+8); q.closePath(); },'#ece8f2',{r:6}); c1Ell(g,x,y,1.6,1.1,'#3a3044'); }
-  sbCanopy(g,R*0.9,rng,C1PAL.mothleaf,8,3);
+  for(let i=0;i<4;i++){ const a=0.6+i*1.55+rng()*0.4, x=Math.cos(a)*R*0.7, y=Math.sin(a)*R*0.66+4; celFill(g,(q,dx,dy)=>{ q.moveTo(x+dx-4,y+dy-9); q.lineTo(x+dx+4,y+dy-9); q.lineTo(x+dx+5,y+dy+10); q.lineTo(x+dx-5,y+dy+10); q.closePath(); },'#f2eef8',{r:8}); c1Ell(g,x,y-2,2.4,1.4,'#3a3044'); c1Ell(g,x+1,y+5,1.6,1,'#3a3044'); }
+  sbCanopy(g,R*0.82,rng,C1PAL.mothleaf,8,3);
   // silver dust glints
   for(let i=0;i<7;i++){ const a=rng()*TAU, d=rng()*R*0.7; c1Ell(g,Math.cos(a)*d,Math.sin(a)*d,1.2,1.2,'rgba(240,236,255,.85)'); }
   if(v>=2){ // cocoons hanging off the crown
@@ -289,14 +289,14 @@ defineBiome(13,{name:'the Brass Yards',level:11,col:['#8e7d64','#97866c','#84735
   props(rng,x,y,s,grove){ const r=rng(); if(grove>0.2&&r<0.045) return {k:'c_scrap'}; if(r<0.012) return {k:'c_gear',v:Math.floor(rng()*2)}; if(r<0.02) return {k:'c_pipe',v:Math.floor(rng()*2)}; if(r<0.026) return {k:'c_scrap',s:0.7+rng()*0.4}; if(r<0.03) return {k:'c_crate'}; return null; },
   decor(g,rng,x,y,s,r){ if(r<0.012){ // an oily puddle with a rainbow sheen
       g.fillStyle='rgba(40,34,40,.55)'; g.beginPath(); g.ellipse(x,y,7+rng()*9,3+rng()*4,0,0,TAU); g.fill(); g.strokeStyle='rgba(180,120,220,.55)'; g.lineWidth=1; g.beginPath(); g.ellipse(x-1,y-1,4,1.6,0,0,TAU); g.stroke(); g.strokeStyle='rgba(120,220,200,.45)'; g.beginPath(); g.ellipse(x+1,y,5,2,0,0,TAU); g.stroke(); }
-    else if(r<0.24) sbTuft(g,x,y,'rgba(110,96,70,.5)',0.7+rng()*0.4); else if(r<0.3) sbPebble(g,x,y,1.4+rng()*1.4,rng()<0.5?'#7a6a58':'#a48a62'); }});
+    else if(r<0.26) sbTuft(g,x,y,'rgba(110,96,70,.5)',0.7+rng()*0.4); else if(r<0.275) sbPebble(g,x,y,1.4+rng()*1.4,rng()<0.5?'#9a8a72':'#b49a72'); else if(r<0.285){ g.strokeStyle='rgba(90,74,58,.45)'; g.lineWidth=1.4; g.beginPath(); g.moveTo(x-8,y); g.lineTo(x+8,y+2); g.stroke(); } }});
 defineBiome(14,{name:'the Saltmarsh Flats',level:9,col:['#a8b878','#b0c080','#9dad6d'],road:'#e4d6a8',roadEdge:'rgba(150,130,90,.8)',water:{shallow:'#6cc4c0',deep:'#3a9aac',lip:'#eef8ee'},shore:'#ddd0a4',
   music:'c_saltmarsh',ambient:{wind:0.4,birds:true,mist:0.3,rain:0.5,gulls:0.6,waves:0.2},critters:['c_gull','c_crab'],chests:3,footprints:'sand',events:{snow:false},
   props(rng,x,y,s,grove){ const r=rng(); if(s.shore>0||grove>0.15){ if(r<0.16) return {k:'reed'}; } if(r<0.03) return {k:'reed'}; if(r<0.034) return {k:'c_crabpot',v:Math.floor(rng()*2)}; if(r<0.037) return {k:'c_mooring',v:Math.floor(rng()*2)}; if(r<0.039) return {k:'c_boat',v:Math.floor(rng()*2)}; if(r<0.041) return {k:'c_netpole'}; return null; },
   decor(g,rng,x,y,s,r){ if(r<0.05){ g.fillStyle='rgba(214,200,150,.55)'; g.beginPath(); g.ellipse(x,y,8+rng()*14,4+rng()*6,rng()*0.5,0,TAU); g.fill(); } else if(r<0.32) sbTuft(g,x,y,'rgba(120,140,80,.55)',0.8+rng()*0.5); else if(r<0.34) sbPebble(g,x,y,1.2+rng(),'#e8dcb4'); }});
 defineBiome(15,{name:'the Rockpools',level:10,col:['#e2d6aa','#e9ddb3','#d8cc9f'],road:'#f2e8c8',roadEdge:'rgba(170,150,110,.8)',water:C1W,shore:'#f0e6c2',
   music:'c_coast',ambient:{wind:0.6,birds:true,rain:0.4,gulls:0.8,waves:0.9},critters:['c_crab','c_gull'],chests:3,footprints:'sand',events:{snow:false,goats:false},
-  props(rng,x,y,s){ if(c1InP(C1G.sandsP,x,y)) return null; const r=rng(); if(r<0.018) return {k:'c_barnrock',s:0.7+rng()*0.6}; if(r<0.028) return {k:'c_kelp'}; if(r<0.033) return {k:'c_driftwood',v:Math.floor(rng()*2)}; if(r<0.036) return {k:'c_nest'}; return null; },
+  props(rng,x,y,s){ if(c1SandsIn(x,y)) return null; const r=rng(); if(r<0.018) return {k:'c_barnrock',s:0.7+rng()*0.6}; if(r<0.028) return {k:'c_kelp'}; if(r<0.033) return {k:'c_driftwood',v:Math.floor(rng()*2)}; if(r<0.036) return {k:'c_nest'}; return null; },
   decor(g,rng,x,y,s,r){ c1SandDecor(g,rng,x,y,r); }});
 function c1SandDecor(g,rng,x,y,r){
   if(r<0.0075){ // a rockpool: dark rim, turquoise water, a glint
@@ -313,8 +313,8 @@ defineBiome(16,{name:'Lantern Point',level:12,col:['#9cbf5e','#a5c767','#91b454'
   decor(g,rng,x,y,s,r){ if(r<0.32) sbTuft(g,x,y,'rgba(108,142,62,.6)',0.8+rng()*0.4); else if(r<0.37) c1Fl(g,rng,x,y,['#a85ab8','#c88ad2','#ffd23a'],3); }});
 defineBiome(17,{name:'Gullcrag Head',level:11,col:['#6f8a5a','#779262','#668052'],road:'#c8c0a0',roadEdge:'rgba(70,70,60,.8)',water:{shallow:'#6ac8d4',deep:'#2e78b8',lip:'#eef8f4'},shore:'#c8c0a4',
   music:'c_coast',ambient:{wind:0.8,birds:true,rain:0.5,gulls:1,waves:0.7},critters:['c_gull'],chests:2,events:{snow:false,goats:false},
-  props(rng,x,y,s,grove){ if(c1InP(C1G.sandsP,x,y)) return null; const r=rng(); if(r<0.03) return {k:'c_nest',v:Math.floor(rng()*2)}; if(r<0.045) return {k:'c_thrift'}; if(grove>0.25&&r<0.07) return {k:'crag',s:0.6+rng()*0.4}; if(r<0.055) return {k:'rock',s:0.6+rng()*0.4}; return null; },
-  decor(g,rng,x,y,s,r){ if(c1InP(C1G.sandsP,x,y)){ c1SandDecor(g,rng,x,y,r); return; } if(r<0.3) sbTuft(g,x,y,'rgba(80,106,64,.6)',0.8+rng()*0.4); else if(r<0.33) c1Fl(g,rng,x,y,['#f08ab4','#ffffff'],2); else if(r<0.36){ g.fillStyle='rgba(250,250,240,.75)'; g.beginPath(); g.ellipse(x,y,1.6+rng()*2,1+rng(),0,0,TAU); g.fill(); } }});
+  props(rng,x,y,s,grove){ if(c1SandsIn(x,y)) return null; const r=rng(); if(r<0.012) return {k:'c_nest',v:Math.floor(rng()*2)}; if(r<0.03) return {k:'c_thrift'}; if(grove>0.25&&r<0.06) return {k:'rock',s:0.7+rng()*0.5}; if(r<0.04) return {k:'c_gorse',s:0.6+rng()*0.3}; if(r<0.046) return {k:'rock',s:0.5+rng()*0.4}; return null; },
+  decor(g,rng,x,y,s,r){ if(c1SandsIn(x,y)){ c1SandDecor(g,rng,x,y,r); return; } if(r<0.3) sbTuft(g,x,y,'rgba(80,106,64,.6)',0.8+rng()*0.4); else if(r<0.33) c1Fl(g,rng,x,y,['#f08ab4','#ffffff'],2); else if(r<0.36){ g.fillStyle='rgba(250,250,240,.75)'; g.beginPath(); g.ellipse(x,y,1.6+rng()*2,1+rng(),0,0,TAU); g.fill(); } }});
 defineBiome(18,{name:'the Moth Wood',level:12,col:['#7d8a7a','#859282','#748170'],road:'#c8c6c8',roadEdge:'rgba(80,76,90,.8)',water:{shallow:'#88b8c8',deep:'#466a90',lip:'#e6eef4'},shore:'#b8b8b0',
   music:'c_mothwood',ambient:{mist:0.5,night:0.12,birds:false,wind:0.2,rain:0.4,moths:0.8},critters:false,chests:2,events:{snow:false,goats:false},
   props(rng,x,y,s,grove){ const r=rng(); if(grove>-0.05&&r<0.2) return {k:'c_mothbirch',v:Math.floor(rng()*4),s:0.85+rng()*0.35}; if(r<0.06) return {k:'c_mothbirch',v:Math.floor(rng()*4)}; if(r<0.09) return {k:'c_shroom'}; if(r<0.1) return {k:'fshrub'}; return null; },
@@ -322,14 +322,16 @@ defineBiome(18,{name:'the Moth Wood',level:12,col:['#7d8a7a','#859282','#748170'
 defineBiome(19,{name:'the Shadow Shoals',level:13,col:['#57546d','#5e5b76','#504d65'],road:'#7a7490',roadEdge:'rgba(30,26,44,.8)',water:{shallow:'#3e4078',deep:'#1c1c40',lip:'#b8b0e0'},shore:'#605a78',
   music:'c_spire',ambient:{mist:0.6,night:0.25,birds:false,wind:0.4,moths:0.6,waves:0.5},critters:false,chests:0,events:{snow:false,goats:false},
   props(rng,x,y,s){ const r=rng(); if(r<0.06) return {k:'c_blackrock',s:0.7+rng()*0.5}; return null; },
+  // the dark water fades into the ordinary sea at the edge of the shoals (water colours do not blend by themselves)
+  rgb(c,s,x,y){ if(!s.water) return c; const ex=(x-7400)/1900, ey=(y-30550)/1150, d=Math.sqrt(ex*ex+ey*ey), k=clamp((d-0.72)/0.3,0,1); return k>0?mixRGB(c,[44,104,164],k*0.9):c; },
   decor(g,rng,x,y,s,r){ if(r<0.08){ g.fillStyle='rgba(200,190,255,.55)'; g.beginPath(); g.arc(x,y,0.9,0,TAU); g.fill(); } else if(r<0.2) sbPebble(g,x,y,1.6+rng()*1.6,'#3c3650'); }});
 const C1B_COAST=[10,11,12,13,14,15,16,17,18,19];
 
 // ================= 4. terrain: which region a point belongs to, the tide, the risen spire, the snow
 // Regions follow the cliffs (the elevation grid), so a cliff top is always cliff-top turf and the beach under it sand.
 function c1Region(x,y,lv,n){
-  if(y>29250&&x>5300&&x<9750) return 19;
-  if(x<2700&&y>27900) return c1InP(C1G.sandsP,x,y)?15:17;
+  if(y>29300){ const ex=(x-7400)/1900, ey=(y-30550)/1150; if(ex*ex+ey*ey<1+n*0.3) return 19; }
+  if(x<2700&&y>27900) return c1SandsIn(x,y)?15:17;
   if(lv>=2){
     if(x>2840&&x<6420&&y>25050&&y<27950) return 11;
     if(x>8540&&x<10620&&y>25940&&y<28800) return 11;
@@ -355,13 +357,16 @@ function c1Region(x,y,lv,n){
 const C1T={low:false,spire:false,snow:false,clock:false};
 function c1DynLand(x,y){
   if(c1InD(C1G.spire,x,y)) return true;
-  for(const r of C1G.causeway) if(c1InR(r,x,y)) return true;
+  // the causeway: a rock spit with ragged sides, not a box
+  const wx=Math.sin(y*0.021+x*0.004)*12+Math.sin(y*0.057+1.3)*6, wy=Math.sin(x*0.031+0.7)*9;
+  for(const r of C1G.causeway) if(c1InR(r,x+wx,y+wy)) return true;
   return false;
 }
+const c1SandsIn=(x,y)=>{ const w=Math.sin(x*0.013+y*0.004)*24+Math.sin(y*0.011+1.7)*20; return c1InP(C1G.sandsP,x+w,y+w*0.6); };
 function c1Extra(x,y,o){
   const lv=elevLvl(x,y), b=c1Region(x,y,lv,o.n);
   o.b=b; o.b2=b; o.t=1;
-  if(x<2120&&y>27840&&y<29460&&c1InP(C1G.sandsP,x,y)){
+  if(x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)){
     if(!C1T.low){ o.water=1; o.depth=0.7; o.sea=1; o.deep=0; o.seaD=0.22; o.shore=0; o.road=0; o.bridge=0; }
     else{ o.water=0; o.depth=0; o.sea=0; o.deep=0; o.seaD=0; o.sand=0.42; o.shore=0; }
   }
@@ -379,7 +384,7 @@ function c1RipAt(x,y){
 }
 function c1Block(x,y){
   if(x>9562&&x<9800&&y>25820&&y<28330) return true;                                         // the Cut
-  if(!C1T.low&&x>1220&&x<2100&&y>27850&&y<29450&&c1InP(C1G.sandsP,x,y)) return true;       // high tide on the sands
+  if(!C1T.low&&x>1180&&x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)) return true;              // high tide on the sands
   if(c1RipAt(x,y)&&!c1Skim()) return true;                                                  // rips: skim only
   return false;
 }
@@ -392,13 +397,13 @@ function c1Calm(x,y){
 }
 // ---------- the roads (bible 1.5, routed round the cliffs; ramps carry them over the faces)
 const C1ROADS=[
-  [[3400,20520],[3700,21000],[4300,21800],[5200,22700],[6200,23400],[6800,23950],[6950,24100],[6950,24300],[6920,24560],[6880,24700]],     // the Pass Road
+  [[3400,20520],[3580,21000],[3720,21330],[4300,21800],[5200,22700],[6200,23400],[6800,23950],[6950,24100],[6950,24300],[6920,24560],[6880,24700]],     // the Pass Road
   [[6200,23400],[7300,22600],[8800,21700],[10400,21900],[12000,22600],[13200,23400],[13200,23950]],                                        // the Downs Road
   [[6880,24700],[6600,24900],[6340,25060],[6100,25170],[5600,25500],[4600,25850],[4300,25950],[3500,26120],[3060,26150],[2930,26190],[2900,26300],[2860,26410],[2760,26440],[2200,26450]],  // the Coast Road
   [[8000,25700],[8800,25400],[9600,25000],[10200,24760]],                                                                                  // the Brass Road
   [[10200,24760],[10600,23400],[10400,21900]],                                                                                              // the Yards Lane
   [[8400,26300],[8600,26290],[9200,26700],[9522,26935]],                                                                                    // the Lantern Road, west of the Cut
-  [[9825,26985],[10225,27000],[10225,27140],[10600,27250],[11500,27500],[12100,28100],[12600,28700],[12880,28820],[12880,29000]],         // the Lantern Road, east of the Cut
+  [[9825,26985],[10225,27000],[10225,27140],[10600,27250],[11500,27500],[12100,28100],[12560,28700],[12540,28960],[12560,29095],[12720,29100],[12860,29080]],         // the Lantern Road, east of the Cut
   [[1900,26300],[1600,25000],[1400,23500],[1300,22600]],                                                                                    // the Moth Track
   // Gearhaven, the Upper Town
   [[6880,24700],[6900,24990],[7700,24990],[8200,24990]],
@@ -600,6 +605,26 @@ const C1K={
       ctx.restore(); }},
   sheep:{R:20,by:2,col:{t:'c',r:10,low:true},
     draw(o,t){ const c={x:o.x,y:o.y,face:o.f>0?0:Math.PI,moving:false}; const k=Math.sin(t*0.8+o.x)*0.6; c.y+=k*0; CRITTERS.c_sheep.draw(c); if(Math.sin(t*0.3+o.x*0.1)>0.995&&!C1.baaT){ C1.baaT=1; later(2,()=>{ C1.baaT=0; }); if(dist2(player.x,player.y,o.x,o.y)<400*400) c1Snd('baa',0.6); } }},
+  bell:{R:50,by:2,col:{t:'c',r:8},
+    draw(o,t){ c1Put(c1Tall('bell',60,90,30,82,g=>{ c1Ell(g,0,4,16,5,'rgba(40,30,30,.3)'); for(const s of [-1,1]) c1Rect(g,s*16-2.5,-66,5,70,'#6a4a2c'); c1Rect(g,-20,-70,40,6,'#8e6a40',2);
+      celFill(g,(q,dx,dy)=>{ q.moveTo(-11+dx,-34+dy); q.quadraticCurveTo(-11+dx,-58+dy,dx,-58+dy); q.quadraticCurveTo(11+dx,-58+dy,11+dx,-34+dy); q.lineTo(14+dx,-30+dy); q.lineTo(-14+dx,-30+dy); q.closePath(); },'#d8a440',{r:12}); c1Ell(g,0,-28,3,3,'#8a6420'); }),o.x,o.y); }},
+  trailer:{R:50,by:6,col:{t:'r',x0:-34,y0:-10,x1:34,y1:10},
+    draw(o){ c1Put(c1Tall('trailer',90,60,45,36,g=>{ c1Ell(g,0,8,38,7,'rgba(40,30,30,.3)'); for(const s of [-1,1]){ celBall(g,s*22,4,7,'#3a3e48'); celBall(g,s*22,4,3,'#8a8e98'); } c1Shade(g,-32,-8,64,8,'#8e6a40'); c1Rect(g,30,-6,12,3,'#5a3e22');
+      celFill(g,(q,dx,dy)=>q.ellipse(dx,dy-16,34,11,0,0,TAU),'#3a8aa8',{r:20}); g.strokeStyle='rgba(255,250,230,.6)'; g.lineWidth=1.2; g.beginPath(); g.ellipse(0,-17,27,6,0,0,TAU); g.stroke(); }),o.x,o.y); }},
+  mill:{R:170,by:4,col:{t:'c',r:22},
+    draw(o){ c1Put(c1Tall('mill',70,180,35,170,g=>{ c1Ell(g,0,4,28,8,'rgba(40,30,30,.3)'); c1Shade(g,-26,-18,52,22,'#7a7e88'); celFill(g,(q,dx,dy)=>{ q.moveTo(-18+dx,-16+dy); q.lineTo(-12+dx,-150+dy); q.lineTo(12+dx,-150+dy); q.lineTo(18+dx,-16+dy); q.closePath(); },'#a85a3e',{r:16});
+      g.strokeStyle='rgba(70,36,24,.45)'; g.lineWidth=1; for(let y=-140;y<-20;y+=10){ g.beginPath(); g.moveTo(-17,y); g.lineTo(17,y); g.stroke(); } c1Rect(g,-15,-158,30,10,'#5a5e68',2); c1Rect(g,-14,-60,28,5,'#d8a440'); c1Rect(g,-15,-110,30,5,'#d8a440'); c1Ell(g,0,-158,11,3,'#2a2228'); }),o.x,o.y); }},
+  gearpile:{R:40,by:4,col:{t:'c',r:18,low:true},
+    draw(o){ c1Put(c1Tall('gearpile',80,60,40,40,g=>{ c1Ell(g,2,6,34,9,'rgba(40,30,30,.3)'); for(const [x,y,r,c] of [[-14,-4,13,'#a4643a'],[10,-8,11,'#c8963a'],[2,4,9,'#8a7a6a'],[-2,-16,8,'#a4643a']]){ celFill(g,(q,dx,dy)=>sbStar(q,9,r,r*0.78,x*0.1,dx+x,dy+y),c,{r}); celBall(g,x,y,r*0.32,'#4a3418'); } }),o.x,o.y); }},
+  prop:{R:40,by:2,col:o=>{ const K=PROPK[o.pk]; return K&&K.col&&o.col!==false?{t:'c',r:K.col.r*(o.s||1),low:!!K.col.low}:[]; },
+    draw(o){ drawSprite(propSprite({k:o.pk,v:o.v||0}),o.x,o.y,o.s||1,0); }},
+  skiff:{R:60,by:0,col:false,
+    draw(o,t){ const b=Math.sin(t*1.3+o.x)*1.6, r=Math.sin(t*0.9+o.y)*0.04; ctx.save(); ctx.translate(o.x,o.y+b); ctx.rotate((o.a||0)+r);
+      ctx.fillStyle='rgba(255,255,255,.35)'; ctx.beginPath(); ctx.ellipse(0,5,40,13,0,0,TAU); ctx.fill();
+      ctx.fillStyle=SBC.outline; ctx.beginPath(); ctx.ellipse(0,0,33,12,0,0,TAU); ctx.fill(); ctx.fillStyle=o.c||'#c8503a'; ctx.beginPath(); ctx.ellipse(0,0,31,10.5,0,0,TAU); ctx.fill(); ctx.fillStyle='#8e6a40'; ctx.beginPath(); ctx.ellipse(0,-1,26,7,0,0,TAU); ctx.fill();
+      ctx.fillStyle='#6a4a2c'; ctx.fillRect(-4,-7,3,13); ctx.fillRect(8,-7,3,13);
+      if(o.sail){ ctx.fillStyle=SBC.outline; ctx.fillRect(-2,-46,4,46); ctx.fillStyle='#f6efe0'; ctx.beginPath(); ctx.moveTo(2,-44); ctx.lineTo(26,-10); ctx.lineTo(2,-8); ctx.closePath(); ctx.fill(); ctx.strokeStyle=SBC.outline; ctx.lineWidth=1.4; ctx.stroke(); ctx.fillStyle=o.c||'#c8503a'; ctx.fillRect(2,-44,8,6); }
+      ctx.restore(); }},
   vane:{R:60,by:0,col:false,
     draw(o,t){ const a=Math.sin(t*0.6+o.x)*0.5; ctx.save(); ctx.translate(o.x,o.y); ctx.strokeStyle=LOOK.sb?SBC.outline:'#2a1a10'; ctx.lineWidth=3.4; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-34); ctx.stroke(); ctx.strokeStyle=C1C.brass; ctx.lineWidth=1.8; ctx.stroke(); ctx.translate(0,-34); ctx.rotate(a); ctx.fillStyle=C1C.brass; ctx.beginPath(); ctx.moveTo(-14,0); ctx.lineTo(10,-3); ctx.lineTo(14,0); ctx.lineTo(10,3); ctx.closePath(); ctx.fill(); ctx.strokeStyle=LOOK.sb?SBC.outline:'#2a1a10'; ctx.lineWidth=1; ctx.stroke(); ctx.restore(); }},
   flag:{R:70,by:0,col:false,
@@ -661,7 +686,7 @@ function c1Elev(){
   for(const r of C1ROOF.terrace) ELEV.ledge({k,x0:r[0]+6,y0:r[3]-10,x1:r[2]-6,y1:r[3]+58});
   // the White Cliffs, the Gull's Rest roof and chimney, the Smugglers' Stair, the ramps down to Saltmarsh, the shelves
   pl({poly:C1G.cliffs,lvl:2,style:'chalk',noise:14,id:'c_cliffs'});
-  pl({rect:[4205,25730,4395,25822],lvl:3,style:'c_roof',noise:0,id:'c_gullsrest_roof'});
+  pl({rect:[4190,25725,4410,25827],lvl:3,style:'c_roof',noise:0,id:'c_gullsrest_roof'});
   pl({rect:[1095,26970,1205,27024],lvl:2,style:'c_roof',climb:true,noise:0,id:'c_oona_roof'});
   pl({rect:[4330,25735,4385,25772],lvl:4,style:'c_roof',climb:true,noise:0,id:'c_gullsrest_chim'});
   pl({rect:[4870,27560,5060,27720],lvl:1,style:'chalk',noise:4,id:'c_smugland'});
@@ -678,7 +703,7 @@ function c1Elev(){
   pl({poly:C1G.heath,lvl:1,style:'grass',noise:14,id:'c_heath'});
   rp({x0:10165,y0:26990,x1:10285,y1:27120,dir:'n'});
   pl({disc:[12900,29100,280,250],lvl:2,style:'rock',noise:10,id:'c_lighthouserock'});
-  rp({x0:12820,y0:28780,x1:12940,y1:28890,dir:'s'});
+  rp({x0:12580,y0:29040,x1:12680,y1:29150,dir:'e'});
   rp({x0:11360,y0:28760,x1:11480,y1:28880,dir:'n'});                                 // the Seal Steps down to the beach
   // Gullcrag Head: the horseshoe round the sands, the stair from Saltmarsh, the spur face (claws, back from the caves)
   pl({poly:C1G.gull,lvl:3,style:'basalt',noise:10,id:'c_gullcrag'});
@@ -794,7 +819,7 @@ function c1Build(B){
   for(const [x,y,w,h,want,stilt] of [[2390,26262,140,90,'c_mina',0],[2000,26800,200,110,'c_charlie',1],[2560,26520,130,90,'c_dory',0],[1150,27045,110,150,'c_oona',1],[1520,27230,110,80,'c_tarbuckle',0],
     [1710,26530,110,80,null,1],[1660,26700,100,80,null,1],[2160,26150,110,80,null,0],[1700,26280,120,80,null,0],[2620,26900,110,80,null,0],[2150,27030,100,80,null,1]]) c1House(B,{x,y,w,h,town:SM,want,stilts:!!stilt,walk:want==='c_oona'});
   // ---- the small places
-  c1House(B,{x:4300,y:25800,w:190,h:140,town:'c_gullsrest',want:'c_maudie',walk:true});
+  c1House(B,{x:4300,y:25800,w:220,h:150,town:'c_gullsrest',want:'c_maudie',walk:true});
   c1House(B,{x:12300,y:28480,w:150,h:100,town:'c_lanternpt',want:'c_agatha'});
   // ---- shrines (bible 1.7); the Chalk Dragon Shrine and the Breakwater Shrine appear later (c1Sync)
   B.shrine({id:'c_s_downgate',x:3150,y:20850,name:S('Downgate Shrine','Downgate Shrine')});
@@ -887,6 +912,11 @@ function c1Places(B){
   c1Obj('tideclock',2250,26318);
   c1LM(B,{id:'c_lm_tideclock',k:'c_lm',x:2200,y:26360,r:0,clr:10,prompt:S('Look at the Tide Clock','Look at the Tide Clock'),draw:()=>{},act:()=>c1Say([C1T.low?S('The Tide Clock says LOW. The sands at Gullcrag are open, and the crabs are furious about it.','The Tide Clock says LOW!'):S('The Tide Clock says HIGH. Its big hand is stuck. Seaweed pokes out of the works, and everything is dusted with silver.','The Tide Clock is stuck on HIGH.')])});
   for(const [x,y] of [[2080,26400],[1990,26420]]) c1Obj('lamp',x,y);
+  c1Obj('bell',2180,26430);
+  for(const [pk,x,y,v] of [['c_netpole',2330,26420,0],['c_netpole',1640,26420,1],['c_crabpot',2050,26895,0],['c_crabpot',2075,26905,1],['c_crabpot',1745,26575,0],['c_crabpot',2470,26770,1],['c_mooring',2140,26530,1],['c_mooring',1900,26530,0],['c_mooring',1440,27640,1],['c_mooring',1700,26890,0],
+    ['c_boat',2560,26420,0],['c_boat',1550,26420,1],['c_netpole',2700,26640,0],['c_barrel',1960,26880,1],['c_barrel',2260,26380,0],['c_crate',2290,26395,1],['c_boat',1300,27420,1],['c_crabpot',1510,27320,0]]) c1Obj('prop',x,y,{pk,v});
+  for(const [x,y,a,c,sail] of [[1810,26780,0.3,'#4a7aa0',0],[2190,26640,-0.2,'#c8503a',0],[1470,27560,1.4,'#e0a030',0]]) c1Obj('skiff',x,y,{a,c,sail});
+  for(const [x,y,a,c,sail] of [[6900,26560,0.1,'#c8503a',1],[7250,26700,-0.15,'#3a7a8a',1],[8250,26760,0.25,'#e0a030',1],[7520,27100,0.05,'#4a6a94',1],[6820,27300,-0.3,'#c8503a',0],[8000,27500,0.4,'#7a5a3a',0],[7900,26560,0,'#3a8a8a',0],[6700,26560,0.2,'#a85a3e',0]]) c1Obj('skiff',x,y,{a,c,sail}); c1Obj('bench',2040,26495); c1Obj('bench',2230,26500);
   // ---- the Gull's Rest: the telescope, the flag on the roof
   c1Obj('telescope',4440,25935); c1Obj('flag',4250,25790);
   c1LM(B,{id:'c_lm_telescope',k:'c_lm',x:4440,y:25945,r:0,clr:10,prompt:S('Look through the telescope','Look through it'),draw:()=>{},act:()=>c1Say([C1T.spire||c1Reached('c_spire')?S('Out past the harbor, at night, a black spire stands where there was no spire before.','A black spire stands out at sea!'):S('Just sea. Lovely sea. Sea sea sea.','Sea. Lovely sea.')])});
@@ -894,6 +924,7 @@ function c1Places(B){
   c1LM(B,{id:'c_lm_passstair',k:'c_lm',x:3400,y:20330,r:0,clr:150,draw:(o,t)=>c1DrawPassStair()});
   c1Obj('fold',3900,21100); for(const [x,y,f] of [[3840,21080,1],[3930,21130,-1],[3990,21060,1],[3870,21150,-1],[3960,21000,1]]) c1Obj('sheep',x,y,{f}); STRUCTS.push({k:'campfire',x:4010,y:21180,small:true}); LIGHTS.push({x:4010,y:21180,r:160,i:0.6,fire:true});
   for(const [x,y] of [[3780,21180],[3700,21070],[4120,21020]]) c1Obj('crate2',x,y,{v:1});
+  c1Obj('bench',4080,21250);
   c1LM(B,{id:'c_lm_fold',k:'c_lm',x:3900,y:21000,r:0,clr:200,prompt:S("Look at Old Barley's sheepfold","Look at the sheep"),draw:()=>{},act:()=>{ c1Snd('baa'); c1Say([S('A round stone fold full of sheep. There are twelve of them. Every single one is named Gerald.','Twelve sheep. They are all named Gerald.')]); }});
   c1Obj('windmill',6252,21340,{base:21170}); c1Obj('windmill',9700,22345,{base:22175,col:false});
   CHESTS.push({id:'c_ch_dragonmill',x:6252,y:21200,b:10,open:false,c1top:true},{id:'c_ch_millcap',x:9700,y:22206,b:10,open:false,c1top:true});
@@ -915,13 +946,15 @@ function c1Places(B){
   c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,prompt:S('Look at the broken bridge','Look at the bridge'),draw:(o,t)=>c1DrawCut(t),act:()=>c1Say([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
   // ---- the Brass Yards: the Brassworks, the stack, the gantries
   c1Obj('works',10140,24800); c1Obj('gantry',11730,24250,{w:700}); c1Obj('gantry',9190,24770,{w:460});
+  for(const [x,y] of [[9800,24300],[11050,25300],[12000,24700],[9150,25250]]){ c1Obj('mill',x,y); C1CHIMS.push([x,y-150]); }
+  for(const [x,y] of [[10500,24950],[11500,24600],[9500,24100],[10900,25600],[11900,25000]]) c1Obj('gearpile',x,y);
   c1LM(B,{id:'c_lm_stack',k:'c_lm',x:10360,y:24520,r:0,clr:20,draw:(o,t)=>c1DrawStack(t)});
   CHESTS.push({id:'c_ch_gantry',x:11900,y:24050,b:13,open:false},{id:'c_ch_heightse',x:10320,y:26400,b:11,open:false});
   B.sign('c_sign_works',10000,24900,S('THE BRASSWORKS. CLOSED UNTIL THE MOTHS GO AWAY. (They have not gone away.)','THE BRASSWORKS. CLOSED. Moths inside.'));
   // ---- Lantern Point: the lighthouse, the keeper's garden, the seal lane, Seal Rocks
   c1Obj('lighthouse',12880,29020);
   for(const [x,y] of [[12380,28610],[12420,28650],[12450,28600],[12350,28660],[12490,28640]]) c1Obj('cabbage',x,y);
-  c1Obj('cabbage',12530,28690,{big:1}); c1Obj('barrel2',12200,28560,{v:0});
+  c1Obj('cabbage',12530,28690,{big:1}); c1Obj('barrel2',12200,28560,{v:0}); c1Obj('trailer',12140,28640);
   c1LM(B,{id:'c_lm_cabbage',k:'c_lm',x:12530,y:28700,r:0,clr:30,prompt:S('Look at the enormous cabbage','Look at the big cabbage'),draw:()=>{},act:()=>c1Say([S('The biggest cabbage you have ever seen. A sign: PRIZE CABBAGE. PLEASE DO NOT EAT. - AGATHA. Someone has taken one tiny bite.','A giant cabbage. DO NOT EAT. Someone took a bite.')])});
   for(let y=29230;y<30080;y+=140){ c1Obj('buoy',11690,y); c1Obj('buoy',11910,y+70); }
   c1LM(B,{id:'c_lm_seal',k:'c_lm',x:11800,y:30180,r:26,clr:60,prompt:S('Wake the seal','Wake the seal'),draw:(o,t)=>c1DrawSeal(o,t),act:()=>c1Seal()});
@@ -942,6 +975,7 @@ function c1Places(B){
   B.sign('c_sign_lantern',13120,23360,S('LANTERN POINT. No road from here. The rope bridge over the Cut is down. Ask in Gearhaven.','LANTERN POINT. No road here. The bridge is down.'));
   B.sign('c_sign_sands',1620,27780,S('GULLCRAG SANDS. Under the sea at high tide. Ask the Tide Warden before you walk.','GULLCRAG SANDS. Under water at high tide.'));
   B.sign('c_sign_salt',3300,26180,S('SALTMARSH, down the steps. Chowder. Fish. More chowder.','SALTMARSH. Chowder!'));
+  B.sign('c_sign_west',6380,25010,S('THE WEST GATE. The Coast Road: the Gull\'s Rest, then Saltmarsh. Mind the gulls. They bite.','West Gate. The Gull\'s Rest and Saltmarsh are west.'));
   B.sign('c_sign_gate',7060,24060,S('GEARHAVEN. Upper Town. Please wipe your feet and wind your watch.','GEARHAVEN. Wipe your feet.'));
   B.sign('c_sign_brassroad',8560,25500,S('The Brass Road: east to the Brass Yards. Mind the scrap.','The Brass Yards are east.'));
 }
@@ -1242,7 +1276,7 @@ function c1BreathSet(on){
 function c1Sync(force){
   if(!G||!G.flags||!C1.built) return;
   const boxes=[];
-  const low=C1F('c_lowtide'); if(low!==C1T.low){ C1T.low=low; boxes.push(C1G.sandsP.bb); }
+  const low=C1F('c_lowtide'); if(low!==C1T.low){ C1T.low=low; const q=C1G.sandsP.bb; boxes.push([q[0]-60,q[1]-60,q[2]+60,q[3]+60]); }
   const sp=C1F('c_spire_up'); if(sp!==C1T.spire){ C1T.spire=sp; c1SpireSet(sp); boxes.push([7050,28880,7760,30560]); }
   const sn=C1F('c_snow'); if(sn!==C1T.snow){ C1T.snow=sn; c1SnowSet(sn); boxes.push('all'); }
   C1T.clock=C1F('c_clock_on');
