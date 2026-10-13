@@ -103,6 +103,7 @@ function drawLily(l,t){
   ctx.restore();
 }
 function buildSprites(){
+  if(LOOK.sb&&sbBuildSprites()) return;
   SPR.oak=[1,2,3,4,5].map(i=>mkOak(1000+i,false)); SPR.birch=[1,2,3].map(i=>mkOak(2000+i,true));
   SPR.pine=[1,2,3,4].map(i=>mkPine(3000+i)); SPR.dead=[1,2,3].map(i=>mkDead(4000+i,false)); SPR.char=[1,2].map(i=>mkDead(4500+i,true));
   SPR.rock=[1,2,3].map(i=>mkRock(5000+i,'grey')); SPR.mossrock=[1,2,3].map(i=>mkRock(5100+i,'moss')); SPR.crag=[1,2,3,4].map(i=>mkRock(5200+i,'crag')); SPR.obsid=[1,2,3].map(i=>mkRock(5300+i,'obsid'));

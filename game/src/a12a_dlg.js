@@ -194,11 +194,13 @@ function faceFlame(g){
   g.save(); g.translate(0,-4); layer(1,'#d9461f'); layer(0.72,'#ff9a3a'); g.translate(0,10); layer(0.42,'#ffe7a0'); g.restore();
 }
 function drawPortrait(who){
-  const c=$('#portrait'), g=c.getContext('2d'), S=176;
+  const c=LOOK.sb?lookPortraitCv():$('#portrait'), g=c.getContext('2d'), S=176;
   g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,S,S);
+  if(!LOOK.sb){
   g.fillStyle={villager:'#2a2418',townsfolk:'#1c2430',ash:'#4a170d',yara:'#1f3018',maren:'#3a1a0c',wren:'#141e34',moss:'#1e2a14',hollis:'#2e2414',pip:'#3a1a0a',goat:'#2a2620',vor:'#320605',voice:'#320605',griz:'#3a3013',morrow:'#2a1236',brood:'#381020',gloam:'#1a2410',cinder:'#251c15',narr:'#2a170c',iska:'#3a2a10',bram:'#3a2a10',oriel:'#3a2a10',sedge:'#3a2a10',tove:'#3a2a10'}[who]||'#2a170c';
   g.fillRect(0,0,S,S);
   const gl=g.createRadialGradient(S/2,S*0.42,6,S/2,S/2,S*0.75); gl.addColorStop(0,'rgba(255,150,70,.32)'); gl.addColorStop(1,'rgba(0,0,0,.45)'); g.fillStyle=gl; g.fillRect(0,0,S,S);
+  }
   g.save(); g.translate(S/2,S/2+14);
   if(who==='ash') faceDragon(g,{skin:'#b8402a',dark:'#7e2617',snout:'#d26238',horn:'#efe0bf',eye:'#ffd34d',k:1});
   else if(who==='vor'||who==='voice') faceDragon(g,{skin:'#3d0e10',dark:'#1a0405',snout:'#561a1b',horn:'#d8c49c',eye:'#ff8a1a',k:1.1,cracks:true,teeth:true,big:true});
@@ -221,6 +223,7 @@ function drawPortrait(who){
   else if(CASTBY[who]||SPECIAL[who]){ g.scale(1.14,1.14); facePerson(g,(CASTBY[who]||SPECIAL[who]).look||{},!!(CASTBY[who]||SPECIAL[who]).kid); }
   else faceFlame(g);
   g.restore();
+  if(LOOK.sb) lookPortraitFinish(who,c);
 }
 
 function faceVillager(g,shirt,hair){

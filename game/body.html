@@ -112,6 +112,89 @@ input{-webkit-user-select:text;user-select:text}
 .opt.seen{opacity:.72}
 .opt .tag{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,200,120,.14);color:#f0cf98;font-weight:700;vertical-align:2px}
 .opt.t-kind .k{color:#9fe0a0} .opt.t-brave .k{color:#ffb070} .opt.t-silly .k{color:#d0a0ff}
+/* ===== Storybook look (Settings > Look, e5_look.js puts .sb on <html>): parchment panels, bold plum outlines,
+   chunky buttons with a pressed state. Sizes stay the same: thicker borders take their width out of the padding. */
+html.sb{--olc:#3b2233;--olt:0 2px 0 #3b2233,2px 0 0 #3b2233,-2px 0 0 #3b2233,0 -2px 0 #3b2233,1.5px 1.5px 0 #3b2233,-1.5px 1.5px 0 #3b2233,1.5px -1.5px 0 #3b2233,-1.5px -1.5px 0 #3b2233,0 4px 0 #3b2233}
+html.sb .panel:not(.skp):not(.lgp),html.sb .dlg,html.sb .upw .card,html.sb #padToast{--ink:#3b2233;--muted:#7a5560;--edge:#3b2233;--btn:#ffe3a8;--btn-hi:#fff4d6;--hot-a:#ffb85a;--hot-b:#f07a34;--gold:#e0782c;--ember:#c8542a;--panel:#fff3d6;color:#3b2233;color-scheme:light}
+html.sb .panel:not(.skp):not(.lgp){background:#fff3d6;border:3px solid #3b2233;border-radius:22px;padding:20px;box-shadow:inset 0 0 0 4px #ffe7b6,inset 0 0 0 6px rgba(59,34,51,.14),0 6px 0 #3b2233,0 24px 60px rgba(30,10,40,.42)}
+html.sb #mapov .panel{padding:14px}
+html.sb .panel.skp,html.sb .panel.lgp{border:3px solid #3b2233;border-radius:22px;box-shadow:inset 0 0 0 3px #b8845a,0 6px 0 #1e1018,0 24px 60px rgba(30,10,40,.5)}
+html.sb .panel h2,html.sb .upw h2{color:#ffd45a;text-shadow:var(--olt);letter-spacing:.03em}
+html.sb .panel.skp h2,html.sb .panel.lgp h2{color:#ffd45a}
+html.sb .panel h3{color:#c8542a}
+html.sb .panel p,html.sb .muted{color:#6a4a52}
+html.sb .btn{background:linear-gradient(180deg,#fff6dc 0%,#ffe6b0 60%,#f6d494 100%);color:#3b2233;border:3px solid #3b2233;border-radius:14px;padding:10px 14px;box-shadow:inset 0 2px 0 rgba(255,255,255,.75),0 4px 0 #3b2233,0 7px 12px rgba(40,20,40,.22);transition:transform .06s,box-shadow .06s,filter .12s}
+html.sb .btn small{color:#7a5560}
+html.sb .btn:hover{border-color:#3b2233;filter:brightness(1.05)}
+html.sb .btn:active{transform:translateY(3px);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 1px 0 #3b2233}
+html.sb .btn.hot{background:linear-gradient(180deg,#ffc56a 0%,#ff9a40 55%,#f07230 100%);color:#fff;border-color:#3b2233;text-shadow:0 2px 0 #3b2233,1.5px 0 0 #3b2233,-1.5px 0 0 #3b2233,0 -1px 0 #3b2233}
+html.sb .btn.hot small{color:#fff4dc;text-shadow:0 1px 0 #3b2233}
+html.sb .btn.sm{padding:8px 10px}
+html.sb .btn:disabled{filter:saturate(.4) brightness(.95);box-shadow:0 2px 0 #3b2233}
+html.sb .seg{border:3px solid #3b2233;border-radius:12px;box-shadow:0 3px 0 #3b2233}
+html.sb .seg button{background:#ffeccb;color:#6a4a52;font-weight:700;padding:6px 12px}
+html.sb .seg button+button{border-left:2px solid #3b2233}
+html.sb .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#ffb85a,#f07a34);color:#fff;text-shadow:0 1.5px 0 #3b2233,1px 0 0 #3b2233,-1px 0 0 #3b2233}
+html.sb .setrow .seg button{padding:6px 9px}
+html.sb .handtop .seg button{padding:4px 8px}
+html.sb .panel.skp .seg button,html.sb .panel.lgp .seg button{background:#3a2030;color:#e8d0b8}
+html.sb .panel.skp .seg button[aria-pressed="true"],html.sb .panel.lgp .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#ffb85a,#f07a34);color:#fff}
+html.sb .setrow{border-bottom:2px dashed rgba(59,34,51,.16)}
+html.sb .setrow>span{color:#3b2233;font-weight:600}
+html.sb .setsec{color:#c8542a}
+html.sb .keys kbd{background:#ffe3a8;color:#3b2233;border:2px solid #3b2233;border-bottom-width:3px}
+html.sb .stat{background:rgba(59,34,51,.07);border:2px solid rgba(59,34,51,.18)}
+html.sb .stat b{color:#3b2233}
+html.sb .journal,html.sb .jq,html.sb .slot,html.sb .ppl div{background:rgba(255,231,182,.7);border:2px solid rgba(59,34,51,.2);color:#6a4a52}
+html.sb .journal .jq{background:transparent;border:0}
+html.sb .jq.foc,html.sb .slot.cur{border-color:#e0782c;box-shadow:0 0 0 2px rgba(224,120,44,.25)}
+html.sb .jq .qt,html.sb .slot .sh,html.sb .ppl b,html.sb .journal .jq{color:#3b2233}
+html.sb .jq .qs{color:#1f6a8a}
+html.sb .jq .row .btn{padding:5px 10px}
+html.sb .ppl .hz{color:#e04870}
+html.sb .fld input{background:#fffaf0;color:#3b2233;border:2px solid #3b2233}
+html.sb .err{color:#c8402a!important}
+html.sb .lb li{border-bottom:2px dashed rgba(59,34,51,.14)}
+html.sb .mapwrap{border:3px solid #3b2233;border-radius:14px;background:#e9d6ac;box-shadow:inset 0 0 0 3px #fff3d6}
+html.sb .legend{color:#6a4a52}
+html.sb .legend i{border:1.5px solid #3b2233}
+/* dialogue */
+html.sb #dialogue{background:linear-gradient(180deg,rgba(40,20,50,0) 40%,rgba(40,20,50,.42) 100%)}
+html.sb .dlg{background:#fff3d6;border:3px solid #3b2233;border-radius:20px;padding:14px 16px 28px;box-shadow:inset 0 0 0 4px #ffe7b6,0 6px 0 #3b2233,0 20px 50px rgba(30,10,40,.4)}
+html.sb #portrait{border:3px solid #3b2233;border-radius:14px;background:#ffe7b6;box-shadow:0 3px 0 #3b2233}
+html.sb .who{display:inline-block;color:#fff;background:#e0782c;border:2.5px solid #3b2233;border-radius:10px;padding:0 10px;letter-spacing:.04em;text-shadow:0 1.5px 0 #3b2233,1px 0 0 #3b2233,-1px 0 0 #3b2233;box-shadow:0 2px 0 #3b2233}
+html.sb .who:empty{display:none}
+html.sb .say{color:#3b2233}
+html.sb .dlg.narr .say{color:#6a4a52}
+html.sb .next{color:#8a6a70;font-weight:600}
+html.sb .skip{background:#fff3d6;color:#3b2233;border:2.5px solid #3b2233;border-radius:12px;font-weight:700;box-shadow:0 3px 0 #3b2233}
+html.sb .skip:active{transform:translateY(2px);box-shadow:0 1px 0 #3b2233}
+html.sb .opt{background:linear-gradient(180deg,#fff6dc,#ffe6b0);color:#3b2233;border:3px solid #3b2233;border-radius:14px;padding:9px 12px;box-shadow:0 3px 0 #3b2233}
+html.sb .opt:hover,html.sb .opt:focus-visible{border-color:#3b2233;filter:brightness(1.06)}
+html.sb .opt:active{transform:translateY(2px);box-shadow:0 1px 0 #3b2233}
+html.sb .opt .k{color:#e0782c}
+html.sb .opt .tag{background:rgba(224,120,44,.16);color:#8a4a1a}
+html.sb .opt.t-kind .k{color:#2e8a3a} html.sb .opt.t-brave .k{color:#d0561e} html.sb .opt.t-silly .k{color:#8a46c8}
+/* blessings */
+html.sb .upw p{color:#fff4dc;text-shadow:0 1.5px 0 #3b2233,1px 0 0 #3b2233,-1px 0 0 #3b2233}
+html.sb .upw .card{background:#fff3d6;color:#3b2233;border:3px solid #3b2233;border-radius:18px;padding:22px 14px 16px;box-shadow:inset 0 0 0 4px #ffe7b6,0 5px 0 #3b2233}
+html.sb .upw .card:hover,html.sb .upw .card:focus-visible{border-color:#3b2233;box-shadow:inset 0 0 0 4px #ffd45a,0 8px 0 #3b2233}
+html.sb .upw .card:active{transform:translateY(2px)}
+html.sb .card .ds{color:#6a4a52}
+html.sb .card .k{border:2px solid #3b2233;color:#3b2233}
+/* the title screen */
+html.sb #menu{background:radial-gradient(ellipse at 50% 42%,rgba(60,30,70,0) 0%,rgba(60,30,70,.2) 55%,rgba(36,18,46,.62) 100%)}
+html.sb .logo{background:linear-gradient(180deg,#fff7d0 0%,#ffd84e 38%,#ff9a34 70%,#ef5a2a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #3b2233) drop-shadow(3px 0 0 #3b2233) drop-shadow(-3px 0 0 #3b2233) drop-shadow(0 -3px 0 #3b2233) drop-shadow(0 12px 18px rgba(40,20,50,.45))}
+html.sb .tag{color:#fff4dc;text-shadow:var(--olt)}
+html.sb .diff,html.sb .menu .note,html.sb .best{color:#fff4dc;text-shadow:0 1.5px 0 #3b2233,1px 0 0 #3b2233,-1px 0 0 #3b2233,0 -1px 0 #3b2233}
+/* chapter cards and the controller toast */
+html.sb #card .num{display:inline-block;color:#fff;background:#e0782c;border:3px solid #3b2233;border-radius:12px;padding:4px 18px 4px 22px;box-shadow:0 4px 0 #3b2233;text-shadow:0 2px 0 #3b2233}
+html.sb #card .nm{color:#fff4dc;text-shadow:0 3px 0 #3b2233,3px 0 0 #3b2233,-3px 0 0 #3b2233,0 -3px 0 #3b2233,2px 2px 0 #3b2233,-2px 2px 0 #3b2233,2px -2px 0 #3b2233,-2px -2px 0 #3b2233,0 6px 0 #3b2233,0 10px 24px rgba(40,20,50,.5)}
+html.sb #padToast{background:#fff3d6;border:3px solid #3b2233;border-radius:16px;box-shadow:0 5px 0 #3b2233,0 14px 40px rgba(30,10,40,.4)}
+html.sb #padToast b{color:#e0782c}
+html.sb #padToast span{color:#6a4a52}
+@media (max-width:640px){html.sb .dlg{padding:10px 12px 26px}html.sb .upw .card{padding:12px 12px 12px 36px}}
+@media (prefers-reduced-motion:reduce){html.sb .btn,html.sb .opt{transition:none}}
 </style>
 
 <canvas id="game" aria-label="Emberblood game world"></canvas>
