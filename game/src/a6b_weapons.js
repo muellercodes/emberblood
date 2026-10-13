@@ -202,7 +202,7 @@ function updateWeapon(dt,inp){
   else if(armed){
     if(D.flyOK&&D.input) D.input(dt,atk,free,p);   // the bow, the boomerang, bombs and the glaive work in the air too
     else if(p.flying){ if(p.ham){ p.ham=null; p.swingT=0; } if(D.unequip&&D.input) D.unequip(p); if(atk&&!(WS.flyT>0)){ WS.flyT=4.6; ftext(p.x,p.y-30,'Land to swing! (The bow and boomerang work up here.)','#cfe6ff',12); } }
-    else if(airborne()&&hasSkill('slam')){ /* attack in the air is Meteor Slam (abilities build) */ }
+    else if(airborne()&&canPound()){ /* attack in the air is the Ground Pound (p3_frost.js) */ }
     else if(D.input) D.input(dt,atk,free,p);
     else if(atk&&free){
       const n=nextCombo(w), fin=n===(w==='daggers'?3:2), cost=w==='daggers'?(fin?6:3):w==='spear'?(fin?13:8):(fin?14:9);
