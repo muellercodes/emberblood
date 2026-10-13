@@ -477,7 +477,7 @@ EVD.tk4={min:'three',tk:true,selfCall:true,kind:'kind',w:c=>tkW(c,TK(3)&&!!G.bos
   tick(E,dt){ if(E.phase==='wait'){ E.d.callT-=dt; if(E.d.callT<=0){ E.d.callT=rand(6,9); evSay(E.main,TKS.tk4.call()); } } },
   talk(E){ E.main.mark=null; evTalk(E,'meet',()=>{ G.flags.tk_n=Math.max(G.flags.tk_n|0,4); const home=G.flags.tk_home, P=home==='baker'?POI.village:home==='farm'?POI.farm:POI.mosshut, a=angTo(E.main.x,E.main.y,P.x,P.y); for(const k of [E.main].concat(E.kids)) k.leave={a,abs:true}; evEnd(E,true); }); }
 };
-EVD.tk5={min:'gate',tk:true,selfCall:true,kind:'brave',w:c=>tkW(c,TK(4)&&!G.done&&!G.bossDone.vorlaxis),spot:()=>evSpot({rad:26,min:240,max:360}),
+EVD.tk5={min:'gate',tk:true,selfCall:true,kind:'brave',w:c=>tkW(c,TK(4)&&!G.flags.act1_done&&!G.bossDone.vorlaxis),spot:()=>evSpot({rad:26,min:240,max:360}),
   setup(E,at){ E.main=E.add(tkKob(at.x,at.y,{pack:true,lid:true,spoon:true})); E.main.use={text:()=>S('Talk to Tikka','Talk to Tikka'),fn:()=>EVD.tk5.talk(E)}; E.main.mark='!'; E.d.callT=0.8; },
   tick(E,dt){ if(E.phase==='wait'){ E.d.callT-=dt; if(E.d.callT<=0){ E.d.callT=rand(6,9); evSay(E.main,TKS.tk5.call()); } } },
   talk(E){ E.main.mark=null; evTalk(E,'meet',()=>{ G.flags.tk_n=Math.max(G.flags.tk_n|0,5); evGive({heal:true,pots:true}); E.main.leave={a:rand(-0.4,0.4)}; evEnd(E,true); }); }
@@ -588,7 +588,7 @@ function evSwing(px,py,dir,range,half){ const E=EV.E; if(AREA||!E||E.phase==='le
 // ================= Tikka in the last fight: she comes up the stairs with snacks, throws buns at Ash and bonks drakelings
 function evAlly(dt){
   const b=G.boss, F=G.flags;
-  if(!b||b.dead||b.type!=='vorlaxis'||AREA){ if(EV.ally&&G.done){ F.tk_helped=true; F.tk_n=Math.max(F.tk_n|0,6); } if(EV.ally&&(!b||b.dead)){ if(G.bossDone&&G.bossDone.vorlaxis){ F.tk_helped=true; F.tk_n=Math.max(F.tk_n|0,6); } EV.ally=null; } return; }
+  if(!b||b.dead||b.type!=='vorlaxis'||AREA){ if(EV.ally&&G.flags.act1_done){ F.tk_helped=true; F.tk_n=Math.max(F.tk_n|0,6); } if(EV.ally&&(!b||b.dead)){ if(G.bossDone&&G.bossDone.vorlaxis){ F.tk_helped=true; F.tk_n=Math.max(F.tk_n|0,6); } EV.ally=null; } return; }
   if(!EV.ally&&F.tk_come==='yes'&&(F.tk_n|0)>=5&&b.hp<b.maxHp*0.62){
     const P=POI.summit; EV.ally={k:'kob',x:P.x+rand(-60,60),y:P.y+430,face:-Math.PI/2,t:0,kk:0.95,scarf:'#c84a3a',apron:true,lid:true,spoon:true,id:'ev_tikka',cd:3,bonk:2,say:8,kids:[]};
     if(F.tk_home&&(F.tk_trust|0)>=3) for(let i=0;i<3;i++) EV.ally.kids.push({k:'kob',x:P.x-60+i*60,y:P.y+470,face:-Math.PI/2,t:rand(0,9),kk:0.66,scarf:['#4a8ac8','#8ac84a','#c88ae0'][i],id:'ev_kob',hop:rand(0,3)});
@@ -620,7 +620,7 @@ function dreamFor(st){ for(const id of DREAM_ORDER){ const D=DREAMS[id]; if(D.st
 function dreamHook(kind){
   try{
     if(!G||G.mode!=='story') return;
-    const id=dreamFor(G.done?'done':G.stage); if(!id) return;
+    const id=dreamFor(G.stage); if(!id) return;
     const k='dr_try_'+id, n=G.flags[k]|0; G.flags[k]=n+1;
     if(n<2&&Math.random()>0.6) return;
     later(1.3,()=>dreamTry(id,0));
@@ -699,7 +699,7 @@ function evGreet(id){
   if(!v&&F.tk_n>=4){ const hk={baker:'bertram',farm:'hollis',moss:'moss'}[F.tk_home]; if(hk===id) v=one('tk_home_told',EV_TALK.home[F.tk_home]); }
   if(!v&&id==='maren'&&F.tk_n>=5&&F.tk_come) v=one('tk_mom_told',F.tk_come==='yes'?EV_TALK.momTikkaYes:EV_TALK.momTikkaHome);
   if(v) return v;
-  const st=G.done?'done':G.stage;
+  const st=G.stage;
   if(id==='maren'&&MOM_CH[st]&&Math.random()<0.4) return pick(MOM_CH[st]);
   if(id==='yara'&&YARA_CH[st]&&Math.random()<0.4) return pick(YARA_CH[st]);
   return null;
@@ -967,7 +967,7 @@ window.__ebX=Object.assign(window.__ebX||{},{
   evDirector:()=>({free:+EV.free.toFixed(1),gap:+EV.gap.toFixed(1),exploring:evExploring(),cur:EV.E?EV.E.id:null,lastEnd:+EV.lastEnd.toFixed(1)}),
   evNudge:(s)=>{ EV.free=Math.max(EV.free,EV.gap-(s||0)); EV.lastEnd=-999; },
   evSet:(i,o)=>{ const E=EV.E; if(!E||!E.ents[i]) return false; Object.assign(E.ents[i],o); return true; }, evData:(o)=>{ const E=EV.E; if(!E) return false; Object.assign(E.d,o); return true; }, evCtx, evPick:()=>evPick(evCtx()),
-  dream:(id)=>dreamStart(id), dreamFor:()=>dreamFor(G.done?'done':G.stage), dreamHook, dreamOpenTest:()=>!!EV.dream,
+  dream:(id)=>dreamStart(id), dreamFor:()=>dreamFor(G.stage), dreamHook, dreamOpenTest:()=>!!EV.dream,
   evGreet:(id)=>evGreet(id), dreamTalkReset:()=>{ for(const k in G.flags) if(k.startsWith('drt_')) delete G.flags[k]; },
   tkSet:(n,o)=>{ G.flags.tk_n=n; Object.assign(G.flags,o||{}); }, evAlly:()=>EV.ally?{x:Math.round(EV.ally.x),y:Math.round(EV.ally.y),kids:EV.ally.kids.length}:null, evEpilogue
 });

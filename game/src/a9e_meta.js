@@ -95,7 +95,7 @@ function fmtPlay(t){ t=Math.floor(t||0); const h=Math.floor(t/3600), m=Math.floo
 function fmtAgo(at){ if(!at) return ''; const d=(Date.now()-at)/1000; if(d<90) return 'just now'; if(d<3600) return `${Math.round(d/60)} min ago`; if(d<86400) return `${Math.round(d/3600)} h ago`; const n=Math.round(d/86400); return n===1?'yesterday':`${n} days ago`; }
 function slotDetail(s){
   const q=s.quests?Object.values(s.quests).filter(x=>x.done).length:0, pg=s.pages?Object.keys(s.pages).length:0;
-  return {head:`Level ${(s.p&&s.p.level)||1} · ${s.done?'Free roam':CHAPTER[s.stage]||'Lantern Day'}`,
+  return {head:`${stageLabel(s)} · Level ${(s.p&&s.p.level)||1}`,
     sub:`${DIFFS[clamp(s.diff|0,0,2)].name} · ${fmtPlay(s.time)} played · ${q} quests · ${pg}/10 pages`, ago:fmtAgo(s.at)};
 }
 let slotConfirm=null;

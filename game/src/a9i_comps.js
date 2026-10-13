@@ -780,7 +780,7 @@ function syncDeeds(){
   const pg=Object.keys(G.pages||{}).length; if(pg>=3) deed('pages3'); if(pg>=10) deed('pages10');
   for(const id in (G.friends||{})) if(friendOf(id)>=5) deed('best_'+id);
   if(player&&player.level>=5) deed('lvl5'); if(player&&player.level>=10) deed('lvl10');
-  if(G.tier>=2) deed('tier2'); if(G.done) deed('done');
+  if(G.tier>=2) deed('tier2'); if(G.flags&&G.flags.act1_done) deed('done');
   if(player&&player.flying&&!D.flew) deed('flew');
 }
 const DAGE=k=>{ const t=G.deeds&&G.deeds[k]; return typeof t==='number'?(G.worldTime||0)-t:1e9; };
@@ -834,9 +834,9 @@ B('gate0','adult',()=>G.stage==='gate',`The Obsidian Gate. Be careful up there, 
 B('cinder1','any',()=>dBd('cindervane'),`The Obsidian Gate is open! My granddad said that would never happen.`,{d:'boss_cindervane'});
 B('cinder2','any',()=>dCh('cinder','ally'),`Sir Cindervane is on your side now? The big burning knight? Wow.`,{d:'ch_cinder_ally'});
 B('summit0','any',()=>G.stage==='summit',`Everyone keeps looking at the mountain. Good luck, Ash. We mean it.`);
-B('done1','any',()=>G.done,`You did it, Ash. The whole valley is talking about you.`,{d:'done'});
-B('done2','kid',()=>G.done,`When I grow up I want to be you. But taller.`,{d:'done'});
-B('done3','adult',()=>G.done,`The biggest Lantern Day in a thousand years. And you were the best part.`,{d:'done'});
+B('done1','any',()=>!!G.flags.act1_done,`You did it, Ash. The whole valley is talking about you.`,{d:'done'});
+B('done2','kid',()=>!!G.flags.act1_done,`When I grow up I want to be you. But taller.`,{d:'done'});
+B('done3','adult',()=>!!G.flags.act1_done,`The biggest Lantern Day in a thousand years. And you were the best part.`,{d:'done'});
 // --- Ember's Trials
 B('jump1','any',()=>dAb('jump'),`I saw you jump right over a fence! Do it again!`,{d:'trial_jump'});
 B('jump2','kid',()=>dAb('jump'),`Can you jump over my house? Over the chimney? Please?`,{d:'trial_jump'});
@@ -1012,7 +1012,7 @@ VCH('wolf','any','any',()=>compNear('greymane'),[[0,`There's a giant wolf in tow
 VCH('wards','any','any',()=>wardLit('crag')&&wardLit('mire')&&wardLit('frost'),[[0,`Can you feel it? The Wards are warm.`],[1,`That's just my tea.`],[0,`No, really. Feel the air.`],[1,`...Oh. Oh, that's nice.`]]);
 VCH('lbuns','any','any',()=>G.stage==='lanterns',[[0,`Have you seen the dragon buns?`],[1,`I ate four.`],[0,`They were decorations!`]]);
 VCH('map','any','any',()=>compNear('juniper'),[[0,`Juniper is drawing a map of us.`],[1,`Make my nose smaller!`]]);
-VCH('over','any','any',()=>G.done,[[0,`Is it really over?`],[1,`Ash says it is.`],[0,`Then it is.`]]);
+VCH('over','any','any',()=>!!G.flags.act1_done&&G.stage==='done',[[0,`Is it really over?`],[1,`Ash says it is.`],[0,`Then it is.`]]);
 VCH('cold','town:lodge','town:lodge',()=>!AREA,[[0,`Cold today.`],[1,`It's always cold. It's the Frostpine.`],[0,`Colder than always, then.`]]);
 VCH('rhyme','id:tamsin','id:hob',ALWAYS,[[0,`Hob, what rhymes with Ash?`],[1,`Cash? Splash? Mustache?`],[0,`Mustache! Perfect!`]]);
 VCH('race','id:elka','id:brisket',()=>G.comp!=='brisket',[[0,`Brisket, race me!`],[1,`I'm still thawing!`],[0,`Excuses!`]]);
