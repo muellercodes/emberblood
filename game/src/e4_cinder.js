@@ -48,12 +48,15 @@ ELEV.style('cinder',{face:'#644a42',lit:'#87655a',dark:'#33221f',lip:'#f0c49c',o
   P({poly:C.T3,lvl:3,style:'cinder',noise:14,seed:43,id:'cm_t3',top:'#927a6c',topK:0.12});
   P({poly:C.T4,lvl:4,style:'cinder',noise:14,seed:44,id:'cm_t4',top:'#927a6c',topK:0.115});
   P({poly:C.T5,lvl:6,style:'cinder',noise:14,seed:45,id:'cm_t5',top:'#9a8274',topK:0.085});
-  // the crater: the floor, then the rim wall all round it but for the south mouth
+  // the crater: the floor, then the rim wall in three arcs: the south mouth (the way in, by the last vent) and two side
+  // gaps (east and west: drops out to T5, the way out of a fight); the north arc has stairs up to its perches
   const [fx,fy,frx,fry]=C.floor, [orx,ory]=C.rimR;
   P({disc:[fx,fy,frx+30,fry+28],lvl:7,style:'cinder',noise:10,seed:46,id:'cm_floor',top:'#6e5046',topK:0.06});
   const arc=(a0,a1,rIn,rOut)=>{ const o=[], st=Math.ceil((a1-a0)/0.06); for(let i=0;i<=st;i++){ const a=a0+(a1-a0)*i/st; o.push([fx+Math.cos(a)*rOut[0],fy+Math.sin(a)*rOut[1]]); } for(let i=st;i>=0;i--){ const a=a0+(a1-a0)*i/st; o.push([fx+Math.cos(a)*rIn[0],fy+Math.sin(a)*rIn[1]]); } return o; };
   const D=Math.PI/180;
-  P({poly:arc(101*D,439*D,[frx,fry],[orx,ory]),lvl:8,style:'cinder',noise:9,seed:47,id:'cm_rim',top:'#bea292',topK:0.075});
+  for(const [a0,a1,id] of [[101,171,'cm_rim_sw'],[189,351,'cm_rim'],[9,79,'cm_rim_se']]) P({poly:arc(a0*D,a1*D,[frx,fry],[orx,ory]),lvl:8,style:'cinder',noise:9,seed:47+a0,id,top:'#bea292',topK:0.075});
+  ELEV.ledge({x0:7580,y0:860,x1:7700,y1:1010});   // the east gap: the crater floor -> T5
+  ELEV.ledge({x0:6300,y0:860,x1:6420,y1:1010});   // the west gap
   // Double Jump steps: the main one from T2 up to T3 (east end), and the little mesa with the chest on T2's east landing
   if(C.opts.dblOnPath) P({rect:[7880,2170,8010,2296],lvl:3,style:'cinder',step:true,noise:5,seed:51,id:'cm_step'});
   else ELEV.ramp({x0:7900,y0:2205,x1:7990,y1:2262,dir:'n',kind:'stairs'});
