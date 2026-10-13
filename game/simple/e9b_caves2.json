@@ -1,0 +1,14 @@
+{
+ "7p7hb6": {
+  "o": "The rails now point {1}.",
+  "s": "The rails point {1} now."
+ },
+ "ifan46": {
+  "o": "{1} is beaten!",
+  "s": "You beat {1}!"
+ },
+ "1qmmdnn": {
+  "o": "Level {1} of {2}",
+  "s": "Level {1}"
+ }
+}
