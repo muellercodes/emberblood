@@ -941,7 +941,10 @@ function c1BossTick(dt){
   let b=G.boss&&C1_BOSS[G.boss.type]?G.boss:null;
   if(!b&&AREA) b=G.enemies.find(e=>!e.dead&&C1_BOSS[e.type])||null;
   if(b&&!b.dead){ C1ST.boss=b; const B=C1_BOSS[b.type]; if(B.intro&&!c1Seen(B.intro)&&scene==='play'&&!DLG) c1Play(B.intro); return; }
-  const o=C1ST.boss; if(o&&(o.dead||o.hp<=0)){ C1ST.boss=null; const B=C1_BOSS[o.type]; if(B&&B.won&&!c1Seen(B.won)) later(2.6,()=>c1When('won_'+o.type,()=>!c1Seen(B.won),()=>c1Play(B.won))); }
+  // (a boss taken away with hp left is not a win: Ash died and woke at a shrine, or left the room; resetBoss and
+  // exitArea only mark it dead. A real win always ends at hp 0.)
+  const o=C1ST.boss; if(o&&o.dead&&o.hp>0){ C1ST.boss=null; return; }
+  if(o&&(o.dead||o.hp<=0)){ C1ST.boss=null; const B=C1_BOSS[o.type]; if(B&&B.won&&!c1Seen(B.won)) later(2.6,()=>c1When('won_'+o.type,()=>!c1Seen(B.won),()=>c1Play(B.won))); }
 }
 // ---------- the Great Clock's hatch (into the Moth's Nest) and Duchess on the roof cap
 function c1ClockTop(){ try{ return typeof elevLvl==='function'&&elevLvl(C1P.clock.x,C1P.clock.y-30)>=4; }catch(e){ return false; } }
