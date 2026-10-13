@@ -891,7 +891,7 @@ function c1LampScene(){
 // the Vesper fight pauses at 10 percent (x1_foes calls this; a watcher calls it if nobody does)
 function c1SpireChoice(e){
   if(G.flags.c_choice_done||C1ST.choiceRun) return false;
-  C1ST.choiceRun=true;
+  C1ST.choiceRun=true; G.taunt=null; G.tauntQ=[];
   if(e){ e.invuln=true; e.passive=true; e.tele=null; e.vx=e.vy=0; }
   // no fight on screen (the beat was called without her): she kneels in front of Ash for the scene
   else { const S0=c1SightAt(player.x+92,player.y-36,'wait'); S0.face=-1; C1ST.cam={x:player.x+46,y:player.y-18,k:0.6}; }
@@ -899,6 +899,9 @@ function c1SpireChoice(e){
   G.projectiles=(G.projectiles||[]).filter(p=>p.owner!=='enemy');
   c1Play('c_choice',()=>{
     G.flags.c_choice_done=1; C1ST.choiceRun=false; C1ST.sight=null;
+    // x1_foes handed the kneel to us (C1.hook.vesperKneel): its finish() ends the fight properly (XP, the room solved)
+    const fin=C1ST.kneelFin; C1ST.kneelFin=null;
+    if(fin){ G.flags.c_mask_xp=1; try{ fin(); }catch(err){ console.error(err); } }
     if(e&&!e.dead){ e.dead=true; if(G.boss===e) G.boss=null; }
     const v=(EDEF.c_mothmask&&EDEF.c_mothmask.value)||2500; if(!G.flags.c_mask_xp){ G.flags.c_mask_xp=1; gainXp(v); }
     later(0.8,()=>c1SpireOut());
@@ -915,9 +918,13 @@ function c1SpireOut(){
 function c1SpireWatch(dt){
   const F=G.flags; if(F.c_choice_done||C1ST.choiceRun) return;
   const b=G.boss&&G.boss.type==='c_mothmask'?G.boss:(AREA?G.enemies.find(e=>e.type==='c_mothmask'):null);
-  if(b&&!b.dead&&b.hp<=b.maxHp*0.1&&scene==='play') c1SpireChoice(b);
+  // (with x1_foes in the build its own Vesper kneels at 10 percent and calls C1.hook.vesperKneel below, so its finish()
+  //  ends the fight properly: the watcher then only covers a Vesper that died some other way)
+  if(b&&!b.dead&&b.hp<=b.maxHp*0.1&&!b.kneel&&typeof vesperKneel!=='function'&&scene==='play') c1SpireChoice(b);
   else if(b&&b.dead&&scene==='play') c1SpireChoice(null);
 }
+// x1_foes stops the Vesper fight at 10 percent and asks for the choice (C1FOES.md 3.5): this is the story's choice
+if(typeof C1!=='undefined'&&C1&&C1.hook) C1.hook.vesperKneel=(e,finish)=>{ C1ST.kneelFin=finish; if(!c1SpireChoice(e)&&G.flags.c_choice_done){ C1ST.kneelFin=null; finish(); } };
 // the end of the act
 function c1EndAct(){
   if(G.flags.c_done) return;
@@ -950,7 +957,8 @@ function c1TideDoor(){ return DOORS.find(d=>d.area==='c_tidehouse'); }
 { const base=miniPrompts; miniPrompts=function(offer){ base(offer); try{ if(G&&G.mode==='story'&&curMap()===1&&!AREA) c1Prompts(offer); }catch(e){ console.error(e); } }; }
 function c1Prompts(offer){
   const p=player, F=G.flags;
-  if(reached('c_brass')&&actOf(G.stage)>=2){ const h=c1Hatch(), d=dist(p.x,p.y,h.x,h.y); if(d<64&&(h.top||!c1ClockTop())) offer(d-4,h.top?S('Open the hatch into the bell loft','Open the hatch'):(hasAbil('claws')?S('Climb the Great Clock to the bell loft','Climb the clock'):S('Look up at the Great Clock','Look up at the clock')),c1HatchAct,h.x,h.y); }
+  // (x1_world puts its own hatch door on top of its Great Clock tower: then that door is the way in, not this prompt)
+  if(reached('c_brass')&&actOf(G.stage)>=2&&!(c1ClockTop()&&DOORS.some(q=>q.area==='c_mothnest'))){ const h=c1Hatch(), d=dist(p.x,p.y,h.x,h.y); if(d<64&&(h.top||!c1ClockTop())) offer(d-4,h.top?S('Open the hatch into the bell loft','Open the hatch'):(hasAbil('claws')?S('Climb the Great Clock to the bell loft','Climb the clock'):S('Look up at the Great Clock','Look up at the clock')),c1HatchAct,h.x,h.y); }
 }
 // ---------- per frame (outdoors through updateStory, inside areas through updateArea)
 function c1Tick(dt){

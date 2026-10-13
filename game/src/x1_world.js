@@ -943,7 +943,9 @@ function c1Places(B){
   for(const [x,y] of [[4060,29640],[4180,29760],[3990,29700]]) c1wObj('crate2',x,y,{col:false});
   // ---- the Cut and its broken rope bridge
   c1wObj('bridgepost',9535,26935); c1wObj('bridgepost',9832,26962,{flip:1});
-  c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,prompt:S('Look at the broken bridge','Look at the bridge'),draw:(o,t)=>c1DrawCut(t),act:()=>c1wSay([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
+  // (once Ash has the Grapple Tail this look-at has no prompt: the posts' grapple prompt shares the same E, and a look
+  //  prompt in range would take E first, see p2_coast's updateInteractions; the broken bridge is still drawn)
+  c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,get prompt(){ return typeof canGrapple==='function'&&canGrapple()?null:S('Look at the broken bridge','Look at the bridge'); },draw:(o,t)=>c1DrawCut(t),act:()=>c1wSay([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
   // ---- the Brass Yards: the Brassworks, the stack, the gantries
   c1wObj('works',10140,24800); c1wObj('gantry',11730,24250,{w:700}); c1wObj('gantry',9190,24770,{w:460});
   for(const [x,y] of [[9800,24300],[11050,25300],[12000,24700],[9150,25250]]){ c1wObj('mill',x,y); C1CHIMS.push([x,y-150]); }

@@ -1693,6 +1693,7 @@ function vesperKneel(e){
   e.kneel=true; e.mv=null; e.tele=null; e.state='kneel'; e.sunk=false; e.r=e.r0||13; e.alpha=1; e.z=0; e.noPhase=true; vesperClear(e); G.fz=[];
   G.projectiles=G.projectiles.filter(q=>q.owner!=='enemy'); for(const q of G.enemies) if(!q.dead&&q!==e&&q.type==='c_moth'){ q.dead=true; c1Puff(q.x,q.y-16,'190,185,215',10); }
   shake(6); SFX.play('warn'); player.iframes=Math.max(player.iframes,3);
+  G.taunt=null; G.tauntQ=[];   // her fight lines stop with the fight (none left to pop up over the scenes after it)
   later(1.4,()=>{ if(e.dead) return; const finish=()=>vesperFinish(e);
     if(C1.hook.vesperKneel){ try{ C1.hook.vesperKneel(e,finish); }catch(err){ console.error(err); finish(); } return; }
     runDialogue(STORY.c_choice||C1_VESPER_CHOICE,()=>{ scene='play'; finish(); }); });
@@ -2089,6 +2090,8 @@ function c1Test(type,o){
   if(typeof P2!=='undefined'){ P2.tips.climb=9; P2.tips.hang=9; P2.tips.pull=9; P2.tips.chain=9; P2.tips.ring=9; }
   if(G.fightSite) resetBoss(); G.bossDone[type]=false; C1.noIntro=o.intro===false; C1.dmg=0; C1.hits=0; C1.bySrc={};
   for(const k in G.flags) if(k.startsWith('c1tip_')) delete G.flags[k];
+  // intro:false also skips x1_story's own first-sight intro for the type (it marks its scenes in G.flags.c_sn)
+  if(o.intro===false){ const SK={c_pinch:'c_pinch_intro',c_ticktock:'c_ticktock_intro',c_gloomwing:'c_gloomwing_intro',c_mothmask:'c_roof_intro',c_shadowash:'c_shadowash',c_saltbeard:'c_saltbeard_intro'}; if(SK[type]) (G.flags.c_sn=G.flags.c_sn||{})[SK[type]]=1; }
   if(type==='c_saltbeard'){ if(AREA) exitArea(true); G.items.c_chowder=1; G.flags.c_saltbeard_won=false; if(window.__eb.setTime) window.__eb.setTime(0.02); const r=window.__eb.bossTest('c_saucygull',{intro:o.intro!==false?undefined:false}); return r; }
   const room=C1LAB_ROOM[type]; if(!room) return null;
   for(const k in G.found) if(k.startsWith('cv_c1_lab_')&&k.endsWith('_solved')) delete G.found[k];

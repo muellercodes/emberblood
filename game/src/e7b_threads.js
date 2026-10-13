@@ -41,8 +41,11 @@ const moonPending=()=>!!(G&&G.flags&&G.flags.moon_hud!=null&&bitesOf()>G.flags.m
 const moonShown=()=>{ const F=G&&G.flags; if(!F) return 0; if(MOON.anim) return MOON.anim.t<MOON_CRUNCH?MOON.anim.from:MOON.anim.to; return F.moon_hud!=null?clamp(F.moon_hud|0,0,6):bitesOf(); };
 function moonCalm(){
   return G&&G.mode==='story'&&scene==='play'&&!DLG&&!G.inCombat&&!(G.boss&&!G.boss.dead)&&!(player&&player.dead)&&!G.mini&&!(G.fade>0.3)
-    &&!(typeof EV!=='undefined'&&EV.dream)&&!PEBRT.crow;
+    &&!(typeof EV!=='undefined'&&EV.dream)&&!PEBRT.crow&&!moonCardOn();
 }
+// a chapter or act card on screen (showCard): the bite waits for it, so the two never stack
+let MOON_CARD_EL=null;
+function moonCardOn(){ if(!MOON_CARD_EL) MOON_CARD_EL=document.getElementById('card'); return !!(MOON_CARD_EL&&MOON_CARD_EL.classList.contains('on')); }
 // what a tap on the HUD moon (and the journal) says
 function moonText(b){
   b=b==null?bitesOf():b; const L=moonLook();
