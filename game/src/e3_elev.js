@@ -309,6 +309,8 @@ function elvClearAt(E,x,y,m){ for(const z of E.clears){ if(x<z.bb[0]-m||y<z.bb[1
 { const base=blockedAt; blockedAt=function(x,y){ if(!ELV.ign&&x<IZX-50){ const g=elvGrid(x,y); if(g){ const c=elvIdx(g,x,y); if(c>=0&&(g.F[c]&EF.FACE)) return true; } } return base(x,y); }; }
 // a spawn spot near (x,y) stays on the level of (x,y): camps on a plateau spawn up there, not on the ground below
 { const base=spotNear; spotNear=function(x,y,r0,r1,avoid){ const g=elvGrid(x,y); if(!g) return base(x,y,r0,r1,avoid); const was=ELV.spotL; ELV.spotL=elevLvl(x,y); try{ return base(x,y,r0,r1,avoid); } finally{ ELV.spotL=was; } }; }
+// (and a companion who catches up with Ash lands on his level)
+{ const base=compSpotNear; compSpotNear=function(x,y,a){ const g=elvGrid(x,y); if(!g) return base(x,y,a); const was=ELV.spotL; ELV.spotL=elevLvl(x,y); try{ return base(x,y,a); } finally{ ELV.spotL=was; } }; }
 { const base=freeSpot; freeSpot=function(x,y,r){ if(!base(x,y,r)) return false; if(ELV.spotL!=null&&elvGrid(x,y)&&elevLvl(x,y)!==ELV.spotL) return false; return true; }; }
 // plateau tops a touch lighter with height (and in the style's top colour); faces read as rock on the overview
 { const base=groundRGB; groundRGB=function(s,x,y){
@@ -742,7 +744,7 @@ function elvPaintChunk(ch,cx,cy){
     gl.restore();
   }
 }
-{ const base=genChunk; genChunk=function(cx,cy){ const ch=base(cx,cy); try{ elvPaintChunk(ch,cx,cy); }catch(e){ console.error('elev chunk',e); } return ch; }; }
+{ const base=genChunk; genChunk=function(cx,cy){ const ch=base(cx,cy); const t0=performance.now(); try{ elvPaintChunk(ch,cx,cy); }catch(e){ console.error('elev chunk',e); } const st=ELV.pstat||(ELV.pstat={n:0,ms:0,max:0}), d=performance.now()-t0; if(d>0.2){ st.n++; st.ms+=d; st.max=Math.max(st.max,d); } return ch; }; }
 
 // ---------- live art: vents breathe hot air, falls splash, and the debug grid
 function elvLiveE(){ if(!G||AREA||!player) return null; const E=ELV.maps[curMap()]; if(!E) return null; if(E.dirty) elvBuild(E); return E; }
