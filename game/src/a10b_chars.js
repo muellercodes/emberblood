@@ -204,6 +204,8 @@ function drawEgg(e,fl){
   if(e.hatch<2){ ctx.strokeStyle='#3a2010'; ctx.lineWidth=1.1; ctx.beginPath(); ctx.moveTo(-6,-2); ctx.lineTo(-2,1); ctx.lineTo(1,-3); ctx.lineTo(5,0); ctx.stroke(); }
   ctx.restore();
 }
+// 2D drawers for foe types this switch does not know (defineFoe in e8_foes.js fills it)
+const FOE2D={};
 function drawEnemy(e){
   const fl=e.flash>0;
   ctx.save();
@@ -220,6 +222,7 @@ function drawEnemy(e){
     case 'gnarl': drawGnarl(e,fl); break; case 'serpent': drawSerpent(e,fl); break; case 'skrae': drawSkrae(e,fl); break; case 'knot': break;
     case 'bramble': drawBramble(e,fl); break; case 'crab': drawCrab(e,fl); break; case 'eel': drawEel(e,fl); break; case 'gust': drawGust(e,fl); break;
     case 'sneak': drawKobold(e,0.92,fl,false); ctx.fillStyle='#c8a050'; ctx.beginPath(); ctx.arc(e.x-Math.cos(e.face)*9,e.y-Math.sin(e.face)*9,6,0,TAU); ctx.fill(); ctx.fillStyle='#8a6a2a'; ctx.fillRect(e.x-Math.cos(e.face)*9-1,e.y-Math.sin(e.face)*9-7,2,4); break;
+    default: { const f=FOE2D[e.type]; if(f) f(e,fl); }
   }
   ctx.restore();
   const topY=(T3.on&&e._t3top!=null)?e._t3top:e.y-e.r;  // 3D drawers set e._t3top to the top of the head (world y)
