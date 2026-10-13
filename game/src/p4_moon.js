@@ -112,7 +112,7 @@ function p4SandAt(x,y){
 }
 // quicksand underfoot: 0 none, 1 quicksand, 2 deep quicksand
 function p4SinkAt(x,y){
-  if(x>=IZX-50){ if(!AREA||!AREA.cave) return 0; const k=tCell(x,y); if(k<0) return 0; const t=AREA.cave.typ[k]; if(t!==P4T.qs&&t!==P4T.qsd) return 0; if(AREA.p4&&AREA.p4.plate&&AREA.p4.plate.get(k)>0) return 0; return t===P4T.qsd?2:1; }
+  if(x>=IZX-50){ if(!AREA||!AREA.cave||!AREA.cave.typ) return 0; const k=tCell(x,y); if(k<0) return 0; const t=AREA.cave.typ[k]; if(t!==P4T.qs&&t!==P4T.qsd) return 0; if(AREA.p4&&AREA.p4.plate&&AREA.p4.plate.get(k)>0) return 0; return t===P4T.qsd?2:1; }
   if(outOfMap(x,y,30)||y<BAND) return 0;
   if(P4.plates.length&&p4PlateAt(x,y)) return 0;
   P4S.sink=0; P4S.sinkDeep=0; const s=T(x,y,P4S); if(s.water) return 0; return s.sink>0.5?(s.sinkDeep>0.5?2:1):0;
@@ -193,7 +193,7 @@ function p4GlassAt(x,y){ if(!P4.glass.length||x>=IZX-50) return null; for(const 
 function p4GlassSolidAt(x,y){ if(P4.noGlass) return false; const o=p4GlassAt(x,y); return !!o&&p4GlassSolid(o)&&o.shown; }
 // glass plates (Blaze on quicksand): p4GlassPlate(x,y) outdoors or on a dungeon quicksand cell, for P4N.plate seconds
 function p4GlassPlate(x,y,r){
-  if(x>=IZX-50){ const A=AREA; if(!A||!A.p4) return false; const k=tCell(x,y); if(k<0) return false; const t=A.cave.typ[k]; if(t!==P4T.qs&&t!==P4T.qsd) return false; A.p4.plate.set(k,P4N.plate); emit(x,y,14,{col:'230,240,255',smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); return true; }
+  if(x>=IZX-50){ const A=AREA; if(!A||!A.p4||!A.cave||!A.cave.typ) return false; const k=tCell(x,y); if(k<0) return false; const t=A.cave.typ[k]; if(t!==P4T.qs&&t!==P4T.qsd) return false; A.p4.plate.set(k,P4N.plate); emit(x,y,14,{col:'230,240,255',smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); return true; }
   const q=P4.plates.find(p=>dist(p.x,p.y,x,y)<20); if(q){ q.t=P4N.plate; return true; }
   P4.plates.push({x,y,r:r||46,t:P4N.plate}); emit(x,y,14,{col:'230,240,255',smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); return true;
 }
@@ -708,7 +708,7 @@ function p4DiveAfter(p,dt,inp){
   const k=AREA&&AREA.cave?tCell(p.x,p.y):-1;
   if(!p4DeepAt(p.x,p.y)){ if(p4Surface(p,true)) return; }
   // currents push a diver too (Water Stride's push is the engine's own)
-  if(AREA&&AREA.cave&&k>=0&&AREA.cave.typ[k]===TY.current&&!canWalkWater()){ const d=FLOW[AREA.cave.flow[k]]||FLOW[1]; tNudge(p,d[0]*175*dt,d[1]*175*dt); }
+  if(AREA&&AREA.cave&&AREA.cave.typ&&k>=0&&AREA.cave.typ[k]===TY.current&&!canWalkWater()){ const d=FLOW[AREA.cave.flow[k]]||FLOW[1]; tNudge(p,d[0]*175*dt,d[1]*175*dt); }
   // bubbles refill the air
   for(const o of p4Objs()) if(o.p4==='bubbles'&&p4BubOn(o)&&dist2(p.x,p.y,o.x,o.y)<(o.r+p.r)**2) p4AirFill(o);
   if(AREA&&AREA.p4) for(const o of AREA.p4.bubbles) if(p4BubOn(o)&&dist2(p.x,p.y,o.x,o.y)<(o.r+p.r)**2) p4AirFill(o);

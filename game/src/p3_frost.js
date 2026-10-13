@@ -687,7 +687,7 @@ function p3Restore(){
 // toA,toB}}, vanes:{'c,r':{id,dir}}, bells:{'c,r':{name}}, locks:{'c,r':{cover:'dome'|'lid'|'none'}}, order:[bell names],
 // timed (bells), lightsPitch:3, lightsTile:1, iceChests:true, onChain(R,o), onRune(R,o), onDrum(R,o), onVane(R,o).
 // Link types: 'ice' (a door plugged with ice: Blaze 1.5 s) and 'chain' (held by a chain lock K in the room it opens from).
-const P3T={crack:60,drift:61};
+const P3T={crack:50,drift:51};   // (not 60 and 61: p4_moon's cells are 60..69, its genCaveRooms took a drift for an arch wall)
 Object.assign(PUZZLE_KINDS,{melt:1,thaw:1,chains:1,bells:1,drum:1,lightsout:1,runes:1});
 Object.assign(SEAL_KINDS,{melt:1,thaw:1,chains:1,bells:1,drum:1,lightsout:1,runes:1});
 Object.assign(DOOR_COL,{ice:'170,220,255',chain:'190,160,250'}); Object.assign(LINK_CH,{ice:'i',chain:'k'});
