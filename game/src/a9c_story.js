@@ -176,8 +176,9 @@ function finalChoice(){
   lines.push(ch('ash',`What will you do?`,opts));
   runDialogue(lines,()=>{
     const E=ENDINGS[G.choices.ending||'hero'];
-    runDialogue(E.lines.concat([['narr',`Emberhollow held the biggest Lantern Day in a thousand years. Maren made a speech. Yara counted the lanterns twice.`]],EPILOGUE_FMT()),()=>{
-      scene='play'; G.stage='done'; G.done=true;
+    runDialogue(E.lines.concat(heartLines(G.choices.ending||'hero'),[['narr',`Emberhollow held the biggest Lantern Day in a thousand years. Maren made a speech. Yara counted the lanterns twice.`]],EPILOGUE_FMT()),()=>{
+      // Act I is over (G.flags.act1_done); G.done stays false, it means the whole game is finished (e7_acts.js)
+      scene='play'; G.stage='done'; G.flags.act1_done=true; G.done=false;
       const seen=store.get('eb_endings',{}); seen[G.choices.ending||'hero']=true; store.set('eb_endings',seen);
       saveGame(true); victory();
     });
@@ -314,5 +315,5 @@ function loadGame(s){
 function clearStatic(){ for(const c of CHESTS) c.open=false; for(const L of LANTERNS) L.lit=false; for(const l of LILIES) l.taken=false; if(GATE_COL) GATE_COL.off=false; for(const [,a] of PROPS) for(const p of a) p.taken=false; }
 function saveSummary(s){
   if(!s||s.v!==3||s.deleted) return null;
-  return `Level ${(s.p&&s.p.level)||1} · ${s.done?'Free roam':CHAPTER[s.stage]||'Lantern Day'} · ${DIFFS[clamp(s.diff|0,0,2)].name}`;
+  return `${stageLabel(s)} · Level ${(s.p&&s.p.level)||1} · ${DIFFS[clamp(s.diff|0,0,2)].name}`;
 }

@@ -43,10 +43,10 @@ const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom ha
 function renderJournal(){
   const el=$('#journal'); if(!el) return;
   const o=questObjective(), n=activeQuests().length;
-  el.innerHTML=`<div class="jh">${escapeHtml(CHAPTER[G.stage]||'')}</div>${o?`<div class="jq">◆ ${escapeHtml(o.text)}</div>`:''}<p style="margin-top:6px">${n?`${n} side quest${n>1?'s':''} on the go. Blue diamonds on the map show where they lead.`:'No side quests yet. Look for a gold ! over people’s heads.'} Open the Journal to choose which ones to follow.</p>`;
+  el.innerHTML=`<div class="jh">${escapeHtml(stageLabel())}</div>${o?`<div class="jq">◆ ${escapeHtml(o.text)}</div>`:''}<p style="margin-top:6px">${n?`${n} side quest${n>1?'s':''} on the go. Blue diamonds on the map show where they lead.`:'No side quests yet. Look for a gold ! over people’s heads.'} Open the Journal to choose which ones to follow.</p>`;
 }
 // ---------- journal
-let jTab='quests';
+let jTab='quests', jHint=false;
 function openJournal(){
   if(!G||G.mode!=='story'||scene!=='play') return;
   scene='journal'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; SFX.play('ui');
@@ -59,7 +59,7 @@ function renderJour(){
   const el=$('#jBody'), rows=[], E=t=>escapeHtml(simplify(t));
   if(jTab==='quests'){
     const o=questObjectiveWorld(), sf=!G.focus;
-    rows.push(`<div class="jq${sf?' foc':''}"><div class="qt">${sf?'◆ ':''}${E(CHAPTER[G.stage]||'The story')}<small>Main story</small></div><div class="qs">${E(o?o.text:'')}</div><div class="row">${sf?'<button class="btn c sm" disabled>Following</button>':'<button class="btn c sm hot" data-f="">Follow</button>'}</div></div>`);
+    rows.push(`<div class="jq${sf?' foc':''}"><div class="qt">${sf?'◆ ':''}${E(CHAPTER[G.stage]||'The story')}<small>${E(G.done?'Main story':actLabel(G.act)+' · Main story')}</small></div><div class="qs">${E(o?o.text:'')}</div>${jHint?`<div class="qs" style="color:#ffd9a0">${E(personName('yara'))}: ${E(hintLine())}</div>`:''}<div class="row">${sf?'<button class="btn c sm" disabled>Following</button>':'<button class="btn c sm hot" data-f="">Follow</button>'}<button class="btn c sm" data-hint="1">${jHint?'Hide hint':'Hint'}</button></div></div>`);
     const act=activeQuests(), side=act.filter(id=>!QDEFS[id].errand), err=act.filter(id=>QDEFS[id].errand);
     const card=id=>{ const d=QDEFS[id], f=G.focus===id, t=isTracked(id);
       return `<div class="jq${f?' foc':''}"><div class="qt">${f?'◆ ':''}${E(d.title.replace('Errand: ',''))}<small>${E(giverLine(d))}</small></div><div class="qs">${E(stepText(id))}</div><div class="row">${f?'<button class="btn c sm" disabled>Following</button>':`<button class="btn c sm hot" data-f="${id}">Follow</button>`}<button class="btn c sm" data-t="${id}">${t?'Hide from screen':'Show on screen'}</button></div></div>`; };
@@ -70,7 +70,7 @@ function renderJour(){
     const done=Object.keys(G.quests).filter(id=>G.quests[id].done&&QDEFS[id]);
     if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${E(done.map(id=>QDEFS[id].title.replace('Errand: ','')).join(' · '))}</p>`);
   }else if(jTab==='story'){
-    rows.push(`<div class="jh2">${E(CHAPTER[G.stage]||'')}</div><p>${E(SO_FAR[G.stage]||'')}</p>`);
+    { const A=ACTS[G.act]; rows.push(`<div class="jh2">${E(G.done?'The End':actLabel(G.act)+(A&&A.name?': '+A.name:''))}</div><p><b style="color:var(--ink)">${E(CHAPTER[G.stage]||'')}</b><br>${E(soFarText(G.stage))}</p>`); }
     const c=G.choices, ch=[];
     if(c.morrow) ch.push(c.morrow==='free'?'You let High Priest Morrow go home.':'You took High Priest Morrow to the Watch House.');
     if(c.fennick) ch.push(c.fennick==='forgive'?'You forgave Fennick Wick.':'You turned Fennick Wick in to Captain Osric.');
@@ -80,7 +80,7 @@ function renderJour(){
     if(ch.length) rows.push(`<div class="jh2">Choices you made</div><ul>${ch.map(t=>`<li>${E(t)}</li>`).join('')}</ul>`);
     rows.push(`<div class="jh2">The Wardens’ Account</div><p>${Object.keys(G.pages).length} of 10 lost pages found.</p>`+Object.keys(G.pages).sort((a,b)=>+a.slice(1)-+b.slice(1)).map(k=>`<p><b style="color:var(--ink)">${E(PAGES[k].title)}</b><br>${E(PAGES[k].text.join(' '))}</p>`).join(''));
     const seen=store.get('eb_endings',{}), ne=Object.keys(seen).length;
-    rows.push(`<div class="jh2">Endings found</div><p>${ne} of 4${ne?': '+E(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · ')):''}. Different choices lead to different endings.</p>`);
+    rows.push(`<div class="jh2">Act I endings found</div><p>${ne} of 4${ne?': '+E(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · ')):''}. Different choices lead to different endings.</p>`);
   }else if(jTab==='people'){
     const met=CAST.filter(c=>!c.generic&&(G.seenTalk&&G.seenTalk['met_'+c.id]));
     rows.push(`<p>People you've met: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
@@ -98,6 +98,7 @@ function renderJour(){
   el.innerHTML=rows.join('');
   if(jTab==='hero') heroTabWire(el);
   if(jTab==='log') logJourWire(el);
+  for(const b of el.querySelectorAll('button[data-hint]')) b.addEventListener('click',()=>{ jHint=!jHint; SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-f]')) b.addEventListener('click',()=>{ followQuest(b.dataset.f||null); SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
 }
@@ -292,7 +293,7 @@ $('#bRestart').addEventListener('click',()=>startNormal());
 $('#bQuit').addEventListener('click',toMenu);
 $('#bRetry').addEventListener('click',()=>{ SFX.play('ui'); if(G.mode==='story') respawn(); else startNormal(); });
 $('#bDeadMenu').addEventListener('click',()=>{ if(G.mode==='story'){ respawn(); } toMenu(); });
-$('#bWinExplore').addEventListener('click',()=>{ scene='play'; hideAll(); setBanner('Free roam','The valley is yours to explore.',2.4); });
+$('#bWinExplore').addEventListener('click',()=>{ scene='play'; hideAll(); if(!actsWinExplore()) setBanner('Free roam','The valley is yours to explore.',2.4); });
 $('#bWinMenu').addEventListener('click',toMenu);
 
 // ================= loop
