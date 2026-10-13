@@ -127,25 +127,24 @@ const ELEV={
 };
 
 // ---------- rasterising a map into its grid
-function elvScanFill(rings,g,fn){
-  // even-odd scanline fill over all rings; fn(cellIndex) for each cell whose centre is inside
+// even-odd scanline fill over all rings: fn(rowStart, i0, i1) for each run of cells whose centres are inside
+function elvScanSpans(rings,g,fn){
   const cs=g.cs, rows=new Map();
-  let j0=1e9, j1=-1e9;
   for(const r of rings) for(let i=0;i<r.n;i++){
     const ax=r.x[i], ay=r.y[i], q=(i+1)%r.n, bx=r.x[q], by=r.y[q]; if(ay===by) continue;
     const ya=Math.min(ay,by), yb=Math.max(ay,by), ja=Math.ceil((ya-g.y0)/cs-0.5), jb=Math.floor((yb-g.y0)/cs-0.5);
-    for(let j=Math.max(0,ja);j<=Math.min(g.h-1,jb);j++){ const yc=g.y0+(j+0.5)*cs; if(yc<ya||yc>=yb) continue; let a=rows.get(j); if(!a){ a=[]; rows.set(j,a); } a.push(ax+(yc-ay)*(bx-ax)/(by-ay)); if(j<j0) j0=j; if(j>j1) j1=j; }
+    for(let j=Math.max(0,ja);j<=Math.min(g.h-1,jb);j++){ const yc=g.y0+(j+0.5)*cs; if(yc<ya||yc>=yb) continue; let a=rows.get(j); if(!a){ a=[]; rows.set(j,a); } a.push(ax+(yc-ay)*(bx-ax)/(by-ay)); }
   }
   for(const [j,xs] of rows){
     xs.sort((a,b)=>a-b);
     for(let k=0;k+1<xs.length;k+=2){
       const ia=Math.max(0,Math.ceil((xs[k]-g.x0)/cs-0.5)), ib=Math.min(g.w-1,Math.floor((xs[k+1]-g.x0)/cs-0.5));
-      for(let i=ia;i<=ib;i++) fn(j*g.w+i);
+      if(ib>=ia) fn(j*g.w,ia,ib);
     }
   }
 }
 function elvBuild(E){
-  E.dirty=false; ELV.rev++;
+  E.dirty=false; ELV.rev++; const PT0=performance.now(), PT=[], pt=l=>PT.push(l+' '+(performance.now()-PT0).toFixed(1));
   if(!E.plats.length){ E.G=null; return; }
   const cs=ELV.cs, M=MAPS[E.k]||MAPS[0];
   let bx0=1e9,by0=1e9,bx1=-1e9,by1=-1e9;
@@ -154,11 +153,13 @@ function elvBuild(E){
   bx0=Math.max(bx0,-cs*4); by0=Math.max(by0,M.y0-cs*4); bx1=Math.min(bx1,M.w+cs*4); by1=Math.min(by1,M.y0+M.h+cs*4);
   const x0=Math.floor(bx0/cs)*cs, y0=Math.floor(by0/cs)*cs, w=Math.ceil((bx1-x0)/cs)+1, h=Math.ceil((by1-y0)/cs)+1, N=w*h;
   const g={x0,y0,w,h,cs,L:null,F:new Uint8Array(N),ST:new Uint8Array(N),RI:new Uint8Array(N),k:E.k};
-  const R=new Uint8Array(N), OW=new Uint16Array(N), FO=new Uint16Array(N), TMP=new Uint8Array(N);
-  // 1. raw levels: the highest plateau over each cell
-  E.plats.forEach((P,pi)=>{ elvScanFill(P.rings,g,c=>{ if(P.lvl>=R[c]){ R[c]=P.lvl; OW[c]=pi+1; } }); });
+  // R raw level, OWB the top owner's step (1) and climb (2) bits, TMP: 1 step face, 2 other face, 4 climbable, 8 rim, 16 rim candidate
+  const R=new Uint8Array(N), OWB=new Uint8Array(N), TMP=new Uint8Array(N), ST=g.ST, FL=[];
+  // 1. raw levels: the highest plateau over each cell (and its look)
+  E.plats.forEach((P,pi)=>{ const lv=P.lvl, lk=P.look, ob=(P.step?1:0)|(P.climb?2:0); elvScanSpans(P.rings,g,(row,ia,ib)=>{ for(let c=row+ia,e=row+ib;c<=e;c++) if(lv>=R[c]){ R[c]=lv; OWB[c]=ob; ST[c]=lk; } }); });
   const rAt=(x,y)=>{ const i=Math.floor((x-x0)/cs), j=Math.floor((y-y0)/cs); return i<0||j<0||i>=w||j>=h?0:R[j*w+i]; };
   const L=R.slice(); g.L=L;
+  pt('raw');
   // 2. face geometry (what lies just outside each vertex decides how tall the face below it is), then 3. its cells
   for(const P of E.plats){
     const per=P.step?ELV.step:ELV.px; let fb=P.bb.slice();
@@ -184,17 +185,32 @@ function elvBuild(E){
     }
     P.fb=fb;
   }
+  pt('geom');
+  // each front segment's face quad, filled row by row (a quad crosses a row at most at 4 points)
+  const QX=new Float64Array(4), QY=new Float64Array(4), XS=new Float64Array(4);
   E.plats.forEach((P,pi)=>{
+    const lv=P.lvl, tbits=(P.step?1:2)|(P.climb?4:0), lk=P.look;
     for(const r of P.rings) for(let i=0;i<r.n;i++){
       if(!r.front[i]) continue; const q=(i+1)%r.n;
-      const quad={n:4,x:[r.x[i],r.x[q],r.x[q]+r.bxv[q],r.x[i]+r.bxv[i]],y:[r.y[i],r.y[q],r.y[q]+r.byv[q],r.y[i]+r.byv[i]]};
-      elvScanFill([quad],g,c=>{
-        if(R[c]>=P.lvl) return;
-        if(P.lvl>L[c]||!(g.F[c]&EF.FACE)){ L[c]=Math.max(L[c],P.lvl); }
-        if(P.lvl>=L[c]){ g.F[c]|=EF.FACE; FO[c]=pi+1; TMP[c]|=P.step?1:2; if(P.climb) TMP[c]|=4; }
-      });
+      QX[0]=r.x[i]; QX[1]=r.x[q]; QX[2]=r.x[q]+r.bxv[q]; QX[3]=r.x[i]+r.bxv[i];
+      QY[0]=r.y[i]; QY[1]=r.y[q]; QY[2]=r.y[q]+r.byv[q]; QY[3]=r.y[i]+r.byv[i];
+      const ya=Math.min(QY[0],QY[1],QY[2],QY[3]), yb=Math.max(QY[0],QY[1],QY[2],QY[3]);
+      const ja=Math.max(0,Math.ceil((ya-y0)/cs-0.5)), jb=Math.min(h-1,Math.floor((yb-y0)/cs-0.5));
+      for(let j=ja;j<=jb;j++){
+        const yc=y0+(j+0.5)*cs; let n=0;
+        for(let e=0;e<4;e++){ const ax=QX[e], ay=QY[e], bx=QX[(e+1)&3], by=QY[(e+1)&3]; if(ay===by) continue; if(yc<Math.min(ay,by)||yc>=Math.max(ay,by)) continue; XS[n++]=ax+(yc-ay)*(bx-ax)/(by-ay); }
+        if(n<2) continue;
+        let xa=XS[0], xb=XS[0]; for(let k=1;k<n;k++){ if(XS[k]<xa) xa=XS[k]; if(XS[k]>xb) xb=XS[k]; }
+        const ia=Math.max(0,Math.ceil((xa-x0)/cs-0.5)), ib=Math.min(w-1,Math.floor((xb-x0)/cs-0.5));
+        for(let ii=ia;ii<=ib;ii++){
+          const c=j*w+ii; if(R[c]>=lv) continue;
+          if(lv>L[c]) L[c]=lv;
+          if(lv>=L[c]){ if(!(g.F[c]&1)){ g.F[c]|=1; FL.push(c); } TMP[c]|=tbits; ST[c]=lk; }
+        }
+      }
     }
   });
+  pt('faces');
   // 4. ramps cut through the faces (and reach on through any face cells beyond their rect)
   const F=g.F, ci=(x,y)=>{ const i=Math.floor((x-x0)/cs), j=Math.floor((y-y0)/cs); return i<0||j<0||i>=w||j>=h?-1:j*w+i; };
   E.ramps.forEach((rp,ri)=>{
@@ -222,26 +238,33 @@ function elvBuild(E){
     rp.ax0=x0+ex0*cs; rp.ax1=x0+(ex1+1)*cs; rp.ay0=y0+ey0*cs; rp.ay1=y0+(ey1+1)*cs;
     for(let j=ey0;j<=ey1;j++) for(let i=ex0;i<=ex1;i++){ const c=j*w+i; if(g.RI[c]===ri+1) L[c]=rp.lo; }
   });
+  pt('ramps');
   // 5. rims: any two touching walkable cells of different levels get the higher one blocked (the back edge of a top)
-  const RIMB=new Uint8Array(N);
-  for(let j=1;j<h-1;j++) for(let i=1;i<w-1;i++){
-    const c=j*w+i; if(F[c]&EF.FACE) continue; const lc=L[c], rc=F[c]&EF.RAMP?E.ramps[g.RI[c]-1]:null;
-    for(let dj=-1;dj<=1;dj++) for(let di=-1;di<=1;di++){
-      if(!di&&!dj) continue; const d=c+dj*w+di; if(F[d]&EF.FACE) continue;
-      const rd=F[d]&EF.RAMP?E.ramps[g.RI[d]-1]:null;
-      if(rc&&rd) continue;
-      if(rd){ if(lc!==rd.lo&&lc!==rd.hi) RIMB[c]=1; continue; }
-      if(rc){ const ld=L[d]; if(ld!==rc.lo&&ld!==rc.hi) RIMB[d]=1; continue; }
-      if(L[d]!==lc){ if(lc>L[d]) RIMB[c]=1; else RIMB[d]=1; }
-    }
+  // levels only change along plateau outlines and ramp edges, so only cells near those are checked (all 8 neighbours)
+  const RI=g.RI, RP=E.ramps, RLO=new Uint8Array(RP.length+1), RHI=new Uint8Array(RP.length+1), CL=[], RL=[];
+  RP.forEach((r,i)=>{ RLO[i+1]=r.lo; RHI[i+1]=r.hi; });
+  const cand=(i,j)=>{ for(let b=Math.max(1,j-1);b<=Math.min(h-2,j+1);b++) for(let a=Math.max(1,i-1);a<=Math.min(w-2,i+1);a++){ const c=b*w+a; if(!(TMP[c]&16)){ TMP[c]|=16; CL.push(c); } } };
+  for(const P of E.plats) for(const r of P.rings) for(let i=0;i<r.n;i++){
+    const q=(i+1)%r.n, ax=r.x[i], ay=r.y[i], dx=r.x[q]-ax, dy=r.y[q]-ay, m=Math.max(1,Math.ceil(Math.hypot(dx,dy)/(cs*0.5)));
+    for(let k=0;k<=m;k++) cand(Math.floor((ax+dx*k/m-x0)/cs),Math.floor((ay+dy*k/m-y0)/cs));
   }
-  for(let c=0;c<N;c++) if(RIMB[c]){ F[c]|=EF.FACE|EF.RIM; const o=OW[c]?E.plats[OW[c]-1]:null; if(o){ if(o.climb) TMP[c]|=4; TMP[c]|=o.step?1:2; } }
+  for(const rp of RP){ if(rp.ax0==null) continue; const i0=Math.floor((rp.ax0-x0)/cs), i1=Math.floor((rp.ax1-x0)/cs)-1, j0=Math.floor((rp.ay0-y0)/cs), j1=Math.floor((rp.ay1-y0)/cs)-1; for(let i=i0;i<=i1;i++){ cand(i,j0); cand(i,j1); } for(let j=j0;j<=j1;j++){ cand(i0,j); cand(i1,j); } }
+  const mark=c=>{ if(!(TMP[c]&8)){ TMP[c]|=8; RL.push(c); } };
+  const pair=(c,d)=>{
+    const fc=F[c], fd=F[d]; if((fc|fd)&1) return;
+    const lc=L[c], ld=L[d]; if(lc===ld&&!((fc|fd)&8)) return;
+    const rc=fc&8, rd=fd&8; if(rc&&rd) return;
+    if(rd){ const k=RI[d]; if(lc!==RLO[k]&&lc!==RHI[k]) mark(c); return; }
+    if(rc){ const k=RI[c]; if(ld!==RLO[k]&&ld!==RHI[k]) mark(d); return; }
+    if(lc>ld) mark(c); else mark(d);
+  };
+  for(const c of CL){ pair(c,c-w-1); pair(c,c-w); pair(c,c-w+1); pair(c,c-1); pair(c,c+1); pair(c,c+w-1); pair(c,c+w); pair(c,c+w+1); }
+  for(const c of RL){ F[c]|=EF.FACE|EF.RIM; const o=OWB[c]; if(o&2) TMP[c]|=4; TMP[c]|=o&1?1:2; }
+  pt('rims');
   // 6. ledges, steps, climbable faces, looks
   for(const l of E.ledges){ const i0=clamp(Math.floor((l.x0-x0)/cs)-1,0,w-1), i1=clamp(Math.floor((l.x1-x0)/cs)+1,0,w-1), j0=clamp(Math.floor((l.y0-y0)/cs)-1,0,h-1), j1=clamp(Math.floor((l.y1-y0)/cs)+1,0,h-1); for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const c=j*w+i; if(F[c]&EF.FACE) F[c]|=EF.LEDGE; } }
-  for(let c=0;c<N;c++){
-    if(F[c]&EF.FACE){ if((TMP[c]&1)&&!(TMP[c]&2)) F[c]|=EF.STEP; if(TMP[c]&4) F[c]|=EF.CLIMB; }
-    const o=FO[c]&&(F[c]&EF.FACE)?FO[c]:OW[c]; g.ST[c]=o?E.plats[o-1].look:0;
-  }
+  for(const L2 of [FL,RL]) for(const c of L2){ const f=F[c]; if(!(f&1)) continue; const t=TMP[c]; if((t&1)&&!(t&2)) F[c]=f|16; if(t&4) F[c]|=2; }
+  pt('flags');
   // ledge lips: the front segments along each ledge; segments over a ramp or a ledge keep their baked look in depth mode
   for(const P of E.plats) for(const r of P.rings){ r.noLean=new Uint8Array(r.n); for(let i=0;i<r.n;i++){ if(!r.front[i]) continue; const q=(i+1)%r.n, mx=(r.x[i]+r.x[q])/2, my=(r.y[i]+r.y[q])/2; for(const rp of E.ramps) if(rp.ax0!=null&&mx>rp.ax0-6&&mx<rp.ax1+6&&my>rp.ay0-30&&my<rp.ay1) r.noLean[i]=1; } }
   for(const l of E.ledges){ l.segs=[]; for(const P of E.plats) for(const r of P.rings) for(let i=0;i<r.n;i++){ if(!r.front[i]) continue; const q=(i+1)%r.n, mx=(r.x[i]+r.x[q])/2, my=(r.y[i]+r.y[q])/2; if(mx>=l.x0-10&&mx<=l.x1+10&&my>=l.y0-24&&my<=l.y1+10){ l.segs.push([P,r,i]); r.noLean[i]=1; } } }
@@ -253,7 +276,7 @@ function elvBuild(E){
     f.y0=top!=null?Math.floor((top-y0)/cs)*cs+y0:f.y; f.y1=bot!=null?bot:f.y0+ELV.px; f.lvl=(()=>{ const c=ci(f.x,f.y0-6); return c<0?0:L[c]; })();
     f.bb=[f.x-f.w-30,f.y0-20,f.x+f.w+30,f.y1+40];
   }
-  E.G=g;
+  pt('end'); E.prof=PT; E.G=g;
 }
 
 // ---------- queries
@@ -424,6 +447,8 @@ function elvHopStep(p,dt){
   if(p&&p.hop){ if(AREA||p.dead){ p.hop=null; p.z=0; } else { elvHopStep(p,dt); try{ SFX.setFire(false); }catch(e){} return; } }
   base(dt,inp);
   if(p&&!AREA&&p.x<IZX-50) elvFlight(p,dt);
+  // a big grid of a map Ash has left is dropped (it is rebuilt the same if he comes back)
+  const k=curMap(); if(k!==ELV.lastK){ ELV.lastK=k; for(const E of ELV.maps) if(E&&E.k!==k&&E.G&&E.G.w*E.G.h>400000){ E.G=null; E.dirty=true; } }
 }; }
 // take-off fixes the flight ceiling: one level above where he stood (vents lift it)
 { const base=takeOff; takeOff=function(p){ base(p); p.elvBase=elevLvl(p.x,p.y); p.elvCeil=p.elvBase+1; const v=elvVentAt(p.x,p.y); if(v){ p.elvCeil=Math.max(p.elvCeil,v.lvl+1+v.lift); p.elvVentT=1.6; } }; }
