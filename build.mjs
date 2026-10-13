@@ -7,9 +7,9 @@ import { execFileSync } from 'node:child_process';
 const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_people','a1f_qdata','a1g_talk','a1h_quests2','a1i_quests3','a1j_quests4','a1l_story2','a2_world','a2b_cols','a2c_build','a2d_places','a2e_interiors','a2f_caves','a2g_floors','a2h_dungeons','a2i_reach','a3_art','a3b_art2','a3c_art3','a3d_art4','a3e_toy3d','a4_ground','a5_input','a5b_pad','a6_player','a6b_weapons','a6c_moves',
   'a7a_enemies','a7b_ai','a7c_bosses','a8_systems','a9a_env','a9b_flow','a9c_story','a9d_quests','a9e_meta','a9f_talk','a9g_mini','a9h_skills','a9i_comps','a9j_events','a10a_fx','a10b_chars','a10c_t3ash','a10d_t3people','a10e_t3beasts','a10f_t3foes','a10g_t3bosses','a11_render','a11c_depth','a11b_hud','a12a_dlg','a13_cloud','a14_music','a12c_log',
   // v9 engine (wave 1)
-  'e1_maps','e2_terrain','e3_elev','e4_cinder','e5_look','e6_balance','e6b_arms','e7_acts','e8_foes','e9a_dungeon','e9b_caves2',
+  'e1_maps','e2_terrain','e3_elev','e4_cinder','e5_look','e6_balance','e6b_arms','e7_acts','e7b_threads','e8_foes','e9a_dungeon','e9b_caves2',
   // v9 powers and the Act I rework
-  'p2_coast','p3_frost','p4_moon','x0_act1',
+  'p2_coast','p3_frost','p4_moon','x0_act1','x0_vorlaxis',
   // Act II, the Clockwork Coast
   'x1_world','x1_people','x1_foes','x1_story','x1_dun_a','x1_dun_b',
   // Act III, Frostreach
@@ -18,7 +18,7 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   'x3_world','x3_people','x3_foes','x3_story','x3_dun_a','x3_dun_b',
   // Finale, Nightfall Peak
   'x4_world','x4_foes','x4_story','x4_ascent',
-  'x9_music',
+  'x9_music','x9_music2',
   'a12b_ui'];
 const cfg = JSON.parse(readFileSync('game/config.json', 'utf8'));
 const api = process.env.API_BASE || cfg.apiBase || '';
