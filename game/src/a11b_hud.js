@@ -316,6 +316,7 @@ function drawTouch(){
     if(b.id==='weapon'){
       touchIcon('weapon',b.x,iy,b.r*0.62,'rgba(255,220,170,.75)');
       if(WICON_STUB){ touchIcon('attack',b.x,iy,b.r*0.42,col); } else drawWeaponIcon(ctx,curWeapon(),b.x,iy,b.r*0.95);
+      { const D=WEAPONS[curWeapon()], cs=D&&D.chip?D.chip(player):null; if(cs&&cs.count!=null) wCount(b.x+b.r*0.62,b.y-b.r*0.55,cs.count,cs.low,false); }
     }
     else if(use){ touchIcon(um.k,b.x,iy,b.r*0.6,'#ffe2a8',um.label); label=um.label; }
     else{ touchIcon(b.id,b.x,iy,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':b.id==='jump'?'#d8f0ff':col,b.label); if(b.id==='attack'&&autoAttackOn()) label='AUTO'; }

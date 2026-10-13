@@ -85,7 +85,8 @@ function ashSteelE(){ const t=(G&&G.tier)||0; return t>=3?'#1e4a80':t>0?'#3e5464
 function ashRangOut(){ if(!G||!G.wproj) return false; for(const q of G.wproj) if(q.k==='rang'&&!q.dead) return true; return false; }
 function ashWpnPose(p,wid,bz,sw){
   const W=AW, sp=p.swingT>0&&p.swingW===wid, pr=sp?clamp(1-p.swingT/p.swingDur,0,1):0;
-  W.useR=W.useL=false; W.twist=W.lean=W.gyaw=0; W.fin=false; W.hideR=W.hideL=false; W.hand=1; W.arrow=false; W.snap=0; W.fall=-1; W.glow=0;
+  W.useR=W.useL=false; W.twist=W.lean=W.gyaw=0; W.fin=false; W.hideR=W.hideL=false; W.hand=1; W.arrow=false; W.snap=0; W.fall=-1; W.glow=0; W.followL=false;
+  const D=WEAPONS[wid]; if(D&&D.pose3d){ D.pose3d(p,W,bz,sw,pr,sp); return; }   // registry weapons (e6b_arms.js)
   if(wid==='sword'){
     W.useR=true;
     if(sp){
@@ -258,7 +259,8 @@ function ashRangAt(cx,cy,cz,ux,uy,s,fire,lite){
 }
 const _ru=[0,0,0], _rv=[0,0,0];
 function ashWpnDraw(p,wid,pal){
-  const W=AW, t=p.t||0, tier=(G&&G.tier)||0;
+  const W=AW, t=p.t||0, tier=(G&&G.tier)||0, D=WEAPONS[wid];
+  if(D&&D.draw3d){ D.draw3d(p,W,pal,t,tier); return; }
   if(wid==='sword'){ ashBlade(W.hR,W.uR,W.vR,W.len,W.fin,pal,true); aMark('hand',W.hR[0],W.hR[1],W.hR[2]); }
   else if(wid==='daggers'){ if(!W.hideR) ashFang(W.hR,W.uR,W.vR,W.len,W.fin,pal); if(!W.hideL) ashFang(W.hL,W.uL,W.vL,W.lenL,W.fin,pal); aMark('hand',W.hR[0],W.hR[1],W.hR[2]); }
   else if(wid==='spear'){
@@ -369,7 +371,7 @@ function ashBuild(g,p,fx,fy,o){
   const gh=o.ghost||null, lite=!!gh, raw=!!o.raw, pal=lite?ASHG:ASHP, t=p.t||0;
   AFINE=!lite&&(raw||o.fine||(o.k||1)*zoom>=1.5);
   const A=gh?null:(p._a||(p._a={mv:0,spr:0,bank:0,roarT:0,lt:null,pf:null}));
-  for(const km in AM) AM[km].on=false; AHS.n=0;
+  for(const km in AM) AM[km].on=false; AHS.n=0; if(!gh) AINFO.wg=null;
   // the roll (0..1, or -1): ghosts remember the phase they were left at
   let rk=-1;
   if(gh){ if(gh._rk==null){ gh._rk=p.dashT>0?clamp(1-p.dashT/0.3,0,1):-1; gh._f=p._vf!=null?p._vf:gh.f; } rk=gh._rk; }
@@ -451,7 +453,7 @@ function ashBuild(g,p,fx,fy,o){
   if(wid){
     // the weapon follows the hand that holds it (after the reach limit, the drink and the roar moved the hands)
     if(wid!=='bow'){ const d0=hR[0]-AW.hR[0], d1=hR[1]-AW.hR[1], d2=hR[2]-AW.hR[2]; AW.hR[0]+=d0; AW.hR[1]+=d1; AW.hR[2]+=d2; if(wid==='spear'){ AW.P[0]+=d0; AW.P[1]+=d1; AW.P[2]+=d2; } }
-    if(wid==='daggers'||wid==='bow') vCopy(AW.hL,hL);
+    if(wid==='daggers'||wid==='bow'||AW.followL) vCopy(AW.hL,hL);
     if(wid==='bow'){ if(AW.arrow) vCopy(AW.P,hR); else if(!(AW.snap>0)) vSet(AW.P,hL[0]-AW.uL[0]*2.6,hL[1]-AW.uL[1]*2.6,hL[2]-AW.uL[2]*2.6); }
   }
   // ---- build
@@ -535,6 +537,8 @@ function ashPost(g,p,k){
   }
   if((I.wid==='sword'||I.wid==='spear')&&p.swingT>0&&AM.bA.on&&((G&&G.tier)||0)>=2){ aScr(AM.bA,a); aScr(AM.bB,b); g.save(); g.globalCompositeOperation='lighter'; g.strokeStyle=`rgba(120,190,255,${0.25+0.1*G.tier})`; g.lineWidth=3.5*k; g.lineCap='round'; g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke(); g.restore(); }
   if(I.fire&&AM.tip.on){ aScr(AM.tip,a); aGlow(g,a[0],a[1],9*k,'255,170,70',0.85); }
+  if(I.wg&&AM.tip.on){ aScr(AM.tip,a); aGlow(g,a[0],a[1],I.wg.r*k,I.wg.col,I.wg.a); }   // a registry weapon's glow (the glaive at night, a bomb's fuse)
+  if(AM.hand.on){ aScr(AM.hand,a); I.hx=a[0]; I.hy=a[1]; I.ht=G?G.time:0; }   // where the hand is on screen, for the whip's chain
   if(I.pk>0&&AM.hand.on){ aScr(AM.hand,a); g.save(); g.globalCompositeOperation='lighter'; g.strokeStyle=`rgba(255,220,150,${0.6*I.pk})`; g.lineWidth=1.5*k; g.beginPath(); g.arc(a[0],a[1],(9+12*(1-I.pk))*k,0,TAU); g.stroke(); g.restore(); aGlow(g,a[0],a[1],8*k,'255,220,150',0.4*I.pk); }
   // wing edges glow warm (much brighter at night and in flight)
   if(I.wo>0.08){
@@ -645,7 +649,7 @@ function ashSheet(rows,S,o){
   const save={weapon:G.weapon,weapons:G.weapons,abil:G.abil,hat:G.hat,tier:G.tier,wproj:G.wproj,mode:G.mode,flags:G.flags,tod:G.tod,flap:MV.flapPh,flapT:MV.flapT,show:MV.showWings,skills:G.skills};
   try{
     rows.forEach((r,ri)=>{
-      G.weapons={sword:true,daggers:true,spear:true,hammer:true,bow:true,boomerang:true}; G.weapon=r.w||'sword'; G.abil=r.abil||{}; G.hat=r.hat||null; G.tier=r.tier||0; G.wproj=r.rangOut?[{k:'rang'}]:[]; G.flags=Object.assign({},save.flags,{forge:r.unarmed?false:true}); G.mode=r.mode||'story'; G.skills=r.skills||{};
+      G.weapons={}; for(const id of WEAPON_IDS) G.weapons[id]=true; G.weapon=r.w||'sword'; G.abil=r.abil||{}; G.hat=r.hat||null; G.tier=r.tier||0; G.wproj=r.rangOut?[{k:'rang'}]:[]; G.flags=Object.assign({},save.flags,{forge:r.unarmed?false:true}); G.mode=r.mode||'story'; G.skills=r.skills||{};
       if(r.tod!=null) G.tod=r.tod; MV.flapPh=r.flap||0; MV.flapT=r.flapT||0; MV.showWings=0;
       g.setTransform(S,0,0,S,0,0); g.fillStyle='rgba(0,0,0,.6)'; g.font=`700 10px ${UIF}`; g.textAlign='left'; g.textBaseline='middle'; g.fillText(r.label||'',6,ri*chh+chh/2);
       for(let i=0;i<8;i++){
