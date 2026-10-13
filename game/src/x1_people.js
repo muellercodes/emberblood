@@ -171,7 +171,7 @@ const X1P_CAST=[
     lines:[S(`I'm Bob. He's also Bob. We are both Bob.`,`I am Bob. He is Bob too.`),
       S(`Tick. Tock. That's not the clock. That's us. The clock's broken.`,`Tick. Tock. That is us, not the clock.`),
       S(`There used to be three of us. We don't talk about Bob.`,`There were three of us. We don't talk about Bob.`)]},
-  {id:'c_mina',name:'Tide Warden Mina Mudge',town:'c_saltmarsh',home:true,house:'The Tide House',job:'scholar',col:'#e8c03a',
+  {id:'c_mina',name:'Tide Warden Mina Mudge',town:'c_saltmarsh',home:true,house:'The Tide Warden\'s Cottage',job:'scholar',col:'#e8c03a',
     look:{skin:'#e8bc98',hair:'#8a5a2a',hairdo:'braids',hat:'rain',hatc:'#e8c03a',outfit:'coat',shirt:'#e8c03a',low:'#3a4a5a',trim:'#3a4a5a',build:'slim',hold:'staff',freckles:true},
     lines:[S(`The Tide Clock doesn't make the tide, exactly. It reminds it. The sea is very forgetful.`,`The Tide Clock reminds the sea. The sea forgets things.`),
       S(`When it's low tide you can walk all the way to Gullcrag. Nobody does. Gulls. So many gulls.`,`At low tide you can walk to Gullcrag. So many gulls!`),
@@ -240,6 +240,9 @@ const X1P_SPOT={c_penny:[7050,25880],c_ravel:[7200,25980],c_jo:[6700,26500],c_po
     for(const c of CAST){
       const at=X1P_HOME[c.id]; if(!at||!c.home||c.generic) continue; i++;
       if(DOORS.some(d=>d.owner===c.id)){ c.home=false; took.push(c); continue; }
+      // x1_world plans the named homes itself (house.want, or a virtual home like Ambrose's workshop at the foot of the
+      // Great Clock): leave those to it, so nobody ends up in a neighbour's house
+      if(HOUSES.some(h=>h.want===c.id&&!h.area)||(typeof C1WD!=='undefined'&&C1WD.homes&&C1WD.homes.some(v=>v.want===c.id))) continue;
       const hs=HOUSES.filter(h=>h.town===c.town&&h.k==='house'&&!h.area); if(!hs.length) continue;
       let h=null, bd=1e18; for(const q of hs){ const d=dist2(q.x,q.y,at[0],at[1]); if(d<bd){ bd=d; h=q; } }
       if(!h||bd>900*900) continue;
@@ -267,7 +270,10 @@ const X1P_SPOT={c_penny:[7050,25880],c_ravel:[7200,25980],c_jo:[6700,26500],c_po
 function x1pDell(){ return !!G&&G.mode==='story'&&x1pQ('lure')&&x1pR('c_salt')&&actOf(G.stage)===2; }
 { const base=npcPresent; npcPresent=function(id){ if(id==='c_bob3') return x1pQ('c_bob')&&!X1P.bob3follow; return base(id); }; }
 // the third Bob stands with the other two once he is home (a SPECIAL with inside:'ev' is skipped by setupNPCs)
-{ const base=setupNPCs; setupNPCs=function(){ base(); try{ if(G&&G.mode==='story'&&npcPresent('c_bob3')){ const [x,y]=npcSpot(SPECIAL.c_bob3); G.npcs.push(mkNPC(SPECIAL.c_bob3,x,y)); } }catch(e){ console.error(e); } }; }
+{ const base=setupNPCs; setupNPCs=function(){ base(); try{ if(G&&G.mode==='story'&&npcPresent('c_bob3')){ const [x,y]=npcSpot(SPECIAL.c_bob3); G.npcs.push(mkNPC(SPECIAL.c_bob3,x,y)); } }catch(e){ console.error(e); }
+  // a coast person whose spot by the door ends up in water or a cliff face steps onto the nearest dry ground
+  try{ if(G&&G.npcs) for(const n of G.npcs){ if(n.y<20000||n.y>31000||n.x>=IZX-50||!blockedAt(n.x,n.y)) continue; const q=x1pDry(n.x,n.y); if(q){ n.x=q.x; n.y=q.y; if(n.home) n.home=[q.x,q.y]; } } }catch(e){ console.error(e); } }; }
+function x1pDry(x,y){ for(let d=12;d<=240;d+=12){ const k=Math.max(8,Math.round(d/8)); for(let i=0;i<k;i++){ const a=i/k*TAU+Math.PI/2, px=x+Math.cos(a)*d, py=y+Math.sin(a)*d; if(!blockedAt(px,py)&&!colAt(px,py,12)&&(typeof elevLvl!=='function'||elevLvl(px,py)===elevLvl(x,y-40))) return {x:px,y:py}; } } return null; }
 
 // a stand-in for the towns while the Act II world module is not in the build (the placeholder map 1): the five POIs,
 // the towns and a house at each named building, so homes, talk and quests can be played and tested
@@ -1006,23 +1012,40 @@ const X1P_PEP=[[3300,28400,'crab',2],[5200,28500,'c_gulper',1],[4500,27900,null,
 const X1P_SKIFF=[['quay',7400,26500,S('the Gearhaven quay','the Gearhaven quay')],['jetty',1360,27430,S('the Saltmarsh jetty','the Saltmarsh jetty')],['beach',11000,28800,S('the Lantern Point beach','the Lantern Point beach')],['break',7150,28950,S('the breakwater','the breakwater')]];
 function x1pHouseNear(x,y,town){ let h=null,bd=1e18; for(const q of HOUSES){ if(q.k!=='house'||(town&&q.town!==town)) continue; const d=dist2(q.x,q.y,x,y); if(d<bd){ bd=d; h=q; } } return h&&bd<700*700?h:null; }
 function x1pLM(o){ if(LANDMARKS.some(q=>q.id===o.id)) return null; o.noNudge=true; if(o.always===undefined&&'prompt' in o) o.always=true; return addLandmark(o); }
+// x1_world has its own look-at landmark on some of the same spots (the wreck, the sealed stone in the dragon's eye):
+// while ours is shown, theirs steps aside, so the quest prompt is the one Ash gets
+function x1pOver(o,worldId){ const w=o&&LANDMARKS.find(q=>q.id===worldId); if(!w) return o;
+  const p0=Object.getOwnPropertyDescriptor(w,'prompt')||{value:w.prompt};   // (only the prompt steps aside: its art stays)
+  Object.defineProperty(w,'prompt',{configurable:true,enumerable:true,get(){ if(!(o.hidden&&o.hidden())) return null; return p0.get?p0.get.call(w):p0.value; }});
+  return o; }
 function x1pBuild(B){
   // Granny Oona's chimney nest and the empty post beside her house
   { const h=x1pHouseNear(1150,27050,'c_saltmarsh'), x=h?h.x+h.w*0.25:1180, y=h?h.y-h.h*0.42:26990;
     x1pLM({id:'c_lm_oonanest',k:'c_nest',x,y,house:h,hidden:()=>!x1pAt('c_oona',0)||!!X1P.carry,prompt:S('Lift the gull nest','Lift the gull nest'),draw:x1pDrawNest,act:x1pNestAct});
     x1pLM({id:'c_lm_oonapost',k:'c_post',x:h?h.x+h.w/2+60:1260,y:h?h.y+h.h/2+12:27080,hidden:()=>!X1P.carry,prompt:S('Set the nest down on the post','Put the nest on the post'),draw:x1pDrawPost,act:x1pPostAct}); }
   // Vesper's note drops (c_notes) and the Moon Ring
-  { const h=x1pHouseNear(4300,25850,'c_gullsrest'), x=h?h.x-h.w*0.3:4320, y=h?h.y+h.h/2-6:25800;
+  // (x1_world gives the Gull's Rest a level 3 roof with a level 4 chimney: the note goes on the chimney top, so the
+  //  claws are really needed; without that world it sits on the house front as before)
+  { const h=x1pHouseNear(4300,25850,'c_gullsrest'); let x=h?h.x-h.w*0.3:4320, y=h?h.y+h.h/2-6:25800;
+    try{ if(typeof elevLvl==='function'&&elevLvl(4357,25752)>=4){ x=4357; y=25790; } }catch(e){}
     x1pLM({id:'c_lm_note3',k:'c_note',n:3,x,y,hidden:()=>!x1pR('c_brass')||!!G.flags.c_note3,prompt:S('Reach for the note on the chimney','Get the note on the chimney'),draw:x1pDrawNote,act:x1pNoteAct}); }
   x1pLM({id:'c_lm_note4',k:'c_note',n:4,x:8100,y:26900,hidden:()=>!x1pR('c_brass')||!!G.flags.c_note4,prompt:S('Reach for the note on the crane','Get the note on the crane'),draw:x1pDrawNote,act:x1pNoteAct});
-  x1pLM({id:'c_lm_note5',k:'c_note',n:5,x:7300,y:25180,hidden:()=>!x1pR('c_brass')||!!G.flags.c_note5,prompt:S('Look behind the falls','Look behind the falls'),draw:x1pDrawNote,act:x1pNoteAct});
+  // note 5: x1_world's alcove behind the falls (reached by riding the shadow lane c_lane_falls from the Great Stair
+  // landing) holds the note; the "look behind the falls" hint stays at the landing where the lane starts
+  { const lane=LANDMARKS.find(q=>q.id==='c_lane_falls'&&q.pts&&q.pts.length>1);
+    if(lane){ const a=lane.pts[0], b=lane.pts[lane.pts.length-1]; X1P.falls={x:b[0]+12,y:b[1]-22,r:95};
+      x1pLM({id:'c_lm_note5',k:'c_note',n:5,x:X1P.falls.x,y:X1P.falls.y,hidden:()=>!x1pR('c_brass')||!!G.flags.c_note5,draw:x1pDrawNote});
+      x1pOver(x1pLM({id:'c_lm_note5h',k:'c_note',n:5,x:a[0]-10,y:a[1],hidden:()=>!x1pR('c_brass')||!!G.flags.c_note5,prompt:S('Look behind the falls','Look behind the falls'),draw:()=>{},act:x1pNoteAct}),'c_lm_falls'); }
+    else{ X1P.falls={x:7300,y:25180,r:95}; x1pLM({id:'c_lm_note5',k:'c_note',n:5,x:7300,y:25180,hidden:()=>!x1pR('c_brass')||!!G.flags.c_note5,prompt:S('Look behind the falls','Look behind the falls'),draw:x1pDrawNote,act:x1pNoteAct}); } }
   x1pLM({id:'c_lm_note6',k:'c_note',n:6,x:1300,y:22600,hidden:()=>!(G.flags.c_note3&&G.flags.c_note4&&G.flags.c_note5)||!!G.flags.c_note6,prompt:S('Read the note on the tallest stone','Read the note on the stone'),draw:x1pDrawNote,act:x1pNoteAct});
   // the silver footprints (c_gifts), drawn only at night
   X1P_TRAIL.forEach(([x,y],i)=>{ if(i<X1P_TRAIL.length-1) x1pLM({id:'c_lm_trail'+i,k:'c_trail',i,x,y,hidden:()=>true,draw:x1pDrawTrail}); });
   // three sea peppers on the Rockpools (c_whip)
   X1P_PEP.forEach(([x,y],i)=>x1pLM({id:'c_lm_pep'+(i+1),k:'c_pepper',i,x,y,hidden:()=>!x1pAt('c_whip',1)||!!G.flags['c_pep'+(i+1)],prompt:S('Pick the sea pepper','Pick the sea pepper'),draw:x1pDrawPepper,act:x1pPepperAct}));
   // the deck of the Saucy Gull (c_whip): the ghost comes at night, at low tide, for the chowder
-  x1pLM({id:'c_lm_deck',k:'c_deck',x:4600,y:28300,hidden:()=>!!G.flags.c_saltbeard_won&&!x1pOn('c_whip'),get prompt(){ return x1pAt('c_whip',3)&&!G.flags.c_chowder_set?S('Set the chowder on the deck','Put the chowder on the deck'):S('Look at the wreck','Look at the wreck'); },draw:x1pDrawDeck,act:x1pDeckAct});
+  { const dk=x1pLM({id:'c_lm_deck',k:'c_deck',x:4600,y:28300,hidden:()=>!!G.flags.c_saltbeard_won&&!x1pOn('c_whip'),get prompt(){ return x1pAt('c_whip',3)&&!G.flags.c_chowder_set?S('Set the chowder on the deck','Put the chowder on the deck'):S('Look at the wreck','Look at the wreck'); },draw:x1pDrawDeck,act:x1pDeckAct});
+    // x1_world has its own "Look at the wreck" 60 px south: while the deck is shown, the deck is the one prompt here
+    x1pOver(dk,'c_lm_wreck'); }
   // the Clockwatch Hall weathervane (c_tail)
   // (on the Clockwatch Hall roof: with no roof height on the map, it sits on the ridge, reached from behind the hall)
   { const h=x1pHouseNear(6700,24440,null); if(h&&dist(h.x,h.y,6700,24440)<260&&x1pLvl({x:6700,y:24440})<=0) X1P.vaneAt=[h.x,h.y-h.h*0.46]; }
@@ -1030,11 +1053,13 @@ function x1pBuild(B){
   // Gull Isle: Pearl's last page (c_logbook)
   x1pLM({id:'c_lm_gullisle',k:'c_isle',x:4100,y:29700,hidden:()=>!!G.flags.c_pg6,prompt:S('Look under the gull nests','Look under the nests'),draw:x1pDrawIslePage,act:()=>{ if(!x1pR('c_salt')){ x1pSay([x1pN(`Gulls. Hundreds of gulls. They glare at you. You glare back. Nobody wins.`,`Lots of gulls glare at you.`)]); return; } cPearlPage(6); }});
   // the Chalk Dragon's eye (c_chalk)
-  x1pLM({id:'c_lm_eye',k:'c_eye',x:6950,y:21700,hidden:()=>!x1pAt('c_chalk',1),prompt:S('Look into the dragon’s eye','Look into the eye'),draw:x1pDrawEye,act:x1pEyeAct});
+  x1pOver(x1pLM({id:'c_lm_eye',k:'c_eye',x:6950,y:21700,hidden:()=>!x1pAt('c_chalk',1),prompt:S('Look into the dragon’s eye','Look into the eye'),draw:x1pDrawEye,act:x1pEyeAct}),'c_lm_sealed');
   // skiff landings (c_regatta's Skiff Whistle)
   for(const [k,x,y,nm] of X1P_SKIFF) x1pLM({id:'c_lm_skiff_'+k,k:'c_skiff',key:k,x,y,hidden:()=>!G.flags.c_skiffs||(k==='break'&&!G.flags.c_spire_up),prompt:S('Call a skiff','Call a skiff'),draw:x1pDrawSkiff,act:x1pSkiffAct});
   // Ravel's treasure map: three X marks
   [[8400,23000,'c_lm_x1'],[3100,28500,'c_lm_x2'],[13600,28200,'c_lm_x3']].forEach(([x,y,id],i)=>x1pLM({id,k:'xmark',x,y,hidden:()=>!G.items.c_map||!!G.found[id],prompt:S('Dig at the X','Dig here'),act:o=>x1pDig(o,i)}));
+  // x1_world dug its own chests at the same three X marks for the same map: Ravel's quest here is the one that counts
+  for(const id of ['c_x_downs','c_x_pools','c_x_lantern']){ const w=LANDMARKS.find(q=>q.id===id); if(w) w.hidden=()=>true; }
   // Duchess on top of the Great Clock (THREADS 14.3), if the story module has not placed her
   x1pLM({id:'c_lm_duchess',k:'c_goat',x:7200,y:24600,hidden:()=>true,draw:x1pDrawDuchess});
   // the moving things: the nest on Ash's head, Bolt trotting after Ash, the third Bob walking home
@@ -1061,7 +1086,23 @@ function x1pPostAct(){
   x1pSay([x1pN(`You set the nest on the post. The gull settles in, fluffs up, and gives you one last look. It might be a thank-you. It's probably not.`,`You put the nest on the post. The gull settles down.`)],()=>questPoke());
 }
 // the stove in Granny Oona's house, and Hettie's gear panel and bench (area objects added when the house is built)
-{ const base=areaNPCs; areaNPCs=function(){ base(); try{ x1pAreaObjs(AREA); }catch(e){ console.error(e); } }; }
+{ const base=areaNPCs; areaNPCs=function(){ base(); try{ x1pAreaObjs(AREA); }catch(e){ console.error(e); } try{ x1pIndoorSpots(AREA); }catch(e){ console.error(e); } }; }
+// the stock house layouts put shelves, desks and counters where a person's ix/iy spot is: then Ash cannot walk up to
+// them, or the furniture's own prompt ("Browse the shelf") wins over "Talk to". Step such a person forward onto the
+// floor, to the first spot where Ash can stand in front of them and their prompt is the nearest one.
+function x1pIndoorSpots(A){
+  if(!A||!A.npcs||!A.npcs.length) return;
+  const reachOf=o=>(o.w?Math.max(o.w,o.h||0)/2:o.r||16)+34;
+  const good=(x,y)=>{ const sx=x, sy=y+36;
+    if(areaBlocked(x,y)||areaBlocked(sx,sy)||colAt(x,y,10)||colAt(sx,sy,12)) return false;
+    for(const o of A.objs||[]){ if(o.broken) continue; const d=dist(sx,sy,o.x,o.y), r=reachOf(o); if(d<r&&!(dist(sx,sy,x,y)-70<d-r-2)) return false; }
+    return true; };
+  for(const n of A.npcs){ if(!n.id||!String(n.id).startsWith('c_')||good(n.x,n.y)) continue;
+    let best=null;
+    for(let dy=20;dy<=220&&!best;dy+=20) for(const dx of [0,-30,30,-60,60]){ if(good(n.x+dx,n.y+dy)){ best={x:n.x+dx,y:n.y+dy}; break; } }
+    if(best){ n.x=best.x; n.y=best.y; if(n.home) n.home=[best.x,best.y]; }
+  }
+}
 { const base=areaObjAct; areaObjAct=function(o){ if(o&&o.x1pAct){ o.x1pAct(o); return; } return base(o); }; }
 { const base=drawFurn; drawFurn=function(o,t){ if(o&&o.x1pDraw){ o.x1pDraw(o,t); return; } return base(o,t); }; }
 function x1pAreaObjs(A){
@@ -1165,7 +1206,8 @@ function x1pDeckAct(o){
   if(G.flags.c_chowder_set) return;
   if(!G.flags.c_lowtide){ x1pSay([x1pN(`The tide is right up around the wreck. You'd need low tide to stand on the deck. (The Tide Clock in Saltmarsh is stuck.)`,`The tide is too high. Fix the Tide Clock first.`)]); return; }
   if(!isNight()){ x1pSay([x1pN(`The deck is empty and the sun is bright. Ghosts keep to dark nights. Come back after dark. (Old Tarbuckle will happily wait with you.)`,`Ghosts come out at night. Come back after dark.`)]); return; }
-  takeItems({c_chowder:1}); G.flags.c_chowder_set=true; saveGame();
+  // c_saltbeard_call is the flag x1_foes' own Saucy Gull site listens for (C1FOES.md 3.4)
+  takeItems({c_chowder:1}); G.flags.c_chowder_set=true; G.flags.c_saltbeard_call=true; saveGame();
 }
 // the ghost fight: an open-world boss site on the wreck (the foes module ships c_saltbeard; a stand-in is made at world
 // build if it does not)
@@ -1300,7 +1342,8 @@ function x1pFrame(dt){
   if(actOf(G.stage)<2&&!G.flags.c_done) return;
   x1pTrailTick(); x1pPepperTick(); x1pVaneTick(dt); x1pBobTick(dt); x1pDuchessTick();
   // the falls note: a Shadow Dash into the shadow behind the water, in the dark
-  if(!AREA&&x1pR('c_brass')&&!G.flags.c_note5&&hasAbil('shadow')&&typeof p2Shadowed==='function'&&p2Shadowed()&&x1pDarkFalls()&&dist(player.x,player.y,7300,25180)<95&&!DLG){ x1pReadNote(5); }
+  { const F=X1P.falls||{x:7300,y:25180,r:95};
+    if(!AREA&&x1pR('c_brass')&&!G.flags.c_note5&&hasAbil('shadow')&&typeof p2Shadowed==='function'&&(p2Shadowed()||F.x!==7300)&&x1pDarkFalls()&&dist(player.x,player.y,F.x,F.y)<F.r&&!DLG){ x1pReadNote(5); } }
   // the notes quest starts when Ash reads note 2 in the Moth's Nest (the story module); a safety net if it did not
   if(!G.quests.c_notes&&(x1pR('c_light')||(AREA&&AREA.id==='c_mothnest'&&G.time-(X1P.nestT||G.time)>6))) startQuest('c_notes');
   if(AREA&&AREA.id==='c_mothnest'&&!X1P.nestT) X1P.nestT=G.time; if(!AREA) X1P.nestT=0;
@@ -1452,7 +1495,8 @@ function x1pDrawVane(o){ if(!x1pAt('c_tail',1)) return; const t=G.time; ctx.save
 function x1pDrawIslePage(o){ if(G.flags.c_pg6||!x1pR('c_salt')) return; const t=G.time; ctx.save(); glowAt(o.x,o.y-8,26,'255,240,200',0.2+0.1*Math.sin(t*3)); ctx.fillStyle='#efe2c0'; ctx.strokeStyle=X1P_INK; ctx.lineWidth=1.5; ctx.save(); ctx.translate(o.x,o.y-8); ctx.rotate(0.2+Math.sin(t)*0.08); ctx.fillRect(-8,-6,16,12); ctx.strokeRect(-8,-6,16,12); ctx.restore(); ctx.restore(); }
 function x1pDrawEye(o){ if(!x1pAt('c_chalk',1)) return; const t=G.time; ctx.save(); glowAt(o.x,o.y,40,'255,250,230',0.3+0.15*Math.sin(t*3)); ctx.fillStyle='#ffffff'; ctx.strokeStyle=X1P_INK; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(o.x,o.y,22,12,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.fillStyle='#3a3a3a'; ctx.beginPath(); ctx.ellipse(o.x,o.y,5,10,0,0,TAU); ctx.fill(); ctx.restore(); }
 function x1pDrawSkiff(o){ if(!G.flags.c_skiffs||(o.key==='break'&&!G.flags.c_spire_up)) return; ctx.save(); ctx.fillStyle='#8a6a3a'; ctx.strokeStyle=X1P_INK; ctx.lineWidth=2; ctx.fillRect(o.x-3,o.y-26,6,28); ctx.strokeRect(o.x-3,o.y-26,6,28); ctx.fillStyle='#c83a2a'; ctx.beginPath(); ctx.moveTo(o.x+3,o.y-26); ctx.lineTo(o.x+18,o.y-21); ctx.lineTo(o.x+3,o.y-16); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore(); }
-function x1pDrawDuchess(o){ if(!x1pDuchessUp()) return; const v=X1P.duch||(X1P.duch={x:o.x,y:o.y,face:Math.PI*0.6,t:0,kind:'goat',moving:false}); v.x=o.x; v.y=o.y; v.t=G.time; if(T3.on&&T3B.goat) T3B.goat(v); else drawGoat(v); }
+// (x1_story draws Duchess by its clock hatch when it is in the build: then she is drawn once, by it)
+function x1pDrawDuchess(o){ if(!x1pDuchessUp()||typeof c1Hatch==='function') return; const v=X1P.duch||(X1P.duch={x:o.x,y:o.y,face:Math.PI*0.6,t:0,kind:'goat',moving:false}); v.x=o.x; v.y=o.y; v.t=G.time; if(T3.on&&T3B.goat) T3B.goat(v); else drawGoat(v); }
 function x1pDrawDog(x,y,face,t,run){
   ctx.save(); ctx.translate(x,y); x1pShadow(0,8,13,5);
   const f=Math.cos(face)<0?-1:1; ctx.scale(f,1); const leg=run?Math.sin(t*20)*3:0;

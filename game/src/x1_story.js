@@ -891,7 +891,7 @@ function c1LampScene(){
 // the Vesper fight pauses at 10 percent (x1_foes calls this; a watcher calls it if nobody does)
 function c1SpireChoice(e){
   if(G.flags.c_choice_done||C1ST.choiceRun) return false;
-  C1ST.choiceRun=true;
+  C1ST.choiceRun=true; G.taunt=null; G.tauntQ=[];
   if(e){ e.invuln=true; e.passive=true; e.tele=null; e.vx=e.vy=0; }
   // no fight on screen (the beat was called without her): she kneels in front of Ash for the scene
   else { const S0=c1SightAt(player.x+92,player.y-36,'wait'); S0.face=-1; C1ST.cam={x:player.x+46,y:player.y-18,k:0.6}; }
@@ -899,6 +899,9 @@ function c1SpireChoice(e){
   G.projectiles=(G.projectiles||[]).filter(p=>p.owner!=='enemy');
   c1Play('c_choice',()=>{
     G.flags.c_choice_done=1; C1ST.choiceRun=false; C1ST.sight=null;
+    // x1_foes handed the kneel to us (C1.hook.vesperKneel): its finish() ends the fight properly (XP, the room solved)
+    const fin=C1ST.kneelFin; C1ST.kneelFin=null;
+    if(fin){ G.flags.c_mask_xp=1; try{ fin(); }catch(err){ console.error(err); } }
     if(e&&!e.dead){ e.dead=true; if(G.boss===e) G.boss=null; }
     const v=(EDEF.c_mothmask&&EDEF.c_mothmask.value)||2500; if(!G.flags.c_mask_xp){ G.flags.c_mask_xp=1; gainXp(v); }
     later(0.8,()=>c1SpireOut());
@@ -915,9 +918,13 @@ function c1SpireOut(){
 function c1SpireWatch(dt){
   const F=G.flags; if(F.c_choice_done||C1ST.choiceRun) return;
   const b=G.boss&&G.boss.type==='c_mothmask'?G.boss:(AREA?G.enemies.find(e=>e.type==='c_mothmask'):null);
-  if(b&&!b.dead&&b.hp<=b.maxHp*0.1&&scene==='play') c1SpireChoice(b);
+  // (with x1_foes in the build its own Vesper kneels at 10 percent and calls C1.hook.vesperKneel below, so its finish()
+  //  ends the fight properly: the watcher then only covers a Vesper that died some other way)
+  if(b&&!b.dead&&b.hp<=b.maxHp*0.1&&!b.kneel&&typeof vesperKneel!=='function'&&scene==='play') c1SpireChoice(b);
   else if(b&&b.dead&&scene==='play') c1SpireChoice(null);
 }
+// x1_foes stops the Vesper fight at 10 percent and asks for the choice (C1FOES.md 3.5): this is the story's choice
+if(typeof C1!=='undefined'&&C1&&C1.hook) C1.hook.vesperKneel=(e,finish)=>{ C1ST.kneelFin=finish; if(!c1SpireChoice(e)&&G.flags.c_choice_done){ C1ST.kneelFin=null; finish(); } };
 // the end of the act
 function c1EndAct(){
   if(G.flags.c_done) return;
@@ -934,7 +941,10 @@ function c1BossTick(dt){
   let b=G.boss&&C1_BOSS[G.boss.type]?G.boss:null;
   if(!b&&AREA) b=G.enemies.find(e=>!e.dead&&C1_BOSS[e.type])||null;
   if(b&&!b.dead){ C1ST.boss=b; const B=C1_BOSS[b.type]; if(B.intro&&!c1Seen(B.intro)&&scene==='play'&&!DLG) c1Play(B.intro); return; }
-  const o=C1ST.boss; if(o&&(o.dead||o.hp<=0)){ C1ST.boss=null; const B=C1_BOSS[o.type]; if(B&&B.won&&!c1Seen(B.won)) later(2.6,()=>c1When('won_'+o.type,()=>!c1Seen(B.won),()=>c1Play(B.won))); }
+  // (a boss taken away with hp left is not a win: Ash died and woke at a shrine, or left the room; resetBoss and
+  // exitArea only mark it dead. A real win always ends at hp 0.)
+  const o=C1ST.boss; if(o&&o.dead&&o.hp>0){ C1ST.boss=null; return; }
+  if(o&&(o.dead||o.hp<=0)){ C1ST.boss=null; const B=C1_BOSS[o.type]; if(B&&B.won&&!c1Seen(B.won)) later(2.6,()=>c1When('won_'+o.type,()=>!c1Seen(B.won),()=>c1Play(B.won))); }
 }
 // ---------- the Great Clock's hatch (into the Moth's Nest) and Duchess on the roof cap
 function c1ClockTop(){ try{ return typeof elevLvl==='function'&&elevLvl(C1P.clock.x,C1P.clock.y-30)>=4; }catch(e){ return false; } }
@@ -950,7 +960,8 @@ function c1TideDoor(){ return DOORS.find(d=>d.area==='c_tidehouse'); }
 { const base=miniPrompts; miniPrompts=function(offer){ base(offer); try{ if(G&&G.mode==='story'&&curMap()===1&&!AREA) c1Prompts(offer); }catch(e){ console.error(e); } }; }
 function c1Prompts(offer){
   const p=player, F=G.flags;
-  if(reached('c_brass')&&actOf(G.stage)>=2){ const h=c1Hatch(), d=dist(p.x,p.y,h.x,h.y); if(d<64&&(h.top||!c1ClockTop())) offer(d-4,h.top?S('Open the hatch into the bell loft','Open the hatch'):(hasAbil('claws')?S('Climb the Great Clock to the bell loft','Climb the clock'):S('Look up at the Great Clock','Look up at the clock')),c1HatchAct,h.x,h.y); }
+  // (x1_world puts its own hatch door on top of its Great Clock tower: then that door is the way in, not this prompt)
+  if(reached('c_brass')&&actOf(G.stage)>=2&&!(c1ClockTop()&&DOORS.some(q=>q.area==='c_mothnest'))){ const h=c1Hatch(), d=dist(p.x,p.y,h.x,h.y); if(d<64&&(h.top||!c1ClockTop())) offer(d-4,h.top?S('Open the hatch into the bell loft','Open the hatch'):(hasAbil('claws')?S('Climb the Great Clock to the bell loft','Climb the clock'):S('Look up at the Great Clock','Look up at the clock')),c1HatchAct,h.x,h.y); }
 }
 // ---------- per frame (outdoors through updateStory, inside areas through updateArea)
 function c1Tick(dt){
@@ -1187,6 +1198,13 @@ const c1RChase=()=>!!(G&&G.mini&&G.mini.kind==='c_roofchase');
 { const base=terrainFix; terrainFix=function(e,ox,oy){ if(e===player&&c1RChase()) return c1RConfine(e,ox,oy); return base(e,ox,oy); }; }
 { const base=landOK; landOK=function(x,y){ if(c1RChase()&&x<IZX-50) return c1RProj(x,y).d<C1R.w/2+4; return base(x,y); }; }
 { const base=addOccluders; addOccluders=function(list){ if(c1RChase()) return; return base(list); }; }
+// x1_world gives the Clock Quarter real height (level 2 streets, level 3 roofs, towers): the chase runs on its own roof
+// layer, so while it runs the faces underneath neither stop, climb nor hop Ash; the route's edges are the only walls
+{ const base=updatePlayer; updatePlayer=function(dt,inp){ if(c1RChase()&&!AREA&&typeof ELV!=='undefined'){ ELV.ign++; try{ return base(dt,inp); } finally{ ELV.ign--; } } return base(dt,inp); }; }
+{ const base=playerBlocked; playerBlocked=function(x,y){ if(c1RChase()&&x<IZX-50) return c1RBlocked(x,y,G.mini); return base(x,y); }; }
+// (and the foe push after the move: e3 puts an Ash it finds inside a face back where he last stood on the ground,
+// so in mid-jump over a face below the roofs he was snapped back to his take-off spot and fell into the wide gap)
+{ const base=separate; separate=function(){ if(c1RChase()&&!AREA&&typeof ELV!=='undefined'){ ELV.ign++; try{ return base(); } finally{ ELV.ign--; } } return base(); }; }
 function c1RBlocked(x,y,M){
   const P=c1RProj(x,y); if(P.d>C1R.w/2) return true;
   // the step: a short wall across the roof that only a Double Jump (high enough) or the ladder gets over
@@ -1282,7 +1300,7 @@ function c1RWin(){
   });
 }
 function c1RLose(){
-  G.flags.c_chase_lost=(G.flags.c_chase_lost|0)+1;
+  G.flags.c_chase_lost=(G.flags.c_chase_lost|0)+1; C1ST.chaseRetryAt=G.time+4;
   later(0.05,()=>{ miniEnd(false,S('She got away!','She got away!'),S('Wait by Whirligig Manor to try again.','Wait by the manor. Try again!')); c1RDown(true); });
 }
 // back down to the street (a safe spot near the end, or near the manor after a loss)
@@ -1296,6 +1314,8 @@ function c1ChaseWatch(dt){
   const F=G.flags;
   if(!F.c_hester||G.mini||!c1Out()||scene!=='play'||!isNight()||F.c_chase_won) return;
   if(dist(player.x,player.y,C1P.manor.x,C1P.manor.y)>380) return;
+  // after a loss Ash is set down by the manor: a few seconds to breathe (or walk off) before round two starts by itself
+  if(G.time<(C1ST.chaseRetryAt||0)) return;
   const S0=c1SightAt(C1R.L[0].x0+40,C1R.L[0].y0-10,'wait'); S0.face=1;
   C1ST.cam={x:C1R.L[0].x0,y:C1R.L[0].y0,k:0.6}; c1ChaseLights(true); C1ST.preRoof=true;
   c1Play(c1Seen('c_chase_start')?STORY.c_chase_retry:'c_chase_start',()=>{ C1ST.sight=null; C1ST.preRoof=false; later(0.1,()=>startMini('c_roofchase',null)); });
@@ -1526,8 +1546,8 @@ function c1Beat(name,arg){
 // ---------- 9. debug hooks (tests: scratchpad/b_c1s/t_c1s.py)
 // __eb.actStart(2,'<stage>') also gets the world flags implied by the stages before it (the same as an old save)
 { const base=window.__ebX&&window.__ebX.actStart; if(typeof base==='function') window.__ebX.actStart=function(n,w){ const r=base(n,w); try{ if((n|0)===2&&G.mode==='story'){ c1Migrate(); setupNPCs(); } }catch(e){ console.error(e); } return r; }; }
-window.__ebX=Object.assign(window.__ebX||{},{c1:{
-  C1ST,C1R,C1P,play:c1Play,chain:c1Chain,seen:c1Seen,mark:c1sMark,trust:c1Trust,beat:c1Beat,spireChoice:c1SpireChoice,endAct:c1EndAct,dunStory:c1DunStory,taunts:C1_TAUNTS,
+const C1S_DBG={
+  C1ST,C1:C1ST,C1R,C1P,play:c1Play,chain:c1Chain,seen:c1Seen,mark:c1sMark,trust:c1Trust,beat:c1Beat,spireChoice:c1SpireChoice,endAct:c1EndAct,dunStory:c1DunStory,taunts:C1_TAUNTS,
   proj:(x,y)=>{ const P=c1RProj(x,y); return {s:Math.round(P.s),d:Math.round(P.d),k:P.g.k}; },
   at:s=>{ const q=c1RAt(s); return {x:Math.round(q.x),y:Math.round(q.y),k:q.g.k}; },
   route:()=>C1R.L.map(g=>({k:g.k,s0:Math.round(g.s0),s1:Math.round(g.s1),x0:g.x0,y0:g.y0,x1:g.x1,y1:g.y1})),
@@ -1545,4 +1565,5 @@ window.__ebX=Object.assign(window.__ebX||{},{c1:{
   state:()=>({stage:G.stage,act:G.act,trust:G.flags.c_trust|0,vesper:G.choices.c_vesper||null,moon:G.flags.moon==null?100:G.flags.moon,shard:!!G.items.c_shard1,
     lowtide:!!G.flags.c_lowtide,clock:!!G.flags.c_clock_on,spire:!!G.flags.c_spire_up,snow:!!G.flags.c_snow,done:!!G.flags.c_done,seen:Object.keys(G.flags.c_sn||{}),q:C1ST.q.map(q=>q.id),fb:Object.keys(C1ST.fb),
     obj:(()=>{ try{ const o=questObjective(); return o?{text:o.text,x:Math.round(o.x||0),y:Math.round(o.y||0)}:null; }catch(e){ return String(e); } })()})
-}});
+};
+window.__ebX=Object.assign(window.__ebX||{},{c1s:C1S_DBG,c1:Object.assign({},(window.__ebX&&window.__ebX.c1)||{},C1S_DBG)});

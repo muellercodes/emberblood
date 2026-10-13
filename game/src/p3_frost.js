@@ -71,7 +71,7 @@ function p3Snd(kind,v){
 // ---------- 2. geometry (the polyline helpers come from p2_coast.js: p2PolyD, p2PolyAt, p2PolyLen)
 function p3Bb(pts,m){ const b=[1e9,1e9,-1e9,-1e9]; for(const q of pts){ b[0]=Math.min(b[0],q[0]); b[1]=Math.min(b[1],q[1]); b[2]=Math.max(b[2],q[0]); b[3]=Math.max(b[3],q[1]); } return [b[0]-m,b[1]-m,b[2]+m,b[3]+m]; }
 const p3InBb=(b,x,y)=>x>b[0]&&x<b[2]&&y>b[1]&&y<b[3];
-function p3Lvl(x,y){ if(AREA){ const k=tCell(x,y); return k<0?0:Math.max(0,dunH(k)); } return elevLvl(x,y); }
+function p3Lvl(x,y){ if(AREA){ if(!AREA.cave) return 0; const k=tCell(x,y); return k<0?0:Math.max(0,dunH(k)); } return elevLvl(x,y); }
 
 // ---------- 3. Blaze Breath
 // The jet: J={ox,oy (on the ground, at the mouth), ang, L (stops at walls, faces and ice), t}. Hit test: a point within
@@ -687,7 +687,7 @@ function p3Restore(){
 // toA,toB}}, vanes:{'c,r':{id,dir}}, bells:{'c,r':{name}}, locks:{'c,r':{cover:'dome'|'lid'|'none'}}, order:[bell names],
 // timed (bells), lightsPitch:3, lightsTile:1, iceChests:true, onChain(R,o), onRune(R,o), onDrum(R,o), onVane(R,o).
 // Link types: 'ice' (a door plugged with ice: Blaze 1.5 s) and 'chain' (held by a chain lock K in the room it opens from).
-const P3T={crack:60,drift:61};
+const P3T={crack:50,drift:51};   // (not 60 and 61: p4_moon's cells are 60..69, its genCaveRooms took a drift for an arch wall)
 Object.assign(PUZZLE_KINDS,{melt:1,thaw:1,chains:1,bells:1,drum:1,lightsout:1,runes:1});
 Object.assign(SEAL_KINDS,{melt:1,thaw:1,chains:1,bells:1,drum:1,lightsout:1,runes:1});
 Object.assign(DOOR_COL,{ice:'170,220,255',chain:'190,160,250'}); Object.assign(LINK_CH,{ice:'i',chain:'k'});

@@ -375,17 +375,19 @@ function c1Extra(x,y,o){
   if(C1WT.snow&&!o.water&&o.road<0.5) o.snow=clamp(0.16+o.n*0.5,0,0.34);
 }
 // skimming: Ash sprints across water with the Skimmer (a rip current lets only that through)
-function c1Skim(){ const p=player; return !!(p&&p.sprinting&&p.onWater&&typeof canSkim==='function'&&canSkim()); }
+// (sprinting with the Skimmer counts from the first step: off a causeway pad or a beach straight into the rip)
+function c1Skim(){ const p=player; return !!(p&&p.sprinting&&typeof canSkim==='function'&&canSkim()); }
 function c1RipAt(x,y){
   if(c1InR(C1G.mouth,x,y)) return true;
   if(c1InR(C1G.sealRip,x,y)) return true;
   if(C1WT.spire&&c1InR(C1G.causewayRip,x,y)) return true;
   return false;
 }
-function c1Block(x,y){
+function c1Block(x,y,land){
   if(x>9562&&x<9800&&y>25820&&y<28330) return true;                                         // the Cut
   if(!C1WT.low&&x>1180&&x<2160&&y>27800&&y<29500&&c1SandsIn(x,y)) return true;              // high tide on the sands
-  if(c1RipAt(x,y)&&!c1Skim()) return true;                                                  // rips: skim only
+  // rips: skim only (on water; the causeway's land where a rip rect overlaps its pads is where the skim starts)
+  if(!land&&c1RipAt(x,y)&&!c1Skim()) return true;
   return false;
 }
 // calm water: the harbor and the skim lanes do not count as deep sea for Water Stride
@@ -943,7 +945,9 @@ function c1Places(B){
   for(const [x,y] of [[4060,29640],[4180,29760],[3990,29700]]) c1wObj('crate2',x,y,{col:false});
   // ---- the Cut and its broken rope bridge
   c1wObj('bridgepost',9535,26935); c1wObj('bridgepost',9832,26962,{flip:1});
-  c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,prompt:S('Look at the broken bridge','Look at the bridge'),draw:(o,t)=>c1DrawCut(t),act:()=>c1wSay([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
+  // (once Ash has the Grapple Tail this look-at has no prompt: the posts' grapple prompt shares the same E, and a look
+  //  prompt in range would take E first, see p2_coast's updateInteractions; the broken bridge is still drawn)
+  c1LM(B,{id:'c_lm_cut',k:'c_lm',x:9500,y:26905,r:0,clr:40,get prompt(){ return typeof canGrapple==='function'&&canGrapple()?null:S('Look at the broken bridge','Look at the bridge'); },draw:(o,t)=>c1DrawCut(t),act:()=>c1wSay([S('The old rope bridge over the Cut. Somebody snipped the ropes, neat and silky. Far below, the sea churns like soup. Two brass posts still stand, one on each side.','The bridge is cut! Two posts still stand.')].concat(canGrapple()?[S('Your tail twitches. Those posts look very grabbable.','Your tail wants to grab those posts!')]:[]))});
   // ---- the Brass Yards: the Brassworks, the stack, the gantries
   c1wObj('works',10140,24800); c1wObj('gantry',11730,24250,{w:700}); c1wObj('gantry',9190,24770,{w:460});
   for(const [x,y] of [[9800,24300],[11050,25300],[12000,24700],[9150,25250]]){ c1wObj('mill',x,y); C1CHIMS.push([x,y-150]); }
@@ -988,6 +992,8 @@ function c1Furnish(B){
     for(const o of C1WD.objs) if(dist2(o.x,o.y,x,y)<60*60) return false;
     for(const l of mapList(LANDMARKS,1)) if(dist2(l.x,l.y,x,y)<70*70) return false;
     for(const s of mapList(SHRINES,1)) if(dist2(s.x,s.y,x,y)<120*120) return false;
+    // (a planned home's door with no house of its own, Ambrose's at the foot of the Great Clock: keep its step clear)
+    for(const hm of C1WD.homes) if(hm.door&&dist2(hm.door.x,hm.door.y+(hm.door.outY||0),x,y)<80*80) return false;
     return true; };
   for(const [x0,y0,x1,y1,lv] of [[6200,24180,8420,25150,2],[6400,25420,8450,26420,0]])
     for(let y=y0;y<y1;y+=64) for(let x=x0;x<x1;x+=64){ if(rng()>0.16) continue; const px=x+rng()*40, py=y+rng()*40; if(!ok(px,py,lv)) continue; c1wObj(kinds[Math.floor(rng()*kinds.length)],px,py,{v:Math.floor(rng()*2)}); }
@@ -1382,7 +1388,7 @@ function c1HouseHands(t){
 // regions everywhere on the coast follow the cliffs (music, ambience, events, banners)
 { const base=biomeInfo; biomeInfo=function(x,y,o){ const r=base(x,y,o); if(C1WD.built&&y>=20000&&y<=31000&&x<IZX-50){ const b=c1Region(x,y,elevLvl(x,y),0); o.b=b; o.b2=b; o.t=1; } return r; }; }
 // the risen Spire Rock and the causeway are land, the harbor and the skim lanes are calm water
-{ const base=mapBlocked; mapBlocked=function(x,y){ if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y); } return base(x,y); }; }
+{ const base=mapBlocked; mapBlocked=function(x,y){ if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y,true); } return base(x,y); }; }
 { const base=mapStrideBlocked; mapStrideBlocked=function(x,y){
   if(y>=20000&&y<=31000&&x>30&&x<13970){ if((C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y))||c1wCalm(x,y)) return !!c1Block(x,y); }
   return base(x,y); }; }
@@ -1401,8 +1407,9 @@ function c1HouseHands(t){
 // the Power Lab's outdoor sandbox (p2_coast debug) moves off the Downs to a flat lowland spot (the Downs are level 1 now)
 if(typeof P2_SB!=='undefined'&&!P2_SB.built){ P2_SB.x=3700; P2_SB.y=24450; }
 // ---------- debug hooks
-window.__ebX=Object.assign(window.__ebX||{},{
-  c1:{C1WD,C1G,C1WT,C1ROOF,C1K,sync:c1Sync,region:(x,y)=>c1Region(x,y,elevLvl(x,y),0),landD:c1LandD,
+// Debug keys: each Act II module has its own (__eb.c1w world, __eb.c1f foes, __eb.c1s story); __eb.c1 is all three
+// merged (the story's state/choose/dlg/at win name clashes, as before the split).
+const C1W_DBG={C1WD,C1:C1WD,C1T:C1WT,C1G,C1WT,C1ROOF,C1K,sync:c1Sync,region:(x,y)=>c1Region(x,y,elevLvl(x,y),0),landD:c1LandD,
     set(flag,v){ G.flags[flag]=v===undefined?true:v; c1Sync(); return {flag,v:G.flags[flag]}; },
     spots:{pass:[3400,20520],downgate:[3190,20900],fold:[3900,21260],dragon:[6600,22560],mill:[9700,22420],gate:[6950,24300],square:[6900,24870],clock:[7200,24860],library:[7700,24520],manor:[7900,25000],
       stairTop:[7070,25150],stairBot:[7070,25420],lift:[7700,25360],market:[7000,25960],teapot:[7300,26290],quay:[7600,26440],pier:[8500,27150],heights:[9200,26700],cut:[9510,26960],cutE:[9860,26985],
@@ -1418,5 +1425,5 @@ window.__ebX=Object.assign(window.__ebX||{},{
       if(!pass(sx,sy)) return {fail:'start blocked'}; const k0=Math.floor((sy-y0)/cs)*w+Math.floor((sx-x0)/cs); seen[k0]=1; q.push(k0);
       while(q.length){ const c=q.pop(), i=c%w, j=(c/w)|0; for(let d=0;d<4;d++){ const a=i+(d===0?1:d===1?-1:0), b=j+(d===2?1:d===3?-1:0); if(a<0||b<0||a>=w||b>=h) continue; const k=b*w+a; if(seen[k]) continue; if(!pass(x0+(a+0.5)*cs,y0+(b+0.5)*cs)) continue; seen[k]=1; q.push(k); } }
       C1WD.flood={seen,w,h,x0,y0,cs}; let n=0; for(const v of seen) n+=v; return {n}; },
-    at(x,y){ const F=C1WD.flood; if(!F) return false; const i=Math.floor((x-F.x0)/F.cs), j=Math.floor((y-F.y0)/F.cs); for(let dj=-2;dj<=2;dj++) for(let di=-2;di<=2;di++){ const a=i+di,b=j+dj; if(a>=0&&b>=0&&a<F.w&&b<F.h&&F.seen[b*F.w+a]) return true; } return false; }}
-});
+    at(x,y){ const F=C1WD.flood; if(!F) return false; const i=Math.floor((x-F.x0)/F.cs), j=Math.floor((y-F.y0)/F.cs); for(let dj=-2;dj<=2;dj++) for(let di=-2;di<=2;di++){ const a=i+di,b=j+dj; if(a>=0&&b>=0&&a<F.w&&b<F.h&&F.seen[b*F.w+a]) return true; } return false; }};
+window.__ebX=Object.assign(window.__ebX||{},{c1w:C1W_DBG,c1:Object.assign({},(window.__ebX&&window.__ebX.c1)||{},C1W_DBG)});
