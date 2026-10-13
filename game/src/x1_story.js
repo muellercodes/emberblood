@@ -1202,6 +1202,9 @@ const c1RChase=()=>!!(G&&G.mini&&G.mini.kind==='c_roofchase');
 // layer, so while it runs the faces underneath neither stop, climb nor hop Ash; the route's edges are the only walls
 { const base=updatePlayer; updatePlayer=function(dt,inp){ if(c1RChase()&&!AREA&&typeof ELV!=='undefined'){ ELV.ign++; try{ return base(dt,inp); } finally{ ELV.ign--; } } return base(dt,inp); }; }
 { const base=playerBlocked; playerBlocked=function(x,y){ if(c1RChase()&&x<IZX-50) return c1RBlocked(x,y,G.mini); return base(x,y); }; }
+// (and the foe push after the move: e3 puts an Ash it finds inside a face back where he last stood on the ground,
+// so in mid-jump over a face below the roofs he was snapped back to his take-off spot and fell into the wide gap)
+{ const base=separate; separate=function(){ if(c1RChase()&&!AREA&&typeof ELV!=='undefined'){ ELV.ign++; try{ return base(); } finally{ ELV.ign--; } } return base(); }; }
 function c1RBlocked(x,y,M){
   const P=c1RProj(x,y); if(P.d>C1R.w/2) return true;
   // the step: a short wall across the roof that only a Double Jump (high enough) or the ladder gets over
