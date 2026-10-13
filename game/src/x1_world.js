@@ -992,6 +992,8 @@ function c1Furnish(B){
     for(const o of C1WD.objs) if(dist2(o.x,o.y,x,y)<60*60) return false;
     for(const l of mapList(LANDMARKS,1)) if(dist2(l.x,l.y,x,y)<70*70) return false;
     for(const s of mapList(SHRINES,1)) if(dist2(s.x,s.y,x,y)<120*120) return false;
+    // (a planned home's door with no house of its own, Ambrose's at the foot of the Great Clock: keep its step clear)
+    for(const hm of C1WD.homes) if(hm.door&&dist2(hm.door.x,hm.door.y+(hm.door.outY||0),x,y)<80*80) return false;
     return true; };
   for(const [x0,y0,x1,y1,lv] of [[6200,24180,8420,25150,2],[6400,25420,8450,26420,0]])
     for(let y=y0;y<y1;y+=64) for(let x=x0;x<x1;x+=64){ if(rng()>0.16) continue; const px=x+rng()*40, py=y+rng()*40; if(!ok(px,py,lv)) continue; c1wObj(kinds[Math.floor(rng()*kinds.length)],px,py,{v:Math.floor(rng()*2)}); }
