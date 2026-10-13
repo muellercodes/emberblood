@@ -1,13 +1,18 @@
 
 // ================= enemies
+// v9 level scaling (e6_balance.js): EDEF numbers are written for level d.lv (default 1). Health grows by balHpK and
+// damage (EDEF.dmg and a boss's literal ed(N) hits, via e.edK) by balDmK. A boss spawned "at level 1" fights at its own lv,
+// and anything spawned while a foe's AI runs (summons, eggs) takes that foe's level in the story.
 function makeEnemy(type,x,y,opt){
   opt=opt||{};
-  const d=EDEF[type], lvl=opt.level||1, lk=1+0.26*(lvl-1);
+  const d=EDEF[type], D=G.diff, lv0=d.lv||1, story=G.mode==='story';
+  let lvl=opt.level||(story&&AIE&&AIE.level)||1; if(d.boss&&lvl<=1) lvl=lv0;
+  const hk=balHpK(lvl)/balHpK(lv0), dk=balDmK(lvl)/balDmK(lv0);
   const hs=opt.hpScale!=null?opt.hpScale:(G.hpMul||1);
   const elite=!d.boss&&type!=='egg'&&(opt.elite!=null?opt.elite:Math.random()<(G.eliteChance||0));
-  const hp=d.hp*G.diff.hp*hs*lk*(elite?1.6:1)*(opt.small?0.35:1);
-  const e={id:++EID,type,x,y,r:d.r*(elite?1.12:1),hp,maxHp:hp,speed:d.speed*rand(0.92,1.08),level:lvl,
-    dmg:d.dmg*(G.dmgMul||1)*(1+0.15*(lvl-1))*(elite?1.25:1),value:d.value*(elite?2:1),elite,
+  const hp=d.hp*(d.boss?(D.bossHp||1)*(story?1:BAL.arenaBoss):D.hp)*hs*hk*(elite?1.6:1)*(opt.small?0.35:1);
+  const e={id:++EID,type,x,y,r:d.r*(elite?1.12:1),hp,maxHp:hp,speed:d.speed*rand(0.92,1.08)*(D.spd||1),level:lvl,edK:dk,
+    dmg:d.dmg*(story?1:(G.dmgMul||1))*dk*(elite?1.25:1),value:d.value*(elite?2:1),elite,
     flying:!!d.flying,shield:!!d.shield,kbRes:d.kbRes!=null?d.kbRes:1,boss:!!d.boss,
     vx:0,vy:0,dx:0,dy:0,face:opt.face!=null?opt.face:angTo(x,y,player.x,player.y),t:rand(0,10),state:'chase',st:0,cd:rand(0.6,1.6),
     flash:0,stun:0,burnT:0,burnTick:0,burnDps:0,tele:null,dead:false,spawnIn:0.2,blocking:false,alpha:1,
@@ -40,7 +45,7 @@ function spotNear(x,y,r0,r1,avoidPlayer){
   }
   const [qx,qy]=clampMap(x,y,60); return {x:qx,y:qy};
 }
-function spawnRune(type,x,y,opt,delay){ G.hazards.push({kind:'spawn',x,y,t:0,delay:delay||0.85,type,opt:opt||{},big:EDEF[type].boss}); }
+function spawnRune(type,x,y,opt,delay){ opt=opt||{}; if(opt.level==null&&AIE&&G.mode==='story') opt=Object.assign({},opt,{level:AIE.level}); G.hazards.push({kind:'spawn',x,y,t:0,delay:delay||0.85,type,opt,big:EDEF[type].boss}); }
 function steer(e,tx,ty,spd){
   let ax=tx-e.x, ay=ty-e.y; const d=Math.hypot(ax,ay);
   if(d<1){ e.dx=e.dy=0; return; }
@@ -128,7 +133,7 @@ function updateEnemies(dt){
       if(e.burnTick<=0){ e.burnTick=0.33; damageEnemy(e,e.burnDps*0.33,{src:'burn'}); if(e.dead) continue; }
       if(Math.random()<dt*14) emit(e.x+rand(-e.r,e.r)*0.6,e.y+rand(-e.r,e.r)*0.6,1,{kind:'fire',ang:-Math.PI/2,spread:0.4,smin:20,smax:50,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:4,drag:1});
     }else e.burnDps=0;
-    if(!e.aggro&&!p.dead&&!e.returning&&d<(e.type==='wolf'?(night?460:300):(night?300:380))){ e.aggro=true; alertCamp(e); if(e.type==='wolf'&&Math.random()<0.5) SFX.play('howl'); }
+    if(!e.aggro&&!p.dead&&!e.returning&&d<(e.type==='wolf'?(night?460:300):(night?300:380))*(G.diff.aggro||1)){ e.aggro=true; alertCamp(e); if(e.type==='wolf'&&Math.random()<0.5) SFX.play('howl'); }
     if(e.aggro&&!e.boss&&G.mode==='story'){
       const hd=dist(e.x,e.y,e.homeX,e.homeY);
       if((hd>e.leash&&d>420)||p.dead){ e.aggro=false; e.returning=true; e.tele=null; }
@@ -136,11 +141,24 @@ function updateEnemies(dt){
     if(e.aggro&&d<750) G.inCombat=true;
     if(e.stun>0){ e.stun-=dt; e.dx=e.dy=0; e.blocking=false; }
     else if(!e.aggro&&e.type!=='egg') idleAI(e,dt);
-    else{ const f=AI[e.type]; if(f) f(e,dt); }
+    else{ const f=AI[e.type]; if(f) runAI(f,e,dt); }
     if(e.dead) continue;
     integrate(e,dt);
   }
   separate();
+}
+// one foe's AI tick with the difficulty's cadence (v9 balance): attack cooldowns run cad times as fast, a wind-up whose
+// telegraph starts this tick (e.st equal to its tele.dur) lasts wind times as long, a recovery that starts lasts rec times
+// as long. While it runs, ed(N) hits are scaled to the foe's level (e.edK) and AIE names the foe, so its summons share its level.
+let AIE=null;
+function runAI(f,e,dt){
+  const D=G.diff, s0=e.state, t0=e.tele, m0=G.dmgMul;
+  if(e.cd>0&&D.cad&&D.cad!==1) e.cd-=dt*(D.cad-1);
+  AIE=e; if(e.edK&&e.edK!==1) G.dmgMul=m0*e.edK;
+  try{ f(e,dt); }finally{ AIE=null; G.dmgMul=m0; }
+  const T=e.tele;
+  if(T&&T!==t0&&!T._bw){ T._bw=1; if(D.wind&&D.wind!==1&&T.dur>0&&Math.abs((e.st||0)-T.dur)<0.03){ e.st*=D.wind; T.dur*=D.wind; } }
+  if(e.state==='recover'&&s0!=='recover'&&D.rec&&D.rec!==1&&e.st>0) e.st*=D.rec;
 }
 
 // ================= wolves

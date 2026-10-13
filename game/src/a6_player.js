@@ -17,12 +17,14 @@ function restorePlayer(s){
   p.hp=p.hpShow=p.maxHp; p.energy=p.maxEnergy; p.stamina=p.maxStamina; p.potions=p.potionsMax; p.stats.phoenix=p.stats.phoenixMax||0;
   return p;
 }
-const xpNeed=l=>120+90*(l-1)+15*(l-1)*(l-1);
+// v9: the XP table, health per level and damage per level live in BAL (e6_balance.js)
+const xpNeed=l=>balXpNeed(l);
 function gainXp(n){
   const p=player; if(G.mode!=='story') return;
   p.xp+=n;
-  while(p.xp>=xpNeed(p.level)){
-    p.xp-=xpNeed(p.level); p.level++; p.maxHp+=6; p.stats.dmgMul*=1.04; p.maxStamina+=3; p.hp=p.maxHp;
+  if(p.level>=BAL.maxLevel){ p.xp=Math.min(p.xp,xpNeed(p.level)); return; }
+  while(p.level<BAL.maxLevel&&p.xp>=xpNeed(p.level)){
+    p.xp-=xpNeed(p.level); p.level++; p.maxHp+=BAL.hpLv; p.stats.dmgMul=balLvlDmg(p.level); p.maxStamina+=3; p.hp=p.maxHp;
     const bless=p.level%2===1; if(bless) G.pendingBless++; onLevelUp(p.level);
     jingle('levelup','level'); setBanner(`Level ${p.level}`,bless?'Health and strength increased. A blessing awaits.':'Health, strength and stamina increased.',2.4);
     emit(p.x,p.y,40,{col:'255,210,120',ang:-Math.PI/2,spread:1.4,smin:40,smax:200,lmin:.5,lmax:1.1,zmin:1.5,zmax:3,rise:30});
@@ -87,14 +89,14 @@ function updatePlayer(dt,inp){
     emit(p.x,p.y,8,{col:'150,130,110',glow:false,smin:30,smax:90,lmin:.3,lmax:.6,zmin:2,zmax:5,grow:7});
   }
   // drink
-  if(inp.drink&&p.potions>0&&p.drinkT<=0&&p.dashT<=0&&p.hp<p.maxHp){ p.potions--; p.drinkT=0.9; p.drinkPool=p.maxHp*0.45*G.diff.heal*(p.stats.drinkMul||1); SFX.play('drink'); }
+  if(inp.drink&&p.potions>0&&p.drinkT<=0&&p.dashT<=0&&p.hp<p.maxHp){ p.potions--; p.drinkT=0.9; p.drinkPool=p.maxHp*0.45*(G.diff.pot||G.diff.heal)*(p.stats.drinkMul||1); SFX.play('drink'); }
   if(p.drinkT>0){ const k=Math.min(dt,p.drinkT)/0.9; heal(p.drinkPool*k,true); p.drinkT-=dt; if(Math.random()<0.4) emit(p.x+rand(-8,8),p.y+rand(-8,8),1,{col:'140,255,170',ang:-Math.PI/2,spread:0.5,smin:20,smax:50,lmin:.4,lmax:.7,zmin:1.5,zmax:2.5,rise:20}); }
   let vx=0,vy=0;
   p.sprinting=false;
   // jump, double jump, take off, land, slam (a6c_moves.js)
   const air=movesPre(dt,inp);
   if(p.dashT>0){
-    p.dashT-=dt; const k=0.55+0.45*(p.dashT/0.3); vx=Math.cos(p.dashDir)*560*k; vy=Math.sin(p.dashDir)*560*k;
+    p.dashT-=dt; const k=(0.55+0.45*(p.dashT/0.3))*(st.rollK||1); vx=Math.cos(p.dashDir)*560*k; vy=Math.sin(p.dashDir)*560*k;
     p.ghostT-=dt; if(p.ghostT<=0){ p.ghostT=0.05; p.ghosts.push({x:p.x,y:p.y,f:p.facing,a:0.6}); }
     if(st.emberDash){ p.emberT-=dt; if(p.emberT<=0){ p.emberT=0.06; G.pools.push({x:p.x,y:p.y,r:22,life:1.6,max:1.6,owner:'player',tick:0}); } }
   }else if(air){
@@ -103,8 +105,8 @@ function updatePlayer(dt,inp){
   }else{
     const here=T(p.x,p.y,PT); p.slowT=(p.slowT||0)-dt;
     let spd=st.speed*(p.breathing?0.55:1)*(p.swingT>0?0.55:1)*(p.drinkT>0?0.45:1)*(here.bog>0.5?(G.flags&&G.flags.perk_bog?0.86:0.72):1)*(here.b===5&&here.road<=0?(G.flags&&G.flags.perk_snow?1.02:0.93):1)*(p.slowT>0?0.6:1)*terrSpeed(here);
-    const skim=p.onWater&&hasSkill('skimmer');
-    if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55*(p.onWater?(skim?1.22:1.1):1); if(!skim){ p.stamina=Math.max(0,p.stamina-16*dt); p.stamDelay=Math.max(p.stamDelay,0.35); } }
+    const skim=p.onWater&&canSkim();
+    if(inp.sprint&&moving&&!p.breathing&&p.swingT<=0&&p.drinkT<=0&&p.stamina>1){ p.sprinting=true; spd*=1.55*(p.onWater?(skim?1.22:1.1):1); if(!skim){ p.stamina=Math.max(0,p.stamina-16*(st.sprintK||1)*dt); p.stamDelay=Math.max(p.stamDelay,0.35); } }
     vx=inp.mx*spd; vy=inp.my*spd;
     // cave ice: Ash slides
     if(AREA&&AREA.cave&&AREA.cave.typ){ const c=AREA.cave, i=Math.floor((p.x-AREA.x0)/c.cell), j=Math.floor((p.y-AREA.y0)/c.cell); if(c.typ[j*c.w+i]===2){ const k=1-Math.exp(-dt*1.8); p.ivx=lerp(p.ivx||0,vx*1.1,k); p.ivy=lerp(p.ivy||0,vy*1.1,k); vx=p.ivx; vy=p.ivy; } else { p.ivx=vx; p.ivy=vy; } }
@@ -223,7 +225,7 @@ function hurtPlayer(amt,sx,sy,kb){
   const p=player;
   if(!p||p.dead||p.iframes>0||scene!=='play'||(window.__eb&&window.__eb.god)) return false;
   if(p.flying&&!airHitOK(sx,sy)) return false;   // ground melee cannot reach Ash in the sky (projectiles and flying foes can)
-  const dmg=Math.max(1,Math.round(amt*G.diff.dmg*(p.stats.armor||1)));
+  const dmg=Math.max(1,Math.min(Math.round(amt*G.diff.dmg*(p.stats.armor||1)),G.diff.cap?Math.ceil(p.maxHp*G.diff.cap):1e9));
   p.hp-=dmg; p.iframes=0.6; p.hurtFlash=0.12; G.hurtVig=0.6; G.combo=0; p.lastHurt=G.time; p.drinkT=0;
   if(kb){ const a=angTo(sx,sy,p.x,p.y); p.kvx+=Math.cos(a)*kb; p.kvy+=Math.sin(a)*kb; }
   shake(7); hitstop=Math.max(hitstop,0.05); SFX.play('hurt');
@@ -273,12 +275,14 @@ function damageEnemy(e,amt,o){
   return a;
 }
 function comboMult(){ return 1+Math.min(3,Math.floor(G.combo/8)*0.5); }
+// kill XP: EDEF.value at the foe's own lv, growing by balXpK for every level above it (a boss at its own level gives value)
+function foeXp(e){ const d=EDEF[e.type]||{}; return Math.max(0,Math.round((e.value||0)*balXpK(e.level||1)/balXpK(d.lv||1))); }
 function killEnemy(e){
   if(e.dead) return;
   e.dead=true; e.hp=0;
   if(e.type!=='egg'){ G.kills++; G.combo++; G.comboT=3; }
   if(G.mode==='normal'){ G.score+=Math.round(e.value*comboMult()); if(Math.random()<0.12*G.diff.heal) dropHeal(e.x,e.y,14); }
-  gainXp(Math.round(e.boss?e.value:e.value*(1+0.25*((e.level||1)-1))));
+  gainXp(foeXp(e));
   if(player.stats.killHeal&&e.type!=='egg') heal(player.stats.killHeal,true);
   if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; k.room=e.room; k.cropTarget=e.cropTarget; k.mini=e.mini; if(e.room&&AREA&&AREA.rooms&&AREA.rooms[e.room]) AREA.rooms[e.room].enemies.push(k); if(e.camp) e.camp.alive++; } }
   if(e.camp){ e.camp.alive--; if(e.camp.alive<=0&&!e.camp.cave){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story'){ setBanner('Camp cleared','',1.6); G.stats.camps=(G.stats.camps||0)+1; questPoke(); } } }

@@ -7,6 +7,10 @@ let HURT_SRC='';   // set to 'proj' (or 'air') around hurtPlayer calls that can 
 const flyMax=()=>FLY_SEC*((player&&player.stats&&player.stats.flyMax)||1);
 function canJump(){ return !!G&&(G.mode==='normal'||hasAbil('jump')); }
 function canWalkWater(){ return !!G&&G.mode==='story'&&hasAbil('stride'); }
+// v9: Double Jump and Skimmer are powers found in Act I side quests, Meteor Slam came back as Ground Pound (Act III)
+function canDblJump(){ return !!G&&(G.mode==='normal'||hasAbil('dbljump'))&&canJump(); }
+function canSkim(){ return !!G&&G.mode==='story'&&hasAbil('skimmer')&&canWalkWater(); }
+function canPound(){ return !!G&&G.mode==='story'&&hasAbil('pound'); }
 function canFlyHere(){
   if(!G||G.mode!=='story'||!hasAbil('wings')) return false;
   if(AREA) return !!(AREA.canFly||(AREA.def&&AREA.def.canFly));
@@ -67,11 +71,11 @@ function movesPre(dt,inp){
   if(air){
     const fly=canFlyHere()&&p.flyE>=1;
     if(MV.jumpBuf>0){
-      if(hasSkill('dbljump')&&!p.dbl&&!p.slam){ MV.jumpBuf=0; p.dbl=true; p.vz=Math.max(p.vz,JUMP_V*(p.stats.jumpK||1)*0.92); MV.flapT=0.35; mvSnd('dbl'); emit(p.x,p.y-p.z,10,{col:'255,190,110',smin:40,smax:120,lmin:.2,lmax:.45,zmin:1.5,zmax:3,drag:4}); }
+      if(canDblJump()&&!p.dbl&&!p.slam){ MV.jumpBuf=0; p.dbl=true; p.vz=Math.max(p.vz,JUMP_V*(p.stats.jumpK||1)*0.92); MV.flapT=0.35; mvSnd('dbl'); emit(p.x,p.y-p.z,10,{col:'255,190,110',smin:40,smax:120,lmin:.2,lmax:.45,zmin:1.5,zmax:3,drag:4}); }
       else if(fly&&!p.slam){ MV.jumpBuf=0; takeOff(p); return true; }
       else if(hasAbil('wings')&&!p.slam&&!AREA&&G.mode==='story'&&MV.noFlyT<=0){ MV.noFlyT=2; ftext(p.x,p.y-p.z-30,p.flyE<1?'Your wings need a rest':'No room to fly here','#ffd9a0',12); }
     }else if(MV.holdT>0.3&&fly&&!p.slam&&p.vz<90){ takeOff(p); return true; }
-    if(hasSkill('slam')&&inp.attack&&!p.slam&&p.z>6){ p.slam=true; p.vz=-560; mvSnd('takeoff',0.6); }
+    if(canPound()&&inp.attack&&!p.slam&&p.z>6){ p.slam=true; p.vz=-560; mvSnd('takeoff',0.6); }
     if(p.slam) inp.attack=false;
   }
   return air;

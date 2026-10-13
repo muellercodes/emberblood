@@ -1,0 +1,22 @@
+{
+ "_about": "Simple words for e6_balance (difficulty notes, the Arena name, the Powers page and skill tree labels). Strings written with S() in code carry their own.",
+ "1mkns0f": "Kind foes and big healing. Keep moving!",
+ "139v1vk": "A real fight. Quick foes, tough bosses.",
+ "3h8ofn": "Fast, mean foes. Very tough bosses.",
+ "1jric0g": "Fast feet, long flights, better powers.",
+ "jni82z": "Find a new power to open this.",
+ "15vclnc": "Find a new power first",
+ "d8muvv": "Not found yet.",
+ "r8e0rz": "Powers are gifts you find. They are free. Many open a skill.",
+ "1a7yhu9": "Top level. You are a legend!",
+ "1eltlv1": "Move!",
+ "1s0lr0p": "Pick a quest to follow (Arena: pick a weapon)",
+ "t_1oig6pb": {
+  "o": "Arena best on {1}: wave {2}, {3} points",
+  "s": "Arena best on {1}: wave {2}"
+ },
+ "t_7l8oq7": {
+  "o": "Upgrade: {1}, in {2}",
+  "s": "Upgrade: {1}"
+ }
+}
