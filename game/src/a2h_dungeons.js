@@ -17,6 +17,10 @@ const TRIALS={
 };
 const trialOpen=id=>{ const T=TRIALS[id]; if(!T||!G) return false; if(G.mode!=='story') return true; return reached(T.stage); };
 const trialDone=id=>!!(G&&G.flags&&G.flags['trial_'+id+'_done']);
+// the dungeon an area belongs to (a floor of a multi-floor dungeon names it in def.dun), and its Trial-like info
+// (TRIALS for Ember's Trials, DUNGEONS for anything made with defineDungeon): abil, abilName, boss, bossY, level, shrine
+function dunRoot(id){ const d=AREADEFS[id]; return (d&&d.dun)||id; }
+function trialInfo(id){ const r=dunRoot(id); return TRIALS[r]||DUNGEONS[r]||null; }
 
 // ---------- room templates (15 x 11 cells; boss rooms are 31 x 23). Letters: see TY_CH in a2f_caves.js, plus
 // J statue, F fountain, D Ember's shrine, b big chest, X chest or key spot, H crystal switch, Y stone eye, V wind vent,
@@ -197,9 +201,9 @@ function trialNpcHere(id){
 const FLOW=[[0,-1],[1,0],[0,1],[-1,0]];
 function trialState(A){
   if(A.tri) return A.tri;
-  const c=A.cave, n=c.w*c.h, id=A.def.id;
+  const c=A.cave, n=c.w*c.h, id=caveSid(A.def);
   const T=A.tri={t:0,crS:new Uint8Array(n),crT:new Float32Array(n),crum:[],spk:new Uint8Array(n),rings:[],logs:[],roots:[],zones:[],bolts:[],
-    high:!G.found['tlow_'+id],safe:null,entry:null,lx:null,ly:null,wasAir:false,wasFly:false,pushed:false,room:null,boss:null,hold:null,stream:new Map(),perches:[],nest:null,fallT:0,puff:null};
+    high:!G.found['tlow_'+caveDsid(A.def)],safe:null,entry:null,lx:null,ly:null,wasAir:false,wasFly:false,pushed:false,room:null,boss:null,hold:null,stream:new Map(),perches:[],nest:null,fallT:0,puff:null};
   for(let k=0;k<n;k++){ const t=c.typ[k]; if(t===TY.crumble) T.crum.push(k); if(t===TY.pit&&G.found[`tpit_${id}_${k}`]) c.typ[k]=0; }
   for(const rid in c.rooms){ const R=c.rooms[rid]; for(let j=R.oy+1;j<=R.oy+R.ih;j++) for(let i=R.ox+1;i<=R.ox+R.iw;i++){ const k=j*c.w+i; if(c.typ[k]===TY.spike) T.spk[k]=R.spikes==='timed'?2:1; } }
   return T;
@@ -213,10 +217,10 @@ function tGround(k){
   if(t===TY.crumble) return !T||T.crS[k]!==2;
   if(t===TY.basin) return !!T&&!T.high;
   if(t===TY.stones) return !!T&&T.high;
-  return false;
+  return typeof dunGround==='function'&&dunGround(k,t,T);   // the cells e9a_dungeon.js adds
 }
-function tWet(k){ const A=AREA, c=A.cave, T=A.tri; if(k<0) return false; const t=c.typ[k]; return t===TY.deep||t===TY.current||(t===TY.basin&&!!T&&T.high)||(t===TY.stones&&!!T&&!T.high); }
-function tHole(k){ const A=AREA, c=A.cave, T=A.tri; if(k<0) return false; const t=c.typ[k]; return t===TY.pit||(t===TY.crumble&&!!T&&T.crS[k]===2); }
+function tWet(k){ const A=AREA, c=A.cave, T=A.tri; if(k<0) return false; const t=c.typ[k]; return t===TY.deep||t===TY.current||(t===TY.basin&&!!T&&T.high)||(t===TY.stones&&!!T&&!T.high)||(typeof dunWet==='function'&&dunWet(k,t,T)); }
+function tHole(k){ const A=AREA, c=A.cave, T=A.tri; if(k<0) return false; const t=c.typ[k]; return t===TY.pit||(t===TY.crumble&&!!T&&T.crS[k]===2)||(typeof dunHole==='function'&&dunHole(k,t,T)); }
 function tSpikeUp(k){ const T=AREA.tri; if(!T||!T.spk[k]) return false; if(T.spk[k]===1) return true; const i=k%AREA.cave.w; return ((T.t*0.7+(i%9)*0.08)%1)<0.48; }
 // a gentle shove that never pushes through walls or furniture
 function tNudge(e,dx,dy){ const nx=e.x+dx; if(!blockedAt(nx,e.y)&&!colAt(nx,e.y,e.r*0.5)) e.x=nx; const ny=e.y+dy; if(!blockedAt(e.x,ny)&&!colAt(e.x,ny,e.r*0.5)) e.y=ny; }
@@ -242,26 +246,26 @@ function tSealed(o){ const R=AREA.rooms[o.room]; return !!(R&&R.sealChest&&!R.so
 
 // ---------- building a Trial room (called by buildCaveRooms for every room with trial:true)
 function trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng){
-  const T=trialState(A), c=A.cave, id=def.id;
+  const T=trialState(A), c=A.cave, id=caveSid(def), root=dunRoot(def.id);
   let eyeN=0;
   for(const m of ms){
     const p=P(m.i,m.j), oid=`tr_${id}_${R.id}_${m.ch}${m.c}_${m.r}`;
     switch(m.ch){
-      case 'J': A.objs.push({k:'tstatue',x:p.x,y:p.y,id:oid,th:id,v:(m.c*7+m.r*3)%3}); addAreaCol({t:'c',x:p.x,y:p.y+4,r:16}); break;
-      case 'F': A.objs.push({k:'tfount',x:p.x,y:p.y,id:oid,th:id}); addAreaCol({t:'c',x:p.x,y:p.y,r:19}); A.lights.push({x:p.x,y:p.y,r:170,i:0.5}); break;
-      case 'D': { const o=tObj(A,'shrine',p.x,p.y+10,oid,{r:36,room:R.id}); o.vis.y=p.y; o.prompt=()=>hasAbil(TRIALS[id].abil)?'Warm your claws at Ember’s flame':'Touch Ember’s flame'; addAreaCol({t:'c',x:p.x,y:p.y,r:22}); A.lights.push({x:p.x,y:p.y-24,r:360,i:0.95,fire:true}); break; }
+      case 'J': A.objs.push({k:'tstatue',x:p.x,y:p.y,id:oid,th:def.theme,v:(m.c*7+m.r*3)%3}); addAreaCol({t:'c',x:p.x,y:p.y+4,r:16}); break;
+      case 'F': A.objs.push({k:'tfount',x:p.x,y:p.y,id:oid,th:def.theme}); addAreaCol({t:'c',x:p.x,y:p.y,r:19}); A.lights.push({x:p.x,y:p.y,r:170,i:0.5}); break;
+      case 'D': { const o=tObj(A,'shrine',p.x,p.y+10,oid,{r:36,room:R.id}); o.vis.y=p.y; o.prompt=()=>{ const TI=trialInfo(root); return TI&&TI.abil&&!hasAbil(TI.abil)?'Touch Ember’s flame':'Warm your claws at Ember’s flame'; }; addAreaCol({t:'c',x:p.x,y:p.y,r:22}); A.lights.push({x:p.x,y:p.y-24,r:360,i:0.95,fire:true}); break; }
       case 'H': { const o={k:'tswitch',x:p.x,y:p.y,id:oid,room:R.id,r:16,acc:R.acc||['boomerang','arrow','slash','spear','hammer','daggers'],timed:R.timed||0,t:0,on:R.solved,lit:R.solved}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:12}); A.lights.push({x:p.x,y:p.y,r:170,i:0,obj:o}); break; }
       case 'Y': { const o={k:'teye',x:p.x,y:p.y,id:oid,room:R.id,r:18,lit:R.solved,ph:eyeN++*1.9,t:0,timed:R.timed||0,face:angTo(p.x,p.y,R.cx,R.cy)}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:13}); A.lights.push({x:p.x,y:p.y,r:170,i:0,obj:o}); break; }
       case 'V': { const v=R.vent||{dir:[1,0],len:6}; A.objs.push({k:'tvent',x:p.x,y:p.y,id:oid,room:R.id,dir:v.dir,len:v.len,ci:m.i,cj:m.j,on:false}); addAreaCol({t:'c',x:p.x,y:p.y,r:14}); break; }
       case 'v': { const o=tObj(A,'valve',p.x,p.y,oid,{r:22,room:R.id}); o.prompt=()=>T.high?'Turn the valve (lower the tide)':'Turn the valve (raise the tide)'; addAreaCol({t:'c',x:p.x,y:p.y,r:14}); break; }
       case 'r': { const k=m.j*c.w+m.i, o={k:'cgate',type:'roots',x:p.x,y:p.y,id:oid,opened:!!G.found[oid],cells:[k],r:30,vertical:false,closed:true,tmp:false,heat:0}; A.gates.push(o); c.dyn[k]=A.gates.length; A.objs.push(o,{k:'tv',kind:'roots',ref:o,x:p.x,y:p.y,id:oid+'_v'}); o.prompt=()=>caveGatePrompt(o); break; }
       case 'q': if(R.pick&&!G.found[oid]) A.objs.push({k:'tpick',x:p.x,y:p.y,id:oid,item:R.pick}); break;
-      case 'u': { const o=tObj(A,'altar',p.x,p.y,oid,{r:32,room:R.id}); o.prompt=()=>trialDone(id)?'Look at the altar':'Lay your claws on Ember’s altar'; addAreaCol({t:'c',x:p.x,y:p.y,r:20}); A.lights.push({x:p.x,y:p.y,r:320,i:0.9}); break; }
+      case 'u': { const o=tObj(A,'altar',p.x,p.y,oid,{r:32,room:R.id}); o.prompt=()=>trialDone(root)?'Look at the altar':'Lay your claws on Ember’s altar'; addAreaCol({t:'c',x:p.x,y:p.y,r:20}); A.lights.push({x:p.x,y:p.y,r:320,i:0.9}); break; }
       case 'W': A.objs.push({k:'twarp',x:p.x,y:p.y,id:oid,room:R.id}); A.lights.push({x:p.x,y:p.y,r:210,i:0.6}); break;
       case 'n': T.perches.push({x:p.x,y:p.y}); break;
       case 'E': T.nest={x:p.x,y:p.y}; A.objs.push({k:'tnest',x:p.x,y:p.y,id:oid}); addAreaCol({t:'c',x:p.x,y:p.y,r:18}); break;
       case 'N': if(R.npc==='puff'){ if(!G.flags.puff_found){ const o=tObj(A,'puff',p.x,p.y,oid,{r:30,room:R.id}); o.prompt=()=>'Say hello to the little dragon'; } }
-        else if(R.npc) (A.trialNpcs=A.trialNpcs||[]).push({id:R.npc,x:p.x,y:p.y}); break;
+        else if(R.npc&&R.trial) (A.trialNpcs=A.trialNpcs||[]).push({id:R.npc,x:p.x,y:p.y}); break;
     }
   }
   const X=spot('X')||{x:R.cx,y:R.cy}, Bp=spot('b')||X;
@@ -273,8 +277,8 @@ function trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng){
 // ---------- every frame inside a Trial (called at the end of updateCaveRooms)
 function trialUpdate(dt,R){
   const A=AREA, T=A.tri; if(!T) return;
-  const c=A.cave, p=player, id=A.def.id;
-  T.t+=dt; A.canFly=id==='sky';
+  const c=A.cave, p=player, id=dunRoot(A.def.id);
+  T.t+=dt; A.canFly=id==='sky'||!!A.def.canFly;
   if(T.hold){ T.hold.t-=dt; if(T.hold.t<=0) T.hold=null; }
   if(T.fallT>0) T.fallT-=dt;
   if(R&&R!==T.room){ T.room=R; onTrialRoom(R); }
@@ -302,7 +306,7 @@ function trialUpdate(dt,R){
   // pickups and the warp home
   for(const o of A.objs){
     if(o.k==='tpick'&&!G.found[o.id]&&dist(p.x,p.y,o.x,o.y)<34&&!airborne()){ G.found[o.id]=true; giveItems({[o.item]:1},true); jingle('item','chest'); const n=G.items[o.item]||1; setBanner(ITEM_NAMES[o.item]||o.item,o.item==='tide_pearl'?`${n} of 3 glow pearls`:o.item==='marlo_hat'?'Marlo will be so happy. Magnificently happy.':'A soft white feather. It hums when the wind blows.',2.2); emit(o.x,o.y,18,{col:'255,240,200',ang:-Math.PI/2,spread:1,smin:30,smax:120,lmin:.4,lmax:.8,zmin:1.5,zmax:3,rise:20}); if(o.item==='sky_feather') addCoins(30,o.x,o.y); questPoke(); saveGame(); }
-    if(o.k==='twarp'&&trialDone(id)&&!T.warping&&dist(p.x,p.y,o.x,o.y)<30){ T.warping=true; SFX.play('shrine'); flashA=0.5; flashCol='255,230,170'; const nm=TRIALS[id].name; later(0.15,()=>{ if(AREA&&AREA.def.id===id){ exitArea(); setBanner(nm,'Ember’s warp sets you down outside.',2.2); } }); }
+    if(o.k==='twarp'&&trialDone(id)&&!T.warping&&dist(p.x,p.y,o.x,o.y)<30){ T.warping=true; SFX.play('shrine'); flashA=0.5; flashCol='255,230,170'; const nm=(trialInfo(id)||A.def).name; later(0.15,()=>{ if(AREA&&dunRoot(AREA.def.id)===id){ exitArea(); setBanner(nm,'Ember’s warp sets you down outside.',2.2); } }); }
   }
   // Puff the hatchling follows Ash to the nest
   if(G.flags.puff_found&&!G.flags.puff_home&&id==='sky'){
@@ -315,14 +319,14 @@ function trialUpdate(dt,R){
   trialBossFx(dt);
 }
 function onTrialRoom(R){
-  const A=AREA, T=A.tri, id=A.def.id, TR=TRIALS[id], p=player;
+  const A=AREA, T=A.tri, aid=A.def.id, id=dunRoot(aid), TR=trialInfo(id), p=player;
   T.entry=tEntryPoint(R,p.x,p.y);
-  const vk=`tv2_${id}_${R.id}`, first=!G.found[vk]; G.found[vk]=1;
-  const talk=(lines)=>later(0.5,()=>{ if(AREA&&AREA.def.id===id&&scene==='play'&&lines) runDialogue(lines,()=>{ scene='play'; saveGame(); }); });
+  const vk=`tv2_${caveSid(A.def)}_${R.id}`, first=!G.found[vk]; G.found[vk]=1;
+  const talk=(lines)=>later(0.5,()=>{ if(AREA&&AREA.def.id===aid&&scene==='play'&&lines) runDialogue(lines,()=>{ scene='play'; saveGame(); }); });
   if(R.kind==='start'&&first) talk(STORY['trial_'+id+'_in']);
-  if(R.kind==='shrine'&&first&&!hasAbil(TR.abil)) talk(STORY['trial_'+id+'_shrine']);
-  if(R.kind==='tboss'&&!R.solved) trialBossStart(R);
-  if(R.kind==='reward'&&first&&!trialDone(id)) taunt('ember',pick([`You did it, little ember. Come. Touch the altar.`,`The altar is for you. It always was.`]));
+  if(R.kind==='shrine'&&first&&TR&&TR.abil&&!hasAbil(TR.abil)) talk(STORY['trial_'+id+'_shrine']);
+  if(R.kind==='tboss'&&!R.solved&&TR&&TR.boss) trialBossStart(R);
+  if(R.kind==='reward'&&first&&TR&&!trialDone(id)) taunt('ember',pick([`You did it, little ember. Come. Touch the altar.`,`The altar is for you. It always was.`]));
   if(R.nest&&G.flags.puff_found&&!G.flags.puff_home) setBanner('A nest!','Bring Puff close to it.',2);
 }
 // Ash on the special floors: pits and crumbled tiles drop him, deep water and chasms hold him back, spikes sting
@@ -330,6 +334,7 @@ function trialPlayerCells(){
   const A=AREA, T=A.tri, c=A.cave, p=player; if(p.dead||scene!=='play') return;
   const air=airborne(), fly=!!p.flying, kv=Math.hypot(p.kvx||0,p.kvy||0);
   const check=(x,y)=>{ const k=tCell(x,y); if(k<0) return null; const t=c.typ[k];
+    if(typeof dunCheck==='function'){ const v=dunCheck(k,x,y,air,fly); if(v!==undefined) return v; }   // heights, rafts, rails (e9a_dungeon.js)
     if(tHole(k)) return air?null:'fall';
     if(tWet(k)) return air||canWalkWater()?null:(T.wasAir?'splash':'wall');
     if(t===TY.chasm) return fly||T.stream.has(k)?null:(T.grace>0?'wall':(T.wasFly||T.pushed||T.ext>0||kv>170)?'fall':'wall');
@@ -367,7 +372,7 @@ function trialEnemyCells(){
     if(e.dead||!e.inArea||e.flying||e.noClip) continue;
     const k=tCell(e.x,e.y); if(k<0) continue;
     const swim=!!(EDEF[e.type]&&EDEF[e.type].swim);
-    const ok=swim?tWet(k):tGround(k);
+    const ok=(swim?tWet(k):tGround(k))&&(typeof dunEnemyOK!=='function'||dunEnemyOK(e,k));
     if(ok){ e._tx=e.x; e._ty=e.y; continue; }
     if(!swim&&!e.boss&&!e.caveBoss&&(tHole(k)||c.typ[k]===TY.chasm)&&Math.hypot(e.vx,e.vy)>140){ emit(e.x,e.y,14,{col:'70,58,48',glow:false,smin:20,smax:80,lmin:.3,lmax:.6,zmin:2,zmax:5,grow:4}); ftext(e.x,e.y-20,'Byeee!','#ffe0a0',12); killEnemy(e); continue; }
     if(e._tx!=null){ e.x=e._tx; e.y=e._ty; } else { e._tx=e.x; e._ty=e.y; }
@@ -393,7 +398,7 @@ function trialBlockInto(b,ni,nj,k){
   b.fx=b.x; b.fy=b.y; b.ci=ni; b.cj=nj; b.anim=0.2; b.sinking=true; SFX.play('roll',0.7); return true;
 }
 function trialSinkBlock(b){
-  const A=AREA, c=A.cave, k=b.cj*c.w+b.ci, id=A.def.id;
+  const A=AREA, c=A.cave, k=b.cj*c.w+b.ci, id=caveSid(A.def);
   b.sinking=false; c.typ[k]=0; G.found[`tpit_${id}_${k}`]=true;
   emit(b.x,b.y,24,{col:'120,110,96',glow:false,smin:30,smax:120,lmin:.4,lmax:.8,zmin:3,zmax:6,grow:5}); SFX.play('boom'); shake(5);
   b.sunk=true; b.ci=b.cj=-99; b.x=b.y=-9999;
@@ -405,30 +410,30 @@ function trialSwitchOn(o){
   if(!was){ SFX.play('shrine'); emit(o.x,o.y,18,{col:'150,230,255',smin:40,smax:150,lmin:.3,lmax:.7,zmin:1.5,zmax:3}); shake(2); if(o.timed) ftext(o.x,o.y-30,`${o.timed} seconds!`,'#bfefff',13); }
 }
 function trialBossWon(R){
-  const A=AREA, id=A.def.id;
+  const A=AREA, aid=A.def.id, id=dunRoot(aid);
   solveRoom(R,true); G.flags['trial_'+id+'_boss']=true; if(typeof deed==='function') deed('trial_'+id);
   questPoke(); saveGame();
-  later(2.7,()=>{ if(G.boss&&G.boss.dead) G.boss=null; if(AREA&&AREA.def.id===id) runDialogue(STORY['trial_'+id+'_won'],()=>{ scene='play'; setBanner('The way is open','Ember’s gift waits beyond the guardian.',2.6); saveGame(); }); });
+  later(2.7,()=>{ if(G.boss&&G.boss.dead) G.boss=null; if(AREA&&AREA.def.id===aid&&STORY['trial_'+id+'_won']) runDialogue(STORY['trial_'+id+'_won'],()=>{ scene='play'; setBanner('The way is open',TRIALS[id]?'Ember’s gift waits beyond the guardian.':'',2.6); saveGame(); }); });
 }
 function trialBossStart(R){
-  const A=AREA, T=A.tri, id=A.def.id, TR=TRIALS[id];
+  const A=AREA, T=A.tri, aid=A.def.id, id=dunRoot(aid), TR=trialInfo(id);
   if(T.boss&&!T.boss.dead) return;
-  const type=TR.boss, d=EDEF[type];
-  const x=R.cx-120, y=type==='skrae'?R.y0+260:R.cy;
-  const e=makeEnemy(type,x,y,{level:1,aggro:true,homeX:R.cx,homeY:R.cy,leash:5000});
+  const type=R.guardian||TR.boss, d=EDEF[type];
+  const x=R.cx-120, y=TR.bossY!=null?R.y0+TR.bossY:type==='skrae'?R.y0+260:R.cy;
+  const e=makeEnemy(type,x,y,{level:TR.bossLevel||1,aggro:true,homeX:R.cx,homeY:R.cy,leash:5000});
   e.inArea=true; e.room=R.id; e.trialBoss=id; e.arena={x0:R.x0,y0:R.y0,x1:R.x1,y1:R.y1,cx:R.cx,cy:R.cy}; e.spawnIn=0.5;
   R.enemies.push(e); T.boss=e; G.boss=e;
   setBanner(d.name,(W<560&&d.short)?d.short:d.title,3,'boss'); jingle('boss_intro',null); SFX.play('warn'); shake(8);
-  later(1.6,()=>{ if(AREA&&AREA.def.id===id&&!e.dead) taunt('ember',STORY['trial_'+id+'_bossline']); });
+  later(1.6,()=>{ if(AREA&&AREA.def.id===aid&&!e.dead&&STORY['trial_'+id+'_bossline']) taunt(TR.bossWho||'ember',STORY['trial_'+id+'_bossline']); });
 }
 
 // ---------- the E button on Trial things
 function trialObjAct(o){
-  const A=AREA, T=A.tri, id=A.def.id, TR=TRIALS[id];
+  const A=AREA, T=A.tri, id=dunRoot(A.def.id), TR=trialInfo(id)||{};
   const say=(t,cb)=>runDialogue([['narr',t]],()=>{ scene='play'; if(cb) cb(); saveGame(); });
   switch(o.tobj){
     case 'shrine':
-      if(hasAbil(TR.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine'); say(`Ember's flame is warm. Your scales stop aching. (Health and draughts restored.)`); return true; }
+      if(!TR.abil||hasAbil(TR.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine'); say(`Ember's flame is warm. Your scales stop aching. (Health and draughts restored.)`); return true; }
       runDialogue(STORY['trial_'+id+'_gift'],()=>{
         scene='play'; grantAbility(TR.abil); player.hp=player.maxHp; player.potions=player.potionsMax;
         jingle('levelup','level'); flashA=0.55; flashCol='255,214,140'; shake(7);
@@ -440,7 +445,7 @@ function trialObjAct(o){
       return true;
     case 'chest': trialChest(o); return true;
     case 'valve':{
-      T.high=!T.high; G.found['tlow_'+id]=!T.high; SFX.play('block'); SFX.play('roll'); shake(4);
+      T.high=!T.high; G.found['tlow_'+caveDsid(A.def)]=!T.high; SFX.play('block'); SFX.play('roll'); shake(4);
       if(o.vis) o.vis.spin=1;
       setBanner(T.high?'The tide rises':'The tide drains away',T.high?'Stepping stones float up out of the water.':'The basin empties. You can walk where the water was.',2);
       // never flood Ash where he stands
@@ -454,13 +459,13 @@ function trialObjAct(o){
   return false;
 }
 function trialChest(o){
-  const A=AREA, T=A.tri, id=A.def.id;
+  const A=AREA, T=A.tri, id=dunRoot(A.def.id), DK=caveDsid(A.def);
   if(G.found[o.id]) return;
   if(tSealed(o)){ runDialogue([['narr',`A great chest, held shut by bands of golden light. They will let go once this room is safe.`]],()=>{ scene='play'; }); return; }
   const fx=()=>{ SFX.play('chest'); flashA=0.35; flashCol='255,226,160'; shake(4); emit(o.x,o.y,40,{col:'255,214,120',ang:-Math.PI/2,spread:1.2,smin:40,smax:200,lmin:.5,lmax:1.1,zmin:1.5,zmax:3.5,rise:20}); };
   G.found[o.id]=true;
-  if(o.item==='map'){ fx(); G.found['tmap_'+id]=true; renderCaveMini(A); T.hold={item:'map',t:2.6}; jingle('item','chest'); setBanner('The Trial map!','Every room of the Trial now shows on your minimap.',2.8); saveGame(); return; }
-  if(o.item==='bosskey'){ fx(); G.found['bkey_'+id]=true; T.hold={item:'bosskey',t:3}; jingle('item','chest');
+  if(o.item==='map'){ fx(); G.found['tmap_'+DK]=true; renderCaveMini(A); T.hold={item:'map',t:2.6}; jingle('item','chest'); setBanner('The Trial map!','Every room of the Trial now shows on your minimap.',2.8); saveGame(); return; }
+  if(o.item==='bosskey'){ fx(); G.found['bkey_'+DK]=true; T.hold={item:'bosskey',t:3}; jingle('item','chest');
     runDialogue([['narr',`Inside the great chest, on a cushion of moss and gold thread: a heavy key shaped like a flame.`],['narr',`The Guardian Key. It opens the great door, where the guardian of the Trial sleeps.`]],()=>{ scene='play'; setBanner('Guardian Key','Now find the great door.',2.4); saveGame(); });
     saveGame(); return; }
   // the dungeon item
@@ -468,7 +473,7 @@ function trialChest(o){
   runDialogue(STORY['trial_'+id+'_item'],()=>{ scene='play'; giveWeapon(o.item); later(2.2,()=>setBanner(WEAPONS[o.item]?WEAPONS[o.item].name:o.item,STORY['trial_'+id+'_itemhow'],4)); questPoke(); saveGame(); });
 }
 function trialReward(o){
-  const A=AREA, id=A.def.id, TR=TRIALS[id];
+  const A=AREA, id=dunRoot(A.def.id), TR=trialInfo(id)||{name:A.def.name,level:A.def.level||1};
   if(trialDone(id)){ runDialogue([['narr',`Ember's altar glows softly. The warp ring beside it is still open, whenever you are ready to go.`]],()=>{ scene='play'; }); return; }
   runDialogue(STORY['trial_'+id+'_end'],()=>{
     scene='play'; const p=player;

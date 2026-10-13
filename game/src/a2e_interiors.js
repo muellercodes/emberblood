@@ -212,8 +212,8 @@ function enterArea(id,door){
   if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+30; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x+30; G.goat.y=player.y+30; }
   updateCam(0,true); G.fade=1; SFX.play('ui');
-  if(def.trial){ const sh=TRIALS[def.trial].shrine; G.shrines[sh.id]=true; G.lastShrine=sh.id; }
-  if(!G.found['seen_'+id]){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,def.trial?`One of Ember’s Trials · Danger level ${def.level}`:`A cave · Danger level ${def.level}`,2.6,'region'); } }
+  { const TI=def.kind==='cave'&&trialInfo(def.trial||def.id), sh=TI&&TI.shrine; if(sh){ G.shrines[sh.id]=true; G.lastShrine=sh.id; } }
+  if(!G.found['seen_'+id]){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,def.trial?`One of Ember’s Trials · Danger level ${def.level}`:`${def.dunKind||'A cave'} · Danger level ${def.level}`,2.6,'region'); } }
   else if(def.kind==='cave') setBanner(def.name,'',1.6,'region');
   if(def.kind==='house'&&def.owner) setBanner(def.name,'',1.4,'region');
   questPoke();

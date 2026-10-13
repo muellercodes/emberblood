@@ -32,7 +32,7 @@ function openMap(){
   if(!G||G.mode!=='story'||scene!=='play') return;
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
   mapSel=null; $('#bTravel').hidden=true; mapHintSet();
-  MAPUI.view=curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
+  MAPUI.view=AREA&&AREA.rooms?-1:curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
   drawMapScreen(); renderJournal(); show('mapov');
 }
 const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
@@ -104,6 +104,7 @@ function renderJour(){
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
+  if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); return; } MAPUI.view=curMap(); }   // the dungeon page
   const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
   g.setTransform(1,0,0,1,0,0); g.fillStyle='#0e0a08'; g.fillRect(0,0,w,h);
   if(O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,MF.ox,MF.oy,MF.w,MF.h); }

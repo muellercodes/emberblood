@@ -40,15 +40,120 @@ const CAVEMAP={
 // the Trials (a2h_dungeons.js) add their own maps later, so the tally is recounted after they load
 const countCaveSecrets=()=>Object.values(CAVEMAP).reduce((n,m)=>n+Object.values(m.rooms).filter(r=>r.kind==='secret').length,0);
 let CAVE_SECRETS=countCaveSecrets();
+// ---------- v9: Whisperwood Hollow, Mirrow Grotto and the Oath's Hidden Tunnel, rebuilt as real dungeons. Their mechanics
+// live in e9a_dungeon.js, which turns every CAVEMAP entry with a dun:{...} block into a dungeon (new save prefixes a1_*)
+const V9_TPL={"w_a":["...............","....l..........","...............",".##.........##.","...............","...............","...............",".##.........##.","...........s...","...............","..............."],
+  "w_b":["...............",".#...........#.","...............",".......l.......","...............","...............","...............","rrrrrrrrrrrrrrr","...............","..s............","..............."],
+  "w_c":["...............",".X.............","...............","...##.....##...","...............","...............","...............","...##.....##...","...............","...............","..............."],
+  "w_d":["...............","..%%%%%%%%%%%..",".%%%%%%%%%%%%%.",".%%%%%%%%%%%%%.","%%%%%%%%%%%%%%.","%%%%%%%%%%%%%%.","%%%%%%%%%%%%%%.",".%%%%%%%%%%%%%.",".%%%%%%%%%%%%%.","..%%%%%%%%%%%..","..s............"],
+  "w_f":["...............",".#.....*.....#.",".##.........##.","...............",".....=====.....",".....=====.....",".....==/==.....","...............",".##.........##.",".#...........#.","..s............"],
+  "w_g":["...............","..rrr..........","..rXr..l.......","..rrr..........","...............","...........*...",".*.............","...............","....#.....#....","...............","..............."],
+  "w_h":["...............",".##.........##.",".#...........#.","...............","...............","...............","...............","...............",".#...........#.",".##.........##.","..............."],
+  "w_i":["...............","...............","..........X....","...............","...............",".....N.........","...............","...*.......*...","...............","...............","..............."],
+  "w_j":["...............",".#...........#.","...............",".......X.......","...............","...............","...............","...#.......#...","...............",".#...........#.","..............."],
+  "w_k":["...............",".f..ooo........","....ooo...j....",".........ooo...",".ooo.....ooo.f.",".ooo...........",".......ooo.....",".l.....ooo.....","...f.......X...","...............","..............."],
+  "w_m":["...............","..r.......r....",".........l.....","...............","..r..........r.","...............","....*.....*....","...............",".r...........r.","...............","..............."],
+  "w_n":["...............",".f.............","..<.......f....","...............","....##...##....","...............","....##...##....","...............","..f........l...","...............","..............."],
+  "w_o":["...............",".=============.",".==X========l=.",".=============.",".____=========.","............./.",".............r.","...............","...*.......*...","...............","..............."],
+  "m_a":["...............","...............","aaaaaaaaaaaaaaa","aaaaaaaaaaaaaaa","...............","...............","...............",".....c.........","...........*...","..s............","..............."],
+  "m_b":["...............","xxxxxxxxxxxxxxx","xxxxxxxxxxxxxxx","...............","...............",".*...........*.",".....=====.....",".....=e=X=.....",".....==/==.....","...............","..s............"],
+  "m_c":["...............","...wwwwwww.....","..wwwwwwwww....","..wwwwwwwww....","...wwwwwww.....","......N........","...............","...*.......*...","...............","...............","..............."],
+  "m_e":["...............","...............",".#...........#.","...aaa.........","...aaa.........","...ama.........","...aaa.........","...............",".O..m..........","...........s...","..............."],
+  "m_f":["#####.....#####","#####aaaaa#####","#####aaaaa#####","#####aaaaa#####",".zzzz.....yyyy.",".zzzz.....yyyy.",".zzzz.....yyyy.","#####..*..#####","#####c...i#####","#####.....#####","#####s....#####"],
+  "m_g":["...............",".......K.......","...............","..#.........#..","...............",".......m.......","...............","..#.........#..",".......X.......","...............","..............."],
+  "m_h":["...............",".ww.........ww.",".ww.........ww.","...............","...............","...............","...............","...............",".ww.........ww.",".ww.........ww.","..............."],
+  "m_i":["...............",".wwwwwwwwwwwww.",".wwwwwwwwwwwww.",".www.....wwwww.",".www..X..wwwww.",".www.....wwwww.",".wwwwwwwwwwwww.",".wwwwwwwwwwwww.",".zzzzzzzzzzzzz.","...............","..............."],
+  "m_j":["...............",".#...........#.","...............","...##.....##...","...............",".......X.......","...............","...##.....##...","...............",".#...........#.","..............."],
+  "m_k":["...............","...............","...*.......*...",".......X.......","...............","...............","...............","...............","...*.......*...","...............","..............."],
+  "m_l":["...............","...............","..aaaaaaaaaa...","..aaaaaaaaaa...","..aaaaXaaaaa...","..aaaaaaaaaa...","..aaaaaaaaaa...","..aaaaaaaaaa...","...............","...............","..............."],
+  "t_a":["...............","...............",".#...........#.","...............","...............",".----A.........","...............","...............",".#..s........#.","...............","..............."],
+  "t_b":["...............",".......|.......",".#.....|.....#.",".......|.......",".......|.......",".......|.......",".......|.......",".......A.H.....","...............",".#..s........#.","..............."],
+  "t_c":["...............",".X.............","...............","..##.......##..","...............","...............","...............","..##.......##..","...............","...............","..............."],
+  "t_d":["...............","...............","...............","...oooooooooooo","...oooooooooooo","...oooooooooooo","...ooooooo9999.","...ooooooo9999X","...ooooooo9999.",".s.oooooooooooo","...oooooooooooo"],
+  "t_e":["...............","...............","...............",".####...####...","...........#...","...........---.","...........#...","...#.......#...","...............","...............","..............."],
+  "t_g":["ooooooooooooooo","ooooooooooooooo","ooooooooooooooo","ooooooottttttoo","..oooootoooot..",".-tooootoooot-.","..ttttt+ooooo..","oooooootooooooo","ooo....|....ooo","ooo....|....ooo","ooo.s.......ooo"],
+  "t_h":["...............",".##.........##.",".......Q.......","...............","...............","...............","...............","...............","...............",".##.........##.","..............."],
+  "t_i":["...............","...............","...............",".......X.......","...............","...*.......*...","...............","...............","...............","...............","..............."],
+  "t_j":["...............","..#....#....#..","...............","...............","...............","---------------","...............","...............","..#....#....#..","...............","..............."],
+  "t_k":["...............",".#...........#.",".......$.......","...!.......;...","...............",".......X.......","...............","...$.......!...",".......;.......",".s.............","..............."],
+  "t_l":["...............","............X..","..BB....BB.....","...............","...............","...............","...............","..BB....BB.....","...............",".....#...#.....","..............."],
+  "t_m":["...............","...............","...*.......*...","..H............","...............",".---....X......","...............","...............","...*.......*...","...............","..............."]};
+// Whisperwood Hollow: living roots that grow back unless a lit lantern-pod keeps them away, spore pods that light the dark,
+// a cracked floor down to the Root Cellar. The Heartroot needs all three heart pods (one upstairs, two in the cellar).
+CAVEMAP.whisper={dun:{save:'a1_whisper',regrow:7,pods:{heart:3},floors:[{id:'1',name:S('The Hollow','The Hollow')},{id:'b1',area:'whisper_b1',name:S('The Root Cellar','The Root Cellar')}],
+    story:{in:[['ash',S(`Juniper? JUNIPER! ...Just bats. And roots. So many roots.`,`Juniper? Just bats. And roots!`)],['ash',S(`The roots are moving. That is fine. That is totally fine.`,`The roots move. That is fine!`)]]}},
+  rooms:{
+    a:{at:[1,3],kind:'start',tpl:V9_TPL.w_a,sign:S(`Juniper went in here. So did the roots. Roots hate fire. Lantern-pods hate the dark. Breathe on both.`,`Roots hate fire. Breathe on the roots and the pod.`)},
+    b:{at:[1,2],kind:'pods',tpl:V9_TPL.w_b,sign:S(`Roots grow back fast in the Hollow. Burn them, then run! A lit lantern-pod nearby keeps them gone.`,`Burn the roots, then run! Then light the pod.`)},
+    c:{at:[0,2],kind:'fight',tpl:V9_TPL.w_c,foes:[['slime',3],['bat',2]],loot:['dmap'],solveOnClear:true,sealChest:true},
+    d:{at:[2,2],kind:'free',tpl:V9_TPL.w_d,sign:S(`The floor here is very thin. Something lives underneath. (It is the Root Cellar. The Root Cellar lives underneath.)`,`The floor is thin. The cellar is under it.`)},
+    e:{at:[0,3],kind:'secret',loot:['page:p1','coins']},
+    f:{at:[1,1],kind:'free',tpl:V9_TPL.w_f,sign:S(`THE HEARTROOT. It drinks the light of three lantern-pods, one up here and two in the cellar below. Light all three, then burn it.`,`The Heartroot needs three pods lit. Then burn it!`)},
+    g:{at:[0,0],kind:'pods',tpl:V9_TPL.w_g,foes:[['slime',2]],loot:['compass']},
+    h:{at:[1,0],kind:'boss',tpl:V9_TPL.w_h,boss:['bramble','Thornhide the Root Ram'],foes:[['slime',2]],tint:'#9a7a4a'},
+    i:{at:[2,0],kind:'npc',tpl:V9_TPL.w_i,npc:'juniper',loot:['heart']},
+    j:{at:[2,1],kind:'fight',tpl:V9_TPL.w_j,foes:[['kobold',2],['bat',2]],loot:['bkey'],solveOnClear:true,sealChest:true},
+    k:{at:[0,1],kind:'spores',tpl:V9_TPL.w_k,dark:true,reward:'key',pods:'heart'}},
+  links:[['a','b','roots'],['b','c','open'],['b','d','lock'],['b','f','open'],['c','k','open'],['k','g','open'],['f','h','boss'],['f','j','roots',{heart:'heart',n:3}],['h','i','gate:h'],['a','e','crack']]};
+CAVEMAP.whisper_b1={rooms:{
+    m:{at:[2,2],kind:'fight',tpl:V9_TPL.w_m,foes:[['bat',2]]},
+    n:{at:[1,2],kind:'spores',tpl:V9_TPL.w_n,dark:true,foes:[['kobold',2]],pods:'heart'},
+    o:{at:[2,1],kind:'pods',tpl:V9_TPL.w_o,pods:'heart',loot:['treasure+map_x1']}},
+  links:[['m','n','open'],['m','o','roots']]};
+// Mirrow Grotto: three tide crystals set the water of the whole grotto low, middle or high. Low water dries the basins,
+// middle water floats the rafts, high water floats the deep rafts and floods the terraces. A sun crystal's beam crosses
+// three rooms to the crystal eye. Water Stride opens the Drowned Gallery.
+CAVEMAP.mirrow={dun:{save:'a1_mirrow',water:{start:2},carry:{cv_mirrow_d_treat:'cv_a1_mirrow_d_treat'},
+    story:{in:[['ash',S(`The whole grotto is flooded! The water hums. The crystals hum back.`,`It is all flooded! The crystals hum.`)]]}},
+  rooms:{
+    a:{at:[1,3],kind:'start',tpl:V9_TPL.m_a,puzzle:true,sign:S(`Tide crystals sing the water up and down. One wave: low. Two waves: middle. Three waves: high. Hit one and listen.`,`Hit a crystal. The water goes up or down.`)},
+    b:{at:[1,2],kind:'tide',tpl:V9_TPL.m_b,loot:['dmap'],sign:S(`The rafts lie at the bottom of their wells until the water lifts them.`,`Rafts float when the water is up.`)},
+    c:{at:[0,2],kind:'npc',tpl:V9_TPL.m_c,npc:'shellby'},
+    d:{at:[0,3],kind:'secret',loot:['coins','treat']},
+    e:{at:[0,1],kind:'tide',tpl:V9_TPL.m_e,beam:'e',rot:{'4,8':1,'4,5':1},sign:S(`The sun crystal never sleeps. Bend its light east, all the way to the crystal eye. A mirror under the water cannot shine.`,`Turn the mirrors. Send the light east. Mirrors under water do not work.`)},
+    f:{at:[1,1],kind:'tide',tpl:V9_TPL.m_f,sign:S(`THE TIDE HALL. West when the terrace is dry, east when the deep rafts float, north when the basin is empty. Plan it!`,`West: not high. East: high. North: low.`)},
+    g:{at:[2,1],kind:'beam',tpl:V9_TPL.m_g,rot:{'7,5':1},foes:[['bat',2]],loot:['bkey'],sealText:S(`The great chest is held shut by a cold crystal eye. It wants light.`,`The eye wants light.`)},
+    h:{at:[1,0],kind:'boss',tpl:V9_TPL.m_h,boss:['crab','Captain Clatter'],foes:[['crab',2]],tint:'#d07a6a'},
+    i:{at:[0,0],kind:'treasure',tpl:V9_TPL.m_i,loot:['treasure']},
+    j:{at:[2,3],kind:'fight',tpl:V9_TPL.m_j,foes:[['crab',2],['bat',2]],solveOnClear:true,reward:'key'},
+    k:{at:[2,0],kind:'treasure',tpl:V9_TPL.m_k,loot:['heart+treat']},
+    l:{at:[2,2],kind:'tide',tpl:V9_TPL.m_l,loot:['compass'],foes:[['crab',1]]}},
+  links:[['a','b','open'],['b','c','open'],['b','l','open'],['b','f','open'],['l','j','open'],['j','a','oneway',{from:'j'}],['c','d','crack'],['f','e','lock'],['f','g','open'],['f','h','boss'],['h','k','gate:h'],['e','i','open']]};
+// The Oath's Hidden Tunnel: mine carts on rails, switch points set by a lever in the guard post, Oath guards with lantern
+// eyes (get seen and the doors slam), a timed gate the cart has to beat, an ore chute with a moving lift and belts.
+CAVEMAP.tunnel={dun:{save:'a1_tunnel',
+    story:{in:[['ash',S(`Rails, carts and lanterns. The Oath has been busy down here.`,`Rails and carts. The Oath was busy!`)],['ash',S(`If a guard sees me, they will ring every bell in the place. Sneaky Ash. Very sneaky.`,`I must sneak. Sneaky Ash!`)]]}},
+  rooms:{
+    a:{at:[1,3],kind:'start',tpl:V9_TPL.t_a,cartDir:'w',sign:S(`OATH TUNNEL. AUTHORIZED KOBOLDS ONLY. Mine carts: press E to ride. Please do not ride carts into walls. (Gerald, we mean you.)`,`Ride carts with E. Do not crash into walls!`)},
+    b:{at:[1,2],kind:'rails',tpl:V9_TPL.t_b,cartDir:'n',timed:10,puzzle:true,sign:S(`LOADING DOCK. The vault gate in the Lamp Hall opens for ten seconds when the switch is struck. The cart is quick. Are you?`,`Hit the switch. Ride fast to the vault!`)},
+    c:{at:[0,2],kind:'fight',tpl:V9_TPL.t_c,foes:[['cultist',2],['kobold',3]],loot:['dmap'],solveOnClear:true,sealChest:true},
+    d:{at:[2,2],kind:'treasure',tpl:V9_TPL.t_d,loot:['compass'],puzzle:true,movers:[{a:[3,7],b:[8,7],w:2,h:2,speed:60,wait:1.2}],sign:S(`ORE CHUTE. Mind the lift. Mind the belts. Mind the big hole. Mostly mind the big hole.`,`Ride the lift. Walk against the belts.`)},
+    e:{at:[0,1],kind:'stealth',tpl:V9_TPL.t_e,levers:[{at:[2,1],room:'g',point:[7,6]}],guards:[{path:[[1,8],[13,8]],wait:1.2,speed:50},{path:[[5,1],[13,1]],wait:1.6,speed:44}]},
+    f:{at:[0,3],kind:'secret',loot:['page:p8','coins']},
+    g:{at:[1,1],kind:'rails',tpl:V9_TPL.t_g,points:{'7,6':2},puzzle:true,sign:S(`SWITCHYARD. The points lever is in the guard post, where nobody can touch it. Signed, the guards.`,`The lever is in the guard post.`)},
+    h:{at:[1,0],kind:'boss',tpl:V9_TPL.t_h,boss:['knight','The Oath’s Champion'],foes:[['cultist',2]],loot:['qitem']},
+    i:{at:[2,0],kind:'treasure',tpl:V9_TPL.t_i,loot:['heart']},
+    j:{at:[2,1],kind:'stealth',tpl:V9_TPL.t_j,guards:[{path:[[4,2],[4,8]],wait:0.8,speed:56},{path:[[10,8],[10,2]],wait:0.8,speed:56}]},
+    k:{at:[0,0],kind:'tiles',tpl:V9_TPL.t_k,seq:['gold','pink','blue','gold'],loot:['treasure'],sign:S(`The Oath's secret code: the sun, the rose, the sky, then the sun again.`,`The code: gold, pink, blue, gold.`)},
+    l:{at:[2,3],kind:'stealth',tpl:V9_TPL.t_l,loot:['skey'],guards:[{path:[[6,1],[6,9]],wait:1.4,speed:46}]},
+    m:{at:[3,1],kind:'treasure',tpl:V9_TPL.t_m,timed:8,loot:['bkey']}},
+  links:[['a','b','open'],['a','l','open'],['a','f','crack'],['b','c','open'],['b','d','open'],['b','g','lock'],['c','e','open'],['g','e','open'],['g','j','open'],['j','m','timed',{room:['b','m']}],['j','d','oneway',{from:'j'}],['e','k','open'],['k','h','boss'],['h','i','gate:h']]};
+CAVE_SECRETS=countCaveSecrets();
 // cell types in cave.typ: 0 floor, 1 water pool (blocks), 2 ice; the Trials add these (see a2h_dungeons.js)
 const TY={deep:3,pit:4,crumble:5,spike:6,chasm:7,current:8,basin:9,stones:10,rune:12};
 // template letters for them: w deep channel, o pit, k crumbling tile, ^ spikes, : chasm, 1-4 current (north, east, south, west),
 // h basin (water at high tide), p stepping stones (dry at high tide), g rune floor
 const TY_CH={w:3,o:4,k:5,'^':6,':':7,'1':8,'2':8,'3':8,'4':8,h:9,p:10,g:12};
+// TY_FLOW: letters that also set a flow direction (0 N, 1 E, 2 S, 3 W); TY_KEEP: cell letters that are also kept as marks
+const TY_FLOW={'1':0,'2':1,'3':2,'4':3}, TY_KEEP={};
 const TORCH_SYMS=['Sun','Moon','Star','Leaf'];
 const PUZZLE_KINDS={braziers:1,torches:1,blocks:1,crystal:1,dark:1,maze:1,lever:1};
 const SEAL_KINDS={braziers:1,torches:1,blocks:1,dark:1,maze:1};
 const cf=(k)=>G.found[k];
+// save prefixes: sid for one floor's rooms, dsid for the whole dungeon (keys, crystal, map, Boss Key); both default to the area id
+const caveSid=d=>d.sid||d.id, caveDsid=d=>d.dsid||d.sid||d.id;
+// dungeons registered by defineDungeon (e9a_dungeon.js); the Trial code reads them like TRIALS
+const DUNGEONS={};
 
 // ---------- building the grid
 function genCaveRooms(def){
@@ -67,7 +172,7 @@ function genCaveRooms(def){
       g[k2]=0;
       if(ch==='~'){ g[k2]=1; typ[k2]=1; continue; }
       if(ch==='I'){ typ[k2]=2; continue; }
-      if(TY_CH[ch]!=null){ typ[k2]=TY_CH[ch]; if(ch>='1'&&ch<='4') flow[k2]=ch.charCodeAt(0)-49; continue; }
+      if(TY_CH[ch]!=null){ typ[k2]=TY_CH[ch]; if(TY_FLOW[ch]!=null) flow[k2]=TY_FLOW[ch]; if(!TY_KEEP[ch]) continue; }
       if(ch!=='.') marks.push({room:k,ch,i,j,c,r});
     }
     if(!tpl&&R.kind!=='secret'&&!R.trial) scatterRocks(R,g,w,rng);
@@ -90,6 +195,7 @@ function genCaveRooms(def){
   });
   // the way out: the south door of the start room
   const S=Object.values(rooms).find(r=>r.kind==='start');
+  if(!S) return {w,h,grid:g,typ,flow,cell:def.cell,rooms,links:gaps,marks,start:null,ex:null,ey:null};   // a lower floor: no way out
   const ej=S.oy+S.sh*RSY; for(let i=S.ox+7;i<=S.ox+9;i++){ g[ej*w+i]=0; typ[ej*w+i]=0; }
   for(let i=S.ox+7;i<=S.ox+9;i++){ g[(ej-1)*w+i]=0; typ[(ej-1)*w+i]=0; }
   return {w,h,grid:g,typ,flow,cell:def.cell,rooms,links:gaps,marks,start:S,ex:S.ox+8,ey:ej};
@@ -126,28 +232,29 @@ function mazeTpl(rng){
 
 // ---------- making the cave live: gates, puzzles, loot, enemies
 function buildCaveRooms(A,def){
-  const c=genCaveRooms(def), x0=IZX+200, y0=IZY+200, cs=c.cell;
+  const c=genCaveRooms(def), x0=IZX+200, y0=IZY+200, cs=c.cell, SK=caveSid(def), DK=caveDsid(def);
   A.cave=c; Object.assign(A,{x0,y0,x1:x0+c.w*cs,y1:y0+c.h*cs});
-  c.dyn=new Int16Array(c.w*c.h); A.gates=[]; A.blocks=[]; A.rooms=c.rooms; A.crys=cf('crys_'+def.id)||0; A.keys=()=>cf('keys_'+def.id)||0;
+  c.dyn=new Int16Array(c.w*c.h); A.gates=[]; A.blocks=[]; A.rooms=c.rooms; A.crys=cf('crys_'+DK)||0; A.keys=()=>cf('keys_'+DK)||0;
   const P=(i,j)=>({x:x0+(i+0.5)*cs,y:y0+(j+0.5)*cs});
   const S=c.start;
-  A.exit={x:x0+(c.ex+0.5)*cs,y:y0+(c.ey+0.75)*cs,r:50}; A.spawn={x:A.exit.x,y:A.exit.y-120};
+  if(S){ A.exit={x:x0+(c.ex+0.5)*cs,y:y0+(c.ey+0.75)*cs,r:50}; A.spawn={x:A.exit.x,y:A.exit.y-120}; }
+  else { const R0=Object.values(c.rooms)[0], q=P(R0.ox+8,R0.oy+6); A.exit={x:q.x,y:q.y,r:0,none:true}; A.spawn={x:q.x,y:q.y}; }
   const rng=mulberry32(def.seed*31+1);
   const addGate=(o,cells)=>{ o.cells=cells; A.gates.push(o); for(const k of cells) c.dyn[k]=A.gates.length; A.objs.push(o); return o; };
   // doors between rooms
   for(const L of c.links){
-    const p=P(L.ci,L.cj), key='cv_'+def.id+'_link'+L.i;
+    const p=P(L.ci,L.cj), key='cv_'+SK+'_link'+L.i;
     const o={k:'cgate',r:56,x:p.x,y:p.y,id:key,type:L.type.split(':')[0],gateRoom:L.type.split(':')[1],vertical:L.vertical,link:L,opened:!!cf(key),tmp:false,closed:false,theme:def.theme};
     addGate(o,L.cells);
     o.prompt=()=>caveGatePrompt(o);
   }
-  // great doors and item-sealed doors in the Trials get a drawn overlay
-  if(def.trial) for(const o of A.gates) if(o.type==='boss'||o.type==='gate') A.objs.push({k:'tdoor',ref:o,x:o.x,y:o.y,id:o.id+'_d'});
+  // great doors and item-sealed doors get a drawn overlay
+  for(const o of A.gates) if(o.type==='boss'||o.type==='gate') A.objs.push({k:'tdoor',ref:o,x:o.x,y:o.y,id:o.id+'_d'});
   // the marks from room templates
   const byRoom={}; for(const m of c.marks) (byRoom[m.room]=byRoom[m.room]||[]).push(m);
   let torchN=0;
   for(const k in c.rooms){
-    const R=c.rooms[k], ms=byRoom[k]||[], mci=R.ox+1+(R.iw>>1), mcj=R.oy+1+(R.ih>>1), cen=P(mci,mcj); R.cx=cen.x; R.cy=cen.y; R.solved=!!cf('cv_'+def.id+'_'+k+'_solved'); R.enemies=[];
+    const R=c.rooms[k], ms=byRoom[k]||[], mci=R.ox+1+(R.iw>>1), mcj=R.oy+1+(R.ih>>1), cen=P(mci,mcj); R.cx=cen.x; R.cy=cen.y; R.solved=!!cf('cv_'+SK+'_'+k+'_solved'); R.enemies=[];
     R.x0=x0+(R.ox+1)*cs; R.y0=y0+(R.oy+1)*cs; R.x1=R.x0+R.iw*cs; R.y1=R.y0+R.ih*cs;
     if(R.kind==='free'&&!R.solved){ R.solved=true; }
     const spot=(ch)=>{ const m=ms.find(q=>q.ch===ch); return m?P(m.i,m.j):null; };
@@ -157,7 +264,7 @@ function buildCaveRooms(A,def){
     let symOrder=null;
     if(R.kind==='torches'){ symOrder=shuffle([0,1,2,3].slice()); R.order=symOrder; R.seq=[]; }
     for(const m of ms){
-      const p=P(m.i,m.j), id=`cv_${def.id}_${k}_${m.ch}${m.c}_${m.r}`;
+      const p=P(m.i,m.j), id=`cv_${SK}_${k}_${m.ch}${m.c}_${m.r}`;
       if(m.ch==='Z'){ const o={k:'brazier',x:p.x,y:p.y,id,room:k,lit:R.solved,r:14,timed:R.timed||0}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:13}); A.lights.push({x:p.x,y:p.y,r:260,i:0,fire:true,obj:o}); }
       else if(m.ch==='T'){ const o={k:'ctorch',x:p.x,y:p.y,id,room:k,sym:torchN++%4,lit:R.solved,r:12}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:11}); A.lights.push({x:p.x,y:p.y,r:230,i:0,fire:true,obj:o}); }
       else if(m.ch==='L'){ const o={k:'lamp2',x:p.x,y:p.y,id,room:k,lit:R.solved,r:12}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:11}); A.lights.push({x:p.x,y:p.y,r:300,i:0,fire:true,obj:o}); }
@@ -169,25 +276,25 @@ function buildCaveRooms(A,def){
       else if(m.ch==='R'||m.ch==='U'){ addGate({k:'pillar',x:p.x,y:p.y,id,room:k,col:m.ch==='R'?'red':'blue',type:m.ch==='R'?'red':'blue',closed:false},[m.j*c.w+m.i]); }
       else if(m.ch==='*'){ A.objs.push({k:'decor',dk:CAVE_DECOR[def.theme]||'shroom',x:p.x,y:p.y,s:1.1,id}); A.lights.push({x:p.x,y:p.y,r:150,i:0.55,tint:CAVE_DECOR[def.theme]}); }
     }
-    if(R.kind==='lever'){ const p=P(R.ox+12,R.oy+3); const o={k:'lever',x:p.x,y:p.y,id:`cv_${def.id}_${k}_lever`,room:k,r:14,on:R.solved}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:12}); }
+    if(R.kind==='lever'){ const p=P(R.ox+12,R.oy+3); const o={k:'lever',x:p.x,y:p.y,id:`cv_${SK}_${k}_lever`,room:k,r:14,on:R.solved}; A.objs.push(o); addAreaCol({t:'c',x:p.x,y:p.y,r:12}); }
     // loot
     const X=spot('X')||cen;
     const sealed=!!SEAL_KINDS[R.kind];
     for(const L of (R.loot||[])){
       const [lk,lv]=L.split(':');
-      if(lk==='chest'){ A.objs.push({k:'cchest',x:X.x,y:X.y,id:`${def.id}_chest_${k}`,sealed:sealed&&!R.solved,room:k,r:18}); addAreaCol({t:'c',x:X.x,y:X.y,r:16}); }
+      if(lk==='chest'){ A.objs.push({k:'cchest',x:X.x,y:X.y,id:`${SK}_chest_${k}`,sealed:sealed&&!R.solved,room:k,r:18}); addAreaCol({t:'c',x:X.x,y:X.y,r:16}); }
       else if(lk==='page'){ const p=spot('G')||(R.kind==='secret'?P(R.ox+8,R.oy+4):freeSpot()); A.objs.push({k:'page',x:p.x,y:p.y,id:'page_'+lv,page:lv}); }
       else if(lk==='qitem'&&def.item){ const p=spot('Q')||P(R.ox+8,R.oy+3); A.objs.push({k:'qitem',x:p.x,y:p.y,id:def.id+'_item',item:def.item.item,label:def.item.label,flag:def.item.flag,needQuest:def.item.needQuest}); }
       else if(lk==='ore'){ const p=P(R.ox+12,R.oy+3); A.objs.push({k:'cave_ore',x:p.x,y:p.y,id:def.id+'_ore',r:16}); A.lights.push({x:p.x,y:p.y,r:140,i:0.6}); }
       else if(lk==='relic'){ const p=P(R.ox+8,R.oy+3); A.objs.push({k:'relic',x:p.x,y:p.y,id:def.id+'_relic',r:16}); A.lights.push({x:p.x,y:p.y,r:220,i:0.85}); }
-      else if(lk==='coins'){ for(let n=0;n<3;n++){ const p=freeSpot(); A.objs.push({k:'coinpile',x:p.x,y:p.y,id:`cv_${def.id}_${k}_coin${n}`,n:6+def.level*2}); } }
-      else if(lk==='treat'){ const p=freeSpot(); A.objs.push({k:'treatpick',x:p.x,y:p.y,id:`cv_${def.id}_${k}_treat`}); }
-      else if(lk==='rock'){ const p=freeSpot(); A.objs.push({k:'rock',x:p.x,y:p.y,id:`cv_${def.id}_${k}_rock`,egg:{k:'rock',label:'Look at the rock',say:['A rock with a tiny hat. A note: "This is Gregory’s cousin, Kevin. He is also very well behaved."']}}); }
+      else if(lk==='coins'){ for(let n=0;n<3;n++){ const p=freeSpot(); A.objs.push({k:'coinpile',x:p.x,y:p.y,id:`cv_${SK}_${k}_coin${n}`,n:6+def.level*2}); } }
+      else if(lk==='treat'){ const p=freeSpot(); A.objs.push({k:'treatpick',x:p.x,y:p.y,id:`cv_${SK}_${k}_treat`}); }
+      else if(lk==='rock'){ const p=freeSpot(); A.objs.push({k:'rock',x:p.x,y:p.y,id:`cv_${SK}_${k}_rock`,egg:{k:'rock',label:'Look at the rock',say:['A rock with a tiny hat. A note: "This is Gregory’s cousin, Kevin. He is also very well behaved."']}}); }
     }
-    if(R.reward==='key'){ R.keyAt=X; if(R.solved&&!cf(`cv_${def.id}_${k}_keytaken`)) spawnKey(A,def,R); }
+    if(R.reward==='key'){ R.keyAt=X; if(R.solved&&!cf(`cv_${SK}_${k}_keytaken`)) spawnKey(A,def,R); }
     if(R.npc) A.npcHere={id:R.npc,x:(spot('N')||P(R.ox+8,R.oy+4)).x,y:(spot('N')||P(R.ox+8,R.oy+4)).y};
-    if(R.sign){ const p=spot('s')||P(R.ox+4,R.oy+R.ih-2); A.objs.push({k:'csign',x:p.x,y:p.y,id:`cv_${def.id}_sign_${k}`,text:R.sign,r:12}); }
-    if(R.trial) trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng);
+    if(R.sign){ const p=spot('s')||P(R.ox+4,R.oy+R.ih-2); A.objs.push({k:'csign',x:p.x,y:p.y,id:`cv_${SK}_sign_${k}`,text:R.sign,r:12}); }
+    trialBuildRoom(A,def,R,ms,P,spot,freeSpot,rng);   // Trial cells and objects work in every cave
     // decoration and pots along the walls
     const dec=CAVE_DECOR[def.theme]||'shroom', nd=R.kind==='secret'?6:R.noDecor?0:3;
     for(let n=0;n<nd;n++){ const side=Math.floor(rng()*4); let i,j; if(side===0){ i=R.ox+1+Math.floor(rng()*R.iw); j=R.oy+1; } else if(side===1){ i=R.ox+1+Math.floor(rng()*R.iw); j=R.oy+R.ih; } else if(side===2){ i=R.ox+1; j=R.oy+1+Math.floor(rng()*R.ih); } else { i=R.ox+R.iw; j=R.oy+1+Math.floor(rng()*R.ih); }
@@ -214,13 +321,13 @@ function buildCaveRooms(A,def){
       }
     }
   }
-  if(def.trial) A.objs.push({k:'tfx',x:0,y:0,w:1e6,id:'tfx'});
+  A.objs.push({k:'tfx',x:0,y:0,w:1e6,id:'tfx'});
   refreshCaveGates();
   renderCaveRooms(A,def);
   A.curRoom=null;
 }
 const CAVE_DECOR={crystal:'crystal',bog:'shroom',ice:'icicle',ember:'magma',mine:'lamp',earth:'shroom',leap:'fern',tide:'shell',sky:'chime'};
-function spawnKey(A,def,R){ if(A.objs.some(o=>o.k==='smallkey'&&o.room===R.id)) return; const p=R.keyAt||{x:R.cx,y:R.cy}; A.objs.push({k:'smallkey',x:p.x,y:p.y,id:`cv_${def.id}_${R.id}_keytaken`,room:R.id,live:true}); }
+function spawnKey(A,def,R){ if(A.objs.some(o=>o.k==='smallkey'&&o.room===R.id)) return; const p=R.keyAt||{x:R.cx,y:R.cy}; A.objs.push({k:'smallkey',x:p.x,y:p.y,id:`cv_${caveSid(def)}_${R.id}_keytaken`,room:R.id,live:true}); }
 function caveRoomSolved(R){ return R.solved; }
 function refreshCaveGates(){
   const A=AREA; if(!A||!A.gates) return;
@@ -243,7 +350,7 @@ function refreshCaveGates(){
 function caveBlockedAt(k){ const A=AREA, d=A.cave.dyn?A.cave.dyn[k]:0; if(d&&A.gates[d-1]&&A.gates[d-1].closed) return true; if(A.blocks) for(const b of A.blocks) if(b.cj*A.cave.w+b.ci===k) return true; return false; }
 function solveRoom(R,quiet){
   const A=AREA, def=A.def; if(R.solved) return;
-  R.solved=true; G.found['cv_'+def.id+'_'+R.id+'_solved']=true;
+  R.solved=true; G.found['cv_'+caveSid(def)+'_'+R.id+'_solved']=true;
   for(const o of A.objs){ if(o.k==='cchest'&&o.room===R.id) o.sealed=false; }
   if(R.reward==='key') spawnKey(A,def,R);
   refreshCaveGates();
@@ -264,7 +371,7 @@ function updateCaveRooms(dt){
   const def=A.def, p=player, R=caveRoomAt(p.x,p.y);
   // entering rooms
   if(R&&R!==A.curRoom){
-    A.curRoom=R; const vk=`cv_${def.id}_v_${R.id}`;
+    A.curRoom=R; const vk=`cv_${caveSid(def)}_v_${R.id}`;
     if(!G.found[vk]){ G.found[vk]=true; renderCaveMini(A); if(R.kind==='secret'){ G.secrets=G.secrets||{}; G.secrets['cs_'+def.id+'_'+R.id]=1; jingle('secret','chest'); setBanner('A secret room!',`${Object.keys(G.secrets).filter(k=>k.startsWith('cs_')).length} of ${CAVE_SECRETS} hidden cave rooms found`,2.6); } else if(R.kind==='boss'&&R.enemies.some(e=>!e.dead)){ const b=R.enemies.find(e=>e.caveBoss); if(b) setBanner(b.caveBoss,def.name,2.4,'boss'); jingle('boss_intro',null); } }
     for(const e of R.enemies) if(!e.dead) e.aggro=true;
   }
@@ -301,11 +408,11 @@ function updateCaveRooms(dt){
       G.found[o.id]=true;
       if(o.k==='coinpile') addCoins(o.n,o.x,o.y);
       if(o.k==='treatpick'){ G.pipTreats=Math.min(3,(G.pipTreats||0)+1); setBanner('A Pip treat!','Pip breathes fire a little faster.',1.6); SFX.play('chest'); }
-      if(o.k==='smallkey'){ G.found['keys_'+def.id]=(G.found['keys_'+def.id]||0)+1; jingle('item','chest'); setBanner('Small key','It opens one locked door in this cave.',2); }
+      if(o.k==='smallkey'){ const kk='keys_'+caveDsid(def); G.found[kk]=(G.found[kk]||0)+1; jingle('item','chest'); setBanner('Small key','It opens one locked door in this cave.',2); }
       saveGame();
     }
   }
-  if(def.trial) trialUpdate(dt,R);
+  if(A.tri) trialUpdate(dt,R);
   // the pillars and doors may have been waiting for Ash to step off them
   if(A.gates.some(o=>!o.closed&&o.k==='pillar')||A.gates.some(o=>o.tmp&&!o.closed)) refreshCaveGates();
 }
@@ -334,7 +441,7 @@ function resetBlocks(room){ for(const b of AREA.blocks) if(b.room===room){ b.ci=
 // ---------- hooks from fire, sword and roar
 function caveBreath(hit,dt){
   const A=AREA; if(!A||!A.rooms) return;
-  if(A.def.trial) trialBreath(hit,dt);
+  trialBreath(hit,dt);
   for(const o of A.objs){
     if(o.k==='ctorch'&&!o.lit&&hit(o.x,o.y,14)){ o.lit=true; SFX.play('pickup'); const R=A.rooms[o.room]; if(R.solved) continue; R.seq.push(o.sym); const want=R.order.slice(0,R.seq.length); if(R.seq.join()!==want.join()){ setBanner('Wrong order','The flames gutter out.',1.4); SFX.play('hurt'); later(0.6,()=>{ for(const q of A.objs) if(q.k==='ctorch'&&q.room===o.room) q.lit=false; R.seq=[]; }); } else if(R.seq.length===4) solveRoom(R); else ftext(o.x,o.y-26,TORCH_SYMS[o.sym],'#ffe0a0',13); }
     if(o.k==='lamp2'&&!o.lit&&hit(o.x,o.y,14)){ o.lit=true; SFX.play('pickup'); }
@@ -344,7 +451,7 @@ function caveBreath(hit,dt){
 }
 function caveSwing(px,py,dir,range,half){
   const A=AREA; if(!A||!A.rooms) return;
-  if(A.def.trial) trialSwing(px,py,dir,range,half);
+  trialSwing(px,py,dir,range,half);
   for(const o of A.objs) if(o.k==='crystal'&&o.cd<=0&&inArcC(px,py,dir,range+10,half,{x:o.x,y:o.y,r:18})) hitCrystal(o);
 }
 function caveRoar(x,y,r){
@@ -352,7 +459,7 @@ function caveRoar(x,y,r){
   for(const o of A.objs) if(o.k==='cgate'&&o.type==='crack'&&!o.opened&&dist(x,y,o.x,o.y)<r+40) breakCrack(o);
 }
 function hitCrystal(o){
-  const A=AREA; o.cd=0.7; A.crys=A.crys?0:1; G.found['crys_'+A.def.id]=A.crys;
+  const A=AREA; o.cd=0.7; A.crys=A.crys?0:1; G.found['crys_'+caveDsid(A.def)]=A.crys;
   refreshCaveGates(); SFX.play('shrine'); shake(2); flashA=0.15; flashCol=A.crys?'120,160,255':'255,120,160';
   emit(o.x,o.y,18,{col:A.crys?'140,180,255':'255,140,180',smin:40,smax:140,lmin:.3,lmax:.7,zmin:1.5,zmax:3});
 }
@@ -363,7 +470,7 @@ function breakCrack(o){
 }
 function caveGatePrompt(o){
   if(o.type==='lock'&&!o.opened) return AREA.keys()>0?`Unlock the door (${AREA.keys()} small key${AREA.keys()>1?'s':''})`:'Locked. A small key would open it.';
-  if(o.type==='boss'&&!o.opened) return G.found['bkey_'+AREA.def.id]?'Open the great door with the Guardian Key':'Look at the great door';
+  if(o.type==='boss'&&!o.opened) return G.found['bkey_'+caveDsid(AREA.def)]?(AREA.def.trial?'Open the great door with the Guardian Key':'Open the great door with the Boss Key'):'Look at the great door';
   if(o.type==='roots'&&!o.opened) return 'Look at the roots';
   if(o.type==='crack'&&!o.opened) return 'Look at the cracked wall';
   if(o.type==='gate'&&o.closed&&!o.tmp) return 'Look at the sealed door';
@@ -374,9 +481,9 @@ function caveObjAct(o){
   const A=AREA, say=(t)=>runDialogue([['narr',t]],()=>{ scene='play'; saveGame(); });
   if(o.tobj) return trialObjAct(o);
   if(o.k==='cgate'){
-    if(o.type==='boss'&&!o.opened){ if(G.found['bkey_'+A.def.id]){ o.opened=true; G.found[o.id]=true; refreshCaveGates(); jingle('secret','chest'); shake(6); setBanner('The great door opens','Something enormous is waiting inside.',2.4); saveGame(); } else say(`A great door, carved with the face of a sleeping dragon. Its lock is shaped like a flame. The Guardian Key for it is hidden somewhere in this Trial.`); return true; }
+    if(o.type==='boss'&&!o.opened){ if(G.found['bkey_'+caveDsid(A.def)]){ o.opened=true; G.found[o.id]=true; refreshCaveGates(); jingle('secret','chest'); shake(6); setBanner('The great door opens','Something enormous is waiting inside.',2.4); saveGame(); } else say(A.def.trial?`A great door, carved with the face of a sleeping dragon. Its lock is shaped like a flame. The Guardian Key for it is hidden somewhere in this Trial.`:S(`A great door with a lock shaped like a flame. The Boss Key for it is hidden somewhere in this dungeon. Look for a big chest.`,`A big locked door. Find the Boss Key. It is in a big chest.`)); return true; }
     if(o.type==='roots'&&!o.opened){ say(`Thick old roots grow right across the way. They look very dry. Very, very burnable.`); return true; }
-    if(o.type==='lock'&&!o.opened){ if(A.keys()>0){ G.found['keys_'+A.def.id]=A.keys()-1; o.opened=true; G.found[o.id]=true; refreshCaveGates(); SFX.play('chest'); setBanner('Unlocked','',1.4); saveGame(); } else say(`A heavy door with a keyhole. Somewhere in this cave there's a small key that fits it.`); return true; }
+    if(o.type==='lock'&&!o.opened){ if(A.keys()>0){ G.found['keys_'+caveDsid(A.def)]=A.keys()-1; o.opened=true; G.found[o.id]=true; refreshCaveGates(); SFX.play('chest'); setBanner('Unlocked','',1.4); saveGame(); } else say(`A heavy door with a keyhole. Somewhere in this cave there's a small key that fits it.`); return true; }
     if(o.type==='crack'){ say(`Cracks run all through this wall, and a cold draft whistles out of them. A good roar might bring it down. Or a lot of fire.`); return true; }
     if(o.type==='gate'){ const R=A.rooms[o.gateRoom]; say(`A sealed stone door. ${R?({blocks:'Something about blocks and the plates on the floor in another room.',braziers:'Carved flames run around the frame. Light every brazier in the next room.',torches:'Four little symbols are carved into it. Light the torches in the right order.',dark:'It needs light.',lever:'There must be a lever somewhere.',boss:'It opens when the guardian falls.',miniboss:'It opens when the guardian falls.',tboss:'It opens when the guardian of the Trial falls.',switches:R.need?`A crystal switch is carved on it. You will need ${R.need} to reach the switches.`:'A crystal switch is carved on it. Strike every switch in that room.',eyes:'A stone eye is carved on it. Wake every eye in that room with an arrow.',tide:'Waves are carved on it. The water in that room holds the answer.',vents:'A little cloud is carved on it.'}[R.kind]||''):''}`); return true; }
     if(o.type==='red'||o.type==='blue') { say(`Glowing ${o.type==='red'?'pink':'blue'} pillars block the way. There's a crystal somewhere in this cave that changes which ones are up. Hit it.`); return true; }
@@ -416,7 +523,7 @@ function renderCaveRooms(A,def){
     const k=j*c.w+i; if(c.grid[k]!==0&&!water(i,j)) continue;
     const x=i*cs, y=j*cs;
     if(water(i,j)){ g.fillStyle=st.water; g.fillRect(x,y,cs,cs); g.strokeStyle='rgba(255,255,255,.08)'; g.lineWidth=2; g.beginPath(); g.moveTo(x+6,y+cs*0.4+rng()*8); g.quadraticCurveTo(x+cs/2,y+cs*0.3,x+cs-6,y+cs*0.45); g.stroke(); continue; }
-    if(def.trial&&trialPaintCell(g,c,k,i,j,x,y,cs,st,rng,def)) continue;
+    if((def.trial||c.typ[k]>=3)&&trialPaintCell(g,c,k,i,j,x,y,cs,st,rng,def)) continue;
     const ice=c.typ[k]===2;
     g.fillStyle=ice?'#b8d0e4':((i+j)%2?st.floor:st.floor2); g.fillRect(x,y,cs,cs);
     g.fillStyle=ice?'rgba(255,255,255,.35)':'rgba(255,255,255,.035)'; g.fillRect(x+2,y+2,cs-4,3);
@@ -468,18 +575,18 @@ function renderCaveRooms(A,def){
 function renderCaveMini(A){
   const c=A.cave, def=A.def, st=CAVE_STYLE[def.theme]||CAVE_STYLE.earth;
   const mm=A.mini||mkCanvas(c.w,c.h), mg=mm.getContext('2d'), im=mg.createImageData(c.w,c.h), fl=hexRGB(st.top).map(q=>q*0.8);
-  const mapped=G.items.juniper_map||(def.trial&&G.found['tmap_'+def.id]);
-  const seen=new Set(Object.keys(c.rooms).filter(k=>G.found[`cv_${def.id}_v_${k}`]||(mapped&&c.rooms[k].kind!=='secret')));
+  const SK=caveSid(def), DK=caveDsid(def), mapped=(G.items.juniper_map&&!def.noJuniper)||G.found['tmap_'+DK]||G.found['dmap_'+DK];
+  const seen=new Set(Object.keys(c.rooms).filter(k=>G.found[`cv_${SK}_v_${k}`]||(mapped&&c.rooms[k].kind!=='secret')));
   for(let j=0;j<c.h;j++) for(let i=0;i<c.w;i++){
     const k=j*c.w+i; let v=[10,8,6], a=255;
     let r=null; for(const id in c.rooms){ const R=c.rooms[id]; if(i>=R.ox&&i<=R.ox+R.iw+1&&j>=R.oy&&j<=R.oy+R.ih+1){ if(seen.has(id)){ r=R; break; } } }
-    if(r){ const t=c.typ[k]; v=c.grid[k]===0?(t===TY.pit||t===TY.chasm?[14,12,18]:t===TY.deep||t===TY.current||t===TY.basin?[50,96,150]:t===TY.spike?[120,96,90]:fl):t===1?[40,70,100]:[26,20,16]; if(!G.found[`cv_${def.id}_v_${r.id}`]) v=v.map(q=>q*0.55); if(r.kind==='tboss'&&c.grid[k]===0) v=[v[0]*1.2+30,v[1]*0.8,v[2]*0.8]; }
+    if(r){ const t=c.typ[k]; v=c.grid[k]===0?(t===TY.pit||t===TY.chasm?[14,12,18]:t===TY.deep||t===TY.current||t===TY.basin?[50,96,150]:t===TY.spike?[120,96,90]:fl):t===1?[40,70,100]:[26,20,16]; if(!G.found[`cv_${SK}_v_${r.id}`]) v=v.map(q=>q*0.55); if(r.kind==='tboss'&&c.grid[k]===0) v=[v[0]*1.2+30,v[1]*0.8,v[2]*0.8]; }
     im.data[k*4]=v[0]; im.data[k*4+1]=v[1]; im.data[k*4+2]=v[2]; im.data[k*4+3]=a;
   }
   mg.putImageData(im,0,0); A.mini=mm;
 }
 function caveProgressText(){
   const A=AREA; if(!A||!A.rooms) return '';
-  const ks=Object.keys(A.rooms), v=ks.filter(k=>G.found[`cv_${A.def.id}_v_${k}`]&&A.rooms[k].kind!=='secret').length, tot=ks.filter(k=>A.rooms[k].kind!=='secret').length, keys=A.keys();
+  const ks=Object.keys(A.rooms), v=ks.filter(k=>G.found[`cv_${caveSid(A.def)}_v_${k}`]&&A.rooms[k].kind!=='secret').length, tot=ks.filter(k=>A.rooms[k].kind!=='secret').length, keys=A.keys();
   return `${v}/${tot} rooms explored${keys?` · ${keys} small key${keys>1?'s':''}`:''}`;
 }

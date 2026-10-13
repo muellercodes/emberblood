@@ -249,7 +249,7 @@ FL.tpick=(o,t)=>{
   else { ctx.save(); ctx.translate(x,y); ctx.rotate(0.5+Math.sin(t*2)*0.3); ctx.fillStyle='#f4f8ff'; ctx.beginPath(); ctx.moveTo(0,-12); ctx.quadraticCurveTo(7,-2,0,12); ctx.quadraticCurveTo(-7,-2,0,-12); ctx.fill(); ctx.strokeStyle='#a8b8d0'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(0,-12); ctx.lineTo(0,13); ctx.stroke(); ctx.restore(); glowAt(x,y,26,'220,235,255',0.4); }
 };
 FL.twarp=(o,t)=>{
-  const on=AREA&&trialDone(AREA.def.id), x=o.x, y=o.y;
+  const on=AREA&&trialDone(dunRoot(AREA.def.id)), x=o.x, y=o.y;
   ctx.save(); ctx.translate(x,y); ctx.scale(1,0.62);
   ctx.strokeStyle=on?'rgba(255,214,120,.95)':'rgba(140,130,110,.55)'; ctx.lineWidth=5; ctx.beginPath(); ctx.arc(0,0,26,0,TAU); ctx.stroke();
   ctx.strokeStyle=on?'rgba(255,245,210,.8)':'rgba(90,80,70,.5)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(0,0,20,0,TAU); ctx.stroke();
@@ -279,7 +279,7 @@ function drawHatchling(x,y,face,t,sleep){
 }
 // Ember's spirit floats over her shrine
 FL.tspirit=(o,t)=>{
-  const id=AREA&&AREA.def.id, gifted=id&&hasAbil(TRIALS[id].abil), a=gifted?0.45:0.9;
+  const TI=AREA&&trialInfo(AREA.def.id), gifted=!TI||!TI.abil||hasAbil(TI.abil), a=gifted?0.45:0.9;
   ctx.save(); ctx.translate(o.x,o.y+Math.sin(t*1.6)*5); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=a;
   const g=ctx.createRadialGradient(0,0,0,0,0,80); g.addColorStop(0,'rgba(255,190,110,.42)'); g.addColorStop(1,'rgba(255,130,50,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,80,0,TAU); ctx.fill();
   ctx.fillStyle='rgba(255,180,110,.5)'; ctx.beginPath(); ctx.moveTo(0,-14); ctx.quadraticCurveTo(15,-2,13,22); ctx.quadraticCurveTo(0,30,-13,22); ctx.quadraticCurveTo(-15,-2,0,-14); ctx.fill();
@@ -308,7 +308,7 @@ FL.tv=(o,t)=>{
       r2put(r2S('tshrine_'+th,110,96,55,58,g=>{ const stone=th==='sky'?'#ece4d2':th==='tide'?'#b8d0dc':'#848a70'; r2e(g,3,12,46,22,'rgba(0,0,0,.3)'); for(let s=0;s<3;s++){ const w=44-s*10, h=20-s*4, yy=10-s*9; g.fillStyle=r2lg(g,-w,yy-h,w,yy+h,r2c(stone,0.2-s*0.05),stone,r2c(stone,-0.4)); g.beginPath(); g.ellipse(0,yy,w,h,0,0,TAU); g.fill(); g.strokeStyle='rgba(0,0,0,.2)'; g.lineWidth=1.2; g.stroke(); }
         g.fillStyle=r2c(stone,-0.55); g.beginPath(); g.ellipse(0,-10,15,7,0,0,TAU); g.fill(); g.fillStyle='#2a1208'; g.beginPath(); g.ellipse(0,-10,11,5,0,0,TAU); g.fill();
         g.strokeStyle=th==='tide'?'rgba(120,210,255,.6)':th==='sky'?'rgba(255,214,120,.7)':'rgba(190,240,120,.6)'; g.lineWidth=1.6; for(let a=0;a<12;a++){ const an=a/12*TAU; g.beginPath(); g.moveTo(Math.cos(an)*36,10+Math.sin(an)*16); g.lineTo(Math.cos(an)*42,10+Math.sin(an)*19); g.stroke(); } }),x,y);
-      const lit=AREA&&!hasAbil(TRIALS[AREA.def.id].abil), s=lit?1:0.6, fy=y-12;
+      const TI=AREA&&trialInfo(AREA.def.id), lit=!!(TI&&TI.abil&&!hasAbil(TI.abil)), s=lit?1:0.6, fy=y-12;
       glowAt(x,fy-14,lit?80:50,'255,170,70',lit?0.55:0.3);
       for(let i=0;i<3;i++){ const k=1-i*0.28, sw=Math.sin(t*7+i*2)*3*s; ctx.fillStyle=['#ff7a2a','#ffb040','#fff0b0'][i]; ctx.beginPath(); ctx.moveTo(x-12*k*s,fy); ctx.quadraticCurveTo(x-10*k*s+sw,fy-26*k*s,x+sw*1.5,fy-(40+Math.sin(t*9)*4)*k*s); ctx.quadraticCurveTo(x+10*k*s+sw,fy-26*k*s,x+12*k*s,fy); ctx.closePath(); ctx.fill(); }
       if(Math.random()<0.3) emit(x+rand(-6,6),fy-20,1,{kind:'fire',ang:-Math.PI/2,spread:0.4,smin:20,smax:60,lmin:.4,lmax:.8,zmin:2,zmax:4,grow:3});
@@ -353,7 +353,7 @@ FL.tv=(o,t)=>{
 FL.tfx=(o,t)=>{
   const A=AREA, T=A&&A.tri; if(!T) return;
   const R=A.curRoom, th=A.def.theme;
-  if(R) trialRoomLight(R,th,t);
+  if(R&&A.def.trial) trialRoomLight(R,th,t);
   if(R&&R.gust&&(R.gustK>0.05||R.gustWarn)){ const d=R.gust.dir, gk=R.gustWarn?0.3:R.gustK; ctx.strokeStyle=`rgba(255,255,255,${0.35*gk})`; ctx.lineWidth=2; ctx.lineCap='round';
     for(let n=0;n<26;n++){ const f=((t*1.6+n*0.137)%1), sx=R.x0+((n*97)%Math.round(R.x1-R.x0)), sy=R.y0+((n*61)%Math.round(R.y1-R.y0)), px=sx+d[0]*(f-0.5)*360, py=sy+d[1]*(f-0.5)*360; ctx.globalAlpha=Math.sin(f*Math.PI); ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px+d[0]*34+d[1]*3,py+d[1]*34+d[0]*3); ctx.stroke(); }
     ctx.globalAlpha=1; }
@@ -405,7 +405,7 @@ FL.tdoor=(o,t)=>{
     ctx.fillStyle=r2c(stone,-0.35); ctx.beginPath(); ctx.arc(x,y,18,0,TAU); ctx.fill();
     ctx.fillStyle=`rgba(255,150,60,${0.6+0.3*Math.sin(t*3)})`; ctx.beginPath(); ctx.moveTo(x,y-13); ctx.quadraticCurveTo(x+9,y-2,x+6,y+6); ctx.quadraticCurveTo(x,y+11,x-6,y+6); ctx.quadraticCurveTo(x-9,y-2,x,y-13); ctx.fill();
     ctx.fillStyle='#2a1a0a'; ctx.beginPath(); ctx.arc(x,y+1,3,0,TAU); ctx.fill(); ctx.fillRect(x-1.5,y+1,3,6);
-    if(G.found['bkey_'+AREA.def.id]) glowAt(x,y,60,'255,200,110',0.35+0.15*Math.sin(t*4));
+    if(G.found['bkey_'+caveDsid(AREA.def)]) glowAt(x,y,60,'255,200,110',0.35+0.15*Math.sin(t*4));
   }else if(g.type==='gate'&&g.closed&&!g.tmp){
     const R=AREA.rooms[g.gateRoom], need=R&&R.need; if(!need) return;
     ctx.save(); ctx.translate(x,y-(horiz?4:0)); ctx.fillStyle='rgba(20,14,8,.75)'; ctx.beginPath(); ctx.arc(0,0,14,0,TAU); ctx.fill();

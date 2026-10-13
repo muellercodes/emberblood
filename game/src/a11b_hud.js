@@ -91,7 +91,8 @@ function drawMinimap(obj){
   ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.fillStyle='#14100c'; ctx.fill(); ctx.clip();
   const toM=(x,y)=>[cx+(x-p.x)*sc,cy+(y-p.y)*sc];
   if(AREA){
-    if(AREA.mini){ const c=AREA.cave, k=c.cell; ctx.imageSmoothingEnabled=false; ctx.drawImage(AREA.mini,cx+(AREA.x0-p.x)*sc,cy+(AREA.y0-p.y)*sc,c.w*k*sc,c.h*k*sc); }
+    if(AREA.rooms&&AREA.dn&&typeof dunMiniDraw==='function') dunMiniDraw(ctx,toM,sc);   // rooms, doors, keys (e9a_dungeon.js)
+    else if(AREA.mini){ const c=AREA.cave, k=c.cell; ctx.imageSmoothingEnabled=false; ctx.drawImage(AREA.mini,cx+(AREA.x0-p.x)*sc,cy+(AREA.y0-p.y)*sc,c.w*k*sc,c.h*k*sc); }
     else { ctx.fillStyle='#5a3e28'; const [x,y]=toM(AREA.rx,AREA.ry); ctx.fillRect(x,y,AREA.rw*sc,AREA.rh*sc); }
     const [ex,ey]=toM(AREA.exit.x,AREA.exit.y); ctx.fillStyle='#8fe08a'; ctx.beginPath(); ctx.arc(ex,ey,4,0,TAU); ctx.fill();
   } else { const O=ovOf(curMap()); if(O.cv){ const ow=span*2/O.s; ctx.imageSmoothingEnabled=true; ctx.drawImage(O.cv,p.x/O.s-ow/2,(p.y-O.y0)/O.s-ow/2,ow,ow,cx-r,cy-r,r*2,r*2); } }
@@ -115,6 +116,7 @@ function drawMinimap(obj){
   ctx.lineWidth=3; ctx.strokeStyle='rgba(10,8,6,.7)'; ctx.lineJoin='round';
   const tt=`${day>0.25?'☀':'☾'} ${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`; ctx.strokeText(tt,cx,M.y+r*2+11); ctx.fillText(tt,cx,M.y+r*2+11);
   ctx.font=`600 10px ${TF}`; ctx.fillStyle='#e8d6b8'; const rt=reg.length>26?reg.slice(0,25)+'.':reg; ctx.strokeText(rt,cx,M.y+r*2+25); ctx.fillText(rt,cx,M.y+r*2+25);
+  if(AREA&&AREA.rooms&&typeof dunHudStrip==='function') dunHudStrip(M);   // small keys, map, compass, Boss Key
 }
 function drawCompass(obj){
   if(!obj||obj.x==null||scene!=='play') return;
