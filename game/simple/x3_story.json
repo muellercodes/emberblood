@@ -1,0 +1,6 @@
+{
+  "_about": "Simple-words templates for text x3_story.js builds at runtime (its fixed lines carry their simple version inline with S()).",
+  "m3s_path": {"o": "Light the Moonpath with Moonfire ({1} of 3 braziers lit)", "s": "Light the Moonpath with Moonfire ({1} of 3)"},
+  "m3s_braz": {"o": "{1} of 3. Its stairs will stay solid now.", "s": "{1} of 3."},
+  "m3s_heart": {"o": "The Ember Heart · {1} of 3", "s": "The Heart · {1} of 3"}
+}
