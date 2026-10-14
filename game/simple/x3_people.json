@@ -1,0 +1,107 @@
+{
+ "_about": "Simple words for x3_people (Act IV people and side quests in Moonfall): templates for text built with numbers or names. Lines written with S() in the code carry their own simple words.",
+ "1gwvtc4": {
+  "o": "{1} is lit!",
+  "s": "{1} is lit!"
+ },
+ "1gebhay": {
+  "o": "Sable’s lamps: {1} of 12",
+  "s": "Lamps: {1} of 12"
+ },
+ "efb54t": {
+  "o": "Relight Sable’s twelve lamps ({1}/12)",
+  "s": "Light Sable’s twelve lamps ({1}/12)"
+ },
+ "165sbnh": {
+  "o": "You dug up {1}!",
+  "s": "You dug up {1}!"
+ },
+ "75waan": {
+  "o": "Look up at the tallest palm ({1} is at the top)",
+  "s": "Look up the palm"
+ },
+ "1w0tsiy": {
+  "o": "{1} the lamp sits at the very top of the tallest palm. The trunk is far too smooth to climb with bare claws.",
+  "s": "The lamp is at the top of the palm. Too smooth to climb."
+ },
+ "1dx296a": {
+  "o": "You dig in your Climbing Claws and go up the palm, scale by scale. A coconut glares at you. At the top, {1} the lamp is cold.",
+  "s": "You climb the palm with your claws. A coconut glares at you."
+ },
+ "1kd94ub": {
+  "o": "{1} hangs on a very tall pole. Your flame won't reach. A long, hot flame might. Or fly up to it.",
+  "s": "It's too high. Try a long hot flame. Or fly up."
+ },
+ "1c2r8td": {
+  "o": "{1} stands by the Moon Well. Breathe on her to light her.",
+  "s": "Breathe on the lamp to light it."
+ },
+ "1gw2ype": {
+  "o": "{1} the lamp is cold. Breathe on her to light her.",
+  "s": "The lamp is cold. Breathe on it."
+ },
+ "9q2066": {
+  "o": "Post {1} of 3 done.",
+  "s": "Post {1} of 3."
+ },
+ "1bjkel8": {
+  "o": "Drive in the ferry posts with a Ground Pound and grapple the line across ({1}/3)",
+  "s": "Pound the ferry posts down. Throw the line with your tail. ({1}/3)"
+ },
+ "1oldpaz": {
+  "o": "Clear the two Crab Pirate forts ({1}/2)",
+  "s": "Clear the two crab forts ({1}/2)"
+ },
+ "1rosl3t": {
+  "o": "Forts: {1} of 2",
+  "s": "Forts: {1} of 2"
+ },
+ "h5m9rr": {
+  "o": "Ferry to {1}",
+  "s": "Go to {1}"
+ },
+ "fh7lgd": {
+  "o": "{1} of 3 rocks gone.",
+  "s": "{1} of 3 rocks."
+ },
+ "1ikcc7m": {
+  "o": "Blow up the three rocks blocking the Bubble Caves under Palmcrest ({1}/3)",
+  "s": "Blow up the three rocks under Palmcrest ({1}/3)"
+ },
+ "119e1px": {
+  "o": "A moth flutters over to it. {1} of 6",
+  "s": "A moth flies to it. {1} of 6"
+ },
+ "6lrh3j": {
+  "o": "The tunnel gets wider. {1} of 3",
+  "s": "Wider! {1} of 3"
+ },
+ "1ge9v1u": {
+  "o": "Widen the Burrow Gap so Vesper can crawl through (burrow under it three times) ({1}/3)",
+  "s": "Burrow under the Burrow Gap three times ({1}/3)"
+ },
+ "1v4bqg9": {
+  "o": "Smoke bomb planted. {1} of 3",
+  "s": "Bomb planted. {1} of 3"
+ },
+ "ntnb2o": {
+  "o": "Plant Vesper’s three moth-smoke bombs at the Moth Knight posts by the Moonpath, unseen ({1}/3)",
+  "s": "Plant 3 smoke bombs by the Moth Knights. Don’t get seen! ({1}/3)"
+ },
+ "p1wg7w": {
+  "o": "Splash! The Moonfish leaps at the ring. {1} of {2}",
+  "s": "Splash! {1} of {2}"
+ },
+ "1d8d1s9": {
+  "o": "Coral Race! Ring {1}/10 · {2}s",
+  "s": "Ring {1}/10 · {2}s"
+ },
+ "18uue3t": {
+  "o": "The map of {1} (40 coins)",
+  "s": "{1} map (40 coins)"
+ },
+ "gusxl5": {
+  "o": "The map of {1} (free)",
+  "s": "{1} map (free)"
+ }
+}
