@@ -1,0 +1,5 @@
+{
+  "_about": "Simple-words templates for text x2_story.js builds at runtime (its fixed lines carry their simple version inline with S()).",
+  "f2s_chains": {"o": "Melt the four chains on the Chain Stones ({1} of 4)", "s": "Melt the chains ({1} of 4)"},
+  "f2s_chain_n": {"o": "Chain {1} of 4 melted!", "s": "Chain {1} of 4 gone!"}
+}
