@@ -2427,6 +2427,8 @@ function f2Test(type,o){
   if(typeof P2!=='undefined'&&P2.tips) for(const k of ['climb','hang','pull','chain','ring']) P2.tips[k]=9;
   if(typeof P3!=='undefined') for(const k of ['blue','ride']) P3.tips[k]=9;
   if(G.fightSite) resetBoss(); G.bossDone[type]=false; F2.noIntro=o.intro===false; F2.dmg=0; F2.hits=0; F2.bySrc={};
+  // (intro:false skips the story's own intro for this boss too: x2_story plays it the first time the boss is in view)
+  if(o.intro===false&&typeof f2sMark==='function') try{ f2sMark((type==='f_squeak'?'f_squall':type)+'_intro'); }catch(e){}
   for(const k in G.flags) if(k.startsWith('f2tip_')) delete G.flags[k];
   if(type==='f_hush'||type==='f_glaciar'){
     if(AREA) exitArea(true);

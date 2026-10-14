@@ -665,7 +665,7 @@ const F2WK={
         ctx.strokeStyle=cols[i]; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x-8,y-6); ctx.quadraticCurveTo(x-14,y-12-wag*4,x-12+wag*6,y-16); ctx.stroke(); } }},
   rack:{R:50,by:6,col:{t:'r',x0:-24,y0:-6,x1:24,y1:6},draw(o){ f2wPut(f2wTall('rack',70,70,35,58,g=>{ for(const s of [-1,1]) f2wRect(g,s*24-2,-44,4,48,F2WC.woodD); f2wRect(g,-28,-44,56,4,F2WC.wood); for(let i=0;i<6;i++){ const x=-20+i*8; g.strokeStyle='#5a4a3a'; g.lineWidth=0.8; g.beginPath(); g.moveTo(x,-40); g.lineTo(x,-34); g.stroke(); celFill(g,(q,dx,dy)=>q.ellipse(x+dx,-26+dy,3,9,0,0,TAU),i%2?'#b07a4a':'#c89060',{r:6}); } f2wSnowCap(g,-28,28,-46,3,mulberry32(12)); }),o.x,o.y); }},
   // the Dreadgate: two doors of black ice as tall as a castle, a dragon curled round the moon, the Frost Lock between
-  dreadgate:{R:260,by:10,col:[{t:'r',x0:-140,y0:-30,x1:-52,y1:12},{t:'r',x0:52,y0:-30,x1:140,y1:12}],
+  dreadgate:{R:260,by:10,col:[{t:'r',x0:-140,y0:-30,x1:-52,y1:12},{t:'r',x0:52,y0:-30,x1:140,y1:12},{t:'r',x0:-52,y0:-30,x1:52,y1:-8}],
     draw(o,t){ const open=F2WT.hush;
       f2wPut(f2wTall('dgate'+(open?1:0),320,300,160,280,g=>{
         f2wEll(g,0,10,150,22,'rgba(10,6,20,.4)');
@@ -685,7 +685,8 @@ const F2WK={
       if(!open){ const k=0.5+0.5*Math.sin(t*2.2); glowAt(o.x,o.y-50,60,'170,130,255',0.18+0.12*k); if(F2WF('f_drum')){ ctx.strokeStyle=`rgba(255,255,255,${0.6+0.3*k})`; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(o.x-26,o.y-62); ctx.lineTo(o.x-6,o.y-44); ctx.lineTo(o.x+8,o.y-58); ctx.lineTo(o.x+26,o.y-30); ctx.stroke(); } }
       else{ glowAt(o.x,o.y-80,70,'120,90,200',0.15); } }},
   // the Horned Gate: a ram's skull as big as a house, the door of Stonehorn Deep in its mouth
-  hornedgate:{R:220,by:20,col:[{t:'r',x0:-130,y0:-40,x1:-38,y1:16},{t:'r',x0:38,y0:-40,x1:130,y1:16}],
+  // (the back of the mouth is solid too: without it Ash walked in at the door and out through the back of the skull)
+  hornedgate:{R:220,by:20,col:[{t:'r',x0:-130,y0:-40,x1:-38,y1:16},{t:'r',x0:38,y0:-40,x1:130,y1:16},{t:'r',x0:-38,y0:-40,x1:38,y1:-12}],
     draw(o,t){ f2wPut(f2wTall('horned',320,240,160,210,g=>{ const B=F2WP.bone;
       f2wEll(g,0,18,140,20,'rgba(60,30,20,.35)');
       // the horns curling out to the sides
@@ -700,7 +701,7 @@ const F2WK={
       f2wSnowCap(g,-60,60,-150,7,mulberry32(14)); }),o.x,o.y);
       if(Math.sin(t*0.5)>0.98&&dist2(player.x,player.y,o.x,o.y)<500*500&&!F2WD.snoreT){ F2WD.snoreT=1; later(3,()=>{ F2WD.snoreT=0; }); f2wSnd('thud',0.6); ftext(o.x,o.y-80,S('Zzzrrrk...','Snore...'),'#f4e4d0',14); } }},
   // Skyreach Temple on its isle: white stone, gold trim, red and saffron flags, round windows, a gold finial
-  temple:{R:260,by:24,col:[{t:'r',x0:-130,y0:-60,x1:-36,y1:20},{t:'r',x0:36,y0:-60,x1:130,y1:20}],
+  temple:{R:260,by:24,col:[{t:'r',x0:-130,y0:-60,x1:-36,y1:20},{t:'r',x0:36,y0:-60,x1:130,y1:20},{t:'r',x0:-36,y0:-60,x1:36,y1:-12}],
     draw(o,t){ f2wPut(f2wTall('temple',320,330,160,300,g=>{
       f2wEll(g,0,22,150,20,'rgba(60,50,90,.3)');
       celFill(g,(q,dx,dy)=>q.rect(-130+dx,-80+dy,260,100),'#f2eef8',{r:100}); f2wRect(g,-130,-82,260,6,F2WC.gold);
@@ -823,7 +824,7 @@ Object.assign(F2WK,{
       g.strokeStyle='rgba(190,160,255,.75)'; g.lineWidth=2.4; g.beginPath(); g.moveTo(-14,-20); g.lineTo(-6,-120); g.lineTo(-2,-200); g.moveTo(16,-10); g.lineTo(10,-90); g.stroke();
       for(const [x,y,w] of [[-30,-30,18],[24,-60,14],[-16,-150,10]]) f2wEll(g,x,y,w,4,'rgba(246,250,255,.9)'); }),o.x,o.y);
       glowAt(o.x,o.y-160,50,'170,130,255',0.18+0.08*Math.sin(t*2)); }},
-  summitdoor:{R:90,by:4,col:[{t:'r',x0:-60,y0:-14,x1:-24,y1:6},{t:'r',x0:24,y0:-14,x1:60,y1:6}],draw(o,t){ const open=F2WF('f_crown_open'); f2wPut(f2wTall('summit'+(open?1:0),140,130,70,110,g=>{
+  summitdoor:{R:90,by:4,col:[{t:'r',x0:-60,y0:-14,x1:-24,y1:6},{t:'r',x0:24,y0:-14,x1:60,y1:6},{t:'r',x0:-24,y0:-14,x1:24,y1:-4}],draw(o,t){ const open=F2WF('f_crown_open'); f2wPut(f2wTall('summit'+(open?1:0),140,130,70,110,g=>{
       celFill(g,(q,dx,dy)=>{ q.moveTo(-64+dx,6+dy); q.quadraticCurveTo(-70+dx,-90+dy,0+dx,-104+dy); q.quadraticCurveTo(70+dx,-90+dy,64+dx,6+dy); q.closePath(); },'#3a3248',{r:60,tones:['#6a5c86','#3a3248','#1a1424']});
       g.fillStyle=open?'#06030c':'#4a4062'; g.beginPath(); g.moveTo(-24,6); g.lineTo(-24,-46); g.quadraticCurveTo(0,-74,24,-46); g.lineTo(24,6); g.closePath(); g.fill();
       if(!open){ g.strokeStyle='#8a6ad0'; g.lineWidth=4; g.beginPath(); g.moveTo(-24,-30); g.lineTo(24,-10); g.moveTo(24,-30); g.lineTo(-24,-10); g.stroke(); }
@@ -900,7 +901,9 @@ const F2WE={
   deck:[1380,42560,1820,42690], crownLedge:[7160,40690,7440,40810], eastSlab:[7780,41150,110]
 };
 function f2wElev(){
-  const k=2, pl=(d)=>ELEV.plateau(Object.assign({k},d)), rp=(d)=>ELEV.ramp(Object.assign({k,kind:'stairs'},d));
+  // (e3 colours a stair by the plateau found at its middle; an east or west stair's middle is off the plateau it climbs
+  // to, and then e3 used the first plateau of the map, Mount Dread's dark violet: a stair says its own colours, `st`)
+  const k=2, pl=(d)=>ELEV.plateau(Object.assign({k},d)), rp=(d)=>ELEV.ramp(Object.assign({k,kind:'stairs'},d.st?{look:elvStyle(d.st)}:{},d));
   // ---- Mount Dread: the massif (with a notch for the Shoulder Ledge), the inner tier, the Crown, its two raised stones
   pl({poly:F2WG.massif,holes:[{poly:F2WG.notch}],lvl:4,style:'f_dread',noise:40,id:'f_massif'});
   pl({rect:[6200,40400,8600,42600],lvl:5,style:'f_dread',noise:50,id:'f_dread5'});
@@ -912,12 +915,12 @@ function f2wElev(){
   // ---- the Dreadmoor (the plaza of the Dreadgate) and its two ways up
   pl({rect:F2WG.dreadmoor,lvl:1,style:'f_moor',noise:50,id:'f_dreadmoor'});
   rp({x0:7220,y0:44650,x1:7380,y1:44790,dir:'n'});                                  // the White Road stairs
-  rp({x0:6140,y0:44450,x1:6300,y1:44600,dir:'e'});                                  // the west end, by Glimmer Point
+  rp({x0:6140,y0:44450,x1:6300,y1:44600,dir:'e',st:'f_moor'});                                  // the west end, by Glimmer Point
   // ---- the Glimmerfrost's pressure ridges (Double Jump)
   F2WE.ridges.forEach((r,i)=>pl({rect:r,lvl:1,style:'ice',step:true,noise:4,id:'f_ridge'+i}));
   // ---- Rimeholm: the terrace, the bell tower (claws), the chapel roof and the smoke yard (steps), the bluff behind
   pl({rect:F2WG.terrace,lvl:1,style:'f_stone',noise:14,id:'f_terrace'});
-  rp({x0:2690,y0:47150,x1:2850,y1:47300,dir:'w'});
+  rp({x0:2690,y0:47150,x1:2850,y1:47300,dir:'w',st:'f_stone'});
   ELEV.ledge({k,x0:1286,y0:46700,x1:1372,y1:47100});
   pl({rect:F2WE.tower,lvl:3,style:'f_stone',climb:true,noise:0,id:'f_belltower'});
   pl({rect:F2WE.chapel,lvl:2,style:'f_slate',step:true,noise:0,id:'f_chapel'});
@@ -940,9 +943,9 @@ function f2wElev(){
   pl({disc:[12800,42880,92],lvl:3,style:'f_red',noise:5,id:'f_horn1'}); pl({disc:[11600,41980,84],lvl:3,style:'f_red',noise:5,id:'f_horn2'});
   // ---- Mumble's Hollow (climbable, with a back ramp), the Whitepass ridge, the Warm Cave cliffs
   pl({disc:[13050,48330,220],lvl:2,style:'f_snow',climb:true,noise:10,id:'f_hollow'});
-  rp({x0:13250,y0:48290,x1:13390,y1:48420,dir:'w'});
+  rp({x0:13250,y0:48290,x1:13390,y1:48420,dir:'w',st:'f_snow'});
   pl({poly:[[1700,48650],[3200,48650],[3100,49150],[1800,49150]],lvl:1,style:'f_snow',noise:16,id:'f_ridge'});
-  rp({x0:1660,y0:48840,x1:1810,y1:48980,dir:'e'}); rp({x0:3080,y0:48840,x1:3230,y1:48980,dir:'w'});
+  rp({x0:1660,y0:48840,x1:1810,y1:48980,dir:'e',st:'f_snow'}); rp({x0:3080,y0:48840,x1:3230,y1:48980,dir:'w',st:'f_snow'});
   pl({poly:[[-200,48150],[600,48060],[1100,48320],[1350,48700],[1320,49200],[1290,49560],[-200,49560]],lvl:2,style:'f_snow',noise:24,id:'f_westcliff'});
   pl({rect:[860,49280,1100,49610],lvl:2,style:'f_snow',climb:true,noise:3,id:'f_westclimb'});
   // ---- Snowgob Gulch: a ring of rock open to the north, the crate ledge (claws) inside
@@ -950,7 +953,7 @@ function f2wElev(){
   pl({rect:F2WE.gulchLedge,lvl:2,style:'f_snow',climb:true,noise:3,id:'f_gulchledge'});
   // ---- the Great Hearth's dais (stairs on four sides) and the shipwreck's deck
   pl({disc:[6800,48950,150],lvl:1,style:'f_stone',noise:0,id:'f_dais'});
-  rp({x0:6760,y0:49070,x1:6840,y1:49160,dir:'n'}); rp({x0:6930,y0:48910,x1:7000,y1:48990,dir:'w'}); rp({x0:6600,y0:48910,x1:6670,y1:48990,dir:'e'}); rp({x0:6760,y0:48790,x1:6840,y1:48830,dir:'s'});
+  rp({x0:6760,y0:49070,x1:6840,y1:49160,dir:'n',st:'f_stone'}); rp({x0:6930,y0:48910,x1:7000,y1:48990,dir:'w',st:'f_stone'}); rp({x0:6600,y0:48910,x1:6670,y1:48990,dir:'e',st:'f_stone'}); rp({x0:6760,y0:48790,x1:6840,y1:48830,dir:'s',st:'f_stone'});
   pl({rect:F2WE.deck,lvl:1,style:'f_wood',noise:0,id:'f_deck'});
   // ---- updrafts (Wings, and the starts of the wind roads)
   // (the Hush plaza's vents and lamps and the Crown's vent and ribbon are the boss module's: F2WORLD.md 6)

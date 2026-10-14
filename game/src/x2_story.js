@@ -37,6 +37,10 @@ function f2sPlay(key,done,opt){
   runDialogue(L,()=>{ scene='play'; F2ST.cam=null; if(done) try{ done(); }catch(e){ console.error(e); } try{ saveGame(); }catch(e){} },opt);
   return true;
 }
+// a dialogue stops the breath (runDialogue turns the fire sound off and lets go of the keys), so the blue Blaze jet
+// goes too: p3_frost only clears it on a play frame, and a thaw or a story scene that starts while Ash holds Blaze
+// kept the jet drawn on screen for the whole scene
+{ const base=runDialogue; runDialogue=function(lines,done,opt){ try{ if(typeof P3!=='undefined'&&P3&&P3.bz){ const B=P3.bz; B.hold=0; B.blue=false; B.jetA=0; P3.jet=null; P3.jetOn=false; } }catch(e){} return base(lines,done,opt); }; }
 function f2sChain(keys,done,opt){ const L=[]; for(const k of keys){ const v=STORY[k]; const a=typeof v==='function'?v():v; if(Array.isArray(a)&&a.length) L.push(...a); } return f2sPlay(L,done,opt); }
 // a beat that waits for a calm moment: f2sWhen(id, cond, fn); an id already queued is not queued again
 function f2sWhen(id,cond,fn){ if(F2ST.q.some(q=>q.id===id)) return; F2ST.q.push({id,cond,fn,t:0}); }
@@ -792,7 +796,9 @@ defineStages(3,[
     mom:[S(`A maze made of ice? Don't lick the walls.`,`An ice maze? Don't lick the walls.`)],
     talk(n){ if(n.id==='f_brynja'){ f2sPlay(STORY.f_brynja_wait); return true; } return false; },
     update(dt){ const F=G.flags;
-      if(!f2sSeen('f_moat')&&scene==='play'&&f2sNear(F2SP.moat,300)) f2sPlay('f_moat');
+      // (on the shore: x2_world's moat ring is open water out to r 380, so the "walk on water" lines play before Ash
+      // has to step onto it)
+      if(!f2sSeen('f_moat')&&scene==='play'&&f2sNear(F2SP.moat,490)) f2sPlay('f_moat');
       if(F.trial_f_maze_done) goStage('f_kindle'); }},
   {id:'f_kindle',chapter:S('The Dying Hearth','The Dying Hearth'),at:{x:6800,y:49160},
     objectives(){ const F=G.flags;
@@ -881,6 +887,8 @@ defineStages(3,[
     objectives(){ if(G.flags.f_done||G.choices.f_glaciar) return [];
       if(G.boss&&!G.boss.dead&&G.boss.type==='f_glaciar'){ const n=f2sChains(); return [{text:n>=4?S('All four chains are gone! Hit the Shard in her chest','Hit the Shard in her chest!'):S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:G.boss.x,y:G.boss.y,fight:true}]; }
       const L=f2sNextLock(); if(L){ const n=f2sChains(); return [{text:S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:L.x,y:L.y}]; }
+      // (Ash who fell in the fight wakes at a shrine below the mountain: the way back up is through the Heart of Dread)
+      if(f2sInArea('f_dread')||(curMap()===2&&!AREA&&f2sElev()<6)) return [f2sDunObj('f_dread','Climb back up through the Heart of Dread to the Crown','Climb back up to the top of the mountain',F2SP.dreadgate)];
       return [{text:S('Face Glaciar on the Crown of Dread','Face Glaciar on top of the mountain'),x:F2SP.crown.x,y:F2SP.crown.y}]; },
     idle:()=>G.flags.f_done?S('The north is warm again. Rest at a shrine or an inn when you are ready for the next part of the story.','Rest when you are ready for more story.')
       :G.choices.f_glaciar?S('The Crown of Dread is quiet. Night is coming to Hearthold.','The mountain is quiet. Night is coming.'):'',
@@ -989,6 +997,9 @@ function f2sDrum(){
   if(f2sSeen('f_drum')) return;
   // (knocked before Ash ever stood at the gate: Tove's "see the drum?" scene is past)
   f2sMark('f_dreadgate');
+  // (Tove's "Jump, then slam down on it" nudge is said as Ash walks up to the drum: it is done now, and a line on the
+  // top of the screen would stay up over the whole scene)
+  f2sQuiet();
   F2ST.cam={x:(player.x+F2SP.plaza.x)/2,y:(player.y+F2SP.plaza.y)/2,k:0.35};
   f2sPlay('f_drum',()=>{ gainXp(300); questUpdated(); });
 }
@@ -1205,7 +1216,9 @@ const F2S_DUN={
     say:S('Just inside the temple gate, a little flame flickers in the wind. The halls beyond are full of gales, for now.','A little flame flickers inside the gate.')},
   f_deep:{at:F2SP.horned,stages:['f_gap','f_deep'],abil:'pound',name:S('Step into Stonehorn Deep','Go into Stonehorn Deep'),
     say:S('Just inside the skull\'s mouth, a little flame burns on top of a drum stone. Deeper down, something snores.','A little flame burns on a drum stone.')},
-  f_dread:{at:F2SP.dreadgate,stages:['f_dread'],name:S('Climb into the Heart of Dread','Go into the mountain'),
+  // (also at f_glaciar: Ash who falls in the Glaciar fight wakes at a shrine below, and the placeholder has no stair of
+  // its own back up to the Crown)
+  f_dread:{at:F2SP.dreadgate,stages:['f_dread','f_glaciar'],name:S('Climb into the Heart of Dread','Go into the mountain'),
     say:S('A long stair of black ice winds up through the mountain, chains on every step. You climb, and climb, and melt every lock you pass.','You climb up the long stair. You melt every chain.')}
 };
 // (x2_world registers a one-room placeholder for a dungeon no helper has built: then the stand-in runs inside it)
