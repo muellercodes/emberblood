@@ -1,0 +1,59 @@
+{
+ "_about": "Simple words for x2_people (Act III people and side quests in Frostreach): templates for text built with numbers and names. Lines written with S() in the code carry their own simple words.",
+ "gw7kbw": {
+  "o": "{1} frozen folk warmed so far! That's {2} cocoas Pim doesn't know about yet!",
+  "s": "{1} people warmed! Pim doesn't know yet!"
+ },
+ "pybl7j": {
+  "o": "You carry {1} of 3. It warms you up when you get hurt.",
+  "s": "You have {1} of 3."
+ },
+ "sti875": {
+  "o": "The Snow Mother’s Song: verse {1}",
+  "s": "Verse {1} of the song"
+ },
+ "19y60lk": {
+  "o": "{1} of 3 verses. Bring them to Brynja at the Great Hearth.",
+  "s": "{1} of 3. Bring them to Brynja."
+ },
+ "z1rxc9": {
+  "o": "The Snowgobs have tied {1} up as a snowman, with a carrot for a nose. She looks furious. Chase the Snowgobs off first!",
+  "s": "The Snowgobs made {1} a snowman! Chase them off first!"
+ },
+ "1o1kyut": {
+  "o": "{1} is up on a ledge on the cliff, wagging and whining. You'd have to climb.",
+  "s": "{1} is on a high ledge. Climb up!"
+ },
+ "69g1iy": {
+  "o": "{1} is out on a floating isle, too far to jump. Only the wind goes there.",
+  "s": "{1} is on a sky isle. Ride the wind!"
+ },
+ "1w48dpf": {
+  "o": "{1} is frozen in a block of clear ice, mid-wag. Only Blaze will melt it.",
+  "s": "{1} is frozen in ice. Use Blaze!"
+ },
+ "1cfmn7o": {
+  "o": "{1} is going home!",
+  "s": "{1} runs home!"
+ },
+ "1ksoedn": {
+  "o": "{1} of 5 sled dogs found.",
+  "s": "{1} of 5 dogs."
+ },
+ "1edznsj": {
+  "o": "Mush! To {1}",
+  "s": "To {1}"
+ },
+ "wc194p": {
+  "o": "{1} is free!",
+  "s": "{1} is free!"
+ },
+ "16dtl2n": {
+  "o": "{1} of 3 wolves. Its eyes are wolf-yellow again.",
+  "s": "{1} of 3 wolves free."
+ },
+ "5t0vak": {
+  "o": "Warmed up by your Blaze so far: {1}. The Mayor wants twelve. Rimeholm wants everyone.",
+  "s": "You warmed {1} people. The Mayor wants 12."
+ }
+}
