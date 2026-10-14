@@ -513,7 +513,7 @@ function m3KnightAI(e,dt,p){
   const L=!(e.stareCd>G.time)?m3LampNear(e.x,e.y,400):null;
   if(L){ e.lure=L; e.state='stare'; e.st=3; m3Txt(e,S('Ooh. A lamp.','Ooh.'),'#fff0c0',13); m3Ev('stare'); return; }
   e.orbit=(e.orbit||rand(0,TAU))+dt*1.1*(e.orbitDir||1); const R=170+Math.sin(e.t*1.3)*30; steer(e,p.x+Math.cos(e.orbit)*R,p.y+Math.sin(e.orbit)*R,e.speed*D.spd); e.face=turnTo(e.face,a,4*dt);
-  e.cd-=dt*D.cdK; if(e.cd<=0&&d<420&&d>80){ e.cd=e.m3guard?rand(3.4,4.6):rand(1.8,2.8); e.state='diveW'; e.st=0.7; e.face=a; e.tele=newTele({shape:'line',len:360,w:e.r*1.8,dur:e.st,col:M3COL.red}); }
+  e.cd-=dt*D.cdK; if(e.cd<=0&&d<420&&d>80){ e.cd=e.m3guard?rand(4.5,6):rand(1.8,2.8); e.state='diveW'; e.st=0.7; e.face=a; e.tele=newTele({shape:'line',len:360,w:e.r*1.8,dur:e.st,col:M3COL.red}); }
 }
 defineFoe('m_mothknight',{name:'Moth Knight',r:18,hp:200,speed:110,dmg:20,value:64,flying:true,shield:true,kbRes:0.5,dcol:'170,165,190',
   ai:m3KnightAI,
@@ -2092,7 +2092,7 @@ function m3DrawTable(D){ const x=D.table.x, y=D.table.y, oc=C1OL(), e=G.boss, go
   ctx.fillStyle='#ffffff'; ctx.strokeStyle='#a89ac0'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.ellipse(x,y-10,14,5,0,0,TAU); ctx.fill(); ctx.stroke();
   if(!gone){ ctx.fillStyle=oc; rrect(ctx,x-6,y-28,12,16,4); ctx.fill(); ctx.fillStyle='#d8c08a'; rrect(ctx,x-4.5,y-26.5,9,13,3); ctx.fill(); ctx.fillStyle='#fff2b0'; ctx.beginPath(); ctx.arc(x,y-20,3,0,TAU); ctx.fill(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.6; ctx.drawImage(foGlowSpr('255,210,120'),x-20,y-40,40,40); }
   ctx.restore(); }
-function m3DukeKnights(e){ const L=fkLevel(e,{}), C=m3Ctx(e), n=byDiff(1,2,2); for(let i=0;i<n;i++){ const q={x:e.x+(i?150:-150),y:e.y+40}; m3Hold(C,q,60); const k=makeEnemy('m_mothknight',q.x,q.y,{level:Math.max(1,L-4),aggro:true,elite:false,homeX:q.x,homeY:q.y,leash:99999}); k.spawnIn=0.3; k.m3guard=e.id; k.arena=e.arena; m3Puff(q.x,q.y-20,'200,195,215',18); } }
+function m3DukeKnights(e){ const L=fkLevel(e,{}), C=m3Ctx(e), n=byDiff(1,2,2); for(let i=0;i<n;i++){ const q={x:e.x+(i?150:-150),y:e.y+40}; m3Hold(C,q,60); const k=makeEnemy('m_mothknight',q.x,q.y,{level:Math.max(1,L-4),aggro:true,elite:false,homeX:q.x,homeY:q.y,leash:99999}); k.spawnIn=0.3; k.m3guard=e.id; k.dmg*=byDiff(0.6,0.7,0.85); k.arena=e.arena; m3Puff(q.x,q.y-20,'200,195,215',18); } }
 function m3DukeLamp(e,D){ if(!D||!D.lamps) return null; let best=null, bd=1e18; for(const L of D.lamps) if(L.lit>0&&!(L.dukeT>G.time)){ const d2=dist2(L.x,L.y,e.x,e.y); if(d2<bd){ bd=d2; best=L; } } return best; }
 function m3DukeAI(e,dt,p){
   p=p||player; const F=foeDiff(), D=m3RoomOf(e), d=dist(e.x,e.y,p.x,p.y), a=angTo(e.x,e.y,p.x,p.y); e.dx=e.dy=0;
