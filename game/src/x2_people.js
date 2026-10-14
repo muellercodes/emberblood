@@ -953,7 +953,7 @@ const F2P_FROZEN=[
     line:S(`WHEEEEE... eee? Why did I stop? I was going SO fast.`,`WHEEE... Why did I stop? I was SO fast!`),after:S(`Again! AGAIN! Soren, push me again!`,`Again! Push me again!`)},
   // Rimeholm (ACT3 4.2): Ylva is the main story (6.6); the others are Rimeholm, One Thaw at a Time (10.5)
   {id:'f_ylva',who:'f_ylva',x:1950,y:46750,lines:()=>STORY.f_ylva||[f2pN(`The ice on the old woman goes soft, then slushy, then drips away. She blinks. She looks down at her knitting.`,`The ice drips away. The old woman blinks.`),
-    f2pL('f_ylva',`Oh, bother. I dropped a stitch. Hello, dear. I wasn't frozen. I was resting my eyes.`,`Oh, bother. A dropped stitch. I was resting my eyes, dear.`)],onThaw:()=>{ G.flags.f_ylva=1; }},
+    f2pL('f_ylva',`Oh, bother. I dropped a stitch. Hello, dear. I wasn't frozen. I was resting my eyes.`,`Oh, bother. A dropped stitch. I was resting my eyes, dear.`)],onThaw:()=>{ if(typeof f2sBeat==='function') try{ f2sBeat('ylva'); return; }catch(e){} G.flags.f_ylva=1; }},   // x2_story plays her scene (F2STORY.md 4)
   {id:'f_tollef',who:'f_tollef',x:1950,y:46830,lines:()=>[f2pL('f_tollef',`WHAT? OH! HELLO! I CAN'T HEAR YOU, I'VE BEEN STANDING NEXT TO A BELL FOR FORTY YEARS!`,`WHAT? HELLO! I CAN'T HEAR! TOO MANY BELLS!`),f2pL('f_tollef',`THE BELL HAS A SONG! THE SNOW MOTHER'S SONG! I ONLY KNOW THE FIRST BIT!`,`THE BELL HAS A SONG! I KNOW THE FIRST BIT!`)]},
   {id:'f_saga',who:'f_saga',x:1150,y:46900,coins:10,lines:()=>[f2pL('f_saga',`I had a bite! A big one! ...It got away. A month ago. Probably.`,`I had a big bite! It got away. A month ago.`),f2pL('f_saga',`Here. Some bait. Good bait. Don't eat it.`,`Here. Good bait. Don't eat it.`)],onThaw:()=>{ giveItems({fish:1},true); }},
   {id:'f_sigrun',who:'f_sigrun',x:2200,y:47250,lines:()=>[f2pL('f_sigrun',`My soup! My SOUP! It's a soup-sicle. ...Actually, that's not bad. Lick it.`,`My soup is a soup-sicle! Lick it.`)],heal:40},
@@ -1023,7 +1023,8 @@ const F2P_SLED={rest:{x:11300,y:49450,n:S('Hask’s Rest','Hask’s Rest')},gate
 const F2P_WOLF=[{flag:'f_wolf1',name:S('Frostear','Frostear'),x:10600,y:50300},{flag:'f_wolf2',name:S('Nibbles','Nibbles'),x:12900,y:49900},{flag:'f_wolf3',name:S('Big Bob','Big Bob'),x:13500,y:50700}];
 // the pups: in the Steamwell among the snow monkeys, in a drift on the Dreadmoor (clear of the Hush arena), on the
 // Glimmerfrost's south pressure ridge (the north one holds the frozen fish secret)
-const F2P_PUP=[{flag:'f_pup1',x:3790,y:49420,how:'stare'},{flag:'f_pup2',x:7850,y:45050,how:'drift'},{flag:'f_pup3',x:5700,y:46940,how:'ridge'}];
+// (x2_world names the spots: f2wSpot('pupsteam'|'pupmoor'|'pupridge'), read at build when it is there)
+const F2P_PUP=[{flag:'f_pup1',x:3760,y:49590,how:'stare',spot:'pupsteam'},{flag:'f_pup2',x:7980,y:44520,how:'drift',spot:'pupmoor'},{flag:'f_pup3',x:5700,y:46940,how:'ridge',spot:'pupridge'}];
 const F2P_SING=[13250,47250], F2P_DRUM=[13300,41400], F2P_BELL=[1950,46750], F2P_GRAVE=[11000,41700];
 function f2pSledCross(){ return typeof CROSSINGS!=='undefined'&&!!(CROSSINGS.f_sled_rest||CROSSINGS.f_sled_gate); }
 // x2_world (F2WORLD.md) leaves stand-ins for two quest objects with switches for this module: its powder crate and
@@ -1037,6 +1038,7 @@ function f2pWorldSpots(){
   F2P_DOGS.forEach((D,i)=>{ const o=f2pLMid('f_dog_'+(i+1)); if(o){ D.x=o.x; D.y=o.y; } });
   const k=(F2WD.objs||[]).find(o=>o&&o.k==='kennel'); if(k){ F2P_KENNEL[0]=k.x; F2P_KENNEL[1]=k.y+24; F2P.worldKennel=true; }
   F2WD.noPowderCrate=true; F2WD.noDogs=true;
+  if(F2WD.gulchCrate&&F2WD.gulchCrate.st==='up') F2WD.gulchCrate.st='gone';   // its crate picture goes too (mine is drawn there)
 }
 function f2pBuild(B){
   f2pPlaceFrozen();
@@ -1085,6 +1087,7 @@ function f2pBuild(B){
   f2pLM({id:'f_lm_forge',k:'f_forge',x:7000,y:49280,hidden:()=>DOORS.some(d=>d.area==='h_f_gunnhild')||!(f2pOn('f_forge')||G.flags.f_forge_lit),get prompt(){ return G.flags.f_forge_lit?S('Warm your claws at the forge','Warm up at the forge'):S('Look at the cold forge','Look at the forge'); },draw:(o,t)=>f2pDrawForge(o.x,o.y,!!G.flags.f_forge_lit,t),act:()=>f2pForgeAct()});
   f2pLM({id:'f_lm_bomatic',k:'f_bomatic',x:6560,y:49300,hidden:()=>DOORS.some(d=>d.area==='h_f_mags')||!(f2pOn('f_bombs')||G.flags.f_bombs_lit),get prompt(){ return S('Look at the Bomb-o-Matic','Look at the Bomb-o-Matic'); },draw:(o,t)=>f2pDrawBomatic(o.x,o.y,!!G.flags.f_bombs_lit,t),act:()=>f2pBomaticAct()});
   // f_pack: Greymane's pups (the home path); the wolves are spawned near their spots
+  for(const P of F2P_PUP){ let q=null; try{ q=typeof f2wSpot==='function'?f2wSpot(P.spot):null; }catch(e){} if(q&&Array.isArray(q)&&q.length>=2){ P.x=q[0]; P.y=q[1]; } else if(q&&q.x!=null){ P.x=q.x; P.y=q.y; } }
   for(const P of F2P_PUP) if(P.how!=='ridge'&&!f2pFree(P.x,P.y)){ const q=f2pNear(P.x,P.y); if(q){ P.x=q.x; P.y=q.y; } }
   F2P_PUP.forEach((P,i)=>f2pLM({id:'f_lm_pup'+(i+1),k:'f_pup',i,x:P.x,y:P.y,hidden:()=>!f2pAt('f_pack',0)||G.choices.greymane!=='home'||!!G.flags[P.flag],get prompt(){ return P.how==='drift'?S('Look at the snowdrift','Look at the snowdrift'):S('Call the pup','Call the pup'); },draw:f2pDrawPupLM,act:o=>f2pPupAct(o,i)}));
   // Duchess on the very top of Mount Dread (THREADS 14.3, sighting 3), after the Glaciar fight
@@ -1414,7 +1417,7 @@ function f2pThawTick(dt){
   if(f2pQ('f_rime')&&!F.f_rime_gen) { F.f_rime_gen=1; f2pThawMany(o=>o.f2pGen); }
   if(G.choices.f_glaciar_home==='stay'&&!F.f_allthawed){ F.f_allthawed=1; f2pThawMany(o=>true); }
   // Ylva offers One Thaw at a Time right after she wakes (ACT3 10.5)
-  if(F.f_ylva&&!G.quests.f_rime&&!F.f_rime_offered&&scene==='play'&&!DLG&&!AREA){ const y=G.npcs.find(n=>n.id==='f_ylva'); if(y&&dist(y.x,y.y,player.x,player.y)<700&&qAvail('f_rime')){ F.f_rime_offered=1; later(0.6,()=>f2pCalm(()=>{ if(!G.quests.f_rime&&qAvail('f_rime')) offerQuest('f_rime'); })); } }
+  if(F.f_ylva&&!G.quests.f_rime&&!F.f_rime_offered&&!(G.declined&&G.declined.f_rime)&&scene==='play'&&!DLG&&!AREA){ const y=G.npcs.find(n=>n.id==='f_ylva'); if(y&&dist(y.x,y.y,player.x,player.y)<700&&qAvail('f_rime')){ F.f_rime_offered=1; later(0.6,()=>f2pCalm(()=>{ if(!G.quests.f_rime&&qAvail('f_rime')) offerQuest('f_rime'); })); } }
 }
 function f2pThawMany(fn){ if(typeof P3==='undefined'||typeof p3ThawStart!=='function') return 0; let k=0; for(const o of P3.out){ if(o.p3!=='frozen'||o.st!=='ice'||!fn(o)) continue; try{ Object.defineProperty(o,'lines',{value:null,writable:true,configurable:true}); }catch(e){} if(k>2) o.line=null; const j=k++; later(0.4+j*0.35,()=>{ if(o.st==='ice') try{ p3ThawStart(o); }catch(e){} }); } return k; }
 // ACT3 6.12 fThawAll (the Snow Mother's breath): every Frozen Folk left outdoors shivers awake, no dialogues (the
@@ -1431,10 +1434,12 @@ function f2pNorthMaps(){
   setBanner(S('Juniper’s North Maps','Juniper’s North Maps'),S('Your map now shows the four great doors, the secrets of the north and every frozen person. Inside the dungeons, the rooms are drawn in.','Your map shows doors, secrets and frozen folk!'),3.8);
 }
 // ---------- Duchess on Mount Dread (after the Glaciar fight) and a few things that happen near places
-function f2pDuchessUp(){ return !!G.choices.f_glaciar&&!G.flags.f_duchess; }
+// she is drawn on the spike from the end of the fight until the act ends (x2_story may play her lines right after the
+// outro); walking up to her plays STORY.f_duchess if nobody has yet
+function f2pDuchessUp(){ return !!G.choices.f_glaciar&&!G.flags.f_done; }
 function f2pPlacesTick(){
   if(AREA||curMap()!==2||scene!=='play'||DLG) return;
-  if(f2pDuchessUp()&&dist(player.x,player.y,7300,40820)<170) runDialogue(STORY.f_duchess,()=>{ scene='play'; if(!G.flags.f_duchess){ G.flags.f_duchess=1; addCoins(30,player.x,player.y); gainXp(60); } saveGame(); });
+  if(f2pDuchessUp()&&!G.flags.f_duchess&&dist(player.x,player.y,7300,40820)<170) runDialogue(STORY.f_duchess,()=>{ scene='play'; if(!G.flags.f_duchess){ G.flags.f_duchess=1; addCoins(30,player.x,player.y); gainXp(60); } saveGame(); });
   // the Singing Stone plays when Ash rides a wind ribbon past it
   if(f2pOn('f_song')&&!G.flags.f_v2&&typeof WIND!=='undefined'&&WIND.ride()&&dist(player.x,player.y,F2P_SING[0],F2P_SING[1])<230&&!(F2P.stoneT>G.time-4)) f2pStoneTry(true);
   // the dream's sung verse (dr_f_auntie 'sing') counts as verse one
@@ -1697,6 +1702,7 @@ const F2P_EPI=[
   {pri:3,cond:()=>f2pQ('f_sled'),line:['narr',S(`Elka and Soren built a sled run from the Windscour all the way down to Hearthold. Everyone calls it the Ash Run. Elka calls it hers.`,`Elka and Soren built a sled run. Everyone calls it the Ash Run.`)]},
   {pri:2,cond:()=>f2pQ('f_juniper'),line:['narr',S(`Juniper's North Maps hang in the Hearth Archive. Brother Eider dusts them every morning and whispers sorry to the corners.`,`Juniper's maps hang in the archive. Eider dusts them every day.`)]},
   {pri:2,cond:()=>f2pQ('f_warm'),line:['narr',S(`Mayor Toastwhistle gave out eleven more medals that winter. All of them were cookies. Everything was fine.`,`The Mayor gave out eleven more medals. All cookies.`)]},
+  {pri:3,cond:()=>G.choices.f_glaciar==='defeat',line:['narr',S(`On Mount Dread an ice dragon slept on under her blanket of snow, and every spring a small dragon with red horns climbed up to say hello.`,`Glaciar slept on. Every spring, Ash climbed up to say hello.`)]},
   {pri:1,cond:()=>true,line:['narr',S(`The Great Hearth of Hearthold burned blue and gold all winter, and Old Brynja talked to it every night, and it talked back in sparks.`,`The Great Hearth burned blue and gold all winter.`)]}
 ];
 function f2pEpiPush(){
