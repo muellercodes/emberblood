@@ -894,7 +894,7 @@ ELEV.style('f_slate',{face:'#c8c0b0',lit:'#e2dccc',dark:'#a49c8c',lip:'#ffffff',
 function f2wArc(cx,cy,r0,r1,a0,a1,n){ const P=[]; n=n||24; for(let i=0;i<=n;i++){ const a=lerp(a0,a1,i/n); P.push([cx+Math.cos(a)*r1,cy+Math.sin(a)*r1]); } for(let i=n;i>=0;i--){ const a=lerp(a0,a1,i/n); P.push([cx+Math.cos(a)*r0,cy+Math.sin(a)*r0]); } return P; }
 const F2WE={
   // Rimeholm's tower, chapel and Sigrun's smoke yard; the dog's shelf on the Windscour's face; the gulch ledge
-  tower:[1900,46700,2000,46800], chapel:[1630,46600,1770,46700], plinth:[2240,47150,2380,47250],
+  tower:[1860,46700,2000,46800], chapel:[1630,46600,1770,46700], plinth:[2240,47150,2380,47250],
   dogShelf:[9230,47640,9470,47790], gulchLedge:[5320,50520,5440,50640],
   ridges:[[4200,45000,4700,45080],[5400,46900,6000,46980],[3600,46000,3680,46500]],
   deck:[1380,42560,1820,42690], crownLedge:[7160,40690,7440,40810], eastSlab:[7780,41150,110]
@@ -1969,7 +1969,7 @@ window.__ebX=Object.assign(window.__ebX||{},{
     objs:()=>F2WD.objs.length, homes:()=>F2WD.homes, ph:()=>F2WD.ph, frozen:()=>F2WD.frz.map(o=>({id:o.id,who:o.who||null,st:o.st,flag:o.flag,x:o.x,y:o.y})),
     thawAll(){ for(const o of F2WD.frz){ if(o.st==='ice'){ G.flags[o.flag]=1; o.st='free'; p3Uncol(o); } } G.flags.f_frozen_n=F2WD.frz.length; f2wSync(); return F2WD.frz.length; },
     SHRINES, HOUSES, DOORS, AREADEFS, CAMPS, save:()=>saveGame(), door:(area,i)=>{ const d=DOORS.filter(q=>q.area===area)[i||0]; if(d) enterArea(d.area,d); return !!AREA; },
-    stride:(x,y)=>mapStrideBlocked(x,y), blocked:(x,y)=>blockedAt(x,y),
+    stride:(x,y)=>mapStrideBlocked(x,y), blocked:(x,y)=>blockedAt(x,y), amb:()=>ambHere(),
     flood(sx,sy,o){ o=o||{}; const cs=o.cs||8, bb=o.bb||[0,40000,14000,51000], x0=bb[0], y0=bb[1], w=Math.ceil((bb[2]-bb[0])/cs), h=Math.ceil((bb[3]-bb[1])/cs), seen=new Uint8Array(w*h), q=[];
       const pass=(x,y)=>{ if(outOfMap(x,y,30)) return false; if(colAt(x,y,5)) return false; if(!blockedAt(x,y)) return true; return !!(o.stride&&!(elevFace(x,y)&1)&&!mapStrideBlocked(x,y)); };
       if(!pass(sx,sy)) return {fail:'start blocked'}; const k0=Math.floor((sy-y0)/cs)*w+Math.floor((sx-x0)/cs); seen[k0]=1; q.push(k0);
