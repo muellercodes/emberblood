@@ -867,7 +867,7 @@ function n4sPaint(g,w,h,k,t,pane){
       if(end==='moth'){ moth(500+Math.sin(t*0.5)*4,170,0.9,'#9a8ab0','#ece6ff'); }
       hill(470,1.4,0.006,'#1a1430'); hill(510,1.0,0.008,'#140e26');
       for(let i=0;i<6;i++){ const a=i/6*TAU+0.3; post(500+Math.cos(a)*220,525+Math.sin(a)*36,true); }
-      kid(470,540,1.1,'#1a1028'); if(G.flags.pip) pip(520,540,1.2,'#1a1028'); break; }
+      glow(495,515,120,'200,215,255',0.32); kid(470,540,1.1,'#241838'); if(G.flags.pip) pip(520,540,1.2,'#241838'); break; }
     case 'lanternday': { stars(30,0.4); glow(500,560,460,'255,170,100',0.35);
       if(end) moonAt(820,110,46,0.95);
       hill(450,1.4,0.006,'#3a2a50'); for(const [x,ww,hh] of [[90,80,62],[200,70,54],[800,84,66],[920,76,58]]) house(x,450,ww,hh,'#4a3458','#2a1c38',true);
@@ -1284,6 +1284,7 @@ function n4sAllyLite(dt){
 function n4sAllyRender(){ if(!N4ST.allies.length){ return; } G.allies=N4ST.allies.map(a=>{ const o=a.r4||(a.r4={draw:null,x:0,y:0,r:10}); o.x=a.x; o.y=a.y+(a.id==='glaciar'?140:a.id==='hush'?40:0); o.draw=()=>n4sDrawAlly(a); return o; }); }
 // what each friend does (generic help; the fights' own mechanics are x4_foes', which can read the friends above)
 function n4sAllyAct(a,dt){
+  if(N4ST.heart&&!N4ST.heart.blazed) return;   // (in the Heart moment the friends wait in the dark)
   const p=player, b=G.boss&&!G.boss.dead?G.boss:null, id=a.id;
   if(id==='greymane'){
     if(b&&a.cd<=0&&dist(a.x,a.y,b.x,b.y)<150&&!b.invuln&&(b.type==='n_echo_vor'||b.type==='n_nyxara')){ a.cd=b.type==='n_nyxara'?6:7; n4sHitBoss(0.03,'230,240,250',S('Bite!','Bite!')); n4sSfx('slash3'); a.tx=b.x+rand(-360,360); a.ty=b.y+rand(-300,300); }
@@ -1557,6 +1558,7 @@ function n4sFallPlay(){
 }
 function n4sChoose(end){
   G.choices.n_end=end; G.flags.n_nyx_done=1; G.flags.n_heart_on=0;
+  if(DLG) DLG.mood={dawn:'n_end_dawn',embermoon:'n_end_ember',moth:'n_end_moth'}[end]||null;
   n4sExtra('n_end',{dawn:S('You ended the Long Night for good, and the morning came.','You ended the Long Night.'),embermoon:S('You gave the Ember Heart to the moon.','You gave the Heart to the moon.'),moth:S('You called her Nyx and lit her a lantern.','You lit Nyx a lantern.')}[end]);
   if(G.stage!=='n_end'){ G.stage='n_end'; try{ ACT_RT.last=null; }catch(e){} }
   try{ saveGame(true); }catch(e){}
@@ -1572,7 +1574,7 @@ function n4sAfterChoice(){
   n4sWhen('dawn',null,()=>n4sDawn(),true);
 }
 function n4sDawn(){
-  N4ST.run=true; if(!N4ST.cut) n4sCutFall(true);
+  N4ST.run=true; if(!N4ST.cut){ n4sCutFall(true); const C=N4ST.cut; C.nyx.alpha=0; C.nyx.mode='gone'; C.fill=C.fillTo=1; C.whole=1; if(G.choices.n_end==='embermoon') C.gold=C.goldTo=1; }
   if(typeof moonRestore==='function') moonRestore(); else G.flags.moon=100;
   if(N4ST.cut) N4ST.cut.fillTo=1;
   n4sPlay('n_dawn_lines',()=>{ N4ST.dawnTo=1; G.flags.n_dawn=1; n4sWhen('epi',null,()=>n4sEpilogue(),true); },{again:true,mood:'n_dawn'});
@@ -1856,6 +1858,11 @@ const N4S_DBG={N4ST,N4S_SC,N4S_ECHO,N4S_STAND,N4S_PANE,N4S_ENDINGS,play:n4sPlay,
   epiLines:()=>n4sEpiLines().filter(l=>Array.isArray(l)||(l&&l.text)).map(l=>Array.isArray(l)?l[1]:(typeof l.text==='function'?l.text():l.text)).filter(Boolean),
   cut:()=>N4ST.cut?{fill:+N4ST.cut.fill.toFixed(2),gold:+N4ST.cut.gold.toFixed(2),nyx:N4ST.cut.nyx.mode,s:+N4ST.cut.nyx.s.toFixed(2)}:null,
   anim:sec=>{ for(let t=0;t<(sec||1);t+=1/30) n4sAnim(1/30); return true; },
+  texts:()=>{ const out=[], add=v=>{ if(typeof v==='string') out.push(v); else if(Array.isArray(v)) v.forEach(add); else if(v&&typeof v==='object') for(const k in v) if(k!=='who'&&k!=='at'&&k!=='lines'&&k!=='n') add(v[k]); };
+    add([N4S_TAUNT,N4S_HINT,N4S_HINTS,N4S_SOFAR,N4S_SOFAR_END,N4S_YARA]); for(const k in N4S_ALLYBEAT) add(N4S_ALLYBEAT[k][1]); for(const k in N4S_BUB) add(N4S_BUB[k].t);
+    for(const k in N4S_PANE) add(N4S_PANE[k].title); for(const k in N4S_ENDINGS) add([N4S_ENDINGS[k].title,N4S_ENDINGS[k].msg]);
+    for(const st of ['n_bridge','n_stair','n_clocks','n_rime','n_glass','n_crown','n_nyxara','n_end']){ const D=STAGEDEF[st]; if(D) add(D.chapter); }
+    return out.filter(t=>t&&t.length>3); },
   state:()=>({stage:G.stage,act:G.act,map:curMap(),x:Math.round(player.x),y:Math.round(player.y),lvl:n4sLvl(),done:!!G.done,end:G.choices.n_end||null,run:N4ST.run,scene,
     dawn:+(+G.flags.n_dawn||0).toFixed(2),moon:typeof moonLeft==='function'?moonLeft():null,look:typeof moonLook==='function'?moonLook():null,heart:!!N4ST.heart,heartDone:!!G.flags.n_heart_done,big:+N4ST.big.toFixed(2),
     lanterns:n4sLanterns(),flames:n4sFlames(),echo:[1,2,3,4].map(n4sEchoDone),nyxDone:n4sNyxDone(),phase:n4sPhase(),gather:!!G.flags.n_gather,road:G.flags.n_road||0,door:!!G.flags.n_door,
