@@ -664,8 +664,17 @@ function s10PlacesTick(dt){
     }
   }
 }
+// place lights (light:{r,i,night}): holes in the dark, like the town's lamps, for the places shown here and now
+const S10L=[];
+function s10Lights(){
+  for(const L of S10L){ const i=LIGHTS.indexOf(L); if(i>=0) LIGHTS.splice(i,1); } S10L.length=0;
+  if(!G||G.mode!=='story') return;
+  for(const id in S10.places){ const P=S10.places[id]; if(!P.light||!s10PlaceShown(P)) continue; const st=s10World(id); if(P.light.state&&P.light.state!==st) continue; if(P.light.off&&s10Arr(P.light.off).includes(st)) continue;
+    const at=s10At(P); if(!at||!inView(at.x,at.y,400)) continue; const L={x:at.x,y:at.y-(P.light.dy!=null?P.light.dy:20),r:P.light.r||90,i:P.light.i!=null?P.light.i:0.6,night:P.light.night!==false,fire:!!P.light.fire,s10:true}; S10L.push(L); LIGHTS.push(L); }
+}
 function s10Render(list){
   if(!G||G.mode!=='story'||!S10.booted) return;
+  s10Lights();
   const T=s10Targets(), t=G.time;
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceOn(P)) continue;
@@ -673,14 +682,20 @@ function s10Render(list){
     if(P.kind==='spot'||P.kind==='gate') continue;
     if(P.show!=null&&!s10Cond(P.show)) continue;
     const at=s10At(P); if(!at||!inView(at.x,at.y,160)) continue;
-    const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look;
-    if(look||P.kind==='chest') list.push({x:at.x,y:at.y,draw:()=>{ if(P.kind==='chest'&&!look) s10DrawChest(at.x,at.y,!!G.chestsOpened[id]); else s10LookDraw(look,at.x,at.y,st); }});
-    if(T.has(id)) list.push({x:at.x,y:at.y+1,draw:()=>s10Sparkle(at.x,at.y-((P.h||40)+14),t)});
+    const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look, sy=s10SortY(P,at);
+    if(look||P.kind==='chest') list.push({x:at.x,y:sy,draw:()=>{ if(P.kind==='chest'&&!look) s10DrawChest(at.x,at.y,!!G.chestsOpened[id]); else s10LookDraw(look,at.x,at.y,st); }});
+    if(T.has(id)) list.push({x:at.x,y:sy+1,draw:()=>s10Sparkle(at.x,at.y-((P.h||40)+14),t)});
   }
   // legacy things a step waits for (the Moth Mask Watch board): a sparkle over them too
   for(const id of T){ if(S10.places[id]) continue; const w=s10Where(id), e=s10Ent(id); if(!w||w.area||AREA||(e&&e.map!=null&&curMap()!==+e.map)||!inView(w.x,w.y,120)) continue; list.push({x:w.x,y:w.y+1,draw:()=>s10Sparkle(w.x,w.y-54,t)}); }
 }
 { const base=eventsForRender; eventsForRender=function(list){ base(list); try{ s10Render(list); }catch(e){ console.error(e); } }; }
+// a place on a house wall (inside the house's footprint) is drawn after the house, so it shows on the wall
+function s10SortY(P,at){
+  if(P._sy!=null&&P._syN===HOUSES.length) return P._sy;
+  let y=at.y; for(const h of HOUSES){ if(!h||h.w==null) continue; if(Math.abs(at.x-h.x)<=h.w/2&&at.y>=h.y-h.h/2&&at.y<=h.y+h.h/2+4) y=Math.max(y,h.y+h.h/2+3); }
+  P._sy=y; P._syN=HOUSES.length; return y;
+}
 function s10Sparkle(x,y,t){
   const b=Math.sin(t*3)*3, a=0.75+Math.sin(t*5)*0.25;
   glowAt(x,y+b,26,'255,226,140',0.35*a);
@@ -838,7 +853,7 @@ function s10Clue(id,ctx){
   setBanner(S('New clue!','New clue!'),C?s10T(C.text):id,3.6,'clue');
   try{ SFX.play('quest'); }catch(e){}
 }
-function s10Mystery(id){ const M=S10.mysteries[id]; return M||{id,title:String(id||'').replace(/_/g,' ').replace(/^./,c=>c.toUpperCase()),act:null}; }
+function s10Mystery(id){ const M=S10.mysteries[id]; return M||{id,title:String(id||'').split('_').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '),act:null}; }
 function s10DeduceReady(D){ return s10Arr(D.needs).every(c=>G.case.clues[c]); }
 // answer a deduction: { right, hint }. A wrong pick counts a try and never fails.
 function s10Deduce(id,i){

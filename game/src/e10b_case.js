@@ -19,8 +19,8 @@ const CB10={wrong:{},flash:{},bookR:null,iconCache:new Map(),openAt:0};
   if(document.getElementById('cb10css')) return;
   const st=document.createElement('style'); st.id='cb10css';
   st.textContent=`
-#jTabs button[data-t="case"]{position:relative}
-.cb10-dot{position:absolute;top:4px;right:6px;width:9px;height:9px;border-radius:50%;background:#ff6a3a;box-shadow:0 0 0 2px rgba(0,0,0,.35);animation:cb10pulse 1.2s ease-in-out infinite}
+#jTabs button[data-t="case"]{position:relative;white-space:nowrap;flex:1.35 1 auto}
+.cb10-dot{position:absolute;top:3px;right:4px;width:9px;height:9px;border-radius:50%;background:#ff6a3a;box-shadow:0 0 0 2px rgba(0,0,0,.35);animation:cb10pulse 1.2s ease-in-out infinite}
 .cb10-dot[hidden]{display:none}
 @keyframes cb10pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
 .cb10{color:var(--ink);font-size:15px;line-height:1.45}
@@ -87,7 +87,7 @@ html.sb .cb10-new{box-shadow:0 2px 0 #3b2233}
 const CB10_SVG={
   gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5l1.6 2.6 3-.7.6 3 2.8 1.3-1.3 2.8 1.3 2.8-2.8 1.3-.6 3-3-.7L12 21.5l-1.6-2.6-3 .7-.6-3-2.8-1.3 1.3-2.8-1.3-2.8 2.8-1.3.6-3 3 .7z"/>',
   board:'<rect x="3.5" y="4" width="17" height="12" rx="1.5"/><path d="M7 20l2-4M17 20l-2-4M7 8h10M7 11h7"/>',
-  bird:'<path d="M4 14c3 0 5-3 8-3 2 0 3-2 3-4 0-1.5 1.5-2.5 3-2 1 .3 1.5 1 2 1.5l-2 .5c.5 3-1.5 7-6 8.5L8 19H5l2-2c-1.5-.5-2.5-1.5-3-3z"/><circle cx="17.5" cy="6.5" r=".6"/>',
+  bird:'<path d="M5 13.5c0-3 2.6-5 5.6-5 1.2 0 2.2.3 3 .9.4-2 2-3.4 4-3.4l3 1.4-2.6.9c.4 3.6-1.6 7.2-6.4 8.2H7.5L5 19l.8-3.2C5.3 15.1 5 14.4 5 13.5z"/><path d="M8.5 12.5c1.5.3 3 .2 4.5-.6"/><circle cx="17.3" cy="7.6" r=".7" fill="currentColor"/>',
   prints:'<ellipse cx="8" cy="8" rx="2.4" ry="3.4"/><ellipse cx="8" cy="3.6" rx="1.4" ry="1.2"/><ellipse cx="15.5" cy="16" rx="2.4" ry="3.4"/><ellipse cx="15.5" cy="11.6" rx="1.4" ry="1.2"/>',
   news:'<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M7 8h7M7 11h7M7 14h4"/>',
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>',

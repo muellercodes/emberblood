@@ -12,8 +12,8 @@ chapter({
   // prop library; window_clock and gear_hatch are new art, requested from the
   // engine owner.
   place: {
-    gh_bird_clock:  { map: 1, at: [7880, 24930], kind: 'examine', look: 'window_clock',
-                      name: 'the bird clock in the window' },
+    gh_bird_clock:  { map: 1, at: [7840, 24940], kind: 'examine', look: 'window_clock',
+                      name: 'the bird clock in the window', light: { r: 80, i: 0.55, night: true, off: ['gone'] } },
     gh_roof_prints: { map: 1, kind: 'prints', path: [[7640, 25060], [7760, 24990], [7900, 24920]],
                       show: 'item magnifier', name: 'silver prints' },
     gh_clock_works: { map: 1, at: [7040, 24880], kind: 'examine', look: 'gear_hatch',

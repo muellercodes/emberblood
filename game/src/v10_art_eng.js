@@ -4,33 +4,29 @@
 // icon_magnifier: Professor Sprocket's spare glass (the Case Book and the satchel use icon_* looks, drawn centred)
 // A look draws at (x, y) = the middle of its base on the ground, except icon_* looks, which are centred.
 
-defineLook('window_clock',{w:40,h:52,draw(g,x,y,t,state){
+defineLook('window_clock',{w:30,h:40,draw(g,x,y,t,state){
+  // a little brass shelf on the manor wall, under a window, with the clock on it (no window of its own: the house has them)
   const O='#3b2233', night=typeof daylight==='function'?daylight()<0.45:false, gone=state==='gone'||state==='stolen';
-  g.save(); g.translate(x,y);
-  // the window: a stone sill and an arched frame on the manor wall
-  g.lineJoin='round'; g.lineWidth=2.4; g.strokeStyle=O;
-  g.fillStyle=night?'#ffd98a':'#9fc6d8'; g.beginPath(); g.moveTo(-15,-6); g.lineTo(-15,-34); g.quadraticCurveTo(0,-50,15,-34); g.lineTo(15,-6); g.closePath(); g.fill();
-  if(night){ const gr=g.createRadialGradient(0,-24,2,0,-24,26); gr.addColorStop(0,'rgba(255,240,180,.95)'); gr.addColorStop(1,'rgba(255,190,90,.0)'); g.fillStyle=gr; g.fill(); }
-  g.stroke();
-  g.strokeStyle=night?'rgba(120,70,30,.55)':'rgba(255,255,255,.55)'; g.lineWidth=1.4; g.beginPath(); g.moveTo(0,-44); g.lineTo(0,-6); g.moveTo(-15,-24); g.lineTo(15,-24); g.stroke();
-  g.fillStyle='#d8c8a8'; g.strokeStyle=O; g.lineWidth=2.2; g.beginPath(); g.rect(-19,-7,38,6); g.fill(); g.stroke();
+  g.save(); g.translate(x,y); g.lineJoin='round';
+  if(night&&!gone){ const k=0.55+0.25*Math.sin(t*3), gr=g.createRadialGradient(0,-16,1,0,-16,28); gr.addColorStop(0,`rgba(255,236,150,${k})`); gr.addColorStop(1,'rgba(255,236,150,0)'); g.fillStyle=gr; g.fillRect(-30,-46,60,50); }
+  // the shelf and its two brackets
+  g.fillStyle='#a07428'; g.strokeStyle=O; g.lineWidth=2;
+  g.beginPath(); g.rect(-13,-6,26,4); g.fill(); g.stroke();
+  for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*9,-2); g.lineTo(s*9,3); g.lineTo(s*5,-2); g.closePath(); g.fill(); g.stroke(); }
   if(!gone){
-    // the clock on the sill: a brass case, a white face, two hands, and the little bird on top
-    const glow=night?0.55+0.25*Math.sin(t*3):0;
-    if(glow){ const gr=g.createRadialGradient(0,-18,1,0,-18,22); gr.addColorStop(0,`rgba(255,236,150,${glow})`); gr.addColorStop(1,'rgba(255,236,150,0)'); g.fillStyle=gr; g.fillRect(-24,-42,48,40); }
-    g.fillStyle='#d8a440'; g.strokeStyle=O; g.lineWidth=2; g.beginPath(); g.moveTo(-9,-7); g.lineTo(-9,-22); g.quadraticCurveTo(0,-32,9,-22); g.lineTo(9,-7); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle=night?'#fff6c8':'#fbf4e2'; g.beginPath(); g.arc(0,-17,6,0,Math.PI*2); g.fill(); g.lineWidth=1.4; g.stroke();
-    g.strokeStyle=O; g.lineWidth=1.2; g.beginPath(); g.moveTo(0,-17); g.lineTo(0,-21.5); g.moveTo(0,-17); g.lineTo(3,-16); g.stroke();
-    // the bird bobs now and then
+    // the case, the face, the hands
+    g.fillStyle='#d8a440'; g.lineWidth=2; g.beginPath(); g.moveTo(-8,-6); g.lineTo(-8,-19); g.quadraticCurveTo(0,-28,8,-19); g.lineTo(8,-6); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle=night?'#fff6c8':'#fbf4e2'; g.beginPath(); g.arc(0,-15,5.4,0,Math.PI*2); g.fill(); g.lineWidth=1.4; g.stroke();
+    g.lineWidth=1.2; g.beginPath(); g.moveTo(0,-15); g.lineTo(0,-19); g.moveTo(0,-15); g.lineTo(2.8,-14); g.stroke();
+    // the bird on top (it bobs now and then)
     const bob=Math.sin(t*2)>0.85?-2:0;
-    g.fillStyle='#4aa8d8'; g.strokeStyle=O; g.lineWidth=1.6; g.beginPath(); g.ellipse(0,-30+bob,4.6,3.6,0,0,Math.PI*2); g.fill(); g.stroke();
-    g.beginPath(); g.arc(3.6,-32.5+bob,2.6,0,Math.PI*2); g.fill(); g.stroke();
-    g.fillStyle='#f0b030'; g.beginPath(); g.moveTo(5.8,-33+bob); g.lineTo(8.6,-32+bob); g.lineTo(5.8,-31.4+bob); g.closePath(); g.fill();
-    g.fillStyle=O; g.beginPath(); g.arc(4.2,-33.2+bob,0.8,0,Math.PI*2); g.fill();
-    g.strokeStyle='#2a6a98'; g.lineWidth=1.2; g.beginPath(); g.moveTo(-4,-30+bob); g.lineTo(-7.5,-28+bob); g.stroke();
+    g.fillStyle='#4aa8d8'; g.lineWidth=1.6; g.beginPath(); g.ellipse(0,-27+bob,4.4,3.4,0,0,Math.PI*2); g.fill(); g.stroke();
+    g.beginPath(); g.arc(3.4,-29.4+bob,2.5,0,Math.PI*2); g.fill(); g.stroke();
+    g.fillStyle='#f0b030'; g.beginPath(); g.moveTo(5.6,-30+bob); g.lineTo(8.4,-29+bob); g.lineTo(5.6,-28.4+bob); g.closePath(); g.fill();
+    g.fillStyle=O; g.beginPath(); g.arc(4,-30.1+bob,0.8,0,Math.PI*2); g.fill();
+    g.strokeStyle='#2a6a98'; g.lineWidth=1.2; g.beginPath(); g.moveTo(-3.6,-27+bob); g.lineTo(-7.2,-25+bob); g.stroke();
   }else{
-    // an empty sill with a little dust ring where it stood
-    g.fillStyle='rgba(214,226,255,.75)'; g.beginPath(); g.ellipse(0,-8,9,2,0,0,Math.PI*2); g.fill();
+    g.fillStyle='rgba(214,226,255,.8)'; g.beginPath(); g.ellipse(0,-7,8,1.8,0,0,Math.PI*2); g.fill();
   }
   g.restore();
 }});
