@@ -86,7 +86,14 @@ function n4aSong(o){
 // ---------- words: the bible's scenes and bubbles belong to x4_story (STORY[key]); ours are stand-ins that play only
 // while no other module has defined that key, so x4_story's version always wins
 function n4aLinesOf(key){ const v=typeof STORY!=='undefined'?STORY[key]:null; const L=typeof v==='function'?v():v; return Array.isArray(L)&&L.length?L:null; }
+// x4_story (it loads before us): when it is in the build, its once-only scenes go through n4sPlay, its bubbles through
+// n4sBeat('say'), the flames, the panes and the Moon Door through n4sBeat (N4STORY.md 4)
+const n4aSt=()=>typeof n4sBeat==='function';
+function n4aStScene(key){ try{ return typeof n4sPlay==='function'&&typeof N4S_SC!=='undefined'&&!!N4S_SC[key]; }catch(e){ return false; } }
+const N4A_STBUB={n_bub_gate:'lanterns',n_bub_sluice:'sluice',n_bub_bed:'bed',n_bub_clock:'chime',n_bub_gallery:'gallery',n_bub_icewall:'icewall',n_bub_lagoon:'lagoon',n_bub_pane3:'nyx'};
+function n4aStBub(key){ try{ const m=N4A_STBUB[key]; return m&&n4aSt()&&typeof N4S_BUB!=='undefined'&&N4S_BUB[m]?m:null; }catch(e){ return null; } }
 function n4aScene(key,lines,done){
+  if(n4aStScene(key)){ try{ return n4sPlay(key,()=>{ if(done) try{ done(); }catch(e){ console.error(e); } }); }catch(e){ console.error('n4a scene',key,e); } }
   const L=n4aLinesOf(key)||lines;
   if(!L||!L.length){ if(done) try{ done(); }catch(e){ console.error(e); } return false; }
   runDialogue(L.map(l=>Array.isArray(l)?l.slice():Object.assign({},l)),()=>{ scene='play'; if(done) try{ done(); }catch(e){ console.error(e); } try{ saveGame(); }catch(e){} });
@@ -94,7 +101,9 @@ function n4aScene(key,lines,done){
 }
 // a one-line bubble over Ash (or Pip); x4_story may define the same key as a one-line STORY entry
 function n4aBub(key,who,text,o){
-  o=o||{}; if(o.once!==false&&N4A.said[key]&&G.time-N4A.said[key]<(o.again||9999)) return false; N4A.said[key]=G.time;
+  o=o||{}; if(N4A.said[key]&&G.time-N4A.said[key]<(o.once===false?(o.again||6):1e9)) return false;
+  const sb=n4aStBub(key); if(sb){ let r=false; try{ r=n4sBeat('say',sb); }catch(e){} if(r||o.once!==false){ N4A.said[key]=G.time; return r; } }
+  N4A.said[key]=G.time;
   const L=n4aLinesOf(key); if(L){ const l=Array.isArray(L[0])?L[0]:null; if(l){ who=l[0]; text=l[1]; } }
   const s=SPK[who]||{name:who,col:'#e0d0ff'}, a=who==='pip'&&G.pip?G.pip:player;
   try{ bubble(a,text,{who:s.name||'',col:s.col}); }catch(e){ try{ taunt(who,text); }catch(e2){} }
@@ -130,6 +139,14 @@ function n4aPrompt(o,x,y,r,text,act,hidden){
   Object.defineProperty(L,'prompt',{get(){ if(!G||L.hidden()) return null; const t=typeof text==='function'?text(o):text; return t||null; },configurable:true});
   N4A.lm.push(L); LANDMARKS.push(L); return L;
 }
+// beside something you hit to solve (a hook, a mirror, a cracked wall), ATTACK stays an attack: its "Look at" prompt
+// never turns the swing into USE (a5_input.js useMode). E and F still read it.
+function n4aAtkNear(){
+  const p=player; if(!p||!G||!n4aOn4()) return false;
+  for(const o of N4A.objs){ if(!o.atk) continue; if(typeof o.atk==='function'&&!o.atk(o)) continue; if(o.atkTest){ if(o.atkTest(o,p.x,p.y)) return true; continue; } const R=o.atkR||((o.hr||o.r)+90); if(dist2(p.x,p.y,o.x,o.y)<R*R) return true; }
+  return false;
+}
+{ const base=useMode; useMode=function(){ try{ if(n4aAtkNear()) return null; }catch(e){} return base.apply(this,arguments); }; }
 function n4aReset(){
   N4A.g=G; N4A.said={}; N4A.glassT=0; N4A.rise=null; N4A.song=null; N4A.skim=false;
   for(const a of N4A.amb) a.live=null;
@@ -153,6 +170,13 @@ function n4aHitAll(x,y,r,src){
     try{ if(!n4aOn4()||(typeof ARMS!=='undefined'&&ARMS.inHam)) return; const w=curWeapon(), src=w==='hammer'?'hammer':w==='daggers'?'daggers':w==='spear'?'spear':'slash';
       for(const o of N4A.objs){ if(!o.hit) continue; if(!inArcC(px,py,dir,range+8,half,{x:o.x,y:o.y-(o.hz||0),r:o.hr||o.r})) continue; o.hit(o,src,o.x,o.y,4); } }catch(e){ console.error(e); } }; }
 if(typeof p3OnPound==='function') p3OnPound(info=>{ try{ if(!n4aOn4()||info.drum) return; for(const o of N4A.objs){ if(!o.pound) continue; const R=(o.pr||o.r)+info.R; if(dist2(info.x,info.y,o.x,o.y)>R*R&&!(o.poundTest&&o.poundTest(o,info))) continue; o.pound(o,info); } }catch(e){ console.error('n4a pound',e); } });
+// our wind streams set Ash down where they end (a short landing, like the dungeon streams), so the next stream's swirl
+// a few steps on never snatches him on arrival; and they are joined only at their swirl (strict), even by a flyer
+if(typeof p3RideOff==='function'){ const base=p3RideOff; p3RideOff=function(p,how){
+    try{ const R=P3.ride; if(R&&how==='end'&&R.o&&R.o.n4aLand&&!AREA&&n4aOn4()){ const o=R.o, e=p2PolyAt(o.pts,o.L), lv=p3StreamLv(o,o.L);
+      P3.ride=null; P3.reCd=P3N.reCd; P3.lastS=o; p.elvBase=lv; p.elvCeil=Math.max(p.elvCeil||0,lv+1);
+      P3.mv={kind:'land',x0:p.x,y0:p.y,x1:e[0],y1:e[1],z0:p.z||P3N.rideZ,t:0,dur:0.36}; p.flying=false; p.gliding=false; p.landing=false; n4aSnd('whoosh',0.4); return; } }catch(err){ console.error('n4a ride off',err); }
+    return base.apply(this,arguments); }; }
 // plain fire breath (and the blue jet, which every stock fire test also feels) on our pieces
 { const base=breathIgnite; breathIgnite=function(mx,my,ang,dt){ base(mx,my,ang,dt);
     try{ if(!n4aOn4()||(typeof p4MoonOn==='function'&&p4MoonOn())) return; const blue=typeof P3!=='undefined'&&P3.bz&&P3.bz.blue;
@@ -271,6 +295,7 @@ function n4aTakeFlame(q){
   const L={leap:['ember',S('The Leap! You still jump like you mean it.','The Leap! Great jumping!')],tide:['ember',S('The Tide! Water never stood a chance.',"The Tide! The water can't stop you.")],
     sky:['ember',S('The Sky! Every time you fly, I feel it in my wings. Well. My ghost wings.','The Sky! I feel it when you fly.')]}[q.fid];
   n4aEmit('flame',{id:q.fid,n});
+  if(n4aSt()){ try{ n4sBeat('flame',q.fid); }catch(e){ console.error(e); } if(n===3) n4aEmit('flames3',{}); else n4aBanner(S('A memory flame','A memory flame'),S(`${n} of 3. The Echo Gate stirs.`,`${n} of 3 flames.`),2.2); n4aSave(); return; }
   n4aScene('n_flame_'+q.fid,L?[L]:null,()=>{
     if(n===3){ n4aEmit('flames3',{});
       n4aScene('n_trials_done',[['ember',S("That's all three. Up ahead, there's a shadow sitting on a throne. Don't be fooled. It's only a memory.",'All three! Up ahead is a shadow on a throne. It is only a memory.')],
@@ -301,6 +326,8 @@ function n4aPane(k,x,y,o){
   return P;
 }
 function n4aReadPane(q){
+  if(n4aSt()&&typeof N4S_PANE!=='undefined'){ const k=q.k, first=!n4aFound('n_pane_'+k), n=n4aPaneN()+(first?1:0); n4aSnd('crystal'); n4aEmit('pane',{k,n,first});
+    let ok=false; try{ ok=n4sBeat('pane',k,()=>n4aSave()); }catch(e){ console.error(e); } if(ok) return; }
   const k=q.k, first=!n4aFound('n_pane_'+k); G.found['n_pane_'+k]=1; const n=n4aPaneN(); G.flags.n_panes=n;
   if(k===3) G.flags.n_knows=1;
   n4aSnd('crystal'); n4aEmit('pane',{k,n,first});
@@ -471,7 +498,7 @@ function n4aBuildSluice(){
   const R=n4aAdd('current',{id:'n_sluice_current',x:n4aP(3700,30)[0],y:n4aP(3700,30)[1],r:0,near:2400});
   R.tick=(q,dt)=>n4aCurrentTick(dt); R.ground=(q,t)=>n4aDrawCurrent(t);
   const C=(typeof N4G!=='undefined'&&N4G.crystal)||n4aP(4000,56);
-  const X=n4aAdd('crystal',{id:'n_crystal1',x:C[0],y:C[1],r:20,hr:46,hz:30,awake:0});
+  const X=n4aAdd('crystal',{id:'n_crystal1',x:C[0],y:C[1],r:20,hr:46,hz:30,awake:0,atk:()=>!n4aF('n_bridge1'),atkR:260});
   X.light=n4aLight(C[0],C[1]-30,240);
   X.hit=(q,src)=>{ if(n4aF('n_bridge1')) return src!=='fire'; if(src==='boomerang'||src==='glaive'||src==='whip'){ n4aCrystalWake(q); return true; }
     if(src==='arrow'){ n4aSay(q.x,q.y-50,S('It needs something that spins back to you.','Throw the boomerang!'),'#d8c8ff','x1'); return true; } return false; };
@@ -498,7 +525,7 @@ function n4aCrystalWake(q){
 function n4aCrackWall(id,A,B,o){
   o=Object.assign({},o||{}); const key='n_crack_'+id;
   const W=n4aGate('crack_'+id,{A,B,x:(A[0]+B[0])/2,y:(A[1]+B[1])/2,th:o.th||20,shut:()=>!n4aFound(key),r:Math.max(40,dist(A[0],A[1],B[0],B[1])/2)});
-  W.key=key; W.hitTest=(q,x,y,r)=>n4aSegD(x,y,A,B)<(r||8)+30; W.poundTest=(q,info)=>n4aSegD(info.x,info.y,A,B)<info.R+20;
+  W.key=key; W.atk=()=>!n4aFound(key); W.atkTest=(q,x,y)=>n4aSegD(x,y,A,B)<110; W.hitTest=(q,x,y,r)=>n4aSegD(x,y,A,B)<(r||8)+30; W.poundTest=(q,info)=>n4aSegD(info.x,info.y,A,B)<info.R+20;
   const brk=(q)=>{ if(n4aFound(key)) return; G.found[key]=1; n4aSnd('crack'); shake(8); hitstop=Math.max(hitstop,0.05);
     for(let i=0;i<40;i++){ const s=Math.random(); emit(lerp(A[0],B[0],s),lerp(A[1],B[1],s)-rand(0,40),1,{col:i%3?'60,44,80':'255,150,80',glow:i%3===0,ang:-Math.PI/2,spread:1.4,smin:40,smax:220,lmin:.4,lmax:1,zmin:2,zmax:5}); }
     n4aBanner(S('The cracked wall breaks!','The wall breaks!'),'',2); n4aEmit('crack',{id}); if(o.then) o.then(); n4aSave(); };
@@ -575,7 +602,7 @@ function n4aBuildTrials(){
   n4aFlame('leap',LF[0],LF[1]);
   // the Tide Court: the eye opens at high tide, but only looks at someone standing on the water
   const TD=(typeof N4G!=='undefined'&&N4G.tide)||{x:6993,y:82332,r:215};
-  const E=n4aAdd('eye',{id:'n_eye_tide',x:TD.x,y:TD.y-12,r:16,hr:22,hz:44,open:0});
+  const E=n4aAdd('eye',{id:'n_eye_tide',x:TD.x,y:TD.y-12,r:16,hr:22,hz:44,open:0,atk:()=>!n4aFound('n_eye_tide'),atkR:200});
   E.isOpen=()=>{ const hi=typeof n4wTideHigh==='function'?n4wTideHigh():false; if(!hi||n4aFound('n_eye_tide')) return false; const p=player; return !n4aAir()&&p.onWater&&dist(p.x,p.y,TD.x,TD.y)<TD.r-8; };
   E.hit=(q,src)=>{ if(n4aFound('n_eye_tide')) return src!=='fire';
     if(src!=='arrow'){ if(src!=='fire') n4aSay(q.x,q.y-60,S('Only an arrow wakes an eye.','Use an arrow!'),'#ffe0b0','eyehow'); return src!=='fire'; }
@@ -657,7 +684,7 @@ function n4aBuildClock(){
   C.tick=(q,dt)=>{ const H=n4aClkHands(), k=Math.min(1,dt*6); q.la=n4aAngLerp(q.la,n4aClkPhi(H.l),k); q.sa=n4aAngLerp(q.sa,n4aClkPhi(H.s),k); };
   C.ground=(q,t)=>n4aDrawHands(q,K,t);
   // the hooks
-  const hk=(id,x,y,which,can,where)=>{ const o=n4aAdd('clockhook',{id,x,y,r:16,hr:30,hz:which==='l'?58:30,which});
+  const hk=(id,x,y,which,can,where)=>{ const o=n4aAdd('clockhook',{id,x,y,r:16,hr:30,hz:which==='l'?58:30,which,atk:()=>!n4aF('n_clockset'),atkR:230});
     o.hit=(q,src)=>{ if(src!=='whip') return false; if(n4aF('n_clockset')){ n4aSay(q.x,q.y-70,S('The clock is right. Leave it be.','The clock is right!'),'#ffe8c0','clkdone',3); return true; }
       if(!can()){ n4aSay(q.x,q.y-70,where,'#ffe8c0','clkwhere'+which,2); return true; }
       if(G.time-(q.cd||-9)<0.22) return true; q.cd=G.time; q.yank=1;
@@ -772,7 +799,7 @@ function n4aBuildGears(){
   G0.over=(q,t)=>{ for(const f of q.fly){ const k=clamp(f.t/f.dur,0,1), x=lerp(f.x0,f.x1,k), y=lerp(f.y0,f.y1,k)-Math.sin(Math.PI*k)*140; n4aPut(n4aSpr('weight',36,40,18,36,n4aWeightArt),x,y); } };
   // the counterweights on their shelves
   SH.forEach((p,i)=>{
-    const W=n4aAdd('weight',{id:'n_gw'+i,x:p[0],y:p[1]-6,r:20,hr:30,hz:20,i});
+    const W=n4aAdd('weight',{id:'n_gw'+i,x:p[0],y:p[1]-6,r:20,hr:30,hz:20,i,atk:q=>!n4aFound(q.id),atkR:230});
     W.hit=(q,src)=>{ if(n4aFound(q.id)) return false; if(src!=='whip'){ if(src!=='fire') n4aSay(q.x,q.y-60,S('It is up on a high shelf. The Chain Whip could yank it down.','Use the whip to pull it down!'),'#ffe8c0','gwhow',2); return src!=='fire'; }
       G.found[q.id]=1; const n=n4aGearN(), to=[PL[0]-24+(n-1)*24,PL[1]-(n-1)*6]; G0.fly.push({x0:q.x,y0:q.y-20,x1:to[0],y1:to[1],t:0,dur:0.8}); n4aSnd('whoosh'); later(0.8,()=>{ n4aSnd('clank'); n4aSnd('creak'); shake(4); emit(to[0],to[1],12,{col:'200,170,110',glow:false,smin:30,smax:110,lmin:.2,lmax:.5,zmin:1.5,zmax:3}); if(n>=3&&!n4aF('n_gear')){ G.flags.n_gear=1; n4aSnd('bigchime'); n4aBanner(S('The gears line up!','The gears line up!'),S('Their teeth make a bridge. Grab the far post for the last bit.','Cross the teeth. Grapple the last gap.'),3); n4aEmit('gear',{}); } n4aSave(); });
       n4aEmit('weight',{i,n}); return true; };
@@ -831,7 +858,7 @@ function n4aBuildClockmaker(){
     const k=on?t*2:0; ctx.strokeStyle='rgba(255,230,160,.8)'; ctx.lineWidth=2; for(let i=0;i<5;i++){ const y=q.y-40+((i*7+k*20)%30); ctx.beginPath(); ctx.moveTo(q.x-22,y); ctx.lineTo(q.x+22,y); ctx.stroke(); } };
   MB.sy=q=>q.y+10;
   n4aPrompt(MB,BX[0],BX[1]+20,40,()=>n4aFound('n_musicbox')?S('Listen to the music box','Listen'):S('Look at the music box','Look at the music box'),q=>{ if(n4aFound('n_musicbox')){ n4aSong(); return; } n4aSay(q.x,q.y-90,S('A music box the size of a cart. Its key is three gears with little numbers on them.','Pull the gears in order: 1, 2, 3.'),'#ffe8c0','mbhow',2); });
-  hooks.forEach((h,i)=>{ const o=n4aAdd('gearhook',{id:'n_mbhook'+h.n,x:h.p[0],y:h.p[1],r:22,hr:32,hz:30,n:h.n,spin:0});
+  hooks.forEach((h,i)=>{ const o=n4aAdd('gearhook',{id:'n_mbhook'+h.n,x:h.p[0],y:h.p[1],r:22,hr:32,hz:30,n:h.n,spin:0,atk:()=>!n4aFound('n_musicbox'),atkR:200});
     o.hit=(q,src)=>{ if(src!=='whip'||n4aFound('n_musicbox')) return src==='whip'; if(G.time-(q.cd||-9)<0.4) return true; q.cd=G.time; q.spin=1;
       if(q.n===MB.step+1){ MB.step++; n4aSnd('tick'); n4aSnd('chime',0.4); emit(q.x,q.y-40,10,{col:'255,220,140',smin:20,smax:80,lmin:.3,lmax:.6,zmin:1.2,zmax:2.4});
         if(MB.step>=3){ G.found.n_musicbox=1; MB.playT=0; n4aSong({slow:false}); n4aBanner(S('The music box plays','The music box plays'),S('The lantern song, at the right speed, for the first time on the peak.','The lantern song!'),3); n4aEmit('musicbox',{}); n4aSave(); } }
@@ -901,7 +928,7 @@ function n4aBuildRimeA(){
   W.ground=(q,t)=>{ if(!n4aFound('n_ice_t3a')) return; ctx.fillStyle='rgba(150,190,240,.3)'; for(let i=0;i<9;i++){ const s=(i+0.5)/9; ctx.beginPath(); ctx.ellipse(lerp(q.A[0],q.B[0],s),lerp(q.A[1],q.B[1],s),26,12,0,0,TAU); ctx.fill(); } };
   n4aPrompt(W,W.x,W.y,80,()=>n4aFound('n_ice_t3a')?null:S('Look at the ice wall','Look at the ice wall'),q=>n4aSay(q.x,q.y-100,n4aHas('blaze')?S('Black ice, thick as a house. Hold your fire until it burns blue.','Hold your fire until it turns blue!'):S('Black ice, thick as a house. Your fire only makes it sweat.','Your fire is not hot enough.'),'#d8f0ff','icehow',2));
   // the Floe Gap: a wind stream loops out over the void and back (jump into its swirl)
-  if(typeof WIND!=='undefined') WIND.stream({id:'n_wind_floe',pts:[n4aP(2000,133.9),n4aP(2190,137.4),n4aP(2320,142.5),n4aP(2190,147.6),n4aP(2000,151.2)],w:84,lv:[5,5]});
+  if(typeof WIND!=='undefined') WIND.stream({strict:true,n4aLand:true,id:'n_wind_floe',pts:[n4aP(2000,133.9),n4aP(2190,137.4),n4aP(2320,142.5),n4aP(2190,147.6),n4aP(2000,151.2)],w:84,lv:[5,5]});
   n4aSwirl('n_floe_swirl',n4aP(2000,133.9),()=>true);
   const F=n4aAdd('floe',{id:'n_floe_far',x:n4aP(2000,153)[0],y:n4aP(2000,153)[1],r:0,near:900});
   F.tick=()=>{ if(n4aF('n_floe')||n4aAir()) return; if(n4aLvl()===5&&n4aSec(player.x,player.y,1500,2400,150.4,158)){ G.flags.n_floe=1; n4aSnd('chime',0.6); n4aEmit('floe',{}); n4aSave(); } };
@@ -936,7 +963,7 @@ function n4aBuildDam(){
     if(!G.wproj) return; const cold=n4aByDiff(5,3,2);
     for(const b of G.wproj){ if(b.k!=='bomb'||b.dead) continue;
       // held on the floe's far end: the cold floe keeps the fuse from burning down
-      if(!b.n4aFlung&&(b.z||0)<3&&b.st!=='fly'&&dist(b.x,b.y,D.B[0],D.B[1])<38){ b.x=D.B[0]; b.y=D.B[1]; b.vx=b.vy=0; b.st='rest'; b.fuse=Math.max(b.fuse,9); b.n4aFloe=true; if(!b.n4aHeld){ b.n4aHeld=1; n4aSay(D.B[0],D.B[1]-40,S('The cold floe holds the fuse.','The fuse waits.'),'#d8f0ff','floe',3); } continue; }
+      if(!b.n4aFlung&&(b.z||0)<3&&b.st!=='fly'&&dist(b.x,b.y,D.B[0],D.B[1])<56){ b.x=D.B[0]; b.y=D.B[1]; b.vx=b.vy=0; b.st='rest'; b.fuse=Math.max(b.fuse,9); b.n4aFloe=true; if(!b.n4aHeld){ b.n4aHeld=1; n4aSay(D.B[0],D.B[1]-40,S('The cold floe holds the fuse.','The fuse waits.'),'#d8f0ff','floe',3); } continue; }
       if(b.n4aFloe&&b.st==='fly'&&!b.n4aFlung){ b.n4aFlung=true; b.fuse=Math.max(b.fuse,9); }
       if(b.n4aFlung&&b.st!=='fly'&&inLedge(b.x,b.y,30)){ b.n4aCold=(b.n4aCold||0)+dt;
         if(n4aJetFar(b.x,b.y,22)){ b.fuse=0.02; continue; }
@@ -951,7 +978,11 @@ function n4aBuildDam(){
   O.stand=(q,t)=>n4aDrawDam(q,L,t); O.sy=q=>L[3];
   O.ground=(q,t)=>{ // the frozen lake held back behind the dam, and the target ring where the bomb lands
     if(n4aF('n_dam')) return; ctx.fillStyle='rgba(150,190,240,.22)'; ctx.beginPath(); ctx.ellipse(q.x,L[1]-60,260,70,0,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(230,244,255,.35)'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(q.x,L[1]-60,260,70,0,0,TAU); ctx.stroke();
-    n4aRing(D.land[0],D.land[1],34,'255,210,140',0.35+0.15*Math.sin(t*3),2.4); };
+    n4aRing(D.land[0],D.land[1],34,'255,210,140',0.35+0.15*Math.sin(t*3),2.4);
+    // where the bomb goes: a cold blue ring on the floe's far end until one sits there
+    if(!(G.wproj||[]).some(b=>b.k==='bomb'&&!b.dead&&b.n4aFloe)) n4aRing(D.B[0],D.B[1],30+3*Math.sin(t*4),'190,230,255',0.4+0.2*Math.sin(t*4),2.4); };
+  // beside the floe, ATTACK stays an attack (a bomb throw), even inside the seesaw's own "Look at" prompt
+  n4aAdd('damatk',{id:'n_dam_atk',x:(D.A[0]+D.B[0])/2,y:(D.A[1]+D.B[1])/2,r:0,near:600,atk:()=>!n4aF('n_dam'),atkR:250});
   n4aPrompt(O,D.A[0]-30,D.A[1]-20,40,()=>n4aF('n_dam')?null:S('Look at the ice dam','Look at the ice dam'),q=>n4aScene('n_dam_look',[['narr',S('High on an icy ledge, an ice dam holds back a frozen lake. Below it, the ink channel cuts the ring in two. Next to you: a seesaw floe.','An ice dam up high. A seesaw floe next to you.')],
     ['ash',S('A bomb on the far end. A big jump on this end. And then... something hot. Very hot.','Bomb on that end. Pound this end. Then something hot!')]]));
   n4aAmbush('dam_far',{x:n4aP(1950,205)[0],y:n4aP(1950,205)[1],r:360,n:4,types:['n_shade_wolf','n_frostshade'],level:22,when:()=>n4aF('n_dam')});
@@ -975,10 +1006,10 @@ const N4A_AUR={p1:null,p2:null};
 function n4aBuildAurora(){
   const P1=n4aP(1950,248), P2=n4aP(1950,268); N4A_AUR.p1=P1; N4A_AUR.p2=P2;
   if(typeof WIND!=='undefined'){
-    WIND.stream({id:'n_wind_s1',pts:[n4aP(1955,228.4),n4aP(2140,235),n4aP(2110,242),n4aP(1950,247.3)],w:84,lv:[5,6]});
-    WIND.stream({id:'n_wind_s2a',pts:[n4aP(1950,249.7),n4aP(2260,253.5),n4aP(2310,244),n4aP(2240,235.5),n4aP(1900,227.2)],w:72,lv:[6,5],on:()=>!n4aF('n_sail')});
-    WIND.stream({id:'n_wind_s2b',pts:[n4aP(1950,249.7),n4aP(1780,255.5),n4aP(1780,261.5),n4aP(1950,267.2)],w:84,lv:[6,6],on:()=>n4aF('n_sail')});
-    WIND.stream({id:'n_wind_s3',pts:[n4aP(1950,269.7),n4aP(2120,276),n4aP(2080,283.5),n4aP(1950,289.6)],w:84,lv:[6,6]});
+    WIND.stream({strict:true,n4aLand:true,id:'n_wind_s1',pts:[n4aP(1955,228.4),n4aP(2140,235),n4aP(2110,242),n4aP(1950,247.3)],w:84,lv:[5,6]});
+    WIND.stream({strict:true,n4aLand:true,id:'n_wind_s2a',pts:[n4aP(1950,249.7),n4aP(2260,253.5),n4aP(2310,244),n4aP(2240,235.5),n4aP(1900,227.2)],w:72,lv:[6,5],on:()=>!n4aF('n_sail')});
+    WIND.stream({strict:true,n4aLand:true,id:'n_wind_s2b',pts:[n4aP(1950,249.7),n4aP(1780,255.5),n4aP(1780,261.5),n4aP(1950,267.2)],w:84,lv:[6,6],on:()=>n4aF('n_sail')});
+    WIND.stream({strict:true,n4aLand:true,id:'n_wind_s3',pts:[n4aP(1950,269.7),n4aP(2120,276),n4aP(2080,283.5),n4aP(1950,289.6)],w:84,lv:[6,6]});
   }
   n4aSwirl('n_s1_swirl',n4aP(1955,228.4),()=>true);
   // the aurora sail and its pound plate on pillar 1
@@ -1026,7 +1057,7 @@ function n4aDrawStrike(s,t){
 }
 // U3 the Gust Stair (after the Echo of the Ice Dragon), the Frozen Choir (optional arc) and the Heart Ember's ice lid
 function n4aBuildRimeB(){
-  if(typeof WIND!=='undefined') WIND.stream({id:'n_wind_gust',pts:[n4aP(1950,20),n4aP(1780,20.4),n4aP(1600,21),n4aP(1430,21.6),n4aP(1300,22)],w:84,lv:[6,7],on:()=>n4aEchoWon(3)});
+  if(typeof WIND!=='undefined') WIND.stream({strict:true,n4aLand:true,id:'n_wind_gust',pts:[n4aP(1950,20),n4aP(1780,20.4),n4aP(1600,21),n4aP(1430,21.6),n4aP(1300,22)],w:84,lv:[6,7],on:()=>n4aEchoWon(3)});
   const col=n4aAdd('gust',{id:'n_gust_col',x:n4aP(1950,20)[0],y:n4aP(1950,20)[1],r:0,near:1200});
   col.ground=(q,t)=>{ const on=n4aEchoWon(3); for(let i=0;i<4;i++){ const r=22+i*13+Math.sin(t*4+i)*3; ctx.save(); ctx.strokeStyle=`rgba(235,246,255,${on?0.6-i*0.12:0.14})`; ctx.lineWidth=2.4; ctx.beginPath(); ctx.ellipse(q.x,q.y,r,r*0.5,0,t*(3+i),t*(3+i)+Math.PI*1.4); ctx.stroke(); ctx.restore(); } };
   col.over=(q,t)=>{ if(!n4aEchoWon(3)) return; for(let i=0;i<10;i++){ const k=((t*0.8+i/10)%1), x=q.x+Math.sin(t*3+i*1.7)*(14+i*2), y=q.y-k*260; ctx.fillStyle=`rgba(240,248,255,${0.8*(1-k)})`; ctx.fillRect(x-1.5,y-1.5,3,3); } n4aGlow(q.x,q.y-90,70,'220,236,255',0.15); };
@@ -1042,7 +1073,7 @@ function n4aBuildRimeB(){
   for(let i=0;i<N;i++){ const a=Math.PI*(1.06+0.88*i/(N-1)), x=CC[0]+Math.cos(a)*R, y=CC[1]+Math.sin(a)*R*0.62, lx=x+Math.cos(a+Math.PI/2)*16, ly=y+4;
     const o=n4aAdd('choirlantern',{id:'n_choirl'+i,x:lx,y:ly,r:12,fr:18,hz:58,i,heat:0});
     o.reset=q=>{ q.heat=0; };
-    o.tick=(q,dt)=>{ if(frost(q.i)&&n4aJet(q.x,q.y-50,16)){ q.heat+=dt; if(Math.random()<0.5) emit(q.x,q.y-60,1,{col:'210,240,255',ang:Math.PI/2,spread:0.4,smin:10,smax:40,lmin:.2,lmax:.5,zmin:1,zmax:2}); if(q.heat>=n4aMeltNeed(0.6)){ G.found['n_choir'+q.i]=1; n4aSnd('ice',0.6); } }
+    o.tick=(q,dt)=>{ if(frost(q.i)&&(n4aJetFar(q.x,q.y,18)||n4aJetFar(q.x,q.y-30,18)||n4aJetFar(q.x,q.y-55,18))){ q.heat+=dt; if(Math.random()<0.5) emit(q.x,q.y-60,1,{col:'210,240,255',ang:Math.PI/2,spread:0.4,smin:10,smax:40,lmin:.2,lmax:.5,zmin:1,zmax:2}); if(q.heat>=n4aMeltNeed(0.6)){ G.found['n_choir'+q.i]=1; n4aSnd('ice',0.6); } }
       else if(frost(q.i)&&n4aBreathOn(q.x,q.y-50,16)) n4aSay(q.x,q.y-90,S('The frost hisses. Hotter!','Hotter! Use Blaze!'),'#d8f0ff','choirfrost',3); };
     o.fire=(q,dt)=>{ if(frost(q.i)||lit(q.i)) return; G.found['n_choir'+q.i]=2; n4aSnd('lamp',0.7); emit(q.x,q.y-60,10,{col:'255,210,120',ang:-Math.PI/2,spread:1,smin:20,smax:70,lmin:.3,lmax:.7,zmin:1.4,zmax:2.6});
       let n=0; for(let k=0;k<N;k++) if(lit(k)) n++; if(n>=N&&!n4aFound('n_choir_sang')){ G.found.n_choir_sang=1; ch.songT=0; n4aSong({base:659.25,eighth:0.26}); n4aBanner(S('The Frozen Choir sings','The choir sings!'),S('Twelve soft chimes, the lantern song.','The lantern song!'),3.2); n4aEmit('choir',{}); } n4aSave(); };
@@ -1130,7 +1161,7 @@ function n4aBuildDunes(){
   N4A.beamStone=null;
   if(typeof p4Add==='function'){ try{ N4A.beamStone=p4Add('moonstone',{id:'n_beam_stone',x:BS[0],y:BS[1],keep:true}); }catch(e){ console.error('n4a beam stone',e); } }
   // the mirrors
-  N4A.mirrors=N4A_MIR.map(m=>{ const o=n4aAdd('mirror',Object.assign({},m,{id:'n_mirror_'+m.id,mid:m.id,r:14,hr:24,hz:m.src==='glaive'?70:30,turnA:0}));
+  N4A.mirrors=N4A_MIR.map(m=>{ const o=n4aAdd('mirror',Object.assign({},m,{id:'n_mirror_'+m.id,mid:m.id,r:14,hr:24,hz:m.src==='glaive'?70:30,turnA:0,atk:()=>!n4aF('n_beam'),atkR:m.src==='glaive'?260:140}));
     addCol({t:'c',x:m.x,y:m.y,r:10});
     o.reset=q=>{ q.turnA=n4aMirFace(m)*45; };
     o.tick=(q,dt)=>{ q.turnA=n4aAngLerp(q.turnA,n4aMirFace(m)*45,Math.min(1,dt*8)); };
@@ -1280,7 +1311,7 @@ function n4aRoad(){ return (typeof N4G!=='undefined'&&N4G.road)||{I1:n4aP(830,30
 const N4A_ROADCOL=['255,150,80','190,140,255','150,210,255','230,236,255'];
 function n4aBuildRoad(){
   const R=n4aRoad(), DOOR=n4aP(728,0), END=n4aP(792,359.3);
-  if(typeof WIND!=='undefined') WIND.stream({id:'n_wind_road',pts:[n4aP(800,321.2),n4aP(930,325),n4aP(1000,330.5),n4aP(960,336.5),n4aP(870,339.2),n4aP(812,339.6)],w:76,lv:[8,8]});
+  if(typeof WIND!=='undefined') WIND.stream({strict:true,n4aLand:true,id:'n_wind_road',pts:[n4aP(800,321.2),n4aP(930,325),n4aP(1000,330.5),n4aP(960,336.5),n4aP(870,339.2),n4aP(812,339.6)],w:76,lv:[8,8]});
   n4aSwirl('n_road_swirl',n4aP(800,321.2),()=>true);
   let glass=null; if(typeof p4Add==='function'){ try{ glass=p4Add('moonglass',{id:'n_road_glass',pts:R.strip,w:R.w}); }catch(e){ console.error('n4a glass',e); } }
   N4A.roadGlass=glass;
@@ -1311,6 +1342,8 @@ function n4aBuildRoad(){
 }
 function n4aOpenDoor(){
   if(n4aF('n_door')) return;
+  const fx=()=>{ n4aSnd('door'); shake(6); flashA=Math.max(flashA,0.5); flashCol='255,220,170'; n4aEmit('door',{}); n4aSave(); };
+  if(n4aSt()){ let ok=false; try{ ok=n4sBeat('door',()=>{ if(n4aF('n_door')) fx(); }); }catch(e){ console.error(e); } if(ok) return; }
   n4aScene('n_moondoor',[['narr',S("At the end of the Moon Road stands a round door of pale glass. There's no handle. Just a hollow in the middle, the size of a plum.",'A round glass door. It has a hole the size of a plum.')],
     ['ash',S('The Heart. The door wants the Heart.','The door wants the Heart.')],['pip',S('Mip?!','Mip?!')],
     ['ash',S("I know. She WANTS me to bring it. That's the scary part.",'I know. She wants the Heart. That is scary.')],['ash',S('But Mom made it whole. Not her. Mom.','But Mom fixed it. Not her.')],
@@ -1356,6 +1389,8 @@ function n4aBuild(B){
 }
 if(MAPS[4]&&!MAPS[4].placeholder){ const M=MAPS[4], base=M.build; M.build=function(B){ if(base) base.call(this,B); n4aBuild(B); }; }
 else console.warn('x4_ascent: map 4 is not built (x4_world missing?)');
+// tell x4_story we are here (its puzzle and pane stand-ins switch off)
+try{ if(typeof n4sBeat==='function') n4sBeat('ascent'); }catch(e){}
 
 // ---------- every frame: the live state is rebuilt when G changes; objects near Ash tick; the stretch fights
 function n4aTick(dt){
