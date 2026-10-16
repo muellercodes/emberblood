@@ -129,7 +129,7 @@ function s10HasPower(x){ return !!(hasAbil(x)||(G.weapons&&G.weapons[x])||(typeo
 function s10TrustFlag(name){ return S10.trust[name]||('trust_'+name); }
 function s10Trust(name){ return +(G.flags[s10TrustFlag(name)]||0); }
 function s10Seen(id){ return !!((G.story&&G.story._seen&&G.story._seen[id])||(G.flags&&G.flags.c_sn&&G.flags.c_sn[id])); }
-function s10World(id){ return G.story&&G.story._w?G.story._w[id]:undefined; }
+function s10World(id){ const w=G.story&&G.story._w?G.story._w[id]:undefined; if(w==null&&S10.places[id]&&S10.places[id].kind==='gate'){ try{ if(typeof gateIsOpen==='function'&&gateIsOpen(id)) return 'open'; }catch(e){} } return w; }
 function s10QuestIs(id,w){
   const q=G.quests&&G.quests[id];
   if(w==='done') return !!(q&&q.done);
@@ -322,7 +322,9 @@ function s10LookHas(id){
 }
 function s10LookDraw(id,x,y,state){
   const t=G?G.time:0;
-  try{ if(typeof lookDraw==='function'){ const r=lookDraw(ctx,id,x,y,t,state); if(r!==false) return true; } }catch(e){ if(!S10.lookMiss.has('err'+id)){ S10.lookMiss.add('err'+id); console.error(e); } }
+  // the gate library's lookDraw (ENG-W) draws its own placeholder for a missing look: then nothing more is drawn here
+  if(typeof lookDraw==='function'){ let r=false; try{ r=lookDraw(ctx,id,x,y,t,state); }catch(e){ if(!S10.lookMiss.has('err'+id)){ S10.lookMiss.add('err'+id); console.error(e); } }
+    if(r===false&&!S10.lookMiss.has(id)){ S10.lookMiss.add(id); s10Err(`look ${id} is not defined (drawn as a placeholder)`); } return r!==false; }
   const L=window.__ebLooks&&window.__ebLooks[id];
   if(L&&L.draw){ try{ L.draw(ctx,x,y,t,state); return true; }catch(e){ if(!S10.lookMiss.has('err'+id)){ S10.lookMiss.add('err'+id); console.error(e); } } }
   if(!S10.lookMiss.has(id)){ S10.lookMiss.add(id); s10Err(`look ${id} is not defined (drawn as a placeholder)`); try{ console.warn('story: no look',id); }catch(e){} }
@@ -650,8 +652,9 @@ function s10Prompts(offer){
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceShown(P)) continue;
     const k=P.kind; if(!['examine','sign','door','prop','chest','gate'].includes(k)) continue;
-    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line)
-    if(k==='gate'&&!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P))) continue;
+    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line), and only
+    // when no gate library built it (e10c_gates says `locked` itself when Ash pushes against the gate)
+    if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
     const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+40; if(d>r) continue;
@@ -706,6 +709,7 @@ const S10_GATE_POWER={climb_wall:'claws',grapple_post:'grapple',shadow_curtain:'
 function s10GateLocked(P){
   if(P.need!=null) return !s10Cond(P.need);
   try{ if(typeof gateCanOpen==='function') return !gateCanOpen(P); }catch(e){}
+  try{ if(typeof gateInfo==='function'){ const I=gateInfo(P.id); if(I){ if(I.open) return false; if(I.power) return !s10HasPower(I.power); } } }catch(e){}
   if(P.gate==='fetch_spot') return !(G.flags.c_pip_fetch||G.flags.pip_fetch);
   const pw=P.opens_with||S10_GATE_POWER[P.gate]; return pw?!s10HasPower(pw):false;
 }

@@ -3,8 +3,9 @@
 // gear_hatch: the open works hatch by the Great Clock square, its gears packed with silver moth dust
 // icon_magnifier: Professor Sprocket's spare glass (the Case Book and the satchel use icon_* looks, drawn centred)
 // A look draws at (x, y) = the middle of its base on the ground, except icon_* looks, which are centred.
+// (anim:true: the gate library redraws these two every frame, for the night glow, the bird and the twinkling dust)
 
-defineLook('window_clock',{w:30,h:40,draw(g,x,y,t,state){
+defineLook('window_clock',{w:30,h:40,anim:true,draw(g,x,y,t,state){
   // a little brass shelf on the manor wall, under a window, with the clock on it (no window of its own: the house has them)
   const O='#3b2233', night=typeof daylight==='function'?daylight()<0.45:false, gone=state==='gone'||state==='stolen';
   g.save(); g.translate(x,y); g.lineJoin='round';
@@ -31,7 +32,7 @@ defineLook('window_clock',{w:30,h:40,draw(g,x,y,t,state){
   g.restore();
 }});
 
-defineLook('gear_hatch',{w:56,h:30,draw(g,x,y,t,state){
+defineLook('gear_hatch',{w:56,h:30,anim:true,draw(g,x,y,t,state){
   const O='#3b2233';
   g.save(); g.translate(x,y);
   g.fillStyle='rgba(40,20,40,.22)'; g.beginPath(); g.ellipse(2,4,30,9,0,0,Math.PI*2); g.fill();
