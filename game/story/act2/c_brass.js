@@ -34,15 +34,15 @@ chapter({
     nest_glow_pile: { map: 1, area: 'c_mothnest', at: [128, 92], r: 28, kind: 'examine', look: 'a2a_glow_pile',
       name: 'a circle of glowing things under the window' },
     nest_diary: { map: 1, area: 'c_mothnest', at: [172, 214], r: 14, kind: 'examine', look: 'a2a_moon_diary',
-      states: { taken: 'a2a_empty' }, name: 'a little book with a moon on it' },
+      states: { taken: 'a2a_empty' }, if: '!flag c_diary_found', name: 'a little book with a moon on it' },
     nest_letters: { map: 1, area: 'c_mothnest', at: [418, 150], r: 14, kind: 'examine', look: 'a2a_letters',
-      states: { taken: 'a2a_empty' }, name: 'a bundle of letters on the crate' },
+      states: { taken: 'a2a_empty' }, if: '!flag c_letters_found', name: 'a bundle of letters on the crate' },
     // drawn on the bell (the look lifts it 30 px) and on its beam (the look lifts it 78 px), sorted just after the bell
     nest_note2: { map: 1, area: 'c_mothnest', at: [262, 116], kind: 'prop', look: 'a2a_bell_note',
       states: { taken: 'a2a_empty' }, name: 'a note pinned to the bell' },
     nest_magpie: { map: 1, area: 'c_mothnest', at: [288, 118], kind: 'prop', look: 'a2a_magpie', name: 'a brass magpie on the beam' },
     // outside the Brassworks, between its signpost (c_sign_works, 10000, 24900) and Pearl's warp landing
-    bw_gate_hanky: { map: 1, at: [10100, 24905], r: 18, kind: 'examine', look: 'a2a_hanky', states: { taken: 'a2a_empty' },
+    bw_gate_hanky: { map: 1, at: [10100, 24905], r: 18, kind: 'examine', look: 'a2a_hanky', states: { taken: 'a2a_empty' }, if: '!flag c_hanky_read',
       name: 'a hanky tied to a stake by the gate', aliases: ['the hanky', "Vesper's hanky"] },
     // the chimney by the Great Clock where she unmasks (the 'unmask' pose sits her on its cap, 52 px up)
     gh_vesper_perch: { map: 1, at: [7230, 24411], kind: 'npc_spot', name: 'a chimney by the Great Clock' },
@@ -86,8 +86,8 @@ chapter({
       hint: ['Look at everything: under the window, by the hammock, on the crate, the biscuit tin and the great bell.', 'Look at everything in the Nest.'],
       parts: [
         { do: 'examine nest_glow_pile', scene: 'brs_pile', then: ['clue b_glow_pile'] },
-        { do: 'examine nest_diary', scene: 'brs_diary', then: ['give c_diary', 'world nest_diary taken'] },
-        { do: 'examine nest_letters', scene: 'brs_letters', then: ['clue b_letters', 'give c_letters', 'world nest_letters taken'] },
+        { do: 'examine nest_diary', scene: 'brs_diary', then: ['give c_diary', 'set c_diary_found', 'world nest_diary taken'] },
+        { do: 'examine nest_letters', scene: 'brs_letters', then: ['clue b_letters', 'give c_letters', 'set c_letters_found', 'world nest_letters taken'] },
         { do: 'examine nest_tin', scene: 'brs_tin' },
         { do: 'examine nest_bell', scene: 'brs_bell', then: ['world nest_note2 taken', 'quest start c_notes'] },
       ] },
@@ -100,7 +100,7 @@ chapter({
       hint: ['The Brass Yards are past the end of the Upper Town. Climb the smokestack with your claws. The hatch is on top.', 'Climb the smokestack. The hatch is on top.'] },
     // Pearl's warp at the end of the Brassworks sets Ash down outside its gate (x1_dun_a.js D1A_WARP: 10210, 24915),
     // a few steps from the hanky Vesper left there (trust K3 shows here), then the clock strikes and she unmasks
-    { id: 'hanky', do: 'examine bw_gate_hanky', scene: 'brs_hanky', then: ['world bw_gate_hanky taken'],
+    { id: 'hanky', do: 'examine bw_gate_hanky', scene: 'brs_hanky', then: ['set c_hanky_read', 'world bw_gate_hanky taken'],
       obj: ['Look at the hanky tied up by the Brassworks gate', 'Look at the hanky by the gate'] },
     { id: 'bong', do: 'cutscene brs_bong', then: ['set c_clock_on', 'set c_brass_done', 'stage c_light'],
       obj: ['Listen!', 'Listen!'] },
@@ -134,37 +134,41 @@ chapter({
     ],
     // trust K3: leave Gran's biscuits (kind) or eat one (funny, costs nothing); the gate note at the end shows which
     brs_tin: [
-      ['narr', 'A biscuit tin. Inside: three biscuits and a note.', 'A biscuit tin. Three biscuits and a note.'],
-      ['narr', '"FOR GRAN. NOT FOR ME. NOT EVEN ONE."', '"FOR GRAN. NOT FOR ME."'],
-      ['ash', 'They smell AMAZING.'],
-      { if: 'flag pip', then: [['pip', 'Mip!']] },
-      { choose: 'c_biscuits', ask: ['What do you do?', 'What do you do?'], pick: [
-        { t: ["Put the lid back on. They're for Gran.", 'Leave them for Gran'], tone: 'kind',
-          then: ['set c_biscuits=left', 'trust vesper +1'],
-          say: [['narr', 'You put the lid back on. Very, very carefully.', 'You put the lid back on. Carefully.']] },
-        { t: ['Eat one. Just ONE.', 'Eat one'], tone: 'silly',
-          then: ['set c_biscuits=ate'],
-          say: [
-            ['narr', 'It is the best biscuit you have ever eaten.', 'It is the best biscuit ever.'],
-            ['ash', 'I feel terrible. ...I feel GREAT. ...No. Terrible.', 'I feel terrible. No, GREAT. No. Terrible.']] },
-      ] },
+      { if: 'flag c_biscuits', then: [['narr', 'Gran\'s biscuit tin. The note still says: "NOT EVEN ONE."', 'Gran\'s tin. "NOT EVEN ONE."']] },
+      { if: '!flag c_biscuits', then: [
+        ['narr', 'A biscuit tin. Inside: three biscuits and a note.', 'A biscuit tin. Three biscuits and a note.'],
+        ['narr', '"FOR GRAN. NOT FOR ME. NOT EVEN ONE."', '"FOR GRAN. NOT FOR ME."'],
+        ['ash', 'They smell AMAZING.'],
+        { if: 'flag pip', then: [['pip', 'Mip!']] },
+        { choose: 'c_biscuits', ask: ['What do you do?', 'What do you do?'], pick: [
+          { t: ["Put the lid back on. They're for Gran.", 'Leave them for Gran'], tone: 'kind',
+            then: ['set c_biscuits=left', 'trust vesper +1'],
+            say: [['narr', 'You put the lid back on. Very, very carefully.', 'You put the lid back on. Carefully.']] },
+          { t: ['Eat one. Just ONE.', 'Eat one'], tone: 'silly',
+            then: ['set c_biscuits=ate'],
+            say: [
+              ['narr', 'It is the best biscuit you have ever eaten.', 'It is the best biscuit ever.'],
+              ['ash', 'I feel terrible. ...I feel GREAT. ...No. Terrible.', 'I feel terrible. No, GREAT. No. Terrible.']] },
+        ] }] },
     ],
     // note 2 (and Pip's Fetch, if Pip is with Ash); the note's words depend on what Ash said on the cliff (trust K2)
     brs_bell: [
-      ['narr', 'A note is pinned to the great bell. You unpin it.', 'A note is pinned to the bell.'],
-      { if: 'flag pip', then: [
-        ['narr', 'CLACK! A brass magpie swoops off the beam, snatches the note out of your claws, and flaps back up.', 'CLACK! A brass magpie grabs the note and flies up!'],
-        ['ash', 'Hey! Give that back, you tin chicken!', 'Hey! Give it back, you tin chicken!'],
-        ['narr', 'Pip goes very still. He has watched a certain thief do this on every roof in town. He took notes.', 'Pip goes very still. He watched the thief do this.'],
-        ['narr', 'ZIP! Pip plucks the note from its beak and lands back on your head.', 'ZIP! Pip grabs the note back!'],
-        ['ash', "Pip! That's stealing! ...From a thief. So it's fine. Good boy!", 'Pip! You stole it back! Good boy!'],
-        ['narr', 'The magpie sulks back to its nest. Its nest is made entirely of teaspoons.', 'The magpie sulks. Its nest is made of teaspoons.'],
-        { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'] }] }] },
-      { if: 'flag c_cliff=gran', then: [
-        ['narr', '"Stop following me. Gran\'s fine. She\'s always cold. It\'s not your problem. V."', '"Stop following me. Gran is fine. V."']] },
-      { if: '!flag c_cliff=gran', then: [
-        ['narr', '"If you can read this, you can climb. Stop it. M."', '"You can climb? Stop it. M."']] },
-      ['narr', 'Underneath, smaller: "My other drops are none of your business either."', 'Smaller: "My other notes are none of your business."'],
+      { if: 'flag c_note2_read', then: [['narr', 'The great bell of the Great Clock. Silver dust in every groove.', 'The great bell. Silver dust everywhere.']] },
+      { if: '!flag c_note2_read', then: [
+        ['narr', 'A note is pinned to the great bell. You unpin it.', 'A note is pinned to the bell.'],
+        { if: 'flag pip', then: [
+          ['narr', 'CLACK! A brass magpie swoops off the beam, snatches the note out of your claws, and flaps back up.', 'CLACK! A brass magpie grabs the note and flies up!'],
+          ['ash', 'Hey! Give that back, you tin chicken!', 'Hey! Give it back, you tin chicken!'],
+          ['narr', 'Pip goes very still. He has watched a certain thief do this on every roof in town. He took notes.', 'Pip goes very still. He watched the thief do this.'],
+          ['narr', 'ZIP! Pip plucks the note from its beak and lands back on your head.', 'ZIP! Pip grabs the note back!'],
+          ['ash', "Pip! That's stealing! ...From a thief. So it's fine. Good boy!", 'Pip! You stole it back! Good boy!'],
+          ['narr', 'The magpie sulks back to its nest. Its nest is made entirely of teaspoons.', 'The magpie sulks. Its nest is made of teaspoons.'],
+          { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'] }] }] },
+        { if: 'flag c_cliff=gran', then: [
+          ['narr', '"Stop following me. Gran\'s fine. She\'s always cold. It\'s not your problem. V." Smaller: "My other drops are none of your business."', '"Stop following me. Gran is fine. V."']] },
+        { if: '!flag c_cliff=gran', then: [
+          ['narr', '"If you can read this, you can climb. Stop it. M." Smaller: "My other drops are none of your business either."', '"You can climb? Stop it. M."']] },
+        { do: ['set c_note2_read'] }] },
     ],
     brs_ambrose: [
       ['c_ambrose', 'Eh? You were up in my bell loft? On the OUTSIDE of my clock? Tick.', 'You climbed my clock? On the OUTSIDE? Tick.'],
