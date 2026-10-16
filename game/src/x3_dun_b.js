@@ -33,7 +33,7 @@ function d3bBeat(name,fallback,cb){
 // Ш shadow platform (solid only while the room's dial says ECLIPSE), Ж shadow curtain (a wall a sunbeam burns away for
 // good), Ψ the hourglass neck (a wall; while the sand pours it is a sand seam a burrower passes), Ω a glass pane (raised
 // floor until a Ground Pound breaks it, then it drops to the floor below it in the same room)
-const D3T={shadow:260,curtain:261,neck:262,pane:263};
+const D3BT={shadow:260,curtain:261,neck:262,pane:263};
 Object.assign(TY,{d3b_shadow:260,d3b_curtain:261,d3b_neck:262,d3b_pane:263});
 const D3B_CELLS={'Ш':{b:'.',t:260},'Ж':{b:'.',t:261},'Ψ':{b:'#',t:262},'Ω':{b:'.',t:263}};
 // marks (taken out of the template before the engine reads it; options per cell in the room's `o3:{'c,r':{...}}`):
@@ -64,8 +64,8 @@ const d3bOpt=(R,c,r)=>(R.o3&&R.o3[`${c},${r}`])||{};
     if(!(c.typ instanceof Uint16Array)) c.typ=Uint16Array.from(c.typ);
     const w=c.w, SK=caveSid(def);
     for(const id in c.rooms){ const R=c.rooms[id];
-      for(const q of R.d3c||[]){ const k=(R.oy+1+q.r)*w+(R.ox+1+q.c); if(c.grid[k]===1&&q.t!==D3T.neck) continue;
-        c.typ[k]=q.t; if(q.t===D3T.neck) c.grid[k]=1; }
+      for(const q of R.d3c||[]){ const k=(R.oy+1+q.r)*w+(R.ox+1+q.c); if(c.grid[k]===1&&q.t!==D3BT.neck) continue;
+        c.typ[k]=q.t; if(q.t===D3BT.neck) c.grid[k]=1; }
       // cells under a mark that must stay a pit (a hook hanging over the gears)
       for(const q of R.pitCells||[]){ const k=(R.oy+1+q[1])*w+(R.ox+1+q[0]); if(c.grid[k]===0) c.typ[k]=TY.pit; }
       // a mark with three raised neighbours stands on the raised floor (like the engine's own marks)
@@ -82,16 +82,16 @@ function d3bPaneBroken(A,k){ return !!G.found[`d3bp_${caveSid(A.def)}_${k}`]; }
 function d3bShadowOn(A,k){ const R=d3bRoomOfCell(A,k); return d3bDialOf(A,R)===2; }
 function d3bRoomOfCell(A,k){ const c=A.cave, i=k%c.w, j=(k-i)/c.w; for(const id in A.rooms){ const R=A.rooms[id]; if(i>R.ox&&i<=R.ox+R.iw&&j>R.oy&&j<=R.oy+R.ih) return R; } return null; }
 { const base=dunGround; dunGround=function(k,t,T){
-    if(t>=260&&t<=263){ const A=AREA; if(!A||!A.d3b) return t!==D3T.shadow;
-      if(t===D3T.shadow) return dunCovered(k)||A.d3b.shadow[k]===1;
-      if(t===D3T.curtain) return true;
-      if(t===D3T.pane) return true;
+    if(t>=260&&t<=263){ const A=AREA; if(!A||!A.d3b) return t!==D3BT.shadow;
+      if(t===D3BT.shadow) return dunCovered(k)||A.d3b.shadow[k]===1;
+      if(t===D3BT.curtain) return true;
+      if(t===D3BT.pane) return true;
       return false; }
     return base.apply(this,arguments); }; }
-{ const base=dunHole; dunHole=function(k,t,T){ if(t===D3T.shadow){ const A=AREA; return !(A&&A.d3b&&A.d3b.shadow[k]===1)&&!dunCovered(k); } return base.apply(this,arguments); }; }
-{ const base=dunH; dunH=function(k){ const A=AREA; if(A&&A.d3b){ const t=A.cave.typ[k]; if(t===D3T.pane) return d3bPaneBroken(A,k)?0:1; } return base.apply(this,arguments); }; }
+{ const base=dunHole; dunHole=function(k,t,T){ if(t===D3BT.shadow){ const A=AREA; return !(A&&A.d3b&&A.d3b.shadow[k]===1)&&!dunCovered(k); } return base.apply(this,arguments); }; }
+{ const base=dunH; dunH=function(k){ const A=AREA; if(A&&A.d3b){ const t=A.cave.typ[k]; if(t===D3BT.pane) return d3bPaneBroken(A,k)?0:1; } return base.apply(this,arguments); }; }
 // the hourglass neck: a wall, and a sand seam while the sand pours (p4_moon lets a burrower through a seam)
-function d3bNeckSet(A,on){ const c=A.cave; for(const k of A.d3b.necks) c.typ[k]=on?P4T.seam:D3T.neck; }
+function d3bNeckSet(A,on){ const c=A.cave; for(const k of A.d3b.necks) c.typ[k]=on?P4T.seam:D3BT.neck; }
 
 // ---------- 2. light: the beam network of a whole dungeon
 // Beams run cell by cell inside a room (N, E, S, W), bounce off mirrors, stop at walls, pedestals, crystals and shadow
@@ -106,7 +106,7 @@ function d3bRI(aid,rid){
   const sp=R.span||[1,1], iw=sp[0]*RSX-1, ih=sp[1]*RSY-1, wall=new Uint8Array(iw*ih), obj=new Map(), def=AREADEFS[aid]||{};
   const tpl=R.tpl&&Array.isArray(R.tpl)?R.tpl:null;
   for(let r=0;r<ih;r++) for(let c=0;c<iw;c++){ const ch=tpl?((tpl[r]||'')[c]||'.'):'.'; if(ch==='#') wall[r*iw+c]=1; else if(ch==='m') obj.set(r*iw+c,{ch:'m',c,r}); }
-  for(const q of R.d3c||[]){ const i=q.r*iw+q.c; if(q.t===D3T.neck) wall[i]=1; if(q.t===D3T.curtain) obj.set(i,{ch:'Ж',c:q.c,r:q.r}); }
+  for(const q of R.d3c||[]){ const i=q.r*iw+q.c; if(q.t===D3BT.neck) wall[i]=1; if(q.t===D3BT.curtain) obj.set(i,{ch:'Ж',c:q.c,r:q.r}); }
   for(const m of R.d3m||[]) if(D3B_BEAMK.has(m.ch)) obj.set(m.r*iw+m.c,{ch:m.ch,c:m.c,r:m.r,opt:d3bOpt(R,m.c,m.r)});
   // windows that throw a beam without taking a cell (R.emit:[{at:[c,r],kind,dir,dial,win}])
   for(const e of R.emit||[]) obj.set(e.at[1]*iw+e.at[0],{ch:'Ϙ',c:e.at[0],r:e.at[1],opt:e,emit:true});
@@ -285,7 +285,7 @@ function d3bBuildRoom(A,def,R,P){
     const k=(R.oy+1+o.r)*c.w+(R.ox+1+o.c), p=at(o.c,o.r); G0.cells.push(k);
     const gt={k:'d3bg',x:p.x,y:p.y,id:`d3bg_${SK}_${R.id}_${o.c}_${o.r}`,room:R.id,cells:[k],closed:!G0.burnt,grp:G0,r:cs*0.5}; gt.prompt=()=>gt.closed?S('Look at the shadow curtain','Look at the curtain'):null;
     A.gates.push(gt); c.dyn[k]=A.gates.length; A.objs.push(gt); X.gates.push(gt); }
-  for(const q of R.d3c||[]){ const k=(R.oy+1+q.r)*c.w+(R.ox+1+q.c); if(q.t===D3T.neck) X.necks.push(k); }
+  for(const q of R.d3c||[]){ const k=(R.oy+1+q.r)*c.w+(R.ox+1+q.c); if(q.t===D3BT.neck) X.necks.push(k); }
   // props, the mirage and the room's special pieces
   for(const pr of R.props||[]){ const p=at(pr[1],pr[2]); d3bObj(A,Object.assign({k:'d3b_prop',kind:pr[0],x:p.x,y:p.y,id:`d3bpr_${R.id}_${pr[1]}_${pr[2]}`,room:R.id},pr[3]||{}),!(pr[3]&&pr[3].flat));
     if(pr[3]&&pr[3].col) addAreaCol({t:'c',x:p.x,y:p.y,r:pr[3].col}); if(pr[3]&&pr[3].glow) A.lights.push({x:p.x,y:p.y-(pr[3].gy||20),r:pr[3].glow,i:pr[3].gi||0.5}); }
@@ -316,7 +316,7 @@ function d3bAfterBuild(A,def){
   for(const o of A.dn.mirrors) o.r=40;
   refreshCaveGates(); X.dirty=true;
 }
-function d3bShadowRefresh(A){ const X=A.d3b, c=A.cave; X.shadow.fill(0); for(let k=0;k<c.typ.length;k++) if(c.typ[k]===D3T.shadow&&d3bShadowOn(A,k)) X.shadow[k]=1; }
+function d3bShadowRefresh(A){ const X=A.d3b, c=A.cave; X.shadow.fill(0); for(let k=0;k<c.typ.length;k++) if(c.typ[k]===D3BT.shadow&&d3bShadowOn(A,k)) X.shadow[k]=1; }
 // the shadow curtains are gates: shut until burnt
 { const base=refreshCaveGates; refreshCaveGates=function(){ base.apply(this,arguments); const A=AREA; if(!A||!A.d3b) return; for(const o of A.d3b.gates){ let cl=!o.grp.burnt; if(cl&&!o.closed&&gateOnAsh(o)) cl=false; o.closed=cl; } }; }
 // the solved rooms that show their hidden stairs
@@ -529,7 +529,7 @@ function d3bMoversPost(A){ const Gr=A.d3b.gears; if(!Gr||!Gr.started||Gr.braked)
 // ---------- 8. Ground Pound: glass panes, the hourglass switches, the jammed cog
 if(typeof p3OnPound==='function') p3OnPound(({x,y,R:rad,drum})=>{ const A=AREA; if(!A||!A.d3b||drum) return; try{
   const c=A.cave, cs=c.cell, r=Math.max(70,(rad||92)*0.75);
-  for(let j=Math.floor((y-r-A.y0)/cs);j<=Math.floor((y+r-A.y0)/cs);j++) for(let i=Math.floor((x-r-A.x0)/cs);i<=Math.floor((x+r-A.x0)/cs);i++){ if(i<0||j<0||i>=c.w||j>=c.h) continue; const k=j*c.w+i; if(c.typ[k]!==D3T.pane||d3bPaneBroken(A,k)) continue; const q=tPos(k); if(dist(q.x,q.y,x,y)>cs*0.5+46) continue; d3bPaneBreak(A,k); }
+  for(let j=Math.floor((y-r-A.y0)/cs);j<=Math.floor((y+r-A.y0)/cs);j++) for(let i=Math.floor((x-r-A.x0)/cs);i<=Math.floor((x+r-A.x0)/cs);i++){ if(i<0||j<0||i>=c.w||j>=c.h) continue; const k=j*c.w+i; if(c.typ[k]!==D3BT.pane||d3bPaneBroken(A,k)) continue; const q=tPos(k); if(dist(q.x,q.y,x,y)>cs*0.5+46) continue; d3bPaneBreak(A,k); }
   for(const o of A.d3b.flips) if(dist(o.x,o.y,x,y)<70){ o.bump=0.4; d3bClockFlip(A,o); break; }
   for(const o of A.d3b.objs) if(o.k==='d3b_cog'&&dist(o.x,o.y,x,y)<72) d3bGearStart(A);
 }catch(e){ console.error(e); } });
@@ -574,7 +574,7 @@ const d3bTheme=A=>(A&&A.def&&A.def.theme)||'m_mirror';
 function d3bPaint(A,def){
   const c=A.cave, cs=c.cell, g=A.canvas.getContext('2d'), obs=def.theme==='m_obs', st=CAVE_STYLE[def.theme], rng=mulberry32((def.seed||7)*13+5);
   g.save(); g.setTransform(A.canvasS,0,0,A.canvasS,0,0);
-  const solidAt=(i,j)=>i<0||j<0||i>=c.w||j>=c.h||(c.grid[j*c.w+i]===1&&c.typ[j*c.w+i]!==D3T.neck);
+  const solidAt=(i,j)=>i<0||j<0||i>=c.w||j>=c.h||(c.grid[j*c.w+i]===1&&c.typ[j*c.w+i]!==D3BT.neck);
   // floor tiles: a big diamond of gold grout in the temple, brass star inlays in the observatory
   for(let j=0;j<c.h;j++) for(let i=0;i<c.w;i++){ const k=j*c.w+i; if(c.grid[k]!==0||c.typ[k]!==0) continue; const x=i*cs, y=j*cs;
     if(!obs){ g.fillStyle=(i+j)%2?'rgba(255,255,255,.18)':'rgba(170,190,230,.10)'; g.fillRect(x,y,cs,cs); g.strokeStyle='rgba(212,180,90,.28)'; g.lineWidth=1.2; if((i+j)%4===0){ g.beginPath(); g.moveTo(x,y+cs/2); g.lineTo(x+cs/2,y); g.lineTo(x+cs,y+cs/2); g.lineTo(x+cs/2,y+cs); g.closePath(); g.stroke(); }
@@ -583,17 +583,17 @@ function d3bPaint(A,def){
       g.strokeStyle='rgba(216,180,104,.22)'; g.lineWidth=1; g.strokeRect(x+1.5,y+1.5,cs-3,cs-3); } }
   // the special cells
   for(let j=0;j<c.h;j++) for(let i=0;i<c.w;i++){ const k=j*c.w+i, t=c.typ[k], x=i*cs, y=j*cs;
-    if(t===D3T.shadow){ g.fillStyle='#0e0a1c'; g.fillRect(x,y,cs,cs); for(let n=0;n<3;n++){ g.fillStyle=`rgba(${rng()<0.5?'200,180,255':'255,255,255'},${0.3+rng()*0.4})`; g.fillRect(x+rng()*cs,y+rng()*cs,1.6,1.6); }
+    if(t===D3BT.shadow){ g.fillStyle='#0e0a1c'; g.fillRect(x,y,cs,cs); for(let n=0;n<3;n++){ g.fillStyle=`rgba(${rng()<0.5?'200,180,255':'255,255,255'},${0.3+rng()*0.4})`; g.fillRect(x+rng()*cs,y+rng()*cs,1.6,1.6); }
       g.strokeStyle='rgba(150,110,220,.35)'; g.setLineDash([4,5]); g.lineWidth=1.4; g.strokeRect(x+3,y+3,cs-6,cs-6); g.setLineDash([]); }
-    else if(t===D3T.pane){ const brk=d3bPaneBroken(A,k); if(brk){ g.fillStyle=obs?'#3a3460':'#9aa8c8'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(220,240,255,.7)'; for(let n=0;n<7;n++){ const a=rng()*TAU, px=x+6+rng()*(cs-12), py=y+6+rng()*(cs-12); g.beginPath(); g.moveTo(px,py); g.lineTo(px+Math.cos(a)*6,py+Math.sin(a)*4); g.lineTo(px+Math.cos(a+0.6)*4,py+Math.sin(a+0.6)*5); g.closePath(); g.fill(); } }
+    else if(t===D3BT.pane){ const brk=d3bPaneBroken(A,k); if(brk){ g.fillStyle=obs?'#3a3460':'#9aa8c8'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(220,240,255,.7)'; for(let n=0;n<7;n++){ const a=rng()*TAU, px=x+6+rng()*(cs-12), py=y+6+rng()*(cs-12); g.beginPath(); g.moveTo(px,py); g.lineTo(px+Math.cos(a)*6,py+Math.sin(a)*4); g.lineTo(px+Math.cos(a+0.6)*4,py+Math.sin(a+0.6)*5); g.closePath(); g.fill(); } }
       else { g.fillStyle=obs?'#8fb4e8':'#c8e2fa'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(255,255,255,.55)'; g.fillRect(x+3,y+3,cs-6,4); g.strokeStyle='rgba(60,80,130,.55)'; g.lineWidth=1.2; g.strokeRect(x+1,y+1,cs-2,cs-2);
         g.strokeStyle='rgba(40,60,110,.5)'; g.beginPath(); const cx=x+cs*(0.3+rng()*0.4), cy=y+cs*(0.3+rng()*0.4); for(let a=0;a<5;a++){ const an=a*1.25+rng(); g.moveTo(cx,cy); g.lineTo(cx+Math.cos(an)*cs*0.42,cy+Math.sin(an)*cs*0.42); } g.stroke();
         // a glass face hangs below a pane that has lower floor to the south
-        const s=k+c.w; if(j+1<c.h&&c.grid[s]===0&&dunHq(c,s)===0&&c.typ[s]!==D3T.pane){ const gr=g.createLinearGradient(0,y+cs,0,y+cs*1.55); gr.addColorStop(0,'rgba(170,210,250,.9)'); gr.addColorStop(1,'rgba(80,110,170,.4)'); g.fillStyle=gr; g.fillRect(x,y+cs,cs,cs*0.55); g.fillStyle='rgba(255,255,255,.4)'; g.fillRect(x,y+cs,cs,2); } } }
-    else if(t===D3T.neck){ g.fillStyle=obs?'#7a8ac8':'#bcd4f0'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(255,255,255,.4)'; g.fillRect(x+cs*0.2,y,cs*0.12,cs); g.fillStyle='#d8b468'; g.fillRect(x,y,cs,4); g.fillRect(x,y+cs-4,cs,4); }
+        const s=k+c.w; if(j+1<c.h&&c.grid[s]===0&&dunHq(c,s)===0&&c.typ[s]!==D3BT.pane){ const gr=g.createLinearGradient(0,y+cs,0,y+cs*1.55); gr.addColorStop(0,'rgba(170,210,250,.9)'); gr.addColorStop(1,'rgba(80,110,170,.4)'); g.fillStyle=gr; g.fillRect(x,y+cs,cs,cs*0.55); g.fillStyle='rgba(255,255,255,.4)'; g.fillRect(x,y+cs,cs,2); } } }
+    else if(t===D3BT.neck){ g.fillStyle=obs?'#7a8ac8':'#bcd4f0'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(255,255,255,.4)'; g.fillRect(x+cs*0.2,y,cs*0.12,cs); g.fillStyle='#d8b468'; g.fillRect(x,y,cs,4); g.fillRect(x,y+cs-4,cs,4); }
   }
   // wall faces: tall mirror panels in the temple (a cool sheen and a gold rim), riveted brass in the observatory
-  for(let j=0;j<c.h-1;j++) for(let i=0;i<c.w;i++){ if(!solidAt(i,j)||solidAt(i,j+1)) continue; if(c.typ[j*c.w+i]===D3T.neck) continue; const x=i*cs, y=j*cs, fh=cs*0.6, fy=y+cs-fh;
+  for(let j=0;j<c.h-1;j++) for(let i=0;i<c.w;i++){ if(!solidAt(i,j)||solidAt(i,j+1)) continue; if(c.typ[j*c.w+i]===D3BT.neck) continue; const x=i*cs, y=j*cs, fh=cs*0.6, fy=y+cs-fh;
     if(!obs){ const gr=g.createLinearGradient(x,fy,x+cs,fy+fh); gr.addColorStop(0,'#eef6ff'); gr.addColorStop(0.45,'#b9cdee'); gr.addColorStop(1,'#8fa6d4'); g.fillStyle=gr; g.fillRect(x+1,fy+2,cs-2,fh-3);
       g.strokeStyle='rgba(255,255,255,.75)'; g.lineWidth=2; g.beginPath(); g.moveTo(x+cs*0.2,fy+fh-3); g.lineTo(x+cs*0.45,fy+4); g.moveTo(x+cs*0.5,fy+fh-3); g.lineTo(x+cs*0.62,fy+fh*0.55); g.stroke();
       g.fillStyle='#e8c060'; g.fillRect(x,fy,cs,2.5); g.fillStyle='rgba(120,90,30,.5)'; g.fillRect(x,fy+fh-2,cs,2); }
@@ -635,7 +635,7 @@ function d3bFloorArt(g,A,R,f,rng){
 }
 // the minimap knows the new cells
 { const base=renderCaveMini; renderCaveMini=function(A){ base.apply(this,arguments); if(!A||!A.d3b||!A.mini) return; const c=A.cave, mg=A.mini.getContext('2d'), im=mg.getImageData(0,0,c.w,c.h); let ch=false;
-    for(let k=0;k<c.typ.length;k++){ const t=c.typ[k]; if(t<260||t>263) continue; const a=k*4; if(im.data[a]===10&&im.data[a+1]===8) continue; const v=t===D3T.shadow?[50,30,80]:t===D3T.pane?[170,200,235]:t===D3T.neck?[150,170,210]:null; if(v){ im.data[a]=v[0]; im.data[a+1]=v[1]; im.data[a+2]=v[2]; ch=true; } }
+    for(let k=0;k<c.typ.length;k++){ const t=c.typ[k]; if(t<260||t>263) continue; const a=k*4; if(im.data[a]===10&&im.data[a+1]===8) continue; const v=t===D3BT.shadow?[50,30,80]:t===D3BT.pane?[170,200,235]:t===D3BT.neck?[150,170,210]:null; if(v){ im.data[a]=v[0]; im.data[a+1]=v[1]; im.data[a+2]=v[2]; ch=true; } }
     if(ch) mg.putImageData(im,0,0); }; }
 
 // ---- the live floor layer (under everyone): shadow platforms, beams, plates, shafts, the hourglass, the gears, planets
@@ -648,12 +648,12 @@ function d3bDrawFloor(A,t){
   const X=A.d3b, c=A.cave, cs=c.cell, obs=d3bTheme(A)==='m_obs';
   const i0=Math.max(0,Math.floor((cam.x-A.x0)/cs)-1), i1=Math.min(c.w-1,Math.floor((cam.x+W/zoom-A.x0)/cs)+1), j0=Math.max(0,Math.floor((cam.y-A.y0)/cs)-1), j1=Math.min(c.h-1,Math.floor((cam.y+H/zoom-A.y0)/cs)+1);
   // shadow platforms: solid violet slabs in an eclipse, a faint dotted ghost otherwise
-  for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const k=j*c.w+i; if(c.typ[k]!==D3T.shadow) continue; const x=A.x0+i*cs, y=A.y0+j*cs;
+  for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const k=j*c.w+i; if(c.typ[k]!==D3BT.shadow) continue; const x=A.x0+i*cs, y=A.y0+j*cs;
     if(X.shadow[k]){ ctx.fillStyle='#3a2468'; ctx.fillRect(x+1,y+1,cs-2,cs-2); ctx.fillStyle='#5a3a96'; ctx.fillRect(x+3,y+3,cs-6,cs*0.55); ctx.fillStyle=`rgba(200,170,255,${0.35+0.2*Math.sin(t*2+i+j)})`; ctx.fillRect(x+4,y+4,cs-8,2.5);
       ctx.strokeStyle='rgba(20,8,40,.8)'; ctx.lineWidth=2; ctx.strokeRect(x+1,y+1,cs-2,cs-2); }
     else { ctx.strokeStyle=`rgba(170,130,240,${0.18+0.1*Math.sin(t*1.5+i*0.7+j)})`; ctx.lineWidth=1.5; ctx.setLineDash([3,6]); ctx.strokeRect(x+5,y+5,cs-10,cs-10); ctx.setLineDash([]); } }
   // the glass panes shine
-  for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const k=j*c.w+i; if(c.typ[k]!==D3T.pane||d3bPaneBroken(A,k)) continue; const x=A.x0+i*cs, y=A.y0+j*cs, f=((t*0.35+i*0.13+j*0.07)%1); ctx.fillStyle='rgba(255,255,255,.28)'; ctx.beginPath(); ctx.moveTo(x+f*cs,y+2); ctx.lineTo(x+f*cs+8,y+2); ctx.lineTo(x+f*cs-6,y+cs-2); ctx.lineTo(x+f*cs-14,y+cs-2); ctx.closePath(); ctx.fill(); }
+  for(let j=j0;j<=j1;j++) for(let i=i0;i<=i1;i++){ const k=j*c.w+i; if(c.typ[k]!==D3BT.pane||d3bPaneBroken(A,k)) continue; const x=A.x0+i*cs, y=A.y0+j*cs, f=((t*0.35+i*0.13+j*0.07)%1); ctx.fillStyle='rgba(255,255,255,.28)'; ctx.beginPath(); ctx.moveTo(x+f*cs,y+2); ctx.lineTo(x+f*cs+8,y+2); ctx.lineTo(x+f*cs-6,y+cs-2); ctx.lineTo(x+f*cs-14,y+cs-2); ctx.closePath(); ctx.fill(); }
   // the Eclipse Lens (flat, huge), the jammed cog, plates and the twin tile, beam shafts
   for(const o of X.objs){ if(!inView(o.x,o.y,140)) continue;
     if(o.k==='d3b_elens') d3bDrawELens(o,t);
@@ -983,7 +983,7 @@ if(typeof ashHat==='function'){ const base=ashHat; ashHat=function(k){ if(k==='M
 
 // ---------- 16. debug and test hooks: window.__eb.d3b (scratchpad/e_d3b/ has the tests)
 const D3B_DBG={
-  D3B, D3T,
+  D3B, D3BT,
   state(){ const A=AREA; if(!A||!A.d3b) return {area:A&&A.id||null}; const X=A.d3b, R=caveRoomAt(player.x,player.y);
     return {area:A.id,room:R&&R.id,dial:R?d3bDialOf(A,R):-1,segs:X.segs.map(s=>({kind:s.kind,hot:s.hot,room:s.room,n:s.pts.length})),tgts:X.tgts.map(o=>({room:o.room,want:o.want,lit:o.lit})),curts:X.curts.map(g=>({room:g.room,burnt:g.burnt})),
       clock:X.clock?{side:X.clock.side,flips:X.clock.flips,pour:+X.clock.pour.toFixed(1),started:X.clock.started}:null,gears:X.gears?{started:X.gears.started,braked:X.gears.braked}:null,
