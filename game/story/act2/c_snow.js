@@ -1,5 +1,7 @@
 // Act II epilogue: Snow in Summer (owner A2b). Data only.
-// What the player does: walks back into Gearhaven under snow in June. The town is out in it; Vesper waves from the
+// What the player does: on the breakwater after the Spire (x1_story's c1SpireOut puts Ash there and starts this stage),
+// the moon dims and the Lady of the Moths thanks him through every moth on the Spire; snow falls in midsummer; that
+// night the moon has its first bite. Then he walks back into Gearhaven under snow in June. The town is out in it; Vesper waves from the
 // Clockwatch roof if she is a friend (or only her grey silk is left on a chimney). Penny's headline, the white north, and
 // the end card: one Shard of three, the north gone white, the moon with a bite out of it. Then one direction only:
 // rest at a shrine or an inn (that is what starts Act III; audit finding 10). Gran's stove lines only if c_oona is
@@ -10,26 +12,68 @@ chapter({
   card: ['Act II · Epilogue', 'Snow in Summer'],
   so_far: [
     'At the top of the Shadow Spire the truth came out: Vesper gave the Heart to a great moth, which cracked it into three Shards. She kept one in secret, and now Ash has it. Then a voice thanked Ash, snow fell in midsummer, and the moon had a bite out of it.',
-    'Vesper gave the Heart to a great moth. It broke into three. Ash has one piece. Then snow fell, and the moon had a bite out of it.'],
+    'The Heart broke in three. Ash has one. Snow fell. The moon got bitten.'],
   mom: [['Snow? In summer? Wear the scarf. Both scarves.', 'Snow in summer? Wear your scarf!']],
 
   place: {
     // the foe ending's trace: a scrap of grey silk on the Clockwatch Hall's chimney (anchored in the street in front of
     // the hall so it sorts in front of the house sprite; the look draws it up on the chimney, 122 px higher)
     clock_silk: { map: 1, at: [6760, 24612], kind: 'prop', look: 'clock_silk', if: 'choice c_vesper=foe', name: 'a scrap of grey silk' },
+    // the friend ending's: Vesper sitting on the Clockwatch roof's eave, legs dangling (the look draws her 58 px up;
+    // the anchor is in the street in front of the hall, so Ash can talk to her from there)
+    v_roof: { map: 1, at: [6795, 24612], r: 40, kind: 'examine', look: 'vesper_roof', if: 'choice c_vesper=friend',
+              name: 'Vesper', prompt: ['Talk to Vesper', 'Talk to Vesper'], say: 'c_vesper_roof' },
   },
 
   step: [
-    { id: 'city', do: 'goto gh_market 460', scene: 'c_snow_town', migrate_if: 'flag c_done', then: ['end_act'],
+    // x1_story's c1SpireOut puts Ash on the breakwater at night and moves the stage here: the voice and the snow first
+    { id: 'voice', do: 'cutscene c_moth_voice', migrate_if: 'flag c_snow' },
+    { id: 'snow', do: 'cutscene c_snow_starts', migrate_if: 'flag c_snow' },
+    { id: 'city', do: 'goto gh_market 460', scene: 'c_snow_town', migrate_if: 'flag c_done', then: ['end_act 2'],
       obj: ['Go back to Gearhaven', 'Go back to Gearhaven'],
       hint: ['By morning the whole coast is white. Go back to Gearhaven and see.', 'Go back to Gearhaven.'] },
-    // the act is over: one direction only (resting is what moves the story on to Act III)
+    // the act is over: one direction only (resting, or the end card's "Continue the story", starts Act III; the step
+    // simply stays current until then)
     { id: 'rest', do: 'wait_for act>=3', at: 'c_teapot_door',
       obj: ['The north has gone white. Rest at a shrine or an inn when you are ready.', 'Rest at a shrine or an inn.'],
       hint: ['The north has gone white. Rest at a shrine or an inn, like the Steaming Teapot, when you are ready.', 'Rest at a shrine or an inn.'] },
   ],
 
   scene: {
+    // Nyxara's first words (THREADS N8), on the breakwater, looking back at the Spire: 6 lines a branch
+    c_moth_voice: [
+      { cam: 'c_spire_door', s: 4 },
+      ['narr', 'From the breakwater you look back. The moon goes dim, like a lamp turned down, and every moth on the Spire turns to face you.', 'You look back. The moon goes dim. Every moth turns to you.'],
+      ['nyxara', 'Thank you, little ember. You have been such a help.', 'Thank you, little ember. You helped so much.'],
+      ['nyxara', 'While you chased my little thief over the rooftops, my heralds flew north, and east, and nobody followed them.', 'While you chased my thief, my moths flew north and east.'],
+      { if: 'choice ending=warden', then: [['ash', 'Grandpa? Are you awake up there?', 'Grandpa? Are you awake?']],
+        else: [{ if: 'choice ending=heir', then: [['ash', 'Grandpa? Did you get out of your birdcage?', 'Grandpa? Did you get out of your cage?']],
+          else: [{ if: 'choice ending=lantern', then: [['ash', "Grandpa? ...No. Grandpa's at home eating the doormat.", 'Grandpa? No. He is at home.']],
+            else: [['ash', "...Grandpa? No. You're gone.", 'Grandpa? No. You are gone.']] }] }] },
+      ['nyxara', 'Oh, no, dear. Not him. Someone much, much older. Shh. Go to sleep.', 'No, dear. Not him. Someone much older. Shh.'],
+      { if: 'choice c_vesper=friend', then: [
+        ['c_vesper', "...That's her. That's the Lady. She sounded so kind in my dreams.", "That's her. The Lady. She sounded so kind."] ],
+        else: [
+        ['narr', 'The moths pour off the Spire in a grey river, up into the sky, and away north.', 'The moths fly up like a grey river, away north.'] ] },
+    ],
+    c_snow_starts: [
+      { if: 'choice c_vesper=friend', then: [
+        ['narr', 'The moths pour off the Spire in a grey river and fly away north. Then something cold lands on your nose.', 'The moths fly north. Something cold lands on your nose.'] ],
+        else: [
+        ['narr', 'Something cold lands on your nose.', 'Something cold lands on your nose.'] ] },
+      { do: ['set c_snow'] },
+      ['narr', 'Snow. Soft and white, drifting down out of a clear summer night.', 'Snow! Out of a summer night!'],
+      ['ash', "Is that... snow? It's MIDSUMMER.", "Is that snow? It's SUMMER!"],
+      { if: 'choice c_vesper=friend', then: [
+        ['c_vesper', "It's never snowed in Saltmarsh. Not once in Gran's whole life. I have to get home. She'll be frightened.", 'It never snows in Saltmarsh. I must go home to Gran.'],
+        ['c_vesper', "I'll find you, when it's time. Somebody has to stop you climbing anything stupid. You've got horns, cousin, not sense.", "I'll find you when it's time. You have horns, cousin, not sense."],
+        { walk: ['c_vesper', 'bw_walk_off'] }, { do: ['clear c_v_breakwater'] } ],
+        else: [{ if: 'flag pip', then: [
+        ['pip', 'Mip? (Pip snaps at a snowflake. Then another. He looks very offended that they taste of nothing.)', 'Mip? (Pip bites a snowflake. It tastes of nothing. He is cross.)'] ] }] },
+      { do: ['moon 95'] },   // the moon's first bite (moonSet: e7b_threads shows it on the HUD)
+      ['narr', 'That night the moon has a bite out of it. Just a small one. As if someone tasted it.', 'That night, the moon has a little bite out of it.'],
+    ],
+
     c_snow_town: [
       { cam: 'gh_market', s: 1 },
       ['narr', 'By morning, Gearhaven is white. Snow on the clock towers. Snow riding round and round on the conveyor streets. Kids having snowball fights in their summer clothes.', 'By morning, Gearhaven is white. Kids throw snowballs in summer clothes.'],
@@ -47,22 +91,17 @@ chapter({
       ['ash', "...I do look worried, don't I?", "I do look worried, don't I?"],
       ['narr', 'Far to the north, past the mountains, the sky is as white as paper.', 'Far to the north, the sky is white as paper.'],
     ],
-    c_vesper_next: [
+    // talking to Vesper on the roof (any time in the epilogue): the Act III hook, and the echoes
+    c_vesper_roof: [
+      { if: 'flag dr_seen_c_twins !flag c_v_twins', then: [
+        ['c_vesper', 'Granny says "fire isn\'t the only warm thing" every single night. How do YOU know that?', 'Granny says that every night! How do you know it?'],
+        { do: ['set c_v_twins'] } ] },
+      { if: 'quest c_oona done', then: [
+        ['c_vesper', "Gran made me sit by her stove for an hour. AN HOUR. Then she made me eat soup. It was warm. Don't tell anyone.", 'Gran made me sit by her stove. Then soup. It was warm.'] ] },
       ['c_vesper', 'The Mother wants all three pieces. Hush took one north. Look at the sky up there. White as paper.', 'The Mother wants all three. Hush took one north.'],
       ['c_vesper', "If you go after it, take a scarf. Take two. And don't climb anything I wouldn't.", "If you go, take a scarf. Take two."],
       ['ash', 'You climb EVERYTHING.', 'You climb EVERYTHING.'],
     ],
   },
 
-  talk: {
-    // Vesper on the Clockwatch roof (only there if she is a friend: see her npc entry in c_spire.js)
-    c_vesper: [
-      { option: ['What happens now?', 'What happens now?'], scene: 'c_vesper_next' },
-      { if: 'flag dr_seen_c_twins', once: true,
-        say: ['Granny says "fire isn\'t the only warm thing" every single night. How do YOU know that?', 'Granny says that every night! How do you know it?'] },
-      { if: 'quest c_oona done', once: true,
-        say: ["Gran made me sit by her stove for an hour. AN HOUR. Then she made me eat soup. It was warm. Don't tell anyone.", 'Gran made me sit by her stove. Then soup. It was warm.'] },
-      { say: ["Somebody has to make sure you don't climb anything stupid. That's me now. I've been promoted.", 'Somebody has to stop you climbing silly things.'] },
-    ],
-  },
 })

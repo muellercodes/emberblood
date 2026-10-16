@@ -7,11 +7,11 @@
 // At 10 percent Vesper kneels and the choice shows every option, with the reason when one is locked:
 //   "Cousin. Why are you doing this?" (trust 4), "Pearl wrote a letter" (Pearl's Logbook done and trust 3), "Finish
 //   the fight". Friend: she sits with Ash at the top. Foe: she shouts the two lines that matter and glides away. Either
-// way Ash gets the Dusk Shard and her notebook page (the long truth is a Case Book page, not a wall of lines). A warm
-// warp takes him to the breakwater, the Lady speaks through every moth, the snow starts, and the moon gets its bite.
+// way Ash gets the Dusk Shard and her notebook page (the long truth is a Case Book page, not a wall of lines), and a
+// warm warp takes him to the breakwater. c_snow.js goes on from there (the Lady's voice, the snow, the bitten moon).
 chapter({
   id: 'c_spire', act: 2, after: 'c_light', next: 'c_snow', takeover: true,
-  silence: ['c_causeway', 'c_choice', 'c_end_fought', 'c_end_ally', 'c_end_pearl', 'c_truth', 'c_nyxara', 'c_snowfall'],
+  silence: ['c_causeway', 'c_end_fought', 'c_end_ally', 'c_end_pearl', 'c_truth', 'c_nyxara', 'c_snowfall'],
   card: ['Act II · Chapter 8', 'The Shadow Spire'],
   so_far: [
     'When the lighthouse burned again, its beam showed a black spire standing in the sea where no spire had ever been. Vesper had gone there with the warm stone.',
@@ -19,11 +19,14 @@ chapter({
   mom: [['A black tower in the sea? Take a lantern. Take two.', 'A black tower? Take a lantern!']],
 
   npc: {
-    // Vesper out of her mask (portrait c_vesper). Placed by scenes; in the snow, on the Clockwatch roof if she is a friend.
-    c_vesper: { name: 'Vesper', map: 1, hidden: true, card: false,
+    // Vesper out of her mask (portrait c_vesper; x1_story's SPECIAL person). On the breakwater with Ash after the Spire
+    // (friend), then on the Clockwatch roof in the snow. Nowhere else: no `at`, so no where entry means not there.
+    c_vesper: { name: 'Vesper', map: 1, card: false,
                 look: { skin: '#e6b896', hair: '#2a2430', hairdo: 'pony', shirt: '#e8c03a', outfit: 'coat', low: '#2a2436',
                         trim: '#c8c0d8', freckles: true, build: 'slim', scarf: '#6a5a7a', hold: 'clasp' },
-                where: [{ if: 'stage>=c_snow choice c_vesper=friend', at: [6795, 24612], lift: 58, pose: 'roof_sit' }] },
+                // (in the snow she is c_snow.js's v_roof, a look on the Clockwatch roof you can talk to; x1_story's own
+                //  c_snow Vesper in the street is turned off here)
+                where: [{ if: 'flag c_v_breakwater', at: 'bw_vesper' }, { if: 'stage>=c_snow', off: true }] },
   },
 
   place: {
@@ -32,8 +35,9 @@ chapter({
     bw_vesper:   { map: 1, at: [7120, 28965], kind: 'npc_spot', name: 'the breakwater' },
     bw_walk_off: { map: 1, at: [6700, 28930], kind: 'npc_spot', name: 'the breakwater, going home' },
     // the moths that cover the Spire door until Ash says what Vesper is (drawn over the legacy door c_spire_door)
+    // (the look draws nothing in state open, once the moths fly off)
     c_spire_door_moths: { map: 1, at: [7400, 30048], kind: 'prop', look: 'door_moths', state: 'covered',
-                          states: { covered: 'door_moths', open: 'none' }, name: 'the moths on the Spire door' },
+                          name: 'the moths on the Spire door' },
   },
 
   item: {
@@ -47,7 +51,7 @@ chapter({
     c_vesper_page: {
       mystery: 'moth_mask', look: 'vesper_page',
       title: ["Vesper's notebook: the night I got back", "Vesper's notebook"],
-      lines: [
+      text: [
         ['The Lady said: the night you get home, take the warm stone to the Moon Ring in the Moth Wood. So I did.', 'The Lady said: take the stone to the Moon Ring. So I did.'],
         ['Two moths came down out of the dark. A grey one, bigger than a ship, with painted eyes on her wings. And a white one that only ever says shhh.', 'Two moths came. A huge grey one. A white one that says shhh.'],
         ['The white one called the grey one MURMUR. The grey one called the white one HUSH. Nobody called me anything.', 'Their names are Murmur and Hush.'],
@@ -90,13 +94,14 @@ chapter({
       obj: ['The moths on the door ask what Vesper IS. Work it out in the Case Book', 'Open the Case Book'],
       hint: ['Fire that does not burn her. Pearl\'s stone. The claws she climbs with. Open the Case Book.', 'Open the Case Book.'] },
     { id: 'opens', do: 'cutscene c_door_opens', migrate_if: 'seen c_spire_in', then: ['set c_cousin', 'world c_spire_door_moths open'] },
-    // the Spire and Vesper's fight stay code (x1_dun_b, x1_foes); at 10 percent she kneels: the kneel scene is the choice
-    { id: 'fight', do: 'fight c_mothmask', at: 'c_spire_door', kneel: 'c_kneel', win: 'c_top',
+    // The Spire and Vesper's fight stay code (x1_dun_b, x1_foes). At 10 percent she kneels and the boss code's own hook
+    // (x1_story's c1SpireChoice, ENG does not run kneel) plays STORY.c_choice, which is this chapter's c_choice scene
+    // (a data scene with an old STORY key replaces it in place). Then x1_story's c1SpireOut plays STORY.c_warp_out (also
+    // this chapter's), takes Ash out to the breakwater at night and moves the stage to c_snow, where c_snow.js goes on
+    // with Nyxara's voice and the snow. `kneel` here names the scene for the checker (after a boss: 6 lines).
+    { id: 'fight', do: 'fight c_mothmask', at: 'c_spire_door', kneel: 'c_choice',
       obj: ['Climb the Shadow Spire to the roof', 'Climb the Spire'],
       hint: ['Fire turns the violet braziers gold and pushes the dark back. The dark is a shadow too: dash along it.', 'Light the braziers. Dash along the dark.'] },
-    { id: 'warp', do: 'cutscene c_warp_home', then: ['warp bw_end', 'time night', 'set c_choice_done'] },
-    { id: 'voice', do: 'cutscene c_moth_voice' },
-    { id: 'snow', do: 'cutscene c_snow_starts', then: ['stage c_snow'] },
   ],
 
   scene: {
@@ -126,38 +131,39 @@ chapter({
       ['narr', 'The moths go very still. Then they peel off the door all at once in a grey cloud, and the door swings open.', 'The moths fly off. The door opens.'],
       ['ash', '...How many greats is a cousin?', 'How many greats is a cousin?'],
     ],
-    // the kneel: every option shows; a locked one says why (the trust number is filled in by the engine)
-    c_kneel: [
-      { choose: 'c_vesper',
+    // the kneel (STORY.c_choice): every option shows; a locked one says why (the engine fills in {trust:vesper})
+    c_choice: [
+      { choose: 'c_vesper', who: 'narr',
         ask: ['Vesper drops to one knee. Her shadows melt into the floor. The violet light in her hand flickers, and she lifts her moth hooks one more time.', 'Vesper falls to one knee. She lifts her hooks one more time.'],
         pick: [
-          { t: ['Lower your sword. "Cousin. Why are you doing this?"', '"Cousin. Why are you doing this?"'], tone: 'kind',
-            if: 'trust vesper>=4',
-            locked: ["She doesn't trust you enough yet ({trust vesper} of 4).", "She doesn't trust you yet ({trust vesper} of 4)."],
-            then: ['choice c_vesper=friend', { journal: { c_vesper: ['You asked Vesper why, and she told you.', 'You asked Vesper why.'] } }],
+          { t: ['Lower your sword. "Cousin. Why are you doing this?"', '"Cousin. Why are you doing this?"'], tone: 'kind', v: 'friend',
+            need: 'trust vesper>=4',
+            locked: ["She doesn't trust you enough yet ({trust:vesper} of 4).", "She doesn't trust you yet ({trust:vesper} of 4)."],
+            then: ['choice c_vesper=friend', { journal: ['You asked Vesper why, and she told you.', 'You asked Vesper why.'], key: 'c_vesper' }],
             say: [
               ['narr', 'Vesper stares at you. Then she pulls off her mask and sits down on the edge of the roof, just a tired girl on a cold roof.', 'She takes off her mask and sits down. Just a tired girl.'],
-              ['c_vesper', 'There\'s a soft voice in my dreams. The Lady of the Moths. She calls me "little thief". She says she can give my family our fire back, and make Gran warm.', 'A voice in my dreams says she can give us fire and make Gran warm.'] ] },
-          { t: ['"Pearl wrote a letter. To you. To all of you."', '"Pearl wrote you a letter."'], tone: 'kind',
-            if: 'quest c_logbook done trust vesper>=3',
-            locked: [
-              { if: '!quest c_logbook done', t: ["You'd need the last page of Pearl's Logbook.", "You need Pearl's last logbook page."] },
-              { t: ["She doesn't trust you enough yet ({trust vesper} of 3).", "She doesn't trust you yet ({trust vesper} of 3)."] } ],
-            then: ['trust vesper +1', 'set c_pearl_letter', 'choice c_vesper=friend', { journal: { c_vesper: ['You read Vesper the letter Pearl wrote, and she told you everything.', 'You read Vesper Pearl\'s letter.'] } }],
+              ['c_vesper', 'There\'s a soft voice in my dreams. The Lady of the Moths. She calls me "little thief". She says she can give my family our fire back, and make Gran warm.', 'A dream voice says she can give us fire, and warm Gran.'] ] },
+          { t: ['"Pearl wrote a letter. To you. To all of you."', '"Pearl wrote you a letter."'], tone: 'kind', v: 'friend',
+            need: 'quest c_logbook done trust vesper>=3',
+            locked: ["This needs the last page of Pearl's Logbook, and trust 3 (now {trust:vesper}).", "Needs Pearl's last logbook page, and trust 3."],
+            then: ['trust vesper +1', 'set c_pearl_letter', 'choice c_vesper=friend', { journal: ['You read Vesper the letter Pearl wrote, and she told you everything.', 'You read Vesper Pearl\'s letter.'], key: 'c_vesper' }],
             say: [
-              ['ash', '"To my children with no fire. Fire isn\'t the only warm thing. Hands are warm. Soup is warm. I had no fire, so I built a city full of warm windows. You can too."', '"Fire isn\'t the only warm thing. I built a city of warm windows. You can too."'],
+              ['ash', '"To my children with no fire. Fire isn\'t the only warm thing. Hands are warm. Soup is warm. I had no fire, so I built a city full of warm windows. You can too."', '"Fire isn\'t the only warm thing. I built warm windows. So can you."'],
               ['narr', 'Vesper sits down on the cold glass, very suddenly, and pushes her mask up to wipe her eyes.', 'Vesper sits down. She wipes her eyes.'],
-              ['c_vesper', 'There\'s a soft voice in my dreams. The Lady of the Moths. She calls me "little thief". She says she can give my family our fire back, and make Gran warm.', 'A voice in my dreams says she can give us fire and make Gran warm.'] ] },
-          { t: ['Finish the fight.', 'Finish the fight.'], tone: 'brave',
-            then: ['choice c_vesper=foe', { journal: { c_vesper: ['You fought Vesper to the end. She threw you the Shard and glided away into the dark.', 'You fought Vesper. She threw you the Shard and flew away.'] } }],
+              ['c_vesper', 'There\'s a soft voice in my dreams. The Lady of the Moths. She calls me "little thief". She says she can give my family our fire back, and make Gran warm.', 'A dream voice says she can give us fire, and warm Gran.'] ] },
+          { t: ['Finish the fight.', 'Finish the fight.'], tone: 'brave', v: 'foe',
+            then: ['choice c_vesper=foe', { journal: ['You fought Vesper to the end. She threw you the Shard and glided away into the dark.', 'You fought Vesper. She threw you the Shard and flew away.'], key: 'c_vesper' }],
             say: [
               ['narr', 'You strike. She blocks, too slow. Her hooks clatter away across the glass, and her mask cracks and falls off.', 'You strike! Her hooks fly away. Her mask cracks.'] ] },
         ] },
     ],
-    // right after the fight: at most 6 lines along each branch. The truth lands in two lines; the rest is her page.
-    c_top: [
+    // right after the kneel (STORY.c_warp_out, played on the roof by x1_story's c1SpireOut): at most 6 lines along each
+    // branch. The boss sprite has gone in its puff, so Vesper (unmasked now) is placed back beside Ash. The truth lands
+    // in two lines; the rest is her notebook page in the Case Book.
+    c_warp_out: [
       { if: 'choice c_vesper=friend', then: [
-        ['c_vesper', 'But a moth as big as a ship cracked the Heart in three. Murmur. She flew right over Gearhaven, and every clock stopped.', 'A huge moth, Murmur, broke it in three. She stopped your clocks.', { payoff: 'murmur_named' }],
+        { place: ['c_vesper', 'player', [64, -24]] }, { anim: ['c_vesper', 'roof_sit'] },
+        ['c_vesper', 'But a moth as big as a ship cracked the Heart in three. Murmur. She flew right over Gearhaven, and every clock stopped.', 'A huge moth, Murmur, broke it in three. She stopped your clocks.', { payoff: 'c_vesper_page' }],
         { if: 'flag dr_c_whisper=go', then: [
           ['ash', 'She talks to me too. I told her to go away. Fire is for sharing, Vesper. You only had to ask.', 'She talks to me too. Fire is for sharing. You only had to ask.'] ],
           else: [{ if: 'quest c_oona done', then: [
@@ -167,59 +173,21 @@ chapter({
         ['ash', 'Cousin... how many greats is a cousin?', 'How many greats is a cousin?'],
         ['c_vesper', "None. Cousins don't get greats.", "None. Cousins don't get greats."],
         ['ash', "Then you're my favorite relative.", "Then you're my favorite relative."],
-        ['narr', 'She laughs, a small cracked laugh. Then she puts the Shard in your claw, warm as a fresh bun and violet as the sky after sunset, and a folded page from her notebook.', 'She laughs. She gives you the warm violet Shard, and a page.'],
-        { do: ['give c_shard1', 'set c_shard1', 'give c_vesper_page', 'page c_vesper_page'] } ],
+        { do: ['give c_shard1', 'set c_shard1', 'give c_vesper_page', 'page c_vesper_page', 'set c_v_breakwater'] },
+        ['narr', 'She laughs, and puts the Shard in your claw, warm as a fresh bun and violet as the sky after sunset, with a page from her notebook. A ring of warm light opens on the roof, and you jump in together.', 'She gives you the Shard and a page. You warp out together.'] ],
       else: [
+        { place: ['c_vesper', 'player', [92, -30]] },
         ['c_vesper', 'Fine. FINE. You win. You always win. Here\'s your stupid stone.', 'Fine. You win. Here is your stupid stone.'],
         ['narr', 'She throws something at your feet. Violet and warm, but small. Just a piece of the Heart, with one sharp edge, like a slice of a plum.', 'She throws down a small violet piece of the Heart.'],
         { do: ['give c_shard1', 'set c_shard1'] },
         ['ash', "This is a BIT of the Heart. Where's the rest?", 'This is just a bit. Where is the rest?'],
-        ['c_vesper', 'Ask the moon! A moth as big as a ship cracked it in three. Murmur. She flew right over your clocks!', 'Ask the moon! A huge moth broke it in three!', { payoff: 'murmur_named' }],
+        ['c_vesper', 'Ask the moon! A moth as big as a ship cracked it in three. Murmur. She flew right over your clocks!', 'Ask the moon! A huge moth broke it in three!', { payoff: 'c_vesper_page' }],
         ['c_vesper', "And the Lady wants ALL of it. She'll come for yours next, little ember!", 'The Lady wants all of it. She will come for yours!'],
-        ['narr', 'She runs to the edge and jumps. Her cloak opens like moth wings, and she glides away into the dark. A notebook page flutters down onto the glass where she stood.', 'She jumps and glides away. A page flutters down.'],
-        { do: ['give c_vesper_page', 'page c_vesper_page'] } ] },
+        { anim: ['c_vesper', 'glide'] }, { walk: ['c_vesper', 'player', [440, -380]] },
+        { do: ['give c_vesper_page', 'page c_vesper_page'] },
+        ['narr', 'She jumps off the edge and glides away into the dark on her moth cloak. A notebook page flutters down where she stood. Then a ring of warm light opens on the roof.', 'She glides away. A page flutters down. A warp ring opens.'] ] },
+      { do: ['set c_choice_done', 'warp bw_end'] },
     ],
-    c_warp_home: [
-      { if: 'choice c_vesper=friend', then: [
-        ['narr', "A ring of warm light opens on the roof, the way Pearl's warps do. Vesper grabs your arm, and you jump in together.", 'A ring of warm light opens. You and Vesper jump in.'],
-        { do: ['spawn c_vesper at bw_vesper'] } ],
-        else: [
-        ['narr', "A ring of warm light opens on the roof, the way Pearl's warps do. You step in, and the Spire falls away below you.", 'A ring of warm light opens. You step in.'] ] },
-    ],
-    // Nyxara's first words (THREADS N8), on the breakwater, looking back at the Spire: 6 lines a branch
-    c_moth_voice: [
-      { cam: 'c_spire_door', s: 4 },
-      ['narr', 'From the breakwater you look back. The moon goes dim, like a lamp turned down, and every moth on the Spire turns to face you.', 'You look back. The moon goes dim. Every moth turns to you.'],
-      ['nyxara', 'Thank you, little ember. You have been such a help.', 'Thank you, little ember. You helped so much.'],
-      ['nyxara', 'While you chased my little thief over the rooftops, my heralds flew north, and east, and nobody followed them.', 'While you chased my thief, my moths flew north and east.'],
-      { if: 'choice ending=warden', then: [['ash', 'Grandpa? Are you awake up there?', 'Grandpa? Are you awake?']],
-        else: [{ if: 'choice ending=heir', then: [['ash', 'Grandpa? Did you get out of your birdcage?', 'Grandpa? Did you get out of your cage?']],
-          else: [{ if: 'choice ending=lantern', then: [['ash', "Grandpa? ...No. Grandpa's at home eating the doormat.", 'Grandpa? No. He is at home.']],
-            else: [['ash', "...Grandpa? No. You're gone.", 'Grandpa? No. You are gone.']] }] }] },
-      ['nyxara', 'Oh, no, dear. Not him. Someone much, much older. Shh. Go to sleep.', 'No, dear. Not him. Someone much older. Shh.'],
-      { if: 'choice c_vesper=friend', then: [
-        ['c_vesper', "...That's her. That's the Lady. She sounded so kind in my dreams.", "That's her. The Lady. She sounded so kind."] ],
-        else: [
-        ['narr', 'The moths pour off the Spire in a grey river, up into the sky, and away north.', 'The moths fly up like a grey river, away north.'] ] },
-    ],
-    c_snow_starts: [
-      { if: 'choice c_vesper=friend', then: [
-        ['narr', 'The moths pour off the Spire in a grey river and fly away north. Then something cold lands on your nose.', 'The moths fly north. Something cold lands on your nose.'] ],
-        else: [
-        ['narr', 'Something cold lands on your nose.', 'Something cold lands on your nose.'] ] },
-      { do: ['set c_snow'] },
-      ['narr', 'Snow. Soft and white, drifting down out of a clear summer night.', 'Snow! Out of a summer night!'],
-      ['ash', "Is that... snow? It's MIDSUMMER.", "Is that snow? It's SUMMER!"],
-      { if: 'choice c_vesper=friend', then: [
-        ['c_vesper', "It's never snowed in Saltmarsh. Not once in Gran's whole life. I have to get home. She'll be frightened.", 'It never snows in Saltmarsh. I must go home to Gran.'],
-        ['c_vesper', "I'll find you, when it's time. Somebody has to stop you climbing anything stupid. You've got horns, cousin, not sense.", "I'll find you when it's time. You have horns, cousin, not sense."],
-        { walk: ['c_vesper', 'bw_walk_off'] }, { do: ['despawn c_vesper'] } ],
-        else: [{ if: 'flag pip', then: [
-        ['pip', 'Mip? (Pip snaps at a snowflake. Then another. He looks very offended that they taste of nothing.)', 'Mip? (Pip bites a snowflake. It tastes of nothing. He is cross.)'] ] }] },
-      { do: ['moon 95'] },
-      ['narr', 'That night the moon has a bite out of it. Just a small one. As if someone tasted it.', 'That night, the moon has a little bite out of it.'],
-    ],
-
     // ---- the Spire's own story keys (each replaces the old STORY[key] in place: x1_dun_b and x1_foes play them)
     c_spire_in: [
       ['narr', 'Inside, the Spire is black glass, cold as a winter window. Violet lamps burn without any heat. Far above, the moon shines through a hole in the roof.', 'Inside, the Spire is cold black glass. Violet lamps burn with no heat.'],

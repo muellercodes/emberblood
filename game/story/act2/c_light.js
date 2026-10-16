@@ -17,10 +17,11 @@ chapter({
   mom: [["A whole city's clock! I told the chickens.", 'You fixed a clock! I told the chickens.']],
 
   npc: {
-    // Captain Squawk: a small creature actor (no a10b look). He stands nowhere until a scene places him.
-    c_squawk: { name: 'Captain Squawk', map: 1, sprite: 'squawk', hidden: true, card: false },
-    // Vesper in her mask, as a scene actor (the heist thief sprite, see v10_art2b.js)
-    c_mask: { name: 'The Moth Mask', map: 1, sprite: 'moth_mask', hidden: true, card: false },
+    // Captain Squawk: a small creature actor (no a10b look, see CHANGES.md A2B). He stands nowhere until a scene places
+    // him, and goes when it ends.
+    c_squawk: { name: 'Captain Squawk', map: 1, sprite: 'squawk', card: false },
+    // (Vesper in her mask, c_mask, is ENG's legacy actor in map1_gear.js: x1_story's sighting sprite, posed with
+    //  v10_art2b.js's definePose('c_mask', 'moths' | 'stand' | 'shadow'))
     // Agatha's bird is Squawk, not a crow (audit finding 7): the parrot sits on her bun
     // (and a step west of the lamp post that stands in front of her today, so she and Squawk can be seen)
     c_agatha: { look: { crow: false }, overlay: 'squawk_shoulder', at: [12185, 28590] },
@@ -29,10 +30,11 @@ chapter({
   place: {
     gh_squawk_sky:  { map: 1, at: [7520, 25640], kind: 'npc_spot', name: 'the sky over the market' },
     gh_crash_spot:  { map: 1, at: [7255, 25872], kind: 'npc_spot', name: 'in front of the fruit stall' },
-    gh_fruit_spill: { map: 1, at: [7228, 25866], kind: 'prop', look: 'fruit_spill', state: 'tidy',
-                      states: { tidy: 'none', spilled: 'fruit_spill' }, name: 'the spilled fruit' },
+    // nothing is drawn while it is tidy (a state with no look draws nothing); Squawk's crash spills it
+    gh_fruit_spill: { map: 1, at: [7228, 25866], kind: 'prop', state: 'tidy',
+                      states: { spilled: 'fruit_spill' }, name: 'the spilled fruit' },
     // the Cut (verified walkable, level 2, both sides; the posts are legacy c_cut_post_w and c_cut_post_e)
-    c_cut_rope:  { map: 1, at: [9478, 26912], r: 34, kind: 'examine', look: 'cut_rope_fence',
+    c_cut_rope:  { map: 1, at: [9460, 26936], r: 34, kind: 'examine', look: 'cut_rope_fence',
                    name: 'the rope across the road', prompt: ['Look at the rope across the road', 'Look at the rope'] },
     c_cut_ends:  { map: 1, at: [9852, 26992], r: 28, kind: 'examine', look: 'cut_rope_ends',
                    name: 'the cut rope ends', prompt: ['Look at the cut ropes', 'Look at the ropes'] },
@@ -43,7 +45,7 @@ chapter({
     // posts (their colliders stand at its ends otherwise). Proven at runtime: a level 2 plateau over the deck (so the
     // cliff faces at both edges go) plus a lowered p2 drawbridge over the same rect (so the water under it does not
     // block) lets Ash walk across both ways. The plateau's own faces must not paint (see A2B_NOTES.md).
-    c_cut_bridge: { map: 1, kind: 'gate', gate: 'bridge', at: [9683, 26985], deck: [9520, 26966, 9846, 27004],
+    c_cut_bridge: { map: 1, kind: 'gate', gate: 'bridge', at: [9683, 27004], deck: [9520, 26966, 9846, 27004],
                     build: { plateau: { rect: [9520, 26966, 9846, 27004], lvl: 2, style: 'c_roof', noise: 0, faces: false } },
                     look: 'rope_bridge', name: 'the rope bridge over the Cut', payoff: { kind: 'shortcut', id: 'c_cut_bridge' } },
     c_cut_sign:  { map: 1, at: [9470, 27012], kind: 'sign', if: 'flag c_bridge',
@@ -173,7 +175,7 @@ chapter({
       ['c_mo', "The lighthouse went dark the night the clock stopped. Ships can't sail at night without it.", 'The lighthouse went dark. Ships cannot sail at night.'],
       ['c_mo', "And the rope bridge over the Cut is down. Chewed through, I bet. Admiral Pinch's crabs. They've always hated that bridge.", 'And the bridge over the Cut is down. Crabs did it, I bet.', { clue: 'l_crab_claim', ref: 'c_lm_cut' }],
       ['ash', "Then I'll swing across. I've got a TAIL.", "I'll swing across. I have a TAIL."],
-      { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_squawk_sky'] }, { do: ['despawn c_squawk'] },
+      { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_squawk_sky'] },
       ['c_squawk', '(already flying east) FOLLOW SQUAWK! FOLLOW SQUAWK!', 'FOLLOW SQUAWK!', { dir: ['gh_market', 'c_lighthouse_door', 'east'] }],
     ],
     c_look_rope: [
@@ -189,11 +191,11 @@ chapter({
     ],
     // after who_cut is solved (Squawk lands on the post: he heard Mo say crabs)
     c_cut_solved: [
-      { place: ['c_squawk', 'player', [44, -54]] }, { anim: ['c_squawk', 'perch'] },
+      { place: ['c_squawk', 'c_cut_post_e'] }, { anim: ['c_squawk', 'perch'] },
       ['ash', 'Vesper cut it, to slow me down. But first she tied a rope so nobody would walk off the edge.', 'Vesper cut it. But she made sure nobody would fall.'],
       ['ash', '...Who DOES that?', 'Who DOES that?'],
       ['c_squawk', 'NOT CRABS! NOT CRABS! TELL MO! SQUAWK!', 'NOT CRABS! TELL MO!', { promise: 'c_cut_bridge' }],
-      { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_squawk_sky'] }, { do: ['despawn c_squawk'] },
+      { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_squawk_sky'] },
       ['narr', 'Squawk flaps off toward Gearhaven, telling every gull he passes.', 'Squawk flies off to tell everyone.'],
     ],
     c_agatha_meet: [
@@ -225,13 +227,13 @@ chapter({
       { place: ['c_mask', 'player', [96, -70]] }, { anim: ['c_mask', 'moths'] }, { cam: 'c_mask', s: 0.6 },
       ['narr', 'Then the moths come back. Not for you. For Vesper. "Get off!" she yells. "I brought the stone! She SAID I\'d get my fire!"', 'The moths come back, for Vesper! "Get off! She said I would get fire!"'],
       { choose: 'c_lamp', ask: ['The moths hiss: "All of it. The Mother wants ALL of it." What do you do?', 'The moths hiss: "The Mother wants all of it." What do you do?'], pick: [
-        { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind',
+        { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind', v: 'saved',
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [
             ['narr', 'You roar fire across the Lamp Room. The moths scatter out of the windows. The fire rolls right over Vesper, and she does not even blink.', 'You roar fire! The moths fly off. Vesper is not even hurt!', { clue: 'l_fireproof' }],
             ['c_mask', '...Why do you keep DOING that?', 'Why do you keep DOING that?'],
             ['ash', 'Because you keep needing it.', 'Because you keep needing it.'] ] },
-        { t: ['"Where is the Ember Heart, Vesper?"', '"Where is the Heart, Vesper?"'], tone: 'brave',
+        { t: ['"Where is the Ember Heart, Vesper?"', '"Where is the Heart, Vesper?"'], tone: 'brave', v: 'asked',
           then: ['set c_lamp=asked'],
           say: [
             ['narr', 'She flinches at her name. Then she dives through the moths, straight through the burning wick, into the shadow under the lamp. Not one hair singed.', 'She jumps right through the fire into the shadow. Not even singed!', { clue: 'l_fireproof' }],
@@ -239,7 +241,7 @@ chapter({
       ] },
       { anim: ['c_mask', 'stand'] },
       ['c_mask', "Don't follow me. Not where I'm going.", "Don't follow me. Not where I'm going."],
-      { anim: ['c_mask', 'shadow'] }, { do: ['despawn c_mask'] },
+      { anim: ['c_mask', 'shadow'] },   // (actors leave when the scene ends)
     ],
     c_lamp_lit: [
       { if: 'item c_lampoil', then: [
@@ -259,7 +261,7 @@ chapter({
       ['ash', 'Something with wings bigger than a ship flew right over the coast. Clock, tide, lighthouse. All in one minute.', 'Something huge flew over. Clock, tide, light. One minute.'],
       { if: 'near c_agatha 500', then: [
         ['c_agatha', 'Big as a house, Squawk said. I told him to hush.', 'Squawk said big as a house. I told him to hush.'] ] },
-      ['ash', 'For once, Squawk was RIGHT. ...So where did it go?', 'Squawk was RIGHT. So where did it go?', { promise: 'murmur_named' }],
+      ['ash', 'For once, Squawk was RIGHT. ...So where did it go?', 'Squawk was RIGHT. So where did it go?', { promise: 'c_vesper_page' }],
     ],
 
     // ---- the lighthouse's own story keys. Each replaces the old STORY[key] in place, so x1_dun_b plays these.

@@ -1,11 +1,13 @@
 // ================= v10_art2b: art for A2b's Act II story data (c_light, c_spire, c_snow). Art only: this file calls
-// defineLook and definePose and nothing else. Every look is drawn in world coordinates at its place's anchor (x,y is
-// where the thing stands on the ground); `state` is the place's world state (or the actor's pose).
+// defineLook and definePose and nothing else. (x,y) is the foot of each look (its place's anchor) and every look fits
+// in its w x h box above it (e10c_gates caches a static look once per state; `live` and anim:true parts are drawn each
+// frame); `state` is the place's world state.
 //   Captain Squawk (a parrot actor: perch, fly, crash) and the Squawk on Agatha's bun, the market fruit he spills,
 //   the Cut (the rope across the road, the cut rope ends, the silk on the thorn bush, the rebuilt rope bridge),
 //   the lighthouse door (Agatha's logbook, Pearl's stone, the giant wing print in dust on the tower), the moths on the
 //   Spire door, the masked Vesper actor (stand, in a storm of moths, slipping into a shadow), Vesper sitting on the
-//   Clockwatch roof, her notebook page, and the scrap of grey silk on the Clockwatch chimney.
+//   Clockwatch roof (a pose, and a look for the snow) and gliding away on her cloak, her notebook page, and the scrap
+//   of grey silk on the Clockwatch chimney.
 // No em dash anywhere. Everything here is block scoped so no name can clash with another module.
 {
   const T2 = Math.PI * 2, OL = '#2a1a16';
@@ -59,34 +61,41 @@
       const fx = x - 10 * k + Math.sin(t * 2) * 4, fy = y - 8 * k - ((t * 6) % 14); el(g, fx, fy, 1.2 * k, 4 * k, Math.sin(t * 3), '#4ac04a', 0.6);
     }
   }
-  if (has) defineLook('squawk', { w: 30, h: 46, draw(g, x, y, t, state) { drawSquawk(g, x, y, t, state || 'perch', 1, 1); } });
-  if (hasPose) for (const p of ['perch', 'idle', 'fly', 'crash']) definePose('c_squawk', p, (g, x, y, t) => drawSquawk(g, x, y, t, p === 'idle' ? 'perch' : p, 1, 1));
+  if (has) defineLook('squawk', { w: 40, h: 60, anim: true, draw(g, x, y, t, state) { drawSquawk(g, x, y, t, state || 'perch', 1, 1); } });
+  // (one call per pose, written out, so the checker can see each one)
+  if (hasPose) {
+    definePose('c_squawk', 'perch', (g, x, y, t) => drawSquawk(g, x, y, t, 'perch', 1, 1));
+    definePose('c_squawk', 'idle', (g, x, y, t) => drawSquawk(g, x, y, t, 'perch', 1, 1));
+    definePose('c_squawk', 'fly', (g, x, y, t) => drawSquawk(g, x, y, t, 'fly', 1, 1));
+    definePose('c_squawk', 'crash', (g, x, y, t) => drawSquawk(g, x, y, t, 'crash', 1, 1));
+  }
   // Squawk on Agatha's shoulder (drawn on top of her every frame; her head is about 19 px above her feet)
-  if (has) defineLook('squawk_shoulder', { w: 18, h: 50, draw(g, x, y, t) {
+  if (has) defineLook('squawk_shoulder', { w: 44, h: 44, anim: true, draw(g, x, y, t) {
     const bob = Math.sin(t * 3.2) * 0.6, peck = (t % 7) < 0.25 ? 1 : 0;
     g.save(); g.translate(x + 9, y - 14 + bob); g.scale(0.74, 0.74); if (peck) g.rotate(0.25); squawkBody(g, t, 'perch'); g.restore();
   } });
 
   // ---------- the market: plums everywhere (the fruit stall Squawk crashed into)
-  if (has) defineLook('fruit_spill', { w: 70, h: 30, flat: true, draw(g, x, y, t) {
+  if (has) defineLook('fruit_spill', { w: 72, h: 26, draw(g, x, y, t) {
+    y -= 6;
     const fr = [[-22, 2, '#7a3a8a', 3.6], [-14, -3, '#7a3a8a', 3.4], [-6, 4, '#c83a2a', 3.8], [3, -2, '#7a3a8a', 3.5], [10, 5, '#e0c040', 3.2], [17, -1, '#7a3a8a', 3.4], [24, 3, '#c83a2a', 3.6], [-28, -4, '#7a3a8a', 3.2]];
     for (const [dx, dy, c, r] of fr) { shadow(g, x + dx + 1, y + dy + 2, r, r * 0.45, 0.22); ci(g, x + dx, y + dy, r, c, 1.1); ci(g, x + dx - r * 0.35, y + dy - r * 0.35, r * 0.32, 'rgba(255,255,255,.45)'); }
     // one green feather, rocking
-    g.save(); g.translate(x + 4, y + 9); g.rotate(0.5 + Math.sin(t * 2) * 0.15); el(g, 0, 0, 1.8, 6, 0, '#4ac04a', 0.8); line(g, [[0, -6], [0, 6]], '#2e8a3a', 0.6); g.restore();
+    g.save(); g.translate(x + 4, y + 9); g.rotate(0.5); el(g, 0, 0, 1.8, 6, 0, '#4ac04a', 0.8); line(g, [[0, -6], [0, 6]], '#2e8a3a', 0.6); g.restore();
   } });
 
   // ---------- the Cut
   // a rope tied across the road two steps before the edge (the road runs north-west to south-east here, so the rope
   // runs south-west to north-east across it), on two little stakes, with a fisher's knot
-  if (has) defineLook('cut_rope_fence', { w: 50, h: 60, draw(g, x, y, t) {
-    const ax = x + 18, ay = y - 24, bx = x - 18, by = y + 24, h = 11;
+  if (has) defineLook('cut_rope_fence', { w: 84, h: 66, draw(g, x, y, t) {
+    const ax = x + 36, ay = y - 48, bx = x, by = y, h = 11;   // (the foot is the south-west stake)
     for (const [sx, sy] of [[ax, ay], [bx, by]]) { shadow(g, sx + 1, sy + 1, 4, 1.6); poly(g, [[sx - 2, sy], [sx - 2, sy - h - 2], [sx, sy - h - 4], [sx + 2, sy - h - 2], [sx + 2, sy]], '#8a5a30', 1.2); }
-    rope(g, ax, ay - h + 1, bx, by - h + 1, 5 + Math.sin(t * 1.5) * 0.6, '#d8b878');
+    rope(g, ax, ay - h + 1, bx, by - h + 1, 5, '#d8b878');
     // the knot: a figure-eight loop at the north-east stake
     g.lineWidth = 1.3; g.strokeStyle = '#d8b878'; g.beginPath(); g.ellipse(ax - 2.5, ay - h + 3, 2.4, 1.6, 0.6, 0, T2); g.stroke(); g.beginPath(); g.ellipse(ax - 5, ay - h + 5, 2, 1.4, 0.6, 0, T2); g.stroke();
   } });
   // the bridge ropes cut clean at the east post: two stubs lying on the edge, their cut faces bright
-  if (has) defineLook('cut_rope_ends', { w: 50, h: 30, flat: true, draw(g, x, y, t) {
+  if (has) defineLook('cut_rope_ends', { w: 100, h: 40, draw(g, x, y, t) {
     // they run from the foot of the east post (20 px west and 26 px north of the anchor) west to the cliff edge,
     // and stop dead there
     for (const [oy, ex, ey] of [[-2, -40, -12], [4, -42, -3]]) {
@@ -94,23 +103,24 @@
       shadow(g, (sx + cx) / 2, (sy + cy) / 2 + 3, 12, 2.5, 0.2);
       g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo((sx + cx) / 2, (sy + cy) / 2 + 4, cx, cy); g.lineCap = 'butt'; g.strokeStyle = OL; g.lineWidth = 5; g.stroke(); g.strokeStyle = '#c8a46a'; g.lineWidth = 3.2; g.stroke();
       g.strokeStyle = 'rgba(90,60,30,.5)'; g.lineWidth = 0.8; for (let k = 0.15; k < 1; k += 0.18) { const qx = sx + (cx - sx) * k, qy = sy + (cy - sy) * k + 4 * k * (1 - k) * 2; g.beginPath(); g.moveTo(qx - 1.4, qy - 1.6); g.lineTo(qx + 1.4, qy + 1.6); g.stroke(); }
-      el(g, cx, cy, 1.6, 2.6, 0.2, '#fff4d0', 0.9); glow(g, cx, cy, 8, '255,250,220', 0.45 + 0.3 * Math.sin(t * 3 + oy));
+      el(g, cx, cy, 1.6, 2.6, 0.2, '#fff4d0', 0.9);
     }
-  } });
+  }, live(g, x, y, t) { for (const [oy, ex, ey] of [[-2, -40, -12], [4, -42, -3]]) glow(g, x + ex, y + ey, 8, '255,250,220', 0.45 + 0.3 * Math.sin(t * 3 + oy)); } });
   // a long thread of grey silk snagged on a thorn bush by the road
-  if (has) defineLook('grey_silk', { w: 50, h: 40, draw(g, x, y, t) {
+  if (has) defineLook('grey_silk', { w: 70, h: 32, draw(g, x, y, t) {
     shadow(g, x + 1, y + 2, 11, 4);
     for (const [dx, dy, r] of [[-5, -6, 6], [4, -7, 6.5], [0, -11, 6], [-1, -4, 7]]) ci(g, x + dx, y + dy, r, '#3e5a34', 1.1);
     g.strokeStyle = OL; g.lineWidth = 1; for (let i = 0; i < 9; i++) { const a = i / 9 * T2, r0 = 7, r1 = 10; g.beginPath(); g.moveTo(x + Math.cos(a) * r0, y - 7 + Math.sin(a) * r0 * 0.8); g.lineTo(x + Math.cos(a) * r1, y - 7 + Math.sin(a) * r1 * 0.8); g.stroke(); }
+  }, live(g, x, y, t) {
     const w = Math.sin(t * 2.2) * 4, w2 = Math.sin(t * 2.2 + 1) * 5;
     g.beginPath(); g.moveTo(x + 5, y - 9); g.bezierCurveTo(x + 14, y - 14 + w, x + 18, y - 4 + w2, x + 27, y - 9 + w); g.strokeStyle = 'rgba(40,36,52,.7)'; g.lineWidth = 2.6; g.stroke(); g.strokeStyle = '#d8d4ea'; g.lineWidth = 1.4; g.stroke();
     glow(g, x + 20, y - 8 + w, 7, '230,226,255', 0.3 + 0.2 * Math.sin(t * 4));
   } });
   // the rebuilt rope bridge over the Cut: planks between two hand ropes (state 'open' once Mo's crew has built it)
-  if (has) defineLook('rope_bridge', { w: 330, h: 50, flat: true, draw(g, x, y, t, state) {
+  if (has) defineLook('rope_bridge', { w: 340, h: 52, draw(g, x, y, t, state) {
     if (state && state !== 'open') return;
-    const x0 = x - 163, x1 = x + 163, yT = y - 19, yB = y + 19;
-    g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(x0, y + 8, x1 - x0, 18);
+    const x0 = x - 163, x1 = x + 163, yT = y - 38, yB = y;   // (the foot is the middle of the deck's south edge)
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(x0, y - 11, x1 - x0, 18);
     for (let px = x0 + 4; px < x1 - 2; px += 10) { const s = Math.sin((px - x0) / (x1 - x0) * Math.PI) * 4; g.fillStyle = OL; g.fillRect(px - 0.6, yT + 4 + s, 9.2, yB - yT - 6); g.fillStyle = (px / 10 | 0) % 3 ? '#a8743e' : '#b88448'; g.fillRect(px, yT + 5 + s, 8, yB - yT - 8); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(px, yT + 5 + s, 8, 2); }
     rope(g, x0, yT, x1, yT, 7, '#d8b878'); rope(g, x0, yB, x1, yB, 7, '#d8b878');
     for (let i = 1; i < 6; i++) { const px = x0 + (x1 - x0) * i / 6, s = Math.sin(i / 6 * Math.PI) * 7; line(g, [[px, yT + s * 0.9], [px, yT + 6 + s * 0.6]], '#c8a46a', 1.2); line(g, [[px, yB + s * 0.9], [px, yB - 4 + s * 0.6]], '#c8a46a', 1.2); }
@@ -118,7 +128,7 @@
 
   // ---------- the lighthouse door
   // Agatha's logbook, open on a little wooden stand, with a brass bell
-  if (has) defineLook('keeper_lectern', { w: 34, h: 50, draw(g, x, y, t) {
+  if (has) defineLook('keeper_lectern', { w: 46, h: 52, draw(g, x, y, t) {
     shadow(g, x + 2, y + 1, 11, 4);
     poly(g, [[x - 2.5, y], [x - 2.5, y - 24], [x + 2.5, y - 24], [x + 2.5, y]], '#7a4a24', 1.2);
     poly(g, [[x - 8, y], [x + 8, y], [x + 6, y - 3], [x - 6, y - 3]], '#6a3e1e', 1.1);
@@ -133,7 +143,7 @@
     line(g, [[x + 15, y - 30], [x + 18, y - 30]], OL, 1); ci(g, x + 18, y - 27, 2.6, '#e0b84a', 1);
   } });
   // Pearl's stone, set into the lighthouse wall: a horned girl with a tail and no fire, climbing, a lantern on her back
-  if (has) defineLook('pearl_stone', { w: 34, h: 44, draw(g, x, y, t) {
+  if (has) defineLook('pearl_stone', { w: 36, h: 44, draw(g, x, y, t) {
     shadow(g, x + 2, y + 1, 14, 4);
     poly(g, [[x - 14, y], [x - 14, y - 32], [x - 10, y - 38], [x + 10, y - 38], [x + 14, y - 32], [x + 14, y]], '#9a948a', 1.5);
     poly(g, [[x - 12, y - 2], [x - 12, y - 31], [x - 9, y - 35], [x + 9, y - 35], [x + 12, y - 31], [x + 12, y - 2]], '#aaa498');
@@ -147,12 +157,11 @@
     g.strokeRect(x - 6.5, y - 25.5, 3, 3.6);
     // two worn lines of letters
     g.lineWidth = 0.8; for (const [yy, w] of [[y - 9, 9], [y - 5.5, 7]]) { g.beginPath(); for (let i = -w; i < w; i += 2.2) { g.moveTo(x + i, yy); g.lineTo(x + i + 1.2, yy); } g.stroke(); }
-    if (Math.sin(t * 1.3) > 0.9) glow(g, x - 6, y - 24, 6, '255,220,150', 0.3);
-  } });
+  }, live(g, x, y, t) { if (Math.sin(t * 1.3) > 0.9) glow(g, x - 6, y - 24, 6, '255,220,150', 0.3); } });
   // the giant wing print in silver dust on the tower (the anchor stands east of the door; the tower's middle is about
   // 67 px west of it and its body rises from about 70 to 270 px above it)
-  if (has) defineLook('wing_print', { w: 140, h: 290, draw(g, x, y, t) {
-    const cx = x - 66, cy = y - 172, sh = 0.55 + 0.07 * Math.sin(t * 1.4);
+  if (has) defineLook('wing_print', { w: 220, h: 290, draw(g, x, y, t) {
+    const cx = x - 66, cy = y - 172, sh = 0.58;
     g.save(); g.globalAlpha = sh;
     // the forewing (the big one) and the hind wing, as if brushed on while passing
     g.beginPath(); g.moveTo(cx - 6, cy + 30); g.bezierCurveTo(cx - 34, cy - 10, cx - 30, cy - 86, cx + 4, cy - 92); g.bezierCurveTo(cx + 32, cy - 88, cx + 34, cy - 30, cx + 10, cy + 26); g.closePath();
@@ -164,11 +173,13 @@
     g.globalAlpha = sh * 0.7; g.strokeStyle = '#a8a0c8'; g.lineWidth = 1.2;
     for (const [a, b] of [[[cx, cy + 26], [cx - 18, cy - 60]], [[cx + 2, cy + 26], [cx + 6, cy - 88]], [[cx + 4, cy + 26], [cx + 24, cy - 50]], [[cx, cy + 32], [cx - 14, cy + 78]], [[cx + 4, cy + 32], [cx + 14, cy + 80]]]) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
     g.restore();
+  }, live(g, x, y, t) {
+    const cx = x - 66, cy = y - 172;
     for (let i = 0; i < 9; i++) { const k = (t * 0.6 + i * 0.37) % 1, px = cx - 24 + ((i * 53) % 50), py = cy - 80 + ((i * 97) % 160); glow(g, px, py, 4, '240,236,255', 0.5 * Math.sin(k * Math.PI)); }
   } });
 
   // ---------- the Spire door: moths, wings folded, painted eyes open, until Ash says what Vesper is
-  if (has) defineLook('door_moths', { w: 50, h: 70, draw(g, x, y, t, state) {
+  if (has) defineLook('door_moths', { w: 96, h: 128, anim: true, draw(g, x, y, t, state) {
     if (state === 'open') return;
     glow(g, x, y - 72, 44, '160,130,230', 0.22 + 0.06 * Math.sin(t * 2));
     for (let i = 0; i < 30; i++) {
@@ -188,8 +199,12 @@
       el(g, mx - 3.6, my, 4.6, 1.5 + 3.4 * f, 0.5, i % 4 ? '#b8b0c8' : '#8a8098', 0.8); el(g, mx + 3.6, my, 4.6, 1.5 + 3.4 * f, -0.5, i % 4 ? '#b8b0c8' : '#8a8098', 0.8);
     }
   }
-  if (has) defineLook('moth_mask', { w: 80, h: 90, draw(g, x, y, t, state) { mask(g, x, y, t, state || 'stand'); } });
-  if (hasPose) for (const p of ['stand', 'moths', 'shadow']) definePose('c_mask', p, (g, x, y, t) => mask(g, x, y, t, p));
+  if (has) defineLook('moth_mask', { w: 130, h: 90, anim: true, draw(g, x, y, t, state) { mask(g, x, y, t, state || 'stand'); } });
+  if (hasPose) {
+    definePose('c_mask', 'stand', (g, x, y, t) => mask(g, x, y, t, 'stand'));
+    definePose('c_mask', 'moths', (g, x, y, t) => mask(g, x, y, t, 'moths'));
+    definePose('c_mask', 'shadow', (g, x, y, t) => mask(g, x, y, t, 'shadow'));
+  }
 
   // ---------- Vesper (a friend) sitting on the eave of the Clockwatch roof in the snow, legs dangling, waving.
   // x,y is her seat on the eave (her npc entry lifts her there). Yellow oilskin, purple scarf, dark ponytail with one
@@ -219,10 +234,34 @@
     for (const s of [-1, 1]) poly(g, [[x + s * 2.6, y - 26.4], [x + s * 4.4, y - 30], [x + s * 4.2, y - 26]], '#f0e6d0', 0.9);
   }
   if (hasPose) definePose('c_vesper', 'roof_sit', roofSit);
+  // the same, as a look on the Clockwatch roof in the snow (c_snow's v_roof): the anchor is in the street in front of
+  // the hall and she sits on the eave 58 px above it
+  if (has) defineLook('vesper_roof', { w: 60, h: 100, anim: true, draw(g, x, y, t) { roofSit(g, x, y - 58, t); } });
+  // Vesper (unmasked) gliding off the Spire on her moth cloak, spread like wings with two pale eye-spots (foe ending)
+  function glide(g, x, y, t) {
+    const fl = Math.sin(t * 6) * 0.12, z = 30;
+    shadow(g, x, y + 2, 16, 5, 0.18);
+    g.save(); g.translate(x, y - z);
+    for (const s of [-1, 1]) {
+      g.save(); g.scale(s, 1); g.rotate(fl);
+      poly(g, [[2, -18], [26, -30], [34, -14], [22, -2], [4, -6]], '#7a6a92', 1.4);
+      poly(g, [[4, -6], [22, -2], [18, 8], [5, 4]], '#5e4e78', 1.2);
+      ci(g, 20, -16, 4, '#e0d8f0', 0.8); ci(g, 20, -16, 1.8, '#5a4a7a');
+      g.restore();
+    }
+    el(g, 0, -10, 4.4, 9, 0, '#e8c03a', 1.2);
+    ci(g, 0, -22, 4.6, '#e6b896', 1.1);
+    g.beginPath(); g.arc(0, -23.2, 4.9, Math.PI * 1.02, Math.PI * 1.98); g.closePath(); g.fillStyle = '#2a2430'; g.fill();
+    line(g, [[-1, -27], [2, -24]], '#d8d4e8', 1);
+    for (const s of [-1, 1]) poly(g, [[s * 2.2, -27.2], [s * 3.8, -30.6], [s * 3.6, -27]], '#f0e6d0', 0.8);
+    line(g, [[-2, -1], [-3, 6]], '#2a2436', 2.6); line(g, [[2, -1], [3, 6]], '#2a2436', 2.6);
+    g.restore();
+  }
+  if (hasPose) definePose('c_vesper', 'glide', glide);
 
   // ---------- Vesper's notebook page (the Case Book page's picture, and the page lying where she left it)
-  if (has) defineLook('vesper_page', { w: 30, h: 36, flat: true, draw(g, x, y, t) {
-    g.save(); g.translate(x, y - 14); g.rotate(-0.12 + Math.sin(t * 1.5) * 0.03);
+  if (has) defineLook('vesper_page', { w: 34, h: 38, draw(g, x, y, t) {
+    g.save(); g.translate(x, y - 15); g.rotate(-0.12);
     poly(g, [[-10, -13], [9, -14], [11, 12], [6, 13.5], [2, 12], [-3, 14], [-8, 12.5], [-11, 13]], '#f4ecd8', 1.3);
     g.strokeStyle = 'rgba(90,120,190,.5)'; g.lineWidth = 0.7; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(-8, -8 + i * 3.6); g.lineTo(8.5, -8.6 + i * 3.6); g.stroke(); }
     g.strokeStyle = 'rgba(40,30,50,.75)'; g.lineWidth = 0.8; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(-7, -7 + i * 3.6); for (let k = 0; k < 6; k++) g.lineTo(-7 + k * 2.2, -7.6 + i * 3.6 + (k % 2) * 0.9); g.stroke(); }
@@ -233,7 +272,7 @@
 
   // ---------- the foe ending's trace: a scrap of grey silk on the Clockwatch Hall's chimney. The anchor is in the street
   // in front of the hall (so it sorts in front of the house); the chimney top is 23 px west and 122 px up.
-  if (has) defineLook('clock_silk', { w: 40, h: 140, draw(g, x, y, t) {
+  if (has) defineLook('clock_silk', { w: 80, h: 142, anim: true, draw(g, x, y, t) {
     const cx = x - 23, cy = y - 122, w = Math.sin(t * 2.6);
     g.save(); g.translate(cx, cy); g.rotate(0.3 + w * 0.25);
     g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(8, 3 + w * 2, 13, 10); g.quadraticCurveTo(6, 9, 2, 13); g.quadraticCurveTo(3, 6, 0, 0); g.closePath();

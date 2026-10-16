@@ -30,15 +30,16 @@ act({
   trust: { vesper: 'c_trust', max: 7,
     banner: ['Vesper trusts you a little more.', 'Vesper trusts you more.'] },
 
-  // decided at the kneel at the top of the Spire (c_spire's c_kneel), read by later acts as G.choices.c_vesper
+  // decided at the kneel at the top of the Spire (c_spire's c_choice), shown in its c_warp_out, read by later acts as
+  // G.choices.c_vesper
   ending: {
-    friend: { at: 'c_spire', scene: 'c_top', choice: 'c_vesper=friend',
+    friend: { at: 'c_spire', scene: 'c_warp_out', choice: 'c_vesper=friend',
               if: { any: ['trust vesper>=4', 'trust vesper>=3 quest c_logbook done'] } },
-    foe:    { at: 'c_spire', scene: 'c_top', choice: 'c_vesper=foe', else: true },
+    foe:    { at: 'c_spire', scene: 'c_warp_out', choice: 'c_vesper=foe', else: true },
   },
 
-  // the end card (the `end_act` effect in c_snow calls endAct(2, this) and sets c_done)
-  end_card: {
+  // the end card (c_snow's `end_act 2` effect calls endAct(2, this); endAct sets act2_done and c_done)
+  end_act: {
     title: ['Act II: The Masked Thief', 'Act II: The Masked Thief'],
     lines: [
       ['Shard 1 of 3, the Dusk Shard. One more flew north. One more flew east.', 'You have 1 of 3 Shards.'],
