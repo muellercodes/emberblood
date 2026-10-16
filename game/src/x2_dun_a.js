@@ -601,6 +601,7 @@ function d2aPeople(A,def){
     if(o.id==='f_sigrid'){ o.onThaw=()=>{ d2aPlay('f_maze_sigrid',()=>d2aSigridKey(A,o)); }; if(p3Thawed(o)) d2aSigridKey(A,o,true); } }
   // the end chest before the altar; the Heart Ember waits there
   X.heartChest=A.objs.find(o=>o.tobj==='dchest'&&o.kind==='heart')||null;
+  for(const g of A.gates) if(g.type==='boss'&&g.link&&[g.link.a,g.link.b].some(id=>A.rooms[id]&&A.rooms[id].wind)) A.objs.push({k:'tv',kind:'d2awhirl',ref:g,x:g.x,y:g.y+40,id:g.id+'_wh'});
 }
 function d2aSigridKey(A,o,quiet){ if(AREA!==A) return; const id=`cv_${A.d2a.SK}_${o.room}_keytaken`; if(G.found[id]||A.objs.some(q=>q.id===id&&q.k==='smallkey')) return;
   A.objs.push({k:'smallkey',x:o.x+30,y:o.y+20,id,room:o.room,live:true}); if(!quiet){ SFX.play('chest'); emit(o.x+30,o.y,14,{col:'255,226,140',smin:30,smax:110,lmin:.3,lmax:.7,zmin:1.5,zmax:3}); setBanner(S('A small key','A small key'),S('Sigrid left it on the floor for you.','Sigrid left her key!'),2.2); } }
@@ -735,9 +736,12 @@ function d2aPaintMine(g,c,k,i,j,x,y,cs,st,rng,def){
 // a crevasse in the glacier (deep blue dark, icy lips) or the black pit of the dead forge (an ember glow far down)
 function d2aPaintCrevasse(g,c,k,i,j,x,y,cs,def,rng,forge){
   const ice=def.theme==='f_glacier'; const n=fbm(x*0.01,y*0.01,2);
-  g.fillStyle=ice?r2c('#0e1c36',n*0.1):r2c('#1a0e0c',n*0.12); g.fillRect(x,y,cs,cs);
-  if(!ice) for(let q=0;q<3;q++){ g.fillStyle=`rgba(255,${120+((rng()*80)|0)},50,${0.12+rng()*0.3})`; g.fillRect(x+rng()*cs,y+cs*0.3+rng()*cs*0.7,1.8,1.8); }
-  d2aPitCell(g,c,k,x,y,cs,'rgba(0,0,0,0)',ice?['#cfe6f6','#3a5a8a']:['#7a6a68','#2a1c1a']);
+  g.fillStyle=ice?r2c('#0e1c36',n*0.1):r2c('#0e0606',n*0.1); g.fillRect(x,y,cs,cs);
+  if(!ice){ // far below: cold slag with the last embers in its cracks
+    const gr=g.createRadialGradient(x+cs/2,y+cs*0.65,2,x+cs/2,y+cs*0.65,cs*0.75); gr.addColorStop(0,'rgba(200,70,30,.22)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(x,y,cs,cs);
+    g.strokeStyle='rgba(255,120,50,.32)'; g.lineWidth=1.2; g.beginPath(); const sx=x+rng()*cs, sy=y+cs*0.45+rng()*cs*0.5; g.moveTo(sx,sy); g.lineTo(sx+(rng()-0.5)*20,sy+(rng()-0.5)*10); g.lineTo(sx+(rng()-0.5)*26,sy+(rng()-0.5)*16); g.stroke();
+    for(let q=0;q<3;q++){ g.fillStyle=`rgba(255,${120+((rng()*80)|0)},50,${0.2+rng()*0.4})`; g.fillRect(x+rng()*cs,y+cs*0.3+rng()*cs*0.7,1.8,1.8); } }
+  d2aPitCell(g,c,k,x,y,cs,'rgba(0,0,0,0)',ice?['#cfe6f6','#3a5a8a']:['#8a7a76','#2a1c1a']);
   const lf=c.grid[k-1]===0&&!d2aDeep(c,k-1), rt=c.grid[k+1]===0&&!d2aDeep(c,k+1);
   if(lf){ g.fillStyle=ice?'rgba(200,230,255,.25)':'rgba(120,90,80,.35)'; g.fillRect(x,y,4,cs); }
   if(rt){ g.fillStyle='rgba(0,0,0,.35)'; g.fillRect(x+cs-4,y,4,cs); }
@@ -751,6 +755,8 @@ function d2aPaint(A,def){
   const solid=q=>q<0||q>=c.typ.length||(c.grid[q]===1&&c.typ[q]!==1);
   const bridge=new Set(); for(const id in c.rooms){ const R=c.rooms[id]; if(R.bridge&&G.found[d2aSolvedKey(def,id)]) for(const [bc,br] of R.bridge) bridge.add((R.oy+1+br)*w+R.ox+1+bc); }
   for(let k=0;k<c.typ.length;k++){ const i=k%w, j=(k-i)/w, x=i*cs, y=j*cs, t=c.typ[k];
+    // the pit cells again (the puzzle sigil of a brazier room is painted over everything by the stock canvas)
+    if(c.grid[k]===0&&!bridge.has(k)&&((t===TY.pit&&th==='f_forge')||(t===TY.chasm&&th!=='f_sky'))){ d2aPaintCrevasse(g,c,k,i,j,x,y,cs,def,rng,th==='f_forge'); continue; }
     if(c.grid[k]===0&&t===0){
       if(bridge.has(k)){ d2aPaintBridge(g,x,y,cs,th,rng,c,k); continue; }
       if(j>0&&dunHq(c,k-w)===1) continue;       // the face of a raised floor above stays
@@ -839,7 +845,7 @@ function d2aFloor(A,t){
   // prayer flags and chimes along the north wall of a room that has them
   for(const id in A.rooms){ const R=A.rooms[id]; if(!(R.flags||R.chimes)||!inView(R.cx,R.y0,R.x1-R.x0)) continue; d2aFlags(R,t); }
   // the whirlwind in the Roost doorway
-  for(const g of A.gates){ if(!d2aWindGate(A,g)||!inView(g.x,g.y,120)) continue; d2aWhirl(g.x,g.y,t); }
+  // (the whirlwind in the Roost doorway is an object, DUN_DRAW.d2awhirl, so it stands in front of the door)
 }
 function d2aFloeSpr(){ return p3Spr('d2a_floe',40,22,g=>{ g.fillStyle='#d8eefc'; rrect(g,-19,-20,38,18,7); g.fill(); g.fillStyle='#a8d0ee'; rrect(g,-19,-8,38,8,4); g.fill(); g.fillStyle='rgba(255,255,255,.8)'; rrect(g,-14,-17,18,3,1.5); g.fill(); }); }
 function d2aFlags(R,t){
@@ -849,9 +855,13 @@ function d2aFlags(R,t){
   if(R.chimes) for(const f of [0.25,0.5,0.75]){ const x=lerp(x0,x1,f), yy=y+13, sw=Math.sin(t*2.4+f*9)*4; ctx.strokeStyle='#8a6a3a'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,yy); ctx.lineTo(x+sw*0.3,yy+10); ctx.stroke(); for(let q=-1;q<=1;q++){ ctx.fillStyle='#ffd870'; ctx.fillRect(x+q*5+sw*0.5-1,yy+10,2.4,10+Math.abs(q)*-3+6); } }
 }
 function d2aWhirl(x,y,t){ ctx.save(); ctx.translate(x,y); ctx.lineCap='round';
-  for(let n=0;n<6;n++){ const a=t*6+n*1.05, r=18+n*7; ctx.strokeStyle=`rgba(${n%2?'230,245,255':'200,190,250'},${0.7-n*0.08})`; ctx.lineWidth=3.2-n*0.3; ctx.beginPath(); ctx.ellipse(0,-20-n*9,r,r*0.32,0,a,a+3.6); ctx.stroke(); }
+  ctx.fillStyle='rgba(120,150,230,.16)'; ctx.beginPath(); ctx.ellipse(0,-34,58,44,0,0,TAU); ctx.fill();
+  for(let n=0;n<6;n++){ const a=t*6+n*1.05, r=22+n*7, yy=-12-n*10;
+    ctx.strokeStyle=`rgba(59,34,51,${0.45-n*0.05})`; ctx.lineWidth=5.6-n*0.5; ctx.beginPath(); ctx.ellipse(0,yy,r,r*0.34,0,a,a+3.6); ctx.stroke();
+    ctx.strokeStyle=n%2?'rgba(150,190,255,.95)':'rgba(200,180,255,.95)'; ctx.lineWidth=3.4-n*0.35; ctx.beginPath(); ctx.ellipse(0,yy,r,r*0.34,0,a,a+3.6); ctx.stroke(); }
   ctx.restore(); }
 // ---- the objects (drawn among the figures, sorted by their foot)
+DUN_DRAW.d2awhirl=(g,t)=>{ if(!AREA||!d2aWindGate(AREA,g)) return; d2aWhirl(g.x,g.y+18,t); if(Math.random()<0.25) emit(g.x+rand(-40,40),g.y+rand(0,24),1,{col:'230,240,255',glow:false,ang:rand(0,TAU),spread:0.4,smin:40,smax:120,lmin:.2,lmax:.4,zmin:1.2,zmax:2.4,drag:2,alpha:0.6}); };
 DUN_DRAW.d2ablock=(b,t)=>{ if(b.gone) return; const A=AREA, cs=A.cave.cell, y=b.y+cs*0.42;
   p3Sh(b.x+3,y-2,24,8,0.28);
   if(b.kind==='stone'){ p3Put(d2aStoneSpr(),b.x,y-b.z); }
@@ -962,7 +972,7 @@ window.__ebX=Object.assign(window.__ebX||{},{d2a:{D2A,D2T,D2AN,
       a:{x:o.pts[0][0],y:o.pts[0][1]},b:{x:o.pts[o.pts.length-1][0],y:o.pts[o.pts.length-1][1]},lvA:p3StreamLv(o,0),lvB:p3StreamLv(o,o.L),landB:d2aRideLand(A,o,o.L),landA:d2aRideLand(A,o,0),bells:d2aRideBells(A,o)})); },
   // a real ride: Ash at one end of ribbon id, in the air, the ride starts (p3RideStart) and the game runs until he is down
   rideGo:(id,dir)=>{ const A=AREA, o=A&&A.p3&&A.p3.ribbons.find(q=>q.id===id); if(!o||!canWindride()||!p3StreamOn(o)) return null; const p=player, s=dir<0?o.L:0, e=p2PolyAt(o.pts,s);
-    p.x=e[0]; p.y=e[1]; p.z=20; p.vz=0; P3.mv=null; P3.ride=null; P3.reCd=0; P3.lx=p.x; P3.ly=p.y; p3RideStart(p,o,s,dir<0?-1:1); for(let i=0;i<300&&(P3.ride||P3.mv);i++) window.__eb.dunSim(1/30); window.__eb.dunSim(0.2); return tCell(p.x,p.y); },
+    p.x=e[0]; p.y=e[1]; p.z=20; p.vz=0; P3.mv=null; P3.ride=null; P3.reCd=0; P3.lx=p.x; P3.ly=p.y; p3RideStart(p,o,s,dir<0?-1:1); for(let i=0;i<300&&(P3.ride||P3.mv);i++){ if(scene==='dialogue'&&window.__eb.skipDialogue) window.__eb.skipDialogue(); window.__eb.dunSim(1/30); } window.__eb.dunSim(0.2); return tCell(p.x,p.y); },
   rideStart:(id,dir)=>{ const A=AREA, o=A&&A.p3&&A.p3.ribbons.find(q=>q.id===id); if(!o) return false; const p=player, s=dir<0?o.L:0, e=p2PolyAt(o.pts,s);
     p.x=e[0]; p.y=e[1]; p.z=20; p.vz=0; P3.mv=null; P3.ride=null; P3.reCd=0; P3.lx=p.x; P3.ly=p.y; p3RideStart(p,o,s,dir<0?-1:1); return true; },
   ups:()=>{ const A=AREA; if(!A||!A.p3) return []; const cs=A.cave.cell; return A.p3.ups.map(u=>{ let best=null, bd=cs*2.4; for(const o of A.p3.ribbons){ if(!p3StreamOn(o)) continue; const q=p2PolyD(o.pts,u.x,u.y); if(q.d<bd){ bd=q.d; best={id:o.id,s:q.s,dir:o.both&&q.s>o.L*0.5?-1:1}; } } return {id:u.id,room:u.room,k:u.ck,to:best}; }); },
@@ -973,6 +983,8 @@ window.__ebX=Object.assign(window.__ebX||{},{d2a:{D2A,D2T,D2AN,
   // can blue fire from cell k reach the point (x,y) (within r)? the jet's own trace (walls and shut doors stop it)
   jetFrom:(k,x,y,r)=>{ const q=tPos(k), ang=Math.atan2(y-q.y,x-q.x), ox=q.x+Math.cos(ang)*16, oy=q.y+Math.sin(ang)*16, d=Math.hypot(x-ox,y-oy), L=p3JetTrace(ox,oy,ang,p3JetLen()); return d<=L+(r||0); },
   jetFromXY:(px,py,x,y,r)=>{ const ang=Math.atan2(y-py,x-px), ox=px+Math.cos(ang)*16, oy=py+Math.sin(ang)*16, d=Math.hypot(x-ox,y-oy), L=p3JetTrace(ox,oy,ang,p3JetLen()); return d<=L+(r||0); },
+  // perf sanity: the average cost of one drawn frame here (ms)
+  renderMs:n=>{ n=n||30; const t=performance.now(); for(let i=0;i<n;i++) render(); return +((performance.now()-t)/n).toFixed(2); },
   quiet:()=>{ try{ MV.tip=null; }catch(e){} G.banner=null; G.bannerQ=[]; return true; },
   info:()=>{ const A=AREA; if(!A||!A.d2a) return null; const X=A.d2a; return {area:A.id,root:X.root,flood:d2aFlood(),blocks:X.blocks.length,vents:X.vents.length,portals:X.portals.length,wheels:X.wheels.length,plates:X.plates.length,sculpt:X.sculpt.length,props:X.props.length,pud:X.pud.size,frz:X.frz.size,cover:X.cover.size,sl:!!X.sl}; }
 }});
