@@ -577,7 +577,7 @@ function d3aOverPaint(A,def){
     } }
   // the Drowned Library's walls are bookcases: a wooden top and rows of spines on the face
   for(const id in A.rooms){ const R=A.rooms[id]; if(!R.shelves) continue;
-    for(let j=R.oy+1;j<R.oy+12;j++) for(let i=R.ox+1;i<R.ox+16;i++){ const k=j*c.w+i; if(c.grid[k]!==1||c.typ[k]>=250||!open(i,j+1)) continue; const x=i*cs, y=j*cs, fy=y+cs*0.6, fh=cs*0.4;
+    for(let j=R.oy+1;j<R.oy+12;j++) for(let i=R.ox+1;i<R.ox+16;i++){ const k=j*c.w+i; if(c.grid[k]!==1||c.typ[k]>=60||!open(i,j+1)) continue; const x=i*cs, y=j*cs, fy=y+cs*0.6, fh=cs*0.4;
       g.fillStyle='#7a5a3e'; g.fillRect(x+1,y+cs*0.12,cs-2,cs*0.48); g.fillStyle='rgba(255,230,190,.18)'; g.fillRect(x+1,y+cs*0.12,cs-2,3);
       g.fillStyle='#4a3020'; g.fillRect(x,fy,cs,fh); let bx=x+3;
       while(bx<x+cs-5){ const bw=3+Math.floor(rng()*4), bh=fh*(0.55+rng()*0.4); g.fillStyle=['#8a3c3c','#3c5a8a','#5a7a3c','#9a7a3a','#6a4a8a','#2f6a6a'][Math.floor(rng()*6)]; g.fillRect(bx,fy+fh-bh-1,bw,bh); g.fillStyle='rgba(255,255,255,.18)'; g.fillRect(bx,fy+fh-bh-1,1,bh); bx+=bw+1; }
