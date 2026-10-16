@@ -309,11 +309,14 @@ function startFishing(spot){
 function updateFishing(dt,inp){
   const F=G.fishing; if(!F) return;
   if(dist(player.x,player.y,F.px,F.py)>12||G.inCombat){ G.fishing=null; return; }
-  if(F.bite>0){ F.bite-=dt; if(inp.use||inp.attack){ G.fishing=null; catchFish(F.spot); return; } if(F.bite<=0){ G.fishing=null; setBanner('It got away','',1.2); } return; }
+  if(F.bite>0){ F.bite-=dt; if(inp.use||inp.attack){ G.fishing=null; FISH_AT=F.spot; try{ catchFish(F.spot); } finally{ FISH_AT=null; } return; } if(F.bite<=0){ G.fishing=null; setBanner('It got away','',1.2); } return; }
   if(inp.use){ G.fishing=null; setBanner('Too soon!','The fish got away.',1.2); return; }
   F.t-=dt; if(F.t<=0){ F.bite=0.95; SFX.play('hit'); G.ripples.push({x:F.wx,y:F.wy,t:0,max:0.8,r:18,splash:true}); }
 }
+// the spot the bite came from (wrappers of catchFish elsewhere drop its argument)
+let FISH_AT=null;
 function catchFish(spot){
+  spot=spot||FISH_AT;
   // the Frostpine ice hole: the fish up there are so cold they crunch (Dell pays for one, see his rumor)
   if(spot&&spot.icehole&&!(G.items.a1_coldfish>0)&&!G.found.a1_dellfish){ giveItems({a1_coldfish:1},true); G.stats.fish=(G.stats.fish||0)+1; setBanner(S('A crunchy Frostpine fish!','A crunchy fish!'),S('It is frozen stiff. Dell in Brindlecross wanted one.','Dell wanted one of these!'),2.4); SFX.play('upgrade'); return; }
   const r=Math.random();
