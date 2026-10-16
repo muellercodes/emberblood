@@ -67,6 +67,8 @@ const CB10={wrong:{},flash:{},bookR:null,iconCache:new Map(),openAt:0};
 .cb10-page b{display:block;color:var(--gold);margin:0 0 6px;font-size:16px}
 .cb10-page p{margin:0 0 6px;color:var(--ink);font-size:15px;line-height:1.5}
 html.sb .cb10-page{background:#fffdf6;border:2px solid #3b2233;box-shadow:0 3px 0 rgba(59,34,51,.85)}
+.cb10-closed{margin:0 0 10px;padding:10px 12px;border-radius:12px;border:2px solid rgba(120,210,130,.7);background:rgba(110,200,120,.1);color:var(--ink);font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+html.sb .cb10-closed{background:#eaf8e4;border-color:#3b8a4a}
 .cb10-ans{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:16px;font-weight:800;color:var(--ink)}
 .cb10-stamp{display:inline-block;transform:rotate(-6deg);border:3px solid #5ac86a;color:#5ac86a;border-radius:8px;padding:0 8px;font-size:13px;font-weight:900;letter-spacing:.12em}
 .cb10-q.solved.just .cb10-stamp{animation:cb10pop .6s ease-out}
@@ -175,6 +177,8 @@ function cbHtml(){
         `</div>${W&&W.hint?`<div class="cb10-hint" role="status"><b>${E(S('Hmm.','Hmm.'))}</b> ${escapeHtml(W.hint)}</div>`:''}`+
         (bonus.length?`<div class="cb10-bonus"><b>${E(S('Extra clues','Extra clues'))}</b>${bonus.map(c=>{ const K=S10.clues[c]; return `<span>${cbIcon(K&&K.icon)}${E(K?s10T(K.text):c)}</span>`; }).join('')}</div>`:'')+`</div>`);
     }
+    // the mystery's closing line (act mystery `solved: [full, simple]`) once every one of its questions is answered
+    { const ids=s10Arr(m.def.deduce).length?s10Arr(m.def.deduce):m.qs.map(q=>q.D.id); if(m.def.solved&&ids.length&&ids.every(id=>C.solved[id])) rows.push(`<div class="cb10-closed"><span class="cb10-stamp">${E(S('CASE CLOSED','CASE CLOSED'))}</span> ${E(s10T(m.def.solved))}</div>`); }
     if(m.clues.length){ rows.push('<div class="cb10-cards">'); for(const id of m.clues){ const K=S10.clues[id]; rows.push(`<div class="cb10-card">${!C.seen[id]?`<span class="cb10-new">${E(S('NEW','NEW'))}</span>`:''}<span class="cb10-ic">${cbIcon(K&&K.icon)}</span><p>${E(K?s10T(K.text):id)}</p></div>`); } rows.push('</div>'); }
     rows.push('</section>');
   }
