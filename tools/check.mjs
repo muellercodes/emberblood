@@ -790,6 +790,7 @@ export function runChecks(M, opts = {}) {
     }
   }
 
+  const info = { gates: [], gatesMin: {}, quests: {}, scenes: {} };
   // ---------- 3, 8, 9: the act walk
   const state0 = () => ({ powers: new Set(), items: new Set(), flags: new Map(), clues: new Set(), solved: new Set(), trust: {}, bonus: [], quests: new Set(), seen: new Set(), stage: null, act: 0, events: new Set() });
   const clone = (s) => ({ powers: new Set(s.powers), items: new Set(s.items), flags: new Map([...s.flags].map(([k, v]) => [k, new Set(v)])), clues: new Set(s.clues), solved: new Set(s.solved), trust: Object.assign({}, s.trust), bonus: s.bonus.slice(), quests: new Set(s.quests), seen: new Set(s.seen), stage: s.stage, act: s.act, events: new Set(s.events) });
@@ -1128,7 +1129,7 @@ export function runChecks(M, opts = {}) {
     if (!e || seen.has(entId)) return null;
     seen.add(entId);
     if (e.payoff && PAYOFF_KINDS.has(e.payoff.kind)) return e.payoff.kind;
-    for (const ef of arr(e.then)) if (isStr(ef)) { const w = ef.split(/\s+/); if (['heart_ember', 'power', 'upgrade', 'weapon'].includes(w[0])) return w[0] === 'weapon' ? 'power' : w[0]; if (w[0] === 'clue' && feedsMain(w[1])) return 'truth'; if (w[0] === 'give' && mainUsesItem(w[1])) return 'item_main'; }
+    for (const ef of arr(e.then)) if (isStr(ef)) { const w = ef.split(/\s+/); if (['heart_ember', 'power', 'upgrade', 'weapon'].includes(w[0])) return w[0] === 'weapon' ? 'power' : w[0]; if (w[0] === 'clue' && feedsMain(w[1])) return 'truth'; if (w[0] === 'give' && mainUsesItem(w[1])) return 'item_main'; if (w[0] === 'open' || (w[0] === 'world' && /open|built|rebuilt|down|lowered/.test(w[2] || ''))) return 'shortcut'; }
     for (const l of arr(e.loot)) {
       if (!isStr(l)) continue;
       const w = l.split(/\s+/);
@@ -1160,6 +1161,8 @@ export function runChecks(M, opts = {}) {
       if (!p) FAIL('backtrack', `gate ${g.id} (${g.gate}, map ${g.map}) leads to ${g.leads}, which pays off nothing from the payoff list`, loc);
       g.payoffFound = p;
     }
+    info.gates.push(...gates.map((g) => ({ id: g.id, act: n, gate: g.gate, power: GATE_POWER[g.gate], map: g.map, at: g.at, leads: g.leads || null, payoff: g.payoffFound || null, owner: g.owner ? g.owner.id : null, file: g.file, line: g.line })));
+    info.gatesMin[n] = min;
     return gates;
   }
   for (const q of Object.values(M.quests)) {
@@ -1180,6 +1183,7 @@ export function runChecks(M, opts = {}) {
       default: break;
     }
     if (!ok) FAIL('quest', `side quest ${q.id}: payoff ${p.kind}${p.id ? ' ' + p.id : ''} is not delivered (${why})`, loc);
+    info.quests[q.id] = { ok, kind: p.kind, id: p.id || null, why: ok ? '' : why };
   }
 
   // ---------- 5. scene length (per branch, after a boss 6)
@@ -1221,6 +1225,7 @@ export function runChecks(M, opts = {}) {
     const boss = afterBoss.get(id);
     const max = boss ? AFTER_BOSS_MAX : SCENE_MAX;
     sc.len = n; sc.afterBoss = boss || null;
+    info.scenes[id] = { len: n, max, afterBoss: boss || null, owner: sc.owner ? sc.owner.id : null };
     if (n > max) FAIL('length', `${id}: ${n} lines${boss ? ` after boss ${boss}` : ''} (max ${max})`, W(sc.owner, { file: sc.file, line: sc.line, scene: id }));
   }
 
@@ -1288,7 +1293,7 @@ export function runChecks(M, opts = {}) {
     }
   }
 
-  return { fails, warns, walk: walkLog, order: ORDER, afterBoss: Object.fromEntries(afterBoss) };
+  return { fails, warns, walk: walkLog, order: ORDER, afterBoss: Object.fromEntries(afterBoss), info };
 }
 
 // which fixture flags and choices the old code (main at BASE_REF) read: a Set, or null when git is not there
@@ -1373,7 +1378,7 @@ export async function main(argv) {
   const json = {
     ok: res.fails.length === 0, act: act != null ? +act : null, ms: Date.now() - t0,
     counts: { fail: res.fails.length, warn: res.warns.length, files: M.files.length, chapters: Object.keys(M.chapters).length, quests: Object.keys(M.quests).length, entities: Object.keys(M.ents).length, clues: Object.keys(M.clues).length, deductions: Object.keys(M.deduce).length, scenes: Object.keys(M.scenes).length },
-    fails: res.fails, warns: res.warns, walk: res.walk, order: res.order,
+    fails: res.fails, warns: res.warns, walk: res.walk, order: res.order, info: res.info,
   };
   writeFileSync(join(outDir, 'check.json'), JSON.stringify(json, null, 1));
   if (!argv.includes('--quiet')) {
