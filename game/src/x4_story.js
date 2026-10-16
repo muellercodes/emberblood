@@ -645,7 +645,7 @@ n4sDef('n_dawn_lines',()=>{
   if(e==='heir'&&(N4ST.big>0.05||G.flags.n_big)) L.push(n4sDo(()=>{ N4ST.bigTo=0; }),xl('narr',`You shrink back to your normal size, which is a relief. The Moon Door was not built for dragons your size.`,`You shrink back to normal. Good thing!`));
   L.push(n4sDo(()=>{ N4ST.dawnTo=1; N4ST.cam={x:4500,y:85100,k:0.5}; }),
     xl('narr',`As the light comes back, the black glass of the peak turns as clear as water. Little white flowers push up through the cracks. Nobody knows where they came from.`,`The black glass turns clear. Little white flowers grow in the cracks.`),
-    n4sDo(()=>{ N4ST.duchShow=1; N4ST.cam={x:4500,y:84860,k:0.6}; }),
+    n4sDo(()=>{ N4ST.duchShow=1; const D=n4sDuchPlace(); N4ST.cam={x:D.x,y:D.y,k:0.5}; }),
     xl('narr',`And there, at the very top of the summit, where nothing could possibly have climbed...`,`And there, at the very top, where nobody could climb...`),
     xl('goat',`Meh.`,`Meh.`),
     {who:'ash',text:S(`DUCHESS?! HOW?!`,`DUCHESS?! HOW?!`),fn:()=>n4sDuchessSeen()},
@@ -1046,6 +1046,8 @@ defineStages(5,[
 defineAct(5,{name:S('Nightfall Peak','Nightfall Peak'),map:4,arrive:'n_bridge',at:{x:13450,y:65450},intro:o=>n4sActIntro(o||{})});
 // the Act IV hand-off: Ash is on the Moon Pier; the bridge is open from the first stage on
 function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself (x4_world reads reached('n_bridge')) */ }
+// during the finale the stock "Travel to <site>" lines for older boss sites would pull Ash off the peak: only the peak's own
+{ const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5) return out.filter(o=>!o.site||/^n_/.test(String(o.site))); }catch(e){} return out; }; }
 
 // ---------- 4. the departure (before the fade), the arrival, the Bridgefoot
 // the moonfire bridge from Moonfall: the first time, the departure plays on the Moon Pier, then the fade
@@ -1548,6 +1550,9 @@ function n4sFallPlay(){
   for(const q of G.enemies) if(!q.dead&&!q.boss){ q.dead=true; try{ puff(q.x,q.y); }catch(err){} }
   for(const pr of G.projectiles) if(pr.owner==='enemy') pr.dead=true;
   G.fz=[]; N4ST.cam={x:4500,y:85150,k:0.55};
+  // the climax gets the screen to itself; and Ash stands where the scene can see both of them
+  G.banner=null; if(Array.isArray(G.bannerQ)) G.bannerQ.length=0;
+  if(player&&dist(player.x,player.y,4500,85250)>460){ player.x=4500; player.y=85440; try{ updateCam(0,true); }catch(err){} }
   const L=[...STORY.n_fall];
   if(n4sMercy()) L.push(...STORY.n_plea); else L.push(...n4sClosedLines());
   L.push(ch('ash',S(`What will you do?`,`What will you do?`),[
@@ -1574,7 +1579,7 @@ function n4sAfterChoice(){
   n4sWhen('dawn',null,()=>n4sDawn(),true);
 }
 function n4sDawn(){
-  N4ST.run=true; if(!N4ST.cut){ n4sCutFall(true); const C=N4ST.cut; C.nyx.alpha=0; C.nyx.mode='gone'; C.fill=C.fillTo=1; C.whole=1; if(G.choices.n_end==='embermoon') C.gold=C.goldTo=1; }
+  N4ST.run=true; if(!N4ST.cut){ if(player&&curMap()===4&&!AREA&&dist(player.x,player.y,4500,85250)>460){ player.x=4500; player.y=85440; try{ updateCam(0,true); }catch(err){} } n4sCutFall(true); const C=N4ST.cut; C.nyx.alpha=0; C.nyx.mode='gone'; C.fill=C.fillTo=1; C.whole=1; if(G.choices.n_end==='embermoon') C.gold=C.goldTo=1; }
   if(typeof moonRestore==='function') moonRestore(); else G.flags.moon=100;
   if(N4ST.cut) N4ST.cut.fillTo=1;
   n4sPlay('n_dawn_lines',()=>{ N4ST.dawnTo=1; G.flags.n_dawn=1; n4sWhen('epi',null,()=>n4sEpilogue(),true); },{again:true,mood:'n_dawn'});
@@ -1617,7 +1622,10 @@ function n4sVictory(){
 function n4sFreeRoam(){ N4ST.cut=null; N4ST.cam=null; N4ST.ally={}; N4ST.allies=[]; G.flags.n_dawn=1; G.flags.n_epi=0; try{ if(typeof n4Sync==='function') n4Sync(); }catch(e){} }
 // Duchess on the summit from the dawn on (her last sighting: Meh.)
 function n4sDuchObj(){ if(!G||!(N4ST.duchShow||G.flags.n_dawn>=1||G.done)||curMap()!==4||AREA) return null; if(!(G.choices.n_end)) return null;
-  const D=N4ST.duch||(N4ST.duch={x:4500,y:84800,face:Math.PI/2,t:0,kind:'goat',moving:false,id:'n_duchess_goat'}); D.t=G.time; return D; }
+  const D=N4ST.duch||(N4ST.duch={x:4470,y:84900,face:Math.PI/2,t:0,kind:'goat',moving:false,id:'n_duchess_goat'}); D.t=G.time; return D; }
+// at the dawn she stands up the slope from Ash and a little to the left (the mended moon hangs top right of the screen)
+function n4sDuchPlace(){ const p=player, D=N4ST.duch||(N4ST.duch={face:Math.PI/2,t:0,kind:'goat',moving:false,id:'n_duchess_goat'});
+  D.x=clamp(p.x-70,4250,4750); D.y=clamp(p.y-190,84800,85700); D.face=Math.atan2(p.y-D.y,p.x-D.x); D.t=G.time; return D; }
 function n4sDuchessSeen(){ if(G.flags.n_duchess) return; G.flags.n_duchess=1; try{ addCoins(30,player.x,player.y); gainXp(60); }catch(e){} }
 function n4sDuchTalk(){ const first=!G.flags.n_duchess; runDialogue([xl('goat',`Meh.`,`Meh.`),...(first?[xl('ash',`How did you even get up here? There's a MOAT.`,`How did you get up here?`),xl('goat',`Meh.`,`Meh.`)]:[])],()=>{ scene='play'; n4sDuchessSeen(); saveGame(); }); }
 // ---------- the cutscene on the summit: Nyxara fallen, the moon filling, and what each ending does (world and sky)
