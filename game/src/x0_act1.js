@@ -1350,7 +1350,7 @@ const A1V={wall:{y:8792,x0:1950,x1:3262,th:10,seg:44},
   gates:{west:{x:2386,hw:50,sign:'FROSTPINE GATE'},north:{x:2800,hw:52,sign:'NORTH GATE'}},
   // the bootprints: from the Hollow Ward under the old oak, up the War Camp road to the North Gate
   prints:[[2580,9128],[2650,9112],[2710,9068],[2734,8996],[2758,8916],[2780,8846],[2798,8806]],
-  icehole:{x:1830,y:3650}, osric:null};
+  icehole:{x:1210,y:3580}, osric:null};
 // the North Gate: shut before the raid; open and broken from the raid until the mystery is solved; then mended, with a
 // shiny new padlock. Solved = Fennick has been confronted (old saves: G.choices.fennick) or the Case Book says so.
 function a1GateSolved(){ return !!(G&&((G.choices&&G.choices.fennick)||(G.flags&&G.flags.a1_gate_solved))); }
