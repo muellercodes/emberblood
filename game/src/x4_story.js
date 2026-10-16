@@ -784,7 +784,8 @@ function n4sBookDraw(){
 }
 // the painted scenes: a 1000 x 560 storybook plate, scaled to the screen (the dialogue box covers the bottom)
 function n4sPaint(g,w,h,k,t,pane){
-  const sc=Math.min(w/1000,h*0.64/560), ox=w/2-500*sc, oy=Math.max(54,h*0.07);
+  // on a tall phone screen the plate is cropped a little at the sides and sits in the middle of the space above the words
+  const port=h>w*1.2, sc=port?Math.min(w/800,h*0.64/560):Math.min(w/1000,h*0.64/560), ox=w/2-500*sc, oy=port?Math.max(100,h*0.44-280*sc):Math.max(54,h*0.07), yT=port?-oy/sc:0;
   const R=mulberry32(77+(k||'').length*13);
   // sky
   const SK={green:['#2a1e4e','#8a4a7a','#f2a46a'],clocks:['#3a5a9a','#f0a0a8','#ffd890'],hearth:['#0e1a3a','#24406e','#5a7ab0'],observatory:['#120a2c','#2e1e5a','#6a4a8a'],
@@ -793,7 +794,7 @@ function n4sPaint(g,w,h,k,t,pane){
   g.fillStyle=SK[0]; g.fillRect(0,0,w,oy);
   g.save(); g.translate(ox,oy); g.scale(sc,sc);
   const x0=-ox/sc-20, x1=(w-ox)/sc+20, yB=(h-oy)/sc+20;
-  const stars=(n,a)=>{ for(let i=0;i<n;i++){ const x=x0+R()*(x1-x0), y=R()*300, s=R()*1.6+0.5, tw=0.5+0.5*Math.sin(t*(1+R()*2)+i); g.fillStyle=`rgba(255,250,235,${(0.2+0.6*tw*R())*a})`; g.beginPath(); g.arc(x,y,s,0,TAU); g.fill(); } };
+  const stars=(n,a)=>{ for(let i=0;i<n;i++){ const x=x0+R()*(x1-x0), y=yT+R()*(300-yT), s=R()*1.6+0.5, tw=0.5+0.5*Math.sin(t*(1+R()*2)+i); g.fillStyle=`rgba(255,250,235,${(0.2+0.6*tw*R())*a})`; g.beginPath(); g.arc(x,y,s,0,TAU); g.fill(); } };
   const glow=(x,y,r,col,a)=>{ const q=g.createRadialGradient(x,y,0,x,y,r); q.addColorStop(0,`rgba(${col},${a})`); q.addColorStop(1,`rgba(${col},0)`); g.fillStyle=q; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); };
   const hill=(y0,amp,f,col)=>{ g.fillStyle=col; g.beginPath(); g.moveTo(x0,yB); for(let x=x0;x<=x1;x+=30) g.lineTo(x,y0+Math.sin(x*f+amp)*amp*9); g.lineTo(x1,yB); g.closePath(); g.fill(); };
   const lantern=(x,y,s,a,col)=>{ glow(x,y,40*s,col||'255,190,110',0.55*a); g.fillStyle=`rgba(255,216,150,${a})`; g.beginPath(); g.ellipse(x,y,7*s,10*s,0,0,TAU); g.fill(); g.fillStyle=`rgba(120,60,30,${a*0.6})`; g.fillRect(x-4*s,y-12*s,8*s,2.4*s); };
