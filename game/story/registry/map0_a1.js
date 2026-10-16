@@ -159,6 +159,10 @@ legacy({ id: 'frost_lantern_1', map: 0, at: [2130, 3770], r: 60, kind: 'prop', n
 legacy({ id: 'frost_lantern_2', map: 0, at: [2400, 3690], r: 60, kind: 'prop', name: 'a frost lantern on an ice pillar', aliases: ['the three frost lanterns'], src: 'prop:a1_frostlantern@2400,3690' })
 legacy({ id: 'frost_lantern_3', map: 0, at: [2670, 3770], r: 60, kind: 'prop', name: 'a frost lantern on an ice pillar', aliases: ['the three frost lanterns'], src: 'prop:a1_frostlantern@2670,3770' })
 
+// ---- clue spots the x0 code draws (A1W v10): the fallen door of the North Gate, black wax on the Hollow Ward
+legacy({ id: 'north_gate_door', map: 0, at: [2774, 8812], r: 34, kind: 'examine', name: 'the fallen door of the North Gate', aliases: ['the door in the mud'], src: 'prop:a1_gatedoor@2774,8812', if: 'stage>=raid' })
+legacy({ id: 'hollow_ward_wax', map: 0, at: [2560, 9122], r: 30, kind: 'examine', name: 'black wax on the Hollow Ward', aliases: ['the black wax', 'the candle stub'], src: 'prop:a1_wax@2560,9122', if: 'stage>=raid !flag act1_done' })
+
 // ---- chests
 legacy({ id: 'marlo_chest', map: 0, at: [6052, 1806], r: 30, kind: 'chest', name: 'Marlo\'s chest', aliases: ['Marlo\'s X', 'the X on a high ledge'], src: 'LANDMARKS:a1_cm_marlo' })
 legacy({ id: 'smoke_ledge_chest', map: 0, at: [8180, 1978], r: 30, kind: 'chest', name: 'Juniper\'s chest on the Smoke Ledge', src: 'LANDMARKS:a1_cm_smoke' })

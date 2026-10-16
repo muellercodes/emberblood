@@ -1430,7 +1430,7 @@ function a1VTick(){
 }
 { const base=eventsForRender; eventsForRender=function(list){ base(list); try{
   if(!G||G.mode!=='story'||AREA) return;
-  a1VTick(); a1DrawGatePrints(G.time);
+  a1VTick(); a1DrawGatePrints(G.time); a1DrawWardWax();
   const f=A1V.osric; if(f){ const D=A1.dogs, d=D&&D.dogs&&D.dogs[0]; if(d) f.face=angTo(f.x,f.y,d.x,d.y); f.t=G.time; if(inView(f.x,f.y,120)) list.push({x:f.x,y:f.y,draw:()=>drawNPC(f)}); }
   }catch(e){ console.error('a1 v10',e); } }; }
 // ---- the art: the palisade, its end posts, the two gateways (the North Gate in three states), the prints, the ice hole
@@ -1503,6 +1503,12 @@ function a1DrawGatePrints(t){
       ctx.save(); ctx.translate(x,y); ctx.rotate(a+Math.PI/2); ctx.fillStyle='rgba(22,16,12,.55)'; ctx.beginPath(); ctx.ellipse(0,-2,3.4,4.8,0,0,TAU); ctx.fill(); ctx.beginPath(); ctx.ellipse(0,5.2,2.8,2.4,0,0,TAU); ctx.fill();
       ctx.fillStyle='rgba(255,226,150,.13)'; ctx.beginPath(); ctx.ellipse(-1,-3,1.3,2.2,0,0,TAU); ctx.fill(); ctx.restore(); } }
   ctx.restore();
+}
+// black candle wax round the Hollow Ward stone: the Oath snuffed it in the raid (a clue for the Case Book)
+function a1DrawWardWax(){
+  const w=WARDS.hollow; if(!w||!reached('raid')||G.flags.act1_done||!inView(w.x,w.y,80)) return;
+  ctx.save(); for(const [dx,dy,r] of [[-16,10,4.5],[-9,14,3],[12,11,4],[18,6,2.6],[3,16,3.4],[-21,4,2.4]]){ ctx.fillStyle='#16101a'; ctx.beginPath(); ctx.ellipse(w.x+dx,w.y+dy,r*1.3,r*0.8,0,0,TAU); ctx.fill(); ctx.fillStyle='rgba(200,190,220,.35)'; ctx.beginPath(); ctx.ellipse(w.x+dx-r*0.3,w.y+dy-r*0.25,r*0.45,r*0.25,0,0,TAU); ctx.fill(); }
+  ctx.fillStyle='#1e1622'; ctx.fillRect(w.x+20,w.y+2,4,9); ctx.fillStyle='#3a3044'; ctx.fillRect(w.x+20,w.y+2,1.4,9); ctx.restore();
 }
 function a1DrawIceHole(x,y,t){
   ctx.save(); ctx.fillStyle='rgba(200,226,246,.85)'; ctx.beginPath(); ctx.ellipse(x,y,78,40,0,0,TAU); ctx.fill();
