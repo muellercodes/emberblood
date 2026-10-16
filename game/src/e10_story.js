@@ -1410,6 +1410,8 @@ const S10API={
   ending:n=>s10Ending(n==null?actOf(G.stage):n),
   reach:(from,to,powers)=>null,
   do:list=>{ s10Do(list,{}); return true; },
+  // the text lines of an old STORY entry by path ('c_whirl_wait', 'bosses.grizzlefang.outro'): tests of the replacing rules
+  storyText:path=>{ let o=typeof STORY!=='undefined'?STORY:null; for(const k of String(path).replace(/^STORY\./,'').split('.')){ if(!o) break; o=o[k]; } if(typeof o==='function') try{ o=o(); }catch(e){ o=null; } return Array.isArray(o)?o.map(l=>Array.isArray(l)?String(l[1]):l&&l.text?String(typeof l.text==='function'?'':l.text):'').filter(Boolean):null; },
   cond:c=>s10Cond(c),
   adapters:()=>(S10.adapted||[]).concat(typeof c1RWin==='function'&&c1RWin._s10?['c1RWin']:[]),
   get S10(){ return S10; }
