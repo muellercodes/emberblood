@@ -139,6 +139,12 @@ function n4aPrompt(o,x,y,r,text,act,hidden){
   Object.defineProperty(L,'prompt',{get(){ if(!G||L.hidden()) return null; const t=typeof text==='function'?text(o):text; return t||null; },configurable:true});
   N4A.lm.push(L); LANDMARKS.push(L); return L;
 }
+// a gate that stands where another kit answers "walkable" first (p4's moon-glass and p2's bridges return before
+// x4_world's walls are asked): checked outermost, here (the Moon Door across the end of the moon-glass strip)
+N4A.hard=[];
+{ const base=blockedAt; blockedAt=function(x,y){
+    if(N4A.hard.length&&!N4A.paint&&x<IZX-50) for(const w of N4A.hard){ const b=w.bb; if(x<b[0]||x>b[2]||y<b[1]||y>b[3]) continue; try{ if(w.test(x,y)&&w.shut(w)) return true; }catch(e){} }
+    return base(x,y); }; }
 // beside something you hit to solve (a hook, a mirror, a cracked wall), ATTACK stays an attack: its "Look at" prompt
 // never turns the swing into USE (a5_input.js useMode). E and F still read it.
 function n4aAtkNear(){
@@ -270,6 +276,7 @@ function n4aGate(id,o){
   o.bb=o.bb||n4aBB([o.A,o.B],o.th+30);
   o.wall=n4aWall({id:'n4a_'+id,bb:o.bb,test:(x,y)=>!N4A.paint&&o.test(x,y),on:()=>{ try{ return !!o.shut(o); }catch(e){ return true; } }});
   o.open=0; o.r=o.r||40;
+  if(o.hard) N4A.hard.push(o);
   return n4aAdd('gate',o);
 }
 // the flame: walk up, press USE; plays Ember's line (bible 15 n_flame)
@@ -1333,7 +1340,7 @@ function n4aBuildRoad(){
     L.stand=(q,t)=>{ const on=(G.flags.n_road|0)>q.i; n4aPut(n4aSpr('rlan'+(on?1:0),34,92,17,86,g=>n4aLanternArt(g,on,false)),q.x,q.y,0.7); if(on){ const f=0.85+0.15*Math.sin(t*7+q.i); n4aGlow(q.x,q.y-44,50,N4A_ROADCOL[q.i],0.6*f); n4aGlow(q.x,q.y-44,14,'255,250,235',0.7*f); } };
     L.sy=q=>q.y+1; });
   // the Moon Door
-  const D=n4aGate('n_moondoor',{A:[DOOR[0]-40,DOOR[1]],B:[DOOR[0]+40,DOOR[1]],x:DOOR[0],y:DOOR[1],test:(x,y)=>dist(x,y,DOOR[0],DOOR[1])<48,bb:[DOOR[0]-60,DOOR[1]-60,DOOR[0]+60,DOOR[1]+60],shut:()=>!n4aF('n_door'),r:60,k:0});
+  const D=n4aGate('n_moondoor',{A:[DOOR[0]-40,DOOR[1]],B:[DOOR[0]+40,DOOR[1]],x:DOOR[0],y:DOOR[1],test:(x,y)=>dist(x,y,DOOR[0],DOOR[1])<48,bb:[DOOR[0]-60,DOOR[1]-60,DOOR[0]+60,DOOR[1]+60],shut:()=>!n4aF('n_door'),r:60,k:0,hard:true});
   D.reset=q=>{ q.k=n4aF('n_door')?1:0; };
   D.tick=(q,dt)=>{ q.k=lerp(q.k,n4aF('n_door')?1:0,Math.min(1,dt*1.2)); };
   D.stand=(q,t)=>n4aDrawMoonDoor(q,DOOR,t); D.sy=q=>DOOR[1]+10;
