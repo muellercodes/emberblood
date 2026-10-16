@@ -41,8 +41,8 @@ quest({
       then: ['give c_scarf', 'hat c_scarf', 'give c_biscuit 3', 'xp 250'] },
     { id: 'note', do: 'wait_for flag c_oona_note', legacy: true,
       obj: ['Get some rest on the coast tonight (a shrine or an inn)', 'Rest at a shrine or an inn'],
-      hint: ['Someone wants to say thank you. Rest anywhere on the coast.', 'Rest anywhere on the coast.'],
-      then: ['xp 250'] },
+      hint: ['Someone wants to say thank you. Rest anywhere on the coast.', 'Rest anywhere on the coast.'] },
+    // (no then: the old step's own reward gives the 250 XP and x1_people gives Vesper's trust +2 with the note)
   ],
 
   scene: {

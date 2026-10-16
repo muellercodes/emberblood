@@ -3,7 +3,7 @@
 // Rest chimney (claws), the top of the east harbor crane (grapple), behind the Cogwater Falls (Shadow Dash, in the
 // dark). Ash writes a reply on the back of each. Surprise: her last note, at the Moon Ring, answers the way he wrote
 // back (kind, brave or silly). Payoff: a Heart Ember in the box on the tallest stone, the Moon Ring clue q_moonring
-// (what_stopped) and, for two kind replies, Vesper's trust +1.
+// (what_stopped) and, for two kind replies, Vesper's trust +1 (the old step's reward, with its 500 XP).
 // Old saves: QDEFS.c_notes steps 0..1 map to drops, ring. Notes 3 to 6 stay x1_people's landmarks (power checks,
 // the reply choice, the falls shadow); x1_people plays the Moon Ring scene by its STORY key c_note6 and gives the
 // Heart Ember c_moonring, so the scene below replaces that text.
@@ -33,8 +33,8 @@ quest({
       ] },
     { id: 'ring', do: 'wait_for flag c_note6', legacy: true, marker: 'c_lm_note6',
       obj: ['One more note waits at the Moon Ring in the Moth Wood', 'The last note is at the Moon Ring'],
-      hint: ['The Moon Ring is a circle of seven pale stones in the Moth Wood, west of the Downs.', 'Seven stones in the Moth Wood.'],
-      then: ['xp 500'] },
+      hint: ['The Moon Ring is a circle of seven pale stones in the Moth Wood, west of the Downs.', 'Seven stones in the Moth Wood.'] },
+    // (no then: the old step's own reward gives the 500 XP and Vesper's trust +1 for two kind replies)
   ],
 
   scene: {
@@ -44,8 +44,7 @@ quest({
         'Seven stones. Something huge sat here.', { clue: 'q_moonring' }],
       ['narr', 'On the tallest stone: a note, weighed down with a little box.', 'A note and a box on the tallest stone.'],
       { if: { any: ['flag c_reply3=kind flag c_reply4=kind', 'flag c_reply3=kind flag c_reply5=kind', 'flag c_reply4=kind flag c_reply5=kind'] },
-        then: [['narr', '"You wrote back. Every time. Nobody writes back."', '"You wrote back. Nobody writes back."'],
-          { do: ['trust vesper +1'] }] },
+        then: [['narr', '"You wrote back. Every time. Nobody writes back."', '"You wrote back. Nobody writes back."']] },
       { if: { any: ['flag c_reply3=brave flag c_reply4=brave', 'flag c_reply3=brave flag c_reply5=brave', 'flag c_reply4=brave flag c_reply5=brave'] },
         then: [['narr', '"You said you\'d climb every chimney on the coast to find me. You nearly did."', '"You nearly found me."']] },
       { if: { any: ['flag c_reply3=silly flag c_reply4=silly', 'flag c_reply3=silly flag c_reply5=silly', 'flag c_reply4=silly flag c_reply5=silly'] },
