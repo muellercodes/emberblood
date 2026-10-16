@@ -100,11 +100,15 @@ chapter({
   scene: {
     // on the Clockwatch roof, right after the chase (c_gear's last scene)
     slt_open: [
-      ['c_bobs', '(from the street below) Bob! She climbed the CLOCK!', 'Bob! She climbed the CLOCK!'],
-      ['c_bobs', "Nobody climbs the clock, Bob. There's a sign.", 'Nobody climbs the clock, Bob.'],
-      ['ash', 'She went up it like a LADDER. How do you even DO that?', 'She climbed it like a ladder! How?'],
-      ['c_bobs', 'Ask the library lady at the Turning Library. She knows everything. Loudly.', 'Ask the library lady. She knows everything.', { promise: 'c_ottoline' }],
-      ['c_bobs', 'And keep that note, Mostly Part Dragon. That is EVIDENCE.', 'Keep that note, dragon. It is EVIDENCE.'],
+      { if: 'near c_hester 900', then: [
+        ['c_bobs', '(from the street below) Bob! She climbed the CLOCK!', 'Bob! She climbed the CLOCK!'],
+        ['c_bobs', "Nobody climbs the clock, Bob. There's a sign.", 'Nobody climbs the clock, Bob.'],
+        ['ash', 'She went up it like a LADDER. How do you even DO that?', 'She climbed it like a ladder! How?'],
+        ['c_bobs', 'Ask the library lady at the Turning Library. She knows everything. Loudly.', 'Ask the library lady. She knows everything.', { promise: 'c_ottoline' }],
+        ['c_bobs', 'And keep that note, Mostly Part Dragon. That is EVIDENCE.', 'Keep that note, dragon. It is EVIDENCE.']] },
+      // (an old save that loads in this chapter somewhere else hears only this)
+      { if: '!near c_hester 900', then: [
+        ['ash', 'She climbed the Great Clock like a LADDER. Somebody at the Turning Library must know how.', 'She climbed the clock! Ask at the library.', { promise: 'c_ottoline' }]] },
     ],
     slt_ottoline: [
       ['c_ottoline', "Welcome to the Turning Library. The shelves run so you don't have to. ...WHAT DO YOU NEED? Sorry. I shouted.", 'Welcome! WHAT DO YOU NEED? Sorry. I shouted.'],

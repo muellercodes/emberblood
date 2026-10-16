@@ -212,6 +212,8 @@ chapter({
       { if: 'flag c_clock_on', once: true, say: ['Twelve bongs. Exactly twelve. I counted. I could cry. I will not. It would be inefficient.', 'Twelve bongs. Exactly twelve. I counted.'] },
     ],
     c_whirligig: [
+      { if: 'stage>=c_brass !flag c_clock_on', once: true, say: ['My Brassworks! Do be careful with the... with the everything. And if you see a large brass gentleman with a wind-up handle in his back, do NOT wind him up.',
+        'My Brassworks! Do NOT wind up the big brass man.'] },
       { if: 'flag c_clock_on', once: true, say: ['My clocks! My lovely clocks! ...Dragon. You did this? Hmph. Well. Thank you. Wipe your feet next time.', 'My clocks! You did this? Hmph. Thank you.'] },
     ],
     c_penny: [
