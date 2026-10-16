@@ -51,16 +51,15 @@ chapter({
       ['narr', 'Above them, four deep scratches go straight up the rock, all the way to the top.', 'Four deep scratches go straight up the rock.'],
       ['ash', 'She climbed it. Like a LADDER. Again.', 'She climbed it! Again!'],
     ],
+    // (6 lines on every branch: it is the first scene after the caves)
     clw_cliff: [
       { place: ['c_mask', 'gull_vesper_seat'] }, { anim: ['c_mask', 'sit'] }, { cam: 'gull_vesper_seat', s: 1 },
-      ['narr', 'Somebody is sitting on the edge of Gullcrag Head, legs dangling over the sea. The Moth Mask.', 'Someone sits on the cliff edge. The Moth Mask!'],
       ['c_mask', "Pearl's claws. Huh. They suit you, little ember.", "Pearl's claws. They suit you, little ember."],
       { choose: 'c_cliff', ask: ['What do you say?', 'What do you say?'], pick: [
         { t: ["Vesper. Your gran is cold, isn't she?", 'Your gran is cold, right?'], tone: 'kind',
           then: ['set c_cliff=gran', 'trust vesper +1'],
           say: [
-            ['narr', 'She nearly falls off the cliff.', 'She nearly falls off the cliff!'],
-            ['c_mask', 'How do you know my NAME?', 'How do you know my NAME?'],
+            ['c_mask', 'WHAT? How do you know my NAME? I nearly fell off!', 'How do you know my NAME? I nearly fell off!'],
             ['c_mask', "...She's been cold for seventy years. I'm going to fix it. Don't follow me.", 'Gran is always cold. I will fix it. Do not follow me.']] },
         { t: ['Give back the Ember Heart, Vesper!', 'Give it back, Vesper!'], tone: 'brave',
           then: ['set c_cliff=heart'],
@@ -72,7 +71,7 @@ chapter({
           say: [['c_mask', 'No.'], ['ash', 'Worth a try.']] },
       ] },
       { anim: ['c_mask', 'glide'] }, { walk: ['c_mask', 'gull_glide_to'] },
-      ['narr', 'She stands, steps backwards off the cliff, and her cloak opens like wings. She glides away toward the city.', 'She steps off the cliff. Her cloak opens like wings.'],
+      ['narr', 'She steps backwards off the cliff. Her cloak opens like wings, and she glides away toward the city.', 'She steps off the cliff. Her cloak opens like wings.'],
       ['ash', 'I REALLY need to learn how to do that.', 'I REALLY need to learn that.'],
       { wait: 1.2 }, { do: ['despawn c_mask'] },
     ],

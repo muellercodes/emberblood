@@ -4,14 +4,14 @@
 // says the Lady of the Moths wants light and promised that Gran will be warm, Gran's letters say "Dear Vesper", a tin
 // of biscuits says FOR GRAN (eat one, or leave them: trust K3), and Pip steals a note back from a brass magpie (Pip
 // learns Fetch). The player works out why she only steals glowing things, asks Clockkeeper Ambrose how to wake the
-// clock, climbs Pearl's smokestack into the Brassworks (the dungeon stays code), and walks out of the gate to a note
-// from Vesper. Then, on screen, the Great Clock strikes, and on a chimney beside it Vesper pushes her mask up.
+// clock, climbs Pearl's smokestack into the Brassworks (the dungeon stays code), and finds a hanky by the gate with a
+// note from Vesper. Then, on screen, the Great Clock strikes, and on a chimney beside it Vesper pushes her mask up.
 chapter({
   id: 'c_brass', act: 2, after: 'c_claws', next: 'c_light', takeover: true,
   card: ['Act II · Chapter 6', 'The Brassworks'],
   so_far: [
     "Ash climbed the Great Clock and searched Vesper's hideout. She keeps everything she steals, because the Lady of the Moths in her dreams wants light, and promised her gran would be warm. Ash woke the Great Clock from the Brassworks, and Vesper pushed her mask up to watch.",
-    "Vesper steals light for the Lady in her dreams. Ash woke the Great Clock. Everyone saw Vesper's face."],
+    "Vesper steals light for a dream Lady. Then everyone saw her face."],
   hint: ['Climb the Great Clock to the hatch at the very top. Then ask Clockkeeper Ambrose. The way into the Brassworks is up its old smokestack in the Brass Yards.',
     'Climb the clock. Ask the Clockkeeper. Then climb the smokestack.'],
   mom: [['Claws! Mind the furniture.', 'Claws! Mind the furniture.']],
@@ -41,6 +41,9 @@ chapter({
     nest_note2: { map: 1, area: 'c_mothnest', at: [262, 116], kind: 'prop', look: 'a2a_bell_note',
       states: { taken: 'a2a_empty' }, name: 'a note pinned to the bell' },
     nest_magpie: { map: 1, area: 'c_mothnest', at: [288, 118], kind: 'prop', look: 'a2a_magpie', name: 'a brass magpie on the beam' },
+    // outside the Brassworks, between its signpost (c_sign_works, 10000, 24900) and Pearl's warp landing
+    bw_gate_hanky: { map: 1, at: [10100, 24905], r: 18, kind: 'examine', look: 'a2a_hanky', states: { taken: 'a2a_empty' },
+      name: 'a hanky tied to a stake by the gate', aliases: ['the hanky', "Vesper's hanky"] },
     // the chimney by the Great Clock where she unmasks (the 'unmask' pose sits her on its cap, 52 px up)
     gh_vesper_perch: { map: 1, at: [7230, 24411], kind: 'npc_spot', name: 'a chimney by the Great Clock' },
   },
@@ -65,7 +68,7 @@ chapter({
       bonus: ['q_oona_lady', 'q_pearl_moth'],
       pick: [
         { t: ['Someone in her dreams wants the light, and promised to make Gran warm',
-          'The Lady in her dreams wants it. She promised Gran would be warm.'], right: true },
+          'The Lady in her dreams wants it, for Gran.'], right: true },
         { t: ['She sells it all for coal', 'She sells it'],
           hint: ['Look at the pile under the window again. Is anything missing?', 'Is anything missing from the pile?'] },
         { t: ["She's scared of the dark", 'She is scared of the dark'],
@@ -95,9 +98,12 @@ chapter({
     { id: 'works', do: 'dungeon c_brassworks', at: 'bw_roof_hatch',
       obj: ['Climb the old smokestack in the Brass Yards and restart the Great Clock', 'Climb the smokestack. Restart the clock.'],
       hint: ['The Brass Yards are past the end of the Upper Town. Climb the smokestack with your claws. The hatch is on top.', 'Climb the smokestack. The hatch is on top.'] },
-    // Pearl's warp at the end of the Brassworks sets Ash down outside its gate (x1_dun_a.js D1A_WARP: 10210, 24915)
-    { id: 'bong', do: 'goto bw_front_gate 420', scene: 'brs_bong', then: ['set c_clock_on', 'set c_brass_done', 'stage c_light'],
-      obj: ['Go back outside', 'Go outside'] },
+    // Pearl's warp at the end of the Brassworks sets Ash down outside its gate (x1_dun_a.js D1A_WARP: 10210, 24915),
+    // a few steps from the hanky Vesper left there (trust K3 shows here), then the clock strikes and she unmasks
+    { id: 'hanky', do: 'examine bw_gate_hanky', scene: 'brs_hanky', then: ['world bw_gate_hanky taken'],
+      obj: ['Look at the hanky tied up by the Brassworks gate', 'Look at the hanky by the gate'] },
+    { id: 'bong', do: 'cutscene brs_bong', then: ['set c_clock_on', 'set c_brass_done', 'stage c_light'],
+      obj: ['Listen!', 'Listen!'] },
   ],
 
   scene: {
@@ -167,28 +173,30 @@ chapter({
       ['ash', 'How do we make the clock go again?', 'How do we make the clock go?'],
       ['c_ambrose', "Her heart's not up top, young dragon. It's DOWN. In the Brassworks. The great drive is jammed.", 'Her heart is down in the Brassworks. It is jammed.'],
       ['c_ambrose', 'Lord Whirligig locked the gate, and the dust stuck it shut. But Mother Pearl built a chimney there. She never could resist a chimney.',
-        'The gate is stuck. But Pearl built a chimney there.', { promise: 'bw_roof_hatch' }],
+        'The gate is stuck. But Pearl built a chimney there.', { promise: 'bw_roof_hatch', ref: 'bw_front_gate' }],
       ['ash', 'A chimney. I have CLAWS now.', 'A chimney! I have CLAWS now.'],
       ['c_ambrose', 'Eh? PAWS? Lovely. Tick... tock.', 'Eh? PAWS? Lovely. Tick... tock.'],
     ],
-    // outdoors, at the Brassworks gate: Vesper's note (trust K3), then the Great Clock strikes and she unmasks on screen
-    brs_bong: [
+    // outdoors by the Brassworks gate: Vesper was in the Nest after Ash, and knows what he did with the biscuits
+    brs_hanky: [
+      ['narr', 'Somebody has tied a hanky to a stake by the gate, with a note.', 'A hanky is tied up by the gate, with a note.', { ref: 'bw_front_gate' }],
       { if: 'flag c_biscuits=left', then: [
-        ['narr', 'Tied to the Brassworks gate: a hanky with one biscuit in it, and a note.', 'A hanky on the gate: one biscuit and a note.'],
-        ['narr', '"You didn\'t eat Gran\'s biscuits. Weird. Here\'s one. ONE. V."', '"You did not eat Gran\'s biscuits. Here is one. V."', { do: ['give c_biscuit 1'] }]] },
+        ['narr', 'Inside the hanky: one biscuit. "You didn\'t eat Gran\'s biscuits. Weird. Here\'s one. ONE. V."', 'One biscuit inside! "Here is one. ONE. V."', { do: ['give c_biscuit 1'] }]] },
       { if: 'flag c_biscuits=ate', then: [
-        ['narr', 'Tied to the Brassworks gate: a hanky full of crumbs, and a note.', 'A hanky on the gate: crumbs and a note.'],
-        ['narr', '"Somebody ate one of Gran\'s biscuits. I COUNTED. V."', '"Somebody ate Gran\'s biscuit. I COUNTED. V."']] },
+        ['narr', 'Inside the hanky: crumbs. "Somebody ate one of Gran\'s biscuits. I COUNTED. V."', 'Crumbs inside! "Somebody ate Gran\'s biscuit. V."']] },
+      ['ash', "She was in the Nest right after me. She's always one roof ahead.", 'She is always one roof ahead!'],
+    ],
+    // the Great Clock strikes, and on a chimney beside it Vesper pushes her mask up (on screen; the camera goes there)
+    brs_bong: [
       { cam: 'c_great_clock', s: 1.5 },
-      ['narr', 'Then, far across the town, something enormous goes CLUNK.', 'Far across the town: CLUNK!'],
-      ['narr', 'Tick. Tock. All over Gearhaven, every clock on every roof starts ticking at once.', 'Tick. Tock. Every clock in town starts ticking!', { do: ['set c_clock_on'] }],
+      ['narr', 'Far across the town, something enormous goes CLUNK. Then every clock on every roof starts ticking.', 'Far away: CLUNK! Every clock in town starts ticking.', { do: ['set c_clock_on'] }],
       { sfx: 'bell' },
       ['narr', 'BONG! BONG! BONG! Twelve times. It is not midnight. The Great Clock does not care.', 'BONG! BONG! BONG! Twelve times!'],
       { place: ['c_mask', 'gh_vesper_perch'] }, { anim: ['c_mask', 'unmask'] }, { cam: 'gh_vesper_perch', s: 1 },
-      ['narr', 'On a chimney beside the clock, a girl in a grey cloak pushes her mask up, to see better.', 'On a chimney, a girl in a grey cloak pushes her mask up.'],
+      ['narr', 'On a chimney beside the clock, a girl in a grey cloak pushes her mask up, to see better.', 'On a chimney, a girl pushes her mask up.'],
       ['narr', "Dark hair. One silver streak. Freckles. She's grinning at the clock like it's a birthday cake.", 'Dark hair, a silver streak, freckles. She is grinning.'],
       { if: 'flag c_cliff=gran', then: [
-        ['narr', 'She looks across the rooftops, right at you, and lifts one hand. Then the mask comes down.', 'She looks right at you. She waves. The mask comes down.']] },
+        ['narr', 'She looks across the rooftops, right at you, and waves. Then the mask comes down.', 'She looks right at you. She waves. The mask comes down.']] },
       { if: '!flag c_cliff=gran', then: [
         ['narr', 'Then the mask comes down, and she is gone over the roofs.', 'The mask comes down. She is gone.']] },
       { do: ['despawn c_mask', { banner: ['GEARHAVEN GAZETTE: CLOCK SAVED BY LIZARD! MOTH MASK HAS A FACE!', 'GAZETTE: MOTH MASK HAS A FACE!'] }] },

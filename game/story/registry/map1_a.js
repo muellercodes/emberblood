@@ -1,8 +1,8 @@
 // game/story/registry/map1_a.js (A2a): things the old code already draws on map 1 that c_coast, c_salt, c_claws and
 // c_brass point at. New things those chapters add live in each chapter's own `place` block.
 // Every `at` was checked in the live game (v10/a2a/probe.py on page.html, main 0fb0938): DOORS, LANDMARKS, CAST.
-// People who live indoors are registered at their house door (the DOORS entry they own), people outdoors at their
-// X1P_SPOT. Entries with `area` are inside that small area: `at` is in the area's own layout coordinates (the same
+// People who live indoors are registered at their house door (the DOORS entry they own), people outdoors where they
+// stand in the game (Mina stands outside her cottage door). Entries with `area` are inside that small area: `at` is in the area's own layout coordinates (the same
 // numbers x1_story.js c1NestLayout uses; the Moth's Nest's (0,0) is world (20300,1300) today), and src 'furn:<k>'
 // names the area object whose k is <k>.
 
@@ -10,7 +10,7 @@
 legacy({ id: 'c_barley', map: 1, at: [3900, 21140], r: 40, kind: 'npc', name: 'Old Barley', src: 'CAST:c_barley' });
 legacy({ id: 'c_ottoline', map: 1, at: [7700, 24491], r: 40, kind: 'npc', name: 'Archivist Ottoline Inkwell',
   aliases: ['Ottoline', 'the archivist'], src: 'CAST:c_ottoline' });
-legacy({ id: 'c_mina', map: 1, at: [2250, 26300], r: 60, kind: 'npc', name: 'Tide Warden Mina Mudge',
+legacy({ id: 'c_mina', map: 1, at: [2416, 26353], r: 80, kind: 'npc', name: 'Tide Warden Mina Mudge',
   aliases: ['Mina', 'the Tide Warden'], src: 'CAST:c_mina' });
 legacy({ id: 'c_charlie', map: 1, at: [2000, 26871], r: 40, kind: 'npc', name: 'Chowder Charlie', src: 'CAST:c_charlie' });
 legacy({ id: 'c_oona', map: 1, at: [1150, 27136], r: 40, kind: 'npc', name: 'Granny Oona Saltwhistle',

@@ -177,6 +177,23 @@ defineLook('a2a_magpie',{w:36,h:26,draw(g,x,y,t){
   if(Math.sin(t*1.9+1)>0.97) a2aGlow(g,x+10,by-10,5,'200,240,255',0.9);
 }});
 
+// ---------- c_brass, by the Brassworks gate: a hanky tied to a little stake, with a note tucked in (it flutters)
+defineLook('a2a_hanky',{w:26,h:40,draw(g,x,y,t){
+  const c=a2aSpr('hanky',30,46,15,42,q=>{
+    a2aShadow(q,1,1,8,2.6,0.25);
+    q.strokeStyle=A2A_INK; q.lineWidth=1.6;
+    q.fillStyle='#8a6a42'; q.fillRect(-2,-34,4,34); q.strokeRect(-2,-34,4,34);
+    // the bundle: a white hanky with blue checks, knotted at the top
+    q.fillStyle='#f6f2ea'; q.beginPath(); q.moveTo(-9,-22); q.quadraticCurveTo(-11,-10,-3,-8); q.lineTo(5,-8); q.quadraticCurveTo(12,-12,9,-22); q.quadraticCurveTo(0,-27,-9,-22); q.closePath(); q.fill(); q.stroke();
+    q.strokeStyle='rgba(70,110,190,.75)'; q.lineWidth=1; for(let i=0;i<3;i++){ q.beginPath(); q.moveTo(-8+i*6,-21); q.lineTo(-6+i*6,-9); q.stroke(); q.beginPath(); q.moveTo(-9,-18+i*4); q.lineTo(9,-18+i*4); q.stroke(); }
+    q.fillStyle='#f6f2ea'; q.strokeStyle=A2A_INK; q.lineWidth=1.4; q.beginPath(); q.ellipse(-3,-27,3,2.4,-0.4,0,TAU); q.ellipse(3,-27,3,2.4,0.4,0,TAU); q.fill(); q.stroke();
+    // the note, tucked under the knot, signed V
+    q.fillStyle='#efe2c4'; q.save(); q.translate(6,-30); q.rotate(0.35); q.fillRect(0,-4,9,8); q.strokeRect(0,-4,9,8); q.fillStyle='#4c3a6a'; q.font='bold 6px sans-serif'; q.fillText('V',2.5,2.5); q.restore();
+  });
+  const fl=Math.sin(t*3.1)*0.06;
+  g.save(); g.translate(x,y); g.rotate(fl*0.3); a2aPut(g,c,0,0); g.restore();
+}});
+
 // ---------- Vesper in the Moth Mask: 'glide' (arrival, the cliff), 'sit' (the cliff edge), 'unmask' (the chimney)
 // the parts shared by the poses, drawn into a baking context q (facing right, feet at 0,0)
 function a2aHood(q,hx,hy,mask){

@@ -10,7 +10,7 @@ chapter({
   card: ['Act II · Chapter 5', 'The Girl from Saltmarsh'],
   so_far: [
     "Ottoline's family tree of Mother Pearl ended with Oona Saltwhistle and her granddaughter Vesper. In Saltmarsh every window had a moth lantern, the Moth Mask's note smelled of Charlie's chowder, and Ash worked out who she was: Vesper Saltwhistle. He fixed the Tide Clock and met her gran, who is always cold.",
-    "The Moth Mask is Vesper Saltwhistle from Saltmarsh. Ash fixed the Tide Clock and met her cold gran."],
+    "The Moth Mask is Vesper Saltwhistle. Ash met her cold gran."],
   hint: ['Ask at the Turning Library in the Upper Town. Then follow the Coast Road to Saltmarsh, where the Tide Clock is stuck.',
     'Ask at the library. Then go to Saltmarsh.'],
   mom: [['Saltmarsh? Wear your boots. And eat the chowder.', 'Wear your boots. Eat the chowder.']],
@@ -46,7 +46,7 @@ chapter({
         'Lord Whirligig blames a rival baron.'] },
     s_tide_dust: { icon: 'kelp', mystery: 'what_stopped',
       text: ["The Tide Clock's cog was packed with kelp and far too much moth dust. More than one girl could carry.",
-        'The Tide Clock was full of moth dust. Too much for one girl.'] },
+        'The Tide Clock was full of moth dust. Too much!'] },
     s_alibi: { icon: 'fish', mystery: 'what_stopped',
       text: ['Granny Oona says Vesper came home just before midnight, the night the clocks stopped. She was shaking.',
         'Gran says Vesper was home that night, shaking.'] },

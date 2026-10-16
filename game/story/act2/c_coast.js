@@ -8,7 +8,7 @@ chapter({
   card: ['Act II · Chapter 3', 'Salt on the Wind'],
   so_far: [
     "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask glide over twice. Three nights ago something much bigger flew over too, and left Gerald the sheep silver with dust.",
-    'Barley saw the Moth Mask fly over. Something much bigger made Gerald the sheep silver.'],
+    'Something huge flew over. Gerald the sheep is silver now.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],
   mom: [["The sea! Pebble says you can smell it from the pass. Eat something salty for me.", 'The sea! Eat something salty for me.']],
