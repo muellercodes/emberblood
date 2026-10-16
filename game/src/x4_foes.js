@@ -602,7 +602,7 @@ defineFoe('n_echo_vesper',{boss:true,name:'Echo of the Moth Mask',title:S('A sha
   onPhase(e,i){ e.n4balT=Math.min(e.n4balT||6,6); n4e2Split(e,false); },
   ai:N4E2_AI,
   onHurt(e,amt,o){ const h=foeHit(e,o); let a=amt;
-    if(e.n4bal){ if(e.n4bal.ph==='perch'&&(n4fLvl()>=5||(player.z||0)>40||h.src==='whip')){ n4e2Knock(e); return amt*0.4; } if(!(e._n4hiT>G.time)){ e._n4hiT=G.time+3; n4fTxt(e,S('She is up on the balcony! Climb up or grapple the post!','Climb up to her!'),'#e0d0ff',13); } return false; }
+    if(e.n4bal){ if(e.n4bal.ph==='perch'&&(n4fLvl()>=5||(player.z||0)>40||h.src==='whip')){ n4e2Knock(e); return n4fGate(e,amt*0.4,o,0.5,e.bph>=1||(e.yanks||0)>=byDiff(1,1,2),S('Crack the Chain Whip on the real one!','Whip the real one!')); } if(!(e._n4hiT>G.time)){ e._n4hiT=G.time+3; n4fTxt(e,S('She is up on the balcony! Climb up or grapple the post!','Climb up to her!'),'#e0d0ff',13); } return false; }
     if(h.src==='whip'&&!(e.n4stag>0)){ n4e2Yank(e); a*=1.2; }
     else if(e.n4stag>0) a*=1.4; else a*=0.6;
     a=n4fGate(e,a,o,0.5,e.bph>=1||(e.yanks||0)>=byDiff(1,1,2),S('Crack the Chain Whip on the real one!','Whip the real one!'));
@@ -1542,7 +1542,6 @@ function n4nDraw(e,fl){
   { const K=N4N_K*(e.n4scale||1), cy=e.y+6-((e.z||0)+26*K*T3.st), R=230*(e.n4scale||1), g=ctx.createRadialGradient(e.x,cy,R*0.15,e.x,cy,R); g.addColorStop(0,'rgba(18,8,36,.42)'); g.addColorStop(0.6,'rgba(30,14,60,.22)'); g.addColorStop(1,'rgba(30,14,60,0)');
     ctx.save(); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(e.x,cy,R,R*0.72,0,0,TAU); ctx.fill(); ctx.restore(); }
   if(T3.on) n4nFig(e,fl); else n4nFig2(e,fl);
-  n4nCracksDraw(e);
   if(e.state==='dizzy'||e.state==='grounded'&&e.n4open&&e.nPhase<4){ const top=e._t3top!=null&&T3.on?e._t3top:e.y-110; ctx.fillStyle='#ffe066'; for(let i=0;i<5;i++){ const a=G.time*4+i*TAU/5; ctx.beginPath(); ctx.arc(e.x+Math.cos(a)*46,top+8+Math.sin(a)*9,4,0,TAU); ctx.fill(); } }
 }
 function n4nDraw2(e,fl){ n4nDraw(e,fl); }
@@ -1666,9 +1665,7 @@ function n4nAir(){ const e=N4N.e&&!N4N.e.dead?N4N.e:null, t=G.time; if(!e) retur
       ctx.save(); ctx.lineCap='round'; ctx.strokeStyle='rgba(40,30,70,.6)'; ctx.lineWidth=7; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.quadraticCurveTo(mx,my,w.x,w.y); ctx.stroke();
       ctx.strokeStyle='#eef2ff'; ctx.lineWidth=3.5; ctx.setLineDash([7,4]); ctx.lineDashOffset=-t*20; ctx.stroke(); ctx.setLineDash([]);
       ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.35; ctx.strokeStyle='rgba(200,215,255,1)'; ctx.lineWidth=12; ctx.stroke(); ctx.restore();
-      if(ready){ const b=Math.abs(Math.sin(t*5))*8; ctx.save(); ctx.font=`900 ${W<600?18:20}px ${UIF}`; ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#3b2233'; const tx=simplify(S('PULL!','PULL!')); ctx.strokeText(tx,A.x,A.y-100-b); ctx.fillStyle='#ffe066'; ctx.fillText(tx,A.x,A.y-100-b); ctx.restore(); } } }
-  // phase 2: POUND! over the glowing platform she hides under
-  if(e.nPhase===2&&e.restP){ const P=e.restP, b=6*Math.abs(Math.sin(t*5)); ctx.save(); ctx.fillStyle='#fff6c0'; ctx.font=`900 ${W<600?20:24}px ${UIF}`; ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#3b2233'; const tx=simplify(S('POUND!','POUND!')); ctx.strokeText(tx,P.x,P.y-P.r-16-b); ctx.fillText(tx,P.x,P.y-P.r-16-b); ctx.restore(); }
+    } }
   if(N4N.vpry&&N4N.vpry.t<1.6){ const V=N4N.vpry; V.t+=1/60; ctx.save(); ctx.globalAlpha=1-V.t/1.6; ctx.fillStyle='#e8d8ff'; ctx.font=`800 16px ${UIF}`; ctx.textAlign='center'; ctx.fillText(simplify(S('Vesper pries it open!','Vesper helps!')),V.x,V.y-110-V.t*20); ctx.restore(); }
 }
 // screen space (after the world): the moon filling with light, the streams of light going up to it, the drowsy dim,
@@ -1683,8 +1680,9 @@ function n4nScreen(){
   const fill=N4F.moonFill||0, show=(here||(!n4fS()&&N4F.fall))&&fill>0&&n4fMap4();
   const M=n4nMoonPos();
   if(show){ ctx.save(); ctx.beginPath(); ctx.arc(M.x,M.y,M.R*0.86,0,TAU); ctx.clip(); const top=M.y+M.R*0.86-2*M.R*0.86*fill;
-    const g=ctx.createLinearGradient(0,top,0,M.y+M.R); g.addColorStop(0,'rgba(250,250,255,.95)'); g.addColorStop(1,'rgba(200,210,255,.85)'); ctx.fillStyle=g; ctx.fillRect(M.x-M.R,top+Math.sin(t*2)*1.5,M.R*2,M.R*2);
-    ctx.restore(); ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.35*fill; ctx.drawImage(foGlowSpr('225,232,255'),M.x-M.R*1.8,M.y-M.R*1.8,M.R*3.6,M.R*3.6); ctx.restore(); }
+    const al=0.22+0.3*fill, g=ctx.createLinearGradient(0,top,0,M.y+M.R); g.addColorStop(0,`rgba(244,246,255,${al})`); g.addColorStop(1,`rgba(196,206,255,${al*0.8})`); ctx.fillStyle=g; ctx.fillRect(M.x-M.R,top+Math.sin(t*2)*1.5,M.R*2,M.R*2);
+    ctx.strokeStyle=`rgba(255,255,255,${al+0.2})`; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<=24;i++){ const x=M.x-M.R+i*M.R/12, y=top+Math.sin(t*2)*1.5+Math.sin(t*3+i*0.8)*2; i?ctx.lineTo(x,y):ctx.moveTo(x,y); } ctx.stroke();
+    ctx.restore(); ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.18*fill; ctx.drawImage(foGlowSpr('225,232,255'),M.x-M.R*1.6,M.y-M.R*1.6,M.R*3.2,M.R*3.2); ctx.restore(); }
   // the streams of silver light from the broken cracks, up into the moon
   if(N4N.streamsUp.length){ for(const s of N4N.streamsUp) s.t+=1/60; N4N.streamsUp=N4N.streamsUp.filter(s=>s.t<2.6);
     ctx.save(); ctx.lineCap='round'; ctx.globalCompositeOperation='lighter';
@@ -1695,7 +1693,13 @@ function n4nScreen(){
 }
 { const base=drawRain; drawRain=function(){ base(); try{ if(!AREA&&scene!=='menu'&&G&&player) n4nScreen(); }catch(err){ if(!N4F.scrErr){ N4F.scrErr=1; console.error('n4f screen',err); } } }; }
 // her eye-spots in the dark of an Eclipse Wing (over the darkness: drawn with the floating words)
-{ const base=drawTexts; drawTexts=function(){ try{ const e=N4N.e; if(e&&!e.dead&&N4N.dark>0.35&&!AREA){ const t=G.time, a=clamp((N4N.dark-0.35)/0.4,0,1); ctx.save(); ctx.globalCompositeOperation='lighter';
+// PULL! and POUND! drawn with the floating words, over the night's darkness
+function n4nLabels(){ const e=N4N.e; if(!e||e.dead||AREA||G.boss!==e) return; const t=G.time;
+  const lab=(x,y,txt,col)=>{ ctx.save(); ctx.font=`900 ${W<600?20:24}px ${UIF}`; ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#3b2233'; const s0=simplify(txt); ctx.strokeText(s0,x,y); ctx.fillStyle=col; ctx.fillText(s0,x,y); ctx.restore(); };
+  if(e.nPhase===1&&!e.trans){ let sn=0; for(const A of N4N.anchors) if(A.snag) sn++; if(sn>=n4nSnagNeed()) for(const A of N4N.anchors) if(A.snag) lab(A.x,A.y-100-Math.abs(Math.sin(t*5))*8,S('PULL!','PULL!'),'#ffe066'); }
+  if(e.nPhase===4) n4nCracksDraw(e);   // the cracks are light: over the dark
+  if(e.nPhase===2&&e.restP){ const P=e.restP; lab(P.x,P.y-P.r-16-6*Math.abs(Math.sin(t*5)),S('POUND!','POUND!'),'#fff6c0'); } }
+{ const base=drawTexts; drawTexts=function(){ try{ n4nLabels(); }catch(err){} try{ const e=N4N.e; if(e&&!e.dead&&N4N.dark>0.35&&!AREA){ const t=G.time, a=clamp((N4N.dark-0.35)/0.4,0,1); ctx.save(); ctx.globalCompositeOperation='lighter';
       for(const sd of [-1,1]){ const q=T3.on?n4nBodyPt(e,e.x+sd*110,e.y-8,34):{x:e.x+sd*120,y:e.y-(e.z||0)*0.75-60}; ctx.globalAlpha=a*(0.7+0.3*Math.sin(t*3+sd)); ctx.drawImage(foGlowSpr('235,232,255'),q.x-42,q.y-42,84,84); ctx.globalAlpha=a; ctx.fillStyle='rgba(250,250,255,.9)'; ctx.beginPath(); ctx.arc(q.x,q.y,13,0,TAU); ctx.fill(); ctx.fillStyle='rgba(60,40,110,.9)'; ctx.globalCompositeOperation='source-over'; ctx.beginPath(); ctx.arc(q.x,q.y,5.5,0,TAU); ctx.fill(); ctx.globalCompositeOperation='lighter'; }
       ctx.restore(); } }catch(err){} base(); }; }
 // ---- the stand-in Heart moment (screen space): the black, Ash and Pip, the Heart with its seams, the meter, the voices
@@ -1811,6 +1815,8 @@ function n4bDanger(){
 function n4bHop(){ const p=player; if((p.z||0)>3||n4fDiving()||n4fBur()||N4FB.pound>0||N4FB.jT>G.time) return; let jump=false;
   for(const z of G.fz||[]) if(z.k==='n4nring'&&!z.hit&&Math.abs(dist(z.x,z.y,p.x,p.y)-z.rad)<60&&dist(z.x,z.y,p.x,p.y)>z.rad-10) jump=true;
   for(const R of G.rings) if(R.owner!=='player'&&R.dmg>0&&Math.abs(dist(R.x,R.y,p.x,p.y)-R.rad)<56&&!(R.delay>0)) jump=true;
+  // on a platform in the Shadow Sea there is nowhere to step: jump a circle just before it bites
+  if(n4bSea()&&n4nOnPlat(p.x,p.y)) for(const z of G.fz||[]) if(z.k==='n4fmark'&&!z.fired&&(!z.shape||z.shape==='circle')&&dist(z.x,z.y,p.x,p.y)<z.r+p.r&&z.t>z.dur-0.32) jump=true;
   if(jump&&!(N4F.fight&&N4F.fight.fly&&player.flying)){ N4FB.jT=G.time+0.6; n4bTap('jump'); n4bEv('hop'); } }
 function n4bFrame(dt){
   const p=player, I=N4FB.inp; N4FB.t+=dt; I.fire=false; I.attack=false; I.mx=0; I.my=0;
@@ -1838,7 +1844,7 @@ function n4bPlan(e,dt,swing){
     n4bGo(e.headX+Math.cos(e.face)*40,e.headY+Math.sin(e.face)*40); swing(1); return false; }
   // Echo of the Moth Mask: whip the real one (yank), knock her off a balcony (the whip from below), then the blade
   if(T==='n_echo_vesper'){
-    if(e.n4bal){ const B=e.n4bal; if(B.ph==='perch'){ n4bGo(B.b.x,B.b.y+50); if(M&&dist(p.x,p.y,e.x,e.y)<170){ if(N4FB.hitT<=0&&n4bSwing(e,1,'whip',170)){ N4FB.hitT=0.42; n4bEv('whipKnock'); } } } else near(160); return true; }
+    if(e.n4bal){ const B=e.n4bal; if(B.ph==='perch'&&!M){ near(220); return false; } if(B.ph==='perch'){ n4bGo(B.b.x,B.b.y+50); if(M&&dist(p.x,p.y,e.x,e.y)<170){ if(N4FB.hitT<=0&&n4bSwing(e,1,'whip',170)){ N4FB.hitT=0.42; n4bEv('whipKnock'); } } } else near(160); return true; }
     if(e.n4stag>0||e.state==='dizzy'){ near(e.r+30); swing(1); return false; }
     if(M&&(e.yanks||0)<byDiff(1,1,2)+(e.bph>=1?1:0)){ near(110); if(dist(p.x,p.y,e.x,e.y)<150&&N4FB.hitT<=0&&n4bSwing(e,1,'whip',150)){ N4FB.hitT=0.5; n4bEv('whip'); } return false; }
     near(e.r+34); swing(1); return false; }
