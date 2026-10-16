@@ -262,7 +262,7 @@ export function buildModel(loaded, game) {
       if (prev && prev.from === 'npc') { M.ents[d.id] = e; if (d.kind === 'npc') M.npcs[d.id] = Object.assign({}, e, prev, { at: prev.at || e.at, map: prev.map != null ? prev.map : e.map }); continue; }
       if (prev) {
         if (prev.from !== 'legacy') dup('entity', d.id, `${prev.file}:${prev.line}`, `${g.file}:${g.line}`);
-        else if (!sameEnt(prev, e)) dup('legacy entry (the two files disagree)', d.id, `${prev.file}:${prev.line}`, `${g.file}:${g.line}`);
+        else if (!sameEnt(prev, e)) dup(`legacy entry (${entSig(prev)} vs ${entSig(e)})`, d.id, `${prev.file}:${prev.line}`, `${g.file}:${g.line}`);
         continue;
       }
       M.ents[d.id] = e;
@@ -330,10 +330,15 @@ export function buildModel(loaded, game) {
   }
   return M;
 }
+// two entries for one id agree: same map, kind, gate and leads, and points within 64 px
 function sameEnt(a, b) {
-  const k = (e) => JSON.stringify([e.map, e.at, e.path, e.kind, e.gate, e.leads]);
-  return k(a) === k(b);
+  const k = (e) => JSON.stringify([e.map, e.kind, e.gate, e.leads, e.area || null]);
+  if (k(a) !== k(b)) return false;
+  const pa = a.at ? [a.at] : a.path || [], pb = b.at ? [b.at] : b.path || [];
+  if (pa.length !== pb.length) return false;
+  return pa.every((p, i) => Array.isArray(p) && Array.isArray(pb[i]) && Math.hypot(p[0] - pb[i][0], p[1] - pb[i][1]) <= 64);
 }
+const entSig = (e) => `${e.kind || '?'} map ${e.map} at ${JSON.stringify(e.at || (e.path && e.path[0]) || null)}${e.leads ? ' leads ' + e.leads : ''}`;
 
 // ---------------------------------------------------------------- parsing the little languages
 // a step's do: 'verb arg arg'
@@ -393,10 +398,16 @@ export function runChecks(M, opts = {}) {
   const dynPrefix = new Map();
   const knownGame = (id) => {
     if (G.strs.has(id) || G.keys.has(id)) return true;
-    const m = /^(.*?[a-z_])(\d+)[a-z]?$/.exec(String(id || ''));
-    if (!m) return false;
-    if (!dynPrefix.has(m[1])) { const pre = m[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); const re = new RegExp(`['"\`]${pre}['"\`]\\s*\\+|\`${pre}\\$\\{`); dynPrefix.set(m[1], Object.values(G.files).some((t) => re.test(t))); }
-    return dynPrefix.get(m[1]);
+    const str = String(id || '');
+    const cands = [];
+    const m = /^(.*?[a-z_])(\d+)[a-z]?$/.exec(str);
+    if (m) cands.push(m[1]);
+    const u = str.lastIndexOf('_');
+    if (u > 0 && u < str.length - 1) cands.push(str.slice(0, u + 1));
+    return cands.some((pre0) => {
+      if (!dynPrefix.has(pre0)) { const pre = pre0.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); const re = new RegExp(`['"\`]${pre}['"\`]\\s*\\+|\`${pre}\\$\\{`); dynPrefix.set(pre0, Object.values(G.files).some((t) => re.test(t))); }
+      return dynPrefix.get(pre0);
+    });
   };
   const isEnt = (id) => !!M.ents[id];
   const isNpc = (id) => !!M.npcs[id] || (M.ents[id] && M.ents[id].kind === 'npc');
@@ -586,7 +597,7 @@ export function runChecks(M, opts = {}) {
         const tags = { fact: t.fact, promise: t.promise, dir: t.dir, ref: t.ref };
         const conds = t.if ? [t.if] : [];
         if (t.if) checkCond(t.if, O, w);
-        if (t.say) textPair(t.say, O, w, npc, tags, conds);
+        if (t.say) { if (Array.isArray(t.say) && Array.isArray(t.say[0])) t.say.forEach((x, k) => textPair(x, O, `${w} say ${k + 1}`, npc, tags, conds)); else textPair(t.say, O, w, npc, tags, conds); }
         if (t.option) { textPair(t.option, O, `${w} option`, 'ash', {}, conds); const sc = t.scene || null; if (sc) addTo(optionScenes, sc, { O, where: w, npc }); }
         if (t.scene) { if (!M.scenes[t.scene]) FAIL('ids', `${O.id}.${w}: scene ${t.scene} is not defined`, W(O, at(O, t.scene))); addTo(scenesUsed, t.scene, { O, where: w }); }
         if (t.fact && !t.say) factCheckLater.push({ O, where: w, fact: t.fact, conds, full: '' });
@@ -642,7 +653,7 @@ export function runChecks(M, opts = {}) {
       const known = ['LANDMARKS', 'CAST', 'DOORS', 'HOUSES', 'POI', 'furn', 'SPECIAL', 'AREA', 'STRUCT', 'NPC'];
       if (!known.includes(m[1])) WARN('ids', `${e.id}: src kind ${m[1]}: is new to the checker; worldcheck.py tests it at runtime`, loc);
       const houseOf = /^h_(.+)$/.exec(m[2]);
-      if (!G.strs.has(m[2]) && !G.keys.has(m[2]) && !(houseOf && (G.cast.has(houseOf[1]) || G.strs.has(houseOf[1])))) FAIL('ids', `${e.id}: src ${s}: ${m[2]} is nowhere in the game code`, loc);
+      if (!knownGame(m[2]) && !(houseOf && (G.cast.has(houseOf[1]) || G.strs.has(houseOf[1])))) FAIL('ids', `${e.id}: src ${s}: ${m[2]} is nowhere in the game code`, loc);
     } else FAIL('ids', `${e.id}: src "${s}" should be "file.js id", LANDMARKS:id, CAST:id, DOORS:area, HOUSES:id, POI:id, furn:k, elev:n@x,y or prop:kind@x,y`, loc);
   }
 
@@ -675,6 +686,8 @@ export function runChecks(M, opts = {}) {
       if (p.if) checkCond(p.if, O, `place ${id}`);
       if (p.say) { if (!M.scenes[p.say]) FAIL('ids', `${O.id}: place ${id} says scene ${p.say}, which is not defined`, W(O, at(O, p.say))); else addTo(scenesUsed, p.say, { O, where: `place ${id}` }); }
       eachEffect(p.then, (e) => checkEffect(e, O, `place ${id}`));
+      // chest loot: a list of effects ('heart_ember id', 'give c_lampoil', 'give coins 30', 'set flag') or bare item ids
+      for (const l of arr(p.loot)) if (isStr(l)) { const w0 = l.trim().split(/\s+/)[0]; if (EFFECT_VERBS.has(w0)) checkEffect(l, O, `place ${id} loot`); else if (isItem(w0)) addTo(itemsGivenData, w0, { O, where: `place ${id} loot` }); else FAIL('ids', `${O.id}: place ${id} loot "${l}" is not an effect or an item`, W(O, at(O, l))); }
       if (p.name) textPair(p.name, O, `place ${id} name`, null, {});
     }
     for (const [id, c] of Object.entries(d.clue || {})) {
