@@ -432,6 +432,8 @@ function d3aOnRoom(A,R){
     if(R.id==='f'&&canDive()) later(1,()=>d3aTip('dive1',S('The First Dive','The First Dive'),S(`Dive with ${d3aCtl('roll')}. The blue ring is your air. Bubbles fill it up again.`,`Press ${d3aCtl('roll')} to dive. Bubbles give air!`)));
   }
   if(root==='m_burrows'){
+    // the bell was rung but its scene never played (a save and quit straight after): play it now
+    if(G.found.m_burrows_bell&&R.id==='m'&&A.def.id.endsWith('_b2')) d3aBeat('bell');
     if(R.lanes&&R.lanes.length) later(0.8,()=>d3aTip('lanes',S('Worm lanes','Worm lanes'),S('Rippling sand means a worm is coming. Get off the lane, burrow under it, or Blaze a glass plate onto it.','Ripples mean a worm! Get off, or burrow!')));
   }
 }
