@@ -38,7 +38,8 @@ places({
         [3350, 3975], [3335, 3900]], lvl: 1, style: 'rock', noise: 8 },
         post: [[3450, 3866, 1], [3450, 4150, 0]],
         nofly: { disc: [3450, 3900, 360], why: ['The wind howls round the crag. Too windy to fly.', 'Too windy to fly here!'] } } },
-    m0_hands: { kind: 'examine', map: 0, at: [3445, 3910], look: 'a2s_handprints', say: 'm0_hands',
+    // (r 10: its prompt reaches 60 px, so it never takes the E press from Ash on the south lip, where he grapples down)
+    m0_hands: { kind: 'examine', map: 0, at: [3445, 3880], r: 10, look: 'a2s_handprints', say: 'm0_hands',
       then: ['clue q_nursery', 'xp 150'], name: ['two little handprints', 'handprints'] },
 
     // ---- 3. The Wardens' Lockup (Shadow Dash). A rock cell open to the south, its mouth barred with iron too thin
