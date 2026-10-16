@@ -22,7 +22,7 @@ places({
         [3700, 10770], [3560, 10775], [3480, 10730], [3470, 10620]], lvl: 2, style: 'rock', climb: true, noise: 14 } } },
     m0_sketch: { kind: 'examine', map: 0, at: [3590, 10620], look: 'a2s_sketch_page', say: 'm0_sketch',
       then: ['clue q_lookout'], name: ['an old sketchbook page', 'a drawing'] },
-    m0_lookout_chest: { kind: 'chest', map: 0, at: [3660, 10660], loot: ['heart_ember m0_lookout'],
+    m0_lookout_chest: { kind: 'chest', map: 0, at: [3660, 10660], loot: ['heart_ember m0_lookout', 'set m0_lookout_open'],
       name: ['a little tin box under a stone', 'a tin box'] },
 
     // ---- 2. Pearl's First Hook (Grapple Tail). A crag one level up north of the Nursery cave (a1_nursery door
@@ -50,7 +50,7 @@ places({
         bars: { x: 6770, y: 8440, w: 152, h: 16, style: 'iron' } } },
     m0_ledger: { kind: 'examine', map: 0, at: [6770, 8268], look: 'a2s_ledger', say: 'm0_ledger',
       then: ['clue q_ward_ledger'], name: ["a Warden's ledger", 'an old book'] },
-    m0_lockup_chest: { kind: 'chest', map: 0, at: [6800, 8320], loot: ['give coins 80', 'xp 150'],
+    m0_lockup_chest: { kind: 'chest', map: 0, at: [6800, 8320], loot: ['give coins 80', 'xp 150', 'set m0_lockup_open'],
       name: ["the Wardens' strongbox", 'a strongbox'] },
 
     // ---- 4. Bramble Pond (Chain Whip). A rusty ring on the south bank, its chain running into the deep water.
@@ -61,7 +61,7 @@ places({
         'A chain goes into the pond. Yank it!'],
       build: { ring: [2850, 10612] }, then: ['set m0_bramble_up'] },
     m0_bramble_chest: { kind: 'chest', map: 0, at: [2920, 10634], if: 'flag m0_bramble_up', look: 'a2s_pond_chest',
-      say: 'm0_oil', loot: ['give c_lampoil', 'give coins 30'], name: ["a tin chest, dripping pond weed", 'a tin chest'] },
+      say: 'm0_oil', loot: ['give c_lampoil', 'give coins 30', 'set m0_bramble_open'], name: ["a tin chest, dripping pond weed", 'a tin chest'] },
 
     // ---- 5. Duchess's Perch (Climbing Claws). A tall rock in the meadows east of Emberhollow.
     m0_duchess: { kind: 'gate', gate: 'climb_wall', map: 0, at: [3920, 9235], r: 140, leads: 'm0_duchess_chest',
@@ -72,7 +72,7 @@ places({
         [3840, 9205], [3790, 9110]], lvl: 2, style: 'rock', climb: true, noise: 14 } } },
     m0_hoofprints: { kind: 'examine', map: 0, at: [3880, 9060], say: 'm0_hoof', name: ['goat hoofprints', 'hoofprints'] },
     m0_duchess_chest: { kind: 'chest', map: 0, at: [3960, 9080], look: 'a2s_goat_stash',
-      loot: ['heart_ember m0_duchess', 'give coins 40'], name: ["Duchess's stash", "Duchess's stash"] },
+      loot: ['heart_ember m0_duchess', 'give coins 40', 'set m0_duchess_open'], name: ["Duchess's stash", "Duchess's stash"] },
   },
 
   clue: {

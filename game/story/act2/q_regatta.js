@@ -21,7 +21,7 @@ quest({
 
   scene: {
     rg_offer: [
-      ['c_jo', "Ahoy, lizard! The chain's up and the harbor's open. It's REGATTA DAY!", 'The harbor is open! REGATTA DAY!', { fact: 'c_harbor=open' }],
+      ['c_jo', "Ahoy, lizard! The chain's up and the harbor's open. It's REGATTA DAY!", 'The harbor is open! REGATTA DAY!', { fact: 'c_harbor=open', if: 'flag c_clock_on' }],
       ['c_jo', "Eight buoys round the harbor, out the mouth and back. Boats only. ...You've got feet.", 'Eight buoys. Boats only. You have feet.'],
       ['ash', 'I can skip.'],
       ['c_jo', 'You can WHAT?'],

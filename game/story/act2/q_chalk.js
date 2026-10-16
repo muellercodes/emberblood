@@ -61,7 +61,7 @@ quest({
       ['narr', 'Inside the little stone door, someone carved letters a long time ago. Neat ones, like a ship\'s log.',
         'Old letters are carved inside.'],
       ['narr', '"FOR MOTHER. I CAN\'T FLY AND I CAN\'T BREATHE FIRE, SO I DREW YOU A DRAGON. WAVE BACK. P."',
-        '"FOR MOTHER. NO FIRE, SO I DREW YOU A DRAGON. P."'],
+        '"FOR MOTHER. I DREW YOU A DRAGON. P."'],
     ],
     ch_barley: [
       ['c_barley', 'I saw her from down here. White as a gull. Waving.', 'I saw her! White as a gull!'],

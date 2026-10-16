@@ -72,7 +72,7 @@ quest({
       ['c_oona', 'My Vesper got the claws, though. Out every night. Home every morning, with silver dust on her boots.',
         'Vesper has the claws. Out every night.'],
       ['c_oona', "She dreams of a Lady who promised to bring the fire home for me. I don't want fire. I want my girl to sit down.",
-        'A Lady promised her fire for me. I just want her home.', { clue: 'q_oona_lady' }],
+        'A Lady promised her fire for me.', { clue: 'q_oona_lady' }],
       { if: 'flag pip quest a1_pip done', then: [['pip', "Mip. (Pip curls up in Gran's lap like a warm bun.)", 'Mip. (Pip naps in her lap.)']] },
       { if: 'item a1_locket !flag c_locket_given', then: [
         { choose: 'c_oona_locket', ask: ["You still have the shell locket from the stranger's camp up north.", 'You still have the shell locket.'],
