@@ -35,11 +35,15 @@ const GATE_KINDS={
   dive_spot:     {power:'dive',    label:'Dive',           name:['a deep pool','a deep pool']},
   burrow_mound:  {power:'burrow',  label:'Burrow',         name:['a fence in the sand','a sand fence']},
   moon_glass:    {power:'moonfire',label:'Moonfire',       name:['moon-glass stairs','glass stairs']},
-  fetch_spot:    {power:'fetch',   label:"Pip's Fetch",    name:['something shiny out of reach','something shiny']}
+  fetch_spot:    {power:'fetch',   label:"Pip's Fetch",    name:['something shiny out of reach','something shiny']},
+  // no power: a way the story opens (A2B's rope bridge over the Cut). Nothing is built while it is shut.
+  bridge:        {power:null,      label:'the story',      name:['a bridge','a bridge']}
 };
 const GT={list:[],by:{},water:[],sand:[],zones:[],fly:[],px:0,py:0,dt:0.016,g:null,syncT:0,warned:{},fetch:null,nudgeT:{},t:0,tick:0};
 function gateKinds(){ const o={}; for(const k in GATE_KINDS){ const K=GATE_KINDS[k]; o[k]={power:K.power,label:K.label,name:K.name[0]}; } return o; }
 function gateOpensWith(kind){ const K=GATE_KINDS[kind]; return K?K.power:null; }
+// can Ash open this gate with what he has now (a place object or a gate id); false for story-only gates
+function gateCanOpen(place){ const g=typeof place==='string'?GT.by[place]:place&&GT.by[place.id]; const kind=g?g.kind:place&&place.gate; const K=GATE_KINDS[kind]; return !!(K&&K.power&&gtHas(K.power)); }
 function gtWarn(key,msg){ if(GT.warned[key]) return; GT.warned[key]=1; try{ console.warn('[gates] '+msg); }catch(e){} }
 // does Ash have the power right now (story mode; weapons are owned, not equipped)
 function gtHas(power){
@@ -74,7 +78,7 @@ function gateBuild(place){
   const g={id:place.id,kind,K,D,place,map,x,y,face,leads:place.leads||null,
     r:clamp(place.r!=null?+place.r:(D.r||110),D.rmin||60,D.rmax||300),
     wall:place.wall!==false,style:place.style||GT_STYLE[map]||'rock',parts:[],pieces:[],used:false};
-  try{ if(place.build) gtBuildCustom(g); else D.build(g); }catch(e){ console.error('[gates] build '+g.id,e); return null; }
+  try{ if(place.build&&!D.ownBuild) gtBuildCustom(g); else D.build(g); }catch(e){ console.error('[gates] build '+g.id,e); return null; }
   GT.list.push(g); GT.by[g.id]=g;
   gtDirtyArea(g.x,g.y,g.r+260);
   if(G) gtSync(g);
@@ -489,6 +493,20 @@ GTK.burrow_mound={r:90,rmin:60,rmax:200,
   sync(g,st){ const o=g.fences&&g.fences[g.face]; if(!o) return; if(st>=2) gtUnlist(o,LANDMARKS,P4.out); else gtList(o,LANDMARKS,P4.out); },
   isIn:(g,x,y)=>Math.abs(x-g.x)<g.r-12&&Math.abs(y-g.y)<g.r-12,
   nudge:g=>S('A fence sunk deep in the sand. You could go under it, if you could dig.','Dig under the fence?')};
+// a bridge (or any story shortcut): build.plateau is made only while it is open (faces:false paints nothing: the
+// place's own look is the deck), and the water under it is walkable like a lowered drawbridge
+GTK.bridge={r:110,rmin:30,ownBuild:true,
+  build(g){ g.B=g.place.build||{}; g.door={x:g.x,y:g.y}; if(!g.B.plateau) gtWarn('bridge:'+g.id,g.id+': a bridge gate needs build.plateau'); },
+  sync(g,st){ const D=g.B.plateau; if(!D) return; const open=st>=2;
+    if(open&&!g.deck){ g.deck=ELEV.plateau(Object.assign({k:g.map,style:g.style,noise:0},D,{id:'gate_'+g.id}));
+      const bb=g.deck?g.deck.bb:null; if(bb&&typeof P2!=='undefined'){ g.br={x0:bb[0],y0:bb[1],x1:bb[2],y1:bb[3],down:true,gate:g.id,k:'e10br'}; P2.br.push(g.br); }
+      gtDirtyArea((bb?bb[0]+bb[2]:g.x*2)/2,(bb?bb[1]+bb[3]:g.y*2)/2,(bb?Math.max(bb[2]-bb[0],bb[3]-bb[1]):200)/2+200); }
+    else if(!open&&g.deck){ const E=ELV.maps[g.map]; if(E){ const i=E.plats.indexOf(g.deck); if(i>=0){ E.plats.splice(i,1); E.plats.forEach((P,j)=>P.i=j); elvDirty(E); } }
+      if(g.br){ gtUnlist(g.br,P2.br); g.br=null; } g.deck=null; gtDirtyArea(g.x,g.y,600); } },
+  isIn:()=>false};
+// a plateau with faces:false is not painted at all (its place look draws it), in the chunks and in depth mode
+{ const base=elvPaintPlat; elvPaintPlat=function(g,P){ if(P&&P.def&&P.def.faces===false) return; return base.apply(this,arguments); }; }
+{ const base=elvDepthLean; elvDepthLean=function(E){ if(E&&E.plats&&E.plats.some(P=>P.def&&P.def.faces===false)) return base(Object.assign({},E,{plats:E.plats.filter(P=>!(P.def&&P.def.faces===false))})); return base(E); }; }
 GTK.fetch_spot={r:70,rmin:30,rmax:200,
   build(g){ const on=g.place.on==='water'?'water':'spire';
     const o={id:'gate_'+g.id+'_shiny',x:g.x,y:g.y,gate:g.id,on,h:on==='spire'?(g.place.h||86):10,got:false,ph:gtHash(g.id)%7}; o.k='e10shiny'; g.shiny=o;
@@ -824,5 +842,5 @@ window.__ebGate=Object.assign(window.__ebGate||{},{
   build:gateBuild, open:gateOpen, close:gateClose, isOpen:gateIsOpen, kinds:gateKinds, opensWith:gateOpensWith, info:gateInfo, inside:gateInside,
   list:()=>GT.list.map(g=>gateInfo(g.id)), has:gtHas, st:gtSt, fetch:()=>GT.fetch?{id:GT.fetch.g.id,ph:GT.fetch.ph}:null,
   looks:()=>Object.keys(LOOKS), poses:()=>Object.keys(POSES).map(k=>k+':'+Object.keys(POSES[k]).join(',')), lookDraw, poseDraw, defineLook, definePose,
-  raw:id=>GT.by[id], waterAt:(x,y)=>!!gtWaterAt(x,y), sync:gtSyncAll, set:gateSet, poseGet, lookHas, lookSize
+  raw:id=>GT.by[id], waterAt:(x,y)=>!!gtWaterAt(x,y), sync:gtSyncAll, set:gateSet, poseGet, lookHas, lookSize, canOpen:gateCanOpen
 });
