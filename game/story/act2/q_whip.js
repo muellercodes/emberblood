@@ -106,7 +106,7 @@ quest({
       ['narr', 'CLANG. CLANG. CLANG. Sparks, steam, singing. Ingrid holds up a chain with a brass grip and a heavy hook.',
         'CLANG! CLANG! A chain with a hook!'],
       ['c_ingrid', 'The Chain Whip! It reaches far and PULLS. Shields, crabs, levers, the odd baron.', 'The Chain Whip! It reaches far and pulls.'],
-      ['c_ingrid', "And hook posts! Lash one and you swing right over the water. Saltbeard's crew left posts out by Gull Isle and Seal Rocks.",
+      ['c_ingrid', "And hook posts! Lash one and you swing right over the water. Saltbeard's crew left two out by Gull Isle.",
         'Lash a hook post to swing over water!', { promise: 'wh_isle_out' }],
     ],
   },

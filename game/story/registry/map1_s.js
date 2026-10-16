@@ -16,9 +16,9 @@ legacy({ id: 'c_ambrose', map: 1, at: [7200, 24846], kind: 'npc', name: ['Clockk
 legacy({ id: 'c_penny', map: 1, at: [7050, 25880], kind: 'npc', name: ['Penny Press', 'Penny'], src: 'CAST:c_penny' });
 legacy({ id: 'c_ravel', map: 1, at: [7200, 25980], kind: 'npc', name: ['Madame Ravel', 'Madame Ravel'], src: 'CAST:c_ravel' });
 legacy({ id: 'c_jo', map: 1, at: [6700, 26500], kind: 'npc', name: ['Skipper Jo', 'Jo'], src: 'CAST:c_jo' });
-legacy({ id: 'c_bobs', map: 1, at: [7700, 25260], kind: 'npc', name: ['Constables Bob and Bob', 'the Bobs'],
+legacy({ id: 'c_bobs', map: 1, at: [7675, 25192], kind: 'npc', name: ['Constables Bob and Bob', 'the Bobs'],
   aliases: ['the Upper Gate in chapters 1 and 2 (6950,24300)'], src: 'CAST:c_bobs' });
-legacy({ id: 'c_bob3', map: 1, at: [7744, 25266], kind: 'npc', name: ['The Third Bob', 'Bob'], src: 'SPECIAL:c_bob3' });
+legacy({ id: 'c_bob3', map: 1, at: [7719, 25198], kind: 'npc', name: ['The Third Bob', 'Bob'], src: 'SPECIAL:c_bob3' });
 legacy({ id: 'c_mina', map: 1, at: [2416, 26353], kind: 'npc', name: ['Tide Warden Mina Mudge', 'Mina'], src: 'CAST:c_mina' });
 legacy({ id: 'c_charlie', map: 1, at: [2000, 26871], kind: 'npc', name: ['Chowder Charlie', 'Charlie'], src: 'CAST:c_charlie' });
 legacy({ id: 'c_dory', map: 1, at: [2578, 26619], kind: 'npc', name: ['Dory Cockle', 'Dory'], src: 'CAST:c_dory' });
