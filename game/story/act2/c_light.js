@@ -22,25 +22,31 @@ chapter({
     // Vesper in her mask, as a scene actor (the heist thief sprite, see v10_art2b.js)
     c_mask: { name: 'The Moth Mask', map: 1, sprite: 'moth_mask', hidden: true, card: false },
     // Agatha's bird is Squawk, not a crow (audit finding 7): the parrot sits on her bun
-    c_agatha: { look: { crow: false }, overlay: 'squawk_shoulder' },
+    // (and a step west of the lamp post that stands in front of her today, so she and Squawk can be seen)
+    c_agatha: { look: { crow: false }, overlay: 'squawk_shoulder', at: [12185, 28590] },
   },
 
   place: {
     gh_squawk_sky:  { map: 1, at: [7520, 25640], kind: 'npc_spot', name: 'the sky over the market' },
+    gh_crash_spot:  { map: 1, at: [7255, 25872], kind: 'npc_spot', name: 'in front of the fruit stall' },
     gh_fruit_spill: { map: 1, at: [7228, 25866], kind: 'prop', look: 'fruit_spill', state: 'tidy',
                       states: { tidy: 'none', spilled: 'fruit_spill' }, name: 'the spilled fruit' },
     // the Cut (verified walkable, level 2, both sides; the posts are legacy c_cut_post_w and c_cut_post_e)
     c_cut_rope:  { map: 1, at: [9478, 26912], r: 34, kind: 'examine', look: 'cut_rope_fence',
                    name: 'the rope across the road', prompt: ['Look at the rope across the road', 'Look at the rope'] },
-    c_cut_ends:  { map: 1, at: [9850, 26928], r: 30, kind: 'examine', look: 'cut_rope_ends',
+    c_cut_ends:  { map: 1, at: [9852, 26992], r: 28, kind: 'examine', look: 'cut_rope_ends',
                    name: 'the cut rope ends', prompt: ['Look at the cut ropes', 'Look at the ropes'] },
     c_cut_silk:  { map: 1, at: [9905, 27030], r: 30, kind: 'examine', look: 'grey_silk',
                    name: 'the thread on the thorn bush', prompt: ['Look at the thorn bush', 'Look at the bush'] },
     c_cut_east:  { map: 1, at: [9900, 26990], r: 140, kind: 'spot', name: 'the far side of the Cut' },
-    // the who_cut payoff: Mo's crew rebuilds the rope bridge (a walkway; built on the p2 drawbridge deck)
-    c_cut_bridge: { map: 1, kind: 'gate', gate: 'bridge', at: [9683, 26960], deck: [9536, 26936, 9830, 26984],
+    // the who_cut payoff: Mo's crew rebuilds the rope bridge, a walkway over the Cut. The deck runs just south of the two
+    // posts (their colliders stand at its ends otherwise). Proven at runtime: a level 2 plateau over the deck (so the
+    // cliff faces at both edges go) plus a lowered p2 drawbridge over the same rect (so the water under it does not
+    // block) lets Ash walk across both ways. The plateau's own faces must not paint (see A2B_NOTES.md).
+    c_cut_bridge: { map: 1, kind: 'gate', gate: 'bridge', at: [9683, 26985], deck: [9520, 26966, 9846, 27004],
+                    build: { plateau: { rect: [9520, 26966, 9846, 27004], lvl: 2, style: 'c_roof', noise: 0, faces: false } },
                     look: 'rope_bridge', name: 'the rope bridge over the Cut', payoff: { kind: 'shortcut', id: 'c_cut_bridge' } },
-    c_cut_sign:  { map: 1, at: [9455, 26960], kind: 'sign', if: 'flag c_bridge',
+    c_cut_sign:  { map: 1, at: [9470, 27012], kind: 'sign', if: 'flag c_bridge',
                    text: ['REBUILT BY THE HARBOR CREW. IT WAS NOT CRABS. SORRY, ADMIRAL. (Mo)', 'REBUILT. IT WAS NOT CRABS. SORRY, ADMIRAL. (Mo)'] },
     // round the lighthouse door (verified walkable, level 2; the door is legacy c_lighthouse_door at 12880,29052)
     lh_logbook:    { map: 1, at: [12760, 29095], r: 32, kind: 'examine', look: 'keeper_lectern',
@@ -158,7 +164,7 @@ chapter({
     // the market: Squawk is seen (audit finding 7), and Mo's crab theory is the herring
     c_squawk_crash: [
       { place: ['c_squawk', 'gh_squawk_sky'] }, { cam: 'gh_fruit_stall', s: 1.2 },
-      { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_fruit_stall'] },
+      { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_crash_spot'] },
       { anim: ['c_squawk', 'crash'] }, { sfx: 'pop' }, { do: ['world gh_fruit_spill spilled'] },
       ['narr', 'A green and red blur shoots across the market and crashes straight into the fruit stall. Plums everywhere.', 'A green and red bird crashes into the fruit stall!'],
       ['c_squawk', 'SQUAWK! LIGHT GONE! MOTHS! SQUAWK!', 'SQUAWK! LIGHT GONE! MOTHS!'],
@@ -222,7 +228,7 @@ chapter({
         { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind',
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [
-            ['narr', 'You roar fire across the Lamp Room. The moths scatter out of the windows. The fire rolls right over Vesper, and she does not even blink.', 'You roar fire! The moths fly off. The fire washes over Vesper. She is not hurt!', { clue: 'l_fireproof' }],
+            ['narr', 'You roar fire across the Lamp Room. The moths scatter out of the windows. The fire rolls right over Vesper, and she does not even blink.', 'You roar fire! The moths fly off. Vesper is not even hurt!', { clue: 'l_fireproof' }],
             ['c_mask', '...Why do you keep DOING that?', 'Why do you keep DOING that?'],
             ['ash', 'Because you keep needing it.', 'Because you keep needing it.'] ] },
         { t: ['"Where is the Ember Heart, Vesper?"', '"Where is the Heart, Vesper?"'], tone: 'brave',
@@ -260,7 +266,7 @@ chapter({
     c_light_in: [
       ['c_pearl', 'My lighthouse. The first one on this coast. Before it, ships found the rocks by hitting them. Very efficient. Very wet.', 'My lighthouse. Before it, ships found rocks by hitting them.'],
       ['c_pearl', "Something's eaten my light. Moths. They love a flame and they hate a light. Funny creatures. Like some people.", 'Moths ate my light. They love a flame and hate a light.'],
-      ['c_pearl', 'My little lens still turns, see? When the beam comes round, the moth webs shrivel. When it goes, the shadows come back. Use both.', 'When the beam comes, moth webs shrink. When it goes, shadows come back. Use both.'],
+      ['c_pearl', 'My little lens still turns, see? When the beam comes round, the moth webs shrivel. When it goes, the shadows come back. Use both.', 'Light shrinks the moth webs. Then shadows come back. Use both.'],
     ],
     c_light_shrine: [
       ['c_pearl', 'My lens room. I used to sit here on long nights and watch the beam go round, and round, and round.', 'My lens room. I watched the beam go round and round.'],
@@ -271,21 +277,21 @@ chapter({
       ['narr', 'The little lens turns, and its beam sweeps across you. Behind you, your own shadow stretches long across the floor. Then it moves. On its own. It waves.', 'The beam sweeps over you. Your shadow stretches out. Then it waves at you!'],
       ['narr', "You step forward, and somehow you're standing where your shadow's head was, three steps away, without taking the steps.", 'You step, and you are suddenly three steps away.'],
       ['c_pearl', "The Shadow Dash! Dash, and for a moment you're a shadow. Moth curtains can't catch you. Nobody looking for you can see you.", 'The Shadow Dash! Dash and you become a shadow. Moth curtains cannot stop you.'],
-      ['c_pearl', "Start your dash inside a shadow and you'll ride it all the way to the far end. Over gaps, if the shadow's long enough.", 'Dash from inside a shadow and you ride it to the end. Even over gaps!'],
+      ['c_pearl', "Start your dash inside a shadow and you'll ride it all the way to the far end. Over gaps, if the shadow's long enough.", 'Dash from a shadow to ride it. Even over gaps!'],
       ['c_pearl', 'Those bars are made of shadow. They only let a shadow through in the dark. Wait for the beam to pass.', 'Shadow bars let you through only in the dark.'],
       ['ash', "I'm a shadow. I'm a SHADOW. Pip, I'm a shadow!", "I'm a SHADOW! Pip, look!"],
       { if: 'flag pip', then: [
         ['pip', "Mip?! (Pip hides behind you. Then he realises that's where your shadow is. Pip is very confused.)", 'Mip?! (Pip hides in your shadow. He is very confused.)'] ] },
     ],
     c_gloomwing_intro: [
-      ['narr', "The Lamp Room is dark. Something huge and soft is wrapped around the great lamp like a scarf. Two enormous eyes open on its wings. Then two more. They're not eyes. They're worse.", 'Something huge and soft wraps the lamp. Two big eyes open on its wings. Then two more.'],
+      ['narr', "The Lamp Room is dark. Something huge and soft is wrapped around the great lamp like a scarf. Two enormous eyes open on its wings. Then two more. They're not eyes. They're worse.", 'A huge soft moth wraps the lamp. Big eyes open on its wings.'],
     ],
     c_light_won: [
       ['narr', 'The beam hits the Gloomwing full on. All the grey dust slides off its wings like snow, and underneath they are gold. The dust was never its own.', 'The beam hits it. The grey dust falls off. Its wings are gold underneath!', { clue: 'l_lamp_moths' }],
       ['c_pearl', 'Poor thing. Somebody told it the dark was its friend. Light is kinder, in the end.', 'Poor thing. Light is kinder, in the end.'],
     ],
     c_light_end: [
-      ['c_pearl', "That's the last of my places, Ash. The claws, the tail, the shadow. All of it was waiting for whoever came next. I'm glad it was you. Now light my lamp.", "That's the last of my places. I'm glad it was you. Now light my lamp."],
+      ['c_pearl', "That's the last of my places, Ash. The claws, the tail, the shadow. All of it was waiting for whoever came next. I'm glad it was you. Now light my lamp.", "My last place. I'm glad it was you. Light my lamp!"],
     ],
   },
 

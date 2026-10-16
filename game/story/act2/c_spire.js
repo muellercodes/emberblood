@@ -52,8 +52,8 @@ chapter({
         ['Two moths came down out of the dark. A grey one, bigger than a ship, with painted eyes on her wings. And a white one that only ever says shhh.', 'Two moths came. A huge grey one. A white one that says shhh.'],
         ['The white one called the grey one MURMUR. The grey one called the white one HUSH. Nobody called me anything.', 'Their names are Murmur and Hush.'],
         ['Murmur cracked the Heart on the stones. Three pieces. "To let the light out," she said.', 'Murmur broke the Heart into three pieces.'],
-        ["Hush flew north with one. Murmur flew east with one, right over Gearhaven. That's when the clocks stopped, and the tide, and the lighthouse. That was HER. Not me.", 'Hush flew north. Murmur flew east, over Gearhaven. She stopped the clocks. Not me!'],
-        ['The third piece fell by my foot. It was warm. Nothing I ever held was warm like that. I kept it. It went purple in my hand, like it was sad.', 'The third piece fell by me. It was warm. I kept it. It turned purple.'],
+        ["Hush flew north with one. Murmur flew east with one, right over Gearhaven. That's when the clocks stopped, and the tide, and the lighthouse. That was HER. Not me.", 'Murmur flew east over Gearhaven. She stopped the clocks. Not me!'],
+        ['The third piece fell by my foot. It was warm. Nothing I ever held was warm like that. I kept it. It went purple in my hand, like it was sad.', 'The third piece fell by me. It was warm. I kept it.'],
         ['Now the moths are angry. They call the Lady THE MOTHER. She wants all three pieces. She said bring the last one to the Spire at moonrise and Gran will be warm.', 'The moths call the Lady the Mother. She wants all three pieces.'],
         ["I don't think she was ever going to keep her promise.", "I don't think she will keep her promise."],
       ] },
@@ -228,7 +228,7 @@ chapter({
       { if: 'flag pip', then: [['pip', 'Mip. (Pip holds your horn. Very tightly.)', 'Mip. (Pip holds your horn tight.)']] },
     ],
     c_spire_dark: [
-      ['narr', 'The dark is spreading across the floor like spilled ink. Where it touches, you feel slow and cold. The violet lamps burn cold. Maybe yours burns warmer.', 'Dark ink spreads on the floor. It makes you slow. Your fire is warmer than the violet lamps.'],
+      ['narr', 'The dark is spreading across the floor like spilled ink. Where it touches, you feel slow and cold. The violet lamps burn cold. Maybe yours burns warmer.', 'Dark ink spreads. It makes you slow. Your fire is warmer.'],
     ],
     c_spire_clones: [
       ['narr', 'Two shadows peel up off the floor. They look exactly like you. They move when you move. One of them is doing it backwards.', 'Two shadows stand up. They look like you. One copies you backwards.'],
@@ -236,7 +236,7 @@ chapter({
       ['narr', 'Both shadows mouth, "Hey. Stop copying me."', 'They both say, "Hey. Stop copying me."'],
     ],
     c_spire_sketch: [
-      ['narr', 'A sketchbook, left on a step. Drawings of an old woman by a cold stove. Of stilt houses. Of a horned kid in a scarf, with a note underneath: "taller in person. no he isn\'t."', 'A sketchbook. An old woman by a cold stove. And you: "taller in person. no he isn\'t."'],
+      ['narr', 'A sketchbook, left on a step. Drawings of an old woman by a cold stove. Of stilt houses. Of a horned kid in a scarf, with a note underneath: "taller in person. no he isn\'t."', 'A sketchbook. A cold old woman. And you: "taller in person. no he isn\'t."'],
     ],
     c_spire_core: [
       ['narr', 'The Spire is hollow in the middle, all the way up. Warm air rises from somewhere deep below. Warm. In here. You spread your wings.', 'The Spire is hollow inside. Warm air rises. You spread your wings.'],
