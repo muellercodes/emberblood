@@ -1280,3 +1280,141 @@ window.__ebX=Object.assign(window.__ebX||{},{vor:{
   tide:()=>(G.fz||[]).filter(z=>z.k==='vtide').map(z=>({rad:z.rad,delay:z.delay})),
   vorFinish:()=>{ if(VOR.e) vorFinish(VOR.e); }
 }});
+
+// ================= v10: what Act I's people promise on the mountain is really there
+// The Oath's Lift (Hob's kettle key): a rope lift from the Ashfall Terraces (Tier 1, its narrow east shelf) up to the
+// Vent Fields (Tier 4, east of the vent). It is chained at the top: Ash unlocks it there with the key the first time he
+// gets up the hard way; then it rides both ways (a shortcut for a retry). Juniper's Smoke Ledge: the narrow ledge east
+// of Bram's Anvil (Tier 2's east shelf), lost in thick smoke unless Ash has her map; with it, chalk marks show the way
+// and the smoke lets him through to a chest with a Heart Ember. Sir Cindervane's stone chair on the rim by the west
+// crater stairs. Marlo's chest stays hidden until Ash holds Marlo's note, which also puts an X on the map.
+const VV={lift:{top:{x:7930,y:1905},bot:{x:8392,y:2412}},
+  smoke:{mouth:{x0:8140,x1:8330,y:2215},path:[[8236,2236],[8232,2176],[8218,2116],[8204,2056],[8192,1996],[8178,1940],[8166,1888]],chest:{x:8180,y:1978}},
+  chair:{x:6630,y:446}};
+const vvMap=()=>!!(G&&G.items&&G.items.juniper_map);
+const vvMarlo=()=>!!(G&&G.items&&G.items.a1_marlonote>0);
+{ const base=initWorld; initWorld=function(){ base(); try{ vvPlaces(); }catch(e){ console.error('vv places',e); } }; }
+function vvPlaces(){
+  const L=(o)=>{ const pr=o.prompt, q=addLandmark(Object.assign({k:'reach',noNudge:true,draw:()=>{}},o,{prompt:typeof pr==='function'?'':pr})); if(typeof pr==='function') Object.defineProperty(q,'prompt',{get:pr,configurable:true}); return q; };
+  // the lift's two stations (the crank frame at the top, a little landing at the bottom)
+  const T=VV.lift.top, B=VV.lift.bot;
+  addCol({t:'c',x:T.x+20,y:T.y-4,r:15}); addCol({t:'c',x:B.x+18,y:B.y-2,r:12});
+  VV.lms=[L({id:'a1_lift_top',x:T.x-12,y:T.y+24,r:0,prompt:()=>G?vvLiftPrompt(1):'',act:()=>vvLiftAct(1)}),
+    L({id:'a1_lift_bot',x:B.x-10,y:B.y+22,r:0,prompt:()=>G?vvLiftPrompt(0):'',act:()=>vvLiftAct(0)})];
+  REACH.clear.push({x:T.x,y:T.y,r:70},{x:B.x,y:B.y,r:60});
+  // the Smoke Ledge: thick smoke closes its mouth unless Ash has Juniper's map; her chest waits at the far end
+  const M=VV.smoke.mouth, c=addCol({t:'r',x0:M.x0,y0:M.y-10,x1:M.x1,y1:M.y+10});
+  Object.defineProperty(c,'off',{get:()=>vvMap(),set(){},configurable:true});
+  L({id:'a1_smokeledge',x:(M.x0+M.x1)/2,y:M.y+36,r:0,prompt:()=>G?(vvMap()?S('Follow Juniper’s chalk marks','Follow the chalk marks'):S('Look at the smoke','Look at the smoke')):'',act:vvSmokeLook,hidden:()=>!!G.found.a1_cm_smoke});
+  const C=VV.smoke.chest;
+  reachChest('a1_cm_smoke',C.x,C.y,{coins:30,xp:150,title:S('Juniper’s Smoke Ledge','The Smoke Ledge'),sub:S('30 coins and a Heart Ember','30 coins and a Heart Ember!'),
+    say:[S(`A little chest tucked into the rocks, with a chalk J on the lid. Inside is a note: "Told you. J."`,`A chest with a chalk J on it. A note: "Told you. J."`)]},
+    {hidden:()=>!!G.found.a1_cm_smoke||!vvMap(),draw:(o,t)=>{ if(G.found[o.id]||vvMap()) rChestDraw(o,t); },act:o=>{ reachLoot(o); try{ gainHeartEmber('a1_smoke'); }catch(e){} }});
+  for(const [x,y] of VV.smoke.path) REACH.clear.push({x,y,r:46});
+  // Sir Cindervane's chair, on the rim at the top of the west crater stairs
+  const H=VV.chair; addCol({t:'c',x:H.x,y:H.y-2,r:12});
+  L({id:'a1_cm_chair',x:H.x,y:H.y+28,r:0,prompt:S('Look at the stone chair','Look at the chair'),act:vvChairAct});
+  // Marlo's chest: not there until Ash has read Marlo's note (an opened one stays, open); opening it uses the note up
+  const MC=LANDMARKS.find(o=>o.id==='a1_cm_marlo');
+  if(MC){ MC.hidden=()=>!!G.found.a1_cm_marlo||!vvMarlo(); MC.draw=(o,t)=>{ if(G.found[o.id]||vvMarlo()) rChestDraw(o,t); };
+    const act=MC.act; MC.act=o=>{ act(o); if(G.found.a1_cm_marlo&&G.items.a1_marlonote) delete G.items.a1_marlonote; }; }
+  mapListsReset();
+}
+function vvLiftPrompt(top){
+  if(G.flags.a1_lift) return top?S('Ride the Oath’s lift down','Ride the lift down'):S('Ride the Oath’s lift up','Ride the lift up');
+  if(top&&G.items.a1_liftkey) return S('Unlock the Oath’s lift','Unlock the lift');
+  return S('Look at the Oath’s lift','Look at the lift');
+}
+function vvLiftAct(top){
+  const T=VV.lift.top, B=VV.lift.bot, done=()=>{ scene='play'; };
+  if(G.flags.a1_lift){ runDialogue([['narr',top?S(`You climb into the basket and let the rope out, hand over hand. Down past the smoke to the lower terraces.`,`You ride the basket down, down, down!`):S(`You climb into the basket and turn the crank. Creak. Creak. Creak. Up past the smoke to the Vent Fields.`,`You turn the crank. Creak, creak! Up you go!`)]],()=>{ done(); const to=top?B:T; mapTravel(to.x-30,to.y+44,{banner:top?S('The Ashfall Terraces','The lower terraces'):S('The Vent Fields','The Vent Fields')}); saveGame(); }); return; }
+  if(top&&G.items.a1_liftkey){ G.flags.a1_lift=true; SFX.play('chest');
+    runDialogue([['narr',S(`The basket is chained to the frame with a big padlock stamped OATH LIFT. Hob's key turns with a clunk.`,`A big lock says OATH LIFT. Hob's key fits! Clunk.`)],['ash',S(`A shortcut! Now I can ride up here from the bottom terraces.`,`A shortcut! I can ride up from the bottom now.`)]],()=>{ done(); setBanner(S('The Oath’s Lift','The Oath’s Lift'),S('It carries you between the Ashfall Terraces and the Vent Fields.','It goes between the low terraces and here.'),3); saveGame(); }); return; }
+  if(top){ runDialogue([['narr',S(`A rickety lift: a rope, a crank and a basket, chained up with a big padlock stamped OATH LIFT. You would need its key.`,`A rope lift with a big lock. It says OATH LIFT.`)]],done); return; }
+  runDialogue([['narr',S(`The bottom of a rope lift. Its basket hangs way up at the top, chained to the frame.`,`A rope lift. The basket is chained up at the top.`)],
+    {who:'narr',text:S(`Hob's key says OATH LIFT. The lock must be up there, at the top.`,`Hob's key fits the lock at the top.`),skipIf:()=>!G.items.a1_liftkey}],done);
+}
+function vvSmokeLook(){
+  if(!vvMap()){ runDialogue([['narr',S(`Thick smoke pours out of the rocks here. You can't see a thing, and it smells like burnt socks.`,`Thick smoke! You can't see a thing.`)],['narr',S(`Somebody with a really good map might know a way through.`,`Maybe a good map shows a way.`)]],()=>{ scene='play'; }); return; }
+  runDialogue([['narr',S(`Juniper's map shows a ledge right through the smoke. Little chalk J's mark the safe rocks.`,`Juniper's map shows a ledge. Chalk J's mark the way.`)]],()=>{ scene='play'; });
+}
+function vvChairAct(){
+  const ally=G.choices&&G.choices.cinder==='ally';
+  runDialogue([['narr',S(`A small stone chair at the top of the crater stairs. Someone carved a C on the back, and a little helmet.`,`A stone chair. A C and a helmet are carved on it.`)],
+    {who:'narr',text:S(`Sir Cindervane's chair. He said it was at the top. Just to know it's there.`,`Sir Cindervane's chair! At the top, like he said.`),skipIf:()=>!ally},
+    {who:'narr',text:S(`You sit down for a moment. What a view. A tired knight would like knowing this was here.`,`You sit down. What a view!`),skipIf:()=>ally}],()=>{ scene='play'; });
+}
+// the lift still works with foes about (low-ground foes below the shelf can see Ash but never reach him)
+{ const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{
+  if(G&&!G.prompt&&G.inCombat&&!AREA&&player&&!player.dead&&VV.lms) for(const o of VV.lms){ if(dist(player.x,player.y,o.x,o.y)<66){ const tx=o.prompt; if(tx) G.prompt={text:tx,act:()=>lmAct(o),x:o.x,y:o.y,always:true}; break; } }
+  }catch(e){ console.error(e); } }; }
+// ---- drawing: the lift (stations, rope, basket), the smoke and Juniper's chalk marks, the chair
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ vvRender(list); }catch(e){ console.error('vv render',e); } }; }
+function vvRender(list){
+  if(AREA||!G||G.mode!=='story'||!player) return;
+  const p=player; if(p.y>3300||p.x<5200||p.x>8800) return;
+  const t=G.time, T=VV.lift.top, B=VV.lift.bot;
+  if(inView((T.x+B.x)/2,(T.y+B.y)/2,460)){
+    const A=[T.x+20,T.y-62], Z=[B.x+18,B.y-44], n=8, at=u=>[lerp(A[0],Z[0],u),lerp(A[1],Z[1],u)+Math.sin(u*Math.PI)*26];
+    for(let i=0;i<n;i++){ const a=at(i/n), b=at((i+1)/n); list.push({x:(a[0]+b[0])/2,y:(a[1]+b[1])/2+90,flying:true,draw:()=>vvRope(a,b)}); }
+    list.push({x:T.x,y:T.y,draw:()=>vvStation(T.x,T.y,true)});
+    list.push({x:B.x,y:B.y,draw:()=>vvStation(B.x,B.y,false)});
+    // the basket: chained at the top while locked, otherwise waiting at the end nearer Ash
+    const up=!G.flags.a1_lift||dist(p.x,p.y,T.x,T.y)<dist(p.x,p.y,B.x,B.y), q=up?at(0.07):at(0.93);
+    list.push({x:q[0],y:q[1]+90,flying:true,draw:()=>vvBasket(q[0],q[1]+14,!G.flags.a1_lift)});
+  }
+  const P=VV.smoke.path;
+  if(inView(8200,2060,300)){
+    const map=vvMap();
+    if(map){ ctx.save(); for(let i=0;i<P.length;i++){ const [x,y]=P[i]; vvChalk(x+(i%2?-10:10),y+6,t+i); } ctx.restore(); }
+    P.forEach(([x,y],i)=>{ for(let k=0;k<(map?1:4);k++){ const ph=t*0.35+i*1.7+k*2.1, px=x+Math.sin(ph)*14+(k-1.5)*20, py=y-8+Math.cos(ph*0.8)*8-k*12, r=map?26:44+k*7, a=map?0.12:0.72-k*0.1;
+      list.push({x:px,y:py+50,flying:true,draw:()=>{ ctx.fillStyle=`rgba(${map?'150,140,140':'78,70,74'},${a})`; ctx.beginPath(); ctx.ellipse(px,py,r,r*0.62,0,0,TAU); ctx.fill(); ctx.fillStyle=`rgba(190,180,176,${a*0.45})`; ctx.beginPath(); ctx.ellipse(px-r*0.25,py-r*0.2,r*0.5,r*0.3,0,0,TAU); ctx.fill(); }}); } });
+    if(!map){ const M=VV.smoke.mouth; for(let k=0;k<5;k++){ const x=lerp(M.x0+18,M.x1-18,k/4)+Math.sin(t*0.6+k)*8, y=M.y-14+Math.cos(t*0.5+k*1.3)*5;
+      list.push({x,y:y+40,flying:true,draw:()=>{ ctx.fillStyle='rgba(78,70,74,.78)'; ctx.beginPath(); ctx.ellipse(x,y,38,28,0,0,TAU); ctx.fill(); ctx.fillStyle='rgba(150,140,138,.3)'; ctx.beginPath(); ctx.ellipse(x-8,y-8,18,10,0,0,TAU); ctx.fill(); }}); } }
+  }
+  const H=VV.chair; if(inView(H.x,H.y,120)) list.push({x:H.x,y:H.y,draw:()=>vvChair(H.x,H.y)});
+}
+function vvRope(a,b){ ctx.save(); ctx.lineCap='round'; ctx.strokeStyle='#3a2416'; ctx.lineWidth=4.4; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); ctx.strokeStyle='#c09060'; ctx.lineWidth=2; ctx.stroke();
+  ctx.strokeStyle='#3a2416'; ctx.lineWidth=3.4; ctx.beginPath(); ctx.moveTo(a[0]+7,a[1]+5); ctx.lineTo(b[0]+7,b[1]+5); ctx.stroke(); ctx.strokeStyle='#8e6a40'; ctx.lineWidth=1; ctx.stroke(); ctx.restore(); }
+function vvStation(x,y,top){
+  ctx.save(); ctx.translate(x,y);
+  ctx.fillStyle='rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(18,2,30,8,0,0,TAU); ctx.fill();
+  ctx.fillStyle='#6a4428'; ctx.fillRect(-4,-6,46,10); ctx.fillStyle='#8e6038'; ctx.fillRect(-4,-6,46,3);
+  const H=top?62:44; ctx.strokeStyle='#2a180e'; ctx.lineWidth=6; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(6,-2); ctx.lineTo(20,-H); ctx.lineTo(34,-2); ctx.stroke();
+  ctx.strokeStyle='#8a5a34'; ctx.lineWidth=3.6; ctx.stroke();
+  ctx.fillStyle='#4a4a52'; ctx.beginPath(); ctx.arc(20,-H,5,0,TAU); ctx.fill(); ctx.fillStyle='#9a9aa6'; ctx.beginPath(); ctx.arc(20,-H,2,0,TAU); ctx.fill();
+  if(top){ // the crank wheel, and the chain and padlock while it is locked
+    ctx.strokeStyle='#2a180e'; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(-2,-26,11,0,TAU); ctx.stroke(); ctx.strokeStyle='#a87444'; ctx.lineWidth=2; ctx.stroke();
+    const a=G.time*(G.flags.a1_lift?0.6:0); for(let k=0;k<4;k++){ const q=a+k*Math.PI/2; ctx.beginPath(); ctx.moveTo(-2,-26); ctx.lineTo(-2+Math.cos(q)*11,-26+Math.sin(q)*11); ctx.stroke(); }
+    ctx.fillStyle='#4a2c18'; ctx.fillRect(-16,-28,6,3);
+    if(!G.flags.a1_lift){ ctx.strokeStyle='#5a5a64'; ctx.lineWidth=2; ctx.setLineDash([3,2]); ctx.beginPath(); ctx.moveTo(34,-10); ctx.lineTo(46,-20); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='#4a4a52'; rrect(ctx,42,-24,10,9,2); ctx.fill(); ctx.strokeStyle='#4a4a52'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(47,-25,3.4,Math.PI,0); ctx.stroke(); ctx.fillStyle='#c84a3a'; ctx.fillRect(44,-21,6,2); } }
+  else { ctx.fillStyle='#d8c8a0'; ctx.font=`900 7px ${UIF}`; ctx.textAlign='center'; ctx.fillText('LIFT',20,-10); }
+  ctx.restore();
+}
+function vvBasket(x,y,chained){ ctx.save(); ctx.translate(x,y);
+  ctx.strokeStyle='#3a2416'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-10,-10); ctx.lineTo(0,-24); ctx.lineTo(10,-10); ctx.stroke();
+  ctx.fillStyle='#7a5030'; ctx.beginPath(); ctx.moveTo(-13,-10); ctx.lineTo(13,-10); ctx.lineTo(10,6); ctx.lineTo(-10,6); ctx.closePath(); ctx.fill(); ctx.strokeStyle='#2a180e'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.strokeStyle='rgba(255,220,170,.35)'; ctx.lineWidth=1; for(let k=-1;k<=1;k++){ ctx.beginPath(); ctx.moveTo(-12,-5+k*4); ctx.lineTo(12,-5+k*4); ctx.stroke(); }
+  if(chained){ ctx.strokeStyle='#5a5a64'; ctx.setLineDash([3,2]); ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(13,-6); ctx.lineTo(20,-16); ctx.stroke(); ctx.setLineDash([]); }
+  ctx.restore(); }
+function vvChalk(x,y,t){ ctx.strokeStyle='rgba(250,248,240,.85)'; ctx.lineWidth=1.8; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(x+3,y-8); ctx.lineTo(x+3,y+1); ctx.quadraticCurveTo(x+3,y+5,x-1,y+5); ctx.quadraticCurveTo(x-4,y+5,x-4,y+2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x-6,y-10); ctx.lineTo(x,y-16); ctx.lineTo(x+6,y-10); ctx.stroke(); if(Math.sin(t*2)>0.7) glowAt(x,y-4,8,'255,250,230',0.25); }
+function vvChair(x,y){ ctx.save(); ctx.translate(x,y); ctx.scale(1.3,1.3);
+  ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(2,3,17,6,0,0,TAU); ctx.fill();
+  ctx.fillStyle='#5e5048'; ctx.fillRect(-13,-34,26,26); ctx.fillStyle='#7a6a60'; ctx.fillRect(-13,-34,8,26); ctx.fillStyle='#4a3e38'; ctx.fillRect(10,-34,3,26);
+  ctx.fillStyle='#6a5a52'; ctx.fillRect(-15,-12,30,12); ctx.fillStyle='#8a7a6e'; ctx.fillRect(-15,-12,30,3); ctx.fillStyle='#463a34'; ctx.fillRect(-15,-1,30,2);
+  ctx.fillStyle='#544640'; ctx.fillRect(-15,-36,30,4);
+  ctx.strokeStyle='rgba(255,200,140,.75)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(0,-24,4.5,Math.PI*0.25,Math.PI*1.75); ctx.stroke();
+  ctx.fillStyle='#8a2a2a'; ctx.fillRect(-11,-14,22,3);
+  ctx.strokeStyle='#2a1a16'; ctx.lineWidth=1.2; ctx.strokeRect(-13,-34,26,26); ctx.strokeRect(-15,-12,30,12);
+  ctx.restore(); }
+// ---- the map: an X for Marlo's note, and Juniper's mark for the Smoke Ledge
+{ const base=drawMapScreen; drawMapScreen=function(){ base(); try{
+  if(!G||G.mode!=='story'||typeof MAPUI==='undefined'||MAPUI.view!==0) return;
+  const g=mapG, X=(x,y,col,lbl)=>{ const [px,py]=mapXY(x,y); g.save(); g.lineCap='round';
+    for(const [w,c] of [[8,'rgba(0,0,0,.75)'],[4.5,col]]){ g.strokeStyle=c; g.lineWidth=w; g.beginPath(); g.moveTo(px-10,py-10); g.lineTo(px+10,py+10); g.moveTo(px+10,py-10); g.lineTo(px-10,py+10); g.stroke(); }
+    g.font='600 15px Rubik, system-ui, sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(lbl,px,py+24); g.fillStyle='#ffe2c8'; g.fillText(lbl,px,py+24); g.restore(); };
+  if(vvMarlo()&&!G.found.a1_cm_marlo) X(VCL.marlo.x,VCL.marlo.y,'#ff5a3a',simplify(S('Marlo’s X','Marlo’s X')));
+  if(vvMap()&&!G.found.a1_cm_smoke) X(VV.smoke.chest.x,VV.smoke.chest.y,'#f4f0ff',simplify(S('The Smoke Ledge','The Smoke Ledge')));
+  }catch(e){ console.error(e); } }; }
+Object.assign(window.__ebX.vor,{VV,lift:()=>({unlocked:!!G.flags.a1_lift,key:!!G.items.a1_liftkey}),smokeOpen:()=>vvMap(),marloShown:()=>{ const o=LANDMARKS.find(q=>q.id==='a1_cm_marlo'); return o?!o.hidden():null; }});
