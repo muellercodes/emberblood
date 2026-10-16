@@ -37,7 +37,7 @@ const GATE_KINDS={
   moon_glass:    {power:'moonfire',label:'Moonfire',       name:['moon-glass stairs','glass stairs']},
   fetch_spot:    {power:'fetch',   label:"Pip's Fetch",    name:['something shiny out of reach','something shiny']}
 };
-const GT={list:[],by:{},water:[],sand:[],dt:0.016,g:null,syncT:0,warned:{},fetch:null,nudgeT:{},t:0,tick:0};
+const GT={list:[],by:{},water:[],sand:[],zones:[],fly:[],px:0,py:0,dt:0.016,g:null,syncT:0,warned:{},fetch:null,nudgeT:{},t:0,tick:0};
 function gateKinds(){ const o={}; for(const k in GATE_KINDS){ const K=GATE_KINDS[k]; o[k]={power:K.power,label:K.label,name:K.name[0]}; } return o; }
 function gateOpensWith(kind){ const K=GATE_KINDS[kind]; return K?K.power:null; }
 function gtWarn(key,msg){ if(GT.warned[key]) return; GT.warned[key]=1; try{ console.warn('[gates] '+msg); }catch(e){} }
@@ -125,6 +125,26 @@ function gtList(o,...arrs){ for(const a of arrs) if(a&&!a.includes(o)) a.push(o)
 function gtUnlist(o,...arrs){ for(const a of arrs){ if(!a) continue; const i=a.indexOf(o); if(i>=0) a.splice(i,1); } }
 // a collider that is off while the gate is open for everyone (st>=2) or while `extra()` says so; never burrowed under
 function gtCol(g,c,extra){ c.deep=true; c.gate=g.id; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||(extra?!!extra():false); },configurable:true}); addCol(c); g.parts.push(c); return c; }
+// door zones: thick rects round a shut door that stop Ash on foot, jumping or rolling (a collider alone is thin enough
+// for a fast roll to tunnel through). pass() says when the power lets him through (a shadow, a lit curtain, melted ice).
+function gtZone(g,R,pass,keep){ const horiz=R.w>=R.h, z={g,keep:!!keep,horiz,cx:R.x,cy:R.y,x0:R.x-R.w/2-(horiz?4:18),x1:R.x+R.w/2+(horiz?4:18),y0:R.y-R.h/2-(horiz?18:4),y1:R.y+R.h/2+(horiz?18:4),pass:pass||null};
+  (g.zones||(g.zones=[])).push(z); GT.zones.push(z); return z; }
+function gtZoneAt(x,y){ const Z=GT.zones; for(let i=0;i<Z.length;i++){ const z=Z[i]; if(x<z.x0||x>z.x1||y<z.y0||y>z.y1) continue; if(!z.keep&&gtSt(z.g.id)>=2) continue; if(z.pass&&z.pass()) continue; return z; } return null; }
+// a move into a shut door's zone from outside it, or across its middle line from anywhere, is blocked (so Ash can always
+// step back out of a zone he was put in, but never through the door)
+const gtInZ=(z,x,y)=>x>=z.x0&&x<=z.x1&&y>=z.y0&&y<=z.y1;
+function gtZoneStops(x,y,ox,oy){ const z=gtZoneAt(x,y); if(!z) return false; if(!gtInZ(z,ox,oy)) return true;
+  return z.horiz?((y-z.cy)*(oy-z.cy)<0):((x-z.cx)*(ox-z.cx)<0); }
+// flight walls: Ash cannot fly into a nook whose way in is not wings (lvl 1 rocks, islands, sand pens); the no-fly
+// zone round it grounds him first, this is the backstop so a fast flier cannot land on top
+function gtFlyIn(x,y){ const L=GT.fly; for(let i=0;i<L.length;i++){ const g=L[i]; if(gtSt(g.id)>=2) continue; const f=g.flyZ;
+  if(f.e){ const dx=(x-f.x)/f.rx, dy=(y-f.y)/f.ry; if(dx*dx+dy*dy<1) return g; } else if(Math.abs(x-f.x)<f.rx&&Math.abs(y-f.y)<f.ry) return g; } return null; }
+function gtFlyWall(g,e,x,y,rx,ry){ g.flyZ={e,x,y,rx,ry}; GT.fly.push(g); }
+{ const base=playerBlocked; playerBlocked=function(x,y){
+    if(x<IZX-50&&G&&G.mode==='story'){ const p=player;
+      if(p&&p.flying){ if(GT.fly.length&&gtFlyIn(x,y)&&!gtFlyIn(GT.px,GT.py)){ gtSayOnce('fly',S('The air over there will not hold your wings.','You cannot fly there.')); return true; } }
+      else if(GT.zones.length&&gtZoneStops(x,y,GT.px,GT.py)) return true; }
+    return base(x,y); }; }
 // wrap an existing collider's `off` so it is also off while the gate is open
 function gtColWrap(g,c,soft){ if(!c) return; if(!soft) c.deep=true; const d=Object.getOwnPropertyDescriptor(c,'off'), get=d&&d.get; if(get) Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||get.call(c); },configurable:true}); else { let v=!!c.off; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||v; },set(x){ v=!!x; },configurable:true}); } }
 
@@ -144,7 +164,10 @@ function gtMesa(g,o){
   const P=ELEV.plateau({k,disc:[g.x,g.y,g.rx,g.ry],lvl,style:g.style,climb:!!o.climb,step:!!o.step,noise:o.noise!=null?o.noise:8,id:'gate_'+g.id,seed:(gtHash(g.id)%997)+11});
   g.plat=P; g.side=gtSide(g,lvl);
   ELEV.clear({k,disc:[g.x,g.y+lvl*ELEV.px*0.4,g.rx+70,g.ry+lvl*ELEV.px+90]});
-  if(o.nofly) g.nofly=ELEV.noFly({k,disc:[g.x,g.y+lvl*ELEV.px*0.5,g.rx+150,g.ry+lvl*ELEV.px+150],why:S('The air over these rocks is too still for wings.','No wind here. You cannot fly.')});
+  // and an apron in front of the way in, so no tree or rock stands where Ash needs to aim, throw or pull
+  const f=g.side.foot, u=g.side.out; ELEV.clear({k,disc:[f[0]+u[0]*90,f[1]+u[1]*90,Math.abs(u[1])?230:180,Math.abs(u[1])?180:230]});
+  if(o.nofly){ g.nofly=ELEV.noFly({k,disc:[g.x,g.y+lvl*ELEV.px*0.5,g.rx+150,g.ry+lvl*ELEV.px+150],why:S('The air over these rocks is too still for wings.','No wind here. You cannot fly.')});
+    gtFlyWall(g,true,g.x,g.y+lvl*ELEV.px*0.5,g.rx+22,g.ry+lvl*ELEV.px*0.5+30); }
   g.inside={x:g.x,y:g.y,r:Math.round(g.r*0.6)};
   g.door={x:g.side.foot[0],y:g.side.foot[1]};
   return P;
@@ -206,16 +229,21 @@ function gtWaterAt(x,y){
 // a jump never clears gate water (only Water Stride, the whip's swing, Dive's swim or flight do); the rapids round a
 // whip island are too fast even for Water Stride (Dive still swims them: p4 asks first)
 { const base=playerBlocked; playerBlocked=function(x,y){
-    if(GT.water.length&&x<IZX-50){ const p=player; if(p&&!p.flying&&!(typeof ARMS!=='undefined'&&ARMS.swing)){ const w=gtWaterAt(x,y);
+    if(GT.water.length&&x<IZX-50){ const p=player; if(p&&!p.flying&&!gtSwinging()){ const w=gtWaterAt(x,y);
       if(w&&(w.rough||((p.z||0)>0&&!canWalkWater()))){ if(w.rough&&canWalkWater()) gtSayOnce('rough',S('The current is far too fast to walk on!','Too fast to walk on!')); return true; } } }
     return base(x,y); }; }
+// the Chain Whip's swing is a jump that may cross gate water: only while it really lasts (ARMS.swing can outlive it
+// when the weapon is switched mid-swing)
+function gtSwinging(){ if(typeof ARMS==='undefined'||!ARMS.swing||!G) return false; const S2=ARMS.swing;
+  if(GT.sw!==S2){ GT.sw=S2; GT.swT0=G.time; } const p=player; return G.time-GT.swT0<=(S2.dur||0.8)+0.25&&!!p&&((p.z||0)>0||(p.vz||0)>0); }
 function gtSayOnce(k,txt){ const n=GT.nudgeT['say_'+k]||0; if(GT.t-n<4&&n) return; GT.nudgeT['say_'+k]=GT.t||0.01; const p=player; if(p) ftext(p.x,p.y-(p.z||0)-44,simplify(txt),'#ffe6b0',13); }
 // an island in a moat (water, whip_hook): r is the island, the moat is `moat` px wide (default 150)
 function gtIsland(g){
   const mw=clamp(g.place.moat!=null?+g.place.moat:150,90,320);
   g.mw=mw; gtAddWater(g,g.r,g.r+mw); g.rx=g.ry=g.r;
-  ELEV.clear({k:g.map,disc:[g.x,g.y,g.r+mw+60]});
+  ELEV.clear({k:g.map,disc:[g.x,g.y,g.r+mw+130]});
   g.nofly=ELEV.noFly({k:g.map,disc:[g.x,g.y,g.r+mw+170],why:S('Spray off the water soaks your wings.','Too wet to fly here.')});
+  gtFlyWall(g,true,g.x,g.y,g.r+mw+14,g.r+mw+14);
   g.inside={x:g.x,y:g.y,r:Math.round(g.r*0.6)};
   const u=GT_FACE[g.face]; g.door={x:g.x+u[0]*(g.r+mw+40),y:g.y+u[1]*(g.r+mw+40)};
 }
@@ -255,7 +283,7 @@ GTK.wind_ribbon={r:110,
   build(g){
     gtMesa(g,{lvl:2}); g.ledge=gtLedge(g);
     const f=g.side.foot, u=g.side.out, a=g.side.along;
-    g.stream=WIND.stream({id:'gate_'+g.id,map:g.map,pts:[[f[0]+u[0]*190+a[0]*70,f[1]+u[1]*190+a[1]*70],[f[0]+u[0]*60,f[1]+u[1]*60],[g.x+a[0]*g.rx*0.15,g.y+a[1]*g.ry*0.15]],lv:[0,2],w:56});
+    g.stream=WIND.stream({id:'gate_'+g.id,gate:g.id,map:g.map,pts:[[f[0]+u[0]*190+a[0]*70,f[1]+u[1]*190+a[1]*70],[f[0]+u[0]*60,f[1]+u[1]*60],[g.x+a[0]*g.rx*0.15,g.y+a[1]*g.ry*0.15]],lv:[0,2],w:56});
     g.door={x:g.stream.pts[0][0],y:g.stream.pts[0][1]}; },
   sync:gtPlainSync, isIn:gtMesaIn,
   nudge:g=>S('A ribbon of wind curls up to the top. Jump into the swirl... if you can ride the wind.','Wind goes up. You need to ride it.')};
@@ -271,7 +299,8 @@ GTK.dive_spot={r:120,
 GTK.moon_glass={r:110,
   build(g){
     gtMesa(g,{lvl:1,nofly:true}); g.ledge=gtLedge(g);
-    g.mramp=gtRamp(g,'stairs',{moon:true,id:'gate_'+g.id}); },
+    g.mramp=gtRamp(g,'stairs',{moon:true,id:'gate_'+g.id}); const R=gtDoorRect(g,20), r=g.mramp;
+    gtZone(g,R,()=>!!(r&&typeof p4RampSolid==='function'&&p4RampSolid(r))); g.door={x:R.x,y:R.y}; },
   sync(g,st){ if(!G||!G.found) return; const k='p4r_gate_'+g.id; if(st>=2) G.found[k]=true; else delete G.found[k]; },
   isIn:gtMesaIn,
   nudge:g=>S('Stairs of pale glass, too thin to hold you. Moonlight might make them solid.','Glass stairs. They need moonlight.')};
@@ -292,6 +321,7 @@ function gtP2Door(g,kind,extra){
   gtDoorMesa(g); const R=gtDoorRect(g,20);
   const o=p2Add(kind,Object.assign({id:'gate_'+g.id+'_d',x:R.x,y:R.y,w:R.w,h:R.h},extra||{}));
   gtColWrap(g,o.col); g.doorObj=o; g.door={x:R.x,y:R.y};
+  gtZone(g,R,kind==='mothcurtain'?()=>P2.pass>0||p2CurtainOpen(o):()=>P2.pass>0);
 }
 // p2 curtains and bars vanish from the world while the gate is open for everyone
 function gtP2Sync(g,st){ const o=g.doorObj; if(!o) return; if(st>=2) gtUnlist(o,LANDMARKS,P2.out); else gtList(o,LANDMARKS,P2.out); }
@@ -304,7 +334,7 @@ GTK.thin_bars={r:110,
 GTK.ice_wall={r:110,
   build(g){ gtDoorMesa(g); const R=gtDoorRect(g,30);
     const o=p3Add('icewall',{id:'gate_'+g.id+'_d',x:R.x,y:R.y,w:R.w+6,h:R.h,hh:g.wall?58:64,then:()=>gtGot(g,2)});
-    if(o.col) o.col.deep=true; g.doorObj=o; g.door={x:R.x,y:R.y}; },
+    if(o.col) o.col.deep=true; g.doorObj=o; g.door={x:R.x,y:R.y}; gtZone(g,{x:R.x,y:R.y,w:R.w,h:R.h},()=>!!o.done); },
   sync(g,st){ const o=g.doorObj; if(!o) return; const open=st>=2;
     if(open&&!o.done){ o.done=true; o.mk=1; if(G&&G.found) G.found[o.id]=true; if(o.col) p3Uncol(o); }
     else if(!open&&o.done){ o.done=false; o.mk=0; o.heat=0; if(G&&G.found) delete G.found[o.id]; if(!o.col){ o.col=p3Col(o,null,{t:'r',x0:o.x-o.w/2,y0:o.y-o.h/2,x1:o.x+o.w/2,y1:o.y+o.h/2}); o.col.deep=true; } } },
@@ -314,12 +344,12 @@ GTK.bomb_rock={r:110,
     const o={id:'gate_'+g.id+'_d',x:R.x,y:R.y+(g.wall&&g.face==='s'?6:0),r:rr,gate:g.id}; o.k='e10boulder'; o.arms=true;
     LANDMARKS.push(o); ARMS.lm.push(o); g.doorObj=o; g.door={x:o.x,y:o.y};
     o.col=gtCol(g,{t:'c',x:o.x,y:o.y,r:rr});
-    if(g.wall){ const B=gtDoorRect(g,16); gtCol(g,{t:'r',x0:B.x-B.w/2,y0:B.y-B.h/2,x1:B.x+B.w/2,y1:B.y+B.h/2}); } },
+    if(g.wall){ const B=gtDoorRect(g,16); gtCol(g,{t:'r',x0:B.x-B.w/2,y0:B.y-B.h/2,x1:B.x+B.w/2,y1:B.y+B.h/2}); gtZone(g,B); } else gtZone(g,{x:o.x,y:o.y,w:rr*1.6,h:rr*1.6}); },
   sync(g,st){ const o=g.doorObj; if(o&&G&&G.found){ if(st>=2) G.found[o.id]=true; else delete G.found[o.id]; } },
   isIn:gtDoorIn};
 // a portcullis of iron bars (chain_ring, pound_plate): a deep collider, rises when the gate opens
 function gtBars(g){ const R=gtDoorRect(g,16); const o={id:'gate_'+g.id+'_bars',x:R.x,y:R.y,w:R.w,h:R.h,horiz:R.w>=R.h,lift:0,gate:g.id};
-  o.col=gtCol(g,{t:'r',x0:R.x-R.w/2,y0:R.y-R.h/2,x1:R.x+R.w/2,y1:R.y+R.h/2}); g.bars=o; g.door={x:R.x,y:R.y}; return o; }
+  o.col=gtCol(g,{t:'r',x0:R.x-R.w/2,y0:R.y-R.h/2,x1:R.x+R.w/2,y1:R.y+R.h/2}); g.bars=o; g.door={x:R.x,y:R.y}; gtZone(g,R); return o; }
 // a spot beside the door, on the ground (for a plate, a lever ring, a crack)
 function gtBeside(g,d){ const f=g.wall?g.side.foot:[g.x,g.y], a=g.wall?g.side.along:(g.face==='s'||g.face==='n'?[1,0]:[0,1]), u=g.wall?g.side.out:GT_FACE[g.face]; return [f[0]-a[0]*d+u[0]*40,f[1]-a[1]*d+u[1]*40]; }
 GTK.chain_ring={r:110,
@@ -352,9 +382,11 @@ GTK.water={r:110,rmin:50,
 GTK.whip_hook={r:110,rmin:60,
   build(g){ gtIsland(g); g.water.rough=true; const u=GT_FACE[g.face], R=g.r, M=g.mw;
     // hook A on the island's near shore swings Ash in; hook B on the far bank swings him back out
-    g.hookA=armsAdd('whiphook',{id:'gate_'+g.id+'_ha',x:g.x+u[0]*(R-26)+u[1]*30,y:g.y+u[1]*(R-26)-u[0]*30,to:{x:g.x+u[0]*R*0.15-u[1]*20,y:g.y+u[1]*R*0.15+u[0]*20}});
-    g.hookB=armsAdd('whiphook',{id:'gate_'+g.id+'_hb',x:g.x+u[0]*(R+M+30)-u[1]*30,y:g.y+u[1]*(R+M+30)+u[0]*30,to:{x:g.x+u[0]*(R+M+110),y:g.y+u[1]*(R+M+110)}});
-    g.door={x:g.x+u[0]*(R+M+50),y:g.y+u[1]*(R+M+50)}; },
+    // (the whip catches a hook 160 to 220 px straight ahead: the near bank's edge is about M+46 px from hook A)
+    const px=-u[1], py=u[0];
+    g.hookA=armsAdd('whiphook',{id:'gate_'+g.id+'_ha',x:g.x+u[0]*(R-26),y:g.y+u[1]*(R-26),to:{x:g.x-u[0]*R*0.1+px*34,y:g.y-u[1]*R*0.1+py*34}});
+    g.hookB=armsAdd('whiphook',{id:'gate_'+g.id+'_hb',x:g.x+u[0]*(R+M+34)-px*64,y:g.y+u[1]*(R+M+34)-py*64,to:{x:g.x+u[0]*(R+M+100)-px*64,y:g.y+u[1]*(R+M+100)-py*64}});
+    g.door={x:g.x+u[0]*(R+M+20),y:g.y+u[1]*(R+M+20)}; },
   sync(g,st){ if(g.water&&g.st!==st) gtDirtyArea(g.x,g.y,g.r+g.mw+40); },
   isIn:(g,x,y)=>gtOnIsland(g,x,y),
   nudge:g=>S('The water runs far too fast. A hook post waits on the island, for something long that could catch it.','Fast water! A hook! You need a whip.')};
@@ -364,10 +396,12 @@ GTK.burrow_mound={r:90,rmin:60,rmax:200,
     p4Add('sandbed',{id:'gate_'+g.id+'_bed',x0:sb[0],y0:sb[1],x1:sb[2],y1:sb[3]});
     GT.sand.push(sb);
     g.fences={};
-    const mk=(side,cx,cy,w2,h2)=>{ const o=p4Add('sandwall',{id:'gate_'+g.id+'_f'+side,x:cx,y:cy,w:w2,h:h2,style:'fence'}); o.col.deep=false; g.fences[side]=o; if(side===g.face) gtColWrap(g,o.col,true); return o; };
+    const mk=(side,cx,cy,w2,h2)=>{ const o=p4Add('sandwall',{id:'gate_'+g.id+'_f'+side,x:cx,y:cy,w:w2,h:h2,style:'fence'}); o.col.deep=false; g.fences[side]=o; if(side===g.face) gtColWrap(g,o.col,true);
+      gtZone(g,{x:cx,y:cy,w:w2,h:h2},null,side!==g.face); return o; };
     mk('n',x,y-R,2*R+T,T); mk('s',x,y+R,2*R+T,T); mk('w',x-R,y,T,2*R-T); mk('e',x+R,y,T,2*R-T);
     ELEV.clear({k:g.map,rect:[sb[0],sb[1],sb[2],sb[3]]});
     g.nofly=ELEV.noFly({k:g.map,disc:[x,y,R+200],why:S('Sand blows in your eyes. You cannot fly here.','Too sandy to fly.')});
+    gtFlyWall(g,false,x,y,R+26,R+26);
     g.inside={x,y,r:Math.round(R*0.6)}; const u=GT_FACE[g.face]; g.door={x:x+u[0]*(R+70),y:y+u[1]*(R+70)};
     g.mound={x:x+u[0]*(R+60)+u[1]*40,y:y+u[1]*(R+60)-u[0]*40}; },
   sync(g,st){ const o=g.fences&&g.fences[g.face]; if(!o) return; if(st>=2) gtUnlist(o,LANDMARKS,P4.out); else gtList(o,LANDMARKS,P4.out); },
@@ -389,7 +423,7 @@ function gtTick(dt){
   if(GT.g!==G){ GT.g=G; GT.fetch=null; GT.syncT=0.05; gtSyncAll(); }
   if(GT.syncT>0){ GT.syncT-=dt; if(GT.syncT<=0) gtSyncAll(); }   // once more after the other modules' own load sync
   if(!GT.list.length||AREA||G.mode!=='story') return;
-  const p=player, k=curMap(); GT.t+=dt; GT.dt=dt;
+  const p=player, k=curMap(); GT.t+=dt; GT.dt=dt; GT.px=p.x; GT.py=p.y;
   for(const g of GT.list){
     if(g.map!==k) continue;
     if(Math.abs(p.x-g.x)>g.r+500||Math.abs(p.y-g.y)>g.r+500) continue;
@@ -407,7 +441,8 @@ function gtNudge(g,p,dt){
   if(near&&p.moving){ n.push+=dt; } else n.push=Math.max(0,n.push-dt*2);
   if(n.push>0.7&&GT.t-n.last>8){ n.last=GT.t; n.push=0; const txt=g.D.nudge?g.D.nudge(g):null; if(txt) ftext(p.x,p.y-(p.z||0)-44,simplify(txt),'#ffe6b0',13); }
 }
-{ const base=updateWeapon; updateWeapon=function(dt,inp){ base(dt,inp); try{ gtTick(dt); }catch(e){ gtWarn('tick',String(e&&e.stack||e)); } }; }
+// (updatePools runs every frame of play, after Ash moves, even while a power's move has taken over his legs)
+{ const base=updatePools; updatePools=function(dt){ base.apply(this,arguments); try{ gtTick(dt); }catch(e){ gtWarn('tick',String(e&&e.stack||e)); } }; }
 
 // ---------- 5. new world pieces: a boulder only bombs break, a chain ring only the whip pulls (e6b's AK registry)
 AK.e10boulder={hit(o,src,x,y,r){ if(gtSt(o.gate)>=2||!armsNear(o,x,y,r)) return false;
@@ -601,6 +636,11 @@ function gtFetchDone(g){
     if(F.ph==='go'){ if(dist(q.x,q.y,top.x,top.y)<16){ F.ph='grab'; F.t=0; } return top; }
     if(F.ph==='grab') return {x:top.x+Math.sin(F.t*30)*2,y:top.y};
     return {x:player.x,y:player.y-6};
+  }; }
+// the end of a gate's wind ribbon without wings: land on the stream's end (on the rock), not a long glide past it
+{ const base=p3RideOff; p3RideOff=function(p,how){
+    const R=P3.ride, o=R&&R.o; base(p,how);
+    if(o&&o.gate&&how==='end'&&!AREA&&!(hasAbil('wings')&&G.mode==='story')){ const e=o.pts[o.pts.length-1]; P3.mv={kind:'land',x0:p.x,y0:p.y,x1:e[0],y1:e[1],z0:p.z||52,t:0,dur:0.34}; p.flying=false; p.gliding=false; }
   }; }
 // the shiny thing rides under Pip on the way back
 { const base=drawPip; drawPip=function(q){ base(q); const F=GT.fetch; if(F&&F.ph==='back'&&q===G.pip){ const t=q.t||0, alt=8+Math.sin(t*5)*3; gtPut(gtShinySprite(),q.x,q.y-alt*0.4+14); } }; }
