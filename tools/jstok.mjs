@@ -75,7 +75,7 @@ export function tokenize(src) {
   while (i < n) {
     const c = src[i];
     if (c === '\n') { line++; i++; continue; }
-    if (c === ' ' || c === '\t' || c === '\r' || c === '\f' || c === '\v' || c === ' ' || c === '﻿') { i++; continue; }
+    if (c === ' ' || c === '\t' || c === '\r' || c === '\f' || c === '\v' || c === '\u00a0' || c === '\ufeff') { i++; continue; }
     if (c === '/' && src[i + 1] === '/') { while (i < n && src[i] !== '\n') i++; continue; }
     if (c === '/' && src[i + 1] === '*') { const k = src.indexOf('*/', i + 2); const e = k < 0 ? n : k + 2; line += countLines(i, e); i = e; continue; }
     const s = i, l0 = line;
@@ -97,9 +97,9 @@ export function tokenize(src) {
       out.push({ t: 'num', v: Number(src.slice(s, e).replace(/_/g, '').replace(/n$/, '')), s, e, line: l0 });
       i = e; continue;
     }
-    if (/[A-Za-z_$\u0080-￿]/.test(c)) {
+    if (/[A-Za-z_$\u0080-\uffff]/.test(c)) {
       let e = i + 1;
-      while (e < n && /[A-Za-z0-9_$\u0080-￿]/.test(src[e])) e++;
+      while (e < n && /[A-Za-z0-9_$\u0080-\uffff]/.test(src[e])) e++;
       out.push({ t: 'id', v: src.slice(s, e), s, e, line: l0 });
       i = e; continue;
     }
