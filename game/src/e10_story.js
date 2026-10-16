@@ -110,6 +110,7 @@ function s10CondParse(src){
       case 'act': { const a=arg(); f=s10ActCmp('=',a); break; }
       case 'area': { const a=arg(); f=()=>!!AREA&&(AREA.id===a||String(AREA.id).startsWith(a+'_')); break; }
       case 'outdoors': f=()=>!AREA; break;
+      case 'ending': { const a=arg(); f=()=>s10Ending(actOf(G.stage))===a; break; }
       case 'true': f=()=>true; break;
       case 'false': f=()=>false; break;
       default: s10Err(`condition "${src}": unknown test "${t}"`); f=()=>false;
@@ -119,6 +120,8 @@ function s10CondParse(src){
   }
   return ()=>out.every(f=>f());
 }
+// an act's ending: the first entry of act.ending whose `if` holds (or the `else` one)
+function s10Ending(n){ const A=S10.acts[n], E=A&&A.ending; if(!E) return null; let other=null; for(const k in E){ const e=E[k]||{}; if(e.else){ other=other||k; continue; } if(e.if!=null&&s10Cond(e.if)) return k; } return other; }
 function s10HasPower(x){ return !!(hasAbil(x)||(G.weapons&&G.weapons[x])||(typeof hasSkill==='function'&&(()=>{ try{ return hasSkill(x); }catch(e){ return false; } })())); }
 function s10TrustFlag(name){ return S10.trust[name]||('trust_'+name); }
 function s10Trust(name){ return +(G.flags[s10TrustFlag(name)]||0); }
@@ -780,13 +783,20 @@ function s10TalkHook(n){
     if(k==='talk'&&x._args[0]===id){ if(x.scene){ s10Run2(a); return true; } s10Finish(a); talkHub(n); return true; }
     if(k==='give'&&x._args[1]===id&&(G.items[x._args[0]]||0)>0){ s10Run2(a,()=>takeItems({[x._args[0]]:1})); return true; }
   }
-  const T=s10TalkFor(id,'line'); if(!T) return false;
+  return false;
+}
+onTalk(n=>s10TalkHook(n));
+// the "what's new" line: the first matching talk entry plays before the person's menu. It rides on the menu (talkHub)
+// rather than taking the talk over, so the old code's quest steps, offers and minigames with that person still run.
+function s10HubLines(n){
+  if(!G||G.mode!=='story'||G.done||!S10.booted||!n) return null;
+  const id=n.id, T=s10TalkFor(id,'line'); if(!T) return null;
   const lines=s10TalkLines(T,id);
   if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1;
   lines.push({who:'narr',text:'',skipIf:()=>true,fn:()=>{ s10Do(T.then,{talk:id}); }});
-  talkHub(n,lines); return true;
+  return lines;
 }
-onTalk(n=>s10TalkHook(n));
+{ const base=talkHub; talkHub=function(n,pre){ let L=pre; try{ const x=s10HubLines(n); if(x&&x.length) L=(pre||[]).concat(x); }catch(e){ console.error(e); } return base(n,L); }; }
 function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify([T.if,T.say,T.scene,T.option,T.then]))); }
 function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if(T.once&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
 function s10TalkFor(id,kind){
@@ -822,6 +832,7 @@ function s10TalkOpts(id,n,o){
 }
 function s10Barks(dt){
   if(!G.npcs||DLG||scene!=='play') return;
+  S10.barkPoll=(S10.barkPoll||0)-dt; if(S10.barkPoll>0) return; S10.barkPoll=0.5;
   for(const id in S10.talk){
     if((S10.barkT[id]||0)>G.time) continue;
     const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); if(!n||dist(n.x,n.y,player.x,player.y)>260) continue;
@@ -1034,6 +1045,7 @@ function s10Boot(){
   for(const [k,d] of S10.raw) try{ s10Register(k,d); }catch(e){ s10Err(`${k} ${d&&d.id}: ${e.message}`); console.error(e); }
   try{ s10Link(); }catch(e){ s10Err('link: '+e.message); console.error(e); }
   try{ s10Adapt(); }catch(e){ s10Err('adapters: '+e.message); console.error(e); }
+  try{ s10Gates(); }catch(e){ s10Err('gates: '+e.message); console.error(e); }
   try{ s10Check(); }catch(e){ s10Err('check: '+e.message); console.error(e); }
   if(G&&!G.story) s10Fresh();
   if(G&&G.mode==='story'){ s10Migrate(); s10NpcSync(true); }
@@ -1070,8 +1082,14 @@ function s10Adapt(){
     let f=null; try{ f=eval(`typeof ${name}==='function'?${name}:null`); }catch(e){ f=null; }
     if(!f||f._s10) continue;
     const w=function(b,...a){ const r=f.call(this,b,...a); try{ storyEmit('beat:'+b); }catch(e){} return r; }; w._s10=true;
-    try{ if(name==='f2sBeat') f2sBeat=w; else if(name==='m3sBeat') m3sBeat=w; else n4sBeat=w; }catch(e){}
+    try{ if(name==='f2sBeat') f2sBeat=w; else if(name==='m3sBeat') m3sBeat=w; else n4sBeat=w; S10.adapted=(S10.adapted||[]).concat(name); }catch(e){}
   }
+}
+// gate places are built by the gate library (ENG-W, e10c_gates: gateBuild(place)) once everything is loaded
+function s10Gates(){
+  for(const id in S10.places){ const P=S10.places[id]; if(P.kind!=='gate'||P._built) continue;
+    if(typeof gateBuild!=='function'){ s10Err(`gate ${id}: no gate library (gateBuild) in this build`); continue; }
+    try{ gateBuild(P); P._built=true; }catch(e){ s10Err(`gate ${id}: ${e.message}`); console.error(e); } }
 }
 // errors(): what the engine finds wrong in the data at load (the checker does the full job)
 function s10Check(){
@@ -1152,6 +1170,10 @@ const S10API={
   talkLine:id=>{ const T=s10TalkFor(id,'line'); return T?{say:T.say?s10T(Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say):null,scene:T.scene||null}:null; },
   track:id=>G.story&&G.story._trk?G.story._trk[id]:undefined,
   mysteries:()=>Object.assign({},S10.mysteries),
+  // a running minigame won through its own win hook (the rooftop chase: x1_story's c1RWin)
+  miniWin:k=>{ if(!G.mini||(k&&G.mini.kind!==k)) return false; const M=MINI_S10[G.mini.kind]; if(M&&M.win) M.win(); else miniEnd(true); return true; },
+  ending:n=>s10Ending(n==null?actOf(G.stage):n),
+  adapters:()=>(S10.adapted||[]).concat(typeof c1RWin==='function'&&c1RWin._s10?['c1RWin']:[]),
   get S10(){ return S10; }
 };
 window.__ebX=Object.assign(window.__ebX||{},{story:S10API});
