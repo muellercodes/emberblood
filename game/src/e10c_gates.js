@@ -286,7 +286,7 @@ function gtWaterAt(x,y){
     for(let i=0;i<L.length;i++){ const w=L[i], b=w.bb; if(x<b[0]||x>b[2]||y<b[1]||y>b[3]) continue;
       if(o.face&1) continue;
       const wd=gtWaterD(w,x,y);
-      if(wd<0&&!gtPlankAt(w,x,y)){ o.water=1; o.depth=Math.max(o.depth||0,clamp(-wd/70,0,1)); o.shore=0; o.road=0; o.bridge=0; o.lava=0; o.lavaS=0; o.bog=0; }
+      if(wd<0&&!gtPlankAt(w,x,y)){ o.water=1; o.depth=Math.max(o.depth||0,w.rough?clamp(0.55-wd/30,0,1):clamp(-wd/70,0,1)); o.shore=0; o.road=0; o.bridge=0; o.lava=0; o.lavaS=0; o.bog=0; }
       else if(wd<30&&!o.water){ o.shore=Math.max(o.shore||0,1-wd/30); }
     }
     return o; }; }
@@ -489,7 +489,7 @@ GTK.fetch_spot={r:70,rmin:30,rmax:200,
   build(g){ const on=g.place.on==='water'?'water':'spire';
     const o={id:'gate_'+g.id+'_shiny',x:g.x,y:g.y,gate:g.id,on,h:on==='spire'?(g.place.h||86):10,got:false,ph:gtHash(g.id)%7}; o.k='e10shiny'; g.shiny=o;
     if(on==='water'){ gtAddWater(g,22,Math.max(70,g.r)); g.rx=g.ry=g.r; ELEV.clear({k:g.map,disc:[g.x,g.y,g.r+60]}); addCol({t:'c',x:g.x,y:g.y,r:20,deep:true}); }
-    else { ELEV.clear({k:g.map,disc:[g.x,g.y,70]}); addCol({t:'c',x:g.x,y:g.y,r:24,deep:true}); }
+    else { ELEV.clear({k:g.map,disc:[g.x,g.y-30,170,150]}); ELEV.clear({k:g.map,disc:[g.x,g.y+170,190,150]}); addCol({t:'c',x:g.x,y:g.y,r:24,deep:true}); }
     g.door={x:g.x,y:g.y+(on==='spire'?60:g.r+40)}; g.inside={x:g.x,y:g.y,r:10}; },
   sync(g,st){ if(g.shiny) g.shiny.got=st>=1; if(g.water&&g.st!==st) gtDirtyArea(g.x,g.y,g.r+40); },
   isIn:()=>false};
@@ -602,11 +602,12 @@ function gtSpireSprite(h){
   });
 }
 function gtShinySprite(){
-  return gtSpr('gshiny',26,22,g=>{
-    g.fillStyle='#c8902a'; g.beginPath(); g.ellipse(0,-8,10,7,0,0,TAU); g.fill();
-    g.fillStyle='#ffd24a'; g.beginPath(); g.ellipse(-1,-9.5,8,5.4,0,0,TAU); g.fill();
-    g.fillStyle='#fff6c8'; g.beginPath(); g.ellipse(-3.5,-11.5,3,1.8,-0.4,0,TAU); g.fill();
-    g.strokeStyle='#8a5a12'; g.lineWidth=1.2; g.beginPath(); g.arc(0,-8,4.6,0.3,2.6); g.stroke();
+  return gtSpr('gshiny',34,28,g=>{
+    g.fillStyle='#b8801e'; g.beginPath(); g.ellipse(0,-11,14,10,0,0,TAU); g.fill();
+    g.fillStyle='#ffd24a'; g.beginPath(); g.ellipse(-1,-13,11.5,7.6,0,0,TAU); g.fill();
+    g.strokeStyle='#8a5a12'; g.lineWidth=1.6; g.beginPath(); g.ellipse(0,-12,6.4,4.2,0,0,TAU); g.stroke();
+    g.fillStyle='#fff6c8'; g.beginPath(); g.ellipse(-5,-16,4.2,2.4,-0.4,0,TAU); g.fill();
+    g.fillStyle='#ff6a8a'; g.beginPath(); g.arc(0,-12,2.6,0,TAU); g.fill();
   });
 }
 function gtDrawShiny(o,t){
@@ -616,10 +617,10 @@ function gtDrawShiny(o,t){
   else { ctx.fillStyle='#7a6e64'; ctx.strokeStyle=SBC.outline; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(o.x,o.y-2,20,9,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.fillStyle='#9a8e82'; ctx.beginPath(); ctx.ellipse(o.x-3,o.y-4,13,5,0,0,TAU); ctx.fill(); }
   if(o.carry) return;
   const bob=Math.sin(t*2.2+o.ph)*1.5;
-  ctx.save(); ctx.globalCompositeOperation='lighter'; glowAt(o.x,top-8+bob,26+4*Math.sin(t*3+o.ph),'255,214,110',0.32); ctx.restore();
+  ctx.save(); ctx.globalCompositeOperation='lighter'; glowAt(o.x,top-10+bob,34+6*Math.sin(t*3+o.ph),'255,214,110',0.42); ctx.restore();
   gtPut(gtShinySprite(),o.x,top+2+bob);
   // twinkles: a four-point star that grows and fades, so it catches the eye from across the screen
-  for(let i=0;i<2;i++){ const ph=(t*0.9+o.ph*0.37+i*0.5)%1, a=Math.sin(ph*Math.PI), s=4+a*7, sx=o.x+(i?9:-7), sy=top-14+bob-(i?2:6);
+  for(let i=0;i<3;i++){ const ph=(t*0.9+o.ph*0.37+i*0.33)%1, a=Math.sin(ph*Math.PI), s=5+a*9, sx=o.x+(i===1?12:i===2?-2:-10), sy=top-18+bob-(i===1?2:i===2?14:6);
     ctx.save(); ctx.globalAlpha=a; ctx.fillStyle='#fffbe6'; ctx.beginPath(); ctx.moveTo(sx,sy-s); ctx.lineTo(sx+1.4,sy-1.4); ctx.lineTo(sx+s,sy); ctx.lineTo(sx+1.4,sy+1.4); ctx.lineTo(sx,sy+s); ctx.lineTo(sx-1.4,sy+1.4); ctx.lineTo(sx-s,sy); ctx.lineTo(sx-1.4,sy-1.4); ctx.closePath(); ctx.fill(); ctx.restore(); }
 }
 // flat things under everyone: the sand pen, the dirt mound, the tunnel hole, the planks over a moat
@@ -628,6 +629,7 @@ function gtDrawGround(t){
   for(const g of GT.list){ if(g.map!==k||!inView(g.x,g.y,g.r+260)) continue;
     if(g.kind==='burrow_mound') gtDrawSand(g,t);
     else if(g.kind==='cracked_floor'&&g.hole) gtDrawHole(g.hole.x,g.hole.y,gtSt(g.id)>=2);
+    if(g.bars&&(g.ring||g.plate)) gtDrawLink(g,t);
     if(g.water&&g.water.rough) gtDrawRapids(g,t);
     if(g.water&&g.water.r0&&gtSt(g.id)>=2) gtDrawPlanks(g);
   }
@@ -642,15 +644,29 @@ function gtDrawSand(g,t){
   ctx.drawImage(sp,cx-sp.ox,cy+ry-sp.oy,sp.ww,sp.hh);
   const m=g.mound; if(m&&gtSt(g.id)<2){ ctx.fillStyle='#b8925a'; ctx.strokeStyle='rgba(90,60,30,.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(m.x,m.y,26,12,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.fillStyle='#3a2414'; ctx.beginPath(); ctx.ellipse(m.x,m.y-2,9,5,0,0,TAU); ctx.fill(); ctx.fillStyle='#d8b878'; ctx.beginPath(); ctx.ellipse(m.x-8,m.y-6,8,3,-0.2,0,TAU); ctx.fill(); }
 }
+// what opens the bars is joined to them: a chain on the ground from the lever ring, a rune line from the plate
+function gtDrawLink(g,t){
+  const b=g.bars, s=g.ring||g.plate, open=gtSt(g.id)>=2, ex=b.x+(s.x<b.x?-1:1)*(b.horiz?b.w/2+4:0), ey=b.y+b.h/2-2;
+  const L=dist(s.x,s.y,ex,ey); if(L<10) return;
+  ctx.save(); ctx.lineCap='round';
+  if(g.ring){ const n=Math.max(3,Math.round(L/9)), sag=open?2:8;
+    for(let i=0;i<=n;i++){ const k=i/n, x=lerp(s.x,ex,k), y=lerp(s.y-4,ey,k)+Math.sin(k*Math.PI)*sag;
+      ctx.fillStyle=SBC.outline; ctx.beginPath(); ctx.ellipse(x,y,4.4,3,i%2?0.9:-0.6,0,TAU); ctx.fill(); ctx.strokeStyle=i%2?'#9aa2ae':'#7c8490'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.ellipse(x,y,2.9,1.8,i%2?0.9:-0.6,0,TAU); ctx.stroke(); } }
+  else { const a=open?0.9:0.55+0.25*Math.sin(t*2.5); ctx.strokeStyle=`rgba(${open?'255,214,120':'120,150,255'},${a})`; ctx.lineWidth=3.4; ctx.setLineDash([7,6]); ctx.lineDashOffset=-t*14;
+    ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(ex,ey); ctx.stroke(); ctx.setLineDash([]); }
+  ctx.restore();
+}
 function gtDrawHole(x,y,open){ ctx.fillStyle='rgba(20,14,26,.92)'; ctx.beginPath(); ctx.ellipse(x,y,22,12,0,0,TAU); ctx.fill(); ctx.strokeStyle=SBC.outline; ctx.lineWidth=2.2; ctx.stroke(); ctx.fillStyle='rgba(255,255,255,.08)'; ctx.beginPath(); ctx.ellipse(x,y-3,15,4,0,Math.PI,TAU); ctx.fill(); if(!open){ ctx.strokeStyle='rgba(120,100,80,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x-16,y-6); ctx.lineTo(x+16,y+6); ctx.moveTo(x-16,y+6); ctx.lineTo(x+16,y-6); ctx.stroke(); } }
 // white water racing round a whip island: curved foam streaks that flow along the moat
 function gtDrawRapids(g,t){
-  const w=g.water, n=26, rm=(w.r0+w.r1)/2, half=(w.r1-w.r0)/2;
+  const w=g.water, n=40, rm=(w.r0+w.r1)/2, half=(w.r1-w.r0)/2;
   ctx.save(); ctx.lineCap='round';
-  for(let i=0;i<n;i++){ const lane=((i*7)%5)/4-0.5, rr=rm+lane*half*1.1, sp=0.5+((i*3)%4)*0.12, a=(i/n)*TAU+t*sp*(1.1-((i%2)*0.3)), L=0.16+((i*5)%3)*0.05;
-    const al=0.35+0.3*Math.sin(t*3+i);
-    ctx.strokeStyle=`rgba(255,255,255,${al})`; ctx.lineWidth=2.6-((i%3)*0.5);
-    ctx.beginPath(); ctx.arc(w.x,w.y,rr,a,a+L); ctx.stroke(); }
+  for(let i=0;i<n;i++){ const lane=((i*7)%5)/4-0.5, rr=rm+lane*half*1.15, sp=0.9+((i*3)%4)*0.18, a=(i/n)*TAU+t*sp/Math.max(1,rr/120), L=0.2+((i*5)%3)*0.07;
+    const al=0.45+0.35*Math.sin(t*4+i*1.7);
+    ctx.strokeStyle=`rgba(255,255,255,${al})`; ctx.lineWidth=3.4-((i%3)*0.7);
+    ctx.beginPath(); ctx.arc(w.x,w.y,rr,a,a+L); ctx.stroke();
+    // a little chevron at the head of some streaks: the water is racing that way
+    if(i%4===0){ const hx=w.x+Math.cos(a+L)*rr, hy=w.y+Math.sin(a+L)*rr, d=a+L+Math.PI/2; ctx.lineWidth=2.4; ctx.beginPath(); ctx.moveTo(hx-Math.cos(d-0.6)*7,hy-Math.sin(d-0.6)*7); ctx.lineTo(hx,hy); ctx.lineTo(hx-Math.cos(d+0.6)*7,hy-Math.sin(d+0.6)*7); ctx.stroke(); } }
   ctx.restore();
 }
 function gtDrawPlanks(g){
