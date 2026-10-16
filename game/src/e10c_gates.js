@@ -149,6 +149,9 @@ function gtFlyWall(g,e,x,y,rx,ry){ g.flyZ={e,x,y,rx,ry}; GT.fly.push(g); }
       if(p&&p.flying){ if(GT.fly.length&&gtFlyIn(x,y)&&!gtFlyIn(GT.px,GT.py)){ gtSayOnce('fly',S('The air over there will not hold your wings.','You cannot fly there.')); return true; } }
       else if(GT.zones.length&&gtZoneStops(x,y,GT.px,GT.py)) return true; }
     return base(x,y); }; }
+// a burrower cannot dig under a shut door (on a sandy map the stairs behind it would let him up); the sand pen's own
+// fences stay diggable (that is the Burrow gate)
+{ const base=p4SandAt; p4SandAt=function(x,y){ if(GT.zones.length&&x<IZX-50){ const z=gtZoneAt(x,y); if(z&&!z.dig) return false; } return base(x,y); }; }
 // wrap an existing collider's `off` so it is also off while the gate is open
 function gtColWrap(g,c,soft){ if(!c) return; if(!soft) c.deep=true; const d=Object.getOwnPropertyDescriptor(c,'off'), get=d&&d.get, set=d&&d.set; if(get) Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||get.call(c); },set(v){ if(set) set.call(c,v); },configurable:true}); else { let v=!!c.off; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||v; },set(x){ v=!!x; },configurable:true}); } }
 
@@ -226,6 +229,7 @@ function gtMesa(g,o){
   const k=g.map; g.rx=g.r; g.ry=Math.round(g.r*0.78);
   // levels are relative to the ground the nook stands on (a gate on a level 2 terrace makes a level 3 or 4 rock)
   const base=gtBaseLvl(g), lvl=Math.min(8,base+o.lvl); g.base=base; g.dl=lvl-base; g.lvl=lvl; o={...o,dl:g.dl};
+  if(g.dl<o.lvl) gtWarn('high:'+g.id,g.id+': the ground here is level '+base+', too high for a '+o.lvl+' level rock (8 is the top); the gate is '+(g.dl?'lower than it should be':'flat and does not block'));
   const P=ELEV.plateau({k,disc:[g.x,g.y,g.rx,g.ry],lvl,style:g.style,climb:!!o.climb,step:!!o.step,noise:o.noise!=null?o.noise:8,id:'gate_'+g.id,seed:(gtHash(g.id)%997)+11});
   g.plat=P; g.side=gtSide(g,g.dl); const dl=g.dl;
   ELEV.clear({k,disc:[g.x,g.y+dl*ELEV.px*0.4,g.rx+70,g.ry+dl*ELEV.px+90]});
@@ -469,13 +473,13 @@ GTK.burrow_mound={r:90,rmin:60,rmax:200,
     if(!g.wall){ const horiz=g.face==='s'||g.face==='n', L=g.place.w||160, sb=horiz?[x-L/2-120,y-160,x+L/2+120,y+160]:[x-160,y-L/2-120,x+160,y+L/2+120]; g.sandBox=sb;
       p4Add('sandbed',{id:'gate_'+g.id+'_bed',x0:sb[0],y0:sb[1],x1:sb[2],y1:sb[3]}); GT.sand.push(sb);
       const o=p4Add('sandwall',{id:'gate_'+g.id+'_f',x,y,w:horiz?L:T,h:horiz?T:L,style:g.place.style2||'fence'}); o.col.deep=false; gtColWrap(g,o.col,true); g.fences={[g.face]:o};
-      gtZone(g,{x,y,w:horiz?L:T,h:horiz?T:L}); g.door={x,y}; return; }
+      gtZone(g,{x,y,w:horiz?L:T,h:horiz?T:L}).dig=true; g.door={x,y}; return; }
     const sb=[x-R-150,y-R-150,x+R+150,y+R+150]; g.sandBox=sb;
     p4Add('sandbed',{id:'gate_'+g.id+'_bed',x0:sb[0],y0:sb[1],x1:sb[2],y1:sb[3]});
     GT.sand.push(sb);
     g.fences={};
     const mk=(side,cx,cy,w2,h2)=>{ const o=p4Add('sandwall',{id:'gate_'+g.id+'_f'+side,x:cx,y:cy,w:w2,h:h2,style:'fence'}); o.col.deep=false; g.fences[side]=o; if(side===g.face) gtColWrap(g,o.col,true);
-      gtZone(g,{x:cx,y:cy,w:w2,h:h2},null,side!==g.face); return o; };
+      gtZone(g,{x:cx,y:cy,w:w2,h:h2},null,side!==g.face).dig=true; return o; };
     mk('n',x,y-R,2*R+T,T); mk('s',x,y+R,2*R+T,T); mk('w',x-R,y,T,2*R-T); mk('e',x+R,y,T,2*R-T);
     ELEV.clear({k:g.map,rect:[sb[0],sb[1],sb[2],sb[3]]});
     g.nofly=ELEV.noFly({k:g.map,disc:[x,y,R+200],why:S('Sand blows in your eyes. You cannot fly here.','Too sandy to fly.')});
@@ -515,7 +519,7 @@ function gtTick(dt){
 // a short hint when Ash pushes at a gate he cannot pass yet (once in a while, never a wall of text)
 function gtNudge(g,p,dt){
   const d=g.door; if(!d||p.dead||(p.z||0)>1) return;
-  const near=dist(p.x,p.y,d.x,d.y)<(g.kind==='water'||g.kind==='whip_hook'?g.mw*0.5+70:80);
+  const near=dist(p.x,p.y,d.x,d.y)<(g.kind==='water'||g.kind==='whip_hook'?(g.mw||100)*0.5+70:80);
   const n=GT.nudgeT[g.id]||(GT.nudgeT[g.id]={push:0,last:-99});
   if(near&&p.moving){ n.push+=dt; } else n.push=Math.max(0,n.push-dt*2);
   if(n.push>0.7&&GT.t-n.last>8){ n.last=GT.t; n.push=0; const txt=g.place.locked?gtS(g.place.locked):g.D.nudge?g.D.nudge(g):null; if(txt) ftext(p.x,p.y-(p.z||0)-44,simplify(txt),'#ffe6b0',13); }
