@@ -14,7 +14,7 @@
 // Small mystery a1_snuffed, "Who put out the Hollow Ward?" (quest a1_snuffed): the Scaled Oath (black candle wax).
 //   Red herring a1_windy (it was a windy day). Its payoff is a truth for a1_how: an Oath cultist came in with the kobolds.
 act({
-  id: 'act1', map: 0,
+  id: 1, map: 0,
   name: ['Act I: The First Flame', 'Act I: The First Flame'],
   legacy_stages: true,
   mystery: {

@@ -8,12 +8,20 @@
 
 // ================= the main mystery
 quest({
-  id: 'gate', act: 1, takeover: 'gate', giver: 'yara', optional: true,
-  start: 'flag gateHint',
+  id: 'gate', act: 1, giver: 'yara', optional: true,
+  // takes over QDEFS.gate: an old save at old step i resumes at old_steps[i]
+  takeover: true, old_steps: ['look', 'letter', 'search', 'confront', 'tunnel', 'plans'],
+  // the oldest saves have no G.quests.gate, only the choice Ash made about Fennick
+  done_if: { any: ['choice fennick=forgive', 'choice fennick=jail'] },
   title: ['The Open Gate', 'The Open Gate'],
   payoff: { kind: 'shortcut', id: 'mine_cart' },
   // Grizzlefang no longer names the lamp-man, and Morrow's letter is only to "W."
   replaces: { 'STORY.bosses.grizzlefang.outro': 'a1_griz_outro', 'STORY.bosses.morrow.outro': 'a1_morrow_outro' },
+
+  // the North Gate's fallen door (drawn by x0_act1.js while the gate is broken)
+  place: {
+    a1_gate_door: { map: 0, at: [2774, 8812], r: 34, kind: 'examine', name: 'the fallen door of the North Gate', if: 'stage>=raid !flag a1_gate_solved' },
+  },
 
   clue: {
     a1_lock:         { mystery: 'a1_gate', icon: 'lock',
@@ -51,7 +59,7 @@ quest({
       mystery: 'a1_gate',
       ask: ['How did the kobolds get through the North Gate?', 'How did the kobolds get in?'],
       needs: ['a1_lock', 'a1_claws'],
-      also: ['a1_oath_inside'],
+      bonus: ['a1_oath_inside'],
       pick: [
         { t: ['Somebody inside opened it with a key', 'Someone opened it with a key'], right: true },
         { t: ['The kobolds smashed the lock', 'They smashed the lock'], hint: ['Look at the padlock again. Is it broken?', 'Is the lock broken?'] },
@@ -63,7 +71,7 @@ quest({
       mystery: 'a1_gate',
       ask: ['The letter was to "W." Who is W.?', 'Who is "W."?'],
       needs: ['a1_letter', 'a1_prints', 'a1_spare_key', 'a1_lamplighter', 'a1_wendel_alibi'],
-      also: ['a1_gold', 'a1_button', 'a1_wren_away'],
+      bonus: ['a1_gold', 'a1_button', 'a1_wren_away'],
       pick: [
         { t: ['Fennick Wick, the lamp man', 'Fennick Wick'], right: true },
         { t: ['Wendel Fisk, the fiddler', 'Wendel Fisk'], hint: ['Nana says Wendel fiddled on the green all day. And do fiddles smell of lamp oil?', 'Where was Wendel all day?'] },
@@ -86,27 +94,27 @@ quest({
   },
 
   step: [
-    { id: 'offer', do: 'talk yara', scene: 'a1_gate_offer', legacy_step: 0,
+    { id: 'offer', do: 'talk yara', scene: 'a1_gate_offer', if: 'flag gateHint',
       obj: ['Ask Elder Yara about the North Gate', 'Talk to Yara'],
       hint: ['Elder Yara wants to talk about the open gate. She is by the well in Emberhollow.', 'Yara is by the well.'] },
-    { id: 'look', do: 'all', legacy_step: 0,
+    { id: 'look', do: 'all',
       obj: ['Find out how the kobolds got through the North Gate', 'Look at the North Gate'],
       hint: ['Look at the North Gate, its fallen door, and the bootprints by the Hollow Ward.', 'Look at the gate and the prints.'],
       parts: [
         { do: 'examine north_gate', scene: 'a1_gate_look' },
-        { do: 'examine north_gate_door', scene: 'a1_door_look' },
+        { do: 'examine a1_gate_door', scene: 'a1_door_look' },
         { do: 'track bootprints', scene: 'a1_prints_look', then: ['clue a1_prints', 'set clue_prints'] },
       ],
       extra: [
         { do: 'talk wendel', scene: 'a1_wendel_w' },
         { do: 'examine pebbles_nest', scene: 'a1_nest_look' },
       ] },
-    { id: 'how', do: 'deduce a1_how', legacy_step: 0,
+    { id: 'how', do: 'deduce a1_how',
       obj: ['Work out how in the Case Book', 'Open the Case Book'] },
-    { id: 'letter', do: 'find oath_letter', legacy_step: 1, then: ['clue a1_letter', 'set clue_letter'],
+    { id: 'letter', do: 'find oath_letter', then: ['clue a1_letter', 'set clue_letter'],
       obj: ['Find out who the Oath was paying. High Priest Morrow might know.', 'Ask Morrow at the Ash Ward'],
       hint: ['Morrow leads the Scaled Oath at the Ash Ward. Beat him and see what he carries.', 'Morrow is at the Ash Ward.'] },
-    { id: 'ask', do: 'all', legacy_step: 2,
+    { id: 'ask', do: 'all',
       obj: ['Find out who "W." is. Ask around Emberhollow.', 'Who is W.? Ask around town.'],
       hint: ['Ask Hal by the North Gate about the key, Nana about Lantern Day, and Mabel about the wall lamps.', 'Ask Hal, Nana and Mabel.'],
       parts: [
@@ -117,9 +125,9 @@ quest({
       extra: [
         { do: 'talk tilly', scene: 'a1_tilly_wren' },
       ] },
-    { id: 'who', do: 'deduce a1_who', legacy_step: 2,
+    { id: 'who', do: 'deduce a1_who',
       obj: ['Work out who "W." is in the Case Book', 'Open the Case Book'] },
-    { id: 'search', do: 'all', legacy_step: 2,
+    { id: 'search', do: 'all',
       obj: ["Search Fennick's shop, Wick's Lamps & Oils", 'Search the lamp shop'],
       hint: ["Wick's Lamps & Oils is near the bakery in Emberhollow. Look in the drawer and the barrels.", 'Look in the drawer and the barrels.'],
       parts: [
@@ -129,13 +137,13 @@ quest({
       extra: [
         { do: 'examine oath_meeting_note', scene: 'a1_cellar_look' },
       ] },
-    { id: 'why', do: 'deduce a1_why', legacy_step: 2,
+    { id: 'why', do: 'deduce a1_why',
       obj: ['Work out why in the Case Book', 'Open the Case Book'] },
-    { id: 'confront', do: 'talk fennick', scene: 'a1_confront', legacy_step: 3,
+    { id: 'confront', do: 'talk fennick', scene: 'a1_confront',
       obj: ['Talk to Fennick Wick', 'Talk to Fennick'] },
-    { id: 'tunnel', do: 'find oath_plans', legacy_step: 4, then: ['set tunnel_plans'],
+    { id: 'tunnel', do: 'find oath_plans', then: ['set tunnel_plans'],
       obj: ["Explore the Oath's Hidden Tunnel off the Ashen Road", 'Go into the Oath tunnel'] },
-    { id: 'plans', do: 'give oath_plans wren', scene: 'a1_wren_plans', legacy_step: 5,
+    { id: 'plans', do: 'give oath_plans wren', scene: 'a1_wren_plans',
       then: ['give coins 60', 'xp 200', 'bless 1'],
       obj: ["Show the Oath's plans to Sister Wren", 'Show Wren the plans'] },
   ],
@@ -152,10 +160,10 @@ quest({
       ['voice', 'Morrow served me well. You will serve me better. Keep climbing, little ember.', 'Keep climbing, little ember.'],
       ['narr', 'A crumpled letter falls out of Morrow\'s sleeve: "To W. Leave the north gate open on Lantern Day, and the oil will never run out."', 'A letter: "To W. Open the north gate. Oil forever."', { ref: 'north_gate', do: ['give oath_letter'] }],
       { choose: 'morrow', ask: ["Please. I'm an old man who believed a dragon. Isn't that punishment enough?", 'Please. I was silly. Let me go?'], pick: [
-        { t: ['Let him go', 'Let him go'], tone: 'kind', then: ['choice morrow=free'],
+        { t: ['Let him go', 'Let him go'], tone: 'kind', v: 'free',
           say: [['ash', 'Go home, Morrow. Find something better to believe in.', 'Go home. Believe in something better.'],
                 ['morrow', 'Thank you. Maybe I will grow something that is not on fire.', 'Thank you. Maybe I will grow pumpkins.']] },
-        { t: ['Take him to Captain Osric', 'Take him to Osric'], tone: 'brave', then: ['choice morrow=jail'],
+        { t: ['Take him to Captain Osric', 'Take him to Osric'], tone: 'brave', v: 'jail',
           say: [['ash', 'You are coming to Brindlecross. Captain Osric can decide.', 'Osric can decide.'],
                 ['narr', 'You march Morrow to the Watch House. Osric looks thrilled. Morrow looks relieved, honestly.', 'Osric is thrilled. Morrow is relieved.']] },
       ] },
@@ -173,7 +181,7 @@ quest({
       ['ash', 'A key. So it was somebody with a key.', 'Somebody had a key.'],
     ],
     a1_door_look: [
-      ['narr', 'One of the gate doors lies in the mud. Kobold claw marks cover its outside.', 'A door lies in the mud. Claw marks outside.', { ref: 'north_gate_door' }],
+      ['narr', 'One of the gate doors lies in the mud. Kobold claw marks cover its outside.', 'A door lies in the mud. Claw marks outside.', { ref: 'a1_gate_door' }],
       ['narr', 'The wall has no marks at all. Nobody climbed over. They ran in when the gate swung open.', 'No marks on the wall. They came through the gate.', { clue: 'a1_claws' }],
     ],
     a1_prints_look: [
@@ -234,10 +242,10 @@ quest({
       ['ash', 'Kobolds burned half the village, Fennick.', 'Kobolds burned half the village!'],
       ['fennick', "I know. I didn't think. I'm so sorry, Ash. I'm so, so sorry.", "I'm so sorry, Ash."],
       { choose: 'fennick', ask: ['What should happen to Fennick?', 'What happens to Fennick?'], pick: [
-        { t: ['Forgive him. He can make it right.', 'Forgive him'], tone: 'kind', then: ['choice fennick=forgive', 'set a1_gate_solved', 'give tunnel_key'],
+        { t: ['Forgive him. He can make it right.', 'Forgive him'], tone: 'kind', v: 'forgive', then: ['set a1_gate_solved', 'give tunnel_key'],
           say: [['ash', 'You are going to make it right. Every lantern, every night.', 'Make it right. Every lantern, every night.'],
                 ['fennick', 'I will! And take this. The key to their tunnel off the Ashen Road.', 'I will! Take their tunnel key.', { ref: 'oath_tunnel' }]] },
-        { t: ['Turn him in to Captain Osric', 'Turn him in to Osric'], tone: 'brave', then: ['choice fennick=jail', 'set a1_gate_solved', 'give tunnel_key'],
+        { t: ['Turn him in to Captain Osric', 'Turn him in to Osric'], tone: 'brave', v: 'jail', then: ['set a1_gate_solved', 'give tunnel_key'],
           say: [['ash', 'You have to answer for it, Fennick.', 'You have to answer for it.'],
                 ['fennick', "That's fair. Take their key. It opens a tunnel off the Ashen Road. I'll bring a lamp. For the cell.", "That's fair. Take their tunnel key.", { ref: 'oath_tunnel' }]] },
       ] },
@@ -268,8 +276,7 @@ quest({
 
 // ================= small mystery: what rattles in Sir Strawsworth's hat? (Hal's rumor)
 quest({
-  id: 'a1_hat', act: 1, giver: 'hal', optional: true,
-  start: 'stage>=lore',
+  id: 'a1_hat', act: 1, giver: 'hal', optional: true,   // started by Hal's rumor (people() at the end)
   title: ["Sir Strawsworth's Hat", 'The Scarecrow Hat'],
   payoff: { kind: 'truth', id: 'a1_button' },
 
@@ -326,11 +333,6 @@ quest({
   },
 
   talk: {
-    hal: [
-      { if: 'stage>=lore !clue a1_rattle', once: true, option: ['Heard anything about Sir Strawsworth?', 'About the scarecrow...'],
-        say: ["His hat rattles when the wind blows. Something's in there. I've never checked. He looks like he'd mind.", 'His hat rattles! I never checked.'],
-        then: ['clue a1_rattle'] },
-    ],
     rook: [
       { if: 'quest a1_hat active', once: true, option: ['Have you ever climbed Sir Strawsworth?', 'Did you climb the scarecrow?'],
         say: ['Once! I got stuck for an hour. Hal had to fetch a ladder. I left jam on his hat.', 'I got stuck on him once! Jam everywhere.'],
@@ -341,10 +343,14 @@ quest({
 
 // ================= small mystery: who put out the Hollow Ward?
 quest({
-  id: 'a1_snuffed', act: 1, giver: 'yara', optional: true,
-  start: 'stage>=lore',
+  id: 'a1_snuffed', act: 1, giver: 'yara', optional: true,   // started by asking Yara (people() at the end)
   title: ['The Cold Ward', 'The Cold Ward'],
   payoff: { kind: 'truth', id: 'a1_oath_inside' },
+
+  // black candle wax round the Hollow Ward stone (drawn by x0_act1.js from the raid until Act I ends)
+  place: {
+    a1_ward_wax: { map: 0, at: [2560, 9122], r: 30, kind: 'examine', name: 'black wax on the Hollow Ward', if: 'stage>=raid !flag act1_done' },
+  },
 
   clue: {
     a1_black_wax:      { mystery: 'a1_snuffed', icon: 'candle',
@@ -378,7 +384,7 @@ quest({
       obj: ['Find out who put out the Hollow Ward', 'Who put out the Ward?'],
       hint: ['Look at the Ward stone under the old oak. Ask Bertram at the bakery, and Sister Wren in Brindlecross.', 'Look at the Ward. Ask Bertram and Wren.'],
       parts: [
-        { do: 'examine hollow_ward_wax', scene: 'a1_wax_look' },
+        { do: 'examine a1_ward_wax', scene: 'a1_wax_look' },
         { do: 'talk bertram', scene: 'a1_bertram_ran' },
         { do: 'talk wren', scene: 'a1_wren_candles', if: 'stage>=wren' },
       ] },
@@ -387,7 +393,7 @@ quest({
 
   scene: {
     a1_wax_look: [
-      ['narr', 'Black wax is dripped all round the cold Ward stone, next to a stub of black candle.', 'Black wax and a black candle stub!', { ref: 'hollow_ward_wax', clue: 'a1_black_wax' }],
+      ['narr', 'Black wax is dripped all round the cold Ward stone, next to a stub of black candle.', 'Black wax and a black candle stub!', { ref: 'a1_ward_wax', clue: 'a1_black_wax' }],
       ['ash', 'Somebody put the Ward out on purpose. With a candle?', 'Someone put it out with a candle?'],
     ],
     a1_bertram_ran: [
@@ -407,6 +413,23 @@ quest({
       { if: 'quest a1_snuffed active', once: true, option: ['Did anything odd happen on Lantern Day?', 'Anything odd on Lantern Day?'],
         say: ['Odd? It was ever so windy! My hat blew right off. And then, kobolds.', 'So windy! My hat blew off. Then kobolds.'],
         then: ['clue a1_windy'] },
+    ],
+  },
+})
+
+// ================= act-wide talk that starts the two small mysteries (A2S's people() call)
+people({
+  id: 'a1_people', act: 1,
+  talk: {
+    hal: [
+      { if: 'stage>=lore !quest a1_hat active !quest a1_hat done', once: true, option: ['Heard anything about Sir Strawsworth?', 'About the scarecrow...'],
+        say: ["His hat rattles when the wind blows. Something's in there. I've never checked. He looks like he'd mind.", 'His hat rattles! I never checked.'],
+        then: ['quest start a1_hat', 'clue a1_rattle'] },
+    ],
+    yara: [
+      { if: 'stage>=lore !flag act1_done !quest a1_snuffed active !quest a1_snuffed done', once: true, option: ['Who put out the Hollow Ward?', 'Who put out the Ward?'],
+        say: ['I wish I knew, Ash. Ward-fire does not just go out. Go and look at the stone.', 'Go and look at the Ward stone.'],
+        then: ['quest start a1_snuffed'] },
     ],
   },
 })
