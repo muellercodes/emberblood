@@ -128,7 +128,7 @@ function gtDirtyArea(x,y,r){
 function gtList(o,...arrs){ for(const a of arrs) if(a&&!a.includes(o)) a.push(o); }
 function gtUnlist(o,...arrs){ for(const a of arrs){ if(!a) continue; const i=a.indexOf(o); if(i>=0) a.splice(i,1); } }
 // a collider that is off while the gate is open for everyone (st>=2) or while `extra()` says so; never burrowed under
-function gtCol(g,c,extra){ c.deep=true; c.gate=g.id; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||(extra?!!extra():false); },configurable:true}); addCol(c); g.parts.push(c); return c; }
+function gtCol(g,c,extra){ c.deep=true; c.gate=g.id; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||(extra?!!extra():false); },set(v){},configurable:true}); addCol(c); g.parts.push(c); return c; }
 // door zones: thick rects round a shut door that stop Ash on foot, jumping or rolling (a collider alone is thin enough
 // for a fast roll to tunnel through). pass() says when the power lets him through (a shadow, a lit curtain, melted ice).
 function gtZone(g,R,pass,keep){ const horiz=R.w>=R.h, z={g,keep:!!keep,horiz,cx:R.x,cy:R.y,x0:R.x-R.w/2-(horiz?4:18),x1:R.x+R.w/2+(horiz?4:18),y0:R.y-R.h/2-(horiz?18:4),y1:R.y+R.h/2+(horiz?18:4),pass:pass||null};
@@ -150,7 +150,7 @@ function gtFlyWall(g,e,x,y,rx,ry){ g.flyZ={e,x,y,rx,ry}; GT.fly.push(g); }
       else if(GT.zones.length&&gtZoneStops(x,y,GT.px,GT.py)) return true; }
     return base(x,y); }; }
 // wrap an existing collider's `off` so it is also off while the gate is open
-function gtColWrap(g,c,soft){ if(!c) return; if(!soft) c.deep=true; const d=Object.getOwnPropertyDescriptor(c,'off'), get=d&&d.get; if(get) Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||get.call(c); },configurable:true}); else { let v=!!c.off; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||v; },set(x){ v=!!x; },configurable:true}); } }
+function gtColWrap(g,c,soft){ if(!c) return; if(!soft) c.deep=true; const d=Object.getOwnPropertyDescriptor(c,'off'), get=d&&d.get, set=d&&d.set; if(get) Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||get.call(c); },set(v){ if(set) set.call(c,v); },configurable:true}); else { let v=!!c.off; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||v; },set(x){ v=!!x; },configurable:true}); } }
 
 // ---------- 1b. a gate with its own geometry: place.build = { plateau, post, ledge, nofly, bars, curtain, ring, plate,
 // hook, ramp } (A2S, CHANGES.md). The pieces are made first; the kind adds its own piece at `at` when build does not
@@ -273,7 +273,7 @@ function gtWaterD(w,x,y){
   return Math.max(outer,inner);
 }
 // the plank bridge over a moat once the gate is open for everyone (a strip from the outer shore to the island)
-function gtPlankAt(w,x,y){ const g=w.g; if(gtSt(g.id)<2||!w.r0) return false; const u=GT_FACE[g.face], vx=x-w.x, vy=y-w.y, along=vx*u[0]+vy*u[1], side=Math.abs(vx*u[1]-vy*u[0]); return side<26&&along>w.r0-30&&along<w.r1+30; }
+function gtPlankAt(w,x,y){ const g=w.g; if(gtSt(g.id)<2||!w.r0) return false; const u=GT_FACE[g.face], vx=x-w.x, vy=y-w.y, along=vx*u[0]+vy*u[1], side=Math.abs(vx*u[1]-vy*u[0]-(w.plank||0)); return side<26&&along>w.r0-30&&along<w.r1+30; }
 function gtWaterAt(x,y){
   const L=GT.water; if(!L.length||x>=IZX-50) return null;
   for(let i=0;i<L.length;i++){ const w=L[i], b=w.bb; if(x<b[0]||x>b[2]||y<b[1]||y>b[3]) continue; if(gtWaterD(w,x,y)<0&&!gtPlankAt(w,x,y)) return w; }
@@ -454,7 +454,7 @@ GTK.water={r:110,rmin:50,
   isIn:(g,x,y)=>gtOnIsland(g,x,y),
   nudge:g=>S('Too far to swim and too far to jump. If only you could walk on water.','Too far! Walk on water?')};
 GTK.whip_hook={r:110,rmin:60,
-  build(g){ gtIsland(g); g.water.rough=true; const u=GT_FACE[g.face], R=g.r, M=g.mw;
+  build(g){ gtIsland(g); g.water.rough=true; g.water.plank=-70; const u=GT_FACE[g.face], R=g.r, M=g.mw;
     // hook A on the island's near shore swings Ash in; hook B on the far bank swings him back out
     // (the whip catches a hook 160 to 220 px straight ahead: the near bank's edge is about M+46 px from hook A)
     const px=-u[1], py=u[0];
@@ -654,10 +654,10 @@ function gtDrawRapids(g,t){
   ctx.restore();
 }
 function gtDrawPlanks(g){
-  const u=GT_FACE[g.face], w=g.water, a0=w.r0-34, a1=w.r1+34, px=-u[1], py=u[0];
+  const u=GT_FACE[g.face], w=g.water, a0=w.r0-34, a1=w.r1+34, px=-u[1], py=u[0], ox=w.x-px*(w.plank||0), oy=w.y-py*(w.plank||0);
   ctx.save(); ctx.lineCap='butt';
-  for(let s=a0;s<a1;s+=13){ const cx=g.x+u[0]*s, cy=g.y+u[1]*s; ctx.strokeStyle=SBC.outline; ctx.lineWidth=12; ctx.beginPath(); ctx.moveTo(cx-px*26,cy-py*26); ctx.lineTo(cx+px*26,cy+py*26); ctx.stroke(); ctx.strokeStyle=(Math.round(s/13)%2)?'#a87a4a':'#b88a56'; ctx.lineWidth=9; ctx.stroke(); }
-  ctx.strokeStyle='#6a4a2a'; ctx.lineWidth=3; for(const sd of [-1,1]){ ctx.beginPath(); ctx.moveTo(g.x+u[0]*a0+px*24*sd,g.y+u[1]*a0+py*24*sd); ctx.lineTo(g.x+u[0]*a1+px*24*sd,g.y+u[1]*a1+py*24*sd); ctx.stroke(); }
+  for(let s=a0;s<a1;s+=13){ const cx=ox+u[0]*s, cy=oy+u[1]*s; ctx.strokeStyle=SBC.outline; ctx.lineWidth=12; ctx.beginPath(); ctx.moveTo(cx-px*26,cy-py*26); ctx.lineTo(cx+px*26,cy+py*26); ctx.stroke(); ctx.strokeStyle=(Math.round(s/13)%2)?'#a87a4a':'#b88a56'; ctx.lineWidth=9; ctx.stroke(); }
+  ctx.strokeStyle='#6a4a2a'; ctx.lineWidth=3; for(const sd of [-1,1]){ ctx.beginPath(); ctx.moveTo(ox+u[0]*a0+px*24*sd,oy+u[1]*a0+py*24*sd); ctx.lineTo(ox+u[0]*a1+px*24*sd,oy+u[1]*a1+py*24*sd); ctx.stroke(); }
   ctx.restore();
 }
 { const base=drawPools; drawPools=function(){ base.apply(this,arguments); try{ gtDrawGround(G?G.time:0); }catch(e){ gtWarn('ground',String(e)); } }; }
