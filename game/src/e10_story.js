@@ -658,7 +658,7 @@ function s10Prompts(offer){
     if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
-    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+40; if(d>r) continue;
+    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+50; if(d>r) continue;
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
     // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)

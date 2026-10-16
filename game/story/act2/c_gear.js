@@ -16,7 +16,7 @@ chapter({
                       name: 'the bird clock in the window', light: { r: 80, i: 0.55, night: true, off: ['gone'] } },
     gh_roof_prints: { map: 1, kind: 'prints', path: [[7640, 25060], [7760, 24990], [7900, 24920]],
                       show: 'item magnifier', name: 'silver prints' },
-    gh_clock_works: { map: 1, at: [7040, 24880], kind: 'examine', look: 'gear_hatch',
+    gh_clock_works: { map: 1, at: [7040, 24880], r: 34, kind: 'examine', look: 'gear_hatch',
                       name: 'the clock works' },
   },
 
