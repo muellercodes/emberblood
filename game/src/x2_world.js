@@ -1114,9 +1114,10 @@ function f2wLM(B,o){ o.noNudge=true; if(o.clr==null) o.clr=60; if(!o.k) o.k='f2w
 function f2wSecret(id,title){ G.secrets=G.secrets||{}; if(G.secrets[id]) return false; G.secrets[id]=1; G.found[id]=true; jingle('secret','chest'); setBanner(S('A secret of Frostreach!','A secret!'),title,2.6); return true; }
 // ---------- override points for the people and story helpers (wrap these; the defaults keep the world working alone)
 // the Great Hearth took 3 s of Blaze (only while it is cold, at f_kindle or later): default lights it
-function f2wHearthBlaze(o){ G.flags.f_hearth_lit=1; shake(6); f2wSnd('whoosh',1); setBanner(S('WHOOMPH!','WHOOMPH!'),S('The Great Hearth roars up in blue and gold fire!','The Great Hearth burns blue!'),3); f2wSync(); saveGame(); }
+// (with the story in the build its own scene says WHOOMPH / SPLOOSH: no second banner over it)
+function f2wHearthBlaze(o){ G.flags.f_hearth_lit=1; shake(6); f2wSnd('whoosh',1); if(!f2wStoryIn()) setBanner(S('WHOOMPH!','WHOOMPH!'),S('The Great Hearth roars up in blue and gold fire!','The Great Hearth burns blue!'),3); f2wSync(); saveGame(); }
 // the North Gate took 2 s of Blaze (only once the Hearth burns): default opens it
-function f2wNorthGate(o){ G.flags.f_northgate=1; shake(4); f2wSnd('crack',1); setBanner(S('SPLOOSH!','SPLOOSH!'),S('The ice slides off the North Gate. It swings open.','The North Gate opens!'),2.6); f2wSync(); saveGame(); }
+function f2wNorthGate(o){ G.flags.f_northgate=1; shake(4); f2wSnd('crack',1); if(!f2wStoryIn()) setBanner(S('SPLOOSH!','SPLOOSH!'),S('The ice slides off the North Gate. It swings open.','The North Gate opens!'),2.6); f2wSync(); saveGame(); }
 // a Frozen Folk person just thawed (after their own line): Ylva's thaw sets f_ylva (the story helper plays STORY.f_ylva)
 function f2wThawed(o){ if(o.id==='f_ylva'&&!F2WF('f_ylva')&&!f2wStoryIn()) G.flags.f_ylva=1; f2wSync(); }
 // the Drum Stone was pounded (n = times): default sets f_drum at the Dreadgate stage (the story helper plays f_drum)

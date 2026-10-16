@@ -600,7 +600,8 @@ const F2P_HOME_MOOD={
 // ---------- what the north says out loud. The stock barks, chats and deed greetings that belong to other lands
 // stay in other mouths; a short list of universal ones (Pip, the night, rain, weapons, levels) works everywhere.
 { const OKB={pip1:1,pip2:1,pip3:1,pip4:1,duC2:1,duC3:1,brC2:1,grC1:1,grC2:1,grC3:1,night3:1,night4:1,low1:1,low2:1,dag1:1,boom1:1,bow1:1,bow2:1,lvl2:1,c_cst2:1,c_cst3:1,c_cst4:1};
-  const OKC={pip:1,night:1,wings:1,whisper:1,breath:1,mip:1,goat:1,hat:1,duch:1,wolf:1,map:1};
+  // (not 'hat': "Did you see Ash's hat? Marigold must be thrilled." is about Emberhollow's hatter, whom nobody up here knows)
+  const OKC={pip:1,night:1,wings:1,whisper:1,breath:1,mip:1,goat:1,duch:1,wolf:1,map:1};
   const notFrost=f=>n=>f(n)&&!F2P_TOWNS.includes(n.town);
   for(const b of BARKS) if(!OKB[b.k]&&!String(b.k).startsWith('f_')) b.w=notFrost(b.w);
   for(const c of CHATS) if(!OKC[c.k]&&!String(c.k).startsWith('f_')){ c.a=notFrost(c.a); c.b=notFrost(c.b); }
