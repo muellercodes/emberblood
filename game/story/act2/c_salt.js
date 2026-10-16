@@ -47,6 +47,9 @@ chapter({
     s_tide_dust: { icon: 'kelp', mystery: 'what_stopped',
       text: ["The Tide Clock's cog was packed with kelp and far too much moth dust. More than one girl could carry.",
         'The Tide Clock was full of moth dust. Too much!'] },
+    s_fishstep: { icon: 'fish',
+      text: ["Before dawn, from the Chowder Pot's window: a cloaked figure left a fish on Granny Oona's step and ran off over the roofs.",
+        'A cloaked girl left a fish on Gran\'s step.'] },
     s_alibi: { icon: 'fish', mystery: 'what_stopped',
       text: ['Granny Oona says Vesper came home just before midnight, the night the clocks stopped. She was shaking.',
         'Gran says Vesper was home that night, shaking.'] },
@@ -57,7 +60,7 @@ chapter({
       mystery: 'moth_mask',
       ask: ['Who is the Moth Mask?', 'Who is the Moth Mask?'],
       needs: ['s_note_salt', 's_gifts', 's_family'],
-      bonus: ['q_lookout', 'q_dishwasher', 'q_box_initials'],
+      bonus: ['s_fishstep', 'q_lookout', 'q_dishwasher', 'q_box_initials'],
       pick: [
         { t: ["A Saltmarsh girl from Pearl's family: Vesper Saltwhistle", 'Vesper Saltwhistle, from Saltmarsh'], right: true },
         { t: ['A clock baron, robbing his rivals', 'A rich clock baron'],
@@ -156,6 +159,14 @@ chapter({
       ['narr', "Out of the cog falls the crab shell, and a fat clump of kelp. It glitters. It's packed with silver moth dust.", 'Out falls kelp, packed with silver dust.'],
       ['ash', "That's not one moth's worth of dust. That's a whole SKY of moths.", 'That is a LOT of moth dust.'],
       ['c_mina', '(from outside) LOW TIDE! Oh, you lovely dragon! The Gullcrag Sands are open!', 'LOW TIDE! The sands are open!'],
+    ],
+    // not played by a step: x1_story.js c1Rested plays STORY.c_fishstep after a rest at the Chowder Pot in this chapter
+    // or the next, and a data scene with an old key replaces that STORY entry (A2S's rule in CHANGES.md)
+    c_fishstep: [
+      ['narr', "Just before dawn, something wakes you. Out of the inn window, a cloaked figure creeps along the longest boardwalk to Granny Oona's house.", 'Before dawn, a cloaked figure creeps to Granny Oona\'s house.'],
+      ['narr', "She lays a fish on the step. She straightens the doormat. Then she's gone, up a post and over a roof, quick as a cat.", 'She leaves a fish. Then she runs over the roofs.', { clue: 's_fishstep' }],
+      ['ash', 'Fish delivery. In a moth cloak. At five in the morning.', 'Fish delivery. In a moth cloak. So early!'],
+      { if: 'flag pip', then: [['pip', 'Mip.']] },
     ],
     slt_oona: [
       ['narr', "The crooked house at the end of the longest boardwalk. Inside, it's colder than outside.", 'The crooked house. Inside, it is colder than outside.'],
