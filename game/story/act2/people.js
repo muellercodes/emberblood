@@ -103,7 +103,8 @@ people({
 
     c_bobs: [
       { if: 'quest c_bob done', once: true,
-        say: ['All three of us! Bob, Bob, and Bob. It is very confusing for everyone. We love it.', 'All three Bobs! We love it.'] },
+        say: ['All three of us! Bob, Bob, and Bob. It is very confusing for everyone. We love it. Ask Bob what he remembers.',
+          'All three Bobs! Ask Bob what he remembers.'] },
       { if: '!flag c_clock_on', fact: 'c_great_clock=stopped',
         say: [["Tick. Tock. That's not the clock. That's us. The clock's broken.", 'Tick. Tock. That is us, not the clock.'],
           ["I'm Bob. He's also Bob. We are both Bob.", 'I am Bob. He is Bob too.']] },
@@ -115,6 +116,8 @@ people({
     ],
 
     c_bob3: [
+      // the quest's surprise (q_bob.js bb_home), for as long as the homecoming plays the old lines
+      { if: 'quest c_bob done !seen bb_home', once: true, scene: 'bb_remember' },
       { say: [["I'm Bob. The clever one. ...They told you I'm not the clever one. I am a bit.", "I'm Bob. The clever one. A bit."],
         ['Thank you for the gentle breath. My ears still smell of toast.', 'My ears smell of toast. Thanks!']] },
       { bark: true, say: ['Tick. Tock. Bob reporting.', 'Tick. Tock. Bob here.'] },

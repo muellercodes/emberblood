@@ -6,7 +6,7 @@
 // (`ally c_bob3` is for the checker: there is no c_bob3 companion, so recruitComp does nothing; the Bobs' help at
 // the Spire comes from A2b reading `quest c_bob done`.) Old saves: QDEFS.c_bob steps 0..2 map to find, calm, home.
 // Finding and calming him stay x1_people's (legacy), and so does his walk home behind Ash (it follows while the old
-// step index is 2, so home is legacy too). The Bobs' registry entry is ENG's (map1_gear.js).
+// step index is 2, so home is legacy too, and its old reward stands). The Bobs' registry entry is ENG's (map1_gear.js).
 quest({
   id: 'c_bob', act: 2, giver: 'c_bobs', optional: true, takeover: true,
   title: ['The Third Bob', 'The Third Bob'],
@@ -29,8 +29,12 @@ quest({
       obj: ['Knock the moth dust out of Bob without breaking him', 'Break his shield. Then breathe gently.'],
       hint: ['Break his shield (a hammer, the Chain Whip or the Reel-In). While he is dizzy, breathe on him gently for about a second.',
         'Break his shield. Breathe gently while he is dizzy.'] },
+    // the old step's own reward gives the badge (and wears it), 40 coins and 500 XP, ends the walk behind Ash and
+    // stands the third Bob at the Lift, so `then` repeats none of it. While ENG leaves legacy talks to the old code
+    // the old step's lines play; bb_home is the text for them (A2S_NOTES.md, engine needs), and the clever Bob's
+    // memory is also in people.js (c_bob3), so it is in the game either way.
     { id: 'home', do: 'talk c_bobs', legacy: true, scene: 'bb_home',
-      then: ['give c_badge', 'hat c_badge', 'give coins 40', 'xp 500', 'ally c_bob3'],
+      then: ['ally c_bob3'],
       obj: ['Bring Bob home to the Clockwork Lift', 'Bring Bob home to the Lift'] },
   ],
 
@@ -54,6 +58,11 @@ quest({
       ['c_bob3', 'I remember now. The sky went soft and grey, and dust fell like snow. Then I was in the Yards.',
         'The sky went grey. Dust fell. Then I was lost.'],
       ['c_bobs', 'The Clockwatch owes you, Mostly Part Dragon. When you need us, all three Bobs will be there.', 'We owe you. All three Bobs will come.'],
+    ],
+    // the clever Bob's memory, played by his own talk in people.js while the homecoming plays the old lines
+    bb_remember: [
+      ['c_bob3', 'I remember now. The night I went funny, the sky went soft and grey, and dust fell like snow.', 'The sky went grey. Dust fell like snow.'],
+      ['c_bob3', 'Then it was all TICK TOCK, and I was in the Brass Yards. I do not like snow any more.', 'Then I was lost. I do not like snow now.'],
     ],
   },
 
