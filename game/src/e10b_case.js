@@ -59,6 +59,10 @@ const CB10={wrong:{},flash:{},bookR:null,iconCache:new Map(),openAt:0};
 @keyframes cb10glow{0%,100%{box-shadow:0 0 0 3px rgba(255,210,74,.35),0 0 10px rgba(255,200,60,.4)}50%{box-shadow:0 0 0 4px rgba(255,210,74,.7),0 0 22px rgba(255,200,60,.85)}}
 .cb10-hint{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:rgba(255,236,200,.1);border:1px solid rgba(255,214,150,.3);color:var(--ink);font-size:14px;position:relative}
 .cb10-hint b{color:var(--gold)}
+.cb10-bonus{margin:10px 0 0;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink)}
+.cb10-bonus b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ember)}
+.cb10-bonus span{display:flex;gap:8px;align-items:center}
+.cb10-bonus svg,.cb10-bonus img{flex:none;width:22px;height:22px;color:var(--gold)}
 .cb10-ans{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:16px;font-weight:800;color:var(--ink)}
 .cb10-stamp{display:inline-block;transform:rotate(-6deg);border:3px solid #5ac86a;color:#5ac86a;border-radius:8px;padding:0 8px;font-size:13px;font-weight:900;letter-spacing:.12em}
 .cb10-q.solved.just .cb10-stamp{animation:cb10pop .6s ease-out}
@@ -135,13 +139,14 @@ function cbVisible(){ return !!(G&&G.mode==='story'&&G.case&&(cbFound().length||
 // a clue's mystery: its own, else a deduction that needs it, else its chapter's first deduction's, else notes
 function cbClueMystery(id){
   const C=S10.clues[id]; if(C&&C.mystery) return C.mystery;
-  for(const k in S10.deduce){ const D=S10.deduce[k]; if(s10Arr(D.needs).includes(id)) return D.mystery||'notes'; }
+  for(const k in S10.deduce){ const D=S10.deduce[k]; if(s10Arr(D.needs).includes(id)||s10Arr(D.bonus).includes(id)) return D.mystery||'notes'; }
   const own=C&&C._owner&&C._owner.d; if(own&&own.deduce){ for(const k in own.deduce) if(own.deduce[k].mystery) return own.deduce[k].mystery; }
   return 'notes';
 }
 function cbModel(){
   const M={}, get=id=>M[id]||(M[id]={id,def:id==='notes'?{title:S('Notes','Notes'),act:null}:s10Mystery(id),clues:[],qs:[]});
-  for(const id of cbFound()) get(cbClueMystery(id)).clues.push(id);
+  const bonusOf=new Set(); for(const k in S10.deduce) for(const c of s10Arr(S10.deduce[k].bonus)) if(!G.case.solved[k]) bonusOf.add(c);
+  for(const id of cbFound()) if(!bonusOf.has(id)) get(cbClueMystery(id)).clues.push(id);
   for(const id in S10.deduce){ const D=S10.deduce[id], need=s10Arr(D.needs), got=need.filter(c=>G.case.clues[c]).length;
     if(G.case.solved[id]||got>0) get(D.mystery||'notes').qs.push({D,got,need:need.length,state:G.case.solved[id]?'solved':got>=need.length?'ready':'locked'}); }
   const cur=G.act;
@@ -160,10 +165,11 @@ function cbHtml(){
       const D=q.D, ask=E(s10T(D.ask));
       if(q.state==='locked'){ rows.push(`<div class="cb10-q locked"><div class="cb10-ask"><i>?</i><span>${E(S('A question is forming... find more clues.','Find more clues to ask a question.'))} <span class="cb10-dots" aria-label="${q.got} of ${q.need}">${Array.from({length:q.need},(_,i)=>`<span class="${i<q.got?'on':''}"></span>`).join('')}</span></span></div></div>`); continue; }
       if(q.state==='solved'){ const P=s10Arr(D.pick).find(p=>p.right); rows.push(`<div class="cb10-q solved${CB10.flash[D.id]?' just':''}"><div class="cb10-ask"><i>✓</i><span>${ask}</span></div><div class="cb10-ans"><span>${E(P?s10T(P.t):'')}</span><span class="cb10-stamp">${E(S('SOLVED','SOLVED'))}</span></div></div>`); continue; }
-      const W=CB10.wrong[D.id], tries=C.tries[D.id]|0, glowOn=easy&&D.easy_glow!==false&&tries>=1;
+      const W=CB10.wrong[D.id], tries=C.tries[D.id]|0, bonus=s10Arr(D.bonus).filter(c=>C.clues[c]), glowOn=(easy&&D.easy_glow!==false&&tries>=1)||bonus.length>0;
       rows.push(`<div class="cb10-q" data-cbq="${escapeHtml(D.id)}"><div class="cb10-ask"><i>?</i><span>${ask}</span></div><div class="cb10-picks">`+
         s10Arr(D.pick).map((p,i)=>`<button type="button" class="cb10-pick${W&&W.no&&W.no.includes(i)?' no':''}${glowOn&&p.right?' glow':''}" data-cbd="${escapeHtml(D.id)}" data-cbi="${i}">${E(s10T(p.t))}</button>`).join('')+
-        `</div>${W&&W.hint?`<div class="cb10-hint" role="status"><b>${E(S('Hmm.','Hmm.'))}</b> ${escapeHtml(W.hint)}</div>`:''}</div>`);
+        `</div>${W&&W.hint?`<div class="cb10-hint" role="status"><b>${E(S('Hmm.','Hmm.'))}</b> ${escapeHtml(W.hint)}</div>`:''}`+
+        (bonus.length?`<div class="cb10-bonus"><b>${E(S('Extra clues','Extra clues'))}</b>${bonus.map(c=>{ const K=S10.clues[c]; return `<span>${cbIcon(K&&K.icon)}${E(K?s10T(K.text):c)}</span>`; }).join('')}</div>`:'')+`</div>`);
     }
     if(m.clues.length){ rows.push('<div class="cb10-cards">'); for(const id of m.clues){ const K=S10.clues[id]; rows.push(`<div class="cb10-card">${!C.seen[id]?`<span class="cb10-new">${E(S('NEW','NEW'))}</span>`:''}<span class="cb10-ic">${cbIcon(K&&K.icon)}</span><p>${E(K?s10T(K.text):id)}</p></div>`); } rows.push('</div>'); }
     rows.push('</section>');

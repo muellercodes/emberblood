@@ -31,6 +31,9 @@ window.act=d=>s10Take('act',d);
 window.chapter=d=>s10Take('chapter',d);
 window.quest=d=>s10Take('quest',d);
 window.legacy=d=>s10Take('legacy',d);
+// (A2S) act-wide people talk and world places that belong to no chapter or quest
+window.people=d=>s10Take('people',d);
+window.places=d=>s10Take('places',d);
 window.__ebStoryLoadErr=(f,e)=>{ s10Err(`${f}: ${e&&e.message||e}`); try{ console.warn('story data',f,e); }catch(err){} };
 
 // ---------- 2. text: [full, simple] or a plain string (S registers the simple version for Words: Simple)
@@ -162,8 +165,15 @@ function s10Effect(e,ctx){
       G.flags[f]=clamp(m&&m[1]==='='?n:m&&m[1]==='-'?cur-n:cur+n,0,99); break; }
     case 'power': if(typeof WEAPONS!=='undefined'&&WEAPONS[a]) giveWeapon(a,S10.quiet); else grantAbility(a); break;
     case 'upgrade': { G.flags['up_'+a]=1; if(!S10.quiet) setBanner(S('Upgrade!','Upgrade!'),s10Name(a),3); break; }
-    case 'heart_ember': { G.flags.heart_embers=(G.flags.heart_embers|0)+1; if(player){ player.maxHp+=10; player.hp=player.maxHp; }
-      if(!S10.quiet){ setBanner(S('Heart Ember!','Heart Ember!'),S('Your fire burns stronger. More health!','More health!'),3.4); try{ SFX.play('upgrade'); }catch(err){} } break; }
+    case 'heart_ember': {
+      if(typeof gainHeartEmber==='function'){ gainHeartEmber(a||null); break; }
+      if(a&&G.found['he_'+a]) break; if(a) G.found['he_'+a]=true;
+      G.found.heartEmbers=(G.found.heartEmbers||0)+1; if(player){ player.maxHp+=10; player.hp=player.maxHp; }
+      if(!S10.quiet){ setBanner(S('A Heart Ember!','A Heart Ember!'),S('Your fire burns stronger. Max health +10.','Max health +10!'),3.4); try{ SFX.play('upgrade'); }catch(err){} } break; }
+    case 'weapon': giveWeapon(a,S10.quiet); break;
+    case 'ally': if(typeof recruitComp==='function') recruitComp(a); else s10Err(`effect "${e}": no companions module`); break;
+    case 'hat': if(typeof x1pHat==='function') x1pHat(a); else { G.hats=G.hats||{}; G.hats[a]=true; G.hat=a; } break;
+    case 'deed': if(typeof deed==='function') deed(a); break;
     case 'open': case 'close': s10Gate(a,k==='open'); break;
     case 'spawn': { const at=b==='at'?c:b; s10NpcSet(a,{at,off:false}); break; }
     case 'despawn': s10NpcSet(a,{off:true}); break;
@@ -216,13 +226,18 @@ window.storyEmit=storyEmit;
 // ---------- 6. entities: story places, legacy things the old code draws, people
 function s10Ent(id){ return S10.places[id]||S10.legacy[id]||S10.npcs[id]||null; }
 function s10At(e){ if(!e) return null; if(e.at) return {x:+e.at[0],y:+e.at[1]}; if(e.path&&e.path.length) return {x:+e.path[0][0],y:+e.path[0][1]}; return null; }
+// an area's layout origin in the world (houses: the room's top left, A.rx/A.ry; else IZX+300, IZY+300)
+const s10InArea=a=>!!AREA&&!!a&&(AREA.id===a||String(AREA.id).startsWith(a+'_'));
+function s10Off(e){ if(!e||!e.area) return {x:0,y:0}; if(!s10InArea(e.area)) return null; return {x:AREA.rx!=null?AREA.rx:(typeof IZX!=='undefined'?IZX+300:0),y:AREA.ry!=null?AREA.ry:(typeof IZY!=='undefined'?IZY+300:0)}; }
+// where a place really is now (null for a place inside an area Ash is not in)
+function s10Pos(e){ const p=s10At(e); if(!p) return null; const o=s10Off(e); if(!o) return null; return {x:p.x+o.x,y:p.y+o.y}; }
 // where something is right now: {x,y,area?,npc?} (people walk and live indoors: their door when Ash is outside)
 function s10Where(id){
   if(id==null) return null;
   const e=s10Ent(id);
   if(e&&(e.kind==='npc'||S10.npcs[id])||(!e&&((typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id])))){ const w=s10NpcWhere(id); if(w) return w; }
-  if(e&&e.kind==='prints'){ const tr=G.story&&G.story._trk&&G.story._trk[id], P=e.path||[], i=tr==='done'?P.length-1:clamp((tr==null?-1:tr)+1,0,P.length-1); if(P[i]) return {x:+P[i][0],y:+P[i][1]}; }
-  if(e&&e.area){ const p=s10At(e); const d=DOORS.find(q=>q.area===e.area); if(AREA&&AREA.id===e.area) return Object.assign({area:e.area},p); return d?{x:d.x,y:d.y,area:e.area}:p; }
+  if(e&&e.kind==='prints'&&!e.area){ const tr=G.story&&G.story._trk&&G.story._trk[id], P=e.path||[], i=tr==='done'?P.length-1:clamp((tr==null?-1:tr)+1,0,P.length-1); if(P[i]) return {x:+P[i][0],y:+P[i][1]}; }
+  if(e&&e.area){ const d=DOORS.find(q=>q.area===e.area), p=s10Pos(e); if(p) return Object.assign({area:AREA.id},p); return d?{x:d.x,y:d.y,area:e.area}:null; }
   if(!e){ const d=DOORS.find(q=>q.area===id); if(d) return {x:d.x,y:d.y,area:id}; const m=typeof CAVEMOUTHS!=='undefined'&&CAVEMOUTHS.find(q=>q.area===id); if(m) return {x:m.x,y:m.y,area:id}; return null; }
   return s10At(e);
 }
@@ -235,7 +250,7 @@ function s10NpcWhere(id){
 }
 function s10Near(id,r){
   const w=s10Where(id); if(!w||!player) return false;
-  if(w.area){ if(!AREA||AREA.id!==w.area) return false; }
+  if(w.area){ if(!s10InArea(w.area)) return false; }
   else{ if(AREA) return false; const e=s10Ent(id); if(e&&e.map!=null&&curMap()!==+e.map) return false; }
   return dist(player.x,player.y,w.x,w.y)<(r||300);
 }
@@ -243,13 +258,17 @@ function s10Near(id,r){
 function s10Resolve(e){
   const at=s10At(e), tol=Math.max(140,(e.r||0)+60), near=(x,y)=>!at||dist(x,y,at.x,at.y)<=tol, far=(x,y)=>`found at ${Math.round(x)},${Math.round(y)}, ${Math.round(dist(x,y,at.x,at.y))} px from ${at.x},${at.y}`;
   const src=String(e.src||'');
-  if(e._story) return {ok:!!at&&(e.map==null||mapAt(at.y)===+e.map||(e.area&&!!AREADEFS[e.area])),why:at?(e.map!=null&&mapAt(at.y)!==+e.map?`y ${at.y} is on map ${mapAt(at.y)}, not ${e.map}`:''):'no position'};
+  if(e._story){ if(e.area) return AREADEFS[e.area]?{ok:!!at,why:at?'':'no position'}:{ok:false,why:`no area ${e.area}`};
+    return {ok:!!at&&(e.map==null||mapAt(at.y)===+e.map),why:at?(e.map!=null&&mapAt(at.y)!==+e.map?`y ${at.y} is on map ${mapAt(at.y)}, not ${e.map}`:''):'no position'}; }
   let m;
   if((m=/^LANDMARKS:(.+)$/.exec(src))){ const o=LANDMARKS.find(q=>q.id===m[1]); if(!o) return {ok:false,why:`no landmark ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^DOORS:(.+)$/.exec(src))){ const o=DOORS.find(q=>q.area===m[1]); if(!o) return {ok:false,why:`no door into ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^(?:CAST|SPECIAL|NPC):(.+)$/.exec(src))){ const id=m[1], c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); return c?{ok:true,real:c}:{ok:false,why:`nobody called ${id}`}; }
   if((m=/^HOUSES?:(.+)$/.exec(src))){ const h=HOUSES.find(q=>q.want===m[1]||q.owner===m[1]||q.id===m[1]); if(!h) return {ok:false,why:`no house for ${m[1]}`}; return near(h.x,h.y)?{ok:true,real:h}:{ok:false,why:far(h.x,h.y)}; }
   if((m=/^CHESTS:(.+)$/.exec(src))){ const o=CHESTS.find(q=>q.id===m[1]); if(!o) return {ok:false,why:`no chest ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
+  if((m=/^furn:(.+)$/.exec(src))){ const k=m[1];
+    if(e.area&&!s10InArea(e.area)) return AREADEFS[e.area]?{ok:true,why:`inside ${e.area}: checked when Ash is in there`}:{ok:false,why:`no area ${e.area}`};
+    const o=AREA&&AREA.objs&&AREA.objs.find(q=>q.k===k); return o?{ok:true,real:o}:{ok:false,why:`no ${k} in ${AREA?AREA.id:'(outdoors)'}`}; }
   if((m=/^elev:(\d+)@(-?\d+),(-?\d+)$/.exec(src))){ const L=typeof elevLvl==='function'?elevLvl(+m[2],+m[3]):0; return L>=+m[1]?{ok:true}:{ok:false,why:`level ${L} at ${m[2]},${m[3]} (want ${m[1]})`}; }
   if((m=/^prop:([\w-]+)@(-?\d+),(-?\d+)$/.exec(src))){ const k=m[1], x=+m[2], y=+m[3], o=s10FindObj(k,x,y,90); return o?{ok:true,real:o}:{ok:false,why:`no ${k} near ${x},${y}`}; }
   if((m=/^[\w.]+\.js\s+([A-Za-z_$][\w$]*)$/.exec(src))||(m=/^(?:fn|code):([A-Za-z_$][\w$]*)$/.exec(src))){
@@ -325,6 +344,7 @@ function s10Register(kind,d){
     return;
   }
   if(!d.id){ s10Err(`${kind}() needs an id (${src})`); return; }
+  if(kind==='people'||kind==='places'){ s10Owned(d,{kind,id:d.id,act:+d.act||null,d}); return; }
   if(kind==='chapter'){ s10Reg(S10.chapters,d.id,d,'chapter',src); if(!S10.chOrder.includes(d.id)) S10.chOrder.push(d.id); }
   else if(kind==='quest'){ s10Reg(S10.quests,d.id,d,'quest',src); if(!S10.qOrder.includes(d.id)) S10.qOrder.push(d.id); }
   const owner={kind,id:d.id,act:+d.act||null,d};
@@ -333,7 +353,7 @@ function s10Register(kind,d){
 }
 // the blocks a chapter, quest or act may carry: place, clue, deduce, scene, talk, npc, item
 function s10Owned(d,owner){
-  for(const id in (d.place||{})){ const p=Object.assign({id,_story:true,_owner:owner},d.place[id]); if(p.kind==null) p.kind='examine'; s10Reg(S10.places,id,p,'place',d._file); }
+  for(const id in (d.place||{})){ const p=Object.assign({id,_story:true,_owner:owner},d.place[id]); if(p.kind==null) p.kind='examine'; if(p.map==null&&d.map!=null) p.map=d.map; s10Reg(S10.places,id,p,'place',d._file); }
   for(const id in (d.clue||{})) s10Reg(S10.clues,id,Object.assign({id,_owner:owner},d.clue[id]),'clue',d._file);
   for(const id in (d.deduce||{})) s10Reg(S10.deduce,id,Object.assign({id,_owner:owner},d.deduce[id]),'deduction',d._file);
   for(const id in (d.scene||{})){ s10Reg(S10.scenes,id,d.scene[id],'scene',d._file); S10.sceneOwner[id]=owner; }
@@ -425,8 +445,8 @@ function s10Actor(id){
   const e=s10Ent(id);
   if(e&&/c1SightAt/.test(String(e.src||''))&&typeof c1SightAt==='function'){
     const A={kind:'sight',id,get S(){ return C1ST.sight; },place(x,y){ const s=c1SightAt(x,y,'wait'); s.face=x<player.x?1:-1; },
-      walk(x,y,d){ const s=C1ST.sight||c1SightAt(x,y,'wait'); s.go={x,y,t:0,d:d||1.2}; s.mode='dive'; },
-      anim(a){ const s=C1ST.sight; if(s) s.mode={climb:'move',run:'move',fly:'dive',glide:'dive',sit:'sit',stand:'wait',wait:'wait'}[a]||'wait'; },
+      walk(x,y,d){ const s=C1ST.sight||c1SightAt(x,y,'wait'); const far=dist(s.x,s.y,x,y); s.go={x,y,t:0,d:d||clamp(far/240,0.5,4)}; if(!s._pose) s.mode='dive'; },
+      anim(a){ const s=C1ST.sight; if(!s) return; s._pose=s10PoseGet(id,a)?a:null; s.mode={climb:'move',run:'move',fly:'dive',glide:'dive',sit:'sit',stand:'wait',wait:'wait'}[a]||'wait'; },
       end(){ C1ST.sight=null; }};
     return S10.actors[id]=A;
   }
@@ -481,13 +501,13 @@ function s10Finish(a,quiet){
     if(a.part){ const P=a.s.parts||[], n=P.filter(p=>st[p._id]).length; if(a.s._kind==='all'?n<P.length:n<1) { storyEmit('step:'+R.key+'.'+a.key); if(!quiet) s10Poke(R,false); return; } }
     st[a.s._id]=1; s10Do(a.s.then,{R,step:a.s});
     storyEmit('step:'+R.key+'.'+a.s._id);
-    if(R.kind==='q') s10QuestStepFlag(R,a.s);
+    if(R.kind==='q'){ s10QuestStepFlag(R,a.s); if(!s10Active(R)) s10QuestComplete(R.d); else if(!quiet) setBanner(s10T(R.d.title)||R.d.id,s10T(s10Active(R).obj)||s10DefaultObj(s10Active(R)),2.8); }
     if(!quiet) s10Poke(R,!a.s.optional);
   } finally { S10.quiet=was; }
 }
 // after a step: the banner for the next objective, the quest journal, a save
 function s10Poke(R,main){
-  if(R.kind==='q'){ questPoke(); saveGame(); return; }
+  if(R.kind==='q'){ try{ s10QuestSync(); }catch(e){} saveGame(); return; }
   if(main&&G.stage===R.d.id){ const nx=s10Active(R); if(nx&&nx._kind!=='cutscene') later(0.3,()=>{ if(scene==='play'&&G.stage===R.d.id&&!DLG) questUpdated(); }); }
   saveGame();
 }
@@ -495,7 +515,7 @@ function s10Poke(R,main){
 function s10Run2(a,before){
   const k=a.R.key+'/'+a.key; if(S10.pend[k]) return; S10.pend[k]=1;
   if(before) try{ before(); }catch(e){ console.error(e); }
-  const sc=a.x.scene;
+  const sc=a.x.scene||a.x.win;
   if(sc) s10Play(sc,()=>s10Finish(a),{R:a.R,step:a.s}); else s10Finish(a);
 }
 const s10Calm=()=>scene==='play'&&!DLG&&!G.mini&&!(G.boss&&!G.boss.dead)&&!player.dead;
@@ -505,6 +525,7 @@ function s10Tick(dt){
   if(S10.tickAt===G.time) return; S10.tickAt=G.time;
   S10.watchT-=dt; if(S10.watchT<=0){ S10.watchT=1; s10Watch(); }
   S10.npcT-=dt; if(S10.npcT<=0){ S10.npcT=1; s10NpcSync(); }
+  if(S10.qOrder.length) try{ s10QuestSync(); }catch(e){ console.error(e); }
   if(G.done) return;
   s10PlacesTick(dt);
   s10Barks(dt);
@@ -552,11 +573,17 @@ const MINI_S10={
 function s10MiniOwner(kind){ const R=s10Runners().find(R=>s10Doable(R).some(a=>a.x._kind==='minigame'&&a.x._args[0]===kind)); return R||null; }
 function s10MiniPoll(a){
   const x=a.x, id=x._args[0], M=MINI_S10[id]||{}, at=x.at||x._args[1];
+  if(x.start==='talk') return;
   if(G.mini||!s10Calm()) return;
   if(!MINI[id]){ s10Err(`minigame ${id} does not exist`); return; }
   if(G.time<S10.mini.lostAt+4) return;
   if(at&&!s10Near(at,x.r||M.near||300)) return;
   if(M.night&&!isNight()&&!x.day) return;
+  s10MiniStart(a);
+}
+function s10MiniStart(a){
+  const x=a.x, id=x._args[0], M=MINI_S10[id]||{};
+  if(G.mini||!MINI[id]) return;
   const k=a.R.key+'/'+a.key; S10.pend[k]=1;
   const go=()=>{ try{ if(M.post) M.post(); }catch(e){} later(0.1,()=>{ delete S10.pend[k]; S10.mini.owner=a.R.key+'/'+a.key; startMini(id,null); }); };
   try{ if(M.pre) M.pre(); }catch(e){ console.error(e); }
@@ -581,7 +608,7 @@ function s10PlaceOn(p){
   if(!p||p.kind==='npc_spot') return false;
   const own=p._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false;
   if(p.if!=null&&!s10Cond(p.if)) return false;
-  if(p.area){ if(!AREA||AREA.id!==p.area) return false; }
+  if(p.area){ if(!s10InArea(p.area)) return false; }
   else { if(AREA) return false; if(p.map!=null&&curMap()!==+p.map) return false; }
   return true;
 }
@@ -592,16 +619,17 @@ function s10Targets(){
 }
 function s10Prompts(offer){
   if(!G||G.mode!=='story'||!S10.booted) return;
-  const p=player;
+  const p=player, T=s10Targets();
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceShown(P)) continue;
     const k=P.kind; if(!['examine','sign','door','prop','chest'].includes(k)) continue;
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
-    const at=s10At(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+40; if(d>r) continue;
+    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+40; if(d>r) continue;
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
-    offer(d-6,text,()=>s10PlaceAct(id),at.x,at.y);
+    // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)
+    offer(d-(T.has(id)?30:6),text,()=>s10PlaceAct(id),at.x,at.y);
   }
 }
 { const base=miniPrompts; miniPrompts=function(offer){ base(offer); try{ s10Prompts(offer); }catch(e){ console.error(e); } }; }
@@ -609,13 +637,15 @@ function s10Prompts(offer){
 { const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; }); if(best&&(!G.prompt||best.d<10)&&!(G.inCombat)) G.prompt={text:best.text,act:best.act,x:best.x,y:best.y}; } }catch(e){ console.error(e); } }; }
 function s10PlaceAct(id){
   const P=S10.places[id]; if(!P) return;
-  G.story._ex=G.story._ex||{}; G.story._ex[id]=(G.story._ex[id]|0)+1;
+  G.story._ex=G.story._ex||{}; const first=!G.story._ex[id]; G.story._ex[id]=(G.story._ex[id]|0)+1;
   storyEmit('examine:'+id);
+  if(first&&P.then) s10Do(P.then,{place:id});
   if(P.kind==='door'){ s10Door(P); return; }
   if(P.kind==='chest'){ s10Chest(P); return; }
   const lines=[]; const st=s10World(id);
   const say=P.states_say&&st!=null&&P.states_say[st]?P.states_say[st]:P.say;
-  if(P.scene){ s10Play(P.scene,()=>s10Examined(id),{place:id}); return; }
+  const sc=P.scene||(typeof say==='string'&&S10.scenes[say]?say:null);
+  if(sc){ s10Play(sc,()=>s10Examined(id),{place:id}); return; }
   if(say!=null){ if(Array.isArray(say)&&say.length&&Array.isArray(say[0])) lines.push(...say); else lines.push(['narr'].concat(Array.isArray(say)?say:[say])); }
   if(lines.length){ s10Play(lines,()=>s10Examined(id),{place:id}); return; }
   if(!s10Examined(id)) ftext(player.x,player.y-46,simplify(s10T(P.name)||id),'#ffe9b0',13);
@@ -633,7 +663,7 @@ function s10Door(P){
 }
 function s10Chest(P){
   G.chestsOpened[P.id]=true; try{ SFX.play('chest'); }catch(e){}
-  const at=s10At(P); emit(at.x,at.y,30,{col:'255,210,120',ang:-Math.PI/2,spread:1,smin:40,smax:160,lmin:.5,lmax:1,zmin:1.5,zmax:3,rise:15});
+  const at=s10Pos(P)||{x:player.x,y:player.y}; emit(at.x,at.y,30,{col:'255,210,120',ang:-Math.PI/2,spread:1,smin:40,smax:160,lmin:.5,lmax:1,zmin:1.5,zmax:3,rise:15});
   if(P.loot) s10Do(P.loot,{place:P.id}); else { addCoins(20,at.x,at.y); gainXp(40); }
   s10Examined(P.id); saveGame();
 }
@@ -656,11 +686,11 @@ function s10PlacesTick(dt){
     const P=S10.places[id];
     if(P.kind==='prints'){
       if(T[id]==='done'||!s10PlaceShown(P)) continue;
-      const path=P.path||[]; let i=T[id]==null?-1:T[id];
+      const path=P.path||[], o=s10Off(P)||{x:0,y:0}; let i=T[id]==null?-1:T[id];
       const nx=path[i+1]; if(!nx) continue;
-      if(dist(player.x,player.y,+nx[0],+nx[1])<(P.r||70)){ i++; T[id]=i; if(i>=path.length-1){ T[id]='done'; storyEmit('track:'+id); try{ SFX.play('pickup'); }catch(e){} } else try{ SFX.play('ui',0.4); }catch(e){} }
+      if(dist(player.x,player.y,+nx[0]+o.x,+nx[1]+o.y)<(P.r||70)){ i++; T[id]=i; if(i>=path.length-1){ T[id]='done'; storyEmit('track:'+id); try{ SFX.play('pickup'); }catch(e){} } else try{ SFX.play('ui',0.4); }catch(e){} }
     }else if(P.kind==='spot'){
-      const S0=G.story._spot||(G.story._spot={}); const at=s10At(P); if(!at||!s10PlaceOn(P)) continue;
+      const S0=G.story._spot||(G.story._spot={}); if(!s10PlaceOn(P)) continue; const at=s10Pos(P); if(!at) continue;
       const inside=dist(player.x,player.y,at.x,at.y)<(P.r||80);
       if(inside&&!S0[id]){ S0[id]=1; storyEmit('spot:'+id); if(P.say&&scene==='play'&&!DLG) s10Play([['narr'].concat(s10Arr(P.say))],null,{place:id}); }
       else if(!inside&&S0[id]&&P.again) S0[id]=0;
@@ -673,7 +703,7 @@ function s10Lights(){
   for(const L of S10L){ const i=LIGHTS.indexOf(L); if(i>=0) LIGHTS.splice(i,1); } S10L.length=0;
   if(!G||G.mode!=='story') return;
   for(const id in S10.places){ const P=S10.places[id]; if(!P.light||!s10PlaceShown(P)) continue; const st=s10World(id); if(P.light.state&&P.light.state!==st) continue; if(P.light.off&&s10Arr(P.light.off).includes(st)) continue;
-    const at=s10At(P); if(!at||!inView(at.x,at.y,400)) continue; const L={x:at.x,y:at.y-(P.light.dy!=null?P.light.dy:20),r:P.light.r||90,i:P.light.i!=null?P.light.i:0.6,night:P.light.night!==false,fire:!!P.light.fire,s10:true}; S10L.push(L); LIGHTS.push(L); }
+    const at=s10Pos(P); if(!at||!inView(at.x,at.y,400)) continue; const L={x:at.x,y:at.y-(P.light.dy!=null?P.light.dy:20),r:P.light.r||90,i:P.light.i!=null?P.light.i:0.6,night:P.light.night!==false,fire:!!P.light.fire,s10:true}; S10L.push(L); LIGHTS.push(L); }
 }
 function s10Render(list){
   if(!G||G.mode!=='story'||!S10.booted) return;
@@ -684,7 +714,7 @@ function s10Render(list){
     if(P.kind==='prints'){ if(s10PlaceShown(P)) list.push({x:0,y:-1e9+1,draw:()=>s10DrawPrints(P,T.has(id))}); continue; }
     if(P.kind==='spot'||P.kind==='gate') continue;
     if(P.show!=null&&!s10Cond(P.show)) continue;
-    const at=s10At(P); if(!at||!inView(at.x,at.y,160)) continue;
+    const at=s10Pos(P); if(!at||!inView(at.x,at.y,160)) continue;
     const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look, sy=s10SortY(P,at);
     if(look||P.kind==='chest') list.push({x:at.x,y:sy,draw:()=>{ if(P.kind==='chest'&&!look) s10DrawChest(at.x,at.y,!!G.chestsOpened[id]); else s10LookDraw(look,at.x,at.y,st); }});
     if(T.has(id)) list.push({x:at.x,y:sy+1,draw:()=>s10Sparkle(at.x,at.y-((P.h||40)+14),t)});
@@ -713,7 +743,8 @@ function s10DrawChest(x,y,open){
 }
 // boot prints (Ash's size): small ovals in pairs, every 26 px along the path; the next one to step on glows
 function s10DrawPrints(P,target){
-  const path=P.path||[]; if(path.length<2) return;
+  const o=s10Off(P); if(!o) return;
+  const path=(P.path||[]).map(q=>[+q[0]+o.x,+q[1]+o.y]); if(path.length<2) return;
   const tr=G.story._trk&&G.story._trk[P.id], reached=tr==='done'?path.length:(tr==null?-1:tr), t=G.time;
   const claw=P.look==='claw'||P.prints==='claw', silver=P.col||'214,226,255';
   let s0=0; const segs=[]; for(let i=0;i<path.length-1;i++){ const a=path[i], b=path[i+1], L=Math.hypot(b[0]-a[0],b[1]-a[1]); segs.push({a,b,L,s0,i}); s0+=L; }
@@ -737,6 +768,8 @@ function s10DrawPrints(P,target){
   if(target&&tr!=='done'&&nx){ const r=14+Math.sin(t*4)*3; ctx.strokeStyle='rgba(230,240,255,.85)'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(+nx[0],+nx[1],r,r*0.55,0,0,TAU); ctx.stroke(); }
   ctx.restore();
 }
+// Vesper's sightings drawn with a data pose (definePose('c_mask', pose)) while a scene has posed her
+if(typeof drawThief==='function'){ const base=drawThief; drawThief=function(T){ try{ if(T&&T._pose&&typeof C1ST!=='undefined'&&T===C1ST.sight){ const f=s10PoseGet('c_mask',T._pose); if(f){ f(ctx,T.x,T.y,G.time); return; } } }catch(e){ console.error(e); } return base(T); }; }
 // people posed by a scene (definePose) and data people's own look overrides
 { const base=drawNPC; drawNPC=function(n){ if(n&&n._pose){ const f=s10PoseGet(n.id,n._pose); if(f){ try{ f(ctx,n.x,n.y,G.time); return; }catch(e){ console.error(e); } } } return base(n); }; }
 
@@ -782,6 +815,7 @@ function s10TalkHook(n){
     const x=a.x, k=x._kind;
     if(k==='talk'&&x._args[0]===id){ if(x.scene){ s10Run2(a); return true; } s10Finish(a); talkHub(n); return true; }
     if(k==='give'&&x._args[1]===id&&(G.items[x._args[0]]||0)>0){ s10Run2(a,()=>takeItems({[x._args[0]]:1})); return true; }
+    if(k==='minigame'&&x.start==='talk'&&(x.at||x._args[1])===id&&!G.mini&&G.time>=S10.mini.lostAt+1){ if(!MINI[x._args[0]]){ s10Err(`minigame ${x._args[0]} does not exist`); return false; } s10MiniStart(a); return true; }
   }
   return false;
 }
@@ -797,6 +831,18 @@ function s10HubLines(n){
   return lines;
 }
 { const base=talkHub; talkHub=function(n,pre){ let L=pre; try{ const x=s10HubLines(n); if(x&&x.length) L=(pre||[]).concat(x); }catch(e){ console.error(e); } return base(n,L); }; }
+function s10HasTalk(id){ const L=S10.talk[id]; if(!L||!L.length) return false; return L.some(T=>{ const own=T._owner; return !(own&&own.act&&actOf(G.stage)<own.act); }); }
+// at boot: CAST lines become the data's current line for people who have data talk
+function s10TalkTakeover(){
+  for(const id in S10.talk){
+    const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(!c||c._s10lines) continue;
+    const old=c.lines; c._s10lines=true;
+    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&s10TalkOk(t)); if(T){ const say=Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say; if(say!=null) return [s10T(say)]; } } }catch(e){} return old; },set(v){ /* the old code may set lines: keep them for when there is no data line */ }}); }catch(e){}
+  }
+  if(typeof BARKS!=='undefined') for(const b of BARKS){ const m=/^id:([\w]+)$/.exec(String(b._who||'')); if(!m||b._s10) continue; const id=m[1], c0=b.c; b._s10=true; b.c=function(){ if(G&&s10HasTalk(id)) return false; return typeof c0==='function'?c0.apply(this,arguments):!!c0; }; }
+}
+// (personal barks are told apart by their "who": B('c_x', 'id:c_hester', ...))
+{ const base=B; B=function(k,who,c,t,o){ const r=base(k,who,c,t,o); try{ const b=BARKS[BARKS.length-1]; if(b&&b.k===k) b._who=who; }catch(e){} return r; }; }
 function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify([T.if,T.say,T.scene,T.option,T.then]))); }
 function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if(T.once&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
 function s10TalkFor(id,kind){
@@ -887,29 +933,79 @@ function s10Solve(id,quiet){
   saveGame();
 }
 
-// ---------- 16. data quests: the same runner; shown in the old quest journal through a QDEFS entry whose steps are flags
+// ---------- 16. data quests: the same runner. The engine owns G.quests[id] for them: QDEFS[id] is a stand-in whose
+// step (any index, and -1) shows the data step's text and target, so the old quest journal, HUD tracker and compass
+// show them, while the old quest engine never advances or offers them (ab: never). takeover:true replaces an old
+// QDEFS entry: old_steps[i] is the data step an old save at G.quests[id].step==i resumes at; a data step with
+// legacy:true keeps the old mechanic: while it is current G.quests[id].step is its old index (other steps -1), and
+// when the old code moves that step on, the data step finishes.
 function s10QuestOpen(q){ if(!q) return false; if(q.act&&actOf(G.stage)<+q.act) return false; if(q.if!=null&&!s10Cond(q.if)) return false; return true; }
-function s10QFlag(qid,sid){ return `sq_${qid}_${sid}`; }
+function s10QDyn(q){
+  const R=()=>s10Run('q',q);
+  return {t:'flag',flag:'__s10_quest',_s10dyn:true,
+    get text(){ const s=s10Active(R()); return s?(s10T(s.obj)||s10DefaultObj(s)):s10T(q.title); },
+    at:()=>{ const r=R(), s=s10Active(r); if(!s) return null; const a=s10Doable(r).find(a=>a.s===s); const w=a&&s10StepWhere(a); return w?(w.npc&&!w.area?'npc:'+w.npc:`xy:${Math.round(w.x)},${Math.round(w.y)}`):null; }};
+}
+function s10QOld(q,s){ const o=s10Arr(q.old_steps); const i=o.indexOf(s._id); return i; }
 function s10QuestDefs(){
   for(const id of S10.qOrder){
-    const q=S10.quests[id]; if(QDEFS[id]&&!QDEFS[id]._s10){ s10Err(`quest ${id}: the old quest table already has that id`); continue; }
-    const steps=(q.step||[]).filter(s=>!s.optional&&s._kind).map(s=>({t:'flag',flag:s10QFlag(id,s._id),text:s10T(s.obj)||s10DefaultObj(s),at:()=>{ const w=s10StepWhere({R:s10Run('q',q),s,x:s}); return w?(w.npc&&!w.area?'npc:'+w.npc:`xy:${Math.round(w.x)},${Math.round(w.y)}`):null; }}));
-    QDEFS[id]={_s10:true,title:s10T(q.title)||id,giver:q.giver||null,ab:'__story_data__',steps:steps.length?steps:[{t:'flag',flag:s10QFlag(id,'end'),text:s10T(q.title)||id}],errand:false,offer:[]};
+    const q=S10.quests[id]; if(q._qdef) continue;
+    const old=QDEFS[id]&&!QDEFS[id]._s10?QDEFS[id]:null;
+    if(old&&!q.takeover){ s10Err(`quest ${id}: the old quest table already has that id (use takeover: true)`); continue; }
+    if(old) (S10.oldQ||(S10.oldQ={}))[id]=old;
+    const dyn=s10QDyn(q), steps=[];
+    if(old){ (old.steps||[]).forEach((st,i)=>{ const sid=s10Arr(q.old_steps)[i], ds=(q.step||[]).find(s=>s._id===sid);
+      steps[i]=ds&&ds.legacy?Object.assign({},st,{text:s10T(ds.obj)||st.text}):dyn; }); }
+    else steps[0]=dyn;
+    steps[-1]=dyn;
+    q._qdef=QDEFS[id]={_s10:true,title:s10T(q.title)||(old&&old.title)||id,giver:q.giver||(old&&old.giver)||null,ab:'__story_data__',min:old&&old.min,steps,errand:false,offer:[],topics:old&&old.topics};
   }
 }
-function s10QuestStepFlag(R,s){ G.flags[s10QFlag(R.d.id,s._id)]=1; }
+// the index G.quests[id].step should have for the current data step
+function s10QStepIdx(q){ const s=s10Active(s10Run('q',q)); if(s&&s.legacy){ const i=s10QOld(q,s); if(i>=0) return i; } return S10.oldQ&&S10.oldQ[q.id]?-1:0; }
+function s10QuestSync(){
+  for(const id of S10.qOrder){
+    const q=S10.quests[id], Q=G.quests[id]; if(!Q||Q.done) continue;
+    const R=s10Run('q',q), s=s10Active(R);
+    if(s&&s.legacy){ const i=s10QOld(q,s); if(i>=0&&Q.step>i&&S10.qLegacy&&S10.qLegacy[id]===i){ S10.qLegacy[id]=null; s10Finish({R,s,x:s,key:s._id}); continue; } }
+    const want=s10QStepIdx(q); if(Q.step!==want) Q.step=want;
+    (S10.qLegacy||(S10.qLegacy={}))[id]=s&&s.legacy?want:null;
+  }
+}
+function s10QuestStepFlag(R,s){ G.flags[`sq_${R.d.id}_${s._id}`]=1; }
 function s10QuestStart(id,quiet){
-  const q=S10.quests[id]; if(!q){ s10Err(`quest ${id} is not defined`); return; }
+  const q=S10.quests[id];
+  if(!q){ if(QDEFS[id]&&!QDEFS[id]._s10){ if(!G.quests[id]) startQuest(id); return; } s10Err(`quest ${id} is not defined`); return; }
   if(G.quests[id]) return;
-  if(QDEFS[id]) startQuest(id); else G.quests[id]={step:0};
+  startQuest(id); if(G.quests[id]) G.quests[id].step=s10QStepIdx(q);
   storyEmit('quest_start:'+id);
 }
+// a data quest whose last step is done: done, banner, friendship, deed q_<id> (later acts read them)
+function s10QuestComplete(q){
+  const id=q.id, Q=G.quests[id]||(G.quests[id]={step:0}); if(Q.done) return;
+  Q.done=true; try{ onQuestDone(id); }catch(e){}
+  if(!S10.quiet) setBanner(S('Quest complete','Quest complete'),s10T(q.title)||id,2.6);
+  G.stats.quests=(G.stats.quests||0)+1; if(q.giver) try{ befriend(q.giver,1.5); }catch(e){}
+  if(typeof deed==='function') deed('q_'+id);
+  storyEmit('quest_done:'+id); G.lastQ=id; try{ questPoke(); }catch(e){} saveGame();
+}
 function s10QuestFinish(id){
-  const q=S10.quests[id]; if(!q){ s10Err(`quest ${id} is not defined`); return; }
+  const q=S10.quests[id];
+  if(!q){ const d=QDEFS[id]; if(d&&!d._s10){ if(!G.quests[id]) startQuest(id); const Q=G.quests[id]; if(Q&&!Q.done){ Q.step=(d.steps||[]).length; Q.done=true; try{ onQuestDone(id); }catch(e){} storyEmit('quest_done:'+id); } return; } s10Err(`quest ${id} is not defined`); return; }
   if(!G.quests[id]) s10QuestStart(id);
   const R=s10Run('q',q), st=s10St(R);
   for(const s of q.step||[]) if(!s.optional&&!st[s._id]){ st[s._id]=1; s10QuestStepFlag(R,s); }
-  questPoke(); storyEmit('quest_done:'+id);
+  s10QuestComplete(q);
+}
+// an old save in the middle of a quest the data took over: resume at old_steps[G.quests[id].step]
+function s10QuestResume(){
+  for(const id of S10.qOrder){
+    const q=S10.quests[id], Q=G.quests[id], key='q:'+id; if(!Q||G.story[key]||!(S10.oldQ&&S10.oldQ[id])) continue;
+    const st=G.story[key]={};
+    if(Q.done){ for(const s of q.step||[]) st[s._id]=1; continue; }
+    const sid=s10Arr(q.old_steps)[Q.step]; if(sid==null) continue;
+    for(const s of q.step||[]){ if(s._id===sid) break; if(!s.optional) st[s._id]=1; }
+  }
 }
 
 // ---------- 17. objectives, markers and hints for the old journal, HUD and compass
@@ -950,9 +1046,9 @@ function s10Objs(c){
   if(G.mini&&s._kind==='minigame'&&G.mini.kind===s._args[0]){ const M=G.mini, D=MINI[M.kind]; const t=D.target?D.target(M):null; const h=D.hud?D.hud(M):null; return [Object.assign({text:h||s10T(s.obj)||s10DefaultObj(s),near:true},t?{x:t.x,y:t.y}:{})]; }
   const text=s10T(s.obj)||s10DefaultObj(s);
   const as=s10Doable(R).filter(a=>a.s===s);
-  const out=[];
-  for(const a of as){ const w=s10StepWhere(a); if(w) out.push(Object.assign({text},w)); }
-  if(!out.length) out.push({text});
+  const out=[], t2=text||(c.card&&s10T(c.card[1]))||s10T(c.name)||'';
+  for(const a of as){ const w=s10StepWhere(a); if(w) out.push(Object.assign({text:t2},w)); }
+  if(!out.length) out.push({text:t2});
   return out;
 }
 function s10Hint(c){
@@ -1006,7 +1102,7 @@ function s10Loaded(s){
   G.case={clues:Object.assign({},C&&C.clues),solved:Object.assign({},C&&C.solved),tries:Object.assign({},C&&C.tries),seen:Object.assign({},C&&C.seen)};
   G.story=Object.assign({_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}},T&&typeof T==='object'?JSON.parse(JSON.stringify(T)):{});
   S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null};
-  if(S10.booted){ s10Migrate(); s10NpcSync(true); }
+  if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10QuestResume(); s10NpcSync(true); }
 }
 // a save made by the old code in the middle of a chapter the data now runs: steps the old code already did are done
 // (a step whose `then` sets a flag the save has, a talk/goto/cutscene whose scene the old code marked seen, and every
@@ -1046,9 +1142,11 @@ function s10Boot(){
   try{ s10Link(); }catch(e){ s10Err('link: '+e.message); console.error(e); }
   try{ s10Adapt(); }catch(e){ s10Err('adapters: '+e.message); console.error(e); }
   try{ s10Gates(); }catch(e){ s10Err('gates: '+e.message); console.error(e); }
+  try{ s10StoryKeys(); }catch(e){ s10Err('old STORY keys: '+e.message); console.error(e); }
+  try{ s10TalkTakeover(); }catch(e){ s10Err('talk takeover: '+e.message); console.error(e); }
   try{ s10Check(); }catch(e){ s10Err('check: '+e.message); console.error(e); }
   if(G&&!G.story) s10Fresh();
-  if(G&&G.mode==='story'){ s10Migrate(); s10NpcSync(true); }
+  if(G&&G.mode==='story'){ s10Migrate(); s10QuestResume(); s10NpcSync(true); }
 }
 window.__ebStoryBoot=()=>{ try{ s10Boot(); }catch(e){ console.error(e); } };
 // chapters become stages (new ones after their `after`), the old stage of the same id is taken over
@@ -1059,22 +1157,26 @@ function s10Link(){
     if(!old){ defineStages(+c.act||2,[{id}]); if(c.after&&stageAt(c.after)>=0){ const i=stageAt(id); STAGES.splice(i,1); STAGES.splice(stageAt(c.after)+1,0,id); } }
     const D=STAGEDEF[id]; if(!D) continue;
     if(take) D._old={objectives:D.objectives,update:D.update,marker:D.marker,hint:D.hint,talk:D.talk,enter:D.enter,soFar:D.soFar,idle:D.idle,card:D.card,chapter:D.chapter};
-    const card=c.card?[String(c.card[0]),s10T(c.card[1])]:D.card;
-    Object.assign(D,{_s10:id,card,chapter:card?card[1]:D.chapter,objectives:()=>s10Objs(c),hint:()=>s10Hint(c),soFar:()=>s10T(c.so_far),marker:nid=>false,
+    const card=c.card===null?null:c.card?[String(c.card[0]),s10T(c.card[1])]:D.card;
+    if(c.mom&&typeof MOM_CH!=='undefined') MOM_CH[id]=s10Arr(c.mom).map(x=>s10T(x));
+    Object.assign(D,{_s10:id,card,chapter:card?card[1]:(c.name?s10T(c.name):D.chapter),objectives:()=>s10Objs(c),hint:()=>s10Hint(c),soFar:()=>s10T(c.so_far),marker:nid=>false,
       talk:()=>false,enter:o=>s10Enter(c,o),update:()=>{},idle:null});
     if(D.chapter) CHAPTER[id]=D.chapter;
     for(const s of c.step||[]){ if(s._kind==='minigame'){ const m=s._args[0]; if(!MINI[m]) s10Err(`${id}.${s._id}: minigame ${m} does not exist`); } }
   }
   s10QuestDefs();
 }
+function s10Silence(c){ if(!c||!c.silence||!G||!G.flags) return; const sn=G.flags.c_sn||(G.flags.c_sn={}); for(const k of s10Arr(c.silence)) sn[k]=1; }
 function s10Enter(c,o){
   if(!G.story) s10Fresh();
-  s10Migrate(); s10NpcSync(true);
+  s10Silence(c); s10Migrate(); s10NpcSync(true);
   storyEmit('chapter:'+c.id);
 }
 // the takeover adapters: the old code's own triggers for a stage the data now runs
 function s10Adapt(){
   s10WrapTalkOpts();
+  // (outside the acts' own moodLine wrappers, so a person with data talk gets no old mood lines)
+  { const base=moodLine; moodLine=function(id){ try{ if(G&&s10HasTalk(id)) return null; }catch(e){} return base(id); }; }
   // Act II's rooftop chase: winning it no longer plays the old ending and jumps to c_salt when the data owns the chase
   if(typeof c1RWin==='function'&&!c1RWin._s10){ const base=c1RWin; c1RWin=function(){ if(!s10MiniOwner('c_roofchase')) return base(); G.flags.c_chase_won=1; later(0.05,()=>miniEnd(true,S('Caught up!','Caught up!'),S('The roofs end at the Clockwatch Hall.','The roofs end here.'))); }; c1RWin._s10=true; }
   // thin adapters: the later acts' story beats also become events
@@ -1083,6 +1185,16 @@ function s10Adapt(){
     if(!f||f._s10) continue;
     const w=function(b,...a){ const r=f.call(this,b,...a); try{ storyEmit('beat:'+b); }catch(e){} return r; }; w._s10=true;
     try{ if(name==='f2sBeat') f2sBeat=w; else if(name==='m3sBeat') m3sBeat=w; else n4sBeat=w; S10.adapted=(S10.adapted||[]).concat(name); }catch(e){}
+  }
+}
+function s10StoryKeys(){
+  if(typeof STORY==='undefined') return;
+  for(const id in S10.scenes){
+    if(!(id in STORY)||S10.storyDone&&S10.storyDone[id]) continue;
+    (S10.storyDone=S10.storyDone||{})[id]=1;
+    const old=STORY[id], lines=s10Lines(S10.scenes[id],{sc:id}), mark={who:'narr',text:'',skipIf:()=>true,fn:()=>{ if(G&&G.story) (G.story._seen||(G.story._seen={}))[id]=1; }};
+    if(Array.isArray(old)){ const L0=old[0], keep=L0&&!Array.isArray(L0)&&L0.text===''&&L0.fn&&L0.skipIf?[L0]:[]; old.length=0; old.push(...keep,mark,...lines); }
+    else STORY[id]=[mark,...lines];
   }
 }
 // gate places are built by the gate library (ENG-W, e10c_gates: gateBuild(place)) once everything is loaded
@@ -1107,7 +1219,7 @@ function s10Check(){
       case 'deduce': if(!S10.deduce[A[0]]) s10Err(`${where}: no deduction ${A[0]}`); break;
       case 'cutscene': if(!S10.scenes[s.scene||A[0]]) s10Err(`${where}: no scene ${s.scene||A[0]}`); break;
       case 'give': if(!has(A[1])) s10Err(`${where}: nobody called ${A[1]}`); break;
-      case 'wait_for': if(!['night','day','hour','event'].includes(A[0])) s10Err(`${where}: wait_for night|day|hour N|event name`); break;
+      case 'wait_for': if(!A.length) s10Err(`${where}: wait_for needs night, day, hour N, event name or a condition`); break;
     }
     if(s.scene&&!S10.scenes[s.scene]) s10Err(`${where}: no scene ${s.scene}`);
     if(s.lose&&!S10.scenes[s.lose]) s10Err(`${where}: no scene ${s.lose}`);
@@ -1173,6 +1285,7 @@ const S10API={
   // a running minigame won through its own win hook (the rooftop chase: x1_story's c1RWin)
   miniWin:k=>{ if(!G.mini||(k&&G.mini.kind!==k)) return false; const M=MINI_S10[G.mini.kind]; if(M&&M.win) M.win(); else miniEnd(true); return true; },
   ending:n=>s10Ending(n==null?actOf(G.stage):n),
+  reach:(from,to,powers)=>null,
   adapters:()=>(S10.adapted||[]).concat(typeof c1RWin==='function'&&c1RWin._s10?['c1RWin']:[]),
   get S10(){ return S10; }
 };

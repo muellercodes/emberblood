@@ -1,7 +1,7 @@
 // game/story/act2/c_gear.js
 chapter({
   id: 'c_gear', act: 2, after: 'c_coast', next: 'c_salt',
-  card: ['Act II · Chapter 2', 'The City of Clocks'],
+  card: ['Act II · Chapter 4', 'The City of Clocks'],   // (the game counts the heist's two chapters first)
   so_far: [
     "Gearhaven's Great Clock stopped at one minute to midnight, full of moth dust. Ash worked out where the Moth Mask would strike and chased her over the roofs.",
     'The Great Clock stopped. Ash found where the Moth Mask would strike and chased her.'],
