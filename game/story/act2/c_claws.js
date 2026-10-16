@@ -32,10 +32,12 @@ chapter({
   },
 
   step: [
-    { id: 'caves', do: 'dungeon c_gullcrag', at: 'c_gullcrag_door',
-      obj: ['Explore the Gullcrag Caves at the foot of Gullcrag Head', 'Explore the Gullcrag Caves'],
+    { id: 'caves', do: 'all', obj: ['Explore the Gullcrag Caves at the foot of Gullcrag Head', 'Explore the Gullcrag Caves'],
       hint: ['Cross the Gullcrag Sands while the tide is low. The caves are at the foot of the dark cliff.', 'Cross the sand to the caves.'],
-      extra: [
+      parts: [
+        { do: 'dungeon c_gullcrag', at: 'c_gullcrag_door' },
+      ],
+      extra: [   // on the way, if the player follows them: they stop right under the spot where she will be sitting
         { do: 'track gc_sand_prints', scene: 'clw_prints' },
       ] },
     // Pearl's warp at the end of the caves sets Ash down right here (x1_dun_a.js D1A_WARP: 2300, 28330)
