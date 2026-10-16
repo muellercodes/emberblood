@@ -1345,7 +1345,8 @@ function x1pFrame(dt){
   { const F=X1P.falls||{x:7300,y:25180,r:95};
     if(!AREA&&x1pR('c_brass')&&!G.flags.c_note5&&hasAbil('shadow')&&typeof p2Shadowed==='function'&&(p2Shadowed()||F.x!==7300)&&x1pDarkFalls()&&dist(player.x,player.y,F.x,F.y)<F.r&&!DLG){ x1pReadNote(5); } }
   // the notes quest starts when Ash reads note 2 in the Moth's Nest (the story module); a safety net if it did not
-  if(!G.quests.c_notes&&(x1pR('c_light')||(AREA&&AREA.id==='c_mothnest'&&G.time-(X1P.nestT||G.time)>6))) startQuest('c_notes');
+  // (only while Ash is in Act II: a save that jumps into Act III or IV must not start an Act II quest by itself)
+  if(!G.quests.c_notes&&actOf(G.stage)===2&&(x1pR('c_light')||(AREA&&AREA.id==='c_mothnest'&&G.time-(X1P.nestT||G.time)>6))) startQuest('c_notes');
   if(AREA&&AREA.id==='c_mothnest'&&!X1P.nestT) X1P.nestT=G.time; if(!AREA) X1P.nestT=0;
   // gulls give up once the nest is down; the Moon Ring moths come back the next night
   if(!isNight()) X1P.ringFoes=false;
