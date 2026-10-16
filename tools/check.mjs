@@ -971,6 +971,7 @@ export function runChecks(M, opts = {}) {
     if (s.if && !condSat(s.if, st)) { const w = whyNot(s.if, st); report(`${where}: step needs ${w ? w.text : condText(s.if)}`); }
     if (target && M.ents[target]) { const r = reach(target, st); if (!r.ok) report(`${where}: ${verb} ${target}: ${r.why}`); }
     if (s.at && M.ents[s.at]) { const r = reach(s.at, st); if (!r.ok) report(`${where}: at ${s.at}: ${r.why}`); }
+    if (ctx.main && ctx.steps) { const tid = (target && M.ents[target]) ? target : (s.at && M.ents[s.at] ? s.at : null); const e = tid ? M.ents[tid] : null; const pt = e ? (e.at || (e.path && e.path[0])) : null; ctx.steps.push({ chapter: O.id, step: s.id || label, verb, target: tid, map: e ? e.map : null, at: pt && !e.area ? pt : null, area: e && e.area ? e.area : null, powers: [...st.powers] }); }
     switch (verb) {
       case 'use_power_at': if (!st.powers.has(args[0])) report(`${where}: needs power ${args[0]}, which the player does not have yet (has ${[...st.powers].join(', ') || 'none'})`); break;
       case 'give': if (args[0] !== 'coins' && !st.items.has(args[0])) report(`${where}: give ${args[0]}: the player does not have ${args[0]} here on the main path`); break;
@@ -1042,7 +1043,8 @@ export function runChecks(M, opts = {}) {
     }
     // walk the act's stages in order: data chapters step by step, old stages by their known power grants
     const actStages = ORDER.filter((s) => actOfStage(s) === n);
-    const ctxBase = { main: true, locked: log.locked, extras: [], granted: new Set(), fail: (msg, loc) => FAIL('solve', msg, loc), failMys: (msg, loc) => FAIL('mystery', msg, loc) };
+    log.steps = [];
+    const ctxBase = { main: true, steps: log.steps, locked: log.locked, extras: [], granted: new Set(), fail: (msg, loc) => FAIL('solve', msg, loc), failMys: (msg, loc) => FAIL('mystery', msg, loc) };
     for (const s of actStages) {
       st.stage = s;
       const c = M.chapters[s];
@@ -1062,7 +1064,7 @@ export function runChecks(M, opts = {}) {
     log.trust = Object.assign({}, st.trust);
     log.bonus = st.bonus.filter((b) => true);
     // optional steps and extras: reachable at the end of the act
-    for (const x of ctxBase.extras) { const s2 = clone(st); walkStep(x.step, x.O, s2, Object.assign({}, ctxBase, { main: false, extras: [], fail: (msg, loc) => FAIL('solve', `${msg} (optional, checked with every power of act ${n})`, loc), failMys: (msg, loc) => FAIL('mystery', msg, loc) }), x.label); }
+    for (const x of ctxBase.extras) { const s2 = clone(st); walkStep(x.step, x.O, s2, Object.assign({}, ctxBase, { main: false, steps: null, extras: [], fail: (msg, loc) => FAIL('solve', `${msg} (optional, checked with every power of act ${n})`, loc), failMys: (msg, loc) => FAIL('mystery', msg, loc) }), x.label); }
     // side quests of this act: walked with the end-of-act state
     for (const q of Object.values(M.quests).filter((q) => +q.def.act === n)) {
       const s2 = clone(st);
