@@ -309,11 +309,13 @@ function startFishing(spot){
 function updateFishing(dt,inp){
   const F=G.fishing; if(!F) return;
   if(dist(player.x,player.y,F.px,F.py)>12||G.inCombat){ G.fishing=null; return; }
-  if(F.bite>0){ F.bite-=dt; if(inp.use||inp.attack){ G.fishing=null; catchFish(); return; } if(F.bite<=0){ G.fishing=null; setBanner('It got away','',1.2); } return; }
+  if(F.bite>0){ F.bite-=dt; if(inp.use||inp.attack){ G.fishing=null; catchFish(F.spot); return; } if(F.bite<=0){ G.fishing=null; setBanner('It got away','',1.2); } return; }
   if(inp.use){ G.fishing=null; setBanner('Too soon!','The fish got away.',1.2); return; }
   F.t-=dt; if(F.t<=0){ F.bite=0.95; SFX.play('hit'); G.ripples.push({x:F.wx,y:F.wy,t:0,max:0.8,r:18,splash:true}); }
 }
-function catchFish(){
+function catchFish(spot){
+  // the Frostpine ice hole: the fish up there are so cold they crunch (Dell pays for one, see his rumor)
+  if(spot&&spot.icehole&&!(G.items.a1_coldfish>0)&&!G.found.a1_dellfish){ giveItems({a1_coldfish:1},true); G.stats.fish=(G.stats.fish||0)+1; setBanner(S('A crunchy Frostpine fish!','A crunchy fish!'),S('It is frozen stiff. Dell in Brindlecross wanted one.','Dell wanted one of these!'),2.4); SFX.play('upgrade'); return; }
   const r=Math.random();
   if(r<0.08){ addCoins(3,player.x,player.y); setBanner('You caught an old boot','There are 3 coins in it!',2); return; }
   giveItems({fish:1},true); G.stats.fish=(G.stats.fish||0)+1; setBanner(`You caught ${pick(FISHES.slice(0,5))}!`,'+1 fish',1.8); SFX.play('upgrade');
@@ -326,13 +328,19 @@ function lmAct(o){
   const done=()=>{ scene='play'; }, say=(t,cb)=>runDialogue([['narr',t]],()=>{ scene='play'; if(cb) cb(); saveGame(); });
   const once=k=>{ if(G.found[k]) return false; G.found[k]=true; return true; };
   switch(o.k){
-    case 'statue': if(PAGE_SPOTS.p7==='st_'+o.who&&!G.pages.p7){ runDialogue([['narr',STATUE_TEXT[o.who]],['narr',`Something papery is tucked into the crack under the statue's feet.`]],()=>{ scene='play'; findPage('p7'); }); return; } say(STATUE_TEXT[o.who]); return;
+    case 'statue': if(PAGE_SPOTS.p7==='st_'+o.who&&!G.pages.p7){ runDialogue([['narr',STATUE_TEXT[o.who]],['narr',`Something papery is tucked into the crack under the statue's feet.`]],()=>{ scene='play'; findPage('p7'); }); return; }
+      // Wendel's rumor: once Ash knows his old songs, each Warden statue hums along the first time (and drops old coins)
+      if(G.quests.song&&G.quests.song.done&&once('hum_'+o.who)){ runDialogue([['narr',STATUE_TEXT[o.who]],['narr',S(`You hum the Lantern Waltz, one of Wendel's old songs. The statue hums along! Deep and warm, like a cat the size of a house.`,`You hum Wendel's song. The statue hums along!`)],['narr',S(`Something clinks at its feet. Ten old Warden coins.`,`Ten old coins clink at its feet.`)]],()=>{ scene='play'; addCoins(10,o.x,o.y); saveGame(); }); return; }
+      say(STATUE_TEXT[o.who]); return;
     case 'wishwell': if((G.coins||0)<1){ say(`You have no coins to wish with. The well looks disappointed.`); return; } G.coins--; SFX.play('pickup'); if(Math.random()<0.12&&once('well_'+Math.floor(G.worldTime/600))) say(`You toss in a coin. A moment later four coins come flying back out. The well says "keep the change."`,()=>addCoins(4,o.x,o.y)); else say(`You toss in a coin and make a wish. A voice from the bottom says: "${pick(FORTUNES)}"`); return;
     case 'facetree': riddleTree(); return;
     case 'fairyring': if(isNight()&&once('fairy')){ say(`You step into the ring. Tiny lights dance around you, and somebody giggles. You feel very, very lucky.`,()=>{ G.pendingBless++; later(0.6,offerPending); }); } else say(G.found.fairy?`The mushrooms are just mushrooms now. They seem pleased with themselves.`:`Just mushrooms. Suspiciously round ones. Maybe come back at night.`); return;
     case 'ribs': if(once('ribs')) say(`Something very big lived here a long time ago. Something even bigger did not like that. There are a few old coins between the ribs.`,()=>addCoins(10,o.x,o.y)); else say(`Very big bones. You feel small. Pip feels smaller.`); return;
     case 'wagon': if(once('wagon')){ runDialogue([['narr',`An abandoned trader's wagon. Inside: a crate of turnips, a broken umbrella, and a note.`],['narr',`"Pell, if you find this, the kettle's gone again. Bet it's those cultists. Also I buried my savings by the big rock east of Brindlecross and drew a map so I wouldn't forget. Then I lost the map. Hob."`],['narr',`Under the turnips: a smudged map.`]],()=>{ scene='play'; giveItems({map_x2:1}); saveGame(); }); } else say(`Turnips. Still turnips.`); return;
-    case 'scarecrow': say(once('knight')?`Sir Strawsworth the scarecrow regards you gravely. You have been knighted. You are now Sir Ash, Knight of the Turnips.`:`Sir Strawsworth stands watch over the turnips. He has never lost a turnip. He has lost several hats.`); return;
+    case 'scarecrow': if(once('knight')){ say(`Sir Strawsworth the scarecrow regards you gravely. You have been knighted. You are now Sir Ash, Knight of the Turnips.`); return; }
+      // Hal's rumor: something rattles in his hat
+      if(once('strawhat')){ runDialogue([['narr',S(`You lift Sir Strawsworth's hat. Something rattles. Inside: twenty-five coins and one very old turnip seed.`,`You look in the scarecrow's hat. 25 coins!`)],['narr',S(`Sir Strawsworth looks relieved. That must have been itchy.`,`The scarecrow looks relieved.`)]],()=>{ scene='play'; addCoins(25,o.x,o.y); saveGame(); }); return; }
+      say(`Sir Strawsworth stands watch over the turnips. He has never lost a turnip. He has lost several hats.`); return;
     case 'grave': say(once('reggie')?`HERE LIES SIR REGINALD THE UNLUCKY. HE TRIPPED.`:`Someone stole Sir Reginald's flowers. Still unlucky.`); return;
     case 'iceblock': say(G.flags.brisket_thawed?`Just a puddle now. A very proud puddle.`:`There's a whole adventurer frozen inside this block of ice. He's giving you a thumbs-up. Some fire might help.`); return;
     case 'hotspring': player.hp=Math.min(player.maxHp,player.hp+player.maxHp*0.5); player.stamina=player.maxStamina; emit(o.x,o.y,20,{col:'230,240,255',glow:false,ang:-Math.PI/2,spread:1,smin:10,smax:40,lmin:1,lmax:2,zmin:4,zmax:9,grow:8,drag:0.5}); say(`Ahhhhh. You soak your tail in the hot spring. Every ache melts away.`); return;

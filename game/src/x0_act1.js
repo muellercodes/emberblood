@@ -72,15 +72,15 @@ STORY.a1_swirl_look=[
   {who:'narr',text:S(`First you would need to walk on water at all. The Trial of the Tide, on Lake Mirrow, teaches that.`,`First learn to walk on water. Try the Trial of the Tide.`),skipIf:()=>hasAbil('stride')}];
 STORY.ward_mire.unshift(xl('sedge',`You skipped! Right over the swirl! Oh, I'm so dizzy for you. In a good way.`,`You skipped over the swirl! I'm dizzy for you!`));
 // 2.4 the Frost Ward: Greymane's Ice (before the choice in his outro)
-STORY.bosses.greymane.outro.splice(1,0,xl('narr',`Behind Greymane, the Frost Ward is frozen solid inside a block of blue ice. Three cold lanterns glitter on the cliffs above it.`,`The Frost Ward is frozen in ice. Three cold lanterns sit up high.`));
+STORY.bosses.greymane.outro.splice(1,0,xl('narr',`Behind Greymane, the Frost Ward is frozen solid inside a block of blue ice. Three cold lanterns glitter on tall ice pillars behind it.`,`The Frost Ward is frozen in ice. Three cold lanterns sit on ice pillars.`));
 STORY.a1_frost_ice=[
   xl('tove',`(through the ice) Mmmf. Ash? It's Tove. I am inside an ice cube. Again. I would like that noted.`,`(in the ice) Ash? It's Tove. I'm in an ice cube. Again.`),
-  xl('tove',`The three lanterns up on the cliff hold the frost. Light them and it melts. You can't climb up there. But an arrow can.`,`Light the three lanterns up there. An arrow can reach them.`),
+  xl('tove',`The three lanterns on those ice pillars hold the frost. Light them and it melts. You can't get past their spikes. But an arrow can.`,`Light the three lanterns on the pillars. An arrow can reach them.`),
   xl('tove',`A burning one, preferably. Breathe fire, then shoot through it. Ember used to do that to light the festival. Showing off.`,`A burning arrow! Breathe fire and shoot through it.`),
   {who:'tove',text:S(`Ember's bow is in her Trial of the Tide. On the island in Lake Mirrow. Go on, I'll wait. I'm good at waiting. And at being cold.`,`No bow? It's in the Trial of the Tide, on Lake Mirrow. I'll wait.`),skipIf:()=>!!(G.weapons&&G.weapons.bow)},
   {who:'tove',text:S(`Oh, and if your arrows are too slow, Ember's Wing-rang burns too, if you throw it through your fire. On a kind day. Today is a kind day.`,`A burning Wing-rang works too, today.`),skipIf:()=>!a1easy()||!(G.weapons&&G.weapons.boomerang)}];
 STORY.a1_frost_melt=[
-  xl('narr',`The third lantern catches. Three flames burn on the cliff, and the ice around the Ward cracks, groans, and slides off in one big wet SLUMP.`,`The third lantern lights! The ice cracks and slides off. SLUMP!`),
+  xl('narr',`The third lantern catches. Three flames burn on their pillars, and the ice around the Ward cracks, groans, and slides off in one big wet SLUMP.`,`The third lantern lights! The ice cracks and slides off. SLUMP!`),
   xl('tove',`I'm free! I'm damp! Mostly free.`,`I'm free! I'm wet! Mostly free.`),
   xl('tove',`Now breathe on my Ward-fire, Ash. Gently. I have had enough surprises for one century.`,`Now breathe on my Ward-fire. Gently!`)];
 // 2.5 the hammer guarantee
@@ -424,9 +424,10 @@ function a1BuildWorld(){
   REACH.clear.push({x:AV.x,y:AV.y-30,r:240});
   // ---- the stranger's camp at the old Southern Pass rockfall, and the pass sign
   const CP=A1W.camp; a1Lm({id:'a1_camp',x:CP.x,y:CP.y,r:0,prompt:()=>a1CampPrompt(),act:a1CampAct,draw:(o,t)=>a1DrawCamp(o.x,o.y,t)});
-  addLandmark({id:'a1_passsign',k:'sign',x:A1W.sign.x,y:A1W.sign.y,r:8,noNudge:true,prompt:'Read the sign',get text(){ return G.flags.act1_done?S('SOUTHERN PASS. Two hundred and six steps down to the Clockwork Coast. (Somebody has moved the rocks. Somebody strong.)','SOUTHERN PASS. 206 steps down to the coast.'):S('SOUTHERN PASS. CLOSED BY ROCKFALL. NO ENTRY. (SOMEONE HAS BEEN CLIMBING OVER IT. RECENTLY.)','SOUTHERN PASS. CLOSED. (Someone climbed over it!)'); }});
-  a1Tall(A1W.rockfall.x,A1W.rockfall.y,()=>a1DrawRockfall(A1W.rockfall.x,A1W.rockfall.y,!G.flags.act1_done),()=>true);
-  addCol({t:'c',x:A1W.rockfall.x+18,y:A1W.rockfall.y-6,r:30});
+  addLandmark({id:'a1_passsign',k:'sign',x:A1W.sign.x,y:A1W.sign.y,r:8,noNudge:true,prompt:'Read the sign',get text(){ return a1PassClear()?S('SOUTHERN PASS. Two hundred and six steps down to the Clockwork Coast. (Somebody has moved the rocks. Somebody strong.)','SOUTHERN PASS. 206 steps down to the coast.'):S('SOUTHERN PASS. CLOSED BY ROCKFALL. NO ENTRY. (SOMEONE HAS BEEN CLIMBING OVER IT. RECENTLY.)','SOUTHERN PASS. CLOSED. (Someone climbed over it!)'); }});
+  a1Tall(A1W.rockfall.x,A1W.rockfall.y,()=>a1DrawRockfall(A1W.rockfall.x,A1W.rockfall.y,!a1PassClear()),()=>true);
+  // the big rock: gone (no invisible bump) once Mom has moved the rocks for the chase south
+  { const c=addCol({t:'c',x:A1W.rockfall.x+18,y:A1W.rockfall.y-6,r:30}); Object.defineProperty(c,'off',{get:()=>a1PassClear(),set(){},configurable:true}); }
   REACH.clear.push({x:CP.x,y:CP.y,r:150},{x:A1W.rockfall.x,y:A1W.rockfall.y,r:90});
   // ---- the Wardens' vault under the Brindlecross bridge (pie), the tunnel's mine cart (gate), the ferry landing (lure)
   a1Lm({id:'a1_vault',x:A1W.vault.x,y:A1W.vault.y,r:0,prompt:()=>G.found.a1_vault?S('Look at the Wardens’ names','Look at the names'):S('Look under the bridge','Look under the bridge'),act:a1VaultAct,draw:(o,t)=>a1DrawVault(o.x,o.y,t)});
@@ -558,7 +559,7 @@ function a1OnSpire(){ const S0=A1W.spire, p=player; if(!p) return false; const d
 function a1Breath(mx,my,ang,dt){
   const hit=(x,y,r)=>inArcC(mx,my,ang,175,0.45,{x,y,r});
   const C=WARDS.crag, S0=A1W.spire; if(C&&!G.wards.crag&&G.wardReady.crag&&!a1OnSpire()&&(hit(C.x,C.y,24)||(dist(player.x,player.y,S0.x,S0.y)<S0.r+320&&inArcC(mx,my,ang,330,0.6,{x:S0.x,y:S0.y,r:S0.r})))){ G.wardMsgT=3; a1note('crag_low',`Too far down! Fly up onto the Nest Spire, then breathe on the Ward.`,`Too low! Fly up onto the spire first.`,3); }
-  const F=WARDS.frost; if(F&&!G.wards.frost&&!G.flags.a1_frost_melted&&hit(F.x,F.y,26)){ G.wardMsgT=3; a1note('frost_ice',`It is frozen solid. Light the three lanterns on the cliff to melt the ice.`,`Frozen! Light the three lanterns up high.`,3); }
+  const F=WARDS.frost; if(F&&!G.wards.frost&&!G.flags.a1_frost_melted&&hit(F.x,F.y,26)){ G.wardMsgT=3; a1note('frost_ice',`It is frozen solid. Light the three lanterns on the ice pillars to melt the ice.`,`Frozen! Light the three lanterns on the pillars.`,3); }
   A1W.frost.lan.forEach(([x,y],i)=>{ if(!G.flags['a1_frost_'+(i+1)]&&hit(x,y-60,22)) a1note('frost_lan',`Too high for your breath! Breathe fire and shoot an arrow through it.`,`Too high! Shoot a fire arrow through your breath.`,4); });
   // the low forge-pits by the Anvil Rock light from a breath
   if(a1on('a1_bram',0)) A1W.anvil.pits.forEach(([x,y,hi],i)=>{ if(hi) { if(hit(x,y-50,24)) a1note('pit_hi',`That pit is up on the rock. A fire arrow or a burning Wing-rang can reach it.`,`Too high! Use a fire arrow or a fire Wing-rang.`,4); return; } if(hit(x,y,18)) a1PitLight(i); });
@@ -1338,3 +1339,181 @@ window.__ebA1={A1,A1W,
   give:r=>giveReward(r), festLines:d=>typeof festIntroLines==='function'?festIntroLines(d):[], talkOpts:id=>compTalkOpts(id,null).map(o=>simplify(String(o.t))),
   winRace:()=>{ const M=G.mini; if(M&&M.kind==='a1_skimrace') a1RaceWin(M); }, nursery:()=>a1NurseryOpen(), retro:()=>a1Retro(), quake:(x,y)=>a1Quake(x,y)
 };
+
+// ---------- 19. v10: Emberhollow's world matches its story
+// The town wall and the North Gate of Act I's mystery, the raid's fires and the rebuilt houses, the bootprints from the
+// Hollow Ward to the gate, the raid coming in through the gate, Captain Osric beside his dogs at the Obsidian Gate, who
+// moved the rocks at the Southern Pass, and the Frostpine ice hole for Dell's crunchy fish.
+// A timber palisade runs along the north edge of the village (x0..x1 at y) with two gateways: the North Gate on the War
+// Camp road (ROADS[0] passes 2800,8800) and the Frostpine Gate on the Frostpine road (ROADS[5]).
+const A1V={wall:{y:8792,x0:1950,x1:3262,th:10,seg:44},
+  gates:{west:{x:2386,hw:50,sign:'FROSTPINE GATE'},north:{x:2800,hw:52,sign:'NORTH GATE'}},
+  // the bootprints: from the Hollow Ward under the old oak, up the War Camp road to the North Gate
+  prints:[[2580,9128],[2650,9112],[2710,9068],[2734,8996],[2758,8916],[2780,8846],[2798,8806]],
+  icehole:{x:1830,y:3650}, osric:null};
+// the North Gate: shut before the raid; open and broken from the raid until the mystery is solved; then mended, with a
+// shiny new padlock. Solved = Fennick has been confronted (old saves: G.choices.fennick) or the Case Book says so.
+function a1GateSolved(){ return !!(G&&((G.choices&&G.choices.fennick)||(G.flags&&G.flags.a1_gate_solved))); }
+function a1GateState(){ if(!G||G.mode!=='story'||a1GateSolved()) return 'fixed'; return reached('raid')?'broken':'shut'; }
+// the rocks at the Southern Pass stay put until the chase south begins (Mom moved them, and says so at her lunch)
+function a1PassClear(){ return !!(G&&G.flags&&G.flags.act1_done&&(G.flags.a1_lunch||(stageAt('c_pass')>=0&&reached('c_pass')))); }
+// cached tall sprites (base point bx,by inside a w x h box), outlined in the Storybook look like the coast's props
+const A1SPR=new Map();
+function a1Spr(key,w,h,bx,by,draw){ const k=(LOOK.sb?'s:':'c:')+key; let c=A1SPR.get(k); if(c) return c;
+  const sc=2, cv=mkCanvas(Math.ceil(w*sc),Math.ceil(h*sc)), g=cv.getContext('2d'); g.scale(sc,sc); g.translate(bx,by); g.lineCap='round'; g.lineJoin='round'; draw(g);
+  c=LOOK.sb?outlineSprite(cv,SBC.outline,1.8,{force:true}):cv; c.ox=bx; c.oy=by; c.w2=w; c.h2=h; A1SPR.set(k,c); return c; }
+function a1Put(c,x,y,sx){ sx=sx||1; ctx.drawImage(c,x-c.ox*sx,y-c.oy,c.w2*sx,c.h2); }
+{ const base=initWorld; initWorld=function(){ base(); try{ a1VBuild(); }catch(e){ console.error('a1 v10 world',e); } }; }
+function a1VBuild(){
+  const W=A1V.wall, gs=[A1V.gates.west,A1V.gates.north];
+  // the palisade between the gateways (rect colliders), a stone post each side of a gateway and at both ends
+  let x=W.x0;
+  const run=(a,b)=>{ addCol({t:'r',x0:a,y0:W.y-W.th,x1:b,y1:W.y+W.th}); const n=Math.max(1,Math.round((b-a)/W.seg)), w=(b-a)/n; for(let i=0;i<n;i++){ const cx=a+w*(i+0.5), sx=w/W.seg; a1Tall(cx,W.y,()=>a1Put(a1PalSpr(),cx,W.y,sx),()=>true); } REACH.clear.push({x:(a+b)/2,y:W.y,r:(b-a)/2+30}); };
+  for(const g of gs){ run(x,g.x-g.hw-24); for(const s of [-1,1]) addCol({t:'c',x:g.x+s*(g.hw+12),y:W.y,r:14}); x=g.x+g.hw+24; }
+  run(x,W.x1);
+  for(const ex of [W.x0,W.x1]){ addCol({t:'c',x:ex,y:W.y,r:17}); a1Tall(ex,W.y+1,()=>a1Put(a1EndSpr(),ex,W.y),()=>true); }
+  for(const g of gs){ REACH.clear.push({x:g.x,y:W.y+10,r:g.hw+70}); a1Tall(g.x,W.y,()=>a1DrawGate(g),()=>true); }
+  // the North Gate shut (before the raid): the doors close the gap
+  const N=A1V.gates.north, shut=addCol({t:'r',x0:N.x-N.hw,y0:W.y-8,x1:N.x+N.hw,y1:W.y+8});
+  Object.defineProperty(shut,'off',{get:()=>a1GateState()!=='shut',set(){},configurable:true});
+  a1Lm({id:'a1_ngate',x:N.x+N.hw+30,y:W.y+28,r:0,prompt:()=>G?S('Look at the North Gate','Look at the gate'):'',act:a1GateLook});
+  // the bootprints run from the Ward to the gate now (drawn on the ground by a1VGround; the stock nine are not drawn)
+  const bp=LANDMARKS.find(o=>o.id==='bootprints'); if(bp) bp.draw=()=>{};
+  // the ice hole in the Frostpine (Dell's crunchy fish)
+  const IH=A1V.icehole; a1Lm({id:'a1_icehole',x:IH.x,y:IH.y,r:0,icehole:true,prompt:S('Fish in the ice hole','Fish in the ice hole'),act:o=>startFishing(o),draw:(o,t)=>a1DrawIceHole(o.x,o.y,t)});
+  REACH.clear.push({x:IH.x,y:IH.y,r:110});
+  mapListsReset();
+}
+function a1GateLook(){
+  const st=a1GateState();
+  if(st==='shut') a1say([xl('narr',`The North Gate, shut and locked for Lantern Day. The road beyond it runs north into the woods. Kobold country.`,`The North Gate. Shut and locked for Lantern Day.`)]);
+  else if(st==='broken') a1say([xl('narr',`The North Gate hangs open. One door lies in the mud, covered in claw marks.`,`The gate hangs open. One door lies in the mud.`),
+    xl('narr',`But the padlock isn't broken at all. It hangs open on its hook. Somebody unlocked it with a key.`,`The padlock is not broken. Someone used a key!`)]);
+  else a1say([xl('narr',`The North Gate has new doors and a brand new padlock, shiny as a new coin. Nobody is leaving this gate open again.`,`New doors and a shiny new padlock!`)]);
+}
+// the raid comes in through the North Gate: half the kobolds pour in at the gate, the rest are already in the streets
+{ const base=spawnRaid; spawnRaid=function(n){
+  if(!(G&&G.mode==='story')) return base(n);
+  const N=A1V.gates.north, Wy=A1V.wall.y, V=POI.village, k=Math.ceil(n/2);
+  for(let i=0;i<n;i++){ let s=null;
+    if(i<k) s=spotNear(N.x,Wy+80,0,70);
+    else for(let j=0;j<8&&!(s&&s.y>Wy+70);j++) s=spotNear(V.x,V.y,140,460,240);
+    if(!s||s.y<Wy+40) s={x:V.x+rand(-160,160),y:V.y+rand(-60,120)};
+    makeEnemy('kobold',s.x,s.y,{level:1,aggro:i<3,homeX:s.x,homeY:s.y,leash:1100,questTag:true,elite:false}); } }; }
+// Mom says who moved the rocks (before her last line, so the two gift lines keep their places)
+{ const L=STORY.a1_passlunch; if(Array.isArray(L)&&!L.some(l=>a1TextOf(l).includes('moved the rocks'))) L.splice(Math.max(0,L.length-1),0,
+  xl('maren',`And yes, before you ask: I moved the rocks. Me and my big hammer. Gorran helped. Mostly by talking to them.`,`Yes, I moved the rocks! Me and my hammer.`)); }
+// Captain Osric comes too: he stands beside the fight and cheers his dogs on (he does not fight)
+{ const base=bossFightBegin; bossFightBegin=function(k){ base(k); try{
+  if(k==='gate'&&A1.dogs&&CASTBY.osric){ const ks=A1.dogs.ks, P=POI.gate; let x=P.x-160, y=P.y+190;
+    if(ks.length){ x=ks.reduce((s,q)=>s+q.x,0)/ks.length-80; y=ks.reduce((s,q)=>s+q.y,0)/ks.length+120; }
+    for(let d=0;d<200&&colAt(x,y,14);d+=20){ x+=12; y+=8; }
+    const f=mkNPC(CASTBY.osric,x,y); f.walker=false; f.face=-Math.PI/2; A1V.osric=f; }
+  }catch(e){ console.error(e); } }; }
+// Dell's crunchy Frostpine fish: caught in the ice hole, he pays for it (his rumor)
+ITEM_NAMES.a1_coldfish=S('A crunchy Frostpine fish','A crunchy fish');
+{ const base=compTalkOpts; compTalkOpts=function(id,n){ const o=base(id,n); try{
+  if(G&&G.mode==='story'&&id==='dell'&&(G.items.a1_coldfish||0)>0&&!G.found.a1_dellfish) o.unshift({t:S('I brought you a crunchy Frostpine fish!','Here is a crunchy fish!'),
+    then:[xl('dell',`Is that a Frostpine fish? From the ice hole? Listen to it CRUNCH. Oh, that's the good stuff.`,`A Frostpine fish! Listen to it CRUNCH!`),
+      xl('dell',`I said I'd owe you, and Dell pays his debts. Forty coins. Don't spend it all on bait.`,`I owe you! Here are forty coins.`)],
+    fn:()=>{ takeItems({a1_coldfish:1}); G.found.a1_dellfish=true; addCoins(40,player.x,player.y); gainXp(80); saveGame(); }});
+  }catch(e){ console.error(e); } return o; }; }
+// every frame: the raid's houses (burnt from the raid until Act I ends, then rebuilt), their fires during the raid, Osric
+function a1VTick(){
+  const on=G.mode==='story'&&reached('raid')&&!G.flags.act1_done;
+  for(const h of HOUSES) if(h.raidBurn&&h.burnt!==on) h.burnt=on;
+  if(on&&G.stage==='raid') for(const h of HOUSES){ if(!h.raidBurn||!inView(h.x,h.y,140)||Math.random()>0.3) continue;
+    const x=h.x+rand(-h.w*0.35,h.w*0.35), y=h.y-h.h*0.35+rand(-8,8);
+    emit(x,y,1,{kind:'fire',ang:-Math.PI/2,spread:0.6,smin:20,smax:70,lmin:.4,lmax:.8,zmin:3,zmax:6,grow:5});
+    if(Math.random()<0.35) emit(x,y-16,1,{col:'60,52,50',glow:false,alpha:0.45,ang:-Math.PI/2,spread:0.4,smin:15,smax:40,lmin:1.2,lmax:2.2,zmin:5,zmax:9,grow:10,drag:0.3}); }
+  if(A1V.osric&&(!G.bf||G.bf.k!=='gate')) A1V.osric=null;
+}
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{
+  if(!G||G.mode!=='story'||AREA) return;
+  a1VTick(); a1DrawGatePrints(G.time);
+  const f=A1V.osric; if(f){ const D=A1.dogs, d=D&&D.dogs&&D.dogs[0]; if(d) f.face=angTo(f.x,f.y,d.x,d.y); f.t=G.time; if(inView(f.x,f.y,120)) list.push({x:f.x,y:f.y,draw:()=>drawNPC(f)}); }
+  }catch(e){ console.error('a1 v10',e); } }; }
+// ---- the art: the palisade, its end posts, the two gateways (the North Gate in three states), the prints, the ice hole
+function a1PalSpr(){ return a1Spr('a1_pal',48,74,24,64,g=>{
+  g.fillStyle='rgba(40,26,14,.22)'; g.beginPath(); g.ellipse(2,2,25,5,0,0,TAU); g.fill();
+  const H=[46,51,44,49,47,52], C=['#8a5a34','#7c5030','#93623a','#80542f','#8e5c36','#7a4f2e'], w=44/6;
+  for(let i=0;i<6;i++){ const lx=-22+i*w, h=H[i];
+    g.fillStyle=C[i]; g.fillRect(lx,-h,w+0.4,h); g.beginPath(); g.moveTo(lx,-h); g.lineTo(lx+w/2,-h-8); g.lineTo(lx+w+0.4,-h); g.closePath(); g.fill();
+    g.fillStyle='rgba(255,224,170,.24)'; g.fillRect(lx+1,-h+1,1.6,h-6);
+    g.fillStyle='rgba(30,16,8,.35)'; g.fillRect(lx+w-1.2,-h,1.2,h); }
+  for(const ry of [-37,-16]){ g.fillStyle='#5a3a20'; g.fillRect(-22,ry,44,4.5); g.fillStyle='rgba(255,210,150,.25)'; g.fillRect(-22,ry,44,1.2); }
+  g.fillStyle='#7d7468'; g.fillRect(-22,-4,44,6); g.fillStyle='#958b7e'; for(let i=0;i<4;i++) g.fillRect(-21+i*11,-4,9.5,2.5);
+}); }
+function a1StonePost(g,x,w,h){
+  g.fillStyle='#7d7468'; g.fillRect(x-w/2,-h,w,h); g.fillStyle='#9a9084'; g.fillRect(x-w/2,-h,w*0.32,h); g.fillStyle='#625a50'; g.fillRect(x+w/2-3,-h,3,h);
+  g.strokeStyle='rgba(50,42,36,.55)'; g.lineWidth=0.9; for(let y=-h+12,i=0;y<0;y+=12,i++){ g.beginPath(); g.moveTo(x-w/2,y); g.lineTo(x+w/2,y); g.stroke(); const bx=x+(i%2?-w/6:w/6); g.beginPath(); g.moveTo(bx,y-12); g.lineTo(bx,y); g.stroke(); }
+  g.fillStyle='#5e564c'; g.fillRect(x-w/2-3,-h-7,w+6,8); g.fillStyle='#a49a8c'; g.fillRect(x-w/2-3,-h-7,w+6,2.4);
+}
+function a1EndSpr(){ return a1Spr('a1_wend',44,104,22,92,g=>{ g.fillStyle='rgba(40,26,14,.25)'; g.beginPath(); g.ellipse(2,2,20,6,0,0,TAU); g.fill(); a1StonePost(g,0,28,78); g.fillStyle='#d8c8a0'; g.beginPath(); g.arc(0,-86,3,0,TAU); g.fill(); }); }
+// a door seen face on (shut), swung open toward the village (a slanted panel from its hinge), or lying flat in the mud
+function a1DoorFace(g,x,w,h,col){
+  g.fillStyle=col; g.fillRect(x,-h,w,h); g.strokeStyle='rgba(40,22,10,.55)'; g.lineWidth=0.9; for(let px=x+w/5;px<x+w-1;px+=w/5){ g.beginPath(); g.moveTo(px,-h); g.lineTo(px,0); g.stroke(); }
+  g.fillStyle='#4a4a52'; for(const by of [-h+8,-12]){ g.fillRect(x,by,w,3.4); g.fillStyle='#7a7a86'; for(let px=x+4;px<x+w;px+=w/3) g.fillRect(px,by+0.8,1.6,1.6); g.fillStyle='#4a4a52'; }
+}
+function a1DoorOpen(g,hx,sx,h,col,droop){
+  const dx=sx*24, dy=30, dr=droop?9:0;
+  g.fillStyle=col; g.beginPath(); g.moveTo(hx,0); g.lineTo(hx+dx,dy+dr); g.lineTo(hx+dx,dy-h+dr*1.6); g.lineTo(hx,-h); g.closePath(); g.fill();
+  g.strokeStyle='rgba(40,22,10,.55)'; g.lineWidth=0.9; for(let k=1;k<4;k++){ const u=k/4; g.beginPath(); g.moveTo(hx+dx*u,dy*u+dr*u-h+dr*0.6*u); g.lineTo(hx+dx*u,dy*u+dr*u); g.stroke(); }
+  g.strokeStyle='#4a4a52'; g.lineWidth=3; for(const f of [0.82,0.2]){ g.beginPath(); g.moveTo(hx,-h*f); g.lineTo(hx+dx,dy+dr-h*f+dr*0.6*(1-f)); g.stroke(); }
+  if(droop){ g.strokeStyle='rgba(255,236,210,.7)'; g.lineWidth=1.1; for(let k=0;k<3;k++){ g.beginPath(); g.moveTo(hx+dx*0.25+k*sx*3,-h*0.55+k*5); g.lineTo(hx+dx*0.7+k*sx*3,-h*0.3+k*5+8); g.stroke(); } g.fillStyle='rgba(30,20,20,.35)'; g.beginPath(); g.ellipse(hx+dx*0.5,-h*0.15+dy*0.5,6,9,0,0,TAU); g.fill(); }
+}
+function a1DoorFlat(g,x,y,w,h){
+  g.save(); g.translate(x+w/2,y+h/2); g.rotate(-0.12);
+  g.fillStyle='rgba(40,26,14,.25)'; g.fillRect(-w/2+2,-h/2+3,w,h); g.fillStyle='#6e4628'; g.fillRect(-w/2,-h/2,w,h);
+  g.strokeStyle='rgba(30,16,8,.55)'; g.lineWidth=0.9; for(let py=-h/2+h/4;py<h/2-1;py+=h/4){ g.beginPath(); g.moveTo(-w/2,py); g.lineTo(w/2,py); g.stroke(); }
+  g.fillStyle='#4a4a52'; g.fillRect(-w/2+6,-h/2,3,h); g.fillRect(w/2-9,-h/2,3,h);
+  g.strokeStyle='rgba(255,236,210,.75)'; g.lineWidth=1.1; for(let k=0;k<3;k++){ g.beginPath(); g.moveTo(-6+k*4,-h/2+3); g.lineTo(2+k*4,h/2-3); g.stroke(); }
+  g.fillStyle='rgba(20,14,14,.35)'; g.beginPath(); g.ellipse(-w/4,0,7,4,0,0,TAU); g.fill(); g.restore();
+}
+function a1Padlock(g,x,y,body,hi,open,k){
+  g.save(); g.translate(x,y); g.scale(k||1,k||1);
+  g.strokeStyle=body; g.lineWidth=2.2; g.beginPath(); if(open) g.arc(3,-4,3.4,Math.PI*1.1,Math.PI*0.1); else g.arc(0,-1,3.4,Math.PI,0); g.stroke();
+  g.fillStyle=body; rrect(g,-4.6,-1,9.2,8,2); g.fill(); g.fillStyle=hi; g.fillRect(-3.4,0,2,5.6); g.fillStyle='#1a1418'; g.fillRect(-0.7,2,1.4,3);
+  g.restore();
+}
+function a1GateSpr(gd,state){ const hw=gd.hw, W=2*hw+72;
+  return a1Spr('a1_gate_'+gd.sign+'_'+state,W,170,W/2,118,g=>{
+    g.fillStyle='rgba(40,26,14,.25)'; g.beginPath(); g.ellipse(0,3,hw+34,7,0,0,TAU); g.fill();
+    let lock=null;
+    if(state==='shut'){ a1DoorFace(g,-hw,hw,50,'#8a5a34'); a1DoorFace(g,0,hw,50,'#82552f'); g.fillStyle='#3a3a42'; g.fillRect(-7,-30,14,4); a1Padlock(g,0,-27,'#4a4a52','#8a8a96',false); }
+    else if(state==='broken'){ a1DoorFlat(g,-hw+2,6,hw-2,30); a1DoorOpen(g,hw,-1,50,'#7a4e2c',true); lock=[hw+5,-26,'#55555f','#9a9aa6',1.4]; }
+    else if(state==='fixed'){ a1DoorOpen(g,-hw,1,50,'#b88450',false); a1DoorOpen(g,hw,-1,50,'#b88450',false); lock=[hw+5,-33,'#e0a83a','#fff2b0',1.8]; }
+    else { a1DoorOpen(g,-hw,1,50,'#6e4a2c',false); a1DoorOpen(g,hw,-1,50,'#6e4a2c',false); }
+    for(const s of [-1,1]) a1StonePost(g,s*(hw+12),24,84);
+    // the padlock hangs open on an iron hook on the right post: the old one after the raid, a shiny new one when mended
+    if(lock){ g.fillStyle='#2e2e36'; g.fillRect(hw+1,lock[1]-6,7,3); a1Padlock(g,lock[0],lock[1],lock[2],lock[3],true,lock[4]); }
+    g.fillStyle='#5a3a20'; g.fillRect(-hw-20,-98,2*hw+40,10); g.fillStyle='rgba(255,210,150,.3)'; g.fillRect(-hw-20,-98,2*hw+40,2.4);
+    const tw=Math.max(70,gd.sign.length*6.6+12); g.fillStyle='#6a4428'; rrect(g,-tw/2,-92,tw,15,3); g.fill(); g.fillStyle='#ecdcb8'; g.font=`900 9px ${UIF}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText(gd.sign,0,-84.5);
+  }); }
+function a1DrawGate(gd){
+  const st=gd===A1V.gates.north?a1GateState():'open', y=A1V.wall.y;
+  a1Put(a1GateSpr(gd,st),gd.x,y);
+  if(st==='fixed'){ const a=0.5+0.5*Math.sin(G.time*3.2), gx=gd.x+gd.hw+5, gy=y-27; glowAt(gx,gy,12+a*6,'255,226,120',0.35+0.35*a); if(a>0.85){ ctx.fillStyle='rgba(255,255,240,.95)'; ctx.fillRect(gx-0.8,gy-5,1.6,10); ctx.fillRect(gx-5,gy-0.8,10,1.6); } }
+}
+function a1DrawGatePrints(t){
+  if(!(reached('lore')&&a1GateState()==='broken')||!inView(2690,8967,260)) return;
+  const P=A1V.prints; let k=0; ctx.save();
+  for(let i=0;i<P.length-1;i++){ const [ax,ay]=P[i], [bx,by]=P[i+1], L=dist(ax,ay,bx,by), a=Math.atan2(by-ay,bx-ax), n=Math.max(1,Math.floor(L/22));
+    for(let j=0;j<n;j++,k++){ const u=(j+0.5)/n, sd=k%2?1:-1, x=lerp(ax,bx,u)-Math.sin(a)*sd*5, y=lerp(ay,by,u)+Math.cos(a)*sd*5;
+      ctx.save(); ctx.translate(x,y); ctx.rotate(a+Math.PI/2); ctx.fillStyle='rgba(22,16,12,.55)'; ctx.beginPath(); ctx.ellipse(0,-2,3.4,4.8,0,0,TAU); ctx.fill(); ctx.beginPath(); ctx.ellipse(0,5.2,2.8,2.4,0,0,TAU); ctx.fill();
+      ctx.fillStyle='rgba(255,226,150,.13)'; ctx.beginPath(); ctx.ellipse(-1,-3,1.3,2.2,0,0,TAU); ctx.fill(); ctx.restore(); } }
+  ctx.restore();
+}
+function a1DrawIceHole(x,y,t){
+  ctx.save(); ctx.fillStyle='rgba(200,226,246,.85)'; ctx.beginPath(); ctx.ellipse(x,y,78,40,0,0,TAU); ctx.fill();
+  ctx.strokeStyle='rgba(120,160,200,.6)'; ctx.lineWidth=1.4; ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=1; for(const [a,b,c,d] of [[-50,-10,-20,4],[30,-18,56,-4],[-30,20,4,12],[18,16,44,26]]){ ctx.beginPath(); ctx.moveTo(x+a,y+b); ctx.lineTo(x+c,y+d); ctx.stroke(); }
+  ctx.fillStyle='#183048'; ctx.beginPath(); ctx.ellipse(x,y,14,7.5,0,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(230,244,255,.9)'; ctx.lineWidth=2; ctx.stroke();
+  const r=4+((t*6)%8); ctx.strokeStyle=`rgba(200,230,255,${0.5-0.05*r})`; ctx.lineWidth=1; ctx.beginPath(); ctx.ellipse(x,y,r,r*0.5,0,0,TAU); ctx.stroke();
+  // a little stool and a bucket
+  ctx.fillStyle='#6a4428'; ctx.fillRect(x+24,y-2,12,4); ctx.fillRect(x+25,y+2,2,6); ctx.fillRect(x+33,y+2,2,6);
+  ctx.fillStyle='#8a8a96'; ctx.beginPath(); ctx.moveTo(x-34,y-6); ctx.lineTo(x-24,y-6); ctx.lineTo(x-26,y+5); ctx.lineTo(x-32,y+5); ctx.closePath(); ctx.fill(); ctx.strokeStyle='#4a4a52'; ctx.lineWidth=1; ctx.stroke();
+  ctx.restore();
+}
+Object.assign(window.__ebA1,{A1V,gateState:()=>a1GateState(),passClear:()=>a1PassClear(),osric:()=>A1V.osric?{x:Math.round(A1V.osric.x),y:Math.round(A1V.osric.y)}:null,
+  burnt:()=>HOUSES.filter(h=>h.town==='village'&&h.k==='house').map(h=>({x:Math.round(h.x),y:Math.round(h.y),raid:!!h.raidBurn,burnt:!!h.burnt}))});
