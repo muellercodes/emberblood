@@ -163,7 +163,8 @@ def check_reach(pg, R, CJ, act):
             prev = s
     if n_none:
         R.skip('15', f'no reach data for {n_none} step pairs (only the finale map has a reach flood; the engine has no story.reach)')
-    R.ok('15', f'{n_ok} step pairs reachable' + (f' ({kind})' if kind else ''))
+    if n_ok or not n_none:
+        R.ok('15', f'{n_ok} step pairs reachable' + (f' ({kind})' if kind else ''))
 
 
 def check_gates(pg, R, CJ, act):
@@ -282,8 +283,10 @@ def check_saves(p, page, R, fixtures, errs_of):
             pg.wait_for_timeout(1500)
             st = pg.evaluate('()=>{ const s=window.__eb.story; return s?{state:s.state(),errors:s.errors()}:null; }')
             if st and st.get('errors'):
+                seen = set(f['msg'] for f in R.fails)
                 for e in st['errors']:
-                    R.fail('17', f'save_{which}: engine data error after load: {e}')
+                    if f'engine data error: {e}' not in seen:
+                        R.fail('17', f'save_{which}: engine data error after load: {e}')
             pg.evaluate('()=>{ try{ __eb.foes.devEval("saveGame()"); }catch(e){} }')
             pg.reload(timeout=180000); pg.wait_for_timeout(1500)
             cont(pg)
@@ -363,8 +366,8 @@ def main():
         lines.append(f"NOTE {x['rule']:<6}{x['msg']}")
     lines.append('```')
     md = '\n'.join(lines) + '\n'
-    if '—' in md:
-        md = md.replace('—', ', ')
+    if chr(0x2014) in md:
+        md = md.replace(chr(0x2014), ', ')
     os.makedirs(out, exist_ok=True)
     open(os.path.join(out, 'worldcheck.md'), 'w', encoding='utf8').write(md)
     json.dump({'ok': not R.fails, 'ms': ms, 'fails': R.fails, 'skips': R.skips, 'notes': R.notes, 'oks': R.oks},

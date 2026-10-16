@@ -528,7 +528,7 @@ ${legacyWarns.length ? `<details class="legacy"><summary>${legacyWarns.length} l
 <script>${JS}</script>
 </body></html>
 `;
-if (html.includes('—')) throw new Error('em dash in the story map');
+if (html.includes(String.fromCharCode(0x2014))) throw new Error('em dash in the story map');
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'storymap.html'), html);
 console.log(`storymap: wrote ${relative(process.cwd(), join(outDir, 'storymap.html'))} (${(html.length / 1024).toFixed(0)} KB, ${acts.length} act${acts.length === 1 ? '' : 's'}, ${nF} problems marked)`);

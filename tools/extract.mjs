@@ -402,7 +402,7 @@ for (const [mod, act] of MODULES) {
   summary.push(`${r.file}: ${r.stages.length} stages, ${r.scenes.length} scenes (${rest.length} with no stage), ${nLoose} loose texts`);
 }
 // no em dash may leave this tool (old text has none, but be sure)
-const idxJson = JSON.stringify(index, null, 0).replace(/—/g, ', ');
+const idxJson = JSON.stringify(index, null, 0).replace(new RegExp(String.fromCharCode(0x2014), 'g'), ', ');
 writeIfChanged(join(resolve(outDir), 'index.json'), idxJson.replace(/\},\{/g, '},\n{'));
 console.log(summary.join('\n'));
 console.log(`extract: ${index.length} lines indexed into ${resolve(outDir)}`);

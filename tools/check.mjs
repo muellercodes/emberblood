@@ -58,7 +58,7 @@ const DIRV = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] };
 const LEGACY_ACT1 = ['a1d_story', 'a1e_people', 'a1f_qdata', 'a1g_talk', 'a9d_quests', 'x0_act1', 'x0_vorlaxis'];
 const BASE_REF = '0fb0938';
 const AFTER_BOSS_MAX = 6, SCENE_MAX = 10, SIMPLE_WORDS = 8;
-const EM = '—';
+const EM = String.fromCharCode(0x2014);
 
 // ---------------------------------------------------------------- small helpers
 const isStr = (x) => typeof x === 'string';
@@ -369,8 +369,10 @@ export function runChecks(M, opts = {}) {
   const actFilter = opts.act != null ? +opts.act : null;
   const inAct = (a) => actFilter == null || a == null || +a === actFilter;
   const at = (O, key) => { if (!O) return { file: '', line: 0 }; const l = (key != null && O.F && (O.F.idx.strLine.get(key) || O.F.idx.keyLine.get(key))) || O.line; return { file: O.file, line: l }; };
-  const FAIL = (rule, msg, where = {}) => { if (inAct(where.act)) fails.push(Object.assign({ rule, msg }, where)); };
-  const WARN = (rule, msg, where = {}) => { if (inAct(where.act)) warns.push(Object.assign({ rule, msg }, where)); };
+  // messages quote the data; an em dash in a quote is shown as [em dash] so no report holds one
+  const clean = (m) => String(m).split(EM).join('[em dash]');
+  const FAIL = (rule, msg, where = {}) => { if (inAct(where.act)) fails.push(Object.assign({ rule, msg: clean(msg) }, where)); };
+  const WARN = (rule, msg, where = {}) => { if (inAct(where.act)) warns.push(Object.assign({ rule, msg: clean(msg) }, where)); };
   const W = (O, extra = {}) => Object.assign({ act: O ? O.act : null, owner: O ? O.id : null, file: O ? O.file : '', line: O ? O.line : 0 }, extra);
 
   // ---------- load and duplicate problems
