@@ -66,8 +66,9 @@ places({
       locked: ['A rusty ring on the bank. Its chain runs down into the pond. Something heavy is on the other end. A good yank might do it.',
         'A chain goes into the pond. Yank it!'],
       build: { ring: [2850, 10612] } },
-    // the chest is up once the gate has opened (the gate library emits gate_open:m0_bramble, kept in the save)
-    m0_bramble_chest: { kind: 'chest', map: 0, at: [2920, 10634], if: 'event gate_open:m0_bramble', look: 'a2s_pond_chest',
+    // the chest is up once the ring is pulled: the gate library's saved state G.flags.gate_m0_bramble is 2 (open for
+    // everyone). Not `event gate_open:...`, which also fires at state 1 when Ash merely walks near the chest's spot.
+    m0_bramble_chest: { kind: 'chest', map: 0, at: [2920, 10634], if: 'flag gate_m0_bramble>=2', look: 'a2s_pond_chest',
       say: 'm0_oil', loot: ['give c_lampoil', 'give coins 30', 'set m0_bramble_open'], name: ["a tin chest, dripping pond weed", 'a tin chest'] },
 
     // ---- 5. Duchess's Perch (Climbing Claws). A tall rock in the meadows east of Emberhollow.
