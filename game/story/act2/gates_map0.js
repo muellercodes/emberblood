@@ -40,14 +40,15 @@ places({
       then: ['clue q_nursery', 'xp 150'], name: ['two little handprints', 'handprints'] },
 
     // ---- 3. The Wardens' Lockup (Shadow Dash). A rock cell open to the south, its mouth barred with iron too thin
-    // for anyone but a shadow.
-    m0_lockup: { kind: 'gate', gate: 'thin_bars', map: 0, at: [6770, 8440], r: 90, leads: 'm0_ledger',
+    // for anyone but a shadow. A no-fly zone round it keeps the Ember Wings from flying in over the bars.
+    m0_lockup: { kind: 'gate', gate: 'thin_bars', map: 0, at: [6770, 8430], r: 90, leads: 'm0_ledger',
       name: ["the Wardens' Lockup", "the Wardens' Lockup"],
       locked: ["Thin iron bars, close together. Nothing bigger than a shadow could get through.",
         'Thin bars. Only a shadow fits.'],
       build: { plateau: { poly: [[6640, 8080], [6900, 8080], [6900, 8360], [6840, 8360], [6840, 8140], [6700, 8140],
         [6700, 8360], [6640, 8360]], lvl: 2, style: 'rock', noise: 6 },
-        bars: { x: 6770, y: 8440, w: 152, h: 16, style: 'iron' } } },
+        bars: { x: 6770, y: 8430, w: 152, h: 44, style: 'iron' },
+        nofly: { disc: [6770, 8300, 340], why: ['The wind whips round the old rock. Too windy to fly.', 'Too windy to fly here!'] } } },
     m0_ledger: { kind: 'examine', map: 0, at: [6770, 8268], look: 'a2s_ledger', say: 'm0_ledger',
       then: ['clue q_ward_ledger'], name: ["a Warden's ledger", 'an old book'] },
     m0_lockup_chest: { kind: 'chest', map: 0, at: [6800, 8320], loot: ['give coins 80', 'xp 150', 'set m0_lockup_open'],
