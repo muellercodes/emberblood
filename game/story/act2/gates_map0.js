@@ -5,7 +5,7 @@
 // tops or inside walls that only the named power gets past, at least 90 px from any ground Ash can stand on.
 //   m0_lookout  claws        Vesper's Lookout above her old camp at the Southern Pass: clue q_lookout, Heart Ember
 //   m0_pearl    grapple      Pearl's First Hook, on a windy crag above Ember's Nursery: clue q_nursery
-//   m0_lockup   shadow dash  the Wardens' Lockup south of Brindlecross, barred with thin iron: clue q_ward_ledger
+//   m0_lockup   shadow dash  the Wardens' Lockup south of Brindlecross, barred with thin iron: Heart Ember, clue q_ward_ledger
 //   m0_bramble  Chain Whip   a chain ring on the bank of Bramble Pond: Fennick's lamp oil (the Gloomwing fight uses it)
 //   m0_duchess  claws        Duchess's Perch east of Emberhollow: Heart Ember (and where goats get coins)
 places({
@@ -15,6 +15,7 @@ places({
     // ---- 1. Vesper's Lookout (Climbing Claws). The rockfall (x0_act1 A1W.rockfall 3446,10842) lies at the foot
     // of the new rock; the old camp (3390,10700) is just west of it.
     m0_lookout: { kind: 'gate', gate: 'climb_wall', map: 0, at: [3560, 10800], r: 140, leads: 'm0_lookout_chest',
+      payoff: { kind: 'heart_ember', id: 'm0_lookout' },
       name: ["Vesper's Lookout", "Vesper's Lookout"],
       locked: ['A tall rock above the old rockfall. Deep scratches run up it, like handholds for claws.',
         'Scratches go up the rock. You need claws.'],
@@ -29,6 +30,7 @@ places({
     // 3500,4420). The wind off the frozen lake grounds the Ember Wings round it, so only the tail gets up; a ledge on
     // its south face is the way down.
     m0_pearl: { kind: 'gate', gate: 'grapple_post', map: 0, at: [3450, 3866], r: 340, leads: 'm0_hands',
+      payoff: { kind: 'truth', id: 'q_nursery' },
       name: ["Pearl's First Hook", "Pearl's Hook"],
       locked: ['A little iron hook glints on top of the crag. Too high to reach, and too windy to fly.',
         'A hook on top. Too high. Too windy.'],
@@ -41,7 +43,8 @@ places({
 
     // ---- 3. The Wardens' Lockup (Shadow Dash). A rock cell open to the south, its mouth barred with iron too thin
     // for anyone but a shadow. A no-fly zone round it keeps the Ember Wings from flying in over the bars.
-    m0_lockup: { kind: 'gate', gate: 'thin_bars', map: 0, at: [6770, 8430], r: 90, leads: 'm0_ledger',
+    m0_lockup: { kind: 'gate', gate: 'thin_bars', map: 0, at: [6770, 8430], r: 90, leads: 'm0_lockup_chest',
+      payoff: { kind: 'heart_ember', id: 'm0_lockup' },
       name: ["the Wardens' Lockup", "the Wardens' Lockup"],
       locked: ["Thin iron bars, close together. Nothing bigger than a shadow could get through.",
         'Thin bars. Only a shadow fits.'],
@@ -51,12 +54,13 @@ places({
         nofly: { disc: [6770, 8300, 340], why: ['The wind whips round the old rock. Too windy to fly.', 'Too windy to fly here!'] } } },
     m0_ledger: { kind: 'examine', map: 0, at: [6770, 8268], look: 'a2s_ledger', say: 'm0_ledger',
       then: ['clue q_ward_ledger'], name: ["a Warden's ledger", 'an old book'] },
-    m0_lockup_chest: { kind: 'chest', map: 0, at: [6800, 8320], loot: ['give coins 80', 'xp 150', 'set m0_lockup_open'],
+    m0_lockup_chest: { kind: 'chest', map: 0, at: [6800, 8320], loot: ['heart_ember m0_lockup', 'give coins 40', 'set m0_lockup_open'],
       name: ["the Wardens' strongbox", 'a strongbox'] },
 
     // ---- 4. Bramble Pond (Chain Whip). A rusty ring on the south bank, its chain running into the deep water.
     // Yanking it with the whip hauls up a tin chest that was never on the map before.
     m0_bramble: { kind: 'gate', gate: 'chain_ring', map: 0, at: [2850, 10612], r: 60, leads: 'm0_bramble_chest',
+      payoff: { kind: 'item_main', id: 'c_lampoil' },
       name: ['the chain in Bramble Pond', 'the pond chain'],
       locked: ['A rusty ring on the bank. Its chain runs down into the pond. Something heavy is on the other end. A good yank might do it.',
         'A chain goes into the pond. Yank it!'],
@@ -66,6 +70,7 @@ places({
 
     // ---- 5. Duchess's Perch (Climbing Claws). A tall rock in the meadows east of Emberhollow.
     m0_duchess: { kind: 'gate', gate: 'climb_wall', map: 0, at: [3920, 9235], r: 140, leads: 'm0_duchess_chest',
+      payoff: { kind: 'heart_ember', id: 'm0_duchess' },
       name: ["Duchess's Perch", "Duchess's Perch"],
       locked: ['Goat hoofprints go straight up this rock. Straight UP. You would need claws.',
         'Hoofprints go up. You need claws.'],
@@ -77,10 +82,10 @@ places({
   },
 
   clue: {
-    q_lookout: { icon: 'page', mystery: 'moth_mask',
+    q_lookout: { icon: 'note', mystery: 'moth_mask',
       text: ["Vesper's old drawing from her lookout above the Southern Pass: Lantern Night in Emberhollow, and in the corner a crooked stilt house with a cold chimney, marked HOME.",
         'Her Lantern Night drawing. A stilt house says HOME.'] },
-    q_nursery: { icon: 'hand', mystery: 'moth_mask',
+    q_nursery: { icon: 'claw', mystery: 'moth_mask',
       text: ["Above Ember's Nursery: two tiny handprints. One burned into the rock, one only clawed. Under the clawed one: P. NO FIRE. CLIMBED UP ANYWAY.",
         'Pearl had no fire. She climbed with claws.'] },
     q_ward_ledger: { icon: 'book', mystery: 'what_stopped',
@@ -116,7 +121,7 @@ places({
     ],
     m0_oil: [
       ['narr', "Up comes a tin chest, dripping pond weed. Painted on the lid: WICK'S BRIGHTEST. FOR A LAMP HAVING A BAD NIGHT.",
-        "A tin chest! WICK'S BRIGHTEST LAMP OIL."],
+        "A tin chest! WICK'S BRIGHTEST LAMP OIL.", { ref: 'm0_bramble_chest' }],
       ['narr', '"Sank this after Lantern Night. Did not trust myself with it. Use it well. F."', '"Use it well. F."'],
       ['ash', "Fennick's lamp oil. Some lamp out there is having a very bad night.", "Fennick's lamp oil!"],
     ],

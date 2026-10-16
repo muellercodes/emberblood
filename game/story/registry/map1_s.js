@@ -2,22 +2,17 @@
 // people's talk and the whip hooks name. Coordinates read from the live game (A2S_NOTES.md, "Registry"). People who
 // live indoors are registered at their front door. World facts used by `fact:` tags carry `states`: each state is
 // the condition under which it holds (the checker's rule 10 reads them). If another registry file defines one of these
-// ids, the two entries must agree.
+// ids, the two entries must agree. ENG's map1_gear.js registers c_hester, c_hettie, c_whirligig, c_penny and
+// c_bobs, so they are not repeated here.
 
 // ---- the people (x1_people X1P_CAST; CAST ids)
-legacy({ id: 'c_hester', map: 1, at: [6700, 24606], kind: 'npc', name: ['Captain Hester Ticklebrass', 'Captain Hester'], src: 'CAST:c_hester' });
-legacy({ id: 'c_hettie', map: 1, at: [6600, 25821], kind: 'npc', name: ['Professor Hettie Sprocket', 'Professor Hettie'], src: 'CAST:c_hettie' });
 legacy({ id: 'c_ottoline', map: 1, at: [7700, 24491], kind: 'npc', name: ['Archivist Ottoline Inkwell', 'Ottoline'], src: 'CAST:c_ottoline' });
-legacy({ id: 'c_whirligig', map: 1, at: [7926, 25001], kind: 'npc', name: ['Lord Percival Whirligig', 'Lord Whirligig'], src: 'CAST:c_whirligig' });
 legacy({ id: 'c_mo', map: 1, at: [8126, 26436], kind: 'npc', name: ['Harbormaster Mo Barnacle', 'Harbormaster Mo'], src: 'CAST:c_mo' });
 legacy({ id: 'c_ingrid', map: 1, at: [7700, 25871], kind: 'npc', name: ['Ingrid Anvilsong', 'Ingrid'], src: 'CAST:c_ingrid' });
 legacy({ id: 'c_fig', map: 1, at: [7300, 26256], kind: 'npc', name: ['Auntie Fig', 'Auntie Fig'], src: 'CAST:c_fig' });
 legacy({ id: 'c_ambrose', map: 1, at: [7200, 24846], kind: 'npc', name: ['Clockkeeper Ambrose Tickett', 'Ambrose'], src: 'CAST:c_ambrose' });
-legacy({ id: 'c_penny', map: 1, at: [7050, 25880], kind: 'npc', name: ['Penny Press', 'Penny'], src: 'CAST:c_penny' });
 legacy({ id: 'c_ravel', map: 1, at: [7200, 25980], kind: 'npc', name: ['Madame Ravel', 'Madame Ravel'], src: 'CAST:c_ravel' });
 legacy({ id: 'c_jo', map: 1, at: [6700, 26500], kind: 'npc', name: ['Skipper Jo', 'Jo'], src: 'CAST:c_jo' });
-legacy({ id: 'c_bobs', map: 1, at: [7675, 25192], kind: 'npc', name: ['Constables Bob and Bob', 'the Bobs'],
-  aliases: ['the Upper Gate in chapters 1 and 2 (6950,24300)'], src: 'CAST:c_bobs' });
 legacy({ id: 'c_bob3', map: 1, at: [7719, 25198], kind: 'npc', name: ['The Third Bob', 'Bob'], src: 'SPECIAL:c_bob3' });
 legacy({ id: 'c_mina', map: 1, at: [2416, 26353], kind: 'npc', name: ['Tide Warden Mina Mudge', 'Mina'], src: 'CAST:c_mina' });
 legacy({ id: 'c_charlie', map: 1, at: [2000, 26871], kind: 'npc', name: ['Chowder Charlie', 'Charlie'], src: 'CAST:c_charlie' });
@@ -52,19 +47,24 @@ legacy({ id: 'c_lm_eye', map: 1, at: [6950, 21700], r: 20, kind: 'examine', name
 legacy({ id: 'c_lm_moonring', map: 1, at: [1350, 22760], r: 140, kind: 'examine', name: ['the Moon Ring', 'the Moon Ring'], src: 'x1_world.js c_lm_moonring' });
 legacy({ id: 'c_lm_skiff_quay', map: 1, at: [7400, 26500], r: 20, kind: 'prop', name: ['the Gearhaven quay skiff landing', 'the quay landing'], src: 'LANDMARKS:c_lm_skiff_quay' });
 legacy({ id: 'c_lm_skiff_beach', map: 1, at: [11000, 28800], r: 20, kind: 'prop', name: ['the Lantern Point beach skiff landing', 'the beach landing'], src: 'LANDMARKS:c_lm_skiff_beach' });
-legacy({ id: 'c_ch_gullisle', map: 1, at: [4040, 29745], kind: 'chest', name: ['the chest on Gull Isle', 'a chest'], src: 'x1_world.js CHESTS c_ch_gullisle' });
-legacy({ id: 'c_ch_seal', map: 1, at: [11800, 30215], kind: 'chest', name: ["Sir Blubbington's chest", "the seal's chest"], src: 'x1_world.js CHESTS c_ch_seal' });
+legacy({ id: 'c_ch_gullisle', map: 1, at: [4040, 29745], kind: 'chest', name: ['the chest on Gull Isle', 'a chest'], src: 'CHESTS:c_ch_gullisle' });
+legacy({ id: 'c_ch_seal', map: 1, at: [11800, 30215], kind: 'chest', name: ["Sir Blubbington's chest", "the seal's chest"], src: 'CHESTS:c_ch_seal' });
 
-// ---- world facts (fact: 'entity=state' in people.js and the quests)
-legacy({ id: 'c_great_clock', map: 1, at: [7000, 24850], r: 200, kind: 'landmark', name: ['the Great Clock', 'the Great Clock'],
-  src: 'LANDMARKS:c_lm_clock', states: { stopped: '!flag c_clock_on', ticking: 'flag c_clock_on' } });
+// the skiff landings (x1_people x1pBuild): c_regatta opens them with `world c_skiffs open`
+legacy({ id: 'c_skiffs', map: 1, at: [7400, 26500], r: 20, kind: 'prop', name: ["Skipper Jo's skiff landings", 'the skiff landings'],
+  src: 'LANDMARKS:c_lm_skiff_quay', states: { open: ['set c_skiffs'] } });
+
+// ---- world facts (fact: 'entity=state' in people.js and the quests). The Great Clock is also in map1_gear.js (the
+// same spot and source); the states are added here.
+legacy({ id: 'c_great_clock', map: 1, at: [7200, 24700], r: 120, kind: 'landmark', name: ['the Great Clock', 'the Great Clock'],
+  src: 'elev:5@7200,24600', states: { stopped: '!flag c_clock_on', ticking: 'flag c_clock_on' } });
 legacy({ id: 'c_tide_clock', map: 1, at: [2200, 26360], r: 120, kind: 'landmark', name: ['the Tide Clock', 'the Tide Clock'],
   src: 'LANDMARKS:c_lm_tideclock', states: { high: '!flag c_lowtide', low: 'flag c_lowtide' } });
-legacy({ id: 'c_lighthouse', map: 1, at: [12880, 29020], r: 200, kind: 'landmark', name: ['the Spinning Lighthouse', 'the lighthouse'],
-  src: 'x1_world.js lighthouse', states: { dark: '!stage>=c_spire', lit: 'stage>=c_spire' } });
+legacy({ id: 'c_lighthouse_lamp', map: 1, at: [12880, 29020], r: 200, kind: 'landmark', name: ['the Spinning Lighthouse', 'the lighthouse'],
+  src: 'prop:lighthouse@12880,29020', states: { dark: '!stage>=c_spire', lit: 'stage>=c_spire' } });
 legacy({ id: 'c_harbor', map: 1, at: [7610, 28900], r: 400, kind: 'landmark', name: ['the harbor chain', 'the harbor chain'],
   src: 'LANDMARKS:c_lm_chain', states: { closed: '!flag c_clock_on', open: 'flag c_clock_on' } });
-legacy({ id: 'c_spire_rock', map: 1, at: [7400, 30200], r: 300, kind: 'landmark', name: ['Spire Rock', 'Spire Rock'],
-  src: 'x1_world.js spire', states: { hidden: '!flag c_spire_up', risen: 'flag c_spire_up' } });
+legacy({ id: 'c_spire_rock', map: 1, at: [7400, 30000], r: 300, kind: 'landmark', name: ['Spire Rock', 'Spire Rock'],
+  src: 'prop:spire@7400,30000', states: { hidden: '!flag c_spire_up', risen: 'flag c_spire_up' } });
 legacy({ id: 'c_gearhaven', map: 1, at: [7200, 25200], r: 1100, kind: 'place', name: ['Gearhaven', 'Gearhaven'],
   src: 'POI:c_gearhaven', states: { clear: '!flag c_snow', snowy: 'flag c_snow' } });

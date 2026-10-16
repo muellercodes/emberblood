@@ -3,13 +3,14 @@
 // Rules kept here:
 //  - Lines that state a world fact that changes carry `fact` and are conditioned on it, so nobody says the clock is
 //    stopped after it ticks (audit finding 8). Facts: c_great_clock stopped|ticking, c_tide_clock high|low,
-//    c_lighthouse dark|lit, c_harbor closed|open, c_spire_rock hidden|risen, c_gearhaven clear|snowy (map1_s.js).
+//    c_lighthouse_lamp dark|lit, c_harbor closed|open, c_spire_rock hidden|risen, c_gearhaven clear|snowy (map1_s.js).
 //  - One night everywhere: the night the moths came was "three nights ago".
 //  - People react to what Ash did: `once` lines after each side quest and choice come first, then the state lines,
 //    then a list the game cycles through.
 //  - Each Embermere gate (gates_map0.js) has a pointer here, tagged with `promise`.
 //  - The diary option lives only here (finding 9: x1_story.js:832 and x1_people.js:748 both added one).
-// Quest offers and in-quest reminders are in the q_*.js files.
+// Quest offers are in the q_*.js files; in-quest reminders that are plain lines live here, above each person's
+// everyday lines (story files load in path order, so these entries come before the quests' own).
 people({
   id: 'act2_people', act: 2,
 
@@ -75,7 +76,7 @@ people({
         say: ['Since every clock in town stopped? BOOMING. Everyone wants a new clock, and I have four hundred. Forty sold this week!',
           'Every clock stopped. Now everyone buys mine!'] },
       { if: 'flag c_clock_on', fact: 'c_great_clock=ticking',
-        say: [['Four hundred clocks, all ticking. Business is terrible. I have never been happier. Hmph.', 'My clocks tick. Business is bad. I am happy!'],
+        say: [['Business is terrible. Every clock in town works now. I have never been happier. Hmph.', 'Business is bad. I am happy. Hmph.'],
           ["Do you know who I AM? I'm on four coins. FOUR.", 'I am on four coins!']] },
       { say: [["Do you know who I AM? I'm on four coins. FOUR.", 'I am on four coins!'],
         ["The Moth Mask has robbed me nine times. NINE! I've started leaving out snacks so she'll at least be polite.", 'Robbed nine times! Now I leave snacks.'],
@@ -140,10 +141,10 @@ people({
       { if: '!flag c_clock_on', fact: 'c_harbor=closed',
         say: [["AHOY! Finest harbor on the coast! Nothing's sailing, mind. The harbor chain won't lift without the Great Clock.", 'AHOY! No ships sail. The chain is stuck.'],
           ['Gave up smoking. Took up bubbling. Much nicer for the gulls.', 'I blow bubbles now. Gulls like it.']] },
-      { if: 'flag c_clock_on !stage>=c_spire', fact: 'c_lighthouse=dark',
+      { if: 'flag c_clock_on !stage>=c_spire', fact: 'c_lighthouse_lamp=dark',
         say: [['The chain is up! Ships can sail. By day. With the lighthouse dark, nobody sails at night. Barnacles.', 'Ships sail by day. The lighthouse is dark.'],
           ['Gave up smoking. Took up bubbling. Much nicer for the gulls.', 'I blow bubbles now. Gulls like it.']] },
-      { if: 'stage>=c_spire', fact: 'c_lighthouse=lit',
+      { if: 'stage>=c_spire', fact: 'c_lighthouse_lamp=lit',
         say: [["The lighthouse spins again! Ships in, ships out, all night long. Best harbor on the coast. Told you.", 'The lighthouse spins! Ships sail all night.'],
           ["Out past the Far Pier there's only sea, and past the sea, they say, the moon falls into the water. Sailors' stories. Probably.",
             'Far out, the moon falls in the sea. Probably.']] },
@@ -154,7 +155,7 @@ people({
     c_ingrid: [
       { if: 'flag a1_bram', once: true,
         say: ['A Warden\'s hammer! May I hold it? ...I may not hold it. I understand. I would not let me hold it either.', 'A Warden\'s hammer! Can I hold it? No? Fair.'] },
-      { if: 'quest c_whip done !flag m0_bramble_open', promise: 'm0_bramble', option: ['Any jobs for my whip?', 'Jobs for my whip?'],
+      { if: 'quest c_whip done !flag m0_bramble_open', promise: 'm0_bramble', ref: 'm0_bramble', option: ['Any jobs for my whip?', 'Jobs for my whip?'],
         say: ["Your mother writes there is a chain in a pond near your village. A rusty ring on the bank, the rest underwater. A whip could yank it. Ja!",
           'A chain lies in a pond up north. Yank it!'] },
       { if: 'quest c_whip done', once: true,
@@ -181,8 +182,6 @@ people({
     c_penny: [
       { if: 'flag c_regatta_won', once: true,
         say: ['HEADLINE: DRAGON WINS REGATTA ON FOOT. JO DEMANDS RECOUNT. THERE IS NOTHING TO RECOUNT.', 'HEADLINE: DRAGON WINS THE REGATTA!'] },
-      { if: 'flag c_clock_on !stage>=c_light',
-        say: ['HEADLINE: MOTH MASK HAS A FACE! I saw it from the market. It is a girl. A GIRL. The board is updated.', 'HEADLINE: THE MOTH MASK IS A GIRL!'] },
       { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
         say: ['HEADLINE: SNOW IN SUMMER. EXPERTS BAFFLED. EXPERT IS ME.', 'HEADLINE: SNOW IN SUMMER!'] },
       { say: [['Every good story has a mystery, a chase, and a really good quote. Say something quotable.', 'Say something good for my paper!'],
@@ -205,10 +204,10 @@ people({
     c_jo: [
       { if: 'flag c_regatta_won', once: true,
         say: ["I'm training. Next year I'm beating you. On FEET. I'm practicing skipping. I keep falling in.", 'Next year I beat you. I keep falling in.'] },
-      { if: '!stage>=c_spire', fact: 'c_lighthouse=dark',
+      { if: '!stage>=c_spire', fact: 'c_lighthouse_lamp=dark',
         say: [["When the lighthouse is dark, no boats go out at night. Not even me. Okay, once me. I hit a seal. He was fine.", 'No boats at night. Once I hit a seal.'],
           ["My skiff's called the Sea Biscuit. Not to be confused with the Soggy Biscuit. Totally different biscuit.", 'My boat is the Sea Biscuit.']] },
-      { if: 'stage>=c_spire', fact: 'c_lighthouse=lit',
+      { if: 'stage>=c_spire', fact: 'c_lighthouse_lamp=lit',
         say: [['Lighthouse is spinning! Night sailing! I only hit ONE seal last night. Progress.', 'Night sailing! I only hit one seal.'],
           ['Port is left. Starboard is right. Down is wet.', 'Port is left. Down is wet.']] },
       { bark: true, say: ['Race you to the pier! ...Oh, right. Feet.', 'Race you! Oh. Feet.'] },
@@ -221,9 +220,15 @@ people({
       { if: 'flag dr_c_twins', once: true, option: ['I had a dream about Pearl. In a basket.', 'I dreamed of Pearl in a basket.'],
         say: ["You dreamed about Pearl? In a basket? Oh, duck. That's our family story. How did you know about the curtains?",
           "You dreamed of Pearl? That's our story!"] },
-      { if: 'stage>=c_salt !clue q_lookout', promise: 'm0_lookout', option: ['Did Vesper ever go up north?', 'Did Vesper go north?'],
+      { if: 'stage>=c_salt !clue q_lookout', promise: 'm0_lookout', ref: 'm0_lookout', option: ['Did Vesper ever camp near Emberhollow?', 'Did Vesper camp near home?'],
         say: ['Once, before your Lantern Night. She camped by the old pass. She said there is a tall rock there where you can see a whole valley of lanterns.',
           'She sat on a tall rock by the old pass.'] },
+      { if: 'quest c_oona active !flag c_oona_nest !power claws',
+        say: ["That roof's too steep for feet, duck. You'd want claws. Pearl's sort.", 'You need claws for that roof.'] },
+      { if: 'quest c_oona active !flag c_oona_nest power claws',
+        say: ["The gull's still up there. Glaring. He glares at everyone. He glared at the vicar.", 'The gull is still up there. Glaring.'] },
+      { if: 'quest c_oona active flag c_oona_nest !flag c_oona_lit',
+        say: ["Breathe on it gently, duck. GENTLY. I'm fond of my eyebrows.", 'Breathe on the stove. Gently!'] },
       { if: 'quest c_oona done',
         say: [["Come in, duck. Shut the door. Not because of the cold. Because of the gulls.", 'Come in, duck. Mind the gulls.'],
           ["Fire isn't the only warm thing. But it's a nice one. Thank you, duck.", 'Thank you for my fire, duck.']] },
@@ -250,6 +255,7 @@ people({
     c_charlie: [
       { if: 'quest c_whip done', once: true,
         say: ['A ghost ate my chowder and said it was worth forty years. Best review I ever had.', 'A ghost loved my chowder!'] },
+      { if: 'quest c_whip active !flag c_saltbeard_won item c_chowder', say: ["Don't you dare taste it.", "Don't taste it!"] },
       { say: [["Chowder! It's soup that's been hugged.", 'Chowder is hugged soup.'],
         ['A cook up in your valley puts ROCKS in soup? Rocks? Ridiculous. Shells, now. Shells are flavor.', 'Rocks in soup? Silly! Shells are better.'],
         ["Eat. You're all horns and no lunch.", 'Eat! All horns and no lunch.']] },
@@ -279,7 +285,7 @@ people({
     c_tarbuckle: [
       { if: 'quest c_whip done', once: true,
         say: ["The Rockpools are quiet at night now. No clanking. I miss it, a bit. Don't tell him.", 'No more clanking. I miss it a bit.'] },
-      { say: [['In my day the sea was twice as wet. You could drown in a puddle.', 'In my day the sea was twice as wet!'],
+      { ref: 'c_gullcrag_door', say: [['In my day the sea was twice as wet. You could drown in a puddle.', 'In my day the sea was twice as wet!'],
         ["You remind me of Pearl's statue in the old cave. Same horns. Better posture.", "You look like Pearl's statue."]] },
       { if: '!quest c_whip done', bark: true,
         say: ['At low tide, on dark nights, you can hear a chain on the Rockpools. Clank. Clank. Hungry, I\'d say.', 'At night a chain clanks. Clank.'] },
@@ -302,10 +308,10 @@ people({
     c_agatha: [
       { if: 'choice fennick=forgive', once: true,
         say: ['I hear you gave a lamp-man a second chance. Good. Lamps deserve second chances. So do people.', 'You gave a lamp-man a chance. Good.'] },
-      { if: '!stage>=c_spire', fact: 'c_lighthouse=dark',
+      { if: '!stage>=c_spire', fact: 'c_lighthouse_lamp=dark',
         say: [["Forty years I've kept that light. Never missed a night. Until the moths.", 'Forty years. Then the moths came.'],
           ["Squawk, stop telling people I'm old. I'm vintage.", 'Squawk, I am not old. I am vintage.']] },
-      { if: 'stage>=c_spire', fact: 'c_lighthouse=lit',
+      { if: 'stage>=c_spire', fact: 'c_lighthouse_lamp=lit',
         say: [['She spins. She shines. Squawk sleeps on the lamp rail like a fat green cushion. All is right.', 'The light spins. All is right.'],
           ['A lighthouse is just a lantern that refuses to go to bed.', "A lantern that won't go to bed."]] },
       { bark: true, say: ["Squawk. Stop it. Squawk. ...He's doing my voice again.", "Squawk. Stop it. He's copying me."] },
@@ -314,7 +320,7 @@ people({
     c_barley: [
       { if: 'quest c_chalk done', once: true,
         say: ['She is white again, the Chalk Dragon. I sit here and look at her every evening. So does Gerald, when he is awake.', 'The Chalk Dragon is white again.'] },
-      { if: 'quest duchess done', once: true,
+      { if: 'quest duchess done', once: true, ref: 'farm',
         say: ['You found a goat called Duchess, up north? I have a Duchess too. Duchess the Second. She says hello. Well. She chews.',
           'You found Duchess? I have Duchess the Second!'] },
       { if: 'stage>=c_claws !flag m0_duchess_open', promise: 'm0_duchess', dir: ['village', 'm0_duchess', 'east'], option: ['Tell me about Duchess the Second', 'Tell me about Duchess'],

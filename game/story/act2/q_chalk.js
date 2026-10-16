@@ -17,7 +17,7 @@ quest({
   },
 
   clue: {
-    q_chalk_pearl: { icon: 'dragon', mystery: 'moth_mask',
+    q_chalk_pearl: { icon: 'star', mystery: 'moth_mask',
       text: ["Inside the Chalk Dragon's eye, Pearl carved: FOR MOTHER. I CAN'T FLY OR BREATHE FIRE, SO I DREW YOU A DRAGON. P.",
         'Pearl had no fire. She drew her mom a dragon.'] },
   },

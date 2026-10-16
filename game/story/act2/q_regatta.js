@@ -15,7 +15,7 @@ quest({
       then: ['set c_regatta_won'],
       obj: ["Beat Skipper Jo round the harbor's eight buoys (talk to Jo to start)", 'Race Jo round 8 buoys. Talk to Jo.'],
       hint: ['Hold sprint to skip across the water. The harbor mouth rip only lets a skip through.', 'Sprint to skip on water!'] },
-    { id: 'whistle', do: 'talk c_jo', scene: 'rg_won', then: ['set c_skiffs', 'give coins 50', 'xp 500'],
+    { id: 'whistle', do: 'talk c_jo', scene: 'rg_won', then: ['world c_skiffs open', 'give coins 50', 'xp 500'],
       obj: ['Talk to Skipper Jo', 'Talk to Skipper Jo'] },
   ],
 

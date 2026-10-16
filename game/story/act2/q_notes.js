@@ -14,7 +14,7 @@ quest({
   old_steps: ['drops', 'ring'],
 
   clue: {
-    q_moonring: { icon: 'stones', mystery: 'what_stopped',
+    q_moonring: { icon: 'dust', mystery: 'what_stopped',
       text: ['The Moon Ring in the Moth Wood: the grass inside is flattened flat, as if something huge sat there. Silver dust everywhere.',
         'Something huge sat in the Moon Ring. Silver dust!'] },
   },

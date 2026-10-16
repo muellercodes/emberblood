@@ -13,6 +13,7 @@ places({
 
   place: {
     wh_isle_out: { kind: 'gate', gate: 'whip_hook', map: 1, at: [4040, 28885], r: 220, leads: 'c_ch_gullisle',
+      payoff: { kind: 'shortcut', id: 'wh_isle_out' },
       name: ['an old hook post in the shallows', 'a hook post'],
       locked: ['An old iron hook on a post, out where the shallows end. Something long could catch it.', 'A hook post. A whip could catch it.'],
       build: { hook: { x: 4040, y: 28885, to: [4040, 29500] } } },

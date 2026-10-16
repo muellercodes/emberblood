@@ -6,7 +6,7 @@ legacy({ id: 'farm', map: 0, at: [3300, 5180], r: 260, kind: 'place', name: ['Ho
 legacy({ id: 'a1_camp', map: 0, at: [3390, 10700], r: 60, kind: 'examine', name: ["the stranger's old camp", 'the old camp'],
   aliases: ["Vesper's old camp"], src: 'LANDMARKS:a1_camp' });
 legacy({ id: 'a1_rockfall', map: 0, at: [3446, 10842], r: 60, kind: 'prop', name: ['the old Southern Pass rockfall', 'the rockfall'],
-  src: 'x0_act1.js A1W.rockfall' });
+  src: 'x0_act1.js A1W' });
 legacy({ id: 'a1_passsign', map: 0, at: [3290, 10806], r: 20, kind: 'sign', name: ['the Southern Pass sign', 'the pass sign'], src: 'LANDMARKS:a1_passsign' });
 legacy({ id: 'a1_nursery', map: 0, at: [3500, 4420], r: 60, kind: 'door', name: ["Ember's Nursery", "Ember's Nursery"], src: 'DOORS:a1_nursery' });
 legacy({ id: 'a1_vault', map: 0, at: [6770, 7404], r: 40, kind: 'examine', name: ["the Wardens' vault under the bridge", 'the vault'], src: 'LANDMARKS:a1_vault' });

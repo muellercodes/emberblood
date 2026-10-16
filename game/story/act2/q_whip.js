@@ -23,7 +23,7 @@ quest({
   },
 
   clue: {
-    q_ghost_saw: { icon: 'ghost', mystery: 'what_stopped',
+    q_ghost_saw: { icon: 'moth', mystery: 'what_stopped',
       text: ["Captain Saltbeard's ghost: three nights ago something flew over the Rockpools, wings like a sky full of curtains. Even he hid.",
         'Three nights ago a giant winged thing flew over.'] },
   },
@@ -67,7 +67,7 @@ quest({
       ['c_charlie', "Ghost Pepper Chowder? Nobody's been brave enough to make that in forty years.", 'Nobody has made that in forty years!'],
       ['c_charlie', 'I need three sea peppers. Little red ones. They grow in the Rockpools, and the crabs will NOT share.',
         'Bring me 3 sea peppers from the Rockpools.'],
-      { if: '!power claws', then: [['c_charlie', "One grows on a cliff ledge. You'd want claws for that one.", 'One is on a cliff. You need claws.']] },
+      { if: '!power claws', then: [['c_charlie', "One grows on a cliff ledge. You'd want claws for that one.", 'One is on a cliff. You need claws.', { ref: 'c_lm_pep3' }]] },
     ],
     wp_brew: [
       ['c_charlie', 'Three sea peppers. Stand back. Further. FURTHER.', 'Three peppers! Stand back!'],
@@ -117,9 +117,6 @@ quest({
       { if: 'quest c_whip active item c_chowder !night', option: ['Can I wait here until dark?', 'Can I wait for dark?'],
         then: ['time night'],
         say: ["Sit, sit. I'll tell you about the time I wrestled an octopus. It took all day. So will this.", "Sit. I'll tell you about an octopus."] },
-    ],
-    c_charlie: [
-      { if: 'quest c_whip active !flag c_saltbeard_won item c_chowder', say: ["Don't you dare taste it.", "Don't taste it!"] },
     ],
   },
 })

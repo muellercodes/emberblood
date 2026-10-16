@@ -27,10 +27,10 @@ quest({
   },
 
   clue: {
-    q_dishwasher: { icon: 'cup', mystery: 'moth_mask',
+    q_dishwasher: { icon: 'moth', mystery: 'moth_mask',
       text: ['Auntie Fig: a girl who washed dishes at the Teapot hummed the Moth Waltz every day, and walked home to Saltmarsh at night.',
         'A dishwasher girl hummed the waltz. She lived in Saltmarsh.'] },
-    q_box_initials: { icon: 'box', mystery: 'moth_mask',
+    q_box_initials: { icon: 'letter', mystery: 'moth_mask',
       text: ["Inside the lid of the stolen music box, someone scratched two tiny letters: V.S.", 'Inside the music box lid: V.S.'] },
   },
 
@@ -86,9 +86,9 @@ quest({
       ['c_posy', "This is my music box. It plays the moth song. You can listen but you can't hold it.", "My box plays the moth song. Don't touch."],
       ['narr', 'Inside the lid, someone has scratched two tiny letters: V.S.', 'Inside the lid: two letters. V.S.', { clue: 'q_box_initials' }],
       { choose: 'c_gifts', ask: ['What do you do?'], pick: [
-        { t: ['Ask Posy to give it back', 'Ask for the box'], then: ['set c_gifts=taken', 'give c_musicbox'],
+        { t: ['Ask Posy to give it back', 'Ask for the box'], v: 'taken', then: ['set c_gifts=taken', 'give c_musicbox'],
           say: [['c_posy', "...Okay. If it's really his."], ['narr', 'Her lip wobbles. Dory says nothing at all, which is worse.', 'Her lip wobbles.']] },
-        { t: ["Let her keep it. I'll talk to Lord Whirligig.", 'Let her keep it.'], tone: 'kind', then: ['set c_gifts=kept'],
+        { t: ["Let her keep it. I'll talk to Lord Whirligig.", 'Let her keep it.'], tone: 'kind', v: 'kept', then: ['set c_gifts=kept'],
           say: [['c_posy', "You're a GOOD dragon."]] },
       ] },
     ],
@@ -99,11 +99,11 @@ quest({
       { if: 'flag c_gifts=kept', then: [
         ['c_whirligig', 'Well, dragon? Where is my music box?', 'Well? Where is my box?'],
         { choose: 'c_gifts_tell', ask: ['What do you tell Lord Whirligig?', 'What do you tell him?'], pick: [
-          { t: ['The truth: a little girl needs it to sleep', 'A girl needs it to sleep'], tone: 'kind',
+          { t: ['The truth: a little girl needs it to sleep', 'A girl needs it to sleep'], tone: 'kind', v: 'truth',
             then: ['set c_gifts=truth', 'trust vesper +1'],
             say: [['c_whirligig', 'A child? Who cannot sleep? ...Hmph. I have ELEVEN music boxes. Let her keep it.', 'A child? Hmph. She can keep it.'],
               ['c_whirligig', 'Does she like clocks? I have rather a lot of clocks.', 'Does she like clocks? I have lots.']] },
-          { t: ['Pay him for it (100 coins)', 'Pay him (100 coins)'], tone: 'kind', if: 'item coins>=100',
+          { t: ['Pay him for it (100 coins)', 'Pay him (100 coins)'], tone: 'kind', v: 'bought', need: 'item coins>=100',
             locked: ['You need 100 coins.', 'You need 100 coins.'],
             then: ['set c_gifts=bought', 'take coins 100', 'give coins 50', 'trust vesper +1'],
             say: [['c_whirligig', "You'll BUY it? For a fishing girl? Keep your coins. No, give them. No. Oh, I don't know!", "You'll buy it? Keep... no... oh!"],

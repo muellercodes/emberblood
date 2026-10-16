@@ -3,8 +3,10 @@
 // shield and, while he is dizzy, blows the dust out with one gentle breath (he is never broken: he just sits down).
 // Surprise: the clever Bob remembers the night the dust fell like snow. Payoff: allies, all three Bobs hold the
 // breakwater on the causeway night and the Spire's Drowned Door (A2b reads quest c_bob done), and a Clockwatch badge.
-// Old saves: QDEFS.c_bob steps 0..2 map to find, calm, home. Finding and calming him stay x1_people's (legacy), and
-// so does his walk home behind Ash (it follows while the old step index is 2, so home is legacy too).
+// (`ally c_bob3` is for the checker: there is no c_bob3 companion, so recruitComp does nothing; the Bobs' help at
+// the Spire comes from A2b reading `quest c_bob done`.) Old saves: QDEFS.c_bob steps 0..2 map to find, calm, home.
+// Finding and calming him stay x1_people's (legacy), and so does his walk home behind Ash (it follows while the old
+// step index is 2, so home is legacy too). The Bobs' registry entry is ENG's (map1_gear.js).
 quest({
   id: 'c_bob', act: 2, giver: 'c_bobs', optional: true, takeover: true,
   title: ['The Third Bob', 'The Third Bob'],
@@ -28,7 +30,7 @@ quest({
       hint: ['Break his shield (a hammer, the Chain Whip or the Reel-In). While he is dizzy, breathe on him gently for about a second.',
         'Break his shield. Breathe gently while he is dizzy.'] },
     { id: 'home', do: 'talk c_bobs', legacy: true, scene: 'bb_home',
-      then: ['give c_badge', 'hat c_badge', 'give coins 40', 'xp 500'],
+      then: ['give c_badge', 'hat c_badge', 'give coins 40', 'xp 500', 'ally c_bob3'],
       obj: ['Bring Bob home to the Clockwork Lift', 'Bring Bob home to the Lift'] },
   ],
 

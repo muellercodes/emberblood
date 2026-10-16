@@ -19,10 +19,10 @@ quest({
   },
 
   clue: {
-    q_oona_lady: { icon: 'flame', mystery: 'moth_mask',
+    q_oona_lady: { icon: 'fire', mystery: 'moth_mask',
       text: ['Granny Oona says Vesper dreams of a Lady who promised to bring the fire home for Gran.',
         'A Lady in her dreams promised Gran fire.'] },
-    q_oona_horns: { icon: 'horns', mystery: 'moth_mask',
+    q_oona_horns: { icon: 'heart', mystery: 'moth_mask',
       text: ['Granny Oona has two tiny horns under her headscarf. The Saltwhistles are Emberbloods, she says. They just never got the fire.',
         'Gran has tiny horns. No fire, though.'] },
   },
@@ -100,12 +100,6 @@ quest({
     c_oona: [
       { if: 'stage>=c_salt !quest c_oona active !quest c_oona done', option: ['Can I help you get warm?', 'Can I help?'],
         scene: 'c_oona_offer' },
-      { if: 'quest c_oona active !flag c_oona_nest !power claws',
-        say: ["That roof's too steep for feet, duck. You'd want claws. Pearl's sort.", 'You need claws for that roof.'] },
-      { if: 'quest c_oona active !flag c_oona_nest power claws',
-        say: ["The gull's still up there. Glaring. He glares at everyone. He glared at the vicar.", 'The gull is still up there. Glaring.'] },
-      { if: 'quest c_oona active flag c_oona_nest !flag c_oona_lit',
-        say: ["Breathe on it gently, duck. GENTLY. I'm fond of my eyebrows.", 'Breathe on the stove. Gently!'] },
     ],
   },
 })
