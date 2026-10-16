@@ -74,7 +74,7 @@ function gateBuild(place){
   const g={id:place.id,kind,K,D,place,map,x,y,face,leads:place.leads||null,
     r:clamp(place.r!=null?+place.r:(D.r||110),D.rmin||60,D.rmax||300),
     wall:place.wall!==false,style:place.style||GT_STYLE[map]||'rock',parts:[],pieces:[],used:false};
-  try{ D.build(g); }catch(e){ console.error('[gates] build '+g.id,e); return null; }
+  try{ if(place.build) gtBuildCustom(g); else D.build(g); }catch(e){ console.error('[gates] build '+g.id,e); return null; }
   GT.list.push(g); GT.by[g.id]=g;
   gtDirtyArea(g.x,g.y,g.r+260);
   if(G) gtSync(g);
@@ -84,7 +84,11 @@ function gateBuild(place){
 function gateInfo(id){ const g=GT.by[id]; if(!g) return null; const d=g.door||{x:g.x,y:g.y};
   return {id:g.id,kind:g.kind,power:g.K.power,label:g.K.label,map:g.map,x:g.x,y:g.y,r:g.r,face:g.face,leads:g.leads,
     door:{x:Math.round(d.x),y:Math.round(d.y)},inside:g.inside?{x:g.inside.x,y:g.inside.y,r:g.inside.r}:null,open:gateIsOpen(id),state:gtSt(id)}; }
-function gateInside(id,x,y){ const g=GT.by[id]; return !!(g&&g.D.isIn&&g.D.isIn(g,x,y)); }
+function gateInside(id,x,y){ const g=GT.by[id]; return !!(g&&gtIsIn(g,x,y)); }
+function gtIsIn(g,x,y){ return g.custom?gtCustomIn(g,x,y):!!(g.D.isIn&&g.D.isIn(g,x,y)); }
+// the engine's `open gate` / `close gate` (it emits gate_open itself)
+function gateSet(id,open){ return open?gtOpenQuiet(id):gateClose(id); }
+function gtOpenQuiet(id){ const g=GT.by[id]; if(!g||!G) return false; G.flags['gate_'+id]=2; gtSync(g); return true; }
 function gateIsOpen(id){ return gtSt(id)>0; }
 // open for everyone (the story's `open gate` effect): the door goes, or a plain way in appears (stairs, a ladder,
 // planks, a gap in the fence)
@@ -112,7 +116,7 @@ function gtEmit(g){
   try{ if(typeof questPoke==='function') questPoke(); }catch(e){}
 }
 // make the world match the saved state (after a load, a new game, gateOpen and gateClose)
-function gtSync(g){ const st=gtSt(g.id); try{ if(g.D.sync) g.D.sync(g,st); }catch(e){ console.error('[gates] sync '+g.id,e); } g.st=st; }
+function gtSync(g){ const st=gtSt(g.id); try{ if(g.D.sync) g.D.sync(g,st); if(g.custom&&g.D.sync!==gtPlainSync) gtRampSync(g,st); }catch(e){ console.error('[gates] sync '+g.id,e); } g.st=st; }
 function gtSyncAll(){ for(const g of GT.list) gtSync(g); }
 // chunks (ground art) and props near a new or changed gate are made again
 function gtDirtyArea(x,y,r){
@@ -148,6 +152,58 @@ function gtFlyWall(g,e,x,y,rx,ry){ g.flyZ={e,x,y,rx,ry}; GT.fly.push(g); }
 // wrap an existing collider's `off` so it is also off while the gate is open
 function gtColWrap(g,c,soft){ if(!c) return; if(!soft) c.deep=true; const d=Object.getOwnPropertyDescriptor(c,'off'), get=d&&d.get; if(get) Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||get.call(c); },configurable:true}); else { let v=!!c.off; Object.defineProperty(c,'off',{get(){ return gtSt(g.id)>=2||v; },set(x){ v=!!x; },configurable:true}); } }
 
+// ---------- 1b. a gate with its own geometry: place.build = { plateau, post, ledge, nofly, bars, curtain, ring, plate,
+// hook, ramp } (A2S, CHANGES.md). The pieces are made first; the kind adds its own piece at `at` when build does not
+// hold it (an ice wall, a boulder, a vent...). `ramp` appears only while the gate is open for everyone (and after a
+// reload). `at` is the gate piece itself here; the inside is place.inside:[x,y,r], else the leads' spot, else the
+// plateau's top, else the far side of the door.
+const gtArr=v=>v==null?[]:Array.isArray(v)&&(Array.isArray(v[0])||typeof v[0]==='object')?v:[v];
+const gtS=v=>Array.isArray(v)?S(v[0],v[1]||v[0]):typeof v==='string'?S(v,v):v;
+const gtPt=q=>Array.isArray(q)?{x:+q[0],y:+q[1],lvl:q[2]}:{x:+q.x,y:+q.y,lvl:q.lvl};
+const GT_SHADOW={shadow_curtain:1,thin_bars:1};
+function gtBuildCustom(g){
+  const B=g.place.build, k=g.map, kind=g.kind, mk=(d)=>{ const o=Object.assign({},d); delete o.why; return o; };
+  g.custom=true; g.wall=false; g.rx=g.ry=g.r; g.door={x:g.x,y:g.y}; let own=false;
+  if(B.plateau){ const d=Object.assign({k,style:g.style,noise:8},B.plateau); g.plat=ELEV.plateau(d); g.lvl=g.plat?g.plat.lvl:0;
+    if(g.plat){ const bb=g.plat.bb, H=g.lvl*ELEV.px; ELEV.clear({k,rect:[bb[0]-30,bb[1]-20,bb[2]+30,bb[3]+H+50]});
+      if(g.lvl<2&&kind!=='vent'&&kind!=='wind_ribbon') gtFlyWall(g,false,(bb[0]+bb[2])/2,(bb[1]+bb[3]+H)/2,(bb[2]-bb[0])/2+20,(bb[3]-bb[1]+H)/2+26); }
+    if(kind==='climb_wall'||kind==='step_face') own=true; }
+  for(const q of gtArr(B.post)){ const P=gtPt(q); g.post=ELEV.grapple({k,x:P.x,y:P.y,lvl:P.lvl}); if(kind==='grapple_post') own=true; }
+  for(const q of gtArr(B.ledge)) ELEV.ledge(Object.assign({k},q));
+  for(const q of gtArr(B.nofly)) ELEV.noFly(Object.assign({k},mk(q),{why:gtS(q.why)||S('The winds are too strong to fly here.','Too windy to fly here.')}));
+  const door=B.bars||B.curtain;
+  if(door){ const R={x:+door.x,y:+door.y,w:+(door.w||96),h:+(door.h||16)};
+    if(GT_SHADOW[kind]){ const cur=kind==='shadow_curtain'||!!B.curtain, o=p2Add(cur?'mothcurtain':'thinbars',{id:'gate_'+g.id+'_d',x:R.x,y:R.y,w:R.w,h:R.h,style:door.style||'iron'});
+      gtColWrap(g,o.col); g.doorObj=o; gtZone(g,R,cur?()=>P2.pass>0||p2CurtainOpen(o):()=>P2.pass>0); }
+    else { const o={id:'gate_'+g.id+'_bars',x:R.x,y:R.y,w:R.w,h:R.h,horiz:R.w>=R.h,lift:0,gate:g.id}; o.col=gtCol(g,{t:'r',x0:R.x-R.w/2,y0:R.y-R.h/2,x1:R.x+R.w/2,y1:R.y+R.h/2}); g.bars=o; gtZone(g,R); }
+    g.doorR=R; g.door={x:R.x,y:R.y}; if(GT_SHADOW[kind]) own=true; }
+  if(B.ring){ const P=gtPt(B.ring), o={id:'gate_'+g.id+'_ring',x:P.x,y:P.y,h:26,need:1,done:false,strain:0,mode:'lever',flip:-1,gate:g.id,r:12}; o.k='e10ring'; o.arms=true;
+    LANDMARKS.push(o); ARMS.lm.push(o); g.ring=o; addCol({t:'c',x:o.x,y:o.y,r:10,deep:true}); g.door={x:o.x,y:o.y}; if(kind==='chain_ring') own=true; }
+  if(B.plate){ const P=gtPt(B.plate), o=p3Add('rplate',{id:'gate_'+g.id+'_plate',x:P.x,y:P.y,r:26,then:()=>gtGot(g,2)});
+    o.p3k=Object.assign(Object.create(P3K.rplate),{bomb(q){ if(!q.done) p3Say(q.x,q.y-40,S('It shakes, but it wants a real stomp.','It needs a big stomp!'),'#ffe6b0','gplate'); }}); g.plate=o; if(kind==='pound_plate') own=true; }
+  g.hooks=[]; for(const q of gtArr(B.hook)){ const P=gtPt(q), to=q.to?gtPt(q.to):null; const o=armsAdd('whiphook',{id:'gate_'+g.id+'_h'+g.hooks.length,x:P.x,y:P.y,to:to?{x:to.x,y:to.y}:undefined}); o.gate=g.id; g.hooks.push(o); if(kind==='whip_hook') own=true; }
+  if(B.ramp) g.openRampDef=Object.assign({k,kind:'stairs'},B.ramp);
+  if(!own) g.D.build(g);   // the kind's own piece at `at` (wall:false)
+  if(g.place.inside){ const q=g.place.inside; g.inside={x:+q[0],y:+q[1],r:+(q[2]||70)}; }
+  else if(g.plat&&!GT_SHADOW[kind]&&!g.doorR){ const bb=g.plat.bb; g.inside={x:Math.round((bb[0]+bb[2])/2),y:Math.round((bb[1]+bb[3])/2),r:Math.round(Math.min(bb[2]-bb[0],bb[3]-bb[1])/2)}; }
+}
+// where the leads' payoff is (the engine's runtime API), for "Ash got in" when nothing else says
+function gtLeadsAt(g){
+  if(g._lead!==undefined) return g._lead; g._lead=null;
+  try{ const E=window.__eb&&window.__eb.story; const e=E&&E.entity&&g.leads?E.entity(g.leads):null; if(e&&e.x!=null&&e.y!=null&&(e.map==null||+e.map===g.map)) g._lead={x:e.x,y:e.y}; }catch(e){}
+  return g._lead;
+}
+function gtCustomIn(g,x,y){
+  if(g.inside) return dist(x,y,g.inside.x,g.inside.y)<g.inside.r;
+  const P=g.plat;
+  if(P&&!g.doorR&&!GT_SHADOW[g.kind]) return elvRingsIn(P.rings,x,y)&&elevLvl(x,y)>=P.lvl&&!(elevFace(x,y)&EF.FACE);
+  const L=gtLeadsAt(g); if(L&&dist(x,y,L.x,L.y)<70) return true;
+  const R=g.doorR; if(R){ const u=GT_FACE[g.face], horiz=R.w>=R.h, inw=horiz?-u[1]:-u[0];   // the inward side is away from `face`
+    if(horiz) return Math.abs(x-R.x)<R.w/2+30&&(y-R.y)*Math.sign(inw||-1)>R.h/2+20&&Math.abs(y-R.y)<R.h/2+420;
+    return Math.abs(y-R.y)<R.h/2+30&&(x-R.x)*Math.sign(inw||-1)>R.w/2+20&&Math.abs(x-R.x)<R.w/2+420; }
+  return false;
+}
+
 // ---------- 2. shapes: the mesa, the moat, the pen
 // the side the way in faces: lip (on top, near the edge), foot (on the ground below the face), out (unit away),
 // along (unit along the edge), depth (px of face on that side)
@@ -158,16 +214,25 @@ function gtSide(g,lvl){
   if(f==='w'){ const d=Math.min(18,H*0.3)+6; return {lip:[x-rx+18,y],foot:[x-rx-d-18,y],out:[-1,0],along:[0,1],depth:d,edge:[x-rx,y]}; }
   return {lip:[x,y+ry-20],foot:[x,y+ry+H+16],out:[0,1],along:[1,0],depth:H,edge:[x,y+ry]};
 }
-// a raised rock, level lvl, round (an ellipse r by 0.78 r): its top is the nook
+// the highest existing plateau under the nook and its way in (from the plateau list, so no grid is built at load)
+function gtBaseLvl(g){
+  const E=ELV.maps[g.map]; if(!E||!E.plats.length) return 0; let b=0; const r=g.r, u=GT_FACE[g.face];
+  const pts=[[g.x,g.y],[g.x+u[0]*(r+80),g.y+u[1]*(r+110)],[g.x-r*0.8,g.y],[g.x+r*0.8,g.y],[g.x,g.y-r*0.7]];
+  for(const P of E.plats){ if(P.lvl<=b||String(P.id).startsWith('gate_')) continue; for(const q of pts) if(q[0]>=P.bb[0]&&q[0]<=P.bb[2]&&q[1]>=P.bb[1]&&q[1]<=P.bb[3]&&elvRingsIn(P.rings,q[0],q[1])){ b=P.lvl; break; } }
+  return b;
+}
+// a raised rock, level lvl above the ground there, round (an ellipse r by 0.78 r): its top is the nook
 function gtMesa(g,o){
-  const lvl=o.lvl, k=g.map; g.rx=g.r; g.ry=Math.round(g.r*0.78); g.lvl=lvl;
+  const k=g.map; g.rx=g.r; g.ry=Math.round(g.r*0.78);
+  // levels are relative to the ground the nook stands on (a gate on a level 2 terrace makes a level 3 or 4 rock)
+  const base=gtBaseLvl(g), lvl=Math.min(8,base+o.lvl); g.base=base; g.dl=lvl-base; g.lvl=lvl; o={...o,dl:g.dl};
   const P=ELEV.plateau({k,disc:[g.x,g.y,g.rx,g.ry],lvl,style:g.style,climb:!!o.climb,step:!!o.step,noise:o.noise!=null?o.noise:8,id:'gate_'+g.id,seed:(gtHash(g.id)%997)+11});
-  g.plat=P; g.side=gtSide(g,lvl);
-  ELEV.clear({k,disc:[g.x,g.y+lvl*ELEV.px*0.4,g.rx+70,g.ry+lvl*ELEV.px+90]});
+  g.plat=P; g.side=gtSide(g,g.dl); const dl=g.dl;
+  ELEV.clear({k,disc:[g.x,g.y+dl*ELEV.px*0.4,g.rx+70,g.ry+dl*ELEV.px+90]});
   // and an apron in front of the way in, so no tree or rock stands where Ash needs to aim, throw or pull
   const f=g.side.foot, u=g.side.out; ELEV.clear({k,disc:[f[0]+u[0]*90,f[1]+u[1]*90,Math.abs(u[1])?230:180,Math.abs(u[1])?180:230]});
-  if(o.nofly){ g.nofly=ELEV.noFly({k,disc:[g.x,g.y+lvl*ELEV.px*0.5,g.rx+150,g.ry+lvl*ELEV.px+150],why:S('The air over these rocks is too still for wings.','No wind here. You cannot fly.')});
-    gtFlyWall(g,true,g.x,g.y+lvl*ELEV.px*0.5,g.rx+22,g.ry+lvl*ELEV.px*0.5+30); }
+  if(o.nofly||dl<2){ g.nofly=ELEV.noFly({k,disc:[g.x,g.y+dl*ELEV.px*0.5,g.rx+150,g.ry+dl*ELEV.px+150],why:S('The air over these rocks is too still for wings.','No wind here. You cannot fly.')});
+    gtFlyWall(g,true,g.x,g.y+dl*ELEV.px*0.5,g.rx+22,g.ry+dl*ELEV.px*0.5+30); }
   g.inside={x:g.x,y:g.y,r:Math.round(g.r*0.6)};
   g.door={x:g.side.foot[0],y:g.side.foot[1]};
   return P;
@@ -186,7 +251,7 @@ function gtRamp(g,kind,extra){ const R=gtRampRect(g,kind==='ladder'?40:60); retu
 function gtUnramp(g,r){ if(!r) return; const E=ELV.maps[g.map]; if(!E) return; const i=E.ramps.indexOf(r); if(i>=0){ E.ramps.splice(i,1); elvDirty(E); } }
 // a one-way drop off the way-in side, beside the way in (the quick way back down)
 function gtLedge(g){
-  const lvl=g.lvl, H=lvl*ELEV.px;
+  const H=(g.dl||g.lvl)*ELEV.px;
   if(g.face==='s'||g.face==='n'){ const dx=g.rx*0.56, ey=g.y+g.ry*Math.sqrt(1-0.56*0.56); g.ledgeAt=[g.x+dx,ey+H*0.5];
     return ELEV.ledge({k:g.map,x0:g.x+dx-26,y0:ey-16,x1:g.x+dx+26,y1:ey+H+16}); }
   const dy=g.ry*0.5, ex=g.rx*Math.sqrt(1-0.25), sx=g.face==='e'?1:-1; g.ledgeAt=[g.x+sx*ex,g.y+dy+H*0.5];
@@ -252,9 +317,12 @@ const gtOnIsland=(g,x,y)=>dist(x,y,g.x,g.y)<g.r-6;
 // ---------- 3. the kinds (GTK[kind]: build(g), sync(g,st), isIn(g,x,y), nudge(g,p) -> text when Ash lacks the power)
 const GTK={};
 const gtPlainSync=(g,st)=>{ // mesa kinds whose open state adds a plain way up (stairs, or a ladder for the claws)
+  if(g.custom) return gtRampSync(g,st);
   if(st>=2&&!g.openRamp) g.openRamp=gtRamp(g,g.kind==='climb_wall'?'ladder':'stairs');
   else if(st<2&&g.openRamp){ gtUnramp(g,g.openRamp); g.openRamp=null; } };
 const gtMesaIn=(g,x,y)=>gtOnMesa(g,x,y);
+// a custom gate's build.ramp: only while open for everyone (and after a reload)
+function gtRampSync(g,st){ if(!g.openRampDef) return; if(st>=2&&!g.openRamp) g.openRamp=ELEV.ramp(Object.assign({},g.openRampDef)); else if(st<2&&g.openRamp){ gtUnramp(g,g.openRamp); g.openRamp=null; } }
 GTK.climb_wall={r:110,
   build(g){ if(!g.wall){ gtWarn('wall:'+g.id,g.id+': climb_wall needs its own rock (wall:false is ignored)'); g.wall=true; }
     gtMesa(g,{lvl:clamp(g.place.lvl||2,1,4),climb:true,nofly:(g.place.lvl||2)<2}); },
@@ -281,14 +349,17 @@ GTK.step_face={r:100,
   nudge:g=>S('Just too high to jump. A second jump in the air would do it.','Too high! Jump twice.')};
 GTK.wind_ribbon={r:110,
   build(g){
+    if(!g.wall){ const to=g.place.to?gtPt(g.place.to):{x:g.x,y:g.y-300}; g.stream=WIND.stream({id:'gate_'+g.id,gate:g.id,map:g.map,pts:g.place.pts||[[g.x,g.y],[to.x,to.y]],lv:g.place.lv||[0,g.place.lvl!=null?g.place.lvl:2],w:56}); g.door={x:g.x,y:g.y}; return; }
     gtMesa(g,{lvl:2}); g.ledge=gtLedge(g);
     const f=g.side.foot, u=g.side.out, a=g.side.along;
-    g.stream=WIND.stream({id:'gate_'+g.id,gate:g.id,map:g.map,pts:[[f[0]+u[0]*190+a[0]*70,f[1]+u[1]*190+a[1]*70],[f[0]+u[0]*60,f[1]+u[1]*60],[g.x+a[0]*g.rx*0.15,g.y+a[1]*g.ry*0.15]],lv:[0,2],w:56});
+    g.stream=WIND.stream({id:'gate_'+g.id,gate:g.id,map:g.map,pts:[[f[0]+u[0]*190+a[0]*70,f[1]+u[1]*190+a[1]*70],[f[0]+u[0]*60,f[1]+u[1]*60],[g.x+a[0]*g.rx*0.15,g.y+a[1]*g.ry*0.15]],lv:[g.base,g.lvl],w:56});
     g.door={x:g.stream.pts[0][0],y:g.stream.pts[0][1]}; },
   sync:gtPlainSync, isIn:gtMesaIn,
   nudge:g=>S('A ribbon of wind curls up to the top. Jump into the swirl... if you can ride the wind.','Wind goes up. You need to ride it.')};
 GTK.dive_spot={r:120,
   build(g){
+    if(!g.wall){ const to=g.place.to?gtPt(g.place.to):null; if(!to){ gtWarn('to:'+g.id,g.id+': a dive_spot with wall:false needs to:[x,y] (where it comes up)'); return; } const ida='gate_'+g.id+'_pa', idb='gate_'+g.id+'_pb';
+      g.poolA=p4Add('pool',{id:ida,kind:'water',x:g.x,y:g.y,r:40,link:idb}); g.poolB=p4Add('pool',{id:idb,kind:'water',x:to.x,y:to.y,r:40,link:ida}); g.door={x:g.x,y:g.y}; g.inside={x:to.x,y:to.y,r:70}; return; }
     gtMesa(g,{lvl:1,nofly:true}); g.ledge=gtLedge(g);
     const f=g.side.foot, u=g.side.out, a=g.side.along, ida='gate_'+g.id+'_pa', idb='gate_'+g.id+'_pb';
     g.poolA=p4Add('pool',{id:ida,kind:'water',x:f[0]+u[0]*46-a[0]*40,y:f[1]+u[1]*46-a[1]*40,r:40,link:idb});
@@ -298,6 +369,7 @@ GTK.dive_spot={r:120,
   nudge:g=>S('A deep, deep pool. Someone who could hold their breath might find where it goes.','A deep pool. You need to dive.')};
 GTK.moon_glass={r:110,
   build(g){
+    if(!g.wall){ const w=g.place.w||220, h=g.place.h||64; g.glass=p4Add('moonglass',{id:'gate_'+g.id+'_glass',x0:g.x-w/2,y0:g.y-h/2,x1:g.x+w/2,y1:g.y+h/2}); g.door={x:g.x,y:g.y}; return; }
     gtMesa(g,{lvl:1,nofly:true}); g.ledge=gtLedge(g);
     g.mramp=gtRamp(g,'stairs',{moon:true,id:'gate_'+g.id}); const R=gtDoorRect(g,20), r=g.mramp;
     gtZone(g,R,()=>!!(r&&typeof p4RampSolid==='function'&&p4RampSolid(r))); g.door={x:R.x,y:R.y}; },
@@ -368,7 +440,9 @@ GTK.pound_plate={r:110,
   isIn:gtDoorIn,
   nudge:g=>S('The gate is locked by the rune plate. It needs a big, hard stomp.','Stomp the plate!')};
 GTK.cracked_floor={r:110,
-  build(g){ gtMesa(g,{lvl:1,nofly:true}); g.ledge=gtLedge(g);
+  build(g){
+    if(!g.wall){ const to=g.place.to; const o=p3Add('crackfloor',{id:'gate_'+g.id+'_crack',x:g.x,y:g.y,r:g.place.cr||54,to:to&&to.area?to:undefined,below:to&&!to.area?(()=>{ const q=gtPt(to); return {x:q.x,y:q.y}; })():undefined,then:()=>gtGot(g,2)}); g.crack=o; g.door={x:g.x,y:g.y}; return; }
+    gtMesa(g,{lvl:1,nofly:true}); g.ledge=gtLedge(g);
     const f=g.side.foot, u=g.side.out, a=g.side.along, top=[g.x-a[0]*g.rx*0.45-u[0]*8,g.y-a[1]*g.ry*0.45-u[1]*8];
     g.hole={x:top[0],y:top[1]};
     const o=p3Add('crackfloor',{id:'gate_'+g.id+'_crack',x:f[0]+u[0]*58-a[0]*24,y:f[1]+u[1]*58-a[1]*24,r:54,below:{x:top[0]+a[0]*40,y:top[1]+a[1]*24+10},then:()=>gtGot(g,2)});
@@ -392,6 +466,10 @@ GTK.whip_hook={r:110,rmin:60,
   nudge:g=>S('The water runs far too fast. A hook post waits on the island, for something long that could catch it.','Fast water! A hook! You need a whip.')};
 GTK.burrow_mound={r:90,rmin:60,rmax:200,
   build(g){ const R=g.r, x=g.x, y=g.y, T=18; g.rx=g.ry=R;
+    if(!g.wall){ const horiz=g.face==='s'||g.face==='n', L=g.place.w||160, sb=horiz?[x-L/2-120,y-160,x+L/2+120,y+160]:[x-160,y-L/2-120,x+160,y+L/2+120]; g.sandBox=sb;
+      p4Add('sandbed',{id:'gate_'+g.id+'_bed',x0:sb[0],y0:sb[1],x1:sb[2],y1:sb[3]}); GT.sand.push(sb);
+      const o=p4Add('sandwall',{id:'gate_'+g.id+'_f',x,y,w:horiz?L:T,h:horiz?T:L,style:g.place.style2||'fence'}); o.col.deep=false; gtColWrap(g,o.col,true); g.fences={[g.face]:o};
+      gtZone(g,{x,y,w:horiz?L:T,h:horiz?T:L}); g.door={x,y}; return; }
     const sb=[x-R-150,y-R-150,x+R+150,y+R+150]; g.sandBox=sb;
     p4Add('sandbed',{id:'gate_'+g.id+'_bed',x0:sb[0],y0:sb[1],x1:sb[2],y1:sb[3]});
     GT.sand.push(sb);
@@ -417,7 +495,7 @@ GTK.fetch_spot={r:70,rmin:30,rmax:200,
   isIn:()=>false};
 
 // ---------- 4. each frame: did Ash get in with the power, hints when he cannot, the state after a load
-const GT_NUDGE_K={climb_wall:1,grapple_post:1,vent:1,step_face:1,wind_ribbon:1,dive_spot:1,moon_glass:1,shadow_curtain:1,thin_bars:1,chain_ring:1,pound_plate:1,water:1,whip_hook:1,burrow_mound:1};
+const GT_NUDGE_K={fetch_spot:0,climb_wall:1,grapple_post:1,vent:1,step_face:1,wind_ribbon:1,dive_spot:1,moon_glass:1,shadow_curtain:1,thin_bars:1,chain_ring:1,pound_plate:1,water:1,whip_hook:1,burrow_mound:1};
 function gtTick(dt){
   if(!G||!player) return;
   if(GT.g!==G){ GT.g=G; GT.fetch=null; GT.syncT=0.05; gtSyncAll(); }
@@ -428,7 +506,8 @@ function gtTick(dt){
     if(g.map!==k) continue;
     if(Math.abs(p.x-g.x)>g.r+500||Math.abs(p.y-g.y)>g.r+500) continue;
     const st=gtSt(g.id); if(st!==g.st) gtSync(g);
-    if(!st&&g.D.isIn&&!p.flying&&g.D.isIn(g,p.x,p.y)) gtGot(g,1);
+    if(!st&&!p.flying&&gtIsIn(g,p.x,p.y)) gtGot(g,1);
+    else if(!st&&g.hooks&&g.hooks.length&&gtSwinging()&&g.hooks.includes(ARMS.swing.h)) gtGot(g,1);
     else if(!st&&GT_NUDGE_K[g.kind]&&!gtHas(g.K.power)) gtNudge(g,p,dt);
   }
   gtFetchTick(dt);
@@ -439,7 +518,7 @@ function gtNudge(g,p,dt){
   const near=dist(p.x,p.y,d.x,d.y)<(g.kind==='water'||g.kind==='whip_hook'?g.mw*0.5+70:80);
   const n=GT.nudgeT[g.id]||(GT.nudgeT[g.id]={push:0,last:-99});
   if(near&&p.moving){ n.push+=dt; } else n.push=Math.max(0,n.push-dt*2);
-  if(n.push>0.7&&GT.t-n.last>8){ n.last=GT.t; n.push=0; const txt=g.D.nudge?g.D.nudge(g):null; if(txt) ftext(p.x,p.y-(p.z||0)-44,simplify(txt),'#ffe6b0',13); }
+  if(n.push>0.7&&GT.t-n.last>8){ n.last=GT.t; n.push=0; const txt=g.place.locked?gtS(g.place.locked):g.D.nudge?g.D.nudge(g):null; if(txt) ftext(p.x,p.y-(p.z||0)-44,simplify(txt),'#ffe6b0',13); }
 }
 // (updatePools runs every frame of play, after Ash moves, even while a power's move has taken over his legs)
 { const base=updatePools; updatePools=function(dt){ base.apply(this,arguments); try{ gtTick(dt); }catch(e){ gtWarn('tick',String(e&&e.stack||e)); } }; }
@@ -646,10 +725,11 @@ function gtFetchDone(g){
 { const base=drawPip; drawPip=function(q){ base(q); const F=GT.fetch; if(F&&F.ph==='back'&&q===G.pip){ const t=q.t||0, alt=8+Math.sin(t*5)*3; gtPut(gtShinySprite(),q.x,q.y-alt*0.4+14); } }; }
 
 // ---------- 8. art hooks for story data: looks (props) and poses (people)
-// defineLook(id,{w,h,draw(g,x,y,t,state),anim:false,live(g,x,y,t,state),outline:true}): (x,y) is the foot (bottom
-// middle); the look fits in w x h above it. A static look (anim false, the default) is drawn ONCE per state into a
-// cached canvas at 2x (with the Storybook outline when that look is on) and blitted each frame; `live` is drawn on
-// top every frame (glows, a blinking eye). anim:true draws `draw` every frame (keep those few and cheap).
+// defineLook(id,{w,h,draw(g,x,y,t,state),anim:false,live(g,x,y,t,state),outline:true}): (x,y) is the place's spot:
+// for a prop the foot (bottom middle, the look fits in w x h above it), for a Case Book icon ('icon_...') the centre.
+// A static look (anim false, the default) is drawn ONCE per state into a cached canvas at 2x (with the Storybook outline
+// when that look is on), trimmed to what was drawn, and blitted each frame; `live` is drawn on top every frame (glows, a
+// blinking eye). anim:true draws `draw` every frame (keep those few and cheap). A look may also be a plain function.
 const LOOKS={}, POSES={}, LOOKC=new Map();
 function defineLook(id,def){
   if(!id||!def){ gtWarn('look:bad','defineLook needs an id and a definition'); return null; }
@@ -660,14 +740,24 @@ function defineLook(id,def){
 }
 function lookHas(id){ return !!LOOKS[id]; }
 function lookSize(id){ const L=LOOKS[id]; return L?{w:L.w,h:L.h}:{w:44,h:44}; }
+// the cached canvas: drawn with room on every side of the spot (any anchor works), then trimmed to its pixels
 function gtLookSprite(id,L,state){
   const key=id+'|'+(state==null?'':state)+(LOOK.sb?'|sb':''); let c=LOOKC.get(key); if(c) return c;
-  const pad=10, W=L.w+pad*2, H=L.h+pad*2, cv=mkCanvas(W*2,H*2), g=cv.getContext('2d'); g.scale(2,2); g.lineJoin='round'; g.lineCap='round';
-  L.draw(g,pad+L.w/2,pad+L.h,0,state);
-  c=L.outline===false?cv:outlineSprite(cv,SBC.outline,sbOW(Math.max(L.w,L.h)/2),{scale:2});
-  c.ox=pad+L.w/2; c.oy=pad+L.h; c.ww=W; c.hh=H; if(LOOKC.size>600) LOOKC.clear(); LOOKC.set(key,c); return c;
+  const pad=10, W=Math.ceil(L.w*2+pad*2), H=Math.ceil(L.h*2+pad*2), cx=W/2, cy=H/2+L.h*0.25;
+  const cv=mkCanvas(W*2,H*2), g=cv.getContext('2d'); g.scale(2,2); g.lineJoin='round'; g.lineCap='round';
+  L.draw(g,cx,cy,0,state);
+  let out=L.outline===false?cv:outlineSprite(cv,SBC.outline,sbOW(Math.max(L.w,L.h)/2),{scale:2});
+  let x0=0,y0=0,x1=out.width,y1=out.height;
+  try{ const d=out.getContext('2d').getImageData(0,0,out.width,out.height).data, w=out.width; x0=1e9; y0=1e9; x1=-1; y1=-1;
+    for(let j=0;j<out.height;j++) for(let i=0;i<w;i++) if(d[(j*w+i)*4+3]>4){ if(i<x0) x0=i; if(i>x1) x1=i; if(j<y0) y0=j; if(j>y1) y1=j; }
+    if(x1<0){ x0=y0=0; x1=y1=1; } x0=Math.max(0,x0-2); y0=Math.max(0,y0-2); x1=Math.min(out.width,x1+3); y1=Math.min(out.height,y1+3); }catch(e){}
+  c=mkCanvas(x1-x0,y1-y0); c.getContext('2d').drawImage(out,-x0,-y0);
+  c.ox=cx-x0/2; c.oy=cy-y0/2; c.ww=(x1-x0)/2; c.hh=(y1-y0)/2;
+  if(LOOKC.size>600) LOOKC.clear(); LOOKC.set(key,c); return c;
 }
-function lookDraw(id,g,x,y,t,state){
+// lookDraw(id,g,x,y,t,state); the engine's order lookDraw(g,id,x,y,t,state) works too. false when there is no look
+function lookDraw(a,b,x,y,t,state){
+  let id=a, g=b; if(typeof a!=='string'&&typeof b==='string'){ id=b; g=a; }
   g=g||ctx; const L=LOOKS[id];
   if(!L){ gtWarn('look?'+id,'no look "'+id+'" (defineLook it in a v10_art file); drawing a placeholder'); gtPlaceholder(g,x,y,id); return false; }
   try{
@@ -694,10 +784,13 @@ function definePose(npcId,pose,def){
   if(typeof P.draw!=='function'){ gtWarn('pose:fn:'+npcId+pose,'definePose '+npcId+' '+pose+': draw must be a function'); return null; }
   (POSES[npcId]||(POSES[npcId]={}))[pose]=P;
   if(P.still) defineLook('pose:'+npcId+':'+pose,{w:P.w,h:P.h,draw:(g,x,y,t)=>P.draw(g,x,y,t)});
+  P.fn=(g,x,y,t)=>poseDraw(npcId,pose,g,x,y,t);
   return P;
 }
 function poseHas(npcId,pose){ return !!(POSES[npcId]&&POSES[npcId][pose]); }
-// returns false when there is no such pose (the engine then draws the person as usual)
+// the engine asks for the drawing function: poseGet(npcId,pose) -> f(g,x,y,t) or null
+function poseGet(npcId,pose){ const P=POSES[npcId]&&POSES[npcId][pose]; return P?P.fn:null; }
+// poseDraw(npcId,pose,g,x,y,t): false when there is no such pose (the engine then draws the person as usual)
 function poseDraw(npcId,pose,g,x,y,t){
   const P=POSES[npcId]&&POSES[npcId][pose];
   if(!P){ gtWarn('pose?'+npcId+':'+pose,'no pose "'+pose+'" for '+npcId+' (definePose it in a v10_art file)'); return false; }
@@ -711,5 +804,5 @@ window.__ebGate=Object.assign(window.__ebGate||{},{
   build:gateBuild, open:gateOpen, close:gateClose, isOpen:gateIsOpen, kinds:gateKinds, opensWith:gateOpensWith, info:gateInfo, inside:gateInside,
   list:()=>GT.list.map(g=>gateInfo(g.id)), has:gtHas, st:gtSt, fetch:()=>GT.fetch?{id:GT.fetch.g.id,ph:GT.fetch.ph}:null,
   looks:()=>Object.keys(LOOKS), poses:()=>Object.keys(POSES).map(k=>k+':'+Object.keys(POSES[k]).join(',')), lookDraw, poseDraw, defineLook, definePose,
-  raw:id=>GT.by[id], waterAt:(x,y)=>!!gtWaterAt(x,y), sync:gtSyncAll
+  raw:id=>GT.by[id], waterAt:(x,y)=>!!gtWaterAt(x,y), sync:gtSyncAll, set:gateSet, poseGet, lookHas, lookSize
 });
