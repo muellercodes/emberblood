@@ -559,7 +559,7 @@ export function runChecks(M, opts = {}) {
         if (t.say) textPair(t.say, O, w, npc, tags, conds);
         if (t.option) { textPair(t.option, O, `${w} option`, 'ash', {}, conds); const sc = t.scene || null; if (sc) addTo(optionScenes, sc, { O, where: w, npc }); }
         if (t.scene) { if (!M.scenes[t.scene]) FAIL('ids', `${O.id}.${w}: scene ${t.scene} is not defined`, W(O, at(O, t.scene))); addTo(scenesUsed, t.scene, { O, where: w }); }
-        if (t.fact) factCheckLater.push({ O, where: w, fact: t.fact, conds, full: pairOf(t.say) && pairOf(t.say).full });
+        if (t.fact && !t.say) factCheckLater.push({ O, where: w, fact: t.fact, conds, full: '' });
         for (const k of ['promise', 'ref']) for (const id of arr(t[k])) if (!isEnt(id) && !M.quests[id] && !isItem(id) && !M.clues[id] && !M.scenes[id]) FAIL(k === 'promise' ? 'uses' : 'ids', `${O.id}.${w}: ${k} ${id} has no entity, quest, item, clue or scene`, W(O, at(O, id)));
         eachEffect(t.then, (e) => checkEffect(e, O, w));
         if (!t.say && !t.option && !t.scene && !t.then) FAIL('ids', `${O.id}.${w}: a talk entry needs say, option, scene or then`, W(O, at(O, npc)));
@@ -628,7 +628,7 @@ export function runChecks(M, opts = {}) {
     if (O.type === 'act') {
       for (const [id, m] of Object.entries(M.mysteries)) if (m.act === O.act && m.def.title) textPair(m.def.title, O, `mystery ${id}`, null, {});
       for (const [tr, flag] of Object.entries(d.trust || {})) if (!isStr(flag)) FAIL('ids', `act ${O.act}: trust.${tr} must name its flag`, W(O, at(O)));
-      for (const [id, en] of Object.entries(d.ending || {})) { if (en.if) checkCond(en.if, O, `ending ${id}`); if (en.at && !M.chapters[en.at]) FAIL('ids', `act ${O.act}: ending ${id} at ${en.at}: no chapter`, W(O, at(O, en.at))); if (en.scene && !M.scenes[en.scene]) FAIL('ids', `act ${O.act}: ending ${id}: scene ${en.scene} is not defined`, W(O, at(O, en.scene))); else if (en.scene) addTo(scenesUsed, en.scene, { O, where: 'ending ' + id }); }
+      for (const [id, en] of Object.entries(d.ending || {})) { if (en.if) checkCond(en.if, O, `ending ${id}`); if (en.at && !M.chapters[en.at] && stageIdx(en.at) < 0) FAIL('ids', `act ${O.act}: ending ${id} at ${en.at}: no chapter`, W(O, at(O, en.at))); if (en.scene && !M.scenes[en.scene]) FAIL('ids', `act ${O.act}: ending ${id}: scene ${en.scene} is not defined`, W(O, at(O, en.scene))); else if (en.scene) addTo(scenesUsed, en.scene, { O, where: 'ending ' + id }); }
     }
     arr(d.step).forEach((s, i) => checkStep(s, O, `step ${i + 1}`));
     for (const [id, c] of Object.entries(d.clue || {})) {
@@ -1303,7 +1303,7 @@ export function report(res, M, opts) {
   const by = (L) => { const m = {}; for (const x of L) m[x.rule] = (m[x.rule] || 0) + 1; return m; };
   const nf = fails.length, nw = warns.length;
   const dataW = warns.filter((w) => !w.legacy), legW = warns.filter((w) => w.legacy);
-  const pad = (s) => (s + '         ').slice(0, 9);
+  const pad = (s) => (s.length >= 8 ? s + ' ' : (s + '        ').slice(0, 8));
   const lines = [];
   lines.push(`check: ${nf} failed, ${nw} warning${nw === 1 ? '' : 's'}${opts.act != null ? ` (act ${opts.act})` : ''}`);
   lines.push('');
