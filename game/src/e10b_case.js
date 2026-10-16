@@ -63,6 +63,10 @@ const CB10={wrong:{},flash:{},bookR:null,iconCache:new Map(),openAt:0};
 .cb10-bonus b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ember)}
 .cb10-bonus span{display:flex;gap:8px;align-items:center}
 .cb10-bonus svg,.cb10-bonus img{flex:none;width:22px;height:22px;color:var(--gold)}
+.cb10-page{padding:12px 14px;border-radius:10px;margin:0 0 10px;background:rgba(255,236,200,.08);border:1px solid rgba(255,214,150,.25);font-family:Georgia,'Times New Roman',serif}
+.cb10-page b{display:block;color:var(--gold);margin:0 0 6px;font-size:16px}
+.cb10-page p{margin:0 0 6px;color:var(--ink);font-size:15px;line-height:1.5}
+html.sb .cb10-page{background:#fffdf6;border:2px solid #3b2233;box-shadow:0 3px 0 rgba(59,34,51,.85)}
 .cb10-ans{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:16px;font-weight:800;color:var(--ink)}
 .cb10-stamp{display:inline-block;transform:rotate(-6deg);border:3px solid #5ac86a;color:#5ac86a;border-radius:8px;padding:0 8px;font-size:13px;font-weight:900;letter-spacing:.12em}
 .cb10-q.solved.just .cb10-stamp{animation:cb10pop .6s ease-out}
@@ -135,7 +139,7 @@ const CB10_BOOK='<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="tr
 function cbFound(){ return Object.keys((G&&G.case&&G.case.clues)||{}); }
 function cbUnseen(){ const C=G&&G.case; if(!C) return 0; return Object.keys(C.clues).filter(k=>!C.seen[k]).length; }
 function cbReadyQ(){ return Object.values(S10.deduce).filter(D=>!G.case.solved[D.id]&&s10DeduceReady(D)); }
-function cbVisible(){ return !!(G&&G.mode==='story'&&G.case&&(cbFound().length||Object.keys(G.case.solved).length)); }
+function cbVisible(){ return !!(G&&G.mode==='story'&&G.case&&(cbFound().length||Object.keys(G.case.solved).length||Object.keys(G.case.pages||{}).length)); }
 // a clue's mystery: its own, else a deduction that needs it, else its chapter's first deduction's, else notes
 function cbClueMystery(id){
   const C=S10.clues[id]; if(C&&C.mystery) return C.mystery;
@@ -172,6 +176,13 @@ function cbHtml(){
         (bonus.length?`<div class="cb10-bonus"><b>${E(S('Extra clues','Extra clues'))}</b>${bonus.map(c=>{ const K=S10.clues[c]; return `<span>${cbIcon(K&&K.icon)}${E(K?s10T(K.text):c)}</span>`; }).join('')}</div>`:'')+`</div>`);
     }
     if(m.clues.length){ rows.push('<div class="cb10-cards">'); for(const id of m.clues){ const K=S10.clues[id]; rows.push(`<div class="cb10-card">${!C.seen[id]?`<span class="cb10-new">${E(S('NEW','NEW'))}</span>`:''}<span class="cb10-ic">${cbIcon(K&&K.icon)}</span><p>${E(K?s10T(K.text):id)}</p></div>`); } rows.push('</div>'); }
+    rows.push('</section>');
+  }
+  // pages (a letter, a journal page): the long truths live here, not in dialogue
+  const pages=Object.keys(C.pages||{}).filter(id=>S10.pages&&S10.pages[id]);
+  if(pages.length){
+    rows.push(`<section class="cb10-m"><div class="cb10-mt"><h4>${E(S('Pages','Pages'))}</h4><span class="cb10-prog">${pages.length}</span></div>`);
+    for(const id of pages){ const P=S10.pages[id]; rows.push(`<div class="cb10-page"><b>${E(s10T(P.title))}</b>${s10Arr(P.text).map(t=>`<p>${E(s10T(t))}</p>`).join('')}</div>`); }
     rows.push('</section>');
   }
   rows.push('</div>');

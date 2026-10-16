@@ -150,6 +150,7 @@ function s10Effect(e,ctx){
     if(Array.isArray(e)){ s10Do(e,ctx); return; }
     if(e.if!=null){ if(s10Cond(e.if)) s10Do(e.then,ctx); else if(e.else) s10Do(e.else,ctx); return; }
     if(e.banner){ if(!S10.quiet) setBanner(s10T(e.banner),e.sub?s10T(e.sub):'',e.dur||3); return; }
+    if(e.journal!=null){ const t=s10T(e.journal), X=G.choices.extra||(G.choices.extra={}); X[e.key||('s10_'+h32(t))]=t; return; }
     if(e.say){ const L=s10Arr(e.say); if(L.length&&!S10.quiet){ const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===L[0]); const tx=s10T(L.slice(1,3)); if(n) npcBubble(n,tx); else bubble(player,tx,{who:'Ash',col:'#ffb070',dy:-52}); } return; }
     s10Err(`effect ${JSON.stringify(e)} is not understood`); return;
   }
@@ -192,8 +193,19 @@ function s10Effect(e,ctx){
     case 'heal': if(player){ player.hp=player.maxHp; } break;
     case 'choice': { const [f,v]=kv(a); G.choices[f]=v; break; }
     case 'solve': s10Solve(a,true); break;
+    case 'moon': if(typeof moonSet==='function') moonSet(+a); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,+a); break;
+    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,DOORS.find(q=>q.area===w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
+    case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x))})); break; }
+    case 'page': s10Page(a); break;
     default: s10Err(`effect "${e}": unknown "${k}"`);
   }
+}
+// Case Book pages (a letter, a journal page): page:{ id:{ title:[full,simple], text:[[full,simple], ...] } } on an act,
+// chapter, quest or places(); the effect `page id` adds it (G.case.pages) with a banner
+function s10Page(id){
+  const P=S10.pages&&S10.pages[id]; if(!P){ s10Err(`page ${id} is not defined`); return; }
+  const C=G.case.pages||(G.case.pages={}); if(C[id]) return; C[id]=1; storyEmit('page:'+id);
+  if(!S10.quiet){ S10.pulseT=G.time+6; setBanner(S('A new page in the Case Book!','A new page!'),s10T(P.title),3.4); try{ SFX.play('quest'); }catch(e){} }
 }
 function s10Time(a){
   const T={night:0.875,dusk:0.78,evening:0.8,day:0.35,morning:0.3,dawn:0.25,noon:0.5,midnight:0.0};
@@ -360,6 +372,7 @@ function s10Owned(d,owner){
   for(const id in (d.scene||{})){ s10Reg(S10.scenes,id,d.scene[id],'scene',d._file); S10.sceneOwner[id]=owner; }
   for(const who in (d.talk||{})){ const L=S10.talk[who]||(S10.talk[who]=[]); for(const t of s10Arr(d.talk[who])) L.push(Object.assign({_owner:owner,_who:who},t)); }
   for(const id in (d.npc||{})){ const n=Object.assign({id,_owner:owner},d.npc[id]); S10.npcs[id]=n; }
+  for(const id in (d.page||{})){ (S10.pages||(S10.pages={}))[id]=Object.assign({id,_owner:owner},d.page[id]); }
   for(const id in (d.item||d.items||{})){ const it=(d.item||d.items)[id]; S10.items[id]=Object.assign({id},it); if(it&&it.name) ITEM_NAMES[id]=s10T(it.name); }
 }
 // steps: parse once ({do:'talk c_hettie'} -> _kind 'talk', _args ['c_hettie'])
@@ -524,7 +537,7 @@ function s10Poke(R,main){
 function s10Run2(a,before){
   const k=a.R.key+'/'+a.key; if(S10.pend[k]) return; S10.pend[k]=1;
   if(before) try{ before(); }catch(e){ console.error(e); }
-  const sc=a.x.scene||a.x.win;
+  const sc=a.x.scene||a.x.win||a.x.after;
   if(sc) s10Play(sc,()=>s10Finish(a),{R:a.R,step:a.s}); else s10Finish(a);
 }
 const s10Calm=()=>scene==='play'&&!DLG&&!G.mini&&!(G.boss&&!G.boss.dead)&&!player.dead;
@@ -532,7 +545,7 @@ function s10Tick(dt){
   if(!S10.booted) s10Boot();
   if(!G||G.mode!=='story'||!G.story) return;
   if(S10.tickAt===G.time) return; S10.tickAt=G.time;
-  S10.watchT-=dt; if(S10.watchT<=0){ S10.watchT=1; s10Watch(); }
+  S10.watchT-=dt; if(S10.watchT<=0){ S10.watchT=1; s10Watch(); try{ s10Over(); }catch(e){} }
   S10.npcT-=dt; if(S10.npcT<=0){ S10.npcT=1; s10NpcSync(); }
   if(S10.qOrder.length) try{ s10QuestSync(); }catch(e){ console.error(e); }
   if(G.done) return;
@@ -541,7 +554,11 @@ function s10Tick(dt){
   if(scene!=='play') return;
   // queued beats (a scene that waits for a calm moment)
   if(S10.queue.length&&s10Calm()){ const q=S10.queue.shift(); try{ q(); }catch(e){ console.error(e); } return; }
-  for(const R of s10Runners()) for(const a of s10Doable(R)){ if(S10.pend[R.key+'/'+a.key]) continue; s10Poll(a); if(DLG||scene!=='play') return; }
+  for(const R of s10Runners()) for(const a of s10Doable(R)){
+    if(S10.pend[R.key+'/'+a.key]) continue;
+    // a step's intro scene plays once when it becomes doable (on the main path; the checker counts it)
+    if(a.x.intro&&!(G.story._intro&&G.story._intro[R.key+'/'+a.key])){ if(s10Calm()){ (G.story._intro||(G.story._intro={}))[R.key+'/'+a.key]=1; s10Play(a.x.intro,null,{R,step:a.s}); return; } continue; }
+    s10Poll(a); if(DLG||scene!=='play') return; }
 }
 // the steps that finish by themselves when something becomes true
 function s10Poll(a){
@@ -632,7 +649,9 @@ function s10Prompts(offer){
   const p=player, T=s10Targets();
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceShown(P)) continue;
-    const k=P.kind; if(!['examine','sign','door','prop','chest'].includes(k)) continue;
+    const k=P.kind; if(!['examine','sign','door','prop','chest','gate'].includes(k)) continue;
+    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line)
+    if(k==='gate'&&!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P))) continue;
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
     const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+40; if(d>r) continue;
@@ -653,6 +672,7 @@ function s10PlaceAct(id){
   storyEmit('examine:'+id);
   if(first&&P.then) s10Do(P.then,{place:id});
   if(P.kind==='door'){ s10Door(P); return; }
+  if(P.kind==='gate'){ s10Play([['narr'].concat(s10Arr(P.locked))],()=>s10Examined(id),{place:id}); return; }
   if(P.kind==='chest'){ s10Chest(P); return; }
   const lines=[]; const st=s10World(id);
   const say=P.states_say&&st!=null&&P.states_say[st]?P.states_say[st]:P.say;
@@ -669,6 +689,7 @@ function s10Examined(id){
   return did;
 }
 function s10Door(P){
+  if(P.need!=null&&!s10Cond(P.need)){ s10Play([['narr'].concat(s10Arr(P.locked||S("It won't open. Not yet.","It won't open.")))],null,{place:P.id}); return; }
   const to=P.leads; if(!to) return;
   if(AREADEFS[to]){ const d=DOORS.find(q=>q.area===to)||{x:player.x,y:player.y}; enterArea(to,d); return; }
   const w=s10Where(to); if(w){ if(AREA) exitArea(); player.x=w.x; player.y=w.y+30; updateCam(0,true); G.chunkBurst=16; }
@@ -678,6 +699,22 @@ function s10Chest(P){
   const at=s10Pos(P)||{x:player.x,y:player.y}; emit(at.x,at.y,30,{col:'255,210,120',ang:-Math.PI/2,spread:1,smin:40,smax:160,lmin:.5,lmax:1,zmin:1.5,zmax:3,rise:15});
   if(P.loot) s10Do(P.loot,{place:P.id}); else { addCoins(20,at.x,at.y); gainXp(40); }
   s10Examined(P.id); saveGame();
+}
+// the power each gate kind opens with (_plan_format's gate table); a gate place may say need:'<condition>' instead
+const S10_GATE_POWER={climb_wall:'claws',grapple_post:'grapple',shadow_curtain:'shadow',thin_bars:'shadow',whip_hook:'whip',chain_ring:'whip',vent:'wings',step_face:'dbljump',
+  water:'stride',ice_wall:'blaze',wind_ribbon:'windride',pound_plate:'pound',cracked_floor:'pound',bomb_rock:'bombs',dive_spot:'dive',burrow_mound:'burrow',moon_glass:'moonfire'};
+function s10GateLocked(P){
+  if(P.need!=null) return !s10Cond(P.need);
+  try{ if(typeof gateCanOpen==='function') return !gateCanOpen(P); }catch(e){}
+  if(P.gate==='fetch_spot') return !(G.flags.c_pip_fetch||G.flags.pip_fetch);
+  const pw=P.opens_with||S10_GATE_POWER[P.gate]; return pw?!s10HasPower(pw):false;
+}
+// place over:'landmarkId' (A2S): while the place shows, that landmark's own prompt steps aside
+function s10Over(){
+  for(const id in S10.places){ const P=S10.places[id]; if(!P.over||P._overDone) continue;
+    const o=LANDMARKS.find(q=>q.id===P.over); if(!o) continue; P._overDone=true;
+    const d=Object.getOwnPropertyDescriptor(o,'prompt')||{value:o.prompt}, get=()=>d.get?d.get.call(o):d.value;
+    try{ Object.defineProperty(o,'prompt',{configurable:true,get(){ try{ if(G&&s10PlaceShown(P)) return null; }catch(e){} return get(); },set(v){ d.value=v; delete d.get; }}); }catch(e){} }
 }
 function s10Gate(id,open){
   s10WorldSet(id,open?'open':'closed');
@@ -827,6 +864,7 @@ function s10TalkHook(n){
     if(s0&&s0._kind==='talk'&&s0._args[0]===id){ s10QuestStart(qid,true); const R=s10Run('q',q); s10Run2({R,s:s0,x:s0,key:s0._id}); return true; } }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
     const x=a.x, k=x._kind;
+    if(a.s.legacy) continue;
     if(k==='talk'&&x._args[0]===id){ if(x.scene){ s10Run2(a); return true; } s10Finish(a); talkHub(n); return true; }
     if(k==='give'&&x._args[1]===id&&(G.items[x._args[0]]||0)>0){ s10Run2(a,()=>takeItems({[x._args[0]]:1})); return true; }
     if(k==='minigame'&&x.start==='talk'&&(x.at||x._args[1])===id&&!G.mini&&G.time>=S10.mini.lostAt+1){ if(!MINI[x._args[0]]){ s10Err(`minigame ${x._args[0]} does not exist`); return false; } s10MiniStart(a); return true; }
@@ -850,8 +888,8 @@ function s10HasTalk(id){ const L=S10.talk[id]; if(!L||!L.length) return false; r
 function s10TalkTakeover(){
   for(const id in S10.talk){
     const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(!c||c._s10lines) continue;
-    const old=c.lines; c._s10lines=true;
-    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&s10TalkOk(t)); if(T){ const say=Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say; if(say!=null) return [s10T(say)]; } } }catch(e){} return old; },set(v){ /* the old code may set lines: keep them for when there is no data line */ }}); }catch(e){}
+    let old=c.lines; c._s10lines=true;
+    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
   }
   if(typeof BARKS!=='undefined') for(const b of BARKS){ const m=/^id:([\w]+)$/.exec(String(b._who||'')); if(!m||b._s10) continue; const id=m[1], c0=b.c; b._s10=true; b.c=function(){ if(G&&s10HasTalk(id)) return false; return typeof c0==='function'?c0.apply(this,arguments):!!c0; }; }
 }
@@ -862,10 +900,16 @@ function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.a
 function s10TalkFor(id,kind){
   for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':'line'; if(k!==kind) continue; if(s10TalkOk(T)) return T; } return null;
 }
+// say forms: [full, simple] or a string (said by that person); a list of lines [[who, full, simple], ...]; or (A2S)
+// a list of [full, simple] variants, the next one each time it plays (what CAST.lines did)
+const s10Speaker=w=>typeof w==='string'&&(w==='narr'||w==='ash'||w==='pip'||!!SPK[w]||!!S10.npcs[w]||!!(typeof CASTBY!=='undefined'&&CASTBY[w]));
+function s10SayVariants(say){ return Array.isArray(say)&&say.length>0&&say.every(v=>Array.isArray(v)&&v.length<=2&&!s10Speaker(v[0])); }
+function s10SayPick(T,say){ const k=s10TalkKey(T), R=G.story._rot||(G.story._rot={}), i=(R[k]|0)%say.length; R[k]=i+1; return say[i]; }
 function s10TalkLines(T,id){
   if(T.scene) return s10Lines(S10.scenes[T.scene]||(s10Err(`talk ${id}: scene ${T.scene} is not defined`),[]),{sc:T.scene,talk:id});
-  const say=T.say; if(say==null) return [];
-  if(Array.isArray(say)&&say.length&&Array.isArray(say[0])) return s10Lines(say,{talk:id});
+  let say=T.say; if(say==null) return [];
+  if(s10SayVariants(say)) say=s10SayPick(T,say);
+  else if(Array.isArray(say)&&say.length&&Array.isArray(say[0])) return s10Lines(say,{talk:id});
   return s10Lines([[id].concat(Array.isArray(say)?say:[say])],{talk:id});
 }
 // talk menu options: data `option` entries, and "Wait here until dark" for a wait step's skip people (the wrapper is
@@ -899,7 +943,7 @@ function s10Barks(dt){
     const L=(S10.talk[id]||[]).filter(T=>T.bark&&s10TalkOk(T)); if(!L.length){ S10.barkT[id]=G.time+5; continue; }
     const T=pick(L); S10.barkT[id]=G.time+rand(8,13);
     if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1;
-    const say=Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say;
+    const say=s10SayVariants(T.say)?s10SayPick(T,T.say):Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say;
     try{ npcBubble(n,s10T(say)); }catch(e){}
   }
 }
@@ -1110,13 +1154,13 @@ function s10LegacyExamined(o){
 }
 
 // ---------- 21. saves: G.case and G.story ride along with the game; old saves start empty
-function s10Fresh(){ G.case={clues:{},solved:{},tries:{},seen:{}}; G.story={_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}}; }
+function s10Fresh(){ G.case={clues:{},solved:{},tries:{},seen:{},pages:{}}; G.story={_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}}; }
 { const base=newRun; newRun=function(mode){ base(mode); try{ s10Fresh(); S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null}; }catch(e){ console.error(e); } }; }
 { const base=saveData; saveData=function(){ const s=base(); try{ if(G&&G.case) s.case=G.case; if(G&&G.story) s.story=G.story; }catch(e){} return s; }; }
 { const base=loadGame; loadGame=function(s){ base(s); try{ s10Loaded(s); }catch(e){ console.error(e); } }; }
 function s10Loaded(s){
   const C=s&&s.case, T=s&&s.story;
-  G.case={clues:Object.assign({},C&&C.clues),solved:Object.assign({},C&&C.solved),tries:Object.assign({},C&&C.tries),seen:Object.assign({},C&&C.seen)};
+  G.case={clues:Object.assign({},C&&C.clues),solved:Object.assign({},C&&C.solved),tries:Object.assign({},C&&C.tries),seen:Object.assign({},C&&C.seen),pages:Object.assign({},C&&C.pages)};
   G.story=Object.assign({_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}},T&&typeof T==='object'?JSON.parse(JSON.stringify(T)):{});
   S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null};
   if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10QuestResume(); s10NpcSync(true); }
