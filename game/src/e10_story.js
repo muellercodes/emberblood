@@ -141,6 +141,7 @@ function s10StepDone(path){ const [c,s]=String(path).split('.'); const st=G.stor
 
 // ---------- 4. effects ('set x', 'give item 2', 'trust vesper +1', ..., {banner:[full,simple]})
 function s10Do(list,ctx){
+  S10.ver++;
   for(const e of s10Arr(list)){ try{ s10Effect(e,ctx||{}); }catch(err){ s10Err(`effect ${JSON.stringify(e)}: ${err.message}`); console.error(err); } }
 }
 function s10Effect(e,ctx){
@@ -217,7 +218,7 @@ function s10Epi(id,pri,ctx){
 // ---------- 5. events: storyEmit(name) is global (dungeons, foes, minigames call it); everything heard is remembered
 function storyEmit(name){
   if(!name||!G||!G.story) return;
-  name=String(name); const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1;
+  name=String(name); const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
   if(S10.auto) S10.auto.log.push('emit '+name);
   return first;
 }
@@ -477,7 +478,14 @@ function s10Runners(){
 }
 function s10Active(R){ const st=s10St(R); for(const s of R.d.step||[]){ if(!s._kind||st[s._id]||s.optional) continue; return s; } return null; }
 // everything that can be done right now: the active step (or its open parts), optional steps, the chapter's extras
+// (cached for the frame: markers, prompts, the HUD and the tick all ask; anything that changes story state bumps S10.ver)
+S10.ver=0; S10.dc={t:-1,v:-1,m:{}};
 function s10Doable(R){
+  const c=S10.dc, t=G?G.time:0;
+  if(c.t!==t||c.v!==S10.ver){ c.t=t; c.v=S10.ver; c.m={}; }
+  return c.m[R.key]||(c.m[R.key]=s10Doable0(R));
+}
+function s10Doable0(R){
   const st=s10St(R), out=[], act=s10Active(R);
   for(const s of R.d.step||[]){
     (s.extra||[]).forEach(p=>{ if(!st[p._id]&&(p.if==null||s10Cond(p.if))) out.push({R,s,x:p,key:p._id,extra:true}); });
@@ -492,6 +500,7 @@ function s10DoableStep(R,s,st,out){
 }
 function s10Finish(a,quiet){
   const R=a.R, st=s10St(R); if(st[a.key]) return;
+  S10.ver++;
   st[a.key]=1; delete S10.pend[R.key+'/'+a.key];
   if(S10.auto) S10.auto.log.push('done '+R.key+'.'+a.key);
   const was=S10.quiet; if(quiet) S10.quiet=true;
@@ -744,31 +753,33 @@ function s10DrawChest(x,y,open){
   ctx.fillStyle=open?'#5a3a1a':'#a06a30'; ctx.fillRect(-15,open?-26:-22,30,open?6:8); ctx.strokeRect(-15,open?-26:-22,30,open?6:8);
   ctx.fillStyle='#e0b84a'; ctx.fillRect(-3,-12,6,6); ctx.restore();
 }
-// boot prints (Ash's size): small ovals in pairs, every 26 px along the path; the next one to step on glows
+// boot prints (a girl's size): pairs of soles and heels every 28 px along the path, silver with a dark rim so they read
+// on pale streets too; the ones already followed fade, the next one to step on has a ring
 function s10DrawPrints(P,target){
   const o=s10Off(P); if(!o) return;
   const path=(P.path||[]).map(q=>[+q[0]+o.x,+q[1]+o.y]); if(path.length<2) return;
   const tr=G.story._trk&&G.story._trk[P.id], reached=tr==='done'?path.length:(tr==null?-1:tr), t=G.time;
-  const claw=P.look==='claw'||P.prints==='claw', silver=P.col||'214,226,255';
+  const claw=P.look==='claw'||P.prints==='claw', fill=P.col||'222,232,255';
   let s0=0; const segs=[]; for(let i=0;i<path.length-1;i++){ const a=path[i], b=path[i+1], L=Math.hypot(b[0]-a[0],b[1]-a[1]); segs.push({a,b,L,s0,i}); s0+=L; }
   if(!inView((path[0][0]+path[path.length-1][0])/2,(path[0][1]+path[path.length-1][1])/2,s0/2+200)) return;
   ctx.save(); let k=0;
   for(const g of segs){
     const ux=(g.b[0]-g.a[0])/g.L, uy=(g.b[1]-g.a[1])/g.L, ang=Math.atan2(uy,ux);
-    for(let s=(k===0?6:((26-(g.s0%26))%26));s<g.L;s+=26,k++){
-      const side=k%2?1:-1, x=g.a[0]+ux*s-uy*side*6, y=g.a[1]+uy*s+ux*side*6, done=g.i<reached;
-      const tw=0.55+0.45*Math.sin(t*4+k*0.9), al=done?0.45:0.8;
+    for(let s=(k===0?8:((28-(g.s0%28))%28));s<g.L;s+=28,k++){
+      const side=k%2?1:-1, x=g.a[0]+ux*s-uy*side*7, y=g.a[1]+uy*s+ux*side*7, done=g.i<reached;
+      const tw=0.5+0.5*Math.sin(t*3+k*1.3), al=done?0.4:0.95;
+      if(!done) glowAt(x,y,14,'190,210,255',0.16+0.12*tw);
       ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
-      ctx.fillStyle=`rgba(${silver},${al})`; ctx.strokeStyle=`rgba(60,60,110,${al*0.7})`; ctx.lineWidth=1;
-      if(claw){ for(const dy of [-3,0,3]){ ctx.beginPath(); ctx.ellipse(3,dy,3,1.2,0,0,TAU); ctx.fill(); } ctx.beginPath(); ctx.ellipse(-2,0,3,3.4,0,0,TAU); ctx.fill(); ctx.stroke(); }
-      else { ctx.beginPath(); ctx.ellipse(2,0,5,3.2,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.ellipse(-5,0,2.6,2.6,0,0,TAU); ctx.fill(); ctx.stroke(); }
+      ctx.fillStyle=`rgba(${fill},${al})`; ctx.strokeStyle=`rgba(40,46,104,${al*0.85})`; ctx.lineWidth=1.4;
+      if(claw){ for(const dy of [-3.6,0,3.6]){ ctx.beginPath(); ctx.ellipse(4,dy,3.6,1.4,0,0,TAU); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.ellipse(-3,0,3.6,4,0,0,TAU); ctx.fill(); ctx.stroke(); }
+      else { ctx.beginPath(); ctx.ellipse(2.5,0,6.4,4,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.ellipse(-6.5,0,3.2,3.2,0,0,TAU); ctx.fill(); ctx.stroke(); }
       ctx.restore();
-      if(!done&&k%3===0) glowAt(x,y,10,'200,215,255',0.18*tw);
+      if(!done&&tw>0.96){ ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fillRect(x-1,y-6,2,12); ctx.fillRect(x-6,y-1,12,2); }
     }
   }
   // the next point to reach
   const nx=path[Math.min(path.length-1,reached+1)];
-  if(target&&tr!=='done'&&nx){ const r=14+Math.sin(t*4)*3; ctx.strokeStyle='rgba(230,240,255,.85)'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(+nx[0],+nx[1],r,r*0.55,0,0,TAU); ctx.stroke(); }
+  if(target&&tr!=='done'&&nx){ const r=16+Math.sin(t*4)*3; ctx.strokeStyle='rgba(40,46,104,.6)'; ctx.lineWidth=4; ctx.beginPath(); ctx.ellipse(+nx[0],+nx[1],r,r*0.55,0,0,TAU); ctx.stroke(); ctx.strokeStyle='rgba(235,242,255,.95)'; ctx.lineWidth=2; ctx.stroke(); }
   ctx.restore();
 }
 // Vesper's sightings drawn with a data pose (definePose('c_mask', pose)) while a scene has posed her
