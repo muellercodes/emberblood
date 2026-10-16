@@ -1,7 +1,7 @@
 // game/story/act2/gates_map0.js (A2S): Act II reasons to go back to Embermere (map 0).
 // Five gates for the Act II powers, each with a payoff behind it. Nothing here exists on map 0 today: every gate
-// carries a `build` block that gateBuild makes first (ELEV.plateau, ELEV.grapple, ELEV.noFly, ELEV.ledge, p2Add
-// thinbars, the chain ring). Coordinates were checked in the live game (A2S_NOTES.md, "Gates"): the payoffs sit on
+// carries a `build` block that gateBuild makes first (ELEV.plateau, ELEV.grapple, ELEV.noFly, p2Add thinbars,
+// the chain ring). Coordinates were checked in the live game (A2S_NOTES.md, "Gates"): the payoffs sit on
 // tops or inside walls that only the named power gets past, at least 90 px from any ground Ash can stand on.
 //   m0_lookout  claws        Vesper's Lookout above her old camp at the Southern Pass: clue q_lookout, Heart Ember
 //   m0_pearl    grapple      Pearl's First Hook, on a windy crag above Ember's Nursery: clue q_nursery
@@ -27,8 +27,8 @@ places({
       name: ['a little tin box under a stone', 'a tin box'] },
 
     // ---- 2. Pearl's First Hook (Grapple Tail). A crag one level up north of the Nursery cave (a1_nursery door
-    // 3500,4420). The wind off the frozen lake grounds the Ember Wings round it, so only the tail gets up; a ledge on
-    // its south face is the way down.
+    // 3500,4420). The wind off the frozen lake grounds the Ember Wings round it, so only the tail gets up; a second hook
+    // post on the ground south of it is the way back down.
     m0_pearl: { kind: 'gate', gate: 'grapple_post', map: 0, at: [3450, 3866], r: 340, leads: 'm0_hands',
       payoff: { kind: 'truth', id: 'q_nursery' },
       name: ["Pearl's First Hook", "Pearl's Hook"],

@@ -31,7 +31,7 @@ quest({
       obj: ["Look into the dragon's eye at the top of the hill", "Look into the dragon's eye"] },
     { id: 'barley', do: 'talk c_barley', scene: 'ch_barley', then: ['give coins 40', 'xp 500'],
       obj: ['Tell Old Barley', 'Tell Old Barley'],
-      extra: [{ do: 'examine ch_eye_words' }] },
+      extra: [{ do: 'examine ch_eye_words', if: 'flag c_chalk_eye' }] },
   ],
 
   scene: {
