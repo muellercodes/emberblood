@@ -20,7 +20,7 @@ const outDir = resolve(arg('--out', join(root, 'dist')));
 const checkPath = resolve(arg('--check', join(outDir, 'check.json')));
 
 // ---------------------------------------------------------------- data
-const game = scanGame(root);
+const game = scanGame(arg('--game', root));
 const loaded = loadStory(storyDir, root);
 const M = buildModel(loaded, game);
 let CJ = null;
