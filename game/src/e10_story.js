@@ -278,6 +278,7 @@ function s10Resolve(e){
   if((m=/^DOORS:(.+)$/.exec(src))){ const o=DOORS.find(q=>q.area===m[1]); if(!o) return {ok:false,why:`no door into ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^(?:CAST|SPECIAL|NPC):(.+)$/.exec(src))){ const id=m[1], c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); return c?{ok:true,real:c}:{ok:false,why:`nobody called ${id}`}; }
   if((m=/^HOUSES?:(.+)$/.exec(src))){ const h=HOUSES.find(q=>q.want===m[1]||q.owner===m[1]||q.id===m[1]); if(!h) return {ok:false,why:`no house for ${m[1]}`}; return near(h.x,h.y)?{ok:true,real:h}:{ok:false,why:far(h.x,h.y)}; }
+  if((m=/^POI:(.+)$/.exec(src))){ const o=typeof POI!=='undefined'&&POI[m[1]]; if(!o) return {ok:false,why:`no POI ${m[1]}`}; const r=Math.max(tol,e.r||0,o.r||0); return !at||dist(o.x,o.y,at.x,at.y)<=r?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^CHESTS:(.+)$/.exec(src))){ const o=CHESTS.find(q=>q.id===m[1]); if(!o) return {ok:false,why:`no chest ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^furn:(.+)$/.exec(src))){ const k=m[1];
     if(e.area&&!s10InArea(e.area)) return AREADEFS[e.area]?{ok:true,why:`inside ${e.area}: checked when Ash is in there`}:{ok:false,why:`no area ${e.area}`};
@@ -1290,7 +1291,7 @@ function s10Gates(){
 function s10Check(){
   const has=id=>!!(s10Ent(id)||(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id])||DOORS.some(d=>d.area===id)||AREADEFS[id]);
   const spk=w=>w==='narr'||w==='ash'||w==='pip'||!!SPK[w]||!!S10.npcs[w]||!!(typeof CASTBY!=='undefined'&&CASTBY[w]);
-  const scanScene=(id,beats)=>{ for(const b of s10Arr(beats)){ if(Array.isArray(b)){ const l=s10Line(b); if(!spk(l.who)) s10Err(`scene ${id}: speaker ${l.who} is unknown`); for(const c of s10Arr(l.o.clue)) if(!S10.clues[c]) s10Err(`scene ${id}: clue ${c} is not defined`); if(/—/.test(l.full+(l.simple||''))) s10Err(`scene ${id}: an em dash`); }
+  const scanScene=(id,beats)=>{ for(const b of s10Arr(beats)){ if(Array.isArray(b)){ const l=s10Line(b); if(!spk(l.who)) s10Err(`scene ${id}: speaker ${l.who} is unknown`); for(const c of s10Arr(l.o.clue)) if(!S10.clues[c]) s10Err(`scene ${id}: clue ${c} is not defined`); if(/\u2014/.test(l.full+(l.simple||''))) s10Err(`scene ${id}: an em dash`); }
     else if(b&&typeof b==='object'){ if(b.then) scanScene(id,b.then); if(b.else) scanScene(id,b.else); for(const p of s10Arr(b.pick)) if(p&&p.say) scanScene(id,p.say); for(const k of ['cam']) if(b[k]!=null&&!has(b[k])) s10Err(`scene ${id}: ${k} ${b[k]} is not a place`);
       for(const k of ['place','walk']) if(b[k]&&b[k][1]!=null&&!Array.isArray(b[k][1])&&!has(b[k][1])) s10Err(`scene ${id}: ${k} target ${b[k][1]} is not a place`); } } };
   for(const id in S10.scenes) scanScene(id,S10.scenes[id]);
