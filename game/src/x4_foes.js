@@ -80,9 +80,9 @@ function n4fSkinCol(c,dot){
     return base.apply(this,arguments); }; }
 { const base=foGlow; foGlow=function(x,y,z,r,col,a,occ){ if(N4F.skinOn) col=N4F.glowCol||'170,120,255'; return base(x,y,z,r,col,a,occ); }; }
 function n4fSkin(fn,glow){ const o=SBC.outline; N4F.skinOn=true; N4F.glowCol=glow||null; SBC.outline='#9a6aff'; try{ fn(); } finally{ N4F.skinOn=false; N4F.glowCol=null; SBC.outline=o; } }
-// the Classic look: a stock 2D drawer through a dark violet filter (canvas filters where the browser has them)
-const N4F_FILT=typeof ctx.filter==='string';
-function n4fSkin2(fn){ if(!N4F_FILT){ fn(); return; } const f=ctx.filter; ctx.filter='brightness(0.42) sepia(1) hue-rotate(215deg) saturate(2.6)'; try{ fn(); } finally{ ctx.filter=f; } }
+// the Classic look: the shadows are drawn with the toy figure in the shadow skin there too (a canvas filter over a stock
+// 2D drawer was far too slow on phones: one filtered layer per path). T3 is switched on just for the figure.
+function n4fSkin2(fn,glow){ const o=T3.on; T3.on=true; try{ n4fSkin(fn,glow); } finally{ T3.on=o; } }
 // a violet rim glow under a shadow figure (both looks)
 function n4fRim(e,r,a){ glowAt(e.x,e.y-(e.z||0)*0.8-r*0.4,r,'150,100,255',a==null?0.22:a); }
 
@@ -148,7 +148,7 @@ n4fSpk('n_echo_glaciar','Echo of the Ice Dragon','#4a5a8a'); n4fSpk('n_echo_hush
 // ================= 2. the foes of the peak (FINALE 14): shadow copies of old foes, plus lamp moths and moths of ink.
 // Level 1 numbers (BALANCE.md 6): spawn them at the peak's level (21 to 23). Every shade is the stock foe's own brain
 // and figure, drawn in the shadow skin (near-black, violet rim, white eyes) and peeling little moths as it moves.
-const N4F_SHADE2D={kobold:(e,fl)=>drawKobold(e,1,fl,false),wolf:(e,fl)=>drawWolf(e,fl),drake:(e,fl)=>drawDrake(e,1,fl,false),knight:(e,fl)=>drawKnight(e,1,fl,false),cultist:(e,fl)=>drawCultist(e,1,fl,false),slime:(e,fl)=>drawSlime(e,fl)};
+const N4F_SHADE2D={kobold:(e,fl)=>foKobold(e,fl,0),wolf:(e,fl)=>T3E.wolf(e,fl),drake:(e,fl)=>foDrake(e,fl,false),knight:(e,fl)=>foKnight(e,fl,false,false),cultist:(e,fl)=>foCultist(e,fl,false),slime:(e,fl)=>T3E.slime(e,fl)};
 function n4fShade3(fig){ return (e,fl)=>{ n4fSkin(()=>fig(e,fl)); }; }
 function n4fShade2(k){ return (e,fl)=>{ n4fRim(e,e.r*2.2,0.18); n4fSkin2(()=>N4F_SHADE2D[k](e,fl)); }; }
 function n4fShadeAI(base){ return (e,dt,p)=>{ base(e,dt,p); n4fFlecks(e,dt,0.6); }; }
@@ -256,7 +256,7 @@ defineFoe('n_lampmoth',{name:'Lamp Moth',r:16,hp:40,speed:0,dmg:0,value:20,kbRes
     if(s==='arrow'||s==='boomerang'||s==='proj'||s==='whip'||s==='glaive'){ e.n4drop=3; e.lampOut=true; e.state='dropped'; SFX.play('pop'); n4fTxt(e,S('Pop! The lamp goes out!','Pop!'),'#ffe8a0',15); emit(e.x,e.y-40,16,{col:'255,230,160',smin:40,smax:160,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); n4fEv('lamppop'); return false; }
     if(!(e._n4hiT>G.time)){ e._n4hiT=G.time+3; n4fTxt(e,S('Too high! An arrow, the whip or the Glaive pops its lamp.','Too high! Shoot the lamp!'),'#ffe8a0',12); } return false; },
   draw3d:(e,fl)=>n4fLampFig(e,fl), draw2d:(e,fl)=>n4fLamp2(e,fl),
-  sheet:[{state:'perch',label:'perched'},{state:'alarm',n4alarm:1,label:'alarm'},{state:'dropped',n4drop:2,z:0,label:'lamp popped'}]});
+  sheet:[{state:'perch',label:'perched'},{state:'alarm',n4alarm:1,label:'alarm'},{state:'dropped',n4drop:2,lampOut:true,z:0,label:'lamp popped'}]});
 function n4fLampFig(e,fl){
   const t=e.t||0, k=1.15, fx=e.x, fy=e.y+8, face=t3Turn(e,e.n4beam!=null?e.n4beam:e.face,10), z=e.z||0, drop=e.state==='dropped', al=e.state==='alarm';
   // the glass post
@@ -489,7 +489,7 @@ defineFoe('n_echo_vor',{boss:true,name:'Echo of the First Flame',title:S('A shad
   draw3d:(e,fl)=>n4vDraw(e), draw2d:(e,fl)=>n4vDraw(e),
   sheet:[{state:'walk',label:'walk',headRel:0,alt:0,scale:1,mouthGlow:0,tailFx:0,phase:1},{state:'breathW',st:0.4,label:'breath / gust',headRel:0,alt:0,scale:1,mouthGlow:1,tailFx:0,phase:1},{state:'stompW',st:0.4,label:'stomp',headRel:0,alt:0,scale:1,mouthGlow:0,tailFx:0,phase:1},{state:'tailW',st:0.3,label:'tail sweep',headRel:0,alt:0,scale:1,mouthGlow:0,tailFx:1,phase:1}]});
 function n4vDraw(e){ if(e.headX==null) updateHeadPos(e); const g=e.n4ghost||0; ctx.save(); ctx.globalAlpha*=1-0.55*g; n4fRim(e,150,0.2+0.15*(1-g));
-  if(T3.on) n4fSkin(()=>drawVorlaxis(e)); else n4fSkin2(()=>drawVorlaxis(e)); ctx.restore(); }
+  n4fSkin2(()=>drawVorlaxis(e)); ctx.restore(); }
 // the head is a hit circle too (as for Vorlaxis)
 { const base=hitCircles; hitCircles=function(e){ if(e.type==='n_echo_vor'){ if(e.headX==null) updateHeadPos(e); const L=e._n4hc||(e._n4hc=[{},{}]); Object.assign(L[0],{x:e.x,y:e.y,r:e.r,m:1}); Object.assign(L[1],{x:e.headX,y:e.headY,r:27,m:e.staggered?2:1.4}); return L; } return base(e); }; }
 // the braziers: obsidian bowls on short stands, dark until breathed on
@@ -622,7 +622,7 @@ function n4e2Draw(e,fl){
   if(e.n4mark>0&&!e.clone){ ctx.save(); ctx.strokeStyle=`rgba(255,220,120,${0.5+0.4*Math.sin(t*10)})`; ctx.lineWidth=3; ctx.beginPath(); ctx.ellipse(e.x,e.y+4,24,12,0,0,TAU); ctx.stroke(); ctx.restore(); }
   if(e.n4bal&&(e.z||0)>4){ ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(e.x,e.y+4,14,6,0,0,TAU); ctx.fill(); }
   n4fRim(e,40,0.16);
-  if(T3.on&&typeof c1FigVesper==='function') n4fSkin(()=>c1FigVesper(e,fl)); else if(typeof c1Vesper2==='function') n4fSkin2(()=>c1Vesper2(e,fl));
+  if(typeof c1FigVesper==='function') n4fSkin2(()=>c1FigVesper(e,fl));
   ctx.restore(); }
 N4FM.n_echo2={
   begin(){},
@@ -750,7 +750,7 @@ defineFoe('n_echo_glaciar',{boss:true,name:'Echo of the Ice Dragon',title:S('A s
   draw3d:(e,fl)=>n4e3Draw(e,fl), draw2d:(e,fl)=>n4e3Draw(e,fl),
   sheet:[{state:'chase',mode:'coil',z:0,label:'coiled'},{state:'breathW',mode:'coil',z:0,st:0.5,label:'breath'},{state:'chase',mode:'air',z:120,dx:120,label:'flying'},{state:'perched',mode:'air',z:0,label:'landed'},{state:'stagger',mode:'stagger',z:0,label:'stunned'}]});
 function n4e3Draw(e,fl){ n4fRim(e,140,0.2);
-  if(T3.on&&typeof f2FigGlaciar==='function') n4fSkin(()=>f2FigGlaciar(e,fl),'170,210,255'); else if(typeof f2Glaciar2==='function') n4fSkin2(()=>f2Glaciar2(e,fl));
+  if(typeof f2FigGlaciar==='function') n4fSkin2(()=>f2FigGlaciar(e,fl),'170,210,255');
   if(e.n4chest>0){ const H=f2GlaHead(e); glowAt(H.x,H.y-(H.z||0)*0.8,50+40*e.n4chest,'200,230,255',0.6*e.n4chest); }
   if(e.n4shield&&n4e3Left()>0&&!e.dead){ const t=G.time, y=e.y-(e.z||0)*0.8-40; ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.22+0.06*Math.sin(t*3); ctx.fillStyle='rgba(160,210,255,1)'; ctx.beginPath(); ctx.ellipse(e.x,y,110,80,0,0,TAU); ctx.fill();
     ctx.globalAlpha=0.5; ctx.strokeStyle='rgba(230,245,255,1)'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(e.x,y,110,80,0,0,TAU); ctx.stroke(); ctx.restore(); } }
@@ -889,14 +889,14 @@ defineFoe('n_nyxara',{boss:true,name:'Nyxara, the Night Mother',title:S('Eater o
   onHurt:(e,amt,o)=>n4nOnHurt(e,amt,o),
   onDeath(e){ n4nDeath(e); },
   draw3d:(e,fl)=>n4nDraw(e,fl), draw2d:(e,fl)=>n4nDraw2(e,fl),
-  sheet:[{state:'hover',alt:150,nPhase:1,label:'phase 1: high'},{state:'grounded',alt:0,nPhase:1,label:'grounded'},{state:'beamW',alt:150,nPhase:1,st:0.4,label:'moonbeam'},{state:'perch',alt:80,nPhase:3,label:'phase 3: eating'},
+  sheet:[{state:'hover',alt:120,z:120,nPhase:1,label:'phase 1: high'},{state:'grounded',alt:0,nPhase:1,label:'grounded'},{state:'beamW',alt:120,z:120,nPhase:1,st:0.4,label:'moonbeam'},{state:'perch',alt:80,nPhase:3,label:'phase 3: eating'},
     {state:'choked',alt:0,nPhase:3,label:'choked'},{state:'grounded',alt:0,nPhase:4,cracks:1,label:'phase 4: cracks'},{state:'sweepW',alt:0,nPhase:4,st:0.3,label:'wing sweep'}]});
 // the bosses here run their own windows: a stock stun (a pound, a whip crack) does not cut their moves short
 { const base=stunEnemy; stunEnemy=function(e,t){ if(e&&(e.type==='n_nyxara'||e.type==='n_echo_vor'||e.type==='n_echo_glaciar'||e.type==='n_echo_hush')) return; return base(e,t); }; }
 if(typeof M3NOSTUN!=='undefined') M3NOSTUN.add('n_echo_hush');
 function n4nInit(e){
   const C=N4N.C, F=G.flags;
-  Object.assign(e,{alt:150,z:150,state:'hover',st:0,cd:2.4,win:0,wins:[0,0,0,0,0],winStart:0,nPhase:1,mode:'p1',noClip:true,leash:99999,orb:0,face:Math.PI/2,phases:[0.7,0.45,0.2],bph:0,
+  Object.assign(e,{alt:120,z:120,state:'hover',st:0,cd:2.4,win:0,wins:[0,0,0,0,0],winStart:0,nPhase:1,mode:'p1',noClip:true,leash:99999,orb:0,face:Math.PI/2,phases:[0.7,0.45,0.2],bph:0,
     pulls:0,cracks:[],sayT:0,tauntT:6,adds:0,trans:0,gale:0,n4open:false});
   e.homeX=C.x; e.homeY=C.y; N4N.e=e; N4F.nyx=e;
   e.p2rings=N4N.anchors.map(A=>({dx:0,dy:0,h:22,need:1.2,repeat:true,done:true,A,onPull:(r,q,info)=>{ if(info.taut&&Math.random()<0.25) emit(A.x,A.y-30,2,{col:'230,235,255',smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.2,zmax:2}); r.A.pullT=info.strain; },then:(r,q)=>n4nPulled(q,r.A)}));
@@ -915,7 +915,7 @@ function n4nPhaseGo(e,p,fresh){
   n4nFlood(p===2); n4nPools(p===2); n4nStreams(p===3); n4nVeils(p===1); if(F) F.fly=p===3; if(typeof n4wCalm==='function') n4wCalm('cz_summit',p===3);
   for(const A of N4N.anchors){ A.snag=false; A.heat=0; A.lit=0; A.pullT=0; } e.pulls=0; for(const r of e.p2rings||[]) r.done=true;
   for(const f of N4N.frags){ f.gone=false; f.eat=0; f.growT=0; } N4N.darkTo=0;
-  if(p===1){ e.alt=e.z=150; e.state='hover'; e.flying=true; e.cd=2; }
+  if(p===1){ e.alt=e.z=120; e.state='hover'; e.flying=true; e.cd=2; }
   if(p===2){ e.alt=e.z=0; e.state='swim'; e.flying=false; e.sub=true; e.restT=byDiff(6,5,4); e.x=N4N.C.x; e.y=N4N.C.y; }
   if(p===3){ e.alt=e.z=90; e.state='fly'; e.flying=true; e.perch=null; e.toFrag=null; e.choke=0; e.cd=2.5; }
   if(p===4){ e.alt=e.z=0; e.state='grounded'; e.flying=false; e.x=N4N.C.x; e.y=N4N.C.y-30; e.face=Math.PI/2; n4nCracksMake(e); N4F.heartfire=true; G.flags.n_heart_done=1; n4nHeirBig(true); }
@@ -1013,7 +1013,7 @@ function n4nAI(e,dt,p){
   if(e.win>0){ e.win-=dt; e.state=e.state==='dizzy'?'dizzy':'grounded'; e.n4open=true; N4F.cue={x:e.x,y:e.y-60}; if(e.nPhase===2) e.sub=false;
     if(Math.random()<dt*6) emit(e.x+rand(-60,60),e.y-20,1,{col:'230,220,255',glow:false,ang:-Math.PI/2,spread:0.5,smin:20,smax:60,lmin:.5,lmax:1,zmin:1.5,zmax:3,rise:20});
     if(e.win<=0){ e.win=0; n4nWinEnd(e); if(!e.trans) n4nRise(e); } return; }
-  if(e.rise>0){ e.rise-=dt; e.invuln=false; if(e.nPhase===1){ e.alt=e.z=lerp(e.z,150,Math.min(1,dt*2.4)); e.state='rise'; } else if(e.nPhase===2){ e.alt=e.z=0; e.state='sink'; e.alpha=clamp(e.rise/0.6,0.15,1); if(e.rise<=0){ e.sub=true; e.alpha=1; e.state='swim'; } }
+  if(e.rise>0){ e.rise-=dt; e.invuln=false; if(e.nPhase===1){ e.alt=e.z=lerp(e.z,120,Math.min(1,dt*2.4)); e.state='rise'; } else if(e.nPhase===2){ e.alt=e.z=0; e.state='sink'; e.alpha=clamp(e.rise/0.6,0.15,1); if(e.rise<=0){ e.sub=true; e.alpha=1; e.state='swim'; } }
     if(e.rise<=0) e.flying=e.nPhase!==2; return; }
   if(e.nPhase===1) n4nP1(e,dt,p); else if(e.nPhase===2) n4nP2(e,dt,p); else if(e.nPhase===3) n4nP3(e,dt,p); else n4nP4(e,dt,p);
 }
@@ -1033,7 +1033,7 @@ function n4nCap(){ return byDiff(3,5,6); }
 function n4nMoths(e,n,fly){ const have=countType('n_mothling'), room=Math.max(0,n4nCap()-have); n=Math.min(n,room); for(let i=0;i<n;i++){ const s=spotNear(e.x,e.y,90,220); spawnRune('n_mothling',s.x,s.y,{aggro:true,level:23},0.5+i*0.12); } return n; }
 // ===== phase 1: high over the middle; the anchors; Moonbeam Sweep, Dust Rain, Lullaby, the moth swarm
 function n4nP1(e,dt,p){
-  const C=N4N.C; e.orb=(e.orb||0)+dt*0.25; const tx=C.x+Math.cos(e.orb)*90, ty=C.y-40+Math.sin(e.orb)*50; steer(e,tx,ty,60); e.alt=e.z=lerp(e.z,150,Math.min(1,dt*2)); e.flying=true; e.face=turnTo(e.face,angTo(e.x,e.y,p.x,p.y),1.5*dt);
+  const C=N4N.C; e.orb=(e.orb||0)+dt*0.25; const tx=C.x+Math.cos(e.orb)*90, ty=C.y-40+Math.sin(e.orb)*50; steer(e,tx,ty,60); e.alt=e.z=lerp(e.z,120,Math.min(1,dt*2)); e.flying=true; e.face=turnTo(e.face,angTo(e.x,e.y,p.x,p.y),1.5*dt);
   // the anchors: Moonfire on a moonstone (0.8 s) flings its chain up onto a wing
   let snag=0; for(const A of N4N.anchors) if(A.snag) snag++;
   const need=n4nSnagNeed();
@@ -1468,7 +1468,7 @@ function n4fFallTall(list){ const F=N4F.fall; if(!F||n4fS()||!n4fMap4()) return;
 // two huge painted eyes pale as two moons, a white fur ruff, feathery antennae, eyes like black glass with a violet
 // shine, six thin legs, and the glow of the broken moon around her. High up she flies with a huge soft shadow below;
 // grounded she sprawls over a third of the floor. In phase 4 six cracks of moonlight glow on her wings.
-const N4NC={fur:'#aea8c0',furD:'#7c7690',furL:'#cfcbdc',ruff:'#f6f4fc',wing:'#9a94ad',wingL:'#b4aac8',band:'#4e4666',wingD:'#6c6486',hband:'#3e3654',edge:'#d8d0f0',spot:'#eef0ff',ring:'#3a3058',sea:'#c4c8de',eye:'#0b0716',leg:'#4e4866',ant:'#e4e0f2'};
+const N4NC={fur:'#9690ac',furD:'#645e7c',furL:'#bdb7cf',ruff:'#f4f2fc',wing:'#77708f',wingL:'#968cb6',band:'#352d4c',wingD:'#554d6e',hband:'#2a2340',edge:'#d8d0f0',spot:'#f0f2ff',ring:'#221b38',sea:'#bfc4dc',eye:'#0b0716',leg:'#3e3858',ant:'#e4e0f2'};
 // one of her wings: a dark dusty band round the edge, the grey wing, a violet shimmer, and (forewings) a painted moon
 const _n4w=[];
 function n4nWing(sd,x,y,z,span,L,th,sweep,band,col,shim,moon,fl){
@@ -1514,7 +1514,7 @@ function n4nFig(e,fl){
   foBegin(fx,fy,face,K,fl,zb);
   if(dead) foSet(FOB,20,0,dead*0.8,0,0,0,-dead*8); else foSet(FOB,20,P[4],P[5],0);
   // the broken-moon glow behind her
-  foGlow(-6,0,30,110,'205,195,255',0.32+0.06*Math.sin(t*1.3),false);
+  foGlow(-6,0,18,120,'190,170,255',0.16+0.04*Math.sin(t*1.3),true);
   // wings: forewings (the painted moon eyes) and hindwings, all four from the thorax
   for(const sd of [-1,1]){
     n4nWing(sd,-10,sd*6,24,40,30,th*0.9-0.04,sw+8,C.hband,wingD,null,0,fl);
@@ -1538,6 +1538,9 @@ function n4nBodyPt(e,wx,wy,bz){ const K=N4N_K*(e.n4scale||1); return {x:wx, y:e.
 function n4nDraw(e,fl){
   if(e.mode==='heart'||e.alpha<0.05) return;
   if(e.sub&&e.nPhase===2) return;   // under the ink: only her ripple and her eyes show (the ground layer)
+  // a soft halo of night behind her, so the moth reads against the pale glass
+  { const K=N4N_K*(e.n4scale||1), cy=e.y+6-((e.z||0)+26*K*T3.st), R=230*(e.n4scale||1), g=ctx.createRadialGradient(e.x,cy,R*0.15,e.x,cy,R); g.addColorStop(0,'rgba(18,8,36,.42)'); g.addColorStop(0.6,'rgba(30,14,60,.22)'); g.addColorStop(1,'rgba(30,14,60,0)');
+    ctx.save(); ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(e.x,cy,R,R*0.72,0,0,TAU); ctx.fill(); ctx.restore(); }
   if(T3.on) n4nFig(e,fl); else n4nFig2(e,fl);
   n4nCracksDraw(e);
   if(e.state==='dizzy'||e.state==='grounded'&&e.n4open&&e.nPhase<4){ const top=e._t3top!=null&&T3.on?e._t3top:e.y-110; ctx.fillStyle='#ffe066'; for(let i=0;i<5;i++){ const a=G.time*4+i*TAU/5; ctx.beginPath(); ctx.arc(e.x+Math.cos(a)*46,top+8+Math.sin(a)*9,4,0,TAU); ctx.fill(); } }
@@ -1594,7 +1597,7 @@ function n4nVeils(on){ N4N.veilOn=!!on; if(typeof p2Add!=='function') return;
 N4N.L={x:4500,y:85200,r:420,i:0};
 if(typeof LIGHTS!=='undefined'){ LIGHTS.push(N4N.L); for(const A of N4N.anchors){ A.L={x:A.x,y:A.y-60,r:190,i:0}; LIGHTS.push(A.L); } }
 function n4nLights(e){ const on=!!(e&&!e.dead&&e.mode!=='heart'&&N4F.fight&&N4F.fight.k==='n_summit');
-  N4N.L.i=on?(e.sub?0.25:0.55):0; if(e){ N4N.L.x=e.x; N4N.L.y=e.y-(e.z||0)*0.4; }
+  N4N.L.i=on?(e.sub?0.25:0.55):0; if(e){ N4N.L.x=e.x; N4N.L.y=e.y-(e.z||0)*0.72-50; }
   for(const A of N4N.anchors) if(A.L) A.L.i=on&&e.nPhase===1?(A.snag?0.8:A.heat>0||A.lit>0?0.6:0.12):0; }
 // the floor: a faint moth sigil, the ink flood with its ripple and the three moon-glass platforms, the anchors' rings
 function n4nGroundDraw(t){
@@ -1619,7 +1622,7 @@ function n4nGroundDraw(t){
       ctx.fillStyle='rgba(255,255,255,.45)'; ctx.beginPath(); ctx.ellipse(P.x-28,P.y-30,36,12,-0.4,0,TAU); ctx.fill();
       if(lit){ ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.5+0.35*Math.sin(t*9); ctx.drawImage(foGlowSpr('170,110,255'),P.x-P.r*1.5,P.y-P.r*1.5,P.r*3,P.r*3); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=k;
         for(const sd of [-1,1]){ ctx.fillStyle='rgba(60,20,110,.55)'; ctx.beginPath(); ctx.ellipse(P.x+sd*36,P.y+4,18,10,0,0,TAU); ctx.fill(); }
-        ctx.fillStyle='#fff6c0'; ctx.font=`900 22px ${UIF}`; ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#3b2233'; const tx=simplify(S('POUND!','POUND!')); ctx.strokeText(tx,P.x,P.y-P.r-14-6*Math.abs(Math.sin(t*5))); ctx.fillText(tx,P.x,P.y-P.r-14-6*Math.abs(Math.sin(t*5))); }
+      }
       if(P.crack){ ctx.strokeStyle='rgba(90,80,140,.8)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(P.x-50,P.y-20); ctx.lineTo(P.x-6,P.y+4); ctx.lineTo(P.x+40,P.y-30); ctx.moveTo(P.x-6,P.y+4); ctx.lineTo(P.x+10,P.y+60); ctx.stroke(); } }
     ctx.globalAlpha=1; } else N4N.floodA=0;
   // phase 1: the chain ring at each anchor's foot (PULL when its chain is snagged and enough are)
@@ -1664,6 +1667,8 @@ function n4nAir(){ const e=N4N.e&&!N4N.e.dead?N4N.e:null, t=G.time; if(!e) retur
       ctx.strokeStyle='#eef2ff'; ctx.lineWidth=3.5; ctx.setLineDash([7,4]); ctx.lineDashOffset=-t*20; ctx.stroke(); ctx.setLineDash([]);
       ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.35; ctx.strokeStyle='rgba(200,215,255,1)'; ctx.lineWidth=12; ctx.stroke(); ctx.restore();
       if(ready){ const b=Math.abs(Math.sin(t*5))*8; ctx.save(); ctx.font=`900 ${W<600?18:20}px ${UIF}`; ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#3b2233'; const tx=simplify(S('PULL!','PULL!')); ctx.strokeText(tx,A.x,A.y-100-b); ctx.fillStyle='#ffe066'; ctx.fillText(tx,A.x,A.y-100-b); ctx.restore(); } } }
+  // phase 2: POUND! over the glowing platform she hides under
+  if(e.nPhase===2&&e.restP){ const P=e.restP, b=6*Math.abs(Math.sin(t*5)); ctx.save(); ctx.fillStyle='#fff6c0'; ctx.font=`900 ${W<600?20:24}px ${UIF}`; ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='#3b2233'; const tx=simplify(S('POUND!','POUND!')); ctx.strokeText(tx,P.x,P.y-P.r-16-b); ctx.fillText(tx,P.x,P.y-P.r-16-b); ctx.restore(); }
   if(N4N.vpry&&N4N.vpry.t<1.6){ const V=N4N.vpry; V.t+=1/60; ctx.save(); ctx.globalAlpha=1-V.t/1.6; ctx.fillStyle='#e8d8ff'; ctx.font=`800 16px ${UIF}`; ctx.textAlign='center'; ctx.fillText(simplify(S('Vesper pries it open!','Vesper helps!')),V.x,V.y-110-V.t*20); ctx.restore(); }
 }
 // screen space (after the world): the moon filling with light, the streams of light going up to it, the drowsy dim,
@@ -1731,6 +1736,9 @@ function n4nFallDraw(F){ const e=F.fig||(F.fig={type:'n_nyxara',x:F.x,y:F.y,face
   ctx.save(); if(F.fade) ctx.globalAlpha=clamp(1-(F.fa||0)/3,0,1); if(T3.on) n4nFig(e,false); else n4nFig2(e,false);
   const t=G.time; glowAt(F.x+20*F.k,F.y-40*F.k,40*F.k,'235,240,255',0.6+0.2*Math.sin(t*2)); ctx.fillStyle='#eef2ff'; ctx.beginPath(); ctx.arc(F.x+20*F.k,F.y-40*F.k,10*F.k,0.6,TAU-0.6); ctx.arc(F.x+26*F.k,F.y-40*F.k,8*F.k,TAU-0.8,0.8,true); ctx.fill();
   ctx.restore(); }
+// the camera leans toward her where she is drawn (as for Vorlaxis in the sky): she is the thing to watch
+{ const base=updateCam; updateCam=function(dt,snap){ const e=N4N.e; if(!(e&&!e.dead&&G.boss===e&&N4F.fight&&N4F.fight.k==='n_summit'&&!AREA&&e.mode!=='heart')) return base(dt,snap);
+    const nc=e.noClip, ey=e.y; e.noClip=false; e.y=ey-(e.z||0)*0.72-40; try{ return base(dt,snap); } finally{ e.noClip=nc; e.y=ey; } }; }
 
 // ================= 12. the scripted fighter (tests) and the debug hooks (window.__ebX.n4f, also __eb.n4f)
 // The bot plays through Ash's own controls: it walks with the stick, breathes fire or Moonfire (FIRE, facing the target;
