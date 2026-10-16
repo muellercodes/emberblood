@@ -1,0 +1,6 @@
+{
+  "_about": "Simple-words templates for text x4_story.js builds at runtime (its fixed lines carry their simple version inline with S()).",
+  "n4s_lanterns": {"o": "Light the three lanterns at the Bridgefoot ({1}/3)", "s": "Light the three lanterns ({1}/3)"},
+  "n4s_flames": {"o": "Take the three memory flames ({1}/3)", "s": "Get the three flames ({1}/3)"},
+  "n4s_winsub": {"o": "Ending {1} of 3 · Endings found: {2} of 3 · First journey: {3}", "s": "Ending {1} of 3 · Found {2} of 3 · First: {3}"}
+}
