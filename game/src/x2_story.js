@@ -887,8 +887,10 @@ defineStages(3,[
     objectives(){ if(G.flags.f_done||G.choices.f_glaciar) return [];
       if(G.boss&&!G.boss.dead&&G.boss.type==='f_glaciar'){ const n=f2sChains(); return [{text:n>=4?S('All four chains are gone! Hit the Shard in her chest','Hit the Shard in her chest!'):S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:G.boss.x,y:G.boss.y,fight:true}]; }
       const L=f2sNextLock(); if(L){ const n=f2sChains(); return [{text:S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:L.x,y:L.y}]; }
-      // (Ash who fell in the fight wakes at a shrine below the mountain: the way back up is through the Heart of Dread)
-      if(f2sInArea('f_dread')||(curMap()===2&&!AREA&&f2sElev()<6)) return [f2sDunObj('f_dread','Climb back up through the Heart of Dread to the Crown','Climb back up to the top of the mountain',F2SP.dreadgate)];
+      // (Ash who fell in the fight wakes at the shrine he last used, below the mountain or on another map: the way back
+      // up is through the Heart of Dread; e1_maps routes the marker over the crossings from another map)
+      const onCrown=curMap()===2&&!AREA&&f2sElev()>=6;
+      if(f2sInArea('f_dread')||!onCrown) return [f2sDunObj('f_dread','Climb back up through the Heart of Dread to the Crown','Climb back up to the top of the mountain',F2SP.dreadgate)];
       return [{text:S('Face Glaciar on the Crown of Dread','Face Glaciar on top of the mountain'),x:F2SP.crown.x,y:F2SP.crown.y}]; },
     idle:()=>G.flags.f_done?S('The north is warm again. Rest at a shrine or an inn when you are ready for the next part of the story.','Rest when you are ready for more story.')
       :G.choices.f_glaciar?S('The Crown of Dread is quiet. Night is coming to Hearthold.','The mountain is quiet. Night is coming.'):'',
