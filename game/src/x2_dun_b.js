@@ -175,6 +175,8 @@ function d2bBuildRoom(A,def,R,P){
       if(R.iceBlocks) for(const b of A.blocks) if(b.room===k) b.d2bIce=true;
       if(R.ringAll) for(const o of A.objs) if(o.p3==='drum'&&o.room===k) o.ring=1400; }
     // a grapple post standing on one of our raised levels is at that level (the zip lands up there)
+    // ice trampled to slush on an earlier visit stays melted
+    if(A.p3) for(const g of A.p3.gates) if(g.g==='ice'&&G.found[g.id+'_slush']){ g.d2bSlush=true; g.melted=true; g.closed=false; }
     if(c.d2bAnyH) for(const o of (A.dn&&A.dn.grapples)||[]){ const k=Math.floor((o.y-A.y0)/cs)*c.w+Math.floor((o.x-A.x0)/cs); if(c.d2bH[k]>0) o.lvl=c.d2bH[k]; }
     // the summit door's four locks
     if(ST.summit&&ST.summitCfg) ST.summit.locks=ST.summitCfg.locks.map(q=>`p3_${caveSid(def)}_${q[0]}_K${q[1]}_${q[2]}`);
@@ -289,17 +291,20 @@ function d2bLifts(A,dt){
 function d2bEyeAwake(o){ return !o.dead&&o.shutT<=0&&o.open; }
 function d2bEyes(A,dt){
   const ST=A.d2b; if(!ST.eyes.length) return;
+  const C0=A.p3, pk=tCell(player.x,player.y);
+  if(C0&&!airborne()) for(const g of C0.gates){ if(g.g!=='ice'||!g.melted||g.d2bSlush||g.cells[0]!==pk) continue; if(!ST.eyes.some(e=>e.room===g.room)) continue;
+    g.d2bSlush=true; G.found[g.id+'_slush']=true; d2bSay(g.x,g.y-40,S('Squelch! Trampled into slush. It cannot freeze again.','Slush! It stays melted.'),'#dff4ff','slush',4); }
   for(const o of ST.eyes){
     if(o.flash>0) o.flash-=dt;
     if(o.dead){ o.open=false; o.L.i=0.05; continue; }
-    const R=A.rooms[o.room]; if(R&&R.solved&&R.kind==='melt'){ o.dead=true; G.found[o.id+'_dead']=true; d2bSnd('shatter'); emit(o.x,o.y,24,{col:'200,170,255',smin:40,smax:160,lmin:.3,lmax:.7,zmin:1.5,zmax:3}); continue; }
+    const R=A.rooms[o.room]; if(R&&R.solved&&(R.kind==='melt'||R.reachAt)){ o.dead=true; G.found[o.id+'_dead']=true; d2bSnd('shatter'); emit(o.x,o.y,24,{col:'200,170,255',smin:40,smax:160,lmin:.3,lmax:.7,zmin:1.5,zmax:3}); continue; }
     if(o.shutT>0){ o.shutT-=dt; o.open=false; if(o.shutT<=0){ o.flash=0.6; d2bSnd('crack',0.5); d2bSay(o.x,o.y+30,S('The eye opens again!','The eye is open!'),'#e8d0ff','eyeopen'+o.id,2); } o.L.i=0.12; continue; }
     const per=4, ph=((ST.t+o.ph)%per+per)%per; o.open=ph<3; o.L.i=o.open?0.65:0.2; o.look=(o.look+dt*1.6)%TAU;
     if(!o.open) continue;
     // its gaze: ice melted in the room grows back, cracked domes close (never on Ash)
     const C=A.p3; if(!C) continue;
     for(const g of C.gates){ if(g.room!==o.room) continue; if(o.targets&&!o.targets.some(q=>tCell(g.x,g.y)===d2bK(R,q[0],q[1]))) continue;
-      if(g.g==='ice'&&g.melted){ if(p3Refreeze(g)){ o.flash=0.5; g.d2bFlash=0.5; d2bTip('eye',S('The Shard Eye froze it again!','The eye froze it again!'),S('Shoot the eye shut with an arrow first. It only takes arrows while it is open.','Shoot the eye with an arrow first!')); } }
+      if(g.g==='ice'&&g.melted&&!g.d2bSlush){ if(p3Refreeze(g)){ o.flash=0.5; g.d2bFlash=0.5; d2bTip('eye',S('The Shard Eye froze it again!','The eye froze it again!'),S('Shoot the eye shut with an arrow first. It only takes arrows while it is open.','Shoot the eye with an arrow first!')); } }
       if(g.g==='lock'&&!g.done&&g.crack>0){ g.crack=0; g.heat=0; o.flash=0.5; g.d2bFlash=0.5; d2bSnd('crack',0.6); d2bSay(g.x,g.y-56,S('The eye seals the ice!','The ice is back!'),'#e8d0ff','eyelock',1.5); d2bTip('eye',S('The Shard Eye sealed the dome!','The eye sealed it!'),S('Shoot the eye shut with an arrow first. Then pound the plate and melt the lock.','Shoot the eye first!')); if(d2bRootOf(A.def)==='f_dread') d2bBeat('f_dread_eye',0.2); } }
   }
 }
@@ -389,7 +394,8 @@ function d2bFalls(A,dt){
 function d2bEcho(A,dt){
   const ST=A.d2b; if(!ST.echo) return; const R=A.rooms[ST.echo.room], p=player, inR=caveRoomAt(p.x,p.y)===R;
   ST.ech=(ST.ech||[]).filter(e=>(e.t+=dt)<e.dur);
-  if(inR&&!R.solved){ A.dark=0.985; A.plr=G.items&&G.items.lantern?90:64; }
+  if(inR&&!R.solved){ A.dark=0.93/(typeof LOOK!=='undefined'&&LOOK.sb?0.66:1);   // (the Storybook look softens cave dark by 0.66: this room stays pitch dark)
+    A.plr=G.items&&G.items.lantern?90:64; }
   for(const e of G.enemies){ if(e.dead||!e.d2bDive) continue; const d=e.d2bDive; d.t-=dt; if(d.t<=0){ e.d2bDive=null; continue; } const a=angTo(e.x,e.y,d.x,d.y), s=260; e.x+=Math.cos(a)*s*dt; e.y+=Math.sin(a)*s*dt; e.face=a; }
 }
 // the echo is light: give each live ring a light while it lasts
@@ -689,12 +695,17 @@ function d2bDrawBridge(b,t,tall){
     ctx.fillStyle='#8a8a98'; if(horiz){ ctx.fillRect(b.x0,b.y0+6,w,3); ctx.fillRect(b.x0,b.y1-9,w,3); } else { ctx.fillRect(b.x0+6,b.y0,3,h); ctx.fillRect(b.x1-9,b.y0,3,h); }
     ctx.restore(); return; }
   if(a>0.98) return;
-  // the raised deck: a tall plank standing at the hinge edge, leaning back
-  const k=1-a, hx=b.hinge==='w'?b.x0:b.hinge==='e'?b.x1:(b.x0+b.x1)/2, hy=b.hinge==='n'?b.y0:b.hinge==='s'?b.y1:(b.y0+b.y1)/2;
-  const L=(horiz?w:h)*k, ww=horiz?h-8:w-8;
-  ctx.save(); ctx.translate(hx,hy+ww*0.5); ctx.fillStyle=SBC.outline; rrect(ctx,-ww/2-3,-L-3,ww+6,L+4,5); ctx.fill(); ctx.fillStyle=D2BC.wood; rrect(ctx,-ww/2,-L,ww,L,4); ctx.fill();
-  ctx.fillStyle='rgba(60,30,10,.45)'; for(let y=-L+12;y<0;y+=14) ctx.fillRect(-ww/2,y,ww,2); ctx.fillStyle='#8a8a98'; ctx.fillRect(-ww/2+4,-L,3,L); ctx.fillRect(ww/2-7,-L,3,L); ctx.restore();
-  if(b.lk&&!b.down) d2bChain(hx,hy+ww*0.5-L+6,b.lk.x,b.lk.y-18,t,1);
+  // the raised deck: the plank stands up on its hinge edge (seen edge-on beside a west or east hinge, face-on beside a
+  // north or south one), held by the chain that runs to its lock
+  const k=1-a, side=b.hinge==='w'||b.hinge==='e', hx=b.hinge==='w'?b.x0:b.hinge==='e'?b.x1:(b.x0+b.x1)/2, rise=(side?w:h)*0.55*k;
+  ctx.save();
+  if(side){ const x=hx-9, y0=b.y0-rise, H=h+rise; ctx.fillStyle='rgba(0,0,0,.3)'; ctx.fillRect(x+4,b.y0+6,22,h); ctx.fillStyle=SBC.outline; rrect(ctx,x-3,y0-3,24,H+6,5); ctx.fill(); ctx.fillStyle=D2BC.wood; rrect(ctx,x,y0,18,H,4); ctx.fill();
+    ctx.fillStyle='rgba(255,230,190,.35)'; ctx.fillRect(x+3,y0+3,4,H-6); ctx.fillStyle='rgba(60,30,10,.45)'; for(let y=y0+14;y<y0+H;y+=16) ctx.fillRect(x,y,18,2); ctx.fillStyle='#8a8a98'; ctx.fillRect(x-1,y0+8,20,4); ctx.fillRect(x-1,y0+H-12,20,4);
+    if(b.lk&&!b.down) d2bChain(hx,y0+8,b.lk.x,b.lk.y-18,t,1); }
+  else { const y=b.hinge==='n'?b.y0:b.y1, x0=b.x0, W=w, y0=y-rise-10; ctx.fillStyle=SBC.outline; rrect(ctx,x0-3,y0-3,W+6,rise+16,5); ctx.fill(); ctx.fillStyle=D2BC.wood; rrect(ctx,x0,y0,W,rise+10,4); ctx.fill();
+    ctx.fillStyle='rgba(60,30,10,.45)'; for(let x=x0+12;x<x0+W;x+=14) ctx.fillRect(x,y0,2,rise+10); ctx.fillStyle='#8a8a98'; ctx.fillRect(x0+6,y0,3,rise+10); ctx.fillRect(x0+W-9,y0,3,rise+10);
+    if(b.lk&&!b.down) d2bChain((b.x0+b.x1)/2,y0+6,b.lk.x,b.lk.y-18,t,1); }
+  ctx.restore();
 }
 function d2bDrawRuneBridge(b,t){ if(b.a<0.01&&!b.down) return; const drop=b.down?b.drop:0, off=(1-Math.max(0,drop))*-160, w=b.x1-b.x0, h=b.y1-b.y0;
   ctx.save(); if(drop<1){ ctx.globalAlpha=0.35+0.65*Math.max(0,drop); ctx.fillStyle='rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse((b.x0+b.x1)/2,(b.y0+b.y1)/2,w*0.6*Math.max(0.2,drop),h*0.6,0,0,TAU); ctx.fill(); ctx.globalAlpha=1; }
@@ -725,12 +736,16 @@ function d2bPaint(A,def){
   g.save(); g.setTransform(A.canvasS,0,0,A.canvasS,0,0);
   const solid=(i,j)=>i<0||j<0||i>=c.w||j>=c.h||(c.grid[j*c.w+i]===1&&c.typ[j*c.w+i]!==1);
   // the open sky beyond the ledges of the Wind Gate (and the void in the Chimney): cloud far below, not black
-  for(const id in c.rooms){ const R=c.rooms[id]; if(!R.voidLook) continue;
-    for(let j=R.oy+1;j<=R.oy+R.ih;j++) for(let i=R.ox+1;i<=R.ox+R.iw;i++){ const k=j*c.w+i; if(c.grid[k]!==0||(c.typ[k]!==TY.chasm&&c.typ[k]!==TY.pit)) continue; const x=i*cs, y=j*cs;
-      if(R.voidLook==='sky'){ const gr=g.createLinearGradient(0,y,0,y+cs); gr.addColorStop(0,'#8e9ec8'); gr.addColorStop(1,'#a8b6d8'); g.fillStyle=gr; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(255,255,255,.55)'; if(rng()<0.5){ g.beginPath(); g.ellipse(x+rng()*cs,y+rng()*cs,10+rng()*14,5+rng()*4,0,0,TAU); g.fill(); } }
+  // (inside the mountain a chasm is a deep dark drop, never the sky: the stock chasm look is the open sky)
+  for(const id in c.rooms){ const R=c.rooms[id], look=R.voidLook||'deep';
+    for(let j=R.oy+1;j<=R.oy+R.ih;j++) for(let i=R.ox+1;i<=R.ox+R.iw;i++){ const k=j*c.w+i; if(c.grid[k]!==0||(c.typ[k]!==TY.chasm&&(look==='deep'||c.typ[k]!==TY.pit))) continue; const x=i*cs, y=j*cs;
+      if(look==='deep'){ const up=c.typ[k-c.w]!==TY.chasm||c.grid[k-c.w]!==0, gr=g.createLinearGradient(0,y,0,y+cs); gr.addColorStop(0,up?(dread?'#2a2240':'#3a2418'):(dread?'#0e0b1a':'#120a07')); gr.addColorStop(1,dread?'#0a0814':'#0e0806'); g.fillStyle=gr; g.fillRect(x,y,cs,cs);
+        if(rng()<0.22){ g.fillStyle=dread?'rgba(190,160,255,.22)':'rgba(120,210,255,.2)'; g.beginPath(); g.arc(x+rng()*cs,y+rng()*cs,1.2+rng()*1.6,0,TAU); g.fill(); }
+        if(up){ g.fillStyle='rgba(0,0,0,.45)'; g.fillRect(x,y,cs,6); } continue; }
+      if(look==='sky'){ const gr=g.createLinearGradient(0,y,0,y+cs); gr.addColorStop(0,'#8e9ec8'); gr.addColorStop(1,'#a8b6d8'); g.fillStyle=gr; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(255,255,255,.55)'; if(rng()<0.5){ g.beginPath(); g.ellipse(x+rng()*cs,y+rng()*cs,10+rng()*14,5+rng()*4,0,0,TAU); g.fill(); } }
       else { g.fillStyle='#0c0a16'; g.fillRect(x,y,cs,cs); if(rng()<0.25){ g.fillStyle='rgba(180,160,230,.18)'; g.beginPath(); g.ellipse(x+rng()*cs,y+rng()*cs,8+rng()*10,3,0,0,TAU); g.fill(); } } }
     // the rim of every ledge: snow lip
-    for(let j=R.oy+1;j<=R.oy+R.ih;j++) for(let i=R.ox+1;i<=R.ox+R.iw;i++){ const k=j*c.w+i; if(c.grid[k]!==0||c.typ[k]===TY.chasm) continue; const x=i*cs, y=j*cs, below=(j+1)*c.w+i;
+    if(R.voidLook) for(let j=R.oy+1;j<=R.oy+R.ih;j++) for(let i=R.ox+1;i<=R.ox+R.iw;i++){ const k=j*c.w+i; if(c.grid[k]!==0||c.typ[k]===TY.chasm) continue; const x=i*cs, y=j*cs, below=(j+1)*c.w+i;
       if(c.typ[below]===TY.chasm){ g.fillStyle='#4a4060'; g.fillRect(x,y+cs-8,cs,10); g.fillStyle='#f2f6ff'; g.beginPath(); g.ellipse(x+cs/2,y+cs-8,cs*0.6,6,0,0,TAU); g.fill(); } } }
   // our heights: each level a shade lighter, a cliff face under every higher edge, a lip on top
   if(c.d2bAnyH){ for(let j=0;j<c.h;j++) for(let i=0;i<c.w;i++){ const k=j*c.w+i; if(c.grid[k]!==0) continue; const h=c.d2bH[k]; if(h>0){ g.fillStyle=`rgba(255,250,235,${0.07*h})`; g.fillRect(i*cs,j*cs,cs,cs); if(c.d2bS[k]){ g.fillStyle='rgba(255,236,190,.22)'; g.fillRect(i*cs+4,j*cs+cs-10,cs-8,4); } } }
@@ -938,8 +953,8 @@ defineDungeon('f_dread',{name:S('The Heart of Dread','The Heart of Dread'),level
       f:{at:[1,0],kind:'chains',tpl:T.f.tpl,hz:T.f.hz,frost:T.f.frost,dz:T.f.dz,foes:[['f_shardling',2]],foeAt:[[13,1],[7,3]],noPots:true,noDecor:true,locks:{'13,8':{cover:'lid'}},
          chainBridges:[{lock:[13,8],a:[9,2],b:[11,2],hinge:'e'},{lock:[8,10],a:[3,6],b:[5,6],hinge:'e'},{lock:[1,1],a:[3,4],b:[5,4],hinge:'w'}],
          tip:[S('The Chain Bridges','The Chain Bridges'),S('Three bridges, three locks. Break the lid, zip up to the ledge with the Grapple Tail, slip through the bars.','Three locks. Lid, ledge, bars!')]},
-      g:{at:[0,0],kind:'melt',tpl:T.g.tpl,frost:T.g.frost,dz:T.g.dz,eyes:{'9,0':{ph:0},'11,10':{ph:2}},noPots:true,noDecor:true,
-         tip:[S('Shard Eyes!','Shard Eyes!'),S('While an eye is open, melted ice freezes again. Shoot both eyes shut with arrows, then melt the ice fast.','Shoot both eyes. Then melt the ice fast!')]},
+      g:{at:[0,0],kind:'d2breach',reachAt:[7,9],tpl:T.g.tpl,frost:T.g.frost,dz:T.g.dz,eyes:{'9,0':{ph:0},'11,10':{ph:2}},noPots:true,noDecor:true,
+         tip:[S('Shard Eyes!','Shard Eyes!'),S('While an eye is open, melted ice freezes again. Shoot both eyes shut with arrows, then melt the ice and walk through it fast. Ice you have walked through is slush and stays melted.','Shoot both eyes. Then melt the ice fast!')]},
       h:Object.assign({at:[0,1]},F2_ROOM.f_grumbo,{tpl:den,stairSeal:true,up:'f_dread_3'})},
       links:[['e','f','open'],['f','g','gate:f'],['g','h','open']]}},
     {id:'3',name:S('The Frozen Throat','The Frozen Throat'),map:{rooms:{
