@@ -617,8 +617,16 @@ function d3bFloorArt(g,A,R,f,rng){
     for(let n=0;n<24;n++){ const a=n/24*TAU; g.beginPath(); g.moveTo(cx+Math.cos(a)*rad*0.93,cy+Math.sin(a)*rad*0.93); g.lineTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad); g.stroke(); }
     for(let n=0;n<26;n++){ const a=rng()*TAU, d=Math.sqrt(rng())*rad*0.95; g.fillStyle='rgba(255,236,190,.8)'; d3bStarPath(g,cx+Math.cos(a)*d,cy+Math.sin(a)*d,1.6+rng()*2.4,4); g.fill(); } }
   else if(k==='lantern'){ // the LANTERN constellation, as the star lamps of the dome stand (the good ones of the room)
-    const S=f.pts||[]; g.globalAlpha=0.9; g.strokeStyle='rgba(255,226,150,.65)'; g.lineWidth=3; g.setLineDash([6,6]); g.beginPath(); S.forEach((q,n)=>{ const x=ox+(q[0]+0.5)*cs, y=oy+(q[1]+0.5)*cs; n?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke(); g.setLineDash([]);
-    for(const q of S){ const x=ox+(q[0]+0.5)*cs, y=oy+(q[1]+0.5)*cs; g.fillStyle='rgba(255,236,170,.95)'; d3bStarPath(g,x,y,7,5); g.fill(); g.strokeStyle='#8a6a2a'; g.lineWidth=1.5; g.stroke(); } }
+    let S=f.pts||[], mini=false;
+    // a small star chart of the room's good star lamps (scale f.s, centred on f.at): the picture to copy. Moon stars
+    // are silver on it, fire stars gold
+    if(!S.length&&R.o3){ const good=Object.keys(R.o3).filter(q=>R.o3[q].good).map(q=>{ const v=q.split(',').map(Number); v.push(R.o3[q].kind||'fire'); return v; }); if(good.length){ mini=true;
+        const mx=good.reduce((a,q)=>a+q[0],0)/good.length, my=good.reduce((a,q)=>a+q[1],0)/good.length, sc=f.s||0.28;
+        good.sort((a,b)=>Math.atan2(a[1]-my,a[0]-mx)-Math.atan2(b[1]-my,b[0]-mx)); S=good.map(q=>[at[0]+(q[0]-mx)*sc,at[1]+(q[1]-my)*sc,q[2]]); S.push(S[0]);
+        g.globalAlpha=0.95; g.fillStyle='rgba(16,12,40,.88)'; g.beginPath(); g.ellipse(cx,cy,cs*2.0,cs*1.3,0,0,TAU); g.fill(); g.strokeStyle='#d8b468'; g.lineWidth=3; g.stroke();
+        g.fillStyle='rgba(255,236,190,.5)'; for(let n=0;n<16;n++){ const a=rng()*TAU, d=Math.sqrt(rng())*cs*1.15; d3bStarPath(g,cx+Math.cos(a)*d*1.5,cy+Math.sin(a)*d,1+rng()*1.2,4); g.fill(); } } }
+    g.globalAlpha=0.95; g.strokeStyle='rgba(255,226,150,.8)'; g.lineWidth=mini?2:3; g.setLineDash(mini?[]:[6,6]); g.beginPath(); S.forEach((q,n)=>{ const x=ox+(q[0]+0.5)*cs, y=oy+(q[1]+0.5)*cs; n?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke(); g.setLineDash([]);
+    for(const q of S){ const x=ox+(q[0]+0.5)*cs, y=oy+(q[1]+0.5)*cs; g.fillStyle=q[2]==='moon'?'rgba(205,222,255,1)':'rgba(255,214,110,1)'; d3bStarPath(g,x,y,mini?6:7,5); g.fill(); g.strokeStyle=q[2]==='moon'?'#3a4a8a':'#8a6a2a'; g.lineWidth=1.5; g.stroke(); } }
   else if(k==='mirrorline'){ g.globalAlpha=0.8; const ax=f.axis||'x'; g.strokeStyle='rgba(200,215,255,.85)'; g.lineWidth=4; g.setLineDash([10,8]); g.beginPath(); if(ax==='x'){ g.moveTo(ox+R.iw*cs/2,oy); g.lineTo(ox+R.iw*cs/2,oy+R.ih*cs); } else { g.moveTo(ox,oy+R.ih*cs/2); g.lineTo(ox+R.iw*cs,oy+R.ih*cs/2); } g.stroke(); g.setLineDash([]); }
   else if(k==='hourglass'){ g.globalAlpha=0.5; g.strokeStyle='#d8b468'; g.lineWidth=5; const w=R.iw*cs, h=R.ih*cs; g.beginPath(); g.moveTo(ox+cs,oy+cs*0.5); g.lineTo(ox+w-cs,oy+cs*0.5); g.lineTo(ox+w/2+cs*1.6,oy+h/2); g.lineTo(ox+w-cs,oy+h-cs*0.5); g.lineTo(ox+cs,oy+h-cs*0.5); g.lineTo(ox+w/2-cs*1.6,oy+h/2); g.closePath(); g.stroke(); }
   else if(k==='orrery'){ g.globalAlpha=0.55; g.strokeStyle='#d8b468'; g.lineWidth=3; for(const rr of [1.2,2.6,4.2]){ g.beginPath(); g.ellipse(cx,cy,rr*cs,rr*cs*0.82,0,0,TAU); g.stroke(); } }
@@ -937,11 +945,11 @@ defineDungeon('m_obs',{name:S('The Eclipse Observatory','The Eclipse Observatory
     links:[['f','g','open'],['g','h','gate:g'],['h','i','open'],['g','j','open']]}},
   {id:'3',name:S('The Star Dome','The Star Dome'),dark:0.5,map:{rooms:{
     k:d3bR({at:[1,1],kind:'d3stars',tpl:D3B_OB.k,down:'m_obs_2',loot:['compass'],noPots:true,noDecor:true,vesper:[9,1],
-      floorArt:[{k:'stars',r:4.6,at:[7,5]},{k:'lantern',mini:true,at:[7,5]}],
+      floorArt:[{k:'stars',r:4.6,at:[7,5]},{k:'lantern',mini:true,at:[11,9],s:0.28}],
       o3:{'7,1':{kind:'fire',high:true,good:true},'2,3':{kind:'moon',good:true},'12,3':{kind:'fire',high:true,good:true},'2,7':{kind:'fire',good:true},'12,7':{kind:'moon',good:true},
         '7,3':{kind:'moon'},'2,5':{kind:'fire'},'7,5':{kind:'fire',high:true},'12,5':{kind:'moon'},'7,7':{kind:'fire'}},
       sealText:S('A chest with a star map on the lid. The stars of the picture are not lit yet.','Light the stars of the picture first.'),
-      tip:[S('The Star Dome','The Star Dome'),S('The picture in the middle of the floor is a constellation: the LANTERN. Light the star lamps that make its shape. A wrong star puts them all out. Fire stars want fire, moon stars want Moonfire.','Light the stars of the LANTERN. A wrong star puts them out.')]}),
+      tip:[S('The Star Dome','The Star Dome'),S('The little star chart on the floor by the stairs is a constellation: the LANTERN. Light the star lamps of the room that make its shape. A wrong star puts them all out. Fire stars want fire, moon stars want Moonfire.','Copy the star chart by the stairs. A wrong star puts them out.')]}),
     l:d3bR({at:[0,1],kind:'free',tpl:D3B_OB.l,loot:['skey'],noPots:true,noDecor:true,gust:{dir:[-1,0],str:90,on:1.2,off:3.8},
       ribbons:[{pts:[[12,9],[2,9],[2,3],[5,1]],w:1.3,id:'d3b_chimney'}],
       sign:S('THE WIND CHIMNEY. Warm air rises. So can you.','Warm air rises. So can you.')}),
