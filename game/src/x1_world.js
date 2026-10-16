@@ -52,7 +52,8 @@ const C1G={
   lagoons:[{x:600,y:25600,r:260},{x:2500,y:25700,r:180},{x:900,y:26300,r:200},{x:1900,y:26700,r:320},{x:2700,y:27300,r:220},{x:1450,y:27620,r:190},{x:1180,y:27080,r:210}],
   // Spire Rock and the Shadow Causeway (only with c_spire_up)
   spire:[7400,30200,300],
-  causeway:[[7180,28960,7330,29310],[7280,29440,7430,29610],[7250,29720,7400,29870]],
+  // (pad 3 runs on into Spire Rock: the last gate is its moth curtain, so nobody is stranded on the rock)
+  causeway:[[7180,28960,7330,29310],[7280,29440,7430,29610],[7250,29720,7400,29940]],
   causewayRip:[7260,29600,7420,29730],
   // Seal Rocks and its skim lane from the Lantern Point beach
   seal:[11800,30200,150], sealLane:[11700,29150,11900,30080], sealRip:[11700,29580,11900,29760],
@@ -394,7 +395,9 @@ function c1Block(x,y,land){
 function c1wCalm(x,y){
   if(c1InP(C1G.harborP,x,y)) return true;
   if(c1InR(C1G.sealLane,x,y)) return true;
-  if(C1WT.spire&&y>28940&&y<29960&&x>7140&&x<7470) return true;
+  // the causeway: only its rip channel is calm (a skim gets over it, nothing else does). Everywhere else round the
+  // pads is deep sea, so Water Stride cannot walk round the moth curtains, the rip or the gaps the posts swing over.
+  if(C1WT.spire&&c1InR(C1G.causewayRip,x,y)) return true;
   return false;
 }
 // ---------- the roads (bible 1.5, routed round the cliffs; ramps carry them over the faces)
@@ -721,7 +724,9 @@ function c1Elev(){
   rp({x0:9130,y0:24730,x1:9250,y1:24820,dir:'n',kind:'ladder'});
   // grapple posts (bible 1.4) and the causeway posts (only with c_spire_up, see c1Posts)
   for(const [x,y,l] of [[9532,26950,2],[9826,26950,2],[6700,24448,4],[4250,25790,3]]) ELEV.grapple({k,x,y,lvl:l});
-  for(const [x,y] of [[7300,29250],[7350,29500],[7300,29750],[7400,29950]]) ELEV.grapple({k,x,y,lvl:0,when:()=>C1WT.spire});
+  // (two: one each side of the first gap, the only one the Grapple Tail swings over. A post past the rip would let the
+  //  tail skip it, and the rip is the Skimmer's gate)
+  for(const [x,y] of [[7300,29250],[7350,29500]]) ELEV.grapple({k,x,y,lvl:0,when:()=>C1WT.spire});
   // vents (wings): the cliff updraft to Gull Isle, the Lantern Point updraft (the Chalk Dragon's Breath is added by c1Sync)
   ELEV.vent({k,x:3900,y:28300,r:70,lift:1}); ELEV.vent({k,x:12000,y:29250,r:70,lift:1});
   // no flying over Lantern Point and the Cut (the Grapple Tail is the way in) or over the Shadow Shoals
@@ -1110,7 +1115,7 @@ function c1PaintQuay(g){
 function c1PaintCulvert(g){ g.save(); const x=7380, y=24080; g.fillStyle=SBC.outline; rrect(g,x-62,y-18,124,34,8); g.fill(); g.fillStyle='#a8a090'; rrect(g,x-58,y-15,116,28,7); g.fill(); g.fillStyle='#1a2a34'; rrect(g,x-46,y-10,92,20,6); g.fill(); g.strokeStyle='#d8a440'; g.lineWidth=3; for(let k=-38;k<=38;k+=12){ g.beginPath(); g.moveTo(x+k,y-10); g.lineTo(x+k,y+10); g.stroke(); } g.restore(); }
 function c1PaintCauseway(g){
   if(!C1WT.spire) return; g.save(); const rng=mulberry32(77);
-  for(const r of C1G.causeway){ for(let y=r.y0+10;y<r.y1;y+=34){ for(let x=r.x0+14;x<r.x1;x+=40){ const rx=16+rng()*8, ry=11+rng()*5, px=x+(rng()-0.5)*10, py=y+(rng()-0.5)*8;
+  for(const [rx0,ry0,rx1,ry1] of C1G.causeway){ for(let y=ry0+10;y<ry1;y+=34){ for(let x=rx0+14;x<rx1;x+=40){ const rx=16+rng()*8, ry=11+rng()*5, px=x+(rng()-0.5)*10, py=y+(rng()-0.5)*8;
     g.fillStyle='rgba(200,190,255,.35)'; g.beginPath(); g.ellipse(px,py+4,rx+5,ry+4,0,0,TAU); g.fill();
     g.fillStyle=SBC.outline; g.beginPath(); g.ellipse(px,py,rx+1.6,ry+1.6,0,0,TAU); g.fill(); g.fillStyle='#2a2638'; g.beginPath(); g.ellipse(px,py,rx,ry,0,0,TAU); g.fill(); g.fillStyle='#4c4662'; g.beginPath(); g.ellipse(px-2,py-2,rx*0.8,ry*0.7,0,0,TAU); g.fill(); g.fillStyle='rgba(190,170,255,.4)'; g.beginPath(); g.ellipse(px-rx*0.35,py-ry*0.4,rx*0.3,ry*0.2,0,0,TAU); g.fill(); } } }
   g.restore();
@@ -1143,7 +1148,7 @@ function c1Paint(){
   ELEV.deco({k,bb:[6550,24680,7670,26030],lvl:2,order:1,paint:g=>c1PaintSquare(g)});
   ELEV.deco({k,bb:[C1QUAY.x0-10,C1QUAY.y-30,C1QUAY.x1+10,C1QUAY.y+10],lvl:0,order:3,paint:g=>c1PaintQuay(g)});
   ELEV.deco({k,bb:[7300,24050,7460,24110],lvl:1,order:7,paint:g=>c1PaintCulvert(g)});
-  ELEV.deco({k,bb:[7150,28940,7470,29900],lvl:0,order:4,paint:g=>c1PaintCauseway(g)});
+  ELEV.deco({k,bb:[7150,28940,7470,29960],lvl:0,order:4,paint:g=>c1PaintCauseway(g)});
   ELEV.deco({k,bb:[7110,24676,7290,24830],lvl:5,order:8,paint:g=>c1PaintClockFace(g)});
   for(const [x,y] of C1STEAM) ELEV.deco({k,bb:[x-12,y-8,x+12,y+8],lvl:elevLvl(x,y),order:6,paint:g=>{ g.fillStyle=SBC.outline; rrect(g,x-11,y-7,22,14,3); g.fill(); g.fillStyle='#4a4e58'; rrect(g,x-9.5,y-5.5,19,11,2); g.fill(); g.fillStyle='#8a8e98'; for(let i=0;i<5;i++) g.fillRect(x-8+i*3.6,y-4.5,1.6,9); }});
 }
@@ -1389,6 +1394,10 @@ function c1HouseHands(t){
 { const base=biomeInfo; biomeInfo=function(x,y,o){ const r=base(x,y,o); if(C1WD.built&&y>=20000&&y<=31000&&x<IZX-50){ const b=c1Region(x,y,elevLvl(x,y),0); o.b=b; o.b2=b; o.t=1; } return r; }; }
 // the risen Spire Rock and the causeway are land, the harbor and the skim lanes are calm water
 { const base=mapBlocked; mapBlocked=function(x,y){ if(C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y)&&x>30){ return !!c1Block(x,y,true); } return base(x,y); }; }
+// the shoal wind: nobody jumps the causeway's gaps or its rip. In the air over its open water Ash is held back, so the
+// moth curtains, the rip (a skim) and the first gap (the Grapple Tail) are the only ways over. A zip moves him itself.
+function c1ShoalAir(x,y){ return C1WT.spire&&y>29000&&y<29960&&x>7150&&x<7700&&!c1DynLand(x,y)&&!c1InP(C1G.harborP,x,y); }
+{ const base=playerBlocked; playerBlocked=function(x,y){ const p=player; if(p&&!p.flying&&(p.z||0)>0&&x<IZX-50&&c1ShoalAir(x,y)) return true; return base(x,y); }; }
 { const base=mapStrideBlocked; mapStrideBlocked=function(x,y){
   if(y>=20000&&y<=31000&&x>30&&x<13970){ if((C1WT.spire&&y>28900&&y<30550&&x>7080&&x<7740&&c1DynLand(x,y))||c1wCalm(x,y)) return !!c1Block(x,y); }
   return base(x,y); }; }
