@@ -8,6 +8,8 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   'a7a_enemies','a7b_ai','a7c_bosses','a8_systems','a9a_env','a9b_flow','a9c_story','a9d_quests','a9e_meta','a9f_talk','a9g_mini','a9h_skills','a9i_comps','a9j_events','a10a_fx','a10b_chars','a10c_t3ash','a10d_t3people','a10e_t3beasts','a10f_t3foes','a10g_t3bosses','a11_render','a11c_depth','a11b_hud','a12a_dlg','a13_cloud','a14_music','a12c_log',
   // v9 engine (wave 1)
   'e1_maps','e2_terrain','e3_elev','e4_cinder','e5_look','e6_balance','e6b_arms','e7_acts','e7b_threads','e8_foes','e9a_dungeon','e9b_caves2',
+  // v10: the story engine, the Case Book, the gate library (new art for story data, game/src/v10_art*.js, goes right after it)
+  'e10_story','e10b_case','e10c_gates',
   // v9 powers and the Act I rework
   'p2_coast','p3_frost','p4_moon','x0_act1','x0_vorlaxis',
   // Act II, the Clockwork Coast
@@ -29,9 +31,18 @@ for (const f of (existsSync('game/simple') ? readdirSync('game/simple') : []).fi
   for (const [k, v] of Object.entries(d)) if (!k.startsWith('_')) simple[k] = v;
 }
 const simpleJs = `const SIMPLE_DATA=${JSON.stringify(simple)};\n`;
+// v10 art for story data (game/src/v10_art*.js, sorted) goes right after the gate library
+const ART = (existsSync('game/src') ? readdirSync('game/src') : []).filter((n) => /^v10_art.*\.js$/.test(n)).sort().map((n) => n.slice(0, -3));
+const ORDER2 = ORDER.flatMap((f) => (f === 'e10c_gates' ? [f, ...ART] : [f]));
 // planned modules that do not exist yet are skipped
-const MODS = ORDER.filter((f) => existsSync(`game/src/${f}.js`));
-const js = MODS.map((f) => (f === 'a1k_simple' ? simpleJs : '') + readFileSync(`game/src/${f}.js`, 'utf8')).join('').replaceAll('__API_BASE__', api);
+const MODS = ORDER2.filter((f) => existsSync(`game/src/${f}.js`));
+// story data (game/story/**/*.js, sorted by path) runs last, after the game's own code has closed: each file only calls
+// the data globals act(), chapter(), quest(), legacy() that e10_story.js puts on window; then the engine boots
+const walk = (d) => (existsSync(d) ? readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(`${d}/${e.name}`) : e.name.endsWith('.js') ? [`${d}/${e.name}`] : [])) : []);
+const STORYF = walk('game/story').sort();
+const storyJs = STORYF.map((f) => `\n;window.__ebStoryFile=${JSON.stringify(f)};try{\n${readFileSync(f, 'utf8')}\n}catch(e){ if(window.__ebStoryLoadErr) window.__ebStoryLoadErr(${JSON.stringify(f)},e); else console.error(e); }\n`).join('')
+  + (STORYF.length || MODS.includes('e10_story') ? '\n;window.__ebStoryFile=null;if(window.__ebStoryBoot) window.__ebStoryBoot();\n' : '');
+const js = (MODS.map((f) => (f === 'a1k_simple' ? simpleJs : '') + readFileSync(`game/src/${f}.js`, 'utf8')).join('') + storyJs).replaceAll('__API_BASE__', api);
 mkdirSync('dist', { recursive: true });
 writeFileSync('dist/game.js', js);
 execFileSync(process.execPath, ['--check', 'dist/game.js'], { stdio: 'inherit' });
