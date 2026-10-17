@@ -1579,6 +1579,8 @@ function n4sFallPlay(){
   G.fz=[]; N4ST.cam={x:4500,y:85150,k:0.55};
   // the climax gets the screen to itself; and Ash stands where the scene can see both of them
   G.banner=null; if(Array.isArray(G.bannerQ)) G.bannerQ.length=0;
+  // (and the fight's callouts: a friend's phase 4 line still waiting in the queue would float up after the ending, at home)
+  n4sQuiet();
   if(player&&dist(player.x,player.y,4500,85250)>460){ player.x=4500; player.y=85440; try{ updateCam(0,true); }catch(err){} }
   const L=[...STORY.n_fall];
   // the act 5 data: its plea and its final choice (every option shows; the moth one locked with its reason; each pick
@@ -1871,8 +1873,9 @@ function n4sFx(s){
 if(typeof storyListen==='function') storyListen('n4fx:',a=>n4sFx(a));
 // after the victory screen's "Keep exploring": Ash wakes up on the green in Emberhollow on Lantern Day, at dusk (the
 // data's n_end then plays n_home there). Duchess is back at the farm.
+function n4sQuiet(){ G.taunt=null; if(Array.isArray(G.tauntQ)) G.tauntQ.length=0; try{ if(typeof MV!=='undefined'&&MV) MV.tip=null; }catch(e){} }
 function n4sGoHome(){
-  n4sFreeRoam(); N4ST.homeBound=1;
+  n4sFreeRoam(); N4ST.homeBound=1; n4sQuiet();
   const w=typeof s10Where==='function'?s10Where('n5_green_wake'):null, x=w?w.x:2620, y=w?w.y:9330;
   G.tod=0.78; G.flags.moon=100;
   mapTravel(x,y,{});
