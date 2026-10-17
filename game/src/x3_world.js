@@ -1420,6 +1420,29 @@ defineMap(3,{id:'moon',name:S('Moonfall','Moonfall'),music:'m_sea',spawn:{x:1300
   onEnter(from){ m3wSync(true); },
   build(B){ m3wBuild(B); }
 });
+// (a region banner still waiting from the map Ash just left is stale on the next map: Act IV starts in Hearthold with
+// "Frostreach" queued behind the intro, and it showed up on the Clockwork Coast after the fast travel, or in Moonfall
+// after Glaciar's flight. The banner queue knows no maps, so a map change drops the waiting region banners; the new
+// map's own banner comes right after. CHANGES.md I4: this belongs in e1_maps' mapChanged.)
+function m3wStaleBanners(k){
+  if(!G) return; const M=MAPS[k], mine=M?simplify(String(M.name)):'', stale=b=>!!b&&b.style==='region'&&b.text!==mine;
+  if(G.bannerQ) G.bannerQ=G.bannerQ.filter(b=>!stale(b));
+  if(stale(G.banner)) G.banner=(G.bannerQ&&G.bannerQ.shift())||null;
+}
+{ const base=mapChanged; mapChanged=function(old,k,banner){ try{ m3wStaleBanners(k); }catch(e){ console.error(e); } return base(old,k,banner); }; }
+// (the quest line for a goal on another map: e1_maps' routeObj adds " (<the goal's map>: <crossing>)", which reads like
+// the goal's own place, "Gearhaven's Far Pier (The Clockwork Coast: The High Pass)" in Hearthold, A4a's leftover. In
+// Act IV it says the way instead: "Gearhaven's Far Pier (go by The High Pass)". CHANGES.md I4 ENGINE REQUEST (1): this
+// belongs in routeObj; once routeObj words it itself, the suffix below is not found and this does nothing.)
+function m3wRouteText(o){
+  if(!o||!o.via||typeof o.text!=='string'||!G||actOf(G.stage)!==4) return o;
+  const c=crossingsOn(curMap()).find(c=>c.id===o.via), nm=c&&(c.name||c.label); if(!nm) return o;
+  for(const k in MAPS){ const suf=simplify(` (${MAPS[k].name}: ${nm})`);
+    if(o.text.endsWith(suf)) return Object.assign({},o,{text:o.text.slice(0,-suf.length)+simplify(` (go by ${nm})`)}); }
+  return o;
+}
+{ const base=questObjective; questObjective=function(){ const o=base(); try{ return m3wRouteText(o); }catch(e){ console.error(e); return o; } }; }
+{ const base=focusObjective; focusObjective=function(){ const o=base(); try{ return m3wRouteText(o); }catch(e){ console.error(e); return o; } }; }
 MAPS[3].terrain.sea={landD:m3wLandD,shore:70,shelf:170}; MAPS[3].tz=null;
 // the sand under each desert biome is its own colour (the sampler mixes sand toward it)
 for(const [b,c] of [[34,[236,208,140]],[35,[232,191,108]],[37,[228,196,120]],[38,[236,240,246]]]) if(BIOMES[b]) BIOMES[b]._sand=c;

@@ -44,6 +44,9 @@ act({
     lines: [
       ['The Ember Heart is whole.', 'The Ember Heart is whole.'],
       ['The moon is gone.', 'The moon is gone.'],
+      // (the act's big choice, A4b's request: a line whose condition fails is left out)
+      { if: 'choice m_hush=free', t: ['Hush flies free.', 'Hush flies free.'] },
+      { if: '!choice m_hush=free', t: ['Hush went back to the Mother.', 'Hush went back to the Mother.'] },
       ['Next: Nightfall Peak.', 'Next: Nightfall Peak.'],
     ] },
 

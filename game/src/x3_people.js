@@ -975,6 +975,15 @@ function m3pQuestFor(id){
 // the people this module speaks for in Moonfall (their story beats in x3_story's stages come first, see below)
 const M3P_TALKERS={dell:1,wren:1,f_mags:1,ev_tikka:1,maren:1,quill:1,juniper:1,c_vesper:1,m_sandy:1,f_glaciar:1};
 // ---------- 11. the returning cast in Moonfall (ACT4 4.1, 4.3, 6.2c, 11): one-line reasons, their own talk
+// v10 (CHANGES.md A4S, N5S): does the story data speak for this person in the current act? A talk entry of this very
+// act (a "what's new" line, a first talk or a menu option) that holds now. Then this module's hook stands down and the
+// person's menu opens with the data's words; what only this hook can do (Mags's spare bombs, Mom's star-iron, Juniper's
+// map shop, Tikka's bun, Glaciar's flight home) still comes first. (An earlier act's entries do not count: Act III's
+// lines for Mags are not for Moonfall.)
+function m3pDataTalk(id){
+  try{ if(typeof S10==='undefined'||!S10||!S10.booted||typeof s10TalkOk!=='function'||!G) return false;
+    const a=actOf(G.stage); return (S10.talk[id]||[]).some(T=>!T.bark&&T._owner&&+T._owner.act===a&&s10TalkOk(T)); }catch(e){ return false; }
+}
 function m3pTalkOnce(key,lines,then){ if(G.seenTalk&&G.seenTalk[key]) return false; G.seenTalk=G.seenTalk||{}; G.seenTalk[key]=1; m3pSay(lines,then); return true; }
 const M3P_DELL1=[m3pL('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
   m3pL('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),m3pL('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
@@ -990,6 +999,13 @@ onTalk(n=>{
   // a story beat of the current stage for this person wins (e7_acts runs the onTalk hooks before the stage's talk)
   { const d=STAGEDEF[G.stage]; if(d&&d.talk&&!G.done){ try{ if(d.talk(n)) return true; }catch(e){ console.error(e); } } }
   if(m3pQuestFor(id)) return false;
+  // (v10) what no data line can do, before the data's talk: Mags's spare bombs, Mom's star-iron, Juniper's map shop in
+  // Sable, Tikka's bun; then a person the story data speaks for in this act gets the data's talk (m3pDataTalk)
+  if(id==='f_mags'&&m3pR('m_reef')&&!(G.weapons&&G.weapons.bombs)){ m3pSay([m3pL('f_mags',`No bombs? NO BOMBS? Here. Take these. Don't thank me. Thank me a little.`,`No bombs? Here! Thank me a little.`)],()=>{ giveWeapon('bombs'); }); return true; }
+  if(id==='maren'&&m3pPierAll()&&G.items.m_stariron&&!G.flags.m_stariron_done&&m3pDataTalk(id)){ m3pSay([m3pStarIron()]); return true; }
+  if(id==='juniper'&&m3pAct()===4&&m3pR('m_sable')&&!(m3pR('n_bridge')&&stageAt('n_bridge')>=0)) return m3pJuniper(n);
+  if(id==='ev_tikka'&&G.flags.tk_come==='yes'&&!G.flags.m_tk_bun&&m3pDataTalk(id)){ G.flags.m_tk_bun=1; m3pSay([m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)],()=>giveItems({c_lumpybun:1})); return true; }
+  if(m3pDataTalk(id)) return false;
   // before the voyage: Dell at Gearhaven's Far Pier
   if(id==='dell'&&!G.flags.m_landed&&m3pR('m_sail')){
     m3pSay([m3pL('dell',pick([`Ash! The Soggy Biscuit Three, ready to sail east! Steam paddle, brass whistle, and sandwiches. Hop aboard at the end of the pier.`,`Past the end of every map I own! I've never been so happy or so scared! The boat's at the end of the pier.`]),`Ash! My boat is ready to sail east! Hop aboard at the end of the pier.`),
@@ -1008,11 +1024,11 @@ onTalk(n=>{
     m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three! Steam paddle, brass whistle, and a captain who has never once sunk her. It's been eleven days now.`,`Three days east and I still haven't sunk! Old Sal won't believe it.`,`Mags says the engine makes that noise on purpose. I've decided to believe her.`]),`My boat still floats! Eleven days!`),
       m3pL('dell',`If you want to sail home to Gearhaven, the boat's at the end of the dock. Just say.`,`Want to sail home? The boat's at the dock.`)]); return true; }
   if(id==='wren'&&m3pIV()&&m3pBoatIn()){
-    if(m3pTalkOnce('m3p_wren',M3P_WREN.slice())) return true;
+    // (her first talk is the story data's m_wren when it has one: A4S's "bring me a BOOK", the promise of m_leash)
+    if(m3pTalkOnce('m3p_wren',(typeof storyOwns==='function'&&storyOwns('scene','m_wren')&&Array.isArray(STORY.m_wren)?STORY.m_wren:M3P_WREN).slice())) return true;
     if(m3pQ('m_leash')){ m3pSay([m3pL('wren',pick([`Ripple and I are reading every pearl in the Archive. He forgets them, so we read them twice. It's heaven.`,`Page eleven! I keep taking it out to look at it. Ember's friends kept it for five hundred years. Under the SEA.`,`I'm writing it all down. "The Account of the Long Night." Chapter one: I was seasick.`]),`Ripple and I read every pearl. Twice!`)]); return true; }
     m3pSay([m3pL('wren',pick([`The raft keeps moving. My books keep moving. I keep reading. It's like a library that dances.`,`The merfolk keep Lumen's old books, Ash. Lumen's priests wrote about moths. Lots about moths.`]),`My books float! Lumen's priests wrote about moths.`)]); return true; }
   if(id==='f_mags'&&m3pIV()){
-    if(m3pR('m_reef')&&!(G.weapons&&G.weapons.bombs)){ m3pSay([m3pL('f_mags',`No bombs? NO BOMBS? Here. Take these. Don't thank me. Thank me a little.`,`No bombs? Here! Thank me a little.`)],()=>{ giveWeapon('bombs'); }); return true; }
     if(!G.seenTalk.m3p_mags){ G.seenTalk.m3p_mags=1; m3pSay([m3pL('f_mags',`Ash! I signed on as Dell's engineer. He pays me in sandwiches. I've got a workbench on the dock now. To sell bombs to pirates. Crab pirates. They have no money. It's going badly.`,`I'm Dell's engineer now! I sell bombs to crab pirates. They have no money.`)]); return true; }
     m3pSay([m3pL('f_mags',pick([`Do bombs work underwater? For SCIENCE? ...Yes. Now they do. Mostly.`,`The engine's FINE. That noise is a feature.`,`If it explodes, it's science. If it explodes twice, it's a lot of science.`]),`If it explodes, it's science!`)]); return true; }
   if(id==='ev_tikka'&&m3pIV()&&G.flags.tk_come==='yes'){
@@ -1020,7 +1036,7 @@ onTalk(n=>{
     m3pSay([m3pL('ev_tikka',m3pPier()?pick([`I made a bun for the mountain. It's lumpy. Lumpy means love. The mountain doesn't deserve it.`,`Captain Dell let me steer once. We went in a circle. A very brave circle.`]):pick([`Lumpy buns! Gilly says they need fish. They do NOT need fish.`,`I carried bread all the way across the sea. To somewhere important! This is the most important place I've ever been.`]),`Lumpy buns! Lumpy means love!`)].concat(bun?[m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)]:[]),()=>{ if(bun) giveItems({c_lumpybun:1}); }); return true; }
   if(id==='maren'&&m3pPierAll()){
     const L=[m3pL('maren',pick([`Eat something. I mean it. Mountains are hungry work. I've packed you a sandwich. It's squashed. It's still a sandwich.`,`I mended the Heart. You'll mend the rest. That's how it works in our family: somebody hits it, and somebody breathes.`,`I'm going to stand right here and watch that bridge until you come back down it. Don't argue. You can't. I'm your mother.`]),`Eat something. I'll wait right here.`)];
-    if(G.items.m_stariron&&!G.flags.m_stariron_done) L.push(ch('maren',S(`What's that in your satchel? Is that... star-iron?`,`Is that star-iron?`),[{t:S('Show Mom the star-iron','Show Mom the star-iron'),fn:()=>{ takeItems({m_stariron:1}); G.flags.m_stariron_done=1; player.stats.slash*=1.10; },then:[m3pL('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Your sword will never be the same!`),m3pN(`TING. TING. TING. Mom hands your sword back. It hums like a moonlit bell.`,`TING. TING. TING. Your sword hums.`),m3pDo(()=>setBanner(S('Star-iron reforge','Star-iron reforge'),S('Your sword hits 10 percent harder.','Your sword hits harder!'),2.6))]},{t:S('Later','Later'),then:[m3pL('maren',`Bring it when you're ready. I'll bring the hammer.`,`Bring it when you're ready.`)]}]));
+    if(G.items.m_stariron&&!G.flags.m_stariron_done) L.push(m3pStarIron());
     m3pSay(L); return true; }
   if(id==='quill'&&m3pPierAll()){ m3pSay([m3pL('quill',pick([`My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have LOVED this. A mountain! Out of the SEA! I'd have hated to tell him the moon is gone.`,`I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.`,`Every time I look through the telescope, the black glass looks back. Fascinating. Terrifying. Mostly fascinating.`]),`I measured the mountain. It's getting taller!`)]); return true; }
   if(id==='juniper'&&m3pIV()&&m3pR('m_sable')) return m3pJuniper(n);
@@ -1033,6 +1049,10 @@ onTalk(n=>{
       G.bossDone&&G.bossDone.m_gravelgut||m3pR('m_glasswall')?`My husband is better now. He's sleeping.`:`Is my husband sick? He ate something shiny.`)]); return true; }
   return false;
 });
+// Mom and the star-iron (the Fallen Star secret): she folds it into Ash's sword on the Moon Pier
+function m3pStarIron(){
+  return ch('maren',S(`What's that in your satchel? Is that... star-iron?`,`Is that star-iron?`),[{t:S('Show Mom the star-iron','Show Mom the star-iron'),fn:()=>{ takeItems({m_stariron:1}); G.flags.m_stariron_done=1; player.stats.slash*=1.10; },then:[m3pL('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Your sword will never be the same!`),m3pN(`TING. TING. TING. Mom hands your sword back. It hums like a moonlit bell.`,`TING. TING. TING. Your sword hums.`),m3pDo(()=>setBanner(S('Star-iron reforge','Star-iron reforge'),S('Your sword hits 10 percent harder.','Your sword hits harder!'),2.6))]},{t:S('Later','Later'),then:[m3pL('maren',`Bring it when you're ready. I'll bring the hammer.`,`Bring it when you're ready.`)]}]);
+}
 // Juniper's Map Tent in Sable (ACT4 4.3): the four Act IV dungeon maps, 40 coins each; the Observatory's for free
 const M3P_DUN=[['m_lumen',S('Drowned Lumen','Drowned Lumen')],['m_burrows',S('the Sandworm Burrows','the Sandworm Burrows')],['m_mirror',S('the Mirror Temple','the Mirror Temple')],['m_obs',S('the Eclipse Observatory','the Eclipse Observatory')]];
 function m3pMapKey(id){ const D=typeof DUNGEONS!=='undefined'&&DUNGEONS[id]; return 'dmap_'+((D&&D.save)||id); }
