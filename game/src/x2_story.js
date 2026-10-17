@@ -500,16 +500,19 @@ STORY.f_hints={
   f_snow:S(`Frostpine Lodge, in the far north-west of Embermere. Ulf will know about the pass. (I can't see it from in here. I'm just guessing. I'm very good at guessing.)`,`Go to Frostpine Lodge, far north-west. Ask Ulf about the pass.`),
   f_pass:S(`Up the High Pass, then follow the White Road east to Hearthold. Look for the town with the wall. And the smoke. And the warmth. Mostly the warmth.`,`Climb the High Pass. Follow the White Road east to Hearthold.`),
   f_hearth:S(`The Hearthkeeper is at the Great Hearth, right in the middle of town. Big fireplace. Can't miss it.`,`The Hearthkeeper is at the Great Hearth, in the middle of town.`),
-  f_maze:S(`North of Hearthold to Glimmer Point, then across the ice to the Glacier Maze. Walk on the water around the door.`,`Go north to Glimmer Point. Cross the ice to the Glacier Maze.`),
-  f_kindle:S(`Hold your fire breath until it turns blue and give it to the Great Hearth. Then melt that North Gate.`,`Hold your fire until it turns blue. Give it to the Hearth. Then melt the North Gate.`),
-  f_thaw:S(`Rimeholm is west, on the sea cliffs. The oldest granny will be at the top of the bell tower. Climb.`,`Rimeholm is west, on the cliffs. Climb the bell tower.`),
+  f_maze:S(`The North Gate is frozen shut. Ask Captain Brann at the West Gate for the way round to the Glacier Maze.`,`The North Gate is frozen. Ask Captain Brann the way round.`),
+  f_kindle:S(`Hold your fire breath until it turns blue and give it to the Great Hearth. Don't be shy.`,`Hold your fire until it turns blue. Give it to the Hearth.`),
+  f_thaw:S(`Rimeholm is west, on the sea cliffs. Somebody there must have seen what froze it. Look closely at everything.`,`Rimeholm is west, on the cliffs. Who saw what froze it?`),
   f_sky:S(`East on the Wind Road, up onto the Windscour. From the east rim, fly the updraft out to the Sky Isles.`,`Go east up the Wind Road. Fly from the east rim to the Sky Isles.`),
   f_gap:S(`The wind ribbons on the Windscour's north rim cross the Howling Gap. Stonehorn Deep is the giant ram skull.`,`Ride the wind ribbons over the Howling Gap. Find the giant ram skull.`),
   f_deep:S(`Deep in the Stonehorn halls. Pound everything that looks cracked.`,`Pound everything that looks cracked.`),
-  f_dreadgate:S(`The big vent on the Dreadmoor starts the Wind Road. Ride it up to the drum. Then pound it.`,`Ride the Wind Road up to the drum. Then pound it.`),
+  f_dreadgate:S(`Those doors won't open for asking. Look at the Frost Lock, and look up at the mountain. Then think.`,`Look at the lock. Look up at the mountain. Think.`),
   f_dread:S(`Up through the mountain. Melt every chain. I'm right here with you. Shivering.`,`Go up through the mountain. Melt every chain.`),
   f_glaciar:S(`She's on the summit. Melt the four chains, Ash. She's not bad. She's under a spell.`,`She's on top. Melt the four chains. She's under a spell.`)
 };
+// Tove's line in Yara's talk: the story data's own hint for the step Ash is on when the data owns the stage (the data's
+// hints say where to look and never a Case Book answer), else the table above
+function f2sToveHint(){ let h=''; try{ const D=typeof stageDef==='function'?stageDef(G.stage):null; if(D&&D._s10&&typeof D.hint==='function') h=D.hint()||''; }catch(e){ console.error(e); } return h||STORY.f_hints[G.stage]||STORY.f_hints.f_snow; }
 STORY.f_yara=S(`I'm reading Pebble's letters like a storybook, Ash. Do what Tove says.`,`I read Pebble's letters like a storybook. Do what Tove says.`);
 
 // ---------- 4. the dungeon story lines (bible section 7), played by the dungeon helpers (x2_dun_a, x2_dun_b).
@@ -909,7 +912,7 @@ defineAct(3,{arrive:'f_snow',at:{x:1560,y:3540},intro(o){ later(3.3,()=>f2sWhen(
 onTalk(n=>{
   if(!f2sOn()) return false;
   const F=G.flags;
-  if(n.id==='yara'&&!F2ST.yara[G.stage]){ F2ST.yara[G.stage]=1; f2sPlay([['yara',STORY.f_yara],['tove',STORY.f_hints[G.stage]||STORY.f_hints.f_snow]]); return true; }
+  if(n.id==='yara'&&!F2ST.yara[G.stage]){ F2ST.yara[G.stage]=1; f2sPlay([['yara',STORY.f_yara],['tove',f2sToveHint()]]); return true; }
   if(n.id==='c_vesper'&&n.f2sGate){ f2sPlay([xl('c_vesper',`Nobody gets past me, cousin. Not a moth, not a mouse. I checked the mouse twice.`,`Nobody gets past me. Not a moth. Not a mouse.`),
     f2sIf('c_vesper',`Go on up. Bring your auntie home.`,`Go on up. Bring your auntie home.`,()=>!G.choices.f_glaciar)]); return true; }
   return false;
@@ -950,6 +953,15 @@ function f2sKindleFx(){
   try{ SFX.play('boom'); jingle('levelup','level'); }catch(e){}
   for(let i=0;i<6;i++) later(i*0.16,()=>emit(P.x+rand(-30,30),P.y-30,30,{col:i%2?'120,190,255':'255,210,110',ang:-Math.PI/2,spread:0.5,smin:120,smax:460,lmin:.6,lmax:1.3,zmin:4,zmax:9,grow:10,rise:60}));
 }
+// the fire column out of the Great Hearth after the WHOOMPH (it also roars while the scene talks: see liteUpdate below)
+function f2sHearthCol(dt){ if(!(F2ST.hearthFx>0)) return; F2ST.hearthFx-=dt; const P=f2sLm('f_lm_hearth','hearth'); if(Math.random()<0.9) emit(P.x+rand(-26,26),P.y-20,2,{kind:Math.random()<0.5?'bfire':'fire',ang:-Math.PI/2,spread:0.3,smin:200,smax:520,lmin:.5,lmax:1,zmin:4,zmax:9,grow:8}); }
+// the story data (game/story/act3) asks for this module's pictures with storyEmit('f3fx:<name>'): the data has no
+// flash or shake of its own. whoomph: the Hearth roars up (f_kindle.js f3_kindle). The engine's storyListen (I5) when
+// it is there, else a wrapper round storyEmit
+const F2S_FX={whoomph:()=>f2sKindleFx()};
+{ const run=rest=>{ const m=/^(\w+)/.exec(String(rest||'')); if(!m) return; if(!F2S_FX[m[1]]){ console.error('x2_story: unknown f3fx:'+rest); return; } if(G&&G.mode==='story') F2S_FX[m[1]](); };
+  if(typeof storyListen==='function') storyListen('f3fx:',rest=>{ try{ run(rest); }catch(e){ console.error(e); } });
+  else { const base=storyEmit; storyEmit=function(name){ const r=base.apply(this,arguments); try{ const n=String(name||''); if(n.startsWith('f3fx:')) run(n.slice(5)); }catch(e){ console.error(e); } return r; }; window.storyEmit=storyEmit; } }
 function f2sKindle(){
   if(f2sSeen('f_kindle')) return;
   f2sPlay('f_kindle',()=>{
@@ -1352,6 +1364,10 @@ function f2sTick(dt){
   f2sQueue(dt); f2sBossTick(dt);
   if(actOf(G.stage)!==3) return;
   const F=G.flags;
+  // Mom's snow letter (f_pb_1): the data's f_snow sends Pebble once, when its first step starts. A save made before
+  // she landed (her flight is not saved), or a long spell with no calm moment (she gives up), sends her again, so the
+  // letter never just stops coming
+  if(G.stage==='f_snow'&&!F.f_pb_1&&!f2sSeen('f_intro')&&typeof PEBRT!=='undefined'&&!PEBRT.crow&&!PEBRT.want&&!(G.time<F2ST.pbT)){ F2ST.pbT=G.time+20; try{ pebbleNow('f_pb_1'); }catch(e){ console.error(e); } }
   f2sFergusTick(); f2sNudgeTick(); f2sStubTick();
   // Rimeholm and Grandmother Ylva can be reached by the Rim Road before the North Gate: their scenes play whenever
   // Ash gets there with Blaze (the stage then moves on by itself)
@@ -1360,14 +1376,14 @@ function f2sTick(dt){
     if(f2sYlvaDue()) f2sWhen('ylva',null,()=>f2sYlva());
   }
   if(G.stage==='f_thaw'&&f2sSeen('f_ylva_end')&&!DLG&&scene==='play') goStage('f_sky');
-  if(F2ST.hearthFx>0){ F2ST.hearthFx-=dt; const P=f2sLm('f_lm_hearth','hearth'); if(Math.random()<0.9) emit(P.x+rand(-26,26),P.y-20,2,{kind:Math.random()<0.5?'bfire':'fire',ang:-Math.PI/2,spread:0.3,smin:200,smax:520,lmin:.5,lmax:1,zmin:4,zmax:9,grow:8}); }
+  f2sHearthCol(dt);
   if(F2ST.glacLeave>0){ F2ST.glacLeave+=dt; if(F2ST.glacLeave>4) F2ST.glacLeave=-1; }
   if(F2ST.hush) F2ST.hush.t+=dt;
 }
 { const base=updateStory; updateStory=function(dt){ base(dt); try{ f2sTick(dt); }catch(e){ console.error(e); } }; }
 { const base=updateArea; updateArea=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&!G.done){ f2sTick(dt); const d=STAGEDEF[G.stage]; if(d&&d.update&&actOf(G.stage)===3) d.update(dt); } }catch(e){ console.error(e); } }; }
 // a fade a scene starts under (the night in Hearthold) clears while the scene plays
-{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'&&scene==='dialogue'&&G.fade>0&&F2ST.fade) G.fade=Math.max(0,G.fade-dt*1.2); if(F2ST.fade&&G.fade<=0) F2ST.fade=false; if(F2ST.hush&&scene==='dialogue') F2ST.hush.t+=dt; }catch(e){} }; }
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'&&scene==='dialogue'&&G.fade>0&&F2ST.fade) G.fade=Math.max(0,G.fade-dt*1.2); if(F2ST.fade&&G.fade<=0) F2ST.fade=false; if(F2ST.hush&&scene==='dialogue') F2ST.hush.t+=dt; if(G&&G.mode==='story'&&scene==='dialogue') f2sHearthCol(dt); }catch(e){} }; }
 // the camera leans toward a scene (F2ST.cam = {x,y,k})
 { const base=updateCam; updateCam=function(dt,snap){
   const C=F2ST.cam; if(!C||AREA||!player||!G||G.mode!=='story') return base(dt,snap);
@@ -1438,6 +1454,8 @@ function f2sGlacMode(){
   const C=G.choices;
   if(F2ST.glacLeave<0||(C.f_glaciar==='free'&&C.f_glaciar_home==='north'&&!F2ST.glacLeave)) return null;
   if(F2ST.glac) return F2ST.glac.mode;
+  // (the finale: once Ash has sung her awake or she has flown to the peak with him, flag n5_glaciar, she is not here)
+  if(G.flags.n5_glaciar&&actOf(G.stage)>=5&&!F2ST.glac) return null;
   if(C.f_glaciar==='defeat') return 'sleep';
   if(C.f_glaciar==='free') return 'awake';
   if(reached('f_glaciar')&&!f2sGlacReal()) return 'spell';

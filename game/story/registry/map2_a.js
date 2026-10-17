@@ -51,7 +51,7 @@ legacy({ id: 'f_saga_ice', map: 2, at: [1150, 46900], r: 30, kind: 'landmark', n
   aliases: ['the frozen fisher girl'], src: 'LANDMARKS:f_saga' });
 legacy({ id: 'f_bo_ice', map: 2, at: [1700, 46646], r: 30, kind: 'landmark', name: 'Little Bo, frozen on the chapel roof',
   aliases: ['the frozen boy on the roof'], src: 'LANDMARKS:f_bo' });
-legacy({ id: 'f_ylva_ice', map: 2, at: [1950, 46746], r: 30, kind: 'landmark', name: 'the knitter frozen on top of the bell tower',
+legacy({ id: 'f_ylva_ice', map: 2, at: [1980, 46790], r: 30, kind: 'landmark', name: 'the knitter frozen on top of the bell tower',
   aliases: ['Grandmother Ylva', 'the oldest granny'], src: 'LANDMARKS:f_ylva' });
 legacy({ id: 'f_guard_ice', map: 2, at: [6050, 48850], r: 30, kind: 'landmark', name: 'a Hearthwarden frozen on watch outside the wall',
   aliases: ['the frozen guard'], src: 'LANDMARKS:f_frz_guard1' });

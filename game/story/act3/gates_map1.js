@@ -34,6 +34,10 @@ places({
       name: ["the boulder on Hettie's cellar", 'a big boulder'],
       locked: ['A huge boulder sits right on top of a cellar door. A painted sign on it says: SORRY, CELLAR. A bomb might move it.',
         'A boulder on a cellar door. Try a bomb!'] },
+    // (I3: a "Look at" prompt while the boulder is shut and Ash has no bombs yet; see f3_bun_look in gates_map0.js)
+    f3_hettie_look: { kind: 'examine', map: 1, at: [6600, 25656], r: 40, h: 64, if: '!flag gate_f3g_hettie>=2', show: '!power bombs',
+      name: ["the boulder on Hettie's cellar", 'a big boulder'], prompt: ['Look at the big boulder', 'Look at the boulder'],
+      say: 'f3_hettie_locked' },
     // (an examine, not a chest: a chest place plays no scene. bombbag 5: five more bombs fit in the bag)
     f3_hettie_cellar: { kind: 'examine', map: 1, at: [6600, 25650], r: 44, h: 30, if: 'flag gate_f3g_hettie>=2 !flag f3_satchel_seen', look: 'sprocket_boulder', say: 'a3g_hettie',
       then: ['upgrade f3_satchel', 'set f3_satchel', 'bombbag 5', 'give coins 60'], name: ["Hettie's cellar", "Hettie's cellar"] },
@@ -41,6 +45,8 @@ places({
   },
 
   scene: {
+    f3_hettie_locked: [['narr', 'A huge boulder sits right on top of a cellar door. A painted sign on it says: SORRY, CELLAR. A bomb might move it.',
+        'A boulder on a cellar door. Try a bomb!']],
     // the letter (Brother Eider's talk in people.js sends it with `mail a3g_otto`)
     a3g_otto: [
       ['narr', 'Pebble brings a letter with a library stamp. It is written VERY LARGE.', 'A letter, written VERY LARGE.'],

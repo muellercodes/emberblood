@@ -66,6 +66,12 @@ places({
       name: ["Bertram's giant frozen bun", 'a giant frozen bun'],
       locked: ["A Lantern bun the size of a cart, frozen as hard as a rock, right against Bertram's cellar door. A sword just bounces off. A bomb might not.",
         'A giant frozen bun! Try a bomb.'] },
+    // (I3: a "Look at" prompt while the bun is shut and Ash has no bombs yet. The gate library says a built gate's
+    //  locked line only when Ash pushes against it, so a kid walking by never learned what the bun needs. If the engine
+    //  ever gives built gates this prompt itself, both say the same and only one prompt shows at a time.)
+    f3_bun_look: { kind: 'examine', map: 0, at: [2380, 9806], r: 40, h: 64, if: '!flag gate_f3g_bun>=2', show: '!power bombs',
+      name: ["Bertram's giant frozen bun", 'a giant frozen bun'], prompt: ['Look at the giant frozen bun', 'Look at the frozen bun'],
+      say: 'f3_bun_locked' },
     // (drawn over the gate library's boulder until it breaks)
     f3_bun_shell: { kind: 'prop', map: 0, at: [2380, 9803], look: 'frozen_bun', show: '!flag gate_f3g_bun>=2', name: ['a giant frozen bun', 'a frozen bun'] },
     f3_bun: { kind: 'examine', map: 0, at: [2380, 9800], r: 44, h: 30, if: 'flag gate_f3g_bun>=2 !flag f3_bun_seen', look: 'frozen_bun_open', say: 'a3g_bun',
@@ -74,6 +80,8 @@ places({
   },
 
   scene: {
+    f3_bun_locked: [['narr', "A Lantern bun the size of a cart, frozen as hard as a rock, right against Bertram's cellar door. A sword just bounces off. A bomb might not.",
+        'A giant frozen bun! Try a bomb.']],
     a3g_tove: [
       ['narr', 'The ice slumps into a puddle. Under it lies a flat stone, carved in neat old letters.', 'Under the ice, a carved stone.'],
       ['narr', '"TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW."', '"TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW."'],

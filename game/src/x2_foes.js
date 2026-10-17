@@ -1987,7 +1987,11 @@ f2Site('f_glaciar','f_glaciar',{boss:'f_glaciar',at:{x:F2CR.x,y:F2CR.y,r:F2CR.r,
   open:()=>!G.bossDone.f_glaciar&&!G.flags.f_glaciar_won,
   arena:{shape:'ring',r:F2CR.wall,style:'ice',skipBlocked:true},flyOK:false,music:'f_glaciar',spawn:P=>({x:P.x,y:P.y}),
   onStart(){ f2FightStart('f_glaciar'); }, onReset(){ f2FightReset('f_glaciar'); },
-  onWin(){ const out=G.choices.f_glaciar||F2G.outcome||'defeat'; G.flags.f_glaciar_won=1; G.flags.f_shard2_got=1; f2Won('f_glaciar');
+  onWin(){ const out=G.choices.f_glaciar||F2G.outcome||'defeat'; G.flags.f_glaciar_won=1; G.flags.f_shard2_got=1;
+    // (her last Shardlings go with her: one left flying round the Crown kept Ash "in combat", and in combat no prompt
+    //  shows, so the walk-up talk with her after the fight (f_glaciar.js f3_auntie) could not be started)
+    for(const q of G.enemies) if(!q.dead&&q.type==='f_shardling') q.dead=true;
+    f2Won('f_glaciar');
     try{ if(F2.hook.glaciarDone) F2.hook.glaciarDone(out); }catch(err){ console.error(err); } }});
 // ---- the Chain Stones, the chains and the plates (drawn while she is on the Crown)
 function f2GlaGround(){ if(!F2G.on&&!(G.boss&&G.boss.type==='f_glaciar')) return; const t=G.time; ctx.save();
