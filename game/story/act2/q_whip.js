@@ -59,7 +59,7 @@ quest({
       ['c_tarbuckle', 'Bring the old fool a bowl and let him rest. And get my sock back. He owes me a sock.', 'Bring him a bowl. And get my sock!'],
       { choose: 'c_whip_offer', ask: ['Help the ghost get his supper?', 'Help the ghost?'], pick: [
         { t: ['I will. Ghosts need supper too.', 'I will help!'], tone: 'kind', then: ['quest start c_whip'],
-          say: [['c_tarbuckle', "Good lad. Start with Charlie at the Chowder Pot. ...and THAT'S why I don't eat eels.", 'Ask Charlie at the Chowder Pot.']] },
+          say: [['c_tarbuckle', 'Good lad. Start with Charlie at the Chowder Pot. Tell him Elias Tarbuckle sent you.', 'Ask Charlie at the Chowder Pot.']] },
         { t: ['Ghosts? No thank you.', 'No thanks.'], say: [['c_tarbuckle', 'In my day we were scared of NOTHING. Except ghosts.', 'In my day we feared ghosts too.']] },
       ] },
     ],
@@ -116,7 +116,7 @@ quest({
       { if: 'stage>=c_salt !quest c_whip active !quest c_whip done', option: ['Tell me a ghost story', 'Tell me a ghost story'], scene: 'wp_offer' },
       { if: 'quest c_whip active item c_chowder !night', option: ['Can I wait here until dark?', 'Can I wait for dark?'],
         then: ['time night'],
-        say: ["Sit, sit. I'll tell you about the time I wrestled an octopus. It took all day. So will this.", "Sit. I'll tell you about an octopus."] },
+        say: ["Sit, sit. I'll tell you about the time I wrestled an octopus. Took all day, and THAT'S why I don't eat eels.", "Sit. I'll tell you about an octopus."] },
     ],
   },
 })

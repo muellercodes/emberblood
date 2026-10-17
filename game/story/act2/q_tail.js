@@ -14,7 +14,7 @@ quest({
   item: {
     c_spring: { name: ['Spring core', 'Spring core'], icon: 'spring', desc: ['BOING. From a dizzy Steam Ram.', 'BOING!'] },
     c_mainspring: { name: ['The weathervane mainspring', 'The weathervane spring'], icon: 'spring',
-      desc: ["Captain Hester's. Do not tell Captain Hester.", "Hester's spring. Shh."] },
+      desc: ['From the Clockwatch weathervane. The Captain must never know.', 'From the weathervane. Shh.'] },
   },
 
   step: [
@@ -26,7 +26,7 @@ quest({
       hint: ['Grapple up to the weathervane on the Clockwatch Hall. Be quick: the wind blows you off.', 'Grapple up. Be quick!'] },
     { id: 'reel', do: 'talk c_hettie', scene: 'tl_reel',
       then: ['take c_spring 3', 'take c_mainspring', 'set c_reel', 'upgrade c_reel', 'xp 500'],
-      obj: ['Bring the springs to Professor Hettie', 'Bring the springs to Hettie'] },
+      obj: ['Bring the springs to Professor Sprocket', 'Bring the springs to Professor Sprocket'] },
   ],
 
   scene: {
@@ -36,11 +36,11 @@ quest({
       ['c_hettie', 'I could put a reel inside it. You would pull things TO you. Crabs. Shields. Biscuits off high shelves.',
         'I can add a reel. Pull things to you!'],
       ['c_hettie', 'I need three spring cores from Steam Rams. They only pop out when a Ram is knocked dizzy.', 'Bring 3 springs from dizzy Steam Rams.'],
-      ['c_hettie', 'And the old mainspring in the Clockwatch weathervane. Captain Hester will say no. Do not ask her.',
-        "And the weathervane spring. Don't tell Hester."],
+      ['c_hettie', 'And the old mainspring in the Clockwatch weathervane. The Captain will say no, so do not ask her.',
+        "And the weathervane spring. Don't tell the Captain."],
       { choose: 'c_tail_offer', ask: ['Get Hettie the springs?'], pick: [
         { t: ['A reel in my tail? Yes!', 'Yes!'], tone: 'brave', then: ['quest start c_tail'],
-          say: [['c_hettie', 'SCIENCE! The Rams live in the Brass Yards. The spring lives on the Captain. Well. On her roof.', 'Rams are in the Brass Yards.']] },
+          say: [['c_hettie', 'SCIENCE! The Rams live in the Brass Yards, and the spring lives on top of the Clockwatch Hall. Try not to get arrested.', 'Rams are in the Brass Yards.']] },
         { t: ["I like my tail the way it is.", 'No thanks.'], say: [['c_hettie', 'Fair. It IS a good tail.']] },
       ] },
     ],

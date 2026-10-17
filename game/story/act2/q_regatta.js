@@ -42,7 +42,7 @@ quest({
       ['c_jo', 'HA! The Sea Biscuit wins again! Rematch? Talk to me.', 'I win! Rematch? Talk to me.'],
     ],
     rg_won: [
-      ['c_jo', "You BEAT me. On FOOT. On WATER. That's not allowed. ...It's allowed. Barnacles.", 'You BEAT me! On FOOT! It is allowed.'],
+      ['c_jo', "You BEAT me. On FOOT. On WATER. That can't be allowed! ...Nobody ever wrote a rule against it. Yet.", 'You BEAT me! On FOOT! On WATER!'],
       ['c_jo', 'Here. My skiff whistle. Blow it at any landing and one of my cousins rows you anywhere on the coast.',
         'My whistle. My cousins row you anywhere.', { promise: 'c_lm_skiff_quay' }],
       ['c_jo', 'I have a LOT of cousins.'],

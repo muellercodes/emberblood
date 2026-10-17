@@ -57,7 +57,7 @@ quest({
       ['narr', 'Three tin watchmen hug. It sounds like a cutlery drawer falling down the stairs.', 'Three tin men hug. CLANG!'],
       ['c_bob3', 'I remember now. The sky went soft and grey, and dust fell like snow. Then I was in the Yards.',
         'The sky went grey. Dust fell. Then I was lost.'],
-      ['c_bobs', 'The Clockwatch owes you, Mostly Part Dragon. When you need us, all three Bobs will be there.', 'We owe you. All three Bobs will come.'],
+      ['c_bobs', 'The Clockwatch owes you, dragon. When you need us, all three Bobs will be there. Probably on time.', 'We owe you. All three Bobs will come.'],
     ],
     // the clever Bob's memory, played by his own talk in people.js while the homecoming plays the old lines
     bb_remember: [

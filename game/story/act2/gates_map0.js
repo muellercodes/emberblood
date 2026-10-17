@@ -123,9 +123,9 @@ places({
       ['ash', 'Wait. EVERY clock?', 'Every clock?'],
     ],
     m0_oil: [
-      ['narr', "Up comes a tin chest, dripping pond weed. Painted on the lid: WICK'S BRIGHTEST. FOR A LAMP HAVING A BAD NIGHT.",
-        "A tin chest! WICK'S BRIGHTEST LAMP OIL.", { ref: 'm0_bramble_chest' }],
-      ['narr', '"Sank this after Lantern Night. Did not trust myself with it. Use it well. F."', '"Use it well. F."'],
+      ['narr', "Up comes a tin chest, dripping pond weed. Painted on the lid: FENNICK'S BRIGHTEST. FOR A LAMP HAVING A BAD NIGHT.",
+        "A tin chest! FENNICK'S BRIGHTEST LAMP OIL.", { ref: 'm0_bramble_chest' }],
+      ['narr', '"My last tin of the good stuff, hidden here for a bad night. If you found it, the bad night is yours. Use it well. F."', '"My last good oil. Use it well. F."'],
       ['ash', "Fennick's lamp oil. Some lamp out there is having a very bad night.", "Fennick's lamp oil!"],
     ],
     m0_hoof: [

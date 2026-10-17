@@ -24,7 +24,7 @@ quest({
       hint: ['Turn the three wall gears until they mesh. Then one gentle breath on Bolt, about a second.',
         'Turn the gears. Then breathe gently.'] },
     { id: 'home', do: 'talk c_hettie', scene: 'bt_home', then: ['ally c_bolt', 'set c_bolt_done', 'xp 500'],
-      obj: ['Talk to Professor Hettie', 'Talk to Professor Hettie'] },
+      obj: ['Talk to Professor Sprocket', 'Talk to Professor Sprocket'] },
   ],
 
   scene: {
