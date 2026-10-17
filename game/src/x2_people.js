@@ -270,7 +270,7 @@ function f2pJunAct3(){ return f2pAct3(); }
   if(id==='f_nisse'){ const d=homeDoor('f_nils'); if(d) return [d.x-60,d.y+46]; return [F2P_NISSE[0],F2P_NISSE[1]]; }
   if(id==='elka'&&f2pElkaHere()){ const s=f2pAt('f_sled',0)&&!G.flags.f_sled_won?F2P_SPOT.elka_race:F2P_SPOT.elka; return [s[0],s[1]]; }
   if(id==='juniper'&&f2pJunAct3()){ if(!G.flags.f_juniper_found) return F2P_SPOT.juniper_floe.slice(); if(G.flags.f_juniper_home||f2pQ('f_juniper')) return F2P_SPOT.juniper_tent.slice(); return F2P_SPOT.juniper_floe.slice(); }
-  if(F2P_SPOT[id]){ const s=F2P_SPOT[id]; return [s[0],s[1]]; }
+  if(F2P_SPOT[id]&&id!=='elka'){ const s=F2P_SPOT[id]; return [s[0],s[1]]; }
   return base(c);
 }; }
 const f2pRimeGen=id=>/^n_f_rimeholm_/.test(String(id));
