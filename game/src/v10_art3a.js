@@ -31,10 +31,12 @@ defineLook('moth_dust_ice',{w:84,h:58,draw(g,x,y){
 
 // ---------- f_thaw: Ylva's red yarn, frozen stiff, hanging down the front of the bell tower from the very top
 // (the place stands at the foot of the tower's south face; the yarn climbs the face to the knitter's chair)
-defineLook('red_yarn',{w:40,h:120,draw(g,x,y){
+defineLook('red_yarn',{w:220,h:130,draw(g,x,y){
   g.save(); g.translate(x,y); g.lineCap='round';
-  // the strand: a little wavy, stiff with frost, with icicle beads on it
+  // the strand: a little wavy, stiff with frost, with icicle beads on it, up the south face of the bell tower, then
+  // (I3) along the top's front edge to the knitter's chair at the front-right corner (Ylva sits at +94, -114)
   const pts=[]; for(let i=0;i<=14;i++){ const k=i/14; pts.push([Math.sin(k*9)*2.2*(1-k*0.4)+k*4,-k*104]); }
+  for(let i=1;i<=8;i++){ const k=i/8; pts.push([4+k*80,-104-k*8+Math.sin(k*Math.PI)*3]); }
   g.strokeStyle=A3A_INK; g.lineWidth=5.6; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke();
   g.strokeStyle='#e8433c'; g.lineWidth=3.4; g.stroke();
   g.strokeStyle='rgba(255,255,255,.65)'; g.lineWidth=0.9; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0]-0.6,p[1]):g.moveTo(p[0]-0.6,p[1])); g.stroke();

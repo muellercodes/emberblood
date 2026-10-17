@@ -956,9 +956,12 @@ function f2sKindleFx(){
 // the fire column out of the Great Hearth after the WHOOMPH (it also roars while the scene talks: see liteUpdate below)
 function f2sHearthCol(dt){ if(!(F2ST.hearthFx>0)) return; F2ST.hearthFx-=dt; const P=f2sLm('f_lm_hearth','hearth'); if(Math.random()<0.9) emit(P.x+rand(-26,26),P.y-20,2,{kind:Math.random()<0.5?'bfire':'fire',ang:-Math.PI/2,spread:0.3,smin:200,smax:520,lmin:.5,lmax:1,zmin:4,zmax:9,grow:8}); }
 // the story data (game/story/act3) asks for this module's pictures with storyEmit('f3fx:<name>'): the data has no
-// flash or shake of its own. whoomph: the Hearth roars up (f_kindle.js f3_kindle)
+// flash or shake of its own. whoomph: the Hearth roars up (f_kindle.js f3_kindle). The engine's storyListen (I5) when
+// it is there, else a wrapper round storyEmit
 const F2S_FX={whoomph:()=>f2sKindleFx()};
-{ const base=storyEmit; storyEmit=function(name){ const r=base.apply(this,arguments); try{ const m=/^f3fx:(\w+)/.exec(String(name||'')); if(m&&F2S_FX[m[1]]&&G&&G.mode==='story') F2S_FX[m[1]](); }catch(e){ console.error(e); } return r; }; window.storyEmit=storyEmit; }
+{ const run=rest=>{ const m=/^(\w+)/.exec(String(rest||'')); if(!m) return; if(!F2S_FX[m[1]]){ console.error('x2_story: unknown f3fx:'+rest); return; } if(G&&G.mode==='story') F2S_FX[m[1]](); };
+  if(typeof storyListen==='function') storyListen('f3fx:',rest=>{ try{ run(rest); }catch(e){ console.error(e); } });
+  else { const base=storyEmit; storyEmit=function(name){ const r=base.apply(this,arguments); try{ const n=String(name||''); if(n.startsWith('f3fx:')) run(n.slice(5)); }catch(e){ console.error(e); } return r; }; window.storyEmit=storyEmit; } }
 function f2sKindle(){
   if(f2sSeen('f_kindle')) return;
   f2sPlay('f_kindle',()=>{
@@ -1361,6 +1364,10 @@ function f2sTick(dt){
   f2sQueue(dt); f2sBossTick(dt);
   if(actOf(G.stage)!==3) return;
   const F=G.flags;
+  // Mom's snow letter (f_pb_1): the data's f_snow sends Pebble once, when its first step starts. A save made before
+  // she landed (her flight is not saved), or a long spell with no calm moment (she gives up), sends her again, so the
+  // letter never just stops coming
+  if(G.stage==='f_snow'&&!F.f_pb_1&&!f2sSeen('f_intro')&&typeof PEBRT!=='undefined'&&!PEBRT.crow&&!PEBRT.want&&!(G.time<F2ST.pbT)){ F2ST.pbT=G.time+20; try{ pebbleNow('f_pb_1'); }catch(e){ console.error(e); } }
   f2sFergusTick(); f2sNudgeTick(); f2sStubTick();
   // Rimeholm and Grandmother Ylva can be reached by the Rim Road before the North Gate: their scenes play whenever
   // Ash gets there with Blaze (the stage then moves on by itself)
