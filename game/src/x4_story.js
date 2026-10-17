@@ -1769,6 +1769,15 @@ function n4sTick(dt){
   if(N4ST.resume) n4sResume();
   if(N4ST.doorFx) N4ST.doorFx.t+=dt;
   if(G.done&&G.choices.n_end&&curMap()===4){ N4ST.duchShow=1; }
+  if(!G.done&&!AREA&&curMap()===4) n4sCheckpoint();
+}
+// (I5) the peak's shrines are its checkpoints: "Rise again" wakes Ash at the last one he walked past. Before, he woke
+// where he last rested or travelled, often Emberhollow or Moonfall (run B fell in the Tendril Wood and woke on the
+// village green, a whole act away)
+function n4sCheckpoint(){
+  const p=player; if(!p||p.dead||!G.shrines) return;
+  for(const s of SHRINES){ if(!/^n_sh_/.test(s.id)||!G.shrines[s.id]||G.lastShrine===s.id) continue;
+    if(dist2(p.x,p.y,s.x,s.y)<200*200){ G.lastShrine=s.id; break; } }
 }
 // animations that also run under dialogue: the Heart's dark, the dawn, the cutscene, Ash's size
 function n4sAnim(dt){
