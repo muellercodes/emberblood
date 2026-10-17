@@ -18,8 +18,8 @@ chapter({
   id: 'f_thaw', act: 3, after: 'f_kindle', next: 'f_sky', takeover: true,
   card: ['Act III · Chapter 3', 'One Thaw at a Time'],
   so_far: [
-    "Rimeholm froze in one night when the great moth flew over. Ash worked out that the knitter on top of the bell tower saw it first, and through her spyglass he saw something asleep on Mount Dread, breathing out the storm. He woke her: Grandmother Ylva. The sleeper is Glaciar, the ice dragon. Ash's great-great-many-times AUNTIE.",
-    'Ash woke Grandmother Ylva in frozen Rimeholm. The dragon on Mount Dread is Glaciar. His AUNTIE!'],
+    "The Great Hearth burns blue again. But Rimeholm, the fishing village on the sea cliffs, went quiet the night the moth flew over, and nobody in Hearthold has heard from it since.",
+    'The Hearth burns again. But Rimeholm went quiet. Nobody has heard from it.'],
   mom: [['A whole frozen village? Take them soup. Take them ALL soup.', 'A frozen village? Take them soup!']],
   // (x2_story's Tove nudge at the foot of the tower names the granny on top; the engine marks it seen once it can)
   silence: ['f_nudge_tower'],
@@ -154,11 +154,11 @@ chapter({
   scene: {
     // (an old STORY key: x2_story plays it by itself near Rimeholm, from f_kindle on; 6 lines, nobody named)
     f_rime_arrive: [
-      ['narr', 'Rimeholm, a fishing village on the cliffs above the frozen sea. Every house is white. Every window is white. Every person is white.',
-        'Rimeholm, on the cliffs. Everything is white. Even the people.'],
+      ['narr', 'Rimeholm, a fishing village on the cliffs above the frozen sea. Ice covers every roof and every window, and every person in the street.',
+        'Rimeholm, on the cliffs. Ice covers everything. Even the people.'],
       ['narr', 'On the quay a fisher girl stands with her line cast out, frozen solid. The fish on her line is frozen in mid-air, looking extremely surprised.',
         'A fisher girl is frozen on the quay. Her fish is frozen in the air.'],
-      ['tove', 'The whole village. Frozen in one night.', 'The whole village froze in one night.'],
+      ['tove', 'The whole village froze, Ash. All at once, by the look of it.', 'The whole village froze at once.'],
       ['ash', 'Can I thaw them?'],
       ['tove', 'One at a time, I think. But first: somebody here must have SEEN what did this. Who?', 'One at a time. But somebody here SAW it. Who?'],
       ['ash', 'Then I will find out who. Detective Ash.', 'I will find out. Detective Ash!'],
@@ -168,7 +168,7 @@ chapter({
     f3_saga: [
       ['narr', 'Saga the fisher, frozen with her rod bent and a fish in mid-flop.', 'Saga is frozen with a fish on her line.'],
       ['narr', 'But she is not looking at her fish. Her eyes are turned UP, at the sky.', 'But she is not looking at the fish. She is looking UP.', { clue: 'f3_looking_up' }],
-      ['ash', "Something up there was more interesting than a fish. That's a LOT.", 'Something up there beat a fish!'],
+      ['ash', "A fisher who isn't looking at her fish? Something up there must have been BIG.", "She's not looking at her fish! Something up there was big."],
     ],
     f3_rope: [
       ['narr', 'The bell rope is frozen stiff, pulled halfway down. Somebody was ringing the alarm when the frost hit.',
@@ -178,7 +178,7 @@ chapter({
     f3_yarn_look: [
       ['narr', 'A red yarn hangs down the front of the bell tower, frozen stiff as a stick.', 'A red yarn hangs down the tower, frozen stiff.'],
       ['narr', 'You follow it up with your eyes. It comes all the way down from the very top.', 'It comes down from the very top.', { clue: 'f3_yarn', ref: 'f_bell_tower' }],
-      ['ash', 'Somebody was knitting up there. On TOP of the tower. In the wind.', 'Somebody was knitting on top of the tower!'],
+      ['ash', 'Somebody was knitting up there, right on top of the tower, in all that wind?', 'Somebody was knitting on top of the tower!'],
     ],
     f3_bo: [
       ['narr', 'Little Bo, frozen on the chapel roof with a snowball in one hand. The other hand points straight up at the sky.',
@@ -189,12 +189,12 @@ chapter({
       ['narr', 'Carved over the chapel door: a dragon curled round a snowflake, fast asleep.', 'A carving: a dragon curled round a snowflake, asleep.'],
       ['narr', 'Under it, worn smooth by a hundred winters: SHE SLEEPS ON THE MOUNTAIN SO THE WINTERS STAY SMALL.',
         'Under it: SHE SLEEPS ON THE MOUNTAIN SO THE WINTERS STAY SMALL.', { clue: 'f3_chapel', ref: 'f_crown' }],
-      ['tove', "A dragon on the mountain. Small winters. This winter isn't small, Ash.", "This winter isn't small, Ash."],
+      ['tove', "A dragon who keeps the winters small. Well, this one isn't small, Ash.", "This winter isn't small, Ash."],
     ],
     f3_who_saw: [
-      ['ash', 'Everybody looked up. Somebody shouted. And somebody was knitting at the very top.', 'Everyone looked up. Somebody shouted. Somebody was on top.'],
+      ['ash', 'Saga looked up. The bell rang because somebody shouted. And somebody was knitting right at the very top.', 'Saga looked up. Somebody shouted. Somebody was on top.'],
       ['tove', 'The knitter on top of the bell tower! She had the best seat in Rimeholm.', 'The knitter on top of the tower! The best seat.', { ref: 'f_bell_tower' }],
-      ['tove', 'Climb up, Ash. Carefully. I am not good with up.', 'Climb up. Carefully.'],
+      ['tove', "Climb up, Ash. Carefully. If you fall, I fall, and I'd rather not.", 'Climb up. Carefully!'],
     ],
     // on top of the tower: the camera goes to the summit of Mount Dread
     f3_spyglass_look: [
@@ -204,7 +204,7 @@ chapter({
         'The storm puffs out. It stops. It puffs again. Like breathing.', { clue: 'f3_spyglass', ref: 'f_crown' }],
       ['narr', 'And on the very top, curled up like a cat, something long and white.', 'Something long and white is curled up on top.', { ref: 'f3_glaciar_asleep' }],
       ['ash', 'Tove. The mountain is BREATHING.', 'Tove. The mountain is BREATHING.'],
-      ['tove', "Before you wake her up, Ash, work out what that is. I want to know before she does.", 'Work out what that is first.'],
+      ['tove', "Work out what that is, Ash. I'd like to know before we go anywhere near it.", 'Work out what that is first.'],
     ],
     // Ylva wakes (10 lines on every branch): played by this chapter whenever she thaws, the scarf, the pointer
     f3_ylva_wake: [

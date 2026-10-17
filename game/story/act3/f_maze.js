@@ -49,13 +49,13 @@ chapter({
     f_moat: [
       ['tove', 'Open water all around the door. Good thing you can walk on water. You CAN walk on water? Please say you can.',
         'Water all around the door. You CAN walk on water? Please say yes.', { ref: 'f_maze_door' }],
-      ['ash', "I can walk on water, run on water, and skip on water. I can't swim, though.", "I can walk on water and skip on water. I can't swim, though."],
+      ['ash', "I can walk on water. I just can't swim. So I walk fast.", "I can walk on water. I just can't swim."],
       ['tove', "Let's not find out today."],
     ],
     // ---- the dungeon's lines (old STORY keys, played by x2_dun_a)
     f_maze_in: [
-      ['tove', "Oh, it's beautiful. Oh, it's FREEZING. Oh, both.", "Oh, it's pretty. Oh, it's FREEZING."],
-      ['tove', 'Mind the ice, Ash. Ice is just floor that wants you to fall over.', 'Mind the ice. Ice is floor that wants you to fall.'],
+      ['tove', "It's beautiful in here. It's also colder than my old post, and I had the coldest post of all five Wardens.", "It's pretty. And colder than my old post!"],
+      ['tove', 'Mind the ice, Ash. Small steps, and keep your tail out for balance.', 'Mind the ice. Small steps!'],
     ],
     f_maze_hjalmar_cold: [
       ['narr', 'A frozen explorer stands in the ice, caught in the middle of a sneeze. Your breath only makes the ice sweat a little.',
@@ -79,7 +79,7 @@ chapter({
     ],
     // Ember's shrine before her gift (a clue for the Snow Mother question)
     f_maze_shrine: [
-      ['ember', 'Oh! A visitor. In the cold! Hello, little ember.', 'Oh! A visitor in the cold! Hello, little ember.'],
+      ['ember', 'Ash? All the way up here, in the cold? Hello again, little ember.', 'Ash! Up here in the cold? Hello again!'],
       ['ash', 'Grandma Ember! I mean, just Ember.'],
       ['ember', 'You remembered! I built this forge a long, long time ago, with my auntie. She did the cold parts. I did the hot parts. We were a very good team.',
         'I built this forge with my auntie. She did the cold parts. I did the hot parts.', { clue: 'f3_cold_parts' }],
@@ -124,7 +124,7 @@ chapter({
     // right after the boss (6 lines)
     f_maze_won: [
       ['narr', 'The purple frost cracks off Old Bellows like an eggshell. Underneath he is warm brass and soot and rivets.', 'The purple frost cracks off. Underneath he is warm brass.'],
-      ['f_bellows', '...Fff. Fwooosh. Warm? Little ember. You smell like the boss.', 'Fff. Fwooosh. Warm? You smell like the boss.'],
+      ['f_bellows', '...Fff. Fwooosh. Warm? Small hot one. You smell like the boss.', 'Fff. Fwooosh. Warm? You smell like the boss.'],
       ['ash', 'The boss? You mean Ember?'],
       ['f_bellows', 'Ember. And the Cold One. They made Bellows. Then the purple cold came, and Bellows forgot.',
         'Ember and the Cold One made Bellows. Then the purple cold came.', { clue: 'f3_bellows_cold' }],

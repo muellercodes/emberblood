@@ -14,7 +14,7 @@ chapter({
     "It snows in summer. The cold comes over the High Pass by Frostpine Lodge."],
   hint: ['Frostpine Lodge is in the far north-west of Embermere, in the snowy highlands. Ulf will know about the pass.',
     'Go to Frostpine Lodge. Ask Ulf about the pass.'],
-  mom: [['Snow in summer! Did you get my letter? Did you get my SOUP?', 'Snow in summer! Did you get my letter?']],
+  mom: [["You came home first! Good. Sit down and eat your soup, and THEN go to the Lodge. Scarf.", 'You came home! Eat your soup. Then go to the Lodge.']],
 
   // Ulf's hat: the hat key is "Wolf-fur Hat" (x2_story's own hat drawing). A3a ENGINE REQUEST in CHANGES.md: `hat
   // <item>` should unlock and wear the item's `hat` name (today x1pHat only knows Act II's three hats).
@@ -56,7 +56,7 @@ chapter({
     f_intro: [
       ['narr', 'Snow. In the middle of summer. It falls on the roofs and fizzles on the warm chimneys, like the sky is sneezing.',
         'Snow! In summer! It fizzles on the chimneys.'],
-      ['narr', 'A crow lands on your horn. It is Pebble, with a letter in her beak and a look that says you owe her a button.',
+      ['narr', 'A crow lands on your horn. It is Pebble, with a letter in her beak and a look that says you owe her something shiny.',
         'Pebble the crow lands on your horn. She has a letter.'],
       ['narr', 'Pebble drops the letter, takes one shiny coin out of your pouch, and does not apologize.',
         'She takes a coin. She is not sorry.'],
@@ -69,11 +69,11 @@ chapter({
       ['pip', 'Mip! (Pip sneezes on a snowflake. It sizzles.)', 'Mip! (Pip sneezes on a snowflake.)'],
       ['narr', "In your pocket, the Shard of the Ember Heart has gone cold. Not cold like a stone. Cold like it's scared of something.",
         'The Shard in your pocket feels cold. Like it is scared.', { if: 'item c_shard1' }],
-      ['ash', 'Okay. North. Scarf. Soup. Not in that order.', 'Okay. North. Scarf. Soup.', { ref: 'high_pass' }],
+      ['ash', "So: go straight to the Lodge, but come home for soup first. I can do both. Soup first.", 'Lodge AND soup. Soup first!', { ref: 'high_pass' }],
     ],
     // at the Lodge (9 lines with Brisket): the split pass, the wings, the sheep, Elka's note, the hat
     f_lodge: [
-      ['ulf', 'Ash! You came. Good. Look at this. LOOK at it.', 'Ash! You came. Look at this!'],
+      ['ulf', 'Ash! Good, you came. Come here and look at this. LOOK at it.', 'Ash! You came. Look at this!'],
       ['narr', 'Ulf points out of the window. Just west of the Lodge, where the High Pass used to be a wall of ice, a white road climbs into the clouds.',
         'Just west of the Lodge, the wall of ice is gone. A white road climbs up.', { dir: ['frostpine_lodge', 'high_pass', 'west'] }],
       ['ulf', 'A hundred years that pass was shut. Then one night, crack, the ice split right down the middle. Like something big flew through it. Something with wings.',
@@ -83,7 +83,7 @@ chapter({
       ['ash', "Where's Elka?", 'Where is Elka?'],
       ['ulf', '...She left a note.', 'She left a note.'],
       ['narr', "The note says: GONE SLEDDING. VERY FAR. BACK FOR SUPPER. (NOT TONIGHT'S.)", 'GONE SLEDDING. VERY FAR. BACK FOR SUPPER. (NOT TONIGHT.)', { clue: 'f3_elka_note' }],
-      ['brisket', "I'm not going. I want that written down somewhere. I have been an ice cube once, and once was plenty.",
+      ['brisket', "Don't look at me. I'm not going up there. You thawed me out of one block of ice already, and I am not getting into another.",
         "I'm not going. I was an ice cube once. Once was enough.", { if: 'flag brisket_thawed' }],
       ['ulf', 'Find her. And whatever is making winter up there, give it a good kick from me. Here: a wolf-fur hat with ear flaps. Wear it for me.',
         'Find her. Kick the winter for me. Here, a fur hat. Wear it for me.'],
@@ -92,7 +92,7 @@ chapter({
 
   talk: {
     ulf: [
-      { if: 'stage=f_pass', say: ['The High Pass is just west of the Lodge, Ash. Follow the white road up. Mind the sheep. They are watching you.',
+      { if: 'stage=f_pass', say: ['The High Pass is just west of the Lodge, Ash. Follow the white road up. If you see Elka, tell her supper is at six. Every night.',
         'The pass is just west of here. Mind the sheep.'], dir: ['frostpine_lodge', 'high_pass', 'west'] },
     ],
   },

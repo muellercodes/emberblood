@@ -69,7 +69,7 @@ chapter({
       ] },
     { id: 'gate', do: 'goto f3_west_gate 230', scene: 'f_gate', then: ['xp 200', 'stage f_hearth'],
       obj: ['Follow the White Road to Hearthold', 'Follow the White Road to Hearthold'],
-      hint: ['Follow the White Road down from the pass to Hearthold, the town with the wall. And the smoke. Mostly the smoke.',
+      hint: ['Follow the White Road east from the pass to Hearthold, the town with the round wall and the chimney smoke.',
         'Follow the White Road to Hearthold, the town with the wall.'] },
   ],
 
@@ -80,20 +80,20 @@ chapter({
         'The pass climbs up and up. Your tail goes numb. Then the clouds open.'],
       ['narr', 'The whole north is white. White hills, white forests, a white lake as flat as a plate. And far away, a black mountain wrapped in a purple storm.',
         'The whole north is white. And far away: a black mountain in a purple storm.', { ref: 'f_crown' }],
-      ['tove', 'Brr. Oh, brr. Oh, I know this cold.', 'Brr. Oh, I know this cold.'],
+      ['tove', 'Brrrr. I know this cold. I know it very well.', 'Brrrr. I know this cold.'],
       ['ash', 'Tove? Is that you? Where are you?', 'Tove? Where are you?'],
       ['tove', "In your fire, Ash. All five of us ride along in there, remember? The others are napping. I volunteered for this trip. I hate this trip.",
         "In your fire, Ash. The others are napping. I came on this trip. I hate this trip."],
       ['tove', "That mountain is Mount Dread. That storm is not a normal storm. Normal storms don't hum.", "That is Mount Dread. That storm hums. Normal storms don't hum."],
       ['ash', "It's humming the same note as the Shard.", 'It hums the same note as the Shard.', { clue: 'f3_storm_hums' }],
-      ['tove', "Then that's where the second piece went. Follow the White Road east. There's a town down there with a fire in it. A big one. Mostly.",
+      ['tove', "Then that's where the second piece went. Follow the White Road east. There's a town down there that keeps a very big fire. I hope it still does.",
         "Then the Shard is there. Follow the road east. There's a town with a big fire.", { dir: ['f_whitepass', 'f_hearthold', 'east'] }],
     ],
     f3_pass_cut_look: [
       ['narr', 'The old wall of ice is split right down the middle, as if something pushed through it.', 'The old ice is split down the middle.'],
       ['narr', 'Soft white dust is packed into the crack, like flour. It is not frost. It comes off on your claws.',
         'Soft white dust is in the crack. Like flour. It sticks to your claws.', { clue: 'f3_pass_cut' }],
-      ['ash', "Huh. Whatever made this was big. And dusty.", 'Whatever did this was big. And dusty.'],
+      ['ash', "Whatever pushed through here was big. And it left dust. Who leaves DUST?", 'Whatever did this was big. And dusty.'],
     ],
     // on the White Road, before Ash has Blaze (x2_story.js f2sFergusTick plays this old STORY key by itself)
     f_fergus_cold: [
@@ -117,15 +117,15 @@ chapter({
       ] },
       ['f_brann', "...Hm. Moths don't have horns. Or tails. Is that smoke coming out of your nose?", "Hm. Moths don't have horns. Is that smoke from your nose?"],
       ['ash', 'Only when I sneeze.'],
-      ['f_brann', "An Emberblood! A real one! Sorry about the spear. We're jumpy. See that guard out there? One of mine. On watch. Frozen. Very brave.",
-        "An Emberblood! Sorry about the spear. See that frozen guard? Very brave.", { ref: 'f_guard_ice' }],
+      ['f_brann', "An Emberblood! A real one, like in the old songs! Sorry about the spear. We're jumpy. See that guard out there? He froze on watch, and he's STILL on watch!",
+        "An Emberblood! Sorry about the spear. That frozen guard is still on watch!", { ref: 'f_guard_ice' }],
       ['narr', 'He lifts his spear out of the gap in the wall. The gap is exactly as wide as a kid with a tail.', 'He lifts his spear out of the gap in the wall.', { ref: 'f3_west_gate' }],
-      ['f_brann', "Welcome to Hearthold, the last warm town in the north. See the Hearthkeeper at the Great Hearth. She's been waiting for someone like you. For a month. Loudly.",
+      ['f_brann', "Welcome to Hearthold, the last warm town in the north! See the Hearthkeeper at the Great Hearth. She's been waiting a month for someone like you, and telling the whole town so.",
         'Welcome to Hearthold! See the Hearthkeeper at the Great Hearth. She has waited a month.', { promise: 'f_brynja' }],
     ],
     // Pebble brings a note from Ulf once Ash has worked out what cracked the pass (who_cracked's payoff)
     f3_ulf_letter: [
-      ['ulf', "(a note in big square letters) Ash. Pebble told me. A MOTH? A moth as big as a barn, through my pass?",
+      ['ulf', "(a note in big square letters) Ash. Pebble brought your note. A MOTH? A moth as big as a barn, through my pass?",
         'Ash. A MOTH? Through my pass?'],
       ['ulf', 'My sheep were right. I said sorry to them. They did not care. They looked at the grass. Ulf.',
         'My sheep were right. I said sorry. They looked at the grass.'],
@@ -134,8 +134,8 @@ chapter({
 
   talk: {
     f_brann: [
-      { if: 'stage=f_pass', say: ["Halt! Oh, it's you. In you come. The Hearthkeeper's at the Great Hearth, in the middle of town.",
-        "Oh, it's you. The Hearthkeeper is at the Great Hearth."] },
+      { if: 'stage=f_pass', say: ["HALT! Who goes there? No, wait. Step back out to the gap in the wall, please. Strangers get asked properly, out there.",
+        "HALT! Step back out. I ask strangers out there."] },
     ],
   },
 })
