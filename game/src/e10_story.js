@@ -301,7 +301,9 @@ function s10Resolve(e){
     return {ok:!!at&&(e.map==null||mapAt(at.y)===+e.map),why:at?(e.map!=null&&mapAt(at.y)!==+e.map?`y ${at.y} is on map ${mapAt(at.y)}, not ${e.map}`:''):'no position'}; }
   let m;
   if((m=/^LANDMARKS:(.+)$/.exec(src))){ const o=LANDMARKS.find(q=>q.id===m[1]); if(!o) return {ok:false,why:`no landmark ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
-  if((m=/^DOORS:(.+)$/.exec(src))){ const o=DOORS.find(q=>q.area===m[1]); if(!o) return {ok:false,why:`no door into ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
+  if((m=/^DOORS:([^@]+)(?:@(-?\d+),(-?\d+))?$/.exec(src))){ const L=DOORS.filter(q=>q.area===m[1]); if(!L.length) return {ok:false,why:`no door into ${m[1]}`};
+    // (area@x,y: one of several doors into the area, the one nearest x,y)
+    const px=m[2]!=null?+m[2]:at?at.x:L[0].x, py=m[3]!=null?+m[3]:at?at.y:L[0].y, o=L.reduce((a,b)=>dist(a.x,a.y,px,py)<=dist(b.x,b.y,px,py)?a:b); return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^(?:CAST|SPECIAL|NPC):(.+)$/.exec(src))){ const id=m[1], c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); return c?{ok:true,real:c}:{ok:false,why:`nobody called ${id}`}; }
   if((m=/^HOUSES?:(.+)$/.exec(src))){ const h=HOUSES.find(q=>q.want===m[1]||q.owner===m[1]||q.id===m[1]); if(!h) return {ok:false,why:`no house for ${m[1]}`}; return near(h.x,h.y)?{ok:true,real:h}:{ok:false,why:far(h.x,h.y)}; }
   // (A1W's forms) WARDS:id SHRINES:id LANTERNS:id CROSSINGS:id CAVEMOUTHS:area SITES:site NPCSPOT:id ITEM_NAMES:id regionAt:Name GATE_COL G.goat <obj>.path
@@ -314,7 +316,7 @@ function s10Resolve(e){
   if((m=/^SITES:(.+)$/.exec(src))){ const S0=SITES[m[1]], P=S0&&POI[S0.poi]; return S0?xy(P||S0,'site '+m[1]):{ok:false,why:`no site ${m[1]}`}; }
   if((m=/^NPCSPOT:(.+)$/.exec(src))) return xy(NPCSPOT[m[1]],'NPC spot '+m[1]);
   if((m=/^ITEM_NAMES:(.+)$/.exec(src))) return ITEM_NAMES[m[1]]!=null?{ok:true}:{ok:false,why:`no item ${m[1]}`};
-  if((m=/^regionAt:(.+)$/.exec(src))){ if(!at) return {ok:false,why:'no position'}; const r=regionAt(at.x,at.y), want=m[1]; return r&&(r.name===want||simplify(r.name)===want||r.key===want)?{ok:true}:{ok:false,why:`region at ${at.x},${at.y} is ${r&&r.name}`}; }
+  if((m=/^regionAt:(.+)$/.exec(src))){ if(!at) return {ok:false,why:'no position'}; const r=regionAt(at.x,at.y), bare=v=>String(v||'').replace(/^the\s+/i,'').toLowerCase(), want=m[1]; return r&&(bare(r.name)===bare(want)||bare(simplify(r.name))===bare(want)||r.key===want)?{ok:true}:{ok:false,why:`region at ${at.x},${at.y} is ${r&&r.name}`}; }
   if(src==='GATE_COL') return GATE_COL?{ok:true,real:GATE_COL}:{ok:false,why:'no GATE_COL'};
   if(src==='G.goat') return G&&G.goat?xy(G.goat,'goat'):{ok:false,why:'no goat now'};
   if((m=/^([A-Za-z_$][\w$]*)(\.[\w$]+)+$/.exec(src))&&!/\.js$/.test(src)){ let v; try{ v=eval(src); }catch(e){ v=undefined; } return v!=null?{ok:true}:{ok:false,why:`${src} is not in the game`}; }
@@ -325,6 +327,7 @@ function s10Resolve(e){
     const o=AREA&&AREA.objs&&AREA.objs.find(q=>q.k===k); return o?{ok:true,real:o}:{ok:false,why:`no ${k} in ${AREA?AREA.id:'(outdoors)'}`}; }
   if((m=/^elev:(\d+)@(-?\d+),(-?\d+)$/.exec(src))){ const L=typeof elevLvl==='function'?elevLvl(+m[2],+m[3]):0; return L>=+m[1]?{ok:true}:{ok:false,why:`level ${L} at ${m[2]},${m[3]} (want ${m[1]})`}; }
   if((m=/^prop:([\w-]+)@(-?\d+),(-?\d+)$/.exec(src))){ const k=m[1], x=+m[2], y=+m[3], o=s10FindObj(k,x,y,90); return o?{ok:true,real:o}:{ok:false,why:`no ${k} near ${x},${y}`}; }
+  if((m=/^[\w.]+\.js\s+([A-Za-z_$][\w$]*(?:\.[\w$]+)+)$/.exec(src))){ let v; try{ v=eval(m[1]); }catch(err){ v=undefined; } return v!=null?{ok:true}:{ok:false,why:`${m[1]} is not in the game`}; }
   if((m=/^[\w.]+\.js\s+([A-Za-z_$][\w$]*)$/.exec(src))||(m=/^(?:fn|code):([A-Za-z_$][\w$]*)$/.exec(src))){
     const id=m[1];
     const o=LANDMARKS.find(q=>q.id===id)||DOORS.find(q=>q.area===id)||HOUSES.find(q=>q.want===id)||CHESTS.find(q=>q.id===id);
@@ -356,6 +359,8 @@ function s10EntityInfo(id){
   const e=s10Ent(id);
   if(e&&!e._story&&e.if!=null&&!s10Cond(e.if)){ const p=s10At(e)||{}; return {id,map:e.map!=null?+e.map:null,x:p.x,y:p.y,kind:e.kind||null,ok:true,why:`not checked now: ${typeof e.if==='string'?e.if:'its if'} does not hold`}; }
   if(!e){ const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(c){ const w=s10NpcWhere(id); return {id,map:w?mapAt(w.y):null,x:w?Math.round(w.x):null,y:w?Math.round(w.y):null,kind:'npc',ok:true,why:'a person in the game (not in the registry)'}; } return {id,ok:false,why:'not in the registry'}; }
+  if(e===S10.npcs[id]&&!e.src&&!S10.places[id]&&!S10.legacy[id]){ const w=s10NpcWhere(id)||s10At(e); const c=SPECIAL[id]||(typeof CASTBY!=='undefined'&&CASTBY[id]);
+    return {id,map:e.map!=null?+e.map:w?mapAt(w.y):null,x:w?Math.round(w.x):null,y:w?Math.round(w.y):null,kind:'npc',ok:!!c,why:c?'a person the story places (its where and at say when)':'no person '+id}; }
   const r=s10Resolve(e), w=s10Where(id)||s10At(e)||{};
   if(r.ok&&e._story&&e.look&&!s10LookHas(e.look)) return {id,map:e.map,x:w.x,y:w.y,kind:e.kind,ok:false,why:`no look ${e.look}`};
   return {id,map:e.map!=null?+e.map:null,x:w.x!=null?Math.round(w.x):null,y:w.y!=null?Math.round(w.y):null,kind:e.kind||null,ok:!!r.ok,why:r.why||''};
@@ -1604,7 +1609,7 @@ function s10Uses(cid){
   return [...U];
 }
 const S10API={
-  chapters:()=>S10.chOrder.map(id=>{ const c=S10.chapters[id]; return {id,act:+c.act||null,active:G&&G.stage===id,done:!!G&&stageAt(G.stage)>stageAt(id)&&stageAt(id)>=0}; }),
+  chapters:()=>S10.chOrder.slice().sort((a,b)=>{ const i=stageAt(a), j=stageAt(b); return (i<0?1e9:i)-(j<0?1e9:j); }).map(id=>{ const c=S10.chapters[id]; return {id,act:+c.act||null,active:G&&G.stage===id,done:!!G&&stageAt(G.stage)>stageAt(id)&&stageAt(id)>=0}; }),
   state:()=>s10ApiState(),
   entities:()=>s10ApiEntities(),
   entity:id=>s10EntityInfo(id),

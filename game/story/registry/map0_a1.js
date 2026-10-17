@@ -101,7 +101,7 @@ legacy({ id: 'high_pass', map: 0, at: [950, 3250], r: 60, kind: 'door', name: 't
 legacy({ id: 'mine_cart', map: 0, at: [8662, 5972], r: 30, kind: 'door', name: 'the Oath\'s mine cart', aliases: ['the mine cart by the tunnel'], src: 'LANDMARKS:a1_cart', opens_with: 'flag tunnel_plans', leads: 'mine_cart_back' })
 legacy({ id: 'mine_cart_back', map: 0, at: [7650, 3650], r: 30, kind: 'door', name: 'the mine cart in the Gatewatch hills', src: 'LANDMARKS:a1_cartback', opens_with: 'flag tunnel_plans', leads: 'mine_cart' })
 legacy({ id: 'mire_ferry', map: 0, at: [10918, 8710], r: 30, kind: 'door', name: 'the Mirefen landing', aliases: ['the Soggy Biscuit Two landing'], src: 'LANDMARKS:a1_mireferry', opens_with: 'quest lure done', leads: 'brindlecross_dock' })
-legacy({ id: 'brindlecross_dock', map: 0, at: [6560, 7400], r: 80, kind: 'place', name: 'the Brindlecross dock', aliases: ['the dock'], src: 'NPCSPOT:minnow' })
+legacy({ id: 'brindlecross_dock', map: 0, at: [6560, 7400], r: 80, kind: 'place', name: 'the Brindlecross dock', aliases: ['the dock'], src: 'CAST:dell' })   // (Dell Fisk fishes there: a9d npcSpot 'dock')
 
 // ---- landmarks, signs and things to look at (LANDMARKS, STRUCTS)
 legacy({ id: 'bootprints', map: 0, path: [[2580, 9128], [2650, 9112], [2710, 9068], [2734, 8996], [2758, 8916], [2780, 8846], [2798, 8806]], r: 30, kind: 'prints', name: 'the sooty bootprints', aliases: ['the bootprints', 'the prints'], src: 'LANDMARKS:bootprints' })
