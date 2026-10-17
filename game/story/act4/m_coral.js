@@ -26,7 +26,6 @@ chapter({
       mystery: 'night_mother',
       ask: ['Where did the great grey moth take the last Shard?', 'Where did the moth take the last Shard?'],
       needs: ['m4_spire_dust', 'm4_star_map', 'm4_scout_report'],
-      bonus: ['m4_mosaic'],
       pick: [
         { t: ['The Eclipse Observatory, far east on the Heights', 'The Eclipse Observatory, far east'], right: true },
         { t: ['Down into Drowned Lumen', 'Down into Drowned Lumen'],
@@ -40,7 +39,10 @@ chapter({
   },
 
   step: [
+    // (then: an old save made in this chapter by the old code never saw the Lumen clues; for everyone else these are
+    // already in the Case Book and nothing happens)
     { id: 'queen', do: 'talk m_coralia', scene: 'crl_coralia', intro: 'crl_after',
+      then: ['clue m4_spire_dust', 'clue m4_star_map', 'clue m4_leash_mural'],
       obj: ['Dive into the coral ring south of Driftwood and meet Queen Coralia', 'Dive into the coral ring. Meet the Queen.'] },
     { id: 'kipper', do: 'talk m_kipper', scene: 'crl_kipper', then: ['clue m4_scout_report'],
       obj: ['Ask Sir Kipper what the scouts saw', 'Ask Sir Kipper what he saw'],

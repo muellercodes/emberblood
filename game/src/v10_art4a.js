@@ -34,12 +34,16 @@ function a4aMoonSpr(n,R){
     q.globalCompositeOperation='source-over';
   });
 }
-// a state change on a look starts its clock (kept per look id); a look not drawn for a second starts over
+// a state change on a look starts its clock (kept per look id). `first` is the state a picture starts from: going
+// back to it starts the clock over (a scene played again, a reload). A state the clock never saw but that comes
+// before the current one in `order` counts as long done (frames can be far apart on a slow machine).
 const A4A_ST={};
-function a4aClock(id,state){
-  const now=a4aNow(); let c=A4A_ST[id];
-  if(!c||now-c.last>1){ c=A4A_ST[id]={st:undefined,t0:now,hist:{},last:now}; }
-  c.last=now; if(c.st!==state){ c.st=state; c.t0=now; c.hist[state]=now; } return c; }
+function a4aClock(id,state,first,order){
+  const now=a4aNow(); let c=A4A_ST[id]; if(!c) c=A4A_ST[id]={st:undefined,t0:now,hist:{}};
+  if(c.st!==state){ if(state===first) c.hist={}; c.st=state; c.t0=now; c.hist[state]=now; }
+  const cur=order?order.indexOf(state):-1;
+  c.since=k=>{ if(c.hist[k]!=null) return now-c.hist[k]; const i=order?order.indexOf(k):-1; return i>=0&&cur>=0&&i<cur?99:-1; };
+  return c; }
 // screen size (CSS px) and a transform to draw in it
 function a4aScreen(g){ const dpr=typeof DPR!=='undefined'?DPR:1; const sw=typeof W!=='undefined'?W:g.canvas.width/dpr, sh=typeof H!=='undefined'?H:g.canvas.height/dpr; g.setTransform(dpr,0,0,dpr,0,0); return {w:sw,h:sh}; }
 
@@ -114,9 +118,10 @@ defineLook('m4a_lamp_fixed',{w:30,h:60,draw(g,x,y){ const c=a4aSpr('lamp_ok',40,
 defineLook('m4a_balcony_dust',{w:120,h:40,draw(g,x,y){
   const c=a4aSpr('balcdust',140,46,104,30,q=>{
     // the long scrape: three gouges in the marble, running off toward the sunrise (east is to the right)
-    q.strokeStyle='rgba(120,128,150,.55)'; q.lineWidth=2.4;
+    q.strokeStyle='rgba(150,158,184,.5)'; q.lineWidth=1.6;
     for(const dy of [-5,0,5]){ q.beginPath(); q.moveTo(-100,dy+4); q.quadraticCurveTo(-40,dy-2,8,dy-6); q.stroke(); }
-    q.strokeStyle='rgba(255,255,255,.7)'; q.lineWidth=1; for(const dy of [-5,0,5]){ q.beginPath(); q.moveTo(-98,dy+3); q.quadraticCurveTo(-40,dy-3,6,dy-7); q.stroke(); }
+    q.strokeStyle='rgba(210,220,255,.75)'; q.lineWidth=0.9; for(const dy of [-5,0,5]){ q.beginPath(); q.moveTo(-98,dy+5); q.quadraticCurveTo(-40,dy-1,6,dy-5); q.stroke(); }
+    q.fillStyle='rgba(214,222,255,.8)'; for(let i=0;i<22;i++){ const u=i/22; q.fillRect(-96+u*100,4-u*10+((i*7)%9)-4,1.4,1.4); }
     // claw tips at the end, pointing right
     q.fillStyle='rgba(90,96,120,.7)'; for(const dy of [-7,-1,5]){ q.beginPath(); q.moveTo(8,dy-2); q.lineTo(16,dy-4); q.lineTo(8,dy+1); q.closePath(); q.fill(); }
     // a stretch of rail, thick with silver dust
@@ -154,8 +159,9 @@ function a4aMoonDisc(g,x,y,R,cov,sunA,t){
 // ---------- m_reef: the first eclipse, over the whole screen. States: dark, rise, bite, eyes, leave (the scene sets
 // them line by line). Nothing is drawn for any other state.
 defineLook('m4a_eclipse',{w:60,h:60,anim:true,draw(g,x,y,t,state){
-  const C=a4aClock('m4a_eclipse',state), H0=C.hist; if(!state||!H0.dark||state==='gone') return;
-  const now=a4aNow(), since=k=>H0[k]?now-H0[k]:-1, ramp=(k,d)=>{ const s=since(k); return s<0?0:Math.min(1,s/(d||1)); };
+  const ORD=['dark','rise','bite','eyes','leave'];
+  if(!state||!ORD.includes(state)) return;
+  const C=a4aClock('m4a_eclipse',state,'dark',ORD), now=a4aNow(), since=C.since, ramp=(k,d)=>{ const s=since(k); return s<0?0:Math.min(1,s/(d||1)); };
   const lv=ramp('leave',2.6), dark=ramp('dark',2)*(1-lv), cov=Math.min(ramp('dark',2.2),1-ramp('leave',1.6)), rise=ramp('rise',2.6)*(1-lv);
   g.save();
   const S=a4aScreen(g), sw=S.w, sh=S.h, narrow=sw<600;
@@ -225,9 +231,9 @@ function a4aGlaciar(g,x,y,s,t){
   g.restore();
 }
 function a4aVoyage(kind){ return {w:60,h:60,anim:true,draw(g,x,y,t,state){
-  const id='m4a_voyage_'+kind, C=a4aClock(id,state==null?'sea':state), H0=C.hist;
-  const now=a4aNow(), t0=H0.sea!=null?H0.sea:C.t0, fin=Math.min(1,(now-t0)/0.6), dawn=H0.dawn?Math.min(1,(now-H0.dawn)/1.8):0, out=H0.dawn?Math.max(0,Math.min(1,(now-H0.dawn-1.4)/2.4)):0;
-  const moths=H0.moths?Math.min(1,(now-H0.moths)/1.2):0;
+  const ORD=['sea','moths','dawn'], id='m4a_voyage_'+kind, C=a4aClock(id,state==null?'sea':state,'sea',ORD), now=a4aNow(), sn=C.since;
+  const fin=sn('sea')<0?1:Math.min(1,sn('sea')/0.6), dawn=sn('dawn')<0?0:Math.min(1,sn('dawn')/1.8), out=sn('dawn')<0?0:Math.max(0,Math.min(1,(sn('dawn')-1.4)/2.4));
+  const moths=sn('moths')<0?0:Math.min(1,sn('moths')/1.2);
   const A=fin*(1-out); if(A<=0.01) return;
   g.save(); const S=a4aScreen(g), sw=S.w, sh=S.h, hz=sh*0.56; g.globalAlpha=A;
   // the sky: dusk blue to night indigo, warming to pink and gold at dawn

@@ -17,26 +17,22 @@ chapter({
   mom: [['A sea boat! Wear a hat. Wear two hats.', 'A sea boat! Wear a hat.']],
 
   place: {
-    // the painted voyage pictures (screen-wide looks, v10_art4a.js), shown only while their voyage scene plays
-    m4_voyage_ship: { map: 3, at: [1300, 64800], kind: 'prop', look: 'm4a_voyage_ship', if: 'flag m4_voy=ship',
+    // all of Driftwood Landing: the West Dock (Dell's boat) and the north isle (Glaciar) are both inside it
+    m4_moonfall: { map: 3, at: [1800, 64500], r: 900, kind: 'spot', name: ['Driftwood Landing, in Moonfall', 'Driftwood Landing'] },
+    // the painted voyage pictures (screen-wide looks, v10_art4a.js), shown only while the voyage scene plays. The scene
+    // fades to black first (a storybook page); the pictures need the engine to draw a `layer: 'screen'` look after the
+    // fade and before the HUD (A4a ENGINE REQUEST in CHANGES.md): until then they are drawn under the black and unseen.
+    m4_voyage_ship: { map: 3, at: [1300, 64800], kind: 'prop', look: 'm4a_voyage_ship', if: 'flag m4_voy=ship', layer: 'screen',
       name: 'the voyage east' },
-    m4_voyage_glaciar: { map: 3, at: [2345, 64320], kind: 'prop', look: 'm4a_voyage_glaciar', if: 'flag m4_voy=glaciar',
+    m4_voyage_glaciar: { map: 3, at: [2345, 64320], kind: 'prop', look: 'm4a_voyage_glaciar', if: 'flag m4_voy=glaciar', layer: 'screen',
       name: 'the flight east' },
   },
 
   step: [
     // Ash lands in Moonfall by Dell's boat (the Far Pier crossing puts him on the West Dock) or on Glaciar's back (the
-    // North Gate crossing, or the intro's own flight, puts him on the north isle)
-    { id: 'land', do: 'any',
-      obj: ['Sail east to Moonfall with Dell, from the end of Gearhaven\'s Far Pier', 'Sail east with Dell from the Far Pier'],
-      parts: [
-        { do: 'wait_for near m4_west_dock 700', at: 'm4_far_pier', scene: 'snl_voyage_ship',
-          then: ['set m_ship=ship', 'set m_dell_docked',
-            { journal: ['You sailed east with Dell on the Soggy Biscuit Three.', 'You sailed east with Dell.'], key: 'm_ship' }] },
-        { do: 'wait_for near m4_north_isle 700', at: 'm4_north_gate', if: 'choice f_glaciar=free', scene: 'snl_voyage_glaciar',
-          then: ['set m_ship=glaciar',
-            { journal: ["You flew east on Auntie Glaciar's back. Very slowly.", 'You flew east on Glaciar. Slowly.'], key: 'm_ship' }] },
-      ],
+    // North Gate crossing, or the intro's own flight, puts him on the north isle); the voyage scene tells which
+    { id: 'land', do: 'goto m4_moonfall', marker: 'm4_far_pier', scene: 'snl_voyage',
+      obj: ["Sail east to Moonfall with Dell, from the end of Gearhaven's Far Pier", 'Sail east with Dell from the Far Pier'],
       then: ['set m_landed', 'xp 300', 'stage m_drift'] },
   ],
 
@@ -70,47 +66,50 @@ chapter({
         ['iska', "Gearhaven is a long way from here. Fast travel to a Gearhaven shrine, then walk down to the Far Pier.",
           'Gearhaven is far. Fast travel to a shrine there. Then walk to the Far Pier.', { do: ['set m_ship=ship'], ref: 'm4_far_pier' }]] },
     ],
-    // the voyage by ship, on arrival at Driftwood's West Dock (the painted picture is the look m4a_voyage_ship)
-    snl_voyage_ship: [
-      { do: ['set m4_voy=ship', 'world m4_voyage_ship sea'] }, { fade: 1 },
-      ['narr', 'The Soggy Biscuit Three chugs out of Gearhaven with a toot of steam. Dell stands at the wheel in his yellow rain hat, grinning so hard his beard sticks out sideways.',
-        "Dell's boat toots out of Gearhaven. Dell grins so hard his beard sticks out."],
-      ['dell', "Three days east, Ash! Past the end of every map I own! I've never been so happy or so scared!",
-        "Three days east! Past every map I own! So happy. And so scared!", { ref: 'm4_west_dock' }],
-      ['wren', "(green, hugging a book) I'm fine. I'm FINE. Books don't get seasick. I'm just going to read... over the side.",
-        "(green) I'm fine. Books don't get seasick. I'll just read... over the side."],
-      ['ash', 'Sister Wren? You came OUTSIDE?'],
-      ['f_mags', "(from below deck) The engine's FINE! It's making that noise on purpose! Mostly! Dell pays me in sandwiches.",
-        '(from below) The engine is FINE! The noise is on purpose! Mostly!'],
-      ['ev_tikka', '(from the galley) Lumpy buns! Lumpy buns for everyone! Lumpy means love!', 'Lumpy buns for everyone! Lumpy means love!',
-        { if: 'flag tk_come=yes' }],
-      ['narr', 'On the second night the moon comes up over the sea. Two bites are gone from its edge, like a cookie. A hundred moths flutter past the mast, all flying east.',
-        'The moon comes up. Two bites are gone. A hundred moths fly past, all going east.', { do: ['world m4_voyage_ship moths'], ref: 'm4_west_dock' }],
-      ['iska', "They're going home to her. Follow the moths, little ember. They always know where the light is.",
-        'They are going home to her. Follow the moths. They know where the light is.'],
-      ['narr', "On the third morning a town comes out of the mist. It's floating.", 'On the third morning, a town comes out of the mist. It floats!',
-        { do: ['world m4_voyage_ship dawn'] }],
-      { do: ['clear m4_voy'] },
-    ],
-    // the flight on Glaciar's back, on landing on Driftwood's north isle
-    snl_voyage_glaciar: [
-      { do: ['set m4_voy=glaciar', 'world m4_voyage_glaciar sea'] }, { fade: 1 },
-      ['narr', 'Glaciar flies slowly. Very slowly. Clouds overtake her. A seagull overtakes her and looks back, smug.',
-        'Glaciar flies very slowly. A seagull passes her. It looks smug.'],
-      ['f_glaciar', "Isn't this LOVELY, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.",
-        "Isn't this LOVELY, dumpling? My left wing fell asleep."],
-      ['ash', "Auntie, it's been two days."],
-      ['f_glaciar', "Patience is a dragon's best friend. My second-best friend is you.", "Patience is a dragon's best friend. You are my second best."],
-      ['narr', "On the second night the moon comes up, with two bites gone like a cookie. Moths flutter past Glaciar's nose, hundreds of them, all flying east.",
-        'The moon has two bites gone. Hundreds of moths fly past, all going east.', { do: ['world m4_voyage_glaciar moths'], ref: 'm4_north_isle' }],
-      ['iska', 'Follow the moths, little ember. They always know where the light is.', 'Follow the moths. They know where the light is.'],
-      ['narr', "On the third morning a floating town comes out of the mist. Glaciar lands on its north beach, and the whole beach freezes solid. The raft folk cheer. Free ice!",
-        'A floating town! Glaciar lands. The beach freezes. Free ice!', { do: ['world m4_voyage_glaciar dawn'], ref: 'm4_north_isle' }],
-      { do: ['clear m4_voy'] },
-      ['f_glaciar', "I'll wait here, dumpling. Dell's boat is a day behind us. He sent a pigeon. The pigeon was very tired.",
-        "I'll wait here, dumpling. Dell's boat is a day behind us."],
-      ['f_glaciar', "Oh, and Brann sends his regards. He's very brave now. He asked me to say it loudly. HE IS VERY BRAVE.",
-        'Brann says hello. He is VERY BRAVE now.'],
+    // the voyage, played on arrival: by Glaciar if Ash landed on the north isle, else by Dell's boat (the painted
+    // pictures are the looks m4a_voyage_glaciar and m4a_voyage_ship)
+    snl_voyage: [
+      { if: 'near m4_north_isle 600 choice f_glaciar=free', then: [
+        { do: ['set m_ship=glaciar', { journal: ["You flew east on Auntie Glaciar's back. Very slowly.", 'You flew east on Glaciar. Slowly.'], key: 'm_ship' }] },
+        { do: ['set m4_voy=glaciar', 'world m4_voyage_glaciar sea'] }, { fade: 1 },
+        ['narr', 'Glaciar flies slowly. Very slowly. Clouds overtake her. A seagull overtakes her and looks back, smug.',
+          'Glaciar flies very slowly. A seagull passes her. It looks smug.'],
+        ['f_glaciar', "Isn't this LOVELY, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.",
+          "Isn't this LOVELY, dumpling? My left wing fell asleep."],
+        ['ash', "Auntie, it's been two days."],
+        ['f_glaciar', "Patience is a dragon's best friend. My second-best friend is you.", "Patience is a dragon's best friend. You are my second best."],
+        ['narr', "On the second night the moon comes up, with two bites gone like a cookie. Moths flutter past Glaciar's nose, hundreds of them, all flying east.",
+          'The moon has two bites gone. Hundreds of moths fly past, all going east.', { do: ['world m4_voyage_glaciar moths'], ref: 'm4_north_isle' }],
+        ['iska', 'Follow the moths, little ember. They always know where the light is.', 'Follow the moths. They know where the light is.'],
+        ['narr', "On the third morning a floating town comes out of the mist. Glaciar lands on its north beach, and the whole beach freezes solid. The raft folk cheer. Free ice!",
+          'A floating town! Glaciar lands. The beach freezes. Free ice!', { do: ['world m4_voyage_glaciar dawn'], ref: 'm4_north_isle' }],
+        { do: ['clear m4_voy'] },
+        ['f_glaciar', "I'll wait here, dumpling. Dell's boat is a day behind us. He sent a pigeon. The pigeon was very tired.",
+          "I'll wait here, dumpling. Dell's boat is a day behind us."],
+        ['f_glaciar', "Oh, and Brann sends his regards. He's very brave now. He asked me to say it loudly. HE IS VERY BRAVE.",
+          'Brann says hello. He is VERY BRAVE now.'],
+      ], else: [
+        { do: ['set m_ship=ship', 'set m_dell_docked', { journal: ['You sailed east with Dell on the Soggy Biscuit Three.', 'You sailed east with Dell.'], key: 'm_ship' }] },
+        { do: ['set m4_voy=ship', 'world m4_voyage_ship sea'] }, { fade: 1 },
+        ['narr', 'The Soggy Biscuit Three chugs out of Gearhaven with a toot of steam. Dell stands at the wheel in his yellow rain hat, grinning so hard his beard sticks out sideways.',
+          "Dell's boat toots out of Gearhaven. Dell grins so hard his beard sticks out."],
+        ['dell', "Three days east, Ash! Past the end of every map I own! I've never been so happy or so scared!",
+          "Three days east! Past every map I own! So happy. And so scared!", { ref: 'm4_west_dock' }],
+        ['wren', "(green, hugging a book) I'm fine. I'm FINE. Books don't get seasick. I'm just going to read... over the side.",
+          "(green) I'm fine. Books don't get seasick. I'll just read... over the side."],
+        ['ash', 'Sister Wren? You came OUTSIDE?'],
+        ['f_mags', "(from below deck) The engine's FINE! It's making that noise on purpose! Mostly! Dell pays me in sandwiches.",
+          '(from below) The engine is FINE! The noise is on purpose! Mostly!'],
+        ['ev_tikka', '(from the galley) Lumpy buns! Lumpy buns for everyone! Lumpy means love!', 'Lumpy buns for everyone! Lumpy means love!',
+          { if: 'flag tk_come=yes' }],
+        ['narr', 'On the second night the moon comes up over the sea. Two bites are gone from its edge, like a cookie. A hundred moths flutter past the mast, all flying east.',
+          'The moon comes up. Two bites are gone. A hundred moths fly past, all going east.', { do: ['world m4_voyage_ship moths'], ref: 'm4_west_dock' }],
+        ['iska', "They're going home to her. Follow the moths, little ember. They always know where the light is.",
+          'They are going home to her. Follow the moths. They know where the light is.'],
+        ['narr', "On the third morning a town comes out of the mist. It's floating.", 'On the third morning, a town comes out of the mist. It floats!',
+          { do: ['world m4_voyage_ship dawn'] }],
+        { do: ['clear m4_voy'] },
+      ] },
     ],
   },
 })

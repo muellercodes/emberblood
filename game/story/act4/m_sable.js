@@ -25,7 +25,8 @@ chapter({
   },
 
   step: [
-    { id: 'road', do: 'goto m4_sable', then: ['set m_sable_seen'],
+    // (then: the eclipse clues again, for an old save made after eclipse 1 by the old code; a no-op for everyone else)
+    { id: 'road', do: 'goto m4_sable', then: ['set m_sable_seen', 'clue m4_milk_smell', 'clue m4_she_asks'],
       obj: ['Follow the Caravan Road east to the Oasis of Sable', 'Follow the road to the Oasis of Sable'] },
     { id: 'rafi', do: 'talk m_rafi', scene: 'sbl_rafi', then: ['set m_rafi', 'xp 600'],
       obj: ['Find Caravan-master Rafi in the Big Tent', 'Find Rafi in the Big Tent'],
