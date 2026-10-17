@@ -15,15 +15,8 @@
 people({
   id: 'act5_people', act: 5,
 
-  clue: {
-    n5_mom_lanterns: { icon: 'lamp', mystery: 'n5_fourth_lantern',
-      text: ['Mom says her gran always made four lanterns on Lantern Day. Three for the family, one for whoever is out in the dark.',
-        'Four lanterns. One for whoever is out in the dark.'] },
-    n5_yara_post: { icon: 'lamp', mystery: 'n5_fourth_lantern',
-      text: ['Elder Yara says the real green had four lantern posts when she was a girl. Nobody remembered why the fourth was there.',
-        'The real green had four posts once.'] },
-  },
-
+  // the clues n5_mom_lanterns and n5_yara_post that Mom and Yara give below are defined by N5a (n_bridge.js), whose
+  // small mystery n5_fourth_lantern asks for them
   place: {
     // the Crown Shrine (n_sh_crown at 3331,85875): everyone waits round it after the gathering
     n5_crown_who: { map: 4, kind: 'examine', at: [3400, 85930], r: 30, h: 46, name: ['your friends by the shrine', 'your friends'],
@@ -68,7 +61,7 @@ people({
         say: ['You lit a lantern for your grandfather, once. I have told that story at the well every night since.', 'I still tell how you lit a lantern for Grandpa.'] },
       { if: 'choice ending=warden', once: true,
         say: ['The Sixth Warden. I still curtsy when you go past. My knees complain about it.', 'I still curtsy to the Sixth Warden.'] },
-      { if: 'seen n_green !clue n5_yara_post', option: ['Were there always three lantern posts on the green?', 'Were there always three posts?'],
+      { if: 'clue n5_fourth_post !clue n5_yara_post', option: ['Were there always three lantern posts on the green?', 'Were there always three posts?'],
         then: ['clue n5_yara_post', 'heart_ember n5_yara'],
         say: [['yara', 'Three? No, dear. There were four posts when I was a girl. Nobody remembered why. The fourth one rotted, and nobody put it back.',
             'There were four posts when I was a girl!'],
@@ -451,7 +444,7 @@ people({
 
     // ======================================================================= map 3, Moonfall (Act IV's people) and the Moon Pier
     maren: [
-      { if: 'seen n_green !clue n5_mom_lanterns', option: ['Mom, why would a green have four lantern posts?', 'Why four lantern posts?'],
+      { if: 'clue n5_fourth_post !clue n5_mom_lanterns', option: ['Mom, why would a green have four lantern posts?', 'Why four lantern posts?'],
         then: ['clue n5_mom_lanterns'],
         say: [['maren', 'Four? My gran always made four lanterns on Lantern Day. Three for us, and one for whoever is out in the dark.',
             'Gran made four lanterns. One for whoever is out in the dark.'],
