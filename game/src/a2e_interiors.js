@@ -10,7 +10,7 @@ const EGGS=[
   {k:'cat',label:'Pet the cat',say:['The cat allows it. You have been judged and found acceptable.','Mrrp.',S('The cat bites you gently, then purrs.','The cat nibbles you, then purrs.')]},
   {k:'mirror',label:'Look in the mirror',say:['A very handsome dragon looks back. Is that a new scale?','You practice your heroic face. It needs work.']},
   {k:'rock',label:'Look at the rock',say:[S('A smooth grey stone from Lake Mirrow, rubbed shiny from years on the windowsill. Somebody’s lucky stone.','A smooth lucky stone from Lake Mirrow.')]},
-  {k:'goose',label:'Pet the goose',say:['HONK.','The goose is training you. You can tell.']},
+  {k:'goose',label:'Pet the goose',say:['HONK.',S('The goose gives you the look it gives everybody. Then it honks.','The goose looks at you. Then it honks.')]},
   {k:'drawer',label:'Search the drawer',say:[S('Thick woolly socks. Nana Pettibone knits a pair for every house in the valley, whether they want them or not.','Woolly socks. Nana Pettibone knits them for everyone.'),S('Spare lamp wicks tied up with string. The tag says WICK’S LAMPS & OILS.','Spare lamp wicks from Wick’s Lamps & Oils.'),'A drawing of you breathing fire on a cake. Someone has written "NO" under it.']},
   {k:'clock',label:'Check the clock',say:['Tick. Tock. It is either very late or very early.',S('The clock is nine minutes fast, so nobody in this house is ever late.','The clock is fast, so nobody here is late.')]},
   {k:'toybox',label:'Rummage in the toy box',say:['A wooden dragon, a wooden knight, and a wooden sandwich.',S('A tiny wooden sword. "ASH" is carved on the handle, crossed out, with "ROOK" carved underneath. So that’s where your old sword went.','Your old toy sword! ASH is crossed out. It says ROOK now.')]},

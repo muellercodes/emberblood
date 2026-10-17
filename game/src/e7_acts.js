@@ -240,7 +240,7 @@ const HSAY=[
   [`Still following? You're very stubborn. I like that.`,`Still here? You're stubborn!`],
   [`Almost there! Well, I am.`,`Almost there!`]
 ];
-const HWAIT=[[`Yoo-hoo! Up here!`,`Up here!`],[`I can wait. I'm very patient. For a thief.`,`I can wait!`],[`*yawns* Are you coming?`,`*yawn* Coming?`],[`Lovely night for a chase!`,`Nice night for a chase!`]];
+const HWAIT=[[`Yoo-hoo! Up here!`,`Up here!`],[`I can wait! Thieves are very good at waiting.`,`I can wait!`],[`*yawns* Are you coming?`,`*yawn* Coming?`],[`Lovely night for a chase!`,`Nice night for a chase!`]];
 const HSHOUT=[[`Thief! THIEF!`,`Thief!`],[`She went that way!`,`That way!`],[`My hat! She bounced on my hat!`,`She bounced on my hat!`],[`Go get her, Ash!`,`Go, Ash!`],[`Was that a giant moth?`,`A giant moth?`],[`Not the roof! I just fixed the roof!`,`Not my roof!`]];
 const HS={on:false,phase:'',t:0,thief:null,fw:[],rockets:[],flash:[],pops:[],bales:null,found:0,pets:[],smoke:[],bombs:[],obst:[],moth:null,ship:null,gear:null,crow:null,cam:null,runIn:null,
   talked:{},sent:{},shoutT:0,fwNext:0,bgT:0,chaseT:0,crash:false,toastT:0,coughT:0};
@@ -583,7 +583,7 @@ defineStages(1,[{id:'done',
   talk(n){
     if(!G.flags.act1_done||HS.crow||(n.id!=='yara'&&n.id!=='maren')||availableFrom(n.id)||(n.id==='maren'&&(G.iron>0||hammerPitchDue()))) return false;
     const L=n.id==='yara'?[xl('yara',`There you are! Didn't Pebble find you? That crow. Never mind. Tonight is Lantern Night, Ash: the party after the party. The whole village is coming. Even the goat.`,`There you are! Tonight is Lantern Night! The whole village is coming.`),xl('yara',`The fireworks start at sundown. Don't be late.`,`The fireworks start at sundown!`)]
-      :[xl('maren',`Tonight's Lantern Night, love. I made a cake. It looks like you. Mostly. The horns went a bit wobbly.`,`Tonight is Lantern Night! I made a cake that looks like you.`)];
+      :[xl('maren',`Tonight's Lantern Night, love. I made a cake that looks like you, except the horns went a bit wobbly.`,`Tonight is Lantern Night! I made a cake that looks like you.`)];
     runDialogue(L,()=>{ scene='play'; G.flags.c_wait=0; G.flags.c_letter=true; startAct(2); });
     return true;
   },

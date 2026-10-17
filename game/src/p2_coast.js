@@ -1239,7 +1239,7 @@ const P2_LAB={
 Object.assign(PUZZLE_KINDS,{chain:1});
 defineDungeon('p2_lab',{name:S('The Power Lab','The Power Lab'),level:10,theme:'earth',seed:202,save:'p2_lab',noJuniper:true,giftOK:{},dark:0.3,
   dunKind:S('A test cave','A test cave'),
-  story:{in:[['ash',S('A cave for practicing the powers of the coast. Handy.','A cave to practice my powers!')]]},
+  story:{in:[['ash',S('A cave for practicing the powers of the coast.','A cave to practice my powers!')]]},
   floors:[
     {id:'1',name:S('The Lab','The Lab'),map:{rooms:{
       a:{at:[1,2],kind:'start',tpl:P2_LAB.a,sign:S('Claws: walk into the cracked dais to climb it. The plain stone one stays too steep.','Climb the cracked dais.'),noPots:true},

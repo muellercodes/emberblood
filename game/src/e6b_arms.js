@@ -431,7 +431,7 @@ function bombIcon(g){
   g.fillStyle='#ffd27a'; g.beginPath(); for(let i=0;i<8;i++){ const r=i%2?1.6:4.4, a=i/8*TAU; g.lineTo(8.6+Math.cos(a)*r,-16.4+Math.sin(a)*r); } g.closePath(); g.fill(); g.fillStyle='#fff6d0'; g.beginPath(); g.arc(8.6,-16.4,1.3,0,TAU); g.fill();
 }
 defineWeapon('bombs',{name:'Blast Bombs',short:'Bombs',crit:0.05,melee:false,flyOK:true,stamina:0,mcol:'255,190,110',order:8,
-  desc:S('Hold attack to aim, let go to throw. BOOM in 1.6 seconds! Blasts open cracked walls and boulders and lights fuses. Walk into a bomb to kick it.','Hold to aim. Let go to throw. BOOM! It breaks walls and big rocks.'),
+  desc:S('Hold attack to aim, let go to throw. BOOM in 1.6 seconds! The blast opens cracked walls and boulders, and lights fuses. Walk into a bomb to kick it.','Hold to aim. Let go to throw. BOOM! It breaks walls and big rocks.'),
   how:S('Hold to aim, let go to throw. Walk into a bomb to kick it. Bombs break cracked walls and boulders and light fuses.','Hold to aim. Let go to throw. Kick bombs. They break walls and big rocks.'),
   acts:['bomb','hammer'], reach:BOMB_FAR, aimR:340,
   proj:{bomb:{step:stepBomb,draw:bombDrawProj}},
