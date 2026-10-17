@@ -225,7 +225,7 @@ people({
     ],
 
     m_kiln: [
-      { if: 'world q_g_cocoon=cut', once: true,
+      { if: 'world q_g_cocoon_in=cut', once: true,
         say: ['You cut the cocoon at the Dreadgate? With MY glaive? I am putting that on a sign. A glass sign.', 'You cut the cocoon? With MY glaive? Ha!'] },
       { if: 'quest m_glaive done', once: true,
         say: ["How's my glaive? Is it cutting? Is it shining? Have you cut bread with it? DON'T.", "How's my glaive? Don't cut bread!"] },

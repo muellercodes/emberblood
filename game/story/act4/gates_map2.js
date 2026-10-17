@@ -3,10 +3,10 @@
 //   q_g_steam   Dive         the Steamwell Rock in the hot springs: Hilde's knitting basket. Hilde Pottersnow (the Warm
 //                            Mitten, Hearthold) knits it into a sweater "for a cold moth" (item m4_sweater, which the
 //                            Hush free branch reads: ACT4_V10 2.3)
-//   q_g_cocoon  Moon Glaive  the moon-silk cocoon at the Dreadgate, where Hush shrank in Act III: a Heart Ember frozen
-//                            inside. The gate library has no Glaive kind yet (A4S ENGINE REQUEST: silk_web in CHANGES.md),
-//                            so the cocoon is an examine place: only the Glaive cuts it (power glaive in the scene),
-//                            fire makes it glow, claws slide off. It does not count towards gates_min.
+//   q_g_cocoon  Moon Glaive  the Silk Door: a rock east of the Dreadgate arena (outside Hush's Act III arena), its stairs
+//                            shut by a door of moon silk (gate kind silk_web, INT10: only the Glaive's blade cuts it;
+//                            fire makes it glow, claws and blades bounce). On top, a cocoon of Hush's silk with a Heart
+//                            Ember frozen inside (q_g_cocoon_in).
 places({
   id: 'a4s_map2', act: 4, map: 2,
 
@@ -31,24 +31,30 @@ places({
         sub: ['Soggy, warm, and full of wool. Take it to Hilde at the Warm Mitten.', 'Take it to Hilde.'] }],
       name: ['a soggy basket, caught in the rocks', 'a soggy basket'] },
 
-    // ---- G6. The Dreadgate cocoon (Moon Glaive). Moon silk left behind where Hush shrank in Act III.
-    q_g_cocoon: { kind: 'examine', map: 2, at: [7150, 44250], r: 40, look: 'a4s_cocoon', states: { cut: 'a4s_cocoon_cut' },
-      payoff: { kind: 'heart_ember', id: 'q_g_cocoon' }, need: 'power glaive',
+    // ---- G6. The Silk Door (Moon Glaive). Moon silk the wind blew off Hush when she shrank in Act III, strung across the
+    // stairs of a rock on the Dreadmoor east of the Dreadgate (outside Hush's arena, clear of the Shoulder's wind ribbon).
+    // The cocoon on top is the payoff.
+    q_g_cocoon: { kind: 'gate', gate: 'silk_web', map: 2, at: [8240, 44250], r: 110, face: 's', leads: 'q_g_cocoon_in',
+      payoff: { kind: 'heart_ember', id: 'q_g_cocoon' },
+      name: ['the Silk Door', 'the Silk Door'],
+      locked: ['A door of moon silk, strung tight across the stairs. Up on the rock behind it, something warm is glowing.',
+        'Moon silk across the stairs. Something glows up there.'] },
+    q_g_cocoon_in: { kind: 'examine', map: 2, at: [8240, 44235], r: 40, look: 'a4s_cocoon', states: { cut: 'a4s_cocoon_cut' },
       say: 'q_g_cocoon',
       name: ['a cocoon of moon silk', 'a moon-silk cocoon'] },
   },
 
   scene: {
     q_g_cocoon: [
-      { if: 'world q_g_cocoon=cut', then: [
+      { if: 'world q_g_cocoon_in=cut', then: [
         ['narr', 'Peeled silver silk, soft as moth wings. Nothing inside now but a warm spot on the stone.', 'Empty silk. A warm spot.'],
       ], else: [
-      ['narr', 'A cocoon of silver silk as big as a barrel, stuck to the stones where Hush shrank. Something warm glows inside.',
+      ['narr', "A cocoon of silver silk as big as a barrel, stuck to the rock. The wind blew Hush's silk up here when she shrank. Something warm glows inside.",
         'A big silver cocoon. Something glows inside.'],
       { if: 'power glaive', then: [
         ['narr', 'You throw the Moon Glaive. It hums round the cocoon once, twice, and comes back to your hand.', 'You throw the Moon Glaive. It comes back.'],
         ['narr', 'The silk falls open like a peeled orange. Inside, frozen in a ball of old ice, is a Heart Ember.',
-          'The silk falls open. A Heart Ember!', { do: ['heart_ember q_g_cocoon', 'world q_g_cocoon cut'] }],
+          'The silk falls open. A Heart Ember!', { do: ['heart_ember q_g_cocoon', 'world q_g_cocoon_in cut'] }],
         ['ash', 'She was keeping it warm. She never could.', 'She tried to keep it warm.'],
       ], else: [
         ['narr', 'Fire only makes it glow, and claws slide right off. Moon silk. Something made of the moon might cut it.',

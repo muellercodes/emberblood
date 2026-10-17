@@ -7,8 +7,9 @@
 //  * Not befriended: Vesper's Lost Letter. Jinx the Mirage Merchant sells a letter a moth dropped in the dunes, to "my
 //    duck". Read by a lamp, the moth dust falls off: it is Granny Oona's letter to Vesper ("Fire isn't the only warm
 //    thing. Be kind."), a truth the finale may use (G.flags.m_vesper_letter).
-// One quest id (old saves have G.quests.m_vesper in either version). Every step belongs to one version; the other
-// version's steps finish by themselves (a wait_for on the Act II choice), so each version reads as its own quest.
+// One quest id (old saves have G.quests.m_vesper in either version), with a title for each version. Every step belongs
+// to one version; the other version's steps finish by themselves (a wait_for on the Act II choice), so each version
+// reads as its own quest.
 // Old saves: old_steps map the befriended version's steps 0..2 (gap, smoke, meet); a not-befriended save at step 0 or 1
 // skips through the befriended steps at once and lands on buy (it already holds the letter) or read.
 // The Burrow Gap and the smoke bombs stay x3_people's (legacy steps: m3pAt('m_vesper',0) and 1); during meet the old
@@ -16,7 +17,9 @@
 // prompts need only the quest to be open.
 quest({
   id: 'm_vesper', act: 4, giver: 'c_vesper', optional: true, takeover: true,
-  title: ['Vesper, Far from Home', 'Vesper, Far from Home'],
+  // (a title with variants, INT10: the first whose condition holds)
+  title: [{ if: 'choice c_vesper=friend', t: ["The Moth Mask's Last Job", "The Moth Mask's Last Job"] },
+    { t: ["Vesper's Lost Letter", "Vesper's Lost Letter"] }],
   payoff: { kind: 'ally', id: 'm_vesper_ally' },
   old_steps: ['gap', 'smoke', 'meet'],
 
