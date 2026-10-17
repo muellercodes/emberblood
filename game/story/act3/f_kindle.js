@@ -21,33 +21,45 @@ chapter({
       text: ['Captain Brann bets his boots that the white moth is making all the snow.', 'Brann thinks the moth makes the snow.'] },
   },
 
+  // (three short scenes in a row: between them the game draws a frame or two, so the Hearth really roars up blue and
+  // gold, the snow really slides off the roofs, and the North Gate really stands open when the camera looks at it)
   step: [
-    { id: 'hearth', do: 'wait_for event beat:hearth', at: 'f_lm_hearth', scene: 'f3_kindle',
-      then: ['set f_hearth_lit', 'set f_northgate', 'stage f_thaw'],
+    { id: 'hearth', do: 'wait_for event beat:hearth', at: 'f_lm_hearth', scene: 'f3_kindle', then: ['set f_hearth_lit'],
       obj: ['Wake the Great Hearth with Blaze', 'Wake the Great Hearth with Blaze'],
       hint: ['Stand by the Great Hearth and hold your fire breath until it burns blue. Keep holding it on her.',
         'Hold your fire on the Hearth until it turns blue.'] },
+    { id: 'roofs', do: 'cutscene f3_kindle_roofs', then: ['set f_northgate'] },
+    { id: 'gate', do: 'cutscene f3_kindle_gate', then: ['stage f_thaw'] },
   ],
 
   scene: {
-    // (an old STORY key: x2_story's Hearth hook plays it before its rewards; this chapter's step plays f3_kindle)
+    // (an old STORY key: x2_story's Hearth hook plays it before its rewards; this chapter's steps play f3_kindle...)
     f_kindle: [],
-    // (10 lines with Pip)
     f3_kindle: [
       ['f_brynja', "Blue! Your breath's gone BLUE! Oh, my old girl will like that. Go on. Give her everything.", 'Blue! Your fire is BLUE! Give her everything!'],
       { sfx: 'boom', do: ['set f_hearth_lit'] },
       ['narr', 'For one second nothing happens. Then, WHOOMPH. A column of blue and gold fire roars up out of the stones, higher than every roof in town.',
         'WHOOMPH! Blue and gold fire roars up. Higher than every roof!'],
+    ],
+    // (6 lines with Pip)
+    f3_kindle_roofs: [
       ['narr', 'Snow slides off every roof in Hearthold at once. Somebody cheers. Somebody else gets snow down their shirt and screams. Then they cheer too.',
         'Snow slides off every roof. People cheer!'],
       ['f_brynja', "Ha! HA! Look at her! She hasn't burned like that since I was a girl!", "Ha! Look at her! She hasn't burned like that in years!"],
       { if: 'flag pip', then: [
         ['narr', "Pip hops onto the edge of the Hearth, sniffs a blue ember, and licks it. Pip's belly starts to glow, warm and orange, like a tiny stove.",
           'Pip licks a blue ember. His belly glows warm, like a tiny stove.', { do: ['set f_pip_warm'] }]] },
-      { cam: 'f_lm_northgate', s: 1.2 },
-      ['narr', 'Up at the North Gate, the ice sags, drips, and slides off in one big slab. SPLOOSH. The gate swings open with a happy sigh.',
-        'At the North Gate, the ice slides off. SPLOOSH! The gate swings open.', { do: ['set f_northgate'], ref: 'f_lm_northgate' }],
-      ['f_brann', '(far off) My boots are full of gate! GUNNAR! You can stop licking things now!', 'My boots are full of gate! GUNNAR! Stop licking things!', { ref: 'f_lm_northgate' }],
+      ['f_brynja', "She won't stay this bright, mind. Not while that purple storm sits on the mountain. But she'll hold now.",
+        "She won't stay this bright. Not with that storm. But she will hold."],
+      ['narr', 'Then, from the north side of town: a long creak, a drip, and a great wet SPLOOSH.', 'Then, from the North Gate: SPLOOSH!',
+        { do: ['set f_northgate'], ref: 'f_lm_northgate' }],
+    ],
+    // (5 lines; the camera goes to the North Gate, which stands open now)
+    f3_kindle_gate: [
+      { cam: 'f_lm_northgate', s: 1 },
+      ['narr', 'The ice has slid off the North Gate in one big slab. The gate swings open with a sound like a happy sigh.',
+        'The ice slid off the North Gate. It swings open!', { ref: 'f_lm_northgate' }],
+      ['f_brann', '...My boots are full of gate. GUNNAR! You can stop licking things now!', 'My boots are full of gate! GUNNAR! Stop licking things!', { ref: 'f_lm_northgate' }],
       { if: 'choice f3_moth=moth', then: [
         ['f_brann', "It's that moth making all this snow. The BIG white one. Not you, moth-dragon. I'd bet my boots on it.", "It's that big white moth making the snow. Not you. I'd bet my boots!",
           { clue: 'f3_brann_bet' }]],

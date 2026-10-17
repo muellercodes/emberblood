@@ -2,7 +2,7 @@
 // What the player does: meets Brynja the Hearthkeeper, whose Great Hearth is down to a tiny orange flicker since a
 // white moth flew over to Mount Dread. Ash's own fire is "a breath for candles": the Hearth was lit with Blaze, and
 // nobody alive knows where that came from. Nobody tells him. He finds out: the oldest ash at the back of the Hearth is
-// BLUE; the carving over the Hearth shows a horned girl and a tall lady with icicle horns holding one flame, LIT AT THE
+// BLUE; the carving beside the Hearth's mouth shows a horned girl and a tall lady with icicle horns holding one flame, LIT AT THE
 // NORTH FORGE (Tove almost remembers who the lady is); and Brother Eider's old map in the Hearth Archive puts the North
 // Forge where the glacier meets the Glimmerfrost, a place folk now call the Glacier Maze. Pim swears the Steamwell is
 // the hottest place in the north (a red herring: hot water is not fire). Then the player works out where to go.
@@ -15,9 +15,10 @@ chapter({
   mom: [["A town with a giant fireplace? That's my kind of town.", 'A town with a giant fireplace? Nice!']],
 
   place: {
-    // on the Hearth's dais, under the fire's mouth (the carving is part of x2_world's Hearth drawing)
-    f3_lintel_spot: { map: 2, at: [6800, 49060], r: 24, kind: 'examine', h: 70,
-      name: ['the carving over the Hearth', 'the carving'], aliases: ['the lintel', 'the old carving'],
+    // on the old stones beside the Hearth's mouth, on the dais (the Hearth's own prompt, "Look at the Great Hearth", is
+    // in front of the mouth, 70 px east of this one, so each has its own place to stand)
+    f3_lintel_spot: { map: 2, at: [6730, 48985], r: 16, kind: 'examine', h: 90,
+      name: ['the carving beside the Hearth', 'the carving'], aliases: ['the lintel', 'the old carving'],
       prompt: ['Look at the carving on the Hearth', 'Look at the carving'], say: 'f3_lintel' },
   },
 
@@ -29,7 +30,7 @@ chapter({
       text: ['At the very back of the Great Hearth, under the grey, the oldest ash is BLUE. The first fire in it was blue fire.',
         'The oldest ash in the Hearth is BLUE.'] },
     f3_lintel: { icon: 'book',
-      text: ['Carved over the Hearth: a horned girl and a tall lady with icicle horns, holding one flame. Under it: LIT AT THE NORTH FORGE.',
+      text: ['Carved beside the Hearth: a horned girl and a tall lady with icicle horns, holding one flame. Under it: LIT AT THE NORTH FORGE.',
         'The carving says: LIT AT THE NORTH FORGE.'] },
     f3_forge_map: { icon: 'map',
       text: ["Brother Eider's old map: the North Forge is where the glacier comes down to the Glimmerfrost. Folk call that place the Glacier Maze now.",
@@ -63,7 +64,7 @@ chapter({
       hint: ['The Hearthkeeper is at the Great Hearth, right in the middle of town. Big fireplace. Can\'t miss it.',
         'She is at the Great Hearth, in the middle of town.'] },
     { id: 'look', do: 'all', obj: ['Find out where the blue fire came from', 'Where did the blue fire come from?'],
-      hint: ['Look at the Hearth itself, and the carving over its mouth. And ask whoever keeps the old books, in the Hearth Archive near the square.',
+      hint: ['Look at the Hearth itself, and the old carving beside its mouth. And ask whoever keeps the old books, in the Hearth Archive near the square.',
         'Look at the Hearth and its carving. Ask the book keeper.'],
       parts: [
         { do: 'examine f_lm_hearth', scene: 'f3_blue_ash', then: ['clue f3_blue_ash'] },
@@ -104,7 +105,7 @@ chapter({
       ['ash', 'The very first fire in here was blue fire. Blaze!', 'The first fire here was blue. Blaze!'],
     ],
     f3_lintel: [
-      ['narr', "Carved over the Hearth's mouth: a horned girl and a tall lady with icicle horns, holding one flame between them.",
+      ['narr', "Carved into the old stones beside the Hearth's mouth: a horned girl and a tall lady with icicle horns, holding one flame between them.",
         'A carving: a horned girl and a tall lady with icicle horns. They hold one flame.'],
       ['narr', 'Under it, in very old letters: LIT AT THE NORTH FORGE.', 'Under it: LIT AT THE NORTH FORGE.', { clue: 'f3_lintel', ref: 'f_glacier' }],
       ['tove', "That girl is Ember. I'd know those horns anywhere. And the tall one... I know her. I think. The cold makes my memory slippery.",
