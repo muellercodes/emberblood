@@ -8,7 +8,7 @@
 // Bomb-o-Matic and the test bomb stay x2_people's own mechanics (legacy steps; the Bomb-o-Matic step's old reward
 // gives the test bomb). Talking to Mags with Blaze starts the quest (her offer).
 quest({
-  id: 'f_bombs', act: 3, giver: 'f_mags', optional: true, takeover: true,
+  id: 'f_bombs', act: 3, until: 3, giver: 'f_mags', optional: true, takeover: true,
   title: ['Mags and the Big Boom', 'Mags and the Big Boom'],
   payoff: { kind: 'power', id: 'bombs' },
   old_steps: ['crate', 'powder', 'bomatic', 'boulder', 'boom'],
