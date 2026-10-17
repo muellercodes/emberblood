@@ -51,8 +51,8 @@ const PLACE_KINDS = new Set(['examine', 'prints', 'sign', 'chest', 'gate', 'door
 const REG_KINDS = new Set(['place', 'landmark', 'door', 'gate', 'npc', 'item', 'chest', 'examine', 'prints', 'sign', 'prop', 'spot', 'npc_spot', 'area']);
 const STEP_VERBS = new Set(['talk', 'goto', 'find', 'examine', 'fight', 'use_power_at', 'give', 'choose', 'deduce', 'track', 'wait_for', 'cutscene', 'minigame', 'dungeon', 'all', 'any']);
 const EFFECT_VERBS = new Set(['set', 'clear', 'give', 'take', 'trust', 'power', 'upgrade', 'heart_ember', 'open', 'close', 'spawn', 'despawn', 'move', 'world', 'clue', 'quest', 'stage', 'time', 'emit', 'mail', 'epi', 'music', 'xp', 'weapon', 'ally', 'hat',
-  // also in ENG's engine (e10_story.js)
-  'coins', 'sfx', 'heal', 'choice', 'solve']);
+  // also in ENG's engine (e10_story.js): see ENGINE.md section 4
+  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon']);
 const WEAPON_POWERS = new Set(['whip', 'bombs', 'glaive']);
 const STEP_SCENES = ['scene', 'lose', 'win', 'kneel', 'after', 'intro'];
 const SPEAKERS_BUILTIN = new Set(['narr', 'ash', 'pip', 'mom', 'maren', 'sign', 'note', 'book', 'banner']);
@@ -89,7 +89,7 @@ export function scanGame(root) {
   const srcDir = join(root, 'game/src');
   const G = {
     files: {}, inBuild: new Set(), strs: new Set(), keys: new Set(), items: new Set(), itemGives: new Set(), itemReads: new Set(),
-    flagReads: new Map(), flagSets: new Set(), choiceReads: new Map(), emits: new Set(), dungeons: new Set(), minis: new Set(),
+    itemReadPrefixes: new Set(), flagReads: new Map(), flagSets: new Set(), choiceReads: new Map(), emits: new Set(), dungeons: new Set(), minis: new Set(),
     foes: new Set(), looks: new Set(), poses: new Set(), propKinds: new Set(), stages: [], stageAct: {}, speakers: new Set(), cast: new Set(),
   };
   if (!existsSync(srcDir)) return G;
@@ -116,6 +116,13 @@ export function scanGame(root) {
     for (const m of t.matchAll(/\[\s*'([a-z][a-z0-9_]*)'\s*,\s*S\(/g)) if (/ITEM_NAMES/.test(t)) G.strs.add(m[1]);
     for (const m of t.matchAll(/giveItems\(\s*\{([^}]*)\}/g)) for (const k of m[1].matchAll(/([A-Za-z_][A-Za-z0-9_]*)\s*:/g)) G.itemGives.add(k[1]);
     for (const m of t.matchAll(/\bitems(?:\.([A-Za-z_][A-Za-z0-9_]*)|\[\s*'([^']+)'\s*\])(?!\s*=[^=])/g)) add(G.itemReads, m[1] || m[2]);
+    // the old quest tables and helpers read items too: take:{x:1}, takeItems({x:1}), {t:'item',item:'x'}, item:{item:'x'},
+    // locked:'x' (a locked chest or door), hasItem('x'), itemCount('x'), k==='x' in an item handler
+    for (const m of t.matchAll(/\b(?:take|takeItems\()\s*:?\s*\{([^}]*)\}/g)) for (const k of m[1].matchAll(/([A-Za-z_][A-Za-z0-9_]*)\s*:/g)) G.itemReads.add(k[1]);
+    for (const m of t.matchAll(/\b(?:item|locked|needItem|key)\s*:\s*'([a-z][a-z0-9_]*)'/g)) G.itemReads.add(m[1]);
+    for (const m of t.matchAll(/\b(?:hasItem|itemCount|haveItem|useItem)\(\s*'([a-z][a-z0-9_]*)'/g)) G.itemReads.add(m[1]);
+    for (const m of t.matchAll(/\bk\s*===\s*'([a-z][a-z0-9_]*)'/g)) G.itemReads.add(m[1]);
+    for (const m of t.matchAll(/\bitems\[\s*'([a-z][a-z0-9_]*)'\s*\+/g)) G.itemReadPrefixes.add(m[1]);
     for (const m of t.matchAll(/\b(?:flags|F)(?:\.([A-Za-z_][A-Za-z0-9_]*)|\[\s*'([^']+)'\s*\])(\s*=(?!=))?/g)) {
       const k = m[1] || m[2]; if (!k) continue;
       if (m[3]) G.flagSets.add(k); else count(G.flagReads, k, mod);
@@ -128,9 +135,29 @@ export function scanGame(root) {
     for (const m of t.matchAll(/defineLook\(\s*['"]([^'"]+)/g)) G.looks.add(m[1]);
     for (const m of t.matchAll(/definePose\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)/g)) G.poses.add(`${m[1]}:${m[2]}`);
     for (const m of t.matchAll(/definePropKind\(\s*['"]([^'"]+)/g)) G.propKinds.add(m[1]);
+    // old drawings an old module tells the engine how to find (e10_story s10FindKind, for legacy src prop:<k>@x,y)
+    for (const m of t.matchAll(/s10FindKind\(\s*['"]([^'"]+)/g)) G.propKinds.add(m[1]);
     for (const m of t.matchAll(/\{id:'([a-z0-9_]+)',name:/g)) G.cast.add(m[1]);
     for (const m of t.matchAll(/(?:c1Spk|f2Spk|m3Spk|Spk)\(\s*'([a-z0-9_]+)'/g)) G.speakers.add(m[1]);
     for (const m of t.matchAll(/\bSPK\.([a-z0-9_]+)\s*=|\bSPK\[\s*'([^']+)'\s*\]\s*=/g)) G.speakers.add(m[1] || m[2]);
+  }
+  // gate kinds the gate library builds (e10c_gates.js GATE_KINDS): power null is a story gate (only an `open` effect)
+  G.gateKinds = {};
+  const gk = /const GATE_KINDS\s*=\s*\{/.exec(G.files.e10c_gates || '');
+  if (gk) {
+    const seg = G.files.e10c_gates.slice(gk.index, spanEnd(G.files.e10c_gates, gk.index + gk[0].length - 1));
+    for (const m of seg.matchAll(/(?:^|[,{\s])([a-z_]+)\s*:\s*\{\s*power\s*:\s*(?:'([a-z]+)'|null)/g)) G.gateKinds[m[1]] = m[2] || null;
+  }
+  for (const [k, p] of Object.entries(G.gateKinds)) if (p && !GATE_POWER[k]) GATE_POWER[k] = p;
+  // upstairs and cellars (a2g_floors.js FLOORS: h_x:{up:{...}} makes area h_x_up)
+  G.areas = new Set();
+  const fl = /const FLOORS\s*=\s*\{/.exec(G.files.a2g_floors || '');
+  if (fl) {
+    const T = G.files.a2g_floors, end = spanEnd(T, fl.index + fl[0].length - 1);
+    for (const m of T.slice(fl.index, end).matchAll(/\n\s*([a-z][a-z0-9_]*)\s*:\s*\{/g)) {
+      const at0 = fl.index + m.index + m[0].length - 1, body = T.slice(at0, spanEnd(T, at0));
+      for (const w of ['up', 'down']) if (new RegExp(`[{,\\s]${w}\\s*:\\s*\\{`).test(body.slice(0, 40)) || new RegExp(`\\n\\s*${w}\\s*:\\s*\\{`).test(body)) G.areas.add(`${m[1]}_${w}`);
+    }
   }
   // stage order: Act I's STAGES, then every defineStages block in module order
   const a9 = G.files.a9c_story || '';
@@ -248,7 +275,7 @@ function actOfPath(rel) { const m = /\/act(\d+)\//.exec(rel); return m ? +m[1] :
 
 export function buildModel(loaded, game) {
   const M = {
-    acts: {}, chapters: {}, quests: {}, ents: {}, npcs: {}, items: {}, clues: {}, deduce: {}, scenes: {}, mysteries: {},
+    acts: {}, chapters: {}, quests: {}, ents: {}, npcs: {}, items: {}, clues: {}, deduce: {}, scenes: {}, mysteries: {}, pages: {},
     dupes: [], owners: [], game, files: loaded.files,
   };
   const dup = (what, id, a, b) => M.dupes.push({ what, id, a, b });
@@ -321,6 +348,11 @@ export function buildModel(loaded, game) {
       const e = Object.assign({ id }, c, { owner: O, file: g.file, line: g.F.idx.keyLine.get(id) || g.line });
       if (M.deduce[id]) dup('deduction', id, `${M.deduce[id].file}:${M.deduce[id].line}`, `${e.file}:${e.line}`);
       M.deduce[id] = e;
+    }
+    for (const [id, pg] of Object.entries(d.page || {})) {
+      const e = Object.assign({ id }, pg, { owner: O, file: g.file, line: g.F.idx.keyLine.get(id) || g.line });
+      if (M.pages[id]) dup('page', id, `${M.pages[id].file}:${M.pages[id].line}`, `${e.file}:${e.line}`);
+      M.pages[id] = e;
     }
     for (const [id, s] of Object.entries(d.scene || {})) {
       const e = { id, beats: s, owner: O, file: g.file, line: g.F.idx.keyLine.get(id) || g.line };
@@ -423,6 +455,7 @@ export function runChecks(M, opts = {}) {
   const scenesUsed = new Map();       // scene -> [where]
   const worldStates = new Map();      // entity -> Set(states) from `world` effects
   const optionScenes = new Map();     // scene -> [where] for talk options
+  const openedByData = new Set();     // entities an `open x` effect opens
   const addTo = (map, k, v) => { if (!map.has(k)) map.set(k, []); map.get(k).push(v); };
 
   // ---------- 1. walk every owner, collect uses, check ids and vocabulary
@@ -431,6 +464,9 @@ export function runChecks(M, opts = {}) {
   function checkEffect(e, O, where) {
     if (e && typeof e === 'object' && !Array.isArray(e)) {
       if (e.banner) { textPair(e.banner, O, where + ' banner', null, {}); return; }
+      if (e.journal != null) { textPair(e.journal, O, where + ' journal', null, {}); return; }
+      if (e.say != null) { if (Array.isArray(e.say)) lineBeat(e.say, O, where + ' say', []); return; }
+      if (e.if != null && ('then' in e || 'else' in e)) { checkCond(e.if, O, where); eachEffect(e.then, (x) => checkEffect(x, O, where)); eachEffect(e.else, (x) => checkEffect(x, O, where)); return; }
       FAIL('ids', `${O.id}.${where}: unknown effect ${short(JSON.stringify(e))}`, W(O, at(O)));
       return;
     }
@@ -450,7 +486,7 @@ export function runChecks(M, opts = {}) {
       }
       case 'trust': { const tr = a[0]; const act = M.acts[O.act]; if (act && !(act.def.trust || {})[tr]) FAIL('ids', `${O.id}.${where}: trust track ${tr} is not in act ${O.act}'s trust: {}`, loc); if (!/^[+-]?\d+$/.test(a[1] || '')) FAIL('ids', `${O.id}.${where}: "${e}" needs +n or -n`, loc); break; }
       case 'power': if (!ALL_POWERS.has(a[0])) FAIL('ids', `${O.id}.${where}: unknown power ${a[0]}`, loc); break;
-      case 'open': case 'close': if (!isEnt(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no entity ${a[0]}`, loc); break;
+      case 'open': case 'close': if (!isEnt(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no entity ${a[0]}`, loc); else if (v === 'open') openedByData.add(a[0]); break;
       case 'spawn': if (!isNpc(a[0]) && !G.cast.has(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no npc ${a[0]}`, loc); if (a[1] === 'at' ? !isEnt(a[2]) : a[1] && !isEnt(a[1])) FAIL('ids', `${O.id}.${where}: "${e}": no place ${a[1] === 'at' ? a[2] : a[1]}`, loc); break;
       case 'despawn': if (!isNpc(a[0]) && !G.cast.has(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no npc ${a[0]}`, loc); break;
       case 'move': if (!isNpc(a[0]) && !G.cast.has(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no npc ${a[0]}`, loc); if (!isEnt(a[1])) FAIL('ids', `${O.id}.${where}: "${e}": no place ${a[1]}`, loc); break;
@@ -460,7 +496,10 @@ export function runChecks(M, opts = {}) {
       case 'stage': if (!M.chapters[a[0]] && stageIdx(a[0]) < 0) FAIL('ids', `${O.id}.${where}: "${e}": no stage ${a[0]}`, loc); break;
       case 'emit': emitsInData.add(a[0]); break;
       case 'upgrade': if (!a[0]) FAIL('ids', `${O.id}.${where}: "${e}" needs an upgrade id`, loc); break;
-      case 'xp': if (!/^\d+$/.test(a[0] || '')) FAIL('ids', `${O.id}.${where}: "${e}" needs a number`, loc); break;
+      case 'xp': case 'bless': case 'moon': if (!/^\d+$/.test(a[0] || '')) FAIL('ids', `${O.id}.${where}: "${e}" needs a number`, loc); break;
+      case 'end_act': if (!/^\d+$/.test(a[0] || '') || !M.acts[+a[0]]) FAIL('ids', `${O.id}.${where}: "${e}": no act file for act ${a[0]}`, loc); break;
+      case 'warp': if (!isEnt(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no entity ${a[0]}`, loc); break;
+      case 'page': if (!M.pages[a[0]]) FAIL('ids', `${O.id}.${where}: "${e}": no page ${a[0]} in any page: block`, loc); break;
       case 'weapon': if (!WEAPON_POWERS.has(a[0]) && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no weapon ${a[0]}`, loc); break;
       case 'ally': if (!a[0]) FAIL('ids', `${O.id}.${where}: "${e}" needs an ally id`, loc); break;
       case 'hat': if (!isItem(a[0]) && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": item ${a[0]} is not defined`, loc); else addTo(itemsUsedData, a[0], { O, where }); break;
@@ -584,6 +623,7 @@ export function runChecks(M, opts = {}) {
     if (s.obj) textPair(s.obj, O, `${w} obj`, null, {});
     if (s.hint) textPair(s.hint, O, `${w} hint`, null, {});
     if (s.if) checkCond(s.if, O, w);
+    if (s.migrate_if) checkCond(s.migrate_if, O, w);
     eachEffect(s.then, (e) => checkEffect(e, O, w));
     arr(s.parts).forEach((p, i) => checkStep(p, O, `${w} part ${i + 1}`));
     arr(s.extra).forEach((p, i) => checkStep(p, O, `${w} extra ${i + 1}`));
@@ -621,7 +661,7 @@ export function runChecks(M, opts = {}) {
     if (!pts.length) { FAIL('ids', `${e.id}: no at or path`, loc); continue; }
     const mp = MAPS[e.map];
     if (!mp) { FAIL('ids', `${e.id}: map ${e.map} does not exist`, loc); continue; }
-    if (e.area) { if (!knownGame(e.area) && !isEnt(e.area)) FAIL('ids', `${e.id}: area ${e.area} is not an area in the game`, loc); if (e.from === 'legacy') checkLegacySrc(e, loc); continue; }
+    if (e.area) { if (!knownGame(e.area) && !isEnt(e.area) && !G.areas.has(e.area)) FAIL('ids', `${e.id}: area ${e.area} is not an area in the game`, loc); if (e.from === 'legacy') checkLegacySrc(e, loc); continue; }
     for (const p of pts) {
       if (!Array.isArray(p) || p.length < 2 || typeof p[0] !== 'number' || typeof p[1] !== 'number') { FAIL('ids', `${e.id}: a point must be [x, y]`, loc); break; }
       const [x, y] = p;
@@ -630,7 +670,7 @@ export function runChecks(M, opts = {}) {
       if (x < 0 || x > mp.w || y < y0 || y > y0 + mp.h) { FAIL('ids', `${e.id}: (${x}, ${y}) is outside map ${e.map} (x 0 to ${mp.w}, y ${y0} to ${y0 + mp.h})`, loc); break; }
     }
     if (e.kind === 'gate' || e.gate) {
-      if (e.gate && !GATE_POWER[e.gate]) FAIL('uses', `${e.id}: unknown gate kind ${e.gate}`, loc);
+      if (e.gate && !GATE_POWER[e.gate] && !(e.gate in (G.gateKinds || {}))) FAIL('uses', `${e.id}: unknown gate kind ${e.gate} (not in e10c_gates.js GATE_KINDS)`, loc);
       if (e.leads && !isEnt(e.leads)) FAIL('ids', `${e.id}: leads to ${e.leads}, which is not placed`, loc);
     }
     if (e.kind === 'door' && e.leads && !isEnt(e.leads) && !knownGame(e.leads) && !(/^h_(.+)$/.test(e.leads) && G.cast.has(e.leads.slice(2)))) FAIL('ids', `${e.id}: leads to ${e.leads}, which is not placed`, loc);
@@ -642,19 +682,29 @@ export function runChecks(M, opts = {}) {
   function checkLegacySrc(e, loc) {
     const s = e.src;
     if (!isStr(s)) { FAIL('ids', `${e.id}: legacy entry has no src (where the old code draws it)`, loc); return; }
+    const inCode = (name) => Object.values(G.files).some((t) => t.includes(name));
     let m;
     if ((m = /^([a-z0-9_]+)\.js\s+(.+)$/.exec(s))) {
       const t = G.files[m[1]];
       if (!t) FAIL('ids', `${e.id}: src ${s}: no game/src/${m[1]}.js`, loc);
       else if (!t.includes(m[2].split(/\s+/)[0])) FAIL('ids', `${e.id}: src ${s}: ${m[2].split(/\s+/)[0]} is not in ${m[1]}.js`, loc);
-    } else if ((m = /^(elev|prop):([A-Za-z0-9_]+)@(-?\d+),(-?\d+)$/.exec(s))) {
-      if (m[1] === 'prop' && !G.propKinds.has(m[2]) && !G.strs.has(m[2]) && !G.keys.has(m[2])) FAIL('ids', `${e.id}: src ${s}: no prop kind ${m[2]}`, loc);
-    } else if ((m = /^([A-Za-z]+):([A-Za-z0-9_]+)(@-?\d+,-?\d+)?$/.exec(s))) {
-      const known = ['LANDMARKS', 'CAST', 'DOORS', 'HOUSES', 'POI', 'furn', 'SPECIAL', 'AREA', 'STRUCT', 'NPC'];
-      if (!known.includes(m[1])) WARN('ids', `${e.id}: src kind ${m[1]}: is new to the checker; worldcheck.py tests it at runtime`, loc);
+    } else if ((m = /^(elev|prop):([A-Za-z0-9_-]+)@(-?\d+),(-?\d+)$/.exec(s))) {
+      if (m[1] === 'prop' && !G.propKinds.has(m[2]) && !G.strs.has(m[2]) && !G.keys.has(m[2])) FAIL('ids', `${e.id}: src ${s}: no prop kind ${m[2]} (definePropKind, a STRUCTS kind, or s10FindKind in the old module that draws it)`, loc);
+    } else if ((m = /^ITEM_NAMES:([A-Za-z0-9_]+)$/.exec(s))) {
+      if (!G.items.has(m[1])) FAIL('ids', `${e.id}: src ${s}: no item ${m[1]} in ITEM_NAMES`, loc);
+    } else if ((m = /^regionAt:(.+)$/.exec(s))) {
+      const re = new RegExp(`['"](?:the )?${m[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`, 'i');
+      if (!Object.values(G.files).some((t) => re.test(t))) FAIL('ids', `${e.id}: src ${s}: no region called ${m[1]} in the game code`, loc);
+    } else if ((m = /^([A-Za-z_]+):([A-Za-z0-9_]+)(@-?\d+,-?\d+)?$/.exec(s))) {
+      // the engine's src forms (e10_story.js s10Resolve, ENGINE.md section 8)
+      const known = ['LANDMARKS', 'CAST', 'DOORS', 'HOUSES', 'HOUSE', 'POI', 'furn', 'SPECIAL', 'NPC', 'CHESTS', 'WARDS', 'SHRINES', 'LANTERNS', 'CROSSINGS', 'CAVEMOUTHS', 'SITES', 'NPCSPOT', 'fn', 'code'];
+      if (!known.includes(m[1])) FAIL('ids', `${e.id}: src kind ${m[1]}: is not one the engine can check (${known.join(', ')})`, loc);
       const houseOf = /^h_(.+)$/.exec(m[2]);
       if (!knownGame(m[2]) && !(houseOf && (G.cast.has(houseOf[1]) || G.strs.has(houseOf[1])))) FAIL('ids', `${e.id}: src ${s}: ${m[2]} is nowhere in the game code`, loc);
-    } else FAIL('ids', `${e.id}: src "${s}" should be "file.js id", LANDMARKS:id, CAST:id, DOORS:area, HOUSES:id, POI:id, furn:k, elev:n@x,y or prop:kind@x,y`, loc);
+    } else if ((m = /^([A-Za-z_$][\w$]*)(\.[\w$]+)*$/.exec(s))) {
+      // a game value by name (GATE_COL, G.goat, A1W.goat.path): the first name must be in the code
+      if (!new RegExp(`\\b(?:const|let|var|function)\\s+${m[1].replace(/\$/g, '\\$')}\\b`).test(Object.values(G.files).join('\n')) && m[1] !== 'G') FAIL('ids', `${e.id}: src ${s}: ${m[1]} is not defined in the game code`, loc);
+    } else FAIL('ids', `${e.id}: src "${s}" should be "file.js id", KIND:id (LANDMARKS, CAST, DOORS, HOUSES, POI, CHESTS, WARDS, SHRINES, LANTERNS, CROSSINGS, CAVEMOUTHS, SITES, NPCSPOT, ITEM_NAMES, regionAt, furn), elev:n@x,y, prop:kind@x,y or a game value`, loc);
   }
 
   // every owner
@@ -713,8 +763,14 @@ export function runChecks(M, opts = {}) {
     checkTalk(d.talk, O);
     if (d.hint) for (const [k, h] of Object.entries(isStr(d.hint) || Array.isArray(d.hint) ? { hint: d.hint } : d.hint)) textPair(h, O, `hint ${k}`, null, {});
     for (const [id, it] of Object.entries(d.item || {})) { if (it.name) textPair(it.name, O, `item ${id} name`, null, {}); if (it.desc) textPair(it.desc, O, `item ${id} desc`, null, {}); }
+    for (const [id, pg] of Object.entries(d.page || {})) { if (pg.title) textPair(pg.title, O, `page ${id} title`, null, {}); arr(pg.text).forEach((x, i) => textPair(x, O, `page ${id} text ${i + 1}`, null, {})); }
     for (const [id, n] of Object.entries(d.npc || {})) for (const w of arr(n.where)) { if (w.if) checkCond(w.if, O, `npc ${id} where`); }
     if (d.payoff) { /* rule 4 below */ }
+    // replaces: { 'STORY.a.b': sceneId } (a data scene put in place of a nested old STORY entry)
+    for (const [k, sc] of Object.entries(d.replaces || {})) { if (!M.scenes[sc]) FAIL('ids', `${O.id}: replaces ${k} with scene ${sc}, which is not defined`, W(O, at(O, sc))); else addTo(scenesUsed, sc, { O, where: `replaces ${k}` }); }
+    // act migrate: [{ if, then }] (once at load, for old saves), end_act: { title, lines }
+    arr(d.migrate).forEach((m, i) => { if (m && m.if) checkCond(m.if, O, `migrate ${i + 1}`); eachEffect(m && m.then, (e) => checkEffect(e, O, `migrate ${i + 1}`)); });
+    if (d.end_act) { if (d.end_act.title) textPair(d.end_act.title, O, 'end_act title', null, {}); arr(d.end_act.lines).forEach((x, i) => textPair(x, O, `end_act line ${i + 1}`, null, {})); }
   }
 
   // promises and refs: an entity, quest, item, clue or scene, or (a promise) a flag or event something sets
@@ -736,16 +792,25 @@ export function runChecks(M, opts = {}) {
       if (!/obj|hint|ask|pick|clue|so_far|title|name|desc|banner/.test(t.where)) WARN('words', `${t.O.id}.${t.where} "${short(t.full, 50)}" says "${w}" with no fact, promise, dir or ref tag`, loc);
     }
   }
-  // em dash anywhere in data, game/src, game/simple and the page html
+  // em dash anywhere in data, game/src, game/simple and the page html: the real character, a string literal whose
+  // value holds one (an escape in a string shows an em dash on screen), and the html entities in html. An escape
+  // inside a regular expression or a comment is how code DETECTS em dashes, so it is not one.
   const emFiles = [];
   for (const F of M.files) emFiles.push([F.rel, F.text]);
   for (const [mod, t] of Object.entries(G.files)) emFiles.push([`game/src/${mod}.js`, t]);
   for (const extra of opts.extraTextFiles || []) emFiles.push(extra);
+  const ESC = /\\u2014|\\u\{2014\}|\\x97/i;
   for (const [rel, t] of emFiles) {
-    if (!t.includes(EM) && !/\\u2014|&mdash;|&#8212;/i.test(t)) continue;
-    const L = t.split('\n');
+    const bad = new Map();   // line -> text
+    if (t.includes(EM)) t.split('\n').forEach((l, i) => { if (l.includes(EM)) bad.set(i + 1, l); });
+    if (/\.html?$/.test(rel) && /&mdash;|&#8212;|&#x2014;/i.test(t)) t.split('\n').forEach((l, i) => { if (/&mdash;|&#8212;|&#x2014;/i.test(l)) bad.set(i + 1, l); });
+    if (/\.json$/.test(rel) && ESC.test(t)) t.split('\n').forEach((l, i) => { if (ESC.test(l)) bad.set(i + 1, l); });
+    if (/\.m?js$/.test(rel) && ESC.test(t)) {
+      const L = t.split('\n');
+      for (const k of tokenize(t)) if ((k.t === 'str' || k.t === 'tpl') && String(k.v).includes(EM)) bad.set(k.line, L[k.line - 1] || '');
+    }
     let n = 0;
-    L.forEach((l, i) => { if (l.includes(EM) || /\\u2014|&mdash;|&#8212;/i.test(l)) { if (n++ < 5) FAIL('emdash', `${rel}:${i + 1} has an em dash: "${short(l.trim(), 50)}"`, { file: rel, line: i + 1, act: actOfPath(rel) }); } });
+    for (const [ln, l] of [...bad].sort((x, y) => x[0] - y[0])) if (n++ < 5) FAIL('emdash', `${rel}:${ln} has an em dash: "${short(l.trim(), 50)}"`, { file: rel, line: ln, act: actOfPath(rel) });
     if (n > 5) FAIL('emdash', `${rel}: ${n - 5} more lines with an em dash`, { file: rel, line: 0, act: actOfPath(rel) });
   }
 
@@ -815,7 +880,7 @@ export function runChecks(M, opts = {}) {
     const O = def.owner || (itemsGivenData.get(id) || [{}])[0].O || null;
     const loc = Object.assign(W(O), { file: def.file || (O ? O.file : ''), line: def.line || (O ? at(O, id).line : 0) });
     const usedData = itemsUsedData.has(id) || opensWith.has(id) || Object.values(M.ents).some((e) => isStr(e.show) && e.show.includes(`item ${id}`));
-    const usedGame = G.itemReads.has(id);
+    const usedGame = G.itemReads.has(id) || [...G.itemReadPrefixes].some((p) => id.startsWith(p));
     if (!usedData && !usedGame && !def.keepsake) FAIL('uses', `item ${id} is given but never used (use it, or mark it keepsake: true)`, loc);
     const isKey = /(^|_)key($|_)|key$/i.test(id) || /\bkey\b/i.test((pairOf(def.name) || {}).full || '');
     if (isKey && !opensWith.has(id) && !Object.values(M.ents).some((e) => isStr(e.opens_with) && e.opens_with.includes(id)) && !usedGame) FAIL('uses', `key ${id} opens nothing (no gate or door has opens_with: ${id})`, loc);
@@ -828,6 +893,9 @@ export function runChecks(M, opts = {}) {
     const ow = arr(e.opens_with);
     if (e.gate && GATE_POWER[e.gate]) continue;
     if (!ow.length && e.from === 'legacy') continue; // the old code opens it
+    // a story gate (gate kind with power null, or any gate an `open` effect opens) needs no other opener
+    if (!ow.length && openedByData.has(e.id)) continue;
+    if (e.gate && (G.gateKinds || {})[e.gate] === null) { FAIL('uses', `gate ${e.id} (${e.gate}) opens only by the story's "open ${e.id}" effect, and nothing runs it`, loc); continue; }
     if (!ow.length) { FAIL('uses', `gate ${e.id} has no opener (gate: kind or opens_with:)`, loc); continue; }
     for (const o of ow) {
       if (ALL_POWERS.has(o)) continue;
@@ -930,6 +998,7 @@ export function runChecks(M, opts = {}) {
       for (const sub of entNeeds(g.id, new Set(seen))) {
         const a = { powers: new Set([...own.powers, ...sub.powers]), conds: own.conds.concat(sub.conds), via: g.id };
         if (g.gate && GATE_POWER[g.gate]) a.powers.add(GATE_POWER[g.gate]);
+        else if (g.gate && (G.gateKinds || {})[g.gate] === null) a.conds.push(`event gate_open:${g.id}`);
         for (const o of arr(g.opens_with)) { if (ALL_POWERS.has(o)) a.powers.add(o); else if (isItem(o)) a.conds.push(`item ${o}`); else a.conds.push(o); }
         if (g.need) a.conds.push(g.need);
         alts.push(a);
@@ -1251,7 +1320,13 @@ export function runChecks(M, opts = {}) {
       case 'heart_ember': ok = has(/heart_ember/) || Object.values(M.ents).some((e) => arr(e.loot).includes('heart_ember') && all.includes(e.id)); why = 'no heart_ember effect or chest'; break;
       case 'item_main': ok = has(new RegExp(`give ${p.id}\\b`)) && mainUsesItem(p.id); why = !has(new RegExp(`give ${p.id}\\b`)) ? `never gives ${p.id}` : `the main path never uses ${p.id}`; break;
       case 'truth': ok = (has(new RegExp(`clue ${p.id}\\b`)) || has(new RegExp(`"clue":"${p.id}"`))) && !!feedsMain(p.id); why = !M.clues[p.id] ? `clue ${p.id} is not defined` : !feedsMain(p.id) ? `clue ${p.id} feeds no main-mystery deduction` : `never adds clue ${p.id}`; break;
-      case 'shortcut': ok = has(/"(open|world) [a-z0-9_]+/) || has(/"kind":"(gate|door)"/); why = 'no open/world effect or gate'; break;
+      case 'shortcut': {
+        ok = has(/"(open|world) [a-z0-9_]+/) || has(/"kind":"(gate|door)"/);
+        // or the payoff names a door or gate the old code opens on a flag this quest sets (opens_with/need: 'flag x')
+        const E = p.id && M.ents[p.id];
+        if (!ok && E) { const fl = [...arr(E.opens_with), ...arr(E.need)].filter(isStr).flatMap((c) => parseCond(c)).filter((q) => q.k === 'flag' && !q.neg).map((q) => q.a[0].split('=')[0]); ok = fl.length > 0 && fl.every((f) => has(new RegExp(`"set ${f}(=|")`))); }
+        why = E ? `no open/world effect or gate, and ${p.id} does not open on a flag this quest sets` : 'no open/world effect or gate'; break;
+      }
       case 'ally': ok = !!p.id && (has(new RegExp(`ally ${p.id}\\b`)) || has(new RegExp(`set [a-z0-9_]*${p.id}`))); why = p.id ? `no "ally ${p.id}" effect` : 'payoff.id should name the ally'; break;
       default: break;
     }

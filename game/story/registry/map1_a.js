@@ -22,8 +22,6 @@ legacy({ id: 'c_ambrose', map: 1, at: [7200, 24846], r: 40, kind: 'npc', name: '
 legacy({ id: 'c_fold', map: 1, at: [3900, 21000], r: 200, kind: 'landmark', name: "Old Barley's sheepfold",
   src: 'LANDMARKS:c_lm_fold' });
 legacy({ id: 'c_saltmarsh', map: 1, at: [1900, 26600], r: 650, kind: 'place', name: 'Saltmarsh', src: 'POI:c_saltmarsh' });
-legacy({ id: 'c_lm_tideclock', map: 1, at: [2200, 26360], r: 40, kind: 'landmark', name: 'the Tide Clock',
-  src: 'LANDMARKS:c_lm_tideclock' });
 legacy({ id: 'c_gullcrag_sands', map: 1, at: [1650, 28400], r: 500, kind: 'place', name: 'the Gullcrag Sands',
   src: 'x1_world.js C1G.sands' });
 legacy({ id: 'c_gullcrag_head', map: 1, at: [2300, 28330], r: 300, kind: 'place', name: 'the top of Gullcrag Head',

@@ -312,7 +312,12 @@ function s10Resolve(e){
   if(!src) return {ok:false,why:'no src'};
   return {ok:false,why:`src "${src}" is not a known form`};
 }
+// old drawings that are not in any object list tell the engine how to find them: s10FindKind(kind, (x,y,r)=>obj|null)
+// (an old module calls it once at load; legacy src 'prop:<kind>@x,y' then resolves through it)
+const S10_FIND={};
+function s10FindKind(k,fn){ S10_FIND[k]=fn; }
 function s10FindObj(k,x,y,r){
+  if(S10_FIND[k]){ try{ const o=S10_FIND[k](x,y,r); if(o) return o; }catch(e){} }
   const lists=[STRUCTS,LANDMARKS,CHESTS];
   for(const n of ['C1WD','F2WD','M3WD','N4WD']){ try{ const W=eval(`typeof ${n}!=='undefined'?${n}:null`); if(W&&W.objs) lists.push(W.objs); }catch(e){} }
   for(const L of lists) for(const o of L){ if(!o) continue; if((o.k===k||o.kind===k||o.pk===k)&&Math.abs(o.x-x)<=r&&Math.abs(o.y-y)<=r) return o; }
