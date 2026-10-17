@@ -25,7 +25,8 @@ act({
     what_knights: {
       title: ['What are the Rime Knights?', 'What are the Rime Knights?'],
       deduce: ['what_knights'],
-      herring: ['f3_golem_rumor'] },
+      herring: ['f3_golem_rumor'],
+      solved: ['Hearthold\'s lost patrol, frozen into moth-frost armor. Blaze sets them free.', 'The lost patrol. Blaze frees them.'] },
   },
 
   // decided when Glaciar falls on the Crown (x2_foes sets G.choices.f_glaciar: free when all four chains were melted,
@@ -47,11 +48,12 @@ act({
   // old saves (no G.story yet) that are already past a chapter never found its clues: give them, and count the
   // deductions they skipped as solved, so the Case Book questions later in the act can still be answered. (Read by the
   // engine once at load when it supports act migrate; A2B asked for it in CHANGES.md.)
+  // (A3a's three lines are A3a's own list, from CHANGES.md)
   migrate: [
-    { if: 'stage>=f_maze', then: ['clue f3_blue_ash', 'clue f3_lintel', 'clue f3_forge_map', 'solve where_blaze'] },
-    { if: 'stage>=f_sky', then: ['clue f3_cold_parts', 'clue f3_looking_up', 'clue f3_alarm_rope', 'clue f3_yarn', 'solve who_saw',
-                                  'clue f3_moth_flew', 'clue f3_spyglass', 'clue f3_chapel', 'solve what_storm'] },
-    { if: 'stage>=f_sky stage<f_dread !item f3_scarf', then: ['give f3_scarf'] },
+    { if: 'stage>=f_maze', then: ['clue f3_moth_flew', 'clue f3_blue_ash', 'clue f3_lintel', 'clue f3_forge_map', 'solve where_blaze'] },
+    { if: 'stage>=f_kindle', then: ['clue f3_cold_parts'] },
+    { if: 'stage>=f_sky', then: ['clue f3_looking_up', 'clue f3_alarm_rope', 'clue f3_yarn', 'clue f3_chapel', 'clue f3_spyglass', 'solve who_saw', 'solve what_storm',
+                                  { if: '!item f3_scarf', then: ['give f3_scarf'] }] },
     { if: 'stage>=f_gap', then: ['clue f3_climbers'] },
     { if: 'stage>=f_dread', then: ['clue f3_gate_carving', 'clue f3_drum_seen', 'solve how_open', 'clue f3_the_mother', 'clue f3_hush_friend'] },
   ],

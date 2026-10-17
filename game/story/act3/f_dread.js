@@ -23,9 +23,12 @@ chapter({
     { id: 'climb', do: 'dungeon f_dread', at: 'f_dread_door',
       obj: ['Climb up through the Heart of Dread', 'Climb up inside the mountain'],
       hint: ['Up through the mountain. Melt every chain. Pound the plates, shoot the eyes. I\'m right here with you. Shivering.', 'Go up through the mountain. Melt every chain.'],
-      // the snow_mother question can be answered here already (its clues are all in after the drum)
+      // the snow_mother question can be answered here already (its clues are all in after the drum). And a player who
+      // rode up and knocked on the drum before working it out in the Case Book (or a save from before the Case Book)
+      // gets the Dreadgate question closed: he did open it, after all.
       extra: [
         { do: 'deduce snow_mother' },
+        { do: 'wait_for !solved how_open', then: ['clue f3_gate_carving', 'clue f3_drum_seen', 'clue f3_climbers', 'solve how_open'] },
       ] },
   ],
 
@@ -45,7 +48,7 @@ chapter({
     f_dread_choir: [
       // (the event is for A3S's what_knights: the Frozen Choir is its bonus clue)
       ['narr', 'Twelve Hearthold soldiers stand frozen in rows, mouths open, as if they were singing. Four of them wear purple frost armor. One of them opens an eye.', 'Twelve frozen soldiers stand like a choir. One opens an eye.',
-        { do: ['emit beat:f_dread_choir'] }],
+        { clue: 'f3_choir', do: ['emit beat:f_dread_choir'] }],
     ],
     f_dread_choir_key: [
       ['f_soldier', 'Here, I found this in my boot. It\'s not my boot. Thank you, dragon. Which way is lunch?', 'I found this key in my boot. Which way is lunch?'],

@@ -92,8 +92,8 @@ chapter({
         { do: 'wait_for !clue f3_hush_friend', then: ['clue f3_hush_friend', 'clue f3_the_mother'] },
       ] },
     // the fight is x2_foes' (its site opens on the Crown at this stage); her intro and both outros are the scenes below
-    // (x2_foes plays them; `kneel` names the free outro for the checker, the engine does not play it again)
-    { id: 'fight', do: 'fight f_glaciar', at: 'f_crown', kneel: 'f_glaciar_outro_free', migrate_if: 'flag f_done',
+    // (x2_foes plays them, so the step names no scene of its own: the engine must not play them a second time)
+    { id: 'fight', do: 'fight f_glaciar', at: 'f_crown', migrate_if: 'flag f_done',
       obj: ['Melt Glaciar\'s four chains, and set her free', 'Melt the four chains'],
       hint: ['Crack each chain\'s ice dome with a Ground Pound, then Blaze the lock. Two chains are up high: climb, and ride the vent.', 'Pound the dome. Then Blaze the lock.'],
       then: ['set f_nyx_named',
@@ -172,6 +172,7 @@ chapter({
     // free: Ash walks up to her and talks (10 lines a branch)
     f3_auntie_talk: [
       { cam: 'f3_glaciar_face', s: 1 },
+      ['narr', 'Auntie Glee pinches your cheek with one enormous claw. Very, very gently. It\'s cold. It\'s also the nicest pinch you have ever had.', 'She pinches your cheek with a huge claw. Very gently. The nicest pinch ever.'],
       ['ash', '(squished) Hi, Auntie. I\'m your great x13 grand-nephew.', '(squished) Hi, Auntie. I\'m your great x13 nephew.'],
       ['f_glaciar', 'Thirteen? Ember was my NIECE, dumpling. So I\'m fourteen greats.', 'Ember was my NIECE. So I\'m fourteen greats.'],
       ['ash', 'I am NOT saying fourteen.', 'I am NOT saying fourteen.'],
@@ -188,10 +189,11 @@ chapter({
         else: [
         ['ash', 'Your brother is gone, Auntie. His fire went out. I\'m sorry.', 'Your brother is gone. His fire went out. Sorry.'],
         ['f_glaciar', 'He chose to be a very loud, very angry dragon for a very long time. You chose something better. Don\'t be sorry, dumpling. Be warm.', 'He chose to be loud and angry. You chose better. Be warm.'] ] }] }] },
-      ['f_glaciar', 'Now listen, dumpling. The one the moths call the Mother has a name. Nyxara. The moon\'s old moth. She wants a night that never ends.', 'The Mother is Nyxara, the moon\'s old moth. She wants night forever.',
-        { do: ['set f_nyx_named', 'page f3_tove_notes'] }],
+      // (Nyxara's name, and the long truth on a Case Book page)
+      { do: ['set f_nyx_named', 'page f3_tove_notes'] },
       { choose: 'f3_auntie_home', who: 'f_glaciar',
-        ask: ['I made a blizzard, dumpling. I\'m a danger. I should fly far north, past the edge of the ice, where I can\'t hurt anyone.', 'I made a blizzard. I should fly far north.'],
+        ask: ['Listen, dumpling. The one the moths call the Mother is NYXARA, the moon\'s old moth. And I made a blizzard for her. I\'m a danger. I should fly far north, where I can\'t hurt anyone.',
+              'The Mother is Nyxara, the moon\'s moth. I made a blizzard. I should fly far north.'],
         pick: [
           { t: ['"You\'re the Snow Mother. Hearthold still sings about you."', '"You\'re the Snow Mother!"'], tone: 'kind', v: 'stay',
             need: { any: ['solved snow_mother', 'flag f_song'] },
@@ -204,8 +206,12 @@ chapter({
             say: [
               ['f_glaciar', 'Then I\'ll rest. And if you ever need a dragon, a cold one, a slow one, good for cooling soup, call me. I\'ll come.', 'If you ever need a cold, slow dragon, call me.'] ] },
         ] },
-      ['tove', 'I still can\'t believe I forgot a whole DRAGON.', 'I can\'t believe I forgot a DRAGON.'],
-      ['f_glaciar', 'Easily, dear. I\'m very quiet.', 'Easily, dear. I\'m very quiet.'],
+      // (A3S's egg chest on Cinder Mountain's rim gives her old shell: she knows it at once)
+      { if: 'item f3_eggshell', then: [
+        ['f_glaciar', 'Wait. Is that my EGGSHELL in your bag? The blue one? Vorlax KEPT it, all this time? Oh, the old softie.', 'Is that my old EGGSHELL? Vorlax KEPT it? Oh, the old softie.'] ],
+        else: [
+        ['tove', 'I still can\'t believe I forgot a whole DRAGON.', 'I can\'t believe I forgot a DRAGON.'],
+        ['f_glaciar', 'Easily, dear. I\'m very quiet.', 'Easily, dear. I\'m very quiet.'] ] },
       // she flies off under the fade (x2_story stops drawing her once f_glaciar_home is north)
       { if: 'choice f3_auntie_home=north', then: [{ fade: 1 }, { do: ['choice f_glaciar_home=north'] }] },
     ],

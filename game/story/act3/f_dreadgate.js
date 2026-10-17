@@ -86,13 +86,12 @@ chapter({
       obj: ['Ride the Drum Wind up to the Drum Stone', 'Ride the Drum Wind up'],
       hint: ['The Drum Wind starts at the big vent on the Dreadmoor, east of the gate. Jump into the swirl.', 'Jump into the swirl at the big vent.'] },
     // x2_story's pound listener rings the drum (G.flags.f_drum) and plays STORY.f_drum, which is the scene below
-    // (`kneel` names a scene the old code plays, for the checker; the engine does not play it again)
-    { id: 'knock', do: 'wait_for flag f_drum', at: 'f_lm_drum', kneel: 'f_drum',
+    { id: 'knock', do: 'wait_for flag f_drum', at: 'f_lm_drum',
       obj: ['Knock on the Drum Stone: jump, then POUND', 'Jump, then POUND the drum!'],
       hint: ['Jump, then press attack in the air to slam down on the drum. Like a sack of anvils.', 'Jump, then slam down on the drum!'] },
     // the fight is x2_foes' (the plaza site opens with f_drum); its intro and outro are the scenes below, in place
     // (then: Hush's two clues again, in case the drum scene was ever skipped: snow_mother cannot be asked without them)
-    { id: 'hush', do: 'fight f_hush', at: 'f_dreadgate_plaza', kneel: 'f_hush_outro', then: ['clue f3_the_mother', 'clue f3_hush_friend', 'stage f_dread'],
+    { id: 'hush', do: 'fight f_hush', at: 'f_dreadgate_plaza', then: ['clue f3_the_mother', 'clue f3_hush_friend', 'stage f_dread'],
       obj: ['Ride the wind back down and face Hush at the Dreadgate', 'Face Hush at the Dreadgate'],
       hint: ['Moths love lamps. Every moth. Light the lamps on the plaza and she can\'t help herself.', 'Light the lamps on the plaza!'] },
   ],

@@ -66,7 +66,7 @@
       try { const S = F2G && F2G.stones; if (S) for (const s of S) if (Math.hypot(s.x - x, s.y - y) < 70 && s.done) return; } catch (e) {}
       const p = 0.75 + 0.25 * Math.sin(t * 3.2 + x * 0.01);
       g.save();
-      glow(g, x, y - 46, 70 * p, '205,190,255', 0.42);
+      glow(g, x, y - 46, 80 * p, '200,225,255', 0.55);
       const gr = g.createLinearGradient(x, y, x, y - 150); gr.addColorStop(0, `rgba(225,215,255,${0.55 * p})`); gr.addColorStop(1, 'rgba(225,215,255,0)');
       g.fillStyle = gr; g.beginPath(); g.moveTo(x - 16, y); g.lineTo(x - 6, y - 150); g.lineTo(x + 6, y - 150); g.lineTo(x + 16, y); g.closePath(); g.fill();
       g.strokeStyle = `rgba(240,232,255,${0.8 * p})`; g.lineWidth = 2.5; g.beginPath(); g.ellipse(x, y, 30 + 4 * Math.sin(t * 3), 12, 0, 0, T2); g.stroke();
@@ -86,6 +86,21 @@
         if ((G.enemies || []).some(e => !e.dead && e.type === 'f_glaciar')) return;
         const s = since('coil', state, t);
         f2sDrawGlac(state === 'blink' && s < 0.9 ? 'awake' : 'spell');
+        // after the blink, her four chains light up, bright as lamps (x2_story's own chain paths: coil point to stone)
+        if (state === 'blink' && s >= 0.9 && typeof f2sGlacPts === 'function' && typeof F2S_STONES !== 'undefined') {
+          const P = f2sGlacPts(), X = F2SP.crown.x, Y = F2SP.crown.y;
+          for (let i = 0; i < 4; i++) {
+            if ((G.flags.f_chains | 0) > i) continue;
+            const L = F2S_STONES[i], q = P[16 + i * 10], p = 0.65 + 0.35 * Math.sin(t * 4 + i * 1.7);
+            g.save(); g.lineCap = 'round';
+            g.beginPath(); g.moveTo(X + q.x, Y + q.y); g.lineTo(L.x, L.y - 30);
+            g.strokeStyle = `rgba(160,215,255,${0.42 * p})`; g.lineWidth = 28; g.stroke();
+            g.strokeStyle = `rgba(200,235,255,${0.7 * p})`; g.lineWidth = 11; g.stroke();
+            g.strokeStyle = `rgba(255,255,255,${0.95 * p})`; g.lineWidth = 4; g.stroke();
+            g.restore();
+            glow(g, L.x, L.y - 30, 46 * p, '210,235,255', 0.5);
+          }
+        }
       } catch (e) {}
     } });
 

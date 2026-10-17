@@ -1,12 +1,11 @@
 // Map 2 (Frostreach): things old code already draws that A3b's chapters (f_sky, f_gap, f_deep, f_dreadgate, f_dread,
 // f_glaciar) name. Positions are x2_world's and x2_people's own (B.door, B.poi, f2wLM, p3Add, CAST homes). Data only.
 
-// the Sky Isles: Skyreach Temple and Brother Pennant on his kite outside it (x2_people's CAST, home 12650,46550)
+// the Sky Isles and Skyreach Temple (Brother Pennant on his kite outside it is A3S's registry entry f_pennant, map2_s.js)
 legacy({ id: 'f_skyreach', map: 2, at: [12650, 46150], r: 420, kind: 'place', name: 'the Sky Isles',
          aliases: ['Skyreach', 'the Sky Isles', 'Skyreach Temple'], src: 'POI:f_skyreach' });
 legacy({ id: 'f_sky_door', map: 2, at: [12650, 46486], r: 40, kind: 'door', leads: 'f_sky', name: 'the doors of Skyreach Temple',
          aliases: ['the temple doors'], src: 'DOORS:f_sky' });
-legacy({ id: 'f_pennant', map: 2, at: [12650, 46550], r: 60, kind: 'npc', name: 'Brother Pennant', src: 'CAST:f_pennant' });
 
 // the Stonehorn hills past the Howling Gap: the Horned Gate (a ram skull as big as a house, the door of Stonehorn Deep)
 legacy({ id: 'f_stonehorn', map: 2, at: [12200, 42500], r: 360, kind: 'place', name: 'the Horned Gate',
