@@ -18,12 +18,23 @@ people({
   // the clues n5_mom_lanterns and n5_yara_post that Mom and Yara give below are defined by N5a (n_bridge.js), whose
   // small mystery n5_fourth_lantern asks for them
   place: {
+    // Mom on the Moon Pier (x3_people's M3P_VIS.pier.maren): x3_people's own pier talk answers Mom before data talk can
+    // (CHANGES.md A4S ENGINE REQUEST), so while the fourth-post clue is wanted her lantern answer is also a place at her
+    // feet; its prompt wins over "Talk to Maren" only until the clue is found
+    n5_mom_ask: { map: 3, kind: 'examine', at: [13505, 65436], r: 26, h: 70, name: ['Mom', 'Mom'],
+      prompt: ['Ask Mom about Lantern Day', 'Ask Mom about lanterns'], if: 'clue n5_fourth_post !clue n5_mom_lanterns', say: 'n5_mom_lanterns_talk' },
     // the Crown Shrine (n_sh_crown at 3331,85875): everyone waits round it after the gathering
     n5_crown_who: { map: 4, kind: 'examine', at: [3400, 85930], r: 30, h: 46, name: ['your friends by the shrine', 'your friends'],
       prompt: ['Who is with me?', 'Who is with me?'], if: 'flag n_gather', say: 'n5_who' },
   },
 
   scene: {
+    n5_mom_lanterns_talk: [
+      ['ash', 'Mom, why would a green have four lantern posts?', 'Mom, why four lantern posts?'],
+      ['maren', 'Four? My gran always made four lanterns on Lantern Day. Three for us, and one for whoever is out in the dark.',
+        'Gran made four lanterns. One for whoever is out in the dark.', { clue: 'n5_mom_lanterns' }],
+      ['maren', 'Her gran did it too. Nobody remembered why. You just did it.', 'Nobody knew why. We just did it.'],
+    ],
     n5_who: [
       ['narr', 'Everyone who climbed this far waits by the Crown Shrine. You count them on your claws.', 'You count your friends by the shrine.'],
       { if: 'flag n5_vesper', then: [{ if: 'quest q_n5_oona started', then: [['c_vesper', "Here. Obviously. I was here first. I'm always first.", 'Here. I was here first.']],
