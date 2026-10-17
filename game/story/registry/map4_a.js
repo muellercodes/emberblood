@@ -9,12 +9,12 @@
 // the moonfire bridge at the end of the Moon Pier (x4_world's crossing n_bridge_in, open from n_bridge on)
 legacy({ id: 'n5_pier_end', map: 3, at: [13700, 65450], r: 120, kind: 'place',
   name: ['the moonfire bridge at the end of the Moon Pier', 'the fire bridge'], aliases: ['the moonfire bridge', 'the Moon Pier'],
-  src: 'CROSSINGS:n_bridge_in' });
+  src: 'LANDMARKS:xing_n_bridge_in' });
 
 // ---------- map 4: the Bridgefoot
 // the south end of the moonfire deck: the way back to Moonfall (always open)
 legacy({ id: 'n5_bridge_back', map: 4, at: [4500, 90900], r: 100, kind: 'place',
-  name: ['the moonfire bridge back to Moonfall', 'the bridge home'], src: 'CROSSINGS:n_bridge_out' });
+  name: ['the moonfire bridge back to Moonfall', 'the bridge home'], src: 'x4_world.js N4X_OUT' });
 legacy({ id: 'n_sh_foot', map: 4, at: [4880, 89880], r: 60, kind: 'landmark', name: ['the Bridgefoot Shrine', 'the Bridgefoot Shrine'],
   src: 'SHRINES:n_sh_foot' });
 // the three dark lanterns of the copied green (x4_ascent: a gentle breath lights each; all three at once melt the curtain)
