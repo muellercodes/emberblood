@@ -1511,6 +1511,10 @@ function s10Replaces(){
       const parts=String(path).replace(/^(STORY|TALK)\./,'').split('.'); let o=root; for(let i=0;i<parts.length-1&&o;i++) o=o[parts[i]];
       const last=parts[parts.length-1]; if(!o||!(last in o)){ s10Err(`replaces ${path}: there is no such old entry`); continue; }
       if(R[path]===null){ delete o[last]; continue; }
+      // a text ([full, simple]) for an old entry that is a text (STORY.f_hints.<stage>, a TALK line): read in the mode
+      // the player is in each time
+      const v=R[path]; if(Array.isArray(v)&&v.length&&v.every(x=>typeof x==='string')||typeof v==='string'&&!S10.scenes[v]&&typeof o[last]==='string'){
+        Object.defineProperty(o,last,{configurable:true,enumerable:true,get(){ return s10T(v); },set(x){}}); continue; }
       const beats=S10.scenes[R[path]]; if(!beats){ s10Err(`replaces ${path}: no scene ${R[path]}`); continue; }
       const lines=s10Lines(beats,{sc:R[path]}), mark={who:'narr',text:'',skipIf:()=>true,fn:()=>{ if(G&&G.story) (G.story._seen||(G.story._seen={}))[R[path]]=1; }};
       const desc=Object.getOwnPropertyDescriptor(o,last);

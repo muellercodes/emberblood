@@ -776,7 +776,7 @@ export function runChecks(M, opts = {}) {
     for (const [id, n] of Object.entries(d.npc || {})) for (const w of arr(n.where)) { if (w.if) checkCond(w.if, O, `npc ${id} where`); }
     if (d.payoff) { /* rule 4 below */ }
     // replaces: { 'STORY.a.b': sceneId } (a data scene put in place of a nested old STORY entry)
-    for (const [k, sc] of Object.entries(d.replaces || {})) { if (sc === null) { if (!/^(STORY|TALK)\./.test(k)) FAIL('ids', `${O.id}: replaces ${k}: write STORY.<path> or TALK.<path>`, W(O, at(O))); continue; } if (!M.scenes[sc]) FAIL('ids', `${O.id}: replaces ${k} with scene ${sc}, which is not defined`, W(O, at(O, sc))); else addTo(scenesUsed, sc, { O, where: `replaces ${k}` }); }
+    for (const [k, sc] of Object.entries(d.replaces || {})) { if (Array.isArray(sc) && sc.length && sc.every(isStr)) { if (!/^(STORY|TALK)\./.test(k)) FAIL('ids', `${O.id}: replaces ${k}: write STORY.<path> or TALK.<path>`, W(O, at(O))); textPair(sc, O, `replaces ${k}`, null, {}); continue; } if (sc === null) { if (!/^(STORY|TALK)\./.test(k)) FAIL('ids', `${O.id}: replaces ${k}: write STORY.<path> or TALK.<path>`, W(O, at(O))); continue; } if (!M.scenes[sc]) FAIL('ids', `${O.id}: replaces ${k} with scene ${sc}, which is not defined`, W(O, at(O, sc))); else addTo(scenesUsed, sc, { O, where: `replaces ${k}` }); }
     // act migrate: [{ if, then }] (once at load, for old saves), end_act: { title, lines }
     arr(d.migrate).forEach((m, i) => { if (m && m.if) checkCond(m.if, O, `migrate ${i + 1}`); eachEffect(m && m.then, (e) => checkEffect(e, O, `migrate ${i + 1}`)); });
     if (d.end_act) { if (d.end_act.title) textVar(d.end_act.title, O, 'end_act title'); arr(d.end_act.lines).forEach((x, i) => textVar(x, O, `end_act line ${i + 1}`)); }
