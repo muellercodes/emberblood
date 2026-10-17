@@ -26,7 +26,7 @@ chapter({
   },
 
   step: [
-    // x1_story's c1SpireOut puts Ash on the breakwater at night and moves the stage here: the voice and the snow first
+    // c_spire's warp-out puts Ash on the breakwater at night and moves the stage here: the voice and the snow first
     { id: 'voice', do: 'cutscene c_moth_voice', migrate_if: 'flag c_snow' },
     { id: 'snow', do: 'cutscene c_snow_starts', migrate_if: 'flag c_snow' },
     { id: 'city', do: 'goto gh_market 460', scene: 'c_snow_town', migrate_if: 'flag c_done', then: ['end_act 2'],

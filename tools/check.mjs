@@ -52,7 +52,7 @@ const REG_KINDS = new Set(['place', 'landmark', 'door', 'gate', 'npc', 'item', '
 const STEP_VERBS = new Set(['talk', 'goto', 'find', 'examine', 'fight', 'use_power_at', 'give', 'choose', 'deduce', 'track', 'wait_for', 'cutscene', 'minigame', 'dungeon', 'all', 'any']);
 const EFFECT_VERBS = new Set(['set', 'clear', 'give', 'take', 'trust', 'power', 'upgrade', 'heart_ember', 'open', 'close', 'spawn', 'despawn', 'move', 'world', 'clue', 'quest', 'stage', 'time', 'emit', 'mail', 'epi', 'music', 'xp', 'weapon', 'ally', 'hat',
   // also in ENG's engine (e10_story.js): see ENGINE.md section 4
-  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon']);
+  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people']);
 const WEAPON_POWERS = new Set(['whip', 'bombs', 'glaive']);
 const STEP_SCENES = ['scene', 'lose', 'win', 'kneel', 'after', 'intro'];
 const SPEAKERS_BUILTIN = new Set(['narr', 'ash', 'pip', 'mom', 'maren', 'sign', 'note', 'book', 'banner']);
@@ -767,7 +767,7 @@ export function runChecks(M, opts = {}) {
     for (const [id, n] of Object.entries(d.npc || {})) for (const w of arr(n.where)) { if (w.if) checkCond(w.if, O, `npc ${id} where`); }
     if (d.payoff) { /* rule 4 below */ }
     // replaces: { 'STORY.a.b': sceneId } (a data scene put in place of a nested old STORY entry)
-    for (const [k, sc] of Object.entries(d.replaces || {})) { if (!M.scenes[sc]) FAIL('ids', `${O.id}: replaces ${k} with scene ${sc}, which is not defined`, W(O, at(O, sc))); else addTo(scenesUsed, sc, { O, where: `replaces ${k}` }); }
+    for (const [k, sc] of Object.entries(d.replaces || {})) { if (sc === null) { if (!/^(STORY|TALK)\./.test(k)) FAIL('ids', `${O.id}: replaces ${k}: write STORY.<path> or TALK.<path>`, W(O, at(O))); continue; } if (!M.scenes[sc]) FAIL('ids', `${O.id}: replaces ${k} with scene ${sc}, which is not defined`, W(O, at(O, sc))); else addTo(scenesUsed, sc, { O, where: `replaces ${k}` }); }
     // act migrate: [{ if, then }] (once at load, for old saves), end_act: { title, lines }
     arr(d.migrate).forEach((m, i) => { if (m && m.if) checkCond(m.if, O, `migrate ${i + 1}`); eachEffect(m && m.then, (e) => checkEffect(e, O, `migrate ${i + 1}`)); });
     if (d.end_act) { if (d.end_act.title) textPair(d.end_act.title, O, 'end_act title', null, {}); arr(d.end_act.lines).forEach((x, i) => textPair(x, O, `end_act line ${i + 1}`, null, {})); }

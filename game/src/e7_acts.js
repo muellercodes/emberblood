@@ -141,7 +141,7 @@ function endAct(n,o){
     stats:[[playClock(),S('Time','Time')],[player.level,S('Level','Level')],[G.deaths|0,S('Times you fell','Falls')]],
     next:fin?null:()=>{ if(o.next) o.next(); else if(!startAct(n+1)) setBanner(S('To be continued!','To be continued!'),S('The next part of the story is still being written.','The next part is coming soon.'),3.4); },
     exploreLabel:fin?S('Keep exploring','Keep exploring'):S('Keep exploring for now','Explore for now'),
-    explore:()=>setBanner(S('Free roam','Free roam'),fin?S('Every land is yours to explore.','Go anywhere!'):S('The story waits for you. Talk to people to find the way on.','The story waits for you.'),3)});
+    explore:()=>setBanner(S('Free roam','Free roam'),fin?S('Every land is yours to explore.','Go anywhere!'):S("The story waits for you. Rest at a shrine or an inn when you're ready.",'Rest at a shrine or an inn.'),3)});
 }
 // startAct(n,{stage,quiet}): moves a save into act n. Earlier acts count as done; the act card, then the stage card.
 function startAct(n,o){

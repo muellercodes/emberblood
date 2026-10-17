@@ -245,7 +245,7 @@ quest({
         { t: ['Forgive him. He can make it right.', 'Forgive him'], tone: 'kind', v: 'forgive', then: ['set a1_gate_solved', 'give tunnel_key'],
           say: [['ash', 'You are going to make it right. Every lantern, every night.', 'Make it right. Every lantern, every night.'],
                 ['fennick', 'I will! And take this. The key to their tunnel off the Ashen Road.', 'I will! Take their tunnel key.', { ref: 'oath_tunnel' }]] },
-        { t: ['Turn him in to Captain Osric', 'Turn him in to Osric'], tone: 'brave', v: 'jail', then: ['set a1_gate_solved', 'give tunnel_key'],
+        { t: ['Turn him in to Captain Osric', 'Turn him in to Osric'], tone: 'brave', v: 'jail', then: ['set a1_gate_solved', 'give tunnel_key', 'people'],
           say: [['ash', 'You have to answer for it, Fennick.', 'You have to answer for it.'],
                 ['fennick', "That's fair. Take their key. It opens a tunnel off the Ashen Road. I'll bring a lamp. For the cell.", "That's fair. Take their tunnel key.", { ref: 'oath_tunnel' }]] },
       ] },
@@ -279,6 +279,8 @@ quest({
   id: 'a1_hat', act: 1, giver: 'hal', optional: true,   // started by Hal's rumor (people() at the end)
   title: ["Sir Strawsworth's Hat", 'The Scarecrow Hat'],
   payoff: { kind: 'truth', id: 'a1_button' },
+  // Hal's old rumor about the hat (a1g_talk.js) is the people() option below now
+  replaces: { 'TALK.hal.rumor': null },
 
   clue: {
     a1_rattle:       { mystery: 'a1_hat', icon: 'hat',
