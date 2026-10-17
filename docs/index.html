@@ -13142,6 +13142,9 @@ function updateFollowers(dt){
 }
 function placeGoat(){
   const st=G.side.duchess;
+  // the finale: Duchess is up on Nightfall Peak (she follows Ash to the top), so Hollis's pen is really empty until the
+  // dawn (the act 5 Duchess mystery, q_n5_follower). A Duchess walking with Ash stays with him.
+  if(G.mode==='story'&&st!=='follow'&&typeof actOf==='function'&&actOf(G.stage)===5&&!G.done&&!(G.flags&&G.flags.n_dawn>=1)){ G.goat=null; return; }
   if(st==='home'){ const P=POI.farm; G.goat={x:P.x+60,y:P.y+150,hx:P.x+60,hy:P.y+150,face:0,t:0,r:10}; }
   else if(st==='follow'){ G.goat={x:player.x-40,y:player.y+30,hx:0,hy:0,face:0,t:0,r:10}; }
   else G.goat={x:GOAT_SPOT[0],y:GOAT_SPOT[1],hx:GOAT_SPOT[0],hy:GOAT_SPOT[1],face:0,t:0,r:10};
@@ -35664,7 +35667,11 @@ function s10Effect(e,ctx){
     case 'bombbag': if(typeof bombBag==='function') bombBag(+a||5); else s10Err(`effect "${e}": no bomb bag`); break;
     case 'bless': { G.pendingBless=(G.pendingBless||0)+(+a||1); later(1.5,()=>{ try{ offerPending(); }catch(err){} }); break; }
     case 'moon': if(typeof moonSet==='function') moonSet(+a); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,+a); break;
-    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,s10DoorFor(w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
+    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; }
+      // (I5, I4's request) the next step waits while a warp is on its way (it lands on the next play frame), so its
+      // scene or cutscene starts where Ash lands, not where Ash was
+      S10.warpAt=G.time;
+      later(0.05,()=>{ S10.warpAt=null; G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,s10DoorFor(w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
     case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x)).filter(Boolean)})); break; }
     case 'page': s10Page(a); break;
     case 'shrine': { const sid=s10ShrineId(a); if(!sid){ s10Err(`effect "${e}": ${a} is not a shrine`); break; } G.shrines=G.shrines||{}; G.shrines[sid]=true; G.lastShrine=sid; break; }
@@ -35713,9 +35720,18 @@ function s10Epi(id,pri,ctx){
 }
 
 // ---------- 5. events: storyEmit(name) is global (dungeons, foes, minigames call it); everything heard is remembered
+// storyListen(prefix, fn): old code that draws a story's pictures hears every emit whose name starts with prefix, as
+// fn(rest, name), each time (x4_story: 'n4fx:', the finale's cutscene, Heart, gathering, dawn, book and the way home)
+const S10_LISTEN=[];
+function storyListen(prefix,fn){ if(typeof fn==='function'&&prefix) S10_LISTEN.push({p:String(prefix),fn}); }
+window.storyListen=storyListen;
 function storyEmit(name){
   if(!name||!G||!G.story) return;
-  name=String(name); const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
+  name=String(name);
+  // (I5) a listened-to prefix is a visual beat for old code, not story state: it is not remembered (saves stay small)
+  const L=S10_LISTEN.filter(q=>name.startsWith(q.p));
+  if(L.length){ if(S10.auto) S10.auto.log.push('emit '+name); for(const q of L) try{ q.fn(name.slice(q.p.length),name); }catch(e){ console.error('storyListen',name,e); } return true; }
+  const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
   if(S10.auto) S10.auto.log.push('emit '+name);
   return first;
 }
@@ -36089,6 +36105,8 @@ function s10Tick(dt){
   s10PlacesTick(dt);
   s10Barks(dt);
   if(scene!=='play') return;
+  // (a warp still on its way: nothing starts until Ash lands; the bound only guards a warp that never landed)
+  if(S10.warpAt!=null){ const wd=G.time-S10.warpAt; if(wd>=0&&wd<1.5) return; S10.warpAt=null; }
   // queued beats (a scene that waits for a calm moment)
   if(S10.queue.length&&s10Calm()){ const q=S10.queue.shift(); try{ q(); }catch(e){ console.error(e); } return; }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
@@ -36221,15 +36239,22 @@ function s10Prompts(offer){
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceShown(P)) continue;
     const k=P.kind; if(!['examine','sign','door','prop','chest','gate'].includes(k)) continue;
-    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line), and only
-    // when no gate library built it (e10c_gates says `locked` itself when Ash pushes against the gate)
-    if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
+    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line); a gate the
+    // gate library built is shut while gateIsOpen says so, and its prompt sits where the power is used (I3: a kid
+    // walking past learns what it needs, not only one who pushes into it)
+    let gAt=null;
+    if(k==='gate'){ if(!P.locked||!s10GateLocked(P)) continue;
+      if(P._built){ try{ if(typeof gateIsOpen==='function'&&gateIsOpen(id)) continue; const I=typeof gateInfo==='function'?gateInfo(id):null; if(I&&I.door) gAt={x:I.door.x,y:I.door.y}; }catch(e){ continue; } }
+      else if(s10World(id)==='open') continue; }
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
     // (a thing already looked at that no step waits for answers only when Ash stands at it: its prompt no longer hides
     //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
     const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
-    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    const at=gAt||s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    // (I5) nor when the Grapple Tail can reach a post from here (Vesper's cracked mask lies on the Silk Gallery's edge,
+    // right where Ash grapples the first post: E only read the mask again)
+    if(again){ try{ if(typeof p2Pick==='function'&&typeof canGrapple==='function'&&canGrapple()&&!AREA&&p2Pick(p,(typeof P2!=='undefined'&&P2.inp)||{mx:0,my:0})) continue; }catch(e){} }
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
     // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)
@@ -36238,7 +36263,22 @@ function s10Prompts(offer){
 }
 { const base=miniPrompts; miniPrompts=function(offer){ base(offer); try{ s10Prompts(offer); }catch(e){ console.error(e); } }; }
 // inside houses and caves miniPrompts is not asked: the nearest story prompt wins when it is the closest thing
-{ const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; });
+// (I5, I3's request) indoors a person wins a tie with plain furniture right in front of them (the old offer kept the
+// first of equal scores, the furniture: Ulf stands 20 px behind his bear rug, so the way in from the door gave "Look at
+// the rug"). A person's reach is 70 and a small thing's 50, so the furniture still wins wherever it is nearer.
+function s10PersonFirst(){
+  const cur=G.prompt; if(!AREA||!cur||G.inCombat||!AREA.npcs||!AREA.npcs.length) return;
+  const o=(AREA.objs||[]).find(o=>o.x===cur.x&&o.y===cur.y&&!o.broken); if(!o) return;
+  const FL=typeof FLOOR_LABEL!=='undefined'?FLOOR_LABEL:{}, CL=typeof CAVE_LABEL!=='undefined'?CAVE_LABEL:{}, FU=typeof FURN_LABEL!=='undefined'?FURN_LABEL:{};
+  if(o.prompt||FL[o.k]||CL[o.k]!==undefined||['qitem','stairs','trig','page','cchest','gchest','cave_ore','relic','note'].includes(o.k)||(o.k==='bed'&&o.home)||o.egg||!FU[o.k]) return;
+  const p=player; let d, reach;
+  if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
+  else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
+  const fs=d-reach; let bn=null, bs=1e9;
+  for(const n of AREA.npcs){ const dn=dist(p.x,p.y,n.x,n.y); if(dn>=(n.turtle?90:70)) continue; const sc=dn-70; if(sc<=fs+0.5&&sc<bs){ bs=sc; bn=n; } }
+  if(bn) G.prompt={text:`Talk to ${bn.name}`,act:()=>talkTo(bn),x:bn.x,y:bn.y};
+}
+{ const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted) s10PersonFirst(); }catch(e){ console.error(e); } try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; });
   const cur=G.prompt, cd=cur&&cur.x!=null?dist(player.x,player.y,cur.x,cur.y):1e9;
   if(best&&(!cur||best.d<cd-4)&&!(G.inCombat)) G.prompt={text:best.text,act:best.act,x:best.x,y:best.y}; } }catch(e){ console.error(e); } }; }
 function s10PlaceAct(id){
@@ -36616,7 +36656,9 @@ function s10Solve(id,quiet){
 // QDEFS entry: old_steps[i] is the data step an old save at G.quests[id].step==i resumes at; a data step with
 // legacy:true keeps the old mechanic: while it is current G.quests[id].step is its old index (other steps -1), and
 // when the old code moves that step on, the data step finishes.
-function s10QuestOpen(q){ if(!q) return false; if(q.act&&actOf(G.stage)<+q.act) return false; if(q.if!=null&&!s10Cond(q.if)) return false; return true; }
+// (I5, I4's request) `until: <act>`: an optional quest of an earlier act is no longer offered or started after that act
+// (a giver who comes along to a later act's map does not offer a quest whose things are back home)
+function s10QuestOpen(q){ if(!q) return false; const a=actOf(G.stage); if(q.act&&a<+q.act) return false; if(q.until!=null&&a>+q.until) return false; if(q.if!=null&&!s10Cond(q.if)) return false; return true; }
 function s10QDyn(q){
   const R=()=>s10Run('q',q);
   return {t:'flag',flag:'__s10_quest',_s10dyn:true,
@@ -36668,6 +36710,9 @@ function s10QuestStart(id,quiet){
   const q=S10.quests[id];
   if(!q){ if(QDEFS[id]&&!QDEFS[id]._s10){ if(!G.quests[id]) startQuest(id); return; } s10Err(`quest ${id} is not defined`); return; }
   if(G.quests[id]) return;
+  // (I5) a quest's own act and `if` gate it here too: the finale's errands are started from scenes that every player
+  // sees (`quest start q_n5_glaciar` at the Floe Gap), and the quest's if keeps a friend freed earlier out of it
+  if(!s10QuestOpen(q)) return;
   // (quiet: started by talking to the giver; the old "New side quest" banner would name the talk that is just
   // playing, so it is left out: the step's own banner names the next thing to do once the scene ends)
   const B0=G.banner, Q0=(G.bannerQ||[]).slice();
@@ -37397,6 +37442,8 @@ function cbPick(id,i){
   const el=$('#jBody'), top=el?el.scrollTop:0;
   renderJour(); if(el) el.scrollTop=top;
   if(r.right) try{ const q=el&&el.querySelector('.cb10-q.solved.just'); if(q) q.scrollIntoView({block:'nearest'}); }catch(e){}
+  // (I5, I4's request) a wrong pick's hint sits under the picks: on a phone it can be below the book's scroll edge
+  else if(CB10.wrong[id]&&CB10.wrong[id].hint) try{ const q=el&&[...el.querySelectorAll('.cb10-q[data-cbq]')].find(n=>n.dataset.cbq===id), h=q&&q.querySelector('.cb10-hint'); if(h) h.scrollIntoView({block:'nearest'}); }catch(e){}
 }
 function cbRender(){
   const el=$('#jBody'); if(!el) return;
@@ -38986,10 +39033,12 @@ defineLook('moth_dust_ice',{w:84,h:58,draw(g,x,y){
 
 // ---------- f_thaw: Ylva's red yarn, frozen stiff, hanging down the front of the bell tower from the very top
 // (the place stands at the foot of the tower's south face; the yarn climbs the face to the knitter's chair)
-defineLook('red_yarn',{w:40,h:120,draw(g,x,y){
+defineLook('red_yarn',{w:220,h:130,draw(g,x,y){
   g.save(); g.translate(x,y); g.lineCap='round';
-  // the strand: a little wavy, stiff with frost, with icicle beads on it
+  // the strand: a little wavy, stiff with frost, with icicle beads on it, up the south face of the bell tower, then
+  // (I3) along the top's front edge to the knitter's chair at the front-right corner (Ylva sits at +94, -114)
   const pts=[]; for(let i=0;i<=14;i++){ const k=i/14; pts.push([Math.sin(k*9)*2.2*(1-k*0.4)+k*4,-k*104]); }
+  for(let i=1;i<=8;i++){ const k=i/8; pts.push([4+k*80,-104-k*8+Math.sin(k*Math.PI)*3]); }
   g.strokeStyle=A3A_INK; g.lineWidth=5.6; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke();
   g.strokeStyle='#e8433c'; g.lineWidth=3.4; g.stroke();
   g.strokeStyle='rgba(255,255,255,.65)'; g.lineWidth=0.9; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0]-0.6,p[1]):g.moveTo(p[0]-0.6,p[1])); g.stroke();
@@ -58086,7 +58135,10 @@ const F2W_FOLK=[
   ['f_frz_postman',1950,42800,'postman',S('a lost postman','a postman'),S('Special delivery! For... the fish? I think I got lost.','A letter for the fish? I am lost.'),{coins:25,after:S('Which way is Hearthold? Never mind, I will follow the dragon.','Which way is home?')}],
   ['f_frz_knight',6500,44400,'knight',S('a Hearthold knight','a knight'),S("The Dreadgate! It's... still closed. Good. I'll just stand here a bit more. Not frozen. Just brave.",'The Dreadgate is still shut. Good.'),{coins:30,lvl:1,after:S('Not frozen. Just brave. Very brave. Is it cold, or is it me?','Not frozen. Just brave.')}],
   ['f_frz_kid',7900,48150,'kid',S('a sledding kid','a sledding kid'),S('WHEEEEE... eee? Why did I stop? I was going SO fast.','WHEEE! Why did I stop?'),{coins:10,kid:true,sled:true,after:S('Again! AGAIN!','Again!')}],
-  ['f_ylva',1950,46746,'ylva',S('Grandmother Ylva','Ylva'),S("I wasn't frozen, dear. I was resting my eyes.",'I was just resting my eyes, dear.'),{lvl:3,rime:true}],
+  // (Ylva knits at the front-right corner of the tower top, in front of the bell's roof; her red yarn runs along the
+  //  front edge and down the south face beside the frozen door. At the back (1950,46746) the bell pavilion was drawn
+  //  over her and a kid could not see her; at the front-left her ice block stood on the top of the claws' climb)
+  ['f_ylva',1980,46790,'ylva',S('Grandmother Ylva','Ylva'),S("I wasn't frozen, dear. I was resting my eyes.",'I was just resting my eyes, dear.'),{lvl:3,rime:true}],
   ['f_tollef',1950,46904,'tollef',S('Tollef the Bellringer','Tollef'),S("WHAT? OH! HELLO! I CAN'T HEAR YOU, I'VE BEEN STANDING NEXT TO A BELL FOR FORTY YEARS!",'WHAT? HELLO! I CANNOT HEAR YOU!'),{rime:true,lock:'door'}],
   ['f_saga',1150,46900,'saga',S('Saga the fisher','Saga'),S('I had a bite! A big one! ...It got away. A month ago. Probably.','I had a bite! It got away.'),{rime:true,fish:true}],
   ['f_sigrun',2310,47196,'sigrun',S('Sigrun the Cook','Sigrun'),S("My soup! My SOUP! It's a soup-sicle. ...Actually, that's not bad. Lick it.",'My soup is a soup-sicle!'),{rime:true,lvl:2,pot:true}],
@@ -59733,7 +59785,7 @@ const F2P_FROZEN=[
   {id:'f_frz_kid',name:S('a sledding kid','a sledding kid'),x:7900,y:48150,coins:15,kid:true,look:f2pLk('#c8946c','#2a1a10',{hairdo:'spiky',outfit:'coat',shirt:'#3a8a5a',low:'#3a3a4a',hat:'beanie',hatc:'#c84a3a',mittens:'#c84a3a',sled:true}),
     line:S(`WHEEEEE... eee? Why did I stop? I was going SO fast.`,`WHEEE... Why did I stop? I was SO fast!`),after:S(`Again! AGAIN! Soren, push me again!`,`Again! Push me again!`)},
   // Rimeholm (ACT3 4.2): Ylva is the main story (6.6); the others are Rimeholm, One Thaw at a Time (10.5)
-  {id:'f_ylva',who:'f_ylva',x:1950,y:46750,lines:()=>STORY.f_ylva||[f2pN(`The ice on the old woman goes soft, then slushy, then drips away. She blinks. She looks down at her knitting.`,`The ice drips away. The old woman blinks.`),
+  {id:'f_ylva',who:'f_ylva',x:1980,y:46790,lines:()=>STORY.f_ylva||[f2pN(`The ice on the old woman goes soft, then slushy, then drips away. She blinks. She looks down at her knitting.`,`The ice drips away. The old woman blinks.`),
     f2pL('f_ylva',`Oh, bother. I dropped a stitch. Hello, dear. I wasn't frozen. I was resting my eyes.`,`Oh, bother. A dropped stitch. I was resting my eyes, dear.`)],onThaw:()=>{ if(typeof f2sBeat==='function') try{ f2sBeat('ylva'); return; }catch(e){} G.flags.f_ylva=1; }},   // x2_story plays her scene (F2STORY.md 4)
   {id:'f_tollef',who:'f_tollef',x:1950,y:46830,lines:()=>[f2pL('f_tollef',`WHAT? OH! HELLO! I CAN'T HEAR YOU, I'VE BEEN STANDING NEXT TO A BELL FOR FORTY YEARS!`,`WHAT? HELLO! I CAN'T HEAR! TOO MANY BELLS!`),f2pL('f_tollef',`THE BELL HAS A SONG! THE SNOW MOTHER'S SONG! I ONLY KNOW THE FIRST BIT!`,`THE BELL HAS A SONG! I KNOW THE FIRST BIT!`)]},
   {id:'f_saga',who:'f_saga',x:1150,y:46900,coins:10,lines:()=>[f2pL('f_saga',`I had a bite! A big one! ...It got away. A month ago. Probably.`,`I had a big bite! It got away. A month ago.`),f2pL('f_saga',`Here. Some bait. Good bait. Don't eat it.`,`Here. Good bait. Don't eat it.`)],onThaw:()=>{ giveItems({fish:1},true); }},
@@ -62531,7 +62583,11 @@ f2Site('f_glaciar','f_glaciar',{boss:'f_glaciar',at:{x:F2CR.x,y:F2CR.y,r:F2CR.r,
   open:()=>!G.bossDone.f_glaciar&&!G.flags.f_glaciar_won,
   arena:{shape:'ring',r:F2CR.wall,style:'ice',skipBlocked:true},flyOK:false,music:'f_glaciar',spawn:P=>({x:P.x,y:P.y}),
   onStart(){ f2FightStart('f_glaciar'); }, onReset(){ f2FightReset('f_glaciar'); },
-  onWin(){ const out=G.choices.f_glaciar||F2G.outcome||'defeat'; G.flags.f_glaciar_won=1; G.flags.f_shard2_got=1; f2Won('f_glaciar');
+  onWin(){ const out=G.choices.f_glaciar||F2G.outcome||'defeat'; G.flags.f_glaciar_won=1; G.flags.f_shard2_got=1;
+    // (her last Shardlings go with her: one left flying round the Crown kept Ash "in combat", and in combat no prompt
+    //  shows, so the walk-up talk with her after the fight (f_glaciar.js f3_auntie) could not be started)
+    for(const q of G.enemies) if(!q.dead&&q.type==='f_shardling') q.dead=true;
+    f2Won('f_glaciar');
     try{ if(F2.hook.glaciarDone) F2.hook.glaciarDone(out); }catch(err){ console.error(err); } }});
 // ---- the Chain Stones, the chains and the plates (drawn while she is on the Crown)
 function f2GlaGround(){ if(!F2G.on&&!(G.boss&&G.boss.type==='f_glaciar')) return; const t=G.time; ctx.save();
@@ -63669,16 +63725,19 @@ STORY.f_hints={
   f_snow:S(`Frostpine Lodge, in the far north-west of Embermere. Ulf will know about the pass. (I can't see it from in here. I'm just guessing. I'm very good at guessing.)`,`Go to Frostpine Lodge, far north-west. Ask Ulf about the pass.`),
   f_pass:S(`Up the High Pass, then follow the White Road east to Hearthold. Look for the town with the wall. And the smoke. And the warmth. Mostly the warmth.`,`Climb the High Pass. Follow the White Road east to Hearthold.`),
   f_hearth:S(`The Hearthkeeper is at the Great Hearth, right in the middle of town. Big fireplace. Can't miss it.`,`The Hearthkeeper is at the Great Hearth, in the middle of town.`),
-  f_maze:S(`North of Hearthold to Glimmer Point, then across the ice to the Glacier Maze. Walk on the water around the door.`,`Go north to Glimmer Point. Cross the ice to the Glacier Maze.`),
-  f_kindle:S(`Hold your fire breath until it turns blue and give it to the Great Hearth. Then melt that North Gate.`,`Hold your fire until it turns blue. Give it to the Hearth. Then melt the North Gate.`),
-  f_thaw:S(`Rimeholm is west, on the sea cliffs. The oldest granny will be at the top of the bell tower. Climb.`,`Rimeholm is west, on the cliffs. Climb the bell tower.`),
+  f_maze:S(`The North Gate is frozen shut. Ask Captain Brann at the West Gate for the way round to the Glacier Maze.`,`The North Gate is frozen. Ask Captain Brann the way round.`),
+  f_kindle:S(`Hold your fire breath until it turns blue and give it to the Great Hearth. Don't be shy.`,`Hold your fire until it turns blue. Give it to the Hearth.`),
+  f_thaw:S(`Rimeholm is west, on the sea cliffs. Somebody there must have seen what froze it. Look closely at everything.`,`Rimeholm is west, on the cliffs. Who saw what froze it?`),
   f_sky:S(`East on the Wind Road, up onto the Windscour. From the east rim, fly the updraft out to the Sky Isles.`,`Go east up the Wind Road. Fly from the east rim to the Sky Isles.`),
   f_gap:S(`The wind ribbons on the Windscour's north rim cross the Howling Gap. Stonehorn Deep is the giant ram skull.`,`Ride the wind ribbons over the Howling Gap. Find the giant ram skull.`),
   f_deep:S(`Deep in the Stonehorn halls. Pound everything that looks cracked.`,`Pound everything that looks cracked.`),
-  f_dreadgate:S(`The big vent on the Dreadmoor starts the Wind Road. Ride it up to the drum. Then pound it.`,`Ride the Wind Road up to the drum. Then pound it.`),
+  f_dreadgate:S(`Those doors won't open for asking. Look at the Frost Lock, and look up at the mountain. Then think.`,`Look at the lock. Look up at the mountain. Think.`),
   f_dread:S(`Up through the mountain. Melt every chain. I'm right here with you. Shivering.`,`Go up through the mountain. Melt every chain.`),
   f_glaciar:S(`She's on the summit. Melt the four chains, Ash. She's not bad. She's under a spell.`,`She's on top. Melt the four chains. She's under a spell.`)
 };
+// Tove's line in Yara's talk: the story data's own hint for the step Ash is on when the data owns the stage (the data's
+// hints say where to look and never a Case Book answer), else the table above
+function f2sToveHint(){ let h=''; try{ const D=typeof stageDef==='function'?stageDef(G.stage):null; if(D&&D._s10&&typeof D.hint==='function') h=D.hint()||''; }catch(e){ console.error(e); } return h||STORY.f_hints[G.stage]||STORY.f_hints.f_snow; }
 STORY.f_yara=S(`I'm reading Pebble's letters like a storybook, Ash. Do what Tove says.`,`I read Pebble's letters like a storybook. Do what Tove says.`);
 
 // ---------- 4. the dungeon story lines (bible section 7), played by the dungeon helpers (x2_dun_a, x2_dun_b).
@@ -64078,7 +64137,7 @@ defineAct(3,{arrive:'f_snow',at:{x:1560,y:3540},intro(o){ later(3.3,()=>f2sWhen(
 onTalk(n=>{
   if(!f2sOn()) return false;
   const F=G.flags;
-  if(n.id==='yara'&&!F2ST.yara[G.stage]){ F2ST.yara[G.stage]=1; f2sPlay([['yara',STORY.f_yara],['tove',STORY.f_hints[G.stage]||STORY.f_hints.f_snow]]); return true; }
+  if(n.id==='yara'&&!F2ST.yara[G.stage]){ F2ST.yara[G.stage]=1; f2sPlay([['yara',STORY.f_yara],['tove',f2sToveHint()]]); return true; }
   if(n.id==='c_vesper'&&n.f2sGate){ f2sPlay([xl('c_vesper',`Nobody gets past me, cousin. Not a moth, not a mouse. I checked the mouse twice.`,`Nobody gets past me. Not a moth. Not a mouse.`),
     f2sIf('c_vesper',`Go on up. Bring your auntie home.`,`Go on up. Bring your auntie home.`,()=>!G.choices.f_glaciar)]); return true; }
   return false;
@@ -64119,6 +64178,15 @@ function f2sKindleFx(){
   try{ SFX.play('boom'); jingle('levelup','level'); }catch(e){}
   for(let i=0;i<6;i++) later(i*0.16,()=>emit(P.x+rand(-30,30),P.y-30,30,{col:i%2?'120,190,255':'255,210,110',ang:-Math.PI/2,spread:0.5,smin:120,smax:460,lmin:.6,lmax:1.3,zmin:4,zmax:9,grow:10,rise:60}));
 }
+// the fire column out of the Great Hearth after the WHOOMPH (it also roars while the scene talks: see liteUpdate below)
+function f2sHearthCol(dt){ if(!(F2ST.hearthFx>0)) return; F2ST.hearthFx-=dt; const P=f2sLm('f_lm_hearth','hearth'); if(Math.random()<0.9) emit(P.x+rand(-26,26),P.y-20,2,{kind:Math.random()<0.5?'bfire':'fire',ang:-Math.PI/2,spread:0.3,smin:200,smax:520,lmin:.5,lmax:1,zmin:4,zmax:9,grow:8}); }
+// the story data (game/story/act3) asks for this module's pictures with storyEmit('f3fx:<name>'): the data has no
+// flash or shake of its own. whoomph: the Hearth roars up (f_kindle.js f3_kindle). The engine's storyListen (I5) when
+// it is there, else a wrapper round storyEmit
+const F2S_FX={whoomph:()=>f2sKindleFx()};
+{ const run=rest=>{ const m=/^(\w+)/.exec(String(rest||'')); if(!m) return; if(!F2S_FX[m[1]]){ console.error('x2_story: unknown f3fx:'+rest); return; } if(G&&G.mode==='story') F2S_FX[m[1]](); };
+  if(typeof storyListen==='function') storyListen('f3fx:',rest=>{ try{ run(rest); }catch(e){ console.error(e); } });
+  else { const base=storyEmit; storyEmit=function(name){ const r=base.apply(this,arguments); try{ const n=String(name||''); if(n.startsWith('f3fx:')) run(n.slice(5)); }catch(e){ console.error(e); } return r; }; window.storyEmit=storyEmit; } }
 function f2sKindle(){
   if(f2sSeen('f_kindle')) return;
   f2sPlay('f_kindle',()=>{
@@ -64521,6 +64589,10 @@ function f2sTick(dt){
   f2sQueue(dt); f2sBossTick(dt);
   if(actOf(G.stage)!==3) return;
   const F=G.flags;
+  // Mom's snow letter (f_pb_1): the data's f_snow sends Pebble once, when its first step starts. A save made before
+  // she landed (her flight is not saved), or a long spell with no calm moment (she gives up), sends her again, so the
+  // letter never just stops coming
+  if(G.stage==='f_snow'&&!F.f_pb_1&&!f2sSeen('f_intro')&&typeof PEBRT!=='undefined'&&!PEBRT.crow&&!PEBRT.want&&!(G.time<F2ST.pbT)){ F2ST.pbT=G.time+20; try{ pebbleNow('f_pb_1'); }catch(e){ console.error(e); } }
   f2sFergusTick(); f2sNudgeTick(); f2sStubTick();
   // Rimeholm and Grandmother Ylva can be reached by the Rim Road before the North Gate: their scenes play whenever
   // Ash gets there with Blaze (the stage then moves on by itself)
@@ -64529,14 +64601,14 @@ function f2sTick(dt){
     if(f2sYlvaDue()) f2sWhen('ylva',null,()=>f2sYlva());
   }
   if(G.stage==='f_thaw'&&f2sSeen('f_ylva_end')&&!DLG&&scene==='play') goStage('f_sky');
-  if(F2ST.hearthFx>0){ F2ST.hearthFx-=dt; const P=f2sLm('f_lm_hearth','hearth'); if(Math.random()<0.9) emit(P.x+rand(-26,26),P.y-20,2,{kind:Math.random()<0.5?'bfire':'fire',ang:-Math.PI/2,spread:0.3,smin:200,smax:520,lmin:.5,lmax:1,zmin:4,zmax:9,grow:8}); }
+  f2sHearthCol(dt);
   if(F2ST.glacLeave>0){ F2ST.glacLeave+=dt; if(F2ST.glacLeave>4) F2ST.glacLeave=-1; }
   if(F2ST.hush) F2ST.hush.t+=dt;
 }
 { const base=updateStory; updateStory=function(dt){ base(dt); try{ f2sTick(dt); }catch(e){ console.error(e); } }; }
 { const base=updateArea; updateArea=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&!G.done){ f2sTick(dt); const d=STAGEDEF[G.stage]; if(d&&d.update&&actOf(G.stage)===3) d.update(dt); } }catch(e){ console.error(e); } }; }
 // a fade a scene starts under (the night in Hearthold) clears while the scene plays
-{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'&&scene==='dialogue'&&G.fade>0&&F2ST.fade) G.fade=Math.max(0,G.fade-dt*1.2); if(F2ST.fade&&G.fade<=0) F2ST.fade=false; if(F2ST.hush&&scene==='dialogue') F2ST.hush.t+=dt; }catch(e){} }; }
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'&&scene==='dialogue'&&G.fade>0&&F2ST.fade) G.fade=Math.max(0,G.fade-dt*1.2); if(F2ST.fade&&G.fade<=0) F2ST.fade=false; if(F2ST.hush&&scene==='dialogue') F2ST.hush.t+=dt; if(G&&G.mode==='story'&&scene==='dialogue') f2sHearthCol(dt); }catch(e){} }; }
 // the camera leans toward a scene (F2ST.cam = {x,y,k})
 { const base=updateCam; updateCam=function(dt,snap){
   const C=F2ST.cam; if(!C||AREA||!player||!G||G.mode!=='story') return base(dt,snap);
@@ -64607,6 +64679,8 @@ function f2sGlacMode(){
   const C=G.choices;
   if(F2ST.glacLeave<0||(C.f_glaciar==='free'&&C.f_glaciar_home==='north'&&!F2ST.glacLeave)) return null;
   if(F2ST.glac) return F2ST.glac.mode;
+  // (the finale: once Ash has sung her awake or she has flown to the peak with him, flag n5_glaciar, she is not here)
+  if(G.flags.n5_glaciar&&actOf(G.stage)>=5&&!F2ST.glac) return null;
   if(C.f_glaciar==='defeat') return 'sleep';
   if(C.f_glaciar==='free') return 'awake';
   if(reached('f_glaciar')&&!f2sGlacReal()) return 'spell';
@@ -68282,6 +68356,29 @@ defineMap(3,{id:'moon',name:S('Moonfall','Moonfall'),music:'m_sea',spawn:{x:1300
   onEnter(from){ m3wSync(true); },
   build(B){ m3wBuild(B); }
 });
+// (a region banner still waiting from the map Ash just left is stale on the next map: Act IV starts in Hearthold with
+// "Frostreach" queued behind the intro, and it showed up on the Clockwork Coast after the fast travel, or in Moonfall
+// after Glaciar's flight. The banner queue knows no maps, so a map change drops the waiting region banners; the new
+// map's own banner comes right after. CHANGES.md I4: this belongs in e1_maps' mapChanged.)
+function m3wStaleBanners(k){
+  if(!G) return; const M=MAPS[k], mine=M?simplify(String(M.name)):'', stale=b=>!!b&&b.style==='region'&&b.text!==mine;
+  if(G.bannerQ) G.bannerQ=G.bannerQ.filter(b=>!stale(b));
+  if(stale(G.banner)) G.banner=(G.bannerQ&&G.bannerQ.shift())||null;
+}
+{ const base=mapChanged; mapChanged=function(old,k,banner){ try{ m3wStaleBanners(k); }catch(e){ console.error(e); } return base(old,k,banner); }; }
+// (the quest line for a goal on another map: e1_maps' routeObj adds " (<the goal's map>: <crossing>)", which reads like
+// the goal's own place, "Gearhaven's Far Pier (The Clockwork Coast: The High Pass)" in Hearthold, A4a's leftover. In
+// Act IV it says the way instead: "Gearhaven's Far Pier (go by The High Pass)". CHANGES.md I4 ENGINE REQUEST (1): this
+// belongs in routeObj; once routeObj words it itself, the suffix below is not found and this does nothing.)
+function m3wRouteText(o){
+  if(!o||!o.via||typeof o.text!=='string'||!G||actOf(G.stage)!==4) return o;
+  const c=crossingsOn(curMap()).find(c=>c.id===o.via), nm=c&&(c.name||c.label); if(!nm) return o;
+  for(const k in MAPS){ const suf=simplify(` (${MAPS[k].name}: ${nm})`);
+    if(o.text.endsWith(suf)) return Object.assign({},o,{text:o.text.slice(0,-suf.length)+simplify(` (go by ${nm})`)}); }
+  return o;
+}
+{ const base=questObjective; questObjective=function(){ const o=base(); try{ return m3wRouteText(o); }catch(e){ console.error(e); return o; } }; }
+{ const base=focusObjective; focusObjective=function(){ const o=base(); try{ return m3wRouteText(o); }catch(e){ console.error(e); return o; } }; }
 MAPS[3].terrain.sea={landD:m3wLandD,shore:70,shelf:170}; MAPS[3].tz=null;
 // the sand under each desert biome is its own colour (the sampler mixes sand toward it)
 for(const [b,c] of [[34,[236,208,140]],[35,[232,191,108]],[37,[228,196,120]],[38,[236,240,246]]]) if(BIOMES[b]) BIOMES[b]._sand=c;
@@ -69581,6 +69678,15 @@ function m3pQuestFor(id){
 // the people this module speaks for in Moonfall (their story beats in x3_story's stages come first, see below)
 const M3P_TALKERS={dell:1,wren:1,f_mags:1,ev_tikka:1,maren:1,quill:1,juniper:1,c_vesper:1,m_sandy:1,f_glaciar:1};
 // ---------- 11. the returning cast in Moonfall (ACT4 4.1, 4.3, 6.2c, 11): one-line reasons, their own talk
+// v10 (CHANGES.md A4S, N5S): does the story data speak for this person in the current act? A talk entry of this very
+// act (a "what's new" line, a first talk or a menu option) that holds now. Then this module's hook stands down and the
+// person's menu opens with the data's words; what only this hook can do (Mags's spare bombs, Mom's star-iron, Juniper's
+// map shop, Tikka's bun, Glaciar's flight home) still comes first. (An earlier act's entries do not count: Act III's
+// lines for Mags are not for Moonfall.)
+function m3pDataTalk(id){
+  try{ if(typeof S10==='undefined'||!S10||!S10.booted||typeof s10TalkOk!=='function'||!G) return false;
+    const a=actOf(G.stage); return (S10.talk[id]||[]).some(T=>!T.bark&&T._owner&&+T._owner.act===a&&s10TalkOk(T)); }catch(e){ return false; }
+}
 function m3pTalkOnce(key,lines,then){ if(G.seenTalk&&G.seenTalk[key]) return false; G.seenTalk=G.seenTalk||{}; G.seenTalk[key]=1; m3pSay(lines,then); return true; }
 const M3P_DELL1=[m3pL('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
   m3pL('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),m3pL('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
@@ -69596,6 +69702,13 @@ onTalk(n=>{
   // a story beat of the current stage for this person wins (e7_acts runs the onTalk hooks before the stage's talk)
   { const d=STAGEDEF[G.stage]; if(d&&d.talk&&!G.done){ try{ if(d.talk(n)) return true; }catch(e){ console.error(e); } } }
   if(m3pQuestFor(id)) return false;
+  // (v10) what no data line can do, before the data's talk: Mags's spare bombs, Mom's star-iron, Juniper's map shop in
+  // Sable, Tikka's bun; then a person the story data speaks for in this act gets the data's talk (m3pDataTalk)
+  if(id==='f_mags'&&m3pR('m_reef')&&!(G.weapons&&G.weapons.bombs)){ m3pSay([m3pL('f_mags',`No bombs? NO BOMBS? Here. Take these. Don't thank me. Thank me a little.`,`No bombs? Here! Thank me a little.`)],()=>{ giveWeapon('bombs'); }); return true; }
+  if(id==='maren'&&m3pPierAll()&&G.items.m_stariron&&!G.flags.m_stariron_done&&m3pDataTalk(id)){ m3pSay([m3pStarIron()]); return true; }
+  if(id==='juniper'&&m3pAct()===4&&m3pR('m_sable')&&!(m3pR('n_bridge')&&stageAt('n_bridge')>=0)) return m3pJuniper(n);
+  if(id==='ev_tikka'&&G.flags.tk_come==='yes'&&!G.flags.m_tk_bun&&m3pDataTalk(id)){ G.flags.m_tk_bun=1; m3pSay([m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)],()=>giveItems({c_lumpybun:1})); return true; }
+  if(m3pDataTalk(id)) return false;
   // before the voyage: Dell at Gearhaven's Far Pier
   if(id==='dell'&&!G.flags.m_landed&&m3pR('m_sail')){
     m3pSay([m3pL('dell',pick([`Ash! The Soggy Biscuit Three, ready to sail east! Steam paddle, brass whistle, and sandwiches. Hop aboard at the end of the pier.`,`Past the end of every map I own! I've never been so happy or so scared! The boat's at the end of the pier.`]),`Ash! My boat is ready to sail east! Hop aboard at the end of the pier.`),
@@ -69614,11 +69727,11 @@ onTalk(n=>{
     m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three! Steam paddle, brass whistle, and a captain who has never once sunk her. It's been eleven days now.`,`Three days east and I still haven't sunk! Old Sal won't believe it.`,`Mags says the engine makes that noise on purpose. I've decided to believe her.`]),`My boat still floats! Eleven days!`),
       m3pL('dell',`If you want to sail home to Gearhaven, the boat's at the end of the dock. Just say.`,`Want to sail home? The boat's at the dock.`)]); return true; }
   if(id==='wren'&&m3pIV()&&m3pBoatIn()){
-    if(m3pTalkOnce('m3p_wren',M3P_WREN.slice())) return true;
+    // (her first talk is the story data's m_wren when it has one: A4S's "bring me a BOOK", the promise of m_leash)
+    if(m3pTalkOnce('m3p_wren',(typeof storyOwns==='function'&&storyOwns('scene','m_wren')&&Array.isArray(STORY.m_wren)?STORY.m_wren:M3P_WREN).slice())) return true;
     if(m3pQ('m_leash')){ m3pSay([m3pL('wren',pick([`Ripple and I are reading every pearl in the Archive. He forgets them, so we read them twice. It's heaven.`,`Page eleven! I keep taking it out to look at it. Ember's friends kept it for five hundred years. Under the SEA.`,`I'm writing it all down. "The Account of the Long Night." Chapter one: I was seasick.`]),`Ripple and I read every pearl. Twice!`)]); return true; }
     m3pSay([m3pL('wren',pick([`The raft keeps moving. My books keep moving. I keep reading. It's like a library that dances.`,`The merfolk keep Lumen's old books, Ash. Lumen's priests wrote about moths. Lots about moths.`]),`My books float! Lumen's priests wrote about moths.`)]); return true; }
   if(id==='f_mags'&&m3pIV()){
-    if(m3pR('m_reef')&&!(G.weapons&&G.weapons.bombs)){ m3pSay([m3pL('f_mags',`No bombs? NO BOMBS? Here. Take these. Don't thank me. Thank me a little.`,`No bombs? Here! Thank me a little.`)],()=>{ giveWeapon('bombs'); }); return true; }
     if(!G.seenTalk.m3p_mags){ G.seenTalk.m3p_mags=1; m3pSay([m3pL('f_mags',`Ash! I signed on as Dell's engineer. He pays me in sandwiches. I've got a workbench on the dock now. To sell bombs to pirates. Crab pirates. They have no money. It's going badly.`,`I'm Dell's engineer now! I sell bombs to crab pirates. They have no money.`)]); return true; }
     m3pSay([m3pL('f_mags',pick([`Do bombs work underwater? For SCIENCE? ...Yes. Now they do. Mostly.`,`The engine's FINE. That noise is a feature.`,`If it explodes, it's science. If it explodes twice, it's a lot of science.`]),`If it explodes, it's science!`)]); return true; }
   if(id==='ev_tikka'&&m3pIV()&&G.flags.tk_come==='yes'){
@@ -69626,7 +69739,7 @@ onTalk(n=>{
     m3pSay([m3pL('ev_tikka',m3pPier()?pick([`I made a bun for the mountain. It's lumpy. Lumpy means love. The mountain doesn't deserve it.`,`Captain Dell let me steer once. We went in a circle. A very brave circle.`]):pick([`Lumpy buns! Gilly says they need fish. They do NOT need fish.`,`I carried bread all the way across the sea. To somewhere important! This is the most important place I've ever been.`]),`Lumpy buns! Lumpy means love!`)].concat(bun?[m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)]:[]),()=>{ if(bun) giveItems({c_lumpybun:1}); }); return true; }
   if(id==='maren'&&m3pPierAll()){
     const L=[m3pL('maren',pick([`Eat something. I mean it. Mountains are hungry work. I've packed you a sandwich. It's squashed. It's still a sandwich.`,`I mended the Heart. You'll mend the rest. That's how it works in our family: somebody hits it, and somebody breathes.`,`I'm going to stand right here and watch that bridge until you come back down it. Don't argue. You can't. I'm your mother.`]),`Eat something. I'll wait right here.`)];
-    if(G.items.m_stariron&&!G.flags.m_stariron_done) L.push(ch('maren',S(`What's that in your satchel? Is that... star-iron?`,`Is that star-iron?`),[{t:S('Show Mom the star-iron','Show Mom the star-iron'),fn:()=>{ takeItems({m_stariron:1}); G.flags.m_stariron_done=1; player.stats.slash*=1.10; },then:[m3pL('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Your sword will never be the same!`),m3pN(`TING. TING. TING. Mom hands your sword back. It hums like a moonlit bell.`,`TING. TING. TING. Your sword hums.`),m3pDo(()=>setBanner(S('Star-iron reforge','Star-iron reforge'),S('Your sword hits 10 percent harder.','Your sword hits harder!'),2.6))]},{t:S('Later','Later'),then:[m3pL('maren',`Bring it when you're ready. I'll bring the hammer.`,`Bring it when you're ready.`)]}]));
+    if(G.items.m_stariron&&!G.flags.m_stariron_done) L.push(m3pStarIron());
     m3pSay(L); return true; }
   if(id==='quill'&&m3pPierAll()){ m3pSay([m3pL('quill',pick([`My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have LOVED this. A mountain! Out of the SEA! I'd have hated to tell him the moon is gone.`,`I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.`,`Every time I look through the telescope, the black glass looks back. Fascinating. Terrifying. Mostly fascinating.`]),`I measured the mountain. It's getting taller!`)]); return true; }
   if(id==='juniper'&&m3pIV()&&m3pR('m_sable')) return m3pJuniper(n);
@@ -69639,6 +69752,10 @@ onTalk(n=>{
       G.bossDone&&G.bossDone.m_gravelgut||m3pR('m_glasswall')?`My husband is better now. He's sleeping.`:`Is my husband sick? He ate something shiny.`)]); return true; }
   return false;
 });
+// Mom and the star-iron (the Fallen Star secret): she folds it into Ash's sword on the Moon Pier
+function m3pStarIron(){
+  return ch('maren',S(`What's that in your satchel? Is that... star-iron?`,`Is that star-iron?`),[{t:S('Show Mom the star-iron','Show Mom the star-iron'),fn:()=>{ takeItems({m_stariron:1}); G.flags.m_stariron_done=1; player.stats.slash*=1.10; },then:[m3pL('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Your sword will never be the same!`),m3pN(`TING. TING. TING. Mom hands your sword back. It hums like a moonlit bell.`,`TING. TING. TING. Your sword hums.`),m3pDo(()=>setBanner(S('Star-iron reforge','Star-iron reforge'),S('Your sword hits 10 percent harder.','Your sword hits harder!'),2.6))]},{t:S('Later','Later'),then:[m3pL('maren',`Bring it when you're ready. I'll bring the hammer.`,`Bring it when you're ready.`)]}]);
+}
 // Juniper's Map Tent in Sable (ACT4 4.3): the four Act IV dungeon maps, 40 coins each; the Observatory's for free
 const M3P_DUN=[['m_lumen',S('Drowned Lumen','Drowned Lumen')],['m_burrows',S('the Sandworm Burrows','the Sandworm Burrows')],['m_mirror',S('the Mirror Temple','the Mirror Temple')],['m_obs',S('the Eclipse Observatory','the Eclipse Observatory')]];
 function m3pMapKey(id){ const D=typeof DUNGEONS!=='undefined'&&DUNGEONS[id]; return 'dmap_'+((D&&D.save)||id); }
@@ -74118,8 +74235,7 @@ function m3sHeartWhole(){
   if(G.flags.m_heart&&G.items.m_heart) return;
   const S3={}; for(const k of ['c_shard1','f_shard2','m_shard3']) if(G.items[k]>0) S3[k]=G.items[k]; takeItems(S3);
   giveItems({m_heart:1}); G.flags.m_heart=1; G.flags.m_reforged=1; if(!G.flags.m_reforge_xp){ G.flags.m_reforge_xp=1; gainXp(M3S_XP.reforge); }
-  flashA=0.7; flashCol='255,190,110'; shake(8); m3sJ('complete','shrine');
-  emit(player.x,player.y-30,60,{col:'255,190,100',ang:-Math.PI/2,spread:1.6,smin:60,smax:280,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30});
+  m3sHeartFx();
 }
 // the reforging in room q: Mom's scene, the three taps, the Heart; then everyone runs down to the Moon Pier
 function m3sReforge(){
@@ -74349,8 +74465,10 @@ function m3sDrawWorld(){
     if(E.flyer){ const F=E.flyer; ctx.save(); ctx.globalAlpha=Math.min(1,F.t)*Math.min(1,(5-F.t)); ctx.translate(F.x,F.y-260); ctx.rotate(0.6); ctx.scale(0.35,0.35); m3sMothFig(ctx,190,0.75+0.25*Math.cos(t*4),M3S_HUSH,0); ctx.restore(); }
   }
   m3sDrawHushFx();
-  // after the peak rises: the start of the moonfire bridge glows at the end of the Moon Pier (the finale builds the bridge)
-  if(G.flags.m_eclipse3&&!AREA&&curMap()===3&&inView(M3SP.pierEnd.x,M3SP.pierEnd.y,300)&&!LANDMARKS.some(o=>o.id==='xing_n_bridge_in')){
+  // after the peak rises: the start of the moonfire bridge glows at the end of the Moon Pier, until the finale's own
+  // bridge shows there (its crossing is hidden until n_bridge, so Act IV's walk to the end of the pier needs this one)
+  const finBridge=LANDMARKS.some(o=>o.id==='xing_n_bridge_in')&&(!!G.flags.n_bridge_open||(stageAt('n_bridge')>=0&&reached('n_bridge')));
+  if(G.flags.m_eclipse3&&!AREA&&curMap()===3&&inView(M3SP.pierEnd.x,M3SP.pierEnd.y,300)&&!finBridge){
     const pk=M3S.peak, b=pk?pk.bridge:1;
     if(b>0.01){ ctx.save(); ctx.globalCompositeOperation='lighter'; const x0=M3SP.pierEnd.x, y0=M3SP.pierEnd.y, x1=x0+600*b;
       const gr=ctx.createLinearGradient(x0,y0,x1,y0); gr.addColorStop(0,'rgba(220,232,255,.9)'); gr.addColorStop(1,'rgba(160,190,255,0)');
@@ -74614,6 +74732,9 @@ onTalk(n=>{
   if(!G||G.mode!=='story'||G.done||curMap()!==3) return false;
   const a=actOf(G.stage); if(a!==4&&a!==5) return false;
   const F=G.flags;
+  // (the star-iron is Mom's own business; otherwise the story data's talk for this act wins, as in x3_people)
+  if(n.id==='maren'&&F.m_maren&&G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; }
+  if(typeof m3pDataTalk==='function'&&m3pDataTalk(n.id)) return false;
   if(n.id==='wren'&&!M3S_PRE.wren&&a===4&&!m3sSeen('m_wren')&&!G.items.m_book_raw){ m3sPlay('m_wren'); return true; }
   if(n.id==='dell'&&!M3S_PRE.dell1&&a===4&&!m3sSeen('m_dell1')&&reached('m_drift')&&!F.m_reforged){ m3sPlay('m_dell1'); return true; }
   if(n.id==='maren'&&F.m_maren){ if(G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; } if(F.m_done&&a===4){ m3sPlay('m_pier_mom'); return true; } }
@@ -74629,7 +74750,7 @@ function m3sMomLetterFirst(){ const F=G.flags; if(!F.m_eclipse2||F.m_pb_3||reach
 
 // ---------- 12. saves: transient state resets; older Act IV saves get the flags their stage implies
 function m3sReset(){
-  Object.assign(M3S,{q:[],rep:{},cam:null,ecl:null,peak:null,voy:null,forge:null,hushFx:null,hushRun:false,hushFin:null,hushE:null,introQ:false,boss:null,grey:0,fadeTo:null,landing:false,eclRun:false,forgeRun:false,pipQ:false,pipT:0,endQ:false,endT:0,endAt:0,finT:0});
+  Object.assign(M3S,{q:[],rep:{},cam:null,ecl:null,peak:null,voy:null,forge:null,hushFx:null,hushRun:false,hushFin:null,hushE:null,introQ:false,boss:null,grey:0,fadeTo:null,landing:false,eclRun:false,forgeRun:false,pipQ:false,pipT:0,endQ:false,endT:0,endAt:0,finT:0,fxOn:false,fxCalm:0,forgeCalm:0});
   if(G&&G.flags) G.flags.m_eclipse_on=0; if(scene==='m3forge') scene='play';
 }
 { const base=newRun; newRun=function(mode){ base(mode); try{ m3sReset(); }catch(e){} }; }
@@ -74663,6 +74784,62 @@ function m3sKit(){
   if(at('m_moonpath')){ A.moonfire=true; if(G.flags.pip) G.flags.m_pip_lamp=1; }
 }
 { const base=window.__ebX&&window.__ebX.actStart; if(typeof base==='function') window.__ebX.actStart=function(n,w){ const r=base(n,w); try{ if((n|0)===4&&G.mode==='story'){ m3sMigrate(); m3sKit(); if(typeof bitesOf==='function') G.flags.moon_hud=bitesOf(); setupNPCs(); saveGame(true); } }catch(e){ console.error(e); } return r; }; }
+// ---------- 12b. v10: Act IV is story data now (game/story/act4). Its scene lines call this file's old pictures with
+// storyEmit('m4fx:<name>[:<arg>]') (the names A4b's data emits): the eclipses (m3sEcl's commands), Hush's leash and her
+// going (m3sHushPose), Mom and Quill coming up the stairs, the three taps of the reforge, the Heart made whole, the party
+// on the pier looking out to sea, and the black peak's vista (m3sPeak). G.flags.s10_fx says this listener is in, so the
+// data's own stand-in pictures (places shown only with !flag s10_fx) step aside.
+function m3sFx(cmd){
+  const [k,a,b]=String(cmd).split(':'), cam=M3S.cam;
+  switch(k){
+    // (the data scene aims its own camera: an eclipse command only draws)
+    case 'ecl': m3sEcl(a,b!=null&&b!==''?+b:undefined); M3S.cam=cam; M3S.fxOn=true; break;
+    case 'hush': if(!M3S.hushFx) m3sHushFxAt(null); m3sHushPose(a); break;
+    case 'mom_in': m3sMomIn(); break;
+    case 'forge': m3sFxForge(); break;
+    case 'heart_whole': m3sHeartFx(); break;
+    case 'party_look': m3sPartyLook(); break;
+    case 'peak': m3sPeak(a); M3S.fxOn=true; break;
+    default: console.error('m4fx: unknown picture '+cmd);
+  }
+}
+// (the engine's storyListen when it has one (I5); else this file wraps storyEmit and window.storyEmit)
+if(typeof storyListen==='function') storyListen('m4fx:',rest=>{ try{ if(G&&G.mode==='story') m3sFx(rest); }catch(e){ console.error(e); } });
+else { const base=storyEmit; storyEmit=function(name){ const r=base(name); try{ const s=String(name||'');
+    if(s.startsWith('m4fx:')&&G&&G.mode==='story') m3sFx(s.slice(5)); }catch(e){ console.error(e); } return r; };
+  window.storyEmit=storyEmit; }
+// the three taps (m_reforge's last line): they start as soon as Mom's scene is over, and the data's next step (the
+// Heart, m_reforge2) waits for them (its step `if: '!flag m4_forging'`). A reload in the middle starts them again; the
+// test autoplay goes straight on.
+function m3sFxForge(){
+  if(G.flags.m_reforged) return;
+  if(typeof S10!=='undefined'&&S10&&S10.auto) return;
+  G.flags.m4_forging=1;
+}
+function m3sForgeWatch(dt){
+  const F=G.flags; if(!F.m4_forging||M3S.forge) return;
+  if(F.m_reforged||G.stage!=='m_reforge'||(typeof S10!=='undefined'&&S10&&S10.auto)){ F.m4_forging=0; return; }
+  if(scene!=='play'||DLG||G.mini){ M3S.forgeCalm=0; return; }
+  M3S.forgeCalm=(M3S.forgeCalm||0)+dt; if(M3S.forgeCalm<0.2) return;
+  M3S.forgeCalm=0; m3sForgeTaps(()=>{ G.flags.m4_forging=0; try{ questUpdated(); }catch(e){} });
+}
+// the pictures of the Heart made whole (the data gives the Heart and takes the Shards itself)
+function m3sHeartFx(){
+  flashA=0.7; flashCol='255,190,110'; shake(8); m3sJ('complete','shrine');
+  emit(player.x,player.y-30,60,{col:'255,190,100',ang:-Math.PI/2,spread:1.6,smin:60,smax:280,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30});
+}
+// a data scene that started an eclipse or the vista is over: the eclipse ends and the vista fades, leaving the world's
+// own peak on the horizon (x3_world) and the glow of the bridge at the end of the pier (m3sDrawWorld)
+function m3sFxAfter(dt){
+  if(!M3S.fxOn) return;
+  if(scene!=='play'||DLG){ M3S.fxCalm=0; return; }
+  M3S.fxCalm=(M3S.fxCalm||0)+dt; if(M3S.fxCalm<0.3) return;
+  M3S.fxOn=false; M3S.fxCalm=0;
+  if(M3S.ecl&&!M3S.ecl.ending) m3sEcl('end');
+  if(M3S.peak) M3S.peak.aT=0;
+}
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'){ if(G.flags&&!G.flags.s10_fx) G.flags.s10_fx=1; m3sForgeWatch(dt); m3sFxAfter(dt); } }catch(e){ console.error(e); } }; }
+{ const base=simUpdate; simUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'){ if(G.flags&&!G.flags.s10_fx) G.flags.s10_fx=1; m3sForgeWatch(dt); m3sFxAfter(dt); } }catch(e){ console.error(e); } }; }
 // ---------- 13. cross-act threads Act IV owns (each added only if nobody added it first): Pebble's letters, the two
 // dreams, Tamsin's verse, the epilogue lines, the town chatter
 if(typeof pebbleLetter==='function'){
@@ -78431,6 +78608,9 @@ function n4fWon(k){
   if(!N4F.fight||N4F.fight.k===k){ N4F.fight=null; N4F.allies=[]; N4F.cue=null; }
   const t=N4FSITE[k]; if(t){ G.flags[t+'_won']=1; const n=N4FK[t]; if(n<5) G.flags['n_echo'+n+'_done']=1; }
   if(typeof N4F.hook.won==='function'){ n4fHook('won',k); return; }
+  // (v10) a stage the story data runs is moved on by its own fight step, after the steps that follow the fight (n_glass
+  // asks the Case Book's n5_wants after Echo 4); jumping here would skip them
+  if(typeof STAGEDEF!=='undefined'&&STAGEDEF[G.stage]&&STAGEDEF[G.stage]._s10) return;
   const N=N4F_NEXT[k]; if(N&&G.stage===N[0]&&typeof STAGEDEF!=='undefined'&&STAGEDEF[N[1]]) try{ setStage(N[1],N[2]); }catch(err){ console.error(err); }
 }
 // every frame (after the foes moved)
@@ -80130,16 +80310,26 @@ const n4sOn=()=>!!G&&G.mode==='story'&&actOf(G.stage)===5;
 const n4sMap4=()=>!!G&&!!player&&!AREA&&player.x<IZX-50&&curMap()===4;
 const n4sF=k=>!!(G&&G.flags&&G.flags[k]);
 const n4sEnd=()=>(G&&G.choices&&G.choices.ending)||'hero';
-const n4sVes=()=>typeof vesperFriend==='function'?!!vesperFriend():!!(G&&G.choices&&G.choices.c_vesper==='friend');
-const n4sGla=()=>!!(G&&G.choices&&G.choices.f_glaciar==='free');
-const n4sHushF=()=>!!(G&&G.choices&&G.choices.m_hush==='free');
+// the three friends Nyxara hurt count when an earlier act freed them, or when they were won back on the peak (the act 5
+// data's flags n5_vesper, n5_glaciar, n5_hush: Vesper's second chance on the Silk Gallery, the errands)
+const n4sVes=()=>(typeof vesperFriend==='function'?!!vesperFriend():!!(G&&G.choices&&G.choices.c_vesper==='friend'))||!!(G&&G.flags&&G.flags.n5_vesper);
+const n4sGla=()=>!!(G&&G.choices&&G.choices.f_glaciar==='free')||!!(G&&G.flags&&G.flags.n5_glaciar);
+const n4sHushF=()=>!!(G&&G.choices&&G.choices.m_hush==='free')||!!(G&&G.flags&&G.flags.n5_hush);
+// a Hush won back on the peak (not freed in Act IV) is small: a moth cut free goes back to her own size (q_n5_hush)
+const n4sHushSmall=()=>!!(G&&G.flags&&G.flags.n5_hush)&&!(G&&G.choices&&G.choices.m_hush==='free');
+// the act 5 data (v10): a scene of the act's chapters, the act file
+const n4sData=k=>{ try{ return typeof S10!=='undefined'&&S10.scenes&&S10.scenes[k]||null; }catch(e){ return null; } };
+const n4sAct5=()=>{ try{ return typeof S10!=='undefined'&&S10.acts&&S10.acts[5]||null; }catch(e){ return null; } };
 const n4sGrey=()=>!!(G&&G.choices&&G.choices.greymane==='ally');
 const n4sCin=()=>!!(G&&G.choices&&G.choices.cinder==='ally');
 const n4sTikka=()=>!!(G&&G.flags&&G.flags.tk_come==='yes');
 const n4sMom=()=>!!(G&&G.flags&&(G.flags.m_maren||G.flags.m_reforged));
 const n4sKnows=()=>typeof nKnowsNyx==='function'?!!nKnowsNyx():!!(G.flags.dr_seen_m_moth||G.flags.f_page11||G.flags.m_page11||G.found.n_pane_3);
-const n4sFreed=()=>typeof nFreed==='function'?nFreed():(n4sVes()?1:0)+(n4sGla()?1:0)+(n4sHushF()?1:0);
-const n4sMercy=()=>typeof nCanMercy==='function'?!!nCanMercy():n4sKnows()&&n4sFreed()>=2;
+// how many of those three are here, and whether the kind ending is open: with the act 5 data, its trust track
+// `friends` and its moth ending's condition (so this file, x4_foes and the data's choice agree); else the old counts
+const n4sFreed=()=>{ const A=n4sAct5(); if(A&&A.trust&&A.trust.friends) return +(G.flags[A.trust.friends]||0); return typeof nFreed==='function'?nFreed():(n4sVes()?1:0)+(n4sGla()?1:0)+(n4sHushF()?1:0); };
+const n4sMercy=()=>{ const A=n4sAct5(), m=A&&A.ending&&A.ending.moth; if(m&&m.if!=null&&typeof s10Cond==='function'){ try{ return !!s10Cond(m.if); }catch(e){ return false; } }
+  return typeof nCanMercy==='function'?!!nCanMercy():n4sKnows()&&n4sFreed()>=2; };
 const n4sQ=q=>!!(G&&G.quests&&G.quests[q]&&G.quests[q].done);
 const n4sIfL=(c,...L)=>{ let ok=false; try{ ok=typeof c==='function'?!!c():!!c; }catch(e){} return ok?L:[]; };
 const n4sDo=fn=>({who:'narr',text:'',fn,skipIf:()=>true});
@@ -80601,6 +80791,8 @@ n4sDef('n_heart_start',()=>[
 ],{again:true});
 // the four voices: [speaker, line, light colour, who it is for the light]
 function n4sSeamLines(k){
+  // the act 5 data's four voices (n_seam_0..3; each voice's light is its emit n4fx:voice:<who>)
+  const D=n4sData('n_seam_'+k); if(D&&typeof s10Lines==='function') return s10Lines(D,{sc:'n_seam_'+k});
   const v=(who,f,s,col)=>[n4sDo(()=>n4sVoice(who,col)),xl(who,f,s)];
   if(k===0) return n4sVes()?v('c_vesper',`Hey. Cousin. Emberbloods without fire still have warm hands. Here. Take mine.`,`Cousin. I have no fire. But my hands are warm. Take them.`,'180,140,255')
     :v('juniper',`Ash! You can't get lost now. I drew you a map. Follow it home!`,`Ash! You can't get lost. I drew you a map!`,'180,140,255');
@@ -80856,6 +81048,17 @@ function n4sEpiLines(){
     xl('narr',`And on the next Lantern Day, the thousand-and-first, everyone came to the green in Emberhollow.`,`On the next Lantern Day, everyone came to the green.`),
     {who:'narr',text:S(`Ash lit the first lantern. And then one more than needed. Just in case.`,`Ash lit the first lantern. And one more, just in case.`),fn:()=>{ if(N4ST.book) N4ST.book.lit=1; }},
     xl('narr',`And whatever the moon looked like, it always, always came back.`,`And the moon always, always came back.`));
+  return L;
+}
+// the act 5 data's epilogue book: the act file's book: [{ page, epi?, skip? }], each page scene in order (its first beat
+// turns to its painted plate with n4fx:book:<plate>), and after a page with epi at most one side-quest line of that land
+// (EPI, THREADS 18.3) that does not match skip. null when the data has no book (the lines above play instead).
+function n4sBookLines(){
+  const A=n4sAct5(); if(!A||!Array.isArray(A.book)||!A.book.length||typeof s10Lines!=='function') return null;
+  const L=[n4sDo(()=>{ if(!N4ST.book) n4sBookOpen(); G.flags.n_epi=1; })];
+  for(const pg of A.book){ const sc=n4sData(pg.page); if(!sc){ console.error('n4s book: no scene',pg.page); continue; }
+    L.push(...s10Lines(sc,{sc:pg.page}));
+    if(pg.epi){ let re=null; try{ re=pg.skip?new RegExp(pg.skip):null; }catch(e){} L.push(...n4sEpiPick(pg.epi,re).slice(0,1)); } }
   return L;
 }
 // ---------- the storybook: a painted scene behind the dialogue (DOM, under the dialogue box, never takes clicks)
@@ -81156,9 +81359,15 @@ defineStages(5,[
 ]);
 defineAct(5,{name:S('Nightfall Peak','Nightfall Peak'),map:4,arrive:'n_bridge',at:{x:13450,y:65450},intro:o=>n4sActIntro(o||{})});
 // the Act IV hand-off: Ash is on the Moon Pier; the bridge is open from the first stage on
-function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself (x4_world reads reached('n_bridge')) */ }
+function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself (x4_world reads reached('n_bridge')) */
+  // Duchess leaves Hollis Farm: she is following Ash up the peak (placeGoat leaves her off map 0 until the dawn)
+  try{ placeGoat(); }catch(e){ console.error(e); } }
 // during the finale the stock "Travel to <site>" lines for older boss sites would pull Ash off the peak: only the peak's own
-{ const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5) return out.filter(o=>!o.site||/^n_/.test(String(o.site))); }catch(e){} return out; }; }
+// (I5) from her fall to the final choice there is nothing left to defeat or travel to (she lies there alive, so the
+// HUD said "Defeat Nyxara", or "Travel to The Moon's Rest"): it says what is being asked
+{ const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5){
+  if(N4ST.run&&!(G.choices&&G.choices.n_end)) return [{text:S('Choose how the Long Night ends','Choose how it ends')}];
+  return out.filter(o=>!o.site||/^n_/.test(String(o.site))); } }catch(e){} return out; }; }
 
 // ---------- 4. the departure (before the fade), the arrival, the Bridgefoot
 // the moonfire bridge from Moonfall: the first time, the departure plays on the Moon Pier, then the fade
@@ -81374,6 +81583,7 @@ function n4sAllyTick(dt){
     if(id==='cinder'){ tx=a.post.x; ty=a.post.y; }
     else if(id==='glaciar'){ const C=fightE||p, R=fightE?560:240, ang=a.t*(fightE?0.35:0.5); tx=C.x+Math.cos(ang)*R; ty=C.y+Math.sin(ang)*R*0.6; a.z=fightE?220:170; }
     else if(id==='grandpa'){ const ang=a.t*1.6; tx=p.x+Math.cos(ang)*70; ty=p.y+Math.sin(ang)*40; a.z=50+Math.sin(a.t*3)*8; }
+    else if(id==='hush'&&n4sHushSmall()){ tx=p.x+7; ty=p.y+1; a.z=46+Math.sin(a.t*3)*3; }   // (small Hush rides on Ash's horn)
     else if(id==='greymane'&&fightE&&a.cd>4&&a.tx!=null){ tx=a.tx; ty=a.ty; }
     else if(id==='greymane'&&fightE){ tx=fightE.x; ty=fightE.y; }
     else { const f=p.facing||0, ca=Math.cos(f), sa=Math.sin(f); tx=p.x-ca*Math.abs(s[1])*0.7+(-sa)*s[0]; ty=p.y-sa*Math.abs(s[1])*0.7+ca*s[0]; }
@@ -81435,10 +81645,10 @@ function n4sDrawAlly(a){
       ctx.save(); ctx.translate(a.x,a.y); ctx.scale(sh,sh); ctx.translate(-a.x,-a.y);
       if(T3.on&&typeof f2FigGlaciar==='function') f2FigGlaciar(f,false); else if(typeof f2Glaciar2==='function') f2Glaciar2(f,false); else n4sSimpleDragon(a.x,a.y-z,'#bfe6f8');
       ctx.restore(); }
-    else if(id==='hush'){ const f=n4sFig('hush',a,{r:42,r0:42}); f.z=a.z||60; f.state='chase'; f.shadow=false; const sc=0.62;
+    else if(id==='hush'){ const f=n4sFig('hush',a,{r:42,r0:42}); const small=n4sHushSmall(), sc=small?0.24:0.62; f.z=small?(a.z||46)/sc:(a.z||60); f.state='chase'; f.shadow=false;
       ctx.save(); ctx.translate(a.x,a.y); ctx.scale(sc,sc); ctx.translate(-a.x,-a.y);
       if(T3.on&&typeof m3FigHush==='function') m3FigHush(f,false); else if(typeof m3Hush2==='function') m3Hush2(f,false); else if(typeof thrMoth==='function') thrMoth(ctx,a.x,a.y-f.z,4,a.t*5,'#f4f2fa','#b890f0');
-      ctx.restore(); glowAt(a.x,a.y-(a.z||60)*0.6,150,'236,232,255',0.16); }
+      ctx.restore(); glowAt(a.x,a.y-(small?(a.z||46):(a.z||60)*0.6),small?60:150,'236,232,255',small?0.22:0.16); }
     else if(id==='tikka'){ const o=N4S_FIG.tikka||(N4S_FIG.tikka={k:'kob',id:'ev_tikka',kk:0.86,scarf:'#c84a3a',apron:true,spoon:true,t:0}); Object.assign(o,{x:a.x,y:a.y,face:a.face,t:a.t});
       const o2=N4S_FIG.tock||(N4S_FIG.tock={k:'kob',id:'ev_tock',kk:0.95,t:0}); Object.assign(o2,{x:a.x-26,y:a.y+10,face:a.face,t:a.t+1});
       if(typeof evDrawKob==='function'){ evDrawKob(o2); evDrawKob(o); } else { n4sSimpleFig(a,'#b8a060','#e8d0a0'); } }
@@ -81663,8 +81873,15 @@ function n4sFallPlay(){
   G.fz=[]; N4ST.cam={x:4500,y:85150,k:0.55};
   // the climax gets the screen to itself; and Ash stands where the scene can see both of them
   G.banner=null; if(Array.isArray(G.bannerQ)) G.bannerQ.length=0;
+  // (and the fight's callouts: a friend's phase 4 line still waiting in the queue would float up after the ending, at home)
+  n4sQuiet();
   if(player&&dist(player.x,player.y,4500,85250)>460){ player.x=4500; player.y=85440; try{ updateCam(0,true); }catch(err){} }
   const L=[...STORY.n_fall];
+  // the act 5 data: its plea and its final choice (every option shows; the moth one locked with its reason; each pick
+  // sets G.choices.n_end, emits n4fx:choose and plays its ending)
+  const C5=n4sData('n_choice');
+  if(C5&&typeof s10Lines==='function'){ L.push(...STORY.n_plea,...s10Lines(C5,{sc:'n_choice'}));
+    runDialogue(L,()=>{ scene='play'; if(G.choices.n_end&&G.stage!=='n_end') n4sChoose(G.choices.n_end); n4sAfterChoice(); },{mood:'n_fall'}); return; }
   if(n4sMercy()) L.push(...STORY.n_plea); else L.push(...n4sClosedLines());
   L.push(ch('ash',S(`What will you do?`,`What will you do?`),[
     {t:S(`Light her a lantern, and let the moon go home`,`Light her a lantern. Let the moon go home.`),tone:'kind',cond:()=>n4sMercy(),fn:()=>n4sChoose('moth'),then:()=>N4S_ENDINGS.moth.lines()},
@@ -81696,7 +81913,7 @@ function n4sDawn(){
   n4sPlay('n_dawn_lines',()=>{ N4ST.dawnTo=1; G.flags.n_dawn=1; n4sWhen('epi',null,()=>n4sEpilogue(),true); },{again:true,mood:'n_dawn'});
 }
 function n4sEpilogue(){
-  const L=n4sEpiLines();
+  const L=n4sBookLines()||n4sEpiLines();
   runDialogue(L,()=>{ scene='play'; G.flags.n_epi=0; n4sBookClose(); n4sVictory(); },{mood:'n_epilogue'});
 }
 // ---------- 10. the victory screen (FINALE 13): "Ending n of 3", the stats, Keep exploring / Title screen
@@ -81715,7 +81932,8 @@ function n4sVictory(){
     const panel=$('#winTitle').parentElement;
     let sub=$('#n4sWinSub'); if(!sub){ sub=document.createElement('div'); sub.id='n4sWinSub'; $('#winMsg').insertAdjacentElement('afterend',sub); }
     sub.hidden=false; sub.textContent=simplify(`Ending ${E.n} of 3 · Endings found: ${k} of 3 · First journey: ${F1.title||''}`);
-    const allies=(typeof nAllies==='function'?nAllies().length:0)+(n4sEnd()==='lantern'?1:0);
+    // (every friend who came: the earlier acts' allies and the friends won back on the peak, plus Grandpa)
+    const allies=['greymane','cinder','tikka','vesper','glaciar','hush'].filter(id=>n4sAllyEarned(id)).length+(n4sEnd()==='lantern'?1:0);
     const rows=[[playClock(),S('Time','Time')],[player.level,S('Level','Level')],[Object.values(G.quests||{}).filter(q=>q&&q.done).length,S('Quests done','Quests')],
       [allies,S('Friends on the peak','Friends')],[`${n4sPanesN()}/6`,S('Moth Memories','Moth Memories')],[`${n4sDuchessN()}/5`,S('Duchess sightings','Duchess')],
       [G.found.heartEmbers|0,S('Heart Embers','Heart Embers')],[G.deaths|0,S('Times knocked down','Falls')]];
@@ -81841,6 +82059,15 @@ function n4sTick(dt){
   if(N4ST.resume) n4sResume();
   if(N4ST.doorFx) N4ST.doorFx.t+=dt;
   if(G.done&&G.choices.n_end&&curMap()===4){ N4ST.duchShow=1; }
+  if(!G.done&&!AREA&&curMap()===4) n4sCheckpoint();
+}
+// (I5) the peak's shrines are its checkpoints: "Rise again" wakes Ash at the last one he walked past. Before, he woke
+// where he last rested or travelled, often Emberhollow or Moonfall (run B fell in the Tendril Wood and woke on the
+// village green, a whole act away)
+function n4sCheckpoint(){
+  const p=player; if(!p||p.dead||!G.shrines) return;
+  for(const s of SHRINES){ if(!/^n_sh_/.test(s.id)||!G.shrines[s.id]||G.lastShrine===s.id) continue;
+    if(dist2(p.x,p.y,s.x,s.y)<200*200){ G.lastShrine=s.id; break; } }
 }
 // animations that also run under dialogue: the Heart's dark, the dawn, the cutscene, Ash's size
 function n4sAnim(dt){
@@ -81904,6 +82131,58 @@ function n4sBeat(name,a,b){
     if(N4S_BUB[name]) return n4sSay(name);
   }catch(e){ console.error('n4sBeat',name,e); }
   return false;
+}
+// ---------- 12b. the act 5 data's visual beats: a data scene says `emit n4fx:<name>[:<arg>]` where this file's own
+// lines ran code (n4sDo): the Heart's dark and its voices' lights, the fall's cutscene, the gathering, the door, the dawn,
+// Duchess on the top, the storybook's plates, and the way home after the victory screen
+const N4S_VCOL={c_vesper:'180,140,255',juniper:'180,140,255',f_glaciar:'150,210,255',elka:'150,210,255',tove:'150,210,255',f_hush:'236,232,255',quill:'226,232,255',
+  maren:'255,170,90',ev_tikka:'255,200,120',grandpa:'255,140,70',iska:'255,214,150',vor:'255,120,60',ash:'255,150,60',ember:'255,190,120'};
+function n4sFx(s){
+  const i=s.indexOf(':'), k=i<0?s:s.slice(0,i), a=i<0?'':s.slice(i+1), HM=N4ST.heart, C=N4ST.cut;
+  switch(k){
+    case 'heart_dark': if(HM) HM.darkTo=1; break;
+    case 'heart_puff': if(HM) HM.puff=1.2; break;
+    case 'heart_float': if(HM) HM.float=1; break;
+    case 'voice': n4sVoice(a,N4S_VCOL[a]||N4S_SEAMC[HM?Math.min(3,HM.mark):0]); break;
+    case 'heart_grandpa': if(HM) HM.grandpa=1; break;
+    case 'heart_wardens': if(HM) HM.wardens=1; break;
+    case 'heart_belly': if(HM) HM.belly=1; break;
+    case 'heart_pip': if(HM) HM.pip=1; break;
+    case 'heart_word': if(HM) HM.word=1; n4sSfx('levelup'); try{ shake(6); }catch(e){} break;
+    case 'heart_spark': if(HM) HM.spark=1; break;
+    case 'heart_blaze': n4sHeartBlaze(); break;
+    case 'cut_fall': n4sCutFall(); break;
+    case 'cut_fill': if(C) C.fillTo=+a||0; break;
+    case 'cut_shrink': if(C&&C.nyx) C.nyx.sTo=+a||0; break;
+    case 'cut_sliver': if(C&&C.nyx) C.nyx.sliver=1; break;
+    case 'cut': n4sCutDo(a); break;
+    case 'choose': if(G.choices.n_end) n4sChoose(G.choices.n_end); break;
+    case 'ally_leave': n4sAllyLeave(a); break;
+    case 'ally_arrive': n4sAllyArrive(a); break;
+    case 'gather_pose': if(a==='off') n4sGatherPose(false); else { N4ST.cam={x:3331,y:85860,k:0.55}; n4sGatherPose(true); } break;
+    case 'door_fx': N4ST.doorFx={t:0}; break;
+    case 'dawn': N4ST.dawnTo=1; N4ST.cam={x:4500,y:85100,k:0.5}; break;
+    case 'duchess_show': { N4ST.duchShow=1; const D=n4sDuchPlace(); N4ST.cam={x:D.x,y:D.y,k:0.5}; break; }
+    case 'duchess_seen': n4sDuchessSeen(); break;
+    case 'home_bound': N4ST.homeBound=1; break;
+    case 'big_off': N4ST.bigTo=0; break;
+    case 'book_open': if(!N4ST.book) n4sBookOpen(); G.flags.n_epi=1; break;
+    case 'book': if(!N4ST.book) n4sBookOpen(); n4sBookScene(a); break;
+    case 'book_lit': if(N4ST.book) N4ST.book.lit=1; break;
+    case 'home': n4sGoHome(); break;
+    default: console.error('n4fx: unknown beat',s);
+  }
+}
+if(typeof storyListen==='function') storyListen('n4fx:',a=>n4sFx(a));
+// after the victory screen's "Keep exploring": Ash wakes up on the green in Emberhollow on Lantern Day, at dusk (the
+// data's n_end then plays n_home there). Duchess is back at the farm.
+function n4sQuiet(){ G.taunt=null; if(Array.isArray(G.tauntQ)) G.tauntQ.length=0; try{ if(typeof MV!=='undefined'&&MV) MV.tip=null; }catch(e){} }
+function n4sGoHome(){
+  n4sFreeRoam(); N4ST.homeBound=1; n4sQuiet();
+  const w=typeof s10Where==='function'?s10Where('n5_green_wake'):null, x=w?w.x:2620, y=w?w.y:9330;
+  G.tod=0.78; G.flags.moon=100;
+  mapTravel(x,y,{});
+  try{ placeGoat(); setupNPCs(); }catch(e){ console.error(e); }
 }
 // ---------- 13. Pebble's notes on the peak (THREADS 9.3: Yara's "where now", one per ring, at a rest)
 if(typeof pebbleLetter==='function'){
@@ -89601,7 +89880,8 @@ chapter({
     f_kindle: [],
     f3_kindle: [
       ['f_brynja', "Blue! Your breath's gone BLUE! Oh, my old girl will like that. Go on. Give her everything.", 'Blue! Your fire is BLUE! Give her everything!'],
-      { sfx: 'boom', do: ['set f_hearth_lit'] },
+      // (emit f3fx:whoomph: x2_story's own WHOOMPH picture, the blue flash, the shake, the boom and the fire column)
+      { do: ['set f_hearth_lit', 'emit f3fx:whoomph'] },
       ['narr', 'For one second nothing happens. Then, WHOOMPH. A column of blue and gold fire roars up out of the stones, higher than every roof in town.',
         'WHOOMPH! Blue and gold fire roars up. Higher than every roof!'],
     ],
@@ -90484,6 +90764,12 @@ places({
       name: ["Bertram's giant frozen bun", 'a giant frozen bun'],
       locked: ["A Lantern bun the size of a cart, frozen as hard as a rock, right against Bertram's cellar door. A sword just bounces off. A bomb might not.",
         'A giant frozen bun! Try a bomb.'] },
+    // (I3: a "Look at" prompt while the bun is shut and Ash has no bombs yet. The gate library says a built gate's
+    //  locked line only when Ash pushes against it, so a kid walking by never learned what the bun needs. If the engine
+    //  ever gives built gates this prompt itself, both say the same and only one prompt shows at a time.)
+    f3_bun_look: { kind: 'examine', map: 0, at: [2380, 9806], r: 40, h: 64, if: '!flag gate_f3g_bun>=2', show: '!power bombs',
+      name: ["Bertram's giant frozen bun", 'a giant frozen bun'], prompt: ['Look at the giant frozen bun', 'Look at the frozen bun'],
+      say: 'f3_bun_locked' },
     // (drawn over the gate library's boulder until it breaks)
     f3_bun_shell: { kind: 'prop', map: 0, at: [2380, 9803], look: 'frozen_bun', show: '!flag gate_f3g_bun>=2', name: ['a giant frozen bun', 'a frozen bun'] },
     f3_bun: { kind: 'examine', map: 0, at: [2380, 9800], r: 44, h: 30, if: 'flag gate_f3g_bun>=2 !flag f3_bun_seen', look: 'frozen_bun_open', say: 'a3g_bun',
@@ -90492,6 +90778,8 @@ places({
   },
 
   scene: {
+    f3_bun_locked: [['narr', "A Lantern bun the size of a cart, frozen as hard as a rock, right against Bertram's cellar door. A sword just bounces off. A bomb might not.",
+        'A giant frozen bun! Try a bomb.']],
     a3g_tove: [
       ['narr', 'The ice slumps into a puddle. Under it lies a flat stone, carved in neat old letters.', 'Under the ice, a carved stone.'],
       ['narr', '"TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW."', '"TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW."'],
@@ -90561,6 +90849,10 @@ places({
       name: ["the boulder on Hettie's cellar", 'a big boulder'],
       locked: ['A huge boulder sits right on top of a cellar door. A painted sign on it says: SORRY, CELLAR. A bomb might move it.',
         'A boulder on a cellar door. Try a bomb!'] },
+    // (I3: a "Look at" prompt while the boulder is shut and Ash has no bombs yet; see f3_bun_look in gates_map0.js)
+    f3_hettie_look: { kind: 'examine', map: 1, at: [6600, 25656], r: 40, h: 64, if: '!flag gate_f3g_hettie>=2', show: '!power bombs',
+      name: ["the boulder on Hettie's cellar", 'a big boulder'], prompt: ['Look at the big boulder', 'Look at the boulder'],
+      say: 'f3_hettie_locked' },
     // (an examine, not a chest: a chest place plays no scene. bombbag 5: five more bombs fit in the bag)
     f3_hettie_cellar: { kind: 'examine', map: 1, at: [6600, 25650], r: 44, h: 30, if: 'flag gate_f3g_hettie>=2 !flag f3_satchel_seen', look: 'sprocket_boulder', say: 'a3g_hettie',
       then: ['upgrade f3_satchel', 'set f3_satchel', 'bombbag 5', 'give coins 60'], name: ["Hettie's cellar", "Hettie's cellar"] },
@@ -90568,6 +90860,8 @@ places({
   },
 
   scene: {
+    f3_hettie_locked: [['narr', 'A huge boulder sits right on top of a cellar door. A painted sign on it says: SORRY, CELLAR. A bomb might move it.',
+        'A boulder on a cellar door. Try a bomb!']],
     // the letter (Brother Eider's talk in people.js sends it with `mail a3g_otto`)
     a3g_otto: [
       ['narr', 'Pebble brings a letter with a library stamp. It is written VERY LARGE.', 'A letter, written VERY LARGE.'],
@@ -91071,7 +91365,7 @@ places({
 // Bomb-o-Matic and the test bomb stay x2_people's own mechanics (legacy steps; the Bomb-o-Matic step's old reward
 // gives the test bomb). Talking to Mags with Blaze starts the quest (her offer).
 quest({
-  id: 'f_bombs', act: 3, giver: 'f_mags', optional: true, takeover: true,
+  id: 'f_bombs', act: 3, until: 3, giver: 'f_mags', optional: true, takeover: true,
   title: ['Mags and the Big Boom', 'Mags and the Big Boom'],
   payoff: { kind: 'power', id: 'bombs' },
   old_steps: ['crate', 'powder', 'bomatic', 'boulder', 'boom'],
@@ -91810,6 +92104,9 @@ act({
     lines: [
       ['The Ember Heart is whole.', 'The Ember Heart is whole.'],
       ['The moon is gone.', 'The moon is gone.'],
+      // (the act's big choice, A4b's request: a line whose condition fails is left out)
+      { if: 'choice m_hush=free', t: ['Hush flies free.', 'Hush flies free.'] },
+      { if: '!choice m_hush=free', t: ['Hush went back to the Mother.', 'Hush went back to the Mother.'] },
       ['Next: Nightfall Peak.', 'Next: Nightfall Peak.'],
     ] },
 
@@ -92362,7 +92659,7 @@ chapter({
 // Old flags kept: m_eclipse2 (x3_world opens the Burrow Gap, darkens the lanterns, x3_people sends Mom's letter
 // m_pb_3), m_gap_dug (set by x3_world when Ash burrows through). New: m4_well = stood | lid, m4_where_next.
 // Visual hooks of the old code (the eclipse pictures, x3_story m3sEcl) ride on `emit m4fx:<name>[:<arg>]` effects:
-// nothing listens to them yet (A4b ENGINE REQUEST in CHANGES.md) and the scene reads right without them.
+// x3_story listens to them (and sets flag s10_fx); the scene also reads right without them.
 chapter({
   id: 'm_glasswall', act: 4, after: 'm_burrows', next: 'm_mirror', takeover: true,
   card: ['Act IV · Chapter 4', 'Mirrors'],
@@ -92390,8 +92687,8 @@ chapter({
     m4_well_tower: { map: 3, at: [9800, 67650], kind: 'npc_spot', name: ['the Moon Well tower', 'the well tower'] },
     // the camera's aim for the eclipse: high enough to show Nyxara on top of the tower and Ash on the rim below
     m4_well_sky:   { map: 3, at: [9800, 67555], kind: 'npc_spot', name: ['the sky over the Moon Well', 'the sky over the well'] },
-    // Nyxara perched on the tower during the eclipse: this chapter's own picture of her, shown only while the engine
-    // has no m4fx listener for x3_story's eclipse pictures (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    // Nyxara perched on the tower during the eclipse: this chapter's own picture of her, shown only when nothing
+    // listens to m4fx for x3_story's eclipse pictures (x3_story sets flag s10_fx when it does)
     m4_nyx_well:   { map: 3, at: [9800, 67661], kind: 'prop', look: 'm4_nyx_perch', states: { drink: 'm4_nyx_perch' },
                      if: 'flag m4_nyx_here !flag s10_fx', name: ['Nyxara', 'Nyxara'] },
     // the far side of the Glasswall, where the Burrow Gap comes up (verified open sand, level 0): only a burrower gets
@@ -93227,7 +93524,7 @@ chapter({
     m4_bridge_on: { map: 3, at: [13762, 65446], r: 36, kind: 'spot', name: ['the moonfire bridge', 'the bridge'] },
     m4_peak_sea: { map: 3, at: [13740, 65200], kind: 'npc_spot', name: ['the sea at the Edge of the World', 'the sea'] },
     // the black mountain out at sea and the moonfire bridge to it: this chapter's own pictures, shown in Act IV only
-    // while nothing listens to m4fx for x3_story's vista (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    // when nothing listens to m4fx for x3_story's vista (x3_story sets flag s10_fx when it does)
     m4_peak:      { map: 3, at: [13990, 65120], kind: 'prop', look: 'm4_peak_far', if: 'flag m4_peak_up act=4 !flag s10_fx',
                     name: ['the black mountain', 'the black mountain'] },
     m4_bridge_fx: { map: 3, at: [13780, 65452], kind: 'prop', look: 'm4_fire_bridge', if: 'flag m4_bridge_lit act=4 !flag s10_fx',
@@ -93243,11 +93540,12 @@ chapter({
       ],
       obj: ['Go through to the Eclipse Lens', 'Go to the Eclipse Lens'],
       hint: ['The Eclipse Lens is through the next door from the great dome, on the same floor. Someone with a hammer is coming up the stairs behind you.', 'Go through the next door to the Lens.'] },
-    // the three taps run between the two scenes once x3_story listens to m4fx:forge (m_reforge's last line); the second
-    // scene waits for them (a cutscene plays only when things are calm)
-    { id: 'heart', do: 'cutscene m_reforge2',
-      then: ['set m_reforged', 'set m_heart', 'set m_maren', 'time noon', 'warp m4_pier'] },
-    { id: 'peak', do: 'cutscene m_peak', then: ['set m_eclipse3', 'set m_done', 'time midnight'] },
+    // the three taps run between the two scenes: m_reforge's last line emits m4fx:forge, x3_story sets m4_forging and
+    // starts its forge game as soon as Mom's scene is over, and clears the flag after the third TING; this scene waits
+    { id: 'heart', do: 'cutscene m_reforge2', if: '!flag m4_forging',
+      then: ['set m_reforged', 'set m_heart', 'set m_maren', 'time noon quiet', 'warp m4_pier'] },
+    // (the warp lands a moment after the Heart's scene; the peak plays on the pier, not in the Lens room)
+    { id: 'peak', do: 'cutscene m_peak', if: 'near m4_pier 500', then: ['set m_eclipse3', 'set m_done', 'time midnight quiet'] },
     { id: 'bridge', do: 'goto m4_pier_end 80', scene: 'm4_pier_bridge',
       obj: ['Walk to the end of the Moon Pier, where the moonfire bridge begins', 'Walk to the end of the pier'],
       hint: ['The bridge starts at the end of the Moon Pier. Mom will walk you there.', 'The bridge starts at the end of the pier.'],
@@ -94748,7 +95046,7 @@ act({
     { page: 'n_book_home' },
     { page: 'n_book_friends' },
     { page: 'n_book_coast', epi: 'c', skip: 'Vesper|Moth Mask' },
-    { page: 'n_book_north', epi: 'f', skip: 'Glaciar|Great Hearth' },
+    { page: 'n_book_north', epi: 'f', skip: 'Glaciar|Great Hearth|ice dragon' },
     { page: 'n_book_moonfall', epi: 'm', skip: 'Hush' },
     { page: 'n_book_moon' },
     { page: 'n_book_lanternday' },
@@ -95251,7 +95549,8 @@ chapter({
   },
 
   step: [
-    { id: 'gather', do: 'goto n_sh_crown 230', scene: 'n_gather', then: ['set n_gather'],
+    // (the Crown Shrine becomes the respawn point for the last fight, as the old code's gathering did)
+    { id: 'gather', do: 'goto n_sh_crown 230', scene: 'n_gather', then: ['set n_gather', 'shrine n_sh_crown'],
       obj: ['Go to the Crown Shrine', 'Go to the shrine'],
       hint: ['The Crown Shrine is at the edge of the last ring, past the Eclipse Hall. Everyone who came is waiting there.', 'Go to the shrine. Your friends wait there.'] },
     { id: 'reach', do: 'deduce n5_reach', scene: 'n5_reach_done',
@@ -95358,6 +95657,8 @@ chapter({
 // the fourth post, the real green has its fourth post back, lit for whoever is out in the dark.
 chapter({
   id: 'n_end', act: 5, after: 'n_nyxara', next: null, takeover: true,
+  // its steps keep running after the victory screen (G.done), so Keep exploring wakes Ash on the green
+  after_done: true,
   card: null, name: ['The Long Night Is Over', 'The Long Night Is Over'],
   so_far: [
     'Ash reached the Night Mother at the top of Nightfall Peak, and the moon came home. The Long Night is over.',
@@ -95374,8 +95675,7 @@ chapter({
 
   step: [
     { id: 'dawn', do: 'wait_for flag n_dawn>=1', obj: ['The Long Night is ending', 'The Long Night is ending'] },
-    // after the victory screen (G.done): ENGINE REQUEST, data runners keep going for this one step, so n_home plays
-    // after "Keep exploring" (today it never does: s10Runners stops when G.done)
+    // after the victory screen (G.done; after_done above), "Keep exploring" sets the play going again: n4fx:home
     { id: 'home', do: 'wait_for flag n_done', then: ['emit n4fx:home'],
       obj: ['The Long Night is over. Go anywhere you like.', 'Go anywhere you like!'] },
     // (n4fx:home: x4_story's free roam, then Ash is put on the green at dusk on Lantern Day; this step finds him there)
@@ -95524,12 +95824,12 @@ chapter({
     ],
 
     // ---- after "Keep exploring": Ash wakes up at home, on Lantern Day
-    // (n4fx:home already put Ash on the green at dusk, with no fade: a fade or time effect inside a scene would leave
-    //  the screen black until it ends, A3b's ENGINE note)
+    // (n4fx:home already brought Ash to the green at dusk, fading in from black like waking up)
     n_home: [
       ['narr', 'You wake up in the grass on the green in Emberhollow. Somebody has tucked a blanket round you. Pip is asleep on your head.', 'You wake up on the green at home. Pip sleeps on your head.'],
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
         ['narr', 'Behind the forge, something very big and very cold is snoring.', 'Behind the forge, a big cold dragon snores.'] ] },
+      { place: ['maren', 'player', [62, 8]] },   // (Mom has come out to find Ash, for this scene)
       ['maren', 'There you are. You slept the whole way home. It is Lantern Day, and you are late.', 'You slept all the way home. It is Lantern Day!'],
       ['narr', 'Round the green the lanterns are lit. All four of them.', 'The lanterns are lit. All four!', { if: 'solved n5_fourth_lantern', ref: 'n5_green_post' }],
       ['ash', 'Mom? ...The moon came back.', 'Mom? The moon came back.'],
@@ -97860,7 +98160,7 @@ legacy({ id: 'f_saga_ice', map: 2, at: [1150, 46900], r: 30, kind: 'landmark', n
   aliases: ['the frozen fisher girl'], src: 'LANDMARKS:f_saga' });
 legacy({ id: 'f_bo_ice', map: 2, at: [1700, 46646], r: 30, kind: 'landmark', name: 'Little Bo, frozen on the chapel roof',
   aliases: ['the frozen boy on the roof'], src: 'LANDMARKS:f_bo' });
-legacy({ id: 'f_ylva_ice', map: 2, at: [1950, 46746], r: 30, kind: 'landmark', name: 'the knitter frozen on top of the bell tower',
+legacy({ id: 'f_ylva_ice', map: 2, at: [1980, 46790], r: 30, kind: 'landmark', name: 'the knitter frozen on top of the bell tower',
   aliases: ['Grandmother Ylva', 'the oldest granny'], src: 'LANDMARKS:f_ylva' });
 legacy({ id: 'f_guard_ice', map: 2, at: [6050, 48850], r: 30, kind: 'landmark', name: 'a Hearthwarden frozen on watch outside the wall',
   aliases: ['the frozen guard'], src: 'LANDMARKS:f_frz_guard1' });
