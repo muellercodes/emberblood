@@ -37,7 +37,8 @@ chapter({
     f_kindle: [],
     f3_kindle: [
       ['f_brynja', "Blue! Your breath's gone BLUE! Oh, my old girl will like that. Go on. Give her everything.", 'Blue! Your fire is BLUE! Give her everything!'],
-      { sfx: 'boom', do: ['set f_hearth_lit'] },
+      // (emit f3fx:whoomph: x2_story's own WHOOMPH picture, the blue flash, the shake, the boom and the fire column)
+      { do: ['set f_hearth_lit', 'emit f3fx:whoomph'] },
       ['narr', 'For one second nothing happens. Then, WHOOMPH. A column of blue and gold fire roars up out of the stones, higher than every roof in town.',
         'WHOOMPH! Blue and gold fire roars up. Higher than every roof!'],
     ],

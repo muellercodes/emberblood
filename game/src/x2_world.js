@@ -1289,7 +1289,9 @@ const F2W_FOLK=[
   ['f_frz_postman',1950,42800,'postman',S('a lost postman','a postman'),S('Special delivery! For... the fish? I think I got lost.','A letter for the fish? I am lost.'),{coins:25,after:S('Which way is Hearthold? Never mind, I will follow the dragon.','Which way is home?')}],
   ['f_frz_knight',6500,44400,'knight',S('a Hearthold knight','a knight'),S("The Dreadgate! It's... still closed. Good. I'll just stand here a bit more. Not frozen. Just brave.",'The Dreadgate is still shut. Good.'),{coins:30,lvl:1,after:S('Not frozen. Just brave. Very brave. Is it cold, or is it me?','Not frozen. Just brave.')}],
   ['f_frz_kid',7900,48150,'kid',S('a sledding kid','a sledding kid'),S('WHEEEEE... eee? Why did I stop? I was going SO fast.','WHEEE! Why did I stop?'),{coins:10,kid:true,sled:true,after:S('Again! AGAIN!','Again!')}],
-  ['f_ylva',1950,46746,'ylva',S('Grandmother Ylva','Ylva'),S("I wasn't frozen, dear. I was resting my eyes.",'I was just resting my eyes, dear.'),{lvl:3,rime:true}],
+  // (Ylva knits at the front-left corner of the tower top, in front of the bell's roof, where her red yarn hangs down
+  //  the south face; at the back (1950,46746) the bell pavilion was drawn over her and a kid could not see her)
+  ['f_ylva',1890,46786,'ylva',S('Grandmother Ylva','Ylva'),S("I wasn't frozen, dear. I was resting my eyes.",'I was just resting my eyes, dear.'),{lvl:3,rime:true}],
   ['f_tollef',1950,46904,'tollef',S('Tollef the Bellringer','Tollef'),S("WHAT? OH! HELLO! I CAN'T HEAR YOU, I'VE BEEN STANDING NEXT TO A BELL FOR FORTY YEARS!",'WHAT? HELLO! I CANNOT HEAR YOU!'),{rime:true,lock:'door'}],
   ['f_saga',1150,46900,'saga',S('Saga the fisher','Saga'),S('I had a bite! A big one! ...It got away. A month ago. Probably.','I had a bite! It got away.'),{rime:true,fish:true}],
   ['f_sigrun',2310,47196,'sigrun',S('Sigrun the Cook','Sigrun'),S("My soup! My SOUP! It's a soup-sicle. ...Actually, that's not bad. Lick it.",'My soup is a soup-sicle!'),{rime:true,lvl:2,pot:true}],
