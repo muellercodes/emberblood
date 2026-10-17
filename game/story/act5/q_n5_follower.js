@@ -86,7 +86,7 @@ quest({
 
   scene: {
     n5_tassel: [
-      ['narr', 'The first lantern had a tassel hanging off it. Had. Something has chewed it down to a soggy stub.',
+      ['narr', 'The first lantern used to have a tassel. Something has chewed it down to a soggy stub.',
         'Something chewed the lantern\'s tassel!'],
       ['ash', "It's still wet. Whatever did this was here a minute ago.", 'It is still wet!'],
       ['pip', 'Mip! (Pip sniffs it and sneezes.)', 'Mip! (Pip sneezes.)'],
@@ -106,12 +106,12 @@ quest({
     ],
     n5_shadow_goat: [
       ['narr', 'A copy of a goat pen, all black glass. A shadow goat stands inside, perfectly still.', 'A glass pen. A shadow goat stands still.'],
-      ['ash', "Hi, shadow goat. ...It doesn't blink. It doesn't chew. It's just a memory.", "It doesn't blink or chew. Just a memory."],
+      ['ash', "Hi, shadow goat. ...It doesn't blink, and it doesn't chew. It's just a memory.", "It doesn't blink or chew. Just a memory."],
     ],
     n5_pen_note_read: [
       ['narr', "Duchess's pen is empty. The gate is open. A note is stuck to the post.", 'The pen is empty. A note is on the post.', { ref: 'n5_duchess_pen' }],
       ['narr', 'It says: "Gone out. Again." At the bottom is a muddy hoofprint.', 'It says: "Gone out. Again."'],
-      ['ash', "...Hollis's handwriting is really bad.", 'Hollis writes really badly.'],
+      ['ash', "...Farmer Hollis has really bad handwriting.", 'Hollis writes really badly.'],
     ],
     n5_hollis_tell: [
       ['hollis', 'Duchess? Up the Night Mother\'s MOUNTAIN? Course she is. She does this every time something big happens.',

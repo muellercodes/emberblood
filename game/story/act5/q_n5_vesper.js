@@ -14,7 +14,7 @@ quest({
 
   item: {
     n5_moth_biscuit: { name: ["Gran's moth biscuit", 'A moth biscuit'], icon: 'heart',
-      desc: ['Shaped like a moth, hard as a roof tile. Gran bakes one every Sunday, in case Vesper comes home.', 'A moth biscuit from Gran.'] },
+      desc: ['Shaped like a moth, and hard as a roof tile. Gran bakes one every Sunday, in case Vesper comes home.', 'A moth biscuit from Gran.'] },
   },
 
   place: {
@@ -36,24 +36,24 @@ quest({
 
   scene: {
     n5_gran_sorry: [
-      ['ash', 'Gran, I did something bad. Vesper fell, up on the mountain, and I just kept going.', 'Vesper fell. I just kept going.'],
+      ['ash', 'Granny Oona, I did something bad. Vesper fell, up on the mountain, and I just kept going.', 'Vesper fell. I just kept going.'],
       ['c_oona', "Oh, duck. Sit down. No, there. That's the warm chair.", "Oh, duck. Sit down. That's the warm chair."],
-      ['ash', 'I said she could climb. She could! But I should have helped.', 'I should have helped her.'],
-      ['c_oona', "She'll be sitting somewhere high with her back to everybody. She does that. She's done it since she was four.",
+      ['ash', 'I told myself she could climb up by herself. She could! But I should have helped.', 'I should have helped her.'],
+      ['c_oona', "She'll be sitting somewhere high with her back to everybody. She's done that since she was four.",
         'She will be sulking somewhere high. She always does.'],
-      ['c_oona', "Sorry won't fix it. Not with my Vesper. But she can't stay cross with a biscuit.", "She can't stay cross with a biscuit."],
-      ['narr', 'Gran takes a tin off the top shelf. Inside are biscuits shaped like little moths. Lots of them.', 'Gran has a tin full of moth biscuits.'],
-      ['c_oona', "One every Sunday, twenty years. In case she came home. Take her one. And tell her: come home for tea after.",
+      ['c_oona', "Sorry won't fix it, not with my Vesper. But she never could stay cross with a biscuit.", "She can't stay cross with a biscuit."],
+      ['narr', 'Gran takes a tin off the top shelf. It is full of biscuits shaped like little moths.', 'Gran has a tin full of moth biscuits.'],
+      ['c_oona', "I've baked one every Sunday since she ran off, in case she came home. Take her one. And tell her: come home for tea after.",
         'One every Sunday, in case she came home. Take one.', { do: ['give n5_moth_biscuit'] }],
     ],
     n5_vesper_sorry: [
       ['narr', 'Vesper sits on the very edge of the Crown, her legs over the dark. She does not turn round.', 'Vesper sits on the edge. She does not turn round.'],
-      ['c_vesper', 'Go away, little ember.', 'Go away.'],
-      ['ash', "I'm sorry. I should have pulled you up. ...Gran sent you this.", "I'm sorry. Gran sent you this."],
+      ['c_vesper', 'Go away, cousin.', 'Go away.'],
+      ['ash', "I'm sorry. I should have pulled you up. ...Your gran sent you this.", "I'm sorry. Gran sent you this."],
       ['narr', 'She looks at the moth biscuit for a long time.', 'She looks at the biscuit for a long time.'],
-      ['c_vesper', '...She still makes these? Every Sunday? They are TERRIBLE.', 'She still makes these? They are terrible!'],
-      ['narr', 'She eats it anyway. It takes a while. It is a very hard biscuit.', 'She eats it anyway. It is a very hard biscuit.'],
-      ['c_vesper', "Fine. I'll stand next to you up there. NOT because you said sorry. Because Gran said.", 'Fine. I will help. Because Gran said.'],
+      ['c_vesper', "...She still makes these? Every Sunday? They're TERRIBLE.", 'She still makes these? They are terrible!'],
+      ['narr', 'She eats it anyway, which takes a while. It is a very hard biscuit.', 'She eats it anyway. It is a very hard biscuit.'],
+      ['c_vesper', "Fine. I'll stand next to you up there. Not because you said sorry. Because Gran said.", 'Fine. I will help. Because Gran said.'],
       ['c_vesper', '"Come home for tea after." ...Okay. Then we both have to come home.', 'Then we both have to come home.'],
     ],
   },
