@@ -131,7 +131,7 @@ chapter({
     m_obs_won: [
       ['iska', 'Through the next door, Ash. The Eclipse Lens, beside the great dome. Somebody is coming. I can hear a hammer.', 'Through the next door to the Lens. I hear a hammer coming!'],
     ],
-    m4_epi_sorry: [['narr', 'Every Lantern Day, a parcel arrives in Sable. It is always one lamp. It is always labelled SORRY.', 'Every Lantern Day, Sable gets a lamp in the post. It says SORRY.']],
+    // (the solve's epilogue line m4_epi_sorry is A4S's scene, q_m_lamps.js)
     // empty: the old copies of the boss words are replaced by these (see replaces)
     m4_hush_quiet: [],
     m4_umber_quiet: [],

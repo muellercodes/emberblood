@@ -20,8 +20,7 @@ chapter({
   hint: ['Sable is full of clues today. Look around the Moon Well and the Lamp House.', 'Look around Sable.'],
 
   place: {
-    // the middle of the oasis (Ash comes back down from the Worm Mouth; verified open ground, level 0)
-    m4_sable:      { map: 3, at: [9800, 67400], r: 450, kind: 'spot', name: ['the Oasis of Sable', 'Sable'] },
+    // (the oasis itself is A4a's place m4_sable, m_sable.js: 9700,67450)
     // a new sign at the south end of the footbridge to the Moon Well (verified open ground)
     m4_well_sign:  { map: 3, at: [9860, 67910], r: 30, kind: 'sign', look: 'm4_sign_well', name: ['the Moon Well sign', 'the well sign'],
                      prompt: ['Read the sign by the well', 'Read the sign'],
@@ -162,11 +161,11 @@ chapter({
         ['nyxara', '"No way," you told me. Brave little ember. Shh, now.', '"No way," you said. Brave little ember.'] ] },
       { choose: 'm4_well', ask: ['She bends her long curled tongue down to the water. What do you do?', 'She bends down to drink. What do you do?'], pick: [
         { t: ['Stand in front of the well', 'Stand in front of the well'], tone: 'brave', v: 'stood',
-          then: ['set m4_well=stood', 'epi m4_epi_stood', { journal: ['At the Moon Well you stood in front of the water and spread your wings at the Night Mother.', 'You stood in front of the Moon Well.'], key: 'm4_well' }],
+          then: ['set m4_well=stood', 'epi m4_epi_well_stood 5', { journal: ['At the Moon Well you stood in front of the water and spread your wings at the Night Mother.', 'You stood in front of the Moon Well.'], key: 'm4_well' }],
           say: [['narr', 'You jump up on the rim and spread your wings wide. She drinks round you, but not through you. Behind your back, one candle of moonlight stays.',
                          'You spread your wings over the well. One candle of light stays behind you.']] },
         { t: ['Help Saffron drag the lid on', 'Help Saffron with the lid'], tone: 'kind', v: 'lid',
-          then: ['set m4_well=lid', 'epi m4_epi_lid', { journal: ['At the Moon Well you helped Saffron drag the old lid over the water.', 'You helped Saffron put the lid on the well.'], key: 'm4_well' }],
+          then: ['set m4_well=lid', 'epi m4_epi_well_lid 5', { journal: ['At the Moon Well you helped Saffron drag the old lid over the water.', 'You helped Saffron put the lid on the well.'], key: 'm4_well' }],
           say: [['narr', 'You and Saffron heave the old stone lid across the water. It sticks halfway. Under it, one candle of moonlight stays safe.',
                          'You and Saffron push the lid on. One candle of light stays safe.']] },
       ] },
@@ -185,9 +184,8 @@ chapter({
     m4_iska_under: [
       ['iska', "The Glasswall, Ash. Nobody can climb it and nobody can fly over it. But you're a worm now. Go UNDER.", "Nobody can climb the Glasswall. But you're a worm now. Go UNDER!", { ref: 'm_burrowgap' }],
     ],
-    // epilogue lines (the `epi` effect takes each scene's first line)
-    m4_epi_stood: [['narr', 'In Sable they still tell how a little dragon stood on the rim of the Moon Well and spread his wings at the Night Mother.', 'In Sable they tell how a dragon stood in front of the Moon Well.']],
-    m4_epi_lid:   [['narr', 'In Sable the Moon Well has a new lid now. Saffron says it took a Well-Warden and a dragon to shift the old one.', 'The Moon Well has a new lid. Saffron and a dragon moved the old one.']],
+    // (the epilogue lines for the well, m4_epi_well_stood and m4_epi_well_lid, are A4S's scenes in act4/people.js:
+    // the choice at the well and Saffron's talk run the same ones, and an epilogue line is added only once)
   },
 
   talk: {
