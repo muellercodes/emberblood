@@ -6,7 +6,8 @@
 // in your claws. Payoff: upgrade Bluefire (f_bluefire: Blaze reaches farther and melts faster; p3_frost and x2_world
 // read it). When the quest is done x2_people thaws the rest of the village by itself.
 // Old saves: QDEFS.f_rime steps 0..2 map to six, rasmus, bluefire. The thaws stay p3_frost's and x2_people's (legacy
-// steps). No talk start: A3a's Ylva scene may run `quest start f_rime`; Ylva's option in people.js starts it otherwise.
+// steps). No talk start: x2_story offers it right after Ylva's thaw (see offer below); Ylva's people.js option offers it
+// again to anyone who said "Not right now".
 quest({
   id: 'f_rime', act: 3, giver: 'f_ylva', optional: true, takeover: true,
   title: ['Rimeholm, One Thaw at a Time', 'One Thaw at a Time'],

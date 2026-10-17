@@ -9,7 +9,8 @@
 // defeat path's song; A3S's f3_crown_wake).
 // Old saves: QDEFS.f_song steps 0..1 map to verses, sing. The three verse places stay x2_people's own mechanics (the
 // bell, the stone and the drum read f2pOn('f_song'); the verses step is legacy so the old HUD target still points at
-// the next verse). STORY.f_song_reveal is a getter and cannot be replaced, so the last step plays sg_reveal itself.
+// the next verse). The last step plays its own scene sg_reveal (STORY.f_song_reveal is a getter on main's engine, so
+// a data scene of that id could not replace it there).
 quest({
   id: 'f_song', act: 3, giver: 'f_brynja', optional: true, takeover: true,
   title: ["The Snow Mother's Song", "The Snow Mother's Song"],
