@@ -1594,9 +1594,12 @@ function m3sFx(cmd){
     case 'heart_whole': m3sHeartFx(); break;
     case 'party_look': m3sPartyLook(); break;
     case 'peak': m3sPeak(a); M3S.fxOn=true; break;
+    default: console.error('m4fx: unknown picture '+cmd);
   }
 }
-{ const base=storyEmit; storyEmit=function(name){ const r=base(name); try{ const s=String(name||'');
+// (the engine's storyListen when it has one (I5); else this file wraps storyEmit and window.storyEmit)
+if(typeof storyListen==='function') storyListen('m4fx:',rest=>{ try{ if(G&&G.mode==='story') m3sFx(rest); }catch(e){ console.error(e); } });
+else { const base=storyEmit; storyEmit=function(name){ const r=base(name); try{ const s=String(name||'');
     if(s.startsWith('m4fx:')&&G&&G.mode==='story') m3sFx(s.slice(5)); }catch(e){ console.error(e); } return r; };
   window.storyEmit=storyEmit; }
 // the three taps (m_reforge's last line): they start as soon as Mom's scene is over, and the data's next step (the
