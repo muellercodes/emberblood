@@ -615,6 +615,7 @@ function s10Tick(dt){
   if(!S10.booted) s10Boot();
   if(!G||G.mode!=='story'||!G.story) return;
   if(S10.tickAt===G.time) return; S10.tickAt=G.time;
+  if(AREA!==S10.furnArea){ S10.furnArea=AREA; try{ s10FurnPrompts(AREA); }catch(e){ console.error(e); } }
   S10.watchT-=dt; if(S10.watchT<=0){ S10.watchT=1; s10Watch(); try{ s10Over(); s10QuestDoneIf(); }catch(e){ console.error(e); } }
   S10.npcT-=dt; if(S10.npcT<=0){ S10.npcT=1; s10NpcSync(); }
   if(S10.qOrder.length) try{ s10QuestSync(); }catch(e){ console.error(e); }
@@ -1450,6 +1451,16 @@ function s10FurnAct(o,base,args){
   base.apply(this,args);
   if(DLG){ const d=DLG, prev=d.done; d.done=()=>{ if(prev) prev(); done(); }; } else done();
   return true;
+}
+// a legacy furn:<k> entry whose furniture has no prompt of its own (house barrels): while a step wants it examined, or
+// the entry has its own say or scene, that furniture in its area says "Look at <the entry's name>"
+function s10FurnPrompts(A){
+  if(!A||!A.objs||typeof FURN_LABEL==='undefined') return;
+  const ents=Object.keys(S10.legacy).map(id=>S10.legacy[id]).filter(e=>/^furn:/.test(String(e.src||''))&&(!e.area||e.area===A.id||(A.def&&A.def.id===e.area)));
+  for(const e of ents){ const k=String(e.src).slice(5);
+    for(const o of A.objs){ if(o.k!==k||o.prompt||FURN_LABEL[k]||(typeof FLOOR_LABEL!=='undefined'&&FLOOR_LABEL[k])||(typeof CAVE_LABEL!=='undefined'&&CAVE_LABEL[k]!==undefined)) continue;
+      const nm=s10T((e.aliases&&e.aliases[0])||e.name)||k;
+      o.prompt=()=>{ try{ const want=s10Runners().some(R=>s10Doable(R).some(a=>a.x._kind==='examine'&&a.x._args[0]===e.id)); return want||e.say!=null||e.scene?simplify(S('Look at '+nm,'Look at '+nm)):null; }catch(err){ return null; } }; } }
 }
 function s10Adapt(){
   s10WrapTalkOpts(); s10WrapLm();
