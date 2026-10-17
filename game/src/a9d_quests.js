@@ -478,8 +478,12 @@ function updateInteractions(dt){
     for(const o of AREA.objs){
       const lab=o.prompt?o.prompt():FLOOR_LABEL[o.k]?FLOOR_LABEL[o.k](o):CAVE_LABEL[o.k]!==undefined?CAVE_LABEL[o.k]:o.k==='qitem'?(G.items[o.item]||G.found[o.id]?null:`Look at ${o.label}`):o.k==='bed'&&o.home?'Sleep in your bed (heal and save)':o.egg&&o.k!=='drawer'?o.egg.label:FURN_LABEL[o.k];
       if(!lab||o.broken) continue; if(o.k==='page'&&G.pages[o.page]) continue; if((o.k==='cave_ore'||o.k==='relic')&&G.found[o.id]) continue;
-      // (a secret's trigger sits on its host, the same size: it wins the tie, or a counter's own label hid it for good)
-      const reach=(o.w?Math.max(o.w,o.h||0)/2:o.r||16)+34; const d=dist(p.x,p.y,o.x,o.y); if(d<reach) offer(d-reach-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
+      // (a secret's trigger sits on its host, the same size: it wins the tie, or a counter's own label hid it for good;
+      //  and stairs you stand against always win: a long counter's reach is half its width all round, so it took every
+      //  press next to Fennick's cellar stairs)
+      const reach=(o.w?Math.max(o.w,o.h||0)/2:o.r||16)+34; const d=dist(p.x,p.y,o.x,o.y);
+      const onStairs=o.k==='stairs'&&o.w&&Math.max(Math.abs(p.x-o.x)-o.w/2,Math.abs(p.y-o.y)-(o.h||o.w)/2)<24;
+      if(d<reach||onStairs) offer(onStairs?-500:d-reach-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
     }
     for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
     const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
