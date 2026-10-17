@@ -11,9 +11,13 @@ legacy({ id: 'm4s_gull', map: 3, at: [1000, 62000], r: 380, kind: 'place', name:
 legacy({ id: 'm4s_palmcrest', map: 3, at: [3200, 66600], r: 520, kind: 'place', name: ['Palmcrest Isle', 'Palmcrest'], src: 'POI:m_palmcrest' });
 
 // ---- doors into the dungeons and areas
-legacy({ id: 'm4s_lumen_door', map: 3, at: [3700, 62430], r: 60, kind: 'door', name: ['Drowned Lumen', 'Drowned Lumen'], src: 'DOORS:m_lumen' });
-legacy({ id: 'm4s_burrows_mouth', map: 3, at: [10600, 62890], r: 80, kind: 'door', name: ['the Sandworm Burrows', 'the Burrows'], src: 'CAVEMOUTHS:m_burrows' });
-legacy({ id: 'm4s_coralcombe', map: 3, at: [1900, 67600], r: 60, kind: 'door', name: ['Coralcombe', 'Coralcombe'], src: 'LANDMARKS:m_dive_coral' });
+// (these three are A4a's ids in map3_a.js, repeated here exactly so A4S's quests can name them on their own)
+legacy({ id: 'm4_lumen_spire', map: 3, at: [3700, 62430], r: 120, kind: 'door', src: 'DOORS:m_lumen', leads: 'm_lumen',
+  name: ['the Lumen Spire', 'the white tower'], aliases: ['the white tower', 'the Spire'] });
+legacy({ id: 'm4_coral_dive', map: 3, at: [1900, 67600], r: 260, kind: 'door', src: 'LANDMARKS:m_dive_coral', leads: 'm_coralcombe',
+  name: ['the Coralcombe dive ring', 'the coral ring'], aliases: ['Coralcombe Reef'] });
+legacy({ id: 'm4_worm_mouth', map: 3, at: [10600, 62904], r: 200, kind: 'door', src: 'DOORS:m_burrows', leads: 'm_burrows',
+  name: ['the Worm Mouth', 'the Worm Mouth'], aliases: ['the Sandworm Burrows'] });
 legacy({ id: 'm4s_rafi_tent', map: 3, at: [9460, 67241], r: 46, kind: 'door', name: ["Rafi's Big Tent", "Rafi's tent"], src: 'DOORS:h_m_rafi' });
 legacy({ id: 'm4s_winnie_hut', map: 3, at: [2060, 65056], r: 46, kind: 'door', name: ["Winnie's Shell Hut", "Winnie's hut"], src: 'DOORS:h_m_winnie' });
 
@@ -21,7 +25,7 @@ legacy({ id: 'm4s_winnie_hut', map: 3, at: [2060, 65056], r: 46, kind: 'door', n
 legacy({ id: 'm_dabble', map: 3, at: [2240, 64800], kind: 'npc', name: ['Mayor Dabble Floatwell', 'Mayor Dabble'], src: 'CAST:m_dabble' });
 legacy({ id: 'm_winnie', map: 3, at: [2060, 65056], kind: 'npc', name: ['Old Winnie the Tidewife', 'Old Winnie'], src: 'CAST:m_winnie', inside: 'h_m_winnie' });
 legacy({ id: 'm_rowan', map: 3, at: [2860, 64800], kind: 'npc', name: ['Rowan Knotwood', 'Rowan'], src: 'CAST:m_rowan' });
-legacy({ id: 'm_squint', map: 3, at: [2300, 64700], kind: 'npc', name: ['Squint', 'Squint'], src: 'CAST:m_squint' });
+legacy({ id: 'm_squint', map: 3, at: [2296, 64711], kind: 'npc', name: ['Squint', 'Squint'], src: 'CAST:m_squint' });
 legacy({ id: 'm_gilly', map: 3, at: [2586, 64929], kind: 'npc', name: ['Cook Gilly', 'Gilly'], src: 'CAST:m_gilly' });
 legacy({ id: 'm_ned', map: 3, at: [1000, 61905], kind: 'npc', name: ['Old Ned', 'Old Ned'], src: 'CAST:m_ned' });
 legacy({ id: 'm_coralia', map: 3, at: [1900, 67600], kind: 'npc', name: ['Queen Coralia of the Lumenfolk', 'Queen Coralia'], src: 'CAST:m_coralia', inside: 'm_coralcombe' });
@@ -36,7 +40,7 @@ legacy({ id: 'm_esme', map: 3, at: [10266, 68081], kind: 'npc', name: ['Esme, Ke
 legacy({ id: 'm_dusty', map: 3, at: [9100, 67300], kind: 'npc', name: ['Dusty and Dune', 'Dusty and Dune'], src: 'CAST:m_dusty' });
 // (Jinx stands somewhere new round Sable every day, and only at noon)
 legacy({ id: 'm_jinx', map: 3, at: [9000, 67500], r: 1100, kind: 'npc', name: ['Jinx the Mirage Merchant', 'Jinx'], src: 'CAST:m_jinx' });
-legacy({ id: 'm_sandy', map: 3, at: [10600, 62890], kind: 'npc', name: ['Queen Sandy', 'Queen Sandy'], src: 'SPECIAL:m_sandy', inside: 'm_burrows' });
+legacy({ id: 'm_sandy', map: 3, at: [10600, 62904], kind: 'npc', name: ['Queen Sandy', 'Queen Sandy'], src: 'SPECIAL:m_sandy', inside: 'm_burrows' });
 
 // ---- the side quests' things (x3_people m3pBuild)
 legacy({ id: 'm3p_furnace', map: 3, at: [10150, 67350], r: 30, kind: 'prop', name: ["Old Kiln's glass furnace", "Kiln's furnace"], src: 'LANDMARKS:m3p_furnace' });
@@ -76,10 +80,10 @@ legacy({ id: 'm4s_ferry', map: 3, at: [2900, 64750], r: 40, kind: 'prop', name: 
 legacy({ id: 'm4s_wren_raft', map: 3, at: [2425, 65080], r: 60, kind: 'place', name: ["Wren's reading raft", "Wren's raft"], src: 'x3_people.js M3P_VIS' });
 
 // ---- items the old code hands over (where: where Ash gets them)
-legacy({ id: 'm_mooncrumb', map: 3, at: [10600, 62890], kind: 'item', name: ['a crumb of the moon', 'a moon crumb'],
-  src: 'x3_people.js m_mooncrumb', where: 'm4s_burrows_mouth' });
+legacy({ id: 'm_mooncrumb', map: 3, at: [10600, 62904], kind: 'item', name: ['a crumb of the moon', 'a moon crumb'],
+  src: 'x3_people.js m_mooncrumb', where: 'm4_worm_mouth' });
 legacy({ id: 'm_book_raw', map: 3, at: [3700, 62430], kind: 'item', name: ['a soggy book with a moth on the cover', 'a soggy moth book'],
-  src: 'x3_people.js m_book_raw', where: 'm4s_lumen_door' });
+  src: 'x3_people.js m_book_raw', where: 'm4_lumen_spire' });
 legacy({ id: 'm_vletter', map: 3, at: [9000, 67500], kind: 'item', name: ['a letter a moth dropped, to "my duck"', 'a letter to "my duck"'],
   src: 'x3_people.js m_vletter', where: 'm_jinx' });
 

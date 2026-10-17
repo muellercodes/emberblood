@@ -23,7 +23,7 @@ quest({
   },
 
   step: [
-    { id: 'crumb', do: 'find m_mooncrumb', at: 'm4s_burrows_mouth',
+    { id: 'crumb', do: 'find m_mooncrumb', at: 'm4_worm_mouth',
       obj: ['Find a fresh piece of the moon', 'Find a piece of the moon'],
       hint: ['Kiln says bits of the moon fell in the Glass Desert. Something in the Sandworm Burrows ate one.',
         'Try the Sandworm Burrows.'] },

@@ -28,7 +28,7 @@ quest({
   },
 
   step: [
-    { id: 'vault', do: 'find m_book_raw', at: 'm4s_lumen_door',
+    { id: 'vault', do: 'find m_book_raw', at: 'm4_lumen_spire',
       obj: ['Melt the moon-wax vault in the Drowned Library with Moonfire', 'Melt the vault in the Drowned Library'],
       hint: ['The vault is in the Drowned Library, deep in Drowned Lumen. Fire will not touch the wax. Moonfire will, even under water.',
         'Use Moonfire on the vault in Drowned Lumen.'] },
@@ -62,7 +62,8 @@ quest({
         '"The leash keeps a moth big and cold."', { clue: 'm4_book' }],
       ['wren', '"Moonfire, breathed gently, melts the knot. A moth set free goes back to her own size, and her own warmth."',
         '"Gentle moonfire melts the knot."'],
-      { if: 'solved free_hush', then: [['ash', 'I KNEW it. Like blowing on hot soup.', 'I knew it!']],
+      // (m_leash_known: set by A4b's free_hush deduction on the main path, or by an old save's reading; this quest sets it after)
+      { if: 'flag m_leash_known', then: [['ash', 'I KNEW it. Like blowing on hot soup.', 'I knew it!']],
         else: [['ash', 'So I could free Hush. Gently.', 'So I can free Hush. Gently.']] },
       ['wren', "Oh! Something's tucked in the back. A page. Not Lumen writing. Ours.", 'A page in the back. In OUR writing!'],
       { if: '!flag f_page11', then: [['wren', "It's the lost ELEVENTH page of the Wardens' book! Under the sea for five hundred years!",

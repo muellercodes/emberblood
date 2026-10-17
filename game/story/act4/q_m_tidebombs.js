@@ -22,9 +22,9 @@ quest({
       hint: ['Dive off the shore of Palmcrest and throw a bomb at each cracked rock. Under water, they stick.',
         'Dive at Palmcrest. Bomb each rock.'],
       parts: [
-        { do: 'wait_for flag m_rock1', marker: 'm3p_rock1' },
-        { do: 'wait_for flag m_rock2', marker: 'm3p_rock2' },
-        { do: 'wait_for flag m_rock3', marker: 'm3p_rock3' },
+        { do: 'wait_for flag m_rock1', at: 'm3p_rock1' },
+        { do: 'wait_for flag m_rock2', at: 'm3p_rock2' },
+        { do: 'wait_for flag m_rock3', at: 'm3p_rock3' },
       ] },
     { id: 'mags', do: 'talk f_mags', scene: 'tb_done',
       then: ['take m_tideproto 3', 'set m_tidebombs', 'upgrade m_tidebombs', 'xp 350', { banner: ['Tide Bombs!', 'Tide Bombs!'],

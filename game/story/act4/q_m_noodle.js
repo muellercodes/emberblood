@@ -13,7 +13,7 @@ quest({
   old_steps: ['home', 'sandy'],
 
   step: [
-    { id: 'home', do: 'wait_for flag m_noodle_home', legacy: true, marker: 'm4s_burrows_mouth',
+    { id: 'home', do: 'wait_for flag m_noodle_home', legacy: true, marker: 'm4_worm_mouth',
       obj: ['Take Noodle home to his mom in the Sandworm Burrows (he only goes through sand)', 'Take Noodle home. Only through sand!'],
       hint: ['If Noodle stops and cries, the ground under him is not sand. Go back and find a sandy way, or burrow, and he will burrow after you.',
         'Noodle cries? Find sand. Or burrow!'] },
