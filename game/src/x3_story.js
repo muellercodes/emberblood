@@ -1526,6 +1526,9 @@ onTalk(n=>{
   if(!G||G.mode!=='story'||G.done||curMap()!==3) return false;
   const a=actOf(G.stage); if(a!==4&&a!==5) return false;
   const F=G.flags;
+  // (the star-iron is Mom's own business; otherwise the story data's talk for this act wins, as in x3_people)
+  if(n.id==='maren'&&F.m_maren&&G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; }
+  if(typeof m3pDataTalk==='function'&&m3pDataTalk(n.id)) return false;
   if(n.id==='wren'&&!M3S_PRE.wren&&a===4&&!m3sSeen('m_wren')&&!G.items.m_book_raw){ m3sPlay('m_wren'); return true; }
   if(n.id==='dell'&&!M3S_PRE.dell1&&a===4&&!m3sSeen('m_dell1')&&reached('m_drift')&&!F.m_reforged){ m3sPlay('m_dell1'); return true; }
   if(n.id==='maren'&&F.m_maren){ if(G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; } if(F.m_done&&a===4){ m3sPlay('m_pier_mom'); return true; } }
