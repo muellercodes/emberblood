@@ -245,7 +245,7 @@ people({
       { if: 'flag m_eclipse2 !clue m4_esme_glass', once: true, then: ['clue m4_esme_glass'],
         say: ['Every lamp went out when she drank the well. And three of them have no GLASS. Who steals lamp glass?',
           'Three lamps lost their glass. Who steals glass?'] },
-      { if: 'solved lamp_thief !seen lm_glass !quest m_lamps active', once: true, scene: 'lm_glass',
+      { if: 'solved lamp_thief !seen lm_glass', once: true, scene: 'lm_glass',
         then: ['set m_lamp_5', 'set m_lamp_6', 'set m_lamp_10', 'epi m4_epi_sorry 5'] },
       { if: 'quest m_lamps active', say: ['Look at a lamp and it tells you what it needs. Lamps are like that. So are dragons.', 'Look at a lamp. It tells you what it needs.'] },
       { if: 'flag m_lamps12', fact: 'm4s_sable_lamps=relit',

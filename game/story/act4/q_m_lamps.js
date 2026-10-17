@@ -38,11 +38,9 @@ quest({
         { do: 'wait_for flag m_lamp_9', at: 'm3p_lamp9', hint: ['Lady Wellington stands by the Moon Well, out on her little islet.', 'She is by the Moon Well.'] },
         { do: 'wait_for flag m_lamp_10', at: 'm3p_lamp10', hint: ['Coco is at the top of the tallest palm. Claws climb palms.', 'Climb the palm.'] },
         { do: 'wait_for flag m_lamp_11', at: 'm4s_rafi_tent', hint: ["Little Sun is inside Rafi's Big Tent. Just walk in.", 'She is in Rafi\'s tent.'] },
-      ],
-      extra: [
-        // the lamp_thief payoff (A4b's deduction in m_observatory.js): the stolen glass comes home, labelled SORRY
-        { do: 'talk m_esme', if: 'solved lamp_thief', scene: 'lm_glass', then: ['set m_lamp_5', 'set m_lamp_6', 'set m_lamp_10', 'epi m4_epi_sorry 5'] },
       ] },
+    // (the lamp_thief payoff, Esme's glass coming home labelled SORRY, is her talk line in people.js: it sets
+    // m_lamp_5, 6 and 10 whether or not this quest is open)
     { id: 'esme', do: 'talk m_esme', scene: 'lm_done',
       then: ['set m_lamps_ally', 'ally m_lamps_ally', 'xp 450', { banner: ['The lamplighters will come!', 'The lamplighters will come!'],
         sub: ["Esme's lamplighters will fight beside you at the Observatory.", 'They will help you at the Observatory.'] }, 'mail m_pb_oil'],
