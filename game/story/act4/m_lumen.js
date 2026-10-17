@@ -21,6 +21,7 @@ chapter({
     m4_channel: { map: 3, at: [3560, 62760], r: 240, kind: 'spot', name: ['the deep channel under the Lumen Spire', 'the deep channel'] },
     // on the balcony (level 1, reached with the Grapple Tail): dust on the rail and a long scrape on the marble
     m4_balcony_dust: { map: 3, at: [3782, 62440], r: 22, kind: 'examine', look: 'm4a_balcony_dust', h: 30, over: 'm_lm_balcony',
+      if: 'stage>=m_lumen', say: 'lmn_dust_again',
       name: ['the dusty balcony rail', 'the dusty rail'] },
   },
 
@@ -69,6 +70,11 @@ chapter({
       ['narr', 'Across the marble floor runs a scrape as long as a boat. Something huge landed here to rest.', 'A scrape as long as a boat! Something huge rested here.'],
       ['narr', 'Its claw marks point out over the sea, toward the sunrise.', 'Its claw marks point toward the sunrise.', { ref: 'm4_spire_balcony' }],
       ['ash', 'Something BIG sat here. And then it flew off that way.', 'Something BIG sat here. Then it flew that way.'],
+    ],
+    // the rail again, once its clue is in the Case Book (before that, the step's scene plays)
+    lmn_dust_again: [
+      { if: 'clue m4_spire_dust', then: [
+        ['narr', 'Silver moth dust on the rail, and the long scrape, pointing toward the sunrise.', 'Moth dust, and the long scrape.', { ref: 'm4_spire_balcony' }]] },
     ],
     // the old STORY keys the dungeon plays (m3sBeat 'window', 'library', 'mosaic'), replaced in place
     m_lumen_window: [

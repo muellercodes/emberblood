@@ -19,10 +19,10 @@ chapter({
 
   place: {
     // the tide post at the south edge of the Town Raft, beside the plank jetty down to the Floating Kitchen
-    m4_tide_post: { map: 3, at: [2348, 64926], r: 20, kind: 'examine', look: 'm4a_tide_post', h: 64,
+    m4_tide_post: { map: 3, at: [2348, 64926], r: 20, kind: 'examine', look: 'm4a_tide_post', h: 64, say: 'drf_post_again',
       name: ['the tide post at the edge of the raft', 'the tide post'] },
     // Squint's spyglass, on a swivel at the top of the crow's nest (level 1, up its ladder)
-    m4_spyglass: { map: 3, at: [2318, 64650], r: 16, kind: 'examine', look: 'm4a_spyglass', h: 40,
+    m4_spyglass: { map: 3, at: [2318, 64650], r: 16, kind: 'examine', look: 'm4a_spyglass', h: 40, say: 'drf_spyglass_again',
       name: ["Squint's spyglass", "Squint's spyglass"] },
     // a raft lantern with a bite out of its glass (lamp_thief, optional; A4b/A4S mend it with `world m4_chewed_lamp fixed`)
     m4_chewed_lamp: { map: 3, at: [2070, 64566], r: 18, kind: 'examine', look: 'm4a_chewed_lamp', h: 56,
@@ -142,6 +142,16 @@ chapter({
       ['m_winnie', 'Not yet, child. Not yet.'],
       ['m_winnie', 'You saw the tower. Go on, then.', { promise: 'm4_lumen_spire' }],
     ],
+    // the tide post and the spyglass again, once their clue is in the Case Book (before that, the step's scene plays)
+    drf_post_again: [
+      { if: 'clue m4_tide_post', then: [
+        ['narr', 'The tide post. Neat old notches, wild new ones, and TWO BITES scratched by the wildest.', 'The tide post. TWO BITES by the wildest notch.']] },
+    ],
+    drf_spyglass_again: [
+      { if: 'clue m4_spyglass', then: [
+        ['narr', "Squint's spyglass. The moon hangs pale in the sky, with bites out of its edge. Far north, the Lumen Spire stands in the sea.",
+          'The moon has bites gone. Far north, the Lumen Spire.', { dir: ['m4_crows_nest', 'm4_lumen_spire', 'north'] }]] },
+    ],
     drf_lamp: [
       { if: 'world m4_chewed_lamp=fixed', then: [
         ['narr', 'The raft lantern has brand new glass. A little tag on it says SORRY.', 'The lantern has new glass. A tag says SORRY.', { fact: 'm4_chewed_lamp=fixed' }]],
@@ -153,6 +163,11 @@ chapter({
   },
 
   talk: {
+    // Winnie wants proof: while the clues are still out there (A4S owns her other talk)
+    m_winnie: [
+      { if: 'stage=m_drift flag m_dabble !step m_drift.look',
+        say: ['Proof first, dragon child. Look at the tide. Look at the sky. And ask somebody who knows fish.', 'Proof first! Look at the tide and the sky. Ask about fish.'] },
+    ],
     // the wobbly_tide payoff (A4S owns Dabble's other talk)
     m_dabble: [
       { if: 'solved wobbly_tide', once: true,
