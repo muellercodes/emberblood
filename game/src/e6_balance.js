@@ -20,7 +20,7 @@ const BAL={
   still:{r:56,blastR:62,delay:[1.0,0.85,0.7],dmg:12},  // the boss "keep moving" eruption (seconds before it comes: DIFFS.still)
   // v10: per boss [Easy, Normal] factor on those seconds (0: no eruptions). The Mirrow Serpent is fought from the shore
   // with the bow, so standing still there is the plan, not a mistake.
-  stillK:{serpent:[0,0]}
+  stillK:{serpent:[0,0], grizzlefang:[1.5,1.4], gnarl:[1.3,1.3]}
 };
 function balHpK(L){ return Math.pow(BAL.foeHp,Math.max(0,(L||1)-1)); }
 function balDmK(L){ return Math.pow(BAL.foeDmg,Math.max(0,(L||1)-1)); }
@@ -44,7 +44,8 @@ const BAL_BOSS={
 for(const k in BAL_BOSS) if(EDEF[k]) Object.assign(EDEF[k],BAL_BOSS[k]);
 // v10 on-ramp: Act I boss health on [Easy, Normal] in the story, times the health above (Hard keeps hp x DIFFS.bossHp).
 // Measured with the casual-kid bot so each boss is a little harder than the one before (scratchpad v10/BAL.md).
-const BAL_BOSS_EZ={grizzlefang:[1,1]};
+const BAL_BOSS_EZ={grizzlefang:[1,0.8], gnarl:[0.85,0.8], morrow:[1.5,1.75], serpent:[0.65,0.8], gloamjaw:[0.8,0.7], broodmother:[1.45,1.1],
+  greymane:[1.2,1.4], skrae:[1.8,1.85], cindervane:[1,0.7]};
 { const base=makeEnemy; makeEnemy=function(type,x,y,opt){ const e=base(type,x,y,opt);
     try{ const k=e&&e.boss&&G&&G.mode==='story'&&BAL_BOSS_EZ[type]; const i=k?DIFFS.indexOf(G.diff):-1; if(k&&i>=0&&i<2&&k[i]!==1){ e.maxHp*=k[i]; e.hp=e.maxHp; } }catch(err){}
     return e; }; }

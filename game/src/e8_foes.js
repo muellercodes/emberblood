@@ -716,8 +716,8 @@ function bossSay(e,who,line,gap){ if(e._sayT>G.time) return; e._sayT=G.time+(gap
 // first boss a new player meets, so his warnings are long enough for a kid to react to (about 0.4 s, then a roll), his bomb
 // lines have wide gaps, fewer kobolds come later, and his iron pot lets more through and cracks from the front too.
 // The numbers and the casual-kid bot tables behind them: scratchpad v10/BAL.md.
-const GRZ={wind:[1.45,1.3], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
-  sumAt:[0.4,0.4], sumN:[2,3], gap:[250,210], bombT:[1.8,1.5], lineT:[1.8,1.45], waves:[[2,3],[3,3]]};
+const GRZ={wind:[1.6,1.5], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
+  sumAt:[0.4,0.4], sumN:[2,2], gap:[250,210], bombT:[1.8,1.5], lineT:[1.8,1.45], waves:[[2,3],[3,3]]};
 defineFoe('grizzlefang',{hp:actIHp(760),phases:[0.66,0.33],
   phaseText:[[S('Bomb Barrage!','Bombs!'),S('Lines of bombs. Find the gap, or roll through them!','Find the gap. Or roll!'),['griz',S('Boys! Light the fuses!','Boys! Light the bombs!')]],
              [S('Iron Pot Armor!','Iron pot!'),S('His front is iron now. Hit him from behind, or smash it with the hammer!','Hit his back! Or use the hammer!'),['griz',S('Ha! Try cutting through THIS!','Ha! Try hitting this!')]]],
@@ -978,7 +978,7 @@ function greyIce(e){
   const ice=(G.fz||[]).filter(z=>z.k==='ice'); if(ice.length>9) for(let i=0;i<ice.length-9;i++) ice[i].done=true;
 }
 function greyPack(e){
-  const C=bossCtx(e), n=byDiff(2,3,4), L=fkLevel(e,{}), a0=rand(0,TAU);
+  const C=bossCtx(e), n=byDiff(2,G.mode==='story'?2:3,4), L=fkLevel(e,{}), a0=rand(0,TAU);   // v10 on-ramp: 2 wolves on Normal (v9: 3)
   shake(6); SFX.play('howl'); G.rings.push({x:e.x,y:e.y,rad:e.r,max:260,speed:500,thick:16,dmg:0,kb:280});
   for(let i=0;i<n;i++){ const a=a0+i*TAU/n+rand(-0.3,0.3), r=C.R-40, x=C.cx+Math.cos(a)*r, y=C.cy+Math.sin(a)*r;
     const w=makeEnemy('wolf',x,y,{level:L,aggro:true,snowy:true,homeX:C.cx,homeY:C.cy,leash:2500}); w.spawnIn=0.25; w.inArena=C.A||null;
@@ -1035,20 +1035,29 @@ defineBoss('gate',{boss:'cindervane',at:'gate',stage:'gate',guards:[['knight',2]
 const ONRAMP={
   // longer red warnings: the wind-up that starts in this state is this many times longer (DIFFS.wind still applies after)
   wind:{
-    gnarl:{swipeW:[1.3,1.3],stompW:[1.2,1.2]},
+    grizzlefang:{},   // his own wind-ups are in GRZ
+    gnarl:{swipeW:[1.45,1.45],stompW:[1.2,1.2]},
     serpent:{riseW:[1.3,1.25]},
-    gloamjaw:{chompW:[1.45,1.35],tongueW:[1.3,1.25],emergeW:[1.3,1.25]},
-    cindervane:{slashW:[1.6,1.5],chargeAim:[1.25,1.15],quakeW:[1.25,1.15]}
+    gloamjaw:{chompW:[1.6,1.55],tongueW:[1.3,1.25],emergeW:[1.3,1.25]},
+    cindervane:{slashW:[1.7,1.65],chargeAim:[1.25,1.15],quakeW:[1.25,1.15]}
   },
   // a longer pause after these attacks (the opening to hit back)
   rec:{ gnarl:{swipeW:[1.3,1.25]}, cindervane:{slashW:[1.6,1.4]} },
-  serpentBolt:[0.78,0.86],   // the serpent's ice bolts fly slower (easier to step aside)
-  gnarlRing:[0.85,0.9],      // Old Gnarl's stomp rings roll slower
+  // a longer breather between attacks: his cooldown is this many times longer each time he goes back to the chase
+  cd:{ grizzlefang:[1.3,1.3], gnarl:[1.2,1.25], gloamjaw:[1.5,1.5], greymane:[1.1,1.15], cindervane:[2.2,2.2] },
+  serpentBolt:[0.75,0.8],    // the serpent's ice bolts fly slower (easier to step aside)
+  gnarlRing:[0.8,0.8],       // Old Gnarl's stomp rings roll slower
+  serpentUp:[1.5,1.3],      // the serpent stays up out of the water longer (the time to shoot it)
+  serpentSpit:[2,2],         // ice bolts in each spit (v9: 3, or 5 once angry; angry adds one)
+  serpentSweep:[1.3,1.25],   // a longer warning before its tail sweeps
   gloamChomp:[3.2,2.8],      // seconds between his chomps while he sits up in the muck (v9: 2)
   gloamSum:[1,2],            // kobolds he calls at half health (v9: 3)
+  gloamSpit:[2,2],           // toxic blobs in each spit, one more once he is angry (v9: 3, then 5)
   cinderCombo:[2,2],         // slashes in Sir Cindervane's combo (v9: 3)
-  cinderGuard:[0.45,0.4],    // share of a front hit that gets through his raised guard (v9: 0.15)
-  guards:{ gate:[[['cultist',1]],[['cultist',2]]] }   // site guards (v9: 2 knights and 2 cultists, each knight hits for a fifth of Ash's health)
+  cinderGuard:[0.55,0.5],    // share of a front hit that gets through his raised guard (v9: 0.15)
+  guards:{ gate:[[['cultist',1]],[['cultist',1]]],     // site guards (v9: 2 knights and 2 cultists; a knight hits for a fifth of Ash's health)
+    warcamp:[[['kobold',3]],[['kobold',4]]],         // (v9: 5 kobolds)
+    mire:[[['kobold',2]],[['kobold',2],['cultist',1]]] }   // (v9: 3 kobolds and 2 cultists)
 };
 function onrampOn(){ return G&&G.mode==='story'&&!foeDiff().hard; }
 const orK=a=>byDiff(a[0],a[1],1);
@@ -1060,9 +1069,18 @@ function onrampTele(e,t0,s0){
   const R=ONRAMP.rec[e.type];
   if(R&&e.state==='recover'&&s0!=='recover'&&R[s0]&&e.st>0) e.st*=orK(R[s0]);
 }
-for(const t of ['gnarl','serpent','gloamjaw','cindervane']) onrampWrap(t,(e,dt,t0,s0,h0,p0)=>{
+for(const t of ['grizzlefang','gnarl','serpent','gloamjaw','greymane','cindervane']) onrampWrap(t,(e,dt,t0,s0,h0,p0)=>{
   onrampTele(e,t0,s0);
-  if(e.type==='serpent') for(let i=p0;i<G.projectiles.length;i++){ const q=G.projectiles[i]; if(q.owner==='enemy'&&q.kind==='ice'&&!q._or){ q._or=1; const k=orK(ONRAMP.serpentBolt); q.vx*=k; q.vy*=k; } }
+  const C=ONRAMP.cd[e.type]; if(C&&e.state==='chase'&&s0!=='chase'&&e.cd>0) e.cd*=orK(C);
+  if(e.type==='serpent'){
+    let n=0; const cap=orK(ONRAMP.serpentSpit)+(e.angry?1:0), drop=[];
+    for(let i=p0;i<G.projectiles.length;i++){ const q=G.projectiles[i]; if(q.owner==='enemy'&&q.kind==='ice'&&!q._or){ q._or=1; if(++n>cap){ drop.push(q); continue; } const k=orK(ONRAMP.serpentBolt); q.vx*=k; q.vy*=k; } }
+    if(drop.length) G.projectiles=G.projectiles.filter(q=>!drop.includes(q));
+    if(e.state==='up'&&s0==='riseW') e.st*=orK(ONRAMP.serpentUp);
+    const T=trialT(); if(T) for(const z of T.zones) if(z.kind==='sweep'&&!z._or){ z._or=1; z.delay*=orK(ONRAMP.serpentSweep); } }
+  if(e.type==='gloamjaw'){ const cap=orK(ONRAMP.gloamSpit)+((e.bph>=2||e.hp<e.maxHp*0.5)?1:0); let n=0; const drop=[];
+    for(let i=h0;i<G.hazards.length;i++){ const h=G.hazards[i]; if(h.kind==='blast'&&h.toxic&&++n>cap) drop.push(h); }
+    if(drop.length) G.hazards=G.hazards.filter(h=>!drop.includes(h)); }
   if(e.type==='gnarl'){ const T=trialT(); if(T) for(const R of T.rings) if(!R._or&&R.dmg>0){ R._or=1; R.speed*=orK(ONRAMP.gnarlRing); } }
   if(e.type==='gloamjaw'&&e.chompCd>G.time+1.95&&e._orC!==e.chompCd){ e.chompCd=G.time+orK(ONRAMP.gloamChomp); e._orC=e.chompCd; }
   if(e.type==='cindervane'&&e.state==='slashW'&&s0==='slashW'&&e.tele&&e.tele!==t0&&(e.combo|0)>=orK(ONRAMP.cinderCombo)){ toRecover(e,1.0*orK(ONRAMP.rec.cindervane.slashW)); }
