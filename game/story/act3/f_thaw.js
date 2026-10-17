@@ -101,7 +101,8 @@ chapter({
       mystery: 'long_winter',
       ask: ['What is making the blizzard on Mount Dread?', 'What makes the storm on Mount Dread?'],
       needs: ['f3_moth_flew', 'f3_chapel', 'f3_spyglass'],
-      bonus: ['f3_moth_north', 'f3_storm_hums'],
+      // (bonus: A3S's f3_ring_scale (the Moon Ring gate), f3_mumble_echo (q_f_mumble), f3_juniper_map (q_f_juniper))
+      bonus: ['f3_moth_north', 'f3_storm_hums', 'f3_ring_scale', 'f3_mumble_echo', 'f3_juniper_map'],
       pick: [
         { t: ['A dragon, asleep on the summit, breathing cold in her sleep', 'A sleeping dragon, breathing snow'], right: true },
         { t: ['The white moth', 'The white moth'],

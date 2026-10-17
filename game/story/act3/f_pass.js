@@ -43,6 +43,8 @@ chapter({
       mystery: 'who_cracked',
       ask: ['What cracked open the High Pass after a hundred years?', 'What cracked the High Pass?'],
       needs: ['f3_ulf_wings', 'f3_pass_cut'],
+      // (bonus: A3S's f3_elka_dust (q_f_sled, Elka saw the dust) and f3_ring_scale (the Moon Ring gate's giant white scale))
+      bonus: ['f3_elka_dust', 'f3_ring_scale'],
       pick: [
         { t: ['A giant moth, flying north through the ice', 'A giant moth flew through it'], right: true },
         { t: ["Elka's sled", "Elka's sled"],

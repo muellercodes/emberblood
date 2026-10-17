@@ -72,7 +72,7 @@ chapter({
     // the Sculpture Gallery's chest (the dungeon gives a blessing after it)
     f_maze_diary: [
       ['narr', "Inside the chest, wrapped in oilcloth, is a little book with a snowflake on the cover. Ember's Ice Diary.",
-        "In the chest is a little book with a snowflake on it. Ember's Ice Diary.", { do: ['give f_icediary', 'set f_icediary'] }],
+        "In the chest is a little book with a snowflake on it. Ember's Ice Diary.", { do: ['give f_icediary', 'set f_icediary'], ref: 'f_maze_door' }],
       ['narr', '"Auntie took me sledding today. She makes the hill and I make the cocoa. She laughs like wind chimes. I call her Auntie Glee. She pretends to hate it."',
         '"Auntie took me sledding. She makes the hill. I make the cocoa. I call her Auntie Glee."', { clue: 'f3_ice_diary' }],
       ['ash', 'Auntie Glee. Ember had an auntie who laughed like wind chimes.', 'Auntie Glee. Ember had an auntie!'],
@@ -96,7 +96,7 @@ chapter({
       ['ember', 'Not everything. Leave the snowmen. Snowmen have feelings.', 'Not everything. Leave the snowmen. They have feelings.'],
     ],
     f_maze_sigrid: [
-      ['f_sigrid', "Brrrr. Thank you, dragon! I've been stuck since the moth. I was looking for the furnace key.", 'Brrrr. Thank you, dragon! I was stuck since the moth came.'],
+      ['f_sigrid', "Brrrr. Thank you, dragon! I've been stuck since the moth. I was looking for the furnace key.", 'Brrrr. Thank you, dragon! I was stuck since the moth came.', { ref: 'f_maze_door' }],
       ['f_sigrid', "Here, take my small key. It opens the shaft door. I'm going home to Hearthold for a very long bath.", 'Take my small key. It opens the shaft door. Bath time!',
         { ref: 'f_maze_door' }],
     ],
@@ -116,7 +116,7 @@ chapter({
       ['narr', 'Lord Blubberton waddles off to take a bath.'],
     ],
     f_bellows_intro: [
-      ['narr', 'In the middle of the dead forge stands a golem as big as a cottage. Brass belly, anvil fists, a great leather bellows on his back. Plates of purple moth-frost cover his chest and arms.',
+      ['narr', 'In the middle of the dead forge stands a golem as big as a cottage. Brass belly, anvil fists, a great leather bellows on his back. Plates of purple moth-frost cover his shoulders and arms.',
         'A golem as big as a cottage. Brass belly. Anvil fists. Purple frost armor.'],
       ['f_bellows', 'CLANK. Bellows... cold... Purple cold says: no fire.', 'CLANK. Bellows cold. Purple cold says: no fire.'],
       ['tove', "That's Old Bellows, Ember's forge keeper! The frost has got him. Melt it off!", "That's Old Bellows, Ember's forge keeper! Melt the frost off him!"],
