@@ -90,7 +90,11 @@ chapter({
       ['narr', 'Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.',
                'Under the dome sits a white moth as big as a barn. A silver thread runs from her neck to two knots, then up into the dark.'],
       ['narr', 'Beside her, in a little brass cradle, something glows silver. The Moon Shard.', 'Beside her, something glows silver. The Moon Shard.'],
-      ['f_hush', 'Shhh. You again. The loud one. ...I never did get a sweater.', 'Shhh. You again. I never got a sweater.'],
+      // Act III's choice f_hush (A3b): Ash wrapped her in Ylva's red scarf ('scarf'), or told her to get a sweater
+      { if: 'choice f_hush=scarf', then: [
+        ['f_hush', 'Shhh. You again. The loud one. ...I kept the red scarf. It is under the leash. It is the only warm thing.', 'Shhh. You again. I kept the red scarf.'] ],
+        else: [
+        ['f_hush', 'Shhh. You again. The loud one. ...I never did get a sweater.', 'Shhh. You again. I never got a sweater.'] ] },
       ['ash', 'Hush. You came back.', 'Hush. You came back.'],
       ['f_hush', 'I flew to the Mother, small and cold. She made me big again. "Never small again," she said. Then she gave me this.', 'The Mother made me big again. Then she gave me this leash.'],
       ['narr', 'Far above, something tugs the leash, gently. Hush flinches.', 'Far above, something tugs the leash. Hush flinches.'],
