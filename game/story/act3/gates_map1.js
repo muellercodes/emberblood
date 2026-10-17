@@ -22,8 +22,11 @@ places({
       name: ['the frozen middle of the Moon Ring', 'the frozen ring'],
       locked: ['The middle of the Moon Ring is frozen over. In summer. Purple moth-frost, and something white is stuck inside it. Your fire only makes it sweat.',
         'Moth-frost! Something white is inside. Use hotter fire.'] },
-    f3_ring_scale: { kind: 'examine', map: 1, at: [1350, 22707], r: 26, h: 30, if: 'flag gate_f3g_ring>=2', look: 'ring_scale_ice', say: 'a3g_ring',
-      then: ['clue f3_ring_scale', 'set f3_ring_open', 'xp 300'], name: ['a giant white scale', 'a giant scale'] },
+    // (until it is looked at, the scale takes the prompt from x1_world's Moon Ring stones, 55 px away; then the scale
+    // stays as a drawing and the stones have their prompt back)
+    f3_ring_scale: { kind: 'examine', map: 1, at: [1350, 22707], r: 26, h: 30, if: 'flag gate_f3g_ring>=2 !flag f3_ring_open', over: 'c_lm_moonring',
+      look: 'ring_scale_ice', say: 'a3g_ring', then: ['clue f3_ring_scale', 'set f3_ring_open', 'xp 300'], name: ['a giant white scale', 'a giant scale'] },
+    f3_ring_scale_after: { kind: 'prop', map: 1, at: [1350, 22707], if: 'flag f3_ring_open', look: 'ring_scale_ice', name: ['a giant white scale', 'a giant scale'] },
 
     // ---- G5. Hettie's cellar (Blast Bombs), in the back yard behind Sprocket's Workshop (door h_c_hettie 6600,25821)
     f3g_hettie: { kind: 'gate', gate: 'bomb_rock', map: 1, at: [6600, 25650], wall: false, w: 84, r: 60, leads: 'f3_hettie_cellar',
@@ -31,8 +34,10 @@ places({
       name: ["the boulder on Hettie's cellar", 'a big boulder'],
       locked: ['A huge boulder sits right on top of a cellar door. A painted sign on it says: SORRY, CELLAR. A bomb might move it.',
         'A boulder on a cellar door. Try a bomb!'] },
-    f3_hettie_cellar: { kind: 'chest', map: 1, at: [6600, 25650], if: 'flag gate_f3g_hettie>=2', look: 'sprocket_boulder', say: 'a3g_hettie',
-      loot: ['upgrade f3_satchel', 'set f3_satchel', 'give coins 60'], name: ["Hettie's cellar", "Hettie's cellar"] },
+    // (an examine, not a chest: a chest place plays no scene. bombbag 5: five more bombs fit in the bag)
+    f3_hettie_cellar: { kind: 'examine', map: 1, at: [6600, 25650], r: 44, h: 30, if: 'flag gate_f3g_hettie>=2 !flag f3_satchel', look: 'sprocket_boulder', say: 'a3g_hettie',
+      then: ['upgrade f3_satchel', 'set f3_satchel', 'bombbag 5', 'give coins 60'], name: ["Hettie's cellar", "Hettie's cellar"] },
+    f3_hettie_after: { kind: 'prop', map: 1, at: [6600, 25650], if: 'flag f3_satchel', look: 'sprocket_cellar', name: ["Hettie's cellar", "Hettie's cellar"] },
   },
 
   scene: {
@@ -53,6 +58,7 @@ places({
       ['narr', 'Under the boulder: a cellar door. Under the door: twelve years of Hettie Sprocket saying "I will fix that later."', 'A cellar full of old projects.'],
       ['narr', 'On top of the pile sits a satchel of brass and leather. A label: BOMB BAG, MARK TWO. DO NOT LET MAGS SEE.',
         'A brass satchel: BOMB BAG. DO NOT LET MAGS SEE.'],
+      ['narr', 'Ash swaps his old bomb bag for it. It holds five more bombs. It also hums a little.', 'It holds five more bombs! It hums.'],
       ['ash', 'Sorry, Hettie. Mags is going to see.', 'Sorry, Hettie.'],
     ],
   },

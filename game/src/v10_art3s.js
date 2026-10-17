@@ -4,10 +4,13 @@
 //   egg_shells        an old nest on Cinder Mountain's rim with a red scorched shell and an ice-blue one
 //   iska_box          Iska's little stone box with its lantern wax seal, by the broken flagstone
 //   ring_scale_ice    a white wing-scale as big as a plate in the Moon Ring's grass, two moth shapes pressed round it
+//   egg_nest          the same nest once the shells and the ember are taken
 //   sprocket_boulder  Hettie's opened cellar hatch with the brass Bomb Bag on top (the boulder's rubble round it)
+//   sprocket_cellar   the same hatch once the Bomb Bag is taken
 //   frozen_bun        Bertram's giant frozen Lantern bun (drawn over the gate's boulder until it bursts)
 //   frozen_bun_open   the burst bun, crumbs everywhere and a Heart Ember glowing in the middle
-// And the hat drawing for 'Hearthwarden Plume' (Captain Brann's spare plume, the what_knights payoff).
+//   frozen_bun_crumbs the burst bun once the Heart Ember is taken
+//   hearth_plume      the hat look for item f3_plume (Captain Brann's spare plume, the what_knights payoff)
 if(typeof defineLook==='function'){ const A3S_INK='#2b2420';
   defineLook('tove_stone_ice',{w:56,h:34,draw(g,x,y){
     g.save(); g.translate(x,y);
@@ -19,11 +22,15 @@ if(typeof defineLook==='function'){ const A3S_INK='#2b2420';
     g.fillStyle='#e8f4ff'; g.beginPath(); g.arc(-6,-9,1.6,0,TAU); g.arc(0,-9,1.6,0,TAU); g.arc(6,-9,1.6,0,TAU); g.fill();
     g.restore();
   }});
+  const nest=g=>{
+    g.strokeStyle='#5a3a22'; g.lineWidth=2.4; for(let i=0;i<9;i++){ const a=i/9*Math.PI; g.beginPath(); g.moveTo(Math.cos(a)*-24,-2+Math.sin(a)*3); g.lineTo(Math.cos(a)*24,-6-Math.sin(a)*2); g.stroke(); }
+    g.fillStyle='#7a5232'; g.strokeStyle=A3S_INK; g.lineWidth=1.8; g.beginPath(); g.ellipse(0,-3,24,7,0,0,TAU); g.fill(); g.stroke();
+  };
+  defineLook('egg_nest',{w:54,h:20,draw(g,x,y){ g.save(); g.translate(x,y); nest(g); g.restore(); }});
   defineLook('egg_shells',{w:54,h:32,draw(g,x,y){
     g.save(); g.translate(x,y);
     g.fillStyle='rgba(255,140,60,.25)'; g.beginPath(); g.arc(0,-8,22,0,TAU); g.fill();
-    g.strokeStyle='#5a3a22'; g.lineWidth=2.4; for(let i=0;i<9;i++){ const a=i/9*Math.PI; g.beginPath(); g.moveTo(Math.cos(a)*-24,-2+Math.sin(a)*3); g.lineTo(Math.cos(a)*24,-6-Math.sin(a)*2); g.stroke(); }
-    g.fillStyle='#7a5232'; g.strokeStyle=A3S_INK; g.lineWidth=1.8; g.beginPath(); g.ellipse(0,-3,24,7,0,0,TAU); g.fill(); g.stroke();
+    nest(g);
     // the red, scorched shell
     g.fillStyle='#c8442a'; g.beginPath(); g.moveTo(-18,-6); g.quadraticCurveTo(-16,-22,-6,-20); g.lineTo(-8,-15); g.lineTo(-4,-12); g.lineTo(-6,-7); g.closePath(); g.fill(); g.stroke();
     g.fillStyle='#3a1a10'; g.beginPath(); g.arc(-12,-14,2.2,0,TAU); g.arc(-15,-9,1.5,0,TAU); g.fill();
@@ -56,24 +63,26 @@ if(typeof defineLook==='function'){ const A3S_INK='#2b2420';
     g.fillStyle='rgba(255,220,255,.6)'; g.beginPath(); g.arc(-4,-11,2.2,0,TAU); g.fill();
     g.restore();
   }});
-  defineLook('sprocket_boulder',{w:70,h:40,draw(g,x,y){
-    g.save(); g.translate(x,y);
+  const hatch=(g,bag)=>{
     g.fillStyle='#7c746a'; g.strokeStyle=A3S_INK; g.lineWidth=1.4; for(const [dx,dy,r] of [[-30,-2,5],[-24,4,4],[28,-3,6],[22,5,3.5],[-6,8,3],[10,9,3.5]]){ g.beginPath(); g.arc(dx,dy,r,0,TAU); g.fill(); g.stroke(); }
     g.fillStyle='#2a1e18'; g.fillRect(-16,-12,32,16); g.strokeRect(-16,-12,32,16);
     g.fillStyle='#8a5a32'; g.save(); g.translate(-16,-12); g.rotate(-0.5); g.fillRect(-2,-14,16,16); g.strokeRect(-2,-14,16,16); g.restore();
     g.save(); g.translate(16,-12); g.rotate(0.5); g.fillRect(-14,-14,16,16); g.strokeRect(-14,-14,16,16); g.restore();
+    if(!bag) return;
     // the brass Bomb Bag, Mark Two
     g.fillStyle='#c89a3a'; g.beginPath(); g.ellipse(0,-6,10,7,0,0,TAU); g.fill(); g.stroke();
     g.fillStyle='#6a4a2a'; g.fillRect(-8,-8,16,3); g.fillStyle='#ffe08a'; g.beginPath(); g.arc(0,-6,2,0,TAU); g.fill();
-    g.restore();
-  }});
-  const bunBody=(g,s,open)=>{
+  };
+  defineLook('sprocket_boulder',{w:70,h:40,draw(g,x,y){ g.save(); g.translate(x,y); hatch(g,true); g.restore(); }});
+  defineLook('sprocket_cellar',{w:70,h:40,draw(g,x,y){ g.save(); g.translate(x,y); hatch(g,false); g.restore(); }});
+  const bunBody=(g,s,open,ember)=>{
     g.fillStyle='rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(0,0,46*s,12*s,0,0,TAU); g.fill();
     g.fillStyle='#c8803a'; g.strokeStyle=A3S_INK; g.lineWidth=2.2;
     if(open){
       for(const sd of [-1,1]){ g.beginPath(); g.moveTo(sd*6,0); g.quadraticCurveTo(sd*46,-4,sd*40,-30); g.quadraticCurveTo(sd*26,-46,sd*8,-34); g.closePath(); g.fill(); g.stroke(); }
       g.fillStyle='#f4e2b8'; for(const sd of [-1,1]){ g.beginPath(); g.moveTo(sd*8,-4); g.quadraticCurveTo(sd*30,-8,sd*28,-26); g.lineTo(sd*10,-28); g.closePath(); g.fill(); }
       g.fillStyle='#c8803a'; for(const [dx,dy] of [[-52,2],[-44,8],[50,4],[42,10],[-20,10],[24,12],[0,14]]){ g.beginPath(); g.arc(dx,dy,3,0,TAU); g.fill(); g.stroke(); }
+      if(!ember) return;
       g.fillStyle='rgba(255,150,60,.35)'; g.beginPath(); g.arc(0,-16,18,0,TAU); g.fill();
       g.fillStyle='#ff9a4a'; g.beginPath(); g.arc(0,-16,7,0,TAU); g.fill(); g.stroke(); g.fillStyle='#ffe6a8'; g.beginPath(); g.arc(-1.5,-17.5,3,0,TAU); g.fill();
       return; }
@@ -85,14 +94,15 @@ if(typeof defineLook==='function'){ const A3S_INK='#2b2420';
     g.fillStyle='#d8ecff'; g.strokeStyle=A3S_INK; g.lineWidth=1.2; for(const dx of [-34,-18,6,22,36]){ g.beginPath(); g.moveTo(dx-3,-4); g.lineTo(dx,8); g.lineTo(dx+3,-4); g.closePath(); g.fill(); g.stroke(); }
   };
   defineLook('frozen_bun',{w:100,h:72,draw(g,x,y){ g.save(); g.translate(x,y); bunBody(g,1,false); g.restore(); }});
-  defineLook('frozen_bun_open',{w:110,h:60,draw(g,x,y){ g.save(); g.translate(x,y); bunBody(g,1,true); g.restore(); }});
+  defineLook('frozen_bun_open',{w:110,h:60,draw(g,x,y){ g.save(); g.translate(x,y); bunBody(g,1,true,true); g.restore(); }});
+  defineLook('frozen_bun_crumbs',{w:110,h:60,draw(g,x,y){ g.save(); g.translate(x,y); bunBody(g,1,true,false); g.restore(); }});
+  // the hat: Captain Brann's spare plume (item f3_plume's hat look: the engine draws it on Ash's head and in the hat menu)
+  defineLook('hearth_plume',{w:20,h:20,draw(g,x,y){
+    g.save(); g.translate(x,y);
+    g.fillStyle='#8a96a4'; g.beginPath(); g.arc(0,0,7.5,0,TAU); g.fill();
+    g.fillStyle='#b8c4d0'; g.beginPath(); g.arc(-1.5,-1.5,4,0,TAU); g.fill();
+    g.fillStyle='#3a6aaa'; g.beginPath(); g.moveTo(-1.5,1); g.quadraticCurveTo(-3,-9,4,-13); g.quadraticCurveTo(3,-6,2,1); g.closePath(); g.fill();
+    g.strokeStyle='#2a4a7a'; g.lineWidth=1; g.stroke();
+    g.restore();
+  }});
 }
-// the hat: Captain Brann's spare plume, drawn like the other hats (seen from above, on Ash's head)
-{ const base=drawHatShape; drawHatShape=function(x,y,k,s){
-  if(k!=='Hearthwarden Plume') return base(x,y,k,s);
-  s=s||1; ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
-  ctx.fillStyle='#8a96a4'; ctx.beginPath(); ctx.arc(0,0,7.5,0,TAU); ctx.fill();
-  ctx.fillStyle='#b8c4d0'; ctx.beginPath(); ctx.arc(-1.5,-1.5,4,0,TAU); ctx.fill();
-  ctx.fillStyle='#3a6aaa'; ctx.beginPath(); ctx.moveTo(-1.5,1); ctx.quadraticCurveTo(-3,-9,4,-13); ctx.quadraticCurveTo(3,-6,2,1); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle='#2a4a7a'; ctx.lineWidth=1; ctx.stroke();
-  ctx.restore(); }; }

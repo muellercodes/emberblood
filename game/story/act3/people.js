@@ -30,7 +30,7 @@ people({
   },
 
   item: {
-    f3_plume: { name: ['Hearthwarden Plume', 'Hearthwarden Plume'], icon: 'star', keepsake: true,
+    f3_plume: { name: ['Hearthwarden Plume', 'Hearthwarden Plume'], icon: 'star', keepsake: true, hat: { look: 'hearth_plume', col: '#3a6aaa' },
       desc: ["Captain Brann's spare plume, Hearthwarden blue. Wear it with your chin UP.", "Brann's blue plume. Chin up!"] },
   },
 
@@ -87,8 +87,10 @@ people({
         then: ['quest start f_juniper'], end: true,
         say: [['f_brann', "The map girl? Went out on the Shiversea floes last week! On FOOT! I said, miss, the ice moves! She said, then I'll map it moving!", 'She walked out on the sea ice! On FOOT!'],
           ['f_brann', 'Out past Rimeholm, where the sea is all floes! Bring her back before her boots freeze! Brave! Or a moth! Probably brave!', 'Past Rimeholm, on the ice! Bring her back!', { ref: 'f3s_floes' }]] },
-      { if: 'flag f_freed_n>=1 !clue f3_freed_knight', once: true,
-        say: ['One of my lads walked in this morning! Blue to the ears! Asking for ME! He is over there, dripping! Go and see him!', 'One of my lads came home! Go see him!'] },
+      // (Rowan, a freed Rime Knight, says it himself once data people can stand in the world; until then Brann tells it)
+      { if: 'flag f_freed_n>=1 !clue f3_freed_knight', once: true, then: ['clue f3_freed_knight'],
+        say: [['f_brann', 'One of my lads walked in this morning! Blue to the ears! Asking for ME! Rowan, of Sir Knut\'s patrol!', 'One of my lads came home! Rowan!'],
+          ['f_brann', 'He says he was WALKING. For weeks. In armor made of ice. Walking for HER, and he could not stop! Then a dragon breathed on him.', 'He walked in ice armor for HER. Then you thawed him!']] },
       { if: 'flag f_hush_done solved what_knights', once: true, fact: 'f3s_hush=gone',
         say: ['My lads are guarding the Dreadgate now. Six blue plumes in a row! Well. Four. Two are at lunch.', 'My lads guard the Dreadgate now!'] },
       { if: 'flag f_northgate', once: true, fact: 'f3s_northgate=open',

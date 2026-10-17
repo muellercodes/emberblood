@@ -52,7 +52,7 @@ places({
       if: '!flag f_thaw_f_frz_knight !flag f_thaw_frz_knight', say: 'a3k_knut', then: ['clue f3_knut'],
       name: ['frozen Sir Knut', 'frozen Sir Knut'], prompt: ['Look at frozen Sir Knut', 'Look at Sir Knut'] },
     // the Crown wake (A3b's defeat line "I'll come back for you" points here)
-    f3_crown_wake: { kind: 'examine', map: 2, at: [7300, 41380], r: 60, h: 80, if: 'choice f_glaciar=defeat flag f_done',
+    f3_crown_wake: { kind: 'examine', map: 2, at: [7300, 41380], r: 60, h: 80, if: 'choice f_glaciar=defeat flag f_done act<5',
       say: 'a3c_wake', name: ['Glaciar, asleep on the Crown', 'sleeping Glaciar'], prompt: ['Sit by Glaciar', 'Sit by Glaciar'] },
   },
 

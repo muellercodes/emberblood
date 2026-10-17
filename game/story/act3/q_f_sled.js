@@ -14,6 +14,12 @@ quest({
   payoff: { kind: 'upgrade', id: 'f_skyhop' },
   old_steps: ['race', 'prize'],
 
+  // while the race is on, Elka waits at the Windscour Shrine, where it starts (x2_people moved her there only when its
+  // own quest started; the data quest's offer step comes first). After the race x2_people puts her back on the hill.
+  npc: {
+    elka: { where: [{ if: 'quest f_sled active !flag f_sled_won', at: [10150, 47340] }] },
+  },
+
   clue: {
     f3_elka_dust: { icon: 'dust', mystery: 'who_cracked',
       text: ['Elka sledded UP the High Pass the morning after it cracked. White dust lay everywhere, soft as flour. She sneezed for a week.',

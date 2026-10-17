@@ -38,12 +38,16 @@ places({
 
     // ---- G2. The eggshells (Wind Riding). Warm wind from the crater floor (level 7, where Act I's last vent lands Ash)
     // up to the south-west rim (level 8: no ramp, no climb, inside Cinder Mountain's no-fly zone).
+    // (build.ledge: the rim's crater-side face hops Ash back down to the crater floor, one way only)
     f3g_eggs: { kind: 'gate', gate: 'wind_ribbon', map: 0, at: [6750, 1150], to: [6528, 1309], lv: [7, 8], wall: false, r: 60, leads: 'f3_eggs',
+      build: { ledge: { x0: 6500, y0: 1262, x1: 6600, y1: 1350 } },
       payoff: { kind: 'heart_ember', id: 'f3_eggs' },
       name: ['a ribbon of warm wind up the crater wall', 'a wind ribbon'],
       locked: ['Warm wind curls up the crater wall to the rim. You could ride it, if you could ride the wind.', 'Wind goes up the wall. Ride it!'] },
-    f3_eggs: { kind: 'chest', map: 0, at: [6528, 1309], look: 'egg_shells', say: 'a3g_eggs',
-      loot: ['heart_ember f3_eggs', 'give f3_eggshell', 'set f3_eggs_open'], name: ['an old nest on the rim', 'an old nest'] },
+    // (an examine, not a chest: a chest place plays no scene, and this one has something to tell)
+    f3_eggs: { kind: 'examine', map: 0, at: [6528, 1309], r: 30, h: 30, if: '!flag f3_eggs_open', look: 'egg_shells', say: 'a3g_eggs',
+      then: ['heart_ember f3_eggs', 'give f3_eggshell', 'set f3_eggs_open'], name: ['an old nest on the rim', 'an old nest'] },
+    f3_eggs_after: { kind: 'prop', map: 0, at: [6528, 1309], if: 'flag f3_eggs_open', look: 'egg_nest', name: ['an empty old nest', 'an empty nest'] },
 
     // ---- G3. Iska's box (Ground Pound). A cracked flagstone in front of Iska's Ward stone (st_iska 3350,8850); the box
     // is beside the hole once the stone breaks (the hole drops anyone standing in it back out on the south side).
@@ -63,8 +67,9 @@ places({
         'A giant frozen bun! Try a bomb.'] },
     // (drawn over the gate library's boulder until it breaks)
     f3_bun_shell: { kind: 'prop', map: 0, at: [2380, 9803], look: 'frozen_bun', show: '!flag gate_f3g_bun>=2', name: ['a giant frozen bun', 'a frozen bun'] },
-    f3_bun: { kind: 'chest', map: 0, at: [2380, 9800], if: 'flag gate_f3g_bun>=2', look: 'frozen_bun_open', say: 'a3g_bun',
-      loot: ['heart_ember f3_bun', 'give coins 30', 'set f3_bun_open'], name: ['the burst bun', 'the burst bun'] },
+    f3_bun: { kind: 'examine', map: 0, at: [2380, 9800], r: 44, h: 30, if: 'flag gate_f3g_bun>=2 !flag f3_bun_open', look: 'frozen_bun_open', say: 'a3g_bun',
+      then: ['heart_ember f3_bun', 'give coins 30', 'set f3_bun_open'], name: ['the burst bun', 'the burst bun'] },
+    f3_bun_after: { kind: 'prop', map: 0, at: [2380, 9800], if: 'flag f3_bun_open', look: 'frozen_bun_crumbs', name: ['the burst bun', 'the burst bun'] },
   },
 
   scene: {
