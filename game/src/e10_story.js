@@ -704,6 +704,9 @@ const MINI_S10={
     win(){ if(typeof c1RWin==='function') c1RWin(); else miniEnd(true); }}
 };
 function s10MiniOwner(kind){ const R=s10Runners().find(R=>s10Doable(R).some(a=>a.x._kind==='minigame'&&a.x._args[0]===kind)); return R||null; }
+// a minigame that only starts at night, while it is day: its step reads "Wait for night at ..." and its skip people
+// offer "Wait here until dark" (c_gear's chase, when the night step was done just before dawn)
+function s10MiniNight(x){ return !!(x&&x._kind==='minigame'&&!x.day&&(MINI_S10[x._args[0]]||{}).night&&!isNight()); }
 function s10MiniPoll(a){
   const x=a.x, id=x._args[0], M=MINI_S10[id]||{}, at=x.at||x._args[1];
   if(x.start==='talk') return;
@@ -1076,9 +1079,9 @@ function s10TalkOpts(id,n,o){
   // a data chapter's own waits replace the old code's "Wait here until dark" for its stage
   if(own){ const wt=S('Wait here until dark','Wait until dark'); for(let i=o.length-1;i>=0;i--) if(o[i]&&o[i].t===wt&&!o[i]._s10) o.splice(i,1); }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
-    const x=a.x; if(x._kind!=='wait_for'||s10WaitOk(x)) continue;
+    const x=a.x, nm=s10MiniNight(x); if(!(x._kind==='wait_for'&&!s10WaitOk(x))&&!nm) continue;
     const sk=s10Arr(x.skip).map(v=>typeof v==='string'?{npc:v}:v).find(v=>v&&v.npc===id); if(!sk) continue;
-    const w=x._args[0], night=w==='night', hr=w==='hour'?+String(x._args[1]).split('-')[0]:null;
+    const w=nm?'night':x._args[0], night=w==='night', hr=w==='hour'?+String(x._args[1]).split('-')[0]:null;
     if(w==='event') continue;
     const label=night?S('Wait here until dark','Wait until dark'):w==='day'?S('Wait here until morning','Wait until morning'):S(`Wait here until ${hr}:00`,`Wait until ${hr}:00`);
     const reply=sk.say?s10T(sk.say):night?S('Very well. Sit with me. It will be dark soon.','Sit with me. It gets dark soon.'):S('Sit with me a while.','Sit with me a while.');
@@ -1255,7 +1258,8 @@ function s10DefaultObj(s){
     case 'deduce': return S('Work it out in the Case Book','Open the Case Book');
     case 'track': return S(`Follow ${n(0)}`,`Follow ${n(0)}`);
     case 'wait_for': return A[0]==='night'?S('Wait for night','Wait for night'):A[0]==='day'?S('Wait for morning','Wait for morning'):S('Wait','Wait');
-    case 'minigame': return s.at?S(`Go to ${s10Name(s.at)}`,`Go to ${s10Name(s.at)}`):S('Get ready!','Get ready!');
+    case 'minigame': if(s10MiniNight(s)) return s.at?S(`Wait for night at ${s10Name(s.at)}`,`Wait for night at ${s10Name(s.at)}`):S('Wait for night','Wait for night');
+      return s.at?S(`Go to ${s10Name(s.at)}`,`Go to ${s10Name(s.at)}`):S('Get ready!','Get ready!');
     case 'dungeon': return S(`Explore ${n(0)}`,`Explore ${n(0)}`);
     case 'choose': return S('Make your choice','Make your choice');
   }
