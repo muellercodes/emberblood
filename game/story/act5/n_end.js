@@ -38,7 +38,7 @@ chapter({
       { do: ['emit n4fx:dawn'] },
       ['narr', 'As the light comes back, the black glass of the peak turns clear as water, and little white flowers push up through the cracks. And at the very top, where nothing could possibly have climbed...', 'The glass turns clear. Flowers grow. And at the very top...', { do: ['emit n4fx:duchess_show'] }],
       ['goat', 'Meh.'],
-      { if: 'solved n5_follower', then: [
+      { if: 'solved n5_who_follows', then: [
         ['ash', 'DUCHESS! I KNEW it!', { do: ['emit n4fx:duchess_seen'] }] ],
         else: [
         ['ash', 'DUCHESS?! HOW?!', { do: ['emit n4fx:duchess_seen'] }] ] },
@@ -105,7 +105,7 @@ chapter({
           ['narr', 'Vesper hung her moth mask in Mom\'s forge, next to the spot where the Heart used to sit. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match.', 'Vesper hung up her mask in the forge. She is still family.'] ],
           else: [
           ['narr', 'Vesper hung her moth mask in Mom\'s forge, right next to the Heart. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match.', 'Vesper hung up her mask by the Heart. She is still family.'] ] },
-        ['narr', 'And every Sunday she walks down to Saltmarsh for tea with Gran, who makes her wear the scarf.', 'Every Sunday, Vesper has tea with Gran.', { if: 'quest q_n5_oona done' }] ],
+        ['narr', 'And every Sunday she goes home to Saltmarsh for tea with Gran. Gran makes it far too strong. Vesper drinks it anyway.', 'Every Sunday, Vesper has tea with Gran.', { if: { any: ['flag n5_tea', 'flag n5_vletter'] } }] ],
         else: [
         ['narr', 'Nobody in Gearhaven saw the Moth Mask again. But every Lantern Day, a small lantern appeared on the forge doorstep in Emberhollow, with no note. Mom always lit it.', 'Every Lantern Day, a lantern with no note appears at the forge.'] ] },
     ],
@@ -166,7 +166,7 @@ chapter({
       ['narr', 'And on the next Lantern Day, the thousand-and-first, everyone came to the green in Emberhollow.', 'On the next Lantern Day, everyone came to the green.'],
       { if: 'solved n5_fourth_lantern', then: [
         ['narr', 'There were four lantern posts on the green again, for the first time in a thousand years. The fourth one is for whoever is out in the dark.', 'There were four lantern posts. One for whoever is out in the dark.'] ],
-        else: [{ if: { any: ['solved n5_follower', 'quest duchess done flag c_duchess flag f_duchess flag m_duchess flag n_duchess'] }, then: [
+        else: [{ if: { any: ['solved n5_who_follows', 'quest duchess done flag c_duchess flag f_duchess flag m_duchess flag n_duchess'] }, then: [
         ['narr', 'Duchess was there too. Nobody knows how. Farmer Hollis says she takes the bus. There is no bus.', 'Duchess was there too. Nobody knows how.'] ] }] },
       ['narr', 'Ash lit the first lantern. And then one more than needed. Just in case.', 'Ash lit the first lantern. And one more, just in case.', { do: ['emit n4fx:book_lit'] }],
       ['narr', 'And whatever the moon looked like, it always, always came back.', 'And the moon always, always came back.'],

@@ -79,7 +79,7 @@ chapter({
       { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] }, then: [
         { do: ['emit n4fx:voice:c_vesper'] },
         ['c_vesper', 'Hey. Cousin. Emberbloods without fire still have warm hands. Here. Take mine.', 'Cousin. I have no fire. But my hands are warm. Take them.'],
-        ['c_vesper', "Gran says come home for tea after. So don't you dare go out.", "Gran says come home for tea. Don't go out!", { if: 'quest q_n5_oona done' }] ],
+        ['c_vesper', "Gran says come home for tea after. So don't you dare go out.", "Gran says come home for tea. Don't go out!", { if: { any: ['flag n5_tea', 'flag n5_vletter'] } }] ],
         else: [
         { do: ['emit n4fx:voice:juniper'] },
         ['juniper', "Ash! You can't get lost now. I drew you a map. Follow it home!", "Ash! You can't get lost. I drew you a map!"] ] },

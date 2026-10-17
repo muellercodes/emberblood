@@ -4,8 +4,6 @@
 //   moon_lock_carving   a moon-glass stone by the Moon Lock, carved with a little moth hugging a thin moon (n_glass)
 //   green_fourth_post   the fourth lantern post back on the Emberhollow green (n_end); state 'moth': a tiny grey moth
 //                       visiting on its top
-//   cocoon_knot         the silver leash knot that holds Hush's hundred little moths in the Moth's Cradle cocoons
-//                       (for N5S's q_n5_hush); states 'tied' (default) and 'melted' (a few loose threads)
 if(typeof defineLook==='function'){ const N5B_INK='#1c1628';
   const n5bGlow=(g,x,y,r,col,a)=>{ const q=g.createRadialGradient(x,y,0,x,y,r); q.addColorStop(0,`rgba(${col},${a})`); q.addColorStop(1,`rgba(${col},0)`); g.fillStyle=q; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); };
   // a small moth seen from above: two pairs of wings, a fuzzy body, two pale moon spots
@@ -56,21 +54,4 @@ if(typeof defineLook==='function'){ const N5B_INK='#1c1628';
     g.restore();
   },live(g,x,y,t){ const f=0.85+0.15*Math.sin(t*7)+0.05*Math.sin(t*13); n5bGlow(g,x+12,y-52,44,'255,180,90',0.42*f); n5bGlow(g,x+12,y-52,12,'255,240,200',0.5*f); }});
 
-  defineLook('cocoon_knot',{w:46,h:44,draw(g,x,y,t,state){
-    g.save(); g.translate(x,y);
-    if(state==='melted'){
-      // a few loose silver threads, fading on the sand
-      g.strokeStyle='rgba(220,226,250,.7)'; g.lineWidth=1.4;
-      for(const [a,b,c,d] of [[-14,-4,-2,-10],[0,-2,12,-8],[-6,-14,6,-18]]){ g.beginPath(); g.moveTo(a,b); g.quadraticCurveTo((a+c)/2,b-8,c,d); g.stroke(); }
-    } else {
-      // the knot: silver leash threads looped tight round each other, pulled from three cocoons
-      g.strokeStyle='#e8ecff'; g.lineWidth=2.4;
-      for(const a of [-2.4,-1.6,-0.7]){ g.beginPath(); g.moveTo(Math.cos(a)*22,-16+Math.sin(a)*22); g.quadraticCurveTo(Math.cos(a)*8,-18+Math.sin(a)*6,0,-18); g.stroke(); }
-      g.fillStyle='#c8cfee'; g.strokeStyle=N5B_INK; g.lineWidth=1.8;
-      g.beginPath(); g.ellipse(0,-18,9,7,0.2,0,TAU); g.fill(); g.stroke();
-      g.strokeStyle='#8a90b8'; g.lineWidth=1.4; for(const r of [5,3]){ g.beginPath(); g.ellipse(0,-18,r+2,r,0.6,0,TAU); g.stroke(); }
-      g.strokeStyle='#e8ecff'; g.lineWidth=2; g.beginPath(); g.moveTo(0,-11); g.quadraticCurveTo(-2,-4,1,0); g.stroke();
-    }
-    g.restore();
-  },live(g,x,y,t,state){ if(state==='melted') return; n5bGlow(g,x,y-18,26,'214,222,255',0.3+0.12*Math.sin(t*3)); }});
 }

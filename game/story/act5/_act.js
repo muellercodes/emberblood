@@ -17,11 +17,14 @@ act({
                'She was a little moth named Nyx. She was scared of being left.'] },
     // small: the Bridgefoot's fourth post with no lantern (N5a; answer: Ember lit one more than she needed, for a cold
     // little moth). Payoff: the post burns for good, and after the ending the real green gets its fourth post back.
-    n5_fourth_lantern: {
-      title: ['Why does the green have a fourth post with no lantern?', 'Why is there a fourth post?'] },
-    // small: who is following Ash up the mountain (N5S; answer: Duchess, the real one). Payoff: the dawn line.
-    n5_follower: {
-      title: ['Who is following you up the mountain?', 'Who is following you?'] },
+    n5_fourth_lantern: { deduce: ['n5_fourth_lantern'],
+      title: ['Why does the green have a fourth post with no lantern?', 'Why is there a fourth post?'],
+      solved: ['Ember lit one more lantern than she needed, for a cold little moth. Now it burns again.', 'Ember lit one more, for a cold little moth.'] },
+    // small: who is following Ash up the mountain (N5S's q_n5_follower; answer: Duchess, the real one). Payoff: the
+    // dawn line "DUCHESS! I KNEW it!", the goathorns hat, a Heart Ember.
+    n5_follower: { deduce: ['n5_who_follows'],
+      title: ['Who is following you up the mountain?', 'Who is following you?'],
+      solved: ['Duchess. The real one. Nobody knows how she gets anywhere.', 'Duchess! Nobody knows how.'] },
   },
 
   // The three friends Nyxara hurt: Vesper, Glaciar and Hush (Greymane, Tikka and Cindervane help in fights but do not
