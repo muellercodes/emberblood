@@ -20,12 +20,7 @@ chapter({
     'The Moon Door opened for the Ember Heart, just as Nyxara wanted. Now Ash has to face the Night Mother, and find out if anyone can reach her.',
     'The door opened. Now Ash must face Nyxara.'],
 
-  // the Ember Heart is Act IV's item (e7b_threads names it); the Ember Moon ending takes it out of the satchel
-  item: {
-    m_heart: { name: ['The Ember Heart, mended (three shining seams)', 'The mended Ember Heart'],
-               desc: ['The Ember Heart, whole again. Three seams shine on it: violet, ice-blue and silver.', 'The Ember Heart, whole again.'],
-               icon: 'heart', keepsake: true },
-  },
+  // the Ember Heart item is defined in act4/m_reforge.js
 
   step: [
     // her four phases (x4_foes shows each phase's own hint as a banner when it starts); the fall and the choice run

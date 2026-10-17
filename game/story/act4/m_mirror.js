@@ -27,17 +27,17 @@ chapter({
   replaces: { 'STORY.bosses.m_fanfare.outro': 'm4_quiet' },
 
   clue: {
-    m4_black_flame:   { icon: 'fire', mystery: 'night_mother',
+    m4_black_flame:   { icon: 'fire', mystery: 'm4_night_mother',
                         text: ['In the Mirror Temple, behind Ember\'s moon flame, words cut into the glass: "A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN."', 'Words in the glass: a broken flame cannot burn black. A whole one can.'] },
-    m4_fanfare_shiny: { icon: 'mask', mystery: 'night_mother', herring: true,
+    m4_fanfare_shiny: { icon: 'mask', mystery: 'm4_night_mother', herring: true,
                         text: ['Lord Fanfare says the voice in the mirrors told him she collects shiny things. Just like him.', 'Fanfare says she collects shiny things.'] },
-    m4_mirror_voice:  { icon: 'eye', mystery: 'night_mother',
+    m4_mirror_voice:  { icon: 'eye', mystery: 'm4_night_mother',
                         text: ['The voice in the temple mirrors: "The brighter the flame, the darker it burns, at the very end."', 'The voice: "The brighter the flame, the darker it burns."'] },
   },
 
   deduce: {
     why_three: {
-      mystery: 'night_mother',
+      mystery: 'm4_night_mother',
       ask: ['Why does she want you to bring her ALL THREE Shards?', 'Why does she want all three?'],
       // m4_she_asks: A4a's eclipse 1 ("She could squash you flat. She doesn't. She ASKS for the Shards.")
       needs: ['m4_she_asks', 'm4_cracked_lamp', 'm4_black_flame'],

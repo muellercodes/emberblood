@@ -20,7 +20,7 @@ chapter({
   },
 
   clue: {
-    m4_rafi_sun: { icon: 'question', herring: true, mystery: 'night_mother',
+    m4_rafi_sun: { icon: 'question', herring: true, mystery: 'm4_night_mother',
       text: ['Rafi is sure of it: "First the moon, now the sun. She\'ll eat the SUN next, mark my words!"', 'Rafi thinks she will eat the sun next.'] },
   },
 

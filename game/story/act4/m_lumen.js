@@ -26,13 +26,13 @@ chapter({
   },
 
   clue: {
-    m4_spire_dust: { icon: 'dust', mystery: 'night_mother',
+    m4_spire_dust: { icon: 'dust', mystery: 'm4_night_mother',
       text: ["On the Lumen Spire's balcony: silver moth dust on the rail, and a scrape as long as a boat. Something huge rested here, facing east.",
         'Moth dust and a huge scrape on the Spire balcony. It faced east.'] },
-    m4_star_map: { icon: 'star', mystery: 'night_mother',
+    m4_star_map: { icon: 'star', mystery: 'm4_night_mother',
       text: ["Etched on Lumen's great window, a sky map of three moon houses: the Spire by the sea, the Moon Well in the sand, and the Eclipse Observatory, far east on the Heights.",
         "Lumen's sky map: the Spire, the Moon Well, and the Observatory far east."] },
-    m4_leash_mural: { icon: 'rope', mystery: 'night_mother',
+    m4_leash_mural: { icon: 'rope', mystery: 'm4_night_mother',
       text: ["A tile picture in Lumen's library: a priest breathes soft silver fire on a moth's thread, and it melts. The moth flies off, small. Beside it, a cut thread whips up into the sky, moth and all.",
         'Soft silver fire melts a moth thread. A cut thread flies up to the sky, moth and all.'] },
     m4_mosaic: { icon: 'wave', mystery: 'wobbly_tide',

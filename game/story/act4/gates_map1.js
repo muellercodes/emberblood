@@ -34,7 +34,7 @@ places({
   },
 
   clue: {
-    m4_ring_trails: { icon: 'moth', mystery: 'night_mother',
+    m4_ring_trails: { icon: 'moth', mystery: 'm4_night_mother',
       text: ['At the Moon Ring, three silver trails fly out of the ring: west, north and east. Under them, in moth dust: ALL THREE COME HOME.',
         'Three trails at the Moon Ring. ALL THREE COME HOME.'] },
   },

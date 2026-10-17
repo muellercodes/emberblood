@@ -30,7 +30,7 @@ chapter({
   },
 
   clue: {
-    m4_little_moth:  { icon: 'moth', mystery: 'night_mother',
+    m4_little_moth:  { icon: 'moth', mystery: 'm4_night_mother',
                        text: ["At the foot of the Moonpath a little moth was tied to the brazier with a silver leash. Fire didn't even warm the leash, and a tug made something far above tug back. Moonfire melted the knot, and the moth flew off, small and warm.",
                               'Fire did nothing to the leash. Moonfire melted the knot.'] },
     m4_stolen_label: { icon: 'lamp', mystery: 'lamp_thief',
@@ -39,7 +39,7 @@ chapter({
 
   deduce: {
     free_hush: {
-      mystery: 'night_mother',
+      mystery: 'm4_night_mother',
       ask: ['How can Hush be set free?', 'How can Hush be freed?'],
       // m4_leash_mural: A4a's Drowned Library (a priest breathes soft silver fire on a moth's thread; a cut thread
       // whips up into the sky, moth and all)

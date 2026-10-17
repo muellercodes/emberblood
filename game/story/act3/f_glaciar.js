@@ -14,7 +14,7 @@
 // and Act IV.
 // The old outro was 28 lines plus a choice plus 10 (38 in one sitting); now 6 after the boss and 10 in the talk.
 chapter({
-  id: 'f_glaciar', act: 3, after: 'f_dread', next: null, takeover: true,
+  id: 'f_glaciar', act: 3, after: 'f_dread', next: 'm_sail', takeover: true,
   card: ['Act III · Final Chapter', 'Auntie'],
   so_far: [
     'At the top of Mount Dread, the ice dragon Glaciar lies bound in four purple chains, with the second Shard of the Ember Heart in her chest. She is dreaming the Long Winter.',

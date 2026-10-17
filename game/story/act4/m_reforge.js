@@ -10,7 +10,7 @@
 // Old flags and items kept (the finale reads them): item m_heart (shards c_shard1, f_shard2, m_shard3 taken), m_heart,
 // m_reforged, m_maren, m_eclipse3, m_done, act4_done (end_act 4), moon 0.
 chapter({
-  id: 'm_reforge', act: 4, after: 'm_observatory', next: null, takeover: true,
+  id: 'm_reforge', act: 4, after: 'm_observatory', next: 'n_bridge', takeover: true,
   card: ['Act IV · Final Chapter', 'The Ember Heart'],
   so_far: [
     'At the Eclipse Observatory, Ash won the last Shard. Hush made her choice, and Ash made his. Now the Heart needs mending, and someone with a hammer is climbing the moonlight stairs.',

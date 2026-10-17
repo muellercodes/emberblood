@@ -26,13 +26,13 @@ chapter({
   },
 
   clue: {
-    m4_milk_smell: { icon: 'moth', mystery: 'night_mother',
+    m4_milk_smell: { icon: 'moth', mystery: 'm4_night_mother',
       text: ['At the eclipse, Nyxara sniffed the air: "More moonlight, east of here. Somewhere warm. Like milk left out."',
         'Nyxara smelled more moonlight to the east. "Like milk left out."'] },
-    m4_she_asks: { icon: 'moth', mystery: 'night_mother',
+    m4_she_asks: { icon: 'moth', mystery: 'm4_night_mother',
       text: ['Nyxara could have squashed Ash flat with one wing. She didn\'t. She ASKED him for the two Shards.',
         'Nyxara could squash Ash flat. She ASKED for the Shards.'] },
-    m4_her_words: { icon: 'heart', mystery: 'night_mother',
+    m4_her_words: { icon: 'heart', mystery: 'm4_night_mother',
       text: ['Nyxara: "The moon leaves me every morning. If I hold it very tight, it can never go." For one second she sounded small.',
         'Nyxara: "The moon leaves me. If I hold it tight, it can never go."'] },
   },

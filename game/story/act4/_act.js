@@ -8,7 +8,7 @@ act({
     // the main mystery: four deductions. A4a: where_shard (where did the grey moth take the last Shard?). A4b:
     // where_feed (where will she feed next? the Moon Well), why_three (why all three Shards? a whole Heart can burn
     // black), free_hush (how can Hush be set free? melt the knots with gentle Moonfire)
-    night_mother: { main: true,
+    m4_night_mother: { main: true,
       title: ['What does the Night Mother want, and how do we stop her?', 'What does the Night Mother want?'],
       deduce: ['where_shard', 'where_feed', 'why_three', 'free_hush'],
       herring: ['m4_bottom_sea', 'm4_rafi_sun', 'm4_fanfare_shiny', 'm4_glaive_cuts'],

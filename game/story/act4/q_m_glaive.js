@@ -13,11 +13,11 @@ quest({
   old_steps: ['crumb', 'bring', 'temper', 'glaive'],
 
   clue: {
-    m4_crumb_bite: { icon: 'moth', mystery: 'night_mother',
+    m4_crumb_bite: { icon: 'moth', mystery: 'm4_night_mother',
       text: ['Tooth marks on the moon crumb Gravelgut ate. Something BIT it off the moon.',
         'The moon crumb has bite marks.'] },
     // the free_hush red herring (A4b's deduction lists the Glaive pick; its hint sends the player back to the mural)
-    m4_glaive_cuts: { icon: 'moth', mystery: 'night_mother', herring: true,
+    m4_glaive_cuts: { icon: 'moth', mystery: 'm4_night_mother', herring: true,
       text: ['Old Kiln: the Moon Glaive cuts moon silk. Nothing else does. (Webs, he said. Not leashes.)',
         'The Glaive cuts moon silk. Webs, not leashes.'] },
   },

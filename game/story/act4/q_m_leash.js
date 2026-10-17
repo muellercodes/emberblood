@@ -19,10 +19,10 @@ quest({
   },
 
   clue: {
-    m4_page11: { icon: 'note', mystery: 'night_mother',
+    m4_page11: { icon: 'note', mystery: 'm4_night_mother',
       text: ["The Wardens' eleventh page: on the first Lantern Day a little grey moth sat on Ember's lantern all night. Ember named her Nyx.",
         'A grey moth sat on Ember\'s lantern. Ember named her Nyx.'] },
-    m4_book: { icon: 'book', mystery: 'night_mother',
+    m4_book: { icon: 'book', mystery: 'm4_night_mother',
       text: ['The Book of Moths: the Mother ties her moths with moon silk. It keeps them big and cold. Moonfire, breathed gently, melts the knot.',
         'The Book of Moths: gentle moonfire melts the knot.'] },
   },

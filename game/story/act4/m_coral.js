@@ -14,16 +14,16 @@ chapter({
   hint: ['Coralcombe is the ring of coral south of Driftwood. Dive in the middle.', 'Coralcombe is the coral ring south of Driftwood. Dive in the middle.'],
 
   clue: {
-    m4_scout_report: { icon: 'eye', mystery: 'night_mother',
+    m4_scout_report: { icon: 'eye', mystery: 'm4_night_mother',
       text: ['Sir Kipper saw the great grey moth fly over the Reefwall, EAST, toward a little brass bump on the far hills.',
         'The moth flew over the reef, EAST, toward a brass bump on the hills.'] },
-    m4_bottom_sea: { icon: 'wave', herring: true, mystery: 'night_mother',
+    m4_bottom_sea: { icon: 'wave', herring: true, mystery: 'm4_night_mother',
       text: ['Mayor Dabble: "Lost things sink. Everything ends up at the bottom of the sea."', 'Dabble: everything lost sinks to the bottom of the sea.'] },
   },
 
   deduce: {
     where_shard: {
-      mystery: 'night_mother',
+      mystery: 'm4_night_mother',
       ask: ['Where did the great grey moth take the last Shard?', 'Where did the moth take the last Shard?'],
       needs: ['m4_spire_dust', 'm4_star_map', 'm4_scout_report'],
       pick: [

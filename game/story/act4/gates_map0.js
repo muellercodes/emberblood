@@ -34,7 +34,7 @@ places({
   },
 
   clue: {
-    m4_iska_note: { icon: 'note', mystery: 'night_mother',
+    m4_iska_note: { icon: 'note', mystery: 'm4_night_mother',
       text: ['A note Iska hid at home long ago: "Moon things listen to moonlight, not claws. If you ever have to free one of her moths, be gentle. I."',
         'Iska\'s old note: "Be gentle with her moths."'] },
   },

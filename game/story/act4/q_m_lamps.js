@@ -16,7 +16,7 @@ quest({
   old_steps: ['lamps', 'esme'],
 
   clue: {
-    m4_esme_secret: { icon: 'lamp', mystery: 'night_mother',
+    m4_esme_secret: { icon: 'lamp', mystery: 'm4_night_mother',
       text: ["Esme's secret: a moth will forget its own name for a lamp. Even a moth as big as a barn. Even a sad one.",
         'A moth forgets everything for a lamp.'] },
   },

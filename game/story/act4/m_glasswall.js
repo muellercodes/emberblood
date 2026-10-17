@@ -51,21 +51,21 @@ chapter({
   },
 
   clue: {
-    m4_well_sign:    { icon: 'board', mystery: 'night_mother',
+    m4_well_sign:    { icon: 'board', mystery: 'm4_night_mother',
                        text: ['The sign by the Moon Well: THE LAST MOONLIGHT IN THE GLASS DESERT. PLEASE DO NOT DRINK IT.', 'The Moon Well is the last moonlight in the desert.'] },
-    m4_well_moths:   { icon: 'moth', mystery: 'night_mother',
+    m4_well_moths:   { icon: 'moth', mystery: 'm4_night_mother',
                        text: ['Hundreds of little moths sleep on the Moon Well tower, all facing the water. As if they are saving her a seat for dinner.', 'Little moths wait on the well tower. Like for dinner.'] },
-    m4_cracked_lamp: { icon: 'lamp', mystery: 'night_mother',
+    m4_cracked_lamp: { icon: 'lamp', mystery: 'm4_night_mother',
                        text: ["On Esme's workbench: a cracked lamp and a note. \"CRACKED LAMPS CAN'T HOLD A FLAME. MEND IT WHOLE FIRST. E.\"", "A cracked lamp can't hold a flame. Mend it whole first."] },
-    m4_bring_three:  { icon: 'moth', mystery: 'night_mother',
+    m4_bring_three:  { icon: 'moth', mystery: 'm4_night_mother',
                        text: ['At the Moon Well, Nyxara said: "My Hush keeps the last piece for you. Bring me all three."', 'Nyxara said: "Bring me all three."'] },
-    m4_hush_pulled:  { icon: 'rope', mystery: 'night_mother',
+    m4_hush_pulled:  { icon: 'rope', mystery: 'm4_night_mother',
                        text: ["When Nyxara flew off from the well, Hush's silver thread twitched and yanked Hush up the sky like a kite.", "Hush's thread yanked her up the sky like a kite."] },
   },
 
   deduce: {
     where_feed: {
-      mystery: 'night_mother',
+      mystery: 'm4_night_mother',
       ask: ['Where will the Night Mother feed next?', 'Where will she eat next?'],
       // m4_milk_smell: A4a's eclipse 1 on the Strand ("More moonlight, somewhere warm. Like milk left out.")
       needs: ['m4_milk_smell', 'm4_well_sign', 'm4_well_moths'],
