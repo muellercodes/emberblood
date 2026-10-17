@@ -52,7 +52,7 @@ const REG_KINDS = new Set(['place', 'landmark', 'door', 'gate', 'npc', 'item', '
 const STEP_VERBS = new Set(['talk', 'goto', 'find', 'examine', 'fight', 'use_power_at', 'give', 'choose', 'deduce', 'track', 'wait_for', 'cutscene', 'minigame', 'dungeon', 'all', 'any']);
 const EFFECT_VERBS = new Set(['set', 'clear', 'give', 'take', 'trust', 'power', 'upgrade', 'heart_ember', 'open', 'close', 'spawn', 'despawn', 'move', 'world', 'clue', 'quest', 'stage', 'time', 'emit', 'mail', 'epi', 'music', 'xp', 'weapon', 'ally', 'hat',
   // also in ENG's engine (e10_story.js): see ENGINE.md section 4
-  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people']);
+  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people', 'bombbag']);
 const WEAPON_POWERS = new Set(['whip', 'bombs', 'glaive']);
 const STEP_SCENES = ['scene', 'lose', 'win', 'kneel', 'after', 'intro'];
 const SPEAKERS_BUILTIN = new Set(['narr', 'ash', 'pip', 'mom', 'maren', 'sign', 'note', 'book', 'banner']);

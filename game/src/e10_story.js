@@ -194,6 +194,7 @@ function s10Effect(e,ctx){
     case 'heal': if(player){ player.hp=player.maxHp; } break;
     case 'choice': { const [f,v]=kv(a); G.choices[f]=v; break; }
     case 'solve': s10Solve(a,true); break;
+    case 'bombbag': if(typeof bombBag==='function') bombBag(+a||5); else s10Err(`effect "${e}": no bomb bag`); break;
     case 'bless': { G.pendingBless=(G.pendingBless||0)+(+a||1); later(1.5,()=>{ try{ offerPending(); }catch(err){} }); break; }
     case 'moon': if(typeof moonSet==='function') moonSet(+a); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,+a); break;
     case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,DOORS.find(q=>q.area===w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
@@ -206,7 +207,7 @@ function s10Effect(e,ctx){
 // chapter, quest or places(); the effect `page id` adds it (G.case.pages) with a banner
 // effect "hat item": unlock and wear a hat (a data hat, or a hat item from an act's own table)
 function s10Hat(a){
-  const it=S10.items[a], nm=it&&it.hat?(s10T(it.name)||a):null;
+  const it=S10.items[a], nm=it&&it.hat?(typeof it.hat==='string'?it.hat:(s10T(it.name)||a)):null;
   let name=nm;
   if(!name) for(const T of ['X1P_HATS','F2P_HATS','M3P_HATS','M3W_HATS']){ let t=null; try{ t=eval(`typeof ${T}!=='undefined'?${T}:null`); }catch(e){} if(t&&t[a]){ name=t[a]; break; } }
   if(!name){ s10Err(`effect "hat ${a}": no hat item ${a}`); return; }
@@ -412,7 +413,7 @@ function s10Owned(d,owner){
   for(const id in (d.page||{})){ (S10.pages||(S10.pages={}))[id]=Object.assign({id,_owner:owner},d.page[id]); }
   for(const id in (d.item||d.items||{})){ const it=(d.item||d.items)[id]; S10.items[id]=Object.assign({id},it); if(it&&it.name) ITEM_NAMES[id]=s10T(it.name);
     // a hat from data: item { name, hat: { look, col } } (the look draws it on Ash and in the hat menu)
-    if(it&&it.hat){ const nm=s10T(it.name)||id; (S10.hats||(S10.hats={}))[nm]=Object.assign({item:id},typeof it.hat==='object'?it.hat:{}); } }
+    if(it&&it.hat&&typeof it.hat==='object'){ const nm=s10T(it.name)||id; (S10.hats||(S10.hats={}))[nm]=Object.assign({item:id},it.hat); } }
 }
 // steps: parse once ({do:'talk c_hettie'} -> _kind 'talk', _args ['c_hettie'])
 const S10_KINDS=['talk','goto','find','examine','fight','use_power_at','give','choose','deduce','track','wait_for','cutscene','minigame','dungeon','all','any'];
@@ -846,7 +847,7 @@ function s10Render(list){
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceOn(P)) continue;
     if(P.kind==='prints'){ if(s10PlaceShown(P)) list.push({x:0,y:-1e9+1,draw:()=>s10DrawPrints(P,T.has(id))}); continue; }
-    if(P.kind==='spot'||P.kind==='gate') continue;
+    if(P.kind==='spot'||P.kind==='gate'||P.layer==='screen') continue;
     if(P.show!=null&&!s10Cond(P.show)) continue;
     const at=s10Pos(P); if(!at||!inView(at.x,at.y,160)) continue;
     const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look, sy=s10SortY(P,at);
@@ -857,6 +858,15 @@ function s10Render(list){
   for(const id of T){ if(S10.places[id]) continue; const w=s10Where(id), e=s10Ent(id); if(!w||w.area||AREA||(e&&e.map!=null&&curMap()!==+e.map)||!inView(w.x,w.y,120)) continue; list.push({x:w.x,y:w.y+1,draw:()=>s10Sparkle(w.x,w.y-54,t)}); }
 }
 { const base=eventsForRender; eventsForRender=function(list){ base(list); try{ s10Render(list); }catch(e){ console.error(e); } }; }
+// place layer:'screen': its look is drawn in screen space over the world and the fade, under the HUD (a storybook
+// picture over a faded-out world); the look gets (x, y) = the middle of the screen and should be anim (W, H are the
+// screen's size)
+{ const base=drawHUD; drawHUD=function(){ try{ if(G&&G.mode==='story'&&S10.booted) s10DrawScreen(); }catch(e){ console.error(e); } return base.apply(this,arguments); }; }
+function s10DrawScreen(){
+  for(const id in S10.places){ const P=S10.places[id]; if(P.layer!=='screen'||!s10PlaceShown(P)) continue;
+    const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look; if(!look) continue;
+    ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); s10LookDraw(look,W/2,H/2,st); ctx.restore(); }
+}
 // a place on a house wall (inside the house's footprint) is drawn after the house, so it shows on the wall
 function s10SortY(P,at){
   if(P._sy!=null&&P._syN===HOUSES.length) return P._sy;
@@ -1261,7 +1271,8 @@ function s10Watch(){
 { const base=miniEnd; miniEnd=function(win,title,sub){ const M=G&&G.mini; base(win,title,sub); try{ if(M&&S10.booted) s10MiniEnded(M.kind,!!win); }catch(e){ console.error(e); } }; }
 // legacy things examined through their own prompt (the Moth Mask Watch board): the step waiting for them finishes
 // once their own lines are read
-{ const base=lmAct; lmAct=function(o){ try{ if(s10LmTakes(o)) return; }catch(e){ console.error(e); } const r=base(o); try{ s10LegacyExamined(o); }catch(e){ console.error(e); } return r; }; }
+// (put on at boot, outside every module's own lmAct wrapper: p3_frost's returns early for a frozen person)
+function s10WrapLm(){ const base=lmAct; lmAct=function(o){ try{ if(s10LmTakes(o)) return; }catch(e){ console.error(e); } const r=base(o); try{ s10LegacyExamined(o); }catch(e){ console.error(e); } return r; }; }
 function s10LmIds(o){ return Object.keys(S10.legacy).filter(id=>{ const e=S10.legacy[id]; return String(e.src||'')==='LANDMARKS:'+o.id||new RegExp('\\.js\\s+'+o.id+'$').test(String(e.src||'')); }); }
 // an examine step with its own scene waits on this landmark: the scene plays instead of the landmark's own lines
 function s10LmTakes(o){
@@ -1352,13 +1363,16 @@ function s10Link(){
     const card=c.card===null?null:c.card?[String(c.card[0]),s10T(c.card[1])]:D.card;
     if(c.mom&&typeof MOM_CH!=='undefined') MOM_CH[id]=s10Arr(c.mom).map(x=>s10T(x));
     Object.assign(D,{_s10:id,card,chapter:card?card[1]:(c.name?s10T(c.name):D.chapter),objectives:()=>s10Objs(c),hint:()=>s10Hint(c),soFar:()=>s10T(c.so_far),marker:nid=>false,
-      talk:()=>false,enter:o=>s10Enter(c,o),update:()=>{},idle:null});
+      talk:()=>false,enter:o=>{ s10Enter(c,o); if(c.keep_enter&&D._old&&typeof D._old.enter==='function') try{ D._old.enter(o); }catch(e){ console.error(e); } },update:()=>{},idle:null});
     if(D.chapter) CHAPTER[id]=D.chapter;
     for(const s of c.step||[]){ if(s._kind==='minigame'){ const m=s._args[0]; if(!MINI[m]) s10Err(`${id}.${s._id}: minigame ${m} does not exist`); } }
   }
   s10QuestDefs();
 }
-function s10Silence(c){ if(!c||!c.silence||!G||!G.flags) return; const sn=G.flags.c_sn||(G.flags.c_sn={}); for(const k of s10Arr(c.silence)) sn[k]=1; }
+// the old modules' once-only marks: Act II c_sn (x1_story), Act III f_sn (x2_story), Act IV m_sn, the finale n_sn
+const S10_SN={2:'c_sn',3:'f_sn',4:'m_sn',5:'n_sn'};
+function s10Silence(c){ if(!c||!c.silence||!G||!G.flags) return; const keys=['c_sn']; const k2=S10_SN[+c.act]; if(k2&&!keys.includes(k2)) keys.push(k2);
+  for(const f of keys){ const sn=G.flags[f]||(G.flags[f]={}); for(const k of s10Arr(c.silence)) sn[k]=1; } }
 function s10Enter(c,o){
   if(!G.story) s10Fresh();
   s10Silence(c); s10Migrate(); s10NpcSync(true);
@@ -1372,16 +1386,21 @@ function s10FurnAct(o,base,args){
   if(!ids.length) return false;
   G.story._ex=G.story._ex||{}; for(const id of ids){ G.story._ex[id]=(G.story._ex[id]|0)+1; storyEmit('examine:'+id); }
   const e=S10.legacy[ids[0]], say=e.say, sc=e.scene||(typeof say==='string'&&S10.scenes[say]?say:null), done=()=>{ for(const id of ids) s10Examined(id); };
-  if(sc){ s10Play(sc,done,{place:ids[0]}); return true; }
-  if(say!=null){ const L=Array.isArray(say)&&say.length&&Array.isArray(say[0])?say:[['narr'].concat(Array.isArray(say)?say:[say])]; s10Play(L,done,{place:ids[0]}); return true; }
+  // a waiting examine step's own scene wins (it plays once, from the step); else the entry's own say or scene
   const waiting=s10Runners().some(R=>s10Doable(R).some(a=>a.x._kind==='examine'&&ids.includes(a.x._args[0])&&(a.x.scene||a.x.win)));
   if(waiting){ done(); return true; }
+  if(sc){ s10Play(sc,done,{place:ids[0]}); return true; }
+  if(say!=null){ const L=Array.isArray(say)&&say.length&&Array.isArray(say[0])?say:[['narr'].concat(Array.isArray(say)?say:[say])]; s10Play(L,done,{place:ids[0]}); return true; }
   base.apply(this,args);
   if(DLG){ const d=DLG, prev=d.done; d.done=()=>{ if(prev) prev(); done(); }; } else done();
   return true;
 }
 function s10Adapt(){
-  s10WrapTalkOpts();
+  s10WrapTalkOpts(); s10WrapLm();
+  // N5A (d): while a data chapter's step has an objective, the stock "Travel to <boss site>" lines step aside (they
+  // would win the HUD's nearest-of), unless the step is the fight at that site
+  { const base=objectiveList; objectiveList=function(){ const out=base(); try{ const c=G&&G.mode==='story'&&!G.done&&S10.chapters[G.stage];
+      if(c&&out.some(o=>!o.site&&!o.fight)){ const s=s10Active(s10Run('ch',c)), foe=s&&s._kind==='fight'?s._args[0]:null; return out.filter(o=>!o.site||(foe&&SITES[o.site]&&SITES[o.site].boss===foe)); } }catch(e){ console.error(e); } return out; }; }
   { const base=areaObjAct; areaObjAct=function(o){ try{ if(o&&S10.booted&&s10FurnAct(o,base,arguments)) return; }catch(e){ console.error(e); } return base.apply(this,arguments); }; }
   // (outside the acts' own moodLine wrappers, so a person with data talk gets no old mood lines)
   { const base=moodLine; moodLine=function(id){ try{ if(G&&s10HasTalk(id)) return null; }catch(e){} return base(id); }; }
@@ -1429,7 +1448,10 @@ function s10Replaces(){
       if(R[path]===null){ delete o[last]; continue; }
       const beats=S10.scenes[R[path]]; if(!beats){ s10Err(`replaces ${path}: no scene ${R[path]}`); continue; }
       const lines=s10Lines(beats,{sc:R[path]}), mark={who:'narr',text:'',skipIf:()=>true,fn:()=>{ if(G&&G.story) (G.story._seen||(G.story._seen={}))[R[path]]=1; }};
-      if(Array.isArray(o[last])){ const old=o[last]; old.length=0; old.push(mark,...lines); } else o[last]=[mark,...lines]; } }
+      const desc=Object.getOwnPropertyDescriptor(o,last);
+      if(desc&&desc.set) o[last]=[mark,...lines];
+      else if(desc&&desc.get) Object.defineProperty(o,last,{configurable:true,enumerable:true,writable:true,value:[mark,...lines]});
+      else if(Array.isArray(o[last])){ const old=o[last]; old.length=0; old.push(mark,...lines); } else o[last]=[mark,...lines]; } }
 }
 // gate places are built by the gate library (ENG-W, e10c_gates: gateBuild(place)) once everything is loaded
 function s10Gates(){
@@ -1508,6 +1530,12 @@ const S10API={
   uses:cid=>s10Uses(cid),
   quests:()=>S10.qOrder.map(id=>({id,active:!!(G.quests[id]&&!G.quests[id].done),done:!!(G.quests[id]&&G.quests[id].done)})),
   doable:()=>s10Runners().flatMap(R=>s10Doable(R).map(a=>({run:R.key,key:a.key,do:a.x.do,extra:!!a.extra}))),
+  // (tests) what each doable step is and where it points: its kind, args, scene, and the marker spot (x, y, area, npc)
+  targets:()=>s10Runners().flatMap(R=>s10Doable(R).map(a=>{ let w=null; try{ w=s10StepWhere(a); }catch(e){} const x=a.x;
+    return {run:R.key,key:a.key,kind:x._kind,args:x._args.slice(),extra:!!a.extra,optional:!!a.s.optional,part:!!a.part,scene:x.scene||null,kneel:x.kneel||null,legacy:!!x.legacy,
+      at:x.at||null,skip:s10Arr(x.skip).map(v=>typeof v==='string'?v:v&&v.npc),pend:!!S10.pend[R.key+'/'+a.key],
+      x:w?Math.round(w.x):null,y:w?Math.round(w.y):null,area:w&&w.area||null,npc:w&&w.npc||null}; })),
+  where:id=>{ const w=s10Where(id); return w?{x:Math.round(w.x),y:Math.round(w.y),area:w.area||null,npc:w.npc||null}:null; },
   objective:()=>{ const c=S10.chapters[G.stage]; return c?s10Objs(c):[]; },
   place:id=>{ const P=S10.places[id]; return P?Object.assign({},P,{_owner:undefined}):null; },
   act:id=>s10PlaceAct(id),
@@ -1559,7 +1587,10 @@ async function s10AutoDo(a,log){
     case 'examine': { const w=s10Where(A[0]); await s10AutoTp(w); if(S10.places[A[0]]) s10PlaceAct(A[0]); else { const e=S10.legacy[A[0]], m=e&&/^LANDMARKS:(.+)$/.exec(e.src||''), o=m&&LANDMARKS.find(q=>q.id===m[1]); if(o) lmAct(o); else s10Examined(A[0]); } break; }
     case 'track': { const P=S10.places[A[0]]; if(P&&P.show!=null&&!s10Cond(P.show)) log.push('  prints not shown: '+P.show); for(const pt of (P&&P.path)||[]){ await s10AutoTp({x:+pt[0],y:+pt[1]-24}); player.x=+pt[0]; player.y=+pt[1]; await s10Frames(3); } break; }
     case 'deduce': { const D=S10.deduce[A[0]]; if(D){ for(const c of s10Arr(D.needs)) if(!G.case.clues[c]){ log.push('  missing clue '+c); } const i=s10Arr(D.pick).findIndex(p=>p.right); const r=s10Deduce(A[0],i); log.push('  deduce '+JSON.stringify(r)); } break; }
-    case 'wait_for': { const w=A[0]; if(x.at) await s10AutoTp(s10Where(x.at)); if(w==='night') G.tod=0.875; else if(w==='day') G.tod=0.35; else if(w==='hour') G.tod=(+String(A[1]).split('-')[0]+0.2)/24; else if(w==='event') storyEmit(A[1]); break; }
+    case 'wait_for': { const w=A[0]; if(x.at) await s10AutoTp(s10Where(x.at)); if(w==='night') G.tod=0.875; else if(w==='day') G.tod=0.35; else if(w==='hour') G.tod=(+String(A[1]).split('-')[0]+0.2)/24; else if(w==='event') storyEmit(A[1]);
+      // (N5A c) a condition of flags: autoplay sets them, as it emits the event of wait_for event
+      else { const tk=A.slice(); for(let i=0;i<tk.length;i++){ if(tk[i]!=='flag'||!tk[i+1]) continue; const m=/^([\w]+)(?:(>=|=)(.+))?$/.exec(tk[++i]); if(m) G.flags[m[1]]=m[3]!=null?s10Num(m[3]):1; } }
+      break; }
     case 'cutscene': break;
     case 'minigame': { const M=MINI_S10[A[0]]||{}; if(x.at) await s10AutoTp(s10Where(x.at)); if(M.night&&!isNight()) G.tod=0.875;
       const t0=performance.now(); while(!G.mini&&performance.now()-t0<15000){ await s10AutoDlg(4000); await s10Frames(2); }

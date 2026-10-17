@@ -233,7 +233,7 @@ legacy({ id: 'vorlaxis', map: 0, at: [7000, 950], r: 300, kind: 'npc', name: 'Vo
 legacy({ id: 'fennick_drawer', map: 0, at: [500, 248], r: 30, kind: 'examine', name: 'the drawer in Fennick\'s shop', aliases: ['the drawer full of wicks'], src: 'furn:drawer', area: 'h_fennick' })
 legacy({ id: 'fennick_barrels', map: 0, at: [50, 330], r: 30, kind: 'examine', name: 'the oil barrels in Fennick\'s shop', aliases: ['the oil barrels'], src: 'furn:barrel', area: 'h_fennick' })
 legacy({ id: 'fennick_trapdoor', map: 0, at: [280, 180], r: 30, kind: 'examine', name: 'the rug behind the counter', aliases: ['the trapdoor'], src: 'furn:counter', area: 'h_fennick' })
-legacy({ id: 'oath_meeting_note', map: 0, at: [384, 143], r: 30, kind: 'examine', name: 'the note in the room under the lamp shop', aliases: ['the cellar note'], src: 'furn:note', area: 'h_fennick_down' })
+legacy({ id: 'oath_meeting_note', map: 0, at: [384, 143], r: 30, kind: 'examine', name: 'the note in the room under the lamp shop', aliases: ['the cellar note'], src: 'furn:note', area: 'h_fennick_down', say: 'a1_cellar_look' })
 legacy({ id: 'pebbles_nest', map: 0, at: [96, 143], r: 30, kind: 'examine', name: 'Pebble\'s nest', aliases: ['the crow nest in the loft'], src: 'furn:nest', area: 'h_yara_up' })
 
 // ---- items (ITEM_NAMES): at is where Ash gets each one
