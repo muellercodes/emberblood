@@ -18,8 +18,9 @@ chapter({
     'Ash beat the shadow dragon. Now Ash climbs the clock cliffs.'],
 
   place: {
-    // the NYX letters on the hub, under where the hands were (art: v10_art5a.js n5a_nyx); the hands set make a path to it
-    n5_clock_hub: { map: 4, at: [2165, 83592], r: 30, kind: 'examine', look: 'n5a_nyx', show: 'flag n_clockset', say: 'ncl_hub',
+    // the NYX letters on the hub, under where the hands were (art: v10_art5a.js n5a_nyx, drawn 75 px above this anchor,
+    // which is on the long hand at the 6, so the prompt mark does not cover the letters); the hands set make a path to it
+    n5_clock_hub: { map: 4, at: [2165, 83640], r: 40, kind: 'examine', look: 'n5a_nyx', show: 'flag n_clockset', say: 'ncl_hub',
       name: ['the hub of the Midnight Clock', 'the middle of the clock'] },
     // the Silk Gallery: Vesper's cracked mask on the cliff edge (Act II foe), where her friend self lands, where she hangs
     n5_cracked_mask: { map: 4, at: [1806, 84912], r: 22, kind: 'examine', look: 'n5a_cracked_mask',
@@ -27,6 +28,8 @@ chapter({
     n5_vesper_land: { map: 4, at: [1812, 84884], kind: 'npc_spot', name: ['the edge of the Silk Gallery', 'the cliff edge'] },
     n5_gallery_isle1: { map: 4, at: [1650, 85200], r: 64, kind: 'spot', name: ['the first island of the Silk Gallery', 'the first island'] },
     n5_vesper_hang: { map: 4, at: [1662, 85262], kind: 'npc_spot', name: ['the edge of the first island', 'the island edge'] },
+    // where the camera looks during her second chance (below her, so the dialogue box does not cover her)
+    n5_hang_cam: { map: 4, at: [1662, 85350], kind: 'npc_spot', name: ['the void under the first island', 'the void'] },
     // the Gear Bridge: a real paper lantern slides out from under the scale plate once the gears line up
     n5_folded_lantern: { map: 4, at: [4548, 88268], r: 24, kind: 'examine', look: 'n5a_folded_lantern', show: 'flag n_gear', say: 'ncl_lantern',
       name: ['a folded paper lantern', 'a paper lantern'] },
@@ -78,7 +81,7 @@ chapter({
         { do: 'examine n5_well' },
         { do: 'goto n5_chimney 320', if: 'choice greymane=ally', scene: 'n_grey_bye' },
       ] },
-    { id: 'who_moth', do: 'deduce n5_who_moth', obj: ['Work out who the little grey moth is, in the Case Book', 'Open the Case Book'],
+    { id: 'who_moth', do: 'deduce n5_who_moth', marker: 'n5_chimney', obj: ['Work out who the little grey moth is, in the Case Book', 'Open the Case Book'],
       hint: ['Open the Case Book (the book button, or B). Think about the fourth post, the flame stone and what Ember said.',
         'Open the Case Book. Think about the moth carvings.'] },
     { id: 'chimney', do: 'wait_for flag n_chimney', marker: 'n5_chimney', obj: ['Ride the Wind Chimney up to the second ring', 'Fly up the Wind Chimney'],
@@ -96,8 +99,8 @@ chapter({
     // the Silk Gallery: a friend Vesper drops in, or her cracked mask lies on the edge of the cliff
     { id: 'vesper', do: 'any', marker: 'n5_gallery_neck', obj: ['Dash through the moth veil to the Silk Gallery', 'Go to the silk bridge'],
       parts: [
-        { do: 'goto n5_gallery_neck 250', if: 'choice c_vesper=friend', scene: 'n_vesper_join', then: ['set n_vline'] },
-        { do: 'goto n5_gallery_neck 250', if: '!choice c_vesper=friend', scene: 'n_vesper_absent' },
+        { do: 'goto n5_gallery_neck 110', if: 'choice c_vesper=friend', scene: 'n_vesper_join', then: ['set n_vline'] },
+        { do: 'goto n5_gallery_neck 110', if: '!choice c_vesper=friend', scene: 'n_vesper_absent' },
       ] },
     // her second chance on the first island (only when she is not already a friend); then across the gallery
     { id: 'chance', do: 'any', marker: 'n5_gallery_isle1', obj: ['Cross the Silk Gallery', 'Cross the silk bridge'],
@@ -112,7 +115,7 @@ chapter({
       hint: ['Up the Chalk Climb (the outer columns are safe), then whip the three brass weights off their shelves onto the scale plate.',
         'Whip the three weights down.'] },
     { id: 'lantern', do: 'examine n5_folded_lantern', then: ['clue n5_night_moth'], obj: ['Look at what slid out from under the scale plate', 'Look under the scale'] },
-    { id: 'name', do: 'deduce n5_name', obj: ["Work out the little moth's name, in the Case Book", 'Open the Case Book'],
+    { id: 'name', do: 'deduce n5_name', marker: 'n5_gear', obj: ["Work out the little moth's name, in the Case Book", 'Open the Case Book'],
       hint: ['Three clues: what Nyxara said by the shrine, the letters under the clock hands, and the lantern note.', 'What did the clues say about night?'] },
     { id: 'echo', do: 'fight n_echo_vesper', marker: 'n_echo_vesper', obj: ['Face the Echo of the Moth Mask', 'Fight the shadow thief'],
       hint: ['Across the Gear Bridge, in the Mask Hall. Only one of the shadows is real.', 'Find the real shadow.'],
@@ -144,7 +147,7 @@ chapter({
     ],
     // the friend Vesper (Act II friend): she lands beside Ash and finds the post Nyxara hid
     n_vesper_join: [
-      { place: ['c_vesper', 'n5_vesper_land'] },
+      { place: ['c_vesper', 'n5_vesper_land'], anim: ['c_vesper', 'perch'] },
       ['narr', 'Someone drops out of the dark on a silk line and lands beside you without a sound. A moth mask. A crooked grin.', 'Someone drops down on a silk rope. A moth mask. A grin.'],
       ['c_vesper', "You're climbing a copy of my city. Badly.", 'You are climbing a copy of my city. Badly.'],
       ['ash', 'VESPER!', 'Vesper!'],
@@ -152,10 +155,10 @@ chapter({
       ['ash', 'How many greats is a cousin?', 'How many greats is a cousin?'],
       ['c_vesper', "None. Cousins don't get greats.", 'None. Cousins have no greats.'],
       ['ash', "Then you're my favorite relative.", 'Then you are my favorite!'],
-      ['c_vesper', "Don't tell the dragon grandpa. Now watch. She hid a grapple post out in the void. I find things people hide.",
-        "Don't tell Grandpa. She hid a post out there. Watch.", { do: ['set n_vline'] }],
-      { cam: 'n5_hidden_post', s: 1.2 },
-      ['narr', 'Vesper flicks a silk line into the dark. Far out over the void, a hidden post lights up gold.', 'Out in the dark, a hidden post glows gold.', { ref: 'n5_hidden_post' }],
+      ['c_vesper', "Don't tell the dragon grandpa. Now. See the gold post on that first island? Grapple it, then the next one. Don't look down.",
+        "Don't tell Grandpa. Grapple that first post. Don't look down.", { ref: 'n5_gallery_isle1' }],
+      ['c_vesper', 'And she hid a post of her own out there, past the third island. I find things people hide.', 'She hid a post out there too. I found it.',
+        { do: ['set n_vline'], ref: 'n5_hidden_post' }],
     ],
     // the foe Vesper (Act II foe): her real mask, cracked, and a note
     n_vesper_absent: [
@@ -168,7 +171,7 @@ chapter({
     ],
     // her second chance: the same picture as the first night (Act II, the clock hand)
     ncl_chance: [
-      { cam: 'n5_vesper_hang', s: 0.8 },
+      { cam: 'n5_hang_cam', s: 0.8 },
       ['narr', 'SNAP! Something drops out of the dark on a silk line, and the line breaks.', 'SNAP! Someone falls. The silk rope breaks!'],
       { place: ['c_vesper', 'n5_vesper_hang'], anim: ['c_vesper', 'hang'] },
       ['narr', 'A grey cloak. Dark hair with one silver streak. She grabs the edge of your island with one hand and hangs over the void.', 'It is Vesper! She hangs from the edge by one hand.'],

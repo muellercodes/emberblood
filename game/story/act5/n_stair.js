@@ -138,7 +138,7 @@ chapter({
       ['narr', "On a rock by the path sits a knight's helmet. Real steel, not glass. Sir Cindervane's.", "A knight's helmet on a rock. Sir Cindervane's!"],
       ['narr', "You pick it up. It's warm. Inside is one small spark that never went out.", 'The helmet is warm. A spark is inside.',
         { do: ['give n_spark'] }],
-      ['ash', 'Thank you, Sir Cindervane. I\'ll bring it back. I promise.', 'Thank you, Sir Cindervane.'],
+      ['ash', 'Thank you, Sir Cindervane. You are still guarding me.', 'Thank you, Sir Cindervane.'],
     ],
     nst_scale: [
       ['narr', 'At the foot of the empty throne lies a grey moth scale as big as a plate. It is soft as dust.', 'A grey moth scale as big as a plate.', { clue: 'n5_grey_scale' }],

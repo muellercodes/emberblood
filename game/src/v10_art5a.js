@@ -60,7 +60,8 @@
     g.restore();
   }
   if (has) {
-    defineLook('n5a_post', { w: 44, h: 84, draw(g, x, y) { post(g, x, y, false); } });
+    defineLook('n5a_post', { w: 44, h: 84, draw(g, x, y) { post(g, x, y, false); },
+      live(g, x, y, t) { glow(g, x, y - 71, 13, '196,176,255', 0.32 + 0.14 * Math.sin(t * 1.7)); } });
     defineLook('n5a_post_lit', { w: 44, h: 84, draw(g, x, y) { post(g, x, y, true); },
       live(g, x, y, t) { glow(g, x + 12.5, y - 50, 26, '255,200,120', 0.55 + 0.1 * Math.sin(t * 6)); flame(g, x + 12.5, y - 48, t, 0.8); } });
   }
@@ -138,18 +139,18 @@
     },
     live(g, x, y, t) { const a = 0.18 + 0.14 * Math.sin(t * 1.6); g.fillStyle = `rgba(200,220,255,${a})`; g.beginPath(); g.ellipse(x + 3, y - 6, 7, 2, -0.2, 0, T2); g.fill(); } });
 
-  // ---------- NYX: three old letters on the Midnight Clock's hub (the hub is 27 px above this anchor), seen once the
+  // ---------- NYX: three old letters on the Midnight Clock's hub (the hub is 75 px above this anchor), seen once the
   // hands are off the twelve; silver engraving, laid flat
-  if (has) defineLook('n5a_nyx', { w: 70, h: 52,
+  if (has) defineLook('n5a_nyx', { w: 70, h: 100,
     draw(g, x, y) {
-      const cx = x, cy = y - 27;
+      const cx = x, cy = y - 75;
       el(g, cx, cy, 30, 18, 0, null, 1.4, 'rgba(196,176,255,.5)');
       g.save(); g.translate(cx, cy); g.scale(1, 0.62);
       g.font = '700 17px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
       for (const [ch, dx] of [['N', -15], ['Y', 0], ['X', 15]]) { g.fillStyle = 'rgba(10,6,18,.9)'; g.fillText(ch, dx + 1, 1.5); g.fillStyle = '#e8e0ff'; g.fillText(ch, dx, 0); }
       g.restore();
     },
-    live(g, x, y, t) { const a = 0.22 + 0.16 * Math.sin(t * 2.2); glow(g, x, y - 27, 30, '210,200,255', a); } });
+    live(g, x, y, t) { const a = 0.22 + 0.16 * Math.sin(t * 2.2); glow(g, x, y - 75, 30, '210,200,255', a); } });
 
   // ---------- Vesper's moth mask, real silver-grey cloth and card, cracked down the middle, a note tucked under it
   if (has) defineLook('n5a_cracked_mask', { w: 40, h: 20,
@@ -205,6 +206,7 @@
   // dark hair with one silver streak, freckles, two little horns, a thin tail, and a snapped silk line in her other hand
   function hang(g, x, y, t) {
     const sw = Math.sin(t * 2.2) * 0.08, fl = Math.sin(t * 5.3);
+    glow(g, x, y + 20, 34, '214,204,255', 0.3);
     g.save(); g.translate(x, y); g.rotate(sw);
     // the snapped silk line, fluttering from the free hand
     g.beginPath(); g.moveTo(6, 14); g.quadraticCurveTo(14 + fl * 3, 22, 10 + fl * 5, 34); g.strokeStyle = 'rgba(232,228,255,.85)'; g.lineWidth = 0.9; g.stroke();
@@ -230,4 +232,37 @@
     g.restore();
   }
   if (hasPose) definePose('c_vesper', 'hang', hang);
+
+  // ---------- Vesper (a friend) just landed on the cliff by the Silk Gallery: her yellow oilskin and purple scarf, the
+  // moth mask pushed up on her head, a silk line still trailing from her hand, a little moonlight round her (the peak is
+  // dark). (x,y) is her feet.
+  function perch(g, x, y, t) {
+    const sw = Math.sin(t * 2) * 0.6;
+    glow(g, x, y - 16, 30, '214,204,255', 0.32);
+    shadow(g, x + 1, y, 8, 2.6, 0.3);
+    // the silk line, up into the dark
+    g.beginPath(); g.moveTo(x + 7, y - 15); g.quadraticCurveTo(x + 10 + sw, y - 40, x + 8, y - 70); g.strokeStyle = 'rgba(232,228,255,.7)'; g.lineWidth = 0.9; g.stroke();
+    // the tail
+    g.beginPath(); g.moveTo(x - 3, y - 6); g.quadraticCurveTo(x - 11, y - 4 + sw, x - 12, y - 11); g.strokeStyle = OL; g.lineWidth = 2.6; g.stroke(); g.strokeStyle = '#6a5a7a'; g.lineWidth = 1.3; g.stroke();
+    // legs and boots
+    for (const dx of [-2.4, 2.4]) { line(g, [[x + dx, y - 8], [x + dx, y - 1]], OL, 3.8); line(g, [[x + dx, y - 8], [x + dx, y - 1]], '#2a2436', 2.4); el(g, x + dx, y - 0.6, 2.4, 1.5, 0, '#4a3a2a', 0.8); }
+    // the yellow oilskin, the purple scarf
+    poly(g, [[x - 6.5, y - 7], [x - 5.5, y - 21], [x + 5.5, y - 21], [x + 6.5, y - 7]], '#e8c03a', 1.3);
+    line(g, [[x, y - 20], [x, y - 8]], '#b8902a', 0.9);
+    el(g, x, y - 21.5, 6, 2.3, 0, '#6a5a7a', 1.1); poly(g, [[x - 2, y - 21], [x - 5, y - 14], [x - 2.6, y - 14.6]], '#6a5a7a', 0.9);
+    // arms: one on her hip, one holding the silk line
+    line(g, [[x - 5.5, y - 19], [x - 8, y - 13], [x - 5.4, y - 11]], OL, 3.6); line(g, [[x - 5.5, y - 19], [x - 8, y - 13], [x - 5.4, y - 11]], '#e8c03a', 2.2);
+    line(g, [[x + 5.5, y - 19], [x + 7.4, y - 15]], OL, 3.6); line(g, [[x + 5.5, y - 19], [x + 7.4, y - 15]], '#e8c03a', 2.2); ci(g, x + 7.6, y - 14.6, 1.7, '#e6b896', 0.8);
+    // the head: freckles, a crooked grin, dark hair with the silver streak, little horns, the mask pushed up
+    ci(g, x, y - 27, 5.5, '#e6b896', 1.3);
+    for (const [fx, fy] of [[-2.4, -26], [-1.2, -25.4], [2.2, -26], [1, -25.4]]) ci(g, x + fx, y + fy, 0.45, '#b8785a');
+    ci(g, x - 1.8, y - 27.8, 0.7, '#2a2034'); ci(g, x + 1.8, y - 27.8, 0.7, '#2a2034');
+    g.beginPath(); g.moveTo(x - 1.6, y - 24.6); g.quadraticCurveTo(x + 0.6, y - 23.4, x + 2.2, y - 25.2); g.strokeStyle = '#7a3a2a'; g.lineWidth = 0.8; g.stroke();
+    g.beginPath(); g.arc(x, y - 28.5, 5.8, Math.PI * 1.02, Math.PI * 1.98); g.lineTo(x + 5, y - 29); g.quadraticCurveTo(x, y - 31.5, x - 5, y - 29); g.closePath(); g.fillStyle = '#2a2430'; g.fill(); g.lineWidth = 1.1; g.strokeStyle = OL; g.stroke();
+    line(g, [[x - 1, y - 34], [x + 2.6, y - 30.4]], '#d8d4e8', 1.1);
+    for (const s2 of [-1, 1]) poly(g, [[x + s2 * 2.6, y - 33.4], [x + s2 * 4.4, y - 37], [x + s2 * 4.2, y - 33]], '#f0e6d0', 0.9);
+    // the moth mask, pushed up on top of her head
+    for (const s2 of [-1, 1]) { g.save(); g.translate(x + s2 * 0.6, y - 34.6); g.scale(s2, 1); g.beginPath(); g.moveTo(0, -1.4); g.quadraticCurveTo(4, -4.4, 7, -2.6); g.quadraticCurveTo(7, 0.6, 4.6, 1.4); g.quadraticCurveTo(2, 1.6, 0, 0.8); g.closePath(); g.fillStyle = '#c8c0dc'; g.fill(); g.lineWidth = 1; g.strokeStyle = '#3a3448'; g.stroke(); g.restore(); }
+  }
+  if (hasPose) definePose('c_vesper', 'perch', perch);
 }
