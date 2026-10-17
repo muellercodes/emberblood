@@ -195,7 +195,7 @@ people({
     moss: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['Moonlilies sleep when the moon does, dearie. All of them. Even the mean ones by the bog.', 'The moonlilies all sleep now.'] },
-      { if: 'flag n_dawn', say: ['The frogs are singing again, every one of them off-key. I never heard anything so lovely.', 'The frogs sing again!'] },
+      { if: 'flag n_dawn', say: ['The frogs are singing again, every one of them out of tune. I never heard anything so lovely.', 'The frogs sing again!'] },
     ],
 
     morrow: [
