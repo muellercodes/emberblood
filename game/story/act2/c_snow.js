@@ -78,7 +78,7 @@ chapter({
       { cam: 'gh_market', s: 1 },
       ['narr', 'By morning, Gearhaven is white. Snow on the clock towers. Snow riding round and round on the conveyor streets. Kids having snowball fights in their summer clothes.', 'By morning, Gearhaven is white. Kids throw snowballs in summer clothes.'],
       ['c_fig', "Snow! In June! I've put a tea cosy on my head, dearie, and I'm not taking it off.", 'Snow in June! I put a tea cosy on my head.'],
-      ['c_hester', 'Snow is not on the schedule. I have checked the schedule twice.', 'Snow is not on the schedule. I checked twice.'],
+      ['c_hester', 'Snow, in June. Nobody filed a report. Clockwatch! Fetch the shovels!', 'Snow in June! Get the shovels!'],
       { if: 'choice c_vesper=friend', then: [
         ['narr', 'High on the Clockwatch roof, someone in a yellow oilskin sits with her legs dangling over the edge, and waves.', 'On the Clockwatch roof, Vesper waves.'],
         { if: 'quest c_oona done', then: [
@@ -86,7 +86,7 @@ chapter({
           else: [
           ['c_vesper', "Gran wrapped me in three blankets and made soup. She says thank you. Don't make it weird.", "Gran says thank you. Don't make it weird."] ] } ],
         else: [
-        ['narr', 'On the Clockwatch roof, where somebody used to sit, there is nobody. Just a scrap of grey silk, caught on a chimney.', 'On the roof, nobody sits now. Just a scrap of grey silk.', { ref: 'clock_silk' }] ] },
+        ['narr', 'Up on the Clockwatch roof there is nobody at all. Just a scrap of grey silk, caught on a chimney.', 'On the roof, nobody. Just a scrap of grey silk.', { ref: 'clock_silk' }] ] },
       ['c_penny', 'HEADLINE: SNOW IN SUMMER! SOMEBODY TOOK A BITE OUT OF THE MOON! DRAGON KID LOOKS WORRIED!', 'HEADLINE: SNOW IN SUMMER! SOMEONE BIT THE MOON!'],
       ['ash', "...I do look worried, don't I?", "I do look worried, don't I?"],
       ['narr', 'Far to the north, past the mountains, the sky is as white as paper.', 'Far to the north, the sky is white as paper.'],
@@ -94,12 +94,12 @@ chapter({
     // talking to Vesper on the roof (any time in the epilogue): the Act III hook, and the echoes
     c_vesper_roof: [
       { if: 'flag dr_seen_c_twins !flag c_v_twins', then: [
-        ['c_vesper', 'Granny says "fire isn\'t the only warm thing" every single night. How do YOU know that?', 'Granny says that every night! How do you know it?'],
+        ['c_vesper', 'Gran has a saying. She says it came all the way down from Pearl: "Fire isn\'t the only warm thing." She says it every single night.', 'Gran says "Fire isn\'t the only warm thing." Every night.'],
         { do: ['set c_v_twins'] } ] },
       { if: 'quest c_oona done', then: [
-        ['c_vesper', "Gran made me sit by her stove for an hour. AN HOUR. Then she made me eat soup. It was warm. Don't tell anyone.", 'Gran made me sit by her stove. Then soup. It was warm.'] ] },
-      ['c_vesper', 'The Mother wants all three pieces. Hush took one north. Look at the sky up there. White as paper.', 'The Mother wants all three. Hush took one north.'],
-      ['c_vesper', "If you go after it, take a scarf. Take two. And don't climb anything I wouldn't.", "If you go, take a scarf. Take two."],
+        ['c_vesper', "Gran knits by her stove every night now. She's knitting YOU something. I'm not allowed to say what.", 'Gran is knitting you something. It is a secret.'] ] },
+      ['c_vesper', "The Mother wants all three pieces. Hush took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. Hush took one north.'],
+      ['c_vesper', "If you go after it, wrap up warm. And don't climb anything I wouldn't.", 'If you go, wrap up warm.'],
       ['ash', 'You climb EVERYTHING.', 'You climb EVERYTHING.'],
     ],
   },

@@ -129,14 +129,14 @@ chapter({
       ['ash', "She's an Emberblood. Like Pearl. Like ME. She's my cousin!", 'She is an Emberblood. She is my cousin!'],
       { do: ['world c_spire_door_moths open'] }, { sfx: 'shrine' },
       ['narr', 'The moths go very still. Then they peel off the door all at once in a grey cloud, and the door swings open.', 'The moths fly off. The door opens.'],
-      ['ash', '...How many greats is a cousin?', 'How many greats is a cousin?'],
+      ['ash', 'I have a COUSIN. Wait till Mom hears.', 'I have a COUSIN!'],
     ],
     // the kneel (STORY.c_choice): every option shows; a locked one says why (the engine fills in {trust:vesper})
     c_choice: [
       { choose: 'c_vesper', who: 'narr',
         ask: ['Vesper drops to one knee. Her shadows melt into the floor. The violet light in her hand flickers, and she lifts her moth hooks one more time.', 'Vesper falls to one knee. She lifts her hooks one more time.'],
         pick: [
-          { t: ['Lower your sword. "Cousin. Why are you doing this?"', '"Cousin. Why are you doing this?"'], tone: 'kind', v: 'friend',
+          { t: ['Lower your weapon. "Cousin. Why are you doing this?"', '"Cousin. Why are you doing this?"'], tone: 'kind', v: 'friend',
             need: 'trust vesper>=4',
             locked: ["She doesn't trust you enough yet ({trust:vesper} of 4).", "She doesn't trust you yet ({trust:vesper} of 4)."],
             then: ['choice c_vesper=friend', { journal: ['You asked Vesper why, and she told you.', 'You asked Vesper why.'], key: 'c_vesper' }],
@@ -165,11 +165,11 @@ chapter({
         { place: ['c_vesper', 'player', [64, -24]] }, { anim: ['c_vesper', 'roof_sit'] },
         ['c_vesper', 'But a moth as big as a ship cracked the Heart in three. Murmur. She flew right over Gearhaven, and every clock stopped.', 'A huge moth, Murmur, broke it in three. She stopped your clocks.', { payoff: 'c_vesper_page' }],
         { if: 'flag dr_c_whisper=go', then: [
-          ['ash', 'She talks to me too. I told her to go away. Fire is for sharing, Vesper. You only had to ask.', 'She talks to me too. Fire is for sharing. You only had to ask.'] ],
+          ['ash', 'She talks to me too, in my dreams. I told her to go away. You could have just asked ME, you know.', 'She talks to me too. You could have just asked me.'] ],
           else: [{ if: 'quest c_oona done', then: [
-            ['ash', "I lit your gran's stove. She laughed till she cried. Fire is for sharing. You only had to ask.", "I lit your gran's stove. Fire is for sharing."] ],
+            ['ash', "I already lit your gran's stove. It took one breath. You could have just asked.", "I lit your gran's stove. You could have asked!"] ],
             else: [
-            ['ash', "Fire isn't something you keep in a box. It's for sharing. You only had to ask.", 'Fire is for sharing. You only had to ask.'] ] }] },
+            ['ash', "I'd have lit your gran's stove myself. You could have just asked.", 'I would have helped. You could have asked.'] ] }] },
         ['ash', 'Cousin... how many greats is a cousin?', 'How many greats is a cousin?'],
         ['c_vesper', "None. Cousins don't get greats.", "None. Cousins don't get greats."],
         ['ash', "Then you're my favorite relative.", "Then you're my favorite relative."],
@@ -192,7 +192,7 @@ chapter({
     c_spire_in: [
       ['narr', 'Inside, the Spire is black glass, cold as a winter window. Violet lamps burn without any heat. Far above, the moon shines through a hole in the roof.', 'Inside, the Spire is cold black glass. Violet lamps burn with no heat.'],
       ['narr', 'The moths whisper as you pass. "Little ember. Little ember. Come up. Come up."', 'The moths whisper: "Little ember. Come up. Come up."'],
-      ['ash', 'Nope. Not creepy. Not creepy at all. Pip, hold my horn.', 'Nope. Not creepy at all. Pip, hold my horn.'],
+      ['ash', 'Nope. Not creepy. Not creepy at all.', 'Nope. Not creepy at all.'],
       { if: 'flag pip', then: [['pip', 'Mip. (Pip holds your horn. Very tightly.)', 'Mip. (Pip holds your horn tight.)']] },
     ],
     c_spire_dark: [
@@ -231,7 +231,7 @@ chapter({
       ['c_vesper', "The Lady comes at moonrise. She'll give my family its fire back. Gran will be warm. So no. You don't get to have this too.", 'The Lady comes at moonrise. Gran will be warm. So no.'],
       { if: 'item a1_locket !flag c_locket_given', then: [
         ['ash', "Wait. This is your gran's locket. You dropped it, up north.", "Wait. Your gran's locket. You dropped it up north."],
-        ['narr', 'She snatches it. She does not say thank you. She does not have to. She puts it on, and the shell glints in the moonlight.', 'She grabs it and puts it on. She does not have to say thanks.'],
+        ['narr', 'She snatches it and puts it on without a word. For a moment her hand stays on it, and the shell glints in the moonlight.', 'She grabs it and puts it on. She holds it tight.'],
         { do: ['take a1_locket', 'set c_locket_given', 'trust vesper +1'] } ],
         else: [{ if: 'flag a1_locket_left', then: [
         ['narr', 'A shell locket on a salty string glints at her throat.', 'A shell locket glints at her throat.'] ] }] },
