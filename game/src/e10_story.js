@@ -1480,6 +1480,10 @@ function s10FurnPrompts(A){
 }
 function s10Adapt(){
   s10WrapTalkOpts(); s10WrapLm();
+  // (A3S) old code that offers a quest the data took over (offerQuest(id): x2_story's f2sYlva for f_rime) plays the data
+  // quest's own `offer: '<scene id>'` instead of the stand-in's bare "Will you help?"
+  { const base=offerQuest; offerQuest=function(id){ try{ const q=S10.quests[id], d=QDEFS[id];
+      if(q&&d&&d._s10&&q.offer&&S10.scenes[q.offer]){ s10Play(q.offer,null,{quest:id}); return; } }catch(e){ console.error(e); } return base.apply(this,arguments); }; }
   // N5A (d): while a data chapter's step has an objective, the stock "Travel to <boss site>" lines step aside (they
   // would win the HUD's nearest-of), unless the step is the fight at that site
   { const base=objectiveList; objectiveList=function(){ const out=base(); try{ const c=G&&G.mode==='story'&&!G.done&&S10.chapters[G.stage];
@@ -1636,8 +1640,9 @@ const S10API={
   place:id=>{ const P=S10.places[id]; return P?Object.assign({},P,{_owner:undefined}):null; },
   act:id=>s10PlaceAct(id),
   scene:(id,cb)=>s10Play(id,cb),
-  // (tests) run effects as a step's then would: 'shrine x', ['set a', 'clue b']
+  // (tests) run effects as a step's then would: 'shrine x', ['set a', 'clue b']; offer a quest as old code does
   do:e=>s10Do(e,{}),
+  offer:id=>offerQuest(id),
   world:(id,st)=>{ if(st!=null) s10WorldSet(id,st); return s10World(id); },
   talkLine:id=>{ const T=s10TalkFor(id,'line'); return T?{say:T.say?s10T(Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say):null,scene:T.scene||null}:null; },
   track:id=>G.story&&G.story._trk?G.story._trk[id]:undefined,

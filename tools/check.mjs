@@ -733,6 +733,8 @@ export function runChecks(M, opts = {}) {
       if (!d.optional) WARN('quest', `${O.id}: side quest without optional: true`, W(O, at(O)));
       if (d.title) textVar(d.title, O, 'title');
       if (d.giver && !isNpc(d.giver) && !G.cast.has(d.giver)) FAIL('ids', `${O.id}: giver ${d.giver} is not an npc`, W(O, at(O, d.giver)));
+      // offer: '<scene>' (old code's offerQuest(id) for a taken-over quest plays it)
+      if (d.offer != null) { if (!isStr(d.offer) || !M.scenes[d.offer]) FAIL('ids', `${O.id}: offer ${JSON.stringify(d.offer)} is not a scene`, W(O, at(O))); else addTo(scenesUsed, d.offer, { O, where: 'offer' }); }
     }
     if (O.type === 'act') {
       for (const [id, m] of Object.entries(M.mysteries)) if (m.act === O.act && m.def.title) textPair(m.def.title, O, `mystery ${id}`, null, {});
