@@ -162,7 +162,7 @@ defineLook('m4a_eclipse',{w:60,h:60,anim:true,draw(g,x,y,t,state){
   const ORD=['dark','rise','bite','eyes','leave'];
   if(!state||!ORD.includes(state)) return;
   const C=a4aClock('m4a_eclipse',state,'dark',ORD), now=a4aNow(), since=C.since, ramp=(k,d)=>{ const s=since(k); return s<0?0:Math.min(1,s/(d||1)); };
-  const lv=ramp('leave',2.6), dark=ramp('dark',2)*(1-lv), cov=Math.min(ramp('dark',2.2),1-ramp('leave',1.6)), rise=ramp('rise',2.6)*(1-lv);
+  const lv=ramp('leave',2.6), dark=ramp('dark',2)*(1-lv), cov=Math.min(ramp('dark',2.2),1-ramp('leave',1.6)), rise=ramp('rise',2.6), fade=1-lv;
   g.save();
   const S=a4aScreen(g), sw=S.w, sh=S.h, narrow=sw<600;
   // the day goes violet and dark (the sky band at the top darker still)
@@ -170,16 +170,16 @@ defineLook('m4a_eclipse',{w:60,h:60,anim:true,draw(g,x,y,t,state){
   const gr=g.createLinearGradient(0,0,0,sh*0.55); gr.addColorStop(0,`rgba(14,6,30,${0.6*dark})`); gr.addColorStop(1,'rgba(14,6,30,0)'); g.fillStyle=gr; g.fillRect(0,0,sw,sh*0.55);
   const sx=sw*(narrow?0.8:0.82), sy=Math.max(60,sh*(narrow?0.16:0.14)), R=Math.max(22,Math.min(sw,sh)*0.055);
   a4aMoonDisc(g,sx,sy,R,cov,Math.min(1,0.3+dark*1.2),now);
-  // Nyxara rises over the dunes (right of Ash on a wide screen, above him on a phone)
-  if(rise>0.01){
+  // Nyxara rises over the dunes (right of Ash on a wide screen, above him on a phone); she leaves up and away east
+  if(rise>0.01&&fade>0.01){
     const e=rise*rise*(3-2*rise), Wd=narrow?Math.min(sw*0.4,220):Math.min(sw*0.26,330);
-    const bx=narrow?sw*0.52:sw*0.7, by=narrow?sh*0.3:sh*0.4, lx=sw*0.25*lv, ly=-sh*0.5*lv;
-    const nx=bx+lx, ny=lerp(sh+Wd,by,e)+ly, bite=since('bite'), grow=bite>=0?1.06:1, fl=0.74+0.26*Math.cos(now*2.1);
-    const eyes=ramp('eyes',1.4);
+    const bx=narrow?sw*0.52:sw*0.7, by=narrow?sh*0.3:sh*0.4, lx=sw*0.45*lv*lv, ly=-sh*0.75*lv;
+    const nx=bx+lx, ny=lerp(sh+Wd,by,e)+ly, bite=since('bite'), grow=bite>=0?1.06:1, fl=0.74+0.26*Math.cos(now*(2.1+lv*3));
+    const eyes=ramp('eyes',1.4)*(1-lv);
     // her shadow on the sand, far below
-    g.save(); g.globalAlpha=0.28*e; g.fillStyle='#0c0618'; g.beginPath(); g.ellipse(nx-Wd*0.1,ny+Wd*0.9,Wd*1.1,Wd*0.25,0,0,TAU); g.fill(); g.restore();
+    g.save(); g.globalAlpha=0.28*e*fade; g.fillStyle='#0c0618'; g.beginPath(); g.ellipse(nx-Wd*0.1,ny+Wd*0.9,Wd*1.1,Wd*0.25,0,0,TAU); g.fill(); g.restore();
     // Hush, big again, on the silver thread that goes all the way up into the sky
-    const ha=ramp('rise',3.4)*(1-lv), hx=nx-Wd*(narrow?0.95:1.25), hy=ny+Wd*(narrow?0.55:0.25)+Math.sin(now*1.6)*6, hs=0.42;
+    const ha=ramp('rise',3.4)*fade, hx=nx-Wd*(narrow?0.95:1.25), hy=ny+Wd*(narrow?0.55:0.25)+Math.sin(now*1.6)*6, hs=0.42;
     if(ha>0.01){
       g.save(); g.globalAlpha=ha; g.strokeStyle='#e8eef8'; g.lineWidth=2; g.shadowColor='#cfe0ff'; g.shadowBlur=8;
       g.beginPath(); g.moveTo(hx,hy-Wd*hs*0.2); g.quadraticCurveTo((hx+nx)/2,Math.max(hy,ny)+Wd*0.2,nx,ny+Wd*0.1); g.stroke();
@@ -187,7 +187,7 @@ defineLook('m4a_eclipse',{w:60,h:60,anim:true,draw(g,x,y,t,state){
       const gl=(now*0.6)%1; g.shadowBlur=0; g.fillStyle='#ffffff'; g.beginPath(); g.arc(lerp(hx,hx+Wd*0.15,gl),lerp(hy,-20,gl),3,0,TAU); g.fill();
       g.translate(hx,hy); g.scale(hs*Wd/190,hs*Wd/190); a4aMoth(g,190,0.7+0.3*Math.cos(now*3.2),'hush',0); g.restore();
     }
-    g.save(); g.globalAlpha=Math.min(1,e*1.4)*(1-lv); a4aGlow(g,nx,ny,Wd*1.3,'150,120,230',0.25*e); g.translate(nx,ny); g.scale(grow*Wd/200,grow*Wd/200); a4aMoth(g,200,fl,'nyx',eyes); g.restore();
+    g.save(); g.globalAlpha=Math.min(1,e*1.4)*fade; a4aGlow(g,nx,ny,Wd*1.3,'150,120,230',0.25*e); g.translate(nx,ny); g.scale(grow*Wd/200,grow*Wd/200); a4aMoth(g,200,fl,'nyx',eyes); g.restore();
   }
   // the bite: one flash of violet-white light
   const b=since('bite'); if(b>=0&&b<0.8){ g.fillStyle=`rgba(232,220,255,${0.45*(1-b/0.8)})`; g.fillRect(0,0,sw,sh); }

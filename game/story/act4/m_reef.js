@@ -62,8 +62,8 @@ chapter({
     ],
     // eclipse 1 (bible 6.5b, THREADS N12): 10 lines on its longest branch
     ref_eclipse: [
-      // (an eclipse needs a sun: at night the morning comes first)
-      { if: 'night', then: [{ do: ['time 10'] }] },
+      // (an eclipse needs a sun: at night the morning comes first, at once: no fade to black over the scene)
+      { if: 'night', then: [{ do: ['time 10 quiet'] }, { fade: 0 }] },
       { do: ['set m_eclipse_on', 'world m4_eclipse1 dark'] }, { cam: 'm4_strand', s: 1.2 },
       ['narr', 'Then the light changes. The sun goes out like a lamp being covered.', 'Then the sun goes out, like a covered lamp.'],
       { do: ['world m4_eclipse1 rise'] },
