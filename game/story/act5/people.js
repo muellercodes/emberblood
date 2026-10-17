@@ -38,10 +38,10 @@ people({
     n5_who: [
       ['narr', 'Everyone who climbed this far waits by the Crown Shrine. You count them on your claws.', 'You count your friends by the shrine.'],
       { if: 'flag n5_vesper', then: [{ if: 'quest q_n5_oona started', then: [['c_vesper', "Here. Obviously. I was here first. I'm always first.", 'Here. I was here first.']],
-          else: [{ if: 'quest q_n5_vesper done', then: [['c_vesper', 'Here. Because Gran said. Mostly because Gran said.', 'Here. Because Gran said.']],
+          else: [{ if: 'quest q_n5_vesper done', then: [['c_vesper', 'Here. Because Gran said so.', 'Here. Because Gran said.']],
             else: [['c_vesper', "Here. Obviously. ...Gran doesn't know where I am, you know. She'll be up all night with the kettle on.",
               "Here. Gran doesn't know where I am, though.", { do: ['quest start q_n5_oona'] }]] }] }],
-        else: [{ if: 'flag n5_vesper_left', then: [['ash', "Vesper isn't here. I left her hanging on the Silk Gallery. Gran would know how to say sorry.",
+        else: [{ if: 'flag n5_vesper_left', then: [['ash', "Vesper isn't here. I left her hanging on the Silk Gallery. Granny Oona would know how I should say sorry.",
             "I left Vesper on the silk bridge. Gran will know what to do.", { do: ['quest start q_n5_vesper'] }]],
           else: [['ash', 'Vesper is out there somewhere. Her mask was on the cliff by the Silk Gallery.', 'Vesper is out there. Look by the silk bridge.']] }] },
       { if: 'flag n5_glaciar', then: [['f_glaciar', 'Present, dumpling. Cold, but present.', 'Here, dumpling. Cold, but here.']],
@@ -51,7 +51,7 @@ people({
         else: [{ if: 'quest q_n5_hush active', then: [['ash', "Hush is still tied up in the Moth's Cradle. A hundred little moths on one silver knot.", "Hush is tied up in the Moth's Cradle."]],
           else: [['ash', "Hush isn't here. Something white was glittering in the Tendril Wood.", "Hush isn't here. Look in the Tendril Wood."]] }] },
       { if: 'trust friends>=3', then: [['ash', 'All three. Everyone she hurt is standing right here with me.', 'All three of them are here!']],
-        else: [{ if: 'trust friends>=2', then: [['ash', 'Two of the three she hurt are here. Two is a lot of friends.', 'Two of the three are here.']],
+        else: [{ if: 'trust friends>=2', then: [['ash', "Two of the three she hurt are here. That's enough for her to hear us.", 'Two of the three are here.']],
           else: [{ if: 'trust friends>=1', then: [['ash', 'Only one of the three she hurt is here. She should hear from the others too.', 'Only one of the three is here.']],
             else: [['ash', 'None of the friends she hurt are here. Not yet.', 'None of them are here yet.']] }] }] },
       { choose: 'n5_who_more', ask: ['Anyone else?', 'Anyone else?'], pick: [
@@ -59,7 +59,7 @@ people({
           say: [['ev_tikka', 'I brought a BIGGER spoon! For the moth!', 'I brought a BIGGER spoon!'], ['ev_tock', "It's a ladle."],
             ['ev_tikka', "It's a BIGGER SPOON, Tock."]] },
         { t: ['Scratch Greymane behind the ears', 'Pat Greymane'], v: 'greymane', if: 'choice greymane=ally',
-          say: [['narr', 'Greymane leans on you so hard you fall over. He is wet. He definitely swam again.', 'Greymane leans on you. He is wet!']] },
+          say: [['narr', "Greymane leans on you so hard you fall over, and now you're wet too.", 'Greymane leans on you. He is wet!']] },
         { t: ["That's everyone", "That's everyone"], v: 'done' },
       ] },
     ],
@@ -76,7 +76,7 @@ people({
         then: ['clue n5_yara_post', 'heart_ember n5_yara'],
         say: [['yara', 'Three? No, dear. There were four posts when I was a girl. Nobody remembered why. The fourth one rotted, and nobody put it back.',
             'There were four posts when I was a girl!'],
-          ['yara', 'When they dug out the old stump, they found this in the hole. Warm as toast, sixty years. I think it was waiting for you.',
+          ['yara', 'When they dug out the old stump, they found this in the hole. It has been warm as toast for sixty years. I think it was waiting for you.',
             'This was in the hole. It is still warm. Take it.']] },
       { if: 'flag n_dawn choice n_end=moth', fact: 'n5_moon=back',
         say: ['A little grey moth sat on the well this morning. I gave her a crumb. She seemed to like that.', 'A little moth sat on the well. I fed her a crumb.'] },
@@ -87,7 +87,7 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: [['Pebble came back with frost on her feathers and would not stop cawing. Be careful up there, Ash.', 'Pebble came back cold. Be careful up there!'],
           ['No moon. The well water is black as ink. I keep a lamp by it so nobody falls in.', 'No moon. I keep a lamp by the well.'],
-          ['Your mother lit every lantern on the green before she left. Light one more than you need, Iska used to say.', 'Light one more than you need.']] },
+          ['Your mother lit every lantern on the green before she sailed. "Light one more than you need," as Iska says.', 'Light one more than you need.']] },
       { bark: true, if: '!flag n_dawn', fact: 'n5_moon=gone', say: ['No moon again tonight. Mind the well.', 'No moon. Mind the well.'] },
     ],
 
@@ -95,17 +95,17 @@ people({
       { if: 'quest q_n5_follower active !clue n5_hollis_note !flag n_dawn', fact: 'n5_duchess_pen=empty',
         say: ["Duchess? Pen's been empty for days. Gate's open. I didn't open it.", "Duchess's pen is empty. I didn't open it."] },
       { if: 'flag n_dawn solved n5_who_follows', fact: 'n5_moon=back',
-        say: ['She came home this morning with frost in her beard and moon-dust on her hooves. Not a word. She is a goat.', 'Duchess came home with moon-dust on her hooves!'] },
+        say: ['She came home this morning with frost in her beard and moon-dust on her hooves, and walked straight past me to her hay.', 'Duchess came home with moon-dust on her hooves!'] },
       { if: '!flag n_dawn', fact: 'n5_duchess_pen=empty',
-        say: [["Long Night or not, the goats want feeding. Well. Goat. Usually. She's off somewhere.", 'The goat wants feeding. She is off somewhere.'],
+        say: [["Long Night or not, the goat wants feeding. If I could find her.", 'The goat wants feeding. She is off somewhere.'],
           ["Pen's empty again. She'll turn up. She always does, somewhere ridiculous.", 'She always turns up somewhere silly.']] },
-      { say: ['Goats, Ash. Never trust a goat. Love them, mind. Never trust them.', 'Love goats. Never trust them.'] },
+      { say: ['Love a goat all you like, Ash. Just never trust one.', 'Love goats. Never trust them.'] },
     ],
 
     mabel: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: [['Moonlilies will not open without a moon. They are sulking. I have told them that is not helpful.', 'Moonlilies sulk without a moon.'],
-          ['Gran sent word from the Mirefen. She says the frogs have stopped singing. That has never happened.', 'Gran says the frogs stopped singing.']] },
+        say: [["The moonlilies won't open without a moon. I talk to them every morning, and they stay shut.", 'Moonlilies sulk without a moon.'],
+          ['Gran sent word from the Mirefen: the frogs have stopped singing. She has never known that in all her years.', 'Gran says the frogs stopped singing.']] },
       { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['Every moonlily in the valley opened at once this morning. It sounded like a sigh.', 'Every moonlily opened at once!'] },
     ],
 
@@ -134,7 +134,7 @@ people({
 
     hal: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['Moo-rgaret will not come in from the field. She is waiting for the moon. Cows are like that.', 'My cow is waiting for the moon.'] },
+        say: ['Moo-rgaret will not come in from the field. She stands in the same spot all night, mooing at the sky.', 'My cow is waiting for the moon.'] },
       { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['The moon came back and Moo-rgaret came in. She acted like it was her idea.', 'The moon is back. So is my cow.'] },
     ],
 
@@ -142,16 +142,16 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['Lanterns! Get your lanterns! Half price during the Long Night! Full price after. That is just business, little dragon.',
           'Lanterns! Half price in the Long Night!'] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['Lanterns, full price! No? Moon souvenirs, then. Very slightly chewed.', 'Moon souvenirs! A bit chewed.'] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['Lanterns, full price again! No? A moon-shaped cookie cutter, then. Lucky, they say.', 'Moon cookie cutters! Lucky!'] },
     ],
 
     dell: [
       { if: 'flag m_ship=glaciar', once: true,
-        say: ['You flew to Moonfall on a DRAGON instead of my boat. I am not upset. The Soggy Biscuit is upset.', 'You flew on a dragon. My boat is upset.'] },
+        say: ["You flew to Moonfall on a DRAGON instead of my boat. I'm not upset. The Soggy Biscuit Three is upset.", 'You flew on a dragon. My boat is upset.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: [['Fish are not biting. Even the fish know something is wrong with the sky.', 'Even the fish know the sky is wrong.'],
           ['Engine is warm, lantern is lit. Wherever you need to go, the Soggy Biscuit Three goes too.', 'My boat will take you anywhere.']] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['Fish are biting again! The moon came back and the fish came with it. I cried a bit.', 'The fish are back! I cried.'] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ["Fish are biting again! The moon came back and the fish came with it. Best day's fishing of my life.", 'The fish are back!'] },
     ],
 
     minnow: [
@@ -161,22 +161,22 @@ people({
 
     mayor: [
       { if: 'choice morrow=jail', once: true,
-        say: ['Morrow sends his regards from the Watch House. He is growing potatoes in the yard. Very law-abiding potatoes.', 'Morrow grows potatoes at the Watch House.'] },
+        say: ['Morrow sends his regards from the Watch House. Captain Osric lets him grow potatoes in the yard.', 'Morrow grows potatoes at the Watch House.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['I have declared the Long Night officially over. Nobody has told the sky. I am sending a strongly worded letter.', 'I told the sky the night is over. It did not listen.'] },
-      { if: 'flag n_dawn', say: ['I am naming a holiday after you. Ash Day. It is just Lantern Day with more cake.', 'Ash Day! Lantern Day with more cake!'] },
+      { if: 'flag n_dawn', say: ['There will be a parade for you, Ash, with ribbons. It is just Lantern Day with more cake, but it is official.', 'A parade for you! With cake!'] },
     ],
 
     nib: [
       { if: '!flag n_dawn',
         say: ['I drew a map of the Night Mother\'s mountain! It is a triangle with a moth on it. One coin.', 'A map of the night mountain! One coin.'] },
-      { if: 'flag n_dawn', say: ['New map! The mountain, but with a happy moon on top. Two coins. It has more detail.', 'New map! Two coins.'] },
+      { if: 'flag n_dawn', say: ["New map! The mountain, with a happy moon on top. Two coins. There's a cat on this one too.", 'New map! Two coins.'] },
     ],
 
     gorran: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['My lads are sitting up with every lamp in Coppergulch lit. For you. Do not make it weird.', 'Every lamp in Coppergulch is lit for you.'] },
-      { if: 'flag n_dawn', say: ['Your mum came back through here swinging that hammer. She said you did fine. FINE. She was crying.', 'Your mum said you did fine. She was crying.'] },
+        say: ['My lads are sitting up with every lamp in Coppergulch lit, for you. Your mother would have my ears if we let them go out.', 'Every lamp in Coppergulch is lit for you.'] },
+      { if: 'flag n_dawn', say: ['Word came down the road that you did it. I told the lads, "That\'s Maren\'s kid." Then I had to sit down for a bit.', "You did it! That's Maren's kid!"] },
     ],
 
     pick: [
@@ -189,29 +189,29 @@ people({
       { if: '!flag n_dawn',
         say: ['I am writing the last verse of your song. I need you to come back, so I know how it ends.', 'Come back, so I know how your song ends.'] },
       { if: 'flag n_dawn choice n_end=moth', say: ['The last verse is about a little moth on a lantern. It makes everyone cry. Good crying.', 'My last verse makes everyone cry.'] },
-      { if: 'flag n_dawn', say: ['I finished your song. Fourteen verses. The last one rhymes "moon" with "soon". I am very proud.', 'I finished your song! Fourteen verses.'] },
+      { if: 'flag n_dawn', say: ['I finished your song. Fourteen verses, and the last one rhymes "moon" with "soon". I\'m keeping it.', 'I finished your song! Fourteen verses.'] },
     ],
 
     moss: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['Moonlilies sleep when the moon does, dearie. All of them. Even the mean ones by the bog.', 'The moonlilies all sleep now.'] },
-      { if: 'flag n_dawn', say: ['The frogs are singing again. Badly. It is the most beautiful thing I have ever heard.', 'The frogs sing again!'] },
+      { if: 'flag n_dawn', say: ['The frogs are singing again, every one of them off-key. I never heard anything so lovely.', 'The frogs sing again!'] },
     ],
 
     morrow: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['I believed a dragon once, and it ended badly. I believe in YOU. That feels different.', 'I believe in you. That feels different.'] },
-      { if: 'flag n_dawn', say: ['I grow carrots now. Carrots do not care about moons or dragons. It is very restful.', 'I grow carrots now. Very restful.'] },
+        say: ["I listened to a voice in my dreams once, and it ended badly. I'm listening to you now. That feels different.", 'I believe in you. That feels different.'] },
+      { if: 'flag n_dawn', say: ["I keep my hands in the dirt these days. Dirt doesn't care about moons or dragons. It's very restful.", 'I dig in the dirt now. Very restful.'] },
     ],
 
     ulf: [
       { if: 'quest q_n5_follower active !solved n5_who_follows',
-        say: ['My brother says his goat has gone walkabout again. Sheep never wander off. Write that down.', 'Sheep never wander. Write that down.'] },
+        say: ['My brother says his goat has gone walkabout again. You never hear that about a sheep.', 'Sheep never wander off.'] },
       { say: ['Goats climb anything, you know. Anything. Sheep stay on the ground where they belong.', 'Goats climb anything. Sheep do not.'] },
     ],
 
     bertram: [
-      { if: '!flag n_dawn', fact: 'n5_moon=gone', say: ['I baked a loaf shaped like the moon. Somebody had to.', 'I baked a moon-shaped loaf.'] },
+      { if: '!flag n_dawn', fact: 'n5_moon=gone', say: ['I baked a loaf shaped like the moon, so the village has one to look at.', 'I baked a moon-shaped loaf.'] },
       { if: 'flag n_dawn', say: ['Moon buns! With a little seam of icing round the middle, like the real one.', 'Moon buns, with icing seams!'] },
     ],
 
@@ -219,17 +219,17 @@ people({
       { if: 'choice fennick=forgive !flag n_dawn', fact: 'n5_moon=gone',
         say: ['Every lantern in Emberhollow is lit, Ash. Every night, like I promised. Tonight they are all lit for you.', 'Every lantern is lit. All for you.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone', say: ['Lamp oil is selling fast. Everybody wants a light in the window.', 'Everyone wants a light in the window.'] },
-      { if: 'flag n_dawn', say: ['I kept a lamp in my window all night anyway. Old habit. Good habit.', 'I kept my lamp lit anyway.'] },
+      { if: 'flag n_dawn', say: ['I kept a lamp in my window all night anyway. I think I always will.', 'I kept my lamp lit anyway.'] },
     ],
 
     wren: [
       { if: 'quest m_leash active item m_book_raw',
-        say: ['Is that the Book of Moths? Under my arm. NOW. Please. Sorry. Now, please.', 'Is that the Book of Moths? Give it here!'] },
+        say: ['Is that the Book of Moths? Oh, give it here, give it here. Carefully!', 'Is that the Book of Moths? Give it here!'] },
       { if: 'quest q_n5_hush active !flag m_leash_known',
         say: ['Moon-silk? The moon-priests of Lumen wrote about it. Their books are in the Drowned Library, under the sea, in Moonfall.',
           'The moon-priests wrote about moon-silk. Their books are in Moonfall.'] },
       { if: 'flag m_page11', once: true,
-        say: ['Two page elevens. I have framed one and I sleep with the other. Do not tell anyone.', 'I sleep with page eleven. Shh.'] },
+        say: ["I have two page elevens now. One is framed. The other sleeps under my pillow, but don't tell anyone.", 'I sleep with page eleven. Shh.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['I have read every book about the moon. Not one says what to do when somebody eats it. I am writing that one myself.',
           'No book says what to do. I am writing one.'] },
@@ -237,20 +237,20 @@ people({
     ],
 
     tilly: [
-      { if: '!flag n_dawn', say: ['The Sleepy Salmon has a bed for you whenever you need it. The soup is mostly soup, even now.', 'A bed for you, any time.'] },
+      { if: '!flag n_dawn', say: ["The Sleepy Salmon has a bed for you whenever you need it, and there's soup on, with Bertram's bread.", 'A bed for you, any time.'] },
       { if: 'flag n_dawn', say: ['Free soup for the dragon who brought the moon home! Do not tell Pell.', 'Free soup for you! Shh.'] },
     ],
 
     osric: [
       { if: 'choice fennick=jail', once: true,
         say: ['My prisoner has polished every lamp in the Watch House twice. They have never been so shiny. I may keep him.', 'My prisoner polishes the lamps.'] },
-      { if: '!flag n_dawn', fact: 'n5_moon=gone', say: ['The Watch is on duty all night. The Watch is me and two very old dogs. All three of us are awake.', 'The Watch is awake. Me and two old dogs.'] },
+      { if: '!flag n_dawn', fact: 'n5_moon=gone', say: ["The Watch is on duty all night. That's me and the two dogs, and none of us has blinked.", 'The Watch is awake. Me and two old dogs.'] },
       { if: 'flag n_dawn', say: ['The dogs howled when the moon came back. So did I. Do not put that in a song.', 'The dogs howled. So did I. Shh.'] },
     ],
 
     marigold: [
       { if: '!flag n_dawn', say: ['A hat for the mountain? Black, with a brim, so no moth lands on your horns. No? Your loss.', 'A hat for the mountain? No? Your loss.'] },
-      { if: 'flag n_dawn', say: ['Everyone wants a moon hat now. I am making them out of spoons.', 'Everyone wants a moon hat now.'] },
+      { if: 'flag n_dawn', say: ["Everyone wants a moon hat now. I can't stitch them fast enough.", 'Everyone wants a moon hat now.'] },
     ],
 
     cookie: [
@@ -264,9 +264,9 @@ people({
     // ======================================================================= map 1, the Clockwork Coast (Act II's people)
     c_oona: [
       { if: 'quest q_n5_oona done', once: true,
-        say: ['She will come home for tea. She said so. Well. YOU said so. Same thing, duck.', 'She will come home for tea!'] },
+        say: ["She's coming home for tea after. You said so, duck, and I believe you.", 'She will come home for tea!'] },
       { if: 'flag n_dawn quest q_n5_oona done',
-        say: ['She came home for tea. She ate eleven biscuits. ELEVEN. And she wore the scarf.', 'She came home! Eleven biscuits!'] },
+        say: ['She came home for tea, duck. Ate eleven biscuits and wore the scarf the whole time.', 'She came home! Eleven biscuits!'] },
       { if: '!flag n5_vesper !flag n_dawn', fact: 'n5_moon=gone',
         say: ['My Vesper has gone up that mountain. I know she has. She always goes where the trouble is.', 'My Vesper went up that mountain.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
@@ -278,7 +278,7 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['Every watchman on every roof, looking up. Nobody knows what we are looking for. We are looking very precisely.',
           'All my guards are looking up. Very precisely.'] },
-      { if: 'flag n_dawn', say: ['The moon rose at seven minutes past eleven. I wrote it down. I may have wept. Precisely.', 'The moon rose. I wrote down the time.'] },
+      { if: 'flag n_dawn', say: ['The moon rose at seven minutes past eleven. I wrote it down, and then I had to sit down.', 'The moon rose. I wrote down the time.'] },
     ],
 
     c_hettie: [
@@ -292,7 +292,7 @@ people({
     c_ottoline: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['The Turning Library has two hundred books about the moon. Every one is suddenly out of date. Shhh.', 'All our moon books are out of date. Shhh.'] },
-      { if: 'flag n_dawn', say: ['Two hundred new pages to write. I have never been so happy. Shhh. Sorry.', 'So many new pages! Shhh.'] },
+      { if: 'flag n_dawn', say: ["Two hundred new pages to write, and every one of them good news. Shhh. I'm whispering, I'm whispering.", 'So many new pages! Shhh.'] },
     ],
 
     c_whirligig: [
@@ -303,12 +303,12 @@ people({
 
     c_mo: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['The tide is all muddled without the moon. Admiral Pinch walked sideways into my office. Well. He always does.', 'The tide is muddled without the moon.'] },
+        say: ['The tide is all muddled without the moon. Even the crabs are walking in circles.', 'The tide is muddled without the moon.'] },
       { if: 'flag n_dawn', say: ['Tide came in right on time this morning. I hugged a crab. Do not tell Pinch.', 'The tide is on time! I hugged a crab.'] },
     ],
 
     c_ingrid: [
-      { say: ['Hammer, hammer, ding. I am making you a horseshoe, for luck. You do not have horses. It is the thought.', 'I am making you a lucky horseshoe.'] },
+      { say: ['Hammer, hammer, DING! A horseshoe, for luck. No horse? JA, the luck works anyway!', 'I am making you a lucky horseshoe.'] },
     ],
 
     c_fig: [
@@ -329,12 +329,12 @@ people({
     ],
 
     c_ravel: [
-      { say: ['A draught for courage? Brewed from moonlight. Well. It was. Before. Now it is mostly lemon.', 'A courage draught. Mostly lemon now.'] },
+      { say: ["A draught for courage? I used to brew it from moonlight. With no moon, it's mostly lemon.", 'A courage draught. Mostly lemon now.'] },
     ],
 
     c_jo: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone', say: ['Night sailing every night now. There is no other kind. I have only hit two seals.', 'Night sailing every night! Only two seals.'] },
-      { if: 'flag n_dawn', say: ['DAY sailing! I forgot what the sea looked like. It is very big. Who knew.', 'Day sailing! The sea is very big.'] },
+      { if: 'flag n_dawn', say: ["DAY sailing! I forgot what the sea looks like in the daytime. It's so blue!", 'Day sailing! The sea is so blue!'] },
     ],
 
     c_bobs: [
@@ -382,7 +382,7 @@ people({
     c_barley: [
       { if: 'quest q_n5_follower active !solved n5_who_follows',
         say: ['A goat that climbs up cliffs where nothing else can? Sounds like Hollis\'s goat. That goat once climbed my chimney.', 'A cliff goat? Sounds like Hollis\'s goat.'] },
-      { say: ['Duchess the Second has gone off her grass. She keeps staring at the mountain. Sheep know things.', 'My sheep keeps staring at the mountain.'] },
+      { say: ['Duchess the Second has gone off her grass. She just stands there staring at the mountain.', 'My sheep keeps staring at the mountain.'] },
     ],
 
     // ======================================================================= map 2, Frostreach (Act III's people)
@@ -427,7 +427,7 @@ people({
 
     f_pennant: [
       { if: '!flag n_dawn', say: ['The wind is blowing the wrong way. Toward the mountain. It wants to watch. Wheee. Sorry.', 'The wind blows toward the mountain. Wheee.'] },
-      { if: 'flag n_dawn', say: ['The wind is blowing home again. Wheee. Sorry. Every time.', 'The wind blows home. Wheee.'] },
+      { if: 'flag n_dawn', say: ['The wind is blowing home again. Wheee! ...It just comes out.', 'The wind blows home. Wheee.'] },
     ],
 
     f_toastwhistle: [
@@ -444,7 +444,7 @@ people({
     ],
 
     f_hilde: [
-      { say: ['Beds at the Warm Mitten, any time. Biscuit the cat will sit on your feet. That is the price.', 'A bed any time. The cat sits on you.'] },
+      { say: ['Beds at the Warm Mitten, any time. Biscuit the cat will sit on your feet for free.', 'A bed any time. The cat sits on you.'] },
     ],
 
     f_eider: [
@@ -467,13 +467,13 @@ people({
         say: ['A knot nothing can cut? Then do not cut it. Ask that old merman, Ripple. Or Wren. Somebody always wrote it down.',
           'Ask Elder Ripple. Somebody wrote it down.'] },
       { if: 'flag n_dawn choice n_end=embermoon', fact: 'n5_moon=back',
-        say: ['You gave the Heart to the moon. I made it for you. ...And you gave it away to keep everyone warm. Good. That is what it was for.',
+        say: ["You gave my Heart to the moon. ...Good. Now it keeps everybody warm, every night. That's what I made it for.",
           'You gave the Heart away to keep everyone warm. Good.'] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
-        say: ['You brought it home. You brought YOU home. Come here. No, closer. Your horns can take it.', 'You came home. Come here. Big hug.'] },
+        say: ['You brought it home, and you brought yourself home. Come here. Closer. Your horns can take it.', 'You came home. Come here. Big hug.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: [['I will be right here at the end of the bridge. With a hammer. In case.', 'I will wait here. With a hammer.'],
-          ['Did you eat the sandwich? It is a little squashed. It has been through a lot. Like you.', 'Did you eat the sandwich?']] },
+        say: [["I'll be right here at the end of the bridge, with my hammer, in case.", 'I will wait here. With a hammer.'],
+          ["Did you eat that sandwich yet? Don't make me come up there.", 'Did you eat the sandwich?']] },
       { bark: true, if: '!flag n_dawn', say: ['Eat something, Ash!', 'Eat something!'] },
     ],
 
@@ -492,8 +492,8 @@ people({
     ],
 
     juniper: [
-      { if: '!flag n_dawn', say: ['I drew the peak again. Four rings, one on top of the other. It keeps changing shape. Rude.', 'I drew the peak again. It keeps changing!'] },
-      { if: 'flag n_dawn', say: ['I drew the moon this morning. It sat still for me. Finally. Polite.', 'I drew the moon. It sat still!'] },
+      { if: '!flag n_dawn', say: ["I drew the peak again. Four rings, one on top of the other. It keeps changing shape on me, and mountains aren't supposed to do that.", 'I drew the peak again. It keeps changing!'] },
+      { if: 'flag n_dawn', say: ['I drew the moon this morning, and it finally sat still long enough for me to finish.', 'I drew the moon. It sat still!'] },
     ],
 
     m_ripple: [
@@ -503,7 +503,7 @@ people({
       { if: 'quest q_n5_hush active flag m_leash_known',
         say: ['Gently, dragon. Moon-silk listens to soft breath. Like blowing on soup.', 'Gently. Like blowing on soup.'] },
       { if: '!flag n_dawn', say: ['The tide has not moved in days. The whole sea is holding its breath, dragon.', 'The whole sea holds its breath.'] },
-      { if: 'flag n_dawn', say: ['The tide came back. The fish are confused. I am also confused. It is wonderful.', 'The tide is back. Everyone is confused!'] },
+      { if: 'flag n_dawn', say: ['The tide came back this morning, and every fish in Coralcombe is swimming in circles. It is wonderful, dragon.', 'The tide is back. Everyone is confused!'] },
     ],
 
     m_winnie: [
@@ -517,7 +517,7 @@ people({
     ],
 
     m_rowan: [
-      { say: ['This knot means "good luck". This one means "come back". I tied both on your raft. You do not have a raft. Still.',
+      { say: ['This knot means "good luck". This one means "come back". I tied them both round the pier post, so you can find your way home.',
         'I tied good-luck knots for you.'] },
     ],
 
@@ -541,7 +541,7 @@ people({
     ],
 
     m_kiln: [
-      { say: ['I made you a glass lantern for the mountain. It is shaped like a shoe. Do not ask.', 'I made you a shoe-shaped lantern.'] },
+      { say: ['I made you a glass lantern for the mountain. It came out shaped like a shoe. The glass had other ideas.', 'I made you a shoe-shaped lantern.'] },
     ],
 
     m_esme: [
@@ -554,7 +554,7 @@ people({
     ],
 
     m_rafi: [
-      { say: ['Three hundred years we crossed the Glass Desert by moonlight. Now we wait for it. Caravans are patient.', 'We wait for the moon. Caravans are patient.'] },
+      { say: ['Three hundred years we crossed the Glass Desert by moonlight. Now we sit by the wagons and wait for it to come back.', 'We wait for the moon to come back.'] },
     ],
 
     m_coralia: [
@@ -570,7 +570,7 @@ people({
     ],
 
     m_kipper: [
-      { say: ['HALT! Who swims there? ...Oh. The hero. Carry on. Bravely. And carefully.', 'HALT! Oh, the hero. Carry on.'] },
+      { say: ["HALT! Who swims there? ...Oh, it's the hero. Carry on, then, and be careful.", 'HALT! Oh, the hero. Carry on.'] },
     ],
   },
 })
