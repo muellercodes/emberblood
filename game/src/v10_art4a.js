@@ -168,7 +168,8 @@ defineLook('m4a_eclipse',{w:60,h:60,anim:true,draw(g,x,y,t,state){
   // the day goes violet and dark (the sky band at the top darker still)
   g.fillStyle=`rgba(20,10,40,${0.5*dark})`; g.fillRect(0,0,sw,sh);
   const gr=g.createLinearGradient(0,0,0,sh*0.55); gr.addColorStop(0,`rgba(14,6,30,${0.6*dark})`); gr.addColorStop(1,'rgba(14,6,30,0)'); g.fillStyle=gr; g.fillRect(0,0,sw,sh*0.55);
-  const sx=sw*(narrow?0.8:0.82), sy=Math.max(60,sh*(narrow?0.16:0.14)), R=Math.max(22,Math.min(sw,sh)*0.055);
+  // (the sun sits clear of the HUD: below the top-left panels, away from the minimap and from where she rises)
+  const sx=sw*(narrow?0.18:0.3), sy=Math.max(140,sh*(narrow?0.28:0.19)), R=Math.max(22,Math.min(sw,sh)*0.055);
   a4aMoonDisc(g,sx,sy,R,cov,Math.min(1,0.3+dark*1.2),now);
   // Nyxara rises over the dunes (right of Ash on a wide screen, above him on a phone); she leaves up and away east
   if(rise>0.01&&fade>0.01){
