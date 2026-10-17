@@ -17,6 +17,9 @@ chapter({
   place: {
     // the temple steps outside the door (12300,68446); the warp ring out of the temple puts Ash here
     m4_temple_out: { map: 3, at: [12300, 68540], r: 260, kind: 'spot', name: ['the Mirror Temple steps', 'the temple steps'] },
+    // the temple's mirrors gone dark with white eyes in them, while Nyxara's voice speaks (drawn on its face)
+    m4_temple_eyes: { map: 3, at: [12300, 68430], kind: 'prop', look: 'm4_mirror_eyes', if: 'flag m4_eyes_on',
+                      name: ['the dark mirrors', 'the dark mirrors'] },
   },
 
   // these replace x3_story's old copies of the boss words (x3_foes plays STORY.bosses[type]): the words now live only
@@ -97,7 +100,7 @@ chapter({
     // outside, on the temple steps (audit: the voice was glued onto the boss outro): at most 6 lines a branch
     m_mirror_voice: [
       { cam: 'm_mirror_door', s: 1 },
-      ['narr', "Behind you, every mirror on the temple's face goes dark at once. In each one, a pair of white eyes opens.", 'Every mirror on the temple goes dark. White eyes open in them.'],
+      ['narr', "Behind you, every mirror on the temple's face goes dark at once. In each one, a pair of white eyes opens.", 'Every mirror on the temple goes dark. White eyes open in them.', { do: ['set m4_eyes_on'] }],
       ['nyxara', "Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, long ago. It hurt very much.", 'You found moonfire. Her priests burned me with it once.'],
       ['nyxara', 'Shine as bright as you like. The brighter the flame, the darker it burns, at the very end.', 'Shine bright. The brighter the flame, the darker it burns, at the end.', { clue: 'm4_mirror_voice' }],
       ['ash', "That doesn't even make sense!", "That doesn't make sense!"],
@@ -106,7 +109,8 @@ chapter({
       { if: '!clue m4_she_asks', then: [
         ['ash', 'On the beach she could have squashed me flat. She ASKED me for the Shards instead. Why ask?', 'On the beach she ASKED me for the Shards. Why ask?', { clue: 'm4_she_asks' }] ],
         else: [
-        ['narr', 'The eyes close. One mirror shows you, looking a bit worried. You fix your hair. It helps.', 'The eyes close. You fix your hair. It helps.'] ] },
+        ['narr', 'The eyes close. One mirror shows you, looking a bit worried. You fix your hair. It helps.', 'The eyes close. You fix your hair. It helps.', { do: ['clear m4_eyes_on'] }] ] },
+      { do: ['clear m4_eyes_on'] },
       // (a save from before v10 never saw Esme's workbench in Sable: Iska knows her saying)
       { if: '!clue m4_cracked_lamp', then: [
         ['iska', 'Esme in Sable says it every day: "Cracked lamps can\'t hold a flame. Mend it whole first."', 'Esme says: "Cracked lamps can\'t hold a flame."', { clue: 'm4_cracked_lamp' }] ] },

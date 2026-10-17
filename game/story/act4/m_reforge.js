@@ -33,6 +33,12 @@ chapter({
     // the first plank of the moonfire bridge, at the very end of the pier
     m4_bridge_on: { map: 3, at: [13762, 65446], r: 36, kind: 'spot', name: ['the moonfire bridge', 'the bridge'] },
     m4_peak_sea: { map: 3, at: [13740, 65200], kind: 'npc_spot', name: ['the sea at the Edge of the World', 'the sea'] },
+    // the black mountain out at sea and the moonfire bridge to it: this chapter's own pictures, shown in Act IV only
+    // while the engine has no `fx` hook for x3_story's vista (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    m4_peak:      { map: 3, at: [13990, 65120], kind: 'prop', look: 'm4_peak_far', if: 'flag m4_peak_up act=4 !flag s10_fx',
+                    name: ['the black mountain', 'the black mountain'] },
+    m4_bridge_fx: { map: 3, at: [13780, 65452], kind: 'prop', look: 'm4_fire_bridge', if: 'flag m4_bridge_lit act=4 !flag s10_fx',
+                    name: ['the moonfire bridge', 'the moonfire bridge'] },
   },
 
   step: [
@@ -65,6 +71,7 @@ chapter({
     m_reforge: [
       ['narr', 'Through the door lies the Eclipse Lens: a disc of moon-glass as big as a pond, set in brass, pointing at the sky. Then footsteps on the stairs. And puffing. A lot of puffing.',
                'Here is the Eclipse Lens, big as a pond. Then: footsteps, and puffing.', { fx: ['mom_in'] }],
+      { place: ['maren', [22060, 1580]] }, { place: ['quill', [22330, 1600]] },
       ['maren', 'Ash? ASH! Those stairs are made of MOONLIGHT. Do you know how hard it is to climb moonlight with a hammer?', 'Ash! Those stairs are MOONLIGHT. Try climbing that with a hammer!'],
       ['ash', 'MOM?!', 'MOM?!'],
       ['narr', 'Mom drops the hammer and hugs you. Then she holds you at arm\'s length and looks at you. Then she hugs you again.', 'Mom drops her hammer and hugs you. Twice.'],
@@ -76,6 +83,7 @@ chapter({
     ],
     // after the taps: at most 6 lines. The why_three payoff: the player saw this coming.
     m_reforge2: [
+      { place: ['maren', [22060, 1580]] }, { place: ['quill', [22330, 1600]] }, { sfx: 'chest' },
       ['narr', 'TING. TING. TING. In the middle of the Lens sits a warm stone the size of a plum, an orange core with three glowing seams, beating softly, like a heart.',
                'TING. TING. TING. A warm stone with three glowing lines beats like a heart.',
                { fx: ['heart_whole'], do: [
@@ -98,14 +106,14 @@ chapter({
                'You all run out onto the old Moon Pier. The last bit of moon slides over the sun.', { fx: [['party_look'], ['ecl', 'start', 3]] }],
       ['narr', 'On it, wings wider than the sky, is Nyxara. CRUNCH. The last of the moon goes out like a candle.', 'Nyxara is on it. CRUNCH. The last of the moon goes out.',
                { do: ['moon 0', 'set m_eclipse3'], fx: ['ecl', 'bite', 0] }],
-      ['narr', 'And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.', 'A black mountain rises out of the sea.', { fx: [['peak', 'rise'], ['ecl', 'gone']] }],
+      ['narr', 'And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.', 'A black mountain rises out of the sea.', { do: ['set m4_peak_up'], fx: [['peak', 'rise'], ['ecl', 'gone']] }],
       ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
       ['ash', "It looks like... Cinder Mountain? And a clock tower? And SNOW? It's every place I've ever been, all squashed together.", 'It looks like Cinder Mountain! And a clock tower! And SNOW!'],
       { if: 'choice m_hush=free', then: [
         ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the mountain. Far off over the dark sea, a small white light glows once, softly.',
-                 'The Heart grows warm. A bridge of fire rolls out to the mountain. Far away, a small white light glows.', { fx: ['peak', 'bridge'] }] ],
+                 'The Heart grows warm. A bridge of fire rolls out to the mountain. Far away, a small white light glows.', { do: ['set m4_bridge_lit'], fx: ['peak', 'bridge'] }] ],
         else: [
-        ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the black mountain.', 'The Heart grows warm. A bridge of fire rolls out to the mountain.', { fx: ['peak', 'bridge'] }] ] },
+        ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the black mountain.', 'The Heart grows warm. A bridge of fire rolls out to the mountain.', { do: ['set m4_bridge_lit'], fx: ['peak', 'bridge'] }] ] },
       ['maren', "...You're going up there.", "You're going up there."],
       ['ash', "I'm going up there.", "I'm going up there."],
       ['maren', "Then I'll walk you to the bridge.", "Then I'll walk you to the bridge."],

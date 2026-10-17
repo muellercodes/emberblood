@@ -2,7 +2,8 @@
 // defineLook and nothing else. (x,y) is the foot of each look (its place's anchor) and every look fits in its w x h
 // box above it; `state` is the place's world state.
 //   Sable: the new sign by the Moon Well, the little moths asleep on the well tower (seen from the footbridge), Esme's
-//   workbench with the cracked lamp and her note. The Moonpath: the little moth on a silver leash, tied to the foot
+//   workbench with the cracked lamp and her note, and Nyxara perched on the tower during the second eclipse.
+//   The Edge of the World: the black glass mountain rising out of the sea, and the moonfire bridge to it. The Moonpath: the little moth on a silver leash, tied to the foot
 //   brazier and hugging a stolen lamp (its thread runs to the brazier and on up into the sky), and the lamp it drops
 //   when the knot melts.
 // No em dash anywhere. Everything here is block scoped so no name can clash with another module.
@@ -17,19 +18,6 @@
   const line = (g, pts, col, lw) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.strokeStyle = col; g.lineWidth = lw; g.lineCap = 'round'; g.lineJoin = 'round'; g.stroke(); };
   const rect = (g, x, y, w, h, fill, lw) => { g.fillStyle = fill; g.fillRect(x, y, w, h); if (lw) { g.lineWidth = lw; g.strokeStyle = OL; g.strokeRect(x, y, w, h); } };
 
-  // a tiny moth seen from above: two wing pairs and a body; s is its size, a its angle, wing the open amount 0..1
-  function tinyMoth(g, x, y, s, a, col, wing) {
-    g.save(); g.translate(x, y); g.rotate(a); g.scale(s, s);
-    const w = 0.55 + 0.45 * (wing == null ? 1 : wing);
-    el(g, -2.6 * w, -0.6, 2.8 * w, 1.9, -0.5, col, 0.55);
-    el(g, 2.6 * w, -0.6, 2.8 * w, 1.9, 0.5, col, 0.55);
-    el(g, -1.9 * w, 1.5, 1.8 * w, 1.3, 0.4, col, 0.5);
-    el(g, 1.9 * w, 1.5, 1.8 * w, 1.3, -0.4, col, 0.5);
-    el(g, 0, 0.4, 0.9, 2.6, 0, '#5a5068', 0.4);
-    line(g, [[-0.4, -2], [-1.6, -3.8]], '#5a5068', 0.4); line(g, [[0.4, -2], [1.6, -3.8]], '#5a5068', 0.4);
-    g.restore();
-  }
-
   // ---------- the sign by the Moon Well: a driftwood post, a pale board with a little moon on it
   has && defineLook('m4_sign_well', { w: 40, h: 46, draw(g, x, y) {
     shadow(g, x, y + 1, 12, 3.5);
@@ -41,18 +29,107 @@
   } });
 
   // ---------- the little moths asleep on the Moon Well tower: the anchor is on the footbridge, 62 px in front of
-  // the tower's base; they cling to its sides from just above the basin to near the top, all facing the water
-  has && defineLook('m4_tower_moths', { w: 90, h: 290, draw(g, x, y) {
+  // the tower's base; they cling to its sides from just above the basin to near the top, all facing the water.
+  // Pale and soft (no dark outline), so they read as moths and not as holes.
+  has && defineLook('m4_tower_moths', { w: 90, h: 290, outline: false, draw(g, x, y) {
     let seed = 7;
     const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
-    const cols = ['#d8d2e6', '#c8c0d8', '#e6e0f0', '#bdb4cf'];
-    for (let i = 0; i < 46; i++) {
-      const up = 96 + rnd() * 170, side = (rnd() - 0.5) * (up < 150 ? 40 : 30);
-      const s = 0.85 + rnd() * 0.5, a = Math.PI + (rnd() - 0.5) * 0.7;   // heads down, toward the water
-      tinyMoth(g, x + side, y - up, s, a, cols[i % cols.length], 0.35 + rnd() * 0.4);
+    const cols = ['#f2eefa', '#e6e0f2', '#fbf8ff', '#ddd6ec'];
+    const moth = (mx, my, s, a, col) => { g.save(); g.translate(mx, my); g.rotate(a); g.scale(s, s);
+      g.fillStyle = 'rgba(70,56,96,.35)'; g.beginPath(); g.ellipse(0.6, 0.8, 4.6, 2.6, 0, 0, T2); g.fill();
+      g.fillStyle = col; g.strokeStyle = 'rgba(96,82,124,.75)'; g.lineWidth = 0.6;
+      for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(0, -1.2); g.quadraticCurveTo(sx * 5.2, -3.4, sx * 4.6, 0.6); g.quadraticCurveTo(sx * 3.2, 2.6, 0, 1.4); g.closePath(); g.fill(); g.stroke(); }
+      g.fillStyle = 'rgba(160,140,200,.8)'; for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * 2.6, -0.6, 0.8, 0, T2); g.fill(); }
+      g.fillStyle = '#6a5a86'; g.beginPath(); g.ellipse(0, 0.2, 0.7, 2, 0, 0, T2); g.fill();
+      g.restore(); };
+    for (let i = 0; i < 34; i++) {
+      const up = 100 + rnd() * 160, side = (rnd() - 0.5) * (up < 150 ? 38 : 28);
+      moth(x + side, y - up, 1.15 + rnd() * 0.45, Math.PI + (rnd() - 0.5) * 0.8, cols[i % cols.length]);   // heads down, toward the water
     }
-    // a few more along the basin's rim, the front row for dinner
-    for (let i = 0; i < 9; i++) tinyMoth(g, x - 26 + i * 6.5, y - 74 - (i % 2) * 3, 0.9, Math.PI, cols[i % 4], 0.5);
+    // the front row along the basin's rim, waiting for dinner
+    for (let i = 0; i < 8; i++) moth(x - 25 + i * 7.2, y - 76 - (i % 2) * 3, 1.25, Math.PI, cols[i % 4]);
+  } });
+
+  // ---------- Nyxara perched on the Moon Well tower (shown during the second eclipse when the engine has no `fx` hook
+  // for x3_story's own eclipse pictures; see CHANGES.md). The anchor is the tower's base; she sits on top of it, wings
+  // half open, white painted eyes on them, her long curled tongue reaching down to the basin.
+  has && defineLook('m4_nyx_perch', { w: 360, h: 420, anim: true, draw(g, x, y, t, state) {
+    const br = Math.sin(t * 1.3) * 0.06, top = y - 236;
+    g.save();
+    glow(g, x, top - 30, 170, '60,30,110', 0.35);
+    for (const sx of [-1, 1]) {
+      g.save(); g.translate(x, top - 34); g.scale(sx, 1); g.rotate(-0.15 - br);
+      // upper wing
+      g.beginPath(); g.moveTo(0, 0); g.bezierCurveTo(40, -96, 150, -112, 168, -40); g.bezierCurveTo(150, 4, 76, 18, 0, 10); g.closePath();
+      g.fillStyle = '#2c2142'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#120c1e'; g.stroke();
+      g.fillStyle = 'rgba(120,90,180,.35)'; g.beginPath(); g.moveTo(10, -6); g.bezierCurveTo(50, -70, 120, -84, 140, -42); g.bezierCurveTo(110, -20, 60, -6, 10, -6); g.fill();
+      // the painted eye
+      el(g, 96, -46, 20, 15, -0.2, '#f2f0ff', 2); el(g, 98, -46, 9, 9, 0, '#1a1030'); ci(g, 101, -49, 3, '#ffffff');
+      // lower wing
+      g.beginPath(); g.moveTo(0, 6); g.bezierCurveTo(50, 20, 116, 40, 96, 92); g.bezierCurveTo(70, 108, 26, 70, 0, 30); g.closePath();
+      g.fillStyle = '#3a2c56'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#120c1e'; g.stroke();
+      ci(g, 62, 54, 7, 'rgba(200,190,255,.7)');
+      g.restore();
+    }
+    // body, head, antennae, the tongue curling down to the water
+    el(g, x, top - 20, 18, 46, 0, '#241a38', 3);
+    ci(g, x, top - 70, 17, '#2c2142', 3);
+    ci(g, x - 6, top - 72, 4, '#e8e4ff'); ci(g, x + 6, top - 72, 4, '#e8e4ff');
+    line(g, [[x - 6, top - 84], [x - 30, top - 120], [x - 52, top - 112]], '#120c1e', 3);
+    line(g, [[x + 6, top - 84], [x + 30, top - 120], [x + 52, top - 112]], '#120c1e', 3);
+    if (state === 'drink') { g.beginPath(); g.moveTo(x, top - 58); g.bezierCurveTo(x + 40, top - 20, x - 30, top + 60, x, y - 80); g.lineWidth = 3.2; g.strokeStyle = '#a890d8'; g.stroke(); }
+    g.restore();
+  } });
+
+  // ---------- the black glass mountain out at sea, at the Edge of the World, and the moonfire bridge to it (shown
+  // after the last bite when the engine has no `fx` hook for x3_story's own vista). The mountain's anchor is at the
+  // east edge of the map; it rises out of the dark sea beyond it. The bridge's anchor is the end of the Moon Pier.
+  has && defineLook('m4_peak_far', { w: 760, h: 760, anim: true, draw(g, x, y, t) {
+    const bx = x + 20, by = y;
+    g.save();
+    glow(g, bx, by - 300, 380, '130,80,220', 0.32);
+    const P = [[-0.5, 0], [-0.44, -0.1], [-0.35, -0.2], [-0.3, -0.28], [-0.24, -0.26], [-0.19, -0.27], [-0.15, -0.37], [-0.12, -0.5], [-0.09, -0.52], [-0.07, -0.42], [-0.03, -0.6], [0, -0.72],
+      [0.03, -1], [0.06, -0.84], [0.1, -0.7], [0.15, -0.62], [0.2, -0.64], [0.26, -0.5], [0.33, -0.34], [0.41, -0.18], [0.5, 0]];
+    const W = 620, Hh = 600;
+    g.beginPath(); P.forEach(([px, py], i) => { const X = bx + px * W, Y = by + py * Hh; i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath();
+    g.fillStyle = '#1e1632'; g.fill(); g.lineWidth = 7; g.strokeStyle = 'rgba(150,110,240,.55)'; g.stroke(); g.lineWidth = 3; g.strokeStyle = '#0c0814'; g.stroke();
+    // glassy facets and a snowy shoulder, a clock-tower notch, a crater (it is every place Ash has been)
+    g.fillStyle = 'rgba(160,140,220,.18)'; g.beginPath(); g.moveTo(bx + 0.03 * W, by - Hh); g.lineTo(bx + 0.2 * W, by - 0.64 * Hh); g.lineTo(bx + 0.05 * W, by - 0.3 * Hh); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(240,244,255,.75)'; g.beginPath(); g.moveTo(bx + 0.15 * W, by - 0.62 * Hh); g.lineTo(bx + 0.2 * W, by - 0.64 * Hh); g.lineTo(bx + 0.24 * W, by - 0.54 * Hh); g.lineTo(bx + 0.17 * W, by - 0.56 * Hh); g.closePath(); g.fill();
+    rect(g, bx - 0.11 * W, by - 0.5 * Hh - 26, 14, 26, '#1e1630');
+    // the broken ring of cold light where the moon should be
+    glow(g, bx + 0.03 * W, by - Hh - 70, 90, '220,230,255', 0.3);
+    g.lineWidth = 7; g.strokeStyle = 'rgba(232,238,255,.92)'; g.beginPath(); g.arc(bx + 0.03 * W, by - Hh - 70, 56, 0.4, 2.2); g.stroke();
+    g.beginPath(); g.arc(bx + 0.03 * W, by - Hh - 70, 56, 2.8, 5.6); g.stroke();
+    // violet lightning, now and then
+    const k = Math.floor(t * 1.7), f = (t * 1.7) % 1;
+    if (f < 0.25) { let lx = bx + ((k * 37) % 120 - 60), ly = by - Hh * 0.9; const pts = [[lx, ly]]; for (let i = 0; i < 6; i++) { lx += ((k * 13 + i * 29) % 40) - 20; ly += 60; pts.push([lx, ly]); }
+      g.globalAlpha = 1 - f * 4; line(g, pts, '#c8a8ff', 3); g.globalAlpha = 1; }
+    // the dark sea round its foot
+    g.fillStyle = 'rgba(12,16,40,.55)'; g.fillRect(bx - W * 0.6, by - 8, W * 1.2, 30);
+    g.restore();
+  } });
+  has && defineLook('m4_fire_bridge', { w: 520, h: 80, anim: true, outline: false, draw(g, x, y, t) {
+    g.save();
+    for (let i = 0; i < 26; i++) { const u = i / 26, X = x + u * 480, Y = y - 6 - Math.sin(u * Math.PI) * 26;
+      glow(g, X, Y, 22, '200,210,255', 0.22 + 0.1 * Math.sin(t * 4 + i));
+      el(g, X, Y, 12, 4.5, 0, 'rgba(230,236,255,.9)');
+      const fl = 6 + 4 * Math.sin(t * 9 + i * 1.7); poly(g, [[X - 4, Y - 2], [X, Y - 2 - fl], [X + 4, Y - 2]], 'rgba(200,214,255,.85)'); }
+    g.restore();
+  } });
+
+  // ---------- the Mirror Temple's face gone dark, a pair of white eyes in every pane (Nyxara's voice, on the steps).
+  // The anchor is just in front of the temple's base (12300,68430); the panes sit over its two windows and its door.
+  has && defineLook('m4_mirror_eyes', { w: 320, h: 220, anim: true, outline: false, draw(g, x, y, t) {
+    const blink = (Math.sin(t * 0.9) > 0.97) ? 0.15 : 1;
+    const pane = (px, py, w, h, ex) => {
+      g.save(); g.globalAlpha = 0.88; g.fillStyle = '#140c22'; g.beginPath(); g.ellipse(px, py, w / 2, h / 2, 0, 0, T2); g.fill(); g.restore();
+      glow(g, px, py, w * 0.8, '120,80,200', 0.25);
+      for (const sx of [-1, 1]) { g.save(); g.translate(px + sx * ex, py - 2); g.scale(1, blink); el(g, 0, 0, 5.4, 3.6, 0, '#f6f4ff'); ci(g, sx * 0.8, 0, 1.6, '#3a2a60'); g.restore(); }
+    };
+    pane(x - 125, y - 162, 38, 66, 7);
+    pane(x + 125, y - 162, 38, 66, 7);
+    pane(x, y - 102, 76, 92, 13);
   } });
 
   // ---------- Esme's workbench outside the Lamp House: a cracked lamp and a folded note
