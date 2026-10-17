@@ -58,7 +58,7 @@ chapter({
     { id: 'bridge', do: 'goto m4_pier_end 80', scene: 'm4_pier_bridge',
       obj: ['Walk to the end of the Moon Pier, where the moonfire bridge begins', 'Walk to the end of the pier'],
       hint: ['The bridge starts at the end of the Moon Pier. Mom will walk you there.', 'The bridge starts at the end of the pier.'],
-      then: ['moon 0', 'set m_done', { if: '!flag m_end_xp', then: ['set m_end_xp', 'xp 600'] }, 'end_act 4'] },
+      then: ['moon 0', { if: '!flag m_end_xp', then: ['set m_end_xp', 'xp 600'] }, 'end_act 4'] },
     // the act is over. "Continue the story" on the end card starts Act V at n_bridge. A player who keeps exploring
     // first steps onto the bridge's first plank when ready (or rests at a shrine: that starts Act V too)
     { id: 'go', do: 'goto m4_bridge_on 36', then: ['stage n_bridge'],

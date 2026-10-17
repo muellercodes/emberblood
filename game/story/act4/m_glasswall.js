@@ -45,6 +45,10 @@ chapter({
     // the far side of the Glasswall, where the Burrow Gap comes up (verified open sand, level 0): only a burrower gets
     // here (nobody climbs the wall or flies over it)
     m4_gap_east:   { map: 3, at: [11160, 67240], r: 140, kind: 'spot', name: ['the far side of the Glasswall', 'the far side of the wall'] },
+    // before the eclipse the Burrow Gap stays shut (x3_world): say why, if Ash goes digging there early (audit 7)
+    m4_gap_shut:   { map: 3, at: [10660, 67230], r: 40, kind: 'examine', if: '!flag m_eclipse2',
+                     name: ['the foot of the Glasswall', 'the Glasswall'], prompt: ['Look at the sand under the Glasswall', 'Look at the sand'],
+                     say: 'm4_gap_shut_say' },
   },
 
   clue: {
@@ -172,6 +176,10 @@ chapter({
                'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['clear m4_nyx_here', 'set m4_moths_gone'], fx: ['ecl', 'leave'] }],
       ['narr', 'Every lantern in Sable blows out at once.', 'Every lantern in Sable goes out.'],
       ['m_saffron', 'Not dead. Dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.', 'One candle of moon is left. Because of you. Go!', { fx: ['ecl', 'end'] }],
+    ],
+    m4_gap_shut_say: [
+      ['narr', 'The sand at the foot of the Glasswall is packed as hard as glass today. Even the worms are waiting for something.', 'The sand here is packed hard. The worms are waiting.'],
+      ['iska', 'Not yet, little ember. Something is coming to Sable first. I can feel it in my wick.', 'Not yet. Something is coming to Sable first.'],
     ],
     m4_iska_under: [
       ['iska', "The Glasswall, Ash. Nobody can climb it and nobody can fly over it. But you're a worm now. Go UNDER.", "Nobody can climb the Glasswall. But you're a worm now. Go UNDER!", { ref: 'm_burrowgap' }],

@@ -55,9 +55,10 @@ chapter({
   },
 
   step: [
-    // the dungeon stays code (x3_dun_b); Fanfare's outro (m_mirror_won_v) is played by the old fight's own hook:
-    // `kneel` names it for the checker (after a boss: at most 6 lines), the engine does not play it
-    { id: 'temple', do: 'dungeon m_mirror', at: 'm_mirror_door', kneel: 'm_mirror_won_v',
+    // the dungeon stays code (x3_dun_b); Fanfare's outro (m_mirror_won_v, at most 6 lines: it comes right after the
+    // boss) is played by the old fight's own hook (x3_foes plays STORY.m_mirror_won_v, this chapter's scene in place).
+    // No `kneel` here: the engine would play it a second time.
+    { id: 'temple', do: 'dungeon m_mirror', at: 'm_mirror_door',
       obj: ["Find Ember's last flame in the Mirror Temple", "Find Ember's flame in the temple"],
       hint: ['Mirrors, beams and moon-glass. When in doubt, turn a mirror. When in more doubt, turn another one.', 'Mirrors and beams. When in doubt, turn a mirror.'],
       // (the shrine's words give m4_black_flame; a run that missed them, or a save from before v10, gets it here)

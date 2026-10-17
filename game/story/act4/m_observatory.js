@@ -51,13 +51,17 @@ chapter({
   },
 
   step: [
-    // the Observatory and its fights stay code (x3_dun_b, x3_foes). Hush's outro and the choice (m_hush_out) are
-    // played by the fight's own hook: `kneel` names it for the checker (after a boss: at most 6 lines a branch)
-    { id: 'climb', do: 'fight m_hushboss', at: 'm_obs_door', kneel: 'm_hush_out',
+    // the Observatory and its fights stay code (x3_dun_b, x3_foes). Hush's outro and the choice (m_hush_out, at most
+    // 6 lines a branch: it comes right after the boss) are played by the fight's own hook (x3_story m3sHushDown).
+    // No `kneel` here: the engine would play it a second time.
+    { id: 'climb', do: 'fight m_hushboss', at: 'm_obs_door',
       obj: ['Climb the Observatory to the Dome Gallery', 'Climb up to the dome'],
       hint: ['Sun, Moon, Eclipse: turn the dial and the room changes. Light a lamp if a moth gets in your way. Moths always look.', 'Turn the dial to change the room. Moths stare at lamps.'],
       // (the old m_reforge stage set these when it started: Dell's boat is in at the Moon Pier, Mom is on her way up)
-      then: ['set m_dell_away=0', 'set m_dell_pier', 'set m_dell_left', { if: 'flag m_eclipse2', then: ['set m_pb_3'] }, 'stage m_reforge'] },
+      then: ['set m_dell_away=0', 'set m_dell_pier', 'set m_dell_left', { if: 'flag m_eclipse2', then: ['set m_pb_3'] }, 'stage m_reforge'],
+      // the small lamp_thief mystery can be solved in the Case Book any time its three clues are found; this part
+      // only tells the story (and the checker) that it belongs here, before the Duke on floor 2
+      extra: [{ do: 'deduce lamp_thief' }] },
   ],
 
   scene: {
@@ -69,7 +73,8 @@ chapter({
     ],
     // Duke Umberwing's outro (a miniboss): the lamp_thief payoff when it is solved first
     m_umber_won: [
-      ['m_umberwing', 'Oh, bother. Bested by a lizard. Here, the key, the key. Take it.', 'Oh, bother. Here, take the key.'],
+      // (the key is real: the Duke's room drops the boss key, x3_dun_b loot bkey)
+      ['m_umberwing', 'Oh, bother. Bested by a lizard. Here, the key, the key. Take it.', 'Oh, bother. Here, take the key.', { ref: 'm_obs_door' }],
       { if: 'solved lamp_thief', then: [
         ['ash', "You're the lamp thief! Bertha's spare, Driftwood's lantern, all of them!", "You're the lamp thief!"],
         ['m_umberwing', '...Bother. Take the lot. I shall post them back. With a note.', 'Bother. Take the lot. I will send them back.', { do: ['set m4_lamps_back'] }],
@@ -110,7 +115,7 @@ chapter({
           say: [
             ['narr', "You breathe Moonfire on the first knot, as softly as you'd blow on hot soup. The silver thread melts like frost on a window. Then the second knot.", 'You breathe soft Moonfire on the knots, like blowing on soup. They melt.', { fx: ['hush', 'knots'] }],
             { if: 'item m4_sweater', then: [
-              ['narr', 'Hush shrinks to her own size. You tug the sweater over her head. It is too small. She does not mind.', 'Hush shrinks. You put the sweater on her. It is too small. She does not mind.', { do: ['take m4_sweater', 'set m4_hush_sweater'], fx: ['hush', 'free'] }] ],
+              ['narr', 'Hush shrinks to her own size. You tug the sweater over her head. It is too small. She does not mind.', 'Hush shrinks. You put the sweater on her. It is too small. She does not mind.', { do: ['take m4_sweater', 'set m4_hush_sweater', 'epi m4_epi_sweater 6'], fx: ['hush', 'free'] }] ],
               else: [
               ['narr', 'Hush shrinks to her own size, stretches her wings, and floats up out of the dome, free and glowing faintly. She looks back, once.', 'Hush shrinks and floats away, free. She looks back once.', { fx: ['hush', 'free'] }] ] },
             ['f_hush', '...Shhh. Thank you. Quietly.', 'Thank you. Quietly.'] ] },
