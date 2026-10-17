@@ -10,6 +10,14 @@ A thousand years ago the dragon Vorlaxis, the First Flame, ruled the valley of E
 
 You play Ash, the newest Emberblood: village lantern-lighter, part-time chimney sweep, and the first in a thousand years born with horns, a tail and real fire. It's the thousandth Lantern Day, the night the binding runs out. Kobolds just crashed the festival, somebody left the north gate open for them, and a cult called the Scaled Oath is snuffing the Wards so your great-great-great-great-great-great-great-great-great-great-great-great-great-grandfather wakes up strong and takes his fire back from you.
 
+After Embermere the story keeps going for four more acts, each on its own map:
+
+- **Act II, The Masked Thief**: someone stole the Ember Heart. Follow a brass gear down to the Clockwork Coast and Gearhaven, a city of stopped clocks, and work out who the Moth Mask is and why she only steals things that glow. New powers: Climbing Claws, Grapple Tail and Shadow Dash, plus the Chain Whip.
+- **Act III, The Long Winter**: snow in June. Climb through frozen Frostreach to the dragon sleeping on Mount Dread, and find out who she really is. New powers: Blaze Breath, Wind Riding and Ground Pound, plus Blast Bombs.
+- **Act IV, The Night Mother**: the moon is being eaten. Sail to Moonfall, dive the drowned city, burrow under the desert and race the eclipses to the last Shard. New powers: Dive, Burrow and Moonfire, plus the Moon Glaive.
+- **The finale, Nightfall Peak**: climb the mountain that wasn't there, bring the friends you made along the way, and face Nyxara. Three endings, and the kindest one depends on what you did in every act.
+
+- **The Case Book**: every act has mysteries to solve. You find the clues yourself by looking, following tracks and asking around, then work out the answer in the Case Book in the Journal (press B). A wrong guess gives a hint, never a fail.
 - **Story Mode**: a 14,000 × 11,000 valley with seven regions, seven bosses and five Wards to relight. Seven towns and hamlets with about 45 houses you can walk into, and a dozen of them have an upstairs, a cellar or a secret room behind a loose brick, a bookcase or a painting. Seven caves built as small puzzle dungeons: push-block plates, crystal switches, torch-order murals, timed braziers, dark rooms, mazes, locked doors with small keys and cracked walls that hide treasure rooms.
 - **Ember's Trials**: three big dungeons built by Ash's ancestor. Each has a gift you earn halfway through and need for the rest, a weapon in a big chest, a boss key and a boss: Old Gnarl the root giant (Trial of the Leap, you learn to **jump**), the Mirrow Serpent (Trial of the Tide, you learn to **walk on water**), and Skrae the Storm Wyvern, fought in the air (Trial of the Sky, you grow **wings and fly**). The new moves open up islands, broken bridges, lava islands and sky nests all over the valley.
 - **Six weapons**: the Ember Blade, Twin Fangs (fast daggers, sneak attacks), a Pike that skewers a whole line, a Forge Hammer that smashes guards and cracked walls, the Ash Bow (shoot through your own fire breath for fire arrows) and the Wing-rang, a boomerang that stuns and fetches coins. Mom forges every one of them stronger with star-iron.
@@ -80,8 +88,10 @@ The backend is a tiny [Cloudflare Worker](worker/src/index.js) with a [D1](https
 
 ```
 game/src/      game code, split into modules (concatenated in order by build.mjs)
+game/story/    the story as data: chapters, side quests, talk, clues and the world registry, act by act
 game/*.html    page markup and styles
-build.mjs      builds docs/index.html
+tools/         the story checker, the story map, the world check and the old-text extractor
+build.mjs      builds docs/index.html (and runs the story checker first)
 docs/          the published site (GitHub Pages serves this folder)
 worker/        Cloudflare Worker API + D1 schema
 ```
@@ -94,6 +104,14 @@ API_BASE=http://127.0.0.1:8787 node build.mjs   # point at a local worker
 ```
 
 Then open `docs/index.html`, or serve the folder (`npx serve docs`).
+
+The story lives in `game/story/` as plain data that one engine (`game/src/e10_story.js`) runs. Every build checks it first and stops if the story and the world disagree: a place the story mentions that isn't on the map, a key that opens nothing, a step or ending that can't be reached with the powers you have by then, a scene that runs too long. The report goes to `dist/check.md`.
+
+```bash
+node tools/check.mjs            # the story check on its own (--act 2 for one act)
+node tools/storymap.mjs         # dist/storymap.html: every act as a graph of chapters, clues, choices and endings
+python3 tools/worldcheck.py     # boots the game headless and checks every place and gate is really there
+```
 
 ## Running the backend yourself
 
