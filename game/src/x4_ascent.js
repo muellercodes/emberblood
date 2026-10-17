@@ -659,7 +659,7 @@ function n4aBuildSilent(){
   const C=n4aAdd('chimney',{id:'n_chimney_top',x:n4aP(3150,204)[0],y:n4aP(3150,204)[1],r:0,near:900});
   C.tick=()=>{ if(n4aF('n_chimney')||n4aAir()) return; if(n4aLvl()===3&&n4aNear(C.x,C.y,320)){ G.flags.n_chimney=1; n4aSnd('chime',0.6); n4aEmit('chimney',{}); n4aSave(); } };
   // the Shadow Raid out of the copy of the north gate: beat them for a chest
-  n4aAmbush('raid',{x:790,y:84380,r:330,n:8,types:['n_shade'],level:21,spread:[60,240],respawn:300,say:['ash',S('Kobolds in the village. Again. Even the shadows have no manners.','Shadow raiders! Again!')]});
+  n4aAmbush('raid',{x:790,y:84380,r:330,n:8,types:['n_shade'],level:21,spread:[60,240],respawn:300,say:['ash',S("Shadow kobolds? I've beaten real ones. You don't scare me.","Shadow kobolds! You don't scare me!")]});
   n4aChest('raid',860,84420,()=>n4aFound('n_amb_raid'));
   // Moth Memory 1 behind a cracked wall in the copy of Yara's house (its east doorway is bricked up and cracked)
   n4aCrackWall('yara',[715,84678],[715,84720],{th:12});
@@ -1287,7 +1287,7 @@ function n4aBuildCradle(){
   M.fire=q=>{ if(q.awake||n4aFound('n_amb_cradle_moth')) return; q.awake=true; n4aSnd('whoosh'); shake(4); n4aSay(q.x,q.y-90,S('The great moth wakes up!','She wakes up!'),'#e8dcff','mothwake',3); n4aEmit('mothwake',{}); };
   M.stand=(q,t)=>{ if(q.awake||n4aFound('n_amb_cradle_moth')) return; n4aDrawSleepMoth(q,t); };
   M.sy=q=>q.y;
-  M.tick=q=>{ if(!q.awake&&!n4aFound('n_amb_cradle_moth')&&n4aNear(q.x,q.y,260)) n4aSay(q.x,q.y-110,S('Zzz... A moth the size of a pony is asleep on the nest. Tiptoe. And maybe no fire.','Shh! She is asleep. No fire!'),'#e8dcff','mothzz',12); };
+  M.tick=q=>{ if(!q.awake&&!n4aFound('n_amb_cradle_moth')&&n4aNear(q.x,q.y,260)) n4aSay(q.x,q.y-110,S("Zzz... A moth the size of a pony is asleep on the nest. Tiptoe past, and maybe don't breathe fire.",'Shh! She is asleep. No fire!'),'#e8dcff','mothzz',12); };
   n4aAmbush('cradle_moth',{x:NE[0],y:NE[1],r:600,n:1,types:['n_mothling'],level:23,opt:{elite:true,hpScale:3},spread:[0,10],when:()=>M.awake});
   n4aPane(6,P6[0],P6[1]+6);
   n4aHeart('n_he4',3735,86112);
