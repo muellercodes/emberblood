@@ -12,6 +12,10 @@ quest({
   title: ['Rimeholm, One Thaw at a Time', 'One Thaw at a Time'],
   payoff: { kind: 'upgrade', id: 'f_bluefire' },
   old_steps: ['six', 'rasmus', 'bluefire'],
+  // x2_story offers f_rime itself right after Ylva's thaw (offerQuest('f_rime')), and a taken-over quest's stand-in has no
+  // offer lines, so today that offer is a bare "Will you help?". offer names the scene that offer should play (an A3S
+  // ENGINE REQUEST in CHANGES.md); Ylva's talk option plays the same scene for anyone who said "Not right now".
+  offer: 'rm_offer',
 
   step: [
     { id: 'six', do: 'wait_for flag f_thaw_f_tollef flag f_thaw_f_saga flag f_thaw_f_sigrun flag f_thaw_f_bo flag f_thaw_f_nils flag f_thaw_f_oskar', legacy: true,
