@@ -44,8 +44,9 @@ const BAL_BOSS={
 for(const k in BAL_BOSS) if(EDEF[k]) Object.assign(EDEF[k],BAL_BOSS[k]);
 // v10 on-ramp: Act I boss health on [Easy, Normal] in the story, times the health above (Hard keeps hp x DIFFS.bossHp).
 // Measured with the casual-kid bot so each boss is a little harder than the one before (scratchpad v10/BAL.md).
-const BAL_BOSS_EZ={grizzlefang:[0.85,0.65], gnarl:[0.6,0.65], morrow:[1.6,1.9], serpent:[0.6,0.6], gloamjaw:[0.55,0.45], broodmother:[1.45,0.95],
-  greymane:[0.9,1.25], skrae:[1.1,1.1], cindervane:[1,0.7]};
+// (Easy never gets more health than Normal: Easy hp x 0.8 <= Normal hp, so an Easy factor is at most 1.25 x the Normal one.)
+const BAL_BOSS_EZ={grizzlefang:[0.75,0.65], gnarl:[0.6,0.65], morrow:[1.6,1.9], serpent:[0.6,0.6], gloamjaw:[0.55,0.45], broodmother:[1.15,0.95],
+  greymane:[0.9,1.25], skrae:[1.1,1.1], cindervane:[0.85,0.7]};
 { const base=makeEnemy; makeEnemy=function(type,x,y,opt){ const e=base(type,x,y,opt);
     try{ const k=e&&e.boss&&G&&G.mode==='story'&&BAL_BOSS_EZ[type]; const i=k?DIFFS.indexOf(G.diff):-1; if(k&&i>=0&&i<2&&k[i]!==1){ e.maxHp*=k[i]; e.hp=e.maxHp; } }catch(err){}
     return e; }; }
