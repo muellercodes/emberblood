@@ -559,7 +559,7 @@ function smokeTick(){
 // ---------- the Southern Pass: a crossing at the south edge of Embermere down to the Clockwork Coast, and back
 // (the arrival point on map 1, (2600,20700), is a placeholder: the Act II world helper moves both ends)
 defineCrossing({id:'c_pass_s',x:HV.pass.x,y:HV.pass.y,to:{x:2600,y:20700},label:S('Take the Southern Pass','Go down the Southern Pass'),name:S('The Southern Pass','The Southern Pass'),kind:'pass',dir:Math.PI/2,
-  need:()=>reached('c_pass'),locked:S('A sign says: SOUTHERN PASS. CLOSED FOR LANTERN NIGHT. The old road down the cliffs. You will need it soon.','The pass is closed tonight.'),
+  need:()=>reached('c_pass'),locked:S('A sign says: SOUTHERN PASS. CLOSED BY ROCKFALL. The old road down the cliffs, buried in rocks. You will need it soon.','The pass is blocked by rocks.'),
   hidden:()=>!(G&&G.flags&&G.flags.act1_done),arrive:S('Salt and steam on the wind. Somewhere, a thousand clocks are ticking.','It smells like the sea! Clocks tick everywhere.')});
 defineCrossing({id:'c_pass_n',x:2600,y:20480,to:{x:HV.pass.x,y:HV.pass.y-150},label:S('Climb back up to Embermere','Go back up to Embermere'),name:S('The Southern Pass','The Southern Pass'),kind:'pass',dir:-Math.PI/2,
   arrive:S('Home air. It smells like bread and woodsmoke.','It smells like home!')});

@@ -158,8 +158,9 @@ function initWorld(){
   }
   buildPlaces(); assignHomes(); defineFloors(); registerSpeakers();
   for(const h of HOUSES) if(h.owner&&!(CASTBY[h.owner]||{}).generic) h.burnt=false;
-  // the raid left its mark: two ordinary homes in Emberhollow are scorched
-  { const gen=HOUSES.filter(h=>h.town==='village'&&h.owner&&(CASTBY[h.owner]||{}).generic); gen.forEach((h,i)=>{ h.burnt=i<2; }); }
+  // the raid burns half of Emberhollow: the northern half, where the kobolds came in through the north gate.
+  // raidBurn marks them; the Act I module (x0_act1) shows them burnt from the raid until Act I ends, then rebuilt.
+  { const vil=HOUSES.filter(h=>h.town==='village'&&h.k==='house').sort((a,b)=>a.y-b.y), n=Math.round(vil.length/2); vil.forEach((h,i)=>{ h.raidBurn=i<n; h.burnt=false; }); }
   // ---- chests
   const quota=[5,5,4,4,3,5,4], have=[0,0,0,0,0,0,0];
   for(let tries=0;tries<9000&&CHESTS.length<30;tries++){
