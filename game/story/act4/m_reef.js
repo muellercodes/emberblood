@@ -18,10 +18,11 @@ chapter({
 
   place: {
     m4_strand: { map: 3, at: [6900, 65640], r: 240, kind: 'spot', name: ['the Tideglass Strand', 'the glass beach'] },
-    // the eclipse: a screen-wide look (the dark, the covered sun, Nyxara and Hush). Its spot is south of the beach so it
-    // is drawn after everything on the beach; it shows only while the eclipse scene runs (m_eclipse_on is set by the
-    // scene and cleared after it; x3_story clears it on every load).
-    m4_eclipse1: { map: 3, at: [6900, 66020], kind: 'prop', look: 'm4a_eclipse', if: 'flag m_eclipse_on !flag m_eclipse1', name: 'the eclipse' },
+    // the eclipse: a screen-wide look (the dark, the covered sun, Nyxara and Hush), drawn on the screen layer (an engine
+    // without it draws it in the world: its spot is south of the beach so it comes after everything there); it shows
+    // only while the eclipse scene runs (m_eclipse_on is set by the scene and cleared after it, and on every load).
+    m4_eclipse1: { map: 3, at: [6900, 66020], kind: 'prop', look: 'm4a_eclipse', if: 'flag m_eclipse_on !flag m_eclipse1', layer: 'screen',
+      name: 'the eclipse' },
   },
 
   clue: {

@@ -8,6 +8,7 @@
 // The landing (old m3sLand, a stage update the takeover silences) is the `land` step here.
 chapter({
   id: 'm_sail', act: 4, after: 'f_glaciar', next: 'm_drift', takeover: true,
+  keep_enter: true,   // (the old enter hook starts the intro when the stage is entered without startAct)
   card: null, name: ['Across the Sea', 'Across the Sea'],   // (x3_story shows the Chapter 1 card after the intro)
   so_far: [
     'The moon has two bites out of it. The last Shard is somewhere east. Dell has a sea boat (and Auntie Glaciar has wings).',
@@ -20,8 +21,8 @@ chapter({
     // all of Driftwood Landing: the West Dock (Dell's boat) and the north isle (Glaciar) are both inside it
     m4_moonfall: { map: 3, at: [1800, 64500], r: 900, kind: 'spot', name: ['Driftwood Landing, in Moonfall', 'Driftwood Landing'] },
     // the painted voyage pictures (screen-wide looks, v10_art4a.js), shown only while the voyage scene plays. The scene
-    // fades to black first (a storybook page); the pictures need the engine to draw a `layer: 'screen'` look after the
-    // fade and before the HUD (A4a ENGINE REQUEST in CHANGES.md): until then they are drawn under the black and unseen.
+    // fades to black first (a storybook page) and the engine draws a `layer: 'screen'` look over the fade, under the
+    // HUD; at dawn the fade lifts and the picture melts away to show Driftwood.
     m4_voyage_ship: { map: 3, at: [1300, 64800], kind: 'prop', look: 'm4a_voyage_ship', if: 'flag m4_voy=ship', layer: 'screen',
       name: 'the voyage east' },
     m4_voyage_glaciar: { map: 3, at: [2345, 64320], kind: 'prop', look: 'm4a_voyage_glaciar', if: 'flag m4_voy=glaciar', layer: 'screen',
@@ -51,20 +52,23 @@ chapter({
         "Hello, little ember. It's Iska. We go east. We will need lots of lanterns.", { ref: 'm4_west_dock' }],
       ['narr', 'Pip climbs up onto your head. Pip is far too big for your head now. Pip disagrees.',
         'Pip climbs onto your head. He is too big now. Pip disagrees.', { if: 'flag pip' }],
-      { if: 'choice f_glaciar=free', then: [
-        ['narr', 'A shadow slides over the town. Glaciar lands outside the walls with a soft, enormous WHUMPH. Half of Hearthold faints. The other half cheers.',
-          'Glaciar lands outside the walls. WHUMPH! Half the town faints. Half cheers.'],
-        ['f_glaciar', 'Good morning, dumpling! I heard the word "east". I don\'t do fast. But I do far.',
-          'Good morning, dumpling! I heard "east". I\'m slow. But I go far.', { ref: 'm4_north_gate' }],
-        { choose: 'm_ship', ask: ['How will you go east?', 'How will you go east?'], pick: [
-          { t: ['Fly with Auntie Glaciar', 'Fly with Glaciar'], tone: 'brave', v: 'glaciar', then: ['set m_ship=glaciar'],
-            say: [['f_glaciar', "Wonderful! Climb aboard. Hold on to a horn. Not THAT horn. The other horn.", 'Wonderful! Climb on. Hold a horn. Not THAT horn!']] },
-          { t: ['Sail with Dell from Gearhaven', 'Sail with Dell'], tone: 'kind', v: 'ship', then: ['set m_ship=ship'],
-            say: [['f_glaciar', "A boat! How quaint. Then I'll nap. Shout if you need me. Loudly. I'm a little deaf on the left.", 'A boat! How sweet. I will nap. Shout loudly!']] },
-        ] }],
-        else: [
-        ['iska', "Gearhaven is a long way from here. Fast travel to a Gearhaven shrine, then walk down to the Far Pier.",
-          'Gearhaven is far. Fast travel to a shrine there. Then walk to the Far Pier.', { do: ['set m_ship=ship'], ref: 'm4_far_pier' }]] },
+      // (once Ash has landed in Moonfall, the way east is already chosen)
+      { if: '!flag m_landed', then: [
+        { if: 'choice f_glaciar=free', then: [
+          ['narr', 'A shadow slides over the town. Glaciar lands outside the walls with a soft, enormous WHUMPH. Half of Hearthold faints. The other half cheers.',
+            'Glaciar lands outside the walls. WHUMPH! Half the town faints. Half cheers.'],
+          ['f_glaciar', 'Good morning, dumpling! I heard the word "east". I don\'t do fast. But I do far.',
+            'Good morning, dumpling! I heard "east". I\'m slow. But I go far.', { ref: 'm4_north_gate' }],
+          { choose: 'm_ship', ask: ['How will you go east?', 'How will you go east?'], pick: [
+            { t: ['Fly with Auntie Glaciar', 'Fly with Glaciar'], tone: 'brave', v: 'glaciar', then: ['set m_ship=glaciar'],
+              say: [['f_glaciar', "Wonderful! Climb aboard. Hold on to a horn. Not THAT horn. The other horn.", 'Wonderful! Climb on. Hold a horn. Not THAT horn!']] },
+            { t: ['Sail with Dell from Gearhaven', 'Sail with Dell'], tone: 'kind', v: 'ship', then: ['set m_ship=ship'],
+              say: [['f_glaciar', "A boat! How quaint. Then I'll nap. Shout if you need me. Loudly. I'm a little deaf on the left.", 'A boat! How sweet. I will nap. Shout loudly!']] },
+          ] }],
+          else: [
+          ['iska', "Gearhaven is a long way from here. Fast travel to a Gearhaven shrine, then walk down to the Far Pier.",
+            'Gearhaven is far. Fast travel to a shrine there. Then walk to the Far Pier.', { do: ['set m_ship=ship'], ref: 'm4_far_pier' }]] },
+      ] },
     ],
     // the voyage, played on arrival: by Glaciar if Ash landed on the north isle, else by Dell's boat (the painted
     // pictures are the looks m4a_voyage_glaciar and m4a_voyage_ship)
@@ -81,8 +85,10 @@ chapter({
         ['narr', "On the second night the moon comes up, with two bites gone like a cookie. Moths flutter past Glaciar's nose, hundreds of them, all flying east.",
           'The moon has two bites gone. Hundreds of moths fly past, all going east.', { do: ['world m4_voyage_glaciar moths'], ref: 'm4_north_isle' }],
         ['iska', 'Follow the moths, little ember. They always know where the light is.', 'Follow the moths. They know where the light is.'],
+        // (the dawn: the picture melts away over the next few seconds and Driftwood shows through)
+        { do: ['world m4_voyage_glaciar dawn'], fade: 0 },
         ['narr', "On the third morning a floating town comes out of the mist. Glaciar lands on its north beach, and the whole beach freezes solid. The raft folk cheer. Free ice!",
-          'A floating town! Glaciar lands. The beach freezes. Free ice!', { do: ['world m4_voyage_glaciar dawn'], ref: 'm4_north_isle' }],
+          'A floating town! Glaciar lands. The beach freezes. Free ice!', { ref: 'm4_north_isle' }],
         { do: ['clear m4_voy'] },
         ['f_glaciar', "I'll wait here, dumpling. Dell's boat is a day behind us. He sent a pigeon. The pigeon was very tired.",
           "I'll wait here, dumpling. Dell's boat is a day behind us."],
@@ -106,8 +112,8 @@ chapter({
           'The moon comes up. Two bites are gone. A hundred moths fly past, all going east.', { do: ['world m4_voyage_ship moths'], ref: 'm4_west_dock' }],
         ['iska', "They're going home to her. Follow the moths, little ember. They always know where the light is.",
           'They are going home to her. Follow the moths. They know where the light is.'],
-        ['narr', "On the third morning a town comes out of the mist. It's floating.", 'On the third morning, a town comes out of the mist. It floats!',
-          { do: ['world m4_voyage_ship dawn'] }],
+        { do: ['world m4_voyage_ship dawn'], fade: 0 },
+        ['narr', "On the third morning a town comes out of the mist. It's floating.", 'On the third morning, a town comes out of the mist. It floats!'],
         { do: ['clear m4_voy'] },
       ] },
     ],

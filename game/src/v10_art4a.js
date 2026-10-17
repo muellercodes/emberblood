@@ -224,7 +224,10 @@ function a4aGlaciar(g,x,y,s,t){
   for(const sd of [-1,1]){ g.save(); g.scale(1,sd); g.fillStyle=sd<0?'#a8d8f4':'#8cc4e8'; g.beginPath(); g.moveTo(-10,-6); g.quadraticCurveTo(-30,-70-fl*30,10,-96-fl*40); g.quadraticCurveTo(20,-60,40,-10); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   // the long body, the tail, the head pointing east (right)
   g.fillStyle='#bfe4fa'; g.beginPath(); g.moveTo(-110,4); g.quadraticCurveTo(-60,-14,0,-12); g.quadraticCurveTo(50,-14,74,-22); g.quadraticCurveTo(94,-24,98,-14); g.quadraticCurveTo(90,-4,72,-6); g.quadraticCurveTo(40,8,0,10); g.quadraticCurveTo(-60,16,-110,4); g.closePath(); g.fill(); g.stroke();
-  g.fillStyle='#f4fbff'; g.beginPath(); g.moveTo(84,-22); g.lineTo(78,-36); g.lineTo(90,-24); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle='#f4fbff'; for(const [a,b,c] of [[[84,-22],[76,-38],[90,-24]],[[90,-23],[90,-40],[95,-21]]]){ g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.lineTo(c[0],c[1]); g.closePath(); g.fill(); g.stroke(); }
+  // frosty spines down her back and a fork at the tail tip
+  g.fillStyle='#e4f6ff'; for(let i=0;i<6;i++){ const bx=-90+i*26, by=-6-Math.sin(i*0.8)*4; g.beginPath(); g.moveTo(bx-6,by); g.lineTo(bx,by-11); g.lineTo(bx+6,by); g.closePath(); g.fill(); g.stroke(); }
+  g.beginPath(); g.moveTo(-110,4); g.lineTo(-126,-6); g.lineTo(-118,6); g.lineTo(-126,16); g.closePath(); g.fill(); g.stroke();
   g.fillStyle='#2c4c6c'; g.beginPath(); g.arc(88,-16,2,0,TAU); g.fill();
   // Ash, tiny, holding on to a horn
   g.fillStyle='#d8582a'; g.beginPath(); g.arc(40,-22,6,0,TAU); g.fill(); g.strokeStyle='#3a1a10'; g.lineWidth=1.6; g.stroke();
