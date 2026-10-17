@@ -1073,7 +1073,11 @@ function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself
   // Duchess leaves Hollis Farm: she is following Ash up the peak (placeGoat leaves her off map 0 until the dawn)
   try{ placeGoat(); }catch(e){ console.error(e); } }
 // during the finale the stock "Travel to <site>" lines for older boss sites would pull Ash off the peak: only the peak's own
-{ const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5) return out.filter(o=>!o.site||/^n_/.test(String(o.site))); }catch(e){} return out; }; }
+// (I5) from her fall to the final choice there is nothing left to defeat or travel to (she lies there alive, so the
+// HUD said "Defeat Nyxara", or "Travel to The Moon's Rest"): it says what is being asked
+{ const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5){
+  if(N4ST.run&&!(G.choices&&G.choices.n_end)) return [{text:S('Choose how the Long Night ends','Choose how it ends')}];
+  return out.filter(o=>!o.site||/^n_/.test(String(o.site))); } }catch(e){} return out; }; }
 
 // ---------- 4. the departure (before the fade), the arrival, the Bridgefoot
 // the moonfire bridge from Moonfall: the first time, the departure plays on the Moon Pier, then the fade
