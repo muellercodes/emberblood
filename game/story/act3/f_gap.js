@@ -12,7 +12,7 @@ chapter({
   so_far: [
     'Ash can ride the wind now. Brother Pennant says the old monks rode it up Mount Dread every spring and knocked, the way the Stonehorns knock. The Stonehorns live past the Howling Gap.',
     'Ash can ride the wind! The monks knocked like Stonehorns. The Stonehorns live past the Howling Gap.'],
-  mom: [['Riding the WIND? Hold on to your hat. And your scarf. And your little brother. You don\'t have a little brother. Hold on anyway.', 'Riding the wind? Hold on to your hat!']],
+  mom: [['Riding the WIND? Then tie your scarf twice, hold on to your hat, and come home in one piece.', 'Riding the wind? Hold on to your hat!']],
 
   place: {
     // the Windscour's north rim, at the vent where x2_world's first Gap ribbon (f_rib_gap1) starts (10000,44450)

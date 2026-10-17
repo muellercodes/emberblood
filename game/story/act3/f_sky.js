@@ -42,17 +42,17 @@ chapter({
     f3_rim_isles: [
       { cam: 'f_skyreach', s: 1.5 },
       ['narr', 'Past the east rim, little islands of rock and snow float out over nothing, tied together with rope bridges. Wind chimes ring on every one.', 'Little islands float in the sky, tied with rope bridges.'],
-      ['tove', 'Floating. In the sky. I\'m cold just looking at them.', 'Floating isles! I\'m cold just looking.'],
+      ['tove', 'Islands floating on nothing at all. I\'m cold just looking at them.', 'Floating isles! I\'m cold just looking.'],
       ['ash', 'How did the monks even get up there?', 'How did the monks get up there?'],
       ['narr', 'Warm air rushes up the cliff past your feet, so hard it ruffles your wings. An updraft.', 'Warm air rushes up past your feet. An updraft!'],
     ],
     f3_pennant_meet: [
-      ['f_pennant', 'Wheeee... oh! Hello! Sorry. I\'m Brother Pennant. Last of the Wind Monks of Skyreach. Also the first. Also the middle. It\'s just me.', 'Wheee! Hello! I\'m Brother Pennant. The last Wind Monk.'],
+      ['f_pennant', 'Wheeee... oh! Hello! Sorry, it slips out. I\'m Brother Pennant, the last Wind Monk of Skyreach.', 'Wheee! Hello! I\'m Brother Pennant. The last Wind Monk.'],
       ['f_pennant', 'The others blew away. On purpose! They ride the winds of the far south now. They send postcards. The postcards blow away.', 'The others blew away. Their postcards blow away too.'],
       ['ash', 'Grandmother Ylva says the monks used to go up Mount Dread.', 'Ylva says the monks went up Mount Dread.'],
-      ['f_pennant', 'Every spring! We rode the wind up to the mountain\'s shoulder, and we KNOCKED. The way the Stonehorns knock. BONK.', 'Every spring we rode the wind up there and KNOCKED. BONK.', { clue: 'f3_climbers' }],
+      ['f_pennant', 'Every spring! The brothers rode the wind up to the mountain\'s shoulder, and they KNOCKED. The way the Stonehorns knock. BONK.', 'Every spring they rode the wind up there and KNOCKED. BONK.', { clue: 'f3_climbers' }],
       ['ash', 'Knocked? On a MOUNTAIN? With what?', 'Knocked on a MOUNTAIN?'],
-      ['f_pennant', 'Oh, I never asked. I held the kites. Then the moths came, and Old Frostfeather went funny.', 'I just held the kites. Then the moths came.'],
+      ['f_pennant', 'I never went up, so I never saw. I held the kites. Then the moths came, and Old Frostfeather went funny.', 'I just held the kites. Then the moths came.'],
       ['f_pennant', 'Our temple owl. Big as a house, gentle as a pillow. She ate a moth and now she\'s all... pecky. She\'s at the very top.', 'Our big owl ate a moth. Now she pecks. She\'s at the top.'],
       ['f_pennant', 'Ember learned to ride the wind here, long ago. They say she left a flame inside. And the Stonehorns? They live past the Howling Gap.', 'Ember left a flame inside. The Stonehorns live past the Howling Gap.'],
       ['ash', 'Will you come in with me?', 'Will you come in with me?'],
@@ -61,7 +61,7 @@ chapter({
 
     // ---- Skyreach Temple's own story keys (x2_dun_a plays them; each replaces the old STORY[key] in place)
     f_sky_in: [
-      ['tove', 'A temple in the sky. Full of wind. Full of cold wind. Of course it is.', 'A temple in the sky. Full of cold wind.'],
+      ['tove', 'A temple in the sky, full of cold wind. I should have stayed napping with the others.', 'A temple in the sky. Full of cold wind.'],
     ],
     f_sky_hats: [
       ['tove', 'Hats! Hundreds of hats! There\'s MY hat! I lost that in the year 312!', 'Hats! Hundreds of hats! There\'s MY hat!'],
