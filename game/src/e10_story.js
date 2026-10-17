@@ -1220,6 +1220,9 @@ function s10QuestStart(id,quiet){
   const q=S10.quests[id];
   if(!q){ if(QDEFS[id]&&!QDEFS[id]._s10){ if(!G.quests[id]) startQuest(id); return; } s10Err(`quest ${id} is not defined`); return; }
   if(G.quests[id]) return;
+  // (I5) a quest's own act and `if` gate it here too: the finale's errands are started from scenes that every player
+  // sees (`quest start q_n5_glaciar` at the Floe Gap), and the quest's if keeps a friend freed earlier out of it
+  if(!s10QuestOpen(q)) return;
   // (quiet: started by talking to the giver; the old "New side quest" banner would name the talk that is just
   // playing, so it is left out: the step's own banner names the next thing to do once the scene ends)
   const B0=G.banner, Q0=(G.bannerQ||[]).slice();

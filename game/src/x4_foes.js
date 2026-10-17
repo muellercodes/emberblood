@@ -307,6 +307,9 @@ function n4fWon(k){
   if(!N4F.fight||N4F.fight.k===k){ N4F.fight=null; N4F.allies=[]; N4F.cue=null; }
   const t=N4FSITE[k]; if(t){ G.flags[t+'_won']=1; const n=N4FK[t]; if(n<5) G.flags['n_echo'+n+'_done']=1; }
   if(typeof N4F.hook.won==='function'){ n4fHook('won',k); return; }
+  // (v10) a stage the story data runs is moved on by its own fight step, after the steps that follow the fight (n_glass
+  // asks the Case Book's n5_wants after Echo 4); jumping here would skip them
+  if(typeof STAGEDEF!=='undefined'&&STAGEDEF[G.stage]&&STAGEDEF[G.stage]._s10) return;
   const N=N4F_NEXT[k]; if(N&&G.stage===N[0]&&typeof STAGEDEF!=='undefined'&&STAGEDEF[N[1]]) try{ setStage(N[1],N[2]); }catch(err){ console.error(err); }
 }
 // every frame (after the foes moved)
