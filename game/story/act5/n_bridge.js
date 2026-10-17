@@ -104,7 +104,7 @@ chapter({
     // 5.0 the departure on the Moon Pier (10 lines on the longest branch: Dell, Mom, Pip)
     n_depart: [
       { cam: 'n5_pier_end', s: 1.2 },
-      ['narr', "The moonfire bridge hums at the edge of the world. It's made of silver flame, and it goes on and on into the dark.", 'The bridge is made of silver fire. It goes far into the dark.'],
+      ['narr', 'Everyone has come out to the end of the pier to see you off. The moonfire bridge waits, silver flame on and on into the dark.', 'Everyone came to see you off. The fire bridge waits.'],
       ['quill', 'I measured the moon tonight. There is none left to measure. I have never been so upset about a number.', 'I tried to measure the moon. There is none left!'],
       ['juniper', "Here. I drew the peak through the Professor's telescope. Four rings, one on top of the other, all the way up.", 'I drew the mountain for you. Four rings, going up.'],
       ['ash', "Four rings. One for each place I've been.", 'Four rings. One for each place I went.'],
