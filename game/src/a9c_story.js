@@ -228,6 +228,9 @@ function updateFollowers(dt){
 }
 function placeGoat(){
   const st=G.side.duchess;
+  // the finale: Duchess is up on Nightfall Peak (she follows Ash to the top), so Hollis's pen is really empty until the
+  // dawn (the act 5 Duchess mystery, q_n5_follower). A Duchess walking with Ash stays with him.
+  if(G.mode==='story'&&st!=='follow'&&typeof actOf==='function'&&actOf(G.stage)===5&&!G.done&&!(G.flags&&G.flags.n_dawn>=1)){ G.goat=null; return; }
   if(st==='home'){ const P=POI.farm; G.goat={x:P.x+60,y:P.y+150,hx:P.x+60,hy:P.y+150,face:0,t:0,r:10}; }
   else if(st==='follow'){ G.goat={x:player.x-40,y:player.y+30,hx:0,hy:0,face:0,t:0,r:10}; }
   else G.goat={x:GOAT_SPOT[0],y:GOAT_SPOT[1],hx:GOAT_SPOT[0],hy:GOAT_SPOT[1],face:0,t:0,r:10};

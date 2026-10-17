@@ -203,7 +203,11 @@ function s10Effect(e,ctx){
     case 'bombbag': if(typeof bombBag==='function') bombBag(+a||5); else s10Err(`effect "${e}": no bomb bag`); break;
     case 'bless': { G.pendingBless=(G.pendingBless||0)+(+a||1); later(1.5,()=>{ try{ offerPending(); }catch(err){} }); break; }
     case 'moon': if(typeof moonSet==='function') moonSet(+a); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,+a); break;
-    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,s10DoorFor(w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
+    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; }
+      // (I5, I4's request) the next step waits while a warp is on its way (it lands on the next play frame), so its
+      // scene or cutscene starts where Ash lands, not where Ash was
+      S10.warpAt=G.time;
+      later(0.05,()=>{ S10.warpAt=null; G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,s10DoorFor(w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
     case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x)).filter(Boolean)})); break; }
     case 'page': s10Page(a); break;
     case 'shrine': { const sid=s10ShrineId(a); if(!sid){ s10Err(`effect "${e}": ${a} is not a shrine`); break; } G.shrines=G.shrines||{}; G.shrines[sid]=true; G.lastShrine=sid; break; }
@@ -252,9 +256,18 @@ function s10Epi(id,pri,ctx){
 }
 
 // ---------- 5. events: storyEmit(name) is global (dungeons, foes, minigames call it); everything heard is remembered
+// storyListen(prefix, fn): old code that draws a story's pictures hears every emit whose name starts with prefix, as
+// fn(rest, name), each time (x4_story: 'n4fx:', the finale's cutscene, Heart, gathering, dawn, book and the way home)
+const S10_LISTEN=[];
+function storyListen(prefix,fn){ if(typeof fn==='function'&&prefix) S10_LISTEN.push({p:String(prefix),fn}); }
+window.storyListen=storyListen;
 function storyEmit(name){
   if(!name||!G||!G.story) return;
-  name=String(name); const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
+  name=String(name);
+  // (I5) a listened-to prefix is a visual beat for old code, not story state: it is not remembered (saves stay small)
+  const L=S10_LISTEN.filter(q=>name.startsWith(q.p));
+  if(L.length){ if(S10.auto) S10.auto.log.push('emit '+name); for(const q of L) try{ q.fn(name.slice(q.p.length),name); }catch(e){ console.error('storyListen',name,e); } return true; }
+  const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
   if(S10.auto) S10.auto.log.push('emit '+name);
   return first;
 }
@@ -628,6 +641,8 @@ function s10Tick(dt){
   s10PlacesTick(dt);
   s10Barks(dt);
   if(scene!=='play') return;
+  // (a warp still on its way: nothing starts until Ash lands; the bound only guards a warp that never landed)
+  if(S10.warpAt!=null){ const wd=G.time-S10.warpAt; if(wd>=0&&wd<1.5) return; S10.warpAt=null; }
   // queued beats (a scene that waits for a calm moment)
   if(S10.queue.length&&s10Calm()){ const q=S10.queue.shift(); try{ q(); }catch(e){ console.error(e); } return; }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
@@ -760,15 +775,22 @@ function s10Prompts(offer){
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceShown(P)) continue;
     const k=P.kind; if(!['examine','sign','door','prop','chest','gate'].includes(k)) continue;
-    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line), and only
-    // when no gate library built it (e10c_gates says `locked` itself when Ash pushes against the gate)
-    if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
+    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line); a gate the
+    // gate library built is shut while gateIsOpen says so, and its prompt sits where the power is used (I3: a kid
+    // walking past learns what it needs, not only one who pushes into it)
+    let gAt=null;
+    if(k==='gate'){ if(!P.locked||!s10GateLocked(P)) continue;
+      if(P._built){ try{ if(typeof gateIsOpen==='function'&&gateIsOpen(id)) continue; const I=typeof gateInfo==='function'?gateInfo(id):null; if(I&&I.door) gAt={x:I.door.x,y:I.door.y}; }catch(e){ continue; } }
+      else if(s10World(id)==='open') continue; }
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
     // (a thing already looked at that no step waits for answers only when Ash stands at it: its prompt no longer hides
     //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
     const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
-    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    const at=gAt||s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    // (I5) nor when the Grapple Tail can reach a post from here (Vesper's cracked mask lies on the Silk Gallery's edge,
+    // right where Ash grapples the first post: E only read the mask again)
+    if(again){ try{ if(typeof p2Pick==='function'&&typeof canGrapple==='function'&&canGrapple()&&!AREA&&p2Pick(p,(typeof P2!=='undefined'&&P2.inp)||{mx:0,my:0})) continue; }catch(e){} }
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
     // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)
@@ -777,7 +799,22 @@ function s10Prompts(offer){
 }
 { const base=miniPrompts; miniPrompts=function(offer){ base(offer); try{ s10Prompts(offer); }catch(e){ console.error(e); } }; }
 // inside houses and caves miniPrompts is not asked: the nearest story prompt wins when it is the closest thing
-{ const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; });
+// (I5, I3's request) indoors a person wins a tie with plain furniture right in front of them (the old offer kept the
+// first of equal scores, the furniture: Ulf stands 20 px behind his bear rug, so the way in from the door gave "Look at
+// the rug"). A person's reach is 70 and a small thing's 50, so the furniture still wins wherever it is nearer.
+function s10PersonFirst(){
+  const cur=G.prompt; if(!AREA||!cur||G.inCombat||!AREA.npcs||!AREA.npcs.length) return;
+  const o=(AREA.objs||[]).find(o=>o.x===cur.x&&o.y===cur.y&&!o.broken); if(!o) return;
+  const FL=typeof FLOOR_LABEL!=='undefined'?FLOOR_LABEL:{}, CL=typeof CAVE_LABEL!=='undefined'?CAVE_LABEL:{}, FU=typeof FURN_LABEL!=='undefined'?FURN_LABEL:{};
+  if(o.prompt||FL[o.k]||CL[o.k]!==undefined||['qitem','stairs','trig','page','cchest','gchest','cave_ore','relic','note'].includes(o.k)||(o.k==='bed'&&o.home)||o.egg||!FU[o.k]) return;
+  const p=player; let d, reach;
+  if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
+  else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
+  const fs=d-reach; let bn=null, bs=1e9;
+  for(const n of AREA.npcs){ const dn=dist(p.x,p.y,n.x,n.y); if(dn>=(n.turtle?90:70)) continue; const sc=dn-70; if(sc<=fs+0.5&&sc<bs){ bs=sc; bn=n; } }
+  if(bn) G.prompt={text:`Talk to ${bn.name}`,act:()=>talkTo(bn),x:bn.x,y:bn.y};
+}
+{ const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted) s10PersonFirst(); }catch(e){ console.error(e); } try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; });
   const cur=G.prompt, cd=cur&&cur.x!=null?dist(player.x,player.y,cur.x,cur.y):1e9;
   if(best&&(!cur||best.d<cd-4)&&!(G.inCombat)) G.prompt={text:best.text,act:best.act,x:best.x,y:best.y}; } }catch(e){ console.error(e); } }; }
 function s10PlaceAct(id){
@@ -1155,7 +1192,9 @@ function s10Solve(id,quiet){
 // QDEFS entry: old_steps[i] is the data step an old save at G.quests[id].step==i resumes at; a data step with
 // legacy:true keeps the old mechanic: while it is current G.quests[id].step is its old index (other steps -1), and
 // when the old code moves that step on, the data step finishes.
-function s10QuestOpen(q){ if(!q) return false; if(q.act&&actOf(G.stage)<+q.act) return false; if(q.if!=null&&!s10Cond(q.if)) return false; return true; }
+// (I5, I4's request) `until: <act>`: an optional quest of an earlier act is no longer offered or started after that act
+// (a giver who comes along to a later act's map does not offer a quest whose things are back home)
+function s10QuestOpen(q){ if(!q) return false; const a=actOf(G.stage); if(q.act&&a<+q.act) return false; if(q.until!=null&&a>+q.until) return false; if(q.if!=null&&!s10Cond(q.if)) return false; return true; }
 function s10QDyn(q){
   const R=()=>s10Run('q',q);
   return {t:'flag',flag:'__s10_quest',_s10dyn:true,
@@ -1207,6 +1246,9 @@ function s10QuestStart(id,quiet){
   const q=S10.quests[id];
   if(!q){ if(QDEFS[id]&&!QDEFS[id]._s10){ if(!G.quests[id]) startQuest(id); return; } s10Err(`quest ${id} is not defined`); return; }
   if(G.quests[id]) return;
+  // (I5) a quest's own act and `if` gate it here too: the finale's errands are started from scenes that every player
+  // sees (`quest start q_n5_glaciar` at the Floe Gap), and the quest's if keeps a friend freed earlier out of it
+  if(!s10QuestOpen(q)) return;
   // (quiet: started by talking to the giver; the old "New side quest" banner would name the talk that is just
   // playing, so it is left out: the step's own banner names the next thing to do once the scene ends)
   const B0=G.banner, Q0=(G.bannerQ||[]).slice();

@@ -202,6 +202,8 @@ function cbPick(id,i){
   const el=$('#jBody'), top=el?el.scrollTop:0;
   renderJour(); if(el) el.scrollTop=top;
   if(r.right) try{ const q=el&&el.querySelector('.cb10-q.solved.just'); if(q) q.scrollIntoView({block:'nearest'}); }catch(e){}
+  // (I5, I4's request) a wrong pick's hint sits under the picks: on a phone it can be below the book's scroll edge
+  else if(CB10.wrong[id]&&CB10.wrong[id].hint) try{ const q=el&&[...el.querySelectorAll('.cb10-q[data-cbq]')].find(n=>n.dataset.cbq===id), h=q&&q.querySelector('.cb10-hint'); if(h) h.scrollIntoView({block:'nearest'}); }catch(e){}
 }
 function cbRender(){
   const el=$('#jBody'); if(!el) return;
