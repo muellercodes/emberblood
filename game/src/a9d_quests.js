@@ -212,6 +212,7 @@ function storyTalk(n){
     if(st==='wake'||st==='lanterns'){ runDialogue([['yara',st==='wake'?'Your mother is waiting at the forge, Ash. Go on.':'Three lanterns on the green. Gently, now. I am counting.']],done); return true; }
     if(reached('warcamp')&&!G.flags.gateHint){ G.flags.gateHint=true; }
     if(availableFrom('yara')) return false;
+    if(typeof storyHasOption==='function'&&storyHasOption('yara')) return false;   // her menu, for the story's own option
     runDialogue([['yara',hintLine()]],done); return true;
   }
   if(id==='maren'){

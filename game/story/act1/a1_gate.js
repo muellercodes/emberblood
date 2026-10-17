@@ -94,7 +94,9 @@ quest({
   },
 
   step: [
-    { id: 'offer', do: 'talk yara', scene: 'a1_gate_offer', if: 'flag gateHint',
+    // (after Grizzlefang's outro, stage wren on: the first talk to Yara offers it. The old gateHint flag was set by
+    // that same talk, after the engine's turn, so it made a new player talk to Yara twice)
+    { id: 'offer', do: 'talk yara', scene: 'a1_gate_offer', if: 'stage>=wren',
       obj: ['Ask Elder Yara about the North Gate', 'Talk to Yara'],
       hint: ['Elder Yara wants to talk about the open gate. She is by the well in Emberhollow.', 'Yara is by the well.'] },
     { id: 'look', do: 'all',

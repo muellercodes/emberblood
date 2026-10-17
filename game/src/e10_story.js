@@ -327,6 +327,9 @@ function s10Resolve(e){
 const S10_FIND={};
 function s10FindKind(k,fn){ S10_FIND[k]=fn; }
 // does the story data own this thing? (old code asks before doing what the data now does: storyOwns('quest','a1_hat'))
+// does this person have a data talk option to show right now? (old code that answers with a line instead of opening the
+// person's menu asks first, so the option can be picked: a9d's Elder Yara)
+function storyHasOption(id){ try{ return !!(S10.booted&&G&&G.mode==='story'&&s10TalkFor(id,'option')); }catch(e){ return false; } }
 function storyOwns(kind,id){ const M={quest:S10.quests,chapter:S10.chapters,scene:S10.scenes,place:S10.places,clue:S10.clues}[kind]; return !!(M&&M[id]); }
 function s10FindObj(k,x,y,r){
   if(S10_FIND[k]){ try{ const o=S10_FIND[k](x,y,r); if(o) return o; }catch(e){} }
@@ -975,7 +978,7 @@ function s10TalkHook(n){
   const id=n.id;
   // quests that start by talking to their giver (first step "talk <giver>")
   for(const qid of S10.qOrder){ const q=S10.quests[qid]; if(G.quests[qid]||!s10QuestOpen(q)) continue; const s0=(q.step||[]).find(s=>!s.optional);
-    if(s0&&s0._kind==='talk'&&s0._args[0]===id&&(s0.if==null||s10Cond(s0.if))){ s10QuestStart(qid,true); const R=s10Run('q',q); s10Run2({R,s:s0,x:s0,key:s0._id}); return true; } }
+    if(s0&&s0._kind==='talk'&&s0._args[0]===id&&q.giver===id&&(s0.if==null||s10Cond(s0.if))){ s10QuestStart(qid,true); const R=s10Run('q',q); s10Run2({R,s:s0,x:s0,key:s0._id}); return true; } }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
     const x=a.x, k=x._kind;
     if(a.s.legacy) continue;
