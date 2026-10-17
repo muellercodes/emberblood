@@ -12,6 +12,9 @@
 // one locked, with the first reason that holds, until her name, the plan and two of those friends are there.
 chapter({
   id: 'n_nyxara', act: 5, after: 'n_crown', next: 'n_end', takeover: true,
+  // keep x4_story's own stage tick (n4sNyxTick: the hero ending's ember spirit, the Heart and fall fallbacks): ENGINE
+  // REQUEST, today takeover always drops it
+  keep: ['update'],
   card: ['Finale · The Last Fight', 'The Night Mother'],
   so_far: [
     'The Moon Door opened for the Ember Heart, just as Nyxara wanted. Now Ash has to face the Night Mother, and find out if anyone can reach her.',

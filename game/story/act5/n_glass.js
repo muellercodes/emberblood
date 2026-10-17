@@ -15,8 +15,8 @@ chapter({
     'Ash beat the shadow ice dragon. The last ring is glass and shadow vines.'],
 
   place: {
-    // a carved stone beside the Moon Lock (a 160, the side Ash comes from), shown once the moonbeam opens the lock
-    n5_lock_carving: { map: 4, at: [4907, 84082], r: 40, kind: 'examine', look: 'moon_lock_carving', show: 'flag n_beam', h: 50,
+    // a carved stone beside the Moon Lock (a 156, on the side Ash comes from, clear of the lock's own drawing), shown once the moonbeam opens the lock
+    n5_lock_carving: { map: 4, at: [4985, 84110], r: 40, kind: 'examine', look: 'moon_lock_carving', show: 'flag n_beam', h: 50,
                        name: ['the carving on the Moon Lock', 'the Moon Lock carving'] },
     // the sand nest in the Moth's Cradle (x4_world draws it, with a big shadow moth asleep on it)
     n5_nest: { map: 4, at: [3869, 86209], r: 70, kind: 'examine', h: 36,
@@ -51,9 +51,9 @@ chapter({
       pick: [
         { t: ['To put out the sun, because she hates the light', 'To put out the sun'],
           hint: ['The little moth in every carving sits on a warm lantern. Would she hate light?', 'She sits on warm lanterns. Does she hate light?'] },
-        { t: ['To rule the night forever', 'To rule the night'],
-          hint: ['She never asks for a crown or an army. What did she beg Hush, every night?', 'What did she beg Hush?'] },
         { t: ['Never to be left alone again. She eats the moon so it can never go away.', 'Never to be left alone again'], right: true },
+        { t: ['To rule the night forever, with everyone asleep', 'To rule the night'],
+          hint: ['She never asks for a crown or an army. What did she beg Hush, every night?', 'What did she beg Hush?'] },
       ],
       then: ['clue n5_her_want'],
     },

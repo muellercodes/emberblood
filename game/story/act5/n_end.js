@@ -25,7 +25,10 @@ chapter({
     { id: 'dawn', do: 'wait_for flag n_dawn>=1', obj: ['The Long Night is ending', 'The Long Night is ending'] },
     // after the victory screen (G.done): ENGINE REQUEST, data runners keep going for this one step, so n_home plays
     // after "Keep exploring" (today it never does: s10Runners stops when G.done)
-    { id: 'home', do: 'wait_for flag n_done', scene: 'n_home', then: ['set n_home'],
+    { id: 'home', do: 'wait_for flag n_done', then: ['emit n4fx:home'],
+      obj: ['The Long Night is over. Go anywhere you like.', 'Go anywhere you like!'] },
+    // (n4fx:home: x4_story's free roam, and Ash is put on the green; then this step finds him there)
+    { id: 'wake', do: 'goto n5_green_wake 240', scene: 'n_home', then: ['set n_home'],
       obj: ['The Long Night is over. Go anywhere you like.', 'Go anywhere you like!'] },
   ],
 
@@ -171,7 +174,7 @@ chapter({
 
     // ---- after "Keep exploring": Ash wakes up at home, on Lantern Day
     n_home: [
-      { do: ['emit n4fx:home', 'time dusk'] }, { wait: 1 },
+      { do: ['time dusk'] }, { wait: 1 },
       ['narr', 'You wake up in the grass on the green in Emberhollow. Somebody has tucked a blanket round you. Pip is asleep on your head.', 'You wake up on the green at home. Pip sleeps on your head.'],
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
         ['narr', 'Behind the forge, something very big and very cold is snoring.', 'Behind the forge, a big cold dragon snores.'] ] },
