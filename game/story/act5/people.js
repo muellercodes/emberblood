@@ -33,8 +33,12 @@ people({
   scene: {
     n5_who: [
       ['narr', 'Everyone who climbed this far waits by the Crown Shrine. You count them on your claws.', 'You count your friends by the shrine.'],
-      { if: 'flag n5_vesper', then: [['c_vesper', "Here. Obviously. I was here first. I'm always first.", 'Here. I was here first.']],
-        else: [{ if: 'choice n5_hang=left', then: [['ash', "Vesper isn't here. I left her hanging on the Silk Gallery.", "Vesper isn't here. I left her."]],
+      { if: 'flag n5_vesper', then: [{ if: 'quest q_n5_oona started', then: [['c_vesper', "Here. Obviously. I was here first. I'm always first.", 'Here. I was here first.']],
+          else: [{ if: 'quest q_n5_vesper done', then: [['c_vesper', 'Here. Because Gran said. Mostly because Gran said.', 'Here. Because Gran said.']],
+            else: [['c_vesper', "Here. Obviously. ...Gran doesn't know where I am, you know. She'll be up all night with the kettle on.",
+              "Here. Gran doesn't know where I am, though.", { do: ['quest start q_n5_oona'] }]] }] }],
+        else: [{ if: 'flag n5_vesper_left', then: [['ash', "Vesper isn't here. I left her hanging on the Silk Gallery. Gran would know how to say sorry.",
+            "I left Vesper on the silk bridge. Gran will know what to do.", { do: ['quest start q_n5_vesper'] }]],
           else: [['ash', 'Vesper is out there somewhere. Her mask was on the cliff by the Silk Gallery.', 'Vesper is out there. Look by the silk bridge.']] }] },
       { if: 'flag n5_glaciar', then: [['f_glaciar', 'Present, dumpling. Cold, but present.', 'Here, dumpling. Cold, but here.']],
         else: [{ if: 'quest q_n5_glaciar active', then: [['ash', "Auntie Glaciar is still asleep on Mount Dread. The Snow Mother's Song could wake her.", 'Glaciar sleeps on Mount Dread. Sing to her!']],

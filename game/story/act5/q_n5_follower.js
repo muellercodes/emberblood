@@ -12,7 +12,7 @@ quest({
   payoff: { kind: 'heart_ember', id: 'n5_hollis' },
 
   item: {
-    n5_goathorns: { name: ['Sock goat horns', 'Goat horns'], icon: 'star', keepsake: true,
+    n5_goathorns: { name: ['Sock goat horns', 'Goat horns'], icon: 'star', keepsake: true, hat: { look: 'hat_n5_goathorns', col: '#e8e0cc' },
       desc: ['Farmer Hollis made them from a sock, for the fair. You already have horns. Now you have MORE horns.',
         'Sock goat horns. Now you have more horns!'] },
   },

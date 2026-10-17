@@ -1,12 +1,13 @@
 // game/story/act5/q_n5_oona.js (N5S): Come Home for Tea (FINALE_V10 2.9 B7). Giver: Vesper, on the peak.
-// Vesper (a friend from Act II, or one Ash pulled up on the Silk Gallery) says Gran doesn't know where she is. Ash takes
+// Vesper (a friend from Act II, or one Ash pulled up on the Silk Gallery) says Gran doesn't know where she is (at the
+// Crown's "Who is with me?", people.js n5_who; or N5a's join and second-chance scenes, see CHANGES.md). Ash takes
 // the bridge home and the boat round to Saltmarsh, and finds Granny Oona in her coat and boots with a frying pan in
 // her bag: she is off to climb the Night Mother's mountain herself. Ash tells her Vesper is safe and with him; Gran
 // sits down very suddenly and writes a note instead. Ash gives the note to Vesper at the Crown Shrine.
 // Surprise: Vesper pays him back with a Heart Ember she stole from the Night Mother's own pile ("Don't tell Gran").
 // Payoff: heart_ember n5_tea. flag n5_tea is read by N5b (her Heart voice: "Gran says come home for tea").
 quest({
-  id: 'q_n5_oona', act: 5, optional: true, giver: 'c_oona', if: 'flag n5_vesper',
+  id: 'q_n5_oona', act: 5, optional: true, giver: 'c_oona', if: 'flag n5_vesper !quest q_n5_vesper started',
   title: ['Come Home for Tea', 'Come home for tea'],
   payoff: { kind: 'heart_ember', id: 'n5_tea' },
 

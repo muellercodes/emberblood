@@ -1,15 +1,13 @@
 // ================= v10_art5s.js (N5S): looks for the finale's friend errands and the Duchess mystery (art only).
 // defineLook(id, {w, h, draw(g, x, y, t, state)}) and nothing else. (x, y) is the point on the ground the place stands
 // on. Static looks are cached once per state by e10c_gates; `live` parts (glints, a sway) are drawn every frame.
-//   n5_cracked_mask   Vesper's real moth mask, cracked down the middle, a "Sorry. V." scrap under it (Silk Gallery)
-//   n5_vesper_hang    Vesper hanging by one hand off the rim of a Silk Gallery island, a snapped silk line (anim)
-//   n5_ice_scale      one of Glaciar's scales, blue as deep ice, half in the snow (the Floe Gap)
-//   n5_moth_scale     a white moth scale stuck to a shadow vine, glittering (the Tendril Wood)
+//   n5_vesper_sulk    Vesper sitting on the rim of the Crown, legs over the dark, back to everyone (q_n5_vesper)
 //   n5_knot           the silver knot that ties a hundred little white moths in their cocoons (the Moth's Cradle)
 //   n5_chewed_tassel  a lantern tassel chewed to a soggy stub, with goat hair (the Bridgefoot)
 //   n5_shadow_pen     a black glass copy of a goat pen with a shadow goat in it (the Silent Green)
 //   n5_pen_note       a note stuck to a fence post, a muddy hoofprint at the bottom (Hollis Farm)
-//   hat_n5_goathorns  Hollis's sock goat horns (for ENG's hat drawing, see CHANGES.md N5S ENGINE REQUEST 7)
+//   hoof              one two-toed hoof print (the prints place n5_f_prints, look 'hoof')
+//   hat_n5_goathorns  Hollis's sock goat horns (the item's hat look)
 if(typeof defineLook==='function'){
   const N5S_INK='#1c1328';
   const V5={suit:'#3b2b52',suit2:'#2a1e3c',cloak:'#9e90c2',cloak2:'#6f6296',mask:'#f6f0e6',gold:'#e2b65c',skin:'#e6b896',hair:'#2a2430',streak:'#e4e0ee',silk:'#e8e4f4'};
@@ -17,92 +15,36 @@ if(typeof defineLook==='function'){
   const n5Shadow=(g,x,y,rx,ry,a)=>{ g.save(); g.globalAlpha=a==null?0.28:a; g.fillStyle='#000'; g.beginPath(); g.ellipse(x,y,rx,ry,0,0,TAU); g.fill(); g.restore(); };
   const n5Twinkle=(g,x,y,s,a)=>{ g.fillStyle=`rgba(255,255,255,${a})`; g.fillRect(x-s,y-0.6,s*2,1.2); g.fillRect(x-0.6,y-s,1.2,s*2); };
   const n5Halo=(g,x,y,r,rgb,a)=>{ g.save(); g.globalAlpha=a; g.fillStyle=`rgb(${rgb})`; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); g.restore(); };
-  // a moth mask seen from above: two wings of white card with gold trim and two eye holes
-  const n5Mask=(g,cracked)=>{
-    for(const s of [-1,1]){ g.save(); if(cracked) g.translate(s*1.6,s*0.6);
-      g.fillStyle=V5.mask; g.strokeStyle=N5S_INK; g.lineWidth=1.6;
-      g.beginPath(); g.moveTo(0,-6); g.quadraticCurveTo(s*10,-13,s*16,-7); g.quadraticCurveTo(s*14,1,s*7,4); g.quadraticCurveTo(s*3,3,0,1); g.closePath(); g.fill(); g.stroke();
-      g.strokeStyle=V5.gold; g.lineWidth=1.1; g.beginPath(); g.moveTo(s*2,-5); g.quadraticCurveTo(s*10,-11,s*14,-6.5); g.stroke();
-      g.fillStyle=N5S_INK; g.beginPath(); g.ellipse(s*7,-3,2.6,1.8,s*0.3,0,TAU); g.fill();
-      g.restore(); }
-    if(cracked){ g.strokeStyle=N5S_INK; g.lineWidth=1.2; g.beginPath(); g.moveTo(0,-7); g.lineTo(1.2,-3); g.lineTo(-0.8,0); g.lineTo(0.6,3); g.stroke(); }
-  };
-
-  // ---------- Vesper: the cracked mask and the scrap of paper (state 'seen' looks the same)
-  defineLook('n5_cracked_mask',{w:40,h:26,draw(g,x,y){
-    g.save(); g.translate(x,y);
-    n5Shadow(g,0,1,17,4,0.25);
-    g.save(); g.translate(7,-2); g.rotate(0.35); g.fillStyle='#efe2c0'; g.strokeStyle=N5S_INK; g.lineWidth=1.2; g.fillRect(-6,-4,12,8); g.strokeRect(-6,-4,12,8);
-      g.fillStyle='#4c3a6a'; g.fillRect(-4,-1.6,3,1.2); g.fillRect(0,-1.6,1.4,1.2); g.fillRect(-4,0.8,5,1); g.restore();
-    g.translate(-3,-4); g.rotate(-0.15); n5Mask(g,true);
+  // ---------- Vesper sulking on the rim of the Crown: sitting, legs over the edge, back turned, a little lilac huff
+  defineLook('n5_vesper_sulk',{w:70,h:80,anim:true,draw(g,x,y,t){
+    const k=0.75+0.25*Math.sin(t*2.1); n5Halo(g,x,y-24,34,'190,170,255',0.12*k);
+    g.save(); g.translate(x,y); g.scale(1.3,1.3);
+    n5Shadow(g,0,1,14,4,0.3);
+    // legs dangling over the rim (drawn below her), swinging a little
+    const sw=Math.sin(t*1.6)*2;
+    g.strokeStyle=N5S_INK; g.lineWidth=4.6; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*4,-4); g.lineTo(s*5+sw*s*0.5,10); g.stroke(); }
+    g.strokeStyle=V5.suit2; g.lineWidth=3; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*4,-4); g.lineTo(s*5+sw*s*0.5,10); g.stroke(); }
+    // cloak spread on the rock, back to us
+    g.fillStyle=V5.cloak; g.strokeStyle=N5S_INK; g.lineWidth=1.6; g.beginPath(); g.moveTo(-12,-2); g.quadraticCurveTo(-14,-22,-6,-30); g.lineTo(6,-30); g.quadraticCurveTo(14,-22,12,-2); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle=V5.cloak2; g.beginPath(); g.moveTo(-6,-28); g.quadraticCurveTo(0,-20,6,-28); g.lineTo(5,-4); g.lineTo(-5,-4); g.closePath(); g.fill();
+    // head from behind: dark hair, the white streak, the mask string
+    n5Ell(g,0,-36,7.2,6.8,V5.hair,1.4);
+    g.strokeStyle=V5.streak; g.lineWidth=1.6; g.beginPath(); g.moveTo(-3,-42); g.quadraticCurveTo(-1,-37,-3,-31); g.stroke();
+    g.strokeStyle=V5.gold; g.lineWidth=1; g.beginPath(); g.moveTo(-7,-37); g.lineTo(7,-37); g.stroke();
     g.restore();
-  }, live(g,x,y,t){ const k=Math.sin(t*2.6); if(k>0.5) n5Twinkle(g,x+9,y-12,1+3*(k-0.5),0.9); }});
-
-  // ---------- Vesper hanging off the rim of an island by one hand (drawn below the rim, swaying a little)
-  defineLook('n5_vesper_hang',{w:70,h:96,anim:true,draw(g,x,y,t){
-    const sw=Math.sin(t*1.7)*0.09;
-    g.save(); g.translate(x,y);
-    // the snapped silk line: a loose curl lying over the rim and a frayed end hanging down
-    g.strokeStyle=V5.silk; g.lineWidth=1.4; g.beginPath(); g.moveTo(-26,-6); g.bezierCurveTo(-12,-14,6,-2,14,-10); g.stroke();
-    g.beginPath(); g.moveTo(14,-10); g.quadraticCurveTo(22,6,18,24+Math.sin(t*2.3)*2); g.stroke();
-    // the rim (a lip of black rock) she is holding
-    g.fillStyle='#3a3456'; g.strokeStyle=N5S_INK; g.lineWidth=1.6; g.beginPath(); g.moveTo(-18,-2); g.lineTo(18,-2); g.lineTo(14,4); g.lineTo(-14,4); g.closePath(); g.fill(); g.stroke();
-    // her hand on the rim, then she swings from the shoulder
-    n5Ell(g,-2,-1,3.4,2.6,V5.skin,1.2);
-    g.rotate(sw);
-    g.strokeStyle=N5S_INK; g.lineWidth=5; g.beginPath(); g.moveTo(-2,0); g.lineTo(-1,16); g.stroke();
-    g.strokeStyle=V5.suit; g.lineWidth=3.2; g.beginPath(); g.moveTo(-2,0); g.lineTo(-1,16); g.stroke();
-    // cloak fluttering, body, legs kicking over nothing
-    g.fillStyle=V5.cloak2; g.strokeStyle=N5S_INK; g.lineWidth=1.6; g.beginPath(); g.moveTo(-6,18); g.quadraticCurveTo(-16,34,-10+Math.sin(t*3)*3,50); g.lineTo(8,46); g.quadraticCurveTo(8,30,6,18); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle=V5.suit; g.beginPath(); g.ellipse(0,30,7.5,12,0,0,TAU); g.fill(); g.stroke();
-    const kick=Math.sin(t*5)*4;
-    g.strokeStyle=N5S_INK; g.lineWidth=4.6; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*3,40); g.lineTo(s*4+(s<0?kick:-kick)*0.5,56); g.stroke(); }
-    g.strokeStyle=V5.suit2; g.lineWidth=3; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*3,40); g.lineTo(s*4+(s<0?kick:-kick)*0.5,56); g.stroke(); }
-    // the other arm flailing
-    g.strokeStyle=N5S_INK; g.lineWidth=4.4; g.beginPath(); g.moveTo(5,22); g.lineTo(15,16+Math.sin(t*4)*4); g.stroke();
-    g.strokeStyle=V5.suit; g.lineWidth=2.8; g.beginPath(); g.moveTo(5,22); g.lineTo(15,16+Math.sin(t*4)*4); g.stroke();
-    // head: dark hair with the white streak, a bare face (the mask is back on the cliff), looking up
-    n5Ell(g,0,14,6.6,6.2,V5.skin,1.4);
-    g.fillStyle=V5.hair; g.beginPath(); g.ellipse(0,11.5,7,4.6,0,Math.PI,TAU); g.fill();
-    g.strokeStyle=V5.streak; g.lineWidth=1.4; g.beginPath(); g.moveTo(-2,8); g.quadraticCurveTo(-1,12,-3,15); g.stroke();
-    g.fillStyle=N5S_INK; g.fillRect(-3,13,1.6,1.8); g.fillRect(1.6,13,1.6,1.8);
-    g.restore();
-    // a little "!" so a kid looks twice
-    const b=Math.abs(Math.sin(t*3))*3; g.fillStyle='#fff3c0'; g.strokeStyle=N5S_INK; g.lineWidth=1.4; g.beginPath(); g.arc(x+20,y-24-b,7,0,TAU); g.fill(); g.stroke();
-    g.fillStyle=N5S_INK; g.fillRect(x+19,y-29-b,2,6); g.fillRect(x+19,y-21.5-b,2,2);
+    // a little huff cloud, now and then
+    const ph=(t*0.35)%1; if(ph<0.5){ const a=0.55*(1-ph*2); g.fillStyle=`rgba(230,224,250,${a})`; g.beginPath(); g.arc(x+16+ph*14,y-58-ph*16,4+ph*6,0,TAU); g.fill(); }
   }});
 
-  // ---------- Glaciar's scale, half buried in the snow
-  defineLook('n5_ice_scale',{w:44,h:30,draw(g,x,y){
-    g.save(); g.translate(x,y);
-    n5Ell(g,0,1,19,5,'rgba(220,236,255,.9)');
-    g.save(); g.rotate(-0.25);
-    g.fillStyle='#5aa0e0'; g.strokeStyle=N5S_INK; g.lineWidth=1.8; g.beginPath(); g.moveTo(-12,-1); g.quadraticCurveTo(-11,-18,0,-22); g.quadraticCurveTo(11,-18,12,-1); g.quadraticCurveTo(0,4,-12,-1); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle='#a8dcff'; g.beginPath(); g.moveTo(-7,-4); g.quadraticCurveTo(-6,-15,0,-18); g.quadraticCurveTo(-1,-10,-2,-3); g.closePath(); g.fill();
-    g.strokeStyle='#2c6aa8'; g.lineWidth=1; for(const k of [-5,0,5]){ g.beginPath(); g.moveTo(k*0.6,-17); g.lineTo(k,-2); g.stroke(); }
-    g.restore();
-    // snow drifted over its foot
-    n5Ell(g,-6,0,11,4.4,'#f4f8ff'); n5Ell(g,7,1,8,3.4,'#eaf2ff');
-    g.restore();
-  }, live(g,x,y,t){ for(let i=0;i<3;i++){ const k=Math.sin(t*2.2+i*2.1); if(k>0.6) n5Twinkle(g,x-6+i*6,y-16+i*3,1+3*(k-0.6),0.95); } }});
-
-  // ---------- a white moth scale stuck to a shadow vine
-  defineLook('n5_moth_scale',{w:36,h:44,draw(g,x,y){
-    g.save(); g.translate(x,y);
-    n5Shadow(g,0,1,10,3,0.3);
-    g.strokeStyle='#120c22'; g.lineWidth=5; g.beginPath(); g.moveTo(-6,2); g.quadraticCurveTo(-12,-14,2,-24); g.quadraticCurveTo(10,-30,6,-38); g.stroke();
-    g.strokeStyle='#3a2a5a'; g.lineWidth=2.6; g.beginPath(); g.moveTo(-6,2); g.quadraticCurveTo(-12,-14,2,-24); g.quadraticCurveTo(10,-30,6,-38); g.stroke();
-    g.save(); g.translate(1,-24); g.rotate(0.5); n5Ell(g,0,0,6,4,'#f8f6ff',1.2); n5Ell(g,-1,-1,3,2,'#ffffff'); g.restore();
-    g.restore();
-  }, live(g,x,y,t){ const a=0.18+0.12*Math.sin(t*3); n5Halo(g,x+1,y-24,11,'240,236,255',a); const k=Math.sin(t*4.1); if(k>0.4) n5Twinkle(g,x+3,y-27,1+4*(k-0.4),0.95); }});
-
   // ---------- the silver knot (state 'loose' after the moths fly free: a few melted threads)
-  defineLook('n5_knot',{w:90,h:50,draw(g,x,y,t,state){
-    g.save(); g.translate(x,y);
+  defineLook('n5_knot',{w:124,h:70,draw(g,x,y,t,state){
+    g.save(); g.translate(x,y); g.scale(1.35,1.35);
     const loose=state==='loose';
     // cocoons round the knot
     const C=[[-34,-4],[-24,-14],[-10,-18],[10,-18],[24,-14],[34,-4],[-28,6],[28,6]];
-    for(const [cx,cy] of C){ n5Shadow(g,cx,cy+5,6,2,0.25); n5Ell(g,cx,cy,5,7.5,loose?'#6a6488':'#d8d4e8',1.4); if(!loose){ g.strokeStyle='#a8a2c4'; g.lineWidth=0.8; for(const k of [-3,0,3]){ g.beginPath(); g.moveTo(cx-4,cy+k); g.lineTo(cx+4,cy+k); g.stroke(); } } }
+    for(const [cx,cy] of C){ n5Shadow(g,cx,cy+5,6,2,0.25); n5Ell(g,cx,cy,5,7.5,loose?'#6a6488':'#ece8f8',1.4); if(!loose){ g.strokeStyle='#a8a2c4'; g.lineWidth=0.8; for(const k of [-3,0,3]){ g.beginPath(); g.moveTo(cx-4,cy+k); g.lineTo(cx+4,cy+k); g.stroke(); }
+      // a little white moth asleep inside each one, wings folded
+      n5Ell(g,cx-1.4,cy-1,1.8,3,'#ffffff'); n5Ell(g,cx+1.4,cy-1,1.8,3,'#ffffff'); } }
     if(!loose){
       g.strokeStyle='#c8d4f0'; g.lineWidth=1.3; for(const [cx,cy] of C){ g.beginPath(); g.moveTo(0,-4); g.quadraticCurveTo(cx*0.5,cy*0.5-6,cx,cy); g.stroke(); }
       g.fillStyle='#e6ecff'; g.strokeStyle=N5S_INK; g.lineWidth=1.6; g.beginPath(); g.ellipse(0,-4,7,5,0,0,TAU); g.fill(); g.stroke();
