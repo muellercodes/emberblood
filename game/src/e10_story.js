@@ -37,7 +37,13 @@ window.places=d=>s10Take('places',d);
 window.__ebStoryLoadErr=(f,e)=>{ s10Err(`${f}: ${e&&e.message||e}`); try{ console.warn('story data',f,e); }catch(err){} };
 
 // ---------- 2. text: [full, simple] or a plain string (S registers the simple version for Words: Simple)
-function s10T(x){ if(x==null) return ''; if(Array.isArray(x)){ if(!x.length) return ''; return x.length>1&&x[1]!=null&&x[1]!==''?S(String(x[0]),String(x[1])):String(x[0]); } return String(x); }
+function s10T(x){ if(x==null) return '';
+  // variants (A4S, A4b): { if, t: [full, simple] } is that text while its condition holds (else nothing); a list of
+  // them is the first whose condition holds (a quest title, an end card line)
+  if(s10IsVar(x)) return x.if==null||s10Cond(x.if)?s10T(x.t):'';
+  if(Array.isArray(x)){ if(!x.length) return ''; if(s10IsVar(x[0])){ for(const v of x){ const t=s10T(v); if(t) return t; } return ''; }
+    return x.length>1&&x[1]!=null&&x[1]!==''?S(String(x[0]),String(x[1])):String(x[0]); } return String(x); }
+const s10IsVar=x=>!!x&&typeof x==='object'&&!Array.isArray(x)&&'t' in x;
 const s10Tx=x=>simplify(s10T(x));
 function s10Name(id){
   const e=s10Ent(id); if(e&&e.name) return s10T(e.name);
@@ -197,14 +203,21 @@ function s10Effect(e,ctx){
     case 'bombbag': if(typeof bombBag==='function') bombBag(+a||5); else s10Err(`effect "${e}": no bomb bag`); break;
     case 'bless': { G.pendingBless=(G.pendingBless||0)+(+a||1); later(1.5,()=>{ try{ offerPending(); }catch(err){} }); break; }
     case 'moon': if(typeof moonSet==='function') moonSet(+a); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,+a); break;
-    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,DOORS.find(q=>q.area===w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
-    case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x))})); break; }
+    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,s10DoorFor(w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
+    case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x)).filter(Boolean)})); break; }
     case 'page': s10Page(a); break;
+    case 'shrine': { const sid=s10ShrineId(a); if(!sid){ s10Err(`effect "${e}": ${a} is not a shrine`); break; } G.shrines=G.shrines||{}; G.shrines[sid]=true; G.lastShrine=sid; break; }
     default: s10Err(`effect "${e}": unknown "${k}"`);
   }
 }
 // Case Book pages (a letter, a journal page): page:{ id:{ title:[full,simple], text:[[full,simple], ...] } } on an act,
 // chapter, quest or places(); the effect `page id` adds it (G.case.pages) with a banner
+// the outside door of an area; an upper floor, a cellar or a dungeon floor has none of its own: its house's or dungeon's
+// (A4b: autoplay and warp into m_obs_4)
+function s10DoorFor(area){ let id=area; for(let k=0;k<8&&id;k++){ const d=DOORS.find(q=>q.area===id)||(typeof CAVEMOUTHS!=='undefined'&&CAVEMOUTHS.find(q=>q.area===id)); if(d) return d; const def=AREADEFS[id];
+  const up=(def&&def.floorOf)||(typeof dunRoot==='function'?dunRoot(id):null); if(!up||up===id) break; id=up; } return null; }
+// effect "shrine id": that shrine is found and is where Ash wakes up (a SHRINES id, or a legacy entry 'SHRINES:<id>')
+function s10ShrineId(a){ if(typeof SHRINES!=='undefined'&&SHRINES.some(q=>q.id===a)) return a; const e=S10.legacy[a], m=e&&/^SHRINES:(.+)$/.exec(e.src||''); return m?m[1]:null; }
 // effect "hat item": unlock and wear a hat (a data hat, or a hat item from an act's own table)
 function s10Hat(a){
   const it=S10.items[a], nm=it&&it.hat?(typeof it.hat==='string'?it.hat:(s10T(it.name)||a)):null;
@@ -536,9 +549,13 @@ function s10WalkTick(dt){
 // step drives the objective, the marker and the hint; all/any parts in any order; extra parts any time in the chapter.
 function s10Run(kind,d){ return {kind,d,key:kind==='q'?'q:'+d.id:d.id}; }
 function s10St(R){ const S0=G.story||(G.story={}); return S0[R.key]||(S0[R.key]={}); }
+// (after the game is won, G.done, only a chapter marked after_done: true runs on: N5b's n_end after "Keep exploring")
+const s10AfterDone=()=>{ const c=G&&S10.chapters[G.stage]; return !!(c&&c.after_done); };
 function s10Runners(){
-  const out=[]; if(!G||G.mode!=='story'||G.done||!G.story) return out;
-  const c=S10.chapters[G.stage]; if(c) out.push(s10Run('ch',c));
+  const out=[]; if(!G||G.mode!=='story'||!G.story) return out;
+  const c=S10.chapters[G.stage];
+  if(G.done){ if(c&&c.after_done) out.push(s10Run('ch',c)); return out; }
+  if(c) out.push(s10Run('ch',c));
   for(const id of S10.qOrder){ const q=G.quests[id]; if(q&&!q.done) out.push(s10Run('q',S10.quests[id])); }
   return out;
 }
@@ -601,7 +618,7 @@ function s10Tick(dt){
   S10.watchT-=dt; if(S10.watchT<=0){ S10.watchT=1; s10Watch(); try{ s10Over(); s10QuestDoneIf(); }catch(e){ console.error(e); } }
   S10.npcT-=dt; if(S10.npcT<=0){ S10.npcT=1; s10NpcSync(); }
   if(S10.qOrder.length) try{ s10QuestSync(); }catch(e){ console.error(e); }
-  if(G.done) return;
+  if(G.done&&!s10AfterDone()) return;
   s10PlacesTick(dt);
   s10Barks(dt);
   if(scene!=='play') return;
@@ -787,7 +804,7 @@ function s10Chest(P){
 }
 // the power each gate kind opens with (_plan_format's gate table); a gate place may say need:'<condition>' instead
 const S10_GATE_POWER={climb_wall:'claws',grapple_post:'grapple',shadow_curtain:'shadow',thin_bars:'shadow',whip_hook:'whip',chain_ring:'whip',vent:'wings',step_face:'dbljump',
-  water:'stride',ice_wall:'blaze',wind_ribbon:'windride',pound_plate:'pound',cracked_floor:'pound',bomb_rock:'bombs',dive_spot:'dive',burrow_mound:'burrow',moon_glass:'moonfire'};
+  water:'stride',ice_wall:'blaze',wind_ribbon:'windride',pound_plate:'pound',cracked_floor:'pound',bomb_rock:'bombs',dive_spot:'dive',burrow_mound:'burrow',moon_glass:'moonfire',silk_web:'glaive'};
 function s10GateLocked(P){
   if(P.need!=null) return !s10Cond(P.need);
   try{ if(typeof gateCanOpen==='function') return !gateCanOpen(P); }catch(e){}
@@ -986,6 +1003,10 @@ function s10TalkHook(n){
     if(k==='give'&&x._args[1]===id&&(G.items[x._args[0]]||0)>0){ s10Run2(a,()=>takeItems({[x._args[0]]:1})); return true; }
     if(k==='minigame'&&x.start==='talk'&&(x.at||x._args[1])===id&&!G.mini&&G.time>=S10.mini.lostAt+1){ if(!MINI[x._args[0]]){ s10Err(`minigame ${x._args[0]} does not exist`); return false; } s10MiniStart(a); return true; }
   }
+  // a talk entry with first: true (A4S) plays once, ahead of the old modules' own talk hooks, then the person's menu
+  const F=s10TalkFor(id,'first');
+  if(F){ (G.story._once||(G.story._once={}))[s10TalkKey(F)]=1; S10.ver++;
+    const L=s10TalkLines(F,id); L.push({who:'narr',text:'',skipIf:()=>true,fn:()=>{ s10Do(F.then,{talk:id}); }}); talkHub(n,L); return true; }
   return false;
 }
 onTalk(n=>s10TalkHook(n));
@@ -1006,19 +1027,19 @@ function s10TalkTakeover(){
   for(const id in S10.talk){
     const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(!c||c._s10lines) continue;
     let old=c.lines; c._s10lines=true;
-    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
+    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&!t.first&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
   }
   if(typeof BARKS!=='undefined') for(const b of BARKS){ const m=/^id:([\w]+)$/.exec(String(b._who||'')); if(!m||b._s10) continue; const id=m[1], c0=b.c; b._s10=true; b.c=function(){ if(G&&s10HasTalk(id)) return false; return typeof c0==='function'?c0.apply(this,arguments):!!c0; }; }
 }
 // (personal barks are told apart by their "who": B('c_x', 'id:c_hester', ...))
 { const base=B; B=function(k,who,c,t,o){ const r=base(k,who,c,t,o); try{ const b=BARKS[BARKS.length-1]; if(b&&b.k===k) b._who=who; }catch(e){} return r; }; }
 function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify([T.if,T.say,T.scene,T.option,T.then]))); }
-function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if(T.once&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
+function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if((T.once||T.first)&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
 // the first matching entry, top to bottom, of the latest act that has one (an act-5 line wins over an act-2 line that
 // would also match; inside one act the order is the data's)
 function s10TalkFor(id,kind){
   let best=null, bestAct=-1;
-  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':'line'; if(k!==kind) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ best=T; bestAct=a; } }
+  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':T.first?'first':'line'; if(k!==kind) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ best=T; bestAct=a; } }
   return best;
 }
 // say forms: [full, simple] or a string (said by that person); a list of lines [[who, full, simple], ...]; or (A2S)
@@ -1142,7 +1163,9 @@ function s10QuestDefs(){
     // (one more after the old steps, so the old code moving its last legacy step on never finishes the quest itself)
     if(old) steps[(old.steps||[]).length]=dyn;
     steps[-1]=dyn;
-    q._qdef=QDEFS[id]={_s10:true,title:s10T(q.title)||(old&&old.title)||id,giver:q.giver||(old&&old.giver)||null,ab:'__story_data__',min:old&&old.min,steps,errand:false,offer:[],topics:old&&old.topics};
+    // (the title is read each time: a title with variants follows its conditions)
+    const oldT=old&&old.title;
+    q._qdef=QDEFS[id]={_s10:true,get title(){ let t=''; try{ t=G?s10T(q.title):''; }catch(e){} return t||oldT||id; },set title(v){},giver:q.giver||(old&&old.giver)||null,ab:'__story_data__',min:old&&old.min,steps,errand:false,offer:[],topics:old&&old.topics};
   }
 }
 // the index G.quests[id].step should have for the current data step
@@ -1299,6 +1322,10 @@ function s10LegacyExamined(o){
   if(DLG){ const d=DLG, prev=d.done; d.done=()=>{ if(prev) prev(); go(); }; } else go();
 }
 
+// (A3b) a fade from a scene's { fade } beat, a warp or a time effect clears while the scene is still talking (G.fade
+// decays in simUpdate only, so the screen stayed black until the scene ended); the hearth story keeps its own slow fade
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.fade>0&&scene==='dialogue'&&!(typeof HS!=='undefined'&&HS.on)) G.fade=Math.max(0,G.fade-dt*2.5); }catch(e){} }; }
+
 // ---------- 21. saves: G.case and G.story ride along with the game; old saves start empty
 function s10Fresh(){ G.case={clues:{},solved:{},tries:{},seen:{},pages:{}}; G.story={_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}}; }
 { const base=newRun; newRun=function(mode){ base(mode); try{ s10Fresh(); S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null}; }catch(e){ console.error(e); } }; }
@@ -1309,7 +1336,7 @@ function s10Loaded(s){
   G.case={clues:Object.assign({},C&&C.clues),solved:Object.assign({},C&&C.solved),tries:Object.assign({},C&&C.tries),seen:Object.assign({},C&&C.seen),pages:Object.assign({},C&&C.pages)};
   G.story=Object.assign({_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}},T&&typeof T==='object'?JSON.parse(JSON.stringify(T)):{});
   S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null};
-  if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10QuestResume(); try{ s10QuestDoneIf(); }catch(e){} s10NpcSync(true); }
+  if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10ActMigrate(); s10QuestResume(); try{ s10QuestDoneIf(); }catch(e){} s10NpcSync(true); }
 }
 // a save made by the old code in the middle of a chapter the data now runs: steps the old code already did are done
 // (a step whose `then` sets a flag the save has, a talk/goto/cutscene whose scene the old code marked seen, and every
@@ -1321,9 +1348,22 @@ function s10Migrate(){
     const R=s10Run('ch',c), st=s10St(R), steps=(c.step||[]).filter(s=>s._kind&&!s.optional);
     let last=-1;
     steps.forEach((s,i)=>{ const sets=s10Arr(s.then).some(e=>typeof e==='string'&&/^set\s/.test(e)&&(()=>{ const f=e.split(/\s+/)[1].split('=')[0]; return !!G.flags[f]; })());
-      const seen=['talk','goto','cutscene'].includes(s._kind)&&s.scene&&G.flags.c_sn&&G.flags.c_sn[s.scene]; if(sets||seen) last=i; });
+      // (a key the chapter silences itself is marked seen by that, not by the old code having played it)
+      const sn2=G.flags[S10_SN[+c.act]], seen=['talk','goto','cutscene'].includes(s._kind)&&s.scene&&!s10Arr(c.silence).includes(s.scene)&&((G.flags.c_sn&&G.flags.c_sn[s.scene])||(sn2&&sn2[s.scene]));
+      // (A2B) migrate_if: <condition>: an old save where it holds has done this step
+      let mig=false; if(s.migrate_if!=null) try{ mig=s10Cond(s.migrate_if); }catch(e){ mig=false; }
+      if(sets||seen||mig) last=i; });
     for(let i=0;i<=last;i++){ const s=steps[i]; s10MigrateStep(R,s); }
   }
+}
+// (A2B) an act's migrate: [{ if, then }]: once per save, at load (or boot), when its condition holds, its effects run
+// quietly (old saves that skipped clues a later step asks for). G.story._mig remembers which ran.
+function s10ActMigrate(){
+  if(!G||G.mode!=='story'||!G.story) return;
+  const M=G.story._mig||(G.story._mig={});
+  for(const n in S10.acts){ const L=s10Arr(S10.acts[n]&&S10.acts[n].migrate);
+    L.forEach((m,i)=>{ const k=n+'/'+i; if(M[k]||!m) return; let ok=false; try{ ok=m.if==null||s10Cond(m.if); }catch(e){ ok=false; } if(!ok) return;
+      M[k]=1; const was=S10.quiet; S10.quiet=true; try{ s10Do(m.then,{act:+n}); }catch(e){ console.error(e); } finally{ S10.quiet=was; } }); }
 }
 function s10MigrateStep(R,s){
   const st=s10St(R), was=S10.quiet; S10.quiet=true;
@@ -1353,7 +1393,7 @@ function s10Boot(){
   try{ s10TalkTakeover(); }catch(e){ s10Err('talk takeover: '+e.message); console.error(e); }
   try{ s10Check(); }catch(e){ s10Err('check: '+e.message); console.error(e); }
   if(G&&!G.story) s10Fresh();
-  if(G&&G.mode==='story'){ s10Migrate(); s10QuestResume(); s10NpcSync(true); }
+  if(G&&G.mode==='story'){ s10Migrate(); s10ActMigrate(); s10QuestResume(); s10NpcSync(true); }
 }
 window.__ebStoryBoot=()=>{ try{ s10Boot(); }catch(e){ console.error(e); } };
 // data registered after boot (tests, a late file) is linked the same way
@@ -1366,11 +1406,20 @@ function s10Link(){
     const old=STAGEDEF[id], take=!!old&&c.takeover!==false;
     if(!old){ defineStages(+c.act||2,[{id}]); if(c.after&&stageAt(c.after)>=0){ const i=stageAt(id); STAGES.splice(i,1); STAGES.splice(stageAt(c.after)+1,0,id); } }
     const D=STAGEDEF[id]; if(!D) continue;
-    if(take) D._old={objectives:D.objectives,update:D.update,marker:D.marker,hint:D.hint,talk:D.talk,enter:D.enter,soFar:D.soFar,idle:D.idle,card:D.card,chapter:D.chapter};
+    if(old) D._old={objectives:D.objectives,update:D.update,marker:D.marker,hint:D.hint,talk:D.talk,enter:D.enter,soFar:D.soFar,idle:D.idle,card:D.card,chapter:D.chapter};
     const card=c.card===null?null:c.card?[String(c.card[0]),s10T(c.card[1])]:D.card;
     if(c.mom&&typeof MOM_CH!=='undefined') MOM_CH[id]=s10Arr(c.mom).map(x=>s10T(x));
-    Object.assign(D,{_s10:id,card,chapter:card?card[1]:(c.name?s10T(c.name):D.chapter),objectives:()=>s10Objs(c),hint:()=>s10Hint(c),soFar:()=>s10T(c.so_far),marker:nid=>false,
-      talk:()=>false,enter:o=>{ s10Enter(c,o); if(c.keep_enter&&D._old&&typeof D._old.enter==='function') try{ D._old.enter(o); }catch(e){ console.error(e); } },update:()=>{},idle:null});
+    // takeover: false: the old stage keeps every hook of its own (the data's steps run beside it; the engine's enter runs
+    // first). keep: ['update', 'enter', ...] (N5b R7, A4a keep_enter): those hooks of a taken-over stage keep running
+    // (enter runs after the engine's own; the others are the old ones instead of the data's)
+    const own=!old||take, keep=new Set(own?s10Arr(c.keep).concat(c.keep_enter?['enter']:[]):['objectives','update','marker','hint','talk','idle','soFar','enter']);
+    for(const h of keep) if(!['objectives','update','marker','hint','talk','idle','soFar','enter'].includes(h)) s10Err(`${id}: keep "${h}" is not a stage hook (objectives, update, marker, hint, talk, idle, soFar, enter)`);
+    const O=D._old||{}, has=h=>keep.has(h)&&O[h]!=null;
+    const N={card,chapter:card?card[1]:(c.name?s10T(c.name):D.chapter),objectives:has('objectives')?O.objectives:()=>s10Objs(c),hint:has('hint')?O.hint:()=>s10Hint(c),
+      soFar:has('soFar')?O.soFar:()=>s10T(c.so_far),marker:has('marker')?O.marker:nid=>false,talk:has('talk')?O.talk:()=>false,
+      enter:o=>{ s10Enter(c,o); if(has('enter')&&typeof O.enter==='function') try{ O.enter(o); }catch(e){ console.error(e); } },update:has('update')?O.update:()=>{},idle:keep.has('idle')?O.idle||null:null};
+    if(own) N._s10=id;
+    Object.assign(D,N);
     if(D.chapter) CHAPTER[id]=D.chapter;
     for(const s of c.step||[]){ if(s._kind==='minigame'){ const m=s._args[0]; if(!MINI[m]) s10Err(`${id}.${s._id}: minigame ${m} does not exist`); } }
   }
@@ -1382,7 +1431,7 @@ function s10Silence(c){ if(!c||!c.silence||!G||!G.flags) return; const keys=['c_
   for(const f of keys){ const sn=G.flags[f]||(G.flags[f]={}); for(const k of s10Arr(c.silence)) sn[k]=1; } }
 function s10Enter(c,o){
   if(!G.story) s10Fresh();
-  s10Silence(c); s10Migrate(); s10NpcSync(true);
+  s10Silence(c); s10Migrate(); s10ActMigrate(); s10NpcSync(true);
   storyEmit('chapter:'+c.id);
 }
 // the takeover adapters: the old code's own triggers for a stage the data now runs
@@ -1442,6 +1491,15 @@ function s10StoryKeys(){
     else if(Array.isArray(old)){ old.length=0; old.push(...L2); }
     else STORY[id]=L2;
   }
+  s10MailKeys();
+}
+// (A4S) a data scene whose id is a Pebble letter's id is that letter's text: the letter keeps its from, when, coin,
+// gift and then, and its lines are the scene's (letters put in later are done on the next call: boot, a load, s10Late)
+function s10MailKeys(){
+  if(typeof PEBBLE_MAIL==='undefined'||!PEBBLE_MAIL) return;
+  const fix=d=>{ if(!d||!d.id||d._s10||!S10.scenes[d.id]) return; const id=d.id; d._s10=true; d.lines=()=>s10Lines(S10.scenes[id],{sc:id}); };
+  for(const d of PEBBLE_MAIL) fix(d);
+  for(const k of Object.keys(PEBBLE_MAIL)) if(!/^\d+$/.test(k)){ const v=PEBBLE_MAIL[k]; if(v&&typeof v==='object'){ if(!v.id) v.id=k; fix(v); } }
 }
 // replaces: { 'STORY.a.b': sceneId } puts a data scene in place of a nested old STORY entry; { 'TALK.who.topic': null }
 // (or any STORY or TALK path with null) takes the old entry out, when a data talk entry says it instead
@@ -1547,6 +1605,8 @@ const S10API={
   place:id=>{ const P=S10.places[id]; return P?Object.assign({},P,{_owner:undefined}):null; },
   act:id=>s10PlaceAct(id),
   scene:(id,cb)=>s10Play(id,cb),
+  // (tests) run effects as a step's then would: 'shrine x', ['set a', 'clue b']
+  do:e=>s10Do(e,{}),
   world:(id,st)=>{ if(st!=null) s10WorldSet(id,st); return s10World(id); },
   talkLine:id=>{ const T=s10TalkFor(id,'line'); return T?{say:T.say?s10T(Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say):null,scene:T.scene||null}:null; },
   track:id=>G.story&&G.story._trk?G.story._trk[id]:undefined,
@@ -1569,7 +1629,7 @@ const s10Frames=n=>new Promise(r=>{ let k=0; const f=()=>{ if(++k>=n) r(); else 
 const s10Sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function s10AutoTp(w){
   if(!w) return false;
-  if(w.area){ if(!AREA||AREA.id!==w.area){ if(AREA) exitArea(); const d=DOORS.find(q=>q.area===w.area); enterArea(w.area,d||{x:player.x,y:player.y}); await s10Frames(4); }
+  if(w.area){ if(!AREA||AREA.id!==w.area){ if(AREA) exitArea(); const d=s10DoorFor(w.area); enterArea(w.area,d||{x:player.x,y:player.y}); await s10Frames(4); }
     const n=w.npc&&AREA&&AREA.npcs.find(q=>q.id===w.npc); if(n){ player.x=n.x; player.y=n.y+34; } return true; }
   if(AREA) { exitArea(); await s10Frames(3); }
   player.x=w.x; player.y=w.y+(w.npc?34:24); player.z=0; updateCam(0,true); G.chunkBurst=16; await s10Frames(3); return true;
@@ -1579,6 +1639,8 @@ async function s10AutoDlg(limit){
   while(performance.now()-t0<(limit||20000)){
     if(DLG){ if(DLG.opts){ DLG.chars=1e9; const o=DLG.opts; let i=o.findIndex(q=>q.tone==='kind'); if(i<0) i=o.findIndex(q=>q.tone!=='locked'); chooseOpt(Math.max(0,i)); } else skipDialogue(); await s10Frames(1); continue; }
     if(scene==='upgrade'){ try{ chooseUpgrade(0); }catch(e){} await s10Frames(1); continue; }
+    // (A4b) the act's end card: "Continue the story" (or, at the very end, "Keep exploring")
+    if(scene==='victory'){ const nx=document.getElementById('bWinNext'), ex=document.getElementById('bWinExplore'), b=nx&&!nx.hidden?nx:ex; if(b) b.click(); await s10Frames(4); continue; }
     if(scene!=='play'){ await s10Frames(2); continue; }
     await s10Frames(2); if(!DLG&&scene==='play') return true;
   }

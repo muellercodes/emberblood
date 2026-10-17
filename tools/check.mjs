@@ -52,7 +52,7 @@ const REG_KINDS = new Set(['place', 'landmark', 'door', 'gate', 'npc', 'item', '
 const STEP_VERBS = new Set(['talk', 'goto', 'find', 'examine', 'fight', 'use_power_at', 'give', 'choose', 'deduce', 'track', 'wait_for', 'cutscene', 'minigame', 'dungeon', 'all', 'any']);
 const EFFECT_VERBS = new Set(['set', 'clear', 'give', 'take', 'trust', 'power', 'upgrade', 'heart_ember', 'open', 'close', 'spawn', 'despawn', 'move', 'world', 'clue', 'quest', 'stage', 'time', 'emit', 'mail', 'epi', 'music', 'xp', 'weapon', 'ally', 'hat',
   // also in ENG's engine (e10_story.js): see ENGINE.md section 4
-  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people', 'bombbag']);
+  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people', 'bombbag', 'shrine']);
 const WEAPON_POWERS = new Set(['whip', 'bombs', 'glaive']);
 const STEP_SCENES = ['scene', 'lose', 'win', 'kneel', 'after', 'intro'];
 const SPEAKERS_BUILTIN = new Set(['narr', 'ash', 'pip', 'mom', 'maren', 'sign', 'note', 'book', 'banner']);
@@ -500,6 +500,7 @@ export function runChecks(M, opts = {}) {
       case 'end_act': if (!/^\d+$/.test(a[0] || '') || !M.acts[+a[0]]) FAIL('ids', `${O.id}.${where}: "${e}": no act file for act ${a[0]}`, loc); break;
       case 'warp': if (!isEnt(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no entity ${a[0]}`, loc); break;
       case 'page': if (!M.pages[a[0]]) FAIL('ids', `${O.id}.${where}: "${e}": no page ${a[0]} in any page: block`, loc); break;
+      case 'shrine': { const L = M.ents[a[0]], sm = L && /^SHRINES:(.+)$/.exec(L.src || ''); if (!sm && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": ${a[0]} is not a shrine (a SHRINES id, or a legacy entry with src SHRINES:<id>)`, loc); break; }
       case 'weapon': if (!WEAPON_POWERS.has(a[0]) && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no weapon ${a[0]}`, loc); break;
       case 'ally': if (!a[0]) FAIL('ids', `${O.id}.${where}: "${e}" needs an ally id`, loc); break;
       case 'hat': if (!isItem(a[0]) && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": item ${a[0]} is not defined`, loc); else addTo(itemsUsedData, a[0], { O, where }); break;
@@ -536,6 +537,14 @@ export function runChecks(M, opts = {}) {
     const p = pairOf(x);
     if (!p) { if (x != null) FAIL('ids', `${O.id}.${where}: text should be "text" or [full, simple], got ${short(JSON.stringify(x))}`, W(O, at(O))); return; }
     texts.push({ O, where, who, full: p.full, simple: p.simple, tags: tags || {}, conds, ...at(O, p.full) });
+  }
+  // a text with variants (A4S, A4b): { if, t: text } or a list of them (the first whose condition holds is shown)
+  function textVar(x, O, where) {
+    const isVar = (v) => v && typeof v === 'object' && !Array.isArray(v) && 't' in v;
+    const vs = isVar(x) ? [x] : Array.isArray(x) && x.length && isVar(x[0]) ? x : null;
+    if (!vs) return textPair(x, O, where, null, {});
+    vs.forEach((v, i) => { if (!isVar(v)) { FAIL('ids', `${O.id}.${where}: variant ${i + 1} should be { if, t: [full, simple] }`, W(O, at(O))); return; }
+      if (v.if != null) checkCond(v.if, O, `${where} variant ${i + 1}`); textPair(v.t, O, `${where} variant ${i + 1}`, null, {}, v.if != null ? [v.if] : []); });
   }
   function lineBeat(b, O, where, conds) {
     // [who, full, simple?, tags?]
@@ -722,7 +731,7 @@ export function runChecks(M, opts = {}) {
     }
     if (O.type === 'quest') {
       if (!d.optional) WARN('quest', `${O.id}: side quest without optional: true`, W(O, at(O)));
-      if (d.title) textPair(d.title, O, 'title', null, {});
+      if (d.title) textVar(d.title, O, 'title');
       if (d.giver && !isNpc(d.giver) && !G.cast.has(d.giver)) FAIL('ids', `${O.id}: giver ${d.giver} is not an npc`, W(O, at(O, d.giver)));
     }
     if (O.type === 'act') {
@@ -770,7 +779,7 @@ export function runChecks(M, opts = {}) {
     for (const [k, sc] of Object.entries(d.replaces || {})) { if (sc === null) { if (!/^(STORY|TALK)\./.test(k)) FAIL('ids', `${O.id}: replaces ${k}: write STORY.<path> or TALK.<path>`, W(O, at(O))); continue; } if (!M.scenes[sc]) FAIL('ids', `${O.id}: replaces ${k} with scene ${sc}, which is not defined`, W(O, at(O, sc))); else addTo(scenesUsed, sc, { O, where: `replaces ${k}` }); }
     // act migrate: [{ if, then }] (once at load, for old saves), end_act: { title, lines }
     arr(d.migrate).forEach((m, i) => { if (m && m.if) checkCond(m.if, O, `migrate ${i + 1}`); eachEffect(m && m.then, (e) => checkEffect(e, O, `migrate ${i + 1}`)); });
-    if (d.end_act) { if (d.end_act.title) textPair(d.end_act.title, O, 'end_act title', null, {}); arr(d.end_act.lines).forEach((x, i) => textPair(x, O, `end_act line ${i + 1}`, null, {})); }
+    if (d.end_act) { if (d.end_act.title) textVar(d.end_act.title, O, 'end_act title'); arr(d.end_act.lines).forEach((x, i) => textVar(x, O, `end_act line ${i + 1}`)); }
   }
 
   // promises and refs: an entity, quest, item, clue or scene, or (a promise) a flag or event something sets
