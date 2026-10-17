@@ -104,7 +104,8 @@ chapter({
     { id: 'well', do: 'goto m4_well_wait 46', scene: 'm_eclipse2',
       obj: ['Wait with Saffron at the rim of the Moon Well', 'Wait at the Moon Well'],
       hint: ['Walk up the footbridge to the stone rim of the well, and wait for her.', 'Wait at the well.'],
-      then: ['set m_eclipse2', 'set m_eclipse_on=0', 'xp 1000', { banner: ['The nights get darker.', 'The nights get darker.'] }] },
+      // (the XP only after the choice at the well: a save from before v10, caught up quietly, got it from the old eclipse)
+      then: ['set m_eclipse2', 'set m_eclipse_on=0', { if: 'flag m4_well', then: ['xp 1000'] }, { banner: ['The nights get darker.', 'The nights get darker.'] }] },
     // x3_world opens the Burrow Gap once m_eclipse2 is set, and sets m_gap_dug when Ash digs through it; coming up on
     // the far side finishes the step
     { id: 'under', do: 'goto m4_gap_east 140', marker: 'm_burrowgap', intro: 'm4_iska_under',
@@ -173,7 +174,7 @@ chapter({
                'She drinks the light. Then she bites the moon again. CRUNCH!', { do: ['world m4_nyx_well drink', 'moon 40'], fx: [['ecl', 'drink'], ['ecl', 'bite', 40]] }],
       ['nyxara', 'One more piece, little ember. My Hush keeps it for you, up in the Observatory. Bring me all three.', 'One more piece. My Hush has it. Bring me all three.', { clue: 'm4_bring_three' }],
       ['narr', 'She rises without a sound. Far above, her silver thread twitches, and a white moth is yanked up the sky like a kite. Hush.',
-               'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['clear m4_nyx_here', 'set m4_moths_gone'], fx: ['ecl', 'leave'] }],
+               'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['set m4_nyx_here=0', 'set m4_moths_gone'], fx: ['ecl', 'leave'] }],
       ['narr', 'Every lantern in Sable blows out at once.', 'Every lantern in Sable goes out.'],
       ['m_saffron', 'Not dead. Dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.', 'One candle of moon is left. Because of you. Go!', { fx: ['ecl', 'end'] }],
     ],

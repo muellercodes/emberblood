@@ -110,8 +110,8 @@ chapter({
       { if: '!clue m4_she_asks', then: [
         ['ash', 'On the beach she could have squashed me flat. She ASKED me for the Shards instead. Why ask?', 'On the beach she ASKED me for the Shards. Why ask?', { clue: 'm4_she_asks' }] ],
         else: [
-        ['narr', 'The eyes close. One mirror shows you, looking a bit worried. You fix your hair. It helps.', 'The eyes close. You fix your hair. It helps.', { do: ['clear m4_eyes_on'] }] ] },
-      { do: ['clear m4_eyes_on'] },
+        ['narr', 'The eyes close. One mirror shows you, looking a bit worried. You fix your hair. It helps.', 'The eyes close. You fix your hair. It helps.', { do: ['set m4_eyes_on=0'] }] ] },
+      { do: ['set m4_eyes_on=0'] },
       // (a save from before v10 never saw Esme's workbench in Sable: Iska knows her saying)
       { if: '!clue m4_cracked_lamp', then: [
         ['iska', 'Esme in Sable says it every day: "Cracked lamps can\'t hold a flame. Mend it whole first."', 'Esme says: "Cracked lamps can\'t hold a flame."', { clue: 'm4_cracked_lamp' }] ] },
