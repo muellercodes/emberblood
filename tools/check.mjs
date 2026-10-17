@@ -674,7 +674,7 @@ export function runChecks(M, opts = {}) {
       if (e.leads && !isEnt(e.leads)) FAIL('ids', `${e.id}: leads to ${e.leads}, which is not placed`, loc);
     }
     if (e.kind === 'door' && e.leads && !isEnt(e.leads) && !knownGame(e.leads) && !(/^h_(.+)$/.test(e.leads) && G.cast.has(e.leads.slice(2)))) FAIL('ids', `${e.id}: leads to ${e.leads}, which is not placed`, loc);
-    if (e.look && !G.looks.has(e.look) && !G.propKinds.has(e.look)) WARN('art', `${e.id}: look ${e.look} has no defineLook yet (a placeholder is drawn)`, loc);
+    if (e.look && !(e.kind === 'prints' && ['boot', 'claw', 'hoof'].includes(e.look)) && !G.looks.has(e.look) && !G.propKinds.has(e.look)) WARN('art', `${e.id}: look ${e.look} has no defineLook yet (a placeholder is drawn)`, loc);
     for (const [st, lk] of Object.entries(e.states || {})) if (isStr(lk) && !G.looks.has(lk) && !G.propKinds.has(lk) && !/^(flag|!flag|item|stage|world)/.test(lk) && !/\s/.test(lk)) WARN('art', `${e.id}: look ${lk} for state ${st} has no defineLook yet`, loc);
     if (e.show) checkCond(e.show, O, `${e.id} show`);
     if (e.from === 'legacy') checkLegacySrc(e, loc);

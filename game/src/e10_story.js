@@ -174,7 +174,7 @@ function s10Effect(e,ctx){
       if(!S10.quiet){ setBanner(S('A Heart Ember!','A Heart Ember!'),S('Your fire burns stronger. Max health +10.','Max health +10!'),3.4); try{ SFX.play('upgrade'); }catch(err){} } break; }
     case 'weapon': giveWeapon(a,S10.quiet); break;
     case 'ally': if(typeof recruitComp==='function') recruitComp(a); else s10Err(`effect "${e}": no companions module`); break;
-    case 'hat': if(typeof x1pHat==='function') x1pHat(a); else { G.hats=G.hats||{}; G.hats[a]=true; G.hat=a; } break;
+    case 'hat': s10Hat(a); break;
     case 'deed': if(typeof deed==='function') deed(a); break;
     case 'open': case 'close': s10Gate(a,k==='open'); break;
     case 'spawn': { const at=b==='at'?c:b; s10NpcSet(a,{at,off:false}); break; }
@@ -204,6 +204,14 @@ function s10Effect(e,ctx){
 }
 // Case Book pages (a letter, a journal page): page:{ id:{ title:[full,simple], text:[[full,simple], ...] } } on an act,
 // chapter, quest or places(); the effect `page id` adds it (G.case.pages) with a banner
+// effect "hat item": unlock and wear a hat (a data hat, or a hat item from an act's own table)
+function s10Hat(a){
+  const it=S10.items[a], nm=it&&it.hat?(s10T(it.name)||a):null;
+  let name=nm;
+  if(!name) for(const T of ['X1P_HATS','F2P_HATS','M3P_HATS','M3W_HATS']){ let t=null; try{ t=eval(`typeof ${T}!=='undefined'?${T}:null`); }catch(e){} if(t&&t[a]){ name=t[a]; break; } }
+  if(!name){ s10Err(`effect "hat ${a}": no hat item ${a}`); return; }
+  G.hats=G.hats||{}; G.hats[name]=true; G.hat=name;
+}
 function s10Page(id){
   const P=S10.pages&&S10.pages[id]; if(!P){ s10Err(`page ${id} is not defined`); return; }
   const C=G.case.pages||(G.case.pages={}); if(C[id]) return; C[id]=1; storyEmit('page:'+id);
@@ -402,7 +410,9 @@ function s10Owned(d,owner){
   for(const who in (d.talk||{})){ const L=S10.talk[who]||(S10.talk[who]=[]); for(const t of s10Arr(d.talk[who])) L.push(Object.assign({_owner:owner,_who:who},t)); }
   for(const id in (d.npc||{})){ const n=Object.assign({id,_owner:owner},d.npc[id]); S10.npcs[id]=n; }
   for(const id in (d.page||{})){ (S10.pages||(S10.pages={}))[id]=Object.assign({id,_owner:owner},d.page[id]); }
-  for(const id in (d.item||d.items||{})){ const it=(d.item||d.items)[id]; S10.items[id]=Object.assign({id},it); if(it&&it.name) ITEM_NAMES[id]=s10T(it.name); }
+  for(const id in (d.item||d.items||{})){ const it=(d.item||d.items)[id]; S10.items[id]=Object.assign({id},it); if(it&&it.name) ITEM_NAMES[id]=s10T(it.name);
+    // a hat from data: item { name, hat: { look, col } } (the look draws it on Ash and in the hat menu)
+    if(it&&it.hat){ const nm=s10T(it.name)||id; (S10.hats||(S10.hats={}))[nm]=Object.assign({item:id},typeof it.hat==='object'?it.hat:{}); } }
 }
 // steps: parse once ({do:'talk c_hettie'} -> _kind 'talk', _args ['c_hettie'])
 const S10_KINDS=['talk','goto','find','examine','fight','use_power_at','give','choose','deduce','track','wait_for','cutscene','minigame','dungeon','all','any'];
@@ -471,6 +481,7 @@ function s10Play(id,done,ctx){
   if(!beats){ s10Err(`scene ${id} is not defined`); if(done) done(); return false; }
   ctx=Object.assign({sc:typeof id==='string'?id:null},ctx||{});
   if(typeof id==='string'&&G.story) (G.story._seen||(G.story._seen={}))[id]=1;
+  if(typeof id==='string'&&S10.oldMark&&S10.oldMark[id]) try{ S10.oldMark[id](); }catch(e){ console.error(e); }
   const lines=s10Lines(beats,ctx);
   if(S10.auto) S10.auto.log.push('scene '+(ctx.sc||'(inline)'));
   runDialogue(lines.length?lines:[{who:'narr',text:'',skipIf:()=>true}],()=>{ scene='play'; s10SceneEnd(); try{ if(done) done(); }catch(e){ console.error(e); } try{ saveGame(); }catch(e){} });
@@ -870,7 +881,7 @@ function s10DrawPrints(P,target){
   const o=s10Off(P); if(!o) return;
   const path=(P.path||[]).map(q=>[+q[0]+o.x,+q[1]+o.y]); if(path.length<2) return;
   const tr=G.story._trk&&G.story._trk[P.id], reached=tr==='done'?path.length:(tr==null?-1:tr), t=G.time;
-  const claw=P.look==='claw'||P.prints==='claw', fill=P.col||'222,232,255';
+  const claw=P.look==='claw'||P.prints==='claw', hoof=P.look==='hoof'||P.prints==='hoof', fill=P.col||'222,232,255';
   let s0=0; const segs=[]; for(let i=0;i<path.length-1;i++){ const a=path[i], b=path[i+1], L=Math.hypot(b[0]-a[0],b[1]-a[1]); segs.push({a,b,L,s0,i}); s0+=L; }
   if(!inView((path[0][0]+path[path.length-1][0])/2,(path[0][1]+path[path.length-1][1])/2,s0/2+200)) return;
   ctx.save(); let k=0;
@@ -882,7 +893,8 @@ function s10DrawPrints(P,target){
       if(!done) glowAt(x,y,14,'190,210,255',0.16+0.12*tw);
       ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
       ctx.fillStyle=`rgba(${fill},${al})`; ctx.strokeStyle=`rgba(40,46,104,${al*0.85})`; ctx.lineWidth=1.4;
-      if(claw){ for(const dy of [-3.6,0,3.6]){ ctx.beginPath(); ctx.ellipse(4,dy,3.6,1.4,0,0,TAU); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.ellipse(-3,0,3.6,4,0,0,TAU); ctx.fill(); ctx.stroke(); }
+      if(hoof){ for(const dy of [-2.6,2.6]){ ctx.beginPath(); ctx.ellipse(1,dy,4.6,2.2,0,0,TAU); ctx.fill(); ctx.stroke(); } }
+      else if(claw){ for(const dy of [-3.6,0,3.6]){ ctx.beginPath(); ctx.ellipse(4,dy,3.6,1.4,0,0,TAU); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.ellipse(-3,0,3.6,4,0,0,TAU); ctx.fill(); ctx.stroke(); }
       else { ctx.beginPath(); ctx.ellipse(2.5,0,6.4,4,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.ellipse(-6.5,0,3.2,3.2,0,0,TAU); ctx.fill(); ctx.stroke(); }
       ctx.restore();
       if(!done&&tw>0.96){ ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fillRect(x-1,y-6,2,12); ctx.fillRect(x-6,y-1,12,2); }
@@ -904,6 +916,9 @@ if(typeof drawThief==='function'){ const base=drawThief; drawThief=function(T){ 
   const r=base(n);
   if(d&&d.overlay&&!(G&&G.mode==='story'&&d._owner&&d._owner.act&&actOf(G.stage)<d._owner.act)) try{ s10LookDraw(d.overlay,n.x,n.y,null); }catch(e){ console.error(e); }
   return r; }; }
+// data hats: the look draws them (the flat sprite and the hat menu); the toy model wears a plain cap in the hat's colour
+{ const base=drawHatShape; drawHatShape=function(x,y,k,s){ const H=S10.hats&&S10.hats[k]; if(H){ ctx.save(); ctx.translate(x,y); if(s) ctx.scale(s,s); if(H.look&&s10LookHas(H.look)) s10LookDraw(H.look,0,0,null); ctx.restore(); return; } return base(x,y,k,s); }; }
+{ const base=ashHat; ashHat=function(k){ const H=S10.hats&&S10.hats[k]; if(H){ try{ aE(0.3,0,5.4,7.6,8.0,4.2,H.col||'#8a6a4a'); }catch(e){} return; } return base(k); }; }
 // data people who are nobody in the old code (npc blocks with a name and no CAST or SPECIAL entry) become SPECIAL
 // people (inside 'ev': only the story places them), with a speaker entry, so scenes, talk and steps can use them
 function s10People(){
@@ -986,8 +1001,12 @@ function s10TalkTakeover(){
 { const base=B; B=function(k,who,c,t,o){ const r=base(k,who,c,t,o); try{ const b=BARKS[BARKS.length-1]; if(b&&b.k===k) b._who=who; }catch(e){} return r; }; }
 function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify([T.if,T.say,T.scene,T.option,T.then]))); }
 function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if(T.once&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
+// the first matching entry, top to bottom, of the latest act that has one (an act-5 line wins over an act-2 line that
+// would also match; inside one act the order is the data's)
 function s10TalkFor(id,kind){
-  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':'line'; if(k!==kind) continue; if(s10TalkOk(T)) return T; } return null;
+  let best=null, bestAct=-1;
+  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':'line'; if(k!==kind) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ best=T; bestAct=a; } }
+  return best;
 }
 // say forms: [full, simple] or a string (said by that person); a list of lines [[who, full, simple], ...]; or (A2S)
 // a list of [full, simple] variants, the next one each time it plays (what CAST.lines did)
@@ -1383,9 +1402,19 @@ function s10StoryKeys(){
   for(const id in S10.scenes){
     if(!(id in STORY)||S10.storyDone&&S10.storyDone[id]) continue;
     (S10.storyDone=S10.storyDone||{})[id]=1;
+    const desc=Object.getOwnPropertyDescriptor(STORY,id), byGetter=!!(desc&&(desc.get||desc.set));
     const old=STORY[id], lines=s10Lines(S10.scenes[id],{sc:id}), mark={who:'narr',text:'',skipIf:()=>true,fn:()=>{ if(G&&G.story) (G.story._seen||(G.story._seen={}))[id]=1; }};
-    if(Array.isArray(old)){ const L0=old[0], keep=L0&&!Array.isArray(L0)&&L0.text===''&&L0.fn&&L0.skipIf?[L0]:[]; old.length=0; old.push(...keep,mark,...lines); }
-    else STORY[id]=[mark,...lines];
+    // the old module's own "seen" mark (its first, silent line: c_sn, f_sn, m_sn, n_sn) is kept, and also runs when the
+    // engine plays the scene itself, so the old code's seen checks still hold
+    const L0=Array.isArray(old)?old[0]:null, keep=L0&&!Array.isArray(L0)&&L0.text===''&&L0.fn&&L0.skipIf?[L0]:[];
+    if(keep.length) (S10.oldMark||(S10.oldMark={}))[id]=keep[0].fn;
+    // (a getter without a setter builds a fresh array on every read, so changing it in place would be lost: the key
+    // becomes a plain value; x4's getters have a setter that keeps what it is given)
+    const L2=[...keep,mark,...lines];
+    if(desc&&desc.set) STORY[id]=L2;
+    else if(byGetter) Object.defineProperty(STORY,id,{configurable:true,enumerable:true,writable:true,value:L2});
+    else if(Array.isArray(old)){ old.length=0; old.push(...L2); }
+    else STORY[id]=L2;
   }
 }
 // replaces: { 'STORY.a.b': sceneId } puts a data scene in place of a nested old STORY entry; { 'TALK.who.topic': null }
