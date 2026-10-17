@@ -17,7 +17,10 @@ const BAL={
   tierMax:12,        // tier cap; star-iron past it becomes coins
   tierCoins:40,
   arenaBoss:0.55,    // Arena champions: about 1 to 1.5 times their old health (story bosses got about 2.3 times tougher)
-  still:{r:56,blastR:62,delay:[1.0,0.85,0.7],dmg:12}   // the boss "keep moving" eruption (seconds before it comes: DIFFS.still)
+  still:{r:56,blastR:62,delay:[1.0,0.85,0.7],dmg:12},  // the boss "keep moving" eruption (seconds before it comes: DIFFS.still)
+  // v10: per boss [Easy, Normal] factor on those seconds (0: no eruptions). The Mirrow Serpent is fought from the shore
+  // with the bow, so standing still there is the plan, not a mistake.
+  stillK:{serpent:[0,0], grizzlefang:[1.5,1.4], gnarl:[1.3,1.3]}
 };
 function balHpK(L){ return Math.pow(BAL.foeHp,Math.max(0,(L||1)-1)); }
 function balDmK(L){ return Math.pow(BAL.foeDmg,Math.max(0,(L||1)-1)); }
@@ -39,6 +42,14 @@ const BAL_BOSS={
   cindervane:{lv:8,hp:3300}, vorlaxis:{lv:10,hp:7800}
 };
 for(const k in BAL_BOSS) if(EDEF[k]) Object.assign(EDEF[k],BAL_BOSS[k]);
+// v10 on-ramp: Act I boss health on [Easy, Normal] in the story, times the health above (Hard keeps hp x DIFFS.bossHp).
+// Measured with the casual-kid bot so each boss is a little harder than the one before (scratchpad v10/BAL.md).
+// (Easy never gets more health than Normal: Easy hp x 0.8 <= Normal hp, so an Easy factor is at most 1.25 x the Normal one.)
+const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.52], broodmother:[1.15,0.95],
+  greymane:[0.9,1.25], skrae:[1,1.15], cindervane:[0.85,0.7]};
+{ const base=makeEnemy; makeEnemy=function(type,x,y,opt){ const e=base(type,x,y,opt);
+    try{ const k=e&&e.boss&&G&&G.mode==='story'&&BAL_BOSS_EZ[type]; const i=k?DIFFS.indexOf(G.diff):-1; if(k&&i>=0&&i<2&&k[i]!==1){ e.maxHp*=k[i]; e.hp=e.maxHp; } }catch(err){}
+    return e; }; }
 
 // ---------- difficulty: the story elite chance
 { const base=newRun; newRun=function(mode){ base(mode); if(G.mode==='story') G.eliteChance=G.diff.elite!=null?G.diff.elite:0.06; }; }
@@ -69,8 +80,10 @@ function balStill(dt){
   if(BST.ax==null||dist2(p.x,p.y,BST.ax,BST.ay)>R*R){ BST.ax=p.x; BST.ay=p.y; BST.t=0; return; }
   if(airborne()||p.dashT>0){ BST.t=Math.max(0,BST.t-dt*2); return; }   // a jump or a roll counts as moving
   if(b.stun>0||b.staggered||BAL_OPEN[b.state]) return;
+  const sk=BAL.stillK[b.type], di0=DIFFS.indexOf(G.diff), sf=sk&&di0>=0&&di0<2&&G.mode==='story'?sk[di0]:1;
+  if(!(sf>0)){ BST.t=0; return; }
   BST.t+=dt;
-  if(BST.t<(G.diff.still||2.6)) return;
+  if(BST.t<(G.diff.still||2.6)*sf) return;
   BST.t=0; BST.ax=p.x; BST.ay=p.y; BST.n++;
   const di=clamp(DIFFS.indexOf(G.diff),0,2), dm=BAL.still.dmg*(b.edK||1)*(G.mode==='story'?1:(G.dmgMul||1));
   blast(p.x,p.y,BAL.still.blastR,BAL.still.delay[di],dm,{still:true});
@@ -165,6 +178,57 @@ function balMigrate(){
 }
 { const base=loadGame; loadGame=function(s){ base(s); balMigrate(); }; }
 
+// ---------- boss help after a fall (v10, every boss in every act): after Ash falls to the same boss twice (once on Easy),
+// the next try that boss starts with 20% less health, 40% after one more fall (never more), and a friendly banner says so.
+// Beating the boss resets it. Settings > "Boss help after a fall" (on by default, saved as eb_bosshelp like the other
+// settings). The falls live in G.flags.bal_falls (saved with the game; an old save has none, so nothing changes for it),
+// keyed by the fight site (G.fightSite) or, for a dungeon guardian, the boss type.
+settings.bossHelp=store.get('eb_bosshelp',true)!==false;
+const BHELP={need:[1,2,2],per:0.2,max:0.4,lastT:-99};
+function bhFalls(){ const f=G.flags||(G.flags={}); const o=f.bal_falls; return o&&typeof o==='object'&&!Array.isArray(o)?o:(f.bal_falls={}); }
+function bhKey(b){ return (G&&G.fightSite)||(b&&b.type)||''; }
+function bhDi(){ const i=DIFFS.indexOf(G&&G.diff); return i<0?clamp(typeof diffIdx==='number'?diffIdx:1,0,2):i; }
+function bossHelpCut(key){
+  if(!settings.bossHelp||!G||G.mode!=='story'||!key) return 0;
+  const n=bhFalls()[key]|0, need=BHELP.need[bhDi()];
+  return n<need?0:Math.min(BHELP.max,BHELP.per*(n-need+1));
+}
+function bhName(b){ const d=EDEF[b.type]||{}; return String(d.name||'The boss').split(',')[0]; }
+// a fall while a boss fight is on counts for that boss
+{ const base=playerDied; playerDied=function(){
+    try{ const b=G&&G.boss; if(G.mode==='story'&&b&&b.boss&&!b.dead&&player&&dist(b.x,b.y,player.x,player.y)<1800){ const F=bhFalls(), k=bhKey(b); if(k) F[k]=(F[k]|0)+1; } }catch(e){}
+    base(); }; }
+// beating the boss resets its help
+{ const base=onBossDefeated; onBossDefeated=function(e){
+    try{ if(G&&G.mode==='story'&&e){ const F=bhFalls(); for(const k of [G.fightSite,e.type]) if(k&&F[k]!=null) delete F[k]; } }catch(err){}
+    base(e); }; }
+// the boss of a new try starts weaker (health and its health bar, in proportion, so every phase mark stays where it was)
+function bossHelpTick(){
+  const b=G&&G.boss; if(!b||b.dead||b._bh||G.mode!=='story') return;
+  b._bh=1; const cut=bossHelpCut(bhKey(b)); if(!(cut>0)) return;
+  b.maxHp*=1-cut; b.hp=Math.min(b.maxHp,b.hp*(1-cut)); b._bhCut=cut;
+  if(G.time-BHELP.lastT<20) return; BHELP.lastT=G.time;
+  const nm=bhName(b), pct=Math.round(cut*100);
+  setBanner(S('Boss help','Boss help'),S(`${nm} starts this fight with ${pct}% less health. You can do it!`,`${nm} is weaker now. You can do it!`),3.6);
+}
+{ const base=updateEnemies; updateEnemies=function(dt){ base(dt); try{ bossHelpTick(); }catch(e){} }; }
+function bhSync(){ for(const b of document.querySelectorAll('#setBossHelp button')) b.setAttribute('aria-pressed',String(b.dataset.v===(settings.bossHelp?'on':'off'))); }
+function setBossHelp(on){ settings.bossHelp=!!on; store.set('eb_bosshelp',settings.bossHelp); bhSync(); return settings.bossHelp; }
+(function bhRow(){
+  try{
+    const panel=document.querySelector('#settings .panel'); if(!panel||document.getElementById('setBossHelp')) return;
+    const r=document.createElement('div'); r.className='setrow';
+    r.innerHTML='<span>Boss help after a fall<small>Fall to the same boss twice (once on Easy) and it starts the next fight with less health. Beat it and it is back to normal.</small></span><div class="seg" id="setBossHelp" role="group" aria-label="Boss help after a fall"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div>';
+    // it goes with the gameplay rows, right under Auto-attack
+    const a=document.getElementById('setAuto'), row=a&&a.closest('.setrow');
+    if(row&&row.parentElement===panel) row.after(r);
+    else { let ref=document.getElementById('bSettingsClose'); while(ref&&ref.parentElement!==panel) ref=ref.parentElement; if(ref) panel.insertBefore(r,ref); else panel.appendChild(r); }
+    for(const b of r.querySelectorAll('button')) b.addEventListener('click',()=>{ SFX.init(); setBossHelp(b.dataset.v==='on'); SFX.play('ui'); });
+    bhSync();
+  }catch(e){}
+})();
+{ const base=renderSettings; renderSettings=function(){ base(); bhSync(); }; }
+
 // ---------- debug hooks (tests): __eb.bal.*
 window.__ebX=Object.assign(window.__ebX||{},{bal:{
   BAL,BAL_BOSS,DIFFS,ABIL_DEFS,ABIL_ORDER,balHpK,balDmK,balXpK,balLvlDmg,balXpNeed,balXpTo,balTierK,
@@ -179,6 +243,7 @@ window.__ebX=Object.assign(window.__ebX||{},{bal:{
   hold(id,on){ const e=G.enemies.find(q=>q.id===id); if(e){ e.stun=on===false?0:999; } },
   clear(){ for(const e of G.enemies) e.dead=true; G.enemies=[]; G.projectiles=[]; G.hazards=[]; G.rings=[]; G.pools=[]; G.boss=null; },
   still:()=>({t:BST.t,n:BST.n,ax:BST.ax}), migrate:balMigrate,
+  help:()=>({on:settings.bossHelp,falls:Object.assign({},bhFalls()),cut:G.boss?(G.boss._bhCut||0):null}), setBossHelp, bossHelpCut,
   moves:()=>({dbl:canDblJump(),skim:canSkim(),pound:canPound()}),
   abil:id=>{ const A=ABIL_DEFS[id]; return A?{name:A.name,how:abilHow(id),act:A.act,skill:A.skill||null,own:hasAbil(id)}:null; }
 }});
