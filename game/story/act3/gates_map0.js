@@ -44,10 +44,11 @@ places({
       payoff: { kind: 'heart_ember', id: 'f3_eggs' },
       name: ['a ribbon of warm wind up the crater wall', 'a wind ribbon'],
       locked: ['Warm wind curls up the crater wall to the rim. You could ride it, if you could ride the wind.', 'Wind goes up the wall. Ride it!'] },
-    // (an examine, not a chest: a chest place plays no scene, and this one has something to tell)
-    f3_eggs: { kind: 'examine', map: 0, at: [6528, 1309], r: 30, h: 30, if: '!flag f3_eggs_open', look: 'egg_shells', say: 'a3g_eggs',
+    // (an examine, not a chest: a chest place plays no scene, and this one has something to tell. The loot is given as
+    // the scene starts; the full look stays until the scene's last beat sets f3_eggs_seen, then the after look shows)
+    f3_eggs: { kind: 'examine', map: 0, at: [6528, 1309], r: 30, h: 30, if: '!flag f3_eggs_seen', look: 'egg_shells', say: 'a3g_eggs',
       then: ['heart_ember f3_eggs', 'give f3_eggshell', 'set f3_eggs_open'], name: ['an old nest on the rim', 'an old nest'] },
-    f3_eggs_after: { kind: 'prop', map: 0, at: [6528, 1309], if: 'flag f3_eggs_open', look: 'egg_nest', name: ['an empty old nest', 'an empty nest'] },
+    f3_eggs_after: { kind: 'prop', map: 0, at: [6528, 1309], if: 'flag f3_eggs_seen', look: 'egg_nest', name: ['an empty old nest', 'an empty nest'] },
 
     // ---- G3. Iska's box (Ground Pound). A cracked flagstone in front of Iska's Ward stone (st_iska 3350,8850); the box
     // is beside the hole once the stone breaks (the hole drops anyone standing in it back out on the south side).
@@ -67,9 +68,9 @@ places({
         'A giant frozen bun! Try a bomb.'] },
     // (drawn over the gate library's boulder until it breaks)
     f3_bun_shell: { kind: 'prop', map: 0, at: [2380, 9803], look: 'frozen_bun', show: '!flag gate_f3g_bun>=2', name: ['a giant frozen bun', 'a frozen bun'] },
-    f3_bun: { kind: 'examine', map: 0, at: [2380, 9800], r: 44, h: 30, if: 'flag gate_f3g_bun>=2 !flag f3_bun_open', look: 'frozen_bun_open', say: 'a3g_bun',
+    f3_bun: { kind: 'examine', map: 0, at: [2380, 9800], r: 44, h: 30, if: 'flag gate_f3g_bun>=2 !flag f3_bun_seen', look: 'frozen_bun_open', say: 'a3g_bun',
       then: ['heart_ember f3_bun', 'give coins 30', 'set f3_bun_open'], name: ['the burst bun', 'the burst bun'] },
-    f3_bun_after: { kind: 'prop', map: 0, at: [2380, 9800], if: 'flag f3_bun_open', look: 'frozen_bun_crumbs', name: ['the burst bun', 'the burst bun'] },
+    f3_bun_after: { kind: 'prop', map: 0, at: [2380, 9800], if: 'flag f3_bun_seen', look: 'frozen_bun_crumbs', name: ['the burst bun', 'the burst bun'] },
   },
 
   scene: {
@@ -85,6 +86,7 @@ places({
       ['narr', 'One shell is red and scorched. The other is ice-blue, and still cold to touch. After all this time.', 'One red and scorched. One blue and cold.'],
       ['ash', 'Two dragons hatched up here. A fire one... and an ice one.', 'A fire dragon and an ice dragon!'],
       ['narr', 'Under the shells, a little glowing ember, warm as a heartbeat.', 'Under them, a glowing ember.'],
+      { do: ['set f3_eggs_seen'] },
     ],
     a3g_iska: [
       ['narr', 'Under the broken flagstone: a little stone box, sealed with wax in the shape of a lantern.', 'A little stone box, sealed with a lantern.'],
@@ -97,6 +99,7 @@ places({
       ['narr', 'KA-BOOM. Frozen crumbs rain down all over Emberhollow. Inside the bun, something glows.', 'KA-BOOM! Crumbs everywhere. Something glows!'],
       ['narr', 'A Heart Ember. Baked right into the middle, warm as toast.', 'A Heart Ember, baked inside!'],
       ['bertram', '(from the window) I have NO idea how that got in there. Do not tell your mother.', '(window) No idea how! Do not tell your mom.'],
+      { do: ['set f3_bun_seen'] },
     ],
   },
 })

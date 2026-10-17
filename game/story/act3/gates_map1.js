@@ -35,9 +35,9 @@ places({
       locked: ['A huge boulder sits right on top of a cellar door. A painted sign on it says: SORRY, CELLAR. A bomb might move it.',
         'A boulder on a cellar door. Try a bomb!'] },
     // (an examine, not a chest: a chest place plays no scene. bombbag 5: five more bombs fit in the bag)
-    f3_hettie_cellar: { kind: 'examine', map: 1, at: [6600, 25650], r: 44, h: 30, if: 'flag gate_f3g_hettie>=2 !flag f3_satchel', look: 'sprocket_boulder', say: 'a3g_hettie',
+    f3_hettie_cellar: { kind: 'examine', map: 1, at: [6600, 25650], r: 44, h: 30, if: 'flag gate_f3g_hettie>=2 !flag f3_satchel_seen', look: 'sprocket_boulder', say: 'a3g_hettie',
       then: ['upgrade f3_satchel', 'set f3_satchel', 'bombbag 5', 'give coins 60'], name: ["Hettie's cellar", "Hettie's cellar"] },
-    f3_hettie_after: { kind: 'prop', map: 1, at: [6600, 25650], if: 'flag f3_satchel', look: 'sprocket_cellar', name: ["Hettie's cellar", "Hettie's cellar"] },
+    f3_hettie_after: { kind: 'prop', map: 1, at: [6600, 25650], if: 'flag f3_satchel_seen', look: 'sprocket_cellar', name: ["Hettie's cellar", "Hettie's cellar"] },
   },
 
   scene: {
@@ -60,6 +60,7 @@ places({
         'A brass satchel: BOMB BAG. DO NOT LET MAGS SEE.'],
       ['narr', 'Ash swaps his old bomb bag for it. It holds five more bombs. It also hums a little.', 'It holds five more bombs! It hums.'],
       ['ash', 'Sorry, Hettie. Mags is going to see.', 'Sorry, Hettie.'],
+      { do: ['set f3_satchel_seen'] },
     ],
   },
 })
