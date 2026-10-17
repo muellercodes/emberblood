@@ -834,7 +834,7 @@ function morrowRing(e){
 // ---------- the Brood Mother: flies up to her nest crag, out of reach of claws and fire; arrows, the Wing-rang or a
 // swing that sends her fireballs back knock her down
 defineFoe('broodmother',{hp:actIHp(1080),phases:[0.66,0.33],
-  phaseText:[[S('To the Nest!','To the nest!'),S('Too high for claws. Use arrows, the Wing-rang, or swing to send her fireballs back!','Too high! Shoot her, or hit her fire back!'),['brood',S('Up, up! You cannot reach me, little ember!','You cannot reach me up here!')]],
+  phaseText:[[S('To the Nest!','To the nest!'),S('Too high for claws. Use arrows, the Wing-rang, or swing to send her fireballs back!','Too high! Shoot her, or hit her fire back!'),['brood',S('Up, up! You cannot reach me up here, egg-thief!','You cannot reach me up here!')]],
              [S('Brood Fury!','Angry mother!'),S('She charges twice and flies home more often. Knock her down again!','She is fast now! Knock her down!'),['brood',S('My children! Avenge your mother!','My babies! Help me!')]]],
   init(e){ e.nestT=99; e.knock=0; },
   onPhase(e,i){ e.nestT=0.5; },
@@ -882,7 +882,7 @@ function broodNestLeave(e,knocked){
   const N=e.nest, a=angTo(N.x,N.y,player.x,player.y), r=(N.r||0)+46, q={x:N.x+Math.cos(a)*r,y:N.y+Math.sin(a)*r}, C=bossCtx(e);
   if(C.A) arenaHold(C.A,q,e.r+30);
   e.nst='down'; e.knocked=knocked; e.downX=q.x; e.downY=q.y;
-  if(knocked){ shake(8); SFX.play('hurt'); emit(e.x,e.y-30,20,{col:'240,150,180',glow:false,smin:40,smax:160,lmin:.4,lmax:.9,zmin:2,zmax:4}); ftext(e.x,e.y-e.r-40,S('She tumbled out of her nest!','She fell out!'),'#ffe066',16); bossSay(e,'brood',S('My nest! You horrid little ember!','My nest!'),3); }
+  if(knocked){ shake(8); SFX.play('hurt'); emit(e.x,e.y-30,20,{col:'240,150,180',glow:false,smin:40,smax:160,lmin:.4,lmax:.9,zmin:2,zmax:4}); ftext(e.x,e.y-e.r-40,S('She tumbled out of her nest!','She fell out!'),'#ffe066',16); bossSay(e,'brood',S('My nest! You horrid little egg-thief!','My nest!'),3); }
 }
 // ---------- Gloamjaw: the bog floods and he hides in the muck; stride over it to strike him (or wait for him to lunge out)
 defineFoe('gloamjaw',{hp:actIHp(1150),phases:[0.66,0.33],
@@ -929,7 +929,7 @@ function gloamPool(e,dt){
       e.tele=null; e.alpha=1; e.invuln=false; e.sub=false; e.noClip=false; shake(10); SFX.play('boom');
       if(d<e.r+54+p.r*0.6&&!airborne()) hurtPlayer(bdmg(18),e.x,e.y,400);
       emit(e.x,e.y,30,{col:'90,120,60',glow:false,smin:80,smax:260,lmin:.4,lmax:.8,zmin:3,zmax:7,grow:6}); G.rings.push({x:e.x,y:e.y,rad:e.r,max:240,speed:520,thick:18,dmg:0,kb:300});
-      if(e.shore){ e.pst='land'; e.landT=byDiff(7,6,5); e.state='recover'; e.st=0.6; bossSay(e,'gloam',S('Out you come, snack!','Got you!'),8); return; }
+      if(e.shore){ e.pst='land'; e.landT=byDiff(7,6,5); e.state='recover'; e.st=0.6; bossSay(e,'gloam',S('Here I come, snack!','Here I come!'),8); return; }
       e.pst='up'; e.upT=byDiff(3.4,3.0,2.6); e.spits=e.bph>=2?2:1; e.state='recover'; e.st=0.5; return;
     case 'up':   // surfaced in the muck: spits, open to a hit
       e.face=turnTo(e.face,a,3*dt); e.upT-=dt;

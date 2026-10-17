@@ -489,7 +489,7 @@ function forgeHammerTalk(){
   const opts=[];
   if(iron) opts.push({t:'Use one star-iron',tone:'brave',fn:make('iron'),then:STORY.maren.hammerMade});
   if(coins) opts.push({t:'Pay 150 coins',fn:make('coins'),then:STORY.maren.hammerMade});
-  opts.push({t:iron||coins?'Maybe later':'I’ll be back',fn:()=>{ no=true; },then:[['maren',iron||coins?`Suit yourself. The offer stands. So does the hammer rack.`:`Bring me one star-iron, or 150 coins for the good iron, and it's yours.`]]});
+  opts.push({t:iron||coins?'Maybe later':'I’ll be back',fn:()=>{ no=true; },then:[['maren',iron||coins?S(`All right, love. It'll be on the rack when you want it.`,`Okay. It will be on the rack.`):`Bring me one star-iron, or 150 coins for the good iron, and it's yours.`]]});
   const L=STORY.maren.hammerOffer, lines=(first?L.slice(0,-1):[]).concat([ch('maren',first?L[L.length-1][1]:`Still want that hammer? One star-iron, or 150 coins.`,opts)]);
   runDialogue(lines,()=>{ scene='play';
     if(made){ giveWeapon('hammer'); return; }

@@ -145,7 +145,7 @@ function cinderPlaces(){
   sign('a1_cm_sign0',7130,2830,'Cinder Mountain. The Throne of Cinders is at the very top. Stairs and ramps go up; the edges you can hop down are the quick way back.','Cinder Mountain. Climb to the top!');
   sign('a1_cm_sign1',7830,2330,'The winds are too strong for wings here. Hot air vents carry you up, so look for the glowing cracks. Also: the low ledge to the north wants a Double Jump.','No flying here. Look for vents. Double Jump the low ledge!');
   sign('a1_cm_sign2',7640,1940,'Step into the vent, jump and spread your wings. Ride the hot air up!','Jump in the vent and fly up!');
-  if(typeof reachChest==='function') reachChest('a1_cm_chest',8240,2318,{coins:70,xp:240,title:S('The mesa chest','Mesa chest'),sub:S('70 coins, and a fine view of the stairs','70 coins!'),say:[S(`A little flat-topped rock with a chest on it. Only a double jump gets up here.`,`A rock with a chest on top. Two jumps got you here!`),S(`Inside: 70 coins and a note. "If you can read this, you can jump twice. Show-off." Ha.`,`70 coins and a note: "Show-off!" Ha.`)]});
+  if(typeof reachChest==='function') reachChest('a1_cm_chest',8240,2318,{coins:70,xp:240,title:S('The mesa chest','Mesa chest'),sub:S('70 coins, and a fine view of the stairs','70 coins!'),say:[S(`A little flat-topped rock with a chest on it. Only a double jump gets up here.`,`A rock with a chest on top. Two jumps got you here!`),S(`Inside: 70 coins and a note: "If you can read this, you can jump twice. Show-off."`,`70 coins and a note: "Show-off!"`)]});
   addLandmark({id:'a1_cm_view',k:'reach',x:7240,y:330,noNudge:true,prompt:S('Look out','Look'),always:false,hidden:()=>false,draw:cinderViewDraw,act:cinderView});
 }
 function cinderViewDraw(o,t){
@@ -161,7 +161,7 @@ function cinderView(o){
   const first=!G.found.a1_cm_view; G.found.a1_cm_view=true;
   // the whole valley spread out below: reveal the map
   for(const [x,y,r] of [[2600,9300,1500],[7300,7500,1500],[6000,7200,1200],[11800,9200,1400],[12200,4300,1400],[2400,4200,1400],[9200,5300,1300],[4600,6000,1300],[10000,2500,1100],[3500,2000,1100]]) fogReveal(x,y,r);
-  runDialogue([['narr',S('From the rim of the crater you can see all of Embermere: the smoke of Emberhollow, the bright eye of Lake Mirrow, the fog over the Mirefen.','You can see all of Embermere from here!')],['ash',first?S('Whoa. Everything looks so small. Even Grandpa\'s ego. Okay, not that.','Whoa. Everything looks tiny!'):S('Still the best view in the world.','Best view ever.')]],()=>{ scene='play'; setBanner(S('The view from the top','What a view!'),S('Your map fills in.','Your map fills in.'),2.6); if(first){ gainXp(150); saveGame(); } });
+  runDialogue([['narr',S('From the rim of the crater you can see all of Embermere: the smoke of Emberhollow, the bright eye of Lake Mirrow, the fog over the Mirefen.','You can see all of Embermere from here!')],['ash',first?S('Whoa. Everything looks so small. I can see the smoke from our forge!','Whoa! I can see home!'):S('Still the best view in the world.','Best view ever.')]],()=>{ scene='play'; setBanner(S('The view from the top','What a view!'),S('Your map fills in.','Your map fills in.'),2.6); if(first){ gainXp(150); saveGame(); } });
 }
 // ---------- the region banner: "Cinder Mountain" on its terraces (the crater keeps its own name)
 { const base=regionAt; regionAt=function(x,y){

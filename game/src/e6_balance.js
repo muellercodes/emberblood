@@ -126,7 +126,7 @@ defineAbility('stride',{act:1,icon:'a_stride',name:'The Tide Stride',short:'Wate
   how:()=>S('Walk right onto lakes and rivers. Sprinting on water is a little faster.','Walk on lakes and rivers!'),
   where:S('Waiting in the Trial of the Tide, on an island in Lake Mirrow.','In the Trial of the Tide, on Lake Mirrow.')});
 defineAbility('wings',{act:1,icon:'a_wings',name:'The Ember Wings',short:'Wings',skill:'strongwings',
-  how:c=>S(`Jump, then press ${c.jump} again in the air to take off. Press it once more to land. Keep an eye on the wing meter.`,`Jump, then press ${c.jump} again to fly. Press it again to land.`),
+  how:c=>S(`Jump and hold ${c.jump} to take off. Press it again to land. Keep an eye on the wing meter.`,`Jump and hold ${c.jump} to fly. Press it again to land.`),
   where:S('Waiting in the Trial of the Sky, up in the Drakeling Crags.','In the Trial of the Sky, up in the Crags.')});
 defineAbility('dbljump',{act:1,icon:'dbljump',name:'Double Jump',
   how:c=>S(`Press ${c.jump} again in midair to jump a second time. Hop up short ledges and clear wide gaps.`,`Press ${c.jump} again in the air. Jump twice!`),
@@ -141,7 +141,7 @@ defineAbility('claws',{act:2,icon:'a_claws',name:'Climbing Claws',skill:'climb2'
 defineAbility('grapple',{act:2,icon:'a_grapple',name:'Grapple Tail',skill:'hook2',
   how:()=>S('Throw your tail at a brass grapple post to pull yourself across gaps and up cliffs.','Throw your tail at a brass post to zip to it.')});
 defineAbility('shadow',{act:2,icon:'a_shadow',name:'Shadow Dash',skill:'dash2',
-  how:c=>S(`Roll (${c.roll}) while you sprint to melt into shadow and dash through bars, thin walls and attacks.`,`Run, then roll to dash through bars.`)});
+  how:c=>S(`Roll (${c.roll}) to melt into shadow and dash through moth curtains, shadow bars and light beams. Nothing can hit you mid-dash.`,`Roll to dash as a shadow. Slip through bars!`)});
 defineAbility('blaze',{act:3,icon:'a_blaze',name:'Blaze Breath',skill:'blaze2',
   how:c=>S(`Hold fire breath (${c.fire}) until it burns white-hot. Blaze Breath melts thick ice and frees frozen people.`,`Hold fire breath to make it white-hot. It melts ice!`)});
 defineAbility('windride',{act:3,icon:'a_windride',name:'Wind Riding',skill:'wind2',
@@ -149,9 +149,9 @@ defineAbility('windride',{act:3,icon:'a_windride',name:'Wind Riding',skill:'wind
 defineAbility('pound',{act:3,icon:'slam',name:'Ground Pound',skill:'pound2',
   how:c=>S(`Jump, then attack (${c.attack}) in midair to crash down. Smash cracked floors, stun foes and ring big bells.`,`Jump, then attack in the air to smash down.`)});
 defineAbility('dive',{act:4,icon:'a_dive',name:'Dive',skill:'dive2',
-  how:()=>S('Swim into deep water and dive under it. Watch your breath and look for sunken paths.','Dive under deep water. Watch your air!')});
+  how:c=>S(`In deep water, press ${c.roll} to dive under it. Watch your breath and look for sunken paths.`,`Press ${c.roll} in deep water to dive. Watch your air!`)});
 defineAbility('burrow',{act:4,icon:'a_burrow',name:'Burrow',skill:'burrow2',
-  how:()=>S('Dig into soft sand to travel under walls and slip past foes.','Dig into sand and go under walls.')});
+  how:c=>S(`On soft sand, press ${c.roll} to dig in, then travel under walls and slip past foes.`,`Press ${c.roll} on sand to dig in.`)});
 defineAbility('moonfire',{act:4,icon:'a_moonfire',name:'Moonfire',skill:'moon2',
   how:()=>S('Breathe silver moonfire to light moon lamps, show hidden bridges and burn away shadow.','Breathe moonfire to light moon lamps.')});
 

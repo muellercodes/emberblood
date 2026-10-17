@@ -161,7 +161,7 @@ function startAct(n,o){
 function actOneScreen(){
   const E=ENDINGS[G.choices.ending||'hero'], seen=Object.keys(store.get('eb_endings',{})).length;
   actScreen({tag:`Act I complete · Ending ${E.n} of 4`,title:E.title,
-    msg:S('The First Flame is quiet. But a warm red stone glows in the forge, and tonight Emberhollow has one more party. The story is not over yet!','Grandpa is quiet now. But the story is not over yet!')+' '+(seen<4?simplify(S(`You've found ${seen} of 4 endings so far.`,`You found ${seen} of 4 endings.`)):simplify(S('You found every ending!','You found every ending!'))),
+    msg:S('The First Flame is quiet. But a warm red stone still glows, and tonight Emberhollow has one more party. The story is not over yet!','Grandpa is quiet now. But the story is not over yet!')+' '+(seen<4?simplify(S(`You've found ${seen} of 4 endings so far.`,`You found ${seen} of 4 endings.`)):simplify(S('You found every ending!','You found every ending!'))),
     next:continueLanternNight,nextLabel:S('Continue the story','Keep going!'),exploreLabel:S('Keep exploring Embermere','Explore Embermere'),
     explore:()=>{ G.flags.c_wait=0; setBanner(S('Free roam','Free roam'),S('Explore Embermere. Tonight is Lantern Night, and Yara will send word.','Explore! Yara will send word tonight.'),3.4); }});
 }
@@ -233,12 +233,12 @@ const HSAY=[
   [`Ooh, bouncy roofs! Emberhollow has the best roofs.`,`Ooh, bouncy roofs!`],
   [`Sorry about the barrels! Not really!`,`Sorry about the barrels!`],
   [`Still there? You're fast for someone with a tail!`,`Fast, for a tail!`],
-  [`Cozy house. Is this one yours? Nice chimney!`,`Is this your house? Nice!`],
+  [`Cozy little village. I can see why you like it here!`,`Cozy village!`],
   [`Mmm, a bakery! It smells amazing. No time!`,`A bakery! Yum! No time!`],
   [`This way! No, that way! Ha!`,`This way! No, that way!`],
   [`Round the pond we go! Mind the frogs!`,`Round the pond! Mind the frogs!`],
   [`Still following? You're very stubborn. I like that.`,`Still here? You're stubborn!`],
-  [`Almost there! Well. I'm almost there. You're almost here.`,`Almost there!`]
+  [`Almost there! Well, I am.`,`Almost there!`]
 ];
 const HWAIT=[[`Yoo-hoo! Up here!`,`Up here!`],[`I can wait. I'm very patient. For a thief.`,`I can wait!`],[`*yawns* Are you coming?`,`*yawn* Coming?`],[`Lovely night for a chase!`,`Nice night for a chase!`]];
 const HSHOUT=[[`Thief! THIEF!`,`Thief!`],[`She went that way!`,`That way!`],[`My hat! She bounced on my hat!`,`She bounced on my hat!`],[`Go get her, Ash!`,`Go, Ash!`],[`Was that a giant moth?`,`A giant moth?`],[`Not the roof! I just fixed the roof!`,`Not my roof!`]];
@@ -252,16 +252,16 @@ const festDecor=()=>!!G&&G.mode==='story'&&(G.stage==='c_fest'||G.stage==='c_clu
 const heartHome=()=>G.stage==='c_fest'&&!G.flags.c_stolen&&!HS.crash;
 // friends Ash helped come to the party (up to six stand on the green; the first two say hello in the opening scene)
 const GUESTS=[
-  {id:'bertram',q:'bun',t:[`Lantern Buns for everybody! They only explode a little. That's the fun part.`,`Lantern Buns! They only explode a little.`]},
+  {id:'bertram',q:'bun',t:[`Lantern Buns for everybody! Grandma Crumb's whole recipe, and Tilly helped me bake them.`,`Lantern Buns! Tilly and I baked them together.`]},
   {id:'juniper',f:'juniper_found',t:[`I mapped the whole festival, Ash. It's mostly snacks. The snacks are in the middle.`,`I mapped the party. It's mostly snacks.`]},
-  {id:'pell',q:'thief',t:[`I'm keeping one eye on my purse tonight. Old habit! Ha. Who would steal at a party?`,`I'm watching my purse tonight. Ha!`]},
+  {id:'pell',q:'thief',t:[`I'm keeping one eye on my purse tonight. Old habit! Who would steal at a party, though?`,`I'm watching my purse tonight!`]},
   {id:'hollis',q:'duchess',t:[`Duchess sends her love. She ate two party hats and a napkin. Best night of her life.`,`Duchess ate two party hats. She loves parties.`]},
   {id:'dell',q:'dell',t:[`I rowed all the way from Brindlecross! Well, I rowed, then I walked. The lake doesn't come this far.`,`I rowed here! Then I walked.`]},
   {id:'elka',q:'race',t:[`Race you to the cake! Ready, go! ...Okay, I already won. And ate some.`,`Race you to the cake! I won.`]},
   {id:'nib',q:'seek',t:[`I'm hiding! You can't see me! ...You can see me, can't you.`,`I'm hiding! Can you see me?`]},
   {id:'gorran',q:'mine',t:[`Brought you a lump of star-iron for the bonfire. It doesn't burn. It just sits there looking expensive.`,`I brought star-iron. It just looks shiny.`]},
   {id:'osric',q:'bounty',t:[`Captain Osric, on duty. Even at parties. ESPECIALLY at parties.`,`On duty, even at parties!`]},
-  {id:'moss',q:'moss',t:[`I came all the way out of the bog for this! My knees are grumpy. My heart is very happy.`,`I came out of the bog for this!`]}
+  {id:'moss',q:'moss',t:[`I came all the way out of the bog for this! My knees want a chair and a cup of tea.`,`I came out of the bog! My knees want a chair.`]}
 ];
 function guestList(){
   const out=[];
@@ -291,8 +291,8 @@ function festIntroLines(day){
   L.push(xl('narr',`That night, Emberhollow glowed. Paper lanterns on every roof. Music on the green. Somebody's goat was wearing a party hat.`,`That night, the village glowed. Lanterns everywhere! A goat in a party hat!`),
     xl('maren',`There's my kid! Come here. No, closer. I am hugging you and you can't stop me.`,`There's my kid! Come here for a hug!`),
     xl('ash',`Mom. Everybody's watching. Also my horns are stuck in your apron.`,`Mom! My horns are stuck in your apron.`),
-    xl('yara',`Welcome to Lantern Night, Ash. The party after the party. I counted the lanterns. Twice. Four hundred and twelve.`,`Welcome to Lantern Night! I counted the lanterns. 412!`),
-    xl('wren',`I came all the way from Brindlecross! I brought books. Nobody wanted books. Apparently this is a party.`,`I came from Brindlecross. I brought books. Nobody wanted books.`));
+    xl('yara',`Welcome to Lantern Night, Ash, the party after the party. Four hundred and twelve lanterns on the roofs. I counted them twice.`,`Welcome to Lantern Night! 412 lanterns. I counted!`),
+    xl('wren',`I left my library for a whole night! I brought books to a party. Tilly says that is not how parties work.`,`I brought books to a party. Tilly says that is wrong.`));
   for(const g of gs.slice(0,2)) L.push([g.id,S(g.t[0],g.t[1])]);
   if(G.flags.pip) L.push(xl('pip',`Mip! Mip mip!`,`Mip! Mip mip!`),xl('narr',`Pip has cake on his nose. He is extremely proud of it.`,`Pip has cake on his nose. He is proud.`));
   if(e==='lantern') L.push(xl('c_grandpa',`Is that cake? Is that a cake shaped like YOU? May I eat the tail?`,`Is that a cake shaped like you? Can I eat the tail?`),xl('maren',`After the fireworks, Grandpa. And wipe your feet.`,`After the fireworks, Grandpa. Wipe your feet.`));
@@ -301,7 +301,7 @@ function festIntroLines(day){
   else L.push(xl('maren',`And look. The Ember Heart, all cozy on its little stand by the forge. It hums when I hammer. I think it likes the music.`,`Look, the Ember Heart! It hums when I hammer.`));
   L.push(xl('narr',`By the forge, the Ember Heart glows on its stand, warm and red, like a little sun that came to the party.`,`The Ember Heart glows by the forge. Warm and red.`),
     xl('yara',`It's time. The first firework is yours, Ash. The big rocket by the well. One breath. A GENTLE breath.`,`Time for fireworks! Light the big rocket. Gently!`),
-    xl('ash',`Gentle. I can do gentle. I have done gentle at least twice.`,`I can be gentle. I did it twice!`));
+    xl('ash',`Gentle. Not like the bakery curtains. I promise.`,`Gentle. I promise!`));
   return L;
 }
 function festStart(){
@@ -343,7 +343,7 @@ function theftLines(){
   const L=[xl('narr',`CRASH! Something tips over inside the forge. The Ember Heart's glow goes out like a blown candle.`,`CRASH! Something falls in the forge. The glow goes out.`),
     xl('maren',`The Heart! Ash, the Ember Heart is GONE!`,`The Heart! It's GONE!`),
     xl('narr',`On the forge roof stands a figure in a cloak like two great moth wings. A white mask hides her face. In her gloved hand, the Ember Heart glows.`,`On the roof stands a masked thief with moth wings. She has the Heart!`),
-    xl('c_thief',`Lovely fireworks. So loud. So bright. Nobody even looked at the forge. Thank you, Emberhollow!`,`Lovely fireworks! Nobody looked at the forge. Thanks!`),
+    xl('c_thief',`Lovely fireworks, Emberhollow. Everybody looked up, and nobody looked at the forge. Thank you!`,`Lovely fireworks! Nobody looked at the forge. Thanks!`),
     xl('ash',`Hey! That's ours! Put it back, or I'll... I'll ask you VERY firmly!`,`Hey! That's ours! Put it back!`)];
   if(G.flags.pip) L.push(xl('pip',`MIP!!`,`MIP!!`));
   L.push(xl('c_thief',`Catch me first, little dragon. If you can.`,`Catch me first, little dragon!`));
@@ -366,12 +366,12 @@ const CLUE_TALK={
   maren:()=>[xl('maren',`Ash! Are you hurt? Let me see your tail. All of it. Good.`,`Are you hurt? Let me see. Good.`),
     xl('ash',`She got away, Mom. On a boat with a moth sail. But she dropped this.`,`She got away on a boat. But she dropped this.`),
     xl('maren',`Brass. Lovely work. Look at those teeth, every one perfect. Whoever made this has a better workshop than mine, and I hate that.`,`Brass! Great work. Better than mine. I hate that.`),
-    xl('maren',`And Ash? The Heart is hot as a coal. I can't hold it without tongs. She picked it up like a bun.`,`The Heart is so hot! She held it like a bun.`),
+    xl('maren',`And Ash? That Heart goes hot as a coal in anyone's hands but ours. She picked it up like a bun.`,`The Heart burns other people. She held it like a bun!`),
     xl('ash',`So she's... fireproof?`,`So she's fireproof?`),
     xl('maren',`So she's something. Be careful.`,`She's something. Be careful.`)],
   yara:()=>[xl('yara',`Gearhaven. I haven't heard that name in fifty years. Let me see that.`,`Gearhaven! Let me see.`),
     xl('yara',`It's a port of tinkerers on the Clockwork Coast. Clock towers, steam, and the loudest gulls in the world. Down the cliffs and beyond the Southern Pass.`,`It's a port by the sea. Clocks, steam, loud gulls. Past the Southern Pass.`),
-    xl('yara',`The pass is the old road down the cliffs, just east of here by the signpost. Mind the steps. There are two hundred and six. I counted. Twice.`,`The pass is east, by the signpost. 206 steps. I counted.`)],
+    xl('yara',`The pass is the old road down the cliffs, just east of here by the signpost. Two hundred and six steps down. Mind every one of them.`,`The pass is east, by the signpost. 206 steps down.`)],
   wren:()=>[xl('wren',`A moth-wing cloak? A white mask? Ash. ASH! That was the Moth Mask!`,`Moth wings and a mask? That was the Moth Mask!`),
     xl('ash',`The what?`,`The what?`),
     xl('wren',`The thief of Gearhaven! A legend! I have three books about her. Two of them are wrong and one of them bit me.`,`A famous thief! I have three books about her. One bit me.`),
@@ -477,7 +477,7 @@ function leapStart(){
 }
 function leapTick(dt){
   const T=HS.thief; HS.t+=dt;
-  if(T&&T.mode==='dive'){ T.u+=dt/1.6; const u=Math.min(1,T.u); T.x=lerp(T.ax,T.bx,u); T.y=lerp(T.ay,T.by,u); T.z=Math.sin(Math.PI*u)*60+(1-u)*6; if(u>=1){ T.onShip=true; T.mode='ship'; try{ SFX.play('block',0.5); }catch(e){} bubble(T,S(`Bye bye, little dragon! Say hello to your mum!`,`Bye bye, little dragon!`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-70}); } }
+  if(T&&T.mode==='dive'){ T.u+=dt/1.6; const u=Math.min(1,T.u); T.x=lerp(T.ax,T.bx,u); T.y=lerp(T.ay,T.by,u); T.z=Math.sin(Math.PI*u)*60+(1-u)*6; if(u>=1){ T.onShip=true; T.mode='ship'; try{ SFX.play('block',0.5); }catch(e){} bubble(T,S(`Bye bye, little dragon! Say hello to your mom!`,`Bye bye, little dragon!`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-70}); } }
   if(HS.ship&&T&&T.onShip){ if(HS.t>2.1) HS.ship.vx=Math.min(95,(HS.ship.vx||0)+dt*40); T.x=HS.ship.x-6; T.y=HS.ship.y-12; }
   if(HS.t>2.2&&HS.t-dt<=2.2) setBanner(S(`She's gone`,`She's gone`),S('Something small and shiny rolled to your feet.','Something shiny is by your feet.'),3);
   if(HS.gear&&HS.gear.landed&&HS.t>1.2&&HS.phase==='leap') HS.phase='gear';
@@ -577,7 +577,7 @@ for(const n of [2,3,4,5]) ACTS[n]._kit0=ACTS[n].kit;
 defineStages(1,[{id:'done',
   idle:()=>G.flags.act1_done?S('Explore Embermere. Yara is planning something for tonight.','Explore! Yara has a plan for tonight.'):'',
   hint:()=>G.flags.act1_done?S(`Go wherever you like, Ash. Tonight is Lantern Night. I'll send Pebble when it's time.`,`Go explore! Tonight is Lantern Night.`):'',
-  soFar:()=>G.flags.act1_done?S('Vorlaxis is quiet at last. He left behind a warm red stone called the Ember Heart, and Mom keeps it safe in the forge. Tonight is Lantern Night.','Grandpa is quiet now. He left a warm stone, the Ember Heart. Tonight is Lantern Night.'):'',
+  soFar:()=>G.flags.act1_done?S('Vorlaxis is quiet at last. He left behind a warm red stone called the Ember Heart. Tonight is Lantern Night.','Grandpa is quiet now. He left a warm stone, the Ember Heart. Tonight is Lantern Night.'):'',
   marker:id=>!!G.flags.act1_done&&id==='yara'&&!HS.crow,
   // Yara or Mom can tell Ash about Lantern Night themselves, before Pebble finds him
   talk(n){
@@ -608,14 +608,14 @@ defineStages(2,[
     hint:()=>HS.on&&HS.phase==='rocket'?S(`One breath on the big rocket by the well, Ash. Gently. Everyone is waiting.`,`Breathe on the big rocket. Gently!`):G.flags.c_stolen?S(`She went over the rooftops from the forge! Follow her, Ash. Quickly!`,`Chase the thief! Start at the forge.`):S(`Lantern Night is in Emberhollow, Ash. Come home. There's cake. It looks like you.`,`Come home to Emberhollow! There's cake.`),
     soFar:()=>G.flags.c_stolen?S('During the Lantern Night fireworks, a masked thief in a moth-wing cloak stole the Ember Heart from the forge and ran off over the rooftops.','A masked thief stole the Ember Heart! She ran over the roofs.'):S(`It's Lantern Night in Emberhollow: music, lanterns and fireworks for the end of the thousand years.`,`It's Lantern Night! Music, lanterns and fireworks.`),
     mom:[S(`Lantern Night, Ash! Did you see the cake? I made the horns out of toffee.`,`Did you see the cake? The horns are toffee!`)],
-    yara:[S(`Four hundred and twelve lanterns. I may count them a third time.`,`412 lanterns. I might count again.`)],
+    yara:[S(`A thousand Lantern Days, Ash, and this is the best party of them all.`,`Best party in a thousand years!`)],
     talk(n){
       if(!HS.on) return false;
       if(HS.phase==='chase'||HS.phase==='leap'){ if(n.id==='maren'||n.id==='yara'||n.id==='wren'||G.npcs.includes(n)){ runDialogue([[n.id,pick([S(`Go, Ash! She's getting away!`,`Go! She's getting away!`),S(`After her! We'll catch up!`,`After her!`)])]],()=>{ scene='play'; }); return true; } return false; }
       if(HS.phase!=='rocket'&&HS.phase!=='intro') return false;
       if(HS.talked[n.id]) return false;
       const gl=GUESTS.find(g=>g.id===n.id);
-      const line=gl?S(gl.t[0],gl.t[1]):n.id==='maren'?S(`Go on, light it! I've got my fingers in my ears already.`,`Go on, light it!`):n.id==='yara'?S(`One breath on the big rocket. Gentle. I am counting.`,`One gentle breath on the rocket!`):n.id==='wren'?S(`I've read all about fireworks. Reading was quieter.`,`I read about fireworks. Reading is quieter.`):null;
+      const line=gl?S(gl.t[0],gl.t[1]):n.id==='maren'?S(`Go on, light it! I've got my fingers in my ears already.`,`Go on, light it!`):n.id==='yara'?S(`One breath on the big rocket, Ash. A gentle one.`,`One gentle breath on the rocket!`):n.id==='wren'?S(`I've read all about fireworks. Reading was quieter.`,`I read about fireworks. Reading is quieter.`):null;
       if(!line) return false;
       HS.talked[n.id]=true; runDialogue([[n.id,line]],()=>{ scene='play'; }); return true;
     },
@@ -639,7 +639,7 @@ defineStages(2,[
       return out;
     },
     marker:id=>(id==='maren'||id==='yara'||id==='wren')&&!G.flags['c_t_'+id],
-    hint:S(`Show that gear to your mother, to me and to Sister Wren. Between the three of us we know nearly everything. Nearly.`,`Show the gear to Mom, Yara and Wren.`),
+    hint:S(`Show that gear to your mother, to me and to Sister Wren. One of us will know where it came from.`,`Show the gear to Mom, Yara and Wren.`),
     soFar:S('The masked thief leapt off the southern cliffs onto a waiting ship and sailed away. She dropped a brass gear stamped GEARHAVEN.','The thief jumped onto a ship and sailed away. She dropped a gear. It says GEARHAVEN.'),
     enter(o){ if(o.load) return; HS.runIn=[]; for(const id of ['maren','yara','wren']){ const n=G.npcs.find(q=>q.id===id); if(n){ n.y-=440; n.x+=rand(-60,60); HS.runIn.push(n); } } },
     talk(n){
@@ -661,7 +661,7 @@ defineStages(2,[
     objectives:()=>[{text:S('Find Gearhaven','Find Gearhaven'),x:7000,y:26000}],
     hint:S(`Gearhaven is somewhere down the coast. Follow the road and look for clock towers. Pebble says hello.`,`Find Gearhaven. Look for clock towers.`),
     soFar:S('Ash took the Southern Pass down to the Clockwork Coast to find Gearhaven, the Moth Mask, and the stolen Ember Heart.','Ash went down to the Clockwork Coast to find Gearhaven and the thief.'),
-    enter(o){ if(o.load||o.prev!=='c_pass') return; later(3.4,()=>{ if(scene!=='play') return; const L=[xl('narr',`Two hundred and six steps later, the land opens out. White chalk cliffs. Salt grass. Gulls yelling about something important.`,`206 steps later: white cliffs, grass and loud gulls.`),xl('ash',`The Clockwork Coast. Okay, Moth Mask. Ready or not, here I come.`,`The Clockwork Coast. Here I come!`)]; if(G.flags.pip) L.push(xl('pip',`Mip!`,`Mip!`)); runDialogue(L,()=>{ scene='play'; }); }); }}
+    enter(o){ if(o.load||o.prev!=='c_pass') return; later(3.4,()=>{ if(scene!=='play') return; const L=[xl('narr',`Two hundred and six steps later, the land opens out into white chalk cliffs and salt grass, and the gulls are yelling about something important.`,`206 steps later: white cliffs, grass and loud gulls.`),xl('ash',`The Clockwork Coast. Okay, Moth Mask. Ready or not, here I come.`,`The Clockwork Coast. Here I come!`)]; if(G.flags.pip) L.push(xl('pip',`Mip!`,`Mip!`)); runDialogue(L,()=>{ scene='play'; }); }); }}
 ]);
 
 // ---------- words of our own: speakers, items, portraits, the Ember Heart in the epilogue
