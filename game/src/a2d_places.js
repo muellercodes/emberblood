@@ -44,7 +44,7 @@ function buildPlaces(){
   hives.forEach(([x,y],i)=>addLandmark({id:'hive'+i,k:'beehive',x,y,r:14,prompt:'Look at the beehive',smokeable:true}));
   const berries=[[3700,5500],[3000,5600],[3850,4950],[2800,4900],[3550,5800],[2650,5250]];
   berries.forEach(([x,y],i)=>addLandmark({id:'berry'+i,k:'frostberry',x,y,r:14,prompt:'Pick frostberries'}));
-  const signs=[[2780,8950,'↑ The War Camp & Whisperwood  ·  → Brindlecross  ·  ↖ Frostpine Highlands'],[7050,7150,'↑ The Obsidian Gate (please don’t)  ·  ↗ The Ashen Road  ·  ↘ The Mirefen  ·  ← Emberhollow'],[9050,5650,'← The Smoky Kettle  ·  → The Drakeling Crags  ·  ↑ Mountain of Certain Doom (not a metaphor)'],[12250,4700,'↓ Coppergulch Mining Camp. Mind the lizards.'],[2300,4500,'↖ Frostpine Lodge  ·  ↓ Hollis Farm (goats)  ·  Sheep are better. (signed, U.)'],[10900,9100,'→ Granny Moss. Follow the smell of tea.']];
+  const signs=[[2780,8950,'↑ The War Camp & Whisperwood  ·  → Brindlecross  ·  ↖ Frostpine Highlands'],[7050,7150,'↑ The Obsidian Gate (please don’t)  ·  ↗ The Ashen Road  ·  ↘ The Mirefen  ·  ← Emberhollow'],[9050,5650,S('↙ The Smoky Kettle  ·  → The Drakeling Crags  ·  ↖ Cinder Mountain (turn back now)','↙ The Smoky Kettle  ·  → The Drakeling Crags  ·  ↖ Cinder Mountain')],[12250,4700,'↓ Coppergulch Mining Camp. Mind the lizards.'],[2300,4500,S('↖ Frostpine Lodge  ·  ↘ Hollis Farm (goats)  ·  Sheep are better. (signed, U.)','↖ Frostpine Lodge  ·  ↘ Hollis Farm (goats)  ·  Sheep are better. (Ulf)')],[10900,9100,'→ Granny Moss. Follow the smell of tea.']];
   signs.forEach(([x,y,t],i)=>addLandmark({id:'sign'+i,k:'sign',x,y,r:8,text:t,prompt:'Read the sign'}));
   // ruins with breakable pots
   const ruins=[[8700,4700],[11000,4000],[12300,8600],[2900,6600],[6300,3900],[5000,8200]];

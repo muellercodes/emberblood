@@ -116,11 +116,11 @@ function trialMap(p,o){
   return {rooms:R,links:[['a','c','open'],['c','b','open'],['c','d','open'],['d','s','crack'],['c','e','lock'],['e','g','open'],['g','h','open'],['h','i','gate:h'],['e','f','open'],['f','k','gate:f'],['k','j','gate:k'],['j','boss','boss'],['boss','z','gate:boss']]};
 }
 CAVEMAP.leap=trialMap('l',{arena:'leap',secretAt:[2,4],tint:'#7ab05a',
-  signA:'TRIAL OF THE LEAP. For my children, when the fire wakes. Mind the roots. They bite. (Not really. Mostly.)',
+  signA:S('TRIAL OF THE LEAP. For my children, when the fire wakes. Mind the roots. They only nibble.','TRIAL OF THE LEAP. For my children. Mind the roots!'),
   foesC:[['slime',3],['kobold',2],['bat',2]],
   b:{kind:'free',reward:'key',sign:'These pits are hungry. Feed them something heavy. The rune stone puts the blocks back.'},
   d:{kind:'fight',foes:[['kobold',3],['bat',3]],loot:['tmap']},
-  signE:'Jump with C, or the JUMP button. Jump while you run to leap farther.',
+  signE:S('Press jump to hop over pits and spikes. Jump while you run to leap farther.','Press jump to hop. Run first to jump far.'),
   g:{kind:'free',loot:['chest'],spikes:'static',sign:'Spikes do not bite a dragon who is in the air.'},
   h:{kind:'miniboss',boss:['bramble','Bramblehorn'],foes:[['slime',2]]},
   i:{big:'boomerang'},
@@ -144,9 +144,9 @@ CAVEMAP.tide=trialMap('t',{arena:'tide',secretAt:[3,3],tint:'#5ab0d8',
 CAVEMAP.sky=trialMap('s',{arena:'sky',secretAt:[2,4],tint:'#d8c890',
   signA:'TRIAL OF THE SKY. The last gift is the hardest. You will need everything the other Trials gave you.',
   foesC:[['drakeling',2],['gust',2],['bat',2]],
-  b:{kind:'switches',need:'a boomerang',acc:['boomerang','arrow'],reward:'key',gust:{dir:[0,1],on:1.4,off:2.6,str:215},sign:'You will need a boomerang here. The wind blows toward the sky. Hide behind the pillars when it gusts.'},
+  b:{kind:'switches',need:'a boomerang',acc:['boomerang','arrow'],reward:'key',gust:{dir:[0,1],on:1.4,off:2.6,str:215},sign:S('You will need a boomerang here. The wind gusts down this hall. Hide behind the pillars when it blows.','You need a boomerang. Hide from the wind!')},
   d:{kind:'eyes',need:'a bow',onSolve:'vent',vent:{dir:[1,0],len:6},loot:['tmap'],sign:'You will need a bow here. Wake the eye and the vent will breathe a bridge of wind.'},
-  signE:'Jump, then jump again in the air to spread your wings. Jump once more to land.',
+  signE:S('Jump, then hold jump in the air to spread your wings. Press jump again to land.','Jump and hold jump to fly. Press jump to land.'),
   g:{kind:'free',gust:{dir:[-1,0],on:1.6,off:2.6,str:170},pick:'sky_feather',sign:'Fly! The wind will try to push you back. Fly anyway.'},
   h:{kind:'fight',foes:[['gust',3],['drakeling',2]],solveOnClear:true,npc:'puff'},
   i:{big:'bosskey'},
@@ -185,9 +185,9 @@ function buildTrialGates(){
   // people who turn up inside the Trials
   Object.assign(SPECIAL,{
     marlo:{id:'marlo',name:'Marlo the Magnificent',col:'#ffb86a',inside:'leap',kid:true,look:{shirt:'#7a3a8a',hair:'#3a2210',hat:'feather',hatc:'#7a3a8a',skin:'#c8946c',hairdo:'spiky',outfit:'tunic',cape:'#ffb86a',trim:'#ffd27a',freckles:true},
-      lines:[`I'm not stuck. I'm waiting. Strategically.`,`One day they'll write songs about me. Tamsin said she'd think about it.`]},
+      lines:[S(`I'm not stuck. Marlo the Magnificent is never stuck. I am resting between feats.`,`I am not stuck! I am resting.`),`One day they'll write songs about me. Tamsin said she'd think about it.`]},
     minnow:{id:'minnow',name:'Minnow Fisk',col:'#8ad8c8',inside:'tide',kid:true,look:{shirt:'#2a6a7a',hair:'#b8a070',hat:'rain',hatc:'#e8c03a',skin:'#e0b48c',hairdo:'pigtails',outfit:'coat',low:'#2a5a6a',trim:'#8ad8c8',hold:'rod'},
-      lines:[`Dad says the fish out here sing. They don't. I checked every single one.`,`Do turtles count as fish? Asking for science.`]}
+      lines:[S(`Dad says the fish out here sing. I've been listening all morning and I haven't heard one note.`,`Dad says these fish sing. I have not heard one.`),S(`Do turtles count as fish? Because I've caught three turtles.`,`Do turtles count as fish?`)]}
   });
 }
 // a person who belongs to a Trial room, once they are here at all
@@ -305,7 +305,7 @@ function trialUpdate(dt,R){
   trialPuzzles(dt);
   // pickups and the warp home
   for(const o of A.objs){
-    if(o.k==='tpick'&&!G.found[o.id]&&dist(p.x,p.y,o.x,o.y)<34&&!airborne()){ G.found[o.id]=true; giveItems({[o.item]:1},true); jingle('item','chest'); const n=G.items[o.item]||1; setBanner(ITEM_NAMES[o.item]||o.item,o.item==='tide_pearl'?`${n} of 3 glow pearls`:o.item==='marlo_hat'?'Marlo will be so happy. Magnificently happy.':'A soft white feather. It hums when the wind blows.',2.2); emit(o.x,o.y,18,{col:'255,240,200',ang:-Math.PI/2,spread:1,smin:30,smax:120,lmin:.4,lmax:.8,zmin:1.5,zmax:3,rise:20}); if(o.item==='sky_feather') addCoins(30,o.x,o.y); questPoke(); saveGame(); }
+    if(o.k==='tpick'&&!G.found[o.id]&&dist(p.x,p.y,o.x,o.y)<34&&!airborne()){ G.found[o.id]=true; giveItems({[o.item]:1},true); jingle('item','chest'); const n=G.items[o.item]||1; setBanner(ITEM_NAMES[o.item]||o.item,o.item==='tide_pearl'?`${n} of 3 glow pearls`:o.item==='marlo_hat'?S('Marlo will be glad to get this back.','Marlo will want this back!'):'A soft white feather. It hums when the wind blows.',2.2); emit(o.x,o.y,18,{col:'255,240,200',ang:-Math.PI/2,spread:1,smin:30,smax:120,lmin:.4,lmax:.8,zmin:1.5,zmax:3,rise:20}); if(o.item==='sky_feather') addCoins(30,o.x,o.y); questPoke(); saveGame(); }
     if(o.k==='twarp'&&trialDone(id)&&!T.warping&&dist(p.x,p.y,o.x,o.y)<30){ T.warping=true; SFX.play('shrine'); flashA=0.5; flashCol='255,230,170'; const nm=(trialInfo(id)||A.def).name; later(0.15,()=>{ if(AREA&&dunRoot(AREA.def.id)===id){ exitArea(); setBanner(nm,'Ember’s warp sets you down outside.',2.2); } }); }
   }
   // Puff the hatchling follows Ash to the nest
@@ -326,7 +326,7 @@ function onTrialRoom(R){
   if(R.kind==='start'&&first) talk(STORY['trial_'+id+'_in']);
   if(R.kind==='shrine'&&first&&TR&&TR.abil&&!hasAbil(TR.abil)) talk(STORY['trial_'+id+'_shrine']);
   if(R.kind==='tboss'&&!R.solved&&TR&&TR.boss) trialBossStart(R);
-  if(R.kind==='reward'&&first&&TR&&!trialDone(id)) taunt('ember',pick([`You did it, little ember. Come. Touch the altar.`,`The altar is for you. It always was.`]));
+  if(R.kind==='reward'&&first&&TR&&!trialDone(id)) taunt('ember',pick([`You did it, little ember. Come. Touch the altar.`,`Go on, touch the altar. I made it for you.`]));
   if(R.nest&&G.flags.puff_found&&!G.flags.puff_home) setBanner('A nest!','Bring Puff close to it.',2);
 }
 // Ash on the special floors: pits and crumbled tiles drop him, deep water and chasms hold him back, spikes sting

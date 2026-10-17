@@ -81,12 +81,12 @@ const V9_TPL={"w_a":["...............","....l..........","...............",".##.
 // Whisperwood Hollow: living roots that grow back unless a lit lantern-pod keeps them away, spore pods that light the dark,
 // a cracked floor down to the Root Cellar. The Heartroot needs all three heart pods (one upstairs, two in the cellar).
 CAVEMAP.whisper={dun:{save:'a1_whisper',regrow:7,pods:{heart:3},floors:[{id:'1',name:S('The Hollow','The Hollow')},{id:'b1',area:'whisper_b1',name:S('The Root Cellar','The Root Cellar')}],
-    story:{in:[['ash',S(`Juniper? JUNIPER! ...Just bats. And roots. So many roots.`,`Juniper? Just bats. And roots!`)],['ash',S(`The roots are moving. That is fine. That is totally fine.`,`The roots move. That is fine!`)]]}},
+    story:{in:[['ash',S(`Juniper? JUNIPER! ...Just bats, and a whole lot of roots.`,`Juniper? Just bats. And roots!`)],['ash',S(`Did that root just move? Roots are not supposed to move.`,`Did that root move?!`)]]}},
   rooms:{
-    a:{at:[1,3],kind:'start',tpl:V9_TPL.w_a,sign:S(`Juniper went in here. So did the roots. Roots hate fire. Lantern-pods hate the dark. Breathe on both.`,`Roots hate fire. Breathe on the roots and the pod.`)},
+    a:{at:[1,3],kind:'start',tpl:V9_TPL.w_a,sign:S(`Chalk on the wall, in Juniper's writing: "Roots hate fire. Lantern-pods hate the dark. Breathe on both. J."`,`Juniper wrote: "Burn the roots. Light the pod."`)},
     b:{at:[1,2],kind:'pods',tpl:V9_TPL.w_b,sign:S(`Roots grow back fast in the Hollow. Burn them, then run! A lit lantern-pod nearby keeps them gone.`,`Burn the roots, then run! Then light the pod.`)},
     c:{at:[0,2],kind:'fight',tpl:V9_TPL.w_c,foes:[['slime',3],['bat',2]],loot:['dmap'],solveOnClear:true,sealChest:true},
-    d:{at:[2,2],kind:'free',tpl:V9_TPL.w_d,sign:S(`The floor here is very thin. Something lives underneath. (It is the Root Cellar. The Root Cellar lives underneath.)`,`The floor is thin. The cellar is under it.`)},
+    d:{at:[2,2],kind:'free',tpl:V9_TPL.w_d,sign:S(`The floor here is thin and cracked. The Root Cellar is right underneath.`,`The floor is thin. The cellar is under it.`)},
     e:{at:[0,3],kind:'secret',loot:['page:p1','coins']},
     f:{at:[1,1],kind:'free',tpl:V9_TPL.w_f,sign:S(`THE HEARTROOT. It drinks the light of three lantern-pods, one up here and two in the cellar below. Light all three, then burn it.`,`The Heartroot needs three pods lit. Then burn it!`)},
     g:{at:[0,0],kind:'pods',tpl:V9_TPL.w_g,foes:[['slime',2]],loot:['compass']},
@@ -122,12 +122,12 @@ CAVEMAP.mirrow={dun:{save:'a1_mirrow',water:{start:2},carry:{cv_mirrow_d_treat:'
 // The Oath's Hidden Tunnel: mine carts on rails, switch points set by a lever in the guard post, Oath guards with lantern
 // eyes (get seen and the doors slam), a timed gate the cart has to beat, an ore chute with a moving lift and belts.
 CAVEMAP.tunnel={dun:{save:'a1_tunnel',
-    story:{in:[['ash',S(`Rails, carts and lanterns. The Oath has been busy down here.`,`Rails and carts. The Oath was busy!`)],['ash',S(`If a guard sees me, they will ring every bell in the place. Sneaky Ash. Very sneaky.`,`I must sneak. Sneaky Ash!`)]]}},
+    story:{in:[['ash',S(`Rails, carts and lanterns. The Oath has been busy down here.`,`Rails and carts. The Oath was busy!`)],['ash',S(`If a guard sees me, they'll ring every bell in the place. Time to be sneaky.`,`I must sneak past the guards!`)]]}},
   rooms:{
-    a:{at:[1,3],kind:'start',tpl:V9_TPL.t_a,cartDir:'w',sign:S(`OATH TUNNEL. AUTHORIZED KOBOLDS ONLY. Mine carts: press E to ride. Please do not ride carts into walls. (Gerald, we mean you.)`,`Ride carts with E. Do not crash into walls!`)},
+    a:{at:[1,3],kind:'start',tpl:V9_TPL.t_a,cartDir:'w',sign:S(`OATH TUNNEL. AUTHORIZED KOBOLDS ONLY. Mine carts: climb in to ride. Please do not ride carts into walls. (Gerald, we mean you.)`,`Climb in a cart to ride. Do not crash into walls!`)},
     b:{at:[1,2],kind:'rails',tpl:V9_TPL.t_b,cartDir:'n',timed:10,puzzle:true,sign:S(`LOADING DOCK. The vault gate in the Lamp Hall opens for ten seconds when the switch is struck. The cart is quick. Are you?`,`Hit the switch. Ride fast to the vault!`)},
     c:{at:[0,2],kind:'fight',tpl:V9_TPL.t_c,foes:[['cultist',2],['kobold',3]],loot:['dmap'],solveOnClear:true,sealChest:true},
-    d:{at:[2,2],kind:'treasure',tpl:V9_TPL.t_d,loot:['compass'],puzzle:true,movers:[{a:[3,7],b:[8,7],w:2,h:2,speed:60,wait:1.2}],sign:S(`ORE CHUTE. Mind the lift. Mind the belts. Mind the big hole. Mostly mind the big hole.`,`Ride the lift. Walk against the belts.`)},
+    d:{at:[2,2],kind:'treasure',tpl:V9_TPL.t_d,loot:['compass'],puzzle:true,movers:[{a:[3,7],b:[8,7],w:2,h:2,speed:60,wait:1.2}],sign:S(`ORE CHUTE. Mind the lift, mind the belts, and most of all, mind the big hole.`,`Ride the lift. Walk against the belts. Mind the hole!`)},
     e:{at:[0,1],kind:'stealth',tpl:V9_TPL.t_e,levers:[{at:[2,1],room:'g',point:[7,6]}],guards:[{path:[[1,8],[13,8]],wait:1.2,speed:50},{path:[[5,1],[13,1]],wait:1.6,speed:44}]},
     f:{at:[0,3],kind:'secret',loot:['page:p8','coins']},
     g:{at:[1,1],kind:'rails',tpl:V9_TPL.t_g,points:{'7,6':2},puzzle:true,sign:S(`SWITCHYARD. The points lever is in the guard post, where nobody can touch it. Signed, the guards.`,`The lever is in the guard post.`)},
@@ -289,7 +289,7 @@ function buildCaveRooms(A,def){
       else if(lk==='relic'){ const p=P(R.ox+8,R.oy+3); A.objs.push({k:'relic',x:p.x,y:p.y,id:def.id+'_relic',r:16}); A.lights.push({x:p.x,y:p.y,r:220,i:0.85}); }
       else if(lk==='coins'){ for(let n=0;n<3;n++){ const p=freeSpot(); A.objs.push({k:'coinpile',x:p.x,y:p.y,id:`cv_${SK}_${k}_coin${n}`,n:6+def.level*2}); } }
       else if(lk==='treat'){ const p=freeSpot(); A.objs.push({k:'treatpick',x:p.x,y:p.y,id:`cv_${SK}_${k}_treat`}); }
-      else if(lk==='rock'){ const p=freeSpot(); A.objs.push({k:'rock',x:p.x,y:p.y,id:`cv_${SK}_${k}_rock`,egg:{k:'rock',label:'Look at the rock',say:['A rock with a tiny hat. A note: "This is Gregory’s cousin, Kevin. He is also very well behaved."']}}); }
+      else if(lk==='rock'){ const p=freeSpot(); A.objs.push({k:'rock',x:p.x,y:p.y,id:`cv_${SK}_${k}_rock`,egg:{k:'rock',label:'Look at the rock',say:[S('A rock with a tiny hat painted on, tucked in a nook. A note: "KEVIN. He guards the deep seam. Do not move Kevin. G."','A rock in a painted hat. "KEVIN. Do not move him. G."')]}}); }
     }
     if(R.reward==='key'){ R.keyAt=X; if(R.solved&&!cf(`cv_${SK}_${k}_keytaken`)) spawnKey(A,def,R); }
     if(R.npc) A.npcHere={id:R.npc,x:(spot('N')||P(R.ox+8,R.oy+4)).x,y:(spot('N')||P(R.ox+8,R.oy+4)).y};
@@ -482,7 +482,7 @@ function caveObjAct(o){
   if(o.tobj) return trialObjAct(o);
   if(o.k==='cgate'){
     if(o.type==='boss'&&!o.opened){ if(G.found['bkey_'+caveDsid(A.def)]){ o.opened=true; G.found[o.id]=true; refreshCaveGates(); jingle('secret','chest'); shake(6); setBanner('The great door opens','Something enormous is waiting inside.',2.4); saveGame(); } else say(A.def.trial?`A great door, carved with the face of a sleeping dragon. Its lock is shaped like a flame. The Guardian Key for it is hidden somewhere in this Trial.`:S(`A great door with a lock shaped like a flame. The Boss Key for it is hidden somewhere in this dungeon. Look for a big chest.`,`A big locked door. Find the Boss Key. It is in a big chest.`)); return true; }
-    if(o.type==='roots'&&!o.opened){ say(`Thick old roots grow right across the way. They look very dry. Very, very burnable.`); return true; }
+    if(o.type==='roots'&&!o.opened){ say(S(`Thick old roots grow right across the way. They look dry enough to burn.`,`Dry roots block the way. Burn them!`)); return true; }
     if(o.type==='lock'&&!o.opened){ if(A.keys()>0){ G.found['keys_'+caveDsid(A.def)]=A.keys()-1; o.opened=true; G.found[o.id]=true; refreshCaveGates(); SFX.play('chest'); setBanner('Unlocked','',1.4); saveGame(); } else say(`A heavy door with a keyhole. Somewhere in this cave there's a small key that fits it.`); return true; }
     if(o.type==='crack'){ say(`Cracks run all through this wall, and a cold draft whistles out of them. A good roar might bring it down. Or a lot of fire.`); return true; }
     if(o.type==='gate'){ const R=A.rooms[o.gateRoom]; say(`A sealed stone door. ${R?({blocks:'Something about blocks and the plates on the floor in another room.',braziers:'Carved flames run around the frame. Light every brazier in the next room.',torches:'Four little symbols are carved into it. Light the torches in the right order.',dark:'It needs light.',lever:'There must be a lever somewhere.',boss:'It opens when the guardian falls.',miniboss:'It opens when the guardian falls.',tboss:'It opens when the guardian of the Trial falls.',switches:R.need?`A crystal switch is carved on it. You will need ${R.need} to reach the switches.`:'A crystal switch is carved on it. Strike every switch in that room.',eyes:'A stone eye is carved on it. Wake every eye in that room with an arrow.',tide:'Waves are carved on it. The water in that room holds the answer.',vents:'A little cloud is carved on it.'}[R.kind]||''):''}`); return true; }
