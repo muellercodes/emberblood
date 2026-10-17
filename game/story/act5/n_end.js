@@ -179,6 +179,7 @@ chapter({
       ['narr', 'You wake up in the grass on the green in Emberhollow. Somebody has tucked a blanket round you. Pip is asleep on your head.', 'You wake up on the green at home. Pip sleeps on your head.'],
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
         ['narr', 'Behind the forge, something very big and very cold is snoring.', 'Behind the forge, a big cold dragon snores.'] ] },
+      { place: ['maren', 'player', [62, 8]] },   // (Mom has come out to find Ash, for this scene)
       ['maren', 'There you are. You slept the whole way home. It is Lantern Day, and you are late.', 'You slept all the way home. It is Lantern Day!'],
       ['narr', 'Round the green the lanterns are lit. All four of them.', 'The lanterns are lit. All four!', { if: 'solved n5_fourth_lantern', ref: 'n5_green_post' }],
       ['ash', 'Mom? ...The moon came back.', 'Mom? The moon came back.'],

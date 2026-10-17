@@ -769,15 +769,19 @@ function s10Prompts(offer){
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceShown(P)) continue;
     const k=P.kind; if(!['examine','sign','door','prop','chest','gate'].includes(k)) continue;
-    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line), and only
-    // when no gate library built it (e10c_gates says `locked` itself when Ash pushes against the gate)
-    if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
+    // a gate only has a prompt of ours while it is shut and Ash lacks its power (it says its `locked` line); a gate the
+    // gate library built is shut while gateIsOpen says so, and its prompt sits where the power is used (I3: a kid
+    // walking past learns what it needs, not only one who pushes into it)
+    let gAt=null;
+    if(k==='gate'){ if(!P.locked||!s10GateLocked(P)) continue;
+      if(P._built){ try{ if(typeof gateIsOpen==='function'&&gateIsOpen(id)) continue; const I=typeof gateInfo==='function'?gateInfo(id):null; if(I&&I.door) gAt={x:I.door.x,y:I.door.y}; }catch(e){ continue; } }
+      else if(s10World(id)==='open') continue; }
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
     // (a thing already looked at that no step waits for answers only when Ash stands at it: its prompt no longer hides
     //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
     const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
-    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    const at=gAt||s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
     // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)
