@@ -80,6 +80,8 @@ chapter({
         { do: 'examine n5_grey_scale' },
         { do: 'examine n5_well' },
         { do: 'goto n5_chimney 320', if: 'choice greymane=ally', scene: 'n_grey_bye' },
+        // a kid who ran past Ember's flame stone into the Echo 1 fight can still find its clues (it sparkles)
+        { do: 'examine n5_flame_stone', if: '!clue n5_ember_moth' },
       ] },
     { id: 'who_moth', do: 'deduce n5_who_moth', marker: 'n5_chimney', obj: ['Work out who the little grey moth is, in the Case Book', 'Open the Case Book'],
       hint: ['Open the Case Book (the book button, or B). Think about the fourth post, the flame stone and what Ember said.',

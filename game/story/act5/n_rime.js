@@ -34,6 +34,9 @@ chapter({
         // Moth Memory pane 3 (the Clockmaker's Rest, after Echo 2) read before the name was worked out
         { do: 'wait_for flag n_knows', if: '!solved n5_name', then: ['clue n5_pane3'] },
         { do: 'goto n5_u2 340', if: { any: ['choice c_vesper=friend', 'flag n5_vesper'] }, scene: 'n_vesper_bye' },
+        // a kid who reached the Echo 2 fight before finding all the name clues can still find them (they sparkle)
+        { do: 'examine n5_clock_hub', if: '!clue n5_clock_word' },
+        { do: 'examine n5_folded_lantern', if: '!clue n5_night_moth' },
       ] },
     { id: 'longclimb', do: 'wait_for flag n_longclimb', marker: 'n5_u2', obj: ['Climb the Long Climb to the third ring', 'Climb up'],
       hint: ['Past the Mask Hall a grapple post now hangs over the void. Grapple across, then climb the icy face with your claws.',
