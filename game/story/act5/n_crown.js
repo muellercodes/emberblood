@@ -82,6 +82,7 @@ chapter({
       ['ash', 'The Heart. The door wants the Heart.', 'The door wants the Heart.'],
       ['pip', 'Mip?!'],
       ['ash', "I know. She WANTS me to bring it. That's the scary part. But Mom made it whole. Not her. Mom.", 'She wants the Heart. That is scary. But Mom fixed it. Not her.'],
+      ['narr', 'Behind you, on the last floating stone, the friends she hurt are waiting with you.', 'Her friends wait behind you.', { if: 'trust friends>=2' }],
       { do: ['emit n4fx:door_fx'] }, { sfx: 'shrine' },
       ['narr', 'You hold up the Ember Heart. Its three seams glow, violet, ice-blue and silver, round a core of warm orange. The door sighs open.', 'You hold up the Heart. It glows. The door opens.'],
     ],
