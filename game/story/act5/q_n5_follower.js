@@ -68,7 +68,7 @@ quest({
 
   step: [
     { id: 'tassel', do: 'examine n5_f_tassel', then: ['clue n5_chewed'],
-      obj: ['Look at the chewed tassel by the first Bridgefoot lantern', 'Look at the chewed tassel'] },
+      obj: ['Find out who is following you up the mountain', 'Who is following you?'] },
     { id: 'look', do: 'all', obj: ['Find out who is following you up the mountain', 'Who is following you?'],
       hint: ['Two-toed prints, a chewed tassel... Farmer Hollis knows more about goats than anybody.', 'Farmer Hollis knows goats.'],
       parts: [
