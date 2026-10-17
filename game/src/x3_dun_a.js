@@ -408,7 +408,7 @@ function d3aUpdate(A,dt){
   // Duchess in her attic air pocket
   const Dq=X.duch; if(Dq){ Dq.t=G.time; if(G.flags.m_duchess) X.duch=null; else if(scene==='play'&&!DLG&&dist(p.x,p.y,Dq.x,Dq.y)<110&&!p4Diving()){ X.duch=null; if(typeof m3pDuchessMeet==='function') m3pDuchessMeet(); else d3aBeat('duchess'); } }
   // the Moon Well: after Ember's gift, the first dive opens the market door again
-  if(G.found.m_lumen_eshut&&!G.found.m_lumen_dive1&&R&&R.id==='d'&&d3aIn('m_lumen')&&!P4.mv){ G.found.m_lumen_dive1=1; refreshCaveGates(); setBanner(S('Your first dive!','Your first dive!'),S('The Moon Well brought you up in the market fountain. The door to the hall is open again.','You swam through! The door opens again.'),3); saveGame(); }
+  if(G.found.m_lumen_eshut&&!G.found.m_lumen_dive1&&R&&R.id==='d'&&d3aIn('m_lumen')&&!P4.mv){ G.found.m_lumen_dive1=1; refreshCaveGates(); setBanner(S('Your first dive!','Your first dive!'),S('The old well brought you up in the market fountain. The door to the hall is open again.','You swam through! The door opens again.'),3); saveGame(); }
   // the plate door: once the block holds the plate, it stays open
   for(const o of A.gates){ if(o.type!=='plate'||!o.pr) continue; const fk=`d3plate_${caveSid(A.def)}_${o.pr}`; if(G.found[fk]) continue; const pl=A.objs.filter(q=>q.k==='plate'&&q.room===o.pr); if(pl.length&&pl.every(q=>q.pressed)){ G.found[fk]=1; refreshCaveGates(); setBanner(S('The stone door rolls open','The door opens!'),S('The block holds the plate down. The door will stay open now.','The block holds it. It stays open.'),2.8); saveGame(); } }
   // plates that hold a while after you step off (room plateHold), and the d3aplates rooms

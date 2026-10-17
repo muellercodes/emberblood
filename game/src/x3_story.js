@@ -377,7 +377,7 @@ m3sDef('m_rafi',[
   xl('m_rafi',`North on the old road, to the Worm Mouth. Bring water. Bring a hat. Bring a bigger hat.`,`Go north on the old road, to the Worm Mouth. Bring water. Bring a hat. A big one.`),
   xdo(()=>{ G.flags.m_rafi=1; })
 ]);
-m3sDef('m_worm_ring',[xl('iska',`A ring of quicksand. Fly over it, or make yourself a glass path with Blaze.`,`A ring of quicksand. Fly over it, or Blaze it into glass.`)]);
+m3sDef('m_worm_ring',[xl('iska',`That sand wants to swallow you, Ash! Fly over it, or Blaze it into a glass path.`,`A ring of quicksand. Fly over it, or Blaze it into glass.`)]);
 m3sDef('m_burrows_after',[xl('iska',`Back to Sable, Ash. Old Kiln might like that crumb. And then the Glasswall.`,`Back to Sable, Ash. Then the Glasswall.`)]);
 // Chapter 4, Mirrors: the second eclipse at Sable (6.8)
 m3sDef('m_eclipse2',[
@@ -401,7 +401,7 @@ m3sDef('m_eclipse2',[
 ]);
 // 6.8c Mom's letter (Pebble brings it after eclipse 2; on reading, Dell sails off to fetch her)
 const M3S_PB3=[
-  xl('maren',`Ash. I saw the moon tonight. Less than half of it is left. Iska told Yara, who told Pebble, who told me, that the Heart needs mending once you find the last piece.`,`Ash. Less than half the moon is left. Yara says the Heart needs fixing when you find the last piece.`),
+  xl('maren',`Ash. I saw the moon tonight. Less than half of it is left. And once you find the last piece, that Heart of yours will need mending.`,`Ash. Less than half the moon is left. The Heart needs fixing when you find the last piece.`),
   xl('maren',`Mending things is my job. I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`Fixing things is my job. I'm coming! Dell will fetch me. Don't argue. It's a letter.`),
   xl('maren',`Dell says he'll bring the boat round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`Dell will bring me to the old pier at the foot of the Heights. I'll find you. Eat something. Love, Mom.`),
   m3sIf('maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,()=>!!G.flags.dr_m_moth),
@@ -427,7 +427,7 @@ m3sDef('m_obs_in',[
   xl('narr',`The nights keep getting darker.`,`The nights get darker.`),
   xl('iska',`The Eclipse Dial. The astronomers could turn the whole dome to watch the sun, or the moon, or the eclipse. Each one changes the light in here. Each one changes what's real.`,`The Eclipse Dial. Sun, moon or eclipse. Each one changes the light in here. And what is real.`),
   xl('ash',`What's real changes?`,`What's real changes?`),
-  xl('iska',`You'll see. Be quick. Be clever. Be you.`,`You'll see. Be quick. Be clever. Be you.`),
+  xl('iska',`You'll see. Turn the dial and watch what the room does.`,`You'll see. Turn the dial and watch.`),
   xdo(()=>{ G.flags.m_obs_in=1; })
 ]);
 // 6.11 Hush, the Moon Shard, and the choice
@@ -518,7 +518,7 @@ m3sDef('m_peak',[
   xdo(()=>{ G.flags.m_done=1; G.tod=0.02; })
 ]);
 // on the pier afterwards: Mom (and the star-iron, the Fallen Star secret)
-STORY.m_pier_mom=[xl('maren',`Eat something first. The bridge will wait. Bridges are very patient. That's the whole point of them.`,`Eat something first. The bridge will wait. Bridges are patient.`)];
+STORY.m_pier_mom=[xl('maren',`Eat something first. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Eat something first. The bridge will wait.`)];
 STORY.m_stariron=[
   xl('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Give it here. Your sword will never be the same!`),
   xl('narr',`CLANG. CLANG. Mom folds the star-iron into your blade. It hums like a struck bell.`,`CLANG! Mom puts the star-iron in your sword. It hums.`),
@@ -529,7 +529,7 @@ STORY.m_stariron=[
 m3sDef('m_lumen_in',[
   xl('iska',`A whole city, under the sea. Lamps still in the windows. Someone loved this place very much.`,`A whole city under the sea. Lamps still in the windows. Someone loved it.`),
   xl('sedge',`(a sleepy, soggy voice from Ash's fire) Mmm? Is it wet? It's wet. Wake me when it's wetter.`,`(sleepy, from your fire) Is it wet? Wake me when it's wetter.`),
-  xl('sedge',`Ooh. Damp. I like it here already.`,`Ooh. Damp. I like it here.`)
+  xl('sedge',`...Ooh. Actually, this IS wet. I'll stay up.`,`Ooh. This IS wet. I will stay up.`)
 ]);
 m3sDef('m_lumen_mosaic',[
   xl('narr',`The three moon lamps flare. On the wall between them a silver mosaic lights up: a moon over a sea, and words in old letters.`,`The lamps light up a silver picture: a moon over the sea, and old words.`),
@@ -538,7 +538,7 @@ m3sDef('m_lumen_mosaic',[
 ]);
 m3sDef('m_lumen_shrine',[
   xl('ember',`Little ember! You came all the way across the sea. I came here once, too, a long time ago. The moon-priests were my friends.`,`Little ember! You came across the sea. I came here once too. The moon-priests were my friends.`),
-  xl('ember',`I hid this flame at the bottom of a well, so only someone brave enough to get wet would find it. Dragons hate getting wet. I made an exception.`,`I hid this flame in a well. Only someone brave enough to get wet would find it.`)
+  xl('ember',`I hid this flame at the bottom of a well, so only someone brave enough to get wet would find it. My tail was soggy for a week.`,`I hid this flame in a well. Only someone brave enough to get wet would find it.`)
 ]);
 m3sDef('m_lumen_gift',[
   xl('narr',`The flame is cool, not hot. It wraps around you like a bubble and settles in your chest. You take a breath. It tastes like the sea.`,`The flame is cool. It wraps you like a bubble. You breathe. It tastes like the sea.`),
@@ -580,7 +580,7 @@ m3sDef('m_duchess',[
 ]);
 STORY.m_zapp_taunt=[S(`Bzzzt!`,`Bzzzt!`),S(`Ooh, shiny. Shiny me.`,`Ooh, shiny me.`)];
 // the Sandworm Burrows (m_burrows): Burrow
-m3sDef('m_burrows_in',[xl('iska',`Tunnels. Sand. Bones. And something very big, breathing, somewhere below. Lovely.`,`Tunnels. Sand. Bones. Something big breathes down below. Lovely.`)]);
+m3sDef('m_burrows_in',[xl('iska',`Tunnels and bones, and something very big breathing somewhere under us. Keep your fire close, Ash.`,`Tunnels and bones. Something big breathes below. Stay close.`)]);
 m3sDef('m_burrows_shrine',[
   xl('ember',`Little ember! You found my sandiest flame. I came here once. A very big worm ate me.`,`Little ember! My sandiest flame. I came here once. A big worm ate me.`),
   xl('ash',`It ATE you?`,`It ATE you?`),
@@ -692,7 +692,7 @@ m3sDef('m_obs_museum',[
   xl('narr',`GRANDMA'S READING LAMP, EATEN YEAR 412. A VERY NICE LANTERN (BORROWED).`,`GRANDMA'S READING LAMP. A VERY NICE LANTERN (BORROWED).`),
   m3sIf('narr',`One label says: WICK'S FINEST LAMP, EMBERHOLLOW.`,`One says: WICK'S FINEST LAMP, EMBERHOLLOW.`,()=>!!G.choices.fennick)
 ]);
-m3sDef('m_obs_ante',[xl('iska',`Last door, little ember. One more lantern than you think you need.`,`Last door, little ember. One more lantern than you need.`)]);
+m3sDef('m_obs_ante',[xl('iska',`Hush is through this door, Ash. One more lantern than you think you need, remember?`,`Hush is through this door. One more lantern than you need.`)]);
 m3sDef('m_umber_intro',[
   xl('narr',`At a table set for one sits a moth as tall as a door, in a velvet cloak that is really his folded wings. He wears a monocle of moon-glass. On his plate is a lamp. He is eating it.`,`At a table sits a tall moth in a velvet cloak and a monocle. He is eating a lamp.`),
   xl('m_umberwing',`Crunchy. Oh! A guest. Charmed. Duke Umberwing, Captain of the Moth Knights, Keeper of the Door. Do wipe your feet.`,`Crunchy. Oh! A guest. I am Duke Umberwing, Keeper of the Door. Wipe your feet.`),
@@ -751,7 +751,7 @@ STORY.m_hints={
   m_moonpath:S(`Moonfire on the moon-glass stairs. Light the three moon braziers and the door at the top will open.`,`Moonfire the glass stairs. Light the three braziers. The door will open.`),
   m_observatory:S(`Sun, Moon, Eclipse. Turn the dial and the room changes. Light a lamp if a moth gets in your way. Moths always look.`,`Turn the dial to change the room. Light a lamp for moths. They always look.`),
   m_reforge:S(`Up to the Eclipse Lens, at the very top. Someone is coming up the stairs behind you. Someone with a hammer.`,`Go up to the Eclipse Lens at the top. Someone with a hammer is coming.`)};
-const M3S_YARA=[S(`Pebble says the moon is getting smaller. Pebble is very upset. Pebble has never been upset about anything. Hurry, Ash.`,`Pebble says the moon is shrinking. She is upset. Hurry, Ash.`)];
+const M3S_YARA=[S(`I counted the lanterns in the square tonight. We needed four more than last month. The moon is getting smaller, Ash. Hurry.`,`We need more lanterns every night. The moon is shrinking. Hurry, Ash.`)];
 const m3sHint=st=>()=>STORY.m_hints[st];
 const m3sStageCard={m_sail:['Act IV · Chapter 1',S('Across the Sea','Across the Sea')]};
 const m3sLit=()=>clamp(G.flags.m_moonpath_lit|0,0,3);
@@ -1532,7 +1532,7 @@ onTalk(n=>{
   if(n.id==='wren'&&!M3S_PRE.wren&&a===4&&!m3sSeen('m_wren')&&!G.items.m_book_raw){ m3sPlay('m_wren'); return true; }
   if(n.id==='dell'&&!M3S_PRE.dell1&&a===4&&!m3sSeen('m_dell1')&&reached('m_drift')&&!F.m_reforged){ m3sPlay('m_dell1'); return true; }
   if(n.id==='maren'&&F.m_maren){ if(G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; } if(F.m_done&&a===4){ m3sPlay('m_pier_mom'); return true; } }
-  if(n.id==='quill'&&F.m_maren&&a===4){ m3sPlay([xl('quill',`I'm measuring the peak. It keeps being taller than my numbers. Rude.`,`The mountain is taller than my numbers. Rude!`)]); return true; }
+  if(n.id==='quill'&&F.m_maren&&a===4){ m3sPlay([xl('quill',`I'm measuring the peak. I've started over four times, and it's taller every time.`,`The mountain keeps getting taller than my numbers!`)]); return true; }
   return false;
 });
 // rests: Oriel's whisper at the Moonpath Shrine ('warden' ending only)
