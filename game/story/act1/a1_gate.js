@@ -390,7 +390,8 @@ quest({
       parts: [
         { do: 'examine a1_ward_wax', scene: 'a1_wax_look' },
         { do: 'talk bertram', scene: 'a1_bertram_ran' },
-        { do: 'talk wren', scene: 'a1_wren_candles', if: 'stage>=wren' },
+        // (from stage oath on: at stage wren her first talk is the main story's, STORY.wren, which moves Ash on)
+        { do: 'talk wren', scene: 'a1_wren_candles', if: 'stage>=oath' },
       ] },
     { id: 'deduce', do: 'deduce a1_snuff_who', obj: ['Work it out in the Case Book', 'Open the Case Book'] },
   ],

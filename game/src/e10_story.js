@@ -1168,7 +1168,11 @@ function s10QuestStart(id,quiet){
   const q=S10.quests[id];
   if(!q){ if(QDEFS[id]&&!QDEFS[id]._s10){ if(!G.quests[id]) startQuest(id); return; } s10Err(`quest ${id} is not defined`); return; }
   if(G.quests[id]) return;
+  // (quiet: started by talking to the giver; the old "New side quest" banner would name the talk that is just
+  // playing, so it is left out: the step's own banner names the next thing to do once the scene ends)
+  const B0=G.banner, Q0=(G.bannerQ||[]).slice();
   startQuest(id); if(G.quests[id]) G.quests[id].step=s10QStepIdx(q);
+  if(quiet){ G.banner=B0; G.bannerQ=Q0; }
   storyEmit('quest_start:'+id);
 }
 // a data quest whose last step is done: done, banner, friendship, deed q_<id> (later acts read them)
