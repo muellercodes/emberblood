@@ -32,12 +32,21 @@ chapter({
   },
 
   place: {
+    // the frozen folk's own prompt is p3_frost's (it only says "frozen"): these two let Ash look closely, while the
+    // clue is not found yet and they are still frozen (Saga stands on the quay; Bo is on the chapel roof, looked at
+    // from the lane below)
+    f3_saga_look: { map: 2, at: [1150, 46900], r: 20, kind: 'examine', h: 66,
+      name: ['Saga the fisher, frozen on the quay', 'the frozen fisher girl'], prompt: ['Look closely at the fisher girl', 'Look at the fisher girl'],
+      say: 'f3_saga', if: 'stage>=f_thaw !flag f_thaw_f_saga !clue f3_looking_up' },
+    f3_bo_look: { map: 2, at: [1700, 46660], r: 40, kind: 'examine', h: 70,
+      name: ['Little Bo, frozen on the chapel roof', 'the boy on the roof'], prompt: ['Look at the boy on the roof', 'Look at the boy on the roof'],
+      say: 'f3_bo', if: 'stage>=f_thaw !flag f_thaw_f_bo !clue f3_bo_points' },
     // the red yarn at the foot of the tower's south face, left of the frozen door (it climbs the face to the top)
     f3_yarn_spot: { map: 2, at: [1886, 46904], r: 20, kind: 'examine', look: 'red_yarn', h: 60,
       name: ['a red yarn hanging down the tower', 'a red yarn'], aliases: ['the yarn', 'the red wool'],
       prompt: ['Look at the red yarn', 'Look at the red yarn'], say: 'f3_yarn_look', if: 'stage>=f_thaw' },
-    // on top of the bell tower (level 3), in the middle, so its prompt only shows from up there
-    f3_spyglass: { map: 2, at: [1912, 46758], r: 8, kind: 'examine', look: 'spyglass', h: 54,
+    // on top of the bell tower (level 3), at the front of the bell's roof, so its prompt only shows from up there
+    f3_spyglass: { map: 2, at: [1925, 46797], r: 8, kind: 'examine', look: 'spyglass', h: 54,
       name: ["the knitter's spyglass", 'the spyglass'], aliases: ['the spyglass', 'the telescope'],
       prompt: ['Look through the spyglass', 'Look through the spyglass'], say: 'f3_spyglass_look', if: 'stage>=f_thaw' },
     // the chapel's carved front (x2_world paints the dragon round the snowflake on it)
@@ -102,20 +111,22 @@ chapter({
 
   step: [
     // (x2_story plays the arrival, the old key f_rime_arrive, when Ash first comes within 600 px of the village)
-    { id: 'rime', do: 'goto f_rimeholm 520',
+    // (then: Brynja's clue, for a save made by the old code after f_hearth, which never found it; already found, it
+    // changes nothing)
+    { id: 'rime', do: 'goto f_rimeholm 520', then: ['clue f3_moth_flew'],
       obj: ['Go to Rimeholm and find out what happened', 'Go to Rimeholm'],
       hint: ['Rimeholm is out the West Gate and along the Rim Road, on the sea cliffs.', 'Rimeholm is on the sea cliffs. Take the Rim Road.'] },
     { id: 'look', do: 'all', obj: ['Find out who saw what froze Rimeholm', 'Who saw it happen?'],
       hint: ['Look at the frozen people. Look at the bell rope by the tower door. Look up. And look at the chapel: chapels remember things.',
         'Look at the people, the bell rope and the chapel.'],
       parts: [
-        { do: 'examine f_saga_ice', scene: 'f3_saga', then: ['clue f3_looking_up'] },
+        { do: 'examine f3_saga_look', then: ['clue f3_looking_up'] },
         { do: 'examine f_lm_bell', scene: 'f3_rope', then: ['clue f3_alarm_rope'] },
         { do: 'examine f3_yarn_spot', then: ['clue f3_yarn'] },
         { do: 'examine f3_chapel_spot', then: ['clue f3_chapel'] },
       ],
       extra: [
-        { do: 'examine f_bo_ice', scene: 'f3_bo', then: ['clue f3_bo_points'] },
+        { do: 'examine f3_bo_look', then: ['clue f3_bo_points'] },
         // Ylva wakes whenever she is thawed while this chapter runs (her scene, her scarf), even before the questions
         { do: 'wait_for event beat:ylva', if: 'near f_bell_tower 420', scene: 'f3_ylva_wake' },
       ] },

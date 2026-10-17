@@ -143,6 +143,9 @@ chapter({
   talk: {
     // the way round the frozen North Gate (the road north starts at the gate; the real way is by the river)
     f_brann: [
+      { if: 'stage=f_maze !flag f_northgate choice f3_moth=moth', fact: 'f_lm_northgate=frozen', once: true,
+        say: ["The Glacier Maze? Listen, moth. Dragon. Whatever you are. The North Gate's frozen. Go round: out the West Gate, over the Whitewater, then up the river onto the ice.",
+          'Listen, moth. Dragon. The North Gate is frozen. Go round by the West Gate and the river.'] },
       { if: 'stage=f_maze !flag f_northgate', fact: 'f_lm_northgate=frozen',
         say: ["North Gate's frozen solid, Emberblood. Go round: out the West Gate, over the Whitewater, then follow the river up onto the ice. The Glacier Maze is where the ice meets the lake.",
           'The North Gate is frozen. Go round by the West Gate and the river.'] },

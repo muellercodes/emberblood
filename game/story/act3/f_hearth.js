@@ -141,7 +141,10 @@ chapter({
       { if: 'flag f3_brynja !solved where_blaze', say: ['Look at my old girl, child. Look close. And ask Eider. He reads everything twice.',
         'Look at the Hearth. And ask Eider.'] },
     ],
+    // (Brann remembers what Ash said at the West Gate: G.choices.f3_moth)
     f_brann: [
+      { if: 'stage=f_hearth choice f3_moth=moth', say: ["Halt! Oh. It's the moth. I mean the dragon. I mean... carry on. The Hearthkeeper's at the Great Hearth.",
+        "Oh. It's the moth. I mean the dragon. Carry on."] },
       { if: 'stage=f_hearth', say: ['The Hearthkeeper is at the Great Hearth, Emberblood. Middle of town. Follow the warm.',
         'The Hearthkeeper is at the Great Hearth.'] },
     ],

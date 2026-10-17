@@ -101,12 +101,18 @@ chapter({
       ['tove', "That's moth-frost, Ash. Normal fire won't touch it. You'll need something hotter.", "That's moth-frost. You need a hotter fire."],
       ['ash', "Sorry, mitten man. I'll come back.", "Sorry, mitten man. I'll come back."],
     ],
-    // Hearthold's West Gate: a gap in the wall with no doors; Brann blocks it with his spear (8 lines)
+    // Hearthold's West Gate: a gap in the wall with no doors; Brann blocks it with his spear (8 lines on each branch).
+    // The answer to "are you a moth?" is G.choices.f3_moth ('no' or 'moth'): Brann remembers it (his talk below, in
+    // f_hearth and f_maze, and his bet in f_kindle's WHOOMPH).
     f_gate: [
       { place: ['f_brann', 'f3_west_gate'] },
       ['f_brann', 'HALT! Who goes there? State your name, your business, and whether you are a moth.', 'HALT! Who are you? Are you a moth?'],
-      ['ash', "Ash Emberblood. I'm here about the winter. And I'm not a moth.", "I'm Ash. I'm here about the winter. I'm not a moth."],
-      ['f_brann', 'That is EXACTLY what a moth would say.'],
+      { choose: 'f3_moth', ask: ['What do you say?', 'What do you say?'], pick: [
+        { t: ["I'm Ash Emberblood. I'm here about the winter. And I'm not a moth.", "I'm Ash. I'm not a moth."], tone: 'kind', v: 'no',
+          say: [['f_brann', 'That is EXACTLY what a moth would say.']] },
+        { t: ['Bzzzz. Yes. I am a very big moth.', 'Bzzz. I am a moth.'], tone: 'silly', v: 'moth',
+          say: [['f_brann', "A MOTH! ...Wait. Moths don't say bzzzz. Moths are SILENT. Nice try, moth.", "A MOTH! Wait. Moths don't say bzzz. Nice try."]] },
+      ] },
       ['f_brann', "...Hm. Moths don't have horns. Or tails. Is that smoke coming out of your nose?", "Hm. Moths don't have horns. Is that smoke from your nose?"],
       ['ash', 'Only when I sneeze.'],
       ['f_brann', "An Emberblood! A real one! Sorry about the spear. We're jumpy. See that guard out there? One of mine. On watch. Frozen. Very brave.",

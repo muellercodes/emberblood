@@ -48,8 +48,12 @@ chapter({
       ['narr', 'Up at the North Gate, the ice sags, drips, and slides off in one big slab. SPLOOSH. The gate swings open with a happy sigh.',
         'At the North Gate, the ice slides off. SPLOOSH! The gate swings open.', { do: ['set f_northgate'], ref: 'f_lm_northgate' }],
       ['f_brann', '(far off) My boots are full of gate! GUNNAR! You can stop licking things now!', 'My boots are full of gate! GUNNAR! Stop licking things!', { ref: 'f_lm_northgate' }],
-      ['f_brann', "It's that moth making all this snow, Emberblood. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",
-        { clue: 'f3_brann_bet' }],
+      { if: 'choice f3_moth=moth', then: [
+        ['f_brann', "It's that moth making all this snow. The BIG white one. Not you, moth-dragon. I'd bet my boots on it.", "It's that big white moth making the snow. Not you. I'd bet my boots!",
+          { clue: 'f3_brann_bet' }]],
+        else: [
+        ['f_brann', "It's that moth making all this snow, Emberblood. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",
+          { clue: 'f3_brann_bet' }]] },
       ['f_brynja', 'Rimeholm went quiet the night the moth came over. Not one letter since. Go and see, child. Out the West Gate and along the Rim Road, on the sea cliffs.',
         'Rimeholm went quiet when the moth came. Go and see. It is on the sea cliffs.', { promise: 'f_rimeholm', dir: ['f_hearthold', 'f_rimeholm', 'west'] }],
     ],

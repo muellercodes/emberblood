@@ -35,8 +35,8 @@ defineLook('red_yarn',{w:40,h:120,draw(g,x,y){
   g.save(); g.translate(x,y); g.lineCap='round';
   // the strand: a little wavy, stiff with frost, with icicle beads on it
   const pts=[]; for(let i=0;i<=14;i++){ const k=i/14; pts.push([Math.sin(k*9)*2.2*(1-k*0.4)+k*4,-k*104]); }
-  g.strokeStyle=A3A_INK; g.lineWidth=4; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke();
-  g.strokeStyle='#d63a34'; g.lineWidth=2.4; g.stroke();
+  g.strokeStyle=A3A_INK; g.lineWidth=5.6; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.stroke();
+  g.strokeStyle='#e8433c'; g.lineWidth=3.4; g.stroke();
   g.strokeStyle='rgba(255,255,255,.65)'; g.lineWidth=0.9; g.beginPath(); pts.forEach((p,i)=>i?g.lineTo(p[0]-0.6,p[1]):g.moveTo(p[0]-0.6,p[1])); g.stroke();
   for(let i=2;i<14;i+=3){ const p=pts[i]; g.fillStyle='#e6f6ff'; g.beginPath(); g.moveTo(p[0]-2,p[1]); g.lineTo(p[0]+2,p[1]); g.lineTo(p[0],p[1]+6); g.closePath(); g.fill(); g.strokeStyle='rgba(60,110,160,.5)'; g.lineWidth=0.8; g.stroke(); }
   // the ball of yarn at the bottom, frozen into a little lump of snow
