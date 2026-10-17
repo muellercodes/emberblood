@@ -46,7 +46,7 @@ chapter({
       ['narr', 'Snow slides off every roof in Hearthold at once. Somebody cheers. Somebody else gets snow down their shirt and screams. Then they cheer too.',
         'Snow slides off every roof. People cheer!'],
       ['f_brynja', "Ha! HA! Look at her! She hasn't burned like that since I was a girl!", "Ha! Look at her! She hasn't burned like that in years!"],
-      { if: 'flag pip', then: [
+      { if: 'flag pip !flag f_pip_warm', then: [
         ['narr', "Pip hops onto the edge of the Hearth, sniffs a blue ember, and licks it. Pip's belly starts to glow, warm and orange, like a tiny stove.",
           'Pip licks a blue ember. His belly glows warm, like a tiny stove.', { do: ['set f_pip_warm'] }]] },
       ['f_brynja', "She won't stay this bright, mind. Not while that purple storm sits on the mountain. But she'll hold now.",

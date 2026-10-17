@@ -49,6 +49,10 @@ chapter({
     f3_spyglass: { map: 2, at: [1925, 46797], r: 8, kind: 'examine', look: 'spyglass', h: 54,
       name: ["the knitter's spyglass", 'the spyglass'], aliases: ['the spyglass', 'the telescope'],
       prompt: ['Look through the spyglass', 'Look through the spyglass'], say: 'f3_spyglass_look', if: 'stage>=f_thaw' },
+    // what Ylva's spyglass shows on the Crown of Dread: the sleeping dragon (x2_story draws Glaciar there itself from
+    // f_glaciar on, so this one is only up to then)
+    f3_glaciar_asleep: { map: 2, at: [7300, 41290], kind: 'prop', look: 'f3_glaciar_asleep',
+      name: ['something long and white, asleep on the summit', 'something asleep on the summit'], if: 'stage>=f_thaw stage<f_glaciar' },
     // the chapel's carved front, on its west half (x2_world paints the dragon round the snowflake there; Bo's spot is
     // the east half, so each has its own place to stand)
     f3_chapel_spot: { map: 2, at: [1650, 46738], r: 20, kind: 'examine', h: 40,
@@ -194,10 +198,10 @@ chapter({
     // on top of the tower: the camera goes to the summit of Mount Dread
     f3_spyglass_look: [
       ['narr', "A brass spyglass on a little stand, frozen pointing at Mount Dread. You put your eye to it.", 'A spyglass, pointing at Mount Dread. You look.'],
-      { cam: 'f_crown', s: 1.6 },
+      { cam: 'f3_glaciar_asleep', s: 1.8, k: 1 }, { wait: 1.6 },
       ['narr', 'The summit. The purple storm puffs out... and stops. Then puffs out again. Slow, like someone breathing in their sleep.',
         'The storm puffs out. It stops. It puffs again. Like breathing.', { clue: 'f3_spyglass', ref: 'f_crown' }],
-      ['narr', 'And on the very top, curled up like a cat, something long and white.', 'Something long and white is curled up on top.'],
+      ['narr', 'And on the very top, curled up like a cat, something long and white.', 'Something long and white is curled up on top.', { ref: 'f3_glaciar_asleep' }],
       ['ash', 'Tove. The mountain is BREATHING.', 'Tove. The mountain is BREATHING.'],
       ['tove', "Before you wake her up, Ash, work out what that is. I want to know before she does.", 'Work out what that is first.'],
     ],
