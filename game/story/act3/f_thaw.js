@@ -38,7 +38,7 @@ chapter({
     f3_saga_look: { map: 2, at: [1150, 46900], r: 20, kind: 'examine', h: 66,
       name: ['Saga the fisher, frozen on the quay', 'the frozen fisher girl'], prompt: ['Look closely at the fisher girl', 'Look at the fisher girl'],
       say: 'f3_saga', if: 'stage>=f_thaw !flag f_thaw_f_saga !clue f3_looking_up' },
-    f3_bo_look: { map: 2, at: [1700, 46660], r: 40, kind: 'examine', h: 70,
+    f3_bo_look: { map: 2, at: [1716, 46668], r: 46, kind: 'examine', h: 70,
       name: ['Little Bo, frozen on the chapel roof', 'the boy on the roof'], prompt: ['Look at the boy on the roof', 'Look at the boy on the roof'],
       say: 'f3_bo', if: 'stage>=f_thaw !flag f_thaw_f_bo !clue f3_bo_points' },
     // the red yarn at the foot of the tower's south face, left of the frozen door (it climbs the face to the top)
@@ -49,8 +49,9 @@ chapter({
     f3_spyglass: { map: 2, at: [1925, 46797], r: 8, kind: 'examine', look: 'spyglass', h: 54,
       name: ["the knitter's spyglass", 'the spyglass'], aliases: ['the spyglass', 'the telescope'],
       prompt: ['Look through the spyglass', 'Look through the spyglass'], say: 'f3_spyglass_look', if: 'stage>=f_thaw' },
-    // the chapel's carved front (x2_world paints the dragon round the snowflake on it)
-    f3_chapel_spot: { map: 2, at: [1662, 46736], r: 22, kind: 'examine', h: 40,
+    // the chapel's carved front, on its west half (x2_world paints the dragon round the snowflake there; Bo's spot is
+    // the east half, so each has its own place to stand)
+    f3_chapel_spot: { map: 2, at: [1650, 46738], r: 20, kind: 'examine', h: 40,
       name: ['the carving on the chapel', 'the chapel carving'], aliases: ['the dragon carving', 'the chapel'],
       prompt: ['Look at the chapel carving', 'Look at the carving'], say: 'f3_chapel_look', if: 'stage>=f_thaw' },
   },
