@@ -204,6 +204,8 @@ function gtCustomIn(g,x,y){
   if(g.inside) return dist(x,y,g.inside.x,g.inside.y)<g.inside.r;
   const P=g.plat;
   if(P&&!g.doorR&&!GT_SHADOW[g.kind]) return elvRingsIn(P.rings,x,y)&&elevLvl(x,y)>=P.lvl&&!(elevFace(x,y)&EF.FACE);
+  // nothing to get past (a lone ring, plate or crack): only the power's own action opens it (A2S, CHANGES.md)
+  if(!(P||g.doorR||g.doorObj||g.bars||g.water||g.fences)) return false;
   const L=gtLeadsAt(g); if(L&&dist(x,y,L.x,L.y)<70) return true;
   const R=g.doorR; if(R){ const u=GT_FACE[g.face], horiz=R.w>=R.h, inw=horiz?-u[1]:-u[0];   // the inward side is away from `face`
     if(horiz) return Math.abs(x-R.x)<R.w/2+30&&(y-R.y)*Math.sign(inw||-1)>R.h/2+20&&Math.abs(y-R.y)<R.h/2+420;
