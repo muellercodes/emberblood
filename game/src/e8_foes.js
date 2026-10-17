@@ -712,6 +712,12 @@ if(typeof BAL_OPEN==='object'&&BAL_OPEN) BAL_OPEN.eggs=1;
 // shared: a boss taunt that does not repeat too often
 function bossSay(e,who,line,gap){ if(e._sayT>G.time) return; e._sayT=G.time+(gap||6); taunt(who,line); }
 // ---------- Grizzlefang: a bomb barrage (find the gap, roll or jump through) and an iron pot armor (hit his back, or the hammer)
+// GRZ: the v10 on-ramp numbers for Easy and Normal (Hard keeps the v9 ones written next to them in the code). He is the
+// first boss a new player meets, so his warnings are long enough for a kid to react to (about 0.4 s, then a roll), his bomb
+// lines have wide gaps, fewer kobolds come later, and his iron pot lets more through and cracks from the front too.
+// The numbers and the casual-kid bot tables behind them: scratchpad v10/BAL.md.
+const GRZ={wind:[1.45,1.3], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
+  sumAt:[0.4,0.4], sumN:[2,3], gap:[250,210], bombT:[1.8,1.5], lineT:[1.8,1.45], waves:[[2,3],[3,3]]};
 defineFoe('grizzlefang',{hp:actIHp(760),phases:[0.66,0.33],
   phaseText:[[S('Bomb Barrage!','Bombs!'),S('Lines of bombs. Find the gap, or roll through them!','Find the gap. Or roll!'),['griz',S('Boys! Light the fuses!','Boys! Light the bombs!')]],
              [S('Iron Pot Armor!','Iron pot!'),S('His front is iron now. Hit him from behind, or smash it with the hammer!','Hit his back! Or use the hammer!'),['griz',S('Ha! Try cutting through THIS!','Ha! Try hitting this!')]]],
@@ -722,7 +728,9 @@ defineFoe('grizzlefang',{hp:actIHp(760),phases:[0.66,0.33],
     if(h.src==='hammer'){ grizCrack(e,true); return amt; }
     if(h.melee&&h.behind){ grizCrack(e,false); return amt; }
     if(!(e._clangT>G.time)){ e._clangT=G.time+0.55; ftext(e.x,e.y-e.r-16,'CLANG!','#c9d0dc',13); SFX.play('block'); }
-    return amt*byDiff(0.25,0.12,0.08); },
+    // v10 (Act I on-ramp): on Easy and Normal, front hits dent the pot too, so a kid who never gets behind him still breaks it
+    if(h.melee&&!foeDiff().hard){ e.dents=(e.dents||0)+1; if(e.dents>=byDiff(GRZ.dent[0],GRZ.dent[1],99)){ e.dents=0; grizCrack(e,false); } }
+    return amt*byDiff(GRZ.front[0],GRZ.front[1],0.08); },
   over(e){ if(!e.armor) return; const top=(T3.on&&e._t3top!=null)?e._t3top:e.y-e.r*1.6, x=e.x, y=top+e.r*0.32, rx=e.r*0.62, ry=e.r*0.4;
     ctx.save(); ctx.fillStyle='#4a4c56'; ctx.strokeStyle='#121318'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,Math.PI,TAU); ctx.lineTo(x+rx*1.15,y); ctx.lineTo(x-rx*1.15,y); ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.fillStyle='#8a909e'; ctx.beginPath(); ctx.ellipse(x-rx*0.35,y-ry*0.55,rx*0.28,ry*0.2,-0.3,0,TAU); ctx.fill();
@@ -733,7 +741,7 @@ defineFoe('grizzlefang',{hp:actIHp(760),phases:[0.66,0.33],
 function grizAI(e,dt,p){
   const F=FOES.grizzlefang, D=foeDiff(), d=dist(e.x,e.y,p.x,p.y);
   e.barT-=dt*D.atk;
-  if(!e.summoned&&e.hp<e.maxHp*0.5){ e.summoned=true; taunt('griz','Get the hatchling, boys!'); const L=fkLevel(e,{}); for(let i=0;i<byDiff(3,4,5);i++){ const s=spotNear(e.x,e.y,90,180); spawnRune('kobold',s.x,s.y,{level:L,aggro:true}); } }
+  if(!e.summoned&&e.hp<e.maxHp*byDiff(GRZ.sumAt[0],GRZ.sumAt[1],0.5)){ e.summoned=true; taunt('griz','Get the hatchling, boys!'); const L=fkLevel(e,{}); for(let i=0;i<byDiff(GRZ.sumN[0],GRZ.sumN[1],5);i++){ const s=spotNear(e.x,e.y,90,180); spawnRune('kobold',s.x,s.y,{level:L,aggro:true}); } }
   if(e.bph>=2&&!e.armor&&e.armorBack&&G.time>e.armorBack&&e.hp>e.maxHp*0.12&&e.state==='chase'&&e.stun<=0) grizArmor(e,true);
   if(e.bar){ grizBarrage(e,dt); return; }
   if(e.bph>=1&&e.barT<=0&&e.state==='chase'&&e.stun<=0){ grizBarrageStart(e); return; }
@@ -742,26 +750,29 @@ function grizAI(e,dt,p){
     if(d>250||Math.random()<0.3){ e.state='bombs'; e.st=0.5; }
     else { e.state='spinW'; e.st=0.65*D.tele; e.tele=newTele({shape:'circle',r:e.r+38,dur:e.st}); }
   }
-  const f0=e.face, sp0=e.speed; if(e.armor) e.speed=sp0*0.78;
+  const f0=e.face, sp0=e.speed, t0=e.tele, h0=G.hazards.length; if(e.armor) e.speed=sp0*0.78;
   F.base(e,dt);
   e.speed=sp0;
+  // longer red warnings for the cleave and the spin, and later lobbed bombs, on Easy and Normal (runAI then applies DIFFS.wind)
+  if(!D.hard){ if(e.tele&&e.tele!==t0&&(e.state==='cleave'||e.state==='spinW')){ const k=byDiff(GRZ.wind[0],GRZ.wind[1],1); e.st*=k; e.tele.dur*=k; }
+    for(let i=h0;i<G.hazards.length;i++){ const h=G.hazards[i]; if(h.kind==='blast'&&h.lob) h.delay*=byDiff(GRZ.lob[0],GRZ.lob[1],1); } }
   if(e.armor&&(e.state==='chase'||e.state==='cleave'||e.state==='recover')){ const lim=byDiff(1.6,2.1,2.5)*dt; e.face=f0+clamp(angDiff(f0,e.face),-lim,lim); }   // heavy: he turns slowly, so circle behind him
   bossCad(e,e.bph>=1?0.8:1);
 }
-function grizBarrageStart(e){ e.bar={n:0,waves:e.bph>=2?4:3,t:0.8*foeDiff().tele,last:rand(0,TAU)}; e.state='bombs'; e.st=0.4; e.dx=e.dy=0; e.tele=newTele({shape:'circle',r:e.r+26,dur:e.bar.t,col:'255,170,60'}); SFX.play('warn'); e.barT=e.bph>=2?13:10.5; bossSay(e,'griz',S('More bombs! MORE!','More bombs!'),12); }
+function grizBarrageStart(e){ const W=byDiff(GRZ.waves[0],GRZ.waves[1],[3,4]); e.bar={n:0,waves:e.bph>=2?W[1]:W[0],t:0.8*foeDiff().tele,last:rand(0,TAU)}; e.state='bombs'; e.st=0.4; e.dx=e.dy=0; e.tele=newTele({shape:'circle',r:e.r+26,dur:e.bar.t,col:'255,170,60'}); SFX.play('warn'); e.barT=e.bph>=2?13:10.5; bossSay(e,'griz',S('More bombs! MORE!','More bombs!'),12); }
 function grizBarrage(e,dt){
   const B=e.bar; e.dx=e.dy=0; e.face=turnTo(e.face,angTo(e.x,e.y,player.x,player.y),3*dt); e.state='bombs'; e.st=0.4;
   B.t-=dt; if(B.t>0) return;
   e.tele=null;
   if(B.n>=B.waves){ e.bar=null; toRecover(e,byDiff(1.3,0.9,0.7)); return; }
-  grizBombLine(e,B); B.n++; B.t=byDiff(1.5,1.15,0.95);
+  grizBombLine(e,B); B.n++; B.t=byDiff(GRZ.lineT[0],GRZ.lineT[1],0.95);
 }
 // a line of lobbed bombs across the arena, through where Ash stands, with one gap (marked green)
 function grizBombLine(e,B){
   // each line runs through Ash toward the middle of the arena (so it crosses the whole floor), turned a little more each wave
   const p=player, C=bossCtx(e), off=[0,0.8,-0.8,1.6][B.n%4]+rand(-0.15,0.15);
   const base=dist(p.x,p.y,C.cx,C.cy)>70?angTo(p.x,p.y,C.cx,C.cy):(B.last+1.2), th=base+off; B.last=base;
-  const ux=Math.cos(th), uy=Math.sin(th), gap=rand(-90,90), gw=byDiff(200,155,130), delay=byDiff(1.5,1.2,1.05);
+  const ux=Math.cos(th), uy=Math.sin(th), gap=rand(-90,90), gw=byDiff(GRZ.gap[0],GRZ.gap[1],130), delay=byDiff(GRZ.bombT[0],GRZ.bombT[1],1.05);
   for(let s=-760;s<=760;s+=60){
     if(Math.abs(s-gap)<gw/2) continue;
     const x=p.x+ux*s, y=p.y+uy*s; if(!bossIn(C,x,y,24)) continue;
@@ -770,15 +781,15 @@ function grizBombLine(e,B){
   fzAdd('safe',{x:p.x+ux*gap,y:p.y+uy*gap,r:gw*0.4,life:delay+0.35});
   SFX.play('slash3'); shake(3);
 }
-function grizArmor(e,back){ e.armor=1; e.cracks=0; e.armorBack=0; shake(6); SFX.play('block'); emit(e.x,e.y-e.r,16,{col:'190,200,215',smin:60,smax:180,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); if(back) bossSay(e,'griz',S('Pot is back on! Ha!','My pot is back!'),4); }
+function grizArmor(e,back){ e.armor=1; e.cracks=0; e.dents=0; e.armorBack=0; shake(6); SFX.play('block'); emit(e.x,e.y-e.r,16,{col:'190,200,215',smin:60,smax:180,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); if(back) bossSay(e,'griz',S('Pot is back on! Ha!','My pot is back!'),4); }
 function grizCrack(e,full){
-  const need=byDiff(2,3,4); e.cracks=(e.cracks||0)+(full?need:1);
+  const need=byDiff(GRZ.need[0],GRZ.need[1],4); e.cracks=(e.cracks||0)+(full?need:1);
   SFX.play('block'); shake(4); emit(e.x,e.y-e.r,10,{col:'255,220,150',smin:80,smax:220,lmin:.15,lmax:.3,zmin:1.2,zmax:2.4});
   if(e.cracks<need){ ftext(e.x,e.y-e.r-22,'CRACK!','#ffd27a',15); return; }
   e.armor=0; e.cracks=0; e.bar=null; e.tele=null; e.state='recover'; e.st=0.3; e.stun=Math.max(e.stun,byDiff(3,2.4,2));
   shake(10); SFX.play('boom'); emit(e.x,e.y-e.r,30,{col:'120,124,136',glow:false,smin:80,smax:280,lmin:.4,lmax:.9,zmin:2,zmax:5,grow:2});
   ftext(e.x,e.y-e.r-28,S('ARMOR BROKEN!','ARMOR OFF!'),'#ffe066',17);
-  e.armorBack=foeDiff().easy?0:G.time+16;
+  e.armorBack=foeDiff().easy?0:G.time+(foeDiff().hard?16:GRZ.back); e.dents=0;
   bossSay(e,'griz',S('My best pot! You will pay for that!','My pot! You will pay!'),3);
 }
 // ---------- High Priest Morrow: a ring of fire pillars with a shield; soak up the flames, then roar them out
@@ -1015,6 +1026,60 @@ defineBoss('crag',{boss:'broodmother',at:'nests',stage:'three',ward:'crag',guard
 defineBoss('mire',{boss:'gloamjaw',at:'mire',stage:'three',ward:'mire',guards:[['kobold',3],['cultist',2]],arena:{shape:'ring',r:368,style:'thorn'}});
 defineBoss('frost',{boss:'greymane',at:'frost',stage:'three',ward:'frost',guards:[['wolf',3]],arena:{shape:'ring',r:360,style:'ice'}});
 defineBoss('gate',{boss:'cindervane',at:'gate',stage:'gate',guards:[['knight',2],['cultist',2]],arena:{shape:'rect',w:590,h:500,dy:46,style:'iron',gaps:[{a:-Math.PI/2,w:1.8}]}});
+
+// ================= v10: the Act I on-ramp (Easy and Normal, story only; Hard keeps every v9 number)
+// Drew could not beat Grizzlefang on Normal, and the casual-kid bot (a new player: about 0.4 s to react, a dodge only half
+// the time) lost most Act I fights on Normal while some later bosses were easier than earlier ones. These knobs make the
+// warnings readable, the openings longer and the crowds smaller, so each boss is a little harder than the one before.
+// [Easy, Normal] pairs; the tables and the reasoning are in scratchpad v10/BAL.md. Health factors live in BAL_BOSS (e6).
+const ONRAMP={
+  // longer red warnings: the wind-up that starts in this state is this many times longer (DIFFS.wind still applies after)
+  wind:{
+    gnarl:{swipeW:[1.3,1.3],stompW:[1.2,1.2]},
+    serpent:{riseW:[1.3,1.25]},
+    gloamjaw:{chompW:[1.45,1.35],tongueW:[1.3,1.25],emergeW:[1.3,1.25]},
+    cindervane:{slashW:[1.6,1.5],chargeAim:[1.25,1.15],quakeW:[1.25,1.15]}
+  },
+  // a longer pause after these attacks (the opening to hit back)
+  rec:{ gnarl:{swipeW:[1.3,1.25]}, cindervane:{slashW:[1.6,1.4]} },
+  serpentBolt:[0.78,0.86],   // the serpent's ice bolts fly slower (easier to step aside)
+  gnarlRing:[0.85,0.9],      // Old Gnarl's stomp rings roll slower
+  gloamChomp:[3.2,2.8],      // seconds between his chomps while he sits up in the muck (v9: 2)
+  gloamSum:[1,2],            // kobolds he calls at half health (v9: 3)
+  cinderCombo:[2,2],         // slashes in Sir Cindervane's combo (v9: 3)
+  cinderGuard:[0.45,0.4],    // share of a front hit that gets through his raised guard (v9: 0.15)
+  guards:{ gate:[[['cultist',1]],[['cultist',2]]] }   // site guards (v9: 2 knights and 2 cultists, each knight hits for a fifth of Ash's health)
+};
+function onrampOn(){ return G&&G.mode==='story'&&!foeDiff().hard; }
+const orK=a=>byDiff(a[0],a[1],1);
+function onrampWrap(type,post){ const base=AI[type]; if(!base) return;
+  AI[type]=function(e,dt){ const t0=e.tele, s0=e.state, h0=G.hazards.length, p0=G.projectiles.length; base(e,dt); if(onrampOn()) post(e,dt,t0,s0,h0,p0); }; }
+function onrampTele(e,t0,s0){
+  const W=ONRAMP.wind[e.type], T=e.tele;
+  if(W&&T&&T!==t0&&W[e.state]&&!T._or&&Math.abs((e.st||0)-T.dur)<0.03){ const k=orK(W[e.state]); T._or=1; e.st*=k; T.dur*=k; }
+  const R=ONRAMP.rec[e.type];
+  if(R&&e.state==='recover'&&s0!=='recover'&&R[s0]&&e.st>0) e.st*=orK(R[s0]);
+}
+for(const t of ['gnarl','serpent','gloamjaw','cindervane']) onrampWrap(t,(e,dt,t0,s0,h0,p0)=>{
+  onrampTele(e,t0,s0);
+  if(e.type==='serpent') for(let i=p0;i<G.projectiles.length;i++){ const q=G.projectiles[i]; if(q.owner==='enemy'&&q.kind==='ice'&&!q._or){ q._or=1; const k=orK(ONRAMP.serpentBolt); q.vx*=k; q.vy*=k; } }
+  if(e.type==='gnarl'){ const T=trialT(); if(T) for(const R of T.rings) if(!R._or&&R.dmg>0){ R._or=1; R.speed*=orK(ONRAMP.gnarlRing); } }
+  if(e.type==='gloamjaw'&&e.chompCd>G.time+1.95&&e._orC!==e.chompCd){ e.chompCd=G.time+orK(ONRAMP.gloamChomp); e._orC=e.chompCd; }
+  if(e.type==='cindervane'&&e.state==='slashW'&&s0==='slashW'&&e.tele&&e.tele!==t0&&(e.combo|0)>=orK(ONRAMP.cinderCombo)){ toRecover(e,1.0*orK(ONRAMP.rec.cindervane.slashW)); }
+});
+// Gloamjaw's bog kobolds and Sir Cindervane's guard: through their own hooks
+{ const base=AI.gloamjaw; AI.gloamjaw=function(e,dt){ const was=!!e.summoned; if(!onrampOn()||was){ base(e,dt); return; }
+    // the old code calls three at half health: keep the on-ramp count of their spawn runes and drop the rest
+    const n0=G.hazards.length; base(e,dt);
+    if(e.summoned){ let keep=orK(ONRAMP.gloamSum); const drop=new Set(); for(let i=n0;i<G.hazards.length;i++){ const h=G.hazards[i]; if(h.kind==='spawn'&&h.type==='kobold'){ if(keep>0) keep--; else drop.add(h); } } if(drop.size) G.hazards=G.hazards.filter(h=>!drop.has(h)); } }; }
+{ const F=FOES.cindervane, prev=F.onHurt; F.onHurt=function(e,amt,o){
+    if(prev){ const r=prev(e,amt,o); if(r===false) return false; if(typeof r==='number') amt=r; }
+    if(onrampOn()&&e.shield&&e.blocking&&o&&o.src!=='burn'&&o.src!=='roar'&&o.src!=='ember'){ const fx=o.fx!=null?o.fx:player.x, fy=o.fy!=null?o.fy:player.y;
+      if(Math.abs(angDiff(e.face,angTo(e.x,e.y,fx,fy)))<1.15) return amt*orK(ONRAMP.cinderGuard)/0.15; }
+    return amt; }; }
+// fewer guards at a site on Easy and Normal (read each time the guards are spawned)
+for(const k in ONRAMP.guards){ const s=SITES[k]; if(!s) continue; const full=s.guards;
+  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?byDiff(ONRAMP.guards[k][0],ONRAMP.guards[k][1],full):full; },set(v){ /* keep the on-ramp table */ }}); }
 
 // ================= debug hooks
 function foeSheet2d(type,rows,o){
