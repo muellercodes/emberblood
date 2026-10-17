@@ -49,10 +49,10 @@ chapter({
     f3_spyglass: { map: 2, at: [1925, 46797], r: 8, kind: 'examine', look: 'spyglass', h: 54,
       name: ["the knitter's spyglass", 'the spyglass'], aliases: ['the spyglass', 'the telescope'],
       prompt: ['Look through the spyglass', 'Look through the spyglass'], say: 'f3_spyglass_look', if: 'stage>=f_thaw' },
-    // what Ylva's spyglass shows on the Crown of Dread: the sleeping dragon (x2_story draws Glaciar there itself from
-    // f_glaciar on, so this one is only up to then)
+    // what Ylva's spyglass shows on the Crown of Dread: the sleeping dragon (from f_dread on, A3b's f3_glaciar_coil
+    // draws her there, so this one is only up to then)
     f3_glaciar_asleep: { map: 2, at: [7300, 41290], kind: 'prop', look: 'f3_glaciar_asleep',
-      name: ['something long and white, asleep on the summit', 'something asleep on the summit'], if: 'stage>=f_thaw stage<f_glaciar' },
+      name: ['something long and white, asleep on the summit', 'something asleep on the summit'], if: 'stage>=f_thaw stage<f_dread' },
     // the chapel's carved front, on its west half (x2_world paints the dragon round the snowflake there; Bo's spot is
     // the east half, so each has its own place to stand)
     f3_chapel_spot: { map: 2, at: [1650, 46738], r: 20, kind: 'examine', h: 40,
