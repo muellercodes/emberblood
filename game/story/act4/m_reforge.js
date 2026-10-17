@@ -34,7 +34,7 @@ chapter({
     m4_bridge_on: { map: 3, at: [13762, 65446], r: 36, kind: 'spot', name: ['the moonfire bridge', 'the bridge'] },
     m4_peak_sea: { map: 3, at: [13740, 65200], kind: 'npc_spot', name: ['the sea at the Edge of the World', 'the sea'] },
     // the black mountain out at sea and the moonfire bridge to it: this chapter's own pictures, shown in Act IV only
-    // while nothing listens to m4fx for x3_story's vista (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    // when nothing listens to m4fx for x3_story's vista (x3_story sets flag s10_fx when it does)
     m4_peak:      { map: 3, at: [13990, 65120], kind: 'prop', look: 'm4_peak_far', if: 'flag m4_peak_up act=4 !flag s10_fx',
                     name: ['the black mountain', 'the black mountain'] },
     m4_bridge_fx: { map: 3, at: [13780, 65452], kind: 'prop', look: 'm4_fire_bridge', if: 'flag m4_bridge_lit act=4 !flag s10_fx',
@@ -50,11 +50,12 @@ chapter({
       ],
       obj: ['Go through to the Eclipse Lens', 'Go to the Eclipse Lens'],
       hint: ['The Eclipse Lens is through the next door from the great dome, on the same floor. Someone with a hammer is coming up the stairs behind you.', 'Go through the next door to the Lens.'] },
-    // the three taps run between the two scenes once x3_story listens to m4fx:forge (m_reforge's last line); the second
-    // scene waits for them (a cutscene plays only when things are calm)
-    { id: 'heart', do: 'cutscene m_reforge2',
-      then: ['set m_reforged', 'set m_heart', 'set m_maren', 'time noon', 'warp m4_pier'] },
-    { id: 'peak', do: 'cutscene m_peak', then: ['set m_eclipse3', 'set m_done', 'time midnight'] },
+    // the three taps run between the two scenes: m_reforge's last line emits m4fx:forge, x3_story sets m4_forging and
+    // starts its forge game as soon as Mom's scene is over, and clears the flag after the third TING; this scene waits
+    { id: 'heart', do: 'cutscene m_reforge2', if: '!flag m4_forging',
+      then: ['set m_reforged', 'set m_heart', 'set m_maren', 'time noon quiet', 'warp m4_pier'] },
+    // (the warp lands a moment after the Heart's scene; the peak plays on the pier, not in the Lens room)
+    { id: 'peak', do: 'cutscene m_peak', if: 'near m4_pier 500', then: ['set m_eclipse3', 'set m_done', 'time midnight quiet'] },
     { id: 'bridge', do: 'goto m4_pier_end 80', scene: 'm4_pier_bridge',
       obj: ['Walk to the end of the Moon Pier, where the moonfire bridge begins', 'Walk to the end of the pier'],
       hint: ['The bridge starts at the end of the Moon Pier. Mom will walk you there.', 'The bridge starts at the end of the pier.'],

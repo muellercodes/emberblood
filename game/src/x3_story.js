@@ -1029,8 +1029,7 @@ function m3sHeartWhole(){
   if(G.flags.m_heart&&G.items.m_heart) return;
   const S3={}; for(const k of ['c_shard1','f_shard2','m_shard3']) if(G.items[k]>0) S3[k]=G.items[k]; takeItems(S3);
   giveItems({m_heart:1}); G.flags.m_heart=1; G.flags.m_reforged=1; if(!G.flags.m_reforge_xp){ G.flags.m_reforge_xp=1; gainXp(M3S_XP.reforge); }
-  flashA=0.7; flashCol='255,190,110'; shake(8); m3sJ('complete','shrine');
-  emit(player.x,player.y-30,60,{col:'255,190,100',ang:-Math.PI/2,spread:1.6,smin:60,smax:280,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30});
+  m3sHeartFx();
 }
 // the reforging in room q: Mom's scene, the three taps, the Heart; then everyone runs down to the Moon Pier
 function m3sReforge(){
@@ -1260,8 +1259,10 @@ function m3sDrawWorld(){
     if(E.flyer){ const F=E.flyer; ctx.save(); ctx.globalAlpha=Math.min(1,F.t)*Math.min(1,(5-F.t)); ctx.translate(F.x,F.y-260); ctx.rotate(0.6); ctx.scale(0.35,0.35); m3sMothFig(ctx,190,0.75+0.25*Math.cos(t*4),M3S_HUSH,0); ctx.restore(); }
   }
   m3sDrawHushFx();
-  // after the peak rises: the start of the moonfire bridge glows at the end of the Moon Pier (the finale builds the bridge)
-  if(G.flags.m_eclipse3&&!AREA&&curMap()===3&&inView(M3SP.pierEnd.x,M3SP.pierEnd.y,300)&&!LANDMARKS.some(o=>o.id==='xing_n_bridge_in')){
+  // after the peak rises: the start of the moonfire bridge glows at the end of the Moon Pier, until the finale's own
+  // bridge shows there (its crossing is hidden until n_bridge, so Act IV's walk to the end of the pier needs this one)
+  const finBridge=LANDMARKS.some(o=>o.id==='xing_n_bridge_in')&&(!!G.flags.n_bridge_open||(stageAt('n_bridge')>=0&&reached('n_bridge')));
+  if(G.flags.m_eclipse3&&!AREA&&curMap()===3&&inView(M3SP.pierEnd.x,M3SP.pierEnd.y,300)&&!finBridge){
     const pk=M3S.peak, b=pk?pk.bridge:1;
     if(b>0.01){ ctx.save(); ctx.globalCompositeOperation='lighter'; const x0=M3SP.pierEnd.x, y0=M3SP.pierEnd.y, x1=x0+600*b;
       const gr=ctx.createLinearGradient(x0,y0,x1,y0); gr.addColorStop(0,'rgba(220,232,255,.9)'); gr.addColorStop(1,'rgba(160,190,255,0)');
@@ -1540,7 +1541,7 @@ function m3sMomLetterFirst(){ const F=G.flags; if(!F.m_eclipse2||F.m_pb_3||reach
 
 // ---------- 12. saves: transient state resets; older Act IV saves get the flags their stage implies
 function m3sReset(){
-  Object.assign(M3S,{q:[],rep:{},cam:null,ecl:null,peak:null,voy:null,forge:null,hushFx:null,hushRun:false,hushFin:null,hushE:null,introQ:false,boss:null,grey:0,fadeTo:null,landing:false,eclRun:false,forgeRun:false,pipQ:false,pipT:0,endQ:false,endT:0,endAt:0,finT:0});
+  Object.assign(M3S,{q:[],rep:{},cam:null,ecl:null,peak:null,voy:null,forge:null,hushFx:null,hushRun:false,hushFin:null,hushE:null,introQ:false,boss:null,grey:0,fadeTo:null,landing:false,eclRun:false,forgeRun:false,pipQ:false,pipT:0,endQ:false,endT:0,endAt:0,finT:0,fxOn:false,fxCalm:0,forgeCalm:0});
   if(G&&G.flags) G.flags.m_eclipse_on=0; if(scene==='m3forge') scene='play';
 }
 { const base=newRun; newRun=function(mode){ base(mode); try{ m3sReset(); }catch(e){} }; }
@@ -1574,6 +1575,59 @@ function m3sKit(){
   if(at('m_moonpath')){ A.moonfire=true; if(G.flags.pip) G.flags.m_pip_lamp=1; }
 }
 { const base=window.__ebX&&window.__ebX.actStart; if(typeof base==='function') window.__ebX.actStart=function(n,w){ const r=base(n,w); try{ if((n|0)===4&&G.mode==='story'){ m3sMigrate(); m3sKit(); if(typeof bitesOf==='function') G.flags.moon_hud=bitesOf(); setupNPCs(); saveGame(true); } }catch(e){ console.error(e); } return r; }; }
+// ---------- 12b. v10: Act IV is story data now (game/story/act4). Its scene lines call this file's old pictures with
+// storyEmit('m4fx:<name>[:<arg>]') (the names A4b's data emits): the eclipses (m3sEcl's commands), Hush's leash and her
+// going (m3sHushPose), Mom and Quill coming up the stairs, the three taps of the reforge, the Heart made whole, the party
+// on the pier looking out to sea, and the black peak's vista (m3sPeak). G.flags.s10_fx says this listener is in, so the
+// data's own stand-in pictures (places shown only with !flag s10_fx) step aside.
+function m3sFx(cmd){
+  const [k,a,b]=String(cmd).split(':'), cam=M3S.cam;
+  switch(k){
+    // (the data scene aims its own camera: an eclipse command only draws)
+    case 'ecl': m3sEcl(a,b!=null&&b!==''?+b:undefined); M3S.cam=cam; M3S.fxOn=true; break;
+    case 'hush': if(!M3S.hushFx) m3sHushFxAt(null); m3sHushPose(a); break;
+    case 'mom_in': m3sMomIn(); break;
+    case 'forge': m3sFxForge(); break;
+    case 'heart_whole': m3sHeartFx(); break;
+    case 'party_look': m3sPartyLook(); break;
+    case 'peak': m3sPeak(a); M3S.fxOn=true; break;
+  }
+}
+{ const base=storyEmit; storyEmit=function(name){ const r=base(name); try{ const s=String(name||'');
+    if(s.startsWith('m4fx:')&&G&&G.mode==='story') m3sFx(s.slice(5)); }catch(e){ console.error(e); } return r; };
+  window.storyEmit=storyEmit; }
+// the three taps (m_reforge's last line): they start as soon as Mom's scene is over, and the data's next step (the
+// Heart, m_reforge2) waits for them (its step `if: '!flag m4_forging'`). A reload in the middle starts them again; the
+// test autoplay goes straight on.
+function m3sFxForge(){
+  if(G.flags.m_reforged) return;
+  if(typeof S10!=='undefined'&&S10&&S10.auto) return;
+  G.flags.m4_forging=1;
+}
+function m3sForgeWatch(dt){
+  const F=G.flags; if(!F.m4_forging||M3S.forge) return;
+  if(F.m_reforged||G.stage!=='m_reforge'||(typeof S10!=='undefined'&&S10&&S10.auto)){ F.m4_forging=0; return; }
+  if(scene!=='play'||DLG||G.mini){ M3S.forgeCalm=0; return; }
+  M3S.forgeCalm=(M3S.forgeCalm||0)+dt; if(M3S.forgeCalm<0.2) return;
+  M3S.forgeCalm=0; m3sForgeTaps(()=>{ G.flags.m4_forging=0; try{ questUpdated(); }catch(e){} });
+}
+// the pictures of the Heart made whole (the data gives the Heart and takes the Shards itself)
+function m3sHeartFx(){
+  flashA=0.7; flashCol='255,190,110'; shake(8); m3sJ('complete','shrine');
+  emit(player.x,player.y-30,60,{col:'255,190,100',ang:-Math.PI/2,spread:1.6,smin:60,smax:280,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30});
+}
+// a data scene that started an eclipse or the vista is over: the eclipse ends and the vista fades, leaving the world's
+// own peak on the horizon (x3_world) and the glow of the bridge at the end of the pier (m3sDrawWorld)
+function m3sFxAfter(dt){
+  if(!M3S.fxOn) return;
+  if(scene!=='play'||DLG){ M3S.fxCalm=0; return; }
+  M3S.fxCalm=(M3S.fxCalm||0)+dt; if(M3S.fxCalm<0.3) return;
+  M3S.fxOn=false; M3S.fxCalm=0;
+  if(M3S.ecl&&!M3S.ecl.ending) m3sEcl('end');
+  if(M3S.peak) M3S.peak.aT=0;
+}
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'){ if(G.flags&&!G.flags.s10_fx) G.flags.s10_fx=1; m3sForgeWatch(dt); m3sFxAfter(dt); } }catch(e){ console.error(e); } }; }
+{ const base=simUpdate; simUpdate=function(dt){ base(dt); try{ if(G&&G.mode==='story'){ if(G.flags&&!G.flags.s10_fx) G.flags.s10_fx=1; m3sForgeWatch(dt); m3sFxAfter(dt); } }catch(e){ console.error(e); } }; }
 // ---------- 13. cross-act threads Act IV owns (each added only if nobody added it first): Pebble's letters, the two
 // dreams, Tamsin's verse, the epilogue lines, the town chatter
 if(typeof pebbleLetter==='function'){

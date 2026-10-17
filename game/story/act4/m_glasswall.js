@@ -9,7 +9,7 @@
 // Old flags kept: m_eclipse2 (x3_world opens the Burrow Gap, darkens the lanterns, x3_people sends Mom's letter
 // m_pb_3), m_gap_dug (set by x3_world when Ash burrows through). New: m4_well = stood | lid, m4_where_next.
 // Visual hooks of the old code (the eclipse pictures, x3_story m3sEcl) ride on `emit m4fx:<name>[:<arg>]` effects:
-// nothing listens to them yet (A4b ENGINE REQUEST in CHANGES.md) and the scene reads right without them.
+// x3_story listens to them (and sets flag s10_fx); the scene also reads right without them.
 chapter({
   id: 'm_glasswall', act: 4, after: 'm_burrows', next: 'm_mirror', takeover: true,
   card: ['Act IV · Chapter 4', 'Mirrors'],
@@ -37,8 +37,8 @@ chapter({
     m4_well_tower: { map: 3, at: [9800, 67650], kind: 'npc_spot', name: ['the Moon Well tower', 'the well tower'] },
     // the camera's aim for the eclipse: high enough to show Nyxara on top of the tower and Ash on the rim below
     m4_well_sky:   { map: 3, at: [9800, 67555], kind: 'npc_spot', name: ['the sky over the Moon Well', 'the sky over the well'] },
-    // Nyxara perched on the tower during the eclipse: this chapter's own picture of her, shown only while the engine
-    // has no m4fx listener for x3_story's eclipse pictures (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    // Nyxara perched on the tower during the eclipse: this chapter's own picture of her, shown only when nothing
+    // listens to m4fx for x3_story's eclipse pictures (x3_story sets flag s10_fx when it does)
     m4_nyx_well:   { map: 3, at: [9800, 67661], kind: 'prop', look: 'm4_nyx_perch', states: { drink: 'm4_nyx_perch' },
                      if: 'flag m4_nyx_here !flag s10_fx', name: ['Nyxara', 'Nyxara'] },
     // the far side of the Glasswall, where the Burrow Gap comes up (verified open sand, level 0): only a burrower gets
