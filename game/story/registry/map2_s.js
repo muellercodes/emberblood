@@ -6,7 +6,7 @@
 // A3b; a person's id is their CAST id (if another registry file defines one, the two entries must agree).
 
 // ---- Hearthold (x2_people F2P_CAST)
-legacy({ id: 'f_brynja', map: 2, at: [6880, 49040], kind: 'npc', name: ['Old Brynja, Hearthkeeper', 'Brynja'], src: 'CAST:f_brynja' });
+legacy({ id: 'f_brynja', map: 2, at: [6880, 49040], kind: 'npc', name: ['Old Brynja, Hearthkeeper', 'Old Brynja'], src: 'CAST:f_brynja' });
 legacy({ id: 'f_brann', map: 2, at: [6270, 48900], kind: 'npc', name: ['Captain Brann Stoutmitt', 'Captain Brann'], src: 'CAST:f_brann' });
 legacy({ id: 'f_pim', map: 2, at: [6650, 49108], kind: 'npc', name: ['Pim', 'Pim'], src: 'CAST:f_pim' });
 legacy({ id: 'f_soren', map: 2, at: [7900, 48250], kind: 'npc', name: ['Soren Sledwright', 'Soren'], src: 'CAST:f_soren' });

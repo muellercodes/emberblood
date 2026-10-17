@@ -64,7 +64,7 @@ places({
       ['narr', 'Under the boulder: a cellar door. Under the door: twelve years of Hettie Sprocket saying "I will fix that later."', 'A cellar full of old projects.'],
       ['narr', 'On top of the pile sits a satchel of brass and leather. A label: BOMB BAG, MARK TWO. DO NOT LET MAGS SEE.',
         'A brass satchel: BOMB BAG. DO NOT LET MAGS SEE.'],
-      ['narr', 'Ash swaps his old bomb bag for it. It holds five more bombs. It also hums a little.', 'It holds five more bombs! It hums.'],
+      ['narr', 'You swap your old bomb bag for it. It holds five more bombs. It also hums a little.', 'It holds five more bombs! It hums.'],
       ['ash', 'Sorry, Hettie. Mags is going to see.', 'Sorry, Hettie.'],
       { do: ['set f3_satchel_seen'] },
     ],

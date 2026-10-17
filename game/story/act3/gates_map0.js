@@ -106,7 +106,7 @@ places({
     a3g_bun: [
       ['narr', 'KA-BOOM. Frozen crumbs rain down all over Emberhollow. Inside the bun, something glows.', 'KA-BOOM! Crumbs everywhere. Something glows!'],
       ['narr', 'A Heart Ember. Baked right into the middle, warm as toast.', 'A Heart Ember, baked inside!'],
-      ['bertram', '(from the window) I have NO idea how that got in there. Do not tell your mother.', '(window) No idea how! Do not tell your mom.'],
+      ['bertram', '(from the window) I have NO idea how that got in there. None. I am a very careful baker.', '(window) No idea how that got in there!'],
       { do: ['set f3_bun_seen'] },
     ],
   },

@@ -43,9 +43,9 @@ people({
       ['f_brann', 'Hearthwardens! Salute! ...Gunnar, that is still a snowman.', 'Salute! Gunnar, that is a snowman.'],
     ],
     a3p_rowan: [
-      ['f3_rowan', 'Captain Brann? CAPTAIN! I was on the Dreadmoor with Sir Knut. Purple snow came down, and then...', 'I was on the moor with Sir Knut. Purple snow fell...'],
+      ['f3_rowan', 'You! You\'re the dragon who breathed on me! I was up on the Dreadmoor with Sir Knut. Purple snow came down, and then...', 'You thawed me! I was on the moor. Purple snow fell...'],
       ['f3_rowan', 'Then I was walking. In armor made of ice. Walking for HER. I could not stop.', 'Then I walked in ice armor. I could not stop.'],
-      ['f3_rowan', 'Then a dragon breathed on me and I woke up in a puddle. Hello. Thank you. Where is my lunch?', 'Then a dragon breathed on me. Thank you!'],
+      ['f3_rowan', 'Then you breathed on me, and I woke up in a puddle. Thank you. Is there any lunch?', 'Then you breathed on me. Thank you!'],
     ],
   },
 
@@ -77,11 +77,11 @@ people({
       // option shows only while Warm Hands is counting, so this one waits then, and the next line gives the clue after it
       { if: 'solved what_knights', once: true, scene: 'a3p_plume' },
       { if: 'flag f_brann_list !clue f3_brann_list', once: true, then: ['clue f3_brann_list'],
-        say: ["Sir Knut's patrol! Six Hearthwardens with blue plumes, gone up the Dreadmoor. Not one came home! Not even a postcard!", "Knut's patrol of six never came home!"] },
+        say: ["Sir Knut's patrol! Six Hearthwardens with blue plumes, gone up the Dreadmoor. Not one came home! Not even a note!", "Knut's patrol of six never came home!"] },
       { if: 'stage>=f_hearth !flag f_brann_list !quest f_warm active', option: ['Is anyone missing from the town?', 'Is anyone missing?'],
         then: ['set f_brann_list', 'clue f3_brann_list'],
         say: [['f_brann', 'Two of my Hearthwardens froze at their posts! One at each gate! And Sir Knut went up to guard the Dreadmoor! With his whole patrol!', 'Two guards froze! Knut took his patrol to the moor!'],
-          ['f_brann', 'Six Hearthwardens with blue plumes! Not one came home! Not even a postcard! Also the milkman. The milkman is a separate problem.', 'Six blue plumes. None came home!']] },
+          ['f_brann', 'Six Hearthwardens with blue plumes! Not one came home! Not even a note! Also the milkman. The milkman is a separate problem.', 'Six blue plumes. None came home!']] },
       // f_juniper starts here (x2_people's own option needs the old quest table)
       { if: 'stage>=f_kindle !quest f_juniper started !flag f_juniper_found', option: ['Have you seen a girl with a map case?', 'Seen a girl with maps?'],
         then: ['quest start f_juniper'], end: true,
@@ -90,10 +90,10 @@ people({
       // (Rowan, the freed Rime Knight by the West Gate, says it himself and gives the same clue; Brann tells it to a player
       // who comes to him first, or plays on an engine without data people)
       { if: 'flag f_freed_n>=1 !clue f3_freed_knight', once: true, then: ['clue f3_freed_knight'],
-        say: [['f_brann', 'One of my lads walked in this morning! Blue to the ears! Asking for ME! Rowan, of Sir Knut\'s patrol!', 'One of my lads came home! Rowan!'],
+        say: [['f_brann', 'One of my lads just walked in through the West Gate! Blue to the ears! Asking for ME! Rowan, of Sir Knut\'s patrol!', 'One of my lads came home! Rowan!'],
           ['f_brann', 'He says he was WALKING. For weeks. In armor made of ice. Walking for HER, and he could not stop! Then a dragon breathed on him.', 'He walked in ice armor for HER. Then you thawed him!']] },
       { if: 'flag f_hush_done solved what_knights', once: true, fact: 'f3s_hush=gone',
-        say: ['My lads are guarding the Dreadgate now. Six blue plumes in a row! Well. Four. Two are at lunch.', 'My lads guard the Dreadgate now!'] },
+        say: ['Two of my lads are guarding the Dreadgate now! The rest are eating. They have a month of lunches to catch up on.', 'My lads guard the Dreadgate now!'] },
       // (A3a's G.choices.f3_moth: what Ash said at the West Gate when Brann asked "are you a moth?")
       { if: 'flag f_hush_done choice f3_moth=moth', once: true, fact: 'f3s_hush=gone',
         say: ['The great white moth is gone, and good riddance! From now on you are the ONLY moth allowed in Hearthold, Ash. Do not tell anyone.',
@@ -107,14 +107,14 @@ people({
       { say: [['I am NOT afraid of moths! I simply respect them from a distance! A large distance! Indoors!', 'I am NOT scared of moths! I just stay far away!'],
         ["My beard has icicles! I'm keeping them! They're intimidating!", 'My beard has icicles! They look tough!'],
         ['Hearthwardens never retreat! We advance backwards! Carefully!', 'We never retreat! We go backwards!']] },
-      { bark: true, if: '!flag f_hush_done', fact: 'f3s_hush=loose', say: ['Moths. Moths everywhere. In my dreams. In my helmet. In my DREAMS about my helmet.', 'Moths everywhere! In my helmet!'] },
+      { bark: true, if: '!flag f_hush_done', fact: 'f3s_hush=loose', say: ["Is that flapping in my helmet? NO! It's my heart! Beating BRAVELY!", "Something's flapping! Oh. It's my heart."] },
       { bark: true, say: ["Hearthwardens! Stand up straight! ...Gunnar, that's a snowman.", "Stand up straight! Gunnar, that's a snowman."] },
     ],
 
     f3_rowan: [
       { if: '!clue f3_freed_knight', once: true, scene: 'a3p_rowan', then: ['clue f3_freed_knight'] },
       { if: 'solved what_knights',
-        say: [['Sir Knut says we are heroes. We were icicles. But heroic ones.', 'We were icicles. Heroic ones.'],
+        say: [['Captain Brann says we are heroes. We were icicles. But heroic ones.', 'We were icicles. Heroic ones.'],
           ['I have eaten three lunches. I am catching up.', 'I have had three lunches.']] },
       { say: [['Every time I close my eyes I hear HER humming. I am keeping my eyes open. Forever, probably.', 'I hear her humming. I keep my eyes open.'],
         ['There are more of us up there. In the ice armor. Melt them, please. Gently.', 'More of us are up there. Melt them!']] },
@@ -124,7 +124,7 @@ people({
       { ref: 'f3s_dreadgate', say: ["Sir Knut's patrol, on guard! Nobody gets frozen on OUR watch. Not again.", 'On guard! Nobody freezes on our watch!'] },
     ],
     f3_patrol_b: [
-      { ref: 'f3s_dreadgate', say: ['We guard the gate. The gate guards us. It is a good arrangement.', 'We guard the gate. The gate guards us.'] },
+      { ref: 'f3s_dreadgate', say: ["Captain Brann said stand here and look brave. I'm very good at the standing part.", 'I stand here and look brave!'] },
     ],
 
     f_toastwhistle: [
@@ -133,19 +133,19 @@ people({
       { if: 'quest f_warm active !flag f_warm12',
         say: ['Every frozen person you warm counts! Pim\'s cocoa is on the town! Pim does not know yet!', 'Every person you thaw counts!'] },
       { if: 'choice f_glaciar_home=stay', fact: 'f3s_glaciar=free',
-        say: ['The Snow Mother lives on our mountain now. I gave her the key to the city. She froze it. Lovingly.', 'I gave the Snow Mother our key. She froze it.'] },
+        say: ["The Snow Mother lives on our mountain now! I gave her the key to the city. She froze it solid. I've hung it over my door.", 'I gave the Snow Mother our key. She froze it.'] },
       { if: '!flag f_hearth_lit', fact: 'f3s_hearth=dying',
         say: [['Everything is fine! The Hearth is fine! The snow is fine! I am fine! Why is my voice so high?', 'Everything is fine! Why is my voice so high?'],
           ["I've ordered the winter to stop. In writing. It has not replied.", 'I told winter to stop. No reply.']] },
       { if: 'flag f_hearth_lit', fact: 'f3s_hearth=blue',
         say: [['The Hearth is blue! Is blue fine? Blue is fine. Everything is FINE.', 'The Hearth is blue! Blue is fine!'],
-          ["I've ordered the winter to stop. In writing. It has not replied. Rude.", 'I told winter to stop. Rude.']] },
+          ["I wrote to the winter again. Still no reply. Between you and me, the Hearth did more than my letters.", 'Still no reply from the winter. The Hearth helped more.']] },
       { bark: true, say: ['Fine! Fine. Fine fine fine.', 'Fine! Fine. Fine.'] },
     ],
 
     f_gunnhild: [
       { if: 'quest f_forge done', once: true,
-        say: ["My forge has been hot every day since. I sing at it. Your mother's song. Badly. Don't tell her.", "My forge is hot. I sing your mom's song. Badly."] },
+        say: ["My forge has been hot every day since. Tell your mother. No, don't. Yes. Tell her it's HOT.", 'My forge is hot every day. Tell your mom!'] },
       { if: 'quest f_forge active flag f_forge_lit !item f_starfrost', fact: 'f3s_forge=lit',
         say: ['Starfrost! Blue ore. It grows where fire meets frost. Old bones in the Stonehorn hills, I hear. Knock hard.', 'Bring blue starfrost. Knock on old bones!'] },
       { if: '!flag f_forge_lit', fact: 'f3s_forge=cold',
@@ -153,10 +153,10 @@ people({
           ['Your mother\'s Maren? MAREN? I have her letters on the wall. Well. One letter. It says "no thank you." I framed it.', 'Your mom wrote me "no thank you." I framed it.'],
           ['Northern iron is stubborn. So am I. We get along.', 'Northern iron is stubborn. So am I.']] },
       { if: 'flag f_forge_lit', fact: 'f3s_forge=lit',
-        say: [['Hear that? A happy forge. She purrs. Most people think forges roar. Mine purrs.', 'Hear that? My forge purrs.'],
+        say: [['Hear that? Most forges roar. Mine purrs.', 'Hear that? My forge purrs.'],
           ['Your mother\'s Maren? MAREN? I have her letters on the wall. Well. One letter. It says "no thank you." I framed it.', 'Your mom wrote me "no thank you." I framed it.'],
           ['Northern iron is stubborn. So am I. We get along.', 'Northern iron is stubborn. So am I.']] },
-      { bark: true, if: '!flag f_forge_lit', fact: 'f3s_forge=cold', say: ['Cold anvil. Cold hammer. Cold Gunnhild.', 'Cold anvil. Cold hammer. Cold me.'] },
+      { bark: true, if: '!flag f_forge_lit', fact: 'f3s_forge=cold', say: ['Hit a cold anvil, and all it does is hurt your arm.', 'A cold anvil just hurts your arm.'] },
       { bark: true, if: 'flag f_forge_lit', fact: 'f3s_forge=lit', say: ['CLANG! CLANG! Hum hum hum. CLANG!', 'CLANG! CLANG! Hum hum.'] },
     ],
 
@@ -171,7 +171,7 @@ people({
         say: [['f_mags', 'Ha! My cousin Hettie in Gearhaven has had a boulder sitting on her cellar door for TWELVE years.', 'Cousin Hettie has a boulder on her cellar!'],
           ['f_mags', 'Right behind her workshop. She asks me about it every Lantern Day. Take her a bomb. Take her a BIG one.', 'Behind her workshop. Take a bomb!', { promise: 'f3g_hettie' }]] },
       { if: 'choice c_vesper=friend', once: true,
-        say: ['Your cousin the Moth Mask sent me a postcard. It just says "STOP BLOWING THINGS UP." I am framing it.', 'The Moth Mask wrote: "STOP BLOWING THINGS UP."'] },
+        say: ['Somebody slid a note under my door, signed with a little moth. It just says "STOP BLOWING THINGS UP." I am framing it.', 'A note signed with a moth: "STOP BLOWING THINGS UP."'] },
       { if: 'choice c_vesper=foe', once: true,
         say: ["The Moth Mask has gone quiet, they say. No more locks picked in Gearhaven. I almost miss her.", 'The Moth Mask is quiet now. I miss her a bit.'] },
       { say: [["Mags Sprocket, Gearhaven's third-best tinker! The other two exploded. Not badly! A little!", "I'm Mags! The other two tinkers exploded. A little!"],
@@ -186,7 +186,7 @@ people({
       { if: 'flag f_hush_done', once: true, fact: 'f3s_hush=gone',
         say: ['They say the great white moth is gone. I slept with my window open last night. First time in a month.', 'The big moth is gone. I opened my window!'] },
       { if: 'flag f_thaw_f_sigrun', once: true,
-        say: ['Sigrun came down from Rimeholm! She tasted my soup and said "salt." Just "salt." I cried. Happy crying.', 'Sigrun said my soup needs salt. I cried. Happy!'] },
+        say: ['Sigrun came down from Rimeholm! She tasted my soup and said "salt." Just "salt." From Sigrun, that is a medal.', 'Sigrun said my soup needs salt. From her, that is praise!'] },
       { say: [["Welcome to the Warm Mitten! Beds are soft, soup is hot, and the cat is called Biscuit. Don't sit on Biscuit.", "Soft beds, hot soup. Don't sit on the cat."],
         ["Sigrun in Rimeholm taught me my soup. If she were here she'd say it needs salt. She'd be right.", 'Sigrun taught me my soup. It needs salt.'],
         ["Have some soup. Have some more soup. The chair's had two bowls already.", 'Have some soup! The chair had two bowls.']] },
@@ -198,7 +198,7 @@ people({
         say: ["Wren says she's going to come and see the archive herself one day. OUTSIDE. On PURPOSE. I've never been so proud.", 'Wren will visit! Outside! I am so proud.'] },
       // G4 pointer: Ottoline's letter about the frozen Moon Ring (gates_map1.js f3g_ring; the letter is a3g_otto)
       { if: 'flag f_hearth_lit', once: true, then: ['mail a3g_otto'],
-        say: ['(whisper) Oh. Ash. A letter came for you, from the archive in Gearhaven. Your stone bird is bringing it now. Sorry. Exciting.', '(whisper) A letter came for you!'] },
+        say: ['(whisper) Ash. A crow stopped at my window just now, with a letter for you from the Turning Library in Gearhaven. She went off to find you. Sorry. Letters excite me.', '(whisper) A crow has a letter for you!'] },
       // G2 pointer: the dragons' egg shells on Cinder Mountain's rim (gates_map0.js f3g_eggs)
       { if: 'power windride !flag f3_eggs_open', option: ['What does the archive say about dragons?', 'What about dragons?'],
         say: [['f_eider', '(whisper) The oldest page says two dragon eggs hatched on the rim of the fire mountain, down in Embermere. A red one. And a white one.', 'Two dragon eggs hatched on the fire mountain.'],
@@ -206,7 +206,7 @@ people({
       // G3 pointer: Iska's stone box under her Ward stone (gates_map0.js f3g_iska)
       { if: 'power pound !flag f3_iska_open', option: ['Any word from Wren?', 'Any word from Wren?'],
         say: [['f_eider', 'Wren says Iska the Warden hid copies of her pages under her own Ward stone, by Emberhollow. Under a cracked flagstone.', 'Iska hid her pages under her Ward stone.'],
-          ['f_eider', 'Wren says "stomp." She underlined it. Twice. Aggressively.', 'Wren says "stomp." Underlined.', { promise: 'f3g_iska' }]] },
+          ['f_eider', 'Wren says "stomp." She underlined it so hard the pen went through the page.', 'Wren says "stomp." Underlined.', { promise: 'f3g_iska' }]] },
       { say: [["Shh. Sorry. Not you. The books. They get nervous in the cold.", 'Shh. Not you. The books are nervous.'],
         ['My cousin Wren runs the library in Brindlecross. She writes me every week. She underlines things. Aggressively.', 'Wren writes every week. She underlines a lot.'],
         ['Wren says: "Tell the dragon child to wear a scarf and to stop setting things on fire, in that order."', 'Wren says: wear a scarf. Stop setting fires.']] },
@@ -220,7 +220,7 @@ people({
       { if: 'flag f_thaw_f_bo', once: true,
         say: ["Little Bo came back for his Sunday cocoa! A month of Sundays! I gave him all of it. He's VERY awake now.", 'Little Bo came back! I gave him a month of cocoa!'] },
       { if: 'choice f_glaciar_home=stay', once: true, fact: 'f3s_glaciar=free',
-        say: ['The Snow Mother is REAL! I am going to sell her cocoa. Cold cocoa. She can heat it herself. No, she cannot.', 'The Snow Mother is real! I will sell her cocoa!'] },
+        say: ["The Snow Mother is REAL! I'm going to sell her iced cocoa. Nobody else up here sells iced cocoa. It's a brand new market!", 'The Snow Mother is real! I will sell her iced cocoa!'] },
       { if: 'flag f_frozen_n>=3',
         say: [["The Mayor's giving away MY cocoa to every thawed person! I'm sending her a bill. A big one. With a drawing.", 'The Mayor gives away my cocoa! I will send a bill!'],
           ['Hot cocoa! Three coins! Two coins if you heat it yourself!', 'Hot cocoa! Three coins!']] },
@@ -237,7 +237,7 @@ people({
         say: ["Nobody has ever sledded from the Windscour all the way down to my hill in one go. Ask the girl in the red hat. She's been asking everybody.", 'Nobody ever sledded here from the Windscour. Ask Elka.'] },
       { say: [['Snow is just slow water that wants you to go fast.', 'Snow is slow water that wants you fast.'],
         ['Some girl from the south came up the pass on a sled. A SLED. Up a MOUNTAIN. I like her.', 'A girl sledded UP the mountain. I like her.'],
-        ['The trick to a good sled is wax. The trick to a good life is also wax. Mostly wax.', 'Good sleds need wax. So does life.']] },
+        ['Wax the runners, lean into the turns, and never sled with your mouth open. I learned that last one the hard way.', 'Wax the runners. Lean in. Keep your mouth shut!']] },
       { bark: true, say: ["Wheee... sorry. That's the monk's word. Mine is \"whoosh.\"", 'Whoosh!'] },
     ],
 
@@ -249,9 +249,9 @@ people({
     ],
     f_sigrid: [
       { if: 'quest f_juniper done', once: true,
-        say: ["Juniper's maps! The inside of the Glacier Maze, drawn properly at last. By me. In red. With warnings.", 'I drew the maze inside on her map. In red.'] },
+        say: ["Juniper put the inside of the Glacier Maze on her map at last. I drew in the warnings myself, in red.", 'I drew the maze inside on her map. In red.'] },
       { say: [['I went into the Glacier Maze to find the furnace key. I found a block of ice instead. I was the block of ice.', 'I looked for a key. I turned into ice instead.'],
-        ['Never explore on an empty stomach. Or in a glacier. Or near moths. Lessons learned.', "Don't explore hungry. Or in a glacier."]] },
+        ["Next time I explore a glacier, I'm taking a sandwich, and a friend who breathes fire.", 'Next time: a sandwich, and a fire friend.']] },
     ],
     f_hjalmar: [
       { say: [["I froze mid-sneeze. I've finished the sneeze now. It was worth the wait.", 'I froze mid-sneeze. I finished it now.'],
@@ -266,7 +266,7 @@ people({
       { if: 'quest f_rime done', once: true, fact: 'f3s_rimeholm=warm',
         say: ["Everyone's thawed, dear. Even old Rasmus. He's started making puns again. I almost miss the ice.", 'Everyone is thawed. Rasmus makes puns again.'] },
       { if: 'choice f_hush=scarf', once: true,
-        say: ['You gave my scarf to a MOTH? ...Good. Everyone needs a scarf. Even moths. Especially moths.', 'You gave my scarf to a moth? Good!'] },
+        say: ["You gave my scarf to a MOTH? ...Good. I'll knit you another one. Longer.", "You gave my scarf to a moth? Good! I'll knit another."] },
       { if: 'quest f_rime active !quest f_rime done', fact: 'f3s_rimeholm=frozen',
         say: ['Start with whoever is shouting, dear. Tollef is always shouting. Even frozen, I think.', 'Start with the shouty one, dear.'] },
       { say: [["I wasn't frozen, dear. I was resting my eyes.", "I wasn't frozen, dear. I was resting my eyes."],
@@ -275,7 +275,7 @@ people({
       { bark: true, say: ['Knit one, purl one. Knit one, purl one. Oh, bother. Dropped one.', 'Knit one, purl one. Oops.'] },
     ],
     f_tollef: [
-      { if: 'flag f_v1', once: true, say: ['I SANG THE FIRST VERSE! FROM THE BELL! THE FISH CRIED! HAPPY CRYING, I THINK!', 'I SANG THE FIRST VERSE! THE FISH CRIED!'] },
+      { if: 'flag f_v1', once: true, say: ['I SANG THE FIRST VERSE! FROM THE BELL! THE FISH CAME UP TO LISTEN! I THINK!', 'I SANG THE FIRST VERSE! THE FISH LISTENED!'] },
       { if: 'quest f_song active !flag f_v1',
         say: ["THE BELL KNOWS THE FIRST VERSE! CLIMB UP TO THE TOP AND I'LL RING IT FROM DOWN HERE! LOUDLY!", 'CLIMB UP TO THE BELL! I WILL RING IT!'] },
       { say: [["WHAT? OH! HELLO! I CAN'T HEAR YOU, I'VE BEEN STANDING NEXT TO A BELL FOR FORTY YEARS!", "WHAT? HELLO! I CAN'T HEAR! TOO MANY BELLS!"],
@@ -303,7 +303,7 @@ people({
         say: ['The Snow Mother is your AUNTIE? Can Steve meet her? Steve is a snowball. She will like him.', 'Your auntie is the Snow Mother? Can Steve meet her?'] },
       { say: [["...THROW! Ha! Got you! ...Where did everyone go? Why are you a dragon?", 'THROW! Got you! Why are you a dragon?'],
         ["I've been holding this snowball for a MONTH. I'm keeping it. Forever. His name is Steve.", 'I kept this snowball a month. He is Steve.'],
-        ["Steve says hi. Steve is a snowball. He can't really talk.", "Steve says hi. He's a snowball."]] },
+        ["Steve says hi. That was me doing his voice. Hi!", "Steve says hi! I did his voice."]] },
       { bark: true, say: ['Steve wants to go sledding. Steve always wants to go sledding.', 'Steve wants to go sledding.'] },
     ],
     f_nils: [
@@ -319,11 +319,11 @@ people({
     ],
     f_oskar: [
       { if: 'flag f_hush_done', once: true, fact: 'f3s_hush=gone',
-        say: ['The great white moth is gone, they say. The post goes through again. On time. Nearly on time. On a time.', 'The moth is gone. The post goes through!'] },
+        say: ['The great white moth is gone, they say. So the post goes through again. Late, but it goes.', 'The moth is gone. The post goes through!'] },
       { if: '!flag f_letter_brynja !quest f_song done',
         say: ["I have a letter for Brynja in Hearthold. An old one. A snowflake stamp. I don't read the post. I only read the outside.", 'I have an old letter for Brynja.'] },
       { say: [["I've never been late. Not once. Thirty years. And now: a MONTH. I'm going to write myself a strongly worded letter.", 'Thirty years, never late. Now a MONTH late!'],
-        ['Rain, snow, moths, ice. The post goes through. Eventually.', 'The post always gets there. One day.']] },
+        ['Rain or snow or moths, the post goes through. Eventually.', 'The post always gets there. One day.']] },
       { bark: true, say: ['Late. Late. A month late. Late.', 'Late. A month late.'] },
     ],
     f_rasmus: [
@@ -331,16 +331,16 @@ people({
         say: ["Bluefire suits you, child. Hmm. Don't melt the village. We just got it back.", "Bluefire suits you. Don't melt the village."] },
       { say: [['Iron is like people, child. Heat it slowly and it bends. Hit it cold and it snaps. Hmm.', 'Iron is like people. Heat it slow and it bends.'],
         ["A forge is a hearth that went to work. Hmm. Hmm. That's a good one. I'll use it again.", 'A forge is a hearth with a job. Good one.'],
-        ["Gunnhild. Best hands in the north. Too fast with them. Hmm. She'll learn. She hums now. That's how you know.", 'Gunnhild has the best hands. She hums now.']] },
+        ["Gunnhild, in Hearthold. Best hands in the north. Too fast with them. Hmm. She'll learn.", 'Gunnhild has the best hands. Too fast.']] },
       { bark: true, say: ['Hmm. Hmmm. Hmm.', 'Hmm. Hmm.'] },
     ],
 
     // ---------------------------------------------------------------- the wild north
     f_hask: [
       { if: 'quest f_dogs done', once: true,
-        say: ['Nine dogs. Nine dog houses. Toast bit me this morning. Hrm. Good to be home.', 'Nine dogs home. Toast bit me. Good.'] },
+        say: ['Nine dogs. Five dog houses. Toast bit me hello. Hrm. Good to have them home.', 'Nine dogs home. Toast bit me. Good.'] },
       { if: 'quest f_mumble done', once: true,
-        say: ['Did you hear that roar last night? The whole forest shook. Hrm. Good lad.', 'Did you hear that roar? Good lad.'] },
+        say: ['Did you hear that roar? The whole forest shook. Hrm. Good lad, that yeti.', 'Did you hear that roar? Good lad.'] },
       { if: '!quest f_dogs done',
         say: [["Hrm. Pup. You look like you've never been cold in your life.", "Hrm. Pup. You've never been cold."],
           ['Ulf at the Lodge? We trade furs. He thinks sheep are better than dogs. He is wrong. Do not tell him I said his name nicely.', 'Ulf thinks sheep beat dogs. He is wrong.']] },
