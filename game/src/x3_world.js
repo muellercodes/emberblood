@@ -1417,9 +1417,16 @@ defineMap(3,{id:'moon',name:S('Moonfall','Moonfall'),music:'m_sea',spawn:{x:1300
   ambient:{wind:0.4,birds:true,rain:0.2},
   terrain:{seeds:M3WSEEDS,roads:M3WROADS,lakes:[{x:9800,y:67650,r:220,amp:10}],isles:M3WG.isles,walkways:M3WWALK,
     sea:{land:M3WG.land,shore:70,shelf:170,noise:90},extra:m3wExtra,block:m3wBlock},
-  onEnter(from){ m3wSync(true); },
+  onEnter(from){ m3wSync(true); m3wStaleBanners(); },
   build(B){ m3wBuild(B); }
 });
+// (a region banner still waiting from the map Ash just left, "Frostreach" after the voyage or a fast travel, is stale
+// once he is in Moonfall: only Moonfall's own map banner stays. The banner queue has no map of its own: CHANGES.md I4.)
+function m3wStaleBanners(){
+  if(!G) return; const mine=simplify(String(MAPS[3].name)), stale=b=>!!b&&b.style==='region'&&b.text!==mine;
+  if(G.bannerQ) G.bannerQ=G.bannerQ.filter(b=>!stale(b));
+  if(stale(G.banner)) G.banner=(G.bannerQ&&G.bannerQ.shift())||null;
+}
 MAPS[3].terrain.sea={landD:m3wLandD,shore:70,shelf:170}; MAPS[3].tz=null;
 // the sand under each desert biome is its own colour (the sampler mixes sand toward it)
 for(const [b,c] of [[34,[236,208,140]],[35,[232,191,108]],[37,[228,196,120]],[38,[236,240,246]]]) if(BIOMES[b]) BIOMES[b]._sand=c;
