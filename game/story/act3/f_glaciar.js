@@ -28,13 +28,20 @@ chapter({
     f3_chain_w: { map: 2, at: [6820, 41250], kind: 'prop', look: 'chain_glow', if: '!flag f_glaciar_won', name: 'the west chain' },
     f3_chain_e: { map: 2, at: [7780, 41150], kind: 'prop', look: 'chain_glow', if: '!flag f_glaciar_won', name: 'the east chain' },
     f3_chain_n: { map: 2, at: [7300, 40760], kind: 'prop', look: 'chain_glow', if: '!flag f_glaciar_won', name: 'the north chain' },
+    // Glaciar coiled round the spike under the spell, from the summit door until the fight's own figure comes out
+    // (look glaciar_coil, v10_art3b.js: x2_story's own drawing of her; state blink shows her blue eyes for a moment).
+    // After the fight x2_story draws her itself, awake or asleep by G.choices.f_glaciar.
+    f3_glaciar_coil: { map: 2, at: [7300, 41290], kind: 'prop', look: 'glaciar_coil', if: 'stage>=f_dread !flag f_glaciar_won', name: 'Glaciar' },
     // in front of Glaciar's coils (x2_story draws her round the spike at the Crown's middle)
-    f3_auntie: { map: 2, at: [7300, 41400], r: 40, kind: 'examine', if: 'choice f_glaciar=free !flag f_done', h: 110,
+    f3_auntie: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=free !flag f_done', h: 110,
                  name: 'Auntie Glee', prompt: ['Talk to Auntie Glee', 'Talk to Auntie'] },
-    f3_auntie_asleep: { map: 2, at: [7300, 41400], r: 40, kind: 'examine', if: 'choice f_glaciar=defeat !flag f_done', h: 60,
+    f3_auntie_asleep: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=defeat !flag f_done', h: 60,
                         name: 'the sleeping dragon', prompt: ['Kneel by Auntie Glee', 'Kneel by Auntie'] },
-    // the night in Hearthold: where Ash stands by the Great Hearth (x2_story's old night spot), and where the camera looks
-    f3_night_spot: { map: 2, at: [6850, 49100], kind: 'npc_spot', name: 'by the Great Hearth' },
+    // where the camera looks when she talks (her head is drawn high above the coils, north of the Crown's middle)
+    f3_glaciar_face: { map: 2, at: [7270, 41150], kind: 'npc_spot', name: 'Glaciar' },
+    // the night in Hearthold: Ash comes home down the main street (level 0, below the Hearth's steps) and walks up to
+    // the Great Hearth (a scene's fade would stay dark while the scene is up, so the warp happens before it, in play)
+    f3_walk_home: { map: 2, at: [6800, 49280], kind: 'npc_spot', name: 'Hearthold\'s main street' },
     f3_hearth_view: { map: 2, at: [6800, 49010], kind: 'npc_spot', name: 'the Great Hearth' },
   },
 
@@ -76,7 +83,14 @@ chapter({
     // when Ash walks onto the Crown whatever this step says; the talk afterwards waits for it)
     { id: 'who', do: 'deduce snow_mother', scene: 'f3_snow_solved', migrate_if: 'flag f_done',
       obj: ['Before you go to her: who IS she? Work it out in the Case Book', 'Who is she? Open the Case Book'],
-      hint: ['The carving on the Great Hearth. What Ember said about the North Forge. The chapel in Rimeholm. And what Hush said. Open the Case Book.', 'Open the Case Book.'] },
+      hint: ['The carving on the Great Hearth. What Ember said about the North Forge. The chapel in Rimeholm. And what Hush said. Open the Case Book.', 'Open the Case Book.'],
+      // (a save from before the Case Book never found these: they are given back here, so the question can be asked)
+      extra: [
+        { do: 'wait_for !clue f3_lintel', then: ['clue f3_lintel'] },
+        { do: 'wait_for !clue f3_cold_parts', then: ['clue f3_cold_parts'] },
+        { do: 'wait_for !clue f3_chapel', then: ['clue f3_chapel'] },
+        { do: 'wait_for !clue f3_hush_friend', then: ['clue f3_hush_friend', 'clue f3_the_mother'] },
+      ] },
     // the fight is x2_foes' (its site opens on the Crown at this stage); her intro and both outros are the scenes below
     // (x2_foes plays them; `kneel` names the free outro for the checker, the engine does not play it again)
     { id: 'fight', do: 'fight f_glaciar', at: 'f_crown', kneel: 'f_glaciar_outro_free', migrate_if: 'flag f_done',
@@ -97,9 +111,12 @@ chapter({
     { id: 'goat', do: 'wait_for flag f_duchess', at: 'f3_duchess',
       obj: ['Somebody is standing on top of the ice spike. Go and see who.', 'Who is on top of the ice spike?'],
       hint: ['Climb up to the ledge behind the spike, with your claws or the grapple post.', 'Climb up behind the spike.'] },
-    { id: 'night', do: 'cutscene f3_night', migrate_if: 'flag f_done', then: ['xp 800', 'end_act 3'] },
+    { id: 'down', do: 'cutscene f3_going_home', migrate_if: 'flag f_done', then: ['warp f3_walk_home', 'time night'] },
+    { id: 'night', do: 'goto f3_hearth_view 150', scene: 'f3_night', migrate_if: 'flag f_done', then: ['xp 800', 'end_act 3'],
+      obj: ['Go to the Great Hearth', 'Go to the Great Hearth'],
+      hint: ['The Great Hearth is right in the middle of town, up the steps.', 'Go up the steps to the Hearth.'] },
     // the act is over: one direction only (resting, or the end card's "Continue the story", starts Act IV)
-    { id: 'rest', do: 'wait_for act>=4', at: 'f3_night_spot',
+    { id: 'rest', do: 'wait_for act>=4', at: 'f3_hearth_view',
       obj: ['The north is warm again. Rest at a shrine or an inn when you are ready.', 'Rest at a shrine or an inn.'],
       hint: ['You did it, Ash. When you\'re ready, the story goes east. Rest at a shrine or an inn.', 'Rest at a shrine or an inn.'] },
   ],
@@ -114,7 +131,7 @@ chapter({
 
     // ---- old STORY keys, replaced in place (x2_foes plays them as the boss intro and the two outros)
     f_glaciar_intro: [
-      { cam: 'f_crown', s: 1.2 },
+      { cam: 'f3_glaciar_face', s: 1.2 },
       ['narr', 'The top of Mount Dread. No wind. No sound. In the middle of the summit, coiled around a spike of black ice, lies a dragon.', 'The top of the mountain. A dragon lies coiled round a black ice spike.'],
       ['narr', 'She is white and blue and silver, as long as a river, with icicle horns. Four chains of purple frost hold her down, one to each side: south, west, east and north. Two of them up high.', 'She is long and white and blue. Four purple chains hold her down.',
         { ref: ['f3_chain_s', 'f3_chain_w', 'f3_chain_e', 'f3_chain_n'] }],
@@ -125,7 +142,7 @@ chapter({
       { if: 'solved snow_mother', then: [
         ['ash', 'AUNTIE GLEE! It\'s me! Ash! Ember\'s great-great-lots-of-greats!', 'AUNTIE GLEE! It\'s me! Ash!'],
         ['narr', 'For one blink, her eyes go blue. And all four chains light up, bright as lamps.', 'For one blink, her eyes go blue. All four chains light up!',
-          { do: ['world f3_chain_s on', 'world f3_chain_w on', 'world f3_chain_e on', 'world f3_chain_n on'] }],
+          { do: ['world f3_glaciar_coil blink', 'world f3_chain_s on', 'world f3_chain_w on', 'world f3_chain_e on', 'world f3_chain_n on'] }],
         ['tove', 'There! Those chains aren\'t hers, Ash. Melt them, and she\'ll remember!', 'Those chains aren\'t hers! Melt them!'] ],
         else: [
         ['tove', 'Ash! Those chains aren\'t hers! Melt them, and maybe she\'ll remember who she is!', 'Melt the chains! Then she may remember!'] ] },
@@ -154,7 +171,7 @@ chapter({
 
     // free: Ash walks up to her and talks (10 lines a branch)
     f3_auntie_talk: [
-      { cam: 'f_crown', s: 1 },
+      { cam: 'f3_glaciar_face', s: 1 },
       ['ash', '(squished) Hi, Auntie. I\'m your great x13 grand-nephew.', '(squished) Hi, Auntie. I\'m your great x13 nephew.'],
       ['f_glaciar', 'Thirteen? Ember was my NIECE, dumpling. So I\'m fourteen greats.', 'Ember was my NIECE. So I\'m fourteen greats.'],
       ['ash', 'I am NOT saying fourteen.', 'I am NOT saying fourteen.'],
@@ -194,7 +211,7 @@ chapter({
     ],
     // defeat: Ash kneels by the sleeping dragon (the promise is kept by A3S's Crown wake place, from f_done on)
     f3_auntie_sleep: [
-      { cam: 'f_crown', s: 1 },
+      { cam: 'f3_glaciar_face', s: 1 },
       ['narr', 'Glaciar sleeps under her blanket of snow. Her breath puffs out, slow and cold. The chains hum.', 'Glaciar sleeps in the snow. The chains hum.'],
       { choose: 'f3_crown_song', who: 'narr', ask: ['What do you do?', 'What do you do?'],
         pick: [
@@ -219,9 +236,13 @@ chapter({
       { do: ['page f3_tove_notes'] },
     ],
 
+    // after the Crown (then the warp home, in play)
+    f3_going_home: [
+      ['narr', 'The Crown of Dread is quiet now. You say goodbye on top of the world, and climb all the way back down the mountain.', 'You say goodbye, and climb all the way back down.', { ref: 'f_crown' }],
+    ],
     // the night in Hearthold, and the act's end (9 lines a branch)
     f3_night: [
-      { fade: 1 }, { do: ['warp f3_night_spot', 'time night'] }, { cam: 'f3_hearth_view', s: 1 },
+      { cam: 'f3_hearth_view', s: 1 },
       ['narr', 'That night the Great Hearth burns gold and blue and doesn\'t flicker once. Pim gives out free cocoa. Captain Brann isn\'t afraid of anything at all, and says so, loudly, until he falls asleep in a chair.', 'That night the Great Hearth burns gold and blue. Free cocoa! Brann falls asleep in a chair.'],
       ['f_brynja', 'Thank you, child. My old girl says thank you too. She says it in sparks.', 'Thank you, child. My old girl says thank you too. In sparks.'],
       { if: 'choice f_glaciar_home=stay', then: [

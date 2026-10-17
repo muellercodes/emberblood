@@ -66,7 +66,7 @@ chapter({
   },
 
   step: [
-    { id: 'arrive', do: 'goto f_dreadgate_plaza 300', scene: 'f3_dg_arrive', migrate_if: 'flag f_drum', then: ['mail f_pb_3'],
+    { id: 'arrive', do: 'goto f_dreadgate_plaza 300', scene: 'f3_dg_arrive', migrate_if: 'flag f_drum',
       obj: ['Go to the Dreadgate at the foot of Mount Dread', 'Go to the Dreadgate'],
       hint: ['The Dreadgate stands at the foot of Mount Dread, at the top of the Dreadmoor north of Hearthold.', 'Go north, up the Dreadmoor.'] },
     { id: 'look', do: 'all', migrate_if: 'flag f_drum',
@@ -76,9 +76,12 @@ chapter({
         { do: 'examine f3_frost_lock', scene: 'f3_look_lock', then: ['clue f3_gate_carving', 'clue f3_lock_sweats'] },
         { do: 'examine f3_drum_look', scene: 'f3_look_drum', then: ['clue f3_drum_seen'] },
       ] },
-    { id: 'deduce', do: 'deduce how_open', scene: 'f3_how_solved', migrate_if: 'flag f_drum',
+    // (Mom's letter, "you are about to climb a mountain to visit your AUNT", comes once he knows he is going up)
+    { id: 'deduce', do: 'deduce how_open', scene: 'f3_how_solved', migrate_if: 'flag f_drum', then: ['mail f_pb_3'],
       obj: ['How does the Dreadgate open? Work it out in the Case Book', 'Open the Case Book'],
-      hint: ['The carving on the lock, the drum up high, and what Brother Pennant said the monks did every spring. Open the Case Book.', 'Open the Case Book.'] },
+      hint: ['The carving on the lock, the drum up high, and what Brother Pennant said the monks did every spring. Open the Case Book.', 'Open the Case Book.'],
+      // (a save from before the Case Book never heard Pennant's clue: it is given back here, so the question can be asked)
+      extra: [ { do: 'wait_for !clue f3_climbers', then: ['clue f3_climbers'] } ] },
     { id: 'ride', do: 'goto f_shoulder 200', marker: 'f3_drum_wind', migrate_if: 'flag f_drum',
       obj: ['Ride the Drum Wind up to the Drum Stone', 'Ride the Drum Wind up'],
       hint: ['The Drum Wind starts at the big vent on the Dreadmoor, east of the gate. Jump into the swirl.', 'Jump into the swirl at the big vent.'] },
@@ -88,7 +91,8 @@ chapter({
       obj: ['Knock on the Drum Stone: jump, then POUND', 'Jump, then POUND the drum!'],
       hint: ['Jump, then press attack in the air to slam down on the drum. Like a sack of anvils.', 'Jump, then slam down on the drum!'] },
     // the fight is x2_foes' (the plaza site opens with f_drum); its intro and outro are the scenes below, in place
-    { id: 'hush', do: 'fight f_hush', at: 'f_dreadgate_plaza', kneel: 'f_hush_outro', then: ['stage f_dread'],
+    // (then: Hush's two clues again, in case the drum scene was ever skipped: snow_mother cannot be asked without them)
+    { id: 'hush', do: 'fight f_hush', at: 'f_dreadgate_plaza', kneel: 'f_hush_outro', then: ['clue f3_the_mother', 'clue f3_hush_friend', 'stage f_dread'],
       obj: ['Ride the wind back down and face Hush at the Dreadgate', 'Face Hush at the Dreadgate'],
       hint: ['Moths love lamps. Every moth. Light the lamps on the plaza and she can\'t help herself.', 'Light the lamps on the plaza!'] },
   ],

@@ -20,7 +20,7 @@ legacy({ id: 'f_dreadgate_plaza', map: 2, at: [7300, 44300], r: 420, kind: 'plac
 legacy({ id: 'f_lm_dreadlock', map: 2, at: [7300, 44160], r: 30, kind: 'landmark', name: 'the Frost Lock',
          aliases: ['the lock'], src: 'LANDMARKS:f_lm_dreadlock' });
 legacy({ id: 'f_dread_door', map: 2, at: [7300, 44172], r: 40, kind: 'door', leads: 'f_dread', name: 'the Dreadgate',
-         aliases: ['the black doors', 'the Heart of Dread'], src: 'DOORS:f_dread@7300,44172' });
+         aliases: ['the black doors', 'the Heart of Dread'], src: 'DOORS:f_dread' });
 // the Shoulder Ledge high on the mountain, and the Drum Stone on it (only a Ground Pound rings it: x2_story's pound
 // listener sets f_drum and plays STORY.f_drum, which is f_dreadgate.js's data scene)
 legacy({ id: 'f_shoulder', map: 2, at: [8400, 43420], r: 300, kind: 'place', name: 'the Shoulder Ledge',
@@ -28,12 +28,10 @@ legacy({ id: 'f_shoulder', map: 2, at: [8400, 43420], r: 300, kind: 'place', nam
 legacy({ id: 'f_lm_drum', map: 2, at: [8350, 43400], r: 40, kind: 'landmark', name: 'the Drum Stone',
          aliases: ['the drum', 'the stone drum'], src: 'LANDMARKS:f_lm_drum' });
 
-// the Crown of Dread, the summit (Glaciar's fight site; x2_story draws her coiled round the black ice spike), and the
-// summit door Ash comes out of (x2_dun_b's d2bSummitOut puts him at 7060,41700)
+// the Crown of Dread, the summit (Glaciar's fight site; x2_story draws her coiled round the black ice spike). Ash
+// comes out of the summit door at its south-west edge (x2_dun_b's d2bSummitOut puts him at 7060,41700).
 legacy({ id: 'f_crown', map: 2, at: [7300, 41250], r: 560, kind: 'place', name: 'the Crown of Dread',
          aliases: ['the summit', 'the top of Mount Dread'], src: 'POI:f_crown' });
-legacy({ id: 'f_crown_door', map: 2, at: [7060, 41662], r: 40, kind: 'door', leads: 'f_dread', name: 'the summit door',
-         src: 'DOORS:f_dread@7060,41662' });
 // Duchess the goat on the tip of the spike after the fight (x2_people draws her there and plays STORY.f_duchess when
 // Ash walks up within 170 px, then sets f_duchess)
 legacy({ id: 'f3_duchess', map: 2, at: [7300, 40820], r: 170, kind: 'npc', name: 'a goat on the ice spike',

@@ -14,6 +14,8 @@
   const glow = (g, x, y, r, rgb, a) => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); };
   // the time since a look's state last changed (each look keeps its own memory, by anchor)
   const MEM = {};
+  // a real clock: the game's own time may stand still while a scene is on screen, and these looks move in scenes
+  const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000;
   const since = (key, state, t) => { const m = MEM[key]; if (!m || m.st !== state) { MEM[key] = { st: state, t0: t, prev: m ? m.st : null, scarf: !!(m && (m.st === 'scarf' || m.scarf)) }; return 0; } return t - m.t0; };
 
   // ---------- the big Hush: the portrait moth, drawn once into a 240 x 220 canvas (centre 120, 120)
@@ -59,8 +61,8 @@
 
   if (has) {
     // ---------- chain_glow: a pale violet-blue column of light on a Chain Stone, pulsing, with motes rising
-    defineLook('chain_glow', { w: 80, h: 160, anim: true, draw(g, x, y, t, state) {
-      if (state !== 'on') return;
+    defineLook('chain_glow', { w: 80, h: 160, anim: true, draw(g, x, y, t0, state) {
+      if (state !== 'on') return; const t = now();
       try { const S = F2G && F2G.stones; if (S) for (const s of S) if (Math.hypot(s.x - x, s.y - y) < 70 && s.done) return; } catch (e) {}
       const p = 0.75 + 0.25 * Math.sin(t * 3.2 + x * 0.01);
       g.save();
@@ -73,8 +75,23 @@
       g.restore();
     } });
 
+    // ---------- glaciar_coil: Glaciar under the spell, coiled round the black ice spike, drawn by x2_story's own
+    // f2sDrawGlac (violet eyes and her chains); state blink: her eyes go blue for a moment. Nothing while the fight's
+    // own figure is out, or once the fight has an outcome (x2_story draws her awake or asleep then).
+    defineLook('glaciar_coil', { w: 600, h: 440, anim: true, draw(g, x, y, t0, state) {
+      const t = now();
+      try {
+        if (typeof f2sDrawGlac !== 'function') return;
+        if (G.choices && G.choices.f_glaciar) return;
+        if ((G.enemies || []).some(e => !e.dead && e.type === 'f_glaciar')) return;
+        const s = since('coil', state, t);
+        f2sDrawGlac(state === 'blink' && s < 0.9 ? 'awake' : 'spell');
+      } catch (e) {}
+    } });
+
     // ---------- hush_rise: the barn-sized moth unfolding off the mountain, high above the drum
-    defineLook('hush_rise', { w: 360, h: 340, anim: true, draw(g, x, y, t, state) {
+    defineLook('hush_rise', { w: 360, h: 340, anim: true, draw(g, x, y, t0, state) {
+      const t = now();
       if (state !== 'unfold') { since('rise', state, t); return; }
       const u = Math.min(1, since('rise', state, t) / 1.8), k = (0.35 + 0.95 * u) * (1 + 0.06 * Math.sin(t * 2.2));
       const sp = bigMoth(); if (!sp) return;
@@ -85,19 +102,20 @@
     } });
 
     // ---------- hush_small: the tiny moth after the fight
-    defineLook('hush_small', { w: 80, h: 220, anim: true, draw(g, x, y, t, state) {
+    defineLook('hush_small', { w: 80, h: 220, anim: true, draw(g, x, y, t0, state) {
+      const t = now();
       const s = since('small', state, t);
       if (state === 'fallen' || state === 'scarf') {
         g.save(); g.globalAlpha = 0.25; el(g, x, y + 2, 12, 4, 0, '#1a1430'); g.restore();
         if (state === 'scarf') glow(g, x, y - 10, 26, '255,190,150', 0.25);
-        tinyMoth(g, x, y - 8, t, { shiver: state === 'fallen', scarf: state === 'scarf', k: 1.15 });
+        tinyMoth(g, x, y - 10, t, { shiver: state === 'fallen', scarf: state === 'scarf', k: 1.6 });
         return;
       }
       if (state === 'away') {
         const u = Math.min(1, s / 3.2); if (u >= 1) return;
         g.save(); g.globalAlpha = 1 - u * u;
         // (the scarf stays on her as she flies away: since() remembers the state before)
-        tinyMoth(g, x + u * 70 + Math.sin(s * 5) * 6, y - 8 - u * 190, t, { fly: true, scarf: !!(MEM.small && MEM.small.scarf), k: 1.15 - u * 0.5 });
+        tinyMoth(g, x + u * 70 + Math.sin(s * 5) * 6, y - 8 - u * 190, t, { fly: true, scarf: !!(MEM.small && MEM.small.scarf), k: 1.6 - u * 0.7 });
         g.restore();
         return;
       }

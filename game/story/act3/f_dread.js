@@ -88,8 +88,8 @@ chapter({
     ],
     // out of the summit door onto the Crown (x2_dun_b, then x2_story's f2sCrownDoor; it moves the stage to f_glaciar)
     f_crown_door: [
-      ['narr', 'The last chain snaps. You climb out of the summit door into the blizzard, and it howls right in your face.', 'The last chain snaps. You climb out into the howling blizzard.', { ref: 'f_crown_door' }],
-      { cam: 'f_crown', s: 2 },
+      ['narr', 'The last chain snaps. You climb out of the summit door into the blizzard, and it howls right in your face.', 'The last chain snaps. You climb out into the howling blizzard.', { ref: 'f_crown' }],
+      { cam: 'f3_glaciar_face', s: 2 },
       ['narr', 'Then, all at once, the wind stops. Like someone pressed a button.', 'Then the wind stops. All at once.'],
       ['tove', 'She\'s right there, Ash. I can feel her. She\'s so cold she\'s almost warm.', 'She\'s right there. She\'s so cold she\'s almost warm.'],
       ['ash', 'Okay. Okay. I\'m going to meet my auntie. Hat off. Be polite. Drink the ice tea.', 'Okay. I\'m going to meet my auntie. Hat off. Be polite.'],
