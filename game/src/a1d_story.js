@@ -4,7 +4,7 @@
 const ch=(who,text,opts)=>({who,text,opts});
 const STORY={
   prologue:[
-    ['narr',`A thousand years ago, the dragon Vorlaxis, the First Flame, ruled the valley of Embermere. Nothing grew. Nothing was cozy. It was a terrible time for picnics.`],
+    ['narr',S(`A thousand years ago, the dragon Vorlaxis, the First Flame, ruled the valley of Embermere. Nothing grew under his smoke, and nobody in the valley had a picnic for three hundred years.`,`Long ago, the dragon Vorlaxis ruled the valley. Nothing grew. No picnics!`)],
     ['narr',`Five Wardens rose against him: Iska, Bram, Oriel, Sedge and Tove. You cannot kill a dragon made of fire. So they did the next best thing. They split his flame in two.`],
     ['narr',`Half stayed with Vorlaxis, chained in sleep under Cinder Mountain. The other half went to his own daughter, Ember, who loved the valley more than she feared her father. Her children were the Emberbloods.`],
     ['narr',`Five Ward-fires, lit with Ember's flame, held the chains. The Wardens wrote that the binding would last a thousand years. After that, someone would have to finish the job.`],
@@ -24,7 +24,7 @@ const STORY={
   lanternsDone:[
     ['yara',`Beautiful work, Ash. A thousand Lantern Days, and they never looked so bright.`],
     ['ash',`And not a single bakery was harmed.`],
-    ['narr',`Then the north gate creaked open. Nobody remembered leaving it unlocked.`],
+    ['narr',S(`Then the North Gate creaked open. Nobody remembered leaving it unlocked.`,`Then the North Gate creaked open.`)],
     ['yara',`Kobolds! In the village! Ash, drive them out!`]
   ],
   lore:[
@@ -38,7 +38,7 @@ const STORY={
     ['yara',`The Hollow Ward under the old oak went dark when the kobolds came. Relight it. Breathe on the ward stone and don't stop until it catches.`]
   ],
   ward_hollow:[
-    ['iska',`Ah. Warm again. Thank you, little ember.`],
+    ['iska',S(`Warm again. Thank you, Emberblood.`,`Warm again. Thank you!`)],
     ['ash',`Did the rock just talk?`],
     ['iska',`I am Iska, first of the Five Wardens. Or what's left of me. We tied our spirits to the Ward-fires so someone would always be watching.`],
     ['iska',`When the thousand years end, the chains fall away. If the five Wards are burning, he wakes weak and slow, and an Emberblood can face him. If they are dark, he wakes at full strength.`],
@@ -46,7 +46,7 @@ const STORY={
     ['iska',`A cult called the Scaled Oath has been snuffing the Wards. Their kobolds answer to a chieftain named Grizzlefang. His war camp is in the woods north of the village. Start there.`]
   ],
   wren:[
-    ['wren',`Ash Emberblood? Wonderful. Yara's crow said you'd come. Mind the books, they bite. Not literally. Mostly.`],
+    ['wren',S(`There you are, Ash. Pebble brought Yara's note an hour ago. Come in, and mind the stacks. They lean.`,`Hello, Ash. Yara's crow said you were coming. Come in.`)],
     ['wren',`Five Wards hold the chains. Hollow, which you relit. The Ash Ward on the Ashen Road. The Crag Ward up with the drakelings. The Sunken Ward in the Mirefen. And the Frost Ward in the Frostpine Highlands.`],
     ['wren',`The Scaled Oath holds the Ash Ward now. Their High Priest, Morrow, is trying to put it out for good. That's your next stop.`],
     ['ash',`And when all five are burning again?`],
@@ -57,7 +57,7 @@ const STORY={
   ward_ash:[
     ['bram',`Hah! Fire in the old stones again! Bram's the name. I was the Warden with the big hammer and the bigger mouth.`],
     ['bram',`Three Wards left, kid. Crag, Mire and Frost. Take them in whatever order you like. Just don't take them lightly.`],
-    ['bram',`And, uh, while you're out there, the people of this valley could use a hand. Wards are important. So are neighbours.`]
+    ['bram',S(`And while you're out there, help folk when you can. A Warden who only looks after rocks is just a rock with opinions.`,`And help people when you can. Not just the Wards.`)]
   ],
   ward_crag:[
     ['oriel',`Welcome, Emberblood. I am Oriel. I watched over these crags, and the dragons who nest in them.`],
@@ -67,12 +67,12 @@ const STORY={
     ['pip',`Mip!`]
   ],
   ward_mire:[
-    ['sedge',`Oh! Oh, hello. Sorry, I've been sitting in a swamp for a thousand years. I'm Sedge. Warden of the Mire. And of mud, mostly.`],
+    ['sedge',S(`Hello, hello! Sorry, I've been sitting in a swamp for a thousand years. I'm Sedge, Warden of the Mire. And of the mud.`,`Hello! Sorry, I sat in a swamp for a long time. I'm Sedge.`)],
     ['sedge',`Thank you, Ash. Granny Moss has been talking to my stone for years. She's lovely. Bring her some tea sometime.`]
   ],
   ward_frost:[
-    ['tove',`Brr. Finally. I'm Tove. I had the coldest post of all five Wardens, and I would like that noted.`],
-    ['tove',`Greymane was a good wolf before the Oath poisoned him with dragon smoke. Whatever you chose for him, you chose with your heart. Thank you.`]
+    ['tove',S(`Brr. Finally, warm stones. I had the coldest post of all five Wardens, and in a thousand years nobody came to visit.`,`Brr. Warm at last! Nobody visited me for a long time.`)],
+    ['tove',S(`Greymane was a good wolf before the Oath fed him dragon smoke. I watched him grow up from a pup. Thank you for being gentle with him.`,`Greymane was a good wolf before the smoke. Thank you for being gentle.`)]
   ],
   allWards:[
     ['iska',`All five Wards burn again, Ash. Can you feel it?`],
@@ -95,7 +95,7 @@ const STORY={
         ['morrow',`You don't understand... he promised... he promised all of us...`],
         ['voice',`Morrow served me well. You will serve me better. Keep climbing, little ember.`],
         ['narr',`A crumpled letter falls out of Morrow's sleeve. You pick it up.`],
-        ['narr',`"To W., the lamp-man of Emberhollow. Leave the north gate open on Lantern Night and the oil will never run out. The Oath remembers its friends."`],
+        ['narr',S(`"To W., the lamp-man of Emberhollow. Leave the North Gate open on Lantern Day and the oil will never run out. The Oath remembers its friends."`,`A letter: open the gate, and get oil forever.`)],
         ch('morrow',`Please. I'm an old man who believed a dragon. Isn't that punishment enough?`,[
           {t:'Let him go',fn:()=>{ G.choices.morrow='free'; },then:[['ash',`Go home, Morrow. Find something better to believe in.`],['morrow',`I... thank you. I think I'll go somewhere quiet. Maybe grow something that isn't on fire.`]]},
           {t:'Take him to Captain Osric',fn:()=>{ G.choices.morrow='jail'; },then:[['ash',`You're coming with me to Brindlecross. Captain Osric can decide.`],['narr',`You march Morrow all the way to the Brindlecross Watch House. Osric looks thrilled. Morrow looks relieved, honestly.`]]}
@@ -140,9 +140,9 @@ const STORY={
   // ---------- the confrontation with Fennick (The Open Gate)
   confront:[
     ['fennick',`Ah. You found the badge. And the letter. And the bootprints. You are very thorough, Ash.`],
-    ['fennick',`They said if I left the gate open on Lantern Night, I'd have lamp oil that never runs out. Never! Do you know what that means to a lamp man?`],
-    ['ash',`Kobolds burned half the village, Fennick.`],
-    ['fennick',`I know. I know. I didn't think. I'm so sorry, Ash. I'm so, so sorry.`],
+    ['fennick',S(`They said if I left the gate open on Lantern Day, I'd have lamp oil that never runs out. Never! Do you know what that means to a lamp man?`,`They promised me oil forever if I left the gate open.`)],
+    ['ash',S(`Kobolds burned two houses, Fennick. And the Ward went out.`,`Kobolds burned two houses, Fennick.`)],
+    ['fennick',S(`I know. I know. I didn't think. I've been sick about it every day since.`,`I know. I didn't think. I feel sick about it.`)],
     ch('ash',`What should happen to Fennick?`,[
       {t:'Forgive him',fn:()=>{ G.choices.fennick='forgive'; },then:[['ash',`You're going to make it right. Every day.`],['fennick',`I will! I'll light every lantern in Emberhollow, every night, forever. And here. They gave me this. It's the key to their tunnel off the Ashen Road.`]]},
       {t:'Turn him in to Captain Osric',fn:()=>{ G.choices.fennick='jail'; },then:[['ash',`You have to answer for it, Fennick.`],['fennick',`...That's fair. Here. They gave me this key. It opens their tunnel off the Ashen Road. Tell Osric I'll come quietly. I'll bring a lamp. For the cell.`]]}
@@ -206,7 +206,7 @@ const EPILOGUE_FMT=()=>{
   if(q('duchess')) L.push(['narr',`Duchess the goat lived a long life full of opinions.`]);
   if(G.flags.pip) L.push(['pip',`Mip!`]);
   { const ev2=evEpilogue(); if(ev2) L.push(ev2); }
-  L.push(['narr',`And the last of the Emberblood line never, ever had to say "great" thirteen times again.`]);
+  L.push(['narr',S(`And Ash never, ever had to say "great" thirteen times again.`,`And Ash never had to say "great" thirteen times again.`)]);
   return L;
 };
 // v6 weapons: Mom offers to forge a hammer (forgeHammerTalk in a6b_weapons.js)
@@ -219,27 +219,27 @@ Object.assign(STORY,{
   trial_leap_sealed:[['narr',`A stone arch, half swallowed by roots. Three runes are carved over the door, cold and grey.`],['narr',`In the middle of the door is a carved flame, with tiny claw marks all around it, as if someone small once knocked and knocked.`],['ash',`Hello? Anybody home?`],['narr',`Nothing. Elder Yara might know what this place is.`]],
   trial_tide_sealed:[['narr',`White stone doors, crusted with shells. Carved fish swim all over them. Their eyes are closed.`],['narr',`The runes over the door are sleeping. Maybe they wake up later. Maybe they're just not morning runes.`]],
   trial_sky_sealed:[['narr',`A gate of white and gold stone, standing all alone on the crag. The wind whistles through it like a flute.`],['narr',`The runes are dark. Somewhere far away, something with very big wings is waiting for you to be ready.`]],
-  trial_leap_in:[['ember',`Oh! Oh, you came. Hello, little ember.`],['ash',`Who said that?`],['ember',`I did. Up here. Well, sort of everywhere. I am Ember. A very long time ago I built this place for my children, so their dragon gifts could wake.`],['ember',`Nobody has opened these doors in a thousand years. Nobody had the fire. But you do. I can feel it. You are so warm.`],['ash',`Wait. Ember? Like Grandma Ember? Great ×13 Grandma Ember?`],['ember',`Thirteen greats is a lot of greats. Just Ember is fine.`],['ember',`This is the Trial of the Leap. Find my shrine in the middle. Mind the pits, and the roots, and Old Gnarl. Mostly Old Gnarl.`]],
+  trial_leap_in:[['ember',S(`Oh! You came. Hello, little ember.`,`Oh! You came. Hello!`)],['ash',`Who said that?`],['ember',`I did. Up here. Well, sort of everywhere. I am Ember. A very long time ago I built this place for my children, so their dragon gifts could wake.`],['ember',`Nobody has opened these doors in a thousand years. Nobody had the fire. But you do. I can feel it. You are so warm.`],['ash',`Wait. Ember? Like Grandma Ember? Great ×13 Grandma Ember?`],['ember',`Thirteen greats is a lot of greats. Just Ember is fine.`],['ember',`This is the Trial of the Leap. Find my shrine in the middle. Mind the pits, and the roots, and Old Gnarl. Mostly Old Gnarl.`]],
   trial_leap_shrine:[['ember',`There it is. My flame. I left a little of it here, just for you.`],['ember',`Touch it, and your legs will remember what your blood already knows.`]],
-  trial_leap_gift:[['narr',`You touch the flame. It doesn't burn. It tickles.`],['narr',`Warmth runs all the way down into your feet. Your tail flicks. Your knees feel... springy.`],['ember',`The Leap! Now you can jump over pits, spikes, and very rude roots. Run first, and you will jump even farther.`],['ash',`I'm going to jump on EVERYTHING.`],['ember',`I know. My children said that too.`]],
+  trial_leap_gift:[['narr',`You touch the flame. It doesn't burn. It tickles.`],['narr',`Warmth runs all the way down into your feet. Your tail flicks. Your knees feel... springy.`],['ember',S(`The Leap! Now you can jump over pits, spikes, and roots that trip you on purpose. Run first, and you will jump even farther.`,`The Leap! Jump over pits and spikes. Run first to jump farther.`)],['ash',`I'm going to jump on EVERYTHING.`],['ember',`I know. My children said that too.`]],
   trial_leap_how:`Press C, the JUMP button, or A on a controller. Sprint first to leap farther.`,
   trial_leap_item:[['narr',`You heave open the great chest. Inside, wrapped in leaves that never went brown, is a curved piece of red-gold wood.`],['ember',`My Wing-rang! I carved it from the old oak by the village. Throw it, and it always comes home. Like children. Eventually.`],['ember',`It can strike things your claws cannot reach. Crystal switches across the pits, for example. Hint, hint.`]],
   trial_leap_itemhow:`Switch weapons with X or the WEAPON button, then throw it. It flies over pits and comes back.`,
-  trial_leap_bossline:`Old Gnarl! When he stomps, JUMP the rings. Then hit the glowing knot on his back. And roots burn, little ember. Roots burn.`,
+  trial_leap_bossline:S(`Old Gnarl! When he stomps, JUMP the rings. Then hit the glowing knot on his back. And roots burn, Ash. Roots burn.`,`Old Gnarl! Jump the rings. Hit the glowing knot. Roots burn!`),
   trial_leap_won:[['narr',`Old Gnarl creaks, wobbles, and sits down with a sound like a whole forest sighing.`],['narr',`A little green sprout pops out of the top of his head. He looks... happy?`],['ember',`Thank you, old friend. You guarded this place for a thousand years. You can rest now. Grow some acorns.`],['ember',`Go on, Ash. Through the door. Something is waiting for you.`]],
-  trial_leap_end:[['ember',`You passed the Trial of the Leap. I am so proud of you I could burst. Ghosts can't burst. I checked.`],['ember',`Take a little more of my fire. It will make you stronger.`],['ember',`Two more Trials are waiting. The Trial of the Tide sleeps on the island in Lake Mirrow. You'll need your new legs to get there.`],['narr',`Step into the warp ring to go back outside.`]],
-  trial_tide_in:[['ember',`Ash! You found the island. Did you jump the broken pier? I made it broken on purpose. Well. Time made it broken. I'm taking the credit.`],['ember',`This is the Trial of the Tide. The water here is old, and clever. Watch how it rises and falls.`],['ember',`My shrine is in the middle. The Mirrow Serpent waits at the end. He is very big, and very wet, and he never stops splashing.`]],
+  trial_leap_end:[['ember',S(`You passed the Trial of the Leap! If I still had feet, I'd be dancing on them.`,`You passed! If I had feet, I would dance.`)],['ember',`Take a little more of my fire. It will make you stronger.`],['ember',`Two more Trials are waiting. The Trial of the Tide sleeps on the island in Lake Mirrow. You'll need your new legs to get there.`],['narr',`Step into the warp ring to go back outside.`]],
+  trial_tide_in:[['ember',`Ash! You found the island. Did you jump the broken pier? I made it broken on purpose. All right, time made it broken. I'm taking the credit.`],['ember',`This is the Trial of the Tide. The water here is old, and clever. Watch how it rises and falls.`],['ember',`My shrine is in the middle. The Mirrow Serpent waits at the end. He is very big, and very wet, and he never stops splashing.`]],
   trial_tide_shrine:[['ember',`My flame again. This one remembers the lake.`],['ember',`Water usually puts fire out. Not ours. Ours walks right across it.`]],
-  trial_tide_gift:[['narr',`The flame pours over you like warm rain. Steam curls off your scales.`],['narr',`You look down. The water in the pools shivers away from your feet, like it's shy.`],['ember',`Water Stride! Now deep water will hold you up, as long as you keep walking. Sprint, and you'll skim like a skipping stone.`],['ash',`Can I walk across Lake Mirrow? The WHOLE lake?`],['ember',`The whole lake. Wave to the fish for me.`]],
-  trial_tide_how:`Just walk onto deep water. With Water Stride it holds you up. Sprint to skim even faster.`,
+  trial_tide_gift:[['narr',`The flame pours over you like warm rain. Steam curls off your scales.`],['narr',`You look down. The water in the pools shivers away from your feet, like it's shy.`],['ember',S(`Water Stride! Now deep water will hold you up, as long as you keep walking. Running on water is hard work, so mind your breath.`,`Water Stride! Walk on deep water. Running on it tires you out.`)],['ash',`Can I walk across Lake Mirrow? The WHOLE lake?`],['ember',`The whole lake. Wave to the fish for me.`]],
+  trial_tide_how:S(`Just walk onto deep water. With Water Stride it holds you up. Sprinting on water burns stamina fast.`,`Walk onto deep water. It holds you up. Running tires you.`),
   trial_tide_item:[['narr',`The great chest opens with a soft click. Inside lies a bow of pale driftwood, strung with something that shines like moonlight on water.`],['ember',`My bow! I made the string out of a moonbeam. Don't ask me how. I don't remember. It was a very long night.`],['ember',`Arrows fly straight and far. Stone eyes that won't open for claws will open for an arrow.`]],
   trial_tide_itemhow:`Switch to the bow with X or the WEAPON button, then shoot. Arrows wake the stone eyes.`,
   trial_tide_bossline:`The Mirrow Serpent! Stride out to his head when he comes up for air. And keep out of the whirlpool!`,
   trial_tide_won:[['narr',`The Mirrow Serpent sinks down, down, down... then bobs back up and floats on its back like a very large, very embarrassed noodle.`],['narr',`It blows one big bubble at you. Then it swims off into the deep, humming.`],['ember',`He always loved a good game of splash. Thank you for playing with him, Ash.`]],
-  trial_tide_end:[['ember',`Two Trials! You are as stubborn as I was. That's a compliment. Mostly.`],['ember',`The last one is the hardest. The Trial of the Sky waits on the crag in the Drakeling Crags, behind a moat far too wide to jump.`],['ash',`But not too wide to walk on.`],['ember',`Exactly. Clever ember.`],['narr',`Step into the warp ring to go back outside.`]],
+  trial_tide_end:[['ember',S(`Two Trials! You're as stubborn as I was. That's a compliment.`,`Two Trials! You are stubborn, like me. That's good.`)],['ember',`The last one is the hardest. The Trial of the Sky waits on the crag in the Drakeling Crags, behind a moat far too wide to jump.`],['ash',`But not too wide to walk on.`],['ember',`Exactly. You're quick.`],['narr',`Step into the warp ring to go back outside.`]],
   trial_sky_in:[['ember',`You walked across the moat! I watched. You looked very heroic. You also slipped once. I won't tell anyone.`],['ember',`This is the Trial of the Sky, my last and my favorite. Here the wind is the floor and the clouds are the walls.`],['ember',`You'll need my Wing-rang and my bow. And at the very top waits Skrae, the Storm Wyvern. She is fast, and she is LOUD.`]],
   trial_sky_shrine:[['ember',`My last flame. I saved the best one for last.`],['ember',`I flew, once. My children flew. Now it is your turn.`]],
-  trial_sky_gift:[['narr',`The flame rushes into you with a roar like wind in a chimney.`],['narr',`Something unfolds on your back. Two wings, small and warm and very, very real.`],['ash',`I have WINGS. Actual WINGS. Pip is going to be so jealous.`],['ember',`Wings! Jump, then jump again in the air to take off. They get tired, so land now and then to let them rest.`],['ember',`Chasms can't stop you now. Nothing can. Well. Walls can. Please don't fly into walls.`]],
+  trial_sky_gift:[['narr',`The flame rushes into you with a roar like wind in a chimney.`],['narr',`Something unfolds on your back. Two wings, small and warm and very, very real.`],['ash',S(`I have WINGS. Actual WINGS. Rook is going to be so jealous.`,`I have WINGS! Rook will be so jealous.`)],['ember',`Wings! Jump, then jump again in the air to take off. They get tired, so land now and then to let them rest.`],['ember',`Chasms can't stop you now. Nothing can. Well. Walls can. Please don't fly into walls.`]],
   trial_sky_how:`Jump, then press JUMP again in the air to fly. Press it once more to land. Watch your flight meter.`,
   trial_sky_item:[['narr',`The great chest opens.`]],
   trial_sky_itemhow:``,
