@@ -107,7 +107,7 @@ chapter({
       { if: '!clue m4_hush_pulled', then: [
         ['ash', 'At the Moon Well her thread yanked Hush up the sky like a kite.', 'Her thread yanked Hush up like a kite.', { clue: 'm4_hush_pulled' }] ] },
       { if: '!quest m_leash done', then: [
-        ['iska', "Elder Ripple's old Book of Moths might know the Mother's real name, too. Names matter, little ember.", "Ripple's old Book might know her real name.", { promise: 'm4_book' }] ] },
+        ['iska', "Elder Ripple keeps Lumen's old records down in Coralcombe. They might know the Mother's real name, too. Names matter, Ash.", "Ripple's old records might know her real name.", { promise: 'm4_book' }] ] },
     ],
     // the experiment: Ash tries what he would try on Hush (play it again to try another way)
     m4_moth_try: [
@@ -118,7 +118,7 @@ chapter({
         { t: ['Tug it loose', 'Tug it'], tone: 'brave', v: 'tug', then: ['set m4_try_tug'],
           say: [['narr', 'You give the thread a tug. Far, far above, something tugs back. Harder. The little moth squeaks.', 'You tug. Far above, something tugs back. Harder!']] },
         { t: ['Cut it with your claws', 'Cut it'], tone: 'brave', v: 'cut', then: ['set m4_try_cut'],
-          say: [['narr', 'Your claws slide off the silver thread like it is made of moonlight. Which it is.', 'Your claws slide off. It is made of moonlight.']] },
+          say: [['narr', 'Your claws slide right off. The thread is moonlight spun thin, and claws cannot hold moonlight.', 'Your claws slide off. It is made of moonlight.']] },
         { t: ['Talk to it', 'Talk to it'], tone: 'kind', v: 'talk',
           say: [['narr', '"Shh," says the little moth. "Shh. The Mother is always listening." It looks at the cold brazier, and back at you.', '"Shh. The Mother listens." It looks at the cold brazier.']] },
       ] },

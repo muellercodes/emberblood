@@ -13,7 +13,7 @@ chapter({
   so_far: [
     'Ash worked out where the last Shard went: east, to the Eclipse Observatory. The only way east is under the Reefwall, through the Sunken Gate. A pufferfish is stuck in it.',
     'The Shard went east, to the Observatory. A fish is stuck in the gate.'],
-  hint: ['The Sunken Gate is in the Reefwall, east across the sea. A pufferfish is stuck in it. Bring bombs. Pufferfish hate bombs. Everybody hates bombs.',
+  hint: ['The Sunken Gate is in the Reefwall, east across the sea. A pufferfish is stuck in it. Bring bombs: a fish full of air does not like a bang.',
     'The Sunken Gate is east, in the Reefwall. A fish is stuck in it. Bring bombs!'],
 
   place: {

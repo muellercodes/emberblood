@@ -10,8 +10,8 @@ chapter({
   id: 'm_mirror', act: 4, after: 'm_glasswall', next: 'm_moonpath', takeover: true,
   card: null, name: ['Mirrors', 'Mirrors'],
   so_far: [
-    "The Mirror Temple keeps Ember's moonfire, and a peacock who thinks he is the most beautiful thing in the world.",
-    "The Mirror Temple keeps Ember's moonfire. And a very vain peacock."],
+    "Nyxara drank the Moon Well and asked for all three Shards. Ash dug under the Glasswall to the Mirror Temple, where Ember hid her moonfire.",
+    'Nyxara drank the Moon Well. Ash dug under the wall to the Mirror Temple.'],
   mom: [['Mirrors? Wave at yourself for me.', 'Mirrors? Wave at yourself for me.']],
 
   place: {
@@ -110,15 +110,15 @@ chapter({
       { if: '!clue m4_she_asks', then: [
         ['ash', 'On the beach she could have squashed me flat. She ASKED me for the Shards instead. Why ask?', 'On the beach she ASKED me for the Shards. Why ask?', { clue: 'm4_she_asks' }] ],
         else: [
-        ['narr', 'The eyes close. One mirror shows you, looking a bit worried. You fix your hair. It helps.', 'The eyes close. You fix your hair. It helps.', { do: ['set m4_eyes_on=0'] }] ] },
+        ['narr', 'The eyes close. In one mirror you see yourself, sandy and a bit worried. You smooth your hair down anyway.', 'The eyes close. You fix your hair anyway.', { do: ['set m4_eyes_on=0'] }] ] },
       { do: ['set m4_eyes_on=0'] },
       // (a save from before v10 never saw Esme's workbench in Sable: Iska knows her saying)
       { if: '!clue m4_cracked_lamp', then: [
-        ['iska', 'Esme in Sable says it every day: "Cracked lamps can\'t hold a flame. Mend it whole first."', 'Esme says: "Cracked lamps can\'t hold a flame."', { clue: 'm4_cracked_lamp' }] ] },
+        ['iska', 'Sable\'s lamplighters have a saying: "Cracked lamps can\'t hold a flame. Mend it whole first."', 'Sable\'s lamplighters say: "Cracked lamps can\'t hold a flame."', { clue: 'm4_cracked_lamp' }] ] },
     ],
     m4_why_solved: [
       ['ash', "A cracked lamp can't hold a flame. A broken Heart can't burn black. She needs it WHOLE, and only my fire can mend it.", 'A broken Heart cannot burn black. She needs it whole. Only my fire can mend it.'],
-      ['iska', 'Then mend it, little ember. And keep it. A whole heart is a warm thing, if you hold it right.', 'Then mend it. And keep it warm.'],
+      ['iska', 'Then mend it, Ash, and keep it in your own satchel. She can ask as nicely as she likes.', 'Then mend it, and keep it. Do not give it to her.'],
     ],
     // an empty scene: the old copies of the boss words are replaced by it (see replaces)
     m4_quiet: [],

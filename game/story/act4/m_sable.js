@@ -11,8 +11,8 @@ chapter({
   so_far: [
     'During an eclipse, Nyxara came herself: a moth the size of a house. She took a huge bite of the moon. She could have squashed Ash flat, but she asked for the Shards instead.',
     'Nyxara came, as big as a house. She bit the moon. She ASKED for the Shards.'],
-  hint: ["Follow the caravan road east, Ash. Where there's a road, there are people. Where there are people, there's usually soup.",
-    "Follow the road east, Ash. Where there's a road, there are people. And soup."],
+  hint: ["Follow the caravan road east, Ash. The oasis is where the palm trees are.",
+    "Follow the road east, Ash. Look for palm trees."],
   mom: [['The sun went out? In the DAY? Wear something warm. And bright.', 'The sun went out? Wear something bright!']],
 
   place: {

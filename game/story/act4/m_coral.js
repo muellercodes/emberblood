@@ -9,8 +9,8 @@ chapter({
   id: 'm_coral', act: 4, after: 'm_lumen', next: 'm_reef', takeover: true,
   card: null, name: ['Drowned Lumen', 'Drowned Lumen'],
   so_far: [
-    "Ash can dive! A great grey moth carried the last Shard of the Ember Heart away. The merfolk of Coralcombe, Lumen's grandchildren, saw it go.",
-    'Ash can dive! The merfolk saw where the last Shard went.'],
+    "Ash can dive! Ember's flame in Drowned Lumen said the merfolk of Coralcombe, Lumen's grandchildren, would know the way east.",
+    'Ash can dive! Ember says the merfolk know the way east.'],
   hint: ['Coralcombe is the ring of coral south of Driftwood. Dive in the middle.', 'Coralcombe is the coral ring south of Driftwood. Dive in the middle.'],
 
   clue: {
@@ -75,24 +75,24 @@ chapter({
     crl_coralia: [
       ['m_coralia', "I am Coralia, Queen of the Lumenfolk. Our grandmothers' grandmothers lived in Lumen, under the moon, until the moth came the first time.",
         'I am Coralia, Queen of the Lumenfolk. Long ago we lived in Lumen.'],
-      ['ash', 'Are you related to the moon?'],
-      ['m_coralia', "I hope not. I can't count that high."],
-      ['m_coralia', "You've come for the last piece of your Heart. A great grey moth carried it off. Where? Ask Sir Kipper. He was on watch.",
-        'A grey moth took the last piece of your Heart. Where? Ask Sir Kipper.'],
-      ['m_coralia', 'And think about Lumen, little dragon. Lumen always knew where the moon\'s things went.', 'And think about Lumen. It knew where moon things go.'],
+      ['ash', 'How many grandmothers ago is that?'],
+      ['m_coralia', "I can't count that high."],
+      ['m_coralia', "The stones in your satchel hum, small dragon. One hummed just like them when a great grey moth carried it over our reef. Where to? Ask Sir Kipper. He was on watch.",
+        'Your stones hum. A grey moth carried one like them over our reef. Ask Sir Kipper where.'],
+      ['m_coralia', 'And think about Lumen, small dragon. Lumen always knew where the moon\'s things went.', 'And think about Lumen. It knew where moon things go.'],
     ],
     crl_kipper: [
-      ['m_kipper', "The great grey moth? I saw it! I was on watch. I am ALWAYS on watch. Except at lunch.", 'I saw the moth! I was on watch. I am ALWAYS on watch.'],
+      ['m_kipper', "The great grey moth? I saw it with my own eyes, from the top of the Shell Hall. A knight is always on watch.", 'I saw the moth! A knight is always on watch.'],
       ['m_kipper', 'Grey, and bigger than a ship. It flew right over the Reefwall. EAST.', 'Grey, bigger than a ship. It flew over the Reefwall. EAST.',
         { dir: ['m4_coral_dive', 'm4_sunken_gate', 'east'] }],
       ['ash', 'Did it come down anywhere?'],
-      ['m_kipper', "Not that I saw. It was heading for a little brass bump on the far hills. Then it was a dot. Then it was lunch.",
+      ['m_kipper', "Not that I saw. It was heading for a little brass bump on the far hills, until it was too small to see. I would have given chase, but Lady Bubbles does not do heights.",
         'It flew toward a brass bump on the far hills. Then it was a dot.'],
     ],
     crl_dabble: [
       ['m_dabble', "Looking for something lost? Then look DOWN. Lost things sink. Everything ends up at the bottom of the sea.",
         'Lost something? Look DOWN. Everything sinks to the bottom of the sea.'],
-      ['m_dabble', 'My hat. My other hat. Most of the chickens, once. They came back. They were cross.', 'My hat. My other hat. The chickens, once.'],
+      ['m_dabble', "I've lost two hats that way. And the chickens, once, but they paddled back on their own, very cross.", 'Two hats. And the chickens, once.'],
     ],
     crl_east: [
       ['m_coralia', "The Eclipse Observatory, where Lumen's astronomers watched the moon. Clever dragon. Our priests drove the moth away from Lumen with a fire made of moonlight.",
@@ -103,8 +103,8 @@ chapter({
       ['m_coralia', 'The only way east is under the Reefwall, through the Sunken Gate. But the gate is blocked. By a very full-of-himself fish. Baron Puffington.',
         'The way east is through the Sunken Gate. But a puffed-up fish is stuck in it.', { promise: 'm4_sunken_gate' }],
       ['m_kipper', 'He called my seahorse a "wet pony"!'],
-      ['m_coralia', 'If you want to know about silver leashes, speak to Elder Ripple in the Pearl Archive. He knows more than is good for him.',
-        'Want to know about silver leashes? Ask Elder Ripple in the Pearl Archive.', { if: '!quest m_leash started' }],
+      ['m_coralia', 'Elder Ripple in the Pearl Archive keeps the old records about the moth. He knows more than is good for him.',
+        'Elder Ripple in the Pearl Archive knows old moth stories.', { if: '!quest m_leash started' }],
     ],
   },
 })

@@ -143,13 +143,13 @@ chapter({
     ],
     m4_warn_saffron: [
       ['ash', "Saffron! Nyxara is coming to drink your well. Today. I'm sure of it.", 'Saffron! Nyxara is coming for your well!'],
-      ['m_saffron', 'The moth that ate the SUN? Coming here, to my well?', 'The moth that ate the sun? HERE?'],
+      ['m_saffron', 'The moth that put out the SUN? Coming here, to my well?', 'The moth that hid the sun? HERE?'],
       ['m_saffron', "...Then she'll find a Well-Warden and a dragon waiting for her. Come and sit on the rim with me.", 'Then we wait for her together. Sit with me.', { ref: 'm4_well_wait' }],
     ],
     // the second eclipse: at most 10 lines a branch. Ash is already there, because he worked it out.
     m_eclipse2: [
       { cam: 'm4_well_sky', s: 1.2 },
-      ['narr', 'You sit on the stone rim of the Moon Well. Saffron sits beside you with a very big spoon. Then the shade goes cold, the moon slides over the sun, and Sable goes dark at noon.',
+      ['narr', 'You sit on the stone rim of the Moon Well. Saffron sits beside you, her staff across her knees. Then the air goes cold, a grey shadow slides over the sun, and Sable goes dark as night.',
                'You wait at the well with Saffron. Then the sun goes dark.', { do: ['emit m4fx:ecl:start:2', 'emit m4fx:ecl:dark', 'set m_eclipse_on'] }],
       ['narr', 'Nyxara drops out of the dark like a black sail and lands right on top of the well tower. Every little moth on it wakes up and cheers.',
                'Nyxara lands on the well tower! The little moths cheer.', { do: ['emit m4fx:ecl:land', 'set m4_nyx_here'] }],
@@ -175,11 +175,11 @@ chapter({
       ['narr', 'She rises without a sound. Far above, her silver thread twitches, and a white moth is yanked up the sky like a kite. Hush.',
                'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['emit m4fx:ecl:leave', 'set m4_nyx_here=0', 'set m4_moths_gone'] }],
       ['narr', 'Every lantern in Sable blows out at once.', 'Every lantern in Sable goes out.'],
-      ['m_saffron', 'Not dead. Dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.', 'One candle of moon is left. Because of you. Go!', { do: ['emit m4fx:ecl:end'] }],
+      ['m_saffron', "She's not dead. Only dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.", 'One candle of moon is left. Because of you. Go!', { do: ['emit m4fx:ecl:end'] }],
     ],
     m4_gap_shut_say: [
       ['narr', 'The sand at the foot of the Glasswall is packed as hard as glass today. Even the worms are waiting for something.', 'The sand here is packed hard. The worms are waiting.'],
-      ['iska', 'Not yet, little ember. Something is coming to Sable first. I can feel it in my wick.', 'Not yet. Something is coming to Sable first.'],
+      ['iska', 'Not yet, Ash. Something is coming to Sable first. I can feel it in my wick.', 'Not yet. Something is coming to Sable first.'],
     ],
     m4_iska_under: [
       ['iska', "The Glasswall, Ash. Nobody can climb it and nobody can fly over it. But you're a worm now. Go UNDER.", "Nobody can climb the Glasswall. But you're a worm now. Go UNDER!", { ref: 'm_burrowgap' }],
@@ -194,7 +194,7 @@ chapter({
       { if: 'flag m4_well=stood', once: true,
         say: ['You stood right in front of my well and spread your wings at her. I will tell that story until I am a hundred.', 'You stood in front of my well! I will tell everyone.'] },
       { if: 'flag m4_well=lid', once: true,
-        say: ['We got the lid on, you and me. One candle of moon, safe under a stone. Not bad for a curtain-fighter and a dragon.', 'We saved one candle of moon. Together.'] },
+        say: ['We got the lid on, you and me. One candle of moon, safe under a stone. Not bad for a Well-Warden and a dragon.', 'We saved one candle of moon. Together.'] },
     ],
   },
 })

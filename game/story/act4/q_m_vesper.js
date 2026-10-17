@@ -85,7 +85,7 @@ quest({
     mv_partner: [
       ['c_vesper', 'Perfect. All three posts, all smoke, and not one knight saw you. I also stole this.', 'Perfect! I also stole this.'],
       ['narr', "She is wearing a Moth Knight's tiny plumed helmet. It does not fit at all.", 'She wears a tiny moth helmet.'],
-      ['c_vesper', "When you go in, I'll be right behind you. Picking locks. Stealing hats. Annoying moths.",
+      ['c_vesper', "When you go in, I'll be right behind you, picking locks and annoying moths.",
         'I will be right behind you.'],
       ['c_vesper', "Thieves don't usually have partners. I think I like it. Don't tell anyone.", 'I like having a partner. Shh.'],
     ],
