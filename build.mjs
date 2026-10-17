@@ -22,6 +22,19 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   'x4_world','x4_foes','x4_story','x4_ascent',
   'x9_music','x9_music2',
   'a12b_ui'];
+// the story checker (tools/check.mjs, rules 1 to 13) runs first: any FAIL stops the build (dist/check.md lists them).
+// EB_SKIP_CHECK=1 skips it for a local experiment only; a build that goes live never sets it.
+if (existsSync('tools/check.mjs') && process.env.EB_SKIP_CHECK !== '1') {
+  try { execFileSync(process.execPath, ['tools/check.mjs', '--quiet'], { stdio: 'inherit' }); }
+  catch (e) {
+    const md = existsSync('dist/check.md') ? readFileSync('dist/check.md', 'utf8') : '';
+    const fails = md.split('\n').filter((l) => l.startsWith('FAIL'));
+    console.error(`build stopped: the story check failed (${fails.length} FAIL, see dist/check.md)`);
+    for (const l of fails.slice(0, 30)) console.error(l);
+    if (fails.length > 30) console.error(`... ${fails.length - 30} more`);
+    process.exit(1);
+  }
+} else if (process.env.EB_SKIP_CHECK === '1') console.warn('WARNING: EB_SKIP_CHECK=1, the story check was skipped (never ship this build)');
 const cfg = JSON.parse(readFileSync('game/config.json', 'utf8'));
 const api = process.env.API_BASE || cfg.apiBase || '';
 // simple-words text (game/simple/*.json) is baked in right before the module that reads it

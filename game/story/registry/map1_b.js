@@ -26,24 +26,24 @@ legacy({ id: 'c_cut_post_e', map: 1, at: [9826, 26950], r: 30, kind: 'gate', gat
 legacy({ id: 'c_lighthouse_door', map: 1, at: [12880, 29052], r: 40, kind: 'door', leads: 'c_lighthouse',
          name: 'the lighthouse door', aliases: ['the Spinning Lighthouse'], src: 'DOORS:c_lighthouse' });
 
-// the Shadow Causeway (only with c_spire_up). Its gates are real since the x1_world causeway fix: deep sea all round,
+// the Shadow Causeway (only with c_spire_up: `if` says so for the world check). Its gates are real since the x1_world causeway fix: deep sea all round,
 // the shoal wind stops jumps, only the rip is calm water (Skimmer), two posts over the first gap (Grapple Tail).
 legacy({ id: 'c_moth_cw1', map: 1, at: [7255, 29150], r: 80, kind: 'gate', gate: 'shadow_curtain', opens_with: 'shadow',
-         leads: 'c_spire_door', name: 'a moth curtain on the causeway', src: 'LANDMARKS:c_moth_cw1' });
+         leads: 'c_spire_door', name: 'a moth curtain on the causeway', src: 'LANDMARKS:c_moth_cw1', if: 'flag c_spire_up' });
 legacy({ id: 'c_cw_post1', map: 1, at: [7300, 29250], r: 30, kind: 'gate', gate: 'grapple_post', opens_with: 'grapple',
          leads: 'c_cw_post2', name: 'a causeway post', src: 'x1_world.js C1G' });
 legacy({ id: 'c_cw_post2', map: 1, at: [7350, 29500], r: 30, kind: 'gate', gate: 'grapple_post', opens_with: 'grapple',
          leads: 'c_cw_post1', name: 'a causeway post', src: 'x1_world.js C1G' });
 legacy({ id: 'c_moth_cw2', map: 1, at: [7355, 29540], r: 80, kind: 'gate', gate: 'shadow_curtain', opens_with: 'shadow',
-         leads: 'c_spire_door', name: 'a moth curtain on the causeway', src: 'LANDMARKS:c_moth_cw2' });
+         leads: 'c_spire_door', name: 'a moth curtain on the causeway', src: 'LANDMARKS:c_moth_cw2', if: 'flag c_spire_up' });
 legacy({ id: 'c_cw_rip', map: 1, path: [[7340, 29600], [7340, 29730]], r: 80, kind: 'gate', opens_with: 'skimmer',
          leads: 'c_spire_door', name: 'the rip current on the causeway', src: 'x1_world.js C1G' });
 legacy({ id: 'c_moth_cw3', map: 1, at: [7325, 29800], r: 80, kind: 'gate', gate: 'shadow_curtain', opens_with: 'shadow',
-         leads: 'c_spire_door', name: 'a moth curtain on the causeway', src: 'LANDMARKS:c_moth_cw3' });
+         leads: 'c_spire_door', name: 'a moth curtain on the causeway', src: 'LANDMARKS:c_moth_cw3', if: 'flag c_spire_up' });
 
 // the Spire door on Spire Rock. The moths on it ask what Vesper is: it stays shut until what_she_is is solved.
 legacy({ id: 'c_spire_door', map: 1, at: [7400, 30040], r: 40, kind: 'door', leads: 'c_spire', name: 'the Spire door',
-         aliases: ['the Shadow Spire', 'Spire Rock'], src: 'DOORS:c_spire',
+         aliases: ['the Shadow Spire', 'Spire Rock'], src: 'DOORS:c_spire', if: 'flag c_spire_up',
          need: 'solved what_she_is',
          locked: [
            ['narr', 'The moths on the door will not move. They whisper: "What IS she, little ember? Say it, and pass."', 'The moths whisper: "What IS she? Say it, and pass."'],

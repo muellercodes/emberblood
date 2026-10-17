@@ -37,7 +37,13 @@ window.places=d=>s10Take('places',d);
 window.__ebStoryLoadErr=(f,e)=>{ s10Err(`${f}: ${e&&e.message||e}`); try{ console.warn('story data',f,e); }catch(err){} };
 
 // ---------- 2. text: [full, simple] or a plain string (S registers the simple version for Words: Simple)
-function s10T(x){ if(x==null) return ''; if(Array.isArray(x)){ if(!x.length) return ''; return x.length>1&&x[1]!=null&&x[1]!==''?S(String(x[0]),String(x[1])):String(x[0]); } return String(x); }
+function s10T(x){ if(x==null) return '';
+  // variants (A4S, A4b): { if, t: [full, simple] } is that text while its condition holds (else nothing); a list of
+  // them is the first whose condition holds (a quest title, an end card line)
+  if(s10IsVar(x)) return x.if==null||s10Cond(x.if)?s10T(x.t):'';
+  if(Array.isArray(x)){ if(!x.length) return ''; if(s10IsVar(x[0])){ for(const v of x){ const t=s10T(v); if(t) return t; } return ''; }
+    return x.length>1&&x[1]!=null&&x[1]!==''?S(String(x[0]),String(x[1])):String(x[0]); } return String(x); }
+const s10IsVar=x=>!!x&&typeof x==='object'&&!Array.isArray(x)&&'t' in x;
 const s10Tx=x=>simplify(s10T(x));
 function s10Name(id){
   const e=s10Ent(id); if(e&&e.name) return s10T(e.name);
@@ -174,7 +180,7 @@ function s10Effect(e,ctx){
       if(!S10.quiet){ setBanner(S('A Heart Ember!','A Heart Ember!'),S('Your fire burns stronger. Max health +10.','Max health +10!'),3.4); try{ SFX.play('upgrade'); }catch(err){} } break; }
     case 'weapon': giveWeapon(a,S10.quiet); break;
     case 'ally': if(typeof recruitComp==='function') recruitComp(a); else s10Err(`effect "${e}": no companions module`); break;
-    case 'hat': if(typeof x1pHat==='function') x1pHat(a); else { G.hats=G.hats||{}; G.hats[a]=true; G.hat=a; } break;
+    case 'hat': s10Hat(a); break;
     case 'deed': if(typeof deed==='function') deed(a); break;
     case 'open': case 'close': s10Gate(a,k==='open'); break;
     case 'spawn': { const at=b==='at'?c:b; s10NpcSet(a,{at,off:false}); break; }
@@ -184,7 +190,8 @@ function s10Effect(e,ctx){
     case 'clue': s10Clue(a,ctx); break;
     case 'quest': if(a==='start') s10QuestStart(b); else if(a==='done') s10QuestFinish(b); else s10Err(`effect "${e}": quest start|done id`); break;
     case 'stage': later(0.05,()=>{ if(G.stage!==a) goStage(a); }); break;
-    case 'time': s10Time(a); break;
+    case 'time': s10Time(a,b); break;
+    case 'people': if(DLG) S10.after.push(()=>{ try{ setupNPCs(); }catch(err){ console.error(err); } }); else setupNPCs(); break;
     case 'emit': storyEmit(a); break;
     case 'mail': s10Mail(a,ctx); break;
     case 'epi': s10Epi(a,b,ctx); break;
@@ -193,26 +200,42 @@ function s10Effect(e,ctx){
     case 'heal': if(player){ player.hp=player.maxHp; } break;
     case 'choice': { const [f,v]=kv(a); G.choices[f]=v; break; }
     case 'solve': s10Solve(a,true); break;
+    case 'bombbag': if(typeof bombBag==='function') bombBag(+a||5); else s10Err(`effect "${e}": no bomb bag`); break;
     case 'bless': { G.pendingBless=(G.pendingBless||0)+(+a||1); later(1.5,()=>{ try{ offerPending(); }catch(err){} }); break; }
     case 'moon': if(typeof moonSet==='function') moonSet(+a); else G.flags.moon=Math.min(G.flags.moon==null?100:G.flags.moon,+a); break;
-    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,DOORS.find(q=>q.area===w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
-    case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x))})); break; }
+    case 'warp': { const w=s10Where(a); if(!w){ s10Err(`effect "${e}": ${a} is not a place`); break; } later(0.05,()=>{ G.fade=1; if(w.area&&AREADEFS[w.area]&&!s10InArea(w.area)){ if(AREA) exitArea(true); enterArea(w.area,s10DoorFor(w.area)||{x:player.x,y:player.y}); } else { if(AREA&&!w.area) exitArea(true); player.x=w.x; player.y=w.y; player.z=0; updateCam(0,true); G.chunkBurst=16; } }); break; }
+    case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x)).filter(Boolean)})); break; }
     case 'page': s10Page(a); break;
+    case 'shrine': { const sid=s10ShrineId(a); if(!sid){ s10Err(`effect "${e}": ${a} is not a shrine`); break; } G.shrines=G.shrines||{}; G.shrines[sid]=true; G.lastShrine=sid; break; }
     default: s10Err(`effect "${e}": unknown "${k}"`);
   }
 }
 // Case Book pages (a letter, a journal page): page:{ id:{ title:[full,simple], text:[[full,simple], ...] } } on an act,
 // chapter, quest or places(); the effect `page id` adds it (G.case.pages) with a banner
+// the outside door of an area; an upper floor, a cellar or a dungeon floor has none of its own: its house's or dungeon's
+// (A4b: autoplay and warp into m_obs_4)
+function s10DoorFor(area){ let id=area; for(let k=0;k<8&&id;k++){ const d=DOORS.find(q=>q.area===id)||(typeof CAVEMOUTHS!=='undefined'&&CAVEMOUTHS.find(q=>q.area===id)); if(d) return d; const def=AREADEFS[id];
+  const up=(def&&def.floorOf)||(typeof dunRoot==='function'?dunRoot(id):null); if(!up||up===id) break; id=up; } return null; }
+// effect "shrine id": that shrine is found and is where Ash wakes up (a SHRINES id, or a legacy entry 'SHRINES:<id>')
+function s10ShrineId(a){ if(typeof SHRINES!=='undefined'&&SHRINES.some(q=>q.id===a)) return a; const e=S10.legacy[a], m=e&&/^SHRINES:(.+)$/.exec(e.src||''); return m?m[1]:null; }
+// effect "hat item": unlock and wear a hat (a data hat, or a hat item from an act's own table)
+function s10Hat(a){
+  const it=S10.items[a], nm=it&&it.hat?(typeof it.hat==='string'?it.hat:(s10T(it.name)||a)):null;
+  let name=nm;
+  if(!name) for(const T of ['X1P_HATS','F2P_HATS','M3P_HATS','M3W_HATS']){ let t=null; try{ t=eval(`typeof ${T}!=='undefined'?${T}:null`); }catch(e){} if(t&&t[a]){ name=t[a]; break; } }
+  if(!name){ s10Err(`effect "hat ${a}": no hat item ${a}`); return; }
+  G.hats=G.hats||{}; G.hats[name]=true; G.hat=name;
+}
 function s10Page(id){
   const P=S10.pages&&S10.pages[id]; if(!P){ s10Err(`page ${id} is not defined`); return; }
   const C=G.case.pages||(G.case.pages={}); if(C[id]) return; C[id]=1; storyEmit('page:'+id);
   if(!S10.quiet){ S10.pulseT=G.time+6; setBanner(S('A new page in the Case Book!','A new page!'),s10T(P.title),3.4); try{ SFX.play('quest'); }catch(e){} }
 }
-function s10Time(a){
+function s10Time(a,how){
   const T={night:0.875,dusk:0.78,evening:0.8,day:0.35,morning:0.3,dawn:0.25,noon:0.5,midnight:0.0};
   const t=T[a]!=null?T[a]:/^\d+(\.\d+)?$/.test(a)?(+a)/24:null; if(t==null){ s10Err(`time ${a}: night, day, dawn, dusk, noon or an hour`); return; }
   G.fade=1; G.tod=t;
-  if(!S10.quiet) later(0.3,()=>setBanner(t>0.7||t<0.2?S('Night falls','Night falls'):S('A new day','A new day'),t>0.7||t<0.2?S('The lamps flicker on, one by one.','The lamps come on.'):S('The sun comes up.','The sun comes up.'),2.6));
+  if(!S10.quiet&&how!=='quiet') later(0.3,()=>setBanner(t>0.7||t<0.2?S('Night falls','Night falls'):S('A new day','A new day'),t>0.7||t<0.2?S('The lamps flicker on, one by one.','The lamps come on.'):S('The sun comes up.','The sun comes up.'),2.6));
 }
 function s10Mail(id,ctx){
   if(typeof pebbleLetter!=='function'){ s10Err(`mail ${id}: no letters module`); return; }
@@ -278,7 +301,9 @@ function s10Resolve(e){
     return {ok:!!at&&(e.map==null||mapAt(at.y)===+e.map),why:at?(e.map!=null&&mapAt(at.y)!==+e.map?`y ${at.y} is on map ${mapAt(at.y)}, not ${e.map}`:''):'no position'}; }
   let m;
   if((m=/^LANDMARKS:(.+)$/.exec(src))){ const o=LANDMARKS.find(q=>q.id===m[1]); if(!o) return {ok:false,why:`no landmark ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
-  if((m=/^DOORS:(.+)$/.exec(src))){ const o=DOORS.find(q=>q.area===m[1]); if(!o) return {ok:false,why:`no door into ${m[1]}`}; return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
+  if((m=/^DOORS:([^@]+)(?:@(-?\d+),(-?\d+))?$/.exec(src))){ const L=DOORS.filter(q=>q.area===m[1]); if(!L.length) return {ok:false,why:`no door into ${m[1]}`};
+    // (area@x,y: one of several doors into the area, the one nearest x,y)
+    const px=m[2]!=null?+m[2]:at?at.x:L[0].x, py=m[3]!=null?+m[3]:at?at.y:L[0].y, o=L.reduce((a,b)=>dist(a.x,a.y,px,py)<=dist(b.x,b.y,px,py)?a:b); return near(o.x,o.y)?{ok:true,real:o}:{ok:false,why:far(o.x,o.y)}; }
   if((m=/^(?:CAST|SPECIAL|NPC):(.+)$/.exec(src))){ const id=m[1], c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); return c?{ok:true,real:c}:{ok:false,why:`nobody called ${id}`}; }
   if((m=/^HOUSES?:(.+)$/.exec(src))){ const h=HOUSES.find(q=>q.want===m[1]||q.owner===m[1]||q.id===m[1]); if(!h) return {ok:false,why:`no house for ${m[1]}`}; return near(h.x,h.y)?{ok:true,real:h}:{ok:false,why:far(h.x,h.y)}; }
   // (A1W's forms) WARDS:id SHRINES:id LANTERNS:id CROSSINGS:id CAVEMOUTHS:area SITES:site NPCSPOT:id ITEM_NAMES:id regionAt:Name GATE_COL G.goat <obj>.path
@@ -291,7 +316,7 @@ function s10Resolve(e){
   if((m=/^SITES:(.+)$/.exec(src))){ const S0=SITES[m[1]], P=S0&&POI[S0.poi]; return S0?xy(P||S0,'site '+m[1]):{ok:false,why:`no site ${m[1]}`}; }
   if((m=/^NPCSPOT:(.+)$/.exec(src))) return xy(NPCSPOT[m[1]],'NPC spot '+m[1]);
   if((m=/^ITEM_NAMES:(.+)$/.exec(src))) return ITEM_NAMES[m[1]]!=null?{ok:true}:{ok:false,why:`no item ${m[1]}`};
-  if((m=/^regionAt:(.+)$/.exec(src))){ if(!at) return {ok:false,why:'no position'}; const r=regionAt(at.x,at.y), want=m[1]; return r&&(r.name===want||simplify(r.name)===want||r.key===want)?{ok:true}:{ok:false,why:`region at ${at.x},${at.y} is ${r&&r.name}`}; }
+  if((m=/^regionAt:(.+)$/.exec(src))){ if(!at) return {ok:false,why:'no position'}; const r=regionAt(at.x,at.y), bare=v=>String(v||'').replace(/^the\s+/i,'').toLowerCase(), want=m[1]; return r&&(bare(r.name)===bare(want)||bare(simplify(r.name))===bare(want)||r.key===want)?{ok:true}:{ok:false,why:`region at ${at.x},${at.y} is ${r&&r.name}`}; }
   if(src==='GATE_COL') return GATE_COL?{ok:true,real:GATE_COL}:{ok:false,why:'no GATE_COL'};
   if(src==='G.goat') return G&&G.goat?xy(G.goat,'goat'):{ok:false,why:'no goat now'};
   if((m=/^([A-Za-z_$][\w$]*)(\.[\w$]+)+$/.exec(src))&&!/\.js$/.test(src)){ let v; try{ v=eval(src); }catch(e){ v=undefined; } return v!=null?{ok:true}:{ok:false,why:`${src} is not in the game`}; }
@@ -302,6 +327,7 @@ function s10Resolve(e){
     const o=AREA&&AREA.objs&&AREA.objs.find(q=>q.k===k); return o?{ok:true,real:o}:{ok:false,why:`no ${k} in ${AREA?AREA.id:'(outdoors)'}`}; }
   if((m=/^elev:(\d+)@(-?\d+),(-?\d+)$/.exec(src))){ const L=typeof elevLvl==='function'?elevLvl(+m[2],+m[3]):0; return L>=+m[1]?{ok:true}:{ok:false,why:`level ${L} at ${m[2]},${m[3]} (want ${m[1]})`}; }
   if((m=/^prop:([\w-]+)@(-?\d+),(-?\d+)$/.exec(src))){ const k=m[1], x=+m[2], y=+m[3], o=s10FindObj(k,x,y,90); return o?{ok:true,real:o}:{ok:false,why:`no ${k} near ${x},${y}`}; }
+  if((m=/^[\w.]+\.js\s+([A-Za-z_$][\w$]*(?:\.[\w$]+)+)$/.exec(src))){ let v; try{ v=eval(m[1]); }catch(err){ v=undefined; } return v!=null?{ok:true}:{ok:false,why:`${m[1]} is not in the game`}; }
   if((m=/^[\w.]+\.js\s+([A-Za-z_$][\w$]*)$/.exec(src))||(m=/^(?:fn|code):([A-Za-z_$][\w$]*)$/.exec(src))){
     const id=m[1];
     const o=LANDMARKS.find(q=>q.id===id)||DOORS.find(q=>q.area===id)||HOUSES.find(q=>q.want===id)||CHESTS.find(q=>q.id===id);
@@ -312,7 +338,17 @@ function s10Resolve(e){
   if(!src) return {ok:false,why:'no src'};
   return {ok:false,why:`src "${src}" is not a known form`};
 }
+// old drawings that are not in any object list tell the engine how to find them: s10FindKind(kind, (x,y,r)=>obj|null)
+// (an old module calls it once at load; legacy src 'prop:<kind>@x,y' then resolves through it)
+const S10_FIND={};
+function s10FindKind(k,fn){ S10_FIND[k]=fn; }
+// does the story data own this thing? (old code asks before doing what the data now does: storyOwns('quest','a1_hat'))
+// does this person have a data talk option to show right now? (old code that answers with a line instead of opening the
+// person's menu asks first, so the option can be picked: a9d's Elder Yara)
+function storyHasOption(id){ try{ return !!(S10.booted&&G&&G.mode==='story'&&s10TalkFor(id,'option')); }catch(e){ return false; } }
+function storyOwns(kind,id){ const M={quest:S10.quests,chapter:S10.chapters,scene:S10.scenes,place:S10.places,clue:S10.clues}[kind]; return !!(M&&M[id]); }
 function s10FindObj(k,x,y,r){
+  if(S10_FIND[k]){ try{ const o=S10_FIND[k](x,y,r); if(o) return o; }catch(e){} }
   const lists=[STRUCTS,LANDMARKS,CHESTS];
   for(const n of ['C1WD','F2WD','M3WD','N4WD']){ try{ const W=eval(`typeof ${n}!=='undefined'?${n}:null`); if(W&&W.objs) lists.push(W.objs); }catch(e){} }
   for(const L of lists) for(const o of L){ if(!o) continue; if((o.k===k||o.kind===k||o.pk===k)&&Math.abs(o.x-x)<=r&&Math.abs(o.y-y)<=r) return o; }
@@ -323,6 +359,8 @@ function s10EntityInfo(id){
   const e=s10Ent(id);
   if(e&&!e._story&&e.if!=null&&!s10Cond(e.if)){ const p=s10At(e)||{}; return {id,map:e.map!=null?+e.map:null,x:p.x,y:p.y,kind:e.kind||null,ok:true,why:`not checked now: ${typeof e.if==='string'?e.if:'its if'} does not hold`}; }
   if(!e){ const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(c){ const w=s10NpcWhere(id); return {id,map:w?mapAt(w.y):null,x:w?Math.round(w.x):null,y:w?Math.round(w.y):null,kind:'npc',ok:true,why:'a person in the game (not in the registry)'}; } return {id,ok:false,why:'not in the registry'}; }
+  if(e===S10.npcs[id]&&!e.src&&!S10.places[id]&&!S10.legacy[id]){ const w=s10NpcWhere(id)||s10At(e); const c=SPECIAL[id]||(typeof CASTBY!=='undefined'&&CASTBY[id]);
+    return {id,map:e.map!=null?+e.map:w?mapAt(w.y):null,x:w?Math.round(w.x):null,y:w?Math.round(w.y):null,kind:'npc',ok:!!c,why:c?'a person the story places (its where and at say when)':'no person '+id}; }
   const r=s10Resolve(e), w=s10Where(id)||s10At(e)||{};
   if(r.ok&&e._story&&e.look&&!s10LookHas(e.look)) return {id,map:e.map,x:w.x,y:w.y,kind:e.kind,ok:false,why:`no look ${e.look}`};
   return {id,map:e.map!=null?+e.map:null,x:w.x!=null?Math.round(w.x):null,y:w.y!=null?Math.round(w.y):null,kind:e.kind||null,ok:!!r.ok,why:r.why||''};
@@ -394,7 +432,9 @@ function s10Owned(d,owner){
   for(const who in (d.talk||{})){ const L=S10.talk[who]||(S10.talk[who]=[]); for(const t of s10Arr(d.talk[who])) L.push(Object.assign({_owner:owner,_who:who},t)); }
   for(const id in (d.npc||{})){ const n=Object.assign({id,_owner:owner},d.npc[id]); S10.npcs[id]=n; }
   for(const id in (d.page||{})){ (S10.pages||(S10.pages={}))[id]=Object.assign({id,_owner:owner},d.page[id]); }
-  for(const id in (d.item||d.items||{})){ const it=(d.item||d.items)[id]; S10.items[id]=Object.assign({id},it); if(it&&it.name) ITEM_NAMES[id]=s10T(it.name); }
+  for(const id in (d.item||d.items||{})){ const it=(d.item||d.items)[id]; S10.items[id]=Object.assign({id},it); if(it&&it.name) ITEM_NAMES[id]=s10T(it.name);
+    // a hat from data: item { name, hat: { look, col } } (the look draws it on Ash and in the hat menu)
+    if(it&&it.hat&&typeof it.hat==='object'){ const nm=s10T(it.name)||id; (S10.hats||(S10.hats={}))[nm]=Object.assign({item:id},it.hat); } }
 }
 // steps: parse once ({do:'talk c_hettie'} -> _kind 'talk', _args ['c_hettie'])
 const S10_KINDS=['talk','goto','find','examine','fight','use_power_at','give','choose','deduce','track','wait_for','cutscene','minigame','dungeon','all','any'];
@@ -448,9 +488,9 @@ function s10Choice(b,ctx,g){
 }
 // the beats that are not lines: cam, place, walk, anim, fade, wait, sfx, do, banner (several may share one object)
 function s10Action(b,ctx){
-  if(b.place) s10ActorPlace(b.place[0],b.place[1]);
+  if(b.place) s10ActorPlace(b.place[0],b.place[1],b.place[2]);
   if(b.anim) s10ActorAnim(b.anim[0],b.anim[1]);
-  if(b.walk) s10ActorWalk(b.walk[0],b.walk[1],b.s||b.dur);
+  if(b.walk) s10ActorWalk(b.walk[0],b.walk[1],b.s||b.dur,b.walk[2]);
   if(b.cam!=null){ const w=s10Where(b.cam); if(w&&!AREA){ S10.cam={x:w.x,y:w.y,t0:G.time,dur:Math.max(0.1,+b.s||1),k:b.k!=null?+b.k:0.92}; } else if(!w) s10Err(`scene ${ctx.sc||'?'}: cam ${b.cam} is not a place`); }
   if(b.fade!=null) G.fade=typeof b.fade==='number'?b.fade:1;
   if(b.wait!=null&&DLG) DLG.lockT=performance.now()+(+b.wait||0.5)*1000;
@@ -463,6 +503,7 @@ function s10Play(id,done,ctx){
   if(!beats){ s10Err(`scene ${id} is not defined`); if(done) done(); return false; }
   ctx=Object.assign({sc:typeof id==='string'?id:null},ctx||{});
   if(typeof id==='string'&&G.story) (G.story._seen||(G.story._seen={}))[id]=1;
+  if(typeof id==='string'&&S10.oldMark&&S10.oldMark[id]) try{ S10.oldMark[id](); }catch(e){ console.error(e); }
   const lines=s10Lines(beats,ctx);
   if(S10.auto) S10.auto.log.push('scene '+(ctx.sc||'(inline)'));
   runDialogue(lines.length?lines:[{who:'narr',text:'',skipIf:()=>true}],()=>{ scene='play'; s10SceneEnd(); try{ if(done) done(); }catch(e){ console.error(e); } try{ saveGame(); }catch(e){} });
@@ -492,8 +533,17 @@ function s10Actor(id){
     anim(a){ n._pose=a; },end(){ n._pose=null; if(temp){ const i=list.indexOf(n); if(i>=0) list.splice(i,1); } else { n.x=x0; n.y=y0; if(h0) n.home=h0; } }};
   return S10.actors[id]=A;
 }
-function s10ActorPlace(id,where){ const A=s10Actor(id), w=Array.isArray(where)?{x:+where[0],y:+where[1]}:s10Where(where); if(A&&w) A.place(w.x,w.y); }
-function s10ActorWalk(id,where,d){ const A=s10Actor(id), w=Array.isArray(where)?{x:+where[0],y:+where[1]}:s10Where(where); if(A&&w) A.walk(w.x,w.y,d); }
+// where an actor goes: [x, y], an entity, or 'player' (Ash, where he stands now), with an optional [dx, dy] offset
+function s10ActTarget(where,off){
+  let w=null;
+  if(Array.isArray(where)) w={x:+where[0],y:+where[1]};
+  else if(where==='player'||where==='ash') w=player?{x:player.x,y:player.y}:null;
+  else { const q=s10Where(where); w=q?{x:q.x,y:q.y}:null; }
+  if(w&&Array.isArray(off)){ w.x+=+off[0]||0; w.y+=+off[1]||0; }
+  return w;
+}
+function s10ActorPlace(id,where,off){ const A=s10Actor(id), w=s10ActTarget(where,off); if(A&&w) A.place(w.x,w.y); }
+function s10ActorWalk(id,where,d,off){ const A=s10Actor(id), w=s10ActTarget(where,off); if(A&&w) A.walk(w.x,w.y,d); }
 function s10ActorAnim(id,a){ const A=s10Actor(id); if(A) A.anim(a); }
 function s10WalkTick(dt){
   for(const W of S10.walks){ W.t+=dt; const k=Math.min(1,W.t/W.d); W.n.x=lerp(W.x0,W.x1,k); W.n.y=lerp(W.y0,W.y1,k); W.n.moving=k<1; W.n.face=Math.atan2(W.y1-W.y0,W.x1-W.x0); }
@@ -504,9 +554,13 @@ function s10WalkTick(dt){
 // step drives the objective, the marker and the hint; all/any parts in any order; extra parts any time in the chapter.
 function s10Run(kind,d){ return {kind,d,key:kind==='q'?'q:'+d.id:d.id}; }
 function s10St(R){ const S0=G.story||(G.story={}); return S0[R.key]||(S0[R.key]={}); }
+// (after the game is won, G.done, only a chapter marked after_done: true runs on: N5b's n_end after "Keep exploring")
+const s10AfterDone=()=>{ const c=G&&S10.chapters[G.stage]; return !!(c&&c.after_done); };
 function s10Runners(){
-  const out=[]; if(!G||G.mode!=='story'||G.done||!G.story) return out;
-  const c=S10.chapters[G.stage]; if(c) out.push(s10Run('ch',c));
+  const out=[]; if(!G||G.mode!=='story'||!G.story) return out;
+  const c=S10.chapters[G.stage];
+  if(G.done){ if(c&&c.after_done) out.push(s10Run('ch',c)); return out; }
+  if(c) out.push(s10Run('ch',c));
   for(const id of S10.qOrder){ const q=G.quests[id]; if(q&&!q.done) out.push(s10Run('q',S10.quests[id])); }
   return out;
 }
@@ -566,10 +620,11 @@ function s10Tick(dt){
   if(!S10.booted) s10Boot();
   if(!G||G.mode!=='story'||!G.story) return;
   if(S10.tickAt===G.time) return; S10.tickAt=G.time;
+  if(AREA!==S10.furnArea){ S10.furnArea=AREA; try{ s10FurnPrompts(AREA); }catch(e){ console.error(e); } }
   S10.watchT-=dt; if(S10.watchT<=0){ S10.watchT=1; s10Watch(); try{ s10Over(); s10QuestDoneIf(); }catch(e){ console.error(e); } }
   S10.npcT-=dt; if(S10.npcT<=0){ S10.npcT=1; s10NpcSync(); }
   if(S10.qOrder.length) try{ s10QuestSync(); }catch(e){ console.error(e); }
-  if(G.done) return;
+  if(G.done&&!s10AfterDone()) return;
   s10PlacesTick(dt);
   s10Barks(dt);
   if(scene!=='play') return;
@@ -590,7 +645,11 @@ function s10Poll(a){
     case 'choose': if(G.choices&&G.choices[A[0]]!=null) s10Finish(a); break;
     case 'deduce': if(G.case.solved[A[0]]&&s10Calm()) s10Run2(a); break;
     case 'wait_for': if(s10WaitOk(x)&&s10Calm()) s10Run2(a); break;
-    case 'fight': { const f=A[0]; if(G.bossDone[f]||G.story._ev['boss_done:'+f]||G.story._ev['fight:'+f]||G.flags['trial_'+f+'_boss']) s10Run2(a); break; }
+    case 'fight': { const f=A[0]; if(!(G.bossDone[f]||G.story._ev['boss_done:'+f]||G.story._ev['fight:'+f]||G.flags['trial_'+f+'_boss'])) break;
+      // a kneel scene the fight never reached (the boss fell some other way): it plays first, then the win
+      if(x.kneel&&!(G.story._kneel&&G.story._kneel[f])&&!s10Seen(x.kneel)){ if(s10Calm()){ const k=a.R.key+'/'+a.key+'/kneel'; if(S10.pend[k]) break; S10.pend[k]=1;
+        s10Play(x.kneel,()=>{ delete S10.pend[k]; s10KneelDone(f); },{R:a.R,step:a.s}); } break; }
+      s10Run2(a); break; }
     case 'dungeon': { const d=A[0]; if(G.flags['trial_'+d+'_done']||G.flags[d+'_done']||G.story._ev['dungeon_done:'+d]) s10Run2(a); break; }
     case 'use_power_at': { const gid=A[1]||A[0]; if(s10World(gid)==='open'||G.story._ev['gate_open:'+gid]) s10Run2(a); break; }
     case 'track': if(G.story._trk&&G.story._trk[A[0]]==='done') s10Run2(a); break;
@@ -607,6 +666,33 @@ function s10WaitOk(x){
   return s10Cond(A.join(' '));
 }
 
+// ---------- 10b. kneels: a boss that stops at low health for a choice hands it to its code's kneel hook. A fight step
+// with kneel:'sceneId' plays that scene at the kneel, then the boss code's own finish() ends the fight (XP, the room),
+// then the step's win (or after) scene plays and the step finishes. KNEEL_S10[foe] says how a foe's code hands it over.
+const KNEEL_S10={
+  // Act II's Vesper: x1_foes vesperKneel calls C1.hook.vesperKneel(e, finish) (x1_story's own handler is the fallback)
+  c_mothmask:{
+    install(h){ if(typeof C1==='undefined'||!C1||!C1.hook) return false; const old=C1.hook.vesperKneel; C1.hook.vesperKneel=(e,fin)=>{ if(h(e,fin)) return; if(old) old(e,fin); else fin(); }; return true; },
+    clear(e){ for(const o of G.enemies) if(o!==e&&!o.dead&&(o.type==='c_mothclone'||o.clone)) o.dead=true; },
+    // the old code's own flags for "the choice is made" (its watcher and its save migration read them)
+    done(){ G.flags.c_choice_done=1; G.flags.c_mask_xp=1; } }
+};
+function s10KneelStep(foe){ for(const R of s10Runners()) for(const a of s10Doable(R)) if(a.x._kind==='fight'&&a.x._args[0]===foe&&a.x.kneel) return a; return null; }
+function s10KneelDone(foe){ (G.story._kneel||(G.story._kneel={}))[foe]=1; const K=KNEEL_S10[foe]; try{ if(K&&K.done) K.done(); }catch(e){ console.error(e); } S10.ver++; }
+function s10Kneel(foe,e,fin){
+  const a=s10KneelStep(foe); if(!a||(G.story._kneel&&G.story._kneel[foe])) return false;
+  const K=KNEEL_S10[foe]||{};
+  if(e){ e.invuln=true; e.passive=true; e.tele=null; e.vx=e.vy=0; }
+  try{ if(K.clear) K.clear(e); }catch(err){ console.error(err); }
+  G.projectiles=(G.projectiles||[]).filter(p=>p.owner!=='enemy'); G.taunt=null; G.tauntQ=[];
+  if(S10.auto) S10.auto.log.push('kneel '+foe);
+  s10Play(a.x.kneel,()=>{ s10KneelDone(foe);
+    try{ fin(); }catch(err){ console.error(err); }
+    if(e&&!e.dead){ e.dead=true; if(G.boss===e) G.boss=null; }
+    G.bossDone[foe]=true; storyEmit('boss_done:'+foe); },{R:a.R,step:a.s});
+  return true;
+}
+
 // ---------- 11. minigames: the existing ones, started from a step; adapters say where and how (MINI_S10[id])
 const MINI_S10={
   // Act II's rooftop chase (x1_story): Vesper waits on the manor roof, the roofs are drawn, the lamps light the route
@@ -618,6 +704,9 @@ const MINI_S10={
     win(){ if(typeof c1RWin==='function') c1RWin(); else miniEnd(true); }}
 };
 function s10MiniOwner(kind){ const R=s10Runners().find(R=>s10Doable(R).some(a=>a.x._kind==='minigame'&&a.x._args[0]===kind)); return R||null; }
+// a minigame that only starts at night, while it is day: its step reads "Wait for night at ..." and its skip people
+// offer "Wait here until dark" (c_gear's chase, when the night step was done just before dawn)
+function s10MiniNight(x){ return !!(x&&x._kind==='minigame'&&!x.day&&(MINI_S10[x._args[0]]||{}).night&&!isNight()); }
 function s10MiniPoll(a){
   const x=a.x, id=x._args[0], M=MINI_S10[id]||{}, at=x.at||x._args[1];
   if(x.start==='talk') return;
@@ -676,7 +765,10 @@ function s10Prompts(offer){
     if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
-    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+50; if(d>r) continue;
+    // (a thing already looked at that no step waits for answers only when Ash stands at it: its prompt no longer hides
+    //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
+    const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
+    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
     // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)
@@ -724,7 +816,7 @@ function s10Chest(P){
 }
 // the power each gate kind opens with (_plan_format's gate table); a gate place may say need:'<condition>' instead
 const S10_GATE_POWER={climb_wall:'claws',grapple_post:'grapple',shadow_curtain:'shadow',thin_bars:'shadow',whip_hook:'whip',chain_ring:'whip',vent:'wings',step_face:'dbljump',
-  water:'stride',ice_wall:'blaze',wind_ribbon:'windride',pound_plate:'pound',cracked_floor:'pound',bomb_rock:'bombs',dive_spot:'dive',burrow_mound:'burrow',moon_glass:'moonfire'};
+  water:'stride',ice_wall:'blaze',wind_ribbon:'windride',pound_plate:'pound',cracked_floor:'pound',bomb_rock:'bombs',dive_spot:'dive',burrow_mound:'burrow',moon_glass:'moonfire',silk_web:'glaive'};
 function s10GateLocked(P){
   if(P.need!=null) return !s10Cond(P.need);
   try{ if(typeof gateCanOpen==='function') return !gateCanOpen(P); }catch(e){}
@@ -787,7 +879,7 @@ function s10Render(list){
   for(const id in S10.places){
     const P=S10.places[id]; if(!s10PlaceOn(P)) continue;
     if(P.kind==='prints'){ if(s10PlaceShown(P)) list.push({x:0,y:-1e9+1,draw:()=>s10DrawPrints(P,T.has(id))}); continue; }
-    if(P.kind==='spot'||P.kind==='gate') continue;
+    if(P.kind==='spot'||P.kind==='gate'||P.layer==='screen') continue;
     if(P.show!=null&&!s10Cond(P.show)) continue;
     const at=s10Pos(P); if(!at||!inView(at.x,at.y,160)) continue;
     const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look, sy=s10SortY(P,at);
@@ -798,6 +890,15 @@ function s10Render(list){
   for(const id of T){ if(S10.places[id]) continue; const w=s10Where(id), e=s10Ent(id); if(!w||w.area||AREA||(e&&e.map!=null&&curMap()!==+e.map)||!inView(w.x,w.y,120)) continue; list.push({x:w.x,y:w.y+1,draw:()=>s10Sparkle(w.x,w.y-54,t)}); }
 }
 { const base=eventsForRender; eventsForRender=function(list){ base(list); try{ s10Render(list); }catch(e){ console.error(e); } }; }
+// place layer:'screen': its look is drawn in screen space over the world and the fade, under the HUD (a storybook
+// picture over a faded-out world); the look gets (x, y) = the middle of the screen and should be anim (W, H are the
+// screen's size)
+{ const base=drawHUD; drawHUD=function(){ try{ if(G&&G.mode==='story'&&S10.booted) s10DrawScreen(); }catch(e){ console.error(e); } return base.apply(this,arguments); }; }
+function s10DrawScreen(){
+  for(const id in S10.places){ const P=S10.places[id]; if(P.layer!=='screen'||!s10PlaceShown(P)) continue;
+    const st=s10World(id), look=P.states&&st!=null&&P.states[st]?P.states[st]:P.look; if(!look) continue;
+    ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); s10LookDraw(look,W/2,H/2,st); ctx.restore(); }
+}
 // a place on a house wall (inside the house's footprint) is drawn after the house, so it shows on the wall
 function s10SortY(P,at){
   if(P._sy!=null&&P._syN===HOUSES.length) return P._sy;
@@ -822,7 +923,7 @@ function s10DrawPrints(P,target){
   const o=s10Off(P); if(!o) return;
   const path=(P.path||[]).map(q=>[+q[0]+o.x,+q[1]+o.y]); if(path.length<2) return;
   const tr=G.story._trk&&G.story._trk[P.id], reached=tr==='done'?path.length:(tr==null?-1:tr), t=G.time;
-  const claw=P.look==='claw'||P.prints==='claw', fill=P.col||'222,232,255';
+  const claw=P.look==='claw'||P.prints==='claw', hoof=P.look==='hoof'||P.prints==='hoof', fill=P.col||'222,232,255';
   let s0=0; const segs=[]; for(let i=0;i<path.length-1;i++){ const a=path[i], b=path[i+1], L=Math.hypot(b[0]-a[0],b[1]-a[1]); segs.push({a,b,L,s0,i}); s0+=L; }
   if(!inView((path[0][0]+path[path.length-1][0])/2,(path[0][1]+path[path.length-1][1])/2,s0/2+200)) return;
   ctx.save(); let k=0;
@@ -834,7 +935,8 @@ function s10DrawPrints(P,target){
       if(!done) glowAt(x,y,14,'190,210,255',0.16+0.12*tw);
       ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
       ctx.fillStyle=`rgba(${fill},${al})`; ctx.strokeStyle=`rgba(40,46,104,${al*0.85})`; ctx.lineWidth=1.4;
-      if(claw){ for(const dy of [-3.6,0,3.6]){ ctx.beginPath(); ctx.ellipse(4,dy,3.6,1.4,0,0,TAU); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.ellipse(-3,0,3.6,4,0,0,TAU); ctx.fill(); ctx.stroke(); }
+      if(hoof){ for(const dy of [-2.6,2.6]){ ctx.beginPath(); ctx.ellipse(1,dy,4.6,2.2,0,0,TAU); ctx.fill(); ctx.stroke(); } }
+      else if(claw){ for(const dy of [-3.6,0,3.6]){ ctx.beginPath(); ctx.ellipse(4,dy,3.6,1.4,0,0,TAU); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.ellipse(-3,0,3.6,4,0,0,TAU); ctx.fill(); ctx.stroke(); }
       else { ctx.beginPath(); ctx.ellipse(2.5,0,6.4,4,0,0,TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.ellipse(-6.5,0,3.2,3.2,0,0,TAU); ctx.fill(); ctx.stroke(); }
       ctx.restore();
       if(!done&&tw>0.96){ ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fillRect(x-1,y-6,2,12); ctx.fillRect(x-6,y-1,12,2); }
@@ -847,8 +949,26 @@ function s10DrawPrints(P,target){
 }
 // Vesper's sightings drawn with a data pose (definePose('c_mask', pose)) while a scene has posed her
 if(typeof drawThief==='function'){ const base=drawThief; drawThief=function(T){ try{ if(T&&T._pose&&typeof C1ST!=='undefined'&&T===C1ST.sight){ const f=s10PoseGet('c_mask',T._pose); if(f){ f(ctx,T.x,T.y,G.time); return; } } }catch(e){ console.error(e); } return base(T); }; }
-// people posed by a scene (definePose) and data people's own look overrides
-{ const base=drawNPC; drawNPC=function(n){ if(n&&n._pose){ const f=s10PoseGet(n.id,n._pose); if(f){ try{ f(ctx,n.x,n.y,G.time); return; }catch(e){ console.error(e); } } } return base(n); }; }
+// people posed by a scene (definePose); creature actors (npc sprite:'look', drawn only by their poses or that look,
+// never as a person); overlays (npc overlay:'look', drawn over the person: Agatha's parrot on her shoulder)
+{ const base=drawNPC; drawNPC=function(n){
+  const d=n&&S10.npcs[n.id];
+  if(n&&n._pose){ const f=s10PoseGet(n.id,n._pose); if(f){ try{ f(ctx,n.x,n.y,G.time); return; }catch(e){ console.error(e); } } }
+  if(d&&d.sprite){ try{ const f=s10PoseGet(n.id,'idle'); if(f) f(ctx,n.x,n.y,G.time); else s10LookDraw(d.sprite,n.x,n.y,n._pose||null); }catch(e){ console.error(e); } return; }
+  const r=base(n);
+  if(d&&d.overlay&&!(G&&G.mode==='story'&&d._owner&&d._owner.act&&actOf(G.stage)<d._owner.act)) try{ s10LookDraw(d.overlay,n.x,n.y,null); }catch(e){ console.error(e); }
+  return r; }; }
+// data hats: the look draws them (the flat sprite and the hat menu); the toy model wears a plain cap in the hat's colour
+{ const base=drawHatShape; drawHatShape=function(x,y,k,s){ const H=S10.hats&&S10.hats[k]; if(H){ ctx.save(); ctx.translate(x,y); if(s) ctx.scale(s,s); if(H.look&&s10LookHas(H.look)) s10LookDraw(H.look,0,0,null); ctx.restore(); return; } return base(x,y,k,s); }; }
+{ const base=ashHat; ashHat=function(k){ const H=S10.hats&&S10.hats[k]; if(H){ try{ aE(0.3,0,5.4,7.6,8.0,4.2,H.col||'#8a6a4a'); }catch(e){} return; } return base(k); }; }
+// data people who are nobody in the old code (npc blocks with a name and no CAST or SPECIAL entry) become SPECIAL
+// people (inside 'ev': only the story places them), with a speaker entry, so scenes, talk and steps can use them
+function s10People(){
+  for(const id in S10.npcs){ const d=S10.npcs[id]; if(!d||!d.name) continue;
+    if((typeof CASTBY!=='undefined'&&CASTBY[id])||SPECIAL[id]) continue;
+    SPECIAL[id]={id,name:s10T(d.name),col:d.col||'#d8c3a0',kid:!!d.kid,look:Object.assign({},d.look||{}),inside:'ev',lines:[],_s10:true};
+    if(!SPK[id]) SPK[id]={name:s10T(d.name),col:d.col||'#d8c3a0'}; }
+}
 
 // ---------- 13. people: data NPCs (npc blocks) added, moved by conditions and effects; legacy people moved or re-dressed
 function s10NpcSet(id,o){ const N=G.story._npc||(G.story._npc={}); N[id]=Object.assign({},N[id]||{},o); s10NpcSync(true); }
@@ -871,6 +991,10 @@ function s10NpcSync(force){
     if(!d&&!legacyP) continue;
     if(d&&!legacyP&&!SPECIAL[id]) continue;
     if(!d&&!(G.story._npc&&G.story._npc[id])) continue;
+    // (A4S) a block stops placing a person the old code places (a CAST person, an old SPECIAL) once its act is over: the
+    // old code places them again (x3_people's Vesper in Act IV after Act II's c_vesper block); people only the data
+    // has keep their block, and spawn/move/despawn states still hold
+    if(d&&d._owner&&d._owner.act&&actOf(G.stage)>+d._owner.act&&((typeof CASTBY!=='undefined'&&CASTBY[id])||(SPECIAL[id]&&!SPECIAL[id]._s10))&&!(G.story._npc&&G.story._npc[id])) continue;
     const want=s10NpcWant(id,d), i=G.npcs.findIndex(q=>q.id===id);
     if(legacyP&&d&&d.look&&i>=0&&!G.npcs[i]._s10look){ G.npcs[i].look=Object.assign({},G.npcs[i].look||{},d.look); G.npcs[i]._s10look=true; }
     if(!want){ if(i>=0&&(d&&!legacyP||(G.story._npc&&G.story._npc[id]&&G.story._npc[id].off))) G.npcs.splice(i,1); continue; }
@@ -887,7 +1011,7 @@ function s10TalkHook(n){
   const id=n.id;
   // quests that start by talking to their giver (first step "talk <giver>")
   for(const qid of S10.qOrder){ const q=S10.quests[qid]; if(G.quests[qid]||!s10QuestOpen(q)) continue; const s0=(q.step||[]).find(s=>!s.optional);
-    if(s0&&s0._kind==='talk'&&s0._args[0]===id&&(s0.if==null||s10Cond(s0.if))){ s10QuestStart(qid,true); const R=s10Run('q',q); s10Run2({R,s:s0,x:s0,key:s0._id}); return true; } }
+    if(s0&&s0._kind==='talk'&&s0._args[0]===id&&q.giver===id&&(s0.if==null||s10Cond(s0.if))){ s10QuestStart(qid,true); const R=s10Run('q',q); s10Run2({R,s:s0,x:s0,key:s0._id}); return true; } }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
     const x=a.x, k=x._kind;
     if(a.s.legacy) continue;
@@ -895,6 +1019,10 @@ function s10TalkHook(n){
     if(k==='give'&&x._args[1]===id&&(G.items[x._args[0]]||0)>0){ s10Run2(a,()=>takeItems({[x._args[0]]:1})); return true; }
     if(k==='minigame'&&x.start==='talk'&&(x.at||x._args[1])===id&&!G.mini&&G.time>=S10.mini.lostAt+1){ if(!MINI[x._args[0]]){ s10Err(`minigame ${x._args[0]} does not exist`); return false; } s10MiniStart(a); return true; }
   }
+  // a talk entry with first: true (A4S) plays once, ahead of the old modules' own talk hooks, then the person's menu
+  const F=s10TalkFor(id,'first');
+  if(F){ (G.story._once||(G.story._once={}))[s10TalkKey(F)]=1; S10.ver++;
+    const L=s10TalkLines(F,id); L.push({who:'narr',text:'',skipIf:()=>true,fn:()=>{ s10Do(F.then,{talk:id}); }}); talkHub(n,L); return true; }
   return false;
 }
 onTalk(n=>s10TalkHook(n));
@@ -915,16 +1043,20 @@ function s10TalkTakeover(){
   for(const id in S10.talk){
     const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(!c||c._s10lines) continue;
     let old=c.lines; c._s10lines=true;
-    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
+    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&!t.first&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
   }
   if(typeof BARKS!=='undefined') for(const b of BARKS){ const m=/^id:([\w]+)$/.exec(String(b._who||'')); if(!m||b._s10) continue; const id=m[1], c0=b.c; b._s10=true; b.c=function(){ if(G&&s10HasTalk(id)) return false; return typeof c0==='function'?c0.apply(this,arguments):!!c0; }; }
 }
 // (personal barks are told apart by their "who": B('c_x', 'id:c_hester', ...))
 { const base=B; B=function(k,who,c,t,o){ const r=base(k,who,c,t,o); try{ const b=BARKS[BARKS.length-1]; if(b&&b.k===k) b._who=who; }catch(e){} return r; }; }
 function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify([T.if,T.say,T.scene,T.option,T.then]))); }
-function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if(T.once&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
+function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if((T.once||T.first)&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
+// the first matching entry, top to bottom, of the latest act that has one (an act-5 line wins over an act-2 line that
+// would also match; inside one act the order is the data's)
 function s10TalkFor(id,kind){
-  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':'line'; if(k!==kind) continue; if(s10TalkOk(T)) return T; } return null;
+  let best=null, bestAct=-1;
+  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':T.first?'first':'line'; if(k!==kind) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ best=T; bestAct=a; } }
+  return best;
 }
 // say forms: [full, simple] or a string (said by that person); a list of lines [[who, full, simple], ...]; or (A2S)
 // a list of [full, simple] variants, the next one each time it plays (what CAST.lines did)
@@ -947,9 +1079,9 @@ function s10TalkOpts(id,n,o){
   // a data chapter's own waits replace the old code's "Wait here until dark" for its stage
   if(own){ const wt=S('Wait here until dark','Wait until dark'); for(let i=o.length-1;i>=0;i--) if(o[i]&&o[i].t===wt&&!o[i]._s10) o.splice(i,1); }
   for(const R of s10Runners()) for(const a of s10Doable(R)){
-    const x=a.x; if(x._kind!=='wait_for'||s10WaitOk(x)) continue;
+    const x=a.x, nm=s10MiniNight(x); if(!(x._kind==='wait_for'&&!s10WaitOk(x))&&!nm) continue;
     const sk=s10Arr(x.skip).map(v=>typeof v==='string'?{npc:v}:v).find(v=>v&&v.npc===id); if(!sk) continue;
-    const w=x._args[0], night=w==='night', hr=w==='hour'?+String(x._args[1]).split('-')[0]:null;
+    const w=nm?'night':x._args[0], night=w==='night', hr=w==='hour'?+String(x._args[1]).split('-')[0]:null;
     if(w==='event') continue;
     const label=night?S('Wait here until dark','Wait until dark'):w==='day'?S('Wait here until morning','Wait until morning'):S(`Wait here until ${hr}:00`,`Wait until ${hr}:00`);
     const reply=sk.say?s10T(sk.say):night?S('Very well. Sit with me. It will be dark soon.','Sit with me. It gets dark soon.'):S('Sit with me a while.','Sit with me a while.');
@@ -1039,12 +1171,17 @@ function s10QuestDefs(){
     if(old) (S10.oldQ||(S10.oldQ={}))[id]=old;
     const dyn=s10QDyn(q), steps=[];
     if(old){ (old.steps||[]).forEach((st,i)=>{ const sid=s10Arr(q.old_steps)[i], ds=(q.step||[]).find(s=>s._id===sid);
-      steps[i]=ds&&ds.legacy?Object.assign({},st,{text:s10T(ds.obj)||st.text}):dyn; }); }
+      steps[i]=ds&&ds.legacy?Object.assign({},st,{text:s10T(ds.obj)||st.text}):dyn;
+      // a legacy talk step's own scene is what the old code plays for it (its lines, clue tags and effects)
+      if(ds&&ds.legacy&&ds.scene&&st&&st.t==='talk'&&S10.scenes[ds.scene]){ const sc=ds.scene;
+        Object.defineProperty(steps[i],'lines',{configurable:true,enumerable:true,get(){ if(G.story) (G.story._seen||(G.story._seen={}))[sc]=1; return s10Lines(S10.scenes[sc],{sc,R:s10Run('q',q),step:ds}); }}); } }); }
     else steps[0]=dyn;
     // (one more after the old steps, so the old code moving its last legacy step on never finishes the quest itself)
     if(old) steps[(old.steps||[]).length]=dyn;
     steps[-1]=dyn;
-    q._qdef=QDEFS[id]={_s10:true,title:s10T(q.title)||(old&&old.title)||id,giver:q.giver||(old&&old.giver)||null,ab:'__story_data__',min:old&&old.min,steps,errand:false,offer:[],topics:old&&old.topics};
+    // (the title is read each time: a title with variants follows its conditions)
+    const oldT=old&&old.title;
+    q._qdef=QDEFS[id]={_s10:true,get title(){ let t=''; try{ t=G?s10T(q.title):''; }catch(e){} return t||oldT||id; },set title(v){},giver:q.giver||(old&&old.giver)||null,ab:'__story_data__',min:old&&old.min,steps,errand:false,offer:[],topics:old&&old.topics};
   }
 }
 // the index G.quests[id].step should have for the current data step
@@ -1070,7 +1207,11 @@ function s10QuestStart(id,quiet){
   const q=S10.quests[id];
   if(!q){ if(QDEFS[id]&&!QDEFS[id]._s10){ if(!G.quests[id]) startQuest(id); return; } s10Err(`quest ${id} is not defined`); return; }
   if(G.quests[id]) return;
+  // (quiet: started by talking to the giver; the old "New side quest" banner would name the talk that is just
+  // playing, so it is left out: the step's own banner names the next thing to do once the scene ends)
+  const B0=G.banner, Q0=(G.bannerQ||[]).slice();
   startQuest(id); if(G.quests[id]) G.quests[id].step=s10QStepIdx(q);
+  if(quiet){ G.banner=B0; G.bannerQ=Q0; }
   storyEmit('quest_start:'+id);
 }
 // a data quest whose last step is done: done, banner, friendship, deed q_<id> (later acts read them)
@@ -1117,7 +1258,8 @@ function s10DefaultObj(s){
     case 'deduce': return S('Work it out in the Case Book','Open the Case Book');
     case 'track': return S(`Follow ${n(0)}`,`Follow ${n(0)}`);
     case 'wait_for': return A[0]==='night'?S('Wait for night','Wait for night'):A[0]==='day'?S('Wait for morning','Wait for morning'):S('Wait','Wait');
-    case 'minigame': return s.at?S(`Go to ${s10Name(s.at)}`,`Go to ${s10Name(s.at)}`):S('Get ready!','Get ready!');
+    case 'minigame': if(s10MiniNight(s)) return s.at?S(`Wait for night at ${s10Name(s.at)}`,`Wait for night at ${s10Name(s.at)}`):S('Wait for night','Wait for night');
+      return s.at?S(`Go to ${s10Name(s.at)}`,`Go to ${s10Name(s.at)}`):S('Get ready!','Get ready!');
     case 'dungeon': return S(`Explore ${n(0)}`,`Explore ${n(0)}`);
     case 'choose': return S('Make your choice','Make your choice');
   }
@@ -1176,16 +1318,30 @@ function s10Watch(){
 { const base=miniEnd; miniEnd=function(win,title,sub){ const M=G&&G.mini; base(win,title,sub); try{ if(M&&S10.booted) s10MiniEnded(M.kind,!!win); }catch(e){ console.error(e); } }; }
 // legacy things examined through their own prompt (the Moth Mask Watch board): the step waiting for them finishes
 // once their own lines are read
-{ const base=lmAct; lmAct=function(o){ const r=base(o); try{ s10LegacyExamined(o); }catch(e){ console.error(e); } return r; }; }
+// (put on at boot, outside every module's own lmAct wrapper: p3_frost's returns early for a frozen person)
+function s10WrapLm(){ const base=lmAct; lmAct=function(o){ try{ if(s10LmTakes(o)) return; }catch(e){ console.error(e); } const r=base(o); try{ s10LegacyExamined(o); }catch(e){ console.error(e); } return r; }; }
+function s10LmIds(o){ return Object.keys(S10.legacy).filter(id=>{ const e=S10.legacy[id]; return String(e.src||'')==='LANDMARKS:'+o.id||new RegExp('\\.js\\s+'+o.id+'$').test(String(e.src||'')); }); }
+// an examine step with its own scene waits on this landmark: the scene plays instead of the landmark's own lines
+function s10LmTakes(o){
+  if(!o||!S10.booted||!G||G.mode!=='story') return false;
+  const ids=s10LmIds(o); if(!ids.length) return false;
+  if(!s10Runners().some(R=>s10Doable(R).some(a=>a.x._kind==='examine'&&ids.includes(a.x._args[0])&&(a.x.scene||a.x.win)))) return false;
+  G.story._ex=G.story._ex||{}; for(const id of ids){ G.story._ex[id]=(G.story._ex[id]|0)+1; storyEmit('examine:'+id); s10Examined(id); }
+  return true;
+}
 function s10LegacyExamined(o){
   if(!o||!S10.booted) return;
-  const ids=Object.keys(S10.legacy).filter(id=>{ const e=S10.legacy[id]; return String(e.src||'')==='LANDMARKS:'+o.id||new RegExp('\\.js\\s+'+o.id+'$').test(String(e.src||'')); });
+  const ids=s10LmIds(o);
   if(!ids.length) return;
   G.story._ex=G.story._ex||{};
   for(const id of ids){ G.story._ex[id]=(G.story._ex[id]|0)+1; storyEmit('examine:'+id); }
   const go=()=>{ for(const id of ids) s10Examined(id); };
   if(DLG){ const d=DLG, prev=d.done; d.done=()=>{ if(prev) prev(); go(); }; } else go();
 }
+
+// (A3b) a fade from a scene's { fade } beat, a warp or a time effect clears while the scene is still talking (G.fade
+// decays in simUpdate only, so the screen stayed black until the scene ended); the hearth story keeps its own slow fade
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.fade>0&&scene==='dialogue'&&!(typeof HS!=='undefined'&&HS.on)) G.fade=Math.max(0,G.fade-dt*2.5); }catch(e){} }; }
 
 // ---------- 21. saves: G.case and G.story ride along with the game; old saves start empty
 function s10Fresh(){ G.case={clues:{},solved:{},tries:{},seen:{},pages:{}}; G.story={_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}}; }
@@ -1197,7 +1353,7 @@ function s10Loaded(s){
   G.case={clues:Object.assign({},C&&C.clues),solved:Object.assign({},C&&C.solved),tries:Object.assign({},C&&C.tries),seen:Object.assign({},C&&C.seen),pages:Object.assign({},C&&C.pages)};
   G.story=Object.assign({_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}},T&&typeof T==='object'?JSON.parse(JSON.stringify(T)):{});
   S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null};
-  if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10QuestResume(); try{ s10QuestDoneIf(); }catch(e){} s10NpcSync(true); }
+  if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10ActMigrate(); s10QuestResume(); try{ s10QuestDoneIf(); }catch(e){} s10NpcSync(true); }
 }
 // a save made by the old code in the middle of a chapter the data now runs: steps the old code already did are done
 // (a step whose `then` sets a flag the save has, a talk/goto/cutscene whose scene the old code marked seen, and every
@@ -1209,9 +1365,22 @@ function s10Migrate(){
     const R=s10Run('ch',c), st=s10St(R), steps=(c.step||[]).filter(s=>s._kind&&!s.optional);
     let last=-1;
     steps.forEach((s,i)=>{ const sets=s10Arr(s.then).some(e=>typeof e==='string'&&/^set\s/.test(e)&&(()=>{ const f=e.split(/\s+/)[1].split('=')[0]; return !!G.flags[f]; })());
-      const seen=['talk','goto','cutscene'].includes(s._kind)&&s.scene&&G.flags.c_sn&&G.flags.c_sn[s.scene]; if(sets||seen) last=i; });
+      // (a key the chapter silences itself is marked seen by that, not by the old code having played it)
+      const sn2=G.flags[S10_SN[+c.act]], seen=['talk','goto','cutscene'].includes(s._kind)&&s.scene&&!s10Arr(c.silence).includes(s.scene)&&((G.flags.c_sn&&G.flags.c_sn[s.scene])||(sn2&&sn2[s.scene]));
+      // (A2B) migrate_if: <condition>: an old save where it holds has done this step
+      let mig=false; if(s.migrate_if!=null) try{ mig=s10Cond(s.migrate_if); }catch(e){ mig=false; }
+      if(sets||seen||mig) last=i; });
     for(let i=0;i<=last;i++){ const s=steps[i]; s10MigrateStep(R,s); }
   }
+}
+// (A2B) an act's migrate: [{ if, then }]: once per save, at load (or boot), when its condition holds, its effects run
+// quietly (old saves that skipped clues a later step asks for). G.story._mig remembers which ran.
+function s10ActMigrate(){
+  if(!G||G.mode!=='story'||!G.story) return;
+  const M=G.story._mig||(G.story._mig={});
+  for(const n in S10.acts){ const L=s10Arr(S10.acts[n]&&S10.acts[n].migrate);
+    L.forEach((m,i)=>{ const k=n+'/'+i; if(M[k]||!m) return; let ok=false; try{ ok=m.if==null||s10Cond(m.if); }catch(e){ ok=false; } if(!ok) return;
+      M[k]=1; const was=S10.quiet; S10.quiet=true; try{ s10Do(m.then,{act:+n}); }catch(e){ console.error(e); } finally{ S10.quiet=was; } }); }
 }
 function s10MigrateStep(R,s){
   const st=s10St(R), was=S10.quiet; S10.quiet=true;
@@ -1241,32 +1410,45 @@ function s10Boot(){
   try{ s10TalkTakeover(); }catch(e){ s10Err('talk takeover: '+e.message); console.error(e); }
   try{ s10Check(); }catch(e){ s10Err('check: '+e.message); console.error(e); }
   if(G&&!G.story) s10Fresh();
-  if(G&&G.mode==='story'){ s10Migrate(); s10QuestResume(); s10NpcSync(true); }
+  if(G&&G.mode==='story'){ s10Migrate(); s10ActMigrate(); s10QuestResume(); s10NpcSync(true); }
 }
 window.__ebStoryBoot=()=>{ try{ s10Boot(); }catch(e){ console.error(e); } };
 // data registered after boot (tests, a late file) is linked the same way
 function s10Late(){ s10Link(); s10Gates(); s10StoryKeys(); s10Replaces(); s10TalkTakeover(); if(G&&G.mode==='story'){ s10QuestResume(); s10NpcSync(true); } }
 // chapters become stages (new ones after their `after`), the old stage of the same id is taken over
 function s10Link(){
+  s10People();
   for(const id of S10.chOrder){
     const c=S10.chapters[id]; if(c._linked) continue; c._linked=true;
     const old=STAGEDEF[id], take=!!old&&c.takeover!==false;
     if(!old){ defineStages(+c.act||2,[{id}]); if(c.after&&stageAt(c.after)>=0){ const i=stageAt(id); STAGES.splice(i,1); STAGES.splice(stageAt(c.after)+1,0,id); } }
     const D=STAGEDEF[id]; if(!D) continue;
-    if(take) D._old={objectives:D.objectives,update:D.update,marker:D.marker,hint:D.hint,talk:D.talk,enter:D.enter,soFar:D.soFar,idle:D.idle,card:D.card,chapter:D.chapter};
+    if(old) D._old={objectives:D.objectives,update:D.update,marker:D.marker,hint:D.hint,talk:D.talk,enter:D.enter,soFar:D.soFar,idle:D.idle,card:D.card,chapter:D.chapter};
     const card=c.card===null?null:c.card?[String(c.card[0]),s10T(c.card[1])]:D.card;
     if(c.mom&&typeof MOM_CH!=='undefined') MOM_CH[id]=s10Arr(c.mom).map(x=>s10T(x));
-    Object.assign(D,{_s10:id,card,chapter:card?card[1]:(c.name?s10T(c.name):D.chapter),objectives:()=>s10Objs(c),hint:()=>s10Hint(c),soFar:()=>s10T(c.so_far),marker:nid=>false,
-      talk:()=>false,enter:o=>s10Enter(c,o),update:()=>{},idle:null});
+    // takeover: false: the old stage keeps every hook of its own (the data's steps run beside it; the engine's enter runs
+    // first). keep: ['update', 'enter', ...] (N5b R7, A4a keep_enter): those hooks of a taken-over stage keep running
+    // (enter runs after the engine's own; the others are the old ones instead of the data's)
+    const own=!old||take, keep=new Set(own?s10Arr(c.keep).concat(c.keep_enter?['enter']:[]):['objectives','update','marker','hint','talk','idle','soFar','enter']);
+    for(const h of keep) if(!['objectives','update','marker','hint','talk','idle','soFar','enter'].includes(h)) s10Err(`${id}: keep "${h}" is not a stage hook (objectives, update, marker, hint, talk, idle, soFar, enter)`);
+    const O=D._old||{}, has=h=>keep.has(h)&&O[h]!=null;
+    const N={card,chapter:card?card[1]:(c.name?s10T(c.name):D.chapter),objectives:has('objectives')?O.objectives:()=>s10Objs(c),hint:has('hint')?O.hint:()=>s10Hint(c),
+      soFar:has('soFar')?O.soFar:()=>s10T(c.so_far),marker:has('marker')?O.marker:nid=>false,talk:has('talk')?O.talk:()=>false,
+      enter:o=>{ s10Enter(c,o); if(has('enter')&&typeof O.enter==='function') try{ O.enter(o); }catch(e){ console.error(e); } },update:has('update')?O.update:()=>{},idle:keep.has('idle')?O.idle||null:null};
+    if(own) N._s10=id;
+    Object.assign(D,N);
     if(D.chapter) CHAPTER[id]=D.chapter;
     for(const s of c.step||[]){ if(s._kind==='minigame'){ const m=s._args[0]; if(!MINI[m]) s10Err(`${id}.${s._id}: minigame ${m} does not exist`); } }
   }
   s10QuestDefs();
 }
-function s10Silence(c){ if(!c||!c.silence||!G||!G.flags) return; const sn=G.flags.c_sn||(G.flags.c_sn={}); for(const k of s10Arr(c.silence)) sn[k]=1; }
+// the old modules' once-only marks: Act II c_sn (x1_story), Act III f_sn (x2_story), Act IV m_sn, the finale n_sn
+const S10_SN={2:'c_sn',3:'f_sn',4:'m_sn',5:'n_sn'};
+function s10Silence(c){ if(!c||!c.silence||!G||!G.flags) return; const keys=['c_sn']; const k2=S10_SN[+c.act]; if(k2&&!keys.includes(k2)) keys.push(k2);
+  for(const f of keys){ const sn=G.flags[f]||(G.flags[f]={}); for(const k of s10Arr(c.silence)) sn[k]=1; } }
 function s10Enter(c,o){
   if(!G.story) s10Fresh();
-  s10Silence(c); s10Migrate(); s10NpcSync(true);
+  s10Silence(c); s10Migrate(); s10ActMigrate(); s10NpcSync(true);
   storyEmit('chapter:'+c.id);
 }
 // the takeover adapters: the old code's own triggers for a stage the data now runs
@@ -1277,21 +1459,42 @@ function s10FurnAct(o,base,args){
   if(!ids.length) return false;
   G.story._ex=G.story._ex||{}; for(const id of ids){ G.story._ex[id]=(G.story._ex[id]|0)+1; storyEmit('examine:'+id); }
   const e=S10.legacy[ids[0]], say=e.say, sc=e.scene||(typeof say==='string'&&S10.scenes[say]?say:null), done=()=>{ for(const id of ids) s10Examined(id); };
-  if(sc){ s10Play(sc,done,{place:ids[0]}); return true; }
-  if(say!=null){ const L=Array.isArray(say)&&say.length&&Array.isArray(say[0])?say:[['narr'].concat(Array.isArray(say)?say:[say])]; s10Play(L,done,{place:ids[0]}); return true; }
+  // a waiting examine step's own scene wins (it plays once, from the step); else the entry's own say or scene
   const waiting=s10Runners().some(R=>s10Doable(R).some(a=>a.x._kind==='examine'&&ids.includes(a.x._args[0])&&(a.x.scene||a.x.win)));
   if(waiting){ done(); return true; }
+  if(sc){ s10Play(sc,done,{place:ids[0]}); return true; }
+  if(say!=null){ const L=Array.isArray(say)&&say.length&&Array.isArray(say[0])?say:[['narr'].concat(Array.isArray(say)?say:[say])]; s10Play(L,done,{place:ids[0]}); return true; }
   base.apply(this,args);
   if(DLG){ const d=DLG, prev=d.done; d.done=()=>{ if(prev) prev(); done(); }; } else done();
   return true;
 }
+// a legacy furn:<k> entry whose furniture has no prompt of its own (house barrels): while a step wants it examined, or
+// the entry has its own say or scene, that furniture in its area says "Look at <the entry's name>"
+function s10FurnPrompts(A){
+  if(!A||!A.objs||typeof FURN_LABEL==='undefined') return;
+  const ents=Object.keys(S10.legacy).map(id=>S10.legacy[id]).filter(e=>/^furn:/.test(String(e.src||''))&&(!e.area||e.area===A.id||(A.def&&A.def.id===e.area)));
+  for(const e of ents){ const k=String(e.src).slice(5);
+    for(const o of A.objs){ if(o.k!==k||o.prompt||FURN_LABEL[k]||(typeof FLOOR_LABEL!=='undefined'&&FLOOR_LABEL[k])||(typeof CAVE_LABEL!=='undefined'&&CAVE_LABEL[k]!==undefined)) continue;
+      const nm=s10T((e.aliases&&e.aliases[0])||e.name)||k;
+      o.prompt=()=>{ try{ const want=s10Runners().some(R=>s10Doable(R).some(a=>a.x._kind==='examine'&&a.x._args[0]===e.id)); return want||e.say!=null||e.scene?simplify(S('Look at '+nm,'Look at '+nm)):null; }catch(err){ return null; } }; } }
+}
 function s10Adapt(){
-  s10WrapTalkOpts();
+  s10WrapTalkOpts(); s10WrapLm();
+  // (A3S) old code that offers a quest the data took over (offerQuest(id): x2_story's f2sYlva for f_rime) plays the data
+  // quest's own `offer: '<scene id>'` instead of the stand-in's bare "Will you help?"
+  { const base=offerQuest; offerQuest=function(id){ try{ const q=S10.quests[id], d=QDEFS[id];
+      if(q&&d&&d._s10&&q.offer&&S10.scenes[q.offer]){ s10Play(q.offer,null,{quest:id}); return; } }catch(e){ console.error(e); } return base.apply(this,arguments); }; }
+  // N5A (d): while a data chapter's step has an objective, the stock "Travel to <boss site>" lines step aside (they
+  // would win the HUD's nearest-of), unless the step is the fight at that site
+  { const base=objectiveList; objectiveList=function(){ const out=base(); try{ const c=G&&G.mode==='story'&&!G.done&&S10.chapters[G.stage];
+      if(c&&out.some(o=>!o.site&&!o.fight)){ const s=s10Active(s10Run('ch',c)), foe=s&&s._kind==='fight'?s._args[0]:null; return out.filter(o=>!o.site||(foe&&SITES[o.site]&&SITES[o.site].boss===foe)); } }catch(e){ console.error(e); } return out; }; }
   { const base=areaObjAct; areaObjAct=function(o){ try{ if(o&&S10.booted&&s10FurnAct(o,base,arguments)) return; }catch(e){ console.error(e); } return base.apply(this,arguments); }; }
   // (outside the acts' own moodLine wrappers, so a person with data talk gets no old mood lines)
   { const base=moodLine; moodLine=function(id){ try{ if(G&&s10HasTalk(id)) return null; }catch(e){} return base(id); }; }
   // Act II's rooftop chase: winning it no longer plays the old ending and jumps to c_salt when the data owns the chase
   if(typeof c1RWin==='function'&&!c1RWin._s10){ const base=c1RWin; c1RWin=function(){ if(!s10MiniOwner('c_roofchase')) return base(); G.flags.c_chase_won=1; later(0.05,()=>miniEnd(true,S('Caught up!','Caught up!'),S('The roofs end at the Clockwatch Hall.','The roofs end here.'))); }; c1RWin._s10=true; }
+  // kneels (section 10b)
+  for(const f in KNEEL_S10){ try{ if(KNEEL_S10[f].install((e,fin)=>s10Kneel(f,e,fin))) S10.adapted=(S10.adapted||[]).concat('kneel:'+f); }catch(e){ console.error(e); } }
   // thin adapters: the later acts' story beats also become events
   for(const name of ['f2sBeat','m3sBeat','n4sBeat']){
     let f=null; try{ f=eval(`typeof ${name}==='function'?${name}:null`); }catch(e){ f=null; }
@@ -1305,20 +1508,50 @@ function s10StoryKeys(){
   for(const id in S10.scenes){
     if(!(id in STORY)||S10.storyDone&&S10.storyDone[id]) continue;
     (S10.storyDone=S10.storyDone||{})[id]=1;
+    const desc=Object.getOwnPropertyDescriptor(STORY,id), byGetter=!!(desc&&(desc.get||desc.set));
     const old=STORY[id], lines=s10Lines(S10.scenes[id],{sc:id}), mark={who:'narr',text:'',skipIf:()=>true,fn:()=>{ if(G&&G.story) (G.story._seen||(G.story._seen={}))[id]=1; }};
-    if(Array.isArray(old)){ const L0=old[0], keep=L0&&!Array.isArray(L0)&&L0.text===''&&L0.fn&&L0.skipIf?[L0]:[]; old.length=0; old.push(...keep,mark,...lines); }
-    else STORY[id]=[mark,...lines];
+    // the old module's own "seen" mark (its first, silent line: c_sn, f_sn, m_sn, n_sn) is kept, and also runs when the
+    // engine plays the scene itself, so the old code's seen checks still hold
+    const L0=Array.isArray(old)?old[0]:null, keep=L0&&!Array.isArray(L0)&&L0.text===''&&L0.fn&&L0.skipIf?[L0]:[];
+    if(keep.length) (S10.oldMark||(S10.oldMark={}))[id]=keep[0].fn;
+    // (a getter without a setter builds a fresh array on every read, so changing it in place would be lost: the key
+    // becomes a plain value; x4's getters have a setter that keeps what it is given)
+    const L2=[...keep,mark,...lines];
+    if(desc&&desc.set) STORY[id]=L2;
+    else if(byGetter) Object.defineProperty(STORY,id,{configurable:true,enumerable:true,writable:true,value:L2});
+    else if(Array.isArray(old)){ old.length=0; old.push(...L2); }
+    else STORY[id]=L2;
   }
+  s10MailKeys();
 }
+// (A4S) a data scene whose id is a Pebble letter's id is that letter's text: the letter keeps its from, when, coin,
+// gift and then, and its lines are the scene's (letters put in later are done on the next call: boot, a load, s10Late)
+function s10MailKeys(){
+  if(typeof PEBBLE_MAIL==='undefined'||!PEBBLE_MAIL) return;
+  const fix=d=>{ if(!d||!d.id||d._s10||!S10.scenes[d.id]) return; const id=d.id; d._s10=true; d.lines=()=>s10Lines(S10.scenes[id],{sc:id}); };
+  for(const d of PEBBLE_MAIL) fix(d);
+  for(const k of Object.keys(PEBBLE_MAIL)) if(!/^\d+$/.test(k)){ const v=PEBBLE_MAIL[k]; if(v&&typeof v==='object'){ if(!v.id) v.id=k; fix(v); } }
+}
+// replaces: { 'STORY.a.b': sceneId } puts a data scene in place of a nested old STORY entry; { 'TALK.who.topic': null }
+// (or any STORY or TALK path with null) takes the old entry out, when a data talk entry says it instead
 function s10Replaces(){
   if(typeof STORY==='undefined') return;
   for(const [kind,d] of S10.raw){ const R=d&&d.replaces; if(!R||typeof R!=='object') continue;
     for(const path in R){ const key=path+'>'+R[path]; if(S10.replDone&&S10.replDone[key]) continue; (S10.replDone=S10.replDone||{})[key]=1;
+      const root=/^TALK\./.test(path)&&typeof TALK!=='undefined'?TALK:STORY;
+      const parts=String(path).replace(/^(STORY|TALK)\./,'').split('.'); let o=root; for(let i=0;i<parts.length-1&&o;i++) o=o[parts[i]];
+      const last=parts[parts.length-1]; if(!o||!(last in o)){ s10Err(`replaces ${path}: there is no such old entry`); continue; }
+      if(R[path]===null){ delete o[last]; continue; }
+      // a text ([full, simple]) for an old entry that is a text (STORY.f_hints.<stage>, a TALK line): read in the mode
+      // the player is in each time
+      const v=R[path]; if(Array.isArray(v)&&v.length&&v.every(x=>typeof x==='string')||typeof v==='string'&&!S10.scenes[v]&&typeof o[last]==='string'){
+        Object.defineProperty(o,last,{configurable:true,enumerable:true,get(){ return s10T(v); },set(x){}}); continue; }
       const beats=S10.scenes[R[path]]; if(!beats){ s10Err(`replaces ${path}: no scene ${R[path]}`); continue; }
-      const parts=String(path).replace(/^STORY\./,'').split('.'); let o=STORY; for(let i=0;i<parts.length-1&&o;i++) o=o[parts[i]];
-      const last=parts[parts.length-1]; if(!o||!(last in o)){ s10Err(`replaces ${path}: there is no such old STORY entry`); continue; }
       const lines=s10Lines(beats,{sc:R[path]}), mark={who:'narr',text:'',skipIf:()=>true,fn:()=>{ if(G&&G.story) (G.story._seen||(G.story._seen={}))[R[path]]=1; }};
-      if(Array.isArray(o[last])){ const old=o[last]; old.length=0; old.push(mark,...lines); } else o[last]=[mark,...lines]; } }
+      const desc=Object.getOwnPropertyDescriptor(o,last);
+      if(desc&&desc.set) o[last]=[mark,...lines];
+      else if(desc&&desc.get) Object.defineProperty(o,last,{configurable:true,enumerable:true,writable:true,value:[mark,...lines]});
+      else if(Array.isArray(o[last])){ const old=o[last]; old.length=0; old.push(mark,...lines); } else o[last]=[mark,...lines]; } }
 }
 // gate places are built by the gate library (ENG-W, e10c_gates: gateBuild(place)) once everything is loaded
 function s10Gates(){
@@ -1332,7 +1565,7 @@ function s10Check(){
   const spk=w=>w==='narr'||w==='ash'||w==='pip'||!!SPK[w]||!!S10.npcs[w]||!!(typeof CASTBY!=='undefined'&&CASTBY[w]);
   const scanScene=(id,beats)=>{ for(const b of s10Arr(beats)){ if(Array.isArray(b)){ const l=s10Line(b); if(!spk(l.who)) s10Err(`scene ${id}: speaker ${l.who} is unknown`); for(const c of s10Arr(l.o.clue)) if(!S10.clues[c]) s10Err(`scene ${id}: clue ${c} is not defined`); if(/\u2014/.test(l.full+(l.simple||''))) s10Err(`scene ${id}: an em dash`); }
     else if(b&&typeof b==='object'){ if(b.then) scanScene(id,b.then); if(b.else) scanScene(id,b.else); for(const p of s10Arr(b.pick)) if(p&&p.say) scanScene(id,p.say); for(const k of ['cam']) if(b[k]!=null&&!has(b[k])) s10Err(`scene ${id}: ${k} ${b[k]} is not a place`);
-      for(const k of ['place','walk']) if(b[k]&&b[k][1]!=null&&!Array.isArray(b[k][1])&&!has(b[k][1])) s10Err(`scene ${id}: ${k} target ${b[k][1]} is not a place`); } } };
+      for(const k of ['place','walk']) if(b[k]&&b[k][1]!=null&&!Array.isArray(b[k][1])&&b[k][1]!=='player'&&b[k][1]!=='ash'&&!has(b[k][1])) s10Err(`scene ${id}: ${k} target ${b[k][1]} is not a place`); } } };
   for(const id in S10.scenes) scanScene(id,S10.scenes[id]);
   const stepCheck=(d,s,where)=>{
     const A=s._args||[];
@@ -1384,7 +1617,7 @@ function s10Uses(cid){
   return [...U];
 }
 const S10API={
-  chapters:()=>S10.chOrder.map(id=>{ const c=S10.chapters[id]; return {id,act:+c.act||null,active:G&&G.stage===id,done:!!G&&stageAt(G.stage)>stageAt(id)&&stageAt(id)>=0}; }),
+  chapters:()=>S10.chOrder.slice().sort((a,b)=>{ const i=stageAt(a), j=stageAt(b); return (i<0?1e9:i)-(j<0?1e9:j); }).map(id=>{ const c=S10.chapters[id]; return {id,act:+c.act||null,active:G&&G.stage===id,done:!!G&&stageAt(G.stage)>stageAt(id)&&stageAt(id)>=0}; }),
   state:()=>s10ApiState(),
   entities:()=>s10ApiEntities(),
   entity:id=>s10EntityInfo(id),
@@ -1397,10 +1630,19 @@ const S10API={
   uses:cid=>s10Uses(cid),
   quests:()=>S10.qOrder.map(id=>({id,active:!!(G.quests[id]&&!G.quests[id].done),done:!!(G.quests[id]&&G.quests[id].done)})),
   doable:()=>s10Runners().flatMap(R=>s10Doable(R).map(a=>({run:R.key,key:a.key,do:a.x.do,extra:!!a.extra}))),
+  // (tests) what each doable step is and where it points: its kind, args, scene, and the marker spot (x, y, area, npc)
+  targets:()=>s10Runners().flatMap(R=>s10Doable(R).map(a=>{ let w=null; try{ w=s10StepWhere(a); }catch(e){} const x=a.x;
+    return {run:R.key,key:a.key,kind:x._kind,args:x._args.slice(),extra:!!a.extra,optional:!!a.s.optional,part:!!a.part,scene:x.scene||null,kneel:x.kneel||null,legacy:!!x.legacy,
+      at:x.at||null,skip:s10Arr(x.skip).map(v=>typeof v==='string'?v:v&&v.npc),pend:!!S10.pend[R.key+'/'+a.key],
+      x:w?Math.round(w.x):null,y:w?Math.round(w.y):null,area:w&&w.area||null,npc:w&&w.npc||null}; })),
+  where:id=>{ const w=s10Where(id); return w?{x:Math.round(w.x),y:Math.round(w.y),area:w.area||null,npc:w.npc||null}:null; },
   objective:()=>{ const c=S10.chapters[G.stage]; return c?s10Objs(c):[]; },
   place:id=>{ const P=S10.places[id]; return P?Object.assign({},P,{_owner:undefined}):null; },
   act:id=>s10PlaceAct(id),
   scene:(id,cb)=>s10Play(id,cb),
+  // (tests) run effects as a step's then would: 'shrine x', ['set a', 'clue b']; offer a quest as old code does
+  do:e=>s10Do(e,{}),
+  offer:id=>offerQuest(id),
   world:(id,st)=>{ if(st!=null) s10WorldSet(id,st); return s10World(id); },
   talkLine:id=>{ const T=s10TalkFor(id,'line'); return T?{say:T.say?s10T(Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say):null,scene:T.scene||null}:null; },
   track:id=>G.story&&G.story._trk?G.story._trk[id]:undefined,
@@ -1423,7 +1665,7 @@ const s10Frames=n=>new Promise(r=>{ let k=0; const f=()=>{ if(++k>=n) r(); else 
 const s10Sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function s10AutoTp(w){
   if(!w) return false;
-  if(w.area){ if(!AREA||AREA.id!==w.area){ if(AREA) exitArea(); const d=DOORS.find(q=>q.area===w.area); enterArea(w.area,d||{x:player.x,y:player.y}); await s10Frames(4); }
+  if(w.area){ if(!AREA||AREA.id!==w.area){ if(AREA) exitArea(); const d=s10DoorFor(w.area); enterArea(w.area,d||{x:player.x,y:player.y}); await s10Frames(4); }
     const n=w.npc&&AREA&&AREA.npcs.find(q=>q.id===w.npc); if(n){ player.x=n.x; player.y=n.y+34; } return true; }
   if(AREA) { exitArea(); await s10Frames(3); }
   player.x=w.x; player.y=w.y+(w.npc?34:24); player.z=0; updateCam(0,true); G.chunkBurst=16; await s10Frames(3); return true;
@@ -1433,6 +1675,8 @@ async function s10AutoDlg(limit){
   while(performance.now()-t0<(limit||20000)){
     if(DLG){ if(DLG.opts){ DLG.chars=1e9; const o=DLG.opts; let i=o.findIndex(q=>q.tone==='kind'); if(i<0) i=o.findIndex(q=>q.tone!=='locked'); chooseOpt(Math.max(0,i)); } else skipDialogue(); await s10Frames(1); continue; }
     if(scene==='upgrade'){ try{ chooseUpgrade(0); }catch(e){} await s10Frames(1); continue; }
+    // (A4b) the act's end card: "Continue the story" (or, at the very end, "Keep exploring")
+    if(scene==='victory'){ const nx=document.getElementById('bWinNext'), ex=document.getElementById('bWinExplore'), b=nx&&!nx.hidden?nx:ex; if(b) b.click(); await s10Frames(4); continue; }
     if(scene!=='play'){ await s10Frames(2); continue; }
     await s10Frames(2); if(!DLG&&scene==='play') return true;
   }
@@ -1448,7 +1692,10 @@ async function s10AutoDo(a,log){
     case 'examine': { const w=s10Where(A[0]); await s10AutoTp(w); if(S10.places[A[0]]) s10PlaceAct(A[0]); else { const e=S10.legacy[A[0]], m=e&&/^LANDMARKS:(.+)$/.exec(e.src||''), o=m&&LANDMARKS.find(q=>q.id===m[1]); if(o) lmAct(o); else s10Examined(A[0]); } break; }
     case 'track': { const P=S10.places[A[0]]; if(P&&P.show!=null&&!s10Cond(P.show)) log.push('  prints not shown: '+P.show); for(const pt of (P&&P.path)||[]){ await s10AutoTp({x:+pt[0],y:+pt[1]-24}); player.x=+pt[0]; player.y=+pt[1]; await s10Frames(3); } break; }
     case 'deduce': { const D=S10.deduce[A[0]]; if(D){ for(const c of s10Arr(D.needs)) if(!G.case.clues[c]){ log.push('  missing clue '+c); } const i=s10Arr(D.pick).findIndex(p=>p.right); const r=s10Deduce(A[0],i); log.push('  deduce '+JSON.stringify(r)); } break; }
-    case 'wait_for': { const w=A[0]; if(x.at) await s10AutoTp(s10Where(x.at)); if(w==='night') G.tod=0.875; else if(w==='day') G.tod=0.35; else if(w==='hour') G.tod=(+String(A[1]).split('-')[0]+0.2)/24; else if(w==='event') storyEmit(A[1]); break; }
+    case 'wait_for': { const w=A[0]; if(x.at) await s10AutoTp(s10Where(x.at)); if(w==='night') G.tod=0.875; else if(w==='day') G.tod=0.35; else if(w==='hour') G.tod=(+String(A[1]).split('-')[0]+0.2)/24; else if(w==='event') storyEmit(A[1]);
+      // (N5A c) a condition of flags: autoplay sets them, as it emits the event of wait_for event
+      else { const tk=A.slice(); for(let i=0;i<tk.length;i++){ if(tk[i]!=='flag'||!tk[i+1]) continue; const m=/^([\w]+)(?:(>=|=)(.+))?$/.exec(tk[++i]); if(m) G.flags[m[1]]=m[3]!=null?s10Num(m[3]):1; } }
+      break; }
     case 'cutscene': break;
     case 'minigame': { const M=MINI_S10[A[0]]||{}; if(x.at) await s10AutoTp(s10Where(x.at)); if(M.night&&!isNight()) G.tod=0.875;
       const t0=performance.now(); while(!G.mini&&performance.now()-t0<15000){ await s10AutoDlg(4000); await s10Frames(2); }

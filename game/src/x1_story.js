@@ -888,6 +888,8 @@ function c1LampScene(){
     later(1.2,()=>goStage('c_spire'));
   });
 }
+// a stage the story data has taken over (e10_story marks STAGEDEF[id]._s10): its own triggers here stand down
+function c1Data(id){ return !!(typeof STAGEDEF!=='undefined'&&STAGEDEF[id]&&STAGEDEF[id]._s10); }
 // the Vesper fight pauses at 10 percent (x1_foes calls this; a watcher calls it if nobody does)
 function c1SpireChoice(e){
   if(G.flags.c_choice_done||C1ST.choiceRun) return false;
@@ -993,7 +995,7 @@ function c1Tick(dt){
 function c1People(){
   if(actOf(G.stage)<2) return;
   for(const id in C1ST.fb){ const at=c1FbSpot(id); if(!at||!SPECIAL[id]) continue; if(G.npcs.some(n=>n.id===id)) continue; const n=mkNPC(SPECIAL[id],at[0],at[1]); n.walker=false; G.npcs.push(n); }
-  if(G.stage==='c_snow'&&c1Friend()&&!G.npcs.some(n=>n.id==='c_vesper')){ const n=mkNPC(SPECIAL.c_vesper,C1P.hall.x+40,C1P.hall.y+90); n.walker=false; n.c1roof=true; G.npcs.push(n); }
+  if(G.stage==='c_snow'&&!c1Data('c_snow')&&c1Friend()&&!G.npcs.some(n=>n.id==='c_vesper')){ const n=mkNPC(SPECIAL.c_vesper,C1P.hall.x+40,C1P.hall.y+90); n.walker=false; n.c1roof=true; G.npcs.push(n); }
 }
 onTalk(n=>{
   if(n.id!=='c_vesper'||!c1On()) return false;
@@ -1023,7 +1025,7 @@ function c1Render(list){
     if(inView(h.x,h.y,90)) list.push({x:h.x,y:h.y-6,draw:()=>c1DrawHatch(h)});
     if(h.top&&reached('c_brass')&&inView(h.x+46,h.y,80)){ const D=C1ST.goat||(C1ST.goat={x:h.x+52,y:h.y+8,hx:h.x+52,hy:h.y+8,face:Math.PI,t:0,r:10,kind:'goat'}); D.t+=0.016; list.push({x:D.x,y:D.y,draw:()=>{ try{ drawNPC(D); }catch(e){} }}); } }
   if(!c1TideDoor()&&inView(C1P.tide.x,C1P.tide.y,90)) list.push({x:C1P.tide.x,y:C1P.tide.y,draw:c1DrawTideDoor});
-  if(G.stage==='c_snow'&&!c1Friend()&&G.choices.c_vesper==='foe'&&inView(C1P.hall.x,C1P.hall.y,80)) list.push({x:C1P.hall.x+30,y:C1P.hall.y+70,draw:()=>c1DrawSilk(C1P.hall.x+30,C1P.hall.y+60)});
+  if(G.stage==='c_snow'&&!c1Data('c_snow')&&!c1Friend()&&G.choices.c_vesper==='foe'&&inView(C1P.hall.x,C1P.hall.y,80)) list.push({x:C1P.hall.x+30,y:C1P.hall.y+70,draw:()=>c1DrawSilk(C1P.hall.x+30,C1P.hall.y+60)});
 }
 function c1DrawHatch(h){
   const x=h.x, y=h.y, t=G.time;
@@ -1537,7 +1539,7 @@ function c1Beat(name,arg){
   switch(name){
     case 'gull_done': F.c_gull_done=1; if(c1Out()&&!c1Seen('c_cliff')) c1When('cliff',()=>c1Out(),()=>c1CliffScene()); return true;
     case 'brass_lever': F.c_brass_done=1; c1When('bong',()=>scene==='play'&&!DLG,()=>c1ClockBong()); return true;
-    case 'light_lit': F.c_light_done=1; c1When('lamp',()=>scene==='play'&&!DLG,()=>c1LampScene()); return true;
+    case 'light_lit': F.c_light_done=1; if(!c1Data('c_light')) c1When('lamp',()=>scene==='play'&&!DLG,()=>c1LampScene()); return true;
     case 'spire_choice': return c1SpireChoice(arg||G.boss||null);
     case 'tide_fixed': F.c_tide_fixed=1; return true;
   }

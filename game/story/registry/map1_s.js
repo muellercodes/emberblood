@@ -68,3 +68,6 @@ legacy({ id: 'c_spire_rock', map: 1, at: [7400, 30000], r: 300, kind: 'landmark'
   src: 'prop:spire@7400,30000', states: { hidden: '!flag c_spire_up', risen: 'flag c_spire_up' } });
 legacy({ id: 'c_gearhaven', map: 1, at: [7200, 25200], r: 1100, kind: 'place', name: ['Gearhaven', 'Gearhaven'],
   src: 'POI:c_gearhaven', states: { clear: '!flag c_snow', snowy: 'flag c_snow' } });
+// INT10: the foot of the Southern Pass (x1_world.js moves the c_pass_n crossing here); map 0's southern_pass leads to it
+legacy({ id: 'c_pass_n', map: 1, at: [3400, 20360], r: 60, kind: 'door', name: ['the foot of the Southern Pass', 'the bottom of the pass'],
+  src: 'CROSSINGS:c_pass_n', leads: 'southern_pass' });

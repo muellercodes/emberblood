@@ -1523,3 +1523,8 @@ function a1DrawIceHole(x,y,t){
 }
 Object.assign(window.__ebA1,{A1V,gateState:()=>a1GateState(),passClear:()=>a1PassClear(),osric:()=>A1V.osric?{x:Math.round(A1V.osric.x),y:Math.round(A1V.osric.y)}:null,
   burnt:()=>HOUSES.filter(h=>h.town==='village'&&h.k==='house').map(h=>({x:Math.round(h.x),y:Math.round(h.y),raid:!!h.raidBurn,burnt:!!h.burnt}))});
+// where the story engine finds this module's own drawings (legacy src 'prop:<kind>@x,y' in game/story/registry/map0_a1.js)
+s10FindKind('a1_gate',(x,y,r)=>Math.abs(A1V.wall.y-y)<=r?Object.values(A1V.gates).find(g=>Math.abs(g.x-x)<=r)||null:null);
+s10FindKind('a1_pal',(x,y,r)=>Math.abs(A1V.wall.y-y)<=r&&x>A1V.wall.x0&&x<A1V.wall.x1?A1V.wall:null);
+s10FindKind('a1_rockfall',(x,y,r)=>Math.abs(A1W.rockfall.x-x)<=r&&Math.abs(A1W.rockfall.y-y)<=r?A1W.rockfall:null);
+s10FindKind('a1_frostlantern',(x,y,r)=>{ const p=A1W.frost.lan.find(([a,b])=>Math.abs(a-x)<=r&&Math.abs(b-y)<=r); return p?{x:p[0],y:p[1]}:null; });

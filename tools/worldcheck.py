@@ -75,6 +75,9 @@ def boot(pg):
     pg.wait_for_timeout(1800)
     pg.evaluate('()=>{ const b=document.getElementById("bStory"); if(b) b.click(); }')
     pg.wait_for_timeout(700)
+    # (a new story game in slot 1, as a new player: the world is the story world, Duchess is in her meadow)
+    pg.evaluate('()=>{ try{ if(typeof __eb.newStory==="function") __eb.newStory(1); }catch(e){} }')
+    pg.wait_for_timeout(900)
     pg.evaluate('()=>{ try{ __eb.skipDialogue(); }catch(e){} try{ __eb.god=true; }catch(e){} }')
 
 

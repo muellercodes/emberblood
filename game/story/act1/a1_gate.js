@@ -11,8 +11,9 @@ quest({
   id: 'gate', act: 1, giver: 'yara', optional: true,
   // takes over QDEFS.gate: an old save at old step i resumes at old_steps[i]
   takeover: true, old_steps: ['look', 'letter', 'search', 'confront', 'tunnel', 'plans'],
-  // the oldest saves have no G.quests.gate, only the choice Ash made about Fennick
-  done_if: { any: ['choice fennick=forgive', 'choice fennick=jail'] },
+  // the oldest saves have no G.quests.gate, only the choice Ash made about Fennick (while the quest runs in the data,
+  // the choice at the confrontation must not end it: the tunnel and Wren's plans come after)
+  done_if: { any: ['choice fennick=forgive !quest gate active', 'choice fennick=jail !quest gate active'] },
   title: ['The Open Gate', 'The Open Gate'],
   payoff: { kind: 'shortcut', id: 'mine_cart' },
   // Grizzlefang no longer names the lamp-man, and Morrow's letter is only to "W."
@@ -94,7 +95,9 @@ quest({
   },
 
   step: [
-    { id: 'offer', do: 'talk yara', scene: 'a1_gate_offer', if: 'flag gateHint',
+    // (after Grizzlefang's outro, stage wren on: the first talk to Yara offers it. The old gateHint flag was set by
+    // that same talk, after the engine's turn, so it made a new player talk to Yara twice)
+    { id: 'offer', do: 'talk yara', scene: 'a1_gate_offer', if: 'stage>=wren',
       obj: ['Ask Elder Yara about the North Gate', 'Talk to Yara'],
       hint: ['Elder Yara wants to talk about the open gate. She is by the well in Emberhollow.', 'Yara is by the well.'] },
     { id: 'look', do: 'all',
@@ -245,7 +248,7 @@ quest({
         { t: ['Forgive him. He can make it right.', 'Forgive him'], tone: 'kind', v: 'forgive', then: ['set a1_gate_solved', 'give tunnel_key'],
           say: [['ash', 'You are going to make it right. Every lantern, every night.', 'Make it right. Every lantern, every night.'],
                 ['fennick', 'I will! And take this. The key to their tunnel off the Ashen Road.', 'I will! Take their tunnel key.', { ref: 'oath_tunnel' }]] },
-        { t: ['Turn him in to Captain Osric', 'Turn him in to Osric'], tone: 'brave', v: 'jail', then: ['set a1_gate_solved', 'give tunnel_key'],
+        { t: ['Turn him in to Captain Osric', 'Turn him in to Osric'], tone: 'brave', v: 'jail', then: ['set a1_gate_solved', 'give tunnel_key', 'people'],
           say: [['ash', 'You have to answer for it, Fennick.', 'You have to answer for it.'],
                 ['fennick', "That's fair. Take their key. It opens a tunnel off the Ashen Road. I'll bring a lamp. For the cell.", "That's fair. Take their tunnel key.", { ref: 'oath_tunnel' }]] },
       ] },
@@ -279,6 +282,8 @@ quest({
   id: 'a1_hat', act: 1, giver: 'hal', optional: true,   // started by Hal's rumor (people() at the end)
   title: ["Sir Strawsworth's Hat", 'The Scarecrow Hat'],
   payoff: { kind: 'truth', id: 'a1_button' },
+  // Hal's old rumor about the hat (a1g_talk.js) is the people() option below now
+  replaces: { 'TALK.hal.rumor': null },
 
   clue: {
     a1_rattle:       { mystery: 'a1_hat', icon: 'hat',
@@ -386,7 +391,8 @@ quest({
       parts: [
         { do: 'examine a1_ward_wax', scene: 'a1_wax_look' },
         { do: 'talk bertram', scene: 'a1_bertram_ran' },
-        { do: 'talk wren', scene: 'a1_wren_candles', if: 'stage>=wren' },
+        // (from stage oath on: at stage wren her first talk is the main story's, STORY.wren, which moves Ash on)
+        { do: 'talk wren', scene: 'a1_wren_candles', if: 'stage>=oath' },
       ] },
     { id: 'deduce', do: 'deduce a1_snuff_who', obj: ['Work it out in the Case Book', 'Open the Case Book'] },
   ],

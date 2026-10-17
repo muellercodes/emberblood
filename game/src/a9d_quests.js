@@ -212,6 +212,7 @@ function storyTalk(n){
     if(st==='wake'||st==='lanterns'){ runDialogue([['yara',st==='wake'?'Your mother is waiting at the forge, Ash. Go on.':'Three lanterns on the green. Gently, now. I am counting.']],done); return true; }
     if(reached('warcamp')&&!G.flags.gateHint){ G.flags.gateHint=true; }
     if(availableFrom('yara')) return false;
+    if(typeof storyHasOption==='function'&&storyHasOption('yara')) return false;   // her menu, for the story's own option
     runDialogue([['yara',hintLine()]],done); return true;
   }
   if(id==='maren'){
@@ -342,7 +343,7 @@ function lmAct(o){
     case 'wagon': if(once('wagon')){ runDialogue([['narr',`An abandoned trader's wagon. Inside: a crate of turnips, a broken umbrella, and a note.`],['narr',`"Pell, if you find this, the kettle's gone again. Bet it's those cultists. Also I buried my savings by the big rock east of Brindlecross and drew a map so I wouldn't forget. Then I lost the map. Hob."`],['narr',`Under the turnips: a smudged map.`]],()=>{ scene='play'; giveItems({map_x2:1}); saveGame(); }); } else say(`Turnips. Still turnips.`); return;
     case 'scarecrow': if(once('knight')){ say(`Sir Strawsworth the scarecrow regards you gravely. You have been knighted. You are now Sir Ash, Knight of the Turnips.`); return; }
       // Hal's rumor: something rattles in his hat
-      if(once('strawhat')){ runDialogue([['narr',S(`You lift Sir Strawsworth's hat. Something rattles. Inside: twenty-five coins and one very old turnip seed.`,`You look in the scarecrow's hat. 25 coins!`)],['narr',S(`Sir Strawsworth looks relieved. That must have been itchy.`,`The scarecrow looks relieved.`)]],()=>{ scene='play'; addCoins(25,o.x,o.y); saveGame(); }); return; }
+      if(!(typeof storyOwns==='function'&&storyOwns('quest','a1_hat'))&&once('strawhat')){ runDialogue([['narr',S(`You lift Sir Strawsworth's hat. Something rattles. Inside: twenty-five coins and one very old turnip seed.`,`You look in the scarecrow's hat. 25 coins!`)],['narr',S(`Sir Strawsworth looks relieved. That must have been itchy.`,`The scarecrow looks relieved.`)]],()=>{ scene='play'; addCoins(25,o.x,o.y); saveGame(); }); return; }
       say(`Sir Strawsworth stands watch over the turnips. He has never lost a turnip. He has lost several hats.`); return;
     case 'grave': say(once('reggie')?`HERE LIES SIR REGINALD THE UNLUCKY. HE TRIPPED.`:`Someone stole Sir Reginald's flowers. Still unlucky.`); return;
     case 'iceblock': say(G.flags.brisket_thawed?`Just a puddle now. A very proud puddle.`:`There's a whole adventurer frozen inside this block of ice. He's giving you a thumbs-up. Some fire might help.`); return;
@@ -477,7 +478,14 @@ function updateInteractions(dt){
     for(const o of AREA.objs){
       const lab=o.prompt?o.prompt():FLOOR_LABEL[o.k]?FLOOR_LABEL[o.k](o):CAVE_LABEL[o.k]!==undefined?CAVE_LABEL[o.k]:o.k==='qitem'?(G.items[o.item]||G.found[o.id]?null:`Look at ${o.label}`):o.k==='bed'&&o.home?'Sleep in your bed (heal and save)':o.egg&&o.k!=='drawer'?o.egg.label:FURN_LABEL[o.k];
       if(!lab||o.broken) continue; if(o.k==='page'&&G.pages[o.page]) continue; if((o.k==='cave_ore'||o.k==='relic')&&G.found[o.id]) continue;
-      const reach=(o.w?Math.max(o.w,o.h||0)/2:o.r||16)+34; const d=dist(p.x,p.y,o.x,o.y); if(d<reach) offer(d-reach,lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
+      // a piece of furniture with a size counts from its edge, not its middle: a long counter's reach used to be half
+      // its width all round, so it beat the shopkeeper standing at it (nobody could talk to Fennick) and the stairs
+      // beside it. A secret's trigger sits on its host, the same size: it wins their tie. Stairs Ash stands against win.
+      let d, reach;
+      if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
+      else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
+      const onStairs=o.k==='stairs'&&o.w&&d<24;
+      if(d<reach||onStairs) offer(onStairs?-500:d-reach-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
     }
     for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
     const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);

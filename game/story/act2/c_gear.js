@@ -71,7 +71,9 @@ chapter({
       obj: ['Tell Captain Ticklebrass at the Clockwatch Hall', 'Tell the Captain'] },
     { id: 'night',  do: 'wait_for night', at: 'c_whirligig_manor', skip: ['c_hester', 'c_whirligig'],
       obj: ['Wait for night by Whirligig Manor', 'Wait for night at the Manor'] },
-    { id: 'chase',  do: 'minigame c_roofchase', at: 'c_whirligig_manor',
+    // (night only: if day comes first, the engine says "Wait for night at Whirligig Manor" and the skip people offer
+    //  "Wait here until dark" again)
+    { id: 'chase',  do: 'minigame c_roofchase', at: 'c_whirligig_manor', skip: ['c_hester', 'c_whirligig'],
       scene: 'c_chase_start', lose: 'c_chase_lost' },
     { id: 'catch',  do: 'cutscene c_chase_end', then: ['stage c_salt'] },
   ],

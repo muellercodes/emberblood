@@ -127,7 +127,7 @@ function storyBossDone(){
   if(site.boss==='vorlaxis'){ finalChoice(); return; }
   runDialogue(STORY.bosses[site.boss].outro,()=>{
     scene='play';
-    if(site.boss==='morrow'){ giveItems({oath_letter:1},true); G.flags.clue_letter=true; G.flags.gateHint=true; questPoke(); if(G.choices.morrow==='jail') setupNPCs(); }
+    if(site.boss==='morrow'){ if(!G.items.oath_letter) giveItems({oath_letter:1},true); G.flags.clue_letter=true; G.flags.gateHint=true; questPoke(); if(G.choices.morrow==='jail') setupNPCs(); }
     G.pendingBless++;
     if(k==='warcamp'){ setStage('wren',['Chapter 3','The Lorekeeper']); }
     else if(k==='gate'){ G.flags.gate=true; GATE_COL.off=true; setStage('summit',['Final Chapter','The First Flame']); shake(8); SFX.play('boom'); later(3.2,()=>setBanner('The Obsidian Gate is open','The road to the summit is clear.',2.6)); }

@@ -94,12 +94,12 @@ chapter({
       obj: ['The moths on the door ask what Vesper IS. Work it out in the Case Book', 'Open the Case Book'],
       hint: ['Fire that does not burn her. Pearl\'s stone. The claws she climbs with. Open the Case Book.', 'Open the Case Book.'] },
     { id: 'opens', do: 'cutscene c_door_opens', migrate_if: 'seen c_spire_in', then: ['set c_cousin', 'world c_spire_door_moths open'] },
-    // The Spire and Vesper's fight stay code (x1_dun_b, x1_foes). At 10 percent she kneels and the boss code's own hook
-    // (x1_story's c1SpireChoice, ENG does not run kneel) plays STORY.c_choice, which is this chapter's c_choice scene
-    // (a data scene with an old STORY key replaces it in place). Then x1_story's c1SpireOut plays STORY.c_warp_out (also
-    // this chapter's), takes Ash out to the breakwater at night and moves the stage to c_snow, where c_snow.js goes on
-    // with Nyxara's voice and the snow. `kneel` here names the scene for the checker (after a boss: 6 lines).
-    { id: 'fight', do: 'fight c_mothmask', at: 'c_spire_door', kneel: 'c_choice',
+    // The Spire and Vesper's fight stay code (x1_dun_b, x1_foes). At 10 percent she kneels: x1_foes hands the kneel to
+    // the engine (KNEEL_S10.c_mothmask), which plays `kneel` (c_choice), lets the fight end, then plays `win`
+    // (c_warp_out: the truth, the Shard, the warp to the breakwater). Then night falls and c_snow goes on with Nyxara's
+    // voice and the snow. (c_choice and c_warp_out are also old STORY keys, replaced in place, for the old fallback.)
+    { id: 'fight', do: 'fight c_mothmask', at: 'c_spire_door', kneel: 'c_choice', win: 'c_warp_out',
+      then: ['time night quiet', 'stage c_snow'],
       obj: ['Climb the Shadow Spire to the roof', 'Climb the Spire'],
       hint: ['Fire turns the violet braziers gold and pushes the dark back. The dark is a shadow too: dash along it.', 'Light the braziers. Dash along the dark.'] },
   ],
@@ -157,7 +157,7 @@ chapter({
               ['narr', 'You strike. She blocks, too slow. Her hooks clatter away across the glass, and her mask cracks and falls off.', 'You strike! Her hooks fly away. Her mask cracks.'] ] },
         ] },
     ],
-    // right after the kneel (STORY.c_warp_out, played on the roof by x1_story's c1SpireOut): at most 6 lines along each
+    // right after the kneel (the fight step's win scene, played on the roof): at most 6 lines along each
     // branch. The boss sprite has gone in its puff, so Vesper (unmasked now) is placed back beside Ash. The truth lands
     // in two lines; the rest is her notebook page in the Case Book.
     c_warp_out: [

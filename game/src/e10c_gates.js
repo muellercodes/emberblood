@@ -36,6 +36,8 @@ const GATE_KINDS={
   burrow_mound:  {power:'burrow',  label:'Burrow',         name:['a fence in the sand','a sand fence']},
   moon_glass:    {power:'moonfire',label:'Moonfire',       name:['moon-glass stairs','glass stairs']},
   fetch_spot:    {power:'fetch',   label:"Pip's Fetch",    name:['something shiny out of reach','something shiny']},
+  // (A4S) a door of moon silk: only the Moon Glaive cuts it (e6b's web, as a gate)
+  silk_web:      {power:'glaive',  label:'Moon Glaive',    name:['a door of moon silk','a silk web']},
   // no power: a way the story opens (A2B's rope bridge over the Cut). Nothing is built while it is shut.
   bridge:        {power:null,      label:'the story',      name:['a bridge','a bridge']}
 };
@@ -51,6 +53,7 @@ function gtHas(power){
   switch(power){
     case 'whip': return !!(G.weapons&&G.weapons.whip);
     case 'bombs': return !!(G.weapons&&G.weapons.bombs);
+    case 'glaive': return !!(G.weapons&&G.weapons.glaive);
     case 'dbljump': return hasAbil('dbljump')||(typeof hasSkill==='function'&&!!hasSkill('dbljump'));
     case 'fetch': return !!(G.flags&&G.flags.c_pip_fetch&&G.flags.pip&&G.pip);
     default: return hasAbil(power);
@@ -429,6 +432,15 @@ GTK.bomb_rock={r:110,
     if(g.wall){ const B=gtDoorRect(g,16); gtCol(g,{t:'r',x0:B.x-B.w/2,y0:B.y-B.h/2,x1:B.x+B.w/2,y1:B.y+B.h/2}); gtZone(g,B); } else gtZone(g,{x:o.x,y:o.y,w:rr*1.6,h:rr*1.6}); },
   sync(g,st){ const o=g.doorObj; if(o&&G&&G.found){ if(st>=2) G.found[o.id]=true; else delete G.found[o.id]; } },
   isIn:gtDoorIn};
+// (A4S) silk_web: a web of moon silk across the door (e6b's drawWeb); the Glaive's blade cuts it, nothing else does
+GTK.silk_web={r:110,
+  build(g){ gtDoorMesa(g); const R=gtDoorRect(g,20);
+    const o={id:'gate_'+g.id+'_d',x:R.x,y:R.y-(g.wall&&g.face==='s'?14:0),w:R.w+8,h:Math.max(R.h,48),gate:g.id}; o.k='e10web'; o.arms=true;
+    LANDMARKS.push(o); ARMS.lm.push(o); g.doorObj=o; g.door={x:R.x,y:R.y};
+    o.col=gtCol(g,{t:'r',x0:R.x-R.w/2,y0:R.y-R.h/2,x1:R.x+R.w/2,y1:R.y+R.h/2}); gtZone(g,R); },
+  sync(g,st){ const o=g.doorObj; if(o&&G&&G.found){ if(st>=2) G.found[o.id]=true; else delete G.found[o.id]; } },
+  isIn:gtDoorIn,
+  nudge:g=>S('Moon silk, strung tight across the way. Only a blade made from the moon could cut it.','Moon silk! Only a moon blade cuts it.')};
 // a portcullis of iron bars (chain_ring, pound_plate): a deep collider, rises when the gate opens
 function gtBars(g){ const R=gtDoorRect(g,16); const o={id:'gate_'+g.id+'_bars',x:R.x,y:R.y,w:R.w,h:R.h,horiz:R.w>=R.h,lift:0,gate:g.id};
   o.col=gtCol(g,{t:'r',x0:R.x-R.w/2,y0:R.y-R.h/2,x1:R.x+R.w/2,y1:R.y+R.h/2}); g.bars=o; g.door={x:R.x,y:R.y}; gtZone(g,R); return o; }
@@ -560,6 +572,19 @@ function gtBreakBoulder(o){
   emit(o.x,o.y,34,{col:'140,124,108',glow:false,smin:60,smax:280,lmin:.4,lmax:1,zmin:3,zmax:7,grow:3,drag:3});
   emit(o.x,o.y,14,{col:'90,80,70',glow:false,ang:-Math.PI/2,spread:1.2,smin:20,smax:80,lmin:.8,lmax:1.5,zmin:6,zmax:10,grow:10,drag:1,rise:15});
   setBanner(S('The boulder bursts!','The big rock breaks!'),'',1.8);
+  gtGot(g,2);
+}
+AK.e10web={hit(o,src,x,y,r){ if(gtSt(o.gate)>=2||!armsNear(o,x,y,r)) return false;
+    if(src==='glaive'){ gtCutWeb(o); return true; }
+    armsNag(o,src==='fire'?AT('Moon silk does not burn. It just glows.','It will not burn.'):AT('Too tough! Only a moon blade can cut moon silk.','Too tough! Try a moon blade.'));
+    return src!=='fire'; },
+  draw(o,t){ if(gtSt(o.gate)<2) drawWeb(o,t); }};
+function gtCutWeb(o){
+  const g=GT.by[o.gate]; if(!g) return;
+  if(G&&G.found) G.found[o.id]=true;
+  SFX.play('slash3',0.7); try{ wsnd('ping',0.6); }catch(e){}
+  for(let i=0;i<22;i++) emit(o.x+rand(-o.w/2,o.w/2),o.y+rand(-o.h/2,o.h/2),1,{col:'220,232,255',smin:20,smax:120,lmin:.4,lmax:.9,zmin:1,zmax:2.4,drag:2,rise:-10});
+  setBanner(S('Moon silk, cut!','Cut!'),'',1.8);
   gtGot(g,2);
 }
 AK.e10ring={hit(o,src,x,y,r){ if(o.done||!armsNear(o,x,y,r+6)) return false;

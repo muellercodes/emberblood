@@ -1559,7 +1559,7 @@ MINI.m3p_fish={
   hud:()=>simplify(S('Land the Moonfish! When it splashes, PULL!','When it splashes, PULL!'))
 };
 function m3pFishGo(){ const p=player; G.fishing={spot:{x:M3P_RING[0],y:M3P_RING[1]},wx:M3P_RING[0],wy:M3P_RING[1]+10,t:rand(1.6,3.2),bite:0,px:p.x,py:p.y,m3p:true}; p.facing=angTo(p.x,p.y,M3P_RING[0],M3P_RING[1]); }
-{ const base=catchFish; catchFish=function(){ if(M3P.fishOn&&G.mini&&G.mini.kind==='m3p_fish'){ G.mini.done=true; M3P.fishOn=false; SFX.play('upgrade'); miniEnd(true,S('You landed the Moonfish!','You got it!'),S('Talk to Gilly.','Talk to Gilly.')); return; } return base(); }; }
+{ const base=catchFish; catchFish=function(...a){ if(M3P.fishOn&&G.mini&&G.mini.kind==='m3p_fish'){ G.mini.done=true; M3P.fishOn=false; SFX.play('upgrade'); miniEnd(true,S('You landed the Moonfish!','You got it!'),S('Talk to Gilly.','Talk to Gilly.')); return; } return base.apply(this,a); }; }
 // a long bite window on Easy
 { const base=updateFishing; updateFishing=function(dt,inp){ const F=G.fishing; if(F&&F.m3p&&F.bite>0&&m3pEasy()&&!F.ez){ F.ez=1; F.bite=1.5; } return base(dt,inp); }; }
 

@@ -7,7 +7,7 @@
 // rest at a shrine or an inn (that is what starts Act III; audit finding 10). Gran's stove lines only if c_oona is
 // done, and "night", not "winter" (finding 11).
 chapter({
-  id: 'c_snow', act: 2, after: 'c_spire', next: null, takeover: true,
+  id: 'c_snow', act: 2, after: 'c_spire', next: 'f_snow', takeover: true,
   silence: ['c_snow_city'],
   card: ['Act II · Epilogue', 'Snow in Summer'],
   so_far: [
@@ -26,7 +26,7 @@ chapter({
   },
 
   step: [
-    // x1_story's c1SpireOut puts Ash on the breakwater at night and moves the stage here: the voice and the snow first
+    // c_spire's warp-out puts Ash on the breakwater at night and moves the stage here: the voice and the snow first
     { id: 'voice', do: 'cutscene c_moth_voice', migrate_if: 'flag c_snow' },
     { id: 'snow', do: 'cutscene c_snow_starts', migrate_if: 'flag c_snow' },
     { id: 'city', do: 'goto gh_market 460', scene: 'c_snow_town', migrate_if: 'flag c_done', then: ['end_act 2'],
