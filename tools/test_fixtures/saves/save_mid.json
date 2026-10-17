@@ -1,0 +1,4 @@
+{
+ "_note": "flags, choices, stage and quests of the old save fixtures (scratchpad/fixtures), for rule 13",
+ "eb_world3": "{\"stage\": \"three\", \"flags\": {\"forge\": true, \"pip\": true}, \"choices\": {\"morrow\": \"free\", \"fennick\": \"forgive\"}, \"quests\": {}}"
+}

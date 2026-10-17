@@ -1,0 +1,22 @@
+// Registry entries the good c_gear fixture needs: things x1_world, x1_people and x1_story already draw.
+legacy({ id: 'c_upper_gate', map: 1, at: [6950, 24250], r: 300, kind: 'gate', name: 'the Upper Gate', src: 'x1_world.js Upper Gate', opens_with: 'stage>=c_gear' })
+legacy({ id: 'c_lm_watch', map: 1, at: [7110, 25990], r: 40, kind: 'examine', name: 'the Moth Mask Watch board', src: 'LANDMARKS:c_lm_watch' })
+legacy({ id: 'c_whirligig_manor', map: 1, at: [7900, 24900], r: 160, kind: 'place', name: 'Whirligig Manor', src: 'x1_world.js Whirligig Manor' })
+legacy({ id: 'c_great_clock', map: 1, at: [7200, 24600], r: 120, kind: 'landmark', name: 'the Great Clock', src: 'x1_world.js c_clock',
+         states: { stopped: '!flag c_clock_on', ticking: 'flag c_clock_on' } })
+legacy({ id: 'c_clock_hand', map: 1, at: [7200, 24560], r: 30, kind: 'prop', name: 'the minute hand', src: 'x1_story.js c1SightLeap' })
+legacy({ id: 'c_clock_top', map: 1, at: [7200, 24450], r: 60, kind: 'place', name: 'the top of the Great Clock', src: 'x1_world.js c_clock' })
+legacy({ id: 'c_hettie', map: 1, at: [6600, 25750], r: 30, kind: 'npc', name: 'Professor Hettie Sprocket', src: 'CAST:c_hettie' })
+legacy({ id: 'c_hester', map: 1, at: [6700, 24500], r: 30, kind: 'npc', name: 'Captain Hester Ticklebrass', src: 'CAST:c_hester' })
+legacy({ id: 'c_penny', map: 1, at: [7050, 25880], r: 30, kind: 'npc', name: 'Penny Press', src: 'CAST:c_penny' })
+legacy({ id: 'c_whirligig', map: 1, at: [7900, 24900], r: 30, kind: 'npc', name: 'Lord Percival Whirligig', src: 'CAST:c_whirligig' })
+legacy({ id: 'c_bobs', map: 1, at: [6950, 24290], r: 30, kind: 'npc', name: 'The Bobs', src: 'CAST:c_bobs' })
+legacy({ id: 'c_mask', map: 1, at: [7900, 24860], r: 30, kind: 'npc', name: 'The Moth Mask', src: 'x1_story.js c_mask' })
+// (demo) more of map 1
+legacy({ id: 'c_ottoline', map: 1, at: [7700, 24491], r: 40, kind: 'npc', name: 'Archivist Ottoline Inkwell', src: 'CAST:c_ottoline' })
+legacy({ id: 'c_oona', map: 1, at: [1150, 27136], r: 40, kind: 'npc', name: 'Granny Oona Saltwhistle', src: 'CAST:c_oona' })
+legacy({ id: 'c_agatha', map: 1, at: [12300, 28500], r: 40, kind: 'npc', name: 'Keeper Agatha', src: 'CAST:c_agatha' })
+legacy({ id: 'c_mo', map: 1, at: [8100, 26350], r: 40, kind: 'npc', name: 'Harbormaster Mo Barnacle', src: 'CAST:c_mo' })
+legacy({ id: 'c_vesper', map: 1, at: [7400, 30000], r: 40, kind: 'npc', name: 'Vesper Saltwhistle', src: 'x1_story.js c_vesper' })
+legacy({ id: 'c_spire_door', map: 1, at: [7400, 30000], r: 60, kind: 'door', name: 'the Spire door', leads: 'c_spire', src: 'DOORS:c_spire' })
+legacy({ id: 'c_cut', map: 1, at: [9550, 26950], r: 200, kind: 'place', name: 'the Cut', src: 'x1_world.js snipped' })

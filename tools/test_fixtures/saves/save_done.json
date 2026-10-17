@@ -1,0 +1,4 @@
+{
+ "_note": "flags, choices, stage and quests of the old save fixtures (scratchpad/fixtures), for rule 13",
+ "eb_world3": "{\"stage\": \"done\", \"flags\": {\"forge\": true, \"pip\": true, \"gate\": true, \"trial_leap_done\": true, \"trial_tide_done\": true, \"trial_sky_done\": true}, \"choices\": {\"morrow\": \"jail\", \"fennick\": \"forgive\", \"greymane\": \"ally\", \"cinder\": \"ally\", \"ending\": \"lantern\"}, \"quests\": {}}"
+}
