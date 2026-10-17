@@ -30,7 +30,7 @@ chapter({
   step: [
     // her four phases (x4_foes shows each phase's own hint as a banner when it starts); the fall and the choice run
     // inside the fight (x4_story's n4sFall), and the choice moves the stage to n_end
-    { id: 'fight', do: 'fight n_nyxara', marker: 'n4_summit',
+    { id: 'fight', do: 'fight n_nyxara',
       obj: ['Stop the Night Mother. Watch her glow, and listen to Pip.', 'Watch her glow. Listen to Pip.'],
       hint: ['Phase by phase: Moonfire the moon anchors and grapple her chains, dive the shadow pools and pound the glowing platform, ride the wind to the piece she is eating, then break the cracks on her wings.',
              'Moonfire. Grapple. Dive. Pound. Fly. Break her cracks.'] },

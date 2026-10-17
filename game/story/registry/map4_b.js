@@ -4,9 +4,9 @@
 // was probed in the live game (elevLvl through elev: entries, SHRINES positions). N5a's map4_a.js has the Bridgefoot and
 // rings 1 to 3. Data only.
 
-// the Gust Stair: the column of wind on ring 3 (level 6) that lifts Ash up to ring 4 (x4_ascent n_gust_col, N4SPOT.gust)
-legacy({ id: 'n4_gust_stair', map: 4, at: [5119, 87049], r: 320, kind: 'place', name: ['the Gust Stair', 'the Gust Stair'],
-         aliases: ['the wind stair'], src: 'elev:6@5119,87049' });
+// the Gust Stair: the column of wind on ring 3 (level 6) that lifts Ash up to ring 4. N5a's entry (registry/map4_a.js),
+// copied exactly: two entries with one id must agree
+legacy({ id: 'n5_gust', map: 4, at: [5166, 87032], r: 140, kind: 'landmark', name: ['the Gust Stair', 'the snow wind'], src: 'prop:n4a@5166,87032' });
 // the Moonglass Shrine on ring 4 (x4_world shrine list)
 legacy({ id: 'n_sh_glass', map: 4, at: [5003, 86279], r: 330, kind: 'landmark', name: ['the Moonglass Shrine', 'the Moonglass Shrine'],
          src: 'SHRINES:n_sh_glass' });
@@ -20,9 +20,10 @@ legacy({ id: 'n4_moonlock', map: 4, at: [4868, 84068], r: 90, kind: 'landmark', 
 // code met Hush, a 180
 legacy({ id: 'n4_tendril_wood', map: 4, at: [4500, 84010], r: 270, kind: 'place', name: ['the Tendril Wood', 'the Tendril Wood'],
          aliases: ['the shadow vines'], src: 'elev:7@4500,84010' });
-// the Eclipse Hall: Echo 4's arena (x4_foes n_echo_hush, site n_echo4), a black glass ring with a sand rim
-legacy({ id: 'n4_echo4', map: 4, at: [3315, 85096], r: 290, kind: 'place', name: ['the Eclipse Hall', 'the Eclipse Hall'],
-         src: 'elev:7@3315,85096' });
+// the Eclipse Hall: Echo 4's arena (x4_foes site n_echo4, boss n_echo_hush), a black glass ring with a sand rim. The id is
+// the foe's, as N5a names the other echoes' sites, so a `fight n_echo_hush` step marks it by itself
+legacy({ id: 'n_echo_hush', map: 4, at: [3315, 85096], r: 290, kind: 'place', name: ['the Eclipse Hall', 'the Eclipse Hall'],
+         src: 'SITES:n_echo4' });
 // the Moth's Cradle: the cocoon field and the sand nest (x4_world cradle_nest, x4_ascent n4aBuildCradle)
 legacy({ id: 'n4_cradle', map: 4, at: [3704, 86084], r: 260, kind: 'place', name: ["the Moth's Cradle", "the Moth's Cradle"],
          aliases: ['the cocoons'], src: 'elev:7@3704,86084' });
@@ -39,6 +40,8 @@ legacy({ id: 'n4_road_end', map: 4, at: [4490, 85992], r: 60, kind: 'place', nam
 // the Moon Door (x4_ascent gate n_moondoor at n4aP(728, 0)): shut until the Ember Heart opens it (n_door)
 legacy({ id: 'n4_moon_door', map: 4, at: [4500, 85928], r: 60, kind: 'door', name: ['the Moon Door', 'the Moon Door'],
          leads: 'n4_summit', src: 'elev:8@4500,85928' });
-// the summit: the round glass floor under the broken moon where Nyxara waits (x4_foes n_nyxara, N4SPOT.summit)
+// the summit: the round glass floor under the broken moon where Nyxara waits (x4_foes site n_summit, boss n_nyxara)
 legacy({ id: 'n4_summit', map: 4, at: [4500, 85300], r: 500, kind: 'place', name: ['the summit', 'the summit'],
          aliases: ['the top', 'the top of the mountain'], src: 'elev:8@4500,85300' });
+legacy({ id: 'n_nyxara', map: 4, at: [4500, 85200], r: 500, kind: 'place', name: ['the Night Mother', 'the Night Mother'],
+         src: 'SITES:n_summit' });

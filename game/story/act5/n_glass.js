@@ -61,8 +61,8 @@ chapter({
 
   step: [
     // Glaciar (Act III's kind choice: she flew with Ash on ring 3) leaves at the Gust Stair, to meet Ash at the top
-    { id: 'glaciar_bye', optional: true, if: 'choice f_glaciar=free', do: 'goto n4_gust_stair 320', scene: 'n_glaciar_bye' },
-    { id: 'gust', do: 'wait_for flag n_gust', at: 'n4_gust_stair',
+    { id: 'glaciar_bye', optional: true, if: 'choice f_glaciar=free', do: 'goto n5_gust 320', scene: 'n_glaciar_bye' },
+    { id: 'gust', do: 'wait_for flag n_gust', at: 'n5_gust',
       obj: ['Ride the Gust Stair up to the fourth ring', 'Ride the wind up'],
       hint: ['The Gust Stair is a tower of wind on the third ring. Glide into it and let it carry you up.', 'Glide into the wind tower. Ride it up.'] },
     { id: 'shrine', do: 'goto n_sh_glass 330', scene: 'n_glass_in',
@@ -86,7 +86,7 @@ chapter({
     // optional finds for n5_wants (bonus clues: they make the right pick glow)
     { id: 'nest', optional: true, do: 'examine n5_nest', scene: 'n5_nest_look' },
     { id: 'panes', optional: true, do: 'wait_for flag n_panes>=2', then: ['clue n5_moth_panes'] },
-    { id: 'echo', do: 'fight n_echo_hush', marker: 'n4_echo4', then: ['clue n5_mem_quiet'],
+    { id: 'echo', do: 'fight n_echo_hush', then: ['clue n5_mem_quiet'],
       obj: ['Face the Echo of the Hush in the Eclipse Hall', 'Fight the shadow moth'],
       hint: ['Moonfire a moonstone to pull her down. When she starts the Great Shush, burrow into the sand at the rim.',
              'Moonfire the stones. Burrow when she shushes.'] },
