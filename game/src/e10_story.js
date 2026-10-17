@@ -757,7 +757,10 @@ function s10Prompts(offer){
     if(k==='gate'&&(P._built||!(P.locked&&s10World(id)!=='open'&&s10GateLocked(P)))) continue;
     if(k==='prop'&&!P.say&&!P.scene) continue;
     if(k==='chest'&&G.chestsOpened[id]) continue;
-    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=(P.r||22)+50; if(d>r) continue;
+    // (a thing already looked at that no step waits for answers only when Ash stands at it: its prompt no longer hides
+    //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
+    const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
+    const at=s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
     const name=s10T(P.name)||id;
     const text=P.prompt?s10T(P.prompt):k==='sign'?S('Read the sign','Read the sign'):k==='door'?(S('Go in','Go in')):k==='chest'?S('Open the chest','Open the chest'):S('Look at '+name,'Look at '+name);
     // a place a step waits for wins over a person or a door about as close (kids should not have to dance for it)
@@ -980,6 +983,10 @@ function s10NpcSync(force){
     if(!d&&!legacyP) continue;
     if(d&&!legacyP&&!SPECIAL[id]) continue;
     if(!d&&!(G.story._npc&&G.story._npc[id])) continue;
+    // (A4S) a block stops placing a person the old code places (a CAST person, an old SPECIAL) once its act is over: the
+    // old code places them again (x3_people's Vesper in Act IV after Act II's c_vesper block); people only the data
+    // has keep their block, and spawn/move/despawn states still hold
+    if(d&&d._owner&&d._owner.act&&actOf(G.stage)>+d._owner.act&&((typeof CASTBY!=='undefined'&&CASTBY[id])||(SPECIAL[id]&&!SPECIAL[id]._s10))&&!(G.story._npc&&G.story._npc[id])) continue;
     const want=s10NpcWant(id,d), i=G.npcs.findIndex(q=>q.id===id);
     if(legacyP&&d&&d.look&&i>=0&&!G.npcs[i]._s10look){ G.npcs[i].look=Object.assign({},G.npcs[i].look||{},d.look); G.npcs[i]._s10look=true; }
     if(!want){ if(i>=0&&(d&&!legacyP||(G.story._npc&&G.story._npc[id]&&G.story._npc[id].off))) G.npcs.splice(i,1); continue; }

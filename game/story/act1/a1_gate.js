@@ -11,8 +11,9 @@ quest({
   id: 'gate', act: 1, giver: 'yara', optional: true,
   // takes over QDEFS.gate: an old save at old step i resumes at old_steps[i]
   takeover: true, old_steps: ['look', 'letter', 'search', 'confront', 'tunnel', 'plans'],
-  // the oldest saves have no G.quests.gate, only the choice Ash made about Fennick
-  done_if: { any: ['choice fennick=forgive', 'choice fennick=jail'] },
+  // the oldest saves have no G.quests.gate, only the choice Ash made about Fennick (while the quest runs in the data,
+  // the choice at the confrontation must not end it: the tunnel and Wren's plans come after)
+  done_if: { any: ['choice fennick=forgive !quest gate active', 'choice fennick=jail !quest gate active'] },
   title: ['The Open Gate', 'The Open Gate'],
   payoff: { kind: 'shortcut', id: 'mine_cart' },
   // Grizzlefang no longer names the lamp-man, and Morrow's letter is only to "W."
