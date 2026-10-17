@@ -50,7 +50,7 @@ act({
     { page: 'n_book_home' },
     { page: 'n_book_friends' },
     { page: 'n_book_coast', epi: 'c', skip: 'Vesper|Moth Mask' },
-    { page: 'n_book_north', epi: 'f', skip: 'Glaciar|Great Hearth' },
+    { page: 'n_book_north', epi: 'f', skip: 'Glaciar|Great Hearth|ice dragon' },
     { page: 'n_book_moonfall', epi: 'm', skip: 'Hush' },
     { page: 'n_book_moon' },
     { page: 'n_book_lanternday' },

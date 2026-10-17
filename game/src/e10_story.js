@@ -252,9 +252,18 @@ function s10Epi(id,pri,ctx){
 }
 
 // ---------- 5. events: storyEmit(name) is global (dungeons, foes, minigames call it); everything heard is remembered
+// storyListen(prefix, fn): old code that draws a story's pictures hears every emit whose name starts with prefix, as
+// fn(rest, name), each time (x4_story: 'n4fx:', the finale's cutscene, Heart, gathering, dawn, book and the way home)
+const S10_LISTEN=[];
+function storyListen(prefix,fn){ if(typeof fn==='function'&&prefix) S10_LISTEN.push({p:String(prefix),fn}); }
+window.storyListen=storyListen;
 function storyEmit(name){
   if(!name||!G||!G.story) return;
-  name=String(name); const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
+  name=String(name);
+  // (I5) a listened-to prefix is a visual beat for old code, not story state: it is not remembered (saves stay small)
+  const L=S10_LISTEN.filter(q=>name.startsWith(q.p));
+  if(L.length){ if(S10.auto) S10.auto.log.push('emit '+name); for(const q of L) try{ q.fn(name.slice(q.p.length),name); }catch(e){ console.error('storyListen',name,e); } return true; }
+  const E=G.story._ev||(G.story._ev={}); const first=!E[name]; E[name]=(E[name]|0)+1; S10.ver++;
   if(S10.auto) S10.auto.log.push('emit '+name);
   return first;
 }

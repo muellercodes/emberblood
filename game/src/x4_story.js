@@ -20,16 +20,26 @@ const n4sOn=()=>!!G&&G.mode==='story'&&actOf(G.stage)===5;
 const n4sMap4=()=>!!G&&!!player&&!AREA&&player.x<IZX-50&&curMap()===4;
 const n4sF=k=>!!(G&&G.flags&&G.flags[k]);
 const n4sEnd=()=>(G&&G.choices&&G.choices.ending)||'hero';
-const n4sVes=()=>typeof vesperFriend==='function'?!!vesperFriend():!!(G&&G.choices&&G.choices.c_vesper==='friend');
-const n4sGla=()=>!!(G&&G.choices&&G.choices.f_glaciar==='free');
-const n4sHushF=()=>!!(G&&G.choices&&G.choices.m_hush==='free');
+// the three friends Nyxara hurt count when an earlier act freed them, or when they were won back on the peak (the act 5
+// data's flags n5_vesper, n5_glaciar, n5_hush: Vesper's second chance on the Silk Gallery, the errands)
+const n4sVes=()=>(typeof vesperFriend==='function'?!!vesperFriend():!!(G&&G.choices&&G.choices.c_vesper==='friend'))||!!(G&&G.flags&&G.flags.n5_vesper);
+const n4sGla=()=>!!(G&&G.choices&&G.choices.f_glaciar==='free')||!!(G&&G.flags&&G.flags.n5_glaciar);
+const n4sHushF=()=>!!(G&&G.choices&&G.choices.m_hush==='free')||!!(G&&G.flags&&G.flags.n5_hush);
+// a Hush won back on the peak (not freed in Act IV) is small: a moth cut free goes back to her own size (q_n5_hush)
+const n4sHushSmall=()=>!!(G&&G.flags&&G.flags.n5_hush)&&!(G&&G.choices&&G.choices.m_hush==='free');
+// the act 5 data (v10): a scene of the act's chapters, the act file
+const n4sData=k=>{ try{ return typeof S10!=='undefined'&&S10.scenes&&S10.scenes[k]||null; }catch(e){ return null; } };
+const n4sAct5=()=>{ try{ return typeof S10!=='undefined'&&S10.acts&&S10.acts[5]||null; }catch(e){ return null; } };
 const n4sGrey=()=>!!(G&&G.choices&&G.choices.greymane==='ally');
 const n4sCin=()=>!!(G&&G.choices&&G.choices.cinder==='ally');
 const n4sTikka=()=>!!(G&&G.flags&&G.flags.tk_come==='yes');
 const n4sMom=()=>!!(G&&G.flags&&(G.flags.m_maren||G.flags.m_reforged));
 const n4sKnows=()=>typeof nKnowsNyx==='function'?!!nKnowsNyx():!!(G.flags.dr_seen_m_moth||G.flags.f_page11||G.flags.m_page11||G.found.n_pane_3);
-const n4sFreed=()=>typeof nFreed==='function'?nFreed():(n4sVes()?1:0)+(n4sGla()?1:0)+(n4sHushF()?1:0);
-const n4sMercy=()=>typeof nCanMercy==='function'?!!nCanMercy():n4sKnows()&&n4sFreed()>=2;
+// how many of those three are here, and whether the kind ending is open: with the act 5 data, its trust track
+// `friends` and its moth ending's condition (so this file, x4_foes and the data's choice agree); else the old counts
+const n4sFreed=()=>{ const A=n4sAct5(); if(A&&A.trust&&A.trust.friends) return +(G.flags[A.trust.friends]||0); return typeof nFreed==='function'?nFreed():(n4sVes()?1:0)+(n4sGla()?1:0)+(n4sHushF()?1:0); };
+const n4sMercy=()=>{ const A=n4sAct5(), m=A&&A.ending&&A.ending.moth; if(m&&m.if!=null&&typeof s10Cond==='function'){ try{ return !!s10Cond(m.if); }catch(e){ return false; } }
+  return typeof nCanMercy==='function'?!!nCanMercy():n4sKnows()&&n4sFreed()>=2; };
 const n4sQ=q=>!!(G&&G.quests&&G.quests[q]&&G.quests[q].done);
 const n4sIfL=(c,...L)=>{ let ok=false; try{ ok=typeof c==='function'?!!c():!!c; }catch(e){} return ok?L:[]; };
 const n4sDo=fn=>({who:'narr',text:'',fn,skipIf:()=>true});
@@ -491,6 +501,8 @@ n4sDef('n_heart_start',()=>[
 ],{again:true});
 // the four voices: [speaker, line, light colour, who it is for the light]
 function n4sSeamLines(k){
+  // the act 5 data's four voices (n_seam_0..3; each voice's light is its emit n4fx:voice:<who>)
+  const D=n4sData('n_seam_'+k); if(D&&typeof s10Lines==='function') return s10Lines(D,{sc:'n_seam_'+k});
   const v=(who,f,s,col)=>[n4sDo(()=>n4sVoice(who,col)),xl(who,f,s)];
   if(k===0) return n4sVes()?v('c_vesper',`Hey. Cousin. Emberbloods without fire still have warm hands. Here. Take mine.`,`Cousin. I have no fire. But my hands are warm. Take them.`,'180,140,255')
     :v('juniper',`Ash! You can't get lost now. I drew you a map. Follow it home!`,`Ash! You can't get lost. I drew you a map!`,'180,140,255');
@@ -746,6 +758,17 @@ function n4sEpiLines(){
     xl('narr',`And on the next Lantern Day, the thousand-and-first, everyone came to the green in Emberhollow.`,`On the next Lantern Day, everyone came to the green.`),
     {who:'narr',text:S(`Ash lit the first lantern. And then one more than needed. Just in case.`,`Ash lit the first lantern. And one more, just in case.`),fn:()=>{ if(N4ST.book) N4ST.book.lit=1; }},
     xl('narr',`And whatever the moon looked like, it always, always came back.`,`And the moon always, always came back.`));
+  return L;
+}
+// the act 5 data's epilogue book: the act file's book: [{ page, epi?, skip? }], each page scene in order (its first beat
+// turns to its painted plate with n4fx:book:<plate>), and after a page with epi at most one side-quest line of that land
+// (EPI, THREADS 18.3) that does not match skip. null when the data has no book (the lines above play instead).
+function n4sBookLines(){
+  const A=n4sAct5(); if(!A||!Array.isArray(A.book)||!A.book.length||typeof s10Lines!=='function') return null;
+  const L=[n4sDo(()=>{ if(!N4ST.book) n4sBookOpen(); G.flags.n_epi=1; })];
+  for(const pg of A.book){ const sc=n4sData(pg.page); if(!sc){ console.error('n4s book: no scene',pg.page); continue; }
+    L.push(...s10Lines(sc,{sc:pg.page}));
+    if(pg.epi){ let re=null; try{ re=pg.skip?new RegExp(pg.skip):null; }catch(e){} L.push(...n4sEpiPick(pg.epi,re).slice(0,1)); } }
   return L;
 }
 // ---------- the storybook: a painted scene behind the dialogue (DOM, under the dialogue box, never takes clicks)
@@ -1046,7 +1069,9 @@ defineStages(5,[
 ]);
 defineAct(5,{name:S('Nightfall Peak','Nightfall Peak'),map:4,arrive:'n_bridge',at:{x:13450,y:65450},intro:o=>n4sActIntro(o||{})});
 // the Act IV hand-off: Ash is on the Moon Pier; the bridge is open from the first stage on
-function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself (x4_world reads reached('n_bridge')) */ }
+function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself (x4_world reads reached('n_bridge')) */
+  // Duchess leaves Hollis Farm: she is following Ash up the peak (placeGoat leaves her off map 0 until the dawn)
+  try{ placeGoat(); }catch(e){ console.error(e); } }
 // during the finale the stock "Travel to <site>" lines for older boss sites would pull Ash off the peak: only the peak's own
 { const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5) return out.filter(o=>!o.site||/^n_/.test(String(o.site))); }catch(e){} return out; }; }
 
@@ -1264,6 +1289,7 @@ function n4sAllyTick(dt){
     if(id==='cinder'){ tx=a.post.x; ty=a.post.y; }
     else if(id==='glaciar'){ const C=fightE||p, R=fightE?560:240, ang=a.t*(fightE?0.35:0.5); tx=C.x+Math.cos(ang)*R; ty=C.y+Math.sin(ang)*R*0.6; a.z=fightE?220:170; }
     else if(id==='grandpa'){ const ang=a.t*1.6; tx=p.x+Math.cos(ang)*70; ty=p.y+Math.sin(ang)*40; a.z=50+Math.sin(a.t*3)*8; }
+    else if(id==='hush'&&n4sHushSmall()){ tx=p.x+7; ty=p.y+1; a.z=46+Math.sin(a.t*3)*3; }   // (small Hush rides on Ash's horn)
     else if(id==='greymane'&&fightE&&a.cd>4&&a.tx!=null){ tx=a.tx; ty=a.ty; }
     else if(id==='greymane'&&fightE){ tx=fightE.x; ty=fightE.y; }
     else { const f=p.facing||0, ca=Math.cos(f), sa=Math.sin(f); tx=p.x-ca*Math.abs(s[1])*0.7+(-sa)*s[0]; ty=p.y-sa*Math.abs(s[1])*0.7+ca*s[0]; }
@@ -1325,10 +1351,10 @@ function n4sDrawAlly(a){
       ctx.save(); ctx.translate(a.x,a.y); ctx.scale(sh,sh); ctx.translate(-a.x,-a.y);
       if(T3.on&&typeof f2FigGlaciar==='function') f2FigGlaciar(f,false); else if(typeof f2Glaciar2==='function') f2Glaciar2(f,false); else n4sSimpleDragon(a.x,a.y-z,'#bfe6f8');
       ctx.restore(); }
-    else if(id==='hush'){ const f=n4sFig('hush',a,{r:42,r0:42}); f.z=a.z||60; f.state='chase'; f.shadow=false; const sc=0.62;
+    else if(id==='hush'){ const f=n4sFig('hush',a,{r:42,r0:42}); const small=n4sHushSmall(), sc=small?0.24:0.62; f.z=small?(a.z||46)/sc:(a.z||60); f.state='chase'; f.shadow=false;
       ctx.save(); ctx.translate(a.x,a.y); ctx.scale(sc,sc); ctx.translate(-a.x,-a.y);
       if(T3.on&&typeof m3FigHush==='function') m3FigHush(f,false); else if(typeof m3Hush2==='function') m3Hush2(f,false); else if(typeof thrMoth==='function') thrMoth(ctx,a.x,a.y-f.z,4,a.t*5,'#f4f2fa','#b890f0');
-      ctx.restore(); glowAt(a.x,a.y-(a.z||60)*0.6,150,'236,232,255',0.16); }
+      ctx.restore(); glowAt(a.x,a.y-(small?(a.z||46):(a.z||60)*0.6),small?60:150,'236,232,255',small?0.22:0.16); }
     else if(id==='tikka'){ const o=N4S_FIG.tikka||(N4S_FIG.tikka={k:'kob',id:'ev_tikka',kk:0.86,scarf:'#c84a3a',apron:true,spoon:true,t:0}); Object.assign(o,{x:a.x,y:a.y,face:a.face,t:a.t});
       const o2=N4S_FIG.tock||(N4S_FIG.tock={k:'kob',id:'ev_tock',kk:0.95,t:0}); Object.assign(o2,{x:a.x-26,y:a.y+10,face:a.face,t:a.t+1});
       if(typeof evDrawKob==='function'){ evDrawKob(o2); evDrawKob(o); } else { n4sSimpleFig(a,'#b8a060','#e8d0a0'); } }
@@ -1555,6 +1581,11 @@ function n4sFallPlay(){
   G.banner=null; if(Array.isArray(G.bannerQ)) G.bannerQ.length=0;
   if(player&&dist(player.x,player.y,4500,85250)>460){ player.x=4500; player.y=85440; try{ updateCam(0,true); }catch(err){} }
   const L=[...STORY.n_fall];
+  // the act 5 data: its plea and its final choice (every option shows; the moth one locked with its reason; each pick
+  // sets G.choices.n_end, emits n4fx:choose and plays its ending)
+  const C5=n4sData('n_choice');
+  if(C5&&typeof s10Lines==='function'){ L.push(...STORY.n_plea,...s10Lines(C5,{sc:'n_choice'}));
+    runDialogue(L,()=>{ scene='play'; if(G.choices.n_end&&G.stage!=='n_end') n4sChoose(G.choices.n_end); n4sAfterChoice(); },{mood:'n_fall'}); return; }
   if(n4sMercy()) L.push(...STORY.n_plea); else L.push(...n4sClosedLines());
   L.push(ch('ash',S(`What will you do?`,`What will you do?`),[
     {t:S(`Light her a lantern, and let the moon go home`,`Light her a lantern. Let the moon go home.`),tone:'kind',cond:()=>n4sMercy(),fn:()=>n4sChoose('moth'),then:()=>N4S_ENDINGS.moth.lines()},
@@ -1586,7 +1617,7 @@ function n4sDawn(){
   n4sPlay('n_dawn_lines',()=>{ N4ST.dawnTo=1; G.flags.n_dawn=1; n4sWhen('epi',null,()=>n4sEpilogue(),true); },{again:true,mood:'n_dawn'});
 }
 function n4sEpilogue(){
-  const L=n4sEpiLines();
+  const L=n4sBookLines()||n4sEpiLines();
   runDialogue(L,()=>{ scene='play'; G.flags.n_epi=0; n4sBookClose(); n4sVictory(); },{mood:'n_epilogue'});
 }
 // ---------- 10. the victory screen (FINALE 13): "Ending n of 3", the stats, Keep exploring / Title screen
@@ -1605,7 +1636,8 @@ function n4sVictory(){
     const panel=$('#winTitle').parentElement;
     let sub=$('#n4sWinSub'); if(!sub){ sub=document.createElement('div'); sub.id='n4sWinSub'; $('#winMsg').insertAdjacentElement('afterend',sub); }
     sub.hidden=false; sub.textContent=simplify(`Ending ${E.n} of 3 · Endings found: ${k} of 3 · First journey: ${F1.title||''}`);
-    const allies=(typeof nAllies==='function'?nAllies().length:0)+(n4sEnd()==='lantern'?1:0);
+    // (every friend who came: the earlier acts' allies and the friends won back on the peak, plus Grandpa)
+    const allies=['greymane','cinder','tikka','vesper','glaciar','hush'].filter(id=>n4sAllyEarned(id)).length+(n4sEnd()==='lantern'?1:0);
     const rows=[[playClock(),S('Time','Time')],[player.level,S('Level','Level')],[Object.values(G.quests||{}).filter(q=>q&&q.done).length,S('Quests done','Quests')],
       [allies,S('Friends on the peak','Friends')],[`${n4sPanesN()}/6`,S('Moth Memories','Moth Memories')],[`${n4sDuchessN()}/5`,S('Duchess sightings','Duchess')],
       [G.found.heartEmbers|0,S('Heart Embers','Heart Embers')],[G.deaths|0,S('Times knocked down','Falls')]];
@@ -1794,6 +1826,57 @@ function n4sBeat(name,a,b){
     if(N4S_BUB[name]) return n4sSay(name);
   }catch(e){ console.error('n4sBeat',name,e); }
   return false;
+}
+// ---------- 12b. the act 5 data's visual beats: a data scene says `emit n4fx:<name>[:<arg>]` where this file's own
+// lines ran code (n4sDo): the Heart's dark and its voices' lights, the fall's cutscene, the gathering, the door, the dawn,
+// Duchess on the top, the storybook's plates, and the way home after the victory screen
+const N4S_VCOL={c_vesper:'180,140,255',juniper:'180,140,255',f_glaciar:'150,210,255',elka:'150,210,255',tove:'150,210,255',f_hush:'236,232,255',quill:'226,232,255',
+  maren:'255,170,90',ev_tikka:'255,200,120',grandpa:'255,140,70',iska:'255,214,150',vor:'255,120,60',ash:'255,150,60',ember:'255,190,120'};
+function n4sFx(s){
+  const i=s.indexOf(':'), k=i<0?s:s.slice(0,i), a=i<0?'':s.slice(i+1), HM=N4ST.heart, C=N4ST.cut;
+  switch(k){
+    case 'heart_dark': if(HM) HM.darkTo=1; break;
+    case 'heart_puff': if(HM) HM.puff=1.2; break;
+    case 'heart_float': if(HM) HM.float=1; break;
+    case 'voice': n4sVoice(a,N4S_VCOL[a]||N4S_SEAMC[HM?Math.min(3,HM.mark):0]); break;
+    case 'heart_grandpa': if(HM) HM.grandpa=1; break;
+    case 'heart_wardens': if(HM) HM.wardens=1; break;
+    case 'heart_belly': if(HM) HM.belly=1; break;
+    case 'heart_pip': if(HM) HM.pip=1; break;
+    case 'heart_word': if(HM) HM.word=1; n4sSfx('levelup'); try{ shake(6); }catch(e){} break;
+    case 'heart_spark': if(HM) HM.spark=1; break;
+    case 'heart_blaze': n4sHeartBlaze(); break;
+    case 'cut_fall': n4sCutFall(); break;
+    case 'cut_fill': if(C) C.fillTo=+a||0; break;
+    case 'cut_shrink': if(C&&C.nyx) C.nyx.sTo=+a||0; break;
+    case 'cut_sliver': if(C&&C.nyx) C.nyx.sliver=1; break;
+    case 'cut': n4sCutDo(a); break;
+    case 'choose': if(G.choices.n_end) n4sChoose(G.choices.n_end); break;
+    case 'ally_leave': n4sAllyLeave(a); break;
+    case 'ally_arrive': n4sAllyArrive(a); break;
+    case 'gather_pose': if(a==='off') n4sGatherPose(false); else { N4ST.cam={x:3331,y:85860,k:0.55}; n4sGatherPose(true); } break;
+    case 'door_fx': N4ST.doorFx={t:0}; break;
+    case 'dawn': N4ST.dawnTo=1; N4ST.cam={x:4500,y:85100,k:0.5}; break;
+    case 'duchess_show': { N4ST.duchShow=1; const D=n4sDuchPlace(); N4ST.cam={x:D.x,y:D.y,k:0.5}; break; }
+    case 'duchess_seen': n4sDuchessSeen(); break;
+    case 'home_bound': N4ST.homeBound=1; break;
+    case 'big_off': N4ST.bigTo=0; break;
+    case 'book_open': if(!N4ST.book) n4sBookOpen(); G.flags.n_epi=1; break;
+    case 'book': if(!N4ST.book) n4sBookOpen(); n4sBookScene(a); break;
+    case 'book_lit': if(N4ST.book) N4ST.book.lit=1; break;
+    case 'home': n4sGoHome(); break;
+    default: console.error('n4fx: unknown beat',s);
+  }
+}
+if(typeof storyListen==='function') storyListen('n4fx:',a=>n4sFx(a));
+// after the victory screen's "Keep exploring": Ash wakes up on the green in Emberhollow on Lantern Day, at dusk (the
+// data's n_end then plays n_home there). Duchess is back at the farm.
+function n4sGoHome(){
+  n4sFreeRoam(); N4ST.homeBound=1;
+  const w=typeof s10Where==='function'?s10Where('n5_green_wake'):null, x=w?w.x:2620, y=w?w.y:9330;
+  G.tod=0.78; G.flags.moon=100;
+  mapTravel(x,y,{});
+  try{ placeGoat(); setupNPCs(); }catch(e){ console.error(e); }
 }
 // ---------- 13. Pebble's notes on the peak (THREADS 9.3: Yara's "where now", one per ring, at a rest)
 if(typeof pebbleLetter==='function'){

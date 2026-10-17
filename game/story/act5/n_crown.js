@@ -31,7 +31,8 @@ chapter({
   },
 
   step: [
-    { id: 'gather', do: 'goto n_sh_crown 230', scene: 'n_gather', then: ['set n_gather'],
+    // (the Crown Shrine becomes the respawn point for the last fight, as the old code's gathering did)
+    { id: 'gather', do: 'goto n_sh_crown 230', scene: 'n_gather', then: ['set n_gather', 'shrine n_sh_crown'],
       obj: ['Go to the Crown Shrine', 'Go to the shrine'],
       hint: ['The Crown Shrine is at the edge of the last ring, past the Eclipse Hall. Everyone who came is waiting there.', 'Go to the shrine. Your friends wait there.'] },
     { id: 'reach', do: 'deduce n5_reach', scene: 'n5_reach_done',

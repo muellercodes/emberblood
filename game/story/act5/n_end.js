@@ -7,6 +7,8 @@
 // the fourth post, the real green has its fourth post back, lit for whoever is out in the dark.
 chapter({
   id: 'n_end', act: 5, after: 'n_nyxara', next: null, takeover: true,
+  // its steps keep running after the victory screen (G.done), so Keep exploring wakes Ash on the green
+  after_done: true,
   card: null, name: ['The Long Night Is Over', 'The Long Night Is Over'],
   so_far: [
     'Ash reached the Night Mother at the top of Nightfall Peak, and the moon came home. The Long Night is over.',
@@ -23,8 +25,7 @@ chapter({
 
   step: [
     { id: 'dawn', do: 'wait_for flag n_dawn>=1', obj: ['The Long Night is ending', 'The Long Night is ending'] },
-    // after the victory screen (G.done): ENGINE REQUEST, data runners keep going for this one step, so n_home plays
-    // after "Keep exploring" (today it never does: s10Runners stops when G.done)
+    // after the victory screen (G.done; after_done above), "Keep exploring" sets the play going again: n4fx:home
     { id: 'home', do: 'wait_for flag n_done', then: ['emit n4fx:home'],
       obj: ['The Long Night is over. Go anywhere you like.', 'Go anywhere you like!'] },
     // (n4fx:home: x4_story's free roam, then Ash is put on the green at dusk on Lantern Day; this step finds him there)
@@ -173,8 +174,7 @@ chapter({
     ],
 
     // ---- after "Keep exploring": Ash wakes up at home, on Lantern Day
-    // (n4fx:home already put Ash on the green at dusk, with no fade: a fade or time effect inside a scene would leave
-    //  the screen black until it ends, A3b's ENGINE note)
+    // (n4fx:home already brought Ash to the green at dusk, fading in from black like waking up)
     n_home: [
       ['narr', 'You wake up in the grass on the green in Emberhollow. Somebody has tucked a blanket round you. Pip is asleep on your head.', 'You wake up on the green at home. Pip sleeps on your head.'],
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
