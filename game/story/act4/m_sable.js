@@ -59,6 +59,11 @@ chapter({
       ['narr', 'Spikes of glass, taller than towers, as far as you can see. The sun bounces off them in a hundred little rainbows.',
         'Glass spikes taller than towers. A hundred little rainbows.', { ref: 'm4_gap_sign' }],
       ['ash', 'Worms go under it. ...Where do you even GET a worm?', 'Worms go under it. Where do I get a worm?'],
+      // the deal at eclipse 1, remembered
+      { if: 'choice m_deal=ask', then: [
+        ['ash', "She said the moon leaves her every morning. ...I keep thinking about that. I wish I didn't.", 'The moon leaves her every morning, she said. I keep thinking about it.']],
+        else: [
+        ['ash', 'Not for a hundred valleys. And not for one big pointy wall, either.', 'Not for a hundred valleys. Not for one pointy wall!']] },
     ],
     sbl_saffron: [
       ['m_saffron', "Don't touch the well. Don't breathe on the well. Don't LOOK at the well like that.", "Don't touch the well. Don't LOOK at it like that."],

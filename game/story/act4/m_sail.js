@@ -70,7 +70,7 @@ chapter({
     // pictures are the looks m4a_voyage_glaciar and m4a_voyage_ship)
     snl_voyage: [
       { if: 'near m4_north_isle 600 choice f_glaciar=free', then: [
-        { do: ['set m_ship=glaciar', { journal: ["You flew east on Auntie Glaciar's back. Very slowly.", 'You flew east on Glaciar. Slowly.'], key: 'm_ship' }] },
+        { do: ['set m_ship=glaciar', { journal: ["You flew to Moonfall on Auntie Glaciar's back. Very slowly.", 'You flew to Moonfall on Glaciar. Slowly.'], key: 'm_ship' }] },
         { do: ['set m4_voy=glaciar', 'world m4_voyage_glaciar sea'] }, { fade: 1 },
         ['narr', 'Glaciar flies slowly. Very slowly. Clouds overtake her. A seagull overtakes her and looks back, smug.',
           'Glaciar flies very slowly. A seagull passes her. It looks smug.'],
@@ -89,7 +89,7 @@ chapter({
         ['f_glaciar', "Oh, and Brann sends his regards. He's very brave now. He asked me to say it loudly. HE IS VERY BRAVE.",
           'Brann says hello. He is VERY BRAVE now.'],
       ], else: [
-        { do: ['set m_ship=ship', 'set m_dell_docked', { journal: ['You sailed east with Dell on the Soggy Biscuit Three.', 'You sailed east with Dell.'], key: 'm_ship' }] },
+        { do: ['set m_ship=ship', 'set m_dell_docked', { journal: ['You sailed to Moonfall with Dell on the Soggy Biscuit Three.', 'You sailed to Moonfall with Dell.'], key: 'm_ship' }] },
         { do: ['set m4_voy=ship', 'world m4_voyage_ship sea'] }, { fade: 1 },
         ['narr', 'The Soggy Biscuit Three chugs out of Gearhaven with a toot of steam. Dell stands at the wheel in his yellow rain hat, grinning so hard his beard sticks out sideways.',
           "Dell's boat toots out of Gearhaven. Dell grins so hard his beard sticks out."],
