@@ -1,0 +1,187 @@
+// Act IV, chapter 4 (part 1): Mirrors, the second eclipse (owner A4b). Data only: the engine runs it, the checker reads it.
+// What the player does: back in Sable after the Sandworm Burrows, Ash looks round the oasis (the sign by the Moon Well,
+// the little moths sleeping on its tower, a cracked lamp on Esme's workbench), and works out where the Night Mother
+// will feed next: the Moon Well, the last moonlight in the desert, like milk left out. He warns Saffron and they wait
+// at the well together. The eclipse comes, Nyxara lands on the tower and finds the little ember got there first. Ash
+// chooses: stand in front of the well (brave) or help Saffron drag the lid on (kind); either way one candle of
+// moonlight is saved. She bites the moon (40), asks for all three Shards, and her thread yanks Hush up the sky like a
+// kite (a free_hush clue). Then under the Glasswall at the Burrow Gap, and across the Mirror Flats to the temple.
+// Old flags kept: m_eclipse2 (x3_world opens the Burrow Gap, darkens the lanterns, x3_people sends Mom's letter
+// m_pb_3), m_gap_dug (set by x3_world when Ash burrows through). New: m4_well = stood | lid, m4_where_next.
+// Visual hooks of the old code (the eclipse pictures, x3_story m3sEcl) ride on `fx:` line options: the engine ignores
+// them today (A4b ENGINE REQUEST in CHANGES.md) and the scene reads right without them.
+chapter({
+  id: 'm_glasswall', act: 4, after: 'm_burrows', next: 'm_mirror', takeover: true,
+  card: ['Act IV · Chapter 4', 'Mirrors'],
+  so_far: [
+    'Ash came up out of the Sandworm Burrows able to dig like a worm. Somewhere out there, Nyxara is still hungry. This time Ash means to be waiting where she feeds next.',
+    'Ash can dig now. Nyxara is still hungry. Where will she go next?'],
+  mom: [['Worms? Under the ground? Wipe your feet before you come home.', 'Worms! Wipe your feet.']],
+  hint: ['Sable is full of clues today. Look around the Moon Well and the Lamp House.', 'Look around Sable.'],
+
+  place: {
+    // the middle of the oasis (Ash comes back down from the Worm Mouth; verified open ground, level 0)
+    m4_sable:      { map: 3, at: [9800, 67400], r: 450, kind: 'spot', name: ['the Oasis of Sable', 'Sable'] },
+    // a new sign at the south end of the footbridge to the Moon Well (verified open ground)
+    m4_well_sign:  { map: 3, at: [9860, 67910], r: 30, kind: 'sign', look: 'm4_sign_well', name: ['the Moon Well sign', 'the well sign'],
+                     prompt: ['Read the sign by the well', 'Read the sign'],
+                     say: 'm4_read_well_sign' },
+    // the moths asleep on the Moon Well's tower, seen from the north end of the footbridge (the tower stands on its
+    // islet at 9800,67650; the look draws them up its side). Gone once she has been.
+    m4_well_moths: { map: 3, at: [9800, 67712], r: 34, kind: 'examine', look: 'm4_tower_moths', if: '!flag m_eclipse2', h: 120,
+                     name: ['the moths on the well tower', 'the moths'], prompt: ['Look up at the well tower', 'Look at the tower'] },
+    // Esme's workbench outside the Lamp House (its door is at 10240,68051; verified open sand, level 0)
+    m4_cracked_lamp: { map: 3, at: [10330, 68060], r: 30, kind: 'examine', look: 'm4_esme_bench',
+                     name: ["Esme's workbench", "Esme's bench"], prompt: ["Look at Esme's workbench", 'Look at the bench'] },
+    // where Ash and Saffron wait: the stone rim of the Moon Well, at the top of the footbridge
+    m4_well_wait:  { map: 3, at: [9800, 67728], r: 46, kind: 'spot', name: ['the rim of the Moon Well', 'the Moon Well'] },
+    m4_well_tower: { map: 3, at: [9800, 67650], kind: 'npc_spot', name: ['the Moon Well tower', 'the well tower'] },
+    // the far side of the Glasswall, where the Burrow Gap comes up (verified open sand, level 0): only a burrower gets
+    // here (nobody climbs the wall or flies over it)
+    m4_gap_east:   { map: 3, at: [11160, 67240], r: 140, kind: 'spot', name: ['the far side of the Glasswall', 'the far side of the wall'] },
+  },
+
+  clue: {
+    m4_well_sign:    { icon: 'board', mystery: 'night_mother',
+                       text: ['The sign by the Moon Well: THE LAST MOONLIGHT IN THE GLASS DESERT. PLEASE DO NOT DRINK IT.', 'The Moon Well is the last moonlight in the desert.'] },
+    m4_well_moths:   { icon: 'moth', mystery: 'night_mother',
+                       text: ['Hundreds of little moths sleep on the Moon Well tower, all facing the water. As if they are saving her a seat for dinner.', 'Little moths wait on the well tower. Like for dinner.'] },
+    m4_cracked_lamp: { icon: 'lamp', mystery: 'night_mother',
+                       text: ["On Esme's workbench: a cracked lamp and a note. \"CRACKED LAMPS CAN'T HOLD A FLAME. MEND IT WHOLE FIRST. E.\"", "A cracked lamp can't hold a flame. Mend it whole first."] },
+    m4_bring_three:  { icon: 'moth', mystery: 'night_mother',
+                       text: ['At the Moon Well, Nyxara said: "My Hush keeps the last piece for you. Bring me all three."', 'Nyxara said: "Bring me all three."'] },
+    m4_hush_pulled:  { icon: 'rope', mystery: 'night_mother',
+                       text: ["When Nyxara flew off from the well, Hush's silver thread twitched and yanked Hush up the sky like a kite.", "Hush's thread yanked her up the sky like a kite."] },
+  },
+
+  deduce: {
+    where_feed: {
+      mystery: 'night_mother',
+      ask: ['Where will the Night Mother feed next?', 'Where will she eat next?'],
+      // m4_milk_smell: A4a's eclipse 1 on the Strand ("More moonlight, somewhere warm. Like milk left out.")
+      needs: ['m4_milk_smell', 'm4_well_sign', 'm4_well_moths'],
+      pick: [
+        { t: ["Sable's Moon Well", 'The Moon Well'], right: true },
+        { t: ['The sun', 'The sun'],
+          hint: ['She covered the sun. She BIT the moon. Moths want moonlight, not sunshine.', 'She bit the moon. Moths want moonlight.'] },
+        { t: ['The Lumen Spire', 'The Lumen Spire'],
+          hint: ["Lumen's lamps are lit again, and no moth came. Where is there moonlight you could drink, like milk?", 'Where is moonlight you could drink?'] },
+      ],
+      then: ['set m4_where_next'],
+    },
+  },
+
+  step: [
+    { id: 'back', do: 'goto m4_sable 450', scene: 'm4_back_sable', then: ['set m4_back_sable'],
+      obj: ['Go back to the Oasis of Sable', 'Go back to Sable'],
+      hint: ['Sable is the oasis with the palm trees, south of the Worm Mouth.', 'Go back to Sable.'] },
+    { id: 'look', do: 'all',
+      obj: ['Look around Sable. Where would a moth go for dinner?', 'Look around Sable for clues'],
+      hint: ['Read the sign by the Moon Well. Look up at the well tower from the footbridge. And Esme left something on her workbench by the Lamp House.',
+             'Read the well sign. Look at the tower. Look at the bench.'],
+      parts: [
+        { do: 'examine m4_well_sign', then: ['clue m4_well_sign'] },
+        { do: 'examine m4_well_moths', scene: 'm4_look_moths', then: ['clue m4_well_moths'] },
+        { do: 'examine m4_cracked_lamp', scene: 'm4_look_bench', then: ['clue m4_cracked_lamp'] },
+      ] },
+    { id: 'deduce', do: 'deduce where_feed', scene: 'm4_where_solved',
+      obj: ['Where will she feed next? Work it out in the Case Book', 'Open the Case Book'],
+      hint: ['She sniffed the air on the beach. Then there is the well sign, and the moths on the tower. Open the Case Book.', 'Open the Case Book.'] },
+    { id: 'saffron', do: 'talk m_saffron', scene: 'm4_warn_saffron', then: ['set m4_warned'],
+      obj: ['Warn Saffron the Well-Warden', 'Warn Saffron'],
+      hint: ['Saffron guards the Moon Well. She stands on the footbridge.', 'Saffron is on the footbridge.'] },
+    // the second eclipse comes because the player predicted it and is waiting (audit 7 and 8)
+    { id: 'well', do: 'goto m4_well_wait 46', scene: 'm_eclipse2',
+      obj: ['Wait with Saffron at the rim of the Moon Well', 'Wait at the Moon Well'],
+      hint: ['Walk up the footbridge to the stone rim of the well, and wait for her.', 'Wait at the well.'],
+      then: ['set m_eclipse2', 'set m_eclipse_on=0', 'xp 1000', { banner: ['The nights get darker.', 'The nights get darker.'] }] },
+    // x3_world opens the Burrow Gap once m_eclipse2 is set, and sets m_gap_dug when Ash digs through it; coming up on
+    // the far side finishes the step
+    { id: 'under', do: 'goto m4_gap_east 140', marker: 'm_burrowgap', intro: 'm4_iska_under',
+      obj: ['Burrow under the Glasswall at the Burrow Gap', 'Dig under the Glasswall'],
+      hint: ['The Burrow Gap is where the worms go under the Glasswall, past the Kiln Tent. Burrow into the sand there.', 'Dig into the sand at the Burrow Gap.'],
+      then: ['set m_gap_dug'] },
+    { id: 'flats', do: 'goto m_mirror_door 360',
+      obj: ['Find the Mirror Temple on the Mirror Flats', 'Find the Mirror Temple'],
+      hint: ['The Mirror Temple stands on a white dais in the middle of the Mirror Flats. Do not believe the lakes.', 'Find the temple on the white flats.'],
+      then: ['stage m_mirror'] },
+  ],
+
+  scene: {
+    m4_back_sable: [
+      ['iska', 'Sable again. Ash, that moth is still hungry. And hungry things go where the dinner is.', 'That moth is still hungry. Where is her dinner?'],
+      // (a save made before v10 never heard the first eclipse's sniff: Ash remembers it here)
+      { if: '!clue m4_milk_smell', then: [
+        ['ash', 'On the beach she sniffed the air. "More moonlight, somewhere warm," she said. "Like milk left out."', 'On the beach she said: "Moonlight, like milk left out."', { clue: 'm4_milk_smell' }] ] },
+      ['ash', "Then I'll find the milk before she does. And this time I'll be WAITING.", "I'll find it first. And I'll be WAITING."],
+    ],
+    m4_read_well_sign: [
+      ['narr', 'THE MOON WELL. The last moonlight in the Glass Desert. Please do not drink it. (Underneath, smaller: THAT MEANS YOU, STRIDERS.)',
+               'THE MOON WELL. The last moonlight in the desert. Do not drink it.'],
+    ],
+    m4_look_moths: [
+      ['narr', 'Hundreds of little moths sleep on the white tower, wings folded, all facing the water. Every few seconds one of them licks its lips.', 'Lots of little moths sleep on the tower. They face the water.'],
+      ['ash', "...Are they saving somebody a SEAT?", 'Are they saving someone a seat?'],
+    ],
+    m4_look_bench: [
+      ['narr', 'A cracked lamp sits on the workbench, with a note tucked under it in curly writing.', 'A cracked lamp and a note sit on the bench.'],
+      ['narr', '"CRACKED LAMPS CAN\'T HOLD A FLAME. MEND IT WHOLE FIRST. E."', '"CRACKED LAMPS CAN\'T HOLD A FLAME. MEND IT WHOLE FIRST. E."'],
+    ],
+    m4_where_solved: [
+      ['ash', 'The Moon Well! The last moonlight in the whole desert, sitting there like a bowl of milk.', 'The Moon Well! Like a bowl of milk.'],
+      ['ash', 'And all those little moths are saving her a seat. I have to warn Saffron.', 'The moths saved her a seat. Warn Saffron!'],
+    ],
+    m4_warn_saffron: [
+      ['ash', "Saffron! Nyxara is coming to drink your well. Today. I'm sure of it.", 'Saffron! Nyxara is coming for your well!'],
+      ['m_saffron', 'The moth that ate the SUN? Coming here, to my well?', 'The moth that ate the sun? HERE?'],
+      ['m_saffron', "...Then she'll find a Well-Warden and a dragon waiting for her. Come and sit on the rim with me.", 'Then we wait for her together. Sit with me.', { ref: 'm4_well_wait' }],
+    ],
+    // the second eclipse: at most 10 lines a branch. Ash is already there, because he worked it out.
+    m_eclipse2: [
+      { cam: 'm4_well_tower', s: 1.2 },
+      ['narr', 'You sit on the stone rim of the Moon Well. Saffron sits beside you with a very big spoon. Then the shade goes cold, the moon slides over the sun, and Sable goes dark at noon.',
+               'You wait at the well with Saffron. Then the sun goes dark.', { do: ['set m_eclipse_on'], fx: [['ecl', 'start', 2], ['ecl', 'dark']] }],
+      ['narr', 'Nyxara drops out of the dark like a black sail and lands right on top of the well tower. Every little moth on it wakes up and cheers.',
+               'Nyxara lands on the well tower! The little moths cheer.', { fx: ['ecl', 'land'] }],
+      ['nyxara', 'Oh. The little ember got here first. Clever. Nobody is ever here first.', 'The little ember got here first. Clever.'],
+      // the deal at the first eclipse (A4a's choice m_deal: ask | refuse) shows here
+      { if: 'choice m_deal=ask', then: [
+        ['nyxara', 'You asked me why, once. Nobody ever asks.', 'You asked me why once. Nobody asks.'] ],
+        else: [
+        ['nyxara', '"No way," you told me. Brave little ember. Shh, now.', '"No way," you said. Brave little ember.'] ] },
+      { choose: 'm4_well', ask: ['She bends her long curled tongue down to the water. What do you do?', 'She bends down to drink. What do you do?'], pick: [
+        { t: ['Stand in front of the well', 'Stand in front of the well'], tone: 'brave', v: 'stood',
+          then: ['set m4_well=stood', 'epi m4_epi_stood', { journal: ['At the Moon Well you stood in front of the water and spread your wings at the Night Mother.', 'You stood in front of the Moon Well.'], key: 'm4_well' }],
+          say: [['narr', 'You jump up on the rim and spread your wings wide. She drinks round you, but not through you. Behind your back, one candle of moonlight stays.',
+                         'You spread your wings over the well. One candle of light stays behind you.']] },
+        { t: ['Help Saffron drag the lid on', 'Help Saffron with the lid'], tone: 'kind', v: 'lid',
+          then: ['set m4_well=lid', 'epi m4_epi_lid', { journal: ['At the Moon Well you helped Saffron drag the old lid over the water.', 'You helped Saffron put the lid on the well.'], key: 'm4_well' }],
+          say: [['narr', 'You and Saffron heave the old stone lid across the water. It sticks halfway. Under it, one candle of moonlight stays safe.',
+                         'You and Saffron push the lid on. One candle of light stays safe.']] },
+      ] },
+      ['narr', 'She drinks the rest. The silver light drains out of the well like bathwater. Then she looks up at the moon and takes another bite. CRUNCH.',
+               'She drinks the light. Then she bites the moon again. CRUNCH!', { do: ['moon 40'], fx: [['ecl', 'drink'], ['ecl', 'bite', 40]] }],
+      ['nyxara', 'One more piece, little ember. My Hush keeps it for you, up in the Observatory. Bring me all three.', 'One more piece. My Hush has it. Bring me all three.', { clue: 'm4_bring_three' }],
+      ['narr', 'She rises without a sound. Far above, her silver thread twitches, and a white moth is yanked up the sky like a kite. Hush.',
+               'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', fx: ['ecl', 'leave'] }],
+      ['narr', 'Every lantern in Sable blows out at once.', 'Every lantern in Sable goes out.'],
+      ['m_saffron', 'Not dead. Dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.', 'One candle of moon is left. Because of you. Go!', { fx: ['ecl', 'end'] }],
+    ],
+    m4_iska_under: [
+      ['iska', "The Glasswall, Ash. Nobody can climb it and nobody can fly over it. But you're a worm now. Go UNDER.", "Nobody can climb the Glasswall. But you're a worm now. Go UNDER!", { ref: 'm_burrowgap' }],
+    ],
+    // epilogue lines (the `epi` effect takes each scene's first line)
+    m4_epi_stood: [['narr', 'In Sable they still tell how a little dragon stood on the rim of the Moon Well and spread his wings at the Night Mother.', 'In Sable they tell how a dragon stood in front of the Moon Well.']],
+    m4_epi_lid:   [['narr', 'In Sable the Moon Well has a new lid now. Saffron says it took a Well-Warden and a dragon to shift the old one.', 'The Moon Well has a new lid. Saffron and a dragon moved the old one.']],
+  },
+
+  talk: {
+    // after the eclipse, Saffron tells it the way it happened (once each; then A4S's ordinary talk takes over)
+    m_saffron: [
+      { if: 'flag m4_well=stood', once: true,
+        say: ['You stood right in front of my well and spread your wings at her. I will tell that story until I am a hundred.', 'You stood in front of my well! I will tell everyone.'] },
+      { if: 'flag m4_well=lid', once: true,
+        say: ['We got the lid on, you and me. One candle of moon, safe under a stone. Not bad for a curtain-fighter and a dragon.', 'We saved one candle of moon. Together.'] },
+    ],
+  },
+})
