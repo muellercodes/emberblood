@@ -108,7 +108,7 @@ chapter({
     { id: 'chance', do: 'any', marker: 'n5_gallery_isle1', obj: ['Cross the Silk Gallery', 'Cross the silk bridge'],
       hint: ['Grapple from post to post across the void. The gold ring shows what your tail can reach.', 'Grapple across.'],
       parts: [
-        { do: 'goto n5_gallery_isle1', if: '!choice c_vesper=friend', scene: 'ncl_chance' },
+        { do: 'goto n5_gallery_isle1', if: '!choice c_vesper=friend', scene: 'n_vesper_join' },
         { do: 'wait_for flag n_gallery' },
       ] },
     { id: 'gallery', do: 'wait_for flag n_gallery', marker: 'n5_gallery_far', obj: ['Cross the Silk Gallery', 'Cross the silk bridge'],
@@ -147,20 +147,57 @@ chapter({
       ['narr', 'N. Y. X. And under them, very small: "NYX: the clockmakers\' old word for night."', 'N Y X. "NYX: the old word for night."', { clue: 'n5_clock_word' }],
       ['ash', 'Nyx. Night. The Midnight Clock is a Nyx clock. ...Huh.', 'Nyx means night. Huh.'],
     ],
-    // the friend Vesper (Act II friend): she lands beside Ash and finds the post Nyxara hid
+    // Vesper on the Silk Gallery, one scene id for both pictures (x4_story's ally runtime reads n4sSeen('n_vesper_join')):
+    // the friend Vesper (Act II friend) lands beside Ash at the near shore; a foe Vesper gets her second chance on the
+    // first island, the same picture as the first night (Act II, the clock hand)
     n_vesper_join: [
-      { place: ['c_vesper', 'n5_vesper_land'], anim: ['c_vesper', 'perch'] },
-      ['narr', 'Someone drops out of the dark on a silk line and lands beside you without a sound. A moth mask. A crooked grin.', 'Someone drops down on a silk rope. A moth mask. A grin.'],
-      ['c_vesper', "You're climbing a copy of my city. Badly.", 'You are climbing a copy of my city. Badly.'],
-      ['ash', 'VESPER!', 'Vesper!'],
-      ['c_vesper', 'Hi, cousin. Thought you might need a thief. Thieves are good at getting into places nobody wants you in.', 'Hi, cousin! You need a thief. Thieves get in anywhere.'],
-      ['ash', 'How many greats is a cousin?', 'How many greats is a cousin?'],
-      ['c_vesper', "None. Cousins don't get greats.", 'None. Cousins have no greats.'],
-      ['ash', "Then you're my favorite relative.", 'Then you are my favorite!'],
-      ['c_vesper', "Don't tell the dragon grandpa. Now. See the gold post on that first island? Grapple it, then the next one. Don't look down.",
-        "Don't tell Grandpa. Grapple that first post. Don't look down.", { ref: 'n5_gallery_isle1' }],
-      ['c_vesper', 'And she hid a post of her own out there, past the third island. I find things people hide.', 'She hid a post out there too. I found it.',
-        { do: ['set n_vline'], ref: 'n5_hidden_post' }],
+      { if: 'choice c_vesper=friend', then: [
+        { place: ['c_vesper', 'n5_vesper_land'], anim: ['c_vesper', 'perch'] },
+        ['narr', 'Someone drops out of the dark on a silk line and lands beside you without a sound. A moth mask. A crooked grin.', 'Someone drops down on a silk rope. A moth mask. A grin.'],
+        ['c_vesper', "You're climbing a copy of my city. Badly.", 'You are climbing a copy of my city. Badly.'],
+        ['ash', 'VESPER!', 'Vesper!'],
+        ['c_vesper', 'Hi, cousin. Thought you might need a thief. Thieves are good at getting into places nobody wants you in.', 'Hi, cousin! You need a thief. Thieves get in anywhere.'],
+        ['ash', 'How many greats is a cousin?', 'How many greats is a cousin?'],
+        ['c_vesper', "None. Cousins don't get greats.", 'None. Cousins have no greats.'],
+        ['ash', "Then you're my favorite relative.", 'Then you are my favorite!'],
+        ['c_vesper', "Don't tell the dragon grandpa. Now. See the gold post on that first island? Grapple it, then the next one. Don't look down.",
+          "Don't tell Grandpa. Grapple that first post. Don't look down.", { ref: 'n5_gallery_isle1' }],
+        ['c_vesper', 'And she hid a post of her own out there, past the third island. I find things people hide.', 'She hid a post out there too. I found it.',
+          { do: ['set n_vline'], ref: 'n5_hidden_post' }],
+        ['c_vesper', "And Ash? Gran doesn't know where I am. She'll be up all night with the kettle on.", "Gran doesn't know where I am.",
+          { do: ['quest start q_n5_oona'], promise: 'q_n5_oona' }],
+      ], else: [
+        { cam: 'n5_hang_cam', s: 0.8 },
+        ['narr', 'SNAP! Something drops out of the dark on a silk line, and the line breaks.', 'SNAP! Someone falls. The silk rope breaks!'],
+        { place: ['c_vesper', 'n5_vesper_hang'], anim: ['c_vesper', 'hang'] },
+        ['narr', 'A grey cloak. Dark hair with one silver streak. She grabs the edge of your island with one hand and hangs over the void.', 'It is Vesper! She hangs from the edge by one hand.'],
+        ['c_vesper', '...Don\'t. Say. Anything.', "Don't. Say. Anything."],
+        ['narr', "It's the clock hand all over again. The very first night you met.", 'It is just like the first night you met.'],
+        { choose: 'n5_vesper_chance', ask: ['What do you do?', 'What do you do?'], pick: [
+          { t: ['Grab her wrist and pull her up', 'Pull her up'], tone: 'kind', v: 'helped',
+            then: ['trust friends +1', 'set n5_vesper', 'set n_vline', 'quest start q_n5_oona'],
+            say: [
+              ['c_vesper', '...You still do that. Even after everything I did.', 'You still do that. Even now.'],
+              ['ash', 'You were going to fall.'],
+              ['c_vesper', "She hid a post out there. I find things people hide. Come on, cousin. Let's go and annoy her.", 'She hid a post. Come on, cousin!'],
+              ['c_vesper', "And Ash? Gran doesn't know where I am. She'll be up all night with the kettle on.", "Gran doesn't know where I am.", { promise: 'q_n5_oona' }],
+            ] },
+          { t: ["Pull her up, then give her Gran's letter", "Pull her up. Give her Gran's letter."], tone: 'kind', v: 'letter', if: 'item m_vletter',
+            then: ['trust friends +1', 'set n5_vesper', 'set n5_vletter', 'set n_vline', 'take m_vletter', 'quest start q_n5_oona'],
+            say: [
+              ['narr', 'You pull her up. Then you give her the letter a moth carried off before she ever saw it.', 'You pull her up. You give her the letter.'],
+              ['c_vesper', '"Come home when you\'re ready." ...Gran wrote this? To ME?', '"Come home when you\'re ready." Gran wrote this?'],
+              ['c_vesper', "I am NOT crying. Come on, cousin. She hid a post out there. Let's go and annoy her.", 'I am NOT crying. Come on, cousin!'],
+              ['c_vesper', "And Ash? Gran doesn't know where I am. She'll be up all night with the kettle on.", "Gran doesn't know where I am.", { promise: 'q_n5_oona' }],
+            ] },
+          { t: ['Keep going', 'Keep going'], tone: 'brave', v: 'left',
+            then: ['set n5_vesper_left', 'quest start q_n5_vesper'],
+            say: [
+              ['narr', 'You step past her. Behind you, she pulls herself up, all by herself.', 'You walk on. She climbs up by herself.'],
+              ['c_vesper', "...I'll remember this, cousin.", "I'll remember this, cousin."],
+            ] },
+        ] },
+      ] },
     ],
     // the foe Vesper (Act II foe): her real mask, cracked, and a note
     n_vesper_absent: [
@@ -170,37 +207,6 @@ chapter({
     ],
     ncl_mask: [
       ['narr', 'Vesper\'s moth mask, cracked down the middle. The note under it says: "Sorry. V."', 'The cracked mask. "Sorry. V."'],
-    ],
-    // her second chance: the same picture as the first night (Act II, the clock hand)
-    ncl_chance: [
-      { cam: 'n5_hang_cam', s: 0.8 },
-      ['narr', 'SNAP! Something drops out of the dark on a silk line, and the line breaks.', 'SNAP! Someone falls. The silk rope breaks!'],
-      { place: ['c_vesper', 'n5_vesper_hang'], anim: ['c_vesper', 'hang'] },
-      ['narr', 'A grey cloak. Dark hair with one silver streak. She grabs the edge of your island with one hand and hangs over the void.', 'It is Vesper! She hangs from the edge by one hand.'],
-      ['c_vesper', '...Don\'t. Say. Anything.', "Don't. Say. Anything."],
-      ['narr', "It's the clock hand all over again. The very first night you met.", 'It is just like the first night you met.'],
-      { choose: 'n5_vesper_chance', ask: ['What do you do?', 'What do you do?'], pick: [
-        { t: ['Grab her wrist and pull her up', 'Pull her up'], tone: 'kind', v: 'helped',
-          then: ['trust friends +1', 'set n5_vesper', 'set n_vline'],
-          say: [
-            ['c_vesper', '...You still do that. Even after everything I did.', 'You still do that. Even now.'],
-            ['ash', 'You were going to fall.'],
-            ['c_vesper', "She hid a post out there. I find things people hide. Come on, cousin. Let's go and annoy her.", 'She hid a post. Come on, cousin!'],
-          ] },
-        { t: ["Pull her up, then give her Gran's letter", "Pull her up. Give her Gran's letter."], tone: 'kind', v: 'letter', if: 'item m_vletter',
-          then: ['trust friends +1', 'set n5_vesper', 'set n5_vletter', 'set n_vline', 'take m_vletter'],
-          say: [
-            ['narr', 'You pull her up. Then you give her the letter a moth carried off before she ever saw it.', 'You pull her up. You give her the letter.'],
-            ['c_vesper', '"Come home when you\'re ready." ...Gran wrote this? To ME?', '"Come home when you\'re ready." Gran wrote this?'],
-            ['c_vesper', "I am NOT crying. Come on, cousin. She hid a post out there. Let's go and annoy her.", 'I am NOT crying. Come on, cousin!'],
-          ] },
-        { t: ['Keep going', 'Keep going'], tone: 'brave', v: 'left',
-          then: ['set n5_vesper_left'],
-          say: [
-            ['narr', 'You step past her. Behind you, she pulls herself up, all by herself.', 'You walk on. She climbs up by herself.'],
-            ['c_vesper', "...I'll remember this, cousin.", "I'll remember this, cousin."],
-          ] },
-      ] },
     ],
     // the Gear Bridge: Ember's lantern for the little moth
     ncl_lantern: [

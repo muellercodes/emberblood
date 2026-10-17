@@ -41,20 +41,19 @@ chapter({
     { id: 'longclimb', do: 'wait_for flag n_longclimb', marker: 'n5_u2', obj: ['Climb the Long Climb to the third ring', 'Climb up'],
       hint: ['Past the Mask Hall a grapple post now hangs over the void. Grapple across, then climb the icy face with your claws.',
         'Grapple over. Then climb.'] },
-    { id: 'rime_in', do: 'any', marker: 'n_sh_rime', obj: ['Go to the Rime Shrine', 'Go to the shrine'],
-      parts: [
-        { do: 'goto n_sh_rime 330', scene: 'n_rime_in' },
-        { do: 'wait_for flag n_floe' },
-      ],
+    // (the Long Climb lands 200 px from the Rime Shrine, inside this circle, so no kid can miss it)
+    { id: 'rime_in', do: 'goto n_sh_rime 330', scene: 'n_rime_in', obj: ['Go to the Rime Shrine', 'Go to the shrine'],
       then: ['clue n5_sun_out'] },
-    // at the Floe Gap: Glaciar comes (freed in Act III), or her scale lies in the snow and the errand starts
+    // at the Floe Gap: Glaciar comes (freed in Act III), or her scale lies in the snow and the errand starts (the quest's
+    // own if keeps it from starting for a Glaciar who is already free)
     { id: 'glaciar', do: 'any', marker: 'n5_floe', obj: ['Melt the ice wall at the Wind Gate', 'Melt the ice wall'],
       hint: ['Plain fire is not hot enough for that ice. Use your Blaze.', 'Use Blaze on the ice.'],
       parts: [
         { do: 'goto n5_floe 320', if: 'choice f_glaciar=free', scene: 'n_glaciar_join' },
-        { do: 'goto n5_floe 320', if: '!choice f_glaciar=free', scene: 'n_glaciar_absent', then: ['quest start q_n5_glaciar'] },
+        { do: 'goto n5_floe 320', if: '!choice f_glaciar=free', scene: 'n_glaciar_absent' },
         { do: 'wait_for flag n_floe' },
-      ] },
+      ],
+      then: ['quest start q_n5_glaciar'] },
     { id: 'floe', do: 'wait_for flag n_floe', marker: 'n5_floe', obj: ['Ride the wind over the Floe Gap', 'Ride the wind'],
       hint: ['Jump into the wind swirl at the edge of the gap. Wings will not work here, but the wind will carry you.', 'Jump into the swirl.'] },
     { id: 'dam', do: 'wait_for flag n_dam', marker: 'n5_dam', obj: ['Break the Ice Dam', 'Break the ice dam'],
