@@ -113,16 +113,16 @@ chapter({
         { t: ['Melt the knots with gentle Moonfire', 'Melt the knots, gently'], tone: 'kind', v: 'free',
           then: ['set m_leash_known', { journal: ["You melted Hush's silver leash with the gentlest Moonfire, and she flew away free.", "You melted Hush's leash. She flew away free."], key: 'm_hush' }],
           say: [
-            ['narr', "You breathe Moonfire on the first knot, as softly as you'd blow on hot soup. The silver thread melts like frost on a window. Then the second knot.", 'You breathe soft Moonfire on the knots, like blowing on soup. They melt.', { fx: ['hush', 'knots'] }],
+            ['narr', "You breathe Moonfire on the first knot, as softly as you'd blow on hot soup. The silver thread melts like frost on a window. Then the second knot.", 'You breathe soft Moonfire on the knots, like blowing on soup. They melt.', { do: ['emit m4fx:hush:knots'] }],
             { if: 'item m4_sweater', then: [
-              ['narr', 'Hush shrinks to her own size. You tug the sweater over her head. It is too small. She does not mind.', 'Hush shrinks. You put the sweater on her. It is too small. She does not mind.', { do: ['take m4_sweater', 'set m4_hush_sweater', 'epi m4_epi_sweater 6'], fx: ['hush', 'free'] }] ],
+              ['narr', 'Hush shrinks to her own size. You tug the sweater over her head. It is too small. She does not mind.', 'Hush shrinks. You put the sweater on her. It is too small. She does not mind.', { do: ['emit m4fx:hush:free', 'take m4_sweater', 'set m4_hush_sweater', 'epi m4_epi_sweater 6'] }] ],
               else: [
-              ['narr', 'Hush shrinks to her own size, stretches her wings, and floats up out of the dome, free and glowing faintly. She looks back, once.', 'Hush shrinks and floats away, free. She looks back once.', { fx: ['hush', 'free'] }] ] },
+              ['narr', 'Hush shrinks to her own size, stretches her wings, and floats up out of the dome, free and glowing faintly. She looks back, once.', 'Hush shrinks and floats away, free. She looks back once.', { do: ['emit m4fx:hush:free'] }] ] },
             ['f_hush', '...Shhh. Thank you. Quietly.', 'Thank you. Quietly.'] ] },
         { t: ['Take the Shard and go', 'Take the Shard and go'], tone: 'brave', v: 'foe',
           then: [{ journal: ['You took the Moon Shard and left Hush on her leash. The Mother pulled her home.', 'You left Hush on her leash. The Mother took her home.'], key: 'm_hush' }],
           say: [
-            ['narr', 'You take the Shard. The leash tightens, and Hush crumbles into a hundred little white moths that flutter up the silver thread to their Mother.', 'You take the Shard. Hush turns into little moths and flies to the Mother.', { fx: ['hush', 'foe'] }],
+            ['narr', 'You take the Shard. The leash tightens, and Hush crumbles into a hundred little white moths that flutter up the silver thread to their Mother.', 'You take the Shard. Hush turns into little moths and flies to the Mother.', { do: ['emit m4fx:hush:foe'] }],
             ['iska', "She'll remember this, Ash. Moths always remember.", 'She will remember this. Moths always remember.'] ] },
       ] },
     ],

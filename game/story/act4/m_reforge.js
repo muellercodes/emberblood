@@ -1,7 +1,7 @@
 // Act IV, the Final Chapter: The Ember Heart (owner A4b). Data only.
 // What the player does: through the next door from Hush's dome, at the Eclipse Lens, Mom comes puffing up the
 // moonlight stairs with her hammer (and Professor Quill behind a telescope). Short and strong, in three pieces:
-// m_reforge (Mom, at most 10 lines), the three taps (x3_story's forge game, an `fx` hook: see CHANGES.md), and
+// m_reforge (Mom, at most 10 lines), the three taps (x3_story's forge game, `emit m4fx:forge`: see CHANGES.md), and
 // m_reforge2 (TING TING TING, the Heart, Nyxara's far voice: at most 6). Ash says what the player worked out in the
 // Mirror Temple (why_three): she WANTS it whole, so it can burn black; Mom: "Then we keep it warm." Then everyone runs
 // down to the Moon Pier at the Edge of the World for the last bite of the moon and the black mountain (m_peak, at most
@@ -34,7 +34,7 @@ chapter({
     m4_bridge_on: { map: 3, at: [13762, 65446], r: 36, kind: 'spot', name: ['the moonfire bridge', 'the bridge'] },
     m4_peak_sea: { map: 3, at: [13740, 65200], kind: 'npc_spot', name: ['the sea at the Edge of the World', 'the sea'] },
     // the black mountain out at sea and the moonfire bridge to it: this chapter's own pictures, shown in Act IV only
-    // while the engine has no `fx` hook for x3_story's vista (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    // while nothing listens to m4fx for x3_story's vista (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
     m4_peak:      { map: 3, at: [13990, 65120], kind: 'prop', look: 'm4_peak_far', if: 'flag m4_peak_up act=4 !flag s10_fx',
                     name: ['the black mountain', 'the black mountain'] },
     m4_bridge_fx: { map: 3, at: [13780, 65452], kind: 'prop', look: 'm4_fire_bridge', if: 'flag m4_bridge_lit act=4 !flag s10_fx',
@@ -50,7 +50,7 @@ chapter({
       ],
       obj: ['Go through to the Eclipse Lens', 'Go to the Eclipse Lens'],
       hint: ['The Eclipse Lens is through the next door from the great dome, on the same floor. Someone with a hammer is coming up the stairs behind you.', 'Go through the next door to the Lens.'] },
-    // the three taps run between the two scenes when the engine has the fx hook (m_reforge's last line); the second
+    // the three taps run between the two scenes once x3_story listens to m4fx:forge (m_reforge's last line); the second
     // scene waits for them (a cutscene plays only when things are calm)
     { id: 'heart', do: 'cutscene m_reforge2',
       then: ['set m_reforged', 'set m_heart', 'set m_maren', 'time noon', 'warp m4_pier'] },
@@ -70,7 +70,7 @@ chapter({
     // at the Lens: at most 10 lines (the old one was 17, then 10 more, then 17 more in one sitting)
     m_reforge: [
       ['narr', 'Through the door lies the Eclipse Lens: a disc of moon-glass as big as a pond, set in brass, pointing at the sky. Then footsteps on the stairs. And puffing. A lot of puffing.',
-               'Here is the Eclipse Lens, big as a pond. Then: footsteps, and puffing.', { fx: ['mom_in'] }],
+               'Here is the Eclipse Lens, big as a pond. Then: footsteps, and puffing.', { do: ['emit m4fx:mom_in'] }],
       { place: ['maren', [22060, 1580]] }, { place: ['quill', [22330, 1600]] },
       ['maren', 'Ash? ASH! Those stairs are made of MOONLIGHT. Do you know how hard it is to climb moonlight with a hammer?', 'Ash! Those stairs are MOONLIGHT. Try climbing that with a hammer!'],
       ['ash', 'MOM?!', 'MOM?!'],
@@ -79,14 +79,14 @@ chapter({
       ['quill', '(arriving last, behind a telescope bigger than she is) The Eclipse Observatory! The end of the world seemed like a good excuse to visit.', '(with a huge telescope) The Observatory! The end of the world is a good reason to visit.'],
       ['narr', 'You tip the three Shards out of your satchel: violet, ice-blue and silver. Mom turns each one over, the way she checks a horseshoe.', 'You tip out the three Shards. Mom checks each one.'],
       ['maren', "I'm a blacksmith. It's a broken stone. This is literally my job.", "I'm a blacksmith. It's a broken stone. This is my job."],
-      ['maren', 'You breathe, the hottest you have, then the coolest. I hammer. Three taps. Gently. Wait for the rings to meet.', 'You breathe hot, then cool. I tap three times. Gently!', { fx: ['forge'] }],
+      ['maren', 'You breathe, the hottest you have, then the coolest. I hammer. Three taps. Gently. Wait for the rings to meet.', 'You breathe hot, then cool. I tap three times. Gently!', { do: ['emit m4fx:forge'] }],
     ],
     // after the taps: at most 6 lines. The why_three payoff: the player saw this coming.
     m_reforge2: [
       { place: ['maren', [22060, 1580]] }, { place: ['quill', [22330, 1600]] }, { sfx: 'chest' },
       ['narr', 'TING. TING. TING. In the middle of the Lens sits a warm stone the size of a plum, an orange core with three glowing seams, beating softly, like a heart.',
                'TING. TING. TING. A warm stone with three glowing lines beats like a heart.',
-               { fx: ['heart_whole'], do: [
+               { do: ['emit m4fx:heart_whole',
                  { if: 'item c_shard1', then: ['take c_shard1'] }, { if: 'item f_shard2', then: ['take f_shard2'] }, { if: 'item m_shard3', then: ['take m_shard3'] },
                  { if: '!item m_heart', then: ['give m_heart'] }, 'set m_heart', 'set m_reforged',
                  { if: '!flag m_reforge_xp', then: ['set m_reforge_xp', 'xp 1000'] }] }],
@@ -103,17 +103,17 @@ chapter({
     m_peak: [
       { cam: 'm4_peak_sea', s: 1.6 },
       ['narr', 'You all run down the Moonpath and out along the old Moon Pier to the edge of the world. High above, the last thin curl of moon slides across the sun.',
-               'You all run out onto the old Moon Pier. The last bit of moon slides over the sun.', { fx: [['party_look'], ['ecl', 'start', 3]] }],
+               'You all run out onto the old Moon Pier. The last bit of moon slides over the sun.', { do: ['emit m4fx:party_look', 'emit m4fx:ecl:start:3'] }],
       ['narr', 'On it, wings wider than the sky, is Nyxara. CRUNCH. The last of the moon goes out like a candle.', 'Nyxara is on it. CRUNCH. The last of the moon goes out.',
-               { do: ['moon 0', 'set m_eclipse3'], fx: ['ecl', 'bite', 0] }],
-      ['narr', 'And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.', 'A black mountain rises out of the sea.', { do: ['set m4_peak_up'], fx: [['peak', 'rise'], ['ecl', 'gone']] }],
+               { do: ['emit m4fx:ecl:bite:0', 'moon 0', 'set m_eclipse3'] }],
+      ['narr', 'And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.', 'A black mountain rises out of the sea.', { do: ['emit m4fx:peak:rise', 'emit m4fx:ecl:gone', 'set m4_peak_up'] }],
       ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
       ['ash', "It looks like... Cinder Mountain? And a clock tower? And SNOW? It's every place I've ever been, all squashed together.", 'It looks like Cinder Mountain! And a clock tower! And SNOW!'],
       { if: 'choice m_hush=free', then: [
         ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the mountain. Far off over the dark sea, a small white light glows once, softly.',
-                 'The Heart grows warm. A bridge of fire rolls out to the mountain. Far away, a small white light glows.', { do: ['set m4_bridge_lit'], fx: ['peak', 'bridge'] }] ],
+                 'The Heart grows warm. A bridge of fire rolls out to the mountain. Far away, a small white light glows.', { do: ['emit m4fx:peak:bridge', 'set m4_bridge_lit'] }] ],
         else: [
-        ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the black mountain.', 'The Heart grows warm. A bridge of fire rolls out to the mountain.', { do: ['set m4_bridge_lit'], fx: ['peak', 'bridge'] }] ] },
+        ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the black mountain.', 'The Heart grows warm. A bridge of fire rolls out to the mountain.', { do: ['emit m4fx:peak:bridge', 'set m4_bridge_lit'] }] ] },
       ['maren', "...You're going up there.", "You're going up there."],
       ['ash', "I'm going up there.", "I'm going up there."],
       ['maren', "Then I'll walk you to the bridge.", "Then I'll walk you to the bridge."],

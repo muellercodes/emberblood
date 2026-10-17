@@ -8,8 +8,8 @@
 // kite (a free_hush clue). Then under the Glasswall at the Burrow Gap, and across the Mirror Flats to the temple.
 // Old flags kept: m_eclipse2 (x3_world opens the Burrow Gap, darkens the lanterns, x3_people sends Mom's letter
 // m_pb_3), m_gap_dug (set by x3_world when Ash burrows through). New: m4_well = stood | lid, m4_where_next.
-// Visual hooks of the old code (the eclipse pictures, x3_story m3sEcl) ride on `fx:` line options: the engine ignores
-// them today (A4b ENGINE REQUEST in CHANGES.md) and the scene reads right without them.
+// Visual hooks of the old code (the eclipse pictures, x3_story m3sEcl) ride on `emit m4fx:<name>[:<arg>]` effects:
+// nothing listens to them yet (A4b ENGINE REQUEST in CHANGES.md) and the scene reads right without them.
 chapter({
   id: 'm_glasswall', act: 4, after: 'm_burrows', next: 'm_mirror', takeover: true,
   card: ['Act IV · Chapter 4', 'Mirrors'],
@@ -39,7 +39,7 @@ chapter({
     // the camera's aim for the eclipse: high enough to show Nyxara on top of the tower and Ash on the rim below
     m4_well_sky:   { map: 3, at: [9800, 67555], kind: 'npc_spot', name: ['the sky over the Moon Well', 'the sky over the well'] },
     // Nyxara perched on the tower during the eclipse: this chapter's own picture of her, shown only while the engine
-    // has no `fx` hook for x3_story's eclipse pictures (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
+    // has no m4fx listener for x3_story's eclipse pictures (flag s10_fx; A4b ENGINE REQUEST in CHANGES.md)
     m4_nyx_well:   { map: 3, at: [9800, 67661], kind: 'prop', look: 'm4_nyx_perch', states: { drink: 'm4_nyx_perch' },
                      if: 'flag m4_nyx_here !flag s10_fx', name: ['Nyxara', 'Nyxara'] },
     // the far side of the Glasswall, where the Burrow Gap comes up (verified open sand, level 0): only a burrower gets
@@ -151,9 +151,9 @@ chapter({
     m_eclipse2: [
       { cam: 'm4_well_sky', s: 1.2 },
       ['narr', 'You sit on the stone rim of the Moon Well. Saffron sits beside you with a very big spoon. Then the shade goes cold, the moon slides over the sun, and Sable goes dark at noon.',
-               'You wait at the well with Saffron. Then the sun goes dark.', { do: ['set m_eclipse_on'], fx: [['ecl', 'start', 2], ['ecl', 'dark']] }],
+               'You wait at the well with Saffron. Then the sun goes dark.', { do: ['emit m4fx:ecl:start:2', 'emit m4fx:ecl:dark', 'set m_eclipse_on'] }],
       ['narr', 'Nyxara drops out of the dark like a black sail and lands right on top of the well tower. Every little moth on it wakes up and cheers.',
-               'Nyxara lands on the well tower! The little moths cheer.', { do: ['set m4_nyx_here'], fx: ['ecl', 'land'] }],
+               'Nyxara lands on the well tower! The little moths cheer.', { do: ['emit m4fx:ecl:land', 'set m4_nyx_here'] }],
       ['nyxara', 'Oh. The little ember got here first. Clever. Nobody is ever here first.', 'The little ember got here first. Clever.'],
       // the deal at the first eclipse (A4a's choice m_deal: ask | refuse) shows here
       { if: 'choice m_deal=ask', then: [
@@ -171,12 +171,12 @@ chapter({
                          'You and Saffron push the lid on. One candle of light stays safe.']] },
       ] },
       ['narr', 'She drinks the rest. The silver light drains out of the well like bathwater. Then she looks up at the moon and takes another bite. CRUNCH.',
-               'She drinks the light. Then she bites the moon again. CRUNCH!', { do: ['world m4_nyx_well drink', 'moon 40'], fx: [['ecl', 'drink'], ['ecl', 'bite', 40]] }],
+               'She drinks the light. Then she bites the moon again. CRUNCH!', { do: ['emit m4fx:ecl:drink', 'emit m4fx:ecl:bite:40', 'world m4_nyx_well drink', 'moon 40'] }],
       ['nyxara', 'One more piece, little ember. My Hush keeps it for you, up in the Observatory. Bring me all three.', 'One more piece. My Hush has it. Bring me all three.', { clue: 'm4_bring_three' }],
       ['narr', 'She rises without a sound. Far above, her silver thread twitches, and a white moth is yanked up the sky like a kite. Hush.',
-               'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['set m4_nyx_here=0', 'set m4_moths_gone'], fx: ['ecl', 'leave'] }],
+               'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['emit m4fx:ecl:leave', 'set m4_nyx_here=0', 'set m4_moths_gone'] }],
       ['narr', 'Every lantern in Sable blows out at once.', 'Every lantern in Sable goes out.'],
-      ['m_saffron', 'Not dead. Dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.', 'One candle of moon is left. Because of you. Go!', { fx: ['ecl', 'end'] }],
+      ['m_saffron', 'Not dead. Dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.', 'One candle of moon is left. Because of you. Go!', { do: ['emit m4fx:ecl:end'] }],
     ],
     m4_gap_shut_say: [
       ['narr', 'The sand at the foot of the Glasswall is packed as hard as glass today. Even the worms are waiting for something.', 'The sand here is packed hard. The worms are waiting.'],
