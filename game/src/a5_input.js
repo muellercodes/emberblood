@@ -387,6 +387,7 @@ function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H
 // test hooks (v11 UX): spawn a foe next to Ash, and what the attack button is doing
 window.__ebDbg=Object.assign(window.__ebDbg||{},{
   dlg:()=>DLG?{i:DLG.i,n:DLG.lines.length,chars:Math.floor(DLG.chars),len:(DLG.text||'').length,opts:DLG.opts?DLG.opts.length:0,shown:!document.getElementById('dlgOpts').hidden,skipArm:!!DLG.skipArm,text:String(DLG.text||'').slice(0,50)}:null,
+  scr:(x,y)=>({x:(x-cam.x)*zoom,y:(y-cam.y)*zoom}),
   lvl:n=>{ let k=0; while(player.level<n&&k++<99) gainXp(xpNeed(player.level)-player.xp+1); return player.level; },
   spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
   atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})
