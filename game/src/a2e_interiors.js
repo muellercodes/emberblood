@@ -318,16 +318,22 @@ function dwLinesText(calls){
     const who=typeof L.who==='function'?L.who():L.who, nm=who&&who!=='narr'&&SPK[who]?SPK[who].name:'';
     out.push(nm?`${nm}: ${t}`:t);
   }
-  return out.join(' ');
+  return out;
+}
+// a long lock text keeps its first sentence and its last line (where the hint about what opens it usually is)
+function dwShort(parts){
+  const all=parts.join(' '); if(all.length<=180||parts.length<2) return all;
+  const first=(parts[0].match(/^.*?[.!?](\s|$)/)||[parts[0]])[0].trim(), last=parts[parts.length-1];
+  const s=first+' '+last; return s.length<=220?s:last;
 }
 // a short note over a door (or anything Ash bumps): wraps to a few lines, fades after a while, goes in the Log
-function doorNote(x,y,text,lock){
+function doorNote(x,y,text,lock,full){
   text=String(text||'').trim(); if(!text) return;
   let s=text;
-  if(s.length>170){ const cut=s.slice(0,170), i=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('! '),cut.lastIndexOf('? ')); s=i>60?cut.slice(0,i+1):cut.replace(/\s+\S*$/,'')+'…'; }
+  if(s.length>230){ const cut=s.slice(0,230), i=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('! '),cut.lastIndexOf('? ')); s=i>60?cut.slice(0,i+1):cut.replace(/\s+\S*$/,'')+'…'; }
   DW.note={x,y,text:s,t:0,dur:clamp(1.6+s.length*0.045,2.6,7),lock:!!lock};
   try{ SFX.play(lock?'block':'ui',0.7); }catch(e){}
-  try{ logAdd({k:'narr',who:'',col:'#d8c3a0',text}); }catch(e){}
+  try{ logAdd({k:'narr',who:'',col:'#d8c3a0',text:full||text}); }catch(e){}
 }
 function doorBump(d){
   if(DW.bumpT>0&&DW.bumpD===d) return;
@@ -335,12 +341,18 @@ function doorBump(d){
   const calls=dwCapture(()=>enterArea(d.area,d));
   // it opened after all: let anything it wanted to say be said
   if(AREA){ for(const c of calls) runDialogue(c[0],c[1],c[2]); return; }
-  { const L=doorLockAt(d); doorNote(L.x,L.y-14,dwLinesText(calls)||doorLockText(d)||S('It will not open.','It is shut.'),true); }
+  { const L=doorLockAt(d), parts=dwLinesText(calls); doorNote(L.x,L.y-14,parts.length?dwShort(parts):doorLockText(d)||S('It will not open.','It is shut.'),true,parts.join(' ')); }
 }
 function doorWalkIn(d){
   if(doorLockText(d)!=null){ doorBump(d); return; }
   if(G.inCombat||(G.boss&&!G.boss.dead)){ if(!(DW.bumpT>0&&DW.bumpD===d)){ DW.bumpT=2.4; DW.bumpD=d; const L=doorLockAt(d); doorNote(L.x,L.y-14,S('Not with foes this close!','Foes are near!'),false); } return; }
-  enterArea(d.area,d);
+  try{ enterArea(d.area,d); }
+  catch(e){
+    // a place that fails to build (a bug in its own code) must not leave Ash half inside: put him back at the door
+    console.error('enterArea',d.area,e);
+    if(AREA&&player.x<IZX-50){ try{ exitArea(true); }catch(e2){ AREA=null; G.area=null; } }
+    DW.bumpT=2.4; DW.bumpD=d; const L=doorLockAt(d); doorNote(L.x,L.y-14,S('Something blocks the way in. Try again later.','Something is in the way.'),false);
+  }
   if(AREA) G.prompt=null;
 }
 // a dungeon door Ash walks into: a key opens it, else it says what it needs (the same words its Look prompt gives)
@@ -354,7 +366,7 @@ function caveDoorBump(push){
     DW.bumpT=2.4; DW.bumpD=o;
     const calls=dwCapture(()=>caveObjAct(o));
     if(o.opened||!o.closed){ for(const c of calls) runDialogue(c[0],c[1],c[2]); return true; }
-    const t=dwLinesText(calls); if(t) doorNote(o.x,o.y-40,t,o.type==='lock'||o.type==='boss');
+    const parts=dwLinesText(calls); if(parts.length) doorNote(o.x,o.y-40,dwShort(parts),o.type==='lock'||o.type==='boss',parts.join(' '));
     else for(const c of calls) runDialogue(c[0],c[1],c[2]);
     return true;
   }
@@ -464,4 +476,4 @@ function doorNoteDraw(){
   lines.forEach((l,i)=>g.fillText(l,bx+pad+iw,by+pad*0.7+lh*i+lh/2));
   g.restore();
 }
-window.__ebDbg=Object.assign(window.__ebDbg||{},{doorInfo:d=>({walk:doorWalkable(d),inA:doorIn(d),lock:doorLockText(d)}),note:()=>DW.note?DW.note.text:null,DW});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{doorInfo:d=>({walk:doorWalkable(d),inA:doorIn(d),lock:doorLockText(d)}),note:()=>DW.note?DW.note.text:null,DW,dsid:()=>AREA?caveDsid(AREA.def):null,areaBlocked:(x,y)=>areaBlocked(x,y)});

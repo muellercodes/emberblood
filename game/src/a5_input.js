@@ -297,7 +297,8 @@ function readInput(dt){
   // the kept press: used once a swing starts (its cooldown jumps up) or a hold weapon takes over
   if(ATK.buf>0){
     ATK.buf-=dt;
-    const used=!p||(p.swingT>0&&ATK.lsw<=0)||p.atkCd>ATK.lcd+0.02||!!p.ham||!!p.bow||p.dead||!atkBufOK();
+    // (a press kept from before a jump never turns into a Ground Pound in the air)
+    const used=!p||(p.swingT>0&&ATK.lsw<=0)||p.atkCd>ATK.lcd+0.02||!!p.ham||!!p.bow||p.dead||!atkBufOK()||airborne();
     if(used) ATK.buf=0; else if(!o.attack&&ATK.press!=='use') o.attack=true;
   }
   // a roll pressed while the last one is still going is kept a little longer too (about 0.3 s; the game keeps 0.15 s)
