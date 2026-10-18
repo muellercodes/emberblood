@@ -55,7 +55,7 @@ STORY.a1_lantern_lit=[vl('narr',`The little lantern catches. Far, far below, in 
 STORY.a1_cinder_walk=[
   vl('cinder',`A thousand years I stood at that gate and looked up this road. I never once walked it.`,`For a thousand years I looked up this road. I never walked it.`),
   vl('ash',`What's it like?`,`What is it like?`),
-  vl('cinder',`Steep. Smoky. Terrible for the knees. Exactly as I imagined. I'm delighted.`,`Steep. Smoky. Bad for my knees. I love it.`),
+  vl('cinder',`Steep, smoky, and terrible for the knees, which is exactly what I hoped for.`,`Steep, smoky, and bad for my knees. I love it.`),
   vl('cinder',`I'll go ahead to the crater stairs and hold them. Nothing that serves him comes up behind you. You have my word, and I have been keeping my word for a very long time.`,`I will go ahead and guard the crater stairs. Nothing will sneak up behind you. I promise.`),
   ch('ash',S(`Anything you want to say to an old knight, Emberblood?`,`Anything to say to an old knight?`),[
     {t:S(`Thank you for waiting for me.`,`Thank you for waiting for me.`),tone:'kind',then:[vl('cinder',`It was worth it. Every year. Don't tell the other knights I said that. There are no other knights. Don't tell them anyway.`,`It was worth it. Every year. Don't tell the other knights. There are none. Still, don't tell.`)]},
@@ -65,7 +65,7 @@ STORY.a1_cinder_walk=[
 STORY.a1_cinder_helm=[vl('narr',`Sir Cindervane's helmet sits on the gate steps, with a red flower in it. You touch it for luck. It's warm.`,`Sir Cindervane's helmet sits here with a red flower. You touch it for luck. It is warm.`)];
 // ---------- 7.2 Tier 1: the Last Candle
 STORY.a1_stragglers=[
-  vl('narr',`Behind a pile of broken carts, three cultists and one knight are sitting around a single black candle. They look like they haven't slept since Tuesday.`,`Behind some broken carts, three cultists and a knight sit by a black candle. They look very tired.`),
+  vl('narr',`Behind a pile of broken carts, three cultists and one knight are sitting around a single black candle. They look like they haven't slept in a week.`,`Behind some broken carts, three cultists and a knight sit by a black candle. They look very tired.`),
   vl('a1_strag',`Is that the Emberblood? Is it over? Please say it's over. I want my mom.`,`Is that the Emberblood? Is it over? I want my mom.`),
   vls('narr',`Sister Soot stands up. She holds a letter. You know the handwriting. It's Morrow's.`,`Sister Soot holds up a letter. It is from Morrow.`,()=>G.choices.morrow!=='free'),
   vls('a1_soot',`Brother Morrow wrote to us. From a pumpkin patch. He says: "Go home. Grow something. It isn't worth it." He drew a pumpkin. It was a good pumpkin.`,`Morrow wrote to us. He says: "Go home. Grow something." He drew a good pumpkin.`,()=>G.choices.morrow!=='free'),
@@ -94,7 +94,7 @@ STORY.a1_iska_cold=[vl('narr',`An old stone lantern with Iska's mark on it. It's
 // ---------- 7.5 Tier 3: Bram's Anvil
 STORY.a1_bram_climb=[
   vl('bram',`HA! The Emberblood on my anvil! I used to come up here and hit this thing for fun. It's the loudest rock in the world.`,`HA! The Emberblood at my anvil! I hit this rock for fun. It's the loudest rock ever.`),
-  vls('bram',`And you brought Old Thunder! Look at her. I could cry. I won't. Wardens don't cry. We leak with pride.`,`You brought Old Thunder! I could cry. Wardens don't cry. We leak.`,()=>!vorThunder()),
+  vls('bram',`And you brought Old Thunder! Look at her. She's still got the dent from the time I hit Oriel's shield by mistake.`,`You brought Old Thunder! She still has my old dent.`,()=>!vorThunder()),
   vls('bram',`No hammer? On MY mountain? Here, take this one. I left it by the anvil a thousand years ago. Still good. Hammers don't go off.`,`No hammer? Take this old one. Hammers never go bad.`,()=>!!(G.weapons&&G.weapons.hammer)),
   vl('bram',`My gate there opens for the old song. "Over Cinder Mountain." If you know it, play it. If you don't, smash rocks. Both are good. Smashing is better.`,`My gate opens for the old song. Or smash the black rocks. Smashing is better.`),
   vl('bram',`Big black rocks want a CHARGED smash. Hold the attack, let the hammer glow, then BOOM.`,`Hold attack to charge the hammer. Then BOOM!`)];

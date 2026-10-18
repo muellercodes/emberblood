@@ -34,7 +34,7 @@ STORY.lore.splice(STORY.lore.length-1,0,
   xl('yara',`The Oath has been busy breaking roads, Ash. You will need those gifts to get where they don't want you. Start with the Leap. It is the closest, and the least wet.`,`The Oath broke the roads. You need Ember's gifts. Start with the Leap.`));
 // 1.2 Sister Wren's warning, after her Ash Ward line
 STORY.wren.splice(3,0,
-  xl('wren',`One problem. Morrow's people smashed the old causeway to the Ash Ward and flooded the ditch. Three big gaps. Very rude.`,`Morrow broke the causeway to the Ash Ward. Three big gaps!`),
+  xl('wren',`One problem. Morrow's people smashed the old causeway to the Ash Ward and flooded the ditch. There are three gaps now, each too wide to step over.`,`Morrow broke the causeway to the Ash Ward. Three big gaps!`),
   {who:'wren',text:S(`Unless you can jump like a frog, you'll want Ember's Trial of the Leap first. In Whisperwood. Yara knows.`,`Can't jump? Do the Trial of the Leap first. In Whisperwood.`),skipIf:()=>hasAbil('jump')},
   xl('ash',`I can be a frog. I can be the best frog.`,`I can be a frog. The best frog!`));
 // 2.1 the Ash Ward: the Broken Causeway
@@ -61,7 +61,7 @@ STORY.ward_crag.unshift(xl('oriel',`You flew! The drakes carried my Ward-fire up
 // 2.3 the Sunken Ward: the Gloam Swirl
 STORY.bosses.gloamjaw.outro.push(xl('narr',`The bog water still spins around the Ward's little island, round and round, like soup that won't stop being stirred.`,`The water spins around the Ward's island. Round and round.`));
 STORY.a1_swirl_thrown=[
-  xl('narr',`WHOOSH. The swirl spins you around twice and spits you out on the bank. Your tail is dizzy. Tails can be dizzy.`,`WHOOSH! The swirl spins you and throws you out. Your tail is dizzy.`),
+  xl('narr',`WHOOSH. The swirl spins you around twice and spits you out on the bank. Even your tail feels dizzy.`,`WHOOSH! The swirl spins you and throws you out. Your tail is dizzy.`),
   xl('sedge',`(a soggy voice from the island) Sorry! Sorry. It does that. You need to go faster than it can grab. Like a skipping stone.`,`(from the island) Sorry! Go faster than it can grab. Like a skipping stone.`),
   xl('ash',`Who skips? Who even skips stones that well?`,`Who skips stones that well?`),
   xl('sedge',`The Fisk girl on the Brindlecross dock skips them eleven times. I can hear the plops from here. Everything travels in water.`,`Minnow Fisk, on the Brindlecross dock. She skips them eleven times!`)];
@@ -74,7 +74,7 @@ STORY.ward_mire.unshift(xl('sedge',`You skipped! Right over the swirl! Oh, I'm s
 // 2.4 the Frost Ward: Greymane's Ice (before the choice in his outro)
 STORY.bosses.greymane.outro.splice(1,0,xl('narr',`Behind Greymane, the Frost Ward is frozen solid inside a block of blue ice. Three cold lanterns glitter on tall ice pillars behind it.`,`The Frost Ward is frozen in ice. Three cold lanterns sit on ice pillars.`));
 STORY.a1_frost_ice=[
-  xl('tove',`(through the ice) Mmmf. Ash? It's Tove. I am inside an ice cube. Again. I would like that noted.`,`(in the ice) Ash? It's Tove. I'm in an ice cube. Again.`),
+  xl('tove',`(through the ice) Mmmf. Ash? It's Tove. I am inside an ice cube. Again. Every few hundred years, another ice cube.`,`(in the ice) Ash? It's Tove. I'm in an ice cube. Again.`),
   xl('tove',`The three lanterns on those ice pillars hold the frost. Light them and it melts. You can't get past their spikes. But an arrow can.`,`Light the three lanterns on the pillars. An arrow can reach them.`),
   xl('tove',`A burning one, preferably. Breathe fire, then shoot through it. Ember used to do that to light the festival. Showing off.`,`A burning arrow! Breathe fire and shoot through it.`),
   {who:'tove',text:S(`Ember's bow is in her Trial of the Tide. On the island in Lake Mirrow. Go on, I'll wait. I'm good at waiting. And at being cold.`,`No bow? It's in the Trial of the Tide, on Lake Mirrow. I'll wait.`),skipIf:()=>!!(G.weapons&&G.weapons.bow)},
@@ -212,7 +212,7 @@ a1Push('dell',1,xl('dell',`My girl Minnow can skip a stone eleven times. Thirtee
 a1Push('lure',1,xl('dell',`She floats! Want a ride? I'll take you across to the Mirefen landing any time. Just ask. Bring snacks.`,`She floats! I'll row you to the Mirefen any time. Just ask.`));
 // 10 bounty: 30 coins and a Heart Ember
 a1Step('bounty',1).reward={coins:30,xp:80,heart:'a1_he_bounty'};
-a1Push('bounty',1,xl('osric',`And this. The Watch Medal. It's a medal. It's also somehow good for your heart. Don't ask me how. I just give them out.`,`And the Watch Medal. It's somehow good for your heart.`));
+a1Push('bounty',1,xl('osric',`And this. The Watch Medal. Pin it over your heart and it keeps you going on the bad days. My old captain swore by his.`,`And the Watch Medal. It is good for your heart.`));
 // 11 bounty2: Osric and his dogs come to the Obsidian Gate fight
 a1Push('bounty2',1,xl('osric',`When you go for the Obsidian Gate, the dogs and I will be there. Those knights need someone to bark at them. The dogs. Not me. Mostly the dogs.`,`When you go to the Obsidian Gate, the dogs and I will come too!`));
 // 12 kettle: the Oath's Lift key rattles in the kettle (x0_vorlaxis: the lift on the climb)
@@ -482,11 +482,11 @@ defineDungeon('a1_nursery',{name:S('Ember’s Nursery','Ember’s Nursery'),leve
   story:{
     in:[xl('narr',`The cave smells like straw and old smoke. Someone has drawn on every wall, in charcoal, very small, very carefully.`,`It smells like straw and smoke. There are drawings on every wall.`),
       xl('narr',`A big red dragon. A little red dragon. The little one is always jumping.`,`A big red dragon. A little red dragon. The little one is always jumping.`)],
-    shrine:[xl('ember',`Oh! Oh, you found it. My nursery. Nobody's found it in a thousand years. Except, apparently, a goat.`,`Oh! You found my nursery! Only a goat found it before.`),
+    shrine:[xl('ember',`Oh! You found it. My nursery. Nobody's found it in a thousand years. Except, apparently, a goat.`,`Oh! You found my nursery! Only a goat found it before.`),
       xl('ash',`Ember? This was YOURS?`,`Ember? This was YOURS?`),
       xl('ember',`When I was little I used to sneak down from the mountain and play here. The goats on these cliffs taught me how to jump twice. Off nothing.`,`I played here when I was little. The goats taught me to jump twice!`),
       xl('ember',`Don't tell my father. He thought jumping was undignified. He was wrong about a lot of things.`,`Don't tell my father. He thought jumping was silly.`),
-      xl('ember',`I left a little spark here, in case one of my children ever came to play. It seems a goat got to it first. Well. Goats count.`,`I left a spark here for my children. A goat found it first. Goats count.`)],
+      xl('ember',`I left a little spark here, in case one of my children ever came to play. It seems a goat got to it first. Goats count.`,`I left a spark here for my children. A goat found it first. Goats count.`)],
     gift:[ch('ember',S(`Touch the stone, Ash. It tickles.`,`Touch the stone. It tickles.`),[
         {t:S(`Touch it`,`Touch it`),tone:'brave',then:[xl('narr',`It tickles your claws, then your knees, then the very tip of your tail.`,`It tickles your claws, your knees and your tail!`)]},
         {t:S(`Let Duchess touch it first`,`Let Duchess go first`),tone:'silly',then:[a1Goat('Meh.'),xl('narr',`Duchess licks the stone. It does not mind. Then you touch it too, and it tickles all the way to the tip of your tail.`,`Duchess licks the stone. Then you touch it. It tickles!`)]}]),
@@ -823,11 +823,11 @@ function a1LakeKingAct(o){
 // ---------- 10. Pip's Five Flames: a little lesson at each lit Ward
 const A1_PIPN={hollow:S('the Hollow Ward','the Hollow Ward'),ash:S('the Ash Ward','the Ash Ward'),crag:S('the Crag Ward','the Crag Ward'),mire:S('the Sunken Ward','the Sunken Ward'),frost:S('the Frost Ward','the Frost Ward')};
 const A1_PIPL={
-  hollow:[xl('iska',`Oh, look at him! Hello, little spark. Let's see what you can do.`,`Look at him! Hello, little spark.`),xl('pip',`Mip... ACHOO!`,`Mip... ACHOO!`),xl('narr',`Five sparks shoot out of Pip's nose and go bouncing across the grass.`,`Five sparks shoot out of Pip's nose!`),xl('iska',`Well. Catch them, Ash. Quickly. Sparks are terrible at staying put.`,`Catch them, Ash! Quickly!`)],
+  hollow:[xl('iska',`Oh, look at him! Hello, little spark. Let's see what you can do.`,`Look at him! Hello, little spark.`),xl('pip',`Mip... ACHOO!`,`Mip... ACHOO!`),xl('narr',`Five sparks shoot out of Pip's nose and go bouncing across the grass.`,`Five sparks shoot out of Pip's nose!`),xl('iska',`Catch them, Ash. Quickly. Sparks are terrible at staying put.`,`Catch them, Ash! Quickly!`)],
   ash:[xl('bram',`A DRAKE! Finally, someone small enough to teach properly. Lesson one: be LOUD!`,`A DRAKE! Lesson one: be LOUD!`),xl('pip',`mip.`,`mip.`),xl('bram',`LOUDER!`,`LOUDER!`),xl('pip',`MIP!`,`MIP!`),xl('bram',`That's the spirit! Now you, Ash. ROAR next to him. Show him how it's done!`,`Now you, Ash. ROAR next to him!`)],
   crag:[xl('oriel',`My drakes flew circles around this spire. Fly with him, Ash. He'll show you the way.`,`Fly with him around the spire, Ash. He'll show you the way.`)],
   mire:[xl('sedge',`Oh no. He's in the bog. Everyone ends up in the bog. Dry him off, gently. Gently! He's a drake, not a crumpet.`,`Oh no, he fell in the bog! Dry him off. Gently!`),xl('narr',`Breathe fire on Pip for about two seconds. Not too short, not too long. Watch the bar.`,`Breathe on Pip for two seconds. Not too long!`)],
-  frost:[xl('tove',`A warm little drake? For me? On MY Ward? Oh, I could cry. I won't. It would freeze.`,`A warm little drake? For me? I could cry!`),xl('tove',`My stone is still cold inside. Warm it with him, side by side. And mind the wolves. They love a cold stone.`,`Warm my stone with him. Mind the wolves!`)]};
+  frost:[xl('tove',`A warm little drake? For me? On MY Ward? I haven't been this warm in a thousand years.`,`A warm little drake? For me? So warm!`),xl('tove',`My stone is still cold inside. Warm it with him, side by side. And mind the wolves. They love a cold stone.`,`Warm my stone with him. Mind the wolves!`)]};
 function a1PipLeft(){ return ['hollow','ash','crag','mire','frost'].filter(id=>!G.flags['a1_pip_'+id]); }
 function a1PipAt(){
   const p=player, left=a1PipLeft().filter(id=>G.wards[id]&&WARDS[id]); if(!left.length) return null;
@@ -850,7 +850,7 @@ const a1RoarKey=()=>{ try{ return btnLabel('roar')||'R'; }catch(e){ return 'R'; 
 { const base=doRoar; doRoar=function(free){ base(free); try{ const L=A1.pipL; if(L&&L.id==='ash'&&L.ph==='loud'&&G.pip&&dist(player.x,player.y,G.pip.x,G.pip.y)<320) a1PipRoared(L);
   if(a1on('a1_bram',0)&&a1easy()){ const [x,y]=A1W.anvil.pits[2]; if(dist(player.x,player.y,x,y)<240) a1PitLight(2); } }catch(e){ console.error(e); } }; }
 function a1PipRoared(L){
-  L.ph='fight'; ftext(G.pip.x,G.pip.y-30,'MIIIP!','#ffb070',16); taunt('bram',S(`THAT'S IT! Oh. Oh, and here come some kobolds. Lesson two: be loud AT them.`,`Here come kobolds! Be loud AT them!`));
+  L.ph='fight'; ftext(G.pip.x,G.pip.y-30,'MIIIP!','#ffb070',16); taunt('bram',S(`THAT'S IT! And here come some kobolds. Lesson two: be loud AT them.`,`Here come kobolds! Be loud AT them!`));
   const W=WARDS.ash; L.foes=[]; for(let i=0;i<4;i++){ const a=i*TAU/4+0.4, s=spotNear(W.x+Math.cos(a)*330,W.y+Math.sin(a)*300,0,80); const e=makeEnemy('kobold',s.x,s.y,{level:Math.max(2,(player.level|0)-1),aggro:true,homeX:W.x,homeY:W.y,leash:1200}); e.spawnIn=0.5; puff(e.x,e.y); L.foes.push(e); }
 }
 function a1PipDone(L){
@@ -973,7 +973,7 @@ STORY.a1_n3=STORY.a1_n3||[xl('narr',`A cloud of grey moths swirls round the thie
 STORY.a1_passlunch=STORY.a1_passlunch||[xl('narr',`Mom is sitting on the rockfall with a basket on her knees. She has clearly been waiting a while.`,`Mom is waiting at the pass with a basket.`),
   xl('maren',`Sandwiches. Cheese, cheese, and a cheese one for Pip. Eat something before you chase anybody.`,`Sandwiches! Eat something first.`),
   {who:'maren',text:S(`The coast is all cliffs and currents, love. Learn to jump twice and skip first. Hollis's goat knows how.`,`Learn to jump twice first. Ask Hollis.`),skipIf:()=>hasAbil('dbljump')},
-  {who:'maren',text:S(`And you'll want to skim across water like a stone. Little Minnow on the Brindlecross dock can teach you. She's very fast and very rude.`,`Learn to skim on water. Ask Minnow on the dock.`),skipIf:()=>hasAbil('skimmer')},
+  {who:'maren',text:S(`And you'll want to skim across water like a stone. Little Minnow on the Brindlecross dock can teach you. She's very fast and very cheeky.`,`Learn to skim on water. Ask Minnow on the dock.`),skipIf:()=>hasAbil('skimmer')},
   xl('maren',`Bring the Heart home. And bring yourself home first. Love you. Eat something.`,`Bring the Heart home. Bring YOU home first. Eat something.`)];
 const a1TextOf=l=>String(Array.isArray(l)?l[1]:l&&l.text||'');
 if(typeof festIntroLines==='function'){ const base=festIntroLines; festIntroLines=function(day){ const L=base(day); try{
