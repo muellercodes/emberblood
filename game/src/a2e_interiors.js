@@ -391,7 +391,7 @@ function doorWalkTick(dt){
   for(const d of mapList(DOORS,curMap())){
     if(Math.abs(d.x-p.x)>70||Math.abs(d.y-p.y)>70||d===DW.hold||!doorWalkable(d)) continue;
     const r=doorRel(d,p);
-    if(r.lat>=(d.cave?26:18)||r.al>=40||r.al<=-50) continue;
+    if(r.lat>=(d.cave?26:18)||r.al>=40||r.al<=-58) continue;
     if(push.x*r.ux+push.y*r.uy<0.4) continue;
     // at the door, or held back in front of it (a locked door answers from there too, its gate often bars the way)
     if(r.al<=-9&&!(mv<0.8)&&!(r.al>-46&&doorLockText(d)!=null)) continue;
