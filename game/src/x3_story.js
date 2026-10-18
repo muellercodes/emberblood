@@ -1709,7 +1709,7 @@ if(typeof BARKS!=='undefined'&&!BARKS.some(b=>/^m_/.test(String(b.k)))){
 if(typeof CHATS!=='undefined'&&!CHATS.some(c=>/^m_/.test(String(c.k)))){
   const inA=()=>actOf(G.stage)>=4&&curMap()===3;
   try{
-    VCH('m3s_dw','id:m_dabble','id:m_winnie',inA,[[0,S(`Is it a good day, Winnie?`,`Is it a good day, Winnie?`)],[1,S(`Gerald says no.`,`Gerald says no.`)],[0,S(`Gerald always says no.`,`Gerald always says no.`)]]);
+    VCH('m3s_dw','id:m_dabble','id:m_winnie',inA,[[0,S(`Is it a good day, Winnie?`,`Is it a good day, Winnie?`)],[1,S(`Ollie says no.`,`Ollie says no.`)],[0,S(`Ollie always says no.`,`Ollie always says no.`)]]);
     VCH('m3s_rk','id:m_rafi','id:m_kiln',inA,[[0,S(`Kiln, have you ever seen snow?`,`Kiln, have you seen snow?`)],[1,S(`I've MADE snow. Out of glass. It was sharp.`,`I MADE snow. Out of glass. It was sharp.`)]]);
     VCH('m3s_wr','id:wren','id:m_ripple',inA,[[1,S(`Your spelling is atrocious.`,`Your spelling is awful.`)],[0,S(`Your spelling is underwater.`,`Your spelling is underwater.`)]]);
     VCH('m3s_tg','id:ev_tikka','id:m_gilly',inA,[[0,S(`Bread is better than fish.`,`Bread is better than fish.`)],[1,S(`Fish IS bread. Wet bread.`,`Fish IS bread. Wet bread.`)]]);
