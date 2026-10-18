@@ -113,8 +113,10 @@ function qpRefresh(){
     for(const c of CAST){
       if(!QP_TOWNS.has(c.town)||!npcPresent(c.id)) continue;
       const T=towns[c.town]||(towns[c.town]={fixed:0,side:[],errs:[]});
+      // someone already waiting on Ash for a quest (a ? or …) offers nothing new until that is done
+      if(npcMarkerWait(c.id)) continue;
       // a gold ! that is not a side quest's (the story, a Case Book quest): it always shows, and takes a place
-      if(!npcMarkerWait(c.id)&&storyMarker(c.id)){ T.fixed++; continue; }
+      if(storyMarker(c.id)){ T.fixed++; continue; }
       let best=null, bp=1e9, er=null;
       for(const id of by[c.id]||[]){ const d=QDEFS[id];
         let ok=false; try{ ok=qAvail(id); }catch(e){ ok=false; } if(!ok) continue;
