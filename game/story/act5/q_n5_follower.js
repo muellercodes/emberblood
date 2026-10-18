@@ -60,7 +60,7 @@ quest({
         { t: ['Duchess. The real one.', 'Duchess!'], right: true },
         { t: ['A shadow goat made of memories', 'A shadow goat'],
           hint: ["Memories don't chew things. Something real chewed that tassel.", 'Shadows do not chew.'] },
-        { t: 'Pip', hint: ['Pip has been on your head the whole time. Mostly.', 'Pip is on your head!'] },
+        { t: 'Pip', hint: ['Pip has been riding on your head the whole way up.', 'Pip is on your head!'] },
       ],
       then: ['set n5_duchess_known'],
     },

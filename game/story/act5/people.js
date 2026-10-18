@@ -37,9 +37,9 @@ people({
     ],
     n5_who: [
       ['narr', 'Everyone who climbed this far waits by the Crown Shrine. You count them on your claws.', 'You count your friends by the shrine.'],
-      { if: 'flag n5_vesper', then: [{ if: 'quest q_n5_oona started', then: [['c_vesper', "Here. Obviously. I was here first. I'm always first.", 'Here. I was here first.']],
+      { if: 'flag n5_vesper', then: [{ if: 'quest q_n5_oona started', then: [['c_vesper', "Here. I got here before any of you, by the way.", 'Here. I was here first.']],
           else: [{ if: 'quest q_n5_vesper done', then: [['c_vesper', 'Here. Because Gran said so.', 'Here. Because Gran said.']],
-            else: [['c_vesper', "Here. Obviously. ...Gran doesn't know where I am, you know. She'll be up all night with the kettle on.",
+            else: [['c_vesper', "Here. ...Gran doesn't know where I am, you know. She'll be up all night with the kettle on.",
               "Here. Gran doesn't know where I am, though.", { do: ['quest start q_n5_oona'] }]] }] }],
         else: [{ if: 'flag n5_vesper_left', then: [['ash', "Vesper isn't here. I left her hanging on the Silk Gallery. Granny Oona would know how I should say sorry.",
             "I left Vesper on the silk bridge. Gran will know what to do.", { do: ['quest start q_n5_vesper'] }]],

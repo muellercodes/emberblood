@@ -251,7 +251,7 @@ function heartText(){
   if(st==='shards') return n>=3?S('You have all 3 Shards. Somebody needs to mend them together.','You have all 3 Shards!')
     :(n===1?S('The Heart was cracked into three Shards. You have 1 of the 3 Shards. It is warm, and it tugs gently toward the next one.','You have 1 of 3 Shards.')
     :S(`The Heart was cracked into three Shards. You have ${n} of the 3 Shards. They are warm, and they tug gently toward the last one.`,`You have ${n} of 3 Shards.`));
-  if(st==='stolen') return S('A masked thief stole the Ember Heart from the forge. Get it back!','A thief stole the Ember Heart!');
+  if(st==='stolen') return S('A masked thief stole the Ember Heart. Get it back!','A thief stole the Ember Heart!');
   if(st==='home') return (F.a1_heart==='ward'||(!F.a1_heart&&G.choices.ending==='warden'))?S('The Ember Heart glows in the sixth Ward-fire on top of Cinder Mountain.','The Ember Heart glows on the mountain.')
     :S("The Ember Heart is safe in Mom's forge, humming softly.",'The Ember Heart is safe in the forge.');
   return '';
@@ -327,9 +327,14 @@ function pebbleAll(){
   return out.sort((a,b)=>pbAct(a.id)-pbAct(b.id)||String(a.id).localeCompare(String(b.id),'en',{numeric:true}));
 }
 const pebbleRead=id=>!!(G&&G.flags&&G.flags[id]);
+// a letter from an act (its id prefix a1_, c_, f_, m_, n_) arrives in that act or the one right after it, never later,
+// and on Nightfall Peak only the peak's own: Mom's "catch that thief" must not land in Moonfall, and a test save made
+// by __eb.actStart(5) (every earlier letter's `when` is true) gets no Gearhaven news on the black glass. Data letters
+// (other ids) and a letter asked for by pebbleNow(id) are never held back.
+function pbStale(id){ const a=pbAct(id); if(a>=9) return false; let cur=0; try{ cur=actOf(G.stage)|0; }catch(e){} if(!cur) return false; return cur>=5?a<5:cur-a>1; }
 function pebbleDue(){
   if(!G||G.mode!=='story') return [];
-  return pebbleAll().filter(d=>{ if(pebbleRead(d.id)) return false; try{ return typeof d.when==='function'?!!d.when():!!d.when; }catch(e){ console.error(e); return false; } }).map(d=>d.id);
+  return pebbleAll().filter(d=>{ if(pebbleRead(d.id)||pbStale(d.id)) return false; try{ return typeof d.when==='function'?!!d.when():!!d.when; }catch(e){ console.error(e); return false; } }).map(d=>d.id);
 }
 // pebbleNow(id?): Pebble comes as soon as it is calm, with that letter (even if its `when` is not true yet), or the next due one
 function pebbleNow(id){ if(id&&pebbleRead(id)) return false; if(id&&!pebbleAll().some(d=>d.id===id)) return false; PEBRT.force=id||null; PEBRT.want=1; PEBRT.wait=0.6; PEBRT.giveUp=0; return true; }
@@ -519,14 +524,14 @@ const ACT_RECAP={
     P.push(S(`That night the moon was a little smaller.`,`That night the moon was smaller.`));
     return P; }},
   4:{label:()=>thrActName(4),done:()=>!!(G.flags.act4_done||G.flags.m_done),paras:()=>{
-    const P=[S(`Ash sailed east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the sea, and the Glass Desert, where the moon's broken light fell as glass.`,`Ash sailed to Moonfall. There is a city under the sea and a desert of glass.`),
+    const P=[S(`Ash crossed the sea east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the water, and the Glass Desert, where the moon's broken light fell as glass.`,`Ash went east to Moonfall. There is a city under the sea and a desert of glass.`),
       S(`During an eclipse, Nyxara came herself: a moth the size of a house. She took a huge bite of the moon, and every night since has been darker.`,`Nyxara came. She is a moth as big as a house. She took a huge bite of the moon.`)];
-    if(G.choices.m_hush==='free') P.push(S(`Ash cut Hush's silver leash, and she floated away, free and glowing.`,`Ash cut Hush's leash. She flew away, free.`));
-    else if(G.choices.m_hush==='foe') P.push(S(`Ash took the Shard and left Hush on her leash. She crumbled into a hundred little white moths that flew up to their Mother.`,`Ash took the Shard. Hush turned into little moths.`));
-    P.push(S(`At the Eclipse Observatory, Hush guarded the last Shard on a silver leash. Ash won it, and the Ember Heart was made whole again. Then Nyxara ate the last of the moon, and a black mountain rose out of the sea at the edge of the world.`,`Ash got the last piece and the Heart was fixed. Then Nyxara ate the rest of the moon. A black mountain rose up.`));
+    if(G.choices.m_hush==='free') P.push(S(`At the Eclipse Observatory, Hush guarded the last Shard on a silver leash. Ash cut the leash, and she floated away, free and glowing.`,`Hush guarded the last Shard. Ash cut her leash. She flew away, free.`));
+    else if(G.choices.m_hush==='foe') P.push(S(`At the Eclipse Observatory, Hush guarded the last Shard on a silver leash. Ash took the Shard and left her tied, and she crumbled into a hundred little white moths that flew up to their Mother.`,`Hush guarded the last Shard. Ash took it and left her tied. She turned into little moths.`));
+    P.push(S(`With the last Shard in Ash's claws, Mom made the Ember Heart whole again. Then Nyxara ate the last of the moon, and a black mountain rose out of the sea at the edge of the world.`,`Mom fixed the Heart. Then Nyxara ate the rest of the moon. A black mountain rose up.`));
     return P; }},
   5:{label:()=>thrActName(5),done:()=>!!(G.done&&(G.flags.act5_done||G.flags.n_done||G.choices.n_end)),paras:()=>{
-    const P=[S(`Ash climbed Nightfall Peak, a mountain made of the moon's memories, with friends from every land, and faced Nyxara at the very top.`,`Ash climbed Nightfall Peak with friends and faced Nyxara.`)];
+    const P=[S(`Ash climbed Nightfall Peak, a mountain made of the moon's memories, and faced Nyxara at the very top.`,`Ash climbed Nightfall Peak and faced Nyxara.`)];
     let e=''; try{ if(typeof endingSoFar==='function') e=endingSoFar(); }catch(err){}
     if(!e) e={dawn:S(`Ash broke Nyxara's hold for good. She became a thousand silver moths that mended the moon, and the Long Night ended in a real morning.`,`Ash ended the Long Night. The moths fixed the moon. Morning came.`),
       embermoon:S(`Ash gave the Ember Heart to the empty moon. It burns gold now, and Nyxara sleeps curled round it, warm at last.`,`Ash gave the Heart to the moon. Now the moon is gold and warm.`),

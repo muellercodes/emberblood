@@ -623,7 +623,7 @@ const N4S_ENDINGS={
     ...n4sIfL(e==='warden',xl('tove',`A w-w-warm moon. FINALLY. I would like that noted.`,`A warm moon! Finally!`)),
     ...n4sIfL(e==='hero',xl('ember',`My Heart, up in the sky. Oh, Ash. Now everyone can see it.`,`My Heart in the sky! Now everyone can see it.`)),
     ...n4sIfL(n4sVes,xl('c_vesper',`You threw a priceless magic heart at the moon. Cousin, I have never been prouder of anyone.`,`You threw a magic heart at the moon! I am so proud.`))]; }},
-  moth:{title:S('The Moth and the Moon','The Moth and the Moon'),n:3,msg:S('You gave back the moon, and gave a lonely moth a lantern.','You gave back the moon. And a lonely moth got a lantern.'),lines:()=>{
+  moth:{title:S('The Moth and the Moon','The Moth and the Moon'),n:3,msg:S('You called her Nyx and lit her a lantern, and the moon came home.','You lit Nyx a lantern. The moon came home.'),lines:()=>{
     const e=n4sEnd(); return [
     n4sDo(()=>n4sCutDo('lantern')),
     xl('narr',`You take out a little paper lantern. It's a bit squashed. It's been through a lot. You light it, very gently.`,`You take out a little paper lantern. You light it gently.`),
