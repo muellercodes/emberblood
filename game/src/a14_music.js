@@ -8,6 +8,7 @@
 //   Music.muted             true when music is off
 //   Music.duck(on)          lower music while dialogue is open
 //   Music.setVolume(v)      0..1 (default 0.5)
+//   Music.setLevel(n)       the Settings slider, 0..100 (saved as eb_vol_music, read through VOL in a1_core.js); 0 is silent
 //   Music._renderOffline(name,sec)  renders a theme or stinger to an AudioBuffer (testing)
 //
 // Score notation (all data below is hand written):
@@ -840,7 +841,7 @@ const Music=(()=>{
     cp.threshold.value=-12; cp.knee.value=10; cp.ratio.value=3; cp.attack.value=.006; cp.release.value=.25;
     C.dk=gn(ac,1); const trim=gn(ac,.35), ls=flt(ac,'lowshelf',120), hs=flt(ac,'highshelf',2500), hp=flt(ac,'highpass',38,.7);
     ls.gain.value=-3; hs.gain.value=6;   // tame the sub (phones cannot play it anyway), add a little air
-    C.dk.connect(trim); trim.connect(ls); ls.connect(hs); hs.connect(hp); hp.connect(cp); cp.connect(C.out); C.out.connect(C.vis); C.vis.connect(ac.destination);
+    C.dk.connect(trim); trim.connect(ls); ls.connect(hs); hs.connect(hp); hp.connect(cp); cp.connect(C.out); C.out.connect(C.vis); C.vis.connect(!offline&&SFX.ac===ac&&SFX.speakers?SFX.speakers:ac.destination);   // the speakers, not the Sounds bus
     C.rvIn=gn(ac,1); const cv=ac.createConvolver(); cv.buffer=impulse(ac,2.3); const rvo=gn(ac,.5);
     C.rvIn.connect(cv); cv.connect(rvo); rvo.connect(C.dk);
     C.dlIn=gn(ac,1); C.dly=ac.createDelay(1.5); C.dly.delayTime.value=.4;
@@ -919,9 +920,10 @@ const Music=(()=>{
     normal:'arena',waves:'arena',gameover:'dead',death:'dead',sad:'tender',emotional:'tender'};
   const XF=2;
   const K=.55;          // master level at volume 1 (calibrated by offline renders, keeps music well under the SFX)
-  let C=null, muted=!!store.get('eb_music_off',false), vol=.5, cur=null, timer=null;
+  let C=null, muted=!!store.get('eb_music_off',false), vol=.5, lvl=VOL.music, cur=null, timer=null;
   const live=[], stings=[];
-  const outGain=()=>muted?0:vol*K;
+  const quiet=()=>muted||lvl<=0;
+  const outGain=()=>quiet()?0:vol*K*VOL.gain(lvl);
   function resolve(n){ if(n==null) return null; if(MSCORE[n]) return n; const a=ALIAS[String(n).toLowerCase()]; return a&&MSCORE[a]?a:undefined; }
   function tick(){
     if(!C) return;
@@ -949,17 +951,17 @@ const Music=(()=>{
     try{ C=mkCtx(ac,outGain(),false); }catch(e){ C=null; return; }
     timer=setInterval(tick,25);
     try{ document.addEventListener('visibilitychange',()=>{ if(!C) return; const t=C.ac.currentTime; C.vis.gain.cancelScheduledValues(t); C.vis.gain.setTargetAtTime(document.hidden?0:1,t,document.hidden?.05:.4); }); }catch(e){}
-    if(cur&&!muted) start(cur,1.2);
+    if(cur&&!quiet()) start(cur,1.2);
   }
   function setTheme(n){
     const r=resolve(n); if(r===undefined) return;      // unknown name: keep whatever is playing
     if(r===cur) return; cur=r;
-    if(!C||muted) return;
+    if(!C||quiet()) return;
     if(r==null){ for(const I of live) fadeOut(I,XF); return; }
     start(r,1.6);
   }
   function stinger(n){
-    const th=MSTING[n]; if(!C||muted||!th) return;
+    const th=MSTING[n]; if(!C||quiet()||!th) return;
     const now=C.ac.currentTime;
     for(const S of stings) fadeOut(S,.15);
     const I=mkInst(C,th,C.sdest,true); I.t0=I.born=now+.03; stings.push(I);
@@ -968,14 +970,18 @@ const Music=(()=>{
     pump(C,I,now+.15,now);
   }
   function toggle(){
-    muted=!muted; store.set('eb_music_off',muted);
-    if(C){
-      const t=C.ac.currentTime; C.out.gain.cancelScheduledValues(t); C.out.gain.setTargetAtTime(outGain(),t,.08);
-      if(muted){ for(const I of live) fadeOut(I,.3); for(const S of stings) fadeOut(S,.2); }
-      else if(cur) start(cur,1);
-    }
+    const q0=quiet(); muted=!muted; store.set('eb_music_off',muted); hear(q0,.08);
     return muted;
   }
+  // after a change to mute or the slider: set the output, and stop or restart the theme if it went silent or came back
+  function hear(q0,tc){
+    if(!C) return;
+    const t=C.ac.currentTime; C.out.gain.cancelScheduledValues(t); C.out.gain.setTargetAtTime(outGain(),t,tc);
+    const q=quiet(); if(q===q0) return;
+    if(q){ for(const I of live) fadeOut(I,.3); for(const S of stings) fadeOut(S,.2); }
+    else if(cur) start(cur,1);
+  }
+  function setLevel(n){ const q0=quiet(); lvl=VOL.n(n); VOL.music=lvl; store.set('eb_vol_music',lvl); hear(q0,.05); return lvl; }
   function duck(on){ if(!C) return; const t=C.ac.currentTime; C.dk.gain.cancelScheduledValues(t); C.dk.gain.setTargetAtTime(on?.45:1,t,on?.15:.35); }
   function setVolume(v){ vol=clamp(+v||0,0,1); if(C){ const t=C.ac.currentTime; C.out.gain.cancelScheduledValues(t); C.out.gain.setTargetAtTime(outGain(),t,.05); } }
 
@@ -1016,8 +1022,8 @@ const Music=(()=>{
     return out;
   }
 
-  return {init,setTheme,stinger,toggle,duck,setVolume,
-    get muted(){ return muted; }, get theme(){ return cur; }, get volume(){ return vol; },
+  return {init,setTheme,stinger,toggle,duck,setVolume,setLevel,
+    get muted(){ return muted; }, get theme(){ return cur; }, get volume(){ return vol; }, get level(){ return lvl; }, get silent(){ return quiet(); },
     themes:()=>Object.keys(MSCORE), stingers:()=>Object.keys(MSTING),
     _renderOffline:renderOffline, _check:check, _isSting:n=>!MSCORE[n]&&!!MSTING[n], _parts:n=>{ const th=MSCORE[n]||MSTING[n]; return th?th.parts.map(P=>P.n):[]; },
     _dump:n=>{ const th=MSCORE[n]||MSTING[n]; if(!th) return null; th._dbg=1; const names=(th.intro||[]).concat(th.form||[]); const B=build(th,names); delete th._dbg;

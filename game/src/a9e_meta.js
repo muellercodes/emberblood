@@ -38,7 +38,7 @@ function musicUpdate(dt){
   if(m!==mLast){ mLast=m; try{ Music.setTheme(m); }catch(e){} }
 }
 // musical cue when music is on, a plain sound effect otherwise
-function jingle(name,sfx){ let ok=false; try{ ok=!Music.muted&&!!SFX.ac; if(ok) Music.stinger(name); }catch(e){ ok=false; } if(!ok&&sfx) SFX.play(sfx); }
+function jingle(name,sfx){ let ok=false; try{ ok=!Music.silent&&!!SFX.ac; if(ok) Music.stinger(name); }catch(e){ ok=false; } if(!ok&&sfx) SFX.play(sfx); }
 
 // ---------- quest tracking: up to three quests shown on screen, one "followed" by the compass
 const TRACK_MAX=3;
@@ -129,13 +129,11 @@ function openSettings(from){ settingsFrom=from||'menu'; renderSettings(); show('
 function closeSettings(){ show(settingsFrom==='pause'?'pause':'menu'); if(settingsFrom==='menu') refreshMenu(); }
 function renderSettings(){
   const seg=(id,val)=>{ for(const b of document.querySelectorAll(`#${id} button`)) b.setAttribute('aria-pressed',String(b.dataset.v===String(val))); };
-  seg('setSfx',SFX.muted?'off':'on'); seg('setMusic',Music.muted?'off':'on'); seg('setNums',settings.nums?'on':'off');
+  seg('setNums',settings.nums?'on':'off');
   seg('setTouch',settings.touch); seg('setBtn',settings.btn<0.95?'s':settings.btn>1.05?'l':'m'); seg('setAuto',autoAttackOn()?'on':'off');
 }
 function applySetting(id,v){
-  if(id==='setSfx'){ if((v==='off')!==SFX.muted) toggleMute(); }
-  else if(id==='setMusic'){ if((v==='off')!==Music.muted){ Music.toggle(); if(!Music.muted){ mLast=null; } } }
-  else if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
+  if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
   else if(id==='setTouch'){ settings.touch=v; store.set('eb_touch',v); }
   else if(id==='setBtn'){ settings.btn=v==='s'?0.88:v==='l'?1.16:1; store.set('eb_btn',settings.btn); }
   else if(id==='setAuto'){ settings.auto=v==='on'; store.set('eb_auto',settings.auto); }

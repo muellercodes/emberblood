@@ -34,15 +34,34 @@ function hexRGB(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&
 function mixRGB(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; }
 
 // ================= sound (synthesized)
+// v11 volume: two sliders in Settings, Music and Sounds, 0 to 100 (store eb_vol_music, eb_vol_sfx; 100 is the mix as it
+// was made, 0 is silent). Mute (the N key, the HUD button) is separate (eb_muted, eb_music_off) and keeps the slider values.
+// A save from before the sliders: a sound switched off on its own in Settings becomes a slider at 0; both off (the N key)
+// stays muted.
+const VOL=(()=>{
+  let s=store.get('eb_vol_sfx',null), m=store.get('eb_vol_music',null);
+  if(s==null||m==null){
+    const so=!!store.get('eb_muted',false), mo=!!store.get('eb_music_off',false);
+    if(s==null){ s=so&&!mo?0:100; if(so&&!mo) store.set('eb_muted',false); store.set('eb_vol_sfx',s); }
+    if(m==null){ m=mo&&!so?0:100; if(mo&&!so) store.set('eb_music_off',false); store.set('eb_vol_music',m); }
+  }
+  const n=v=>clamp(Math.round(+v||0),0,100);
+  return {sfx:n(s),music:n(m),n,gain:v=>Math.pow(clamp(v,0,100)/100,2)};   // a squared curve: half way sounds about half as loud
+})();
 const SFX=(()=>{
-  let ac=null,master=null,noiseBuf=null,fireNode=null,fireGain=null;
-  let muted=!!store.get('eb_muted',false);
+  let ac=null,master=null,bus=null,speakers=null,noiseBuf=null,fireNode=null,fireGain=null;
+  let muted=!!store.get('eb_muted',false), level=VOL.sfx;
   const last={}, loops={};
+  // the Sounds bus: everything but the music ends here. Other modules connect their own sounds to ac.destination, so on
+  // this context that name points at the bus (the real speakers stay in SFX.speakers, where the music goes).
+  const busGain=()=>muted?0:VOL.gain(level);
   function init(){
     if(ac){ if(ac.state==='suspended') ac.resume(); return; }
     try{
       ac=new (window.AudioContext||window.webkitAudioContext)();
-      master=ac.createGain(); master.gain.value=muted?0:0.45; master.connect(ac.destination);
+      speakers=ac.destination; bus=ac.createGain(); bus.gain.value=busGain(); bus.connect(speakers);
+      try{ Object.defineProperty(ac,'destination',{value:bus,configurable:true}); }catch(e){}
+      master=ac.createGain(); master.gain.value=0.45; master.connect(bus);
       noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
       const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
     }catch(e){ ac=null; }
@@ -61,7 +80,7 @@ const SFX=(()=>{
     s.connect(f); f.connect(g); g.connect(master); s.start(t,Math.random()); s.stop(t+dur+0.03);
   }
   function play(name,vol){
-    if(!ac||muted) return;
+    if(!ac||muted||level<=0) return;
     const now=performance.now(); if(last[name]&&now-last[name]<45) return; last[name]=now;
     const v=vol==null?1:vol;
     try{
@@ -113,7 +132,7 @@ const SFX=(()=>{
   function setFire(on){
     if(!ac) return;
     try{
-      if(on&&!fireNode&&!muted){
+      if(on&&!fireNode&&!muted&&level>0){
         fireNode=ac.createBufferSource(); fireNode.buffer=noiseBuf; fireNode.loop=true;
         const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=700; f.Q.value=0.6;
         fireGain=ac.createGain(); fireGain.gain.value=0;
@@ -126,8 +145,12 @@ const SFX=(()=>{
       }
     }catch(e){ fireNode=null; fireGain=null; }
   }
-  function toggle(){ muted=!muted; store.set('eb_muted',muted); if(master) master.gain.value=muted?0:0.45; if(muted) setFire(false); return muted; }
-  return {init,play,setFire,toggle,ambient,get muted(){return muted;},get ac(){return ac;},get noise(){return noiseBuf;}};
+  function busTo(tc){ if(!bus) return; try{ const t=ac.currentTime; bus.gain.cancelScheduledValues(t); bus.gain.setTargetAtTime(busGain(),t,tc); }catch(e){ bus.gain.value=busGain(); } }
+  function toggle(){ muted=!muted; store.set('eb_muted',muted); busTo(0.02); if(muted) setFire(false); return muted; }
+  // the Sounds slider: 0 to 100, applied at once and saved
+  function setVolume(v){ level=VOL.n(v); VOL.sfx=level; store.set('eb_vol_sfx',level); busTo(0.03); if(level<=0) setFire(false); return level; }
+  return {init,play,setFire,toggle,ambient,setVolume,get muted(){return muted;},get volume(){return level;},get silent(){return muted||level<=0;},
+    get ac(){return ac;},get speakers(){return speakers||(ac&&ac.destination);},get noise(){return noiseBuf;}};
 })();
 
 // ================= canvas

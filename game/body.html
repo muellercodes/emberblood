@@ -46,6 +46,23 @@ body.padnav .dlg:focus{outline:none;animation:none}
 #settings .setrow{flex-wrap:wrap}
 #settings .setrow>span{flex:1 1 150px;min-width:0}
 #settings .setrow>.seg,#settings .setrow>.btn{margin-left:auto}
+/* v11: the volume sliders (Settings > Music and Sounds) and the difficulty row. --f (0 to 1) is the slider's value: the
+   ember fill runs to the middle of the knob. */
+#settings .setrow>.vsl{margin-left:auto}
+#settings .setvol>span{flex:1 1 80px}
+.vsl{--tw:22px;display:flex;align-items:center;gap:10px;flex:1 1 200px;min-width:170px;max-width:270px}
+.vsl input[type=range]{--f:1;-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:32px;margin:0;padding:0;background:transparent;cursor:pointer;touch-action:none;border-radius:10px}
+.vsl input[type=range]::-webkit-slider-runnable-track{box-sizing:border-box;height:10px;border-radius:6px;border:1px solid var(--edge);background:linear-gradient(90deg,var(--hot-a),var(--ember)) 0 0/calc(var(--tw)/2 - 1px + (100% - var(--tw) + 2px)*var(--f)) 100% no-repeat,#170b08;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.vsl input[type=range]::-moz-range-track{box-sizing:border-box;height:10px;border-radius:6px;border:1px solid var(--edge);background:linear-gradient(90deg,var(--hot-a),var(--ember)) 0 0/calc(var(--tw)/2 - 1px + (100% - var(--tw) + 2px)*var(--f)) 100% no-repeat,#170b08;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.vsl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:var(--tw);height:var(--tw);margin-top:-7px;border-radius:50%;border:2px solid #2a130d;background:radial-gradient(circle at 38% 34%,#fff4cf 0,#ffc35a 42%,#e8521f 100%);box-shadow:0 0 10px rgba(255,150,60,.55),0 2px 4px rgba(0,0,0,.5);transition:transform .08s}
+.vsl input[type=range]::-moz-range-thumb{box-sizing:border-box;width:var(--tw);height:var(--tw);border-radius:50%;border:2px solid #2a130d;background:radial-gradient(circle at 38% 34%,#fff4cf 0,#ffc35a 42%,#e8521f 100%);box-shadow:0 0 10px rgba(255,150,60,.55),0 2px 4px rgba(0,0,0,.5)}
+.vsl input[type=range]:active::-webkit-slider-thumb{transform:scale(1.12)}
+.vsl input[type=range]:focus{outline:none}
+.vsl input[type=range]:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.vsl output{min-width:2.4em;text-align:right;font-weight:700;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.setvol.off .vsl output{color:var(--muted)}
+.setrow small.setlock,.setrow small.setmuted{color:var(--gold)}
+#setDiff button:disabled{opacity:.45;cursor:not-allowed}
 #setPadBox .setnote{margin:6px 0 2px;font-size:13px;text-align:left;color:var(--muted)}
 @media (max-width:600px){#howPadCv{display:none}.padkeys .pk{text-align:left}}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
@@ -142,6 +159,15 @@ html.sb .panel.skp .seg button[aria-pressed="true"],html.sb .panel.lgp .seg butt
 html.sb .setrow{border-bottom:2px dashed rgba(59,34,51,.16)}
 html.sb .setrow>span{color:#3b2233;font-weight:600}
 html.sb .setsec{color:#c8542a}
+html.sb .vsl{--tw:26px}
+html.sb .vsl input[type=range]::-webkit-slider-runnable-track{height:14px;border:3px solid #3b2233;border-radius:9px;background:linear-gradient(180deg,#ffb85a,#f07a34) 0 0/calc(var(--tw)/2 - 3px + (100% - var(--tw) + 6px)*var(--f)) 100% no-repeat,#ffeccb;box-shadow:0 2px 0 #3b2233}
+html.sb .vsl input[type=range]::-moz-range-track{height:14px;border:3px solid #3b2233;border-radius:9px;background:linear-gradient(180deg,#ffb85a,#f07a34) 0 0/calc(var(--tw)/2 - 3px + (100% - var(--tw) + 6px)*var(--f)) 100% no-repeat,#ffeccb;box-shadow:0 2px 0 #3b2233}
+html.sb .vsl input[type=range]::-webkit-slider-thumb{margin-top:-9px;border:3px solid #3b2233;background:linear-gradient(180deg,#fffaf0,#ffe3a8);box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 3px 0 #3b2233}
+html.sb .vsl input[type=range]::-moz-range-thumb{border:3px solid #3b2233;background:linear-gradient(180deg,#fffaf0,#ffe3a8);box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 3px 0 #3b2233}
+html.sb .vsl input[type=range]:focus-visible{outline-color:#e0782c}
+html.sb .vsl output{color:#3b2233}
+html.sb .setvol.off .vsl output{color:#7a5560}
+html.sb .setrow small.setlock,html.sb .setrow small.setmuted{color:#c8542a;font-weight:600}
 html.sb .keys kbd{background:#ffe3a8;color:#3b2233;border:2px solid #3b2233;border-bottom-width:3px}
 html.sb .stat{background:rgba(59,34,51,.07);border:2px solid rgba(59,34,51,.18)}
 html.sb .stat b{color:#3b2233}
@@ -467,8 +493,9 @@ html.sb #padToast span{color:#6a4a52}
 <div id="settings" class="ov dim">
   <div class="panel">
     <h2>Settings</h2>
-    <div class="setrow"><span>Sound effects</span><div class="seg" id="setSfx" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
-    <div class="setrow"><span>Music</span><div class="seg" id="setMusic" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow" id="setDiffRow"><span>Difficulty<small id="setDiffNote">Easy: gentler foes, more healing. Normal: a real fight. Hard: fast, fierce foes.</small><small class="setlock" id="setDiffLock" hidden>Locked during an Arena run, so the leaderboard stays fair. Change it on the title screen.</small></span><div class="seg" id="setDiff" role="group" aria-label="Difficulty"><button type="button" data-v="0" aria-pressed="false">Easy</button><button type="button" data-v="1" aria-pressed="false">Normal</button><button type="button" data-v="2" aria-pressed="false">Hard</button></div></div>
+    <div class="setrow setvol"><span>Music<small class="setmuted" id="setMusicMuted" hidden>Muted. Move the slider to turn it back on.</small></span><div class="vsl"><input type="range" id="setMusicVol" min="0" max="100" step="5" value="100" aria-label="Music volume"><output id="setMusicVal" for="setMusicVol">100</output></div></div>
+    <div class="setrow setvol"><span>Sounds<small class="setmuted" id="setSfxMuted" hidden>Muted. Move the slider to turn it back on.</small></span><div class="vsl"><input type="range" id="setSfxVol" min="0" max="100" step="5" value="100" aria-label="Sound effects volume"><output id="setSfxVal" for="setSfxVol">100</output></div></div>
     <div class="setrow"><span>Damage numbers</span><div class="seg" id="setNums" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Touch controls<small>For phones and tablets. One hand puts every button under one thumb, on the side set by Handed.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" id="setTouchOne" aria-pressed="false">One hand</button></div></div>
     <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>

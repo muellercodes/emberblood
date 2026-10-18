@@ -221,7 +221,7 @@ $('#bHowClose').addEventListener('click',closeHow);
 $('#bSettings').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSettings('menu'); });
 $('#bPauseSettings').addEventListener('click',()=>{ SFX.play('ui'); openSettings('pause'); });
 $('#bSettingsClose').addEventListener('click',()=>{ SFX.play('ui'); closeSettings(); });
-for(const id of ['setSfx','setMusic','setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
+for(const id of ['setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
 // ---------- two more rows (UX build), injected like the depth row so body.html stays as it is:
 // "Aim with the mouse" (off: Ash faces the way he walks) and "Characters" (3D toy figures or the classic flat art)
 // (a3e_toy3d.js reads eb_chars at load; this flips it live)
@@ -281,6 +281,85 @@ function handSync(){
     handSync();
   }catch(e){}
 })();
+// ---------- v11: Settings > Difficulty, Music and Sounds (the rows are in body.html; they go to the top of the list)
+// Difficulty works from the pause menu in the middle of a journey (balSetDiff in e6_balance.js rescales the foes that
+// are out and keeps it with the journey); during an Arena run it is locked so the leaderboard stays fair.
+// The two sliders run 0 to 100 and apply while you drag: mouse, touch, the arrow keys and a controller's d-pad or stick
+// (left and right on a focused slider move it 5). Moving a muted one turns that sound back on. Letting go of the Sounds
+// slider plays a short sample.
+const SETV={sampleT:0};
+function setDiffLocked(){ return !!(G&&G.mode==='normal'&&settingsFrom==='pause'); }
+function diffSync(){
+  const lock=setDiffLocked();
+  for(const b of document.querySelectorAll('#setDiff button')){ b.setAttribute('aria-pressed',String(+b.dataset.v===diffIdx)); b.disabled=lock; }
+  const L=$('#setDiffLock'), N=$('#setDiffNote');
+  if(N) N.textContent=simplify(S('Easy: gentler foes, more healing. Normal: a real fight. Hard: fast, fierce foes.','Easy: soft foes. Normal: a fair fight. Hard: tough foes.'));
+  if(L){ L.hidden=!lock; L.textContent=simplify(S('Locked during an Arena run, so the leaderboard stays fair. Change it on the title screen.','Locked in the Arena. Change it on the title screen.')); }
+}
+function setDifficulty(i){
+  if(setDiffLocked()) return diffIdx;
+  i=clamp(i|0,0,2); if(i===diffIdx&&G&&G.diff===DIFFS[i]) return i;
+  balSetDiff(i); diffSync();
+  if(settingsFrom!=='pause') refreshMenu();
+  return i;
+}
+function volSync(){
+  const row=(id,v,muted)=>{
+    const i=$('#'+id+'Vol'), o=$('#'+id+'Val'), m=$('#'+id+'Muted'); if(!i) return;
+    if(+i.value!==v) i.value=v;
+    i.style.setProperty('--f',String(v/100));
+    if(o) o.textContent=v>0?String(v):simplify(S('Off','Off'));
+    if(m){ m.hidden=!muted; m.textContent=simplify(S('Muted. Move the slider to turn it back on.','Muted. Move it to turn it on.')); }
+    i.setAttribute('aria-valuetext',muted?'Muted':v>0?v+' of 100':'Off');
+    const r=i.closest('.setrow'); if(r) r.classList.toggle('off',muted||v<=0);
+  };
+  row('setMusic',Music.level,Music.muted); row('setSfx',SFX.volume,SFX.muted);
+}
+function volSample(){ SETV.sampleT=0; if(SFX.silent) return; SFX.play('slash'); setTimeout(()=>SFX.play('hit'),110); }
+function volInput(el,stepped){
+  SFX.init();
+  const v=VOL.n(el.value), music=el.id==='setMusicVol';
+  if(music){ if(Music.muted&&v>0){ Music.toggle(); mLast=null; } Music.setLevel(v); }
+  else { if(SFX.muted&&v>0) SFX.toggle(); SFX.setVolume(v); }
+  volSync();
+  // a step from the keys or a controller: the sample comes once the steps stop (the same as letting go)
+  if(stepped&&!music){ clearTimeout(SETV.sampleT); SETV.sampleT=setTimeout(volSample,300); }
+}
+(function setTopRows(){
+  try{
+    const panel=document.querySelector('#settings .panel'), h=panel&&panel.querySelector('h2'); if(!panel||!h) return;
+    // Difficulty first, then Music and Sounds, above the rows other modules added on top (Words)
+    const rows=['setDiff','setMusicVol','setSfxVol'].map(id=>{ const el=$('#'+id); return el&&el.closest('.setrow'); }).filter(Boolean);
+    let ref=h; for(const r of rows){ ref.after(r); ref=r; }
+    for(const b of document.querySelectorAll('#setDiff button')) b.addEventListener('click',()=>{ SFX.init(); setDifficulty(+b.dataset.v); SFX.play('ui'); });
+    for(const id of ['setMusicVol','setSfxVol']){
+      const el=$('#'+id); if(!el) continue;
+      el.addEventListener('input',()=>volInput(el,false));
+      el.addEventListener('change',()=>{ volInput(el,false); if(id==='setSfxVol') volSample(); });
+      // a tap or a drag on the slider must not scroll the panel or reach the game under it
+      el.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+      // the game's key handler skips keys aimed at an input (for the name fields), so a focused slider takes its own:
+      // left and right move it, up and down move to the next row like every other row, and the rest (N to mute,
+      // Escape to go back) go to the game as usual
+      el.addEventListener('keydown',e=>{
+        const c=e.code;
+        if(c==='ArrowLeft'||c==='ArrowRight'){ e.preventDefault(); e.stopPropagation(); navMove(navRoot(),c==='ArrowRight'?'r':'l'); return; }
+        if(c==='ArrowUp'||c==='ArrowDown'){ e.preventDefault(); e.stopPropagation(); const r=navRoot(); if(r) navMove(r,c==='ArrowDown'?'d':'u'); return; }
+        if(c==='Tab'||c==='Enter'||c==='Space') return;
+        e.stopPropagation(); onKey(e);
+      });
+    }
+    diffSync(); volSync();
+  }catch(e){}
+})();
+{ const base=renderSettings; renderSettings=function(){ base(); try{ diffSync(); volSync(); }catch(e){} }; }
+// left and right on a focused slider move it (the arrow keys and a controller both come through navMove)
+{ const base=navMove; navMove=function(root,dir){
+    const el=document.activeElement;
+    if((dir==='l'||dir==='r')&&el&&el.matches&&el.matches('.vsl input[type=range]')&&root&&root.contains(el)){
+      const v=clamp((+el.value||0)+(dir==='r'?5:-5),0,100); if(v!==+el.value){ el.value=v; volInput(el,true); } return; }
+    return base(root,dir); }; }
+window.__ebX=Object.assign(window.__ebX||{},{setv:{setDifficulty,diffSync,volSync,locked:setDiffLocked,vol:()=>({music:Music.level,sfx:SFX.volume,mMuted:Music.muted,sMuted:SFX.muted,mSilent:Music.silent,sSilent:SFX.silent})}});
 $('#bSlotsClose').addEventListener('click',()=>{ SFX.play('ui'); show('menu'); refreshMenu(); });
 $('#bPauseJournal').addEventListener('click',()=>{ scene='play'; hideAll(); openJournal(); });
 $('#bMapJournal').addEventListener('click',()=>{ closeMap(true); openJournal(); });
