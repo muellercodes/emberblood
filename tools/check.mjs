@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // tools/check.mjs: the Emberblood v10 story checker (rules 1 to 13 of _plan_format.md, plus warnings).
 //
-//   node tools/check.mjs [--act 2] [--root <repo root>] [--story <dir>] [--out <dir>] [--quiet]
+//   node tools/check.mjs [--act 2] [--root <repo root>] [--story <dir>] [--game <dir>] [--out <dir>] [--quiet] [--voice]
+//
+// --voice prints the table of the voice and talk rules (v11 J2: phrase budgets, CAPS and opener shares, replies) and
+// writes <out>/voice.md. Without it the voice rules print one summary line each; every line they name is a WARN in
+// check.md. --game reads another folder's game/src as the old code (the tests use a small fake game).
 //
 // Loads every game/story/**/*.js in a vm sandbox where act, chapter, quest and legacy are collectors and nothing
 // else exists (a file that calls anything else, computes, or holds a function fails), reads the game code for what
@@ -52,7 +56,9 @@ const REG_KINDS = new Set(['place', 'landmark', 'door', 'gate', 'npc', 'item', '
 const STEP_VERBS = new Set(['talk', 'goto', 'find', 'examine', 'fight', 'use_power_at', 'give', 'choose', 'deduce', 'track', 'wait_for', 'cutscene', 'minigame', 'dungeon', 'all', 'any']);
 const EFFECT_VERBS = new Set(['set', 'clear', 'give', 'take', 'trust', 'power', 'upgrade', 'heart_ember', 'open', 'close', 'spawn', 'despawn', 'move', 'world', 'clue', 'quest', 'stage', 'time', 'emit', 'mail', 'epi', 'music', 'xp', 'weapon', 'ally', 'hat',
   // also in ENG's engine (e10_story.js): see ENGINE.md section 4
-  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people', 'bombbag', 'shrine']);
+  'coins', 'sfx', 'heal', 'choice', 'solve', 'bless', 'deed', 'end_act', 'warp', 'page', 'moon', 'people', 'bombbag', 'shrine',
+  // talk v11 (J1): 'said key' remembers what Ash answered (G.story.said), read by the condition 'said key'
+  'said']);
 const WEAPON_POWERS = new Set(['whip', 'bombs', 'glaive']);
 const STEP_SCENES = ['scene', 'lose', 'win', 'kneel', 'after', 'intro'];
 const SPEAKERS_BUILTIN = new Set(['narr', 'ash', 'pip', 'mom', 'maren', 'sign', 'note', 'book', 'banner']);
@@ -63,11 +69,66 @@ const BASE_REF = '0fb0938';
 const AFTER_BOSS_MAX = 6, SCENE_MAX = 10, SIMPLE_WORDS = 8;
 const EM = String.fromCharCode(0x2014);
 
+// ---------------------------------------------------------------- voice budgets (v11 STORY_PLAN.md section 5, J2)
+// Every budget below is a WARN, never a FAIL. They read the whole game: every text in the story data, and the string
+// literals of the old code (game/src modules in the build). A line is one text: its full and simple versions count once.
+// Lines are taken in play order (act, then file path, then line number). A budget keeps the first lines it allows and
+// names every line after them with file:line and the speaker (when the old code's speaker can be told).
+//   re       what counts (tested on the full and the simple text; curly quotes count as straight ones)
+//   and      a second pattern the same line must also match
+//   max      the most uses in the whole game
+//   who      the only speakers who may say it (anyone else, or a line whose speaker is unknown, is named)
+//   perAct   { speaker: n }: the most uses per act by that speaker
+//   acts     { speaker: [acts] }: the acts in which that speaker may say it
+export const VOICE = [
+  { id: 'greats', what: '"great-great" or counting greats', max: 5,
+    re: /great-great|\bgreats\b|\bgreat[ -]?(?:x|×|\(?times)[ -]?(?:\d|thirteen)|×\s*1\d\b/i },
+  { id: 'ember', what: '"little ember"', re: /\blittle ember\b/i, who: ['ember', 'nyxara', 'voice', 'c_mask'], perAct: { ember: 1 }, acts: { c_mask: [2] } },
+  { id: 'dumpling', what: '"dumpling"', re: /\bdumplings?\b/i, who: ['f_glaciar'] },
+  { id: 'duck', what: '"duck"', re: /\bduck\b/, who: ['c_oona'] },
+  { id: 'dearie', what: '"dearie"', re: /\bdearie\b/i, who: ['c_fig'] },
+  { id: 'big', what: '"big as a barn/house/ship" or "bigger than a ship"', max: 3, re: /\bbig as an? (?:barn|house|ship)\b|\bbigger than an? ship\b/i },
+  { id: 'halt', what: '"HALT!"', re: /\bHALT!/, who: ['c_bobs'] },
+  { id: 'tuesday', what: '"Tuesday"', re: /\btuesday\b/i, who: ['m_umberwing'] },
+  { id: 'bakery', what: "Bertram's bakery exploding", max: 2, re: /\bbakery\b/i,
+    and: /explod|\bblew up|\bblow(?:n|s)? up|\bboom|on fire|\bburn|\brebuilt|bakery (?:remover|curtains|breath)|practice on/i },
+  { id: 'eat', what: '"Eat something"', re: /\beat something\b/i, who: ['maren'], perAct: { maren: 1 } },
+  { id: 'everything', what: '"EVERYTHING" as a catchphrase', max: 2, re: /\bEVERYTHING\b/ },
+  { id: 'imcaps', what: '"I\'m a [A-Z]+."', max: 0, re: /\bI'm a [A-Z]+\./ },
+  { id: 'bravest', what: '"The bravest"', max: 0, re: /\bThe bravest\b/ },
+  { id: 'cookie', what: 'the fortune cookies of STORY_PLAN 2.8', max: 0,
+    re: /that's why it counts|is just a door nobody|the darker it burns|iron is like people|a smith without a fire|slow water that wants|a river you can't see|a dragon's best friend/i },
+];
+// shares: `caps` per file (lines with a fully capitalized word of 3+ letters; Roman numerals are not words), `opener` per
+// speaker. share is the most allowed; min is the fewest lines always allowed, so one such line in a small file or from a
+// speaker with few lines is never a warning. skip lines are left out of the count (Penny's headlines, Tollef's shouting).
+// Neither share reads the menus and the HUD (skipMods), or a callout nobody says ("CRACK!", "STUNNED!": 3 words or
+// fewer, no small letters, no speaker).
+export const VOICE_SHARE = {
+  caps: { what: 'lines with a CAPS word (3+ letters), per file', share: 0.08, min: 1, skipWho: ['f_tollef'], skipText: /\bHEADLINE\b|^EXTRA!/, skipTextWho: ['c_penny', null] },
+  skipMods: ['a11b_hud', 'a12a_dlg', 'a12b_ui', 'a12c_log', 'a13_cloud', 'a1k_simple', 'a5_input', 'a5b_pad', 'a9e_meta', 'a14_music', 'x9_music', 'x9_music2'],
+  opener: { what: 'lines opening with "Oh!", "Okay." or "...", per speaker', share: 0.10, min: 1, re: /^(?:\([^)]*\)\s*)?(?:Oh!|Okay\.|\.\.\.|…)/ },
+};
+// one person, several speaker ids (old code and data use both)
+export const VOICE_ALIAS = { mom: 'maren', n_nyxara: 'nyxara', glaciar: 'f_glaciar', hush: 'f_hush', c_mothmask: 'c_mask', c_mothmask3: 'c_mask', moth_mask: 'c_mask' };
+// speakers that are not people (no opener share)
+const VOICE_NOT_PEOPLE = new Set(['narr', 'sign', 'note', 'book', 'banner']);
+// talk v11 (STORY_PLAN 6.3): menu labels banned in data, and the generic choose prompts
+export const BANNED_LABELS = ["What's new?", 'Tell me about yourself.', "You look like something's on your mind.", 'Anything else?', 'What else is on your mind?'];
+export const GENERIC_ASKS = ['What do you do?', 'What do you say?'];
+const REPLY_WORDS = 8, REPLY_MIN = 2, REPLY_MAX = 3, RESPONSE_LINES = 2;
+const REPLY_KEYS = new Set(['t', 'tone', 'f', 'if', 'need', 'locked', 'then', 'say', 'scene', 'next', 'id', 'v', 'end']);
+const TONES = new Set(['kind', 'brave', 'silly']);
+
 // ---------------------------------------------------------------- small helpers
 const isStr = (x) => typeof x === 'string';
 const arr = (x) => (x == null ? [] : Array.isArray(x) ? x : [x]);
 const words = (s) => (isStr(s) ? s.trim().split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length : 0);
 const short = (s, n = 60) => { s = String(s).replace(/\s+/g, ' '); return s.length > n ? s.slice(0, n - 3) + '...' : s; };
+// a menu label or a reply, compared without case, punctuation or curly quotes
+const normLabel = (s) => String(s).replace(/[’‘]/g, "'").toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+const BANNED_N = new Set(BANNED_LABELS.map(normLabel));
+const GENERIC_N = new Set(GENERIC_ASKS.map(normLabel));
 function walkFiles(dir, out = []) {
   if (!existsSync(dir)) return out;
   for (const n of readdirSync(dir).sort()) {
@@ -189,6 +250,168 @@ function spanEnd(t, i) {
     else if (c === ']' || c === '}' || c === ')') { d--; if (d === 0) return k + 1; }
   }
   return t.length;
+}
+
+// ---------------------------------------------------------------- the old code's text (for the voice budgets)
+// every string literal in a JS source, fast (char codes, no regular expression per character): { v, s, e, line }.
+// Comments and regular expressions are skipped; a template's ${...} parts are skipped and stay in v as written.
+const KW_BEFORE_RE = new Set(['return', 'typeof', 'case', 'in', 'of', 'new', 'delete', 'void', 'throw', 'else', 'do', 'yield', 'await', 'instanceof']);
+const unesc = (raw) => (raw.includes('\\') ? raw.replace(/\\(u\{[0-9a-fA-F]+\}|u[0-9a-fA-F]{4}|x[0-9a-fA-F]{2}|\r?\n|[\s\S])/g, (m, e) => {
+  if (e[0] === 'u') return String.fromCodePoint(parseInt(e[1] === '{' ? e.slice(2, -1) : e.slice(1), 16));
+  if (e[0] === 'x') return String.fromCharCode(parseInt(e.slice(1), 16));
+  return e === 'n' ? '\n' : e === 't' ? '\t' : e[0] === '\n' || e[0] === '\r' ? '' : e;
+}) : raw);
+export function litScan(src) {
+  const out = [], n = src.length;
+  let i = 0, line = 1, val = false, idS = -1, idE = -1;
+  const idc = (c) => (c >= 97 && c <= 122) || (c >= 65 && c <= 90) || (c >= 48 && c <= 57) || c === 95 || c === 36 || c > 127;
+  const lines = (a, b) => { let k = 0; for (let x = a; x < b; x++) if (src.charCodeAt(x) === 10) k++; return k; };
+  const quoted = (j, q) => { j++; while (j < n) { const c = src.charCodeAt(j); if (c === 92) { j += 2; continue; } if (c === q || c === 10) return j + 1; j++; } return j; };
+  const tpl = (j) => { j++; while (j < n) { const c = src.charCodeAt(j); if (c === 92) { j += 2; continue; } if (c === 96) return j + 1; if (c === 36 && src.charCodeAt(j + 1) === 123) { j = braces(j + 1); continue; } j++; } return j; };
+  function braces(j) {
+    let d = 0;
+    while (j < n) {
+      const c = src.charCodeAt(j);
+      if (c === 123) { d++; j++; continue; }
+      if (c === 125) { d--; j++; if (d === 0) return j; continue; }
+      if (c === 39 || c === 34) { j = quoted(j, c); continue; }
+      if (c === 96) { j = tpl(j); continue; }
+      if (c === 47 && src.charCodeAt(j + 1) === 47) { const k = src.indexOf('\n', j); j = k < 0 ? n : k; continue; }
+      if (c === 47 && src.charCodeAt(j + 1) === 42) { const k = src.indexOf('*/', j + 2); j = k < 0 ? n : k + 2; continue; }
+      j++;
+    }
+    return j;
+  }
+  while (i < n) {
+    const c = src.charCodeAt(i);
+    if (c === 10) { line++; i++; continue; }
+    if (c === 32 || c === 9 || c === 13) { i++; continue; }
+    if (c === 47) {
+      const d = src.charCodeAt(i + 1);
+      if (d === 47) { const k = src.indexOf('\n', i); i = k < 0 ? n : k; continue; }
+      if (d === 42) { const k = src.indexOf('*/', i + 2), e = k < 0 ? n : k + 2; line += lines(i, e); i = e; continue; }
+      if (idS >= 0 && KW_BEFORE_RE.has(src.slice(idS, idE))) val = false;
+      idS = -1;
+      if (!val) { // a regular expression
+        let j = i + 1, cls = false;
+        while (j < n) { const x = src.charCodeAt(j); if (x === 92) { j += 2; continue; } if (x === 10) break; if (cls) { if (x === 93) cls = false; } else if (x === 91) cls = true; else if (x === 47) { j++; break; } j++; }
+        while (j < n && idc(src.charCodeAt(j))) j++;
+        i = j; val = true; continue;
+      }
+      i++; val = false; continue;
+    }
+    idS = -1;
+    if (c === 39 || c === 34 || c === 96) {
+      const e = c === 96 ? tpl(i) : quoted(i, c), raw = src.slice(i + 1, e - 1);
+      out.push({ v: c === 96 && raw.includes('${') ? raw : unesc(raw), s: i, e, line });
+      line += lines(i, e); i = e; val = true; continue;
+    }
+    if (idc(c)) { let j = i + 1; while (j < n && idc(src.charCodeAt(j))) j++; val = true; idS = i; idE = j; i = j; continue; }
+    val = c === 41 || c === 93 || c === 125;
+    i++;
+  }
+  return out;
+}
+// the members of the object literal whose { is at t[open]: [{ key, s }] at depth 1, and the index past its }
+function members(t, open) {
+  const out = [];
+  let d = 0, k = open, want = false;
+  const KEY = /([A-Za-z_$][\w$]*|'[^'\\\n]*'|"[^"\\\n]*")\s*:/y;
+  for (; k < t.length; k++) {
+    const c = t[k];
+    if (want && d === 1 && !/\s/.test(c)) {
+      want = false;
+      if (c === '/' && (t[k + 1] === '/' || t[k + 1] === '*')) want = true;
+      else { KEY.lastIndex = k; const m = KEY.exec(t); if (m) out.push({ key: m[1].replace(/^['"]|['"]$/g, ''), s: k }); }
+    }
+    if (c === '"' || c === "'" || c === '`') { const q = c; k++; while (k < t.length && t[k] !== q) { if (t[k] === '\\') k++; k++; } continue; }
+    if (c === '/' && t[k + 1] === '/') { while (k < t.length && t[k] !== '\n') k++; continue; }
+    if (c === '/' && t[k + 1] === '*') { k = t.indexOf('*/', k + 2); if (k < 0) break; k++; continue; }
+    if (c === '[' || c === '{' || c === '(') { d++; if (d === 1) want = true; }
+    else if (c === ']' || c === '}' || c === ')') { d--; if (d === 0) return { members: out, end: k + 1 }; }
+    else if (c === ',' && d === 1) want = true;
+  }
+  return { members: out, end: t.length };
+}
+// where the old code says who speaks: tables keyed by people (TALK, greetings, taunts: most keys are speakers) and
+// CAST-like objects ({ id:'x', name: ... }). Returns spans [{ s, e, who }] sorted by start, properly nested.
+function speakerSpans(t, known) {
+  const spans = [];
+  for (const m of t.matchAll(/(?:\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=|Object\.assign\(\s*[A-Za-z_$][\w$.]*\s*,)\s*\{/g)) {
+    const open = m.index + m[0].length - 1;
+    const { members: mem, end } = members(t, open);
+    const keyed = mem.filter((x) => known.has(x.key));
+    if (mem.length < 3 || keyed.length < mem.length * 0.6) continue;
+    mem.forEach((x, i) => { if (known.has(x.key)) spans.push({ s: x.s, e: i + 1 < mem.length ? mem[i + 1].s : end, who: x.key }); });
+  }
+  for (const m of t.matchAll(/\{\s*id\s*:\s*(['"])([a-z][a-z0-9_]*)\1\s*,\s*name\s*:/g)) if (known.has(m[2])) spans.push({ s: m.index, e: spanEnd(t, m.index), who: m[2] });
+  // two-person chats: VCH(key, 'id:a', 'id:b'|'any', cond, [[0, S(..)], [1, S(..)]]): seat 0 is a, seat 1 is b
+  for (const m of t.matchAll(/\bVCH\(\s*(['"])[^'"\n]*\1\s*,\s*(['"])id:([a-z0-9_]+)\2\s*,\s*(['"])(?:id:([a-z0-9_]+)|[^'"\n]*)\4/g)) spans.push({ s: m.index, e: spanEnd(t, m.index + 3), who: null, seats: [m[3], m[5] || null] });
+  return spans.sort((a, b) => a.s - b.s || b.e - a.e);
+}
+const PRE_WHO = /[[(,]\s*(['"])([a-z][a-z0-9_]*)\1\s*,\s*(S\(\s*|pick\(\s*\[\s*)?$/;
+const PRE_HELPER = /\b(x1pN|f2pN|m3pN|m3sAct|c1Pip|f2sPip|m3sPip|n4sPip)\(\s*$/;
+const PRE_BARK = /\bB\(\s*(['"])[^'"\n]*\1\s*,\s*(['"])id:([a-z][a-z0-9_]*)\2[^\n]*$/;
+const PRE_WHOKEY = /\bwho\s*:\s*(['"])([a-z][a-z0-9_]*)\1\s*,\s*(?:text|t|say)\s*:\s*(?:S\(\s*)?$/;
+const PRE_IDRET = /\bid\s*===?\s*(['"])([a-z][a-z0-9_]*)\1[^;{}\n]{0,80}?\)\s*return\s+(?:S\(\s*)?$/;
+const PRE_SEAT = /\[\s*([01])\s*,\s*S\(\s*$/;
+const PROSE_BAD = /[{}<>=\\|]|=>|\bfunction\b|^\s*$|\d(?:px|em)\b|rgba?\(|#[0-9a-f]{3,6}\b/i;
+const VOICE_ANY = new RegExp(VOICE.map((r) => r.re.source).join('|'), 'i');
+// a literal reads like a line of text: starts like a sentence, has a space or ends like one, and is not code
+const isProse = (v) => { const x = v.replace(/\$\{[^}]*\}/g, 'X'); return /[A-Za-z]{2}/.test(x) && /^[\s*]*[A-Z0-9("'“‘.…¡¿[]/.test(x) && (/\s/.test(x.trim()) || /[.!?…]["'”’)]*$/.test(x)) && !PROSE_BAD.test(x); };
+export function modAct(mod) {
+  let m;
+  if ((m = /^x(\d)_/.exec(mod))) return +m[1] + 1;
+  if ((m = /^p(\d)_/.exec(mod))) return +m[1];
+  if ((m = /^v10_art(\d)/.exec(mod))) return +m[1];
+  if (/^(a\d|x0_|e7_acts$)/.test(mod)) return 1;
+  return null;
+}
+// the old code's lines: [{ src:'code', file, line, who, full, simple, act }] for every module in the build
+export function oldTextUnits(G, known) {
+  const units = [];
+  for (const mod of Object.keys(G.files).sort()) {
+    if (!G.inBuild.has(mod)) continue;
+    const t = G.files[mod], file = `game/src/${mod}.js`, act = modAct(mod), skipShare = VOICE_SHARE.skipMods.includes(mod);
+    const lits = litScan(t), spans = speakerSpans(t, known);
+    const stack = [];
+    let sp = 0, pend = null, list = null;
+    for (const L of lits) {
+      while (stack.length && stack[stack.length - 1].e <= L.s) stack.pop();
+      while (sp < spans.length && spans[sp].s <= L.s) { const x = spans[sp++]; while (stack.length && stack[stack.length - 1].e <= x.s) stack.pop(); if (x.e > L.s) stack.push(x); }
+      while (stack.length && stack[stack.length - 1].e <= L.s) stack.pop();
+      const v = L.v;
+      if (!/[A-Za-z]/.test(v)) { pend = null; continue; }
+      // the simple half of S(full, simple) or of a line helper's (who, full, simple)
+      if (pend && /^\s*,\s*$/.test(t.slice(pend.e, L.s))) { if (v !== pend.u.full) pend.u.simple = v; pend = null; continue; }
+      pend = null;
+      // one word with no end stop (an id, a key, a css value): not a line, unless it holds a budget phrase
+      if (!/\s/.test(v) && !/[.!?…]["'”’)]*$/.test(v) && !VOICE_ANY.test(v)) continue;
+      const pre = t.slice(Math.max(0, L.s - 160), L.s);
+      let who = null, direct = false, pairs = /\bS\(\s*$/.test(pre), m;
+      if (list && L.s >= list.e) list = null;
+      // a speaker id right before the text ('who', `text` / helper('who', ...) / 'who', S( / 'who', pick([ ); an array
+      // line ['who', `text`] may name a speaker the game code lists nowhere else (a boss in an intro)
+      if ((m = PRE_WHO.exec(pre)) && (known.has(m[2]) || (/\[\s*(['"])[a-z0-9_]+\1\s*,\s*$/.test(pre) && m[2].length <= 20 && isProse(v)))) {
+        who = m[2]; direct = true; pairs = !m[3] || m[3][0] === 'S';
+        if (m[3] && m[3][0] === 'p') list = { who, e: spanEnd(t, pre.lastIndexOf('[') + Math.max(0, L.s - 160)) };
+      }
+      else if ((m = PRE_HELPER.exec(pre))) { who = /Pip$/.test(m[1]) ? 'pip' : 'narr'; direct = true; pairs = true; }
+      else if ((m = PRE_BARK.exec(pre)) && known.has(m[3])) { who = m[3]; direct = true; }
+      else if ((m = PRE_WHOKEY.exec(pre) || PRE_IDRET.exec(pre)) && known.has(m[2])) { who = m[2]; direct = true; }
+      else if ((m = PRE_SEAT.exec(pre))) { const seat = [...stack].reverse().find((x) => x.seats); if (seat && seat.seats[+m[1]]) { who = seat.seats[+m[1]]; direct = true; } }
+      else if (list) { who = list.who; direct = true; }
+      // not a line of text: still read by the phrase budgets when it holds one of their phrases
+      const prose = direct || isProse(v);
+      if (!prose && !VOICE_ANY.test(v)) continue;
+      if (!who && stack.length) { const x = [...stack].reverse().find((q) => q.who); if (x) who = x.who; }
+      const callout = !who && !/[a-z]/.test(v.replace(/\$\{[^}]*\}/g, '')) && words(v) <= 3;
+      const u = { src: 'code', file, line: L.line, who: VOICE_ALIAS[who] || who, full: v, simple: null, act, noShare: !prose || callout || skipShare };
+      units.push(u);
+      if (pairs) pend = { e: L.e, u };
+    }
+  }
+  return units;
 }
 
 // ---------------------------------------------------------------- loading the data (sandbox + static scan)
@@ -382,7 +605,7 @@ export function parseDo(s) {
 // conditions: 'flag x item y !power z' -> [{ neg, k, a:[...] }]; unknown words -> { bad }
 // a condition word and how many words follow it ('?' = one more word only if it matches)
 const COND_ARGS = { flag: 1, item: 1, power: 1, trust: 1, choice: 1, clue: 1, solved: 1, seen: 1, diff: 1, hour: 1, night: 0, day: 0, weapon: 1, world: 1,
-  event: 1, step: 1, area: 1, outdoors: 0, ending: 1, true: 0, false: 0 };
+  event: 1, step: 1, area: 1, outdoors: 0, ending: 1, true: 0, false: 0, said: 1 };
 const COND_OPT = { quest: /^(done|active|started|open|available)$/, near: /^\d+$/, coins: /^[<>=!]/ };
 export function parseCond(c) {
   const res = [];
@@ -456,6 +679,10 @@ export function runChecks(M, opts = {}) {
   const worldStates = new Map();      // entity -> Set(states) from `world` effects
   const optionScenes = new Map();     // scene -> [where] for talk options
   const openedByData = new Set();     // entities an `open x` effect opens
+  const saidSets = new Map();         // said key -> [loc] from 'said key' effects
+  const saidReads = new Map();        // said key -> [loc] from 'said key' conditions
+  const replyTexts = new Map();       // a reply's text (normalized) -> [{ O, where, loc, full }]
+  const talkPeople = new Map();       // npc -> { conv: loc of the first re/ask entry, idle: bool }
   const addTo = (map, k, v) => { if (!map.has(k)) map.set(k, []); map.get(k).push(v); };
 
   // ---------- 1. walk every owner, collect uses, check ids and vocabulary
@@ -503,6 +730,7 @@ export function runChecks(M, opts = {}) {
       case 'shrine': { const L = M.ents[a[0]], sm = L && /^SHRINES:(.+)$/.exec(L.src || ''); if (!sm && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": ${a[0]} is not a shrine (a SHRINES id, or a legacy entry with src SHRINES:<id>)`, loc); break; }
       case 'weapon': if (!WEAPON_POWERS.has(a[0]) && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": no weapon ${a[0]}`, loc); break;
       case 'ally': if (!a[0]) FAIL('ids', `${O.id}.${where}: "${e}" needs an ally id`, loc); break;
+      case 'said': if (!/^[a-z0-9_]+$/.test(a[0] || '') || a.length > 1) FAIL('said', `${O.id}.${where}: "${e}" should be said <key> (a-z, 0-9, _)`, loc); else addTo(saidSets, a[0], loc); break;
       case 'hat': if (!isItem(a[0]) && !knownGame(a[0])) FAIL('ids', `${O.id}.${where}: "${e}": item ${a[0]} is not defined`, loc); else addTo(itemsUsedData, a[0], { O, where }); break;
       default: break;
     }
@@ -527,6 +755,7 @@ export function runChecks(M, opts = {}) {
         case 'near': if (!isEnt(a)) FAIL('ids', `${O.id}.${where}: place ${a} in "${condText(c)}" is not defined`, loc); break;
         case 'trust': { const m = /^([a-z0-9_]+)(>=|<=|>|<|=)(\d+)$/.exec(a || ''); if (!m) FAIL('ids', `${O.id}.${where}: "${condText(c)}": write trust name>=n`, loc); break; }
         case 'stage': if (!M.chapters[a] && stageIdx(a) < 0) FAIL('ids', `${O.id}.${where}: stage ${a} in "${condText(c)}" is not a stage`, loc); break;
+        case 'said': if (!/^[a-z0-9_]+$/.test(a || '')) FAIL('said', `${O.id}.${where}: "${condText(c)}": write said <key>`, loc); else addTo(saidReads, a, Object.assign({ cond: condText(c) }, loc)); break;
         default: break;
       }
     }
@@ -546,7 +775,7 @@ export function runChecks(M, opts = {}) {
     vs.forEach((v, i) => { if (!isVar(v)) { FAIL('ids', `${O.id}.${where}: variant ${i + 1} should be { if, t: [full, simple] }`, W(O, at(O))); return; }
       if (v.if != null) checkCond(v.if, O, `${where} variant ${i + 1}`); textPair(v.t, O, `${where} variant ${i + 1}`, null, {}, v.if != null ? [v.if] : []); });
   }
-  function lineBeat(b, O, where, conds) {
+  function lineBeat(b, O, where, conds, depth = 0) {
     // [who, full, simple?, tags?]
     const who = b[0];
     let full = b[1], simple = b[2], tags = {};
@@ -559,19 +788,100 @@ export function runChecks(M, opts = {}) {
     if (tags.if) checkCond(tags.if, O, where);
     if (tags.do) eachEffect(tags.do, (e) => checkEffect(e, O, where));
     for (const k of ['promise', 'ref']) for (const id of arr(tags[k])) promiseLater.push({ k, id, O, where, loc: W(O, at(O, full)) });
+    if (tags.re != null) checkRe(tags.re, O, where, isStr(who) ? who : null, depth, conds, W(O, at(O, full)));
+  }
+  // talk v11 (STORY_PLAN 6.3): menu labels written per person, never the old generic ones
+  function labelCheck(x, O, where) {
+    const p = pairOf(x);
+    if (!p) return;
+    for (const s of [p.full, p.simple]) if (s && BANNED_N.has(normLabel(s))) { FAIL('label', `${O.id}.${where}: "${s}" is a generic menu label (not allowed in data: write what Ash would ask this person now)`, W(O, at(O, p.full))); return; }
+  }
+  // re: [{ t: [full, simple], tone?, f?, if?, then?, say: [[who, full, simple]], scene?, next? }]: 2 or 3 replies to the
+  // line just said. person: who said that line (a talk entry's npc, or the scene line's speaker)
+  function checkRe(re, O, where, person, depth, conds, loc0) {
+    const loc = loc0 || W(O, at(O));
+    if (!Array.isArray(re)) { FAIL('re', `${O.id}.${where}: re should be a list of ${REPLY_MIN} or ${REPLY_MAX} replies`, loc); return; }
+    if (depth >= 2) { FAIL('re', `${O.id}.${where}: replies to a reply's response (replies go two levels deep at most)`, loc); return; }
+    if (re.length < REPLY_MIN || re.length > REPLY_MAX) FAIL('re', `${O.id}.${where}: re has ${re.length} repl${re.length === 1 ? 'y' : 'ies'} (write ${REPLY_MIN} or ${REPLY_MAX})`, loc);
+    const tones = [];
+    re.forEach((r, i) => {
+      const rw = `${where} re ${i + 1}`;
+      if (!r || typeof r !== 'object' || Array.isArray(r)) { FAIL('re', `${O.id}.${rw}: a reply is { t: [full, simple], say: [[who, full, simple]] }, got ${short(JSON.stringify(r))}`, loc); return; }
+      const p = pairOf(r.t);
+      if (!p) { FAIL('re', `${O.id}.${rw}: a reply needs t: [full, simple] (what Ash says back)`, loc); return; }
+      const rl = W(O, at(O, p.full));
+      for (const k of Object.keys(r)) if (!REPLY_KEYS.has(k)) WARN('re', `${O.id}.${rw}: unknown reply field ${k} (fields: ${[...REPLY_KEYS].join(', ')})`, rl);
+      textPair(r.t, O, rw, 'ash', {}, conds);
+      labelCheck(r.t, O, rw);
+      for (const x of [p.full, p.simple]) if (x && words(x) > REPLY_WORDS) FAIL('re', `${O.id}.${rw}: reply "${short(x, 50)}" has ${words(x)} words (a reply is a button: ${REPLY_WORDS} or fewer)`, rl);
+      addTo(replyTexts, normLabel(p.full), { O, where: rw, loc: rl, full: p.full });
+      const rc = r.if != null ? conds.concat([r.if]) : conds;
+      if (r.if != null) checkCond(r.if, O, rw);
+      if (r.need != null) checkCond(r.need, O, rw);
+      if (r.locked != null) textPair(r.locked, O, `${rw} locked`, null, {}, rc);
+      if (r.tone != null && !TONES.has(r.tone)) FAIL('re', `${O.id}.${rw}: tone ${JSON.stringify(r.tone)} (tones: ${[...TONES].join(', ')}; or leave it out)`, rl);
+      if (r.f != null && typeof r.f !== 'number') FAIL('re', `${O.id}.${rw}: f (friendship) should be a number`, rl);
+      tones.push(r.tone || null);
+      eachEffect(r.then, (e) => checkEffect(e, O, rw));
+      // the response: lines, a scene, or one more line with its own replies (next)
+      const resp = responseLines(r.say, person);
+      if (resp === null) FAIL('re', `${O.id}.${rw}: say should be [[who, full, simple], ...]`, rl);
+      else if (resp.length) {
+        if (resp[0][0] === 'ash') FAIL('re', `${O.id}.${rw}: the response to "${short(p.full, 40)}" starts with Ash; the first line is the other person's`, rl);
+        if (resp.length > RESPONSE_LINES) WARN('re', `${O.id}.${rw}: the response to "${short(p.full, 40)}" is ${resp.length} lines (write 1 or ${RESPONSE_LINES})`, rl);
+        resp.forEach((l, k) => lineBeat(l, O, `${rw} say ${k + 1}`, rc, depth + 1));
+      }
+      if (r.scene != null) { if (!M.scenes[r.scene]) FAIL('ids', `${O.id}.${rw}: scene ${r.scene} is not defined`, W(O, at(O, r.scene))); else addTo(scenesUsed, r.scene, { O, where: rw }); }
+      if (r.next != null) { if (depth >= 1) FAIL('re', `${O.id}.${rw}: next inside a next (replies go two levels deep at most)`, rl); else checkNext(r.next, O, rw, person, rc); }
+      if (!(resp && resp.length) && r.scene == null && r.next == null) FAIL('re', `${O.id}.${rw}: reply "${short(p.full, 40)}" has no response (say: [[who, full, simple]] by someone other than Ash)`, rl);
+    });
+    const silly = tones.filter((t) => t === 'silly').length;
+    if (silly > 1) WARN('re', `${O.id}.${where}: ${silly} joke (silly) replies (one at most)`, loc);
+    if (tones.length === 3 && ['kind', 'brave', 'silly'].every((t) => tones.includes(t))) WARN('re', `${O.id}.${where}: the replies are one kind, one brave and one silly (write what Ash would say to this line, not a set of tones)`, loc);
+  }
+  // a reply's say: [[who, full, simple, tags?], ...], or a [full, simple] pair said by the person; null when neither
+  function responseLines(say, person) {
+    if (say == null) return [];
+    if (isStr(say)) return person ? [[person, say]] : null;
+    if (!Array.isArray(say)) return null;
+    if (say.every(Array.isArray)) return say;
+    if (say.every(isStr) && say.length <= 2 && !/^[a-z][a-z0-9_]*$/.test(say[0])) return person ? [[person, ...say]] : null;
+    if (isStr(say[0]) && /^[a-z][a-z0-9_]*$/.test(say[0])) return [say];
+    return null;
+  }
+  // next: one more line with its own replies: [who, full, simple, { re }] or { who?, say: [full, simple], re }
+  function checkNext(nx, O, where, person, conds) {
+    const w = `${where} next`;
+    if (Array.isArray(nx) && isStr(nx[0]) && /^[a-z][a-z0-9_]*$/.test(nx[0])) { lineBeat(nx, O, w, conds, 1); return; }
+    if (!nx || typeof nx !== 'object' || Array.isArray(nx)) { FAIL('re', `${O.id}.${w}: next is [who, full, simple, { re }] or { say: [full, simple], re }`, W(O, at(O))); return; }
+    const who = nx.who || person;
+    if (nx.who != null && !isSpeaker(nx.who)) FAIL('ids', `${O.id}.${w}: unknown speaker ${JSON.stringify(nx.who)}`, W(O, at(O)));
+    const lines = responseLines(nx.say, who);
+    if (!lines || !lines.length) FAIL('re', `${O.id}.${w}: next needs say: [full, simple]`, W(O, at(O)));
+    else lines.forEach((l, k) => lineBeat(l, O, `${w} say ${k + 1}`, conds, 1));
+    if (nx.re != null) checkRe(nx.re, O, w, who, 1, conds, W(O, at(O, lines && lines[0] ? lines[0][1] : null)));
   }
   function beats(list, O, where, conds = []) {
-    arr(list).forEach((b, i) => {
+    const BL = arr(list);
+    BL.forEach((b, i) => {
       const w = `${where}#${i + 1}`;
       if (Array.isArray(b)) { lineBeat(b, O, w, conds); return; }
       if (!b || typeof b !== 'object') { FAIL('ids', `${O.id}.${w}: unknown beat ${short(JSON.stringify(b))}`, W(O, at(O))); return; }
       if ('choose' in b) {
         choiceIds.add(b.choose);
-        if (b.ask) textPair(b.ask, O, `${w} ask`, null, {}, conds);
+        let prev = null;
+        for (let k = i - 1; k >= 0; k--) if (Array.isArray(BL[k])) { prev = BL[k]; break; }
+        // the ask is said by who (the engine shows Ash when who is left out; the voice rules credit the line before)
+        if (b.ask) { textPair(b.ask, O, `${w} ask`, isStr(b.who) ? b.who : prev && isStr(prev[0]) ? prev[0] : null, {}, conds); labelCheck(b.ask, O, `${w} ask`); }
+        // "What do you do?" (the default) or "What do you say?" asks nothing unless a narration line shows the moment
+        const askF = b.ask ? (pairOf(b.ask) || {}).full : GENERIC_ASKS[0];
+        if (askF && GENERIC_N.has(normLabel(askF))) {
+          if (!prev || prev[0] !== 'narr') WARN('choose', `${O.id}.${w}: choose ${b.choose} asks "${askF}"${b.ask ? '' : ' (the default)'} after ${prev ? `a line by ${prev[0]}` : 'no line'} (put a narration line of the action right before it, or ask something specific)`, W(O, at(O, b.ask ? askF : b.choose)));
+        }
         if (!arr(b.pick).length) FAIL('ids', `${O.id}.${w}: choose ${b.choose} has no picks`, W(O, at(O)));
         arr(b.pick).forEach((p, j) => {
           const pw = `${w} pick ${j + 1}`;
-          if (p.t != null) textPair(p.t, O, pw, 'ash', {}, conds);
+          if (p.t != null) { textPair(p.t, O, pw, 'ash', {}, conds); labelCheck(p.t, O, pw); }
           if (p.if) checkCond(p.if, O, pw);
           if (p.locked) { if (Array.isArray(p.locked) && p.locked.length && typeof p.locked[0] === 'object' && !Array.isArray(p.locked[0])) p.locked.forEach((L, k) => { if (L.if) checkCond(L.if, O, `${pw} locked ${k + 1}`); textPair(L.t, O, `${pw} locked ${k + 1}`, null, {}, conds); }); else textPair(p.locked, O, `${pw} locked`, null, {}, conds); }
           eachEffect(p.then, (e) => checkEffect(e, O, pw));
@@ -647,12 +957,32 @@ export function runChecks(M, opts = {}) {
         const conds = t.if ? [t.if] : [];
         if (t.if) checkCond(t.if, O, w);
         if (t.say) { if (Array.isArray(t.say) && Array.isArray(t.say[0])) t.say.forEach((x, k) => textPair(x, O, `${w} say ${k + 1}`, npc, tags, conds)); else textPair(t.say, O, w, npc, tags, conds); }
-        if (t.option) { textPair(t.option, O, `${w} option`, 'ash', {}, conds); const sc = t.scene || null; if (sc) addTo(optionScenes, sc, { O, where: w, npc }); }
+        if (t.option) { textPair(t.option, O, `${w} option`, 'ash', {}, conds); labelCheck(t.option, O, `${w} option`); const sc = t.scene || null; if (sc) addTo(optionScenes, sc, { O, where: w, npc }); }
+        // talk v11 (STORY_PLAN 6.3, J1's engine): ask topics, idle and bye lines, replies to the opener
+        const tp = talkPeople.get(npc) || { conv: null, idle: false };
+        talkPeople.set(npc, tp);
+        const variants = (x, wh) => { if (Array.isArray(x) && Array.isArray(x[0])) x.forEach((v, k) => textPair(v, O, `${wh} ${k + 1}`, npc, {}, conds)); else textPair(x, O, wh, npc, {}, conds); };
+        if (t.ask != null) {
+          textPair(t.ask, O, `${w} ask`, 'ash', {}, conds);
+          labelCheck(t.ask, O, `${w} ask`);
+          if (!t.say && !t.scene && !t.then) FAIL('talk', `${O.id}.${w}: topic "${short((pairOf(t.ask) || {}).full || '?', 40)}" needs say or scene (what ${npc} answers)`, W(O, at(O, (pairOf(t.ask) || {}).full)));
+          if (t.option) FAIL('talk', `${O.id}.${w}: an entry is an ask topic or an option, not both`, W(O, at(O, npc)));
+          if (t.scene) { const sc = t.scene; addTo(optionScenes, sc, { O, where: w, npc }); }
+          tp.conv = tp.conv || W(O, at(O, (pairOf(t.ask) || {}).full));
+        }
+        if (t.idle != null) { variants(t.idle, `${w} idle`); tp.idle = true; }
+        if (t.bye != null) variants(t.bye, `${w} bye`);
+        if (t.re != null) {
+          if (!t.say) FAIL('re', `${O.id}.${w}: re needs the line it answers (say)`, W(O, at(O, npc)));
+          const first = Array.isArray(t.say) && Array.isArray(t.say[0]) ? t.say[0] : t.say;
+          checkRe(t.re, O, w, npc, 0, conds, W(O, at(O, (pairOf(first) || {}).full)));
+          tp.conv = tp.conv || W(O, at(O, (pairOf(first) || {}).full));
+        }
         if (t.scene) { if (!M.scenes[t.scene]) FAIL('ids', `${O.id}.${w}: scene ${t.scene} is not defined`, W(O, at(O, t.scene))); addTo(scenesUsed, t.scene, { O, where: w }); }
         if (t.fact && !t.say) factCheckLater.push({ O, where: w, fact: t.fact, conds, full: '' });
         for (const k of ['promise', 'ref']) for (const id of arr(t[k])) promiseLater.push({ k, id, O, where: w, loc: W(O, at(O, id)) });
         eachEffect(t.then, (e) => checkEffect(e, O, w));
-        if (!t.say && !t.option && !t.scene && !t.then) FAIL('ids', `${O.id}.${w}: a talk entry needs say, option, scene or then`, W(O, at(O, npc)));
+        if (!t.say && !t.option && !t.scene && !t.then && t.ask == null && t.idle == null && t.bye == null) FAIL('ids', `${O.id}.${w}: a talk entry needs say, option, ask, idle, bye, scene or then`, W(O, at(O, npc)));
       });
     }
   }
@@ -1049,6 +1379,7 @@ export function runChecks(M, opts = {}) {
         if (tags.if && !condSat(tags.if, st)) { noteBonus(tags.do, tags.if, st, ctx); continue; }
         if (tags.clue) addClue(tags.clue, st, ctx);
         addG(applyEffects(tags.do, st, ctx));
+        if (Array.isArray(tags.re)) addG(replyGain(tags.re, st, ctx));
         continue;
       }
       if (!b || typeof b !== 'object') continue;
@@ -1076,6 +1407,22 @@ export function runChecks(M, opts = {}) {
       if (b.do) addG(applyEffects(b.do, st, ctx));
     }
     return total;
+  }
+  // replies on a scene line are a choice: the best reply's gain (J1: re on a line is a choose block)
+  function replyGain(re, st, ctx) {
+    const best = {};
+    for (const r of arr(re)) {
+      if (!r || typeof r !== 'object') continue;
+      if (r.if && !condSat(r.if, st)) { noteBonus(r.then, r.if, st, ctx); continue; }
+      const g = {};
+      const add2 = (x) => { for (const [k, v] of Object.entries(x)) g[k] = (g[k] || 0) + v; };
+      add2(applyEffects(r.then, st, ctx));
+      for (const l of responseLines(r.say, null) || []) { const tg = (l[3] && typeof l[3] === 'object') ? l[3] : (l[2] && typeof l[2] === 'object' ? l[2] : {}); if (tg.clue) addClue(tg.clue, st, ctx); add2(applyEffects(tg.do, st, ctx)); }
+      const nre = Array.isArray(r.next) ? ((r.next[3] && typeof r.next[3] === 'object' ? r.next[3] : r.next[2]) || {}).re : r.next && r.next.re;
+      if (Array.isArray(nre)) add2(replyGain(nre, st, ctx));
+      for (const [k, v] of Object.entries(g)) best[k] = Math.max(best[k] || 0, v);
+    }
+    return best;
   }
   function collectEffects(list) { const out = []; for (const b of arr(list)) { if (Array.isArray(b)) { const t = b[3] || b[2]; if (t && typeof t === 'object' && t.do) out.push(...arr(t.do)); } else if (b && b.do) out.push(...arr(b.do)); } return out; }
   function noteBonus(effects, cond, st, ctx) {
@@ -1349,7 +1696,7 @@ export function runChecks(M, opts = {}) {
   const sceneLen = (list, depth = 0, seen = new Set()) => {
     let n = 0;
     for (const b of arr(list)) {
-      if (Array.isArray(b)) { n++; continue; }
+      if (Array.isArray(b)) { n++; const tg = (b[3] && typeof b[3] === 'object') ? b[3] : (b[2] && typeof b[2] === 'object' ? b[2] : null); if (tg && Array.isArray(tg.re)) n += replyLen(tg.re); continue; }
       if (!b || typeof b !== 'object') continue;
       if ('choose' in b) {
         let best = 0;
@@ -1365,6 +1712,17 @@ export function runChecks(M, opts = {}) {
     }
     return n;
   };
+  // the longest branch through replies: a response's lines, plus the next line and its replies
+  function replyLen(re, depth = 0) {
+    let best = 0;
+    for (const r of arr(re)) {
+      if (!r || typeof r !== 'object') continue;
+      let k = (responseLines(r.say, 'x') || []).length;
+      if (r.next && depth < 2) { k += 1; const nre = Array.isArray(r.next) ? ((r.next[3] && typeof r.next[3] === 'object' ? r.next[3] : r.next[2]) || {}).re : r.next.re; if (Array.isArray(nre)) k += replyLen(nre, depth + 1); }
+      best = Math.max(best, k);
+    }
+    return best;
+  }
   const afterBoss = new Map(); // scene -> boss
   for (const O of M.owners) {
     const steps = arr(O.def.step);
@@ -1386,6 +1744,83 @@ export function runChecks(M, opts = {}) {
     sc.len = n; sc.afterBoss = boss || null;
     info.scenes[id] = { len: n, max, afterBoss: boss || null, owner: sc.owner ? sc.owner.id : null };
     if (n > max) FAIL('length', `${id}: ${n} lines${boss ? ` after boss ${boss}` : ''} (max ${max})`, W(sc.owner, { file: sc.file, line: sc.line, scene: id }));
+  }
+
+  // ---------- 14. talk v11 (J2): said keys, unique reply texts, people with v11 talk and no idle line
+  for (const [k, L] of saidReads) if (!saidSets.has(k)) for (const l of L) FAIL('said', `${l.owner}: said ${k} is read (if: "${l.cond}") but nothing sets it (a reply sets it with then: ['said ${k}'])`, l);
+  for (const [k, L] of saidSets) if (!saidReads.has(k)) WARN('said', `${L[0].owner}: said ${k} is set but no if: ever reads it (${L.map((l) => `${l.file}:${l.line}`).join(', ')})`, L[0]);
+  for (const [, L] of replyTexts) for (const x of L.slice(1)) FAIL('re', `${x.O.id}.${x.where}: reply "${short(x.full, 50)}" is also at ${L[0].loc.file}:${L[0].loc.line} (reply texts are unique across the game)`, x.loc);
+  for (const [npc, tp] of talkPeople) if (tp.conv && !tp.idle) WARN('idle', `${npc} has replies or ask topics but no idle line (a talk entry { idle: [full, simple] }: what ${npc} says when the opener was already heard today)`, tp.conv);
+
+  // ---------- 15. voice budgets (J2, all WARN): phrases, CAPS share per file, opener share per speaker
+  const voice = voiceRules();
+  function voiceRules() {
+    const known = new Set([...SPEAKERS_BUILTIN, ...G.cast, ...G.speakers, ...G.foes, ...Object.keys(M.npcs), 'voice', 'grandpa']);
+    for (const t of texts) if (isStr(t.who)) known.add(t.who);
+    const units = texts.map((t) => ({ src: 'data', file: t.file, line: t.line, who: isStr(t.who) ? (VOICE_ALIAS[t.who] || t.who) : null, full: t.full, simple: t.simple, act: t.O && t.O.act != null ? +t.O.act : actOfPath(t.file),
+      noShare: !isStr(t.who) && !/[a-z]/.test(t.full) && words(t.full) <= 3 }));
+    if (opts.oldText !== false) for (const u of oldTextUnits(G, known)) units.push(u);
+    const ord = (u) => (u.act == null || isNaN(u.act) ? 0 : u.act);
+    units.sort((a, b) => ord(a) - ord(b) || (a.file < b.file ? -1 : a.file > b.file ? 1 : 0) || a.line - b.line);
+    const norm = (x) => (isStr(x) ? x.replace(/[’‘]/g, "'").replace(/[“”]/g, '"') : '');
+    const stats = {};
+    // the over counts follow --act (the uses are the whole game's, since the budgets are)
+    const warnU = (rule, u, why) => { if (!inAct(u.act)) return 0; WARN(rule, `${u.file}:${u.line} ${u.who || '?'} "${short(u.full, 60)}": ${why}`, { file: u.file, line: u.line, act: u.act, who: u.who, voice: true }); return 1; };
+    for (const R of VOICE) {
+      const hit = (x) => { x = norm(x); return !!x && R.re.test(x) && (!R.and || R.and.test(x)); };
+      const hits = units.filter((u) => hit(u.full) || hit(u.simple));
+      const over = [];
+      if (R.max != null) hits.slice(R.max).forEach((u, i) => over.push([u, `use ${R.max + i + 1} of ${hits.length} (the game keeps ${R.max}${R.max ? ', the first in play order' : ''})`]));
+      if (R.who) {
+        const perAct = new Map();
+        for (const u of hits) {
+          if (!u.who || !R.who.includes(u.who)) { over.push([u, `${R.what} is for ${R.who.join(', ')} only${u.who ? '' : ' (the speaker of this line is unknown)'}`]); continue; }
+          if (R.acts && R.acts[u.who] && !R.acts[u.who].includes(u.act)) { over.push([u, `${u.who} says it in act ${R.acts[u.who].join(', ')} only`]); continue; }
+          if (R.perAct && R.perAct[u.who] != null) { const k = `${u.who} ${u.act}`, n = (perAct.get(k) || 0) + 1; perAct.set(k, n); if (n > R.perAct[u.who]) over.push([u, `${u.who}'s use ${n} in act ${u.act} (${R.perAct[u.who]} per act)`]); }
+        }
+      }
+      let nOver = 0;
+      for (const [u, why] of over) nOver += warnU(`voice.${R.id}`, u, why);
+      const bud = [R.max != null ? `${R.max} in the game` : '', R.who ? `${R.who.join(', ')} only` : '', ...Object.entries(R.perAct || {}).map(([w, n]) => `${w} ${n} per act`), ...Object.entries(R.acts || {}).map(([w, a]) => `${w} in act ${a.join(', ')}`)].filter(Boolean).join('; ');
+      stats[`voice.${R.id}`] = { what: R.what, budget: bud, uses: hits.length, over: nOver };
+    }
+    // CAPS share per file
+    const C = VOICE_SHARE.caps;
+    const capsWord = (x) => { const m = norm(x).replace(/\$\{[^}]*\}/g, ' ').match(/\b[A-Z]{3,}\b/g); return m ? m.find((w) => !/^[IVX]+$/.test(w)) || null : null; };
+    const byFile = new Map();
+    for (const u of units) {
+      if (u.noShare || (u.who && C.skipWho.includes(u.who)) || (C.skipTextWho.includes(u.who) && C.skipText.test(norm(u.full)))) continue;
+      addTo(byFile, u.file, u);
+    }
+    const cs = { what: C.what, budget: `${Math.round(C.share * 100)}% of a file's lines (at least ${C.min})`, uses: 0, over: 0, files: 0, overFiles: 0 };
+    for (const [, L] of byFile) {
+      const caps = L.map((u) => [u, capsWord(u.full) || capsWord(u.simple)]).filter((x) => x[1]);
+      if (!caps.length) continue;
+      cs.uses += caps.length; cs.files++;
+      const allow = Math.max(C.min, Math.floor(C.share * L.length));
+      if (caps.length <= allow) continue;
+      let k = 0;
+      for (const [u, w] of caps.slice(allow)) k += warnU('voice.caps', u, `"${w}": ${caps.length} of ${L.length} lines in this file have a CAPS word (${Math.round(100 * caps.length / L.length)}%; the budget is ${Math.round(C.share * 100)}%, ${allow} line${allow === 1 ? '' : 's'})`);
+      if (k) { cs.over += k; cs.overFiles++; }
+    }
+    stats['voice.caps'] = cs;
+    // opener share per speaker
+    const P = VOICE_SHARE.opener;
+    const bySpk = new Map();
+    for (const u of units) if (u.who && !u.noShare && !VOICE_NOT_PEOPLE.has(u.who)) addTo(bySpk, u.who, u);
+    const os = { what: P.what, budget: `${Math.round(P.share * 100)}% of a speaker's lines (at least ${P.min})`, uses: 0, over: 0, speakers: 0, overSpeakers: 0 };
+    for (const [who, L] of bySpk) {
+      const op = L.filter((u) => P.re.test(norm(u.full).trim()) || (u.simple && P.re.test(norm(u.simple).trim())));
+      if (!op.length) continue;
+      os.uses += op.length; os.speakers++;
+      const allow = Math.max(P.min, Math.floor(P.share * L.length));
+      if (op.length <= allow) continue;
+      let k = 0;
+      for (const u of op.slice(allow)) k += warnU('voice.opener', u, `${who} opens ${op.length} of ${L.length} lines with "Oh!", "Okay." or "..." (${Math.round(100 * op.length / L.length)}%; the budget is ${Math.round(P.share * 100)}%, ${allow} line${allow === 1 ? '' : 's'})`);
+      if (k) { os.over += k; os.overSpeakers++; }
+    }
+    stats['voice.opener'] = os;
+    return { stats, lines: units.length, code: units.filter((u) => u.src === 'code').length };
   }
 
   // ---------- 13. old saves
@@ -1452,7 +1887,7 @@ export function runChecks(M, opts = {}) {
     }
   }
 
-  return { fails, warns, walk: walkLog, order: ORDER, afterBoss: Object.fromEntries(afterBoss), info };
+  return { fails, warns, walk: walkLog, order: ORDER, afterBoss: Object.fromEntries(afterBoss), info, voice, act: actFilter };
 }
 
 // which fixture flags and choices the old code (main at BASE_REF) read: a Set, or null when git is not there
@@ -1507,11 +1942,75 @@ export function report(res, M, opts) {
   }
   lines.push('');
   lines.push('```');
-  for (const f of fails) lines.push(`FAIL ${pad(f.rule)}${f.msg}`);
-  for (const w of dataW) lines.push(`WARN ${pad(w.rule)}${w.msg}`);
+  // the talk rules (J2) end with the file:line they are about (the voice lines start with theirs)
+  const J2T = new Set(['re', 'talk', 'label', 'said', 'choose', 'idle']);
+  const fl = (x) => (J2T.has(x.rule) && x.file && !x.msg.includes(`${x.file}:${x.line}`) ? ` (${x.file}:${x.line})` : '');
+  for (const f of fails) lines.push(`FAIL ${pad(f.rule)}${f.msg}${fl(f)}`);
+  for (const w of dataW) lines.push(`WARN ${pad(w.rule)}${w.msg}${fl(w)}`);
   for (const w of legW) lines.push(`WARN ${pad(w.rule)}${w.msg}`);
   lines.push('```');
   return lines.join('\n') + '\n';
+}
+
+// the voice and talk rules, one row each: { rule, what, budget, uses, over }
+const TALK_RULES = [
+  ['re', 'replies (re): 2 or 3, 8 words or fewer, a response by someone other than Ash, unique across the game', 'FAIL (a few shape notes WARN)'],
+  ['talk', 'ask topics, idle and bye lines: well formed', 'FAIL'],
+  ['label', 'generic menu labels in data ("What\'s new?", "Anything else?" ...)', 'FAIL'],
+  ['said', 'said keys: every one an if: reads is set somewhere (FAIL), every one set is read (WARN)', 'FAIL / WARN'],
+  ['choose', 'a choose asking "What do you do?" or "What do you say?" without a narration line before it', 'WARN'],
+  ['idle', 'a person with replies or ask topics and no idle line', 'WARN'],
+];
+export function voiceRows(res) {
+  const rows = [];
+  const st = (res.voice && res.voice.stats) || {};
+  for (const [rule, x] of Object.entries(st)) {
+    const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+    const usesText = x.files != null ? `${pl(x.uses, 'line')} in ${pl(x.files, 'file')}` : x.speakers != null ? `${pl(x.uses, 'line')} from ${pl(x.speakers, 'speaker')}` : pl(x.uses, 'use');
+    const where = !x.over ? '' : x.overFiles != null ? ` in ${pl(x.overFiles, 'file')}` : x.overSpeakers != null ? ` from ${pl(x.overSpeakers, 'speaker')}` : '';
+    rows.push({ rule, what: x.what, budget: x.budget, uses: x.uses, over: x.over, usesText, overText: `${x.over}${where}`, where });
+  }
+  for (const [rule, what, budget] of TALK_RULES) {
+    const f = res.fails.filter((q) => q.rule === rule).length, w = res.warns.filter((q) => q.rule === rule).length;
+    rows.push({ rule, what, budget, uses: f + w, over: f + w, usesText: '', overText: `${f ? f + ' FAIL' : ''}${f && w ? ', ' : ''}${w ? w + ' WARN' : ''}` || '0' });
+  }
+  return rows;
+}
+// the build's short summary: one line per rule that has something to say
+export function voiceSummary(res) {
+  const rows = voiceRows(res).filter((r) => r.over > 0);
+  const n = rows.filter((r) => r.rule.startsWith('voice.')).reduce((s, r) => s + r.over, 0);
+  const out = [`voice: ${n} line${n === 1 ? '' : 's'} over budget${res.act != null ? ` in act ${res.act}` : ''} (WARN; each one is in check.md; the table: node tools/check.mjs --voice)`];
+  const w = Math.max(8, ...rows.map((r) => r.rule.length));
+  for (const r of rows) out.push(`  ${(r.rule + ' '.repeat(w)).slice(0, w)}  ${r.rule.startsWith('voice.') ? `${r.over} over${r.where} (${r.usesText}; budget: ${r.budget})` : `${r.overText}: ${r.what}`}`);
+  return out;
+}
+export function voiceReport(res, M) {
+  const rows = voiceRows(res);
+  const v = res.voice || {};
+  const L = [];
+  L.push('# Voice and talk rules: the counts today', '');
+  L.push('Made by `node tools/check.mjs --voice` (it also prints the first table). Every voice rule is a WARN that names each');
+  L.push('line over its budget with file:line and the speaker; dist/check.md lists them all. The talk rules re, talk, label and');
+  L.push('said FAIL and stop the build; choose, idle and a few re notes WARN. Budgets live in the VOICE table at the top of');
+  L.push('tools/check.mjs.', '');
+  L.push(`Read: ${v.lines || 0} lines (${(v.lines || 0) - (v.code || 0)} texts in the story data, ${v.code || 0} in the old code's string literals).`, '');
+  L.push('| rule | what | budget | uses | over budget |', '|---|---|---|---|---|');
+  for (const r of rows) L.push(`| ${r.rule} | ${r.what.replace(/\|/g, '/')} | ${r.budget} | ${r.usesText} | ${r.overText} |`);
+  const mine = res.warns.concat(res.fails).filter((w) => /^voice\.|^(re|talk|label|said|choose|idle)$/.test(w.rule));
+  // lines over budget by act (the act of the story file, or of the old module: x1 is Act II; - is the shared code)
+  const acts = [...new Set(mine.map((w) => (w.act == null ? '-' : String(w.act))))].sort();
+  if (acts.length) {
+    L.push('', '## Over budget, by act', '', `| rule | ${acts.map((a) => (a === '-' ? 'shared code' : `act ${a}`)).join(' | ')} |`, `|---|${acts.map(() => '---|').join('')}`);
+    for (const r of rows) { const c = acts.map((a) => mine.filter((w) => w.rule === r.rule && (w.act == null ? '-' : String(w.act)) === a).length); if (c.some(Boolean)) L.push(`| ${r.rule} | ${c.join(' | ')} |`); }
+  }
+  const byFile = new Map();
+  for (const w of mine) if (w.file) { const e = byFile.get(w.file) || { n: 0, rules: {} }; e.n++; e.rules[w.rule] = (e.rules[w.rule] || 0) + 1; byFile.set(w.file, e); }
+  if (byFile.size) {
+    L.push('', `## Every file with a line over budget (${byFile.size}), most first`, '', '| file | lines | by rule |', '|---|---|---|');
+    for (const [f, e] of [...byFile].sort((a, b) => b[1].n - a[1].n || (a[0] < b[0] ? -1 : 1))) L.push(`| ${f} | ${e.n} | ${Object.entries(e.rules).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k.replace(/^voice\./, '')} ${n}`).join(', ')} |`);
+  }
+  return L.join('\n') + '\n';
 }
 
 // ---------------------------------------------------------------- the CLI
@@ -1534,20 +2033,33 @@ export async function main(argv) {
   const md = report(res, M, { act });
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, 'check.md'), md);
+  const vs = voiceSummary(res);
+  if (argv.includes('--voice')) {
+    const vmd = voiceReport(res, M);
+    writeFileSync(join(outDir, 'voice.md'), vmd);
+    const rows = voiceRows(res), w = Math.max(...rows.map((r) => r.rule.length));
+    console.log(`voice and talk rules (${res.voice ? res.voice.lines : 0} lines read):`);
+    console.log(`  ${'rule'.padEnd(w)}  ${'uses'.padStart(18)}  ${'over budget'.padStart(20)}  budget`);
+    for (const r of rows) console.log(`  ${r.rule.padEnd(w)}  ${String(r.usesText).padStart(18)}  ${String(r.overText).padStart(20)}  ${r.budget}`);
+    console.log(`wrote ${relative(process.cwd(), join(outDir, 'voice.md'))}`);
+  }
   const json = {
-    ok: res.fails.length === 0, act: act != null ? +act : null, ms: Date.now() - t0,
+    ok: res.fails.length === 0, act: act != null ? +act : null, ms: Date.now() - t0, cpu: Math.round((process.cpuUsage().user + process.cpuUsage().system) / 1000),
     counts: { fail: res.fails.length, warn: res.warns.length, files: M.files.length, chapters: Object.keys(M.chapters).length, quests: Object.keys(M.quests).length, entities: Object.keys(M.ents).length, clues: Object.keys(M.clues).length, deductions: Object.keys(M.deduce).length, scenes: Object.keys(M.scenes).length },
-    fails: res.fails, warns: res.warns, walk: res.walk, order: res.order, info: res.info,
+    fails: res.fails, warns: res.warns, walk: res.walk, order: res.order, info: res.info, voice: res.voice ? res.voice.stats : null,
   };
   writeFileSync(join(outDir, 'check.json'), JSON.stringify(json, null, 1));
-  if (!argv.includes('--quiet')) {
+  const quiet = argv.includes('--quiet');
+  if (!quiet) {
     const head = md.split('\n').slice(0, 8).join('\n');
     console.log(head.replace(/\n```[\s\S]*$/, ''));
     const L = md.split('\n').filter((l) => l.startsWith('FAIL'));
     for (const l of L.slice(0, 40)) console.log(l);
     if (L.length > 40) console.log(`... ${L.length - 40} more FAIL lines in ${relative(process.cwd(), join(outDir, 'check.md'))}`);
-    console.log(`(${json.ms} ms) wrote ${relative(process.cwd(), join(outDir, 'check.md'))} and check.json`);
   }
+  // the voice rules are a short summary (one line per rule), never every warning: those are in check.md
+  if (!argv.includes('--voice')) for (const l of vs) console.log(l);
+  if (!quiet) console.log(`(${json.ms} ms) wrote ${relative(process.cwd(), join(outDir, 'check.md'))} and check.json`);
   return res.fails.length ? 1 : 0;
 }
 function findFixtures(root) {
