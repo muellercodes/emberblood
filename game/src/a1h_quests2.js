@@ -36,7 +36,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'wendel',text:'Talk to Wendel',take:{sheet1:1,sheet2:1,sheet3:1},lines:[['wendel',`That was beautiful. You have the ears of a dragon. Which, I suppose, you do.`],['wendel',`Take this. Every song I finish, I'll play it for you.`]],reward:{bless:1,xp:80}}
     ]},
   pie:{title:'The Case of the Missing Pie',giver:'mayor',min:'wren',
-    offer:[['mayor',S(`Ash! A crime has been committed! My prize pie, the one for the Harvest Fair judging, has been EATEN. In the night. By a FIEND.`,`Ash! Someone ate my prize pie in the night!`)],['mayor',`Find the culprit. Ask around. Leave no crumb unturned!`]],
+    offer:[['mayor',S(`Ash! A crime has been committed! My prize pie, the one for the Brindlecross Fair judging, has been EATEN. In the night. By a FIEND.`,`Ash! Someone ate my prize pie in the night!`)],['mayor',`Find the culprit. Ask around. Leave no crumb unturned!`]],
     topics:{
       nib:{t:'Did you see who ate the Mayor’s pie?',flag:'clue_nib',lines:[['nib',`Not me! I was hiding from the Mayor's dog all night. But I DID see someone walking around in pajamas at midnight. They had a really big mustache.`]]},
       tilly:{t:'Was anyone up late last night?',flag:'clue_tilly',lines:[['tilly',`The Mayor came in at midnight in his nightcap, asking for "more crust, more crust." His eyes were closed. I gave him a bread roll and he walked home.`]]},

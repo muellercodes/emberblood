@@ -25,7 +25,7 @@ EVS.cart={title:S('Stuck in the Mud','Stuck in the Mud'),
   call:()=>S(`Hello? Anybody? My wagon is stuck!`,`Help! My wagon is stuck!`),
   meet:E=>[
     xl('ev_wim',`Oh, thank goodness, a dragon! I'm Wim Wobble, traveling tinker. My wagon is stuck in the mud up to its ears.`,`Hi! I'm Wim. My wagon is stuck in the mud.`),
-    xl('ash',`Wagons have ears?`,`Wagons have ears?`),
+    xl('ash',`I'm Ash. Wait, wagons have ears?`,`I'm Ash. Wagons have ears?`),
     xl('ev_wim',`This one does. I gave it ears. It's a long story. Can you help me get it out?`,`This one does. Can you help me?`),
     xc('ash',`How should I get it out?`,`How will you get it out?`,[
       xo(`Push it out! Whack the wheels!`,`Hit the wheels to push it out!`,{tone:'brave',fn:()=>{ E.plan='push'; },then:[xl('ev_wim',`Mind the paint! Well. Mind the wood. The paint is mostly mud now.`,`Go! Hit the wheels!`)]}),
@@ -107,7 +107,7 @@ EVS.ghost={title:S('The Ghost Who Lost His Hat','The Ghost and the Hat'),
     xc('ash',`Will you find his hat?`,`Will you find his hat?`,[
       xo(`I'll find it!`,`I will find it!`,{tone:'kind',fn:()=>{ E.plan='find'; },then:[xl('ev_wisp',`It's tall and black and very dashing. Like me, a hundred years ago. It blew that way. I think. Ghosts are bad with directions.`,`It is tall and black. Look for it nearby!`)]}),
       xo(`Can ghosts even wear hats?`,`Can ghosts wear hats?`,{fn:()=>{ E.plan='find'; },then:[xl('ev_wisp',`Of course! How else would anyone know where my head is? Please find it. It blew off somewhere nearby.`,`Yes! Or nobody can find my head. Please find it!`)]}),
-      xo(`BOO!`,`BOO!`,{fn:()=>{ E.plan='find'; },then:[xl('ev_wisp',`AAAAH! Oh. Oh, you got me. That's very rude. Ha. Ha ha. Will you still help me find my hat?`,`AAAH! You scared me! Will you still help?`),xl('ash',`Sorry. Yes. I'll find it.`,`Sorry! Yes, I will find it.`)]})
+      xo(`BOO!`,`BOO!`,{fn:()=>{ E.plan='find'; },then:[xl('ev_wisp',`AAAAH! Oh. Oh, you got me. Nobody has scared a ghost in a hundred years. Ha. Ha ha. Will you still help me find my hat?`,`AAAH! You scared me! Will you still help?`),xl('ash',`Sorry. Yes. I'll find it.`,`Sorry! Yes, I will find it.`)]})
     ])],
   back:E=>[
     xc('ev_wisp',`My hat! You found my hat!`,`You found my hat!`,[
@@ -183,7 +183,7 @@ EVS.wizard2={title:S('The Wizard Comes Back','The Wizard Comes Back'),
       xl('ev_quib',`Told you wizards always find their hats. Did you have any new ideas? Wearing a wizard hat gives you at least three.`,`I found you! Did the hat give you new ideas?`),
       xc('ash',`Any new ideas?`,`Any new ideas?`,[
         xo(`I thought about pancakes a lot`,`I thought about pancakes`,{then:[xl('ev_quib',`Pancakes! A classic wizard idea. You're a natural.`,`Pancakes! A great idea.`)]}),
-        xo(`I wondered how many stars there are`,`How many stars are there?`,{then:[xl('ev_quib',`Eleven thousand and twelve. I counted. Then I lost count. Then I made that number up.`,`Lots! I counted. Then I lost count.`)]}),
+        xo(`I wondered how many stars there are`,`How many stars are there?`,{then:[xl('ev_quib',`Eleven thousand and twelve. Possibly. I made that number up, but it sounded right.`,`Lots! I made up a number.`)]}),
         xo(`Not really`,`Not really`,{then:[xl('ev_quib',`That's an idea too. A very restful one.`,`That is okay too.`)]})]),
       xl('ev_quib',old&&old!=='none'?`Here's your own hat back. And you know what? Keep the wizard hat too. It looked better on you. Don't tell it I said that.`:`Here are your worries back. I've polished them. They're much smaller now. And keep the wizard hat. It looked better on you.`,
         old&&old!=='none'?`Here is your hat back. Keep the wizard hat too!`:`Here are your worries. They are smaller now. Keep the wizard hat!`),
@@ -194,7 +194,7 @@ EVS.wizard2={title:S('The Wizard Comes Back','The Wizard Comes Back'),
 // ---------- The Whispering Fog (follow the lights to a hidden grove)
 EVS.fog={title:S('The Whispering Fog','The Whispering Fog'),
   start:E=>[
-    xl('narr',`The fog whispers, very softly: "Follow the lights, little ember. We have something to show you."`,`The fog whispers: "Follow the lights. We want to show you something."`),
+    xl('narr',`The fog whispers, very softly: "Follow the lights, dragon child. We have something to show you."`,`The fog whispers: "Follow the lights. We want to show you something."`),
     xc('ash',`Follow the whispers?`,`Follow the lights?`,[
       xo(`Follow the lights`,`Follow the lights`,{fn:()=>{ E.plan='follow'; }}),
       xo(`Nope. Spooky fog. No thank you.`,`No. Too spooky!`,{fn:()=>{ E.plan='no'; },then:[xl('narr',`The fog sighs, a little hurt, and drifts away.`,`The fog sighs and floats away.`)]})
@@ -203,11 +203,11 @@ EVS.fog={title:S('The Whispering Fog','The Whispering Fog'),
     const s=nearSecret(player.x,player.y,2600,'fog');
     return [
       xl('narr',`The fog opens like a curtain. Behind it is a tiny grove nobody has seen in a hundred years. Glowing flowers. A spring as clear as glass.`,`The fog opens. You find a secret garden with glowing flowers and a clear pool.`),
-      xl('ev_fog',`We are the fog. We only show this place to kind hearts. Choose one gift, little ember.`,`We are the fog. Pick one present.`),
+      xl('ev_fog',`We are the fog. We only show this place to kind hearts. Choose one gift, dragon child.`,`We are the fog. Pick one present.`),
       xc('ash',`Choose one gift`,`Pick one present`,[
         xo(`Drink from the spring`,`Drink from the pool`,{fn:()=>evGive({maxhp:5,heal:true,stamina:true}),then:[xl('narr',`The water tastes like rain and starlight. Your scales feel brand new. (+5 max health)`,`The water tastes like rain. You feel brand new! (+5 health)`)]}),
         xo(`Pick a glowing flower for Mom`,`Pick a flower for Mom`,{tone:'kind',fn:()=>{ G.flags.ev_flower=true; },then:[xl('narr',`You pick one glowing flower. It hums a tiny tune in your claws. Mom is going to love it.`,`You pick a glowing flower for Mom. It hums a little song.`)]}),
-        xo(`Ask the fog where a secret is hidden`,`Ask where a secret is`,{fn:()=>{ if(s) fogReveal(s.x,s.y,500); },then:[s?xl('ev_fog',`Something hidden waits to the ${dirWord(player.x,player.y,s.x,s.y)} of here. Not too far. Go and look, little ember.`,`A secret is ${dirWord(player.x,player.y,s.x,s.y)} of here. Go look!`):xl('ev_fog',`You have found every secret near here already. We are impressed. We are fog, and we are impressed.`,`You found all the secrets here already!`)]})
+        xo(`Ask the fog where a secret is hidden`,`Ask where a secret is`,{fn:()=>{ if(s) fogReveal(s.x,s.y,500); },then:[s?xl('ev_fog',`Something hidden waits to the ${dirWord(player.x,player.y,s.x,s.y)} of here. Not too far. Go and look.`,`A secret is ${dirWord(player.x,player.y,s.x,s.y)} of here. Go look!`):xl('ev_fog',`You have found every secret near here already. Even the fog is impressed.`,`You found all the secrets here already!`)]})
       ])];
   }
 };
@@ -217,9 +217,9 @@ EVS.drake={title:S('The Lost Drakeling','The Lost Baby Dragon'),
     xl('narr',`A baby drakeling sits all alone, crying tiny puffs of smoke. It looks at your horns and decides you might be family.`,`A baby dragon is all alone. It is crying little puffs of smoke.`),
     G.pip?xl('narr',`Pip sniffs the baby. The baby sniffs Pip. They are best friends now. That was fast.`,`Pip sniffs the baby. Now they are friends!`):xl('narr',`It peeps at you. Hopefully.`,`It peeps at you.`),
     xc('ash',`What will you do?`,`What will you do?`,[
-      xo(`Come on, little one. Let's find your mum.`,`Let's find your mum!`,{tone:'kind',fn:()=>{ E.plan='lead'; },then:[xl('narr',`The baby hops after you, peeping. Somewhere nearby, a big drakeling must be looking for it. Look for her nest.`,`The baby follows you. Find its mum's nest!`)]}),
+      xo(`Come on, little one. Let's find your mom.`,`Let's find your mom!`,{tone:'kind',fn:()=>{ E.plan='lead'; },then:[xl('narr',`The baby hops after you, peeping. Somewhere nearby, a big drakeling must be looking for it. Look for her nest.`,`The baby follows you. Find its mom's nest!`)]}),
       xo(`Pip, can you smell where the nest is?`,`Pip, find the nest!`,{cond:()=>!!G.pip,fn:()=>{ E.plan='lead'; E.d.pip=true; },then:[xl('pip',`Mip! Mip mip!`,`Mip!`),xl('narr',`Pip zips off. Follow Pip! The baby hops after you.`,`Pip flies off. Follow Pip!`)]}),
-      xo(`Share a fish with it first`,`Give it a fish`,{cond:()=>(G.items.fish||0)>0,fn:()=>{ takeItems({fish:1}); E.plan='lead'; E.d.fed=true; },then:[xl('narr',`The baby gobbles the fish in one bite and does a happy wiggle. Now it would follow you anywhere. Let's find its mum.`,`It eats the fish and wiggles. Now let's find its mum!`)]})
+      xo(`Share a fish with it first`,`Give it a fish`,{cond:()=>(G.items.fish||0)>0,fn:()=>{ takeItems({fish:1}); E.plan='lead'; E.d.fed=true; },then:[xl('narr',`The baby gobbles the fish in one bite and does a happy wiggle. Now it would follow you anywhere. Let's find its mom.`,`It eats the fish and wiggles. Now let's find its mom!`)]})
     ])],
   win:E=>[
     xl('narr',`The big drakeling swoops down and wraps her wings around her baby. Then she looks at you for a long, long moment.`,`The mum dragon hugs her baby with her wings. She looks at you.`),
@@ -241,7 +241,7 @@ EVS.drake2={title:S('A Visit from an Old Friend','A Visit from a Friend'),
 EVS.fish={title:S('The Fishing Contest','The Fishing Contest'),
   call:()=>S(`Ahoy! Any brave fishers about?`,`Hello! Who wants a fishing contest?`),
   meet:E=>[
-    xl('ev_bess',`Ahoy, dragon! I'm Barnacle Bess, champion of every fishing contest within shouting distance. Fancy a contest?`,`Hi! I am Barnacle Bess. I win every fishing contest. Want to try?`),
+    xl('ev_bess',`Ahoy, dragon! I'm Barnacle Bess, champion of every fishing contest within shouting distance. Want a contest?`,`Hi! I am Barnacle Bess. I win every fishing contest. Want to try?`),
     xl('ev_bess',`First to catch two fish wins. Winner gets my Golden Bobber. Loser says "Bess is the best" three times.`,`First to catch two fish wins! The winner gets my Golden Bobber.`),
     !G.items.rod?xl('ev_bess',`No rod? Here, borrow my spare. Don't let it get away. It bites.`,`No fishing rod? You can use my spare one.`):xl('ev_bess',`I see you've got a rod. Good. That makes it fair. Mostly.`,`You have a rod. Good!`),
     xc('ash',`Take the challenge?`,`Try the contest?`,[
@@ -278,7 +278,7 @@ EVS.show={title:S('The Show Must Go On','The Dragon Show'),
     ]),
     xl('ev_fizz',`And now, the BIG FINISH! Light the stage torches, mighty dragon!`,`Now the big finish! Light the torches with your fire!`)],
   win:E=>[
-    xl('narr',`WHOOSH! The torches blaze up. The crowd goes wild. A rabbit faints. It's fine. It's a happy faint.`,`WHOOSH! The torches light up. Everyone cheers!`),
+    xl('narr',`WHOOSH! The torches blaze up. The crowd goes wild. A rabbit in the front row faints from joy.`,`WHOOSH! The torches light up. Everyone cheers!`),
     xl('ev_fizz',`Bravo! Bravissimo! You were magnificent. Here's your share of the coins, star of the stage!`,`You were amazing! Here are your coins!`)],
   quit:E=>[xl('ev_fizz',`The torches went out and so did the audience. Ah well. Every show is practice for the next one.`,`The audience went home. Oh well. Next time!`)]
 };
@@ -300,7 +300,7 @@ EVS.cheese={title:S('The Runaway Cheese','The Runaway Cheese'),
   win:E=>[
     xl('ev_chuck',`My Great Wheel! Thirty years of aging! It was going to win the Brindlecross Fair!`,`My big cheese! Thank you!`),
     xl('ev_chuck',`Take a slice. No, take two slices. You saved my whole life's work. And my lunch.`,`Have some cheese. You saved my lunch!`)],
-  quit:E=>[xl('ev_chuck',`It rolled right into a bush. It's fine. It's bush cheese now. Bush cheese is a delicacy, probably.`,`It rolled into a bush. Oh well. Bush cheese!`)]
+  quit:E=>[xl('ev_chuck',`It rolled right into a bush. Now it's bush cheese. Some people pay extra for bush cheese. Probably.`,`It rolled into a bush. Oh well. Bush cheese!`)]
 };
 // ---------- The Sleepy Bear (a picnic under a snoring bear)
 EVS.bear={title:S('The Sleepy Bear','The Sleepy Bear'),
@@ -349,7 +349,7 @@ EVS.frogs={title:S('The Frog Choir','The Frog Choir'),
   meet:E=>{
     const sc=()=>E.d.score=(E.d.score||0);
     return [
-      xl('ev_croak',`Ah! A conductor! At last! I am Lord Croakington. My choir sings at the Swamp Song Festival tonight, and our conductor got eaten. By a heron. Very rude heron.`,`Hello! I am Lord Croakington. My frog choir needs a leader. Will you help?`),
+      xl('ev_croak',`Ah! A conductor! At last! I am Lord Croakington. My choir sings at the Swamp Song Festival tonight, and our conductor got eaten. By a heron. We have not forgiven the heron.`,`Hello! I am Lord Croakington. My frog choir needs a leader. Will you help?`),
       xl('ev_croak',`Wave your claws and tell us how to sing. We'll do whatever you say. Within reason. We are frogs.`,`Tell us how to sing!`),
       xc('ash',`First verse. How should they sing?`,`First song part. How should they sing?`,[
         xo(`Slow and dreamy`,`Slow and dreamy`,{fn:()=>{ sc(); E.d.score+=1; E.d.v1='slow'; },then:[xl('narr',`Rrrribbit... rrrribbit... The frogs sway like reeds in the wind. One falls asleep.`,`Ribbit... ribbit... The frogs sing slowly. One falls asleep.`)]}),
@@ -358,7 +358,7 @@ EVS.frogs={title:S('The Frog Choir','The Frog Choir'),
       ]),
       xc('ash',`Second verse!`,`Second part!`,[
         xo(`Everyone hum`,`Everyone hum`,{fn:()=>{ E.d.score+=2; },then:[xl('narr',`Mmmmmmm. The whole swamp hums along. Even the mud seems to be humming.`,`Hmmmmm. The whole swamp hums.`)]}),
-        xo(`Just the smallest frog, alone`,`Just the tiny frog`,{tone:'kind',fn:()=>{ E.d.score+=3; },then:[xl('narr',`The tiniest frog steps forward and sings one high, perfect "ribbit." Everyone cries a little. Even you.`,`The tiny frog sings one perfect "ribbit". Everyone cries happy tears.`)]}),
+        xo(`Just the smallest frog, alone`,`Just the tiny frog`,{tone:'kind',fn:()=>{ E.d.score+=3; },then:[xl('narr',`The tiniest frog steps forward and sings one high, perfect "ribbit." The whole choir sniffs. So do you.`,`The tiny frog sings one perfect "ribbit". The frogs sniff.`)]}),
         xo(`Sing it backwards`,`Sing it backwards`,{fn:()=>{ E.d.score+=1; },then:[xl('narr',`Tibbir. Tibbir. It sounds terrible. The frogs love it.`,`Tibbir! Tibbir! It sounds silly. The frogs love it.`)]})
       ]),
       xc('ash',`The grand finale!`,`The big ending!`,[
@@ -511,7 +511,7 @@ const DREAMS={
         xo(`Dad`,`Dad`,{tone:'kind',fn:()=>{ G.flags.dr_spark='dad'; },then:[xl('vor_old',`...You named it after me?`,`You named it after me?`),xl('narr',`The great dragon is quiet for a long time. Then he curls his tail around you, very carefully, as if you were made of glass.`,`The big dragon is quiet. Then he wraps his tail around you, very gently.`)]})
       ]),
       xl('narr',`Far below, in the valley, a little house lights its very first fire. Your father watches it with narrowed eyes.`,`Far below, a little house lights a fire. Your father watches it. He frowns.`),
-      xl('vor_old',`"Mine," he whispers. But you are already asleep.`,`"Mine," he whispers. But you are asleep.`)]},
+      xl('narr',`"Mine," he whispers. But you are already asleep.`,`"Mine," he whispers. But you are asleep.`)]},
   flight:{stages:['warcamp'],title:S('Over the Valley','Flying Over the Valley'),scene:'flight',
     lines:()=>[
       xl('narr',`You're riding on your father's back, high over the valley. The wind is cold, and the stars are close enough to lick.`,`You ride on your father's back, high in the sky.`),
@@ -528,11 +528,11 @@ const DREAMS={
       const L=[
         xl('narr',`It's night. You're older now, almost grown. You walk down the mountain all alone, with your heart thumping like a drum.`,`It is night. You are bigger now. You walk down the mountain alone.`),
         xl('narr',`You knock on a little wooden door. It opens. A woman with a lantern looks up at your horns, and she does not run.`,`You knock on a door. A woman with a lantern opens it. She does not run.`),
-        xl('iska',`Well. You must be Ember. I've seen you up on the mountain, watching us.`,`You must be Ember. I have seen you watching us.`)];
+        xl('iska',`So. You must be Ember. I've seen you up on the mountain, watching us.`,`You must be Ember. I have seen you watching us.`)];
       if(nm) L.push(xl('iska',`And who is this little spark following you around?`,`Who is this little spark?`),xl('ember_kid',`That's ${nm}. My first spark. He never goes out.`,`That is ${nm}. My first spark.`));
       L.push(xc('ember_kid',`What do you say to her?`,`What do you say?`,[
         xo(`I want to help.`,`I want to help.`,{tone:'brave',fn:()=>{ G.flags.dr_knock='help'; },then:[xl('ember_kid',`It's my father. He gets angrier every year. I'm scared of what he'll do to all of you.`,`My father gets angrier every year. I am scared for you.`),xl('iska',`Then come in. Bring your fire. I'll put the kettle on.`,`Then come in. I will make tea.`)]}),
-        xo(`I'm scared.`,`I am scared.`,{tone:'kind',fn:()=>{ G.flags.dr_knock='scared'; },then:[xl('iska',`Of course you are. Being scared is how you know something matters. Come in. I'll put the kettle on.`,`That is okay. Being scared means it matters. Come in.`)]}),
+        xo(`I'm scared.`,`I am scared.`,{tone:'kind',fn:()=>{ G.flags.dr_knock='scared'; },then:[xl('iska',`Of course you are. So am I, most days. Come in. I'll put the kettle on.`,`Of course. So am I. Come in.`)]}),
         xo(`Do you have any cake?`,`Do you have cake?`,{fn:()=>{ G.flags.dr_knock='cake'; },then:[xl('iska',`...I do, actually. Lantern cake. Come in, you funny thing.`,`I do! Lantern cake. Come in!`),xl('narr',`It's the best cake you have ever eaten. You decide, right then and there, to save the valley.`,`It is the best cake ever. You decide to save the valley.`)]})
       ]),
       xl('narr',`That night, for the first time ever, a dragon and a person sit at the same table and make a plan.`,`That night, a dragon and a person make a plan together.`));
@@ -547,7 +547,7 @@ const DREAMS={
       xl('oriel',`The drakes say the mountain is grumbling again. They're worried.`,`The dragons say the mountain is angry again.`),
       xl('iska',`Then we need five fires, one for each of us. And they'll need Ember's flame to light them.`,`We need five fires. Ember's flame will light them.`),
       xc('ember_kid',`What do you do?`,`What do you do?`,[
-        xo(`Warm Tove's hands`,`Warm Tove's hands`,{tone:'kind',fn:()=>{ G.flags.dr_five='tove'; },then:[xl('narr',`You breathe a tiny warm breath on Tove's fingers. Tove makes a sound like a happy kettle.`,`You breathe warm air on Tove's hands. Tove is happy.`),xl('tove',`I take back everything I ever said about dragons.`,`I love dragons now.`)]}),
+        xo(`Warm Tove's hands`,`Warm Tove's hands`,{tone:'kind',fn:()=>{ G.flags.dr_five='tove'; },then:[xl('narr',`You breathe a tiny warm breath on Tove's fingers. Tove makes a sound like a happy kettle.`,`You breathe warm air on Tove's hands. Tove is happy.`),xl('tove',`Warm hands. I'd forgotten what those were like.`,`Warm hands! I forgot how that feels.`)]}),
         xo(`Dry off Sedge`,`Dry off Sedge`,{fn:()=>{ G.flags.dr_five='sedge'; },then:[xl('narr',`You breathe gently on Sedge. Steam rises. For one whole minute, Sedge is dry.`,`You dry Sedge with warm air. Sedge is dry for one minute!`),xl('sedge',`Oh. Oh my. Is this what dry feels like? I don't like it. Thank you, though.`,`So this is dry? I don't like it. Thank you anyway!`)]}),
         xo(`Ask Bram for another story`,`Ask Bram for a story`,{fn:()=>{ G.flags.dr_five='bram'; },then:[xl('bram',`A STORY! Finally, someone with taste!`,`A story! Yes!`),xl('narr',`Bram's story is very long. It has three dragons in it, a goat, and no ending. Everybody laughs anyway.`,`Bram's story is long and silly. It has a goat. Everyone laughs.`)]}),
         xo(`Help Iska fold lanterns`,`Help Iska make lanterns`,{fn:()=>{ G.flags.dr_five='iska'; },then:[xl('iska',`Fold here. And here. There. Your first lantern.`,`Fold here and here. Your first lantern!`),xl('narr',`It's lopsided. Iska says it's perfect. She keeps it for a thousand years.`,`It is wonky. Iska says it is perfect. She keeps it forever.`)]})
@@ -591,13 +591,13 @@ const DREAMS={
         xo(`One for every house in the valley`,`One for every house`,{tone:'brave',fn:()=>{ G.flags.dr_lantern='all'; },then:[xl('narr',`It takes all night. When you're done, the whole valley glows. People come out of their houses to see. Nobody runs.`,`It takes all night. The whole valley glows. Nobody runs away.`)]})
       ]),
       xl('narr',`That was the very first Lantern Day. A thousand years later, a kid with horns and a tail would light the thousandth one.`,`That was the first Lantern Day. A thousand years later, you would light the thousandth.`),
-      xl('ember',`Wake up, little ember. It's your turn now.`,`Wake up, little ember. It is your turn now.`));
+      xl('ember',`Wake up, Ash. It's your turn now.`,`Wake up, Ash. It is your turn now.`));
       return L;
     }},
   home:{stages:['done'],title:S('A Hill Full of Lanterns','A Hill Full of Lanterns'),scene:'home',
     lines:()=>[
       xl('narr',`You dream of a hill covered in lanterns. A girl with horns is sitting in the grass, swinging her feet.`,`You dream of a hill full of lanterns. A girl with horns sits in the grass.`),
-      xl('ember_kid',`You did it. You really did it. I knew you would. Well. I hoped. Hoping is like knowing, but braver.`,`You did it! I hoped you would. Hoping is brave.`),
+      xl('ember_kid',`You did it. You really did it. I knew you would. All right, I hoped. But I hoped very hard.`,`You did it! I hoped so hard.`),
       xc('ash',`What do you say?`,`What do you say?`,[
         xo(`Thank you, Grandma Ember`,`Thank you, Grandma Ember`,{tone:'kind',fn:()=>{ G.flags.dr_home='thanks'; },then:[xl('ember_kid',`Just Ember. Thirteen greats is far too many greats.`,`Just Ember. Thirteen greats is too many!`)]}),
         xo(`Will I see you again?`,`Will I see you again?`,{fn:()=>{ G.flags.dr_home='again'; },then:[xl('ember_kid',`Every Lantern Day. Look for the brightest lantern. That's me, waving.`,`Every Lantern Day. Look for the brightest lantern. That is me, waving.`)]})
@@ -620,9 +620,9 @@ const DREAM_TALK={
   knight:{maren:{flower:S(`Somebody left a red flower on the forge this morning. Was that you?`,`There was a red flower on the forge. Was that you?`),spark:S(`There's a little spark in my glove that won't go out. Ash. Did you do that?`,`There is a spark in my glove that won't go out!`),joke:S(`I heard you laughing at your own joke in your sleep. Was it the gate one? It's a terrible joke. I love it.`,`You laughed at your own joke in your sleep!`)},
     yara:S(`Sir Cindervane. A thousand years at that gate. Imagine what he thinks about.`,`Sir Cindervane waited a thousand years. Wow.`)},
   lantern:{maren:{one:S(`I left a lantern in the window for you. Just one. You know why.`,`I put a lantern in the window for you.`),more:S(`I left two lanterns in the window. One for you, and one more, just in case.`,`I put two lanterns in the window for you.`),all:S(`Every house in the village put a lantern out tonight. Nobody planned it. Isn't that strange?`,`Every house put out a lantern tonight!`)},
-    yara:S(`One more than you think you need. Iska's rule. It's a good rule for lanterns. And for friends.`,`Light one more lantern than you need. Iska's rule.`)},
+    yara:S(`One more than you think you need. Iska's rule. In sixty years I have never once had too many lanterns.`,`Light one more lantern than you need. Iska's rule.`)},
   home:{maren:{thanks:S(`You're smiling in your sleep these days. Good dreams?`,`You smile in your sleep now. Good dreams?`),again:S(`You're smiling in your sleep these days. Good dreams?`,`You smile in your sleep now. Good dreams?`)},
-    yara:S(`You've seen her, haven't you? Ember. In your dreams. She'd be so proud.`,`You saw Ember in a dream? She would be so proud.`)}
+    yara:S(`You've seen her, haven't you? Ember, in your dreams. I can tell. You've been humming the old lantern song all morning.`,`You dreamed of Ember? You are humming her song.`)}
 };
 
 // ================= small variations on moments that repeat
@@ -638,7 +638,7 @@ const DREAM_TALK={
 // Elder Yara's hints come in a couple of versions each
 { const YH={
     warcamp:[STORY.yaraHints.warcamp,S(`Follow the north road out of the village. Grizzlefang's camp is where the trees start. You'll smell it before you see it.`,`Go north from the village. Grizzlefang's camp is at the edge of the woods.`)],
-    wren:[STORY.yaraHints.wren,S(`East, Ash, along the road to the lake. Sister Wren is in the Brindlecross library. Knock first. She bites. Not literally.`,`Go east to Brindlecross by the lake. Find Sister Wren in the library.`)],
+    wren:[STORY.yaraHints.wren,S(`East, Ash, along the road to the lake. Sister Wren is in the Brindlecross library. Knock loudly. She reads with her whole head inside the book.`,`Go east to Brindlecross by the lake. Find Sister Wren in the library.`)],
     oath:[STORY.yaraHints.oath,S(`The Ash Ward is up the Ashen Road, past the Smoky Kettle. Morrow's people throw fire. Throw it back harder.`,`Go up the Ashen Road past the Smoky Kettle inn. The Ash Ward is there.`)],
     three:[STORY.yaraHints.three,S(`Crag Ward in the east, Sunken Ward in the swampy southeast, Frost Ward in the snowy northwest. Pack a scarf for that last one.`,`Three Wards left: east, southeast and northwest. Bring a scarf!`)],
     gate:[STORY.yaraHints.gate,S(`North of Brindlecross, the road climbs to the Obsidian Gate. Its guard has stood there a thousand years. Be kind to him. Then beat him.`,`Go north of Brindlecross to the Obsidian Gate. Be brave.`)],
@@ -655,12 +655,12 @@ const MOM_CH={
   oath:[S(`The Scaled Oath. People in robes who want a dragon to make them kings. Dragons make toast, Ash. Toast.`,`The Oath wants a dragon king. Dragons just make toast!`)],
   three:[S(`Three Wards in three corners of the valley. You'll see more of Embermere this month than I have in my whole life.`,`Three Wards in three places. You will see the whole valley!`),S(`I keep looking at the mountain. Then I keep looking at my hammer. Then I keep looking at the mountain.`,`I keep looking at the mountain. I worry.`)],
   gate:[S(`The Obsidian Gate. When I was little, we dared each other to touch it. Nobody ever did. You're going to walk through it.`,`Nobody ever touched the Gate. You will walk through it!`)],
-  summit:[S(`Come here. No, closer. That's a hug. You're getting another one when you come back. That's a promise.`,`Come here for a hug. You get another when you come back.`),S(`Whatever you decide up there, Ash, you decide it. Not him. Not the Wardens. You.`,`Up there, you decide. Nobody else.`)],
+  summit:[S(`Come here. No, closer. That's a hug. You're getting another one when you come back. That's a promise.`,`Come here for a hug. You get another when you come back.`),S(`Take the extra sandwich. And Ash? Come back down. That's the only rule.`,`Take the sandwich. And come back down.`)],
   done:[S(`My kid saved the valley. I've told everybody. Twice. I've started telling the chickens.`,`My kid saved the valley! I told everybody. Twice.`),S(`The forge has never been so busy. Everyone wants a lantern hook with a little dragon on it.`,`Everyone wants dragon lantern hooks now!`)]
 };
 const YARA_CH={
-  warcamp:[S(`Breathe, Ash. The Hollow Ward is lit. One of five. That's how every long road starts. One step.`,`One Ward is lit. Four to go. One step at a time.`)],
-  three:[S(`Three Wards to go, and the mountain is breathing louder every night. I counted the breaths. I count everything.`,`Three Wards left. The mountain breathes louder every night.`)],
+  warcamp:[S(`Breathe, Ash. The Hollow Ward is lit. That's one. Four to go, and I'll be counting.`,`One Ward is lit. Four to go.`)],
+  three:[S(`Three Wards to go, and the mountain is breathing louder every night. Forty-one breaths last night. I lay awake for every one.`,`Three Wards left. The mountain breathes louder every night.`)],
   gate:[S(`All five Wards burn. A thousand years of Wardens, and a kid with a tail finished the job. Well. Nearly.`,`All five Wards are lit! You nearly did it.`)],
   done:[S(`A thousand and one Lantern Days. I'll light the first lantern again next year. Unless you'd like to.`,`Next Lantern Day, you can light the first lantern.`)]
 };
@@ -691,7 +691,7 @@ const WX_BARKS=[
 ];
 const WX_CHATS=[
   ['wxc_rain',()=>!AREA&&G.rainK>0.45,[[0,S(`Lovely weather for ducks.`,`Good weather for ducks.`)],[1,S(`And frogs.`,`And frogs.`)],[0,S(`And dragons?`,`And dragons?`)],[1,S(`Dragons hate rain. Look at Ash's face.`,`Dragons hate rain. Look at Ash.`)]]],
-  ['wxc_night',()=>isNight(),[[0,S(`Can't sleep?`,`Can't sleep?`)],[1,S(`The mountain's too loud. Can you hear it breathing?`,`The mountain is too loud.`)],[0,S(`That's just my husband snoring.`,`That is just my husband snoring.`)]]],
+  ['wxc_night',()=>isNight(),[[0,S(`Can't sleep?`,`Can't sleep?`)],[1,S(`The mountain's too loud. Can you hear it breathing?`,`The mountain is too loud.`)],[0,S(`I hear it. I've stopped telling myself it's the wind.`,`I hear it too. It is not the wind.`)]]],
   ['wxc_sun',()=>!AREA&&G.rainK<0.1&&isDay(),[[0,S(`Sunny again!`,`Sunny again!`)],[1,S(`I'm going to sit in it like a lizard.`,`I will sit in the sun like a lizard.`)],[0,S(`Don't say lizard near Ash.`,`Shh! Don't say lizard near Ash.`)]]]
 ];
 EVS.snow.quit=E=>[xl('ev_juno',`Ha! We win! The Frostpine Snow Gang is undefeated! Rematch any time, dragon. Here, have some cocoa anyway.`,`We win! Play again any time! Have some cocoa.`)];
@@ -706,9 +706,9 @@ const EV_TALK={
   momTikkaHome:S(`There's a little kobold lighting a lantern in her window every night. She says it's for you. I like her already.`,`A little kobold lights a lantern for you every night. I like her.`),
   opts:{
     wren:[{key:'ev_wren_dream',cond:()=>!!(G.flags.dr_seen_knock||G.flags.dr_seen_five||G.flags.dr_seen_split),t:S(`I keep dreaming about Ember and the Wardens`,`I dream about Ember`),
-      lines:[['wren',S(`Dreams of Ember? Oh, Ash. Write them down! Every single detail! The Wardens' Account only has ten pages. You might be the eleventh.`,`Dreams of Ember? Write them down! You might be page eleven!`)],['wren',S(`Emberbloods used to dream like that, the old books say. The fire remembers what the blood forgets.`,`The fire remembers old things.`)]]}],
+      lines:[['wren',S(`Dreams of Ember? Oh, Ash. Write them down! Every single detail! The Wardens' Account only has ten pages. You might be the eleventh.`,`Dreams of Ember? Write them down! You might be page eleven!`)],['wren',S(`Emberbloods used to dream like that, the old books say. Nobody ever wrote down why.`,`Old Emberbloods had dreams like that too.`)]]}],
     yara:[{key:'ev_yara_tikka',cond:()=>(G.flags.tk_n|0)>=2,t:S(`I've met a kobold who wants to be a baker`,`I met a kobold who bakes`),
-      lines:[['yara',S(`A kobold baker? Hm. When I was young, a kobold once traded me a pie for a button. It was a very good pie. People can change, Ash. So can kobolds.`,`A kobold baker? People can change. Kobolds can too.`)]]}],
+      lines:[['yara',S(`A kobold baker? Hm. When I was young, a kobold once traded me a pie for a button. It was a very good pie. I've wondered about that kobold ever since.`,`A kobold baker? A kobold once gave me a very good pie.`)]]}],
     tamsin:[{key:'ev_tamsin_show',cond:()=>!!G.flags.ev_show,t:S(`Did you hear I was in a play?`,`I was in a play!`),
       lines:[['tamsin',S(`The Marvelous Mudlarks? Everyone heard! A real dragon playing a dragon. It's the role you were born for. I've already written two verses.`,`Everyone heard! A real dragon in a play!`)]]}],
     dell:[{key:'ev_dell_bess',cond:()=>!!G.flags.ev_fish,t:S(`I had a fishing contest with Barnacle Bess`,`I fished with Barnacle Bess`),
@@ -747,7 +747,7 @@ const EV_BARKS=[
   ['evb_tk1','adult',()=>(G.flags.tk_n|0)>=1&&(G.flags.tk_n|0)<4,S(`Someone saw a little kobold carrying a loaf of bread bigger than she was. Strange times.`,`Someone saw a little kobold with a big loaf of bread.`)],
   ['evb_tkb','town:village',()=>G.flags.tk_home==='baker',S(`Have you seen the little kobolds at the bakery? One of them is completely covered in flour. It's adorable.`,`There are little kobolds at the bakery now! So cute!`)],
   ['evb_tkf','id:hollis',()=>G.flags.tk_home==='farm',S(`The kobold kids are up before the rooster. The rooster is very upset about it.`,`The kobold kids wake up before the rooster!`)],
-  ['evb_tkm','town:mire',()=>G.flags.tk_home==='moss',S(`Granny Moss has kobold helpers now. Her frog has been floating since Tuesday.`,`Granny Moss has kobold helpers. Her frog floats now!`)],
+  ['evb_tkm','town:mire',()=>G.flags.tk_home==='moss',S(`Granny Moss has kobold helpers now. Her frog has been floating for a week.`,`Granny Moss has kobold helpers. Her frog floats now!`)],
   ['evb_dream','any',()=>!!(G.deeds&&(G.deeds.dream_spark||G.deeds.dream_knock)),S(`You look like you've been dreaming of old things, Ash. Your eyes are all faraway.`,`You look sleepy, Ash. Good dreams?`)]
 ];
 // greetings when you talk to someone soon after an event (picked by who it is)
