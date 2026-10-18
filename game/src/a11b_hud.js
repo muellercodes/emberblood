@@ -82,6 +82,7 @@ function drawHUD(){
   if(G.prompt&&scene==='play'){
     drawPromptPill(b);
   }
+  doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawSkillHud();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'&&tipOn('play')){

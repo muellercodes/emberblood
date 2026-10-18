@@ -4,6 +4,9 @@
 const IZX=20000, IZY=1000;
 const AREADEFS={}, DOORS=[];
 let AREA=null;
+// walking in and out of doors (v11, see the end of this file): the door Ash came in by, the one he must step off before
+// it works again, a short note over a locked door, and when it may show again
+const DW={from:null,hold:null,holdT:0,note:null,bumpT:0,bumpD:null};
 const BOOKS=['How to Train Your Goat (Don’t)','Dragons: A Very Warm History','101 Uses for a Bucket','The Wardens: Were They Cool? (Yes)','Knitting for Beginners and Their Victims','Fish, and Where to Find Them, by Dell Fisk','Lamp Oil: A Love Story','The Bakery Incident: A Survivor’s Account','Is My Cat a Wizard?','Kobolds: Tiny and Pointy','Advanced Napping','So You’ve Been Turned Into a Frog','Rock Soup: One Recipe, Four Hundred Rocks','Star-Iron and Other Stubborn Rocks, by Professor Quill','Brindlecross: Named After My Great ×4 Grandfather, by Mayor Brindle','The Big Book of Small Lanterns','A Field Guide to Things That Bite','Sheep Are Better: A Rebuttal, by Ulf Hollis','Goats Are Better: A Rebuttal to the Rebuttal, by Hollis'];
 const PAINTINGS=['A bowl of fruit. One grape looks nervous.',S('A stern old woman holding up a lantern. Her eyebrows follow you around the room.','A stern woman with a lantern. Her eyes follow you!'),S('A goat. Just a goat, painted with a great deal of love.','A goat. Just a goat.'),'Five figures around a fire. Someone has drawn a mustache on one of them.','A dragon eating a birthday cake. It is titled "Grandpa’s Party." Nobody knows who painted it.',S('A hand-drawn map with a big red X on it. The X is on the kitchen.','A map with a red X. The X is on the kitchen!'),S('A sunset over a lake. There is a fish jumping in it. The fish looks smug.','A lake at sunset. A smug fish jumps.'),'A very old drawing of a girl with horns, holding a lantern up to a mountain.'];
 const EGGS=[
@@ -201,7 +204,7 @@ function enterArea(id,door){
   if(def.trial&&!trialOpen(def.trial)){ runDialogue(STORY['trial_'+def.trial+'_sealed']||[['narr','The great stone doors will not move.']],()=>{ scene='play'; }); return; }
   if(def.locked&&!G.items[def.locked]&&!G.found[def.id+'_unlocked']){ runDialogue([['narr',def.lockText||'The way is sealed with an iron door and a very big lock. There’s a scale stamped on it.']],()=>{ scene='play'; }); return; }
   if(def.locked&&!G.found[def.id+'_unlocked']){ G.found[def.id+'_unlocked']=true; setBanner('Unlocked',def.name,1.8); }
-  G.ow={x:door.x,y:door.y+(door.outY||40)};
+  G.ow={x:door.x,y:door.y+(door.outY||40)}; DW.from=door; DW.note=null;
   for(const e of G.enemies) if(!e.boss) e.dead=true;
   G.projectiles=[]; G.hazards=[]; G.pools=[]; G.rings=[]; G.pickups=[]; G.critters=[];
   AREA={def,id,kind:def.kind,name:def.name,cols:[],objs:[],lights:[],npcs:[],dark:def.dark,level:def.level||1};
@@ -224,7 +227,7 @@ function exitArea(silent){
   for(const e of G.enemies) if(e.inArea) e.dead=true;
   G.projectiles=[]; G.hazards=[]; G.pools=[]; G.pickups=[];
   const ow=G.ow||{x:POI.village.x,y:POI.village.y+150};
-  AREA=null; G.area=null;
+  AREA=null; G.area=null; DW.hold=DW.from||null; DW.holdT=0.4; DW.note=null;
   player.x=ow.x; player.y=ow.y; player.kvx=player.kvy=0; player.facing=Math.PI/2;
   if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
@@ -247,4 +250,217 @@ function updateArea(dt){
   for(const L of A.lights){ if(L.obj) L.i=L.obj.lit?0.9:0; if(L.win) L.i=0.35*daylight(); }
   for(const n of A.npcs){ n.t+=dt; n.face=turnTo(n.face,angTo(n.x,n.y,p.x,p.y),dist(n.x,n.y,p.x,p.y)<240?3*dt:0); }
   if(A.def.kind==='cave'&&Math.random()<dt*0.25) SFX.play('step',0.4);
+}
+
+// ================= walking in and out (v11 UX)
+// Like Link's Awakening: walking into an unlocked door takes Ash inside at once (no prompt, no key, no dialogue box),
+// and the doormat inside takes him back out (updateArea). House stairs work the same way (floorStairsWalk in
+// a2g_floors.js). A locked door shows a padlock before he gets to it (doorLocksDraw), and bumping it puts a short note
+// over it instead of a dialogue box; the note goes in the Log too. In a dungeon, walking into a locked door with a
+// small key (or the great door with the Boss Key) opens it, and a closed door says what opens it.
+// After any of these moves, the trigger Ash arrives next to waits until he has stepped off it, so he never bounces back.
+// Doors that still ask: roof hatches and crossings (deliberate climbs), and anything that is not a plain way in.
+function doorWalkable(d){
+  if(d.walk!=null) return !!d.walk;
+  if(d.hs||d.cave) return true;
+  let l=''; try{ l=String(d.label||''); }catch(e){}
+  return /^(enter|go in|go into|try|climb down)\b/i.test(l.trim());
+}
+// the way into the door: up for houses and caves; for the others, the side where something solid is
+function doorIn(d){
+  if(d._in!=null) return d._in;
+  let a=-Math.PI/2;
+  if(!d.hs&&!d.cave){
+    const solid=(x,y)=>{ try{ return colAt(x,y,4)||blockedAt(x,y); }catch(e){ return false; } };
+    let best=null;
+    for(const k of [-Math.PI/2,0,Math.PI,Math.PI/2]){ let n=0; for(const r of [22,34,48]) if(solid(d.x+Math.cos(k)*r,d.y+Math.sin(k)*r)) n++; if(n&&(!best||n>best.n)) best={k,n}; }
+    if(best) a=best.k;
+  }
+  return d._in=a;
+}
+// where Ash stands next to a door: how far in (al, plus is inside) and how far to the side (lat)
+function doorRel(d,p){ const a=doorIn(d), ux=Math.cos(a), uy=Math.sin(a), rx=p.x-d.x, ry=p.y-d.y; return {al:rx*ux+ry*uy,lat:Math.abs(rx*uy-ry*ux),ux,uy}; }
+function inDoorZone(d,p){ const r=doorRel(d,p); return r.lat<(d.cave?26:18)&&r.al>-9&&r.al<40; }
+// what keeps a door shut right now (the text it would say), or null when it opens. The same rules enterArea and the
+// act modules use (door.need, door.m3need, the Trials, the Oath's tunnel key, the goats' little cave)
+function doorLockText(d){
+  const def=AREADEFS[d.area]; if(!def||!G) return null;
+  const T=v=>typeof v==='function'?v():v;
+  try{
+    if(d.need&&!d.need()) return T(d.locked)||S('It will not open.','It is shut.');
+    if(d.m3need&&!d.m3need()) return T(d.m3locked)||S('It will not open.','It is shut.');
+    if(G.mode!=='story') return null;
+    if(def.trial&&!trialOpen(def.trial)) return S('The great stone doors will not move.','The doors will not move.');
+    if(def.locked&&!G.items[def.locked]&&!G.found[def.id+'_unlocked']) return def.lockText||'The way is sealed with an iron door and a very big lock. There’s a scale stamped on it.';
+    if(d.area==='a1_nursery'&&typeof a1NurseryOpen==='function'&&!a1NurseryOpen()) return S('Too dark to go in alone.','Too dark to go in alone.');
+  }catch(e){}
+  return null;
+}
+// the way Ash is pushing: the stick or the keys, or his roll
+function dwPush(p){
+  if(p.dashT>0) return {x:Math.cos(p.dashDir),y:Math.sin(p.dashDir)};
+  const mx=p.inMx||0, my=p.inMy||0, m=Math.hypot(mx,my);
+  return m>0.35?{x:mx/m,y:my/m}:null;
+}
+// run fn with runDialogue held back: what it would have said comes back as lines instead of a dialogue box
+function dwCapture(fn){
+  const real=runDialogue, calls=[];
+  runDialogue=function(lines,done,opt){ calls.push([lines,done,opt]); };
+  try{ fn(); } catch(e){ console.error(e); } finally { runDialogue=real; }
+  return calls;
+}
+function dwLinesText(calls){
+  const out=[];
+  for(const c of calls) for(const l of c[0]||[]){
+    const L=lineParts(l); if(!L) continue;
+    try{ if(L.skipIf&&L.skipIf()) continue; }catch(e){}
+    let t=typeof L.text==='function'?L.text():L.text; if(!t) continue; t=simplify(String(t));
+    const who=typeof L.who==='function'?L.who():L.who, nm=who&&who!=='narr'&&SPK[who]?SPK[who].name:'';
+    out.push(nm?`${nm}: ${t}`:t);
+  }
+  return out.join(' ');
+}
+// a short note over a door (or anything Ash bumps): wraps to a few lines, fades after a while, goes in the Log
+function doorNote(x,y,text,lock){
+  text=String(text||'').trim(); if(!text) return;
+  let s=text;
+  if(s.length>170){ const cut=s.slice(0,170), i=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('! '),cut.lastIndexOf('? ')); s=i>60?cut.slice(0,i+1):cut.replace(/\s+\S*$/,'')+'…'; }
+  DW.note={x,y,text:s,t:0,dur:clamp(1.6+s.length*0.045,2.6,7),lock:!!lock};
+  try{ SFX.play(lock?'block':'ui',0.7); }catch(e){}
+  try{ logAdd({k:'narr',who:'',col:'#d8c3a0',text}); }catch(e){}
+}
+function doorBump(d){
+  if(DW.bumpT>0&&DW.bumpD===d) return;
+  DW.bumpT=2.4; DW.bumpD=d;
+  const calls=dwCapture(()=>enterArea(d.area,d));
+  // it opened after all: let anything it wanted to say be said
+  if(AREA){ for(const c of calls) runDialogue(c[0],c[1],c[2]); return; }
+  { const L=doorLockAt(d); doorNote(L.x,L.y-14,dwLinesText(calls)||doorLockText(d)||S('It will not open.','It is shut.'),true); }
+}
+function doorWalkIn(d){
+  if(doorLockText(d)!=null){ doorBump(d); return; }
+  if(G.inCombat||(G.boss&&!G.boss.dead)){ if(!(DW.bumpT>0&&DW.bumpD===d)){ DW.bumpT=2.4; DW.bumpD=d; const L=doorLockAt(d); doorNote(L.x,L.y-14,S('Not with foes this close!','Foes are near!'),false); } return; }
+  enterArea(d.area,d);
+  if(AREA) G.prompt=null;
+}
+// a dungeon door Ash walks into: a key opens it, else it says what it needs (the same words its Look prompt gives)
+function caveDoorBump(push){
+  const A=AREA, p=player; if(!A||!A.gates||!push) return false;
+  for(const o of A.gates){
+    if(o.k!=='cgate'||!o.closed||o.tmp||o.opened) continue;
+    const dx=o.x-p.x, dy=o.y-p.y, d=Math.hypot(dx,dy); if(d>(A.cave?A.cave.cell*1.15:56)||d<1) continue;
+    if((push.x*dx+push.y*dy)/d<0.55) continue;
+    if(DW.bumpT>0&&DW.bumpD===o) return true;
+    DW.bumpT=2.4; DW.bumpD=o;
+    const calls=dwCapture(()=>caveObjAct(o));
+    if(o.opened||!o.closed){ for(const c of calls) runDialogue(c[0],c[1],c[2]); return true; }
+    const t=dwLinesText(calls); if(t) doorNote(o.x,o.y-40,t,o.type==='lock'||o.type==='boss');
+    else for(const c of calls) runDialogue(c[0],c[1],c[2]);
+    return true;
+  }
+  return false;
+}
+function doorWalkTick(dt){
+  const p=player; if(!p||!G||G.mode!=='story') return;
+  if(DW.holdT>0) DW.holdT-=dt;
+  if(DW.bumpT>0) DW.bumpT-=dt;
+  if(DW.note){ DW.note.t+=dt; if(DW.note.t>DW.note.dur) DW.note=null; }
+  if(scene!=='play'||p.dead||p.flying||(p.z||0)>2||G.fishing||G.fade>0.6) return;
+  const push=dwPush(p);
+  if(AREA){
+    if(AREA.kind==='house') floorStairsWalk(push);
+    else caveDoorBump(push);
+    return;
+  }
+  if(DW.hold&&!(DW.holdT>0)&&!inDoorZone(DW.hold,p)) DW.hold=null;
+  if(!push) return;
+  for(const d of mapList(DOORS,curMap())){
+    if(Math.abs(d.x-p.x)>70||Math.abs(d.y-p.y)>70||d===DW.hold||!doorWalkable(d)) continue;
+    const r=doorRel(d,p);
+    // a locked door is often barred by its gate before Ash reaches it: it answers from a little further out
+    const lk=r.al>-46&&r.al<=-9&&doorLockText(d)!=null;
+    if(r.lat>=(d.cave?26:18)||(r.al<=-9&&!lk)||r.al>=40) continue;
+    if(push.x*r.ux+push.y*r.uy<0.4) continue;
+    doorWalkIn(d); return;
+  }
+}
+// the doors Ash walks into have no prompt: they step aside while the prompts are picked
+const DW_OFF=1e7;
+function dwHide(){
+  const p=player, out=[]; if(AREA||!p||!G||G.mode!=='story') return out;
+  for(const d of mapList(DOORS,curMap())){ if(Math.abs(d.x-p.x)>90||Math.abs(d.y-p.y)>90||!doorWalkable(d)) continue; d.x+=DW_OFF; out.push(d); }
+  return out;
+}
+{ const base=updateInteractions; updateInteractions=function(dt){
+  try{ doorWalkTick(dt); }catch(e){ console.error(e); }
+  const hid=dwHide();
+  try{ base(dt); } finally { for(const d of hid) d.x-=DW_OFF; }
+  // the doormat takes him out: "Leave" is not something to press any more
+  if(AREA&&G.prompt&&G.prompt.text==='Leave') G.prompt=null;
+}; }
+// ---------- how a locked door looks: a plank barred across it and a padlock, in both looks (drawn with the world)
+function doorLockAt(d){
+  if(d.hs) return {x:d.x,y:d.y-30,w:28};
+  if(d.trial) return {x:d.x,y:d.y-62,w:44};
+  if(d.cave) return {x:d.x,y:d.y-24,w:40};
+  const a=doorIn(d); return {x:d.x+Math.cos(a)*14,y:d.y+Math.sin(a)*14-14,w:30};
+}
+function drawPadlock(g,x,y,s,sb){
+  const ol=sb?SBC.outline:'#1a120c';
+  g.save(); g.translate(x,y); g.scale(s,s);
+  g.lineWidth=3.2; g.strokeStyle=ol; g.beginPath(); g.arc(0,-5,5.2,Math.PI,0); g.lineTo(5.2,-1); g.moveTo(-5.2,-1); g.lineTo(-5.2,-5); g.stroke();
+  g.lineWidth=1.8; g.strokeStyle=sb?'#d8d2c4':'#b8b4ac'; g.beginPath(); g.arc(0,-5,5.2,Math.PI,0); g.lineTo(5.2,-1); g.moveTo(-5.2,-1); g.lineTo(-5.2,-5); g.stroke();
+  g.fillStyle=sb?SBC.gold:'#e0b040'; g.strokeStyle=ol; g.lineWidth=sb?2.2:1.6; rrect(g,-7.5,-2,15,12,2.5); g.fill(); g.stroke();
+  g.fillStyle='rgba(255,255,255,.45)'; g.fillRect(-5.5,-0.5,11,2);
+  g.fillStyle=ol; g.beginPath(); g.arc(0,3,1.9,0,TAU); g.fill(); g.fillRect(-0.9,3.5,1.8,4);
+  g.restore();
+}
+function drawDoorLock(d,t){
+  const L=doorLockAt(d), sb=LOOK.sb, g=ctx, w=L.w;
+  g.save();
+  // the bar: a dark plank with two nails, across the doorway
+  g.translate(L.x,L.y+2); g.rotate(-0.12);
+  g.fillStyle=sb?SBC.outline:'rgba(0,0,0,.45)'; rrect(g,-w/2-1,-3,w+2,9,2); g.fill();
+  g.fillStyle=sb?'#a8743e':'#7a5230'; rrect(g,-w/2,-4,w,7,2); g.fill();
+  if(sb){ g.strokeStyle=SBC.outline; g.lineWidth=1.6; g.stroke(); }
+  g.fillStyle=sb?'#5a3a24':'#3a2414'; g.beginPath(); g.arc(-w/2+4,-0.5,1.3,0,TAU); g.arc(w/2-4,-0.5,1.3,0,TAU); g.fill();
+  g.restore();
+  // a soft dark disc so the lock reads on any wall, then the padlock (it breathes a little so the eye finds it)
+  const s=1+Math.sin(t*2.4)*0.04;
+  g.fillStyle=sb?'rgba(59,34,51,.35)':'rgba(10,6,4,.45)'; g.beginPath(); g.arc(L.x,L.y+1,11.5,0,TAU); g.fill();
+  drawPadlock(g,L.x,L.y+1,s,sb);
+}
+function doorLocksDraw(){
+  if(!G||G.mode!=='story'||AREA) return;
+  const t=G.time||0;
+  for(const d of mapList(DOORS,curMap())){
+    if(!inView(d.x,d.y,80)) continue;
+    const lk=doorLockText(d)!=null;
+    // a door that just opened (story progress, a key): a puff of dust where the bar was
+    if(d._lk&&!lk){ const L=doorLockAt(d); emit(L.x,L.y,16,{col:'230,210,170',glow:false,smin:30,smax:110,lmin:.4,lmax:.8,zmin:1.5,zmax:3,grow:6}); try{ SFX.play('chest',0.6); }catch(e){} }
+    d._lk=lk;
+    if(lk) drawDoorLock(d,t);
+  }
+}
+{ const base=drawWall; drawWall=function(){ base.apply(this,arguments); try{ doorLocksDraw(); }catch(e){ console.error(e); } }; }
+// ---------- the note over a locked door (drawn with the HUD, a11b_hud.js), so it never hides under a roof
+function doorNoteDraw(){
+  const N=DW.note; if(!N||scene!=='play') return;
+  const sx=(N.x-cam.x)*zoom, sy=(N.y-cam.y)*zoom, a=clamp(Math.min(N.t/0.15,(N.dur-N.t)/0.4),0,1); if(a<=0) return;
+  const g=ctx, sb=LOOK.sb, maxW=Math.min(300,W-40), lh=19, pad=12, iw=N.lock?22:0;
+  g.save(); g.globalAlpha=a; g.font=`600 14px ${UIF}`;
+  const words=N.text.split(/\s+/), lines=[]; let cur='';
+  for(const w of words){ const tr=cur?cur+' '+w:w; if(g.measureText(tr).width>maxW-pad*2-iw&&cur){ lines.push(cur); cur=w; } else cur=tr; }
+  if(cur) lines.push(cur);
+  let tw=0; for(const l of lines) tw=Math.max(tw,g.measureText(l).width);
+  const bw=Math.ceil(tw+pad*2+iw), bh=lines.length*lh+pad*1.4;
+  const bx=clamp(sx-bw/2,SAFE.l+12,W-SAFE.r-12-bw), by=clamp(sy-bh-18,SAFE.t+12,H-SAFE.b-bh-12);
+  const tx=clamp(sx,bx+16,bx+bw-16), below=by+bh<sy-4;
+  if(sb){ g.fillStyle=SBC.outline; rrect(g,bx,by+3,bw,bh,10); g.fill(); g.fillStyle='#fff3d6'; rrect(g,bx,by,bw,bh,10); g.fill(); g.lineWidth=2.6; g.strokeStyle=SBC.outline; g.stroke(); }
+  else{ g.fillStyle='rgba(12,9,6,.86)'; rrect(g,bx,by,bw,bh,10); g.fill(); g.strokeStyle='rgba(255,210,150,.45)'; g.lineWidth=1; g.stroke(); }
+  if(below){ g.fillStyle=sb?'#fff3d6':'rgba(12,9,6,.86)'; g.beginPath(); g.moveTo(tx-7,by+bh-0.5); g.lineTo(tx,by+bh+8); g.lineTo(tx+7,by+bh-0.5); g.closePath(); g.fill(); if(sb){ g.strokeStyle=SBC.outline; g.lineWidth=2.2; g.beginPath(); g.moveTo(tx-7,by+bh); g.lineTo(tx,by+bh+8); g.lineTo(tx+7,by+bh); g.stroke(); } }
+  if(N.lock) drawPadlock(g,bx+pad+7,by+pad*0.7+lh/2-1,0.85,sb);
+  g.fillStyle=sb?SBC.outline:'#ffe6c0'; g.textAlign='left'; g.textBaseline='middle';
+  lines.forEach((l,i)=>g.fillText(l,bx+pad+iw,by+pad*0.7+lh*i+lh/2));
+  g.restore();
 }
