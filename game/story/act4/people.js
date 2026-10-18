@@ -106,7 +106,7 @@ people({
         say: ['Hilde in Hearthold writes that the Steamwell ate her knitting basket. Basket and all! Whoever fishes it out gets a sweater.',
           'The Steamwell ate Hilde\'s basket. Fish it out!'] },
       { if: 'flag m_dell_away stage<m_reforge', fact: 'm4s_dell_boat=away',
-        say: ['Dell took every sandwich on the dock when he sailed. ALL of them. Mags is furious. I made her fish.', 'Dell took all the sandwiches. Mags is cross.'] },
+        say: ["Dell left Mags a note: don't touch the sandwiches. She's been staring at them for two days. I made her fish instead.", 'Mags must not touch the sandwiches. I made her fish.'] },
       { say: [["Fish stew! Fish pie! Fish pudding! I'm working on fish cocoa. It's not going well.", 'Fish stew! Fish pie! Fish pudding!'],
         ["Hilde in Hearthold sends me soup recipes. I send back fish. It's a good friendship.", 'Hilde sends soup recipes. I send fish.']] },
       { bark: true, say: ['FISH! Get your fish! Fresh fish, old fish, fish-shaped fish!', 'FISH! Get your fish!'] },
@@ -185,7 +185,7 @@ people({
     ],
 
     m_kelp: [
-      { if: 'flag m_dolphin', once: true, say: ["How's the Dolphin Kick, dearie? One tail. Remember. Just the one.", 'How is the Dolphin Kick? One tail!'] },
+      { if: 'flag m_dolphin', once: true, say: ["How's the Dolphin Kick, dearie? Just the one tail, remember. Not both. You haven't got both.", 'How is the Dolphin Kick? One tail!'] },
       { say: [["Pearls for your pockets, dearie. They don't do anything. They're just lovely.", 'Pearls for your pockets. Just lovely.'],
         ['A dragon who breathes under water! Your mother must be so proud. And so confused.', 'A dragon who breathes water! Your mom is proud.'],
         ["Eat your seaweed, dearie. It's green. Green is good for horns.", 'Eat your seaweed. Good for horns.']] },

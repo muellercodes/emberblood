@@ -1646,7 +1646,7 @@ if(typeof pebbleLetter==='function'){
     ?[xl('fennick',`The Watch House is the brightest place in Brindlecross. I polish. It's what I'm for now. Fennick.`,`The Watch House is so bright. I polish the lamps. Fennick.`)]
     :[xl('fennick',`Every lantern in Emberhollow is lit, every night, all night. Nobody here is scared of the dark. Not while I've got oil. Your friend, Fennick.`,`I keep every lantern lit. Nobody is scared. Fennick.`)]});
   if(!have('m_pb_4')) pebbleLetter('m_pb_4',{from:'yara',when:()=>m3sMoonNow()<=40&&!!G.flags.m_pb_2&&actOf(G.stage)>=4,lines:[
-    xl('yara',`I counted the moon tonight. Less than half. Pebble sat on my windowsill and stared at it all night. She won't eat. Well. She ate one coin.`,`Less than half the moon is left. Pebble won't eat. Well, she ate a coin.`)]});
+    xl('yara',`I counted the moon tonight. Less than half. Pebble sat on my windowsill and stared at it all night. She wouldn't eat a thing, except one coin.`,`Less than half the moon is left. Pebble won't eat. Only a coin.`)]});
   if(!have('m_pb_oil')) pebbleLetter('m_pb_oil',{from:'fennick',when:()=>m3sQDone('m_lamps'),gift:{items:{m_lampoil:1}},lines:()=>G.choices.fennick==='jail'
     ?[xl('osric',`(a letter) Captain Osric here. We found this in Fennick Wick's old shop. He says it is lamp oil that never runs out. He says please use it. He also says sorry. Again. O.`,`Captain Osric here. This lamp oil never runs out. Fennick says sorry. O.`)]
     :[xl('fennick',`(a letter) Fennick Wick here, lamp man of Emberhollow. Yara says you need lamps that never go out. I spent my whole life making this oil. Use it for something good. That is all I ever wanted. F.`,`Fennick here. This lamp oil never runs out. Use it for something good. F.`)]});
