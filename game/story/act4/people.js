@@ -55,18 +55,18 @@ people({
 
     m_winnie: [
       { if: 'flag m_eclipse1', once: true,
-        say: ['When the moth bit the moon, the tide went three ways at once. Gerald hid in the sugar bowl. He is still in there.',
-          'When the moon got bitten, Gerald hid in the sugar bowl.'] },
+        say: ['When the moth bit the moon, the tide went three ways at once. Ollie hid in the sugar bowl. He is still in there.',
+          'When the moon got bitten, Ollie hid in the sugar bowl.'] },
       { if: 'choice m_hush=free', once: true,
-        say: ['A little white light went over the hut, low and slow, heading out to sea. Gerald came out of the sugar bowl to look.',
-          'A white light went by. Gerald came out to look.'] },
+        say: ['A little white light went over the hut, low and slow, heading out to sea. Ollie came out of the sugar bowl to look.',
+          'A white light went by. Ollie came out to look.'] },
       { if: 'flag m_eclipse2', fact: 'm4s_moon=half',
         say: ["Less than half a moon now. The tide comes in when it likes and goes out when it's bored, like a cat.",
           'Less than half a moon. The tide does what it likes.'] },
-      { if: 'stage>=m_lumen', say: [['Gerald says hello. Gerald is an octopus. Gerald lives in my teapot. Don\'t make tea.', 'Gerald the octopus lives in my teapot.'],
+      { if: 'stage>=m_lumen', say: [['Ollie says hello. Ollie is an octopus. Ollie lives in my teapot. Don\'t make tea.', 'Ollie the octopus lives in my teapot.'],
         ["Sixty years I've watched the tide from this hut. Lately it comes in twice before breakfast.", 'The tide comes twice before breakfast now!'],
         ["You worked out the tide on your own. You're getting good at this, child.", 'You are getting good at this, child.']] },
-      { bark: true, say: ['Shh, Gerald. Not now, Gerald.', 'Shh, Gerald.'] },
+      { bark: true, say: ['Shh, Ollie. Not now, Ollie.', 'Shh, Ollie.'] },
     ],
 
     m_rowan: [
