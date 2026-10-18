@@ -126,6 +126,23 @@ function goFloor(o){
   if(!G.found['seen_'+to]){ G.found['seen_'+to]=true; if(def.secret){ G.secrets=G.secrets||{}; G.secrets['sec_'+to]=1; } }
   setBanner(def.name,'',1.4,'region'); saveGame();
 }
+// walking onto the stairs takes Ash up or down (v11 UX, like the doors in a2e_interiors.js): he bumps their edge while
+// pushing into them. The stairs he arrives by wait until he has stepped away from them, so he never bounces back.
+function floorStairsWalk(push){
+  const A=AREA, p=player; if(!A||!p) return false;
+  for(const o of A.objs){
+    if(o.k!=='stairs'||(o.hidden&&!G.found[o.hidden])) continue;
+    const hw=(o.w||64)/2, hh=(o.h||56)/2, nx=clamp(p.x,o.x-hw,o.x+hw), ny=clamp(p.y,o.y-hh,o.y+hh), dx=nx-p.x, dy=ny-p.y, d=Math.hypot(dx,dy);
+    const touch=d<=(p.r||14)+5;
+    if(DW.hold===o){ if(DW.holdT>0||touch) continue; DW.hold=null; }
+    if(!touch||!push) continue;
+    if(d>0.5&&(push.x*dx+push.y*dy)/d<0.35) continue;
+    goFloor(o);
+    if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; G.prompt=null; }
+    return true;
+  }
+  return false;
+}
 function revealTrig(o){
   if(G.found[o.key]){ return false; }
   runDialogue([['narr',o.text]],()=>{
@@ -179,4 +196,5 @@ function floorObjAct(o){
   }
   return false;
 }
-const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
+// (the stairs have no prompt: Ash walks onto them, floorStairsWalk)
+const FLOOR_LABEL={stairs:o=>null,trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};

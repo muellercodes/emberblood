@@ -67,7 +67,7 @@ function updatePlayer(dt,inp){
   const fighting=inp.attack||inp.fire||p.breathing||!!p.bow||!!p.ham;
   if(!usingTouch&&!mouseAim){
     if(stickAim){ if(ranged) aim=wAimAssist(aim); }
-    else if(fighting) aim=aimAssist(aim,inp.fire||p.breathing?'breath':wpn);
+    else if(fighting){ const cf=inp.attack&&!inp.fire&&!p.breathing?clickFoe(ranged?620:Math.max(170,wReach(wpn)+110)):null; aim=cf?angTo(p.x,p.y,cf.x,cf.y):aimAssist(aim,inp.fire||p.breathing?'breath':wpn); }
   }
   p.aim=aim;
   if(stickAim||(usingTouch&&!moving)) p.faceGoal=aim;   // letting go of the right stick (or a touch target) keeps that facing

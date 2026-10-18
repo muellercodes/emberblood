@@ -33,7 +33,7 @@ function tipX(cx,cy,fn,r){
 }
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); if(scene!=='play') OFFK.add(e.code); else if(!e.repeat) OFFK.delete(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); OFFK.delete(e.code); });
-addEventListener('blur',()=>{ keys.clear(); OFFK.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
+addEventListener('blur',()=>{ keys.clear(); OFFK.clear(); mouse.l=mouse.r=mouse.lp=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
 document.addEventListener('visibilitychange',()=>{ if(document.hidden&&scene==='play') pauseGame(); });
 cvs.addEventListener('mousemove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; if(!usingTouch) aimMode='mouse'; });
 cvs.addEventListener('mousedown',e=>{
@@ -41,7 +41,7 @@ cvs.addEventListener('mousedown',e=>{
   if(scene==='play'&&hudClick(e.clientX,e.clientY)) return;
   usingTouch=false; aimMode='mouse';
   if(scene==='play') bannerSkip();
-  if(e.button===0) mouse.l=true; if(e.button===2) mouse.r=true;
+  if(e.button===0){ mouse.l=true; if(scene==='play') mouse.lp=true; } if(e.button===2) mouse.r=true;
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
@@ -142,7 +142,24 @@ function stickZone(x,y){
 // left click, the controller's attack buttons) does that instead of swinging. Foes near: attack attacks. A press that
 // started as a swing never turns into a talk, attack stays attack for 0.4 s after a swing, and a key still held from a
 // conversation or a menu does nothing until it is let go (OFFK). E, F and the controller's top button stay a dedicated use.
-const ATK={press:'',swingT:-9,g:null};
+const ATK={press:'',swingT:-9,g:null,buf:0,lsw:0,lcd:0};
+// (v11) an attack pressed while Ash cannot swing yet (the end of a swing, a roll, a drink) is kept for ATK_BUF seconds
+// and swings as soon as he can, so a quick tap is never lost. A click shorter than one frame counts too (mouse.lp).
+// The bow, hammer, whip, bombs and glaive read how long the button is held, so only the plain swings are buffered.
+const ATK_BUF=0.3;
+// the foe a fresh click landed on (or next to), while that press lasts: a6_player.js aims the swing at it
+function clickFoe(R){
+  const c=ATK.ck, p=player; if(!c||!G||!p||G.time-c.t>0.45) return null;
+  let best=null, bd=1e9;
+  for(const e of G.enemies){
+    if(e.dead||e.passive||e.invuln||e.alpha<0.3||e.spawnIn>0) continue;
+    const dc=dist(c.x,c.y,e.x,e.y)-(e.r||10); if(dc>48) continue;
+    if(dist(p.x,p.y,e.x,e.y)-(e.r||10)>R) continue;
+    if(dc<bd){ bd=dc; best=e; }
+  }
+  return best;
+}
+function atkBufOK(){ const w=curWeapon(), D=wDef(w); return !D.input||w==='boomerang'; }
 const PROMPT_KINDS=[
   [/^(talk|chat|ask|speak|greet)/i,'talk','TALK'],
   [/^(open|unlock)/i,'open','OPEN'],
@@ -257,8 +274,9 @@ function readInput(dt){
   const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5,Digit7:6,Digit8:7,Digit9:8};
   let wSel=-1; for(const k in WSEL) if(pressed.has(k)) wSel=WSEL[k];
   const K=c=>keys.has(c), P=c=>pressed.has(c), LP=a=>LEFT_KEYS[a].some(P), LH=a=>LEFT_KEYS[a].some(K), KA=c=>(K(c)||P(c))&&!OFFK.has(c);
+  const mClick=!!mouse.lp; mouse.lp=false; ATK.f=(ATK.f||0)+1;
   const o={mx,my,
-    attack:KA('KeyJ')||KA('Enter')||mouse.l||!!touch.held.attack||!!touch.pressed.attack,
+    attack:KA('KeyJ')||KA('Enter')||mouse.l||mClick||!!touch.held.attack||!!touch.pressed.attack,
     fire:K('KeyK')||LH('fire')||mouse.r||!!touch.held.fire||(touch.fireT>0),
     roll:P('Space')||LP('roll')||!!touch.pressed.roll,
     roar:P('KeyQ')||LP('roar')||!!touch.pressed.roar,
@@ -270,10 +288,24 @@ function readInput(dt){
     whistle:P('KeyG')||LP('whistle')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
   padInput(o,dt);
   // one button for attack and use: decided once, when the press starts (see useMode)
-  if(!o.attack) ATK.press='';
-  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; }
-  if(ATK.press==='use') o.attack=false;
   const p=player;
+  if(!o.attack) ATK.press='';
+  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; else{ if(p&&G&&atkBufOK()) ATK.buf=ATK_BUF;
+    // a click on a foe swings at that foe (without "Aim with the mouse" Ash still faces the way he walks otherwise)
+    ATK.ck=(mouse.l||mClick)&&!usingTouch&&!settings.mouseAim&&G?Object.assign(toWorld(mouse.x,mouse.y),{t:G.time}):null; } }
+  if(ATK.press==='use') o.attack=false;
+  // the kept press: used once a swing starts (its cooldown jumps up) or a hold weapon takes over
+  if(ATK.buf>0){
+    ATK.buf-=dt;
+    // (a press kept from before a jump never turns into a Ground Pound in the air)
+    const used=!p||(p.swingT>0&&ATK.lsw<=0)||p.atkCd>ATK.lcd+0.02||!!p.ham||!!p.bow||p.dead||!atkBufOK()||airborne();
+    if(used) ATK.buf=0; else if(!o.attack&&ATK.press!=='use') o.attack=true;
+  }
+  // a roll pressed while the last one is still going is kept a little longer too (about 0.3 s; the game keeps 0.15 s)
+  if(o.roll) ATK.rb=0.15;
+  else if(ATK.rb>0){ ATK.rb-=dt; if(p&&(p.dashT>0||p.dead)) ATK.rb=0; else if(G&&G.dashBuf<=0.02&&ATK.rb>0) o.roll=true; }
+  if(p&&p.atkCd>ATK.lcd+0.02) ATK.n=(ATK.n||0)+1;   // swings started (tests)
+  ATK.lsw=p?p.swingT:0; ATK.lcd=p?p.atkCd:0;
   if((ATK.press==='atk'&&o.attack)||(p&&(p.swingT>0||p.ham||p.bow))){ ATK.swingT=G.time; ATK.g=G; }
   if(!o.attack&&ATK.press!=='use'&&autoSwing()) o.attack=true;
   if(o.use) bannerSkip();
@@ -353,3 +385,11 @@ function updateCam(dt,snap){
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
 }
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
+// test hooks (v11 UX): spawn a foe next to Ash, and what the attack button is doing
+window.__ebDbg=Object.assign(window.__ebDbg||{},{
+  dlg:()=>DLG?{i:DLG.i,n:DLG.lines.length,chars:Math.floor(DLG.chars),len:(DLG.text||'').length,opts:DLG.opts?DLG.opts.length:0,shown:!document.getElementById('dlgOpts').hidden,skipArm:!!DLG.skipArm,text:String(DLG.text||'').slice(0,50)}:null,
+  scr:(x,y)=>({x:(x-cam.x)*zoom,y:(y-cam.y)*zoom}),
+  lvl:n=>{ let k=0; while(player.level<n&&k++<99) gainXp(xpNeed(player.level)-player.xp+1); return player.level; },
+  spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
+  atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})
+});

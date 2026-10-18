@@ -82,6 +82,7 @@ function drawHUD(){
   if(G.prompt&&scene==='play'){
     drawPromptPill(b);
   }
+  doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawSkillHud();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'&&tipOn('play')){
@@ -207,7 +208,21 @@ function touchClear(w,h,y){
 let PROMPT_R=null;
 // where the prompt pill and the hint box start on touch: a little above the buttons (short screens: along the bottom)
 function touchBase(){ const B=H-SAFE.b; return B-SAFE.t<600?B-30:Math.min(B-300,touchTopOver(0,W)-30); }
+// (v11) the person or thing the prompt is about gets a soft gold ring at its feet, so it is always clear who E (or a
+// click) will talk to or what it will use, even with two people standing close together
+function drawPromptTarget(){
+  const pr=G.prompt; if(!pr||pr.x==null||pr.y==null||!player) return;
+  if(Math.abs(pr.x-player.x)<2&&Math.abs(pr.y-player.y)<2) return;   // a prompt about Ash himself (fishing, flying)
+  const sx=(pr.x-cam.x)*zoom, sy=(pr.y-cam.y)*zoom; if(sx<-40||sy<-40||sx>W+40||sy>H+40) return;
+  const n=AREA?AREA.npcs&&AREA.npcs.find(q=>q.x===pr.x&&q.y===pr.y):G.npcs.find(q=>q.x===pr.x&&q.y===pr.y);
+  const r=(n?20:16)*zoom, k=0.5+0.5*Math.sin((G.time||0)*4.2), g=ctx;
+  g.save(); g.translate(sx,sy+(n?3:0)*zoom); g.scale(1,0.5);
+  g.lineWidth=4.5; g.strokeStyle=LOOK.sb?'rgba(59,34,51,.45)':'rgba(0,0,0,.35)'; g.beginPath(); g.arc(0,0,r+2+k*2,0,TAU); g.stroke();
+  g.lineWidth=2.4; g.strokeStyle=`rgba(255,214,120,${0.75+0.2*k})`; g.setLineDash([7,5]); g.lineDashOffset=-(G.time||0)*12; g.beginPath(); g.arc(0,0,r+2+k*2,0,TAU); g.stroke();
+  g.restore();
+}
 function drawPromptPill(b){
+  drawPromptTarget();
   const dev=curDevice(), t=simplify(G.prompt.text);
   // the key that does it: E (or the controller's top button); the left-handed keyboard shows Enter when it will
   // talk or open, and \ when a foe is close (Enter attacks then)
@@ -228,7 +243,7 @@ function hintTextRaw(){
     // a phone on its side has little room: one short line
     if(H-SAFE.t-SAFE.b<600) return `Drag on the ${settings.touch==='two'?(L?'right':'left'):'free side'} to move · SLASH attacks, talks and opens · Tap flasks to drink`;
     if(settings.touch==='two') return `Drag on the ${L?'right':'left'} to move, push all the way to sprint · SLASH attacks, and says TALK or OPEN when it will do that instead · Tap the flasks to drink, the minimap for the map, the quest list for the journal`;
-    return 'Drag anywhere low on the screen to move · Ash swings by himself · SLASH says TALK or OPEN near people and doors · Settings has more layouts';
+    return 'Drag anywhere low on the screen to move · Ash swings by himself · SLASH says TALK or OPEN near people and chests · Walk into a door to go in · Settings has more layouts';
   }
   if(dev==='pad'){
     const mv=L?'Right stick':'Left stick';
