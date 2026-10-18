@@ -1184,9 +1184,16 @@ function c1DrawChain(t){
   ctx.restore();
 }
 function c1DrawPassStair(){
-  c1Put(c1wTall('passstair',220,380,110,360,g=>{
-    for(let i=0;i<11;i++){ const y=-i*30, w=120-i*4; g.fillStyle='rgba(40,30,40,.25)'; g.fillRect(-w/2+4,y+4,w,22); g.fillStyle=i%2?'#e8e2d2':'#f2ede0'; g.fillRect(-w/2,y,w,22); g.fillStyle='rgba(255,255,255,.5)'; g.fillRect(-w/2,y,w,4); g.fillStyle='rgba(120,110,90,.4)'; g.fillRect(-w/2,y+18,w,4); }
-    for(const s of [-1,1]){ g.fillStyle='#b8b0a0'; g.beginPath(); g.moveTo(s*62,20); g.lineTo(s*44,-310); g.lineTo(s*36,-310); g.lineTo(s*54,20); g.closePath(); g.fill(); } }),3400,20330);
+  // the stair up to Embermere: every step a lit tread over a shaded riser, brighter toward the top, between stone walls
+  c1Put(c1wTall('passstair2',220,380,110,360,g=>{
+    g.fillStyle='rgba(40,30,40,.22)'; g.beginPath(); g.moveTo(-58,20); g.lineTo(66,20); g.lineTo(50,-306); g.lineTo(-34,-306); g.closePath(); g.fill();
+    for(let i=0;i<11;i++){ const u=i/10, y=-i*30-10, w=120-i*4;
+      g.fillStyle=stC('#7e7666','#bcb4a0',u); g.fillRect(-w/2,y+16,w,14);
+      g.fillStyle=stC('#d2cab4','#fffaf0',u); g.fillRect(-w/2,y-1,w,18);
+      g.fillStyle=`rgba(255,255,255,${0.4+0.4*u})`; g.fillRect(-w/2,y+14,w,2.4); g.fillStyle='rgba(60,50,40,.35)'; g.fillRect(-w/2,y+16.4,w,2.4);
+      g.fillStyle='rgba(120,110,90,.22)'; g.fillRect(-w*0.18,y+1,1.4,13); g.fillRect(w*0.22,y+1,1.4,13); }
+    for(const s of [-1,1]){ g.fillStyle=s<0?'#c8c0ae':'#a8a090'; g.beginPath(); g.moveTo(s*62,20); g.lineTo(s*44,-316); g.lineTo(s*36,-316); g.lineTo(s*54,20); g.closePath(); g.fill();
+      g.fillStyle='rgba(255,255,255,.45)'; g.beginPath(); g.moveTo(s*(s<0?62:54),20); g.lineTo(s*(s<0?44:36),-316); g.lineTo(s*(s<0?42:34),-316); g.lineTo(s*(s<0?60:52),20); g.closePath(); g.fill(); } }),3400,20330);
 }
 function c1DrawSealed(o,t){ c1Put(c1wTall('sealed',60,70,30,60,g=>{ c1Ell(g,0,4,22,7,'rgba(40,40,30,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-16+dx,4+dy); q.lineTo(-12+dx,-40+dy); q.quadraticCurveTo(dx,-50+dy,12+dx,-40+dy); q.lineTo(16+dx,4+dy); q.closePath(); },'#e4e0d2',{r:16}); g.strokeStyle='#a8a090'; g.lineWidth=2; g.beginPath(); g.moveTo(-8,-30); g.lineTo(8,-12); g.moveTo(8,-30); g.lineTo(-8,-12); g.stroke(); }),o.x,o.y); }
 function c1DrawBirch(o,t){ const open=G.found.c_birch_cracked; c1Put(c1wTall('birch'+(open?1:0),90,120,45,100,g=>{

@@ -403,9 +403,16 @@ function drawCrossing(def,t){
     ctx.fillStyle='#3a2614'; ctx.fillRect(-2,-26,3,26); ctx.fillStyle='#efe6d0'; ctx.beginPath(); ctx.moveTo(1,-25); ctx.lineTo(17,-6); ctx.lineTo(1,-6); ctx.closePath(); ctx.fill();
     ctx.restore();
   }else if(k==='stair'){
-    const sp=rSpr(key,200,220,100,120,g=>{ g.rotate(a+Math.PI/2);
-      for(let i=0;i<7;i++){ const w=70-i*3, yy=40-i*14; g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(-w/2+3,yy+4,w,12); g.fillStyle=i%2?'#9c968c':'#aaa294'; g.fillRect(-w/2,yy,w,12); g.fillStyle='rgba(255,250,235,.25)'; g.fillRect(-w/2,yy,w,3); g.strokeStyle='rgba(40,36,30,.5)'; g.lineWidth=1; g.strokeRect(-w/2,yy,w,12); }
-      for(const sx of [-1,1]){ g.fillStyle='#7d6d5c'; g.fillRect(sx*40-6,-56,12,108); g.fillStyle='#958a7c'; g.fillRect(sx*40-6,-56,12,6); } });
+    // steps running off along `dir`: going up they brighten toward the far end, going down they sink into the dark
+    const down=def.down!=null?!!def.down:/down|crawl|descend/i.test(String(def.label||'')), key2=key+(down?'_d':'_u');
+    const sp=rSpr(key2,200,220,100,120,g=>{ g.rotate(a+Math.PI/2);
+      g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(-44,-54,92,110);
+      for(let i=0;i<7;i++){ const u=i/6, w=70-i*3, yy=40-i*14, lit=down?1-u*0.85:0.35+u*0.65;
+        g.fillStyle=stC('#3a342e','#6e665c',lit); g.fillRect(-w/2,yy+8,w,6);
+        g.fillStyle=stC('#4a443c','#d0c8b8',lit); g.fillRect(-w/2,yy,w,8.5);
+        g.fillStyle=`rgba(255,250,235,${0.15+0.4*lit})`; g.fillRect(-w/2,yy+7,w,1.6); g.fillStyle='rgba(20,16,12,.35)'; g.fillRect(-w/2,yy+8.6,w,1.4); }
+      for(const sx of [-1,1]){ g.fillStyle='#7d6d5c'; g.fillRect(sx*40-6,-56,12,108); g.fillStyle='#958a7c'; g.fillRect(sx*40-6,-56,12,6); g.fillStyle='rgba(255,250,235,.25)'; g.fillRect(sx*40-6,-56,2,108); }
+      g.strokeStyle='rgba(40,36,30,.6)'; g.lineWidth=1.4; g.strokeRect(-46,-56,92,108); });
     rPut(sp,x,y);
   }else if(k==='bridge'){
     const sp=rSpr(key,260,260,130,130,g=>{ g.rotate(a-Math.PI/2);

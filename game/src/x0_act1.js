@@ -1528,3 +1528,111 @@ s10FindKind('a1_gate',(x,y,r)=>Math.abs(A1V.wall.y-y)<=r?Object.values(A1V.gates
 s10FindKind('a1_pal',(x,y,r)=>Math.abs(A1V.wall.y-y)<=r&&x>A1V.wall.x0&&x<A1V.wall.x1?A1V.wall:null);
 s10FindKind('a1_rockfall',(x,y,r)=>Math.abs(A1W.rockfall.x-x)<=r&&Math.abs(A1W.rockfall.y-y)<=r?A1W.rockfall:null);
 s10FindKind('a1_frostlantern',(x,y,r)=>{ const p=A1W.frost.lan.find(([a,b])=>Math.abs(a-x)<=r&&Math.abs(b-y)<=r); return p?{x:p[0],y:p[1]}:null; });
+
+// ---------- 20. v11: Emberhollow walled all the way round
+// debug: can Ash stand here on foot (terrain and colliders), and a flood fill of where he can walk from a point
+function a1WalkOK(x,y,r){ if(playerBlocked(x,y)) return false; let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return !hit; }
+function a1Flood(x0,y0,x1,y1,cs,sx,sy,r){
+  const W=Math.ceil((x1-x0)/cs), H=Math.ceil((y1-y0)/cs), ok=new Int8Array(W*H).fill(-1), seen=new Uint8Array(W*H), q=[];
+  const pass=k=>{ if(ok[k]<0){ const i=k%W, j=(k-i)/W; ok[k]=a1WalkOK(x0+(i+0.5)*cs,y0+(j+0.5)*cs,r)?1:0; } return ok[k]===1; };
+  const s=Math.floor((sy-y0)/cs)*W+Math.floor((sx-x0)/cs); if(!pass(s)) return null; seen[s]=1; q.push(s);
+  while(q.length){ const k=q.pop(), i=k%W; for(const [di,dj] of [[1,0],[-1,0],[0,1],[0,-1]]){ const ni=i+di, nj=(k-i)/W+dj; if(ni<0||nj<0||ni>=W||nj>=H) continue; const n=nj*W+ni; if(seen[n]||!pass(n)) continue; seen[n]=1; q.push(n); } }
+  return {W,H,cs,x0,y0,seen,at:(x,y,rr)=>{ rr=rr||0; for(let dy=-rr;dy<=rr;dy+=cs) for(let dx=-rr;dx<=rr;dx+=cs){ const i=Math.floor((x+dx-x0)/cs), j=Math.floor((y+dy-y0)/cs); if(i>=0&&j>=0&&i<W&&j<H&&seen[j*W+i]) return true; } return false; }};
+}
+window.__ebA1.wall=Object.assign(window.__ebA1.wall||{},{walk:a1WalkOK,
+  fields:()=>DECALS.filter(d=>d.k==='field'&&Math.abs(d.x-2600)<1500&&Math.abs(d.y-9300)<1500).map(d=>({x:Math.round(d.x),y:Math.round(d.y),w:Math.round(d.w),h:Math.round(d.h),rot:+d.rot.toFixed(2)})),
+  reach:(sx,sy,pts,box)=>{ const b=box||[1200,8200,4300,11000], F=a1Flood(b[0],b[1],b[2],b[3],12,sx,sy,14); if(!F) return 'start blocked'; return pts.map(p=>[p[0],p[1],p[2]||'',F.at(p[0],p[1],p[3]||24)]); },
+  cols:(x0,y0,x1,y1)=>{ const out=[]; forCols((x0+x1)/2,(y0+y1)/2,Math.max(x1-x0,y1-y0)/2,c=>{ if(!colActive(c)) return; const cx=c.t==='c'?c.x:(c.x0+c.x1)/2, cy=c.t==='c'?c.y:(c.y0+c.y1)/2; if(cx<x0||cx>x1||cy<y0||cy>y1) return; out.push(c.t==='c'?['c',Math.round(c.x),Math.round(c.y),c.r,!!c.low]:['r',Math.round(c.x0),Math.round(c.y0),Math.round(c.x1),Math.round(c.y1),!!c.low]); }); return out; }});
+// The v10 palisade along the north edge (section 19: the North Gate of Act I's mystery and the Frostpine Gate, both
+// unchanged) now goes on round the whole village: down the east side to the Brindle Gate on the Brindlecross road,
+// along the south to the Pond Gate above Bramble Pond, and up the west side past the Field Gate (the woods and the far
+// west plot) to the north-west corner post. The forge's plots and Strawsworth's field are inside the wall.
+// Same timber and stone as the north run; it collides for Ash, foes and people, and a landing Ash never stops on it.
+const A1WALL={
+  // corner to corner, clockwise from the north-east post to the north-west post (the north run is section 19's)
+  pts:[[3262,8792],[3262,9000],[3330,9180],[3330,9800],[3250,10040],[1990,10040],[1760,9800],[1745,9530],[1975,9490],[1975,9200],[1950,8792]],
+  gates:[{id:'brindle',x:3330,y:9482,hw:46,sign:'BRINDLE GATE'},{id:'pond',x:2850,y:10040,hw:46,sign:'POND GATE'},{id:'field',x:1752.5,y:9665,hw:40,sign:'FIELD GATE'}],
+  sign:[2925,10084], th:10, gap:24, pieces:[], cols:[], H:[46,51,44,49,47,52], C:['#8a5a34','#7c5030','#93623a','#80542f','#8e5c36','#7a4f2e']
+};
+{ const base=initWorld; initWorld=function(){ base(); try{ a1WallBuild(); }catch(e){ console.error('a1 wall',e); } }; }
+function a1WallPiece(x,y,draw){ A1WALL.pieces.push({x,y,draw}); }
+function a1WallCol(c){ A1WALL.cols.push(c); return addCol(c); }
+function a1WallBuild(){
+  const A=A1WALL, P=A.pts; A.pieces.length=0; let v=0;
+  for(let i=0;i<P.length-1;i++){
+    const [ax,ay]=P[i], [bx,by]=P[i+1], L=dist(ax,ay,bx,by), ux=(bx-ax)/L, uy=(by-ay)/L, cuts=[];
+    for(const g of A.gates){ const t=(g.x-ax)*ux+(g.y-ay)*uy, off=Math.abs((g.x-ax)*uy-(g.y-ay)*ux); if(t>0&&t<L&&off<4){ Object.assign(g,{ux,uy,t,seg:i}); cuts.push([t-g.hw-A.gap,t+g.hw+A.gap]); } }
+    cuts.sort((p,q)=>p[0]-q[0]);
+    let t0=i===0?17:0; const tEnd=i===P.length-2?L-17:L;
+    for(const [c0,c1] of cuts){ a1WallRun(ax,ay,ux,uy,t0,c0,v); v+=5; t0=c1; }
+    a1WallRun(ax,ay,ux,uy,t0,tEnd,v); v+=5;
+    if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay)); REACH.clear.push({x:ax,y:ay,r:60}); }
+  }
+  for(const g of A.gates) a1WallGate(g);
+  // the Bramble Pond sign steps out of the Pond Gate's way, to the side of the path down to the water
+  const s=LANDMARKS.find(o=>o.id==='rc_bramblesign'); if(s){ s.x=A.sign[0]; s.y=A.sign[1]; if(s.colRef){ removeCol(s.colRef); s.colRef=addCol({t:'c',x:s.x,y:s.y,r:s.r||8}); } }
+  mapListsReset();
+}
+// one straight run of palisade from t0 to t1 along a side: colliders, a clear strip, and the stakes in bays
+function a1WallRun(ax,ay,ux,uy,t0,t1,v){
+  const A=A1WALL, L=t1-t0; if(L<6) return;
+  const x0=ax+ux*t0, y0=ay+uy*t0, x1=ax+ux*t1, y1=ay+uy*t1, ns=Math.abs(ux)<0.01, ew=Math.abs(uy)<0.01;
+  if(ns||ew) a1WallCol({t:'r',x0:Math.min(x0,x1)-(ns?A.th:0),y0:Math.min(y0,y1)-(ew?A.th:0),x1:Math.max(x0,x1)+(ns?A.th:0),y1:Math.max(y0,y1)+(ew?A.th:0)});
+  else { const n=Math.ceil(L/12); for(let k=0;k<=n;k++) a1WallCol({t:'c',x:lerp(x0,x1,k/n),y:lerp(y0,y1,k/n),r:11}); }
+  for(let d=0;d<=L+1;d+=40) REACH.clear.push({x:x0+ux*Math.min(d,L),y:y0+uy*Math.min(d,L),r:46});
+  // six stakes to a bay along an east-west run, three on the steep sides, so they sort well with Ash walking by
+  const n=Math.max(1,Math.round(L/7.33)), st=L/n, per=Math.abs(ux)>0.8?6:3, ang=Math.atan2(uy,ux);
+  for(let k=0;k<n;k+=per){ const m=Math.min(per,n-k), bx=x0+ux*st*(k+0.5), by=y0+uy*st*(k+0.5), vr=(v+k/per)%6|0, key='a1w_bay_'+ang.toFixed(3)+'_'+st.toFixed(2)+'_'+m+'_'+vr;
+    a1WallPiece(bx,Math.max(by,by+uy*st*(m-1)),()=>a1Put(A1SPR.get((LOOK.sb?'s:':'c:')+key)||a1BaySpr(ang,st,m,vr,key),bx,by)); }
+}
+// a bay of stakes along any direction: a stone footing, pointed logs back to front, two rails where the run is wide
+// enough on screen to show them (the north run's sprite, a1PalSpr, is this same palisade seen square on)
+function a1BaySpr(ang,st,m,vr,key){
+  const ux=Math.cos(ang), uy=Math.sin(ang), xs=[], ys=[]; for(let k=0;k<m;k++){ xs.push(ux*st*k); ys.push(uy*st*k); }
+  const xmin=Math.min(...xs)-10, xmax=Math.max(...xs)+10, ymin=Math.min(...ys)-64, ymax=Math.max(...ys)+9;
+  return a1Spr(key,xmax-xmin,ymax-ymin,-xmin,-ymin,g=>{
+    // seen end on (a north-south run) the logs are drawn a little thicker and rounder, with a shadow cast to the east
+    const A=A1WALL, edge=Math.abs(ux)<0.5, w=Math.abs(ux)>0.8?st+0.5:edge?11:8, ex=ux*st/2, ey=uy*st/2, ax=xs[0]-ex, ay=ys[0]-ey, bx=xs[m-1]+ex, by=ys[m-1]+ey;
+    g.lineCap='round'; g.strokeStyle='rgba(40,26,14,.22)'; g.lineWidth=edge?13:11; g.beginPath(); g.moveTo(ax+(edge?8:2),ay+3); g.lineTo(bx+(edge?8:2),by+3); g.stroke();
+    g.lineCap='butt'; g.strokeStyle='#7d7468'; g.lineWidth=edge?15:6.5; g.beginPath(); g.moveTo(ax,ay-1); g.lineTo(bx,by-1); g.stroke();
+    g.strokeStyle='#958b7e'; g.lineWidth=2.4; g.setLineDash([8,3]); g.beginPath(); g.moveTo(ax,ay-3); g.lineTo(bx,by-3); g.stroke(); g.setLineDash([]);
+    const order=xs.map((_,k)=>k).sort((p,q)=>ys[p]-ys[q]||xs[p]-xs[q]);
+    for(const k of order){ const x=xs[k], y=ys[k], h=A.H[(k+vr)%6];
+      g.fillStyle=A.C[(k+vr)%6]; g.fillRect(x-w/2,y-h,w,h); g.beginPath(); g.moveTo(x-w/2,y-h); g.lineTo(x,y-h-8); g.lineTo(x+w/2,y-h); g.closePath(); g.fill();
+      if(edge){ g.fillStyle='rgba(255,224,170,.3)'; g.fillRect(x-w/2+0.8,y-h+1,2.6,h-2); g.fillStyle='rgba(30,16,8,.4)'; g.fillRect(x+w/2-3.6,y-h,3.6,h); g.fillStyle='rgba(30,16,8,.3)'; g.fillRect(x-w/2,y-h+5,w,1.2); }
+      else { g.fillStyle='rgba(255,224,170,.24)'; g.fillRect(x-w/2+1,y-h+1,1.6,h-6); g.fillStyle='rgba(30,16,8,.35)'; g.fillRect(x+w/2-1.2,y-h,1.2,h); } }
+    if(Math.abs(ux)>0.35) for(const ry of [-37,-16]){ g.strokeStyle='#5a3a20'; g.lineWidth=4.5; g.beginPath(); g.moveTo(ax,ay+ry+2.2); g.lineTo(bx,by+ry+2.2); g.stroke();
+      g.strokeStyle='rgba(255,210,150,.25)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(ax,ay+ry+0.6); g.lineTo(bx,by+ry+0.6); g.stroke(); }
+  }); }
+// a gateway: stone posts each side (colliders), open doors; east-west runs reuse the North Gate's own art
+function a1WallGate(g){
+  const ew=Math.abs(g.uy)<0.3, d=g.hw+12, V=POI.village;
+  const posts=[[g.x-g.ux*d,g.y-g.uy*d],[g.x+g.ux*d,g.y+g.uy*d]];
+  for(const [x,y] of posts) a1WallCol({t:'c',x,y,r:14});
+  REACH.clear.push({x:g.x,y:g.y+10,r:g.hw+70});
+  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y)); return; }
+  // a side gate on a north-south run: two posts, the doors standing open against the inside of the wall, and the
+  // gate's name on a board on top of the south post, where you can read it
+  const [N,Sp]=posts[0][1]<posts[1][1]?posts:[posts[1],posts[0]], inw=Math.sign(V.x-g.x)||1;
+  a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]));
+  a1WallPiece(N[0],N[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),N[0],N[1]+2));
+  a1WallPiece(Sp[0],Sp[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),Sp[0],Sp[1]+2));
+  a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]));
+}
+function a1SidePostSpr(g,south){
+  return a1Spr('a1w_post_'+g.id+'_'+south,130,130,65,118,gg=>{
+    gg.fillStyle='rgba(40,26,14,.25)'; gg.beginPath(); gg.ellipse(2,3,20,7,0,0,TAU); gg.fill();
+    a1StonePost(gg,0,24,84);
+    if(!south) return;
+    gg.fillStyle='#4a2e18'; gg.fillRect(-2,-100,4,10); gg.fillRect(-26,-100,52,3);
+    const tw=Math.max(70,g.sign.length*6.6+12); gg.fillStyle='#6a4428'; rrect(gg,-tw/2,-113,tw,15,3); gg.fill(); gg.fillStyle='rgba(255,224,170,.25)'; gg.fillRect(-tw/2+3,-112,tw-6,1.6);
+    gg.fillStyle='#ecdcb8'; gg.font=`900 9px ${UIF}`; gg.textAlign='center'; gg.textBaseline='middle'; gg.fillText(g.sign,0,-105.5);
+  }); }
+function a1SideDoorSpr(hw,inw){ return a1Spr('a1w_door_'+hw+'_'+inw,hw*2+40,70,hw+20,60,g=>{
+  const x=inw<0?-12-hw:12;
+  g.fillStyle='rgba(40,26,14,.22)'; g.fillRect(x+2,-1,hw,6);
+  a1DoorFace(g,x,hw,48,'#6e4a2c'); g.fillStyle='rgba(255,224,170,.2)'; g.fillRect(x,-48,hw,2);
+}); }
+// draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode)
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; list.push({x:q.x,y:q.y,draw:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
+window.__ebA1.wall.A1WALL=A1WALL; window.__ebA1.wall.off=on=>{ for(const c of A1WALL.cols) c.off=!!on; return A1WALL.cols.length; };

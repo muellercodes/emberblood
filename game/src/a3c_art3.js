@@ -154,26 +154,103 @@ Object.assign(R2ST,{
   museum:{fl:'herring',wl:{k:'damask',c:['#6a2228','#8a3036'],wain:'#4a2a1a'},fab:6,wood:'dark',trim:'#c8a040',dec:['crest','banner'],arch:1,rug:'persian'},
   deck:{fl:'grey',wl:{k:'stone',c:['#3a3e58','#30344a','#464a66']},fab:6,wood:'grey',trim:'#2a2a3a',dec:['starchart','moonchart'],rug:'kilim'}
 });
+// ---------- stairs that read as stairs (house floors and dungeon floors share this art)
+// Up: a flight that climbs north (up the screen), so every riser faces you: treads lit, brighter toward the top, risers
+// in shade, a side wall with a newel post on each side, warm light spilling down from the floor above.
+// Down: a stairwell cut into the floor, falling south into the dark, inside a frame: each step darker than the one
+// before, the side walls of the well in deep shade. Footprint (w x h, centred on x,y) and triggers are the callers'.
+// Cached at 2x per size, material, lid and look; the light and the arrow are live.
+const STAIR_MAT={
+  // t0/t1: tread at the bottom/top, r0/r1: riser at the bottom/top, side: the side walls, cap: rails and post caps
+  wood:{t0:'#9c6a40',t1:'#e4b47c',r0:'#4a2a16',r1:'#8a5a30',side:'#5e381e',cap:'#b07a4a',post:'#6a4024',rim:'#6e4626',rimLit:'#a87648',deep:'#160d08',line:'#3a2212',run:['#b03a30','#6e1e1a','#e2b24c']},
+  stone:{t0:'#78706a',t1:'#b2aa9a',r0:'#363230',r1:'#6a645e',side:'#56504a',cap:'#a8a092',post:'#625a52',rim:'#5a554e',rimLit:'#9a9286',deep:'#0e0c0c',line:'#2a2622'},
+  dun:{t0:'#806c52',t1:'#bca682',r0:'#32281e',r1:'#64523e',side:'#52443a',cap:'#a8967a',post:'#5e4e3e',rim:'#4e4236',rimLit:'#8e7c62',deep:'#0c0a08',line:'#241c14'}
+};
+const STAIR_SPR=new Map();
+const stC=(a,b,k)=>{ const m=mixRGB(hexRGB(a),hexRGB(b),clamp(k,0,1)); return '#'+m.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); };
+const stairZ=h=>Math.round(h*0.56);   // how far the top of an up flight rises above its footprint (screen px)
+function stairSprite(dir,w,h,mk,lid){
+  const key=dir+'|'+w+'|'+h+'|'+mk+'|'+(lid?1:0)+'|'+(LOOK.sb?1:0); let c=STAIR_SPR.get(key); if(c) return c;
+  const M=STAIR_MAT[mk]||STAIR_MAT.wood, Z=dir==='up'?stairZ(h):0, pad=10, top=dir==='up'?Z+12:(lid?16:4);
+  const W=w+pad*2, H=h+top+pad, sc=2, cv=mkCanvas(W*sc,H*sc), g=cv.getContext('2d');
+  g.scale(sc,sc); g.translate(pad+w/2,top+h/2); g.lineJoin='round'; g.lineCap='round';
+  if(dir==='up') stairUpArt(g,w,h,M,Z); else stairDownArt(g,w,h,M,lid);
+  c=LOOK.sb?outlineSprite(cv,SBC.outline,1.5,{force:true}):cv; c.ox=pad+w/2; c.oy=top+h/2; c.w2=W; c.h2=H; STAIR_SPR.set(key,c); return c;
+}
+function stairUpArt(g,w,h,M,Z){
+  const hw=w/2, hh=h/2, N=h>=50?5:4, d=h/N, r=Z/N, sw=Math.max(5,Math.round(w*0.1)), x0=-hw+sw, x1=hw-sw, iw=x1-x0, top=-hh-Z, wt=top-6;
+  const R=M.run, rw=R?Math.round(iw*0.46):0, rx=-rw/2;
+  // the shadow the flight throws on the floor (south-east)
+  g.fillStyle='rgba(30,14,6,.32)'; g.beginPath(); g.moveTo(-hw+6,hh+5); g.lineTo(hw+6,hh+5); g.lineTo(hw+6,wt+10); g.lineTo(hw,wt+4); g.lineTo(hw,hh); g.closePath(); g.fill();
+  // steps, bottom (south) to top: each riser faces you in shade, each tread above it is lit, lighter the higher it is
+  for(let i=0;i<N;i++){ const u=N>1?i/(N-1):1, yb=hh-i*d, zt=(i+1)*r, zb=i*r, ry=yb-zt, rh=zt-zb, ty=yb-d-zt;
+    g.fillStyle=stC(M.r0,M.r1,u); g.fillRect(x0,ry,iw,rh+0.6);
+    g.fillStyle=stC(M.t0,M.t1,u); g.fillRect(x0,ty,iw,d+0.6);
+    // a worn board joint or two, the bright nosing on the tread's front edge and the shadow it throws on the riser
+    g.fillStyle='rgba(40,20,8,.16)'; g.fillRect(x0+iw*0.24,ty+1.5,1,d-2.5); g.fillRect(x0+iw*0.73,ty+1.5,1,d-2.5);
+    g.fillStyle=`rgba(255,246,224,${0.4+0.4*u})`; g.fillRect(x0,ry-1.7,iw,1.7);
+    g.fillStyle='rgba(20,8,2,.45)'; g.fillRect(x0,ry,iw,Math.min(1.8,rh*0.3));
+    if(R){ // a runner down the middle, held by a brass rod on every step
+      g.fillStyle=stC(R[1],R[0],0.25+0.4*u); g.fillRect(rx,ry,rw,rh+0.6); g.fillStyle=stC(R[0],'#fff0d8',0.28*u); g.fillRect(rx,ty+1,rw,d-0.4);
+      g.fillStyle=R[2]; g.fillRect(rx-1,ry-1.5,rw+2,1.5); g.fillStyle='rgba(255,236,170,.55)'; g.fillRect(rx,ty+1,1,d+rh-1); g.fillRect(rx+rw-1,ty+1,1,d+rh-1); } }
+  // the floor above: a lit landing at the top of the flight
+  g.fillStyle=stC(M.t1,'#fff4dc',0.35); g.fillRect(x0,wt,iw,top-wt+0.6); g.fillStyle='rgba(255,252,236,.7)'; g.fillRect(x0,wt,iw,1.6);
+  if(R){ g.fillStyle=stC(R[0],'#fff0d8',0.35); g.fillRect(rx,wt+1.6,rw,top-wt-1); }
+  // the left wall's shadow across the steps
+  g.fillStyle='rgba(30,14,4,.22)'; g.fillRect(x0,wt,4,hh-wt);
+  // side walls with a handrail on top (lighter toward the top), and a newel post at the foot of each
+  for(const s of [-1,1]){ const a=s<0?-hw:hw-sw;
+    const sg=g.createLinearGradient(0,hh,0,wt); sg.addColorStop(0,stC(M.side,'#000000',0.2)); sg.addColorStop(1,stC(M.side,M.cap,0.55)); g.fillStyle=sg; g.fillRect(a,wt,sw,hh-wt);
+    const hx=a+sw/2; g.fillStyle=M.cap; g.fillRect(hx-1.6,wt,3.2,hh-wt-14); g.fillStyle='rgba(255,246,224,.45)'; g.fillRect(hx-1.6,wt,1.1,hh-wt-14);
+    const pw=sw+4, py=hh-17; g.fillStyle=M.post; g.fillRect(hx-pw/2,py,pw,hh-py); g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(hx+pw/2-2,py,2,hh-py);
+    g.fillStyle=M.cap; g.fillRect(hx-pw/2-1,py-4,pw+2,4.5); g.fillStyle='rgba(255,246,224,.5)'; g.fillRect(hx-pw/2-1,py-4,pw+2,1.3);
+    g.fillStyle=M.cap; g.beginPath(); g.arc(hx,py-6,2.6,0,TAU); g.fill(); }
+  g.strokeStyle=M.line; g.lineWidth=1.3; g.strokeRect(-hw,wt,w,hh-wt);
+}
+function stairDownArt(g,w,h,M,lid){
+  const hw=w/2, hh=h/2, fr=Math.max(4,Math.round(w*0.09)), ix0=-hw+fr, ix1=hw-fr, iy0=-hh+fr, iy1=hh-fr, iw=ix1-ix0, sw=Math.max(3,Math.round(iw*0.1)), sx0=ix0+sw, sx1=ix1-sw;
+  const d=h*0.15, r=h*0.09;
+  // the frame round the well (boards or stones, lit along the top) and the dark inside
+  g.fillStyle=M.rim; g.fillRect(-hw,-hh,w,h);
+  g.fillStyle=M.rimLit; g.fillRect(-hw+1,-hh+1,w-2,fr-2); g.fillRect(-hw+1,-hh+1,fr-2,h-2); g.fillStyle=stC(M.rimLit,M.rim,0.45); g.fillRect(ix1+1,-hh+fr-1,fr-2,h-fr); g.fillRect(-hw+fr-1,iy1+1,w-fr,fr-2);
+  g.fillStyle='rgba(20,10,4,.4)'; for(const q of [-hw*0.36,hw*0.3]){ g.fillRect(q,-hh,1,fr); g.fillRect(q+3,hh-fr,1,fr); }
+  g.fillStyle=M.deep; g.fillRect(ix0,iy0,iw,iy1-iy0);
+  // steps going down, away to the south: the face under the step above, then the step, each darker than the last
+  let y=iy0, i=0;
+  while(y<iy1-0.5){ const k=Math.max(0,1-i*0.2), rr=Math.min(r,iy1-y);
+    g.fillStyle=stC(stC(M.r0,M.r1,0.6),M.deep,1-k*0.85); g.fillRect(sx0,y,sx1-sx0,rr); y+=rr; if(y>=iy1) break;
+    const dd=Math.min(d,iy1-y); g.fillStyle=stC(stC(M.t0,M.t1,0.55),M.deep,1-k*0.95); g.fillRect(sx0,y,sx1-sx0,dd);
+    g.fillStyle=`rgba(255,240,210,${0.4*k})`; g.fillRect(sx0,y+dd-1.4,sx1-sx0,1.4);
+    y+=dd; i++; }
+  // the walls of the well in shade (the west one catches a little light), and the gloom at the bottom
+  g.fillStyle=stC(M.side,M.deep,0.4); g.fillRect(ix0,iy0,sw,iy1-iy0); g.fillStyle=stC(M.side,M.deep,0.72); g.fillRect(ix1-sw,iy0,sw,iy1-iy0);
+  const dg=g.createLinearGradient(0,iy0,0,iy1); dg.addColorStop(0,'rgba(0,0,0,0)'); dg.addColorStop(0.5,'rgba(0,0,0,.2)'); dg.addColorStop(1,'rgba(0,0,0,.82)'); g.fillStyle=dg; g.fillRect(ix0,iy0,iw,iy1-iy0);
+  g.fillStyle='rgba(0,0,0,.5)'; g.fillRect(ix0,iy0,iw,1.8);
+  g.strokeStyle=M.line; g.lineWidth=1.1; g.strokeRect(ix0,iy0,iw,iy1-iy0);
+  g.strokeStyle=M.line; g.lineWidth=1.3; g.strokeRect(-hw,-hh,w,h);
+  // a secret way down keeps its lid, swung up against the north-west corner
+  if(lid){ g.save(); g.translate(-hw+2,-hh+2); g.rotate(-0.28); g.fillStyle='rgba(20,10,4,.3)'; g.fillRect(-3,-9,w*0.86,12); g.fillStyle='#6a4428'; g.fillRect(-6,-13,w*0.86,12);
+    g.fillStyle='#86603a'; g.fillRect(-6,-13,w*0.86,2.4); g.fillStyle='#4a4a52'; g.fillRect(w*0.18,-13,3,12); g.fillRect(w*0.6,-13,3,12); g.strokeStyle=M.line; g.lineWidth=1; g.strokeRect(-6,-13,w*0.86,12); g.restore(); }
+}
+// draw a stair at (x,y): the cached flight or well, then the live light and a small arrow that says up or down
+function drawStairArt(x,y,w,h,dir,mk,t,lid){
+  const c=stairSprite(dir,w,h,mk,lid); ctx.drawImage(c,x-c.ox,y-c.oy,c.w2,c.h2);
+  const b=Math.sin(t*3)*1.6, up=dir==='up', Z=stairZ(h);
+  if(up) glowAt(x,y-h/2-Z,w*0.6,'255,226,160',0.18+0.06*Math.sin(t*2.2));
+  const ay=up?y-h/2-Z-15+b:y+h*0.1+b, s=Math.max(5,w*0.1);
+  ctx.save(); ctx.lineJoin='round'; ctx.lineCap='round'; ctx.beginPath();
+  if(up){ ctx.moveTo(x-s,ay+s*0.55); ctx.lineTo(x,ay-s*0.45); ctx.lineTo(x+s,ay+s*0.55); } else { ctx.moveTo(x-s,ay-s*0.45); ctx.lineTo(x,ay+s*0.55); ctx.lineTo(x+s,ay-s*0.45); }
+  ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(30,16,8,.8)'; ctx.lineWidth=5; ctx.stroke(); ctx.strokeStyle=up?'#fff0c8':'rgba(255,226,170,.9)'; ctx.lineWidth=2.6; ctx.stroke(); ctx.restore();
+}
 function hintedKey(key){ if(!G||!G.hints) return false; for(const h in G.hints) if(key.startsWith(h)) return true; return false; }
 function drawFurnHouseX(o,t){
   const x=o.x, y=o.y;
   switch(o.k){
     case 'stairs':{
       if(o.hidden&&!G.found[o.hidden]) return true;
-      const w=o.w, h=o.h;
-      if(o.dir==='up'){
-        ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(x-w/2+4,y-h/2+6,w,h);
-        for(let i=0;i<5;i++){ const yy=y+h/2-(i+1)*h/5; ctx.fillStyle=i%2?'#8a6040':'#9a6e48'; ctx.fillRect(x-w/2,yy,w,h/5+1); ctx.fillStyle='rgba(255,240,210,.18)'; ctx.fillRect(x-w/2,yy,w,2); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(x-w/2,yy+h/5-2,w,2); }
-        ctx.fillStyle='#4a2e18'; ctx.fillRect(x-w/2-4,y-h/2,5,h); ctx.fillRect(x+w/2-1,y-h/2,5,h);
-        ctx.fillStyle='rgba(255,230,180,.75)'; ctx.beginPath(); ctx.moveTo(x,y-h/2-12); ctx.lineTo(x+7,y-h/2-4); ctx.lineTo(x-7,y-h/2-4); ctx.closePath(); ctx.fill();
-      }else{
-        ctx.fillStyle='#120c08'; ctx.fillRect(x-w/2,y-h/2,w,h);
-        for(let i=0;i<4;i++){ const yy=y-h/2+i*h/4; const k=1-i*0.18; ctx.fillStyle=`rgba(${120*k|0},${86*k|0},${58*k|0},1)`; ctx.fillRect(x-w/2+6+i*3,yy+4,w-12-i*6,h/4-4); }
-        const g=ctx.createLinearGradient(0,y-h/2,0,y+h/2); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.7)'); ctx.fillStyle=g; ctx.fillRect(x-w/2,y-h/2,w,h);
-        ctx.strokeStyle='#5a3a22'; ctx.lineWidth=4; ctx.strokeRect(x-w/2,y-h/2,w,h);
-        if(o.hidden){ ctx.fillStyle='#6a4428'; ctx.save(); ctx.translate(x-w/2,y-h/2); ctx.rotate(-0.25); ctx.fillRect(-6,-10,w*0.9,12); ctx.restore(); }
-        ctx.fillStyle='rgba(255,230,180,.75)'; ctx.beginPath(); ctx.moveTo(x,y+4); ctx.lineTo(x+7,y-4); ctx.lineTo(x-7,y-4); ctx.closePath(); ctx.fill();
-      }
+      // stone steps in cellars and vaults, wooden ones everywhere else
+      const st=AREA&&AREA.def&&AREA.def.style, mk=st==='cellar'||st==='vault'?'stone':'wood';
+      drawStairArt(x,y,o.w,o.h,o.dir==='up'?'up':'down',mk,t,!!o.hidden);
       return true; }
     case 'trig':{
       if(G.found[o.key]) return true;
@@ -201,3 +278,4 @@ function drawFurnHouseX(o,t){
   }
   return false;
 }
+window.__ebDbg=Object.assign(window.__ebDbg||{},{stairSprite,STAIR_SPR,STAIR_MAT});
