@@ -126,7 +126,7 @@ chapter({
     ],
     slt_mina: [
       ['narr', 'Saltmarsh stands on stilts over a silver lagoon, and the whole village smells of chowder.', 'Saltmarsh is on stilts over the water. It smells like soup.'],
-      ['c_mina', "Still high. Go OUT, sea. Please? ...Oh! Hello, dragon. It's been high tide ever since the night the clocks stopped.", 'Still high tide! Oh, hello, dragon. It will not go out!'],
+      ['c_mina', "Still high. Go OUT, sea. Please? ...Oh! Hello, dragon. Don't mind me, I'm telling the sea off.", 'Still high tide! Oh, hello, dragon.'],
       ['c_mina', 'The Tide Clock stuck the same night as the Great Clock. Now the sea has forgotten how to go out.', 'The Tide Clock is stuck. The sea forgot how to go out.'],
       ['ash', 'I need to get to the Gullcrag Caves.', 'I need to get to the caves.', { promise: 'c_gullcrag_door' }],
       ['c_mina', "Not at high tide! The Gullcrag Sands are under the sea. Fix my clock and she'll go out again. The door's open.", 'Not at high tide! Fix my clock. The door is open.', { promise: 'c_tidehouse_door' }],
