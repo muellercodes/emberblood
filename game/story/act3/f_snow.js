@@ -19,7 +19,7 @@ chapter({
   // Ulf's hat: the hat key is "Wolf-fur Hat" (x2_story's own hat drawing). A3a ENGINE REQUEST in CHANGES.md: `hat
   // <item>` should unlock and wear the item's `hat` name (today x1pHat only knows Act II's three hats).
   item: {
-    f3_wolf_hat: { name: ["Ulf's wolf-fur hat", 'A wolf-fur hat'], desc: ['Ear flaps! Very warm. Very fluffy.', 'Very warm. Very fluffy.'],
+    f3_wolf_hat: { name: ["Ulf's wolf-fur hat", 'A wolf-fur hat'], desc: ['Ear flaps! Warm as toast, and smells a bit of sheep.', 'Ear flaps! Warm and fluffy.'],
       icon: 'heart', keepsake: true, hat: 'Wolf-fur Hat' },
   },
 

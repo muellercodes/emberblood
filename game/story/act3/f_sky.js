@@ -105,7 +105,7 @@ chapter({
       ['f_pennant', '(from outside, on his kite) She\'s back! Her eyes are gold again! Old girl! OLD GIRL!', '(from outside) She\'s back! Her eyes are gold!'],
     ],
     f_sky_end: [
-      ['ember', 'Two of my flames in one winter. My auntie would be proud of you. I am.', 'Two of my flames in one winter. I\'m proud of you.'],
+      ['ember', 'Two of my flames in one winter! My auntie would have liked you. She always liked the brave ones.', 'Two of my flames in one winter! My auntie would like you.'],
       ['ember', 'The Howling Gap is no match for you now. The Stonehorns live on the other side. Speak up. They\'re a bit deaf.', 'Now you can cross the Howling Gap. The Stonehorns are a bit deaf.'],
       ['narr', 'Step into the warp ring to go back outside.', 'Step into the warp ring to go outside.'],
     ],

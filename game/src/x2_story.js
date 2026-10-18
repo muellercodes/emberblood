@@ -149,7 +149,7 @@ const F2S_PORT={
 for(const k in F2S_PORT) if(typeof EVPORT!=='undefined'&&!EVPORT[k]) EVPORT[k]=F2S_PORT[k];
 // the wolf-fur hat (Ulf's gift at the Lodge), worn like any hat; the hat's name is its key
 const F2S_HAT='Wolf-fur Hat';
-function f2sHat(){ G.hats=G.hats||{}; G.hats[F2S_HAT]=true; G.hat=F2S_HAT; setBanner(S('Wolf-fur Hat','Wolf-fur Hat'),S('Ear flaps! Very warm. Very fluffy.','Very warm. Very fluffy.'),2.6); }
+function f2sHat(){ G.hats=G.hats||{}; G.hats[F2S_HAT]=true; G.hat=F2S_HAT; setBanner(S('Wolf-fur Hat','Wolf-fur Hat'),S('Ear flaps! Warm as toast, and smells a bit of sheep.','Ear flaps! Warm and fluffy.'),2.6); }
 if(typeof drawHatShape==='function'){ const base=drawHatShape; drawHatShape=function(x,y,k,s){
   if(k!==F2S_HAT) return base(x,y,k,s); s=s||1; ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
   ctx.fillStyle='#8a7a6a'; ctx.beginPath(); ctx.arc(0,0,8.5,0,TAU); ctx.fill(); ctx.fillStyle='#b8a890'; ctx.beginPath(); ctx.arc(-1,-1,5,0,TAU); ctx.fill();
@@ -1550,7 +1550,7 @@ const F2S_MAIL={
     xl('dell',`Dear Ash. I bought a SEA boat in Gearhaven. I have not lost it yet. It has been four days.`,`Dear Ash. I bought a SEA boat. I have not lost it yet!`),
     xl('dell',`When you need to go east, come to the dock. Dell.`,`When you go east, come to the dock. Dell.`)]},
   f_pb_5:{from:'quill',when:()=>(G.flags.moon==null?100:G.flags.moon)<=85,lines:()=>[
-    xl('quill',`Fifteen percent. Something is EATING it. Nothing eats moons. I checked.`,`Something is eating the moon! I checked.`),
+    xl('quill',`Fifteen percent. Something is EATING it. Nothing is supposed to eat moons.`,`Something is eating the moon!`),
     xl('quill',`I have measured it every night this week. Professor Quill. P.S. Please stop whatever is eating it.`,`I measure it every night. Professor Quill.`)]}
 };
 // (Mom's three letters are the story's. Dell's and Quill's belong to x2_people, which loads first: these two stand in
