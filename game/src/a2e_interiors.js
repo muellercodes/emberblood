@@ -388,13 +388,13 @@ function doorWalkTick(dt){
 const DW_OFF=1e7;
 function dwHide(){
   const p=player, out=[]; if(AREA||!p||!G||G.mode!=='story') return out;
-  for(const d of mapList(DOORS,curMap())){ if(Math.abs(d.x-p.x)>90||Math.abs(d.y-p.y)>90||!doorWalkable(d)) continue; d.x+=DW_OFF; out.push(d); }
+  for(const d of mapList(DOORS,curMap())){ if(Math.abs(d.x-p.x)>90||Math.abs(d.y-p.y)>90||!doorWalkable(d)) continue; out.push([d,d.x]); d.x+=DW_OFF; }
   return out;
 }
 { const base=updateInteractions; updateInteractions=function(dt){
   try{ doorWalkTick(dt); }catch(e){ console.error(e); }
   const hid=dwHide();
-  try{ base(dt); } finally { for(const d of hid) d.x-=DW_OFF; }
+  try{ base(dt); } finally { for(const [d,x] of hid) d.x=x; }
   // the doormat takes him out: "Leave" is not something to press any more
   if(AREA&&G.prompt&&G.prompt.text==='Leave') G.prompt=null;
 }; }

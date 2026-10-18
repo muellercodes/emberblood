@@ -243,7 +243,7 @@ function hintTextRaw(){
     // a phone on its side has little room: one short line
     if(H-SAFE.t-SAFE.b<600) return `Drag on the ${settings.touch==='two'?(L?'right':'left'):'free side'} to move · SLASH attacks, talks and opens · Tap flasks to drink`;
     if(settings.touch==='two') return `Drag on the ${L?'right':'left'} to move, push all the way to sprint · SLASH attacks, and says TALK or OPEN when it will do that instead · Tap the flasks to drink, the minimap for the map, the quest list for the journal`;
-    return 'Drag anywhere low on the screen to move · Ash swings by himself · SLASH says TALK or OPEN near people and doors · Settings has more layouts';
+    return 'Drag anywhere low on the screen to move · Ash swings by himself · SLASH says TALK or OPEN near people and chests · Walk into a door to go in · Settings has more layouts';
   }
   if(dev==='pad'){
     const mv=L?'Right stick':'Left stick';
