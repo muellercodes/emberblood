@@ -1130,6 +1130,8 @@ const CROWD={
   retry:[0.25,0.5],    // seconds before a foe that had to wait tries again
   batWarn:[0.36,0.3],  // seconds of red line before a bat swoops (before DIFFS.wind)
   wolfPant:[0.6,0.45], // a wolf that has lunged stands panting this long before it backs off (the moment to hit it)
+  free:{wolf:1},       // without a boss, a wolf pack keeps its own rhythm: a wolf made to wait circles out of reach,
+                       // which made pack fights longer and so more lunges landed (its pant and longer warning stay)
   // longer red warnings: the wind-up that starts in this state is this many times longer (after DIFFS.wind). A kobold's
   // swing warned for 0.33 s on Normal, less than a kid needs to see it and press roll.
   wind:{kobold:{windup:[1.35,1.25]}, wolf:{crouch:[1.25,1.15]}}
@@ -1146,6 +1148,7 @@ function crowdBusy(skip){
 // may e start its attack now? (e is near Ash and just tried)
 function crowdOk(e){
   const b=G.boss, withBoss=!!(b&&!b.dead&&dist2(b.x,b.y,player.x,player.y)<900*900);
+  if(!withBoss&&CROWD.free[e.type]) return true;
   if(withBoss&&b.tele) return false;
   const last=G._crowdT!=null&&G._crowdT<=G.time?G._crowdT:-99;
   if(G.time-last<orK(withBoss?CROWD.bossGap:CROWD.gap)) return false;
