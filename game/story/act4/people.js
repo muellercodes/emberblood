@@ -154,7 +154,7 @@ people({
         say: ['The Book of Moths! Soggy, but whole. Take it to someone who reads old Lumen better than I do. Which is anybody.',
           'Take the book to someone who reads Lumen.'] },
       { if: 'power moonfire !clue m4_ring_trails', option: ['What do your records say about the moth?', 'What do the records say?'], promise: 'q_g_ring',
-        say: ['Her trails all start at a ring of stones in a wood on the Clockwork Coast, where something precious broke. Written in moon-ink, up on the rock beside it.',
+        say: ['The old records say her trails all start at a ring of stones in a wood on the Clockwork Coast. Something is written there in moon-ink, up on the rock beside it.',
           'Her trails start at the Moon Ring. Look from the rock.'] },
       { say: [['The old records say the Mother tied her moths with silver thread, even then. Poor things.', 'She tied her moths with silver thread.'],
         ['Sorry, fish. Not you. The other fish.'],
