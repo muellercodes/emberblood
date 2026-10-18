@@ -57,7 +57,7 @@ const QDEFS={
       {t:'talk',npc:'maren',text:'Give Mom the star-iron and Gorran’s message',lines:[['maren',`Gorran! That old rock goblin. Spring, like always.`],['maren',`Thank you for this, Ash. Give me that blade.`]],reward:{coins:25,xp:80}}
     ]},
   dell:{title:'Three Fish for Dell',giver:'dell',min:'wren',give:{rod:1},
-    offer:[['dell',`Know how to fish? No? Here, borrow my spare rod.`],['dell',`Stand at any fishing spot, press E, and when the bobber splashes, press E again. Bring me three fish. I've been eating bread for a week.`]],
+    offer:[['dell',`Know how to fish? No? Here, borrow my spare rod.`],['dell',S(`Stand at any fishing spot and press the use button. When the bobber splashes, press it again. Bring me three fish. I've been eating bread for a week.`,`Stand by a fishing spot. Press use. When it splashes, press again. Bring me three fish.`)]],
     steps:[
       {t:'item',item:'fish',n:3,text:'Catch 3 fish at a fishing spot (look for ripples on the shore)'},
       {t:'talk',npc:'dell',text:'Bring the fish to Dell on the Brindlecross dock',take:{fish:3},lines:[['dell',`Fish! Real fish! Keep the rod. And if you ever get to the Sunken Grotto down in the Mirefen... my boat went down near there.`]],reward:{coins:20,xp:40}}
