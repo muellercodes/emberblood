@@ -531,7 +531,7 @@ Object.assign(TALK,{
 // first meetings and everyday greetings in each person's own voice (the stock ones say "Maren's kid" and mention wolves)
 const X1P_FIRST={
   c_hester:S(`State your business. Briefly, please. The Clockwatch has a great deal of business today.`,`State your business. Quickly, please.`),
-  c_hettie:S(`The dragon! Don't touch that. Or that. Can I measure your tail yet? No? Later. Definitely later.`,`The dragon! Can I measure your tail? Later?`),
+  c_hettie:S(`The dragon! Can I measure your tail yet? No? Later. Definitely later. I'll write it down.`,`The dragon! Can I measure your tail? Later?`),
   c_ottoline:S(`Welcome to the Turning Library... WELCOME! Sorry. Sorry. The shelves make me nervous when they speed up.`,`WELCOME! Sorry. Welcome.`),
   c_whirligig:S(`A dragon, on my front step. Hmph. Do dragons wipe their feet?`,`A dragon! Hmph. Wipe your feet.`),
   c_mo:S(`AHOY! A dragon on my docks! Welcome to the finest harbor on the coast!`,`AHOY! Welcome to my harbor!`),
