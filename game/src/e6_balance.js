@@ -48,7 +48,7 @@ for(const k in BAL_BOSS) if(EDEF[k]) Object.assign(EDEF[k],BAL_BOSS[k]);
 // v11: the guards and summons of a boss now take turns and wait for his red warnings (e8_foes.js, fair crowds), which
 // made the bosses with a crowd much easier on Normal; Gloamjaw, the Brood Mother and Greymane get a little more health
 // back so the act still climbs (v10 Normal: gloamjaw 0.52, broodmother 0.95, greymane 1.25; scratchpad v11/SET_NOTES.md).
-const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.57], broodmother:[1.15,1.15],
+const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.57], broodmother:[1.15,1.05],
   greymane:[0.9,1.5], skrae:[1,1.15], cindervane:[0.85,0.7]};
 { const base=makeEnemy; makeEnemy=function(type,x,y,opt){ const e=base(type,x,y,opt);
     try{ const k=e&&e.boss&&G&&G.mode==='story'&&BAL_BOSS_EZ[type]; const i=k?DIFFS.indexOf(G.diff):-1; if(k&&i>=0&&i<2&&k[i]!==1){ e.maxHp*=k[i]; e.hp=e.maxHp; } }catch(err){}
