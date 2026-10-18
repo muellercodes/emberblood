@@ -41,8 +41,8 @@ quest({
 
   scene: {
     ml_offer: [
-      ['m_ripple', 'Dragon. A word, if you please. That white moth with the silver thread. We have seen threads like that before.',
-        'That white moth on a thread? We know those threads.'],
+      ['m_ripple', 'Dragon. A word, if you please. You are after the great moth. The old records say she ties her moths to her with silver thread.',
+        'You are after the moth? She ties her moths with silver thread.'],
       ['m_ripple', 'The moon-priests of Lumen wrote a Book of Moths. It is in a vault in the Drowned Library, sealed with moon-wax.',
         'The priests wrote a Book of Moths. It is in a vault.'],
       ['m_ripple', 'Only moonfire melts moon-wax. Then take the book to someone who reads old Lumen. I read it very badly.',
@@ -50,7 +50,7 @@ quest({
       ['m_ripple', 'I once read "moth" as "mother" for a whole week. Sorry, fish. Not you.', 'I once read "moth" as "mother". Sorry, fish.'],
       { choose: 'm_leash_offer', ask: ['Will you find the Book of Moths?', 'Find the Book of Moths?'], pick: [
         { t: ['I will. Moths are kind of my thing now.', 'I will!'], tone: 'kind', then: ['quest start m_leash'],
-          say: [['m_ripple', 'Splendid. Mind the octopus. She thinks every lamp down there is hers.', 'Mind the octopus down there.']] },
+          say: [['m_ripple', 'Splendid. You know the way down already, which is more than I ever do.', 'Splendid! You know the way.']] },
         { t: ['Not yet', 'Not yet'],
           say: [['m_ripple', 'Have we met? Oh, yes. Come back when you like. I may remember.', 'Come back. I may remember you.']] },
       ] },
@@ -72,7 +72,7 @@ quest({
           'Another eleventh page! I will hug it.']] },
       ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx." (Iska)',
         '"A grey moth sat on Ember\'s lantern. Ember named her Nyx."', { clue: 'm4_page11' }],
-      ['iska', 'I wrote that. I really did think nothing of it. I was wrong.', 'I wrote that. I was wrong.'],
+      ['iska', 'I wrote that, a thousand years ago, about a little moth on a lantern. I never thought about her again.', 'I wrote that. I forgot all about her.'],
     ],
     // replaces STORY.m_vault in place (x3_people's vault plays it by key when the wax melts)
     m_vault: [

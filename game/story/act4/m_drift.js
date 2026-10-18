@@ -107,7 +107,7 @@ chapter({
       ['narr', 'A tall post at the edge of the raft, notched at every high tide. The old notches are neat, like steps.', 'A tide post. The old notches are neat, like steps.'],
       ['narr', 'The new ones go up, and down, and sideways. By the wildest notch, somebody has scratched: TWO BITES.',
         'The new ones are wild. By the wildest one: TWO BITES.'],
-      ['ash', 'Two bites of WHAT?'],
+      ['ash', "TWO BITES? That's what Mom's letter said about the moon.", 'TWO BITES? Mom said that about the moon.'],
     ],
     drf_spyglass: [
       ['narr', "Squint's brass spyglass, on a swivel at the top of the crow's nest. You put your eye to it.", "Squint's spyglass. You look through it."],
@@ -133,7 +133,7 @@ chapter({
         'Wobbly! Ha! I like you. You looked around. So tell me WHY.'],
     ],
     drf_winnie_story: [
-      ['m_winnie', "The sea follows the moon. Smart child. Yes. And it has happened before.", 'Yes! The sea follows the moon. It happened before.'],
+      ['m_winnie', "The sea follows the moon. Yes, child, you've got it. And it has happened before.", 'Yes! The sea follows the moon. It happened before.'],
       ['m_winnie', 'Five hundred years ago a moth bit the moon for the very first time. The sea rose up and up, and swallowed a whole city. Old Lumen, the moon city.',
         'Long ago a moth bit the moon. The sea rose up and swallowed a city. Old Lumen.'],
       ['iska', 'Ember came east too, long ago. I can feel her flame down in that city, Ash. Like a candle in a window.',

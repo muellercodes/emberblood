@@ -1006,7 +1006,7 @@ function m3wDoors(B){
   { const d=DOORS[DOORS.length-1]; d.m3need=()=>m3wGate('m_burrows'); d.m3locked=S('A warm wind breathes out of the hole. Something huge is asleep down there. Better to come back with a reason.','Something big sleeps down there. Not yet.'); }
   B.door({x:12300,y:68446,area:'m_mirror',label:S('Enter the Mirror Temple','Go in the temple'),outY:26,m3need:()=>m3wGate('m_glasswall'),m3locked:S('Your own face looks back from the glass door. It does not open. Not yet.','The glass door stays shut.')});
   B.door({x:M3W_OBSDOOR.x,y:M3W_OBSDOOR.y,area:'m_obs',label:S('Enter the Eclipse Observatory','Go in the Observatory'),outY:30,m3need:()=>(G.flags.m_moonpath_lit|0)>=3,
-    m3locked:S('The great brass door is shut tight. Three moon braziers on the Moonpath are still cold.','The door is shut. Light the three moon bowls.')});
+    m3locked:S('The great brass door is shut tight. Three moon braziers on the Moonpath are still cold.','The door is shut. Light the three braziers.')});
   // Coralcombe: a dive door in the middle of the ring of coral (Dive)
   p4Add('pool',{id:'m_dive_coral',x:M3WG.coral[0],y:M3WG.coral[1],r:60,kind:'water',area:'m_coralcombe',label:S('Dive down to Coralcombe','Dive down to Coralcombe'),arrive:S('Down through a curtain of bubbles','Down through the bubbles!')});
   // (the Bubble Caves under Palmcrest and Mags' three cracked rocks are x3_people's, side quest m_tidebombs)
@@ -1093,7 +1093,7 @@ function m3wPlaces(B){
   B.sign('m_sign_shoals',2870,63780,S('THE SPIRE SHOALS. Walk the sandbars north. The last bit is deep. Swing if you can.','Walk the sandbars. The end is deep.'));
   B.sign('m_sign_strand',6990,65470,S('THE TIDEGLASS STRAND. East, the Caravan Road to the Oasis of Sable. North, the Whale Bones. Mind the hot glass.','Sable is east. Hot glass!'));
   B.sign('m_sign_sable',9150,67440,S('THE OASIS OF SABLE. Water, shade and stories. Do not touch the well.','SABLE. Do not touch the well.'));
-  B.sign('m_sign_north',9900,66930,S('North: the Wormfields and the Worm Mouth. Bring water. Bring a hat. Bring a bigger hat.','North: the Worm Mouth. Bring a hat!'));
+  B.sign('m_sign_north',9900,66930,S('North: the Wormfields and the Worm Mouth. Bring water. The worms will not share theirs.','North: the Worm Mouth. Bring water!'));
   B.sign('m_sign_worm',10380,63300,S('THE WORM MOUTH. Quicksand all round. Worms are not rude. They are just hungry.','THE WORM MOUTH. Quicksand!'));
   B.sign('m_sign_gap',10620,67380,S('THE GLASSWALL. Nobody can climb it. Nobody can fly over it. (Worms go under it.)','THE GLASSWALL. Worms go under it.'));
   B.sign('m_sign_flats',11190,67360,S('THE MIRROR FLATS. Do not believe the lakes.','Do not believe the lakes!'));
@@ -1113,7 +1113,7 @@ function m3wPuzzles(B){
   p4Add('moonstone',{id:'m_rift_stone',x:R.x-R.r1-56,y:R.y+76,dur:15,glass:['m_rift_glass'],beam:{ang:-0.3,len:300,w:26}});
   for(const [i,dx,dy] of [[1,-R.r1-140,-46],[2,-R.r1-130,130]]) p4Add('glyph',{id:'m_rift_glyph'+i,x:R.x+dx,y:R.y+dy,then:()=>m3wTip('riftg',R.x+dx,R.y+dy-30,S('A moth eye, painted in moonlight. It is looking at the stone.','A moth eye. It looks at the stone.'),'#dfe6ff',6)});
   CHESTS.push({id:'m_ch_rift',x:R.x+12,y:R.y+4,b:38,open:false});
-  B.sign('m_sign_rift',R.x-R.r1-170,R.y+40,S('THE SILVER RIFT. Lumen walked over it on bridges of moonlight. The moon has gone thin. Bring your own.','A moonlight bridge. Bring your own!'));
+  B.sign('m_sign_rift',R.x-R.r1-170,R.y+40,S('THE SILVER RIFT. Lumen walked over it on bridges of moonlight. No moonlight, no bridge.','No moonlight, no bridge!'));
   // the Moth's Eye Hollow (Shatterfields): a ring of glass, one doorway shut by rock that only moonlight opens; three
   // moth eyes on the ground outside show where (Moonfire, or Pip's lantern)
   const H=M3W_HOLLOW;
@@ -1204,10 +1204,10 @@ function m3wTurtleTalk(){
   if(G.found.m_sec_turtle==='awake'){ G.found.m_sec_turtle='talked';
     runDialogue([['m_greatshell',S('I remember Lumen before it sank. Lamps in every window. Terrible music.','I remember Lumen. Lamps everywhere. Bad music.')],
       ['m_greatshell',S('My great-grandson remembers it too, but he was only a baby. Two hundred. He mostly remembers the snacks.','My great-grandson was a baby then. He remembers snacks.')]],()=>{ scene='play'; saveGame(); }); return; }
-  m3wSay([S('Great-Grandma Shellby is asleep again, smiling.','Shellby is asleep. Smiling.')]);
+  m3wSay([S('Shellby\'s great-grandma is asleep again, smiling.','She is asleep. Smiling.')]);
 }
 function m3wTurtleWake(blaze){
-  if(blaze){ if(!M3WD.tips.turtleOw||G.time-M3WD.tips.turtleOw>4){ M3WD.tips.turtleOw=G.time; runDialogue([['m_greatshell',S('OW. Rude.','OW. Rude.')]],()=>{ scene='play'; }); } return; }
+  if(blaze){ if(!M3WD.tips.turtleOw||G.time-M3WD.tips.turtleOw>4){ M3WD.tips.turtleOw=G.time; runDialogue([['m_greatshell',S('OW! Hot, hot! Gently, young dragon.','OW! Gently!')]],()=>{ scene='play'; }); } return; }
   if(G.found.m_sec_turtle) return; G.found.m_sec_turtle='awake'; m3wSnd('rumble'); shake(3);
   runDialogue([['narr',S('The rock opens one enormous eye.','The rock opens one huge eye!')],
     ['m_greatshell',S('...Is that my great-grandson\'s friend? Tell that boy to write. Four hundred years and not one letter.','Are you my great-grandson\'s friend? Tell him to write!')],

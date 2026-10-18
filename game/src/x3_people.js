@@ -556,11 +556,11 @@ Object.assign(TALK,{
     secret:{t:S(`Mayor's emergency socks. Dry! Run faster.`,`My emergency socks. Dry! Run faster.`),reward:{stamina:15}},
     best:{t:S(`I'm naming the next raft after you. The Ash. It's fireproof.`,`The next raft is called The Ash. It's fireproof!`),reward:{coins:100}},
     chat:m3pChat(`Quick question for the town records. If you had a raft, what would you name it?`,`What would you name your raft?`,
-      [`The Maren, after my mom. So she'd always float.`,`The Maren, after Mom.`,`Oh, that's lovely. A raft that never lets you sink. I'm writing it down. Wetly.`,`Lovely! A raft that never lets you sink.`,0.5],
+      [`The Maren, after my mom. So she'd always float.`,`The Maren, after Mom.`,`Oh, that's lovely. A raft that never lets you sink. I'm putting it in the town book.`,`Lovely! A raft that never lets you sink.`,0.5],
       [`The Unsinkable Dragon!`,`The Unsinkable Dragon!`,`Bold! Brave! Probably sinkable! I love it!`,`Brave! Probably sinkable! I love it!`,0.5],
       [`Wet Socks.`,`Wet Socks.`,`WET SOCKS. Ha! HA! That's MY raft! You've seen my socks! Everyone's seen my socks.`,`WET SOCKS! That's my raft! Ha!`,1],'silly')},
   m_winnie:{bio:S('The Tidewife of Driftwood. Reads the moon. Lives with an octopus.','She reads the moon. She lives with an octopus.'),
-    about:{yara:S(`An elder in your valley who counts the moon? Good. Somebody up there should. Tell her Gerald says hello. Gerald counts too. Mostly to eight.`,`Your Elder Yara counts the moon? Good. Gerald counts to eight.`),m_ripple:S(`Old Ripple down in the reef and I were sweethearts once. Then he grew a tail. It was a whole thing.`,`Ripple and I were sweethearts. Then he grew a tail.`)},
+    about:{yara:S(`An elder in your valley who counts the moon? Good. Somebody up there should. Tell her Gerald says hello. Gerald counts too. Mostly to eight.`,`Your Elder Yara counts the moon? Good. Gerald counts to eight.`),m_ripple:S(`Old Ripple down in the reef and I were sweethearts once. He couldn't come up and I couldn't go down, so we wrote letters in bottles.`,`Ripple and I were sweethearts. We wrote letters in bottles.`)},
     rumor:{t:S(`The moon-priests kept their books in a library under the sea. Fish are terrible librarians. Somebody should go and look.`,`The moon-priests kept books under the sea. Someone should look.`),hint:null},
     loves:['fish'],hates:['moonlily'],
     deep:S(`When I was a girl the moon was so bright you could read by it. I read every book in Driftwood. By moonlight. All four.`,`I read every book here by moonlight. All four.`),
@@ -568,7 +568,7 @@ Object.assign(TALK,{
     best:{t:S(`Gerald wants you to have his favorite rock. It's a very good rock.`,`Gerald gives you his best rock. It's a good rock.`),reward:{bless:1}},
     chat:m3pChat(`Sit, child. Tell an old woman. Do you think the moon gets lonely?`,`Does the moon get lonely?`,
       [`Maybe. That's why we keep looking at it.`,`Maybe. So we look at it.`,`Ha! Yes. A thing that's looked at is never quite alone. You're cleverer than your horns.`,`Yes! Looked-at things are never alone.`,1],
-      [`Not while I'm here to save it!`,`Not while I'm here!`,`Brave little ember. The moon could do worse. It has done worse.`,`Brave! The moon could do worse.`,0.5],
+      [`Not while I'm here to save it!`,`Not while I'm here!`,`Brave child. The moon could do worse. It has done worse.`,`Brave! The moon could do worse.`,0.5],
       [`It has Gerald.`,`It has Gerald.`,`Everyone has Gerald. Gerald is everywhere. Look behind you. No. He's in the teapot.`,`Gerald is everywhere. He's in the teapot.`,0.5],'kind')},
   m_rowan:{bio:S('Raft-builder and ferry captain. Has a knot for every feeling.','She builds rafts. She has a knot for every feeling.'),
     about:{dell:S(`Your captain, Dell? He tied his boat to my dock with a granny knot. A GRANNY KNOT. I've retied it. Don't tell him.`,`Dell used a granny knot! I fixed it. Shh.`),c_jo:S(`A sailor kid in Gearhaven who hates losing? Send her here. I'll teach her the "you won fair" knot. It's very hard to tie.`,`Send that sailor kid here. I'll teach her the "you won fair" knot.`)},
@@ -626,7 +626,7 @@ Object.assign(TALK,{
       [`Snow! You have to see snow!`,`Snow!`,`Snow! One day! I'll throw a snowball at the sun! It will be a very short throw.`,`One day I'll throw snow at the sun!`,0.5],
       [`The sea. It's like a desert that got wet.`,`The sea.`,`A wet desert! HO HO! I'll tell that one twice. No, three times!`,`A wet desert! I'll tell that three times!`,0.5],'kind')},
   m_saffron:{bio:S('Well-Warden of Sable. Do not touch the well.','She guards the Moon Well. Don’t touch it.'),
-    about:{yara:S(`Your Elder counts the moon? I count the moonlight in my well. Drop by drop. Every night. It's getting less.`,`I count the moonlight in my well. There's less now.`),m_esme:S(`Esme names lamps. I name nothing. I just keep the light in. It works.`,`Esme names lamps. I just keep the light in.`)},
+    about:{yara:S(`Your Elder counts the moon? I watch my well instead. Every night there's a little less moonlight in it.`,`I watch my well. There is less light every night.`),m_esme:S(`Esme names lamps. I keep one well, and I call it the well.`,`Esme names lamps. I just keep the well.`)},
     rumor:{t:S(`The Glasswall grew up overnight when the moon got sick. Taller than towers. Only the worms go under. Worms are not polite, but they are thorough.`,`The Glasswall grew in one night. Only worms go under it.`),hint:null,need:()=>m3pR('m_sable')},
     loves:['honey'],hates:['fish'],
     deep:S(`My mother kept the well, and hers. When the moon went dim I sat by it every night and talked to it. It didn't answer. I kept talking.`,`My family kept the well. I talk to it at night. I keep talking.`),
@@ -687,13 +687,13 @@ Object.assign(TALK,{
     loves:['moonlily'],hates:['fish'],
     deep:S(`My grandmother's grandmother sang to the moon from a balcony in Lumen. I sing to it from the bottom of the sea. It still hears, I think.`,`My family sang to the moon from Lumen. I sing from the sea.`),
     secret:{t:S(`A pearl from the royal clam. It makes you a little harder to drown. And to hurt.`,`A royal pearl. You are a bit harder to hurt.`),reward:{maxhp:10}},
-    best:{t:S(`You are a friend of the Lumenfolk now, for as long as the sea is wet. Which is a long time.`,`You are our friend while the sea is wet. That's forever.`),reward:{bless:1}},
+    best:{t:S(`You are a friend of the Lumenfolk now, for as long as the sea is wet.`,`You are our friend while the sea is wet. That's forever.`),reward:{bless:1}},
     chat:m3pChat(`A queen may ask a question. What makes a good ruler, small dragon?`,`What makes a good ruler?`,
       [`Listening, even to the small ones.`,`Listening.`,`Even to the small ones. Like you. ...That was a joke. I make one a year. You've had it.`,`Like you. That was my joke for the year.`,1],
       [`Being brave first, so others can be brave too.`,`Being brave first.`,`Brave first. Yes. Lumen's priests went out first, the night the moth came. We remember.`,`Yes. Our priests went first. We remember.`,0.5],
-      [`A really big crown.`,`A big crown.`,`My crown is enormous. It does nothing. It does look nice. You're not entirely wrong.`,`My crown is big. It does nothing. It looks nice.`,0.5],'kind')},
+      [`A really big crown.`,`A big crown.`,`My crown is enormous and does nothing at all. It does look nice. You're not entirely wrong.`,`My crown is big. It does nothing. It looks nice.`,0.5],'kind')},
   m_ripple:{bio:S('Archivist of the Pearl Archive. Slow, kind, forgetful. Apologizes to fish.','He keeps the old books. He says sorry to fish.'),
-    about:{wren:S(`A librarian from up above, who reads Lumen? Oh, how lovely. I'd like to argue about spelling with her. Gently.`,`A librarian who reads Lumen? I'd love to argue spelling with her.`),m_winnie:S(`Winnie. Oh. Winnie. We were young. I grew a tail. She grew an octopus. Life goes on.`,`Winnie and I were young once. Then life went on.`)},
+    about:{wren:S(`A librarian from up above, who reads Lumen? Oh, how lovely. I'd like to argue about spelling with her. Gently.`,`A librarian who reads Lumen? I'd love to argue spelling with her.`),m_winnie:S(`Winnie. Oh, Winnie. She couldn't come down and I couldn't come up, so we sent letters in bottles for a whole year. Sorry, fish. I'm fine.`,`Winnie and I wrote letters in bottles. Long ago.`)},
     rumor:{t:S(`The priests' vault in the Drowned Library is sealed with moon-wax. Only moonfire melts it. I have never seen moonfire. I would like to, before I forget what I wanted.`,`The Library vault needs moonfire to open.`),hint:null,need:()=>!m3pQ('m_leash')},
     loves:['moonlily'],hates:['fish'],
     deep:S(`I have read every pearl in the Archive. Every story. Then I forget them, and I get to read them again. It's the only good thing about being old.`,`I read every story. Then I forget. So I read them again!`),
@@ -747,25 +747,25 @@ Object.assign(TALK,{
 // did in earlier acts: how he came east (Glaciar or the ship), Vesper friend or foe, Glaciar freed or beaten.
 const m3pGl=()=>G.choices.f_glaciar==='free', m3pGlBeat=()=>!!G.choices.f_glaciar&&G.choices.f_glaciar!=='free';
 const M3P_FIRST={
-  m_dabble:()=>G.flags.m_ship==='glaciar'?S(`Mayor Dabble Floatwell! You came on a DRAGON. An ICE one. My north beach is frozen solid and the chickens are ice skating. Welcome!`,`I'm Mayor Dabble! You came on an ice dragon! The chickens are skating!`)
-    :S(`Mayor Dabble Floatwell, at your service! Mind the gap. Mind ALL the gaps. Welcome to the only town that's never in the same place twice!`,`I'm Mayor Dabble! Mind the gaps! Our town floats!`),
-  m_winnie:()=>S(`Sit, sit, dragon child. Mind the octopus. Winnie, the Tidewife. I read the moon. Lately it reads badly.`,`Sit, dragon child. I'm Old Winnie. I read the moon.`),
+  m_dabble:()=>G.flags.m_ship==='glaciar'?S(`You came on a DRAGON. An ICE one! My north beach is frozen solid and the chickens are ice skating.`,`You came on an ice dragon! The chickens are skating!`)
+    :S(`Our visiting dragon! Mind the gaps. Mind ALL the gaps. The chickens are still talking about you.`,`Our dragon! Mind the gaps!`),
+  m_winnie:()=>S(`Winnie, the Tidewife, if nobody told you. I read the tide, and the moon. Lately the moon reads badly.`,`I'm Old Winnie. I read the tide and the moon.`),
   m_rowan:()=>S(`Rowan Knotwood. This is my "pleased to meet you" knot. Hold this end. No, the OTHER end.`,`I'm Rowan. This knot means "nice to meet you".`),
-  m_squint:()=>S(`LAND HO! ...Oh. A DRAGON HO! I'm Squint. Lookout. Official. The eyepatch is pretend. The lookout is real.`,`DRAGON HO! I'm Squint, the lookout!`),
+  m_squint:()=>S(`LAND HO! ...Oh. DRAGON HO! I'm Squint, the official lookout. The eyepatch is pretend. The lookout part is real.`,`DRAGON HO! I'm Squint, the lookout!`),
   m_gilly:()=>S(`Cook Gilly, Floating Kitchen! You look starving. Fish? Fish pie? Fish on a stick? Fish on a smaller fish?`,`I'm Cook Gilly! You look hungry. Fish?`),
-  m_ned:()=>S(`Who's that? Climbing MY lighthouse? ...A dragon. Hmph. Old Ned. Keeper. Mind the moths. Mind everything.`,`Who's climbing my lighthouse? A dragon. Hmph. I'm Old Ned.`),
-  m_coralia:()=>m3pGl()?S(`Welcome, small dragon. I am Coralia. We felt the sea turn cold when your ice auntie flew over. The fish wore little coats for a week.`,`Welcome. I'm Queen Coralia. The sea went cold when your auntie flew by!`)
-    :m3pGlBeat()?S(`Welcome, small dragon. I am Coralia. A great cold came down from the north this year, then stopped. Someone stopped it. I think it was you.`,`Welcome. I'm Queen Coralia. A great cold stopped this year. Was it you?`)
-    :S(`Welcome, small dragon. I am Coralia, Queen of the Lumenfolk.`,`Welcome. I'm Queen Coralia.`),
+  m_ned:()=>S(`Who's that, climbing MY lighthouse? ...A dragon. Hmph. I'm Ned. I keep this light. Mind the moths.`,`Who's climbing my lighthouse? A dragon. Hmph. I'm Old Ned.`),
+  m_coralia:()=>G.flags.m_ship==='glaciar'?S(`We felt the sea turn cold when your ice auntie flew over, small dragon. The fish wore little coats for a week.`,`The sea went cold when your auntie flew over!`)
+    :m3pGlBeat()?S(`A great cold came down from the north this year, then stopped. Someone stopped it. I think it was you, small dragon.`,`A great cold stopped this year. Was it you?`)
+    :S(`Yes, small dragon? The sea is listening, and so am I.`,`Yes, small dragon?`),
   m_ripple:()=>S(`Oh! A visitor. Elder Ripple, of the Pearl Archive. Have we met? I'm sorry. I'm sure I'd remember a dragon. Probably.`,`Oh, a visitor! I'm Elder Ripple. Have we met? Sorry.`),
   m_rocket:()=>S(`Whoa, a dragon who SWIMS? I'm Rocket. Fastest in Coralcombe. Second fastest is a squid. You might be third. Might.`,`A swimming dragon! I'm Rocket. Fastest here!`),
-  m_kipper:()=>S(`HALT! Sir Kipper of the Lumenfolk, and Lady Bubbles, my noble seahorse. State your business! ...Please.`,`HALT! I'm Sir Kipper. And my seahorse, Lady Bubbles!`),
+  m_kipper:()=>S(`HALT! ...Oh, it's the dragon. Sir Kipper, at your service, and this is Lady Bubbles. We never did introduce ourselves properly.`,`HALT! Oh, it's you. I'm Sir Kipper. This is Lady Bubbles.`),
   m_kelp:()=>S(`Oh, look at you, dearie, all dry and crispy. Nana Kelp. Healer. Pearls. Hugs, if you need one.`,`Look at you, dearie! I'm Nana Kelp. I heal and sell pearls.`),
-  m_rafi:()=>m3pVesperOn()?S(`HO! The dragon cousin! A girl in a moth mask told me you'd come. She said you'd be taller. I'm Rafi Sandstride, master of the Great Caravan!`,`HO! A moth-mask girl said you'd come! I'm Rafi!`)
-    :S(`HO! A dragon! Out of the SEA! I'm Rafi Sandstride, master of the Great Caravan!`,`HO! A dragon! I'm Rafi, the caravan-master!`),
+  m_rafi:()=>m3pVesperOn()?S(`HO! A girl in a moth mask came through and said her dragon cousin would follow. She said you'd be taller!`,`HO! A moth-mask girl said you would come!`)
+    :S(`HO! The dragon from the sea! Sit with the caravan a while.`,`HO! The sea dragon! Sit with us!`),
   m_saffron:()=>S(`Saffron. Well-Warden. Don't touch the well.`,`I'm Saffron. Don't touch the well.`),
   m_kiln:()=>S(`EH? A DRAGON? In my furnace tent? Old Kiln. Glassblower. Mind the hot bits. ALL the bits are hot bits.`,`EH? A dragon? I'm Old Kiln. Everything here is hot!`),
-  m_esme:()=>S(`Hello, little flame. I'm Esme. I keep the lamps. You must be the brightest thing to walk into Sable in years.`,`Hello, little flame. I'm Esme. I keep the lamps.`),
+  m_esme:()=>S(`Hello, dragon. I'm Esme. I keep the lamps. You must be the brightest thing to walk into Sable in years.`,`Hello, dragon. I'm Esme. I keep the lamps.`),
   m_dusty:()=>S(`Dusty: Hi! I'm Dusty! Dune: I'm Dune! Dusty: We're twins! Dune: We know you know.`,`Hi! We're Dusty and Dune! Twins!`),
   m_jinx:()=>m3pVesperOn()?S(`Am I real? Are you? A girl in a moth mask bought a hat from me last week, so I'm fairly sure I'm real. Jinx, mirage merchant.`,`Am I real? A moth-mask girl bought a hat. So I'm real. I'm Jinx.`)
     :S(`Am I a mirage? Are YOU? Jinx, merchant of whatever-this-is. Buy something and find out.`,`Am I a mirage? I'm Jinx. Buy something!`)
@@ -785,11 +785,11 @@ const M3P_HELLO={
   m_rafi:[S(`HO! The dragon!`,`HO!`),S(`Sit with the caravan!`,`Sit with us!`)],
   m_saffron:[S(`Don't touch the well.`,`Don't touch the well.`),S(`Dragon.`,`Dragon.`)],
   m_kiln:[S(`EH? Oh, you. HELLO!`,`HELLO!`),S(`Mind the furnace!`,`Mind the furnace!`)],
-  m_esme:[S(`Hello, little flame.`,`Hello, little flame.`),S(`The lamps say hello.`,`The lamps say hi.`)],
+  m_esme:[S(`Hello, dragon.`,`Hello, dragon.`),S(`The lamps say hello.`,`The lamps say hi.`)],
   m_dusty:[S(`Dusty: Ash! Dune: ASH!`,`Ash! ASH!`),S(`Dusty: Wanna surf? Dune: We have one tray.`,`Wanna surf? One tray.`)],
   m_jinx:[S(`Back again? Or am I?`,`Back again?`),S(`Something for everyone. Nothing for free.`,`Nothing for free.`)]
 };
-const M3P_NIGHTL=[S(`The nights are so dark now. Stay near the lamps, Ash.`,`It's so dark at night. Stay near lamps.`),S(`Can you see the moon? I can hardly see the moon.`,`I can hardly see the moon.`),S(`Every night darker. Every lamp brighter. That's the rule.`,`Darker nights. Brighter lamps.`)];
+const M3P_NIGHTL=[S(`The nights are so dark now. Stay near the lamps, Ash.`,`It's so dark at night. Stay near lamps.`),S(`Can you see the moon? I can hardly see the moon.`,`I can hardly see the moon.`),S(`Every night is darker than the last. Keep a lamp lit, Ash.`,`Darker every night. Keep a lamp lit.`)];
 { const base=greetLine; greetLine=function(id){
   if(!M3P_FIRST[id]) return base(id);
   if(!(G.seenTalk&&G.seenTalk['met_'+id])) return M3P_FIRST[id]();
@@ -862,7 +862,7 @@ const m3pHereV=id=>()=>!!(G&&m3pIV()&&curMap()===3&&m3pVisitC()[id]);
 B('m_vdel1','id:dell',m3pHereV('dell'),S(`Toot toot! That's the brass whistle. I just like pressing it.`,`Toot toot! I like the whistle.`));
 B('m_vdel2','id:dell',()=>m3pHereV('dell')()&&m3pPier(),S(`End of the world. Lovely spot for a sandwich.`,`End of the world. Nice spot for lunch.`));
 B('m_vwre1','id:wren',m3pHereV('wren'),S(`Page forty-one... the raft moved... page forty-two.`,`Page forty-one... the raft moved.`));
-B('m_vmag1','id:f_mags',m3pHereV('f_mags'),S(`If you hear a bang, that was science. If you hear two, that was more science.`,`A bang? That was science.`));
+B('m_vmag1','id:f_mags',m3pHereV('f_mags'),S(`If you hear a bang from the dock, don't worry. That was me.`,`A bang? That was me.`));
 B('m_vtik1','id:ev_tikka',m3pHereV('ev_tikka'),S(`Lumpy buns! Fresh lumpy buns! Lumpy means love!`,`Lumpy buns! Lumpy means love!`));
 B('m_vjun1','id:juniper',m3pHereV('juniper'),S(`The dunes moved again. I'll redraw them. Again.`,`The dunes moved! I'll redraw them.`));
 B('m_vves1','id:c_vesper',()=>m3pHereV('c_vesper')()&&!m3pPierAll(),S(`Psst. Up here. No, HERE.`,`Psst. Up here!`));
@@ -877,9 +877,9 @@ B('m_dw5',M3P_DW,()=>G.flags.m_ship==='glaciar',S(`The north beach is still froz
 B('m_dw6',M3P_DW,()=>m3pQ('m_lighthouse')&&isNight(),S(`Look! Old Ned's light! Silver! I can see my own feet!`,`Old Ned's light is on! Silver!`),{d:'q_m_lighthouse'});
 B('m_dw7',M3P_DW,()=>!!G.flags.m_dell_away,S(`Captain Dell's gone west to fetch your mom. He tooted twice. That's sailor for "back soon".`,`Dell went to get your mom. Back soon!`));
 B('m_sb1',M3P_SB,ALWAYS,S(`A dragon in Sable! Is it true you breathe fire? Can you light my lamp? I'll pay in dates.`,`Can you light my lamp? I'll pay in dates!`));
-B('m_sb2',M3P_SB,m3pE2,S(`The well is dim. My lamp is dim. My mood is dim.`,`The well is dim. My mood is dim.`),{d:'m_eclipse2'});
-B('m_sb3',M3P_SB,ALWAYS,S(`Esme says lamps make everything better. She's right. She's always right. It's annoying.`,`Esme says lamps make things better. She's right.`));
-B('m_sb4',M3P_SB,()=>m3pQ('m_lamps'),S(`All twelve lamps! Esme cried. Bertha didn't. Bertha is a lamp.`,`All twelve lamps! Esme cried.`),{d:'q_m_lamps'});
+B('m_sb2',M3P_SB,m3pE2,S(`The well's gone dim, and my lamp with it. I keep walking into my own tent pole.`,`The well is dim. So is my lamp.`),{d:'m_eclipse2'});
+B('m_sb3',M3P_SB,ALWAYS,S(`Esme says a lamp makes everything better. I hate it when she's right.`,`Esme says lamps make things better. She is right.`));
+B('m_sb4',M3P_SB,()=>m3pQ('m_lamps'),S(`All twelve lamps lit again! Esme cried, and Small Bertha looks very pleased with herself.`,`All twelve lamps! Esme cried.`),{d:'q_m_lamps'});
 B('m_sb5',M3P_SB+'|kid',m3pMoonGone,S(`Somebody took a BITE out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
 B('m_sb6',M3P_SB,()=>m3pVesperOn()&&m3pR('m_sable')&&isNight(),S(`There's a girl on the tent roofs at night. Moth mask. She waves at the lamps. Friend of yours?`,`A moth-mask girl sits on the roofs at night. Your friend?`));
 B('m_cc1',M3P_CC,ALWAYS,S(`A dragon who swims! What next, a fish who walks?`,`A swimming dragon! What next?`));
@@ -903,14 +903,14 @@ VCH('m_ch10',M3P_SB,M3P_SB,m3pE2,[[0,S(`Did you see her drink the well?`,`Did yo
 VCH('m_ch11',M3P_DW,M3P_DW,ALWAYS,[[0,S(`Where's the town today?`,`Where's the town today?`)],[1,S(`About here, I think.`,`About here.`)],[0,S(`Same as yesterday, then.`,`Same as yesterday.`)],[1,S(`No, yesterday it was about THERE.`,`No, it was THERE.`)]]);
 // greetings that react to what Ash did, in the east and before
 Object.assign(DGREET,{
-  m_eclipse1:[[M3P_CT,S(`The sun went out! In the MIDDLE of the DAY! And that moth! Ash, was that moth looking at YOU?`,`The sun went out! Was that moth looking at you?`)]],
+  m_eclipse1:[[M3P_CT,S(`The sun went out! In the MIDDLE of the DAY! And that shape across it... Ash, was that a MOTH?`,`The sun went out! Was that a MOTH?`)]],
   m_eclipse2:[[M3P_SB,S(`She drank our well. Like a bowl of milk. I'll never drink milk again.`,`She drank our well. I'll never drink milk again.`)]],
   m_puffdone:[[M3P_DW+'|'+M3P_CC,S(`You popped the Baron! The whole lagoon heard the PFFFFT!`,`You popped the Baron! We heard the PFFFT!`)]],
   'm_puffdone@m_kipper':[['any',S(`A wet pony, he said! WHO is the wet pony NOW, Baron? ...Him. He's the wet one.`,`Who's the wet pony now, Baron? Him!`)]],
-  m_dive:[[M3P_CC,S(`You learned the Deep Breath! Ember taught it to our priests, long ago. Welcome to the water, small dragon.`,`You can dive! Ember taught our priests that.`)]],
+  m_dive:[[M3P_CC,S(`You learned to Dive! Ember taught our priests that, long ago. Welcome to the water, small dragon.`,`You can dive! Ember taught our priests that.`)]],
   m_burrow:[[M3P_SB,S(`The worms taught you to dig? Rafi says that makes you half caravan, half worm. It's a compliment. Mostly.`,`You can dig like a worm! Half worm!`)]],
   m_moonfire:[[M3P_CT,S(`Moonfire! Silver fire! My grandmother sang about it. I didn't think it was real!`,`Moonfire! I didn't think it was real!`)]],
-  'm_moonfire@m_coralia':[['any',S(`Moonfire. The girl with horns taught it to Lumen, and now it comes back to us in a dragon. The sea is very old, and very fair.`,`Moonfire comes back to us in a dragon. The sea is fair.`)]],
+  'm_moonfire@m_coralia':[['any',S(`Moonfire. The girl with horns taught it to Lumen, and now a dragon brings it home to us. I'll have the old song sung tonight.`,`Moonfire comes home to us in a dragon. We will sing tonight.`)]],
   wpn_glaive:[[M3P_SB,S(`Old Kiln made a GLAIVE? Out of the MOON? He made me a cup once. It melted.`,`Kiln made a glaive? He made me a cup once. It melted.`)]],
   'wpn_glaive@m_kiln':[['any',S(`MY GLAIVE! In the hands of a DRAGON! I'll never top it. I'll try. With shoes.`,`MY GLAIVE! I'll never top it. I'll try. With shoes.`)]],
   q_m_ferry:[[M3P_DW,S(`The ferry runs again! I took it to the Strand and back for no reason! Twice!`,`The ferry runs! I rode it twice for fun!`)]],
@@ -921,9 +921,9 @@ Object.assign(DGREET,{
   q_m_leash:[[M3P_CC,S(`Elder Ripple says the old priests' book has been READ. By a dry person! He's been smiling for three days.`,`The old book was read! Ripple smiles all day.`)]],
   'ch_c_vesper_friend':[[M3P_SB,S(`A girl in a moth mask stays on the tent roofs. She says she's "watching your back". We said, fine, but don't steal the dates.`,`A moth-mask girl watches your back. Don't steal dates!`)]],
   'ch_c_vesper_foe':[[M3P_DW,S(`A girl in a moth mask sailed past last month. She didn't wave. She didn't look happy. Do you know her?`,`A sad girl in a moth mask sailed past. Do you know her?`)]],
-  'ch_f_glaciar_free':[[M3P_DW,S(`Your auntie froze the whole north beach! Free ice! Best summer ever!`,`Your auntie froze the beach! Free ice!`)]],
+  'ch_f_glaciar_free':[[M3P_DW,S(`They say the ice dragon up north woke up kind this year, and a little dragon did it. Was that you?`,`The ice dragon woke up kind. Was that you?`)]],
   'ch_f_glaciar_defeat':[[M3P_CT,S(`They say an ice dragon slept up north, and now she's sleeping for good. Is it true? That's a bit sad.`,`An ice dragon up north sleeps for good now? Sad.`)]],
-  'ch_m_hush_free':[[M3P_CT,S(`A white moth flew over the dunes last night. She glowed. She didn't eat anything. That's a good moth.`,`A glowing white moth flew by. A good moth.`)]],
+  'ch_m_hush_free':[[M3P_CT,S(`A white moth flew over the dunes, glowing like a lamp. She didn't eat a single one. That's a good moth.`,`A glowing white moth flew by. A good moth.`)]],
   'ch_fennick_forgive@m_esme':[['any',S(`I hear your lamp-man back home keeps every lantern lit, all night. I'd like to shake his hand. Carefully. Lamp-men have hot hands.`,`Your lamp-man keeps every lamp lit. I want to shake his hand.`)]]
 });
 { const base=syncDeeds; syncDeeds=function(){ base(); try{ if(G&&G.mode==='story'&&m3pIV()){ const F=G.flags, C=G.choices;
@@ -962,7 +962,7 @@ const M3P_INN={
     if(id==='m_dusty'&&m3pQ('m_noodle')&&!G.flags.m_noodle_told) o.push({t:S('Noodle is home with his mom.','Noodle is home with his mom.'),tag:'quest',fn:()=>{ G.flags.m_noodle_told=1; addCoins(40,player.x,player.y); },then:[m3pL('m_dusty',`Dusty: We'll miss him! Dune: We won't miss our shoes! Dusty: Here, for taking him home. Dune: It's our shoe money.`,`We'll miss him! Not our shoes! Here, shoe money.`)],back:true});
     if(id==='m_squint'&&m3pAt('m_lighthouse',0)&&!G.items.m_sandwich) o.push({t:S('Can I have the sandwich for your grandpa?','The sandwich for Ned?'),tag:'quest',fn:()=>giveItems({m_sandwich:1}),then:[m3pL('m_squint',`Here. It's fish. Everything is fish.`,`Here. It's fish.`)],back:true});
     if(id==='m_rowan'&&m3pAt('m_ferry',1)) o.push({t:S('How do the ferry posts work?','How do the posts work?'),tag:'quest',then:[m3pL('m_rowan',`Each post on the sandbars is crooked. Jump and slam it down straight, like a mallet. Then fling the line across with that tail of yours. Post one, post two, post three, then the Gate.`,`Jump and slam each post down. Then throw the line with your tail.`)],back:true});
-    if(id==='m_esme'&&m3pAt('m_lamps',0)) o.push({t:S('Where are the lamps that are hard to reach?','Where are the hard lamps?'),tag:'quest',then:[m3pL('m_esme',`The Twins are up on tall poles by the market: a long, hot flame reaches them, or fly past. Muffin and Barnaby blew over in the eclipse wind and got buried. Look where the sand sparkles. Lady Wellington is on the well's islet. Coco is up the tallest palm. And Little Sun is inside Rafi's tent.`,`Two are on tall poles. Two are buried where sand sparkles. One is on the well island. One is up a palm. One is in Rafi's tent.`)],back:true});
+    if(id==='m_esme'&&m3pAt('m_lamps',0)) o.push({t:S('Where are the lamps that are hard to reach?','Where are the hard lamps?'),tag:'quest',then:[m3pL('m_esme',`Dot and Dash are up on tall poles by the market: a long, hot flame reaches them, or fly past. Muffin and Barnaby blew over in the eclipse wind and got buried. Look where the sand sparkles. Lady Wellington is on the well's islet. Coco is up the tallest palm. And Little Sun is inside Rafi's tent.`,`Two are on tall poles. Two are buried where sand sparkles. One is on the well island. One is up a palm. One is in Rafi's tent.`)],back:true});
     if(id==='m_kiln'&&m3pAt('m_glaive',2)) o.push({t:S('How do I temper the moon crumb?','How do I temper it?'),tag:'quest',then:[m3pL('m_kiln',`EH? MOONFIRE! In the FURNACE! Breathe it in for a good long while, until the furnace turns SILVER! Not candlelight! MOONFIRE!`,`Breathe MOONFIRE into the furnace until it turns SILVER!`)],back:true});
   }catch(e){ console.error(e); }
   return o; }; }
@@ -1009,11 +1009,11 @@ onTalk(n=>{
   // before the voyage: Dell at Gearhaven's Far Pier
   if(id==='dell'&&!G.flags.m_landed&&m3pR('m_sail')){
     m3pSay([m3pL('dell',pick([`Ash! The Soggy Biscuit Three, ready to sail east! Steam paddle, brass whistle, and sandwiches. Hop aboard at the end of the pier.`,`Past the end of every map I own! I've never been so happy or so scared! The boat's at the end of the pier.`]),`Ash! My boat is ready to sail east! Hop aboard at the end of the pier.`),
-      m3pL('dell',`Sister Wren's coming too. She's very green. Books don't get seasick, she says. She's not a book.`,`Sister Wren is coming too. She feels sick already.`)]); return true; }
+      m3pL('dell',`Sister Wren's coming too. She's gone green already, and we haven't left the pier.`,`Sister Wren is coming too. She feels sick already.`)]); return true; }
   // Glaciar, napping on the north isle under a sail
-  if(n.m3pNap){ const L=G.seenTalk.m3p_nap?[m3pL('f_glaciar',pick([`Zzz... Oh, dumpling! I was resting my eyes. Both of them. For a day.`,`The sun this far south is very rude. My sail hat helps. A little.`,`The raft children keep sliding down my tail. I pretend to be asleep. I'm a very good pretender.`]),`Zzz... Oh, dumpling! I was resting.`)]
+  if(n.m3pNap){ const L=G.seenTalk.m3p_nap?[m3pL('f_glaciar',pick([`Zzz... Oh, dumpling! I was resting my eyes. Both of them. For a day.`,`The sun this far south is far too keen. My sail hat helps, a little.`,`The raft children keep sliding down my tail. I pretend to be asleep. I'm a very good pretender.`]),`Zzz... Oh, dumpling! I was resting.`)]
       :[m3pN(`A heap of ice-blue scales is snoring on the north isle, under a sun hat made from a sail. One eye opens.`,`Glaciar naps under a sail hat. One eye opens.`),
-        m3pL('f_glaciar',`Dumpling! Brann sends his regards. He's very brave now. He asked me to say it loudly. BRANN SENDS HIS REGARDS.`,`Dumpling! BRANN SAYS HELLO! He asked me to say it loudly.`),
+        m3pL('f_glaciar',`Dumpling! The raft children brought me a fish. A raw one. I said thank you and froze it for later.`,`Dumpling! The raft children gave me a fish!`),
         m3pL('f_glaciar',`When you want to go home, just say. I don't do fast. But I do far.`,`Want to go home? Just say. I'm slow. But I go far.`)];
     G.seenTalk.m3p_nap=1;
     if(!(typeof CROSSINGS!=='undefined'&&CROSSINGS.m_glaciar_back)&&G.flags.m_landed) L.push(ch('f_glaciar',S('Shall we fly north, dumpling?','Fly north?'),[{t:S('Fly me back to Hearthold','Fly to Hearthold'),fn:()=>later(0.2,()=>mapTravel(6850,49100,{banner:S('Hearthold','Hearthold')}))},{t:S('Not yet, Auntie','Not yet'),then:[m3pL('f_glaciar',`Then I'll nap. Shout if you need me. Loudly. I'm a little deaf on the left.`,`Then I'll nap. Shout loudly!`)]}]));
@@ -1029,8 +1029,8 @@ onTalk(n=>{
     if(m3pQ('m_leash')){ m3pSay([m3pL('wren',pick([`Ripple and I are reading every pearl in the Archive. He forgets them, so we read them twice. It's heaven.`,`Page eleven! I keep taking it out to look at it. Ember's friends kept it for five hundred years. Under the SEA.`,`I'm writing it all down. "The Account of the Long Night." Chapter one: I was seasick.`]),`Ripple and I read every pearl. Twice!`)]); return true; }
     m3pSay([m3pL('wren',pick([`The raft keeps moving. My books keep moving. I keep reading. It's like a library that dances.`,`The merfolk keep Lumen's old books, Ash. Lumen's priests wrote about moths. Lots about moths.`]),`My books float! Lumen's priests wrote about moths.`)]); return true; }
   if(id==='f_mags'&&m3pIV()){
-    if(!G.seenTalk.m3p_mags){ G.seenTalk.m3p_mags=1; m3pSay([m3pL('f_mags',`Ash! I signed on as Dell's engineer. He pays me in sandwiches. I've got a workbench on the dock now. To sell bombs to pirates. Crab pirates. They have no money. It's going badly.`,`I'm Dell's engineer now! I sell bombs to crab pirates. They have no money.`)]); return true; }
-    m3pSay([m3pL('f_mags',pick([`Do bombs work underwater? For SCIENCE? ...Yes. Now they do. Mostly.`,`The engine's FINE. That noise is a feature.`,`If it explodes, it's science. If it explodes twice, it's a lot of science.`]),`If it explodes, it's science!`)]); return true; }
+    if(!G.seenTalk.m3p_mags){ G.seenTalk.m3p_mags=1; m3pSay([m3pL('f_mags',`I've got a workbench on the dock now, to sell bombs to pirates. Crab pirates. They pay in shells, so it's going badly.`,`I sell bombs to crab pirates. They pay in shells!`)]); return true; }
+    m3pSay([m3pL('f_mags',pick([`Do bombs work underwater? I'm going to find out. For SCIENCE.`,`The engine's FINE. That noise is a feature.`,`If it explodes, it's science. If it explodes twice, it's a lot of science.`]),`If it explodes, it's science!`)]); return true; }
   if(id==='ev_tikka'&&m3pIV()&&G.flags.tk_come==='yes'){
     const bun=!G.flags.m_tk_bun; G.flags.m_tk_bun=1;
     m3pSay([m3pL('ev_tikka',m3pPier()?pick([`I made a bun for the mountain. It's lumpy. Lumpy means love. The mountain doesn't deserve it.`,`Captain Dell let me steer once. We went in a circle. A very brave circle.`]):pick([`Lumpy buns! Gilly says they need fish. They do NOT need fish.`,`I carried bread all the way across the sea. To somewhere important! This is the most important place I've ever been.`]),`Lumpy buns! Lumpy means love!`)].concat(bun?[m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)]:[]),()=>{ if(bun) giveItems({c_lumpybun:1}); }); return true; }
@@ -1038,11 +1038,11 @@ onTalk(n=>{
     const L=[m3pL('maren',pick([`Eat something. I mean it. Mountains are hungry work. I've packed you a sandwich. It's squashed. It's still a sandwich.`,`I mended the Heart. You'll mend the rest. That's how it works in our family: somebody hits it, and somebody breathes.`,`I'm going to stand right here and watch that bridge until you come back down it. Don't argue. You can't. I'm your mother.`]),`Eat something. I'll wait right here.`)];
     if(G.items.m_stariron&&!G.flags.m_stariron_done) L.push(m3pStarIron());
     m3pSay(L); return true; }
-  if(id==='quill'&&m3pPierAll()){ m3pSay([m3pL('quill',pick([`My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have LOVED this. A mountain! Out of the SEA! I'd have hated to tell him the moon is gone.`,`I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.`,`Every time I look through the telescope, the black glass looks back. Fascinating. Terrifying. Mostly fascinating.`]),`I measured the mountain. It's getting taller!`)]); return true; }
+  if(id==='quill'&&m3pPierAll()){ m3pSay([m3pL('quill',pick([`My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have LOVED this. A mountain! Out of the SEA! I'd have hated to tell him the moon is gone.`,`I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.`,`Every time I look through the telescope, the black glass seems to look back at me. I keep looking anyway.`]),`I measured the mountain. It's getting taller!`)]); return true; }
   if(id==='juniper'&&m3pIV()&&m3pR('m_sable')) return m3pJuniper(n);
   if(id==='c_vesper'&&m3pIV()&&m3pVesperOn()){
     if(m3pPierAll()){ m3pSay([m3pL('c_vesper',pick([`Not alone, cousin. I said it. I meant it. Don't make it weird.`,`I stole a hat from a moth knight on the way down. It doesn't fit. I'm keeping it.`]),`Not alone, cousin.`)]); return true; }
-    if(m3pQ('m_vesper')){ m3pSay([m3pL('c_vesper',`I'll be right behind you. Picking locks. Stealing hats. Annoying moths.`,`I'll be right behind you.`)]); return true; }
+    if(m3pQ('m_vesper')){ m3pSay([m3pL('c_vesper',`When you go up, I'll be right behind you. My lockpicks have been out since breakfast.`,`I'll be right behind you.`)]); return true; }
     m3pSay([m3pL('c_vesper',pick([`Gran writes every week. She says the stove's still warm. She says "come home". I say "soon". It's nearly true.`,`The lamps here are nice. Less nice than climbing them. I've climbed all twelve. Don't tell Esme.`,`Cousin. You're getting better at not falling off things. I'm almost impressed.`]),`Cousin. You're getting better at climbing.`)]); return true; }
   if(id==='m_sandy'){ m3pSay([m3pN(`(a rumble that might be a snore)`,`(a rumble, maybe a snore)`),
     m3pL('m_sandy',G.bossDone&&G.bossDone.m_gravelgut||G.items.m_mooncrumb||m3pR('m_glasswall')?`...Oh, it's you, little warm thing. My husband is sleeping it off. A hundred years, he says. I'll wake him for birthdays.`:`...You smell like the sky. Is my husband very sick? He ate something shiny. I told him not to.`,
@@ -1057,13 +1057,13 @@ function m3pStarIron(){
 const M3P_DUN=[['m_lumen',S('Drowned Lumen','Drowned Lumen')],['m_burrows',S('the Sandworm Burrows','the Sandworm Burrows')],['m_mirror',S('the Mirror Temple','the Mirror Temple')],['m_obs',S('the Eclipse Observatory','the Eclipse Observatory')]];
 function m3pMapKey(id){ const D=typeof DUNGEONS!=='undefined'&&DUNGEONS[id]; return 'dmap_'+((D&&D.save)||id); }
 function m3pJuniper(n){
-  if(m3pR('n_bridge')&&stageAt('n_bridge')>=0){ m3pSay([m3pL('juniper',`I saw it from Sable! A MOUNTAIN! I ran all the way. I'm drawing it through the Professor's telescope. It keeps changing shape. Rude.`,`I ran from Sable to draw the mountain! It keeps changing.`)]); return true; }
+  if(m3pR('n_bridge')&&stageAt('n_bridge')>=0){ m3pSay([m3pL('juniper',`I saw it from Sable! A MOUNTAIN! I came under the Glasswall on my belly to get here. I'm drawing it through the Professor's telescope, but it won't hold still.`,`I saw the mountain from Sable! It won't hold still.`)]); return true; }
   const first=!G.flags.m3p_jun; G.flags.m3p_jun=1;
   const L=[]; if(first) L.push(m3pL('juniper',`Ash! I heard about a desert made of GLASS. I had to come. I've opened a Map Tent. Rook says hi. Rook says bring him a sand worm. I said no.`,`Ash! A glass desert! I opened a Map Tent. Rook says hi.`));
   const opts=[];
   for(const [id,nm] of M3P_DUN){ const key=m3pMapKey(id), have=!!G.found[key];
     if(id==='m_obs'){ if(!have) opts.push({t:S(`The map of ${nm} (free)`,`${nm} map (free)`),fn:()=>{ G.found[key]=true; setBanner(S('Juniper’s map','Juniper’s map'),S('Every room of the Observatory shows on your map.','The Observatory map!'),2.6); },then:[m3pL('juniper',`Nobody should go in THERE without a map.`,`Nobody should go in there without a map.`)]}); continue; }
-    if(!have) opts.push({t:S(`The map of ${nm} (40 coins)`,`${nm} map (40 coins)`),cond:()=>(G.coins||0)>=40,fn:()=>{ G.coins-=40; G.found[key]=true; setBanner(S('Juniper’s map','Juniper’s map'),S('Every room of that place shows on your map.','Every room shows on your map.'),2.6); },then:[m3pL('juniper',`Pleasure doing business! I drew it from the outside. The inside is your problem.`,`Thanks! The inside is your problem.`)]}); }
+    if(!have) opts.push({t:S(`The map of ${nm} (40 coins)`,`${nm} map (40 coins)`),cond:()=>(G.coins||0)>=40,fn:()=>{ G.coins-=40; G.found[key]=true; setBanner(S('Juniper’s map','Juniper’s map'),S('Every room of that place shows on your map.','Every room shows on your map.'),2.6); },then:[m3pL('juniper',`Pleasure doing business! I copied it from the oldest charts I could find. Whatever lives in there now is your problem.`,`Thanks! What lives inside is your problem.`)]}); }
   if(!opts.length){ L.push(m3pL('juniper',pick([`You've got every map I've drawn. I'm sketching the dunes now. They keep moving. No wait, that's a worm.`,`All sold! I'm drawing the Glasswall. It's very hard to draw glass. It's mostly the stuff behind it.`]),`You have all my maps!`)); m3pSay(L); return true; }
   opts.push({t:S('Just looking','Just looking'),then:[m3pL('juniper',`The dungeons have their own map chests too. Probably guarded. Probably by something with teeth.`,`Dungeons have map chests too. Guarded.`)]});
   L.push(ch('juniper',S(`Maps! Fresh maps! Mostly dry!`,`Maps! Fresh maps!`),opts)); m3pSay(L); return true;
@@ -1453,7 +1453,7 @@ function m3pGapTick(){
   if(!m3pBurrowed()){ M3P.gapSide=0; return; }
   const side=p.x<10900?-1:1;
   if(M3P.gapSide&&side!==M3P.gapSide){ G.flags.m_vgap_n=(G.flags.m_vgap_n|0)+1; const n=G.flags.m_vgap_n; emit(p.x,p.y,14,{col:'226,196,128',glow:false,smin:40,smax:140,lmin:.3,lmax:.6,zmin:1.5,zmax:3});
-    if(n>=3){ G.flags.m_vesper_gap=1; setBanner(S('The Burrow Gap is wide enough!','The gap is wide enough!'),S('A cat-sized shape slips through behind you. "Thanks, worm."','Vesper slips through. "Thanks, worm."'),3); questPoke(); saveGame(); }
+    if(n>=3){ G.flags.m_vesper_gap=1; setBanner(S('The Burrow Gap is wide enough!','The gap is wide enough!'),S('A small shape in a moth mask slips through behind you. "Thanks, worm."','Vesper slips through. "Thanks, worm."'),3); questPoke(); saveGame(); }
     else setBanner(S(`The tunnel gets wider. ${n} of 3`,`Wider! ${n} of 3`),'',1.6); }
   M3P.gapSide=side;
 }
@@ -1936,24 +1936,24 @@ function m3pOverlay(){ if(!G||G.mode!=='story'||AREA||curMap()!==3) return; m3pB
 const m3pMoon=()=>typeof moonLeft==='function'?moonLeft():(G.flags.moon==null?100:G.flags.moon);
 const M3P_MAIL=[
   {id:'m_pb_1',from:'quill',when:()=>m3pIV()&&m3pMoon()<=60,lines:[
-    m3pL('quill',`Ash, I watched the eclipse from my roof. The moon is now sixty percent of a moon. I have written to the Eclipse Observatory. They are very old and very slow at replying. Go and knock.`,`The moon is shrinking fast. Go knock at the Eclipse Observatory!`),
+    m3pL('quill',`Ash, I watched the eclipse from my roof. The moon is now sixty percent of a moon. I have written to the Eclipse Observatory, out of habit. Nobody has answered a letter there in years. Go and knock.`,`The moon is shrinking fast. Nobody answers at the Observatory. Go and knock!`),
     m3pL('quill',`P.S. My old teacher, Professor Lumley, was its last astronomer. If you find his spectacles, they are mine now. He said so. Professor Quill.`,`P.S. If you find Professor Lumley's glasses, they're mine. Quill.`)]},
   {id:'m_pb_2',from:'fennick',when:()=>m3pIV()&&m3pMoon()<=40,lines:[
     {who:'fennick',text:S(`Every lantern in Emberhollow is lit, every night, all night. Nobody here is scared of the dark. Not while I've got oil. Your friend, Fennick.`,`I keep every lantern lit. Nobody is scared. Fennick.`),skipIf:()=>G.choices.fennick==='jail'},
     {who:'fennick',text:S(`The Watch House is the brightest place in Brindlecross. I polish. It's what I'm for now. Fennick.`,`The Watch House shines. I polish. Fennick.`),skipIf:()=>G.choices.fennick!=='jail'}]},
   {id:'m_pb_3',from:'maren',when:()=>!!G.flags.m_eclipse2,then:()=>{ if(!G.flags.m_dell_away&&!m3pR('m_reforge')){ G.flags.m_dell_away=1; M3P.sig=''; } },lines:[
-    m3pL('maren',`Ash. I saw the moon tonight. Less than half of it is left. Iska told Yara, who told Pebble, who told me, that the Heart needs mending once you find the last piece.`,`Ash. Less than half the moon is left. The Heart needs mending once you find the last piece.`),
+    m3pL('maren',`Ash. I saw the moon tonight. Less than half of it is left. And once you find the last piece, that Heart of yours will need mending.`,`Ash. Less than half the moon is left. The Heart needs mending once you find the last piece.`),
     m3pL('maren',`Mending things is my job. I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`Mending is my job. I'm coming! Dell is coming to get me. Don't argue.`),
     m3pL('maren',`Dell says he'll bring the boat round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`Dell will bring the boat to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
     m3pIf(()=>!!G.flags.dr_m_moth,'maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Unless they eat moons.`),
     m3pN(`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails west.`),
     m3pDo(()=>{ if(!G.flags.m_dell_away&&!m3pR('m_reforge')){ G.flags.m_dell_away=1; M3P.sig=''; } })]},
   {id:'m_pb_4',from:'yara',when:()=>m3pIV()&&m3pMoon()<=40&&!!G.flags.m_pb_2,lines:[
-    m3pL('yara',`I counted the moon tonight. Less than half. Pebble sat on my windowsill and stared at it all night. She won't eat. Well. She ate one coin.`,`Less than half a moon. Pebble stared at it all night. She ate one coin.`)]},
+    m3pL('yara',`I counted the moon tonight. Less than half. Pebble sat on my windowsill and stared at it all night. She wouldn't eat a thing, except one coin.`,`Less than half a moon. Pebble stared at it all night. She ate one coin.`)]},
   // the fallback bombs (ACT4 6.5): no Blast Bombs when the Sunken Gate opens? Mags sends some (Pebble carries the parcel)
   {id:'m_pb_bombs',from:'f_mags',coin:0,when:()=>m3pIV()&&m3pR('m_reef')&&!(G.weapons&&G.weapons.bombs),then:()=>{ if(!(G.weapons&&G.weapons.bombs)) giveWeapon('bombs'); },lines:[
     m3pN(`Pebble drops a lumpy parcel on your head. It ticks.`,`Pebble drops a parcel on you. It ticks.`),
-    m3pL('f_mags',`(a note on the parcel) No bombs? NO BOMBS? Here. Take these. Don't thank me. Thank me a little. A pufferfish hates a bomb. Everybody hates a bomb. Mags.`,`No bombs? Here! Thank me a little. Pufferfish hate bombs. Mags.`)]},
+    m3pL('f_mags',`(a note on the parcel) No bombs? NO BOMBS? Here. Take these. Don't thank me. Thank me a little. A pufferfish hates a bomb. Mags.`,`No bombs? Here! Thank me a little. Pufferfish hate bombs. Mags.`)]},
   {id:'m_pb_oil',from:'fennick',when:()=>m3pQ('m_lamps'),gift:{items:{m_lampoil:1}},lines:[
     {who:'fennick',text:S(`(a letter) Fennick Wick here, lamp man of Emberhollow. Yara says you need lamps that never go out. I spent my whole life making this oil. Use it for something good. That is all I ever wanted. F.`,`Fennick here. Yara says you need lamps that never go out. Here is my best oil. Use it well. F.`),skipIf:()=>G.choices.fennick==='jail'},
     {who:'osric',text:S(`(a letter) Captain Osric here. We found this in Fennick Wick's old shop. He says it is lamp oil that never runs out. He says please use it. He also says sorry. Again. O.`,`Captain Osric here. This is Fennick's oil. It never runs out. He says sorry. Again. O.`),skipIf:()=>G.choices.fennick!=='jail'},

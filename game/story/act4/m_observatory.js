@@ -74,7 +74,7 @@ chapter({
     // Duke Umberwing's outro (a miniboss): the lamp_thief payoff when it is solved first
     m_umber_won: [
       // (the key is real: the Duke's room drops the boss key, x3_dun_b loot bkey)
-      ['m_umberwing', 'Oh, bother. Bested by a lizard. Here, the key, the key. Take it.', 'Oh, bother. Here, take the key.', { ref: 'm_obs_door' }],
+      ['m_umberwing', 'Oh, bother. Bested by a hatchling. Here, the key, the key. Take it.', 'Oh, bother. Here, take the key.', { ref: 'm_obs_door' }],
       { if: 'solved lamp_thief', then: [
         ['ash', "You're the lamp thief! Bertha's spare, Driftwood's lantern, all of them!", "You're the lamp thief!"],
         ['m_umberwing', '...Bother. Take the lot. I shall post them back. With a note.', 'Bother. Take the lot. I will send them back.', { do: ['set m4_lamps_back'] }],

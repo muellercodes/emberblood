@@ -403,7 +403,7 @@ function d3bAct(A,o){
     case 'd3b_dial': case 'd3b_stud': d3bDialUse(A,o); return;
     case 'd3b_tgt': d3bSay(o.lit?(o.want==='moon'?S('The moon crystal glows, cool and silver.','The moon crystal glows.'):S('The sun crystal blazes, warm as a summer noon.','The sun crystal blazes.')):(o.want==='moon'?S('A crystal of pale silver. It drinks moonlight. Bring a moonbeam to it.','A moon crystal. Bring moonlight to it.'):S('A crystal of warm gold. It drinks sunlight. Bring a sunbeam to it.','A sun crystal. Bring sunlight to it.'))); return;
     case 'd3b_lens': d3bSay(canBlaze()?S('A great glass lens on a brass stand. Blue fire, breathed right into it, would light it like a little sun.','A lens. Breathe blue fire into it!'):S('A great glass lens on a brass stand. Ordinary fire only makes it warm.','A lens. Your fire is not hot enough.')); return;
-    case 'd3b_lamp': d3bSay(o.lit>0?S('The lamp burns bright. Moths love it. Moths cannot help it.','The lamp is lit. Moths love it.'):o.high?S('A lamp post so tall its lamp is up near the ceiling. Ordinary fire will not reach it. Blue fire might.','A tall lamp. Use blue fire!'):S('A brass lamp post. Any fire will light it, for a while.','A lamp. Any fire lights it.')); return;
+    case 'd3b_lamp': d3bSay(o.lit>0?S('The lamp burns bright. Every moth in the room is staring at it.','The lamp is lit. Moths love it.'):o.high?S('A lamp post so tall its lamp is up near the ceiling. Ordinary fire will not reach it. Blue fire might.','A tall lamp. Use blue fire!'):S('A brass lamp post. Any fire will light it, for a while.','A lamp. Any fire lights it.')); return;
     case 'd3b_star': d3bSay(o.kind==='moon'?S('A star lamp of silver glass. It wants moonlight.','A moon star. It wants Moonfire.'):o.high?S('A star lamp high on a brass arm. Only a long blue flame would reach it.','A high star. Use blue fire!'):S('A star lamp of gold glass. It wants fire.','A fire star. It wants fire.')); return;
     case 'd3b_scope': d3bBeat('scope',[['narr',S(`You put your eye to the great telescope. Far to the east, past the end of every map, is a patch of sea where the stars look wrong.`,`You look through the telescope. Far east, the stars look wrong.`)]]); return;
     case 'd3b_flip': d3bSay(canPound()?S('A brass switch shaped like a little hourglass. It looks like it wants a good hard thump from above.','A flip switch. Ground Pound it!'):S('A brass switch shaped like a little hourglass, stuck fast.','A stuck switch.')); return;
@@ -554,7 +554,7 @@ function d3bVesperTick(A,o,dt){ const g=d3bVaultGate(A); o.on=!!G.flags.m_vesper
 if(typeof m3sReforge==='function'){ const base=m3sReforge; m3sReforge=function(){ const A=AREA;
     if(A&&A.d3b&&A.def&&dunRoot(A.def.id)==='m_obs'){ const L=A.d3b.objs.find(o=>o.k==='d3b_elens'); if(L&&caveRoomAt(player.x,player.y)===A.rooms[L.room]){
       const chest=A.objs.find(o=>o.tobj==='dchest'&&o.room===L.room&&o.kind==='heart'), near=dist(player.x,player.y,L.x,L.y)<230;
-      if(chest&&!G.found[chest.id]){ if(near&&!(A.d3b.lensNag>G.time)){ A.d3b.lensNag=G.time+8; setBanner(S('The great chest first','The big chest first'),S('Iska: "Open the great chest, little ember. Then the Lens."','Open the big chest first!'),2.6); } return false; }
+      if(chest&&!G.found[chest.id]){ if(near&&!(A.d3b.lensNag>G.time)){ A.d3b.lensNag=G.time+8; setBanner(S('The great chest first','The big chest first'),S('Iska: "Open the great chest, Ash. Then the Lens."','Open the big chest first!'),2.6); } return false; }
       if(!near) return false; } }
     return base.apply(this,arguments); }; }
 
@@ -962,7 +962,7 @@ defineDungeon('m_obs',{name:S('The Eclipse Observatory','The Eclipse Observatory
     links:[['k','l','open'],['k','m','open'],['k','n','lock',{keys:2}],['n','o','crack']]}},
   {id:'4',name:S('The Eclipse Lens','The Eclipse Lens'),dark:0.5,map:{rooms:{
     p:d3bR({at:[1,2],kind:'free',tpl:D3B_OB.p,down:'m_obs_3',rest:[12,2],beat:'ante',noPots:true,noDecor:true,floorArt:{k:'stars',r:2.4},
-      beatFb:[['iska',S('Last door, little ember. One more lantern than you think you need.','Last door. One more lantern than you need.')]]}),
+      beatFb:[['iska',S('Hush is through this door, Ash. One more lantern than you think you need, remember?','Hush is through this door. One more lantern than you need.')]]}),
     B:{at:[0,0],span:[2,2],kind:'boss',m3boss:'m_hushboss',tpl:M3_TPL.dome,frost:M3_TPL.domeFrost,noPots:true,noDecor:true},
     q:d3bR({at:[2,0],kind:'free',tpl:D3B_OB.q,loot:['heart'],lensSpot:[8,4],terrace:[13,5],warpAfter:[7,8],noPots:true,noDecor:true})},
     links:[['p','B','boss',{at:1}],['B','q','gate:B',{at:0}]]}}

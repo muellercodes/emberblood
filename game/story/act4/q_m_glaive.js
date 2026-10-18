@@ -53,7 +53,7 @@ quest({
         ] },
     ],
     gl_bring: [
-      ['m_kiln', 'A crumb of the MOON! Still warm! Well. Cool. Moon-warm.', 'A crumb of the MOON!'],
+      ['m_kiln', 'A crumb of the MOON! Still warm! No, cold! Moon-cold!', 'A crumb of the MOON!'],
       ['narr', 'He screws a glass lens into his eye and turns the crumb round and round.', 'He looks at it through a glass.'],
       ['m_kiln', 'Hm. HM. Tooth marks. Something BIT this off the moon. Something with a VERY big mouth.',
         'Tooth marks! Something BIT the moon.', { clue: 'm4_crumb_bite' }],
@@ -70,7 +70,7 @@ quest({
         'Throw it. It comes back. It cuts moon silk.', { clue: 'm4_glaive_cuts' }],
       ['m_kiln', 'Moon-silk WEBS, mind. Not leashes. Never leashes. Ask a priest of Lumen why. I just make things.',
         'Webs! Not leashes. Never leashes.'],
-      ['m_kiln', "Up in the cold north, by the Dreadgate, there's a door of moon silk nobody can open. Something glows behind it. Go and show off.",
+      ['m_kiln', "A trader from the cold north told me about a door of moon silk by the Dreadgate that nobody can open. Something glows behind it. Go and show off.",
         'By the Dreadgate up north is a silk door. Go cut it!', { promise: 'q_g_cocoon' }],
       ['m_kiln', "And don't use it to cut bread. It'll cut the table too.", "Don't cut bread with it!"],
     ],

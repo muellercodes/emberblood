@@ -51,7 +51,7 @@ places({
       ['narr', 'Inside: a note in very old ink. "Moon things listen to moonlight, not claws. If you ever have to free one of her moths, be gentle. I."',
         '"Moon things listen to moonlight. Be gentle. I."', { clue: 'm4_iska_note' }],
       ['iska', 'I wrote that? ...I wrote that.', 'I wrote that?'],
-      ['iska', 'I must have known, once. Five hundred years is a long time to keep things in your head.',
+      ['iska', 'I must have known, once. A thousand years is a long time to keep things in your head.',
         'I knew once. Then I forgot.'],
     ],
     m4_epi_biscuit: [

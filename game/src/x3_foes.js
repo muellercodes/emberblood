@@ -912,7 +912,7 @@ function m3OctValve(D,v){
   if((e.bph||0)<2){ ftext(v.x,v.y-40,S('It will not turn! Her arm is holding it.','It is stuck!'),'#e0c0ff',14); return; }
   if(D.flooded){ const out=e.mode==='swim'&&(e.sw==='out'||e.sw==='lunge'||e.sw==='eye'); m3OctFlood(D,false);
     if(out){ e.mode='strand'; e.sw=null; e.strandT=byDiff(6,5,4.5); e.strands=(e.strands||0)+1; e.tele=null; M3.hold=null; m3Txt(e,S('Stranded! She flops on the dais!','She is stuck! Hit her!'),'#ffe066',16); m3Say(e,'m_octavia',S('No no NO! Where did the sea go?!','Where is the water?!'),2); m3Ev('strand'); }
-    else { m3OctToWall(e,D); e.tideT=byDiff(12,10,8); m3Say(e,'m_octavia',S('Draining my bath? RUDE.','Rude!'),4); } }
+    else { m3OctToWall(e,D); e.tideT=byDiff(12,10,8); m3Say(e,'m_octavia',S('Draining my bath? How DARE you!','How dare you!'),4); } }
   else { m3OctFlood(D,true); m3OctToSwim(e,D); e.tideT=byDiff(12,10,8); }
 }
 { const base=updateInteractions; updateInteractions=function(dt){ base(dt);
@@ -1808,7 +1808,7 @@ function m3Weak(e,key,text,simple){ if(e[key]>G.time) return; e[key]=G.time+2.6;
 c1Lines('m_zapp','m_zapp_intro','m_zapp_outro',
   [['narr',S('The hall is one big pool. Three dark lamps stand on little ledges over the water. Under it, something long glows and crackles.','A big pool. Three dark lamps. Something glows under the water.')],
    ['m_zapp',S('Bzzzt! Who swims in MY pool? Oh, a little dragon! You will look lovely all lit up.','Bzzzt! Who is in my pool?')],
-   ['iska',S('Eels love their own glow, little ember. Give her something shiny to look at.','Give her something shiny to look at.')]],
+   ['iska',S('Eels love their own glow, Ash. Give her something shiny to look at.','Give her something shiny to look at.')]],
   [['narr',S('Lady Zapp floats up, all her sparks gone quiet, and stares at the lamp light on the water.','Lady Zapp floats up. Her sparks go quiet.')],
    ['m_zapp',S('Ooh, shiny. Shiny me. ...Fine, take your key. I only want to look at the lamps now.','Shiny me. Take the key.')]]);
 M3ROOM.m_zapp={
@@ -1934,7 +1934,7 @@ function m3Zapp2(e,fl){
 c1Lines('m_bigfin','m_bigfin_intro','m_bigfin_outro',
   [['narr',S('The pit is all soft sand. A huge fin rises out of it, with a scar across it, and slides round and round you.','Soft sand. A huge fin goes round and round you.')],
    ['m_bigfin',S('CHOMP! Nobody burrows in MY sand! Nobody!','CHOMP! This is MY sand!')],
-   ['iska',S('She hides under the sand. Shake the ground, little ember, and she has to come up.','Shake the ground! She has to come up.')]],
+   ['iska',S('She hides under the sand. Shake the ground, Ash, and she has to come up.','Shake the ground! She has to come up.')]],
   [['narr',S('Big Fin flops onto the sand, too tired to dive.','Big Fin flops down. She is too tired to dive.')],
    ['m_bigfin',S('Fine. FINE. You may burrow in my sand. On Tuesdays. Wipe your claws.','Fine. You can dig here. Sometimes.')]]);
 M3ROOM.m_bigfin={ build(R,A){ return {R,type:'m_bigfin'}; } };

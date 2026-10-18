@@ -28,8 +28,8 @@ chapter({
     ],
     // the old STORY.m_burrows_end (the dungeon plays it at its end), replaced in place: Sable first, then the Glasswall
     m_burrows_end: [
-      ['ember', 'A crumb of the moon. Hold on to it, little ember. Old Kiln in Sable would know what to do with a thing like that.',
-        'A crumb of the moon. Keep it, little ember. Old Kiln in Sable will know what to do.'],
+      ['ember', 'A crumb of the moon. Hold on to it, little ember. Somebody in Sable who works with fire and glass might know what to do with a thing like that.',
+        'A crumb of the moon. Keep it, little ember. Someone in Sable who works with glass will know what to do.'],
       ['ember', 'Go back to Sable first, little ember. Then under the Glasswall, the way the worms do. My last flame in the east is in the temple beyond it.',
         'Go back to Sable first. Then go under the Glasswall, like the worms.', { ref: 'm4_gap_sign' }],
       ['narr', 'Step into the warp ring to go back outside.', 'Step in the warp ring to go outside.'],

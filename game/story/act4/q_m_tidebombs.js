@@ -34,7 +34,7 @@ quest({
 
   scene: {
     tb_offer: [
-      ['f_mags', "Ash! I signed on as Dell's engineer. He pays me in sandwiches. Now. Do bombs work UNDER WATER? For science.",
+      ['f_mags', "Ash! You're just the dragon I need. Do bombs work UNDER WATER? For science.",
         'Ash! Do bombs work UNDER WATER? For science!'],
       ['f_mags', 'Also, three big rocks block the Bubble Caves under Palmcrest, and the merfolk asked very politely.',
         'Three rocks block the Bubble Caves at Palmcrest.', { ref: 'm3p_bubbledoor' }],

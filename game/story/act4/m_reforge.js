@@ -13,7 +13,7 @@ chapter({
   id: 'm_reforge', act: 4, after: 'm_observatory', next: 'n_bridge', takeover: true,
   card: ['Act IV · Final Chapter', 'The Ember Heart'],
   so_far: [
-    'At the Eclipse Observatory, Ash won the last Shard. Hush made her choice, and Ash made his. Now the Heart needs mending, and someone with a hammer is climbing the moonlight stairs.',
+    "At the Eclipse Observatory, Ash won the last Shard and chose what to do about Hush. Now the Heart needs mending, and someone with a hammer is climbing the moonlight stairs.",
     'Ash won the last Shard. Someone with a hammer is coming up the stairs.'],
   mom: [['A broken stone? Bring it here. I mend things.', 'A broken stone? I mend things.']],
 
@@ -77,7 +77,7 @@ chapter({
       ['ash', 'MOM?!', 'MOM?!'],
       ['narr', 'Mom drops the hammer and hugs you. Then she holds you at arm\'s length and looks at you. Then she hugs you again.', 'Mom drops her hammer and hugs you. Twice.'],
       ['maren', "Dell's boat is faster than it looks. He's down at the old pier with the sandwiches. And Professor Quill would not stay home.", 'Dell is at the pier with sandwiches. Quill came too.'],
-      ['quill', '(arriving last, behind a telescope bigger than she is) The Eclipse Observatory! The end of the world seemed like a good excuse to visit.', '(with a huge telescope) The Observatory! The end of the world is a good reason to visit.'],
+      ['quill', '(arriving last, behind a telescope bigger than she is) The Eclipse Observatory! My old teacher, Professor Lumley, worked here. I always meant to visit.', '(with a huge telescope) The Observatory! My old teacher worked here.'],
       ['narr', 'You tip the three Shards out of your satchel: violet, ice-blue and silver. Mom turns each one over, the way she checks a horseshoe.', 'You tip out the three Shards. Mom checks each one.'],
       ['maren', "I'm a blacksmith. It's a broken stone. This is literally my job.", "I'm a blacksmith. It's a broken stone. This is my job."],
       ['maren', 'You breathe, the hottest you have, then the coolest. I hammer. Three taps. Gently. Wait for the rings to meet.', 'You breathe hot, then cool. I tap three times. Gently!', { do: ['emit m4fx:forge'] }],
@@ -97,7 +97,7 @@ chapter({
         else: [
         ['nyxara', "(from very far away) Yes. Make it whole. A cracked heart can't burn, little ember. A whole one can.", '(far away) Yes. Make it whole. A whole heart can burn.'] ] },
       ['ash', 'She WANTS it whole. So it can burn black. I knew it.', 'She WANTS it whole, to burn black. I knew it.'],
-      ['maren', 'Then we keep it warm. Hearts are for keeping warm. Outside, all of us. Down to the pier.', 'Then we keep it warm. Outside, everyone!'],
+      ['maren', 'Then we keep it warm, and we keep it ours. Outside, all of us. Down to the pier.', 'Then we keep it warm. And ours. Outside, everyone!'],
       { if: 'flag pip', then: [['pip', 'Mip. (Pip curls up on the warm Heart and falls asleep at once, glowing a little.)', 'Mip. (Pip falls asleep on the warm Heart.)']] },
     ],
     // the last bite and the black mountain, on the Moon Pier: at most 10 lines a branch, one "Not alone" line

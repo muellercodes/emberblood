@@ -95,14 +95,14 @@ chapter({
         "A priest breathes soft silver fire on a moth's thread. It melts. The moth flies free."],
       ['narr', 'Beside it, a priest cuts a thread with a sword. The cut thread whips up into the sky, moth and all.',
         'Next to it, a cut thread whips up into the sky, moth and all.', { clue: 'm4_leash_mural' }],
-      ['ash', 'Soft fire melts it. Cutting it sends the moth flying away. Got it. ...Why do I need to know this?',
-        'Soft fire melts it. Cutting sends it away. Why do I need to know?'],
+      ['ash', 'Soft fire melts it. Cutting it sends the moth flying up into the sky. Got it. ...Why do I need to know this?',
+        'Soft fire melts it. Cutting sends it up into the sky. Why do I need to know?'],
     ],
     m_lumen_mosaic: [
       ['narr', 'The three moon lamps flare. On the wall between them a silver mosaic lights up: a moon over a sea, and words in old letters.',
         'The lamps light up a silver picture: a moon over the sea, and old words.'],
       ['narr', 'THE MOON RISES, THE SEA FALLS. THE MOON FALLS, THE SEA RISES.', 'MOON UP, SEA DOWN. MOON DOWN, SEA UP.', { clue: 'm4_mosaic' }],
-      ['iska', 'The whole city breathed with the moon. Up and down. Full and empty. Just like you told Winnie.', 'The city breathed with the moon. Like you told Winnie.'],
+      ['iska', 'The whole city breathed with the moon, up and down, just like you told Winnie.', 'The city breathed with the moon. Like you told Winnie.'],
     ],
   },
 })
