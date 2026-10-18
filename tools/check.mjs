@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // tools/check.mjs: the Emberblood v10 story checker (rules 1 to 13 of _plan_format.md, plus warnings).
 //
-//   node tools/check.mjs [--act 2] [--root <repo root>] [--story <dir>] [--out <dir>] [--quiet]
+//   node tools/check.mjs [--act 2] [--root <repo root>] [--story <dir>] [--game <dir>] [--out <dir>] [--quiet] [--voice]
+//
+// --voice prints the table of the voice and talk rules (v11 J2: phrase budgets, CAPS and opener shares, replies) and
+// writes <out>/voice.md. Without it the voice rules print one summary line each; every line they name is a WARN in
+// check.md. --game reads another folder's game/src as the old code (the tests use a small fake game).
 //
 // Loads every game/story/**/*.js in a vm sandbox where act, chapter, quest and legacy are collectors and nothing
 // else exists (a file that calls anything else, computes, or holds a function fails), reads the game code for what
@@ -797,6 +801,7 @@ export function runChecks(M, opts = {}) {
   function checkRe(re, O, where, person, depth, conds, loc0) {
     const loc = loc0 || W(O, at(O));
     if (!Array.isArray(re)) { FAIL('re', `${O.id}.${where}: re should be a list of ${REPLY_MIN} or ${REPLY_MAX} replies`, loc); return; }
+    if (depth >= 2) { FAIL('re', `${O.id}.${where}: replies to a reply's response (replies go two levels deep at most)`, loc); return; }
     if (re.length < REPLY_MIN || re.length > REPLY_MAX) FAIL('re', `${O.id}.${where}: re has ${re.length} repl${re.length === 1 ? 'y' : 'ies'} (write ${REPLY_MIN} or ${REPLY_MAX})`, loc);
     const tones = [];
     re.forEach((r, i) => {
@@ -1759,7 +1764,8 @@ export function runChecks(M, opts = {}) {
     units.sort((a, b) => ord(a) - ord(b) || (a.file < b.file ? -1 : a.file > b.file ? 1 : 0) || a.line - b.line);
     const norm = (x) => (isStr(x) ? x.replace(/[’‘]/g, "'").replace(/[“”]/g, '"') : '');
     const stats = {};
-    const warnU = (rule, u, why) => WARN(rule, `${u.file}:${u.line} ${u.who || '?'} "${short(u.full, 60)}": ${why}`, { file: u.file, line: u.line, act: u.act, who: u.who, voice: true });
+    // the over counts follow --act (the uses are the whole game's, since the budgets are)
+    const warnU = (rule, u, why) => { if (!inAct(u.act)) return 0; WARN(rule, `${u.file}:${u.line} ${u.who || '?'} "${short(u.full, 60)}": ${why}`, { file: u.file, line: u.line, act: u.act, who: u.who, voice: true }); return 1; };
     for (const R of VOICE) {
       const hit = (x) => { x = norm(x); return !!x && R.re.test(x) && (!R.and || R.and.test(x)); };
       const hits = units.filter((u) => hit(u.full) || hit(u.simple));
@@ -1773,9 +1779,10 @@ export function runChecks(M, opts = {}) {
           if (R.perAct && R.perAct[u.who] != null) { const k = `${u.who} ${u.act}`, n = (perAct.get(k) || 0) + 1; perAct.set(k, n); if (n > R.perAct[u.who]) over.push([u, `${u.who}'s use ${n} in act ${u.act} (${R.perAct[u.who]} per act)`]); }
         }
       }
-      for (const [u, why] of over) warnU(`voice.${R.id}`, u, why);
+      let nOver = 0;
+      for (const [u, why] of over) nOver += warnU(`voice.${R.id}`, u, why);
       const bud = [R.max != null ? `${R.max} in the game` : '', R.who ? `${R.who.join(', ')} only` : '', ...Object.entries(R.perAct || {}).map(([w, n]) => `${w} ${n} per act`), ...Object.entries(R.acts || {}).map(([w, a]) => `${w} in act ${a.join(', ')}`)].filter(Boolean).join('; ');
-      stats[`voice.${R.id}`] = { what: R.what, budget: bud, uses: hits.length, over: over.length };
+      stats[`voice.${R.id}`] = { what: R.what, budget: bud, uses: hits.length, over: nOver };
     }
     // CAPS share per file
     const C = VOICE_SHARE.caps;
@@ -1792,8 +1799,9 @@ export function runChecks(M, opts = {}) {
       cs.uses += caps.length; cs.files++;
       const allow = Math.max(C.min, Math.floor(C.share * L.length));
       if (caps.length <= allow) continue;
-      cs.overFiles++;
-      for (const [u, w] of caps.slice(allow)) { cs.over++; warnU('voice.caps', u, `"${w}": ${caps.length} of ${L.length} lines in this file have a CAPS word (${Math.round(100 * caps.length / L.length)}%; the budget is ${Math.round(C.share * 100)}%, ${allow} line${allow === 1 ? '' : 's'})`); }
+      let k = 0;
+      for (const [u, w] of caps.slice(allow)) k += warnU('voice.caps', u, `"${w}": ${caps.length} of ${L.length} lines in this file have a CAPS word (${Math.round(100 * caps.length / L.length)}%; the budget is ${Math.round(C.share * 100)}%, ${allow} line${allow === 1 ? '' : 's'})`);
+      if (k) { cs.over += k; cs.overFiles++; }
     }
     stats['voice.caps'] = cs;
     // opener share per speaker
@@ -1807,8 +1815,9 @@ export function runChecks(M, opts = {}) {
       os.uses += op.length; os.speakers++;
       const allow = Math.max(P.min, Math.floor(P.share * L.length));
       if (op.length <= allow) continue;
-      os.overSpeakers++;
-      for (const u of op.slice(allow)) { os.over++; warnU('voice.opener', u, `${who} opens ${op.length} of ${L.length} lines with "Oh!", "Okay." or "..." (${Math.round(100 * op.length / L.length)}%; the budget is ${Math.round(P.share * 100)}%, ${allow} line${allow === 1 ? '' : 's'})`); }
+      let k = 0;
+      for (const u of op.slice(allow)) k += warnU('voice.opener', u, `${who} opens ${op.length} of ${L.length} lines with "Oh!", "Okay." or "..." (${Math.round(100 * op.length / L.length)}%; the budget is ${Math.round(P.share * 100)}%, ${allow} line${allow === 1 ? '' : 's'})`);
+      if (k) { os.over += k; os.overSpeakers++; }
     }
     stats['voice.opener'] = os;
     return { stats, lines: units.length, code: units.filter((u) => u.src === 'code').length };
@@ -1878,7 +1887,7 @@ export function runChecks(M, opts = {}) {
     }
   }
 
-  return { fails, warns, walk: walkLog, order: ORDER, afterBoss: Object.fromEntries(afterBoss), info, voice };
+  return { fails, warns, walk: walkLog, order: ORDER, afterBoss: Object.fromEntries(afterBoss), info, voice, act: actFilter };
 }
 
 // which fixture flags and choices the old code (main at BASE_REF) read: a Set, or null when git is not there
@@ -1968,7 +1977,7 @@ export function voiceRows(res) {
 export function voiceSummary(res) {
   const rows = voiceRows(res).filter((r) => r.over > 0);
   const n = rows.filter((r) => r.rule.startsWith('voice.')).reduce((s, r) => s + r.over, 0);
-  const out = [`voice: ${n} line${n === 1 ? '' : 's'} over budget (WARN; each one is in check.md; the table: node tools/check.mjs --voice)`];
+  const out = [`voice: ${n} line${n === 1 ? '' : 's'} over budget${res.act != null ? ` in act ${res.act}` : ''} (WARN; each one is in check.md; the table: node tools/check.mjs --voice)`];
   const w = Math.max(8, ...rows.map((r) => r.rule.length));
   for (const r of rows) out.push(`  ${(r.rule + ' '.repeat(w)).slice(0, w)}  ${r.rule.startsWith('voice.') ? `${r.over} over${r.where} (${r.usesText}; budget: ${r.budget})` : `${r.overText}: ${r.what}`}`);
   return out;
@@ -1985,12 +1994,18 @@ export function voiceReport(res, M) {
   L.push(`Read: ${v.lines || 0} lines (${(v.lines || 0) - (v.code || 0)} texts in the story data, ${v.code || 0} in the old code's string literals).`, '');
   L.push('| rule | what | budget | uses | over budget |', '|---|---|---|---|---|');
   for (const r of rows) L.push(`| ${r.rule} | ${r.what.replace(/\|/g, '/')} | ${r.budget} | ${r.usesText} | ${r.overText} |`);
+  const mine = res.warns.concat(res.fails).filter((w) => /^voice\.|^(re|talk|label|said|choose|idle)$/.test(w.rule));
+  // lines over budget by act (the act of the story file, or of the old module: x1 is Act II; - is the shared code)
+  const acts = [...new Set(mine.map((w) => (w.act == null ? '-' : String(w.act))))].sort();
+  if (acts.length) {
+    L.push('', '## Over budget, by act', '', `| rule | ${acts.map((a) => (a === '-' ? 'shared code' : `act ${a}`)).join(' | ')} |`, `|---|${acts.map(() => '---|').join('')}`);
+    for (const r of rows) { const c = acts.map((a) => mine.filter((w) => w.rule === r.rule && (w.act == null ? '-' : String(w.act)) === a).length); if (c.some(Boolean)) L.push(`| ${r.rule} | ${c.join(' | ')} |`); }
+  }
   const byFile = new Map();
-  for (const w of res.warns.concat(res.fails)) if (/^voice\.|^(re|talk|label|said|choose|idle)$/.test(w.rule) && w.file) { const e = byFile.get(w.file) || { n: 0, rules: {} }; e.n++; e.rules[w.rule] = (e.rules[w.rule] || 0) + 1; byFile.set(w.file, e); }
-  const top = [...byFile].sort((a, b) => b[1].n - a[1].n).slice(0, 30);
-  if (top.length) {
-    L.push('', `## The ${top.length} files with the most (of ${byFile.size})`, '', '| file | lines | by rule |', '|---|---|---|');
-    for (const [f, e] of top) L.push(`| ${f} | ${e.n} | ${Object.entries(e.rules).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k.replace(/^voice\./, '')} ${n}`).join(', ')} |`);
+  for (const w of mine) if (w.file) { const e = byFile.get(w.file) || { n: 0, rules: {} }; e.n++; e.rules[w.rule] = (e.rules[w.rule] || 0) + 1; byFile.set(w.file, e); }
+  if (byFile.size) {
+    L.push('', `## Every file with a line over budget (${byFile.size}), most first`, '', '| file | lines | by rule |', '|---|---|---|');
+    for (const [f, e] of [...byFile].sort((a, b) => b[1].n - a[1].n || (a[0] < b[0] ? -1 : 1))) L.push(`| ${f} | ${e.n} | ${Object.entries(e.rules).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k.replace(/^voice\./, '')} ${n}`).join(', ')} |`);
   }
   return L.join('\n') + '\n';
 }
