@@ -176,7 +176,7 @@ function finalChoice(){
   lines.push(ch('ash',`What will you do?`,opts));
   runDialogue(lines,()=>{
     const E=ENDINGS[G.choices.ending||'hero'];
-    runDialogue(E.lines.concat(heartLines(G.choices.ending||'hero'),[['narr',`Emberhollow held the biggest Lantern Day in a thousand years. Maren made a speech. Yara counted the lanterns twice.`]],EPILOGUE_FMT()),()=>{
+    runDialogue(E.lines.concat(heartLines(G.choices.ending||'hero'),[['narr',S(`Emberhollow lit every lantern it owned and held a second Lantern Day, the biggest in a thousand years. Maren made a speech. Yara counted the lanterns twice.`,`Emberhollow held a second Lantern Day, the biggest ever. Yara counted the lanterns twice.`)]],EPILOGUE_FMT()),()=>{
       // Act I is over (G.flags.act1_done); G.done stays false, it means the whole game is finished (e7_acts.js)
       scene='play'; G.stage='done'; G.flags.act1_done=true; G.done=false;
       const seen=store.get('eb_endings',{}); seen[G.choices.ending||'hero']=true; store.set('eb_endings',seen);
