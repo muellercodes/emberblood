@@ -894,7 +894,7 @@ function c1Places(B){
   for(let x=6980;x<=8150;x+=235) c1wObj('lamp',x,24960);
   for(const [x,y] of [[6990,24260],[6880,24560],[6600,24930],[7090,25120],[7740,25120],[7100,25520],[6960,25760],[7180,26080],[7560,26300],[7900,26290],[8250,26300],[7750,25560],[6800,25960],[7480,25960],[8040,25480],[8040,26000],[2120,26520],[1990,26880],[2440,26690],[4400,25960],[12230,28620]]) c1wObj('lamp',x,y);
   // ---- the Great Clock (its face is the elevation; the dial hands and the stuck time are live), the square, the lift
-  c1LM(B,{id:'c_lm_clock',k:'c_lm',x:7000,y:24850,r:0,clr:10,prompt:S('Look at the Great Clock','Look at the clock'),draw:(o,t)=>c1DrawClock(t),act:()=>c1wSay([C1WT.clock?S('The Great Clock ticks again. TICK. TOCK. The pigeons approve.','The Great Clock ticks again!'):S('The Great Clock. All four faces say one minute to midnight. It is not midnight. It is not even close.','The clock says one minute to midnight. It is wrong.')])});
+  c1LM(B,{id:'c_lm_clock',k:'c_lm',x:7000,y:24850,r:0,clr:10,prompt:S('Look at the Great Clock','Look at the clock'),draw:(o,t)=>c1DrawClock(t),act:()=>c1wSay([C1WT.clock?S('The Great Clock ticks again. TICK. TOCK. The pigeons approve.','The Great Clock ticks again!'):S('The Great Clock. All four faces say one minute to midnight, and they have said it morning, noon and night.','The clock says one minute to midnight. All day long.')])});
   c1wObj('fountain',6990,24880); c1wObj('vane',6700,24448);
   for(const [x,y] of [[7060,24370],[7110,24400],[7170,24360],[7230,24410],[7290,24375],[7400,24400],[7520,24420],[7600,24680],[7760,24780],[7840,24800]]) c1wObj('chimney',x,y);
   for(const [x,y] of [[7060,24340],[7110,24370],[7170,24330],[7230,24380],[7290,24345]]) C1CHIMS.push([x,y-46]);
@@ -932,10 +932,10 @@ function c1Places(B){
   c1wObj('fold',3900,21100); for(const [x,y,f] of [[3840,21080,1],[3930,21130,-1],[3990,21060,1],[3870,21150,-1],[3960,21000,1]]) c1wObj('sheep',x,y,{f}); STRUCTS.push({k:'campfire',x:4010,y:21180,small:true}); LIGHTS.push({x:4010,y:21180,r:160,i:0.6,fire:true});
   for(const [x,y] of [[3780,21180],[3700,21070],[4120,21020]]) c1wObj('crate2',x,y,{v:1});
   c1wObj('bench',4080,21250);
-  c1LM(B,{id:'c_lm_fold',k:'c_lm',x:3900,y:21000,r:0,clr:200,prompt:S("Look at Old Barley's sheepfold","Look at the sheep"),draw:()=>{},act:()=>{ c1Snd('baa'); c1wSay([S('A round stone fold full of sheep. There are twelve of them. Every single one is named Gerald.','Twelve sheep. They are all named Gerald.')]); }});
+  c1LM(B,{id:'c_lm_fold',k:'c_lm',x:3900,y:21000,r:0,clr:200,prompt:S("Look at Old Barley's sheepfold","Look at the sheep"),draw:()=>{},act:()=>{ c1Snd('baa'); c1wSay([S('A round stone fold full of sheep. Every one of them is named Gerald, except the bossy one at the front, who is Duchess the Second.','The sheep are all named Gerald. Except Duchess.')]); }});
   c1wObj('windmill',6252,21340,{base:21170}); c1wObj('windmill',9700,22345,{base:22175,col:false});
   CHESTS.push({id:'c_ch_dragonmill',x:6252,y:21200,b:10,open:false,c1top:true},{id:'c_ch_millcap',x:9700,y:22206,b:10,open:false,c1top:true});
-  c1LM(B,{id:'c_lm_dragon',k:'c_lm',x:6600,y:22560,r:0,clr:30,prompt:S('Look at the shape on the hill','Look at the hill'),draw:()=>{},act:()=>c1wSay([C1F('c_chalk_drawn')?S('The Chalk Dragon blazes white across the hill. Its tail curls. Its wings spread. It is waving.','The Chalk Dragon is white again. It is waving!'):S('A huge grey shape is cut into the hill, under grass and moth dust. It might be a dragon. It might be a very long sausage.','A big grey shape on the hill. A dragon? A sausage?')])});
+  c1LM(B,{id:'c_lm_dragon',k:'c_lm',x:6600,y:22560,r:0,clr:30,prompt:S('Look at the shape on the hill','Look at the hill'),draw:()=>{},act:()=>c1wSay([C1F('c_chalk_drawn')?S('The Chalk Dragon blazes white across the hill, wings spread, as if it were waving.','The Chalk Dragon is white again. It is waving!'):S('A huge grey shape is cut into the hill, under grass and moth dust. It might be a dragon. It might be a very long sausage.','A big grey shape on the hill. A dragon? A sausage?')])});
   c1LM(B,{id:'c_lm_sealed',k:'c_lm',x:6950,y:21700,r:0,clr:90,hidden:()=>c1ChalkDone(),prompt:S('Look at the stone in the eye','Look at the stone'),draw:(o,t)=>{ if(!c1ChalkDone()) c1DrawSealed(o,t); },act:()=>c1wSay([S('A shrine stone, sealed with old chalk. It is cold. Maybe the dragon needs to see again first.','A sealed shrine. The dragon must wake up first.')])});
   // ---- the Moth Wood: the Moon Ring, the hollow birch
   for(let i=0;i<7;i++){ const a=i/7*TAU-Math.PI/2; c1wObj('standing',1350+Math.cos(a)*130,22750+Math.sin(a)*96,{v:i%3,pale:true}); }
@@ -1031,7 +1031,7 @@ function c1WatchLines(){
     c_claws:S('LAST SEEN: on the cliffs above the Gullcrag Caves, sitting very still. Like a moth.','LAST SEEN: the Gullcrag cliffs.'),
     c_brass:S('LAST SEEN: the very top of the Great Clock. Nobody can climb that. Except, apparently, her.','LAST SEEN: the top of the Great Clock!'),
     c_light:S('LAST SEEN: Lantern Point. The lighthouse has gone dark. Penny Press says: SUSPICIOUS.','LAST SEEN: Lantern Point. The lighthouse is dark.'),
-    c_spire:S('LAST SEEN: out at sea?! On a black rock that was NOT THERE YESTERDAY.','LAST SEEN: on a black rock out at sea!'),
+    c_spire:S('LAST SEEN: out at sea?! On a black rock that was NOT THERE BEFORE.','LAST SEEN: on a black rock out at sea!'),
     c_snow:S('SNOW IN SUMMER! Mask not seen. Everybody very cold. Penny Press is wearing two hats.','SNOW IN SUMMER! Everyone is cold.')};
   L.push(by[st]||S('THE MOTH MASK WATCH. LAST SEEN: everywhere and nowhere. (The usual.)','LAST SEEN: everywhere. As usual.'));
   if(G.quests&&G.quests.c_notes&&!G.quests.c_notes.done) L.push(S('READERS WRITE: notes have been found in very high places. Chimneys. Clock towers. One in a gull.','Notes are found in high places!'));

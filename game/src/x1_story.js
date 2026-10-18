@@ -314,9 +314,9 @@ c1Def('c_nest',[
 c1Def('c_duchess',[
   xl('narr',`On the very top of the Great Clock, higher than any roof in Gearhaven, a goat is eating a weathervane.`,`On top of the Great Clock, a goat is eating a weathervane.`),
   xl('goat',`Meh.`,`Meh.`),
-  xl('ash',`That's not Duchess the Second. That's DUCHESS. How did you get UP here? I needed CLAWS!`,`That's DUCHESS! How did you get up here? I needed CLAWS!`),
+  xl('ash',`That's not just any goat. That's DUCHESS. How did you get UP here? I needed CLAWS!`,`That's DUCHESS! How did you get up here? I needed CLAWS!`),
   xl('goat',`Meh.`,`Meh.`),
-  xl('narr',`Duchess has left a little pile of coins by the hatch. Nobody knows where goats get coins. Nobody asks.`,`Duchess left a pile of coins. Nobody knows where goats get coins.`),
+  xl('narr',`Duchess has left a little pile of coins by the hatch. Nobody knows where goats get coins.`,`Duchess left a pile of coins. Nobody knows where goats get coins.`),
   xdo(()=>{ G.flags.c_duchess=true; addCoins(30); gainXp(40); })
 ]);
 c1Def('c_pip_fetch',[
@@ -530,25 +530,25 @@ STORY.c_hints={
 // Pass c1DunStory(id) as defineDungeon's `story` (or play any key with c1Play(key)); see C1STORY.md for each key.
 // The Gullcrag Caves (c_gullcrag): the Climbing Claws
 c1Def('c_gull_in',[
-  xl('c_pearl',`Well, well. Somebody finally rang the doorbell. Took you a thousand years. Wipe your feet, there's sand everywhere. There's always sand everywhere.`,`Well, well! Somebody came at last. Wipe your feet. There's sand everywhere.`),
+  xl('c_pearl',`Well, well. Somebody finally rang the doorbell. Took you a thousand years. Mind the sand, dear. It gets into everything.`,`Well, well! Somebody came at last. Mind the sand.`),
   xl('ash',`Who said that?`,`Who said that?`),
   xl('c_pearl',`Pearl. I built these caves. Well, the sea built them. I put up the signs.`,`Pearl. I built these caves. Well, the sea did. I made the signs.`),
-  xl('ash',`Pearl? Mother Pearl? EMBER'S Pearl? You're my... my great-great-great...`,`Pearl? EMBER'S Pearl? You're my great-great-great...`),
-  xl('c_pearl',`Aunt. Great aunt, a dozen times over. Don't do the greats, we'll be here all day. Mother warned me about the greats.`,`Aunt. Lots of greats. Don't count them. We'll be here all day.`),
+  xl('ash',`Pearl? THE Pearl? The library lady told me about you! You're my great-great-great...`,`Pearl? THE Pearl? You're my great-great-great...`),
+  xl('c_pearl',`Aunt. Great aunt, a dozen times over. Don't do the greats, dear, we'll be here all day.`,`Aunt. Lots of greats. Don't count them. We'll be here all day.`),
   xl('c_pearl',`This cave breathes with the tide. In, out. Learn its breath and it'll carry you. Fight it and it'll carry you anyway, just somewhere wetter.`,`This cave breathes with the tide. In, out. Learn it and it will carry you.`)
 ]);
 c1Def('c_gull_bell',[xl('c_pearl',`That's the Tide Bell. Give it a whack. Go on. The sea listens to bells. It's very old-fashioned.`,`That's the Tide Bell. Give it a whack! The sea listens to bells.`)]);
-c1Def('c_gull_barrel',[xl('c_pearl',`Barrels float. Dragons, mostly, don't. Think about that.`,`Barrels float. Dragons don't. Think about that.`)]);
+c1Def('c_gull_barrel',[xl('c_pearl',`Barrels float. Dragons sink like anchors. Think about that.`,`Barrels float. Dragons don't. Think about that.`)]);
 c1Def('c_gull_shrine',[
   xl('c_pearl',`Here we are. My hall. That's me, the statue. I was taller. The sculptor was rude.`,`My hall. That statue is me. I was taller.`),
   xl('c_pearl',`I had no fire, Ash. Not a spark. Mother cried about it the day I was born. Then she laughed, because I grabbed her horn and climbed straight up her face.`,`I had no fire, Ash. Not a spark. So I climbed. I even climbed up my mother's face!`),
-  xl('c_pearl',`So I climbed. Cliffs, masts, towers, my mother. I left the climb here for whoever came next. Touch my hand.`,`I left my climbing here for whoever came next. Touch my hand.`)
+  xl('c_pearl',`So I climbed, and I never stopped. I left the climb here for whoever came next. Touch my hand.`,`I left my climbing here for whoever came next. Touch my hand.`)
 ]);
 c1Def('c_gull_gift',[
   xl('narr',`You touch the statue's hand. Your claws tingle, then itch, then grow, just a little: curved, strong and grippy.`,`You touch the statue's hand. Your claws grow. Strong and grippy!`),
   xl('c_pearl',`The Climbing Claws! Cracked walls, chalk cliffs, handholds, tall towers with rude thieves on them. Walk into a wall with handholds and up you go.`,`The Climbing Claws! Walk into a wall with handholds and up you go.`),
   xl('ash',`I can climb the GREAT CLOCK.`,`I can climb the GREAT CLOCK!`),
-  xl('c_pearl',`You can climb anything with a crack in it. Which is everything, if you look properly. Oh. And the tide's coming in. Right now. Up you go.`,`You can climb anything with a crack. Oh, and the tide is coming in. Up you go!`)
+  xl('c_pearl',`You can climb anything with a crack in it, and if you look properly, everything has a crack in it. Oh, and the tide's coming in right now. Up you go.`,`You can climb anything with a crack. Oh, and the tide is coming in. Up you go!`)
 ]);
 STORY.c_gull_how=S(`Walk into a cracked wall with handholds to climb it. You can't attack while you climb.`,`Walk into a wall with handholds to climb. No attacks while climbing.`);
 STORY.c_gull_bossline=S(`The Grand Admiral! When the tide comes in, CLIMB. Hit his claw when it's stuck. Mind the cannons.`,`When the tide comes in, CLIMB! Hit his stuck claw.`);
@@ -564,14 +564,14 @@ c1Def('c_gull_won',[
 ]);
 c1Def('c_gull_end',[
   xl('c_pearl',`My cradle. Mother rocked me here, the one time she came south. She sang the lantern song. Badly. She was a dragon.`,`My cradle. Mother rocked me here once. She sang the lantern song. Badly.`),
-  xl('c_pearl',`There's a girl who climbs my cliffs at night, Ash. She has my claws and no fire, like me. She's angry about it. I was too, for a while.`,`A girl climbs my cliffs at night. She has my claws and no fire. She is angry about it.`),
+  xl('c_pearl',`There's a girl who climbs my cliffs at night, Ash. She has my claws and no fire, like me. She's angry about it. So was I, when I was her age.`,`A girl climbs my cliffs at night. She has my claws and no fire. She is angry about it.`),
   xl('c_pearl',`Two more of my places are waiting: the Brassworks under my clock, and my lighthouse. The warp knows the way up.`,`Two more of my places wait: the Brassworks and my lighthouse. The warp will take you up.`)
 ]);
 // The Brassworks (c_brassworks): the Grapple Tail
 c1Def('c_brass_in',[
   xl('c_pearl',`Ash! You came down my chimney. Of course you did. Every child in my family comes down the chimney.`,`Ash! You came down my chimney. Of course you did.`),
   xl('c_pearl',`This is the Brassworks. My clock's heart. A baron owns it now and he's put his name on all the doors. I put my name on all the gears first. Look closely.`,`This is the Brassworks. My clock's heart. My name is on all the gears.`),
-  xl('c_pearl',`Steam pushes, gears turn, belts carry. Watch the rhythm. Everything in here has a heartbeat. Mind it doesn't step on yours.`,`Steam pushes. Gears turn. Belts carry. Watch the rhythm.`)
+  xl('c_pearl',`Everything in here keeps a rhythm: the steam, the gears, the belts. Learn it before it steps on your tail.`,`Watch the rhythm of the steam and the gears.`)
 ]);
 c1Def('c_brass_shrine',[
   xl('c_pearl',`My tool rack. My wrenches, my good hammer, and my favorite thing I ever made.`,`My tool rack. And my favorite thing I ever made.`),
@@ -580,7 +580,7 @@ c1Def('c_brass_shrine',[
 c1Def('c_brass_gift',[
   xl('narr',`On the velvet cushion sits a little brass hook, shaped like a curled claw. You pick it up and it clicks onto the tip of your tail as if it had been waiting there all along.`,`A little brass hook sits on a cushion. It clicks onto the tip of your tail.`),
   xl('narr',`Your tail twitches. Then it LASHES, all by itself, and the hook bites into a brass ring on the ceiling with a clang.`,`Your tail flicks up by itself. CLANG! The hook grabs a ring on the ceiling.`),
-  xl('c_pearl',`The Grapple Tail! It's not a gadget, dear. It's a gift. The gadget just reminds your tail what it can do. Aim at a ring or a post and it'll pull you over.`,`The Grapple Tail! Aim at a ring or a post. Your tail pulls you over.`),
+  xl('c_pearl',`The Grapple Tail! The hook only reminds your tail what it could always do. Aim at a ring or a post and it'll pull you over.`,`The Grapple Tail! Aim at a ring or a post. Your tail pulls you over.`),
   xl('ash',`My tail is a ROPE.`,`My tail is a ROPE!`),
   xl('c_pearl',`A rope with opinions. Oh, and the floor's about to fall out. Hold on.`,`A rope with opinions. Oh, the floor is falling. Hold on!`)
 ]);
@@ -598,7 +598,7 @@ c1Def('c_brass_won',[
 ]);
 c1Def('c_brass_end',[
   xl('c_pearl',`My first workshop. Before the city. Before the baron. Just me, a bench, and a very big idea.`,`My first workshop. Just me, a bench and a big idea.`),
-  xl('c_pearl',`Everyone said a clock was silly. "Pearl," they said, "nobody needs to know what time it is." Then I built one, and now everybody's late for things. Progress.`,`Everyone said a clock was silly. Now everybody is late for things. Progress!`),
+  xl('c_pearl',`Everyone said a clock was silly. "Pearl," they said, "nobody needs to know what time it is." Then I built one, and now everybody's late for things.`,`Everyone said a clock was silly. Now everybody is late for things!`),
   xl('c_pearl',`Pull the big lever, Ash. Wake my clock up. The whole city's been holding its breath.`,`Pull the big lever, Ash. Wake my clock up!`)
 ]);
 // The Spinning Lighthouse (c_lighthouse): the Shadow Dash
@@ -952,7 +952,7 @@ function c1BossTick(dt){
 function c1ClockTop(){ try{ return typeof elevLvl==='function'&&elevLvl(C1P.clock.x,C1P.clock.y-30)>=4; }catch(e){ return false; } }
 function c1Hatch(){ return c1ClockTop()?{x:C1P.clock.x,y:C1P.clock.y-36,top:true}:{x:C1P.clockBase.x,y:C1P.clockBase.y+26,top:false}; }
 function c1HatchAct(){
-  if(!hasAbil('claws')){ c1Play([xl('narr',`The hatch into the bell loft is right at the top of the Great Clock, higher than any roof in Gearhaven. You would need claws like hers to get up there.`,`The hatch is way up at the top. You need climbing claws.`)]); return; }
+  if(!hasAbil('claws')){ c1Play([xl('narr',`The hatch into the bell loft is right at the top of the Great Clock, higher than any roof in Gearhaven. You would need claws like hers to get up there.`,`The hatch is way up at the top. You need climbing claws like hers.`)]); return; }
   const go=()=>{ const h=c1Hatch(); enterArea('c_mothnest',{x:h.x,y:h.y,outY:h.top?30:24}); };
   if(!c1Seen('c_duchess')&&reached('c_brass')) c1Play('c_duchess',go); else go();
 }
@@ -1090,7 +1090,7 @@ function c1JourCard(){
   const el=document.querySelector('#jBody .ppl'); if(!el||el.querySelector('[data-c1v]')) return;
   const t=G.flags.c_trust|0, moth=on=>`<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 6 C5 0 0 1 1 5 C2 9 6 9 8 6 C10 9 14 9 15 5 C16 1 11 0 8 6Z" fill="${on?'#ffcf4a':'#7a748a'}" stroke="#2a2034" stroke-width="1"/></svg>`;
   const d=document.createElement('div'); d.setAttribute('data-c1v','1');
-  const bio=simplify(S('Gearhaven\'s rooftop thief, the Moth Mask. Granny Oona\'s granddaughter, from Saltmarsh. Your very distant cousin.','The Moth Mask. Granny Oona\'s girl. Your cousin.'));
+  const bio=simplify(S('Gearhaven\'s rooftop thief, the Moth Mask. Granny Oona\'s granddaughter, from Saltmarsh. She climbs like Pearl.','The Moth Mask. Granny Oona\'s girl. She climbs like Pearl.'));
   const st=G.choices.c_vesper==='friend'?simplify(S('A friend.','A friend.')):G.choices.c_vesper==='foe'?simplify(S('Gone.','Gone.')):simplify(S('Trust','Trust'));
   d.innerHTML=`<b>Vesper</b> <span class="hz" title="${t} of 7">${Array.from({length:7},(_,i)=>moth(i<t)).join('')}</span><small>${escapeHtml(st)} · ${escapeHtml(bio)}</small>`;
   el.prepend(d);
@@ -1116,7 +1116,7 @@ if(typeof DREAMS!=='undefined'){
     xl('narr',`Pip, asleep on your feet, growls in a tiny voice. The moth flutters away. You wake up cold.`,`Pip growls. The moth flies off. You wake up cold.`),
     xl('ash',`Bad dream, Pip. Just a bad dream.`,`Just a bad dream, Pip.`)]};
   if(typeof DREAM_ORDER!=='undefined') for(const id of ['c_twins','c_whisper']) if(!DREAM_ORDER.includes(id)){ const i=DREAM_ORDER.indexOf('home'); DREAM_ORDER.splice(i>=0?Math.max(i+1,DREAM_ORDER.length):DREAM_ORDER.length,0,id); }
-  if(typeof DREAM_TALK!=='undefined'&&!DREAM_TALK.c_twins) DREAM_TALK.c_twins={c_oona:S(`You dreamed about Pearl? In a basket? Oh, duck. That's our family story. How did you know about the curtains?`,`You dreamed of Pearl? That's our family story!`)};
+  if(typeof DREAM_TALK!=='undefined'&&!DREAM_TALK.c_twins) DREAM_TALK.c_twins={c_oona:S(`You dreamed about baby Pearl, up the curtains the day she was born? Oh, duck. That's our family story. Nobody outside this house knows that one.`,`You dreamed of Pearl? That's our family story!`)};
 }
 if(typeof EV_TAMSIN!=='undefined'&&!EV_TAMSIN.some(v=>String(v&&v[1]).includes('moth mask'))) EV_TAMSIN.push([()=>!!(G&&G.flags&&G.flags.c_done),S(`\u{1F3B5} A thief in a moth mask ran off with our light, and Ash chased her south through the clockwork and night...`,`\u{1F3B5} Ash chased a thief through the night...`)]);
 // Pebble's Act II letters (bible 8.2) and the Act II epilogue lines (8.8): only when the shared helper module
@@ -1167,7 +1167,7 @@ if(typeof EPI!=='undefined'&&EPI&&Array.isArray(EPI.c)&&!EPI.c.length) EPI.c.pus
   {pri:3,cond:()=>!!G.flags.c_regatta_won,line:['narr',S(`The Harbor Regatta has a new rule: no dragons. It's called the Ash Rule.`,`The Regatta has a new rule: no dragons.`)]},
   {pri:2,cond:()=>true,line:['narr',S(`The Great Clock has not stopped once since. Clockkeeper Ambrose says "Tick." Everyone agrees.`,`The Great Clock never stopped again.`)]});
 // moths crowd the lamps at night in Gearhaven (THREADS N4), and the kids notice the bitten moon
-B('c1_moths','town:c_gearhaven',()=>c1On()&&isNight()&&!G.flags.c_snow,()=>pick([S('Never seen so many moths. They are eating my curtains. And my CLOCKS.','So many moths! They eat my curtains!'),S('Forty moths on my lamp last night. Forty! I counted. Then I screamed.','Forty moths on my lamp!')]));
+B('c1_moths','town:c_gearhaven',()=>c1On()&&isNight()&&!G.flags.c_snow,()=>pick([S('Never seen so many moths. They are eating my curtains. And my CLOCKS.','So many moths! They eat my curtains!'),S('The moths ate a hole in my best curtain last night. Shaped like a moth.','The moths ate my curtain!')]));
 B('c1_moon','kid',()=>!!G.flags&&(G.flags.moon==null?100:G.flags.moon)<100&&(G.flags.moon==null?100:G.flags.moon)>=95,S('Somebody took a BITE out of the moon! Was it you?','Who bit the moon? Was it you?'));
 
 // ---------- 6. the rooftop chase (MINI.c_roofchase): Whirligig Manor to the Clockwatch Hall, over the Clock Quarter.
@@ -1400,7 +1400,7 @@ defineDungeon('c_tidehouse',{name:S('The Tide House','The Tide House'),level:9,t
     rooms:{
       a:{at:[0,2],kind:'start',puzzle:true,tpl:C1_TIDE.a,foes:[['crab',2]],sign:S('THE GEAR ROOM. Kelp in the gears? A SHORT breath of fire. Not a long one. - M. Mudge','Burn the kelp off the gears. A SHORT breath!'),noPots:true},
       b:{at:[0,1],kind:'blocks',tpl:C1_TIDE.b,sign:S('THE WEIGHT SHAFT. The weight goes on the hook plate. The channel is in the way. Think backwards. The rune stone puts the weights back.','Push one weight into the gap. Push the other onto the plate.'),noPots:true},
-      c:{at:[0,0],kind:'switches',tpl:C1_TIDE.c,acc:['boomerang','arrow','hammer'],sign:S('THE CLOCK FACE. If the big hand sticks: knock the shell out of the cog. Then pull the lever. Then have a cup of tea.','Knock the shell out of the cog. Then pull the lever.'),noPots:true}},
+      c:{at:[0,0],kind:'switches',tpl:C1_TIDE.c,acc:['boomerang','arrow','hammer'],sign:S('THE CLOCK FACE. If the big hand sticks: knock the shell out of the cog, then pull the lever. Then tell the sea it may go out. - M. Mudge','Knock the shell out of the cog. Then pull the lever.'),noPots:true}},
     links:[['a','b','gate:a'],['b','c','gate:b']]}}]});
 // the Gear Room's lantern-pods are the three kelp-wrapped wooden gears (same mechanic, its own art and words)
 { const P=AREADEFS.c_tidehouse; if(P) P.c1tide=true; }
@@ -1488,7 +1488,7 @@ function c1NestLayout(def){
 }
 const C1_NEST_SAY={
   c1_nbell:[S('The great bell of the Great Clock. Silver dust is caked in every groove. A note was pinned here.','The great bell. Covered in silver dust.')],
-  c1_nhammock:[S('A hammock made from an old sail with a moth painted on it. It smells of the sea. There is a book of jokes under the pillow. Most of them are about baronesses.','A hammock made from a sail. It smells of the sea.')],
+  c1_nhammock:[S('A hammock made from an old sail with a moth painted on it. It smells of the sea. Under the pillow there is a book of jokes, and most of them are about clock barons.','A hammock made from a sail. It smells of the sea.')],
   c1_ncrate:[S('A crate used as a table. A candle stub, a cup with a chip in it, and a ring where a stack of letters sat.','A crate for a table. A candle and a cup.')],
   c1_ntin:[S('A biscuit tin. Inside: three biscuits and a note, "FOR GRAN. NOT FOR ME. NOT EVEN ONE." One biscuit has a bite out of it.','A biscuit tin. "FOR GRAN." One has a bite gone.')],
   c1_ndraw:[S('Moth drawings, dozens of them. Every moth has two painted eyes on its wings. Some of the drawings have been scribbled over, hard.','Moth drawings. Every moth has two painted eyes.'),S('A drawing of a little stilt house with smoke coming out of the chimney. Somebody drew the smoke in, carefully, after.','A drawing of a house with warm smoke.')],

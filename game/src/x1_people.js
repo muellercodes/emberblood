@@ -297,7 +297,7 @@ if(MAPS[1]&&MAPS[1].placeholder){ const b0=MAPS[1].build; MAPS[1].build=function
 const x1pChat=(q,qs,a,b,c,best)=>({q:S(q,qs),opts:[{t:S(a[0],a[1]),tone:'kind',r:S(a[2],a[3]),f:a[4]},{t:S(b[0],b[1]),tone:'brave',r:S(b[2],b[3]),f:b[4]},{t:S(c[0],c[1]),tone:'silly',r:S(c[2],c[3]),f:c[4]}],best});
 Object.assign(TALK,{
   c_hester:{bio:S('Captain of the Clockwatch, Gearhaven’s guard. Counts everything in seconds.','Captain of the city guard. She counts seconds.'),
-    about:{osric:S(`Captain Osric and I trade letters every week. He sends dog news. I send Bob news. Neither of us is winning.`,`Captain Osric writes to me. Dog news and Bob news.`),c_mina:S(`The Tide Warden in Saltmarsh counts waves. I count seconds. We get along terribly well.`,`Mina counts waves. I count seconds. We are friends.`)},
+    about:{osric:S(`Captain Osric and I trade letters every week. He sends dog news. I send Bob news. Neither of us is winning.`,`Captain Osric writes to me. Dog news and Bob news.`),c_mina:S(`The Tide Warden in Saltmarsh talks to the sea. I talk to the Bobs. Neither of them listens, and we get along very well.`,`Mina talks to the sea. I talk to the Bobs. We are friends.`)},
     rumor:{t:S(`My weathervane has a spring in it the size of a cat. Nobody touches it. I will know.`,`My weathervane has a big spring in it. Don't touch it!`),hint:'c_lm_vane',need:()=>x1pR('c_brass')},
     loves:['frostberry'],hates:['moonlily'],
     deep:S(`I was not always the Captain. I was a lost girl crying on the Great Stair, and an old clockkeeper counted to sixty with me until I stopped. I have been counting ever since.`,`I was once a lost girl on the stairs. An old man counted with me. I still count.`),
@@ -308,11 +308,11 @@ Object.assign(TALK,{
       [`Zero. I just go!`,`Zero! I just go!`,`Zero seconds. Hm. I admire it. I would also like the paperwork first.`,`Zero. Brave. I want paperwork first.`,0.5],
       [`Seven. Seven is a lucky number.`,`Seven. It's lucky.`,`Seven is not a plan. ...Seven is a nice number, though.`,`Seven is not a plan. It is a nice number.`,0.5],'kind')},
   c_hettie:{bio:S('Inventor in Sprocket’s Workshop. Lost her brass dog, Bolt, when the moths came.','An inventor. Her brass dog Bolt ran away.'),
-    about:{quill:S(`Professor Quill up north? We write about stars and screws. She thinks the moon is rock. I think it's gears. One of us is right.`,`Professor Quill and I write letters. She says the moon is rock. I say gears.`),c_ingrid:S(`Ingrid makes the parts I can't. I make the parts she won't. Mostly the exploding ones.`,`Ingrid makes my parts. I make the ones that explode.`)},
+    about:{quill:S(`Professor Quill up north? We write about stars and screws. She thinks the moon is rock. I think it's gears. One of us is right.`,`Professor Quill and I write letters. She says the moon is rock. I say gears.`),c_ingrid:S(`Ingrid makes the parts I can't. I make the parts she won't. Usually the exploding ones.`,`Ingrid makes my parts. I make the ones that explode.`)},
     rumor:{t:S(`The Steam Rams in the Brass Yards have springs in their bellies. Knock one dizzy and BOING. Science!`,`Steam Rams have springs inside. Knock one dizzy. BOING!`),hint:null,need:()=>x1pR('c_brass')},
     loves:['honey'],hates:['fish'],
     deep:S(`My mother built clocks. My grandmother built clocks. I built a clock that runs backwards. It tells you how long until you were born. Nobody wants it. I love it.`,`My family built clocks. Mine runs backwards. Nobody wants it. I love it.`),
-    secret:{t:S(`Here. A pocket gear-spring. Clip it to your boots. You'll roll quicker. Probably. Possibly. It's fine.`,`A spring for your boots. You will roll faster!`),reward:{roll:true}},
+    secret:{t:S(`Here. A pocket gear-spring. Clip it to your boots. You'll roll quicker. Probably. I've only tested it on the toaster.`,`A spring for your boots. You will roll faster!`),reward:{roll:true}},
     best:{t:S(`You're my favorite test subject. I mean friend. FRIEND. Take this whirligoo. It makes your draughts fizz harder.`,`You're my best friend! This makes your draughts heal more.`),reward:{heal:0.15}},
     chat:x1pChat(`If you could invent anything at all, what would it be?`,`What would you invent?`,
       [`Something that keeps everyone warm.`,`Something to keep people warm.`,`Oh, that's lovely. And hard. I'll start tonight. Where's my spanner?`,`Lovely! I'll start tonight.`,0.5],
@@ -374,7 +374,7 @@ Object.assign(TALK,{
       [`Fought a dragon on a mountain!`,`Fought a dragon!`,`A DRAGON! Well. You are a dragon. So it was a fair fight. Have a biscuit.`,`A dragon! A fair fight, then. Biscuit?`,0.5],
       [`Ate one of Bertram's buns.`,`Ate Bertram's bun.`,`I don't know who Bertram is, dearie, but I believe you. Have a safe biscuit.`,`I believe you. Have a safe biscuit.`,0.5],'kind')},
   c_ambrose:{bio:S('Keeper of the Great Clock for ninety years. A bit deaf. Ends sentences with tick.','He winds the Great Clock. A bit deaf. Tick.'),
-    about:{yara:S(`Your Elder Yara? Counts everything? Eh. I count ticks. Ninety years of them. Shall we compare? Tick.`,`Yara counts things? I count ticks. Tick.`),c_hester:S(`Captain Hester was a little girl crying on the Great Stair once. I counted to sixty with her. Now she counts at everybody. Tick.`,`I once counted to sixty with Hester. Now she counts at everyone.`)},
+    about:{yara:S(`Your Elder Yara? Eh. Ninety years I've wound this clock, and nobody ever made ME an elder. Tick.`,`Yara is an elder? Nobody made ME one. Tick.`),c_hester:S(`Captain Hester was a little girl crying on the Great Stair once. I counted to sixty with her. Now she counts at everybody. Tick.`,`I once counted to sixty with Hester. Now she counts at everyone.`)},
     rumor:{t:S(`Her heart's not up the tower, young dragon. It's down in the Brassworks. The great drive. Tick... tock.`,`The clock's heart is in the Brassworks. Tick.`),hint:null,need:()=>x1pR('c_brass')},
     loves:['honey'],hates:['frostberry'],
     deep:S(`Eh? My wife used to say the clock was my sweetheart. She wasn't wrong. But I'd stop every clock in the world to hear her laugh again. Tick.`,`My wife said the clock was my sweetheart. I miss her laugh. Tick.`),
@@ -428,8 +428,8 @@ Object.assign(TALK,{
       [`You're both clever in your own way.`,`You both are.`,`Hear that, Bob? Both of us! ...I think that means you, Bob.`,`Both of us, Bob! Hooray!`,1],
       [`Him. Definitely him.`,`Him!`,`HA! Told you, Bob. ...Wait. Which one did it point at?`,`Ha! Wait. Which one?`,0.5],
       [`The third one.`,`The third one.`,`...We don't talk about Bob. But. Yes. Fair.`,`We don't talk about Bob. But fair.`,0.5],'kind')},
-  c_mina:{bio:S('Tide Warden of Saltmarsh. Keeps the Tide Clock. Counts waves under her breath.','She keeps the Tide Clock. She counts waves.'),
-    about:{dell:S(`A fisherman up north named Dell? I hear his boats know the bottom of every lake. Personally.`,`Dell's boats know the bottom of every lake.`),c_hester:S(`Captain Hester counts seconds, I count waves. Once we counted together for an hour. Best afternoon of my life.`,`Hester and I once counted together. Best day ever.`)},
+  c_mina:{bio:S('Tide Warden of Saltmarsh. Keeps the Tide Clock. Talks to the sea like a forgetful old friend.','She keeps the Tide Clock. She talks to the sea.'),
+    about:{dell:S(`A fisherman up north named Dell? I hear his boats know the bottom of every lake. Personally.`,`Dell's boats know the bottom of every lake.`),c_hester:S(`Captain Ticklebrass came down once to ask why the tide was late. She timed it, I measured it, and we both told the sea off. Lovely afternoon.`,`The Captain and I told the sea off once. Lovely day.`)},
     rumor:{t:S(`At low tide the Rockpools show their peppers. Little red ones. The crabs guard them like gold.`,`Red peppers grow in the Rockpools. Crabs guard them.`),hint:'c_lm_pep1',need:()=>x1pOn('c_whip')},
     loves:['fish'],hates:['honey'],
     deep:S(`My granddad was Tide Warden. One night he forgot to set the clock, and the sea came up to the doorsteps. Nobody was hurt. But he never forgot again. Neither will I.`,`My granddad forgot the clock once. The sea came in. I never forget.`),
@@ -437,7 +437,7 @@ Object.assign(TALK,{
     best:{t:S(`You're the best thing to happen to the tide in years. Here. A bit of my spare tide pole. It's lucky.`,`You helped the tide! A lucky piece of my pole.`),reward:{potmax:1}},
     chat:x1pChat(`Sorry. Can I ask? Do you like the sea, or does it make you nervous?`,`Do you like the sea?`,
       [`Both. Is that okay?`,`Both.`,`Oh, that's the right answer. The sea is both. Thank you.`,`Right answer. The sea is both.`,1],
-      [`I love it! It's huge!`,`I love it!`,`It IS huge. Forty-two waves since you said that. Sorry.`,`It is huge. Forty-two waves. Sorry.`,0.5],
+      [`I love it! It's huge!`,`I love it!`,`It IS huge. And it's in a terrible mood today. Look at it.`,`It IS huge. And grumpy today!`,0.5],
       [`It's a lake that forgot to stop.`,`A lake that forgot to stop.`,`A lake that... ha! Oh, I'm telling the Tide Clock that.`,`Ha! I'll tell the Tide Clock!`,0.5],'kind')},
   c_charlie:{bio:S('Cook at the Chowder Pot, Saltmarsh’s inn. Everything comes back to chowder. Rest here.','The chowder cook. You can rest at his inn.'),
     about:{cookie:S(`Cookie of Coppergulch puts ROCKS in her soup. We write. We argue. She's wrong. She's my best enemy.`,`Cookie puts rocks in soup! We argue by letter.`),c_tarbuckle:S(`Old Tarbuckle eats my chowder every night and says it was better in his day. It was not. I wasn't born.`,`Tarbuckle says chowder was better in his day. Ha.`)},
@@ -517,7 +517,7 @@ Object.assign(TALK,{
       [`Because I can!`,`Because I can!`,`Hm. Simple. I like simple.`,`Simple. I like it.`,0.5],
       [`Squawk is very nosy.`,`Squawk is nosy.`,`He is. SQUAWK. Mind your own business.`,`He is! Mind your business, Squawk.`,0.5],'kind')},
   c_barley:{bio:S('The shepherd of the Chalk Downs. Talks about his sheep as if they had jobs.','The shepherd. His sheep have jobs.'),
-    about:{hollis:S(`A farmer up north lost a goat called Duchess? I have a Duchess too. Duchess the Second. No relation. Probably.`,`I have a sheep named Duchess the Second. No relation. Probably.`),c_penny:S(`The Press girl comes up here for news. I tell her the sheep news. She never prints it. Gerald is very hurt.`,`Penny never prints my sheep news. Gerald is sad.`)},
+    about:{hollis:S(`Farmer Hollis, up your way? He sold me my first ewes, years back. I named the bossiest one after his goat. Duchess the Second.`,`Farmer Hollis sold me my sheep. I named one after his goat.`),c_penny:S(`The Press girl comes up here for news. I tell her the sheep news. She never prints it. Gerald is very hurt.`,`Penny never prints my sheep news. Gerald is sad.`)},
     rumor:{t:S(`The Chalk Dragon on the hill used to shine white. Mother Pearl cut it for her mother, so she'd see it from the sky. It's gone grey now. Like me.`,`The Chalk Dragon on the hill went grey. Like me.`),hint:'c_lm_eye'},
     loves:['honey'],hates:['fish'],
     deep:S(`My wife used to walk the Chalk Dragon's line every spring, to keep it white. When she went, I tried. My knees said no. The dragon's been greying ever since.`,`My wife kept the Chalk Dragon white. My knees can't. It went grey.`),
@@ -530,27 +530,27 @@ Object.assign(TALK,{
 });
 // first meetings and everyday greetings in each person's own voice (the stock ones say "Maren's kid" and mention wolves)
 const X1P_FIRST={
-  c_hester:S(`You are forty seconds late. I have been expecting you for forty seconds. Captain Hester Ticklebrass, the Clockwatch.`,`You are forty seconds late. I am Captain Hester.`),
-  c_hettie:S(`Visitor! Oh, you're a DRAGON. Don't touch anything. Can I measure your tail? Later. Professor Hettie Sprocket. Inventor.`,`A dragon! I'm Professor Hettie. Can I measure your tail?`),
-  c_ottoline:S(`Welcome to the Turning Library... WELCOME! Sorry. Sorry. Ottoline Inkwell, archivist. Welcome.`,`WELCOME! Sorry. I'm Ottoline. Welcome.`),
-  c_whirligig:S(`Do you know who I AM? Lord Percival Whirligig. I'm on four coins. FOUR. Do dragons wipe their feet?`,`I am Lord Whirligig! On four coins! Wipe your feet.`),
-  c_mo:S(`AHOY! A dragon on my docks! Harbormaster Mo Barnacle. Welcome to the finest harbor on the coast!`,`AHOY! I'm Harbormaster Mo! Welcome!`),
+  c_hester:S(`State your business. Briefly, please. The Clockwatch has a great deal of business today.`,`State your business. Quickly, please.`),
+  c_hettie:S(`The dragon! Don't touch that. Or that. Can I measure your tail yet? No? Later. Definitely later.`,`The dragon! Can I measure your tail? Later?`),
+  c_ottoline:S(`Welcome to the Turning Library... WELCOME! Sorry. Sorry. The shelves make me nervous when they speed up.`,`WELCOME! Sorry. Welcome.`),
+  c_whirligig:S(`A dragon, on my front step. Hmph. Do dragons wipe their feet?`,`A dragon! Hmph. Wipe your feet.`),
+  c_mo:S(`AHOY! A dragon on my docks! Welcome to the finest harbor on the coast!`,`AHOY! Welcome to my harbor!`),
   c_ingrid:S(`A dragon in my smithy! Maren's child? Ja! I am Ingrid Anvilsong. I have heard SONGS about your mother.`,`Maren's child! Ja! I am Ingrid. Your mom is famous!`),
-  c_fig:S(`Sit down, dearie, you look like you've been chasing something. I'm Auntie Fig. Everybody's auntie.`,`Sit down, dearie. I'm Auntie Fig.`),
-  c_ambrose:S(`Eh? A visitor? Speak up. Ambrose Tickett. I keep the Great Clock. Tick.`,`Eh? I'm Ambrose. I keep the clock. Tick.`),
+  c_fig:S(`Sit down, dearie, you look like you've been chasing something. Everybody calls me Auntie Fig, so you might as well.`,`Sit down, dearie. Call me Auntie Fig.`),
+  c_ambrose:S(`Eh? Speak up, young dragon. These old ears have lived next to a bell for ninety years. Tick.`,`Eh? Speak up! I live by a bell. Tick.`),
   c_penny:S(`HEADLINE: DRAGON KID TALKS TO PENNY PRESS. Any comment?`,`HEADLINE: DRAGON TALKS TO PENNY! Comment?`),
-  c_ravel:S(`Welcome to Ravel's Remarkable Rarities! Everything is remarkable. Some of it is rare. I'm Madame Ravel.`,`Welcome to my shop! I'm Madame Ravel.`),
+  c_ravel:S(`Welcome to Ravel's Remarkable Rarities! Everything is remarkable. Some of it is rare.`,`Welcome to my shop! Everything is special.`),
   c_jo:S(`Ahoy, lizard! Skipper Jo. Ever raced on water? Course you haven't, you've got feet.`,`Ahoy, lizard! I'm Skipper Jo. Can you race on water?`),
-  c_bobs:S(`Halt! Who goes there? ...It's a lizard, Bob.`,`Halt! Who are you? ...A lizard, Bob.`),
-  c_mina:S(`High tide, high tide... oh! A dragon. Hello. Sorry. I was counting. Mina Mudge, Tide Warden.`,`Oh! A dragon. Sorry. I'm Mina, the Tide Warden.`),
-  c_charlie:S(`Welcome to the Chowder Pot! Chowder Charlie. Sit. Eat. You're all horns and no lunch.`,`Welcome! I'm Charlie. Eat something!`),
-  c_dory:S(`Mind the nets. Mind the hooks. Dory Cockle. Who are you? Never mind. Mind the nets.`,`Mind the nets! I'm Dory.`),
-  c_oona:S(`Come in, duck, come in. Shut the door, the wind's got opinions. I'm Oona. Granny Oona to everybody.`,`Come in, duck. Shut the door. I'm Granny Oona.`),
+  c_bobs:S(`Halt! Who goes there? ...It's the lizard again, Bob. ...He says dragon, Bob.`,`Halt! Oh. It's the lizard again, Bob.`),
+  c_mina:S(`Oh! Hello, dragon. Mind the edge of the boardwalk. The water's deeper than it looks today.`,`Hello! Mind the edge. The water is deep.`),
+  c_charlie:S(`Sit, sit. The pot's always on at the Chowder Pot. Bowl of chowder?`,`Sit! The pot is on. Chowder?`),
+  c_dory:S(`Mind the nets. Mind the hooks. And mind Posy, she bites.`,`Mind the nets. And Posy. She bites.`),
+  c_oona:S(`Come in, duck, come in. Shut the door behind you. The wind gets in everywhere.`,`Come in, duck. Shut the door.`),
   c_tarbuckle:S(`In my day dragons were twice the size. You'll do, though. Captain Elias Tarbuckle. Old Tarbuckle, they say. Sit.`,`In my day dragons were bigger. I'm Old Tarbuckle.`),
-  c_posy:S(`I'm Posy. This is my music box. You can listen but you can't hold it.`,`I'm Posy. You can't hold my music box.`),
+  c_posy:S(`Are you a REAL dragon? Can you breathe fire? Do it on that gull.`,`Are you a real dragon? Breathe fire on that gull!`),
   c_maudie:S(`WELCOME TO THE GULL'S REST! I'M MAUDIE! SORRY! WIND!`,`WELCOME! I'M MAUDIE! WIND!`),
-  c_agatha:S(`A dragon? Hm. Smaller than I pictured. Agatha Brightwater. I keep the light. Or I did.`,`A dragon? Small. I'm Agatha. I keep the light.`),
-  c_barley:S(`Evening. You'll be the dragon, then. The sheep said there'd be a dragon. Barley. Old Barley.`,`Hello. You're the dragon. The sheep said so. I'm Barley.`)
+  c_agatha:S(`Hm. The dragon. Squawk, look who it is. Don't shout.`,`Hm. The dragon. Squawk, don't shout.`),
+  c_barley:S(`Back again, young dragon? Mind Gerald. He's lying down. He likes it down there.`,`Back again? Mind Gerald. He is lying down.`)
 };
 const X1P_HELLO={
   c_hester:[S(`On time. Good.`,`On time. Good.`),S(`Report.`,`Report!`),S(`Ash. Seven seconds early. Excellent.`,`Seven seconds early. Good.`)],
@@ -565,7 +565,7 @@ const X1P_HELLO={
   c_ravel:[S(`Ah, my favorite customer!`,`My favorite customer!`),S(`Back for something remarkable?`,`Back for something good?`)],
   c_jo:[S(`Ahoy, lizard!`,`Ahoy, lizard!`),S(`Still got feet? Shame.`,`Still got feet? Shame.`)],
   c_bobs:[S(`Halt! Oh. It's Ash, Bob.`,`Halt! Oh, it's Ash.`),S(`Tick. Tock. Hello.`,`Tick. Tock. Hello.`)],
-  c_mina:[S(`Hello! Seven waves. Sorry. Hello!`,`Hello! Sorry. Hello!`),S(`The tide says hello. Well. I do.`,`The tide says hi. Well, I do.`)],
+  c_mina:[S(`Hello! Mind your feet, the boards are wet.`,`Hello! The boards are wet.`),S(`Hello, Ash! Lovely bit of tide today.`,`Hello, Ash! Lovely tide today.`)],
   c_charlie:[S(`Hungry? You look hungry.`,`Hungry? You look hungry.`),S(`Ash! Chowder's on.`,`Ash! Chowder's ready.`)],
   c_dory:[S(`Ash. Mind the nets.`,`Ash. Mind the nets.`),S(`Hm. Hello.`,`Hm. Hello.`)],
   c_oona:[S(`Come in, duck.`,`Come in, duck.`),S(`There's my warm duck.`,`My warm duck!`)],
@@ -573,7 +573,7 @@ const X1P_HELLO={
   c_posy:[S(`Ash! Listen to my box!`,`Ash! Listen to my box!`),S(`Hi, dragon. Hi.`,`Hi, dragon!`)],
   c_maudie:[S(`ASH! WIND!`,`ASH! WIND!`),S(`HELLO! TEA? TEA!`,`HELLO! TEA?`)],
   c_agatha:[S(`Hm. You again.`,`Hm. You again.`),S(`Ash. Squawk says hello. Squawk, say hello.`,`Squawk says hello.`)],
-  c_barley:[S(`Evening, young dragon.`,`Hello, young dragon.`),S(`Gerald says hello. Then he fainted.`,`Gerald says hi. He fainted.`)]
+  c_barley:[S(`There you are, young dragon.`,`Hello, young dragon.`),S(`Gerald says hello. Then he fainted.`,`Gerald says hi. He fainted.`)]
 };
 const X1P_NIGHT=[S(`Late for walking, Ash. The moths are out.`,`It's late. The moths are out.`),S(`Mind the lamps. The moths love them.`,`Moths love the lamps.`),S(`Can't sleep either? Me neither.`,`Can't sleep? Me neither.`)];
 { const base=greetLine; greetLine=function(id){
@@ -648,12 +648,12 @@ B('c_aga1','id:c_agatha',ALWAYS,S(`Squawk. Stop it. Squawk. ...He's doing my voi
 B('c_bar1','id:c_barley',ALWAYS,S(`Easy, Gerald. Easy. ...He's fainted.`,`Easy, Gerald. ...He fainted.`));
 // town barks: the stopped clocks, the stuck tide, the Moth Mask, and later the snow and the bitten moon
 B('c_gh1',X1P_GH+'|!id:c_hester',x1pPre,S(`Is it lunch? Nobody knows when lunch is anymore.`,`Is it lunch? Nobody knows!`));
-B('c_gh2',X1P_GH,x1pPre,S(`One minute to midnight. At breakfast. It's very confusing.`,`Midnight at breakfast? Odd.`));
+B('c_gh2',X1P_GH,x1pPre,S(`One minute to midnight again. Or still. I can't tell any more.`,`Still one minute to midnight!`));
 B('c_gh3',X1P_GH,x1pTicks,S(`Tick, tock! I'd forgotten how much I like that sound.`,`Tick, tock! I missed that.`),{d:'c_clock'});
-B('c_gh4',X1P_GH,()=>!x1pR('c_brass'),S(`The Moth Mask? She's a menace. She's a legend. She fixed my roof. She's a menace.`,`The Moth Mask fixed my roof. She's a menace!`));
+B('c_gh4',X1P_GH,()=>!x1pR('c_brass'),S(`The Moth Mask? She robbed the baron next door and fixed my roof, the same night. I don't know what to think.`,`The Moth Mask fixed my roof! I don't know what to think.`));
 B('c_gh5',X1P_GH,()=>isNight(),S(`Never seen so many moths. They are eating my curtains. And my CLOCKS.`,`So many moths! They eat my curtains!`));
-B('c_gh6',X1P_GH,()=>isNight(),S(`Forty moths on my lamp last night. Forty! I counted. Then I screamed.`,`Forty moths on my lamp!`));
-B('c_gh7',X1P_GH+'|kid',()=>x1pR('c_light')&&!G.flags.c_snow,S(`Did you see the lighthouse beam? There's a black tower out at sea! It wasn't there yesterday!`,`There's a black tower out at sea!`));
+B('c_gh6',X1P_GH,()=>isNight(),S(`There were so many moths on my lamp last night, it looked like it had grown a fur hat.`,`My lamp was so mothy it looked like a fur hat!`));
+B('c_gh7',X1P_GH+'|kid',()=>!!G.flags.c_spire_up&&!G.flags.c_snow,S(`Did you see the lighthouse beam? There's a black tower out at sea! It wasn't there before!`,`There's a black tower out at sea!`));
 B('c_sm1',X1P_SM,()=>!G.flags.c_lowtide&&x1pR('c_salt'),S(`Three days of high tide. The fish are getting cheeky.`,`High tide for days! Cheeky fish.`));
 B('c_sm2',X1P_SM,()=>!!G.flags.c_lowtide,S(`Low tide at last! Mina's been dancing on the boardwalk.`,`Low tide! Mina is dancing.`),{d:'c_tide'});
 B('c_sm3',X1P_SM+'|!id:c_oona',ALWAYS,S(`Somebody left roof tiles on my step again. Nobody saw who. Nobody ever does.`,`Someone left roof tiles on my step. Nobody saw who.`));
@@ -664,21 +664,21 @@ B('c_cst3',X1P_CT,()=>hasAbil('claws'),S(`I saw you go straight up a wall! Like 
 B('c_cst4',X1P_CT,()=>hasAbil('grapple'),S(`Your tail's a rope? Your TAIL is a ROPE?`,`Your tail is a rope?`),{d:'trial_grapple'});
 B('c_cst5',X1P_CT,()=>!!(G.weapons&&G.weapons.whip)&&G.weapon==='whip',S(`Mind that chain! Is that old Saltbeard's? It still smells of sea.`,`Mind that chain! It smells of the sea.`),{d:'wpn_whip'});
 B('c_cst6',X1P_CT,()=>G.comp==='c_bolt'&&compNear('c_bolt'),S(`Bolt! Who's a shiny boy? Who's a shiny sneezy boy?`,`Bolt! Who's a shiny boy?`),{r:['c_bolt',S(`Bark! (whirr) ACHOO.`,`Bark! ACHOO.`)]});
-B('c_cst7',X1P_CT,()=>!!G.flags.act1_done,S(`You're the dragon from up north! The one who beat the mountain! Word travels. Mostly by gull.`,`You beat the mountain up north! We heard.`),{d:'done'});
+B('c_cst7',X1P_CT,()=>!!G.flags.act1_done,S(`You're the dragon from up north! The one who beat the mountain! Penny Press told the whole market.`,`You beat the mountain up north! Penny told us.`),{d:'done'});
 // two people talking
 VCH('c_ch1','id:c_hester','id:c_bobs',ALWAYS,[[0,S(`Report, Bob.`,`Report, Bob.`)],[1,S(`All quiet, Captain. Except Bob.`,`All quiet. Except Bob.`)],[0,S(`Which Bob?`,`Which Bob?`)],[1,S(`...Yes, Captain.`,`Yes, Captain.`)]]);
 VCH('c_ch2','id:c_hettie','id:c_ingrid',ALWAYS,[[0,S(`Ingrid! I need a gear the size of a hat.`,`I need a gear as big as a hat!`)],[1,S(`Why?`,`Why?`)],[0,S(`For a hat.`,`For a hat.`)],[1,S(`...Ja. Fair.`,`Ja. Fair.`)]]);
 VCH('c_ch3','id:c_whirligig','id:c_penny',ALWAYS,[[1,S(`Lord Whirligig! Any comment on the Moth Mask?`,`Any comment on the Moth Mask?`)],[0,S(`NO comment.`,`NO comment.`)],[1,S(`HEADLINE: LORD SAYS NO COMMENT.`,`HEADLINE: NO COMMENT!`)],[0,S(`Don't print that! ...Is that my name in big letters? Print that.`,`Don't print that! ...Big letters? Print it.`)]]);
-VCH('c_ch4','id:c_mo','id:c_jo',ALWAYS,[[1,S(`Mo, can I take the Biscuit out?`,`Can I take my boat out?`)],[0,S(`No ships sail, Jo.`,`No boats, Jo.`)],[1,S(`It's a SKIFF.`,`It's a SKIFF.`)],[0,S(`No skiffs sail either. Barnacles.`,`No skiffs either. Barnacles.`)]]);
+VCH('c_ch4','id:c_mo','id:c_jo',ALWAYS,[[1,S(`Mo, can I take the Biscuit out past the Far Pier?`,`Can I take my boat past the pier?`)],[0,S(`Not past the Far Pier, Jo.`,`Not past the pier, Jo.`)],[1,S(`It's a SKIFF.`,`It's a SKIFF.`)],[0,S(`Skiffs especially. Barnacles.`,`Skiffs especially. Barnacles.`)]]);
 VCH('c_ch5','id:c_fig','any',()=>x1pR('c_gear'),[[0,S(`More tea, dearie?`,`More tea?`)],[1,S(`I've had six cups.`,`I've had six cups.`)],[0,S(`So that's a yes.`,`So, yes.`)]]);
 VCH('c_ch6','id:c_ravel','id:c_whirligig',ALWAYS,[[0,S(`A genuine sea-dragon scale, my lord!`,`A real sea-dragon scale!`)],[1,S(`That is a crisp.`,`That is a crisp.`)],[0,S(`A sea-dragon crisp. Very rare.`,`A sea-dragon crisp. Rare!`)]]);
 VCH('c_ch7','id:c_mina','id:c_dory',()=>!G.flags.c_lowtide,[[0,S(`Still high tide.`,`Still high tide.`)],[1,S(`I can see that.`,`I can see.`)],[0,S(`I know. I just like saying it. It helps.`,`I just like saying it.`)]]);
 VCH('c_ch8','id:c_charlie','id:c_tarbuckle',ALWAYS,[[1,S(`In my day chowder had a proper bite.`,`In my day chowder bit back.`)],[0,S(`That was the eels, Elias.`,`That was the eels.`)],[1,S(`...and THAT'S why I don't eat eels.`,`And THAT'S why I don't eat eels.`)]]);
 VCH('c_ch9','id:c_posy','id:c_dory',ALWAYS,[[0,S(`Mom, can dragons swim?`,`Mom, can dragons swim?`)],[1,S(`Ask the dragon.`,`Ask the dragon.`)],[0,S(`I'm SHY.`,`I'm SHY.`)]]);
-VCH('c_ch10',X1P_GH,X1P_GH,x1pPre,[[0,S(`What time is it?`,`What time is it?`)],[1,S(`One minute to midnight.`,`One minute to midnight.`)],[0,S(`It's the middle of the afternoon!`,`It's the afternoon!`)],[1,S(`Tell the clock.`,`Tell the clock.`)]]);
+VCH('c_ch10',X1P_GH,X1P_GH,x1pPre,[[0,S(`What time is it?`,`What time is it?`)],[1,S(`One minute to midnight.`,`One minute to midnight.`)],[0,S(`It said that at breakfast!`,`It said that at breakfast!`)],[1,S(`Tell the clock.`,`Tell the clock.`)]]);
 VCH('c_ch11',X1P_SM,X1P_SM,ALWAYS,[[0,S(`Did you leave a goose on my step?`,`Did you leave me a goose?`)],[1,S(`No. Did you?`,`No. Did you?`)],[0,S(`...The Moth Mask, then.`,`The Moth Mask, then.`)],[1,S(`Bless her.`,`Bless her.`)]]);
 VCH('c_ch12',X1P_GH,X1P_GH,()=>!!G.flags.c_snow,[[0,S(`Snow in June.`,`Snow in June.`)],[1,S(`The gulls are wearing it like hats.`,`The gulls wear it like hats.`)],[0,S(`So am I.`,`So am I.`)]]);
-VCH('c_ch13','id:c_bobs','id:c_bob3',ALWAYS,[[0,S(`Bob!`,`Bob!`)],[1,S(`Bob!`,`Bob!`)],[0,S(`...We just like saying it.`,`We just like saying it.`)]]);
+VCH('c_ch13','id:c_bobs','id:c_bob3',ALWAYS,[[0,S(`Bob!`,`Bob!`)],[1,S(`Bob!`,`Bob!`)],[0,S(`...Welcome back, Bob.`,`Welcome back, Bob.`)]]);
 // greetings that react to what Ash did, up north and on the coast
 Object.assign(DGREET,{
   'done@c_ingrid':[['any',S(`Maren's child beat a whole mountain of dragon! I will write a song. Ja. It will be short.`,`You beat a dragon mountain! I'll write a song!`)]],
@@ -686,20 +686,20 @@ Object.assign(DGREET,{
   'pip@c_hettie':[['any',S(`Is that a baby DRAGON on your head? May I measure him? Gently? He bit my ruler. Fair.`,`A baby dragon! Can I measure him? He bit my ruler.`)]],
   'pip@c_oona':[['any',S(`Oh, look at the little one. Warm as a teapot. Come here, little duck.`,`Look at the little one! Warm as a teapot.`)]],
   'trial_wings@c_maudie':[['any',S(`I SAW YOU FLY PAST MY WINDOW! I DROPPED A WHOLE TRAY!`,`YOU FLEW PAST MY WINDOW!`)]],
-  'q_duchess@c_barley':[['any',S(`You found a goat called Duchess, up north? I've a Duchess too. Duchess the Second. She says hello. Well. She chews.`,`You found Duchess? I have Duchess the Second!`)]],
-  'ch_fennick_forgive@c_agatha':[['any',S(`I hear you gave a lamp-man a second chance. Good. Lamps deserve second chances. So do people.`,`You gave a lamp-man a second chance. Good.`)]],
-  trial_claws:[[X1P_CT,S(`You climbed the Great Clock? On the OUTSIDE? Ambrose is telling everyone. Tick.`,`You climbed the Great Clock? Wow!`)]],
+  'q_duchess@c_barley':[['any',S(`Farmer Hollis wrote that a dragon found his goat, Duchess. Was that you? I named my best ewe after that goat.`,`Did you find Hollis's goat? I named a sheep after her!`)]],
+  'ch_fennick_forgive@c_agatha':[['any',S(`Word in the lamp trade is you let Fennick Wick off with a warning. Good. Nobody makes better oil.`,`You let Fennick off? Good. He makes the best oil.`)]],
+  trial_claws:[[X1P_CT,S(`You climbed the Great Clock? On the OUTSIDE? Old Ambrose is telling everybody.`,`You climbed the Great Clock? Wow!`)]],
   'trial_claws@c_ambrose':[['any',S(`Eh? You climbed her? On the outside? Nobody's done that since the girl. Tick.`,`You climbed my clock? Like the girl did. Tick.`)]],
   trial_grapple:[[X1P_CT,S(`Is it true your tail is a rope now? Can I see? From over here?`,`Your tail is a rope? Show me!`)]],
-  'trial_grapple@c_hettie':[['any',S(`Pearl's hook! In your TAIL! I need to sit down. I need to take notes. I need both.`,`Pearl's hook in your tail! I need notes!`)]],
+  'trial_grapple@c_hettie':[['any',S(`Pearl's hook! In your TAIL! Hold still, I have to draw it. No, hold MORE still.`,`Pearl's hook in your tail! Hold still!`)]],
   trial_shadow:[[X1P_CT,S(`You went all shadowy! Penny saw it! She says it's the scoop of the year.`,`You turned into a shadow!`)]],
   wpn_whip:[[X1P_CT,S(`Is that Saltbeard's anchor chain? As a WHIP? Old Tarbuckle must be thrilled.`,`Saltbeard's chain is a whip now!`)]],
-  'wpn_whip@c_ingrid':[['any',S(`How is my chain whip? Is it cracking? Is it singing? Not literally. Ja?`,`How is the whip? Is it cracking? Ja?`)]],
+  'wpn_whip@c_ingrid':[['any',S(`How is my Chain Whip? Does it crack? Ja? I knew it would crack!`,`How is the whip? Does it crack? Ja!`)]],
   c_clock:[[X1P_GH,S(`You restarted the Great Clock! I had lunch at the right time today! I cried!`,`You fixed the clock! Lunch on time! I cried!`)]],
   'c_clock@c_whirligig':[['any',S(`My clocks. All four hundred. Ticking. Dragon, I... hmph. Thank you. Wipe your feet.`,`My clocks tick! Hmph. Thank you.`)]],
   'c_clock@c_ambrose':[['any',S(`Tick. Tock. TICK. TOCK. Oh, young dragon. Listen to her.`,`Tick. Tock. Listen to her!`)]],
   c_tide:[[X1P_SM,S(`Low tide at last! The fish are sulking. We're delighted.`,`Low tide! The fish sulk. We cheer.`)]],
-  'c_tide@c_mina':[['any',S(`LOW. TIDE. I've counted every wave going out. All of them. Sorry. Thank you.`,`LOW TIDE! I counted every wave. Thank you!`)]],
+  'c_tide@c_mina':[['any',S(`Low tide! LOW! Look at all that sand. I'd forgotten what the bottom of the lagoon looked like. Thank you, dragon!`,`LOW TIDE! Look at all that sand! Thank you!`)]],
   c_snowfall:[[X1P_CT,S(`It's snowing! In summer! Is this your doing, dragon? No? Then whose?`,`Snow in summer! Whose doing is that?`)]],
   q_c_oona:[[X1P_SM,S(`You lit Granny Oona's stove! The whole boardwalk smells of toast!`,`You lit Granny Oona's stove!`)]],
   q_c_regatta:[[X1P_GH,S(`You beat Skipper Jo! Nobody beats Skipper Jo! She's still checking the rules.`,`You beat Skipper Jo! Nobody does that!`)]],
@@ -743,13 +743,13 @@ const X1P_INN={
   try{
     if(X1P_INN[id]) o.unshift({t:S('A bed, or something warm?','A bed, or something warm?'),tag:'shop',fn:()=>X1P_INN[id](),end:true});
     const dark=(id==='c_fig'&&x1pAt('c_gifts',2))||(id==='c_tarbuckle'&&x1pAt('c_whip',3))||(id==='c_maudie'&&x1pAt('c_notes',1));
-    if(dark&&!isNight()) o.push({t:S('Can I wait here until dark?','Can I wait for dark?'),fn:()=>later(0.1,()=>x1pWaitDark()),end:true,then:[[id,id==='c_tarbuckle'?S(`Sit, sit. I'll tell you about the time I wrestled an octopus. It took all day. So will this.`,`Sit. I'll tell you about an octopus.`):S(`Of course, dearie. Put your feet up.`,`Of course. Put your feet up.`)]]});
+    if(dark&&!isNight()) o.push({t:S('Can I wait here until dark?','Can I wait for dark?'),fn:()=>later(0.1,()=>x1pWaitDark()),end:true,then:[[id,id==='c_tarbuckle'?S(`Sit, sit. I'll tell you about the time I wrestled an octopus. Took all day, and THAT'S why I don't eat eels.`,`Sit. I'll tell you about an octopus.`):S(`Of course, dearie. Put your feet up.`,`Of course. Put your feet up.`)]]});
     if(id==='c_jo'&&!G.quests.c_regatta&&x1pR('c_brass')&&!hasAbil('skimmer')) o.push({t:S('Can I race in the regatta?','Can I race?'),then:[['c_jo',S(`You walk on water but you can't SKIP? Come back when you can, landlubber.`,`You can't skip on water? Come back when you can!`)]],back:true});
     if(id==='c_ottoline'&&G.items.c_diary&&!G.flags.c_diary_sent) o.push({t:S('Can you read this dream diary?','Can you read this diary?'),tag:'quest',fn:()=>{ G.flags.c_diary_sent=true; },then:[['c_ottoline',S(`Moon letters in the margins. I can't read them. But I know somebody who can, and she'll be insufferable about it. I'll send a copy to Wren.`,`Moon letters! I can't read them. Wren can. I'll send her a copy.`)]],back:true});
     if(id==='c_whirligig'&&G.flags.c_gifts==='taken'&&x1pQ('c_gifts')) o.push({t:S('Can I buy the music box back for Posy? (100 coins)','Buy the music box for Posy (100 coins)'),tag:'quest',fn:()=>{ if((G.coins||0)<100){ setBanner(S('Not enough coins.','Not enough coins.'),'',1.6); return; } G.coins-=100; G.flags.c_gifts='bought'; x1pTrust(1); giveItems({c_musicbox:1}); },then:()=>(G.flags.c_gifts==='bought'?[['c_whirligig',S(`You'll BUY it? For a fishing girl? ...Well, I never. Take it. Take it to the child. Hmph.`,`For the fishing girl? Well! Take it to her. Hmph.`)]]:[['c_whirligig',S(`Come back with the coins, dragon.`,`Come back with coins.`)]]),back:true});
     if(id==='c_posy'&&G.flags.c_gifts==='bought'&&G.items.c_musicbox) o.push({t:S('Here. Your music box. It’s yours.','Here is your music box.'),tag:'gift',fn:()=>{ takeItems({c_musicbox:1}); G.flags.c_box_home=true; },then:[['c_posy',S(`MY BOX! You're a GOOD dragon. The best dragon. Listen! LISTEN!`,`MY BOX! You're a GOOD dragon!`)],x1pN(`The moth song tinkles out over the boardwalk. Dory turns away to mend a net that doesn't need mending.`,`The moth song plays. Dory smiles.`)],back:true});
-    if(id==='c_penny'&&G.flags.c_box_home&&!G.flags.c_penny_kind){ o.push({t:S('Posy has her music box back.','Posy has her box back.'),fn:()=>{ G.flags.c_penny_kind=true; },then:[['c_penny',S(`HEADLINE: DRAGON BUYS BACK MUSIC BOX. CHILD HAPPY. LORD... ALSO HAPPY? I'm not printing her name. Some stories are better kept.`,`HEADLINE: CHILD HAPPY! I won't print her name.`)]],back:true}); }
-    if(id==='c_oona'&&G.flags.dr_c_twins&&!G.seenTalk.c_oona_twins) o.push({t:S('I had a dream about Pearl. In a basket.','I dreamed of Pearl in a basket.'),key:'c_oona_twins',then:[['c_oona',S(`You dreamed about Pearl? In a basket? Oh, duck. That's our family story. How did you know about the curtains?`,`You dreamed of Pearl? That's our story! How did you know?`)]],back:true});
+    if(id==='c_penny'&&G.flags.c_box_home&&!G.flags.c_penny_kind){ o.push({t:S('Posy has her music box back.','Posy has her box back.'),fn:()=>{ G.flags.c_penny_kind=true; },then:[['c_penny',S(`HEADLINE: DRAGON BUYS BACK MUSIC BOX. CHILD HAPPY. LORD... ALSO HAPPY? I'm not printing the kid's name. It's her box, not my news.`,`HEADLINE: CHILD HAPPY! I won't print her name.`)]],back:true}); }
+    if(id==='c_oona'&&G.flags.dr_c_twins&&!G.seenTalk.c_oona_twins) o.push({t:S('I dreamed about baby Pearl. She climbed the curtains.','I dreamed baby Pearl climbed the curtains.'),key:'c_oona_twins',then:[['c_oona',S(`Up the curtains, the day she was born! Oh, duck. That's our family story. Nobody outside this house knows that one.`,`Up the curtains! That's our family story!`)]],back:true});
   }catch(e){ console.error(e); }
   return o; }; }
 // the smith shows a gold ! while Ash carries star-iron (Maren's job, on the coast)
@@ -760,7 +760,7 @@ function x1pFerry(k){ const P=X1P_FERRY[k]; if(typeof mapTravel==='function') ma
 onTalk(n=>{
   if(n.id!=='dell'||!x1pDell()) return false;
   const first=!G.flags.c_dell_met; G.flags.c_dell_met=true;
-  const L=first?[x1pL('dell',`Ash! Followed the river all the way down! Took a wrong turn at a waterfall. Took a right turn after.`,`Ash! I followed the river down here!`),x1pL('dell',`See that big one in the harbor? Brass whistle, steam paddle? That's a SEA boat. One day, Ash. One day.`,`See that big sea boat? One day, Ash. One day.`)]:[x1pL('dell',pick([`The Soggy Biscuit Two, at your service! Mostly floating.`,`All aboard! Mind the wet bit. It's all the wet bit.`]),`All aboard the Soggy Biscuit Two!`)];
+  const L=first?[x1pL('dell',`Ash! Followed the river all the way down! Took a wrong turn at a waterfall. Took a right turn after.`,`Ash! I followed the river down here!`),x1pL('dell',`See that big one in the harbor? Brass whistle, steam paddle? That's a SEA boat. One day, Ash. One day.`,`See that big sea boat? One day, Ash. One day.`)]:[x1pL('dell',pick([`The Soggy Biscuit Two, at your service! Still floating!`,`All aboard! Mind the wet bit. It's all the wet bit.`]),`All aboard the Soggy Biscuit Two!`)];
   const opts=[{t:S('Row me to the Gearhaven quay','To the Gearhaven quay'),fn:()=>later(0.2,()=>x1pFerry('quay'))},{t:S('Row me to the Saltmarsh jetty','To the Saltmarsh jetty'),fn:()=>later(0.2,()=>x1pFerry('jetty'))}];
   if(x1pR('c_light')) opts.push({t:S('Row me to Lantern Point','To Lantern Point'),fn:()=>later(0.2,()=>x1pFerry('point'))});
   opts.push({t:S('Just saying hello','Just saying hi'),then:[['dell',S(`Hello! Hello back! Sorry. I get excited about the sea.`,`Hello! I love the sea!`)]]});
@@ -891,7 +891,7 @@ Object.assign(QDEFS,{
       {t:'flag',flag:'c_bob_found',text:S('Find the third Bob, a Tin Watchman with a blue plume, somewhere in the Brass Yards','Find the third Bob in the Brass Yards. Blue plume!'),at:'xy:11300,24400'},
       {t:'flag',flag:'c_bob_calm',text:S('Knock the moth dust out of Bob without breaking him: break his shield, then breathe on him gently while he is dizzy','Break his shield. Then breathe on him gently.'),at:()=>X1P.bob&&!X1P.bob.e.dead?`xy:${Math.round(X1P.bob.e.x)},${Math.round(X1P.bob.e.y)}`:'xy:11300,24400'},
       {t:'talk',npc:'c_bobs',text:S('Bring Bob home to the Clockwork Lift','Bring Bob home to the Lift'),lines:[x1pL('c_bobs',`BOB!`,`BOB!`),x1pL('c_bob3',`BOB!`,`BOB!`),x1pN(`Three tin watchmen hug. It sounds like a cutlery drawer falling down the stairs.`,`Three tin men hug. CLANG!`),
-        x1pL('c_bobs',`The Clockwatch owes you, Mostly Part Dragon. When you need us, we'll be there. All of us. All three Bobs.`,`We owe you. When you need us, all three Bobs will come.`)],reward:{coins:40,xp:500,x1p:()=>{ X1P.bob3follow=false; giveItems({c_badge:1},true); x1pHat('c_badge'); setBanner(S('A Clockwatch badge','A Clockwatch badge'),S('The Bobs will hold the breakwater and the Spire door for you.','The Bobs will help you at the Spire.'),3.2); if(!AREA&&!G.npcs.some(n=>n.id==='c_bob3')){ const [x,y]=npcSpot(SPECIAL.c_bob3); G.npcs.push(mkNPC(SPECIAL.c_bob3,x,y)); } }}}]}
+        x1pL('c_bobs',`The Clockwatch owes you, dragon. When you need us, all three Bobs will be there. Probably on time.`,`We owe you. All three Bobs will come.`)],reward:{coins:40,xp:500,x1p:()=>{ X1P.bob3follow=false; giveItems({c_badge:1},true); x1pHat('c_badge'); setBanner(S('A Clockwatch badge','A Clockwatch badge'),S('The Bobs will hold the breakwater and the Spire door for you.','The Bobs will help you at the Spire.'),3.2); if(!AREA&&!G.npcs.some(n=>n.id==='c_bob3')){ const [x,y]=npcSpot(SPECIAL.c_bob3); G.npcs.push(mkNPC(SPECIAL.c_bob3,x,y)); } }}}]}
 });
 // lines that depend on choices (getters, so a talk step can name them by STORY key)
 Object.assign(STORY,{
@@ -984,7 +984,7 @@ const x1pPagesHeld=()=>{ let n=0; for(let i=1;i<=6;i++) if(G.items['c_page'+i]&&
 onTalk(n=>{
   if(n.id!=='c_ottoline'||!G.quests.c_logbook||G.quests.c_logbook.done) return false;
   const L=[];
-  if(G.flags.c_pb_5&&!G.flags.c_ott_wren){ G.flags.c_ott_wren=true; L.push(x1pL('c_ottoline',`A letter from Sister Wren of Emberhollow came this morning. About you. And about commas. She's wrong about commas.`,`Sister Wren wrote about you. And commas. She's wrong.`),x1pL('c_ottoline',`She's wrong about everything. Lovely woman. We've been arguing by post for thirty years.`,`She's always wrong. Lovely woman.`)); }
+  if(G.flags.c_pb_5&&!G.flags.c_ott_wren){ G.flags.c_ott_wren=true; L.push(x1pL('c_ottoline',`A letter came from Sister Wren in Brindlecross. About you. And about commas. She's wrong about commas.`,`Sister Wren wrote about you. And commas. She's wrong.`),x1pL('c_ottoline',`She's wrong about everything. Lovely woman. We've been arguing by post for thirty years.`,`She's always wrong. Lovely woman.`)); }
   const held=[]; for(let i=1;i<=6;i++) if(G.items['c_page'+i]&&!G.flags['c_pgd'+i]) held.push(i);
   if(!held.length){ if(!L.length) return false; runDialogue(L,()=>{ scene='play'; talkHub(n); }); return true; }
   const before=G.flags.c_pages_given|0, after=before+held.length;
@@ -994,7 +994,7 @@ onTalk(n=>{
     x1pL('c_ottoline',`I'll copy this out for Wren tonight. And Ash? Remember everything that moth ever says to you. Everything.`,`I'll copy it for Wren. Remember what that moth says. Everything.`)); }
   if(after>=6) L.push(x1pL('c_ottoline',`That's all six. The whole logbook, home on its shelf. Here. Pearl's letter is yours to carry. It was always meant for someone like you. And this was pressed between the pages.`,`All six! Pearl's letter is yours. And this was in the pages.`));
   else if(before<3&&after>=3) L.push(x1pL('c_ottoline',`That's ${after}! This deserves more than coins.`,`That's ${after}! More than coins for you.`));
-  else L.push(x1pL('c_ottoline',`${6-after} to go. Pearl's old places. Caves, lofts, lighthouses. QUIETLY. Sorry.`,`${6-after} to go. Look in Pearl's old places.`));
+  else L.push(x1pL('c_ottoline',`${6-after} to go. Her caves, her workshop, her lighthouse. GO! ...Sorry. Go.`,`${6-after} to go. Look in Pearl's old places.`));
   runDialogue(L,()=>{ scene='play';
     for(const i of held){ G.flags['c_pgd'+i]=1; takeItems({['c_page'+i]:1}); }
     G.flags.c_pages_given=after; addCoins(15*held.length,player.x,player.y); gainXp(40*held.length);
@@ -1242,7 +1242,7 @@ function x1pVaneTick(dt){
   try{ if(ram&&x1pAt('c_tail',0)&&(G.items.c_spring||0)<3){ emit(e.x,e.y,12,{col:'255,220,120',smin:40,smax:140,lmin:.3,lmax:.7,zmin:1.5,zmax:3}); ftext(e.x,e.y-30,S('BOING!','BOING!'),'#ffe8a0',15); giveItems({c_spring:1}); } }catch(er){ console.error(er); } }; }
 // ---------- c_chalk: the eye
 function x1pEyeAct(){
-  runDialogue([x1pN(`From the top of the hill, the whole Chalk Dragon blazes white across the Downs. Its tail curls. Its wings spread. It's waving.`,`The Chalk Dragon shines white. It's waving!`),
+  runDialogue([x1pN(`From the top of the hill, the whole Chalk Dragon blazes white across the Downs, wings spread, as if it were waving.`,`The Chalk Dragon shines white. It's waving!`),
     x1pN(`In its eye, a little stone door you never noticed slides open, and warm air breathes out of the hill.`,`A little stone door opens in its eye. Warm air comes out.`),
     x1pL('c_barley',`(from far below) She's white again! Gerald! GERALD! ...He's fainted.`,`(far away) She's white! Gerald! ...He fainted.`)],()=>{ scene='play';
     x1pHeart('c_chalkeye'); G.flags.c_chalk_eye=true; G.flags.c_chalk_breath=true; if(G.shrines) G.shrines.c_s_chalk=true; questPoke(); saveGame(); });
@@ -1596,14 +1596,14 @@ const X1P_MAIL=[
     {who:'maren',text:S(`P.S. I climbed up and told your grandfather you'd gone south. He grunted. It was a nice grunt.`,`P.S. I told Grandpa. He grunted. A nice grunt.`),skipIf:()=>G.choices.ending!=='warden'},
     {who:'maren',text:S(`P.S. Your grandfather says, and I quote, "The hatchling will fail." Bertram charges extra to hear him say it.`,`P.S. Grandpa says you will fail. He is grumpy.`),skipIf:()=>G.choices.ending!=='heir'},
     {who:'maren',text:S(`P.S. Grandpa ate four of Bertram's buns and the doormat. He says hello. He says it with smoke.`,`P.S. Grandpa ate the doormat. He says hello.`),skipIf:()=>G.choices.ending!=='lantern'},
-    x1pN(`Pebble eyes your coin pouch. Pebble is Elder Yara's crow, and Pebble does not work for free.`,`Pebble wants a coin. She does not work for free.`)]},
+    x1pN(`Pebble eyes your coin pouch. Even this far south, Pebble does not work for free.`,`Pebble wants a coin. She does not work for free.`)]},
   {id:'c_pb_2',from:'morrow',when:()=>!!G.flags.dr_c_whisper,lines:[
     {who:'narr',text:S(`The letter smells of pumpkins.`,`The letter smells of pumpkins.`),skipIf:()=>G.choices.morrow==='jail'},
     {who:'narr',text:S(`The letter is stamped "Watch House Library. Please Return."`,`The letter is from the Watch House.`),skipIf:()=>G.choices.morrow!=='jail'},
-    x1pL('morrow',`Young Ash. Word reaches even my pumpkins. A voice in your dreams that promises you things? I had one of those once. Do not answer it. Ever. Morrow.`,`A voice in your dreams? I had one once. Don't answer it. Morrow.`),
+    x1pL('morrow',`Young Ash. Your mother tells me you have been dreaming badly. A voice in your dreams that promises you things? I had one of those once. Do not answer it. Ever. Morrow.`,`A voice in your dreams? I had one once. Don't answer it. Morrow.`),
     {who:'morrow',text:S(`P.S. The cells are in alphabetical order now.`,`P.S. I tidied the cells.`),skipIf:()=>G.choices.morrow!=='jail'}]},
   {id:'c_pb_3',from:'yara',when:()=>(G.flags.moon==null?100:G.flags.moon)<100,lines:[
-    x1pL('yara',`I counted the moon tonight. That sounds strange. But it is smaller, Ash. By about one bite. Pebble and I are keeping an eye on it.`,`The moon is one bite smaller. Pebble and I are watching it.`)]},
+    x1pL('yara',`I looked at the moon for a long time tonight. It is smaller, Ash. By about one bite. Pebble and I are keeping an eye on it.`,`The moon is one bite smaller. Pebble and I are watching it.`)]},
   {id:'c_pb_4',from:'maren',when:()=>!!G.flags.c_clock_on,lines:[
     x1pL('maren',`Ash! Pebble says you fixed a CLOCK. A whole city's clock! I told everyone. I told the chickens.`,`You fixed a whole city's clock! I told the chickens.`),
     x1pL('maren',`Yara says the best smith on that coast is Ingrid Anvilsong. Tell her I said her braids are too long for a forge. Tell her nicely. She's bigger than me.`,`Tell Ingrid her braids are too long for a forge. Nicely!`),
@@ -1614,16 +1614,16 @@ const X1P_MAIL=[
     x1pL('maren',`Eat something. Love, Mom. P.S. It's very cold here for summer. Odd.`,`Eat something. Love, Mom. P.S. It is cold here. Odd.`),
     x1pDo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>x1pR('c_salt'),lines:[
-    x1pL('wren',`Dear Ash. I knew it! The torn page said Pearl sailed south, and now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),
-    x1pL('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have written to each other for thirty years and never once agreed about anything. It's been wonderful.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
+    x1pL('wren',`Dear Ash. My books say Ember's daughter Pearl sailed south, a thousand years ago. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),
+    x1pL('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have argued by letter for thirty years. She is wrong about almost everything, and I would be lost without her.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
     x1pL('wren',`Ask her about Pearl's logbook. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about Pearl's logbook. Your friend, Wren.`)]},
   {id:'c_pb_6',from:'wren',when:()=>!!G.flags.c_diary_sent,lines:[
     x1pL('wren',`Ash. Ottoline copied out the moon letters from that girl's diary and sent them to me. They are very old. Older than the Wardens.`,`The moon letters in the diary are very, very old.`),
     x1pL('wren',`They spell the same two words over and over. "Night." And "Mother." I don't like this, Ash. I don't like it at all.`,`They spell "Night" and "Mother." I don't like it.`),
     x1pL('wren',`Keep your fire close. Wren.`,`Keep your fire close. Wren.`)]},
   {id:'c_pb_7',from:'quill',when:()=>(G.flags.moon==null?100:G.flags.moon)<100,lines:[
-    x1pL('quill',`The moon is five percent smaller. I measured twice. I hate it.`,`The moon is smaller. I measured!`),
-    x1pL('quill',`I have checked my telescope, my glasses and my eyes. All fine. The moon is not. Professor Quill.`,`It is not my glasses. Professor Quill.`)]}
+    x1pL('quill',`The moon is five percent smaller. I have measured it every night this week, hoping I was wrong.`,`The moon is smaller. I measured it!`),
+    x1pL('quill',`It is not my telescope and it is not my glasses. Something has taken a bite out of the moon. Professor Quill.`,`Something bit the moon. Professor Quill.`)]}
 ];
 X1P.mailShared=false;
 try{ if(typeof PEBBLE_MAIL!=='undefined'&&PEBBLE_MAIL&&typeof PEBBLE_MAIL.push==='function'){ for(const m of X1P_MAIL) if(!PEBBLE_MAIL.some(q=>q.id===m.id)) PEBBLE_MAIL.push(m); X1P.mailShared=true; } }catch(e){}
@@ -1639,14 +1639,14 @@ const X1P_EPI=[
   {pri:9,cond:()=>G.choices.c_vesper==='friend',line:['narr',S(`Vesper Saltwhistle still climbs the Great Clock every night. Now she sits on the top and waves at the moon, and Granny Oona leaves the window open for her.`,`Vesper still climbs the Great Clock. Now Gran leaves the window open.`)]},
   {pri:8,cond:()=>G.choices.c_vesper==='foe',line:['narr',S(`Nobody on the coast saw the Moth Mask again. But every winter, Granny Oona found a fish on her step, with a little bow on it.`,`Every winter, Gran found a fish on her step.`)]},
   {pri:6,cond:()=>x1pQ('c_oona'),line:['narr',S(`Granny Oona's stove never went out again. She keeps a kettle on it for anyone who climbs in through the window.`,`Gran's stove never went out again.`)]},
-  {pri:5,cond:()=>x1pQ('c_bolt'),line:['narr',S(`Bolt the brass dog learned to fetch. Mostly he fetches Lord Whirligig's hat.`,`Bolt learned to fetch. Mostly hats.`)]},
-  {pri:4,cond:()=>x1pQ('c_bob'),line:['narr',S(`Captain Hester promoted all three Bobs. They now have one very long badge between them.`,`All three Bobs got one long badge.`)]},
+  {pri:5,cond:()=>x1pQ('c_bolt'),line:['narr',S(`Bolt the brass dog learned to fetch. Every morning he fetches Lord Whirligig's hat.`,`Bolt fetches Lord Whirligig's hat every day.`)]},
+  {pri:4,cond:()=>x1pQ('c_bob'),line:['narr',S(`Captain Ticklebrass promoted all three Bobs. They now have one very long badge between them.`,`All three Bobs got one long badge.`)]},
   {pri:3,cond:()=>!!G.flags.c_regatta_won,line:['narr',S(`The Harbor Regatta has a new rule: no dragons. It's called the Ash Rule.`,`The Regatta has a new rule: no dragons.`)]},
   {pri:2,cond:()=>true,line:['narr',S(`The Great Clock has not stopped once since. Clockkeeper Ambrose says "Tick." Everyone agrees.`,`The Great Clock never stopped again.`)]}
 ];
 function x1pEpiPush(){ if(X1P.epi) return; try{ if(typeof EPI!=='undefined'&&EPI&&EPI.c&&typeof EPI.c.push==='function'){ for(const e of X1P_EPI) EPI.c.push(e); X1P.epi=true; } }catch(e){ /* EPI comes from a later module: tried again at world build */ } }
 x1pEpiPush();
-if(typeof DREAM_TALK!=='undefined'){ DREAM_TALK.c_twins=Object.assign(DREAM_TALK.c_twins||{},{c_oona:S(`You dreamed about Pearl? In a basket? Oh, duck. That's our family story. How did you know about the curtains?`,`You dreamed of Pearl? That's our story! How did you know?`)}); }
+if(typeof DREAM_TALK!=='undefined'){ DREAM_TALK.c_twins=Object.assign(DREAM_TALK.c_twins||{},{c_oona:S(`You dreamed about baby Pearl, up the curtains the day she was born? Oh, duck. That's our family story. Nobody outside this house knows that one.`,`Baby Pearl up the curtains? That's our family story!`)}); }
 // ---------- the journal: Vesper's card (moth icons for trust) once her name is known
 const x1pVesperKnown=()=>!!(G.flags.c_vesper_named||G.items.c_diary||G.items.c_letters||G.choices.c_vesper||x1pR('c_light'));
 { const base=renderJour; renderJour=function(){ base(); try{

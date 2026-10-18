@@ -327,7 +327,7 @@ people({
         say: ["A goat came down the chalk road this week, all on her own, and walked past my sheep like she had business in town. Chewed my gate on the way. Duchess the Second was most offended.",
           'A strange goat came down the road. She chewed my gate!'] },
       { if: 'stage>=c_claws !flag m0_duchess_open', promise: 'm0_duchess', dir: ['emberhollow', 'm0_duchess', 'east'], option: ['Tell me about Duchess the Second', 'Tell me about Duchess'],
-        say: ["I got her as a kid from the Hollis farm, up your way. Her mother climbs rocks no goat should. Hollis says there's one east of your village, all over hoofprints. Goats hide things up high.",
+        say: ["I named her after Farmer Hollis's goat, up your way. Duchess the First climbs rocks no goat should. Hollis says there's one east of your village, all over hoofprints. Goats hide things up high.",
           'A goat rock east of your village. Look up high.'] },
       { say: [["That's Duchess the Second, she's in charge. That's Gerald, he's in charge of nothing. He's happy.", 'Duchess is in charge. Gerald is not.'],
         ['Sit a while. The sea will still be there.', 'Sit a while. The sea will wait.'],
