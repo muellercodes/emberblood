@@ -1942,8 +1942,11 @@ export function report(res, M, opts) {
   }
   lines.push('');
   lines.push('```');
-  for (const f of fails) lines.push(`FAIL ${pad(f.rule)}${f.msg}`);
-  for (const w of dataW) lines.push(`WARN ${pad(w.rule)}${w.msg}`);
+  // the talk rules (J2) end with the file:line they are about (the voice lines start with theirs)
+  const J2T = new Set(['re', 'talk', 'label', 'said', 'choose', 'idle']);
+  const fl = (x) => (J2T.has(x.rule) && x.file && !x.msg.includes(`${x.file}:${x.line}`) ? ` (${x.file}:${x.line})` : '');
+  for (const f of fails) lines.push(`FAIL ${pad(f.rule)}${f.msg}${fl(f)}`);
+  for (const w of dataW) lines.push(`WARN ${pad(w.rule)}${w.msg}${fl(w)}`);
   for (const w of legW) lines.push(`WARN ${pad(w.rule)}${w.msg}`);
   lines.push('```');
   return lines.join('\n') + '\n';
