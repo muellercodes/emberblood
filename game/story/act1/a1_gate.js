@@ -280,6 +280,8 @@ quest({
 // ================= small mystery: what rattles in Sir Strawsworth's hat? (Hal's rumor)
 quest({
   id: 'a1_hat', act: 1, giver: 'hal', optional: true,   // started by Hal's rumor (people() at the end)
+  // (v11) open from the raid on, like Hal's option: before it Hal showed a gold ! for a quest he could not give yet
+  if: 'stage>=lore',
   title: ["Sir Strawsworth's Hat", 'The Scarecrow Hat'],
   payoff: { kind: 'truth', id: 'a1_button' },
   // Hal's old rumor about the hat (a1g_talk.js) is the people() option below now
@@ -349,6 +351,8 @@ quest({
 // ================= small mystery: who put out the Hollow Ward?
 quest({
   id: 'a1_snuffed', act: 1, giver: 'yara', optional: true,   // started by asking Yara (people() at the end)
+  // (v11) open from the raid on, like Yara's option (before it she showed a gold ! for it on Lantern Day morning)
+  if: 'stage>=lore !flag act1_done',
   title: ['The Cold Ward', 'The Cold Ward'],
   payoff: { kind: 'truth', id: 'a1_oath_inside' },
 

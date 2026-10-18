@@ -14,10 +14,14 @@ Object.assign(QDEFS,{
       {t:'flag',flag:'seek_won',npc:'nib',mini:'seek',text:'Find all four hidden kids in Brindlecross (talk to Nib to start)',ready:[['nib',`Close your eyes and count to ten! No peeking! ...Okay GO!`]]},
       {t:'talk',npc:'nib',text:'Tell Nib you found everyone',lines:[['nib',`You found ALL of us! Even Jem, and Jem hid in a barrel! Here, my best treasure map. It's a real one. Mostly.`]],give:{map_x2:1},reward:{coins:20,xp:50}}
     ]},
-  pumpkins:{title:'Pumpkin Patrol',giver:'hal',min:'wren',
-    offer:[['hal',`Ash, the slimes have found my pumpkin patch. They come out of the hedges and eat everything. EVERYTHING.`],['hal',S(`Guard the patch with me for one minute. Every pumpkin you save is a pie for the winter.`,`Guard my pumpkins for one minute. Save the pies!`)]],
+  // a small village quest, offered from Lantern Day morning (the minigame is in a9g_mini.js: four small waves)
+  pumpkins:{title:'Pumpkin Patrol',giver:'hal',min:'lanterns',
+    get offer(){ const fest=G&&G.mode==='story'&&!reached('raid');
+      return [['hal',fest?S(`Ash! Slimes in my pumpkin patch. On Lantern Day! Those are the festival pumpkins.`,`Slimes in my pumpkins! On Lantern Day!`):`Ash, the slimes have found my pumpkin patch. They come out of the hedges and eat everything. EVERYTHING.`],
+        ['hal',S(`They come in little waves, a few at a time. Knock them off the pumpkins before they finish a bite.`,`They come in little waves. Knock them off the pumpkins!`)],
+        ['hal',fest?S(`Every pumpkin you save is a pie for the festival.`,`Save the festival pies!`):S(`Every pumpkin you save is a pie for the winter.`,`Save the pies!`)]]; },
     steps:[
-      {t:'flag',flag:'pumpkins_saved',npc:'hal',mini:'defend',text:'Guard Hal’s pumpkin patch from the slimes for one minute (talk to Hal to start)',ready:[['hal',`Here they come! Don't let them eat the big one. Her name is Gertrude.`]]},
+      {t:'flag',flag:'pumpkins_saved',npc:'hal',mini:'defend',text:'Guard Hal’s pumpkin patch from four little waves of slimes (talk to Hal to start)',ready:[['hal',`Here they come! Don't let them eat the big one. Her name is Gertrude.`]]},
       {t:'talk',npc:'hal',text:'Tell Hal how the pumpkins did',lines:[['hal',`You saved them! Well, most of them. Here, a little something from the farm.`]],reward:{coins:30,xp:70,bless:1}}
     ]},
   race:{title:'The Frostpine Dash',giver:'elka',min:'wren',

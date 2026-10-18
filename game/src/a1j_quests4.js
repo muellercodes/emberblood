@@ -3,7 +3,7 @@
 // below keeps the quest hidden until Ash has the gift. (A native check would be one line in qAvail:
 // `if(d.ab&&!hasAbil(d.ab)) return false;`.)
 const abGate=(ab,after)=>function(){ return hasAbil(ab)?(after||null):'__needs_'+ab; };
-QDEFS.sheep={title:'Clover Goes Missing',giver:'hal',min:'lore',ab:'jump',
+QDEFS.sheep={title:'Clover Goes Missing',giver:'hal',min:'warcamp',ab:'jump',
   offer:[['hal',`Ash! My best sheep, Clover, has gone and done it again.`],['hal',`She hopped across the stepping stone on Bramble Pond, just south of town, and now she's stuck on the little island. She can jump out there. She cannot jump back. She's very proud and very silly.`],['ash',`So you want me to jump out and fetch her?`],['hal',`Can you jump? Since when can you jump?`]],
   steps:[
     {t:'flag',flag:'clover_found',text:'Jump across Bramble Pond, south of Emberhollow, and help Clover the sheep off the island',at:'lm:rc_clover'},

@@ -2,8 +2,11 @@
 // ================= side quests, errands, lore pages
 const ITEM_NAMES={letter_b:'Bertram’s letter',recipe:'Tilly’s half of the recipe',frostberry:'Frostberry',basket:'Mabel’s basket',moonlily:'Moonlily',letter_moss:'Granny Moss’s letter',oath_letter:'Crumpled Oath letter',oath_badge:'Brass scale badge',tunnel_key:'Oath tunnel key',oath_plans:'The Oath’s plans',lucky_pick:'Gorran’s lucky pick',star_iron:'Star-iron',horn:'Ulf’s horn',fish:'Fish',rod:'Fishing rod',lucky_lure:'Dell’s lucky lure',kettle:'Hob’s kettle',honey:'Honey',juniper_map:'Juniper’s map',carrot:'Carrot of Destiny',map_x1:'Nib’s treasure map',map_x2:'Smudged treasure map',map_x3:'Juniper’s secret map',lantern:'Cave lantern',treat:'Pip treat',relic:'Warden’s Mantle',errand:'Parcel'};
 const QDEFS={
-  bun:{title:'The Lantern Bun',giver:'bertram',min:'lore',give:{letter_b:1},
-    offer:[['bertram',`Ash. I need your help, and it pains me to say it.`],['bertram',`For the thousandth Lantern Day I wanted to bake Grandma Crumb's Lantern Bun. The recipe is torn in two. Half here, half with my sister Tilly at the Sleepy Salmon Inn in Brindlecross.`],['ash',`Why is it torn in two?`],['bertram',`We had an argument. About the bun. Nine years ago. Take her this letter. It says sorry. It took me nine years to write. It's very short.`]],
+  // offered from Lantern Day morning (it is the festival's own bun); before the raid Bertram says there is no rush
+  bun:{title:'The Lantern Bun',giver:'bertram',min:'lanterns',give:{letter_b:1},
+    get offer(){ const L=[['bertram',`Ash. I need your help, and it pains me to say it.`],['bertram',`For the thousandth Lantern Day I wanted to bake Grandma Crumb's Lantern Bun. The recipe is torn in two. Half here, half with my sister Tilly at the Sleepy Salmon Inn in Brindlecross.`],['ash',`Why is it torn in two?`],['bertram',`We had an argument. About the bun. Nine years ago. Take her this letter. It says sorry. It took me nine years to write. It's very short.`]];
+      if(G&&G.mode==='story'&&!reached('raid')) L.push(['bertram',S(`No rush. Light your lanterns first. Buns are patient. Bakers are not.`,`No rush. Light your lanterns first.`)]);
+      return L; },
     steps:[
       {t:'talk',npc:'tilly',text:'Bring Bertram’s letter to Tilly at the Sleepy Salmon Inn in Brindlecross',take:{letter_b:1},give:{recipe:1},lines:[['tilly',`A letter from Bertram? "Sorry about the bun. B." Nine years for five words.`],['tilly',`...Fine. Here's my half of the recipe. Tell him he still needs frostberries. They only grow near Hollis Farm up in the Frostpine, and they're cold enough to freeze your tongue.`]]},
       {t:'item',item:'frostberry',n:3,text:'Pick 3 frostberries near Hollis Farm in the Frostpine Highlands',at:'poi:farm'},
@@ -11,7 +14,7 @@ const QDEFS={
       {t:'flag',flag:'oven_lit',text:'Gently light Bertram’s oven with your fire breath',at:'npc:bertram'},
       {t:'talk',npc:'bertram',text:'See how the Lantern Bun turned out',lines:[['bertram',`It's... perfect. The Lantern Bun. Go on, have the first one.`],['narr',`You eat the Lantern Bun. It's warm all the way down to the tip of your tail.`],['bertram',`Maybe I'll take one to Tilly. After nine years. Maybe.`]],reward:{coins:40,maxhp:15,bless:1}}
     ]},
-  hollow:{title:'Lost in the Hollow',giver:'rook',min:'lore',
+  hollow:{title:'Lost in the Hollow',giver:'rook',min:'warcamp',
     offer:[['rook',`Ash! My sister Juniper went to map Whisperwood Hollow three days ago. She said she'd be back by supper.`],['rook',`Juniper is NEVER late for supper. The cave is west of the war camp road, deep in the woods. Please find her.`]],
     steps:[
       {t:'flag',flag:'juniper_found',text:'Find Juniper inside Whisperwood Hollow, west of the war camp road',at:'cave:whisper'},

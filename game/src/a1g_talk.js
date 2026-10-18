@@ -77,7 +77,9 @@ const TALK={
     about:{dell:S(`Dell thinks fish are friendly. Fish are rude. One jumped out of the lake once and took the sandwich right out of my hand.`,`Fish are rude. One stole my sandwich!`),tamsin:S(`Tamsin at the Smoky Kettle is the best bard in the valley. She can make a lute cry. Mine just sounds like a cat.`,`Tamsin is the best bard. Her lute sounds great. Mine does not.`)},
     rumor:{t:S(`If you play one of my old songs near the Warden statues, they hum along. I've only heard it once. Maybe I dreamed it.`,`Hum one of my old songs by a Warden statue. It hums along!`)},
     loves:['honey'],hates:['fish'],
-    deep:S(`In the raid a kobold ran off with my song folder and dropped the sheets all down the road. Three songs, and I can't remember how they go. It's like losing three friends who were also noises.`,`A kobold took my songs in the raid. I miss them.`),
+    // (before the raid there are no lost songs yet: his Lost Songs quest opens after it)
+    get deep(){ return reached('lore')?S(`In the raid a kobold ran off with my song folder and dropped the sheets all down the road. Three songs, and I can't remember how they go. It's like losing three friends who were also noises.`,`A kobold took my songs in the raid. I miss them.`)
+      :S(`Tonight I play the Lantern Waltz on the green. I wrote it. It is the best thing I ever wrote, and I keep it in my song folder.`,`Tonight I play my Lantern Waltz. It is my best song.`); },
     secret:{t:`Here, a lullaby I wrote. Hum it to yourself and you'll rest easier at shrines.`,reward:{regen:true}},
     best:{t:`I finished the song about you! It rhymes "Ash" with "flash" now. And "dash." And one "moustache," for the Mayor.`,reward:{coins:80}},
     chat:{q:`Do you want to hear my newest song? It's about cheese.`,opts:[
