@@ -378,11 +378,11 @@ const N4F_ALLYK={
     if(a.slash>0) a.slash-=dt; },
   vesper(a,dt,e,k){ const p=player; n4fAllyWalk(a,dt,p.x+Math.cos(a.t*0.5)*90,p.y+Math.sin(a.t*0.5)*60,320); a.state=Math.hypot(a.dx,a.dy)>20?'chase':'chase';
     if(k==='n_echo2'&&a.cd<=0){ a.cd=6; const L=G.enemies.filter(q=>!q.dead&&q.type==='n_echo_vclone'); if(L.length){ const c=pick(L); a.throwT=0.35; later(0.3,()=>{ if(!c.dead) n4fVClonePop(c,S('Vesper popped a fake!','Vesper got one!')); }); }
-      if(!e.dead){ e.n4mark=2.2; taunt('c_vesper',pick([S('That one! The one that does not flicker!','That one is real!'),S('Elbow out. That is her. That is ME.','That one! Elbow out!')])); } } }
+      if(!e.dead){ e.n4mark=2.2; taunt('c_vesper',pick([S('That one! The one that does not flicker!','That one is real!'),S("That one, with her elbow out! That's me!",'That one! Elbow out!')])); } } }
   ,
   glaciar(a,dt,e,k){ a.orb+=dt*0.35; const C=G.bf&&G.bf.A?{x:G.bf.A.cx,y:G.bf.A.cy,R:arenaR(G.bf.A)}:{x:e.x,y:e.y,R:400}; const tx=C.x+Math.cos(a.orb)*(C.R+120), ty=C.y+Math.sin(a.orb)*(C.R+60)*0.8;
     a.dx=(tx-a.x)*1.5; a.dy=(ty-a.y)*1.5; a.x+=a.dx*dt; a.y+=a.dy*dt; a.face=Math.atan2(a.dy,a.dx); a.z=150; a.state='chase'; a.mode='air';
-    if(k==='n_echo3'&&a.cd<=0){ a.cd=15; N4F.calmT=5; taunt('f_glaciar',pick([S('Enough snow, me! Calm down!','Calm down, me!'),S('Hush, you dreary thing.','Hush, gloomy me.')])); n4fEv('glacalm'); } },
+    if(k==='n_echo3'&&a.cd<=0){ a.cd=15; N4F.calmT=5; taunt('f_glaciar',pick([S('Enough snow, me! Calm down!','Calm down, me!'),S('Oh, stop sulking, you dreary thing.','Stop sulking, gloomy me.')])); n4fEv('glacalm'); } },
   hush(a,dt,e,k){ a.orb+=dt*0.4; const C=G.bf&&G.bf.A?{x:G.bf.A.cx,y:G.bf.A.cy,R:arenaR(G.bf.A)}:{x:e.x,y:e.y,R:300};
     let tx=C.x+Math.cos(a.orb)*C.R*0.75, ty=C.y+Math.sin(a.orb)*C.R*0.5; if(a.perch){ tx=a.perch.x; ty=a.perch.y; }
     a.x=lerp(a.x,tx,Math.min(1,dt*1.2)); a.y=lerp(a.y,ty,Math.min(1,dt*1.2)); a.face=angTo(a.x,a.y,e.x,e.y); a.state=k==='n_echo4'?'fold':'chase'; a.z=lerp(a.z,a.perch?60:(k==='n_echo4'?50:110),Math.min(1,dt*2)); },
@@ -969,7 +969,7 @@ function n4nTransTick(e,dt){ e.transT-=dt; e.dx=e.dy=0; e.invuln=true;
 function n4nPulled(e,A){ if(e.nPhase!==1||e.win>0||e.trans) return; A.snag=false; e.pulls=(e.pulls||0)+1; for(const r of e.p2rings) if(r.A===A) r.done=true; n4fEv('pull');
   shake(8); SFX.play('boom'); emit(A.x,A.y-40,20,{col:'230,235,255',smin:60,smax:200,lmin:.3,lmax:.6,zmin:1.5,zmax:3});
   const need=n4nPullNeed(e);
-  if(e.pulls>=need){ e.pulls=0; for(const B of N4N.anchors){ B.snag=false; B.heat=0; } for(const r of e.p2rings) r.done=true; e.alt=e.z=0; n4nGround(e,N4N.C.x,N4N.C.y-20,['You tied me DOWN? How rude!','You tied me down? Rude!']); }
+  if(e.pulls>=need){ e.pulls=0; for(const B of N4N.anchors){ B.snag=false; B.heat=0; } for(const r of e.p2rings) r.done=true; e.alt=e.z=0; n4nGround(e,N4N.C.x,N4N.C.y-20,["Tied down like a kite? That isn't kind, little ember.",'You tied me down? Not kind!']); }
   else ftext(A.x,A.y-60,S('PULL! One more!','One more!'),'#ffe066',16); }
 function n4nPullNeed(e){ let n=byDiff(1,2,2); if(n4fAllyHere('vesper')&&n>1) n--; return n; }
 function n4nSnagNeed(){ return byDiff(2,3,4); }
@@ -1021,9 +1021,9 @@ function n4nAI(e,dt,p){
   if(e.nPhase===1) n4nP1(e,dt,p); else if(e.nPhase===2) n4nP2(e,dt,p); else if(e.nPhase===3) n4nP3(e,dt,p); else n4nP4(e,dt,p);
 }
 const N4N_TAUNT={
-  1:[S('Shh, shh.','Shh, shh.'),S('Why fight? Sleep is so soft.','Why fight? Sleep is soft.'),S("There's nowhere to hide from the moon, dear. Oh. Except behind that pillar. Clever.",'You cannot hide. Oh. Except behind that pillar.')],
+  1:[S('Shh, shh.','Shh, shh.'),S('Why fight? Sleep is so soft.','Why fight? Sleep is soft.'),S("Nowhere to hide from the moonlight, dear. Except the pillars. I should have made fewer pillars.",'You cannot hide. Except behind a pillar.')],
   2:[S("Under the dark it's quiet. Come down. Stay.",'Under the dark it is quiet. Stay.')],
-  3:[S('Mmm. Crunchy.','Mmm. Crunchy.'),S('The moon is MINE. I have eaten nearly all of it.','The moon is MINE.')],
+  3:[S('Mmm. Crunchy.','Mmm. Crunchy.'),S("The moon is mine. There's hardly any left now.",'The moon is mine.')],
   4:[S("Stop! You're letting it all OUT!",'Stop! You are letting it out!'),S("It's leaking! My moon is LEAKING!",'My moon is leaking!'),S('Everyone leaves. EVERYONE LEAVES.','Everyone leaves!')]};
 // after a window: she tears free (phase 1), sinks back under the ink (2), or flies off to the next piece (3)
 function n4nRise(e){ e.state='rise'; e.rise=e.nPhase===2?0.6:1.0; e.cd=byDiff(2.2,1.6,1.2); if(e.nPhase===1){ for(const A of N4N.anchors){ A.snag=false; A.heat=0; } for(const r of e.p2rings) r.done=true; e.pulls=0; n4nSay(e,'Ow. My poor wings. Again, then.','Ow. Again, then.',4); }
@@ -1133,7 +1133,7 @@ function n4nJawsTick(e,A,dt,p){ if(A.t<A.dur){ e.x=lerp(e.x,A.x,Math.min(1,dt*3)
 function n4nOnPound(info){ const e=N4N.e; if(!e||e.dead||G.boss!==e) return;
   if(e.nPhase===2&&e.restP){ const P=e.restP; if(dist(info.x,info.y,P.x,P.y)<P.r+30){ P.crack=1; P.glow=0; e.restP=null; const a=angTo(N4N.C.x,N4N.C.y,P.x,P.y);
       for(let i=0;i<30;i++) emit(P.x+rand(-60,60),P.y+rand(-40,40),1,{col:'235,240,255',ang:-Math.PI/2,spread:0.3,smin:200,smax:500,lmin:.4,lmax:.8,zmin:2,zmax:4});
-      n4nGround(e,P.x+Math.cos(a)*40,P.y+Math.sin(a)*30,['Ow! That was the MOON! You hit me with the MOON!','Ow! You hit me with the MOON!']); } } }
+      n4nGround(e,P.x+Math.cos(a)*40,P.y+Math.sin(a)*30,['Ow. That was a piece of my own moon you dropped on me.','Ow! You hit me with my own moon!']); } } }
 if(typeof p3OnPound==='function') p3OnPound(n4nOnPound);
 // ===== phase 3: the Moon's Ring (calm air, two wind rings, the fragments)
 function n4nStreams(on){ if(typeof WIND==='undefined'||typeof P3==='undefined') return; const C=N4N.C;
@@ -1154,7 +1154,7 @@ function n4nP3(e,dt,p){
     if(Math.random()<dt*3) ftext(f.x+rand(-30,30),f.y-150,S('CRUNCH','CRUNCH'),'#e8e8ff',13);
     // Moonfire in her face: CHOKED
     const F=n4nFace(e); if(n4fMoonAt(F.x,F.y,42)){ e.choke+=dt; if(Math.random()<dt*25) emit(F.x,F.y-60,1,{col:'214,226,255',smin:20,smax:80,lmin:.3,lmax:.6,zmin:1.4,zmax:2.6}); } else e.choke=Math.max(0,e.choke-dt*0.5);
-    if(e.choke>=byDiff(0.6,1.0,1.3)){ e.choke=0; e.perch=null; n4fEv('choke'); taunt('nyxara',S("*cough* That's SPICY!",'*cough* SPICY!')); const a=angTo(C.x,C.y,e.x,e.y); e.tumble={t:0,x0:e.x,y0:e.y,z0:e.z,x1:C.x+Math.cos(a)*440,y1:C.y+Math.sin(a)*440}; ftext(e.x,e.y-140,S('CHOKED!','CHOKED!'),'#ffe066',24); shake(8); return; }
+    if(e.choke>=byDiff(0.6,1.0,1.3)){ e.choke=0; e.perch=null; n4fEv('choke'); taunt('nyxara',S("*cough* Hot! Who puts fire in a moon?",'*cough* Hot!')); const a=angTo(C.x,C.y,e.x,e.y); e.tumble={t:0,x0:e.x,y0:e.y,z0:e.z,x1:C.x+Math.cos(a)*440,y1:C.y+Math.sin(a)*440}; ftext(e.x,e.y-140,S('CHOKED!','CHOKED!'),'#ffe066',24); shake(8); return; }
     if(f.eat>=byDiff(6,5,4)){ f.gone=true; f.growT=0; f.eat=0; e.perch=null; SFX.play('pop'); emit(f.x,f.y-90,24,{col:'230,235,255',smin:40,smax:160,lmin:.3,lmax:.7,zmin:1.4,zmax:3}); n4nSay(e,'Mmm. Crunchy.','Mmm. Crunchy.',4); e.cd=0.6; }
     return; }
   // flying to the next piece (Pip and Hush show which one), with attacks on the way

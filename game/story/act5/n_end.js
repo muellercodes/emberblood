@@ -50,9 +50,9 @@ chapter({
       ['pip', 'Mip!'],
       { do: ['emit n4fx:home_bound'] },
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
-        ['f_glaciar', 'Climb on, dumplings. All of you. Yes, even the goat. ...Especially not the goat. Fine. The goat. Slowly, mind.', 'Climb on, everyone. Even the goat.'] ],
+        ['f_glaciar', 'Climb on, dumplings, all of you. Not the goat. ...Oh, very well, the goat too. Hold on tight. I fly slowly, but I always get there.', 'Climb on, everyone. Even the goat.'] ],
         else: [
-        ['dell', "All aboard the Soggy Biscuit! Mind the fish. There aren't any fish. Mind them anyway.", "All aboard! Let's go home."] ] },
+        ['dell', "(far away, across the moonfire bridge, a steam whistle) All aboard the Soggy Biscuit Three! Everybody home for breakfast!", "All aboard! Let's go home."] ] },
     ],
 
     // ---- the epilogue book (the act file's book: list; x4_story's storybook plays the pages in order). Each page
@@ -61,17 +61,17 @@ chapter({
       { do: ['emit n4fx:book_open', 'emit n4fx:book:green', 'set n_epi'] },
       ['narr', 'This is what happened after the Long Night, to everyone in this story.', 'This is what happened next, to everyone.'],
       { if: 'choice fennick=forgive', then: [
-        ['narr', 'Fennick Wick kept every lantern in Emberhollow burning all through the dark, so nobody had to be scared. Now people call him the light-man. He cried a bit.', 'Fennick kept every lantern lit. Now he is the light-man.'] ],
+        ['narr', 'Fennick Wick kept every lantern in Emberhollow burning all through the dark, so nobody had to be scared. Now people call him the light-man, and he goes pink every time.', 'Fennick kept every lantern lit. Now he is the light-man.'] ],
         else: [{ if: 'choice fennick=jail', then: [
-        ['narr', 'During the Long Night the Watch House was the brightest place in Brindlecross, because Fennick polished every lamp in it. Captain Osric gave him a medal. It was a lamp.', 'Fennick polished every lamp. He got a medal. It was a lamp.'] ] }] },
+        ['narr', 'During the Long Night the Watch House was the brightest place in Brindlecross, because Fennick polished every lamp in it. Captain Osric gave him a medal shaped like a lamp.', 'Fennick polished every lamp. He got a lamp medal.'] ] }] },
       { if: 'choice morrow=free', then: [
-        ['narr', "Morrow's pumpkins grew so big in the new moonlight that he won a ribbon. The ribbon was not on fire. He framed it.", 'Morrow grew giant pumpkins and won a ribbon.'] ],
+        ['narr', "Morrow's pumpkins grew so big in the new moonlight that he won first prize at the fair, and he framed the ribbon over his door.", 'Morrow grew giant pumpkins and won a ribbon.'] ],
         else: [{ if: 'choice morrow=jail', then: [
-        ['narr', 'Morrow wrote a book in the Watch House library: "Never Trust a Voice in Your Dreams." It sold very well.', 'Morrow wrote a book: "Never Trust a Voice in Your Dreams."'] ] }] },
+        ['narr', 'Morrow wrote a book in the Watch House library: "Never Trust a Voice in Your Dreams." Everyone in Brindlecross has read it.', 'Morrow wrote a book: "Never Trust a Voice in Your Dreams."'] ] }] },
       { if: 'choice ending=lantern', then: [
         ['narr', 'Grandpa told all of Emberhollow that he had saved the moon single-handed. Duchess bit him. Mom made them both wipe their feet.', 'Grandpa said he saved the moon. Duchess bit him.'] ],
         else: [{ if: 'choice ending=warden', then: [
-        ['narr', 'Ash climbed Cinder Mountain to tell Grandpa the whole story. He pretended to be asleep. He was listening to every word.', 'Ash told sleeping Grandpa the whole story. He listened.'] ],
+        ['narr', 'Ash climbed Cinder Mountain to tell Grandpa the whole story. He pretended to be asleep, but one ear stayed up the whole time.', 'Ash told sleeping Grandpa the whole story. He listened.'] ],
         else: [{ if: 'choice ending=heir', then: [
         ['narr', 'Tiny Grandpa told everyone at the bakery that he had saved the moon himself, from his birdcage. Bertram raised the price of admission.', 'Tiny Grandpa said he saved the moon from his birdcage.'] ],
         else: [
@@ -84,13 +84,13 @@ chapter({
         else: [{ if: 'choice greymane=home', then: [
         ['narr', "Greymane's pack howled at the moon every night it came back. Farmer Hollis said it was the happiest howling he'd ever heard.", "Greymane's wolves howl happily at the moon."] ] }] },
       { if: 'choice cinder=ally', then: [
-        ['narr', 'Sir Cindervane finally, finally sat down. He said "good." Then he said "no more echoes, please." Then he rested.', 'Sir Cindervane finally sat down and rested.'] ],
+        ['narr', 'Sir Cindervane finally sat down, said "No more echoes, please," and rested.', 'Sir Cindervane finally sat down and rested.'] ],
         else: [{ if: 'flag dr_knight=spark', then: [
-        ['narr', "The little spark in Sir Cindervane's gauntlet at the Obsidian Gate never went out. Not even in the Long Night.", "The spark in Sir Cindervane's glove never went out.", { ref: 'obsidian_gate' }] ],
+        ['narr', "The little spark in Sir Cindervane's gauntlet at the Obsidian Gate never went out, not even in the Long Night.", "The spark in Sir Cindervane's glove never went out.", { ref: 'obsidian_gate' }] ],
         else: [{ if: 'flag dr_knight=joke', then: [
         ['narr', 'Visitors to the Obsidian Gate say you can still hear a knight chuckling under his helmet. He laughed all through the Long Night.', 'At the Obsidian Gate, a knight is still laughing.', { ref: 'obsidian_gate' }] ],
         else: [
-        ['narr', "The red flower on Sir Cindervane's helmet at the Obsidian Gate never wilted. Not even in the Long Night.", "The flower on Sir Cindervane's helmet never wilted.", { ref: 'obsidian_gate' }] ] }] }] },
+        ['narr', "The red flower on Sir Cindervane's helmet at the Obsidian Gate never wilted, not even in the Long Night.", "The flower on Sir Cindervane's helmet never wilted.", { ref: 'obsidian_gate' }] ] }] }] },
       { if: 'flag tk_come=yes', then: [
         ['narr', "Tikka hung her bigger spoon over the oven at home. Tock still says it's a ladle.", 'Tikka hung her big spoon over the oven.'] ],
         else: [{ if: 'flag tk_come=home', then: [
@@ -100,23 +100,23 @@ chapter({
     ],
     n_book_coast: [
       { do: ['emit n4fx:book:clocks'] },
-      ['narr', 'Every clock in Gearhaven started ticking again at the very same second. The tinkers called it a malfunction. It was a celebration.', 'Every clock in Gearhaven ticked again at once.'],
+      ['narr', 'Every clock in Gearhaven started ticking again at the very same second, and the whole city came out in its nightclothes to listen.', 'Every clock in Gearhaven ticked again at once.'],
       { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] }, then: [
         { if: 'choice n_end=embermoon', then: [
           ['narr', 'Vesper hung her moth mask in Mom\'s forge, next to the spot where the Heart used to sit. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match.', 'Vesper hung up her mask in the forge. She is still family.'] ],
           else: [
           ['narr', 'Vesper hung her moth mask in Mom\'s forge, right next to the Heart. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match.', 'Vesper hung up her mask by the Heart. She is still family.'] ] },
-        ['narr', 'And every Sunday she goes home to Saltmarsh for tea with Gran. Gran makes it far too strong. Vesper drinks it anyway.', 'Every Sunday, Vesper has tea with Gran.', { if: { any: ['flag n5_tea', 'flag n5_vletter'] } }] ],
+        ['narr', 'And every Sunday she goes home to Saltmarsh for tea with Gran, who makes it far too strong. Vesper drinks every drop.', 'Every Sunday, Vesper has tea with Gran.', { if: { any: ['flag n5_tea', 'flag n5_vletter'] } }] ],
         else: [
         ['narr', 'Nobody in Gearhaven saw the Moth Mask again. But every Lantern Day, a small lantern appeared on the forge doorstep in Emberhollow, with no note. Mom always lit it.', 'Every Lantern Day, a lantern with no note appears at the forge.'] ] },
     ],
     n_book_north: [
       { do: ['emit n4fx:book:hearth'] },
-      ['narr', 'The Great Hearth of Hearthold burned so high that the whole town took off their scarves for the first time in a hundred years. Then they put them back on. It is still Frostreach.', 'The Great Hearth burned so high that everyone took off their scarves.'],
+      ['narr', 'The Great Hearth of Hearthold burned so high that the whole town took off their scarves for the first time in a hundred years. For about a minute.', 'The Great Hearth burned so high that everyone took off their scarves.'],
       { if: 'flag n5_glaciar !choice f_glaciar=free', then: [
-        ['narr', 'Glaciar never stopped telling people that a small dragon climbed all of Mount Dread just to sing to her. Every Lantern Day she brings ice cream for everybody. Far too much.', 'Glaciar tells everyone a small dragon sang to her. She brings ice cream.'] ],
+        ['narr', 'Glaciar never stopped telling people that a small dragon came all the way back to Mount Dread just to sing to her. Every Lantern Day she brings far too much ice cream for everybody.', 'Glaciar tells everyone a small dragon sang to her. She brings ice cream.'] ],
         else: [{ if: 'choice f_glaciar=free', then: [
-        ['narr', 'Grand-aunt Glaciar (thirteen greats) came to Lantern Day and brought ice cream for everybody. She brought too much. Ash said all thirteen greats, twice, and she pretended not to love it.', 'Glaciar came to Lantern Day with ice cream. Ash said all the greats, twice.'] ],
+        ['narr', 'Grand-aunt Glaciar (thirteen greats) came to Lantern Day with far too much ice cream. Ash said all thirteen greats, twice, and she pretended not to love it.', 'Glaciar came to Lantern Day with ice cream. Ash said all the greats, twice.'] ],
         else: [
         ['narr', "On Mount Dread, Glaciar slept, and for the first time in a long while her dreams were warm. Every Lantern Day somebody climbed up and sang her a verse of the Snow Mother's Song, just in case.", 'On Mount Dread, Glaciar slept. Her dreams were warm.'] ] }] },
     ],
@@ -124,12 +124,12 @@ chapter({
       { do: ['emit n4fx:book:observatory'] },
       { if: { any: ['flag n5_hush', 'choice m_hush=free'] }, then: [
         { if: 'choice n_end=dawn', then: [
-          ['narr', "Hush stayed in Moonfall and became the Eclipse Observatory's first moth astronomer. She shushes anyone who is loud near the telescopes. Professor Quill says she is the best colleague she has ever had.", 'Hush works at the Observatory. She shushes loud people.'] ],
+          ['narr', "Hush stayed in Moonfall and became the Eclipse Observatory's first moth astronomer. She shushes anyone who is loud near the telescopes, and Professor Quill says she is the best colleague she has ever had.", 'Hush works at the Observatory. She shushes loud people.'] ],
           else: [
-          ['narr', 'Hush flew up to the moon to sit beside her mother. The two moths watch the world together, and neither of them says anything, and it is perfect.', 'Hush flew up to sit with her mother. It is perfect.'] ] } ],
+          ['narr', 'Hush flew up to the moon to sit beside her mother. The two moths watch the world together without saying a word, which suits them both.', 'Hush flew up to sit with her mother. They watch the world together.'] ] } ],
         else: [
         ['narr', "Some nights in the Glass Desert, little white moths gather round travellers' lanterns. They never bite. They only want to be warm.", 'In the desert, little white moths sit by lanterns to be warm.'] ] },
-      ['narr', 'Professor Quill measured the moon every night for a whole year. It came back every single time. She wrote that down too.', 'Quill measured the moon all year. It always came back.'],
+      ['narr', 'Professor Quill measured the moon every night for a whole year. It came back every single time, and she has the notebooks to prove it.', 'Quill measured the moon all year. It always came back.'],
     ],
     // the moon: the ending's picture, the Act I ending's line (moved here from the ending), Pip, Wren's book
     n_book_moon: [
@@ -143,10 +143,10 @@ chapter({
       { if: 'choice ending=lantern', then: [
         { if: 'choice n_end=moth', then: [['grandpa', 'Hmph. I wanted to say "mine" about that moon. I\'m glad I didn\'t.', 'I wanted to say "mine". I am glad I didn\'t.']],
           else: [{ if: 'choice n_end=embermoon', then: [['grandpa', "Now THAT is a proper moon. Orange. Like a dragon's eye. Like... hers.", 'Now that is a good moon. Orange, like Ember.']],
-          else: [['grandpa', 'A mended moon. Like a mended sock. Very practical. Ember would have liked it.', 'A fixed moon, like a fixed sock. Ember would like it.']] }] } ],
+          else: [['grandpa', 'A mended moon, like a mended sock. Ember would have liked that.', 'A fixed moon, like a fixed sock. Ember would like it.']] }] } ],
         else: [{ if: 'choice ending=warden', then: [
         { if: 'choice n_end=moth', then: [['iska', 'Light one more than you need. You did, Warden. You lit one for her.', 'You lit one more lantern. One for her.']],
-          else: [{ if: 'choice n_end=embermoon', then: [['tove', 'A w-w-warm moon. FINALLY. I would like that noted.', 'A warm moon! Finally!']],
+          else: [{ if: 'choice n_end=embermoon', then: [['tove', "A warm moon! That's the best kind of moon there is.", 'A warm moon! The best kind!']],
           else: [['bram', "HA! Morning! I'd forgotten what it looked like!", 'Ha! Morning! I forgot what it looks like!']] }] } ],
         else: [{ if: 'choice ending=heir', then: [
         { if: 'choice n_end=moth', then: [['grandpa', '(from his birdcage) A moth? On MY moon? ...Fine. She can stay.', 'A moth on MY moon? Fine. She can stay.']],
@@ -169,7 +169,7 @@ chapter({
         ['narr', 'There were four lantern posts on the green again, for the first time in a thousand years. The fourth one is for whoever is out in the dark.', 'There were four lantern posts. One for whoever is out in the dark.'] ],
         else: [{ if: { any: ['solved n5_who_follows', 'quest duchess done flag c_duchess flag f_duchess flag m_duchess flag n_duchess'] }, then: [
         ['narr', 'Duchess was there too. Nobody knows how. Farmer Hollis says she takes the bus. There is no bus.', 'Duchess was there too. Nobody knows how.'] ] }] },
-      ['narr', 'Ash lit the first lantern. And then one more than needed. Just in case.', 'Ash lit the first lantern. And one more, just in case.', { do: ['emit n4fx:book_lit'] }],
+      ['narr', 'Ash lit the first lantern, and then one more than he needed, just in case.', 'Ash lit the first lantern. And one more, just in case.', { do: ['emit n4fx:book_lit'] }],
       ['narr', 'And whatever the moon looked like, it always, always came back.', 'And the moon always, always came back.'],
     ],
 
@@ -180,13 +180,13 @@ chapter({
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
         ['narr', 'Behind the forge, something very big and very cold is snoring.', 'Behind the forge, a big cold dragon snores.'] ] },
       { place: ['maren', 'player', [62, 8]] },   // (Mom has come out to find Ash, for this scene)
-      ['maren', 'There you are. You slept the whole way home. It is Lantern Day, and you are late.', 'You slept all the way home. It is Lantern Day!'],
+      ['maren', "There you are. You slept the whole way home. It's Lantern Day, and you're late.", 'You slept all the way home. It is Lantern Day!'],
       ['narr', 'Round the green the lanterns are lit. All four of them.', 'The lanterns are lit. All four!', { if: 'solved n5_fourth_lantern', ref: 'n5_green_post' }],
       ['ash', 'Mom? ...The moon came back.', 'Mom? The moon came back.'],
       ['maren', 'It always does. Now go and light one more than you need.', 'It always does. Go light one more.'],
     ],
     n5_green_post_look: [
-      ['narr', 'A fourth lantern post, new wood, with a little lantern that never quite goes out. On a tag, in careful letters: FOR WHOEVER IS OUT IN THE DARK.', 'A fourth post. Its tag says: FOR WHOEVER IS OUT IN THE DARK.'],
+      ['narr', 'A fourth lantern post of new wood, with a little lantern that never quite goes out. On a tag, in careful letters: FOR WHOEVER IS OUT IN THE DARK.', 'A fourth post. Its tag says: FOR WHOEVER IS OUT IN THE DARK.'],
       { if: 'choice n_end=moth', then: [
         ['narr', 'A tiny grey moth is sitting on top of it, warming her wings. Visiting.', 'A tiny grey moth sits on top. Visiting.'] ] },
     ],

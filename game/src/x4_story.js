@@ -201,7 +201,7 @@ n4sDef('n_green',()=>[
   xl('ash',`She built a mountain out of the moon's memories. My memories. Okay. That's the creepiest thing anyone has ever done.`,`She made a mountain from my memories. So creepy.`),
   xl('ash',`Three lanterns. A gentle breath, Ash. Gentle.`,`Three lanterns. Breathe gently.`)
 ]);
-n4sBubDef('lanterns','ash',`And not a single bakery was harmed. Mostly because there isn't one.`,`Not one bakery got burned!`);
+n4sBubDef('lanterns','ash',`Three lanterns, and not one bakery on fire. Mom would be proud.`,`Not one bakery burned!`);
 n4sDef('n_gate_open',()=>[
   n4sDo(()=>{ N4ST.cam={x:4500,y:89400,k:0.5}; }),
   xl('narr',`The third lantern catches. For one moment the whole green glows warm, like home on Lantern Day.`,`The lanterns glow. It feels like home for a moment.`),
@@ -235,7 +235,7 @@ n4sDef('n_trials_done',()=>[
   xl('ember',`Memories can't hurt you. ...These ones can, a bit. Be careful, little ember.`,`Memories can't hurt you. Well. These can. Be careful!`)
 ]);
 n4sBubDef('raid','ash',`Kobolds in the village. Again. Even the shadows have no manners.`,`Shadow raiders! Again!`);
-n4sBubDef('bed','ash',`My bed. She even copied my bed. ...It's not comfy. Shadow beds are terrible.`,`My bed! It is not comfy at all.`);
+n4sBubDef('bed','ash',`She even copied my bed. ...It's made of glass. I'm never complaining about my lumpy pillow again.`,`My bed! It is glass. Not comfy!`);
 n4sDef('n_helmet',()=>[
   xl('narr',`You pick up the helmet. It's warm. Inside is one small spark that never went out.`,`The helmet is warm. A spark is inside.`),
   n4sDo(()=>{ if(!(G.items.n_spark>0)) giveItems({n_spark:1}); })
@@ -255,7 +255,7 @@ n4sDef('n_clocks_in',()=>[
 ]);
 n4sBubDef('chime','ash',`Lantern Time. Somebody has to keep the right time around here.`,`Lantern Time! That's the right time.`);
 n4sBubDef('gallery','ash',`The post is hiding in the curtain. Dash in, then grab it.`,`Dash into the curtain. Then grab the post.`);
-n4sBubDef('nyx','ash',`Nyx? Her name was Nyx?`,`Her name was Nyx?`);
+n4sBubDef('nyx','ash',`Nyx. Ember called her Nyx.`,`Ember called her Nyx.`);
 n4sDef('n_vesper_join',()=>[
   n4sDo(()=>n4sAllyArrive('vesper')),
   xl('narr',`Someone drops out of the dark on a silk line and lands beside you without a sound. A moth mask. A crooked grin.`,`Someone drops down on a silk rope. A moth mask. A grin.`),
@@ -386,12 +386,12 @@ n4sDef('n_trans23',()=>[
 ]);
 // her taunts during the fight (8.3, 8.5), and the friends' big moments in phase 4 (taunt lines, once each)
 const N4S_TAUNT={
-  p1:[S(`Shh, shh.`,`Shh, shh.`),S(`Why fight? Sleep is so soft.`,`Why fight? Sleep is so soft.`),S(`There's nowhere to hide from the moon, dear. Oh. Except behind that pillar. Clever.`,`You can't hide from the moon. Oh. Except behind that pillar.`)],
-  pulled:[S(`You tied me DOWN? How rude!`,`You tied me down? Rude!`)],
+  p1:[S(`Shh, shh.`,`Shh, shh.`),S(`Why fight? Sleep is so soft.`,`Why fight? Sleep is so soft.`),S(`Nowhere to hide from the moonlight, dear. Except the pillars. I should have made fewer pillars.`,`You cannot hide. Except behind a pillar.`)],
+  pulled:[S(`Tied down like a kite? That isn't kind, little ember.`,`You tied me down? Not kind!`)],
   p2:[S(`Under the dark it's quiet. Come down. Stay.`,`Under the dark it is quiet. Stay.`)],
-  pounded:[S(`Ow! That was the MOON! You hit me with the MOON!`,`Ow! You hit me with the MOON!`)],
-  p3:[S(`Mmm. Crunchy.`,`Mmm. Crunchy.`),S(`The moon is MINE. I have eaten nearly all of it.`,`The moon is MINE.`)],
-  choked:[S(`*cough* That's SPICY!`,`*cough* SPICY!`)],
+  pounded:[S(`Ow. That was a piece of my own moon you dropped on me.`,`Ow! You hit me with my own moon!`)],
+  p3:[S(`Mmm. Crunchy.`,`Mmm. Crunchy.`),S(`The moon is mine. There's hardly any left now.`,`The moon is mine.`)],
+  choked:[S(`*cough* Hot! Who puts fire in a moon?`,`*cough* Hot!`)],
   p4:[S(`Stop! You're letting it all OUT!`,`Stop! It is all coming out!`),S(`It's leaking! My moon is LEAKING!`,`My moon is leaking!`),S(`Everyone leaves. EVERYONE LEAVES.`,`Everyone leaves. EVERYONE LEAVES.`)]
 };
 const N4S_ALLYBEAT={
@@ -623,7 +623,7 @@ const N4S_ENDINGS={
     ...n4sIfL(e==='warden',xl('tove',`A w-w-warm moon. FINALLY. I would like that noted.`,`A warm moon! Finally!`)),
     ...n4sIfL(e==='hero',xl('ember',`My Heart, up in the sky. Oh, Ash. Now everyone can see it.`,`My Heart in the sky! Now everyone can see it.`)),
     ...n4sIfL(n4sVes,xl('c_vesper',`You threw a priceless magic heart at the moon. Cousin, I have never been prouder of anyone.`,`You threw a magic heart at the moon! I am so proud.`))]; }},
-  moth:{title:S('The Moth and the Moon','The Moth and the Moon'),n:3,msg:S('You gave back the moon, and gave a lonely moth a lantern.','You gave back the moon. And a lonely moth got a lantern.'),lines:()=>{
+  moth:{title:S('The Moth and the Moon','The Moth and the Moon'),n:3,msg:S('You called her Nyx and lit her a lantern, and the moon came home.','You lit Nyx a lantern. The moon came home.'),lines:()=>{
     const e=n4sEnd(); return [
     n4sDo(()=>n4sCutDo('lantern')),
     xl('narr',`You take out a little paper lantern. It's a bit squashed. It's been through a lot. You light it, very gently.`,`You take out a little paper lantern. You light it gently.`),
@@ -676,13 +676,13 @@ const N4S_PANE={
    xl('n_memory',`When the moon was new, it had one moth. She loved it more than anything.`,`The moon had one moth. She loved it so much.`)]},
  2:{title:S(`Every Morning`,`Every Morning`),at:[5765,81600],lines:()=>[
    xl('narr',`The moon is sinking behind the hills. The little moth is chasing it, and she can't keep up.`,`The moon goes down. The moth chases it.`),
-   xl('n_memory',`Every morning the moon went away. Every morning she waited for it to come back. It always did. She always worried it wouldn't.`,`Every morning the moon left. It always came back. She always worried.`)]},
+   xl('n_memory',`Every morning the moon went away, and every morning she waited for it to come back. It always did. She worried every time that it wouldn't.`,`Every morning the moon left. It always came back. She always worried.`)]},
  3:{title:S(`The Girl with the Lantern`,`The Girl with the Lantern`),at:[5475,82522],lines:()=>[
    xl('narr',`A hill at night. A girl with little horns holds up a paper lantern, and the little moth sits on it, warming her wings.`,`A girl with horns holds a lantern. The moth sits on it to get warm.`),
    xl('n_memory',`On the very first Lantern Day, a girl named Ember lit a lantern on a hill. The cold little moth came down to be warm. Ember called her Nyx.`,`On the first Lantern Day, Ember lit a lantern. The moth came to be warm. Ember named her Nyx.`)]},
  4:{title:S(`Someone Else Lit It`,`Someone Else Lit It`),at:[6332,85867],lines:()=>[
    xl('narr',`The same hill, many years later. Someone else is lighting the lantern. The moth looks for the girl with horns. She isn't there.`,`Years later. Someone else lights the lantern. The girl is gone.`),
-   xl('n_memory',`Ember lit a lantern every year. Then one year someone else lit it. Ember was gone, the way everyone is gone one day. Nyx did not understand.`,`One year, Ember was gone. Nyx did not understand.`)]},
+   xl('n_memory',`Ember lit a lantern every year. Then one year someone else lit it. Ember had grown old and gone, the way people do. Nyx did not understand.`,`One year, Ember was gone. Nyx did not understand.`)]},
  5:{title:S(`Thinner Every Month`,`Thinner Every Month`),at:[3659,84359],lines:()=>[
    xl('narr',`The moon is a thin silver curl. The moth is wrapped round it, holding on.`,`The moon is thin. The moth holds on to it.`),
    xl('n_memory',`Every month the moon grew thin. "It will leave me too," thought Nyx. "Everyone leaves." She grew bigger, and colder, and very, very afraid.`,`"The moon will leave me too," Nyx thought. She grew big and cold and scared.`)]},
@@ -691,7 +691,7 @@ const N4S_PANE={
    xl('n_memory',`So she took a bite. Just a small one. To keep it safe inside her, where it could never leave. Then she took another.`,`She took a bite to keep it safe inside her. Then another.`)]}
 };
 n4sDef('n_panes_all',()=>[
-  xl('ash',`She wasn't trying to be a monster. She was just scared of being alone. ...That's still not okay. But I get it.`,`She was not a monster. She was scared of being alone. That is not okay. But I get it.`)
+  xl('ash',`All six pictures, and she's scared in every one. Even when she was tiny.`,`She is scared in every picture. Even when she was tiny.`)
 ]);
 
 // 12. the grand epilogue: the Thousand-and-First Lantern Day. A storybook read over painted scenes, one per land.
@@ -973,12 +973,12 @@ function n4sPane(k,done){
 
 // ---------- 3. the stages, the journal and the act (FINALE 4)
 const N4S_HINTS={
-  n_bridge:S(`Juniper's map says the bridge lands at the Bridgefoot. Three lanterns there. You know what to do.`,`Light the three lanterns by the bridge.`),
-  n_stair:S(`First ring: it looks like home. Skim, fly, and take Ember's three flames.`,`Skim, fly, and get the three flames.`),
-  n_clocks:S(`Second ring: clocks and cliffs. Climb, grapple, dash through the dark curtains.`,`Climb, grapple, and dash.`),
-  n_rime:S(`Third ring: winter. Blaze the ice, ride the wind, pound what's cracked.`,`Melt ice. Ride wind. Pound!`),
-  n_glass:S(`Fourth ring: glass and tendrils. Dive, dig, and burn the dark with moonfire.`,`Dive, dig, and use moonfire.`),
-  n_crown:S(`The summit. Everyone who came is at the Crown Shrine. Then the Moon Road.`,`Go to the shrine. Then the Moon Road.`),
+  n_bridge:S(`Juniper's map says the bridge comes down by a green with three lanterns. Light all three.`,`Light the three lanterns by the bridge.`),
+  n_stair:S(`Pebble has flown round the first ring for me. She says it looks like home. Skim, fly, and take Ember's three flames.`,`Skim, fly, and get the three flames.`),
+  n_clocks:S(`The second ring is clocks and cliffs, Pebble says. Climb, grapple, and dash through the dark curtains.`,`Climb, grapple, and dash.`),
+  n_rime:S(`The third ring is winter. Blaze the ice, ride the wind, and pound anything cracked.`,`Melt ice. Ride wind. Pound!`),
+  n_glass:S(`The fourth ring is glass and grabbing vines. Dive, dig, and burn the dark with moonfire.`,`Dive, dig, and use moonfire.`),
+  n_crown:S(`Whoever came to help you will be waiting at the Crown Shrine. After that comes the Moon Road.`,`Go to the shrine. Then the Moon Road.`),
   n_nyxara:S(`Phase by phase. Watch her glow, and listen to Pip.`,`Watch her and listen to Pip.`)};
 const N4S_SOFAR={
   n_bridge:S(`Nyxara ate the last of the moon, and Nightfall Peak rose out of the sea at the edge of the world. Ash crossed a bridge of moonfire with the Ember Heart, whole again, warm in the satchel. Nyxara wants it. Ash is bringing it anyway.`,`Nyxara ate the moon. A black mountain rose up. Ash crossed the bridge with the Ember Heart.`),
@@ -1329,7 +1329,7 @@ function n4sAllyAct(a,dt){
     if(b&&b.type==='n_echo_vesper'){ if(a.cd<=0){ a.cd=6; const e=n4sNearFoe(b.x,b.y,600); if(e){ n4sHitFoe(e,2,'200,170,255',S('Pop!','Pop!')); } ftext(b.x,b.y-70,simplify(S('That one is real!','That one!')),'#e8d8ff',14); } }
     else if(!b&&a.cd<=0){ const e=n4sNearFoe(a.x,a.y,520,q=>/lampmoth/.test(q.type)); if(e){ a.cd=8; n4sHitFoe(e,0.6,'255,230,170',S('Lamp out!','Lamp out!')); } }
   } else if(id==='glaciar'){
-    if(b&&b.type==='n_echo_glaciar'){ if(a.cd<=0){ a.cd=15; N4ST.glaCalm=5; try{ taunt('f_glaciar',S('Enough snow, copy of me. Calm, dumpling. Five seconds.','Calm air! Go!')); }catch(e){} } }
+    if(b&&b.type==='n_echo_glaciar'){ if(a.cd<=0){ a.cd=15; N4ST.glaCalm=5; try{ taunt('f_glaciar',S('Enough snow, copy of me! There, dumpling, calm air. Quick!','Calm air! Go!')); }catch(e){} } }
     else if(!b&&a.cd<=0){ const e=n4sNearFoe(p.x,p.y,420,q=>/wolf|frost/.test(q.type)); if(e){ a.cd=4; e.stun=Math.max(e.stun||0,2); n4sHitFoe(e,0.3,'190,230,255',S('Frozen!','Frozen!')); } }
   } else if(id==='hush'){
     if(a.cd<=0){ a.cd=10; const foes=G.enemies.filter(e=>!e.dead&&!e.boss&&/mothling/.test(e.type)&&dist(e.x,e.y,p.x,p.y)<420); if(foes.length){ for(const e of foes) e.stun=Math.max(e.stun||0,2); ftext(a.x,a.y-(a.z||0)-30,simplify(S('Shhhh.','Shhh.')),'#f0ecff',14); } }
@@ -1379,7 +1379,7 @@ function n4sSimpleDragon(x,y,col,s){ s=s||1; ctx.save(); ctx.translate(x,y); ctx
       try{ if(typeof MV!=='undefined'&&MV){ MV.hover=null; MV.lx=p.x; MV.ly=p.y; } }catch(e){}
       const g=N4ST.ally.glaciar; if(g){ g.x=p.x-80; g.y=p.y-40; }
       emit(p.x,p.y,16,{col:'200,235,255',smin:40,smax:140,lmin:.3,lmax:.7,zmin:1.5,zmax:3});
-      try{ bubble(player,simplify(S('Caught you, dumpling! I only do slowly, but I am very good at catching.','Caught you, dumpling!')),{who:'Glaciar',col:'#a8e0ff'}); }catch(e){}
+      try{ bubble(player,simplify(S('Caught you, dumpling! Slow at everything except catching.','Caught you, dumpling!')),{who:'Glaciar',col:'#a8e0ff'}); }catch(e){}
       return; } } }catch(e){ console.error(e); }
   return base(p,bad); }; }
 

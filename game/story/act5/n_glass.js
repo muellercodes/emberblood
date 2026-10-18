@@ -101,31 +101,31 @@ chapter({
     n_glaciar_bye: [
       ['f_glaciar', 'This wind is too thin for old wings, dumpling. I will circle the peak and meet you at the top.', 'The wind is too thin for me. I will meet you at the top.'],
       ['ash', 'Promise?'],
-      ['f_glaciar', 'I keep my promises. So do you. Off you go.', 'I keep my promises. Go on.'],
+      ['f_glaciar', 'I keep my promises, dumpling. Off you go.', 'I keep my promises. Go on.'],
       { do: ['emit n4fx:ally_leave:glaciar'] },
     ],
     n_glass_in: [
       { cam: 'n_sh_glass', s: 1.5 },
-      ['narr', 'The last ring before the top. Glass dunes. Drowned mirrors. Shadow vines curling out of every crack, reaching for your light.', 'The last ring. Glass sand, mirrors, and shadow vines.'],
+      ['narr', 'This is the last ring before the top: glass dunes, drowned mirrors, and shadow vines curling out of every crack to reach for your light.', 'The last ring. Glass sand, mirrors, and shadow vines.'],
       ['narr', "Up here the broken moon is so close you could almost touch it. It doesn't shine. It just hangs there, empty.", 'The broken moon is so close. It does not shine.'],
       { if: 'flag pip', then: [
-        ['ash', 'Okay. Last ring. Pip, tell me I can do this.', 'Last ring. Pip, tell me I can do this.'],
+        ['ash', 'Okay, last ring. Pip, tell me I can do this.', 'Last ring. Pip, tell me I can do this.'],
         ['pip', 'Mip!'],
         ['ash', 'Thanks, Pip.'] ],
         else: [
-        ['ash', 'Okay. Last ring. You can do this, Ash.', 'Last ring. You can do this.'] ] },
+        ['ash', 'Okay, last ring. You can do this, Ash.', 'Last ring. You can do this.'] ] },
       ['nyxara', 'So close now. Come closer. Bring it to me. I have been so cold, for so long.', 'Come closer. Bring it to me. I am so cold.'],
     ],
     n_hush_join: [
       { do: ['emit n4fx:ally_arrive:hush'] },
       ['narr', 'A great white moth glides down through the vines, big as a barn. A broken silver thread trails from her neck.', 'A huge white moth flies down. A broken thread hangs from her neck.'],
       ['ash', 'HUSH! You came!', 'Hush! You came!'],
-      ['f_hush', "Shhhh. Not so LOUD, little ember. It's so cold up here. The Mother promised a warm dark. She didn't mean it.", 'Shhh. Not so loud. It is cold. The Mother lied.'],
+      ['f_hush', "Shhhh. Not so LOUD, little ember. It's so cold up here. The Mother promised us a warm dark. She didn't mean it.", 'Shhh. Not so loud. It is cold. The Mother lied.'],
       ['narr', 'Hush lands beside you, close enough that her fuzzy wing brushes your arm.', 'Hush lands close to you.'],
-      ['ash', "...Yeah. I'm scared too. Let's go. Quietly.", "I am scared too. Let's go. Quietly."],
+      ['ash', "Then stay close to me. I'm warm. Let's go, quietly.", "Stay close. I am warm. Let's go, quietly."],
     ],
     n_hush_absent: [
-      ['narr', "A single white moth scale drifts past, glittering. Then another. They float away toward the cocoons in the Moth's Cradle.", 'White sparkles float by, toward the big cocoons.', { ref: 'n4_cradle' }],
+      ['narr', "A single white moth scale drifts past, glittering, and then another. They float away toward the cocoons in the Moth's Cradle.", 'White sparkles float by, toward the big cocoons.', { ref: 'n4_cradle' }],
       ['ash', 'Hush?'],
       ['narr', 'Nothing answers. But somewhere in the cocoons, something very small goes "shh".', 'Far off, something small says "shh".'],
       ['ash', "She's in there somewhere. Pip, we're coming back for her.", "She is in there. We will come back for her.", { promise: 'q_n5_hush' }],
@@ -139,24 +139,24 @@ chapter({
     ],
     // right after the boss: at most 6 lines a branch
     n_echo4_outro: [
-      ['narr', 'The shadow moth falls apart into a hundred little moths that flutter away into the dark.', 'The shadow moth breaks into little moths.'],
+      ['narr', 'The shadow moth falls apart into a hundred little moths, and they flutter away into the dark.', 'The shadow moth breaks into little moths.'],
       ['n_memory', 'My quiet one. Stay with me. Everyone else leaves.', 'Stay with me. Everyone else leaves.', { clue: 'n5_mem_quiet' }],
       { if: 'choice m_hush=free', then: [
-        ['narr', 'Hush trembles. Then, slowly, she turns toward the top of the mountain.', 'Hush shakes. Then she looks up at the top.'],
-        ['ash', "We're going to go and see her, aren't we.", 'We are going to see her.'],
+        ['narr', 'Hush trembles. Then, slowly, she turns to look at the top of the mountain.', 'Hush shakes. Then she looks up at the top.'],
+        ['ash', "We're going up there to see her, aren't we?", 'We are going to see her.'],
         { do: ['emit n4fx:ally_leave:hush'] } ],
         else: [
-        ['ash', 'She said that to Hush every night. No wonder Hush only ever whispered.', 'She said that every night. No wonder Hush whispers.'] ] },
+        ['ash', 'She must have said that to Hush a hundred times. No wonder Hush only ever whispers.', 'She said that a lot. No wonder Hush whispers.'] ] },
     ],
     // ---- this chapter's own scenes
     n5_lock_look: [
       ['narr', 'Round the open Moon Lock someone carved a picture, very small and very old.', 'Someone carved a tiny old picture here.'],
-      ['narr', 'A little moth, wrapped all the way round a thin curl of moon. Holding on with every leg. As if the moon might fly away.', 'A little moth hugs a thin moon, holding on tight.', { clue: 'n5_moon_lock' }],
-      ['ash', "That little moth again. She's everywhere up here.", 'That little moth again.'],
+      ['narr', "It's a little moth wrapped all the way round a thin curl of moon, holding on with every leg, as if the moon might fly away.", 'A little moth hugs a thin moon, holding on tight.', { clue: 'n5_moon_lock' }],
+      ['ash', "That little moth again. She's carved everywhere up here.", 'That little moth again.'],
     ],
     n5_nest_look: [
-      ['narr', 'Under the sleeping moth, the nest is lined with things people left behind. A mitten. A lantern shade. One boot.', 'The nest is full of lost things. A mitten. One boot.', { clue: 'n5_nest' }],
-      ['ash', "She keeps everything. Even the boots.", 'She keeps everything.'],
+      ['narr', 'Under the sleeping moth, the nest is lined with things people left behind: a mitten, a lantern shade, one boot.', 'The nest is full of lost things. A mitten. One boot.', { clue: 'n5_nest' }],
+      ['ash', "She keeps everything anybody leaves. Even one boot.", 'She keeps everything.'],
     ],
     // the solve line: today's n_panes_all line, word for word
     n5_wants_done: [

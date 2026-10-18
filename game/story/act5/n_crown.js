@@ -53,36 +53,36 @@ chapter({
     // one line per friend who is here (10 lines on the longest branch)
     n_gather: [
       { do: ['emit n4fx:gather_pose:on'] }, { cam: 'n_sh_crown', s: 1.2 },
-      ['narr', 'The Crown Shrine sits at the edge of the last ring. Above it, the summit. Round the summit, a moat of nothing, and a road of floating stones.', 'The shrine is on the top ring. The summit is across a dark moat.', { ref: 'n4_moon_road' }],
+      ['narr', 'The Crown Shrine sits at the edge of the last ring. Above it is the summit, with a moat of nothing all round it and a road of floating stones across.', 'The shrine is on the top ring. The summit is across a dark moat.', { ref: 'n4_moon_road' }],
       { if: 'choice greymane=ally', then: [
-        ['narr', 'Greymane is already here, sitting by the shrine as if he has waited all day. He is wet. He definitely swam again.', 'Greymane is here! He is wet. He swam again.'] ] },
+        ['narr', 'Greymane is already here, sitting by the shrine as if he has waited all day, and dripping wet. He swam again.', 'Greymane is here! He is wet. He swam again.'] ] },
       { if: 'flag tk_come=yes', then: [
         ['ev_tikka', 'ASH! I brought snacks! And my brother! And a BIGGER spoon!', 'Ash! I brought snacks and a bigger spoon!'] ] },
       { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] }, then: [
         ['c_vesper', 'Told you. Thieves never take the stairs.', "Told you. Thieves don't use stairs."] ] },
       { if: 'flag n5_glaciar !choice f_glaciar=free', then: [
-        ['f_glaciar', 'You came back for me, dumpling. You climbed all of Mount Dread and sang. Just like you promised.', 'You came back and sang, dumpling. Like you promised.'] ],
+        ['f_glaciar', 'You came back for me, dumpling, and sang me awake, just like you promised.', 'You came back and sang, dumpling. Like you promised.'] ],
         else: [{ if: 'choice f_glaciar=free', then: [
-        ['f_glaciar', 'Hmph. I have been to warmer funerals, dumpling.', 'Hmph. It is cold up here, dumpling.'] ] }] },
+        ['f_glaciar', 'Hmph. Too cold even for me, dumpling, and I am made of snow.', 'Too cold even for me, dumpling!'] ] }] },
       { if: { any: ['flag n5_hush', 'choice m_hush=free'] }, then: [
-        ['narr', 'Hush settles on the shrine roof, folds her wings, and shushes everybody. Nobody minds.', 'Hush sits on the roof. She shushes everyone.'] ] },
+        ['narr', 'Hush settles on the shrine roof, folds her wings, and shushes everybody. Nobody minds a bit.', 'Hush sits on the roof. She shushes everyone.'] ] },
       { if: 'choice cinder=ally', then: [
         ['narr', 'Far below, a voice booms: "NONE SHALL PASS!" Sir Cindervane is holding the stairs again.', 'Far below, Sir Cindervane shouts: "NONE SHALL PASS!"'] ] },
       { if: { any: ['choice greymane=ally', 'flag tk_come=yes', 'flag n5_vesper', 'choice c_vesper=friend', 'flag n5_glaciar', 'choice f_glaciar=free', 'flag n5_hush', 'choice m_hush=free'] },
         then: [
-        ['ash', "Look at all of you. I didn't bring an army. I brought... friends.", 'Look at you all. I brought friends!'] ],
+        ['ash', "You all came. All the way up here.", 'You all came!'] ],
         else: [
         ['ash', 'Just you and me, Pip.'],
         ['pip', 'Mip.'] ] },
-      ['ash', "Okay. Big moth. Broken moon. Let's go and give it back.", "Big moth. Broken moon. Let's give it back."],
+      ['ash', "Okay. Let's go and get the moon back.", "Let's go and get the moon back."],
       { do: ['emit n4fx:gather_pose:off', 'set n_gather'] },
     ],
     n_moondoor: [
       { cam: 'n4_moon_door', s: 1 },
-      ['narr', "At the end of the Moon Road stands a round door of pale glass. There's no handle. Just a hollow in the middle, the size of a plum.", 'A round glass door. It has a hole the size of a plum.'],
+      ['narr', "At the end of the Moon Road stands a round door of pale glass. There's no handle, only a hollow in the middle the size of a plum.", 'A round glass door. It has a hole the size of a plum.'],
       ['ash', 'The Heart. The door wants the Heart.', 'The door wants the Heart.'],
       ['pip', 'Mip?!'],
-      ['ash', "I know. She WANTS me to bring it. That's the scary part. But Mom made it whole. Not her. Mom.", 'She wants the Heart. That is scary. But Mom fixed it. Not her.'],
+      ['ash', "I know. She wants me to bring it, and that's the scary part. But Mom made it whole, not her.", 'She wants the Heart. That is scary. But Mom fixed it. Not her.'],
       ['narr', 'Behind you, on the last floating stone, the friends she hurt are waiting with you.', 'Her friends wait behind you.', { if: 'trust friends>=2' }],
       { do: ['emit n4fx:door_fx'] }, { sfx: 'shrine' },
       ['narr', 'You hold up the Ember Heart. Its three seams glow, violet, ice-blue and silver, round a core of warm orange. The door sighs open.', 'You hold up the Heart. It glows. The door opens.'],
@@ -90,17 +90,17 @@ chapter({
     // ---- this chapter's own scenes
     // after n5_reach: the plan in one line, and the count (as a banner)
     n5_reach_done: [
-      ['ash', 'Her name. A lantern of her own. And the friends she hurt, right here with me.', 'Her name. A lantern. And her friends.'],
+      ['ash', 'Her name. A lantern of her own. And the friends she hurt, there to speak for her.', 'Her name. A lantern. And her friends.'],
       { if: 'trust friends>=3', then: [
         { banner: ['You know how to reach her', 'You know how to reach her'], sub: ['All three of the friends she hurt are here with you.', 'All three of her friends are here.'] } ],
         else: [{ if: 'trust friends>=2', then: [
         { banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Friends she hurt, here with you: 2 of 2.', 'Her friends here: 2 of 2.'] } ],
         else: [{ if: 'trust friends>=1', then: [
         { do: [{ banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Friends she hurt, here with you: 1 of 2.', 'Her friends here: 1 of 2.'] }] },
-        ['ash', 'But only one of them is with me. She needs to hear from two.', 'But only one friend is here. I need two.'] ],
+        ['ash', 'But only one of them is here with me. She needs to hear from two.', 'But only one friend is here. I need two.'] ],
         else: [
         { do: [{ banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Friends she hurt, here with you: 0 of 2.', 'Her friends here: 0 of 2.'] }] },
-        ['ash', "But none of them are with me. She needs to hear from two.", 'But none of her friends are here. I need two.'] ] }] }] },
+        ['ash', "But none of them are here with me. She needs to hear from two.", 'But none of her friends are here. I need two.'] ] }] }] },
     ],
     // at the end of the Moon Road (the step finishes here): if fewer than two of the friends she hurt came, Ember's
     // voice asks who is missing and Ash may go and find them first. The door waits either way.
@@ -110,15 +110,15 @@ chapter({
         ['narr', 'You look back. On the floating stones behind you, everyone she hurt is following you up.', 'You look back. Your friends are right behind you.'],
         ['pip', 'Mip!'] ],
         else: [
-        ['ember', 'Little ember. She will only listen to the ones she hurt. Who is still missing?', 'She will only listen to her friends. Who is missing?'],
+        ['ember', 'Little ember, she will only listen to the ones she hurt. Who is still missing?', 'She will only listen to her friends. Who is missing?'],
         { if: '!flag n5_vesper !choice c_vesper=friend', then: [
-          ['ash', 'Vesper went her own way, back on the Silk Gallery.', 'Vesper went her own way.'] ] },
+          ['ash', 'Vesper is out there somewhere. The last I saw of her was the Silk Gallery.', 'Vesper is out there somewhere.'] ] },
         { if: '!flag n5_glaciar !choice f_glaciar=free', then: [
           ['ash', 'Glaciar is still asleep, far away on Mount Dread.', 'Glaciar is asleep on Mount Dread.'] ] },
         { if: '!flag n5_hush !choice m_hush=free', then: [
           ['ash', "Hush is still caught in the cocoons in the Moth's Cradle.", 'Hush is stuck in the cocoons.', { ref: 'n4_cradle' }] ] },
         { choose: 'n5_door', who: 'ash', ask: ['Go in now, or go and find them first?', 'Go in now?'], pick: [
-          { t: ['Go in. I will do this the hard way.', 'Go in now'], tone: 'brave', v: 'go',
+          { t: ["Go in. I'll do this the hard way.", 'Go in now'], tone: 'brave', v: 'go',
             say: [['ash', "Okay. Whatever happens, I'm still going to try.", 'Whatever happens, I will try.']] },
           { t: ['Not yet. Find them first.', 'Not yet'], tone: 'kind', v: 'later',
             say: [['narr', 'Any shrine on the peak can fly you home and back in a blink. The door will wait.', 'Fly to any shrine and back. The door will wait.']] },

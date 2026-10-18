@@ -69,12 +69,12 @@ chapter({
 
   scene: {
     n_vesper_bye: [
-      ['c_vesper', "I'll go up my own way. Thieves never take the stairs. See you at the top, cousin.", 'I will go my own way. See you at the top!'],
+      ['c_vesper', "I'm going up my own way. Thieves never take the stairs. See you at the top, cousin.", 'I will go my own way. See you at the top!'],
     ],
     n_rime_in: [
-      ['narr', 'The third ring is winter. Black ice. Snow that falls up instead of down. A frozen aurora hangs in the air like a curtain.', 'The third ring is winter. The snow falls UP.'],
-      ['narr', "Shadow people stand in the snow, frozen mid-step. Copies of the people of Hearthold. They aren't real. You check anyway.", 'Shadow people stand frozen in the snow. They are not real.'],
-      ['ash', "It's okay. They're just memories. ...I'm going to say hi to all of them anyway.", 'They are just memories. I will say hi anyway.'],
+      ['narr', 'The third ring is winter: black ice, and snow that falls up instead of down. A frozen aurora hangs in the air like a curtain.', 'The third ring is winter. The snow falls UP.'],
+      ['narr', "Shadow people stand in the snow, frozen mid-step. They are copies of the people of Hearthold. You know some of those faces.", 'Shadow people stand frozen in the snow. You know some of them.'],
+      ['ash', "They're just memories. ...Hi, Brynja. Hi, Brann. Sorry, I can't stop.", 'They are just memories. Hi, everyone!'],
       ['nyxara', 'Cold is kind, little ember. Cold keeps things. Ask my little cold one.', 'Cold keeps things safe. Ask the ice dragon.'],
       ['nyxara', 'And the sun is a liar. One day I will put it out.', 'The sun is a liar. I will put it out.', { clue: 'n5_sun_out' }],
     ],
@@ -83,18 +83,18 @@ chapter({
       { sfx: 'boom' },
       ['narr', 'CRASH. Something enormous lands on the ice behind you, and the whole ring shakes.', 'CRASH! Something huge lands behind you.'],
       ['f_glaciar', 'DUMPLING! You are climbing the Moth\'s mountain without a scarf!', 'Dumpling! You have no scarf!'],
-      ['ash', 'Great-great-great-great-great-great-great-great-great-great-great-great-great Grand-aunt Glaciar! ...I counted. I counted every great.',
-        'Great x13 Grand-aunt Glaciar! I counted them all!'],
-      ['f_glaciar', 'I heard, my little hot cross bun. The whole sea heard. Go on, then. Jump in the wind. If you fall, I will catch you.',
+      ['ash', 'Great-great-great-great-great-great-great-great-great-great-great-great-great Grand-aunt Glaciar!',
+        'Great x13 Grand-aunt Glaciar!'],
+      ['f_glaciar', 'Thirteen greats, and not one missed. The whole sea heard you, my little hot cross bun. Go on, then. Jump in the wind. If you fall, I will catch you.',
         'I heard you. Jump in the wind. If you fall, I will catch you.'],
-      ['f_glaciar', 'I only do slowly, but I am very good at catching.', 'I am slow. But I am good at catching.'],
+      ['f_glaciar', 'I do everything slowly, dumpling, except catching.', 'I am slow. But I catch fast.'],
     ],
     // Glaciar still asleep (beaten in Act III): her scale, and the promise Ash made her (N5S's errand)
     n_glaciar_absent: [
       ['narr', "Half buried in the snow lies a single dragon scale, blue as deep ice. It's still cold.", 'A blue dragon scale lies in the snow. It is cold.', { ref: 'n5_ice_scale' }],
-      ['ash', "Glaciar's. She's still asleep under the snow on Mount Dread.", 'Glaciar is still asleep on Mount Dread.'],
+      ['ash', "Glaciar's. She's still asleep in the snow on Mount Dread, chains and all.", 'Glaciar is still asleep on Mount Dread.'],
       ['ash', "I told her I'd come back for her. I promised.", 'I promised I would come back for her.', { promise: 'q_n5_glaciar' }],
-      ['ash', "Snow dragons wake up for songs, don't they? Somebody on this ring must know the right one.", 'A song could wake her. Who knows one?'],
+      ['ash', "The Snow Mother's Song can wake her. If the moon remembers Hearthold, maybe it remembers the song too.", 'A song could wake her. Who knows one?'],
       ['pip', 'Mip!'],
     ],
     nri_scale: [
@@ -103,20 +103,20 @@ chapter({
     // Echo 3: x4_foes plays STORY.n_echo3_intro and STORY.n_echo3_outro (data versions)
     n_echo3_intro: [
       ['narr', 'In a ring of black ice, chained in frost, a shadow dragon raises her head. Her breath is a blizzard.', 'A shadow ice dragon raises her head. She is in chains.'],
-      ['n_echo_glaciar', 'The Mother says cold is kind. The Mother says sleep is kindest. The Mother says fire is a lie.', 'The Mother says cold is kind. Fire is a lie.'],
-      ['ash', "That's not you talking. That's the Shard. Well. A copy of you, with a copy of the Shard. This is very confusing.", 'That is the Shard talking. This is confusing!'],
-      ['f_glaciar', 'Was I really that dreary? Dumpling, I need a scarf. And you need to melt those chains.', 'Was I that gloomy? Melt those chains, dumpling!',
+      ['n_echo_glaciar', 'The Mother says cold is kind. The Mother says fire is a lie.', 'The Mother says cold is kind. Fire is a lie.'],
+      ['ash', "That's not you talking, Auntie, that's the Shard. ...A copy of you with a copy of the Shard, I mean. Echoes are confusing.", 'That is the Shard talking. This is confusing!'],
+      ['f_glaciar', "Was I really that dreary? Melt those chains, dumpling. I can't bear to look at me.", 'Was I that gloomy? Melt those chains, dumpling!',
         { if: 'choice f_glaciar=free' }],
     ],
     n_echo3_outro: [
-      ['narr', 'The ice cracks. The shadow dragon shatters into a flurry of moths.', 'The ice dragon breaks into moths.'],
+      ['narr', 'The ice cracks, and the shadow dragon shatters into a flurry of moths.', 'The ice dragon breaks into moths.'],
       ['n_memory', 'Auntie Glee! Can we make the big snow? For the sledding?', 'Auntie Glee! Can we make snow for sledding?'],
       ['n_memory', 'Every year, dumpling. Every single year.', 'Every year, dumpling.'],
       { if: 'choice f_glaciar=free', then: [
-        ['f_glaciar', 'I forgot the sledding. For a thousand years, I forgot it. Thank you for reminding me, dumpling.', 'I forgot the sledding. Thank you for reminding me.'],
-        ['ash', 'Every Lantern Day. Sleds AND cake.', 'Every Lantern Day. Sleds and cake!'],
+        ['f_glaciar', 'I forgot the sledding. A thousand years, and I forgot it. Thank you for reminding me, dumpling.', 'I forgot the sledding. Thank you for reminding me.'],
+        ['ash', 'Then we do it every Lantern Day. Sleds and cake.', 'Every Lantern Day. Sleds and cake!'],
       ], else: [
-        ['ash', 'Even ice dragons get lonely, huh, Pip?', 'Ice dragons get lonely too, Pip.'],
+        ['ash', 'Even ice dragons get lonely, Pip.', 'Ice dragons get lonely too, Pip.'],
         ['pip', 'Mip.'],
       ] },
     ],
