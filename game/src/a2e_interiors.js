@@ -264,7 +264,7 @@ function doorWalkable(d){
   if(d.walk!=null) return !!d.walk;
   if(d.hs||d.cave) return true;
   let l=''; try{ l=String(d.label||''); }catch(e){}
-  return /^(enter|go in|go into|try|climb down)\b/i.test(l.trim());
+  return /^(enter|go in|go into|go back|try|climb down)\b/i.test(l.trim());
 }
 // the way into the door: up for houses and caves; for the others, the side where something solid is
 function doorIn(d){
@@ -385,14 +385,16 @@ function doorWalkTick(dt){
     return;
   }
   if(DW.hold&&!(DW.holdT>0)&&!inDoorZone(DW.hold,p)) DW.hold=null;
+  // stopped while pushing: something in front of the door (its gate, a cave mouth's rocks, a step) holds Ash back
+  const mv=DW.lp?Math.hypot(p.x-DW.lp.x,p.y-DW.lp.y):99; DW.lp={x:p.x,y:p.y};
   if(!push) return;
   for(const d of mapList(DOORS,curMap())){
     if(Math.abs(d.x-p.x)>70||Math.abs(d.y-p.y)>70||d===DW.hold||!doorWalkable(d)) continue;
     const r=doorRel(d,p);
-    // a locked door is often barred by its gate before Ash reaches it: it answers from a little further out
-    const lk=r.al>-46&&r.al<=-9&&doorLockText(d)!=null;
-    if(r.lat>=(d.cave?26:18)||(r.al<=-9&&!lk)||r.al>=40) continue;
+    if(r.lat>=(d.cave?26:18)||r.al>=40||r.al<=-50) continue;
     if(push.x*r.ux+push.y*r.uy<0.4) continue;
+    // at the door, or held back in front of it (a locked door answers from there too, its gate often bars the way)
+    if(r.al<=-9&&!(mv<0.8)&&!(r.al>-46&&doorLockText(d)!=null)) continue;
     doorWalkIn(d); return;
   }
 }
@@ -476,4 +478,4 @@ function doorNoteDraw(){
   lines.forEach((l,i)=>g.fillText(l,bx+pad+iw,by+pad*0.7+lh*i+lh/2));
   g.restore();
 }
-window.__ebDbg=Object.assign(window.__ebDbg||{},{doorInfo:d=>({walk:doorWalkable(d),inA:doorIn(d),lock:doorLockText(d)}),note:()=>DW.note?DW.note.text:null,DW,dsid:()=>AREA?caveDsid(AREA.def):null,areaBlocked:(x,y)=>areaBlocked(x,y)});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{doorInfo:d=>({walk:doorWalkable(d),inA:doorIn(d),lock:doorLockText(d)}),note:()=>DW.note?DW.note.text:null,DW,dsid:()=>AREA?caveDsid(AREA.def):null,areaBlocked:(x,y)=>areaBlocked(x,y),pBlocked:(x,y)=>playerBlocked(x,y)||colAt(x,y,10)});
