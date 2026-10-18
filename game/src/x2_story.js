@@ -1545,7 +1545,7 @@ const F2S_MAIL={
     xl('maren',`(the letter) Ash. Yara says you are about to climb a mountain to visit your AUNT. If she's your auntie, she's mine too, a few greats back. Nobody tells me anything.`,`Yara says you will visit your AUNT on a mountain. She's my auntie too!`),
     xl('maren',`Be polite. Take your hat off indoors. If she offers you tea, drink it, even if it's made of ice. Love, Mom.`,`Be polite. Hat off indoors. Drink her tea, even ice tea. Love, Mom.`),
     xl('maren',`P.S. Wendel wrote a new song about you. It rhymes "Ash" with "succotash". I've asked him to stop.`,`P.S. Wendel's new song rhymes "Ash" with "succotash".`),
-    f2sIf('maren',`P.S. Grandpa wants me to tell her he says hello. He also says "she started it." I don't know what that means.`,`P.S. Grandpa says hello. And "she started it."`,()=>f2sEnding()==='lantern')]},
+    f2sIf('maren',`P.P.S. Grandpa wants me to tell her he says hello. He also says "she started it." I don't know what that means.`,`P.P.S. Grandpa says hello. And "she started it."`,()=>f2sEnding()==='lantern')]},
   f_pb_4:{from:'dell',when:()=>!!G.flags.f_done,lines:()=>[
     xl('dell',`Dear Ash. I bought a SEA boat in Gearhaven. I have not lost it yet. It has been four days.`,`Dear Ash. I bought a SEA boat. I have not lost it yet!`),
     xl('dell',`When you need to go east, come to the dock. Dell.`,`When you go east, come to the dock. Dell.`)]},

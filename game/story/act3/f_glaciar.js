@@ -258,7 +258,7 @@ chapter({
         else: [
         ['narr', 'Somewhere on the mountain, an ice dragon sleeps under a blanket of snow. You promised to come back. You will.', 'An ice dragon sleeps on the mountain. You promised to come back.', { promise: 'f3_crown_wake' }] ] }] },
       { if: 'flag f_freed_n>=1', then: [
-        ['f_brann', 'And my lost Hearthwardens are home! Every one you breathed on! Frozen in armor, they said, until a dragon breathed blue fire on them.', 'My lost guards are home! A dragon saved them.'] ] },
+        ['f_brann', 'And my lost Hearthwardens are home! Frozen in armor, they said, until a dragon breathed blue fire on them. A dragon! That was YOU!', 'My lost guards are home! A dragon saved them.'] ] },
       { if: 'choice f_hush=scarf', then: [
         ['narr', 'Across the face of the moon flutters a tiny white moth, wearing a long red scarf.', 'A tiny white moth in a red scarf flutters across the moon.'] ] },
       ['narr', 'Before you close your eyes, you look up. The moon is beautiful. It\'s also smaller. Like somebody took another bite out of the edge.', 'You look up. The moon is smaller. Someone took another bite.',
