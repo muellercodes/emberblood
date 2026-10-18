@@ -4,7 +4,7 @@ chapter({ id: 'v_bad', act: 2, after: 'v_start', next: 'v_end', card: ['Act II',
     v_tess: { name: ['Tess Tiller', 'Tess'], map: 1, at: [7000, 25000] },
     v_rolf: { name: ['Rolf', 'Rolf'], map: 1, at: [7100, 25000] },
   },
-  step: [ { id: 's1', do: 'cutscene v_bad_s' }, { id: 's2', do: 'cutscene v_bad_s2' }, { id: 's3', do: 'talk v_tess' } ],
+  step: [ { id: 's1', do: 'cutscene v_bad_s' }, { id: 's2', do: 'cutscene v_bad_s2' }, { id: 's3', do: 'cutscene v_bad_s3' }, { id: 's4', do: 'talk v_tess' } ],
   scene: {
     v_bad_s: [
       ['ash', 'Great-great-great-great-aunt Tess?', 'Great-great-aunt Tess?'],
@@ -21,6 +21,8 @@ chapter({ id: 'v_bad', act: 2, after: 'v_start', next: 'v_end', card: ['Act II',
       ['v_rolf', 'Its wings were bigger than a ship. Big as a ship!', 'Its wings were huge!'],
       ['ash', 'Big as a house?', 'Big as a house?'],
       ['v_rolf', 'Big as a barn, I said.', 'Big as a barn.'],
+    ],
+    v_bad_s3: [
       ['v_tess', "Bertram's bakery blew up again. That's the third time.", 'The bakery blew up again.'],
       ['v_tess', 'The bakery exploded on Tuesday. And on Friday.', 'The bakery exploded.'],
       ['v_tess', 'Bertram rebuilt the bakery twice.', 'The bakery was rebuilt twice.'],
