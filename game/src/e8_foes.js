@@ -1111,14 +1111,16 @@ for(const k in ONRAMP.guards){ const s=SITES[k]; if(!s) continue; const full=s.g
 // an attack some time after the last one started (longer while a boss is up, so his guards and summons do not chip at
 // Ash while he watches the boss, and never while the boss's own red warning is up); one that has to wait keeps circling
 // and tries again a moment later. Kobold and wolf warnings are a little longer, and bats, the one foe that struck with no
-// warning, show a short red line first. The bot tables: scratchpad v11/SET_NOTES.md.
+// warning, show a short red line first; a wolf pants for a moment after its lunge before it runs off, so it can be hit.
+// The bot tables: scratchpad v11/SET_NOTES.md.
 const CROWD={
-  gap:[1.3,0.9],       // [Easy, Normal] seconds from one foe's attack start near Ash to the next
+  gap:[1.4,1.1],       // [Easy, Normal] seconds from one foe's attack start near Ash to the next
   bossGap:[2.4,1.9],   // the same for a boss's guards and summons while the boss is up
   most:[1,2],          // foes near Ash that may be winding up or striking at the same moment
   near:480,            // px from Ash that counts as near
   retry:[0.25,0.5],    // seconds before a foe that had to wait tries again
   batWarn:[0.36,0.3],  // seconds of red line before a bat swoops (before DIFFS.wind)
+  wolfPant:[0.6,0.45], // a wolf that has lunged stands panting this long before it backs off (the moment to hit it)
   // longer red warnings: the wind-up that starts in this state is this many times longer (after DIFFS.wind). A kobold's
   // swing warned for 0.33 s on Normal, less than a kid needs to see it and press roll.
   wind:{kobold:{windup:[1.35,1.25]}, wolf:{crouch:[1.25,1.15]}}
@@ -1149,6 +1151,9 @@ function crowdOk(e){
   }; }
 { const base=runAI; runAI=function(f,e,dt){
     const s0=e.state; base(f,e,dt);
+    if(e.type==='wolf'&&!e.boss){
+      if(s0==='lunge'&&e.state==='recover'&&crowdOn()){ e._pant=orK(CROWD.wolfPant); e.st+=e._pant; }
+      if(e._pant>0){ if(e.state!=='recover') e._pant=0; else { e._pant-=dt; e.dx=e.dy=0; } } }
     if(e.boss||s0===e.state||CROWD_START[e.type]!==e.state||!crowdOn()) return;
     if(dist2(e.x,e.y,player.x,player.y)<CROWD.near*CROWD.near){
       if(!crowdOk(e)){ e.state=s0; e.tele=null; e.st=0; e.cd=Math.max(e.cd||0,rand(CROWD.retry[0],CROWD.retry[1])); return; }

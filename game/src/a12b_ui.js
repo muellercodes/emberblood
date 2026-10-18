@@ -353,6 +353,8 @@ function volInput(el,stepped){
   }catch(e){}
 })();
 { const base=renderSettings; renderSettings=function(){ base(); try{ diffSync(); volSync(); }catch(e){} }; }
+// Settings opens at the top, where Difficulty and the sliders are (it kept the scroll of the last visit)
+{ const base=openSettings; openSettings=function(from){ base(from); try{ const o=$('#settings'); if(o) o.scrollTop=0; }catch(e){} }; }
 // left and right on a focused slider move it (the arrow keys and a controller both come through navMove)
 { const base=navMove; navMove=function(root,dir){
     const el=document.activeElement;
