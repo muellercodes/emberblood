@@ -73,7 +73,7 @@ chapter({
     ],
     n_rime_in: [
       ['narr', 'The third ring is winter: black ice, and snow that falls up instead of down. A frozen aurora hangs in the air like a curtain.', 'The third ring is winter. The snow falls UP.'],
-      ['narr', "Shadow people stand in the snow, frozen mid-step. They are copies of the people of Hearthold. You know some of those faces.", 'Shadow people stand frozen in the snow. They are not real.'],
+      ['narr', "Shadow people stand in the snow, frozen mid-step. They are copies of the people of Hearthold. You know some of those faces.", 'Shadow people stand frozen in the snow. You know some of them.'],
       ['ash', "They're just memories. ...Hi, Brynja. Hi, Brann. Sorry, I can't stop.", 'They are just memories. Hi, everyone!'],
       ['nyxara', 'Cold is kind, little ember. Cold keeps things. Ask my little cold one.', 'Cold keeps things safe. Ask the ice dragon.'],
       ['nyxara', 'And the sun is a liar. One day I will put it out.', 'The sun is a liar. I will put it out.', { clue: 'n5_sun_out' }],

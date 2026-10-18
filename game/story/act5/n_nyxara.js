@@ -153,7 +153,7 @@ chapter({
       { do: ['emit n4fx:cut_shrink:0.62'] },
       ['narr', 'Nyxara crumples onto the glass, smaller every second. In her claws she holds one last sliver of moon, tight, the way you would hold a blanket.', 'Nyxara falls and shrinks. She holds the last bit of moon tight.', { do: ['emit n4fx:cut_sliver'] }],
       ['nyxara', "Don't. Please. It always leaves. Every morning it goes away. Every month it gets thin. I only wanted it to stay.", 'Please. It always goes away. I only wanted it to stay.'],
-      ['ash', 'My grandpa said "mine" too, about the whole valley. He ended up shut inside a mountain for a thousand years, all by himself.', 'My grandpa said "mine" too. It made him so lonely.'],
+      ['ash', 'My grandpa said "mine" too, about the whole valley. He ended up shut inside a mountain for a thousand years, all by himself.', 'My grandpa said "mine" too. He ended up all alone.'],
       ['nyxara', 'Everyone leaves, little ember.', 'Everyone leaves.'],
       ['ash', "The moon goes away every morning, and it comes back every night. That's not leaving. That's visiting.", 'The moon goes every morning and comes back every night. That is visiting!'],
     ],

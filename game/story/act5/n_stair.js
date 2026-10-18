@@ -65,7 +65,7 @@ chapter({
       pick: [
         { t: ["The moon's own little moth, from long, long ago", "The moon's little moth, from long ago"], right: true },
         { t: ['Murmur, the big grey moth who cracked the Heart', 'Murmur, who cracked the Heart'],
-          hint: ['Murmur is Hush\'s sister. She cracked the Heart this year. These carvings are a thousand years old.', 'Murmur is new. The carvings are very old.'] },
+          hint: ['Murmur is Hush\'s sister. She cracked the Heart this year. These carvings are a thousand years old.', 'Murmur came this year. The carvings are very old.'] },
         { t: ["A shadow made of Grandpa's fire", "A shadow of Grandpa's fire"],
           hint: ["Ember carved these moths when she was small. Grandpa's shadow only turned up today.", 'Ember carved them long ago. The shadow is new.'] },
       ],

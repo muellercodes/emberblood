@@ -126,7 +126,7 @@ chapter({
         { if: 'choice n_end=dawn', then: [
           ['narr', "Hush stayed in Moonfall and became the Eclipse Observatory's first moth astronomer. She shushes anyone who is loud near the telescopes, and Professor Quill says she is the best colleague she has ever had.", 'Hush works at the Observatory. She shushes loud people.'] ],
           else: [
-          ['narr', 'Hush flew up to the moon to sit beside her mother. The two moths watch the world together without saying a word, which suits them both.', 'Hush flew up to sit with her mother. It is perfect.'] ] } ],
+          ['narr', 'Hush flew up to the moon to sit beside her mother. The two moths watch the world together without saying a word, which suits them both.', 'Hush flew up to sit with her mother. They watch the world together.'] ] } ],
         else: [
         ['narr', "Some nights in the Glass Desert, little white moths gather round travellers' lanterns. They never bite. They only want to be warm.", 'In the desert, little white moths sit by lanterns to be warm.'] ] },
       ['narr', 'Professor Quill measured the moon every night for a whole year. It came back every single time, and she has the notebooks to prove it.', 'Quill measured the moon all year. It always came back.'],

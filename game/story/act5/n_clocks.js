@@ -62,7 +62,7 @@ chapter({
       pick: [
         { t: 'Nyx', right: true },
         { t: 'Murmur',
-          hint: ["That's Hush's sister. Vesper saw her crack the Heart this year. Ember's moth is a thousand years older.", 'Murmur is new. This moth is very old.'] },
+          hint: ["That's Hush's sister. Vesper saw her crack the Heart this year. Ember's moth is a thousand years older.", 'Murmur came this year. This moth is very old.'] },
         { t: 'Hush',
           hint: ['Ash met Hush this year. Ember\'s little moth lived a thousand years ago.', 'You met Hush this year. This moth is very old.'] },
         { t: ['The Lady of the Moths', 'The Lady of the Moths'],

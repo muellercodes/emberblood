@@ -200,7 +200,7 @@ people({
 
     morrow: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ["I listened to a voice in my dreams once, and it ended badly. I'm listening to you now. That feels different.", 'I believe in you. That feels different.'] },
+        say: ["I listened to a voice in my dreams once, and it ended badly. I'm listening to you now. That feels different.", 'I listened to a dream voice once. Now I listen to you.'] },
       { if: 'flag n_dawn', say: ["I keep my hands in the dirt these days. Dirt doesn't care about moons or dragons. It's very restful.", 'I dig in the dirt now. Very restful.'] },
     ],
 
@@ -467,7 +467,7 @@ people({
         say: ['A knot nothing can cut? Then do not cut it. Ask that old merman, Ripple. Or Wren. Somebody always wrote it down.',
           'Ask Elder Ripple. Somebody wrote it down.'] },
       { if: 'flag n_dawn choice n_end=embermoon', fact: 'n5_moon=back',
-        say: ["You gave my Heart to the moon. ...Good. Now it keeps everybody warm, every night. That's what I made it for.",
+        say: ["You gave our Heart to the moon. ...Good. I mended it so it would keep somebody warm. Now it keeps everybody warm.",
           'You gave the Heart away to keep everyone warm. Good.'] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['You brought it home, and you brought yourself home. Come here. Closer. Your horns can take it.', 'You came home. Come here. Big hug.'] },
@@ -503,7 +503,7 @@ people({
       { if: 'quest q_n5_hush active flag m_leash_known',
         say: ['Gently, dragon. Moon-silk listens to soft breath. Like blowing on soup.', 'Gently. Like blowing on soup.'] },
       { if: '!flag n_dawn', say: ['The tide has not moved in days. The whole sea is holding its breath, dragon.', 'The whole sea holds its breath.'] },
-      { if: 'flag n_dawn', say: ['The tide came back this morning, and every fish in Coralcombe is swimming in circles. It is wonderful, dragon.', 'The tide is back. Everyone is confused!'] },
+      { if: 'flag n_dawn', say: ['The tide came back this morning, and every fish in Coralcombe is swimming in circles. It is wonderful, dragon.', 'The tide is back! The fish swim in circles!'] },
     ],
 
     m_winnie: [

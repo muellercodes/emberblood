@@ -146,7 +146,7 @@ chapter({
         ['ash', "We're going up there to see her, aren't we?", 'We are going to see her.'],
         { do: ['emit n4fx:ally_leave:hush'] } ],
         else: [
-        ['ash', 'She must have said that to Hush a hundred times. No wonder Hush only ever whispers.', 'She said that every night. No wonder Hush whispers.'] ] },
+        ['ash', 'She must have said that to Hush a hundred times. No wonder Hush only ever whispers.', 'She said that a lot. No wonder Hush whispers.'] ] },
     ],
     // ---- this chapter's own scenes
     n5_lock_look: [

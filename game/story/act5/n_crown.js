@@ -112,7 +112,7 @@ chapter({
         else: [
         ['ember', 'Little ember, she will only listen to the ones she hurt. Who is still missing?', 'She will only listen to her friends. Who is missing?'],
         { if: '!flag n5_vesper !choice c_vesper=friend', then: [
-          ['ash', 'Vesper is out there somewhere. The last I saw of her was the Silk Gallery.', 'Vesper went her own way.'] ] },
+          ['ash', 'Vesper is out there somewhere. The last I saw of her was the Silk Gallery.', 'Vesper is out there somewhere.'] ] },
         { if: '!flag n5_glaciar !choice f_glaciar=free', then: [
           ['ash', 'Glaciar is still asleep, far away on Mount Dread.', 'Glaciar is asleep on Mount Dread.'] ] },
         { if: '!flag n5_hush !choice m_hush=free', then: [
