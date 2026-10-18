@@ -32,7 +32,7 @@ quest({
     a1_prints:       { mystery: 'a1_gate', icon: 'prints',
                        text: ['Sooty bootprints walk from the Hollow Ward to the North Gate. They smell of lamp oil.', 'Bootprints go to the gate. They smell of lamp oil.'] },
     a1_letter:       { mystery: 'a1_gate', icon: 'letter',
-                       text: ['Morrow\'s letter: "To W. Leave the north gate open on Lantern Day, and the oil will never run out."', 'A letter to "W.": open the gate, get oil forever.'] },
+                       text: ['Morrow\'s letter: "To W. Leave the North Gate open on Lantern Day, and the oil will never run out."', 'A letter to "W.": open the gate, get oil forever.'] },
     a1_spare_key:    { mystery: 'a1_gate', icon: 'key',
                        text: ["Hal keeps the gate key on his belt. The spare hangs by his door for whoever lights the wall lamps. It was gone on Lantern Day.", 'The spare key is for the lamp lighter. It was gone.'] },
     a1_lamplighter:  { mystery: 'a1_gate', icon: 'lamp',
@@ -76,7 +76,7 @@ quest({
       pick: [
         { t: ['Fennick Wick, the lamp man', 'Fennick Wick'], right: true },
         { t: ['Wendel Fisk, the fiddler', 'Wendel Fisk'], hint: ['Nana says Wendel fiddled on the green all day. And do fiddles smell of lamp oil?', 'Where was Wendel all day?'] },
-        { t: ['Sister Wren, the librarian', 'Sister Wren'], hint: ['Wren lives far away in Brindlecross. Did she ever leave her library?', 'Did Wren leave her library?'] },
+        { t: ['Sister Wren, the librarian', 'Sister Wren'], hint: ['Wren lives over in Brindlecross. Did she ever leave her library?', 'Did Wren leave her library?'] },
         { t: ['Hal Burrows, who keeps the gate key', 'Hal Burrows'], hint: ['Hal starts with H, not W. And his own key never left his belt.', 'Hal starts with H, not W.'] },
       ],
       then: ['set a1_gate_who'],
@@ -161,14 +161,14 @@ quest({
     ],
     a1_morrow_outro: [
       ['voice', 'Morrow served me well. You will serve me better. Keep climbing, little ember.', 'Keep climbing, little ember.'],
-      ['narr', 'A crumpled letter falls out of Morrow\'s sleeve: "To W. Leave the north gate open on Lantern Day, and the oil will never run out."', 'A letter: "To W. Open the north gate. Oil forever."', { ref: 'north_gate', do: ['give oath_letter'] }],
+      ['narr', 'A crumpled letter falls out of Morrow\'s sleeve: "To W. Leave the North Gate open on Lantern Day, and the oil will never run out."', 'A letter: "To W. Open the North Gate. Oil forever."', { ref: 'north_gate', do: ['give oath_letter'] }],
       { choose: 'morrow', ask: ["Please. I'm an old man who believed a dragon. Isn't that punishment enough?", 'Please. I was silly. Let me go?'], pick: [
         { t: ['Let him go', 'Let him go'], tone: 'kind', v: 'free',
           say: [['ash', 'Go home, Morrow. Find something better to believe in.', 'Go home. Believe in something better.'],
                 ['morrow', 'Thank you. Maybe I will grow something that is not on fire.', 'Thank you. Maybe I will grow pumpkins.']] },
         { t: ['Take him to Captain Osric', 'Take him to Osric'], tone: 'brave', v: 'jail',
           say: [['ash', 'You are coming to Brindlecross. Captain Osric can decide.', 'Osric can decide.'],
-                ['narr', 'You march Morrow to the Watch House. Osric looks thrilled. Morrow looks relieved, honestly.', 'Osric is thrilled. Morrow is relieved.']] },
+                ['narr', 'You march Morrow to the Watch House. Osric looks thrilled. Morrow looks relieved.', 'Osric is thrilled. Morrow is relieved.']] },
       ] },
     ],
     a1_gate_offer: [
@@ -242,8 +242,8 @@ quest({
       ['ash', 'I found your Oath badge. And the spare key to the North Gate.', 'I found your badge. And the gate key.', { ref: 'north_gate' }],
       ['fennick', '...W for Wick. I knew I should have used a fake name.', 'W for Wick. I needed a fake name.'],
       ['fennick', 'My barrels were empty, Ash. They said leave the gate open, and the oil would never run out.', 'My oil ran out. They promised oil forever.'],
-      ['ash', 'Kobolds burned half the village, Fennick.', 'Kobolds burned half the village!'],
-      ['fennick', "I know. I didn't think. I'm so sorry, Ash. I'm so, so sorry.", "I'm so sorry, Ash."],
+      ['ash', 'Kobolds burned two houses, Fennick. And the Ward went out.', 'Kobolds burned two houses!'],
+      ['fennick', "I know. I didn't think. I see those two black roofs every time I open my shutters.", 'I know. I see those burnt roofs every day.'],
       { choose: 'fennick', ask: ['What should happen to Fennick?', 'What happens to Fennick?'], pick: [
         { t: ['Forgive him. He can make it right.', 'Forgive him'], tone: 'kind', v: 'forgive', then: ['set a1_gate_solved', 'give tunnel_key'],
           say: [['ash', 'You are going to make it right. Every lantern, every night.', 'Make it right. Every lantern, every night.'],
@@ -266,7 +266,7 @@ quest({
     // the lamp man is very nervous until the mystery is solved
     fennick: [
       { if: 'quest gate active !flag a1_gate_solved', bark: true,
-        say: ['Lamp oil! Wicks! Business is very normal. VERY normal.', 'Business is very normal!'] },
+        say: ['Lamp oil! Wicks! Business is fine! Why does everyone keep asking?', 'Business is fine! Stop asking!'] },
     ],
     // a helpful cousin (a clue that backs up the main deduction)
     hob: [
@@ -405,12 +405,12 @@ quest({
     a1_bertram_ran: [
       ['ash', 'Bertram, did the kobolds touch the Hollow Ward?', 'Did the kobolds touch the Ward?'],
       ['bertram', 'Kobolds? They ran screaming from my oven. They are scared stiff of fire. Of FIRE, Ash. In a bakery.', 'They ran from my oven! Kobolds fear fire.', { clue: 'a1_kobolds_scared' }],
-      ['bertram', 'A kobold would never go near a Ward-fire. I would, though. For a bun.', 'No kobold goes near a Ward-fire.'],
+      ['bertram', 'A kobold would not go within ten steps of a Ward-fire. Not for all the buns in my shop.', 'No kobold goes near a Ward-fire.'],
     ],
     a1_wren_candles: [
       ['ash', 'Sister Wren, how do you put out a Ward-fire?', 'How do you put out a Ward-fire?'],
       ['wren', "You don't. Not with water, not with wind. Ward-fire has burned for a thousand years.", 'Water and wind cannot do it.'],
-      ['wren', 'Unless you have an Oath black candle. They drink fire. Horrible things. Very bad manners.', 'The Oath has black candles. They drink fire!', { clue: 'a1_oath_candles' }],
+      ['wren', 'Unless you have an Oath black candle. They drink fire. Horrible things.', 'The Oath has black candles. They drink fire!', { clue: 'a1_oath_candles' }],
     ],
   },
 

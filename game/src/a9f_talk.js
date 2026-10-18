@@ -35,11 +35,119 @@ function giveTalkReward(r){
   if(r.reveal){ for(const k in POI) fogReveal(POI[k].x,POI[k].y,700); for(const m of CAVEMOUTHS) fogReveal(m.x,m.y,400); }
   SFX.play('chest');
 }
+// ---------- the first time Ash talks to someone. Where they live decides what they say: Emberhollow has known him all
+// his life, the nearby Act I towns know Maren and have heard of her boy, and only people from far away introduce
+// themselves. Every entry is [full, simple].
+const NEAR_TOWNS=['brindle','copper','lodge','farm','way','mire'];
+const TOWN_OF={juniper:'village',sal:'brindle',minnow:'brindle'};
+function townOf(id){ if(TOWN_OF[id]) return TOWN_OF[id]; const c=CASTBY[id]||SPECIAL[id]; return (c&&c.town)||''; }
+// has Ash already dealt with this person (a quest offer, a quest step, a story scene) before the first chat?
+function metBefore(id){
+  if(id==='brisket'||id==='morrow'||id==='marlo') return true;
+  if(SPECIAL[id]&&SPECIAL[id].inside==='ev') return true;   // event and story people: Ash meets them in their scene first
+  if(id==='wren'&&reached('oath')) return true;
+  for(const qid in (G.quests||{})){ const d=QDEFS[qid], q=G.quests[qid]; if(!d||!q) continue; if(d.giver===id) return true; const st=d.steps||[]; for(let i=0;i<st.length;i++) if(st[i]&&st[i].npc===id&&(q.done||i<q.step)) return true; }
+  for(const qid in (G.declined||{})){ const d=QDEFS[qid]; if(d&&d.giver===id) return true; }
+  return false;
+}
+// Emberhollow's named people: Lantern Day morning (pre), during the raid, and any time after (post)
+const FIRST_HOME={
+  bertram:{pre:[`Happy Lantern Day, Ash! Two hundred buns in the oven, and not one of them is for you. Keep your breath off my chimney.`,`Happy Lantern Day! Keep your fire away from my oven.`],
+    raid:[`Ash! There's a kobold in my flour bin! Get it out before it sneezes!`,`Ash! A kobold is in my flour!`],
+    post:[`Ash! You're not here to light the oven, are you? The last time you lit my oven, I got a new roof.`,`Ash! Please don't light my oven. Last time I needed a new roof.`]},
+  fennick:{pre:[`Ash! Big day. Lots of lamps. I've been up since very early with the lamps. Just the lamps. Happy Lantern Day.`,`Ash! Big day. I have been busy with lamps. Just lamps.`],
+    raid:[`Kobolds! In the lanes! How did they get in? Nobody knows. Go on, Ash, go!`,`Kobolds! How did they get in? Go, Ash!`],
+    post:[`Ash! Need a lamp? Oil? Wicks? I've got wicks. I'm fine, by the way. Everything's fine.`,`Ash! Need a lamp? I am fine. All fine.`],
+    forgive:[`Ash. I lit every lamp in the village last night, and I'll light them again tonight. That's the deal.`,`Ash. I light every lamp now. Every night.`],
+    jail:[`Ash. Captain Osric lets me polish his lamps in here. It's more than I deserve.`,`Ash. I polish the lamps in here. It is fair.`]},
+  mabel:{pre:[`Morning, Ash! Mind my mint by the well. The whole green smells of it and I want it to stay that way.`,`Morning, Ash! Do not step on my mint.`],
+    raid:[`Go, Ash! I'll patch you up after. Go!`,`Go, Ash! I will fix your cuts after.`],
+    post:[`Let me look at you. Scratches, bruises, one singed eyebrow. Same as every week since you were four.`,`Let me look at you. Scratches again, like always.`]},
+  rook:{pre:[`Ash! Are you lighting the lanterns? Can I watch? Can I hold the sword? I won't drop it this time.`,`Ash! Can I watch you light the lanterns?`],
+    post:[`Ash! I've been practising my roar. Listen. RAAAH. Juniper says I sound like a kettle.`,`Ash! Listen to my roar. RAAAH! Good?`]},
+  wendel:{pre:[`Ash! I'm playing on the green all day. Take requests. Not "Ash and Crash." That one isn't finished.`,`Ash! I am playing music on the green all day.`],
+    raid:[`One of them grabbed my song folder! Ash, my songs! Get after him!`,`A kobold took my songs! Get him, Ash!`],
+    post:[`Ash, you're just in time. What rhymes with "kobold"? I've been stuck on it since breakfast.`,`Ash! What rhymes with kobold? I am stuck.`]},
+  nana:{pre:[`Hold still, Ash, I'm measuring you for your winter sweater. Again. You keep growing horns.`,`Hold still! I am measuring you for a sweater.`],
+    raid:[`There's one under my rocking chair, Ash! Shoo it out, dear!`,`A kobold is under my chair! Shoo it out!`],
+    post:[`Ash, dear, you're thin. You're always thin. Come by after, I've a pot on.`,`Ash, you are too thin. Come and eat later.`]},
+  hal:{pre:[`Morning, Ash! Moo-rgaret's wearing a ribbon for Lantern Day. Well, she was. She ate it.`,`Morning! My cow had a ribbon. She ate it.`],
+    raid:[`They're in the turnips! Ash, the turnips!`,`Kobolds in my turnips! Help!`],
+    post:[`Ash! The turnips are coming back, slowly. They're shy since the kobolds.`,`Ash! My turnips are growing back. Slowly.`]},
+  juniper:{post:[`Ash! I owe you a supper. Rook says it's three suppers. Rook isn't in charge of suppers.`,`Ash! I owe you a supper. Maybe three.`]}
+};
+// Emberhollow's other neighbours, in turn so they don't repeat
+const HOME_GEN={
+  pre:[[`Happy Lantern Day, Ash! Go easy on the lanterns. Last year's still has a scorch mark.`,`Happy Lantern Day! Be gentle with the lanterns.`],
+    [`Morning, Ash. Your mom's been hammering since before the birds. What's she making you?`,`Morning! Your mom is busy in the forge.`],
+    [`Ash! Yara's letting you light the lanterns this year? About time.`,`You get to light the lanterns this year!`],
+    [`There's Maren's boy, up early for once. Off to the green?`,`Up early, Ash? Going to the green?`],
+    [`Ash, tell your mother my gate hinge is squeaking again. After the festival. No rush.`,`Tell your mom my gate squeaks. No rush.`],
+    [`Morning, Ash! My little ones want to see you blow smoke rings later, if you've time.`,`Morning! My kids want to see smoke rings.`]],
+  post:[[`Ash! You chased three of them right past my window. I've never seen kobolds run so fast.`,`You chased the kobolds past my window!`],
+    [`Your mother came out of the forge with a hammer in each hand. If I were a kobold, I'd have run too.`,`Your mom came out with two hammers. The kobolds ran!`],
+    [`There's our dragon. I always said all that practice on Bertram's bakery was for something.`,`There's our dragon! You were great.`],
+    [`Ash! Are you hurt? No? Good. A kobold ran off with my other boot. If you see a boot, it's mine.`,`Are you hurt? A kobold took my boot!`],
+    [`I've lived here forty years and never locked my door. I'm locking it now. Twice.`,`I lock my door now. Twice.`],
+    [`Ash. I saw Yara's face when the Ward went out. I've never seen her look scared before.`,`Yara looked scared when the Ward went out.`]],
+  later:[[`Ash! Back from your travels? Bring us any news, or just mud?`,`Ash! Any news? Or just mud?`],
+    [`Your mom says you're off relighting the old Wards. I said, our Ash? The one who set fire to the well?`,`Your mom says you light the Wards now. Our Ash!`],
+    [`Look who's home. Your mother watches the road every evening, you know.`,`Your mom watches the road for you every night.`],
+    [`You've been all over the valley, they say. Don't forget where your supper is.`,`Don't forget to come home for supper!`],
+    [`Is the smoke on the mountain anything to worry about? Don't answer. I can see it on your face.`,`Is the mountain smoke bad? I can see it is.`],
+    [`There's Maren's boy. You look taller. Is it the horns or the adventuring?`,`You look taller, Ash!`]]
+};
+// the nearby towns' named people, if Ash has not dealt with them yet
+const FIRST_NEAR={
+  wren:[`Ash? Look at you. The last time I was in Emberhollow, you were small enough to sit in Yara's wood basket.`,`Ash? You were so small last time I saw you!`],
+  tilly:[`Maren's boy! I'd know those horns anywhere. Is my brother's bakery still standing? Don't tell him I asked.`,`Maren's boy! Is my brother's bakery still standing?`],
+  osric:[`Ash, isn't it? Maren's boy. Mum writes about you in every letter. More than she writes about me, I think.`,`Ash! My mum writes about you a lot.`],
+  pell:[`Emberhollow's own fire-breather! You singed one of my hats two summers back. Never mind. Have a look round.`,`You burned my hat once! Never mind. Look around.`],
+  dell:[`Maren's lad! Your mom made my best fish hooks. Three of them are still in the lake somewhere.`,`Maren's boy! Your mom made my best fish hooks.`],
+  marigold:[`Maren's boy! Stand still. Hm. Your head's gone up a whole hat size since spring. It's the horns.`,`Maren's boy! Your head grew a hat size!`],
+  quill:[`The Emberblood boy. I'd know you through a telescope, and I have. You light up the whole green on Lantern Day.`,`The Emberblood boy! I saw you through my telescope.`],
+  mayor:[`Young Ash of Emberhollow! Maren's boy! Your mother mended our town bell, you know. Splendid woman. Splendid bell.`,`Ash of Emberhollow! Your mom fixed our bell!`],
+  nib:[`You're the dragon kid! Rook told me all about you. Can you really breathe fire? Do it on that barrel.`,`You're the dragon kid! Breathe fire! Do it!`],
+  gorran:[`Well, I'll be. Maren's kid. You've got her jaw. Last time I saw you, you were chewing on my boot.`,`Maren's kid! You used to chew on my boot.`],
+  cookie:[`So you're Maren's boy. Gorran talks about your mom like she hung the moon. Sit down. You look like you need soup.`,`Maren's boy! Sit down. Have some soup.`],
+  pick:[`Gorran said Maren's kid would come up the hill one day. We bet you'd be taller. We both lost.`,`Maren's kid! We thought you would be taller.`],
+  hollis:[`You'll be Maren's boy, from down the valley. Your mom shod my mule. Best shoes he ever had.`,`Maren's boy! Your mom made shoes for my mule.`],
+  ulf:[`HA! The dragon boy! Hal Burrows writes about you. In between the cheese.`,`The dragon boy! Hal writes to me about you.`],
+  elka:[`You're ASH! Rook's Ash! He writes about you in every single letter. Did you really blow up a bakery?`,`You're Ash! Rook writes about you!`],
+  hob:[`Ash! Fennick's little neighbour. You've grown. Mostly up, and a bit sideways at the horns. Come in out of the smoke.`,`Ash! You've grown! Come in.`],
+  tamsin:[`The Emberblood! I've been singing about you all week and I've never seen you up close. Turn round. I need to know how long the tail is.`,`The Emberblood! Turn around. I need to see your tail for my song.`],
+  moss:[`So this is Mabel's dragon boy. Sit by the fire, child. By it. Not in it.`,`Mabel's dragon boy! Sit by the fire.`],
+  sal:[`Maren's boy? Tell your mother I still want those rivets. The boat won't build itself.`,`Tell your mom I need those rivets.`]
+};
+// the nearby towns' other people: they know Maren, and they have heard of her boy
+const NEAR_GEN=[[`You're Maren's boy, from Emberhollow? I'd know those horns anywhere. Everybody would.`,`You are Maren's boy! I know those horns.`],
+  [`The smith's lad! Your mother mended my cart wheel last spring. Still rolls straight.`,`Your mom fixed my cart wheel. It still rolls!`],
+  [`Hello, Ash. Yes, I know your name. There's only one boy in the valley with a tail.`,`Hello, Ash. Only one boy here has a tail!`],
+  [`Maren's boy, all the way out here? Does your mother know where you are?`,`Maren's boy, out here? Does your mom know?`],
+  [`Emberhollow's fire-breather! My cousin buys her nails from your mom. Says she's the best smith in the valley.`,`My cousin buys nails from your mom. She's the best!`],
+  [`Well, if it isn't the little dragon from up the road. Mind my roof, it's thatch.`,`The little dragon! Careful, my roof is straw.`]];
+// people from far away: they have never met Ash, so they say who they are
+const AWAY_GEN=[n=>[`Hello there. I'm ${n}. I live just here.`,`Hello! I am ${n}. I live here.`],
+  n=>[`Oh! Hello. I'm ${n}. You're not from round here, are you? It's the horns.`,`Hi! I am ${n}. You are not from here, are you?`],
+  n=>[`Well, hello. ${n}, that's me. I don't think I've seen you before. I'd remember the tail.`,`Hi! I am ${n}. I would remember that tail!`],
+  n=>[`Hello, traveller. I'm ${n}. Mind the puddle by my door, it's deeper than it looks.`,`Hi! I am ${n}. Mind the puddle!`]];
+function firstGreet(id,c){
+  const town=townOf(id), st=G.stage, ph=(st==='wake'||st==='lanterns')?'pre':st==='raid'?'raid':reached('wren')?'later':'post';
+  const n=Object.keys(G.seenTalk||{}).filter(k=>k.startsWith('met_')).length;
+  let L=null;
+  if(town==='village'){
+    const P=FIRST_HOME[id];
+    if(P){ L=(id==='fennick'&&G.choices&&P[G.choices.fennick])||P[ph]||P.post; }
+    else{ const pool=HOME_GEN[ph]||HOME_GEN.post; L=pool[n%pool.length]; }
+  }else if(NEAR_TOWNS.includes(town)){ if(metBefore(id)) return null; L=FIRST_NEAR[id]||NEAR_GEN[n%NEAR_GEN.length]; }
+  else{ if(metBefore(id)) return null; L=AWAY_GEN[n%AWAY_GEN.length](c.name); }
+  return L?S(L[0],L[1]):null;
+}
 // what someone will say about the world, chosen by friendship and time
 function greetLine(id){
   const c=CASTBY[id]||SPECIAL[id]||{name:personName(id)}, f=friendOf(id), T=TALK[id]||{}, night=isNight();
   const first=!(G.seenTalk&&G.seenTalk['met_'+id]);
-  if(first&&id!=='maren'&&id!=='yara') return c.generic?`Oh, hello! You're Ash, aren't you? I'm ${c.name}. I live just here.`:`Oh! You must be Ash, Maren's kid. I'm ${c.name}. Nice to meet you properly.`;
+  if(first&&id!=='maren'&&id!=='yara'){ const g=firstGreet(id,c); if(g) return g; }
   const dg=deedGreet(id); if(dg) return dg;
   if(f>=5) return pick([`Ash! My favorite person. What do you need?`,`There's my best friend! Sit, sit.`,`You again! Good. I was hoping.`]);
   if(f>=3) return pick([`Hello, Ash. Always nice to see you.`,`Ash! Got a minute?`,`Good to see you.`]);
@@ -47,13 +155,13 @@ function greetLine(id){
   return pick([`Hello, Ash.`,`Oh, hi Ash.`,`Morning, Ash. Or afternoon. I lose track.`,`Ash! What's new?`]);
 }
 const GENERIC_RUMORS=[
-  [`They say if you breathe fire on a snowman, something good falls out. Something orange.`,'lm_snowman'],
-  [`The old tree in Whisperwood talks. It tells riddles. Very bad riddles.`,'lm_barkley'],
-  [`Bees hate smoke. And dragons make smoke. Just saying.`,null],
-  [`Somebody buried treasure under a big X out in the wilds. More than one somebody, actually.`,'xmarks'],
-  [`There's a hot spring up in the Frostpine. Heals anything. Except bad jokes.`,'lm_spring'],
+  [S(`The kids up in the Frostpine build snowmen with carrot noses. Breathe fire on one and see what falls out.`,`Breathe fire on a snowman. Something falls out!`),'lm_snowman'],
+  [S(`The old tree in Whisperwood asks riddles if you're polite to it. My brother wasn't, and it dropped a branch on him.`,`The old tree in Whisperwood asks riddles. Be polite to it!`),'lm_barkley'],
+  [S(`Bees go sleepy in smoke. That's how the honey folk get their honey. You've got smoke to spare.`,`Smoke makes bees sleepy. You can make smoke!`),null],
+  [S(`My granddad swore there was treasure under the big X's scratched on old maps round here. He never dug one up. Bad back.`,`There is treasure under the X's on old maps.`),'xmarks'],
+  [S(`There's a hot spring up in the Frostpine. My uncle soaked his bad knee in it and walked home without his stick.`,`A hot spring in the Frostpine heals you.`),'lm_spring'],
   [`At night, a ring of mushrooms in the forest starts to glow. Step inside for luck.`,'lm_fairy'],
-  [`I heard some houses here have cellars. Old houses love secrets. Look under the rugs.`,null],
+  [S(`Some of the old houses round here have cellars nobody has opened in years. Look under the rugs.`,`Old houses have cellars. Look under the rugs.`),null],
   [`Caves have cracked walls sometimes. A good roar can bring them down.`,null],
   [`The Wardens hid pages of their book all over the valley. Sister Wren in Brindlecross pays for them.`,null]
 ];
@@ -77,7 +185,7 @@ function talkHub(n,pre){
   G.talkDay=G.talkDay||{}; G.talkDay[id]=dayNow();
   // friendship gifts arrive on their own
   const f=friendOf(id);
-  if(T.secret&&f>=3&&!G.seenTalk['sec_'+id]&&(!T.need||T.need())){ G.seenTalk['sec_'+id]=1; lines.push([id,`Ash, I've been meaning to give you something. We're friends now, so.`],[id,T.secret.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.secret.reward); return true; }}); }
+  if(T.secret&&f>=3&&!G.seenTalk['sec_'+id]&&(!T.need||T.need())){ G.seenTalk['sec_'+id]=1; lines.push([id,S(`Ash, wait. I've been keeping something for you.`,`Ash, wait. I have something for you.`)],[id,T.secret.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.secret.reward); return true; }}); }
   if(T.best&&f>=5&&!G.seenTalk['best_'+id]){ G.seenTalk['best_'+id]=1; lines.push([id,T.best.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.best.reward); return true; }}); }
   const greet=greetLine(id);
   G.seenTalk['met_'+id]=1;

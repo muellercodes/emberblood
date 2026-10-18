@@ -139,7 +139,7 @@ const CLINES={
     taunt:[`Over here, you lumps!`,`Hey! Yes, you! Hit my shield!`,`Come and get some Brisket!`,`My shield is lonely! Visit it!`,`Is that all you've got? My granny hits harder!`],
     kill:[`Ha! Take that!`,`Another one for the song!`,`Brisket, one. Bad guys, zero.`],
     idle:BRISKET_JOKES,
-    low:[`I'm fine! This is fine! Mostly fine!`], lowAsh:[`Ash! Drink something!`,`You're hurt! I'll cover you!`],
+    low:[S(`Ow! Nothing broken! Probably!`,`Ow! I'm okay!`)], lowAsh:[`Ash! Drink something!`,`You're hurt! I'll cover you!`],
     boss:[`That's a big one. I'll hold the shield, you do the hero part.`,`Whoa. Okay. Big. Very big.`],
     bye:[`Off to the lodge! Call me if you need a shield!`,`Back to being warm! See you, Ash!`],
     cave:[`Caves! Cold, dark and full of bats. Feels like home.`,`Ooh, echoes! HELLO! ...hello... hello...`],
@@ -158,8 +158,8 @@ const CLINES={
     up:[`I'm up! I didn't even drop the map!`,`Okay, okay. Where was I? Oh. Fighting.`],
     point:[`Ooh! Something over there!`,`Ash! Look! Over there!`,`That's not on my map yet!`,`I see something shiny!`],
     kill:[`Bullseye!`,`Sling, one. Kobolds, zero.`,`Did you see that? Tell Rook!`],
-    idle:[`I'm calling this spot "Ash Was Here".`,`Rook would love this. Don't tell him.`,`This valley has nine hundred trees. I counted. Some twice.`,`Hold still, I'm drawing you. Okay, you can move.`,`Every map needs a dragon on it. Now mine has a real one.`],
-    low:[`I'm okay! I'm okay. Mostly okay.`], lowAsh:[`Ash, you're hurt! Drink a draught!`,`Ash! Careful!`],
+    idle:[`I'm calling this spot "Ash Was Here".`,`Rook would love this. Don't tell him.`,S(`I've drawn nine hundred trees on this map. My hand hurts.`,`I drew so many trees. My hand hurts.`),`Hold still, I'm drawing you. Okay, you can move.`,`Every map needs a dragon on it. Now mine has a real one.`],
+    low:[S(`Ow! I'm okay. The map's okay too.`,`Ow! I'm okay. So is my map.`)], lowAsh:[`Ash, you're hurt! Drink a draught!`,`Ash! Careful!`],
     boss:[`Okay, that one is NOT going on my map. Too scary.`,`That's the biggest thing I've ever seen. Draw fast, Juniper.`],
     bye:[`See you, Ash! I'll be at home, finishing the map!`,`Bye! Come get me for the next adventure!`],
     cave:[`Caves are my favorite! This time I brought two lanterns.`,`Bats. It's always bats.`],
@@ -640,7 +640,7 @@ function brisketAsk(){
   const o=CF.ice||iceLM(), at=o?{x:o.x+10,y:o.y+34}:null, old=G.comp&&G.comp!=='brisket'?CDEF[G.comp]:null;
   runDialogue([['brisket',`Actually... being warm sounds a bit boring. I've been an ice cube for ages. I want an ADVENTURE.`],['brisket',`I've got a sword. I've got a shield. I've got about four hundred jokes. Can I come with you?`],
     ch('ash','Bring Brisket along?',[
-      {t:old?`Yes! Come on! (${old.name} heads home)`:'Yes! Come on!',tag:'friend',fn:()=>recruitComp('brisket',at),then:[['brisket',`Brisket the Bold rides again! Well. Walks. Squishily.`]]},
+      {t:old?`Yes! Come on! (${old.name} heads home)`:'Yes! Come on!',tag:'friend',fn:()=>recruitComp('brisket',at),then:[['brisket',S(`Brisket the Bold rides again! Walks again, anyway. Squishily.`,`Brisket the Bold is back! Let's go!`)]]},
       {t:'Maybe later.',then:[['brisket',`Fair enough! I'll be at the Frostpine Lodge, thawing my toes. Ask me any time.`]]}])],()=>{ scene='play'; saveGame(); });
 }
 // prompts of our own: Duchess at the farm, Greymane in the pines, your companion when you stop next to them
@@ -807,8 +807,8 @@ const BARKS=[];
 function B(k,who,c,t,o){ BARKS.push(Object.assign({k,w:whoFn(who),c,t},o||{})); }
 const ALWAYS=()=>true;
 // --- the story so far
-B('raid1','adult|town:village',()=>dSt('lore')&&!dSt('warcamp'),`You chased the kobolds off! My chickens thank you.`);
-B('raid2','town:village',()=>dSt('lore'),`Kobolds in the bakery! Bertram screamed louder than the kobolds did.`);
+B('raid1','town:village|!kid',()=>dSt('lore')&&!dSt('warcamp'),`You chased the kobolds off! My chickens thank you.`);
+B('raid2','town:village|!id:bertram',()=>dSt('lore'),`Kobolds in the bakery! Bertram screamed louder than the kobolds did.`);
 B('raid3','kid',()=>dSt('lore'),`Did you see the kobolds run? Like this! Wheee!`);
 B('hollowW','town:village',()=>wardLit('hollow'),`The old oak feels warm again. Did you do that?`,{d:'ward_hollow'});
 B('camp0','adult',()=>dSt('warcamp')&&!dBd('grizzlefang'),`They say the kobold war camp is north of the village. Be careful, Ash.`);
@@ -817,12 +817,12 @@ B('grizz2','adult',()=>dBd('grizzlefang'),`No more kobolds stealing socks! Thank
 B('grizz3','kid',()=>dBd('grizzlefang'),`Did Grizzlefang smell bad? I bet he smelled SO bad.`,{d:'boss_grizzlefang'});
 B('oath0','adult',()=>dSt('oath')&&!dBd('morrow'),`People in robes keep walking past at night. The Scaled Oath. Creepy.`);
 B('mfree','any',()=>dCh('morrow','free')&&dBd('morrow'),`Morrow is growing pumpkins in the Mirefen now. Very nervous pumpkins.`,{d:'ch_morrow_free'});
-B('mjail','any',()=>dCh('morrow','jail'),`High Priest Morrow, in Osric's cell! I hear he alphabetized it.`,{d:'ch_morrow_jail'});
+B('mjail','any|!id:osric',()=>dCh('morrow','jail'),`High Priest Morrow, in Osric's cell! I hear he alphabetized it.`,{d:'ch_morrow_jail'});
 B('wAsh','any',()=>wardLit('ash'),`I saw the Ash Ward light up from my window. Like a sunrise at night!`,{d:'ward_ash'});
 B('three0','adult',()=>G.stage==='three',()=>`${threeLeft().length} ${threeLeft().length===1?'Ward is':'Wards are'} still dark. You'll get ${threeLeft().length===1?'it':'them'}, Ash.`);
 B('brood1','any',()=>dBd('broodmother'),`The Brood Mother is beaten? No more drakelings stealing my laundry!`,{d:'boss_broodmother'});
 B('gloam1','any',()=>dBd('gloamjaw'),`You fought the thing in the Mirefen? I won't even go in my own cellar.`,{d:'boss_gloamjaw'});
-B('gloam2','town:brindle',()=>dBd('gloamjaw'),`Dell says the lake smells less like swamp now. Thanks, I think.`,{d:'boss_gloamjaw'});
+B('gloam2','town:brindle|!id:dell',()=>dBd('gloamjaw'),`Dell says the lake smells less like swamp now. Thanks, I think.`,{d:'boss_gloamjaw'});
 B('ghome','any',()=>dCh('greymane','home'),`You let Greymane go home to his pack? That's a kind dragon.`,{d:'ch_greymane_home'});
 B('gally','any',()=>dCh('greymane','ally'),`Greymane is your FRIEND now? The giant wolf? Does he fetch?`,{d:'ch_greymane_ally'});
 B('glodge','town:lodge',()=>dBd('greymane'),`The wolves stopped bothering the lodge. They still sing at night, though.`,{d:'boss_greymane'});
@@ -841,7 +841,7 @@ B('done3','adult',()=>!!G.flags.act1_done,`The biggest Lantern Day in a thousand
 B('jump1','any',()=>dAb('jump'),`I saw you jump right over a fence! Do it again!`,{d:'trial_jump'});
 B('jump2','kid',()=>dAb('jump'),`Can you jump over my house? Over the chimney? Please?`,{d:'trial_jump'});
 B('stride1','any',()=>dAb('stride'),`Somebody saw you walking ON Lake Mirrow. On top of it!`,{d:'trial_stride'});
-B('stride2','town:brindle',()=>dAb('stride'),`Dell says you skipped across the lake like a stone. A dragon stone.`,{d:'trial_stride'});
+B('stride2','town:brindle|!id:dell',()=>dAb('stride'),S(`Dell says you walked right across the lake. He dropped his sandwich in it.`,`Dell saw you walk on the lake. He dropped his sandwich!`),{d:'trial_stride'});
 B('wings1','any',()=>dAb('wings'),`WINGS! Ash has WINGS! I need to sit down.`,{d:'trial_wings'});
 B('wings2','kid',()=>dAb('wings'),`Can you give me a ride? Just one? Just to the bakery?`,{d:'trial_wings'});
 B('wings3','adult',()=>dAb('wings'),`All three of Ember's Trials? Your great-great-lots-of-greats grandma would be proud.`,{d:'trial_wings'});
@@ -858,30 +858,30 @@ B('bow2','kid',()=>dEq('bow'),`Teach me archery! I'll be the target. No wait.`,{
 B('sword1','id:maren',()=>G.weapon==='sword'&&G.tier>=2,`Grandmother's sword looks sharper every day. Keep it oiled.`);
 // --- side quests
 B('seek1','town:brindle',()=>qDone('seek'),`You found Jem in the BARREL? Jem has been in that barrel since spring.`,{d:'q_seek'});
-B('seek2','kid',()=>qDone('seek'),`Nib says you're the best seeker ever. Nib NEVER says that!`,{d:'q_seek'});
-B('thief1','town:brindle',()=>qDone('thief'),`Pell says you outran a kobold. Pell talks a lot, but I believe it.`,{d:'q_thief'});
-B('pump1','town:village',()=>qDone('pumpkins'),`Gertrude the pumpkin is safe! Hal threw her a little party.`,{d:'q_pumpkins'});
-B('race1','town:lodge',()=>qDone('race'),`You beat Elka? Nobody beats Elka. She's still sulking in the snow.`,{d:'q_race'});
+B('seek2','kid|!id:nib',()=>qDone('seek'),`Nib says you're the best seeker ever. Nib NEVER says that!`,{d:'q_seek'});
+B('thief1','town:brindle|!id:pell',()=>qDone('thief'),`Pell says you outran a kobold. Pell talks a lot, but I believe it.`,{d:'q_thief'});
+B('pump1','town:village|!id:hal',()=>qDone('pumpkins'),`Gertrude the pumpkin is safe! Hal threw her a little party.`,{d:'q_pumpkins'});
+B('race1','town:lodge|!id:elka',()=>qDone('race'),`You beat Elka? Nobody beats Elka. She's still sulking in the snow.`,{d:'q_race'});
 B('race2','id:rook',()=>qDone('race'),`Elka wrote me that you beat her! She drew you as a big red blur.`,{d:'q_race'});
-B('song1','town:village',()=>qDone('song'),`Wendel plays the Lantern Waltz every single night now. Thanks. I think.`,{d:'q_song'});
-B('pie1','town:brindle',()=>qDone('pie'),`The pie mystery is solved! I knew it was the mustache all along.`,{d:'q_pie'});
+B('song1','town:village|!id:wendel',()=>qDone('song'),`Wendel plays the Lantern Waltz every single night now. Thanks. I think.`,{d:'q_song'});
+B('pie1','town:brindle|!id:mayor',()=>qDone('pie'),`The pie mystery is solved! I knew it was the mustache all along.`,{d:'q_pie'});
 B('pie2','adult|!id:mayor',()=>qDone('pie'),`Don't tell anyone, but I heard the Mayor sleep-bakes.`,{d:'q_pie'});
-B('swap1','any',()=>qDone('swap'),`A wheel of cheese for a piece of a star? Hal's grandpa only got a cow.`,{d:'q_swap'});
-B('bun1','town:village|town:brindle',()=>qDone('bun'),`Bertram and Tilly are talking again. All thanks to one exploding bun.`,{d:'q_bun'});
+B('swap1','any|!id:hal',()=>qDone('swap'),`A wheel of cheese for a piece of a star? Hal's grandpa only got a cow.`,{d:'q_swap'});
+B('bun1','town:village|town:brindle|!id:bertram,tilly',()=>qDone('bun'),`Bertram and Tilly are talking again. All thanks to one exploding bun.`,{d:'q_bun'});
 B('hollow1','town:village|!id:rook',()=>qDone('hollow'),`Rook won't stop telling everyone how you saved Juniper.`,{d:'q_hollow'});
 B('duch1','town:farm|town:lodge',()=>qDone('duchess')&&G.comp!=='duchess',`Duchess is home! She's ignoring everyone again. Back to normal.`,{d:'q_duchess'});
-B('horn1','town:lodge',()=>qDone('horn'),`Ulf's horn is back! Now the whole lodge wakes up at dawn. Hooray.`,{d:'q_horn'});
-B('mine1','town:copper',()=>qDone('mine'),`The mine is safe again! Pick and Shovel only scream a little now.`,{d:'q_mine'});
-B('lure1','any',()=>qDone('lure'),`Dell has a new boat! The Soggy Biscuit Two. It floats. Mostly.`,{d:'q_lure'});
+B('horn1','town:lodge|!id:ulf',()=>qDone('horn'),`Ulf's horn is back! Now the whole lodge wakes up at dawn. Hooray.`,{d:'q_horn'});
+B('mine1','town:copper|!id:pick',()=>qDone('mine'),`The mine is safe again! Pick and Shovel only scream a little now.`,{d:'q_mine'});
+B('lure1','any|!id:dell',()=>qDone('lure'),`Dell has a new boat! The Soggy Biscuit Two. It floats. Mostly.`,{d:'q_lure'});
 B('dell1','town:brindle|!id:dell',()=>qDone('dell'),`Dell tells everyone about your three fish. They get bigger every time.`,{d:'q_dell'});
-B('bounty1','town:brindle',()=>qDone('bounty'),`Captain Osric wrote your name on the bounty board. In gold ink!`,{d:'q_bounty'});
-B('bounty2','any',()=>qDone('bounty2'),`The Big Bounty! Osric says you're his best Watch helper ever. Except the dogs.`,{d:'q_bounty2'});
-B('kettle1','town:way|town:brindle',()=>qDone('kettle'),`Hob got his kettle back! The Smoky Kettle is smoky again.`,{d:'q_kettle'});
+B('bounty1','town:brindle|!id:osric',()=>qDone('bounty'),`Captain Osric wrote your name on the bounty board. In gold ink!`,{d:'q_bounty'});
+B('bounty2','any|!id:osric',()=>qDone('bounty2'),`The Big Bounty! Osric says you're his best Watch helper ever. Except the dogs.`,{d:'q_bounty2'});
+B('kettle1','town:way|town:brindle|!id:hob',()=>qDone('kettle'),`Hob got his kettle back! The Smoky Kettle is smoky again.`,{d:'q_kettle'});
 B('fenF','any|!id:fennick',()=>dCh('fennick','forgive'),`Fennick lights every lantern in town now. Even the ones already lit.`,{d:'ch_fennick_forgive'});
-B('fenJ','any',()=>dCh('fennick','jail'),`Fennick's in Osric's cell, polishing the bars. Very shiny bars.`,{d:'ch_fennick_jail'});
+B('fenJ','any|!id:fennick',()=>dCh('fennick','jail'),`Fennick's in Osric's cell, polishing the bars. Very shiny bars.`,{d:'ch_fennick_jail'});
 B('pages1','town:brindle|!id:wren',()=>pageN()>=3,`Sister Wren says you found pages of the Wardens' book. She did a little dance.`,{d:'pages3'});
-B('pages2','any',()=>pageN()>=10,`All ten pages! Wren is going to write a whole new book. About you.`,{d:'pages10'});
-B('moss1','town:village|town:mire',()=>qDone('moss'),`Granny Moss got her basket! And she sent back a frog. Why a frog?`,{d:'q_moss'});
+B('pages2','any|!id:wren',()=>pageN()>=10,`All ten pages! Wren is going to write a whole new book. About you.`,{d:'pages10'});
+B('moss1','town:village|town:mire|!id:moss',()=>qDone('moss'),S(`Granny Moss got her basket! And she wrote back. One whole sentence.`,`Granny Moss got her basket. She wrote back!`),{d:'q_moss'});
 // --- secrets Ash found
 B('knight','any',()=>!!G.found.knight,`Sir Ash, Knight of the Turnips! I heard. Very fancy.`,{d:'f_knight'});
 B('barkley','any',()=>!!G.found.barkley,`You beat Old Barkley's riddles? Nobody does that. He must be so grumpy.`,{d:'f_barkley'});
@@ -893,9 +893,9 @@ B('best1','adult',()=>CAST.some(c=>!c.generic&&friendOf(c.id)>=5),()=>{ const c=
 // --- Pip and the companions (with a reply from the friend in question)
 B('pip1','any',pipNear,`Is that a baby dragon? He's so small! Can I pet him?`,{r:['pip','Mip!']});
 B('pip2','kid',pipNear,`Your little dragon just sneezed on my boots. Best day ever!`,{r:['pip','Mip mip!']});
-B('pip3','adult',pipNear,`Your little friend keeps chewing my shoelace. It's fine. It's cute.`,{r:['pip','Mrrp?']});
+B('pip3','adult',pipNear,S(`Your little friend keeps chewing my shoelace. I don't mind. Much.`,`Your little dragon chews my shoelace!`),{r:['pip','Mrrp?']});
 B('pip4','any',pipNear,`Mip! ...Sorry. I've been practicing.`,{r:['pip','Mip?']});
-B('pip5','id:maren',()=>!!G.flags.pip,`Pip ate a horseshoe again. Is that normal? Don't answer that.`);
+B('pip5','id:maren',()=>!!G.flags.pip,S(`Pip's been at the nail box again. I'm missing six nails and he's very pleased with himself.`,`Pip ate my nails again. He looks happy.`));
 B('duC1','any|!id:hollis',()=>compNear('duchess'),`Is that a goat following you?`,{r:['duchess','Meh.']});
 B('duC2','any',()=>compNear('duchess'),`Why is your goat wearing a tiara?`,{r:['duchess','(Duchess does not explain herself.)']});
 B('duC3','adult',()=>compNear('duchess'),`That goat is looking at me like I owe her money.`,{r:['duchess','Meh.']});
@@ -913,7 +913,7 @@ B('grC3','adult',()=>compNear('greymane'),`Keep that wolf away from my chickens.
 B('rain1','any',rainy,`Rain, rain. Ash, come stand under my hat.`);
 B('rain2','adult',rainy,`Wet dragon smell. Lovely. Really.`);
 B('rain3','kid',rainy,`Puddles! Want to jump in puddles with me?`);
-B('rain4','any',rainy,`Don't breathe fire at the rain. It just makes steam. I tried.`);
+B('rain4','any',rainy,S(`Don't breathe fire at the rain, Ash. It just makes steam, and then everybody's hair goes frizzy.`,`Don't breathe fire at the rain. It makes steam!`));
 B('night1','adult',isNight,`Out late, Ash? Mind the wolves.`);
 B('night2','any',isNight,`The stars are out. Professor Quill must be so happy.`);
 B('night3','kid',isNight,`I'm not sleepy. I'm NOT. ...Okay, a little.`);
@@ -926,14 +926,14 @@ B('vill1','town:village|!id:maren',()=>!!G.flags.forge,`Your mom's forge is ring
 B('brin1','town:brindle|!id:pell',ALWAYS,`Market day! Pell has new socks. With holes. On purpose.`);
 B('low1','adult',lowHp,`You look singed. Sit down a minute. Drink something green.`);
 B('low2','kid',lowHp,`Are you okay? You look like a burnt marshmallow.`);
-B('low3','id:mabel,moss',lowHp,`You're hurt! Drink a draught, Ash. Herbs heal everything. Except bad moods.`);
+B('low3','id:mabel,moss',lowHp,S(`You're hurt! Drink a draught, Ash, and sit down before you fall down.`,`You're hurt! Drink a draught and sit down.`));
 B('coins1','any',()=>(G.coins||0)>=150,`You're jingling, Ash. Spend some at Pell's!`);
 B('lvl1','adult',()=>player.level>=5,`You've grown, Ash. Your tail is longer. I think.`,{d:'lvl5'});
 B('lvl2','kid',()=>player.level>=8,()=>`Level ${player.level}? That's like a million in dragon years.`);
 B('hat1','any|!id:marigold',()=>!!G.hat&&!!HATLINE[G.hat],()=>HATLINE[G.hat]);
 B('hat2','any|!id:marigold',()=>!!G.hat&&!HATLINE[G.hat],`Nice hat, Ash! Marigold would approve.`);
-B('hat3','id:marigold',()=>!!G.hat,`That hat! On you! I'm going to cry. Happy tears.`);
-B('hat4','id:marigold',()=>!G.hat,`Every hero needs a hat. Just saying.`);
+B('hat3','id:marigold',()=>!!G.hat,S(`That hat! On you! Turn round, I need to see the back.`,`That hat! Turn around, let me see!`));
+B('hat4','id:marigold',()=>!G.hat,S(`No hat today? I'm trying not to take it personally.`,`No hat today? Oh well.`));
 // --- Lantern Day and the early story
 B('lant1','any',()=>G.stage==='lanterns'||G.stage==='wake',`Happy Lantern Day! Gently with those lanterns, Ash.`);
 B('lant2','kid',()=>G.stage==='lanterns'||G.stage==='wake',`Did you see the dragon buns? I ate four.`);
@@ -943,7 +943,7 @@ B('wren1','town:brindle|!id:wren',()=>G.stage==='wren',`Sister Wren is in the li
 // --- people being themselves
 B('maren1','id:maren',ALWAYS,`Did you eat? Dragons need breakfast too.`);
 B('maren2','id:maren',()=>compNear(G.comp),()=>`Bring ${CDEF[G.comp].name} by for supper sometime.`,{r:['comp','come']});
-B('yara1','id:yara',ALWAYS,`Pebble says hello. Pebble says a lot of things. Mostly "caw".`);
+B('yara1','id:yara',ALWAYS,S(`Pebble left a button on your windowsill this morning. That means she likes you.`,`Pebble left you a button. She likes you.`));
 B('nana1','id:nana',ALWAYS,`Do you need a sweater? You look like you need a sweater.`);
 B('nana2','id:nana',rainy,`Rain! Where is your sweater? I KNITTED you a sweater.`);
 B('bert1','id:bertram',ALWAYS,`Fresh buns! Only one of them explodes. Probably.`);
@@ -961,7 +961,7 @@ B('dell2','id:dell',ALWAYS,`The fish aren't biting today. They're nibbling. Rude
 B('gorran1','id:gorran',ALWAYS,`Tell your mom Old Gorran says hello. And that I still owe her a hammer.`);
 B('holl1','id:hollis',()=>G.comp!=='duchess',`Duchess is in a mood. Duchess is always in a mood.`);
 B('ulf1','id:ulf',ALWAYS,`People think I hunt wolves. I prefer sheep. To look at.`);
-B('hob1','id:hob',ALWAYS,`Lost my scarf again. That's eleven. Don't tell Marigold.`);
+B('hob1','id:hob',ALWAYS,S(`Lost my scarf again. Don't tell Marigold. She'll only knit another one.`,`I lost my scarf again. Don't tell Marigold!`));
 B('moss2','id:moss',ALWAYS,`My frog says you smell like smoke. He means it nicely.`);
 B('mabel1','id:mabel',ALWAYS,`Mind the herbs! The purple ones bite.`);
 B('wend1','id:wendel',ALWAYS,`Want to hear a new tune? It's called "Ash Walks By".`);
@@ -979,10 +979,10 @@ B('morrow1','id:morrow',()=>dCh('morrow','free'),`Pumpkins, Ash! Pumpkins that a
 // --- neighbours with opinions
 B('gen1','gen',ALWAYS,`Lovely weather for a dragon.`);
 B('gen2','gen',ALWAYS,`Have you seen my cat? She's orange. Like you!`);
-B('gen3','gen',ALWAYS,`I'm training a goose. It's going badly. For me.`);
+B('gen3','gen',ALWAYS,S(`That goose chased me again this morning. I don't know what I did to it.`,`A goose chased me again!`));
 B('gen4','gen',ALWAYS,`Mind the puddle. It's deeper than it looks. Ask my left boot.`);
-B('gen5','gen',()=>dSt('lore'),`Is it true you're a real Emberblood? Can I touch your horns? No? Okay.`);
-B('gen6','gen',ALWAYS,`I keep my good socks for emergencies. This is not an emergency.`);
+B('gen5','gen',()=>dSt('lore'),S(`My nephew bet me your horns are hot. Are they? Can I touch one? No? Okay.`,`Are your horns hot? Can I touch one? No? Okay.`));
+B('gen6','gen',ALWAYS,S(`I've been weeding since sunrise. My back is one big knot.`,`I weeded all morning. My back hurts.`));
 B('gen7','gen',()=>!!G.flags.forge,`Careful with that sword near my washing line.`);
 B('gen8','gen|kid',()=>dSt('warcamp'),`My cousin says dragons are scary. I told him about you. Now he wants to meet you.`);
 // live reactions when Ash flies, jumps or walks on water nearby
@@ -1008,11 +1008,11 @@ VCH('sock','any','any',ALWAYS,[[0,`Lovely day.`],[1,`Is it? I lost a sock.`],[0,
 VCH('soup','adult','adult',ALWAYS,[[0,`What's for supper?`],[1,`Rock Soup.`],[0,`Again?`],[1,`Cookie sent it. You can't say no to Cookie.`]]);
 VCH('hammer','any','any',()=>dHw('hammer'),[[0,`Maren made Ash a hammer!`],[1,`Bet it's heavier than my aunt's fruitcake.`],[0,`Nothing is heavier than that fruitcake.`]]);
 VCH('brisk','any|!id:brisket','any|!id:brisket',()=>compNear('brisket'),[[0,`Brisket was frozen for how long?`],[1,`Since Tuesday.`],[0,`Which Tuesday?`],[1,`Nobody knows.`]]);
-VCH('wolf','any','any',()=>compNear('greymane'),[[0,`There's a giant wolf in town!`],[1,`It's with Ash. It's fine.`],[0,`...Is it fine?`],[1,`It's wagging. It's fine.`]]);
+VCH('wolf','any','any',()=>compNear('greymane'),[[0,`There's a giant wolf in town!`],[1,`It's with Ash.`],[0,`...Is that better or worse?`],[1,`It's wagging. Better.`]]);
 VCH('wards','any','any',()=>wardLit('crag')&&wardLit('mire')&&wardLit('frost'),[[0,`Can you feel it? The Wards are warm.`],[1,`That's just my tea.`],[0,`No, really. Feel the air.`],[1,`...Oh. Oh, that's nice.`]]);
 VCH('lbuns','any','any',()=>G.stage==='lanterns',[[0,`Have you seen the dragon buns?`],[1,`I ate four.`],[0,`They were decorations!`]]);
 VCH('map','any','any',()=>compNear('juniper'),[[0,`Juniper is drawing a map of us.`],[1,`Make my nose smaller!`]]);
-VCH('over','any','any',()=>!!G.flags.act1_done&&G.stage==='done',[[0,`Is it really over?`],[1,`Ash says it is.`],[0,`Then it is.`]]);
+VCH('over','any','any',()=>!!G.flags.act1_done&&G.stage==='done',[[0,`Is it really over?`],[1,`Ash says so.`],[0,`Then I'm having a nap.`]]);
 VCH('cold','town:lodge','town:lodge',()=>!AREA,[[0,`Cold today.`],[1,`It's always cold. It's the Frostpine.`],[0,`Colder than always, then.`]]);
 VCH('rhyme','id:tamsin','id:hob',ALWAYS,[[0,`Hob, what rhymes with Ash?`],[1,`Cash? Splash? Mustache?`],[0,`Mustache! Perfect!`]]);
 VCH('race','id:elka','id:brisket',()=>G.comp!=='brisket',[[0,`Brisket, race me!`],[1,`I'm still thawing!`],[0,`Excuses!`]]);
@@ -1031,7 +1031,7 @@ VCH('osric','id:osric','any',()=>dCh('morrow','jail'),[[0,`Morrow alphabetized t
 const DGREET={
   boss_grizzlefang:[['any',`Ash! Is it true? You beat Grizzlefang?`],['adult',`The kobold chieftain, gone! Thanks to you, Ash.`]],
   'boss_grizzlefang@maren':[['any',`My kid beat the kobold chieftain. MY kid. I'm telling everyone.`]],
-  'boss_grizzlefang@yara':[['any',`The chieftain is gone. You've done well, Ash. But the real work begins now.`]],
+  'boss_grizzlefang@yara':[['any',S(`Grizzlefang is gone, and you came home in one piece. That's the part I care about.`,`Grizzlefang is gone, and you are home safe. Good.`)]],
   boss_morrow:[['any',`Ash! The Scaled Oath is broken. People say you did it.`]],
   ward_ash:[['any',`I saw the Ash Ward burning from my window. That was you, wasn't it?`]],
   boss_broodmother:[['any',`No more drakelings over the hills! You're amazing, Ash.`]],
@@ -1053,13 +1053,13 @@ const DGREET={
   wpn_spear:[['any',`Got yourself a spear! Point it away from me, please.`]],
   q_seek:[['town:brindle',`Ash! Found any more kids in barrels?`]],
   q_pie:[['town:brindle|!id:mayor',`Ash! Don't worry, the Mayor's secret is safe with me. Mostly.`]],
-  q_race:[['town:lodge',`Ash! Faster than Elka! Who knew?`]],
-  'q_hollow@rook':[['any',`Ash! Juniper says you're her hero. Her second hero. I'm first. I'm her brother.`]],
+  q_race:[['town:lodge|!id:elka',`Ash! Faster than Elka! Who knew?`]],
+  'q_hollow@rook':[['any',S(`Ash! Juniper says you're her hero. Her second hero. I'm first. Brothers always come first.`,`Juniper says you are her hero! Her second one. I'm first.`)]],
   pip:[['any',`Ash! I heard you have a baby dragon now! Where is he?`]],
   'pip@maren':[['any',`Is Pip eating properly? He ate my tongs.`]],
   ch_greymane_ally:[['any',`Is it true Greymane stands with you now? The giant wolf? Wow.`]],
   ch_greymane_home:[['adult',`They say you sent Greymane home to his family. That was kind, Ash.`]],
-  ch_morrow_free:[['adult',`You let Morrow go? To grow pumpkins? Well. People can change, I suppose.`]],
+  ch_morrow_free:[['adult',S(`You let Morrow go? To grow pumpkins? People can change, I suppose.`,`You let Morrow go grow pumpkins? Okay!`)]],
   ch_morrow_jail:[['adult',`Morrow's in a cell now. Osric says he's the tidiest prisoner ever.`]],
   ch_fennick_forgive:[['town:village|!id:fennick',`Fennick says you gave him a second chance. He's been lighting lanterns ever since.`]],
   comp_brisket:[['any',`I see you've thawed out a friend!`]],

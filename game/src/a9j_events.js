@@ -318,7 +318,7 @@ const DMUMPAL={skin:'#c8603a',dark:'#8a3a1e',belly:'#f6d8a8',snout:'#e08a5a',hor
 EVD.drake={min:'lore',kind:'kind',w:c=>(reached('three')||G.flags.pip)?([2,3,4].includes(c.b)?2.2:c.b<2?0.6:0):0,spot:()=>evSpot({rad:22}),
   setup(E,at){ E.main=E.add({k:'baby',x:at.x,y:at.y,face:Math.PI/2,t:0,id:'ev_drake',bdy:-30}); E.main.use={text:()=>S('Look at the baby drakeling','Look at the baby dragon'),fn:()=>EVD.drake.talk(E)};
     const m=evNear(at.x,at.y,560,780,{rad:24})||{x:at.x+600,y:at.y}; E.mum=E.add({k:'mum',x:m.x,y:m.y,face:angTo(m.x,m.y,at.x,at.y),t:0,hide:true}); E.nest=E.add({k:'nest',x:m.x,y:m.y+4,ground:true,hide:true}); },
-  talk(E){ E.main.use=null; evTalk(E,'meet',()=>{ if(!E.plan) return; E.mum.hide=false; E.nest.hide=false; E.mum.mark='?'; if(E.d.pip&&G.pip) EV.pipGo={x:E.mum.x,y:E.mum.y-30}; evAct(E,160); setBanner(S('Find the nest','Find the nest'),S('Lead the baby to its mum. She is not far.','Take the baby to its mum.'),2.4); }); },
+  talk(E){ E.main.use=null; evTalk(E,'meet',()=>{ if(!E.plan) return; E.mum.hide=false; E.nest.hide=false; E.mum.mark='?'; if(E.d.pip&&G.pip) EV.pipGo={x:E.mum.x,y:E.mum.y-30}; evAct(E,160); setBanner(S('Find the nest','Find the nest'),S('Lead the baby to its mom. She is not far.','Take the baby to its mom.'),2.4); }); },
   tick(E,dt){ const b=E.main; b.t+=dt; if(E.phase==='wait'&&Math.random()<dt*0.6) emit(b.x,b.y-14,1,{col:'200,200,200',glow:false,ang:-Math.PI/2,spread:0.4,smin:10,smax:30,lmin:.6,lmax:1,zmin:2,zmax:4,grow:5});
     if(E.d.fly){ E.d.fz=(E.d.fz||0)+dt*90; E.mum.z=E.d.fz; b.z=E.d.fz; E.mum.alpha=b.alpha=clamp(1-E.d.fz/260,0,1); } },
   act(E,dt){ const p=player, b=E.main, M=E.mum, d=dist(p.x,p.y,b.x,b.y);

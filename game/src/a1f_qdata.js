@@ -18,14 +18,14 @@ const QDEFS={
       {t:'talk',npc:'rook',text:'Tell Rook his sister is safe',lines:[['rook',`JUNIPER! She came in the door covered in bat poop and yelling about you! You're the best, Ash.`],['juniper',`Here. My map of every cave and secret spot in the valley. Two years of work. Don't spill anything on it.`]],give:{juniper_map:1,map_x3:1},reward:{coins:25,xp:80}}
     ]},
   gate:{title:'The Open Gate',giver:'yara',min:'warcamp',story:true,
-    offer:[['yara',`Something's been bothering me, Ash. Somebody unlocked the north gate the night of the festival. Kobolds can't pick locks. They don't have the thumbs for it.`],['yara',`Have a look around the Hollow Ward. Whoever let them in might have stopped there too.`]],
+    offer:[['yara',S(`Something's been bothering me, Ash. Somebody unlocked the North Gate on Lantern Day. Kobolds can't pick locks. They don't have the thumbs for it.`,`Someone unlocked the North Gate. Kobolds can't pick locks.`)],['yara',`Have a look around the Hollow Ward. Whoever let them in might have stopped there too.`]],
     steps:[
       {t:'flag',flag:'clue_prints',text:'Look for clues near the Hollow Ward under the old oak',at:'lm:bootprints'},
       {t:'flag',flag:'clue_letter',text:'Find out who the Oath was paying. High Priest Morrow might know.',at:'poi:oath'},
       {t:'flag',flag:'clue_badge',text:'Search Wick’s Lamps & Oils in Emberhollow',at:'npc:fennick'},
       {t:'talk',npc:'fennick',text:'Confront Fennick Wick',lines:'confront',give:{tunnel_key:1}},
       {t:'flag',flag:'tunnel_plans',text:'Explore the Oath’s Hidden Tunnel off the Ashen Road',at:'cave:tunnel'},
-      {t:'talk',npc:'wren',text:'Show the Oath’s plans to Sister Wren',take:{oath_plans:1},lines:[['wren',`"Snuff the Wards before the thousandth year ends. When the binding fails, deliver the Emberblood to the mountain. The Great One will take back his fire, and we will be rewarded with..." and then there's a doodle of a dragon wearing a crown.`],['wren',`So that's their whole plan. Weaken the chains, then hand you over. Well. You've ruined it, mostly by being very annoying to kidnap.`]],reward:{coins:60,xp:200,bless:1}}
+      {t:'talk',npc:'wren',text:'Show the Oath’s plans to Sister Wren',take:{oath_plans:1},lines:[['wren',`"Snuff the Wards before the thousandth year ends. When the binding fails, deliver the Emberblood to the mountain. The Great One will take back his fire, and we will be rewarded with..." and then there's a doodle of a dragon wearing a crown.`],['wren',S(`So that's their whole plan. Weaken the chains, then hand you over. You've ruined it, mostly by being very annoying to kidnap.`,`Their plan: weaken the chains and hand you over. You ruined it!`)]],reward:{coins:60,xp:200,bless:1}}
     ]},
   moss:{title:'Gran’s Basket',giver:'mabel',min:'wren',give:{basket:1},
     offer:[['mabel',`Gran hasn't written in weeks. Could you take her this basket? Bread, honey, and a strongly worded note about writing more.`],['mabel',`She lives out in the Mirefen, southeast past Brindlecross. Follow the smell of tea.`]],
@@ -57,7 +57,7 @@ const QDEFS={
       {t:'talk',npc:'maren',text:'Give Mom the star-iron and Gorran’s message',lines:[['maren',`Gorran! That old rock goblin. Spring, like always.`],['maren',`Thank you for this, Ash. Give me that blade.`]],reward:{coins:25,xp:80}}
     ]},
   dell:{title:'Three Fish for Dell',giver:'dell',min:'wren',give:{rod:1},
-    offer:[['dell',`Know how to fish? No? Here, borrow my spare rod.`],['dell',`Stand at any fishing spot, press E, and when the bobber splashes, press E again. Bring me three fish. I've been eating bread for a week.`]],
+    offer:[['dell',`Know how to fish? No? Here, borrow my spare rod.`],['dell',S(`Stand at any fishing spot and press the use button. When the bobber splashes, press it again. Bring me three fish. I've been eating bread for a week.`,`Stand by a fishing spot. Press use. When it splashes, press again. Bring me three fish.`)]],
     steps:[
       {t:'item',item:'fish',n:3,text:'Catch 3 fish at a fishing spot (look for ripples on the shore)'},
       {t:'talk',npc:'dell',text:'Bring the fish to Dell on the Brindlecross dock',take:{fish:3},lines:[['dell',`Fish! Real fish! Keep the rod. And if you ever get to the Sunken Grotto down in the Mirefen... my boat went down near there.`]],reward:{coins:20,xp:40}}
@@ -95,12 +95,12 @@ const ERRANDS=[
   ['nana','osric','an itchy sweater',`Take this sweater to my Osric in Brindlecross. He'll pretend he doesn't like it.`,`Another one? Is it the blue one? ...It's the blue one. Tell her I'm wearing it right now. I am. Look.`,20,'wren'],
   ['wendel','dell','a jar of worms',`Give these to my cousin Dell on the Brindlecross dock. They're the good worms. He'll know.`,`The good worms! Wendel remembered! Tell him the fish say hello. Rudely.`,15,'wren'],
   ['hal','ulf','a wheel of stinky cheese',`Take this cheese to Ulf at Frostpine Lodge. Don't sniff it. I mean it.`,`Hal's cheese! I can smell it from here. So can the wolves. Thank you, I think.`,20,'wren'],
-  ['marigold','hob','scarf number ten',`Bring this scarf to my twin brother Hob at the Smoky Kettle. It's his tenth. He loses them on purpose, I'm sure of it.`,`A scarf! I'll treasure it. Until Tuesday, probably. Tell her thanks.`,15,'wren'],
+  ['marigold','hob','scarf number ten',`Bring this scarf to my twin brother Hob at the Smoky Kettle. It's his tenth. He loses them on purpose, I'm sure of it.`,S(`A scarf! I'll treasure it. Until the next windy day, probably. Tell her thanks.`,`A scarf! I will keep it. For a while. Say thanks!`),15,'wren'],
   ['quill','gorran','a rolled-up star chart',`Gorran Flint at Coppergulch asked for my star chart. I've marked where the stars fell. Star-iron, Ash!`,`Quill's chart! She's circled the spots where star-iron fell. Look, here, and here. Go look.`,20,'three'],
   ['cookie','tilly','a recipe for Rock Soup',`Give this to Tilly Crumb at the Sleepy Salmon. She says my soup is a crime. This is my defense.`,`Rock Soup. With actual rocks. ...I'll put it on the menu as a dare.`,15,'three'],
   ['elka','rook','a carved toy sled',`This is for my pen pal Rook in Emberhollow. I carved it myself. It's fast. Probably.`,`A sled! From Elka! Now I just need snow. And a hill. And to be a little braver.`,15,'wren'],
   ['yara','wren','a letter from her old teacher',`Take this to Sister Wren. I was her teacher. I'm still correcting her spelling.`,`From Yara? "...and your spelling is still atrocious. Proud of you. Y." *sniff* It's the dust. Libraries are very dusty.`,15,'oath'],
-  ['mayor','yara','a very fancy invitation',`An invitation to the Brindlecross Bridge Ribbon-Cutting, for Elder Yara. Gold leaf. My face is on it.`,`An invitation. With his face on it. I'll go. I'll count the ribbon.`,15,'wren'],
+  ['mayor','yara','a very fancy invitation',`An invitation to the Brindlecross Bridge Ribbon-Cutting, for Elder Yara. Gold leaf. My face is on it.`,S(`An invitation. With his face on it. I'll go. I'll bring my own scissors. He never remembers the scissors.`,`An invitation with his face on it. I will go.`),15,'wren'],
   ['pell','hob','a crate of mysterious hats',`Run these hats to Hob at the Smoky Kettle. Don't open the crate. The hats are shy.`,`Hats! Marigold will be furious. Wonderful. Tell Pell the soup's on me.`,20,'wren'],
   ['gorran','quill','a sack of pretty rocks',`For Professor Quill in Brindlecross. She says they're "just rocks." They are not just rocks. They're pretty rocks.`,`Oh, Gorran. These are just rocks. ...They are very pretty, though. Tell him thank you.`,15,'three'],
   ['tilly','bertram','a slice of Tilly’s pie',`If you're heading to Emberhollow, give this pie to my brother. Don't tell him it's from me. He'll know. He always knows.`,`Tilly's pie. She remembered I like the crust burnt. ...Don't tell her I cried.`,20,'wren']
@@ -112,7 +112,7 @@ for(const [from,to,what,ask,reply,coins,min] of ERRANDS){
 }
 // ---------- the Wardens' Account
 const PAGES={
-  p1:{title:'Page One: Of the First Flame',text:[`Before the Wardens, before the lanterns, there was Vorlaxis. He woke in the heart of the mountain when the world was still warm from being made, and he decided the whole valley was his.`,`Nothing grew under his shadow. Nothing was cozy. Even the picnics were bad.`]},
+  p1:{title:'Page One: Of the First Flame',text:[`Before the Wardens, before the lanterns, there was Vorlaxis. He woke in the heart of the mountain when the world was still warm from being made, and he decided the whole valley was his.`,S(`Nothing grew under his smoke. People hid in caves and ate their suppers cold, because a cooking fire made him curious.`,`Nothing grew. People hid in caves and ate cold food.`)]},
   p2:{title:'Page Two: Of the Five',text:[`Iska, who made lanterns. Bram, who carried the biggest hammer and the loudest voice. Oriel, who could talk to drakes. Sedge, who was never once dry. Tove, who was never once warm.`,`Five ordinary people who decided that "nobody else is going to do it" was a good enough reason.`]},
   p3:{title:'Page Three: Of Ember',text:[`Vorlaxis had a daughter. Her name was Ember. She had his horns and his fire, and her mother's laugh.`,`She loved the valley more than she feared her father. One night she walked down the mountain and knocked on Iska's door and said, "I want to help."`]},
   p4:{title:'Page Four: Of the Splitting',text:[`A dragon made of fire cannot be killed. But fire can be shared. On the longest night, the Five and Ember split the First Flame in two.`,`Half stayed with Vorlaxis, who fell into a deep sleep. Half went into Ember. It hurt. She laughed anyway. Her children carried that fire after her, and their children after them.`]},

@@ -18,7 +18,7 @@ QDEFS.lakeking={title:'The Lake King',giver:'dell',min:'warcamp',ab:'stride',
   ]};
 Object.defineProperty(QDEFS.lakeking,'after',{get:abGate('stride','dell')});
 QDEFS.skyhoops={title:'Hoops in the Sky',giver:'elka',min:'oath',ab:'wings',
-  offer:[['elka',`ASH. You can FLY now? That is so unfair. I love it.`],['elka',`Ulf flies kites. I tied eight hoops to eight kites around the lodge. Fly through all of them before my sand timer runs out and I'll give you the fastest thing I own.`],['ash',`What's the fastest thing you own?`],['elka',`My lucky boots. Well. My second luckiest boots.`]],
+  offer:[['elka',`ASH. You can FLY now? That is so unfair. I love it.`],['elka',`Ulf flies kites. I tied eight hoops to eight kites around the lodge. Fly through all of them before my sand timer runs out and I'll give you the fastest thing I own.`],['ash',`What's the fastest thing you own?`],['elka',S(`My lucky boots. My second luckiest, anyway.`,`My lucky boots. Well, second luckiest.`)]],
   steps:[
     {t:'flag',flag:'skyhoops_won',npc:'elka',mini:'skyrace',text:'Fly through Elka’s eight kite hoops around Frostpine Lodge before her sand timer runs out (talk to Elka to start)',ready:[['elka',`Take off, then fly through the glowing hoop. Then the next one. Each hoop gives your wings a little rest. Ready? The sand is falling!`]]},
     {t:'talk',npc:'elka',text:'Collect your prize from Elka',lines:[['elka',`ALL EIGHT! That was the best thing I have ever seen. Ulf cried a little. He says it was the wind.`],['elka',`Here, my boots. You don't need them, you have wings. But now you'll LOOK fast too.`]],reward:{xp:180,stamina:10,sp:1}}

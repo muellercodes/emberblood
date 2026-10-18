@@ -55,7 +55,7 @@ STORY.a1_lantern_lit=[vl('narr',`The little lantern catches. Far, far below, in 
 STORY.a1_cinder_walk=[
   vl('cinder',`A thousand years I stood at that gate and looked up this road. I never once walked it.`,`For a thousand years I looked up this road. I never walked it.`),
   vl('ash',`What's it like?`,`What is it like?`),
-  vl('cinder',`Steep. Smoky. Terrible for the knees. Exactly as I imagined. I'm delighted.`,`Steep. Smoky. Bad for my knees. I love it.`),
+  vl('cinder',`Steep, smoky, and terrible for the knees, which is exactly what I hoped for.`,`Steep, smoky, and bad for my knees. I love it.`),
   vl('cinder',`I'll go ahead to the crater stairs and hold them. Nothing that serves him comes up behind you. You have my word, and I have been keeping my word for a very long time.`,`I will go ahead and guard the crater stairs. Nothing will sneak up behind you. I promise.`),
   ch('ash',S(`Anything you want to say to an old knight, Emberblood?`,`Anything to say to an old knight?`),[
     {t:S(`Thank you for waiting for me.`,`Thank you for waiting for me.`),tone:'kind',then:[vl('cinder',`It was worth it. Every year. Don't tell the other knights I said that. There are no other knights. Don't tell them anyway.`,`It was worth it. Every year. Don't tell the other knights. There are none. Still, don't tell.`)]},
@@ -65,7 +65,7 @@ STORY.a1_cinder_walk=[
 STORY.a1_cinder_helm=[vl('narr',`Sir Cindervane's helmet sits on the gate steps, with a red flower in it. You touch it for luck. It's warm.`,`Sir Cindervane's helmet sits here with a red flower. You touch it for luck. It is warm.`)];
 // ---------- 7.2 Tier 1: the Last Candle
 STORY.a1_stragglers=[
-  vl('narr',`Behind a pile of broken carts, three cultists and one knight are sitting around a single black candle. They look like they haven't slept since Tuesday.`,`Behind some broken carts, three cultists and a knight sit by a black candle. They look very tired.`),
+  vl('narr',`Behind a pile of broken carts, three cultists and one knight are sitting around a single black candle. They look like they haven't slept in a week.`,`Behind some broken carts, three cultists and a knight sit by a black candle. They look very tired.`),
   vl('a1_strag',`Is that the Emberblood? Is it over? Please say it's over. I want my mom.`,`Is that the Emberblood? Is it over? I want my mom.`),
   vls('narr',`Sister Soot stands up. She holds a letter. You know the handwriting. It's Morrow's.`,`Sister Soot holds up a letter. It is from Morrow.`,()=>G.choices.morrow!=='free'),
   vls('a1_soot',`Brother Morrow wrote to us. From a pumpkin patch. He says: "Go home. Grow something. It isn't worth it." He drew a pumpkin. It was a good pumpkin.`,`Morrow wrote to us. He says: "Go home. Grow something." He drew a good pumpkin.`,()=>G.choices.morrow!=='free'),
@@ -94,7 +94,7 @@ STORY.a1_iska_cold=[vl('narr',`An old stone lantern with Iska's mark on it. It's
 // ---------- 7.5 Tier 3: Bram's Anvil
 STORY.a1_bram_climb=[
   vl('bram',`HA! The Emberblood on my anvil! I used to come up here and hit this thing for fun. It's the loudest rock in the world.`,`HA! The Emberblood at my anvil! I hit this rock for fun. It's the loudest rock ever.`),
-  vls('bram',`And you brought Old Thunder! Look at her. I could cry. I won't. Wardens don't cry. We leak with pride.`,`You brought Old Thunder! I could cry. Wardens don't cry. We leak.`,()=>!vorThunder()),
+  vls('bram',`And you brought Old Thunder! Look at her. She's still got the dent from the time I hit Oriel's shield by mistake.`,`You brought Old Thunder! She still has my old dent.`,()=>!vorThunder()),
   vls('bram',`No hammer? On MY mountain? Here, take this one. I left it by the anvil a thousand years ago. Still good. Hammers don't go off.`,`No hammer? Take this old one. Hammers never go bad.`,()=>!!(G.weapons&&G.weapons.hammer)),
   vl('bram',`My gate there opens for the old song. "Over Cinder Mountain." If you know it, play it. If you don't, smash rocks. Both are good. Smashing is better.`,`My gate opens for the old song. Or smash the black rocks. Smashing is better.`),
   vl('bram',`Big black rocks want a CHARGED smash. Hold the attack, let the hammer glow, then BOOM.`,`Hold attack to charge the hammer. Then BOOM!`)];
@@ -138,13 +138,13 @@ STORY.a1_vor_end=[
 const VOR_HEART={
   hero:[vl('narr',`Where the dragon had been, something small glowed in the ash. A warm red stone, the size of a plum, beating very slowly, like a heart that was only dozing.`,`Where the dragon was, a warm red stone glows in the ash. It beats slowly, like a sleepy heart.`),
     vl('ash',`Huh. It's still warm.`,`Huh. It's still warm.`),
-    vl('narr',`Ash carried it home in both hands. Mom put it on the shelf above the forge, where it kept the whole house cozy and made the bread rise twice as fast. They called it the Ember Heart.`,`Ash carried it home. Mom put it above the forge. It kept the house cozy. They called it the Ember Heart.`)],
+    vl('narr',`Ash carried it home in both hands. It was hot as a coal, but not to him. Mom lifted it onto the shelf above the forge with her longest tongs, and there it kept the whole house cozy. They called it the Ember Heart.`,`Ash carried it home. Mom put it above the forge. It kept the house cozy. They called it the Ember Heart.`)],
   warden:[vl('narr',`When the sixth Ward-fire caught, something rolled out of the old flame and into the new one. A warm red stone, the size of a plum, beating very slowly.`,`When the sixth Ward-fire lit, a warm red stone rolled into it. It beats slowly.`),
     vl('iska',`The Ember Heart. All that's left of the fire he couldn't keep. Leave it in your Ward-fire, Warden. It will keep him sleepy. And keep you warm on the cold climbs.`,`The Ember Heart. Leave it in your Ward-fire, Warden. It keeps him sleepy and you warm.`),
     vl('narr',`So the Ember Heart sat in the sixth Ward-fire at the top of the mountain, glowing like a tiny sunrise, and every Lantern Day Ash brought it down for the festival and carried it back up again.`,`The Ember Heart glowed in the Ward-fire like a tiny sunrise. Every Lantern Day, Ash carried it down for the party.`)],
   heir:[vl('narr',`There was a little fire left over. Too much for Grandpa in his birdcage, not quite enough to make Ash any bigger. It rolled off the throne and sat there, glowing, the size of a plum.`,`A little fire was left over. It rolled off the throne and glowed there, the size of a plum.`),
     vl('ash',`Is that... spare fire?`,`Is that spare fire?`),
-    vl('narr',`Mom keeps it in the forge now. She calls it the Ember Heart. She also uses it as a paperweight, and once, when nobody was looking, to toast a crumpet.`,`Mom keeps it in the forge. She calls it the Ember Heart. Once she toasted a crumpet on it.`),
+    vl('narr',`Mom keeps it in the forge now and moves it with her longest tongs. She calls it the Ember Heart. Once, when nobody was looking, she toasted a crumpet on it.`,`Mom keeps it in the forge. She calls it the Ember Heart. Once she toasted a crumpet on it.`),
     vl('narr',`(Being a giant dragon turned out to be very hard on doorways. By the next morning Ash had worked out how to fold back down to normal size. Mostly.)`,`(Being a giant dragon was hard on doors. By morning Ash was normal size again. Mostly.)`)],
   lantern:[vl('narr',`Halfway down the mountain, Grandpa coughed. Something warm and red tumbled out and bounced on the path.`,`Halfway down, Grandpa coughed. A warm red stone bounced out.`),
     vl('vor',`Hm. That's the last of it. The old flame. I don't need it anymore. It's heavy, and it makes me grumpy.`,`That's the last of my old fire. I don't need it. It makes me grumpy.`),
