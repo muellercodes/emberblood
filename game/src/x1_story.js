@@ -1112,9 +1112,9 @@ if(typeof DREAMS!=='undefined'){
     xc('nyxara',`Little ember. Would you like to never lose anything, ever again?`,`Little ember. Do you want to never lose anything again?`,[
       xo(`Who are you?`,`Who are you?`,{fn:()=>{ G.flags.dr_c_whisper='who'; },then:[xl('nyxara',`Someone who understands. Everyone leaves, dear. I can make it stop.`,`Someone who knows. Everyone leaves. I can stop it.`)]}),
       xo(`Go away.`,`Go away.`,{tone:'brave',fn:()=>{ G.flags.dr_c_whisper='go'; },then:[xl('nyxara',`Shh. I'll come back. I always come back. That's the thing about the night.`,`Shh. I will come back. The night always does.`)]}),
-      xo(`...What do you mean?`,`What do you mean?`,{fn:()=>{ G.flags.dr_c_whisper='what'; },then:[xl('nyxara',`Your mother. Your friends. Your little Pip. One day they all go away. Unless the night never ends.`,`One day everyone goes away. Unless night never ends.`)]})]),
-    xl('narr',`Pip, asleep on your feet, growls in a tiny voice. The moth flutters away. You wake up cold.`,`Pip growls. The moth flies off. You wake up cold.`),
-    xl('ash',`Bad dream, Pip. Just a bad dream.`,`Just a bad dream, Pip.`)]};
+      xo(`...What do you mean?`,`What do you mean?`,{fn:()=>{ G.flags.dr_c_whisper='what'; },then:[xl('nyxara',`Your mother. Your friends. Everyone you love. One day they all go away. Unless the night never ends.`,`One day everyone goes away. Unless night never ends.`)]})]),
+    xl('narr',`In the forge, a log falls and the fire flares up. The moth flutters away. You wake up cold.`,`The fire flares. The moth flies off. You wake up cold.`),
+    xl('ash',`Just a bad dream. Just a bad dream.`,`Just a bad dream.`)]};
   if(typeof DREAM_ORDER!=='undefined') for(const id of ['c_twins','c_whisper']) if(!DREAM_ORDER.includes(id)){ const i=DREAM_ORDER.indexOf('home'); DREAM_ORDER.splice(i>=0?Math.max(i+1,DREAM_ORDER.length):DREAM_ORDER.length,0,id); }
   if(typeof DREAM_TALK!=='undefined'&&!DREAM_TALK.c_twins) DREAM_TALK.c_twins={c_oona:S(`You dreamed about baby Pearl, up the curtains the day she was born? Oh, duck. That's our family story. Nobody outside this house knows that one.`,`You dreamed of Pearl? That's our family story!`)};
 }
@@ -1260,7 +1260,7 @@ MINI.c_roofchase={
     const gap=M.ms-M.as, walk=(p.stats&&p.stats.speed)||200;
     let v=walk*1.15*(easy?0.92:1);
     if(gap<90) v=Math.max(v,330);
-    if(easy&&M.wi<C1R.waits.length&&M.ms>=C1R.waits[M.wi]){ if(gap>230){ v=0; M.wait+=dt; if(M.wait>0.2&&!(M.yoT>G.time)){ M.yoT=G.time+3; c1RSay(M,[S('Yoo-hoo! Up here!','Up here!'),S('Coming, little ember?','Coming?'),S('I can wait. For a bit.','I can wait.')]); } } else { M.wi++; M.wait=0; } }
+    if(easy&&M.wi<C1R.waits.length&&M.ms>=C1R.waits[M.wi]){ if(gap>230){ v=0; M.wait+=dt; if(M.wait>0.2&&!(M.yoT>G.time)){ M.yoT=G.time+3; c1RSay(M,[S('Over here! Try to keep up!','Over here!'),S('Coming, little ember?','Coming?'),S('I can wait. Not for long.','I can wait.')]); } } else { M.wi++; M.wait=0; } }
     if(M.ms>=C1R.total-30){ M.ms=C1R.total-30; v=0; }
     M.ms=Math.min(C1R.total-30,M.ms+v*dt);
     const mq=c1RAt(M.ms); M.face=mq.g.ux<0?-1:1; M.mx=mq.x; M.my=mq.y; M.mz=(mq.g.k==='gap'||mq.g.k==='gap2')?Math.sin(clamp((M.ms-mq.g.s0)/mq.g.len,0,1)*Math.PI)*(mq.g.k==='gap2'?54:34):mq.g.k==='line'?8:0;
