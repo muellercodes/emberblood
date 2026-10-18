@@ -464,3 +464,4 @@ function doorNoteDraw(){
   lines.forEach((l,i)=>g.fillText(l,bx+pad+iw,by+pad*0.7+lh*i+lh/2));
   g.restore();
 }
+window.__ebDbg=Object.assign(window.__ebDbg||{},{doorInfo:d=>({walk:doorWalkable(d),inA:doorIn(d),lock:doorLockText(d)}),note:()=>DW.note?DW.note.text:null,DW});

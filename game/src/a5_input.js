@@ -300,6 +300,9 @@ function readInput(dt){
     const used=!p||(p.swingT>0&&ATK.lsw<=0)||p.atkCd>ATK.lcd+0.02||!!p.ham||!!p.bow||p.dead||!atkBufOK();
     if(used) ATK.buf=0; else if(!o.attack&&ATK.press!=='use') o.attack=true;
   }
+  // a roll pressed while the last one is still going is kept a little longer too (about 0.3 s; the game keeps 0.15 s)
+  if(o.roll) ATK.rb=0.15;
+  else if(ATK.rb>0){ ATK.rb-=dt; if(p&&(p.dashT>0||p.dead)) ATK.rb=0; else if(G&&G.dashBuf<=0.02&&ATK.rb>0) o.roll=true; }
   if(p&&p.atkCd>ATK.lcd+0.02) ATK.n=(ATK.n||0)+1;   // swings started (tests)
   ATK.lsw=p?p.swingT:0; ATK.lcd=p?p.atkCd:0;
   if((ATK.press==='atk'&&o.attack)||(p&&(p.swingT>0||p.ham||p.bow))){ ATK.swingT=G.time; ATK.g=G; }
@@ -383,6 +386,7 @@ function updateCam(dt,snap){
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
 // test hooks (v11 UX): spawn a foe next to Ash, and what the attack button is doing
 window.__ebDbg=Object.assign(window.__ebDbg||{},{
+  dlg:()=>DLG?{i:DLG.i,n:DLG.lines.length,chars:Math.floor(DLG.chars),len:(DLG.text||'').length,opts:DLG.opts?DLG.opts.length:0,shown:!document.getElementById('dlgOpts').hidden,skipArm:!!DLG.skipArm,text:String(DLG.text||'').slice(0,50)}:null,
   lvl:n=>{ let k=0; while(player.level<n&&k++<99) gainXp(xpNeed(player.level)-player.xp+1); return player.level; },
   spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
   atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})

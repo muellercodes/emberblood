@@ -25,7 +25,10 @@ function runDialogue(lines,done,opt){
   show('dialogue'); setLine();
 }
 function lineParts(l){ return Array.isArray(l)?{who:l[0],text:l[1],opts:l[2]}:l; }
-function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d(); }
+function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d();
+  // (v11) a talk that ends with foes close (a boss's opening words with his guards already swinging) gives Ash a moment
+  // to get his hands back on the keys before the first hit can land (he blinks while it lasts)
+  try{ if(G&&player&&!player.dead&&(G.inCombat||(G.boss&&!G.boss.dead)||foeNear(160))) player.iframes=Math.max(player.iframes,0.9); }catch(e){} }
 function setLine(){
   const L=lineParts(DLG.lines[DLG.i]), who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
   if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; }
