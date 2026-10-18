@@ -18,7 +18,7 @@ const FLOORS={
     items:[['musicbox'],['chair'],['cobweb'],['window'],['crate']]}},
   h_osric:{down:{style:'cellar',name:'The old cells',items:[['cell'],['barrel'],['barrel'],['crate'],['note','Scratched into the wall: "DAY 3. The dogs still won’t share their biscuits."']]}},
   h_osric_down:{down:{style:'cellar',name:'The smugglers’ tunnel',secret:{at:'wall',label:'Push the loose brick',text:'You push the loose brick. It falls through. So do the next twelve. There’s a tunnel back here.'},
-    items:[['crate'],['crate'],['hchest',{coins:60,camps:true,text:'An Oath stash: sixty coins and a map of every camp on the Ashen Road. They’re on your map now.'}],['note','Chalk on the wall: "Meet at the crossroads. Bring snacks. Do NOT bring Fennick, he hums."']]}},
+    items:[['crate'],['crate'],['hchest',{coins:60,camps:true,text:S('An Oath stash: sixty coins and a map of every Oath and kobold camp in the valley. They’re on your map now.','Oath loot: 60 coins and a map of every camp!')}],['note','Chalk on the wall: "Meet at the crossroads. Bring snacks. Do NOT bring Fennick, he hums."']]}},
   h_library:{up:{style:'archive',name:'The library archive',items:[['shelf'],['shelf'],['shelf',{trig:true}],['desk'],['candles'],['window']]}},
   h_library_up:{up:{style:'secretroom',name:'Iska’s reading room',secret:{at:'shelf',label:'Pull the odd blue book',text:'One blue book won’t come off the shelf. You tug it. The whole bookcase swings open like a door. Iska loved secret rooms.'},
     items:[['note','Iska’s handwriting: "If anyone finds this room, I hope it’s someone kind. Sit. Read. Then go and be brave. The lantern is for you." '],['hchest',{bless:1,energy:20,text:'Iska’s spare lantern wick. Your fire breath lasts longer now.'}],['shelf'],['candles'],['chair']]}},
@@ -31,7 +31,7 @@ const FLOORS={
   h_gorran:{down:{style:'cellar',name:'Gorran’s rock cellar',secret:{at:'bunk',label:'Look under the bunk',text:'Under the bunk is a trapdoor with ROCKS painted on it in big letters. Gorran is not subtle.'},
     items:[['rock'],['rock'],['ore'],['note','"My rock collection. Every one has a name. The big one is Maren. Don’t tell her." G.'],['crate']]}},
   h_ulf:{up:{style:'attic',name:'The lodge attic',items:[['moosehead'],['hchest',{hat:'feather',reveal:'frost',text:'Grandfather Hollis’s hunting map, with every path in the high snow marked. And under it, a dashing feathered cap with a note: "For Ulf. Love, Marigold." Ulf never looked up. It’s yours now.'}],['crate'],['cobweb'],['window']]}},
-  h_quill:{up:{style:'deck',name:'The rooftop telescope',items:[['telescope2'],['chair'],['note','Quill’s notes: "Three stars fell into the valley. I’ve marked them on my chart. Look at night. ALWAYS AT NIGHT."']]}}
+  h_quill:{up:{style:'deck',name:'The rooftop telescope',items:[['telescope2'],['chair'],['note',S('Quill’s notes: "Stars have fallen into the valley. I’ve marked every one on my chart. Look at night. ALWAYS AT NIGHT."','Quill’s notes: "Stars fell here. Look at night. ALWAYS AT NIGHT."')]]}}
 };
 const SECRET_ROOMS=[];
 for(const id in FLOORS){ for(const dir of ['up','down','cubby']){ const F=FLOORS[id][dir]; if(F&&F.secret) SECRET_ROOMS.push(id+'_'+dir); if(dir==='cubby'&&F) SECRET_ROOMS.push(id+'_cubby'); } }
@@ -169,7 +169,7 @@ function floorObjAct(o){
         {t:'Hum something spooky',tone:'silly',then:[['narr','"Ooooo! That’s MY job! Ha! I like you."']]},
         {t:'Back away slowly',then:[['narr','"Everyone does that. I’m used to it. Bye now."']]}])],()=>{ scene='play'; saveGame(); }); return true;
     case 'moosehead': say(pick(['The moose head blinks. "...Don’t tell Ulf I can talk. He’s scared enough of the attic already."',S('"I used to be the biggest moose in the Frostpine," says the moose head. "Now I’m the biggest moose in the attic. Not much competition up here."','"I was the biggest moose in the woods," says the moose head. "Now I am the biggest in the attic."')])); return true;
-    case 'telescope2': if(isNight()){ say('Through the big telescope, the night sky is full. Three bright streaks show where stars fell into the valley. You can see them on your map now.',()=>{ G.flags.chart=true; }); } else say('Too bright to see any stars. Quill’s note says: ALWAYS AT NIGHT.'); return true;
+    case 'telescope2': if(isNight()){ say(S('Through the big telescope, the night sky is full. Bright streaks show where stars fell into the valley. You can see the spots on your map now.','You see where stars fell! They are on your map now.'),()=>{ G.flags.chart=true; }); } else say('Too bright to see any stars. Quill’s note says: ALWAYS AT NIGHT.'); return true;
     case 'mousehole': say(pick(['A tiny door in the wall, with a tiny sign: KNOCK FIRST.','You knock. A tiny voice says "Not today, thank you."','There’s a very small doormat that says WELCOME (NOT YOU, CAT).'])); return true;
     case 'crate': say(pick(['A crate full of turnips.','A crate labeled "DO NOT OPEN." You don’t. You’re a good dragon.','Old lanterns, packed in straw.','Jars of pickles. So many pickles.'])); return true;
     case 'cobweb': say('A spider has written something in the web. It might say "hello." It might say "go away." Spider handwriting is hard.'); return true;

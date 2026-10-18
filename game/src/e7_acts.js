@@ -350,7 +350,7 @@ function theftLines(){
   return L;
 }
 function cliffLines(){
-  return [xl('c_thief',`Here we are. The edge of Embermere. You run fast, little dragon. Almost fast enough.`,`The edge of Embermere. You almost caught me!`),
+  return [xl('c_thief',`Here we are, the edge of Embermere. You run fast, Emberblood. Almost fast enough.`,`The edge of Embermere. You almost caught me!`),
     xl('ash',`Why do you even want it? It's a warm rock! A very important warm rock, but still!`,`Why do you want it? It's just a warm rock!`),
     xl('c_thief',`Because someone promised me it would fix something that has been broken for a long, long time.`,`Someone promised it would fix something broken.`),
     xl('c_thief',`...Sorry. Really. I'm a thief, not a liar.`,`Sorry. Really.`),
@@ -412,8 +412,8 @@ function thiefArrive(T){
   T.seg++; T.mode='wait'; T.t=0; T.z=0; const n=HROUTE[T.seg]; T.x=n.x; T.y=n.y;
   if(n.say!=null&&HSAY[n.say]) bubble(T,S(HSAY[n.say][0],HSAY[n.say][1]),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-56});
   if(n.drop) dropBarrels(T);
-  if(n.hide){ T.mode='hide'; T.alpha=0; smokeAt(T.x,T.y,1.1); HS.bales=n.hide.map(([x,y])=>({x,y,checked:false,shake:0})); HS.found=0; bubble(T,S(`Hide and seek, little dragon! Ready or not!`,`Hide and seek! Ready or not!`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-56}); later(0.2,questUpdated); }
-  if(n.end){ T.face=player.x>=T.x?1:-1; bubble(T,S(`End of the line, little dragon. Come closer. I won't bite.`,`Come closer. I won't bite.`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-56}); }
+  if(n.hide){ T.mode='hide'; T.alpha=0; smokeAt(T.x,T.y,1.1); HS.bales=n.hide.map(([x,y])=>({x,y,checked:false,shake:0})); HS.found=0; bubble(T,S(`Hide and seek! Ready or not, here I go!`,`Hide and seek! Ready or not!`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-56}); later(0.2,questUpdated); }
+  if(n.end){ T.face=player.x>=T.x?1:-1; bubble(T,S(`End of the line. Come a little closer, I won't bite.`,`Come closer. I won't bite.`),{who:SPK.c_thief.name,col:SPK.c_thief.col,dy:-56}); }
 }
 function thiefPoof(T){
   smokeAt(T.x,T.y,1);

@@ -796,7 +796,7 @@ function grizCrack(e,full){
 }
 // ---------- High Priest Morrow: a ring of fire pillars with a shield; soak up the flames, then roar them out
 defineFoe('morrow',{hp:actIHp(860),phases:[0.66,0.33],
-  phaseText:[[S('Ring of Fire!','Ring of fire!'),S('His shield feeds on the pillars. Stand in the ring until your ROAR is full, then roar!','Wait for ROAR. Then roar!'),['morrow',S('Burn in the holy fire of the Oath!','Burn, little dragon!')]],
+  phaseText:[[S('Ring of Fire!','Ring of fire!'),S('His shield feeds on the pillars. Stand in the ring until your ROAR is full, then roar!','Wait for ROAR. Then roar!'),['morrow',S('Burn in the holy fire of the Oath!','Burn in the Oath fire!')]],
              [S('The Fire Spins!','Spinning fire!'),S('More pillars, and they turn. Same trick: fill your ROAR, then roar!','Fill ROAR. Then roar!'),['morrow',S('The Oath will not break!','The Oath is strong!')]]],
   init(e){ e.ringT=99; },
   onPhase(e,i){ e.ringT=0.5; },
@@ -945,7 +945,7 @@ function gloamPool(e,dt){
 // ---------- Greymane: an ice coat that only fire melts, frozen ground from his breath, and the pack leaping the wall
 defineFoe('greymane',{hp:actIHp(1100),phases:[0.66,0.33],
   phaseText:[[S('Frost Coat!','Ice coat!'),S('Ice covers him. Melt it with fire breath! His breath freezes the ground, so melt that too.','Melt his ice with fire!'),['ember',S('Ice? You are a fire dragon, Ash. Melt it!','Melt it, Ash! Use fire!')]],
-             [S('The Pack!','The pack!'),S('Wolves leap over the wall. Keep moving, and keep melting his coat!','Wolves! Keep moving!'),['ember',S('Here comes the whole pack!','The pack is here!')]]],
+             [S('The Pack!','The pack!'),S('He howls for his pack. If wolves leap the wall, keep moving, and keep melting his coat!','He calls wolves! Keep moving!'),['ember',S('He is calling his pack, Ash!','He calls his pack!')]]],
   onPhase(e,i){ if(i===1) e.coatGo=true; if(i===2) e.packCall=true; },
   ai:greyAI,
   onHurt(e,amt,o){ if(!e.coat) return; const h=foeHit(e,o);
