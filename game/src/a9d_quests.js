@@ -83,7 +83,50 @@ function qAvail(id){
   if(d.errand){ const to=d.steps[0].npc; if(!npcPresent(to)||!npcPresent(d.giver)) return false; if(Object.values(G.quests).filter(q=>!q.done&&q.errand).length>=3) return false; }
   if(id==='lure'&&!G.bossDone.gloamjaw) return false;
   if(id==='gate'&&!G.flags.gateHint) return false;
-  return true;
+  return qpOk(id);
+}
+// ---------- pacing: a town is a place people live, not a job board (v11)
+// Each Act I town shows at most QP_MAX gold ! at once, story ones included, and at most QP_ERR errand letters. When more
+// side quests are open than that, the ones higher in QP_ORDER are offered first; the rest wait their turn (a quest that
+// is already started is never touched). Nobody offers anything while the kobolds are in Emberhollow. When each quest
+// opens is its own `min` stage (see QUESTS_NOTES.md in the v11 scratchpad for the table).
+const QP_MAX=3, QP_ERR=1, QP_TOWNS=new Set(['village','brindle','copper','farm','lodge','way','mire']);
+const QP_ORDER=['a1_lanterns','bun','pumpkins','song','hollow','sheep','moss','a1_bram','swap','a1_pip',
+  'dell','bounty','thief','seek','pie','lure','bounty2','a1_moth','duchess','a1_hop','horn','race','skyhoops','kettle','mine'];
+const QP={raw:0,key:'',G:null,allow:null,err:null,prio:null};
+// an Act I quest (Act II to V ids start c_, f_, m_, n4_, q_) whose giver lives in an Act I town
+function qpPaced(id){ const d=QDEFS[id]; if(!d||d.story||d._s10||/^(c|f|m|n\d|q)_/.test(id)) return false; const c=CASTBY[d.giver]; return !!c&&QP_TOWNS.has(c.town); }
+function qpPrio(id){ if(!QP.prio){ QP.prio={}; QP_ORDER.forEach((k,i)=>{ QP.prio[k]=i; }); let i=100; for(const k in QDEFS) if(QP.prio[k]==null) QP.prio[k]=i++; } return QP.prio[id]!=null?QP.prio[id]:999; }
+function qpOk(id){
+  if(QP.raw||!G||G.mode!=='story'||!qpPaced(id)) return true;
+  if(G.stage==='raid') return false;
+  qpRefresh();
+  return QDEFS[id].errand?QP.err.has(id):QP.allow.has(id);
+}
+function qpRefresh(){
+  const key=`${G.stage}|${Object.keys(G.quests).length}|${Math.floor((G.time||0)*2)}|${G.done?1:0}`;
+  if(QP.G===G&&QP.key===key&&QP.allow) return;
+  QP.G=G; QP.key=key; const allow=new Set(), err=new Set(), towns={};
+  QP.raw++;
+  try{
+    const by={}; for(const id in QDEFS){ if(G.quests[id]||!qpPaced(id)) continue; const g=QDEFS[id].giver; (by[g]||(by[g]=[])).push(id); }
+    for(const c of CAST){
+      if(!QP_TOWNS.has(c.town)||!npcPresent(c.id)) continue;
+      const T=towns[c.town]||(towns[c.town]={fixed:0,side:[],errs:[]});
+      // a gold ! that is not a side quest's (the story, a Case Book quest): it always shows, and takes a place
+      if(!npcMarkerWait(c.id)&&storyMarker(c.id)){ T.fixed++; continue; }
+      let best=null, bp=1e9, er=null;
+      for(const id of by[c.id]||[]){ const d=QDEFS[id];
+        let ok=false; try{ ok=qAvail(id); }catch(e){ ok=false; } if(!ok) continue;
+        if(d.errand){ if(!er) er=id; continue; }
+        const pr=qpPrio(id); if(pr<bp){ bp=pr; best=id; } }
+      if(best) T.side.push([bp,best]); else if(er) T.errs.push(er);
+    }
+    for(const t in towns){ const T=towns[t]; T.side.sort((a,b)=>a[0]-b[0]);
+      for(const [,id] of T.side.slice(0,Math.max(0,QP_MAX-T.fixed))) allow.add(id);
+      for(const id of T.errs.slice(0,QP_ERR)) err.add(id); }
+  } finally { QP.raw--; }
+  QP.allow=allow; QP.err=err;
 }
 function availableFrom(id){ let err=null; for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)){ if(!QDEFS[k].errand) return k; if(!err) err=k; } return err; }
 function stepOf(id){ const q=G.quests[id]; return q&&!q.done?QDEFS[id].steps[q.step]:null; }
@@ -148,9 +191,14 @@ function questPoke(){
 }
 function reforgeIron(){ if(G.iron<=0) return; while(G.iron>0){ G.iron--; G.tier++; player.stats.slash*=1.15; } setBanner(`Blade reforged · tier ${G.tier+1}`,'Each star-iron makes every weapon hit 15% harder.',2.8); SFX.play('upgrade'); }
 // markers: ! = has a quest for you, ? = waiting on you
-function npcMarker(id){
+// a person someone's quest is waiting on: ? (ready) or … (still need something)
+function npcMarkerWait(id){
   for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id) return haveAll(st.take)?'?':'…'; if(st&&st.mini&&st.npc===id&&!G.mini) return '?'; const T=QDEFS[qid].topics; if(st&&T&&T[id]&&!G.flags[T[id].flag]&&G.quests[qid].step===0) return '?'; }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)) return '?';
+  return null;
+}
+function npcMarker(id){
+  const w=npcMarkerWait(id); if(w) return w;
   const av=availableFrom(id); if(av&&!QDEFS[av].errand) return '!';
   if(storyMarker(id)) return '!';
   if(av) return '✉';
@@ -532,3 +580,6 @@ function updateAllies(dt){
     }
   }
 }
+// test hooks (QUESTS pacing checks)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{qAvail:id=>qAvail(id),availableFrom:id=>availableFrom(id),npcMarker:id=>npcMarker(id),storyMarker:id=>storyMarker(id),
+  qpRaw:id=>{ QP.raw++; try{ return qAvail(id); } finally { QP.raw--; } },qpState:()=>{ QP.key=''; qpRefresh(); return {allow:[...QP.allow],err:[...QP.err]}; }});
