@@ -640,7 +640,7 @@ function brisketAsk(){
   const o=CF.ice||iceLM(), at=o?{x:o.x+10,y:o.y+34}:null, old=G.comp&&G.comp!=='brisket'?CDEF[G.comp]:null;
   runDialogue([['brisket',`Actually... being warm sounds a bit boring. I've been an ice cube for ages. I want an ADVENTURE.`],['brisket',`I've got a sword. I've got a shield. I've got about four hundred jokes. Can I come with you?`],
     ch('ash','Bring Brisket along?',[
-      {t:old?`Yes! Come on! (${old.name} heads home)`:'Yes! Come on!',tag:'friend',fn:()=>recruitComp('brisket',at),then:[['brisket',`Brisket the Bold rides again! Walks again, anyway. Squishily.`]]},
+      {t:old?`Yes! Come on! (${old.name} heads home)`:'Yes! Come on!',tag:'friend',fn:()=>recruitComp('brisket',at),then:[['brisket',S(`Brisket the Bold rides again! Walks again, anyway. Squishily.`,`Brisket the Bold is back! Let's go!`)]]},
       {t:'Maybe later.',then:[['brisket',`Fair enough! I'll be at the Frostpine Lodge, thawing my toes. Ask me any time.`]]}])],()=>{ scene='play'; saveGame(); });
 }
 // prompts of our own: Duchess at the farm, Greymane in the pines, your companion when you stop next to them
@@ -1059,7 +1059,7 @@ const DGREET={
   'pip@maren':[['any',`Is Pip eating properly? He ate my tongs.`]],
   ch_greymane_ally:[['any',`Is it true Greymane stands with you now? The giant wolf? Wow.`]],
   ch_greymane_home:[['adult',`They say you sent Greymane home to his family. That was kind, Ash.`]],
-  ch_morrow_free:[['adult',`You let Morrow go? To grow pumpkins? People can change, I suppose.`]],
+  ch_morrow_free:[['adult',S(`You let Morrow go? To grow pumpkins? People can change, I suppose.`,`You let Morrow go grow pumpkins? Okay!`)]],
   ch_morrow_jail:[['adult',`Morrow's in a cell now. Osric says he's the tidiest prisoner ever.`]],
   ch_fennick_forgive:[['town:village|!id:fennick',`Fennick says you gave him a second chance. He's been lighting lanterns ever since.`]],
   comp_brisket:[['any',`I see you've thawed out a friend!`]],
