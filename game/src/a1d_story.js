@@ -98,7 +98,7 @@ const STORY={
         ['narr',S(`"To W., the lamp-man of Emberhollow. Leave the North Gate open on Lantern Day and the oil will never run out. The Oath remembers its friends."`,`A letter: open the gate, and get oil forever.`)],
         ch('morrow',`Please. I'm an old man who believed a dragon. Isn't that punishment enough?`,[
           {t:'Let him go',fn:()=>{ G.choices.morrow='free'; },then:[['ash',`Go home, Morrow. Find something better to believe in.`],['morrow',`I... thank you. I think I'll go somewhere quiet. Maybe grow something that isn't on fire.`]]},
-          {t:'Take him to Captain Osric',fn:()=>{ G.choices.morrow='jail'; },then:[['ash',`You're coming with me to Brindlecross. Captain Osric can decide.`],['narr',`You march Morrow all the way to the Brindlecross Watch House. Osric looks thrilled. Morrow looks relieved, honestly.`]]}
+          {t:'Take him to Captain Osric',fn:()=>{ G.choices.morrow='jail'; },then:[['ash',`You're coming with me to Brindlecross. Captain Osric can decide.`],['narr',`You march Morrow all the way to the Brindlecross Watch House. Osric looks thrilled. Morrow looks relieved.`]]}
         ])
       ]},
     broodmother:{

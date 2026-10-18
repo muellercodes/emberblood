@@ -640,7 +640,7 @@ function brisketAsk(){
   const o=CF.ice||iceLM(), at=o?{x:o.x+10,y:o.y+34}:null, old=G.comp&&G.comp!=='brisket'?CDEF[G.comp]:null;
   runDialogue([['brisket',`Actually... being warm sounds a bit boring. I've been an ice cube for ages. I want an ADVENTURE.`],['brisket',`I've got a sword. I've got a shield. I've got about four hundred jokes. Can I come with you?`],
     ch('ash','Bring Brisket along?',[
-      {t:old?`Yes! Come on! (${old.name} heads home)`:'Yes! Come on!',tag:'friend',fn:()=>recruitComp('brisket',at),then:[['brisket',`Brisket the Bold rides again! Well. Walks. Squishily.`]]},
+      {t:old?`Yes! Come on! (${old.name} heads home)`:'Yes! Come on!',tag:'friend',fn:()=>recruitComp('brisket',at),then:[['brisket',`Brisket the Bold rides again! Walks again, anyway. Squishily.`]]},
       {t:'Maybe later.',then:[['brisket',`Fair enough! I'll be at the Frostpine Lodge, thawing my toes. Ask me any time.`]]}])],()=>{ scene='play'; saveGame(); });
 }
 // prompts of our own: Duchess at the farm, Greymane in the pines, your companion when you stop next to them
@@ -1054,12 +1054,12 @@ const DGREET={
   q_seek:[['town:brindle',`Ash! Found any more kids in barrels?`]],
   q_pie:[['town:brindle|!id:mayor',`Ash! Don't worry, the Mayor's secret is safe with me. Mostly.`]],
   q_race:[['town:lodge|!id:elka',`Ash! Faster than Elka! Who knew?`]],
-  'q_hollow@rook':[['any',`Ash! Juniper says you're her hero. Her second hero. I'm first. I'm her brother.`]],
+  'q_hollow@rook':[['any',S(`Ash! Juniper says you're her hero. Her second hero. I'm first. Brothers always come first.`,`Juniper says you are her hero! Her second one. I'm first.`)]],
   pip:[['any',`Ash! I heard you have a baby dragon now! Where is he?`]],
   'pip@maren':[['any',`Is Pip eating properly? He ate my tongs.`]],
   ch_greymane_ally:[['any',`Is it true Greymane stands with you now? The giant wolf? Wow.`]],
   ch_greymane_home:[['adult',`They say you sent Greymane home to his family. That was kind, Ash.`]],
-  ch_morrow_free:[['adult',`You let Morrow go? To grow pumpkins? Well. People can change, I suppose.`]],
+  ch_morrow_free:[['adult',`You let Morrow go? To grow pumpkins? People can change, I suppose.`]],
   ch_morrow_jail:[['adult',`Morrow's in a cell now. Osric says he's the tidiest prisoner ever.`]],
   ch_fennick_forgive:[['town:village|!id:fennick',`Fennick says you gave him a second chance. He's been lighting lanterns ever since.`]],
   comp_brisket:[['any',`I see you've thawed out a friend!`]],

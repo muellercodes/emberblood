@@ -111,7 +111,7 @@ EVS.ghost={title:S('The Ghost Who Lost His Hat','The Ghost and the Hat'),
     ])],
   back:E=>[
     xc('ev_wisp',`My hat! You found my hat!`,`You found my hat!`,[
-      xo(`Here you go, Sir Wispley`,`Here you go!`,{tone:'kind',fn:()=>evGive({coins:20,heal:true}),then:[xl('ev_wisp',`I feel whole again. Well. As whole as a ghost gets. Here, ghost money. It's just regular money, but colder.`,`Thank you! Here is some ghost money. It is cold.`)]}),
+      xo(`Here you go, Sir Wispley`,`Here you go!`,{tone:'kind',fn:()=>evGive({coins:20,heal:true}),then:[xl('ev_wisp',`I feel whole again. As whole as a ghost gets, anyway. Here, ghost money. It's just regular money, but colder.`,`Thank you! Here is some ghost money. It is cold.`)]}),
       xo(`Can I try it on first?`,`Can I try it on?`,{fn:()=>evGive({coins:20,heal:true}),then:[xl('narr',`You put on the hat. It's freezing. Your horns poke out of the top. Sir Wispley laughs so hard he goes see-through. More see-through.`,`You put on the hat. It is so cold! Your horns stick out. Sir Wispley laughs and laughs.`),xl('ev_wisp',`Oh, that was worth losing it for. Here, for the giggle.`,`That was funny! Here, for the giggle.`)]}),
       xo(`Can I keep it?`,`Can I keep it?`,{fn:()=>{ if(G.hats&&G.hats.top) evGive({coins:30}); else evGive({hat:'top',wear:true}); E.d.kept=true; },then:[xl('ev_wisp',`Keep it? ...Well. You did find it. And you look so dashing. Take it! I'll wear my second-best hat. It's a bucket.`,`Okay! You can keep it. I will wear a bucket instead.`)]})
     ]),
@@ -417,7 +417,7 @@ TKS.tk2={title:S('The Oven That Would Not Light','Tikka Bakes Bread'),
       :xl('narr',`The oven glows a soft orange. Soon the whole lakeshore smells like warm bread.`,`The oven glows. Soon it smells like warm bread.`),
     xl('ev_tikka',E.d.burnt?`It's... half bread and half charcoal. That's TWO foods! You're a genius.`:`It worked! My first real bread! It's lumpy and lovely and it's MINE.`,E.d.burnt?`It is half burnt. That is okay!`:`It worked! My first real bread!`),
     xc('ev_tikka',`Here, the first bun is for you. What will you do with it?`,`Here is the first bun. For you!`,[
-      xo(`Eat it right now`,`Eat it now`,{fn:()=>{ G.flags.tk_bun='ate'; evGive({heal:true}); },then:[xl('narr',`It's crunchy. In a good way. Mostly. Your health fills right up.`,`Crunchy! Yum. You feel all better.`)]}),
+      xo(`Eat it right now`,`Eat it now`,{fn:()=>{ G.flags.tk_bun='ate'; evGive({heal:true}); },then:[xl('narr',`It's crunchy, in a good way. Your health fills right up.`,`Crunchy! Yum. You feel all better.`)]}),
       xo(`Save it for Bertram the baker`,`Save it for Bertram the baker`,{tone:'kind',fn:()=>{ G.flags.tk_bun='bertram'; tkTrust(1); },then:[xl('ev_tikka',`For a REAL baker? He'll probably hate it. Do you think he'll hate it? Don't tell me.`,`For a real baker? Wow! I hope he likes it.`)]})
     ]),
     xc('ash',`What do you tell her?`,`What do you tell her?`,[
@@ -661,7 +661,7 @@ const MOM_CH={
 const YARA_CH={
   warcamp:[S(`Breathe, Ash. The Hollow Ward is lit. That's one. Four to go, and I'll be counting.`,`One Ward is lit. Four to go.`)],
   three:[S(`Three Wards to go, and the mountain is breathing louder every night. Forty-one breaths last night. I lay awake for every one.`,`Three Wards left. The mountain breathes louder every night.`)],
-  gate:[S(`All five Wards burn. A thousand years of Wardens, and a kid with a tail finished the job. Well. Nearly.`,`All five Wards are lit! You nearly did it.`)],
+  gate:[S(`All five Wards burn. A thousand years of Wardens, and a kid with a tail finished the job. Nearly finished it.`,`All five Wards are lit! You nearly did it.`)],
   done:[S(`A thousand and one Lantern Days. I'll light the first lantern again next year. Unless you'd like to.`,`Next Lantern Day, you can light the first lantern.`)]
 };
 // Pip's chirps with a bit of context (night, rain, snow, water, low health, a dream, a friend)
