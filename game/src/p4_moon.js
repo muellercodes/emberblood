@@ -1355,7 +1355,7 @@ const P4_LAB={
 };
 defineDungeon('p4_lab',{name:S('The Moon Lab','The Moon Lab'),level:17,theme:'crystal',seed:404,save:'p4_lab',noJuniper:true,giftOK:{},dark:0.2,
   dunKind:S('A test cave','A test cave'),
-  story:{in:[['ash',S('A cave for practicing the powers of Moonfall. Wet, sandy and a bit spooky. Perfect.','A cave to practice my powers!')]]},
+  story:{in:[['ash',S('A cave for practicing the powers of Moonfall. It is wet, sandy and a bit spooky.','A cave to practice my powers!')]]},
   floors:[{id:'1',name:S('The Lab','The Lab'),map:{rooms:{
     a:{at:[1,2],kind:'start',tpl:P4_LAB.a,loot:['treasure'],sign:S('Dive: roll on the deep water, swim under the arch, find the chest. Bubbles give air.','Dive under the arch!'),noPots:true,noDecor:true},
     b:{at:[1,1],kind:'switches',tpl:P4_LAB.b,sign:S('The switch is under the flooded water. Dive and swim into it. The dark pools are linked.','Dive to the switch!'),noPots:true,noDecor:true},

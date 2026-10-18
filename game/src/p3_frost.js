@@ -1245,7 +1245,7 @@ function p3GateAct(o){
 }
 function p3MarkAct(o){
   if(o.k==='p3_vane') p3Read(S('A big wind vane. Hit it (an arrow, the boomerang, the whip, a sword) and it turns. It decides which way the wind blows.','A wind vane. Hit it to turn it.'));
-  else if(o.k==='p3_up') p3Read(canWindride()?S('A warm updraft. Step into it and the wind lifts you up.','Step in. The wind lifts you!'):S('Warm air rushes up out of the grate. It nearly lifts you off your feet. Nearly.','Warm air blows up. Not strong enough.'));
+  else if(o.k==='p3_up') p3Read(canWindride()?S('A warm updraft. Step into it and the wind lifts you up.','Step in. The wind lifts you!'):S('Warm air rushes up out of the grate. It almost lifts you off your feet, but not quite.','Warm air blows up. Not strong enough.'));
   else if(o.k==='p3_psw') p3Read(S('A big round switch with a ram’s face. Too heavy for your claws. Jump on it and pound!','A heavy switch. Pound it!'));
   else if(o.k==='p3_lt') p3Read(S('A pound tile. Pounding it flips it, and the tiles beside it flip too.','Pound it. Its neighbours flip too.'));
 }
@@ -1435,7 +1435,7 @@ const P3_LAB={
 };
 defineDungeon('p3_lab',{name:S('The Frost Lab','The Frost Lab'),level:13,theme:'ice',seed:303,save:'p3_lab',noJuniper:true,giftOK:{},dark:0.25,
   dunKind:S('A test cave','A test cave'),
-  story:{in:[['ash',S('A cave for practicing the powers of the north. It is cold in here. Obviously.','A cave to practice my winter powers!')]]},
+  story:{in:[['ash',S('A cave for practicing the powers of the north. It is very cold in here.','A cave to practice my winter powers!')]]},
   floors:[
     {id:'1',name:S('The Frost Lab','The Frost Lab'),map:{rooms:{
       a:{at:[1,2],kind:'start',tpl:P3_LAB.a.tpl,frost:P3_LAB.a.frost,loot:['treasure','dmap'],noPots:true,noDecor:true,

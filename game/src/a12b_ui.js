@@ -83,7 +83,7 @@ function renderJour(){
     rows.push(`<div class="jh2">Act I endings found</div><p>${ne} of 4${ne?': '+E(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · ')):''}. Different choices lead to different endings.</p>`);
   }else if(jTab==='people'){
     const met=CAST.filter(c=>!c.generic&&(G.seenTalk&&G.seenTalk['met_'+c.id]));
-    rows.push(`<p>People you've met: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
+    rows.push(`<p>People you've talked to: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
     rows.push('<div class="ppl">'+met.map(c=>{ const f=friendOf(c.id), h='♥'.repeat(Math.floor(f))+'♡'.repeat(5-Math.floor(f)); const T=TALK[c.id]||{}; return `<div><b>${E(c.name.replace(', your mom',''))}</b> <span class="hz">${h}</span><small>${E(TOWN_NAME[c.town]||'')}${T.bio?' · '+E(T.bio):''}</small></div>`; }).join('')+'</div>');
   }else if(jTab==='bag'){
     const inv=Object.keys(G.items).filter(k=>G.items[k]>0).map(k=>`${ITEM_NAMES[k]||k}${G.items[k]>1?' ×'+G.items[k]:''}`);
