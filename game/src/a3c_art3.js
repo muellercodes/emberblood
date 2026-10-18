@@ -163,8 +163,8 @@ Object.assign(R2ST,{
 const STAIR_MAT={
   // t0/t1: tread at the bottom/top, r0/r1: riser at the bottom/top, side: the side walls, cap: rails and post caps
   wood:{t0:'#9c6a40',t1:'#e4b47c',r0:'#4a2a16',r1:'#8a5a30',side:'#5e381e',cap:'#b07a4a',post:'#6a4024',rim:'#6e4626',rimLit:'#a87648',deep:'#160d08',line:'#3a2212',run:['#b03a30','#6e1e1a','#e2b24c']},
-  stone:{t0:'#7e766c',t1:'#bfb7a6',r0:'#3c3834',r1:'#78716a',side:'#56504a',cap:'#a8a092',post:'#625a52',rim:'#5a554e',rimLit:'#9a9286',deep:'#0e0c0c',line:'#2a2622'},
-  dun:{t0:'#857258',t1:'#c8b48e',r0:'#382c22',r1:'#6e5c48',side:'#52443a',cap:'#a8967a',post:'#5e4e3e',rim:'#4e4236',rimLit:'#8e7c62',deep:'#0c0a08',line:'#241c14'}
+  stone:{t0:'#78706a',t1:'#b2aa9a',r0:'#363230',r1:'#6a645e',side:'#56504a',cap:'#a8a092',post:'#625a52',rim:'#5a554e',rimLit:'#9a9286',deep:'#0e0c0c',line:'#2a2622'},
+  dun:{t0:'#806c52',t1:'#bca682',r0:'#32281e',r1:'#64523e',side:'#52443a',cap:'#a8967a',post:'#5e4e3e',rim:'#4e4236',rimLit:'#8e7c62',deep:'#0c0a08',line:'#241c14'}
 };
 const STAIR_SPR=new Map();
 const stC=(a,b,k)=>{ const m=mixRGB(hexRGB(a),hexRGB(b),clamp(k,0,1)); return '#'+m.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); };
