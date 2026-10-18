@@ -717,7 +717,7 @@ function bossSay(e,who,line,gap){ if(e._sayT>G.time) return; e._sayT=G.time+(gap
 // lines have wide gaps, fewer kobolds come later, and his iron pot lets more through and cracks from the front too.
 // The numbers and the casual-kid bot tables behind them: scratchpad v10/BAL.md.
 // Story only: the Arena's champion Grizzlefang keeps the v9 numbers (the [Easy, Normal, Hard] array passed to grzK).
-const GRZ={wind:[1.6,1.5], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
+const GRZ={wind:[1.6,1.75], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
   sumAt:[0.4,0.4], sumN:[2,2], gap:[250,210], bombT:[1.8,1.5], lineT:[1.8,1.45], waves:[[2,3],[3,3]]};
 function grzK(k,v9){ return onrampOn()?byDiff(GRZ[k][0],GRZ[k][1],v9[2]):byDiff(v9[0],v9[1],v9[2]); }
 defineFoe('grizzlefang',{hp:actIHp(760),phases:[0.66,0.33],
@@ -1044,7 +1044,7 @@ const ONRAMP={
     cindervane:{slashW:[1.7,1.65],chargeAim:[1.25,1.15],quakeW:[1.25,1.15]}
   },
   // a longer pause after these attacks (the opening to hit back)
-  rec:{ gnarl:{swipeW:[1.3,1.25]}, cindervane:{slashW:[1.6,1.4]} },
+  rec:{ grizzlefang:{cleave:[1.3,1.4]}, gnarl:{swipeW:[1.3,1.25]}, cindervane:{slashW:[1.6,1.4]} },
   // a longer breather between attacks: his cooldown is this many times longer each time he goes back to the chase
   // (High Priest Morrow is the one boss that was too easy for his place in the act: he casts a little more often)
   cd:{ grizzlefang:[1.3,1.3], gnarl:[1.2,1.25], morrow:[0.85,0.75], gloamjaw:[1.7,1.7], greymane:[1.1,1.15], cindervane:[2.2,2.2] },
@@ -1101,8 +1101,77 @@ for(const t of ['grizzlefang','gnarl','morrow','serpent','gloamjaw','greymane','
       if(Math.abs(angDiff(e.face,angTo(e.x,e.y,fx,fy)))<1.15) return amt*orK(ONRAMP.cinderGuard)/0.15; }
     return amt; }; }
 // fewer guards at a site on Easy and Normal (read each time the guards are spawned)
+// v11: and on Easy and Normal they wait for their boss. Nobody is out front as Ash walks into the war camp, the bog or the
+// gate yard (real play: Grizzlefang's two guards had cost Ash 33 of his 116 health before the fight even began); they come
+// running out of spawn runes beside the boss when his fight starts, so Ash meets the boss with the health he walked in with.
 for(const k in ONRAMP.guards){ const s=SITES[k]; if(!s) continue; const full=s.guards;
-  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?byDiff(ONRAMP.guards[k][0],ONRAMP.guards[k][1],full):full; },set(v){ /* keep the on-ramp table */ }}); }
+  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?[]:full; },set(v){ /* keep the on-ramp table */ }}); }
+{ const base=startBossFight; startBossFight=function(k){ base(k);
+    try{ const L=ONRAMP.guards[k], s=SITES[k];
+      if(L&&s&&onrampOn()){ const list=byDiff(L[0],L[1],null), P=POI[s.poi];
+        if(list&&list.length&&P){ const g=G.siteGuards[k]||(G.siteGuards[k]={id:'g_'+k,alive:0}); let i=0;
+          for(const [type,n] of list) for(let j=0;j<n;j++,i++){ const q=spotNear(P.x,P.y,110,210);
+            spawnRune(type,q.x,q.y,{level:P.level,aggro:true,camp:g,homeX:P.x,homeY:P.y,leash:700},1.9+i*0.35); g.alive++; } } } }catch(e){ console.error(e); } }; }
+
+// ================= v11: fair crowds (story, Easy and Normal, Act I; Hard, the Arena and later acts keep their behaviour)
+// Drew (an adult on keyboard and mouse) still found ordinary fights hard on Normal, and the casual-kid bot lost most of
+// its health to a stream of kobold swings. Ash's 0.6 s of flinch time after a hit already swallows two swings that land
+// together, so what hurts is how often a new attack starts near him. Now foes near Ash take turns: a foe may only start
+// an attack some time after the last one started (longer while a boss is up, so his guards and summons do not chip at
+// Ash while he watches the boss, and never while the boss's own red warning is up); one that has to wait keeps circling
+// and tries again a moment later. Kobold and wolf warnings are a little longer, and bats, the one foe that struck with no
+// warning, show a short red line first; a wolf pants for a moment after its lunge before it runs off, so it can be hit.
+// The bot tables: scratchpad v11/SET_NOTES.md.
+const CROWD={
+  gap:[1.4,1.1],       // [Easy, Normal] seconds from one foe's attack start near Ash to the next
+  bossGap:[2.4,1.9],   // the same for a boss's guards and summons while the boss is up
+  most:[1,2],          // foes near Ash that may be winding up or striking at the same moment
+  near:480,            // px from Ash that counts as near
+  retry:[0.25,0.5],    // seconds before a foe that had to wait tries again
+  batWarn:[0.36,0.3],  // seconds of red line before a bat swoops (before DIFFS.wind)
+  wolfPant:[0.6,0.45], // a wolf that has lunged stands panting this long before it backs off (the moment to hit it)
+  free:{wolf:1},       // without a boss, a wolf pack keeps its own rhythm: a wolf made to wait circles out of reach,
+                       // which made pack fights longer and so more lunges landed (its pant and longer warning stay)
+  // longer red warnings: the wind-up that starts in this state is this many times longer (after DIFFS.wind). A kobold's
+  // swing warned for 0.33 s on Normal, less than a kid needs to see it and press roll.
+  wind:{kobold:{windup:[1.35,1.25]}, wolf:{crouch:[1.25,1.15]}}
+};
+const CROWD_START={kobold:'windup',wolf:'crouch',knight:'windup',drakeling:'aim',cultist:'cast',bat:'swoopW'};
+const CROWD_BUSY=new Set(['windup','strike','crouch','lunge','aim','charge','cast','swoop','swoopW']);
+function crowdOn(){ return onrampOn()&&(G.act||1)===1; }
+function crowdBusy(skip){
+  const p=player, R2=CROWD.near*CROWD.near; let n=0;
+  for(const o of G.enemies){ if(o===skip||o.dead||o.boss||!CROWD_START[o.type]) continue;
+    if(CROWD_BUSY.has(o.state)&&dist2(o.x,o.y,p.x,p.y)<R2) n++; }
+  return n;
+}
+// may e start its attack now? (e is near Ash and just tried)
+function crowdOk(e){
+  const b=G.boss, withBoss=!!(b&&!b.dead&&dist2(b.x,b.y,player.x,player.y)<900*900);
+  if(!withBoss&&CROWD.free[e.type]) return true;
+  if(withBoss&&b.tele) return false;
+  const last=G._crowdT!=null&&G._crowdT<=G.time?G._crowdT:-99;
+  if(G.time-last<orK(withBoss?CROWD.bossGap:CROWD.gap)) return false;
+  return crowdBusy(e)<orK(CROWD.most);
+}
+// the bat's warning: hover with a red line for a moment, then the swoop the stock bat does
+{ const base=AI.bat; if(base) AI.bat=function(e,dt){
+    if(e.state==='swoopW'){ const p=player; e.dx=e.dy=0; e.face=turnTo(e.face,angTo(e.x,e.y,p.x,p.y),2.5*dt); e.st-=dt;
+      if(e.st<=0){ e.tele=null; e.state='swoop'; e.st=0.34; e.hitP=false; } return; }
+    const s0=e.state; base(e,dt);
+    if(e.state==='swoop'&&s0!=='swoop'&&crowdOn()){ const w=orK(CROWD.batWarn); e.state='swoopW'; e.st=w; e.tele=newTele({shape:'line',len:150,w:e.r*2.4,dur:w}); }
+  }; }
+{ const base=runAI; runAI=function(f,e,dt){
+    const s0=e.state; base(f,e,dt);
+    if(e.type==='wolf'&&!e.boss){
+      if(s0==='lunge'&&e.state==='recover'&&crowdOn()){ e._pant=orK(CROWD.wolfPant); e.st+=e._pant; }
+      if(e._pant>0){ if(e.state!=='recover') e._pant=0; else { e._pant-=dt; e.dx=e.dy=0; } } }
+    if(e.boss||s0===e.state||CROWD_START[e.type]!==e.state||!crowdOn()) return;
+    if(dist2(e.x,e.y,player.x,player.y)<CROWD.near*CROWD.near){
+      if(!crowdOk(e)){ e.state=s0; e.tele=null; e.st=0; e.cd=Math.max(e.cd||0,rand(CROWD.retry[0],CROWD.retry[1])); return; }
+      G._crowdT=G.time; }
+    const W=CROWD.wind[e.type], T=e.tele; if(W&&W[e.state]&&T&&!T._cw&&T.dur>0&&Math.abs((e.st||0)-T.dur)<0.03){ const k=orK(W[e.state]); T._cw=1; e.st*=k; T.dur*=k; }
+  }; }
 
 // ================= debug hooks
 function foeSheet2d(type,rows,o){

@@ -45,8 +45,11 @@ for(const k in BAL_BOSS) if(EDEF[k]) Object.assign(EDEF[k],BAL_BOSS[k]);
 // v10 on-ramp: Act I boss health on [Easy, Normal] in the story, times the health above (Hard keeps hp x DIFFS.bossHp).
 // Measured with the casual-kid bot so each boss is a little harder than the one before (scratchpad v10/BAL.md).
 // (Easy never gets more health than Normal: Easy hp x 0.8 <= Normal hp, so an Easy factor is at most 1.25 x the Normal one.)
-const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.52], broodmother:[1.15,0.95],
-  greymane:[0.9,1.25], skrae:[1,1.15], cindervane:[0.85,0.7]};
+// v11: the guards and summons of a boss now take turns and wait for his red warnings (e8_foes.js, fair crowds), which
+// made the bosses with a crowd much easier on Normal; Gloamjaw, the Brood Mother and Greymane get a little more health
+// back so the act still climbs (v10 Normal: gloamjaw 0.52, broodmother 0.95, greymane 1.25; scratchpad v11/SET_NOTES.md).
+const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.57], broodmother:[1.15,1.05],
+  greymane:[0.9,1.5], skrae:[1,1.15], cindervane:[0.85,0.7]};
 { const base=makeEnemy; makeEnemy=function(type,x,y,opt){ const e=base(type,x,y,opt);
     try{ const k=e&&e.boss&&G&&G.mode==='story'&&BAL_BOSS_EZ[type]; const i=k?DIFFS.indexOf(G.diff):-1; if(k&&i>=0&&i<2&&k[i]!==1){ e.maxHp*=k[i]; e.hp=e.maxHp; } }catch(err){}
     return e; }; }
@@ -229,10 +232,34 @@ function setBossHelp(on){ settings.bossHelp=!!on; store.set('eb_bosshelp',settin
 })();
 { const base=renderSettings; renderSettings=function(){ base(); bhSync(); }; }
 
+// ---------- v11: change the difficulty in the middle of a journey (Settings > Difficulty, from the pause menu too).
+// Foes that are already out get the health they would have had at spawn on the new level, in proportion (a foe at 60% stays
+// at 60%), and the new speed; damage, wind-ups, cooldowns, healing and the keep-moving rule read G.diff live. The journey
+// keeps it (the save's diff field: only that field is written now, so the save point does not move) and the title screen
+// picker shows it. Hard and the Arena are never touched here (the Arena locks the row, see a12b_ui.js).
+function balFoeHpK(e,i){
+  const D=DIFFS[i]||DIFFS[1]; if(!e.boss) return D.hp||1;
+  let k=(D.bossHp||1); const z=G&&G.mode==='story'&&BAL_BOSS_EZ[e.type]; if(z&&i<2) k*=z[i];
+  return k;
+}
+function balSetDiff(i){
+  i=clamp(i|0,0,2); const o=G&&G.diff?DIFFS.indexOf(G.diff):-1;
+  diffIdx=i; store.set('eb_diff',i);
+  if(!G) return i;
+  G.diff=DIFFS[i]; if(G.mode==='story') G.eliteChance=G.diff.elite!=null?G.diff.elite:0.06;
+  if(o>=0&&o!==i) for(const e of G.enemies){
+    if(e.dead) continue;
+    const k=balFoeHpK(e,i)/balFoeHpK(e,o); if(k>0&&isFinite(k)&&k!==1){ e.maxHp*=k; e.hp=Math.min(e.maxHp,e.hp*k); }
+    const s=(DIFFS[i].spd||1)/(DIFFS[o].spd||1); if(s>0&&s!==1) e.speed*=s;
+  }
+  if(G.mode==='story'&&o!==i){ try{ const K=SLOT_KEYS[curSlot], s=store.get(K,null); if(s&&typeof s==='object'){ s.diff=i; store.set(K,s); Cloud.queueSave(packSaves()); } }catch(e){} }
+  return i;
+}
+
 // ---------- debug hooks (tests): __eb.bal.*
 window.__ebX=Object.assign(window.__ebX||{},{bal:{
   BAL,BAL_BOSS,DIFFS,ABIL_DEFS,ABIL_ORDER,balHpK,balDmK,balXpK,balLvlDmg,balXpNeed,balXpTo,balTierK,
-  setDiff(i){ diffIdx=clamp(i|0,0,2); store.set('eb_diff',diffIdx); if(G){ G.diff=DIFFS[diffIdx]; if(G.mode==='story') G.eliteChance=G.diff.elite; } return G&&G.diff.name; },
+  setDiff(i){ balSetDiff(i); return G&&G.diff.name; }, balSetDiff,
   // an "expected" Ash at level L: tier is star-iron (default: the expected tier for that level), extras on by default
   hero(L,o){ o=o||{}; const p=player; L=clamp(L|0,1,BAL.maxLevel); const tier=o.tier!=null?o.tier:balExpTier(L);
     p.level=L; p.xp=0; p.stats.dmgMul=balLvlDmg(L); G.tier=tier; p.stats.slash=15*balTierK(tier); p.stats.wpnMul=o.bare?1:1+0.02*(L-1); p.stats.armor=o.bare?1:balExpArmor(L);
