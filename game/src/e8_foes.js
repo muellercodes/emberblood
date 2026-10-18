@@ -1101,8 +1101,17 @@ for(const t of ['grizzlefang','gnarl','morrow','serpent','gloamjaw','greymane','
       if(Math.abs(angDiff(e.face,angTo(e.x,e.y,fx,fy)))<1.15) return amt*orK(ONRAMP.cinderGuard)/0.15; }
     return amt; }; }
 // fewer guards at a site on Easy and Normal (read each time the guards are spawned)
+// v11: and on Easy and Normal they wait for their boss. Nobody is out front as Ash walks into the war camp, the bog or the
+// gate yard (real play: Grizzlefang's two guards had cost Ash 33 of his 116 health before the fight even began); they come
+// running out of spawn runes beside the boss when his fight starts, so Ash meets the boss with the health he walked in with.
 for(const k in ONRAMP.guards){ const s=SITES[k]; if(!s) continue; const full=s.guards;
-  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?byDiff(ONRAMP.guards[k][0],ONRAMP.guards[k][1],full):full; },set(v){ /* keep the on-ramp table */ }}); }
+  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?[]:full; },set(v){ /* keep the on-ramp table */ }}); }
+{ const base=startBossFight; startBossFight=function(k){ base(k);
+    try{ const L=ONRAMP.guards[k], s=SITES[k];
+      if(L&&s&&onrampOn()){ const list=byDiff(L[0],L[1],null), P=POI[s.poi];
+        if(list&&list.length&&P){ const g=G.siteGuards[k]||(G.siteGuards[k]={id:'g_'+k,alive:0}); let i=0;
+          for(const [type,n] of list) for(let j=0;j<n;j++,i++){ const q=spotNear(P.x,P.y,110,210);
+            spawnRune(type,q.x,q.y,{level:P.level,aggro:true,camp:g,homeX:P.x,homeY:P.y,leash:700},1.9+i*0.35); g.alive++; } } } }catch(e){ console.error(e); } }; }
 
 // ================= v11: fair crowds (story, Easy and Normal, Act I; Hard, the Arena and later acts keep their behaviour)
 // Drew (an adult on keyboard and mouse) still found ordinary fights hard on Normal, and the casual-kid bot lost most of
