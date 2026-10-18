@@ -10,8 +10,8 @@ chapter({
   id: 'f_hearth', act: 3, after: 'f_pass', next: 'f_maze', takeover: true,
   card: ['Act III · Chapter 2', 'The Dying Hearth'],
   so_far: [
-    "Hearthold huddles round its dying Great Hearth, which went cold when a white moth flew over to Mount Dread. The Hearth was lit with Blaze, blue fire. Ash found blue ash in it, a carving that says LIT AT THE NORTH FORGE, and Brother Eider's old map of the North Forge under the glacier.",
-    'The Great Hearth needs blue fire. Ash found out where it came from: the North Forge, under the glacier.'],
+    "Hearthold huddles round its Great Hearth, and the Hearth is dying: it sank to a flicker the night a white moth flew over to Mount Dread. It was first lit with Blaze, a blue fire, and nobody alive knows where Blaze came from.",
+    'The Great Hearth is dying. It was lit with blue fire. Nobody knows where that came from.'],
   mom: [["A town with a giant fireplace? That's my kind of town.", 'A town with a giant fireplace? Nice!']],
 
   place: {
@@ -113,7 +113,7 @@ chapter({
     ],
     // in the Hearth Archive (Eider's house)
     f3_eider: [
-      ['f_eider', 'Shh. Sorry. Not you. The books. They get nervous in the cold.', 'Shh. Not you. The books are nervous.'],
+      ['f_eider', 'Shh! Sorry, not you. I was talking to the books. They get nervous in the cold.', 'Shh! Not you. The books are nervous.'],
       ['ash', 'Where is the North Forge?', { ref: 'f_glacier' }],
       ['f_eider', 'The North Forge! Nobody has asked me that in forty years. Here: the oldest map in the archive.', 'The North Forge! Here: the oldest map.', { ref: 'f_glacier' }],
       ['narr', 'A crackly map. Where the glacier comes down to the frozen lake, the Glimmerfrost, someone drew a little flame and wrote NORTH FORGE.',

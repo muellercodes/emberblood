@@ -25,7 +25,7 @@ chapter({
 
   scene: {
     f_deep_in: [
-      ['tove', 'It\'s warmer down here. Not WARM. Warmer. I\'ll take it.', 'It\'s warmer down here. Not WARM. Warmer.'],
+      ['tove', 'It\'s a little warmer down here. Only a little, but I\'ll take it.', 'It\'s a bit warmer down here.'],
       ['narr', 'From somewhere deep below comes a snore like a rockslide.', 'From deep below comes a snore like a rockslide.'],
     ],
     f_deep_shrine: [
@@ -34,7 +34,7 @@ chapter({
       ['ember', 'Like on a door the size of a mountain.', 'Like on a door the size of a mountain.'],
     ],
     f_deep_gift: [
-      ['narr', 'The flame drops into you like a stone into a pond. Your feet feel heavy. In a good way. In a SMASHING way.', 'The flame drops into you like a stone. Your feet feel heavy!'],
+      ['narr', 'The flame drops into you like a stone into a pond. Your feet feel heavy, the good kind of heavy. The kind that breaks floors.', 'The flame drops into you like a stone. Your feet feel heavy!'],
       ['ember', 'Ground Pound! Jump, then come down HARD. You\'ll break cracked floors, flip pound switches, and knock the armor right off grumpy things.', 'Ground Pound! Jump, then come down HARD.'],
       ['ash', 'I\'m a ROCK.', 'I\'m a ROCK.'],
       ['ember', 'The bravest rock.', 'The bravest rock.'],
@@ -43,7 +43,7 @@ chapter({
       ['narr', 'A sign by the cracked floor says: GOING DOWN? KNOCK.', 'A sign says: GOING DOWN? KNOCK.'],
     ],
     f_deep_echo: [
-      ['tove', 'It\'s pitch black. Pound the floor and listen. Knock, look, walk. Knock, look, walk.', 'It\'s dark. Pound and look. Knock, look, walk.'],
+      ['tove', 'It\'s pitch black. Every pound sends a ring of light along the stone. Pound, look, then walk.', 'It\'s dark. Pound, look, then walk.'],
     ],
     f_rockjaw_intro: [
       ['f_rockjaw', 'ROLL ROLL ROLL! I\'m not round, I\'m big-boned!', 'ROLL ROLL ROLL! I\'m big-boned!'],
@@ -54,7 +54,7 @@ chapter({
     f_grumblehorn_intro: [
       ['narr', 'On a throne carved out of the mountain sits a ram the size of a barn. His wool is like grey stone. His huge curled horns ring with violet light.', 'A ram as big as a barn sits on a stone throne. His horns glow purple.'],
       ['f_grumblehorn', 'HRRRMPH! Who\'s KNOCKING?', 'HRRRMPH! Who\'s KNOCKING?'],
-      ['ash', 'Me! Ash! I came about the Dreadgate.', 'Me! Ash! I came about the Dreadgate.', { ref: 'f_dread_door' }],
+      ['ash', 'Me! Ash! I came to learn how you knock!', 'Me! Ash! I came to learn to knock!', { ref: 'f_dread_door' }],
       ['f_grumblehorn', 'Get off my lawn! I don\'t have a lawn! Get off it anyway!', 'Get off my lawn! I don\'t have a lawn!'],
     ],
     // right after the boss: 6 lines
@@ -64,14 +64,14 @@ chapter({
       ['ash', 'Me. Sorry.', 'Me. Sorry.'],
       ['f_grumblehorn', 'Hrm. Good drumming. VERY good. The old monks drummed like that, up on the mountain. She always opened for them.', 'Good drumming! The old monks drummed like that. She opened for them.', { clue: 'f3_good_drumming' }],
       ['ash', 'She?', 'She?'],
-      ['f_grumblehorn', 'The Gate. Or the dragon. Both very old ladies. Both very cold. Hrrrmph. Off you go.', 'The Gate. Or the dragon. Both very old ladies. Off you go.', { ref: 'f_dread_door' }],
+      ['f_grumblehorn', 'The Gate. The dragon. Old ladies, the pair of them, and cold as each other. Hrrrmph. Off you go.', 'The Gate. Or the dragon. Both old ladies. Off you go.', { ref: 'f_dread_door' }],
     ],
     f_deep_lamb: [
       ['f_lamb', 'Baaa! (A baby Stonehorn with tiny rock horns headbutts your knee. It\'s adorable. It also hurts.)', 'Baaa! (A baby ram headbutts your knee. Cute. Ouch.)'],
     ],
     f_deep_end: [
       ['ember', 'Three flames in one winter. You have all the fire I left in the north now. The rest is up to you.', 'Three flames in one winter. You have all my northern fire.'],
-      ['ember', 'Go to the mountain, little ember. And when you see her... tell my auntie I miss her.', 'Go to the mountain. Tell my auntie I miss her.'],
+      ['ember', 'Go to the mountain, Ash. And when you see her... tell my auntie I miss her.', 'Go to the mountain. Tell my auntie I miss her.'],
       ['narr', 'Step into the warp ring to go back outside.', 'Step into the warp ring to go outside.'],
     ],
   },

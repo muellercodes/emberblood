@@ -50,7 +50,7 @@ quest({
       ['f_rasmus', 'Hmm. Missed.'],
       ['f_rasmus', 'Warm. You did that. One person at a time. That is the only way anything good ever gets done.', 'Warm. You did that. One at a time.'],
       ['f_rasmus', 'Your fire is good, child. It could be better. Breathe on my anvil. No. Harder. HARDER.', 'Breathe on my anvil. HARDER.'],
-      ['narr', 'The anvil glows red, then white, then a blue so bright you can see the bones in your claws. Neat.', 'The anvil glows red, white, then bright blue!'],
+      ['narr', 'The anvil glows red, then white, then a blue so bright you can see the bones in your claws.', 'The anvil glows red, white, then bright blue!'],
       ['f_rasmus', 'There. Blue as a glacier, hot as a summer. Bluefire. Go and melt something that deserves it.', 'There. Bluefire. Go melt something.'],
     ],
   },

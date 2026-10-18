@@ -69,8 +69,8 @@ quest({
     mb_thanks: [
       ['f_mumble', 'I ROARED! Did you hear me? Everyone heard me! The MOUNTAIN heard me!', 'I ROARED! The MOUNTAIN heard me!'],
       { if: 'choice f_glaciar=free', then: [
-        ['narr', 'Far away on Mount Dread, a dragon roars back. It sounds like a hundred wind chimes laughing.', 'Far away, a dragon roars back. Like wind chimes!'],
-        ['f_mumble', '...Was that your AUNTIE? She is very loud. I like her.', 'Was that your auntie? I like her.']],
+        ['narr', 'Far, far away, a dragon roars back. It sounds like a hundred wind chimes laughing.', 'Far away, a dragon roars back. Like wind chimes!'],
+        ['f_mumble', '...Was that the ice dragon? She is very loud. I like her.', 'Was that the ice dragon? I like her.']],
         else: [
         ['narr', 'Far away, up on Mount Dread, something answers. A long, deep, sleepy rumble. Like a giant turning over in bed.',
           'Far away on the mountain, something big rumbles. Sleepily.', { clue: 'f3_mumble_echo' }],

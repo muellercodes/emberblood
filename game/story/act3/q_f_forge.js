@@ -45,7 +45,7 @@ quest({
         else: [
         ['f_gunnhild', "Ingrid Anvilsong down on the coast makes chain whips out of anything. Ghost chains, even. Get one, and I'll make it better.",
           'Ingrid on the coast makes chain whips. Get one!']] },
-      ['f_gunnhild', "I could make it BURN. Light my forge, Maren's kid. Then bring me starfrost.", "I could make it BURN. Light my forge first."],
+      ['f_gunnhild', "I could make it BURN. Light my forge first, Emberblood. Then bring me starfrost.", "I could make it BURN. Light my forge first."],
     ],
     fg_chain: [
       ['narr', 'CLANG. CLANG. CLANG. Gunnhild hums the same lantern song your mom hums. You do not say anything. You just grin.',

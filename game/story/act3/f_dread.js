@@ -12,7 +12,7 @@ chapter({
   so_far: [
     'Ash knocked on the mountain with a Ground Pound and beat Hush at the Dreadgate. The Frost Lock broke. Now he climbs up through the Heart of Dread, toward whoever is breathing out the Long Winter.',
     'The Dreadgate is open! Ash climbs up inside the mountain.'],
-  mom: [['Inside a mountain? Take a lantern. Take two. Take Pip, he glows.', 'Inside a mountain? Take a lantern!']],
+  mom: [['Inside a mountain? Take a lantern. Take two. And a sandwich.', 'Inside a mountain? Take a lantern!']],
 
   clue: {
     f3_nursery: { icon: 'heart', mystery: 'long_winter',
@@ -22,7 +22,7 @@ chapter({
   step: [
     { id: 'climb', do: 'dungeon f_dread', at: 'f_dread_door',
       obj: ['Climb up through the Heart of Dread', 'Climb up inside the mountain'],
-      hint: ['Up through the mountain. Melt every chain. Pound the plates, shoot the eyes. I\'m right here with you. Shivering.', 'Go up through the mountain. Melt every chain.'],
+      hint: ['Up through the mountain. Melt every chain, pound the plates and shoot the eyes. I\'m right here with you.', 'Go up through the mountain. Melt every chain.'],
       // the snow_mother question can be answered here already (its clues are all in after the drum). And a player who
       // rode up and knocked on the drum before working it out in the Case Book (or a save from before the Case Book)
       // gets the Dreadgate question closed: he did open it, after all.
@@ -34,7 +34,7 @@ chapter({
 
   scene: {
     f_dread_in: [
-      ['narr', 'Inside Mount Dread it is quiet. Too quiet. Black rock, purple ice, and everywhere you look, chains. Chains on statues. Chains on bridges. Chains on nothing at all.', 'Inside the mountain: black rock, purple ice, and chains everywhere.'],
+      ['narr', 'Inside Mount Dread it is very quiet. Black rock, purple ice, and chains everywhere you look: on statues, on bridges, and some on nothing at all.', 'Inside the mountain: black rock, purple ice, and chains everywhere.'],
       ['tove', 'Moth-frost chains. Practice ones, I think. Somebody practiced for a long time.', 'Moth-frost chains. Somebody practiced for a long time.'],
       ['ash', 'Then I\'ll practice melting them.', 'Then I\'ll practice melting them.'],
       ['pip', '(Pip climbs into your hood and stays there.)', '(Pip hides in your hood.)'],
@@ -54,7 +54,7 @@ chapter({
       ['f_soldier', 'Here, I found this in my boot. It\'s not my boot. Thank you, dragon. Which way is lunch?', 'I found this key in my boot. Which way is lunch?'],
     ],
     f_dread_nest: [
-      ['tove', 'Moths love lamps. Every moth. It\'s very embarrassing for them. Light the corner lamps and they\'ll forget all about the stairs.', 'Moths love lamps. Light the corner lamps!'],
+      ['tove', 'A moth can\'t help itself near a lamp. Light the corner lamps and they\'ll forget all about the stairs.', 'Moths love lamps. Light the corner lamps!'],
     ],
     f_dread_chimney: [
       ['tove', 'A wind chimney! Ride the ribbons up. Hide in the niches when the blizzard blows across.', 'Ride the ribbons up! Hide when the blizzard blows.'],
@@ -72,7 +72,7 @@ chapter({
         ['f_grumbo', '...Sorry, Mumble.', 'Sorry, Mumble.'] ] },
     ],
     f_dread_dragons: [
-      ['tove', 'Ice statues of old dragons. All chained. Don\'t wake the big ones. Please. I\'m begging.', 'Old dragon statues. Don\'t wake the big ones.'],
+      ['tove', 'Ice statues of old dragons, every one in chains. Don\'t wake the big ones. I mean it.', 'Old dragon statues. Don\'t wake the big ones.'],
     ],
     f_dread_egg: [
       ['narr', 'The ice egg in the little dragon\'s arms cracks open. Inside, warm and red, is a Heart Ember.', 'The ice egg cracks open. A warm Heart Ember!'],

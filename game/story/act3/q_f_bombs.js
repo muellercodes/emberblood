@@ -50,9 +50,9 @@ quest({
     bm_powder: [
       ['f_mags', "My powder! You're a hero! A very warm hero!", 'My powder! You are a warm hero!'],
       { if: 'item f_bucket', then: [
-        ['f_mags', "Is that the Snowgob King's BUCKET? On your HEAD? I am so jealous I could explode. I won't. Today.",
+        ['f_mags', "Is that the Snowgob King's BUCKET? On your HEAD? I have to measure that. Later. Science later.",
           "The king's BUCKET? I am SO jealous!"]] },
-      ['f_mags', 'Uh oh. The fuses are frozen solid. They need a REALLY hot spark. Blue hot. YOU hot.',
+      ['f_mags', 'Uh oh. The fuses are frozen solid. They need a REALLY hot spark. Blue hot. Your kind of hot.',
         'The fuses are frozen. They need YOUR fire.'],
       ['f_mags', 'Breathe on the Bomb-o-Matic and do not stop until it whistles. Then stand back. Not that far. A bit further.',
         'Breathe on the Bomb-o-Matic till it whistles!'],
@@ -74,8 +74,8 @@ quest({
       ['narr', 'Pebble drops a letter on your head. It smells of cinnamon.', 'A letter that smells of cinnamon.'],
       ['narr', '"Dear Ash. The Long Winter came all the way to Emberhollow. One of my Lantern buns froze SO big, it is blocking my cellar."',
         '"A Lantern bun froze HUGE. It blocks my cellar."', { promise: 'f3g_bun' }],
-      ['narr', '"Mags writes that you have BOMBS now. Please come home and blow up my bun. Love, Bertram."', '"Come and blow up my bun. Bertram."'],
-      ['narr', '"P.S. Do not tell your mother about the bun. She thinks I am a good baker."', '"P.S. Do not tell your mom."'],
+      ['narr', '"If you ever get your claws on some BOMBS, please come home and blow up my bun. Love, Bertram."', '"Bring a bomb. Blow up my bun. Bertram."'],
+      ['narr', '"P.S. Your mother already told everyone about my doorstops. Please do not let her hear about this one."', '"P.S. Do not tell your mom about this bun."'],
     ],
   },
   // (Mags's in-quest reminders are in people.js, which loads before the quest files)

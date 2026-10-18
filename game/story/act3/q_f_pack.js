@@ -39,18 +39,18 @@ quest({
     pk_home: [
       { if: 'choice greymane=home', then: [
         ['narr', "Three fat pups tumble over Greymane's paws. He licks every one of them until they fall over.", "Three pups tumble over Greymane's paws."],
-        ['narr', 'Then he howls, and you feel it right down to your tail, and somehow you understand it.', 'He howls. You feel it in your tail.'],
+        ['narr', 'Then he howls, so deep you feel it right down to your tail. It sounds a lot like thank you.', 'He howls. You feel it in your tail.'],
         ['ash', '...Thank you. I think I just learned a howl.', 'I think I learned a howl!'],
         { do: ['set f_longhowl', 'upgrade f_longhowl',
           { banner: ['The Long Howl', 'The Long Howl'], sub: ['Your Roar now shatters icicles, ice spikes and snowballs in its ring, and stuns frost foes for longer.', 'Your roar breaks ice now!'] }] }],
         else: [
         ['narr', 'Greymane looks at his three wolves, wet and blinking and themselves again. He howls, long and low. Far away, the pack answers.',
           'Greymane howls. Far away, the pack answers.'],
-        ['narr', 'He leans his huge head against you. You get the feeling you will see him again. Somewhere cold. Somewhere it matters.',
-          'He leans on you. You will see him again.'],
+        ['narr', 'He leans his huge head against you. When you need the pack, it will come.',
+          'He leans on you. The pack will come when you need it.'],
         { do: ['set f_pack_ally', 'ally f_pack_ally',
           { banner: ['Greymane will come', 'Greymane will come'], sub: ['When you face the ice dragon, the pack will run with you.', 'The wolves will help you fight!'] }] }] },
-      { if: 'quest f_mumble done', then: [['narr', 'From the Pinewhisper, a yeti roars along. Badly. Happily.', 'A yeti roars along. Happily.']] },
+      { if: 'quest f_mumble done', then: [['narr', 'From the Pinewhisper, a yeti roars along, a little out of tune.', 'A yeti roars along. Happily.']] },
       ['narr', 'Before he goes, Greymane digs in the snow and drops something at your feet: an old Hearthwarden helmet with a blue plume.',
         'Greymane digs up a helmet with a blue plume.', { clue: 'f3_wolf_helmet' }],
       ['narr', "Scratched inside it: KNUT'S PATROL. SIX OF US. DREADMOOR.", '"KNUT\'S PATROL. SIX OF US. DREADMOOR."'],

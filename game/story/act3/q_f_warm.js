@@ -48,7 +48,7 @@ quest({
         "It's a cookie. There's a real one too. And a Heart Ember!"],
       { if: 'flag f_thaw_f_fergus', then: [
         ['narr', 'Fergus pulls a very long red mitten over the end of your tail. A TAIL mitten. He made it specially.', 'Fergus puts a red mitten on your tail!']] },
-      ['f_toastwhistle', 'Everything is FINE now. Actually fine. I checked.', 'Everything is FINE now. I checked.'],
+      ['f_toastwhistle', 'And now everything is fine. Not the loud kind of fine. The quiet kind.', 'Now everything is fine. The quiet kind.'],
     ],
   },
 })

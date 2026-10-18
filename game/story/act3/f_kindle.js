@@ -12,9 +12,9 @@ chapter({
   id: 'f_kindle', act: 3, after: 'f_maze', next: 'f_thaw', takeover: true,
   card: null, name: ['The Dying Hearth', 'The Dying Hearth'],
   so_far: [
-    "Ash has Blaze, Ember's blue fire! He woke the Great Hearth with it: WHOOMPH. The North Gate's ice slid off, and Captain Brann bet his boots that the moth makes the snow.",
-    'Ash has Blaze! He woke the Great Hearth. WHOOMPH!'],
-  mom: [["BLUE fire? Your grandmother set a river on fire once. Don't.", "Blue fire? Don't set a river on fire."]],
+    "Ash has Blaze, Ember's blue fire, from her old North Forge in the Glacier Maze. Now the Great Hearth in Hearthold needs it, before its last little flame goes out.",
+    'Ash has Blaze! Now the Great Hearth needs it.'],
+  mom: [["BLUE fire? Show me. ...Not in the kitchen! Outside, outside!", 'Blue fire? Not in the kitchen!']],
 
   clue: {
     f3_brann_bet: { icon: 'moth', herring: true,

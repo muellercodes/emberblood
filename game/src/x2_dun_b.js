@@ -102,7 +102,7 @@ function d2bBuildRoom(A,def,R,P){
       case 'b': ST.stat.push({kind:'bones',x:p.x,y:p.y,id,v:(m.c*3+m.r)%3,flat:true}); break;
       case 'g': ST.stat.push({kind:'geode',x:p.x,y:p.y+6,id,v:(m.c+m.r*2)%3}); col(p.x,p.y+4,16); A.lights.push({x:p.x,y:p.y-10,r:170,i:0.5,tint:'crystal'}); break;
       case 'm': ST.stat.push({kind:'skull',x:p.x,y:p.y+16,id}); col(p.x,p.y+8,30); break;
-      case 'S': { const o={kind:'soldier',x:p.x,y:p.y+8,id,v:(m.c*5+m.r)%4}; ST.stat.push(o); o.col=col(p.x,p.y+4,15); p3On(o,{fire(q,dt,blue){ if(blue) d2bSay(q.x,q.y-70,S('Frozen too deep. Glaciar’s spell holds this one.','Too frozen. The spell holds him.'),'#e8dcff','soldier'); }},A); break; }
+      case 'S': { const o={kind:'soldier',x:p.x,y:p.y+8,id,v:(m.c*5+m.r)%4}; ST.stat.push(o); o.col=col(p.x,p.y+4,15); p3On(o,{fire(q,dt,blue){ if(blue) d2bSay(q.x,q.y-70,S('Frozen too deep. The moth-frost on the mountain holds this one fast.','Too frozen. The spell holds him.'),'#e8dcff','soldier'); }},A); break; }
       case 'D': ST.stat.push({kind:'dragon',x:p.x,y:p.y+20,id,v:(m.c)%2}); col(p.x,p.y,40); col(p.x-34,p.y+10,22); col(p.x+34,p.y+10,22); break;
       case 'h': { const o={kind:'hatch',x:p.x,y:p.y+10,id,egg:!!F[id]}; ST.stat.push(o); col(p.x,p.y+4,18); ST.eggs.push(o);
         p3On(o,{blaze:{need:2,h:30,when:q=>!q.egg,then:q=>d2bEggCrack(A,q)},fire(q,dt,blue){ if(!blue&&!q.egg) d2bSay(q.x,q.y-60,S('The ice egg sweats a little. It needs a hotter fire.','The egg needs blue fire.'),'#dff4ff','egg'); }},A); break; }
@@ -500,7 +500,7 @@ function d2bLambTick(o,dt){ o.t+=dt; o.baa-=dt; const p=player, d=dist(p.x,p.y,o
       case 'd2b_summit': if(o.open){ d2bSummitOut(A,o); return; } { const n=(o.locks||[]).filter(d2bLockDone).length; d2bRead(S(`The summit door: black ice, as tall as three dragons. Four chains of purple moth-frost hold it shut, each ending in a lock. ${n} of 4 locks melted.`,`The top door. Four chained locks. ${n} of 4 melted.`)); } return;
       case 'd2b_pplate': d2bRead(canPound()?S('A big round plate with a ram’s face, sunk in the floor before the stone door. Jump, and POUND it!','A ram plate. Jump and POUND it!'):S('A big round plate with a ram’s face. It is far too heavy to press with your claws.','A ram plate. Too heavy.')); return;
       case 'd2b_rubble': caveObjAct(o.gate); return;
-      case 'd2b_lamp': d2bRead(S('A lamp of old brass and violet glass. Moths love lamps. Every moth. Any fire will light it.','A moth lamp. Light it with fire!')); return;
+      case 'd2b_lamp': d2bRead(S('A lamp of old brass and violet glass. No moth can stay away from a lit lamp. Any fire will light it.','A moth lamp. Light it with fire!')); return;
     }
   }; }
 // the prompts of things that have no o.prompt (drawn or flat ones)
@@ -856,7 +856,7 @@ defineDungeon('f_deep',{name:S('Stonehorn Deep','Stonehorn Deep'),level:16,theme
       b:{at:[1,0],kind:'fight',tpl:T.b.tpl,dz:T.b.dz,foes:[['f_frostshell',3]],foeAt:[[4,5],[10,5],[7,7]],noDecor:true,
          tip:[S('Frostshell beetles','Frostshell beetles'),S('Their ice shells stop blades from the front. Hit them from behind, flip them with the hammer, or melt the shell with blue fire.','Hit them from behind, or melt the shell!')]},
       c:{at:[0,0],kind:'plates',tpl:T.c.tpl,frost:T.c.frost,dz:T.c.dz,railPlates:true,cartDir:'e',points:{'10,2':0},reward:'key',noPots:true,
-         sign:S('THE CART RUN. Mind the cart. Mind the ice. Mind the switch.','Ride the cart. Mind the ice!'),
+         sign:S('THE CART RUN. Melt the ice on the rails and set the switch before you ride.','Ride the cart. Mind the ice!'),
          tip:[S('The Cart Run','The Cart Run'),S('Ride the cart to the plate at the end of the line. Melt the ice on the rails and set the switch first.','Ride the cart to the plate!')]},
       d:{at:[2,0],kind:'free',tpl:T.d.tpl,dz:T.d.dz,loot:['dmap'],foes:[['f_stalagbat',2]],foeAt:[[1,1],[13,1]],ribs:true,noDecor:true,
          tip:[S('The Bone Bridge','The Bone Bridge'),S('Bars of bone block the bridge. A Shadow Dash slips through. Or swing around them with the Grapple Tail.','Dash through the bars, or grapple around!')]}},

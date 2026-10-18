@@ -71,7 +71,7 @@ chapter({
       hint: ['The Dreadgate stands at the foot of Mount Dread, at the top of the Dreadmoor north of Hearthold.', 'Go north, up the Dreadmoor.'] },
     { id: 'look', do: 'all', migrate_if: 'flag f_drum',
       obj: ['Find out how the Dreadgate opens', 'Look around the gate'],
-      hint: ['Doors love clues. Look closely at the Frost Lock. And look up.', 'Look at the lock. And look up.'],
+      hint: ['Whoever built that lock left a way to open it. Look closely at the Frost Lock. And look up.', 'Look at the lock. And look up.'],
       parts: [
         { do: 'examine f3_frost_lock', scene: 'f3_look_lock', then: ['clue f3_gate_carving', 'clue f3_lock_sweats'] },
         { do: 'examine f3_drum_look', scene: 'f3_look_drum', then: ['clue f3_drum_seen'] },
@@ -101,9 +101,9 @@ chapter({
       { cam: 'f_dread_door', s: 1.5 },
       ['narr', 'The Dreadgate. Two doors of black ice as tall as a castle, carved with a dragon curled around the moon. In the middle hangs a lock as big as a cart, sealed with purple frost.', 'The Dreadgate: two black ice doors, tall as a castle. A huge frozen lock.', { ref: 'f_dread_door' }],
       ['narr', 'The wind off the mountain is so cold it has a sound. It goes "nnnnnn".', 'The wind is so cold it goes "nnnnnn".'],
-      ['tove', 'Well. That\'s a door.', 'Well. That\'s a door.'],
+      ['tove', 'That is a very big door.', 'That\'s a big door.'],
       ['ash', 'How do we open THAT?', 'How do we open THAT?'],
-      ['tove', 'No idea. Look around. Doors always leave clues. Doors LOVE clues.', 'No idea. Look around. Doors love clues.'],
+      ['tove', 'No idea. But whoever made a lock this big made a way to open it. Look around.', 'No idea. Look around. There must be a way.'],
     ],
     f3_look_lock: [
       ['narr', 'The Frost Lock hums. Carved into its face: a ram, butting a round drum with his head. Cracks run all the way from the drum down to the lock.', 'Carved on the lock: a ram butts a drum. Cracks run down to the lock.'],
@@ -114,7 +114,7 @@ chapter({
     f3_look_drum: [
       { cam: 'f_lm_drum', s: 1.5 },
       ['narr', 'You look up. High on the mountain\'s shoulder, above the snow, sits a round stone drum with a ram\'s face carved on it.', 'High on the mountain sits a stone drum with a ram\'s face.', { ref: 'f_lm_drum' }],
-      ['ash', 'A drum. On a mountain. Who plays a drum on a MOUNTAIN?', 'Who plays a drum on a MOUNTAIN?'],
+      ['ash', 'A drum, way up there? Who plays a drum on a MOUNTAIN?', 'Who plays a drum on a MOUNTAIN?'],
     ],
     f3_how_solved: [
       ['ash', 'The ram on the lock is knocking on a drum. The monks rode the wind up the mountain and knocked. So I ride up to that drum and KNOCK!', 'The ram knocks on a drum. So I ride up there and KNOCK!'],
@@ -164,10 +164,10 @@ chapter({
             say: [
               ['ash', 'Get a sweater, little moth.', 'Get a sweater, little moth.'] ] },
         ] },
-      ['narr', 'She flutters up toward the moon and is gone. Behind you, the Frost Lock cracks apart, CRACK, and the Dreadgate swings open.', 'She flies up to the moon. CRACK! The lock breaks. The gate opens!',
+      ['narr', 'She flutters up into the sky, smaller and smaller, and is gone. Behind you, the Frost Lock cracks apart, CRACK, and the Dreadgate swings open.', 'She flies away. CRACK! The lock breaks. The gate opens!',
         { do: ['world f3_hush_small away'], ref: 'f_dread_door' }],
       { if: 'choice c_vesper=friend', then: [
-        ['c_vesper', 'Go on, cousin. I\'ll watch the gate. Thieves are very good at watching gates.', 'Go on, cousin. I\'ll watch the gate.', { ref: 'f_dread_door' }] ] },
+        ['c_vesper', 'Go on, cousin. I\'ll watch the gate. I know every trick for getting past one.', 'Go on, cousin. I\'ll watch the gate.', { ref: 'f_dread_door' }] ] },
     ],
   },
 })

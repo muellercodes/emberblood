@@ -5,9 +5,9 @@
 // (The same id in another registry file must be the same entry: A3b's map2_b.js, A3S's map2_s.js.)
 
 // ---------- people
-legacy({ id: 'f_brynja', map: 2, at: [6880, 49040], r: 40, kind: 'npc', name: 'Old Brynja, Hearthkeeper',
+legacy({ id: 'f_brynja', map: 2, at: [6880, 49040], r: 40, kind: 'npc', name: ['Old Brynja, Hearthkeeper', 'Old Brynja'],
   aliases: ['Brynja', 'the Hearthkeeper'], src: 'CAST:f_brynja' });
-legacy({ id: 'f_brann', map: 2, at: [6270, 48900], r: 40, kind: 'npc', name: 'Captain Brann Stoutmitt',
+legacy({ id: 'f_brann', map: 2, at: [6270, 48900], r: 40, kind: 'npc', name: ['Captain Brann Stoutmitt', 'Captain Brann'],
   aliases: ['Brann', 'the Captain'], src: 'CAST:f_brann' });
 legacy({ id: 'f_eider', map: 2, at: [6990, 49326], r: 40, kind: 'npc', name: 'Brother Eider',
   aliases: ['Eider', 'the archive monk'], src: 'CAST:f_eider', inside: 'h_f_eider' });
@@ -24,10 +24,10 @@ legacy({ id: 'f_steamwell', map: 2, at: [3800, 49400], r: 220, kind: 'place', na
   aliases: ['the hot spring'], src: 'POI:f_steamwell' });
 legacy({ id: 'f_whitepass', map: 2, at: [2600, 50450], r: 260, kind: 'place', name: 'the top of the High Pass',
   aliases: ['the White Pass'], src: 'POI:f_whitepass' });
-legacy({ id: 'f_skyreach', map: 2, at: [12650, 46150], r: 420, kind: 'place', name: 'Skyreach',
-  aliases: ['the Sky Isles', 'the Wind Monks'], src: 'POI:f_skyreach' });
+legacy({ id: 'f_skyreach', map: 2, at: [12650, 46150], r: 420, kind: 'place', name: 'the Sky Isles',
+  aliases: ['Skyreach', 'Skyreach Temple', 'the Wind Monks'], src: 'POI:f_skyreach' });
 legacy({ id: 'f_crown', map: 2, at: [7300, 41250], r: 560, kind: 'place', name: 'the Crown of Dread',
-  aliases: ['the summit of Mount Dread', 'the top of Mount Dread'], src: 'POI:f_crown' });
+  aliases: ['the summit', 'the top of Mount Dread'], src: 'POI:f_crown' });
 
 // ---------- doors and crossings
 legacy({ id: 'f_maze_door', map: 2, at: [5600, 44450], r: 40, kind: 'door', name: 'the door of the Glacier Maze',

@@ -58,8 +58,8 @@ places({
 
   scene: {
     a3k_knut: [
-      ['narr', 'Sir Knut of the Hearthwardens, frozen solid, sword up, facing the Dreadgate. Very brave. Very still.', 'Sir Knut, frozen, sword up.'],
-      ['narr', 'Purple frost is creeping over his armor in little spikes. It is growing. Slowly. Like a second suit of armor, made of ice.',
+      ['narr', 'Sir Knut of the Hearthwardens, frozen solid with his sword up, facing the Dreadgate.', 'Sir Knut, frozen, sword up.'],
+      ['narr', 'Purple frost is creeping over his armor in little spikes, slowly, like a second suit of armor made of ice.',
         'Purple ice spikes grow on his armor.'],
       ['ash', 'It is turning him into something. Something with spikes.', 'It is turning him into something spiky!'],
     ],
@@ -72,7 +72,7 @@ places({
             say: [
               ['narr', '"Sleep now, the snow is falling slow..." Your voice cracks on the high bit. You keep going.', 'You sing. Your voice cracks. You keep going.'],
               ['narr', 'One huge blue eye opens. Then the other. The snow slides off her in one long hush.', 'Her blue eyes open!'],
-              ['f_glaciar', '...Ember used to sing me that. You came BACK, dumpling. Even the wobbly part.', 'Ember sang me that. You came back!'],
+              ['f_glaciar', '...Ember used to sing me that. You came BACK, dumpling, and you sang the wobbly bit and everything.', 'Ember sang me that. You came back!'],
               ['f_glaciar', 'Then I suppose I had better stay and earn that song. Come here. Let me pinch your cheeks.', 'I will stay. Let me pinch your cheeks!'],
               ['narr', 'She breathes out, soft and slow, and every frozen person on the roads and in the villages gives a little shiver and wakes up.',
                 'She breathes out softly. Every frozen person wakes up.']] },

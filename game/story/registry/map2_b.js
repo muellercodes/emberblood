@@ -3,7 +3,7 @@
 
 // the Sky Isles and Skyreach Temple (Brother Pennant on his kite outside it is A3S's registry entry f_pennant, map2_s.js)
 legacy({ id: 'f_skyreach', map: 2, at: [12650, 46150], r: 420, kind: 'place', name: 'the Sky Isles',
-         aliases: ['Skyreach', 'the Sky Isles', 'Skyreach Temple'], src: 'POI:f_skyreach' });
+         aliases: ['Skyreach', 'Skyreach Temple', 'the Wind Monks'], src: 'POI:f_skyreach' });
 legacy({ id: 'f_sky_door', map: 2, at: [12650, 46486], r: 40, kind: 'door', leads: 'f_sky', name: 'the doors of Skyreach Temple',
          aliases: ['the temple doors'], src: 'DOORS:f_sky' });
 

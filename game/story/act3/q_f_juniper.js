@@ -53,7 +53,7 @@ quest({
       ['juniper', 'Oh! And this one. I drew it from the floe, the night before the ice ate my boots.', 'And this one. I drew it from the ice.'],
       ['narr', 'The top of Mount Dread. Something long and white lies curled round the summit, like a cat round a teapot.',
         'The mountain top. Something long and white curls round it.', { clue: 'f3_juniper_map' }],
-      ['juniper', 'And the storm up there puffs out, stops, and puffs out again. I counted. Twelve puffs a minute. Like snoring.',
+      ['juniper', 'And the storm up there puffs out, stops, and puffs out again. Twelve puffs a minute, all night long. Like snoring.',
         'The storm puffs out and in. Like snoring.'],
       ['ash', 'Something is SLEEPING up there.'],
     ],

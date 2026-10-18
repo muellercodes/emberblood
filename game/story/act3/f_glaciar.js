@@ -153,10 +153,10 @@ chapter({
       ['narr', 'The Shard pops out of Glaciar\'s chest like a cork from a bottle and lands in the snow, ringing like a tiny bell. You pick it up. It\'s warm.', 'The Shard pops out of her chest like a cork. You pick it up.',
         { do: ['give f_shard2'] }],
       ['narr', 'The last of the purple drains out of her eyes. They\'re blue now. Pale, kind, sleepy blue, like a winter morning.', 'Her eyes turn blue. Kind and sleepy.'],
-      ['f_glaciar', 'Oh. Oh my. Oh, my head. Did I... did I make a blizzard?', 'Oh, my head. Did I make a blizzard?'],
-      ['ash', 'A big one. Over the whole north. And a lot of the coast.', 'A big one. Over the whole north.'],
-      ['f_glaciar', 'Oh, I\'m so sorry. I\'m a slow-winter dragon. One gentle snow a year, for the sledding. Blizzards are rude.', 'I\'m so sorry. I make one gentle snow a year. Blizzards are rude.'],
-      ['f_glaciar', 'Horns. Tail. That nose. You\'re one of Ember\'s! Come here, dumpling, let me pinch your cheeks!', 'You\'re one of Ember\'s! Come here, dumpling!'],
+      ['f_glaciar', 'My head. What a horrid dream I was having. Tell me the truth, dear: did I make a blizzard?', 'My head. Did I make a blizzard?'],
+      ['ash', 'A big one. Over the whole north. It even snowed at home!', 'A big one. It even snowed at home!'],
+      ['f_glaciar', 'How very embarrassing. I am a slow-winter dragon, you know. One gentle snow a year, for the sledding. Blizzards are rude.', 'How embarrassing. I make one gentle snow a year. Blizzards are rude.'],
+      ['f_glaciar', 'Wait. Let me look at you. Ember\'s horns, and Ember\'s nose, bless it. You\'re one of HERS! Come here, dumpling, let me pinch your cheeks!', 'You\'re one of Ember\'s! Come here, dumpling!'],
     ],
     // defeat: a chain was still on when she fell (6 lines right after the boss)
     f_glaciar_outro_defeat: [
@@ -166,7 +166,7 @@ chapter({
       ['f_glaciar', '(very sleepy) ...Nyxara. The moon\'s... old moth. She wants... the night. Forever.', '(sleepy) Nyxara. The moon\'s moth. She wants the night.', { do: ['set f_nyx_named'] }],
       ['f_glaciar', '(a whisper) ...Ember? Is that you?', '(a whisper) Ember? Is that you?'],
       ['narr', 'Her eyes close. Snow begins to cover her, gently, like a blanket.', 'Her eyes close. Snow covers her like a blanket.'],
-      ['tove', 'She\'s asleep. Not hurt. Just asleep. The chains will keep her that way. A long, long time.', 'She\'s asleep. Not hurt. The chains keep her asleep.'],
+      ['tove', 'She\'s only asleep, Ash. She isn\'t hurt. But those chains will keep her asleep for a long, long time.', 'She\'s asleep. Not hurt. The chains keep her asleep.'],
     ],
 
     // free: Ash walks up to her and talks (10 lines a branch)
@@ -174,25 +174,25 @@ chapter({
       { cam: 'f3_glaciar_face', s: 1 },
       ['narr', 'Auntie Glee pinches your cheek with one enormous claw. Very, very gently. It\'s cold. It\'s also the nicest pinch you have ever had.', 'She pinches your cheek with a huge claw. Very gently. The nicest pinch ever.'],
       ['ash', '(squished) Hi, Auntie. I\'m your great x13 grand-nephew.', '(squished) Hi, Auntie. I\'m your great x13 nephew.'],
-      ['f_glaciar', 'Thirteen? Ember was my NIECE, dumpling. So I\'m fourteen greats.', 'Ember was my NIECE. So I\'m fourteen greats.'],
+      ['f_glaciar', 'Thirteen? Dumpling, Ember was my NIECE, and she is thirteen greats back. That makes me fourteen.', 'Ember was my NIECE. She has 13 greats. So I have 14.'],
       ['ash', 'I am NOT saying fourteen.', 'I am NOT saying fourteen.'],
       // her brother, by the Act I ending
       { if: 'choice ending=warden', then: [
         ['ash', 'Your brother is asleep on his mountain. I say goodnight to him every Lantern Day.', 'Your brother sleeps on his mountain. I say goodnight to him.'],
-        ['f_glaciar', 'Goodnight? To VORLAX? Ha! He must hate that. Good. Keep doing it.', 'Goodnight to VORLAX? Ha! Keep doing it.'] ],
+        ['f_glaciar', 'Goodnight? To VORLAX? Oh, he must hate that. Splendid. Do it every year, and do it loudly.', 'Goodnight to VORLAX? Ha! Keep doing it.'] ],
         else: [{ if: 'choice ending=heir', then: [
         ['ash', 'Your brother is, um, small now. He lives in a birdcage. In a bakery. Bertram charges admission.', 'Your brother is small now. He lives in a birdcage.'],
-        ['f_glaciar', 'A BIRDCAGE! Oh, I must visit. I\'ll bring a mirror, so he can see his own face.', 'A BIRDCAGE! I must visit. I\'ll bring a mirror.'] ],
+        ['f_glaciar', 'A BIRDCAGE! Oh, I must visit. I shall pay the baker double and sit beside it all afternoon, eating buns.', 'A BIRDCAGE! Oh, I must visit.'] ],
         else: [{ if: 'choice ending=lantern', then: [
         ['ash', 'Your brother came home. He\'s goat-sized now, he lives with my mom, and he really, really likes cake.', 'Your brother came home. He\'s small, and he LOVES cake.'],
-        ['f_glaciar', '...Vorlax likes CAKE? He always said cake was for hatchlings. Oh, the old fibber. I\'m so glad.', 'Vorlax likes CAKE? Oh, I\'m so glad.'] ],
+        ['f_glaciar', '...Vorlax likes CAKE? All our lives he told me cake was for hatchlings. The old fibber.', 'Vorlax likes CAKE? The old fibber!'] ],
         else: [
         ['ash', 'Your brother is gone, Auntie. His fire went out. I\'m sorry.', 'Your brother is gone. His fire went out. Sorry.'],
-        ['f_glaciar', 'He chose to be a very loud, very angry dragon for a very long time. You chose something better. Don\'t be sorry, dumpling. Be warm.', 'He chose to be loud and angry. You chose better. Be warm.'] ] }] }] },
+        ['f_glaciar', 'He spent a very long time being loud and angry, dumpling. That was his choice, and you made a kinder one. Now, no long faces on my mountain.', 'He chose to be loud and angry. You chose kinder. No long faces!'] ] }] }] },
       // (Nyxara's name, and the long truth on a Case Book page)
       { do: ['set f_nyx_named', 'page f3_tove_notes'] },
       { choose: 'f3_auntie_home', who: 'f_glaciar',
-        ask: ['Listen, dumpling. The one the moths call the Mother is NYXARA, the moon\'s old moth. And I made a blizzard for her. I\'m a danger. I should fly far north, where I can\'t hurt anyone.',
+        ask: ['Now listen, dumpling. The one the moths call the Mother is NYXARA, the moon\'s old moth, and I made her a blizzard in my sleep. A dragon who does that is not safe to have about. I should fly far north, where I can\'t hurt anyone.',
               'The Mother is Nyxara, the moon\'s moth. I made a blizzard. I should fly far north.'],
         pick: [
           { t: ['"You\'re the Snow Mother. Hearthold still sings about you."', '"You\'re the Snow Mother!"'], tone: 'kind', v: 'stay',
@@ -200,7 +200,7 @@ chapter({
             locked: ['Who is the Snow Mother of Hearthold\'s song? Work it out in the Case Book first.', 'Who is the Snow Mother? Ask the Case Book.'],
             then: ['choice f_glaciar_home=stay', { journal: ['Glaciar stayed in the north as the Snow Mother.', 'Glaciar stayed as the Snow Mother.'], key: 'f_glaciar_home' }],
             say: [
-              ['f_glaciar', 'Ember\'s song? They still SING it? Then I\'ll stay. Someone has to keep the north. One gentle snow a year, for the sledding.', 'They still sing Ember\'s song? Then I\'ll stay.'] ] },
+              ['f_glaciar', 'Ember\'s song? They still SING it? Well. Then I shall stay. Somebody has to keep the north, and keep the winters small.', 'They still sing Ember\'s song? Then I\'ll stay.'] ] },
           { t: ['"Go and rest, Auntie. Come back when you\'re ready."', '"Go and rest, Auntie."'], tone: 'kind', v: 'north',
             then: [{ journal: ['Glaciar flew north to rest.', 'Glaciar flew north to rest.'], key: 'f_glaciar_home' }],
             say: [
@@ -232,7 +232,7 @@ chapter({
               ['narr', 'Glaciar opens one eye. It\'s blue.', 'Glaciar opens one eye. It\'s blue.'],
               ['f_glaciar', '...Ember used to sing me that. Who taught you, dumpling?', 'Ember sang me that. Who taught you?'],
               ['ash', 'Hearthold did. They still sing it. It\'s about you, Auntie.', 'Hearthold did. It\'s about you, Auntie.'],
-              ['f_glaciar', 'Oh. Oh, my. Then I suppose I\'d better stay and earn it.', 'Oh my. Then I\'d better stay and earn it.'] ] },
+              ['f_glaciar', 'Well, well. Then I suppose I had better stay and earn it.', 'Then I\'d better stay and earn it.'] ] },
           { t: ['Let her sleep, and promise to come back', 'Let her sleep'], tone: 'brave', v: 'sleep',
             say: [
               ['ash', 'Sleep well, Auntie. I\'ll come back for you. I promise.', 'Sleep well, Auntie. I\'ll come back. I promise.', { promise: 'f3_crown_wake' }],
@@ -250,7 +250,7 @@ chapter({
     f3_night: [
       { cam: 'f3_hearth_view', s: 1 },
       ['narr', 'That night the Great Hearth burns gold and blue and doesn\'t flicker once. Pim gives out free cocoa. Captain Brann isn\'t afraid of anything at all, and says so, loudly, until he falls asleep in a chair.', 'That night the Great Hearth burns gold and blue. Free cocoa! Brann falls asleep in a chair.'],
-      ['f_brynja', 'Thank you, child. My old girl says thank you too. She says it in sparks.', 'Thank you, child. My old girl says thank you too. In sparks.'],
+      ['f_brynja', 'Thank you, child. Listen to her crackle. That\'s my old girl saying thank you too.', 'Thank you, child. Hear her crackle? She says thanks too.'],
       { if: 'choice f_glaciar_home=stay', then: [
         ['narr', 'Out on the roads and in the villages, every frozen person gave a little shiver tonight, and woke up. High on the mountain, the Snow Mother hums an old song.', 'Every frozen person in the north woke up tonight. The Snow Mother hums on the mountain.'] ],
         else: [{ if: 'choice f_glaciar=free', then: [
@@ -258,14 +258,14 @@ chapter({
         else: [
         ['narr', 'Somewhere on the mountain, an ice dragon sleeps under a blanket of snow. You promised to come back. You will.', 'An ice dragon sleeps on the mountain. You promised to come back.', { promise: 'f3_crown_wake' }] ] }] },
       { if: 'flag f_freed_n>=1', then: [
-        ['f_brann', 'And some of my lost Hearthwardens walked home tonight! Frozen in armor, they said, until a dragon breathed blue fire on them.', 'Some of my lost guards came home tonight! A dragon saved them.'] ] },
+        ['f_brann', 'And my lost Hearthwardens are home! Frozen in armor, they said, until a dragon breathed blue fire on them. A dragon! That was YOU!', 'My lost guards are home! A dragon saved them.'] ] },
       { if: 'choice f_hush=scarf', then: [
         ['narr', 'Across the face of the moon flutters a tiny white moth, wearing a long red scarf.', 'A tiny white moth in a red scarf flutters across the moon.'] ] },
       ['narr', 'Before you close your eyes, you look up. The moon is beautiful. It\'s also smaller. Like somebody took another bite out of the edge.', 'You look up. The moon is smaller. Someone took another bite.',
         { do: ['moon 85', 'set f_moon_bite3', 'set f_nyx_named'] }],
       ['nyxara', 'Two pieces, little ember. Two out of three. You\'re doing so well.', 'Two pieces, little ember. Two of three.'],
       ['nyxara', 'Come east. Bring them both. I\'ll leave a light on.', 'Come east. Bring them both. I\'ll leave a light on.'],
-      ['ash', '...I really, really hate moths.', 'I really, really hate moths.'],
+      ['ash', '...I really, really hate that moth.', 'I really, really hate that moth.'],
     ],
   },
 })
