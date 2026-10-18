@@ -43,15 +43,15 @@ chapter({
     nest_magpie: { map: 1, area: 'c_mothnest', at: [288, 118], kind: 'prop', look: 'a2a_magpie', name: 'a brass magpie on the beam' },
     // outside the Brassworks, between its signpost (c_sign_works, 10000, 24900) and Pearl's warp landing
     bw_gate_hanky: { map: 1, at: [10100, 24905], r: 18, kind: 'examine', look: 'a2a_hanky', states: { taken: 'a2a_empty' }, if: '!flag c_hanky_read',
-      name: 'a hanky tied to a stake by the gate', aliases: ['the hanky', "Vesper's hanky"] },
+      name: ['a hanky tied to a stake by the gate', 'a hanky by the gate'], aliases: ['the hanky', "Vesper's hanky"] },
     // the chimney by the Great Clock where she unmasks (the 'unmask' pose sits her on its cap, 52 px up)
     gh_vesper_perch: { map: 1, at: [7230, 24411], kind: 'npc_spot', name: 'a chimney by the Great Clock' },
   },
 
   clue: {
     b_glow_pile: { icon: 'pile',
-      text: ['Under the window of the Nest lies everything she ever stole, in a neat circle. Nothing sold. Every single thing glows.',
-        'Everything she stole is in a circle. It all glows.'] },
+      text: ['Under the window of the Nest lies every glowing thing she ever stole, laid out in a neat circle. Nothing was sold.',
+        'Every glowing thing she stole is here, in a circle.'] },
     b_dream_page: { icon: 'book',
       text: ['Her dream diary: "The Lady of the Moths came again. She says: bring her light, and Gran will be warm."',
         '"Bring the Lady light, and Gran will be warm."'] },
@@ -109,12 +109,12 @@ chapter({
   scene: {
     brs_nest: [
       ['narr', 'The bell loft at the top of the Great Clock. Somebody LIVES up here.', 'The bell loft. Somebody LIVES up here!'],
-      ['narr', 'A hammock made from an old sail. Moth drawings pinned on every beam. A blanket that smells of the sea.', 'A hammock. Moth drawings. A blanket that smells of the sea.'],
-      ['ash', "Her hideout. Pip, don't touch anything.", "Her hideout. Pip, don't touch anything."],
+      ['narr', 'There is a hammock made from an old sail, moth drawings pinned to every beam, and a blanket that smells of the sea.', 'A sail hammock, moth drawings, a blanket that smells of the sea.'],
+      ['ash', "It's her hideout. Don't touch anything.", "Her hideout. Don't touch anything."],
       { if: 'flag pip', then: [['narr', 'Pip touches everything.', 'Pip touches everything.']] },
     ],
     brs_pile: [
-      ['narr', 'Under the window, laid out in a neat circle like a present: everything the Moth Mask ever stole.', 'Under the window, in a circle: everything she stole.'],
+      ['narr', 'Under the window, laid out in a neat circle like a present: every glowing thing the Moth Mask ever stole.', 'Under the window, in a circle: every glowing thing she stole.'],
       ['narr', "A glow-lamp. A jar of glowworms. A moon-dial. Lord Whirligig's gold candlestick. They all shine.", 'A glow-lamp. Glowworms. A gold candlestick. All shining.'],
       ['narr', "And Bob's hat. It has a little glowing badge on the front.", "And Bob's hat. It has a glowing badge!"],
       { if: 'flag c_chase=helped', then: [['narr', "And Lord Whirligig's new bird clock. Its little bird glows.", 'And the bird clock. Its bird glows.']] },
@@ -124,7 +124,7 @@ chapter({
       ['narr', 'By the hammock: a little book with a moon on the cover. A dream diary.', 'A little book with a moon on it. A dream diary.'],
       ['narr', 'One page has been read so many times it has gone soft as cloth.', 'One page has been read so many times.'],
       ['narr', '"The Lady of the Moths came again. She says: bring her light, and Gran will be warm."', '"Bring the Lady light, and Gran will be warm."', { clue: 'b_dream_page' }],
-      ['narr', '"And bring the warm stone to the Spire at moonrise. Then I will be real."', '"Bring the warm stone to the Spire."'],
+      ['narr', '"She says bring the warm stone to the Spire at moonrise, and I will be a real Emberblood at last."', '"Bring the warm stone to the Spire."'],
       ['ash', "The Spire? There isn't a spire. And who is the LADY?", 'What Spire? And who is the LADY?'],
     ],
     brs_letters: [
@@ -148,7 +148,7 @@ chapter({
             then: ['set c_biscuits=ate'],
             say: [
               ['narr', 'It is the best biscuit you have ever eaten.', 'It is the best biscuit ever.'],
-              ['ash', 'I feel terrible. ...I feel GREAT. ...No. Terrible.', 'I feel terrible. No, GREAT. No. Terrible.']] },
+              ['ash', "That was the best biscuit I've ever had, and I feel AWFUL about it.", 'Best biscuit ever. I feel awful.']] },
         ] }] },
     ],
     // note 2 (and Pip's Fetch, if Pip is with Ash); the note's words depend on what Ash said on the cliff (trust K2)
@@ -159,11 +159,11 @@ chapter({
         { if: 'flag pip', then: [
           ['narr', 'CLACK! A brass magpie swoops off the beam, snatches the note out of your claws, and flaps back up.', 'CLACK! A brass magpie grabs the note and flies up!'],
           ['ash', 'Hey! Give that back, you tin chicken!', 'Hey! Give it back, you tin chicken!'],
-          ['narr', 'Pip goes very still. He has watched a certain thief do this on every roof in town. He took notes.', 'Pip goes very still. He watched the thief do this.'],
+          ['narr', 'Pip goes very still. He has watched a certain thief snatch things off rooftops all over town.', 'Pip goes very still. He watched the thief do this.'],
           ['narr', 'ZIP! Pip plucks the note from its beak and lands back on your head.', 'ZIP! Pip grabs the note back!'],
-          ['ash', "Pip! That's stealing! ...From a thief. So it's fine. Good boy!", 'Pip! You stole it back! Good boy!'],
+          ['ash', "Pip! That's stealing! ...From a thief, though. Good boy!", 'Pip! You stole it back! Good boy!'],
           ['narr', 'The magpie sulks back to its nest. Its nest is made entirely of teaspoons.', 'The magpie sulks. Its nest is made of teaspoons.'],
-          { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'] }] }] },
+          { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'], sub: ['When something shiny is out of reach and it says "Pip, fetch!", use your action button.', 'Shiny thing out of reach? Use your action button!'] }] }] },
         { if: 'flag c_cliff=gran', then: [
           ['narr', '"Stop following me. Gran\'s fine. She\'s always cold. It\'s not your problem. V." Smaller: "My other drops are none of your business."', '"Stop following me. Gran is fine. V."']] },
         { if: '!flag c_cliff=gran', then: [
@@ -187,7 +187,7 @@ chapter({
       { if: 'flag c_biscuits=left', then: [
         ['narr', 'Inside the hanky: one biscuit. "You didn\'t eat Gran\'s biscuits. Weird. Here\'s one. ONE. V."', 'One biscuit inside! "Here is one. ONE. V."', { do: ['give c_biscuit 1'] }]] },
       { if: 'flag c_biscuits=ate', then: [
-        ['narr', 'Inside the hanky: crumbs. "Somebody ate one of Gran\'s biscuits. I COUNTED. V."', 'Crumbs inside! "Somebody ate Gran\'s biscuit. V."']] },
+        ['narr', 'Inside the hanky: crumbs. "You ate one of Gran\'s biscuits. You left crumbs on my blanket. V."', 'Crumbs inside! "You ate Gran\'s biscuit. V."']] },
       ['ash', "She was in the Nest right after me. She's always one roof ahead.", 'She is always one roof ahead!'],
     ],
     // the Great Clock strikes, and on a chimney beside it Vesper pushes her mask up (on screen; the camera goes there)
@@ -198,7 +198,7 @@ chapter({
       ['narr', 'BONG! BONG! BONG! Twelve times. It is not midnight. The Great Clock does not care.', 'BONG! BONG! BONG! Twelve times!'],
       { place: ['c_mask', 'gh_vesper_perch'] }, { anim: ['c_mask', 'unmask'] }, { cam: 'gh_vesper_perch', s: 1 },
       ['narr', 'On a chimney beside the clock, a girl in a grey cloak pushes her mask up, to see better.', 'On a chimney, a girl pushes her mask up.'],
-      ['narr', "Dark hair. One silver streak. Freckles. She's grinning at the clock like it's a birthday cake.", 'Dark hair, a silver streak, freckles. She is grinning.'],
+      ['narr', "She has dark hair with one silver streak in it, and freckles, and she's grinning at the clock like it's a birthday cake.", 'Dark hair, a silver streak, freckles. She is grinning.'],
       { if: 'flag c_cliff=gran', then: [
         ['narr', 'She looks across the rooftops, right at you, and waves. Then the mask comes down.', 'She looks right at you. She waves. The mask comes down.']] },
       { if: '!flag c_cliff=gran', then: [
@@ -213,18 +213,18 @@ chapter({
         'The clock stopped. Somebody lives up in the bell loft. Tick.'] },
     ],
     c_hester: [
-      { if: 'flag c_clock_on', once: true, say: ['Twelve bongs. Exactly twelve. I counted. I could cry. I will not. It would be inefficient.', 'Twelve bongs. Exactly twelve. I counted.'] },
+      { if: 'flag c_clock_on', once: true, say: ['Twelve bongs, exactly three seconds apart. Do not tell the Bobs, but I stood in the square and saluted.', 'Twelve bongs! I saluted the clock.'] },
     ],
     c_whirligig: [
       { if: 'stage>=c_brass !flag c_clock_on', once: true, say: ['My Brassworks! Do be careful with the... with the everything. And if you see a large brass gentleman with a wind-up handle in his back, do NOT wind him up.',
         'My Brassworks! Do NOT wind up the big brass man.'] },
-      { if: 'flag c_clock_on', once: true, say: ['My clocks! My lovely clocks! ...Dragon. You did this? Hmph. Well. Thank you. Wipe your feet next time.', 'My clocks! You did this? Hmph. Thank you.'] },
+      { if: 'flag c_clock_on', once: true, say: ['My clocks! My lovely clocks! ...Dragon. You did this? Hmph. Thank you. Wipe your feet next time.', 'My clocks! You did this? Hmph. Thank you.'] },
     ],
     c_penny: [
       { if: 'flag c_clock_on', once: true, say: ['MOTH MASK HAS A FACE! Did you SEE it? I saw it. From really far away. I am going to need a bigger notebook.', 'MOTH MASK HAS A FACE! I need a bigger notebook!'] },
     ],
     c_oona: [
-      { if: 'flag c_biscuits=ate', once: true, say: ['Vesper says a dragon ate one of my biscuits. She was FURIOUS. I laughed so hard I had to sit down.', 'A dragon ate my biscuit? Ha! Vesper was FURIOUS.'] },
+      { if: 'flag c_biscuits=ate', once: true, say: ['Vesper says a dragon ate one of my biscuits. She was FURIOUS. I laughed so hard my rocking chair nearly tipped over.', 'A dragon ate my biscuit? Ha! Vesper was FURIOUS.'] },
       { if: 'flag c_biscuits=left', once: true, say: ['Vesper brought me my biscuits. Well, two. She said the third went to a dragon who deserved it. Was that you, duck?', 'Vesper brought me two biscuits. A dragon got one. You?'] },
     ],
   },

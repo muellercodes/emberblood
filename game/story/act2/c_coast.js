@@ -7,7 +7,7 @@ chapter({
   // the game numbers Act II's cards after the heist (c_fest 1, c_pass 2), so this is Chapter 3
   card: ['Act II · Chapter 3', 'Salt on the Wind'],
   so_far: [
-    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask glide over twice. Three nights ago something much bigger flew over too, and left Gerald the sheep silver with dust.",
+    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask glide over twice. The night the clocks stopped, something much bigger flew over too, and left Gerald the sheep silver with dust.",
     'Something huge flew over. Gerald the sheep is silver now.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],
@@ -26,7 +26,7 @@ chapter({
 
   clue: {
     w_silver_sheep: { icon: 'sheep', mystery: 'what_stopped',
-      text: ['Three nights ago something big flew over the Downs. It left Gerald the sheep silver with moth dust. Far too much dust.',
+      text: ['The night the clocks stopped, something big flew over the Downs. It left Gerald the sheep silver with moth dust. Far too much dust.',
         'Something big flew over. Gerald the sheep is covered in silver dust.'] },
   },
 
@@ -46,32 +46,32 @@ chapter({
   scene: {
     cst_arrive: [
       ['narr', 'The Southern Pass winds down and down, until the valley runs out and the ground turns into sky.', 'The pass winds down. Then the ground turns into sky.'],
-      ['narr', 'No. Not sky. Water. Blue all the way to the edge of the world, and it smells of salt and old boats.', 'Not sky. Water! Blue to the edge of the world.'],
-      ['ash', "Pip, look. It's a lake that forgot to stop.", 'Pip, look! A lake that forgot to stop.'],
+      ['narr', "It isn't sky. It's water, blue all the way to the edge of the world, and it smells of salt and old boats.", "It isn't sky. It's water, blue to the edge of the world."],
+      ['ash', "Whoa. It's a lake that forgot to stop.", 'Whoa! A lake that forgot to stop.'],
       { if: 'flag pip', then: [['pip', 'Mip!']] },
       { if: 'choice ending=heir', then: [['ash', "Good thing I'm back to normal size. A giant dragon would scare all the boats.", 'Good thing I am small again!']] },
-      ['narr', "Far below, on the white cliffs, a city ticks. Clock towers. Chimneys. A harbor full of ships that aren't going anywhere.", 'Far below, a city of clocks. Ships that do not move.'],
+      ['narr', "Far below, on the white cliffs, a city of clock towers and chimneys sits around a harbor. Not one ship in it is moving.", 'Far below is a city of clocks. Its ships are not moving.'],
       { place: ['c_mask', 'cst_glide_from'] }, { anim: ['c_mask', 'glide'] }, { walk: ['c_mask', 'cst_glide_to'] },
       ['narr', 'And gliding down over the sheepfold, grey against the sky, goes a figure with wings like a moth.', 'Someone with moth wings glides down over the sheep.'],
       ['ash', 'There you are.'],
-      ['ash', 'Okay, Moth Lady. Ready or not.', 'Okay, Moth Lady. Ready or not!'],
+      ['ash', 'Okay, Moth Mask. Ready or not, here I come.', 'Okay, Moth Mask. Here I come!'],
       { wait: 1 }, { do: ['despawn c_mask'] },
     ],
     cst_barley: [
-      ['c_barley', "You'll be the dragon, then. The sheep said there'd be a dragon.", 'You must be the dragon. The sheep said so.'],
-      ['ash', 'The sheep SAID?'],
-      ['c_barley', "Not in words. Gerald fainted. That's how Gerald says most things.", 'Gerald fainted. That is how Gerald talks.'],
+      ['c_barley', 'Well, now. Horns and a tail, on my road. Keep your voice down, young dragon. The sheep are jumpy today.', 'Horns and a tail! Keep your voice down. The sheep are jumpy.'],
+      ['ash', 'Jumpy about what?'],
+      ['c_barley', "Gerald's fainted twice since breakfast. When Gerald faints, something's going on.", 'Gerald fainted twice today. Something is going on.'],
       ['c_barley', 'A girl just went over on a cloak like moth wings. Same as three nights back.', 'A moth girl just flew over. Same as three nights ago.'],
       ['c_barley', 'That first time she was carrying something that glowed. Like a little red sun.', 'That time she carried something glowing. Like a red sun.'],
       ['ash', "That's the Ember Heart! Which way did she go?", 'The Ember Heart! Where did she go?'],
-      ['c_barley', 'Down to Gearhaven, same as today. But later that night something BIGGER went over. Gerald saw it.', 'To Gearhaven. But later something BIGGER flew over. Gerald saw it.'],
+      ['c_barley', "Down to Gearhaven, both times. But later that night something much bigger went over. Gerald saw it, and he hasn't been right since.", 'To Gearhaven. Later something much bigger flew over. Gerald saw it.'],
       ['ash', 'Which one is Gerald?'],
-      ['c_barley', "They're all Gerald. You want the shiny one.", "They're all Gerald. Find the shiny one."],
+      ['c_barley', "They're all Gerald, bar Duchess. You want the shiny one.", "They're all Gerald. Find the shiny one."],
     ],
     cst_gerald: [
       ['narr', 'Just outside the fold, one sheep lies flat on his back with his legs in the air.', 'One sheep lies on his back, legs in the air.'],
-      ['narr', 'He is SILVER. Horns to hooves. Soft, glittery dust, as if somebody sneezed glitter on him. A LOT of glitter.', 'He is SILVER all over. Glittery dust. LOTS of it.'],
-      ['ash', "That's not one moth's worth of dust. That's a whole... sheep's worth.", 'That is a LOT of dust.'],
+      ['narr', 'He is silver from his horns to his hooves, under soft, glittery dust as thick as frost.', 'He is silver all over. Thick, glittery dust.'],
+      ['ash', 'A moth did this? It would have to be a moth the size of a barn.', 'A moth did this? A moth as big as a barn!'],
       ['narr', 'Gerald opens one eye, sees a dragon, and faints again.', 'Gerald sees you. He faints again.'],
       { if: 'flag pip', then: [
         ['pip', 'Mip... mip... MIP-CHOO!'],

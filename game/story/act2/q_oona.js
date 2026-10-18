@@ -47,7 +47,7 @@ quest({
 
   scene: {
     c_oona_offer: [
-      ['c_oona', "Oh, look at you. Horns. A tail. And you're WARM. I can feel it from here, like standing next to a loaf.",
+      ['c_oona', "Oh, look at you, duck. Horns and a tail, and you're WARM. I can feel it from here, like standing next to a fresh loaf.",
         "Horns, a tail, and WARM! Like a loaf."],
       ['c_oona', "My old stove hasn't lit in twenty years. A gull built a nest right on top of my chimney.",
         'My stove is cold. A gull sits on my chimney.'],
@@ -58,7 +58,7 @@ quest({
           { t: ["I'll light it for you!", 'I will help!'], tone: 'kind', then: ['quest start c_oona'],
             say: [['c_oona', 'Bless you, duck. Mind the gull. He bites.', 'Bless you. Mind the gull.']] },
           { t: ['Not right now', 'Not now'],
-            say: [['c_oona', "Mind the wind on your way out, duck. It's got opinions.", 'Mind the wind, duck.']] },
+            say: [['c_oona', "Mind the wind on the boardwalk, duck. It'll have your hat off.", 'Mind the wind, duck.']] },
         ] },
     ],
     // replaces STORY.c_oona_fire (x1_people plays it by key at this step); at most 10 lines on any branch

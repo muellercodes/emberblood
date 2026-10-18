@@ -41,7 +41,7 @@ quest({
       obj: ['Ask Auntie Fig at the Steaming Teapot about the tune', 'Ask Auntie Fig about the tune'] },
     { id: 'prints', do: 'track gf_prints', scene: 'gf_trail_end', then: ['set c_gift_trail'],
       obj: ['Follow the silver footprints west', 'Follow the silver prints'],
-      hint: ["They glitter at night. Through Professor Hettie's glass they show by day too.", 'They shine at night, or through the glass.'] },
+      hint: ["They glitter at night. Through Professor Sprocket's glass they show by day too.", 'They shine at night, or through the glass.'] },
     { id: 'posy', do: 'talk c_posy', scene: 'gf_posy',
       obj: ['Talk to Little Posy in Saltmarsh', 'Talk to Little Posy'] },
     { id: 'tell', do: 'talk c_whirligig', scene: 'gf_tell',
@@ -54,8 +54,8 @@ quest({
   scene: {
     gf_offer: [
       ['c_penny', 'HEADLINE: MOTH MASK STEALS GOLDEN MUSIC BOX. LORD WHIRLIGIG FAINTS. TWICE.', 'HEADLINE: MOTH MASK STEALS MUSIC BOX!'],
-      ['c_penny', 'Here is the thing. Everything she steals turns up in Saltmarsh. Roof tiles. Medicine. Once a whole goose.',
-        'Her loot turns up in Saltmarsh. Once a goose!'],
+      ['c_penny', 'Here is the thing. Half of what she takes from the barons turns up on Saltmarsh doorsteps.',
+        'Her loot turns up on Saltmarsh doorsteps.'],
       ['c_penny', 'Follow the music box, find the Moth Mask. Scoop of the century. You in?', 'Follow the box. Find her. You in?'],
       { choose: 'c_gifts_offer', ask: ['Help Penny?'], pick: [
         { t: ["I'm in. Where do we start?", "I'm in!"], then: ['quest start c_gifts'],
@@ -75,7 +75,7 @@ quest({
         'She walked home to Saltmarsh at night.', { clue: 'q_dishwasher' }],
       ['c_fig', 'Moth dust gets everywhere, dearie. Her footprints still glitter on the cliff road some nights.',
         'Her footprints still shine some nights.'],
-      { if: 'item magnifier', then: [['ash', "Or in daylight. Through Professor Hettie's glass!", "Or by day, through Hettie's glass!"]] },
+      { if: 'item magnifier', then: [['ash', "Or in daylight, through Professor Sprocket's glass!", 'Or by day, through the magnifier!']] },
     ],
     gf_trail_end: [
       ['narr', 'The silver prints stop at the door of Cockle Cottage. Inside, a little girl is humming. The same waltz.',
@@ -117,8 +117,8 @@ quest({
         'V.S. is Vesper Saltwhistle!']] },
       { if: 'solved who_is_she', then: [['c_penny', 'V.S. on the lid. Vesper Saltwhistle. ...You knew already. HEADLINE: DRAGON KNEW FIRST. I hate it.',
         'You knew already? I hate it!']] },
-      { if: '!flag c_gifts=taken', then: [['c_penny', "Scoop of the century. And I'm not printing it. Some stories are better kept.",
-        "Big scoop. I won't print it."], { do: ['give coins 40'] }] },
+      { if: '!flag c_gifts=taken', then: [['c_penny', "Scoop of the century, and I'm not printing it. A little kid's music box isn't news. It's hers.",
+        "Big scoop. I won't print it. It's hers."], { do: ['give coins 40'] }] },
       ['c_penny', "Here. My spare Press Pass. You're a reporter now. Unpaid.", "Take my Press Pass. You're a reporter!"],
     ],
     gf_box_home: [

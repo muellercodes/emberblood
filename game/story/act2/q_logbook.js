@@ -37,11 +37,11 @@ quest({
     lb_offer: [
       ['c_ottoline', "Mother Pearl kept a logbook. Every day of her life on this coast. And six of its pages are MISSING. Sorry. Missing.",
         "Six of Pearl's pages are MISSING! Sorry."],
-      ['c_ottoline', "They blew away in a great storm, long ago. Pearl's old places might still hold them. Caves. Lofts. Lighthouses.",
+      ['c_ottoline', "They blew away in a great storm, three hundred years ago. Pearl's old places might still hold them: her caves, her workshop, her lighthouse.",
         "Look in Pearl's old places.", { ref: 'c_gullcrag_door' }],
       { if: 'flag c_pb_5', then: [['c_ottoline', 'Sister Wren wrote that you would ask. She also wrote that I am wrong about commas. I am not.',
         'Wren said you would come. She is wrong.']] },
-      { choose: 'c_logbook_offer', ask: ["Bring them to me? I'll pay you in coins. And in being quiet. Mostly coins.", 'Bring them? I will pay.'],
+      { choose: 'c_logbook_offer', ask: ["Bring them to me? I'll pay you in coins. And I'll be quiet for a whole week. I'll TRY.", 'Bring them? I will pay.'],
         pick: [
           { t: ["I'll find them.", "I'll find them."], tone: 'kind', then: ['quest start c_logbook'],
             say: [['c_ottoline', 'WONDERFUL! ...Sorry. Wonderful.', 'WONDERFUL! Sorry.']] },

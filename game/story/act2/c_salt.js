@@ -48,8 +48,8 @@ chapter({
       text: ["The Tide Clock's cog was packed with kelp and far too much moth dust. More than one girl could carry.",
         'The Tide Clock was full of moth dust. Too much!'] },
     s_fishstep: { icon: 'fish',
-      text: ["Before dawn, from the Chowder Pot's window: a cloaked figure left a fish on Granny Oona's step and ran off over the roofs.",
-        'A cloaked girl left a fish on Gran\'s step.'] },
+      text: ["Before dawn, from the Chowder Pot's window: a cloaked figure left a fish on the step of the crooked house at the end of the longest boardwalk, and ran off over the roofs.",
+        'A cloaked girl left a fish at the crooked house.'] },
     s_alibi: { icon: 'fish', mystery: 'what_stopped',
       text: ['Granny Oona says Vesper came home just before midnight, the night the clocks stopped. She was shaking.',
         'Gran says Vesper was home that night, shaking.'] },
@@ -74,7 +74,7 @@ chapter({
 
   step: [
     { id: 'open', do: 'cutscene slt_open', then: ['give c_note1'],
-      obj: ['Climb down off the Clockwatch roof', 'Climb down off the roof'] },
+      obj: ['Catch your breath after the chase', 'Catch your breath'] },
     { id: 'ottoline', do: 'talk c_ottoline', scene: 'slt_ottoline', then: ['set c_ottoline'],
       obj: ['Ask at the Turning Library how anyone climbs a clock', 'Ask at the library how to climb a clock'],
       hint: ['The Turning Library is the round building with a dome, in the Upper Town near Whirligig Manor.', 'The library has a dome. It is in the Upper Town.'] },
@@ -108,25 +108,25 @@ chapter({
         ['c_bobs', "Nobody climbs the clock, Bob. There's a sign.", 'Nobody climbs the clock, Bob.'],
         ['ash', 'She went up it like a LADDER. How do you even DO that?', 'She climbed it like a ladder! How?'],
         ['c_bobs', 'Ask the library lady at the Turning Library. She knows everything. Loudly.', 'Ask the library lady. She knows everything.', { promise: 'c_ottoline' }],
-        ['c_bobs', 'And keep that note, Mostly Part Dragon. That is EVIDENCE.', 'Keep that note, dragon. It is EVIDENCE.']] },
+        ['c_bobs', 'And keep that note. That is EVIDENCE. We have always wanted some evidence.', 'Keep that note. It is EVIDENCE!']] },
       // (an old save that loads in this chapter somewhere else hears only this)
       { if: '!near c_hester 900', then: [
         ['ash', 'She climbed the Great Clock like a LADDER. Somebody at the Turning Library must know how.', 'She climbed the clock! Ask at the library.', { promise: 'c_ottoline' }]] },
     ],
     slt_ottoline: [
-      ['c_ottoline', "Welcome to the Turning Library. The shelves run so you don't have to. ...WHAT DO YOU NEED? Sorry. I shouted.", 'Welcome! WHAT DO YOU NEED? Sorry. I shouted.'],
+      ['c_ottoline', "Welcome to the Turning Library. Please don't run, the shelves do that for you. WHAT CAN I... sorry. What can I do for you?", 'Welcome! WHAT DO YOU... sorry. What do you need?'],
       ['ash', 'How does somebody climb straight up the Great Clock?', 'How does someone climb the Great Clock?'],
-      ['c_ottoline', 'Like Mother Pearl! Our founder. Horns like yours, claws that climbed anything, and not one spark of fire.', 'Like Mother Pearl! Horns like yours. Climbing claws. No fire.'],
-      ['ash', "Pearl? EMBER'S Pearl? Then she's my great-great-great... I have an AUNT!", "Ember's Pearl? She's my great-great... AUNT!"],
+      ['c_ottoline', "Only one person ever climbed like that. Mother Pearl, who built this city. Ember's own daughter, with horns like yours, claws that climbed anything, and not one spark of fire.", "Mother Pearl! Ember's daughter. Horns like yours. Climbing claws. No fire."],
+      ['ash', "EMBER'S daughter? Then she's my great-great-great... I have an AUNT!", "Ember's daughter? She's my great-great... AUNT!"],
       ['c_ottoline', "Pearl learned to climb in the sea caves at Gullcrag, past Saltmarsh. You'd need claws like hers.", 'Pearl learned to climb in the Gullcrag caves, past Saltmarsh.', { promise: 'c_gullcrag_door' }],
       ['narr', "A shelf rolls past with a fat scroll on it: PEARL'S FAMILY TREE. It falls off, unrolls across the floor, and keeps going out the door.", "A scroll falls: PEARL'S FAMILY TREE. It unrolls right out the door."],
       ['c_ottoline', 'Oh dear. It does that. Two hundred names, and every one of them a climber.', 'Oh dear. It does that. Two hundred climbers.'],
       ['narr', 'At the very bottom, in newer ink: "Oona Saltwhistle, of Saltmarsh. And her granddaughter, Vesper."', 'At the bottom: "Oona Saltwhistle, of Saltmarsh. And granddaughter Vesper."', { clue: 's_family' }],
-      ['c_ottoline', "Nobody's been added since. Pearl's family got very small. QUIETLY small. Sorry.", "No one since. Pearl's family is very small now."],
+      ['c_ottoline', "Nobody since. All of Pearl's great big family, down to one old lady and one girl.", 'No one since. Just an old lady and a girl.'],
     ],
     slt_mina: [
-      ['narr', 'Saltmarsh stands on stilts over a silver lagoon. A gull on every post. The whole village smells of chowder.', 'Saltmarsh is on stilts over the water. It smells like soup.'],
-      ['c_mina', "High tide, high tide, high tide. Oh! A dragon. Hello. It's been high tide for three days.", 'High tide, high tide! Oh, a dragon. Hello!'],
+      ['narr', 'Saltmarsh stands on stilts over a silver lagoon, and the whole village smells of chowder.', 'Saltmarsh is on stilts over the water. It smells like soup.'],
+      ['c_mina', "Still high. Go OUT, sea. Please? ...Oh! Hello, dragon. Don't mind me, I'm telling the sea off.", 'Still high tide! Oh, hello, dragon.'],
       ['c_mina', 'The Tide Clock stuck the same night as the Great Clock. Now the sea has forgotten how to go out.', 'The Tide Clock is stuck. The sea forgot how to go out.'],
       ['ash', 'I need to get to the Gullcrag Caves.', 'I need to get to the caves.', { promise: 'c_gullcrag_door' }],
       ['c_mina', "Not at high tide! The Gullcrag Sands are under the sea. Fix my clock and she'll go out again. The door's open.", 'Not at high tide! Fix my clock. The door is open.', { promise: 'c_tidehouse_door' }],
@@ -157,15 +157,15 @@ chapter({
     slt_lowtide: [
       ['narr', 'CLUNK. The big hand of the Tide Clock swings from HIGH to LOW.', 'CLUNK! The big hand swings to LOW.'],
       ['narr', "Out of the cog falls the crab shell, and a fat clump of kelp. It glitters. It's packed with silver moth dust.", 'Out falls kelp, packed with silver dust.'],
-      ['ash', "That's not one moth's worth of dust. That's a whole SKY of moths.", 'That is a LOT of moth dust.'],
+      ['ash', 'There is more dust in here than there was on Gerald. Whatever did this was HUGE.', 'More dust than on Gerald! Something HUGE did this.'],
       ['c_mina', '(from outside) LOW TIDE! Oh, you lovely dragon! The Gullcrag Sands are open!', 'LOW TIDE! The sands are open!'],
     ],
     // not played by a step: x1_story.js c1Rested plays STORY.c_fishstep after a rest at the Chowder Pot in this chapter
     // or the next, and a data scene with an old key replaces that STORY entry (A2S's rule in CHANGES.md)
     c_fishstep: [
-      ['narr', "Just before dawn, something wakes you. Out of the inn window, a cloaked figure creeps along the longest boardwalk to Granny Oona's house.", 'Before dawn, a cloaked figure creeps to Granny Oona\'s house.'],
+      ['narr', 'Just before dawn, something wakes you. Out of the inn window, a cloaked figure creeps along the longest boardwalk to the crooked house at the very end.', 'Before dawn, a cloaked figure creeps to the crooked house.'],
       ['narr', "She lays a fish on the step. She straightens the doormat. Then she's gone, up a post and over a roof, quick as a cat.", 'She leaves a fish. Then she runs over the roofs.', { clue: 's_fishstep' }],
-      ['ash', 'Fish delivery. In a moth cloak. At five in the morning.', 'Fish delivery. In a moth cloak. So early!'],
+      ['ash', 'Who brings an old lady fish over the rooftops, in the dark?', 'Who brings fish over the roofs in the dark?'],
       { if: 'flag pip', then: [['pip', 'Mip.']] },
     ],
     slt_oona: [
@@ -173,8 +173,8 @@ chapter({
       ['c_oona', 'Come in, duck, shut the door. Not that it helps. We Saltwhistles are always cold.', 'Come in, duck. We Saltwhistles are always cold.'],
       ['ash', 'Is Vesper home?'],
       ['c_oona', "Out. She's always out. Climbing something tall, I expect. She thinks I don't know.", 'Out. Climbing something tall. She thinks I do not know.'],
-      ['narr', 'On the table: forty-one fish. In the stove: no fire at all. Not for a long, long time.', 'Forty-one fish on the table. The stove is cold.'],
-      ['ash', 'Three nights ago, when the clocks stopped. Where was Vesper?', 'Where was Vesper when the clocks stopped?'],
+      ['narr', 'Fish are piled up on the table, more than one old lady could eat in a month. The stove is stone cold, and it has been for years.', 'Lots of fish on the table. The stove is cold.'],
+      ['ash', 'The night the clocks stopped. Where was Vesper?', 'Where was Vesper when the clocks stopped?'],
       ['c_oona', 'Here, duck. She came in just before midnight, white as a sheet, and held my hands till morning.', 'Here. She came home before midnight, white as a sheet.', { clue: 's_alibi' }],
       ['c_oona', "She was shaking. She wouldn't say why. Take a fish, duck. Please. I'm running out of plates.", 'She was shaking. Take a fish, duck. Please.'],
     ],

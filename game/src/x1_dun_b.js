@@ -358,7 +358,7 @@ function xbCocoonBurn(A,o){ o.dead=true; G.found[o.id]=true; if(o.col){ removeCo
 { const base=areaObjAct; areaObjAct=function(o){ if(o&&o.xb&&AREA&&AREA.xb){ xbAct(AREA,o); return; } return base.apply(this,arguments); }; }
 function xbAct(A,o){
   switch(o.k){
-    case 'xb_drum': xbSay(o.burnT>0?S('The drum roars with flame. Too hot to touch!','It is burning! Too hot!'):o.cd>0?S('The drum is still smoking. Give it a moment.','It is still smoking.'):S('A drum of old lamp oil. Fire would make it burn bright for a while. Very bright. Very hot.','Lamp oil. Fire makes it burn bright!')); return;
+    case 'xb_drum': xbSay(o.burnT>0?S('The drum roars with flame. Too hot to touch!','It is burning! Too hot!'):o.cd>0?S('The drum is still smoking. Give it a moment.','It is still smoking.'):S('A drum of old lamp oil. Fire would make it burn bright and hot for a while.','Lamp oil. Fire makes it burn bright!')); return;
     case 'xb_vbraz': xbSay(S('A brazier of violet fire that gives off no heat at all. It looks cold. Maybe your fire burns warmer.','Cold violet fire. Your fire is warmer!')); return;
     case 'xb_horn': if(o.cd>0){ xbSay(S('The old horn wheezes. It needs a moment to fill up again.','It needs a rest.')); return; }
       o.cd=xbDiff(8,10,11); o.blowT=xbDiff(6.5,5,4.5); xbHorn(); shake(6); flashA=0.15; flashCol='230,240,255'; setBanner(S('BWAAAAAMP!','BWAAAMP!'),S('Every moth curtain in the room shrivels! Run!','The moths shrink! Run!'),2.2); return;
@@ -369,7 +369,7 @@ function xbAct(A,o){
     case 'xb_nest': xbSay(S('A great cocoon, thick as a mattress, wrapped round something that glints. Your fire just slides off it. It would take a huge, steady light to burn this.','A huge cocoon. Fire slides off. It needs a big, steady light.')); return;
     case 'xb_mass': xbSay(S('Grey silk is piled in front of the west door like a snowdrift. A strong beam of light might burn it away.','Silk blocks the door. A beam of light could burn it.')); return;
     case 'xb_lamp': xbLampAct(A,o); return;
-    case 'xb_gull': xbSay(o.gullHi?S('The gull is still sitting on its forty spoons. It is not sharing.','The gull will not share its spoons.'):S('A fat gull sits on a pile of spoons. Forty spoons. It glares at you as if YOU are the one who steals things.','A gull on forty spoons. It glares at you.'),()=>{ o.gullHi=1; }); return;
+    case 'xb_gull': xbSay(o.gullHi?S('The gull is still sitting on its spoons. It is not sharing.','The gull will not share its spoons.'):S('A fat gull sits on a heap of stolen spoons. It glares at you as if YOU were the thief.','A gull on a heap of spoons. It glares at you.'),()=>{ o.gullHi=1; }); return;
     case 'xb_book': if(typeof c1Play==='function'&&STORY.c_spire_sketch) c1Play('c_spire_sketch'); else xbSay(S('A sketchbook full of drawings of an old woman, stilt houses and a horned kid in a scarf.','A sketchbook. Lots of drawings.')); return;
     case 'xb_prop': { const D=XB_PROP[o.kind]; if(D&&D.say) xbSay(typeof D.say==='function'?D.say(o):D.say); return; }
   }
@@ -1217,7 +1217,7 @@ defineDungeon('c_spire',{name:S('The Shadow Spire','The Shadow Spire'),level:13,
       tpl:xbTplStair(xbTplStair(C1_TPL.mirror,7,1,'<'),7,9,'X')})},
     links:[['i','j','gate:i']]}},
   {id:'4',name:S('The Last Stair','The Last Stair'),map:{rooms:{
-    k:xbR({at:[0,0],kind:'free',foes:[['c_moth',3]],mothFree:true,down:'c_spire_3',up:'c_spire_5',say1:()=>{ const bolt=typeof boltHelps==='function'&&boltHelps(); setBanner(bolt?S('Woof! Woof!','Woof! Woof!'):S('Mip!','Mip!'),bolt?S('Bolt barks up the last stair. Pip mips back at him.','Bolt barks. Pip mips back.'):S('Pip holds on to your horns. The stair crumbles behind every step.','Pip holds on. Run up!'),2.8); },seal:{kind:'boss',dir:'up'},void:'sky',restFall:true,noPots:true,noDecor:true,
+    k:xbR({at:[0,0],kind:'free',foes:[['c_moth',3]],mothFree:true,down:'c_spire_3',up:'c_spire_5',say1:()=>{ const bolt=typeof boltHelps==='function'&&boltHelps(); setBanner(bolt?S('Woof! Woof!','Woof! Woof!'):S('Run!','Run!'),bolt?S('Bolt barks up the last stair, his tail spinning.','Bolt barks. Run up!'):S('The stair crumbles behind every step.','The stair crumbles. Run up!'),2.8); },seal:{kind:'boss',dir:'up'},void:'sky',restFall:true,noPots:true,noDecor:true,
       gust:{dir:[-1,0],on:1.2,off:3.2,str:120},xbLights:[[1,9,200,0.4],[7,6,240,0.5],[13,1,180,0.35],[1,1,180,0.35],[10,9,180,0.3]],
       tpl:['kk....oooo...kk',
            'kk....oooo...kk',

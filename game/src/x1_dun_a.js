@@ -593,7 +593,7 @@ function d1aWarp(A,o){
         const T={hatch:S(`A heavy hatch in the wreck's deck, with a lock shaped like a flame. The Boss Key would open it. Through the cracks: the sound of the sea, and someone humming.`,`A hatch with a flame lock. Find the Boss Key.`),
           stair:S(`A great iron door over the long stair down, with a lock shaped like a flame. The Boss Key for it is somewhere in the Brassworks.`,`A big door. Find the Boss Key.`),
           steam:S(`Hot steam roars up out of the hatch. Somewhere, a valve must send it elsewhere.`,`Hot steam! Find a valve to stop it.`),
-          lift:S(`The freight lift's cage is locked. A brass plate says: FOREMAN'S LIFT. FOREMAN ONLY. (THAT MEANS THE FOREMAN.)`,`The lift is locked. Only the Foreman can use it.`)}[o.d1aLook];
+          lift:S(`The freight lift's cage is locked. A brass plate says: FOREMAN'S LIFT. NO PASSENGERS. NO PIGEONS.`,`The lift is locked. Only the Foreman can use it.`)}[o.d1aLook];
         d1aSay([T||S('It will not open.','It will not open.')]); return true; } }
     return base.apply(this,arguments); }; }
 // strikes: bells, belt levers, pipe valves and the gear hub answer to weapons; stone eyes under water or out of reach do not
@@ -621,7 +621,7 @@ function d1aWarp(A,o){
     base(id);
     try{ if(id==='claws'&&d1aIn('c_gullcrag')) d1aFloodStart(AREA); if(id==='grapple'&&d1aIn('c_brassworks')){ d1aDropStart(AREA); const R=AREA.rooms[AREA.d1a.dropRoom]; if(R&&!R.solved) solveRoom(R,true); } }catch(e){ console.error(e); } }; }
 // Pearl speaks in her own places (the altar line, the shrine when you already have her gift), and they are not Trials
-{ const base=taunt; taunt=function(who,text){ if(who==='ember'&&d1aIn()&&AREA.rooms&&(AREA.curRoom||{}).kind==='reward') return base('c_pearl',pick([S(`Well done, dear. The altar's yours. Go on.`,`Well done! Touch the altar.`),S(`That's the hard part over. Mostly.`,`The hard part is over. Mostly.`)])); return base(who,text); }; }
+{ const base=taunt; taunt=function(who,text){ if(who==='ember'&&d1aIn()&&AREA.rooms&&(AREA.curRoom||{}).kind==='reward') return base('c_pearl',pick([S(`Well done, dear. The altar's yours. Go on.`,`Well done! Touch the altar.`),S(`That's the hard part over. Go on, it's yours.`,`The hard part is over. Go on!`)])); return base(who,text); }; }
 { const base=showCard; showCard=function(num,name){ if(d1aIn()&&String(num)==='Trial complete') num=S('Dungeon complete','Done!'); return base(num,name); }; }
 { const base=trialObjAct; trialObjAct=function(o){
     const A=AREA;
@@ -631,7 +631,7 @@ function d1aWarp(A,o){
     if(A&&A.d1a&&o&&o.tobj==='altar'&&trialDone(A.d1a.root)){ d1aSay([A.d1a.root==='c_gullcrag'?S(`Pearl's cradle rocks gently, all by itself. The warp by the wall still glows, whenever you are ready to go.`,`The cradle rocks gently. The warp still glows.`):S(`The great lever is down and the drive hums. Far above, the Great Clock ticks. The warp in the corner still glows.`,`The lever is down. The clock is awake! The warp still glows.`)]); return true; }
     if(A&&A.d1a&&o&&o.tobj==='shrine'){ const SH=D1A_SHRINE[dunRoot(A.def.id)];
       if(SH&&!hasAbil(SH.abil)&&!d1aSeen(SH.key)&&STORY[SH.key]){ d1aPlay(SH.key,()=>{ scene='play'; base(o); }); return true; } const TI=trialInfo(dunRoot(A.def.id)); if(TI&&TI.abil&&hasAbil(TI.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine');
-      d1aSay([A.d1a.root==='c_gullcrag'?S(`Pearl's statue holds out her stone hand. It feels warm, somehow. (Health and draughts restored.)`,`The statue's hand is warm. (You feel better!)`):S(`Pearl's velvet cushion. It smells of oil and old adventures. (Health and draughts restored.)`,`A soft cushion. (You feel better!)`)]); return true; } }
+      d1aSay([A.d1a.root==='c_gullcrag'?S(`Pearl's statue holds out her stone hand. It feels warm. (Health and draughts restored.)`,`The statue's hand is warm. (You feel better!)`):S(`Pearl's velvet cushion. It smells of oil and old adventures. (Health and draughts restored.)`,`A soft cushion. (You feel better!)`)]); return true; } }
     return base.apply(this,arguments); }; }
 // ---------- 8. art: the baked floor (my cells, faces at every height, the sea and brass dressing)
 const d1aOL=()=>LOOK.sb?SBC.outline:'#1a1012';

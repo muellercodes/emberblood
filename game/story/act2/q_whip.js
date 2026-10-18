@@ -24,8 +24,8 @@ quest({
 
   clue: {
     q_ghost_saw: { icon: 'moth', mystery: 'what_stopped',
-      text: ["Captain Saltbeard's ghost: three nights ago something flew over the Rockpools, wings like a sky full of curtains. Even he hid.",
-        'Three nights ago a giant winged thing flew over.'] },
+      text: ["Captain Saltbeard's ghost: the night the clocks stopped, something flew over the Rockpools, wings like a sky full of curtains. Even he hid.",
+        'A giant winged thing flew over that night.'] },
   },
 
   step: [
@@ -59,7 +59,7 @@ quest({
       ['c_tarbuckle', 'Bring the old fool a bowl and let him rest. And get my sock back. He owes me a sock.', 'Bring him a bowl. And get my sock!'],
       { choose: 'c_whip_offer', ask: ['Help the ghost get his supper?', 'Help the ghost?'], pick: [
         { t: ['I will. Ghosts need supper too.', 'I will help!'], tone: 'kind', then: ['quest start c_whip'],
-          say: [['c_tarbuckle', "Good lad. Start with Charlie at the Chowder Pot. ...and THAT'S why I don't eat eels.", 'Ask Charlie at the Chowder Pot.']] },
+          say: [['c_tarbuckle', 'Good lad. Start with Charlie at the Chowder Pot. Tell him Elias Tarbuckle sent you.', 'Ask Charlie at the Chowder Pot.']] },
         { t: ['Ghosts? No thank you.', 'No thanks.'], say: [['c_tarbuckle', 'In my day we were scared of NOTHING. Except ghosts.', 'In my day we feared ghosts too.']] },
       ] },
     ],
@@ -90,8 +90,8 @@ quest({
       ['narr', 'Captain Saltbeard sits down on his own deck and slurps the chowder. He glows brighter with every spoonful.',
         'Saltbeard slurps the chowder. He glows.'],
       ['c_saltbeard', 'Forty YEARS I waited for this bowl. Worth it.', 'Forty years I waited! Worth it.'],
-      ['c_saltbeard', 'Three nights back, something flew over these rocks. Wings like a sky full of curtains. Even I hid.',
-        'Three nights ago a huge thing flew over. I hid!', { clue: 'q_ghost_saw' }],
+      ['c_saltbeard', 'The night the clocks stopped, something flew over these rocks. Wings like a sky full of curtains. Even I hid.',
+        'A huge thing flew over that night. I hid!', { clue: 'q_ghost_saw' }],
       ['c_saltbeard', 'Tell Elias sorry about the cards. And take my chain. Give it a better job than holding me down.',
         'Tell Elias sorry. Take my chain.'],
       ['narr', "Then he's gone. There's only the tide, an empty bowl, and one very old sock.", 'He is gone. Just a bowl and an old sock.'],
@@ -116,7 +116,7 @@ quest({
       { if: 'stage>=c_salt !quest c_whip active !quest c_whip done', option: ['Tell me a ghost story', 'Tell me a ghost story'], scene: 'wp_offer' },
       { if: 'quest c_whip active item c_chowder !night', option: ['Can I wait here until dark?', 'Can I wait for dark?'],
         then: ['time night'],
-        say: ["Sit, sit. I'll tell you about the time I wrestled an octopus. It took all day. So will this.", "Sit. I'll tell you about an octopus."] },
+        say: ["Sit, sit. I'll tell you about the time I wrestled an octopus. Took all day, and THAT'S why I don't eat eels.", "Sit. I'll tell you about an octopus."] },
     ],
   },
 })

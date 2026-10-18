@@ -180,7 +180,7 @@ chapter({
     ],
     c_look_rope: [
       ['narr', "A rope is tied across the road, two steps before the cliff edge, tight as a fence. Somebody didn't want anyone walking off in the dark.", 'A rope across the road stops you walking off the edge.'],
-      ['ash', 'A fisher\'s knot. Gran-style. Huh.', 'A fisher\'s knot. Huh.'],
+      ['ash', "That's a fisher's knot, like on the Saltmarsh nets. Huh.", "A fisher's knot. Like the Saltmarsh nets."],
     ],
     c_look_ends: [
       ['narr', 'The bridge ropes end right here at the post. Cut clean through, in one stroke. The ends shine like they were sliced with something sharp and hooked.', 'The ropes were cut clean. Not chewed.'],
@@ -206,8 +206,8 @@ chapter({
       ['c_agatha', "There's a big one wrapped round my lamp now. And a girl in a grey cloak, up and down my stairs like she owns them.", 'A big moth is round my lamp. And a girl in a grey cloak.'],
       ['ash', 'Vesper.', 'Vesper.'],
       { if: 'item c_lampoil', then: [
-        ['c_agatha', "Is that Fennick's Brightest in your bag? The good stuff. Save it for my lamp.", "Fennick's oil? Save it for my lamp."] ] },
-      ['c_agatha', "My logbook's on its stand by the lighthouse path, if you like reading. And mind the steps. All three hundred.", 'My logbook is by the path. Mind the steps!', { ref: 'lh_logbook' }],
+        ['c_agatha', "Is that a tin of Fennick's Brightest in your bag? That's the good stuff. Save it for my lamp.", "Fennick's oil? Save it for my lamp."] ] },
+      ['c_agatha', "My logbook's on its stand by the lighthouse path, if you like reading. And mind the stairs. They were built for one old keeper, not for dragons.", 'My logbook is by the path. Mind the stairs!', { ref: 'lh_logbook' }],
     ],
     c_read_log: [
       ['narr', "AGATHA'S LOG. The night the clock stopped. 11:59: lamp out. A great shadow went over the stars, west to east, a whole minute long.", "AGATHA'S LOG. 11:59: lamp out. A huge shadow went over the stars.", { ref: 'lh_logbook' }],
@@ -216,7 +216,7 @@ chapter({
     c_read_stone: [
       ['narr', 'A stone is set into the lighthouse wall, worn smooth by a thousand years of salty wind. Carved on it: a girl with little horns and a tail, climbing a cliff with a lantern on her back.', 'A carved stone: a horned girl climbing a cliff.'],
       ['narr', 'Underneath: I HAD NO FIRE, SO I CLIMBED. P.', 'Underneath: I HAD NO FIRE, SO I CLIMBED. P.'],
-      ['ash', '"No fire." Just like Pearl. Just like...', 'No fire. Just like Pearl. Just like...'],
+      ['ash', '"I had no fire, so I climbed." Pearl wrote that. And I know somebody else who climbs like that...', '"No fire, so I climbed." Like someone I know...'],
     ],
     c_look_print: [
       ['narr', 'Silver dust is printed on the tower in one enormous shape: a wing, with a painted eye in the middle. It is taller than the whole lighthouse.', 'A giant wing is printed in dust on the tower. Taller than the lighthouse!'],
@@ -231,8 +231,8 @@ chapter({
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [
             ['narr', 'You roar fire across the Lamp Room. The moths scatter out of the windows. The fire rolls right over Vesper, and she does not even blink.', 'You roar fire! The moths fly off. Vesper is not even hurt!', { clue: 'l_fireproof' }],
-            ['c_mask', '...Why do you keep DOING that?', 'Why do you keep DOING that?'],
-            ['ash', 'Because you keep needing it.', 'Because you keep needing it.'] ] },
+            ['c_mask', '...Why would you do that? I cut your BRIDGE.', 'Why help me? I cut your BRIDGE.'],
+            ['ash', 'And you tied a rope across the road so nobody would fall.', 'You tied a rope so nobody would fall.'] ] },
         { t: ['"Where is the Ember Heart, Vesper?"', '"Where is the Heart, Vesper?"'], tone: 'brave', v: 'asked',
           then: ['set c_lamp=asked'],
           say: [
@@ -258,7 +258,7 @@ chapter({
       ['ash', '"Not where I\'m going," she said. That\'s where she\'s going.', "That's where Vesper is going."],
     ],
     c_stopped_solved: [
-      ['ash', 'Something with wings bigger than a ship flew right over the coast. Clock, tide, lighthouse. All in one minute.', 'Something huge flew over. Clock, tide, light. One minute.'],
+      ['ash', 'Something with wings bigger than a ship flew over the whole coast, and the clock, the tide and the lighthouse all stopped in the same minute.', 'Something huge flew over. Everything stopped in one minute.'],
       { if: 'near c_agatha 500', then: [
         ['c_agatha', 'Big as a house, Squawk said. I told him to hush.', 'Squawk said big as a house. I told him to hush.'] ] },
       ['ash', 'For once, Squawk was RIGHT. ...So where did it go?', 'Squawk was RIGHT. So where did it go?', { promise: 'c_vesper_page' }],
@@ -266,8 +266,8 @@ chapter({
 
     // ---- the lighthouse's own story keys. Each replaces the old STORY[key] in place, so x1_dun_b plays these.
     c_light_in: [
-      ['c_pearl', 'My lighthouse. The first one on this coast. Before it, ships found the rocks by hitting them. Very efficient. Very wet.', 'My lighthouse. Before it, ships found rocks by hitting them.'],
-      ['c_pearl', "Something's eaten my light. Moths. They love a flame and they hate a light. Funny creatures. Like some people.", 'Moths ate my light. They love a flame and hate a light.'],
+      ['c_pearl', 'My lighthouse, the first one on this coast. Before it, ships found the rocks by bumping into them.', 'My lighthouse. Before it, ships found rocks by bumping into them.'],
+      ['c_pearl', "Something's eaten my light. Moths. They'll fly round a candle all night, but a real beam sends them running.", 'Moths ate my light. A real beam makes them run.'],
       ['c_pearl', 'My little lens still turns, see? When the beam comes round, the moth webs shrivel. When it goes, the shadows come back. Use both.', 'Light shrinks the moth webs. Then shadows come back. Use both.'],
     ],
     c_light_shrine: [
@@ -277,11 +277,11 @@ chapter({
     ],
     c_light_gift: [
       ['narr', 'The little lens turns, and its beam sweeps across you. Behind you, your own shadow stretches long across the floor. Then it moves. On its own. It waves.', 'The beam sweeps over you. Your shadow stretches out. Then it waves at you!'],
-      ['narr', "You step forward, and somehow you're standing where your shadow's head was, three steps away, without taking the steps.", 'You step, and you are suddenly three steps away.'],
+      ['narr', "You step forward, and you're standing where your shadow's head was, three steps away, without taking the steps.", 'You step, and you are suddenly three steps away.'],
       ['c_pearl', "The Shadow Dash! Dash, and for a moment you're a shadow. Moth curtains can't catch you. Nobody looking for you can see you.", 'The Shadow Dash! Dash and you become a shadow. Moth curtains cannot stop you.'],
       ['c_pearl', "Start your dash inside a shadow and you'll ride it all the way to the far end. Over gaps, if the shadow's long enough.", 'Dash from a shadow to ride it. Even over gaps!'],
       ['c_pearl', 'Those bars are made of shadow. They only let a shadow through in the dark. Wait for the beam to pass.', 'Shadow bars let you through only in the dark.'],
-      ['ash', "I'm a shadow. I'm a SHADOW. Pip, I'm a shadow!", "I'm a SHADOW! Pip, look!"],
+      ['ash', "I'm a shadow. I'm a SHADOW!", "I'm a SHADOW!"],
       { if: 'flag pip', then: [
         ['pip', "Mip?! (Pip hides behind you. Then he realises that's where your shadow is. Pip is very confused.)", 'Mip?! (Pip hides in your shadow. He is very confused.)'] ] },
     ],
@@ -290,10 +290,10 @@ chapter({
     ],
     c_light_won: [
       ['narr', 'The beam hits the Gloomwing full on. All the grey dust slides off its wings like snow, and underneath they are gold. The dust was never its own.', 'The beam hits it. The grey dust falls off. Its wings are gold underneath!', { clue: 'l_lamp_moths' }],
-      ['c_pearl', 'Poor thing. Somebody told it the dark was its friend. Light is kinder, in the end.', 'Poor thing. Light is kinder, in the end.'],
+      ['c_pearl', 'Poor thing. It was never grey at all. Somebody dusted it and sent it up here to sit on my lamp.', 'Poor thing. Someone dusted it grey and sent it here.'],
     ],
     c_light_end: [
-      ['c_pearl', "That's the last of my places, Ash. The claws, the tail, the shadow. All of it was waiting for whoever came next. I'm glad it was you. Now light my lamp.", "My last place. I'm glad it was you. Light my lamp!"],
+      ['c_pearl', "That's the last of my places, Ash. I left my claws and my tail and my shadow for whoever came next, and I'm glad it was you. Now light my lamp.", "My last place. I'm glad it was you. Light my lamp!"],
     ],
   },
 
@@ -304,7 +304,7 @@ chapter({
         say: ["Not crabs? Squawk told the whole market. Twice. I've sent the crew out with new rope.", 'Not crabs? Squawk told everyone. My crew will fix it.'] },
     ],
     c_agatha: [
-      { if: 'flag c_agatha !flag c_light_done', say: ['Three hundred steps. Mind the third one. And the other two hundred and ninety-nine.', 'Mind the steps. All of them.'] },
+      { if: 'flag c_agatha !flag c_light_done', say: ['Squawk wants to know why you are still down here. So do I.', 'Squawk asks why you are still here. So do I.'] },
       { if: 'flag c_light_done', say: ['My light is back. Squawk, say thank you to the dragon. ...He says BIG AS A HOUSE. That means thank you.', 'My light is back! Squawk says thank you.'] },
     ],
   },
