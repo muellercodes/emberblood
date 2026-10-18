@@ -328,7 +328,7 @@ c1Def('c_pip_fetch',[
   c1If('narr',`Pip shoots up to the beam, plucks the gear out of the magpie's beak, and is back on your head before it can even say clack.`,`Pip zooms up and grabs the gear back! He lands on your head.`,()=>!!G.flags.pip),
   c1If('ash',`You stole it back! Pip! That's stealing! ...From a thief. So it's fine. Good boy!`,`You stole it back! From a thief. So it's fine. Good boy!`,()=>!!G.flags.pip),
   c1If('narr',`The magpie gives up and goes back to its nest, which is made entirely of teaspoons.`,`The magpie goes back to its nest. It is made of teaspoons.`,()=>!!G.flags.pip),
-  xdo(()=>{ if(G.flags.pip){ G.flags.c_pip_fetch=true; later(0.6,()=>setBanner(S(`Pip learned Fetch!`,`Pip can Fetch!`),S(`Look at a small thing across a gap and press E.`,`Look at it. Press E.`),3.4)); } })
+  xdo(()=>{ if(G.flags.pip){ G.flags.c_pip_fetch=true; later(0.6,()=>setBanner(S(`Pip learned Fetch!`,`Pip can Fetch!`),S(`When something shiny is out of reach and it says "Pip, fetch!", press ${balCtls().use}.`,`Shiny thing out of reach? Press ${balCtls().use}.`),3.4)); } })
 ]);
 c1Def('c_ambrose',[
   xl('c_ambrose',`Eh? You climbed my clock? On the OUTSIDE? Nobody's done that since... well. Since the girl. Tick.`,`Eh? You climbed my clock? On the OUTSIDE? Only the girl did that. Tick.`),
@@ -584,7 +584,7 @@ c1Def('c_brass_gift',[
   xl('ash',`My tail is a ROPE.`,`My tail is a ROPE!`),
   xl('c_pearl',`A rope with opinions. Oh, and the floor's about to fall out. Hold on.`,`A rope with opinions. Oh, the floor is falling. Hold on!`)
 ]);
-STORY.c_brass_how=S(`Aim at a brass ring or a post and press GRAPPLE. Your tail pulls you over gaps. It can pull light things to you, too.`,`Aim at a ring or a post and grapple. Your tail pulls you over gaps.`);
+STORY.c_brass_how=S(`Walk up to a brass ring or a post and use your action button. Your tail pulls you over gaps. It can pull light things to you, too.`,`At a ring or a post, use your action button. Your tail pulls you over.`);
 STORY.c_brass_bossline=S(`Ticktock! Grab the key on his back with your tail and PULL. Jump his stomps. When the pendulum swings, get up on the rings!`,`Grab his back key with your tail and PULL! Jump his stomps!`);
 c1Def('c_ticktock_intro',[
   xl('narr',`In the middle of the pit, something enormous and brass is standing very still. Then its eyes light up. Tick. Tock. TICK.`,`Something huge and brass stands in the pit. Its eyes light up. Tick. Tock. TICK.`),

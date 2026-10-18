@@ -163,7 +163,7 @@ chapter({
           ['narr', 'ZIP! Pip plucks the note from its beak and lands back on your head.', 'ZIP! Pip grabs the note back!'],
           ['ash', "Pip! That's stealing! ...From a thief, though. Good boy!", 'Pip! You stole it back! Good boy!'],
           ['narr', 'The magpie sulks back to its nest. Its nest is made entirely of teaspoons.', 'The magpie sulks. Its nest is made of teaspoons.'],
-          { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'] }] }] },
+          { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'], sub: ['When something shiny is out of reach and it says "Pip, fetch!", use your action button.', 'Shiny thing out of reach? Use your action button!'] }] }] },
         { if: 'flag c_cliff=gran', then: [
           ['narr', '"Stop following me. Gran\'s fine. She\'s always cold. It\'s not your problem. V." Smaller: "My other drops are none of your business."', '"Stop following me. Gran is fine. V."']] },
         { if: '!flag c_cliff=gran', then: [
