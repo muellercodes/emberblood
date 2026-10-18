@@ -161,7 +161,7 @@ chapter({
           ['ash', 'Hey! Give that back, you tin chicken!', 'Hey! Give it back, you tin chicken!'],
           ['narr', 'Pip goes very still. He has watched a certain thief snatch things off rooftops all over town.', 'Pip goes very still. He watched the thief do this.'],
           ['narr', 'ZIP! Pip plucks the note from its beak and lands back on your head.', 'ZIP! Pip grabs the note back!'],
-          ['ash', "Pip! That's stealing! ...From a thief. So it's fine. Good boy!", 'Pip! You stole it back! Good boy!'],
+          ['ash', "Pip! That's stealing! ...From a thief, though. Good boy!", 'Pip! You stole it back! Good boy!'],
           ['narr', 'The magpie sulks back to its nest. Its nest is made entirely of teaspoons.', 'The magpie sulks. Its nest is made of teaspoons.'],
           { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'] }] }] },
         { if: 'flag c_cliff=gran', then: [
@@ -218,7 +218,7 @@ chapter({
     c_whirligig: [
       { if: 'stage>=c_brass !flag c_clock_on', once: true, say: ['My Brassworks! Do be careful with the... with the everything. And if you see a large brass gentleman with a wind-up handle in his back, do NOT wind him up.',
         'My Brassworks! Do NOT wind up the big brass man.'] },
-      { if: 'flag c_clock_on', once: true, say: ['My clocks! My lovely clocks! ...Dragon. You did this? Hmph. Well. Thank you. Wipe your feet next time.', 'My clocks! You did this? Hmph. Thank you.'] },
+      { if: 'flag c_clock_on', once: true, say: ['My clocks! My lovely clocks! ...Dragon. You did this? Hmph. Thank you. Wipe your feet next time.', 'My clocks! You did this? Hmph. Thank you.'] },
     ],
     c_penny: [
       { if: 'flag c_clock_on', once: true, say: ['MOTH MASK HAS A FACE! Did you SEE it? I saw it. From really far away. I am going to need a bigger notebook.', 'MOTH MASK HAS A FACE! I need a bigger notebook!'] },

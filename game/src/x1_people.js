@@ -371,7 +371,7 @@ Object.assign(TALK,{
     best:{t:S(`You're my favorite customer, dearie. Don't tell the others. Free beds for life, everywhere I can talk anyone into it.`,`My favorite! Free beds for life!`),reward:{freeinn:true}},
     chat:x1pChat(`Sit, dearie. Tell Auntie Fig. What's the bravest thing you ever did?`,`What is the bravest thing you did?`,
       [`Said sorry when I was wrong.`,`I said sorry.`,`Oh, that's the bravest kind. Most people never manage it. Have a biscuit.`,`That's the bravest kind. Have a biscuit.`,1],
-      [`Fought a dragon on a mountain!`,`Fought a dragon!`,`A DRAGON! Well. You are a dragon. So it was a fair fight. Have a biscuit.`,`A dragon! A fair fight, then. Biscuit?`,0.5],
+      [`Fought a dragon on a mountain!`,`Fought a dragon!`,`A DRAGON! But you are a dragon, dearie, so it was a fair fight. Have a biscuit.`,`A dragon! A fair fight, then. Biscuit?`,0.5],
       [`Ate one of Bertram's buns.`,`Ate Bertram's bun.`,`I don't know who Bertram is, dearie, but I believe you. Have a safe biscuit.`,`I believe you. Have a safe biscuit.`,0.5],'kind')},
   c_ambrose:{bio:S('Keeper of the Great Clock for ninety years. A bit deaf. Ends sentences with tick.','He winds the Great Clock. A bit deaf. Tick.'),
     about:{yara:S(`Your Elder Yara? Eh. Ninety years I've wound this clock, and nobody ever made ME an elder. Tick.`,`Yara is an elder? Nobody made ME one. Tick.`),c_hester:S(`Captain Hester was a little girl crying on the Great Stair once. I counted to sixty with her. Now she counts at everybody. Tick.`,`I once counted to sixty with Hester. Now she counts at everyone.`)},
@@ -616,13 +616,13 @@ const X1P_NIGHT=[S(`Late for walking, Ash. The moths are out.`,`It's late. The m
 const X1P_GH='town:c_gearhaven', X1P_SM='town:c_saltmarsh';
 const x1pPre=()=>!G.flags.c_clock_on, x1pTicks=()=>!!G.flags.c_clock_on;
 // personal barks
-B('c_hes1','id:c_hester',ALWAYS,S(`Forty seconds. Thirty-nine. Thirty-eight. I count when I'm nervous.`,`Forty. Thirty-nine. I count when I'm nervous.`));
-B('c_hes2','id:c_hester',x1pPre,S(`One minute to midnight, all day long. I am losing my mind, very precisely.`,`One minute to midnight, all day. Ugh.`));
+B('c_hes1','id:c_hester',ALWAYS,S(`Forty seconds. Thirty-nine. Thirty-eight...`,`Forty. Thirty-nine. Thirty-eight...`));
+B('c_hes2','id:c_hester',x1pPre,S(`One minute to midnight, all day long. Somebody fix that clock before I arrest it.`,`Somebody fix that clock!`));
 B('c_het1','id:c_hettie',ALWAYS,S(`If you hear a bang, that was the toaster. Probably.`,`A bang? That's the toaster.`));
 B('c_het2','id:c_hettie',()=>!x1pQ('c_bolt'),S(`Bolt? Boooolt? Here, boy! ...He's not here, is he.`,`Bolt? Here, boy! ...Not here.`));
 B('c_ott1','id:c_ottoline',ALWAYS,S(`shhh... SHHHH! ...sorry.`,`shhh... SHHH! Sorry.`));
 B('c_whi1','id:c_whirligig',ALWAYS,S(`*checks his pocket watch* Still stopped. *checks again* Still stopped.`,`*checks his watch* Still stopped.`));
-B('c_whi2','id:c_whirligig',x1pTicks,S(`Listen to them! Four hundred clocks, all ticking. I may sing. I won't. I might.`,`My clocks tick again! I might sing.`));
+B('c_whi2','id:c_whirligig',x1pTicks,S(`Listen to them! Four hundred clocks, all ticking at once. That is MUSIC, dragon.`,`My clocks tick! Music!`));
 B('c_mo1','id:c_mo',ALWAYS,S(`*blows a bubble* Lovely day for it. For what? For it.`,`*blows a bubble* Lovely day.`));
 B('c_mo2','id:c_mo',x1pPre,S(`Barnacles! The harbor chain's stuck again!`,`Barnacles! The chain is stuck!`));
 B('c_ing1','id:c_ingrid',ALWAYS,S(`Hammer, hammer, DING!`,`Hammer, hammer, DING!`));
@@ -634,9 +634,9 @@ B('c_pen2','id:c_penny',()=>!x1pR('c_brass'),S(`EXTRA! MOTH MASK SEEN ON ROOFTOP
 B('c_rav1','id:c_ravel',ALWAYS,S(`Remarkable rarities! Rarely remarkable! I mean the other way round!`,`Remarkable things for sale!`));
 B('c_jo1','id:c_jo',ALWAYS,S(`Race you to the pier! ...Oh, right. Feet.`,`Race you! Oh. Feet.`));
 B('c_bob1','id:c_bobs',ALWAYS,S(`Tick. Tock. All quiet, Bob. All quiet, Bob.`,`Tick. Tock. All quiet.`));
-B('c_bob2','id:c_bobs',()=>!x1pQ('c_bob'),S(`We miss Bob. We do not talk about Bob. We miss him.`,`We miss Bob.`));
-B('c_min1','id:c_mina',ALWAYS,S(`Thirty-one, thirty-two... sorry. Waves.`,`Thirty-one... sorry. Waves.`));
-B('c_min2','id:c_mina',()=>!G.flags.c_lowtide,S(`High tide. Still. Again. Forever.`,`Still high tide. Forever.`));
+B('c_bob2','id:c_bobs',()=>!x1pQ('c_bob'),S(`We do not talk about Bob. ...We miss Bob, Bob.`,`We miss Bob.`));
+B('c_min1','id:c_mina',ALWAYS,S(`That's it, sea. Out you go. Good sea.`,`Out you go, sea. Good sea.`));
+B('c_min2','id:c_mina',()=>!G.flags.c_lowtide,S(`Still high. Go OUT, sea. Please?`,`Still high. Go OUT, sea!`));
 B('c_cha1','id:c_charlie',ALWAYS,S(`Chowder! Get your chowder! Hugged soup!`,`Chowder! Hugged soup!`));
 B('c_dor1','id:c_dory',ALWAYS,S(`Mind the nets.`,`Mind the nets.`));
 B('c_oon1','id:c_oona',ALWAYS,S(`Brrr. Shut the door, duck.`,`Brrr. Shut the door.`));
@@ -687,19 +687,19 @@ Object.assign(DGREET,{
   'pip@c_oona':[['any',S(`Oh, look at the little one. Warm as a teapot. Come here, little duck.`,`Look at the little one! Warm as a teapot.`)]],
   'trial_wings@c_maudie':[['any',S(`I SAW YOU FLY PAST MY WINDOW! I DROPPED A WHOLE TRAY!`,`YOU FLEW PAST MY WINDOW!`)]],
   'q_duchess@c_barley':[['any',S(`Farmer Hollis wrote that a dragon found his goat, Duchess. Was that you? I named my best ewe after that goat.`,`Did you find Hollis's goat? I named a sheep after her!`)]],
-  'ch_fennick_forgive@c_agatha':[['any',S(`Word in the lamp trade is you let Fennick Wick off with a warning. Good. Nobody makes better oil.`,`You let Fennick off? Good. He makes the best oil.`)]],
+  'ch_fennick_forgive@c_agatha':[['any',S(`Hm. The dragon who gives lamp-men second chances. Come in, then.`,`Hm. The kind dragon. Come in.`)]],
   trial_claws:[[X1P_CT,S(`You climbed the Great Clock? On the OUTSIDE? Old Ambrose is telling everybody.`,`You climbed the Great Clock? Wow!`)]],
   'trial_claws@c_ambrose':[['any',S(`Eh? You climbed her? On the outside? Nobody's done that since the girl. Tick.`,`You climbed my clock? Like the girl did. Tick.`)]],
   trial_grapple:[[X1P_CT,S(`Is it true your tail is a rope now? Can I see? From over here?`,`Your tail is a rope? Show me!`)]],
   'trial_grapple@c_hettie':[['any',S(`Pearl's hook! In your TAIL! Hold still, I have to draw it. No, hold MORE still.`,`Pearl's hook in your tail! Hold still!`)]],
   trial_shadow:[[X1P_CT,S(`You went all shadowy! Penny saw it! She says it's the scoop of the year.`,`You turned into a shadow!`)]],
   wpn_whip:[[X1P_CT,S(`Is that Saltbeard's anchor chain? As a WHIP? Old Tarbuckle must be thrilled.`,`Saltbeard's chain is a whip now!`)]],
-  'wpn_whip@c_ingrid':[['any',S(`How is my Chain Whip? Does it crack? Ja? I knew it would crack!`,`How is the whip? Does it crack? Ja!`)]],
+  'wpn_whip@c_ingrid':[['any',S(`Ja! There is my Chain Whip! Not at the anvil, please.`,`Ja! My Chain Whip! Not at the anvil!`)]],
   c_clock:[[X1P_GH,S(`You restarted the Great Clock! I had lunch at the right time today! I cried!`,`You fixed the clock! Lunch on time! I cried!`)]],
   'c_clock@c_whirligig':[['any',S(`My clocks. All four hundred. Ticking. Dragon, I... hmph. Thank you. Wipe your feet.`,`My clocks tick! Hmph. Thank you.`)]],
   'c_clock@c_ambrose':[['any',S(`Tick. Tock. TICK. TOCK. Oh, young dragon. Listen to her.`,`Tick. Tock. Listen to her!`)]],
   c_tide:[[X1P_SM,S(`Low tide at last! The fish are sulking. We're delighted.`,`Low tide! The fish sulk. We cheer.`)]],
-  'c_tide@c_mina':[['any',S(`Low tide! LOW! Look at all that sand. I'd forgotten what the bottom of the lagoon looked like. Thank you, dragon!`,`LOW TIDE! Look at all that sand! Thank you!`)]],
+  'c_tide@c_mina':[['any',S(`Hello, dragon! Did you see? The sand! The SAND!`,`Hello! Did you see the sand?`)]],
   c_snowfall:[[X1P_CT,S(`It's snowing! In summer! Is this your doing, dragon? No? Then whose?`,`Snow in summer! Whose doing is that?`)]],
   q_c_oona:[[X1P_SM,S(`You lit Granny Oona's stove! The whole boardwalk smells of toast!`,`You lit Granny Oona's stove!`)]],
   q_c_regatta:[[X1P_GH,S(`You beat Skipper Jo! Nobody beats Skipper Jo! She's still checking the rules.`,`You beat Skipper Jo! Nobody does that!`)]],
@@ -781,7 +781,7 @@ onTalk(n=>{
   if(have){ L.push(x1pL('juniper',pick([`You've got my map of this one. The inside is your problem. Good luck!`,`I'm sketching the cliffs. They keep moving. No wait, that's the gulls.`]),`You have my map. Good luck!`)); runDialogue(L,()=>{ scene='play'; }); return true; }
   L.push(x1pL('juniper',`Here, I drew this from the outside. The inside is your problem.`,`I drew this from outside. Inside is your job.`));
   if(free){ L.push(x1pDo(()=>{ G.found[key]=true; setBanner(S('Juniper’s map','Juniper’s map'),S('Every room of this place shows on your map.','Every room shows on your map.'),2.6); })); }
-  else { L.push(ch('juniper',S(`Mapping isn't free. Well. For you it's nearly free. Twenty-five coins.`,`Mapping costs 25 coins. For you.`),[
+  else { L.push(ch('juniper',S(`Mapping isn't free. For you it's nearly free, though. Twenty-five coins.`,`Mapping costs 25 coins. For you.`),[
     {t:S('Here you go (25 coins)','Pay 25 coins'),cond:()=>(G.coins||0)>=25,fn:()=>{ G.coins-=25; G.found[key]=true; setBanner(S('Juniper’s map','Juniper’s map'),S('Every room of this place shows on your map.','Every room shows on your map.'),2.6); },then:[['juniper',S(`Pleasure doing business! Rook will be so jealous.`,`Thanks! Rook will be jealous.`)]]},
     {t:S('Maybe later','Maybe later'),then:[['juniper',S(`The dungeon's own map is in there somewhere. Probably in a chest. Probably guarded.`,`There's a map chest inside too.`)]]}])); }
   runDialogue(L,()=>{ scene='play'; saveGame(); }); return true;
@@ -1151,7 +1151,7 @@ const X1P_NOTE={
   3:{t:S(`"If you're reading this, you climbed a chimney. Weird hobby. The gulls up here steal everything. Don't leave your lunch. - M."`,`"You climbed a chimney? Weird. The gulls steal lunch. - M."`),
     r:[[`The gulls took my lunch anyway. Hope you had yours.`,`The gulls ate my lunch. Hope you ate yours.`],[`I'll climb every chimney on this coast till I find you.`,`I'll climb every chimney to find you.`],[`I left you a sandwich. The gulls left you the crusts.`,`I left you a sandwich. Gulls ate it.`]]},
   4:{t:S(`"Cranes are for crates, not lizards. If you're up here, look at the harbor at night. Pretty, isn't it? Gran used to bring me. - M."`,`"Look at the harbor at night. Pretty, right? Gran used to bring me. - M."`),
-    r:[[`It's beautiful. Your gran's right.`,`It's beautiful. Your gran is right.`],[`It'd be prettier with the lighthouse lit.`,`Prettier with the lighthouse lit.`],[`I can see my house from here. Wait. No I can't. I live in a valley.`,`I can see my house! No I can't.`]]},
+    r:[[`It's beautiful. Your gran's right.`,`It's beautiful. Your gran is right.`],[`I'd rather see it from the top of the Great Clock. Race you there.`,`Race you to the top of the Great Clock.`],[`I can see my house from here. Wait. No I can't. I live in a valley.`,`I can see my house! No I can't.`]]},
   5:{t:S(`"Fine. You're good. But you're not me. You've got a mom and a mountain and real fire. You don't know what cold is. - V."`,`"You're good. But you have a mom and fire. You don't know cold. - V."`),
     r:[[`Then tell me. I'll listen.`,`Then tell me. I'll listen.`],[`I know what it's like to be scared, though.`,`I know what scared feels like.`],[`I know what cold is. It's when Mom opens the window in winter.`,`Cold is when Mom opens the window.`]]}
 };

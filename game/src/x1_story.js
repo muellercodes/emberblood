@@ -1162,8 +1162,8 @@ if(typeof EPI!=='undefined'&&EPI&&Array.isArray(EPI.c)&&!EPI.c.length) EPI.c.pus
   {pri:9,cond:()=>G.choices.c_vesper==='friend',line:['narr',S(`Vesper Saltwhistle still climbs the Great Clock every night. Now she sits on the top and waves at the moon, and Granny Oona leaves the window open for her.`,`Vesper still climbs the Great Clock. Now Gran leaves the window open.`)]},
   {pri:8,cond:()=>G.choices.c_vesper==='foe',line:['narr',S(`Nobody on the coast saw the Moth Mask again. But every winter, Granny Oona found a fish on her step, with a little bow on it.`,`Every winter, Gran found a fish on her step.`)]},
   {pri:6,cond:()=>!!(G.quests.c_oona&&G.quests.c_oona.done),line:['narr',S(`Granny Oona's stove never went out again. She keeps a kettle on it for anyone who climbs in through the window.`,`Gran's stove never went out again.`)]},
-  {pri:5,cond:()=>!!(G.quests.c_bolt&&G.quests.c_bolt.done),line:['narr',S(`Bolt the brass dog learned to fetch. Mostly he fetches Lord Whirligig's hat.`,`Bolt learned to fetch. Mostly hats.`)]},
-  {pri:4,cond:()=>!!(G.quests.c_bob&&G.quests.c_bob.done),line:['narr',S(`Captain Hester promoted all three Bobs. They now have one very long badge between them.`,`All three Bobs got one long badge.`)]},
+  {pri:5,cond:()=>!!(G.quests.c_bolt&&G.quests.c_bolt.done),line:['narr',S(`Bolt the brass dog learned to fetch. Every morning he fetches Lord Whirligig's hat.`,`Bolt fetches Lord Whirligig's hat every day.`)]},
+  {pri:4,cond:()=>!!(G.quests.c_bob&&G.quests.c_bob.done),line:['narr',S(`Captain Ticklebrass promoted all three Bobs. They now have one very long badge between them.`,`All three Bobs got one long badge.`)]},
   {pri:3,cond:()=>!!G.flags.c_regatta_won,line:['narr',S(`The Harbor Regatta has a new rule: no dragons. It's called the Ash Rule.`,`The Regatta has a new rule: no dragons.`)]},
   {pri:2,cond:()=>true,line:['narr',S(`The Great Clock has not stopped once since. Clockkeeper Ambrose says "Tick." Everyone agrees.`,`The Great Clock never stopped again.`)]});
 // moths crowd the lamps at night in Gearhaven (THREADS N4), and the kids notice the bitten moon
