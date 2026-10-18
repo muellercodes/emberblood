@@ -87,19 +87,44 @@ function drawSeekProp(s,t){
 // Ash), and a pumpkin takes three bites to eat, so there is always time to knock a slime off it. A slime cut in half
 // leaves two babies that run off scared. When it ends, any slimes left hop back into the hedges one by one (no bang).
 const PATCH={
-  waves:[[2,3,3,4],[3,3,4,5],[4,5,5,6]],   // slimes in each wave, by difficulty (Easy, Normal, Hard)
+  waves:[[2,3,3,3],[3,3,4,4],[4,4,5,6]],   // slimes in each wave, by difficulty (Easy, Normal, Hard)
   onScreen:[2,3,4],                        // at most this many hopping at once
   bite:[1.7,1.3,1.0],                      // seconds a slime sits on a pumpkin for each bite
-  bites:3, rest:4, first:2.5, waveMax:35,  // bites to eat one, breather between waves, the first wait, a wave's time limit
+  bites:3, rest:3.5, first:2.5, waveMax:25, // bites to eat one, breather between waves, the first wait, a wave's time limit
 };
 const patchK=()=>clamp(typeof diffIdx==='number'?diffIdx:1,0,2);
 const patchLive=M=>M.slimes.filter(e=>!e.dead&&!e.patchLeave);
 const patchLeft=M=>M.crops.filter(q=>!q.eaten);
+// one banner that changes in place (the same title), so wave news never queues up behind itself
+const patchSay=(sub,dur)=>setBanner(S('Pumpkin Patrol','Pumpkin Patrol'),sub,dur||1.8);
+const patchN=(n,one,many)=>`${n} ${n===1?one:many}`;
+// the patch goes in the clearest spot in front of Hal's house: not under the Hollow Ward's big oak, not on a signpost
+function patchSite(){
+  const door=DOORS.find(d=>d.owner==='hal')||{x:POI.village.x,y:POI.village.y}, side=door.x<POI.village.x?-1:1, obs=[[door.x,door.y,70]];
+  const near=(o,r)=>Math.abs(o.x-door.x)<r&&Math.abs(o.y-door.y)<r;
+  for(const s of STRUCTS) if(near(s,800)){ const r=s.k==='bigoak'?200:s.w?Math.max(s.w,s.h||0)*0.55+40:s.k==='ward'||s.k==='shrine'?110:60; obs.push([s.x,s.y,r]); }
+  for(const l of LANDMARKS) if(near(l,800)) obs.push([l.x,l.y,55]);
+  let best=null;
+  for(let dy=-80;dy<=320;dy+=40) for(let dx=-320;dx<=320;dx+=40){
+    const cx=door.x+dx*side, cy=door.y+dy, spots=[]; let ok=true, clear=1e9;
+    for(let i=0;i<8;i++) spots.push([cx+((i%4)-1.5)*46,cy+(Math.floor(i/4)-0.5)*46]);
+    for(const [x,y] of spots){ const s={}; T(x,y,s);
+      if(blockedAt(x,y)||s.water||s.bridge||s.road>0||s.roadD<40||Math.abs(y-WALL_Y)<110){ ok=false; break; }
+      for(const [ox,oy,r] of obs) clear=Math.min(clear,dist(x,y,ox,oy)-r); }
+    if(!ok) continue;
+    const score=Math.min(clear,40)-dist(cx,cy,door.x,door.y+90)/25;
+    if(!best||score>best.s) best={s:score,cx,cy};
+  }
+  return best||{cx:door.x+side*160,cy:door.y+60};
+}
 function patchSpawn(M){
   const p=player;
   for(let k=0;k<30;k++){
-    const a=rand(0,TAU), r=rand(330,400), x=M.cx+Math.cos(a)*r, y=M.cy+Math.sin(a)*r*0.8;
+    const a=rand(0,TAU), r=rand(300,360), x=M.cx+Math.cos(a)*r, y=M.cy+Math.sin(a)*r*0.8;
     if(blockedAt(x,y)||dist(x,y,p.x,p.y)<170) continue;
+    // a clear straight hop in to the patch (not behind a fence or a house)
+    let clear=true; for(let f=0.06;f<0.9;f+=0.06) if(blockedAt(x+(M.cx-x)*f,y+(M.cy-y)*f)){ clear=false; break; }
+    if(!clear) continue;
     const e=makeEnemy('slime',x,y,{level:2,aggro:true,homeX:M.cx,homeY:M.cy,leash:99999,elite:false});
     e.mini='patch'; e.spawnIn=0.5; e.cd=rand(0.5,0.9); patchAim(M,e); M.slimes.push(e);
     emit(x,y,10,{col:'120,170,60',glow:false,smin:30,smax:100,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); ftext(x,y-22,'rustle','#c8e8a0',11);
@@ -145,8 +170,7 @@ function patchSlimeAI(e,dt){
 { const base=AI.slime; AI.slime=function(e,dt,p){ if(e.mini==='patch') return patchSlimeAI(e,dt); return base(e,dt,p); }; }
 MINI.defend={
   start(){
-    const door=DOORS.find(d=>d.owner==='hal')||{x:POI.village.x,y:POI.village.y};
-    const cx=door.x+(door.x<POI.village.x?-160:160), cy=door.y+60, crops=[], k=patchK();
+    const {cx,cy}=patchSite(), crops=[], k=patchK();
     for(let i=0;i<8;i++){ const x=cx+((i%4)-1.5)*46, y=cy+(Math.floor(i/4)-0.5)*46; crops.push({x,y,eaten:false,big:i===5,hp:PATCH.bites,shake:0}); }
     return {cx,cy,crops,music:'combat',waves:PATCH.waves[k].slice(),onScreen:PATCH.onScreen[k],bite:PATCH.bite[k],
       wave:0,todo:0,spawnT:0,phase:'rest',restT:PATCH.first,waveT:0,away:0,slimes:[]};
@@ -160,23 +184,23 @@ MINI.defend={
     if(M.phase==='rest'){
       M.restT-=dt;
       if(M.restT<=0){ M.wave++; M.todo=M.waves[M.wave-1]; M.phase='wave'; M.waveT=0; M.spawnT=0;
-        setBanner(S(`Wave ${M.wave} of ${nW}`,`Wave ${M.wave} of ${nW}`),M.wave===nW?S('The last one!','The last one!'):S(`${M.todo} slimes. Knock them off the pumpkins!`,`${M.todo} slimes are coming!`),1.8); SFX.play('warn',0.5); }
+        patchSay(M.wave===nW?S(`Last wave! ${patchN(M.todo,'slime','slimes')}.`,`Last wave!`):S(`Wave ${M.wave} of ${nW}: ${patchN(M.todo,'slime','slimes')}. Knock them off the pumpkins!`,`Wave ${M.wave}: ${patchN(M.todo,'slime','slimes')}!`)); SFX.play('warn',0.5); }
       return;
     }
     M.waveT+=dt; M.spawnT-=dt;
     if(M.todo>0&&M.spawnT<=0&&patchLive(M).length<M.onScreen){ if(patchSpawn(M)){ M.todo--; M.spawnT=0.9; } else M.spawnT=0.3; }
     // a wave that runs too long (a slime stuck in a hedge) gives up and hops home
-    if(M.waveT>PATCH.waveMax){ M.todo=0; for(const e of patchLive(M)) e.patchLeave=true; }
+    if(M.waveT>PATCH.waveMax&&(M.todo>0||patchLive(M).length)){ M.todo=0; M.gaveUp=(M.gaveUp||0)+1; for(const e of patchLive(M)) e.patchLeave=true; }
     if(M.todo<=0&&!patchLive(M).length){
       if(M.wave>=nW){ const left=patchLeft(M).length; M.saved=left; addCoins(left*4,p.x,p.y); miniEnd(true,`${left} pumpkins saved!`,left===8?'Every single one. Hal is weeping.':'Go tell Hal.'); return; }
-      M.phase='rest'; M.restT=PATCH.rest; setBanner(S('Phew!','Phew!'),S(`Next wave in ${PATCH.rest} seconds.`,`Next wave soon.`),1.6);
+      M.phase='rest'; M.restT=PATCH.rest; patchSay(S(`Phew! Wave ${M.wave} done. Catch your breath.`,`Phew! Rest a moment.`),1.6);
     }
   },
   end(M){ for(const e of M.slimes) if(!e.dead) e.patchLeave=true; },
   target:M=>({x:M.cx,y:M.cy}),
   hud:M=>{ const pk=`Pumpkins ${patchLeft(M).length}/8`;
     if(M.phase==='rest') return M.wave?`Wave ${M.wave} of ${M.waves.length} done! Next in ${Math.max(1,Math.ceil(M.restT))}s · ${pk}`:`Get ready! Slimes in ${Math.max(1,Math.ceil(M.restT))}s · ${pk}`;
-    return `Wave ${M.wave} of ${M.waves.length} · ${M.todo+patchLive(M).length} slimes left · ${pk}`; },
+    return `Wave ${M.wave} of ${M.waves.length} · ${patchN(M.todo+patchLive(M).length,'slime','slimes')} left · ${pk}`; },
   draw(M,t){
     // the tilled patch, so you can see what you are guarding
     ctx.fillStyle='rgba(92,58,30,.45)'; ctx.beginPath(); ctx.ellipse(M.cx,M.cy,122,70,0,0,TAU); ctx.fill();
