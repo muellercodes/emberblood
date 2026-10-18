@@ -352,7 +352,7 @@ Object.assign(TALK,{
       [`The big waves!`,`Big waves!`,`HA! A storm-lover! You'd have liked my granny. She sailed INTO storms. For fun.`,`HA! My granny loved storms too!`,1],
       [`The fish. They live there for free.`,`Fish live there for free.`,`Free rent! Never thought of it! Lucky little fish.`,`Free rent! Lucky fish!`,0.5],'brave')},
   c_ingrid:{bio:S('The smith of the Bright Anvil. Sings while she hammers. Says ja a lot. Reforges star-iron.','The smith. She sings and hammers. Bring her star-iron.'),
-    about:{maren:S(`Maren of Emberhollow? The smith who forged a sword for a dragon? I have heard SONGS about your mother.`,`Your mom Maren is famous! There are songs about her.`),c_hettie:S(`Hettie brings me broken robots. I fix them. They explode. She brings them back. It is a good friendship.`,`Hettie brings robots. I fix them. They explode. Good friends!`)},
+    about:{maren:S(`Your mother forged a sword for a dragon, they say. One day I will shake her hand. Gently. My hands are very strong. Ja.`,`One day I will shake your mom's hand. Gently. Ja!`),c_hettie:S(`Hettie brings me broken robots. I fix them. They explode. She brings them back. It is a good friendship.`,`Hettie brings robots. I fix them. They explode. Good friends!`)},
     rumor:{t:S(`Star-iron falls from the sky, ja? On the Downs' east crag there is a lump of it. I can smell it from here. Bring it.`,`There is star-iron on the east hills. Bring it to me!`),hint:null},
     loves:['honey'],hates:['moonlily'],
     deep:S(`I come from far in the north where the forges are cold. My father said, Ingrid, go south, where the fire is easy. Ja. Easy. Look at my arms. Nothing here is easy. It is wonderful.`,`I came from the cold north. Work here is hard. It is wonderful.`),
@@ -654,7 +654,7 @@ B('c_gh4',X1P_GH,()=>!x1pR('c_brass'),S(`The Moth Mask? She robbed the baron nex
 B('c_gh5',X1P_GH,()=>isNight(),S(`Never seen so many moths. They are eating my curtains. And my CLOCKS.`,`So many moths! They eat my curtains!`));
 B('c_gh6',X1P_GH,()=>isNight(),S(`There were so many moths on my lamp last night, it looked like it had grown a fur hat.`,`My lamp was so mothy it looked like a fur hat!`));
 B('c_gh7',X1P_GH+'|kid',()=>!!G.flags.c_spire_up&&!G.flags.c_snow,S(`Did you see the lighthouse beam? There's a black tower out at sea! It wasn't there before!`,`There's a black tower out at sea!`));
-B('c_sm1',X1P_SM,()=>!G.flags.c_lowtide&&x1pR('c_salt'),S(`Three days of high tide. The fish are getting cheeky.`,`High tide for days! Cheeky fish.`));
+B('c_sm1',X1P_SM,()=>!G.flags.c_lowtide&&x1pR('c_salt'),S(`Still high tide. The fish are getting cheeky.`,`Still high tide! Cheeky fish.`));
 B('c_sm2',X1P_SM,()=>!!G.flags.c_lowtide,S(`Low tide at last! Mina's been dancing on the boardwalk.`,`Low tide! Mina is dancing.`),{d:'c_tide'});
 B('c_sm3',X1P_SM+'|!id:c_oona',ALWAYS,S(`Somebody left roof tiles on my step again. Nobody saw who. Nobody ever does.`,`Someone left roof tiles on my step. Nobody saw who.`));
 B('c_sm4',X1P_SM,()=>x1pQ('c_oona'),S(`Granny Oona's chimney is smoking! First time in twenty years! The gulls don't know what to do.`,`Granny Oona's chimney is smoking!`),{d:'q_c_oona'});

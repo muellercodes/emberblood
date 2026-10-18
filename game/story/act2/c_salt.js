@@ -126,7 +126,7 @@ chapter({
     ],
     slt_mina: [
       ['narr', 'Saltmarsh stands on stilts over a silver lagoon, and the whole village smells of chowder.', 'Saltmarsh is on stilts over the water. It smells like soup.'],
-      ['c_mina', "Still high. Go OUT, sea. Please? ...Oh! Hello, dragon. It's been high tide for three whole days.", 'Still high tide! Oh, hello, dragon. Three days of it!'],
+      ['c_mina', "Still high. Go OUT, sea. Please? ...Oh! Hello, dragon. It's been high tide ever since the night the clocks stopped.", 'Still high tide! Oh, hello, dragon. It will not go out!'],
       ['c_mina', 'The Tide Clock stuck the same night as the Great Clock. Now the sea has forgotten how to go out.', 'The Tide Clock is stuck. The sea forgot how to go out.'],
       ['ash', 'I need to get to the Gullcrag Caves.', 'I need to get to the caves.', { promise: 'c_gullcrag_door' }],
       ['c_mina', "Not at high tide! The Gullcrag Sands are under the sea. Fix my clock and she'll go out again. The door's open.", 'Not at high tide! Fix my clock. The door is open.', { promise: 'c_tidehouse_door' }],
@@ -174,7 +174,7 @@ chapter({
       ['ash', 'Is Vesper home?'],
       ['c_oona', "Out. She's always out. Climbing something tall, I expect. She thinks I don't know.", 'Out. Climbing something tall. She thinks I do not know.'],
       ['narr', 'Fish are piled up on the table, more than one old lady could eat in a month. The stove is stone cold, and it has been for years.', 'Lots of fish on the table. The stove is cold.'],
-      ['ash', 'Three nights ago, when the clocks stopped. Where was Vesper?', 'Where was Vesper when the clocks stopped?'],
+      ['ash', 'The night the clocks stopped. Where was Vesper?', 'Where was Vesper when the clocks stopped?'],
       ['c_oona', 'Here, duck. She came in just before midnight, white as a sheet, and held my hands till morning.', 'Here. She came home before midnight, white as a sheet.', { clue: 's_alibi' }],
       ['c_oona', "She was shaking. She wouldn't say why. Take a fish, duck. Please. I'm running out of plates.", 'She was shaking. Take a fish, duck. Please.'],
     ],

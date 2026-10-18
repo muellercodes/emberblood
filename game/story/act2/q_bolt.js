@@ -31,7 +31,7 @@ quest({
     bt_offer: [
       ['c_hettie', "Ash. You've got a TAIL that GRABS things. Wonderful. Unrelated question. Can you grab a dog?",
         'Your tail grabs things! Can you grab a dog?'],
-      ['c_hettie', 'Bolt! My brass dog. He ran off the night the moths came, three nights ago. Dust in his nose gears.',
+      ['c_hettie', 'Bolt! My brass dog. He ran off the night the moths came, with dust in his nose gears.',
         'My brass dog Bolt ran off. Dust in his nose.'],
       ['c_hettie', "He sneezes every five seconds and it scares him. Penny's board says he's up on the harbor cranes.",
         "He sneezes and it scares him. He's on the cranes."],

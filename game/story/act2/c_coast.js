@@ -7,7 +7,7 @@ chapter({
   // the game numbers Act II's cards after the heist (c_fest 1, c_pass 2), so this is Chapter 3
   card: ['Act II · Chapter 3', 'Salt on the Wind'],
   so_far: [
-    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask glide over twice. Three nights ago something much bigger flew over too, and left Gerald the sheep silver with dust.",
+    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask glide over twice. The night the clocks stopped, something much bigger flew over too, and left Gerald the sheep silver with dust.",
     'Something huge flew over. Gerald the sheep is silver now.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],
@@ -26,7 +26,7 @@ chapter({
 
   clue: {
     w_silver_sheep: { icon: 'sheep', mystery: 'what_stopped',
-      text: ['Three nights ago something big flew over the Downs. It left Gerald the sheep silver with moth dust. Far too much dust.',
+      text: ['The night the clocks stopped, something big flew over the Downs. It left Gerald the sheep silver with moth dust. Far too much dust.',
         'Something big flew over. Gerald the sheep is covered in silver dust.'] },
   },
 

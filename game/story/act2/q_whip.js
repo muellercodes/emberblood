@@ -24,8 +24,8 @@ quest({
 
   clue: {
     q_ghost_saw: { icon: 'moth', mystery: 'what_stopped',
-      text: ["Captain Saltbeard's ghost: three nights ago something flew over the Rockpools, wings like a sky full of curtains. Even he hid.",
-        'Three nights ago a giant winged thing flew over.'] },
+      text: ["Captain Saltbeard's ghost: the night the clocks stopped, something flew over the Rockpools, wings like a sky full of curtains. Even he hid.",
+        'A giant winged thing flew over that night.'] },
   },
 
   step: [
@@ -90,8 +90,8 @@ quest({
       ['narr', 'Captain Saltbeard sits down on his own deck and slurps the chowder. He glows brighter with every spoonful.',
         'Saltbeard slurps the chowder. He glows.'],
       ['c_saltbeard', 'Forty YEARS I waited for this bowl. Worth it.', 'Forty years I waited! Worth it.'],
-      ['c_saltbeard', 'Three nights back, something flew over these rocks. Wings like a sky full of curtains. Even I hid.',
-        'Three nights ago a huge thing flew over. I hid!', { clue: 'q_ghost_saw' }],
+      ['c_saltbeard', 'The night the clocks stopped, something flew over these rocks. Wings like a sky full of curtains. Even I hid.',
+        'A huge thing flew over that night. I hid!', { clue: 'q_ghost_saw' }],
       ['c_saltbeard', 'Tell Elias sorry about the cards. And take my chain. Give it a better job than holding me down.',
         'Tell Elias sorry. Take my chain.'],
       ['narr', "Then he's gone. There's only the tide, an empty bowl, and one very old sock.", 'He is gone. Just a bowl and an old sock.'],
