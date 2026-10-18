@@ -64,7 +64,7 @@ function updateDialogue(dt){
   if(!DLG) return;
   const text=DLG.text||'';
   if(DLG.opts&&DLG.chars>=text.length) showOpts();
-  DLG.chars=Math.min(text.length,DLG.chars+dt*60);
+  DLG.chars=Math.min(text.length,DLG.chars+dt*DLG_CPS);
   if(DLG.chars>=text.length&&!DLG.fullAt) DLG.fullAt=performance.now();
   const n=Math.floor(DLG.chars); if(n!==DLG.shown){ DLG.shown=n; $('#dlgSay').textContent=text.slice(0,n); }
 }
@@ -95,7 +95,9 @@ function dlgLogSkipped(L){
 // A click first finishes the typing. The next one goes on only once the whole line has been up for 0.4 s, and a
 // double click never moves more than one line. Choices wait 0.35 s after they appear. Escape (and the controller's
 // back button, and the Skip button) asks once before it skips the conversation.
-const DLG_FULL=400, DLG_LOCK=220, DLG_OPTS=350;
+// (v11) a desktop click that finishes the typing and then goes on felt dead for most of a second: the wait after a full
+// line is now 0.28 s (still longer than a double click) and the text types a little faster (75 letters a second)
+const DLG_FULL=280, DLG_LOCK=200, DLG_OPTS=300, DLG_CPS=75;
 function dlgNext(){
   if(!DLG) return;
   const now=performance.now(), text=DLG.text||'';

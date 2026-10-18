@@ -147,6 +147,18 @@ const ATK={press:'',swingT:-9,g:null,buf:0,lsw:0,lcd:0};
 // and swings as soon as he can, so a quick tap is never lost. A click shorter than one frame counts too (mouse.lp).
 // The bow, hammer, whip, bombs and glaive read how long the button is held, so only the plain swings are buffered.
 const ATK_BUF=0.3;
+// the foe a fresh click landed on (or next to), while that press lasts: a6_player.js aims the swing at it
+function clickFoe(R){
+  const c=ATK.ck, p=player; if(!c||!G||!p||G.time-c.t>0.45) return null;
+  let best=null, bd=1e9;
+  for(const e of G.enemies){
+    if(e.dead||e.passive||e.invuln||e.alpha<0.3||e.spawnIn>0) continue;
+    const dc=dist(c.x,c.y,e.x,e.y)-(e.r||10); if(dc>48) continue;
+    if(dist(p.x,p.y,e.x,e.y)-(e.r||10)>R) continue;
+    if(dc<bd){ bd=dc; best=e; }
+  }
+  return best;
+}
 function atkBufOK(){ const w=curWeapon(), D=wDef(w); return !D.input||w==='boomerang'; }
 const PROMPT_KINDS=[
   [/^(talk|chat|ask|speak|greet)/i,'talk','TALK'],
@@ -278,7 +290,9 @@ function readInput(dt){
   // one button for attack and use: decided once, when the press starts (see useMode)
   const p=player;
   if(!o.attack) ATK.press='';
-  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; else if(p&&G&&atkBufOK()) ATK.buf=ATK_BUF; }
+  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; else{ if(p&&G&&atkBufOK()) ATK.buf=ATK_BUF;
+    // a click on a foe swings at that foe (without "Aim with the mouse" Ash still faces the way he walks otherwise)
+    ATK.ck=(mouse.l||mClick)&&!usingTouch&&!settings.mouseAim&&G?Object.assign(toWorld(mouse.x,mouse.y),{t:G.time}):null; } }
   if(ATK.press==='use') o.attack=false;
   // the kept press: used once a swing starts (its cooldown jumps up) or a hold weapon takes over
   if(ATK.buf>0){
@@ -369,6 +383,7 @@ function updateCam(dt,snap){
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
 // test hooks (v11 UX): spawn a foe next to Ash, and what the attack button is doing
 window.__ebDbg=Object.assign(window.__ebDbg||{},{
+  lvl:n=>{ let k=0; while(player.level<n&&k++<99) gainXp(xpNeed(player.level)-player.xp+1); return player.level; },
   spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
   atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})
 });
