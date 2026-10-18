@@ -124,7 +124,13 @@ npx wrangler d1 execute emberblood --remote --file=schema.sql
 npx wrangler deploy
 ```
 
-Put the `*.workers.dev` URL it prints into `game/config.json`, rebuild, and push. The live game uses `https://emberblood-api.muellercodes.workers.dev`. Allowed browser origins are set by `ALLOWED_ORIGINS` in `wrangler.toml` (localhost is always allowed for testing).
+A database made from an older `schema.sql` needs the migrations in `worker/migrations/` once, in order (`npx wrangler d1 execute emberblood --remote --file=migrations/0001_admin.sql`).
+
+Put the `*.workers.dev` URL it prints into `game/config.json`, rebuild, and push.
+
+### Admin page
+
+`docs/admin.html` (on the live site at `/emberblood/admin.html`) is for the accounts named in `ADMIN_USERS` in `wrangler.toml`. It lists every account with its journeys, last save and Arena scores, and lets an admin view, download or replace a save (the old one is kept as a backup, and backups can be restored), set a new password, pause or turn an account back on, delete an account, and "view as" any account. A view session is look-only: the server accepts its saves and scores but never writes them, it never renews, and it ends after 12 hours. Use it in a private window, because the game in that window loads the viewed account's journeys. The live game uses `https://emberblood-api.muellercodes.workers.dev`. Allowed browser origins are set by `ALLOWED_ORIGINS` in `wrangler.toml` (localhost is always allowed for testing).
 
 ## License
 

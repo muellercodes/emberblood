@@ -66,17 +66,180 @@ async function authUser(req, env) {
   const m = h.match(/^Bearer ([A-Za-z0-9_-]{20,100})$/);
   if (!m) throw new HttpError(401, 'Please sign in.');
   const th = await sha256(m[1]), now = Date.now();
-  const row = await env.DB.prepare('SELECT s.user_id AS id, s.expires_at AS exp, u.name AS name FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?').bind(th).first();
+  const row = await env.DB.prepare('SELECT s.user_id AS id, s.expires_at AS exp, s.kind AS kind, u.name AS name, u.paused_at AS paused FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?').bind(th).first();
   if (!row) throw new HttpError(401, 'Please sign in again.');
   if (row.exp < now) { await env.DB.prepare('DELETE FROM sessions WHERE token_hash = ?').bind(th).run(); throw new HttpError(401, 'Your session expired. Please sign in again.'); }
-  if (row.exp - now < RENEW_BELOW) {
+  const view = row.kind === 'view';
+  if (row.paused && !view) throw new HttpError(403, PAUSED_MSG);
+  // a "view as" session from the admin page never renews and never counts as the player being seen
+  if (!view && row.exp - now < RENEW_BELOW) {
     await env.DB.batch([
       env.DB.prepare('UPDATE sessions SET expires_at = ? WHERE token_hash = ?').bind(now + SESSION_MS, th),
       env.DB.prepare('UPDATE users SET last_seen = ? WHERE id = ?').bind(now, row.id),
     ]);
   }
-  return { id: row.id, name: row.name, th };
+  return { id: row.id, name: row.name, th, view };
 }
+
+// ---------- admin: accounts named in ADMIN_USERS (comma separated) can see and fix every account
+const VIEW_MS = 12 * 3600000;      // "view as" sessions last 12 hours and are look-only
+const PAUSED_MSG = 'This account is paused. Ask a grown-up to turn it back on.';
+const isAdminName = (env, name) => String(env.ADMIN_USERS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean).includes(String(name).toLowerCase());
+async function authAdmin(req, env) {
+  const u = await authUser(req, env);
+  if (u.view || !isAdminName(env, u.name)) throw new HttpError(403, 'That account is not an admin.');
+  return u;
+}
+const qid = (req) => { const n = +new URL(req.url).searchParams.get('id'); if (!Number.isInteger(n) || n < 1) throw new HttpError(400, 'Which account?'); return n; };
+async function userById(env, id) {
+  const u = await env.DB.prepare('SELECT id, name, created_at, last_seen, paused_at FROM users WHERE id = ?').bind(id).first();
+  if (!u) throw new HttpError(404, 'No account with that id.');
+  return u;
+}
+function slotSummary(s) {
+  if (!s || s.v !== 3) return null;
+  if (s.deleted) return { deleted: true, at: s.at || 0 };
+  if (s.empty) return null;
+  const f = s.flags || {}, q = s.quests ? Object.values(s.quests).filter((x) => x && x.done).length : 0;
+  return { at: s.at || 0, stage: s.stage || null, done: !!s.done, act1_done: !!f.act1_done, level: (s.p && s.p.level) || 1, time: Math.round(s.time || 0), diff: s.diff | 0, coins: s.coins | 0, quests: q, pages: s.pages ? Object.keys(s.pages).length : 0 };
+}
+function slotsOf(blob) {
+  if (!blob || blob.v !== 3) return [null, null, null];
+  if (Array.isArray(blob.slots)) return [0, 1, 2].map((i) => slotSummary(blob.slots[i]));
+  return [blob.empty ? null : slotSummary(blob), null, null];
+}
+function checkSave(s) {
+  if (!s || typeof s !== 'object' || Array.isArray(s) || s.v !== 3) throw new HttpError(400, 'That does not look like an Emberblood save.');
+  const data = JSON.stringify(s);
+  if (data.length > MAX_SAVE) throw new HttpError(413, 'That save is too big.');
+  return data;
+}
+// keep the save that is about to be replaced, so an admin change can always be undone
+async function backupSave(env, userId, note) {
+  const row = await env.DB.prepare('SELECT data, updated_at FROM saves WHERE user_id = ?').bind(userId).first();
+  if (!row) return null;
+  const res = await env.DB.prepare('INSERT INTO save_backups (user_id, data, save_at, made_at, note) VALUES (?, ?, ?, ?, ?)').bind(userId, row.data, row.updated_at, Date.now(), String(note || '').slice(0, 120)).run();
+  return res.meta.last_row_id;
+}
+async function writeSave(env, userId, data) {
+  const now = Date.now();
+  await env.DB.prepare('INSERT INTO saves (user_id, data, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at').bind(userId, data, now).run();
+  return now;
+}
+
+const adminRoutes = {
+  'GET /api/admin/me': async (req, env) => { const u = await authAdmin(req, env); return { user: { id: u.id, name: u.name }, admin: true }; },
+
+  'GET /api/admin/users': async (req, env) => {
+    await authAdmin(req, env);
+    const now = Date.now();
+    const { results } = await env.DB.prepare(`SELECT u.id, u.name, u.created_at, u.last_seen, u.paused_at, s.updated_at AS save_at, length(s.data) AS save_bytes, s.data AS data,
+      (SELECT count(*) FROM sessions x WHERE x.user_id = u.id AND x.kind IS NULL AND x.expires_at > ?) AS sessions,
+      (SELECT count(*) FROM sessions x WHERE x.user_id = u.id AND x.kind = 'view' AND x.expires_at > ?) AS views,
+      (SELECT count(*) FROM save_backups b WHERE b.user_id = u.id) AS backups
+      FROM users u LEFT JOIN saves s ON s.user_id = u.id ORDER BY u.id`).bind(now, now).all();
+    const best = (await env.DB.prepare('SELECT user_id, diff, wave, score FROM best').all()).results || [];
+    return { now, users: (results || []).map((r) => {
+      let blob = null; try { blob = r.data ? JSON.parse(r.data) : null; } catch {}
+      return { id: r.id, name: r.name, created: r.created_at, last_seen: r.last_seen, paused: r.paused_at || null, save_at: r.save_at || null, save_bytes: r.save_bytes || 0,
+        sessions: r.sessions, views: r.views, backups: r.backups, admin: isAdminName(env, r.name), slots: slotsOf(blob),
+        arena: best.filter((b) => b.user_id === r.id).map((b) => ({ diff: b.diff, wave: b.wave, score: b.score })) };
+    }) };
+  },
+
+  'GET /api/admin/save': async (req, env) => {
+    await authAdmin(req, env);
+    const u = await userById(env, qid(req));
+    const row = await env.DB.prepare('SELECT data, updated_at FROM saves WHERE user_id = ?').bind(u.id).first();
+    return { user: u, save: row ? JSON.parse(row.data) : null, updated: row ? row.updated_at : null };
+  },
+
+  'PUT /api/admin/save': async (req, env) => {
+    const a = await authAdmin(req, env);
+    const u = await userById(env, qid(req));
+    const data = checkSave((await body(req)).save);
+    const backup = await backupSave(env, u.id, 'before ' + a.name + ' replaced it');
+    return { ok: true, updated: await writeSave(env, u.id, data), backup };
+  },
+
+  'GET /api/admin/backups': async (req, env) => {
+    await authAdmin(req, env);
+    const u = await userById(env, qid(req));
+    const { results } = await env.DB.prepare('SELECT id, save_at, made_at, note, length(data) AS bytes FROM save_backups WHERE user_id = ? ORDER BY id DESC LIMIT 50').bind(u.id).all();
+    return { user: u, backups: results || [] };
+  },
+
+  'GET /api/admin/backup': async (req, env) => {
+    await authAdmin(req, env);
+    const row = await env.DB.prepare('SELECT id, user_id, data, save_at, made_at, note FROM save_backups WHERE id = ?').bind(qid(req)).first();
+    if (!row) throw new HttpError(404, 'No backup with that id.');
+    return { backup: { id: row.id, user_id: row.user_id, save_at: row.save_at, made_at: row.made_at, note: row.note }, save: JSON.parse(row.data) };
+  },
+
+  'POST /api/admin/restore': async (req, env) => {
+    const a = await authAdmin(req, env);
+    const bid = +(await body(req)).backup;
+    const row = await env.DB.prepare('SELECT user_id, data FROM save_backups WHERE id = ?').bind(bid | 0).first();
+    if (!row) throw new HttpError(404, 'No backup with that id.');
+    const backup = await backupSave(env, row.user_id, 'before ' + a.name + ' restored backup ' + bid);
+    return { ok: true, updated: await writeSave(env, row.user_id, row.data), backup };
+  },
+
+  // a look-only session for another account: its saves and scores are never written
+  'POST /api/admin/viewas': async (req, env) => {
+    await authAdmin(req, env);
+    const u = await userById(env, +(await body(req)).id | 0);
+    const token = randToken(), now = Date.now();
+    await env.DB.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at, kind) VALUES (?, ?, ?, ?, 'view')").bind(await sha256(token), u.id, now, now + VIEW_MS).run();
+    return { token, user: { id: u.id, name: u.name }, expires: now + VIEW_MS };
+  },
+
+  'POST /api/admin/endviews': async (req, env) => {
+    await authAdmin(req, env);
+    const res = await env.DB.prepare("DELETE FROM sessions WHERE kind = 'view'").run();
+    return { ok: true, ended: res.meta.changes || 0 };
+  },
+
+  // set a new password for an account (kids forget theirs); their other sign-ins stay signed in
+  'POST /api/admin/password': async (req, env) => {
+    await authAdmin(req, env);
+    const b = await body(req);
+    const u = await userById(env, +b.id | 0);
+    const password = String(b.password || '');
+    if (password.length < 8 || password.length > 128) throw new HttpError(400, 'Passwords need 8 to 128 characters.');
+    await env.DB.prepare('UPDATE users SET pass = ? WHERE id = ?').bind(await hashPassword(password), u.id).run();
+    return { ok: true };
+  },
+
+  // pause: the account can't sign in, load or save until it is turned back on. Nothing is lost.
+  'POST /api/admin/pause': async (req, env) => {
+    await authAdmin(req, env);
+    const b = await body(req);
+    const u = await userById(env, +b.id | 0);
+    if (isAdminName(env, u.name)) throw new HttpError(400, 'An admin account cannot be paused.');
+    const at = b.paused ? Date.now() : null;
+    await env.DB.prepare('UPDATE users SET paused_at = ? WHERE id = ?').bind(at, u.id).run();
+    return { ok: true, paused: at };
+  },
+
+  // delete: the account, its save, its backups, its scores and its sign-ins are gone for good.
+  // The page must send the account's exact name as `confirm`.
+  'POST /api/admin/delete': async (req, env) => {
+    await authAdmin(req, env);
+    const b = await body(req);
+    const u = await userById(env, +b.id | 0);
+    if (isAdminName(env, u.name)) throw new HttpError(400, 'An admin account cannot be deleted.');
+    if (String(b.confirm || '') !== u.name) throw new HttpError(400, 'Type the account name exactly to delete it.');
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM saves WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM save_backups WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM best WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM users WHERE id = ?').bind(u.id),
+    ]);
+    return { ok: true, deleted: u.name };
+  },
+};
 const ip = (req) => req.headers.get('CF-Connecting-IP') || 'local';
 function creds(b) {
   const username = String(b.username || '').trim(), password = String(b.password || '');
@@ -104,8 +267,9 @@ const routes = {
     const key = 'login:' + ip(req);
     const lim = await env.DB.prepare('SELECT n, reset_at FROM limits WHERE k = ?').bind(key).first();
     if (lim && lim.reset_at > Date.now() && lim.n >= 12) throw new HttpError(429, 'Too many tries. Take a breather and try again in a few minutes.');
-    const u = await env.DB.prepare('SELECT id, name, pass FROM users WHERE name = ?').bind(username).first();
+    const u = await env.DB.prepare('SELECT id, name, pass, paused_at FROM users WHERE name = ?').bind(username).first();
     if (!u || !(await checkPassword(password, u.pass))) { await limit(env, key, 1000, 600000); throw new HttpError(401, 'That name and password do not match.'); }
+    if (u.paused_at) throw new HttpError(403, PAUSED_MSG);
     await env.DB.prepare('UPDATE users SET last_seen = ? WHERE id = ?').bind(Date.now(), u.id).run();
     return { token: await newSession(env, u.id), user: { id: u.id, name: u.name } };
   },
@@ -116,7 +280,7 @@ const routes = {
     return { ok: true };
   },
 
-  'GET /api/me': async (req, env) => { const u = await authUser(req, env); return { user: { id: u.id, name: u.name } }; },
+  'GET /api/me': async (req, env) => { const u = await authUser(req, env); return u.view ? { user: { id: u.id, name: u.name }, view: true } : { user: { id: u.id, name: u.name } }; },
 
   'GET /api/save': async (req, env) => {
     const u = await authUser(req, env);
@@ -126,18 +290,14 @@ const routes = {
 
   'PUT /api/save': async (req, env) => {
     const u = await authUser(req, env);
-    const b = await body(req);
-    const s = b.save;
-    if (!s || typeof s !== 'object' || Array.isArray(s) || s.v !== 3) throw new HttpError(400, 'That does not look like an Emberblood save.');
-    const data = JSON.stringify(s);
-    if (data.length > MAX_SAVE) throw new HttpError(413, 'That save is too big.');
-    const now = Date.now();
-    await env.DB.prepare('INSERT INTO saves (user_id, data, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at').bind(u.id, data, now).run();
-    return { ok: true, updated: now };
+    const data = checkSave((await body(req)).save);
+    if (u.view) return { ok: true, updated: Date.now(), view: true };   // look-only: the real save is never touched
+    return { ok: true, updated: await writeSave(env, u.id, data) };
   },
 
   'POST /api/score': async (req, env) => {
     const u = await authUser(req, env);
+    if (u.view) return { ok: true, view: true };
     const b = await body(req);
     const diff = b.diff | 0, wave = b.wave | 0, score = b.score | 0;
     if (diff < 0 || diff > 2 || wave < 1 || wave > 500 || score < 0 || score > 50000000) throw new HttpError(400, 'That score does not look right.');
@@ -159,7 +319,7 @@ export default {
     const cors = corsHeaders(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     const url = new URL(req.url);
-    const route = routes[`${req.method} ${url.pathname}`];
+    const route = routes[`${req.method} ${url.pathname}`] || adminRoutes[`${req.method} ${url.pathname}`];
     if (!route) return json({ error: 'Not found.' }, 404, cors);
     try { return json(await route(req, env), 200, cors); }
     catch (e) {

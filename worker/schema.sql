@@ -4,13 +4,15 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL UNIQUE COLLATE NOCASE,
   pass TEXT NOT NULL,
   created_at INTEGER NOT NULL,
-  last_seen INTEGER NOT NULL
+  last_seen INTEGER NOT NULL,
+  paused_at INTEGER               -- set when an admin pauses the account (it can't sign in or save)
 );
 CREATE TABLE IF NOT EXISTS sessions (
   token_hash TEXT PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at INTEGER NOT NULL,
-  expires_at INTEGER NOT NULL
+  expires_at INTEGER NOT NULL,
+  kind TEXT                       -- NULL for a normal sign-in, 'view' for a look-only session from the admin page
 );
 CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS sessions_exp ON sessions(expires_at);
@@ -28,6 +30,16 @@ CREATE TABLE IF NOT EXISTS best (
   PRIMARY KEY (user_id, diff)
 );
 CREATE INDEX IF NOT EXISTS best_board ON best(diff, score DESC);
+-- saves an admin replaced or restored, so every admin change can be undone
+CREATE TABLE IF NOT EXISTS save_backups (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  data TEXT NOT NULL,
+  save_at INTEGER,
+  made_at INTEGER NOT NULL,
+  note TEXT
+);
+CREATE INDEX IF NOT EXISTS save_backups_user ON save_backups(user_id);
 CREATE TABLE IF NOT EXISTS limits (
   k TEXT PRIMARY KEY,
   n INTEGER NOT NULL,

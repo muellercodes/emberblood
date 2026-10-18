@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Emberblood Admin</title>
+<style>
+:root{
+  --bg:#f6f1e7; --card:#fffdf8; --ink:#2b2118; --muted:#7a6b5c; --line:#e4d9c6; --accent:#c4561f; --accent-ink:#fff;
+  --ok:#2f7a4a; --warn:#a3560a; --bad:#b3261e; --chip:#efe6d6; --code:#f3ecdf;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#191411; --card:#231c17; --ink:#f1e7da; --muted:#a8988a; --line:#3a2f27; --accent:#e8743a; --accent-ink:#1b120c;
+  --ok:#6fc28d; --warn:#e3a35a; --bad:#f08077; --chip:#30261f; --code:#1d1713;
+}}
+:root[data-theme="dark"]{
+  --bg:#191411; --card:#231c17; --ink:#f1e7da; --muted:#a8988a; --line:#3a2f27; --accent:#e8743a; --accent-ink:#1b120c;
+  --ok:#6fc28d; --warn:#e3a35a; --bad:#f08077; --chip:#30261f; --code:#1d1713;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:22px;margin:0}
+h2{font-size:17px;margin:0}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.hot{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.bad{color:var(--bad);border-color:var(--bad)}
+button.bad.hot{background:var(--bad);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+input[type=text],input[type=password]{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:8px 10px;min-width:0}
+label{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+.chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--chip);color:var(--muted);margin-left:6px;vertical-align:2px}
+.chip.admin{color:var(--accent)} .chip.paused{color:var(--warn)} .chip.view{color:var(--ok)}
+.acct-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 16px;margin:8px 0 10px;font-size:13px}
+.facts b{font-weight:600;color:var(--ink)}
+.slots{display:grid;gap:6px;margin:6px 0 12px}
+.slot{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
+.slot .t{font-weight:600}
+.panel{border-top:1px dashed var(--line);margin-top:12px;padding-top:12px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:10px;max-height:360px;overflow:auto;font-size:12px;white-space:pre-wrap;word-break:break-all}
+.msg{margin:8px 0 0;font-size:14px}
+.msg.err{color:var(--bad)} .msg.good{color:var(--ok)}
+.note{background:var(--chip);border-radius:8px;padding:10px 12px;font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>Emberblood Admin</h1><div class="muted small" id="who"></div></div>
+    <div class="row" id="topbar" hidden>
+      <button id="refresh">Refresh</button>
+      <button id="endViews">End all view sessions</button>
+      <button id="signOut">Sign out</button>
+    </div>
+  </header>
+
+  <div class="card note" id="viewNote" hidden></div>
+
+  <section class="card" id="signin">
+    <h2>Sign in</h2>
+    <p class="muted small">Only admin accounts can use this page.</p>
+    <label for="nm">Name</label><input type="text" id="nm" autocomplete="username" value="MuellerCodes">
+    <label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password">
+    <div class="row" style="margin-top:12px"><button class="hot" id="go">Sign in</button></div>
+    <p class="msg err" id="signErr"></p>
+  </section>
+
+  <section id="list" hidden></section>
+</main>
+<script>
+(() => {
+  const LIVE = 'https://emberblood-api.muellercodes.workers.dev';
+  // ?api= works only for a local test server, so a link can never send the admin password anywhere else
+  const q = new URLSearchParams(location.search).get('api');
+  const API = q && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(q) ? q : LIVE;
+  const SLOT_KEYS = ['eb_world3', 'eb_slot2', 'eb_slot3'];
+  const DIFF = ['Easy', 'Normal', 'Hard'];
+  const CH = {"c_fest":"Lantern Night","c_clue":"Lantern Night","c_pass":"The Southern Pass","c_coast":"The Clockwork Coast","c_gear":"The City of Clocks","c_salt":"The Girl from Saltmarsh","c_claws":"The Girl from Saltmarsh","c_brass":"The Brassworks","c_light":"The Spinning Lighthouse","c_spire":"The Shadow Spire","c_snow":"Snow in Summer","f_snow":"A Letter in the Snow","f_pass":"A Letter in the Snow","f_hearth":"The Dying Hearth","f_maze":"The Dying Hearth","f_kindle":"The Dying Hearth","f_thaw":"One Thaw at a Time","f_sky":"One Thaw at a Time","f_gap":"The Stonehorn Knock","f_deep":"The Stonehorn Knock","f_dreadgate":"The Dreadgate","f_dread":"The Dreadgate","f_glaciar":"Auntie","m_sail":"Across the Sea","m_drift":"Across the Sea","m_lumen":"Drowned Lumen","m_coral":"Drowned Lumen","m_reef":"The Glass Desert","m_sable":"The Glass Desert","m_burrows":"The Glass Desert","m_glasswall":"Mirrors","m_mirror":"Mirrors","m_moonpath":"The Eclipse Observatory","m_observatory":"The Eclipse Observatory","m_reforge":"The Ember Heart","n_bridge":"The Moonfire Bridge","n_stair":"The Ember Stair","n_clocks":"The Clockstop Cliffs","n_rime":"The Rime Spiral","n_glass":"The Moonglass Crown","n_crown":"The Moon Road","n_nyxara":"The Night Mother","n_end":"The Long Night Is Over","wake":"Lantern Day","lanterns":"Lantern Day","raid":"Lantern Day","lore":"The Real Story","hollow":"The Real Story","warcamp":"The Kobold Chieftain","wren":"The Lorekeeper","oath":"The Ash Ward","three":"Three Wards","gate":"The Obsidian Gate","summit":"The First Flame","done":"Free Roam"};
+
+  const $ = (s, el) => (el || document).querySelector(s);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ss = { get(k) { try { return sessionStorage.getItem(k); } catch { return null; } }, set(k, v) { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch {} } };
+  const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+  let token = ss.get('eb_admin_token'), me = null, users = [];
+
+  async function api(method, path, body) {
+    const h = { 'Content-Type': 'application/json' };
+    if (token) h.Authorization = 'Bearer ' + token;
+    let r;
+    try { r = await fetch(API + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined, mode: 'cors', credentials: 'omit' }); }
+    catch { throw new Error('Could not reach the server.'); }
+    let j = {}; try { j = await r.json(); } catch {}
+    if (r.status === 401 && path !== '/api/login') { setToken(null); render(); }
+    if (!r.ok) throw new Error(j.error || 'Something went wrong (' + r.status + ').');
+    return j;
+  }
+  function setToken(t) { token = t; ss.set('eb_admin_token', t); }
+
+  const fmtDate = (t) => t ? new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'never';
+  function ago(t) {
+    if (!t) return ''; const d = (Date.now() - t) / 1000;
+    if (d < 90) return 'just now'; if (d < 3600) return Math.round(d / 60) + ' min ago'; if (d < 86400) return Math.round(d / 3600) + ' h ago';
+    const n = Math.round(d / 86400); return n === 1 ? 'yesterday' : n + ' days ago';
+  }
+  const play = (t) => { t = t | 0; const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60); return h ? h + 'h ' + m + 'm' : m + 'm'; };
+  function actOf(st) { st = String(st || ''); if (st.startsWith('n_')) return 'Finale'; if (st.startsWith('m_')) return 'Act IV'; if (st.startsWith('f_')) return 'Act III'; if (st.startsWith('c_')) return 'Act II'; return 'Act I'; }
+  function stageText(s) {
+    if (s.stage === 'done') return s.done && s.act1_done ? 'The End' : 'Act I complete';
+    if (s.done) return 'The End';
+    return actOf(s.stage) + ' · ' + (CH[s.stage] || 'Lantern Day');
+  }
+  function slotHtml(s, i) {
+    if (!s) return '<div class="slot muted">Journey ' + (i + 1) + ': empty</div>';
+    if (s.deleted) return '<div class="slot muted">Journey ' + (i + 1) + ': deleted ' + esc(ago(s.at)) + '</div>';
+    return '<div class="slot"><span class="t">Journey ' + (i + 1) + ': ' + esc(stageText(s)) + '</span> <span class="muted small">(' + esc(s.stage) + ')</span><br>' +
+      '<span class="small">Level ' + s.level + ' · ' + DIFF[s.diff] + ' · ' + play(s.time) + ' played · ' + s.quests + (s.quests === 1 ? ' quest · ' : ' quests · ') + s.pages + (s.pages === 1 ? ' page · ' : ' pages · ') + s.coins + ' coins · saved ' + esc(ago(s.at)) + '</span></div>';
+  }
+
+  function viewState() { try { return JSON.parse(ls.get('eb_view') || 'null'); } catch { return null; } }
+  function renderViewNote() {
+    const v = viewState(), el = $('#viewNote');
+    if (!v) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = 'This window is set up to view <b>' + esc(v.name) + '</b> (look only). <a href="./" target="_blank" rel="noopener">Open the game</a> · <button id="stopView">Stop viewing</button>';
+    $('#stopView').onclick = stopView;
+  }
+  function stopView() {
+    for (const k of ['eb_token', 'eb_user', 'eb_view', 'eb_cur_slot', ...SLOT_KEYS]) ls.set(k, null);
+    renderViewNote();
+  }
+
+  function render() {
+    const signed = !!token;
+    $('#signin').hidden = signed; $('#list').hidden = !signed; $('#topbar').hidden = !signed;
+    $('#who').textContent = signed && me ? 'Signed in as ' + me.name : '';
+    renderViewNote();
+    if (!signed) return;
+    const el = $('#list');
+    if (!users.length) { el.innerHTML = '<p class="muted">Loading accounts...</p>'; return; }
+    el.innerHTML = '<p class="muted small">' + users.length + ' accounts. Times are in your time zone.</p>' + users.map((u) => {
+      const arena = u.arena.length ? u.arena.map((a) => DIFF[a.diff] + ' wave ' + a.wave + ' (' + a.score.toLocaleString() + ')').join(', ') : 'none';
+      return '<article class="card" data-id="' + u.id + '">' +
+        '<div class="acct-head"><h2>' + esc(u.name) + (u.admin ? '<span class="chip admin">admin</span>' : '') + (u.paused ? '<span class="chip paused">paused</span>' : '') + (u.views ? '<span class="chip view">' + u.views + ' view open</span>' : '') + '</h2>' +
+        '<span class="muted small">#' + u.id + '</span></div>' +
+        '<div class="facts"><div>Made <b>' + esc(fmtDate(u.created)) + '</b></div><div>Last signed in <b>' + esc(fmtDate(u.last_seen)) + '</b></div>' +
+        '<div>Last cloud save <b>' + esc(u.save_at ? fmtDate(u.save_at) : 'none') + '</b></div><div>Signed in on <b>' + u.sessions + '</b> device' + (u.sessions === 1 ? '' : 's') + '</div>' +
+        '<div>Arena <b>' + esc(arena) + '</b></div><div>Save backups <b>' + u.backups + '</b></div>' + (u.paused ? '<div>Paused <b>' + esc(fmtDate(u.paused)) + '</b></div>' : '') + '</div>' +
+        '<div class="slots">' + u.slots.map(slotHtml).join('') + '</div>' +
+        '<div class="row"><button class="hot" data-a="view">View as ' + esc(u.name) + '</button><button data-a="save">Save</button><button data-a="pw">Set password</button>' +
+        (u.admin ? '' : '<button data-a="pause">' + (u.paused ? 'Turn back on' : 'Pause') + '</button><button class="bad" data-a="del">Delete</button>') + '</div>' +
+        '<div class="panel" hidden></div></article>';
+    }).join('');
+  }
+
+  async function load() {
+    try {
+      const j = await api('GET', '/api/admin/users'); users = j.users; render();
+    } catch (e) { $('#list').innerHTML = '<p class="msg err">' + esc(e.message) + '</p>'; }
+  }
+
+  async function signIn() {
+    const name = $('#nm').value.trim(), pass = $('#pw').value, err = $('#signErr');
+    err.textContent = ''; $('#go').disabled = true;
+    try {
+      const j = await api('POST', '/api/login', { username: name, password: pass });
+      setToken(j.token);
+      try { const m = await api('GET', '/api/admin/me'); me = m.user; }
+      catch (e) { await api('POST', '/api/logout').catch(() => {}); setToken(null); throw e; }
+      $('#pw').value = ''; render(); load();
+    } catch (e) { err.textContent = e.message; }
+    $('#go').disabled = false;
+  }
+
+  function panelOf(card) { return $('.panel', card); }
+  function openPanel(card, html) { const p = panelOf(card); p.hidden = false; p.innerHTML = html; return p; }
+  function download(name, obj) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+  const stamp = () => new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+
+  // ---------- view as: a look-only sign-in for that account, used by the game in this window
+  async function viewAs(u, card) {
+    const v = viewState();
+    const hasOwn = !v && (ls.get('eb_token') || SLOT_KEYS.some((k) => ls.get(k)));
+    if (hasOwn) {
+      openPanel(card, '<p class="note">This browser window has your own game saves or sign-in in it. Viewing here would mix them with ' + esc(u.name) + '\'s journeys. Open this page in a <b>private window</b> (Safari: File, New Private Window. Chrome: File, New Incognito Window), sign in there, and press View again.</p>');
+      return;
+    }
+    try {
+      const j = await api('POST', '/api/admin/viewas', { id: u.id });
+      for (const k of ['eb_cur_slot', ...SLOT_KEYS]) ls.set(k, null);
+      ls.set('eb_token', j.token); ls.set('eb_user', j.user); ls.set('eb_view', { name: j.user.name, id: j.user.id, expires: j.expires });
+      await load();
+      card = document.querySelector('[data-id="' + u.id + '"]') || card;
+      openPanel(card, '<p class="msg good">Ready. The game opens signed in as ' + esc(u.name) + ', look only. Their journeys load from the cloud, and nothing you do there changes their save or scores. This view ends by itself in 12 hours.</p><div class="row"><a class="btn hot" style="background:var(--accent);color:var(--accent-ink);text-decoration:none" href="./" target="_blank" rel="noopener" data-a-open>Open the game as ' + esc(u.name) + '</a></div>');
+    } catch (e) { openPanel(card, '<p class="msg err">' + esc(e.message) + '</p>'); }
+  }
+
+  // ---------- save viewer, download, replace, backups
+  async function showSave(u, card) {
+    const p = openPanel(card, '<p class="muted">Loading the save...</p>');
+    try {
+      const [s, b] = await Promise.all([api('GET', '/api/admin/save?id=' + u.id), api('GET', '/api/admin/backups?id=' + u.id)]);
+      const rows = b.backups.length ? '<table><tr><th>Backup</th><th>Made</th><th>Note</th><th></th></tr>' + b.backups.map((x) =>
+        '<tr><td>#' + x.id + '</td><td>' + esc(fmtDate(x.made_at)) + '</td><td>' + esc(x.note) + '</td><td class="row"><button data-b="get" data-bid="' + x.id + '">Download</button><button data-b="restore" data-bid="' + x.id + '">Restore</button></td></tr>').join('') + '</table>'
+        : '<p class="muted small">No backups yet. One is made each time a save is replaced or restored here.</p>';
+      p.innerHTML = (s.save ? '<div class="row"><button data-s="dl">Download save</button><label class="btn" style="margin:0;color:var(--ink)">Replace from a file<input type="file" accept="application/json,.json" data-s="file" hidden></label></div>' +
+        '<p class="muted small">Last cloud save ' + esc(fmtDate(s.updated)) + ', ' + Math.round(JSON.stringify(s.save).length / 1024) + ' KB.</p>' +
+        '<details><summary>Show the raw save</summary><pre>' + esc(JSON.stringify(s.save, null, 2)) + '</pre></details>'
+        : '<p class="muted">This account has no cloud save yet.</p><label class="btn" style="margin:0;color:var(--ink)">Upload a save file<input type="file" accept="application/json,.json" data-s="file" hidden></label>') +
+        '<h2 style="margin-top:14px">Backups</h2>' + rows + '<p class="msg" data-s="msg"></p>';
+      const msg = $('[data-s=msg]', p);
+      const dl = $('[data-s=dl]', p); if (dl) dl.onclick = () => download('emberblood-' + u.name + '-' + stamp() + '.json', s.save);
+      $('[data-s=file]', p).onchange = async (ev) => {
+        const f = ev.target.files[0]; if (!f) return;
+        let save; try { save = JSON.parse(await f.text()); } catch { msg.className = 'msg err'; msg.textContent = 'That file is not a save.'; return; }
+        if (save && save.save && save.save.v === 3) save = save.save;
+        if (!confirm('Replace ' + u.name + '\'s cloud save with ' + f.name + '? The current one is kept as a backup.')) return;
+        try { await api('PUT', '/api/admin/save?id=' + u.id, { save }); await load(); showSave(u, $('[data-id="' + u.id + '"]')); }
+        catch (e) { msg.className = 'msg err'; msg.textContent = e.message; }
+      };
+      for (const bt of p.querySelectorAll('[data-b]')) bt.onclick = async () => {
+        const bid = +bt.dataset.bid;
+        try {
+          if (bt.dataset.b === 'get') { const j = await api('GET', '/api/admin/backup?id=' + bid); download('emberblood-' + u.name + '-backup-' + bid + '.json', j.save); return; }
+          if (!confirm('Put backup #' + bid + ' back as ' + u.name + '\'s save? The current one is kept as a backup first.')) return;
+          await api('POST', '/api/admin/restore', { backup: bid }); await load(); showSave(u, $('[data-id="' + u.id + '"]'));
+        } catch (e) { msg.className = 'msg err'; msg.textContent = e.message; }
+      };
+    } catch (e) { p.innerHTML = '<p class="msg err">' + esc(e.message) + '</p>'; }
+  }
+
+  function setPassword(u, card) {
+    const p = openPanel(card, '<label>New password for ' + esc(u.name) + ' (8 or more characters)</label><div class="row"><input type="text" data-p="pw" autocomplete="off" spellcheck="false"><button class="hot" data-p="go">Set password</button></div><p class="muted small">Any device already signed in stays signed in.</p><p class="msg" data-p="msg"></p>');
+    $('[data-p=go]', p).onclick = async () => {
+      const pw = $('[data-p=pw]', p).value, msg = $('[data-p=msg]', p);
+      if (pw.length < 8) { msg.className = 'msg err'; msg.textContent = 'Passwords need at least 8 characters.'; return; }
+      try { await api('POST', '/api/admin/password', { id: u.id, password: pw }); $('[data-p=pw]', p).value = ''; msg.className = 'msg good'; msg.textContent = 'Done. ' + u.name + ' signs in with the new password now.'; }
+      catch (e) { msg.className = 'msg err'; msg.textContent = e.message; }
+    };
+  }
+
+  async function togglePause(u, card) {
+    const on = !u.paused;
+    if (on && !confirm('Pause ' + u.name + '? They can\'t sign in, load or save in the cloud until you turn it back on. Nothing is deleted.')) return;
+    try { await api('POST', '/api/admin/pause', { id: u.id, paused: on }); await load(); }
+    catch (e) { openPanel(card, '<p class="msg err">' + esc(e.message) + '</p>'); }
+  }
+
+  function del(u, card) {
+    const p = openPanel(card, '<p class="note"><b>Delete ' + esc(u.name) + ' for good?</b> The account, its cloud save, its backups, its Arena scores and every sign-in are removed. This can\'t be undone from here.</p>' +
+      '<label><input type="checkbox" data-d="dl" checked> Download a copy of the save first</label>' +
+      '<label>Type <b>' + esc(u.name) + '</b> to confirm</label><div class="row"><input type="text" data-d="nm" autocomplete="off" spellcheck="false"><button class="bad hot" data-d="go" disabled>Delete forever</button><button data-d="no">Keep it</button></div><p class="msg" data-d="msg"></p>');
+    const nm = $('[data-d=nm]', p), go = $('[data-d=go]', p), msg = $('[data-d=msg]', p);
+    nm.oninput = () => { go.disabled = nm.value !== u.name; };
+    $('[data-d=no]', p).onclick = () => { p.hidden = true; };
+    go.onclick = async () => {
+      go.disabled = true;
+      try {
+        if ($('[data-d=dl]', p).checked) { const s = await api('GET', '/api/admin/save?id=' + u.id); if (s.save) download('emberblood-' + u.name + '-before-delete-' + stamp() + '.json', s.save); }
+        await api('POST', '/api/admin/delete', { id: u.id, confirm: nm.value });
+        users = users.filter((x) => x.id !== u.id); render();
+      } catch (e) { msg.className = 'msg err'; msg.textContent = e.message; go.disabled = false; }
+    };
+  }
+
+  $('#list').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-a]'); if (!b) return;
+    const card = b.closest('[data-id]'), u = users.find((x) => x.id === +card.dataset.id); if (!u) return;
+    ({ view: viewAs, save: showSave, pw: setPassword, pause: togglePause, del })[b.dataset.a](u, card);
+  });
+  $('#go').onclick = signIn;
+  for (const id of ['#nm', '#pw']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') signIn(); });
+  $('#refresh').onclick = load;
+  $('#signOut').onclick = async () => { await api('POST', '/api/logout').catch(() => {}); setToken(null); me = null; users = []; render(); };
+  $('#endViews').onclick = async () => {
+    try { const j = await api('POST', '/api/admin/endviews'); stopView(); alert('Ended ' + j.ended + ' view session' + (j.ended === 1 ? '' : 's') + '.'); load(); }
+    catch (e) { alert(e.message); }
+  };
+
+  render();
+  if (token) api('GET', '/api/admin/me').then((m) => { me = m.user; render(); load(); }).catch(() => { setToken(null); render(); });
+})();
+</script>
+</body>
+</html>

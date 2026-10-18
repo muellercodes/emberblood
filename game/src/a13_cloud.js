@@ -3,7 +3,7 @@
 const API_BASE='__API_BASE__';
 const Cloud=(()=>{
   const base=(API_BASE.startsWith('http')?API_BASE:'').replace(/\/$/,'');
-  let token=store.get('eb_token',null), user=store.get('eb_user',null), online=null, pending=null, pushT=null, lastPush=0, busy=false, lastErr='';
+  let token=store.get('eb_token',null), user=store.get('eb_user',null), online=null, pending=null, pushT=null, lastPush=0, busy=false, lastErr='', paused='', viewing=false;
   const listeners=new Set();
   const changed=()=>{ for(const f of listeners){ try{ f(); }catch(e){} } };
   async function req(path,opt){
@@ -18,14 +18,15 @@ const Cloud=(()=>{
     let j=null; try{ j=await r.json(); }catch(e){}
     online=true;
     if(r.status===401&&token&&path!=='/api/login'){ setSession(null,null); }
+    if(r.status===403&&token&&/paused/i.test((j&&j.error)||'')&&paused!==j.error){ paused=j.error; changed(); }
     if(!r.ok){ const er=new Error((j&&j.error)||('Something went wrong ('+r.status+')')); er.status=r.status; throw er; }
     return j||{};
   }
-  function setSession(t,u){ token=t; user=u; store.set('eb_token',t); store.set('eb_user',u); changed(); }
+  function setSession(t,u){ token=t; user=u; paused=''; viewing=false; store.set('eb_token',t); store.set('eb_user',u); changed(); }
   async function check(){
     if(!base){ online=false; changed(); return false; }
     try{ await req('/api/health',{timeout:7000}); }catch(e){ changed(); return false; }
-    if(token){ try{ const j=await req('/api/me'); user=j.user; store.set('eb_user',user); }catch(e){} }
+    if(token){ try{ const j=await req('/api/me'); user=j.user; viewing=!!j.view; paused=''; store.set('eb_user',user); }catch(e){} }
     changed(); return true;
   }
   async function auth(kind,name,pass){ const j=await req('/api/'+kind,{method:'POST',body:{username:name,password:pass}}); setSession(j.token,j.user); return j.user; }
@@ -37,7 +38,7 @@ const Cloud=(()=>{
   async function submitScore(diff,wave,score){ if(!token||!base) return; try{ await req('/api/score',{method:'POST',body:{diff,wave,score}}); }catch(e){} }
   async function board(diff){ const j=await req('/api/leaderboard?diff='+diff); return j.rows||[]; }
   addEventListener('pagehide',()=>{ if(pending&&token&&base){ try{ fetch(base+'/api/save',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({save:pending}),keepalive:true,mode:'cors'}); pending=null; }catch(e){} } });
-  return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},
+  return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},get paused(){return paused;},get viewing(){return viewing;},
     check,auth,logout,pull,push,queueSave,flush,submitScore,board,onChange:f=>listeners.add(f)};
 })();
 // merge cloud and device saves slot by slot: whichever is newer wins (deleted slots carry a dated marker)
@@ -58,7 +59,10 @@ let acTab='login';
 function acctLabel(){
   const b=$('#bAcct'); if(!b) return;
   if(!Cloud.hasBase||Cloud.online===false){ b.innerHTML='Account<small>Cloud saves are offline here. Progress saves on this device.</small>'; return; }
-  b.innerHTML=Cloud.signedIn?`Signed in as ${escapeHtml((Cloud.user&&Cloud.user.name)||'you')}<small>Your story saves to the cloud automatically.</small>`:'Sign in or create an account<small>Keep your journey safe in the cloud and join the leaderboard.</small>';
+  const nm=escapeHtml((Cloud.user&&Cloud.user.name)||'you');
+  if(Cloud.signedIn&&Cloud.paused){ b.innerHTML=`Account paused<small>${escapeHtml(Cloud.paused)}</small>`; return; }
+  if(Cloud.signedIn&&Cloud.viewing){ b.innerHTML=`Viewing as ${nm} (look only)<small>Nothing you do here changes their save.</small>`; return; }
+  b.innerHTML=Cloud.signedIn?`Signed in as ${nm}<small>Your story saves to the cloud automatically.</small>`:'Sign in or create an account<small>Keep your journey safe in the cloud and join the leaderboard.</small>';
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function openAcct(){
@@ -68,7 +72,7 @@ function openAcct(){
 function renderAcct(){
   const off=!Cloud.hasBase||Cloud.online===false;
   $('#acOff').hidden=!off; $('#acForm').hidden=off||Cloud.signedIn; $('#acIn').hidden=off||!Cloud.signedIn;
-  if(Cloud.signedIn) $('#acWho').textContent=(Cloud.user&&Cloud.user.name)||'you';
+  if(Cloud.signedIn) $('#acWho').textContent=((Cloud.user&&Cloud.user.name)||'you')+(Cloud.viewing?' (look only, nothing here saves to their account)':Cloud.paused?' (paused)':'');
   for(const b of document.querySelectorAll('#acTabs button')) b.setAttribute('aria-pressed',String(b.dataset.t===acTab));
   $('#acGo').textContent=acTab==='login'?'Sign in':'Create account';
   $('#acPass').setAttribute('autocomplete',acTab==='login'?'current-password':'new-password');
