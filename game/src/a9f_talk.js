@@ -44,6 +44,7 @@ function townOf(id){ if(TOWN_OF[id]) return TOWN_OF[id]; const c=CASTBY[id]||SPE
 // has Ash already dealt with this person (a quest offer, a quest step, a story scene) before the first chat?
 function metBefore(id){
   if(id==='brisket'||id==='morrow'||id==='marlo') return true;
+  if(SPECIAL[id]&&SPECIAL[id].inside==='ev') return true;   // event and story people: Ash meets them in their scene first
   if(id==='wren'&&reached('oath')) return true;
   for(const qid in (G.quests||{})){ const d=QDEFS[qid], q=G.quests[qid]; if(!d||!q) continue; if(d.giver===id) return true; const st=d.steps||[]; for(let i=0;i<st.length;i++) if(st[i]&&st[i].npc===id&&(q.done||i<q.step)) return true; }
   for(const qid in (G.declined||{})){ const d=QDEFS[qid]; if(d&&d.giver===id) return true; }
