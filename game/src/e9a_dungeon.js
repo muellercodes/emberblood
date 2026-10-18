@@ -826,12 +826,8 @@ FL.dspore=(o,t)=>{
   if(o.burst&&o.gT>0){ const k=clamp(o.gT/6,0,1); for(let n=0;n<10;n++){ const f=((t*0.12+n*0.1)%1), px=x+Math.sin(n*2.3+t*0.7)*60*f, py=hy+f*70; ctx.fillStyle=`rgba(200,255,170,${0.8*k*(1-f*0.5)})`; ctx.beginPath(); ctx.arc(px,py,2.2,0,TAU); ctx.fill(); } glowAt(x,y+10,90,'170,255,150',0.25*k); }
 };
 FL.dstairs=(o,t)=>{
-  const x=o.x, y=o.y, cs=48, up=o.dir==='up';
-  ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(x-cs/2,y-cs/2,cs,cs);
-  for(let i=0;i<4;i++){ const yy=y-cs/2+i*cs/4, kk=up?0.55+i*0.12:1-i*0.2; ctx.fillStyle=`rgba(${150*kk|0},${120*kk|0},${90*kk|0},1)`; ctx.fillRect(x-cs/2+3+(up?0:i*3),yy+2,cs-6-(up?0:i*6),cs/4-3); }
-  if(!up){ const g=ctx.createLinearGradient(0,y-cs/2,0,y+cs/2); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.7)'); ctx.fillStyle=g; ctx.fillRect(x-cs/2,y-cs/2,cs,cs); }
-  ctx.strokeStyle='#5a3a22'; ctx.lineWidth=3; ctx.strokeRect(x-cs/2,y-cs/2,cs,cs);
-  const b=Math.sin(t*3)*2; ctx.fillStyle='rgba(255,230,180,.85)'; ctx.beginPath(); if(up){ ctx.moveTo(x,y-cs/2-14+b); ctx.lineTo(x+8,y-cs/2-5+b); ctx.lineTo(x-8,y-cs/2-5+b); } else { ctx.moveTo(x,y+4+b); ctx.lineTo(x+8,y-5+b); ctx.lineTo(x-8,y-5+b); } ctx.closePath(); ctx.fill();
+  // the shared stair art (a3c_art3.js): a flight climbing north for up, a well falling south for down, in one cell
+  drawStairArt(o.x,o.y+2,44,44,o.dir==='up'?'up':'down','dun',t,false);
 };
 DUN_DRAW.tidec=(q,t)=>{
   const x=q.x, y=q.y, T=AREA.tri, on=T&&T.lvl===q.tune, bob=Math.sin(t*2+x)*2;

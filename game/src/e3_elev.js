@@ -651,14 +651,49 @@ function elvPaintRamp(g,E,rp){
   if(rp.kind==='ramp'){
     if(vert){ g.fillStyle=S.lit; g.fillRect(x0+5,y0,W-10,Hh); g.fillStyle='rgba(255,255,255,.10)'; g.fillRect(x0+W*0.35,y0,W*0.3,Hh); g.strokeStyle='rgba(0,0,0,.18)'; g.lineWidth=1; g.beginPath(); for(let y=y0+10;y<y1;y+=12){ g.moveTo(x0+8,y); g.lineTo(x1-8,y); } g.stroke(); }
     else{ g.fillStyle=S.lit; g.fillRect(x0,y0+5,W,Hh-10); g.fillStyle='rgba(255,255,255,.10)'; g.fillRect(x0,y0+Hh*0.35,W,Hh*0.3); }
-  }else{
-    // stairs: treads lit, risers in shade
-    if(vert){ for(let y=y0;y<y1;y+=8){ g.fillStyle=S.lit; g.fillRect(x0+5,y,W-10,5); g.fillStyle=S.face; g.fillRect(x0+5,y+5,W-10,3); } g.fillStyle='rgba(255,250,236,.22)'; for(let y=y0;y<y1;y+=8) g.fillRect(x0+5,y,W-10,1.2); }
-    else{ for(let x=x0;x<x1;x+=8){ g.fillStyle=S.lit; g.fillRect(x,y0+5,5,Hh-10); g.fillStyle=S.face; g.fillRect(x+5,y0+5,3,Hh-10); } }
-  }
+  }else{ elvPaintStairs(g,S,rp,x0,y0,x1,y1); g.restore(); return; }
   g.strokeStyle=S.out; g.lineWidth=2.2; g.strokeRect(x0+0.5,y0,W-1,Hh);
   if(vert){ g.beginPath(); g.moveTo(x0+5,y0); g.lineTo(x0+5,y1); g.moveTo(x1-5,y0); g.lineTo(x1-5,y1); g.lineWidth=1.4; g.strokeStyle='rgba(0,0,0,.35)'; g.stroke(); }
   g.restore();
+}
+// stairs cut into a face: real steps (a lit tread and a shaded riser each), lighter toward the high end, stone cheek
+// walls with lit caps down both sides, a bright lip where they meet the top and a shadow at the foot. Climbing north the
+// risers face you; climbing south only the treads show; climbing east or west the flight's south side shows its steps.
+function elvPaintStairs(g,S,rp,x0,y0,x1,y1){
+  const W=x1-x0, H=y1-y0, d=rp.dir, vert=d==='n'||d==='s', L=vert?H:W, n=Math.max(3,Math.round(L/(vert?12:16))), p=L/n;
+  const cw=Math.max(5,Math.min(11,Math.round((vert?W:H)*0.09)));
+  const tr=u=>stC(stC(S.face,S.lit,0.75),'#fff4dc',0.04+0.32*u), rs=u=>stC(S.dark,S.face,0.2+0.6*u);
+  g.fillStyle=S.dark; g.fillRect(x0,y0,W,H);
+  if(vert){
+    const sx0=x0+cw, sx1=x1-cw, sw=sx1-sx0;
+    for(let i=0;i<n;i++){ const u=n>1?i/(n-1):1;
+      if(d==='n'){ const a=y1-(i+1)*p, th=p*0.56;
+        g.fillStyle=tr(u); g.fillRect(sx0,a,sw,th+0.5); g.fillStyle=rs(u); g.fillRect(sx0,a+th,sw,p-th+0.5);
+        g.fillStyle=`rgba(255,250,236,${0.25+0.35*u})`; g.fillRect(sx0,a+th-1.5,sw,1.5); g.fillStyle='rgba(0,0,0,.32)'; g.fillRect(sx0,a+th,sw,1.6);
+      }else{ const a=y0+i*p;
+        g.fillStyle=tr(u); g.fillRect(sx0,a,sw,p+0.5); g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(sx0,a,sw,1.8); g.fillStyle=`rgba(255,250,236,${0.2+0.3*u})`; g.fillRect(sx0,a+1.8,sw,1.2); }
+      // worn joints in each step
+      g.fillStyle='rgba(0,0,0,.12)'; const jx=sx0+sw*(0.3+0.4*((i*7)%3)/2); g.fillRect(jx,(d==='n'?y1-(i+1)*p:y0+i*p)+2,1.2,p*0.5); }
+    // the west cheek's shadow on the steps, then both cheeks: lit caps that brighten toward the high end
+    g.fillStyle='rgba(0,0,0,.2)'; g.fillRect(sx0,y0,4,H);
+    const hy=d==='n'?y0:y1, ly=d==='n'?y1:y0;
+    for(const cx of [x0,x1-cw]){ const cg=g.createLinearGradient(0,ly,0,hy); cg.addColorStop(0,stC(S.face,S.dark,0.25)); cg.addColorStop(1,stC(S.lit,S.lip,0.35)); g.fillStyle=cg; g.fillRect(cx,y0,cw,H);
+      g.fillStyle='rgba(255,250,236,.3)'; g.fillRect(cx+1,y0,1.4,H); g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(cx+cw-1.4,y0,1.4,H);
+      g.strokeStyle='rgba(0,0,0,.22)'; g.lineWidth=1; g.beginPath(); for(let y=y0+p*0.8;y<y1-2;y+=p*1.6){ g.moveTo(cx+1,y); g.lineTo(cx+cw-1,y); } g.stroke(); }
+    // the lip at the top and the shadow at the foot
+    g.fillStyle=S.lip; g.fillRect(x0,hy-(d==='n'?0:2.4),W,2.4);
+    g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(x0-3,ly+(d==='n'?0:-4),W+6,4);
+  }else{
+    const sy0=y0+cw*0.6, sy1=y1-cw, sh=sy1-sy0, side=Math.min(H*0.45,40);
+    for(let i=0;i<n;i++){ const u=n>1?i/(n-1):1, a=d==='e'?x0+i*p:x1-(i+1)*p;
+      g.fillStyle=tr(u); g.fillRect(a,sy0,p+0.5,sh); g.fillStyle='rgba(0,0,0,.28)'; g.fillRect(d==='e'?a:a+p-1.6,sy0,1.6,sh);
+      g.fillStyle=`rgba(255,250,236,${0.2+0.3*u})`; g.fillRect(d==='e'?a+1.6:a+p-2.8,sy0,1.2,sh);
+      // the flight's south side: a stepped face that grows toward the high end
+      const fh=side*(i+1)/n; g.fillStyle=rs(u); g.fillRect(a,sy1-fh,p+0.5,fh+cw); g.fillStyle=`rgba(255,250,236,${0.25+0.3*u})`; g.fillRect(a,sy1-fh,p+0.5,1.4); }
+    g.fillStyle=stC(S.lit,S.lip,0.3); g.fillRect(x0,y0,W,cw*0.6); g.fillStyle='rgba(0,0,0,.2)'; g.fillRect(x0,sy0,W,3);
+    g.fillStyle=S.lip; g.fillRect(d==='e'?x1-2.4:x0,y0,2.4,H);
+  }
+  g.strokeStyle=S.out; g.lineWidth=2.2; g.strokeRect(x0+0.5,y0,W-1,H);
 }
 // the plateau a point belongs to (for colours)
 function elvOwnerAt(E,x,y,rp){ const g=E.G; if(!g) return null; let best=null; for(const P of E.plats){ if(x<P.fb[0]||x>P.fb[2]||y<P.fb[1]||y>P.fb[3]) continue; if(!best||P.lvl>best.lvl){ if(elvRingsIn(P.rings,x,y)) best=P; } } if(!best&&rp){ for(const P of E.plats) if(P.lvl===rp.hi&&x>=P.fb[0]&&x<=P.fb[2]&&y>=P.fb[1]&&y<=P.fb[3]) return P; } return best; }
@@ -723,7 +758,7 @@ function elvPaintChunk(ch,cx,cy){
   if(gd&&(x0>gd.x0+gd.w*gd.cs||x1<gd.x0||y0>gd.y0+gd.h*gd.cs||y1<gd.y0)&&!decos.length) return;
   const g=ch.g, m=40, items=[];
   for(const P of E.plats) if(P.fb&&P.fb[0]<x1+m&&P.fb[2]>x0-m&&P.fb[1]<y1+m&&P.fb[3]>y0-m) items.push([P.lvl,0,P.i,()=>elvPaintPlat(g,P,x0-m,y0-m,x1+m,y1+m)]);
-  for(const rp of E.ramps) if(rp.ax0!=null&&rp.ax0<x1+20&&rp.ax1>x0-20&&rp.ay0<y1+20&&rp.ay1>y0-20) items.push([rp.hi,1,rp.i,()=>elvPaintRamp(g,E,rp)]);
+  for(const rp of E.ramps) if(rp.ax0!=null&&rp.ax0<x1+20&&rp.ax1>x0-20&&rp.ay0<y1+20&&rp.ay1>y0-20) items.push([rp.hi+(rp.kind==='stairs'?0.15:0),1,rp.i,()=>elvPaintRamp(g,E,rp)]);   // stairs after the trails on their level, so no path is painted over the steps
   for(const l of E.ledges) if(l.x0<x1+40&&l.x1>x0-40&&l.y0<y1+60&&l.y1>y0-60) items.push([99,2,0,()=>elvPaintLedge(g,E,l)]);
   for(const f of E.falls) if(f.bb&&f.bb[0]<x1&&f.bb[2]>x0&&f.bb[1]<y1&&f.bb[3]>y0) items.push([f.lvl,3,0,()=>elvPaintFall(g,f)]);
   for(const v of E.vents) if(v.x+80>x0&&v.x-80<x1&&v.y+60>y0&&v.y-60<y1) items.push([v.lvl||0,4,v.i,()=>elvPaintVent(g,v)]);
