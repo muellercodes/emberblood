@@ -1477,7 +1477,7 @@ function f2VesperAlly(){ try{ if(F2.hook.vesper) return !!F2.hook.vesper(); }cat
 // her drop-in after Hush's first line (bible 6.10a), only while the story has not written its own intro
 const F2_VESPER_HUSH=[['c_vesper',S('Hello, cousin. Miss me?','Hello, cousin. Miss me?')],
   ['ash',S('Vesper! What are you doing here?','Vesper! Why are you here?')],
-  ['c_vesper',S(`That's the moth that whispered in my dreams. Every night for a year. "Bring me the Heart, little thief." I have a score to settle. Let's make it LOUD.`,`That moth whispered in my dreams. Let's be LOUD!`)]];
+  ['c_vesper',S(`That's one of HER moths. I know those painted eyes. I have a score to settle with her. Let's make it LOUD.`,`That is one of HER moths. Let's be LOUD!`)]];
 { const B=STORY.bosses.f_hush, d=Object.getOwnPropertyDescriptor(B,'intro'); Object.defineProperty(B,'intro',{get(){ const L=d.get.call(this); return this._in||!f2VesperAlly()||STORY.f_hush_intro?L:L.concat(F2_VESPER_HUSH); },set(v){ this._in=v; },enumerable:true,configurable:true}); }
 const F2HUSH={x:7300,y:44300,r:420,lamps:[[7000,44250],[7600,44250],[7300,44560]],vents:[[7080,44340],[7520,44340]]};
 // ---- lamp-braziers. f2Lamp({x,y,h,burn,on,id}) makes one (outdoors; the finale echo can use them too). At the
@@ -1689,6 +1689,7 @@ const F2CR={x:7300,y:41250,r:560,wall:600,vent:{x:7650,y:41500},post:{x:7200,y:4
           {id:'n',name:S('the North Stone','the north stone'),x:7300,y:40760,up:1,ph:1}]};
 const F2G={on:false,stones:[],melted:0,lvl:0,heart:false,night:false,windOn:false,wall:null,wallT:15,wallW:0,whiteCd:12,whiteWarn:0,pushT:0,fallCd:0,mumble:null,grey:null,nyx:false,saidT:0,outcome:null,built:false};
 // the chain lines in her own voice, in the order the chains snap (bible 9.7)
+// (the same words as x2_story's F2S_TAUNTS.f_glaciar_chain, full and simple, so a line is never said twice)
 const F2_CHAIN_LINES=[S("...Fire? Warm fire? I knew a little girl with fire like that...","Fire? Warm fire? I knew a girl with fire like that..."),
   S("The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.","Who is the Mother? I have a brother. A loud one."),
   S("Little one. Your horns. You have her horns. Ember's horns!","Your horns! You have Ember's horns!"),

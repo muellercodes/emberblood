@@ -332,7 +332,7 @@ Object.assign(TALK,{
       [`Only angry ones. Big angry ones!`,`Only angry ones!`,`Ha! You've met a forest fire, then. No, my girl is a gentle sort.`,`Ha! My fire is gentle.`,0.5],
       [`Mine feels hungry. All the time.`,`Mine is always hungry.`,`Then feed it, child! There's soup at the Warm Mitten.`,`Then feed it! Soup at the inn.`,0.5],'kind')},
   f_brann:{bio:S('Captain of the Hearthwardens. Loud. Brave. Afraid of moths.','Captain of the guards. Loud and brave. Scared of moths.'),
-    about:{osric:S(`A captain in the south with two old dogs? I have two old guards! Gunnar and Gunnar's other leg. It's a long story.`,`A captain with dogs? I have Gunnar. Long story.`),f_pim:S(`Pim sold me cocoa on credit! I owe her eleven coins! She sends me bills! Very official ones!`,`I owe Pim eleven coins! She sends bills!`),f_mags:S(`Mags blew the snow off my tower roof last week! Kindly! Also my eyebrows!`,`Mags blew the snow off my roof! And my eyebrows!`)},
+    about:{osric:S(`A captain in the south with two old dogs? I have Gunnar! Gunnar licks gates. It is not the same.`,`A captain with dogs? I have Gunnar. He licks gates.`),f_pim:S(`Pim sold me cocoa on credit! I owe her eleven coins! She sends me bills! Very official ones!`,`I owe Pim eleven coins! She sends bills!`),f_mags:S(`Mags blew the snow off my tower roof last week! Kindly! Also my eyebrows!`,`Mags blew the snow off my roof! And my eyebrows!`)},
     rumor:{t:S(`A girl with a map case went out on the floes last week! On FOOT! Brave! Or a moth! Probably brave!`,`A girl with maps went out on the ice! Brave!`),hint:'f_lm_tent',need:()=>f2pR('f_kindle')&&!G.flags.f_juniper_found},
     loves:['fish'],hates:['moonlily'],
     deep:S(`When I was a boy a moth flew into my ear. I heard it flapping for a week. I've never been the same.`,`A moth flew in my ear once. It flapped for a week.`),
@@ -344,7 +344,7 @@ Object.assign(TALK,{
       [`Sneeze fire on it.`,`Sneeze fire on it.`,`HA! A fire sneeze! I'm putting that in the Hearthwarden handbook!`,`HA! A fire sneeze! I love it!`,1],'silly')},
   f_toastwhistle:{bio:S('Mayor of Hearthold. Everything is fine. Everything.','The mayor. She says everything is fine.'),
     about:{mayor:S(`The Mayor of Brindlecross sent me a letter of advice. It was about pies. I don't know why.`,`The Mayor up south sent me advice. About pies.`),f_brynja:S(`Brynja's kept that fire longer than I've been alive. I'm a little scared of her. Fine. I'm a lot scared of her.`,`Brynja scares me. A lot.`)},
-    rumor:{t:S(`The Ice Sculpture Garden by the Wind Road has statues of six monsters from the south. The sign says the first one to fall guards the gold. Very mysterious. Very fine.`,`The ice statues guard gold. The first to fall has it.`),hint:'f_lm_garden',need:()=>f2pR('f_kindle')},
+    rumor:{t:S(`The Ice Sculpture Garden, north of the town wall, has statues of six monsters from the south. The sign says the first one to fall guards the gold. A mystery! A FINE mystery.`,`The ice statues guard gold. The first to fall has it.`),hint:'f_lm_garden',need:()=>f2pR('f_kindle')},
     loves:['honey'],hates:['fish'],
     deep:S(`I'm not actually fine. I'm a mayor. Mayors are never fine. We just say it louder.`,`I'm not really fine. Mayors just say it louder.`),
     secret:{t:S(`The key to the city! It opens nothing. But it's very shiny.`,`The key to the city! It opens nothing. Shiny!`),reward:{coins:60}},
@@ -365,7 +365,7 @@ Object.assign(TALK,{
       [`My sword! It beat a mountain!`,`My sword!`,`A mountain-beating sword. Of course it did. Let me hold it. No. Let me LOOK at it.`,`Of course it did! Let me look at it.`,0.5],
       [`Soup. Her soup is iron-strong.`,`Soup. Very strong soup.`,`Iron soup? That's a smith's soup. I'm putting a pot on.`,`Iron soup! A smith's soup!`,0.5],'kind')},
   f_mags:{bio:S('A Gearhaven tinker stranded in the snow. Loves explosions.','A tinker from Gearhaven. She loves explosions.'),
-    about:{c_hettie:S(`Cousin Hettie? Second-best tinker in Gearhaven. We don't talk about who's first. It's me. It's not me. It's complicated.`,`Cousin Hettie is the second-best tinker. Who's first? Complicated.`),c_whirligig:S(`Lord Whirligig bought a heater from me. He wanted one shaped like his face. I made it. It glows in the eyes. He loves it.`,`Lord Whirligig has a heater shaped like his face!`),f_brann:S(`Captain Brann thinks I'm dangerous. I'm only dangerous on purpose.`,`Brann thinks I'm dangerous. Only on purpose!`)},
+    about:{c_hettie:S(`Cousin Hettie? Second-best tinker in Gearhaven. We don't talk about who's first. It's me. Hettie says it's her. We've argued about it for twenty years.`,`Cousin Hettie is the second-best tinker. Or I am. We argue.`),c_whirligig:S(`Lord Whirligig bought a heater from me. He wanted one shaped like his face. I made it. It glows in the eyes. He loves it.`,`Lord Whirligig has a heater shaped like his face!`),f_brann:S(`Captain Brann thinks I'm dangerous. I'm only dangerous on purpose.`,`Brann thinks I'm dangerous. Only on purpose!`)},
     rumor:{t:S(`The Snowgobs in the Gulch pushed my steam sled right off the road. Their king wears a bucket. A BUCKET! I want that bucket. For science.`,`The Snowgob King wears a bucket! I want it. For science.`),hint:null,need:()=>f2pR('f_kindle')},
     loves:['honey'],hates:['fish'],
     deep:S(`I blew up my first workshop when I was six. My mom said "Mags, what did you learn?" I said "BIGGER."`,`I blew up my workshop at six. I learned: BIGGER.`),
@@ -387,14 +387,14 @@ Object.assign(TALK,{
       [`Spicy! The spicier the better!`,`Spicy soup!`,`A fire breather who likes it spicy? I'll get the red pepper jar. The big one.`,`Spicy? I'll get the big pepper jar!`,0.5],
       [`Snow soup. Just snow in a bowl.`,`Snow in a bowl.`,`Snow soup! Oh, you'd melt it before the first spoon. Here, have a real one.`,`Ha! You'd melt it. Here, real soup.`,0.5],'kind')},
   f_eider:{bio:S('Archivist of the Hearth Archive. Sister Wren’s cousin. Whispers.','He keeps the old books. Wren is his cousin.'),
-    about:{wren:S(`Wren was always the brave cousin. She climbed the library roof once. To read. On the roof. Why.`,`Wren is the brave cousin. She read books on the roof.`),c_ottoline:S(`An archivist in Gearhaven who SHOUTS and then says sorry? Wren writes to her. I'm too shy to. Please don't tell her I exist.`,`A librarian who shouts? I'm too shy to write her.`),f_brynja:S(`Brynja can't read the old songs. She doesn't need to. She hums them. She's never once hummed a wrong note.`,`Brynja hums the old songs. Never a wrong note.`)},
+    about:{wren:S(`Wren was always the brave cousin. She climbed the library roof once, just to read up there. I still don't know why.`,`Wren is the brave cousin. She read books on the roof.`),c_ottoline:S(`An archivist in Gearhaven who SHOUTS and then says sorry? Wren writes to her. I'm too shy to. Please don't tell her I exist.`,`A librarian who shouts? I'm too shy to write her.`),f_brynja:S(`Brynja can't read the old songs. She doesn't need to. She hums them. She's never once hummed a wrong note.`,`Brynja hums the old songs. Never a wrong note.`)},
     rumor:{t:S(`The archive says Rimeholm's bell, a stone on the sky isles and a drum in the Stonehorn hills all have words carved on them. The same tune, three times. Shh. Sorry. It's exciting.`,`A bell, a stone and a drum have the same song on them!`),hint:null,need:()=>f2pR('f_thaw')},
     loves:['honey'],hates:['fish'],
     deep:S(`Wren was always the brave cousin. I was the cousin under the table. Libraries have very good tables.`,`Wren was brave. I hid under tables. Good tables.`),
     secret:{t:S(`A copy of the old map of the north.`,`An old map of the north.`),reward:{reveal:true}},
     best:{t:S(`I'm adding you to the archive. Page one. Next to the Snow Mother.`,`You're in the archive now. Page one!`),reward:{bless:1}},
     chat:f2pChat(`(whispering) Can I ask? Have you ever been scared of a book?`,`Have you ever been scared of a book?`,
-      [`Yes. But the scary part ended.`,`Yes. But it ended.`,`It always ends. That's the kindest thing about books. Shh. Sorry. I'm emotional.`,`It always ends. That's kind. Sorry.`,0.5],
+      [`Yes. But the scary part ended.`,`Yes. But it ended.`,`It always ends. That's the kindest thing about books. (sniff) Shh. Sorry.`,`It always ends. That's kind. (sniff)`,0.5],
       [`Nope. Books should be scared of ME.`,`Books should fear ME.`,`(gasp) Don't say that in here. They're listening. ...I like you.`,`Shh! They're listening! I like you.`,1],
       [`Only a cookbook. It had snails.`,`A cookbook with snails.`,`Snails? In the BOOK? Oh. In the recipes. ...That's worse.`,`Snails? In recipes? That's worse!`,0.5],'brave')},
   f_pim:{bio:S('Runs the only cocoa stand in the north. A tiny businesswoman.','She sells cocoa. A tiny boss.'),
@@ -466,7 +466,7 @@ Object.assign(TALK,{
     loves:['fish'],hates:['moonlily'],
     deep:S(`My first letter was to my mother. I delivered it myself. She was in the next room. It still counts.`,`My first letter went to Mom. In the next room.`)},
   f_rasmus:{bio:S('The old smith of Rimeholm. Slow, deep, wise. Makes puns.','The old smith. Slow and wise. He likes puns.'),
-    about:{f_gunnhild:S(`Gunnhild. Best hands in the north. Too fast with them. Hmm. She'll learn. She's learning. She hums now. That's how you know.`,`Gunnhild has the best hands. She hums now. That's good.`),maren:S(`Maren of Emberhollow? Hmm. Gunnhild won't stop talking about her. Tell your mother the north says her fire is good. Very good. Hmm.`,`Tell your mom the north says her fire is good.`)},
+    about:{f_gunnhild:S(`Gunnhild. Best hands in the north. Too fast with them. Hmm. She'll learn. She's learning.`,`Gunnhild has the best hands. Too fast. She'll learn.`),maren:S(`Maren of Emberhollow? Hmm. Gunnhild won't stop talking about her. Tell your mother the north says her fire is good. Very good. Hmm.`,`Tell your mom the north says her fire is good.`)},
     loves:['fish'],hates:['moonlily'],
     deep:S(`I've made ten thousand nails, child. Every one held something up. Hmm. That's enough of a life, I think.`,`I made ten thousand nails. Each held something up.`)},
   f_hask:{bio:S('Fur trapper of the Pinewhisper. Talks to dogs more than people. Calls you pup.','A trapper. He talks to dogs. He calls you pup.'),
@@ -484,7 +484,7 @@ Object.assign(TALK,{
     about:{tamsin:S(`A singer in the south writes songs about you? Wheee! The wind loves songs. It steals the words and takes them to the mountains.`,`A singer writes songs about you? The wind loves songs!`),elka:S(`The sled girl! She asked me for a map of every wind ribbon down the Windscour. I gave her one. It blew away. She caught it. Wheee!`,`Elka wanted a wind map. It blew away. She caught it!`)},
     rumor:{t:S(`The Singing Stone on the little isle south-east of the temple is full of holes. Ride the wind past it and it sings. Old words. Very old. Wheee.`,`Ride the wind past the Singing Stone. It sings old words.`),hint:'f_lm_singing',need:()=>f2pR('f_sky')},
     loves:['honey'],hates:['moonlily'],
-    deep:S(`I was scared of heights when I joined the monks. They said, Pennant, the sky doesn't have a floor, so you can't fall off it. I don't know if that's true. I stopped checking.`,`I was scared of heights. The monks said the sky has no floor.`),
+    deep:S(`I was scared of heights when I joined the monks. They said, Pennant, the sky doesn't have a floor, so you can't fall off it. I don't know if that's true. I've never looked down long enough to find out.`,`I was scared of heights. The monks said the sky has no floor.`),
     secret:{t:S(`A wind feather from the temple roof. Hold it and your wings feel lighter. Wheee!`,`A wind feather. Your wings feel lighter!`),reward:{energy:15}},
     best:{t:S(`You're an honorary Wind Monk! You don't have to shave your head. Please don't. Here, a breath of the high wind.`,`You're a Wind Monk now! Here's some high wind.`),reward:{stamina:20}},
     chat:f2pChat(`Wheee! Sorry. Quick one. What does the wind sound like to you?`,`What does the wind sound like?`,
@@ -501,12 +501,12 @@ function f2pFuse(){ if(!G.flags.f_bombfuse||G.flags.f_bombfuse_bag) return; if(G
 // ---------- first meetings and everyday greetings in each person's own voice
 const F2P_FIRST={
   f_brynja:S(`There, there, old girl. Somebody's come to see you. ...Oh. You're the Emberblood. Come closer. Let me look at you. Skinny.`,`Oh! The Emberblood. Come here. Skinny!`),
-  f_brann:S(`HALT! State your name and whether you are a moth! ...Ash? The Emberblood? Carry on! Captain Brann Stoutmitt, Hearthwardens!`,`HALT! Are you a moth? No? Carry on! I'm Captain Brann!`),
+  f_brann:S(`HALT! State your name and whether you are a moth! ...Horns. A tail. Not a moth, then. Carry on! Captain Brann Stoutmitt, Hearthwardens!`,`HALT! Are you a moth? No? Carry on! I'm Captain Brann!`),
   f_toastwhistle:S(`A visitor! Welcome to Hearthold, where everything is fine! I'm Mayor Ottilie Toastwhistle. Everything is FINE.`,`Welcome! I'm Mayor Toastwhistle. Everything is fine!`),
-  f_gunnhild:S(`Hm. A dragon in my forge. A cold forge. Gunnhild Anvilheart. ...Wait. Maren's kid? MAREN'S KID?`,`I'm Gunnhild, the smith. Wait. Maren's kid?!`),
+  f_gunnhild:S(`Hm. A dragon in my forge. A cold forge. Gunnhild Anvilheart. ...Wait. That sword. That's MAREN'S work. You're Maren's kid? MAREN'S KID?`,`I'm Gunnhild. Wait. That's Maren's sword! You're her kid?!`),
   f_mags:S(`A DRAGON! A real warm one! Mags Sprocket, Gearhaven's third-best tinker. Can I measure your sparks?`,`A dragon! I'm Mags, a tinker. Can I measure your sparks?`),
   f_hilde:S(`Welcome to the Warm Mitten, dear! I'm Hilde. Sit. Soup. Don't sit on Biscuit. That's the cat.`,`Welcome! I'm Hilde. Sit. Soup. Mind the cat.`),
-  f_eider:S(`(whispering) Oh. Hello. Brother Eider. The archive. Sorry. You're very warm. The books like you already.`,`(whisper) Hello. I'm Eider. The books like you.`),
+  f_eider:S(`(whispering) Oh. Hello. I'm Brother Eider, and this is the archive. Sorry. You're very warm. The books like you already.`,`(whisper) Hello. I'm Eider. The books like you.`),
   f_pim:S(`Customer! Hot cocoa, three coins! I'm Pim. I own this stand. And one day, ALL the stands.`,`Customer! Cocoa, three coins! I'm Pim.`),
   f_soren:S(`Hey. Soren. I make sleds. You look like you'd go fast downhill. That's a compliment.`,`Hey. I'm Soren. I make sleds.`),
   f_fergus:S(`MITTENS! Oh, it's you! The dragon who thawed me! Fergus Fiddlesticks. Mittens for life, free, for you.`,`It's you! You thawed me! I'm Fergus. Free mittens!`),
@@ -516,12 +516,12 @@ const F2P_FIRST={
   f_tollef:S(`HELLO! TOLLEF! BELLRINGER! WHAT'S YOUR NAME? ...WHAT? NEVER MIND! HELLO!`,`HELLO! I'M TOLLEF! BELL RINGER!`),
   f_saga:S(`You're the dragon who thawed us. I'm Saga. I fish. I'm better at it than you. Probably.`,`I'm Saga. I fish. Better than you.`),
   f_sigrun:S(`You. Dragon. Sigrun. I cook. You eat. That's how this works.`,`I'm Sigrun. I cook. You eat.`),
-  f_bo:S(`Whoa, a dragon! I'm Bo. This is Steve. He's a snowball. Say hi, Steve.`,`A dragon! I'm Bo. This is Steve, my snowball.`),
+  f_bo:S(`Hi, dragon! I'm Bo. You met Steve already. Say hi again, Steve.`,`Hi! I'm Bo. Say hi again, Steve.`),
   f_nils:S(`Hello! Nils. Goats. Well, goat. Nisse. Don't turn your back on her.`,`Hello! I'm Nils. My goat is Nisse. Watch out.`),
-  f_oskar:S(`Oskar, Rimeholm post. A month late. A WHOLE month. Oh, hello. Sorry. I'm upset.`,`I'm Oskar, the mailman. A month late! Sorry.`),
+  f_oskar:S(`Oskar, Rimeholm post. A month late. A WHOLE month. Oh. Hello. Sorry. Thirty years, and never late until now.`,`I'm Oskar, the mailman. A month late! Sorry.`),
   f_rasmus:S(`Hmm. You're the warm one. Rasmus. Smith. Old one. Hmm.`,`Hmm. You're the warm one. I'm Rasmus.`),
   f_hask:S(`Hrm. Pup. Hask. This is my camp. Those are my tents. That was my kennel. Hrm.`,`Hrm. Pup. I'm Hask. This is my camp.`),
-  f_pennant:S(`Wheeee... oh! Hello! Brother Pennant, Wind Monk! Last one! Also the first. Wheee.`,`Hello! I'm Brother Pennant. Wheee!`),
+  f_pennant:S(`Wheeee... oh! Hello! Sorry, it slips out. Brother Pennant, the last Wind Monk of Skyreach!`,`Hello! I'm Brother Pennant. Wheee!`),
   f_mumble:S(`(very quietly) ...hello. Sorry. Hello. I'm Mumble.`,`(quietly) hello. Sorry. I'm Mumble.`)
 };
 const F2P_HELLO={
@@ -550,9 +550,14 @@ const F2P_HELLO={
   f_mumble:[S(`(quietly) hello again.`,`(quietly) hello.`),S(`(wave)`,`(wave)`)]
 };
 const F2P_NIGHT=[S(`Late, Ash. Keep near the lamps. The moths like the dark.`,`It's late. Stay near the lamps.`),S(`Can't sleep? Nobody can. That storm hums.`,`Can't sleep? The storm hums.`),S(`Mind the cold out there. It bites at night.`,`The cold bites at night.`)];
+// (people Ash has already met in a story scene are greeted as people he knows, not with their first-meeting line)
+const F2P_MET={f_brynja:['f_brynja'],f_brann:['f_gate'],f_eider:['f3_eider'],f_pim:['f3_pim'],f_ylva:['f3_ylva_wake'],f_pennant:['f3_pennant_meet'],
+  f_mumble:['mb_offer'],f_mags:['bm_offer'],f_gunnhild:['fg_offer'],f_hask:['dg_offer'],f_toastwhistle:['wm_offer'],f_rasmus:['rm_bluefire']};
+function f2pMetBefore(id){ try{ const sn=G.story&&G.story._seen; if(sn&&(F2P_MET[id]||[]).some(k=>sn[k])) return true;
+  if(id==='f_ylva'&&G.flags.f_ylva) return true; if(id==='f_brann'&&G.choices&&G.choices.f3_moth) return true; }catch(e){} return false; }
 { const base=greetLine; greetLine=function(id){
   if(!F2P_FIRST[id]) return base(id);
-  if(!(G.seenTalk&&G.seenTalk['met_'+id])) return F2P_FIRST[id];
+  if(!(G.seenTalk&&G.seenTalk['met_'+id])&&!f2pMetBefore(id)) return F2P_FIRST[id];
   const dg=deedGreet(id); if(dg) return dg;
   const f=typeof friendOf==='function'?friendOf(id):0;
   if(f>=5) return pick([S(`Ash! My favorite person in the whole north!`,`Ash! My favorite!`),S(`There's my best friend.`,`My best friend!`)]);
@@ -564,8 +569,8 @@ const F2P_NIGHT=[S(`Late, Ash. Keep near the lamps. The moths like the dark.`,`I
 const F2P_HOME_MOOD={
   ulf:()=>f2pQ('f_sled')?S(`Elka wrote me a letter. Her first one ever! It's mostly about how she lost a race. To you. She sounds very happy about it.`,`Elka wrote me! She lost a race to you. She sounds happy.`)
     :S(`Elka went up the pass on a sled. UP. If you see her, tell her to come home for supper. Any supper.`,`Elka sledded UP the pass. Tell her to come home for supper.`),
-  brisket:()=>S(`North? Over the pass? No. Once is plenty. I was a snowman for a WEEK. You go. Bring me back a story. A warm one.`,`Go north? No! I was a snowman for a week. You go.`),
-  yara:()=>S(`I'm reading Pebble's letters like a storybook, Ash. Do what Tove says.`,`I read Pebble's letters like a storybook. Listen to Tove.`)
+  brisket:()=>S(`North? Over the pass? No. Once is plenty. I was a block of ice for a WEEK. You go. Bring me back a story. A warm one.`,`Go north? No! I was a block of ice for a week. You go.`),
+  yara:()=>S(`Pebble tells me how you're getting on up there, Ash. Listen to Tove.`,`Pebble tells me how you are. Listen to Tove.`)
 };
 { const base=moodLine; moodLine=function(id){
   const F=G.flags, Q=f2pQ, C=G.choices||{};
@@ -631,7 +636,7 @@ B('f_yl1','id:f_ylva',ALWAYS,S(`Knit one, purl one. Knit one, purl one. Oh, both
 B('f_hsk1','id:f_hask',()=>!f2pQ('f_dogs'),S(`Hrm. Too quiet. A camp should have barking.`,`Too quiet. A camp needs barking.`));
 B('f_hsk2','id:f_hask',()=>f2pQ('f_dogs'),S(`Pepper. PEPPER. Drop the boot.`,`Pepper! Drop the boot!`),{r:['f_dog',S(`Woof!`,`Woof!`)]});
 // town barks: the dying Hearth, the blue Hearth, the frozen village, the moths, and later the moon
-B('f_hh1',F2P_HH,f2pCold,S(`My soup froze to the spoon. Then the spoon froze to my hand. Then my hand froze to my face. It was a long morning.`,`My soup froze. Then my spoon. Then my face.`));
+B('f_hh1',F2P_HH,f2pCold,S(`My soup froze on the spoon. And I was sitting right next to the Hearth!`,`My soup froze. Right next to the Hearth!`));
 B('f_hh2',F2P_HH,f2pCold,S(`Brr.`,`Brr.`));
 B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the Emberblood? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
 B('f_hh4',F2P_HH,f2pLit,S(`The Hearth is BLUE! I didn't know fire could be blue! I didn't know fire could be HAPPY!`,`The Hearth is BLUE! Fire can be happy!`),{d:'f_hearth'});
@@ -642,18 +647,18 @@ B('f_hh8',F2P_HH,()=>G.choices.f_glaciar==='free'&&G.choices.f_glaciar_home==='s
 B('f_hh9',F2P_HH,()=>(G.flags.f_frozen_n|0)>=6,S(`My cousin was frozen on the Glimmerfrost for a month! The dragon warmed her up! She owes the dragon cocoa now.`,`The dragon thawed my cousin!`));
 B('f_rh1',F2P_RH,ALWAYS,S(`Did you know we were frozen? Neither did we.`,`We were frozen? We didn't know!`));
 B('f_rh2',F2P_RH,ALWAYS,S(`I missed a month. Did anything good happen? Oh. A dragon kid happened. Good.`,`I missed a month. A dragon kid came. Good.`));
-B('f_rh3',F2P_RH,()=>f2pQ('f_rime'),S(`The bell rang this morning! The whole village came out to cheer! The fish did not.`,`The bell rang! We cheered! The fish didn't.`),{d:'q_f_rime'});
-B('f_hr1',F2P_HR+'|id:f_hask',()=>f2pQ('f_mumble'),S(`Did you hear that roar last night? The whole forest shook. Hrm. Good lad.`,`Did you hear that roar? Good lad.`));
+B('f_rh3',F2P_RH,()=>f2pQ('f_rime'),S(`The bell rings every morning again! The whole village comes out to cheer! The fish don't.`,`The bell rings again! We cheer! The fish don't.`),{d:'q_f_rime'});
+B('f_hr1',F2P_HR+'|id:f_hask',()=>f2pQ('f_mumble'),S(`Did you hear that roar in the Pinewhisper? The whole forest shook. Hrm. Good lad.`,`Did you hear that roar? Good lad.`));
 B('f_ft1',F2P_FT,()=>f2pMoon()<100,S(`Look at the moon. Somebody bit it. Who bites a MOON?`,`Somebody bit the moon!`));
 B('f_ft2',F2P_FT,()=>!!G.weapons&&!!G.weapons.bombs&&G.weapon==='bombs',S(`Are those BOMBS? Mags made you bombs? Stand over there. Further.`,`Are those bombs? Stand over there!`),{d:'wpn_bombs'});
 B('f_ft3',F2P_FT,()=>hasAbil('blaze'),S(`Your fire went BLUE! I saw it from my window! My window melted a bit!`,`Your fire went blue! My window melted!`),{d:'trial_blaze'});
 B('f_ft4',F2P_FT+'|kid',()=>hasAbil('windride'),S(`You RODE the WIND! Like a kite! Can I ride on your back?`,`You rode the wind! Can I ride too?`),{d:'trial_windride'});
 B('f_ft5',F2P_FT,()=>G.comp==='greymane'&&compNear('greymane'),S(`Is that a WOLF? A friendly wolf? A friendly ENORMOUS wolf?`,`A friendly giant wolf?!`));
 B('f_ft6',F2P_FT,()=>!!G.flags.pip&&!!G.flags.f_pip_warm&&pipNear(),S(`Your little dragon's tummy is glowing! Can I warm my hands on him?`,`Your little dragon's tummy glows!`));
-B('f_ft7',F2P_FT,()=>!!G.flags.act1_done,S(`You're the dragon kid from the south! The one who beat the fire mountain! The south sends stories up the pass sometimes.`,`You beat the fire mountain! We heard!`));
+B('f_ft7',F2P_FT,()=>!!G.flags.act1_done,S(`You're the dragon kid from the south! The one from the fire mountain! Mags brought up a Gearhaven paper all about you.`,`You're the dragon kid! We read about you!`));
 // Pip in the cold (ACT3 11): he sneezes sparks, chases snowflakes, and glows once he has learned Warm
 const F2P_PIP=[S('Mip! (Pip sneezes. Three tiny sparks fly out.)','Mip! (Pip sneezes sparks.)'),S('Mip mip! (Pip tries to catch a snowflake on his tongue. It melts before it lands.)','Mip! (Pip tries to catch snowflakes.)'),
-  S('Mrrp. (Pip burrows into your scarf. You are not wearing a scarf. Pip burrows anyway.)','Mrrp. (Pip hides from the cold.)'),S('Achoo! Mip. (A spark lands in the snow and fizzles.)','Achoo! Mip. (A spark fizzles.)')];
+  S('Mrrp. (Pip burrows into your collar, out of the wind.)','Mrrp. (Pip hides from the cold.)'),S('Achoo! Mip. (A spark lands in the snow and fizzles.)','Achoo! Mip. (A spark fizzles.)')];
 const F2P_PIPW=[S('Mip! (Pip’s tummy glows warm. Snowflakes fizz on it.)','Mip! (Pip glows warm.)'),S('Mip mip! (Pip warms your claws with his glowing tummy.)','Mip! (Pip warms your claws.)')];
 { const base=pipChirp; pipChirp=function(q){ try{ if(G&&G.mode==='story'&&!AREA&&curMap()===2&&Math.random()<0.45){ bubble(q,pick(G.flags.f_pip_warm&&Math.random()<0.5?F2P_PIPW:F2P_PIP),{kind:'pip',dy:-22}); csfx('chirp'); return; } }catch(e){} return base(q); }; }
 function f2pMoon(){ try{ return typeof moonLeft==='function'?moonLeft():(G.flags.moon==null?100:G.flags.moon); }catch(e){ return 100; } }
@@ -675,13 +680,13 @@ VCH('f_ch14','id:f_hask','id:f_mumble',()=>f2pQ('f_mumble'),[[0,S(`Hrm. Roar, la
 // greetings that react to what Ash did: in earlier acts and up here
 f2pDG({
   'done@f_gunnhild':[['any',S(`Maren's kid beat the fire mountain! I knew it. I said it. I said it to the anvil.`,`You beat the fire mountain! I told my anvil!`)]],
-  'done@f_brynja':[['any',S(`They say you put the old fire dragon in the south to rest. Good. Some fires need a long sleep.`,`You put the old dragon to rest. Some fires need sleep.`)]],
+  'done@f_brynja':[['any',S(`They say you climbed the fire mountain in the south and settled the old dragon there. Good. Some fires need settling.`,`You settled the old fire dragon. Good.`)]],
   'pip@f_hilde':[['any',S(`Is that a baby dragon? Oh, the little warm thing! Soup for him too!`,`A baby dragon! Soup for him too!`)]],
   'pip@f_bo':[['any',S(`You have a BABY dragon? Can Steve meet him? Gently?`,`A baby dragon! Can Steve meet him?`)]],
   'c_clock@f_mags':[['any',S(`You restarted the Great Clock in Gearhaven? I set my watch by that clock! Well. I set my bombs by it.`,`You fixed the Great Clock? I set my bombs by it!`)]],
   'q_c_bolt@f_mags':[['any',S(`You found Hettie's brass dog? Bolt? Cousin Hettie wrote me four pages about it. With diagrams.`,`You found Bolt? Hettie wrote me four pages!`)]],
   'wpn_whip@f_gunnhild':[['any',S(`That's a chain whip. Gearhaven work. Good links. I could make it better. I could make it BURN.`,`A chain whip! I could make it burn!`)]],
-  'ch_c_vesper_friend@f_mags':[['any',S(`They say you made friends with the Moth Mask. Your COUSIN? Families are so complicated. Mine just explodes.`,`The Moth Mask is your cousin? Families!`)]],
+  'ch_c_vesper_friend@f_mags':[['any',S(`They say the Moth Mask is your COUSIN? My family just explodes. Hettie's eyebrows never grew back.`,`The Moth Mask is your cousin? Families!`)]],
   'q_race@f_soren':[['any',S(`You beat Elka in a race once? On feet? Hey. Respect.`,`You beat Elka in a race? Respect.`)]],
   ch_greymane_ally:[[F2P_FT,S(`Is it true a giant grey wolf follows you? From the south? We saw paw prints as big as plates.`,`A giant wolf follows you? We saw huge paw prints!`)]],
   f_hearth:[[F2P_HH,S(`You woke the Great Hearth! She's BLUE! I've never seen anything like it!`,`You woke the Hearth! She's blue!`)]],
@@ -691,7 +696,7 @@ f2pDG({
   q_f_rime:[[F2P_RH,S(`The whole village is warm again! Thanks to you, dragon!`,`The whole village is warm! Thank you!`)]],
   q_f_bombs:[[F2P_HH,S(`Was that you? The big BOOM by the lake? Captain Brann fell out of his tower!`,`The big BOOM! Brann fell off his tower!`)]],
   q_f_sled:[[F2P_HH,S(`You beat Elka down the Windscour! In one go! Soren's been talking about it all day.`,`You beat Elka! Soren won't stop talking.`)]],
-  q_f_mumble:[[F2P_HR+'|'+F2P_HH,S(`Was that a ROAR in the Pinewhisper last night? My teacup jumped off the table.`,`Was that a roar? My cup jumped!`)]],
+  q_f_mumble:[[F2P_HR+'|'+F2P_HH,S(`Was that a ROAR in the Pinewhisper? My teacup jumped right off the table.`,`Was that a roar? My cup jumped!`)]],
   q_f_warm:[[F2P_HH,S(`The Warm Hands Medal! You've got the Mayor's medal! She made it herself. You can tell.`,`You got the Mayor's medal! She made it.`)]],
   q_f_dogs:[[F2P_HR,S(`Hask's dogs are home! The camp sounds right again. All that barking. Lovely.`,`Hask's dogs are home! Lovely barking.`)]],
   f_hush:[[F2P_FT,S(`The great white moth is gone? Truly? I'm going to open every window in my house. Then close them. It's cold.`,`The big moth is gone? I'll open my windows!`)]],
@@ -739,10 +744,10 @@ const F2P_INN={
   try{
     if(F2P_INN[id]) o.unshift({t:S('A bed, or something warm?','A bed, or something warm?'),tag:'shop',fn:()=>F2P_INN[id](),end:true});
     if(id==='f_brann'&&!G.quests.f_juniper&&qAvail('f_juniper')&&!G.flags.f_juniper_found) o.push({t:S('Have you seen a girl with a map case?','Seen a girl with maps?'),tag:'quest',fn:()=>later(0.2,()=>startQuest('f_juniper')),then:[f2pL('f_brann',`The map girl? Went out on the Shiversea floes last week! On FOOT! I said, miss, the ice moves! She said, then I'll map it moving! Brave! Or a moth! Probably brave!`,`She walked out on the sea ice! Brave! Or a moth!`),f2pL('f_brann',`North-west, past Rimeholm! Where the sea is all floes! Bring her back before her boots freeze!`,`Go north-west, past Rimeholm! Bring her back!`)],end:true});
-    if(id==='f_brann'&&f2pAt('f_warm',0)&&!G.flags.f_brann_list) o.push({t:S('Is anyone missing from the town?','Is anyone missing?'),tag:'quest',fn:()=>{ G.flags.f_brann_list=1; },then:[f2pL('f_brann',`Three of my Hearthwardens! One at the West Gate, one at the East Gate, frozen at their posts! And Sir Knut went to guard the Dreadmoor! Alone! Brave! Frozen!`,`Three guards are frozen! West Gate, East Gate, and one on the moor!`),f2pL('f_brann',`Also the milkman. And a girl who was ice skating. And the post. The post is ALWAYS late, but this is very late!`,`Also the milkman, a skater and the post!`)],back:true});
+    if(id==='f_brann'&&f2pAt('f_warm',0)&&!G.flags.f_brann_list) o.push({t:S('Is anyone missing from the town?','Is anyone missing?'),tag:'quest',fn:()=>{ G.flags.f_brann_list=1; },then:[f2pL('f_brann',`Two of my Hearthwardens, frozen at their posts! One at the West Gate, one at the East Gate! And Sir Knut took his whole patrol up the Dreadmoor! Six blue plumes! Not one came home!`,`Two guards froze at the gates! Knut's patrol never came home!`),f2pL('f_brann',`Also the milkman. And a girl who was ice skating. And the post. The post is ALWAYS late, but this is very late!`,`Also the milkman, a skater and the post!`)],back:true});
     if(id==='f_mags'&&f2pAt('f_bombs',3)&&!G.flags.f_bombs_test&&!f2pTestBombHeld()) o.push({t:S('Can I have another test bomb?','Another test bomb?'),tag:'quest',fn:()=>later(0.2,f2pGiveTestBomb),then:[f2pL('f_mags',`You lost it? Did it go BOOM? Was it a GOOD boom? Here. Aim for the Big Boulder this time. On the old Quarry Road, by the lake.`,`Lost it? Here's another. Aim for the Big Boulder!`)],end:true});
     if(id==='f_oskar'&&f2pThawed('f_oskar')&&!G.flags.f_letter_brynja&&!f2pQ('f_song')) o.push({t:S('I can take your letter to Brynja.','I can take the letter to Brynja.'),tag:'quest',fn:()=>{ G.flags.f_letter_brynja=1; giveItems({f_snowletter:1}); },then:[f2pL('f_oskar',`You'd deliver it? For me? A month late is better than two months late. Here. Snowflake stamp. Very old. Careful with the corners.`,`You'll deliver it? Thank you! Careful with the corners.`)],back:true});
-    if(id==='f_brynja'&&G.items.f_snowletter&&!G.flags.f_letter_read) o.push({t:S('Oskar the mailman sent you a letter.','Oskar sent you a letter.'),tag:'quest',fn:()=>{ G.flags.f_letter_read=1; takeItems({f_snowletter:1}); f2pCalm(()=>{ if(qAvail('f_song')) offerQuest('f_song'); }); },then:[f2pN(`Brynja breaks the old seal. The paper is yellow and soft as cloth.`,`Brynja opens the old letter.`),f2pL('f_brynja',`"To the Hearthkeeper. If the fire ever runs low, remember the Snow Mother's Song. She will." ...It's my mother's writing. She sent this to Rimeholm sixty years ago. It's been in the post ever since.`,`It's from my mom! "If the fire runs low, remember the Snow Mother's Song."`)],end:true});
+    if(id==='f_brynja'&&G.items.f_snowletter&&!G.flags.f_letter_read) o.push({t:S('Oskar the mailman sent you a letter.','Oskar sent you a letter.'),tag:'quest',fn:()=>{ G.flags.f_letter_read=1; takeItems({f_snowletter:1}); f2pCalm(()=>{ if(qAvail('f_song')) offerQuest('f_song'); }); },then:[f2pN(`Brynja breaks the old seal. The paper is yellow and soft as cloth.`,`Brynja opens the old letter.`),f2pL('f_brynja',`"To the Hearthkeeper. If the fire ever runs low, remember the Snow Mother's Song. She will." ...It's my mother's writing. Sixty years this has been in the post.`,`It's from my mom! "If the fire runs low, remember the Snow Mother's Song."`)],end:true});
     if(id==='f_hask'&&f2pQ('f_dogs')&&!f2pSledCross()) o.push({t:S('Can your sled take me somewhere?','Can your sled take me?'),tag:'travel',fn:()=>f2pCalm(()=>f2pSledMenu('rest')),end:true});
     if(id==='juniper'&&f2pAct3()&&G.flags.f_juniper_found&&!G.flags.f_juniper_home&&!F2P.esc) o.push({t:S('Ready to go back to shore?','Ready to go to shore?'),tag:'quest',fn:()=>later(0.2,f2pEscortStart),then:[f2pL('juniper',`Ready. Walk slowly. My boots are full of sea.`,`Ready. Walk slowly.`)],end:true});
     if(id==='f_nils'&&f2pThawed('f_nils')&&G.quests.duchess&&G.quests.duchess.done&&!G.seenTalk.f_nils_duchess) o.push({t:S('I know a goat in the south called Duchess.','I know a goat called Duchess.'),key:'f_nils_duchess',then:[f2pL('f_nils',`Duchess? A goat in the south? Is she single? Nisse is asking.`,`Duchess? Is she single? Nisse asks.`),['f_nisse',S(`Meh.`,`Meh.`)],f2pL('f_nils',`That's a very interested meh.`,`That's an interested meh.`)],back:true});
@@ -949,7 +954,7 @@ const F2P_FROZEN=[
   {id:'f_frz_postman',name:S('a postman','a postman'),x:1950,y:42800,coins:25,look:f2pLk('#e6b494','#8a5a2a',{hairdo:'short',outfit:'coat',shirt:'#3a4a7a',low:'#2a3a5a',hat:'cap',hatc:'#3a4a7a',bag:'#7a5a32'}),
     line:S(`Special delivery! For... the fish? I think I got lost.`,`Special delivery! For the fish? I'm lost.`),after:S(`Don't tell Oskar in Rimeholm. He'll write me a strongly worded letter. He loves those.`,`Don't tell Oskar. He'll write me a letter.`)},
   {id:'f_frz_knight',name:S('Sir Knut of the Hearthwardens','Sir Knut'),x:6500,y:44400,coins:30,look:f2pLk('#f0c8a8','#e8c060',{hairdo:'short',outfit:'armor',helm:true,plume:'#c83a2a',cape:'#7a2a2a',hold:'sword',build:'tall'}),
-    line:S(`The Dreadgate! It's... still closed. Good. I'll just stand here a bit more. Not frozen. Just brave.`,`The Dreadgate is still shut. Good. I'll stand here. Bravely.`),after:S(`I am guarding the moor. From over here. Bravely. Next to the warm dragon.`,`I'm guarding the moor. Bravely. Near you.`)},
+    line:S(`My patrol! Where's my patrol? They were right behind me when the purple snow came down!`,`Where is my patrol? The purple snow came!`),after:S(`I'll guard the moor until my patrol comes home. Bravely. Next to the warm dragon.`,`I'll guard the moor till they come home.`)},
   {id:'f_frz_kid',name:S('a sledding kid','a sledding kid'),x:7900,y:48150,coins:15,kid:true,look:f2pLk('#c8946c','#2a1a10',{hairdo:'spiky',outfit:'coat',shirt:'#3a8a5a',low:'#3a3a4a',hat:'beanie',hatc:'#c84a3a',mittens:'#c84a3a',sled:true}),
     line:S(`WHEEEEE... eee? Why did I stop? I was going SO fast.`,`WHEEE... Why did I stop? I was SO fast!`),after:S(`Again! AGAIN! Soren, push me again!`,`Again! Push me again!`)},
   // Rimeholm (ACT3 4.2): Ylva is the main story (6.6); the others are Rimeholm, One Thaw at a Time (10.5)
@@ -1217,7 +1222,7 @@ function f2pStoneTry(byWind){
   if(!f2pOn('f_song')||G.flags.f_v2) return false;
   F2P.stoneT=G.time;
   f2pSay([f2pN(byWind?`The wind rushes through the holes in the Singing Stone, and it sings. A low, clear tune, and words glowing one by one along its side.`:`You beat your wings hard. The wind swirls round the stone, through every hole, and it sings. Words glow along its side.`,`The wind blows through the stone. It sings! Words glow on it.`),...f2pVerse(F2P_V2),
-    ['tove',S(`"Auntie." Ash. Ember had an auntie. Why does that make me feel so warm?`,`"Auntie." Ember had an auntie. That makes me feel warm.`)]],()=>f2pVerseGot(2));
+    ['tove',S(`"Auntie." Ember's auntie again, Ash. She turns up everywhere we go up here.`,`Ember's auntie again! She is everywhere up here.`)]],()=>f2pVerseGot(2));
   return true;
 }
 function f2pStoneAct(o){

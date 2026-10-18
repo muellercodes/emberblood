@@ -497,8 +497,8 @@ f2sDef('f_night',[
 ]);
 // Tove's "where now" hints (bible 6.14): the journal Hint button and Yara's talk
 STORY.f_hints={
-  f_snow:S(`Frostpine Lodge, in the far north-west of Embermere. Ulf will know about the pass. (I can't see it from in here. I'm just guessing. I'm very good at guessing.)`,`Go to Frostpine Lodge, far north-west. Ask Ulf about the pass.`),
-  f_pass:S(`Up the High Pass, then follow the White Road east to Hearthold. Look for the town with the wall. And the smoke. And the warmth. Mostly the warmth.`,`Climb the High Pass. Follow the White Road east to Hearthold.`),
+  f_snow:S(`Frostpine Lodge, in the far north-west of Embermere. Ulf will know about the pass.`,`Go to Frostpine Lodge, far north-west. Ask Ulf about the pass.`),
+  f_pass:S(`Up the High Pass, then follow the White Road east to Hearthold. Look for the town with the round wall and the chimney smoke.`,`Climb the High Pass. Follow the White Road east to Hearthold.`),
   f_hearth:S(`The Hearthkeeper is at the Great Hearth, right in the middle of town. Big fireplace. Can't miss it.`,`The Hearthkeeper is at the Great Hearth, in the middle of town.`),
   f_maze:S(`The North Gate is frozen shut. Ask Captain Brann at the West Gate for the way round to the Glacier Maze.`,`The North Gate is frozen. Ask Captain Brann the way round.`),
   f_kindle:S(`Hold your fire breath until it turns blue and give it to the Great Hearth. Don't be shy.`,`Hold your fire until it turns blue. Give it to the Hearth.`),
@@ -507,13 +507,13 @@ STORY.f_hints={
   f_gap:S(`The wind ribbons on the Windscour's north rim cross the Howling Gap. Stonehorn Deep is the giant ram skull.`,`Ride the wind ribbons over the Howling Gap. Find the giant ram skull.`),
   f_deep:S(`Deep in the Stonehorn halls. Pound everything that looks cracked.`,`Pound everything that looks cracked.`),
   f_dreadgate:S(`Those doors won't open for asking. Look at the Frost Lock, and look up at the mountain. Then think.`,`Look at the lock. Look up at the mountain. Think.`),
-  f_dread:S(`Up through the mountain. Melt every chain. I'm right here with you. Shivering.`,`Go up through the mountain. Melt every chain.`),
+  f_dread:S(`Up through the mountain. Melt every chain. I'm right here with you.`,`Go up through the mountain. Melt every chain.`),
   f_glaciar:S(`She's on the summit. Melt the four chains, Ash. She's not bad. She's under a spell.`,`She's on top. Melt the four chains. She's under a spell.`)
 };
 // Tove's line in Yara's talk: the story data's own hint for the step Ash is on when the data owns the stage (the data's
 // hints say where to look and never a Case Book answer), else the table above
 function f2sToveHint(){ let h=''; try{ const D=typeof stageDef==='function'?stageDef(G.stage):null; if(D&&D._s10&&typeof D.hint==='function') h=D.hint()||''; }catch(e){ console.error(e); } return h||STORY.f_hints[G.stage]||STORY.f_hints.f_snow; }
-STORY.f_yara=S(`I'm reading Pebble's letters like a storybook, Ash. Do what Tove says.`,`I read Pebble's letters like a storybook. Do what Tove says.`);
+STORY.f_yara=S(`Pebble tells me how you're getting on up there, Ash. Listen to Tove.`,`Pebble tells me how you are. Listen to Tove.`);
 
 // ---------- 4. the dungeon story lines (bible section 7), played by the dungeon helpers (x2_dun_a, x2_dun_b).
 // Pass f2sDunStory(id) as defineDungeon's `story` (or play any key with f2sPlay(key)); F2STORY.md lists each key.
@@ -707,13 +707,14 @@ const F2S_TAUNTS={
   f_grumblehorn:[S('HRRRMPH!','HRRRMPH!'),S(`Get off my lawn! I don't have a lawn! Get off it anyway!`,`Get off my lawn!`),S('My HORNS!','My HORNS!')],
   f_hush:[S('Shhhh.','Shhhh.'),S('Too loud, too loud.','Too loud!'),S('Rest, little ember.','Rest, little ember.')], f_hush_lamp:[S('Ooooh. Prettyyy.','Ooooh. Pretty.')],
   f_glaciar:[S('Sleep, little ember. Sleep under the snow.','Sleep under the snow.'),S('The Mother says cold is kind.','The Mother says cold is kind.'),S('The long night is coming. Lie down.','The long night is coming.')],
-  f_glaciar_chain:[S(`...Fire? Warm fire? I knew a little girl with fire like that...`,`Fire? I knew a little girl with fire like that...`),
-    S(`The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.`,`The Mother says... no. NO. Who IS the Mother?`),
+  // (the same words as x2_foes' F2_CHAIN_LINES, full and simple: f2sSay does not repeat a line the foe module just said)
+  f_glaciar_chain:[S(`...Fire? Warm fire? I knew a little girl with fire like that...`,`Fire? Warm fire? I knew a girl with fire like that...`),
+    S(`The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.`,`Who is the Mother? I have a brother. A loud one.`),
     S(`Little one. Your horns. You have her horns. Ember's horns!`,`Your horns! You have Ember's horns!`),
-    S(`The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!`,`The Shard is in my heart! Get it OUT, dumpling! Mind my tail!`)],
+    S(`The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!`,`The Shard is in my heart! Get it out, dumpling!`)],
   f_glaciar_warn:[S('Duck, dumpling!','Duck!'),S('Jump!','Jump!'),S('Mind your head!','Mind your head!')],
   tove_glaciar:[S('Melt the chains!','Melt the chains!'),S('Up on the ledge! Climb!','Climb up the ledge!'),S('The vent! Ride it to the slab!','Ride the vent up!'),S('Her chest! Hit the Shard!','Hit the Shard!')],
-  nyxara_n9:S('Sleep, little cold one. Be cold for me.','Sleep, cold one.'),
+  nyxara_n9:S('Sleep, little cold one. Be cold for me.','Sleep, cold one. Be cold for me.'),
   f_blubberton:[S('I say! Unhand my hall, you scaly scamp!','Leave my hall!'),S('Tally ho!','Tally ho!'),S('Ow! Most rude!','Ow! Rude!')],
   f_squall:[S('Whoosh!','Whoosh!')], f_squeak:[S('Wheeee-hee!','Wheeee-hee!')], f_squalls:[S(`Tag, you're IT!`,`Tag, you're IT!`)],
   f_rockjaw:[S('ROLL ROLL ROLL!','ROLL ROLL ROLL!'),S(`I'm not round, I'm big-boned!`,`I'm big-boned!`)],
@@ -913,7 +914,7 @@ onTalk(n=>{
   if(!f2sOn()) return false;
   const F=G.flags;
   if(n.id==='yara'&&!F2ST.yara[G.stage]){ F2ST.yara[G.stage]=1; f2sPlay([['yara',STORY.f_yara],['tove',f2sToveHint()]]); return true; }
-  if(n.id==='c_vesper'&&n.f2sGate){ f2sPlay([xl('c_vesper',`Nobody gets past me, cousin. Not a moth, not a mouse. I checked the mouse twice.`,`Nobody gets past me. Not a moth. Not a mouse.`),
+  if(n.id==='c_vesper'&&n.f2sGate){ f2sPlay([xl('c_vesper',`Nobody gets past me, cousin. I know every way into a place. I've used most of them.`,`Nobody gets past me, cousin.`),
     f2sIf('c_vesper',`Go on up. Bring your auntie home.`,`Go on up. Bring your auntie home.`,()=>!G.choices.f_glaciar)]); return true; }
   return false;
 });
@@ -1199,8 +1200,8 @@ function f2sFoeHooks(){
 // Tove's little nudges on the main path, once each (top of the screen), where a kid is most likely to get stuck
 const F2S_NUDGE=[
   {k:'f_nudge_tower',st:['f_thaw'],at:{x:1950,y:46860},r:230,when:()=>!f2sYlvaThawed()&&f2sElev()<3,line:S(`Granny's on top of the bell tower. The south side has handholds. Climb!`,`Climb the bell tower. The south side has handholds.`)},
-  {k:'f_nudge_gap',st:['f_gap'],at:{x:10000,y:44450},r:260,when:()=>!G.flags.f_gap_crossed,line:S(`See the swirl at the vent? Jump into it. The wind ribbon does the rest. Don't look down. I'm looking down. Don't.`,`Jump into the swirl at the vent. The wind carries you!`)},
-  {k:'f_nudge_vent',st:['f_dreadgate'],at:{x:8800,y:44450},r:260,when:()=>f2sSeen('f_dreadgate')&&!G.flags.f_drum,line:S(`This is the Wind Road. Jump into the swirl and ride it all the way up to the drum.`,`Jump into the swirl. Ride up to the drum!`)},
+  {k:'f_nudge_gap',st:['f_gap'],at:{x:10000,y:44450},r:260,when:()=>!G.flags.f_gap_crossed,line:S(`See the swirl at the vent? Jump in, and the wind ribbon does the rest. Don't look down. I just did. I wish I hadn't.`,`Jump into the swirl at the vent. The wind carries you!`)},
+  {k:'f_nudge_vent',st:['f_dreadgate'],at:{x:8800,y:44450},r:260,when:()=>f2sSeen('f_dreadgate')&&!G.flags.f_drum,line:S(`This is the Drum Wind. Jump into the swirl and ride it all the way up to the drum.`,`Jump into the swirl. Ride up to the drum!`)},
   {k:'f_nudge_drum',st:['f_dreadgate'],at:{x:8350,y:43380},r:200,when:()=>!G.flags.f_drum,line:S(`That's the drum. Jump, then slam down on it. Like a sack of anvils!`,`Jump, then slam down on the drum!`)}
 ];
 function f2sNudgeTick(){
@@ -1535,15 +1536,15 @@ function f2sRender(list){
 const F2S_MAIL={
   f_pb_1:{from:'maren',quiet:true,when:()=>false,lines:()=>STORY.f_intro,then:()=>f2sIntroDone()},
   f_pb_2:{from:'maren',quiet:true,when:()=>reached('f_kindle'),lines:()=>[
-    xl('narr',`Pebble lands on your head. Another letter. Another coin. She's starting a collection.`,`Pebble lands on your head. A letter. A coin. She collects them.`),
-    xl('maren',`(the letter) Yara's crow says you have BLUE fire now. Ash. Your grandmother had blue fire once. She set the river on fire. Rivers are not supposed to burn.`,`You have BLUE fire? Grandma set a river on fire once. Rivers should not burn.`),
+    xl('narr',`Pebble lands on your head with another letter, and takes another coin. She must have quite a pile by now.`,`Pebble brings a letter. She takes a coin. Again.`),
+    xl('maren',`(the letter) Ash. Yara says you have BLUE fire now. Pebble told her. Don't ask me how. Your grandmother had blue fire once. She set the river on fire. Rivers are not supposed to burn.`,`Yara says you have BLUE fire! Grandma set a river on fire once.`),
     xl('maren',`Please don't set any rivers on fire. If you do, put them out. Eat something. Love, Mom. P.S. Bertram says the frozen buns make excellent paperweights. He's selling them.`,`Don't set rivers on fire. Eat something. Love, Mom. P.S. Bertram sells frozen buns as paperweights.`),
     xl('maren',`P.P.S. The bakery exploded. Unrelated.`,`P.P.S. The bakery exploded. Not your fault.`),
     f2sIf('maren',`P.P.P.S. Tikka sent you a lumpy bun. It froze. It is still lumpy. Lumpy means love, she says.`,`P.P.P.S. Tikka sent a lumpy bun. It froze. Lumpy means love.`,()=>G.flags.tk_home==='baker')]},
   f_pb_3:{from:'maren',when:()=>reached('f_dreadgate'),lines:()=>[
-    xl('maren',`(the letter) Ash. Yara says you are about to climb a mountain to visit your AUNT. I didn't know you had an aunt. I didn't know I had an aunt-in-law. I'm going to need a minute.`,`Yara says you will visit your AUNT on a mountain. I need a minute.`),
+    xl('maren',`(the letter) Ash. Yara says you are about to climb a mountain to visit your AUNT. If she's your auntie, she's mine too, a few greats back. Nobody tells me anything.`,`Yara says you will visit your AUNT on a mountain. She's my auntie too!`),
     xl('maren',`Be polite. Take your hat off indoors. If she offers you tea, drink it, even if it's made of ice. Love, Mom.`,`Be polite. Hat off indoors. Drink her tea, even ice tea. Love, Mom.`),
-    xl('maren',`P.S. Wendel wrote a new song about you. It rhymes "Ash" with "succotash". I'm so sorry.`,`P.S. Wendel's new song rhymes "Ash" with "succotash". Sorry.`),
+    xl('maren',`P.S. Wendel wrote a new song about you. It rhymes "Ash" with "succotash". I've asked him to stop.`,`P.S. Wendel's new song rhymes "Ash" with "succotash".`),
     f2sIf('maren',`P.S. Grandpa wants me to tell her he says hello. He also says "she started it." I don't know what that means.`,`P.S. Grandpa says hello. And "she started it."`,()=>f2sEnding()==='lantern')]},
   f_pb_4:{from:'dell',when:()=>!!G.flags.f_done,lines:()=>[
     xl('dell',`Dear Ash. I bought a SEA boat in Gearhaven. I have not lost it yet. It has been four days.`,`Dear Ash. I bought a SEA boat. I have not lost it yet!`),

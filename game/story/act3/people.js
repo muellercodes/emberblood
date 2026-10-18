@@ -145,7 +145,7 @@ people({
 
     f_gunnhild: [
       { if: 'quest f_forge done', once: true,
-        say: ["My forge has been hot every day since. Tell your mother. No, don't. Yes. Tell her it's HOT.", 'My forge is hot every day. Tell your mom!'] },
+        say: ["My forge has been hot every day since. I wrote your mother a letter about it. Four pages. I haven't sent it.", 'My forge is hot! I wrote your mom. I did not send it.'] },
       { if: 'quest f_forge active flag f_forge_lit !item f_starfrost', fact: 'f3s_forge=lit',
         say: ['Starfrost! Blue ore. It grows where fire meets frost. Old bones in the Stonehorn hills, I hear. Knock hard.', 'Bring blue starfrost. Knock on old bones!'] },
       { if: '!flag f_forge_lit', fact: 'f3s_forge=cold',

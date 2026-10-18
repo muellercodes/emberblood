@@ -156,7 +156,7 @@ defineDungeon('f_maze',{name:S('The Glacier Maze','The Glacier Maze'),level:14,t
     {id:'1',name:S('The Ice Halls','The Ice Halls'),map:{rooms:{
       a:{at:[1,2],kind:'start',tpl:D2A_M.a,frost:D2A_M.aF,noPots:true,
          frozen:{'1,5':{id:'f_hjalmar',flag:'f_thaw_hjalmar',name:S('Hjalmar the explorer','Hjalmar'),look:d2aLook('f_hjalmar',D2A_HJ),coins:40,leave:true,face:0.3}},
-         sign:S('THE GLACIER MAZE. Mind your feet. Mind your tail. Mind everything.','THE GLACIER MAZE. Mind your feet!')},
+         sign:S('THE GLACIER MAZE. Mind your feet on the ice, and mind your tail in the doors.','THE GLACIER MAZE. Mind your feet!')},
       f:{at:[2,2],kind:'secret',tpl:D2A_M.f,noDecor:true,props:[['jar',2,1],['jar',4,1],['jar',8,1],['jar',12,1],['jar',4,9],['jar',10,9],['sack',2,3],['sack',12,7]]},
       b:{at:[1,1],kind:'fight',tpl:D2A_M.b,foes:[['f_rimehound',2],['f_snowgob',2]],noPots:true,noDecor:true},
       c:{at:[0,1],kind:'free',tpl:D2A_M.c,foes:[['f_stalagbat',3]],loot:['skey'],noPots:true},
@@ -617,7 +617,7 @@ function d2aSigridKey(A,o,quiet){ if(AREA!==A) return; const id=`cv_${A.d2a.SK}_
           if(!d2aSeen('f_maze_pantry')) d2aPlay('f_maze_pantry',tail); else tail(); return true; }
         G.found[o.id]=true; X.solid.delete(k); A.objs=A.objs.filter(q=>q!==o&&q!==o.vis); addCoins(60,o.x,o.y); G.pipTreats=Math.min(3,(G.pipTreats||0)+1); jingle('item','chest');
         setBanner(S('A mammoth steak!','A mammoth steak!'),S('Pip will be thrilled. (+60 coins, and a treat for Pip.)','For Pip! (+60 coins)'),2.6); saveGame(); return true; }
-      case 'altar': if(X.heartChest&&!G.found[X.heartChest.id]&&!trialDone(X.root)){ d2aSay([['ember',S(`Not yet, little ember. Open the big chest first. It's yours.`,`Open the big chest first!`)]]); return true; } break;
+      case 'altar': if(X.heartChest&&!G.found[X.heartChest.id]&&!trialDone(X.root)){ d2aSay([['ember',S(`Not yet, Ash. Open the big chest first. It's yours.`,`Open the big chest first!`)]]); return true; } break;
     }
     return base.apply(this,arguments); }; }
 // the hats: a frosty bobble hat (the Ice Dam's island chest), a little saffron monk cap (Skyreach's hat room)
