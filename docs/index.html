@@ -155,6 +155,24 @@ body.padnav .dlg:focus{outline:none;animation:none}
 #settings .setrow{flex-wrap:wrap}
 #settings .setrow>span{flex:1 1 150px;min-width:0}
 #settings .setrow>.seg,#settings .setrow>.btn{margin-left:auto}
+/* v11: the volume sliders (Settings > Music and Sounds) and the difficulty row. --f (0 to 1) is the slider's value: the
+   ember fill runs to the middle of the knob. */
+#settings .setrow>.vsl{margin-left:auto}
+#settings .setvol>span{flex:1 1 80px}
+.vsl{--tw:22px;display:flex;align-items:center;gap:10px;flex:1 1 200px;min-width:170px;max-width:270px}
+.vsl input[type=range]{--f:1;-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:32px;margin:0;padding:0;background:transparent;cursor:pointer;touch-action:none;border-radius:10px}
+.vsl input[type=range]::-webkit-slider-runnable-track{box-sizing:border-box;height:10px;border-radius:6px;border:1px solid var(--edge);background:linear-gradient(90deg,var(--hot-a),var(--ember)) 0 0/calc(var(--tw)/2 - 1px + (100% - var(--tw) + 2px)*var(--f)) 100% no-repeat,#170b08;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.vsl input[type=range]::-moz-range-track{box-sizing:border-box;height:10px;border-radius:6px;border:1px solid var(--edge);background:linear-gradient(90deg,var(--hot-a),var(--ember)) 0 0/calc(var(--tw)/2 - 1px + (100% - var(--tw) + 2px)*var(--f)) 100% no-repeat,#170b08;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.vsl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:var(--tw);height:var(--tw);margin-top:-7px;border-radius:50%;border:2px solid #2a130d;background:radial-gradient(circle at 38% 34%,#fff4cf 0,#ffc35a 42%,#e8521f 100%);box-shadow:0 0 10px rgba(255,150,60,.55),0 2px 4px rgba(0,0,0,.5);transition:transform .08s}
+.vsl input[type=range]::-moz-range-thumb{box-sizing:border-box;width:var(--tw);height:var(--tw);border-radius:50%;border:2px solid #2a130d;background:radial-gradient(circle at 38% 34%,#fff4cf 0,#ffc35a 42%,#e8521f 100%);box-shadow:0 0 10px rgba(255,150,60,.55),0 2px 4px rgba(0,0,0,.5)}
+.vsl input[type=range]:active::-webkit-slider-thumb{transform:scale(1.12)}
+.vsl input[type=range]:focus:not(:focus-visible){outline:none}
+.vsl input[type=range]:focus-visible,body.padnav .vsl input[type=range]:focus{outline:2px solid var(--gold);outline-offset:3px}
+.vsl input[type=range]:focus-visible::-webkit-slider-thumb,body.padnav .vsl input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(255,195,90,.35),0 0 16px rgba(255,150,60,.9)}
+.vsl output{min-width:2.4em;text-align:right;font-weight:700;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.setvol.off .vsl output{color:var(--muted)}
+.setrow small.setlock,.setrow small.setmuted{color:var(--gold)}
+#setDiff button:disabled{opacity:.45;cursor:not-allowed}
 #setPadBox .setnote{margin:6px 0 2px;font-size:13px;text-align:left;color:var(--muted)}
 @media (max-width:600px){#howPadCv{display:none}.padkeys .pk{text-align:left}}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted)}
@@ -251,6 +269,16 @@ html.sb .panel.skp .seg button[aria-pressed="true"],html.sb .panel.lgp .seg butt
 html.sb .setrow{border-bottom:2px dashed rgba(59,34,51,.16)}
 html.sb .setrow>span{color:#3b2233;font-weight:600}
 html.sb .setsec{color:#c8542a}
+html.sb .vsl{--tw:26px}
+html.sb .vsl input[type=range]::-webkit-slider-runnable-track{height:14px;border:3px solid #3b2233;border-radius:9px;background:linear-gradient(180deg,#ffb85a,#f07a34) 0 0/calc(var(--tw)/2 - 3px + (100% - var(--tw) + 6px)*var(--f)) 100% no-repeat,#ffeccb;box-shadow:0 2px 0 #3b2233}
+html.sb .vsl input[type=range]::-moz-range-track{height:14px;border:3px solid #3b2233;border-radius:9px;background:linear-gradient(180deg,#ffb85a,#f07a34) 0 0/calc(var(--tw)/2 - 3px + (100% - var(--tw) + 6px)*var(--f)) 100% no-repeat,#ffeccb;box-shadow:0 2px 0 #3b2233}
+html.sb .vsl input[type=range]::-webkit-slider-thumb{margin-top:-9px;border:3px solid #3b2233;background:linear-gradient(180deg,#fffaf0,#ffe3a8);box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 3px 0 #3b2233}
+html.sb .vsl input[type=range]::-moz-range-thumb{border:3px solid #3b2233;background:linear-gradient(180deg,#fffaf0,#ffe3a8);box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 3px 0 #3b2233}
+html.sb .vsl input[type=range]:focus-visible,html.sb body.padnav .vsl input[type=range]:focus{outline-color:#e0782c}
+html.sb .vsl input[type=range]:focus-visible::-webkit-slider-thumb,html.sb body.padnav .vsl input[type=range]:focus::-webkit-slider-thumb{box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 3px 0 #3b2233,0 0 0 4px rgba(224,120,44,.45)}
+html.sb .vsl output{color:#3b2233}
+html.sb .setvol.off .vsl output{color:#7a5560}
+html.sb .setrow small.setlock,html.sb .setrow small.setmuted{color:#c8542a;font-weight:600}
 html.sb .keys kbd{background:#ffe3a8;color:#3b2233;border:2px solid #3b2233;border-bottom-width:3px}
 html.sb .stat{background:rgba(59,34,51,.07);border:2px solid rgba(59,34,51,.18)}
 html.sb .stat b{color:#3b2233}
@@ -579,8 +607,9 @@ html.sb #padToast span{color:#6a4a52}
 <div id="settings" class="ov dim">
   <div class="panel">
     <h2>Settings</h2>
-    <div class="setrow"><span>Sound effects</span><div class="seg" id="setSfx" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
-    <div class="setrow"><span>Music</span><div class="seg" id="setMusic" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    <div class="setrow" id="setDiffRow"><span>Difficulty<small id="setDiffNote">Easy: gentler foes, more healing. Normal: a real fight. Hard: fast, fierce foes.</small><small class="setlock" id="setDiffLock" hidden>Locked during an Arena run, so the leaderboard stays fair. Change it on the title screen.</small></span><div class="seg" id="setDiff" role="group" aria-label="Difficulty"><button type="button" data-v="0" aria-pressed="false">Easy</button><button type="button" data-v="1" aria-pressed="false">Normal</button><button type="button" data-v="2" aria-pressed="false">Hard</button></div></div>
+    <div class="setrow setvol"><span>Music<small class="setmuted" id="setMusicMuted" hidden>Muted. Move the slider to turn it back on.</small></span><div class="vsl"><input type="range" id="setMusicVol" min="0" max="100" step="5" value="100" aria-label="Music volume"><output id="setMusicVal" for="setMusicVol">100</output></div></div>
+    <div class="setrow setvol"><span>Sounds<small class="setmuted" id="setSfxMuted" hidden>Muted. Move the slider to turn it back on.</small></span><div class="vsl"><input type="range" id="setSfxVol" min="0" max="100" step="5" value="100" aria-label="Sound effects volume"><output id="setSfxVal" for="setSfxVol">100</output></div></div>
     <div class="setrow"><span>Damage numbers</span><div class="seg" id="setNums" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Touch controls<small>For phones and tablets. One hand puts every button under one thumb, on the side set by Handed.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" id="setTouchOne" aria-pressed="false">One hand</button></div></div>
     <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>
@@ -635,15 +664,34 @@ function hexRGB(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&
 function mixRGB(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; }
 
 // ================= sound (synthesized)
+// v11 volume: two sliders in Settings, Music and Sounds, 0 to 100 (store eb_vol_music, eb_vol_sfx; 100 is the mix as it
+// was made, 0 is silent). Mute (the N key, the HUD button) is separate (eb_muted, eb_music_off) and keeps the slider values.
+// A save from before the sliders: a sound switched off on its own in Settings becomes a slider at 0; both off (the N key)
+// stays muted.
+const VOL=(()=>{
+  let s=store.get('eb_vol_sfx',null), m=store.get('eb_vol_music',null);
+  if(s==null||m==null){
+    const so=!!store.get('eb_muted',false), mo=!!store.get('eb_music_off',false);
+    if(s==null){ s=so&&!mo?0:100; if(so&&!mo) store.set('eb_muted',false); store.set('eb_vol_sfx',s); }
+    if(m==null){ m=mo&&!so?0:100; if(mo&&!so) store.set('eb_music_off',false); store.set('eb_vol_music',m); }
+  }
+  const n=v=>clamp(Math.round(+v||0),0,100);
+  return {sfx:n(s),music:n(m),n,gain:v=>Math.pow(clamp(v,0,100)/100,2)};   // a squared curve: half way sounds about half as loud
+})();
 const SFX=(()=>{
-  let ac=null,master=null,noiseBuf=null,fireNode=null,fireGain=null;
-  let muted=!!store.get('eb_muted',false);
+  let ac=null,master=null,bus=null,speakers=null,noiseBuf=null,fireNode=null,fireGain=null;
+  let muted=!!store.get('eb_muted',false), level=VOL.sfx;
   const last={}, loops={};
+  // the Sounds bus: everything but the music ends here. Other modules connect their own sounds to ac.destination, so on
+  // this context that name points at the bus (the real speakers stay in SFX.speakers, where the music goes).
+  const busGain=()=>muted?0:VOL.gain(level);
   function init(){
     if(ac){ if(ac.state==='suspended') ac.resume(); return; }
     try{
       ac=new (window.AudioContext||window.webkitAudioContext)();
-      master=ac.createGain(); master.gain.value=muted?0:0.45; master.connect(ac.destination);
+      speakers=ac.destination; bus=ac.createGain(); bus.gain.value=busGain(); bus.connect(speakers);
+      try{ Object.defineProperty(ac,'destination',{value:bus,configurable:true}); }catch(e){}
+      master=ac.createGain(); master.gain.value=0.45; master.connect(bus);
       noiseBuf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
       const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
     }catch(e){ ac=null; }
@@ -662,7 +710,7 @@ const SFX=(()=>{
     s.connect(f); f.connect(g); g.connect(master); s.start(t,Math.random()); s.stop(t+dur+0.03);
   }
   function play(name,vol){
-    if(!ac||muted) return;
+    if(!ac||muted||level<=0) return;
     const now=performance.now(); if(last[name]&&now-last[name]<45) return; last[name]=now;
     const v=vol==null?1:vol;
     try{
@@ -714,7 +762,7 @@ const SFX=(()=>{
   function setFire(on){
     if(!ac) return;
     try{
-      if(on&&!fireNode&&!muted){
+      if(on&&!fireNode&&!muted&&level>0){
         fireNode=ac.createBufferSource(); fireNode.buffer=noiseBuf; fireNode.loop=true;
         const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=700; f.Q.value=0.6;
         fireGain=ac.createGain(); fireGain.gain.value=0;
@@ -727,8 +775,12 @@ const SFX=(()=>{
       }
     }catch(e){ fireNode=null; fireGain=null; }
   }
-  function toggle(){ muted=!muted; store.set('eb_muted',muted); if(master) master.gain.value=muted?0:0.45; if(muted) setFire(false); return muted; }
-  return {init,play,setFire,toggle,ambient,get muted(){return muted;},get ac(){return ac;},get noise(){return noiseBuf;}};
+  function busTo(tc){ if(!bus) return; try{ const t=ac.currentTime; bus.gain.cancelScheduledValues(t); bus.gain.setTargetAtTime(busGain(),t,tc); }catch(e){ bus.gain.value=busGain(); } }
+  function toggle(){ muted=!muted; store.set('eb_muted',muted); busTo(0.02); if(muted) setFire(false); return muted; }
+  // the Sounds slider: 0 to 100, applied at once and saved
+  function setVolume(v){ level=VOL.n(v); VOL.sfx=level; store.set('eb_vol_sfx',level); busTo(0.03); if(level<=0) setFire(false); return level; }
+  return {init,play,setFire,toggle,ambient,setVolume,get muted(){return muted;},get volume(){return level;},get silent(){return muted||level<=0;},
+    get ac(){return ac;},get speakers(){return speakers||(ac&&ac.destination);},get noise(){return noiseBuf;}};
 })();
 
 // ================= canvas
@@ -14237,7 +14289,7 @@ function musicUpdate(dt){
   if(m!==mLast){ mLast=m; try{ Music.setTheme(m); }catch(e){} }
 }
 // musical cue when music is on, a plain sound effect otherwise
-function jingle(name,sfx){ let ok=false; try{ ok=!Music.muted&&!!SFX.ac; if(ok) Music.stinger(name); }catch(e){ ok=false; } if(!ok&&sfx) SFX.play(sfx); }
+function jingle(name,sfx){ let ok=false; try{ ok=!Music.silent&&!!SFX.ac; if(ok) Music.stinger(name); }catch(e){ ok=false; } if(!ok&&sfx) SFX.play(sfx); }
 
 // ---------- quest tracking: up to three quests shown on screen, one "followed" by the compass
 const TRACK_MAX=3;
@@ -14328,13 +14380,11 @@ function openSettings(from){ settingsFrom=from||'menu'; renderSettings(); show('
 function closeSettings(){ show(settingsFrom==='pause'?'pause':'menu'); if(settingsFrom==='menu') refreshMenu(); }
 function renderSettings(){
   const seg=(id,val)=>{ for(const b of document.querySelectorAll(`#${id} button`)) b.setAttribute('aria-pressed',String(b.dataset.v===String(val))); };
-  seg('setSfx',SFX.muted?'off':'on'); seg('setMusic',Music.muted?'off':'on'); seg('setNums',settings.nums?'on':'off');
+  seg('setNums',settings.nums?'on':'off');
   seg('setTouch',settings.touch); seg('setBtn',settings.btn<0.95?'s':settings.btn>1.05?'l':'m'); seg('setAuto',autoAttackOn()?'on':'off');
 }
 function applySetting(id,v){
-  if(id==='setSfx'){ if((v==='off')!==SFX.muted) toggleMute(); }
-  else if(id==='setMusic'){ if((v==='off')!==Music.muted){ Music.toggle(); if(!Music.muted){ mLast=null; } } }
-  else if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
+  if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
   else if(id==='setTouch'){ settings.touch=v; store.set('eb_touch',v); }
   else if(id==='setBtn'){ settings.btn=v==='s'?0.88:v==='l'?1.16:1; store.set('eb_btn',settings.btn); }
   else if(id==='setAuto'){ settings.auto=v==='on'; store.set('eb_auto',settings.auto); }
@@ -24464,6 +24514,7 @@ Cloud.onChange(acctLabel);
 //   Music.muted             true when music is off
 //   Music.duck(on)          lower music while dialogue is open
 //   Music.setVolume(v)      0..1 (default 0.5)
+//   Music.setLevel(n)       the Settings slider, 0..100 (saved as eb_vol_music, read through VOL in a1_core.js); 0 is silent
 //   Music._renderOffline(name,sec)  renders a theme or stinger to an AudioBuffer (testing)
 //
 // Score notation (all data below is hand written):
@@ -25296,7 +25347,7 @@ const Music=(()=>{
     cp.threshold.value=-12; cp.knee.value=10; cp.ratio.value=3; cp.attack.value=.006; cp.release.value=.25;
     C.dk=gn(ac,1); const trim=gn(ac,.35), ls=flt(ac,'lowshelf',120), hs=flt(ac,'highshelf',2500), hp=flt(ac,'highpass',38,.7);
     ls.gain.value=-3; hs.gain.value=6;   // tame the sub (phones cannot play it anyway), add a little air
-    C.dk.connect(trim); trim.connect(ls); ls.connect(hs); hs.connect(hp); hp.connect(cp); cp.connect(C.out); C.out.connect(C.vis); C.vis.connect(ac.destination);
+    C.dk.connect(trim); trim.connect(ls); ls.connect(hs); hs.connect(hp); hp.connect(cp); cp.connect(C.out); C.out.connect(C.vis); C.vis.connect(!offline&&SFX.ac===ac&&SFX.speakers?SFX.speakers:ac.destination);   // the speakers, not the Sounds bus
     C.rvIn=gn(ac,1); const cv=ac.createConvolver(); cv.buffer=impulse(ac,2.3); const rvo=gn(ac,.5);
     C.rvIn.connect(cv); cv.connect(rvo); rvo.connect(C.dk);
     C.dlIn=gn(ac,1); C.dly=ac.createDelay(1.5); C.dly.delayTime.value=.4;
@@ -25375,9 +25426,10 @@ const Music=(()=>{
     normal:'arena',waves:'arena',gameover:'dead',death:'dead',sad:'tender',emotional:'tender'};
   const XF=2;
   const K=.55;          // master level at volume 1 (calibrated by offline renders, keeps music well under the SFX)
-  let C=null, muted=!!store.get('eb_music_off',false), vol=.5, cur=null, timer=null;
+  let C=null, muted=!!store.get('eb_music_off',false), vol=.5, lvl=VOL.music, cur=null, timer=null;
   const live=[], stings=[];
-  const outGain=()=>muted?0:vol*K;
+  const quiet=()=>muted||lvl<=0;
+  const outGain=()=>quiet()?0:vol*K*VOL.gain(lvl);
   function resolve(n){ if(n==null) return null; if(MSCORE[n]) return n; const a=ALIAS[String(n).toLowerCase()]; return a&&MSCORE[a]?a:undefined; }
   function tick(){
     if(!C) return;
@@ -25405,17 +25457,17 @@ const Music=(()=>{
     try{ C=mkCtx(ac,outGain(),false); }catch(e){ C=null; return; }
     timer=setInterval(tick,25);
     try{ document.addEventListener('visibilitychange',()=>{ if(!C) return; const t=C.ac.currentTime; C.vis.gain.cancelScheduledValues(t); C.vis.gain.setTargetAtTime(document.hidden?0:1,t,document.hidden?.05:.4); }); }catch(e){}
-    if(cur&&!muted) start(cur,1.2);
+    if(cur&&!quiet()) start(cur,1.2);
   }
   function setTheme(n){
     const r=resolve(n); if(r===undefined) return;      // unknown name: keep whatever is playing
     if(r===cur) return; cur=r;
-    if(!C||muted) return;
+    if(!C||quiet()) return;
     if(r==null){ for(const I of live) fadeOut(I,XF); return; }
     start(r,1.6);
   }
   function stinger(n){
-    const th=MSTING[n]; if(!C||muted||!th) return;
+    const th=MSTING[n]; if(!C||quiet()||!th) return;
     const now=C.ac.currentTime;
     for(const S of stings) fadeOut(S,.15);
     const I=mkInst(C,th,C.sdest,true); I.t0=I.born=now+.03; stings.push(I);
@@ -25424,14 +25476,18 @@ const Music=(()=>{
     pump(C,I,now+.15,now);
   }
   function toggle(){
-    muted=!muted; store.set('eb_music_off',muted);
-    if(C){
-      const t=C.ac.currentTime; C.out.gain.cancelScheduledValues(t); C.out.gain.setTargetAtTime(outGain(),t,.08);
-      if(muted){ for(const I of live) fadeOut(I,.3); for(const S of stings) fadeOut(S,.2); }
-      else if(cur) start(cur,1);
-    }
+    const q0=quiet(); muted=!muted; store.set('eb_music_off',muted); hear(q0,.08);
     return muted;
   }
+  // after a change to mute or the slider: set the output, and stop or restart the theme if it went silent or came back
+  function hear(q0,tc){
+    if(!C) return;
+    const t=C.ac.currentTime; C.out.gain.cancelScheduledValues(t); C.out.gain.setTargetAtTime(outGain(),t,tc);
+    const q=quiet(); if(q===q0) return;
+    if(q){ for(const I of live) fadeOut(I,.3); for(const S of stings) fadeOut(S,.2); }
+    else if(cur) start(cur,1);
+  }
+  function setLevel(n){ const q0=quiet(); lvl=VOL.n(n); VOL.music=lvl; store.set('eb_vol_music',lvl); hear(q0,.05); return lvl; }
   function duck(on){ if(!C) return; const t=C.ac.currentTime; C.dk.gain.cancelScheduledValues(t); C.dk.gain.setTargetAtTime(on?.45:1,t,on?.15:.35); }
   function setVolume(v){ vol=clamp(+v||0,0,1); if(C){ const t=C.ac.currentTime; C.out.gain.cancelScheduledValues(t); C.out.gain.setTargetAtTime(outGain(),t,.05); } }
 
@@ -25472,8 +25528,8 @@ const Music=(()=>{
     return out;
   }
 
-  return {init,setTheme,stinger,toggle,duck,setVolume,
-    get muted(){ return muted; }, get theme(){ return cur; }, get volume(){ return vol; },
+  return {init,setTheme,stinger,toggle,duck,setVolume,setLevel,
+    get muted(){ return muted; }, get theme(){ return cur; }, get volume(){ return vol; }, get level(){ return lvl; }, get silent(){ return quiet(); },
     themes:()=>Object.keys(MSCORE), stingers:()=>Object.keys(MSTING),
     _renderOffline:renderOffline, _check:check, _isSting:n=>!MSCORE[n]&&!!MSTING[n], _parts:n=>{ const th=MSCORE[n]||MSTING[n]; return th?th.parts.map(P=>P.n):[]; },
     _dump:n=>{ const th=MSCORE[n]||MSTING[n]; if(!th) return null; th._dbg=1; const names=(th.intro||[]).concat(th.form||[]); const B=build(th,names); delete th._dbg;
@@ -28930,8 +28986,11 @@ for(const k in BAL_BOSS) if(EDEF[k]) Object.assign(EDEF[k],BAL_BOSS[k]);
 // v10 on-ramp: Act I boss health on [Easy, Normal] in the story, times the health above (Hard keeps hp x DIFFS.bossHp).
 // Measured with the casual-kid bot so each boss is a little harder than the one before (scratchpad v10/BAL.md).
 // (Easy never gets more health than Normal: Easy hp x 0.8 <= Normal hp, so an Easy factor is at most 1.25 x the Normal one.)
-const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.52], broodmother:[1.15,0.95],
-  greymane:[0.9,1.25], skrae:[1,1.15], cindervane:[0.85,0.7]};
+// v11: the guards and summons of a boss now take turns and wait for his red warnings (e8_foes.js, fair crowds), which
+// made the bosses with a crowd much easier on Normal; Gloamjaw, the Brood Mother and Greymane get a little more health
+// back so the act still climbs (v10 Normal: gloamjaw 0.52, broodmother 0.95, greymane 1.25; scratchpad v11/SET_NOTES.md).
+const BAL_BOSS_EZ={grizzlefang:[0.75,0.6], gnarl:[0.75,0.7], morrow:[1.75,1.95], serpent:[0.5,0.55], gloamjaw:[0.6,0.57], broodmother:[1.15,1.05],
+  greymane:[0.9,1.5], skrae:[1,1.15], cindervane:[0.85,0.7]};
 { const base=makeEnemy; makeEnemy=function(type,x,y,opt){ const e=base(type,x,y,opt);
     try{ const k=e&&e.boss&&G&&G.mode==='story'&&BAL_BOSS_EZ[type]; const i=k?DIFFS.indexOf(G.diff):-1; if(k&&i>=0&&i<2&&k[i]!==1){ e.maxHp*=k[i]; e.hp=e.maxHp; } }catch(err){}
     return e; }; }
@@ -29114,10 +29173,34 @@ function setBossHelp(on){ settings.bossHelp=!!on; store.set('eb_bosshelp',settin
 })();
 { const base=renderSettings; renderSettings=function(){ base(); bhSync(); }; }
 
+// ---------- v11: change the difficulty in the middle of a journey (Settings > Difficulty, from the pause menu too).
+// Foes that are already out get the health they would have had at spawn on the new level, in proportion (a foe at 60% stays
+// at 60%), and the new speed; damage, wind-ups, cooldowns, healing and the keep-moving rule read G.diff live. The journey
+// keeps it (the save's diff field: only that field is written now, so the save point does not move) and the title screen
+// picker shows it. Hard and the Arena are never touched here (the Arena locks the row, see a12b_ui.js).
+function balFoeHpK(e,i){
+  const D=DIFFS[i]||DIFFS[1]; if(!e.boss) return D.hp||1;
+  let k=(D.bossHp||1); const z=G&&G.mode==='story'&&BAL_BOSS_EZ[e.type]; if(z&&i<2) k*=z[i];
+  return k;
+}
+function balSetDiff(i){
+  i=clamp(i|0,0,2); const o=G&&G.diff?DIFFS.indexOf(G.diff):-1;
+  diffIdx=i; store.set('eb_diff',i);
+  if(!G) return i;
+  G.diff=DIFFS[i]; if(G.mode==='story') G.eliteChance=G.diff.elite!=null?G.diff.elite:0.06;
+  if(o>=0&&o!==i) for(const e of G.enemies){
+    if(e.dead) continue;
+    const k=balFoeHpK(e,i)/balFoeHpK(e,o); if(k>0&&isFinite(k)&&k!==1){ e.maxHp*=k; e.hp=Math.min(e.maxHp,e.hp*k); }
+    const s=(DIFFS[i].spd||1)/(DIFFS[o].spd||1); if(s>0&&s!==1) e.speed*=s;
+  }
+  if(G.mode==='story'&&o!==i){ try{ const K=SLOT_KEYS[curSlot], s=store.get(K,null); if(s&&typeof s==='object'){ s.diff=i; store.set(K,s); Cloud.queueSave(packSaves()); } }catch(e){} }
+  return i;
+}
+
 // ---------- debug hooks (tests): __eb.bal.*
 window.__ebX=Object.assign(window.__ebX||{},{bal:{
   BAL,BAL_BOSS,DIFFS,ABIL_DEFS,ABIL_ORDER,balHpK,balDmK,balXpK,balLvlDmg,balXpNeed,balXpTo,balTierK,
-  setDiff(i){ diffIdx=clamp(i|0,0,2); store.set('eb_diff',diffIdx); if(G){ G.diff=DIFFS[diffIdx]; if(G.mode==='story') G.eliteChance=G.diff.elite; } return G&&G.diff.name; },
+  setDiff(i){ balSetDiff(i); return G&&G.diff.name; }, balSetDiff,
   // an "expected" Ash at level L: tier is star-iron (default: the expected tier for that level), extras on by default
   hero(L,o){ o=o||{}; const p=player; L=clamp(L|0,1,BAL.maxLevel); const tier=o.tier!=null?o.tier:balExpTier(L);
     p.level=L; p.xp=0; p.stats.dmgMul=balLvlDmg(L); G.tier=tier; p.stats.slash=15*balTierK(tier); p.stats.wpnMul=o.bare?1:1+0.02*(L-1); p.stats.armor=o.bare?1:balExpArmor(L);
@@ -32436,7 +32519,7 @@ function bossSay(e,who,line,gap){ if(e._sayT>G.time) return; e._sayT=G.time+(gap
 // lines have wide gaps, fewer kobolds come later, and his iron pot lets more through and cracks from the front too.
 // The numbers and the casual-kid bot tables behind them: scratchpad v10/BAL.md.
 // Story only: the Arena's champion Grizzlefang keeps the v9 numbers (the [Easy, Normal, Hard] array passed to grzK).
-const GRZ={wind:[1.6,1.5], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
+const GRZ={wind:[1.6,1.75], lob:[1.3,1.15], front:[0.5,0.35], need:[1,2], dent:[5,7], back:24,
   sumAt:[0.4,0.4], sumN:[2,2], gap:[250,210], bombT:[1.8,1.5], lineT:[1.8,1.45], waves:[[2,3],[3,3]]};
 function grzK(k,v9){ return onrampOn()?byDiff(GRZ[k][0],GRZ[k][1],v9[2]):byDiff(v9[0],v9[1],v9[2]); }
 defineFoe('grizzlefang',{hp:actIHp(760),phases:[0.66,0.33],
@@ -32763,7 +32846,7 @@ const ONRAMP={
     cindervane:{slashW:[1.7,1.65],chargeAim:[1.25,1.15],quakeW:[1.25,1.15]}
   },
   // a longer pause after these attacks (the opening to hit back)
-  rec:{ gnarl:{swipeW:[1.3,1.25]}, cindervane:{slashW:[1.6,1.4]} },
+  rec:{ grizzlefang:{cleave:[1.3,1.4]}, gnarl:{swipeW:[1.3,1.25]}, cindervane:{slashW:[1.6,1.4]} },
   // a longer breather between attacks: his cooldown is this many times longer each time he goes back to the chase
   // (High Priest Morrow is the one boss that was too easy for his place in the act: he casts a little more often)
   cd:{ grizzlefang:[1.3,1.3], gnarl:[1.2,1.25], morrow:[0.85,0.75], gloamjaw:[1.7,1.7], greymane:[1.1,1.15], cindervane:[2.2,2.2] },
@@ -32820,8 +32903,77 @@ for(const t of ['grizzlefang','gnarl','morrow','serpent','gloamjaw','greymane','
       if(Math.abs(angDiff(e.face,angTo(e.x,e.y,fx,fy)))<1.15) return amt*orK(ONRAMP.cinderGuard)/0.15; }
     return amt; }; }
 // fewer guards at a site on Easy and Normal (read each time the guards are spawned)
+// v11: and on Easy and Normal they wait for their boss. Nobody is out front as Ash walks into the war camp, the bog or the
+// gate yard (real play: Grizzlefang's two guards had cost Ash 33 of his 116 health before the fight even began); they come
+// running out of spawn runes beside the boss when his fight starts, so Ash meets the boss with the health he walked in with.
 for(const k in ONRAMP.guards){ const s=SITES[k]; if(!s) continue; const full=s.guards;
-  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?byDiff(ONRAMP.guards[k][0],ONRAMP.guards[k][1],full):full; },set(v){ /* keep the on-ramp table */ }}); }
+  Object.defineProperty(s,'guards',{configurable:true,enumerable:true,get(){ return onrampOn()?[]:full; },set(v){ /* keep the on-ramp table */ }}); }
+{ const base=startBossFight; startBossFight=function(k){ base(k);
+    try{ const L=ONRAMP.guards[k], s=SITES[k];
+      if(L&&s&&onrampOn()){ const list=byDiff(L[0],L[1],null), P=POI[s.poi];
+        if(list&&list.length&&P){ const g=G.siteGuards[k]||(G.siteGuards[k]={id:'g_'+k,alive:0}); let i=0;
+          for(const [type,n] of list) for(let j=0;j<n;j++,i++){ const q=spotNear(P.x,P.y,110,210);
+            spawnRune(type,q.x,q.y,{level:P.level,aggro:true,camp:g,homeX:P.x,homeY:P.y,leash:700},1.9+i*0.35); g.alive++; } } } }catch(e){ console.error(e); } }; }
+
+// ================= v11: fair crowds (story, Easy and Normal, Act I; Hard, the Arena and later acts keep their behaviour)
+// Drew (an adult on keyboard and mouse) still found ordinary fights hard on Normal, and the casual-kid bot lost most of
+// its health to a stream of kobold swings. Ash's 0.6 s of flinch time after a hit already swallows two swings that land
+// together, so what hurts is how often a new attack starts near him. Now foes near Ash take turns: a foe may only start
+// an attack some time after the last one started (longer while a boss is up, so his guards and summons do not chip at
+// Ash while he watches the boss, and never while the boss's own red warning is up); one that has to wait keeps circling
+// and tries again a moment later. Kobold and wolf warnings are a little longer, and bats, the one foe that struck with no
+// warning, show a short red line first; a wolf pants for a moment after its lunge before it runs off, so it can be hit.
+// The bot tables: scratchpad v11/SET_NOTES.md.
+const CROWD={
+  gap:[1.4,1.1],       // [Easy, Normal] seconds from one foe's attack start near Ash to the next
+  bossGap:[2.4,1.9],   // the same for a boss's guards and summons while the boss is up
+  most:[1,2],          // foes near Ash that may be winding up or striking at the same moment
+  near:480,            // px from Ash that counts as near
+  retry:[0.25,0.5],    // seconds before a foe that had to wait tries again
+  batWarn:[0.36,0.3],  // seconds of red line before a bat swoops (before DIFFS.wind)
+  wolfPant:[0.6,0.45], // a wolf that has lunged stands panting this long before it backs off (the moment to hit it)
+  free:{wolf:1},       // without a boss, a wolf pack keeps its own rhythm: a wolf made to wait circles out of reach,
+                       // which made pack fights longer and so more lunges landed (its pant and longer warning stay)
+  // longer red warnings: the wind-up that starts in this state is this many times longer (after DIFFS.wind). A kobold's
+  // swing warned for 0.33 s on Normal, less than a kid needs to see it and press roll.
+  wind:{kobold:{windup:[1.35,1.25]}, wolf:{crouch:[1.25,1.15]}}
+};
+const CROWD_START={kobold:'windup',wolf:'crouch',knight:'windup',drakeling:'aim',cultist:'cast',bat:'swoopW'};
+const CROWD_BUSY=new Set(['windup','strike','crouch','lunge','aim','charge','cast','swoop','swoopW']);
+function crowdOn(){ return onrampOn()&&(G.act||1)===1; }
+function crowdBusy(skip){
+  const p=player, R2=CROWD.near*CROWD.near; let n=0;
+  for(const o of G.enemies){ if(o===skip||o.dead||o.boss||!CROWD_START[o.type]) continue;
+    if(CROWD_BUSY.has(o.state)&&dist2(o.x,o.y,p.x,p.y)<R2) n++; }
+  return n;
+}
+// may e start its attack now? (e is near Ash and just tried)
+function crowdOk(e){
+  const b=G.boss, withBoss=!!(b&&!b.dead&&dist2(b.x,b.y,player.x,player.y)<900*900);
+  if(!withBoss&&CROWD.free[e.type]) return true;
+  if(withBoss&&b.tele) return false;
+  const last=G._crowdT!=null&&G._crowdT<=G.time?G._crowdT:-99;
+  if(G.time-last<orK(withBoss?CROWD.bossGap:CROWD.gap)) return false;
+  return crowdBusy(e)<orK(CROWD.most);
+}
+// the bat's warning: hover with a red line for a moment, then the swoop the stock bat does
+{ const base=AI.bat; if(base) AI.bat=function(e,dt){
+    if(e.state==='swoopW'){ const p=player; e.dx=e.dy=0; e.face=turnTo(e.face,angTo(e.x,e.y,p.x,p.y),2.5*dt); e.st-=dt;
+      if(e.st<=0){ e.tele=null; e.state='swoop'; e.st=0.34; e.hitP=false; } return; }
+    const s0=e.state; base(e,dt);
+    if(e.state==='swoop'&&s0!=='swoop'&&crowdOn()){ const w=orK(CROWD.batWarn); e.state='swoopW'; e.st=w; e.tele=newTele({shape:'line',len:150,w:e.r*2.4,dur:w}); }
+  }; }
+{ const base=runAI; runAI=function(f,e,dt){
+    const s0=e.state; base(f,e,dt);
+    if(e.type==='wolf'&&!e.boss){
+      if(s0==='lunge'&&e.state==='recover'&&crowdOn()){ e._pant=orK(CROWD.wolfPant); e.st+=e._pant; }
+      if(e._pant>0){ if(e.state!=='recover') e._pant=0; else { e._pant-=dt; e.dx=e.dy=0; } } }
+    if(e.boss||s0===e.state||CROWD_START[e.type]!==e.state||!crowdOn()) return;
+    if(dist2(e.x,e.y,player.x,player.y)<CROWD.near*CROWD.near){
+      if(!crowdOk(e)){ e.state=s0; e.tele=null; e.st=0; e.cd=Math.max(e.cd||0,rand(CROWD.retry[0],CROWD.retry[1])); return; }
+      G._crowdT=G.time; }
+    const W=CROWD.wind[e.type], T=e.tele; if(W&&W[e.state]&&T&&!T._cw&&T.dur>0&&Math.abs((e.st||0)-T.dur)<0.03){ const k=orK(W[e.state]); T._cw=1; e.st*=k; T.dur*=k; }
+  }; }
 
 // ================= debug hooks
 function foeSheet2d(type,rows,o){
@@ -86374,7 +86526,7 @@ $('#bHowClose').addEventListener('click',closeHow);
 $('#bSettings').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSettings('menu'); });
 $('#bPauseSettings').addEventListener('click',()=>{ SFX.play('ui'); openSettings('pause'); });
 $('#bSettingsClose').addEventListener('click',()=>{ SFX.play('ui'); closeSettings(); });
-for(const id of ['setSfx','setMusic','setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
+for(const id of ['setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
 // ---------- two more rows (UX build), injected like the depth row so body.html stays as it is:
 // "Aim with the mouse" (off: Ash faces the way he walks) and "Characters" (3D toy figures or the classic flat art)
 // (a3e_toy3d.js reads eb_chars at load; this flips it live)
@@ -86434,6 +86586,87 @@ function handSync(){
     handSync();
   }catch(e){}
 })();
+// ---------- v11: Settings > Difficulty, Music and Sounds (the rows are in body.html; they go to the top of the list)
+// Difficulty works from the pause menu in the middle of a journey (balSetDiff in e6_balance.js rescales the foes that
+// are out and keeps it with the journey); during an Arena run it is locked so the leaderboard stays fair.
+// The two sliders run 0 to 100 and apply while you drag: mouse, touch, the arrow keys and a controller's d-pad or stick
+// (left and right on a focused slider move it 5). Moving a muted one turns that sound back on. Letting go of the Sounds
+// slider plays a short sample.
+const SETV={sampleT:0};
+function setDiffLocked(){ return !!(G&&G.mode==='normal'&&settingsFrom==='pause'); }
+function diffSync(){
+  const lock=setDiffLocked();
+  for(const b of document.querySelectorAll('#setDiff button')){ b.setAttribute('aria-pressed',String(+b.dataset.v===diffIdx)); b.disabled=lock; }
+  const L=$('#setDiffLock'), N=$('#setDiffNote');
+  if(N) N.textContent=simplify(S('Easy: gentler foes, more healing. Normal: a real fight. Hard: fast, fierce foes.','Easy: soft foes. Normal: a fair fight. Hard: tough foes.'));
+  if(L){ L.hidden=!lock; L.textContent=simplify(S('Locked during an Arena run, so the leaderboard stays fair. Change it on the title screen.','Locked in the Arena. Change it on the title screen.')); }
+}
+function setDifficulty(i){
+  if(setDiffLocked()) return diffIdx;
+  i=clamp(i|0,0,2); if(i===diffIdx&&G&&G.diff===DIFFS[i]) return i;
+  balSetDiff(i); diffSync();
+  if(settingsFrom!=='pause') refreshMenu();
+  return i;
+}
+function volSync(){
+  const row=(id,v,muted)=>{
+    const i=$('#'+id+'Vol'), o=$('#'+id+'Val'), m=$('#'+id+'Muted'); if(!i) return;
+    if(+i.value!==v) i.value=v;
+    i.style.setProperty('--f',String(v/100));
+    if(o) o.textContent=v>0?String(v):simplify(S('Off','Off'));
+    if(m){ m.hidden=!muted; m.textContent=simplify(S('Muted. Move the slider to turn it back on.','Muted. Move it to turn it on.')); }
+    i.setAttribute('aria-valuetext',muted?'Muted':v>0?v+' of 100':'Off');
+    const r=i.closest('.setrow'); if(r) r.classList.toggle('off',muted||v<=0);
+  };
+  row('setMusic',Music.level,Music.muted); row('setSfx',SFX.volume,SFX.muted);
+}
+function volSample(){ SETV.sampleT=0; if(SFX.silent) return; SFX.play('slash'); setTimeout(()=>SFX.play('hit'),110); }
+function volInput(el,stepped){
+  SFX.init();
+  const v=VOL.n(el.value), music=el.id==='setMusicVol';
+  if(music){ if(Music.muted&&v>0){ Music.toggle(); mLast=null; } Music.setLevel(v); }
+  else { if(SFX.muted&&v>0) SFX.toggle(); SFX.setVolume(v); }
+  volSync();
+  // a step from the keys or a controller: the sample comes once the steps stop (the same as letting go)
+  if(stepped&&!music){ clearTimeout(SETV.sampleT); SETV.sampleT=setTimeout(volSample,300); }
+}
+(function setTopRows(){
+  try{
+    const panel=document.querySelector('#settings .panel'), h=panel&&panel.querySelector('h2'); if(!panel||!h) return;
+    // Difficulty first, then Music and Sounds, above the rows other modules added on top (Words)
+    const rows=['setDiff','setMusicVol','setSfxVol'].map(id=>{ const el=$('#'+id); return el&&el.closest('.setrow'); }).filter(Boolean);
+    let ref=h; for(const r of rows){ ref.after(r); ref=r; }
+    for(const b of document.querySelectorAll('#setDiff button')) b.addEventListener('click',()=>{ SFX.init(); setDifficulty(+b.dataset.v); SFX.play('ui'); });
+    for(const id of ['setMusicVol','setSfxVol']){
+      const el=$('#'+id); if(!el) continue;
+      el.addEventListener('input',()=>volInput(el,false));
+      el.addEventListener('change',()=>{ volInput(el,false); if(id==='setSfxVol') volSample(); });
+      // a tap or a drag on the slider must not scroll the panel or reach the game under it
+      el.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+      // the game's key handler skips keys aimed at an input (for the name fields), so a focused slider takes its own:
+      // left and right move it, up and down move to the next row like every other row, and the rest (N to mute,
+      // Escape to go back) go to the game as usual
+      el.addEventListener('keydown',e=>{
+        const c=e.code;
+        if(c==='ArrowLeft'||c==='ArrowRight'){ e.preventDefault(); e.stopPropagation(); navMove(navRoot(),c==='ArrowRight'?'r':'l'); return; }
+        if(c==='ArrowUp'||c==='ArrowDown'){ e.preventDefault(); e.stopPropagation(); const r=navRoot(); if(r) navMove(r,c==='ArrowDown'?'d':'u'); return; }
+        if(c==='Tab'||c==='Enter'||c==='Space') return;
+        e.stopPropagation(); onKey(e);
+      });
+    }
+    diffSync(); volSync();
+  }catch(e){}
+})();
+{ const base=renderSettings; renderSettings=function(){ base(); try{ diffSync(); volSync(); }catch(e){} }; }
+// Settings opens at the top, where Difficulty and the sliders are (it kept the scroll of the last visit)
+{ const base=openSettings; openSettings=function(from){ base(from); try{ const o=$('#settings'); if(o) o.scrollTop=0; }catch(e){} }; }
+// left and right on a focused slider move it (the arrow keys and a controller both come through navMove)
+{ const base=navMove; navMove=function(root,dir){
+    const el=document.activeElement;
+    if((dir==='l'||dir==='r')&&el&&el.matches&&el.matches('.vsl input[type=range]')&&root&&root.contains(el)){
+      const v=clamp((+el.value||0)+(dir==='r'?5:-5),0,100); if(v!==+el.value){ el.value=v; volInput(el,true); } return; }
+    return base(root,dir); }; }
+window.__ebX=Object.assign(window.__ebX||{},{setv:{setDifficulty,diffSync,volSync,locked:setDiffLocked,vol:()=>({music:Music.level,sfx:SFX.volume,mMuted:Music.muted,sMuted:SFX.muted,mSilent:Music.silent,sSilent:SFX.silent})}});
 $('#bSlotsClose').addEventListener('click',()=>{ SFX.play('ui'); show('menu'); refreshMenu(); });
 $('#bPauseJournal').addEventListener('click',()=>{ scene='play'; hideAll(); openJournal(); });
 $('#bMapJournal').addEventListener('click',()=>{ closeMap(true); openJournal(); });
