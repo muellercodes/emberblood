@@ -76,15 +76,15 @@ chapter({
 
     c_snow_town: [
       { cam: 'gh_market', s: 1 },
-      ['narr', 'By morning, Gearhaven is white. Snow on the clock towers. Snow riding round and round on the conveyor streets. Kids having snowball fights in their summer clothes.', 'By morning, Gearhaven is white. Kids throw snowballs in summer clothes.'],
+      ['narr', 'By morning, Gearhaven is white. Snow rides round and round on the conveyor streets, and kids have snowball fights in their summer clothes.', 'By morning, Gearhaven is white. Kids throw snowballs in summer clothes.'],
       ['c_fig', "Snow! In June! I've put a tea cosy on my head, dearie, and I'm not taking it off.", 'Snow in June! I put a tea cosy on my head.'],
-      ['c_hester', 'Snow, in June. Nobody filed a report. Clockwatch! Fetch the shovels!', 'Snow in June! Get the shovels!'],
+      ['c_hester', 'Clockwatch! Shovels! Nobody filed a report about this.', 'Clockwatch! Get the shovels!'],
       { if: 'choice c_vesper=friend', then: [
         ['narr', 'High on the Clockwatch roof, someone in a yellow oilskin sits with her legs dangling over the edge, and waves.', 'On the Clockwatch roof, Vesper waves.'],
         { if: 'quest c_oona done', then: [
           ['c_vesper', "Gran says thank you. She says it's the first night she's been warm in years.", 'Gran says thank you. She is warm now.'] ],
           else: [
-          ['c_vesper', "Gran wrapped me in three blankets and made soup. She says thank you. Don't make it weird.", "Gran says thank you. Don't make it weird."] ] } ],
+          ['c_vesper', "Gran wrapped me in three blankets and made soup. She says thank you for sending me home. Don't make it weird.", "Gran says thank you. Don't make it weird."] ] } ],
         else: [
         ['narr', 'Up on the Clockwatch roof there is nobody at all. Just a scrap of grey silk, caught on a chimney.', 'On the roof, nobody. Just a scrap of grey silk.', { ref: 'clock_silk' }] ] },
       ['c_penny', 'HEADLINE: SNOW IN SUMMER! SOMEBODY TOOK A BITE OUT OF THE MOON! DRAGON KID LOOKS WORRIED!', 'HEADLINE: SNOW IN SUMMER! SOMEONE BIT THE MOON!'],

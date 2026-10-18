@@ -129,7 +129,7 @@ chapter({
       ['ash', "She's an Emberblood. Like Pearl. Like ME. She's my cousin!", 'She is an Emberblood. She is my cousin!'],
       { do: ['world c_spire_door_moths open'] }, { sfx: 'shrine' },
       ['narr', 'The moths go very still. Then they peel off the door all at once in a grey cloud, and the door swings open.', 'The moths fly off. The door opens.'],
-      ['ash', 'I have a COUSIN. Wait till Mom hears.', 'I have a COUSIN!'],
+      ['ash', 'A cousin who robs clock barons. Wait till Mom hears.', 'Wait till Mom hears!'],
     ],
     // the kneel (STORY.c_choice): every option shows; a locked one says why (the engine fills in {trust:vesper})
     c_choice: [
