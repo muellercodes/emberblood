@@ -1201,8 +1201,11 @@ const TIE_NAMES={village:['Tilly Crumb in Brindlecross','Dell the fisherman','Go
 // ================= side quests, errands, lore pages
 const ITEM_NAMES={letter_b:'Bertram’s letter',recipe:'Tilly’s half of the recipe',frostberry:'Frostberry',basket:'Mabel’s basket',moonlily:'Moonlily',letter_moss:'Granny Moss’s letter',oath_letter:'Crumpled Oath letter',oath_badge:'Brass scale badge',tunnel_key:'Oath tunnel key',oath_plans:'The Oath’s plans',lucky_pick:'Gorran’s lucky pick',star_iron:'Star-iron',horn:'Ulf’s horn',fish:'Fish',rod:'Fishing rod',lucky_lure:'Dell’s lucky lure',kettle:'Hob’s kettle',honey:'Honey',juniper_map:'Juniper’s map',carrot:'Carrot of Destiny',map_x1:'Nib’s treasure map',map_x2:'Smudged treasure map',map_x3:'Juniper’s secret map',lantern:'Cave lantern',treat:'Pip treat',relic:'Warden’s Mantle',errand:'Parcel'};
 const QDEFS={
-  bun:{title:'The Lantern Bun',giver:'bertram',min:'lore',give:{letter_b:1},
-    offer:[['bertram',`Ash. I need your help, and it pains me to say it.`],['bertram',`For the thousandth Lantern Day I wanted to bake Grandma Crumb's Lantern Bun. The recipe is torn in two. Half here, half with my sister Tilly at the Sleepy Salmon Inn in Brindlecross.`],['ash',`Why is it torn in two?`],['bertram',`We had an argument. About the bun. Nine years ago. Take her this letter. It says sorry. It took me nine years to write. It's very short.`]],
+  // offered from Lantern Day morning (it is the festival's own bun); before the raid Bertram says there is no rush
+  bun:{title:'The Lantern Bun',giver:'bertram',min:'lanterns',give:{letter_b:1},
+    get offer(){ const L=[['bertram',`Ash. I need your help, and it pains me to say it.`],['bertram',`For the thousandth Lantern Day I wanted to bake Grandma Crumb's Lantern Bun. The recipe is torn in two. Half here, half with my sister Tilly at the Sleepy Salmon Inn in Brindlecross.`],['ash',`Why is it torn in two?`],['bertram',`We had an argument. About the bun. Nine years ago. Take her this letter. It says sorry. It took me nine years to write. It's very short.`]];
+      if(G&&G.mode==='story'&&!reached('raid')) L.push(['bertram',S(`No rush. Light your lanterns first. Buns are patient. Bakers are not.`,`No rush. Light your lanterns first.`)]);
+      return L; },
     steps:[
       {t:'talk',npc:'tilly',text:'Bring Bertram’s letter to Tilly at the Sleepy Salmon Inn in Brindlecross',take:{letter_b:1},give:{recipe:1},lines:[['tilly',`A letter from Bertram? "Sorry about the bun. B." Nine years for five words.`],['tilly',`...Fine. Here's my half of the recipe. Tell him he still needs frostberries. They only grow near Hollis Farm up in the Frostpine, and they're cold enough to freeze your tongue.`]]},
       {t:'item',item:'frostberry',n:3,text:'Pick 3 frostberries near Hollis Farm in the Frostpine Highlands',at:'poi:farm'},
@@ -1210,7 +1213,7 @@ const QDEFS={
       {t:'flag',flag:'oven_lit',text:'Gently light Bertram’s oven with your fire breath',at:'npc:bertram'},
       {t:'talk',npc:'bertram',text:'See how the Lantern Bun turned out',lines:[['bertram',`It's... perfect. The Lantern Bun. Go on, have the first one.`],['narr',`You eat the Lantern Bun. It's warm all the way down to the tip of your tail.`],['bertram',`Maybe I'll take one to Tilly. After nine years. Maybe.`]],reward:{coins:40,maxhp:15,bless:1}}
     ]},
-  hollow:{title:'Lost in the Hollow',giver:'rook',min:'lore',
+  hollow:{title:'Lost in the Hollow',giver:'rook',min:'warcamp',
     offer:[['rook',`Ash! My sister Juniper went to map Whisperwood Hollow three days ago. She said she'd be back by supper.`],['rook',`Juniper is NEVER late for supper. The cave is west of the war camp road, deep in the woods. Please find her.`]],
     steps:[
       {t:'flag',flag:'juniper_found',text:'Find Juniper inside Whisperwood Hollow, west of the war camp road',at:'cave:whisper'},
@@ -1402,7 +1405,9 @@ const TALK={
     about:{dell:S(`Dell thinks fish are friendly. Fish are rude. One jumped out of the lake once and took the sandwich right out of my hand.`,`Fish are rude. One stole my sandwich!`),tamsin:S(`Tamsin at the Smoky Kettle is the best bard in the valley. She can make a lute cry. Mine just sounds like a cat.`,`Tamsin is the best bard. Her lute sounds great. Mine does not.`)},
     rumor:{t:S(`If you play one of my old songs near the Warden statues, they hum along. I've only heard it once. Maybe I dreamed it.`,`Hum one of my old songs by a Warden statue. It hums along!`)},
     loves:['honey'],hates:['fish'],
-    deep:S(`In the raid a kobold ran off with my song folder and dropped the sheets all down the road. Three songs, and I can't remember how they go. It's like losing three friends who were also noises.`,`A kobold took my songs in the raid. I miss them.`),
+    // (before the raid there are no lost songs yet: his Lost Songs quest opens after it)
+    get deep(){ return reached('lore')?S(`In the raid a kobold ran off with my song folder and dropped the sheets all down the road. Three songs, and I can't remember how they go. It's like losing three friends who were also noises.`,`A kobold took my songs in the raid. I miss them.`)
+      :S(`Tonight I play the Lantern Waltz on the green. I wrote it. It is the best thing I ever wrote, and I keep it in my song folder.`,`Tonight I play my Lantern Waltz. It is my best song.`); },
     secret:{t:`Here, a lullaby I wrote. Hum it to yourself and you'll rest easier at shrines.`,reward:{regen:true}},
     best:{t:`I finished the song about you! It rhymes "Ash" with "flash" now. And "dash." And one "moustache," for the Mayor.`,reward:{coins:80}},
     chat:{q:`Do you want to hear my newest song? It's about cheese.`,opts:[
@@ -1657,10 +1662,14 @@ Object.assign(QDEFS,{
       {t:'flag',flag:'seek_won',npc:'nib',mini:'seek',text:'Find all four hidden kids in Brindlecross (talk to Nib to start)',ready:[['nib',`Close your eyes and count to ten! No peeking! ...Okay GO!`]]},
       {t:'talk',npc:'nib',text:'Tell Nib you found everyone',lines:[['nib',`You found ALL of us! Even Jem, and Jem hid in a barrel! Here, my best treasure map. It's a real one. Mostly.`]],give:{map_x2:1},reward:{coins:20,xp:50}}
     ]},
-  pumpkins:{title:'Pumpkin Patrol',giver:'hal',min:'wren',
-    offer:[['hal',`Ash, the slimes have found my pumpkin patch. They come out of the hedges and eat everything. EVERYTHING.`],['hal',S(`Guard the patch with me for one minute. Every pumpkin you save is a pie for the winter.`,`Guard my pumpkins for one minute. Save the pies!`)]],
+  // a small village quest, offered from Lantern Day morning (the minigame is in a9g_mini.js: four small waves)
+  pumpkins:{title:'Pumpkin Patrol',giver:'hal',min:'lanterns',
+    get offer(){ const fest=G&&G.mode==='story'&&!reached('raid');
+      return [['hal',fest?S(`Ash! Slimes in my pumpkin patch. On Lantern Day! Those are the festival pumpkins.`,`Slimes in my pumpkins! On Lantern Day!`):`Ash, the slimes have found my pumpkin patch. They come out of the hedges and eat everything. EVERYTHING.`],
+        ['hal',S(`They come in little waves, a few at a time. Knock them off the pumpkins before they finish a bite.`,`They come in little waves. Knock them off the pumpkins!`)],
+        ['hal',fest?S(`Every pumpkin you save is a pie for the festival.`,`Save the festival pies!`):S(`Every pumpkin you save is a pie for the winter.`,`Save the pies!`)]]; },
     steps:[
-      {t:'flag',flag:'pumpkins_saved',npc:'hal',mini:'defend',text:'Guard Hal’s pumpkin patch from the slimes for one minute (talk to Hal to start)',ready:[['hal',`Here they come! Don't let them eat the big one. Her name is Gertrude.`]]},
+      {t:'flag',flag:'pumpkins_saved',npc:'hal',mini:'defend',text:'Guard Hal’s pumpkin patch from four little waves of slimes (talk to Hal to start)',ready:[['hal',`Here they come! Don't let them eat the big one. Her name is Gertrude.`]]},
       {t:'talk',npc:'hal',text:'Tell Hal how the pumpkins did',lines:[['hal',`You saved them! Well, most of them. Here, a little something from the farm.`]],reward:{coins:30,xp:70,bless:1}}
     ]},
   race:{title:'The Frostpine Dash',giver:'elka',min:'wren',
@@ -1764,7 +1773,7 @@ Object.assign(QDEFS,{
 // below keeps the quest hidden until Ash has the gift. (A native check would be one line in qAvail:
 // `if(d.ab&&!hasAbil(d.ab)) return false;`.)
 const abGate=(ab,after)=>function(){ return hasAbil(ab)?(after||null):'__needs_'+ab; };
-QDEFS.sheep={title:'Clover Goes Missing',giver:'hal',min:'lore',ab:'jump',
+QDEFS.sheep={title:'Clover Goes Missing',giver:'hal',min:'warcamp',ab:'jump',
   offer:[['hal',`Ash! My best sheep, Clover, has gone and done it again.`],['hal',`She hopped across the stepping stone on Bramble Pond, just south of town, and now she's stuck on the little island. She can jump out there. She cannot jump back. She's very proud and very silly.`],['ash',`So you want me to jump out and fetch her?`],['hal',`Can you jump? Since when can you jump?`]],
   steps:[
     {t:'flag',flag:'clover_found',text:'Jump across Bramble Pond, south of Emberhollow, and help Clover the sheep off the island',at:'lm:rc_clover'},
@@ -3229,6 +3238,9 @@ function assignHomes(){
 const IZX=20000, IZY=1000;
 const AREADEFS={}, DOORS=[];
 let AREA=null;
+// walking in and out of doors (v11, see the end of this file): the door Ash came in by, the one he must step off before
+// it works again, a short note over a locked door, and when it may show again
+const DW={from:null,hold:null,holdT:0,note:null,bumpT:0,bumpD:null};
 const BOOKS=['How to Train Your Goat (Don’t)','Dragons: A Very Warm History','101 Uses for a Bucket','The Wardens: Were They Cool? (Yes)','Knitting for Beginners and Their Victims','Fish, and Where to Find Them, by Dell Fisk','Lamp Oil: A Love Story','The Bakery Incident: A Survivor’s Account','Is My Cat a Wizard?','Kobolds: Tiny and Pointy','Advanced Napping','So You’ve Been Turned Into a Frog','Rock Soup: One Recipe, Four Hundred Rocks','Star-Iron and Other Stubborn Rocks, by Professor Quill','Brindlecross: Named After My Great ×4 Grandfather, by Mayor Brindle','The Big Book of Small Lanterns','A Field Guide to Things That Bite','Sheep Are Better: A Rebuttal, by Ulf Hollis','Goats Are Better: A Rebuttal to the Rebuttal, by Hollis'];
 const PAINTINGS=['A bowl of fruit. One grape looks nervous.',S('A stern old woman holding up a lantern. Her eyebrows follow you around the room.','A stern woman with a lantern. Her eyes follow you!'),S('A goat. Just a goat, painted with a great deal of love.','A goat. Just a goat.'),'Five figures around a fire. Someone has drawn a mustache on one of them.','A dragon eating a birthday cake. It is titled "Grandpa’s Party." Nobody knows who painted it.',S('A hand-drawn map with a big red X on it. The X is on the kitchen.','A map with a red X. The X is on the kitchen!'),S('A sunset over a lake. There is a fish jumping in it. The fish looks smug.','A lake at sunset. A smug fish jumps.'),'A very old drawing of a girl with horns, holding a lantern up to a mountain.'];
 const EGGS=[
@@ -3426,7 +3438,7 @@ function enterArea(id,door){
   if(def.trial&&!trialOpen(def.trial)){ runDialogue(STORY['trial_'+def.trial+'_sealed']||[['narr','The great stone doors will not move.']],()=>{ scene='play'; }); return; }
   if(def.locked&&!G.items[def.locked]&&!G.found[def.id+'_unlocked']){ runDialogue([['narr',def.lockText||'The way is sealed with an iron door and a very big lock. There’s a scale stamped on it.']],()=>{ scene='play'; }); return; }
   if(def.locked&&!G.found[def.id+'_unlocked']){ G.found[def.id+'_unlocked']=true; setBanner('Unlocked',def.name,1.8); }
-  G.ow={x:door.x,y:door.y+(door.outY||40)};
+  G.ow={x:door.x,y:door.y+(door.outY||40)}; DW.from=door; DW.note=null;
   for(const e of G.enemies) if(!e.boss) e.dead=true;
   G.projectiles=[]; G.hazards=[]; G.pools=[]; G.rings=[]; G.pickups=[]; G.critters=[];
   AREA={def,id,kind:def.kind,name:def.name,cols:[],objs:[],lights:[],npcs:[],dark:def.dark,level:def.level||1};
@@ -3449,7 +3461,7 @@ function exitArea(silent){
   for(const e of G.enemies) if(e.inArea) e.dead=true;
   G.projectiles=[]; G.hazards=[]; G.pools=[]; G.pickups=[];
   const ow=G.ow||{x:POI.village.x,y:POI.village.y+150};
-  AREA=null; G.area=null;
+  AREA=null; G.area=null; DW.hold=DW.from||null; DW.holdT=0.4; DW.note=null;
   player.x=ow.x; player.y=ow.y; player.kvx=player.kvy=0; player.facing=Math.PI/2;
   if(G.pip){ G.pip.x=player.x-30; G.pip.y=player.y; } compsOnMove();
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x-40; G.goat.y=player.y+30; }
@@ -3473,6 +3485,234 @@ function updateArea(dt){
   for(const n of A.npcs){ n.t+=dt; n.face=turnTo(n.face,angTo(n.x,n.y,p.x,p.y),dist(n.x,n.y,p.x,p.y)<240?3*dt:0); }
   if(A.def.kind==='cave'&&Math.random()<dt*0.25) SFX.play('step',0.4);
 }
+
+// ================= walking in and out (v11 UX)
+// Like Link's Awakening: walking into an unlocked door takes Ash inside at once (no prompt, no key, no dialogue box),
+// and the doormat inside takes him back out (updateArea). House stairs work the same way (floorStairsWalk in
+// a2g_floors.js). A locked door shows a padlock before he gets to it (doorLocksDraw), and bumping it puts a short note
+// over it instead of a dialogue box; the note goes in the Log too. In a dungeon, walking into a locked door with a
+// small key (or the great door with the Boss Key) opens it, and a closed door says what opens it.
+// After any of these moves, the trigger Ash arrives next to waits until he has stepped off it, so he never bounces back.
+// Doors that still ask: roof hatches and crossings (deliberate climbs), and anything that is not a plain way in.
+function doorWalkable(d){
+  if(d.walk!=null) return !!d.walk;
+  if(d.hs||d.cave) return true;
+  let l=''; try{ l=String(d.label||''); }catch(e){}
+  return /^(enter|go in|go into|go back|try|climb down)\b/i.test(l.trim());
+}
+// the way into the door: up for houses and caves; for the others, the side where something solid is
+function doorIn(d){
+  if(d._in!=null) return d._in;
+  let a=-Math.PI/2;
+  if(!d.hs&&!d.cave){
+    const solid=(x,y)=>{ try{ return colAt(x,y,4)||blockedAt(x,y); }catch(e){ return false; } };
+    let best=null;
+    for(const k of [-Math.PI/2,0,Math.PI,Math.PI/2]){ let n=0; for(const r of [22,34,48]) if(solid(d.x+Math.cos(k)*r,d.y+Math.sin(k)*r)) n++; if(n&&(!best||n>best.n)) best={k,n}; }
+    if(best) a=best.k;
+  }
+  return d._in=a;
+}
+// where Ash stands next to a door: how far in (al, plus is inside) and how far to the side (lat)
+function doorRel(d,p){ const a=doorIn(d), ux=Math.cos(a), uy=Math.sin(a), rx=p.x-d.x, ry=p.y-d.y; return {al:rx*ux+ry*uy,lat:Math.abs(rx*uy-ry*ux),ux,uy}; }
+function inDoorZone(d,p){ const r=doorRel(d,p); return r.lat<(d.cave?26:18)&&r.al>-9&&r.al<40; }
+// what keeps a door shut right now (the text it would say), or null when it opens. The same rules enterArea and the
+// act modules use (door.need, door.m3need, the Trials, the Oath's tunnel key, the goats' little cave)
+function doorLockText(d){
+  const def=AREADEFS[d.area]; if(!def||!G) return null;
+  const T=v=>typeof v==='function'?v():v;
+  try{
+    if(d.need&&!d.need()) return T(d.locked)||S('It will not open.','It is shut.');
+    if(d.m3need&&!d.m3need()) return T(d.m3locked)||S('It will not open.','It is shut.');
+    if(G.mode!=='story') return null;
+    if(def.trial&&!trialOpen(def.trial)) return S('The great stone doors will not move.','The doors will not move.');
+    if(def.locked&&!G.items[def.locked]&&!G.found[def.id+'_unlocked']) return def.lockText||'The way is sealed with an iron door and a very big lock. There’s a scale stamped on it.';
+    if(d.area==='a1_nursery'&&typeof a1NurseryOpen==='function'&&!a1NurseryOpen()) return S('Too dark to go in alone.','Too dark to go in alone.');
+  }catch(e){}
+  return null;
+}
+// the way Ash is pushing: the stick or the keys, or his roll
+function dwPush(p){
+  if(p.dashT>0) return {x:Math.cos(p.dashDir),y:Math.sin(p.dashDir)};
+  const mx=p.inMx||0, my=p.inMy||0, m=Math.hypot(mx,my);
+  return m>0.35?{x:mx/m,y:my/m}:null;
+}
+// run fn with runDialogue held back: what it would have said comes back as lines instead of a dialogue box
+function dwCapture(fn){
+  const real=runDialogue, calls=[];
+  runDialogue=function(lines,done,opt){ calls.push([lines,done,opt]); };
+  try{ fn(); } catch(e){ console.error(e); } finally { runDialogue=real; }
+  return calls;
+}
+function dwLinesText(calls){
+  const out=[];
+  for(const c of calls) for(const l of c[0]||[]){
+    const L=lineParts(l); if(!L) continue;
+    try{ if(L.skipIf&&L.skipIf()) continue; }catch(e){}
+    let t=typeof L.text==='function'?L.text():L.text; if(!t) continue; t=simplify(String(t));
+    const who=typeof L.who==='function'?L.who():L.who, nm=who&&who!=='narr'&&SPK[who]?SPK[who].name:'';
+    out.push(nm?`${nm}: ${t}`:t);
+  }
+  return out;
+}
+// a long lock text keeps its first sentence and its last line (where the hint about what opens it usually is)
+function dwShort(parts){
+  const all=parts.join(' '); if(all.length<=180||parts.length<2) return all;
+  const first=(parts[0].match(/^.*?[.!?](\s|$)/)||[parts[0]])[0].trim(), last=parts[parts.length-1];
+  const s=first+' '+last; return s.length<=220?s:last;
+}
+// a short note over a door (or anything Ash bumps): wraps to a few lines, fades after a while, goes in the Log
+function doorNote(x,y,text,lock,full){
+  text=String(text||'').trim(); if(!text) return;
+  let s=text;
+  if(s.length>230){ const cut=s.slice(0,230), i=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('! '),cut.lastIndexOf('? ')); s=i>60?cut.slice(0,i+1):cut.replace(/\s+\S*$/,'')+'…'; }
+  DW.note={x,y,text:s,t:0,dur:clamp(1.6+s.length*0.045,2.6,7),lock:!!lock};
+  try{ SFX.play(lock?'block':'ui',0.7); }catch(e){}
+  try{ logAdd({k:'narr',who:'',col:'#d8c3a0',text:full||text}); }catch(e){}
+}
+function doorBump(d){
+  if(DW.bumpT>0&&DW.bumpD===d) return;
+  DW.bumpT=2.4; DW.bumpD=d;
+  const calls=dwCapture(()=>enterArea(d.area,d));
+  // it opened after all: let anything it wanted to say be said
+  if(AREA){ for(const c of calls) runDialogue(c[0],c[1],c[2]); return; }
+  { const L=doorLockAt(d), parts=dwLinesText(calls); doorNote(L.x,L.y-14,parts.length?dwShort(parts):doorLockText(d)||S('It will not open.','It is shut.'),true,parts.join(' ')); }
+}
+function doorWalkIn(d){
+  if(doorLockText(d)!=null){ doorBump(d); return; }
+  if(G.inCombat||(G.boss&&!G.boss.dead)){ if(!(DW.bumpT>0&&DW.bumpD===d)){ DW.bumpT=2.4; DW.bumpD=d; const L=doorLockAt(d); doorNote(L.x,L.y-14,S('Not with foes this close!','Foes are near!'),false); } return; }
+  try{ enterArea(d.area,d); }
+  catch(e){
+    // a place that fails to build (a bug in its own code) must not leave Ash half inside: put him back at the door
+    console.error('enterArea',d.area,e);
+    if(AREA&&player.x<IZX-50){ try{ exitArea(true); }catch(e2){ AREA=null; G.area=null; } }
+    DW.bumpT=2.4; DW.bumpD=d; const L=doorLockAt(d); doorNote(L.x,L.y-14,S('Something blocks the way in. Try again later.','Something is in the way.'),false);
+  }
+  if(AREA) G.prompt=null;
+}
+// a dungeon door Ash walks into: a key opens it, else it says what it needs (the same words its Look prompt gives)
+function caveDoorBump(push){
+  const A=AREA, p=player; if(!A||!A.gates||!push) return false;
+  for(const o of A.gates){
+    if(o.k!=='cgate'||!o.closed||o.tmp||o.opened) continue;
+    const dx=o.x-p.x, dy=o.y-p.y, d=Math.hypot(dx,dy); if(d>(A.cave?A.cave.cell*1.15:56)||d<1) continue;
+    if((push.x*dx+push.y*dy)/d<0.55) continue;
+    if(DW.bumpT>0&&DW.bumpD===o) return true;
+    DW.bumpT=2.4; DW.bumpD=o;
+    const calls=dwCapture(()=>caveObjAct(o));
+    if(o.opened||!o.closed){ for(const c of calls) runDialogue(c[0],c[1],c[2]); return true; }
+    const parts=dwLinesText(calls); if(parts.length) doorNote(o.x,o.y-40,dwShort(parts),o.type==='lock'||o.type==='boss',parts.join(' '));
+    else for(const c of calls) runDialogue(c[0],c[1],c[2]);
+    return true;
+  }
+  return false;
+}
+function doorWalkTick(dt){
+  const p=player; if(!p||!G||G.mode!=='story') return;
+  if(DW.holdT>0) DW.holdT-=dt;
+  if(DW.bumpT>0) DW.bumpT-=dt;
+  if(DW.note){ DW.note.t+=dt; if(DW.note.t>DW.note.dur) DW.note=null; }
+  if(scene!=='play'||p.dead||p.flying||(p.z||0)>2||G.fishing||G.fade>0.6) return;
+  const push=dwPush(p);
+  if(AREA){
+    if(AREA.kind==='house') floorStairsWalk(push);
+    else caveDoorBump(push);
+    return;
+  }
+  if(DW.hold&&!(DW.holdT>0)&&!inDoorZone(DW.hold,p)) DW.hold=null;
+  // stopped while pushing: something in front of the door (its gate, a cave mouth's rocks, a step) holds Ash back
+  const mv=DW.lp?Math.hypot(p.x-DW.lp.x,p.y-DW.lp.y):99; DW.lp={x:p.x,y:p.y};
+  if(!push) return;
+  for(const d of mapList(DOORS,curMap())){
+    if(Math.abs(d.x-p.x)>70||Math.abs(d.y-p.y)>70||d===DW.hold||!doorWalkable(d)) continue;
+    const r=doorRel(d,p);
+    if(r.lat>=(d.cave?26:18)||r.al>=40||r.al<=-58) continue;
+    if(push.x*r.ux+push.y*r.uy<0.4) continue;
+    // at the door, or held back in front of it (a locked door answers from there too, its gate often bars the way)
+    if(r.al<=-9&&!(mv<0.8)&&!(r.al>-46&&doorLockText(d)!=null)) continue;
+    doorWalkIn(d); return;
+  }
+}
+// the doors Ash walks into have no prompt: they step aside while the prompts are picked
+const DW_OFF=1e7;
+function dwHide(){
+  const p=player, out=[]; if(AREA||!p||!G||G.mode!=='story') return out;
+  for(const d of mapList(DOORS,curMap())){ if(Math.abs(d.x-p.x)>90||Math.abs(d.y-p.y)>90||!doorWalkable(d)) continue; out.push([d,d.x]); d.x+=DW_OFF; }
+  return out;
+}
+{ const base=updateInteractions; updateInteractions=function(dt){
+  try{ doorWalkTick(dt); }catch(e){ console.error(e); }
+  const hid=dwHide();
+  try{ base(dt); } finally { for(const [d,x] of hid) d.x=x; }
+  // the doormat takes him out: "Leave" is not something to press any more
+  if(AREA&&G.prompt&&G.prompt.text==='Leave') G.prompt=null;
+}; }
+// ---------- how a locked door looks: a plank barred across it and a padlock, in both looks (drawn with the world)
+function doorLockAt(d){
+  if(d.hs) return {x:d.x,y:d.y-30,w:28};
+  if(d.trial) return {x:d.x,y:d.y-62,w:44};
+  if(d.cave) return {x:d.x,y:d.y-24,w:40};
+  const a=doorIn(d); return {x:d.x+Math.cos(a)*14,y:d.y+Math.sin(a)*14-14,w:30};
+}
+function drawPadlock(g,x,y,s,sb){
+  const ol=sb?SBC.outline:'#1a120c';
+  g.save(); g.translate(x,y); g.scale(s,s);
+  g.lineWidth=3.2; g.strokeStyle=ol; g.beginPath(); g.arc(0,-5,5.2,Math.PI,0); g.lineTo(5.2,-1); g.moveTo(-5.2,-1); g.lineTo(-5.2,-5); g.stroke();
+  g.lineWidth=1.8; g.strokeStyle=sb?'#d8d2c4':'#b8b4ac'; g.beginPath(); g.arc(0,-5,5.2,Math.PI,0); g.lineTo(5.2,-1); g.moveTo(-5.2,-1); g.lineTo(-5.2,-5); g.stroke();
+  g.fillStyle=sb?SBC.gold:'#e0b040'; g.strokeStyle=ol; g.lineWidth=sb?2.2:1.6; rrect(g,-7.5,-2,15,12,2.5); g.fill(); g.stroke();
+  g.fillStyle='rgba(255,255,255,.45)'; g.fillRect(-5.5,-0.5,11,2);
+  g.fillStyle=ol; g.beginPath(); g.arc(0,3,1.9,0,TAU); g.fill(); g.fillRect(-0.9,3.5,1.8,4);
+  g.restore();
+}
+function drawDoorLock(d,t){
+  const L=doorLockAt(d), sb=LOOK.sb, g=ctx, w=L.w;
+  g.save();
+  // the bar: a dark plank with two nails, across the doorway
+  g.translate(L.x,L.y+2); g.rotate(-0.12);
+  g.fillStyle=sb?SBC.outline:'rgba(0,0,0,.45)'; rrect(g,-w/2-1,-3,w+2,9,2); g.fill();
+  g.fillStyle=sb?'#a8743e':'#7a5230'; rrect(g,-w/2,-4,w,7,2); g.fill();
+  if(sb){ g.strokeStyle=SBC.outline; g.lineWidth=1.6; g.stroke(); }
+  g.fillStyle=sb?'#5a3a24':'#3a2414'; g.beginPath(); g.arc(-w/2+4,-0.5,1.3,0,TAU); g.arc(w/2-4,-0.5,1.3,0,TAU); g.fill();
+  g.restore();
+  // a soft dark disc so the lock reads on any wall, then the padlock (it breathes a little so the eye finds it)
+  const s=1+Math.sin(t*2.4)*0.04;
+  g.fillStyle=sb?'rgba(59,34,51,.35)':'rgba(10,6,4,.45)'; g.beginPath(); g.arc(L.x,L.y+1,11.5,0,TAU); g.fill();
+  drawPadlock(g,L.x,L.y+1,s,sb);
+}
+function doorLocksDraw(){
+  if(!G||G.mode!=='story'||AREA) return;
+  const t=G.time||0;
+  for(const d of mapList(DOORS,curMap())){
+    if(!inView(d.x,d.y,80)) continue;
+    const lk=doorLockText(d)!=null;
+    // a door that just opened (story progress, a key): a puff of dust where the bar was
+    if(d._lk&&!lk){ const L=doorLockAt(d); emit(L.x,L.y,16,{col:'230,210,170',glow:false,smin:30,smax:110,lmin:.4,lmax:.8,zmin:1.5,zmax:3,grow:6}); try{ SFX.play('chest',0.6); }catch(e){} }
+    d._lk=lk;
+    if(lk) drawDoorLock(d,t);
+  }
+}
+{ const base=drawWall; drawWall=function(){ base.apply(this,arguments); try{ doorLocksDraw(); }catch(e){ console.error(e); } }; }
+// ---------- the note over a locked door (drawn with the HUD, a11b_hud.js), so it never hides under a roof
+function doorNoteDraw(){
+  const N=DW.note; if(!N||scene!=='play') return;
+  const sx=(N.x-cam.x)*zoom, sy=(N.y-cam.y)*zoom, a=clamp(Math.min(N.t/0.15,(N.dur-N.t)/0.4),0,1); if(a<=0) return;
+  const g=ctx, sb=LOOK.sb, maxW=Math.min(300,W-40), lh=19, pad=12, iw=N.lock?22:0;
+  g.save(); g.globalAlpha=a; g.font=`600 14px ${UIF}`;
+  const words=N.text.split(/\s+/), lines=[]; let cur='';
+  for(const w of words){ const tr=cur?cur+' '+w:w; if(g.measureText(tr).width>maxW-pad*2-iw&&cur){ lines.push(cur); cur=w; } else cur=tr; }
+  if(cur) lines.push(cur);
+  let tw=0; for(const l of lines) tw=Math.max(tw,g.measureText(l).width);
+  const bw=Math.ceil(tw+pad*2+iw), bh=lines.length*lh+pad*1.4;
+  const bx=clamp(sx-bw/2,SAFE.l+12,W-SAFE.r-12-bw), by=clamp(sy-bh-18,SAFE.t+12,H-SAFE.b-bh-12);
+  const tx=clamp(sx,bx+16,bx+bw-16), below=by+bh<sy-4;
+  if(sb){ g.fillStyle=SBC.outline; rrect(g,bx,by+3,bw,bh,10); g.fill(); g.fillStyle='#fff3d6'; rrect(g,bx,by,bw,bh,10); g.fill(); g.lineWidth=2.6; g.strokeStyle=SBC.outline; g.stroke(); }
+  else{ g.fillStyle='rgba(12,9,6,.86)'; rrect(g,bx,by,bw,bh,10); g.fill(); g.strokeStyle='rgba(255,210,150,.45)'; g.lineWidth=1; g.stroke(); }
+  if(below){ g.fillStyle=sb?'#fff3d6':'rgba(12,9,6,.86)'; g.beginPath(); g.moveTo(tx-7,by+bh-0.5); g.lineTo(tx,by+bh+8); g.lineTo(tx+7,by+bh-0.5); g.closePath(); g.fill(); if(sb){ g.strokeStyle=SBC.outline; g.lineWidth=2.2; g.beginPath(); g.moveTo(tx-7,by+bh); g.lineTo(tx,by+bh+8); g.lineTo(tx+7,by+bh); g.stroke(); } }
+  if(N.lock) drawPadlock(g,bx+pad+7,by+pad*0.7+lh/2-1,0.85,sb);
+  g.fillStyle=sb?SBC.outline:'#ffe6c0'; g.textAlign='left'; g.textBaseline='middle';
+  lines.forEach((l,i)=>g.fillText(l,bx+pad+iw,by+pad*0.7+lh*i+lh/2));
+  g.restore();
+}
+window.__ebDbg=Object.assign(window.__ebDbg||{},{doorInfo:d=>({walk:doorWalkable(d),inA:doorIn(d),lock:doorLockText(d)}),note:()=>DW.note?DW.note.text:null,DW,dsid:()=>AREA?caveDsid(AREA.def):null,areaBlocked:(x,y)=>areaBlocked(x,y),pBlocked:(x,y)=>playerBlocked(x,y)||colAt(x,y,10)});
 
 // ================= caves: hand-planned room dungeons with keys, locked doors, shutters and puzzles
 // Each cave is a grid of rooms (15x11 floor cells each, sharing walls). Rooms hold a fight, a puzzle, a person or treasure.
@@ -3711,8 +3951,8 @@ function buildCaveRooms(A,def){
   A.cave=c; Object.assign(A,{x0,y0,x1:x0+c.w*cs,y1:y0+c.h*cs});
   c.dyn=new Int16Array(c.w*c.h); A.gates=[]; A.blocks=[]; A.rooms=c.rooms; A.crys=cf('crys_'+DK)||0; A.keys=()=>cf('keys_'+DK)||0;
   const P=(i,j)=>({x:x0+(i+0.5)*cs,y:y0+(j+0.5)*cs});
-  const S=c.start;
-  if(S){ A.exit={x:x0+(c.ex+0.5)*cs,y:y0+(c.ey+0.75)*cs,r:50}; A.spawn={x:A.exit.x,y:A.exit.y-120}; }
+  const hasStart=c.start;   // not S: that name is the simple-words helper, used further down
+  if(hasStart){ A.exit={x:x0+(c.ex+0.5)*cs,y:y0+(c.ey+0.75)*cs,r:50}; A.spawn={x:A.exit.x,y:A.exit.y-120}; }
   else { const R0=Object.values(c.rooms)[0], q=P(R0.ox+8,R0.oy+6); A.exit={x:q.x,y:q.y,r:0,none:true}; A.spawn={x:q.x,y:q.y}; }
   const rng=mulberry32(def.seed*31+1);
   const addGate=(o,cells)=>{ o.cells=cells; A.gates.push(o); for(const k of cells) c.dyn[k]=A.gates.length; A.objs.push(o); return o; };
@@ -4193,6 +4433,23 @@ function goFloor(o){
   if(!G.found['seen_'+to]){ G.found['seen_'+to]=true; if(def.secret){ G.secrets=G.secrets||{}; G.secrets['sec_'+to]=1; } }
   setBanner(def.name,'',1.4,'region'); saveGame();
 }
+// walking onto the stairs takes Ash up or down (v11 UX, like the doors in a2e_interiors.js): he bumps their edge while
+// pushing into them. The stairs he arrives by wait until he has stepped away from them, so he never bounces back.
+function floorStairsWalk(push){
+  const A=AREA, p=player; if(!A||!p) return false;
+  for(const o of A.objs){
+    if(o.k!=='stairs'||(o.hidden&&!G.found[o.hidden])) continue;
+    const hw=(o.w||64)/2, hh=(o.h||56)/2, nx=clamp(p.x,o.x-hw,o.x+hw), ny=clamp(p.y,o.y-hh,o.y+hh), dx=nx-p.x, dy=ny-p.y, d=Math.hypot(dx,dy);
+    const touch=d<=(p.r||14)+5;
+    if(DW.hold===o){ if(DW.holdT>0||touch) continue; DW.hold=null; }
+    if(!touch||!push) continue;
+    if(d>0.5&&(push.x*dx+push.y*dy)/d<0.35) continue;
+    goFloor(o);
+    if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; G.prompt=null; }
+    return true;
+  }
+  return false;
+}
 function revealTrig(o){
   if(G.found[o.key]){ return false; }
   runDialogue([['narr',o.text]],()=>{
@@ -4246,7 +4503,8 @@ function floorObjAct(o){
   }
   return false;
 }
-const FLOOR_LABEL={stairs:o=>o.hidden&&!G.found[o.hidden]?null:o.dir==='up'?(o.back?'Go back up':'Go upstairs'):(o.back?'Go back down':'Go down the stairs'),trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
+// (the stairs have no prompt: Ash walks onto them, floorStairsWalk)
+const FLOOR_LABEL={stairs:o=>null,trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
 // ================= Ember's Trials: three grand dungeons built on the cave room system (a2f_caves.js)
 // A thousand years ago Ember, Ash's ancestor, built three Trials so her children could wake their dragon gifts.
 // Nobody since Ember was born with real fire, so nobody has been able to open them. Until Ash.
@@ -7638,26 +7896,103 @@ Object.assign(R2ST,{
   museum:{fl:'herring',wl:{k:'damask',c:['#6a2228','#8a3036'],wain:'#4a2a1a'},fab:6,wood:'dark',trim:'#c8a040',dec:['crest','banner'],arch:1,rug:'persian'},
   deck:{fl:'grey',wl:{k:'stone',c:['#3a3e58','#30344a','#464a66']},fab:6,wood:'grey',trim:'#2a2a3a',dec:['starchart','moonchart'],rug:'kilim'}
 });
+// ---------- stairs that read as stairs (house floors and dungeon floors share this art)
+// Up: a flight that climbs north (up the screen), so every riser faces you: treads lit, brighter toward the top, risers
+// in shade, a side wall with a newel post on each side, warm light spilling down from the floor above.
+// Down: a stairwell cut into the floor, falling south into the dark, inside a frame: each step darker than the one
+// before, the side walls of the well in deep shade. Footprint (w x h, centred on x,y) and triggers are the callers'.
+// Cached at 2x per size, material, lid and look; the light and the arrow are live.
+const STAIR_MAT={
+  // t0/t1: tread at the bottom/top, r0/r1: riser at the bottom/top, side: the side walls, cap: rails and post caps
+  wood:{t0:'#9c6a40',t1:'#e4b47c',r0:'#4a2a16',r1:'#8a5a30',side:'#5e381e',cap:'#b07a4a',post:'#6a4024',rim:'#6e4626',rimLit:'#a87648',deep:'#160d08',line:'#3a2212',run:['#b03a30','#6e1e1a','#e2b24c']},
+  stone:{t0:'#78706a',t1:'#b2aa9a',r0:'#363230',r1:'#6a645e',side:'#56504a',cap:'#a8a092',post:'#625a52',rim:'#5a554e',rimLit:'#9a9286',deep:'#0e0c0c',line:'#2a2622'},
+  dun:{t0:'#806c52',t1:'#bca682',r0:'#32281e',r1:'#64523e',side:'#52443a',cap:'#a8967a',post:'#5e4e3e',rim:'#4e4236',rimLit:'#8e7c62',deep:'#0c0a08',line:'#241c14'}
+};
+const STAIR_SPR=new Map();
+const stC=(a,b,k)=>{ const m=mixRGB(hexRGB(a),hexRGB(b),clamp(k,0,1)); return '#'+m.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); };
+const stairZ=h=>Math.round(h*0.56);   // how far the top of an up flight rises above its footprint (screen px)
+function stairSprite(dir,w,h,mk,lid){
+  const key=dir+'|'+w+'|'+h+'|'+mk+'|'+(lid?1:0)+'|'+(LOOK.sb?1:0); let c=STAIR_SPR.get(key); if(c) return c;
+  const M=STAIR_MAT[mk]||STAIR_MAT.wood, Z=dir==='up'?stairZ(h):0, pad=10, top=dir==='up'?Z+12:(lid?16:4);
+  const W=w+pad*2, H=h+top+pad, sc=2, cv=mkCanvas(W*sc,H*sc), g=cv.getContext('2d');
+  g.scale(sc,sc); g.translate(pad+w/2,top+h/2); g.lineJoin='round'; g.lineCap='round';
+  if(dir==='up') stairUpArt(g,w,h,M,Z); else stairDownArt(g,w,h,M,lid);
+  c=LOOK.sb?outlineSprite(cv,SBC.outline,1.5,{force:true}):cv; c.ox=pad+w/2; c.oy=top+h/2; c.w2=W; c.h2=H; STAIR_SPR.set(key,c); return c;
+}
+function stairUpArt(g,w,h,M,Z){
+  const hw=w/2, hh=h/2, N=h>=50?5:4, d=h/N, r=Z/N, sw=Math.max(5,Math.round(w*0.1)), x0=-hw+sw, x1=hw-sw, iw=x1-x0, top=-hh-Z, wt=top-6;
+  const R=M.run, rw=R?Math.round(iw*0.46):0, rx=-rw/2;
+  // the shadow the flight throws on the floor (south-east)
+  g.fillStyle='rgba(30,14,6,.32)'; g.beginPath(); g.moveTo(-hw+6,hh+5); g.lineTo(hw+6,hh+5); g.lineTo(hw+6,wt+10); g.lineTo(hw,wt+4); g.lineTo(hw,hh); g.closePath(); g.fill();
+  // steps, bottom (south) to top: each riser faces you in shade, each tread above it is lit, lighter the higher it is
+  for(let i=0;i<N;i++){ const u=N>1?i/(N-1):1, yb=hh-i*d, zt=(i+1)*r, zb=i*r, ry=yb-zt, rh=zt-zb, ty=yb-d-zt;
+    g.fillStyle=stC(M.r0,M.r1,u); g.fillRect(x0,ry,iw,rh+0.6);
+    g.fillStyle=stC(M.t0,M.t1,u); g.fillRect(x0,ty,iw,d+0.6);
+    // a worn board joint or two, the bright nosing on the tread's front edge and the shadow it throws on the riser
+    g.fillStyle='rgba(40,20,8,.16)'; g.fillRect(x0+iw*0.24,ty+1.5,1,d-2.5); g.fillRect(x0+iw*0.73,ty+1.5,1,d-2.5);
+    g.fillStyle=`rgba(255,246,224,${0.4+0.4*u})`; g.fillRect(x0,ry-1.7,iw,1.7);
+    g.fillStyle='rgba(20,8,2,.45)'; g.fillRect(x0,ry,iw,Math.min(1.8,rh*0.3));
+    if(R){ // a runner down the middle, held by a brass rod on every step
+      g.fillStyle=stC(R[1],R[0],0.25+0.4*u); g.fillRect(rx,ry,rw,rh+0.6); g.fillStyle=stC(R[0],'#fff0d8',0.28*u); g.fillRect(rx,ty+1,rw,d-0.4);
+      g.fillStyle=R[2]; g.fillRect(rx-1,ry-1.5,rw+2,1.5); g.fillStyle='rgba(255,236,170,.55)'; g.fillRect(rx,ty+1,1,d+rh-1); g.fillRect(rx+rw-1,ty+1,1,d+rh-1); } }
+  // the floor above: a lit landing at the top of the flight
+  g.fillStyle=stC(M.t1,'#fff4dc',0.35); g.fillRect(x0,wt,iw,top-wt+0.6); g.fillStyle='rgba(255,252,236,.7)'; g.fillRect(x0,wt,iw,1.6);
+  if(R){ g.fillStyle=stC(R[0],'#fff0d8',0.35); g.fillRect(rx,wt+1.6,rw,top-wt-1); }
+  // the left wall's shadow across the steps
+  g.fillStyle='rgba(30,14,4,.22)'; g.fillRect(x0,wt,4,hh-wt);
+  // side walls with a handrail on top (lighter toward the top), and a newel post at the foot of each
+  for(const s of [-1,1]){ const a=s<0?-hw:hw-sw;
+    const sg=g.createLinearGradient(0,hh,0,wt); sg.addColorStop(0,stC(M.side,'#000000',0.2)); sg.addColorStop(1,stC(M.side,M.cap,0.55)); g.fillStyle=sg; g.fillRect(a,wt,sw,hh-wt);
+    const hx=a+sw/2; g.fillStyle=M.cap; g.fillRect(hx-1.6,wt,3.2,hh-wt-14); g.fillStyle='rgba(255,246,224,.45)'; g.fillRect(hx-1.6,wt,1.1,hh-wt-14);
+    const pw=sw+4, py=hh-17; g.fillStyle=M.post; g.fillRect(hx-pw/2,py,pw,hh-py); g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(hx+pw/2-2,py,2,hh-py);
+    g.fillStyle=M.cap; g.fillRect(hx-pw/2-1,py-4,pw+2,4.5); g.fillStyle='rgba(255,246,224,.5)'; g.fillRect(hx-pw/2-1,py-4,pw+2,1.3);
+    g.fillStyle=M.cap; g.beginPath(); g.arc(hx,py-6,2.6,0,TAU); g.fill(); }
+  g.strokeStyle=M.line; g.lineWidth=1.3; g.strokeRect(-hw,wt,w,hh-wt);
+}
+function stairDownArt(g,w,h,M,lid){
+  const hw=w/2, hh=h/2, fr=Math.max(4,Math.round(w*0.09)), ix0=-hw+fr, ix1=hw-fr, iy0=-hh+fr, iy1=hh-fr, iw=ix1-ix0, sw=Math.max(3,Math.round(iw*0.1)), sx0=ix0+sw, sx1=ix1-sw;
+  const d=h*0.15, r=h*0.09;
+  // the frame round the well (boards or stones, lit along the top) and the dark inside
+  g.fillStyle=M.rim; g.fillRect(-hw,-hh,w,h);
+  g.fillStyle=M.rimLit; g.fillRect(-hw+1,-hh+1,w-2,fr-2); g.fillRect(-hw+1,-hh+1,fr-2,h-2); g.fillStyle=stC(M.rimLit,M.rim,0.45); g.fillRect(ix1+1,-hh+fr-1,fr-2,h-fr); g.fillRect(-hw+fr-1,iy1+1,w-fr,fr-2);
+  g.fillStyle='rgba(20,10,4,.4)'; for(const q of [-hw*0.36,hw*0.3]){ g.fillRect(q,-hh,1,fr); g.fillRect(q+3,hh-fr,1,fr); }
+  g.fillStyle=M.deep; g.fillRect(ix0,iy0,iw,iy1-iy0);
+  // steps going down, away to the south: the face under the step above, then the step, each darker than the last
+  let y=iy0, i=0;
+  while(y<iy1-0.5){ const k=Math.max(0,1-i*0.2), rr=Math.min(r,iy1-y);
+    g.fillStyle=stC(stC(M.r0,M.r1,0.6),M.deep,1-k*0.85); g.fillRect(sx0,y,sx1-sx0,rr); y+=rr; if(y>=iy1) break;
+    const dd=Math.min(d,iy1-y); g.fillStyle=stC(stC(M.t0,M.t1,0.55),M.deep,1-k*0.95); g.fillRect(sx0,y,sx1-sx0,dd);
+    g.fillStyle=`rgba(255,240,210,${0.4*k})`; g.fillRect(sx0,y+dd-1.4,sx1-sx0,1.4);
+    y+=dd; i++; }
+  // the walls of the well in shade (the west one catches a little light), and the gloom at the bottom
+  g.fillStyle=stC(M.side,M.deep,0.4); g.fillRect(ix0,iy0,sw,iy1-iy0); g.fillStyle=stC(M.side,M.deep,0.72); g.fillRect(ix1-sw,iy0,sw,iy1-iy0);
+  const dg=g.createLinearGradient(0,iy0,0,iy1); dg.addColorStop(0,'rgba(0,0,0,0)'); dg.addColorStop(0.5,'rgba(0,0,0,.2)'); dg.addColorStop(1,'rgba(0,0,0,.82)'); g.fillStyle=dg; g.fillRect(ix0,iy0,iw,iy1-iy0);
+  g.fillStyle='rgba(0,0,0,.5)'; g.fillRect(ix0,iy0,iw,1.8);
+  g.strokeStyle=M.line; g.lineWidth=1.1; g.strokeRect(ix0,iy0,iw,iy1-iy0);
+  g.strokeStyle=M.line; g.lineWidth=1.3; g.strokeRect(-hw,-hh,w,h);
+  // a secret way down keeps its lid, swung up against the north-west corner
+  if(lid){ g.save(); g.translate(-hw+2,-hh+2); g.rotate(-0.28); g.fillStyle='rgba(20,10,4,.3)'; g.fillRect(-3,-9,w*0.86,12); g.fillStyle='#6a4428'; g.fillRect(-6,-13,w*0.86,12);
+    g.fillStyle='#86603a'; g.fillRect(-6,-13,w*0.86,2.4); g.fillStyle='#4a4a52'; g.fillRect(w*0.18,-13,3,12); g.fillRect(w*0.6,-13,3,12); g.strokeStyle=M.line; g.lineWidth=1; g.strokeRect(-6,-13,w*0.86,12); g.restore(); }
+}
+// draw a stair at (x,y): the cached flight or well, then the live light and a small arrow that says up or down
+function drawStairArt(x,y,w,h,dir,mk,t,lid){
+  const c=stairSprite(dir,w,h,mk,lid); ctx.drawImage(c,x-c.ox,y-c.oy,c.w2,c.h2);
+  const b=Math.sin(t*3)*1.6, up=dir==='up', Z=stairZ(h);
+  if(up) glowAt(x,y-h/2-Z,w*0.6,'255,226,160',0.18+0.06*Math.sin(t*2.2));
+  const ay=up?y-h/2-Z-15+b:y+h*0.1+b, s=Math.max(5,w*0.1);
+  ctx.save(); ctx.lineJoin='round'; ctx.lineCap='round'; ctx.beginPath();
+  if(up){ ctx.moveTo(x-s,ay+s*0.55); ctx.lineTo(x,ay-s*0.45); ctx.lineTo(x+s,ay+s*0.55); } else { ctx.moveTo(x-s,ay-s*0.45); ctx.lineTo(x,ay+s*0.55); ctx.lineTo(x+s,ay-s*0.45); }
+  ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(30,16,8,.8)'; ctx.lineWidth=5; ctx.stroke(); ctx.strokeStyle=up?'#fff0c8':'rgba(255,226,170,.9)'; ctx.lineWidth=2.6; ctx.stroke(); ctx.restore();
+}
 function hintedKey(key){ if(!G||!G.hints) return false; for(const h in G.hints) if(key.startsWith(h)) return true; return false; }
 function drawFurnHouseX(o,t){
   const x=o.x, y=o.y;
   switch(o.k){
     case 'stairs':{
       if(o.hidden&&!G.found[o.hidden]) return true;
-      const w=o.w, h=o.h;
-      if(o.dir==='up'){
-        ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(x-w/2+4,y-h/2+6,w,h);
-        for(let i=0;i<5;i++){ const yy=y+h/2-(i+1)*h/5; ctx.fillStyle=i%2?'#8a6040':'#9a6e48'; ctx.fillRect(x-w/2,yy,w,h/5+1); ctx.fillStyle='rgba(255,240,210,.18)'; ctx.fillRect(x-w/2,yy,w,2); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(x-w/2,yy+h/5-2,w,2); }
-        ctx.fillStyle='#4a2e18'; ctx.fillRect(x-w/2-4,y-h/2,5,h); ctx.fillRect(x+w/2-1,y-h/2,5,h);
-        ctx.fillStyle='rgba(255,230,180,.75)'; ctx.beginPath(); ctx.moveTo(x,y-h/2-12); ctx.lineTo(x+7,y-h/2-4); ctx.lineTo(x-7,y-h/2-4); ctx.closePath(); ctx.fill();
-      }else{
-        ctx.fillStyle='#120c08'; ctx.fillRect(x-w/2,y-h/2,w,h);
-        for(let i=0;i<4;i++){ const yy=y-h/2+i*h/4; const k=1-i*0.18; ctx.fillStyle=`rgba(${120*k|0},${86*k|0},${58*k|0},1)`; ctx.fillRect(x-w/2+6+i*3,yy+4,w-12-i*6,h/4-4); }
-        const g=ctx.createLinearGradient(0,y-h/2,0,y+h/2); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.7)'); ctx.fillStyle=g; ctx.fillRect(x-w/2,y-h/2,w,h);
-        ctx.strokeStyle='#5a3a22'; ctx.lineWidth=4; ctx.strokeRect(x-w/2,y-h/2,w,h);
-        if(o.hidden){ ctx.fillStyle='#6a4428'; ctx.save(); ctx.translate(x-w/2,y-h/2); ctx.rotate(-0.25); ctx.fillRect(-6,-10,w*0.9,12); ctx.restore(); }
-        ctx.fillStyle='rgba(255,230,180,.75)'; ctx.beginPath(); ctx.moveTo(x,y+4); ctx.lineTo(x+7,y-4); ctx.lineTo(x-7,y-4); ctx.closePath(); ctx.fill();
-      }
+      // stone steps in cellars and vaults, wooden ones everywhere else
+      const st=AREA&&AREA.def&&AREA.def.style, mk=st==='cellar'||st==='vault'?'stone':'wood';
+      drawStairArt(x,y,o.w,o.h,o.dir==='up'?'up':'down',mk,t,!!o.hidden);
       return true; }
     case 'trig':{
       if(G.found[o.key]) return true;
@@ -7685,6 +8020,7 @@ function drawFurnHouseX(o,t){
   }
   return false;
 }
+window.__ebDbg=Object.assign(window.__ebDbg||{},{stairSprite,STAIR_SPR,STAIR_MAT});
 // ================= dungeon art: Ember's Trials (floors and walls, live floor effects, puzzle pieces, the guardians, the gates outside)
 // Light falls from the upper left, like everywhere else. Static floor art is painted once into the cave canvas (renderCaveRooms);
 // moving things (water, crumbling tiles, spikes, wind, boss effects) are drawn live by drawTrialFloor.
@@ -8864,7 +9200,7 @@ function tipX(cx,cy,fn,r){
 }
 addEventListener('keydown',e=>{ if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){ if(e.code==='Escape'&&scene==='menu'){ show('menu'); } return; } SFX.init(); if(!keys.has(e.code)) pressed.add(e.code); keys.add(e.code); if(scene!=='play') OFFK.add(e.code); else if(!e.repeat) OFFK.delete(e.code); onKey(e); });
 addEventListener('keyup',e=>{ keys.delete(e.code); OFFK.delete(e.code); });
-addEventListener('blur',()=>{ keys.clear(); OFFK.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
+addEventListener('blur',()=>{ keys.clear(); OFFK.clear(); mouse.l=mouse.r=mouse.lp=false; touch.held={}; touch.stickId=null; if(scene==='play') pauseGame(); });
 document.addEventListener('visibilitychange',()=>{ if(document.hidden&&scene==='play') pauseGame(); });
 cvs.addEventListener('mousemove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; if(!usingTouch) aimMode='mouse'; });
 cvs.addEventListener('mousedown',e=>{
@@ -8872,7 +9208,7 @@ cvs.addEventListener('mousedown',e=>{
   if(scene==='play'&&hudClick(e.clientX,e.clientY)) return;
   usingTouch=false; aimMode='mouse';
   if(scene==='play') bannerSkip();
-  if(e.button===0) mouse.l=true; if(e.button===2) mouse.r=true;
+  if(e.button===0){ mouse.l=true; if(scene==='play') mouse.lp=true; } if(e.button===2) mouse.r=true;
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
@@ -8973,7 +9309,24 @@ function stickZone(x,y){
 // left click, the controller's attack buttons) does that instead of swinging. Foes near: attack attacks. A press that
 // started as a swing never turns into a talk, attack stays attack for 0.4 s after a swing, and a key still held from a
 // conversation or a menu does nothing until it is let go (OFFK). E, F and the controller's top button stay a dedicated use.
-const ATK={press:'',swingT:-9,g:null};
+const ATK={press:'',swingT:-9,g:null,buf:0,lsw:0,lcd:0};
+// (v11) an attack pressed while Ash cannot swing yet (the end of a swing, a roll, a drink) is kept for ATK_BUF seconds
+// and swings as soon as he can, so a quick tap is never lost. A click shorter than one frame counts too (mouse.lp).
+// The bow, hammer, whip, bombs and glaive read how long the button is held, so only the plain swings are buffered.
+const ATK_BUF=0.3;
+// the foe a fresh click landed on (or next to), while that press lasts: a6_player.js aims the swing at it
+function clickFoe(R){
+  const c=ATK.ck, p=player; if(!c||!G||!p||G.time-c.t>0.45) return null;
+  let best=null, bd=1e9;
+  for(const e of G.enemies){
+    if(e.dead||e.passive||e.invuln||e.alpha<0.3||e.spawnIn>0) continue;
+    const dc=dist(c.x,c.y,e.x,e.y)-(e.r||10); if(dc>48) continue;
+    if(dist(p.x,p.y,e.x,e.y)-(e.r||10)>R) continue;
+    if(dc<bd){ bd=dc; best=e; }
+  }
+  return best;
+}
+function atkBufOK(){ const w=curWeapon(), D=wDef(w); return !D.input||w==='boomerang'; }
 const PROMPT_KINDS=[
   [/^(talk|chat|ask|speak|greet)/i,'talk','TALK'],
   [/^(open|unlock)/i,'open','OPEN'],
@@ -9088,8 +9441,9 @@ function readInput(dt){
   const WSEL={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5,Digit7:6,Digit8:7,Digit9:8};
   let wSel=-1; for(const k in WSEL) if(pressed.has(k)) wSel=WSEL[k];
   const K=c=>keys.has(c), P=c=>pressed.has(c), LP=a=>LEFT_KEYS[a].some(P), LH=a=>LEFT_KEYS[a].some(K), KA=c=>(K(c)||P(c))&&!OFFK.has(c);
+  const mClick=!!mouse.lp; mouse.lp=false; ATK.f=(ATK.f||0)+1;
   const o={mx,my,
-    attack:KA('KeyJ')||KA('Enter')||mouse.l||!!touch.held.attack||!!touch.pressed.attack,
+    attack:KA('KeyJ')||KA('Enter')||mouse.l||mClick||!!touch.held.attack||!!touch.pressed.attack,
     fire:K('KeyK')||LH('fire')||mouse.r||!!touch.held.fire||(touch.fireT>0),
     roll:P('Space')||LP('roll')||!!touch.pressed.roll,
     roar:P('KeyQ')||LP('roar')||!!touch.pressed.roar,
@@ -9101,10 +9455,24 @@ function readInput(dt){
     whistle:P('KeyG')||LP('whistle')||!!touch.pressed.whistle, aimX:0, aimY:0, pad:false};
   padInput(o,dt);
   // one button for attack and use: decided once, when the press starts (see useMode)
-  if(!o.attack) ATK.press='';
-  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; }
-  if(ATK.press==='use') o.attack=false;
   const p=player;
+  if(!o.attack) ATK.press='';
+  else if(!ATK.press){ const um=useMode(); ATK.press=um?'use':'atk'; if(um) o.use=true; else{ if(p&&G&&atkBufOK()) ATK.buf=ATK_BUF;
+    // a click on a foe swings at that foe (without "Aim with the mouse" Ash still faces the way he walks otherwise)
+    ATK.ck=(mouse.l||mClick)&&!usingTouch&&!settings.mouseAim&&G?Object.assign(toWorld(mouse.x,mouse.y),{t:G.time}):null; } }
+  if(ATK.press==='use') o.attack=false;
+  // the kept press: used once a swing starts (its cooldown jumps up) or a hold weapon takes over
+  if(ATK.buf>0){
+    ATK.buf-=dt;
+    // (a press kept from before a jump never turns into a Ground Pound in the air)
+    const used=!p||(p.swingT>0&&ATK.lsw<=0)||p.atkCd>ATK.lcd+0.02||!!p.ham||!!p.bow||p.dead||!atkBufOK()||airborne();
+    if(used) ATK.buf=0; else if(!o.attack&&ATK.press!=='use') o.attack=true;
+  }
+  // a roll pressed while the last one is still going is kept a little longer too (about 0.3 s; the game keeps 0.15 s)
+  if(o.roll) ATK.rb=0.15;
+  else if(ATK.rb>0){ ATK.rb-=dt; if(p&&(p.dashT>0||p.dead)) ATK.rb=0; else if(G&&G.dashBuf<=0.02&&ATK.rb>0) o.roll=true; }
+  if(p&&p.atkCd>ATK.lcd+0.02) ATK.n=(ATK.n||0)+1;   // swings started (tests)
+  ATK.lsw=p?p.swingT:0; ATK.lcd=p?p.atkCd:0;
   if((ATK.press==='atk'&&o.attack)||(p&&(p.swingT>0||p.ham||p.bow))){ ATK.swingT=G.time; ATK.g=G; }
   if(!o.attack&&ATK.press!=='use'&&autoSwing()) o.attack=true;
   if(o.use) bannerSkip();
@@ -9184,6 +9552,14 @@ function updateCam(dt,snap){
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
 }
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
+// test hooks (v11 UX): spawn a foe next to Ash, and what the attack button is doing
+window.__ebDbg=Object.assign(window.__ebDbg||{},{
+  dlg:()=>DLG?{i:DLG.i,n:DLG.lines.length,chars:Math.floor(DLG.chars),len:(DLG.text||'').length,opts:DLG.opts?DLG.opts.length:0,shown:!document.getElementById('dlgOpts').hidden,skipArm:!!DLG.skipArm,text:String(DLG.text||'').slice(0,50)}:null,
+  scr:(x,y)=>({x:(x-cam.x)*zoom,y:(y-cam.y)*zoom}),
+  lvl:n=>{ let k=0; while(player.level<n&&k++<99) gainXp(xpNeed(player.level)-player.xp+1); return player.level; },
+  spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
+  atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})
+});
 // ================= gamepads: PlayStation, Xbox and Nintendo controllers through the browser Gamepad API (controls build)
 // Buttons are read by physical position (the "standard" mapping): 0 bottom face, 1 right face, 2 left face, 3 top face,
 // 4 L1/LB/L, 5 R1/RB/R, 6 L2/LT/ZL, 7 R2/RT/ZR, 8 Back/View/Share/Create/minus, 9 Start/Menu/Options/plus,
@@ -9854,7 +10230,7 @@ function updatePlayer(dt,inp){
   const fighting=inp.attack||inp.fire||p.breathing||!!p.bow||!!p.ham;
   if(!usingTouch&&!mouseAim){
     if(stickAim){ if(ranged) aim=wAimAssist(aim); }
-    else if(fighting) aim=aimAssist(aim,inp.fire||p.breathing?'breath':wpn);
+    else if(fighting){ const cf=inp.attack&&!inp.fire&&!p.breathing?clickFoe(ranged?620:Math.max(170,wReach(wpn)+110)):null; aim=cf?angTo(p.x,p.y,cf.x,cf.y):aimAssist(aim,inp.fire||p.breathing?'breath':wpn); }
   }
   p.aim=aim;
   if(stickAim||(usingTouch&&!moving)) p.faceGoal=aim;   // letting go of the right stick (or a touch target) keeps that facing
@@ -13319,7 +13695,52 @@ function qAvail(id){
   if(d.errand){ const to=d.steps[0].npc; if(!npcPresent(to)||!npcPresent(d.giver)) return false; if(Object.values(G.quests).filter(q=>!q.done&&q.errand).length>=3) return false; }
   if(id==='lure'&&!G.bossDone.gloamjaw) return false;
   if(id==='gate'&&!G.flags.gateHint) return false;
-  return true;
+  return qpOk(id);
+}
+// ---------- pacing: a town is a place people live, not a job board (v11)
+// Each Act I town shows at most QP_MAX gold ! at once, story ones included, and at most QP_ERR errand letters. When more
+// side quests are open than that, the ones higher in QP_ORDER are offered first; the rest wait their turn (a quest that
+// is already started is never touched). Nobody offers anything while the kobolds are in Emberhollow. When each quest
+// opens is its own `min` stage (see QUESTS_NOTES.md in the v11 scratchpad for the table).
+const QP_MAX=3, QP_ERR=1, QP_TOWNS=new Set(['village','brindle','copper','farm','lodge','way','mire']);
+const QP_ORDER=['a1_lanterns','bun','pumpkins','song','hollow','sheep','moss','a1_bram','swap','a1_pip',
+  'dell','bounty','thief','seek','pie','lure','bounty2','a1_moth','duchess','a1_hop','horn','race','skyhoops','kettle','mine'];
+const QP={raw:0,key:'',G:null,allow:null,err:null,prio:null};
+// an Act I quest (Act II to V ids start c_, f_, m_, n4_, q_) whose giver lives in an Act I town
+function qpPaced(id){ const d=QDEFS[id]; if(!d||d.story||d._s10||/^(c|f|m|n\d|q)_/.test(id)) return false; const c=CASTBY[d.giver]; return !!c&&QP_TOWNS.has(c.town); }
+function qpPrio(id){ if(!QP.prio){ QP.prio={}; QP_ORDER.forEach((k,i)=>{ QP.prio[k]=i; }); let i=100; for(const k in QDEFS) if(QP.prio[k]==null) QP.prio[k]=i++; } return QP.prio[id]!=null?QP.prio[id]:999; }
+function qpOk(id){
+  if(QP.raw||!G||G.mode!=='story'||!qpPaced(id)) return true;
+  if(G.stage==='raid') return false;
+  qpRefresh();
+  return QDEFS[id].errand?QP.err.has(id):QP.allow.has(id);
+}
+function qpRefresh(){
+  const key=`${G.stage}|${Object.keys(G.quests).length}|${Math.floor((G.time||0)*2)}|${G.done?1:0}`;
+  if(QP.G===G&&QP.key===key&&QP.allow) return;
+  QP.G=G; QP.key=key; const allow=new Set(), err=new Set(), towns={};
+  QP.raw++;
+  try{
+    const by={}; for(const id in QDEFS){ if(G.quests[id]||!qpPaced(id)) continue; const g=QDEFS[id].giver; (by[g]||(by[g]=[])).push(id); }
+    for(const c of CAST){
+      if(!QP_TOWNS.has(c.town)||!npcPresent(c.id)) continue;
+      const T=towns[c.town]||(towns[c.town]={fixed:0,side:[],errs:[]});
+      // someone already waiting on Ash for a quest (a ? or …) offers nothing new until that is done
+      if(npcMarkerWait(c.id)) continue;
+      // a gold ! that is not a side quest's (the story, a Case Book quest): it always shows, and takes a place
+      if(storyMarker(c.id)){ T.fixed++; continue; }
+      let best=null, bp=1e9, er=null;
+      for(const id of by[c.id]||[]){ const d=QDEFS[id];
+        let ok=false; try{ ok=qAvail(id); }catch(e){ ok=false; } if(!ok) continue;
+        if(d.errand){ if(!er) er=id; continue; }
+        const pr=qpPrio(id); if(pr<bp){ bp=pr; best=id; } }
+      if(best) T.side.push([bp,best]); else if(er) T.errs.push(er);
+    }
+    for(const t in towns){ const T=towns[t]; T.side.sort((a,b)=>a[0]-b[0]);
+      for(const [,id] of T.side.slice(0,Math.max(0,QP_MAX-T.fixed))) allow.add(id);
+      for(const id of T.errs.slice(0,QP_ERR)) err.add(id); }
+  } finally { QP.raw--; }
+  QP.allow=allow; QP.err=err;
 }
 function availableFrom(id){ let err=null; for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)){ if(!QDEFS[k].errand) return k; if(!err) err=k; } return err; }
 function stepOf(id){ const q=G.quests[id]; return q&&!q.done?QDEFS[id].steps[q.step]:null; }
@@ -13384,9 +13805,14 @@ function questPoke(){
 }
 function reforgeIron(){ if(G.iron<=0) return; while(G.iron>0){ G.iron--; G.tier++; player.stats.slash*=1.15; } setBanner(`Blade reforged · tier ${G.tier+1}`,'Each star-iron makes every weapon hit 15% harder.',2.8); SFX.play('upgrade'); }
 // markers: ! = has a quest for you, ? = waiting on you
-function npcMarker(id){
+// a person someone's quest is waiting on: ? (ready) or … (still need something)
+function npcMarkerWait(id){
   for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id) return haveAll(st.take)?'?':'…'; if(st&&st.mini&&st.npc===id&&!G.mini) return '?'; const T=QDEFS[qid].topics; if(st&&T&&T[id]&&!G.flags[T[id].flag]&&G.quests[qid].step===0) return '?'; }
   if(id==='wren'&&G.quests.pages&&Object.keys(G.pages).length>(G.pagesGiven||0)) return '?';
+  return null;
+}
+function npcMarker(id){
+  const w=npcMarkerWait(id); if(w) return w;
   const av=availableFrom(id); if(av&&!QDEFS[av].errand) return '!';
   if(storyMarker(id)) return '!';
   if(av) return '✉';
@@ -13768,6 +14194,9 @@ function updateAllies(dt){
     }
   }
 }
+// test hooks (QUESTS pacing checks)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{qAvail:id=>qAvail(id),availableFrom:id=>availableFrom(id),npcMarker:id=>npcMarker(id),storyMarker:id=>storyMarker(id),
+  qpRaw:id=>{ QP.raw++; try{ return qAvail(id); } finally { QP.raw--; } },qpState:()=>{ QP.key=''; qpRefresh(); return {allow:[...QP.allow],err:[...QP.err]}; }});
 
 // ================= meta systems: music direction, quest tracking, save slots, settings
 Object.assign(settings,{
@@ -14182,6 +14611,8 @@ function miniTalk(n){
   for(const qid in G.quests){
     const st=stepOf(qid);
     if(st&&st.mini&&st.npc===n.id&&!G.mini&&!G.flags[st.flag]){
+      // (one fight at a time: no pumpkin patrol while kobolds run around Emberhollow)
+      if(G.mode==='story'&&G.stage==='raid'){ runDialogue([[n.id,S(`Kobolds first, Ash! The pumpkins can wait.`,`Kobolds first! The pumpkins can wait.`)]],()=>{ scene='play'; }); return true; }
       const lines=(st.ready||[[n.id,'Ready?']]).slice(0,-1);
       const last=(st.ready||[[n.id,'Ready?']]).slice(-1)[0];
       lines.push(ch(last[0],last[1],[{t:'Let’s go!',tone:'brave',fn:()=>{ later(0.05,()=>startMini(st.mini,qid)); }},{t:'Give me a minute.',then:[[n.id,`Okay. I'll be right here.`]]}]));
@@ -14237,26 +14668,141 @@ function drawSeekProp(s,t){
   if(!s.found&&Math.sin(t*3+x)>0.92){ ctx.fillStyle='#ffe0b0'; ctx.beginPath(); ctx.arc(x+8,y-14,2,0,TAU); ctx.fill(); }
 }
 // ---------- Pumpkin Patrol
+// Four small waves of slimes with a breather between them. Only a few hop at once, they go for Hal's pumpkins (not for
+// Ash), and a pumpkin takes three bites to eat, so there is always time to knock a slime off it. A slime cut in half
+// leaves two babies that run off scared. When it ends, any slimes left hop back into the hedges one by one (no bang).
+const PATCH={
+  waves:[[2,3,3,3],[3,3,4,4],[4,4,5,6]],   // slimes in each wave, by difficulty (Easy, Normal, Hard)
+  onScreen:[2,3,4],                        // at most this many hopping at once
+  bite:[1.7,1.3,1.0],                      // seconds a slime sits on a pumpkin for each bite
+  bites:3, rest:3.5, first:2.5, waveMax:25, // bites to eat one, breather between waves, the first wait, a wave's time limit
+};
+const patchK=()=>clamp(typeof diffIdx==='number'?diffIdx:1,0,2);
+const patchLive=M=>M.slimes.filter(e=>!e.dead&&!e.patchLeave);
+const patchLeft=M=>M.crops.filter(q=>!q.eaten);
+// one banner that changes in place (the same title), so wave news never queues up behind itself
+const patchSay=(sub,dur)=>setBanner(S('Pumpkin Patrol','Pumpkin Patrol'),sub,dur||1.8);
+const patchN=(n,one,many)=>`${n} ${n===1?one:many}`;
+// the patch goes in the clearest spot in front of Hal's house: not under the Hollow Ward's big oak, not on a signpost
+function patchSite(){
+  const door=DOORS.find(d=>d.owner==='hal')||{x:POI.village.x,y:POI.village.y}, side=door.x<POI.village.x?-1:1, obs=[[door.x,door.y,70]];
+  const near=(o,r)=>Math.abs(o.x-door.x)<r&&Math.abs(o.y-door.y)<r;
+  for(const s of STRUCTS) if(near(s,800)){ const r=s.k==='bigoak'?200:s.w?Math.max(s.w,s.h||0)*0.55+40:s.k==='ward'||s.k==='shrine'?110:60; obs.push([s.x,s.y,r]); }
+  for(const l of LANDMARKS) if(near(l,800)) obs.push([l.x,l.y,55]);
+  let best=null;
+  for(let dy=-80;dy<=320;dy+=40) for(let dx=-320;dx<=320;dx+=40){
+    const cx=door.x+dx*side, cy=door.y+dy, spots=[]; let ok=true, clear=1e9;
+    for(let i=0;i<8;i++) spots.push([cx+((i%4)-1.5)*46,cy+(Math.floor(i/4)-0.5)*46]);
+    for(const [x,y] of spots){ const s={}; T(x,y,s);
+      if(blockedAt(x,y)||s.water||s.bridge||s.road>0||s.roadD<40||Math.abs(y-WALL_Y)<110){ ok=false; break; }
+      for(const [ox,oy,r] of obs) clear=Math.min(clear,dist(x,y,ox,oy)-r); }
+    if(!ok) continue;
+    const score=Math.min(clear,40)-dist(cx,cy,door.x,door.y+90)/25;
+    if(!best||score>best.s) best={s:score,cx,cy};
+  }
+  return best||{cx:door.x+side*160,cy:door.y+60};
+}
+function patchSpawn(M){
+  const p=player;
+  for(let k=0;k<30;k++){
+    const a=rand(0,TAU), r=rand(300,360), x=M.cx+Math.cos(a)*r, y=M.cy+Math.sin(a)*r*0.8;
+    if(blockedAt(x,y)||dist(x,y,p.x,p.y)<170) continue;
+    // a clear straight hop in to the patch (not behind a fence or a house)
+    let clear=true; for(let f=0.06;f<0.9;f+=0.06) if(blockedAt(x+(M.cx-x)*f,y+(M.cy-y)*f)){ clear=false; break; }
+    if(!clear) continue;
+    const e=makeEnemy('slime',x,y,{level:2,aggro:true,homeX:M.cx,homeY:M.cy,leash:99999,elite:false});
+    e.mini='patch'; e.spawnIn=0.5; e.cd=rand(0.5,0.9); patchAim(M,e); M.slimes.push(e);
+    emit(x,y,10,{col:'120,170,60',glow:false,smin:30,smax:100,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); ftext(x,y-22,'rustle','#c8e8a0',11);
+    return true;
+  }
+  return false;
+}
+// the nearest pumpkin that fewer than two slimes are already after
+function patchAim(M,e){
+  const live=patchLeft(M); if(!live.length){ e.cropTarget=null; return; }
+  const n=c=>M.slimes.filter(o=>o!==e&&!o.dead&&o.cropTarget===c).length;
+  e.cropTarget=live.slice().sort((a,b)=>(n(a)>=2)-(n(b)>=2)||dist2(a.x,a.y,e.x,e.y)-dist2(b.x,b.y,e.x,e.y))[0];
+}
+function patchSlimeAI(e,dt){
+  const p=player, M=G.mini&&G.mini.kind==='defend'?G.mini:null, d=dist(e.x,e.y,p.x,p.y);
+  e.dx=e.dy=0; if(e.hopT>0) e.hopT-=dt; e.cd-=dt;
+  // going home: wait a moment (each one its own moment), hop away from the patch, then gone in a puff of leaves
+  if(!M||e.patchLeave||e.small){
+    if(e.leaveT==null) e.leaveT=e.small?rand(1.0,1.8):rand(0.2,1.6);
+    e.leaveT-=dt;
+    const hx=M?M.cx:e.homeX, hy=M?M.cy:e.homeY, a=e.small?angTo(p.x,p.y,e.x,e.y):angTo(hx,hy,e.x,e.y);
+    if(e.cd<=0&&(e.small||e.leaveT<1)){ e.cd=rand(0.45,0.7); e.hopT=0.25; e.vx+=Math.cos(a)*170; e.vy+=Math.sin(a)*170; e.face=a; }
+    if(e.leaveT<=-0.9){ e.dead=true; emit(e.x,e.y,8,{col:'120,170,60',glow:false,smin:20,smax:70,lmin:.3,lmax:.5,zmin:1,zmax:2.5}); }
+    return;
+  }
+  const c=e.cropTarget&&!e.cropTarget.eaten?e.cropTarget:(patchAim(M,e),e.cropTarget);
+  // a bump hurts a little (they are not trying to hurt you, you are just in the way)
+  e.touchCd=(e.touchCd||0)-dt; if(e.touchCd<=0&&d<e.r+p.r){ if(hurtPlayer(e.dmg*0.5,e.x,e.y,120)) e.touchCd=1.2; }
+  if(!c) return;
+  const dc=dist(e.x,e.y,c.x,c.y);
+  if(e.flash>0) e.biteT=0;   // a hit knocks it off its bite
+  if(dc<22){
+    // sitting on a pumpkin, nibbling: it wobbles and says nom, a bite at a time
+    c.shake=0.25;
+    e.biteT=(e.biteT||0)+dt;
+    if(e.biteT>=M.bite){ e.biteT=0; c.hp--; ftext(c.x,c.y-22,c.hp>0?'nom':'CHOMP',c.hp>0?'#ffd0a0':'#ffb070',c.hp>0?11:14); SFX.play('pop',c.hp>0?0.4:0.8);
+      if(c.hp<=0){ c.eaten=true; emit(c.x,c.y,12,{col:'230,130,40',glow:false,smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); e.cropTarget=null; } }
+    return;
+  }
+  e.biteT=Math.max(0,(e.biteT||0)-dt*2);
+  if(e.cd<=0){ const a=angTo(e.x,e.y,c.x,c.y); e.cd=rand(0.8,1.15); e.hopT=0.25; const sp=Math.min(150,dc*3.2+40); e.vx+=Math.cos(a)*sp; e.vy+=Math.sin(a)*sp; e.face=a; }
+}
+{ const base=AI.slime; AI.slime=function(e,dt,p){ if(e.mini==='patch') return patchSlimeAI(e,dt); return base(e,dt,p); }; }
 MINI.defend={
   start(){
-    const c=CASTBY.hal, door=DOORS.find(d=>d.owner==='hal')||{x:POI.village.x,y:POI.village.y};
-    const cx=door.x+(door.x<POI.village.x?-160:160), cy=door.y+60, crops=[];
-    for(let i=0;i<8;i++){ const x=cx+((i%4)-1.5)*46, y=cy+(Math.floor(i/4)-0.5)*46; crops.push({x,y,eaten:false,big:i===5}); }
-    return {cx,cy,crops,limit:60,wave:0,music:'combat'};
+    const {cx,cy}=patchSite(), crops=[], k=patchK();
+    for(let i=0;i<8;i++){ const x=cx+((i%4)-1.5)*46, y=cy+(Math.floor(i/4)-0.5)*46; crops.push({x,y,eaten:false,big:i===5,hp:PATCH.bites,shake:0}); }
+    return {cx,cy,crops,music:'combat',waves:PATCH.waves[k].slice(),onScreen:PATCH.onScreen[k],bite:PATCH.bite[k],
+      wave:0,todo:0,spawnT:0,phase:'rest',restT:PATCH.first,waveT:0,away:0,slimes:[]};
   },
   update(M,dt){
-    M.spawnT=(M.spawnT||1)-dt;
-    if(M.spawnT<=0&&M.t<M.limit-4){ M.spawnT=Math.max(1.6,4.2-M.t*0.05); const n=2+Math.floor(M.t/20);
-      for(let i=0;i<n;i++){ const a=rand(0,TAU), x=M.cx+Math.cos(a)*420, y=M.cy+Math.sin(a)*360; if(blockedAt(x,y)) continue; const live=M.crops.filter(q=>!q.eaten); if(!live.length) break; const e=makeEnemy('slime',x,y,{level:2,aggro:true,homeX:M.cx,homeY:M.cy,leash:99999,tint:'#9ad04a'}); e.mini=true; e.cropTarget=pick(live); e.spawnIn=0.3; } }
-    for(const e of G.enemies){ if(e.dead||!e.mini||!e.cropTarget) continue; const c=e.cropTarget; if(c.eaten){ const live=M.crops.filter(q=>!q.eaten); e.cropTarget=live.length?pick(live):null; continue; } if(dist(e.x,e.y,c.x,c.y)<22){ c.eaten=true; SFX.play('pop'); ftext(c.x,c.y-20,'CHOMP','#ffb070',13); emit(c.x,c.y,12,{col:'230,130,40',glow:false,smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:3}); } }
-    const left=M.crops.filter(q=>!q.eaten).length;
-    if(!left){ miniEnd(false,'The slimes ate everything!','Talk to Hal to try again.'); return; }
-    if(M.t>=M.limit){ M.saved=left; addCoins(left*4,player.x,player.y); miniEnd(true,`${left} pumpkins saved!`,left===8?'Every single one. Hal is weeping.':'Go tell Hal.'); }
+    const p=player, nW=M.waves.length;
+    for(const c of M.crops) if(c.shake>0) c.shake-=dt;
+    if(p.dead){ miniEnd(false,S('Hal calls it off','Hal calls it off'),S('Rest up, then talk to Hal to try again.','Rest, then talk to Hal again.')); return; }
+    if(dist(p.x,p.y,M.cx,M.cy)>1100){ M.away+=dt; if(M.away>5){ miniEnd(false,S('You left the patch!','You left the patch!'),S('Talk to Hal to try again.','Talk to Hal to try again.')); return; } } else M.away=0;
+    if(!patchLeft(M).length){ miniEnd(false,'The slimes ate everything!','Talk to Hal to try again.'); return; }
+    if(M.phase==='rest'){
+      M.restT-=dt;
+      if(M.restT<=0){ M.wave++; M.todo=M.waves[M.wave-1]; M.phase='wave'; M.waveT=0; M.spawnT=0;
+        patchSay(M.wave===nW?S(`Last wave! ${patchN(M.todo,'slime','slimes')}.`,`Last wave!`):S(`Wave ${M.wave} of ${nW}: ${patchN(M.todo,'slime','slimes')}. Knock them off the pumpkins!`,`Wave ${M.wave}: ${patchN(M.todo,'slime','slimes')}!`)); SFX.play('warn',0.5); }
+      return;
+    }
+    M.waveT+=dt; M.spawnT-=dt;
+    if(M.todo>0&&M.spawnT<=0&&patchLive(M).length<M.onScreen){ if(patchSpawn(M)){ M.todo--; M.spawnT=0.9; } else M.spawnT=0.3; }
+    // a wave that runs too long (a slime stuck in a hedge) gives up and hops home
+    if(M.waveT>PATCH.waveMax&&(M.todo>0||patchLive(M).length)){ M.todo=0; M.gaveUp=(M.gaveUp||0)+1; for(const e of patchLive(M)) e.patchLeave=true; }
+    if(M.todo<=0&&!patchLive(M).length){
+      if(M.wave>=nW){ const left=patchLeft(M).length; M.saved=left; addCoins(left*4,p.x,p.y); miniEnd(true,`${left} pumpkins saved!`,left===8?'Every single one. Hal is weeping.':'Go tell Hal.'); return; }
+      M.phase='rest'; M.restT=PATCH.rest; patchSay(S(`Phew! Wave ${M.wave} done. Catch your breath.`,`Phew! Rest a moment.`),1.6);
+    }
   },
-  end(M){ for(const e of G.enemies) if(e.mini&&!e.dead){ e.dead=true; deathFx(e); } },
+  end(M){ for(const e of M.slimes) if(!e.dead) e.patchLeave=true; },
   target:M=>({x:M.cx,y:M.cy}),
-  hud:M=>`Guard the pumpkins! ${M.crops.filter(q=>!q.eaten).length}/8 left · ${Math.max(0,Math.ceil(M.limit-M.t))}s`,
-  draw(M,t){ for(const c of M.crops){ if(c.eaten){ ctx.fillStyle='rgba(120,70,20,.5)'; ctx.beginPath(); ctx.ellipse(c.x,c.y,9,5,0,0,TAU); ctx.fill(); continue; } const r=c.big?15:11; ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(c.x+2,c.y+r*0.6,r,r*0.45,0,0,TAU); ctx.fill(); ctx.fillStyle='#e8782a'; ctx.beginPath(); ctx.ellipse(c.x,c.y,r,r*0.82,0,0,TAU); ctx.fill(); ctx.strokeStyle='#b8521a'; ctx.lineWidth=1.5; for(const k of [-0.5,0,0.5]){ ctx.beginPath(); ctx.ellipse(c.x+k*r*0.6,c.y,r*0.35,r*0.8,0,0,TAU); ctx.stroke(); } ctx.fillStyle='#4a7a2a'; ctx.fillRect(c.x-1.5,c.y-r-3,3,6); } }
+  hud:M=>{ const pk=`Pumpkins ${patchLeft(M).length}/8`;
+    if(M.phase==='rest') return M.wave?`Wave ${M.wave} of ${M.waves.length} done! Next in ${Math.max(1,Math.ceil(M.restT))}s · ${pk}`:`Get ready! Slimes in ${Math.max(1,Math.ceil(M.restT))}s · ${pk}`;
+    return `Wave ${M.wave} of ${M.waves.length} · ${patchN(M.todo+patchLive(M).length,'slime','slimes')} left · ${pk}`; },
+  draw(M,t){
+    // the tilled patch, so you can see what you are guarding
+    ctx.fillStyle='rgba(92,58,30,.45)'; ctx.beginPath(); ctx.ellipse(M.cx,M.cy,122,70,0,0,TAU); ctx.fill();
+    ctx.strokeStyle='rgba(255,210,140,.35)'; ctx.lineWidth=2; ctx.setLineDash([7,6]); ctx.beginPath(); ctx.ellipse(M.cx,M.cy,128,76,0,0,TAU); ctx.stroke(); ctx.setLineDash([]);
+    for(const c of M.crops){
+      if(c.eaten){ ctx.fillStyle='rgba(120,70,20,.5)'; ctx.beginPath(); ctx.ellipse(c.x,c.y,9,5,0,0,TAU); ctx.fill(); continue; }
+      const r=c.big?15:11, x=c.x+(c.shake>0?Math.sin(t*60)*1.6:0), y=c.y;
+      ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(x+2,y+r*0.6,r,r*0.45,0,0,TAU); ctx.fill();
+      ctx.fillStyle='#e8782a'; ctx.beginPath(); ctx.ellipse(x,y,r,r*0.82,0,0,TAU); ctx.fill();
+      ctx.strokeStyle='#b8521a'; ctx.lineWidth=1.5; for(const k of [-0.5,0,0.5]){ ctx.beginPath(); ctx.ellipse(x+k*r*0.6,y,r*0.35,r*0.8,0,0,TAU); ctx.stroke(); }
+      ctx.fillStyle='#4a7a2a'; ctx.fillRect(x-1.5,y-r-3,3,6);
+      // bite marks, and three little pips for how much is left
+      const bit=PATCH.bites-c.hp;
+      if(bit>0){ ctx.fillStyle='#5a3a1a'; for(let i=0;i<bit;i++){ ctx.beginPath(); ctx.arc(x+r*0.75-i*r*0.5,y-r*0.55,r*0.28,0,TAU); ctx.fill(); }
+        for(let i=0;i<PATCH.bites;i++){ ctx.fillStyle=i<c.hp?'#ffcf4a':'rgba(40,24,12,.7)'; ctx.beginPath(); ctx.arc(x+(i-1)*7,y+r+6,2.6,0,TAU); ctx.fill(); } }
+    }
+  }
 };
 // ---------- The Frostpine Dash
 MINI.race={
@@ -23114,6 +23660,7 @@ function drawHUD(){
   if(G.prompt&&scene==='play'){
     drawPromptPill(b);
   }
+  doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawSkillHud();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   if(G.hintT>0&&scene==='play'&&tipOn('play')){
@@ -23239,7 +23786,21 @@ function touchClear(w,h,y){
 let PROMPT_R=null;
 // where the prompt pill and the hint box start on touch: a little above the buttons (short screens: along the bottom)
 function touchBase(){ const B=H-SAFE.b; return B-SAFE.t<600?B-30:Math.min(B-300,touchTopOver(0,W)-30); }
+// (v11) the person or thing the prompt is about gets a soft gold ring at its feet, so it is always clear who E (or a
+// click) will talk to or what it will use, even with two people standing close together
+function drawPromptTarget(){
+  const pr=G.prompt; if(!pr||pr.x==null||pr.y==null||!player) return;
+  if(Math.abs(pr.x-player.x)<2&&Math.abs(pr.y-player.y)<2) return;   // a prompt about Ash himself (fishing, flying)
+  const sx=(pr.x-cam.x)*zoom, sy=(pr.y-cam.y)*zoom; if(sx<-40||sy<-40||sx>W+40||sy>H+40) return;
+  const n=AREA?AREA.npcs&&AREA.npcs.find(q=>q.x===pr.x&&q.y===pr.y):G.npcs.find(q=>q.x===pr.x&&q.y===pr.y);
+  const r=(n?20:16)*zoom, k=0.5+0.5*Math.sin((G.time||0)*4.2), g=ctx;
+  g.save(); g.translate(sx,sy+(n?3:0)*zoom); g.scale(1,0.5);
+  g.lineWidth=4.5; g.strokeStyle=LOOK.sb?'rgba(59,34,51,.45)':'rgba(0,0,0,.35)'; g.beginPath(); g.arc(0,0,r+2+k*2,0,TAU); g.stroke();
+  g.lineWidth=2.4; g.strokeStyle=`rgba(255,214,120,${0.75+0.2*k})`; g.setLineDash([7,5]); g.lineDashOffset=-(G.time||0)*12; g.beginPath(); g.arc(0,0,r+2+k*2,0,TAU); g.stroke();
+  g.restore();
+}
 function drawPromptPill(b){
+  drawPromptTarget();
   const dev=curDevice(), t=simplify(G.prompt.text);
   // the key that does it: E (or the controller's top button); the left-handed keyboard shows Enter when it will
   // talk or open, and \ when a foe is close (Enter attacks then)
@@ -23260,7 +23821,7 @@ function hintTextRaw(){
     // a phone on its side has little room: one short line
     if(H-SAFE.t-SAFE.b<600) return `Drag on the ${settings.touch==='two'?(L?'right':'left'):'free side'} to move · SLASH attacks, talks and opens · Tap flasks to drink`;
     if(settings.touch==='two') return `Drag on the ${L?'right':'left'} to move, push all the way to sprint · SLASH attacks, and says TALK or OPEN when it will do that instead · Tap the flasks to drink, the minimap for the map, the quest list for the journal`;
-    return 'Drag anywhere low on the screen to move · Ash swings by himself · SLASH says TALK or OPEN near people and doors · Settings has more layouts';
+    return 'Drag anywhere low on the screen to move · Ash swings by himself · SLASH says TALK or OPEN near people and chests · Walk into a door to go in · Settings has more layouts';
   }
   if(dev==='pad'){
     const mv=L?'Right stick':'Left stick';
@@ -23397,7 +23958,10 @@ function runDialogue(lines,done,opt){
   show('dialogue'); setLine();
 }
 function lineParts(l){ return Array.isArray(l)?{who:l[0],text:l[1],opts:l[2]}:l; }
-function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d(); }
+function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d();
+  // (v11) a talk that ends with foes close (a boss's opening words with his guards already swinging) gives Ash a moment
+  // to get his hands back on the keys before the first hit can land (he blinks while it lasts)
+  try{ if(G&&player&&!player.dead&&(G.inCombat||(G.boss&&!G.boss.dead)||foeNear(160))) player.iframes=Math.max(player.iframes,0.9); }catch(e){} }
 function setLine(){
   const L=lineParts(DLG.lines[DLG.i]), who=typeof L.who==='function'?L.who():L.who, s=SPK[who]||{name:personName(who),col:'#d8c3a0'};
   if(L.fn&&!L._ran){ L._ran=true; L.fn(); if(!DLG) return; }
@@ -23436,7 +24000,7 @@ function updateDialogue(dt){
   if(!DLG) return;
   const text=DLG.text||'';
   if(DLG.opts&&DLG.chars>=text.length) showOpts();
-  DLG.chars=Math.min(text.length,DLG.chars+dt*60);
+  DLG.chars=Math.min(text.length,DLG.chars+dt*DLG_CPS);
   if(DLG.chars>=text.length&&!DLG.fullAt) DLG.fullAt=performance.now();
   const n=Math.floor(DLG.chars); if(n!==DLG.shown){ DLG.shown=n; $('#dlgSay').textContent=text.slice(0,n); }
 }
@@ -23467,7 +24031,9 @@ function dlgLogSkipped(L){
 // A click first finishes the typing. The next one goes on only once the whole line has been up for 0.4 s, and a
 // double click never moves more than one line. Choices wait 0.35 s after they appear. Escape (and the controller's
 // back button, and the Skip button) asks once before it skips the conversation.
-const DLG_FULL=400, DLG_LOCK=220, DLG_OPTS=350;
+// (v11) a desktop click that finishes the typing and then goes on felt dead for most of a second: the wait after a full
+// line is now 0.28 s (still longer than a double click) and the text types a little faster (75 letters a second)
+const DLG_FULL=280, DLG_LOCK=200, DLG_OPTS=300, DLG_CPS=75;
 function dlgNext(){
   if(!DLG) return;
   const now=performance.now(), text=DLG.text||'';
@@ -25566,9 +26132,16 @@ function drawCrossing(def,t){
     ctx.fillStyle='#3a2614'; ctx.fillRect(-2,-26,3,26); ctx.fillStyle='#efe6d0'; ctx.beginPath(); ctx.moveTo(1,-25); ctx.lineTo(17,-6); ctx.lineTo(1,-6); ctx.closePath(); ctx.fill();
     ctx.restore();
   }else if(k==='stair'){
-    const sp=rSpr(key,200,220,100,120,g=>{ g.rotate(a+Math.PI/2);
-      for(let i=0;i<7;i++){ const w=70-i*3, yy=40-i*14; g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(-w/2+3,yy+4,w,12); g.fillStyle=i%2?'#9c968c':'#aaa294'; g.fillRect(-w/2,yy,w,12); g.fillStyle='rgba(255,250,235,.25)'; g.fillRect(-w/2,yy,w,3); g.strokeStyle='rgba(40,36,30,.5)'; g.lineWidth=1; g.strokeRect(-w/2,yy,w,12); }
-      for(const sx of [-1,1]){ g.fillStyle='#7d6d5c'; g.fillRect(sx*40-6,-56,12,108); g.fillStyle='#958a7c'; g.fillRect(sx*40-6,-56,12,6); } });
+    // steps running off along `dir`: going up they brighten toward the far end, going down they sink into the dark
+    const down=def.down!=null?!!def.down:/down|crawl|descend/i.test(String(def.label||'')), key2=key+(down?'_d':'_u');
+    const sp=rSpr(key2,200,220,100,120,g=>{ g.rotate(a+Math.PI/2);
+      g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(-44,-54,92,110);
+      for(let i=0;i<7;i++){ const u=i/6, w=70-i*3, yy=40-i*14, lit=down?1-u*0.85:0.35+u*0.65;
+        g.fillStyle=stC('#3a342e','#6e665c',lit); g.fillRect(-w/2,yy+8,w,6);
+        g.fillStyle=stC('#4a443c','#d0c8b8',lit); g.fillRect(-w/2,yy,w,8.5);
+        g.fillStyle=`rgba(255,250,235,${0.15+0.4*lit})`; g.fillRect(-w/2,yy+7,w,1.6); g.fillStyle='rgba(20,16,12,.35)'; g.fillRect(-w/2,yy+8.6,w,1.4); }
+      for(const sx of [-1,1]){ g.fillStyle='#7d6d5c'; g.fillRect(sx*40-6,-56,12,108); g.fillStyle='#958a7c'; g.fillRect(sx*40-6,-56,12,6); g.fillStyle='rgba(255,250,235,.25)'; g.fillRect(sx*40-6,-56,2,108); }
+      g.strokeStyle='rgba(40,36,30,.6)'; g.lineWidth=1.4; g.strokeRect(-46,-56,92,108); });
     rPut(sp,x,y);
   }else if(k==='bridge'){
     const sp=rSpr(key,260,260,130,130,g=>{ g.rotate(a-Math.PI/2);
@@ -26842,14 +27415,49 @@ function elvPaintRamp(g,E,rp){
   if(rp.kind==='ramp'){
     if(vert){ g.fillStyle=S.lit; g.fillRect(x0+5,y0,W-10,Hh); g.fillStyle='rgba(255,255,255,.10)'; g.fillRect(x0+W*0.35,y0,W*0.3,Hh); g.strokeStyle='rgba(0,0,0,.18)'; g.lineWidth=1; g.beginPath(); for(let y=y0+10;y<y1;y+=12){ g.moveTo(x0+8,y); g.lineTo(x1-8,y); } g.stroke(); }
     else{ g.fillStyle=S.lit; g.fillRect(x0,y0+5,W,Hh-10); g.fillStyle='rgba(255,255,255,.10)'; g.fillRect(x0,y0+Hh*0.35,W,Hh*0.3); }
-  }else{
-    // stairs: treads lit, risers in shade
-    if(vert){ for(let y=y0;y<y1;y+=8){ g.fillStyle=S.lit; g.fillRect(x0+5,y,W-10,5); g.fillStyle=S.face; g.fillRect(x0+5,y+5,W-10,3); } g.fillStyle='rgba(255,250,236,.22)'; for(let y=y0;y<y1;y+=8) g.fillRect(x0+5,y,W-10,1.2); }
-    else{ for(let x=x0;x<x1;x+=8){ g.fillStyle=S.lit; g.fillRect(x,y0+5,5,Hh-10); g.fillStyle=S.face; g.fillRect(x+5,y0+5,3,Hh-10); } }
-  }
+  }else{ elvPaintStairs(g,S,rp,x0,y0,x1,y1); g.restore(); return; }
   g.strokeStyle=S.out; g.lineWidth=2.2; g.strokeRect(x0+0.5,y0,W-1,Hh);
   if(vert){ g.beginPath(); g.moveTo(x0+5,y0); g.lineTo(x0+5,y1); g.moveTo(x1-5,y0); g.lineTo(x1-5,y1); g.lineWidth=1.4; g.strokeStyle='rgba(0,0,0,.35)'; g.stroke(); }
   g.restore();
+}
+// stairs cut into a face: real steps (a lit tread and a shaded riser each), lighter toward the high end, stone cheek
+// walls with lit caps down both sides, a bright lip where they meet the top and a shadow at the foot. Climbing north the
+// risers face you; climbing south only the treads show; climbing east or west the flight's south side shows its steps.
+function elvPaintStairs(g,S,rp,x0,y0,x1,y1){
+  const W=x1-x0, H=y1-y0, d=rp.dir, vert=d==='n'||d==='s', L=vert?H:W, n=Math.max(3,Math.round(L/(vert?12:16))), p=L/n;
+  const cw=Math.max(5,Math.min(11,Math.round((vert?W:H)*0.09)));
+  const tr=u=>stC(stC(S.face,S.lit,0.75),'#fff4dc',0.04+0.32*u), rs=u=>stC(S.dark,S.face,0.2+0.6*u);
+  g.fillStyle=S.dark; g.fillRect(x0,y0,W,H);
+  if(vert){
+    const sx0=x0+cw, sx1=x1-cw, sw=sx1-sx0;
+    for(let i=0;i<n;i++){ const u=n>1?i/(n-1):1;
+      if(d==='n'){ const a=y1-(i+1)*p, th=p*0.56;
+        g.fillStyle=tr(u); g.fillRect(sx0,a,sw,th+0.5); g.fillStyle=rs(u); g.fillRect(sx0,a+th,sw,p-th+0.5);
+        g.fillStyle=`rgba(255,250,236,${0.25+0.35*u})`; g.fillRect(sx0,a+th-1.5,sw,1.5); g.fillStyle='rgba(0,0,0,.32)'; g.fillRect(sx0,a+th,sw,1.6);
+      }else{ const a=y0+i*p;
+        g.fillStyle=tr(u); g.fillRect(sx0,a,sw,p+0.5); g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(sx0,a,sw,1.8); g.fillStyle=`rgba(255,250,236,${0.2+0.3*u})`; g.fillRect(sx0,a+1.8,sw,1.2); }
+      // worn joints in each step
+      g.fillStyle='rgba(0,0,0,.12)'; const jx=sx0+sw*(0.3+0.4*((i*7)%3)/2); g.fillRect(jx,(d==='n'?y1-(i+1)*p:y0+i*p)+2,1.2,p*0.5); }
+    // the west cheek's shadow on the steps, then both cheeks: lit caps that brighten toward the high end
+    g.fillStyle='rgba(0,0,0,.2)'; g.fillRect(sx0,y0,4,H);
+    const hy=d==='n'?y0:y1, ly=d==='n'?y1:y0;
+    for(const cx of [x0,x1-cw]){ const cg=g.createLinearGradient(0,ly,0,hy); cg.addColorStop(0,stC(S.face,S.dark,0.25)); cg.addColorStop(1,stC(S.lit,S.lip,0.35)); g.fillStyle=cg; g.fillRect(cx,y0,cw,H);
+      g.fillStyle='rgba(255,250,236,.3)'; g.fillRect(cx+1,y0,1.4,H); g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(cx+cw-1.4,y0,1.4,H);
+      g.strokeStyle='rgba(0,0,0,.22)'; g.lineWidth=1; g.beginPath(); for(let y=y0+p*0.8;y<y1-2;y+=p*1.6){ g.moveTo(cx+1,y); g.lineTo(cx+cw-1,y); } g.stroke(); }
+    // the lip at the top and the shadow at the foot
+    g.fillStyle=S.lip; g.fillRect(x0,hy-(d==='n'?0:2.4),W,2.4);
+    g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(x0-3,ly+(d==='n'?0:-4),W+6,4);
+  }else{
+    const sy0=y0+cw*0.6, sy1=y1-cw, sh=sy1-sy0, side=Math.min(H*0.45,40);
+    for(let i=0;i<n;i++){ const u=n>1?i/(n-1):1, a=d==='e'?x0+i*p:x1-(i+1)*p;
+      g.fillStyle=tr(u); g.fillRect(a,sy0,p+0.5,sh); g.fillStyle='rgba(0,0,0,.28)'; g.fillRect(d==='e'?a:a+p-1.6,sy0,1.6,sh);
+      g.fillStyle=`rgba(255,250,236,${0.2+0.3*u})`; g.fillRect(d==='e'?a+1.6:a+p-2.8,sy0,1.2,sh);
+      // the flight's south side: a stepped face that grows toward the high end
+      const fh=side*(i+1)/n; g.fillStyle=rs(u); g.fillRect(a,sy1-fh,p+0.5,fh+cw); g.fillStyle=`rgba(255,250,236,${0.25+0.3*u})`; g.fillRect(a,sy1-fh,p+0.5,1.4); }
+    g.fillStyle=stC(S.lit,S.lip,0.3); g.fillRect(x0,y0,W,cw*0.6); g.fillStyle='rgba(0,0,0,.2)'; g.fillRect(x0,sy0,W,3);
+    g.fillStyle=S.lip; g.fillRect(d==='e'?x1-2.4:x0,y0,2.4,H);
+  }
+  g.strokeStyle=S.out; g.lineWidth=2.2; g.strokeRect(x0+0.5,y0,W-1,H);
 }
 // the plateau a point belongs to (for colours)
 function elvOwnerAt(E,x,y,rp){ const g=E.G; if(!g) return null; let best=null; for(const P of E.plats){ if(x<P.fb[0]||x>P.fb[2]||y<P.fb[1]||y>P.fb[3]) continue; if(!best||P.lvl>best.lvl){ if(elvRingsIn(P.rings,x,y)) best=P; } } if(!best&&rp){ for(const P of E.plats) if(P.lvl===rp.hi&&x>=P.fb[0]&&x<=P.fb[2]&&y>=P.fb[1]&&y<=P.fb[3]) return P; } return best; }
@@ -26914,7 +27522,7 @@ function elvPaintChunk(ch,cx,cy){
   if(gd&&(x0>gd.x0+gd.w*gd.cs||x1<gd.x0||y0>gd.y0+gd.h*gd.cs||y1<gd.y0)&&!decos.length) return;
   const g=ch.g, m=40, items=[];
   for(const P of E.plats) if(P.fb&&P.fb[0]<x1+m&&P.fb[2]>x0-m&&P.fb[1]<y1+m&&P.fb[3]>y0-m) items.push([P.lvl,0,P.i,()=>elvPaintPlat(g,P,x0-m,y0-m,x1+m,y1+m)]);
-  for(const rp of E.ramps) if(rp.ax0!=null&&rp.ax0<x1+20&&rp.ax1>x0-20&&rp.ay0<y1+20&&rp.ay1>y0-20) items.push([rp.hi,1,rp.i,()=>elvPaintRamp(g,E,rp)]);
+  for(const rp of E.ramps) if(rp.ax0!=null&&rp.ax0<x1+20&&rp.ax1>x0-20&&rp.ay0<y1+20&&rp.ay1>y0-20) items.push([rp.hi+(rp.kind==='stairs'?0.15:0),1,rp.i,()=>elvPaintRamp(g,E,rp)]);   // stairs after the trails on their level, so no path is painted over the steps
   for(const l of E.ledges) if(l.x0<x1+40&&l.x1>x0-40&&l.y0<y1+60&&l.y1>y0-60) items.push([99,2,0,()=>elvPaintLedge(g,E,l)]);
   for(const f of E.falls) if(f.bb&&f.bb[0]<x1&&f.bb[2]>x0&&f.bb[1]<y1&&f.bb[3]>y0) items.push([f.lvl,3,0,()=>elvPaintFall(g,f)]);
   for(const v of E.vents) if(v.x+80>x0&&v.x-80<x1&&v.y+60>y0&&v.y-60<y1) items.push([v.lvl||0,4,v.i,()=>elvPaintVent(g,v)]);
@@ -33106,12 +33714,8 @@ FL.dspore=(o,t)=>{
   if(o.burst&&o.gT>0){ const k=clamp(o.gT/6,0,1); for(let n=0;n<10;n++){ const f=((t*0.12+n*0.1)%1), px=x+Math.sin(n*2.3+t*0.7)*60*f, py=hy+f*70; ctx.fillStyle=`rgba(200,255,170,${0.8*k*(1-f*0.5)})`; ctx.beginPath(); ctx.arc(px,py,2.2,0,TAU); ctx.fill(); } glowAt(x,y+10,90,'170,255,150',0.25*k); }
 };
 FL.dstairs=(o,t)=>{
-  const x=o.x, y=o.y, cs=48, up=o.dir==='up';
-  ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(x-cs/2,y-cs/2,cs,cs);
-  for(let i=0;i<4;i++){ const yy=y-cs/2+i*cs/4, kk=up?0.55+i*0.12:1-i*0.2; ctx.fillStyle=`rgba(${150*kk|0},${120*kk|0},${90*kk|0},1)`; ctx.fillRect(x-cs/2+3+(up?0:i*3),yy+2,cs-6-(up?0:i*6),cs/4-3); }
-  if(!up){ const g=ctx.createLinearGradient(0,y-cs/2,0,y+cs/2); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.7)'); ctx.fillStyle=g; ctx.fillRect(x-cs/2,y-cs/2,cs,cs); }
-  ctx.strokeStyle='#5a3a22'; ctx.lineWidth=3; ctx.strokeRect(x-cs/2,y-cs/2,cs,cs);
-  const b=Math.sin(t*3)*2; ctx.fillStyle='rgba(255,230,180,.85)'; ctx.beginPath(); if(up){ ctx.moveTo(x,y-cs/2-14+b); ctx.lineTo(x+8,y-cs/2-5+b); ctx.lineTo(x-8,y-cs/2-5+b); } else { ctx.moveTo(x,y+4+b); ctx.lineTo(x+8,y-5+b); ctx.lineTo(x-8,y-5+b); } ctx.closePath(); ctx.fill();
+  // the shared stair art (a3c_art3.js): a flight climbing north for up, a well falling south for down, in one cell
+  drawStairArt(o.x,o.y+2,44,44,o.dir==='up'?'up':'down','dun',t,false);
 };
 DUN_DRAW.tidec=(q,t)=>{
   const x=q.x, y=q.y, T=AREA.tri, on=T&&T.lvl===q.tune, bob=Math.sin(t*2+x)*2;
@@ -46462,6 +47066,114 @@ s10FindKind('a1_gate',(x,y,r)=>Math.abs(A1V.wall.y-y)<=r?Object.values(A1V.gates
 s10FindKind('a1_pal',(x,y,r)=>Math.abs(A1V.wall.y-y)<=r&&x>A1V.wall.x0&&x<A1V.wall.x1?A1V.wall:null);
 s10FindKind('a1_rockfall',(x,y,r)=>Math.abs(A1W.rockfall.x-x)<=r&&Math.abs(A1W.rockfall.y-y)<=r?A1W.rockfall:null);
 s10FindKind('a1_frostlantern',(x,y,r)=>{ const p=A1W.frost.lan.find(([a,b])=>Math.abs(a-x)<=r&&Math.abs(b-y)<=r); return p?{x:p[0],y:p[1]}:null; });
+
+// ---------- 20. v11: Emberhollow walled all the way round
+// debug: can Ash stand here on foot (terrain and colliders), and a flood fill of where he can walk from a point
+function a1WalkOK(x,y,r){ if(playerBlocked(x,y)) return false; let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return !hit; }
+function a1Flood(x0,y0,x1,y1,cs,sx,sy,r){
+  const W=Math.ceil((x1-x0)/cs), H=Math.ceil((y1-y0)/cs), ok=new Int8Array(W*H).fill(-1), seen=new Uint8Array(W*H), q=[];
+  const pass=k=>{ if(ok[k]<0){ const i=k%W, j=(k-i)/W; ok[k]=a1WalkOK(x0+(i+0.5)*cs,y0+(j+0.5)*cs,r)?1:0; } return ok[k]===1; };
+  const s=Math.floor((sy-y0)/cs)*W+Math.floor((sx-x0)/cs); if(!pass(s)) return null; seen[s]=1; q.push(s);
+  while(q.length){ const k=q.pop(), i=k%W; for(const [di,dj] of [[1,0],[-1,0],[0,1],[0,-1]]){ const ni=i+di, nj=(k-i)/W+dj; if(ni<0||nj<0||ni>=W||nj>=H) continue; const n=nj*W+ni; if(seen[n]||!pass(n)) continue; seen[n]=1; q.push(n); } }
+  return {W,H,cs,x0,y0,seen,at:(x,y,rr)=>{ rr=rr||0; for(let dy=-rr;dy<=rr;dy+=cs) for(let dx=-rr;dx<=rr;dx+=cs){ const i=Math.floor((x+dx-x0)/cs), j=Math.floor((y+dy-y0)/cs); if(i>=0&&j>=0&&i<W&&j<H&&seen[j*W+i]) return true; } return false; }};
+}
+window.__ebA1.wall=Object.assign(window.__ebA1.wall||{},{walk:a1WalkOK,
+  fields:()=>DECALS.filter(d=>d.k==='field'&&Math.abs(d.x-2600)<1500&&Math.abs(d.y-9300)<1500).map(d=>({x:Math.round(d.x),y:Math.round(d.y),w:Math.round(d.w),h:Math.round(d.h),rot:+d.rot.toFixed(2)})),
+  reach:(sx,sy,pts,box)=>{ const b=box||[1200,8200,4300,11000], F=a1Flood(b[0],b[1],b[2],b[3],12,sx,sy,14); if(!F) return 'start blocked'; return pts.map(p=>[p[0],p[1],p[2]||'',F.at(p[0],p[1],p[3]||24)]); },
+  cols:(x0,y0,x1,y1)=>{ const out=[]; forCols((x0+x1)/2,(y0+y1)/2,Math.max(x1-x0,y1-y0)/2,c=>{ if(!colActive(c)) return; const cx=c.t==='c'?c.x:(c.x0+c.x1)/2, cy=c.t==='c'?c.y:(c.y0+c.y1)/2; if(cx<x0||cx>x1||cy<y0||cy>y1) return; out.push(c.t==='c'?['c',Math.round(c.x),Math.round(c.y),c.r,!!c.low]:['r',Math.round(c.x0),Math.round(c.y0),Math.round(c.x1),Math.round(c.y1),!!c.low]); }); return out; }});
+// The v10 palisade along the north edge (section 19: the North Gate of Act I's mystery and the Frostpine Gate, both
+// unchanged) now goes on round the whole village: down the east side to the Brindle Gate on the Brindlecross road,
+// along the south to the Pond Gate above Bramble Pond, and up the west side past the Field Gate (the woods and the far
+// west plot) to the north-west corner post. The forge's plots and Strawsworth's field are inside the wall.
+// Same timber and stone as the north run; it collides for Ash, foes and people, and a landing Ash never stops on it.
+const A1WALL={
+  // corner to corner, clockwise from the north-east post to the north-west post (the north run is section 19's)
+  pts:[[3262,8792],[3262,9000],[3330,9180],[3330,9800],[3250,10040],[1990,10040],[1760,9800],[1745,9530],[1975,9490],[1975,9200],[1950,8792]],
+  gates:[{id:'brindle',x:3330,y:9482,hw:46,sign:'BRINDLE GATE'},{id:'pond',x:2850,y:10040,hw:46,sign:'POND GATE'},{id:'field',x:1752.5,y:9665,hw:40,sign:'FIELD GATE'}],
+  sign:[2925,10084], th:10, gap:24, pieces:[], cols:[], H:[46,51,44,49,47,52], C:['#8a5a34','#7c5030','#93623a','#80542f','#8e5c36','#7a4f2e']
+};
+{ const base=initWorld; initWorld=function(){ base(); try{ a1WallBuild(); }catch(e){ console.error('a1 wall',e); } }; }
+function a1WallPiece(x,y,draw){ A1WALL.pieces.push({x,y,draw}); }
+function a1WallCol(c){ A1WALL.cols.push(c); return addCol(c); }
+function a1WallBuild(){
+  const A=A1WALL, P=A.pts; A.pieces.length=0; let v=0;
+  for(let i=0;i<P.length-1;i++){
+    const [ax,ay]=P[i], [bx,by]=P[i+1], L=dist(ax,ay,bx,by), ux=(bx-ax)/L, uy=(by-ay)/L, cuts=[];
+    for(const g of A.gates){ const t=(g.x-ax)*ux+(g.y-ay)*uy, off=Math.abs((g.x-ax)*uy-(g.y-ay)*ux); if(t>0&&t<L&&off<4){ Object.assign(g,{ux,uy,t,seg:i}); cuts.push([t-g.hw-A.gap,t+g.hw+A.gap]); } }
+    cuts.sort((p,q)=>p[0]-q[0]);
+    let t0=i===0?17:0; const tEnd=i===P.length-2?L-17:L;
+    for(const [c0,c1] of cuts){ a1WallRun(ax,ay,ux,uy,t0,c0,v); v+=5; t0=c1; }
+    a1WallRun(ax,ay,ux,uy,t0,tEnd,v); v+=5;
+    if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay)); REACH.clear.push({x:ax,y:ay,r:60}); }
+  }
+  for(const g of A.gates) a1WallGate(g);
+  // the Bramble Pond sign steps out of the Pond Gate's way, to the side of the path down to the water
+  const s=LANDMARKS.find(o=>o.id==='rc_bramblesign'); if(s){ s.x=A.sign[0]; s.y=A.sign[1]; if(s.colRef){ removeCol(s.colRef); s.colRef=addCol({t:'c',x:s.x,y:s.y,r:s.r||8}); } }
+  mapListsReset();
+}
+// one straight run of palisade from t0 to t1 along a side: colliders, a clear strip, and the stakes in bays
+function a1WallRun(ax,ay,ux,uy,t0,t1,v){
+  const A=A1WALL, L=t1-t0; if(L<6) return;
+  const x0=ax+ux*t0, y0=ay+uy*t0, x1=ax+ux*t1, y1=ay+uy*t1, ns=Math.abs(ux)<0.01, ew=Math.abs(uy)<0.01;
+  if(ns||ew) a1WallCol({t:'r',x0:Math.min(x0,x1)-(ns?A.th:0),y0:Math.min(y0,y1)-(ew?A.th:0),x1:Math.max(x0,x1)+(ns?A.th:0),y1:Math.max(y0,y1)+(ew?A.th:0)});
+  else { const n=Math.ceil(L/12); for(let k=0;k<=n;k++) a1WallCol({t:'c',x:lerp(x0,x1,k/n),y:lerp(y0,y1,k/n),r:11}); }
+  for(let d=0;d<=L+1;d+=40) REACH.clear.push({x:x0+ux*Math.min(d,L),y:y0+uy*Math.min(d,L),r:46});
+  // six stakes to a bay along an east-west run, three on the steep sides, so they sort well with Ash walking by
+  const n=Math.max(1,Math.round(L/7.33)), st=L/n, per=Math.abs(ux)>0.8?6:3, ang=Math.atan2(uy,ux);
+  for(let k=0;k<n;k+=per){ const m=Math.min(per,n-k), bx=x0+ux*st*(k+0.5), by=y0+uy*st*(k+0.5), vr=(v+k/per)%6|0, key='a1w_bay_'+ang.toFixed(3)+'_'+st.toFixed(2)+'_'+m+'_'+vr;
+    a1WallPiece(bx,Math.max(by,by+uy*st*(m-1)),()=>a1Put(A1SPR.get((LOOK.sb?'s:':'c:')+key)||a1BaySpr(ang,st,m,vr,key),bx,by)); }
+}
+// a bay of stakes along any direction: a stone footing, pointed logs back to front, two rails where the run is wide
+// enough on screen to show them (the north run's sprite, a1PalSpr, is this same palisade seen square on)
+function a1BaySpr(ang,st,m,vr,key){
+  const ux=Math.cos(ang), uy=Math.sin(ang), xs=[], ys=[]; for(let k=0;k<m;k++){ xs.push(ux*st*k); ys.push(uy*st*k); }
+  const xmin=Math.min(...xs)-10, xmax=Math.max(...xs)+10, ymin=Math.min(...ys)-64, ymax=Math.max(...ys)+9;
+  return a1Spr(key,xmax-xmin,ymax-ymin,-xmin,-ymin,g=>{
+    // seen end on (a north-south run) the logs are drawn a little thicker and rounder, with a shadow cast to the east
+    const A=A1WALL, edge=Math.abs(ux)<0.5, w=Math.abs(ux)>0.8?st+0.5:edge?11:8, ex=ux*st/2, ey=uy*st/2, ax=xs[0]-ex, ay=ys[0]-ey, bx=xs[m-1]+ex, by=ys[m-1]+ey;
+    g.lineCap='round'; g.strokeStyle='rgba(40,26,14,.22)'; g.lineWidth=edge?13:11; g.beginPath(); g.moveTo(ax+(edge?8:2),ay+3); g.lineTo(bx+(edge?8:2),by+3); g.stroke();
+    g.lineCap='butt'; g.strokeStyle='#7d7468'; g.lineWidth=edge?15:6.5; g.beginPath(); g.moveTo(ax,ay-1); g.lineTo(bx,by-1); g.stroke();
+    g.strokeStyle='#958b7e'; g.lineWidth=2.4; g.setLineDash([8,3]); g.beginPath(); g.moveTo(ax,ay-3); g.lineTo(bx,by-3); g.stroke(); g.setLineDash([]);
+    const order=xs.map((_,k)=>k).sort((p,q)=>ys[p]-ys[q]||xs[p]-xs[q]);
+    for(const k of order){ const x=xs[k], y=ys[k], h=A.H[(k+vr)%6];
+      g.fillStyle=A.C[(k+vr)%6]; g.fillRect(x-w/2,y-h,w,h); g.beginPath(); g.moveTo(x-w/2,y-h); g.lineTo(x,y-h-8); g.lineTo(x+w/2,y-h); g.closePath(); g.fill();
+      if(edge){ g.fillStyle='rgba(255,224,170,.3)'; g.fillRect(x-w/2+0.8,y-h+1,2.6,h-2); g.fillStyle='rgba(30,16,8,.4)'; g.fillRect(x+w/2-3.6,y-h,3.6,h); g.fillStyle='rgba(30,16,8,.3)'; g.fillRect(x-w/2,y-h+5,w,1.2); }
+      else { g.fillStyle='rgba(255,224,170,.24)'; g.fillRect(x-w/2+1,y-h+1,1.6,h-6); g.fillStyle='rgba(30,16,8,.35)'; g.fillRect(x+w/2-1.2,y-h,1.2,h); } }
+    if(Math.abs(ux)>0.35) for(const ry of [-37,-16]){ g.strokeStyle='#5a3a20'; g.lineWidth=4.5; g.beginPath(); g.moveTo(ax,ay+ry+2.2); g.lineTo(bx,by+ry+2.2); g.stroke();
+      g.strokeStyle='rgba(255,210,150,.25)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(ax,ay+ry+0.6); g.lineTo(bx,by+ry+0.6); g.stroke(); }
+  }); }
+// a gateway: stone posts each side (colliders), open doors; east-west runs reuse the North Gate's own art
+function a1WallGate(g){
+  const ew=Math.abs(g.uy)<0.3, d=g.hw+12, V=POI.village;
+  const posts=[[g.x-g.ux*d,g.y-g.uy*d],[g.x+g.ux*d,g.y+g.uy*d]];
+  for(const [x,y] of posts) a1WallCol({t:'c',x,y,r:14});
+  REACH.clear.push({x:g.x,y:g.y+10,r:g.hw+70});
+  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y)); return; }
+  // a side gate on a north-south run: two posts, the doors standing open against the inside of the wall, and the
+  // gate's name on a board on top of the south post, where you can read it
+  const [N,Sp]=posts[0][1]<posts[1][1]?posts:[posts[1],posts[0]], inw=Math.sign(V.x-g.x)||1;
+  a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]));
+  a1WallPiece(N[0],N[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),N[0],N[1]+2));
+  a1WallPiece(Sp[0],Sp[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),Sp[0],Sp[1]+2));
+  a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]));
+}
+function a1SidePostSpr(g,south){
+  return a1Spr('a1w_post_'+g.id+'_'+south,130,130,65,118,gg=>{
+    gg.fillStyle='rgba(40,26,14,.25)'; gg.beginPath(); gg.ellipse(2,3,20,7,0,0,TAU); gg.fill();
+    a1StonePost(gg,0,24,84);
+    if(!south) return;
+    gg.fillStyle='#4a2e18'; gg.fillRect(-2,-100,4,10); gg.fillRect(-26,-100,52,3);
+    const tw=Math.max(70,g.sign.length*6.6+12); gg.fillStyle='#6a4428'; rrect(gg,-tw/2,-113,tw,15,3); gg.fill(); gg.fillStyle='rgba(255,224,170,.25)'; gg.fillRect(-tw/2+3,-112,tw-6,1.6);
+    gg.fillStyle='#ecdcb8'; gg.font=`900 9px ${UIF}`; gg.textAlign='center'; gg.textBaseline='middle'; gg.fillText(g.sign,0,-105.5);
+  }); }
+function a1SideDoorSpr(hw,inw){ return a1Spr('a1w_door_'+hw+'_'+inw,hw*2+40,70,hw+20,60,g=>{
+  const x=inw<0?-12-hw:12;
+  g.fillStyle='rgba(40,26,14,.22)'; g.fillRect(x+2,-1,hw,6);
+  a1DoorFace(g,x,hw,48,'#6e4a2c'); g.fillStyle='rgba(255,224,170,.2)'; g.fillRect(x,-48,hw,2);
+}); }
+// draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode)
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; list.push({x:q.x,y:q.y,draw:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
+window.__ebA1.wall.A1WALL=A1WALL; window.__ebA1.wall.off=on=>{ for(const c of A1WALL.cols) c.off=!!on; return A1WALL.cols.length; };
 // ================= x0_vorlaxis (v9 Act I): the story of the Cinder Mountain climb and the new Vorlaxis fight
 // Bible: scratchpad/bible/ACT1.md 6.4 (Three Lanterns for Mom), 7 (the climb, tier by tier), 8 (Vorlaxis in the crater)
 // and 9.1 to 9.5 (the Ember Heart in each ending, the lanterns line). Guide: scratchpad/VORLAXIS.md.
@@ -49068,9 +49780,16 @@ function c1DrawChain(t){
   ctx.restore();
 }
 function c1DrawPassStair(){
-  c1Put(c1wTall('passstair',220,380,110,360,g=>{
-    for(let i=0;i<11;i++){ const y=-i*30, w=120-i*4; g.fillStyle='rgba(40,30,40,.25)'; g.fillRect(-w/2+4,y+4,w,22); g.fillStyle=i%2?'#e8e2d2':'#f2ede0'; g.fillRect(-w/2,y,w,22); g.fillStyle='rgba(255,255,255,.5)'; g.fillRect(-w/2,y,w,4); g.fillStyle='rgba(120,110,90,.4)'; g.fillRect(-w/2,y+18,w,4); }
-    for(const s of [-1,1]){ g.fillStyle='#b8b0a0'; g.beginPath(); g.moveTo(s*62,20); g.lineTo(s*44,-310); g.lineTo(s*36,-310); g.lineTo(s*54,20); g.closePath(); g.fill(); } }),3400,20330);
+  // the stair up to Embermere: every step a lit tread over a shaded riser, brighter toward the top, between stone walls
+  c1Put(c1wTall('passstair2',220,380,110,360,g=>{
+    g.fillStyle='rgba(40,30,40,.22)'; g.beginPath(); g.moveTo(-58,20); g.lineTo(66,20); g.lineTo(50,-306); g.lineTo(-34,-306); g.closePath(); g.fill();
+    for(let i=0;i<11;i++){ const u=i/10, y=-i*30-10, w=120-i*4;
+      g.fillStyle=stC('#7e7666','#bcb4a0',u); g.fillRect(-w/2,y+16,w,14);
+      g.fillStyle=stC('#d2cab4','#fffaf0',u); g.fillRect(-w/2,y-1,w,18);
+      g.fillStyle=`rgba(255,255,255,${0.4+0.4*u})`; g.fillRect(-w/2,y+14,w,2.4); g.fillStyle='rgba(60,50,40,.35)'; g.fillRect(-w/2,y+16.4,w,2.4);
+      g.fillStyle='rgba(120,110,90,.22)'; g.fillRect(-w*0.18,y+1,1.4,13); g.fillRect(w*0.22,y+1,1.4,13); }
+    for(const s of [-1,1]){ g.fillStyle=s<0?'#c8c0ae':'#a8a090'; g.beginPath(); g.moveTo(s*62,20); g.lineTo(s*44,-316); g.lineTo(s*36,-316); g.lineTo(s*54,20); g.closePath(); g.fill();
+      g.fillStyle='rgba(255,255,255,.45)'; g.beginPath(); g.moveTo(s*(s<0?62:54),20); g.lineTo(s*(s<0?44:36),-316); g.lineTo(s*(s<0?42:34),-316); g.lineTo(s*(s<0?60:52),20); g.closePath(); g.fill(); } }),3400,20330);
 }
 function c1DrawSealed(o,t){ c1Put(c1wTall('sealed',60,70,30,60,g=>{ c1Ell(g,0,4,22,7,'rgba(40,40,30,.3)'); celFill(g,(q,dx,dy)=>{ q.moveTo(-16+dx,4+dy); q.lineTo(-12+dx,-40+dy); q.quadraticCurveTo(dx,-50+dy,12+dx,-40+dy); q.lineTo(16+dx,4+dy); q.closePath(); },'#e4e0d2',{r:16}); g.strokeStyle='#a8a090'; g.lineWidth=2; g.beginPath(); g.moveTo(-8,-30); g.lineTo(8,-12); g.moveTo(8,-30); g.lineTo(-8,-12); g.stroke(); }),o.x,o.y); }
 function c1DrawBirch(o,t){ const open=G.found.c_birch_cracked; c1Put(c1wTall('birch'+(open?1:0),90,120,45,100,g=>{
@@ -86110,6 +86829,8 @@ quest({
 // ================= small mystery: what rattles in Sir Strawsworth's hat? (Hal's rumor)
 quest({
   id: 'a1_hat', act: 1, giver: 'hal', optional: true,   // started by Hal's rumor (people() at the end)
+  // (v11) open from the raid on, like Hal's option: before it Hal showed a gold ! for a quest he could not give yet
+  if: 'stage>=lore',
   title: ["Sir Strawsworth's Hat", 'The Scarecrow Hat'],
   payoff: { kind: 'truth', id: 'a1_button' },
   // Hal's old rumor about the hat (a1g_talk.js) is the people() option below now
@@ -86179,6 +86900,8 @@ quest({
 // ================= small mystery: who put out the Hollow Ward?
 quest({
   id: 'a1_snuffed', act: 1, giver: 'yara', optional: true,   // started by asking Yara (people() at the end)
+  // (v11) open from the raid on, like Yara's option (before it she showed a gold ! for it on Lantern Day morning)
+  if: 'stage>=lore !flag act1_done',
   title: ['The Cold Ward', 'The Cold Ward'],
   payoff: { kind: 'truth', id: 'a1_oath_inside' },
 

@@ -236,8 +236,8 @@ function buildCaveRooms(A,def){
   A.cave=c; Object.assign(A,{x0,y0,x1:x0+c.w*cs,y1:y0+c.h*cs});
   c.dyn=new Int16Array(c.w*c.h); A.gates=[]; A.blocks=[]; A.rooms=c.rooms; A.crys=cf('crys_'+DK)||0; A.keys=()=>cf('keys_'+DK)||0;
   const P=(i,j)=>({x:x0+(i+0.5)*cs,y:y0+(j+0.5)*cs});
-  const S=c.start;
-  if(S){ A.exit={x:x0+(c.ex+0.5)*cs,y:y0+(c.ey+0.75)*cs,r:50}; A.spawn={x:A.exit.x,y:A.exit.y-120}; }
+  const hasStart=c.start;   // not S: that name is the simple-words helper, used further down
+  if(hasStart){ A.exit={x:x0+(c.ex+0.5)*cs,y:y0+(c.ey+0.75)*cs,r:50}; A.spawn={x:A.exit.x,y:A.exit.y-120}; }
   else { const R0=Object.values(c.rooms)[0], q=P(R0.ox+8,R0.oy+6); A.exit={x:q.x,y:q.y,r:0,none:true}; A.spawn={x:q.x,y:q.y}; }
   const rng=mulberry32(def.seed*31+1);
   const addGate=(o,cells)=>{ o.cells=cells; A.gates.push(o); for(const k of cells) c.dyn[k]=A.gates.length; A.objs.push(o); return o; };
