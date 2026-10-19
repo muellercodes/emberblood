@@ -878,7 +878,7 @@ f2Lines('f_bellows',['f_bellows_intro','trial_f_maze_boss'],['f_maze_won','trial
    ['tove',S('His armour is moth-frost, Ash. Normal fire will not touch it. Blaze will!','Use blue fire on his armour!')]],
   [['narr',S('The purple frost cracks off Old Bellows like an eggshell. Underneath he is warm brass and soot and rivets.','The purple frost cracks off. He is warm brass again.')],
    ['f_bellows',S('...Fff. Fwooosh. Warm?','Fwoosh. Warm?')],
-   ['f_bellows',S('Little ember. You smell like the boss.','Little ember. You smell like the boss.')],
+   ['f_bellows',S('Small hot one. You smell like the boss.','You smell like the boss.')],
    ['ash',S('The boss? You mean Ember?','The boss? Ember?')],
    ['f_bellows',S('Ember. And the Cold One. They made Bellows. Bellows kept the forge. Then the bad cold came. The purple cold. Bellows forgot.','Ember and the Cold One made me. Then the purple cold came.')],
    ['f_bellows',S('Bellows will light the forge again. Bellows will keep it warm until somebody needs it.','I will keep the forge warm.')],
@@ -1071,7 +1071,7 @@ function f2DrawGreatBellows(D){ const x=D.bel.x, y=D.bel.y, oc=F2OL(), e=G.boss,
 //   them back (any swing, shot or bomb): the updraft restarts. Feather Storm rings (jump). Then the trick again, faster.
 //   Gate: the last 4 percent needs a daze in phase 3.
 f2Lines('f_frostfeather',['f_frostfeather_intro','trial_f_sky_boss'],['f_sky_won','trial_f_sky_won'],
-  [['narr',S('The top of the tower is open to the sky. On a nest of sticks and old kite string sits a snow owl as big as a house. Purple dust glitters in her eyes.','A huge snow owl sits on a nest. Purple dust is in her eyes.')],
+  [['narr',S('The top of the tower is open to the sky. On a nest of sticks and old kite string, as wide as a pond, sits Old Frostfeather, the temple owl. Purple dust glitters in her eyes.','A huge snow owl sits on a nest. Purple dust is in her eyes.')],
    ['f_frostfeather',S('HOO! HOOOOO!','HOO! HOOOO!')],
    ['tove',S('Moth dust in her eyes, Ash. She cannot see who you are. When she flies high, ride the updraft and Blaze it out!','Ride the updraft. Blue fire her eyes!')]],
   [['narr',S("Glittery purple dust pours out of Old Frostfeather's feathers. She sneezes. A whole cloud of little moths shoots out of her beak and flutters away, looking embarrassed.",'Purple dust pours off her. She sneezes out a cloud of moths!')],
@@ -1544,7 +1544,7 @@ const HUSH_HIGH=FK.brain({move:'hold',turn:3,cd:[1.3,2.2],
 f2Foe('f_hush',{boss:true,name:'Hush',title:S('the Snow Moth','the snow moth'),short:'Hush',
   lv:16,hp:4400,r:42,speed:130,dmg:22,value:1400,flying:true,kbRes:0.2,dcol:'236,228,250',phases:[0.6,0.25],
   phaseText:[[S('Moths!','Moths!'),S('Little moths snuff the lamps. Burn them first, or light two lamps at once! Her wings blow lamps out fast now.','Burn the moths! Light two lamps!'),['f_hush',S('Too loud, too loud.','Too loud.')]],
-             [S('The Hush!','The Hush!'),S('She splits into three! Only the real Hush goes to a lit lamp. The others pop when you hit them.','Only the real one goes to a lamp!'),['f_hush',S('Rest, little ember.','Rest, little ember.')]]],
+             [S('The Hush!','The Hush!'),S('She splits into three! Only the real Hush goes to a lit lamp. The others pop when you hit them.','Only the real one goes to a lamp!'),['f_hush',S('Rest now, loud one.','Rest, loud one.')]]],
   init(e){ f2BossInit(e); e.mode='high'; e.z=140; e.orb=rand(0,TAU); e.grounds=[0,0,0]; e.hovH=0; e.gustT=6; },
   onPhase(e,i){ if(i===2) f2HushSplit(e); },
   onDeath(e){ for(const q of G.enemies) if(!q.dead&&q.type==='f_hushfake'){ q.dead=true; f2Puff(q.x,q.y-60,'236,228,250',16); } },
@@ -1694,14 +1694,14 @@ const F2_CHAIN_LINES=[S("...Fire? Warm fire? I knew a little girl with fire like
   S("The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.","Who is the Mother? I have a brother. A loud one."),
   S("Little one. Your horns. You have her horns. Ember's horns!","Your horns! You have Ember's horns!"),
   S("The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!","The Shard is in my heart! Get it out, dumpling!")];
-const F2_GLA_TAUNT=[S('Sleep, little ember. Sleep under the snow.','Sleep, little ember.'),S('The Mother says cold is kind.','The Mother says cold is kind.'),S('The long night is coming. Lie down.','The long night is coming.')];
+const F2_GLA_TAUNT=[S('Sleep, little one. Sleep under the snow.','Sleep, little one.'),S('Stay. In the cold, nothing ever has to leave.','Stay. Nothing leaves.'),S('The long night is coming. Lie down.','The long night is coming.')];
 // her words: the story may write STORY.f_glaciar_intro, or set STORY.bosses.f_glaciar.intro / .outroFree / .outroDefeat
 f2Lines('f_glaciar',['f_glaciar_intro'],[],
   [['narr',S('The top of Mount Dread. No wind. No sound. In the middle of the summit, coiled around a spike of black ice, lies a dragon.','The top of the mountain. A dragon lies coiled around a black spike.')],
    ['narr',S('She is white and blue and silver, as long as a river, with icicle horns and frost for whiskers. Four chains of purple frost hold her down, one to each corner of the summit. In her chest, something glows. The Shard.','She is long and white and blue. Four purple chains hold her. The Shard glows in her chest.')],
    ['ash',S('Hi... Auntie?','Hi... Auntie?')],
    ['f_glaciar',S("...Fire. I smell fire. My brother's fire.","Fire. I smell my brother's fire.")],
-   ['f_glaciar',S('No. No, the Mother says fire is a lie. The Mother says dark is kind and cold is kind and sleep is the kindest of all. The Mother says...','No. The Mother says fire is a lie. Sleep is kind.')],
+   ['f_glaciar',S('No. The Mother says fire goes out. The Mother says cold keeps things.','No. The Mother says cold keeps things.')],
    ['narr',S("Her eyes open. They're purple.","Her eyes open. They are purple.")],
    ['f_glaciar',S('The Mother says to put you out.','The Mother says to put you out.')],
    ['tove',S("Ash! Those chains aren't hers! Melt them, and maybe she'll remember who she is!",'Melt the chains! Then she may remember!')]],[]);

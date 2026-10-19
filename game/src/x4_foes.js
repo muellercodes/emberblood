@@ -558,7 +558,7 @@ function n4e2Split(e,first){
   const spots=[]; for(let i=0;i<=n;i++){ const an=rand(0,TAU), r=rand(90,250); spots.push({x:C.x+Math.cos(an)*r,y:C.y+Math.sin(an)*r}); }
   n4fPuff(e.x,e.y-16,'90,60,150',22); if(!e.n4bal){ e.x=spots[0].x; e.y=spots[0].y; e.mv=null; e.tele=null; e.state='chase'; n4fPuff(e.x,e.y-16,'90,60,150',22); }
   for(let i=1;i<=n;i++){ const c=makeEnemy('n_echo_vclone',spots[i].x,spots[i].y,{level:L,aggro:true,elite:false,homeX:spots[i].x,homeY:spots[i].y,leash:99999}); c.spawnIn=0.2; c.cd=rand(0.6,1.6); n4fPuff(c.x,c.y-16,'90,60,150',18); }
-  SFX.play('cast'); if(!first) n4fSay(e,'n_echo_vesper',pick([S('Which one is me? Guess!','Which one is me?'),S('Keep up, little ember!','Keep up!')]),8);
+  SFX.play('cast'); if(!first) n4fSay(e,'n_echo_vesper',pick([S('Which one is me? Guess!','Which one is me?'),S('Try to keep up this time.','Keep up!')]),8);
   if(first) n4fTip('clones',S('Clones!','Clones!'),S('Only the real one stays still and clear; the clones flicker. A Shadow Dash through a clone pops it. Whip the real one!','Clones flicker. Dash through them! Whip the real one!'));
 }
 // the whip yank: she is pulled off her feet (the main window)
@@ -590,7 +590,7 @@ function n4e2Pre(e,dt,d,a){
   e.cloneT=(e.cloneT||0)+dt*F.atk; if(e.cloneT>=(e.bph>=1?10:14)){ e.cloneT=0; n4e2Split(e,false); }
   e.n4balT=(e.n4balT==null?byDiff(14,12,10):e.n4balT)-dt*F.atk;
   if(e.n4balT<=0&&!e.mv&&e.state==='chase'){ let b=N4E2.balc[0]; if(dist(p.x,p.y,b.x,b.y)<dist(p.x,p.y,N4E2.balc[1].x,N4E2.balc[1].y)) b=N4E2.balc[1]; e.n4bal={ph:'leap',t:0,b,x0:e.x,y0:e.y}; e.tele=null; SFX.play('jump');
-    n4fSay(e,'n_echo_vesper',S('Up here, little ember! Catch me!','Up here! Catch me!'),6);
+    n4fSay(e,'n_echo_vesper',S('Up here! Catch me first.','Up here! Catch me!'),6);
     n4fTip('balc',S('The balcony','The balcony'),S('She is up on a pillar. Climb it with your Claws, or grapple the post, and knock her down!','Climb up or grapple! Knock her down!')); return true; }
   // keep her inside the hall
   const C=N4E2.C, dd=dist(e.x,e.y,C.x,C.y); if(dd>320){ const an=angTo(C.x,C.y,e.x,e.y); e.x=C.x+Math.cos(an)*320; e.y=C.y+Math.sin(an)*320; }
@@ -643,12 +643,12 @@ const n4e2Intro=()=>[
   n4fL('n_echo_vesper',`The Heart will give my family its fire back. She promised. She PROMISED.`,`The Heart will give my family fire. She promised!`),
   n4fL('ash',`She promised you lots of things. She lied about all of them.`,`She promised lots of things. She lied.`),
   n4fL('c_vesper',`Do I really stand like that? With my elbow out? Ugh. Help me knock her down. I can't watch this.`,`Do I really stand like that? Ugh. Let's knock her down.`,()=>n4fAllyHas('vesper'))];
-n4e2Intro.short=()=>[n4fL('n_echo_vesper',`Back for more, little ember?`,`Back for more?`),n4fL('ash',`Whip the real one. Knock her off the balcony. Got it.`,`Whip her. Knock her down. Got it.`)];
+n4e2Intro.short=()=>[n4fL('n_echo_vesper',`Back for more? Cute.`,`Back for more?`),n4fL('ash',`Whip the real one. Knock her off the balcony. Got it.`,`Whip her. Knock her down. Got it.`)];
 n4fLines('n_echo_vesper','n_echo2_intro','n_echo2_outro',n4e2Intro,()=>[
   n4fL('narr',`The shadow thief spins, stumbles, and pops into a cloud of moths.`,`The shadow thief pops into moths.`),
   n4fL('narr',`A memory hangs in the air. A small voice, in a small room by the sea.`,`A memory floats by. A small voice by the sea.`),
   n4fL('n_memory',`Granny, why can't I make fire like the stories?`,`Granny, why can't I make fire?`),
-  n4fL('n_memory',`Oh, duck. Fire isn't the only warm thing.`,`Oh, duck. Fire is not the only warm thing.`),
+  n4fL('n_memory',`Give me your hands, then. Both of them. There. Whose are warmer now?`,`Give me your hands. There. Warmer now?`),
   n4fL('c_vesper',`...She used to say that. Every night.`,`She used to say that every night.`,()=>vesperFriend()),
   n4fL('ash',`She was right.`,`She was right.`,()=>vesperFriend()),
   n4fL('c_vesper',`Don't make it a whole thing.`,`Don't make it a big thing.`,()=>vesperFriend()),
@@ -718,7 +718,7 @@ function n4e3Air(e,dt,p){
   e.n4slamT=(e.n4slamT==null?6:e.n4slamT)-dt*D0.atk; e.n4inhT=(e.n4inhT==null?9:e.n4inhT)-dt*D0.atk;
   if(!e.mv&&(e.state==='chase'||e.state==='recover'||e.state==='takeoff')){
     if(e.n4slamT<=0){ const q={x:p.x,y:p.y}; const d=dist(q.x,q.y,C.x,C.y); if(d>300){ const an=angTo(C.x,C.y,q.x,q.y); q.x=C.x+Math.cos(an)*300; q.y=C.y+Math.sin(an)*300; }
-      const dur=n4fTele(1.2); e.n4slam={ph:'aim',t:0,dur,x:q.x,y:q.y}; n4fMark({x:q.x,y:q.y,r:120,dur:dur+0.15,col:N4FCOL.red,owner:e}); SFX.play('warn'); n4fSay(e,'n_echo_glaciar',S('Down you go, dumpling.','Down you go.'),7); return; }
+      const dur=n4fTele(1.2); e.n4slam={ph:'aim',t:0,dur,x:q.x,y:q.y}; n4fMark({x:q.x,y:q.y,r:120,dur:dur+0.15,col:N4FCOL.red,owner:e}); SFX.play('warn'); n4fSay(e,'n_echo_glaciar',S('Down you go, little one.','Down you go.'),7); return; }
     if(e.n4inhT<=0){ e.n4inh={t:0,dur:n4fTele(1.2)}; SFX.play('warn'); n4fTip('inhale',S('A huge breath!','A huge breath!'),S('Her chest glows: throw a Blast Bomb into her open mouth!','Throw a bomb in her mouth!')); return; } }
   if(e.state==='takeoff'){ e.st-=dt; e.z=lerp(e.z||0,120,Math.min(1,dt*3)); if(e.st<=0) e.state='chase'; }
   if(N4E3_AIR) N4E3_AIR(e,dt,p);
@@ -736,7 +736,7 @@ function n4fLoop(){ if(typeof P3==='undefined'||!P3.ride) return; const R=P3.rid
 if(typeof F2HC!=='undefined'&&F2HC.f_glaciar) F2HC.n_echo_glaciar=F2HC.f_glaciar;
 defineFoe('n_echo_glaciar',{boss:true,name:'Echo of the Ice Dragon',title:S('A shadow of Glaciar','A shadow of Glaciar'),short:'Echo of the Ice Dragon',
   lv:22,hp:15000,r:60,speed:60,dmg:26,value:1000,kbRes:0,dcol:'70,80,140',phases:[0.5],
-  phaseText:[[S('The Wind!','The Wind!'),S('She flies! Ride the wind ring and hit her from the air. Pound her when she lands; bomb her mouth when she breathes in!','She flies! Ride the wind! Pound her when she lands!'),['n_echo_glaciar',S('Cold is kind. Cold is KIND.','Cold is kind!')]]],
+  phaseText:[[S('The Wind!','The Wind!'),S('She flies! Ride the wind ring and hit her from the air. Pound her when she lands; bomb her mouth when she breathes in!','She flies! Ride the wind! Pound her when she lands!'),['n_echo_glaciar',S('Cold keeps things. Cold KEEPS things.','Cold keeps things!')]]],
   init(e){ if(typeof f2BossInit==='function') f2BossInit(e); const C=N4E3.C; e.mode='coil'; e.z=0; e.fly=0; e.c8=rand(0,TAU); e.homeX=C.x; e.homeY=C.y; e.r0=60; e.leash=99999; e.n4shield=true; e.stuns=0;
     e.f2ctx={cx:C.x,cy:C.y,R:N4E3.R,A:null,rect:false}; e.n4edK=(e.edK||1)*Math.pow(1.10,22-17); e.edK=e.n4edK; n4fBossIn(e); },
   onPhase(e,i){ if(i===1){ e.mode='n4air'; e.mv=null; e.tele=null; e.state='takeoff'; e.st=1; e.n4slamT=5; e.n4inhT=9; if(N4F.fight) N4F.fight.fly=true; if(typeof n4wCalm==='function') n4wCalm('cz_echo3',true); n4e3Stream(true);
@@ -787,14 +787,14 @@ defineBoss('n_echo3',{boss:'n_echo_glaciar',at:{x:3121,y:86579,r:400,name:S('The
   onStart(){ n4fFightStart('n_echo3'); }, onReset(){ n4fFightReset('n_echo3'); }, onWin(){ n4fWon('n_echo3'); }});
 const n4e3Intro=()=>[
   n4fL('narr',`On a throne of black ice, chained in frost, a shadow dragon lifts her head. Her breath is a blizzard.`,`A shadow ice dragon sits on an ice throne, in chains.`),
-  n4fL('n_echo_glaciar',`The Mother says cold is kind. The Mother says sleep is kindest. The Mother says fire is a lie.`,`The Mother says cold is kind. Fire is a lie.`),
+  n4fL('n_echo_glaciar',`Cold keeps things, little one. Nothing leaves in the cold.`,`Cold keeps things. Nothing leaves.`),
   n4fL('ash',`That's not you talking. That's the Shard. Well. A copy of you, with a copy of the Shard. This is very confusing.`,`That is the Shard talking. This is confusing!`),
   n4fL('f_glaciar',`Was I really that dreary? Dumpling, I need a scarf. And you need to melt those chains.`,`Was I that gloomy? Melt those chains, dumpling!`,()=>n4fAllyHas('glaciar'))];
-n4e3Intro.short=()=>[n4fL('n_echo_glaciar',`Cold again, dumpling? Cold is kind.`,`Cold again? Cold is kind.`),n4fL('ash',`Pound the plate, Blaze the lock. Four times.`,`Pound the plate. Blaze the lock. Four times!`)];
+n4e3Intro.short=()=>[n4fL('n_echo_glaciar',`Cold again, little one? Stay. Nothing leaves.`,`Cold again? Stay.`),n4fL('ash',`Pound the plate, Blaze the lock. Four times.`,`Pound the plate. Blaze the lock. Four times!`)];
 n4fLines('n_echo_glaciar','n_echo3_intro','n_echo3_outro',n4e3Intro,()=>[
   n4fL('narr',`The ice cracks. The shadow dragon shatters into a flurry of moths.`,`The ice dragon breaks into moths.`),
   n4fL('n_memory',`Auntie Glee! Can we make the big snow? For the sledding?`,`Auntie Glee! Can we make snow for sledding?`),
-  n4fL('n_memory',`Every year, dumpling. Every single year.`,`Every year, dumpling.`),
+  n4fL('n_memory',`Every year, little one. Every single year.`,`Every year, little one.`),
   n4fL('f_glaciar',`I forgot the sledding. For a thousand years, I forgot it. Thank you for reminding me, dumpling.`,`I forgot the sledding. Thank you for reminding me.`,()=>G.choices.f_glaciar==='free'),
   n4fL('ash',`Every Lantern Day. Sleds AND cake.`,`Every Lantern Day. Sleds and cake!`,()=>G.choices.f_glaciar==='free'),
   n4fL('ash',`Even ice dragons get lonely, huh, Pip?`,`Ice dragons get lonely too, Pip.`,()=>G.choices.f_glaciar!=='free'),
@@ -969,7 +969,7 @@ function n4nTransTick(e,dt){ e.transT-=dt; e.dx=e.dy=0; e.invuln=true;
 function n4nPulled(e,A){ if(e.nPhase!==1||e.win>0||e.trans) return; A.snag=false; e.pulls=(e.pulls||0)+1; for(const r of e.p2rings) if(r.A===A) r.done=true; n4fEv('pull');
   shake(8); SFX.play('boom'); emit(A.x,A.y-40,20,{col:'230,235,255',smin:60,smax:200,lmin:.3,lmax:.6,zmin:1.5,zmax:3});
   const need=n4nPullNeed(e);
-  if(e.pulls>=need){ e.pulls=0; for(const B of N4N.anchors){ B.snag=false; B.heat=0; } for(const r of e.p2rings) r.done=true; e.alt=e.z=0; n4nGround(e,N4N.C.x,N4N.C.y-20,["Tied down like a kite? That isn't kind, little ember.",'You tied me down? Not kind!']); }
+  if(e.pulls>=need){ e.pulls=0; for(const B of N4N.anchors){ B.snag=false; B.heat=0; } for(const r of e.p2rings) r.done=true; e.alt=e.z=0; n4nGround(e,N4N.C.x,N4N.C.y-20,["Tied down like a kite? That isn't kind, dear.",'You tied me down? Not kind!']); }
   else ftext(A.x,A.y-60,S('PULL! One more!','One more!'),'#ffe066',16); }
 function n4nPullNeed(e){ let n=byDiff(1,2,2); if(n4fAllyHere('vesper')&&n>1) n--; return n; }
 function n4nSnagNeed(){ return byDiff(2,3,4); }
@@ -993,8 +993,8 @@ const n4nIntro=()=>[
   n4fL('narr',`Something enormous is folded over the edge of the moon, like a blanket over a lamp. It unfolds.`,`Something huge is wrapped over the moon. It unfolds.`),
   n4fL('narr',`Wings. Wings as wide as a town square, grey and soft as dust, with two pale moons painted on them. A moth the size of a house.`,`Wings as big as a town! A moth the size of a house.`),
   n4fL('nyxara',`There you are. Little ember. Look how big you've grown.`,`There you are, little ember. How big you are.`),
-  n4fL('ash',`Are you... my great-great-great...`,`Are you my great-great-great...`),
-  n4fL('nyxara',`No.`,`No.`), n4fL('ash',`Oh, thank goodness.`,`Oh, good.`),
+  n4fL('ash',`You've been watching me.`,`You have been watching me.`),
+  n4fL('nyxara',`Every night, dear. I watch everyone, right up until they leave.`,`Every night. Until they leave.`),
   n4fL('nyxara',`I am much older than your family, dear. I was here when the moon was new.`,`I am older than your family. I was here when the moon was new.`),
   n4fL('nyxara',`And you brought me your heart. Whole again. Your mother did such lovely work. A cracked heart can't burn, you see. A whole one can.`,`You brought me the Heart. Whole again. Now it can burn.`),
   n4fL('ash',`You wanted me to fix it. This whole time.`,`You wanted me to fix it. All along.`),
@@ -1108,7 +1108,7 @@ function n4nOnPlat(x,y){ for(const P of N4N.plats) if(dist(x,y,P.x,P.y)<P.r+8) r
 function n4nP2(e,dt,p){
   const C=N4N.C; e.sub=!(e.act&&e.act.k==='jaws'&&e.act.up); e.flying=false; e.alt=e.z=0;
   if(e.restP){ const P=e.restP; e.restT2-=dt; e.state='rest'; e.x=lerp(e.x,P.x,Math.min(1,dt*4)); e.y=lerp(e.y,P.y,Math.min(1,dt*4)); P.glow=1; N4F.cue={x:P.x,y:P.y-30};
-    if(e.restT2<=0){ e.restP=null; P.glow=0; e.restT=byDiff(11,9,7); n4nSay(e,'Too slow, little ember.','Too slow!',6); } return; }
+    if(e.restT2<=0){ e.restP=null; P.glow=0; e.restT=byDiff(11,9,7); n4nSay(e,'Too slow, dear.','Too slow!',6); } return; }
   for(const P of N4N.plats) P.glow=Math.max(0,P.glow-dt*2);
   // swim toward Ash (under the ink), and now and then to a platform to rest under it
   e.restT=(e.restT==null?6:e.restT)-dt*foeDiff().atk;
@@ -1266,9 +1266,9 @@ function n4nSeamLines(k){ const C=G.choices||{}, F=G.flags||{}, L=[];
   const v=(who,col,full,simple)=>({who,text:S(full,simple),fn:()=>n4nVoice(col)});
   if(k===0){ if(C.c_vesper==='friend') L.push(v('c_vesper',N4N_SEAMC[0],`Hey. Cousin. Emberbloods without fire still have warm hands. Here. Take mine.`,`Cousin. I have no fire. But my hands are warm. Take them.`));
     else L.push(v('juniper',N4N_SEAMC[0],`Ash! You can't get lost now. I drew you a map. Follow it home!`,`Ash! You can't get lost. I drew you a map!`)); }
-  if(k===1){ if(C.f_glaciar==='free') L.push(v('f_glaciar',N4N_SEAMC[1],`Cold keeps things, she says. Warm GIVES things. Give, dumpling.`,`Cold keeps things. Warm gives things. Give, dumpling!`));
+  if(k===1){ if(C.f_glaciar==='free') L.push(v('f_glaciar',N4N_SEAMC[1],`I slept through the last time this family needed me. Not this time. Breathe!`,`I slept last time. Not this time. Breathe!`));
     else L.push(v('elka',N4N_SEAMC[1],`Faster than a wolf, Ash! FASTER!`,`Faster than a wolf, Ash!`)); }
-  if(k===2){ if(C.m_hush==='free'){ L.push(v('narr',N4N_SEAMC[2],`A soft white light settles on your shoulder. Hush. For once, she doesn't say shhh.`,`Hush lands on your shoulder. She does not say shhh.`)); L.push(n4fL('f_hush',`...Hold on, little ember. Hold on.`,`Hold on.`)); }
+  if(k===2){ if(C.m_hush==='free'){ L.push(v('narr',N4N_SEAMC[2],`A soft white light settles on your shoulder. Hush. For once, she doesn't say shhh.`,`Hush lands on your shoulder. She does not say shhh.`)); L.push(n4fL('f_hush',`Hold on, loud one. Hold on.`,`Hold on, loud one.`)); }
     else L.push(v('quill',N4N_SEAMC[2],`The moon always comes back, Ash. I have measured it. Every month. It's the most reliable thing I know.`,`The moon always comes back. I measured it.`)); }
   if(k===3){ L.push(v('maren',N4N_SEAMC[3],`Ash! I can feel it from here. Don't you dare go out. You still haven't eaten your sandwich.`,`Ash! Don't you go out! You did not eat your sandwich!`));
     if(F.tk_come==='home') L.push(n4fL('narr',`Far, far away in Embermere, in one small window, a lantern is burning. Tikka promised.`,`Far away, Tikka's lantern burns in her window.`));
@@ -1278,7 +1278,7 @@ function n4nSeamLines(k){ const C=G.choices||{}, F=G.flags||{}, L=[];
     else if(end==='warden') L.push(n4fL('narr',`Five small lights blink on around you. One, two, three, four, five.`,`Five little lights shine around you.`),n4fL('iska',`Sixth Warden. We felt the dark from our Ward-fires. We came.`,`Sixth Warden. We felt the dark. We came.`),
       n4fL('bram',`And to SHOUT! BREATHE, kid!`,`BREATHE, kid!`),n4fL('vor',`...Breathe from your belly, hatchling. Not your nose.`,`Breathe from your belly, little one.`));
     else if(end==='heir') L.push(n4fL('narr',`The fire you took from Grandpa, the fire that once made you huge, wakes up deep in your belly.`,`The big fire you once had wakes up in your belly.`),n4fL('grandpa',`(very far away, from the warm shelf above Bertram's oven) You call that a flame? Do it BIGGER.`,`(far away) Is that a flame? Do it BIGGER!`),n4fL('ash',`Thanks, Grandpa.`,`Thanks, Grandpa.`));
-    else L.push(n4fL('ember',`Little ember. Remember what my father taught me? Breathe from your belly. Not your nose.`,`Little ember. Breathe from your belly.`)); }
+    else L.push(n4fL('ember',`Ash. Do what my father taught me. Breathe from your belly, not your nose.`,`Ash. Breathe from your belly.`)); }
   return L; }
 function n4nVoice(col){ const H=N4N.heartUI; if(!H) return; const a=rand(-2.6,-0.5); H.voices.push({col,t:0,x:H.x+Math.cos(a)*130,y:H.y-60+Math.sin(a)*70}); }
 function n4nHeartStandIn(e,resume){
@@ -1368,7 +1368,7 @@ function n4nBeats(e,left){ const b=e.beats, br=e.broken;
     const end=n4fEnd();
     if(end==='lantern'&&n4fAllyBeat('grandpa',['grandpa',S(`Get AWAY from my grandchild, you oversized sock!`,`Get away from my grandchild, you big sock!`)])){ if(!n4fS()) e.n4gpa=0.5; }
     if(end==='warden'&&n4fAllyBeat('wardens',['iska',S(`Five lights, one for each of us. Stand close, Warden.`,`Five lights for you. Stand close!`)])){ if(!n4fS()) N4F.ward=5; }
-    if(end==='hero'&&n4fAllyBeat('ember',['ember',S(`I'm right here, little ember. Aim for the cracks.`,`I am here. Aim for the cracks!`)])){ if(!n4fS()) e.n4emb=0.5; } }
+    if(end==='hero'&&n4fAllyBeat('ember',['ember',S(`I'm right here, Ash. Aim for the cracks.`,`I am here. Aim for the cracks!`)])){ if(!n4fS()) e.n4emb=0.5; } }
   if(left===2&&!b.vesper){ b.vesper=1;
     if(n4fAllyBeat('vesper',['c_vesper',S(`Hey, Night Mother! You've got a crack. Let me help with that.`,`Hey! You have a crack. Let me help!`)])){ let best=null, bd=1e9; for(const k of e.cracks){ if(k.broken) continue; const d=dist(player.x,player.y,k.x,k.y); if(d<bd){ bd=d; best=k; } }
       if(best){ N4N.vpry={x:best.x,y:best.y,t:0}; n4fEv('vpry'); n4nCrackStrike(e,best,99,'vesper'); } } }

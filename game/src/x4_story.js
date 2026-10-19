@@ -387,7 +387,7 @@ n4sDef('n_trans23',()=>[
 // her taunts during the fight (8.3, 8.5), and the friends' big moments in phase 4 (taunt lines, once each)
 const N4S_TAUNT={
   p1:[S(`Shh, shh.`,`Shh, shh.`),S(`Why fight? Sleep is so soft.`,`Why fight? Sleep is so soft.`),S(`Nowhere to hide from the moonlight, dear. Except the pillars. I should have made fewer pillars.`,`You cannot hide. Except behind a pillar.`)],
-  pulled:[S(`Tied down like a kite? That isn't kind, little ember.`,`You tied me down? Not kind!`)],
+  pulled:[S(`Tied down like a kite? That isn't kind, dear.`,`You tied me down? Not kind!`)],
   p2:[S(`Under the dark it's quiet. Come down. Stay.`,`Under the dark it is quiet. Stay.`)],
   pounded:[S(`Ow. That was a piece of my own moon you dropped on me.`,`Ow! You hit me with my own moon!`)],
   p3:[S(`Mmm. Crunchy.`,`Mmm. Crunchy.`),S(`The moon is mine. There's hardly any left now.`,`The moon is mine.`)],
@@ -399,7 +399,7 @@ const N4S_ALLYBEAT={
   glaciar:['f_glaciar',S(`Hold STILL, old moth.`,`Hold still!`)],
   grandpa:['grandpa',S(`Get AWAY from my grandchild, you oversized sock!`,`Get away from my grandchild, you big sock!`)],
   wardens:['iska',S(`Five lights, one for each of us. Stand close, Warden.`,`Five lights for you. Stand close!`)],
-  ember:['ember',S(`I'm right here, little ember. Aim for the cracks.`,`I am here. Aim for the cracks!`)],
+  ember:['ember',S(`I'm right here, Ash. Aim for the cracks.`,`I am here. Aim for the cracks!`)],
   tikka:['ev_tikka',S(`One lumpy bun, coming UP!`,`Here comes a bun!`)],
   cinder:['cinder',S(`None shall pass! Not even moths!`,`Nobody gets past me!`)],
   vesper:['c_vesper',S(`Hey, Night Mother! You've got a crack. Let me help with that.`,`Hey! You have a crack. Let me help!`)]
