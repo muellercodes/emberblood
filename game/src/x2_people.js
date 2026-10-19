@@ -1644,7 +1644,7 @@ window.__ebX=Object.assign(window.__ebX||{},{f2p:{
   npc:id=>{ const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); return n?{x:Math.round(n.x),y:Math.round(n.y)}:null; },
   // (J11 talk tests) stand next to a person, inside their house if they are indoors; returns the npc or null
   go:id=>{ const c=CASTBY[id]||SPECIAL[id]; if(c&&c.inside){ if(!AREA||AREA.id!==c.inside){ if(AREA) exitArea(true); enterArea(c.inside,DOORS.find(q=>q.area===c.inside)); } } else if(AREA) exitArea(true);
-    const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); if(!n) return null; player.x=n.x; player.y=n.y+(AREA?50:40); return n; },
+    let n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); if(!n&&!AREA){ try{ setupNPCs(); }catch(e){} n=G.npcs.find(q=>q.id===id); } if(!n) return null; player.x=n.x; player.y=n.y+(AREA?50:40); return n; },
   where:id=>{ const c=CASTBY[id]||SPECIAL[id]; const n=G.npcs.find(q=>q.id===id); const d=DOORS.find(q=>q.owner===id); return {inside:c&&c.inside||null,door:d?{x:Math.round(d.x),y:Math.round(d.y),area:d.area}:null,out:n?{x:Math.round(n.x),y:Math.round(n.y)}:null,present:npcPresent(id)}; },
   step:id=>{ const q=G.quests[id]; return q?{step:q.step,done:!!q.done,text:stepText(id)}:null; },
   stages:()=>F2P_STAGES.map(s=>[s,stageAt(s),f2pFallbackStage(s)]), frame:f2pFrame, heat:(k,x,y,r,need,dt)=>f2pHeat(k,x,y,r,need,dt),

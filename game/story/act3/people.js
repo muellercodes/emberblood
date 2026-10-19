@@ -215,6 +215,14 @@ people({
           { t: ['Will you stop being scared now?', 'Will you stop being scared?'],
             say: [['f_brann', 'Of the big ones, yes! Of the small ones, no! Small ones get in your helmet!', 'Of big ones, yes. Small ones get in your helmet!']] },
         ] },
+      { if: 'flag f_northgate !flag f_done', once: true, fact: 'f3s_northgate=open',
+        say: ['My boots are still full of gate! I am keeping them, as a trophy! The Hearthkeeper says they smell. They smell of victory!', 'My boots are full of gate! I am keeping them!'], ref: 'f3s_northgate',
+        re: [
+          { t: ['Did Gunnar stop licking it?', 'Did Gunnar stop licking it?'],
+            say: [['f_brann', 'He licked the open bit too! He says it tastes different now! Warmer! I did not ask!', 'He licked it open too. He says it tastes warmer.']] },
+          { t: ['Where does that road go?', 'Where does that road go?'],
+            say: [['f_brann', 'Up onto the Dreadmoor, where Sir Knut went. Nobody goes up there now. Nobody comes back down.', 'Up to the moor, where Knut went. Nobody comes back.', { ref: 'f3s_knut' }]] },
+        ] },
       // what Ash told him about moths, and what Ash told the Mayor about being brave
       { if: 'said brann_still flag f_hush_done', once: true,
         say: ['I tried your trick! A moth landed on my helmet last night, and I stood as still as a statue. Gunnar thought I had frozen again and fetched hot water.',
@@ -233,14 +241,6 @@ people({
             say: [['f_brann', 'Ha! I knew it! I am going to tell Gunnar! Gunnar is scared of nothing, which is a different problem!', 'Ha! I will tell Gunnar. He fears nothing. That is a problem.']] },
           { t: ['Even indoors?', 'Even indoors?'], tone: 'silly',
             say: [['f_brann', 'Especially indoors! The moths are indoors! Somewhere! Behind the curtains, probably!', 'Especially indoors! Moths hide behind curtains!']] },
-        ] },
-      { if: 'flag f_northgate !flag f_done', once: true, fact: 'f3s_northgate=open',
-        say: ['My boots are still full of gate! I am keeping them, as a trophy! The Hearthkeeper says they smell. They smell of victory!', 'My boots are full of gate! I am keeping them!'], ref: 'f3s_northgate',
-        re: [
-          { t: ['Did Gunnar stop licking it?', 'Did Gunnar stop licking it?'],
-            say: [['f_brann', 'He licked the open bit too! He says it tastes different now! Warmer! I did not ask!', 'He licked it open too. He says it tastes warmer.']] },
-          { t: ['Where does that road go?', 'Where does that road go?'],
-            say: [['f_brann', 'Up onto the Dreadmoor, where Sir Knut went. Nobody goes up there now. Nobody comes back down.', 'Up to the moor, where Knut went. Nobody comes back.', { ref: 'f3s_knut' }]] },
         ] },
       // his patrol, once he has told Ash about it
       { if: 'clue f3_brann_list !solved what_knights',
@@ -336,6 +336,15 @@ people({
     // Says everything is fine, louder each time; nervous, kind, writes letters to the weather. Warm Hands (f_warm) is
     // her quest: twelve thawed people and a medal she makes herself.
     f_toastwhistle: [
+      // her first meeting (before her quest; Brann's shouting got there first)
+      { if: '!quest f_warm started stage<f_kindle', once: true,
+        say: ["You must be the Emberblood! Brann has told the whole town. Twice. I'm Mayor Toastwhistle, and everything is fine.", "You're the Emberblood! I'm the Mayor. All is fine."],
+        re: [
+          { t: ['Is everything fine?', 'Is everything fine?'],
+            say: [['f_toastwhistle', 'Yes! No. The Hearth is going out and the town is freezing. Apart from that, fine.', 'Yes! No. The fire is going out. Apart from that, fine.']] },
+          { t: ['What did Brann say about me?', 'What did Brann say?'],
+            say: [['f_toastwhistle', "That you have horns, a tail, and you are not a moth. He said the last part three times.", 'Horns, a tail, and not a moth. Three times.']] },
+        ] },
       { if: 'quest f_warm done', once: true,
         say: ['Twelve people! Warm! And a medal ceremony! I have never been this fine. This is what fine actually feels like.', 'Twelve warm people and a medal! This is fine!'],
         re: [
@@ -359,15 +368,6 @@ people({
             say: [['f_toastwhistle', 'I keep a list! It has gold stars on it! Some of the stars are cocoa stains, but they count!', 'I keep a list with gold stars. Some are cocoa.']] },
           { t: ['When will you tell Pim?', 'When will you tell Pim?'],
             say: [['f_toastwhistle', 'Soon! Tomorrow! ...In writing! From a long way away!', 'Soon! In a letter. From far away!']] },
-        ] },
-      // her first meeting (before her quest; Brann's shouting got there first)
-      { if: '!quest f_warm started stage<f_kindle', once: true,
-        say: ["You must be the Emberblood! Brann has told the whole town. Twice. I'm Mayor Toastwhistle, and everything is fine.", "You're the Emberblood! I'm the Mayor. All is fine."],
-        re: [
-          { t: ['Is everything fine?', 'Is everything fine?'],
-            say: [['f_toastwhistle', 'Yes! No. The Hearth is going out and the town is freezing. Apart from that, fine.', 'Yes! No. The fire is going out. Apart from that, fine.']] },
-          { t: ['What did Brann say about me?', 'What did Brann say?'],
-            say: [['f_toastwhistle', "That you have horns, a tail, and you are not a moth. He said the last part three times.", 'Horns, a tail, and not a moth. Three times.']] },
         ] },
       // her moment (the old chat): while the Hearth is dying and the town is scared
       { if: '!flag f_hearth_lit', fact: 'f3s_hearth=dying',
@@ -415,6 +415,15 @@ people({
     // Gruff, proud, a huge fan of Maren (she asked her north once; the "no thank you" is framed on her wall). Knows the
     // sword before she knows the face. Her quest f_forge lights her forge and makes the Ember Chain.
     f_gunnhild: [
+      // her first meeting, before her quest (she knows the sword before the face)
+      { if: '!quest f_forge started', once: true,
+        say: ["Hm. A dragon in my cold forge. ...Wait. That sword. That's Maren's work. You're Maren's kid?", "That's Maren's sword. You're her kid?"],
+        re: [
+          { t: ['You know my mom?', 'You know my mom?'],
+            say: [['f_gunnhild', 'Know her? Her letter is on my wall. One letter. It says "no thank you." I framed it.', 'Her letter is on my wall. It says "no thank you."']] },
+          { t: ['You can tell just by looking?', 'Just by looking?'],
+            say: [['f_gunnhild', 'Nobody else folds steel like that. Twenty times, then once more for luck. I tried it. Mine cracked.', 'Nobody folds steel like that. I tried. Mine cracked.']] },
+        ] },
       { if: 'quest f_forge done', once: true,
         say: ["My forge has been hot every day since. I wrote your mother a letter about it. Four pages. I haven't sent it.", 'My forge is hot! I wrote your mom. I did not send it.'],
         re: [
@@ -439,15 +448,6 @@ people({
             say: [['f_gunnhild', 'Mammoths, long gone. The ore grows in them like frost on a window. Knock, and it falls out.', 'Old mammoths. Knock, and the ore falls out.', { ref: 'f3s_skulldrum' }]] },
           { t: ['What will you make with it?', 'What will you make?'],
             say: [['f_gunnhild', 'Something that burns at the tip. You\'ll see. I\'ve been thinking about it since the day I met your sword.', 'Something with a burning tip. You will see.']] },
-        ] },
-      // her first meeting, before her quest (she knows the sword before the face)
-      { if: '!quest f_forge started', once: true,
-        say: ["Hm. A dragon in my cold forge. ...Wait. That sword. That's Maren's work. You're Maren's kid?", "That's Maren's sword. You're her kid?"],
-        re: [
-          { t: ['You know my mom?', 'You know my mom?'],
-            say: [['f_gunnhild', 'Know her? Her letter is on my wall. One letter. It says "no thank you." I framed it.', 'Her letter is on my wall. It says "no thank you."']] },
-          { t: ['You can tell just by looking?', 'Just by looking?'],
-            say: [['f_gunnhild', 'Nobody else folds steel like that. Twenty times, then once more for luck. I tried it. Mine cracked.', 'Nobody folds steel like that. I tried. Mine cracked.']] },
         ] },
       // her moment (the old chat), the forge lit and the sword on her anvil
       { if: 'flag f_forge_lit', fact: 'f3s_forge=lit',
@@ -493,6 +493,15 @@ people({
     // Fast, cheerful, loves explosions, stranded up here with her heaters. Brought Penny's paper up the pass in her sled.
     // Knows the Moth Mask (sold her a lock); Hettie is her cousin. Her quest f_bombs makes Ash's Blast Bombs.
     f_mags: [
+      // her first meeting (from f_kindle on, her quest's offer plays first)
+      { if: '!quest f_bombs started stage<f_kindle', once: true,
+        say: ["A dragon! A real warm one! Penny's paper came up the pass in my sled, you know. You're on the front page.", "A warm dragon! You're in Penny's paper!"],
+        re: [
+          { t: ['What does Penny say about me?', 'What does Penny say?'],
+            say: [['f_mags', 'That you chase thieves over rooftops and wake up clocks. The drawing of you is mostly teeth.', 'You chase thieves and wake clocks. The drawing is all teeth.']] },
+          { t: ['Why are you so far from home?', 'Why are you up here?'],
+            say: [['f_mags', 'I came north to sell steam heaters. Then winter came. Business has never been better, and I have never been colder.', 'I sell heaters. Business is great. I am so cold.']] },
+        ] },
       { if: 'quest f_bombs done', once: true,
         say: ['Captain Brann came by to say no to my fireworks shop. He bought six rockets on the way out.', 'Brann said no to my shop. Then bought six rockets.'],
         re: [
@@ -524,15 +533,6 @@ people({
           { t: ['Did she really pay for that lock?', 'Did she pay for the lock?'],
             say: [['f_mags', 'Every coin. Picked it first, then paid. Good manners, that one.', 'Every coin. She picked it, then paid.']] },
         ] },
-      // her first meeting (from f_kindle on, her quest's offer plays first)
-      { if: '!quest f_bombs started stage<f_kindle', once: true,
-        say: ["A dragon! A real warm one! Penny's paper came up the pass in my sled, you know. You're on the front page.", "A warm dragon! You're in Penny's paper!"],
-        re: [
-          { t: ['What does Penny say about me?', 'What does Penny say?'],
-            say: [['f_mags', 'That you chase thieves over rooftops and wake up clocks. The drawing of you is mostly teeth.', 'You chase thieves and wake clocks. The drawing is all teeth.']] },
-          { t: ['Why are you so far from home?', 'Why are you up here?'],
-            say: [['f_mags', 'I came north to sell steam heaters. Then winter came. Business has never been better, and I have never been colder.', 'I sell heaters. Business is great. I am so cold.']] },
-        ] },
       // her moment (the old chat), once she has made him his bombs
       { if: 'power bombs',
         say: ['Serious science question. If you could blow up one thing in the whole world, what would it be?', 'If you could blow up one thing, what?'],
@@ -562,6 +562,15 @@ people({
     // Motherly, feeds everyone (even the chairs), calls Ash "lamb". Lost her husband to a blizzard long ago: a light in
     // every window. Her oldest friend is Sigrun, the cook in frozen Rimeholm.
     f_hilde: [
+      // her first meeting (Brann's shouting got here first)
+      { if: 'stage<f_thaw', once: true,
+        say: ["Come in from the cold, lamb! You're the Emberblood Brann keeps shouting about. Sit. Soup. Mind the cat.", 'Come in, lamb! Sit. Soup. Mind the cat.'],
+        re: [
+          { t: ['Where is the cat?', 'Where is the cat?'],
+            say: [['f_hilde', 'On the windowsill, being a loaf. Her name is Biscuit. Don\'t sit on Biscuit. People do.', 'On the sill. She is Biscuit. Do not sit on her.']] },
+          { t: ['Does Brann really shout about me?', 'Does Brann shout about me?'],
+            say: [['f_hilde', 'From the West Gate tower, every morning. "The Emberblood is here! Stay calm!" Nobody was calm.', '"The Emberblood is here! Stay calm!" Nobody was.', { ref: 'f3_west_gate' }]] },
+        ] },
       { if: 'choice f_glaciar_home=stay', once: true, fact: 'f3s_glaciar=free',
         say: ["The Snow Mother is real! And she's your auntie! The snow is falling soft as feathers now.", 'The Snow Mother is real! Your auntie!'],
         re: [
@@ -585,15 +594,6 @@ people({
             say: [['f_hilde', 'Of course she was. She would stir a pot through an earthquake. She did once.', 'Of course. She would stir through an earthquake.']] },
           { t: ['Did you add the salt?', 'Did you add the salt?'],
             say: [['f_hilde', 'I did. Don\'t tell her. It was much better.', 'I did. Shh. It was much better.']] },
-        ] },
-      // her first meeting (Brann's shouting got here first)
-      { if: 'stage<f_thaw', once: true,
-        say: ["Come in from the cold, lamb! You're the Emberblood Brann keeps shouting about. Sit. Soup. Mind the cat.", 'Come in, lamb! Sit. Soup. Mind the cat.'],
-        re: [
-          { t: ['Where is the cat?', 'Where is the cat?'],
-            say: [['f_hilde', 'On the windowsill, being a loaf. Her name is Biscuit. Don\'t sit on Biscuit. People do.', 'On the sill. She is Biscuit. Do not sit on her.']] },
-          { t: ['Does Brann really shout about me?', 'Does Brann shout about me?'],
-            say: [['f_hilde', 'From the West Gate tower, every morning. "The Emberblood is here! Stay calm!" Nobody was calm.', '"The Emberblood is here! Stay calm!" Nobody was.', { ref: 'f3_west_gate' }]] },
         ] },
       // before Rimeholm: she is worried about Sigrun (said hilde_sigrun: Sigrun hears it when she thaws)
       { if: '!flag f_thaw_f_sigrun stage<f_sky', ref: 'f3s_rimeholm',
@@ -694,6 +694,15 @@ people({
     // A tiny businesswoman with one stand and big plans. Little Bo from Rimeholm was her best Sunday customer; she has
     // been saving his cocoa for a month.
     f_pim: [
+      // her first meeting, after the chapter (the chapter's own f3_pim is the usual one)
+      { if: '!seen f3_pim', once: true,
+        say: ["Customer! Hot cocoa, three coins! Two if you heat it yourself! I'm Pim. I own this stand. One day, all the stands.", "Cocoa, three coins! I'm Pim. I own this stand."],
+        re: [
+          { t: ["I'll heat mine myself.", "I'll heat it myself."],
+            say: [['f_pim', '(You breathe on the cup. It steams.) Ooh. That\'s two coins. And a job, if you want one.', 'Ooh! Two coins. And a job, if you want.']] },
+          { t: ['How many stands are there?', 'How many stands?'],
+            say: [['f_pim', 'One. This one. So I\'m halfway.', 'One. This one. So I am halfway.']] },
+        ] },
       // the what_knights red herring: glacier golems
       { if: 'stage>=f_thaw !clue f3_golem_rumor', once: true, then: ['clue f3_golem_rumor'],
         say: ["Did you see the Rime Knights? Gunnhild says they're made of glacier! Walking ice golems! I'd charge them double.", 'Gunnhild says Rime Knights are made of glacier!'],
@@ -747,15 +756,6 @@ people({
           { t: ['Cocoa soup.', 'Cocoa soup.'], tone: 'silly', f: 1,
             say: [['f_pim', 'Cocoa soup. A new product. I\'ll call it Soupa-Cocoa. You get one percent.', 'Cocoa soup! A new product! You get one percent.']] },
         ] },
-      // her first meeting, after the chapter (the chapter's own f3_pim is the usual one)
-      { if: '!seen f3_pim', once: true,
-        say: ["Customer! Hot cocoa, three coins! Two if you heat it yourself! I'm Pim. I own this stand. One day, all the stands.", "Cocoa, three coins! I'm Pim. I own this stand."],
-        re: [
-          { t: ["I'll heat mine myself.", "I'll heat it myself."],
-            say: [['f_pim', '(You breathe on the cup. It steams.) Ooh. That\'s two coins. And a job, if you want one.', 'Ooh! Two coins. And a job, if you want.']] },
-          { t: ['How many stands are there?', 'How many stands?'],
-            say: [['f_pim', 'One. This one. So I\'m halfway.', 'One. This one. So I am halfway.']] },
-        ] },
       { say: [['Hot cocoa! Three coins! Two coins if you heat it yourself!', 'Hot cocoa! Three coins!'],
         ["My cocoa has a secret ingredient. It's more cocoa.", 'My secret is more cocoa.']] },
       // topics
@@ -772,6 +772,15 @@ people({
     // Calm, slow-talking, loves speed. Elka (Ulf's daughter) has been on his hill since she sledded up the pass. Judges
     // Elka's Long Sled (f_sled).
     f_soren: [
+      // his first meeting, before the race
+      { if: 'stage<f_gap', once: true,
+        say: ["Hey. Soren. I make sleds. You look like you'd go fast downhill. That's a compliment.", "Hey. I'm Soren. I make sleds."],
+        re: [
+          { t: ["I've never been on a sled.", 'I never went sledding.'],
+            say: [['f_soren', 'Never? ...All right. Come back when the snow\'s soft. It\'s always soft.', 'Never? Come back when the snow is soft.']] },
+          { t: ['Is that Elka on your hill?', 'Is that Elka?'],
+            say: [['f_soren', 'The girl from the south? She sleds like she\'s late for something. I gave her a new runner. She broke it in an hour. Respect.', 'She broke my new runner in an hour. Respect.']] },
+        ] },
       { if: 'quest f_sled done', once: true,
         say: ["I put a little flag where you finished. Elka keeps kicking it over. She says it's an accident. It's not an accident.", 'I put a flag where you won. Elka kicks it.'],
         re: [
@@ -787,15 +796,6 @@ people({
             say: [['f_soren', 'Since the pass cracked. She came up it on a sled. Up. I like her.', 'Since the pass cracked. She sledded up it. I like her.']] },
           { t: ['Has anybody ever tried?', 'Has anyone tried?'],
             say: [['f_soren', 'Me. Forty years ago. I\'m still finding bits of that sled.', 'Me. Long ago. I still find bits of the sled.']] },
-        ] },
-      // his first meeting, before the race
-      { if: 'stage<f_gap', once: true,
-        say: ["Hey. Soren. I make sleds. You look like you'd go fast downhill. That's a compliment.", "Hey. I'm Soren. I make sleds."],
-        re: [
-          { t: ["I've never been on a sled.", 'I never went sledding.'],
-            say: [['f_soren', 'Never? ...All right. Come back when the snow\'s soft. It\'s always soft.', 'Never? Come back when the snow is soft.']] },
-          { t: ['Is that Elka on your hill?', 'Is that Elka?'],
-            say: [['f_soren', 'The girl from the south? She sleds like she\'s late for something. I gave her a new runner. She broke it in an hour. Respect.', 'She broke my new runner in an hour. Respect.']] },
         ] },
       // his moment (the old chat), once he has seen Ash ride the wind
       { if: 'power windride',
@@ -1095,14 +1095,6 @@ people({
     // Brisk and competitive. Froze with a fish on her line, looking up. Her mom is away at sea; her dad learned fishing
     // from Dell Fisk (Act I, the Lake King).
     f_saga: [
-      { if: 'quest lakeking done', once: true,
-        say: ["You caught the Lake King? The Lake King? Dad says that's not possible. Dad's wrong a lot.", 'You caught the Lake King? Dad says no way!'],
-        re: [
-          { t: ['He fought me for an hour.', 'He fought for an hour.'],
-            say: [['f_saga', 'An hour? I\'d have had him in half that. ...Probably. Fine. Forty minutes.', 'An hour? I would take half. Fine. Forty minutes.']] },
-          { t: ['Dell helped. Sort of.', 'Dell helped. Sort of.'],
-            say: [['f_saga', 'Dell? Then the boat sank. Did the boat sink? The boat always sinks.', 'Dell? Did the boat sink? It always sinks.']] },
-        ] },
       // her first talk after the thaw (she knows only that a dragon thawed them)
       { if: 'flag f_thaw_f_saga', once: true,
         say: ["You're the dragon who thawed us. I'm Saga. I fish. I'm better at it than you. Probably.", "I'm Saga. I fish. Better than you."],
@@ -1111,6 +1103,14 @@ people({
             say: [['f_saga', 'Never? Then I\'m better at it than you. Definitely. Want to learn? It\'s mostly waiting, then shouting.', 'Never? Then I am better. It is waiting, then shouting.']] },
           { t: ['You froze looking up.', 'You froze looking up.'], if: 'clue f3_looking_up',
             say: [['f_saga', 'Course I did. Something wider than the sky came over. You\'d look up too. Then I couldn\'t look down.', 'Something huge came over. Then I could not look down.']] },
+        ] },
+      { if: 'quest lakeking done', once: true,
+        say: ["You caught the Lake King? The Lake King? Dad says that's not possible. Dad's wrong a lot.", 'You caught the Lake King? Dad says no way!'],
+        re: [
+          { t: ['He fought me for an hour.', 'He fought for an hour.'],
+            say: [['f_saga', 'An hour? I\'d have had him in half that. ...Probably. Fine. Forty minutes.', 'An hour? I would take half. Fine. Forty minutes.']] },
+          { t: ['Dell helped. Sort of.', 'Dell helped. Sort of.'],
+            say: [['f_saga', 'Dell? Then the boat sank. Did the boat sink? The boat always sinks.', 'Dell? Did the boat sink? It always sinks.']] },
         ] },
       // her moment: her mom's red boat
       { if: 'flag f_thaw_f_saga',
@@ -1135,6 +1135,15 @@ people({
     // ---------------------------------------------------------------- Sigrun the Cook, the smokehouse
     // No-nonsense, feeds everyone; Hilde's oldest friend (they argue about salt). Her hot soup gives Mumble back his roar.
     f_sigrun: [
+      // her first talk after the thaw
+      { if: 'flag f_thaw_f_sigrun', once: true,
+        say: ["You. Dragon. Sigrun. I cook, you sit. That's how this works. Sit.", 'I am Sigrun. I cook. You sit.'],
+        re: [
+          { t: ["I'm not hungry, thanks.", "I'm not hungry."],
+            say: [['f_sigrun', 'Nobody\'s not hungry. You\'re all tail and no supper. Sit.', 'Nobody is not hungry. You are all tail. Sit.']] },
+          { t: ["What's in the pot?", "What's in the pot?"],
+            say: [['f_sigrun', 'Fish, onions, and a month of waiting. It\'s had a long time to think about itself.', 'Fish, onions, and a month of waiting.']] },
+        ] },
       { if: 'quest f_mumble done', once: true,
         say: ['I heard that yeti roar from here. My soup did that. Tell everyone. Tell Hilde twice.', 'I heard that yeti roar! My soup did that!'],
         re: [
@@ -1151,15 +1160,6 @@ people({
             say: [['f_sigrun', 'Ha! That\'s her, all right. Tell her I\'m coming down to sort it out. With a sack of salt.', 'Ha! That is her. Tell her I am coming. With salt.']] },
           { t: ['She misses you terribly.', 'She misses you.'],
             say: [['f_sigrun', 'Course she does. Nobody else tells her the truth about her cooking.', 'Course. Nobody else tells her the truth.']] },
-        ] },
-      // her first talk after the thaw
-      { if: 'flag f_thaw_f_sigrun', once: true,
-        say: ["You. Dragon. Sigrun. I cook, you sit. That's how this works. Sit.", 'I am Sigrun. I cook. You sit.'],
-        re: [
-          { t: ["I'm not hungry, thanks.", "I'm not hungry."],
-            say: [['f_sigrun', 'Nobody\'s not hungry. You\'re all tail and no supper. Sit.', 'Nobody is not hungry. You are all tail. Sit.']] },
-          { t: ["What's in the pot?", "What's in the pot?"],
-            say: [['f_sigrun', 'Fish, onions, and a month of waiting. It\'s had a long time to think about itself.', 'Fish, onions, and a month of waiting.']] },
         ] },
       // her moment
       { if: 'flag f_thaw_f_sigrun',
@@ -1186,14 +1186,6 @@ people({
 
     // ---------------------------------------------------------------- Little Bo, and Steve the snowball
     f_bo: [
-      { if: 'choice f_glaciar_home=stay', once: true, fact: 'f3s_glaciar=free',
-        say: ['The Snow Mother is your auntie? Can Steve meet her? Steve is a snowball. She will like him.', 'Your auntie is the Snow Mother? Can Steve meet her?'],
-        re: [
-          { t: ['She would love Steve.', 'She would love Steve.'], tone: 'kind', f: 0.5,
-            say: [['f_bo', 'I knew it. Steve\'s going to be her favorite. Don\'t tell Saga.', 'I knew it. Steve will be her favorite.']] },
-          { t: ['She might eat him.', 'She might eat him.'], tone: 'silly',
-            say: [['f_bo', 'She would not! ...Would she? Steve, stay behind me.', 'She would not! Steve, stay behind me.']] },
-        ] },
       // his first talk after the thaw (said bo_pim: Pim's saved cocoa)
       { if: 'flag f_thaw_f_bo', once: true,
         say: ["Hi, dragon! I'm Bo. You met Steve already. Say hi again, Steve.", "Hi! I'm Bo. Say hi again, Steve."],
@@ -1202,6 +1194,14 @@ people({
             say: [['f_bo', 'He says hi. He says you\'re very warm. He doesn\'t like warm. Stand back a bit.', 'He says you are warm. He hates warm.']] },
           { t: ['Pim saved you a month of cocoa.', 'Pim saved your cocoa.'], if: 'said bo_pim',
             say: [['f_bo', 'A month? A whole month of Sundays? Steve, we\'re rich.', 'A month of cocoa? Steve, we are rich!']] },
+        ] },
+      { if: 'choice f_glaciar_home=stay', once: true, fact: 'f3s_glaciar=free',
+        say: ['The Snow Mother is your auntie? Can Steve meet her? Steve is a snowball. She will like him.', 'Your auntie is the Snow Mother? Can Steve meet her?'],
+        re: [
+          { t: ['She would love Steve.', 'She would love Steve.'], tone: 'kind', f: 0.5,
+            say: [['f_bo', 'I knew it. Steve\'s going to be her favorite. Don\'t tell Saga.', 'I knew it. Steve will be her favorite.']] },
+          { t: ['She might eat him.', 'She might eat him.'], tone: 'silly',
+            say: [['f_bo', 'She would not! ...Would she? Steve, stay behind me.', 'She would not! Steve, stay behind me.']] },
         ] },
       { say: [['Saga says Steve is just snow. Steve is not just snow. Steve is Steve.', 'Saga says Steve is just snow. He is not.'],
         ["I'm teaching Steve to fish. He keeps sinking. Then he comes back smaller.", 'I am teaching Steve to fish. He sinks.']] },
@@ -1220,14 +1220,6 @@ people({
     // ---------------------------------------------------------------- Nils the Goatherd, and Nisse the goat
     // Gentle; lives with Nisse on a sea-stack whose bridge fell. Nisse says one word.
     f_nils: [
-      { if: 'quest duchess done', once: true,
-        say: ['A goat in the south called Duchess? Is she single? Nisse is asking. Nisse asks about every goat.', 'A goat called Duchess? Nisse wants to know.'],
-        re: [
-          { t: ['She eats hats.', 'She eats hats.'],
-            say: [['f_nils', 'So does Nisse! ...Nisse, sit down. She\'s gone all pink round the ears.', 'So does Nisse! She has gone pink.'], ['f_nisse', 'Meh.', 'Meh.']] },
-          { t: ["She's very bossy.", "She's bossy."],
-            say: [['f_nils', 'Nisse says good. Nisse likes a goat who knows her own mind. She can\'t stand a nice goat.', 'Nisse says good. She likes a bossy goat.']] },
-        ] },
       // his first talk after the thaw
       { if: 'flag f_thaw_f_nils', once: true,
         say: ['She likes you. That was a friendly headbutt. The unfriendly ones are much lower.', 'She likes you. That was a friendly headbutt.'],
@@ -1236,6 +1228,14 @@ people({
             say: [['f_nils', 'I don\'t, mostly. The bridge fell in the spring. Nisse likes it better this way. Nobody visits.', 'I don\'t. The bridge fell. Nisse likes it.']] },
           { t: ['Does she headbutt everybody?', 'Does she headbutt all?'],
             say: [['f_nils', 'Only the people she likes. And the post. She hates the post.', 'Only friends. And the post. She hates the post.']] },
+        ] },
+      { if: 'quest duchess done', once: true,
+        say: ['A goat in the south called Duchess? Is she single? Nisse is asking. Nisse asks about every goat.', 'A goat called Duchess? Nisse wants to know.'],
+        re: [
+          { t: ['She eats hats.', 'She eats hats.'],
+            say: [['f_nils', 'So does Nisse! ...Nisse, sit down. She\'s gone all pink round the ears.', 'So does Nisse! She has gone pink.'], ['f_nisse', 'Meh.', 'Meh.']] },
+          { t: ["She's very bossy.", "She's bossy."],
+            say: [['f_nils', 'Nisse says good. Nisse likes a goat who knows her own mind. She can\'t stand a nice goat.', 'Nisse says good. She likes a bossy goat.']] },
         ] },
       // his moment
       { if: 'flag f_thaw_f_nils',
@@ -1337,6 +1337,15 @@ people({
     // Grunts ("hrm"), talks to dogs more than people, calls Ash "pup". Trades furs with Ulf at the Lodge (and letters:
     // that is how he knows of Ash). His dogs ran off in the first blizzard (f_dogs).
     f_hask: [
+      // his first meeting, before his dogs (Ulf writes to him)
+      { if: 'stage<f_thaw !quest f_dogs started', once: true,
+        say: ["Hrm. Pup. You'll be Ulf's dragon boy. He wrote me. Said you'd come up the pass with a tail on.", "Hrm. Pup. Ulf's dragon boy."],
+        re: [
+          { t: ['You know Ulf?', 'You know Ulf?'],
+            say: [['f_hask', 'We trade furs. Fair trader. Wrong about dogs. Don\'t tell him I said his name nicely.', 'We trade furs. He is wrong about dogs.']] },
+          { t: ['Why is your camp so quiet?', 'Why so quiet?'],
+            say: [['f_hask', 'My dogs ran off in the first blizzard. Hrm. A camp should have barking.', 'My dogs ran off. A camp needs barking.']] },
+        ] },
       { if: 'quest f_dogs done', once: true,
         say: ['Nine dogs. Five dog houses. Toast bit me hello this morning. Hrm. Good to have them home.', 'Nine dogs home. Toast bit me. Good.'],
         re: [
@@ -1352,15 +1361,6 @@ people({
             say: [['f_hask', 'Should be. The Rimehounds have been quiet ever since. Too quiet. Hrm. I like it.', 'The wolves are quiet now. I like it.']] },
           { t: ['Snarl brings him fish now.', 'Snarl brings him fish.'],
             say: [['f_hask', 'Hrm. Wolves understand a roar. Better than they understand please.', 'Wolves understand a roar. Not please.']] },
-        ] },
-      // his first meeting, before his dogs (Ulf writes to him)
-      { if: 'stage<f_thaw !quest f_dogs started', once: true,
-        say: ["Hrm. Pup. You'll be Ulf's dragon boy. He wrote me. Said you'd come up the pass with a tail on.", "Hrm. Pup. Ulf's dragon boy."],
-        re: [
-          { t: ['You know Ulf?', 'You know Ulf?'],
-            say: [['f_hask', 'We trade furs. Fair trader. Wrong about dogs. Don\'t tell him I said his name nicely.', 'We trade furs. He is wrong about dogs.']] },
-          { t: ['Why is your camp so quiet?', 'Why so quiet?'],
-            say: [['f_hask', 'My dogs ran off in the first blizzard. Hrm. A camp should have barking.', 'My dogs ran off. A camp needs barking.']] },
         ] },
       // his moment (the old chat), with his dogs on his mind (said hask_dogs: Ulf hears about it)
       { if: 'quest f_dogs started',
