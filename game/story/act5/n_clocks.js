@@ -83,9 +83,10 @@ chapter({
         // a kid who ran past Ember's flame stone into the Echo 1 fight can still find its clues (it sparkles)
         { do: 'examine n5_flame_stone', if: '!clue n5_ember_moth' },
       ] },
-    { id: 'who_moth', do: 'deduce n5_who_moth', marker: 'n5_chimney', obj: ['Work out who the little grey moth is, in the Case Book', 'Open the Case Book'],
-      hint: ['Open the Case Book (the book button, or B). Think about the fourth post, the flame stone and what Ember said.',
-        'Open the Case Book. Think about the moth carvings.'] },
+    // (v11) solved by the flame stone scene (n_stair); this only waits for a kid who ran past the stone
+    { id: 'who_moth', do: 'deduce n5_who_moth', marker: 'n5_flame_stone', obj: ["Look at Ember's old flame stone by the Echo Gate", 'Look at the old stone'],
+      hint: ["Ember's old flame stone stands just before the Echo Gate. It has moths carved on it.",
+        'The old stone is by the Echo Gate.'] },
     { id: 'chimney', do: 'wait_for flag n_chimney', marker: 'n5_chimney', obj: ['Ride the Wind Chimney up to the second ring', 'Fly up the Wind Chimney'],
       hint: ['Past the Shadow Throne, a column of silver air roars up the cliff. Fly into it.', 'Fly up the windy column.'] },
     { id: 'clocks_in', do: 'any', marker: 'n_sh_clock', obj: ['Go to the Clockstop Shrine', 'Go to the shrine'],
