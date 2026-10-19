@@ -1,9 +1,10 @@
 // Act IV, chapter 4 (part 2): Mirrors, the Mirror Temple (owner A4b). Data only.
 // What the player does: the Mirror Temple dungeon stays code (x3_dun_b): Ember's moonfire (and, in the shrine, words
 // in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.), Pip's Lantern, Lord Fanfare (his outro is short
-// now and carries the herring: "She told me she collects shiny things!"). Out on the temple steps every mirror on the
-// temple's face goes dark and Nyxara's voice says the brighter the flame, the darker it burns. Then Ash works out why
-// she wants all three Shards: only a WHOLE Heart can burn black, and only his fire can mend it (why_three).
+// now and carries the herring: "She told me she collects shiny things!"). v11: the shrine is Ember's one appearance in
+// Act IV. She made moonfire "for her. For my little moth. In case she ever went wrong." Out on the temple steps every
+// mirror goes dark and Nyxara's voice says: mend it, then give it to me. Then Ash works out why she wants all three
+// Shards: a whole Heart can burn black, and it has to be given to her (why_three). The Shards are getting colder.
 // The dungeon's own story keys (m_mirror_shrine, m_mirror_won_v, m_mirror_end) are data scenes with the old STORY
 // key, so x3_dun_b plays the data text in place. Old flags kept: m_mirror_done (from trial_m_mirror_done), m_pip_lamp.
 chapter({
@@ -32,13 +33,13 @@ chapter({
     m4_fanfare_shiny: { icon: 'mask', mystery: 'm4_night_mother', herring: true,
                         text: ['Lord Fanfare says the voice in the mirrors told him she collects shiny things. Just like him.', 'Fanfare says she collects shiny things.'] },
     m4_mirror_voice:  { icon: 'eye', mystery: 'm4_night_mother',
-                        text: ['The voice in the temple mirrors: "The brighter the flame, the darker it burns, at the very end."', 'The voice: "The brighter the flame, the darker it burns."'] },
+                        text: ['The voice in the temple mirrors: "Mend it. Then give it to me. You will want to, at the end."', 'The voice: "Mend it. Then give it to me."'] },
   },
 
   deduce: {
     why_three: {
       mystery: 'm4_night_mother',
-      ask: ['Why does she want you to bring her ALL THREE Shards?', 'Why does she want all three?'],
+      ask: ['Why does she want you to bring her all three Shards?', 'Why does she want all three?'],
       // m4_she_asks: A4a's eclipse 1 ("She could squash you flat. She doesn't. She ASKS for the Shards.")
       needs: ['m4_she_asks', 'm4_cracked_lamp', 'm4_black_flame'],
       // m4_ring_trails: A4S's Moon Ring gate (map 1)
@@ -47,8 +48,8 @@ chapter({
         { t: ['To give the Heart back to us', 'To give it back'],
           hint: ['Then why keep Hush on a leash, and why ask so sweetly? Look at the lamp on Esme\'s bench.', "Then why is Hush on a leash?"] },
         { t: ['She collects shiny things', 'She collects shiny things'],
-          hint: ['Fanfare thinks everything is about shiny things. Why would she need all THREE, and why must YOU bring them?', 'Why must YOU bring all three?'] },
-        { t: ['She needs it WHOLE, so it can burn black, and only my fire can mend it', 'A whole Heart can burn black'], right: true },
+          hint: ['Fanfare thinks everything is about shiny things. Why would she need all three, and why must you be the one to bring them?', 'Why must you bring all three?'] },
+        { t: ['She needs it whole, so it can burn black, and she needs me to give it to her', 'Whole, and given to her. Then it burns black.'], right: true },
       ],
       then: ['set m4_why_three'],
     },
@@ -76,26 +77,31 @@ chapter({
 
   scene: {
     // ---- the temple's own story keys (each replaces the old STORY[key] in place; x3_dun_b and x3_foes play them)
+    // v11: Ember's one appearance in Act IV, and her confession (the Act I "favorite flame" line stays in Act I only)
     m_mirror_shrine: [
-      ['ember', 'Little ember. This is my favorite flame. I made it with the moon-priests, long ago, when Lumen was dry and full of lamps.', 'Little ember. This is my favorite flame. I made it with the moon-priests.'],
-      ['ember', "We mixed my fire with moonlight, in case a shadow ever came for the moon. It burns cool and silver. Shadows can't stand it.", 'We mixed my fire with moonlight. It burns cool and silver. Shadows hate it.'],
+      ['ember', 'Hello, little ember. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.',
+        'Hello, little ember. This is my last flame. My fire, mixed with moonlight.'],
+      ['ash', "What's it for?", "What's it for?"],
+      ['ember', 'For her. For my little moth. In case she ever went wrong.', 'For my little moth. In case she went wrong.'],
+      ['ash', 'Your moth?', 'Your moth?'],
+      ['ember', 'Take it, Ash. And if you ever meet her, be gentler than I was.', 'Take it. If you meet her, be gentler than me.'],
       ['narr', 'Behind the flame, words are cut deep into the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', 'Words in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', { clue: 'm4_black_flame' }],
-      ['ash', "...Burn BLACK? Fire isn't black.", "Burn black? Fire isn't black."],
+      ['ash', "Burn black? Fire isn't black.", "Burn black? Fire isn't black."],
     ],
     // Fanfare's outro, right after the boss: at most 6 lines (the voice in the mirrors moved outside)
     m_mirror_won_v: [
       ['narr', "The last violet eye on Lord Fanfare's tail goes out. One by one, his feathers turn back to green and gold.", 'The last purple eye goes out. His feathers turn green and gold again.'],
-      ['m_fanfare', '...Oh. Oh dear. Was I horrid? Something cold got into the mirrors and whispered to me.', 'Oh dear. Was I horrid? Something cold whispered from the mirrors.'],
+      ['m_fanfare', 'Oh dear. Was I horrid? Something cold got into the mirrors and whispered to me.', 'Oh dear. Was I horrid? Something cold whispered from the mirrors.'],
       ['ash', "You're still very shiny.", "You're still very shiny."],
-      ['m_fanfare', "...Thank you. You're quite shiny yourself. For a lizard.", "Thank you. You're shiny too. For a lizard."],
-      ['ash', "I'm a DRAGON.", "I'm a DRAGON."],
-      ['m_fanfare', 'Even better! She told me she collects shiny things, you know. Like me. I was meant to guard Ember\'s flame FOR her family. Not FROM them.',
-                    'She said she collects shiny things, like me! I was meant to guard the flame FOR you.', { clue: 'm4_fanfare_shiny' }],
+      ['m_fanfare', "Thank you. You're quite shiny yourself. For a lizard.", "Thank you. You're shiny too. For a lizard."],
+      ['ash', "I'm a dragon.", "I'm a dragon."],
+      ['m_fanfare', 'Even better! She told me she collects shiny things, you know. Like me. I was meant to guard Ember\'s flame for her family. Not from them.',
+                    'She said she collects shiny things, like me! I was meant to guard the flame for you.', { clue: 'm4_fanfare_shiny' }],
     ],
+    // (v11: Iska, not Ember: Ember speaks once in Act IV, at the shrine)
     m_mirror_end: [
-      ['ember', "That's all of my flames, little ember. Every one I ever hid. You've carried them further than I ever went.", "That's all my flames, little ember. You carried them further than I ever went."],
-      ['ember', 'The Moonpath starts at the foot of the Heights, north of here. Light it up. And Ash? When you see her... she was alone for a very long time. It might help to know that.',
-                'The Moonpath is north of here, at the foot of the Heights. Light it up. And Ash? She was alone a long time.', { dir: ['m_mirror_door', 'm4_mp_foot', 'north'] }],
+      ['iska', "That was the last of Ember's flames, Ash. The Moonpath starts at the foot of the Heights, north of here.",
+                "That was Ember's last flame. The Moonpath is north of here.", { dir: ['m_mirror_door', 'm4_mp_foot', 'north'] }],
       ['narr', 'Step into the warp ring to go back outside.', 'Step in the warp ring to go outside.'],
     ],
     // outside, on the temple steps (audit: the voice was glued onto the boss outro): at most 6 lines a branch
@@ -103,12 +109,12 @@ chapter({
       { cam: 'm_mirror_door', s: 1 },
       ['narr', "Behind you, every mirror on the temple's face goes dark at once. In each one, a pair of white eyes opens.", 'Every mirror on the temple goes dark. White eyes open in them.', { do: ['set m4_eyes_on'] }],
       ['nyxara', "Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, long ago. It hurt very much.", 'You found moonfire. Her priests burned me with it once.'],
-      ['nyxara', 'Shine as bright as you like. The brighter the flame, the darker it burns, at the very end.', 'Shine bright. The brighter the flame, the darker it burns, at the end.', { clue: 'm4_mirror_voice' }],
-      ['ash', "That doesn't even make sense!", "That doesn't make sense!"],
-      ['nyxara', 'It will.', 'It will.'],
+      ['nyxara', 'Mend it, little ember. Then give it to me. You will want to, at the end.', 'Mend it. Then give it to me. You will want to.', { clue: 'm4_mirror_voice' }],
+      ['ash', "I won't.", "I won't."],
+      ['nyxara', 'Everyone does.', 'Everyone does.'],
       // (a save made before v10 never heard the first eclipse's deal: Ash remembers it here)
       { if: '!clue m4_she_asks', then: [
-        ['ash', 'On the beach she could have squashed me flat. She ASKED me for the Shards instead. Why ask?', 'On the beach she ASKED me for the Shards. Why ask?', { clue: 'm4_she_asks' }] ],
+        ['ash', 'On the beach she could have squashed me flat. She asked me for the Shards instead. Why ask?', 'On the beach she asked me for the Shards. Why ask?', { clue: 'm4_she_asks' }] ],
         else: [
         ['narr', 'The eyes close. In one mirror you see yourself, sandy and a bit worried. You smooth your hair down anyway.', 'The eyes close. You fix your hair anyway.', { do: ['set m4_eyes_on=0'] }] ] },
       { do: ['set m4_eyes_on=0'] },
@@ -116,9 +122,12 @@ chapter({
       { if: '!clue m4_cracked_lamp', then: [
         ['iska', 'Sable\'s lamplighters have a saying: "Cracked lamps can\'t hold a flame. Mend it whole first."', 'Sable\'s lamplighters say: "Cracked lamps can\'t hold a flame."', { clue: 'm4_cracked_lamp' }] ] },
     ],
+    // v11: the dilemma, not the answer: mend it and she wants it; leave it broken and it goes cold (Act III's cold
+    // Shard). Mom settles it at the Eclipse Lens (m_reforge)
     m4_why_solved: [
-      ['ash', "A cracked lamp can't hold a flame. A broken Heart can't burn black. She needs it WHOLE, and only my fire can mend it.", 'A broken Heart cannot burn black. She needs it whole. Only my fire can mend it.'],
-      ['iska', 'Then mend it, Ash, and keep it in your own satchel. She can ask as nicely as she likes.', 'Then mend it, and keep it. Do not give it to her.'],
+      ['ash', "She needs it whole, and she can't just take it. Somebody has to give it to her.", 'She needs it whole. And somebody has to give it to her.'],
+      ['ash', 'So maybe I just never mend it.', 'So maybe I never mend it.'],
+      ['narr', 'The Shards in your satchel are colder than they were yesterday. Colder than this morning.', 'The Shards in your satchel feel colder than yesterday.'],
     ],
     // an empty scene: the old copies of the boss words are replaced by it (see replaces)
     m4_quiet: [],

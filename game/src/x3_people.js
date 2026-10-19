@@ -1942,9 +1942,9 @@ const M3P_MAIL=[
     {who:'fennick',text:S(`Every lantern in Emberhollow is lit, every night, all night. Nobody here is scared of the dark. Not while I've got oil. Your friend, Fennick.`,`I keep every lantern lit. Nobody is scared. Fennick.`),skipIf:()=>G.choices.fennick==='jail'},
     {who:'fennick',text:S(`The Watch House is the brightest place in Brindlecross. I polish. It's what I'm for now. Fennick.`,`The Watch House shines. I polish. Fennick.`),skipIf:()=>G.choices.fennick!=='jail'}]},
   {id:'m_pb_3',from:'maren',when:()=>!!G.flags.m_eclipse2,then:()=>{ if(!G.flags.m_dell_away&&!m3pR('m_reforge')){ G.flags.m_dell_away=1; M3P.sig=''; } },lines:[
-    m3pL('maren',`Ash. I saw the moon tonight. Less than half of it is left. And once you find the last piece, that Heart of yours will need mending.`,`Ash. Less than half the moon is left. The Heart needs mending once you find the last piece.`),
-    m3pL('maren',`Mending things is my job. I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`Mending is my job. I'm coming! Dell is coming to get me. Don't argue.`),
-    m3pL('maren',`Dell says he'll bring the boat round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`Dell will bring the boat to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
+    m3pL('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
+    m3pL('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
+    m3pL('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
     m3pIf(()=>!!G.flags.dr_m_moth,'maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Unless they eat moons.`),
     m3pN(`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails west.`),
     m3pDo(()=>{ if(!G.flags.m_dell_away&&!m3pR('m_reforge')){ G.flags.m_dell_away=1; M3P.sig=''; } })]},

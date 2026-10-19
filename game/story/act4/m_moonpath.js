@@ -62,7 +62,7 @@ chapter({
   step: [
     { id: 'foot', do: 'goto m4_mp_foot 260', scene: 'm_moonpath',
       obj: ['Go to the foot of the Moonpath', 'Go to the Moonpath'],
-      hint: ["Ember said the Moonpath starts at the foot of the Heights. Look for its sign.", 'Find the Moonpath sign.'] },
+      hint: ["Iska said the Moonpath starts at the foot of the Heights. Look for its sign.", 'Find the Moonpath sign.'] },
     { id: 'moth', do: 'examine m4_little_moth', then: ['set m4_moth_seen'],
       obj: ['Help the little moth on the leash', 'Help the little moth'],
       hint: ['A little moth is tied to the cold brazier at the foot of the stairs.', 'Look at the little moth.'] },

@@ -400,9 +400,9 @@ m3sDef('m_eclipse2',[
 ]);
 // 6.8c Mom's letter (Pebble brings it after eclipse 2; on reading, Dell sails off to fetch her)
 const M3S_PB3=[
-  xl('maren',`Ash. I saw the moon tonight. Less than half of it is left. And once you find the last piece, that Heart of yours will need mending.`,`Ash. Less than half the moon is left. The Heart needs fixing when you find the last piece.`),
-  xl('maren',`Mending things is my job. I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`Fixing things is my job. I'm coming! Dell will fetch me. Don't argue. It's a letter.`),
-  xl('maren',`Dell says he'll bring the boat round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`Dell will bring me to the old pier at the foot of the Heights. I'll find you. Eat something. Love, Mom.`),
+  xl('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
+  xl('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
+  xl('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
   m3sIf('maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,()=>!!G.flags.dr_m_moth),
   xl('narr',`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails off west.`)];
 // the Mirror Flats and the Moonpath (6.8b, 6.9b)
@@ -627,15 +627,18 @@ m3sDef('m_mirror_in',[
   xl('iska',`Mirrors everywhere. Careful, Ash. Not everything in here is real. Not everything in here is you.`,`Mirrors everywhere. Careful, Ash. Not everything here is real.`),
   xl('ash',`That one's me. I'd know that face anywhere. It's handsome.`,`That one's me. I know that face. It's handsome.`)
 ]);
+// (the data scene m_mirror_shrine, game/story/act4/m_mirror.js, replaces this one in place: Ember's one appearance in
+// Act IV and her confession, v11)
 m3sDef('m_mirror_shrine',[
-  xl('ember',`Little ember. This is my favorite flame. I made it with the moon-priests, long ago, when Lumen was dry and full of lamps.`,`Little ember. This is my favorite flame. I made it with the moon-priests.`),
-  xl('ember',`We mixed my fire with moonlight, in case a shadow ever came for the moon. It burns cool and silver. Shadows can't stand it.`,`We mixed my fire with moonlight. It burns cool and silver. Shadows hate it.`)
+  xl('ember',`Hello, Ash. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.`,`Hello, Ash. This is my last flame. My fire, mixed with moonlight.`),
+  xl('ash',`What's it for?`,`What's it for?`),
+  xl('ember',`For her. For my little moth. In case she ever went wrong.`,`For my little moth. In case she went wrong.`),
+  xl('ash',`Your moth?`,`Your moth?`),
+  xl('ember',`Take it, Ash. And if you ever meet her, be gentler than I was.`,`Take it. If you meet her, be gentler than me.`)
 ]);
 m3sDef('m_mirror_gift',[
   xl('narr',`The flame is silver. It's cool, like a breeze on a summer night. When it touches you, your shadow sits up and pays attention.`,`The flame is silver and cool, like a summer night breeze.`),
-  xl('ember',`Moonfire! Breathe it like fire, but think of the moon. It lights moon-glass so you can stand on it, wakes moon braziers, burns shadows and shadow vines, and it even works underwater.`,`Moonfire! It lights moon-glass and moon braziers. It burns shadows. It works underwater too!`),
-  xl('ash',`I'm the MOON.`,`I'm the MOON.`),
-  xl('ember',`The bravest moon. Don't let it go to your head.`,`The bravest moon. Don't let it go to your head.`)
+  xl('iska',`Moonfire. Breathe it like fire, but think of the moon. It lights moon-glass so you can stand on it, wakes moon braziers, burns shadows and shadow vines, and it even works underwater.`,`Moonfire! It lights moon-glass and moon braziers. It burns shadows. It works underwater too.`)
 ]);
 STORY.m_mirror_how=S(`Swap your breath to MOONFIRE (the little moon by your fire meter), then breathe it like fire. It lights moon-glass, moon braziers and Shades, burns shadow vines, and works underwater.`,`Swap to MOONFIRE, then breathe. It lights moon-glass. It works underwater too!`);
 STORY.m_mirror_bossline=S(`Lord Fanfare! Moonfire the violet eyes on his tail! When he blocks the skylight, keep the braziers lit, and turn the big mirror on him!`,`Moonfire the purple eyes on his tail! Keep the braziers lit! Turn the big mirror on him!`);
@@ -658,24 +661,23 @@ m3sDef('m_pip_lamp',[
 ]);
 m3sDef('m_mirror_won',[
   xl('narr',`The last violet eye on Lord Fanfare's tail goes out. One by one, his feathers turn back to green and gold.`,`The last purple eye goes out. His feathers turn green and gold again.`),
-  xl('m_fanfare',`...Oh. Oh dear. Was I horrid? I think I was horrid. Something cold got into the mirrors and whispered to me.`,`Oh dear. Was I horrid? Something cold whispered to me from the mirrors.`),
+  xl('m_fanfare',`Oh dear. Was I horrid? I think I was horrid. Something cold got into the mirrors and whispered to me.`,`Oh dear. Was I horrid? Something cold whispered to me from the mirrors.`),
   xl('ash',`You're still very shiny.`,`You're still very shiny.`),
-  xl('m_fanfare',`...Thank you. You're quite shiny yourself. For a lizard.`,`Thank you. You're shiny too. For a lizard.`),
-  xl('ash',`I'm a DRAGON.`,`I'm a DRAGON.`),
-  xl('m_fanfare',`Even better. Dragons go with everything. I was supposed to guard Ember's flame FOR her family, you know. Not FROM them. I shall polish something to make up for it.`,`Even better! I was meant to guard Ember's flame FOR her family. Not FROM them. I will polish something to say sorry.`)
+  xl('m_fanfare',`Thank you. You're quite shiny yourself. For a lizard.`,`Thank you. You're shiny too. For a lizard.`),
+  xl('ash',`I'm a dragon.`,`I'm a dragon.`),
+  xl('m_fanfare',`Even better. Dragons go with everything. I was supposed to guard Ember's flame for her family, you know. Not from them. I shall polish something to make up for it.`,`Even better! I was meant to guard Ember's flame for her family. Not from them. I will polish something to say sorry.`)
 ]);
 // Nyxara's voice through every mirror at once (6.9): plays straight after the peacock's outro
 m3sDef('m_mirror_voice',[
   xl('narr',`Every mirror in the temple goes dark at once. In each one, a pair of white eyes opens.`,`Every mirror goes dark. In each one, two white eyes open.`),
   xl('nyxara',`Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, once, long ago. It hurt very much.`,`Moonfire. You found Ember's moonfire. Her priests burned me with it once. It hurt.`),
-  xl('nyxara',`Brighter, brighter, brighter. Shine as bright as you like. The brighter the flame, the darker it burns, at the very end.`,`Shine as bright as you like. The brighter the flame, the darker it burns, at the end.`),
-  xl('ash',`That doesn't even make sense!`,`That doesn't make sense!`),
-  xl('nyxara',`It will.`,`It will.`),
+  xl('nyxara',`Mend it, little ember. Then give it to me. You will want to, at the end.`,`Mend it. Then give it to me. You will want to.`),
+  xl('ash',`I won't.`,`I won't.`),
+  xl('nyxara',`Everyone does.`,`Everyone does.`),
   xl('narr',`The eyes close. The mirrors are just mirrors again. One of them shows you, looking a bit worried. You fix your hair. It helps.`,`The eyes close. A mirror shows you, a bit worried. You fix your hair. It helps.`)
 ]);
 m3sDef('m_mirror_end',[
-  xl('ember',`That's all of my flames, little ember. Every one I ever hid. You've carried them further than I ever went.`,`That's all my flames, little ember. You carried them further than I ever went.`),
-  xl('ember',`The Moonpath starts at the foot of the Heights, north of here. Light it up. And Ash? When you see her... she was alone for a very long time. I don't know if that helps. It might.`,`The Moonpath is north of here, at the foot of the Heights. Light it up. And Ash? She was alone a long time. That might help.`),
+  xl('iska',`That was the last of Ember's flames, Ash. The Moonpath starts at the foot of the Heights, north of here.`,`That was Ember's last flame. The Moonpath is north of here.`),
   xl('narr',`Step into the warp ring to go back outside.`,`Step in the warp ring to go outside.`)
 ]);
 STORY.m_prism_taunt=[S(`RAWR. Do you like my mane? Everyone likes my mane.`,`RAWR. Do you like my mane?`)];
