@@ -316,6 +316,9 @@ function lineMood(who,L,full){
   return m||moodRest(who,moodRead(who,full));
 }
 
+// the portrait is a little bigger on screen, so a face can be read (the box is no taller: the text column sets it)
+(function portraitSize(){ try{ const st=document.createElement('style'); st.id='moodPortrait';
+  st.textContent='#dlgBox #portrait{width:112px;height:112px}@media (max-width:640px){#dlgBox #portrait{width:72px;height:72px}}'; document.head.appendChild(st); }catch(e){} })();
 // ---------- the portrait cache: one picture per (speaker, mood, look, story state), cleared with each conversation
 const PCACHE=new Map();
 function pcacheReset(){ PCACHE.clear(); }
@@ -647,7 +650,8 @@ function drawPortrait(who){
   g.fillRect(0,0,S,S);
   const gl=g.createRadialGradient(S/2,S*0.42,6,S/2,S/2,S*0.75); gl.addColorStop(0,'rgba(255,150,70,.32)'); gl.addColorStop(1,'rgba(0,0,0,.45)'); g.fillStyle=gl; g.fillRect(0,0,S,S);
   }
-  g.save(); g.translate(S/2,S/2+14);
+  // (v11 MOOD) the face sits a little closer, so its expression reads at 112 px
+  g.save(); g.translate(S/2,S/2+16); g.scale(1.1,1.1);
   if(who==='ash') faceDragon(g,{skin:'#b8402a',dark:'#7e2617',snout:'#d26238',horn:'#efe0bf',eye:'#ffd34d',k:1});
   else if(who==='vor'||who==='voice') faceDragon(g,{skin:'#3d0e10',dark:'#1a0405',snout:'#561a1b',horn:'#d8c49c',eye:'#ff8a1a',k:1.1,cracks:true,teeth:true,big:true});
   else if(who==='brood') faceDragon(g,{skin:'#8a2a4a',dark:'#4d1228',snout:'#a8405e',horn:'#ead2b0',eye:'#ffe066',k:1,frill:true});

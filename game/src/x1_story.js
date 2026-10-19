@@ -120,11 +120,11 @@ function glowAtG(g,x,y,r,col,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); g
 function c1Horns(g,y,k){ g.fillStyle='#f0e6d0'; g.strokeStyle='#3a2a20'; g.lineWidth=2.5; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*14,y); g.quadraticCurveTo(s*22,y-16*k,s*30,y-24*k); g.quadraticCurveTo(s*20,y-10*k,s*24,y+2); g.closePath(); g.fill(); g.stroke(); } }
 const C1_PORT={
   c_mask:{bg:'#1e1630',f:g=>{ if(typeof faceThief==='function') faceThief(g); else c1FaceMoth(g,false); }},
-  c_vesper:{bg:'#2a2040',f:g=>{ facePerson(g,C1_VOUT,true); c1Horns(g,-44,0.7);
+  c_vesper:{bg:'#2a2040',f:g=>{ g.save(); g.translate(0,6); g.scale(1.2,1.2); facePerson(g,C1_VOUT,true); c1Horns(g,-44,0.7);
     // the mask, pushed up on her forehead
     g.fillStyle='#d8d4e4'; g.strokeStyle='#2a2034'; g.lineWidth=2.5; g.beginPath(); g.moveTo(-26,-50); g.quadraticCurveTo(0,-70,26,-50); g.quadraticCurveTo(14,-42,0,-46); g.quadraticCurveTo(-14,-42,-26,-50); g.closePath(); g.fill(); g.stroke();
     g.strokeStyle='#e2b65c'; g.lineWidth=2; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*6,-58); g.quadraticCurveTo(s*14,-80,s*28,-84); g.stroke(); }
-    g.strokeStyle='#c8c8d8'; g.lineWidth=3; g.beginPath(); g.moveTo(10,-30); g.quadraticCurveTo(18,-14,14,4); g.stroke(); }},
+    g.strokeStyle='#c8c8d8'; g.lineWidth=3; g.beginPath(); g.moveTo(10,-30); g.quadraticCurveTo(18,-14,14,4); g.stroke(); g.restore(); }},
   c_pearl:{bg:'#14343a',f:g=>{ glowAtG(g,0,-10,100,'120,220,210',0.3); facePerson(g,{skin:'#e8c09a',hair:'#3a6a6a',hairdo:'wild',outfit:'coat',shirt:'#2a5a6a',low:'#1a3a44',trim:'#e0c070',freckles:true,build:'strong'},false); c1Horns(g,-46,1);
     g.strokeStyle='#c8a060'; g.lineWidth=5; g.beginPath(); g.moveTo(-50,70); g.quadraticCurveTo(-10,30,40,62); g.stroke(); g.strokeStyle='rgba(90,60,30,.6)'; g.lineWidth=1.5; for(let i=0;i<8;i++){ const t=i/7, x=-50+t*90, y=70-Math.sin(t*Math.PI)*24; g.beginPath(); g.moveTo(x-3,y-3); g.lineTo(x+3,y+3); g.stroke(); } }},
   c_squawk:{bg:'#1a3a2a',f:g=>{ const O='#14200e'; g.lineWidth=3; g.strokeStyle=O;
