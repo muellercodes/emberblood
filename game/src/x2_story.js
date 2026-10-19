@@ -390,29 +390,30 @@ f2sDef('f_glaciar_intro',[
 ]);
 // one of these four by the Act I ending (G.choices.ending), for the free outro's "My brother. Is he...?"
 const F2S_BROTHER=[
-  f2sIf('ash',`He's gone, Auntie. His fire went out. I'm sorry.`,`He's gone, Auntie. His fire went out. I'm sorry.`,()=>f2sEnding()==='hero'),
-  f2sIf('f_glaciar',`...Gone. Well. He chose to be a very loud, very angry dragon for a very long time. You chose something better. Don't be sorry, dumpling. Be warm.`,`Gone. Well. He chose to be loud and angry. You chose better. Don't be sorry, dumpling. Be warm.`,()=>f2sEnding()==='hero'),
-  f2sIf('ash',`He's asleep on his mountain. I keep a fire there so he stays that way. I say goodnight to him every Lantern Day.`,`He's asleep on his mountain. I say goodnight to him every Lantern Day.`,()=>f2sEnding()==='warden'),
-  f2sIf('f_glaciar',`Goodnight? To VORLAX? Ha! He must hate that. Good. Keep doing it.`,`Goodnight? To VORLAX? Ha! He must hate that. Keep doing it.`,()=>f2sEnding()==='warden'),
-  f2sIf('ash',`He's, um. Small now. He lives in a birdcage. In a bakery. Bertram charges admission.`,`He's small now. He lives in a birdcage. In a bakery.`,()=>f2sEnding()==='heir'),
+  f2sIf('ash',`He's gone, Auntie. His fire went out like a candle at bedtime. I said sorry. Ember said goodnight.`,`He's gone. His fire went out. I said sorry.`,()=>f2sEnding()==='hero'),
+  f2sIf('f_glaciar',`He chose to be all fire and no family. You ended it so nobody else would be burned. That's a hard thing for a small dragon, dumpling. Come here.`,`He chose fire over family. You did a hard thing. Come here.`,()=>f2sEnding()==='hero'),
+  f2sIf('ash',`He's asleep on his mountain, inside a sixth Ward. I climb up every Lantern Day and say goodnight. Sometimes he almost says it back.`,`He sleeps in a Ward. I say goodnight. He almost says it back.`,()=>f2sEnding()==='warden'),
+  f2sIf('f_glaciar',`Almost? From Vorlax, that's a speech. Keep climbing.`,`From him, that is a speech. Keep climbing.`,()=>f2sEnding()==='warden'),
+  f2sIf('ash',`I took his fire. All of it, for one night. Then I gave most of it back. He sits on the warm shelf over Bertram's oven now, and he's never once said thank you.`,`I took his fire, then gave most back. He sits on a warm baker's shelf.`,()=>f2sEnding()==='heir'),
   f2sIf('narr',`Glaciar laughs. It sounds like a thousand icicles chiming at once. Snow slides off the whole mountain.`,`Glaciar laughs like a thousand icicles. Snow slides off the mountain.`,()=>f2sEnding()==='heir'),
-  f2sIf('f_glaciar',`A BIRDCAGE! Oh, I must visit. I'll bring a mirror so he can see his own face.`,`A BIRDCAGE! I must visit. I'll bring a mirror.`,()=>f2sEnding()==='heir'),
-  f2sIf('ash',`He came home. He's about the size of a goat now. He lives with my mom. He really, really likes cake.`,`He came home. He's goat-sized now. He lives with my mom. He LOVES cake.`,()=>f2sEnding()==='lantern'),
-  f2sIf('f_glaciar',`...Vorlax likes CAKE? He always said cake was for hatchlings. Oh, the old fibber. Oh, I'm so glad.`,`Vorlax likes CAKE? He said cake was for babies. Oh, I'm so glad.`,()=>f2sEnding()==='lantern')
+  f2sIf('f_glaciar',`Never once? Then he hasn't changed a bit, the old crosspatch. I'm glad he's somewhere warm.`,`He has not changed. I am glad he is warm.`,()=>f2sEnding()==='heir'),
+  f2sIf('ash',`I lit him a lantern, like Ember used to. He came home. He's the size of a goat, and the first thing he asked was if there was cake.`,`I lit him a lantern. He came home. He asked for cake.`,()=>f2sEnding()==='lantern'),
+  f2sIf('f_glaciar',`Vorlax asked for cake? All our lives he told me cake was for hatchlings. The old fibber.`,`Cake! He said cake was for babies. The old fibber!`,()=>f2sEnding()==='lantern')
 ];
 f2sDef('f_glaciar_free',[
   {who:'narr',text:S(`The Shard pops out of Glaciar's chest like a cork from a bottle and lands in the snow, ringing like a tiny bell.`,`The Shard pops out of her chest like a cork. It rings in the snow.`),fn:()=>f2sGlacShow('awake')},
   xl('narr',`The last of the purple drains out of her eyes. They're blue now. Pale, kind, sleepy blue, like a winter morning.`,`The purple leaves her eyes. They're blue now. Kind and sleepy.`),
-  xl('f_glaciar',`Oh. Oh my. Oh, my head. Did I... did I make a blizzard?`,`Oh my. My head. Did I make a blizzard?`),
-  xl('ash',`A big one. Over the whole north. And a bit of the south. And a lot of the coast.`,`A big one. Over the whole north. And the coast.`),
-  xl('f_glaciar',`Oh, I'm so sorry. I'm a slow-winter dragon. One gentle snow a year, for the sledding. I don't DO blizzards. Blizzards are rude.`,`Oh, I'm so sorry. I make one gentle snow a year, for sledding. Blizzards are rude.`),
-  xl('f_glaciar',`Come here. Let me look at you. ...Horns. Tail. That nose. You're Ember's. You're one of Ember's!`,`Come here. Horns. Tail. That nose. You're one of Ember's!`),
-  xl('ash',`I'm Ash. Hi. I'm your great, great... Auntie, I'm your great x13 grand-nephew.`,`I'm Ash. I'm your great x13 grand-nephew.`),
-  xl('f_glaciar',`A NEPHEW! I have a NEPHEW! Come here, dumpling, let me pinch your cheeks!`,`A NEPHEW! Come here, dumpling! Let me pinch your cheeks!`),
+  xl('f_glaciar',`My head. What a horrid dream. Tell me the truth, dear. Did I make a blizzard?`,`My head. Did I make a blizzard?`),
+  xl('ash',`A big one. All over the mountains. It even snowed at home.`,`A big one. It even snowed at home!`),
+  xl('f_glaciar',`How very rude of me. I make one gentle snow a year, for the sledding. That is all I have ever made.`,`How rude of me. I make one gentle snow a year.`),
+  xl('f_glaciar',`Wait. Let me look at you. Those horns. That nose. You're one of HERS! You're Ember's!`,`Those horns! You're one of Ember's!`),
+  xl('ash',`I'm Ash. Ember was my grandma, a lot of grandmas back.`,`I'm Ash. Ember's family.`),
+  xl('f_glaciar',`Family. Come here, dumpling, let me pinch your cheeks.`,`Family! Come here, dumpling!`),
   xl('narr',`She pinches your cheek with one enormous claw. Very, very gently. It's cold. It's also the nicest pinch you have ever had.`,`She pinches your cheek with a huge claw. Very gently. It's the nicest pinch ever.`),
   xl('ash',`(squished) Hi, Auntie.`,`(squished) Hi, Auntie.`),
-  xl('f_glaciar',`Wait. Thirteen greats? Ember was my NIECE, dumpling. If she's thirteen, then I'm fourteen.`,`Wait. Ember was my NIECE. So I'm fourteen greats.`),
-  xl('ash',`I am NOT saying fourteen.`,`I am NOT saying fourteen.`),
+  xl('f_glaciar',`And Tove. I can hear you grumbling in there. I slept, Tove. I'm a slow dragon. By the time I woke, Ember had done it without me.`,`Tove. I slept. I am slow. Ember did it without me.`),
+  xl('tove',`...You could have come.`,`You could have come.`),
+  xl('f_glaciar',`I know.`,`I know.`),
   f2sPip(`Mip? (Pip hides behind your leg. Then he decides she's nice.)`,`Mip? (Pip hides. Then he decides she's nice.)`),
   f2sIf('f_glaciar',`And you... you made the big snowflake with me. In a dream? Dragons dream long dreams, dumpling.`,`You made the big snowflake with me. In a dream!`,()=>G.flags.dr_f_auntie==='flake'),
   xl('f_glaciar',`Tell me, dumpling. My brother. Vorlaxis. Is he...?`,`Tell me. My brother, Vorlaxis. Is he...?`),
@@ -424,11 +425,11 @@ f2sDef('f_glaciar_free',[
   xl('f_glaciar',`Her name is Nyxara. She's old. Older than me. Older than my brother. She's the moon's old moth.`,`Her name is Nyxara. She's older than me. She's the moon's old moth.`),
   xdo(()=>{ G.flags.f_nyx_named=1; }),
   xl('ash',`The moon has a MOTH?`,`The moon has a MOTH?`),
-  xl('f_glaciar',`Every light has a moth, dumpling. She circled the moon so long she forgot it wasn't hers. Now she wants to eat it. All of it. A night that never ends.`,`Every light has a moth. She thinks the moon is hers. She wants to eat it. A night that never ends.`),
-  xl('f_glaciar',`But a moon doesn't just go out. To make the endless night she needs a black fire. A fire that burns dark instead of bright. And there's only one fire old enough to turn black.`,`To make the endless night, she needs a black fire. Only one fire is old enough.`),
-  xl('ash',`The First Flame. The Ember Heart.`,`The First Flame. The Ember Heart.`),
-  xl('f_glaciar',`That's why she stole it. That's why she broke it. One piece went to the coast, one came to me, and one went east, to where the moon's light fell, a long time ago.`,`That's why she broke it. One piece went to the coast. One came to me. One went east.`),
-  xl('f_glaciar',`I can't stay here, dumpling. I made a blizzard. I'm a danger. I'll fly north, past the edge of the ice, where I can't hurt anybody.`,`I can't stay. I made a blizzard. I'll fly far north, where I can't hurt anyone.`),
+  xl('f_glaciar',`Every light has a moth, dumpling. She circled the moon so long she forgot it wasn't hers. Now she wants to keep it. All of it. A night that never ends.`,`Every light has a moth. She thinks the moon is hers. She wants a night that never ends.`),
+  xl('f_glaciar',`"Cold keeps things," she whispered to me. "Nothing leaves in the cold." That's what my blizzard was for.`,`She said cold keeps things. Nothing leaves. That was my blizzard.`),
+  xl('ash',`And the Ember Heart?`,`And the Ember Heart?`),
+  xl('f_glaciar',`The whole Heart burns any moth that holds it. So she broke it into pieces her moths could carry. One went to the coast, one came to me, and one went east, to where the moon's light fell, a long time ago.`,`She broke it so her moths could carry it. One piece went east.`),
+  xl('f_glaciar',`I can't stay here, dumpling. I made a blizzard. A dragon who does that is not safe to have about. I'll fly far away, past the edge of the ice.`,`I can't stay. I made a blizzard. I'll fly far away.`),
   xc('ash',`What do you say?`,`What do you say?`,()=>[
     xo(`You're the Snow Mother. Hearthold still sings about you.`,`You're the Snow Mother!`,{tone:'kind',cond:()=>!!G.flags.f_song,fn:()=>{ G.choices.f_glaciar_home='stay'; },then:()=>STORY.f_glaciar_stay}),
     xo(`Go and rest, Auntie. Come back when you're ready.`,`Go and rest, Auntie.`,{tone:'kind',fn:()=>{ G.choices.f_glaciar_home='north'; },then:()=>STORY.f_glaciar_north})
@@ -444,23 +445,23 @@ f2sDef('f_glaciar_stay',[
   xl('f_glaciar',`Then I'll stay. Someone has to keep the north. One gentle snow a year. For the sledding.`,`Then I'll stay. One gentle snow a year. For sledding.`),
   xl('narr',`Glaciar breathes out, slow and soft. Far below, in Rimeholm and on the roads and the moor, every frozen person in the north gives a little shiver, and wakes up.`,`Glaciar breathes out, slow and soft. Every frozen person in the north wakes up.`),
   xdo(()=>{ f2sThawAll(); }),
-  xl('tove',`Oh. OH. I remember now. Ember's North Forge. She built it with her auntie. With HER. How could I forget a dragon?`,`Oh! I remember now. Ember built the North Forge with her auntie. With HER!`),
-  xl('f_glaciar',`Easily, dear. I'm very quiet.`,`Easily, dear. I'm very quiet.`)
+  xl('tove',`Hearthold kept your song, then. Even when you were asleep.`,`They kept your song. Even while you slept.`),
+  xl('f_glaciar',`I know, Tove. I know.`,`I know, Tove.`)
 ]);
 f2sDef('f_glaciar_north',[
-  xl('f_glaciar',`I will, dumpling. I will. And if you ever need a dragon, a cold one, a slow one, the kind that's good for cooling soup, call me. I'll come.`,`I will, dumpling. If you ever need a cold, slow dragon, call me. I'll come.`),
+  xl('f_glaciar',`I will, dumpling. And if you ever need a dragon, a cold one, a slow one, good for cooling soup, call me. This time I'll come.`,`If you ever need a cold, slow dragon, call me. This time I'll come.`),
   xl('narr',`She shakes the snow off her wings.`,`She shakes the snow off her wings.`)
 ]);
 f2sDef('f_glaciar_defeat',[
   {who:'narr',text:S(`Glaciar crashes down into the snow. The whole mountain shakes. The purple chains pull tight around her.`,`Glaciar crashes into the snow. The mountain shakes. The chains pull tight.`),fn:()=>f2sGlacShow('down')},
   xl('narr',`The Shard cracks out of the ice over her heart and rolls to your feet.`,`The Shard cracks out of her heart. It rolls to your feet.`),
   xdo(()=>{ if(!G.items.f_shard2) giveItems({f_shard2:1}); }),
-  xl('f_glaciar',`(very sleepy) ...Nyxara. The moon's... old moth. She wants... the night. Forever. She needs... your fire... burned black...`,`(sleepy) Nyxara. The moon's moth. She wants the night forever. She needs your fire... burned black...`),
+  xl('f_glaciar',`(very sleepy) Nyxara. The moon's... old moth. She wants... the night. Forever.`,`(sleepy) Nyxara. The moon's moth. She wants the night forever.`),
   xdo(()=>{ G.flags.f_nyx_named=1; }),
-  xl('f_glaciar',`(a whisper) ...Ember? Is that you?`,`(a whisper) Ember? Is that you?`),
+  xl('f_glaciar',`(a whisper) Ember? Is that you?`,`(a whisper) Ember? Is that you?`),
   {who:'narr',text:S(`Her eyes close. Snow begins to cover her, gently, like a blanket.`,`Her eyes close. Snow covers her like a blanket.`),fn:()=>f2sGlacShow('sleep')},
-  xl('tove',`She's asleep. Not hurt. Just asleep. The chains will keep her that way, I think. A long, long time.`,`She's asleep. Not hurt. The chains keep her asleep. For a long time.`),
-  xc('ash',`What do you do?`,`What do you do?`,()=>[
+  xl('tove',`Asleep again. ...She isn't hurt, Ash. But those chains will hold her a long, long time.`,`Asleep again. Not hurt. The chains will hold her.`),
+  xc('ash',`You kneel down by her ear.`,`You kneel by her ear.`,()=>[
     xo(`Sing her the Snow Mother's Song`,`Sing her the song`,{tone:'kind',cond:()=>!!G.flags.f_song,fn:()=>{ G.choices.f_glaciar='free'; G.flags.f_glaciar_sung=1; G.choices.f_glaciar_home='stay'; },then:()=>STORY.f_glaciar_sung}),
     xo(`Let her sleep`,`Let her sleep`,{then:[xl('ash',`Sleep well, Auntie. I'm sorry. I'll come back for you. I promise.`,`Sleep well, Auntie. I'll come back. I promise.`),xl('narr',`You tuck the snow around her horns, the way Mom tucks your blanket. It's the best you can do.`,`You tuck the snow around her horns, like Mom tucks your blanket.`),
       f2sIf('narr',`(If you knew the Snow Mother's Song, you could sing her awake. Brynja in Hearthold knows where the verses are.)`,`(A song could wake her. Ask Brynja in Hearthold.)`,()=>!G.flags.f_song)]})
@@ -470,9 +471,9 @@ f2sDef('f_glaciar_sung',[
   xl('narr',`You kneel by her ear and sing. The first verse is about a sleepy dragon. The second is about a girl with horns. The third is about a fire that never goes out.`,`You kneel by her ear and sing. A sleepy dragon. A girl with horns. A fire that never goes out.`),
   xl('narr',`One by one, the chains go soft. Then slushy. Then they drip away into nothing.`,`One by one, the chains melt away.`),
   {who:'narr',text:S(`Glaciar opens one eye. It's blue.`,`Glaciar opens one eye. It's blue.`),fn:()=>f2sGlacShow('awake')},
-  xl('f_glaciar',`...Ember used to sing me that. Who taught you that, dumpling?`,`Ember sang me that. Who taught you, dumpling?`),
+  xl('f_glaciar',`Ember used to sing me that. Who taught you, dumpling?`,`Ember sang me that. Who taught you, dumpling?`),
   xl('ash',`Hearthold did. They still sing it. It's about you, Auntie.`,`Hearthold did. It's about you, Auntie.`),
-  xl('f_glaciar',`Oh. Oh, my. Then I suppose I'd better stay and earn it.`,`Oh my. Then I'd better stay and earn it.`),
+  xl('f_glaciar',`Well, well. Then I suppose I'd better stay and earn it.`,`Then I'd better stay and earn it.`),
   xl('narr',`She breathes out, slow and soft, and every frozen person in the north gives a little shiver and wakes up.`,`She breathes out, soft and slow. Every frozen person in the north wakes up.`),
   xdo(()=>{ f2sThawAll(); }),
   xl('f_glaciar',`Nyxara wants the last piece, dumpling. It's east, where the moon's light fell. When you're ready to go, I'll fly you. Slowly. I only do slowly.`,`Nyxara wants the last piece. It's east. I'll fly you there. Slowly. I only do slowly.`)
@@ -493,7 +494,7 @@ f2sDef('f_night',[
   xdo(()=>{ G.flags.f_moon_bite3=1; G.flags.f_nyx_named=1; f2sMoon(85); }),
   xl('nyxara',`Two pieces, little ember. Two out of three. You're doing so well.`,`Two pieces, little ember. Two of three. You're doing so well.`),
   xl('nyxara',`Come east. Bring them both. I'll leave a light on.`,`Come east. Bring them both. I'll leave a light on.`),
-  xl('ash',`...I really, really hate moths.`,`I really, really hate moths.`)
+  xl('narr',`In your pocket the two Shards lie side by side, humming the same note. For the first time since the snow came, they're warm.`,`In your pocket, the two Shards hum. They are warm again.`)
 ]);
 // Tove's "where now" hints (bible 6.14): the journal Hint button and Yara's talk
 STORY.f_hints={
@@ -705,8 +706,8 @@ const F2S_TAUNTS={
   f_bellows3:[S('FWOOOOSH!','FWOOOOSH!')],
   f_frostfeather:[S('HOO!','HOO!'),S('HOOOOO!','HOOOOO!')], f_frostfeather2:[S('Hoo hoo hoo!','Hoo hoo hoo!')],
   f_grumblehorn:[S('HRRRMPH!','HRRRMPH!'),S(`Get off my lawn! I don't have a lawn! Get off it anyway!`,`Get off my lawn!`),S('My HORNS!','My HORNS!')],
-  f_hush:[S('Shhhh.','Shhhh.'),S('Too loud, too loud.','Too loud!'),S('Rest, little ember.','Rest, little ember.')], f_hush_lamp:[S('Ooooh. Prettyyy.','Ooooh. Pretty.')],
-  f_glaciar:[S('Sleep, little ember. Sleep under the snow.','Sleep under the snow.'),S('The Mother says cold is kind.','The Mother says cold is kind.'),S('The long night is coming. Lie down.','The long night is coming.')],
+  f_hush:[S('Shhhh.','Shhhh.'),S('Too loud, too loud.','Too loud!'),S('Rest, loud one.','Rest, loud one.')], f_hush_lamp:[S('Ooooh. Prettyyy.','Ooooh. Pretty.')],
+  f_glaciar:[S('Sleep, little one. Sleep under the snow.','Sleep under the snow.'),S('The Mother says cold keeps things.','Cold keeps things.'),S('Nothing leaves in the cold. Lie down.','Nothing leaves in the cold.')],
   // (the same words as x2_foes' F2_CHAIN_LINES, full and simple: f2sSay does not repeat a line the foe module just said)
   f_glaciar_chain:[S(`...Fire? Warm fire? I knew a little girl with fire like that...`,`Fire? Warm fire? I knew a girl with fire like that...`),
     S(`The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.`,`Who is the Mother? I have a brother. A loud one.`),
@@ -915,7 +916,7 @@ onTalk(n=>{
   const F=G.flags;
   if(n.id==='yara'&&!F2ST.yara[G.stage]){ F2ST.yara[G.stage]=1; f2sPlay([['yara',STORY.f_yara],['tove',f2sToveHint()]]); return true; }
   if(n.id==='c_vesper'&&n.f2sGate){ f2sPlay([xl('c_vesper',`Nobody gets past me, cousin. I know every way into a place. I've used most of them.`,`Nobody gets past me, cousin.`),
-    f2sIf('c_vesper',`Go on up. Bring your auntie home.`,`Go on up. Bring your auntie home.`,()=>!G.choices.f_glaciar)]); return true; }
+    f2sIf('c_vesper',`Go on up. Whoever's up there, bring her home.`,`Go on up. Bring her home.`,()=>!G.choices.f_glaciar)]); return true; }
   return false;
 });
 // Elka has gone sledding by the time Ulf shows Ash the pass (she turns up again in the north: x2_people)
@@ -1538,14 +1539,14 @@ const F2S_MAIL={
   f_pb_2:{from:'maren',quiet:true,when:()=>reached('f_kindle'),lines:()=>[
     xl('narr',`Pebble lands on your head with another letter, and takes another coin. She must have quite a pile by now.`,`Pebble brings a letter. She takes a coin. Again.`),
     xl('maren',`(the letter) Ash. Yara says you have BLUE fire now. Pebble told her. Don't ask me how. Your grandmother had blue fire once. She set the river on fire. Rivers are not supposed to burn.`,`Yara says you have BLUE fire! Grandma set a river on fire once.`),
-    xl('maren',`Please don't set any rivers on fire. If you do, put them out. Eat something. Love, Mom. P.S. Bertram says the frozen buns make excellent paperweights. He's selling them.`,`Don't set rivers on fire. Eat something. Love, Mom. P.S. Bertram sells frozen buns as paperweights.`),
-    xl('maren',`P.P.S. The bakery exploded. Unrelated.`,`P.P.S. The bakery exploded. Not your fault.`),
-    f2sIf('maren',`P.P.P.S. Tikka sent you a lumpy bun. It froze. It is still lumpy. Lumpy means love, she says.`,`P.P.P.S. Tikka sent a lumpy bun. It froze. Lumpy means love.`,()=>G.flags.tk_home==='baker')]},
+    xl('maren',`Please don't set any rivers on fire. If you do, put them out. Eat something. Love, Mom.`,`Don't set rivers on fire. Eat something. Love, Mom.`),
+    xl('maren',`P.S. Your bed is made. I keep making it.`,`P.S. Your bed is made. I keep making it.`),
+    f2sIf('maren',`P.P.S. Tikka sent you a lumpy bun. It froze. It is still lumpy. Lumpy means love, she says.`,`P.P.S. Tikka sent a lumpy bun. It froze. Lumpy means love.`,()=>G.flags.tk_home==='baker')]},
   f_pb_3:{from:'maren',when:()=>reached('f_dreadgate'),lines:()=>[
-    xl('maren',`(the letter) Ash. Yara says you are about to climb a mountain to visit your AUNT. If she's your auntie, she's mine too, a few greats back. Nobody tells me anything.`,`Yara says you will visit your AUNT on a mountain. She's my auntie too!`),
-    xl('maren',`Be polite. Take your hat off indoors. If she offers you tea, drink it, even if it's made of ice. Love, Mom.`,`Be polite. Hat off indoors. Drink her tea, even ice tea. Love, Mom.`),
+    xl('maren',`(the letter) Ash. Pebble says you're going up a mountain to knock on it. I've read that twice. It still says knock.`,`Ash. Pebble says you will knock on a mountain. I read it twice.`),
+    xl('maren',`Gloves on before you knock. And if anybody up there asks you in, take your hat off and be polite. Love, Mom.`,`Gloves on. If anyone asks you in, be polite. Love, Mom.`),
     xl('maren',`P.S. Wendel wrote a new song about you. It rhymes "Ash" with "succotash". I've asked him to stop.`,`P.S. Wendel's new song rhymes "Ash" with "succotash".`),
-    f2sIf('maren',`P.P.S. Grandpa wants me to tell her he says hello. He also says "she started it." I don't know what that means.`,`P.P.S. Grandpa says hello. And "she started it."`,()=>f2sEnding()==='lantern')]},
+    f2sIf('maren',`P.P.S. Grandpa heard where you're going. He went quiet for a long time, then said, "Tell her she started it." Tell who? He won't say.`,`P.P.S. Grandpa says: "Tell her she started it." Tell who? He won't say.`,()=>f2sEnding()==='lantern')]},
   f_pb_4:{from:'dell',when:()=>!!G.flags.f_done,lines:()=>[
     xl('dell',`Dear Ash. I bought a SEA boat in Gearhaven. I have not lost it yet. It has been four days.`,`Dear Ash. I bought a SEA boat. I have not lost it yet!`),
     xl('dell',`When you need to go east, come to the dock. Dell.`,`When you go east, come to the dock. Dell.`)]},
