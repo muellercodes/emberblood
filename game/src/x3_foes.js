@@ -1521,7 +1521,7 @@ function m3Fanfare2(e,fl){
 c1Lines('m_hushboss','m_hush_intro','m_hush_outro',
   [['narr',S('Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. Frost glitters in her fur. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.','A huge white moth sits under the dome. A silver thread ties her to the floor and to the sky.')],
    ['narr',S('Beside her, in a little brass cradle, something glows silver. The Moon Shard.','Beside her glows the Moon Shard.')],
-   ['f_hush',S('Shhh. You again. The loud one. ...I never did get a sweater.','Shhh. You again. I never got a sweater.')],
+   ['f_hush',S('You again. Loud one. I flew home, like you said. I told her you were coming.','You again. I flew home. I told her you were coming.')],
    ['ash',S('Hush. You came back.','Hush. You came back.')],
    ['f_hush',S('I flew to the Mother, small and cold. She made me big again. "You came back small," she said. "Never again." Then she gave me this.','The Mother made me big again. Then she gave me this leash.')],
    ['narr',S('The silver leash glints. Somewhere far above, something tugs it, gently. Hush flinches.','Something far above tugs the leash. Hush flinches.')],

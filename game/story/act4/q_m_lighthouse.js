@@ -46,7 +46,7 @@ quest({
       ['m_ned', "Moonlight in a lighthouse! Ha! Ships'll see that from the edge of the world.", 'Ha! Ships will see that from far away!'],
       ['m_ned', 'And at night, mind, this beam goes right down to the sea floor. You will see things down there. Old, shiny things.',
         'At night the beam shows the sea floor. Shiny things!', { promise: 'm3p_sunk1' }],
-      ['m_ned', "Tell Squint I'm coming down for supper. Tell her to make it NOT fish.", "Tell Squint I'm coming for supper. NOT fish."],
+      ['m_ned', "Tell Squint I'm coming down for supper. Tell her to make it anything but fish.", "Tell Squint I'm coming for supper. No fish."],
     ],
   },
 

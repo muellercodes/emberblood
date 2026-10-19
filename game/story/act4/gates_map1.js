@@ -48,7 +48,7 @@ places({
       ['narr', 'From up here you can see the whole Moon Ring, where the Ember Heart cracked into three.', 'You can see the whole Moon Ring.'],
       ['narr', 'In the moonfire, silver lines glow on the ground. Three trails run out of the ring, like ribbons: west, north and east.',
         'Three silver trails run out of the ring.', { ref: 'c_lm_moonring' }],
-      ['narr', 'Under them, in moth dust, somebody wrote: ALL THREE COME HOME.', '"ALL THREE COME HOME."', { clue: 'm4_ring_trails' }],
+      ['narr', 'Under them, in moth dust, somebody wrote: "All three come home."', '"All three come home."', { clue: 'm4_ring_trails' }],
       ['ash', 'Three Shards. Three trails. She wants them all back together.', 'She wants all three back together.'],
     ],
   },

@@ -31,7 +31,7 @@ quest({
         'He is Noodle. He cries for his mom!'],
       ['narr', 'A little sandworm, about as long as your tail, pokes his head out of the sand by your feet and goes "mip".',
         'A baby worm pops up and goes "mip".'],
-      { if: 'flag pip', then: [['pip', 'Mip! MIP. (Pip glares at the worm. That is HIS word.)', 'MIP! (That is Pip\'s word!)']] },
+      { if: 'flag pip', then: [['pip', 'Mip! Mip. (Pip glares at the worm. That is his word.)', 'Mip! (That is Pip\'s word!)']] },
       { choose: 'm_noodle_offer', ask: ['Take Noodle home?', 'Take Noodle home?'], pick: [
         { t: ['I know a big worm. Come on, Noodle.', 'Come on, Noodle!'], tone: 'kind', then: ['quest start m_noodle'],
           say: [['m_dusty', 'Dusty: Bye, Noodle! Dune: Bye, shoes!', 'Bye, Noodle! Bye, shoes!']] },
@@ -51,7 +51,7 @@ quest({
 
   talk: {
     m_dusty: [
-      { if: 'stage>=m_glasswall power burrow !quest m_noodle active !quest m_noodle done', option: ['Who is THIS?', 'Who is this?'],
+      { if: 'stage>=m_glasswall power burrow !quest m_noodle active !quest m_noodle done', option: ['Who is this?', 'Who is this?'],
         scene: 'nd_offer' },
     ],
   },

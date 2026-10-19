@@ -49,7 +49,7 @@ quest({
       ['m_rocket', '(from the Racing Reef) You beat me! Nobody beats me! Except Pickles. Pickles is a squid.', 'You beat me! Nobody does that!'],
       ['m_kelp', 'The Dolphin Kick. Kick with your tail, like this. No, your other tail. You only have one tail. That one.',
         'The Dolphin Kick. Kick with your tail. That one.'],
-      ['ash', 'How do YOU know a racing kick?'],
+      ['ash', 'How do you know a racing kick?'],
       ['m_kelp', 'I was the fastest swimmer in Coralcombe for ninety years. Who do you think taught Pickles?',
         'I was the fastest for ninety years. I taught Pickles!'],
       ['m_kelp', "Don't tell Rocket. It would ruin him. Now eat some seaweed.", "Don't tell Rocket. Eat your seaweed."],

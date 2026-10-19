@@ -90,13 +90,14 @@ chapter({
       ['narr', 'Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.',
                'Under the dome sits a white moth as big as a barn. A silver thread runs from her neck to two knots, then up into the dark.'],
       ['narr', 'Beside her, in a little brass cradle, something glows silver. The Moon Shard.', 'Beside her, something glows silver. The Moon Shard.'],
-      // Act III's choice f_hush (A3b): Ash wrapped her in Ylva's red scarf ('scarf'), or told her to get a sweater
+      // Act III's choice f_hush (A3b, J5 v11): Ash wrapped her in Ylva's red scarf ('scarf'), or ('shoo') told her "Fly
+      // home, then. Tell her I'm coming." She did, and the Mother put the leash on her
       { if: 'choice f_hush=scarf', then: [
         ['f_hush', "You again. Loud one. I kept the red scarf. It's under the leash. The only warm thing.", 'You again. I kept the red scarf.'] ],
         else: [
-        ['f_hush', 'You again. Loud one. I never got a sweater.', 'You again. I never got a sweater.'] ] },
+        ['f_hush', 'You again. Loud one. I flew home, like you said. I told her you were coming.', 'You again. I flew home. I told her you were coming.'] ] },
       ['ash', 'Hush. You came back.', 'Hush. You came back.'],
-      ['f_hush', 'I went home small and cold. She made me big. "Never small again," she said. Then she gave me this.', 'The Mother made me big again. Then she gave me this leash.'],
+      ['f_hush', 'I went home small and cold. She made me big. "Never small again," she said. Then she put this on me.', 'The Mother made me big again. Then she put this leash on me.'],
       ['narr', 'Far above, something tugs the leash, gently. Hush flinches.', 'Far above, something tugs the leash. Hush flinches.'],
       ['f_hush', 'I keep the Shard. You bring the other two. She gets all three. They all go up to her, in the end.', 'I keep it. You bring two. She gets all three.'],
       { if: 'flag m_vesper_ally flag m_lamps_ally', then: [
