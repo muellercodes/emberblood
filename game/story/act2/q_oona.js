@@ -47,10 +47,10 @@ quest({
 
   scene: {
     c_oona_offer: [
-      ['c_oona', "Oh, look at you, duck. Horns and a tail, and you're WARM. I can feel it from here, like standing next to a fresh loaf.",
-        "Horns, a tail, and WARM! Like a loaf."],
-      ['c_oona', "My old stove hasn't lit in twenty years. A gull built a nest right on top of my chimney.",
-        'My stove is cold. A gull sits on my chimney.'],
+      ['c_oona', "Oh, look at you, duck. Horns and a tail, and you're warm. I can feel it from here, like standing next to a fresh loaf.",
+        "Horns, a tail, and warm! Like a loaf."],
+      ['c_oona', "Vesper used to light my stove for me, for all the good it did. Now a gull's built a nest on the chimney, and it smokes us out.",
+        'Now a gull sits on my chimney. The stove smokes.'],
       ['c_oona', "I can't climb up to shift it. And there's never been a spark in this family. Not one.",
         "I can't climb. And we have no spark."],
       { choose: 'c_oona_offer', ask: ["Would you, duck? I'd pay you in biscuits. Very old biscuits.", 'Will you help? I pay in biscuits.'],
@@ -83,15 +83,15 @@ quest({
                 "My daughter's locket! I'll give it to Vesper."]] },
             { t: ['Keep it for now', 'Keep it for now'], say: [['ash', "(I'll give it to her myself.)"]] },
           ] }] },
-      ['c_oona', "Fire isn't the only warm thing, duck. Here. A scarf I knitted for Vesper, and three of my biscuits.",
-        "Fire isn't the only warm thing. Take these."],
+      ['c_oona', "Look at it go. ...Here. A scarf I knitted for Vesper, who won't wear it, and three of my biscuits.",
+        'Look at it go. Here, a scarf and three biscuits.'],
     ],
     // replaces STORY.c_oona_note (x1_people plays it after the next rest, then sets c_oona_note and Vesper's trust +2)
     c_oona_note: [
       ['narr', "When you wake up, there's a note on your pillow. And a fish.", 'A note and a fish are on your pillow.'],
-      ['narr', '"You lit Gran\'s stove. She made me sit by it for an hour. Nobody makes me sit still."',
-        '"You lit Gran\'s stove. She made me sit by it."'],
-      ['narr', '"She showed you her horns, didn\'t she. She does that. ...Thanks, little ember. V."', '"Thanks, little ember. V."'],
+      ['narr', '"You lit Gran\'s stove. It was still going this morning. It\'s never still going in the morning. Never."',
+        '"You lit Gran\'s stove. It was still going this morning!"'],
+      ['narr', '"She made me sit by it for an hour. She showed you her horns, didn\'t she. She does that. ...Thanks. V."', '"She made me sit by it. Thanks. V."'],
       ['narr', 'The fish has a little bow on it.'],
     ],
   },
