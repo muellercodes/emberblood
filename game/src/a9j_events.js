@@ -620,12 +620,23 @@ function dreamFor(st){ for(const id of DREAM_ORDER){ const D=DREAMS[id]; if(D.st
 function dreamHook(kind){
   try{
     if(!G||G.mode!=='story') return;
+    // (v11) the 'spark' dream is on the main path: the first time Ash sleeps in his own bed after the Hollow Ward is lit,
+    // he always dreams it (once; a save that has already seen it is untouched)
+    if(dreamSparkDue(kind)){ later(1.3,()=>dreamTry('spark',0)); return; }
     const id=dreamFor(G.stage); if(!id) return;
     const k='dr_try_'+id, n=G.flags[k]|0; G.flags[k]=n+1;
     if(n<2&&Math.random()>0.6) return;
     later(1.3,()=>dreamTry(id,0));
   }catch(e){}
 }
+function dreamSparkDue(kind){
+  if(G.flags.dr_seen_spark||!DREAMS.spark||G.done) return false;
+  const home=EV.homeRest||(kind==='inn'&&!!AREA&&/^h_ash(_|$)/.test(String(AREA.id||'')));
+  const past=(G.wards&&G.wards.hollow)||stageAt(G.stage)>stageAt('hollow');
+  return !!(home&&past);
+}
+// resting at home (Ash's own bed) is restHome, which rests through innRest: the flag tells dreamHook it was home
+{ const base=restHome; restHome=function(){ EV.homeRest=true; try{ return base.apply(this,arguments); }finally{ EV.homeRest=false; } }; }
 function dreamTry(id,n){ if(!G||G.flags['dr_seen_'+id]) return; if(scene!=='play'||DLG||G.pendingBless>0||G.inCombat||(G.boss&&!G.boss.dead)){ if(n<12) later(1.0,()=>dreamTry(id,n+1)); return; } dreamStart(id); }
 function dreamStart(id){
   const D=DREAMS[id]; if(!D) return false;

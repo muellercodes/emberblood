@@ -43,9 +43,12 @@ function setLine(){
   const box=$('#dlgOpts'); box.innerHTML=''; DLG.opts=null; box.hidden=true; $('#dlgNext').hidden=false;
   if(L.opts){ let o=typeof L.opts==='function'?L.opts():L.opts; o=o.filter(q=>q&&(!q.cond||q.cond())); if(o.length) DLG.opts=o; DLG.hub=L; }
 }
+// (v11) an answer's tone (kind, brave, silly) is hidden metadata for friendship points: no colored numbers unless
+// DLG_TONES is turned on. A locked option is always shown greyed (t-locked), with its reason when picked.
+let DLG_TONES=false;
 function showOpts(){
   const box=$('#dlgOpts'); if(!DLG||!DLG.opts||box.childElementCount) return;
-  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(simplify(typeof o.t==='function'?o.t():o.t))}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
+  DLG.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='opt'+(o.key&&G&&G.seenTalk&&G.seenTalk[o.key]?' seen':'')+(o.tone&&(o.tone==='locked'||DLG_TONES)?' t-'+o.tone:''); b.innerHTML=`<span class="k">${i+1}</span>${escapeHtml(simplify(typeof o.t==='function'?o.t():o.t))}${o.tag?`<span class="tag">${escapeHtml(o.tag)}</span>`:''}`; b.addEventListener('click',e=>{ e.stopPropagation(); dlgChoose(i); }); box.appendChild(b); });
   box.hidden=false; $('#dlgNext').hidden=true; DLG.optsAt=performance.now();
   if(!usingTouch) setTimeout(()=>{ const f=box.querySelector('button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },30);
 }
@@ -137,6 +140,13 @@ function dlgSkipLabel(){
 }
 $('#dialogue').addEventListener('click',()=>{ SFX.init(); dlgNext(); });
 $('#dlgSkip').addEventListener('click',e=>{ e.stopPropagation(); dlgAskSkip('click'); });
+// (v11) a talk menu can have more than four options now (replies, topics, More, Goodbye): the number keys 5 to 9 pick
+// them too (1 to 4 are a5_input's)
+addEventListener('keydown',e=>{ if(scene!=='dialogue'||!DLG||!DLG.opts) return; const m=/^(?:Digit|Numpad)([5-9])$/.exec(e.code||''); if(!m) return;
+  e.preventDefault(); if(!e.repeat) dlgChoose(+m[1]-1); });
+// test hooks: the whole line being typed, whether options are up, and finish the typing now
+window.__ebDbg=Object.assign(window.__ebDbg||{},{dlgText:()=>DLG?String(DLG.text||''):'',dlgHasOpts:()=>!!(DLG&&DLG.opts),
+  dlgFinish:()=>{ if(DLG){ DLG.chars=(DLG.text||'').length; DLG.fullAt=performance.now()-1000; } },tones:v=>{ if(v!=null) DLG_TONES=!!v; return DLG_TONES; }});
 
 // ================= portraits
 function faceDragon(g,o){

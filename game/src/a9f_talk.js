@@ -175,9 +175,50 @@ function giftReact(id,item){
   if((T.hates||[]).includes(item)){ befriend(id,-0.5); return pick([`Oh. ${GIFTS[item]}. That's... thank you. I'll put it somewhere. Far away.`,`A ${GIFTS[item].toLowerCase()}! I'm, um, allergic. A bit. It's the thought that counts.`]); }
   befriend(id,c&&c.generic?0.5:0.75); return pick([`For me? Thank you, Ash. That's very kind.`,`Oh, how nice. Thank you!`,`${GIFTS[item]}? Lovely. Thank you.`]);
 }
-// the conversation menu
+// ---------- the conversation menu (v11, STORY_PLAN 6.3)
+// 1. The opener is the greeting, said once: when the story data has a current line for this person (s10Opener in
+//    e10_story.js), that line is what they greet Ash with and the menu sits under it; the generic greetLine runs only
+//    when there is no data line (and on a first meeting with a person not yet converted, for their introduction). An
+//    opener heard today is not repeated: the person's idle line instead (or a one-time remark, or a plain hello).
+// 2. Under the opener: its replies (re) first, then the story's and quests' topics, then up to three ask topics, then
+//    "More..." (rumors, gifts) and Goodbye. People not converted yet keep the old menu, minus the repeat: "What's new?"
+//    never says a line already heard this visit, and is gone when the opener came from the data (it comes back as
+//    "Anything else going on?" only while the opener has a variant not heard today).
+// 3. After an answer the person says their idle line (or a neutral "Mm?"), never "What else is on your mind?".
+// Old TALK labels: T.deepAsk, T.rumorAsk and T.about[who] = { ask, t } name the old topics while they are converted.
+const talkLbl=x=>Array.isArray(x)?S(String(x[0]),String(x[1]==null?x[0]:x[1])):String(x);
+// a remembered moment (a dream, an event, a deed) that greetLine would have said; random chatter is left out
+function talkRemark(id){
+  try{ if(typeof evGreet==='function'){ const v=evGreet(id); const ch0=(typeof MOM_CH!=='undefined'&&MOM_CH[G.stage])||[], ch1=(typeof YARA_CH!=='undefined'&&YARA_CH[G.stage])||[];
+    if(v&&!ch0.includes(v)&&!ch1.includes(v)) return v; } }catch(e){}
+  try{ return deedGreet(id)||null; }catch(e){ return null; }
+}
+function talkVisit(n,firstMeet,lines){
+  const id=n.id, X=typeof s10Opener==='function'?s10Opener(n):null, v11=typeof s10V11==='function'&&s10V11(id);
+  const idle=()=>typeof s10Idle==='function'?s10Idle(id,X&&X.T):null;
+  const V={id,v11,X,said:new Set(),answered:false,more:false,re:null,fn:null};
+  const heard=t=>{ if(t!=null&&typeof t!=='function') V.said.add(String(t)); return t; };
+  // the person already spoke in this visit (a first entry, a quest line): no second greeting, the menu sits under idle
+  const spoke=lines.some(L=>(Array.isArray(L)?L[0]:L&&L.who)===id);
+  if(spoke&&!(X&&!X.heard)){ V.text=heard(idle()||'Mm?'); V.again=()=>idle()||pick(['Mm?','Yes?']); return V; }
+  if(X&&!X.heard){
+    // a first meeting with someone not converted yet keeps their introduction; otherwise a remembered moment, if any
+    const g=spoke?null:firstMeet&&!v11?greetLine(id):talkRemark(id); if(g) lines.push([id,heard(g)]);
+    for(const L of X.pre) lines.push(L);
+    const L0=X.last;
+    if(L0){ heard(L0.text); V.text=()=>L0.skipIf&&L0.skipIf()?(idle()||'Mm?'):L0.text; V.fn=()=>{ if(L0.fn) L0.fn(); X.run(); }; }
+    else{ V.text=idle()||'Mm?'; V.fn=X.run; }
+    V.re=X.re; V.key=X.key;
+  }
+  else if(X) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  // a converted person with no opener left (all answered) says their own idle line, not a generic hello
+  else if(v11&&!firstMeet) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  else V.text=heard(greetLine(id));
+  V.again=()=>idle()||pick(['Mm?','Yes?']);
+  return V;
+}
 function talkHub(n,pre){
-  const id=n.id, c=CASTBY[id]||SPECIAL[id]||{}, T=TALK[id]||{};
+  const id=n.id, T=TALK[id]||{};
   const lines=(pre||[]).slice();
   G.seenTalk=G.seenTalk||{};
   const firstMeet=!G.seenTalk['met_'+id];
@@ -187,35 +228,64 @@ function talkHub(n,pre){
   const f=friendOf(id);
   if(T.secret&&f>=3&&!G.seenTalk['sec_'+id]&&(!T.need||T.need())){ G.seenTalk['sec_'+id]=1; lines.push([id,S(`Ash, wait. I've been keeping something for you.`,`Ash, wait. I have something for you.`)],[id,T.secret.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.secret.reward); return true; }}); }
   if(T.best&&f>=5&&!G.seenTalk['best_'+id]){ G.seenTalk['best_'+id]=1; lines.push([id,T.best.t]); lines.push({who:'narr',text:'',skipIf:()=>{ giveTalkReward(T.best.reward); return true; }}); }
-  const greet=greetLine(id);
+  const V=talkVisit(n,firstMeet,lines);
   G.seenTalk['met_'+id]=1;
-  const hub=ch(id,greet,()=>{
-    const o=[];
-    const shop=SHOPTALK[id];
-    if(shop) o.push({t:id==='marigold'?'Show me your hats':id==='tilly'||id==='hob'?'A bed, or something to eat?':'What are you selling?',tag:'shop',fn:()=>shop(n),end:true});
-    // quest step that needs more items: remind
-    for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id&&!haveAll(st.take)) o.push({t:`About ${QDEFS[qid].title.replace('Errand: ','')}...`,tag:'quest',then:[[id,`You still need: ${Object.keys(st.take||{}).map(k=>ITEM_NAMES[k]||k).join(', ')}. I'll be right here.`]],back:true}); }
-    for(const qid in G.quests){ const T=QDEFS[qid].topics, q=G.quests[qid]; if(!T||!T[id]||q.done||q.step!==0||G.flags[T[id].flag]) continue; const tp=T[id]; o.push({t:tp.t,tag:'quest',fn:()=>{ G.flags[tp.flag]=true; later(0.2,questPoke); },then:tp.lines,back:true}); }
-    const av=availableFrom(id); if(av&&QDEFS[av].errand) o.push({t:'Need anything carried somewhere?',tag:'errand',fn:()=>offerQuest(av),end:true});
+  const hub={who:id,text:V.text,opts:()=>talkOpts(n,V)};
+  if(V.fn) hub.fn=V.fn;
+  hub.again=V.again; V.hub=hub;
+  lines.push(hub);
+  runDialogue(lines,()=>{ scene='play'; saveGame(); });
+}
+function talkOpts(n,V){
+  const id=n.id, c=CASTBY[id]||SPECIAL[id]||{}, T=TALK[id]||{}, o=[];
+  // the opener's replies, until one is picked (they go back to this menu, under the idle line)
+  if(V.re&&!V.answered&&typeof s10ReOpts==='function') o.push(...s10ReOpts(V.re,{talk:id},id,{hub:V,top:true}));
+  const shop=SHOPTALK[id];
+  const shopO=shop?{t:id==='marigold'?'Show me your hats':id==='tilly'||id==='hob'?'A bed, or something to eat?':'What are you selling?',tag:'shop',fn:()=>shop(n),end:true}:null;
+  if(shopO&&!V.v11) o.push(shopO);
+  // quest step that needs more items: remind
+  for(const qid in G.quests){ const st=stepOf(qid); if(st&&st.t==='talk'&&st.npc===id&&!haveAll(st.take)) o.push({t:`About ${QDEFS[qid].title.replace('Errand: ','')}...`,tag:'quest',then:[[id,`You still need: ${Object.keys(st.take||{}).map(k=>ITEM_NAMES[k]||k).join(', ')}. I'll be right here.`]],back:true}); }
+  for(const qid in G.quests){ const Q=QDEFS[qid].topics, q=G.quests[qid]; if(!Q||!Q[id]||q.done||q.step!==0||G.flags[Q[id].flag]) continue; const tp=Q[id]; o.push({t:tp.t,tag:'quest',fn:()=>{ G.flags[tp.flag]=true; later(0.2,questPoke); },then:tp.lines,back:true}); }
+  const av=availableFrom(id); if(av&&QDEFS[av].errand) o.push({t:'Need anything carried somewhere?',tag:'errand',fn:()=>offerQuest(av),end:true});
+  const comp=compTalkOpts(id,n);
+  const rum=T.rumor&&(!T.rumor.need||T.rumor.need())?{t:T.rumorAsk?talkLbl(T.rumorAsk):'Heard any rumors?',key:'rum_'+id,fn:()=>markHint(T.rumor.hint),then:[[id,T.rumor.t]],back:true}:null;
+  const gifts=giftsHeld();
+  const giftO=gifts.length&&(!G.gifted||G.gifted[id]!==dayNow())&&!SPECIAL[id]?{t:'I brought you something.',tag:'gift',then:()=>[ch(id,`Ooh, what is it?`,gifts.map(k=>({t:`${GIFTS[k]} (you have ${G.items[k]})`,then:()=>[[id,giftReact(id,k)]]})).concat([{t:'Never mind',then:[[id,`A mystery gift! My favorite kind. Maybe next time.`]]}]))],back:true}:null;
+  const varO=V.X&&typeof s10VarOpt==='function'?s10VarOpt(id):null;
+  if(V.v11){
+    // converted: story and quest topics, up to three ask topics, the shop, then "More..." (rumors, gifts)
+    o.push(...comp);
+    if(typeof s10AskOpts==='function') o.push(...s10AskOpts(id,V));
+    if(varO) o.push(varO);
+    if(shopO) o.push(shopO);
     if(id==='tamsin') o.push({t:'Sing me your song about me!',key:'song_'+id+'_'+dayNow(),then:()=>tamsinSong().slice(1),back:true});
-    o.push({t:'What’s new?',key:`new_${id}_${dayNow()}`,then:()=>{ const L=(c.lines&&c.lines.length)?c.lines:[`Not much. The valley's quiet. Too quiet, my gran would say.`]; const m=moodLine(id); const t=m&&n.li%3===2?m:L[n.li%L.length]; n.li=(n.li||0)+1; return [[id,t]]; },back:true});
+    if(V.more){ if(rum) o.push(rum); if(giftO) o.push(giftO); }
+    else if(rum||giftO) o.push({t:S('More...','More...'),fn:()=>{ V.more=true; },then:[],back:true});
+  }else{
+    if(id==='tamsin') o.push({t:'Sing me your song about me!',key:'song_'+id+'_'+dayNow(),then:()=>tamsinSong().slice(1),back:true});
+    if(V.X){ if(varO) o.push(varO); }
+    else{
+      // "What's new?" never says a line already heard this visit (the greeting included)
+      const L=(c.lines&&c.lines.length)?c.lines:[`Not much. The valley's quiet. Too quiet, my gran would say.`];
+      const nextNew=()=>{ const m=moodLine(id), li=n.li|0; if(m&&li%3===2&&!V.said.has(String(m))) return m; for(let k=0;k<L.length;k++){ const t=L[(li+k)%L.length]; if(!V.said.has(String(t))){ n.li=li+k; return t; } } return null; };
+      if(nextNew()!=null) o.push({t:'What’s new?',key:`new_${id}_${dayNow()}`,then:()=>{ const t=nextNew(); n.li=(n.li|0)+1; if(t==null) return []; V.said.add(String(t)); return [[id,t]]; },back:true});
+    }
     if(T.chat&&!G.seenTalk['chat_'+id]&&(!T.need||T.need())) o.push({t:'You look like something’s on your mind.',tag:'new',then:()=>[ch(id,T.chat.q,T.chat.opts.map(a=>({t:a.t,tone:a.tone,fn:()=>{ G.seenTalk['chat_'+id]=1; befriend(id,a.f+(a.tone===T.chat.best?0.25:0)); },then:[[id,a.r]]})))],back:true});
-    if(T.deep&&friendOf(id)>=2) o.push({t:'Tell me about yourself.',key:'deep_'+id,then:[[id,T.deep]],back:true});
-    for(const who in (T.about||{})) o.push({t:`What about ${shortName(who)}?`,key:`ab_${id}_${who}`,then:[[id,T.about[who]]],back:true});
-    if(T.rumor&&(!T.rumor.need||T.rumor.need())) o.push({t:'Heard any rumors?',key:'rum_'+id,fn:()=>markHint(T.rumor.hint),then:[[id,T.rumor.t]],back:true});
+    if(T.deep&&friendOf(id)>=2) o.push({t:T.deepAsk?talkLbl(T.deepAsk):'Tell me about yourself.',key:'deep_'+id,then:[[id,T.deep]],back:true});
+    for(const who in (T.about||{})){ const A=T.about[who], obj=A&&typeof A==='object'&&!Array.isArray(A);
+      o.push({t:obj&&A.ask?talkLbl(A.ask):`What about ${shortName(who)}?`,key:`ab_${id}_${who}`,then:[[id,obj?(Array.isArray(A.t)?talkLbl(A.t):A.t):A]],back:true}); }
+    if(rum) o.push(rum);
     if(c.generic){
       const tie=c.lines&&c.lines[0]; if(tie) o.push({t:'Know anyone around the valley?',key:'tie_'+id,then:[[id,tie]],back:true});
       const gr=GENERIC_RUMORS[Math.abs(hashStr(id))%GENERIC_RUMORS.length]; o.push({t:'Heard any rumors?',key:'rum_'+id,fn:()=>markHint(gr[1]),then:[[id,gr[0]]],back:true});
     }
-    o.push(...compTalkOpts(id,n));
-    const gifts=giftsHeld();
-    if(gifts.length&&(!G.gifted||G.gifted[id]!==dayNow())&&!SPECIAL[id]) o.push({t:'I brought you something.',tag:'gift',then:()=>[ch(id,`Ooh, what is it?`,gifts.map(k=>({t:`${GIFTS[k]} (you have ${G.items[k]})`,then:()=>[[id,giftReact(id,k)]]})).concat([{t:'Never mind',then:[[id,`A mystery gift! My favorite kind. Maybe next time.`]]}]))],back:true});
-    o.push({t:'Goodbye',end:true,then:[[id,friendOf(id)>=3?pick([`See you soon, Ash.`,`Come back any time.`,`Be careful out there.`]):pick([`Bye, Ash.`,`See you.`,`Mind your tail.`])]]});
-    return o;
-  });
-  hub.again=()=>pick(['Anything else?','What else is on your mind?','Mm? Anything else?','Go on.']);
-  lines.push(hub);
-  runDialogue(lines,()=>{ scene='play'; saveGame(); });
+    o.push(...comp);
+    if(typeof s10AskOpts==='function') o.push(...s10AskOpts(id,V));
+    if(giftO) o.push(giftO);
+  }
+  o.push({t:'Goodbye',end:true,then:()=>{ const bye=typeof s10Bye==='function'?s10Bye(id):null;
+    return [[id,bye||(friendOf(id)>=3?pick([`See you soon, Ash.`,`Come back any time.`,`Be careful out there.`]):pick([`Bye, Ash.`,`See you.`,`Mind your tail.`]))]]; }});
+  return o;
 }
 // a tally for the journal's Secrets tab
 function secretTally(){
