@@ -507,7 +507,7 @@ const DREAMS={
       xl('narr',`You huff. You puff. A single spark pops out of your mouth and floats in the air like a firefly.`,`You huff and puff. One little spark pops out!`),
       xc('vor_old',`There. Your first spark. Every dragon names their first spark. What will you call it?`,`Your first spark! What will you name it?`,[
         xo(`Twinkle`,`Twinkle`,{fn:()=>{ G.flags.dr_spark='twinkle'; },then:[xl('vor_old',`Twinkle. Hm. Small and bright. Like you.`,`Twinkle. Small and bright. Like you.`)]}),
-        xo(`Mister Crackles`,`Mister Crackles`,{fn:()=>{ G.flags.dr_spark='crackles'; },then:[xl('vor_old',`Mister Crackles. That is a ridiculous name. ...I love it. Do not tell anyone I said that.`,`Mister Crackles? That is silly. I love it. Shh, don't tell.`)]}),
+        xo(`Mister Crackles`,`Mister Crackles`,{fn:()=>{ G.flags.dr_spark='crackles'; },then:[xl('vor_old',`Mister Crackles. That is a ridiculous name. ...Mister Crackles.`,`Mister Crackles? Silly. ...Mister Crackles.`)]}),
         xo(`Dad`,`Dad`,{tone:'kind',fn:()=>{ G.flags.dr_spark='dad'; },then:[xl('vor_old',`...You named it after me?`,`You named it after me?`),xl('narr',`The great dragon is quiet for a long time. Then he curls his tail around you, very carefully, as if you were made of glass.`,`The big dragon is quiet. Then he wraps his tail around you, very gently.`)]})
       ]),
       xl('narr',`Far below, in the valley, a little house lights its very first fire. Your father watches it with narrowed eyes.`,`Far below, a little house lights a fire. Your father watches it. He frowns.`),
@@ -516,7 +516,7 @@ const DREAMS={
     lines:()=>[
       xl('narr',`You're riding on your father's back, high over the valley. The wind is cold, and the stars are close enough to lick.`,`You ride on your father's back, high in the sky.`),
       xl('vor_old',`Look down, Ember. All of it. Every hill, every river, every little house. One day, all of it will be yours.`,`Look down, Ember. One day all of this will be yours.`),
-      xc('ember_kid',`What do you say?`,`What do you say?`,[
+      xc('ember_kid',`What do you tell him?`,`What do you tell him?`,[
         xo(`I don't want it to be mine. I want it to be happy.`,`I want it to be happy, not mine.`,{tone:'kind',fn:()=>{ G.flags.dr_flight='happy'; },then:[xl('vor_old',`Happy? Happiness is for small things, child. We are dragons.`,`Happy? Dragons don't need happy.`),xl('narr',`His voice is cold. But his wings curl a little closer around you, to keep off the wind.`,`His voice is cold. But his wings hold you close and warm.`)]}),
         xo(`Can we visit the little houses?`,`Can we visit the houses?`,{fn:()=>{ G.flags.dr_flight='visit'; },then:[xl('vor_old',`Visit? They would run from us. They always run.`,`They would run away. They always run.`),xl('narr',`He says it like it doesn't matter. You can tell that it does.`,`He says he does not care. But he does.`)]}),
         xo(`Faster! FASTER!`,`Faster! FASTER!`,{tone:'brave',fn:()=>{ G.flags.dr_flight='faster'; },then:[xl('narr',`Your father laughs, a sound like a landslide, and dives. The whole valley spins. You scream with joy.`,`Your father laughs and dives down. The valley spins! You scream with joy.`),xl('narr',`Years later, you will realize it was the last time you ever heard him laugh.`,`It is the last time you hear him laugh.`)]})
@@ -553,12 +553,12 @@ const DREAMS={
         xo(`Help Iska fold lanterns`,`Help Iska make lanterns`,{fn:()=>{ G.flags.dr_five='iska'; },then:[xl('iska',`Fold here. And here. There. Your first lantern.`,`Fold here and here. Your first lantern!`),xl('narr',`It's lopsided. Iska says it's perfect. She keeps it for a thousand years.`,`It is wonky. Iska says it is perfect. She keeps it forever.`)]})
       ]),
       xl('narr',`Five friends and a dragon, around one small fire. It's the warmest you have ever felt.`,`Five friends and a dragon by the fire. You feel so warm.`)]},
-  split:{stages:['three'],title:S('The Longest Night','The Longest Night'),scene:'split',
+  split:{stages:['three'],title:S('The Shortest Night','The Shortest Night'),scene:'split',
     lines:()=>[
-      xl('narr',`The longest night of the year. Snow is falling on the mountaintop. Your father sleeps, huge and restless, his breath like a forge.`,`It is the longest night. Snow falls. Your father sleeps.`),
+      xl('narr',`The shortest night of the year. Even at midnight the sky never goes quite dark. Your father sleeps, huge and restless, his breath like a forge.`,`It is the shortest night. Your father sleeps.`),
       xc('iska',`Are you sure, Ember? Once we split his flame, half of it lives in you. Forever. And in your children, and theirs.`,`Are you sure, Ember? Half his fire will live in you forever.`,[
         xo(`I'm sure.`,`I am sure.`,{tone:'brave',fn:()=>{ G.flags.dr_split='sure'; },then:[xl('iska',`Then hold my hand. Wardens, now!`,`Hold my hand. Now!`)]}),
-        xo(`No. But I'll do it anyway.`,`No. But I will do it.`,{tone:'kind',fn:()=>{ G.flags.dr_split='brave'; },then:[xl('iska',`That's the bravest answer there is. Hold my hand. Wardens, now!`,`That is the bravest answer. Hold my hand. Now!`)]})
+        xo(`No. But I'll do it anyway.`,`No. But I will do it.`,{tone:'kind',fn:()=>{ G.flags.dr_split='brave'; },then:[xl('iska',`That's the best answer anyone ever gave me. Hold my hand. Wardens, now!`,`That's the best answer. Hold my hand. Now!`)]})
       ]),
       xl('narr',`Five lanterns flare. Your father's fire rises out of him like a river of light, and half of it pours into you.`,`Five lanterns shine. Half of your father's fire flows into you.`),
       xc('narr',`It hurts. It hurts like a sunburn on the inside.`,`It hurts, like a sunburn inside.`,[
@@ -581,13 +581,14 @@ const DREAMS={
     lines:()=>{
       const k=G.flags.dr_knight;
       const L=[
-        xl('narr',`The longest night again, one year later. You climb the hill above the valley with a paper lantern in your claws.`,`One year later. You climb a hill with a paper lantern.`),
+        xl('narr',`The shortest night again, one year later. You climb the hill above the valley with a paper lantern in your claws.`,`One year later. You climb a hill with a paper lantern.`),
         xl('narr',`Behind you, the mountain is quiet. Your father has been asleep for exactly one year.`,`Your father has been asleep for one year.`)];
       if(k) L.push(xl('narr',k==='flower'?`Far below at the gate, a young knight raises his helmet to say hello. There's a red flower in it.`:k==='spark'?`Far below at the gate, a young knight raises one hand to say hello. His gauntlet glows with a little spark.`:`Far below at the gate, a young knight is still chuckling at a joke from one year ago.`,
         k==='flower'?`At the gate, the knight waves. The red flower is still on his helmet.`:k==='spark'?`At the gate, the knight waves. His glove still glows.`:`At the gate, the knight still laughs at your joke.`));
       L.push(xc('ember_kid',`How many lanterns will you light?`,`How many lanterns will you light?`,[
         xo(`Just one. For Father.`,`Just one. For Father.`,{fn:()=>{ G.flags.dr_lantern='one'; },then:[xl('narr',`You light it and hold it up high, so that he can see it from his sleep and know where home is.`,`You hold it up high, so he can see it and know where home is.`)]}),
-        xo(`One more than I need`,`One more than I need`,{tone:'kind',fn:()=>{ G.flags.dr_lantern='more'; },then:[xl('narr',`You light one for Father, and one more, just in case. Iska taught you that. "Light one more than you think you need."`,`You light one for Father, and one more. Iska taught you that.`)]}),
+        xo(`One more than I need`,`One more than I need`,{tone:'kind',fn:()=>{ G.flags.dr_lantern='more'; },then:[xl('narr',`You light one for Father, and one more, just in case. Iska taught you that. "Light one more than you think you need."`,`You light one for Father, and one more. Iska taught you that.`),
+          xl('narr',`Out of the dark comes a little grey moth, shivering. She lands on the extra lantern, spreads her wings over the warm paper, and stays.`,`A little grey moth lands on the extra lantern. She stays.`)]}),
         xo(`One for every house in the valley`,`One for every house`,{tone:'brave',fn:()=>{ G.flags.dr_lantern='all'; },then:[xl('narr',`It takes all night. When you're done, the whole valley glows. People come out of their houses to see. Nobody runs.`,`It takes all night. The whole valley glows. Nobody runs away.`)]})
       ]),
       xl('narr',`That was the very first Lantern Day. A thousand years later, a kid with horns and a tail would light the thousandth one.`,`That was the first Lantern Day. A thousand years later, you would light the thousandth.`),
@@ -599,7 +600,7 @@ const DREAMS={
       xl('narr',`You dream of a hill covered in lanterns. A girl with horns is sitting in the grass, swinging her feet.`,`You dream of a hill full of lanterns. A girl with horns sits in the grass.`),
       xl('ember_kid',`You did it. You really did it. I knew you would. All right, I hoped. But I hoped very hard.`,`You did it! I hoped so hard.`),
       xc('ash',`What do you say?`,`What do you say?`,[
-        xo(`Thank you, Grandma Ember`,`Thank you, Grandma Ember`,{tone:'kind',fn:()=>{ G.flags.dr_home='thanks'; },then:[xl('ember_kid',`Just Ember. Thirteen greats is far too many greats.`,`Just Ember. Thirteen greats is too many!`)]}),
+        xo(`Thank you, Grandma Ember`,`Thank you, Grandma Ember`,{tone:'kind',fn:()=>{ G.flags.dr_home='thanks'; },then:[xl('ember_kid',`Grandma! Nobody has called me that in a thousand years. Say it again.`,`Grandma! Nobody calls me that. Say it again.`)]}),
         xo(`Will I see you again?`,`Will I see you again?`,{fn:()=>{ G.flags.dr_home='again'; },then:[xl('ember_kid',`Every Lantern Day. Look for the brightest lantern. That's me, waving.`,`Every Lantern Day. Look for the brightest lantern. That is me, waving.`)]})
       ]),
       xl('narr',`She hugs you. It feels like sunshine on your scales. Then you wake up, and it's morning, and somebody is making pancakes.`,`She hugs you. It feels like sunshine. Then you wake up. Someone is making pancakes.`)]}
@@ -616,7 +617,7 @@ const DREAM_TALK={
   five:{maren:{tove:S(`Your claws were warm all night. Toasty. I tucked you in and nearly burned my hand.`,`Your claws were very warm last night!`),sedge:S(`Why is there steam coming off your pillow? Never mind. I don't want to know.`,`Why is your pillow steaming?`),bram:S(`You were laughing in your sleep. Something about a goat with no ending.`,`You laughed in your sleep. Something about a goat.`),iska:S(`You folded your blanket into a lantern shape in your sleep. It was lopsided. It was perfect.`,`You folded your blanket like a lantern. It was perfect.`)},
     yara:S(`The five Wardens around a fire. I always pictured Bram doing all the talking.`,`I always think Bram talked the most.`)},
   split:{maren:{sure:S(`You look older today. Not taller. Just... older. I don't like it. Eat a pancake.`,`You look older today. Eat a pancake.`),brave:S(`You look older today. Not taller. Just... older. I don't like it. Eat a pancake.`,`You look older today. Eat a pancake.`)},
-    yara:S(`The longest night. Ember laughed, the pages say. Did she? I always hoped she did.`,`On the longest night, Ember laughed. I hope she did.`)},
+    yara:S(`The shortest night. Ember laughed, the pages say. I always hoped she did.`,`On the shortest night, Ember laughed. I hope she did.`)},
   knight:{maren:{flower:S(`Somebody left a red flower on the forge this morning. Was that you?`,`There was a red flower on the forge. Was that you?`),spark:S(`There's a little spark in my glove that won't go out. Ash. Did you do that?`,`There is a spark in my glove that won't go out!`),joke:S(`I heard you laughing at your own joke in your sleep. Was it the gate one? It's a terrible joke. I love it.`,`You laughed at your own joke in your sleep!`)},
     yara:S(`Sir Cindervane. A thousand years at that gate. Imagine what he thinks about.`,`Sir Cindervane waited a thousand years. Wow.`)},
   lantern:{maren:{one:S(`I left a lantern in the window for you. Just one. You know why.`,`I put a lantern in the window for you.`),more:S(`I left two lanterns in the window. One for you, and one more, just in case.`,`I put two lanterns in the window for you.`),all:S(`Every house in the village put a lantern out tonight. Nobody planned it. Isn't that strange?`,`Every house put out a lantern tonight!`)},

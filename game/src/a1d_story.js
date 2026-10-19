@@ -6,7 +6,7 @@ const STORY={
   // the opening: a new game starts with Ash asleep in his bed upstairs; Mom calls up from the kitchen on her way to the forge
   prologue:[
     ['narr',S(`A thousand years ago, the dragon Vorlaxis lay on top of Cinder Mountain and looked down at the valley of Embermere. He had one word for everything he saw. Mine.`,`Long ago, the dragon Vorlaxis looked down at the valley. He had one word for it: mine.`)],
-    ['narr',S(`Five Wardens stood up to him, and so did his own daughter, Ember. You cannot kill a dragon made of fire. So on the shortest night of the year, they split his fire in two.`,`Five Wardens and his daughter Ember stood up to him. They split his fire in two.`)],
+    ['narr',S(`Five Wardens stood up to him, and so did his own daughter, Ember. You cannot kill a dragon made of fire. So at Midsummer, on the shortest night of the year, they split his fire in two.`,`Five Wardens and his daughter Ember stood up to him. They split his fire in two.`)],
     ['narr',S(`Half stayed with Vorlaxis, chained in sleep under the mountain. The other half went with Ember. She gave it to her children, and they gave it to theirs.`,`Half stayed with him, asleep under the mountain. Ember gave the other half to her children.`)],
     ['narr',S(`The chains were made to hold for a thousand years. Every year since, on that short night, the valley has hung out lanterns. Most people have forgotten why.`,`The chains would hold a thousand years. Every year, the valley lights lanterns. Most people forget why.`)],
     ['narr',S(`Most of Ember's family forgot too. All they have left of her fire is warm hands. Then Ash was born, with horns, a tail, and real fire.`,`Most of Ember's family just have warm hands now. Then Ash was born, with real fire.`)],
