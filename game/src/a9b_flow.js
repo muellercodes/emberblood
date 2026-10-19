@@ -19,9 +19,73 @@ function startStory(fromSave){
   if(s&&s.v===3){ loadGame(s); scene='play'; hideAll(); updateCam(0,true); G.chunkBurst=16; setBanner(regionAt(player.x,player.y).name,'Journey resumed',2.2); return; }
   newRun('story'); clearStatic(); fogInit('');
   player.x=POI.village.x+60; player.y=POI.village.y+150; player.facing=-Math.PI/2;
-  setupNPCs(); placeGoat(); updateCam(0,true); G.chunkBurst=16;
+  setupNPCs(); placeGoat();
+  wakeInBed();   // (v11) asleep upstairs at home; if the house is missing he starts on the street, as before
+  updateCam(0,true); G.chunkBurst=16;
   G.hintT=30;
-  runDialogue(STORY.prologue,()=>{ scene='play'; hideAll(); showCard('Chapter 1','Lantern Day'); later(2.9,questUpdated); saveGame(); });
+  runDialogue(STORY.prologue||STORY.open,()=>{ wakeUp(); scene='play'; hideAll(); showCard('Chapter 1','Lantern Day'); later(2.9,questUpdated); saveGame(); });
+}
+// ---------- a new story wakes Ash in his own bed (v11). Drew: "Why is Ash outside when his mom calls him awake?"
+// He sleeps in the attic hideout at home (h_ash_up, the bed is in a2e_interiors.js); the opening plays there with him
+// asleep under the quilt, Mom calling up the stairs; then he gets up, and walks down the stairs and out of the door
+// himself. Old saves never come here (loadGame puts them where they saved).
+const WAKE={on:false,bed:null};
+function wakeInBed(){
+  const d=DOORS.find(q=>q.area==='h_ash'); if(!d||!AREADEFS.h_ash||!AREADEFS.h_ash_up) return false;
+  enterArea('h_ash',d); if(!AREA||AREA.id!=='h_ash') return false;
+  goFloor({to:'h_ash_up'});
+  G.banner=null; if(G.bannerQ) G.bannerQ.length=0;   // no "Home" or room name over the opening
+  const bed=AREA&&AREA.id==='h_ash_up'&&AREA.objs.find(o=>o.k==='bed'&&o.home); if(!bed) return true;
+  WAKE.on=true; WAKE.bed=bed;
+  player.x=bed.x; player.y=bed.y+8; player.facing=Math.PI/2; player.kvx=player.kvy=0;   // under the quilt (drawn by drawSleeper)
+  return true;
+}
+function wakeUp(){
+  const b=WAKE.bed; WAKE.on=false; WAKE.bed=null; if(!b||!AREA||AREA.id!=='h_ash_up') return;
+  // out of bed on the side that faces the room, facing the stairs down
+  const r=player.r||14, spots=[[b.x+b.w/2+r+6,b.y+b.h*0.18],[b.x+b.w/2+r+6,b.y-b.h*0.18],[b.x,b.y+b.h/2+r+6]];
+  const s=spots.find(([x,y])=>stairStandFree(AREA,x,y,r,null))||spots[0];
+  player.x=s[0]; player.y=s[1]; player.kvx=player.kvy=0;
+  const st=AREA.objs.find(q=>q.k==='stairs'&&q.back); player.facing=st?angTo(player.x,player.y,st.x,st.y):Math.PI/2;
+  emit(b.x+b.w*0.3,b.y,10,{col:'240,228,206',glow:false,smin:20,smax:70,lmin:.3,lmax:.6,zmin:1,zmax:4});
+  SFX.play('step',0.8);
+}
+// Ash asleep: the top of his head on the pillow (eyes shut, horns over the pillow), the quilt pulled up to his chin and
+// rising and falling over him, one claw on top, his tail hanging off the side with its little ember, and Z's.
+{ const base=drawPlayer; drawPlayer=function(){ if(WAKE.on&&WAKE.bed&&AREA&&AREA.id==='h_ash_up'){ drawSleeper(WAKE.bed,G.time||0); return; } return base.apply(this,arguments); }; }
+function drawSleeper(b,t){
+  const g=ctx, x0=b.x-b.w/2, y0=b.y-b.h/2, w=b.w, cx=b.x+3, br=Math.sin(t*1.6), hx=cx, hy=y0+21;
+  g.save(); g.lineJoin='round'; g.lineCap='round';
+  // the tail, out from under the quilt and over the side of the bed, an ember at its tip
+  g.strokeStyle='#4a1208'; g.lineWidth=7; g.beginPath(); g.moveTo(x0+w-8,y0+64); g.quadraticCurveTo(x0+w+10,y0+66,x0+w+9,y0+84); g.stroke();
+  g.strokeStyle='#9a3420'; g.lineWidth=4.6; g.stroke();
+  g.fillStyle='#b0402a'; g.beginPath(); g.moveTo(x0+w+5,y0+82); g.lineTo(x0+w+9,y0+92); g.lineTo(x0+w+13,y0+82); g.closePath(); g.fill();
+  glowAt(x0+w+9,y0+92,12,'255,170,70',0.45+0.15*Math.sin(t*7));
+  // head on the pillow
+  for(const s of [-1,1]){ // horns, curling back over the pillow
+    g.strokeStyle='#5e4a30'; g.lineWidth=4.4; g.beginPath(); g.moveTo(hx+s*4.5,hy-5); g.quadraticCurveTo(hx+s*7,hy-12,hx+s*12.5,hy-13); g.stroke();
+    g.strokeStyle='#efe0bf'; g.lineWidth=2.8; g.stroke(); }
+  g.fillStyle='#5e1a10'; g.beginPath(); g.ellipse(hx,hy,10.6,9.6,0,0,TAU); g.fill();
+  g.fillStyle='#b0402a'; g.beginPath(); g.ellipse(hx,hy,9.4,8.4,0,0,TAU); g.fill();
+  g.fillStyle='#e2694a'; g.beginPath(); g.ellipse(hx-3,hy-3,4,3,-0.4,0,TAU); g.fill();
+  g.fillStyle='#c8573a'; g.beginPath(); g.ellipse(hx,hy+5,5.2,3.8,0,0,TAU); g.fill();
+  g.fillStyle='#4a1208'; g.fillRect(hx-2.2,hy+4.2,1.2,1.2); g.fillRect(hx+1,hy+4.2,1.2,1.2);
+  g.strokeStyle='#3a0e06'; g.lineWidth=1.3; for(const s of [-1,1]){ g.beginPath(); g.arc(hx+s*4,hy-0.5,2,0.15*Math.PI,0.85*Math.PI); g.stroke(); }
+  // the quilt raised over him (the bed's own patchwork shows through): lit on the top left, in shade on the bottom
+  // right, a soft shadow along its edge; it rises and falls as he breathes
+  const qy=y0+60, qw=17+br*0.5, qh=24+br*0.9;
+  g.save(); g.beginPath(); g.ellipse(cx,qy,qw,qh,0,0,TAU); g.clip();
+  const lg=g.createLinearGradient(cx-qw,qy-qh,cx+qw*0.8,qy+qh); lg.addColorStop(0,'rgba(255,238,206,.42)'); lg.addColorStop(0.42,'rgba(255,238,206,.08)'); lg.addColorStop(0.62,'rgba(40,8,2,.06)'); lg.addColorStop(1,'rgba(40,8,2,.46)');
+  g.fillStyle=lg; g.fillRect(cx-qw,qy-qh,qw*2,qh*2); g.restore();
+  g.strokeStyle='rgba(40,8,2,.32)'; g.lineWidth=2.2; g.beginPath(); g.ellipse(cx+0.8,qy+0.8,qw,qh,0,-0.35*Math.PI,0.85*Math.PI); g.stroke();
+  g.strokeStyle='rgba(255,236,200,.35)'; g.lineWidth=1.2; g.beginPath(); g.ellipse(cx,qy,qw-0.6,qh-0.6,0,0.95*Math.PI,1.6*Math.PI); g.stroke();
+  // the hem pulled up to his chin, and one claw on top of it
+  g.fillStyle='#f4eee2'; rrect(g,x0+3,y0+29,w-6,6.5,2.5); g.fill(); g.fillStyle='rgba(120,100,80,.3)'; g.fillRect(x0+4,y0+34.5,w-8,1);
+  g.fillStyle='#5e1a10'; g.beginPath(); g.ellipse(hx+11,y0+33,4.4,3.4,0.3,0,TAU); g.fill(); g.fillStyle='#b0402a'; g.beginPath(); g.ellipse(hx+11,y0+32.6,3.4,2.5,0.3,0,TAU); g.fill();
+  // Z's drifting up from the pillow
+  for(let i=0;i<3;i++){ const k=(t*0.45+i/3)%1, a=Math.sin(k*Math.PI), sz=7+k*7, zx=hx+10+k*18+Math.sin(t*1.3+i*2)*2, zy=hy-10-k*34;
+    g.globalAlpha=a; g.font=`800 ${sz.toFixed(1)}px ${UIF}`; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=3; g.strokeStyle='rgba(40,20,10,.7)'; g.strokeText('z',zx,zy); g.fillStyle='#fff4dc'; g.fillText('z',zx,zy); }
+  g.restore();
 }
 function playerDied(){
   const p=player; p.dead=true; p.breathing=false; SFX.setFire(false); SFX.play('death'); shake(12);
