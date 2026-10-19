@@ -182,7 +182,7 @@ function letterLines(){
   return [xl('narr',`Flap. Flap. FLOMP. A crow lands right on your head. It's Pebble, Elder Yara's crow, with a letter tied to her leg.`,`A crow lands on your head! It's Pebble, Yara's crow. She has a letter.`),
     xl('c_letter',`"Dear Ash. Come home tonight for Lantern Night, the party after the party. There will be music and fireworks. Your mother made a cake shaped like you. It is a little scary. Love, Yara."`,`"Come home tonight for Lantern Night! Music! Fireworks! A cake shaped like you! Love, Yara."`),
     xl('c_letter',`"P.S. Pebble bites. Do not offer her cake."`,`"P.S. Pebble bites."`),
-    xl('ash',`A party AND fireworks AND a cake shaped like me? I'm on my way!`,`Fireworks and cake? On my way!`),
+    xl('ash',`A party, fireworks, and a cake shaped like me? I'm on my way!`,`Fireworks and cake? On my way!`),
     xl('narr',`Pebble nibbles your horn, just a little, and flaps away toward home.`,`Pebble bites your horn. Then she flies home.`)];
 }
 function crowArrived(){
@@ -260,7 +260,7 @@ const GUESTS=[
   {id:'elka',q:'race',t:[`Race you to the cake! Ready, go! ...Okay, I already won. And ate some.`,`Race you to the cake! I won.`]},
   {id:'nib',q:'seek',t:[`I'm hiding! You can't see me! ...You can see me, can't you.`,`I'm hiding! Can you see me?`]},
   {id:'gorran',q:'mine',t:[`Brought you a lump of star-iron for the bonfire. It doesn't burn. It just sits there looking expensive.`,`I brought star-iron. It just looks shiny.`]},
-  {id:'osric',q:'bounty',t:[`Captain Osric, on duty. Even at parties. ESPECIALLY at parties.`,`On duty, even at parties!`]},
+  {id:'osric',q:'bounty',t:[`Captain Osric, on duty, even tonight. Parties are when people get careless.`,`On duty, even tonight. People get careless at parties.`]},
   {id:'moss',q:'moss',t:[`I came all the way out of the bog for this! My knees want a chair and a cup of tea.`,`I came out of the bog! My knees want a chair.`]}
 ];
 function guestList(){
@@ -288,20 +288,20 @@ function festPeople(){
 function festIntroLines(day){
   const L=[], e=G.choices.ending||'hero', gs=guestList();
   if(day) L.push(xl('narr',`You get home just as the sun goes down. By the time you reach the green, the first stars are out.`,`You get home at sunset. The stars come out.`));
-  L.push(xl('narr',`That night, Emberhollow glowed. Paper lanterns on every roof. Music on the green. Somebody's goat was wearing a party hat.`,`That night, the village glowed. Lanterns everywhere! A goat in a party hat!`),
+  L.push(xl('narr',`That night Emberhollow glowed, a paper lantern on every roof. Up on a far roof, a girl in a grey cloak sits alone, watching the lanterns. You wave. She doesn't.`,`Lanterns glow on every roof. A girl in a grey cloak watches from a far roof. You wave. She doesn't.`),
     xl('maren',`There's my kid! Come here. No, closer. I am hugging you and you can't stop me.`,`There's my kid! Come here for a hug!`),
     xl('ash',`Mom. Everybody's watching. Also my horns are stuck in your apron.`,`Mom! My horns are stuck in your apron.`),
-    xl('yara',`Welcome to Lantern Night, Ash, the party after the party. Four hundred and twelve lanterns on the roofs. I counted them twice.`,`Welcome to Lantern Night! 412 lanterns. I counted!`),
+    xl('yara',`Welcome to Lantern Night, Ash, the party after the party. I haven't seen the village this bright since I was a girl.`,`Welcome to Lantern Night! The village has never been so bright.`),
     xl('wren',`I left my library for a whole night! I brought books to a party. Tilly says that is not how parties work.`,`I brought books to a party. Tilly says that is wrong.`));
   for(const g of gs.slice(0,2)) L.push([g.id,S(g.t[0],g.t[1])]);
   if(G.flags.pip) L.push(xl('pip',`Mip! Mip mip!`,`Mip! Mip mip!`),xl('narr',`Pip has cake on his nose. He is extremely proud of it.`,`Pip has cake on his nose. He is proud.`));
   if(e==='lantern') L.push(xl('c_grandpa',`Is that cake? Is that a cake shaped like YOU? May I eat the tail?`,`Is that a cake shaped like you? Can I eat the tail?`),xl('maren',`After the fireworks, Grandpa. And wipe your feet.`,`After the fireworks, Grandpa. Wipe your feet.`));
-  else if(e==='heir') L.push(xl('narr',`Grandpa watches the party from his birdcage on the cake table. He has been glaring at the cake for an hour.`,`Grandpa sits in his birdcage. He glares at the cake.`),xl('c_grandpa',`That stone by the forge was MY fire, you know. I'm only saying.`,`That stone was MY fire. Just saying.`));
+  else if(e==='heir') L.push(xl('narr',`Bertram has carried Grandpa down from the warm shelf over his oven, so he can see the party. Grandpa has been glaring at the cake for an hour.`,`Tiny Grandpa came to the party. He glares at the cake.`),xl('c_grandpa',`That stone by the forge was MY fire, you know. I'm only saying.`,`That stone was MY fire. Just saying.`));
   else if(e==='warden') L.push(xl('ash',`I carried the Ember Heart down from the summit, so everyone could see it tonight. It's warm as toast.`,`I brought the Ember Heart down from the mountain. It's warm!`),xl('maren',`It can sit by the forge for the night. Safest spot in the valley.`,`It can sit by the forge. It's safe there.`));
   else L.push(xl('maren',`And look. The Ember Heart, all cozy on its little stand by the forge. It hums when I hammer. I think it likes the music.`,`Look, the Ember Heart! It hums when I hammer.`));
   L.push(xl('narr',`By the forge, the Ember Heart glows on its stand, warm and red, like a little sun that came to the party.`,`The Ember Heart glows by the forge. Warm and red.`),
-    xl('yara',`It's time. The first firework is yours, Ash. The big rocket by the well. One breath. A GENTLE breath.`,`Time for fireworks! Light the big rocket. Gently!`),
-    xl('ash',`Gentle. Not like the bakery curtains. I promise.`,`Gentle. I promise!`));
+    xl('yara',`It's time. The first firework is yours, Ash. The big rocket by the well. One breath. A gentle one.`,`Time for fireworks! Light the big rocket. Gently!`),
+    xl('ash',`Gentle. I've been practicing all year.`,`Gentle. I've been practicing!`));
   return L;
 }
 function festStart(){
@@ -344,7 +344,7 @@ function theftLines(){
     xl('maren',`The Heart! Ash, the Ember Heart is GONE!`,`The Heart! It's GONE!`),
     xl('narr',`On the forge roof stands a figure in a cloak like two great moth wings. A white mask hides her face. In her gloved hand, the Ember Heart glows.`,`On the roof stands a masked thief with moth wings. She has the Heart!`),
     xl('c_thief',`Lovely fireworks, Emberhollow. Everybody looked up, and nobody looked at the forge. Thank you!`,`Lovely fireworks! Nobody looked at the forge. Thanks!`),
-    xl('ash',`Hey! That's ours! Put it back, or I'll... I'll ask you VERY firmly!`,`Hey! That's ours! Put it back!`)];
+    xl('ash',`Hey! That's ours! Put it back, or I'll... I'll ask you very firmly!`,`Hey! That's ours! Put it back!`)];
   if(G.flags.pip) L.push(xl('pip',`MIP!!`,`MIP!!`));
   L.push(xl('c_thief',`Catch me first, little dragon. If you can.`,`Catch me first, little dragon!`));
   return L;
@@ -354,12 +354,12 @@ function cliffLines(){
     xl('ash',`Why do you even want it? It's a warm rock! A very important warm rock, but still!`,`Why do you want it? It's just a warm rock!`),
     xl('c_thief',`Because someone promised me it would fix something that has been broken for a long, long time.`,`Someone promised it would fix something broken.`),
     xl('c_thief',`...Sorry. Really. I'm a thief, not a liar.`,`Sorry. Really.`),
-    xl('narr',`She spreads her cloak. It opens like a pair of enormous moth wings, dusty silver and violet, with two great golden eyes painted on them.`,`She opens her cloak. It's a pair of huge moth wings!`),
+    xl('narr',`She spreads her cloak, the grey one from the roof. It opens like a pair of enormous moth wings, dusty silver and violet, with two great golden eyes painted on them.`,`She opens her grey cloak. It's a pair of huge moth wings!`),
     xl('c_thief',`Goodnight, Emberblood!`,`Goodnight, Emberblood!`)];
 }
 function gearLines(){
   return [xl('narr',`A brass gear, still warm from her pocket. Tiny, perfect teeth. Stamped on one side in curly letters: GEARHAVEN.`,`A brass gear! It says GEARHAVEN.`),
-    xl('ash',`Gearhaven. Okay, Gearhaven. I'm coming for you. Right after I find out where you are.`,`Gearhaven. I'm coming! Wherever you are.`),
+    xl('ash',`Gearhaven. I don't even know where that is. I'm going anyway.`,`Gearhaven. I don't know where it is. I'm going anyway.`),
     xl('narr',`Footsteps pound up the path behind you. Mom, Elder Yara and Sister Wren, all very out of breath.`,`Mom, Yara and Wren come running.`)];
 }
 const CLUE_TALK={
@@ -372,16 +372,17 @@ const CLUE_TALK={
   yara:()=>[xl('yara',`Gearhaven. I haven't heard that name in fifty years. Let me see that.`,`Gearhaven! Let me see.`),
     xl('yara',`It's a port of tinkerers on the Clockwork Coast. Clock towers, steam, and the loudest gulls in the world. Down the cliffs and beyond the Southern Pass.`,`It's a port by the sea. Clocks, steam, loud gulls. Past the Southern Pass.`),
     xl('yara',`The pass is the old road down the cliffs, just east of here by the signpost. Two hundred and six steps down. Mind every one of them.`,`The pass is east, by the signpost. 206 steps down.`)],
-  wren:()=>[xl('wren',`A moth-wing cloak? A white mask? Ash. ASH! That was the Moth Mask!`,`Moth wings and a mask? That was the Moth Mask!`),
+  wren:()=>[xl('wren',`A moth-wing cloak? A white mask? Ash, that was the Moth Mask!`,`Moth wings and a mask? That was the Moth Mask!`),
     xl('ash',`The what?`,`The what?`),
-    xl('wren',`The thief of Gearhaven! A legend! I have three books about her. Two of them are wrong and one of them bit me.`,`A famous thief! I have three books about her. One bit me.`),
-    xl('wren',`In every story, the Moth Mask only steals things that glow. Lamps. Gems. A lighthouse, once. Never anything to sell. Curious, isn't it?`,`She only steals things that glow. Never to sell. Odd!`)]
+    xl('wren',`The thief of Gearhaven. The Gearhaven Gazette writes about her every week. Tilly gets it for the inn, and I read it for the crossword.`,`A thief from Gearhaven. Their newspaper writes about her every week.`),
+    xl('wren',`She only steals things that glow. Lamps, mostly. Gems. And she never sells any of it. Curious, isn't it?`,`She only steals things that glow. She never sells them. Odd!`)]
 };
 function sendOffLines(){
   const L=[xl('maren',`So. You're going after her.`,`So. You're going after her.`),
     xl('ash',`I have to, Mom. The Heart is the last of the First Flame. If somebody bad wants it, that's... bad.`,`I have to. Someone bad wants the Heart.`),
-    xl('maren',`...Fine. But you write. You eat. You take a scarf, the sea is windy. And you come HOME.`,`Fine. Write. Eat. Take a scarf. Come home.`),
-    xl('yara',`Pebble will find you wherever you go. She always does. Usually at breakfast.`,`Pebble the crow will find you.`),
+    xl('maren',`I know. I knew it the minute you picked up that gear. Take a scarf. The sea is windy.`,`I know. Take a scarf. The sea is windy.`),
+    xl('maren',`And there'll be a lantern in my window every night until you're home. So don't take forever.`,`I'll keep a lantern in the window till you're home.`),
+    xl('yara',`Pebble will find you wherever you go. Usually at breakfast.`,`Pebble the crow will find you.`),
     xl('wren',`Take notes! Draw everything! Especially the clocks!`,`Take notes! Draw the clocks!`)];
   if(G.flags.pip) L.push(xl('pip',`Mip!`,`Mip!`),xl('narr',`Pip is coming too. That was never a question.`,`Pip is coming too!`));
   return L;
@@ -577,7 +578,7 @@ for(const n of [2,3,4,5]) ACTS[n]._kit0=ACTS[n].kit;
 defineStages(1,[{id:'done',
   idle:()=>G.flags.act1_done?S('Explore Embermere. Yara is planning something for tonight.','Explore! Yara has a plan for tonight.'):'',
   hint:()=>G.flags.act1_done?S(`Go wherever you like, Ash. Tonight is Lantern Night. I'll send Pebble when it's time.`,`Go explore! Tonight is Lantern Night.`):'',
-  soFar:()=>G.flags.act1_done?S('Vorlaxis is quiet at last. He left behind a warm red stone called the Ember Heart. Tonight is Lantern Night.','Grandpa is quiet now. He left a warm stone, the Ember Heart. Tonight is Lantern Night.'):'',
+  soFar:()=>G.flags.act1_done?S('The First Flame is settled. What it left behind is a warm red stone called the Ember Heart. Tonight is Lantern Night.','The First Flame is settled. It left a warm stone, the Ember Heart. Tonight is Lantern Night.'):'',
   marker:id=>!!G.flags.act1_done&&id==='yara'&&!HS.crow,
   // Yara or Mom can tell Ash about Lantern Night themselves, before Pebble finds him
   talk(n){
@@ -652,7 +653,7 @@ defineStages(2,[
   {id:'c_pass',chapter:S('The Southern Pass','The Southern Pass'),card:['Act II · Chapter 2',S('The Southern Pass','The Southern Pass')],at:{x:3300,y:10760},
     objectives:()=>curMap()===0?[{text:S('Take the Southern Pass down to the Clockwork Coast','Go down the Southern Pass'),x:HV.pass.x,y:HV.pass.y}]:[],
     hint:S(`The Southern Pass is just east along the cliffs, by the old signpost. Two hundred and six steps down to the Clockwork Coast.`,`The pass is east, by the signpost.`),
-    soFar:S('Gearhaven is a clockwork port on the coast beyond the Southern Pass. Sister Wren says the thief is the Moth Mask, a legend who only steals things that glow.','Gearhaven is a port past the Southern Pass. The thief is the Moth Mask. She steals things that glow.'),
+    soFar:S('Gearhaven is a clockwork port on the coast beyond the Southern Pass. Sister Wren says the thief is the Moth Mask: the Gearhaven Gazette writes about her every week, and she only steals things that glow.','Gearhaven is a port past the Southern Pass. The thief is the Moth Mask. She steals things that glow.'),
     mom:[S(`Scarf. Did you pack a scarf? Pack two.`,`Did you pack a scarf?`)],
     yara:[S(`Two hundred and six steps. East, by the signpost.`,`206 steps. East, by the sign.`)],
     talk(n){ const L=SEND_LINE[n.id]; if(!L||HS.sent[n.id]) return false; HS.sent[n.id]=true; runDialogue([[n.id,S(L[0],L[1])]],()=>{ scene='play'; }); return true; },
@@ -672,7 +673,7 @@ function heartLines(e){
   const L={
     hero:xl('narr',`Where the First Flame went out, something was left in the ashes: a warm red stone the size of a plum, beating softly like a heart. Mom named it the Ember Heart and kept it in the forge, where it hummed whenever she worked.`,`Something was left in the ashes: a warm red stone, like a heart. Mom called it the Ember Heart. She kept it in the forge.`),
     warden:xl('narr',`Inside the new sixth Ward-fire sat a warm red stone the size of a plum, beating softly like a heart: the last spark of the First Flame. The Wardens called it the Ember Heart.`,`In the sixth Ward-fire sat a warm red stone, like a heart. The Wardens called it the Ember Heart.`),
-    heir:xl('narr',`When the fire poured into Ash, one small piece did not fit: a warm stone the size of a plum, beating like a tiny heart. Mom put the Ember Heart on a shelf in the forge. Grandpa glared at it from his birdcage.`,`One small piece of fire did not fit: a warm stone, like a heart. Mom put the Ember Heart in the forge.`),
+    heir:xl('narr',`When the fire poured into Ash, one small piece did not fit: a warm stone the size of a plum, beating like a tiny heart. Mom put the Ember Heart on a shelf in the forge. Grandpa glared at it from the warm shelf over Bertram's oven.`,`One small piece of fire did not fit: a warm stone, like a heart. Mom put the Ember Heart in the forge.`),
     lantern:xl('narr',`Grandpa coughed up a warm red stone the size of a plum, beating softly like a heart. "The last of my old fire," he said. "Keep it safe, Maren. I don't trust myself with it." Mom put the Ember Heart over the forge.`,`Grandpa coughed up a warm stone, like a heart. "Keep it safe," he said. Mom put the Ember Heart in the forge.`)};
   return [L[e]||L.hero];
 }

@@ -58,7 +58,7 @@ STORY.a1_cinder_walk=[
   vl('cinder',`Steep, smoky, and terrible for the knees, which is exactly what I hoped for.`,`Steep, smoky, and bad for my knees. I love it.`),
   vl('cinder',`I'll go ahead to the crater stairs and hold them. Nothing that serves him comes up behind you. You have my word, and I have been keeping my word for a very long time.`,`I will go ahead and guard the crater stairs. Nothing will sneak up behind you. I promise.`),
   ch('ash',S(`Anything you want to say to an old knight, Emberblood?`,`Anything to say to an old knight?`),[
-    {t:S(`Thank you for waiting for me.`,`Thank you for waiting for me.`),tone:'kind',then:[vl('cinder',`It was worth it. Every year. Don't tell the other knights I said that. There are no other knights. Don't tell them anyway.`,`It was worth it. Every year. Don't tell the other knights. There are none. Still, don't tell.`)]},
+    {t:S(`Thank you for waiting for me.`,`Thank you for waiting for me.`),tone:'kind',then:[vl('cinder',`It was worth it. Every year of it. Even the winters.`,`It was worth it. Even the winters.`)]},
     {t:S(`Race you to the top!`,`Race you to the top!`),tone:'brave',then:[vl('cinder',`HA! In this armor? You'll win. I'll complain the whole way.`,`HA! In this armor? You will win. I will grumble.`)]},
     {t:S(`Did you bring your chair?`,`Did you bring your chair?`),tone:'silly',then:[vl('cinder',`...How do you know about the chair? Never mind. Yes. It's at the top. Just to know it's there.`,`How do you know about my chair? Yes. It is at the top.`)]}
   ])];
@@ -69,8 +69,8 @@ STORY.a1_stragglers=[
   vl('a1_strag',`Is that the Emberblood? Is it over? Please say it's over. I want my mom.`,`Is that the Emberblood? Is it over? I want my mom.`),
   vls('narr',`Sister Soot stands up. She holds a letter. You know the handwriting. It's Morrow's.`,`Sister Soot holds up a letter. It is from Morrow.`,()=>G.choices.morrow!=='free'),
   vls('a1_soot',`Brother Morrow wrote to us. From a pumpkin patch. He says: "Go home. Grow something. It isn't worth it." He drew a pumpkin. It was a good pumpkin.`,`Morrow wrote to us. He says: "Go home. Grow something." He drew a good pumpkin.`,()=>G.choices.morrow!=='free'),
-  vls('a1_soot',`You threw Brother Morrow in a cell! We are all that's left of the Scaled Oath. We will NOT let you pass!`,`You put Morrow in a cell! We are the last of the Oath. You will NOT pass!`,()=>G.choices.morrow!=='jail'),
-  ch('ash',S(`What do you say?`,`What do you say?`),[
+  vls('a1_soot',`You threw Brother Morrow in a cell! We are all that's left of the Scaled Oath. We will not let you pass!`,`You put Morrow in a cell! We are the last of the Oath. You will not pass!`,()=>G.choices.morrow!=='jail'),
+  ch('ash',S(`What do you tell them?`,`What do you tell them?`),[
     {t:S(`Go home. All of you. It's over.`,`Go home. It's over.`),tone:'kind',cond:()=>G.choices.morrow==='free',fn:()=>{ G.flags.a1_strag='home'; },then:[
       vl('a1_soot',`...Yes. Yes, I think we will. Come on, brothers. Blow out the candle. We're going to go and look at a pumpkin.`,`Yes. I think we will. Blow out the candle. Let's go see a pumpkin.`),
       vl('narr',`The last of the Scaled Oath walk down the mountain in a line, holding hands. The knight carries the candle. It is not lit.`,`The last of the Oath walk down the mountain, holding hands. The candle is out.`)]},
@@ -86,10 +86,10 @@ STORY.a1_step_nodj=[
   vls('pip',`Mip?`,`Mip?`,()=>!G.flags.pip),
   vl('ash',`...Farmer Hollis's goat. Hollis said his goat jumps twice.`,`Farmer Hollis's goat! It jumps twice.`)];
 STORY.a1_iska_climb=[
-  vl('iska',`My lantern. I put it here a thousand years ago, on the longest night, so the five of us could find our way back down.`,`My old lantern. I put it here long ago, so we could find our way down.`),
+  vl('iska',`My lantern. I put it here a thousand years ago, on the shortest night, so the five of us could find our way back down.`,`My old lantern. I put it here long ago, so we could find our way down.`),
   vl('iska',`We never needed it. We went down a different way. Wardens are very bad at planning.`,`We never used it. Wardens are bad at plans.`),
   vls('iska',`You carry Ember's letter, don't you? Page nine. "Not as a king. Just as my father." Remember it up there. It might matter.`,`You have Ember's letter. "Just as my father." Remember it up there.`,()=>!(G.pages&&G.pages.p9)),
-  vl('iska',`The crater's vents breathe on a rhythm. Fly when they breathe out. Watch for the gold sparks. Like a person. Like a very hot, very large person.`,`The vents up top breathe. Fly in when you see gold sparks.`)];
+  vl('iska',`The crater's vents breathe in and out, like someone asleep. Fly when they breathe out. Watch for the gold sparks.`,`The vents up top breathe. Fly in when you see gold sparks.`)];
 STORY.a1_iska_cold=[vl('narr',`An old stone lantern with Iska's mark on it. It's cold and empty. One of Mom's paper lanterns would fit inside just right.`,`An old stone lantern. It is empty. Mom's lantern would fit.`)];
 // ---------- 7.5 Tier 3: Bram's Anvil
 STORY.a1_bram_climb=[
@@ -97,7 +97,7 @@ STORY.a1_bram_climb=[
   vls('bram',`And you brought Old Thunder! Look at her. She's still got the dent from the time I hit Oriel's shield by mistake.`,`You brought Old Thunder! She still has my old dent.`,()=>!vorThunder()),
   vls('bram',`No hammer? On MY mountain? Here, take this one. I left it by the anvil a thousand years ago. Still good. Hammers don't go off.`,`No hammer? Take this old one. Hammers never go bad.`,()=>!!(G.weapons&&G.weapons.hammer)),
   vl('bram',`My gate there opens for the old song. "Over Cinder Mountain." If you know it, play it. If you don't, smash rocks. Both are good. Smashing is better.`,`My gate opens for the old song. Or smash the black rocks. Smashing is better.`),
-  vl('bram',`Big black rocks want a CHARGED smash. Hold the attack, let the hammer glow, then BOOM.`,`Hold attack to charge the hammer. Then BOOM!`)];
+  vl('bram',`Big black rocks want a charged smash. Hold the attack, let the hammer glow, then BOOM.`,`Hold attack to charge the hammer. Then BOOM!`)];
 STORY.a1_gate_song=[vl('narr',`You hum the three notes Wendel taught you. Dum, da-DUM. The carved notes on the door light up one by one, and the Hammer Gate rolls aside with a grumble.`,`You hum the old song. The notes light up. The gate rolls open!`),
   vl('bram',`(from far away) THAT'S the one! Up you go, kid!`,`That's the one! Up you go!`)];
 STORY.a1_gate_shut=[vl('narr',`A stone door carved with musical notes. It doesn't move. It looks like it wants a song. Or a lot of patience.`,`A stone door with music notes. It wants a song.`)];
@@ -106,20 +106,20 @@ STORY.a1_rim=[
   vl('narr',`The crater is a bowl of fire. In the middle, on a throne of black glass, something enormous is breathing.`,`The crater is a bowl of fire. On a black throne, something huge is breathing.`),
   vl('ember',`Ash. Wait. Just for a moment.`,`Ash. Wait a moment.`),
   vl('ash',`Ember?`,`Ember?`),
-  vl('ember',`He's my father. I know what he did. I know what he wants. But I loved him, and some part of me still does.`,`He is my father. I know what he did. But I loved him. Part of me still does.`),
+  vl('ember',`He's my father. He taught me to breathe fire, and then he burned the valley with his. I loved him anyway. Part of me still does.`,`He is my father. He did terrible things. I still love him a little.`),
   vl('ember',`I'm not asking you to be gentle. He won't let you. I'm asking you to remember that whatever you do up here, you get to choose it.`,`You don't have to be gentle. But remember: up here, you get to choose.`),
-  vl('iska',`And you're not alone. Five Flames ride with yours. Can you feel us?`,`You are not alone. Five Flames ride with you.`),
-  vl('ash',`My hands are warm. Really warm.`,`My hands are warm. Really warm.`),
-  vl('ember',`Then go. My brave, silly, wonderful little ember. Go and finish it.`,`Then go, my brave little ember. Go finish it.`)];
+  vl('iska',`And you're not alone. All five of us came up the mountain with you.`,`You are not alone. All five of us are with you.`),
+  vl('ash',`I'm ready. Mostly.`,`I'm ready. Mostly.`),
+  vl('ember',`Then go on. I'll be right here. I've been right here for a thousand years.`,`Then go. I'll be right here.`)];
 // ---------- 8.1 the intro (replaces STORY.bosses.vorlaxis.intro)
 const VOR_INTRO=[
   vl('narr',`The great dragon lifts his head from the throne. Black glass cracks off his scales and tinkles down like hail.`,`The great dragon lifts his head. Black glass falls off him like hail.`),
-  vl('vor',`So. You are what Ember's line became. Small. Soft. Barely a spark. And you CLIMBED my mountain.`,`So. This is Ember's family now. Small. Soft. And you CLIMBED my mountain.`),
-  vl('ash',`Hi, Grandpa. Great-great-great-great... you know what, I'm not saying all of it.`,`Hi, Grandpa. Great-great-great... I'm not saying all of it.`),
+  vl('vor',`You have her horns. And my fire. Did you climb my mountain to give it back?`,`You have her horns. And my fire.`),
+  vl('ash',`Hi, Grandpa.`,`Hi, Grandpa.`),
   vl('vor',`For a thousand years my daughter's children fed my prison with MY fire. Today I take it back.`,`For a thousand years you kept me locked up with MY fire. Today I take it back.`),
   vl('ash',`She gave it to us. It was never yours to take back.`,`She gave it to us. It is not yours to take.`),
-  vls('pip',`MIP!`,`MIP!`,()=>!G.flags.pip),
-  vls('vor',`...You brought a DRAKE? To fight ME? Oh, I am going to enjoy this.`,`You brought a DRAKE? To fight ME? Oh, this will be fun.`,()=>!G.flags.pip),
+  vls('pip',`Mip!`,`Mip!`,()=>!G.flags.pip),
+  vls('vor',`A drake. You brought a drake to fight me.`,`You brought a drake to fight me?`,()=>!G.flags.pip),
   vl('vor',`Come then, hatchling. Show me the fire you stole.`,`Come, hatchling. Show me the fire you stole.`)];
 const VOR_INTRO2=[vl('vor',`Back again, hatchling? Good. I was getting bored.`,`Back again, hatchling? Good.`)];
 const VOR_TAUNT={
@@ -127,13 +127,13 @@ const VOR_TAUNT={
   p3:S(`ENOUGH! If I cannot have my fire, I will bury you in my MOUNTAIN!`,`ENOUGH! I will bury you in my MOUNTAIN!`),
   crash:[S('Rrraagh! My SCALES!','My SCALES!'),S('You cannot keep me DOWN!','You cannot keep me down!')],
   sum:[S('Children! To me!','Children! To me!'),S('Rise, my brood!','Rise, my brood!')],
-  sky:[S('The sky is mine, hatchling!','The sky is mine!'),S('Can you even FLY, little ember?','Can you even fly?')],
+  sky:[S('The sky is mine, hatchling!','The sky is mine!'),S('Can you even fly, hatchling?','Can you even fly?')],
   crust:[S('My mountain is my armor!','My mountain is my armor!'),S('Stone does not burn, hatchling!','Stone does not burn!')]};
 // ---------- 8.4 the finish
 STORY.a1_vor_end=[
-  vl('vor',`...How. How does something so SMALL burn so bright?`,`How? How does something so SMALL burn so bright?`),
+  vl('vor',`How? How does something so small burn so bright?`,`How does something so small burn so bright?`),
   vl('ember',`(everywhere at once) Because it isn't only hers, Father. It never was.`,`(from everywhere) Because it is not only hers, Father.`),
-  vl('vor',`...Ember?`,`...Ember?`)];
+  vl('vor',`Ember?`,`Ember?`)];
 // ---------- 9.1 to 9.5 the Ember Heart (heartLines below puts them in the epilogue)
 const VOR_HEART={
   hero:[vl('narr',`Where the dragon had been, something small glowed in the ash. A warm red stone, the size of a plum, beating very slowly, like a heart that was only dozing.`,`Where the dragon was, a warm red stone glows in the ash. It beats slowly, like a sleepy heart.`),
@@ -142,15 +142,15 @@ const VOR_HEART={
   warden:[vl('narr',`When the sixth Ward-fire caught, something rolled out of the old flame and into the new one. A warm red stone, the size of a plum, beating very slowly.`,`When the sixth Ward-fire lit, a warm red stone rolled into it. It beats slowly.`),
     vl('iska',`The Ember Heart. All that's left of the fire he couldn't keep. Leave it in your Ward-fire, Warden. It will keep him sleepy. And keep you warm on the cold climbs.`,`The Ember Heart. Leave it in your Ward-fire, Warden. It keeps him sleepy and you warm.`),
     vl('narr',`So the Ember Heart sat in the sixth Ward-fire at the top of the mountain, glowing like a tiny sunrise, and every Lantern Day Ash brought it down for the festival and carried it back up again.`,`The Ember Heart glowed in the Ward-fire like a tiny sunrise. Every Lantern Day, Ash carried it down for the party.`)],
-  heir:[vl('narr',`There was a little fire left over. Too much for Grandpa in his birdcage, not quite enough to make Ash any bigger. It rolled off the throne and sat there, glowing, the size of a plum.`,`A little fire was left over. It rolled off the throne and glowed there, the size of a plum.`),
+  heir:[vl('narr',`One small piece of the fire would not go in. It rolled off the throne and sat there glowing, the size of a plum.`,`One small piece of fire would not go in. It glowed there, the size of a plum.`),
     vl('ash',`Is that... spare fire?`,`Is that spare fire?`),
-    vl('narr',`Mom keeps it in the forge now and moves it with her longest tongs. She calls it the Ember Heart. Once, when nobody was looking, she toasted a crumpet on it.`,`Mom keeps it in the forge. She calls it the Ember Heart. Once she toasted a crumpet on it.`),
-    vl('narr',`(Being a giant dragon turned out to be very hard on doorways. By the next morning Ash had worked out how to fold back down to normal size. Mostly.)`,`(Being a giant dragon was hard on doors. By morning Ash was normal size again. Mostly.)`)],
+    vl('narr',`By morning Ash had found out that his mother's door does not fit a dragon. So he breathed most of the fire back out, on purpose, into every lantern, hearth and oven in the valley, and folded back down to his own size.`,`Mom's door doesn't fit a dragon. So Ash gave most of the fire away, to every lantern and oven in the valley.`),
+    vl('narr',`Mom keeps the spare piece in the forge and calls it the Ember Heart. Grandpa, very small and very bitter, sits on the warm shelf above Bertram's oven, and has never once said thank you.`,`Mom keeps the Ember Heart in the forge. Tiny Grandpa sits on the warm shelf over Bertram's oven.`)],
   lantern:[vl('narr',`Halfway down the mountain, Grandpa coughed. Something warm and red tumbled out and bounced on the path.`,`Halfway down, Grandpa coughed. A warm red stone bounced out.`),
     vl('vor',`Hm. That's the last of it. The old flame. I don't need it anymore. It's heavy, and it makes me grumpy.`,`That's the last of my old fire. I don't need it. It makes me grumpy.`),
     vl('vor',`Give it to your mother. Tell her to keep it somewhere warm. And tell her I'm sorry about the bakery. Not that bakery. The one from nine hundred years ago.`,`Give it to your mother. And tell her sorry about the bakery. The very old one.`),
     vl('narr',`Maren put the Ember Heart above the forge. Grandpa sat next to it every evening, the size of a goat, warming his old claws and pretending he wasn't.`,`Mom put the Ember Heart above the forge. Grandpa sat by it every evening, warming his claws.`)]};
-const VOR_LANTERNS=vl('maren',`Three little lights on the mountain. I watched every one. I didn't sleep. I'm not going to sleep for a week. Come here.`,`Three little lights on the mountain. I watched every one. Come here.`);
+const VOR_LANTERNS=vl('maren',`Three little lights on the mountain. I watched every one. Come here.`,`Three little lights on the mountain. I watched every one. Come here.`);
 // small lines (banners, bubbles, tips)
 const VT={
   p1:[S('Jump the rings!','Jump the rings!'),S('He stomps and the lava rolls in as rings. JUMP over them. Hide behind a pillar from his fire breath.','Jump over the rings! Hide from his fire.')],
@@ -563,7 +563,7 @@ function vorWayUp(){
   const out=base();
   try{ if(G.mode==='story'&&G.stage==='summit'&&!AREA){
     for(const o of out){ if(o.site!=='summit') continue; const w=vorWayUp(); if(w){ o.text=w.t; o.x=w.x; o.y=w.y; } }
-    if(!G.quests.a1_lanterns&&player.y>3100&&qAvail('a1_lanterns')){ const m=npcOf('maren'); if(m) out.push({text:S('Optional: Mom has something for you before the climb','Optional: see Mom first'),x:m.x,y:m.y,npc:'maren'}); }
+    if(!G.quests.a1_lanterns&&player.y>3100&&qAvail('a1_lanterns')){ const m=npcOf('maren'); if(m) out.push({text:S('Go home first: Mom is waiting at the forge with something for the climb','See Mom at the forge before you climb'),x:m.x,y:m.y,npc:'maren'}); }
   } }catch(e){ console.error(e); }
   return out; }; }
 function vorTierEnter(t){
