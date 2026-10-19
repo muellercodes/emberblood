@@ -77,7 +77,11 @@ function houseLayout(def){
   if(st==='knitter'){ put('yarn',W*0.3,H*0.75,{}); put('rocker',W*0.3,H*0.62,{}); put('cat',W*0.38,H*0.82,{}); }
   if(st==='fiddler'){ put('lute',W*0.3,H*0.78,{}); put('cat',W*0.75,H*0.8,{}); }
   if(st==='herbalist'){ put('herbs',W*0.3,wallY+10,{}); put('planter',W*0.28,H*0.78,{}); put('planter',W*0.4,H*0.8,{}); put('cauldron',W*0.82,H*0.78,{small:true}); }
-  if(st==='ash'){ put('bed',70,120,{w:62,h:96,home:true}); put('bed',W-70,120,{w:62,h:96,mom:true}); put('fireplace',W/2,wallY+14,{}); put('table',W*0.55,H*0.58,{w:90,h:56}); put('chair',W*0.55-60,H*0.58,{}); put('chair',W*0.55+60,H*0.58,{}); put('portraits',W*0.3,wallY*0.45,{}); put('gchest',W-60,H-70,{page:'p9'}); put('toybox',60,H-70,{}); put('heights',W/2+60,H-10,{}); }
+  // (v11: Ash sleeps upstairs, in the attic hideout, where a new game wakes him; his flight up takes his old corner.
+  //  The bed goes against the back wall in the middle, where nothing stood, so the attic's chest and the rest keep
+  //  their places, and their ids in old saves.)
+  if(def.id==='h_ash_up') put('bed',W/2,100,{w:62,h:96,home:true});
+  if(st==='ash'){ put('bed',W-70,120,{w:62,h:96,mom:true}); put('fireplace',W/2,wallY+14,{}); put('table',W*0.55,H*0.58,{w:90,h:56}); put('chair',W*0.55-60,H*0.58,{}); put('chair',W*0.55+60,H*0.58,{}); put('portraits',W*0.3,wallY*0.45,{}); put('gchest',W-60,H-70,{page:'p9'}); put('toybox',60,H-70,{}); put('heights',W/2+60,H-10,{}); }
   if(st==='yara'){ put('bed',70,120,{w:62,h:96}); put('fireplace',W/2,wallY+14,{}); put('abacus',W*0.7,H*0.55,{}); put('perch',W-60,H*0.4,{}); put('shelf',W*0.25,wallY+12,{w:120,page:'p3'}); put('table',W*0.4,H*0.6,{w:80,h:50}); put('pot',40,H-60,{}); }
   // generic easter egg + diary for everyone else
   if(def.egg!=null){ const e=EGGS[def.egg%EGGS.length]; put(e.k,W*0.18+rng()*W*0.2,H*0.82,{egg:e}); }
