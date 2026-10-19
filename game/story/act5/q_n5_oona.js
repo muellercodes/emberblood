@@ -13,7 +13,7 @@ quest({
 
   item: {
     n5_tea_note: { name: ["Gran's note for Vesper", "Gran's note"], icon: 'letter',
-      desc: ['Big wobbly letters: "Come home for tea after, duck. Love, Gran."', '"Come home for tea after, duck."'] },
+      desc: ['Big wobbly letters: "Come home for tea after. Love, Gran."', '"Come home for tea after."'] },
   },
 
   place: {
@@ -45,7 +45,7 @@ quest({
       ['c_oona', '...With you? Up there? Oh, thank goodness. Then you take her something from me.',
         'With you? Oh, thank goodness. Take her this.'],
       { if: 'item c_scarf', then: [
-        ['c_oona', "And you've still got the scarf I knitted her! Tell her to WEAR it this time.", 'Tell her to wear the scarf this time!']],
+        ['c_oona', "And you've still got the scarf I knitted her! Tell her to wear it this time.", 'Tell her to wear the scarf this time!']],
         else: [
         ['c_oona', "And tell her to wear her scarf. It's still on her bed, where she left it.", 'Tell her to wear her scarf.']] },
       ['narr', 'She writes a note in big wobbly letters and presses it into your claws.', 'She writes a note for Vesper.',
@@ -53,10 +53,10 @@ quest({
     ],
     n5_tea_give: [
       ['narr', "You give Vesper Gran's note. She reads it three times.", 'Vesper reads the note three times.'],
-      ['c_vesper', '"Come home for tea after, duck." ...After. She thinks there\'s going to be an after.',
+      ['c_vesper', '"Come home for tea after." After. She thinks there\'s going to be an after.',
         'She thinks there will be an after.'],
       ['ash', "There is. I promised Mom too."],
-      ['c_vesper', "...Okay. Then there's an after. And I'm NOT wearing the scarf.", "Okay. There's an after. No scarf!"],
+      ['c_vesper', "Okay. Then there's an after. And I'm not wearing the scarf.", "Okay. There's an after. No scarf!"],
       ['c_vesper', "...I'll wear the scarf.", "I'll wear the scarf."],
       ['c_vesper', "Here. I pinched this off the Night Mother's own pile on the way up. Don't tell Gran.",
         "I stole this from the Night Mother. Don't tell Gran!"],

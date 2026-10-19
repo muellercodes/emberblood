@@ -5,9 +5,11 @@
 // letters, NYX, the clockmakers' word for night (clue; with Pip's Fetch, Pip pulls the glass cap off). At the Silk
 // Gallery: a friend Vesper drops in to help (Act II friend), or her cracked mask lies on the cliff ("Sorry. V.") and
 // on the first island her silk line snaps and she hangs over the void, the very first night all over again: pull her
-// up (trust friends +1, she is back), pull her up and give her Gran's letter (if Ash kept it in Act IV), or keep going.
-// Up the Chalk Climb, the Gear Bridge turns, and from under the scale plate slides a real paper lantern: "For my
-// little night-moth. E." (clue). The Case Book asks the moth's name (Nyx: n_knows). Then the Echo of the Moth Mask.
+// up (trust friends +1, she is back), pull her up and give her Gran's letter (if Ash kept it in Act IV), or tell her to
+// climb up herself. Up the Chalk Climb, the Gear Bridge turns, and from under the scale plate slides a real paper lantern
+// painted with a little grey moth, signed "E." (clue; v11: no "night-moth" note, so the hub is the one word clue). The
+// Case Book asks the moth's name (Nyx: n_knows), the one real question of rings 1 and 2. Then the Echo of the Moth Mask,
+// the second fear ("Without fire I'm nothing.").
 // Data only. Still x4 code: the puzzles (x4_ascent), the clock bubble, the echo fight and its words (x4_foes), the step
 // to n_rime after the win (x4_foes), the friends who walk with Ash (x4_story's ally runtime, see N5A_NOTES).
 chapter({
@@ -41,13 +43,15 @@ chapter({
     n5_clock_word: { icon: 'clock', mystery: 'night_mother',
       text: ["Under the hands of the Midnight Clock: NYX, the clockmakers' old word for night.", 'NYX means night.'] },
     n5_night_moth: { icon: 'lamp', mystery: 'night_mother',
-      text: ['A real paper lantern from the Gear Bridge, painted with a little grey moth: "For my little night-moth. E."', '"For my little night-moth. E."'] },
+      text: ['A real paper lantern from the Gear Bridge, very old, painted with a little grey moth and signed "E." Ember made her moth a lantern of her own.',
+        'An old lantern with a grey moth on it. Signed "E."'] },
     // what solving n5_name gives (N5b's n5_reach needs it)
     n5_her_name: { icon: 'star', mystery: 'night_mother',
       text: ['Ember named the little grey moth Nyx. Nyx... Nyxara. The Night Mother was that little moth.', 'The little moth was Nyx. Nyxara!'] },
     // the Echo 2 outro memory (given when n_rime starts: x4_foes plays the outro itself); N5b's n5_reach needs it
     n5_oona_warm: { icon: 'heart', mystery: 'night_mother',
-      text: ['A memory from the Echo of the Moth Mask. Gran Oona: "Oh, duck. Fire isn\'t the only warm thing."', '"Fire isn\'t the only warm thing."'] },
+      text: ['A memory from the Echo of the Moth Mask: Gran Oona had no fire to give little Vesper, so she warmed her hands in her own.',
+        'Gran had no fire. She warmed Vesper\'s hands with hers.'] },
     // a bonus clue for the name: Moth Memory pane 3 in the Clockmaker's Rest (optional, after Echo 2; see n_rime)
     n5_pane3: { icon: 'moth', mystery: 'night_mother',
       text: ['Moth Memory 3, in the Clockmaker\'s Rest: a girl with a lantern, and a little moth she calls Nyx.', 'A girl and a moth called Nyx.'] },
@@ -61,8 +65,8 @@ chapter({
       bonus: ['n5_page11', 'n5_moth_dream', 'n5_pane3'],
       pick: [
         { t: 'Nyx', right: true },
-        { t: 'Murmur',
-          hint: ["That's Hush's sister. Vesper saw her crack the Heart this year. Ember's moth is a thousand years older.", 'Murmur came this year. This moth is very old.'] },
+        { t: 'Moonbeam',
+          hint: ["Iska said the moth rode down on a moonbeam. That's how she came, not what Ember called her.", 'That is how she came. Not her name.'] },
         { t: 'Hush',
           hint: ['Ash met Hush this year. Ember\'s little moth lived a thousand years ago.', 'You met Hush this year. This moth is very old.'] },
         { t: ['The Lady of the Moths', 'The Lady of the Moths'],
@@ -119,7 +123,7 @@ chapter({
         'Whip the three weights down.'] },
     { id: 'lantern', do: 'examine n5_folded_lantern', then: ['clue n5_night_moth'], obj: ['Look at what slid out from under the scale plate', 'Look under the scale'] },
     { id: 'name', do: 'deduce n5_name', marker: 'n5_gear', obj: ["Work out the little moth's name, in the Case Book", 'Open the Case Book'],
-      hint: ['Three clues: what Nyxara said by the shrine, the letters under the clock hands, and the lantern note.', 'What did the clues say about night?'] },
+      hint: ['Three clues: what Nyxara said by the shrine, the letters under the clock hands, and the lantern Ember painted.', 'What did the clues say about night?'] },
     { id: 'echo', do: 'fight n_echo_vesper', marker: 'n_echo_vesper', obj: ['Face the Echo of the Moth Mask', 'Fight the shadow thief'],
       hint: ['Across the Gear Bridge, in the Mask Hall. Only one of the shadows is real.', 'Find the real shadow.'],
       then: ['stage n_rime'] },
@@ -138,7 +142,7 @@ chapter({
       ['ash', 'I know, Pip. I miss the ticking too.', 'I miss the ticking too, Pip.', { if: 'flag pip' }],
       ['nyxara', 'Midnight is the best time, little ember. Nothing ends at midnight. Everything just waits.', 'At midnight, nothing ends. Everything just waits.'],
       ['nyxara', 'I came in the night once, to a girl with a lantern. She was so warm.', 'I came in the night once, to a girl with a lantern.', { clue: 'n5_came_in_night' }],
-      ['ash', 'What girl? Hey! Come back! What girl?', 'What girl? Hey! Come back!'],
+      ['ash', 'What girl? Hey! What girl?', 'What girl? Hey!'],
     ],
     ncl_hub: [
       { if: 'flag c_pip_fetch flag pip', then: [
@@ -146,7 +150,7 @@ chapter({
       ] },
       ['narr', 'With the hands off the twelve, you can see what they were covering. Three old letters, carved deep into the hub.', 'Under the hands are three old letters.'],
       ['narr', 'N. Y. X. And under them, very small: "NYX: the clockmakers\' old word for night."', 'N Y X. "NYX: the old word for night."', { clue: 'n5_clock_word' }],
-      ['ash', 'Nyx means night. So the Midnight Clock is a Nyx clock. Huh.', 'Nyx means night. Huh.'],
+      ['ash', 'Nyx. Night. A night clock, stopped at midnight, so the night never has to end.', 'Nyx means night.'],
     ],
     // Vesper on the Silk Gallery, one scene id for both pictures (x4_story's ally runtime reads n4sSeen('n_vesper_join')):
     // the friend Vesper (Act II friend) lands beside Ash at the near shore; a foe Vesper gets her second chance on the
@@ -156,13 +160,11 @@ chapter({
         { place: ['c_vesper', 'n5_vesper_land'], anim: ['c_vesper', 'perch'] },
         ['narr', 'Someone drops out of the dark on a silk line and lands beside you without a sound. A moth mask. A crooked grin.', 'Someone drops down on a silk rope. A moth mask. A grin.'],
         ['c_vesper', "You're climbing a copy of my rooftops, and you're doing it wrong.", 'You are climbing my rooftops wrong.'],
-        ['ash', 'VESPER!', 'Vesper!'],
-        ['c_vesper', 'Hi, cousin. I thought you might need a thief. Getting in where nobody wants you is what I do best.', 'Hi, cousin! You need a thief. Thieves get in anywhere.'],
-        ['ash', 'How many greats is a cousin?', 'How many greats is a cousin?'],
-        ['c_vesper', "None. Cousins don't get greats.", 'None. Cousins have no greats.'],
-        ['ash', "Then you're my favorite relative.", 'Then you are my favorite!'],
-        ['c_vesper', "Don't tell your dragon grandpa. Now, see the gold post on that first island? Grapple it, then the next one, and don't look down.",
-          "Don't tell Grandpa. Grapple that first post. Don't look down.", { ref: 'n5_gallery_isle1' }],
+        ['ash', 'Vesper!'],
+        ['c_vesper', "Hi, cousin. None of the doors up here have locks. That's just rude. Locks are the fun part.", 'Hi, cousin. No locks up here. Locks are the fun part.'],
+        ['c_vesper', "She still talks to me in my sleep, you know. Last night she said I'd never get up here. So. Here I am.", 'She still talks in my dreams. She said I would never get here. So here I am.'],
+        ['c_vesper', "See the gold post on that first island? Grapple it, then the next one, and don't look down.",
+          "Grapple that first post. Don't look down.", { ref: 'n5_gallery_isle1' }],
         ['c_vesper', 'She hid a post of her own out there too, past the third island. Hiding things from me never works.', 'She hid a post out there too. I found it.',
           { do: ['set n_vline'], ref: 'n5_hidden_post' }],
         ['c_vesper', "And Ash? Gran doesn't know where I am. She'll be up all night with the kettle on.", "Gran doesn't know where I am.",
@@ -174,11 +176,11 @@ chapter({
         ['narr', 'A grey cloak. Dark hair with one silver streak. She grabs the edge of your island with one hand and hangs over the void.', 'It is Vesper! She hangs from the edge by one hand.'],
         ['c_vesper', "...Don't you dare say anything.", "Don't you dare say anything."],
         ['narr', "It's the clock hand all over again, the very first night you met.", 'It is just like the first night you met.'],
-        { choose: 'n5_vesper_chance', ask: ['What do you do?', 'What do you do?'], pick: [
+        { choose: 'n5_vesper_chance', ask: ['She has claws. So do you. What do you do?', 'What do you do?'], pick: [
           { t: ['Grab her wrist and pull her up', 'Pull her up'], tone: 'kind', v: 'helped',
             then: ['trust friends +1', 'set n5_vesper', 'set n_vline', 'quest start q_n5_oona'],
             say: [
-              ['c_vesper', '...You still do that. After everything I did to you.', 'You still do that. Even now.'],
+              ['c_vesper', 'You still do that. After everything I did to you.', 'You still do that. Even now.'],
               ['ash', 'You were going to fall.'],
               ['c_vesper', "She hid a post out there. I'll show you. Come on, cousin, let's go and annoy her.", 'She hid a post. Come on, cousin!'],
               ['c_vesper', "And Ash? Gran doesn't know where I am. She'll be up all night with the kettle on.", "Gran doesn't know where I am.", { promise: 'q_n5_oona' }],
@@ -188,14 +190,14 @@ chapter({
             say: [
               ['narr', 'You pull her up. Then you give her the letter a moth carried off before she ever saw it.', 'You pull her up. You give her the letter.'],
               ['c_vesper', '"Come home when you\'re ready." ...Gran wrote this? To me? After I ran off?', '"Come home when you\'re ready." Gran wrote this?'],
-              ['c_vesper', "I am NOT crying. Come on, cousin. She hid a post out there. Let's go and annoy her.", 'I am NOT crying. Come on, cousin!'],
+              ['c_vesper', "I'm not crying. Come on, cousin. She hid a post out there. Let's go and annoy her.", 'I am not crying. Come on, cousin!'],
               ['c_vesper', "And Ash? Gran doesn't know where I am. She'll be up all night with the kettle on.", "Gran doesn't know where I am.", { promise: 'q_n5_oona' }],
             ] },
-          { t: ['Keep going', 'Keep going'], tone: 'brave', v: 'left',
+          { t: ["\"You've got claws. Climb.\"", '"You can climb. Go on."'], tone: 'brave', v: 'left',
             then: ['set n5_vesper_left', 'quest start q_n5_vesper'],
             say: [
-              ['narr', 'You step past her. Behind you, she pulls herself up, all by herself.', 'You walk on. She climbs up by herself.'],
-              ['c_vesper', "...I'll remember this, cousin.", "I'll remember this, cousin."],
+              ['narr', 'She stares at you. Then she digs her claws into the glass and hauls herself up, all by herself.', 'She glares. Then she climbs up by herself.'],
+              ['c_vesper', "Fine. I'll do it myself, cousin. I always have.", 'Fine. I will do it myself. I always have.'],
             ] },
         ] },
       ] },
@@ -204,7 +206,7 @@ chapter({
     n_vesper_absent: [
       ['narr', "On the edge of the cliff lies a moth mask. A real one, not glass. It's cracked down the middle.", 'A real moth mask lies here. It is cracked.', { ref: 'n5_cracked_mask' }],
       ['narr', 'Under it is a scrap of paper. Two words: "Sorry. V."', 'A note says: "Sorry. V."'],
-      ['ash', "...Me too, Vesper.", 'Me too, Vesper.'],
+      ['ash', 'Me too, Vesper.'],
     ],
     ncl_mask: [
       ['narr', 'Vesper\'s moth mask, cracked down the middle. The note under it says: "Sorry. V."', 'The cracked mask. "Sorry. V."'],
@@ -213,32 +215,31 @@ chapter({
     ncl_lantern: [
       ['narr', 'When the last weight landed, the scale plate tipped, and something flat slid out from under it.', 'Something flat slid out from under the plate.'],
       ['narr', 'It is a paper lantern, folded flat: a real Lantern Day lantern, very old, not glass. Someone has painted a little grey moth on it.', 'A real paper lantern. A little grey moth is painted on it.'],
-      ['narr', 'Inside, in curly writing: "For my little night-moth. E."', '"For my little night-moth. E."', { clue: 'n5_night_moth' }],
-      ['ash', 'E. ...Ember! Ember made the little moth a lantern of her very own!', 'E is for Ember! She made the moth a lantern!'],
+      ['narr', 'In one corner, in small curly writing, a single letter: E.', 'In the corner is one letter: E.', { clue: 'n5_night_moth' }],
+      ['ash', 'E for Ember. She made her moth a lantern of her very own. And then she stopped coming.', 'E is for Ember. She made the moth a lantern.'],
     ],
     // Echo 2: x4_foes plays STORY.n_echo2_intro and STORY.n_echo2_outro (data versions; the hall is a ring of black
     // glass with two balconies, no moth lamps)
     n_echo2_intro: [
       ['narr', 'In a ring of black glass between two high balconies waits a masked figure. Blink, and there are three of her. Blink again, and there are five.', 'A masked shadow waits. Then there are lots of her!'],
-      ['n_echo_vesper', 'The Heart will give my family its fire back. She promised me. She PROMISED.', 'The Heart will give my family fire. She promised!'],
-      ['ash', 'She promised you all kinds of things, and none of them were true.', 'She promised lots of things. She lied.'],
+      ['n_echo_vesper', 'She promised me fire. A real Emberblood, at last. Without fire I\'m nothing.', 'She promised me fire. Without fire I am nothing.'],
       { if: { any: ['choice c_vesper=friend', 'flag n5_vesper'] }, then: [
-        ['c_vesper', "Do I really stand like that, with my elbow out? Ugh. Help me knock her down before I die of shame.", "Do I really stand like that? Ugh. Let's knock her down."],
-      ] },
-      { if: 'flag n5_vesper_left', then: [
-        ['narr', 'Up on a balcony, a real grey cloak flutters for a moment. Then it is gone.', 'Up on a balcony, a grey cloak flutters. Then it is gone.'],
+        ['c_vesper', 'Do I really stand like that, with my elbow out? Ugh.', 'Do I really stand like that? Ugh.'],
+        ['c_vesper', "Fire isn't the only warm thing. Gran said it every night. You just never listened.", "Fire isn't the only warm thing. Gran always said so."],
+      ], else: [
+        ['ash', "Fire isn't the only warm thing. Your gran says it every night.", "Fire isn't the only warm thing. Gran says so."],
+        ['narr', 'Up on a balcony, a real grey cloak flutters for a moment. Then it is gone.', 'Up on a balcony, a grey cloak flutters. Then it is gone.', { if: 'flag n5_vesper_left' }],
       ] },
     ],
     n_echo2_outro: [
       ['narr', 'The shadow thief spins, stumbles, and pops into a cloud of moths.', 'The shadow thief pops into moths.'],
       ['narr', 'A memory hangs in the air: a small voice in a small room by the sea.', 'A memory floats by. A small voice by the sea.'],
-      ['n_memory', "Granny, why can't I make fire like the stories?", "Granny, why can't I make fire?"],
-      ['n_memory', "Oh, duck. Fire isn't the only warm thing.", 'Oh, duck. Fire is not the only warm thing.', { clue: 'n5_oona_warm' }],
+      ['n_memory', "Granny, why can't I make fire like in the stories?", "Granny, why can't I make fire?"],
+      ['n_memory', "Give me your hands, then. Both of them. There. Whose are warmer now?", 'Give me your hands. There. Warmer now?', { clue: 'n5_oona_warm' }],
       { if: { any: ['choice c_vesper=friend', 'flag n5_vesper'] }, then: [
-        ['c_vesper', '...She still says that. Every night, with the kettle on.', 'She still says that every night.'],
-        ['ash', "She's right."],
+        ['c_vesper', 'She still does that. Every night, with the kettle on.', 'She still does that every night.'],
       ], else: [
-        ['ash', 'I hope you heard that, Vesper, wherever you are.', 'I hope Vesper heard that.'],
+        ['ash', "Wherever you are, Vesper, your gran's kettle is on.", "Vesper, your gran is waiting."],
       ] },
     ],
   },

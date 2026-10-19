@@ -1,4 +1,5 @@
-// game/story/act5/q_n5_vesper.js (N5S): Sorry, Cousin. Vesper's arc on the peak after a "Keep going".
+// game/story/act5/q_n5_vesper.js (N5S): Sorry, Cousin. Vesper's arc on the peak after "You've got claws. Climb." (v11;
+// the pick was "Keep going": Ash trusted her to climb, and did not help).
 // N5a's n_clocks owns the climb's Vesper beats (n_vesper_join, n_vesper_absent, the second chance ncl_chance on the
 // Silk Gallery's first island, n_vesper_bye). A kid who stepped past her there (flag n5_vesper_left) can still make it
 // right: Ash goes home to Saltmarsh, and Granny Oona knows exactly what to do with a granddaughter who sulks up high.
@@ -36,9 +37,9 @@ quest({
 
   scene: {
     n5_gran_sorry: [
-      ['ash', 'Granny Oona, I did something bad. Vesper fell, up on the mountain, and I just kept going.', 'Vesper fell. I just kept going.'],
+      ['ash', 'Granny Oona, Vesper nearly fell, up on the mountain. I told her to climb up by herself.', 'Vesper nearly fell. I told her to climb up herself.'],
       ['c_oona', "Oh, duck. Sit down. No, there. That's the warm chair.", "Oh, duck. Sit down. That's the warm chair."],
-      ['ash', 'I told myself she could climb up by herself. She could! But I should have helped.', 'I should have helped her.'],
+      ['ash', 'She could, too! She did. But I should have helped.', 'She did. But I should have helped her.'],
       ['c_oona', "She'll be sitting somewhere high with her back to everybody. She's done that since she was four.",
         'She will be sulking somewhere high. She always does.'],
       ['c_oona', "Sorry won't fix it, not with my Vesper. But she never could stay cross with a biscuit.", "She can't stay cross with a biscuit."],
@@ -51,10 +52,10 @@ quest({
       ['c_vesper', 'Go away, cousin.', 'Go away.'],
       ['ash', "I'm sorry. I should have pulled you up. ...Your gran sent you this.", "I'm sorry. Gran sent you this."],
       ['narr', 'She looks at the moth biscuit for a long time.', 'She looks at the biscuit for a long time.'],
-      ['c_vesper', "...She still makes these? Every Sunday? They're TERRIBLE.", 'She still makes these? They are terrible!'],
+      ['c_vesper', "She still makes these? Every Sunday? They're terrible.", 'She still makes these? They are terrible!'],
       ['narr', 'She eats it anyway, which takes a while. It is a very hard biscuit.', 'She eats it anyway. It is a very hard biscuit.'],
       ['c_vesper', "Fine. I'll stand next to you up there. Not because you said sorry. Because Gran said.", 'Fine. I will help. Because Gran said.'],
-      ['c_vesper', '"Come home for tea after." ...Okay. Then we both have to come home.', 'Then we both have to come home.'],
+      ['c_vesper', '"Come home for tea after." Okay. Then we both have to come home.', 'Then we both have to come home.'],
     ],
   },
 })
