@@ -957,7 +957,7 @@ people({
         re: [
           { t: ['What was the pun?', 'What was the pun?'],
             say: [['f_ylva', 'Something about a forge being a hearth with a job. He is very pleased with it. He has told it four times.', 'A forge is a hearth with a job. He told it four times.']] },
-          { t: ['It is good to hear the bell.', 'The bell is back.'], tone: 'kind', f: 0.5,
+          { t: ["It's good to hear the bell.", 'The bell is back.'], tone: 'kind', f: 0.5,
             say: [['f_ylva', 'Tollef rings it every morning, and the whole village comes out to complain. It\'s lovely.', 'Everyone comes out to complain. It is lovely.']] },
         ] },
       // what Ash told Tollef about the moth and the bell (said tollef_bell)
