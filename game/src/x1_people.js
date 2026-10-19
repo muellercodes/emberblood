@@ -1591,10 +1591,10 @@ T3C.c_bolt=(c,v,down)=>{ if(down){ ctx.save(); ctx.translate(c.x,c.y); ctx.rotat
 const X1P_MAIL=[
   {id:'c_pb_1',from:'maren',when:()=>x1pR('c_coast'),lines:[
     {who:'maren',text:S(`Ash. The forge is very quiet without that stone humming in it. Catch that thief. Eat something. Love, Mom.`,`The forge is so quiet. Catch that thief. Eat something! Love, Mom.`),skipIf:()=>G.flags.a1_heart==='ward'},
-    {who:'maren',text:S(`Ash. The mountain looks very bare without that stone on top. Catch that thief. Eat something. Love, Mom.`,`The mountain looks bare. Catch that thief. Eat something! Love, Mom.`),skipIf:()=>G.flags.a1_heart!=='ward'},
+    {who:'maren',text:S(`Ash. The mountain looks very bare without that stone on top. Catch that thief, and eat properly. Love, Mom.`,`The mountain looks bare. Catch that thief. Love, Mom.`),skipIf:()=>G.flags.a1_heart!=='ward'},
     {who:'maren',text:S(`P.S. The mountain is quiet. I keep looking at it anyway.`,`P.S. The mountain is quiet now.`),skipIf:()=>G.choices.ending!=='hero'},
     {who:'maren',text:S(`P.S. I climbed up and told your grandfather you'd gone south. He grunted. It was a nice grunt.`,`P.S. I told Grandpa. He grunted. A nice grunt.`),skipIf:()=>G.choices.ending!=='warden'},
-    {who:'maren',text:S(`P.S. Your grandfather says, and I quote, "The hatchling will fail." Bertram charges extra to hear him say it.`,`P.S. Grandpa says you will fail. He is grumpy.`),skipIf:()=>G.choices.ending!=='heir'},
+    {who:'maren',text:S(`P.S. Your grandfather sits on the shelf above Bertram's oven and says, and I quote, "The hatchling will fail." Nobody listens. Bertram gives him the burnt ones.`,`P.S. Grandpa says you will fail. Nobody listens.`),skipIf:()=>G.choices.ending!=='heir'},
     {who:'maren',text:S(`P.S. Grandpa ate four of Bertram's buns and the doormat. He says hello. He says it with smoke.`,`P.S. Grandpa ate the doormat. He says hello.`),skipIf:()=>G.choices.ending!=='lantern'},
     x1pN(`Pebble eyes your coin pouch. Even this far south, Pebble does not work for free.`,`Pebble wants a coin. She does not work for free.`)]},
   {id:'c_pb_2',from:'morrow',when:()=>!!G.flags.dr_c_whisper,lines:[
@@ -1610,8 +1610,8 @@ const X1P_MAIL=[
     {who:'maren',text:S(`Fennick sends a can of his Brightest Lamp Oil. He says it's for "any lamp that's having a bad night." He's been very good, you know. Every lantern, every night.`,`Fennick sent lamp oil, for any lamp having a bad night.`),skipIf:()=>G.choices.fennick!=='forgive'},
     {who:'maren',text:S(`Tikka sent you a bun. It's lumpy. It's wonderful. Eat it when you're hurt.`,`Tikka sent a lumpy bun. Eat it when you are hurt.`),skipIf:()=>!G.flags.tk_home},
     x1pL('maren',`Wendel wrote you a poem. "Ash, Ash, as brave as an eyelash." He says eyelashes are very brave. They stand in front of your eyes all day.`,`Wendel wrote a poem: "Ash, Ash, as brave as an eyelash."`),
-    x1pL('maren',`Bertram's bakery exploded on Tuesday. Nothing to do with moths. Nobody was hurt. The ceiling is a skylight now.`,`Bertram's bakery blew up again. Nobody was hurt.`),
-    x1pL('maren',`Eat something. Love, Mom. P.S. It's very cold here for summer. Odd.`,`Eat something. Love, Mom. P.S. It is cold here. Odd.`),
+    x1pL('maren',`I keep a lantern lit in the window every night, like I said I would. Yara says she can see it from her porch.`,`My lantern is in the window every night.`),
+    x1pL('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     x1pDo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>x1pR('c_salt'),lines:[
     x1pL('wren',`Dear Ash. My books say Ember's daughter Pearl sailed south, a thousand years ago. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),

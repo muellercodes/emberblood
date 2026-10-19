@@ -164,7 +164,7 @@ c1Def('c_arrive',[
   {who:'narr',text:S(`And gliding down over the cliffs toward it, small and grey against the sky, is a figure with wings like a moth.`,`Someone with moth wings glides down toward it.`),fn:()=>c1GlideStart()},
   xl('ash',`There you are.`,`There you are.`),
   xl('narr',`You turn the brass gear over in your claws. Stamped on it, in tiny letters: GEARHAVEN.`,`You look at the brass gear. It says GEARHAVEN.`),
-  xl('ash',`Okay, Moth Lady. Ready or not.`,`Okay, Moth Lady. Ready or not!`)
+  xl('ash',`That's Mom's Heart you've got. I'm bringing it home.`,`That's Mom's Heart. I'm bringing it home.`)
 ]);
 c1Def('c_barley',[
   xl('c_barley',`Evening. You'll be the dragon, then. The sheep said there'd be a dragon.`,`Hello. You must be the dragon. The sheep said so.`),
@@ -241,9 +241,9 @@ c1Def('c_chase_end',[
   {who:'narr',text:S(`She vanishes into the dark at the top of the tower. Something flutters down and lands on your nose. A note.`,`She is gone at the top. A note flutters down onto your nose.`),fn:()=>{ C1ST.sight=null; }}
 ]);
 c1Def('c_note1',[
-  xl('narr',`The note says: "Go home, little ember. This isn't your story. - M."`,`The note says: "Go home, little ember. This isn't your story. M."`),
+  xl('narr',`The note says: "Go home. This isn't your story. M."`,`The note says: "Go home. This isn't your story. M."`),
   c1If('narr',`Underneath, smaller: "P.S. Thanks for the hand. Don't make it a habit."`,`P.S. "Thanks for the hand."`,()=>G.flags.c_chase==='helped'),
-  xl('ash',`She climbed a clock. A whole clock. With her CLAWS.`,`She climbed a whole clock. With her CLAWS.`),
+  xl('ash',`She climbed a whole clock with her claws. Like a ladder.`,`She climbed a whole clock with her claws.`),
   xl('ash',`I need claws like that. Not these ones. Better ones.`,`I need claws like that.`),
   c1Pip(`Mip.`)
 ]);
@@ -257,7 +257,7 @@ c1Def('c_ottoline',[
   xl('narr',`A shelf slides up beside you, carrying a heavy blue book. On the cover is a woman with horns, a coil of rope, and a lantern.`,`A shelf slides up with a blue book. On it: a woman with horns, a rope and a lantern.`),
   xl('c_ottoline',`A thousand years ago, a young woman sailed into this bay with nothing but a rope and a stubborn streak. She had horns like yours. Claws that could climb anything. And no fire. Not a spark.`,`Long ago a young woman sailed here with a rope. She had horns like yours. Claws that climb anything. And no fire at all.`),
   xl('c_ottoline',`So she built a clock instead. And a lighthouse. And a city. They say her mother was a dragon girl from the mountains in the north.`,`So she built a clock. And a lighthouse. And a city. Her mother was a dragon girl from the north.`),
-  xl('ash',`...Ember. Her mother was EMBER. That makes her my great-great-great... AUNT. I have an AUNT.`,`Ember! Her mother was EMBER! She's my great-great-great... AUNT!`),
+  xl('ash',`Ember's daughter. With no fire at all. ...I never even thought about the ones who didn't get any.`,`Ember's daughter, with no fire. I never thought about that.`),
   xl('c_ottoline',`They say Pearl learned to climb in the sea caves at Gullcrag, past Saltmarsh. Nobody goes there now. The tide hasn't gone out for three days. And the gulls. So many gulls.`,`Pearl learned to climb in the sea caves past Saltmarsh. But the tide is stuck high. And so many gulls!`),
   xl('c_ottoline',`And the Moth Mask? The barons' gold always seems to end up in Saltmarsh. If I wanted to find her, I'd start there. Quietly. QUIETLY. Sorry.`,`And the Moth Mask? Try Saltmarsh. Quietly. QUIETLY. Sorry.`),
   xdo(()=>{ G.flags.c_ottoline=1; })
@@ -314,7 +314,7 @@ c1Def('c_nest',[
 c1Def('c_duchess',[
   xl('narr',`On the very top of the Great Clock, higher than any roof in Gearhaven, a goat is eating a weathervane.`,`On top of the Great Clock, a goat is eating a weathervane.`),
   xl('goat',`Meh.`,`Meh.`),
-  xl('ash',`That's not just any goat. That's DUCHESS. How did you get UP here? I needed CLAWS!`,`That's DUCHESS! How did you get up here? I needed CLAWS!`),
+  xl('ash',`That's not just any goat. That's Duchess, from Farmer Hollis's. How did you get up here? I needed claws!`,`That's Duchess! How did you get up here? I needed claws!`),
   xl('goat',`Meh.`,`Meh.`),
   xl('narr',`Duchess has left a little pile of coins by the hatch. Nobody knows where goats get coins.`,`Duchess left a pile of coins. Nobody knows where goats get coins.`),
   xdo(()=>{ G.flags.c_duchess=true; addCoins(30); gainXp(40); })
@@ -395,7 +395,7 @@ c1Def('c_lamp_vesper',[
   xl('narr',`You breathe on the wick. It catches. The great lens turns.`,`You breathe on the wick. It lights! The lens turns.`),
   xl('narr',`A beam of gold light swings out over the sea. Round and round, the way it used to. Past the harbor, past the breakwaters, over the dark water.`,`A gold beam swings out over the sea. Round and round.`),
   xl('narr',`And where the beam passes, for a moment, it lights up something that wasn't there before. A tower. Black as a burnt match, tall as the Great Clock, standing on a rock in the sea. Covered in moths.`,`The beam lights up something new. A black tower in the sea. Covered in moths.`),
-  xl('c_squawk',`(from far below) SQUAWK! SPIRE! BIG AS A HOUSE! BIGGER!`,`SQUAWK! SPIRE! BIG AS A HOUSE!`),
+  xl('c_squawk',`(from far below) SQUAWK! SPIRE! BIGGER THAN A HOUSE!`,`SQUAWK! SPIRE! BIGGER THAN A HOUSE!`),
   xl('ash',`"Bring the warm stone to the Spire." That's where she's going.`,`"Bring the warm stone to the Spire." That's where she's going!`),
   xdo(()=>{ G.flags.c_lit=1; })
 ]);
@@ -450,9 +450,9 @@ c1Def('c_end_ally',[
   c1If('ash',`It's not fair. But I lit your gran's stove. She laughed so hard she cried. Fire isn't something you keep. It's something you share.`,`It's not fair. But I lit your gran's stove. Fire is for sharing.`,()=>!!(G.quests.c_oona&&G.quests.c_oona.done)),
   c1If('ash',`It's not fair. But fire isn't something you keep in a box. It's something you share. I'd have shared it. You only had to ask.`,`It's not fair. But fire is for sharing. You only had to ask.`,()=>!(G.quests.c_oona&&G.quests.c_oona.done)),
   xl('c_vesper',`...You'd have shared it? Gran always says fire isn't the only warm thing. I never believed her.`,`You'd have shared it? Gran says fire isn't the only warm thing.`),
-  xl('ash',`You're my cousin. Sort of. How many greats is a cousin?`,`You're my cousin. How many greats is a cousin?`),
-  xl('c_vesper',`None. Cousins don't get greats.`,`None. Cousins don't get greats.`),
-  xl('ash',`Then you're my favorite relative.`,`Then you're my favorite relative.`),
+  xl('ash',`You're my cousin, you know. Sort of.`,`You're my cousin. Sort of.`),
+  xl('c_vesper',`Don't make it weird.`,`Don't make it weird.`),
+  xl('ash',`Too late.`,`Too late.`),
   xl('narr',`She laughs, a small cracked laugh. Then she opens her hand.`,`She laughs a little. Then she opens her hand.`)
 ]);
 c1Def('c_end_pearl',[
@@ -471,9 +471,9 @@ c1Def('c_end_pearl',[
 c1Def('c_truth',[
   xl('narr',`In her palm lies a piece of the Ember Heart. It was red once. Now it glows violet, like the sky just after sunset, and it beats very slowly. One sharp edge, like a slice of a plum.`,`In her hand is a piece of the Ember Heart. It glows violet now. It beats slowly.`),
   xl('c_vesper',`I never had the whole thing for long. The night I got back, I took it to the Moon Ring in the Moth Wood, like the Lady said.`,`The night I came back, I took the Heart to the Moon Ring in the Moth Wood.`),
-  xl('c_vesper',`Two moths came. A great grey one, bigger than a ship, with painted violet eyes on her wings. And a white one that kept going "shhh".`,`Two moths came. A huge grey one, bigger than a ship. And a white one that went "shhh".`),
-  xl('c_vesper',`The grey one took the Heart in her feet and cracked it on the stones. Three pieces. "To let the light out," she said. The white one called her Murmur.`,`The grey one cracked the Heart on the stones. Three pieces. Her name is Murmur.`),
-  xl('c_vesper',`The white one flew north with one piece. Murmur flew east with another. The third fell in the grass by my foot. And I picked it up. It was warm. Nothing I've ever held was warm like that. I couldn't let it go.`,`The white one flew north with a piece. Murmur flew east with one. The third fell by my foot. It was so warm. I kept it.`),
+  xl('c_vesper',`A moth came down, grey and soft as dust, so big her shadow put out the stars. Two pale moons on her wings. And a white one that kept going "shhh".`,`A giant grey moth came. And a white one that went "shhh".`),
+  xl('c_vesper',`The Heart burned her feet. So she cracked it on the stones. Three pieces. "So my moths can carry it," she said. The white one called her Mother.`,`It burned her. She broke it in three. The white one called her Mother.`),
+  xl('c_vesper',`The white one flew north with one piece. The Mother flew east with another. The third fell in the grass by my foot. It burned the moths. It didn't burn me. I kept it.`,`The white one flew north. The Mother flew east. The third fell by my foot. I kept it.`),
   xl('c_vesper',`It went purple in my hand. Like it was sad. The moths have been angry with me ever since. The Mother wants all three. That's what they call her. She said if I brought the last piece here tonight, she'd keep her promise.`,`It turned purple in my hand. The moths are angry. The Mother wants all three pieces.`),
   c1If('c_vesper',`I kept it in Gran's locket. The one you brought back.`,`I kept it in Gran's locket. The one you brought back.`,()=>!!G.flags.c_locket_given),
   c1If('c_vesper',`Take it. You'll need it more than me. I don't think she was ever going to keep her promise.`,`Take it. I don't think she was ever going to keep her promise.`,()=>G.choices.c_vesper==='friend'),
@@ -484,19 +484,19 @@ c1Def('c_nyxara',[
   xl('narr',`The moon goes dim. Not behind a cloud. Just dimmer, like a lamp being turned down.`,`The moon goes dim. Like a lamp turned down.`),
   xl('narr',`Every moth on the Spire turns to face you at once. Thousands of tiny painted eyes. And through all of them, one soft voice.`,`Every moth turns to look at you. And one soft voice speaks.`),
   xl('nyxara',`Thank you, little ember. You have been such a help.`,`Thank you, little ember. You helped so much.`),
-  xl('nyxara',`You put out the old flame for me, and left me its heart. And while you chased my little thief over the rooftops, my heralds flew north, and east, and nobody followed them.`,`You put out the old flame for me. While you chased my thief, my moths flew north and east.`),
+  xl('nyxara',`Go home now, little ember. Stay home.`,`Go home now. Stay home.`),
   c1If('ash',`...Grandpa? No. You're gone.`,`Grandpa? No. You are gone.`,()=>G.choices.ending==='hero'||!G.choices.ending),
   c1If('ash',`Grandpa? Are you awake up there?`,`Grandpa? Are you awake?`,()=>G.choices.ending==='warden'),
-  c1If('ash',`Grandpa? Did you get out of your birdcage?`,`Grandpa? Did you get out of your cage?`,()=>G.choices.ending==='heir'),
-  c1If('ash',`Grandpa? ...No. Grandpa's at home eating the doormat.`,`Grandpa? No. He is at home.`,()=>G.choices.ending==='lantern'),
-  xl('nyxara',`Oh, no, dear. Not him. Someone much, much older. Shh. Go to sleep.`,`No, dear. Not him. Someone much older. Shh.`),
+  c1If('ash',`Grandpa? Did you get down off Bertram's oven shelf?`,`Grandpa? Did you get off the oven shelf?`,()=>G.choices.ending==='heir'),
+  c1If('ash',`Grandpa? ...No. Grandpa's at home. Mom makes him wipe his feet.`,`Grandpa? No. He is at home.`,()=>G.choices.ending==='lantern'),
+  xl('nyxara',`Oh, no, dear. Not him. Someone much, much older.`,`No, dear. Someone much older.`),
   xl('c_vesper',`...That's her. That's the Lady. She sounded so kind in my dreams.`,`That's her. The Lady. She sounded so kind in my dreams.`),
   xl('narr',`The moths lift off the Spire all at once, a grey river pouring up into the sky, and fly away north.`,`All the moths fly up like a grey river. They fly away north.`)
 ]);
 c1Def('c_snowfall',[
   xl('narr',`Something cold lands on your nose.`,`Something cold lands on your nose.`),
   xl('narr',`Snow starts falling on the coast. White, and soft, drifting down out of a clear summer night. In the middle of summer.`,`Snow starts to fall. In summer!`),
-  xl('ash',`Is that... snow? It's MIDSUMMER.`,`Is that snow? It's SUMMER!`),
+  xl('ash',`Is that... snow? It's the middle of summer.`,`Is that snow? It's summer!`),
   c1Pip(`Mip? (Pip snaps at a snowflake. Then another. He looks very offended that they taste of nothing.)`,`Mip? (Pip bites a snowflake. It tastes of nothing. He is cross.)`),
   xl('c_vesper',`It's never snowed in Saltmarsh. Not once. Not in Gran's whole life.`,`It never snowed in Saltmarsh. Not once.`),
   c1If('c_vesper',`I'll find you, when it's time. Somebody has to make sure you don't climb anything stupid. You've got horns, cousin, not sense.`,`I'll find you when it's time. You have horns, cousin, not sense.`,()=>G.choices.c_vesper==='friend'),
@@ -530,32 +530,32 @@ STORY.c_hints={
 // Pass c1DunStory(id) as defineDungeon's `story` (or play any key with c1Play(key)); see C1STORY.md for each key.
 // The Gullcrag Caves (c_gullcrag): the Climbing Claws
 c1Def('c_gull_in',[
-  xl('c_pearl',`Well, well. Somebody finally rang the doorbell. Took you a thousand years. Mind the sand, dear. It gets into everything.`,`Well, well! Somebody came at last. Mind the sand.`),
+  xl('c_pearl',`That bell hasn't been rung in a long time. Mind the sand. It gets in the hinges.`,`Someone rang my bell. Mind the sand.`),
   xl('ash',`Who said that?`,`Who said that?`),
-  xl('c_pearl',`Pearl. I built these caves. Well, the sea built them. I put up the signs.`,`Pearl. I built these caves. Well, the sea did. I made the signs.`),
-  xl('ash',`Pearl? THE Pearl? The library lady told me about you! You're my great-great-great...`,`Pearl? THE Pearl? You're my great-great-great...`),
-  xl('c_pearl',`Aunt. Great aunt, a dozen times over. Don't do the greats, dear, we'll be here all day.`,`Aunt. Lots of greats. Don't count them. We'll be here all day.`),
-  xl('c_pearl',`This cave breathes with the tide. In, out. Learn its breath and it'll carry you. Fight it and it'll carry you anyway, just somewhere wetter.`,`This cave breathes with the tide. In, out. Learn it and it will carry you.`)
+  xl('c_pearl',`Pearl. I cut the steps in these caves and put up the signs. The sea did the digging.`,`Pearl. I cut these steps. The sea dug the caves.`),
+  xl('ash',`Pearl? Ember's Pearl? The library lady told me about you.`,`Pearl? Ember's daughter?`),
+  xl('c_pearl',`Then she told you I had no fire. Good. Saves time.`,`Then you know I had no fire. Good.`),
+  xl('c_pearl',`This cave breathes with the tide. In, out. Learn when it breathes in and it'll carry you. Get it wrong and it'll carry you anyway, just somewhere wetter.`,`This cave breathes with the tide. Learn it and it will carry you.`)
 ]);
-c1Def('c_gull_bell',[xl('c_pearl',`That's the Tide Bell. Give it a whack. Go on. The sea listens to bells. It's very old-fashioned.`,`That's the Tide Bell. Give it a whack! The sea listens to bells.`)]);
+c1Def('c_gull_bell',[xl('c_pearl',`That's the Tide Bell. Hit it hard. I hung it there so the sea would listen, and it mostly does.`,`The Tide Bell. Hit it hard. The sea listens.`)]);
 c1Def('c_gull_barrel',[xl('c_pearl',`Barrels float. Dragons sink like anchors. Think about that.`,`Barrels float. Dragons don't. Think about that.`)]);
 c1Def('c_gull_shrine',[
-  xl('c_pearl',`Here we are. My hall. That's me, the statue. I was taller. The sculptor was rude.`,`My hall. That statue is me. I was taller.`),
+  xl('c_pearl',`My hall. I carved that statue myself, so you can blame me for the nose.`,`My hall. I carved that statue. Blame me for the nose.`),
   xl('c_pearl',`I had no fire, Ash. Not a spark. Mother cried about it the day I was born. Then she laughed, because I grabbed her horn and climbed straight up her face.`,`I had no fire, Ash. Not a spark. So I climbed. I even climbed up my mother's face!`),
-  xl('c_pearl',`So I climbed, and I never stopped. I left the climb here for whoever came next. Touch my hand.`,`I left my climbing here for whoever came next. Touch my hand.`)
+  xl('c_pearl',`So I climbed. Cliffs, towers, my mother. I left the knack of it here for whoever came next. Put your hand on mine.`,`So I climbed. I left it here for you. Touch my hand.`)
 ]);
 c1Def('c_gull_gift',[
   xl('narr',`You touch the statue's hand. Your claws tingle, then itch, then grow, just a little: curved, strong and grippy.`,`You touch the statue's hand. Your claws grow. Strong and grippy!`),
-  xl('c_pearl',`The Climbing Claws! Cracked walls, chalk cliffs, handholds, tall towers with rude thieves on them. Walk into a wall with handholds and up you go.`,`The Climbing Claws! Walk into a wall with handholds and up you go.`),
-  xl('ash',`I can climb the GREAT CLOCK.`,`I can climb the GREAT CLOCK!`),
-  xl('c_pearl',`You can climb anything with a crack in it, and if you look properly, everything has a crack in it. Oh, and the tide's coming in right now. Up you go.`,`You can climb anything with a crack. Oh, and the tide is coming in. Up you go!`)
+  xl('c_pearl',`The Climbing Claws. Cracked walls, chalk cliffs, anything with a handhold. Walk into it and up you go.`,`The Climbing Claws! Walk into a wall with handholds and up you go.`),
+  xl('ash',`I can climb the Great Clock. I can get to her.`,`I can climb the clock! I can get to her!`),
+  xl('c_pearl',`Anything with a crack in it, and everything has a crack if you look. The tide's on its way in, by the way. Up you go.`,`Anything with a crack. Oh, the tide is coming in. Up you go!`)
 ]);
 STORY.c_gull_how=S(`Walk into a cracked wall with handholds to climb it. You can't attack while you climb.`,`Walk into a wall with handholds to climb. No attacks while climbing.`);
 STORY.c_gull_bossline=S(`The Grand Admiral! When the tide comes in, CLIMB. Hit his claw when it's stuck. Mind the cannons.`,`When the tide comes in, CLIMB! Hit his stuck claw.`);
 c1Def('c_pinch_intro',[
-  xl('c_pinch',`WHO goes there? Who dares enter the lagoon of GRAND ADMIRAL PINCH without SALUTING?`,`WHO goes there? Salute GRAND ADMIRAL PINCH!`),
+  xl('c_pinch',`Who dares enter the lagoon of GRAND ADMIRAL PINCH without saluting?`,`Salute Grand Admiral Pinch!`),
   xl('ash',`Um. Hello, Admiral.`,`Um. Hello, Admiral.`),
-  xl('c_pinch',`That is not a salute! PREPARE TO BE PINCHED!`,`That is not a salute! GET PINCHED!`)
+  xl('c_pinch',`That is not a salute! Prepare to be pinched!`,`That is not a salute! Get pinched!`)
 ]);
 c1Def('c_gull_won',[
   xl('narr',`Grand Admiral Pinch staggers, sits down in the sand, and sulks. Then he spots an old teacup in the wreck, squeezes into it, and looks enormously dignified.`,`The Admiral sits down and sulks. Then he squeezes into an old teacup. He looks very proud.`),
@@ -563,13 +563,13 @@ c1Def('c_gull_won',[
   xl('c_pearl',`He's been Admiral of this lagoon for four hundred years. Nobody's told him there's no navy. Let him keep his teacup.`,`He's been Admiral here for four hundred years. Let him keep his teacup.`)
 ]);
 c1Def('c_gull_end',[
-  xl('c_pearl',`My cradle. Mother rocked me here, the one time she came south. She sang the lantern song. Badly. She was a dragon.`,`My cradle. Mother rocked me here once. She sang the lantern song. Badly.`),
+  xl('c_pearl',`My cradle. Mother rocked me here, the one time she came south. She sang me the lantern song, flat as a board.`,`My cradle. Mother sang me the lantern song here. Flat.`),
   xl('c_pearl',`There's a girl who climbs my cliffs at night, Ash. She has my claws and no fire, like me. She's angry about it. So was I, when I was her age.`,`A girl climbs my cliffs at night. She has my claws and no fire. She is angry about it.`),
   xl('c_pearl',`Two more of my places are waiting: the Brassworks under my clock, and my lighthouse. The warp knows the way up.`,`Two more of my places wait: the Brassworks and my lighthouse. The warp will take you up.`)
 ]);
 // The Brassworks (c_brassworks): the Grapple Tail
 c1Def('c_brass_in',[
-  xl('c_pearl',`Ash! You came down my chimney. Of course you did. Every child in my family comes down the chimney.`,`Ash! You came down my chimney. Of course you did.`),
+  xl('c_pearl',`Down the chimney. Good. That's how I always came in, too.`,`Down my chimney. That's how I came in too.`),
   xl('c_pearl',`This is the Brassworks. My clock's heart. A baron owns it now and he's put his name on all the doors. I put my name on all the gears first. Look closely.`,`This is the Brassworks. My clock's heart. My name is on all the gears.`),
   xl('c_pearl',`Everything in here keeps a rhythm: the steam, the gears, the belts. Learn it before it steps on your tail.`,`Watch the rhythm of the steam and the gears.`)
 ]);
@@ -579,10 +579,10 @@ c1Def('c_brass_shrine',[
 ]);
 c1Def('c_brass_gift',[
   xl('narr',`On the velvet cushion sits a little brass hook, shaped like a curled claw. You pick it up and it clicks onto the tip of your tail as if it had been waiting there all along.`,`A little brass hook sits on a cushion. It clicks onto the tip of your tail.`),
-  xl('narr',`Your tail twitches. Then it LASHES, all by itself, and the hook bites into a brass ring on the ceiling with a clang.`,`Your tail flicks up by itself. CLANG! The hook grabs a ring on the ceiling.`),
+  xl('narr',`Your tail twitches. Then it lashes out all by itself, and the hook bites into a brass ring on the ceiling with a clang.`,`Your tail flicks up by itself. Clang! The hook grabs a ring on the ceiling.`),
   xl('c_pearl',`The Grapple Tail! The hook only reminds your tail what it could always do. Aim at a ring or a post and it'll pull you over.`,`The Grapple Tail! Aim at a ring or a post. Your tail pulls you over.`),
-  xl('ash',`My tail is a ROPE.`,`My tail is a ROPE!`),
-  xl('c_pearl',`A rope with opinions. Oh, and the floor's about to fall out. Hold on.`,`A rope with opinions. Oh, the floor is falling. Hold on!`)
+  xl('ash',`My tail is a rope!`,`My tail is a rope!`),
+  xl('c_pearl',`A rope with opinions. Hold on. The floor's about to go.`,`A rope with opinions. Hold on, the floor is going!`)
 ]);
 STORY.c_brass_how=S(`Walk up to a brass ring or a post and use your action button. Your tail pulls you over gaps. It can pull light things to you, too.`,`At a ring or a post, use your action button. Your tail pulls you over.`);
 STORY.c_brass_bossline=S(`Ticktock! Grab the key on his back with your tail and PULL. Jump his stomps. When the pendulum swings, get up on the rings!`,`Grab his back key with your tail and PULL! Jump his stomps!`);
@@ -599,7 +599,7 @@ c1Def('c_brass_won',[
 c1Def('c_brass_end',[
   xl('c_pearl',`My first workshop. Before the city. Before the baron. Just me, a bench, and a very big idea.`,`My first workshop. Just me, a bench and a big idea.`),
   xl('c_pearl',`Everyone said a clock was silly. "Pearl," they said, "nobody needs to know what time it is." Then I built one, and now everybody's late for things.`,`Everyone said a clock was silly. Now everybody is late for things!`),
-  xl('c_pearl',`Pull the big lever, Ash. Wake my clock up. The whole city's been holding its breath.`,`Pull the big lever, Ash. Wake my clock up!`)
+  xl('c_pearl',`Somebody's holding my clock at one minute to midnight. Pull the big lever, Ash. Let it go on.`,`Pull the big lever, Ash. Let my clock go on.`)
 ]);
 // The Spinning Lighthouse (c_lighthouse): the Shadow Dash
 c1Def('c_light_in',[
@@ -609,7 +609,7 @@ c1Def('c_light_in',[
 ]);
 c1Def('c_light_shrine',[
   xl('c_pearl',`My lens room. I used to sit here on long nights and watch the beam go round, and round, and round.`,`My lens room. I watched the beam go round and round here.`),
-  xl('c_pearl',`I learned something here. The brighter the light, the deeper the shadow behind it. And a shadow, Ash, is just a door nobody's noticed.`,`The brighter the light, the deeper the shadow. A shadow is a door nobody noticed.`)
+  xl('c_pearl',`A light that strong throws shadows a mile long. I used to curse them. Then one night I stepped into one, and came out at the far end.`,`Strong light makes long shadows. One night I stepped into one.`)
 ]);
 c1Def('c_light_gift',[
   xl('narr',`The little lens turns, and its beam sweeps across you. Behind you, your own shadow stretches long across the floor. Then it moves. On its own. It waves.`,`The beam sweeps over you. Your shadow stretches out. Then it waves at you!`),
@@ -617,7 +617,7 @@ c1Def('c_light_gift',[
   xl('c_pearl',`The Shadow Dash! Dash, and for a moment you're a shadow. Moth curtains can't catch you. Nobody looking for you can see you.`,`The Shadow Dash! Dash and you become a shadow. Moth curtains can't stop you.`),
   xl('c_pearl',`Start your dash inside a shadow and you'll ride it all the way to the far end. Over gaps, if the shadow's long enough.`,`Dash from inside a shadow and you ride it to the end. Even over gaps!`),
   xl('c_pearl',`And those bars? Made of shadow. They only let a shadow through in the dark. Wait for the beam to pass.`,`Shadow bars let you through only in the dark. Wait for the beam to pass.`),
-  xl('ash',`I'm a shadow. I'm a SHADOW. Pip, I'm a shadow!`,`I'm a SHADOW! Pip, look!`),
+  xl('ash',`Mom is never going to find me at bedtime again.`,`Mom will never find me at bedtime!`),
   c1Pip(`Mip?! (Pip hides behind you. Then he realises that's where your shadow is. Pip is very confused.)`,`Mip?! (Pip hides in your shadow. He is very confused.)`)
 ]);
 STORY.c_light_how=S(`Dash to become a shadow: pass moth curtains and shadow bars. Start in a shadow to ride it far.`,`Dash to be a shadow. Pass moth curtains and shadow bars.`);
@@ -637,7 +637,7 @@ c1Def('c_light_end',[
 // The Shadow Spire (c_spire): everything at once (no Pearl here; the moths whisper)
 c1Def('c_spire_in',[
   xl('narr',`Inside, the Spire is black glass, cold as a winter window. Violet lamps burn without any heat. Far above, the moon shines through a hole in the roof.`,`Inside, the Spire is cold black glass. Violet lamps burn with no heat.`),
-  xl('narr',`The moths whisper as you pass. "Little ember. Little ember. Come up. Come up."`,`The moths whisper: "Little ember. Come up. Come up."`),
+  xl('nyxara',`(a hundred tiny voices, from every wall) Little ember. Little ember. Come up. Come up.`,`Little ember. Come up. Come up.`),
   xl('ash',`Nope. Not creepy. Not creepy at all. Pip, hold my horn.`,`Nope. Not creepy at all. Pip, hold my horn.`),
   c1Pip(`Mip. (Pip holds your horn. Very tightly.)`,`Mip. (Pip holds your horn tight.)`)
 ]);
@@ -651,7 +651,7 @@ c1Def('c_spire_sketch',[xl('narr',`A sketchbook, left on a step. Drawings of an 
 c1Def('c_spire_core',[xl('narr',`The Spire is hollow in the middle, all the way up. Warm air rises from somewhere deep below. Warm. In here. You spread your wings.`,`The Spire is hollow inside. Warm air rises. You spread your wings.`)]);
 c1Def('c_shadowash',[
   xl('narr',`The floor is a black mirror. Your reflection looks up at you. Then it puts its hands flat on the glass from the other side, and climbs out.`,`The floor is a black mirror. Your reflection climbs out of it!`),
-  xl('c_shadow',`I'm going to jump on EVERYTHING.`,`I'm going to jump on EVERYTHING.`),
+  xl('c_shadow',`I wasn't snoring. I was practicing my gentle breaths.`,`I was not snoring. I was practicing breathing.`),
   xl('ash',`That's MY line!`,`That's MY line!`),
   xl('c_shadow',`That's MY line!`,`That's MY line!`)
 ]);
@@ -665,7 +665,7 @@ const C1_TAUNTS={
   c_mothmask:[S(`Keep up, little ember!`,`Keep up!`),S(`You fight like someone with a mom waiting at home.`,`You fight like someone with a mom at home.`),S(`Which one's me? Guess!`,`Which one is me? Guess!`),S(`I've been climbing since I could walk. What've you been doing? Lighting lanterns?`,`I've climbed since I could walk. You light lanterns!`)],
   c_mothmask3:[S(`You can't follow me here!`,`You can't follow me here!`)],
   c_mothmask_follow:[S(`...How did you DO that?`,`How did you DO that?`)],
-  c_shadowash:[S(`Great-great-great-great...`,`Great-great-great...`),S(`Mip! (in a deep, wrong voice)`,`Mip! (in a wrong voice)`),S(`I can be a frog. I can be the best frog.`,`I can be the best frog.`)],
+  c_shadowash:[S(`Gentle breaths. Gentle breaths...`,`Gentle breaths...`),S(`Mip! (in a deep, wrong voice)`,`Mip! (in a wrong voice)`),S(`I can be a frog. I can be the best frog.`,`I can be the best frog.`)],
   c_pinch:[S(`PINCH! Salute your Admiral! SALUTE!`,`SALUTE your Admiral!`)]
 };
 // what defineDungeon's `story` should be for each Act II dungeon (keys as e9a expects them)
@@ -694,7 +694,7 @@ defineStages(2,[
     objectives:()=>[{text:S('Follow the Pass Road down to Gearhaven','Follow the road to Gearhaven'),x:C1P.gate.x,y:C1P.gate.y}],
     hint:()=>STORY.c_hints.c_coast,
     soFar:S('A masked thief stole the Ember Heart and fled south. The only clue was a brass gear stamped GEARHAVEN. Ash followed the Southern Pass down to the sea.','A thief stole the Ember Heart. She dropped a gear that says GEARHAVEN. Ash went south to the sea.'),
-    mom:[S(`The sea! Pebble says you can smell it from the pass. Eat something salty for me.`,`The sea! Eat something salty for me.`)],
+    mom:[S(`The sea! Pebble says you can smell it from the pass. Bring me back a shell. A plain one is fine.`,`The sea! Bring me back a shell.`)],
     marker:id=>id==='c_barley'&&!c1Seen('c_barley'),
     enter(o){ if(o.load) return; if(o.prev==='c_pass'||!c1Seen('c_arrive')) later(3.4,()=>c1When('arrive',()=>c1Out(),()=>c1Play('c_arrive'))); },
     talk(n){ if(n.id==='c_barley'&&!c1Seen('c_barley')){ c1Play('c_barley'); return true; } return false; },
@@ -999,8 +999,8 @@ function c1People(){
 }
 onTalk(n=>{
   if(n.id!=='c_vesper'||!c1On()) return false;
-  const L=[xl('c_vesper',`Gran made me sit by her stove for an hour. AN HOUR. Then she made me eat soup. It was warm. Don't tell anyone.`,`Gran made me sit by her stove. Then soup. It was warm.`)];
-  if(G.flags.dr_seen_c_twins&&!c1Seen('c_vesper_twins')) L.push(xdo(()=>c1sMark('c_vesper_twins')),xl('c_vesper',`Granny says "fire isn't the only warm thing" every single night. How do YOU know that?`,`Granny says that every night! How do you know it?`));
+  const L=[xl('c_vesper',`Gran made me sit by her stove for an hour. An hour! Then she made me eat soup. It was warm. Don't tell anyone.`,`Gran made me sit by her stove. Then soup. It was warm.`)];
+  if(G.flags.dr_seen_c_twins&&!c1Seen('c_vesper_twins')) L.push(xdo(()=>c1sMark('c_vesper_twins')),xl('c_vesper',`Gran says "fire isn't the only warm thing" every single night. How do you know that?`,`Gran says that every night! How do you know it?`));
   c1Play(L); return true;
 });
 // ---------- drawing: the glide, the sightings, Duchess, the hatch, the Tide House door, the scrap of silk
@@ -1061,7 +1061,7 @@ function c1Rested(kind){
 }
 STORY.c_warden_whisper=[
   xl('narr',`The shrine flame flickers red, then blue, then green, then gold, then white.`,`The shrine flame turns five colors.`),
-  xl('iska',`(very far away, inside the flame) Little ember. We're still here. All five of us. Keep your fire close. It's getting dark out there.`,`We are still here, little ember. Keep your fire close.`),
+  xl('iska',`(very far away, inside the flame) Ash. We're still here. All five of us. Keep your fire close. It's getting dark out there.`,`We are still here, Ash. Keep your fire close.`),
   xl('bram',`(even further away) AND EAT YOUR VEGETABLES!`,`EAT YOUR VEGETABLES!`),
   xdo(()=>{ G.flags.c_warden_whisper=1; })
 ];
@@ -1108,7 +1108,7 @@ if(typeof DREAMS!=='undefined'){
     xl('narr',`Years later, Pearl sails south to the sea. Her children's children forget they were ever Emberbloods. But they never forget the saying.`,`Pearl sails south. Her family forgets they were Emberbloods. But they remember the saying.`)]};
   if(!DREAMS.c_whisper) DREAMS.c_whisper={stages:['c_light'],title:S('The Moth at the Window','The Moth at the Window'),scene:'whisper',lines:()=>[
     xl('narr',`You dream you're home in Emberhollow. It's night. The forge is warm. Mom is humming.`,`You dream of home. It is night. Mom is humming.`),
-    xl('narr',`Something taps at the window. Tap. Tap. A grey moth with two painted eyes on its wings.`,`Tap, tap. A grey moth is at the window.`),
+    xl('narr',`Something taps at the window. Tap. Tap. A grey moth, with two pale moons painted on her wings.`,`Tap, tap. A grey moth is at the window.`),
     xc('nyxara',`Little ember. Would you like to never lose anything, ever again?`,`Little ember. Do you want to never lose anything again?`,[
       xo(`Who are you?`,`Who are you?`,{fn:()=>{ G.flags.dr_c_whisper='who'; },then:[xl('nyxara',`Someone who understands. Everyone leaves, dear. I can make it stop.`,`Someone who knows. Everyone leaves. I can stop it.`)]}),
       xo(`Go away.`,`Go away.`,{tone:'brave',fn:()=>{ G.flags.dr_c_whisper='go'; },then:[xl('nyxara',`Shh. I'll come back. I always come back. That's the thing about the night.`,`Shh. I will come back. The night always does.`)]}),
@@ -1123,11 +1123,11 @@ if(typeof EV_TAMSIN!=='undefined'&&!EV_TAMSIN.some(v=>String(v&&v[1]).includes('
 // (e7b_threads) is there and has not already filled them in
 if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)&&!PEBBLE_MAIL.some(m=>m&&String(m.id).startsWith('c_pb_'))) PEBBLE_MAIL.push(
   {id:'c_pb_1',from:'maren',when:()=>reached('c_coast'),lines:[
-    c1If('maren',`Ash. The forge is very quiet without that stone humming in it. Catch that thief. Eat something. Love, Mom.`,`The forge is so quiet. Catch that thief. Eat something! Love, Mom.`,()=>G.flags.a1_heart!=='ward'),
-    c1If('maren',`Ash. The mountain looks very bare without that stone on top. Catch that thief. Eat something. Love, Mom.`,`The mountain looks bare. Catch that thief. Eat something! Love, Mom.`,()=>G.flags.a1_heart==='ward'),
+    c1If('maren',`Ash. The forge is very quiet without that stone humming in it. Catch that thief. Love, Mom.`,`The forge is so quiet. Catch that thief. Love, Mom.`,()=>G.flags.a1_heart!=='ward'),
+    c1If('maren',`Ash. The mountain looks very bare without that stone on top. Catch that thief, and eat properly. Love, Mom.`,`The mountain looks bare. Catch that thief. Love, Mom.`,()=>G.flags.a1_heart==='ward'),
     c1If('maren',`P.S. The mountain is quiet. I keep looking at it anyway.`,`P.S. The mountain is quiet now.`,()=>G.choices.ending==='hero'),
     c1If('maren',`P.S. I climbed up and told your grandfather you'd gone south. He grunted. It was a nice grunt.`,`P.S. I told Grandpa. He grunted. A nice grunt.`,()=>G.choices.ending==='warden'),
-    c1If('maren',`P.S. Your grandfather says, and I quote, "The hatchling will fail." Bertram charges extra to hear him say it.`,`P.S. Grandpa says you will fail. He is grumpy.`,()=>G.choices.ending==='heir'),
+    c1If('maren',`P.S. Your grandfather sits on the shelf above Bertram's oven and says, and I quote, "The hatchling will fail." Nobody listens. Bertram gives him the burnt ones.`,`P.S. Grandpa says you will fail. Nobody listens.`,()=>G.choices.ending==='heir'),
     c1If('maren',`P.S. Grandpa ate four of Bertram's buns and the doormat. He says hello. He says it with smoke.`,`P.S. Grandpa ate the doormat. He says hello.`,()=>G.choices.ending==='lantern'),
     xl('narr',`Pebble eyes your coin pouch. Pebble is Elder Yara's crow, and Pebble does not work for free.`,`Pebble wants a coin. She does not work for free.`)]},
   {id:'c_pb_2',from:'morrow',when:()=>!!G.flags.dr_c_whisper,lines:[
@@ -1143,8 +1143,8 @@ if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)&&!PEBBLE_MAIL.so
     c1If('maren',`Fennick sends a can of his Brightest Lamp Oil. He says it's for "any lamp that's having a bad night." He's been very good, you know. Every lantern, every night.`,`Fennick sent lamp oil, for any lamp having a bad night.`,()=>G.choices.fennick==='forgive'),
     c1If('maren',`Tikka sent you a bun. It's lumpy. It's wonderful. Eat it when you're hurt.`,`Tikka sent a lumpy bun. Eat it when you are hurt.`,()=>!!G.flags.tk_home),
     xl('maren',`Wendel wrote you a poem. "Ash, Ash, as brave as an eyelash." He says eyelashes are very brave. They stand in front of your eyes all day.`,`Wendel wrote a poem: "Ash, Ash, as brave as an eyelash."`),
-    xl('maren',`Bertram's bakery exploded on Tuesday. Nothing to do with moths. Nobody was hurt. The ceiling is a skylight now.`,`Bertram's bakery blew up again. Nobody was hurt.`),
-    xl('maren',`Eat something. Love, Mom. P.S. It's very cold here for summer. Odd.`,`Eat something. Love, Mom. P.S. It is cold here. Odd.`),
+    xl('maren',`I keep a lantern lit in the window every night, like I said I would. Yara says she can see it from her porch.`,`My lantern is in the window every night.`),
+    xl('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     xdo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>reached('c_salt'),lines:[
     xl('wren',`Dear Ash. I knew it! The torn page said Pearl sailed south, and now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),
@@ -1167,8 +1167,8 @@ if(typeof EPI!=='undefined'&&EPI&&Array.isArray(EPI.c)&&!EPI.c.length) EPI.c.pus
   {pri:3,cond:()=>!!G.flags.c_regatta_won,line:['narr',S(`The Harbor Regatta has a new rule: no dragons. It's called the Ash Rule.`,`The Regatta has a new rule: no dragons.`)]},
   {pri:2,cond:()=>true,line:['narr',S(`The Great Clock has not stopped once since. Clockkeeper Ambrose says "Tick." Everyone agrees.`,`The Great Clock never stopped again.`)]});
 // moths crowd the lamps at night in Gearhaven (THREADS N4), and the kids notice the bitten moon
-B('c1_moths','town:c_gearhaven',()=>c1On()&&isNight()&&!G.flags.c_snow,()=>pick([S('Never seen so many moths. They are eating my curtains. And my CLOCKS.','So many moths! They eat my curtains!'),S('The moths ate a hole in my best curtain last night. Shaped like a moth.','The moths ate my curtain!')]));
-B('c1_moon','kid',()=>!!G.flags&&(G.flags.moon==null?100:G.flags.moon)<100&&(G.flags.moon==null?100:G.flags.moon)>=95,S('Somebody took a BITE out of the moon! Was it you?','Who bit the moon? Was it you?'));
+B('c1_moths','town:c_gearhaven',()=>c1On()&&isNight()&&!G.flags.c_snow,()=>pick([S('Never seen so many moths. They are eating my curtains. And my clocks.','So many moths! They eat my curtains!'),S('The moths ate a hole in my best curtain last night. Shaped like a moth.','The moths ate my curtain!')]));
+B('c1_moon','kid',()=>!!G.flags&&(G.flags.moon==null?100:G.flags.moon)<100&&(G.flags.moon==null?100:G.flags.moon)>=95,S('Somebody took a bite out of the moon! Was it you?','Who bit the moon? Was it you?'));
 
 // ---------- 6. the rooftop chase (MINI.c_roofchase): Whirligig Manor to the Clockwatch Hall, over the Clock Quarter.
 // The roofs are a layer of their own, drawn over the town: while the chase runs Ash is up on them (houses and
@@ -1395,7 +1395,7 @@ const C1_TIDE={
   b:['...............','...............','.......P.......','...............','...............','ooooooooooooooo','...............','.......B.......','....B..........','..S.........s..','...............'],
   c:['...............','.....ooooo.....','.....o.H.o.....','.....ooooo.....','.....ooooo.....','...............','...............','...............','..s............','...............','...............']};
 defineDungeon('c_tidehouse',{name:S('The Tide House','The Tide House'),level:9,theme:'c_tide',seed:2251,save:'c_tidehouse',dark:0.32,dunKind:S('The Tide Clock','The Tide Clock'),noJuniper:true,
-  story:{in:[xl('narr',`Inside the Tide Clock it smells of seaweed, wet wood and very old oil. Somewhere above you, a big gear is trying to turn and can't.`,`Inside it smells of seaweed and old oil. A big gear is stuck.`),xl('c_mina',`(from outside) Gently with the fire, dragon! It's a WOODEN clock!`,`Gently with the fire! It's a WOODEN clock!`)]},
+  story:{in:[xl('narr',`Inside the Tide Clock it smells of seaweed, wet wood and very old oil. Somewhere above you, a big gear is trying to turn and can't.`,`Inside it smells of seaweed and old oil. A big gear is stuck.`),xl('c_mina',`(from outside) Gently with the fire, dragon! It's a wooden clock!`,`Gently with the fire! It's a wooden clock!`)]},
   floors:[{id:'1',name:S('The Tide Clock','The Tide Clock'),map:{
     rooms:{
       a:{at:[0,2],kind:'start',puzzle:true,tpl:C1_TIDE.a,foes:[['crab',2]],sign:S('THE GEAR ROOM. Kelp in the gears? A SHORT breath of fire. Not a long one. - M. Mudge','Burn the kelp off the gears. A SHORT breath!'),noPots:true},
@@ -1431,7 +1431,7 @@ function c1DrawGear(q,t){
   saveGame(); }; }
 // the start room holds the gears, so it solves when they all turn (kind 'start' never solves on its own)
 { const base=caveBreath; caveBreath=function(hit,dt){ base.apply(this,arguments); try{ if(!c1Tide()) return;
-  for(const o of AREA.dn.pods){ if(!o.lit||!hit(o.x,o.y,24)) continue; o.c1heat=(o.c1heat||0)+dt; if(o.c1heat>1.1){ o.c1heat=0; o.c1stop=G.time+3; ftext(o.x,o.y-62,S('Gently! It\'s a WOODEN clock!','Gently! Wood!'),'#ffd0a0',14); try{ SFX.play('warn',0.5); }catch(e){} } } }catch(e){} }; }
+  for(const o of AREA.dn.pods){ if(!o.lit||!hit(o.x,o.y,24)) continue; o.c1heat=(o.c1heat||0)+dt; if(o.c1heat>1.1){ o.c1heat=0; o.c1stop=G.time+3; ftext(o.x,o.y-62,S('Gently! It\'s a wooden clock!','Gently! Wood!'),'#ffd0a0',14); try{ SFX.play('warn',0.5); }catch(e){} } } }catch(e){} }; }
 { const base=trialObjAct; trialObjAct=function(o){ if(c1Tide()&&o&&o.tobj==='lpod'){ runDialogue([['narr',o.lit?S('A wooden gear, clean and turning. Tick, tock.','The gear turns. Tick, tock.'):S('A big wooden gear, wrapped in slimy kelp. It wants to turn. A short breath of fire would burn the kelp off.','A gear wrapped in kelp. A short breath of fire!')]],()=>{ scene='play'; }); return true; } return base.apply(this,arguments); }; }
 // the lever on the Clock Face (it only moves once the shell is knocked out of the cog)
 { const base=buildCaveRooms; buildCaveRooms=function(A,def){ base.apply(this,arguments); try{ if(def&&def.id==='c_tidehouse') c1TideBuild(A); }catch(e){ console.error(e); } }; }

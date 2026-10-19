@@ -11,8 +11,8 @@ chapter({
   silence: ['c_snow_city'],
   card: ['Act II · Epilogue', 'Snow in Summer'],
   so_far: [
-    'At the top of the Shadow Spire the truth came out: Vesper gave the Heart to a great moth, which cracked it into three Shards. She kept one in secret, and now Ash has it. Then a voice thanked Ash, snow fell in midsummer, and the moon had a bite out of it.',
-    'The Heart broke in three. Ash has one. Snow fell. The moon got bitten.'],
+    "At the top of the Shadow Spire the truth came out: the Lady in Vesper's dreams is a moth, the Mother of moths. She cracked the Heart into three Shards and sent two away. Vesper kept the third, and now Ash has it. Then a soft voice thanked Ash, snow fell in midsummer, and the moon had a bite out of it.",
+    'The Lady is a giant moth. She broke the Heart in three. Ash has one. Snow fell. The moon got bitten.'],
   mom: [['Snow? In summer? Wear the scarf. Both scarves.', 'Snow in summer? Wear your scarf!']],
 
   place: {
@@ -45,16 +45,15 @@ chapter({
       { cam: 'c_spire_door', s: 4 },
       ['narr', 'From the breakwater you look back. The moon goes dim, like a lamp turned down, and every moth on the Spire turns to face you.', 'You look back. The moon goes dim. Every moth turns to you.'],
       ['nyxara', 'Thank you, little ember. You have been such a help.', 'Thank you, little ember. You helped so much.'],
-      ['nyxara', 'While you chased my little thief over the rooftops, my heralds flew north, and east, and nobody followed them.', 'While you chased my thief, my moths flew north and east.'],
       { if: 'choice ending=warden', then: [['ash', 'Grandpa? Are you awake up there?', 'Grandpa? Are you awake?']],
-        else: [{ if: 'choice ending=heir', then: [['ash', 'Grandpa? Did you get out of your birdcage?', 'Grandpa? Did you get out of your cage?']],
-          else: [{ if: 'choice ending=lantern', then: [['ash', "Grandpa? ...No. Grandpa's at home eating the doormat.", 'Grandpa? No. He is at home.']],
+        else: [{ if: 'choice ending=heir', then: [['ash', "Grandpa? Did you get down off Bertram's oven shelf?", 'Grandpa? Did you get off the oven shelf?']],
+          else: [{ if: 'choice ending=lantern', then: [['ash', "Grandpa? ...No. Grandpa's at home. Mom makes him wipe his feet.", 'Grandpa? No. He is at home.']],
             else: [['ash', "...Grandpa? No. You're gone.", 'Grandpa? No. You are gone.']] }] }] },
-      ['nyxara', 'Oh, no, dear. Not him. Someone much, much older. Shh. Go to sleep.', 'No, dear. Not him. Someone much older. Shh.'],
+      ['nyxara', 'Oh, no, dear. Not him. Someone much, much older. Go home now. Stay home.', 'No, dear. Someone much older. Go home. Stay home.'],
       { if: 'choice c_vesper=friend', then: [
         ['c_vesper', "...That's her. That's the Lady. She sounded so kind in my dreams.", "That's her. The Lady. She sounded so kind."] ],
         else: [
-        ['narr', 'The moths pour off the Spire in a grey river, up into the sky, and away north.', 'The moths fly up like a grey river, away north.'] ] },
+        ['narr', 'The moths pour off the Spire in a grey river, up past the dim moon, and away north.', 'The moths fly up like a grey river, away north.'] ] },
     ],
     c_snow_starts: [
       { if: 'choice c_vesper=friend', then: [
@@ -63,9 +62,9 @@ chapter({
         ['narr', 'Something cold lands on your nose.', 'Something cold lands on your nose.'] ] },
       { do: ['set c_snow'] },
       ['narr', 'Snow. Soft and white, drifting down out of a clear summer night.', 'Snow! Out of a summer night!'],
-      ['ash', "Is that... snow? It's MIDSUMMER.", "Is that snow? It's SUMMER!"],
+      ['ash', 'Is that... snow? It was Lantern Day a week ago. It\'s the middle of summer.', "Is that snow? It's the middle of summer!"],
       { if: 'choice c_vesper=friend', then: [
-        ['c_vesper', "It's never snowed in Saltmarsh. Not once in Gran's whole life. I have to get home. She'll be frightened.", 'It never snows in Saltmarsh. I must go home to Gran.'],
+        ['c_vesper', "It's never snowed in Saltmarsh. Not once in Gran's whole life. I have to get home. Her fire will be out by morning, and now this.", 'It never snows in Saltmarsh. I must go home to Gran.'],
         ['c_vesper', "I'll find you, when it's time. Somebody has to stop you climbing anything stupid. You've got horns, cousin, not sense.", "I'll find you when it's time. You have horns, cousin, not sense."],
         { walk: ['c_vesper', 'bw_walk_off'] }, { do: ['clear c_v_breakwater'] } ],
         else: [{ if: 'flag pip', then: [
@@ -82,7 +81,7 @@ chapter({
       { if: 'choice c_vesper=friend', then: [
         ['narr', 'High on the Clockwatch roof, someone in a yellow oilskin sits with her legs dangling over the edge, and waves.', 'On the Clockwatch roof, Vesper waves.'],
         { if: 'quest c_oona done', then: [
-          ['c_vesper', "Gran says thank you. She says it's the first night she's been warm in years.", 'Gran says thank you. She is warm now.'] ],
+          ['c_vesper', "Gran says thank you. Her stove stayed lit all night, in the snow. She keeps putting her hand near it to check.", 'Gran says thank you. Her stove stayed lit all night.'] ],
           else: [
           ['c_vesper', "Gran wrapped me in three blankets and made soup. She says thank you for sending me home. Don't make it weird.", "Gran says thank you. Don't make it weird."] ] } ],
         else: [
@@ -94,13 +93,13 @@ chapter({
     // talking to Vesper on the roof (any time in the epilogue): the Act III hook, and the echoes
     c_vesper_roof: [
       { if: 'flag dr_seen_c_twins !flag c_v_twins', then: [
-        ['c_vesper', 'Gran has a saying. She says it came all the way down from Pearl: "Fire isn\'t the only warm thing." She says it every single night.', 'Gran says "Fire isn\'t the only warm thing." Every night.'],
+        ['c_vesper', 'Gran has a saying. She says it came all the way down from Pearl: "Fire isn\'t the only warm thing." I used to think it was just something you say to cold people.', 'Gran says "Fire isn\'t the only warm thing." I never believed her.'],
         { do: ['set c_v_twins'] } ] },
       { if: 'quest c_oona done', then: [
-        ['c_vesper', "Gran knits by her stove every night now. She's knitting YOU something. I'm not allowed to say what.", 'Gran is knitting you something. It is a secret.'] ] },
+        ['c_vesper', "Gran knits by her stove every night now. She's knitting you something. I'm not allowed to say what.", 'Gran is knitting you something. It is a secret.'] ] },
       ['c_vesper', "The Mother wants all three pieces. Hush took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. Hush took one north.'],
       ['c_vesper', "If you go after it, wrap up warm. And don't climb anything I wouldn't.", 'If you go, wrap up warm.'],
-      ['ash', 'You climb EVERYTHING.', 'You climb EVERYTHING.'],
+      ['ash', 'You climb everything.', 'You climb everything.'],
     ],
   },
 

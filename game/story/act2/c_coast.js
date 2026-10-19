@@ -7,11 +7,11 @@ chapter({
   // the game numbers Act II's cards after the heist (c_fest 1, c_pass 2), so this is Chapter 3
   card: ['Act II · Chapter 3', 'Salt on the Wind'],
   so_far: [
-    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask glide over twice. The night the clocks stopped, something much bigger flew over too, and left Gerald the sheep silver with dust.",
+    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask come up off the beach and glide over the Downs with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with dust.",
     'Something huge flew over. Gerald the sheep is silver now.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],
-  mom: [["The sea! Pebble says you can smell it from the pass. Eat something salty for me.", 'The sea! Eat something salty for me.']],
+  mom: [["The sea! Pebble says you can smell it from the pass. Bring me back a shell. A plain one is fine.", 'The sea! Bring me back a shell.']],
   // x1_story.js plays these old scenes by itself (the c_coast enter hook, Barley's talk): the engine marks them seen
   silence: ['c_arrive', 'c_barley'],
 
@@ -54,16 +54,15 @@ chapter({
       { place: ['c_mask', 'cst_glide_from'] }, { anim: ['c_mask', 'glide'] }, { walk: ['c_mask', 'cst_glide_to'] },
       ['narr', 'And gliding down over the sheepfold, grey against the sky, goes a figure with wings like a moth.', 'Someone with moth wings glides down over the sheep.'],
       ['ash', 'There you are.'],
-      ['ash', 'Okay, Moth Mask. Ready or not, here I come.', 'Okay, Moth Mask. Here I come!'],
+      ['ash', "That's Mom's Heart you've got. I'm bringing it home.", "That's Mom's Heart. I'm bringing it home."],
       { wait: 1 }, { do: ['despawn c_mask'] },
     ],
     cst_barley: [
-      ['c_barley', 'Well, now. Horns and a tail, on my road. Keep your voice down, young dragon. The sheep are jumpy today.', 'Horns and a tail! Keep your voice down. The sheep are jumpy.'],
-      ['ash', 'Jumpy about what?'],
-      ['c_barley', "Gerald's fainted twice since breakfast. When Gerald faints, something's going on.", 'Gerald fainted twice today. Something is going on.'],
-      ['c_barley', 'A girl just went over on a cloak like moth wings. Same as three nights back.', 'A moth girl just flew over. Same as three nights ago.'],
-      ['c_barley', 'That first time she was carrying something that glowed. Like a little red sun.', 'That time she carried something glowing. Like a red sun.'],
-      ['ash', "That's the Ember Heart! Which way did she go?", 'The Ember Heart! Where did she go?'],
+      ['c_barley', 'Horns and a tail, on my road. Keep your voice down, young dragon. The sheep are jumpy today.', 'Horns and a tail! Keep your voice down. The sheep are jumpy.'],
+      ['ash', "Did a girl in a moth cloak come this way?", 'Did a moth girl come this way?'],
+      ['c_barley', 'Just now, gliding. And three nights back, the first time. She came up off the beach, wet to the knees, with a boat bobbing empty behind her.', 'Just now. And three nights ago. She came up off the beach, all wet.'],
+      ['c_barley', 'That night she carried something that glowed. Like a little red sun, in a sack.', 'That night she carried something glowing. Like a red sun.'],
+      ['ash', "That's my mom's Ember Heart. Which way did she go?", "That's Mom's Ember Heart! Where did she go?"],
       ['c_barley', "Down to Gearhaven, both times. But later that night something much bigger went over. Gerald saw it, and he hasn't been right since.", 'To Gearhaven. Later something much bigger flew over. Gerald saw it.'],
       ['ash', 'Which one is Gerald?'],
       ['c_barley', "They're all Gerald, bar Duchess. You want the shiny one.", "They're all Gerald. Find the shiny one."],
@@ -71,7 +70,7 @@ chapter({
     cst_gerald: [
       ['narr', 'Just outside the fold, one sheep lies flat on his back with his legs in the air.', 'One sheep lies on his back, legs in the air.'],
       ['narr', 'He is silver from his horns to his hooves, under soft, glittery dust as thick as frost.', 'He is silver all over. Thick, glittery dust.'],
-      ['ash', 'A moth did this? It would have to be a moth the size of a barn.', 'A moth did this? A moth as big as a barn!'],
+      ['ash', "Moth dust. A moth did this? Not a little one. Not from the size of that sheep.", 'Moth dust! From a very big moth.'],
       ['narr', 'Gerald opens one eye, sees a dragon, and faints again.', 'Gerald sees you. He faints again.'],
       { if: 'flag pip', then: [
         ['pip', 'Mip... mip... MIP-CHOO!'],

@@ -54,7 +54,7 @@ quest({
     bb_home: [
       ['c_bobs', 'BOB!'],
       ['c_bob3', 'BOB!'],
-      ['narr', 'Three tin watchmen hug. It sounds like a cutlery drawer falling down the stairs.', 'Three tin men hug. CLANG!'],
+      ['narr', 'Three tin watchmen hug. It sounds like a cutlery drawer falling down the stairs.', 'Three tin men hug. Clang!'],
       ['c_bob3', 'I remember now. The sky went soft and grey, and dust fell like snow. Then I was in the Yards.',
         'The sky went grey. Dust fell. Then I was lost.'],
       ['c_bobs', 'The Clockwatch owes you, dragon. When you need us, all three Bobs will be there. Probably on time.', 'We owe you. All three Bobs will come.'],
@@ -62,7 +62,7 @@ quest({
     // the clever Bob's memory, played by his own talk in people.js while the homecoming plays the old lines
     bb_remember: [
       ['c_bob3', 'I remember now. The night I went funny, the sky went soft and grey, and dust fell like snow.', 'The sky went grey. Dust fell like snow.'],
-      ['c_bob3', 'Then it was all TICK TOCK, and I was in the Brass Yards. I do not like snow any more.', 'Then I was lost. I do not like snow now.'],
+      ['c_bob3', 'Then it was all tick, tock, and I was in the Brass Yards. I do not like snow any more.', 'Then I was lost. I do not like snow now.'],
     ],
   },
 

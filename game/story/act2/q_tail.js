@@ -31,7 +31,7 @@ quest({
 
   scene: {
     tl_offer: [
-      ['c_hettie', "May I see your tail? Professionally. Oh, it's MAGNIFICENT. Pearl's hook! I've only ever seen drawings.",
+      ['c_hettie', "May I see your tail? Professionally. Oh, it's magnificent. Pearl's hook! I've only ever seen drawings.",
         "Pearl's hook! May I see it?"],
       ['c_hettie', 'I could put a reel inside it. You would pull things TO you. Crabs. Shields. Biscuits off high shelves.',
         'I can add a reel. Pull things to you!'],
@@ -40,13 +40,13 @@ quest({
         "And the weathervane spring. Don't tell the Captain."],
       { choose: 'c_tail_offer', ask: ['Get Hettie the springs?'], pick: [
         { t: ['A reel in my tail? Yes!', 'Yes!'], tone: 'brave', then: ['quest start c_tail'],
-          say: [['c_hettie', 'SCIENCE! The Rams live in the Brass Yards, and the spring lives on top of the Clockwatch Hall. Try not to get arrested.', 'Rams are in the Brass Yards.']] },
+          say: [['c_hettie', 'Science! The Rams live in the Brass Yards, and the spring lives on top of the Clockwatch Hall. Try not to get arrested.', 'Rams are in the Brass Yards.']] },
         { t: ["I like my tail the way it is.", 'No thanks.'], say: [['c_hettie', 'Fair. It IS a good tail.']] },
       ] },
     ],
     tl_reel: [
       ['narr', 'Hettie takes your tail very gently, a screwdriver in her teeth. Click. Whirr. Clunk.', 'Click. Whirr. Clunk!'],
-      ['c_hettie', 'The Reel-In! Grapple a shield and PULL. Grapple a crab and PULL.', 'The Reel-In! Grapple and PULL!'],
+      ['c_hettie', 'The Reel-In! Grapple a shield and pull. Grapple a crab and pull.', 'The Reel-In! Grapple and pull!'],
       ['c_hettie', 'Try it. That biscuit on the top shelf. Go on.', 'Try it on that biscuit!'],
       ['narr', 'You flick your tail. The biscuit zips across the room into your hand. So does the shelf.', 'The biscuit flies to you. So does the shelf.'],
       ['c_hester', '(from somewhere up the hill) WHO TOOK MY WEATHERVANE SPRING?', '(far away) WHO TOOK MY SPRING?'],

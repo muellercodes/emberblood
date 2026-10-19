@@ -41,7 +41,7 @@ quest({
         "Look in Pearl's old places.", { ref: 'c_gullcrag_door' }],
       { if: 'flag c_pb_5', then: [['c_ottoline', 'Sister Wren wrote that you would ask. She also wrote that I am wrong about commas. I am not.',
         'Wren said you would come. She is wrong.']] },
-      { choose: 'c_logbook_offer', ask: ["Bring them to me? I'll pay you in coins. And I'll be quiet for a whole week. I'll TRY.", 'Bring them? I will pay.'],
+      { choose: 'c_logbook_offer', who: 'c_ottoline', ask: ["Bring them to me? I'll pay you in coins. And I'll be quiet for a whole week. I'll try.", 'Bring them? I will pay.'],
         pick: [
           { t: ["I'll find them.", "I'll find them."], tone: 'kind', then: ['quest start c_logbook'],
             say: [['c_ottoline', 'WONDERFUL! ...Sorry. Wonderful.', 'WONDERFUL! Sorry.']] },

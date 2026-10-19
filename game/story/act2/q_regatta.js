@@ -21,7 +21,7 @@ quest({
 
   scene: {
     rg_offer: [
-      ['c_jo', "Ahoy, lizard! The chain's up and the harbor's open. It's REGATTA DAY!", 'The harbor is open! REGATTA DAY!', { fact: 'c_harbor=open', if: 'flag c_clock_on' }],
+      ['c_jo', "Ahoy, lizard! The chain's up and the harbor's open. It's Regatta Day!", 'The harbor is open! Regatta Day!', { fact: 'c_harbor=open', if: 'flag c_clock_on' }],
       ['c_jo', "Eight buoys round the harbor, out the mouth and back. Boats only. ...You've got feet.", 'Eight buoys. Boats only. You have feet.'],
       ['ash', 'I can skip.'],
       ['c_jo', 'You can WHAT?'],
@@ -32,7 +32,7 @@ quest({
       ] },
     ],
     rg_noskim: [
-      ['c_jo', "You walk on water but you can't SKIP? Come back when you can, landlubber.", "You can't skip? Come back when you can!"],
+      ['c_jo', "You walk on water but you can't skip? Come back when you can, landlubber.", "You can't skip? Come back when you can!"],
     ],
     rg_ready: [
       ['c_jo', 'Eight buoys. Follow the flags. First back to my shed wins. Sprint to skip, lizard!', 'Eight buoys. First back wins. Sprint!'],
@@ -42,11 +42,11 @@ quest({
       ['c_jo', 'HA! The Sea Biscuit wins again! Rematch? Talk to me.', 'I win! Rematch? Talk to me.'],
     ],
     rg_won: [
-      ['c_jo', "You BEAT me. On FOOT. On WATER. That can't be allowed! ...Nobody ever wrote a rule against it. Yet.", 'You BEAT me! On FOOT! On WATER!'],
+      ['c_jo', "You beat me. On foot. On water. That can't be allowed! ...Nobody ever wrote a rule against it. Yet.", 'You beat me! On foot! On water!'],
       ['c_jo', 'Here. My skiff whistle. Blow it at any landing and one of my cousins rows you anywhere on the coast.',
         'My whistle. My cousins row you anywhere.', { promise: 'c_lm_skiff_quay' }],
-      ['c_jo', 'I have a LOT of cousins.'],
-      ['c_mo', '(from the Harbor Office) THE DRAGON WINS THE REGATTA! BARNACLES! Somebody write that down!', '(far away) THE DRAGON WINS!'],
+      ['c_jo', 'I have a lot of cousins.'],
+      ['c_mo', '(from the Harbor Office) The dragon wins the regatta! Barnacles! Somebody write that down!', '(far away) The dragon wins!'],
       ['c_penny', 'Already did.'],
     ],
   },

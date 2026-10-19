@@ -173,7 +173,7 @@ people({
       { if: 'quest c_gifts done', once: true,
         say: ['Penny told me who my old dishwasher is. I always knew. I just never said. Tea?', 'I always knew who she was. Tea?'] },
       { if: 'quest c_oona done', once: true,
-        say: ["Oona's stove is lit! She sent me a note. It's warm, she wrote, three times, and underlined it.", "Oona's stove is lit! She wrote WARM."] },
+        say: ["Oona's stove is lit, and it stays lit! She sent me a note. It's warm, she wrote, three times, and underlined it.", 'Oona\'s stove stays lit! She wrote "warm" three times.'] },
       { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
         say: ["Snow in summer, dearie! I've had more customers today than all year. Everybody wants something hot.", 'Snow! Everyone wants hot tea today.'] },
       { say: [["Sit down, dearie, you look like you've been chasing something.", 'Sit down, dearie. You look tired.'],
@@ -184,9 +184,9 @@ people({
 
     c_penny: [
       { if: 'flag c_regatta_won', once: true,
-        say: ['HEADLINE: DRAGON WINS REGATTA ON FOOT. JO DEMANDS RECOUNT. THERE IS NOTHING TO RECOUNT.', 'HEADLINE: DRAGON WINS THE REGATTA!'] },
+        say: ['You won the regatta on foot, and Jo wants a recount. Of what? There was one dragon, and he came first.', 'You won on foot! Jo wants a recount.'] },
       { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['HEADLINE: SNOW IN SUMMER. EXPERTS BAFFLED. EXPERT IS ME.', 'HEADLINE: SNOW IN SUMMER!'] },
+        say: ["Snow in summer, and a bite out of the moon. Two front pages in one night. I always wanted that. I don't like it.", "Snow, and a bitten moon. Two big stories. I don't like it."] },
       { say: [['Every good story has a mystery, a chase, and a really good quote. Say something quotable.', 'Say something good for my paper!'],
         ['The Moth Mask Watch board says what I say. The board is me. I am the board.', 'I am the Moth Mask board!'],
         ["One day I'll have a printing press. Right now I have a very loud voice.", 'One day, a press. Now, a loud voice.']] },
@@ -219,7 +219,7 @@ people({
     // ---------------------------------------------------------------- Saltmarsh
     c_oona: [
       { if: 'quest c_oona done', once: true,
-        say: ["The stove's been going all week. My Vesper sat by it on Tuesday, a whole evening, and never once looked at the door.", 'Vesper sat by my stove a whole evening!'] },
+        say: ["The stove's been going all week, and not once out by morning. My Vesper sat by it a whole evening and never once looked at the door.", 'The stove never goes out! Vesper sat by it all evening.'] },
       { if: 'flag dr_c_twins', once: true, option: ['I dreamed about baby Pearl. She climbed the curtains.', 'I dreamed baby Pearl climbed the curtains.'],
         say: ["Up the curtains, the day she was born! Oh, duck. That's our family story. Nobody outside this house knows that one.",
           "Up the curtains! That's our family story!"] },
@@ -234,8 +234,8 @@ people({
         say: ["Breathe on it gently, duck. GENTLY. I'm fond of my eyebrows.", 'Breathe on the stove. Gently!'] },
       { if: 'quest c_oona done',
         say: [["Come in, duck. Shut the door. Not because of the cold. Because of the gulls.", 'Come in, duck. Mind the gulls.'],
-          ["Fire isn't the only warm thing. But it's a nice one. Thank you, duck.", 'Thank you for my fire, duck.']] },
-      { say: [["I've been cold since I was a girl. Our family always is. Emberbloods, you know. Just without the fire.", 'I am always cold. Emberbloods with no fire.'],
+          ["I keep getting up in the night to see if it's gone out. It never has. Thank you, duck.", "It never goes out. Thank you, duck."]] },
+      { say: [["Strike a match in this house and it's out by morning, duck. Pearl's line. We just wear more cardigans.", 'Our fires go out by morning. We wear cardigans.'],
         ["My Vesper brings me fish every morning. Leaves it on the step and runs. She thinks I don't know it's her. I know.", 'Vesper leaves fish on my step. I know.'],
         ["Mother Pearl climbed every cliff on this coast, and here's me, needing a sit-down after my own front step.", 'Pearl climbed cliffs. I need a rest after my step!']] },
       { bark: true, if: '!quest c_oona done', say: ['Brrr. Shut the door, duck.', 'Brrr. Shut the door.'] },

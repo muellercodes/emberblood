@@ -10,8 +10,9 @@ act({
       title: ['Who is the Moth Mask, and why does she steal?', 'Who is the Moth Mask?'],
       deduce: ['where_next', 'who_is_she', 'why_glowing', 'what_she_is'],
       herring: ['g_penny_first', 's_baron_rumor'] },
-    // small: the night everything stopped (answer: a moth bigger than a ship flew over the coast; Vesper names her
-    // Murmur at the top of the Spire, and her notebook page tells the rest)
+    // small: the night everything stopped (answer: something huge flew over the coast; at the top of the Spire Vesper
+    // says it was the Lady herself, a moth, and her notebook page tells the rest: the Mother, with two pale moons on
+    // her wings, cracked the Heart and stopped every clock at one minute to midnight. There is no Murmur any more.)
     what_stopped: {
       title: ['What stopped the clocks, the tide and the light?', 'What stopped the clocks?'],
       deduce: ['what_stopped'],
