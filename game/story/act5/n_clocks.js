@@ -16,7 +16,7 @@ chapter({
   id: 'n_clocks', act: 5, after: 'n_stair', next: 'n_rime', takeover: true,
   card: ['Finale · The Second Ring', 'The Clockstop Cliffs'],
   so_far: [
-    'Ash beat the Echo of the First Flame and found the little grey moth carved everywhere Ember had been. The second ring is a copy of Gearhaven, where every clock is stuck at midnight.',
+    'Ash beat the Echo of the First Flame and found the little grey moth carved everywhere Ember had been. The second ring is a copy of Gearhaven, where every clock is stuck at one minute to midnight.',
     'Ash beat the shadow dragon. Now Ash climbs the clock cliffs.'],
 
   place: {
@@ -136,11 +136,11 @@ chapter({
     ],
     n_clocks_in: [
       ['narr', 'The second ring is a copy of Gearhaven: clock towers, brass gears and chalk cliffs, every bit of it black glass.', 'The second ring looks like Gearhaven. All black glass.'],
-      ['narr', 'Every clock says midnight. Not one of them ticks.', 'Every clock says midnight. None of them tick.'],
+      ['narr', 'Every clock says one minute to midnight, like the clocks of Gearhaven did. Not one of them ticks.', 'Every clock says one minute to midnight. None of them tick.'],
       ['ash', 'Gearhaven was never this quiet. Gearhaven was so loud you could hear it think.', 'Gearhaven was never this quiet.'],
       ['pip', 'Mip?'],
       ['ash', 'I know, Pip. I miss the ticking too.', 'I miss the ticking too, Pip.', { if: 'flag pip' }],
-      ['nyxara', 'Midnight is the best time, little ember. Nothing ends at midnight. Everything just waits.', 'At midnight, nothing ends. Everything just waits.'],
+      ['nyxara', 'One minute to midnight, little ember. My favorite minute. Nothing has ended yet, and nothing ever has to.', 'One minute to midnight. My favorite. Nothing has ended yet.'],
       ['nyxara', 'I came in the night once, to a girl with a lantern. She was so warm.', 'I came in the night once, to a girl with a lantern.', { clue: 'n5_came_in_night' }],
       ['ash', 'What girl? Hey! What girl?', 'What girl? Hey!'],
     ],
@@ -150,7 +150,7 @@ chapter({
       ] },
       ['narr', 'With the hands off the twelve, you can see what they were covering. Three old letters, carved deep into the hub.', 'Under the hands are three old letters.'],
       ['narr', 'N. Y. X. And under them, very small: "NYX: the clockmakers\' old word for night."', 'N Y X. "NYX: the old word for night."', { clue: 'n5_clock_word' }],
-      ['ash', 'Nyx. Night. A night clock, stopped at midnight, so the night never has to end.', 'Nyx means night.'],
+      ['ash', 'Nyx. Night. A night clock, stopped one minute short of midnight, so the night never has to end.', 'Nyx means night.'],
     ],
     // Vesper on the Silk Gallery, one scene id for both pictures (x4_story's ally runtime reads n4sSeen('n_vesper_join')):
     // the friend Vesper (Act II friend) lands beside Ash at the near shore; a foe Vesper gets her second chance on the

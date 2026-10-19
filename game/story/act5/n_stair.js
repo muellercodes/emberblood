@@ -50,8 +50,8 @@ chapter({
       text: ['Ember: every Lantern Day a little grey moth sat on her lantern. Iska said the moth rode down on a moonbeam. Then Ember grew up, and stopped climbing the hill.',
         'A little grey moth sat on Ember\'s lantern. She came on a moonbeam.'] },
     n5_grey_scale: { icon: 'moth', mystery: 'night_mother', herring: true,
-      text: ['A grey moth scale as big as a plate, at the foot of the Shadow Throne, soft as dust, like Nyxara\'s wings. Far too big for the little moth on Ember\'s lantern.',
-        'A huge grey scale, like Nyxara\'s. Ember\'s moth was tiny.'] },
+      text: ['A grey moth scale as big as a plate, at the foot of the Shadow Throne, soft as dust: the Mother\'s, like her wings. Far too big for the little moth on Ember\'s lantern.',
+        'A huge grey scale. The Mother\'s. Ember\'s moth was tiny.'] },
     // the Echo 1 outro memory (given when the next chapter starts: x4_foes plays the outro itself); N5b's n5_wants needs it
     n5_mem_grandpa: { icon: 'fire', mystery: 'night_mother',
       text: ['A memory from the Echo of the First Flame, in a sad young voice: "Ember? Is that you, up there with the lanterns?"',
@@ -148,7 +148,7 @@ chapter({
     ],
     nst_scale: [
       ['narr', 'At the foot of the empty throne lies a grey moth scale as big as a plate. It is soft as dust.', 'A grey moth scale as big as a plate.', { clue: 'n5_grey_scale' }],
-      ['ash', "Grey and soft, like Nyxara's wings on the beach. But Ember's moth was small enough to sit on a lantern.", "Like Nyxara's wings. But Ember's moth was tiny."],
+      ['ash', "Grey and soft. It's hers, the Mother's, like her wings on the beach. But Ember's moth was small enough to sit on a lantern.", "It is the Mother's. But Ember's moth was tiny."],
     ],
     nst_well: [
       ['narr', 'A black glass copy of the village well. Words are carved all round its rim, in old letters.', 'A copy of the village well. Words are carved on it.'],
