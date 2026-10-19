@@ -177,14 +177,13 @@ const m3sDunObj=(id,f,s,P)=>m3sIn(id)?{text:S(f,s),x:player.x,y:player.y,area:AR
 // ---------- 3. the main story (bible/ACT4.md section 6). Every scene is STORY.<key>; M3STORY.md lists when each plays
 // Chapter 1, Across the Sea (6.1): the morning after Act III, in Hearthold
 m3sDef('m_intro',[
-  xl('narr',`Morning in Hearthold. The Great Hearth crackles. Pim is already selling cocoa. Pebble lands on your head with TWO letters, and takes TWO coins.`,`Morning in Hearthold. Pebble lands on your head with TWO letters. She takes TWO coins.`),
+  xl('narr',`Morning in Hearthold. The Great Hearth crackles. Pim is already selling cocoa. Pebble lands on your head with two letters, and takes two coins.`,`Morning in Hearthold. Pebble lands on your head with two letters. She takes two coins.`),
   xdo(()=>{ G.coins=Math.max(0,(G.coins|0)-2); }),
-  xl('maren',`(the first letter) Ash. Yara says the moon is smaller. I looked. It is. Two bites. I don't like it when the sky changes shape. Be careful. Be brave. Be home soon. Eat something. Love, Mom.`,`Ash. The moon is smaller. Two bites. Be careful. Be brave. Eat something. Love, Mom.`),
-  xl('maren',`P.S. Bertram's bakery exploded on Tuesday. He says it's unrelated. It's always unrelated.`,`P.S. Bertram's bakery blew up again. He says it was not his fault.`),
+  xl('maren',`(the first letter) Ash. I went out to look at the moon tonight. Then I came back in and lit an extra lantern in the window. Love, Mom.`,`(a letter) I looked at the moon tonight. Then I lit an extra lantern in the window. Love, Mom.`),
   xl('dell',`(the second letter) Ash! Dell again! The Soggy Biscuit Three is ready in Gearhaven. She has a steam paddle, a brass whistle, and a captain who has never once sunk her. That's me. It has been FIVE days.`,`Ash! It's Dell! My boat, the Soggy Biscuit Three, is ready in Gearhaven. I have not sunk her once!`),
   xl('dell',`Come to the Far Pier when you're ready to sail east. Nobody else will sail into a dark sea, so it's me or a bathtub. I've packed sandwiches. And a librarian. Long story. Dell.`,`Come to the Far Pier. We will sail east. I packed sandwiches. And a librarian. Dell.`),
   xl('tove',`East, where the moon's light fell. I'm going to hand you over to Iska for this part, Ash. She's better with the dark. I'm better with complaining about the cold.`,`East, where the moon's light fell. Iska will help you now. She is good with the dark.`),
-  xl('iska',`Hello again, little ember. It's Iska. I made lanterns, once. I have a feeling we're going to need a lot of them.`,`Hello, little ember. It's Iska. I made lanterns. We will need lots of them.`),
+  xl('iska',`Ash, it's Iska. Tove says the dark is my job now, and she's right. East is where the moon's light fell. We'll need a lot of lanterns.`,`Ash, it's Iska. I'll help you now, not Tove. We go east. We'll need lots of lanterns.`),
   m3sIf('narr',`Pip climbs up onto your head. Pip is far too big for your head now. Pip disagrees.`,`Pip climbs onto your head. He is too big now. Pip does not agree.`,()=>!!G.flags.pip),
   m3sIf('narr',`A shadow slides over the town. Glaciar lands outside the walls with a soft, enormous WHUMPH. Half of Hearthold faints. The other half cheers.`,`Glaciar lands outside the walls. WHUMPH! Half the town faints. The other half cheers.`,m3sGlaciar),
   m3sIf('f_glaciar',`Good morning, dumpling! I heard the word "east". I don't do fast. But I do far.`,`Good morning, dumpling! I heard "east". I'm slow. But I go far.`,m3sGlaciar),
@@ -200,27 +199,27 @@ m3sDef('m_voyage_ship',[
   xdo(()=>m3sVoy('ship')),
   xl('narr',`The Soggy Biscuit Three chugs out of Gearhaven with a toot of steam. Dell stands at the wheel in his yellow rain hat, grinning so hard his beard sticks out sideways.`,`Dell's boat toots out of Gearhaven. Dell grins so hard his beard sticks out.`),
   xl('dell',`Three days east, Ash! Past the end of every map I own! I've never been so happy or so scared!`,`Three days east, Ash! Past every map I own! I'm so happy. And so scared!`),
-  xl('wren',`(green, hugging a book) I'm fine. I'm FINE. Books don't get seasick. I'm just going to read... over the side.`,`(green, hugging a book) I'm fine. Books don't get seasick. I'll just read... over the side.`),
-  xl('ash',`Sister Wren? You came OUTSIDE?`,`Sister Wren? You came OUTSIDE?`),
+  xl('wren',`(green, hugging a book) I'm fine. Books don't get seasick. I'm just going to read... over the side.`,`(green, hugging a book) I'm fine. Books don't get seasick. I'll just read... over the side.`),
+  xl('ash',`Sister Wren? You came outside?`,`Sister Wren? You came outside?`),
   xl('wren',`My cousin Eider wrote to me about the dragon child who thawed a whole village. I thought: if Ash can climb a mountain, I can sit on a boat. I was wrong. But I'm here.`,`My cousin wrote about you. I thought, if Ash can climb a mountain, I can sit on a boat. I was wrong. But I'm here.`),
-  xl('f_mags',`(from below deck) The engine's FINE! It's making that noise on purpose! Mostly! I'm the engineer now. Dell pays me in sandwiches.`,`(from below) The engine is FINE! The noise is on purpose! Mostly! Dell pays me in sandwiches.`),
+  xl('f_mags',`(from below deck) The engine's fine! It's making that noise on purpose! Mostly! I'm the engineer now. Dell pays me in sandwiches.`,`(from below) The engine is fine! The noise is on purpose! Mostly! Dell pays me in sandwiches.`),
   m3sIf('ev_tikka',`(from the galley) Lumpy buns! Lumpy buns for everyone! Lumpy means love!`,`Lumpy buns for everyone! Lumpy means love!`,()=>G.flags.tk_come==='yes'),
   m3sAct(`On the second night the moon comes up over the sea. Two bites are missing from its edge, like a cookie.`,`On the second night the moon comes up. Two bites are gone, like a cookie.`,()=>{ if(M3S.voy) M3S.voy.moon=1; }),
   m3sAct(`Something flutters past the mast. A moth. Then another. Then a hundred, all flying east, toward the moon. Every one has two pale painted eyes on its wings.`,`A moth flies past. Then a hundred, all flying east. Each has two painted eyes.`,()=>{ if(M3S.voy) M3S.voy.moths=1; }),
-  xl('iska',`They're going home to her. Follow the moths, little ember. They always know where the light is.`,`They are going home to her. Follow the moths. They know where the light is.`),
+  xl('iska',`They're going home to her. Follow the moths, Ash. They always know where the light is.`,`They are going home to her. Follow the moths. They know where the light is.`),
   m3sAct(`On the third morning a town comes out of the mist. It's floating.`,`On the third morning a town comes out of the mist. It floats!`,()=>{ M3S.fadeTo=0; })
 ]);
 // 6.1c the flight with Glaciar
 m3sDef('m_voyage_glaciar',[
   xdo(()=>m3sVoy('glaciar')),
   xl('narr',`Glaciar flies slowly. Very slowly. Clouds overtake her. A seagull overtakes her and looks back, smug.`,`Glaciar flies very slowly. A seagull passes her. It looks smug.`),
-  xl('f_glaciar',`Isn't this LOVELY, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.`,`Isn't this LOVELY, dumpling? My left wing fell asleep.`),
+  xl('f_glaciar',`Isn't this lovely, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.`,`Isn't this lovely, dumpling? My left wing fell asleep.`),
   xl('ash',`Auntie, it's been two days.`,`Auntie, it's been two days.`),
-  xl('f_glaciar',`Patience is a dragon's best friend. My second-best friend is you.`,`Patience is a dragon's best friend. You are my second best.`),
+  xl('f_glaciar',`Two days is nothing. I once took a week to turn round.`,`Two days is nothing. I once took a week to turn round.`),
   m3sAct(`On the second night the moon comes up over the sea. Two bites are missing from its edge, like a cookie.`,`On the second night the moon comes up. Two bites are gone, like a cookie.`,()=>{ if(M3S.voy) M3S.voy.moon=1; }),
   m3sAct(`Moths flutter past Glaciar's nose, hundreds of them, all flying east.`,`Hundreds of moths fly past, all going east.`,()=>{ if(M3S.voy) M3S.voy.moths=1; }),
   xl('f_glaciar',`Ugh. Moths. I can taste her on the wind. Like cold tea. Hold on, dumpling.`,`Ugh. Moths. I can taste her on the wind. Hold on, dumpling.`),
-  xl('iska',`Follow the moths, little ember. They always know where the light is.`,`Follow the moths. They know where the light is.`),
+  xl('iska',`Follow the moths, Ash. They always know where the light is.`,`Follow the moths. They know where the light is.`),
   m3sAct(`On the third morning a town comes out of the mist. It's floating. Glaciar lands on its north beach and the whole beach freezes solid. The raft folk cheer. Free ice!`,`On the third morning, a floating town! Glaciar lands. The beach freezes. Free ice!`,()=>{ M3S.fadeTo=0; }),
   xl('f_glaciar',`I'll wait here, dumpling. The sun this far south is very rude. Dell's boat is a day behind us. He sent a pigeon. The pigeon was very tired.`,`I'll wait here, dumpling. Dell's boat is a day behind us. He sent a very tired pigeon.`),
   m3sIf('f_glaciar',`Oh, and Brann sends his regards. He's very brave now. He asked me to say it loudly. HE IS VERY BRAVE.`,`Brann says hello. He is VERY BRAVE now.`,()=>true)
@@ -234,7 +233,7 @@ m3sDef('m_dell_late',[
 ]);
 // Chapter 1, Driftwood Landing (6.2)
 m3sDef('m_dabble',[
-  xl('m_dabble',`Welcome! WELCOME to Driftwood Landing, the only town in the world that's never in the same place twice! I'm Mayor Dabble Floatwell. Mind the gap. Mind ALL the gaps.`,`Welcome to Driftwood Landing! This town is never in the same place twice. I'm Mayor Dabble. Mind the gaps!`),
+  xl('m_dabble',`Welcome! Welcome to Driftwood Landing, the only town in the world that's never in the same place twice! I'm Mayor Dabble Floatwell. Mind the gap. Mind all the gaps.`,`Welcome to Driftwood Landing! This town is never in the same place twice. I'm Mayor Dabble. Mind the gaps!`),
   xl('m_dabble',`We're a raft town. We go where the tide takes us. Usually that's somewhere nice. Lately...`,`We are a raft town. We go where the tide takes us. Lately...`),
   xl('narr',`The whole town lurches. A raft full of chickens drifts past, out to sea. The chickens look worried.`,`The whole town wobbles. A raft full of chickens floats away. They look worried.`),
   xl('m_dabble',`Lately the tide's gone wobbly. Too high, then too low, then sideways. Old Winnie says it's the moon. Go and see Old Winnie. She's the one with the seashell hat. Wave to the chickens.`,`The tide has gone wobbly. Old Winnie says it's the moon. Go see her. She has a seashell hat. Wave to the chickens.`),
@@ -780,7 +779,7 @@ defineStages(4,[
       return [m3sObj(`Ask Old Winnie the Tidewife about the moon`,`Ask Old Winnie about the moon`,m3sWho('m_winnie',M3SP.winnie.x,M3SP.winnie.y))]; },
     hint:m3sHint('m_drift'), yara:M3S_YARA,
     soFar:S(`Ash sailed east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the sea, and the Glass Desert, where the moon's broken light fell as glass.`,`Ash sailed to Moonfall. There is a city under the sea and a desert of glass.`),
-    mom:[S(`A floating town? Does it have floors? Eat something that isn't fish.`,`A floating town! Eat something.`)],
+    mom:[S(`A floating town? Does it have floors? Mind you don't fall between them.`,`A floating town! Don't fall in.`)],
     marker:id=>{ const F=G.flags; return (id==='m_dabble'&&!F.m_dabble)||(id==='m_winnie'&&!F.m_winnie); },
     talk(n){ const F=G.flags;
       if(n.id==='m_dabble'&&!F.m_dabble){ m3sPlay('m_dabble',()=>questUpdated()); return true; }

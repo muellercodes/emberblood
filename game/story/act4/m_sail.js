@@ -1,5 +1,5 @@
 // game/story/act4/m_sail.js (A4a): Act IV, Chapter 1, "Across the Sea" (first half).
-// What the player does: the morning after Act III, Pebble brings two letters (Mom: the moon has two bites gone; Dell:
+// What the player does: the morning after Act III, Pebble brings two letters (Mom: an extra lantern in the window; Dell:
 // his sea boat is ready at Gearhaven's Far Pier) and Ash picks how to go east: Dell's boat, or Auntie Glaciar if she
 // was freed in Act III. The voyage plays as a painted picture (the moon with two bites, a hundred moths flying east,
 // a floating town in the mist), then Driftwood Landing, where m_drift begins.
@@ -40,16 +40,14 @@ chapter({
   scene: {
     // the old STORY.m_intro, replaced in place (x3_story's m3sIntroStart plays it, then shows the Chapter 1 card)
     m_intro: [
-      ['narr', 'Morning in Hearthold. Pim is already selling cocoa. Pebble lands on your head with TWO letters, and takes TWO coins.',
-        'Pebble lands on your head with TWO letters. She takes TWO coins.', { do: ['take coins 2'] }],
-      ['maren', "(the first letter) Ash. Yara says the moon is smaller. I looked. It is. Two bites. Be careful. Be brave. Be home soon. Eat something. Love, Mom.",
-        'Ash. The moon is smaller. Two bites. Be brave. Eat something. Love, Mom.'],
-      ['maren', "P.S. Bertram's bakery exploded on Tuesday. He says it's unrelated. It's always unrelated.",
-        "P.S. Bertram's bakery blew up again. He says it was not his fault."],
+      ['narr', 'Morning in Hearthold. Pim is already selling cocoa. Pebble lands on your head with two letters, and takes two coins.',
+        'Pebble lands on your head with two letters. She takes two coins.', { do: ['take coins 2'] }],
+      ['maren', "(the first letter) Ash. I went out to look at the moon tonight. Then I came back in and lit an extra lantern in the window. Love, Mom.",
+        '(a letter) I looked at the moon tonight. Then I lit an extra lantern in the window. Love, Mom.'],
       ['dell', "(the second letter) Ash! Dell again! The Soggy Biscuit Three is ready at Gearhaven's Far Pier. Nobody else will sail into a dark sea, so it's me or a bathtub. I've packed sandwiches. And a librarian.",
         "Ash! It's Dell! My boat is ready at Gearhaven's Far Pier. I packed sandwiches. And a librarian.", { promise: 'm4_far_pier' }],
-      ['iska', "Hello again, little ember. It's Iska. Tove says the dark is my job now, and she's right. East is where the moon's light fell. We'll need a lot of lanterns.",
-        "Hello again, little ember. It's Iska. I'll help you now, not Tove. We go east. We need lots of lanterns.", { ref: 'm4_west_dock' }],
+      ['iska', "Ash, it's Iska. Tove says the dark is my job now, and she's right. East is where the moon's light fell. We'll need a lot of lanterns.",
+        "Ash, it's Iska. I'll help you now, not Tove. We go east. We'll need lots of lanterns.", { ref: 'm4_west_dock' }],
       ['narr', 'Pip climbs up onto your head. Pip is far too big for your head now. Pip disagrees.',
         'Pip climbs onto your head. He is too big now. Pip disagrees.', { if: 'flag pip' }],
       // (once Ash has landed in Moonfall, the way east is already chosen)
@@ -78,10 +76,10 @@ chapter({
         { do: ['set m4_voy=glaciar', 'world m4_voyage_glaciar sea'] }, { fade: 1 },
         ['narr', 'Glaciar flies slowly. Very slowly. Clouds overtake her. A seagull overtakes her and looks back, smug.',
           'Glaciar flies very slowly. A seagull passes her. It looks smug.'],
-        ['f_glaciar', "Isn't this LOVELY, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.",
-          "Isn't this LOVELY, dumpling? My left wing fell asleep."],
+        ['f_glaciar', "Isn't this lovely, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.",
+          "Isn't this lovely, dumpling? My left wing fell asleep."],
         ['ash', "Auntie, it's been two days."],
-        ['f_glaciar', "Patience is a dragon's best friend. My second-best friend is you.", "Patience is a dragon's best friend. You are my second best."],
+        ['f_glaciar', 'Two days is nothing. I once took a week to turn round.', 'Two days is nothing. I once took a week to turn round.'],
         ['narr', "On the second night the moon comes up, with two bites gone like a cookie. Moths flutter past Glaciar's nose, hundreds of them, all flying east.",
           'The moon has two bites gone. Hundreds of moths fly past, all going east.', { do: ['world m4_voyage_glaciar moths'], ref: 'm4_north_isle' }],
         ['iska', 'Follow the moths, Ash. They always know where the light is.', 'Follow the moths. They know where the light is.'],
@@ -101,11 +99,13 @@ chapter({
           "Dell's boat toots out of Gearhaven. Dell grins so hard his beard sticks out."],
         ['dell', "Three days east, Ash! Past the end of every map I own! I've never been so happy or so scared!",
           "Three days east! Past every map I own! So happy. And so scared!", { ref: 'm4_west_dock' }],
-        ['wren', "(green, hugging a book) I'm fine. I'm FINE. Books don't get seasick. I'm just going to read... over the side.",
+        ['wren', "(green, hugging a book) I'm fine. Books don't get seasick. I'm just going to read... over the side.",
           "(green) I'm fine. Books don't get seasick. I'll just read... over the side."],
-        ['ash', 'Sister Wren? You came OUTSIDE?'],
-        ['f_mags', "(from below deck) The engine's FINE! It's making that noise on purpose! Mostly! Dell pays me in sandwiches.",
-          '(from below) The engine is FINE! The noise is on purpose! Mostly!'],
+        ['ash', 'Sister Wren? You came outside?'],
+        ['wren', "Somebody has to read Lumen writing, and I'm the only one up north who can. Badly.",
+          'Someone must read Lumen writing. Only I can. Badly.'],
+        ['f_mags', "(from below deck) The engine's fine! It's making that noise on purpose! Mostly! Dell pays me in sandwiches.",
+          '(from below) The engine is fine! The noise is on purpose! Mostly!'],
         ['ev_tikka', '(from the galley) Lumpy buns! Lumpy buns for everyone! Lumpy means love!', 'Lumpy buns for everyone! Lumpy means love!',
           { if: 'flag tk_come=yes' }],
         ['narr', 'On the second night the moon comes up over the sea. Two bites are gone from its edge, like a cookie. A hundred moths flutter past the mast, all flying east.',
