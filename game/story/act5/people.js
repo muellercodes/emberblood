@@ -132,6 +132,8 @@ people({
             say: ["...Come here. There. That's enough of that. Now go back up.", 'Come here. There. Now go back up.'] },
           { t: ["The rings are all places I've been.", 'The rings are places I know.'],
             say: ['Then you know the way round already. That helps.', 'Then you know the way. Good.'] },
+          { t: ['Is the window lantern still lit?', 'Is the window lantern lit?'], if: 'said mom_window', tone: 'kind',
+            say: ["Hal is minding it till I'm home. He's put a second one next to it, for luck.", 'Hal minds it. He lit a second one.'] },
         ] },
       // on the pier, before the bridge
       { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
@@ -174,6 +176,9 @@ people({
         say: ["This one? It came home in my apron pocket. I can't undo it, and I'm not going to try.", 'It came home in my pocket. I will not undo it.'] },
       { ask: ['Will you teach me to mend things?', 'Will you teach me to mend?'], if: 'flag n_dawn',
         say: ["Tomorrow. Bring your own apron. You're not borrowing mine again.", 'Tomorrow. Bring your own apron.'] },
+      { ask: ['Is Auntie Glee staying?', 'Is Auntie Glee staying?'], if: { all: ['flag n_dawn', 'said mom_glee', { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }] },
+        say: ["You told me her name in your letter, and I've said it all week. Glee. Auntie Glee. She can stay as long as she likes. The milk can't.",
+          'Auntie Glee can stay as long as she likes.'] },
       { ask: ['Is Vesper staying for Lantern Day?', 'Is Vesper staying?'], if: { all: ['flag n_dawn', { any: ['flag n5_vesper', 'choice c_vesper=friend'] }] },
         say: ["She's in the forge, trying out my tongs. I've told her she can hang that mask by the door.", 'She is in the forge. Her mask can hang by the door.'] },
       { if: 'flag n_dawn', idle: [["Mm? Pass me the tongs. It's good to say that again.", 'Pass me the tongs.'], ['Go on. I can hammer and listen.', 'Go on. I am listening.']] },
@@ -251,6 +256,8 @@ people({
             say: ["This one does. It's grown a ring since breakfast. I've rubbed the top out twice.", 'This one does. It grew a ring today!'] },
           { t: ['Can I see it?', 'Can I see it?'],
             say: ["Not till it's done. Half a map gets people lost. I know. I was the people.", 'Not yet. Half a map gets you lost. I know!'] },
+          { t: ["Rook still doesn't know about the ice.", "Rook doesn't know."], if: 'said juniper_rook',
+            say: ["Keep it that way. He'd put it on a map with a big X: Juniper fell in here.", 'Keep it that way. He would draw an X.'] },
         ] },
       { if: 'flag n_depart !flag n_dawn',
         say: ['Did my map work? Tell me the truth. Did it get you lost?', 'Did my map work? Tell the truth!'],
@@ -377,6 +384,8 @@ people({
         re: [
           { t: ['What do fish do without a moon?', 'What do fish do now?'],
             say: ['Same as me. Sit very still and look up.', 'Sit still and look up. Like me.'] },
+          { t: ["Mom's polishing her hammer again.", "Mom's polishing her hammer."], if: 'said dell_hammer',
+            say: ["On nothing, all night, at the end of the pier. It's the shiniest hammer in the world. Again.", 'All night. The shiniest hammer in the world.'] },
           { t: ["I'll bring the moon back.", "I'll bring the moon back."], tone: 'brave',
             say: ["Then I'll catch you a fish to celebrate. A big one. Medium. A fish.", 'Then I will catch you a fish. A big one. Medium.'] },
         ] },
@@ -1179,6 +1188,8 @@ people({
             say: ['The only sensible thing anybody has said all week!', 'The only sensible thing all week!'] },
           { t: ['Do you need a light?', 'Do you need a light?'],
             say: ["Breathe on the lamp, then. Gently! ...There. That's a good lad.", 'Breathe on it. Gently! There.'] },
+          { t: ['Is Elka home for supper?', 'Is Elka home for supper?'], if: 'said elka_supper', tone: 'kind',
+            say: ["Six o'clock, every night since you told her. She rolls her eyes. She comes.", 'At six, every night. She rolls her eyes.'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['The pack howled the moon up. I howled with them. Hollis heard me from the farm.', 'The wolves howled. So did I!'],
@@ -2150,6 +2161,16 @@ people({
     // Talks to the Great Hearth like a pet ("old girl"). Once called Ash's breath "a breath for candles". Her mother's
     // fire book has the Snow Mother's Song in it (q_n5_glaciar's pointer).
     f_brynja: [
+      // (Act III, said brynja_small_fire) Ash told her his fire goes small when he is scared
+      { if: 'said brynja_small_fire !flag n_dawn', once: true, fact: 'n5_moon=gone',
+        say: ["You told me your fire goes small when you're scared. Mine is going small tonight, child. So is hers. We are minding each other.",
+          'Your fire shrinks when you are scared. So does mine, tonight.'],
+        re: [
+          { t: ['Mine went small up there too.', 'Mine went small up there.'], tone: 'kind',
+            say: ['Then it knows you. Small fires come back. Big ones burn out.', 'Small fires come back.'] },
+          { t: ["Then I'll come back big.", "I'll come back big."], tone: 'brave',
+            say: ['Come back any size, child. Just come back.', 'Any size. Just come back.'] },
+        ] },
       { if: 'quest q_n5_glaciar active !flag f_song !item n5_song',
         say: ["The Snow Mother's Song? My mother wrote it in the front of the fire book: if the fire ever runs low, remember the song. The old songs are still up there somewhere, frozen.",
           "Remember the Snow Mother's Song. The old songs are frozen up there."],
@@ -2211,6 +2232,15 @@ people({
     // ---------------------------------------------------------------- Captain Brann, the Hearthwardens
     // Loud, brave, afraid of moths. Sir Knut's patrol came home (Act III). Gunnar is still a snowman.
     f_brann: [
+      // (Act III, said brann_still) Ash's answer to "a moth lands on your nose"
+      { if: 'said brann_still !flag n_dawn', once: true,
+        say: ['You told me once: stay very still, and be brave. I have been very still all week! The brave part comes and goes!', 'Stay still and be brave, you said. I am still! Brave comes and goes.'],
+        re: [
+          { t: ['That still counts, Captain.', 'That still counts.'], tone: 'kind',
+            say: ['Does it? Good! Then I will keep standing right here.', 'Good! I will keep standing here.'] },
+          { t: ['Has a moth landed on you?', 'Did a moth land on you?'],
+            say: ['Twice! I stood like a statue! Then I screamed, very quietly, inside my helmet.', 'Twice! I screamed inside my helmet.'] },
+        ] },
       // the Mayor told the town (said toast_scared: Ash told her it was all right not to be fine)
       { if: 'said toast_scared !flag n_dawn', once: true,
         say: ['The Mayor stood up in the square and said she was terrified! Then everybody said they were too! Best town meeting we ever had!', 'The Mayor said she was scared. So did everyone!'],
@@ -2317,6 +2347,8 @@ people({
             say: ["Dogs don't need a moon. They've got noses. Hrm.", 'Dogs have noses. They are fine.'] },
           { t: ['Why a hat?', 'Why a hat?'],
             say: ['Heads get cold. Even dragon ones. Hrm.', 'Heads get cold. Hrm.'] },
+          { t: ['Ulf still says sheep.', 'Ulf still says sheep.'], if: 'said hask_dogs', tone: 'silly',
+            say: ['Hrm. Ulf is wrong. Ulf is always wrong. Good man, though. Hrm.', 'Ulf is wrong. Good man, though.'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ["Hrm. Moon's back. The dogs howled. I didn't. Hrm. Maybe a bit.", 'Hrm. The dogs howled. Me too, a bit.'],
@@ -2334,6 +2366,16 @@ people({
 
     // ---------------------------------------------------------------- Brother Pennant, the last Wind Monk (on a kite)
     f_pennant: [
+      // (Act III, said pennant_hum) what the wind sounds like to Ash
+      { if: 'said pennant_hum !flag n_dawn', once: true, fact: 'n5_moon=gone',
+        say: ['You said the wind sounds like somebody humming far away. I listen for it every day now. Tonight the humming comes from your mountain.',
+          'You said the wind hums. Tonight it hums from your mountain.'],
+        re: [
+          { t: ['Is it a sad hum?', 'Is it a sad hum?'],
+            say: ["A lonely one. Like somebody singing to herself so she won't be scared. Wheee. Sorry.", 'A lonely one. Wheee. Sorry.'] },
+          { t: ['Maybe it is a lullaby.', 'Maybe a lullaby.'], tone: 'kind',
+            say: ["Then somebody up there wants to sleep, and can't.", 'Then somebody up there cannot sleep.'] },
+        ] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['The wind is blowing the wrong way. Toward the mountain. It wants to watch. Wheee. Sorry.', 'The wind blows toward the mountain. Wheee.'],
         re: [
@@ -2365,6 +2407,8 @@ people({
             say: ["Is it? ...Oh. Oh, that's a relief. I'm terrified.", 'Is it? Oh, good. I am terrified.'] },
           { t: ['Your voice is fine, Mayor.', 'Your voice is fine.'],
             say: ['Thank you! It is very fine. It is just higher.', 'Thank you! Just higher.'] },
+          { t: ['You said you might be brave.', 'You might be brave.'], if: 'said toast_brave',
+            say: ["I said might! ...Scared, and doing it anyway. Look at me. I'm doing it.", 'I said might! Scared, and doing it. Look!'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['Everything is actually fine! My voice is still high. That is just how it is now.', 'Everything is really fine now!'],
@@ -2385,8 +2429,8 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['My forge burns all night now. If you come back with a dented sword, I will be ready.', 'My forge is ready for your sword.'],
         re: [
-          { t: ['Did you ever send Mom your letter?', 'Did you send the letter?'], if: 'quest f_forge done',
-            say: ['I sent it. She wrote back. Three lines. I have read them forty times.', 'I sent it. She wrote three lines back.'] },
+          { t: ['Did Mom write back?', 'Did Mom write back?'], if: 'said gunnhild_send',
+            say: ['Three lines, like you said she would. I have read them forty times.', 'Three lines. I read them forty times.'] },
           { t: ["Mom's watching the bridge.", 'Mom is watching the bridge.'],
             say: ['Of course she is. A smith never leaves a fire burning with nobody watching.', 'Of course. A smith always watches the fire.'] },
         ] },
@@ -2437,6 +2481,8 @@ people({
             say: ["Biscuit is the warmest thing in Hearthold. Ask anyone she's sat on.", 'The warmest thing in Hearthold.'] },
           { t: ['Are you feeding everybody?', 'Are you feeding everyone?'], tone: 'kind',
             say: ["Everybody, twice. I've started on the chairs.", 'Everybody, twice. And the chairs.'] },
+          { t: ['Gilly says your soup needs fish.', 'Gilly says: more fish.'], if: 'said gilly_hilde', tone: 'silly',
+            say: ["She would. I put salt in hers. We've never met. I love her.", 'She would. We never met. I love her.'] },
         ] },
       { if: 'flag n_dawn',
         say: ['Breakfast for the whole town, and Biscuit has eaten the first plate. Sit down.', 'Breakfast for everyone! Sit down.'],
@@ -2540,6 +2586,8 @@ people({
             say: ['The moon, child. Same as you, and me, and the octopus.', 'The moon. Like us. And the octopus.'] },
           { t: ['Can you read the stars instead?', 'Can you read the stars?'],
             say: ['I can. They mostly say "be patient". Stars are very dull.', 'They say "be patient". Dull.'] },
+          { t: ['Ripple kept every bottle.', 'Ripple kept every bottle.'], if: 'said ripple_hello', tone: 'kind',
+            say: ['Every one? In a clam, under his bed? ...Oh, that old fool. Hiccup.', 'Every one? Oh, that old fool. Hiccup.'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['Hiccup. There. The tide is back. Hiccup.', 'Hiccup. The tide is back.'],
@@ -2562,6 +2610,8 @@ people({
       { if: '!flag n_dawn',
         say: ['Driftwood Landing stays put for you tonight! First time in history! We tied it to a rock.', 'We tied the town to a rock for you!'],
         re: [
+          { t: ['Is the Maren still floating?', 'Is the Maren floating?'], if: 'said dabble_raft_maren',
+            say: ['The Maren is the one tied tightest to the rock. Rowan says she pulls the others in. She would.', 'She is tied tightest. She pulls the others in.'] },
           { t: ['Which rock?', 'Which rock?'],
             say: ['A big one. It was here first. It is being very good about it.', 'A big one. It is being very good.'] },
           { t: ["Won't the town mind?", 'Does the town mind?'],
@@ -2704,6 +2754,8 @@ people({
             say: ['Look. Do not touch. Looking is allowed.', 'Look. Do not touch.'] },
           { t: ['I would never touch it.', 'I would never touch it.'], tone: 'kind',
             say: ['Everybody says that. ...You might be the first who means it.', 'Everyone says that. You might mean it.'] },
+          { t: ['Did you breathe, like I said?', 'Did you breathe?'], if: 'said saffron_breathe',
+            say: ['I breathed. I was even a little kind to the moth. Do not touch the well.', 'I breathed. I was a bit kind. Do not touch.'] },
         ] },
       { if: '!flag n_dawn', say: [["Do not touch the well.", "Do not touch the well."]] },
       { if: 'flag n_dawn', say: [["Do not touch the well. Not even now.", "Do not touch the well."]] },
@@ -2744,6 +2796,8 @@ people({
             say: ["She heard. She flickered. That means you're welcome, in Bertha.", 'She flickered. That means "you are welcome".'] },
           { t: ['Does every lamp have a name?', 'Do they all have names?'],
             say: ['Every one. Bertha, Clem, the Twins, Little Moon, and seven more. Little Moon is sulking this week.', 'All of them. Little Moon is sulking.'] },
+          { t: ['Lit for the lonely ones too?', 'For the lonely ones too?'], if: 'said esme_lonely', tone: 'kind',
+            say: ["For her too. You said everyone gets lonely in the dark. She's in the dark more than anyone.", 'For her too. She is always in the dark.'] },
         ] },
       { if: 'flag n_dawn',
         say: ['We blew the lamps out at sunrise. Bertha sulked. She likes being needed.', 'Bertha the lamp sulked at sunrise.'],
@@ -2792,6 +2846,8 @@ people({
             say: ['We go at night, by the moon. We go at night, by the moon. ...I have told you twice. It is a good story.', 'We go at night by the moon. Twice. Good story.'] },
           { t: ['Have you ever seen snow?', 'Have you seen snow?'],
             say: ['Never. They tell me it is cold sand that falls from the sky. I do not believe them.', 'Never. Cold sand from the sky? No.'] },
+          { t: ['I still owe you a snowball.', 'I owe you a snowball.'], if: 'said rafi_snowball', tone: 'kind',
+            say: ['You do. You do. Bring it after. I have a bowl ready. A bowl ready.', 'You do. I have a bowl ready.'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['The moon is back. Tonight we cross. Tonight we cross.', 'The moon is back. Tonight we cross.'],
@@ -2886,6 +2942,8 @@ people({
         re: [
           { t: ['How is Lady Bubbles?', 'How is Lady Bubbles?'],
             say: ['Restless. She does not care for the dark. Neither do I. We are both being very brave about it.', 'Restless. We are both being brave.'] },
+          { t: ['How is the warhorse?', 'How is the warhorse?'], if: 'said kipper_warhorse', tone: 'kind',
+            say: ['Very proud of the word. She makes me say it to her every morning. Warhorse.', 'Proud. I say "warhorse" every morning.'] },
           { t: ['Any crabs up there, do you think?', 'Crabs up there?'], tone: 'silly',
             say: ['Do not jest about crabs, sir. ...Are there?', 'Do not joke about crabs. ...Are there?'] },
         ] },

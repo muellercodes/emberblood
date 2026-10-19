@@ -1143,7 +1143,7 @@ function s10VarNext(T,k){ const n=T.say.length, R=G.story._rot||(G.story._rot={}
 function s10VarTake(T,k,i){ const R=G.story._rot||(G.story._rot={}); R[k]=i+1; s10Heard()[k+'#'+i]=s10Day(); return s10Lines([[T._who].concat(T.say[i])],{talk:T._who}); }
 // -> null (no data line), { T, heard:true } (heard today), or { T, pre:[lines], last: line|null, re, key, run() }
 function s10Opener(n){
-  if(!G||G.mode!=='story'||G.done||!S10.booted||!n) return null;
+  if(!G||G.mode!=='story'||(G.done&&!s10AfterDone())||!S10.booted||!n) return null;
   const id=n.id, T=s10TalkFor(id,'line'); if(!T) return null;
   const k=s10TalkKey(T), H=s10Heard(), vars=!T.scene&&s10SayVariants(T.say);
   let lines;
