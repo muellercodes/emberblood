@@ -2,7 +2,7 @@
 
 A top-down, open-world action game you play in the browser. No install, no downloads.
 
-**Play it:** https://muellercodes.github.io/emberblood/
+**Play it:** https://playemberblood.com
 
 ## The story
 
