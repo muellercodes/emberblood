@@ -221,7 +221,7 @@ $('#bHowClose').addEventListener('click',closeHow);
 $('#bSettings').addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); openSettings('menu'); });
 $('#bPauseSettings').addEventListener('click',()=>{ SFX.play('ui'); openSettings('pause'); });
 $('#bSettingsClose').addEventListener('click',()=>{ SFX.play('ui'); closeSettings(); });
-for(const id of ['setNums','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
+for(const id of ['setNums','setChat','setTouch','setBtn','setAuto']) for(const b of document.querySelectorAll(`#${id} button`)) b.addEventListener('click',()=>{ SFX.init(); applySetting(id,b.dataset.v); SFX.play('ui'); });
 // ---------- two more rows (UX build), injected like the depth row so body.html stays as it is:
 // "Aim with the mouse" (off: Ash faces the way he walks) and "Characters" (3D toy figures or the classic flat art)
 // (a3e_toy3d.js reads eb_chars at load; this flips it live)

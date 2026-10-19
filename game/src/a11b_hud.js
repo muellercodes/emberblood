@@ -34,6 +34,17 @@ function drawHUD(){
     const maxW=Math.min(300,W*0.5-L), sideStory=!(fo&&fo.side);
     const txt=(t,x,y)=>{ ctx.lineWidth=LOOK.sb?3.6:3; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.92)':'rgba(0,0,0,.6)'; ctx.lineJoin='round'; ctx.strokeText(t,x,y); ctx.fillText(t,x,y); };
     ctx.textAlign='left';
+    // a phone (or any small screen): just the goal the compass follows, then "+N more"
+    const compact=W<600||H<560;
+    if(compact){
+      const g=fo||obj, n=activeQuests().length;
+      ctx.save(); ctx.translate(L+6,qy); ctx.rotate(Math.PI/4); ctx.fillStyle='#ffcf7a'; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.lineWidth=1.6; ctx.strokeRect(-3.5,-3.5,7,7); ctx.fillRect(-3.5,-3.5,7,7); ctx.restore();
+      const cw=Math.max(maxW,Math.min(300,MINI_R().x-L-12));   // as wide as the room left of the minimap
+      goalLine(g.text,L+16,qy,cw-14,g.x!=null?dist(p.x,p.y,g.x,g.y)/25:null,'#f6ead8',txt);
+      let ly=qy+8;
+      if(n>0){ ly+=8; ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.8)'; txt(`+${n} more ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+16,ly); ly+=6; }
+      TRACK_R={x:L-4,y:qy-12,w:cw+12,h:ly-qy+18};
+    }else{
     ctx.font=`700 10.5px ${TF}`; ctx.fillStyle='#ffcf7a'; txt((sideStory?'◆ ':'')+obj.title.toUpperCase(),L+2,qy);
     goalLine(obj.text,L+2,qy+16,maxW,sideStory&&obj.x!=null?dist(p.x,p.y,obj.x,obj.y)/25:null,'#f6ead8',txt);
     let ly=qy+30;
@@ -52,6 +63,7 @@ function drawHUD(){
     const more=activeQuests().length-shown;
     if(more>0&&room>30){ ly+=4; ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.78)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+2,ly); ly+=12; }
     TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
+    }
   }else if(G.mode==='normal'){
     ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`ARENA · ${G.diff.name.toUpperCase()}`,L+2,qy);
     ctx.font=`800 18px ${TF}`; ctx.fillStyle='#fff3dc'; ctx.fillText(G.wave>0?`Wave ${G.wave}`:'Get ready',L+2,qy+20);
@@ -77,13 +89,13 @@ function drawHUD(){
     ctx.font=`600 11.5px ${UIF}`; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; sub=simplify(sub);
     ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?3.6:3.2; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.95)':'rgba(10,6,4,.85)'; ctx.strokeText(sub,W/2,by+16); ctx.fillStyle=LOOK.sb?'#fff0d4':'#f2dcc0'; ctx.fillText(sub,W/2,by+16);
   }
-  // prompt
-  if(G.prompt&&scene==='play'){
-    drawPromptPill(b);
-  }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story){ lvQueue(); drawSkillHud(); }
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
+  // prompt: (v11 polish) drawn after the speech bubbles (drawCompHud draws them), so it is always on top
+  if(G.prompt&&scene==='play'){
+    drawPromptPill(b);
+  }
   if(story&&G.hintT>=29&&G.playTime<5&&!G.flags.coach) G.flags.coach=1;   // a new journey (startStory sets G.hintT=30): the coach is on
   if(scene==='play'&&tipOn('play')) drawCoach(b);
   drawOffscreen(); drawTouch();
@@ -528,12 +540,11 @@ function lvQueue(){
 }
 
 // ================= (v11 polish) short goals
-// goalLine draws one goal on one line: the goal (cut short to fit, see goalShort) and, after a dot, how far it is, or
-// "leave here first" when it is outside the room Ash is in.
+// goalLine draws one goal on one line: the goal (cut short to fit, see goalShort) and, after a dot, how far it is.
 function goalLine(text,x,y,maxW,dm,col,txt,font){
   const F=font||`500 12px ${UIF}`, SF=`600 10.5px ${UIF}`, raw=String(text==null?'':text);
-  const leave=/\(leave here first\)\s*$/i.test(raw);
-  const suf=leave?simplify(GOAL_LEAVE):dm!=null?`· ${Math.max(1,Math.round(dm))} m`:'';
+  // (the "(leave here first)" tail is not shown: the distance and the marker already point at the way out)
+  const suf=dm!=null?`· ${Math.max(1,Math.round(dm))} m`:'';
   ctx.font=SF; const sw=suf?ctx.measureText(suf).width+7:0;
   ctx.font=F; const g=goalShort(raw,maxW-sw);
   ctx.fillStyle=col; txt(g,x,y);
@@ -542,7 +553,7 @@ function goalLine(text,x,y,maxW,dm,col,txt,font){
 // the goal cut to fit one line (ctx.font set): the whole goal if it fits, else its Simple words version (written
 // short for younger players), else as many of its first sentences as fit, else its first clause, else cut with an
 // ellipsis. A count at the end (" · 2/3 lit") always stays.
-const GSC=new Map(), GOAL_LEAVE=S('· leave here first','· go outside first');
+const GSC=new Map();
 function goalShort(raw,maxW){
   const key=ctx.font+'|'+Math.round(maxW)+'|'+raw, c=GSC.get(key); if(c!=null) return c;
   let t=bnCore(raw), tail='';

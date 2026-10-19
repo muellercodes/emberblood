@@ -1135,11 +1135,13 @@ function s10Barks(dt){
   for(const id in S10.talk){
     if((S10.barkT[id]||0)>G.time) continue;
     const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); if(!n||dist(n.x,n.y,player.x,player.y)>260) continue;
+    // (v11 polish) a bark line is chatter: it keeps to the chatter rules (Settings > Chatter, one bubble at a time,
+    // long gaps; chatterOK in a9i_comps.js), and the same person waits 60 to 90 s before the next one
+    if(typeof chatterOK==='function'&&!chatterOK(n)) continue;
     const L=(S10.talk[id]||[]).filter(T=>T.bark&&s10TalkOk(T)); if(!L.length){ S10.barkT[id]=G.time+5; continue; }
-    const T=pick(L); S10.barkT[id]=G.time+rand(8,13);
-    if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1;
+    const T=pick(L); S10.barkT[id]=G.time+rand(60,90);
     const say=s10SayVariants(T.say)?s10SayPick(T,T.say):Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0].slice(1):T.say;
-    try{ npcBubble(n,s10T(say)); }catch(e){}
+    try{ if(npcBubble(n,s10T(say),true)){ if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1; if(typeof BK!=='undefined') BK.npcT[n.id]=G.time; return; } }catch(e){}
   }
 }
 // the marker over a person a step waits for ("!"), and over the giver of a quest that can start ("!")

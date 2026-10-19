@@ -130,10 +130,12 @@ function closeSettings(){ show(settingsFrom==='pause'?'pause':'menu'); if(settin
 function renderSettings(){
   const seg=(id,val)=>{ for(const b of document.querySelectorAll(`#${id} button`)) b.setAttribute('aria-pressed',String(b.dataset.v===String(val))); };
   seg('setNums',settings.nums?'on':'off');
+  seg('setChat',settings.chat==='off'?'off':'some');
   seg('setTouch',settings.touch); seg('setBtn',settings.btn<0.95?'s':settings.btn>1.05?'l':'m'); seg('setAuto',autoAttackOn()?'on':'off');
 }
 function applySetting(id,v){
   if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
+  else if(id==='setChat'){ settings.chat=v==='off'?'off':'some'; store.set('eb_chat',settings.chat); }   // v11: Chatter (a9i_comps.js chatterOK)
   else if(id==='setTouch'){ settings.touch=v; store.set('eb_touch',v); }
   else if(id==='setBtn'){ settings.btn=v==='s'?0.88:v==='l'?1.16:1; store.set('eb_btn',settings.btn); }
   else if(id==='setAuto'){ settings.auto=v==='on'; store.set('eb_auto',settings.auto); }
