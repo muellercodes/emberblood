@@ -137,11 +137,24 @@ function floorStairsWalk(push){
     if(DW.hold===o){ if(DW.holdT>0||touch) continue; DW.hold=null; }
     if(!touch||!push) continue;
     if(d>0.5&&(push.x*dx+push.y*dy)/d<0.35) continue;
+    // (and the way he pushes, from where he stands, runs into the flight: walking along its edge past a corner, from
+    //  the crate to the note in Pebble's loft, brushed the corner and took him downstairs)
+    if(d>0.5&&!stairRayHits(p.x,p.y,push.x,push.y,d+16,o.x-hw,o.y-hh,o.x+hw,o.y+hh)) continue;
     goFloor(o);
     if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; G.prompt=null; }
     return true;
   }
   return false;
+}
+// does the ray from (x,y) along (ux,uy) meet the box within len? (slabs)
+function stairRayHits(x,y,ux,uy,len,x0,y0,x1,y1){
+  let t0=0, t1=len;
+  for(const [p,d,lo,hi] of [[x,ux,x0,x1],[y,uy,y0,y1]]){
+    if(Math.abs(d)<1e-6){ if(p<lo||p>hi) return false; continue; }
+    let a=(lo-p)/d, b=(hi-p)/d; if(a>b){ const s=a; a=b; b=s; }
+    t0=Math.max(t0,a); t1=Math.min(t1,b); if(t0>t1) return false;
+  }
+  return true;
 }
 function revealTrig(o){
   if(G.found[o.key]){ return false; }
