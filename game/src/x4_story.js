@@ -436,7 +436,7 @@ n4sDef('n_echo1_outro',()=>[
   xl('ash',`Even the moon remembers you missing her, Grandpa.`,`The moon remembers you missed her, Grandpa.`),
   n4sByEnd({hero:xl('ash',`I hope you found her.`,`I hope you found her.`),
     warden:xl('ash',`Goodnight, Grandpa. The real one.`,`Goodnight, real Grandpa.`),
-    heir:xl('ash',`I'm telling the little one in the birdcage. He'll pretend he doesn't care. He'll care.`,`I will tell tiny Grandpa. He will care.`),
+    heir:xl('ash',`I'm telling the little one on the shelf above Bertram's oven. He'll pretend he doesn't care. He'll care.`,`I will tell tiny Grandpa. He will care.`),
     lantern:xl('ash',`I'm telling him the moon remembers. He'll pretend he doesn't care. He'll care.`,`I will tell Grandpa. He will care.`)}),
   n4sDo(()=>n4sAllyLeave('cinder')),
   xl('narr',`Up ahead, a column of silver air roars up the cliff. The Wind Chimney.`,`Up ahead, the wind roars up the cliff.`)
@@ -527,7 +527,7 @@ function n4sSeamLines(k){
     xl('vor',`...Breathe from your belly, hatchling. Not your nose.`,`Breathe from your belly, little one.`));
   else if(e==='heir') L.push(n4sDo(()=>{ if(N4ST.heart) N4ST.heart.belly=1; n4sVoice('ash','255,150,60'); }),
     xl('narr',`The fire you took from Grandpa, the fire that once made you huge, wakes up deep in your belly.`,`The big fire you once had wakes up in your belly.`),
-    xl('grandpa',`(very far away, from a birdcage in a bakery) You call THAT a flame? Pathetic. Do it BIGGER.`,`(far away) Is that a flame? Do it BIGGER!`),
+    xl('grandpa',`(very far away, from the warm shelf above Bertram's oven) You call that a flame? Do it BIGGER.`,`(far away) Is that a flame? Do it BIGGER!`),
     xl('ash',`Thanks, Grandpa.`,`Thanks, Grandpa.`));
   else L.push(n4sDo(()=>n4sVoice('ember','255,190,120')),
     xl('ember',`Little ember. Remember what my father taught me? Breathe from your belly. Not your nose.`,`Little ember. Breathe from your belly.`));
@@ -564,13 +564,13 @@ n4sDef('n_fall',()=>[
 ]);
 n4sDef('n_plea',()=>[
   ...n4sIfL(n4sVes,xl('c_vesper',`She found me when I was little and alone, and she promised me fire. I know what lonely sounds like. That's what it sounds like.`,`She found me when I was lonely. I know that sound.`)),
-  ...n4sIfL(n4sGla,xl('f_glaciar',`I know cold, old moth. Cold doesn't keep anything. It only stops it.`,`I know cold. Cold does not keep things. It just stops them.`)),
+  ...n4sIfL(n4sGla,xl('f_glaciar',`You froze my mountain to keep things, old moth. It kept nothing. It only kept me asleep.`,`Your cold kept nothing. It only kept me asleep.`)),
   ...n4sIfL(n4sHushF,xl('narr',`Hush lands in front of her mother and folds her wings around her mother's claws.`,`Hush folds her wings around her mother.`),
-    xl('f_hush',`...Mother. Let go.`,`Mother. Let go.`)),
+    xl('f_hush',`Mother. Let go.`,`Mother. Let go.`)),
   xl('ash',`Nyx.`,`Nyx.`),
   xl('narr',`Nyxara goes very, very still.`,`Nyxara goes very still.`),
-  xl('nyxara',`...Nobody has called me that in a thousand years. Not since the girl with the lantern.`,`Nobody has called me that in a thousand years.`),
-  xl('ash',`Ember. My great-times-thirteen grandma. She lit a lantern so you'd be warm. I can light you one too.`,`Ember lit a lantern for you. I can light one too.`)
+  xl('nyxara',`Nobody has called me that in a thousand years. Not since the girl with the lantern.`,`Nobody has called me that in a thousand years.`),
+  xl('ash',`Ember was sorry she stopped climbing the hill. So I climbed it instead. I can light you a lantern.`,`Ember was sorry she stopped coming. I came instead. I can light you a lantern.`)
 ]);
 // (why the kind ending is closed: so kids know next time)
 function n4sClosedLines(){
@@ -583,7 +583,7 @@ function n4sClosedLines(){
 const N4S_ENDINGS={
   dawn:{title:S('Morning','Morning'),n:1,msg:S('You ended the Long Night, and the morning came.','You ended the Long Night. Morning came!'),lines:()=>{
     const e=n4sEnd(); return [
-    xl('ash',`No more Long Night. Not for anyone.`,`No more Long Night. For anyone.`),
+    xl('ash',`I'm not giving it to you. And there's no more Long Night, for anyone.`,`I will not give it to you. No more Long Night.`),
     n4sDo(()=>n4sCutDo('breath')),
     xl('narr',`You breathe Heartfire, gold and silver, the biggest breath of your whole life.`,`You breathe gold and silver fire. Your biggest breath ever.`),
     n4sDo(()=>n4sCutDo('moths')),
@@ -598,7 +598,7 @@ const N4S_ENDINGS={
     ...n4sIfL(n4sHushF,xl('narr',`Hush watches the silver moths stitch the moon. She doesn't say anything, not even shhh. But she stays until the very last one.`,`Hush watches the moths fix the moon. She stays till the end.`)),
     ...n4sIfL(e==='lantern',xl('grandpa',`A mended moon. Like a mended sock. Very practical. Ember would have liked it.`,`A fixed moon. Like a fixed sock. Ember would like it.`)),
     ...n4sIfL(e==='warden',xl('bram',`HA! Morning! I'd forgotten what it looked like!`,`Ha! Morning! I forgot what it looks like!`)),
-    ...n4sIfL(e==='hero',xl('ember',`Good morning, little ember. It's a lovely one.`,`Good morning, little ember.`)),
+    ...n4sIfL(e==='hero',xl('ember',`Good morning, Ash. It's a lovely one.`,`Good morning, Ash.`)),
     ...n4sIfL(n4sVes,xl('c_vesper',`Morning. I've never stayed up all night for something good before.`,`Morning. I never stayed up all night for a good thing before.`)),
     xl('narr',`The Long Night was over. And the night after it was just a night: dark, and starry, and short, and completely normal.`,`The Long Night was over. The next night was just a normal night.`)]; }},
   embermoon:{title:S('The Ember Moon','The Ember Moon'),n:2,msg:S('You gave the Ember Heart to the sky, and the moon burned gold.','You gave the Heart to the moon. It glows gold!'),lines:()=>{
@@ -607,12 +607,12 @@ const N4S_ENDINGS={
     n4sDo(()=>n4sCutDo('hold')),
     xl('narr',`You hold up the Ember Heart. It's blazing, gold and silver, the warmest thing in the world.`,`You hold up the Heart. It is so warm.`),
     n4sDo(()=>n4sCutDo('throw')),
-    xl('narr',`Then you throw it. As hard as you can. Straight up.`,`Then you throw it. As hard as you can. Up!`),
+    xl('narr',`Then you give it away: straight up, as high as you can throw.`,`Then you throw it up to the moon, a gift.`),
     ...n4sIfL(()=>G.flags.pip,xl('pip',`MIP?!`,`MIP?!`)),
     n4sDo(()=>n4sCutDo('catch')),
     xl('narr',`The Heart flies up and up, into the empty moon. And the moon catches fire.`,`The Heart flies into the empty moon. The moon catches fire!`),
     xl('narr',`Not a scary fire. A lantern fire. Warm and orange and soft, like a window at night when somebody is waiting up for you.`,`A warm lantern fire. Like a window when someone waits for you.`),
-    xl('narr',`Nyxara looks up at it. Her eyes fill with orange light. For the first time in ten thousand years, she isn't cold.`,`Nyxara looks at it. For the first time, she is not cold.`),
+    xl('narr',`Nyxara looks up at it. Her eyes fill with orange light. For the first time in a thousand years, she isn't cold.`,`Nyxara looks at it. For the first time, she is not cold.`),
     xl('nyxara',`...Oh.`,`Oh.`),
     n4sDo(()=>n4sCutDo('curl')),
     xl('narr',`She lets go of the last sliver of moon, flies up, and curls round the new warm moon like a cat round a stove. And she falls asleep.`,`She lets go of the last bit of moon. She curls up on the warm moon like a cat, and sleeps.`),
@@ -620,9 +620,9 @@ const N4S_ENDINGS={
     xl('narr',`The Ember Heart was gone from the family. But everyone, everywhere, could see it. Every single night.`,`The Heart was gone. But everyone could see it every night.`),
     ...n4sIfL(n4sHushF,n4sDo(()=>{ N4ST.gone.hush=1; n4sAllyLeave('hush'); }),xl('narr',`Hush flew up to the warm gold moon and curled up next to her mother.`,`Hush flew up and curled up next to her mother.`)),
     ...n4sIfL(e==='lantern',xl('grandpa',`Now THAT is a proper moon. Orange. Like a dragon's eye. Like... hers.`,`Now that is a good moon. Orange, like Ember's eyes.`)),
-    ...n4sIfL(e==='warden',xl('tove',`A w-w-warm moon. FINALLY. I would like that noted.`,`A warm moon! Finally!`)),
+    ...n4sIfL(e==='warden',xl('tove',`A warm moon! That's the best kind of moon there is.`,`A warm moon! The best kind!`)),
     ...n4sIfL(e==='hero',xl('ember',`My Heart, up in the sky. Oh, Ash. Now everyone can see it.`,`My Heart in the sky! Now everyone can see it.`)),
-    ...n4sIfL(n4sVes,xl('c_vesper',`You threw a priceless magic heart at the moon. Cousin, I have never been prouder of anyone.`,`You threw a magic heart at the moon! I am so proud.`))]; }},
+    ...n4sIfL(n4sVes,xl('c_vesper',`You gave the moon a magic heart, cousin. Gran is going to want the whole story. Twice.`,`You gave the moon a magic heart! Gran will want the whole story.`))]; }},
   moth:{title:S('The Moth and the Moon','The Moth and the Moon'),n:3,msg:S('You called her Nyx and lit her a lantern, and the moon came home.','You lit Nyx a lantern. The moon came home.'),lines:()=>{
     const e=n4sEnd(); return [
     n4sDo(()=>n4sCutDo('lantern')),
@@ -641,14 +641,14 @@ const N4S_ENDINGS={
     ...n4sIfL(n4sHushF,n4sDo(()=>{ N4ST.gone.hush=1; n4sAllyLeave('hush'); }),xl('narr',`Hush flew up to sit beside her. The two moths watched the moon together, and neither of them said anything, and it was perfect.`,`Hush sat next to her. They watched the moon together.`)),
     ...n4sIfL(e==='lantern',xl('grandpa',`Hmph. I wanted to say "mine" about that moon. I'm glad I didn't.`,`I wanted to say "mine" about the moon. I am glad I didn't.`)),
     ...n4sIfL(e==='warden',xl('iska',`Light one more than you need. You did, Warden. You lit one for her.`,`You lit one more lantern. One for her.`)),
-    ...n4sIfL(e==='hero',xl('ember',`You lit her a lantern. That's what I did, a thousand years ago. Thank you for finishing it, little ember.`,`You lit her a lantern, like I did. Thank you.`)),
+    ...n4sIfL(e==='hero',xl('ember',`You lit her a lantern. That's what I did, a thousand years ago. Thank you for finishing it, Ash.`,`You lit her a lantern, like I did. Thank you.`)),
     ...n4sIfL(n4sGla,xl('f_glaciar',`She will be cold sometimes. Everyone is. That is what friends are for.`,`Everyone is cold sometimes. That is what friends are for.`)),
     ...n4sIfL(n4sVes,xl('c_vesper',`A moth on the moon. Of course. Of COURSE she's a moth again.`,`Of course she is a little moth again.`))]; }}
 };
 const N4S_SOFAR_END={
-  dawn:S(`Ash broke Nyxara's hold for good. She became a thousand silver moths that mended the moon, and the Long Night ended in a real morning.`,`Ash ended the Long Night. The moths fixed the moon. Morning came.`),
-  embermoon:S(`Ash gave the Ember Heart to the empty moon. It burns gold now, and Nyxara sleeps curled round it, warm at last.`,`Ash gave the Heart to the moon. Now the moon is gold and warm.`),
-  moth:S(`Ash called the Night Mother by her old name and lit her a lantern. She let the moon go home and became a small moth again, keeping it company.`,`Ash lit a lantern for Nyx. She let the moon go. Now she is a little moth.`)};
+  dawn:S(`Ash would not hand the Heart over in fear. He breathed the biggest fire of his life, and Nyxara came apart into a thousand silver moths that stitched the moon back together. Then the sky turned pink, and it was morning.`,`Ash would not give her the Heart. The moths fixed the moon. Morning came.`),
+  embermoon:S(`Ash gave the Ember Heart away, freely, to the empty moon. Given, it burned gold instead of black, and Nyx sleeps curled round it like a cat round a stove, warm at last.`,`Ash gave the Heart to the moon. The moon is gold and warm now. Nyx sleeps on it.`),
+  moth:S(`Ash called her by her old name and lit her Mom's paper lantern. It won't last forever. Lanterns never do, which is why you light new ones. She let the moon go home and became a small grey moth again, one who visits.`,`Ash lit a lantern for Nyx. She let the moon go. Now she is a little moth who visits.`)};
 // the journal's "story so far" for n_end (e7b_threads' recap reads it too)
 function endingSoFar(){ return N4S_SOFAR_END[G&&G.choices&&G.choices.n_end]||''; }
 // 11. the dawn (after every ending)
@@ -726,17 +726,17 @@ function n4sEpiLines(){
     if(t){ if(F.tk_come==='yes'){ const full=String(t[1]), simp=n4sSimpleOf(full); L.push(['narr',S(full+` She hung her bigger spoon over the oven. Tock still says it's a ladle.`,simp+` She hung her big spoon over the oven.`)]); } else L.push(t); } }catch(err){ console.error(err); }
   L.push({hero:xl('narr',`On Lantern Day, Ash lit one lantern for Grandpa, the way Ember used to, so he'd know where home was, wherever he was.`,`Ash lit one lantern for Grandpa, so he would know where home was.`),
     warden:xl('narr',`Ash climbed Cinder Mountain to tell Grandpa the whole story. He pretended to be asleep. He was listening to every word.`,`Ash told sleeping Grandpa the whole story. He listened to every word.`),
-    heir:xl('narr',`Tiny Vorlaxis told everyone at the bakery that he had saved the moon himself, from his birdcage. Bertram raised the price of admission.`,`Tiny Grandpa said he saved the moon from his birdcage. Nobody believed him.`),
+    heir:xl('narr',`From his warm shelf above the oven, tiny Grandpa told everyone in the bakery that he had saved the moon himself. Bertram saved him the darkest bun in the batch. It is his favorite.`,`Tiny Grandpa said he saved the moon. Bertram gave him a bun.`),
     lantern:xl('narr',`Grandpa told all of Emberhollow that he had saved the moon single-handed. Duchess bit him. Mom made them both wipe their feet.`,`Grandpa said he saved the moon. Duchess bit him. Mom made them wipe their feet.`)}[e]);
   if(n4sQ('hollow')) L.push(xl('narr',`Juniper Ashby's map of Embermere grew three new pages: the Clockwork Coast, Frostreach and Moonfall. And one small one: a spiral mountain, labelled "DON'T."`,`Juniper drew maps of every land. And one mountain, labelled "DON'T."`));
   // ---- the Clockwork Coast (Gearhaven's clock towers at sunrise)
   L.push(sc('clocks'),xl('narr',`Every clock in Gearhaven started ticking again at the very same second. The tinkers called it a malfunction. It was a celebration.`,`Every clock in Gearhaven started ticking again at once.`));
-  if(n4sVes()) L.push(xl('narr',`Vesper took off her moth mask and hung it in Maren's forge, next to the spot where the Heart used to sit. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match. Nobody minds.`,`Vesper hung up her mask. She lights her lantern with a match. She is still family.`));
+  if(n4sVes()) L.push(xl('narr',`Vesper took off her moth mask and hung it in Mom's forge. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern from the forge, with Mom's tongs.`,`Vesper hung up her mask. She lights her lantern from the forge. She is still family.`));
   else if(c.c_vesper==='foe') L.push(xl('narr',`Nobody in Gearhaven saw the Moth Mask again. But every Lantern Day, a small lantern appeared on the forge doorstep in Emberhollow, with no note. Maren always lit it.`,`Every Lantern Day, a lantern with no note appears at the forge. Mom lights it.`));
   L.push(...n4sEpiPick('c',/Vesper|Moth Mask/));
   // ---- Frostreach (Hearthold's Great Hearth)
   L.push(sc('hearth'),xl('narr',`The Great Hearth of Hearthold burned so high that the whole town took off their scarves for the first time in a hundred years. Then they put them back on. It's still the north.`,`The Great Hearth burned so high that everyone took off their scarves. Then put them back on.`));
-  if(n4sGla()) L.push(xl('narr',`Great x13 Grand-aunt Glaciar came to Lantern Day and brought ice cream for everybody. She brought too much. Nobody minded. Ash said all thirteen greats, twice, and she pretended not to love it.`,`Glaciar came to Lantern Day with ice cream. Ash said all the greats, twice.`));
+  if(n4sGla()) L.push(xl('narr',`Auntie Glee came to Lantern Day with far too much ice cream, and stayed until the very last lantern went out. She said she had slept through enough of them.`,`Auntie Glee came to Lantern Day. She stayed until the last lantern went out.`));
   else if(c.f_glaciar==='defeat') L.push(xl('narr',`On Mount Dread the snow fell softly, and stopped when it was supposed to. Glaciar slept, and dreamed, and for the first time in a long while her dreams were warm. Every Lantern Day somebody climbed up and sang her a verse of the Snow Mother's Song, just in case.`,`On Mount Dread, Glaciar slept. Her dreams were warm.`));
   L.push(...n4sEpiPick('f',/Glaciar|Great Hearth/));
   // ---- Moonfall (the Eclipse Observatory under the new moon)

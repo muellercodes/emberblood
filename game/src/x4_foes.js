@@ -537,7 +537,7 @@ n4fLines('n_echo_vor','n_echo1_intro','n_echo1_outro',n4vIntro,()=>[
   n4fL('ash',`Even the moon remembers you missing her, Grandpa.`,`The moon remembers you missed her, Grandpa.`),
   n4fL('ash',`I hope you found her.`,`I hope you found her.`,()=>N4V_END()==='hero'),
   n4fL('ash',`Goodnight, Grandpa. The real one.`,`Goodnight, real Grandpa.`,()=>N4V_END()==='warden'),
-  n4fL('ash',`I'm telling the little one in the birdcage. He'll pretend he doesn't care. He'll care.`,`I will tell tiny Grandpa. He will care.`,()=>N4V_END()==='heir'),
+  n4fL('ash',`I'm telling the little one on the shelf above Bertram's oven. He'll pretend he doesn't care. He'll care.`,`I will tell tiny Grandpa. He will care.`,()=>N4V_END()==='heir'),
   n4fL('ash',`I'm telling him the moon remembers. He'll pretend he doesn't care. He'll care.`,`I will tell Grandpa. He will care.`,()=>N4V_END()==='lantern'),
   n4fL('narr',`Up ahead, a column of silver air roars up the cliff. The Wind Chimney.`,`Up ahead, the wind roars up the cliff.`)]);
 
@@ -1277,7 +1277,7 @@ function n4nSeamLines(k){ const C=G.choices||{}, F=G.flags||{}, L=[];
       n4fL('narr',`Grandpa lands on your head, which is rude, and breathes into the Heart with you. It's the first fire he has breathed in a whole year. It's a big one.`,`Grandpa lands on your head and breathes fire into the Heart with you.`));
     else if(end==='warden') L.push(n4fL('narr',`Five small lights blink on around you. One, two, three, four, five.`,`Five little lights shine around you.`),n4fL('iska',`Sixth Warden. We felt the dark from our Ward-fires. We came.`,`Sixth Warden. We felt the dark. We came.`),
       n4fL('bram',`And to SHOUT! BREATHE, kid!`,`BREATHE, kid!`),n4fL('vor',`...Breathe from your belly, hatchling. Not your nose.`,`Breathe from your belly, little one.`));
-    else if(end==='heir') L.push(n4fL('narr',`The fire you took from Grandpa, the fire that once made you huge, wakes up deep in your belly.`,`The big fire you once had wakes up in your belly.`),n4fL('grandpa',`(very far away, from a birdcage in a bakery) You call THAT a flame? Pathetic. Do it BIGGER.`,`(far away) Is that a flame? Do it BIGGER!`),n4fL('ash',`Thanks, Grandpa.`,`Thanks, Grandpa.`));
+    else if(end==='heir') L.push(n4fL('narr',`The fire you took from Grandpa, the fire that once made you huge, wakes up deep in your belly.`,`The big fire you once had wakes up in your belly.`),n4fL('grandpa',`(very far away, from the warm shelf above Bertram's oven) You call that a flame? Do it BIGGER.`,`(far away) Is that a flame? Do it BIGGER!`),n4fL('ash',`Thanks, Grandpa.`,`Thanks, Grandpa.`));
     else L.push(n4fL('ember',`Little ember. Remember what my father taught me? Breathe from your belly. Not your nose.`,`Little ember. Breathe from your belly.`)); }
   return L; }
 function n4nVoice(col){ const H=N4N.heartUI; if(!H) return; const a=rand(-2.6,-0.5); H.voices.push({col,t:0,x:H.x+Math.cos(a)*130,y:H.y-60+Math.sin(a)*70}); }
