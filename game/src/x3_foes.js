@@ -763,15 +763,7 @@ M3_TPL.domeFrost=m3Tpl(31,23,(i,j)=>(i===10&&j===3)||(i===20&&j===3)?'U':'.');
 // TURN A VALVE (USE at a valve) to drain it: she is stranded on the dais, flopping, 5 s (x2). She refloods after.
 // Gate: she cannot fall until she was stranded 1 / 2 / 2 times. Bubble vents give air in the flood.
 c1Lines('m_octavia','m_octavia_intro','m_lumen_won',
-  [['narr',S('The cellar is round and dark. Lamps hang on the walls, and eight round windows look out into the deep. Something big moves past them. Then a gold eye fills one window.','A dark round room. Eight windows. A huge gold eye looks in!')],
-   ['m_octavia',S('A visitor! Down here! Do you have a lamp? Everyone who comes down here has a lamp. Give it to me, dear.','A visitor! Do you have a lamp? Give it to me!')],
-   ['ash',S('These are Lumen\'s lamps. You took them all?','You took all of Lumen\'s lamps?')],
-   ['m_octavia',S('Took? I COLLECTED. There is a difference. Mostly in the screaming.','I did not take them. I collected them!')]],
-  [['narr',S('Octavia flops on the dais, all eight arms in a tangle, and makes a noise like a very sad bath.','Octavia flops down in a tangle. She sounds like a sad bath.')],
-   ['m_octavia',S("Fine! FINE! Take your lamps. I only wanted something pretty to look at down here. It's DARK at the bottom of the sea, you know.",'Fine! Take the lamps. It is so dark down here.')],
-   ['ash',S('You could just... share them? Leave them in the windows?','You could share them. Put them in the windows!')],
-   ['m_octavia',S("...Share. Hm. I've never tried sharing. Is it nice?",'Share? I never tried that. Is it nice?')],
-   ['narr',S("One by one, she puts the moon lamps back in Lumen's windows. All through the drowned city, lights come on.",'She puts the lamps back. The whole city lights up!')]]);
+  [],[]); // the words are x3_story's (m3sBossWords sets this boss's intro and outro)
 // where the windows, valves and lamps go: along the walls, away from the room's doors
 function m3Doors(R){ const A=AREA, c=A.cave, cs=c.cell, out=[]; for(const L of c.links||[]) for(const k of L.cells||[]){ const q=tPos(k); if(q.x>R.x0-cs*1.5&&q.x<R.x1+cs*1.5&&q.y>R.y0-cs*1.5&&q.y<R.y1+cs*1.5) out.push(q); } return out; }
 function m3WallSpots(R,side,n,doors,inset){ const L=[], m=inset||10, far=q=>doors.every(d=>dist(d.x,d.y,q.x,q.y)>170);
@@ -984,19 +976,7 @@ const M3PUFF={reefX:6050,site:{x:5850,y:65600},sb:{x:5850,y:65600,r:220},arch:{x
 // sandbank in it (x3_world's real map has both)
 try{ const M=MAPS[3]; if(M&&M.placeholder){ const Z=tzOf(M); Z.lakes.push({x:5990,y:65600,r:640,amp:20}); Z.isles.push({x:M3PUFF.sb.x,y:M3PUFF.sb.y,r:M3PUFF.sb.r}); M3PUFF.fake=true; } }catch(err){ console.error(err); }
 c1Lines('m_puffington','m_puffington_intro','m_puffington_outro',
-  [['narr',S('Under the Reefwall, in the green dark, the arch of the Sunken Gate is plugged. Completely. By a pufferfish. A spiky, spotty, yellow pufferfish the size of a cottage, with a tiny captain\'s hat and a magnificent whiskery moustache.','A huge spiky pufferfish is stuck in the gate. He has a tiny hat and a big moustache.')],
-   ['m_puffington',S('HALT! Who goes there? State your business! Pay the toll! Admire my moustache!','HALT! Pay the toll! Look at my moustache!')],
-   ['ash',S('Are you... stuck in the gate?','Are you stuck in the gate?')],
-   ['m_puffington',S("STUCK? I'm not STUCK. I'm GUARDING. I am Baron Puffington, Keeper of the Sunken Gate, and I puff up like this on PURPOSE.",'I am not stuck! I am GUARDING. I am Baron Puffington!')],
-   ['ash',S('How long have you been puffed up?','How long have you been puffed up?')],
-   ['m_puffington',S('...Since Tuesday.','Since Tuesday.')],
-   ['m_puffington',S("The toll is one pie! A fish pie! ...No. Not fish. Never mind. The toll is EVERYTHING! Crabs! Get him!",'The toll is EVERYTHING! Crabs, get him!')]],
-  [['narr',S('With a long, sad PFFFFFFFFT, Baron Puffington goes down like a balloon. He is now a normal-sized pufferfish. His moustache is still enormous.','PFFFT! He goes down like a balloon. His moustache is still huge.')],
-   ['m_puffington',S("Fine! FINE! The gate's open. I was getting a cramp anyway. Do you know how hard it is to hold your breath since Tuesday?",'Fine! The gate is open. I held my breath since Tuesday!')],
-   ['ash',S('Maybe just... don\'t puff up in doorways?','Maybe do not puff up in doorways?')],
-   ['m_puffington',S("...That's actually very good advice. I shall write it on my hat.",'Good advice. I will write it on my hat.')],
-   ['narr',S('The Baron swims off into the deep with tremendous dignity, and bumps into a rock.','He swims off proudly. He bumps into a rock.')],
-   ['iska',S('Swim through, Ash. The Glass Desert is on the other side.','Swim through, Ash. The desert is on the other side.')]]);
+  [],[]); // the words are x3_story's (m3sBossWords sets this boss's intro and outro)
 function m3PuffMouth(e){ const k=e.puffed?1:0.4; return {x:e.x+Math.cos(e.face)*e.r*0.85,y:e.y+Math.sin(e.face)*e.r*0.85-8*k,r:e.puffed?24:12}; }
 M3HC.m_puffington=e=>{ const L=e._hc||(e._hc=[{},{}]); let n=0, M=m3PuffMouth(e);
   m3HS(L,n++,{x:e.x,y:e.y,r:e.r*0.95,m:e.puffed&&e.mode==='cork'&&!(e.dazeT>0)?0.1:1});
@@ -1179,15 +1159,7 @@ function m3Puff2(e,fl){
 // Phase 3: worm lanes cross the hall on a clock, and two Sand Sharks join. He rears up and waits over a mound (a gold
 // ring): BURROW under him and POP UP into his belly (x3, a long stagger). Gate: 1 / 2 / 2 belly pops.
 c1Lines('m_gravelgut','m_gravelgut_intro','m_burrows_won',
-  [['narr',S('The floor of the hall is one deep bowl of sand. Four tall glass pillars stand in it. The sand breathes. Something under it is very, very big.','A bowl of sand. Four glass pillars. Something huge is under the sand.')],
-   ['m_gravelgut',S('(a rumble from below) ...Ooooh. My tummy. Is that... a snack? You look crunchy. Glass is crunchy. I like crunchy.','Ooh, my tummy. Are you a snack? You look crunchy.')],
-   ['ash',S('I am NOT crunchy. I am a dragon. Dragons are spicy.','I am not crunchy! I am spicy!')]],
-  [['narr',S('Gravelgut gives one enormous cough. Something small and bright flies out of his mouth, bounces three times, and rolls to your feet. It glows silver.','Gravelgut coughs. Something bright rolls to your feet.')],
-   xdo(()=>{ try{ giveItems({m_mooncrumb:1}); }catch(err){} }),
-   ['ash',S('It\'s... a crumb. Of the MOON.','It is a crumb of the MOON!')],
-   ['m_gravelgut',S("(a rumble) ...Oof. Oh. Oh, that's better. My tummy. I've had a tummy ache for a month. Why did I eat that?",'Oof. My tummy feels better.')],
-   ['iska',S("She spilled it, Ash. Nyxara. She's a messy eater.",'Nyxara dropped it. She is a messy eater.')],
-   ['m_gravelgut',S("Thank you, little warm thing. I'm going to lie down for a hundred years.",'Thank you. Now I will sleep for a hundred years.')]]);
+  [],[]); // the words are x3_story's (m3sBossWords sets this boss's intro and outro)
 M3ROOM.m_gravelgut={
   build(R,A){ const D={R,type:'m_gravelgut',pillars:[]}, rx=(R.x1-R.x0), ry=(R.y1-R.y0);
     for(const [u,v] of [[-0.24,-0.22],[0.24,-0.22],[-0.24,0.24],[0.24,0.24]]){ const P={x:R.cx+u*rx,y:R.cy+v*ry,r:30,up:true,regrow:0,ph:rand(0,6)}; P.col=addAreaCol({t:'c',x:P.x,y:P.y,r:24,deep:true}); Object.defineProperty(P.col,'off',{get:()=>!P.up,configurable:true}); D.pillars.push(P); }
@@ -1329,18 +1301,7 @@ function m3Gut2(e,fl){
 // Strut: a ring of feathers (jump). Get to his side or behind him and Moonfire the last four eyes; each stuns him 1.5 s.
 // The last eye ends the fight.
 c1Lines('m_fanfare','m_mirror_boss_in','m_mirror_won',
-  [['narr',S('In the middle of the Mirror Hall, a peacock as tall as a house is admiring himself in six mirrors at once. His feathers are glass and silver. On every tail feather is an eye, painted dark violet.','A giant glass peacock looks at himself in six mirrors. His tail has violet eyes.')],
-   ['m_fanfare',S("Mirror, mirror, on the wall... it's ME. It's always me.",'Mirror, mirror... it is ME!')],
-   ['m_fanfare',S("Oh! A visitor. A small, scaly, slightly singed visitor. I am Lord Fanfare, Keeper of the Moon Flame, Most Beautiful Thing in the World. Don't look at my tail.",'Oh! A visitor. I am Lord Fanfare, the most beautiful thing in the world. Do not look at my tail.')],
-   ['m_fanfare',S('...No, DO look. Look at it.','No, DO look!')],
-   ['ash',S('It\'s nice. Why are the eyes on it purple?','It is nice. Why are the eyes purple?')],
-   ['m_fanfare',S("A voice in the mirrors told me I was the only light that matters. Isn't that lovely? Now. Shoo. You're making the mirrors look crowded.",'A voice in the mirrors said I am the only light. Now shoo!')]],
-  [['narr',S('The last violet eye on Lord Fanfare\'s tail goes out. One by one, his feathers turn back to green and gold.','The last eye goes out. His feathers turn green and gold.')],
-   ['m_fanfare',S('...Oh. Oh dear. Was I horrid? I think I was horrid. Something cold got into the mirrors and whispered to me.','Oh dear. Was I horrid? Something cold whispered to me.')],
-   ['ash',S("You're still very shiny.",'You are still very shiny.')],
-   ['m_fanfare',S("...Thank you. You're quite shiny yourself. For a lizard.",'Thank you. You are shiny too. For a lizard.')],
-   ['ash',S("I'm a DRAGON.",'I am a DRAGON.')],
-   ['m_fanfare',S("Even better. Dragons go with everything. I was supposed to guard Ember's flame FOR her family, you know. Not FROM them. I shall polish something to make up for it.",'Even better! I was meant to guard the flame FOR you. I am sorry.')]]);
+  [],[]); // the words are x3_story's (m3sBossWords sets this boss's intro and outro)
 // ---------- a mirror on a stand with a moon crystal (the Mirror Hall, Prism's Hall): any weapon hit (or USE) turns it
 // 45 degrees; Moonfire on the crystal lights it (8 s, 12 on Easy) and the mirror throws a moonbeam the way it points
 function m3MirrorMake(A,x,y,dir){ const M={k:'m3mirror',x,y,r:26,dir:dir||0,lit:0,heat:0,turnT:0,beam:null};
@@ -1519,18 +1480,7 @@ function m3Fanfare2(e,fl){
 // For the finale (FINALE 6.4): M3HUSH.def({phases:3, shadow:true}) makes the same moth with one phase fewer, and
 // M3HUSH.parts(cx,cy,R,{outdoor:true,...}) the same arena pieces (moonstones, pools, knots, rim) anywhere.
 c1Lines('m_hushboss','m_hush_intro','m_hush_outro',
-  [['narr',S('Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. Frost glitters in her fur. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.','A huge white moth sits under the dome. A silver thread ties her to the floor and to the sky.')],
-   ['narr',S('Beside her, in a little brass cradle, something glows silver. The Moon Shard.','Beside her glows the Moon Shard.')],
-   ['f_hush',S('You again. Loud one. I flew home, like you said. I told her you were coming.','You again. I flew home. I told her you were coming.')],
-   ['ash',S('Hush. You came back.','Hush. You came back.')],
-   ['f_hush',S('I flew to the Mother, small and cold. She made me big again. "You came back small," she said. "Never again." Then she gave me this.','The Mother made me big again. Then she gave me this leash.')],
-   ['narr',S('The silver leash glints. Somewhere far above, something tugs it, gently. Hush flinches.','Something far above tugs the leash. Hush flinches.')],
-   ['f_hush',S('The Mother brought the Shard here herself. They all go up to her, in the end.','The Mother brought the Shard here. They all go up to her, in the end.')],
-   ['f_hush',S("I'm to keep it until you bring the other two. Then the Mother gets all three. Shhh. Don't be loud about it.",'I keep it until you bring the others. Shhh.')],
-   {who:'c_vesper',text:S('Hi, moth. Remember the Dreadgate? I brought more fire bombs.','Hi, moth! I brought fire bombs.'),skipIf:()=>!G.flags.m_vesper_ally},
-   {who:'m_esme',text:S('(from the stairs) Lamplighters! Poles up! Wicks lit!','Lamplighters! Light the lamps!'),skipIf:()=>!G.flags.m_lamps_ally},
-   ['f_hush',S('Shhhhhhhhh.','Shhhhh.')]],
-  null);
+  [],null); // the words are x3_story's (m3sBossWords sets this boss's intro and outro)
 // the built-in outro and the choice (ACT4 6.11); the story helper can replace it (STORY.m_hush_outro or M3.hook.hushDone)
 STORY.bosses.m_hushboss.outro=null;
 const M3_HUSH_OUTRO=()=>[
@@ -2069,13 +2019,7 @@ function m3Prism2(e,fl){
 // and the dust burns off: he falls 2 s (x1.5). Gate: he cannot drop below half until he stared at a lamp, nor fall until
 // he stared 2 times (1 on Easy) and fell once.
 c1Lines('m_umberwing','m_umberwing_intro','m_umberwing_outro',
-  [['narr',S('A table is set for one, with a lamp on a plate. Behind it a moth as tall as a door unfolds his cloak, and the cloak is wings.','A table with a lamp on a plate. A huge moth in a cloak bows.')],
-   ['m_umberwing',S('Charmed. Do wipe your feet. I am Duke Umberwing, keeper of this door, and you are interrupting my supper.','Charmed. Wipe your feet. I am Duke Umberwing.')],
-   ['ash',S('Your supper is a LAMP.','Your supper is a LAMP.')],
-   ['m_umberwing',S('Crunchy. Now: en garde!','Crunchy. En garde!')]],
-  [['narr',S('The Duke sits down on the floor with a dusty puff. Then he picks up the lamp from his plate and hugs it.','The Duke sits down. He hugs his lamp.')],
-   ['m_umberwing',S("I'm keeping this one. It has sentimental value. I stole it on a Tuesday.",'I am keeping this lamp. I stole it on a Tuesday.')],
-   ['narr',S('He bows, flutters up to the window, and is gone into the night with the lamp under his arm. He left the key on the table.','He flies out the window with his lamp. The key is on the table.')]]);
+  [],[]); // the words are x3_story's (m3sBossWords sets this boss's intro and outro)
 M3ROOM.m_umberwing={
   build(R,A){ const D={R,type:'m_umberwing',table:{x:R.cx,y:R.cy}}, dx=(R.x1-R.x0)*0.36, dy=(R.y1-R.y0)*0.3;
     D.lamps=[[-1,-1],[1,-1],[-1,1],[1,1]].map(([u,v])=>m3AddLamp(R.cx+u*dx,R.cy+v*dy+20,{h:48,dur:12,R:170}));
