@@ -1256,7 +1256,7 @@ people({
           'A white moth flew by in a tiny sweater!'],
         re: [
           { t: ['Hilde knitted it for her.', 'Hilde knitted it.'],
-            say: [['m_esme', 'Then she has a friend in the cold north and one in the hot south. That is a lucky moth.', 'A friend north and one south. Lucky moth.']] },
+            say: [['m_esme', 'Then she has a friend in the snow and one in the sand. That is a lucky moth.', 'A friend in snow and one in sand. Lucky moth.']] },
           { t: ['Did she look happy?', 'Did she look happy?'],
             say: [['m_esme', 'She looked warm. With moths, that is the same thing.', 'Warm. For a moth that is the same.']] },
         ] },
@@ -1472,18 +1472,520 @@ people({
       { bark: true, say: ['*shimmers a little*', '*shimmers*'] },
     ],
 
-    // ================================================================ Hearthold (Act IV visits)
+    // ================================================================ Hearthold (Act IV visits; talk v11, J11b)
+    // ---------------------------------------------------------------- Hilde, the Warm Mitten
+    // Soup, knitting, Biscuit the cat. Writes to Cook Gilly in Driftwood (said gilly_hilde: Gilly's message arrives).
     f_hilde: [
+      { if: 'said gilly_hilde', once: true,
+        say: ['Gilly says my soup needs more fish? More fish! Tell her it needs less fish. Tell her I said it lovingly.', 'Gilly wants more fish? Tell her less fish. Lovingly.'],
+        re: [
+          { t: ["She said you'd put salt in.", "She said you'd add salt."],
+            say: [['f_hilde', 'I have already put salt in. I put salt in when I read her letter. Biscuit, fetch the salt.', 'I already did. Biscuit, fetch the salt.']] },
+          { t: ['You two should meet one day.', 'You two should meet.'], tone: 'kind', f: 0.5,
+            say: [['f_hilde', 'One day. She floats about too much. I would have to chase a whole town.', 'One day. I would have to chase a town.']] },
+        ] },
       { if: 'item m4_basket', once: true, scene: 'hl_basket', then: ['take m4_basket', 'give m4_sweater', 'xp 200'] },
-      { if: 'item m4_sweater', say: ["Have you found that poor cold moth yet? Keep the sweater dry. It shrinks, and she's small enough as it is.", 'Found the cold moth yet? Keep the sweater dry!'] },
+      { if: 'item m4_sweater', say: ["Have you found that poor cold moth yet? Keep the sweater dry. It shrinks, and she's small enough as it is.", 'Found the cold moth yet? Keep the sweater dry!'],
+        re: [
+          { t: ["I'll keep it dry, I promise.", "I'll keep it dry."],
+            say: [['f_hilde', 'Good. It is a small sweater. A wet one would be smaller.', 'Good. A wet one would be smaller.']] },
+          { t: ['Will it fit a moth that big?', 'Will it fit a big moth?'],
+            say: [['f_hilde', 'It is for when she is small again. Gilly says she will be. Gilly is usually right about small things.', 'It is for when she is small again.']] },
+        ] },
       { if: 'power dive !flag gate_q_g_steam', promise: 'q_g_steam',
         say: ["The Steamwell ate my knitting! Basket and all. It's down there somewhere, warm and soggy. Nobody can reach it.",
-          'The Steamwell ate my knitting basket!'] },
+          'The Steamwell ate my knitting basket!'],
+        re: [
+          { t: ['I can dive now. I will get it.', 'I can dive now. I will get it.'], tone: 'brave', f: 0.5,
+            say: [['f_hilde', 'Would you? It is right at the bottom, warm and soggy. Mind the steam.', 'Would you? Mind the steam.']] },
+          { t: ['What was in the basket?', 'What was in the basket?'],
+            say: [['f_hilde', "My best wool, and Biscuit's favourite ball. Biscuit has been very quiet about it.", "My best wool. And Biscuit's ball."]] },
+        ] },
       { say: [["Soup's on! Soup's always on. Even when you're far away. Especially then.", "Soup's on! Always."],
         ['Gilly in Moonfall sends me fish. I send her my soup recipes. She puts fish in all of them.', 'Gilly sends fish. I send soup recipes.']] },
+      { ask: ['How did you and Gilly start writing?', 'How did you meet Gilly?'],
+        say: ['A bottle washed up in the fjord with a fish recipe in it. I wrote back to say it was wrong. Eleven years ago.', 'A bottle with her recipe washed up. I said it was wrong.'] },
+      { idle: [['Sit! Soup? Go on.', 'Soup? Go on.'], ['Mind Biscuit. What is it?', 'Mind the cat.']] },
+      { bye: [["Soup's on when you're back!", "Soup's on when you're back!"]] },
       { bark: true, say: ["Soup's on! Soup's always on!", "Soup's on!"] },
     ],
+
+    // ================================================================ the returning cast in Moonfall (talk v11, J11b)
+    // x3_people's own talk hook stands down for these once this act's data has a line for them (m3pDataTalk), after the
+    // few things only it does (Mags's spare bombs, Mom's star-iron, Juniper's map tent, Tikka's bun, Wren's first talk).
+    // Where they stand: Dell, Wren and Mags at Gearhaven's Far Pier before the voyage; then Dell's boat at the Driftwood
+    // dock (a day late on Glaciar's route), Wren on her reading raft (then in the Pearl Archive), Mags on the dock;
+    // Dell away fetching Mom after eclipse 2; everyone on the Moon Pier at the end (Mom and Quill once the Heart is whole).
+
+    // ---------------------------------------------------------------- Captain Dell Fisk, the Soggy Biscuit Three (a lead)
+    // Easy-going lake fisherman turned sea captain, fond of sandwiches and his brass whistle. Wendel's cousin.
+    dell: [
+      // what Dabble told Dell (said dabble_raft_maren is read by Mom too)
+      { if: 'stage=m_sail !flag m_landed',
+        say: ['Ash! The Soggy Biscuit Three, ready to sail east! Steam paddle, brass whistle, and sandwiches. Hop aboard at the end of the pier.', 'My boat is ready! Hop aboard at the end of the pier.'],
+        re: [
+          { t: ['Is she really ready for the sea?', 'Is she ready for the sea?'],
+            say: [['dell', 'She floats. Mostly. Mags says the noise is on purpose. I have decided to believe her.', 'She floats. Mostly. The noise is on purpose.']] },
+          { t: ['Who else is coming?', 'Who else is coming?'],
+            say: [['dell', 'Sister Wren, who has gone green already, and we have not left the pier. And Mags, who is why we float.', 'Wren, already green. And Mags, who keeps us afloat.']] },
+        ] },
+      // the Moon Pier, at the end
+      { if: 'act=4 flag m_done',
+        say: ["End of the world. Lovely spot for a sandwich. When you come down off that mountain, I'll be right here. The kettle's on.", "I'll be right here. The kettle's on."],
+        re: [
+          { t: ['Keep the kettle on for me.', 'Keep the kettle on.'],
+            say: [['dell', "It's always on. I'll put a second one on as well, just in case.", 'Always. I will put on a second one too.']] },
+          { t: ["What if I'm up there a long time?", 'What if I am gone long?'],
+            say: [['dell', 'Then I make more sandwiches. I am very good at waiting, Ash. I am a fisherman.', 'Then more sandwiches. I am a fisherman. I wait.']] },
+        ] },
+      { if: 'flag m_reforged !flag m_done',
+        say: ["Your mom didn't say a word the whole way here. She polished that hammer from Gearhaven to the edge of the world.", 'Your mom polished her hammer the whole way here.'],
+        re: [
+          { t: ['She does that when she is scared.', 'She does that when scared.'], tone: 'kind', f: 0.75, then: ['said dell_hammer'],
+            say: [['dell', 'Then she was very scared. It is the shiniest hammer in the world now.', 'Then she was very scared. It is so shiny now.']] },
+          { t: ['Did she bring sandwiches too?', 'Did she bring sandwiches?'],
+            say: [['dell', 'She did. I did. We have far too many sandwiches. Have one.', 'We both did. Far too many. Have one.']] },
+        ] },
+      { if: 'stage=m_reforge !flag m_reforged',
+        say: ['Your mom climbed a staircase made of moonlight. I stayed with the sandwiches. Somebody had to.', 'Your mom went up the moon stairs. I minded the sandwiches.'],
+        re: [
+          { t: ['Which way did she go?', 'Which way did she go?'],
+            say: [['dell', 'Up. Straight up the Moonpath, with her hammer, and Professor Quill puffing after her. You will catch them.', 'Up the Moonpath, with her hammer. Go!']] },
+          { t: ['The sandwiches needed you.', 'The sandwiches needed you.'],
+            say: [['dell', 'They did. Not one has been eaten by a gull. I am very proud.', 'Not one eaten by a gull. I am proud.']] },
+        ] },
+      // the first talk in Driftwood: news from home
+      { if: 'flag m_dell_docked !flag m_dell_away stage<m_reforge', once: true,
+        say: ['Pebble found me even out here. Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went splash." That is all of it.',
+          'Wendel wrote you a poem. "A dragon called Ash saw the moon go splash."'],
+        re: [
+          { t: ["Tell him it's a good start.", "Tell him it's a good start."], tone: 'kind', f: 0.5,
+            say: [['dell', 'I will. He will write a second line. It will take him a year.', 'I will. The next line will take a year.']] },
+          { t: ["The moon didn't go splash.", "The moon didn't go splash."],
+            say: [['dell', 'Not yet. Do not tell Wendel. He will want to change it.', 'Not yet. Do not tell Wendel.']] },
+          { t: ['Do fish still dream of his sandwiches?', 'Fish still dream of his sandwiches?'], if: 'said dell_sandwich',
+            say: [['dell', 'I told him what you said. Now he leaves one on the dock every night. The gulls are enormous.', 'He leaves one on the dock now. Fat gulls.']] },
+        ] },
+      // his moment: he has never sailed past the edge of a map before
+      { if: 'flag m_dell_docked stage>=m_coral !flag m_dell_away stage<m_reforge',
+        say: ["I've never sailed past the end of a map before. Were you scared, the first time you went somewhere new?", 'Were you scared, the first time you went somewhere new?'],
+        re: [
+          { t: ['Yes. Every single time.', 'Yes. Every time.'], tone: 'kind', f: 0.75,
+            say: [['dell', 'Good. Me too. I thought it was only me.', 'Good. Me too. I thought it was just me.']] },
+          { t: ['No. I was too busy.', 'No. I was too busy.'], tone: 'brave', f: 0.5,
+            say: [['dell', 'Ha! Then that is the trick. Stay busy. I shall polish the whistle.', 'Ha! Stay busy. I will polish the whistle.']] },
+        ] },
+      { if: 'flag m_dell_docked !flag m_dell_away stage<m_reforge',
+        say: ["Three days east and I still haven't sunk her. Old Sal won't believe it. I'm not sure I do.", "I still haven't sunk her! Sal won't believe it."],
+        re: [
+          { t: ["You're a real sea captain now.", "You're a sea captain now."],
+            say: [['dell', 'A lake captain, on a sea. The sea has not noticed yet. I am being very quiet.', 'A lake captain on a sea. I am being quiet.']] },
+          { t: ['Could we sail home sometime?', 'Could we sail home?'],
+            say: [['dell', 'Any time you like. The boat is at the end of the dock. Say the word and I toot.', 'Any time. The boat is at the dock.', { ref: 'm4_west_dock' }]] },
+        ] },
+      { ask: ['Does Minnow know you sailed east?', 'Does Minnow know?'],
+        say: ['She made me promise to bring back a shell for every day. I have eleven shells and a crab. The crab came on his own.', 'I owe her a shell a day. I have eleven. And a crab.'] },
+      { ask: ['Why did you come all this way?', 'Why did you come so far?'],
+        say: ['Nobody else would sail into a dark sea, and your mom asked, and I like you. That is three reasons. One would have done.', 'Nobody else would. Your mom asked. I like you.'] },
+      { idle: [['The kettle is on. What is it?', 'Kettle is on. Yes?'], ['Toot toot. Go on.', 'Toot toot. Go on.']] },
+      { bye: [['Tight lines, and calm seas.', 'Calm seas!'], ['Toot toot!', 'Toot toot!']] },
+      { bark: true, say: ["Toot toot! That's the brass whistle. I just like pressing it.", 'Toot toot! I like the whistle.'] },
+    ],
+
+    // ---------------------------------------------------------------- Sister Wren, the librarian from Brindlecross
+    // Bookish, eager, out of her depth outdoors, seasick and happy. Her first talk in Driftwood is the scene m_wren below
+    // (x3_people plays it once); the Book of Moths is hers to read (q_m_leash).
+    wren: [
+      { if: 'stage=m_sail !flag m_landed',
+        say: ['I have brought eleven books and a bucket. The bucket is for the sea. Captain Dell says I will need it before the end of the pier.', 'I brought eleven books and a bucket.'],
+        re: [
+          { t: ['What do you want from the sea?', 'What do you want out there?'],
+            say: [['wren', "The merfolk have Lumen's old books, and nobody has read them in five hundred years. Five hundred, Ash.", "The merfolk have Lumen's books. Unread for 500 years!"]] },
+          { t: ['Hold my tail if it gets rough.', 'Hold my tail if it is rough.'], tone: 'kind', f: 0.5,
+            say: [['wren', 'Thank you. I may hold it for three days.', 'Thank you. Maybe for three days.']] },
+        ] },
+      // after the Book of Moths (q_m_leash): she reads in the Pearl Archive now
+      { if: 'quest m_leash done', once: true,
+        say: ["Page eleven, in Iska's own hand. I keep taking it out to look at it. Ember's friends kept it safe for five hundred years. Under the sea.", "Page eleven, in Iska's own hand!"],
+        re: [
+          { t: ['Iska says she forgot that moth.', 'Iska says she forgot the moth.'],
+            say: [['wren', 'Then she remembered, and wrote it down. That is what a page is for.', 'Then she remembered. That is what pages are for.']] },
+          { t: ['So the moth has a name. Nyx.', 'The moth has a name. Nyx.'],
+            say: [['wren', 'Somebody gave her that name, once, on a lantern. It is a sad thing, to be named and then left.', 'Someone named her once. Then left. That is sad.']] },
+        ] },
+      { if: 'quest m_leash done',
+        say: ['Ripple and I are reading every pearl in the Archive. He forgets them, so we read them twice. It is heaven.', 'Ripple and I read every pearl. Twice!'],
+        re: [
+          { t: ['He says you argue a lot.', 'He says you argue a lot.'],
+            say: [['wren', 'About commas. It is the best kind of arguing. Nobody gets hurt, and somebody learns something.', 'About commas. The best kind of arguing.']] },
+          { t: ['Will you ever go home again?', 'Will you go home again?'],
+            say: [['wren', 'When every pearl is read. So, never. I will write.', 'When every pearl is read. So, never. I will write.']] },
+        ] },
+      { if: 'flag m_eclipse1 !flag m_eclipse2',
+        say: ['The sun went out while I was on the last page of a book. I finished it by feel. It was a sad ending. I could tell.', 'The sun went out. I finished my book by feel.'],
+        re: [
+          { t: ['Did Lumen write about the eclipse?', 'Did Lumen write about this?'],
+            say: [['wren', 'Lumen wrote about everything. Somewhere down in that Archive is the night she first came. Bring me anything soggy.', 'Somewhere down there. Bring me anything soggy.']] },
+          { t: ['Did it scare you, Wren?', 'Did it scare you?'],
+            say: [['wren', 'Very. So I kept reading. It is what I do with being scared.', 'Very. So I kept reading.']] },
+        ] },
+      { if: 'flag m_dell_docked !quest m_leash done',
+        say: ["The raft keeps moving. My books keep moving. I keep reading. It's a library that dances.", 'My books float! It is a dancing library.'],
+        re: [
+          { t: ['Found anything about the moth?', 'Found anything about the moth?'],
+            say: [['wren', "Lumen's priests wrote about moths. A great deal about moths. Bring me something old and soggy, and I'll find out what.", 'They wrote lots about moths. Bring me something soggy.']] },
+          { t: ['Are you still seasick?', 'Are you still seasick?'],
+            say: [['wren', 'Only when I look up. So I do not look up.', 'Only when I look up. So I do not.']] },
+        ] },
+      { ask: ['Does Ottoline still write to you?', 'Does Ottoline write to you?'],
+        say: ['Every week. She says Lumen is spelled with two Ms in the old style. It is not. I have written back. Four pages.', 'Every week. She spells Lumen wrong. Four pages back.'] },
+      { ask: ["What's the best book you brought?", "What's your best book here?"],
+        say: ['The one about the sea. I have not read it yet. I am saving it for when I stop being sick.', 'The sea book. I will read it when I stop being sick.'] },
+      { idle: [['Mm? The raft moved. Go on.', 'Go on.'], ["Sorry. I'm on the good part. Yes?", 'Yes?']] },
+      { bye: [['Mind the water. It is everywhere.', 'Mind the water.'], ['Bring me something soggy!', 'Bring me something soggy!']] },
+      { bark: true, say: ['Page forty-one... the raft moved... page forty-two.', 'Page forty-one... the raft moved.'] },
+    ],
+
+    // ---------------------------------------------------------------- Mags Sprocket, Dell's engineer
+    // Loud, cheerful, says "science" about explosions. Her Tide Bombs quest starts the first time Ash talks to her in
+    // Moonfall (the quest's own step plays then).
+    f_mags: [
+      { if: 'stage=m_sail !flag m_landed',
+        say: ["The engine's fine. That noise is a feature. If you hear a bang, that's also a feature.", 'The engine is fine. The noise is a feature.'],
+        re: [
+          { t: ['Will we really make it east?', 'Will we make it east?'],
+            say: [['f_mags', 'Three days, if the paddle holds. Four if it does not. Swimming if neither.', 'Three days. Four if the paddle breaks.']] },
+          { t: ['What kind of feature?', 'What kind of feature?'],
+            say: [['f_mags', 'The exciting kind.', 'The exciting kind.']] },
+        ] },
+      { if: 'quest m_tidebombs done', once: true,
+        say: ['Tide Bombs! Under water! I have written to everybody I know. Nobody believes me. They are right not to, mostly.', 'Tide Bombs! Nobody believes me!'],
+        re: [
+          { t: ['I saw them work. They believe me.', 'I saw it. I believe you.'],
+            say: [['f_mags', 'One whole person believes me! Science has a witness!', 'One person believes me! Science!']] },
+          { t: ['What will you blow up next?', 'What will you blow up next?'],
+            say: [['f_mags', 'Nothing. For a whole week. I promised Dell. ...Starting tomorrow.', 'Nothing for a week. From tomorrow.']] },
+        ] },
+      { if: 'quest m_tidebombs active',
+        say: ['Rocks first. Dive, throw, swim away. The swimming away is the important bit.', 'Dive. Throw. Swim away fast.'],
+        re: [
+          { t: ['Do they really stick to things?', 'Do they really stick?'],
+            say: [['f_mags', 'To rocks, walls and grumpy things. Not to me. So far.', 'To rocks and grumpy things. Not me. So far.']] },
+          { t: ["What if one doesn't go off?", "What if one doesn't go off?"],
+            say: [['f_mags', 'Then do not stand next to it while you wonder why.', 'Then do not stand next to it.']] },
+        ] },
+      { if: 'flag m_dell_away stage<m_reforge',
+        say: ["Dell's gone for your mom and left me with the sandwiches. I'm not allowed to touch them. I'm touching the engine instead.", 'Dell went for your mom. I must not touch the sandwiches.'],
+        re: [
+          { t: ['Gilly said she made you fish.', 'Gilly made you fish.'],
+            say: [['f_mags', 'She did. I ate it. Do not tell Dell I could not wait.', 'I ate it. Do not tell Dell.']] },
+          { t: ['Will they be safe out there?', 'Will they be safe?'],
+            say: [['f_mags', 'In that boat? I built half of it. They will be fine. Probably.', 'I built half that boat. They will be fine.']] },
+        ] },
+      { if: 'act=4 flag m_done',
+        say: ["No moon? Then I'll see by bang-light. Don't look at me like that. It's very bright.", "No moon? I'll see by bang-light."],
+        re: [
+          { t: ['Please be careful, Mags.', 'Please be careful, Mags.'], tone: 'kind', f: 0.5,
+            say: [['f_mags', 'I am always careful. I am careful very loudly. Off you go.', 'I am careful. Very loudly. Go on.']] },
+          { t: ['Save some bangs for when I am back.', 'Save some bangs for me.'],
+            say: [['f_mags', 'A big one. For the party. I am already building it.', 'A big one, for the party!']] },
+        ] },
+      { if: 'flag m_dell_docked stage<m_reforge',
+        say: ["I've got a workbench on the dock now, to sell bombs to the Crab Pirates. They pay in shells, so it's going badly.", 'I sell bombs to crab pirates. They pay in shells!'],
+        re: [
+          { t: ["You're selling bombs to pirates?", "You're selling bombs to pirates?"],
+            say: [['f_mags', 'Very small ones. For fishing. They are terrible at fishing. It is the claws.', 'Tiny ones. For fishing. They are bad at it.']] },
+          { t: ['Do crabs even need bombs?', 'Do crabs need bombs?'],
+            say: [['f_mags', 'Nobody needs bombs. Everybody wants them. That is business.', 'Nobody needs bombs. Everybody wants them.']] },
+        ] },
+      { ask: ['How did you meet Dell?', 'How did you meet Dell?'],
+        say: ['He came into my shed asking for a boat engine. He left with an engine, three bombs and a cold. Best customer I ever had.', 'He came for an engine. He left with bombs too.'] },
+      { ask: ['Why do you like bombs so much?', 'Why do you like bombs?'],
+        say: ['They are honest. You always know where you stand with a bomb. Far away.', 'They are honest. You stand far away.'] },
+      { idle: [['If it explodes, it is science. Go on.', 'Go on.'], ['Mind the fuse. What is it?', 'Mind the fuse.']] },
+      { bye: [["Don't stand next to anything that ticks!", "Don't stand near ticking things!"], ['Swim away fast. Always.', 'Swim away fast.']] },
+      { bark: true, say: ["If you hear a bang from the dock, don't worry. That was me.", 'A bang? That was me.'] },
+    ],
+
+    // ---------------------------------------------------------------- Tikka, the kobold baker (sails as ship's cook, if she came)
+    // Small, fierce about her lumpy buns ("lumpy means love"). Argues with Gilly about bread and fish.
+    ev_tikka: [
+      { if: 'flag tk_come=yes stage>=m_reforge',
+        say: ["I made a bun for the mountain. It's lumpy. Lumpy means love. The mountain doesn't deserve it.", 'I made a bun for the mountain. Lumpy means love.'],
+        re: [
+          { t: ['Can I take one up with me?', 'Can I take one up?'], tone: 'kind', f: 0.5,
+            say: [['ev_tikka', 'Take two. One for you, and one for whoever is up there being sad.', 'Take two. One for whoever is sad up there.']] },
+          { t: ['Did Dell let you steer?', 'Did Dell let you steer?'],
+            say: [['ev_tikka', 'Once. We went in a circle. A very brave circle.', 'Once. We went in a circle. A brave one.']] },
+        ] },
+      { if: 'flag tk_come=yes stage>=m_coral stage<m_reforge',
+        say: ['I carried bread all the way across the sea. To somewhere important! This is the most important place I have ever been.', 'I carried bread across the sea. To somewhere important!'],
+        re: [
+          { t: ['You came all this way for bread?', 'You came this far for bread?'],
+            say: [['ev_tikka', 'For you. The bread came too.', 'For you. The bread came too.']] },
+          { t: ['Do you miss the valley?', 'Do you miss the valley?'],
+            say: [['ev_tikka', 'A bit. The valley smelled of smoke. This smells of fish. I am getting used to it.', 'A bit. Here smells of fish. I am used to it.']] },
+        ] },
+      { if: 'flag tk_come=yes stage<m_reforge',
+        say: ['Lumpy buns! Gilly says they need fish. They do not need fish.', 'Lumpy buns! They do not need fish.'],
+        re: [
+          { t: ["They're perfect without fish.", "They're perfect without fish."], tone: 'kind', f: 0.5,
+            say: [['ev_tikka', 'Perfect! Did you hear that, Gilly? Perfect!', 'Perfect! Hear that, Gilly?']] },
+          { t: ['Maybe a little bit of fish?', 'Maybe a little fish?'],
+            say: [['ev_tikka', 'You have been talking to her. I can smell it on you.', 'You talked to her. I can tell.']] },
+        ] },
+      { ask: ['Who taught you to bake?', 'Who taught you to bake?'],
+        say: ['Nobody. I watched a baker through a window for a whole winter. Then I tried. The first ones bounced.', 'I watched through a window. My first buns bounced.'] },
+      { idle: [['Lumpy means love. What is it?', 'What is it?'], ['Mind the oven. Go on.', 'Go on.']] },
+      { bye: [['Take a bun! Lumpy means love!', 'Take a bun!']] },
+      { bark: true, say: ['Lumpy buns! Fresh lumpy buns! Lumpy means love!', 'Lumpy buns! Lumpy means love!'] },
+    ],
+
+    // ---------------------------------------------------------------- Mom (Maren), at home and on the Moon Pier (a lead)
+    // Voice sheet: short, practical, warm, teasing; worry comes out as instructions, love as hugs and work. She is at the
+    // forge until her letter after eclipse 2, then on the Moon Pier once the Heart is whole. The Lens is the chapter's.
+    maren: [
+      // on the Moon Pier: what Dell told Ash, and what Dabble named a raft (both carried by Dell)
+      { if: 'flag m_reforged said dell_hammer', once: true,
+        say: ['Dell told you about the hammer. Of course he did. ...I polished it so I had something to do with my hands.', 'Dell told you about the hammer. Of course.'],
+        re: [
+          { t: ['You climbed moonlight with it.', 'You climbed moonlight with it.'],
+            say: [['maren', 'I did. Do not tell Hal. He will want to try it.', 'I did. Do not tell Hal.']] },
+          { t: ["I'd have polished it too.", "I'd have polished it too."], tone: 'kind', f: 0.75,
+            say: [['maren', 'You would have breathed on it once and called it done. Come here.', 'You would breathe on it once. Come here.']] },
+        ] },
+      { if: 'flag m_reforged said dabble_raft_maren', once: true,
+        say: ['Dell says there is a raft in that floating town with my name on it. The Maren. He says you named it.', 'Dell says a raft is named after me. By you.'],
+        re: [
+          { t: ['So it would never sink.', 'So it would never sink.'], tone: 'kind', f: 0.75,
+            say: [['maren', '...Then I had better not, had I.', 'Then I had better not.']] },
+          { t: ['Rowan tied all the knots.', 'Rowan tied the knots.'],
+            say: [['maren', 'Good. I would want somebody careful on the knots. You can sit on the front.', 'Good. A careful knot-tier. You sit at the front.']] },
+        ] },
+      // the mountain is up: before he walks to the bridge
+      { if: 'act=4 flag m_done',
+        say: ["Have a sandwich first. That bridge isn't going anywhere, and you're not climbing a mountain hungry.", 'Have a sandwich first. The bridge will wait.'],
+        re: [
+          { t: ["I'm not hungry, Mom.", "I'm not hungry."],
+            say: [['maren', 'You are ten, and you are about to climb a mountain. You are hungry. Sit.', 'You are ten. You are hungry. Sit.']] },
+          { t: ['Will you be here when I come down?', 'Will you be here after?'], tone: 'kind', f: 0.75,
+            say: [['maren', 'Right here, on this pier. I am not going to watch you go. I am going to watch for you coming back.', 'Right here. Watching for you to come back.']] },
+          { t: ["I'll be careful. Like I said.", "I'll be careful. Like I said."], if: 'said maren_careful',
+            say: [['maren', 'You said that in the valley. You were mostly careful. Be careful all the way up, this time.', 'You were mostly careful. All the way, this time.']] },
+        ] },
+      { if: 'act=4 flag m_done',
+        say: ['You could stay, you know. Nobody would think one bit less of you. I had to say it once, out loud.', 'You could stay. Nobody would mind. I had to say it.'],
+        re: [
+          { t: ["I know. I'm still going.", "I know. I'm still going."], tone: 'brave', f: 0.75,
+            say: [['maren', '...I know you are. Now it is said, and I can stop saying it.', 'I know. Now it is said.']] },
+          { t: ['Would you stay, if it was you?', 'Would you stay, if it was you?'],
+            say: [['maren', 'No. That is the trouble with being your mother. I know exactly where you get it.', 'No. I know where you get it from.']] },
+        ] },
+      { if: 'flag m_reforged !flag m_done',
+        say: ["There it is. Whole. Three seams, like a mended pot. It'll hold. My work holds.", 'Whole. Three seams. It will hold.'],
+        re: [
+          { t: ['She still wants it, Mom.', 'She still wants it.'],
+            say: [['maren', 'Let her want it. Wanting is not having. You have it.', 'Let her want. Wanting is not having.']] },
+          { t: ['Thank you for coming all this way.', 'Thanks for coming all this way.'], tone: 'kind', f: 0.75,
+            say: [['maren', 'You breathed. I tapped. That is how it works in our family.', 'You breathed. I tapped. That is us.']] },
+        ] },
+      // at home, after the sun went out over the eastern sea (Yara's crow brought it)
+      { if: 'flag m_eclipse1 !flag m_dell_left !flag m_maren',
+        say: ['Yara says the sun went out over the eastern sea, in the middle of the day. I want to hear it from you.', 'Yara says the sun went out. Tell me.'],
+        re: [
+          { t: ['She asked me for the Shards.', 'She asked me for the Shards.'],
+            say: [['maren', 'She asked? Then she cannot simply take them, can she. Keep telling her no.', 'She asked? Then she cannot take them. Say no.']] },
+          { t: ["I'm all right. Really.", "I'm all right. Really."],
+            say: [['maren', 'Turn round. ...You have a scratch on your wing. Sit. You are all right, and you are sitting.', 'Turn round. A scratch. Sit down.']] },
+        ] },
+      { if: 'stage>=m_drift !flag m_dell_left !flag m_maren',
+        say: ["You've been east? Over the sea? You smell of fish and glass.", 'You went east? You smell of fish.'],
+        re: [
+          { t: ["There's a whole town on rafts.", "There's a town on rafts."],
+            say: [['maren', "On rafts? Does it have floors? Mind you don't fall between them.", "On rafts? Don't fall between them."]] },
+          { t: ['Mom, the moon is shrinking.', 'Mom, the moon is shrinking.'],
+            say: [['maren', 'I know. I watch it from the forge door. Tell me what you mean to do. The plan, Ash, not the brave bit.', 'I know. Tell me the plan. Not the brave bit.']] },
+        ] },
+      // her letter (an extra lantern in the window): said mom_window
+      { if: '!flag m_dell_left !flag m_maren', once: true,
+        say: ["I lit the extra lantern, like I said in my letter. It's in the window. Hal says it keeps him up. Good.", 'I lit the extra lantern in the window.'],
+        re: [
+          { t: ['I read your letter twice.', 'I read your letter twice.'], tone: 'kind', f: 0.75, then: ['said mom_window'],
+            say: [['maren', '...Did you. Then you know it is there. That is all it is for.', 'Then you know it is there. That is all.']] },
+          { t: ["Doesn't the cow mind the light?", "Doesn't the cow mind?"],
+            say: [['maren', 'Moo-rgaret? She sleeps facing it. Hal says she has never slept better.', 'She sleeps facing it. Hal says she loves it.']] },
+        ] },
+      { ask: ['Will you mend the Heart for me?', 'Will you mend the Heart?'], if: '!flag m_reforged',
+        say: ["Bring me all three and the forge will be hot. It's been hot since the day you left.", 'Bring all three. The forge is hot.'] },
+      { ask: ['Did you leave the window lantern lit?', 'Is the window lantern lit?'], if: 'flag m_reforged said mom_window',
+        say: ['Before we left. Hal is minding it. He is taking it very seriously. He has a chair.', 'Yes. Hal is minding it. He has a chair.'] },
+      { ask: ['How did you climb the moonlight?', 'How did you climb moonlight?'], if: 'flag m_reforged',
+        say: ['One step at a time. I did not look down, and Quill talked the whole way. That helped, and it did not.', 'One step at a time. Quill talked all the way.'] },
+      { ask: ["Who's minding the forge?", "Who's minding the forge?"], if: 'flag m_reforged',
+        say: ['Hal. He is feeding it leek soup peelings. It is fine. It is warm.', 'Hal. With soup peelings. It is fine.'] },
+      { idle: [['Mm? Boots laced? Go on.', 'Boots laced? Go on.'], ["I'm right here. What is it?", "I'm right here."]] },
+      { bye: [['Go on, then. Mind the edges.', 'Go on. Mind the edges.'], ['Scarf. Boots. Go.', 'Scarf. Boots. Go.']] },
+      { bark: true, if: 'flag m_reforged', say: ['Boots laced before you climb. Both of them. I mean it.', 'Lace your boots first!'] },
+    ],
+
+    // ---------------------------------------------------------------- Professor Quill, on the Moon Pier with her telescope
+    // A Brindlecross scholar: measures everything, argues with Wren by letter. Her old teacher Lumley kept the
+    // Observatory. She came up the moonlight stairs behind Mom.
+    quill: [
+      { if: 'act=4 flag m_done',
+        say: ["I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.", 'I measured the mountain. It is getting taller!'],
+        re: [
+          { t: ['How tall is it now?', 'How tall is it now?'],
+            say: [['quill', 'Taller than any number I would like to say out loud. Go before it grows.', 'Too tall to say. Go before it grows.']] },
+          { t: ['Will you keep measuring it?', 'Will you keep measuring?'],
+            say: [['quill', 'Every hour, until you are at the top. Then I will measure you coming down.', 'Every hour. Then I will measure you coming down.']] },
+        ] },
+      { if: 'act=4 flag m_done',
+        say: ['Every time I look through the telescope, the black glass seems to look back at me. I keep looking anyway.', 'The black glass seems to look back at me.'],
+        re: [
+          { t: ['Then stop looking for a bit.', 'Stop looking for a bit.'], tone: 'kind', f: 0.5,
+            say: [['quill', '...Good advice. I will not take it. But it is good advice.', 'Good advice. I will not take it.']] },
+          { t: ['What can you see at the top?', 'What is at the top?'],
+            say: [['quill', 'A door, I think. And something grey sitting in front of it. Waiting.', 'A door. And something grey, waiting.']] },
+        ] },
+      { if: 'flag m_reforged !flag m_done',
+        say: ["My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have loved this. A lens like a pond!", 'My old teacher kept the Observatory. He would love this!'],
+        re: [
+          { t: ['Did you get to look through it?', 'Did you look through it?'],
+            say: [['quill', 'For one minute, before your mother started hammering. Best minute of my life. Do not tell Wren.', 'For one minute. The best minute. Do not tell Wren.']] },
+          { t: ['Why did he leave?', 'Why did he leave?'],
+            say: [['quill', 'Nobody answered his letters, he said. So he stopped writing them. I wrote anyway. You answered.', 'Nobody wrote back. I wrote anyway. You answered.']] },
+        ] },
+      { ask: ['Do you and Wren still argue?', 'Do you and Wren still argue?'],
+        say: ['She says the Wardens were heroes. I say stubborn. She wrote from a raft to tell me I was wrong. On wet paper.', 'Heroes or stubborn. She wrote from a raft. On wet paper.'] },
+      { ask: ['How did you keep up with Mom?', 'How did you keep up with Mom?'],
+        say: ['I did not. Your mother climbs moonlight like it owes her money. I climbed it like a professor.', 'I did not. She climbs fast. I climb like a professor.'] },
+      { idle: [['Hm? I was measuring. Go on.', 'Go on.'], ['Fascinating. Sorry. Yes?', 'Yes?']] },
+      { bye: [['Go carefully. I will be measuring.', 'Go carefully.']] },
+      { bark: true, say: ['Fascinating. Terrifying. Mostly fascinating.', 'Fascinating! And scary.'] },
+    ],
+
+    // ---------------------------------------------------------------- Vesper, on the friend path (Act II's c_vesper=friend)
+    // Quick, proud, a climber, teases instead of thanking; "cousin". In Sable she waits on the tent roofs at night (her
+    // Last Job, q_m_vesper: the quest's first talk is its own scene); at the end she is on the Moon Pier.
+    c_vesper: [
+      { if: 'choice c_vesper=friend flag m_vesper_ally flag m_reforged',
+        say: ["Not alone, cousin. I said it. I meant it. Don't make it weird.", 'Not alone, cousin. Do not make it weird.'],
+        re: [
+          { t: ["Too late. It's a bit weird.", "Too late. It's weird."],
+            say: [['c_vesper', 'Ugh. Fine. It is a bit weird. Go and climb your mountain.', 'Ugh. Fine. Go climb your mountain.']] },
+          { t: ['Gran would want you home.', 'Gran would want you home.'],
+            say: [['c_vesper', 'Gran wants us both home. So we go up, and then we go home. In that order.', 'Both of us. Up first. Then home.']] },
+        ] },
+      // what she said to the Mother at the Moon Well, from the roof
+      { if: 'choice c_vesper=friend flag m_eclipse2', once: true,
+        say: ["You heard me, didn't you. Up on the roof, at the well. ...Don't make it a thing.", 'You heard me, at the well. Do not make it a thing.'],
+        re: [
+          { t: ['I heard you. That was brave.', 'I heard. That was brave.'], tone: 'kind', f: 0.75,
+            say: [['c_vesper', 'It was cold. Being brave is mostly cold. ...Thanks, cousin.', 'It was cold. Mostly. ...Thanks, cousin.']] },
+          { t: ['Gran would be so proud.', 'Gran would be proud.'],
+            say: [['c_vesper', 'Gran would say "took you long enough". She would be right.', 'Gran would say "took you long enough".']] },
+        ] },
+      { if: 'choice c_vesper=friend quest m_vesper done !flag m_reforged',
+        say: ["When you go up, I'll be right behind you. My lockpicks have been out since breakfast.", "I'll be right behind you."],
+        re: [
+          { t: ['Bring the stolen helmet.', 'Bring the stolen helmet.'],
+            say: [['c_vesper', 'Never taking it off. It does not fit. That is how you know it is stolen.', 'Never taking it off. It does not fit.']] },
+          { t: ['Stay close to me in there.', 'Stay close in there.'], tone: 'kind', f: 0.5,
+            say: [['c_vesper', 'Closer than your shadow. Your shadow is going to complain.', 'Closer than your shadow.']] },
+        ] },
+      { if: 'choice c_vesper=friend quest m_vesper active',
+        say: ["Under the Gap and back, three times. Then three smoke bombs by the Moonpath. I'd do it myself, but I'm a thief, not a worm.", 'Dig the Gap three times. Then the smoke bombs.'],
+        re: [
+          { t: ['Why not just climb the wall?', 'Why not climb the wall?'],
+            say: [['c_vesper', 'Nobody can climb it. I tried. I have glass in places I am not going to talk about.', 'Nobody can. I tried. Ouch.']] },
+          { t: ['Why do you want to come?', 'Why do you want to come?'],
+            say: [['c_vesper', 'That white moth up there is on a leash. I know what it is like to be told what to fetch.', 'That moth is on a leash. I know how that is.']] },
+        ] },
+      { if: 'choice c_vesper=friend stage>=m_sable',
+        say: ['Gran writes every week. She says the stove is still warm. She says "come home". I say "soon". It is nearly true.', 'Gran writes. She says come home. I say soon.'],
+        re: [
+          { t: ['How is Gran?', 'How is Gran?'],
+            say: [['c_vesper', 'Warm. You did that. She is knitting you something. I am not allowed to say. Act surprised.', 'Warm. She is knitting you something. Act surprised.']] },
+          { t: ['Soon is a good word.', 'Soon is a good word.'],
+            say: [['c_vesper', "It's a thief's word. It means \"when nobody is looking\".", 'It is a thief word. It means "when nobody looks".']] },
+        ] },
+      { ask: ['What did she promise you, at the well?', 'What did she promise you?'], if: 'choice c_vesper=friend flag m_eclipse2',
+        say: ['Fire of my own. She promised me that the last time too. I have stopped believing her. I have not stopped wanting it.', 'Fire of my own. I do not believe her. I still want it.'] },
+      { ask: ['Did you really take two pearls?', 'Did you take two pearls?'], if: 'choice c_vesper=friend stage>=m_sable',
+        say: ['I asked first. Then I took them. That is manners.', 'I asked first. Then took them. Manners.'] },
+      { idle: [['Psst. Up here. What?', 'Psst. What?'], ['Make it quick, cousin. Knights.', 'Quick, cousin.']] },
+      { bye: [["Don't fall off anything.", "Don't fall off anything."], ['See you on the roofs.', 'See you on the roofs.']] },
+      { bark: true, if: '!flag m_reforged', say: ['Psst. Up here. No, here.', 'Psst. Up here!'] },
+    ],
+
+    // ---------------------------------------------------------------- Queen Sandy, the great mother sandworm (the Burrows)
+    // Slow, rumbling, motherly; calls Ash "little warm thing" and decides he is a good little worm. Her husband is
+    // Gravelgut, the sick worm king. (Noodle's homecoming is the quest's own step.)
+    m_sandy: [
+      { if: 'quest m_noodle done', once: true,
+        say: ['Three hundred and twelve, all home. They say "mip" now. They learned it from your little one.', 'All 312 home. They say "mip" now.'],
+        re: [
+          { t: ['Pip will be very cross.', 'Pip will be cross.'],
+            say: [['m_sandy', 'Tell him it is a compliment. Worms only copy the ones they like.', 'Worms only copy the ones they like.']] },
+          { t: ['Does Noodle miss the twins?', 'Does Noodle miss the twins?'],
+            say: [['m_sandy', 'He misses their shoes. To a worm, that is the same thing.', 'He misses their shoes. Same thing.']] },
+        ] },
+      { if: 'flag m_burrows_done',
+        say: ["...Oh, it's you, little warm thing. My husband is sleeping it off. A hundred years, he says. I'll wake him for birthdays.", 'My husband is better now. He is sleeping.'],
+        re: [
+          { t: ['He taught me how to dig.', 'He taught me to dig.'],
+            say: [['m_sandy', 'Then you are a good little worm. Yes, you are. Do not argue with a queen.', 'Then you are a good little worm.']] },
+          { t: ['Tell him I said thank you.', 'Tell him thank you.'], tone: 'kind', f: 0.5,
+            say: [['m_sandy', 'When he wakes. In a hundred years. I will remember. Worms remember.', 'When he wakes. I will remember.']] },
+        ] },
+      { if: '!flag m_burrows_done',
+        say: ['You smell like the sky, little warm thing. Is my husband very sick? He ate something shiny. I told him not to.', 'Is my husband sick? He ate something shiny.'],
+        re: [
+          { t: ["I'll help him. I promise.", "I'll help him. I promise."], tone: 'brave', f: 0.5,
+            say: [['m_sandy', 'Then go gently, little warm thing. He bites when he hurts.', 'Go gently. He bites when he hurts.']] },
+          { t: ['What did he eat?', 'What did he eat?'],
+            say: [['m_sandy', 'Something that fell from the sky and kept glowing. Worms should not eat glowing things.', 'Something from the sky that glowed.']] },
+        ] },
+      { ask: ['How many children do you have?', 'How many children do you have?'],
+        say: ['Three hundred and twelve. Some are very small. Some are very loud. All of them eat shoes.', 'Three hundred and twelve. All eat shoes.'] },
+      { idle: [['(a rumble) Little warm thing?', 'Little warm thing?'], ['Mm. The sand is listening.', 'The sand is listening.']] },
+      { bye: [['Dig deep, little worm.', 'Dig deep.']] },
+    ],
+
+    // ---------------------------------------------------------------- Auntie Glaciar, napping on Driftwood's north isle
+    // (Glaciar's route only: freed in Act III, she flew Ash east.) Slow, grand, fond, a bit deaf on the left; "dumpling"
+    // once a scene. Her flight home is the crossing on the isle.
+    f_glaciar: [
+      { if: 'flag m_ship=glaciar choice f_glaciar=free', once: true,
+        say: ['Dumpling! The raft children brought me a fish. A raw one. I said thank you and froze it for later.', 'Dumpling! The raft children gave me a fish!'],
+        re: [
+          { t: ['Are you going to eat it?', 'Will you eat it?'],
+            say: [['f_glaciar', 'Not yet. It is still looking at me. I shall wait until it stops.', 'Not yet. It is still looking at me.']] },
+          { t: ['Is it too hot for you here?', 'Is it too hot here?'],
+            say: [['f_glaciar', 'Far too hot. The sun this far south is very keen. My sail hat helps, a little.', 'Far too hot. My sail hat helps.']] },
+        ] },
+      { if: 'flag m_ship=glaciar choice f_glaciar=free flag m_eclipse1',
+        say: ['I felt her go over, when the sun went out. Cold, the way I was cold. Mind yourself.', 'I felt her go over. Cold, like I was.'],
+        re: [
+          { t: ['Is that what the spell felt like?', 'Did the spell feel like that?'],
+            say: [['f_glaciar', 'Like being kept. Very safe, and very still. I would not wish it on her. Not even her.', 'Like being kept. Safe and still. I would not wish it on her.']] },
+          { t: ["I'll be careful, Auntie.", "I'll be careful, Auntie."],
+            say: [['f_glaciar', 'You will be brave, which is not quite the same thing. Be both, if you can.', 'You will be brave. Be careful too.']] },
+        ] },
+      { if: 'flag m_ship=glaciar choice f_glaciar=free',
+        say: ['The raft children keep sliding down my tail. I pretend to be asleep. I am a very good pretender.', 'The children slide down my tail. I pretend to sleep.'],
+        re: [
+          { t: ['They love you, Auntie.', 'They love you, Auntie.'], tone: 'kind', f: 0.75,
+            say: [['f_glaciar', 'Do they? ...Then I shall stay very still for them. For a week, perhaps.', 'Do they? Then I will stay still for them.']] },
+          { t: ['Should I tell them to stop?', 'Should I tell them to stop?'],
+            say: [['f_glaciar', 'Oh, no. Let them. It is the nicest thing to happen to my tail in a thousand years.', 'No. Let them. My tail likes it.']] },
+        ] },
+      { idle: [['Mm? Speak up, dumpling. The left side.', 'Speak up, dumpling.'], ['Zzz... oh. Yes?', 'Oh. Yes?']] },
+      { bye: [["Shout if you need me. Loudly. I'm a little deaf on the left.", 'Shout loudly if you need me.']] },
+    ],
   },
+
 
   scene: {
     hl_basket: [

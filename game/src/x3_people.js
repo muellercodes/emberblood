@@ -168,19 +168,19 @@ const M3P_CAST=[
       S(`Every raft in this town is tied to every other raft. If one goes, we all go. That's not a knot. That's a town.`,`Every raft is tied to every other raft. That's a town.`)]},
   {id:'m_squint',name:'Squint',town:'m_driftwood',kid:true,col:'#e8c03a',
     look:{skin:'#e8bc98',hair:'#e8c060',hairdo:'spiky',outfit:'tunic',shirt:'#e8c03a',low:'#3a6aaa',hold:'telescope',eyepatch:true},
-    lines:[S(`LAND HO! ...Oh. That's Palmcrest. It's always there. LAND HO anyway.`,`LAND HO! ...Oh. It's just Palmcrest. LAND HO anyway!`),
-      S(`I wear an eyepatch so I'm always ready to be a pirate. I'm not a pirate. I'm READY.`,`My eyepatch is pretend. I'm not a pirate. I'm READY.`),
+    lines:[S(`Land ho! ...Oh. That's Palmcrest. It's always there. Land ho anyway.`,`Land ho! ...Oh. It's just Palmcrest. land ho anyway!`),
+      S(`I wear an eyepatch so I'm always ready to be a pirate. I'm not a pirate. I'm ready.`,`My eyepatch is pretend. I'm not a pirate. I'm READY.`),
       S(`My grandpa Ned keeps the lighthouse on Gull Isle. It went dark. He won't come down.`,`Grandpa Ned's lighthouse went dark. He won't come down.`)]},
   {id:'m_gilly',name:'Cook Gilly',town:'m_driftwood',home:true,house:'The Floating Kitchen',job:'inn',col:'#3a8aaa',
     look:{skin:'#f0c4a2',hair:'#b8401a',hairdo:'bun',outfit:'tunic',shirt:'#efe6d6',low:'#5a4a3a',apron:'#3a8aaa',hat:'chef',build:'wide',hold:'ladle',freckles:true},
     lines:[S(`Fish stew! Fish pie! Fish pudding! I'm working on fish cocoa. It's not going well.`,`Fish stew! Fish pie! Fish pudding! Fish cocoa is not going well.`),
       S(`Hilde up north sends me soup recipes. I send back fish. It's a good friendship.`,`Hilde up north sends me soup recipes. I send fish back.`),
-      S(`The Moonfish! I just want to SEE it. Not cook it. ...Mostly not cook it.`,`I just want to SEE the Moonfish. Not cook it. Mostly.`)]},
+      S(`The Moonfish! I just want to see it. Not cook it. ...Mostly not cook it.`,`I just want to see the Moonfish. Not cook it. Mostly.`)]},
   {id:'m_ned',name:'Old Ned',town:'m_driftwood',col:'#e8c03a',
     look:{skin:'#e0ae88',hair:'#efeae0',beard:'big',beardc:'#efeae0',outfit:'coat',shirt:'#2a3a5a',low:'#1a2a4a',hat:'rain',hatc:'#e8c03a',hold:'lamp',build:'old'},
-    lines:[S(`Moths. MOTHS. Every night, all over my lamp. Then the lamp went out and they still came. Moths have no manners.`,`Moths sat on my lamp till it went out. No manners!`),
+    lines:[S(`Moths. Moths. Every night, all over my lamp. Then the lamp went out and they still came. Moths have no manners.`,`Moths sat on my lamp till it went out. No manners!`),
       S(`Tell Squint I'm fine. Tell her to eat her vegetables. Tell her the eyepatch suits her.`,`Tell Squint I'm fine. And to eat her vegetables.`),
-      S(`My cousin Agatha keeps the lighthouse in Gearhaven. Hers SPINS. Show-off.`,`My cousin Agatha's lighthouse SPINS. Show-off.`)]},
+      S(`My cousin Agatha keeps the lighthouse in Gearhaven. Hers spins. Show-off.`,`My cousin Agatha's lighthouse spins. Show-off.`)]},
   // Coralcombe, the merfolk village (inside the area m_coralcombe; drawn with fish tails)
   {id:'m_coralia',name:'Queen Coralia of the Lumenfolk',town:'m_coralcombe',inside:'m_coralcombe',col:'#2a9a9a',merfolk:true,room:'hall',fx:0.5,fy:0.3,
     look:{skin:'#9ad0c8',hair:'#e8c060',hairdo:'long',outfit:'dress',shirt:'#3a8a8a',low:'#2a6a6a',tail:'#2a9a9a',hat:'crown',hatc:'#f08080',necklace:'#f0e0c0'},
@@ -199,29 +199,29 @@ const M3P_CAST=[
       S(`Pickles cheats. He has eight arms. That's six more than fair.`,`Pickles has eight arms. That's not fair!`)]},
   {id:'m_kipper',name:'Sir Kipper',town:'m_coralcombe',inside:'m_coralcombe',col:'#3a5a8a',merfolk:true,room:'hall',fx:0.72,fy:0.78,
     look:{skin:'#8ac0b0',hair:'#3a2a1a',helm:true,plume:'#f08080',outfit:'armor',shirt:'#a8b8c8',low:'#3a5a8a',trim:'#e8c060',tail:'#3a5a8a',hold:'spear',stache:true},
-    lines:[S(`HALT! Who swims there? ...Oh. It's you. Carry on. Carefully.`,`HALT! Oh, it's you. Carry on. Carefully.`),
+    lines:[S(`Who swims there? ...Oh. It's you. Carry on. Carefully.`,`Oh, it's you. Carry on. Carefully.`),
       S(`Baron Puffington called my seahorse a "wet pony". I demanded satisfaction. He laughed. Then I left.`,`The Baron called my seahorse a "wet pony". Then I left.`),
-      S(`I am not afraid of crabs. I am RESPECTFUL of crabs. From a distance. A long one.`,`I'm not scared of crabs. I just stay far away.`)]},
+      S(`I am not afraid of crabs. I am respectful of crabs. From a distance. A long one.`,`I'm not scared of crabs. I just stay far away.`)]},
   {id:'m_kelp',name:'Nana Kelp',town:'m_coralcombe',inside:'m_coralcombe',col:'#5a8a3a',merfolk:true,room:'kelp',fx:0.5,fy:0.45,
     look:{skin:'#9ad0c8',hair:'#3a7a3a',hairdo:'curly',outfit:'robe',shirt:'#5a8a3a',low:'#3a6a2a',tail:'#5a8a3a',shawl:'#c8e0a0',build:'old',hold2:'basket'},
-    lines:[S(`Pearls for your pockets, dearie. They don't do anything. They're just lovely.`,`Pearls for your pockets, dearie. They're just lovely.`),
+    lines:[S(`Pearls for your pockets, sprat. They don't do anything. They're just lovely.`,`Pearls for your pockets, sprat. They're just lovely.`),
       S(`A dragon who breathes underwater! Your mother must be so proud. And so confused.`,`A dragon who breathes underwater! Your mom must be proud. And confused.`),
-      S(`Eat your seaweed, dearie. It's green. Green is good for horns.`,`Eat your seaweed, dearie. Green is good for horns.`)]},
+      S(`Eat your seaweed, sprat. It's green. Green is good for horns.`,`Eat your seaweed. Green is good for horns.`)]},
   // the Oasis of Sable
   {id:'m_rafi',name:'Caravan-master Rafi Sandstride',town:'m_sable',home:true,house:'The Big Tent',job:'mayor',col:'#c86a2a',
     look:{skin:'#a87050',hair:'#1a1a1a',beard:true,beardc:'#1a1a1a',outfit:'coat',shirt:'#c86a2a',low:'#7a3a1a',hat:'kerchief',hatc:'#e8c03a',sash:'#3a6aaa',build:'big'},
     lines:[S(`Three hundred years our caravan has crossed the Glass Desert by moonlight! Two hundred and ninety-nine without getting lost!`,`Three hundred years we crossed the desert! Only lost once!`),
-      S(`I have never seen snow. Is it true it's cold? On PURPOSE?`,`I have never seen snow. Is it cold on PURPOSE?`),
-      S(`My best strider walked into a dune last night. Twice. I told that story already? Then this time it was THREE times.`,`My strider walked into a dune. Twice! No, three times!`)]},
+      S(`I have never seen snow. Is it true it's cold? On purpose?`,`I have never seen snow. Is it cold on purpose?`),
+      S(`My best strider walked into a dune last night. Twice. I told that story already? Then this time it was three times.`,`My strider walked into a dune. Twice! No, three times!`)]},
   {id:'m_saffron',name:'Saffron the Well-Warden',town:'m_sable',col:'#c0c8ff',
     look:{skin:'#7c4c30',hair:'#2a1a10',hairdo:'braids',outfit:'robe',shirt:'#3a3a6a',low:'#2a2a50',shawl:'#c0c8ff',hold:'staff',earrings:true},
-    lines:[S(`Don't touch the well. Don't breathe on the well. Don't LOOK at the well like that.`,`Don't touch the well. Don't LOOK at it like that.`),
+    lines:[S(`Don't touch the well. Don't breathe on the well. Don't look at the well like that.`,`Don't touch the well. Don't look at it like that.`),
       S(`The well drinks the moon every night, and gives it back to us. Lamps. Water. Light.`,`The well drinks the moon at night. It gives us light.`),
       S(`I talk to the well at night. It doesn't answer. It's a good listener, though.`,`I talk to the well. It's a good listener.`)]},
   {id:'m_kiln',name:'Old Kiln the Glassblower',town:'m_sable',home:true,house:'The Kiln Tent',job:'lamps',col:'#e8803a',
     look:{skin:'#c08860',hair:'#efeae0',hairdo:'wild',outfit:'vest',shirt:'#5a3a2a',low:'#4a3020',apron:'#5a3a2a',goggles:true,soot:true,build:'old',hold:'staff'},
     lines:[S(`I make glass. Glass bottles, glass bowls, glass shoes. Don't buy the glass shoes.`,`I make glass bottles, bowls and shoes. Don't buy the shoes.`),
-      S(`A piece of the MOON? You could make a glaive out of that! I could! I would! Bring it!`,`A piece of the MOON? I could make a glaive! Bring it!`),
+      S(`A piece of the moon? You could make a glaive out of that! I could! I would! Bring it!`,`A piece of the MOON? I could make a glaive! Bring it!`),
       S(`EH? Speak up. The furnace is very loud. So am I.`,`EH? Speak up! The furnace is loud.`)]},
   {id:'m_esme',name:'Esme, Keeper of Lamps',town:'m_sable',home:true,house:'The Lamp House',job:'lamps',col:'#e8c03a',
     look:{skin:'#94603e',hair:'#efeae0',hairdo:'bun',outfit:'robe',shirt:'#5a2a5a',low:'#3a1a3a',hat:'fancy',hatc:'#e8c03a',hold:'lamp',build:'tall'},
@@ -230,12 +230,12 @@ const M3P_CAST=[
       S(`A lamp in the dark says "someone is here". That's all anyone wants to hear, at night.`,`A lamp says "someone is here". That's what we need at night.`)]},
   {id:'m_dusty',name:'Dusty and Dune',town:'m_sable',kid:true,col:'#3aaaaa',
     look:{skin:'#c8946c',hair:'#e8c060',hairdo:'spiky',outfit:'tunic',shirt:'#3aaaaa',low:'#2a6a6a',goggles:true,scarf:'#e8a030',twin:true},
-    lines:[S(`Dusty: We surf the dunes on trays! Dune: Stolen trays! Dusty: BORROWED trays!`,`We surf dunes on trays! Borrowed trays!`),
+    lines:[S(`Dusty: We surf the dunes on trays! Dune: Stolen trays! Dusty: Borrowed trays!`,`We surf dunes on trays! Borrowed trays!`),
       S(`Dune: We found a baby worm. Dusty: He follows us. Dune: He eats our shoes.`,`We found a baby worm. He eats our shoes!`),
       S(`Dusty: Race you down the big dune! Dune: Last one down is a cactus!`,`Race you down the dune! Last one is a cactus!`)]},
   {id:'m_jinx',name:'Jinx the Mirage Merchant',town:'m_sable',col:'#c86ae0',
     look:{skin:'#d8aa84',hair:'#7a2a7a',hairdo:'long',outfit:'coat',shirt:'#7a2a6a',low:'#4a1a4a',hat:'top',hatc:'#ffd27a',back:'pack',earrings:true},
-    lines:[S(`Am I a mirage? Are YOU? Buy something and find out.`,`Am I a mirage? Are YOU? Buy something!`),
+    lines:[S(`Am I a mirage? Are you? Buy something and find out.`,`Am I a mirage? Are YOU? Buy something!`),
       S(`Today's special: a bottle of shade. Keeps you cool. Mostly empty.`,`Today's special: a bottle of shade. It's mostly empty.`),
       S(`I'm only here at noon. At one o'clock I'm a rumor. At two I'm a legend.`,`I'm here at noon. Later I'm just a rumor.`)]}
 ];
@@ -249,7 +249,7 @@ if(typeof TIE_NAMES!=='undefined'){ TIE_NAMES.m_driftwood=TIE_NAMES.m_driftwood|
 // Mags Sprocket is an Act III person (x2_people); if that module is not in the build she is defined here, with no home
 if(!CASTBY.f_mags&&!SPECIAL.f_mags){ SPECIAL.f_mags={id:'f_mags',name:'Mags Sprocket',col:'#e8a040',inside:'ev',
   look:{skin:'#e8bc98',hair:'#c8582a',hairdo:'wild',outfit:'overalls',shirt:'#e8d8b8',low:'#5a4a3a',goggles:true,oil:true,soot:true,build:'strong',hold:'mallet',bag:'#8a5a32'},
-  lines:[S(`The engine's FINE. It's making that noise on purpose.`,`The engine is FINE. The noise is on purpose.`)]}; M3P.magsOwn=true; }
+  lines:[S(`The engine's fine. It's making that noise on purpose.`,`The engine is fine. The noise is on purpose.`)]}; M3P.magsOwn=true; }
 // Queen Sandy, the great mother sandworm (Sandworm Burrows room l): a creature with her own drawer
 if(!SPECIAL.m_sandy) SPECIAL.m_sandy={id:'m_sandy',name:'Queen Sandy',col:'#e8c070',inside:'ev',creature:'worm',look:{},lines:[]};
 // Tikka (Act I's kobold baker, `tk_come==='yes'`) sails as Dell's ship's cook: a person record for the talk prompt; she
@@ -544,198 +544,114 @@ function m3pStandDungeons(){
     M3P.ownBurrows=true; }catch(e){ console.error('x3_people Burrows stand-in',e); } }
 }
 
-// ---------- 7. talk (a1g_talk.js format): bio, about (people in other towns), rumor (points at a quest or a secret),
-// gifts, deep (2 hearts), secret (3 hearts), best (5 hearts), and a one-time chat with three ways to answer (ACT4 4.4)
-const m3pChat=(q,qs,a,b,c,best)=>({q:S(q,qs),opts:[{t:S(a[0],a[1]),tone:'kind',r:S(a[2],a[3]),f:a[4]},{t:S(b[0],b[1]),tone:'brave',r:S(b[2],b[3]),f:b[4]},{t:S(c[0],c[1]),tone:'silly',r:S(c[2],c[3]),f:c[4]}],best});
+// ---------- 7. talk (a1g_talk.js format): bio, rumor (points at a quest or a secret) with its menu label (rumorAsk, under
+// "More..."), gifts, secret (3 hearts), best (5 hearts). v11 (J11b): every person here talks in the v11 shape in Act IV
+// (game/story/act4/people.js: openers that answer, the old chat as a moment, topics, idle, bye), so their old chat, about
+// and deep are gone from this table (the data has them, rewritten).
 Object.assign(TALK,{
   m_dabble:{bio:S('Mayor of Driftwood Landing. Wet socks, dry jokes.','The mayor of the raft town. Wet socks.'),
-    about:{m_rafi:S(`The caravan-master of Sable? We trade fish for dates. He says our fish are wet. They're FISH.`,`Rafi says our fish are wet. They're FISH!`),c_mo:S(`A harbormaster in Gearhaven blows bubbles from his pipe? A man after my own heart. And my own socks.`,`A harbormaster who blows bubbles? I like him already.`)},
+    rumorAsk:[`Is there anything odd out at sea?`,`Anything odd at sea?`],
     rumor:{t:S(`Turtleback Isle is very bumpy for an isle. And it snores. Islands don't snore. Do they?`,`Turtleback Isle snores. Islands don't snore. Do they?`),hint:'m_sec_turtle'},
     loves:['fish'],hates:['honey'],
-    deep:S(`I was born on a raft. I've only walked on real ground twice. I didn't like it. It didn't move.`,`I was born on a raft. Real ground doesn't move. I don't like it.`),
-    secret:{t:S(`Mayor's emergency socks. Dry! Run faster.`,`My emergency socks. Dry! Run faster.`),reward:{stamina:15}},
-    best:{t:S(`I'm naming the next raft after you. The Ash. It's fireproof.`,`The next raft is called The Ash. It's fireproof!`),reward:{coins:100}},
-    chat:m3pChat(`Quick question for the town records. If you had a raft, what would you name it?`,`What would you name your raft?`,
-      [`The Maren, after my mom. So she'd always float.`,`The Maren, after Mom.`,`Oh, that's lovely. A raft that never lets you sink. I'm putting it in the town book.`,`Lovely! A raft that never lets you sink.`,0.5],
-      [`The Unsinkable Dragon!`,`The Unsinkable Dragon!`,`Bold! Brave! Probably sinkable! I love it!`,`Brave! Probably sinkable! I love it!`,0.5],
-      [`Wet Socks.`,`Wet Socks.`,`WET SOCKS. Ha! HA! That's MY raft! You've seen my socks! Everyone's seen my socks.`,`WET SOCKS! That's my raft! Ha!`,1],'silly')},
+    secret:{t:S(`The mayor's emergency socks. Dry ones! You'll run faster.`,`My emergency socks. Dry! Run faster.`),reward:{stamina:15}},
+    best:{t:S(`I'm naming the next raft after you. The Ash. It's fireproof.`,`The next raft is called The Ash. It's fireproof!`),reward:{coins:100}}},
   m_winnie:{bio:S('The Tidewife of Driftwood. Reads the moon. Lives with an octopus.','She reads the moon. She lives with an octopus.'),
-    about:{yara:S(`An elder in your valley who counts the moon? Good. Somebody up there should. Tell her Ollie says hello. Ollie counts too. Mostly to eight.`,`Your Elder Yara counts the moon? Good. Ollie counts to eight.`),m_ripple:S(`Old Ripple down in the reef and I were sweethearts once. He couldn't come up and I couldn't go down, so we wrote letters in bottles.`,`Ripple and I were sweethearts. We wrote letters in bottles.`)},
+    rumorAsk:[`Where did the moon-priests keep their books?`,`Where are the old books?`],
     rumor:{t:S(`The moon-priests kept their books in a library under the sea. Fish are terrible librarians. Somebody should go and look.`,`The moon-priests kept books under the sea. Someone should look.`),hint:null},
     loves:['fish'],hates:['moonlily'],
-    deep:S(`When I was a girl the moon was so bright you could read by it. I read every book in Driftwood. By moonlight. All four.`,`I read every book here by moonlight. All four.`),
     secret:{t:S(`A shell that hums the tide. Hold it and your draughts heal more.`,`A shell that hums. Your draughts heal more.`),reward:{heal:0.1}},
-    best:{t:S(`Ollie wants you to have his favorite rock. It's a very good rock.`,`Ollie gives you his best rock. It's a good rock.`),reward:{bless:1}},
-    chat:m3pChat(`Sit, child. Tell an old woman. Do you think the moon gets lonely?`,`Does the moon get lonely?`,
-      [`Maybe. That's why we keep looking at it.`,`Maybe. So we look at it.`,`Ha! Yes. A thing that's looked at is never quite alone. You're cleverer than your horns.`,`Yes! Looked-at things are never alone.`,1],
-      [`Not while I'm here to save it!`,`Not while I'm here!`,`Brave child. The moon could do worse. It has done worse.`,`Brave! The moon could do worse.`,0.5],
-      [`It has Ollie.`,`It has Ollie.`,`Everyone has Ollie. Ollie is everywhere. Look behind you. No. He's in the teapot.`,`Ollie is everywhere. He's in the teapot.`,0.5],'kind')},
+    best:{t:S(`Ollie wants you to have his favorite rock. It's a very good rock.`,`Ollie gives you his best rock. It's a good rock.`),reward:{bless:1}}},
   m_rowan:{bio:S('Raft-builder and ferry captain. Has a knot for every feeling.','She builds rafts. She has a knot for every feeling.'),
-    about:{dell:S(`Your captain, Dell? He tied his boat to my dock with a granny knot. A GRANNY KNOT. I've retied it. Don't tell him.`,`Dell used a granny knot! I fixed it. Shh.`),c_jo:S(`A sailor kid in Gearhaven who hates losing? Send her here. I'll teach her the "you won fair" knot. It's very hard to tie.`,`Send that sailor kid here. I'll teach her the "you won fair" knot.`)},
+    rumorAsk:[`Any wrecks worth diving to?`,`Any wrecks to dive to?`],
     rumor:{t:S(`There's a whole galleon on its side by the Sunken Gate. Pirates' hold, full of something. Fishy. Possibly treasure.`,`A sunken ship sits by the Sunken Gate. Maybe treasure!`),hint:'m_sec_galleon',need:()=>!!G.flags.m_puff_done},
     loves:['fish'],hates:['honey'],
-    deep:S(`My dad built the Town Raft with eleven knots. Eleven! It's held for forty years. I check every knot every morning.`,`My dad tied the Town Raft with eleven knots. I check them every day.`),
     secret:{t:S(`A sailor's knot charm. You hold on tighter.`,`A knot charm. You hold on tighter.`),reward:{armor:0.05}},
-    best:{t:S(`The fastest raft I ever built. It's yours. It's in your heart. Also behind the shed.`,`My fastest raft is yours. It's behind the shed.`),reward:{coins:80}},
-    chat:m3pChat(`This is my "tell me something" knot. What's the bravest thing you ever did?`,`What's the bravest thing you did?`,
-      [`I said sorry to someone I hurt.`,`I said sorry.`,`That's the "hard knot". Hardest one there is. Good.`,`That's the hardest knot. Good.`,0.5],
-      [`I climbed a mountain with a dragon on top!`,`I climbed a dragon mountain!`,`That's the "big knot". I tie it on the mast in storms. Good knot. Good dragon.`,`That's the big knot! Good dragon.`,1],
-      [`I ate Gilly's fish pudding.`,`I ate fish pudding.`,`...That's the "I'm so sorry" knot. Here. Have it.`,`That's the "I'm so sorry" knot.`,0.5],'brave')},
+    best:{t:S(`The fastest raft I ever built. It's yours. It's behind the shed.`,`My fastest raft is yours. It's behind the shed.`),reward:{coins:80}}},
   m_squint:{bio:S('Driftwood’s lookout. The eyepatch is pretend.','The town lookout. Her eyepatch is pretend.'),
-    about:{m_ned:S(`Grandpa Ned is the grumpiest lighthouse keeper in the whole sea. And the best. Don't tell him I said the second bit.`,`Grandpa Ned is grumpy. And the best. Shh.`),rook:S(`A kid up north wants to be a knight? Tell him lookouts are better. We see the danger FIRST.`,`A kid wants to be a knight? Lookouts are better!`)},
-    rumor:{t:S(`From up here I can see a sunken door in the deep water north of the Spire. Something glows behind it. LAND HO! ...No. WATER HO.`,`I see a sunken door north of the Spire. WATER HO!`),hint:'m_sec_backdoor'},
+    rumorAsk:[`Anything glowing out on the water?`,`Anything glowing out there?`],
+    rumor:{t:S(`From up here I can see a sunken door in the deep water north of the Spire. Something glows behind it. Water ho!`,`I see a sunken door north of the Spire. Water ho!`),hint:'m_sec_backdoor'},
     loves:['honey'],hates:['fish'],
-    deep:S(`I'm scared of the dark. That's why I watch for the light. Lookouts see the light first.`,`I'm scared of the dark. So I watch for light.`),
     secret:{t:S(`My spare spyglass. Treasure shows up on your map.`,`My spare spyglass. See treasure on your map!`),reward:{reveal:true}},
-    best:{t:S(`You're an honorary lookout! Say "LAND HO!" ...Perfect.`,`You're a lookout now! Say "LAND HO!" Perfect!`),reward:{bless:1}},
-    chat:m3pChat(`LOOKOUT QUESTION. Would you rather be a pirate or a lookout?`,`Pirate or lookout?`,
-      [`A lookout. Then I can warn my friends.`,`A lookout.`,`CORRECT. Lookouts look out for people. It's in the name.`,`CORRECT! We look out for people.`,1],
-      [`A pirate! A good pirate!`,`A good pirate!`,`A good pirate is just a lookout with a hat. I'll allow it.`,`A good pirate is a lookout with a hat.`,0.5],
-      [`A pirate lookout with TWO eyepatches.`,`Two eyepatches!`,`Then you couldn't see anything! ...I'm trying it. It's very dark. LAND HO?`,`Then you can't see! ...LAND HO?`,0.5],'kind')},
+    best:{t:S(`You're an honorary lookout! Say "Land ho!" ...Perfect.`,`You're a lookout now! Say "Land ho!" Perfect!`),reward:{bless:1}}},
   m_gilly:{bio:S('Runs the Floating Kitchen. Puts fish in everything. Rest here.','She runs the Floating Kitchen. Fish in everything. Rest here.'),
-    about:{tilly:S(`The inn up your way, the Sleepy Salmon? A SALMON on the sign! That's a woman with taste. Fishy taste.`,`An inn called the Sleepy Salmon? Good taste!`),c_charlie:S(`A chowder cook down the coast? Chowder is just fish that gave up. I'm kidding. I love him. We've never met.`,`Charlie makes chowder? I love him. We never met.`)},
+    rumorAsk:[`What do the fishermen talk about?`,`What do fishermen say?`],
     rumor:{t:S(`Fishermen say there's a moonfish in the deep water north of town. Glows like the moon. Only comes up when the moon is full. So, never, now.`,`A Moonfish lives in the deep water up north. It glows!`),hint:null},
     loves:['fish'],hates:['moonlily'],
-    deep:S(`I wanted to be a pastry chef. Then I found out pastry doesn't swim. I've been sad about it ever since.`,`I wanted to make pastry. Pastry doesn't swim. I'm still sad.`),
     secret:{t:S(`My best fish pie. Eat it on a bad day.`,`My best fish pie. For a bad day.`),reward:{potmax:1}},
-    best:{t:S(`Free meals forever. And a fish named after you. He's a very handsome fish.`,`Free meals forever! And a fish named after you.`),reward:{freeinn:true}},
-    chat:m3pChat(`Chef's question! What's the weirdest thing you've ever eaten?`,`What's the weirdest thing you ate?`,
-      [`My mom's burnt toast. I ate it so she'd smile.`,`Mom's burnt toast.`,`Oh, my heart. That's the best recipe there is. Burnt, with love.`,`Aww. Burnt toast with love is the best.`,0.5],
-      [`A lava pepper on a dare!`,`A lava pepper!`,`A LAVA PEPPER? Could you put it in a fish? Could you put it in TWO fish?`,`A lava pepper? Can I put it in a fish?`,0.5],
-      [`A whole fish cocoa. It wasn't good.`,`Fish cocoa.`,`You TRIED it? My fish cocoa? Nobody's tried it! It's awful, isn't it. It's AWFUL. I love you.`,`You tried my fish cocoa? It's awful! I love you!`,1],'silly')},
+    best:{t:S(`Free meals forever. And a fish named after you. He's a very handsome fish.`,`Free meals forever! And a fish named after you.`),reward:{freeinn:true}}},
   m_ned:{bio:S('Keeper of the Gull Isle lighthouse. Grumpy. Fond of Squint.','The lighthouse keeper. Grumpy. He loves Squint.'),
-    about:{c_agatha:S(`Agatha. My cousin. Gearhaven light. Hers SPINS. She sends me letters about it. Every letter, "it spins". I KNOW it spins.`,`My cousin Agatha's light spins. She tells me every letter.`),m_squint:S(`Squint thinks I don't see her waving from the crow's nest every night. I see her. I wave back with the lamp. Used to.`,`Squint waves at me every night. I used to wave back.`)},
+    rumorAsk:[`What can you see from the top?`,`What can you see from up here?`],
     rumor:{t:S(`From up here you can see a ring of glass spikes in the far north desert. Something fell there. Something that glowed.`,`Far north in the desert, something fell. It glowed.`),hint:'m_sec_crater'},
     loves:['fish'],hates:['honey'],
-    deep:S(`I've kept that lamp lit for fifty years so no ship would hit the rocks. Not one did. Then the moths came and I let it go out. I'm ashamed.`,`I kept the lamp lit fifty years. Then I let it go out. I'm ashamed.`),
     secret:{t:S(`A lighthouse lens shard. Your fire reaches further.`,`A lens shard. Your fire goes further.`),reward:{energy:15}},
-    best:{t:S(`The lighthouse is yours too now. Squint says you're family. Squint is always right.`,`The lighthouse is yours too. Squint says you're family.`),reward:{maxhp:15}},
-    chat:m3pChat(`Hmph. You. Dragon. What do you do when you're scared?`,`What do you do when you're scared?`,
-      [`I think about the people waiting for me.`,`I think of my family.`,`...Aye. That's what a lamp is, you know. Somebody waiting. Hmph.`,`Aye. A lamp is somebody waiting.`,0.5],
-      [`I go toward the scary thing anyway.`,`I go anyway.`,`Hmph. Good. That's what my lamp did. Every night, toward the storm.`,`Good. My lamp did that too.`,1],
-      [`I hide behind Pip.`,`I hide behind Pip.`,`Pip's very small. ...Hmph. Smart, though. Moths don't like dragons.`,`Pip's small. Smart, though.`,0.5],'brave')},
+    best:{t:S(`The lighthouse is yours too now. Squint says you're family. Squint is always right.`,`The lighthouse is yours too. Squint says you're family.`),reward:{maxhp:15}}},
   m_rafi:{bio:S('Master of the Great Caravan. Has never seen snow. Tells every story twice.','The caravan-master. He has never seen snow.'),
-    about:{m_dabble:S(`The raft mayor? A fine man. Very damp. When he visits, my striders try to drink him.`,`The raft mayor is very damp. My striders try to drink him.`),elka:S(`A girl up north races sleds on SNOW? Snow! Tell her I'll trade her a strider ride for a snowball. A real one.`,`A girl races on snow? I'll trade a strider ride for a snowball!`)},
+    rumorAsk:[`Tell me a desert story.`,`Tell me a desert story.`],
     rumor:{t:S(`In the far south dunes there's an oasis that isn't there. Palms, a pool, all of it. You walk up, and pfft. But my grandmother said at night it hides something real.`,`A fake oasis in the south dunes. At night it hides something real.`),hint:'m_sec_mirage'},
     loves:['honey'],hates:['fish'],
-    deep:S(`My grandmother crossed the desert alone with one strider and a song. I sing it every night. The striders hate it.`,`My gran crossed the desert with one strider and a song. I still sing it.`),
     secret:{t:S(`A strider-hide belt. Run faster on sand.`,`A strider belt. You run faster.`),reward:{speed:1.03}},
-    best:{t:S(`You ride at the front of the caravan, forever. That's where the stories are.`,`You ride at the front of the caravan forever!`),reward:{bless:1}},
-    chat:m3pChat(`Settle a caravan argument! Would you rather see snow, or the sea?`,`Snow or the sea?`,
-      [`Both. Together. With you.`,`Both, with you.`,`HO! With me! Then we'll go to the snowy sea, you and I! I'll bring the striders. They'll hate it.`,`HO! The snowy sea! My striders will hate it!`,1],
-      [`Snow! You have to see snow!`,`Snow!`,`Snow! One day! I'll throw a snowball at the sun! It will be a very short throw.`,`One day I'll throw snow at the sun!`,0.5],
-      [`The sea. It's like a desert that got wet.`,`The sea.`,`A wet desert! HO HO! I'll tell that one twice. No, three times!`,`A wet desert! I'll tell that three times!`,0.5],'kind')},
+    best:{t:S(`You ride at the front of the caravan, forever. That's where the stories are.`,`You ride at the front of the caravan forever!`),reward:{bless:1}}},
   m_saffron:{bio:S('Well-Warden of Sable. Do not touch the well.','She guards the Moon Well. Don’t touch it.'),
-    about:{yara:S(`Your Elder counts the moon? I watch my well instead. Every night there's a little less moonlight in it.`,`I watch my well. There is less light every night.`),m_esme:S(`Esme names lamps. I keep one well, and I call it the well.`,`Esme names lamps. I just keep the well.`)},
+    rumorAsk:[`When did the Glasswall grow?`,`When did the wall grow?`],
     rumor:{t:S(`The Glasswall grew up overnight when the moon got sick. Taller than towers. Only the worms go under. Worms are not polite, but they are thorough.`,`The Glasswall grew in one night. Only worms go under it.`),hint:null,need:()=>m3pR('m_sable')},
     loves:['honey'],hates:['fish'],
-    deep:S(`My mother kept the well, and hers. When the moon went dim I sat by it every night and talked to it. It didn't answer. I kept talking.`,`My family kept the well. I talk to it at night. I keep talking.`),
     secret:{t:S(`A cup of moon water. Heals a little.`,`A cup of moon water. It heals.`),reward:{potmax:1}},
-    best:{t:S(`You may touch the well. Once. Gently.`,`You may touch the well. Once. Gently.`),reward:{maxhp:15}},
-    chat:m3pChat(`A question. Short answer. Is it okay to be angry when you're scared?`,`Is it okay to be angry when scared?`,
-      [`Yes. Then breathe, and be kind anyway.`,`Yes. Then be kind.`,`...Good answer. I'll breathe. I won't be kind to the moth.`,`Good answer. I'll breathe.`,0.5],
-      [`Yes! Angry is just brave with a frown.`,`Yes! It's brave with a frown.`,`Brave with a frown. Yes. That's me. Exactly.`,`Brave with a frown. That's me.`,1],
-      [`Only at moths.`,`Only at moths.`,`Only at moths. Agreed. Don't touch the well.`,`Only at moths. Don't touch the well.`,0.5],'brave')},
+    best:{t:S(`You may touch the well. Once. Gently.`,`You may touch the well. Once. Gently.`),reward:{maxhp:15}}},
   m_kiln:{bio:S('Glassblower of Sable. Sets small things on fire. A bit deaf.','The glassblower. A bit deaf. Sets things on fire.'),
-    about:{c_ingrid:S(`EH? A smith in Gearhaven sings while she works? I SHOUT while I work. It's the same thing. Louder.`,`A smith who sings? I shout. Same thing. Louder.`),bertram:S(`Your baker's bakery explodes? HA! Mine too! Not a bakery. A kiln. Twice. Ask me about my eyebrows.`,`Bertram's bakery explodes? My kiln too! Twice!`)},
+    rumorAsk:[`Found anything in the sand?`,`Found anything in the sand?`],
     rumor:{t:S(`Under the whale bones on the beach there's something buried. I tried to dig it up once. Got a crab in my ear. EH? No, it's still in there.`,`Something is buried under the whale bones on the beach.`),hint:'m_sec_bones'},
     loves:['honey'],hates:['fish'],
-    deep:S(`I made my first glass when lightning hit a dune. I was nine. I've been chasing lightning ever since.`,`Lightning hit a dune when I was nine. It made glass. I've chased lightning since.`),
     secret:{t:S(`Glass goggles. Glare doesn't bother you.`,`Glass goggles. No more glare!`),reward:{m3pFlag:'m_goggles',m3pBanner:[S('Glass goggles','Glass goggles'),S('The glare of the white glass won’t bother you now.','No more glare!')]}},
-    best:{t:S(`I made a glass dragon of you. It's on the furnace. It's melting. It's beautiful.`,`I made a glass you. It's melting. It's beautiful!`),reward:{coins:100}},
-    chat:m3pChat(`EH? WHAT'S THE PRETTIEST THING YOU'VE EVER SEEN? SPEAK UP!`,`WHAT'S THE PRETTIEST THING YOU SAW?`,
-      [`MY MOM'S FORGE AT NIGHT!`,`MOM'S FORGE AT NIGHT!`,`A FORGE AT NIGHT! YES! Orange and gold and a little bit of smoke. Your mother has taste.`,`A FORGE AT NIGHT! YES! Good taste!`,1],
-      [`A DRAGON ON A MOUNTAIN!`,`A DRAGON ON A MOUNTAIN!`,`A DRAGON! I'll make one! Out of glass! It'll break! It'll be GLORIOUS!`,`A DRAGON! I'll make one out of glass!`,0.5],
-      [`YOUR EYEBROWS!`,`YOUR EYEBROWS!`,`MY... HA! I don't HAVE eyebrows! They went in the second explosion! That's a JOKE, that is!`,`I don't HAVE eyebrows! Ha!`,0.5],'kind')},
+    best:{t:S(`I made a glass dragon of you. It's on the furnace. It's melting. It's beautiful.`,`I made a glass you. It's melting. It's beautiful!`),reward:{coins:100}}},
   m_esme:{bio:S('Keeper of Lamps. Names every lamp.','She lights the lamps. Every lamp has a name.'),
-    about:{fennick:S(`A lamp-maker in your valley who keeps every lantern lit? I'd like to meet him. I'd like to ask what he calls them.`,`A lamp-man who keeps every lamp lit? I want to meet him.`),c_agatha:S(`A lighthouse keeper on the coast with a spinning light? Spinning! The lamp must be very dizzy. Poor thing.`,`A spinning lighthouse? The lamp must be dizzy!`)},
+    rumorAsk:[`Is there a lamp you have never lit?`,`A lamp you never lit?`],
     rumor:{t:S(`In the mangroves, in the south, there's an old lamp on a stump that nobody has lit for a hundred years. I always wanted to. It's too far for my legs.`,`An old lamp on a stump in the mangroves. Nobody has lit it.`),hint:'m_sec_fireflies'},
     loves:['honey'],hates:['fish'],
-    deep:S(`I light the lamps because a lamp in the dark says "someone is here". That's all anyone wants to hear, at night.`,`A lamp in the dark says "someone is here". That's what we want to hear.`),
     secret:{t:S(`A lamplighter's wick. Your fire lasts longer.`,`A lamplighter's wick. Your fire lasts longer.`),reward:{energy:20}},
-    best:{t:S(`I named a lamp after you. Ash. She's very bright and a little bit stubborn.`,`I named a lamp Ash. Bright and stubborn.`),reward:{bless:1}},
-    chat:m3pChat(`Tell me, dragon. Do you think moths are bad, or just lonely?`,`Are moths bad, or lonely?`,
-      [`Lonely. Everyone gets lonely in the dark.`,`Lonely.`,`...Yes. I think so too. That's why I keep lighting the lamps. For them as well.`,`Yes. I light the lamps for them too.`,1],
-      [`Bad, if they eat the moon!`,`Bad, if they eat the moon!`,`Fair. A moth that eats the moon has forgotten something. Maybe we can remind her.`,`Fair. Maybe she forgot something.`,0.5],
-      [`Fluffy.`,`Fluffy.`,`They ARE very fluffy. It's hard to be cross with something so fluffy.`,`They ARE fluffy. It's hard to be cross.`,0.5],'kind')},
+    best:{t:S(`I named a lamp after you. Ash. She's very bright and a little bit stubborn.`,`I named a lamp Ash. Bright and stubborn.`),reward:{bless:1}}},
   m_dusty:{bio:S('Twin sand-surfers. Borrow trays. Lose trays.','Twins who surf the dunes on trays.'),
-    about:{elka:S(`Dusty: A girl who races on SNOW? Dune: Snow is cold sand! Dusty: We'd win. Dune: We'd freeze.`,`A girl races on snow? We'd win! We'd freeze.`),nib:S(`Dusty: A kid who plays hide and seek? Dune: We're the best at that. Dusty: We hide in the sand. Dune: Nobody finds us. Dusty: Ever. Dune: Help.`,`We hide in the sand. Nobody finds us. Ever. Help.`)},
+    rumorAsk:[`Where is the sand too hard to dig?`,`Where is the sand hard?`],
     rumor:{t:S(`Dusty: There are hard sand spots in the dunes. Dune: Too hard to dig. Dusty: The big worms could. Dune: Maybe you could, if you were a big worm.`,`Some sand is too hard to dig. Big worms can dig it.`),hint:null},
     loves:['honey'],hates:['fish'],
-    deep:S(`Dusty: We're not scared of anything. Dune: Except the dark. Dusty: And Mom.`,`We're not scared of anything. Except the dark. And Mom.`),
     secret:{t:S(`Dusty: Our best tray! Dune: Surf down dunes! Dusty: We borrowed it. Dune: From ourselves.`,`Our best tray! Surf down the dunes!`),reward:{m3pFlag:'m_tray',m3pBanner:[S('The twins’ best tray','The twins’ best tray'),S('Sprint down a dune and you slide like a sand-surfer.','Sprint down a dune to surf!')]}},
-    best:{t:S(`Dusty: You're our THIRD twin now. Dune: That's not how twins work. Dusty: It is now.`,`You're our THIRD twin now!`),reward:{bless:1}},
-    chat:m3pChat(`Dusty: Important question! Dune: Very important! Both: Which is better, sand or snow?`,`Sand or snow?`,
-      [`Both, if your friends are there.`,`Both, with friends.`,`Dusty: Aww. Dune: That's so nice it's annoying. Dusty: We love it.`,`Aww! That's so nice it's annoying!`,0.5],
-      [`Snow! It's FAST!`,`Snow!`,`Dusty: FAST? Dune: Faster than a tray? Dusty: We need snow. Dune: Where do we get snow?`,`FAST? We need snow!`,0.5],
-      [`Sand. Snow can't make glass.`,`Sand.`,`Dusty: SAND WINS! Dune: Sand makes glass, and glass makes WINDOWS! Both: SAND!`,`SAND WINS! Sand makes glass!`,1],'silly')},
+    best:{t:S(`Dusty: You're our third twin now. Dune: That's not how twins work. Dusty: It is now.`,`You're our third twin now!`),reward:{bless:1}}},
   m_jinx:{bio:S('A merchant who appears at noon in the dunes. Might not be real.','A merchant of the dunes at noon. Maybe a mirage.'),
-    about:{pell:S(`A peddler up north with a wagon? Wagons are so solid. So THERE. I prefer to be mostly somewhere.`,`A peddler with a wagon? I'm only mostly here.`),c_ravel:S(`A shop on the coast with rarities? I have rarities too. Mine are rarer. Sometimes they aren't there at all.`,`My things are rarer. Sometimes they're not there at all.`)},
+    rumorAsk:[`Got a riddle for me?`,`Got a riddle?`],
     rumor:{t:S(`A riddle, free of charge: what is round and silver and keeps getting smaller? ...No, not my coin purse.`,`Riddle: what is round and silver and getting smaller?`),hint:null},
     loves:['moonlily'],hates:['fish'],
-    deep:S(`Am I a mirage? I asked my mother once. She shimmered and said "eat your lunch". I still don't know.`,`Am I a mirage? My mother just shimmered.`),
     secret:{t:S(`A real bottle of shade. It's not empty. Probably.`,`A real bottle of shade.`),reward:{stamina:15}},
-    best:{t:S(`For you, my best trick: a lucky coin that's always in your other pocket.`,`My lucky coin. It's in your other pocket.`),reward:{crit:0.04}},
-    chat:m3pChat(`A merchant's question. If you could buy one thing that doesn't exist, what would it be?`,`What would you buy that doesn't exist?`,
-      [`More time with my family.`,`More family time.`,`...Hm. I don't sell that. Nobody does. You'll have to make it yourself.`,`I don't sell that. You make it yourself.`,1],
-      [`A sword made of starlight!`,`A starlight sword!`,`I had one of those. It went out at dawn. Very disappointing.`,`I had one. It went out at dawn.`,0.5],
-      [`A mirage of a mirage.`,`A mirage of a mirage.`,`That's just... me. You want to buy ME? I'm not for sale. I'm for rent. Ha!`,`That's ME! I'm not for sale!`,0.5],'kind')},
+    best:{t:S(`For you, my best trick: a lucky coin that's always in your other pocket.`,`My lucky coin. It's in your other pocket.`),reward:{crit:0.04}}},
   // the merfolk of Coralcombe
   m_coralia:{bio:S('Queen of the Lumenfolk, the merfolk of Coralcombe. Calm, regal, a little dry.','The merfolk queen. Calm and a bit dry.'),
-    about:{yara:S(`An elder who keeps the old stories? Good. Somebody must. The sea keeps ours, but the sea is not a good listener.`,`An elder who keeps stories? Good. The sea doesn't listen.`),m_winnie:S(`The Tidewife up above. She calls me "dear". Nobody calls a queen "dear". I let her.`,`Winnie calls me "dear". I let her.`)},
+    rumorAsk:[`Is there another way into Lumen?`,`Another way into Lumen?`],
     rumor:{t:S(`There is a back door into old Lumen, in the deep water north of the Spire. Our children use it. They think I don't know.`,`There's a back door into Lumen, north of the Spire.`),hint:'m_sec_backdoor'},
     loves:['moonlily'],hates:['fish'],
-    deep:S(`My grandmother's grandmother sang to the moon from a balcony in Lumen. I sing to it from the bottom of the sea. It still hears, I think.`,`My family sang to the moon from Lumen. I sing from the sea.`),
     secret:{t:S(`A pearl from the royal clam. It makes you a little harder to drown. And to hurt.`,`A royal pearl. You are a bit harder to hurt.`),reward:{maxhp:10}},
-    best:{t:S(`You are a friend of the Lumenfolk now, for as long as the sea is wet.`,`You are our friend while the sea is wet. That's forever.`),reward:{bless:1}},
-    chat:m3pChat(`A queen may ask a question. What makes a good ruler, small dragon?`,`What makes a good ruler?`,
-      [`Listening, even to the small ones.`,`Listening.`,`Even to the small ones. Like you. ...That was a joke. I make one a year. You've had it.`,`Like you. That was my joke for the year.`,1],
-      [`Being brave first, so others can be brave too.`,`Being brave first.`,`Brave first. Yes. Lumen's priests went out first, the night the moth came. We remember.`,`Yes. Our priests went first. We remember.`,0.5],
-      [`A really big crown.`,`A big crown.`,`My crown is enormous and does nothing at all. It does look nice. You're not entirely wrong.`,`My crown is big. It does nothing. It looks nice.`,0.5],'kind')},
+    best:{t:S(`You are a friend of the Lumenfolk now, for as long as the sea is wet.`,`You are our friend while the sea is wet. That's forever.`),reward:{bless:1}}},
   m_ripple:{bio:S('Archivist of the Pearl Archive. Slow, kind, forgetful. Apologizes to fish.','He keeps the old books. He says sorry to fish.'),
-    about:{wren:S(`A librarian from up above, who reads Lumen? Oh, how lovely. I'd like to argue about spelling with her. Gently.`,`A librarian who reads Lumen? I'd love to argue spelling with her.`),m_winnie:S(`Winnie. Oh, Winnie. She couldn't come down and I couldn't come up, so we sent letters in bottles for a whole year. Sorry, fish. I'm fine.`,`Winnie and I wrote letters in bottles. Long ago.`)},
+    rumorAsk:[`What is in the Drowned Library?`,`What is in the Library?`],
     rumor:{t:S(`The priests' vault in the Drowned Library is sealed with moon-wax. Only moonfire melts it. I have never seen moonfire. I would like to, before I forget what I wanted.`,`The Library vault needs moonfire to open.`),hint:null,need:()=>!m3pQ('m_leash')},
     loves:['moonlily'],hates:['fish'],
-    deep:S(`I have read every pearl in the Archive. Every story. Then I forget them, and I get to read them again. It's the only good thing about being old.`,`I read every story. Then I forget. So I read them again!`),
     secret:{t:S(`A reading pearl. Hold it to your eye and the dark looks a little less dark. Your breath lasts longer, too.`,`A reading pearl. Your breath lasts longer.`),reward:{energy:15}},
-    best:{t:S(`I've written you into the Archive. "Ash, the small dragon who came back." I'll forget I did it. You won't.`,`I wrote you into the Archive. You won't forget.`),reward:{reveal:true}},
-    chat:m3pChat(`Ah. A question, before I forget it. What is the most important thing to remember?`,`What's most important to remember?`,
-      [`The people who love you.`,`The people who love you.`,`Yes. Yes. Write that down for me. In big letters. On my tail.`,`Yes. Write that on my tail.`,1],
-      [`Where you put your sword!`,`Where your sword is!`,`Ha! Very practical. I once lost a spear for eleven years. It was in my beard.`,`Ha! I lost a spear in my beard for years.`,0.5],
-      [`Fish names.`,`Fish names.`,`I know every fish name. That one is Bob. That one is also Bob. Sorry, Bob.`,`That fish is Bob. That one too. Sorry, Bob.`,0.5],'kind')},
+    best:{t:S(`I've written you into the Archive. "Ash, the small dragon who came back." I'll forget I did it. You won't.`,`I wrote you into the Archive. You won't forget.`),reward:{reveal:true}}},
   m_rocket:{bio:S('The fastest swimmer in Coralcombe. A boaster and a good sport.','The fastest merfolk swimmer. A good sport.'),
-    about:{elka:S(`A girl who races on SNOW? Snow is just water that stopped. I'd swim through it. Probably. Is it cold?`,`Snow is just water that stopped. I'd swim through it.`),c_jo:S(`A skiff racer on the coast? A BOAT? Boats are cheating. They have SAILS.`,`A boat racer? Boats cheat. They have sails!`)},
+    rumorAsk:[`Any tricks for the race?`,`Any race tricks?`],
     rumor:{t:S(`The race goes round the reef and through the mangroves. There are two old masts down there. If your tail can grab things... nah. Forget I said it.`,`Two old masts on the race course. If your tail can grab...`),hint:null},
     loves:['moonlily'],hates:['fish'],
-    deep:S(`I race because when I'm fast nobody sees I'm small. Pickles is small too. That's why we're friends.`,`I race so nobody sees I'm small. Pickles is small too.`),
-    secret:{t:S(`My lucky fin-band. You swim faster when you wear it. Okay, YOU don't. But you feel faster.`,`My lucky fin-band. You feel faster!`),reward:{stamina:15}},
-    best:{t:S(`You're my best racing buddy. Even better than Pickles. Don't tell Pickles.`,`You're my best race buddy. Don't tell Pickles.`),reward:{coins:100}},
-    chat:m3pChat(`Quick! Racer's question! What's better, winning, or a really close race?`,`Winning, or a close race?`,
-      [`A close race. Then everybody had fun.`,`A close race.`,`...Yeah. Yeah, you're right. Close races are the best. Even when I lose. Mostly.`,`Yeah. Close races are best. Mostly.`,0.5],
-      [`WINNING!`,`WINNING!`,`YES! WINNING! Ha! You get it! You and me, we're the same!`,`YES! WINNING! We're the same!`,1],
-      [`Snacks after.`,`Snacks after.`,`Snacks after! Pickles always brings snacks. That's why I let him come second.`,`Pickles brings snacks. So he comes second.`,0.5],'brave')},
+    secret:{t:S(`My lucky fin-band. You swim faster when you wear it. Okay, you don't. But you feel faster.`,`My lucky fin-band. You feel faster!`),reward:{stamina:15}},
+    best:{t:S(`You're my best racing buddy. Even better than Pickles. Don't tell Pickles.`,`You're my best race buddy. Don't tell Pickles.`),reward:{coins:100}}},
   m_kipper:{bio:S('Knight of the Lumenfolk. Very proper. Secretly scared of crabs. Rides a seahorse called Lady Bubbles.','A merfolk knight on a seahorse. Scared of crabs.'),
-    about:{osric:S(`A captain of the watch in your valley? With dogs? Dogs are just land seahorses. I approve of him.`,`A captain with dogs? Dogs are land seahorses. Good.`),c_bobs:S(`Two tin watchmen on the coast, both called Bob? How proper. Every knight should have a spare.`,`Two tin men called Bob? Every knight needs a spare.`)},
+    rumorAsk:[`Where do the Crab Pirates live?`,`Where are the Crab Pirates?`],
     rumor:{t:S(`The Crab Pirates have two forts on the reef isles. Two! Somebody should do something. Somebody braver. About crabs.`,`The Crab Pirates have two forts. Someone braver should go.`),hint:null},
     loves:['moonlily'],hates:['fish'],
-    deep:S(`When I was a squire a crab pinched my tail and wouldn't let go for a whole afternoon. I was very brave about it. I cried quietly.`,`A crab pinched my tail all afternoon. I cried quietly. Bravely.`),
     secret:{t:S(`My spare shell-plate. Strap it on. Crabs fear it. Probably.`,`My spare shell armor. Crabs fear it. Probably.`),reward:{armor:0.04}},
-    best:{t:S(`I dub thee Sir Ash of the Dry Lands, Knight of Coralcombe. Rise. Swim. Whatever dragons do.`,`I name you Sir Ash, Knight of Coralcombe! Rise!`),reward:{dmg:0.05}},
-    chat:m3pChat(`A knight must ask: what is a knight's greatest weapon?`,`What is a knight's best weapon?`,
-      [`Kindness. And a spear, just in case.`,`Kindness. And a spear.`,`Kindness and a spear! Exactly the order I keep them in.`,`Kindness, then a spear! Exactly!`,1],
-      [`Courage!`,`Courage!`,`Courage! Yes! Especially near crabs. Courage near crabs is the bravest sort.`,`Courage! Especially near crabs!`,0.5],
-      [`A seahorse.`,`A seahorse.`,`Lady Bubbles IS my greatest weapon. She bites. Not me. Usually.`,`Lady Bubbles bites. Not me. Usually.`,0.5],'kind')},
-  m_kelp:{bio:S('Healer and pearl-seller of the Kelp Garden. Everybody is “dearie”.','The healer of the Kelp Garden. Calls you dearie.'),
-    about:{moss:S(`A bog granny up your way who makes potions? I make potions too. Seaweed ones. They taste of feet. They work.`,`A granny with potions? Mine are seaweed. They taste of feet.`),m_gilly:S(`The cook up top puts fish in everything? Oh, dearie. I put kelp in everything. We'd be terrible together. Wonderful.`,`Gilly puts fish in everything. I put kelp. We'd be wonderful.`)},
-    rumor:{t:S(`Rocket thinks nobody can beat him in the reef race. Beat him, dearie. Gently. And I'll teach you a kick that'll make you fly through water.`,`Beat Rocket in the race. I'll teach you a special kick!`),hint:null},
+    best:{t:S(`I dub thee Sir Ash of the Dry Lands, Knight of Coralcombe. Rise. Swim. Whatever dragons do.`,`I name you Sir Ash, Knight of Coralcombe! Rise!`),reward:{dmg:0.05}}},
+  m_kelp:{bio:S('Healer and pearl-seller of the Kelp Garden. Calls every child “sprat”.','The healer of the Kelp Garden. She calls you sprat.'),
+    rumorAsk:[`How do I swim faster?`,`How do I swim faster?`],
+    rumor:{t:S(`Rocket thinks nobody can beat him in the reef race. Beat him, sprat. Gently. And I'll teach you a kick that'll make you fly through water.`,`Beat Rocket in the race. I'll teach you a special kick!`),hint:null},
     loves:['moonlily'],hates:['fish'],
-    deep:S(`I've patched up every merfolk in this village. Every scrape, every sting, every broken fin. The sea is rough, dearie. So we're gentle.`,`I patch up everyone here. The sea is rough. So we're gentle.`),
-    secret:{t:S(`My kelp tonic, dearie. Your draughts will mend you better.`,`My kelp tonic. Your draughts heal more.`),reward:{heal:0.1}},
-    best:{t:S(`A pearl pouch, dearie. Holds one more draught. And it's lovely.`,`A pearl pouch. One more draught. And lovely!`),reward:{potmax:1}},
-    chat:m3pChat(`Come here, dearie. Let Nana look at you. Are you eating enough?`,`Are you eating enough?`,
-      [`My mom always asks that too.`,`Mom asks that too.`,`Of course she does, dearie. Mothers have to. It's in the rules. Eat something.`,`Of course. Moms must. Eat something!`,1],
-      [`I eat like a DRAGON!`,`I eat like a dragon!`,`Good! Then you'll grow big and strong and very hard to fit through doors.`,`Good! You'll grow too big for doors!`,0.5],
-      [`I ate a seashell once.`,`I ate a seashell.`,`Oh, dearie. No. Here, have some kelp. Not the shell. The KELP.`,`Oh, dearie. Have kelp. Not shells.`,0.5],'kind')}
+    secret:{t:S(`My kelp tonic, sprat. Your draughts will mend you better.`,`My kelp tonic. Your draughts heal more.`),reward:{heal:0.1}},
+    best:{t:S(`A pearl pouch. Holds one more draught. And it's lovely.`,`A pearl pouch. One more draught. And lovely!`),reward:{potmax:1}}}
 });
 // talk rewards with no stock field: a speed belt, a flag (goggles, the twins' tray) with its banner, or a function
 { const base=giveTalkReward; giveTalkReward=function(r){ base(r); try{ if(!r) return;
@@ -747,46 +663,46 @@ Object.assign(TALK,{
 // did in earlier acts: how he came east (Glaciar or the ship), Vesper friend or foe, Glaciar freed or beaten.
 const m3pGl=()=>G.choices.f_glaciar==='free', m3pGlBeat=()=>!!G.choices.f_glaciar&&G.choices.f_glaciar!=='free';
 const M3P_FIRST={
-  m_dabble:()=>G.flags.m_ship==='glaciar'?S(`You came on a DRAGON. An ICE one! My north beach is frozen solid and the chickens are ice skating.`,`You came on an ice dragon! The chickens are skating!`)
-    :S(`Our visiting dragon! Mind the gaps. Mind ALL the gaps. The chickens are still talking about you.`,`Our dragon! Mind the gaps!`),
+  m_dabble:()=>G.flags.m_ship==='glaciar'?S(`You came on a dragon. An ice one! My north beach is frozen solid and the chickens are ice skating.`,`You came on an ice dragon! The chickens are skating!`)
+    :S(`Our visiting dragon! Mind the gaps. Mind all the gaps. The chickens are still talking about you.`,`Our dragon! Mind the gaps!`),
   m_winnie:()=>S(`Winnie, the Tidewife, if nobody told you. I read the tide, and the moon. Lately the moon reads badly.`,`I'm Old Winnie. I read the tide and the moon.`),
-  m_rowan:()=>S(`Rowan Knotwood. This is my "pleased to meet you" knot. Hold this end. No, the OTHER end.`,`I'm Rowan. This knot means "nice to meet you".`),
-  m_squint:()=>S(`LAND HO! ...Oh. DRAGON HO! I'm Squint, the official lookout. The eyepatch is pretend. The lookout part is real.`,`DRAGON HO! I'm Squint, the lookout!`),
+  m_rowan:()=>S(`Rowan Knotwood. This is my "pleased to meet you" knot. Hold this end. No, the other end.`,`I'm Rowan. This knot means "nice to meet you".`),
+  m_squint:()=>S(`Land ho! ...Oh. Dragon ho! I'm Squint, the official lookout. The eyepatch is pretend. The lookout part is real.`,`Dragon ho! I'm Squint, the lookout!`),
   m_gilly:()=>S(`Cook Gilly, Floating Kitchen! You look starving. Fish? Fish pie? Fish on a stick? Fish on a smaller fish?`,`I'm Cook Gilly! You look hungry. Fish?`),
-  m_ned:()=>S(`Who's that, climbing MY lighthouse? ...A dragon. Hmph. I'm Ned. I keep this light. Mind the moths.`,`Who's climbing my lighthouse? A dragon. Hmph. I'm Old Ned.`),
+  m_ned:()=>S(`Who's that, climbing my lighthouse? ...A dragon. Hmph. I'm Ned. I keep this light. Mind the moths.`,`Who's climbing my lighthouse? A dragon. Hmph. I'm Old Ned.`),
   m_coralia:()=>G.flags.m_ship==='glaciar'?S(`We felt the sea turn cold when your ice auntie flew over, small dragon. The fish wore little coats for a week.`,`The sea went cold when your auntie flew over!`)
     :m3pGlBeat()?S(`A great cold came down from the north this year, then stopped. Someone stopped it. I think it was you, small dragon.`,`A great cold stopped this year. Was it you?`)
     :S(`Yes, small dragon? The sea is listening, and so am I.`,`Yes, small dragon?`),
   m_ripple:()=>S(`Oh! A visitor. Elder Ripple, of the Pearl Archive. Have we met? I'm sorry. I'm sure I'd remember a dragon. Probably.`,`Oh, a visitor! I'm Elder Ripple. Have we met? Sorry.`),
-  m_rocket:()=>S(`Whoa, a dragon who SWIMS? I'm Rocket. Fastest in Coralcombe. Second fastest is a squid. You might be third. Might.`,`A swimming dragon! I'm Rocket. Fastest here!`),
-  m_kipper:()=>S(`HALT! ...Oh, it's the dragon. Sir Kipper, at your service, and this is Lady Bubbles. We never did introduce ourselves properly.`,`HALT! Oh, it's you. I'm Sir Kipper. This is Lady Bubbles.`),
-  m_kelp:()=>S(`Oh, look at you, dearie, all dry and crispy. Nana Kelp. Healer. Pearls. Hugs, if you need one.`,`Look at you, dearie! I'm Nana Kelp. I heal and sell pearls.`),
+  m_rocket:()=>S(`Whoa, a dragon who swims? I'm Rocket. Fastest in Coralcombe. Second fastest is a squid. You might be third. Might.`,`A swimming dragon! I'm Rocket. Fastest here!`),
+  m_kipper:()=>S(`Who swims there? ...Oh, it's the dragon from the well. Sir Kipper, at your service, and this is Lady Bubbles.`,`Oh, it's you. I'm Sir Kipper. This is Lady Bubbles.`),
+  m_kelp:()=>S(`Oh, look at you, sprat, all dry and crispy. Nana Kelp. Healer. Pearls. Hugs, if you need one.`,`Look at you, sprat! I'm Nana Kelp. I heal and sell pearls.`),
   m_rafi:()=>m3pVesperOn()?S(`HO! A girl in a moth mask came through and said her dragon cousin would follow. She said you'd be taller!`,`HO! A moth-mask girl said you would come!`)
     :S(`HO! The dragon from the sea! Sit with the caravan a while.`,`HO! The sea dragon! Sit with us!`),
   m_saffron:()=>S(`Saffron. Well-Warden. Don't touch the well.`,`I'm Saffron. Don't touch the well.`),
-  m_kiln:()=>S(`EH? A DRAGON? In my furnace tent? Old Kiln. Glassblower. Mind the hot bits. ALL the bits are hot bits.`,`EH? A dragon? I'm Old Kiln. Everything here is hot!`),
+  m_kiln:()=>S(`EH? A dragon? In my furnace tent? Old Kiln. Glassblower. Mind the hot bits. All the bits are hot bits.`,`EH? A dragon? I'm Old Kiln. Everything here is hot!`),
   m_esme:()=>S(`Hello, dragon. I'm Esme. I keep the lamps. You must be the brightest thing to walk into Sable in years.`,`Hello, dragon. I'm Esme. I keep the lamps.`),
   m_dusty:()=>S(`Dusty: Hi! I'm Dusty! Dune: I'm Dune! Dusty: We're twins! Dune: We know you know.`,`Hi! We're Dusty and Dune! Twins!`),
   m_jinx:()=>m3pVesperOn()?S(`Am I real? Are you? A girl in a moth mask bought a hat from me last week, so I'm fairly sure I'm real. Jinx, mirage merchant.`,`Am I real? A moth-mask girl bought a hat. So I'm real. I'm Jinx.`)
-    :S(`Am I a mirage? Are YOU? Jinx, merchant of whatever-this-is. Buy something and find out.`,`Am I a mirage? I'm Jinx. Buy something!`)
+    :S(`Am I a mirage? Are you? Jinx, merchant of whatever-this-is. Buy something and find out.`,`Am I a mirage? I'm Jinx. Buy something!`)
 };
 const M3P_HELLO={
   m_dabble:[S(`Ash! Mind the gap!`,`Ash! Mind the gap!`),S(`Our hero! Wet socks and all!`,`Our hero!`)],
   m_winnie:[S(`Ah, the dragon child. Ollie waves.`,`Hello, dragon child.`),S(`Sit, sit.`,`Sit, sit.`)],
   m_rowan:[S(`*ties a "hello" knot*`,`*ties a hello knot*`),S(`Ash. Mind the ropes.`,`Mind the ropes.`)],
-  m_squint:[S(`LAND HO! Oh. Ash HO!`,`Ash HO!`),S(`Lookout reporting! Nothing to report!`,`Nothing to report!`)],
+  m_squint:[S(`Land ho! Oh. Ash ho!`,`Ash ho!`),S(`Lookout reporting! Nothing to report!`,`Nothing to report!`)],
   m_gilly:[S(`Hungry? Fish?`,`Hungry? Fish?`),S(`There's my favorite dragon! Sit! Eat!`,`Sit! Eat!`)],
   m_ned:[S(`Hmph. You again.`,`Hmph. You again.`),S(`Mind the moths.`,`Mind the moths.`)],
   m_coralia:[S(`Welcome back, small dragon.`,`Welcome back.`),S(`The sea is glad to see you. So am I.`,`The sea is glad you're here.`)],
   m_ripple:[S(`Ah! Hello. Have we met? Oh, yes. Hello again.`,`Hello again!`),S(`Sorry, fish. Hello, dragon.`,`Hello, dragon.`)],
   m_rocket:[S(`Race me!`,`Race me!`),S(`Hey! Still slow?`,`Still slow?`)],
-  m_kipper:[S(`HALT! Oh. Carry on, friend.`,`Carry on, friend.`),S(`Lady Bubbles says hello.`,`Lady Bubbles says hi.`)],
-  m_kelp:[S(`Hello, dearie.`,`Hello, dearie.`),S(`Have you eaten, dearie?`,`Have you eaten?`)],
+  m_kipper:[S(`Who swims there? Oh. Carry on, friend.`,`Carry on, friend.`),S(`Lady Bubbles says hello.`,`Lady Bubbles says hi.`)],
+  m_kelp:[S(`Hello, sprat.`,`Hello, sprat.`),S(`Have you eaten, sprat?`,`Have you eaten?`)],
   m_rafi:[S(`HO! The dragon!`,`HO!`),S(`Sit with the caravan!`,`Sit with us!`)],
   m_saffron:[S(`Don't touch the well.`,`Don't touch the well.`),S(`Dragon.`,`Dragon.`)],
-  m_kiln:[S(`EH? Oh, you. HELLO!`,`HELLO!`),S(`Mind the furnace!`,`Mind the furnace!`)],
+  m_kiln:[S(`EH? Oh, you. Hello!`,`Hello!`),S(`Mind the furnace!`,`Mind the furnace!`)],
   m_esme:[S(`Hello, dragon.`,`Hello, dragon.`),S(`The lamps say hello.`,`The lamps say hi.`)],
-  m_dusty:[S(`Dusty: Ash! Dune: ASH!`,`Ash! ASH!`),S(`Dusty: Wanna surf? Dune: We have one tray.`,`Wanna surf? One tray.`)],
+  m_dusty:[S(`Dusty: Ash! Dune: Ash!`,`Ash! Ash!`),S(`Dusty: Wanna surf? Dune: We have one tray.`,`Wanna surf? One tray.`)],
   m_jinx:[S(`Back again? Or am I?`,`Back again?`),S(`Something for everyone. Nothing for free.`,`Nothing for free.`)]
 };
 const M3P_NIGHTL=[S(`The nights are so dark now. Stay near the lamps, Ash.`,`It's so dark at night. Stay near lamps.`),S(`Can you see the moon? I can hardly see the moon.`,`I can hardly see the moon.`),S(`Every night is darker than the last. Keep a lamp lit, Ash.`,`Darker every night. Keep a lamp lit.`)];
@@ -805,21 +721,21 @@ const M3P_NIGHTL=[S(`The nights are so dark now. Stay near the lamps, Ash.`,`It'
   if(id==='m_dabble'&&F.m_ship==='glaciar') return S(`Your auntie froze our north beach. We're selling the ice to Sable. Sable is paying in dates. Everybody's happy except the ice.`,`We sell your auntie's ice to Sable. For dates!`);
   if(id==='m_winnie'&&F.m_eclipse1) return S(`When the moth bit the moon the tide went three ways at once. Ollie hid in the sugar bowl. He's still in there.`,`When the moon got bitten, Ollie hid in the sugar bowl.`);
   if(id==='m_rowan'&&Q('m_ferry')) return S(`"Thank you" knot's still holding. Biggest knot in the lagoon. People come to look at it. I charge.`,`My thank-you knot still holds. People come to look.`);
-  if(id==='m_squint'&&Q('m_lighthouse')) return S(`Grandpa came down for supper! It was fish. He pretended not to mind. LAND HO on his face. That's a joke. I'm happy.`,`Grandpa came down for supper! I'm so happy!`);
+  if(id==='m_squint'&&Q('m_lighthouse')) return S(`Grandpa came down for supper! It was fish. He pretended not to mind. He had seconds.`,`Grandpa came down for supper! I'm so happy!`);
   if(id==='m_gilly'&&G.flags.tk_come==='yes'&&m3pBoatIn()) return S(`That baker girl Tikka says bread is better than fish. We're not speaking. We speak all day. It's lovely.`,`Tikka says bread beats fish. We argue all day. It's lovely.`);
   if(id==='m_gilly'&&Q('m_moonfish')) return S(`I painted the Moonfish on my sign. Now everybody wants to eat here. I tell them it's not on the menu. Some fish are for looking at.`,`I painted the Moonfish on my sign. It's not on the menu!`);
   if(id==='m_ned'&&Q('m_lighthouse')) return S(`Silver light, every night. The moths still come. Now they just sit and look at it. Like me. Hmph.`,`Silver light every night. The moths just look at it.`);
   if(id==='m_coralia'&&C.m_hush==='free') return S(`A white moth flew low over the reef last night, glowing softly. She didn't stop. She didn't need to. You did a kind thing, small dragon.`,`A white moth flew over the reef. Glowing. You did a kind thing.`);
   if(id==='m_coralia'&&m3pVesperOn()) return S(`Your cousin with the moth mask came to the surface to wave at our lookouts. Very rude. Very charming. Family, I suppose.`,`Your cousin in the moth mask waved at us. Rude. Charming.`);
   if(id==='m_ripple'&&Q('m_leash')) return S(`Your librarian friend and I have agreed on nothing at all. It has been the best week of my life.`,`Wren and I agree on nothing. Best week ever!`);
-  if(id==='m_rocket'&&F.m_race_won) return S(`Rocket is the fastest swimmer in Coralcombe. Second fastest is... me. Wait. That's not right. Ugh. YOU.`,`I'm fastest. No. You are. Ugh!`);
+  if(id==='m_rocket'&&F.m_race_won) return S(`Rocket is the fastest swimmer in Coralcombe. Second fastest is... me. Wait. That's not right. Ugh. You.`,`I'm fastest. No. You are. Ugh!`);
   if(id==='m_kipper'&&F.m_puff_done) return S(`You deflated the Baron! I have written a ballad. Forty verses. It rhymes "Puffington" with "huffington". Shall I sing it? I shall.`,`You beat the Baron! I wrote a song with forty verses!`);
-  if(id==='m_kelp'&&F.m_dolphin) return S(`How's the Dolphin Kick, dearie? One tail. Remember. Just the one.`,`How's the Dolphin Kick? Just one tail, dearie.`);
-  if(id==='m_rafi'&&m3pGl()) return S(`You have an AUNTIE made of SNOW? Bring her! No, she'd melt. Bring a PIECE of her! No, that's rude. Bring a postcard!`,`Your auntie is made of snow? Bring a postcard!`);
+  if(id==='m_kelp'&&F.m_dolphin) return S(`How's the Dolphin Kick, sprat? One tail. Remember. Just the one.`,`How's the Dolphin Kick? Just one tail, sprat.`);
+  if(id==='m_rafi'&&m3pGl()) return S(`You have an auntie made of snow? Bring her! No, she'd melt. Bring a postcard!`,`Your auntie is made of snow? Bring a postcard!`);
   if(id==='m_saffron'&&F.m_eclipse2) return S(`One candle's worth of moon left in her. I sit with her every night. I won't stop.`,`My well is dim. I sit with her every night.`);
-  if(id==='m_kiln'&&G.weapons&&G.weapons.glaive) return S(`How's my glaive? Is it cutting? Is it shining? Have you cut bread with it? DON'T.`,`How's my glaive? Don't cut bread with it!`);
+  if(id==='m_kiln'&&G.weapons&&G.weapons.glaive) return S(`How's my glaive? Is it cutting? Is it shining? Have you cut bread with it? Don't.`,`How's my glaive? Don't cut bread with it!`);
   if(id==='m_esme'&&Q('m_lamps')) return S(`Twelve lamps, every night. Bertha is very proud. Small Bertha is unbearable.`,`All twelve lamps glow. Bertha is proud.`);
-  if(id==='m_dusty'&&Q('m_noodle')) return S(`Dusty: We miss Noodle. Dune: We don't miss our shoes. Dusty: We miss him a LOT. Dune: ...Yeah.`,`We miss Noodle. Not our shoes.`);
+  if(id==='m_dusty'&&Q('m_noodle')) return S(`Dusty: We miss Noodle. Dune: We don't miss our shoes. Dusty: We miss him a lot. Dune: ...Yeah.`,`We miss Noodle. Not our shoes.`);
   if(id==='m_jinx'&&!m3pVesperOn()) return S(`A moth dropped something in the dunes last week. A letter. I keep a lost-and-found. Everything is for sale. Even lost things.`,`A moth dropped a letter. It's in my lost-and-found.`);
   if(F.m_eclipse2&&m3pMoonPerson(id)&&Math.random()<0.5) return S(`The moon is less than half now. My mother says to keep a lamp in the window. So I keep three.`,`The moon is less than half. I keep three lamps lit.`);
   return base(id);
@@ -843,19 +759,19 @@ B('m_row1','id:m_rowan',ALWAYS,S(`Bowline, clove hitch, sheepshank, "go away" kn
 B('m_squ1','id:m_squint',ALWAYS,S(`LAND HO! ...It's still Palmcrest.`,`LAND HO! Still Palmcrest.`));
 B('m_squ2','id:m_squint',()=>!m3pQ('m_lighthouse'),S(`*looks at Gull Isle through her telescope* Still dark. Still dark, Grandpa.`,`Grandpa's light is still dark.`));
 B('m_gil1','id:m_gilly',ALWAYS,S(`FISH! Get your fish! Fresh fish, old fish, fish-shaped fish!`,`FISH! Get your fish!`));
-B('m_ned1','id:m_ned',ALWAYS,S(`Shoo. SHOO. Go and sit on someone else's lamp.`,`Shoo, moths. SHOO.`));
+B('m_ned1','id:m_ned',ALWAYS,S(`Shoo. Shoo. Go and sit on someone else's lamp.`,`Shoo, moths. Shoo.`));
 B('m_ned2','id:m_ned',()=>m3pQ('m_lighthouse'),S(`*polishes the great lamp* Silver. Ha. Silver.`,`*polishes the lamp* Silver!`));
 B('m_cor1','id:m_coralia',ALWAYS,S(`The tide is restless. So is the queen.`,`The tide is restless.`));
 B('m_rip1','id:m_ripple',ALWAYS,S(`Where did I put... ah. On my head. Sorry, fish.`,`Where's my... oh. Sorry, fish.`));
-B('m_roc1','id:m_rocket',ALWAYS,S(`*does a loop* Did you see that? DID YOU?`,`*loops* Did you see?`));
+B('m_roc1','id:m_rocket',ALWAYS,S(`*does a loop* Did you see that? Did you?`,`*loops* Did you see?`));
 B('m_kip1','id:m_kipper',ALWAYS,S(`Steady, Lady Bubbles. Steady. Is that a crab? It's a rock. Steady.`,`Is that a crab? It's a rock. Steady.`));
 B('m_kel1','id:m_kelp',ALWAYS,S(`Pearls! Kelp tonic! Hugs! One of those is free!`,`Pearls! Tonic! Hugs!`));
 B('m_raf1','id:m_rafi',ALWAYS,S(`HO HO! Did I tell you about the time... yes? I'll tell it again, bigger!`,`HO HO! Did I tell you this one?`));
 B('m_saf1','id:m_saffron',ALWAYS,S(`Don't touch the well.`,`Don't touch the well.`));
 B('m_kil1','id:m_kiln',ALWAYS,S(`EH? WHAT? Oh. Nobody said anything. Good.`,`EH? WHAT?`));
-B('m_kil2','id:m_kiln',()=>!!G.items.m_mooncrumb,S(`I can SEE moonlight in your satchel! Bring it here!`,`Moonlight in your bag! Bring it here!`));
+B('m_kil2','id:m_kiln',()=>!!G.items.m_mooncrumb,S(`I can see moonlight in your satchel! Bring it here!`,`Moonlight in your bag! Bring it here!`));
 B('m_esm1','id:m_esme',ALWAYS,S(`Bertha, Small Bertha, Old Pip, Gertrude, Gilbert...`,`Bertha, Small Bertha, Old Pip...`));
-B('m_dus1','id:m_dusty',ALWAYS,S(`Dusty: Tray race! Dune: We have one tray! Dusty: Tray WALK!`,`Tray race! One tray. Tray WALK!`));
+B('m_dus1','id:m_dusty',ALWAYS,S(`Dusty: Tray race! Dune: We have one tray! Dusty: Tray walk!`,`Tray race! One tray. Tray walk!`));
 B('m_jin1','id:m_jinx',ALWAYS,S(`*shimmers a little*`,`*shimmers*`));
 // the returning friends, while they stand in Moonfall
 const m3pHereV=id=>()=>!!(G&&m3pIV()&&curMap()===3&&m3pVisitC()[id]);
@@ -865,14 +781,14 @@ B('m_vwre1','id:wren',m3pHereV('wren'),S(`Page forty-one... the raft moved... pa
 B('m_vmag1','id:f_mags',m3pHereV('f_mags'),S(`If you hear a bang from the dock, don't worry. That was me.`,`A bang? That was me.`));
 B('m_vtik1','id:ev_tikka',m3pHereV('ev_tikka'),S(`Lumpy buns! Fresh lumpy buns! Lumpy means love!`,`Lumpy buns! Lumpy means love!`));
 B('m_vjun1','id:juniper',m3pHereV('juniper'),S(`The dunes moved again. I'll redraw them. Again.`,`The dunes moved! I'll redraw them.`));
-B('m_vves1','id:c_vesper',()=>m3pHereV('c_vesper')()&&!m3pPierAll(),S(`Psst. Up here. No, HERE.`,`Psst. Up here!`));
+B('m_vves1','id:c_vesper',()=>m3pHereV('c_vesper')()&&!m3pPierAll(),S(`Psst. Up here. No, here.`,`Psst. Up here!`));
 B('m_vmar1','id:maren',()=>m3pHereV('maren')(),S(`Boots laced before you climb. Both of them. I mean it.`,`Lace your boots first!`));
 B('m_vqui1','id:quill',()=>m3pHereV('quill')(),S(`Fascinating. Terrifying. Mostly fascinating.`,`Fascinating! And scary.`));
 // town barks: the wobbly tide, the eclipses, the lamps, the dark nights
 B('m_dw1',M3P_DW,ALWAYS,S(`The tide went out this morning and didn't come back for lunch.`,`The tide went out and didn't come back!`));
 B('m_dw2',M3P_DW,ALWAYS,S(`My raft drifted off with my breakfast on it. I miss my breakfast.`,`My raft drifted off with my breakfast.`));
-B('m_dw3',M3P_DW,m3pE1,S(`Did you SEE that moth? I've stopped going outside. I'm a raft town. Everything is outside.`,`Did you SEE that moth? I won't go outside!`),{d:'m_eclipse1'});
-B('m_dw4',M3P_DW+'|kid',m3pMoonGone,S(`Somebody took a BITE out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
+B('m_dw3',M3P_DW,m3pE1,S(`Did you see that moth? I've stopped going outside. I'm a raft town. Everything is outside.`,`Did you see that moth? I won't go outside!`),{d:'m_eclipse1'});
+B('m_dw4',M3P_DW+'|kid',m3pMoonGone,S(`Somebody took a bite out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
 B('m_dw5',M3P_DW,()=>G.flags.m_ship==='glaciar',S(`The north beach is still frozen! I've been ice skating! On a beach! Thank your auntie!`,`I went ice skating on the beach!`));
 B('m_dw6',M3P_DW,()=>m3pQ('m_lighthouse')&&isNight(),S(`Look! Old Ned's light! Silver! I can see my own feet!`,`Old Ned's light is on! Silver!`),{d:'q_m_lighthouse'});
 B('m_dw7',M3P_DW,()=>!!G.flags.m_dell_away,S(`Captain Dell's gone west to fetch your mom. He tooted twice. That's sailor for "back soon".`,`Dell went to get your mom. Back soon!`));
@@ -880,45 +796,45 @@ B('m_sb1',M3P_SB,ALWAYS,S(`A dragon in Sable! Is it true you breathe fire? Can y
 B('m_sb2',M3P_SB,m3pE2,S(`The well's gone dim, and my lamp with it. I keep walking into my own tent pole.`,`The well is dim. So is my lamp.`),{d:'m_eclipse2'});
 B('m_sb3',M3P_SB,ALWAYS,S(`Esme says a lamp makes everything better. I hate it when she's right.`,`Esme says lamps make things better. She is right.`));
 B('m_sb4',M3P_SB,()=>m3pQ('m_lamps'),S(`All twelve lamps lit again! Esme cried, and Small Bertha looks very pleased with herself.`,`All twelve lamps! Esme cried.`),{d:'q_m_lamps'});
-B('m_sb5',M3P_SB+'|kid',m3pMoonGone,S(`Somebody took a BITE out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
+B('m_sb5',M3P_SB+'|kid',m3pMoonGone,S(`Somebody took a bite out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
 B('m_sb6',M3P_SB,()=>m3pVesperOn()&&m3pR('m_sable')&&isNight(),S(`There's a girl on the tent roofs at night. Moth mask. She waves at the lamps. Friend of yours?`,`A moth-mask girl sits on the roofs at night. Your friend?`));
 B('m_cc1',M3P_CC,ALWAYS,S(`A dragon who swims! What next, a fish who walks?`,`A swimming dragon! What next?`));
 B('m_cc2',M3P_CC,ALWAYS,S(`Mind the coral. It bites. Only a little.`,`Mind the coral. It bites a little.`));
 B('m_cc3',M3P_CC,()=>!!G.flags.m_puff_done,S(`The Sunken Gate is open! I swam through it twice! The Baron waved. With a fin.`,`The Sunken Gate is open! The Baron waved.`),{d:'m_puffdone'});
-B('m_cst1',M3P_CT,()=>hasAbil('dive'),S(`You can breathe WATER now? Can you breathe soup?`,`You can breathe water? Can you breathe soup?`),{d:'m_dive'});
+B('m_cst1',M3P_CT,()=>hasAbil('dive'),S(`You can breathe water now? Can you breathe soup?`,`You can breathe water? Can you breathe soup?`),{d:'m_dive'});
 B('m_cst2',M3P_CT,()=>hasAbil('burrow'),S(`I saw a sand mound with two little horns go past the market! Was that you?`,`A sand mound with horns went by! Was that you?`),{d:'m_burrow'});
 B('m_cst3',M3P_CT,()=>hasAbil('moonfire'),S(`Silver fire! Like the old songs! Do it again!`,`Silver fire! Like the old songs!`),{d:'m_moonfire'});
-B('m_cst4',M3P_CT,()=>!!(G.weapons&&G.weapons.glaive)&&G.weapon==='glaive',S(`Is that a piece of the MOON on a stick?`,`Is that a piece of the moon on a stick?`),{d:'wpn_glaive'});
+B('m_cst4',M3P_CT,()=>!!(G.weapons&&G.weapons.glaive)&&G.weapon==='glaive',S(`Is that a piece of the moon on a stick?`,`Is that a piece of the moon on a stick?`),{d:'wpn_glaive'});
 // two people talking (ACT4 6.14)
 VCH('m_ch1','id:m_dabble','id:m_winnie',ALWAYS,[[0,S(`Is it a good day, Winnie?`,`Is it a good day, Winnie?`)],[1,S(`Ollie says no.`,`Ollie says no.`)],[0,S(`Ollie always says no.`,`Ollie always says no.`)]]);
-VCH('m_ch2','id:m_rafi','id:m_kiln',ALWAYS,[[0,S(`Kiln, have you ever seen snow?`,`Kiln, have you seen snow?`)],[1,S(`I've MADE snow. Out of glass. It was sharp.`,`I made glass snow. It was sharp.`)]]);
+VCH('m_ch2','id:m_rafi','id:m_kiln',ALWAYS,[[0,S(`Kiln, have you ever seen snow?`,`Kiln, have you seen snow?`)],[1,S(`I've made snow. Out of glass. It was sharp.`,`I made glass snow. It was sharp.`)]]);
 VCH('m_ch3','id:wren','id:m_ripple',ALWAYS,[[0,S(`Your spelling is atrocious.`,`Your spelling is awful.`)],[1,S(`Your spelling is underwater.`,`Your spelling is underwater.`)],[0,S(`...Fair.`,`Fair.`)]]);
-VCH('m_ch4','id:ev_tikka','id:m_gilly',ALWAYS,[[0,S(`Bread is better than fish.`,`Bread is better than fish.`)],[1,S(`Fish IS bread. Wet bread.`,`Fish IS bread. Wet bread.`)],[0,S(`That's not... hm.`,`That's not... hm.`)]]);
+VCH('m_ch4','id:ev_tikka','id:m_gilly',ALWAYS,[[0,S(`Bread is better than fish.`,`Bread is better than fish.`)],[1,S(`Fish is bread. Wet bread.`,`Fish is bread. Wet bread.`)],[0,S(`That's not... hm.`,`That's not... hm.`)]]);
 VCH('m_ch5','id:m_rowan','id:m_dabble',ALWAYS,[[0,S(`Mayor, your raft's loose again.`,`Mayor, your raft is loose.`)],[1,S(`Is it? How exciting!`,`How exciting!`)],[0,S(`*ties a "sigh" knot*`,`*ties a sigh knot*`)]]);
 VCH('m_ch6','id:m_coralia','id:m_kipper',ALWAYS,[[1,S(`My queen! A crab has entered the hall!`,`My queen! A crab!`)],[0,S(`It lives here, Sir Kipper.`,`It lives here.`)],[1,S(`...Bravely noted.`,`Bravely noted.`)]]);
-VCH('m_ch7','id:m_rocket','id:m_kelp',ALWAYS,[[0,S(`Nana! I swam to the Spire and back!`,`I swam to the Spire and back!`)],[1,S(`Did you eat first, dearie?`,`Did you eat first?`)],[0,S(`...No.`,`No.`)],[1,S(`Kelp. Now.`,`Kelp. Now.`)]]);
+VCH('m_ch7','id:m_rocket','id:m_kelp',ALWAYS,[[0,S(`Nana! I swam to the Spire and back!`,`I swam to the Spire and back!`)],[1,S(`Did you eat first, sprat?`,`Did you eat first?`)],[0,S(`...No.`,`No.`)],[1,S(`Kelp. Now.`,`Kelp. Now.`)]]);
 VCH('m_ch8','id:m_esme','id:m_saffron',ALWAYS,[[0,S(`The lamps are drinking more oil every night.`,`The lamps drink more oil now.`)],[1,S(`The well is giving less light every night.`,`The well gives less light.`)],[0,S(`Then we'll be brighter.`,`Then we'll be brighter.`)],[1,S(`...Yes.`,`Yes.`)]]);
-VCH('m_ch9','id:m_squint','id:dell',ALWAYS,[[0,S(`Captain! Is your boat a pirate ship?`,`Is your boat a pirate ship?`)],[1,S(`It's a Biscuit. The Soggy Biscuit Three.`,`It's the Soggy Biscuit Three.`)],[0,S(`A pirate BISCUIT!`,`A pirate BISCUIT!`)]]);
+VCH('m_ch9','id:m_squint','id:dell',ALWAYS,[[0,S(`Captain! Is your boat a pirate ship?`,`Is your boat a pirate ship?`)],[1,S(`It's a Biscuit. The Soggy Biscuit Three.`,`It's the Soggy Biscuit Three.`)],[0,S(`A pirate biscuit!`,`A pirate biscuit!`)]]);
 VCH('m_ch10',M3P_SB,M3P_SB,m3pE2,[[0,S(`Did you see her drink the well?`,`Did you see her drink the well?`)],[1,S(`Like a cat with milk.`,`Like a cat with milk.`)],[0,S(`A very big cat.`,`A very big cat.`)]]);
-VCH('m_ch11',M3P_DW,M3P_DW,ALWAYS,[[0,S(`Where's the town today?`,`Where's the town today?`)],[1,S(`About here, I think.`,`About here.`)],[0,S(`Same as yesterday, then.`,`Same as yesterday.`)],[1,S(`No, yesterday it was about THERE.`,`No, it was THERE.`)]]);
+VCH('m_ch11',M3P_DW,M3P_DW,ALWAYS,[[0,S(`Where's the town today?`,`Where's the town today?`)],[1,S(`About here, I think.`,`About here.`)],[0,S(`Same as yesterday, then.`,`Same as yesterday.`)],[1,S(`No, yesterday it was about there.`,`No, it was there.`)]]);
 // greetings that react to what Ash did, in the east and before
 Object.assign(DGREET,{
-  m_eclipse1:[[M3P_CT,S(`The sun went out! In the MIDDLE of the DAY! And that shape across it... Ash, was that a MOTH?`,`The sun went out! Was that a MOTH?`)]],
+  m_eclipse1:[[M3P_CT,S(`The sun went out! In the middle of the day! And that shape across it... Ash, was that a moth?`,`The sun went out! Was that a moth?`)]],
   m_eclipse2:[[M3P_SB,S(`She drank our well. Like a bowl of milk. I'll never drink milk again.`,`She drank our well. I'll never drink milk again.`)]],
   m_puffdone:[[M3P_DW+'|'+M3P_CC,S(`You popped the Baron! The whole lagoon heard the PFFFFT!`,`You popped the Baron! We heard the PFFFT!`)]],
-  'm_puffdone@m_kipper':[['any',S(`A wet pony, he said! WHO is the wet pony NOW, Baron? ...Him. He's the wet one.`,`Who's the wet pony now, Baron? Him!`)]],
+  'm_puffdone@m_kipper':[['any',S(`A wet pony, he said! Who is the wet pony now, Baron? ...Him. He's the wet one.`,`Who's the wet pony now, Baron? Him!`)]],
   m_dive:[[M3P_CC,S(`You learned to Dive! Ember taught our priests that, long ago. Welcome to the water, small dragon.`,`You can dive! Ember taught our priests that.`)]],
   m_burrow:[[M3P_SB,S(`The worms taught you to dig? Rafi says that makes you half caravan, half worm. It's a compliment. Mostly.`,`You can dig like a worm! Half worm!`)]],
   m_moonfire:[[M3P_CT,S(`Moonfire! Silver fire! My grandmother sang about it. I didn't think it was real!`,`Moonfire! I didn't think it was real!`)]],
   'm_moonfire@m_coralia':[['any',S(`Moonfire. The girl with horns taught it to Lumen, and now a dragon brings it home to us. I'll have the old song sung tonight.`,`Moonfire comes home to us in a dragon. We will sing tonight.`)]],
-  wpn_glaive:[[M3P_SB,S(`Old Kiln made a GLAIVE? Out of the MOON? He made me a cup once. It melted.`,`Kiln made a glaive? He made me a cup once. It melted.`)]],
-  'wpn_glaive@m_kiln':[['any',S(`MY GLAIVE! In the hands of a DRAGON! I'll never top it. I'll try. With shoes.`,`MY GLAIVE! I'll never top it. I'll try. With shoes.`)]],
+  wpn_glaive:[[M3P_SB,S(`Old Kiln made a glaive? Out of the moon? He made me a cup once. It melted.`,`Kiln made a glaive? He made me a cup once. It melted.`)]],
+  'wpn_glaive@m_kiln':[['any',S(`MY GLAIVE! In the hands of a dragon! I'll never top it. I'll try. With shoes.`,`MY GLAIVE! I'll never top it. I'll try. With shoes.`)]],
   q_m_ferry:[[M3P_DW,S(`The ferry runs again! I took it to the Strand and back for no reason! Twice!`,`The ferry runs! I rode it twice for fun!`)]],
   q_m_moonfish:[[M3P_DW,S(`Gilly saw the Moonfish! She cried into the soup. The soup was improved.`,`Gilly saw the Moonfish! She cried into the soup.`)]],
   q_m_race:[[M3P_CC,S(`You beat Rocket! Nobody beats Rocket! Except Pickles, once, by cheating.`,`You beat Rocket! Nobody does that!`)]],
   q_m_noodle:[[M3P_SB,S(`You took the baby worm home! Dusty and Dune are telling everyone. They're also telling everyone they want another one.`,`You took Noodle home! The twins want another worm.`)]],
   q_m_lamps:[[M3P_SB,S(`Every lamp in Sable, lit again! It feels like the moon came home. A little bit.`,`Every lamp is lit! Like the moon came home.`)]],
-  q_m_leash:[[M3P_CC,S(`Elder Ripple says the old priests' book has been READ. By a dry person! He's been smiling for three days.`,`The old book was read! Ripple smiles all day.`)]],
+  q_m_leash:[[M3P_CC,S(`Elder Ripple says the old priests' book has been read. By a dry person! He's been smiling for three days.`,`The old book was read! Ripple smiles all day.`)]],
   'ch_c_vesper_friend':[[M3P_SB,S(`A girl in a moth mask stays on the tent roofs. She says she's "watching your back". We said, fine, but don't steal the dates.`,`A moth-mask girl watches your back. Don't steal dates!`)]],
   'ch_c_vesper_foe':[[M3P_DW,S(`A girl in a moth mask sailed past last month. She didn't wave. She didn't look happy. Do you know her?`,`A sad girl in a moth mask sailed past. Do you know her?`)]],
   'ch_f_glaciar_free':[[M3P_DW,S(`They say the ice dragon up north woke up kind this year, and a little dragon did it. Was that you?`,`The ice dragon woke up kind. Was that you?`)]],
@@ -933,10 +849,10 @@ Object.assign(DGREET,{
 Object.assign(DEED_PRI,{m_eclipse1:8,m_eclipse2:8,m_puffdone:7,m_dive:7,m_burrow:7,m_moonfire:7,wpn_glaive:5});
 
 // ---------- 10. shops and the inn (prices about 3.5 times Act I's, BALANCE.md 8)
-SHOPTALK.m_kelp=()=>runShop('m_kelp',S(`Pearls for your pockets, dearie, and tonic for your tummy.`,`Pearls and tonic, dearie!`),[
-  [S('Refill your healing draughts (kelp tonic, tastes of feet)','Refill your draughts'),20,()=>{ player.potions=player.potionsMax; setBanner(S('Draughts refilled','Draughts full'),S('Tastes of feet. Works, though.','Tastes of feet. It works!'),1.8); },()=>player.potions<player.potionsMax||S('Your flasks are already full, dearie.','Your flasks are full.')],
-  [S('A Pearl Lamp (a lantern for dark rooms)','A Pearl Lamp (a lantern)'),60,()=>{ G.items.lantern=1; setBanner(S('Pearl Lamp','Pearl Lamp'),S('It glows soft and silver. Dark rooms will be kinder now.','It glows. Dark rooms are kinder now.'),2.2); },()=>!G.items.lantern||S('You already have a lamp, dearie.','You have a lamp already.')],
-  [S('Air bubbles in a jar (fills your air once under water, automatically)','A jar of air bubbles'),40,()=>{ G.items.m_airjar=(G.items.m_airjar||0)+1; setBanner(S('A jar of air','A jar of air'),S('When your air runs low under water, you’ll open it.','It opens when your air runs low.'),2.4); },()=>(G.items.m_airjar||0)<2||S('Two jars is plenty, dearie. Three and you’d float.','Two jars is enough.')],
+SHOPTALK.m_kelp=()=>runShop('m_kelp',S(`Pearls for your pockets, sprat, and tonic for your tummy.`,`Pearls and tonic, sprat!`),[
+  [S('Refill your healing draughts (kelp tonic, tastes of feet)','Refill your draughts'),20,()=>{ player.potions=player.potionsMax; setBanner(S('Draughts refilled','Draughts full'),S('Tastes of feet. Works, though.','Tastes of feet. It works!'),1.8); },()=>player.potions<player.potionsMax||S('Your flasks are already full, sprat.','Your flasks are full.')],
+  [S('A Pearl Lamp (a lantern for dark rooms)','A Pearl Lamp (a lantern)'),60,()=>{ G.items.lantern=1; setBanner(S('Pearl Lamp','Pearl Lamp'),S('It glows soft and silver. Dark rooms will be kinder now.','It glows. Dark rooms are kinder now.'),2.2); },()=>!G.items.lantern||S('You already have a lamp, sprat.','You have a lamp already.')],
+  [S('Air bubbles in a jar (fills your air once under water, automatically)','A jar of air bubbles'),40,()=>{ G.items.m_airjar=(G.items.m_airjar||0)+1; setBanner(S('A jar of air','A jar of air'),S('When your air runs low under water, you’ll open it.','It opens when your air runs low.'),2.4); },()=>(G.items.m_airjar||0)<2||S('Two jars is plenty, sprat. Three and you’d float.','Two jars is enough.')],
   [S('A pearl for your pocket (it doesn’t do anything; it’s just lovely)','A pearl. Just lovely.'),5,()=>{ G.items.m_pearl=(G.items.m_pearl||0)+1; setBanner(S('A lovely pearl','A lovely pearl'),S('It does nothing at all. It’s lovely.','It does nothing. It’s lovely.'),2); }]
 ]);
 ITEM_NAMES.m_airjar=S('A jar of air bubbles','A jar of air'); ITEM_NAMES.m_pearl=S('A lovely pearl','A lovely pearl');
@@ -959,7 +875,8 @@ const M3P_INN={
   const o=base(id,n); if(!n||!G||G.mode!=='story') return o;
   try{
     if(M3P_INN[id]&&!m3pGillyOut()) o.unshift({t:S('A bed, or something to eat?','A bed, or food?'),tag:'shop',fn:()=>M3P_INN[id](),end:true});
-    if(id==='m_dusty'&&m3pQ('m_noodle')&&!G.flags.m_noodle_told) o.push({t:S('Noodle is home with his mom.','Noodle is home with his mom.'),tag:'quest',fn:()=>{ G.flags.m_noodle_told=1; addCoins(40,player.x,player.y); },then:[m3pL('m_dusty',`Dusty: We'll miss him! Dune: We won't miss our shoes! Dusty: Here, for taking him home. Dune: It's our shoe money.`,`We'll miss him! Not our shoes! Here, shoe money.`)],back:true});
+    // (v11 J11b: the twins' thank-you for Noodle, with its 40 coins, is their talk line in act4/people.js; the old menu row
+    // here paid the same 40 coins a second time, so it is gone)
     if(id==='m_squint'&&m3pAt('m_lighthouse',0)&&!G.items.m_sandwich) o.push({t:S('Can I have the sandwich for your grandpa?','The sandwich for Ned?'),tag:'quest',fn:()=>giveItems({m_sandwich:1}),then:[m3pL('m_squint',`Here. It's fish. Everything is fish.`,`Here. It's fish.`)],back:true});
     if(id==='m_rowan'&&m3pAt('m_ferry',1)) o.push({t:S('How do the ferry posts work?','How do the posts work?'),tag:'quest',then:[m3pL('m_rowan',`Each post on the sandbars is crooked. Jump and slam it down straight, like a mallet. Then fling the line across with that tail of yours. Post one, post two, post three, then the Gate.`,`Jump and slam each post down. Then throw the line with your tail.`)],back:true});
     if(id==='m_esme'&&m3pAt('m_lamps',0)) o.push({t:S('Where are the lamps that are hard to reach?','Where are the hard lamps?'),tag:'quest',then:[m3pL('m_esme',`Dot and Dash are up on tall poles by the market: a long, hot flame reaches them, or fly past. Muffin and Barnaby blew over in the eclipse wind and got buried. Look where the sand sparkles. Lady Wellington is on the well's islet. Coco is up the tallest palm. And Little Sun is inside Rafi's tent.`,`Two are on tall poles. Two are buried where sand sparkles. One is on the well island. One is up a palm. One is in Rafi's tent.`)],back:true});
@@ -987,7 +904,7 @@ function m3pDataTalk(id){
 function m3pTalkOnce(key,lines,then){ if(G.seenTalk&&G.seenTalk[key]) return false; G.seenTalk=G.seenTalk||{}; G.seenTalk[key]=1; m3pSay(lines,then); return true; }
 const M3P_DELL1=[m3pL('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
   m3pL('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),m3pL('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
-  m3pL('dell',`Oh, and my cousin Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went SPLASH." That's it. That's the whole poem.`,`Wendel wrote a poem: "A dragon called Ash watched the moon go SPLASH." That's all.`)];
+  m3pL('dell',`Oh, and my cousin Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went splash." That's it. That's the whole poem.`,`Wendel wrote a poem: "A dragon called Ash watched the moon go splash." That's all.`)];
 const M3P_WREN=[m3pL('wren',`Ash! Look at me. Outside. On a raft. In the SEA. I've been sick four times and I've never been happier.`,`Ash! I'm outside! On a raft! I was sick four times. I'm so happy!`),
   m3pL('wren',`Elder Ripple of the merfolk keeps Old Lumen's records. I can read Lumen writing, you know. Badly. Very badly. Better than anyone else up here, which is nobody.`,`I can read Lumen writing. Badly. Better than anyone up here.`),
   m3pL('wren',`If you find anything with writing on it down there, bring it to me. Even if it's soggy. Especially if it's soggy.`,`Find anything with writing? Bring it. Even soggy. Especially soggy.`)];
@@ -1005,6 +922,9 @@ onTalk(n=>{
   if(id==='maren'&&m3pPierAll()&&G.items.m_stariron&&!G.flags.m_stariron_done&&m3pDataTalk(id)){ m3pSay([m3pStarIron()]); return true; }
   if(id==='juniper'&&m3pAct()===4&&m3pR('m_sable')&&!(m3pR('n_bridge')&&stageAt('n_bridge')>=0)) return m3pJuniper(n);
   if(id==='ev_tikka'&&G.flags.tk_come==='yes'&&!G.flags.m_tk_bun&&m3pDataTalk(id)){ G.flags.m_tk_bun=1; m3pSay([m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)],()=>giveItems({c_lumpybun:1})); return true; }
+  // (v11 J11b) Wren's first talk in Driftwood stays this hook's, ahead of the data's talk for her: it is her promise of
+  // a book (q_m_leash), and saves already mark it heard here (G.seenTalk.m3p_wren)
+  if(id==='wren'&&m3pIV()&&m3pBoatIn()&&!(G.seenTalk&&G.seenTalk.m3p_wren)&&m3pTalkOnce('m3p_wren',(typeof storyOwns==='function'&&storyOwns('scene','m_wren')&&Array.isArray(STORY.m_wren)?STORY.m_wren:M3P_WREN).slice())) return true;
   if(m3pDataTalk(id)) return false;
   // before the voyage: Dell at Gearhaven's Far Pier
   if(id==='dell'&&!G.flags.m_landed&&m3pR('m_sail')){
@@ -1019,7 +939,7 @@ onTalk(n=>{
     if(!(typeof CROSSINGS!=='undefined'&&CROSSINGS.m_glaciar_back)&&G.flags.m_landed) L.push(ch('f_glaciar',S('Shall we fly north, dumpling?','Fly north?'),[{t:S('Fly me back to Hearthold','Fly to Hearthold'),fn:()=>later(0.2,()=>mapTravel(6850,49100,{banner:S('Hearthold','Hearthold')}))},{t:S('Not yet, Auntie','Not yet'),then:[m3pL('f_glaciar',`Then I'll nap. Shout if you need me. Loudly. I'm a little deaf on the left.`,`Then I'll nap. Shout loudly!`)]}]));
     m3pSay(L); return true; }
   if(id==='dell'&&m3pIV()&&G.flags.m_landed){
-    if(m3pPier()){ m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three, moored at the end of the world. I've never been so far from a lake.`,`Your mom climbed a staircase made of MOONLIGHT. I stayed with the sandwiches. Somebody had to.`,`When you come down off that mountain, I'll be right here. The kettle's on. It's always on.`]),`I'll wait here at the pier for you.`)]); return true; }
+    if(m3pPier()){ m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three, moored at the end of the world. I've never been so far from a lake.`,`Your mom climbed a staircase made of moonlight. I stayed with the sandwiches. Somebody had to.`,`When you come down off that mountain, I'll be right here. The kettle's on. It's always on.`]),`I'll wait here at the pier for you.`)]); return true; }
     if(!G.seenTalk.m3p_dell1&&m3pR('m_drift')){ G.seenTalk.m3p_dell1=1; m3pSay(M3P_DELL1.slice()); return true; }
     m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three! Steam paddle, brass whistle, and a captain who has never once sunk her. It's been eleven days now.`,`Three days east and I still haven't sunk! Old Sal won't believe it.`,`Mags says the engine makes that noise on purpose. I've decided to believe her.`]),`My boat still floats! Eleven days!`),
       m3pL('dell',`If you want to sail home to Gearhaven, the boat's at the end of the dock. Just say.`,`Want to sail home? The boat's at the dock.`)]); return true; }
@@ -1030,7 +950,7 @@ onTalk(n=>{
     m3pSay([m3pL('wren',pick([`The raft keeps moving. My books keep moving. I keep reading. It's like a library that dances.`,`The merfolk keep Lumen's old books, Ash. Lumen's priests wrote about moths. Lots about moths.`]),`My books float! Lumen's priests wrote about moths.`)]); return true; }
   if(id==='f_mags'&&m3pIV()){
     if(!G.seenTalk.m3p_mags){ G.seenTalk.m3p_mags=1; m3pSay([m3pL('f_mags',`I've got a workbench on the dock now, to sell bombs to pirates. Crab pirates. They pay in shells, so it's going badly.`,`I sell bombs to crab pirates. They pay in shells!`)]); return true; }
-    m3pSay([m3pL('f_mags',pick([`Do bombs work underwater? I'm going to find out. For SCIENCE.`,`The engine's FINE. That noise is a feature.`,`If it explodes, it's science. If it explodes twice, it's a lot of science.`]),`If it explodes, it's science!`)]); return true; }
+    m3pSay([m3pL('f_mags',pick([`Do bombs work underwater? I'm going to find out. For science.`,`The engine's fine. That noise is a feature.`,`If it explodes, it's science. If it explodes twice, it's a lot of science.`]),`If it explodes, it's science!`)]); return true; }
   if(id==='ev_tikka'&&m3pIV()&&G.flags.tk_come==='yes'){
     const bun=!G.flags.m_tk_bun; G.flags.m_tk_bun=1;
     m3pSay([m3pL('ev_tikka',m3pPier()?pick([`I made a bun for the mountain. It's lumpy. Lumpy means love. The mountain doesn't deserve it.`,`Captain Dell let me steer once. We went in a circle. A very brave circle.`]):pick([`Lumpy buns! Gilly says they need fish. They do NOT need fish.`,`I carried bread all the way across the sea. To somewhere important! This is the most important place I've ever been.`]),`Lumpy buns! Lumpy means love!`)].concat(bun?[m3pN(`Tikka presses a warm lumpy bun into your claws. It will heal you when you're badly hurt.`,`Tikka gives you a lumpy bun. It heals you when you're hurt.`)]:[]),()=>{ if(bun) giveItems({c_lumpybun:1}); }); return true; }
@@ -1038,7 +958,7 @@ onTalk(n=>{
     const L=[m3pL('maren',pick([`Mountains are hungry work. I packed you a sandwich. It got squashed on the stairs. It's still a sandwich.`,`I mended the Heart. You'll mend the rest. That's how it works in our family: somebody hits it, and somebody breathes.`,`I'm going to stand right here and watch that bridge until you come back down it. Don't argue. You can't. I'm your mother.`]),`Take a sandwich. I'll wait right here.`)];
     if(G.items.m_stariron&&!G.flags.m_stariron_done) L.push(m3pStarIron());
     m3pSay(L); return true; }
-  if(id==='quill'&&m3pPierAll()){ m3pSay([m3pL('quill',pick([`My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have LOVED this. A mountain! Out of the SEA! I'd have hated to tell him the moon is gone.`,`I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.`,`Every time I look through the telescope, the black glass seems to look back at me. I keep looking anyway.`]),`I measured the mountain. It's getting taller!`)]); return true; }
+  if(id==='quill'&&m3pPierAll()){ m3pSay([m3pL('quill',pick([`My old teacher, Professor Lumley, was the Observatory's last astronomer. He'd have loved this. A mountain! Out of the sea! I'd have hated to tell him the moon is gone.`,`I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.`,`Every time I look through the telescope, the black glass seems to look back at me. I keep looking anyway.`]),`I measured the mountain. It's getting taller!`)]); return true; }
   if(id==='juniper'&&m3pIV()&&m3pR('m_sable')) return m3pJuniper(n);
   if(id==='c_vesper'&&m3pIV()&&m3pVesperOn()){
     if(m3pPierAll()){ m3pSay([m3pL('c_vesper',pick([`Not alone, cousin. I said it. I meant it. Don't make it weird.`,`I stole a hat from a moth knight on the way down. It doesn't fit. I'm keeping it.`]),`Not alone, cousin.`)]); return true; }
@@ -1057,9 +977,9 @@ function m3pStarIron(){
 const M3P_DUN=[['m_lumen',S('Drowned Lumen','Drowned Lumen')],['m_burrows',S('the Sandworm Burrows','the Sandworm Burrows')],['m_mirror',S('the Mirror Temple','the Mirror Temple')],['m_obs',S('the Eclipse Observatory','the Eclipse Observatory')]];
 function m3pMapKey(id){ const D=typeof DUNGEONS!=='undefined'&&DUNGEONS[id]; return 'dmap_'+((D&&D.save)||id); }
 function m3pJuniper(n){
-  if(m3pR('n_bridge')&&stageAt('n_bridge')>=0){ m3pSay([m3pL('juniper',`I saw it from Sable! A MOUNTAIN! I came under the Glasswall on my belly to get here. I'm drawing it through the Professor's telescope, but it won't hold still.`,`I saw the mountain from Sable! It won't hold still.`)]); return true; }
+  if(m3pR('n_bridge')&&stageAt('n_bridge')>=0){ m3pSay([m3pL('juniper',`I saw it from Sable! A mountain! I came under the Glasswall on my belly to get here. I'm drawing it through the Professor's telescope, but it won't hold still.`,`I saw the mountain from Sable! It won't hold still.`)]); return true; }
   const first=!G.flags.m3p_jun; G.flags.m3p_jun=1;
-  const L=[]; if(first) L.push(m3pL('juniper',`Ash! I heard about a desert made of GLASS. I had to come. I've opened a Map Tent. Rook says hi. Rook says bring him a sand worm. I said no.`,`Ash! A glass desert! I opened a Map Tent. Rook says hi.`));
+  const L=[]; if(first) L.push(m3pL('juniper',`Ash! I heard about a desert made of glass. I had to come. I've opened a Map Tent. Rook says hi. Rook says bring him a sand worm. I said no.`,`Ash! A glass desert! I opened a Map Tent. Rook says hi.`));
   const opts=[];
   for(const [id,nm] of M3P_DUN){ const key=m3pMapKey(id), have=!!G.found[key];
     if(id==='m_obs'){ if(!have) opts.push({t:S(`The map of ${nm} (free)`,`${nm} map (free)`),fn:()=>{ G.found[key]=true; setBanner(S('Juniper’s map','Juniper’s map'),S('Every room of the Observatory shows on your map.','The Observatory map!'),2.6); },then:[m3pL('juniper',`Nobody should go in THERE without a map.`,`Nobody should go in there without a map.`)]}); continue; }
@@ -1139,7 +1059,7 @@ const M3P_Q={
       {t:'flag',flag:'m_race_won',npc:'m_rocket',mini:'m_swimrace',text:S('Race Rocket around the reef (talk to Rocket to start)','Race Rocket round the reef. Talk to him to start.'),
         ready:[m3pL('m_rocket',`Ten rings! Round the reef, out through the mangroves and back! Rings count! Miss one and it doesn't count!`,`Ten rings! Miss one and it doesn't count!`),m3pL('m_rocket',`Ready? We start outside, at the ring!`,`Ready? We start outside!`)]},
       {t:'talk',npc:'m_kelp',text:S('Learn the Dolphin Kick from Nana Kelp','Learn the Dolphin Kick from Nana Kelp'),lines:[m3pL('m_rocket',`(from the Racing Reef) You beat me! Nobody beats me! Except Pickles. Pickles is a squid.`,`You beat me! Nobody beats me! Except Pickles.`),
-        m3pL('m_kelp',`The Dolphin Kick, dearie. Kick with your tail, like this. No, your OTHER tail. You only have one tail. That one.`,`The Dolphin Kick, dearie. Kick with your tail. Your only tail.`)],reward:{xp:350,fn:'m_dolphin'}}]},
+        m3pL('m_kelp',`The Dolphin Kick, sprat. Kick with your tail, like this. No, your other tail. You only have one tail. That one.`,`The Dolphin Kick, sprat. Kick with your tail. Your only tail.`)],reward:{xp:350,fn:'m_dolphin'}}]},
   m_ferry:{title:S('The Raft Ferry','The Raft Ferry'),giver:'m_rowan',min:'m_reef',
     offer:[m3pL('m_rowan',`This is a "help me" knot. I don't tie it often.`,`This is my "help me" knot. I don't tie it often.`),
       m3pL('m_rowan',`The Crab Pirates cut every one of my ferry lines. With the lines up, my ferry runs from here to the Strand in one go, through the Sunken Gate. The Baron's out of the gate now. But his crab crew is still about. Two forts, on the reef isles.`,`Crab Pirates cut my ferry lines. Two crab forts are on the reef isles. Clear them, and fix my lines.`)],
@@ -1395,7 +1315,7 @@ const M3P_FERRY={dw:{x:2900,y:64800,n:S('Driftwood Landing','Driftwood Landing')
 function m3pFerryPrompt(){ if(!m3pQ('m_ferry')) return null; if(typeof CROSSINGS!=='undefined'&&CROSSINGS.m_ferry_dw) return null; return S('Take Rowan’s raft ferry','Take Rowan’s raft ferry'); }
 function m3pFerryMenu(from){
   const opts=[]; for(const k of ['dw','pc','st']) if(k!==from){ const P=M3P_FERRY[k]; opts.push({t:S(`Ferry to ${P.n}`,`Go to ${P.n}`),fn:()=>later(0.2,()=>{ if(typeof mapTravel==='function') mapTravel(P.x,P.y,{banner:P.n}); else { player.x=P.x; player.y=P.y; } })}); }
-  opts.push({t:S('Not now','Not now'),then:[m3pN(`The ferry raft bobs, patient as a duck.`,`The raft bobs. It waits.`)]});
+  opts.push({t:S('Not now','Not now'),then:[m3pN(`The ferry raft bobs on its line, waiting.`,`The raft bobs. It waits.`)]});
   m3pSay([ch('narr',S('Rowan’s raft ferry. Where to? (Mind the chickens.)','Where to? Mind the chickens!'),opts)]);
 }
 // Tide Bombs: while Mags's prototypes are in the bag, and for good after the quest, a bomb in water sticks and goes off
@@ -1474,7 +1394,7 @@ function m3pSentTick(dt){
     if(Math.abs(angDiff(st.a,angTo(s.x,s.y,p.x,p.y)))<half){
       st.cd=2.5; const had=!!G.flags['m_smoke'+s.i]; delete G.flags['m_smoke'+s.i];
       const a=angTo(s.x,s.y,p.x,p.y); p.kvx+=Math.cos(a)*420; p.kvy+=Math.sin(a)*420;
-      bubble({x:s.x,y:s.y-30},pick([S('HALT! Who goes there?','HALT!'),S('A DRAGON? Begone!','Begone, dragon!'),S('Intruder! Shoo!','Shoo!')]),{who:S('Moth Knight','Moth Knight'),col:'#b8a8e8',dy:-30});
+      bubble({x:s.x,y:s.y-30},pick([S('Stop! Who goes there?','Stop!'),S('A dragon? Begone!','Begone, dragon!'),S('Intruder! Shoo!','Shoo!')]),{who:S('Moth Knight','Moth Knight'),col:'#b8a8e8',dy:-30});
       SFX.play('warn'); if(had) setBanner(S('Seen! He found the smoke bomb.','Seen! He found the bomb.'),S('Light his lamp to make him look away, then try again.','Light his lamp. Then try again.'),2.6);
     }
   }
@@ -1982,7 +1902,7 @@ const M3P_EPI=[
 ];
 function m3pEpiPush(){ if(M3P.epi) return; try{ if(typeof EPI!=='undefined'&&EPI){ EPI.m=EPI.m||[]; for(const e of M3P_EPI) EPI.m.push(e); M3P.epi=true; } }catch(e){} }
 m3pEpiPush();
-if(typeof DREAM_TALK!=='undefined'){ DREAM_TALK.m_moth=Object.assign(DREAM_TALK.m_moth||{},{m_winnie:S(`You dreamed of a little gray moth on a lantern? Oh, child. The tide dreams of the moon too. We all dream of what we're pulled by.`,`You dreamed of a little moth? We all dream of what pulls us.`)});
+if(typeof DREAM_TALK!=='undefined'){ DREAM_TALK.m_moth=Object.assign(DREAM_TALK.m_moth||{},{m_winnie:S(`You dreamed of a little grey moth on a lantern? Ollie dreams of crabs, I think. His arms twitch. Sit down and tell me the rest of yours.`,`A little grey moth on a lantern? Sit. Tell me the rest.`)});
   DREAM_TALK.m_eclipse=Object.assign(DREAM_TALK.m_eclipse||{},{m_esme:S(`A dream of a lantern and a moth? Moths dream of lamps, I think. And lamps, if they dream, dream of somebody coming home.`,`Lamps dream of somebody coming home.`)}); }
 
 // ---------- 18. debug hooks for tests (window.__ebX.m3p, also __eb.m3p)
