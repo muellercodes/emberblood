@@ -130,7 +130,8 @@ function storyBossDone(){
     if(site.boss==='morrow'){ if(!G.items.oath_letter) giveItems({oath_letter:1},true); G.flags.clue_letter=true; G.flags.gateHint=true; questPoke(); if(G.choices.morrow==='jail') setupNPCs(); }
     G.pendingBless++;
     if(k==='warcamp'){ setStage('wren',['Chapter 3','The Lorekeeper']); }
-    else if(k==='gate'){ G.flags.gate=true; GATE_COL.off=true; setStage('summit',['Final Chapter','The First Flame']); shake(8); SFX.play('boom'); later(3.2,()=>setBanner('The Obsidian Gate is open','The road to the summit is clear.',2.6)); }
+    else if(k==='gate'){ G.flags.gate=true; GATE_COL.off=true; setStage('summit',['Final Chapter','The First Flame']); if(!G.quests.a1_lanterns) G.flags.a1_lan_due=1;   // Mom comes with her three lanterns (x0_vorlaxis)
+      shake(8); SFX.play('boom'); later(3.2,()=>setBanner('The Obsidian Gate is open','The road to the summit is clear.',2.6)); }
     else if(site.ward){ G.wardReady[site.ward]=true; later(0.4,()=>setBanner('The Ward is cold',`Breathe fire on ${WARD_NAME[site.ward]} to relight it.`,3)); }
     if(k==='warcamp'||k==='gate') questUpdated();
     saveGame(); later(1.2,offerPending);

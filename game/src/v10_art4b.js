@@ -52,28 +52,30 @@
 
   // ---------- Nyxara perched on the Moon Well tower (shown during the second eclipse when the engine has no `fx` hook
   // for x3_story's own eclipse pictures; see CHANGES.md). The anchor is the tower's base; she sits on top of it, wings
-  // half open, white painted eyes on them, her long curled tongue reaching down to the basin.
+  // half open, grey and soft as dust, a pale moon painted on each one (v11), her long curled tongue reaching down to the basin.
   has && defineLook('m4_nyx_perch', { w: 360, h: 420, anim: true, draw(g, x, y, t, state) {
     const br = Math.sin(t * 1.3) * 0.06, top = y - 236;
     g.save();
-    glow(g, x, top - 30, 170, '60,30,110', 0.35);
+    glow(g, x, top - 30, 170, '96,86,150', 0.35);
     for (const sx of [-1, 1]) {
       g.save(); g.translate(x, top - 34); g.scale(sx, 1); g.rotate(-0.15 - br);
       // upper wing
       g.beginPath(); g.moveTo(0, 0); g.bezierCurveTo(40, -96, 150, -112, 168, -40); g.bezierCurveTo(150, 4, 76, 18, 0, 10); g.closePath();
-      g.fillStyle = '#2c2142'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#120c1e'; g.stroke();
-      g.fillStyle = 'rgba(120,90,180,.35)'; g.beginPath(); g.moveTo(10, -6); g.bezierCurveTo(50, -70, 120, -84, 140, -42); g.bezierCurveTo(110, -20, 60, -6, 10, -6); g.fill();
-      // the painted eye
-      el(g, 96, -46, 20, 15, -0.2, '#f2f0ff', 2); el(g, 98, -46, 9, 9, 0, '#1a1030'); ci(g, 101, -49, 3, '#ffffff');
+      g.fillStyle = '#787282'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#120c1e'; g.stroke();
+      g.fillStyle = 'rgba(214,210,228,.3)'; g.beginPath(); g.moveTo(10, -6); g.bezierCurveTo(50, -70, 120, -84, 140, -42); g.bezierCurveTo(110, -20, 60, -6, 10, -6); g.fill();
+      // the painted moon: pale, with a crescent of shadow and two little craters
+      glow(g, 96, -46, 34, '236,234,255', 0.3); ci(g, 96, -46, 17, '#f2f0f7', 2);
+      g.save(); g.beginPath(); g.arc(96, -46, 16, 0, T2); g.clip(); ci(g, 88, -42, 15, '#b2aec6'); ci(g, 98, -47, 13.5, '#f2f0f7'); g.restore();
+      ci(g, 101, -50, 2.6, 'rgba(176,170,196,.7)'); ci(g, 96, -40, 1.8, 'rgba(176,170,196,.7)');
       // lower wing
       g.beginPath(); g.moveTo(0, 6); g.bezierCurveTo(50, 20, 116, 40, 96, 92); g.bezierCurveTo(70, 108, 26, 70, 0, 30); g.closePath();
-      g.fillStyle = '#3a2c56'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#120c1e'; g.stroke();
-      ci(g, 62, 54, 7, 'rgba(200,190,255,.7)');
+      g.fillStyle = '#6a6476'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#120c1e'; g.stroke();
+      ci(g, 62, 54, 7, 'rgba(236,232,244,.7)');
       g.restore();
     }
     // body, head, antennae, the tongue curling down to the water
-    el(g, x, top - 20, 18, 46, 0, '#241a38', 3);
-    ci(g, x, top - 70, 17, '#2c2142', 3);
+    el(g, x, top - 20, 18, 46, 0, '#625c6e', 3);
+    ci(g, x, top - 70, 17, '#6a6476', 3);
     ci(g, x - 6, top - 72, 4, '#e8e4ff'); ci(g, x + 6, top - 72, 4, '#e8e4ff');
     line(g, [[x - 6, top - 84], [x - 30, top - 120], [x - 52, top - 112]], '#120c1e', 3);
     line(g, [[x + 6, top - 84], [x + 30, top - 120], [x + 52, top - 112]], '#120c1e', 3);

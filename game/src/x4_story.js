@@ -154,240 +154,61 @@ for(const k in N4S_PORT) if(!EVPORT[k]) EVPORT[k]=N4S_PORT[k];
   b.classList.toggle('n4echo',/^n_echo_/.test(String(w))); b.classList.toggle('n4mem',w==='n_memory'); if(w==='n_memory') b.classList.add('narr'); }catch(e){} }; }
 
 // ---------- 2. the scenes (bible/FINALE.md 5 to 12). Every one is STORY.<key>, built when played.
+// v11: the Act V data (game/story/act5/*.js) has a scene of the same id for every key below but n_panes_all, and e10's
+// s10StoryKeys puts it in place at boot through the getter's setter (N4S_OVR), so these bodies were never played: they
+// are ()=>[] now. The keys stay: the getters, the once-only marks and x4_ascent's n4aStScene read them.
 // 5.0 the departure: the Moonfall end of the moonfire bridge, the first time Ash takes it (before the fade)
-n4sDef('n_depart',()=>{
-  const mom=n4sMom();
-  return [
-    n4sDo(()=>{ N4ST.cam={x:13760,y:65430,k:0.55}; }),
-    xl('narr',`The moonfire bridge hums at the edge of the world. It's made of silver flame, and it goes on and on into the dark.`,`The bridge is made of silver fire. It goes far into the dark.`),
-    xl('quill',`I measured the moon tonight. There is none left to measure. I have never been so upset about a number.`,`I tried to measure the moon. There is none left!`),
-    xl('quill',`The moon has watched every night that ever happened, Ash. If she ate it, she ate all of that too. Every memory.`,`The moon saw every night. She ate its memories too.`),
-    xl('juniper',`Here. I drew the peak through the Professor's telescope. It's a spiral. Four rings, one on top of the other, all the way up.`,`I drew the mountain for you. Four rings, going up and up.`),
-    n4sDo(()=>{ if(!(G.items.n_map>0)) giveItems({n_map:1}); }),
-    xl('ash',`Four rings. One for each place I've been.`,`Four rings. One for each place I went.`),
-    xl('juniper',`That's what I thought too. Creepy, right? Also cool. Mostly creepy.`,`Creepy, right? A bit cool too.`),
-    ...n4sIfL(G.flags.m_ship!=='glaciar',xl('dell',`I'll keep the boat right here at the foot of the bridge. Engine warm. Lantern lit. Fish... not biting. Never mind the fish.`,`I will wait here with the boat.`)),
-    ...(mom?[
-      xl('maren',`Come here.`,`Come here.`),
-      xl('narr',`Mom hugs you so hard your horns creak.`,`Mom gives you a big, big hug.`),
-      xl('maren',`I made the Heart whole again. You bring it home again. Deal?`,`I fixed the Heart. You bring it home. Deal?`),
-      xl('ash',`Deal.`,`Deal.`),
-      xl('maren',`And eat something. There's a sandwich in your satchel. It's a little squashed. It's been through a lot. Like you.`,`And eat something. There is a sandwich in your bag.`)
-    ]:[
-      xl('narr',`Flap, flap. Pebble lands on your horn with a folded note in her beak, and takes a coin for it.`,`Pebble lands on your horn with a note. She takes a coin.`),
-      n4sDo(()=>{ G.coins=Math.max(0,(G.coins|0)-1); }),
-      xl('maren',`(the note) Your mother says: I made the Heart whole again. You bring it home again. Deal?`,`(the note) I fixed the Heart. You bring it home. Deal?`),
-      xl('ash',`Deal.`,`Deal.`),
-      xl('maren',`(the note) And eat something. There's a sandwich in your satchel. It's a little squashed. It's been through a lot. Like you. Love, Mom.`,`(the note) Eat something. There is a sandwich in your bag. Love, Mom.`)
-    ]),
-    ...n4sIfL(()=>G.flags.pip,
-      xl('pip',`Mip.`,`Mip.`),
-      xl('narr',`Pip climbs onto your shoulder. Pip is far too big for your shoulder now. Pip does not care.`,`Pip climbs on your shoulder. Pip is too big now. Pip does not care.`))
-  ];
-});
+n4sDef('n_depart',()=>[]);
 // 5.0 the arrival (the first three lines are bubbles while Ash walks north on the deck; the box for the rest)
 n4sBubDef('arr1','narr',`Behind you, the bridge flickers. Ahead, a mountain of black glass rises out of a sea of ink.`,`A black glass mountain rises out of a black sea.`);
 n4sBubDef('arr2','narr',`Nothing moves. No birds. No wind in any trees. Just a broken moon over the peak, like a cracked plate.`,`Nothing moves. The broken moon hangs over the top.`);
 n4sBubDef('arr3','ash',`Hello? ...Okay. Nobody. Great. Love that.`,`Hello? ...Nobody. Great.`);
-n4sDef('n_arrive',()=>[
-  xl('nyxara',`Come up, little ember. Bring your heart.`,`Come up, little ember. Bring your heart.`),
-  xl('ash',`She says "little ember" just like Grandpa used to. I REALLY wish she would stop.`,`She talks like Grandpa did. I wish she would stop.`),
-  ...n4sIfL(()=>G.flags.pip,xl('pip',`Mip!`,`Mip!`))
-]);
-n4sDef('n_green',()=>[
-  n4sDo(()=>{ N4ST.cam={x:4500,y:89660,k:0.6}; }),
-  xl('narr',`At the foot of the peak there is a little green with three lantern posts. All black glass. All dark.`,`There is a little green with three dark lanterns.`),
-  xl('ash',`That's... that's OUR green. From home. She copied it.`,`That is our green from home! She copied it.`),
-  xl('ash',`She built a mountain out of the moon's memories. My memories. Okay. That's the creepiest thing anyone has ever done.`,`She made a mountain from my memories. So creepy.`),
-  xl('ash',`Three lanterns. A gentle breath, Ash. Gentle.`,`Three lanterns. Breathe gently.`)
-]);
-n4sBubDef('lanterns','ash',`Three lanterns, and not one bakery on fire. Mom would be proud.`,`Not one bakery burned!`);
-n4sDef('n_gate_open',()=>[
-  n4sDo(()=>{ N4ST.cam={x:4500,y:89400,k:0.5}; }),
-  xl('narr',`The third lantern catches. For one moment the whole green glows warm, like home on Lantern Day.`,`The lanterns glow. It feels like home for a moment.`),
-  xl('narr',`Then the shadow gate melts away, and a whisper comes down the mountain, soft as a moth's wing.`,`The dark gate melts. A whisper comes down the mountain.`),
-  xl('nyxara',`Shhh. Such pretty lanterns. Light as many as you like, little ember. Up here, they all go out.`,`Pretty lanterns. Up here, they all go out.`),
-  xl('ash',`Not if I keep lighting them.`,`Not if I keep lighting them.`),
-  ...(n4sGrey()?[
-    n4sDo(()=>{ n4sAllyArrive('greymane'); try{ SFX.play('howl'); }catch(e){} }),
-    xl('narr',`A howl rolls up out of the dark. Long, and loud, and very, very familiar.`,`A howl! You know that howl.`),
-    xl('narr',`Greymane bounds out of the ink, shakes himself off, and soaks you completely.`,`Greymane jumps out of the sea and shakes water all over you.`),
-    xl('ash',`GREYMANE! How did you even get here?`,`Greymane! How did you get here?`),
-    xl('narr',`Greymane looks at the sea. Greymane looks at you. Greymane is clearly not going to tell you.`,`Greymane looks at the sea. He will not say.`),
-    xl('ash',`You SWAM? ...You know what? I'm just happy you're here.`,`You swam?! I'm so happy you came.`)
-  ]:G.choices.greymane==='home'?[
-    xl('narr',`Far, far away, across the dark water, a wolf howls. Not close enough to help. Close enough to hear.`,`Far away, a wolf howls. You are not alone.`)
-  ]:[])
-]);
+n4sDef('n_arrive',()=>[]);
+n4sDef('n_green',()=>[]);
+n4sBubDef('lanterns','ash',`Three lanterns. Like the ones on the mountain, for Mom.`,`Three lanterns. Like for Mom.`);
+n4sDef('n_gate_open',()=>[]);
 // 5.1 Tier I, the Ember Stair
 n4sBubDef('sluice','ash',`Walking won't beat that. But a skim might.`,`Walking is too slow. Try skimming!`);
-n4sDef('n_trials',()=>[
-  xl('ember',`Oh, she copied my Trials too? That is just RUDE.`,`She copied my Trials? So rude!`),
-  xl('ash',`Grandma Ember? You're here?`,`Grandma Ember? You are here?`),
-  xl('ember',`A little bit. The moon remembers me, so I'm in her mountain. Like a song stuck in your head. And it's just Ember, please.`,`A little bit. The moon remembers me. Just call me Ember.`),
-  xl('ember',`Three courts, three flames. Leap, Tide and Sky. You've done them all before. Do them faster. With style.`,`Three flames: Leap, Tide and Sky. You can do it!`)
-]);
-n4sDef('n_flame_leap',()=>[xl('ember',`The Leap! You still jump like you mean it.`,`The Leap! Great jumping!`)]);
-n4sDef('n_flame_tide',()=>[xl('ember',`The Tide! Water never stood a chance.`,`The Tide! The water can't stop you.`)]);
-n4sDef('n_flame_sky',()=>[xl('ember',`The Sky! Every time you fly, I feel it in my wings. Well. My ghost wings.`,`The Sky! I feel it when you fly.`)]);
-n4sDef('n_trials_done',()=>[
-  xl('ember',`That's all three. Up ahead, there's a shadow sitting on a throne. Don't be fooled. It's only a memory.`,`All three! Up ahead is a shadow on a throne. It is only a memory.`),
-  xl('ember',`Memories can't hurt you. ...These ones can, a bit. Be careful, little ember.`,`Memories can't hurt you. Well. These can. Be careful!`)
-]);
+n4sDef('n_trials',()=>[]);
+n4sDef('n_flame_leap',()=>[]);
+n4sDef('n_flame_tide',()=>[]);
+n4sDef('n_flame_sky',()=>[]);
+n4sDef('n_trials_done',()=>[]);
 n4sBubDef('raid','ash',`Kobolds in the village. Again. Even the shadows have no manners.`,`Shadow raiders! Again!`);
 n4sBubDef('bed','ash',`She even copied my bed. ...It's made of glass. I'm never complaining about my lumpy pillow again.`,`My bed! It is glass. Not comfy!`);
-n4sDef('n_helmet',()=>[
-  xl('narr',`You pick up the helmet. It's warm. Inside is one small spark that never went out.`,`The helmet is warm. A spark is inside.`),
-  n4sDo(()=>{ if(!(G.items.n_spark>0)) giveItems({n_spark:1}); })
-]);
-n4sDef('n_grey_bye',()=>[
-  xl('narr',`Greymane looks up the Wind Chimney, then at you, then trots off along the cliff with his nose to the ground.`,`Greymane looks up. Then he runs off along the cliff.`),
-  n4sDo(()=>n4sAllyLeave('greymane')),
-  xl('ash',`He'll find his own way up. Wolves always do.`,`He will find his own way up.`)
-]);
+n4sDef('n_helmet',()=>[]);
+n4sDef('n_grey_bye',()=>[]);
 // 5.2 Tier II, the Clockstop Cliffs
-n4sDef('n_clocks_in',()=>[
-  xl('narr',`The second ring looks like Gearhaven. Clock towers. Brass gears. Chalk cliffs. All made of black glass.`,`The second ring looks like Gearhaven. All black glass.`),
-  xl('narr',`Every clock says midnight. Not one of them ticks.`,`Every clock says midnight. None of them tick.`),
-  xl('ash',`Gearhaven was never this quiet. Gearhaven was so loud you could hear it think.`,`Gearhaven was never this quiet.`),
-  ...n4sIfL(()=>G.flags.pip,xl('pip',`Mip?`,`Mip?`),xl('ash',`I know, Pip. I miss the ticking too.`,`I miss the ticking too, Pip.`)),
-  xl('nyxara',`Midnight is the best time, little ember. Nothing ends at midnight. Nothing begins. Everything just... waits.`,`At midnight, nothing ends. Everything just waits.`)
-]);
+n4sDef('n_clocks_in',()=>[]);
 n4sBubDef('chime','ash',`Lantern Time. Somebody has to keep the right time around here.`,`Lantern Time! That's the right time.`);
 n4sBubDef('gallery','ash',`The post is hiding in the curtain. Dash in, then grab it.`,`Dash into the curtain. Then grab the post.`);
 n4sBubDef('nyx','ash',`Nyx. Ember called her Nyx.`,`Ember called her Nyx.`);
-n4sDef('n_vesper_join',()=>[
-  n4sDo(()=>n4sAllyArrive('vesper')),
-  xl('narr',`Someone drops out of the dark on a silk line and lands beside you without a sound. A moth mask. A crooked grin.`,`Someone drops down on a silk rope. A moth mask. A grin.`),
-  xl('c_vesper',`You're climbing a copy of my city. Badly.`,`You are climbing a copy of my city. Badly.`),
-  xl('ash',`VESPER!`,`Vesper!`),
-  xl('c_vesper',`Hi, cousin. Thought you might need a thief. Thieves are good at getting into places nobody wants you in.`,`Hi, cousin! You need a thief. Thieves get in anywhere.`),
-  xl('ash',`How many greats is a cousin?`,`How many greats is a cousin?`),
-  xl('c_vesper',`None. Cousins don't get greats.`,`None. Cousins have no greats.`),
-  xl('ash',`Then you're my favorite relative.`,`Then you are my favorite!`),
-  xl('c_vesper',`Don't tell the dragon grandpa. Now. See that dark knob on the pillar? That's a grapple post. She hid it. I find things people hide.`,`Don't tell Grandpa. See that dark knob? It is a hidden grapple post.`),
-  n4sDo(()=>{ G.flags.n_vline=1; })
-]);
-n4sDef('n_vesper_absent',()=>[
-  xl('narr',`On a ledge lies a moth mask. A real one, not glass. It's cracked down the middle.`,`A real moth mask lies here. It is cracked.`),
-  xl('narr',`Under it is a scrap of paper. It says: "Sorry. V."`,`A note says: "Sorry. V."`),
-  xl('ash',`...Me too.`,`Me too.`)
-]);
-n4sDef('n_vesper_bye',()=>[
-  xl('c_vesper',`I'll go up my own way. Thieves never take the stairs. See you at the top, cousin.`,`I will go my own way. See you at the top!`),
-  n4sDo(()=>n4sAllyLeave('vesper'))
-]);
+n4sDef('n_vesper_join',()=>[]);
+n4sDef('n_vesper_absent',()=>[]);
+n4sDef('n_vesper_bye',()=>[]);
 // 5.3 Tier III, the Rime Spiral
-n4sDef('n_rime_in',()=>[
-  xl('narr',`The third ring is winter. Black ice. Snow that falls up instead of down. A frozen aurora hangs in the air like a curtain.`,`The third ring is winter. The snow falls UP.`),
-  xl('narr',`Shadow people stand in the snow, frozen mid-step. Copies of the people of Hearthold. They aren't real. You check anyway.`,`Shadow people stand frozen in the snow. They are not real.`),
-  xl('ash',`It's okay. They're just memories. ...I'm going to say hi to all of them anyway.`,`They are just memories. I will say hi anyway.`),
-  xl('nyxara',`Cold is kind, little ember. Cold keeps things. Ask my little cold one.`,`Cold keeps things safe. Ask the ice dragon.`)
-]);
+n4sDef('n_rime_in',()=>[]);
 n4sBubDef('icewall','ash',`My fire isn't hot enough for that. I need a BLAZE.`,`Normal fire is too weak. Use Blaze!`);
-n4sDef('n_glaciar_join',()=>[
-  n4sDo(()=>{ n4sAllyArrive('glaciar'); try{ shake(10); }catch(e){} }),
-  xl('narr',`CRASH. Something enormous lands on the ice behind you, and the whole ring shakes.`,`CRASH! Something huge lands behind you.`),
-  xl('f_glaciar',`DUMPLING! You are climbing the Moth's mountain without a scarf!`,`Dumpling! You have no scarf!`),
-  xl('ash',`Great-great-great-great-great-great-great-great-great-great-great-great-great Grand-aunt Glaciar! ...I counted. I counted every great.`,`Great x13 Grand-aunt Glaciar! I counted them all!`),
-  xl('f_glaciar',`I heard, my little hot cross bun. The whole sea heard. Go on, then. Fly. If you fall, I will catch you. I only do slowly, but I am very good at catching.`,`I heard you. Go and fly. If you fall, I will catch you.`)
-]);
-n4sDef('n_glaciar_absent',()=>[
-  xl('narr',`Half buried in the snow lies a single dragon scale, blue as deep ice. It's still cold.`,`A blue dragon scale lies in the snow. It is cold.`),
-  xl('ash',`Glaciar's. She's still asleep under the snow on Mount Dread. One day the right song will wake her.`,`She is still asleep. A song could wake her.`)
-]);
-n4sDef('n_glaciar_bye',()=>[
-  xl('f_glaciar',`I will circle the peak. When you need a dragon, roar.`,`I will fly around the top. Roar if you need me.`),
-  n4sDo(()=>n4sAllyLeave('glaciar'))
-]);
+n4sDef('n_glaciar_join',()=>[]);
+n4sDef('n_glaciar_absent',()=>[]);
+n4sDef('n_glaciar_bye',()=>[]);
 // 5.4 Tier IV, the Moonglass Crown
-n4sDef('n_glass_in',()=>[
-  xl('narr',`The last ring before the top. Glass dunes. Drowned mirrors. Shadow tendrils curling out of every crack, reaching for your light.`,`The last ring. Glass sand, mirrors, and shadow vines.`),
-  xl('narr',`Up here the broken moon is so close you could almost touch it. It doesn't shine. It just hangs there, empty.`,`The broken moon is so close now. It does not shine.`),
-  ...(G.flags.pip?[
-    xl('ash',`Okay. Last ring. You can do this, Ash. Pip, tell me I can do this.`,`Last ring. Pip, tell me I can do this.`),
-    xl('pip',`Mip!`,`Mip!`),
-    xl('ash',`Thanks, Pip.`,`Thanks, Pip.`)
-  ]:[xl('ash',`Okay. Last ring. You can do this, Ash.`,`Last ring. You can do this.`)]),
-  xl('nyxara',`So close now. Come closer. Bring it to me. I have been so cold, for so long.`,`Come closer. Bring it to me. I am so cold.`)
-]);
+n4sDef('n_glass_in',()=>[]);
 n4sBubDef('lagoon','pip',`Mip mip!`,`Mip mip!`);
-n4sDef('n_hush_join',()=>[
-  n4sDo(()=>n4sAllyArrive('hush')),
-  xl('narr',`A great white moth glides down through the tendrils, as big as a barn. Two painted violet eyes on her wings, two real ones in the middle, blinking. A broken silver thread trails from her neck.`,`A huge white moth flies down. A broken silver thread hangs from her neck.`),
-  xl('narr',`Wherever her soft glow touches them, the tendrils shiver and shrink away.`,`Her glow makes the shadow vines shrink away.`),
-  xl('ash',`HUSH! You came!`,`Hush! You came!`),
-  xl('f_hush',`Shhhh. Not so LOUD, little ember. ...It's so cold up here. The Mother promised a warm dark. She didn't mean it.`,`Shhh. Not so loud. It is cold. The Mother lied.`),
-  xl('narr',`Hush lands beside you, close enough that her fuzzy wing brushes your arm.`,`Hush lands close to you.`),
-  xl('ash',`...Yeah. I'm scared too. Let's go. Quietly.`,`I am scared too. Let's go. Quietly.`)
-]);
-n4sDef('n_hush_absent',()=>[
-  xl('narr',`A single white moth scale drifts past, glittering. Then it's gone.`,`A white sparkle floats by. Then it is gone.`),
-  xl('ash',`Hush?`,`Hush?`),
-  xl('narr',`Nothing answers. Of course nothing answers.`,`Nothing answers.`)
-]);
+n4sDef('n_hush_join',()=>[]);
+n4sDef('n_hush_absent',()=>[]);
 // 5.5 the Crown gathering (7.5): lines only for the friends who are here, in this order; it works with nobody too
-n4sDef('n_gather',()=>{
-  const n=n4sGatherCount(), L=[
-    n4sDo(()=>{ N4ST.cam={x:3331,y:85860,k:0.55}; n4sGatherPose(true); }),
-    xl('narr',`The Crown Shrine sits at the edge of the last ring. Above it, the summit. Around the summit, a moat of nothing, and a road of floating stones.`,`The shrine is at the top ring. The summit is across a dark moat.`)];
-  if(n4sGrey()) L.push(xl('narr',`Greymane is already here, sitting by the shrine as if he has been waiting all day. He is wet. He definitely swam again.`,`Greymane is here! He is wet. He swam again.`));
-  if(n4sTikka()) L.push(xl('ev_tikka',`ASH! I came on Dell's boat! I brought snacks! And my brother! And a BIGGER spoon!`,`Ash! I came on Dell's boat! I brought snacks and a bigger spoon!`),
-    xl('ev_tock',`It's a ladle.`,`It is a ladle.`),
-    xl('ev_tikka',`It's a BIGGER SPOON, Tock.`,`It is a BIGGER SPOON, Tock.`));
-  if(n4sVes()) L.push(xl('c_vesper',`Told you. Thieves never take the stairs.`,`Told you. Thieves don't use stairs.`));
-  if(n4sGla()) L.push(xl('narr',`Glaciar curls around the whole shrine like a wall of ice, and sniffs.`,`Glaciar curls around the shrine and sniffs.`),
-    xl('f_glaciar',`Hmph. I have been to warmer funerals, dumpling.`,`Hmph. It is cold up here.`),
-    xl('ash',`Nobody is having a funeral!`,`Nobody is having a sad party!`),
-    xl('f_glaciar',`Good. I hate them.`,`Good.`));
-  if(n4sHushF()) L.push(xl('narr',`Hush settles on the shrine roof, folds her wings, and shushes everybody. Nobody minds.`,`Hush sits on the roof. She says shhh to everyone.`));
-  if(!n) L.push(xl('ash',`Just you and me, Pip.`,`Just you and me, Pip.`),...n4sIfL(()=>G.flags.pip,xl('pip',`Mip.`,`Mip.`)),xl('ash',`Yeah. That's plenty.`,`Yeah. That is enough.`));
-  else L.push(xl('ash',`Look at all of you. I didn't bring an army. I brought... friends.`,`Look at you all. I brought friends!`));
-  L.push(xl('ash',`Okay. Big moth. Broken moon. Let's go and give it back.`,`Okay. Big moth. Broken moon. Let's give it back.`));
-  return L;
-});
-n4sDef('n_moondoor',()=>[
-  n4sDo(()=>{ N4ST.cam={x:4500,y:85900,k:0.5}; }),
-  xl('narr',`At the end of the Moon Road stands a round door of pale glass. There's no handle. Just a hollow in the middle, the size of a plum.`,`A round glass door. It has a hole the size of a plum.`),
-  xl('ash',`The Heart. The door wants the Heart.`,`The door wants the Heart.`),
-  ...n4sIfL(()=>G.flags.pip,xl('pip',`Mip?!`,`Mip?!`)),
-  xl('ash',`I know. She WANTS me to bring it. That's the scary part.`,`I know. She wants the Heart. That is scary.`),
-  xl('ash',`But Mom made it whole. Not her. Mom.`,`But Mom fixed it. Not her.`),
-  n4sDo(()=>{ N4ST.doorFx={t:0}; n4sSfx('shrine'); }),
-  xl('narr',`You hold up the Ember Heart. Its three seams glow, dusk-violet, ice-blue and moon-silver, around a core of warm orange. The door sighs open.`,`You hold up the Heart. It glows. The door opens.`)
-]);
+n4sDef('n_gather',()=>[]);
+n4sDef('n_moondoor',()=>[]);
 // 8.1 Nyxara (her fight's intro: STORY.bosses.n_nyxara.intro reads this)
-n4sDef('n_nyxara_intro',()=>[
-  n4sDo(()=>{ N4ST.cam={x:4500,y:85080,k:0.6}; }),
-  xl('narr',`The summit is a wide round floor of pale glass, right under the broken moon.`,`The top is a round glass floor under the broken moon.`),
-  xl('narr',`Something enormous is folded over the edge of the moon, like a blanket over a lamp. It unfolds.`,`Something huge is wrapped over the moon. It unfolds.`),
-  xl('narr',`Wings. Wings as wide as a town square, grey and soft as dust, with two pale moons painted on them. A moth the size of a house.`,`Wings as big as a town! A moth the size of a house.`),
-  xl('nyxara',`There you are. Little ember. Look how big you've grown.`,`There you are, little ember. How big you are.`),
-  xl('ash',`Are you... my great-great-great...`,`Are you my great-great-great...`),
-  xl('nyxara',`No.`,`No.`),
-  xl('ash',`Oh, thank goodness.`,`Oh, good.`),
-  xl('nyxara',`I am much older than your family, dear. I was here when the moon was new.`,`I am older than your family. I was here when the moon was new.`),
-  xl('nyxara',`And you brought me your heart. Whole again. Your mother did such lovely work. A cracked heart can't burn, you see. A whole one can.`,`You brought me the Heart. Whole again. Now it can burn.`),
-  xl('ash',`You wanted me to fix it. This whole time.`,`You wanted me to fix it. All along.`),
-  xl('nyxara',`Shh. Shh. Don't be sad. Give it to me, and I'll make it burn black. Then the sun will go out, and the night will never end, and nobody, nobody will ever have to say goodbye again.`,`Give it to me. I will make it burn black. Then night never ends, and nobody says goodbye.`),
-  xl('ash',`That's not a night. That's just a really long nap with no breakfast.`,`That is just a long nap with no breakfast!`),
-  xl('ash',`Give the moon back, Nyxara.`,`Give the moon back, Nyxara.`),
-  xl('nyxara',`Hush now, little ember. Go to sleep.`,`Hush, little ember. Go to sleep.`)
-]);
+n4sDef('n_nyxara_intro',()=>[]);
 // 8.3 the transitions between her phases (x4_foes plays them with n4sPhase(p,done), or reads N4S_PHASE)
-n4sDef('n_trans12',()=>[
-  xl('nyxara',`Enough of the floor. Let the sea come up and tuck you in.`,`No more floor. Let the dark sea come up.`),
-  xl('narr',`Ink pours up out of the glass, and the summit floods with shadow. Only the rim and three pale platforms stay dry.`,`Black ink floods the floor. Only the edge and three platforms stay dry.`)
-]);
-n4sDef('n_trans23',()=>[
-  xl('nyxara',`Fine. If you won't sleep, I will finish my supper.`,`Fine. I will finish my supper.`),
-  xl('narr',`The ink drains up into the sky like rain falling the wrong way. Nyxara rises toward the last floating pieces of the moon.`,`The ink goes up into the sky. Nyxara flies to the last moon pieces.`),
-  xl('ash',`She's eating the last pieces! Wings, Ash. Ride the wind!`,`She is eating the last pieces! Fly! Ride the wind!`)
-]);
+n4sDef('n_trans12',()=>[]);
+n4sDef('n_trans23',()=>[]);
 // her taunts during the fight (8.3, 8.5), and the friends' big moments in phase 4 (taunt lines, once each)
 const N4S_TAUNT={
   p1:[S(`Shh, shh.`,`Shh, shh.`),S(`Why fight? Sleep is so soft.`,`Why fight? Sleep is so soft.`),S(`Nowhere to hide from the moonlight, dear. Except the pillars. I should have made fewer pillars.`,`You cannot hide. Except behind a pillar.`)],
-  pulled:[S(`Tied down like a kite? That isn't kind, little ember.`,`You tied me down? Not kind!`)],
+  pulled:[S(`Tied down like a kite? That isn't kind, dear.`,`You tied me down? Not kind!`)],
   p2:[S(`Under the dark it's quiet. Come down. Stay.`,`Under the dark it is quiet. Stay.`)],
   pounded:[S(`Ow. That was a piece of my own moon you dropped on me.`,`Ow! You hit me with my own moon!`)],
   p3:[S(`Mmm. Crunchy.`,`Mmm. Crunchy.`),S(`The moon is mine. There's hardly any left now.`,`The moon is mine.`)],
@@ -399,7 +220,7 @@ const N4S_ALLYBEAT={
   glaciar:['f_glaciar',S(`Hold STILL, old moth.`,`Hold still!`)],
   grandpa:['grandpa',S(`Get AWAY from my grandchild, you oversized sock!`,`Get away from my grandchild, you big sock!`)],
   wardens:['iska',S(`Five lights, one for each of us. Stand close, Warden.`,`Five lights for you. Stand close!`)],
-  ember:['ember',S(`I'm right here, little ember. Aim for the cracks.`,`I am here. Aim for the cracks!`)],
+  ember:['ember',S(`I'm right here, Ash. Aim for the cracks.`,`I am here. Aim for the cracks!`)],
   tikka:['ev_tikka',S(`One lumpy bun, coming UP!`,`Here comes a bun!`)],
   cinder:['cinder',S(`None shall pass! Not even moths!`,`Nobody gets past me!`)],
   vesper:['c_vesper',S(`Hey, Night Mother! You've got a crack. Let me help with that.`,`Hey! You have a crack. Let me help!`)]
@@ -413,165 +234,26 @@ const N4S_HINT={
 
 // 6. the echoes: intros and outros (STORY.bosses[type] reads these), with the Act I ending's lines and the allies'
 const n4sByEnd=(o)=>{ const e=n4sEnd(); return o[e]||o.hero||[]; };
-n4sDef('n_echo1_intro',()=>[
-  xl('narr',`On a black glass throne sits a dragon made of shadow. It looks exactly like Grandpa. It even has his frown.`,`A shadow dragon sits on a throne. It looks like Grandpa.`),
-  xl('n_echo_vor',`So. You are what Ember's line became. Small. Soft. Barely a spark.`,`So. You are Ember's child. Small. Barely a spark.`),
-  n4sByEnd({hero:xl('ash',`I heard you the first time, Grandpa. And I already won.`,`I heard you the first time. And I won.`),
-    warden:xl('ash',`You're supposed to be asleep on the mountain. ...Oh. You're not him. You're a copy.`,`You should be asleep. Oh. You are just a copy.`),
-    heir:xl('ash',`Small? I'm the dragon now. Sit.`,`Small? I am the dragon now. Sit!`),
-    lantern:xl('ash',`That's not my grandpa. My grandpa wipes his feet.`,`You are not my grandpa. My grandpa wipes his feet.`)}),
-  xl('n_echo_vor',`Then come and take it from me, hatchling.`,`Then come and take it, little one.`),
-  xl('ash',`Okay. Again.`,`Okay. Again!`),
-  ...(n4sCin()?[
-    n4sDo(()=>n4sAllyArrive('cinder')),
-    xl('cinder',`Halt! ...Oh. It is you, Emberblood. I said one last fight. It seems I miscounted.`,`Oh! It is you! I said one last fight. I counted wrong.`),
-    xl('ash',`Sir Cindervane! You came back!`,`Sir Cindervane! You came back!`),
-    xl('cinder',`Some knights do not know when to sit down. I hold the stairs. Go.`,`I will guard the stairs. Go!`)]:[]),
-  ...n4sIfL(()=>n4sGrey()&&n4sAllyHere('greymane'),xl('narr',`Greymane's hackles rise. He has met this dragon before, too.`,`Greymane growls. He knows this dragon.`))
-]);
-n4sDef('n_echo1_outro',()=>[
-  xl('narr',`The shadow dragon cracks like old glass and bursts into a cloud of moths.`,`The shadow dragon breaks into moths.`),
-  xl('narr',`For a moment, one last memory hangs in the air. A voice, younger and sadder than any you ever heard him use.`,`A memory floats in the air. A sad voice.`),
-  xl('n_memory',`...Ember? Is that you, up there with the lanterns?`,`Ember? Is that you with the lanterns?`),
-  xl('ash',`Even the moon remembers you missing her, Grandpa.`,`The moon remembers you missed her, Grandpa.`),
-  n4sByEnd({hero:xl('ash',`I hope you found her.`,`I hope you found her.`),
-    warden:xl('ash',`Goodnight, Grandpa. The real one.`,`Goodnight, real Grandpa.`),
-    heir:xl('ash',`I'm telling the little one on the shelf above Bertram's oven. He'll pretend he doesn't care. He'll care.`,`I will tell tiny Grandpa. He will care.`),
-    lantern:xl('ash',`I'm telling him the moon remembers. He'll pretend he doesn't care. He'll care.`,`I will tell Grandpa. He will care.`)}),
-  n4sDo(()=>n4sAllyLeave('cinder')),
-  xl('narr',`Up ahead, a column of silver air roars up the cliff. The Wind Chimney.`,`Up ahead, the wind roars up the cliff.`)
-]);
-n4sDef('n_echo2_intro',()=>[
-  xl('narr',`In a hall full of moth lamps, a masked figure waits. Then there are three of her. Then five.`,`A masked shadow waits. Then there are lots of her!`),
-  xl('n_echo_vesper',`The Heart will give my family its fire back. She promised. She PROMISED.`,`The Heart will give my family fire. She promised!`),
-  xl('ash',`She promised you lots of things. She lied about all of them.`,`She promised lots of things. She lied.`),
-  ...n4sIfL(n4sVes,xl('c_vesper',`Do I really stand like that? With my elbow out? Ugh. Help me knock her down. I can't watch this.`,`Do I really stand like that? Ugh. Let's knock her down.`))
-]);
-n4sDef('n_echo2_outro',()=>[
-  xl('narr',`The shadow thief spins, stumbles, and pops into a cloud of moths.`,`The shadow thief pops into moths.`),
-  xl('narr',`A memory hangs in the air. A small voice, in a small room by the sea.`,`A memory floats by. A small voice by the sea.`),
-  xl('n_memory',`Granny, why can't I make fire like the stories?`,`Granny, why can't I make fire?`),
-  xl('n_memory',`Oh, duck. Fire isn't the only warm thing.`,`Oh, duck. Fire is not the only warm thing.`),
-  ...(n4sVes()?[xl('c_vesper',`...She used to say that. Every night.`,`She used to say that every night.`),
-    xl('ash',`She was right.`,`She was right.`),
-    xl('c_vesper',`Don't make it a whole thing.`,`Don't make it a big thing.`)]
-   :[xl('ash',`I hope you heard that, Vesper. Wherever you are.`,`I hope Vesper heard that.`)])
-]);
-n4sDef('n_echo3_intro',()=>[
-  xl('narr',`On a throne of black ice, chained in frost, a shadow dragon lifts her head. Her breath is a blizzard.`,`A shadow ice dragon sits on an ice throne, in chains.`),
-  xl('n_echo_glaciar',`The Mother says cold is kind. The Mother says sleep is kindest. The Mother says fire is a lie.`,`The Mother says cold is kind. Fire is a lie.`),
-  xl('ash',`That's not you talking. That's the Shard. Well. A copy of you, with a copy of the Shard. This is very confusing.`,`That is the Shard talking. This is confusing!`),
-  ...n4sIfL(n4sGla,xl('f_glaciar',`Was I really that dreary? Dumpling, I need a scarf. And you need to melt those chains.`,`Was I that gloomy? Melt those chains, dumpling!`))
-]);
-n4sDef('n_echo3_outro',()=>[
-  xl('narr',`The ice cracks. The shadow dragon shatters into a flurry of moths.`,`The ice dragon breaks into moths.`),
-  xl('n_memory',`Auntie Glee! Can we make the big snow? For the sledding?`,`Auntie Glee! Can we make snow for sledding?`),
-  xl('n_memory',`Every year, dumpling. Every single year.`,`Every year, dumpling.`),
-  ...(n4sGla()?[xl('f_glaciar',`I forgot the sledding. For a thousand years, I forgot it. Thank you for reminding me, dumpling.`,`I forgot the sledding. Thank you for reminding me.`),
-    xl('ash',`Every Lantern Day. Sleds AND cake.`,`Every Lantern Day. Sleds and cake!`)]
-   :[xl('ash',`Even ice dragons get lonely, huh, Pip?`,`Ice dragons get lonely too, Pip.`),...n4sIfL(()=>G.flags.pip,xl('pip',`Mip.`,`Mip.`))])
-]);
-n4sDef('n_echo4_intro',()=>[
-  xl('narr',`In a hall of brass rings and drowned stars, a great shadow moth unfolds her wings. Two painted eyes stare at you. Then the two real ones blink.`,`A shadow moth opens her wings. Her eyes blink at you.`),
-  xl('n_echo_hush',`Shhhhhh.`,`Shhhhh.`),
-  ...n4sIfL(n4sHushF,xl('narr',`Beside you, the real Hush folds her wings over her eyes.`,`The real Hush covers her eyes.`),
-    xl('ash',`It's okay, Hush. You don't have to watch.`,`It's okay, Hush. Don't look.`))
-]);
-n4sDef('n_echo4_outro',()=>[
-  xl('narr',`The shadow moth falls apart into a hundred little moths that flutter away into the dark.`,`The shadow moth breaks into little moths.`),
-  xl('n_memory',`My quiet one. Stay with me. Everyone else leaves.`,`My quiet one. Stay with me. Everyone else leaves.`),
-  ...(n4sHushF()?[xl('narr',`Hush trembles. Then, slowly, she turns toward the top of the mountain.`,`Hush shakes. Then she looks up at the top.`),
-    xl('ash',`We're going to go and see her, aren't we.`,`We are going to see her.`),
-    n4sDo(()=>n4sAllyLeave('hush'))]
-   :[xl('ash',`She said that to Hush every night. No wonder Hush only ever whispered.`,`She said that every night. No wonder Hush only whispers.`)])
-]);
+n4sDef('n_echo1_intro',()=>[]);
+n4sDef('n_echo1_outro',()=>[]);
+n4sDef('n_echo2_intro',()=>[]);
+n4sDef('n_echo2_outro',()=>[]);
+n4sDef('n_echo3_intro',()=>[]);
+n4sDef('n_echo3_outro',()=>[]);
+n4sDef('n_echo4_intro',()=>[]);
+n4sDef('n_echo4_outro',()=>[]);
 // 8.4 the Heart moment: the start, a voice for each seam (25, 50, 75, 90 percent) and the end
-n4sDef('n_heart_start',()=>[
-  xl('narr',`Nyxara swallows the last piece of the moon.`,`Nyxara eats the last piece of the moon.`),
-  n4sDo(()=>{ if(N4ST.heart) N4ST.heart.darkTo=1; }),
-  xl('narr',`And everything goes black.`,`Everything goes black.`),
-  xl('narr',`Not dark. Black. No lanterns. No stars. You can't even see your own claws.`,`So black. You cannot see your claws.`),
-  n4sDo(()=>{ if(N4ST.heart) N4ST.heart.puff=1.2; }),
-  xl('narr',`You breathe fire. Nothing comes out but a little puff of smoke.`,`You breathe fire. Only smoke comes out.`),
-  xl('ash',`My fire. My fire's going out.`,`My fire is going out!`),
-  xl('nyxara',`Shh. There. Isn't that better? No more fighting. No more goodbyes. Give me the Heart, and we'll all just... rest.`,`There. No more fighting. Give me the Heart. Let's rest.`),
-  n4sDo(()=>{ if(N4ST.heart) N4ST.heart.float=1; }),
-  xl('narr',`Something tugs at your satchel. The Ember Heart floats up out of it, glowing faintly. Black flames lick at its edges.`,`The Heart floats out of your bag. Black fire licks at it.`),
-  xl('narr',`It's still warm. Barely. And then you hear voices. Not from the dark. From the Heart.`,`It is still a little warm. Then you hear voices from the Heart.`)
-],{again:true});
-// the four voices: [speaker, line, light colour, who it is for the light]
+n4sDef('n_heart_start',()=>[],{again:true});
+// the four voices are the Act V data's scenes n_seam_0..3 (game/story/act5/n_nyxara.js); there is no copy here
 function n4sSeamLines(k){
   // the act 5 data's four voices (n_seam_0..3; each voice's light is its emit n4fx:voice:<who>)
   const D=n4sData('n_seam_'+k); if(D&&typeof s10Lines==='function') return s10Lines(D,{sc:'n_seam_'+k});
-  const v=(who,f,s,col)=>[n4sDo(()=>n4sVoice(who,col)),xl(who,f,s)];
-  if(k===0) return n4sVes()?v('c_vesper',`Hey. Cousin. Emberbloods without fire still have warm hands. Here. Take mine.`,`Cousin. I have no fire. But my hands are warm. Take them.`,'180,140,255')
-    :v('juniper',`Ash! You can't get lost now. I drew you a map. Follow it home!`,`Ash! You can't get lost. I drew you a map!`,'180,140,255');
-  if(k===1) return n4sGla()?v('f_glaciar',`Cold keeps things, she says. Warm GIVES things. Give, dumpling.`,`Cold keeps things. Warm gives things. Give, dumpling!`,'150,210,255')
-    :v('elka',`Faster than a wolf, Ash! FASTER!`,`Faster than a wolf, Ash!`,'150,210,255');
-  if(k===2) return n4sHushF()?[n4sDo(()=>n4sVoice('f_hush','236,232,255')),xl('narr',`A soft white light settles on your shoulder. Hush. For once, she doesn't say shhh.`,`Hush lands on your shoulder. She does not say shhh.`),
-      xl('f_hush',`...Hold on, little ember. Hold on.`,`Hold on.`)]
-    :v('quill',`The moon always comes back, Ash. I have measured it. Every month. It's the most reliable thing I know.`,`The moon always comes back. I measured it.`,'226,232,255');
-  // the core: Mom, Tikka's lantern (if she stayed home), then the Act I ending
-  const L=[...v('maren',`Ash! I can feel it from here. Don't you dare go out. You still haven't eaten your sandwich.`,`Ash! Don't you go out! You did not eat your sandwich!`,'255,170,90')];
-  if(G.flags.tk_come==='home') L.push(n4sDo(()=>n4sVoice('ev_tikka','255,200,120')),xl('narr',`Far, far away in Embermere, in one small window, a lantern is burning. Tikka promised.`,`Far away, Tikka's lantern burns in her window.`));
-  const e=n4sEnd();
-  if(e==='lantern') L.push(n4sDo(()=>{ n4sVoice('grandpa','255,140,70'); N4ST.heart&&(N4ST.heart.grandpa=1); }),
-    xl('narr',`Far below, a small orange light is climbing up out of the dark. It's flapping very hard.`,`A small orange light flies up from below. It flaps very hard.`),
-    xl('grandpa',`Nobody. Puts out. MY. Grandchild.`,`Nobody puts out MY grandchild!`),
-    xl('narr',`Grandpa lands on your head, which is rude, and breathes into the Heart with you. It's the first fire he has breathed in a whole year. It's a big one.`,`Grandpa lands on your head and breathes fire into the Heart with you.`));
-  else if(e==='warden') L.push(n4sDo(()=>{ if(N4ST.heart) N4ST.heart.wardens=1; n4sVoice('iska','255,214,150'); }),
-    xl('narr',`Five small lights blink on around you. One, two, three, four, five.`,`Five little lights shine around you.`),
-    xl('iska',`Sixth Warden. We felt the dark from our Ward-fires. We came.`,`Sixth Warden. We felt the dark. We came.`),
-    xl('bram',`And to SHOUT! BREATHE, kid!`,`BREATHE, kid!`),
-    n4sDo(()=>n4sVoice('vor','255,120,60')),
-    xl('vor',`...Breathe from your belly, hatchling. Not your nose.`,`Breathe from your belly, little one.`));
-  else if(e==='heir') L.push(n4sDo(()=>{ if(N4ST.heart) N4ST.heart.belly=1; n4sVoice('ash','255,150,60'); }),
-    xl('narr',`The fire you took from Grandpa, the fire that once made you huge, wakes up deep in your belly.`,`The big fire you once had wakes up in your belly.`),
-    xl('grandpa',`(very far away, from the warm shelf above Bertram's oven) You call that a flame? Do it BIGGER.`,`(far away) Is that a flame? Do it BIGGER!`),
-    xl('ash',`Thanks, Grandpa.`,`Thanks, Grandpa.`));
-  else L.push(n4sDo(()=>n4sVoice('ember','255,190,120')),
-    xl('ember',`Little ember. Remember what my father taught me? Breathe from your belly. Not your nose.`,`Little ember. Breathe from your belly.`));
-  return L;
+  return [];
 }
-n4sDef('n_heart_end',()=>[
-  xl('narr',`The Heart flickers. Almost. Almost.`,`The Heart flickers. Almost!`),
-  ...(G.flags.pip?[
-    n4sDo(()=>{ if(N4ST.heart) N4ST.heart.pip=1; }),
-    xl('narr',`Then Pip climbs up your arm, puffs out every single scale, and says, very loudly, the first word Pip has ever said.`,`Then Pip climbs up your arm. Pip says a word for the very first time.`),
-    {who:'pip',text:S(`ASH!`,`ASH!`),fn:()=>{ if(N4ST.heart) N4ST.heart.word=1; n4sSfx('levelup'); try{ shake(6); }catch(e){} }},
-    n4sDo(()=>{ if(N4ST.heart) N4ST.heart.spark=1; }),
-    xl('narr',`And Pip breathes one tiny spark into the Heart.`,`Pip breathes one tiny spark into the Heart.`)
-  ]:[xl('narr',`You breathe one last time, from your belly. One tiny spark catches.`,`You breathe one more time. A tiny spark catches.`)]),
-  {who:'narr',text:S(`The Ember Heart blazes like a sunrise.`,`The Heart shines like the sun!`),fn:()=>n4sHeartBlaze()},
-  ...n4sIfL(()=>G.flags.pip,xl('ash',`Did Pip just... TALK?`,`Did Pip just TALK?`),xl('pip',`Mip.`,`Mip.`)),
-  xl('nyxara',`No. No, no, no. That light is MINE!`,`No! That light is MINE!`),
-  xl('ash',`It's not yours. It never was. Let's finish this.`,`It is not yours. Let's finish this.`)
-],{again:true});
+n4sDef('n_heart_end',()=>[],{again:true});
 // 9. the fall, the plea (or the hint), the choice
-n4sDef('n_fall',()=>[
-  n4sDo(()=>{ n4sCutFall(); }),
-  xl('narr',`The last crack bursts. Light pours out of Nyxara's wings in a great silver river, up, up, into the empty moon.`,`The last crack breaks. Silver light pours up into the moon.`),
-  n4sDo(()=>{ if(N4ST.cut) N4ST.cut.fillTo=0.6; }),
-  xl('narr',`The moon starts to fill. Slowly. Like a cup.`,`The moon starts to fill up, like a cup.`),
-  n4sDo(()=>{ if(N4ST.cut&&N4ST.cut.nyx) N4ST.cut.nyx.sTo=0.62; }),
-  xl('narr',`Nyxara crumples onto the glass. She's still big. But she's getting smaller. Every second, smaller.`,`Nyxara falls down. She gets smaller and smaller.`),
-  n4sDo(()=>{ if(N4ST.cut&&N4ST.cut.nyx) N4ST.cut.nyx.sliver=1; }),
-  xl('narr',`In her claws she holds one last sliver of moon, tight, the way you'd hold a blanket.`,`She holds the last bit of moon tight, like a blanket.`),
-  xl('nyxara',`Don't. Please. It always leaves. Every morning it goes away. Every month it gets thin. I only wanted it to stay.`,`Please don't. It always goes away. I only wanted it to stay.`),
-  xl('ash',`My grandpa said "mine" too. About the whole valley. It made him so lonely he turned into a mountain.`,`My grandpa said "mine" too. It made him so lonely.`),
-  xl('nyxara',`Everyone leaves, little ember.`,`Everyone leaves.`),
-  xl('ash',`Yeah. The moon leaves every morning. And it comes back every night. That's not leaving. That's... visiting.`,`The moon goes every morning. And comes back every night. That is visiting!`)
-]);
-n4sDef('n_plea',()=>[
-  ...n4sIfL(n4sVes,xl('c_vesper',`She found me when I was little and alone, and she promised me fire. I know what lonely sounds like. That's what it sounds like.`,`She found me when I was lonely. I know that sound.`)),
-  ...n4sIfL(n4sGla,xl('f_glaciar',`You froze my mountain to keep things, old moth. It kept nothing. It only kept me asleep.`,`Your cold kept nothing. It only kept me asleep.`)),
-  ...n4sIfL(n4sHushF,xl('narr',`Hush lands in front of her mother and folds her wings around her mother's claws.`,`Hush folds her wings around her mother.`),
-    xl('f_hush',`Mother. Let go.`,`Mother. Let go.`)),
-  xl('ash',`Nyx.`,`Nyx.`),
-  xl('narr',`Nyxara goes very, very still.`,`Nyxara goes very still.`),
-  xl('nyxara',`Nobody has called me that in a thousand years. Not since the girl with the lantern.`,`Nobody has called me that in a thousand years.`),
-  xl('ash',`Ember was sorry she stopped climbing the hill. So I climbed it instead. I can light you a lantern.`,`Ember was sorry she stopped coming. I came instead. I can light you a lantern.`)
-]);
+n4sDef('n_fall',()=>[]);
+n4sDef('n_plea',()=>[]);
 // (why the kind ending is closed: so kids know next time)
 function n4sClosedLines(){
   const L=[];
@@ -652,23 +334,7 @@ const N4S_SOFAR_END={
 // the journal's "story so far" for n_end (e7b_threads' recap reads it too)
 function endingSoFar(){ return N4S_SOFAR_END[G&&G.choices&&G.choices.n_end]||''; }
 // 11. the dawn (after every ending)
-n4sDef('n_dawn_lines',()=>{
-  const e=n4sEnd(), L=[];
-  if(e==='heir'&&(N4ST.big>0.05||G.flags.n_big)) L.push(n4sDo(()=>{ N4ST.bigTo=0; }),xl('narr',`You shrink back to your normal size, which is a relief. The Moon Door was not built for dragons your size.`,`You shrink back to normal. Good thing!`));
-  L.push(n4sDo(()=>{ N4ST.dawnTo=1; N4ST.cam={x:4500,y:85100,k:0.5}; }),
-    xl('narr',`As the light comes back, the black glass of the peak turns as clear as water. Little white flowers push up through the cracks. Nobody knows where they came from.`,`The black glass turns clear. Little white flowers grow in the cracks.`),
-    n4sDo(()=>{ N4ST.duchShow=1; const D=n4sDuchPlace(); N4ST.cam={x:D.x,y:D.y,k:0.5}; }),
-    xl('narr',`And there, at the very top of the summit, where nothing could possibly have climbed...`,`And there, at the very top, where nobody could climb...`),
-    xl('goat',`Meh.`,`Meh.`),
-    {who:'ash',text:S(`DUCHESS?! HOW?!`,`DUCHESS?! HOW?!`),fn:()=>n4sDuchessSeen()},
-    xl('goat',`Meh.`,`Meh.`));
-  if(e==='lantern') L.push(xl('grandpa',`Not HER.`,`Not HER.`),xl('goat',`Meh.`,`Meh.`));
-  if(G.flags.pip) L.push(xl('pip',`Mip!`,`Mip!`));
-  L.push(n4sDo(()=>{ N4ST.homeBound=1; }));
-  if(n4sGla()) L.push(xl('f_glaciar',`Climb on, dumplings. All of you. Yes, even the goat. ...Especially not the goat. Fine. The goat. Slowly, mind. I only do slowly.`,`Climb on, everyone. Even the goat.`));
-  else L.push(xl('dell',`All aboard the Soggy Biscuit! Mind the fish. There aren't any fish. Mind them anyway.`,`All aboard! Let's go home.`));
-  return L;
-});
+n4sDef('n_dawn_lines',()=>[]);
 // 16. the Moth Memories: six glass panes (x4_ascent places them and calls n4sPane(k); stand-ins below when it is absent)
 const N4S_PANE={
  1:{title:S(`The New Moon`,`The New Moon`),at:[650,84700],lines:()=>[

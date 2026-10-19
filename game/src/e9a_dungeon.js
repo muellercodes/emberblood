@@ -121,6 +121,19 @@ function dunNearGround(x,y,maxR){
 }
 
 // ---------- 5. floors: stairs between them and holes that drop you to the one below
+// v11 (FIXW2 2b): a flight that is an island (the only floor there is the stair: Drowned Lumen's tide rooms, the well in
+// the Burrows' mounds, the Mirror's glass bridge) used to put Ash in the middle of the stair. He steps off it instead:
+// onto plain floor south, east or west of it if there is any (never a diagonal, which in the Burrows is outside the
+// mounds, and never water: Lumen's deep water drops a diver to the floor below), else onto the flight's front lip, its
+// bottom step. Same cell, same room, so no puzzle is skipped.
+function dunOffStair(s,to){
+  const A=AREA, c=A&&A.cave; if(!c||!to) return to;
+  const ks=tCell(s.x,s.y); if(ks<0||tCell(to.x,to.y)!==ks) return to;
+  const ok=k=>k>=0&&k!==ks&&!c.dyn[k]&&!tHole(k)&&tGround(k)&&!tWet(k);
+  for(const [di,dj] of [[0,1],[1,0],[-1,0]]){ const k=tCell(s.x+di*c.cell,s.y+dj*c.cell); if(ok(k)){ const q=tPos(k); if(!colAt(q.x,q.y,12)) return {x:q.x,y:q.y}; } }
+  const q=tPos(ks), y=q.y+c.cell*0.36;
+  return colAt(q.x,y,10)||tCell(q.x,y)!==ks?to:{x:q.x,y};
+}
 function dunGoFloor(aid,arrive){
   const def=AREADEFS[aid]; if(!def||!AREA) return false;
   dunNoteCleared(AREA);
@@ -133,7 +146,7 @@ function dunGoFloor(aid,arrive){
   const p=player; let to=null;
   if(arrive&&arrive.stairs){ const want=arrive.stairs, near=arrive.near||{x:p.x,y:p.y}; let best=null, bd=1e18;
     for(const s of AREA.dn.stairs){ if(s.dir!==want) continue; const d=dist2(s.x,s.y,near.x,near.y); if(d<bd){ bd=d; best=s; } }
-    if(best){ to=dunNearGround(best.x,best.y+AREA.cave.cell,4); AREA.dn.stairGrace=1; AREA.dn.graceAt=best; } }
+    if(best){ to=dunOffStair(best,dunNearGround(best.x,best.y+AREA.cave.cell,4)); AREA.dn.stairGrace=1; AREA.dn.graceAt=best; } }
   if(!to){ const q=arrive&&(arrive.x!=null?arrive:arrive.near); to=dunNearGround(q?q.x:AREA.spawn.x,q?q.y:AREA.spawn.y,12); if(arrive&&arrive.stairs){ AREA.dn.stairGrace=1; AREA.dn.graceAt={x:to.x,y:to.y}; } }
   moveReset(p); p.x=to.x; p.y=to.y; p.kvx=p.kvy=0;
   if(arrive&&arrive.fall){ p.z=70; p.vz=0; }

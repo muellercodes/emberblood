@@ -50,6 +50,30 @@ QDEFS.a1_lanterns={title:S('Three Lanterns for Mom','Three Lanterns for Mom'),gi
 // only before the fight is won (after it, Mom has nothing left to worry about)
 { const base=qAvail; qAvail=function(id){ if(id==='a1_lanterns'&&G&&(G.bossDone.vorlaxis||(G.flags&&G.flags.act1_done))) return false; return base(id); }; }
 STORY.a1_lantern_lit=[vl('narr',`The little lantern catches. Far, far below, in Emberhollow, a tiny light blinks back from the forge.`,`The lantern glows. Far below, a tiny light blinks back from the forge.`)];
+// v11 (STORY_PLAN 3.4): Mom's Three Lanterns can't be missed. The moment the Obsidian Gate opens (a9c_story's summit
+// start sets a1_lan_due), Mom comes up the road with them herself and the quest starts on its own: its goal goes in
+// the list and all three Lantern Rests get a marker. A save that already has the quest (started or done) is untouched;
+// one that reached the summit before this keeps Mom's offer at the forge, as before.
+STORY.a1_lanterns_run=[vl('narr',`Footsteps pound up the road behind you. It's Mom, still in her apron, out of breath, with three paper lanterns tied to her belt.`,`Mom runs up the road in her apron. She has three paper lanterns.`)];
+STORY.a1_lanterns_back=[vl('narr',`She squeezes your shoulder once, hard. Then she walks back down the road to the forge, and she doesn't look back. You can tell it's difficult.`,`She squeezes your shoulder. Then she walks back to the forge.`)];
+function vorLanternsDue(){
+  const F=G.flags;
+  if(!F.a1_lan_due) return false;
+  if(G.mode!=='story'||G.quests.a1_lanterns||G.bossDone.vorlaxis||F.act1_done||G.stage!=='summit'){ F.a1_lan_due=0; return false; }
+  // (after the chapter card, and after the blessing the gate fight earned, if it is offered)
+  if(VOR.lanT==null) VOR.lanT=G.time+2.6;
+  if(G.time<VOR.lanT||(G.pendingBless>0&&G.time<VOR.lanT+5)) return false;
+  if(scene!=='play'||DLG||G.mini||G.fightSite||AREA||!player||player.dead) return false;
+  F.a1_lan_due=0; VOR.lanT=null;
+  runDialogue([...STORY.a1_lanterns_run,...QDEFS.a1_lanterns.offer,...STORY.a1_lanterns_back],()=>{ scene='play'; if(!G.quests.a1_lanterns) startQuest('a1_lanterns'); });
+  return true;
+}
+{ const base=updateStory; updateStory=function(dt){ try{ if(vorLanternsDue()) return; }catch(e){ console.error(e); } return base(dt); }; }
+// while the quest runs, every Lantern Rest still dark is marked: in the world, on the minimap and on the map
+const vorLanQ=()=>{ const q=G&&G.mode==='story'&&G.quests&&G.quests.a1_lanterns; return !!q&&!q.done&&(G.items.a1_lantern||0)>0; };
+{ const base=questTargets; questTargets=function(){ const out=base(); try{ if(vorLanQ()&&!AREA){ const tx=S(`Light one of Mom's lanterns here`,`Light Mom's lantern here`);
+  for(const R of VRESTS) if(!vorRestLit(R)&&!out.some(o=>o.id==='a1_lanterns'&&Math.abs(o.x-R.x)<8&&Math.abs(o.y-R.y)<8)) out.push({x:R.x,y:R.y,id:'a1_lanterns',text:tx}); } }catch(e){ console.error(e); } return out; }; }
+{ const base=drawMarkers; drawMarkers=function(t){ base(t); try{ if(vorLanQ()&&!AREA) for(const R of VRESTS) if(!vorRestLit(R)&&inView(R.x,R.y,60)) drawMarker(R.x,R.y-62,'?',t); }catch(e){ console.error(e); } }; }
 
 // ---------- 7.1 Tier 0: the Gate Yard
 STORY.a1_cinder_walk=[

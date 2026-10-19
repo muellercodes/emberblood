@@ -1197,7 +1197,10 @@ function m3sEclTick(dt){
 { const base=ambientTint; ambientTint=function(){ let c=base(); try{ if(AREA||!G) return c; const E=M3S.ecl; if(E) c=mixRGB(c,[110,96,160],E.k*0.5); if(M3S.grey>0) c=mixRGB(c,[178,178,192],Math.min(1,M3S.grey/3)*0.32); }catch(e){} return c; }; }
 // a moth seen from above, head up, centred on (0,0). W is half the wingspan; f how open the wings are (0.55 to 1)
 const M3S_MARKS=[[0.3,-0.16],[0.44,-0.44],[0.7,-0.5],[0.84,-0.3],[0.52,-0.1],[0.24,-0.34],[0.9,-0.44],[0.34,0.3],[0.5,0.42]];
-const M3S_NYX={fore:'#241c34',fore2:'#33284a',hind:'#2b2140',band:'#c8cce0',ring:'#d6c8f4',eye:'#8a5ad8',pupil:'#140a24',fur:'#3a3050',fur2:'#5a4a72',ant:'#d8dcf0',marks:9,glow:'150,120,230',moonEyes:true};
+// (v11: Nyxara is "grey and soft as dust, with two pale moons painted on her wings", n_nyxara.js: dusty grey wings, a
+// pale moon where the painted eyes were, and still the small marks that open like eyes when she is angry)
+const M3S_NYX={fore:'#787282',fore2:'#8a8494',hind:'#6a6476',band:'#d2cedb',ring:'#f2f0f7',moonSh:'#b2aec6',eye:'#8a5ad8',pupil:'#140a24',fur:'#625c6e',fur2:'#7e788a',ant:'#e2e0ee',marks:9,glow:'168,160,218',moonEyes:true,moons:true,dust:true};
+const M3S_DUST=[[0.2,-0.22],[0.28,-0.42],[0.38,-0.56],[0.62,-0.58],[0.8,-0.52],[0.92,-0.3],[0.86,-0.14],[0.68,-0.06],[0.4,-0.02],[0.22,0.06],[0.3,0.2],[0.46,0.3],[0.56,0.52],[0.4,0.58],[0.2,0.4],[0.74,-0.4],[0.5,-0.48],[0.16,-0.1]];
 const M3S_HUSH={fore:'#f4f2fa',fore2:'#e6e2f2',hind:'#e8e4f4',band:'#cfdcf4',ring:'#ece2ff',eye:'#9a6ae0',pupil:'#2a1a4a',fur:'#ffffff',fur2:'#e8e4f6',ant:'#f0ecff',marks:0,glow:'230,236,255',frost:true};
 function m3sMothFig(g,Wd,f,o,open){
   const O=SBC.outline, lw=Math.max(1.4,Wd*0.017), W=Wd;
@@ -1215,12 +1218,22 @@ function m3sMothFig(g,Wd,f,o,open){
     g.strokeStyle=o.band; g.lineWidth=W*0.034; g.beginPath(); g.moveTo(s*W*0.3*f,-W*0.5); g.bezierCurveTo(s*W*0.6*f,-W*0.64,s*W*0.92*f,-W*0.58,s*W*0.98*f,-W*0.36); g.stroke();
     g.strokeStyle=O; g.lineWidth=lw;
     g.fillStyle=o.band; m3sDot(g,s*W*0.44*f,W*0.4,W*0.05); g.fill();
-    // the painted eye
+    // the dust: fine pale and dark specks over the wings
+    if(o.dust){ const ds=Math.max(0.8,W*0.012); for(let i=0;i<M3S_DUST.length;i++){ const [ux,uy]=M3S_DUST[i]; g.fillStyle=i%3?'rgba(236,232,244,.5)':'rgba(52,46,64,.35)'; m3sDot(g,s*W*ux*f,W*uy,ds*(1+(i%2)*0.6)); g.fill(); } }
+    // the painted eye (Hush), or a pale painted moon (Nyxara): a soft glow, a crescent of shadow, two little craters
     const ex=s*W*0.58*f, ey=-W*0.27, er=W*0.15;
+    if(o.moons){
+      g.save(); g.globalCompositeOperation='lighter'; m3sGlowG(g,ex,ey,er*1.8,'236,234,255',0.32); g.restore();
+      g.fillStyle=o.ring; m3sDot(g,ex,ey,er); g.fill(); g.stroke();
+      g.save(); m3sDot(g,ex,ey,er-lw*0.5); g.clip(); g.fillStyle=o.moonSh; m3sDot(g,ex-s*er*0.55,ey+er*0.2,er*0.9); g.fill();
+      g.fillStyle=o.ring; m3sDot(g,ex+s*er*0.12,ey-er*0.06,er*0.8); g.fill(); g.restore();
+      g.fillStyle='rgba(176,170,196,.7)'; m3sDot(g,ex+s*er*0.3,ey-er*0.25,er*0.16); g.fill(); m3sDot(g,ex+s*er*0.05,ey+er*0.38,er*0.11); g.fill();
+    } else {
     g.fillStyle=o.ring; m3sDot(g,ex,ey,er); g.fill(); g.stroke();
     g.fillStyle=o.eye; m3sDot(g,ex,ey,er*0.66); g.fill();
     g.fillStyle=o.pupil; m3sDot(g,ex,ey,er*0.3); g.fill();
     g.fillStyle='rgba(255,255,255,.85)'; m3sDot(g,ex-er*0.25,ey-er*0.27,er*0.13); g.fill();
+    }
     // a hundred small pale marks like closed eyes; they open one by one when she is angry
     if(o.marks){ const nOpen=Math.round((open||0)*o.marks);
       for(let i=0;i<o.marks;i++){ const [ux,uy]=M3S_MARKS[i], mx=s*W*ux*f, my=W*uy, mr=W*0.035;
