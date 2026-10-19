@@ -797,7 +797,7 @@ function drawRocket(){
   }),x,y);
   if(HS.phase==='rocket'){ const k=0.5+0.5*Math.sin(t*6); glowAt(x+3,y-14,10+k*6,'255,200,90',0.8); }
 }
-// the cake table (a cake shaped like Ash), with Grandpa next to it in the 'lantern' ending, or in a birdcage ('heir')
+// the cake table (a cake shaped like Ash), with Grandpa next to it in the 'lantern' ending (with a hat) and the 'heir' ending (without)
 function drawCake(){
   const x=HV.cake.x, y=HV.cake.y, e=G.choices.ending;
   rPut(rSpr('c_cake',130,96,65,64,g=>{
@@ -817,7 +817,7 @@ function drawCake(){
     for(const cx of [-42,36]){ g.fillStyle='#8ab8d8'; g.fillRect(cx,-34,8,9); g.strokeStyle='#2a1a0e'; g.lineWidth=1.5; g.strokeRect(cx,-34,8,9); }
   }),x,y);
   if(e==='lantern') drawMiniDragon(x-74,y+6,1,true);
-  else if(e==='heir') drawCage(x+58,y-26);
+  else if(e==='heir') drawMiniDragon(x+58,y+6,-1,false);   // small Grandpa beside the cake, no cage
 }
 function drawMiniDragon(x,y,f,hat){
   const t=G.time;
