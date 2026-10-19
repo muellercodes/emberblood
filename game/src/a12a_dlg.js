@@ -197,20 +197,23 @@ const MR={
   dirScared:/\b(scared|terrified|trembl|shaking|shiver|frightened|whimper)/, dirHappy:/\b(grin|smil|beam|delight|cheer)/,
   dirShy:/\b(blush|shy|embarrass|sheepish)/, dirSly:/\b(sly|smirk|wink)/, dirWorry:/\b(nervous|worried|anxious|uneasy|hesitant)/,
   dirSoft:/\b(softly|gently|quietly|very softly|tenderly|warmly)/, dirSurprise:/\b(gasp|startled|surprised|amazed)/,
-  laugh:/(^|[\s"(])(ha(ha)+|hah(ah)*|heh(eh)+|hee(hee)+|hehe|ahaha|hoho(ho)*|bwaha\w*|pfft|snrk)\b|\b(laughs|giggles|chuckles)\b/i,
-  sleep:/\b(yawn\w*|y+a+w+n+|zzz+|so sleepy|so tired|i'?m sleepy|i'?m tired|nap time|need a nap|bedtime)\b/i,
-  angry:/\b(how dare|you lied|liar|thief!|get out|leave (me|him|her|us|them) alone|stop it|never forgive|i hate|furious|enough!|you monster|give it back|put (it|that|him|her) down)\b/i,
+  laugh:/(^|[\s"(])(ha(ha)+|hah(ah)+|heh(eh)+|hee(hee)+|hehe|ahaha|hoho(ho)*|bwaha\w*|pfft|snrk)\b/i,
+  sleep:/\b(yawn\w*|y+a+a+w+n+|zzz+|so sleepy|so tired|i'?m sleepy|i'?m tired|i'?m so tired|need a nap)\b/i,
+  angry:/\b(how dare|you lied|liar|thief!|get out|leave (me|him|her|us|them) alone|stop it|never forgive|i hate|furious|enough!|you monster|give (it|that|them|her|him|my \w+) back|put (it|that|him|her) down|that'?s not fair|not fair|cheat(er|ing)?!)\b/i,
   scaredHard:/\b(help( me| us)?!|run!|aa+h+|eek|yikes|look out|watch out|it'?s coming|they'?re coming)\b/i,
-  fear:/\b(scared|afraid|terrified|frightened|monster|ghost|dark|danger|dangerous|trap|creepy|spooky|shaking)\b/i,
-  worry:/\b(careful|be careful|what if|i hope (he|she|you|they|it)|are you (ok|okay|alright|all right|sure|hurt)|uh[- ]oh|oh no|is it safe|hurry|i don'?t like (this|it)|something'?s wrong|worried|nervous)\b/i,
-  sad:/\b(i'?m (so )?sorry|i miss|miss (him|her|you|them)|lonely|alone|all alone|gone forever|never came back|died|dead|funeral|goodbye|tears|crying|cry|i wish|heartbroken|broke my heart|nobody came|forgot (me|her|him))\b/i,
+  fear:/\b(scared|afraid|terrified|frightened|danger|dangerous)\b/i,
+  worry:/\b(careful|be careful|what if|i hope (he|she|you|they)('?s|'?re| is| are) (ok|okay|all right|alright|safe)|are you (ok|okay|alright|all right|hurt)|uh[- ]oh|oh no|is it safe|i don'?t like (this|it)|something'?s wrong|i'?m (so |a bit |a little |very )?(worried|nervous))\b/i,
+  sad:/\b(i'?m (so |very |really )?sorry|i miss|miss (him|her|you|them)|lonely|all alone|so alone|i'?m alone|gone forever|never came back|funeral|i wish i|heartbroken|broke my heart|nobody came|forgot (me|her|him))\b/i,
   surpriseStart:/^(oh!|oh,? my|whoa|woah|wow|what\?!|what!|huh\?!|wait,? what|really\?!|no way|you'?re kidding|goodness!|gosh!|my word|great gears|blimey)/i,
-  happy:/\b(thank you|thanks|yay|hooray|hurrah|huzzah|wonderful|brilliant|lovely|marvell?ous|fantastic|amazing|perfect|splendid|we did it|you did it|well done|good job|i love|love it|so happy|i'?m glad|so glad|welcome|congratulations|beautiful|delicious|best (day|thing))\b/i,
-  greet:/^(hello|hi|hey|good morning|good evening|morning|evening|welcome|there you are|there he is|there'?s my)\b/i,
-  determined:/\b(i'?ll do it|i will do it|i won'?t let|i won'?t give up|i won'?t hand|let'?s go|let'?s do (this|it)|we can do this|i can do this|i promise|i'?m ready|i'?m coming|not until|watch me|leave it to me|count on me|i'?ll find (her|him|it|them|you)|i'?ll bring|i'?ll stop|i'?ll save|i'?ll get it back|stand back|we'?ll see about that)\b/i,
-  tender:/\b(little one|sweetheart|my dear|my darling|love you|come here|i'?m proud of you|proud of you|you'?re safe|it'?s all right|it'?s okay|you did well|good night|goodnight|sleep well)\b/i,
+  happy:/\b(thank you|thanks|yay|hooray|hurrah|huzzah|wonderful|brilliant|lovely|marvell?ous|fantastic|amazing|perfect|splendid|adorable|we did it|you did it|well done|good job|i love|love it|so happy|i'?m glad|so glad|welcome|congratulations|beautiful|delicious|best (day|thing))\b/i,
+  greet:/^(hello|hi|good morning|good evening|morning|evening|welcome|there you are|there he is|there'?s my)\b/i,
+  determined:/\b(i'?ll do it|i will do it|i won'?t let|i won'?t give up|i won'?t hand|let'?s go|let'?s do (this|it)|we can do this|i can do this|i'?m ready|i'?m coming (for|to get)|not until|watch me|leave it to me|count on me|i'?ll find (her|him|it|them|you)|i'?ll stop (her|him|it|them)|i'?ll save|i'?ll get it back|stand back|we'?ll see about that)\b/i,
+  tender:/(\b(little one|sweetheart|my dear|my darling|love you|i'?m proud of you|proud of you|you'?re safe|you did well|good night|goodnight|sleep well)\b|(^|[.!?]\s+)(it'?s all right|it'?s okay)\b|\blet'?s go home\b)/i,
   shy:/^(um+|uh+m*|erm+|er+)\b/i,
   sly:/\b(our little secret|don'?t tell|wouldn'?t you like to know|maybe i did|maybe i didn'?t|guess who|finders keepers|not telling)\b/i,
+  happyBang:/(^ha!|\b(ahoy|bravo|bravissimo|whe+e+|yippee|woo+|hurray|ooh|lucky|magnificent|splendid|adorable|i like (you|it|that)|good (lad|boy|girl|dragon|job|work|news|show)|my favou?rite|happy lantern day|fair winds|come again|free (soup|cocoa|tea|buns?)|you'?re back|it'?s you|the best)\b)/i,
+  worryBang:/\b(hurry|quick|quickly|get it out|look out|watch out|find out why|somebody (help|stop|find|catch)|don'?t let (it|him|her|them)|oh dear|dear me|goodness me|not fine|keeps crying|i'?m hiding|still here! hiding)\b/i,
+  angryBang:/\b(unhand|nobody (puts|touches|takes|steals)|scamp|villain|scoundrel|rascal|how could you|what have you done|get off (it|me|my \w+)|you'?ll pay|grr+|h+r+m+p+h+|harrumph)\b/i,
   neg:/\b(not|n'?t|never|no|nothing|nobody)\s+(\w+\s+)?$/i
 };
 // a hit only counts when it isn't just after a "not" ("I'm not scared")
@@ -222,25 +225,34 @@ function moodRead(who,text){
     if(MR.dirLaugh.test(dir)) return 'laughing'; if(MR.dirSleep.test(dir)) return 'sleepy'; if(MR.dirSad.test(dir)) return 'sad';
     if(MR.dirAngry.test(dir)) return 'angry'; if(MR.dirScared.test(dir)) return 'scared'; if(MR.dirShy.test(dir)) return 'shy';
     if(MR.dirSly.test(dir)) return 'sly'; if(MR.dirWorry.test(dir)) return 'worried'; if(MR.dirSurprise.test(dir)) return 'surprised';
-    if(MR.dirHappy.test(dir)) return 'happy'; if(MR.dirSoft.test(dir)) return 'tender';
+    if(MR.dirHappy.test(dir)) return 'happy';
+    if(MR.dirSoft.test(dir)) return mrHit(MR.sad,t)||/\blonely\b/i.test(t)?'sad':/\b(sorry|um|uh)\b/i.test(t)?'shy':'tender';
   }
-  const bang=/!/.test(t), q=/\?/.test(t), trail=/(\.\.\.|…)["')]*$/.test(t), short=t.split(/\s+/).length<=14;
+  const bang=/!/.test(t), q=/\?/.test(t), short=t.split(/\s+/).length<=14;
   if(mrHit(MR.laugh,t)) return 'laughing';
   if(mrHit(MR.sleep,t)) return 'sleepy';
-  if(bang&&mrHit(MR.angry,t)) return 'angry';
+  if(bang&&(mrHit(MR.angry,t)||mrHit(MR.angryBang,t))) return 'angry';
   if(bang&&mrHit(MR.scaredHard,t)) return 'scared';
   if(/\?!|!\?/.test(t)&&short) return 'surprised';
   if(MR.surpriseStart.test(t)) return 'surprised';
+  if(bang&&mrHit(MR.worryBang,t)) return 'worried';
+  const happy=mrHit(MR.happy,t)||(bang&&mrHit(MR.happyBang,t));
+  if(/\blet'?s go home\b/i.test(t)&&!bang) return 'tender';
   if(mrHit(MR.sad,t)&&!bang) return 'sad';
-  if(mrHit(MR.worry,t)) return 'worried';
+  if(mrHit(MR.worry,t)&&!happy) return 'worried';
+  if(happy&&bang) return 'happy';
   if(q&&mrHit(MR.fear,t)) return 'worried';
   if(mrHit(MR.determined,t)) return 'determined';
   if(mrHit(MR.sly,t)) return 'sly';
   if(mrHit(MR.tender,t)&&!bang) return 'tender';
-  if(mrHit(MR.happy,t)) return bang||/\b(thank you|thanks|welcome|i'?m glad|so glad|i love)\b/i.test(t)?'happy':'neutral';
+  if(happy&&/\b(thank you|thanks|welcome|i'?m glad|so glad|i love)\b/i.test(t)) return 'happy';
   if(bang&&MR.greet.test(t)) return 'happy';
+  // excited: a shout with a question ("Vesper! How did you get up here?"), or a word in capitals in a shout or a question
+  const n=t.split(/\s+/).length, caps=/\b(?!HEADLINE\b|EXTRA\b)[A-Z]{3,}\b/.test(t)&&t.replace(/[^a-z]/g,'').length>t.replace(/[^A-Z]/g,'').length;
+  if(bang&&q&&n<=24) return 'surprised';
+  if((bang||q)&&caps&&n<=16) return 'surprised';
+  if(/^oh dear\b/i.test(t)) return 'worried';
   if(MR.shy.test(t)) return 'shy';
-  if(trail&&short&&!q&&!bang) return 'sad';
   if(who==='pip'&&bang) return 'happy';
   return 'neutral';
 }
@@ -251,6 +263,7 @@ function moodRest(who,m){
     if(who==='f_glaciar'&&typeof f2sGlacEyes==='function'&&f2sGlacEyes()==='#c890ff'&&!(G.bossDone&&G.bossDone.f_glaciar)) return 'cold';
     if(/^n_echo_/.test(who)) return m==='neutral'||m==='tender'||m==='happy'?'cold':m;
     if(who==='c_mask'&&m==='neutral') return 'sly';
+    if(who==='nyxara'&&m==='happy') return 'sly';
   }catch(e){}
   return m;
 }
