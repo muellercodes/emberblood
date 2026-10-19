@@ -260,7 +260,10 @@ function updateArea(dt){
 // small key (or the great door with the Boss Key) opens it, and a closed door says what opens it.
 // After any of these moves, the trigger Ash arrives next to waits until he has stepped off it, so he never bounces back.
 // Doors that still ask: roof hatches and crossings (deliberate climbs), and anything that is not a plain way in.
+// (d.walk can be a function: Ambrose's workshop in the foot of the Great Clock keeps its prompt once Ash has the
+//  Climbing Claws, so walking north there climbs the clock and E goes in; see x1_world.js)
 function doorWalkable(d){
+  if(typeof d.walk==='function'){ try{ return !!d.walk(); }catch(e){ return true; } }
   if(d.walk!=null) return !!d.walk;
   if(d.hs||d.cave) return true;
   let l=''; try{ l=String(d.label||''); }catch(e){}

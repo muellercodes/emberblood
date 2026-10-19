@@ -816,7 +816,9 @@ function c1Build(B){
   const GH='c_gearhaven';
   C1ROOF.houses.forEach(([x,y,w,h,want],i)=>c1House(B,{x,y,w,h,town:GH,want,walk:true,seed:6100+i*37}));
   for(const [x,y,w,h] of [[6400,24300,130,90],[6350,24720,120,100],[8250,24420,140,100],[8250,24700,120,90],[6560,25090,120,70],[8130,25090,130,70],[7350,24872,120,80],[8320,24890,120,90]]) c1House(B,{x,y,w,h,town:GH});
-  C1WD.homes.push({want:'c_ambrose',town:GH,door:{x:7200,y:24846,outY:20},name:S("Ambrose's Workshop","Ambrose's Workshop")});
+  // (the workshop door is in the foot of the Great Clock, right under the hatch Ash climbs to with the Climbing Claws:
+  //  once he has them it keeps its "Enter" prompt instead of opening when walked into, so pushing north there climbs)
+  C1WD.homes.push({want:'c_ambrose',town:GH,door:{x:7200,y:24846,outY:20,walk:()=>!(typeof canClaws==='function'&&canClaws())},name:S("Ambrose's Workshop","Ambrose's Workshop")});
   // the Lower Town and the harbor
   for(const [x,y,w,h,want] of [[6600,25750,170,110,'c_hettie'],[7700,25800,180,110,'c_ingrid'],[7300,26180,210,120,'c_fig'],[8100,26340,150,100,'c_mo']]) c1House(B,{x,y,w,h,town:GH,want});
   for(const [x,y,w,h] of [[6520,25420,120,80],[6780,25440,110,80],[7300,25470,120,80],[7980,25440,120,80],[8300,25560,110,90],[6480,26080,110,90],[6680,26180,100,80],[7600,26080,110,90],
@@ -1383,7 +1385,7 @@ function c1HouseHands(t){
     const def=defHouse('h_'+o.id,{name:o.house||'House',owner:o.id,style,seed:1000+i+town.length*31,painting:i,egg:i+3,w:style==='inn'||style==='lodge'?680:560,h:style==='inn'?460:400,town});
     if(INDOOR[o.id]&&CASTBY[o.id]) CASTBY[o.id].inside=def.id;
     if(hsx){ hsx.owner=o.id; hsx.area=def.id; hsx.door=door; }
-    DOORS.push({x:door.x,y:door.y,area:def.id,label:`Enter ${def.name}`,outY:door.outY||0,hs:hsx||undefined,owner:def.owner}); off.push(o); o.home=false; };
+    DOORS.push({x:door.x,y:door.y,area:def.id,label:`Enter ${def.name}`,outY:door.outY||0,hs:hsx||undefined,owner:def.owner,walk:typeof door.walk==='function'?door.walk:undefined}); off.push(o); o.home=false; };
   try{
     for(const town of TOWN_ORDER){ if(!town.startsWith('c_')) continue;
       const owners=CAST.filter(c=>c.town===town&&c.home&&!c.generic);
