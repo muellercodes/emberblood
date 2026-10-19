@@ -120,6 +120,8 @@ function s10CondParse(src){
       case 'area': { const a=arg(); f=()=>!!AREA&&(AREA.id===a||String(AREA.id).startsWith(a+'_')); break; }
       case 'outdoors': f=()=>!AREA; break;
       case 'ending': { const a=arg(); f=()=>s10Ending(actOf(G.stage))===a; break; }
+      // (v11 talk) what Ash answered: a reply's then: ['said key'] sets it (G.story.said, saved; old saves start empty)
+      case 'said': { const a=arg(); f=()=>!!(G.story&&G.story.said&&G.story.said[a]); break; }
       case 'true': f=()=>true; break;
       case 'false': f=()=>false; break;
       default: s10Err(`condition "${src}": unknown test "${t}"`); f=()=>false;
@@ -211,6 +213,7 @@ function s10Effect(e,ctx){
     case 'end_act': { const n=+a||actOf(G.stage), A=S10.acts[n], ea=A&&A.end_act||{}; later(0.3,()=>endAct(n,{title:ea.title?s10T(ea.title):undefined,lines:s10Arr(ea.lines).map(x=>s10T(x)).filter(Boolean)})); break; }
     case 'page': s10Page(a); break;
     case 'shrine': { const sid=s10ShrineId(a); if(!sid){ s10Err(`effect "${e}": ${a} is not a shrine`); break; } G.shrines=G.shrines||{}; G.shrines[sid]=true; G.lastShrine=sid; break; }
+    case 'said': if(!a){ s10Err(`effect "${e}": said <key>`); break; } (G.story.said||(G.story.said={}))[a]=1; break;
     default: s10Err(`effect "${e}": unknown "${k}"`);
   }
 }
@@ -1063,36 +1066,78 @@ function s10TalkHook(n){
   return false;
 }
 onTalk(n=>s10TalkHook(n));
-// the "what's new" line: the first matching talk entry plays before the person's menu. It rides on the menu (talkHub)
-// rather than taking the talk over, so the old code's quest steps, offers and minigames with that person still run.
-function s10HubLines(n){
+// (v11 talk, STORY_PLAN 6.3 idea A) the opener: the first matching talk entry IS the person's greeting, and the menu
+// sits under its last line (talkHub in a9f_talk.js calls s10Opener; the generic greetLine runs only when there is no
+// data line). It rides on the menu rather than taking the talk over, so the old code's quest steps, offers and
+// minigames with that person still run. An opener heard today is not said again: the person's idle line instead (a
+// list of [full, simple] variants plays the next one not heard today, then idle). G.story._hd: { key: day } heard.
+const s10Day=()=>Math.floor((G.worldTime||0)/540);   // dayNow() in a9f_talk.js
+function s10Heard(){ return G.story._hd||(G.story._hd={}); }
+// the next variant of a variant entry not heard today (from the rotation), or -1
+function s10VarNext(T,k){ const n=T.say.length, R=G.story._rot||(G.story._rot={}), H=s10Heard(), d=s10Day(), i0=(R[k]|0)%n;
+  for(let j=0;j<n;j++){ const i=(i0+j)%n; if(H[k+'#'+i]!==d) return i; } return -1; }
+function s10VarTake(T,k,i){ const R=G.story._rot||(G.story._rot={}); R[k]=i+1; s10Heard()[k+'#'+i]=s10Day(); return s10Lines([[T._who].concat(T.say[i])],{talk:T._who}); }
+// -> null (no data line), { T, heard:true } (heard today), or { T, pre:[lines], last: line|null, re, key, run() }
+function s10Opener(n){
   if(!G||G.mode!=='story'||G.done||!S10.booted||!n) return null;
   const id=n.id, T=s10TalkFor(id,'line'); if(!T) return null;
-  const lines=s10TalkLines(T,id);
-  if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1;
-  lines.push({who:'narr',text:'',skipIf:()=>true,fn:()=>{ s10Do(T.then,{talk:id}); }});
-  return lines;
+  const k=s10TalkKey(T), H=s10Heard(), vars=!T.scene&&s10SayVariants(T.say);
+  let lines;
+  if(vars){ const i=s10VarNext(T,k); if(i<0) return {T,heard:true}; lines=s10VarTake(T,k,i); }
+  else{ if(!T.once&&H[k]===s10Day()) return {T,heard:true}; H[k]=s10Day(); lines=s10TalkLines(T,id); }
+  if(T.once) (G.story._once||(G.story._once={}))[k]=1;
+  S10.ver++;
+  // the menu sits under the opener's last line when that line is the person's own
+  let last=null; const j=s10LastLine(lines);
+  if(j>=0&&lines[j].who===id&&!lines[j].opts){ last=lines[j]; lines.splice(j,1); }
+  const answered=!!(G.story._ra&&G.story._ra[k]);
+  return {T,heard:false,pre:lines,last,key:k,re:T.re&&!answered?T.re:null,run:()=>{ s10Do(T.then,{talk:id}); }};
 }
-{ const base=talkHub; talkHub=function(n,pre){ let L=pre; try{ const x=s10HubLines(n); if(x&&x.length) L=(pre||[]).concat(x); }catch(e){ console.error(e); } return base(n,L); }; }
+const s10LastLine=L=>{ for(let j=L.length-1;j>=0;j--) if(L[j]&&L[j].text!=='') return j; return -1; };
+// "Anything else going on?": the opener's next variant not heard today (only for a variant entry)
+function s10VarOpt(id){
+  if(!G||G.mode!=='story'||!S10.booted) return null;
+  const T=s10TalkFor(id,'line'); if(!T||T.scene||!s10SayVariants(T.say)) return null;
+  const k=s10TalkKey(T); if(s10VarNext(T,k)<0) return null;
+  return {t:S('Anything else going on?','Anything else new?'),then:()=>{ const i=s10VarNext(T,k); return i<0?[]:s10VarTake(T,k,i); },back:true};
+}
+// a person's idle line (what they say when the opener was heard today, and the prompt over the menu after an answer)
+// and bye line: the opener's own idle when it has one, else the first matching { idle } / { bye } entry of the latest act
+function s10MetaText(id,field,T0){
+  if(!G||G.mode!=='story'||!S10.booted) return null;
+  let src=T0&&T0[field]!=null?T0:null;
+  if(!src){ let bestAct=-1; for(const T of S10.talk[id]||[]){ if(T[field]==null||s10TalkKind(T)!=='meta') continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ src=T; bestAct=a; } } }
+  if(!src) return null;
+  const v=src[field];
+  if(Array.isArray(v)&&v.length&&Array.isArray(v[0])){ const R=G.story._rot||(G.story._rot={}), k=field+':'+s10TalkKey(src), i=(R[k]|0)%v.length; R[k]=i+1; return s10T(v[i]); }
+  return s10T(v)||null;
+}
+function s10Idle(id,T0){ return s10MetaText(id,'idle',T0); }
+function s10Bye(id){ return s10MetaText(id,'bye'); }
+// a person converted to v11 talk (has replies or ask topics in a live act): the new menu (talkHub)
+function s10V11(id){ if(!S10.booted) return false; return (S10.talk[id]||[]).some(T=>(T.ask!=null||T.re!=null)&&!(T._owner&&T._owner.act&&actOf(G.stage)<T._owner.act)); }
 function s10HasTalk(id){ const L=S10.talk[id]; if(!L||!L.length) return false; return L.some(T=>{ const own=T._owner; return !(own&&own.act&&actOf(G.stage)<own.act); }); }
 // at boot: CAST lines become the data's current line for people who have data talk
 function s10TalkTakeover(){
   for(const id in S10.talk){
     const c=(typeof CASTBY!=='undefined'&&CASTBY[id])||(typeof SPECIAL!=='undefined'&&SPECIAL[id]); if(!c||c._s10lines) continue;
     let old=c.lines; c._s10lines=true;
-    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>!t.option&&!t.bark&&!t.once&&!t.first&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
+    try{ Object.defineProperty(c,'lines',{configurable:true,get(){ try{ if(G&&s10HasTalk(id)){ const T=s10TalkFor(id,'line')||(S10.talk[id]||[]).find(t=>s10TalkKind(t)==='line'&&!t.once&&s10TalkOk(t)); if(T){ const say=s10SayVariants(T.say)?T.say.map(v=>s10T(v)):Array.isArray(T.say)&&Array.isArray(T.say[0])?[s10T(T.say[0].slice(1))]:T.say!=null?[s10T(T.say)]:null; if(say) return say; } } }catch(e){} return old; },set(v){ old=v; /* the old code may set lines: kept for when there is no data line */ }}); }catch(e){}
   }
   if(typeof BARKS!=='undefined') for(const b of BARKS){ const m=/^id:([\w]+)$/.exec(String(b._who||'')); if(!m||b._s10) continue; const id=m[1], c0=b.c; b._s10=true; b.c=function(){ if(G&&s10HasTalk(id)) return false; return typeof c0==='function'?c0.apply(this,arguments):!!c0; }; }
 }
 // (personal barks are told apart by their "who": B('c_x', 'id:c_hester', ...))
 { const base=B; B=function(k,who,c,t,o){ const r=base(k,who,c,t,o); try{ const b=BARKS[BARKS.length-1]; if(b&&b.k===k) b._who=who; }catch(e){} return r; }; }
-function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify([T.if,T.say,T.scene,T.option,T.then]))); }
+// (the key of an entry without ask, idle or bye is what it was before v11, so saves keep their once marks)
+function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify(T.ask!=null||T.idle!=null||T.bye!=null?[T.if,T.say,T.scene,T.option,T.then,T.ask,T.idle,T.bye]:[T.if,T.say,T.scene,T.option,T.then]))); }
+// what an entry is: option (a menu option), bark, ask (a topic), first, meta (only idle or bye), line (an opener)
+function s10TalkKind(T){ if(T.option) return 'option'; if(T.bark) return 'bark'; if(T.ask!=null) return 'ask'; if(T.first) return 'first'; if(T.say==null&&T.scene==null&&T.then==null) return 'meta'; return 'line'; }
 function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if((T.once||T.first)&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
 // the first matching entry, top to bottom, of the latest act that has one (an act-5 line wins over an act-2 line that
 // would also match; inside one act the order is the data's)
 function s10TalkFor(id,kind){
   let best=null, bestAct=-1;
-  for(const T of S10.talk[id]||[]){ const k=T.option?'option':T.bark?'bark':T.first?'first':'line'; if(k!==kind) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ best=T; bestAct=a; } }
+  for(const T of S10.talk[id]||[]){ const k=s10TalkKind(T); if(k!==kind) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ best=T; bestAct=a; } }
   return best;
 }
 // say forms: [full, simple] or a string (said by that person); a list of lines [[who, full, simple], ...]; or (A2S)
@@ -1386,14 +1431,14 @@ function s10LegacyExamined(o){
 { const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(G&&G.fade>0&&scene==='dialogue'&&!(typeof HS!=='undefined'&&HS.on)) G.fade=Math.max(0,G.fade-dt*2.5); }catch(e){} }; }
 
 // ---------- 21. saves: G.case and G.story ride along with the game; old saves start empty
-function s10Fresh(){ G.case={clues:{},solved:{},tries:{},seen:{},pages:{}}; G.story={_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}}; }
+function s10Fresh(){ G.case={clues:{},solved:{},tries:{},seen:{},pages:{}}; G.story={_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{},said:{}}; }
 { const base=newRun; newRun=function(mode){ base(mode); try{ s10Fresh(); S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null}; }catch(e){ console.error(e); } }; }
 { const base=saveData; saveData=function(){ const s=base(); try{ if(G&&G.case) s.case=G.case; if(G&&G.story) s.story=G.story; }catch(e){} return s; }; }
 { const base=loadGame; loadGame=function(s){ base(s); try{ s10Loaded(s); }catch(e){ console.error(e); } }; }
 function s10Loaded(s){
   const C=s&&s.case, T=s&&s.story;
   G.case={clues:Object.assign({},C&&C.clues),solved:Object.assign({},C&&C.solved),tries:Object.assign({},C&&C.tries),seen:Object.assign({},C&&C.seen),pages:Object.assign({},C&&C.pages)};
-  G.story=Object.assign({_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{}},T&&typeof T==='object'?JSON.parse(JSON.stringify(T)):{});
+  G.story=Object.assign({_ev:{},_seen:{},_once:{},_ex:{},_w:{},_npc:{},_trk:{},said:{}},T&&typeof T==='object'?JSON.parse(JSON.stringify(T)):{});
   S10.queue.length=0; S10.pend={}; S10.cam=null; S10.actors={}; S10.walks.length=0; S10.mini={lostAt:-99,tries:0,owner:null};
   if(S10.booted){ s10Silence(S10.chapters[G.stage]); s10Migrate(); s10ActMigrate(); s10QuestResume(); try{ s10QuestDoneIf(); }catch(e){} s10NpcSync(true); }
 }
