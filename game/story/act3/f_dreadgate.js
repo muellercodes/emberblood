@@ -168,7 +168,7 @@ chapter({
               ['ash', 'Fly home, then. Tell her I\'m coming.', 'Fly home. Tell her I\'m coming.'],
               ['f_hush', 'Shhh. She knows.', 'Shhh. She knows.'] ] },
         ] },
-      ['narr', 'She flutters up into the sky, smaller and smaller, and is gone. Behind you, the Frost Lock cracks apart, and the Dreadgate swings open.', 'She flies away. CRACK! The lock breaks. The gate opens!',
+      ['narr', 'She flutters up into the sky, smaller and smaller, and is gone. Behind you, the Frost Lock cracks apart, and the Dreadgate swings open.', 'She flies away. The lock breaks. The gate opens!',
         { do: ['world f3_hush_small away'], ref: 'f_dread_door' }],
       { if: 'choice c_vesper=friend', then: [
         ['c_vesper', 'Go on, cousin. I\'ll watch the gate. I know every trick for getting past one.', 'Go on, cousin. I\'ll watch the gate.', { ref: 'f_dread_door' }] ] },

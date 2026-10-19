@@ -189,7 +189,7 @@ chapter({
         ['ash', 'He\'s asleep on his mountain, inside a sixth Ward. I climb up every Lantern Day and say goodnight. Sometimes he almost says it back.', 'He sleeps in a Ward. I say goodnight. He almost says it back.'],
         ['f_glaciar', 'Almost? From Vorlax, that\'s a speech. Keep climbing.', 'From him, that is a speech. Keep climbing.'] ],
         else: [{ if: 'choice ending=heir', then: [
-        ['ash', 'I took his fire. All of it, for one night. Then I gave most of it back. He sits on the warm shelf over Bertram\'s oven now, and he\'s never once said thank you.', 'I took his fire, then gave most back. He sits on a warm baker\'s shelf.'],
+        ['ash', 'I took his fire. All of it, for one night. Then I gave most of it back. He sits on the warm shelf over Bertram\'s oven now, and he\'s never once said thank you.', 'I took his fire, then gave most back. He sits on Bertram\'s oven shelf.'],
         ['f_glaciar', 'Never once? Then he hasn\'t changed a bit, the old crosspatch. I\'m glad he\'s somewhere warm.', 'He has not changed. I am glad he is warm.'] ],
         else: [{ if: 'choice ending=lantern', then: [
         ['ash', 'I lit him a lantern, like Ember used to. He came home. He\'s the size of a goat, and the first thing he asked was if there was cake.', 'I lit him a lantern. He came home. He asked for cake.'],
