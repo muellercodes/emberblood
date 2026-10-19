@@ -32,8 +32,8 @@ const STORY={
   // (x0_act1.js puts Ember's Trials, two lines, in before the last line)
   lore:[
     ['yara',S(`You fought like a dragon out there. Sit down, Ash. It's time you heard the real story, not the one from the puppet show.`,`You fought like a dragon. Sit down. Here is the real story.`)],
-    ['yara',S(`Ember was Vorlaxis's daughter. That makes him your ${GREATS}grandfather.`,`Ember was his daughter. So Vorlaxis is your grandfather, thirteen times back.`)],
-    ['ash',`...You just said "great" thirteen times.`],
+    ['yara',S(`Ember was Vorlaxis's daughter. That makes him your ${GREATS}grandfather.`,`Ember was his daughter. So Vorlaxis is your great-great-great-great... grandfather.`)],
+    ['ash',S(`...You just said "great" thirteen times.`,`That's a lot of greats.`)],
     ['yara',S(`Here's the part the puppet show leaves out. The binding was made to last a thousand years. Today is the thousandth Lantern Day.`,`The chains were made to last a thousand years. Today is the thousandth Lantern Day.`)],
     ['ash',`So the chains are about to...`],
     ['yara',S(`Come off. That isn't a coincidence, Ash. That's a deadline. And kobolds didn't open that gate by themselves.`,`Come off. It's a deadline. And someone opened the gate for the kobolds.`)],
