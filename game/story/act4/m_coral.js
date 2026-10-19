@@ -98,9 +98,9 @@ chapter({
     crl_east: [
       ['m_coralia', "The Eclipse Observatory, where Lumen's astronomers watched the moon. Clever dragon. Our priests drove the moth away from Lumen with a fire made of moonlight.",
         'The Observatory! Clever dragon. Long ago our priests drove the moth away with moonlight fire.'],
-      ['m_coralia', 'A girl with horns taught it to them, long before. We still sing about her.', 'A girl with horns taught them. We still sing about her.'],
-      ['ash', 'Ember. That was Ember.'],
-      ['m_coralia', 'Then you are her family. Welcome home, a little bit.', 'You are her family. Welcome home, a little bit.'],
+      ['m_coralia', 'A girl with horns taught it to them, long before. We still sing about her. Sir Kipper tells me she was your family.', 'A girl with horns taught them. Kipper says she was your family.'],
+      ['ash', 'She still is.', 'She still is.'],
+      ['m_coralia', 'Then welcome home, a little bit.', 'Then welcome home, a little bit.'],
       ['m_coralia', 'The only way east is under the Reefwall, through the Sunken Gate. But the gate is blocked. By a very full-of-himself fish. Baron Puffington.',
         'The way east is through the Sunken Gate. But a puffed-up fish is stuck in it.', { promise: 'm4_sunken_gate' }],
       ['m_kipper', 'He called my seahorse a "wet pony"!'],

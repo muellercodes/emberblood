@@ -82,7 +82,7 @@ chapter({
       ['nyxara', "Now, little ember. Give me the two Shards in your satchel, and I'll leave your little valley alone. Forever.",
         'Give me your two Shards. Then I will leave your valley alone. Forever.', { do: ['world m4_eclipse1 eyes'] }],
       ['narr', "She could squash you flat with one wing. She doesn't. She asks.", "She could squash you flat. She doesn't. She asks.", { clue: 'm4_she_asks' }],
-      { choose: 'm_deal', ask: ['Give her the two Shards?', 'Give her the Shards?'], pick: [
+      { choose: 'm_deal', who: 'narr', ask: ['She waits for your answer, very still.', 'She waits for your answer.'], pick: [
         { t: ['No way. Not for a hundred valleys!', 'No way!'], tone: 'brave', v: 'refuse',
           then: [{ journal: ['You told Nyxara "No way", not for a hundred valleys.', 'You told Nyxara "No way".'], key: 'm_deal' }],
           say: [['nyxara', 'Brave. How lovely. Keep them warm for me, then. Everyone comes to me in the end.', 'Brave. Keep them warm for me. Everyone comes to me.',

@@ -55,10 +55,10 @@ chapter({
       ask: ['What happens to Driftwood if the moon keeps shrinking?', 'What happens to Driftwood if the moon shrinks?'],
       needs: ['m4_tide_post', 'm4_spyglass', 'm4_gilly_fish'],
       pick: [
-        { t: ['The sea goes wild and swallows it, like the city under that tower', 'The sea swallows it, like that old city'], right: true },
         { t: ['Nothing, once the pufferfish is out of the gate', 'Nothing, once the fish is out'],
           hint: ['Look at the tide post again. What is scratched by the wildest notch? Can a fish do that to the sky?',
             'What is scratched by the wild notch?'] },
+        { t: ['The sea goes wild and swallows it, like the city under that tower', 'The sea swallows it, like that old city'], right: true },
         { t: ['Nothing. Driftwood floats, so it just goes up and down', 'Nothing. Driftwood floats.'],
           hint: ["The chickens' raft floated too, and look where it is now. And how high is the oldest notch on the tide post?",
             "Where is the chickens' raft now? Look at the top notch."] },

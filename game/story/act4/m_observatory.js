@@ -113,7 +113,7 @@ chapter({
     m_hush_out: [
       ['narr', 'Hush sinks down onto the brass floor and folds her wings. The Moon Shard rolls out of its cradle to your feet.', 'Hush sinks down. The Moon Shard rolls to your feet.', { do: [{ if: '!item m_shard3 !item m_heart', then: ['give m_shard3'] }, 'set m_hush_done'] }],
       ['f_hush', 'Take it. It was never mine. Nothing is ever mine.', 'Take it. It was never mine.'],
-      { choose: 'm_hush', ask: ['The silver leash still pulls at her neck, up toward the dark.', 'The leash still pulls her up.'], pick: [
+      { choose: 'm_hush', who: 'narr', ask: ['The silver leash still pulls at her neck, up toward the dark.', 'The leash still pulls her up.'], pick: [
         { t: ['Melt the knots with gentle Moonfire', 'Melt the knots, gently'], tone: 'kind', v: 'free',
           then: ['set m_leash_known', { journal: ["You melted Hush's silver leash with the gentlest Moonfire, and she flew away free.", "You melted Hush's leash. She flew away free."], key: 'm_hush' }],
           say: [

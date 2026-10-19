@@ -179,7 +179,7 @@ people({
       { if: '!flag m_puff_done', fact: 'm4s_sunken_gate=plugged',
         say: ['Baron Puffington is stuck in the Sunken Gate. He called my seahorse a "wet pony". I demanded satisfaction. He laughed.',
           'The Baron called my seahorse a "wet pony"!'] },
-      { say: [['Who swims there? Oh. It\'s you, from the well. Carry on. Carefully.', 'Oh, it is you. Carry on.'],
+      { say: [['Oh. It\'s you, from the well. Carry on. Carefully.', 'Oh, it is you. Carry on.'],
         ['I am not afraid of crabs. I am respectful of crabs, from the far end of the Shell Hall.', 'I am not scared of crabs. I stay far away.']] },
       { bark: true, say: ["Steady, Lady Bubbles. Steady. Is that a crab? It's a rock. Steady.", 'Is that a crab? A rock. Steady.'] },
     ],

@@ -163,7 +163,7 @@ chapter({
       { if: 'choice c_vesper=friend', then: [
         ['nyxara', 'And there is my little thief, up on the tent roof. Come home, little thief. I have fire for you now. Your very own.', 'Come home, little thief. I have fire for you now.'],
         ['c_vesper', "(from the roof behind you) You promised me that last time. Keep it. Gran says fire isn't the only warm thing.", '(from the roof) You promised that last time. Keep it.'] ] },
-      { choose: 'm4_well', ask: ['She bends her long curled tongue down to the water.', 'She bends down to drink.'], pick: [
+      { choose: 'm4_well', who: 'narr', ask: ['She bends her long curled tongue down to the water.', 'She bends down to drink.'], pick: [
         { t: ['Stand in front of the well', 'Stand in front of the well'], tone: 'brave', v: 'stood',
           then: ['set m4_well=stood', 'epi m4_epi_well_stood 5', { journal: ['At the Moon Well you stood in front of the water and spread your wings at the Night Mother.', 'You stood in front of the Moon Well.'], key: 'm4_well' }],
           say: [['narr', 'You jump up on the rim and spread your wings wide. She drinks round you, but not through you. Behind your back, one candle of moonlight stays.',

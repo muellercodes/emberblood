@@ -280,9 +280,9 @@ m3sDef('m_coralia',[
   xl('m_coralia',`I am Coralia, Queen of the Lumenfolk. Our grandmothers' grandmothers' grandmothers lived in Lumen, under the moon, until the moth came the first time. When the city drowned, we chose the sea.`,`I am Coralia, Queen of the Lumenfolk. Long ago we lived in Lumen. When it drowned, we chose the sea.`),
   xl('ash',`Are you related to the moon?`,`Are you related to the moon?`),
   xl('m_coralia',`I hope not. I can't count that high.`,`I hope not. I can't count that high.`),
-  xl('m_coralia',`Our moon-priests drove her away that night with a fire made of moonlight. A girl with horns had taught it to them, long before. We still sing about her.`,`Our priests drove the moth away with moonlight fire. A girl with horns taught them. We still sing about her.`),
-  xl('ash',`Ember. That was Ember.`,`Ember. That was Ember.`),
-  xl('m_coralia',`Then you are her family. Welcome home, a little bit.`,`Then you are her family. Welcome home, a little bit.`),
+  xl('m_coralia',`Our moon-priests drove her away that night with a fire made of moonlight. A girl with horns had taught it to them, long before. We still sing about her. Sir Kipper tells me she was your family.`,`Our priests drove the moth away with moonlight fire. A girl with horns taught them. Kipper says she was your family.`),
+  xl('ash',`She still is.`,`She still is.`),
+  xl('m_coralia',`Then welcome home, a little bit.`,`Then welcome home, a little bit.`),
   xl('m_coralia',`You've come for the third piece of your Heart. A great grey moth, two pale moons on her wings, carried it east over the Glass Desert to the Eclipse Observatory, where Lumen's astronomers watched the moon.`,`A giant grey moth took the last piece of your Heart east. To the Eclipse Observatory, past the Glass Desert.`),
   xl('m_coralia',`And now a white moth guards it there. Our scouts saw her. White as foam, with a silver thread tied to her neck that goes all the way up into the sky.`,`Now a white moth guards it. She has a silver thread on her neck. It goes up into the sky.`),
   xl('ash',`Hush. That's Hush. I beat her. She went small. She was so cold.`,`Hush! I beat her. She went small. She was so cold.`),
@@ -540,7 +540,7 @@ m3sDef('m_lumen_mosaic',[
 // in Act IV, at the Mirror Temple)
 m3sDef('m_lumen_shrine',[
   xl('narr',`Beside the flame, the dark water bulges. A seahorse in a tiny saddle comes up out of it, and on the seahorse sits a merman in shell armour.`,`A merman on a seahorse comes up out of the water.`),
-  xl('m_kipper',`Who swims there? ...A dragon. At the bottom of Lumen. Nobody ever wrote a rule about that.`,`A dragon, down here? Nobody wrote a rule about that.`),
+  xl('m_kipper',`A dragon. At the bottom of Lumen. Nobody ever wrote a rule about that.`,`A dragon, down here? Nobody wrote a rule about that.`),
   xl('m_kipper',`Sir Kipper of Coralcombe, and Lady Bubbles. The Queen keeps a knight beside this flame. A girl with horns left it with our grandmothers.`,`I'm Sir Kipper. We guard this flame. A girl with horns left it.`),
   xl('ash',`That was Ember. She's my family.`,`That was Ember. She's my family.`),
   xl('m_kipper',`Then it's yours. Take it, and then come and see the Queen.`,`Then it's yours. Take it. Then come and see the Queen.`)
@@ -1664,7 +1664,7 @@ if(typeof defineDream==='function'&&typeof DREAMS!=='undefined'){
   if(!DREAMS.m_moth) defineDream('m_moth',{stages:['m_coral','m_reef'],title:S('The Moth on the Lantern','The Moth on the Lantern'),scene:'moth',lines:()=>[
     xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth with two pale moons on her wings is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
     xl('ember_kid',`You came back! If you're going to keep coming back, you need a name.`,`You came back! You need a name.`),
-    xc('ember_kid',`She shivers on the cold post.`,`She shivers on the cold post.`,[
+    xc('narr',`She shivers on the cold post.`,`She shivers on the cold post.`,[
       xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. I'll call you Nyx, because you come in the night.`,`Sit on mine. I will call you Nyx.`)]}),
       xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. I'll call you Nyx.`,`Your own lantern! I will call you Nyx.`)]}),
       xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. I'll call you Nyx.`,`Careful, it's hot! Fine. Sit here. I will call you Nyx.`)]})]),
@@ -1678,7 +1678,7 @@ if(typeof defineDream==='function'&&typeof DREAMS!=='undefined'){
     xl('narr',`On the hill above Emberhollow, a girl with horns sits alone, holding a lantern that has gone out.`,`Young Ember sits alone with a lantern that went out.`),
     xl('ember_kid',`It went out. It's never gone out before.`,`It went out. It never went out before.`),
     xl('ember_kid',`I was waiting for somebody. They didn't come.`,`I was waiting for someone. They didn't come.`),
-    xc('ash',`She holds the cold lantern out to you.`,`She holds out the cold lantern.`,[
+    xc('narr',`She holds the cold lantern out to you.`,`She holds out the cold lantern.`,[
       xo(`Light it again`,`Light it again`,{tone:'brave',fn:()=>{ G.flags.dr_m_eclipse='light'; },then:[xl('narr',`You breathe on it. Nothing. You breathe harder. A tiny spark catches, and holds.`,`You breathe on it. A tiny spark catches.`)]}),
       xo(`Sit with her`,`Sit with her`,{tone:'kind',fn:()=>{ G.flags.dr_m_eclipse='sit'; },then:[xl('narr',`You sit down beside her. Her shoulder is warm against yours. The lantern flickers back on, all by itself.`,`You sit with her. The lantern lights up by itself.`)]})]),
     xl('narr',`You wake up. Your claws are warm. Pip is sitting on your chest, glowing like a nightlight.`,`You wake up. Pip glows on your chest.`)]});
