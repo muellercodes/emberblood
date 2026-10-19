@@ -98,7 +98,7 @@ quest({
         { do: ['take c_musicbox', 'give coins 80'] }] },
       { if: 'flag c_gifts=kept', then: [
         ['c_whirligig', 'Well, dragon? Where is my music box?', 'Well? Where is my box?'],
-        { choose: 'c_gifts_tell', ask: ['What do you tell Lord Whirligig?', 'What do you tell him?'], pick: [
+        { choose: 'c_gifts_tell', who: 'narr', ask: ['What do you tell Lord Whirligig?', 'What do you tell him?'], pick: [
           { t: ['The truth: a little girl needs it to sleep', 'A girl needs it to sleep'], tone: 'kind', v: 'truth',
             then: ['set c_gifts=truth', 'trust vesper +1'],
             say: [['c_whirligig', 'A child? Who cannot sleep? ...Hmph. I have eleven music boxes. Let her keep it.', 'A child? Hmph. She can keep it.'],

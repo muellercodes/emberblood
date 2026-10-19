@@ -53,7 +53,7 @@ quest({
         'Now a gull sits on my chimney. The stove smokes.'],
       ['c_oona', "I can't climb up to shift it. And there's never been a spark in this family. Not one.",
         "I can't climb. And we have no spark."],
-      { choose: 'c_oona_offer', ask: ["Would you, duck? I'd pay you in biscuits. Very old biscuits.", 'Will you help? I pay in biscuits.'],
+      { choose: 'c_oona_offer', who: 'c_oona', ask: ["Would you, duck? I'd pay you in biscuits. Very old biscuits.", 'Will you help? I pay in biscuits.'],
         pick: [
           { t: ["I'll light it for you!", 'I will help!'], tone: 'kind', then: ['quest start c_oona'],
             say: [['c_oona', 'Bless you, duck. Mind the gull. He bites.', 'Bless you. Mind the gull.']] },
@@ -75,7 +75,7 @@ quest({
         'A Lady promised her fire for me.', { clue: 'q_oona_lady' }],
       { if: 'flag pip quest a1_pip done', then: [['pip', "Mip. (Pip curls up in Gran's lap like a warm bun.)", 'Mip. (Pip naps in her lap.)']] },
       { if: 'item a1_locket !flag c_locket_given', then: [
-        { choose: 'c_oona_locket', ask: ["You still have the shell locket from the stranger's camp up north.", 'You still have the shell locket.'],
+        { choose: 'c_oona_locket', who: 'narr', ask: ["You still have the shell locket from the stranger's camp up north.", 'You still have the shell locket.'],
           pick: [
             { t: ['Show Granny Oona the locket', 'Show Gran the locket'], tone: 'kind',
               then: ['set c_locket_given', 'trust vesper +1', 'take a1_locket'],

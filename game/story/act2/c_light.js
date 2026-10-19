@@ -226,7 +226,7 @@ chapter({
     c_lamp_rescue: [
       { place: ['c_mask', 'player', [96, -70]] }, { anim: ['c_mask', 'moths'] }, { cam: 'c_mask', s: 0.6 },
       ['narr', 'Then the moths come back. Not for you. For Vesper. "Get off!" she yells. "I brought the stone! She said I\'d get my fire!"', 'The moths come back, for Vesper! "Get off! She said I would get fire!"'],
-      { choose: 'c_lamp', ask: ['The moths hiss, all together: "All of it. The Mother wants all of it."', 'The moths hiss: "The Mother wants all of it."'], pick: [
+      { choose: 'c_lamp', who: 'narr', ask: ['The moths hiss, all together: "All of it. The Mother wants all of it."', 'The moths hiss: "The Mother wants all of it."'], pick: [
         { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind', v: 'saved',
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [

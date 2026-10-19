@@ -127,7 +127,7 @@ chapter({
       ['narr', 'The roofs end. Across the gap, the Great Clock is stuck at one minute to midnight.', 'The roofs end at the Great Clock.'],
       { place: ['c_mask', 'c_clock_hand'] },
       ['narr', 'She leaps, catches the minute hand, and slips. She hangs right in front of you.', 'She jumps to the clock hand. She slips!'],
-      { choose: 'c_chase', ask: ['Her sack swings an arm\'s length away. So does her hand.', 'Her sack is close. So is her hand.'], pick: [
+      { choose: 'c_chase', who: 'narr', ask: ['Her sack swings an arm\'s length away. So does her hand.', 'Her sack is close. So is her hand.'], pick: [
         { t: ['Grab her wrist and pull her up', 'Pull her up'], tone: 'kind',
           then: ['set c_chase=helped', 'trust vesper +1'],
           say: [['c_mask', '...Why did you do that?'], ['ash', 'You were going to fall.'], ['c_mask', "I don't fall. I drop on purpose. Sometimes.", "I don't fall. I drop on purpose."]] },
