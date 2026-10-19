@@ -51,30 +51,30 @@ chapter({
     clw_prints: [
       ['narr', 'The prints stop at the foot of the cliff. Small boots. Somebody light.', 'The boot prints stop at the cliff.'],
       ['narr', 'Above them, four deep scratches go straight up the rock, all the way to the top.', 'Four deep scratches go straight up the rock.'],
-      ['ash', 'She climbed it. Like a LADDER. Again.', 'She climbed it! Again!'],
+      ['ash', 'She climbed it like a ladder. Again.', 'She climbed it! Again!'],
     ],
     // (6 lines on every branch: it is the first scene after the caves)
     clw_cliff: [
       { place: ['c_mask', 'gull_vesper_seat'] }, { anim: ['c_mask', 'sit'] }, { cam: 'gull_vesper_seat', s: 1 },
       ['c_mask', "Pearl's claws. Huh. They suit you, little ember.", "Pearl's claws. They suit you, little ember."],
-      { choose: 'c_cliff', ask: ['What do you say?', 'What do you say?'], pick: [
+      ['ash', 'Why do you keep calling me that? The only one who ever called me that was the voice on the mountain.', 'Why do you call me that? Only the voice on the mountain did.'],
+      ['c_mask', "...I don't know. It's just what you're called. Isn't it?", "I don't know. It's just your name. Isn't it?"],
+      { choose: 'c_cliff', who: 'narr', ask: ['She swings her boots over the drop and waits, like she has all night.', 'She swings her boots over the drop. She waits.'], pick: [
         { t: ["Vesper. Your gran is cold, isn't she?", 'Your gran is cold, right?'], tone: 'kind',
           then: ['set c_cliff=gran', 'trust vesper +1'],
           say: [
-            ['c_mask', 'WHAT? How do you know my NAME? I nearly fell off!', 'How do you know my NAME? I nearly fell off!'],
-            ['c_mask', "...She's been cold for seventy years. I'm going to fix it. Don't follow me.", 'Gran is always cold. I will fix it. Do not follow me.']] },
-        { t: ['Give back the Ember Heart, Vesper!', 'Give it back, Vesper!'], tone: 'brave',
+            ['c_mask', "How do you know my name? ...She's been cold for seventy years. I'm going to fix it. Don't follow me.", 'How do you know my name? Gran is always cold. I will fix it.']] },
+        { t: ["Give back my mom's Heart, Vesper.", "Give back Mom's Heart, Vesper."], tone: 'brave',
           then: ['set c_cliff=heart'],
           say: [
-            ['c_mask', 'Ooh. He knows my name. Want a medal?', 'Ooh, he knows my name. Want a medal?'],
-            ['c_mask', "It's somewhere you can't climb. Yet.", "It's somewhere you can't climb. Yet."]] },
+            ['c_mask', "So you know my name. It's somewhere you can't climb. Yet.", "So you know my name. It's where you can't climb. Yet."]] },
         { t: ['Nice cloak. Can I borrow it?', 'Nice cloak. Can I borrow it?'], tone: 'silly',
           then: ['set c_cliff=cloak'],
-          say: [['c_mask', 'No.'], ['ash', 'Worth a try.']] },
+          say: [['c_mask', 'No.']] },
       ] },
       { anim: ['c_mask', 'glide'] }, { walk: ['c_mask', 'gull_glide_to'] },
       ['narr', 'She steps backwards off the cliff. Her cloak opens like wings, and she glides away toward the city.', 'She steps off the cliff. Her cloak opens like wings.'],
-      ['ash', 'I REALLY need to learn how to do that.', 'I REALLY need to learn that.'],
+      ['ash', 'I really need to learn how to do that.', 'I need to learn that.'],
       { wait: 1.2 }, { do: ['despawn c_mask'] },
     ],
     clw_marks: [
