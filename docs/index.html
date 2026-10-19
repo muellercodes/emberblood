@@ -3546,7 +3546,10 @@ function updateArea(dt){
 // small key (or the great door with the Boss Key) opens it, and a closed door says what opens it.
 // After any of these moves, the trigger Ash arrives next to waits until he has stepped off it, so he never bounces back.
 // Doors that still ask: roof hatches and crossings (deliberate climbs), and anything that is not a plain way in.
+// (d.walk can be a function: Ambrose's workshop in the foot of the Great Clock keeps its prompt once Ash has the
+//  Climbing Claws, so walking north there climbs the clock and E goes in; see x1_world.js)
 function doorWalkable(d){
+  if(typeof d.walk==='function'){ try{ return !!d.walk(); }catch(e){ return true; } }
   if(d.walk!=null) return !!d.walk;
   if(d.hs||d.cave) return true;
   let l=''; try{ l=String(d.label||''); }catch(e){}
@@ -4489,18 +4492,35 @@ function goFloor(o){
 // pushing into them. The stairs he arrives by wait until he has stepped away from them, so he never bounces back.
 function floorStairsWalk(push){
   const A=AREA, p=player; if(!A||!p) return false;
+  // the push that just took him up or down does not carry him on up the next flight in line (held up through the
+  // library's stairs, he went straight on up the archive's secret ones): no stairs take him again until he lets go or turns
+  const L=DW.latch; if(L&&(L.a!==A.id||!push||push.x*L.x+push.y*L.y<0.7)) DW.latch=null;
+  const latched=!!DW.latch;
   for(const o of A.objs){
     if(o.k!=='stairs'||(o.hidden&&!G.found[o.hidden])) continue;
     const hw=(o.w||64)/2, hh=(o.h||56)/2, nx=clamp(p.x,o.x-hw,o.x+hw), ny=clamp(p.y,o.y-hh,o.y+hh), dx=nx-p.x, dy=ny-p.y, d=Math.hypot(dx,dy);
     const touch=d<=(p.r||14)+5;
     if(DW.hold===o){ if(DW.holdT>0||touch) continue; DW.hold=null; }
-    if(!touch||!push) continue;
+    if(latched||!touch||!push) continue;
     if(d>0.5&&(push.x*dx+push.y*dy)/d<0.35) continue;
+    // (and the way he pushes, from where he stands, runs into the flight: walking along its edge past a corner, from
+    //  the crate to the note in Pebble's loft, brushed the corner and took him downstairs)
+    if(d>0.5&&!stairRayHits(p.x,p.y,push.x,push.y,d+16,o.x-hw,o.y-hh,o.x+hw,o.y+hh)) continue;
     goFloor(o);
-    if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; G.prompt=null; }
+    if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; DW.latch={x:push.x,y:push.y,a:AREA.id}; G.prompt=null; }
     return true;
   }
   return false;
+}
+// does the ray from (x,y) along (ux,uy) meet the box within len? (slabs)
+function stairRayHits(x,y,ux,uy,len,x0,y0,x1,y1){
+  let t0=0, t1=len;
+  for(const [p,d,lo,hi] of [[x,ux,x0,x1],[y,uy,y0,y1]]){
+    if(Math.abs(d)<1e-6){ if(p<lo||p>hi) return false; continue; }
+    let a=(lo-p)/d, b=(hi-p)/d; if(a>b){ const s=a; a=b; b=s; }
+    t0=Math.max(t0,a); t1=Math.min(t1,b); if(t0>t1) return false;
+  }
+  return true;
 }
 function revealTrig(o){
   if(G.found[o.key]){ return false; }
@@ -47245,7 +47265,8 @@ const A1WALL={
   sign:[2925,10084], th:10, gap:24, pieces:[], cols:[], H:[46,51,44,49,47,52], C:['#8a5a34','#7c5030','#93623a','#80542f','#8e5c36','#7a4f2e']
 };
 { const base=initWorld; initWorld=function(){ base(); try{ a1WallBuild(); }catch(e){ console.error('a1 wall',e); } }; }
-function a1WallPiece(x,y,draw){ A1WALL.pieces.push({x,y,draw}); }
+// (hx: how far the piece reaches each side of cx, for the see-through fade when Ash walks behind it; 0 never fades)
+function a1WallPiece(x,y,draw,hx,cx){ A1WALL.pieces.push({x,y,draw,hx:hx||0,cx:cx==null?x:cx}); }
 function a1WallCol(c){ A1WALL.cols.push(c); return addCol(c); }
 function a1WallBuild(){
   const A=A1WALL, P=A.pts; A.pieces.length=0; let v=0;
@@ -47256,7 +47277,7 @@ function a1WallBuild(){
     let t0=i===0?17:0; const tEnd=i===P.length-2?L-17:L;
     for(const [c0,c1] of cuts){ a1WallRun(ax,ay,ux,uy,t0,c0,v); v+=5; t0=c1; }
     a1WallRun(ax,ay,ux,uy,t0,tEnd,v); v+=5;
-    if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay)); REACH.clear.push({x:ax,y:ay,r:60}); }
+    if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay),20); REACH.clear.push({x:ax,y:ay,r:60}); }
   }
   for(const g of A.gates) a1WallGate(g);
   // the Bramble Pond sign steps out of the Pond Gate's way, to the side of the path down to the water
@@ -47273,7 +47294,7 @@ function a1WallRun(ax,ay,ux,uy,t0,t1,v){
   // six stakes to a bay along an east-west run, three on the steep sides, so they sort well with Ash walking by
   const n=Math.max(1,Math.round(L/7.33)), st=L/n, per=Math.abs(ux)>0.8?6:3, ang=Math.atan2(uy,ux);
   for(let k=0;k<n;k+=per){ const m=Math.min(per,n-k), bx=x0+ux*st*(k+0.5), by=y0+uy*st*(k+0.5), vr=(v+k/per)%6|0, key='a1w_bay_'+ang.toFixed(3)+'_'+st.toFixed(2)+'_'+m+'_'+vr;
-    a1WallPiece(bx,Math.max(by,by+uy*st*(m-1)),()=>a1Put(A1SPR.get((LOOK.sb?'s:':'c:')+key)||a1BaySpr(ang,st,m,vr,key),bx,by)); }
+    a1WallPiece(bx,Math.max(by,by+uy*st*(m-1)),()=>a1Put(A1SPR.get((LOOK.sb?'s:':'c:')+key)||a1BaySpr(ang,st,m,vr,key),bx,by),Math.abs(ux)*st*(m-1)/2+10,bx+ux*st*(m-1)/2); }
 }
 // a bay of stakes along any direction: a stone footing, pointed logs back to front, two rails where the run is wide
 // enough on screen to show them (the north run's sprite, a1PalSpr, is this same palisade seen square on)
@@ -47300,14 +47321,14 @@ function a1WallGate(g){
   const posts=[[g.x-g.ux*d,g.y-g.uy*d],[g.x+g.ux*d,g.y+g.uy*d]];
   for(const [x,y] of posts) a1WallCol({t:'c',x,y,r:14});
   REACH.clear.push({x:g.x,y:g.y+10,r:g.hw+70});
-  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y)); return; }
+  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y),g.hw+28); return; }
   // a side gate on a north-south run: two posts, the doors standing open against the inside of the wall, and the
   // gate's name on a board on top of the south post, where you can read it
   const [N,Sp]=posts[0][1]<posts[1][1]?posts:[posts[1],posts[0]], inw=Math.sign(V.x-g.x)||1;
-  a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]));
+  a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]),18);
   a1WallPiece(N[0],N[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),N[0],N[1]+2));
   a1WallPiece(Sp[0],Sp[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),Sp[0],Sp[1]+2));
-  a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]));
+  a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]),18);
 }
 function a1SidePostSpr(g,south){
   return a1Spr('a1w_post_'+g.id+'_'+south,130,130,65,118,gg=>{
@@ -47323,8 +47344,11 @@ function a1SideDoorSpr(hw,inw){ return a1Spr('a1w_door_'+hw+'_'+inw,hw*2+40,70,h
   g.fillStyle='rgba(40,26,14,.22)'; g.fillRect(x+2,-1,hw,6);
   a1DoorFace(g,x,hw,48,'#6e4a2c'); g.fillStyle='rgba(255,224,170,.2)'; g.fillRect(x,-48,hw,2);
 }); }
-// draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode)
-{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; list.push({x:q.x,y:q.y,draw:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
+// draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode).
+// A piece in front of Ash (he is just north of it, inside the south wall) is drawn see-through, as roofs are, so the
+// logs never hide him: along the south run he was gone behind them.
+function a1WallFade(q){ const p=player; if(!q.hx||!p||p.dead) return 1; const dy=q.y-p.y; return dy>2&&dy<64&&Math.abs(p.x-q.cx)<q.hx+12?0.42:1; }
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; const a=a1WallFade(q); list.push({x:q.x,y:q.y,draw:a<1?()=>{ ctx.save(); ctx.globalAlpha*=a; try{ q.draw(); } finally { ctx.restore(); } }:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
 window.__ebA1.wall.A1WALL=A1WALL; window.__ebA1.wall.off=on=>{ for(const c of A1WALL.cols) c.off=!!on; return A1WALL.cols.length; };
 // ================= x0_vorlaxis (v9 Act I): the story of the Cinder Mountain climb and the new Vorlaxis fight
 // Bible: scratchpad/bible/ACT1.md 6.4 (Three Lanterns for Mom), 7 (the climb, tier by tier), 8 (Vorlaxis in the crater)
@@ -49564,7 +49588,9 @@ function c1Build(B){
   const GH='c_gearhaven';
   C1ROOF.houses.forEach(([x,y,w,h,want],i)=>c1House(B,{x,y,w,h,town:GH,want,walk:true,seed:6100+i*37}));
   for(const [x,y,w,h] of [[6400,24300,130,90],[6350,24720,120,100],[8250,24420,140,100],[8250,24700,120,90],[6560,25090,120,70],[8130,25090,130,70],[7350,24872,120,80],[8320,24890,120,90]]) c1House(B,{x,y,w,h,town:GH});
-  C1WD.homes.push({want:'c_ambrose',town:GH,door:{x:7200,y:24846,outY:20},name:S("Ambrose's Workshop","Ambrose's Workshop")});
+  // (the workshop door is in the foot of the Great Clock, right under the hatch Ash climbs to with the Climbing Claws:
+  //  once he has them it keeps its "Enter" prompt instead of opening when walked into, so pushing north there climbs)
+  C1WD.homes.push({want:'c_ambrose',town:GH,door:{x:7200,y:24846,outY:20,walk:()=>!(typeof canClaws==='function'&&canClaws())},name:S("Ambrose's Workshop","Ambrose's Workshop")});
   // the Lower Town and the harbor
   for(const [x,y,w,h,want] of [[6600,25750,170,110,'c_hettie'],[7700,25800,180,110,'c_ingrid'],[7300,26180,210,120,'c_fig'],[8100,26340,150,100,'c_mo']]) c1House(B,{x,y,w,h,town:GH,want});
   for(const [x,y,w,h] of [[6520,25420,120,80],[6780,25440,110,80],[7300,25470,120,80],[7980,25440,120,80],[8300,25560,110,90],[6480,26080,110,90],[6680,26180,100,80],[7600,26080,110,90],
@@ -50131,7 +50157,7 @@ function c1HouseHands(t){
     const def=defHouse('h_'+o.id,{name:o.house||'House',owner:o.id,style,seed:1000+i+town.length*31,painting:i,egg:i+3,w:style==='inn'||style==='lodge'?680:560,h:style==='inn'?460:400,town});
     if(INDOOR[o.id]&&CASTBY[o.id]) CASTBY[o.id].inside=def.id;
     if(hsx){ hsx.owner=o.id; hsx.area=def.id; hsx.door=door; }
-    DOORS.push({x:door.x,y:door.y,area:def.id,label:`Enter ${def.name}`,outY:door.outY||0,hs:hsx||undefined,owner:def.owner}); off.push(o); o.home=false; };
+    DOORS.push({x:door.x,y:door.y,area:def.id,label:`Enter ${def.name}`,outY:door.outY||0,hs:hsx||undefined,owner:def.owner,walk:typeof door.walk==='function'?door.walk:undefined}); off.push(o); o.home=false; };
   try{
     for(const town of TOWN_ORDER){ if(!town.startsWith('c_')) continue;
       const owners=CAST.filter(c=>c.town===town&&c.home&&!c.generic);
