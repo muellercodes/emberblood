@@ -27,7 +27,7 @@ function runDialogue(lines,done,opt){
 }
 // an old-code line is [who, text, opts] or { who, text, opts, ... }; (v11 MOOD) a face mood rides along as a string:
 // [who, text, 'sad'], [who, text, opts, 'sad'] or { who, text, face: 'sad' } (the line's `mood` field is the music's)
-function lineParts(l){ if(!Array.isArray(l)) return l; const o2=typeof l[2]==='string'; return {who:l[0],text:l[1],opts:o2?undefined:l[2],face:o2?l[2]:l[3]}; }
+function lineParts(l){ if(!Array.isArray(l)) return l; const o2=typeof l[2]==='string'&&!!moodName(l[2]); return {who:l[0],text:l[1],opts:o2?undefined:l[2],face:o2?l[2]:l[3]}; }
 function endDialogue(){ const d=DLG&&DLG.done; DLG=null; hideAll(); try{ Music.duck(false); }catch(e){} if(d) d();
   // (v11) a talk that ends with foes close (a boss's opening words with his guards already swinging) gives Ash a moment
   // to get his hands back on the keys before the first hit can land (he blinks while it lasts)
@@ -877,6 +877,7 @@ function faceTurtle(g){
 window.__ebDbg=Object.assign(window.__ebDbg||{},{moodRead,moodName,MOOD_LIST,MOOD_SHEET,
   lineMood:(who,text,face)=>lineMood(who,{face},text),
   dlgFace:()=>DLG?{who:DLG.pWho,mood:DLG.pFace,anim:!!DLG.pAnim}:null,
+  say:lines=>runDialogue(lines,()=>{ scene='play'; }),
   portraitSheet(whos,moods,cell,big){
     moods=moods||MOOD_LIST; cell=cell||104; const pad=big?24:18, top=22, W=pad+moods.length*cell, H=top+whos.length*(cell+(big?18:4));
     const c=mkCanvas(W,H), g=c.getContext('2d'); g.fillStyle='#16100c'; g.fillRect(0,0,W,H);
