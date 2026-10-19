@@ -349,7 +349,7 @@ people({
         say: ['Three Wards left, and all far off. Hold out your hand. A button, from Pebble. She only gives those to people she expects back.', 'Hold out your hand. A button from Pebble. She wants you back.'],
         re: [
           { t: ["Tell her I'll bring it back.", "I'll bring it back."], say: ['Bring yourself back. The button is extra.', 'Bring yourself back. The button is extra.'] },
-          { t: ['Does she give you buttons?', 'Does she give you buttons?'], say: ['Every winter, one. I keep them in a jar. Sixty-one buttons. Not that I have counted.', 'One every winter. I keep them in a jar.'] },
+          { t: ['Does she give you buttons?', 'Does she give you buttons?'], say: ['Every winter, one. I keep them in a jar by the window. The jar is nearly full.', 'One every winter. I keep them in a jar.'] },
         ] },
       { if: 'stage=gate', ref: 'obsidian_gate',
         say: ['Sir Cindervane has stood at the Obsidian Gate for a thousand years. My father took me to see him once. He never blinked.', 'My dad took me to see Sir Cindervane once. He never blinked.'],
@@ -907,7 +907,7 @@ people({
         re: [
           { t: ["She'll knit you something on the spot.", 'She will knit you something.'], say: ['She will. She will measure me at the door. I have stopped fighting it.', 'She will measure me at the door.'] },
           { t: ['Bring the dogs.', 'Bring the dogs.'], if: '!choice fennick=jail', say: ['They would eat the buns. Bertram would never forgive me.', 'They would eat all the buns.'] },
-          { t: ['Who will watch the cells?', 'Who watches the cells?'], if: 'choice fennick=jail', say: ['Fennick will. He asked. I said yes. I think that is what trust looks like.', 'Fennick asked to. I said yes.'] },
+          { t: ['Who will watch the cells?', 'Who watches the cells?'], if: 'choice fennick=jail', say: ['Fennick will. He asked. I said yes. He has polished the bars already.', 'Fennick asked to. I said yes.'] },
         ] },
       { ask: ['How many sweaters has Nana made you?', 'How many sweaters?'],
         say: ['Eleven. I wear them all at once in winter. I am very warm and I cannot bend my arms.', 'Eleven. I wear them all in winter.'] },
@@ -1368,7 +1368,7 @@ people({
         re: [
           { t: ['You should have howled back.', 'You should have howled.'], tone: 'silly', say: ['I did, a little. Elka will never let me forget it.', 'I did, a bit. Elka heard.'] },
           { t: ['Greymane went home to them.', 'Greymane went home.'], if: 'choice greymane=home', say: ['Home to his pack. That is where a wolf king should be. Thank you, Ash.', 'That is where he belongs. Thank you.'] },
-          { t: ['Will they stay away from the lodge?', 'Will they stay away?'], say: ['They will keep to the high snow, like always. Wolves keep their word. Better than people.', 'They keep to the high snow, like always.'] },
+          { t: ['Will they stay away from the lodge?', 'Will they stay away?'], say: ['They will keep to the high snow, like always. Like they did when my grandfather was a boy.', 'They keep to the high snow, like always.'] },
         ] },
       // his old chat, as a moment (Hollis asks the same question the other way round; they compare notes)
       { if: 'stage>=wren !flag act1_done',
@@ -1446,7 +1446,7 @@ people({
           { t: ['Do you miss the adventures?', 'Do you miss adventures?'], next: { say: ['Sometimes. Do you think I should go back to it?', 'Sometimes. Should I go back?'],
             re: [
               { t: ["You've earned your rest. Be warm.", 'You earned a rest.'], tone: 'kind', f: 1, say: ['Thank you. I needed somebody to say it out loud.', 'Thank you. I needed to hear that.'] },
-              { t: ['Only inside a blanket.', 'Only in a blanket.'], tone: 'silly', f: 0.75, say: ['A blanket-fort adventurer. That is honestly my dream.', 'A blanket fort adventurer. My dream.'] },
+              { t: ['Only inside a blanket.', 'Only in a blanket.'], tone: 'silly', f: 0.75, say: ['A blanket-fort adventurer. Now that, I could do.', 'A blanket fort adventurer. I could do that.'] },
             ] } },
         ] },
       { ask: ['What was Brisket the Bold like?', 'What was Brisket the Bold like?'],
@@ -1542,7 +1542,7 @@ people({
         re: [
           { t: ['Wagon. A wagon full of friends.', 'Wagon. Full of friends.'], tone: 'kind', f: 1, say: ['A wagon full of friends! That is going in the chorus.', 'That goes in the chorus!'] },
           { t: ['Does it have to rhyme?', 'Does it have to rhyme?'], f: 0.5, say: ['Everything has to rhyme, Ash. That is the whole job.', 'Always. That is the whole job.'] },
-          { t: ["Draggin'. Like my tail.", "Draggin'. Like my tail."], tone: 'silly', f: 1, say: ["Draggin' his tail, the dragon went waggin'. Brilliant. Terrible. Brilliant.", "Draggin' his tail! Brilliant!"] },
+          { t: ["Draggin'. Like my tail.", "Draggin'. Like my tail."], tone: 'silly', f: 1, say: ["Draggin' his tail, the dragon went waggin'! That is terrible. I love it.", "Draggin' his tail! I love it."] },
         ] },
       { if: 'stage=done',
         say: ["I have the last verse of your song at last. It's about the top of the mountain, and it's the quietest verse I've ever written.", 'I wrote the last verse. It is very quiet.'],
