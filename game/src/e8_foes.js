@@ -563,6 +563,35 @@ function areaSites(){
   for(const k in BOSSES){ const s=SITES[k]; if(!s||s.area!==AREA.id||!siteOpen(k)) continue; const P=POI[s.poi];
     if(dist(player.x,player.y,P.x,P.y)<P.r*0.72){ G.fightSite=k; G.fightIntro=true; runDialogue((STORY.bosses[s.boss]&&STORY.bosses[s.boss].intro)||[],()=>{ scene='play'; G.fightIntro=false; startBossFight(k); }); return; } }
 }
+// ---------- (v11 polish) boss intro framing: nobody swings while the boss is talking
+// The intro opens the moment Ash walks into the site, and foes already on him kept their wind-up (a red wedge behind
+// the dialogue box) and struck the instant it closed. Now, when an intro starts (the stock trigger, areaSites above, or
+// an act's own), every foe near Ash drops its wind-up, steps back to a respectful distance while the boss talks and
+// waits a beat after the talk before its first swing (on top of the dialogue's own grace, a12a_dlg.js).
+const INTRO_BACK=190;
+function introCalm(){
+  const p=player; if(!G||!p) return;
+  G._introCalm=G.fightSite||true;
+  for(const e of G.enemies){
+    if(e.dead||e.boss||dist2(e.x,e.y,p.x,p.y)>520*520) continue;
+    if(e.tele||/^(windup|strike|aim|charge|lunge|swoop|crouch|leap|pounce|dive)/.test(e.state||'')){ e.tele=null; e.state='chase'; e.st=0; }
+    e.cd=Math.max(e.cd||0,1.1+Math.random()*0.5); e.vx=0; e.vy=0;
+    const d=dist(e.x,e.y,p.x,p.y);
+    if(d<INTRO_BACK){ const a=d>1?angTo(p.x,p.y,e.x,e.y):Math.random()*TAU; e._introTo={x:p.x+Math.cos(a)*INTRO_BACK,y:p.y+Math.sin(a)*INTRO_BACK}; }
+  }
+}
+// while the intro talk runs (liteUpdate runs, the AI does not): the foes that were too close walk back, facing Ash
+function introStep(dt){
+  for(const e of G.enemies){
+    const T=e._introTo; if(!T) continue; if(e.dead){ e._introTo=null; continue; }
+    const d=dist(e.x,e.y,T.x,T.y); if(d<2){ e._introTo=null; continue; }
+    const s=Math.min(d,170*dt), a=angTo(e.x,e.y,T.x,T.y), nx=e.x+Math.cos(a)*s, ny=e.y+Math.sin(a)*s;
+    if(freeSpot(nx,ny,e.r||12)){ e.x=nx; e.y=ny; e.face=angTo(e.x,e.y,player.x,player.y); } else e._introTo=null;
+  }
+}
+{ const base=updateStory; updateStory=function(dt){ const was=G&&G.fightIntro; base(dt); if(G&&!was&&G.fightIntro) introCalm(); }; }
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt);
+    try{ if(G&&G.fightIntro){ if(G._introCalm!==(G.fightSite||true)) introCalm(); introStep(dt); } else if(G&&G._introCalm){ G._introCalm=null; for(const e of G.enemies) e._introTo=null; } }catch(err){ console.error(err); } }; }
 { const base=objectiveList; objectiveList=function(){ const out=base(); for(const o of out){ const s=o.site&&SITES[o.site]; if(s&&s.area&&!(AREA&&AREA.id===s.area)){ const d=DOORS.find(q=>q.area===s.area); if(d){ o.x=d.x; o.y=d.y; } o.area=s.area; } } return out; }; }
 
 // ================= phases

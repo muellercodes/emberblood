@@ -34,10 +34,18 @@ function csfx(name,vol){
 const BUB=[];
 function bubble(a,text,o){
   if(!a||!text) return null; o=o||{}; text=simplify(String(text));
-  for(let i=BUB.length-1;i>=0;i--) if(BUB[i].a===a) BUB.splice(i,1);
   const kind=o.kind||(/^[(*]/.test(text)?'narr':'say');
+  // (v11 polish) chatter (o.amb) is one or two short lines: a longer line uses its Simple words version if that fits,
+  // else it is not said at all
+  if(o.amb){ const t2=bubFit(text,kind); if(!t2) return null; text=t2; }
+  // Pip's little chirps never cut somebody else short
+  if(kind==='pip'&&BUB.some(q=>q.a!==a&&q.kind!=='far'&&q.kind!=='pip'&&q.dur-q.t>0.8)) return null;
+  for(let i=BUB.length-1;i>=0;i--) if(BUB[i].a===a) BUB.splice(i,1);
+  // one bubble on screen at a time: whoever was speaking before fades out now (a far howl does not count)
+  if(kind!=='far') for(const q of BUB) if(q.kind!=='far') q.dur=Math.min(q.dur,q.t+0.25);
   // long enough to read (UX build): about 1.5 s plus 0.07 s a letter, 3 to 8 s; a quick sound bubble (Fweet!) stays quick
-  const b={a,text,t:0,dur:o.dur&&o.dur<1.5?o.dur:Math.max(o.dur||0,readT(text,3,8)),who:o.who||'',col:o.col||null,kind,dy:o.dy!=null?o.dy:-34,ax:a.x,ay:a.y,area:!!AREA};
+  const b={a,text,t:0,dur:o.dur&&o.dur<1.5?o.dur:Math.max(o.dur||0,readT(text,3,8)),who:o.who||'',col:o.col||null,kind,dy:o.dy!=null?o.dy:-34,ax:a.x,ay:a.y,area:!!AREA,amb:!!o.amb};
+  if(o.amb) CHAT.last=G?G.time:0;
   BUB.push(b); while(BUB.length>7) BUB.shift();
   logBubble(a,text,o,kind);
   if(kind!=='far') csfx('pop');
@@ -45,27 +53,67 @@ function bubble(a,text,o){
 }
 function updateBubbles(dt){
   for(const b of BUB){ b.t+=dt; if(b.a&&b.a.x!=null){ b.ax=b.a.x; b.ay=b.a.y; } }
-  for(let i=BUB.length-1;i>=0;i--){ const b=BUB[i]; if(b.t>=b.dur||b.area!==!!AREA) BUB.splice(i,1); }
+  for(let i=BUB.length-1;i>=0;i--){ const b=BUB[i]; if(b.t>=b.dur||b.area!==!!AREA||(b.amb&&!chatterOn())) BUB.splice(i,1); }
 }
 function bubbleOn(a){ return BUB.some(b=>b.a===a); }
+// ---------- (v11 polish) chatter: fewer, smaller bubbles that never cover what Ash can use
+// Drew, on a phone in Wick's shop: Fennick's bubble hid "Search the drawer", and town was "a lot of voices". Bubbles are
+// a size smaller (11 px, a narrow column) and one at a time (bubble above). Ambient talk (villager barks, villagers
+// chatting, the story data's bark lines; o.amb) goes through chatterOK: Settings > Chatter Off silences it; on Some
+// (the default) it waits 24 s after the last ambient line, 90 s before the same person speaks again, for any other
+// bubble to finish and for the prompt to go, and says nothing while Ash talks or for 4 s after, in a fight, or for 6 s
+// after he walks into a building (or out). A line that needs more than two lines is not said (bubFit).
+const CHAT={last:-99,area:0,areaT:-99,dlgT:-99,gap:24,per:90};
+if(settings.chat==null) settings.chat=store.get('eb_chat','some')==='off'?'off':'some';
+const BUB_W=()=>W<560?132:156, BUB_LH=()=>13.5;
+function BUB_FONT(kind){ return `${kind==='narr'||kind==='far'?'italic 600':'600'} ${kind==='far'?10.5:11}px ${UIF}`; }
+function chatterOn(){ return settings.chat!=='off'; }
+function chatterTick(){
+  if(!G) return; const a=AREA?AREA.id:'';
+  if(a!==CHAT.area){ CHAT.area=a; CHAT.areaT=G.time; }
+  if(DLG||scene==='dialogue') CHAT.dlgT=G.time;
+}
+function chatterOK(n){
+  if(!chatterOn()||!G||!player||scene!=='play'||DLG) return false;
+  const t=G.time;
+  if(G.inCombat||(G.boss&&!G.boss.dead)||G.fightIntro||G.mini||G.prompt) return false;
+  if(t-CHAT.areaT<6||t-CHAT.dlgT<4||t-CHAT.last<CHAT.gap) return false;
+  if(BUB.some(b=>b.kind!=='far')) return false;
+  if(n&&BK.npcT[n.id]!=null&&t-BK.npcT[n.id]<CHAT.per) return false;
+  return true;
+}
+// the text as it will show in a bubble, or null when it needs more than two lines even in Simple words
+function bubFit(text,kind){
+  ctx.save(); ctx.font=BUB_FONT(kind); const mw=BUB_W();
+  let out=wrapText(text,mw).length<=2?text:null;
+  if(!out){ try{ simpleInit(); const v=SIMPLE.map[h32(String(text))]; if(v&&wrapText(v,mw).length<=2) out=v; }catch(e){} }
+  ctx.restore(); return out;
+}
 function darkCol(hex){ try{ const c=mixRGB(hexRGB(hex),[38,22,12],0.42); return `rgb(${c.map(Math.round)})`; }catch(e){ return '#5a3a20'; } }
 function drawBubbles(){
   if(!BUB.length||scene!=='play') return;
   ctx.save(); ctx.textBaseline='middle'; ctx.textAlign='left'; ctx.lineJoin='round';
-  const maxW=W<560?138:176, placed=[];
+  const maxW=BUB_W(), placed=[];
+  // (v11 polish) the prompt always wins: a bubble never covers the prompt pill or the person or thing it is about
+  const pr=G&&G.prompt&&PROMPT_R?G.prompt:null, keep=[];
+  if(pr){ keep.push({x:PROMPT_R.x-6,y:PROMPT_R.y-6,w:PROMPT_R.w+12,h:PROMPT_R.h+12});
+    if(pr.x!=null&&pr.y!=null){ const tx=(pr.x-cam.x)*zoom, ty=(pr.y-cam.y)*zoom; keep.push({x:tx-30*zoom,y:ty-62*zoom,w:60*zoom,h:72*zoom}); } }
   const list=[];
   for(const b of BUB){ const a3=b.a, up=T3.on&&a3&&a3._t3pp&&a3._t3top!=null&&b.kind!=='far'?Math.min(0,a3._t3top-a3.y+(b.dy<=-40?15:31)):0; // 3D heads are taller
     const sx=(b.ax-cam.x)*zoom, sy=(b.ay+b.dy+up-cam.y)*zoom; if(sx>-140&&sx<W+140&&sy>-60&&sy<H+80) list.push({b,sx,sy}); }
   list.sort((p,q)=>q.sy-p.sy);
   for(const q of list){
     const b=q.b, narr=b.kind==='narr', far=b.kind==='far', bang=b.kind==='bang', pipk=b.kind==='pip';
-    const font=`${narr||far?'italic 600':'600'} ${far?11:12}px ${UIF}`; ctx.font=font;
-    const lines=wrapText(b.text,maxW); let tw=0; for(const l of lines) tw=Math.max(tw,ctx.measureText(l).width);
-    let nameW=0; if(b.who){ ctx.font=`800 9px ${UIF}`; nameW=ctx.measureText(b.who.toUpperCase()).width; }
-    const nameH=b.who?11:0, padX=8, ic=bang?16:0, w=Math.ceil(Math.max(tw,nameW))+padX*2+ic, h=lines.length*15+9+nameH;
+    const font=BUB_FONT(b.kind); ctx.font=font;
+    const lines=wrapText(b.text,maxW).slice(0,b.amb?2:4); let tw=0; for(const l of lines) tw=Math.max(tw,ctx.measureText(l).width);
+    let nameW=0; if(b.who){ ctx.font=`800 8.5px ${UIF}`; nameW=ctx.measureText(b.who.toUpperCase()).width; }
+    const LH=BUB_LH(), nameH=b.who?10:0, padX=7, ic=bang?15:0, w=Math.ceil(Math.max(tw,nameW))+padX*2+ic, h=lines.length*LH+8+nameH;
     let x=clamp(q.sx-w/2,SAFE.l+4,W-SAFE.r-w-4), y=q.sy-h-9;
     for(let g=0;g<8;g++){ let hit=null; for(const r of placed) if(x<r.x+r.w+3&&x+w+3>r.x&&y<r.y+r.h+3&&y+h+3>r.y){ hit=r; break; } if(!hit) break; y=hit.y-h-5; }
     if(y<SAFE.t+4) y=SAFE.t+4;
+    // over the prompt or what it is about: up and out of the way if the bubble can stay near its speaker, else gone
+    if(keep.length&&b.a!==pr){ let hit=keep.find(r=>x<r.x+r.w&&x+w>r.x&&y<r.y+r.h&&y+h>r.y);
+      if(hit){ const y2=Math.min(...keep.filter(r=>x<r.x+r.w&&x+w>r.x).map(r=>r.y))-h-6; if(y2>=SAFE.t+4&&q.sy-(y2+h)<70&&!keep.some(r=>x<r.x+r.w&&x+w>r.x&&y2<r.y+r.h&&y2+h>r.y)) y=y2; else { b.dur=Math.min(b.dur,b.t+0.3); continue; } } }
     placed.push({x,y,w,h});
     const pop=b.t<0.16?0.55+0.45*Math.sin(b.t/0.16*Math.PI/2):1, a=clamp(Math.min(b.t/0.1,(b.dur-b.t)/0.35),0,1);
     const tx=clamp(q.sx,x+12,x+w-12);
@@ -77,11 +125,11 @@ function drawBubbles(){
     ctx.fillStyle=fill; rr(x,y,w,h,8); ctx.fill(); ctx.strokeStyle=edge; ctx.lineWidth=1.3; ctx.stroke();
     if(!far){ ctx.beginPath(); ctx.moveTo(tx-6,y+h-1); ctx.lineTo(clamp(q.sx,tx-14,tx+14),Math.min(q.sy-1,y+h+9)); ctx.lineTo(tx+6,y+h-1); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.stroke();
       ctx.fillStyle=fill; ctx.fillRect(tx-5,y+h-2.5,10,2.4); }
-    let ty=y+5+nameH;
-    if(b.who){ ctx.font=`800 9px ${UIF}`; ctx.fillStyle=narr?(b.col||'#ffd9a0'):darkCol(b.col||'#a0603a'); ctx.fillText(b.who.toUpperCase(),x+padX+ic,y+10); }
+    let ty=y+4+nameH;
+    if(b.who){ ctx.font=`800 8.5px ${UIF}`; ctx.fillStyle=narr?(b.col||'#ffd9a0'):darkCol(b.col||'#a0603a'); ctx.fillText(b.who.toUpperCase(),x+padX+ic,y+9); }
     if(bang){ ctx.fillStyle='#e8541f'; ctx.beginPath(); ctx.arc(x+padX+5,y+h/2,7,0,TAU); ctx.fill(); ctx.font=`900 11px ${UIF}`; ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText('!',x+padX+5,y+h/2+0.5); ctx.textAlign='left'; }
     ctx.font=font; ctx.fillStyle=narr?'#f2e6d4':far?'#34445e':'#2a1a10';
-    lines.forEach((l,i)=>ctx.fillText(l,x+padX+ic,ty+7+i*15));
+    lines.forEach((l,i)=>ctx.fillText(l,x+padX+ic,ty+LH/2+i*LH));
     ctx.restore();
   }
   ctx.restore();
@@ -1096,6 +1144,7 @@ const BK={g:null,next:0,said:{},npcT:{},chat:null,chatNext:0,checkT:0,syncT:0,fl
 function blog(who,text){ BK.log.push([Math.round(G.time*10)/10,who,text]); if(BK.log.length>200) BK.log.shift(); }
 function villagerBarks(dt){
   if(!G||G.mode!=='story'||!player) return;
+  chatterTick();
   if(BK.g!==G){ BK.g=G; BK.said={}; BK.npcT={}; BK.chat=null; BK.next=G.time+7; BK.chatNext=G.time+16; BK.log.length=0; }
   BK.syncT-=dt; if(BK.syncT<=0){ BK.syncT=2; syncDeeds(); }
   if(scene!=='play'||player.dead) return;
@@ -1104,8 +1153,8 @@ function villagerBarks(dt){
   liveBarks(list);
   BK.checkT-=dt; if(BK.checkT>0) return; BK.checkT=0.5;
   if(G.inCombat||G.mini||(G.boss&&!G.boss.dead)) return;
-  if(G.time>=BK.next){ const n=barkTarget(list,215,45); if(n){ const b=pickBark(n); if(b){ sayBark(n,b); BK.next=G.time+rand(7,12); } else BK.next=G.time+3; } }
-  if(G.time>=BK.chatNext){ BK.chatNext=G.time+rand(6,10); tryChat(list); }
+  if(G.time>=BK.next&&chatterOK()){ const n=barkTarget(list,215,CHAT.per); if(n){ const b=pickBark(n); if(b){ sayBark(n,b); BK.next=G.time+rand(26,40); } else BK.next=G.time+3; } }
+  if(G.time>=BK.chatNext&&chatterOK()){ BK.chatNext=G.time+rand(10,16); tryChat(list); }
 }
 function npcOK(n){ return n&&!n.turtle&&n.kind!=='goat'&&n.id!=='shellby'&&(CASTBY[n.id]||SPECIAL[n.id]); }
 function barkTarget(list,R,cool){
@@ -1128,13 +1177,15 @@ function pickBark(n){
   if(!cand.length) return null;
   let r=Math.random()*tot; for(const [b,w] of cand){ r-=w; if(r<=0) return b; } return cand[cand.length-1][0];
 }
-function npcBubble(n,text){ const s=SPK[n.id]; n.face=angTo(n.x,n.y,player.x,player.y); blog(n.id,text); return bubble(n,text,{who:shortName(n.id),col:s?s.col:'#d8c3a0',dy:npcMarker(n.id)?-46:-34}); }
+function npcBubble(n,text,amb){ const s=SPK[n.id]; if(amb&&!bubFit(simplify(String(text)),'say')) return null; n.face=angTo(n.x,n.y,player.x,player.y); blog(n.id,text); return bubble(n,text,{who:shortName(n.id),col:s?s.col:'#d8c3a0',dy:npcMarker(n.id)?-46:-34,amb:!!amb}); }
 function sayBark(n,b){
   const text=typeof b.t==='function'?b.t(n):b.t; if(!text) return;
+  if(!npcBubble(n,text,true)) return;
   BK.said[b.k]=G.time; BK.npcT[n.id]=G.time;
   if(b.d){ const m=G.flags.comp_bk=G.flags.comp_bk||{}; m[b.k]=(m[b.k]|0)+1; }
-  npcBubble(n,text);
-  if(b.r) later(Math.min(2.4,1.2+text.length*0.02),()=>{ const [who,t]=b.r;
+  // a friend's reply waits for the line to finish (one bubble at a time)
+  const bb=BUB.find(q=>q.a===n);
+  if(b.r) later(bb?bb.dur+0.3:2.4,()=>{ const [who,t]=b.r; if(!chatterOn()||scene!=='play'||G.inCombat) return;
     if(who==='pip'&&G.pip){ bubble(G.pip,t,{kind:'pip',dy:-22}); csfx('chirp'); blog('pip',t); }
     else if(CM&&!CM.hidden&&!CM.outside&&(who==='comp'||who===CM.id)){ const line=who==='comp'?pickC(CM.id,t):t; const d=CDEF[CM.id]; CM.lastSay=G.time; if(CM.id==='duchess') csfx('bleat',0.8); bubble(CM,line,{who:d.name,col:d.col,dy:CM.id==='greymane'?-40:-34}); blog(CM.id,line); } });
 }
@@ -1143,12 +1194,12 @@ function liveBarks(list){
   if(p.flying&&G.time>BK.flyT){ kind='fly'; R=340; cd=26; }
   else if((p.z||0)>12&&!p.flying&&G.time>BK.jumpT){ kind='jump'; R=170; cd=34; }
   else if(p.onWater&&!p.flying&&G.time>BK.waterT){ kind='water'; R=320; cd=40; }
-  if(!kind) return;
-  const n=barkTarget(list,R,14); if(!n) return;
+  if(!kind||!chatterOK()) return;
+  const n=barkTarget(list,R,CHAT.per); if(!n) return;
   const info=npcInfo(n), opts=LIVE[kind].filter(o=>o.w(info)); if(!opts.length) return;
   BK[kind+'T']=G.time+cd; BK.npcT[n.id]=G.time; BK.next=Math.max(BK.next,G.time+4);
   if(kind==='fly') deed('flew');
-  npcBubble(n,pick(opts).t);
+  npcBubble(n,pick(opts).t,true);
 }
 function tryChat(list){
   const p=player, near=list.filter(n=>npcOK(n)&&!n.prisoner&&dist2(n.x,n.y,p.x,p.y)<380*380&&inView(n.x,n.y,-30)&&!bubbleOn(n));
@@ -1162,6 +1213,7 @@ function tryChat(list){
     for(const s of scripts){
       if(BK.said['c_'+s.k]!=null&&G.time-BK.said['c_'+s.k]<720) continue;
       let ok=false; try{ ok=!!s.c(); }catch(e){} if(!ok) continue;
+      if(!s.l.every(([w,t])=>bubFit(simplify(String(t)),'say'))) continue;   // every line must fit a small bubble
       let a=null,b=null; if(s.a(ix)&&s.b(iy)){ a=x; b=y; } else if(s.a(iy)&&s.b(ix)){ a=y; b=x; } if(!a) continue;
       BK.said['c_'+s.k]=G.time; BK.chat={a,b,l:s.l,i:0,t:0.2,k:s.k};
       for(const n of [a,b]){ n.walk=false; n.wt=9; }
@@ -1175,11 +1227,12 @@ function runChat(dt){
   C.a.face=turnTo(C.a.face,angTo(C.a.x,C.a.y,C.b.x,C.b.y),5*dt); C.b.face=turnTo(C.b.face,angTo(C.b.x,C.b.y,C.a.x,C.a.y),5*dt);
   for(const n of [C.a,C.b]){ n.walk=false; if(n.wt<2) n.wt=2; }
   if(C.t>0) return;
-  if(C.i>=C.l.length){ BK.chat=null; BK.next=Math.max(BK.next,G.time+5); BK.chatNext=G.time+rand(30,48); return; }
+  if(C.i>=C.l.length){ BK.chat=null; BK.next=Math.max(BK.next,G.time+CHAT.gap); BK.chatNext=G.time+rand(70,110); BK.npcT[C.a.id]=BK.npcT[C.b.id]=G.time; return; }
+  if(!chatterOn()||G.prompt||DLG){ BK.chat=null; return; }
   const [w,txt]=C.l[C.i++], n=w?C.b:C.a, other=w?C.a:C.b, s=SPK[n.id];
-  blog(n.id,txt); const bb=bubble(n,txt,{who:shortName(n.id),col:s?s.col:'#d8c3a0',dy:npcMarker(n.id)?-46:-34});
+  blog(n.id,txt); const bb=bubble(n,txt,{who:shortName(n.id),col:s?s.col:'#d8c3a0',dy:npcMarker(n.id)?-46:-34,amb:true});
   n.face=angTo(n.x,n.y,other.x,other.y);
-  C.t=Math.max(1.9,(bb?bb.dur:2.5)*0.72);
+  C.t=(bb?bb.dur:2.5)+0.25;   // the next line comes when this one is read (one bubble at a time)
 }
 
 // ================= drawing: companions, stones, rings, the melting ice, Greymane in the pines
