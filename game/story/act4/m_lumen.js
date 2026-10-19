@@ -2,7 +2,8 @@
 // What the player does: walks the sandbars north (the shoals sign says so) to the deep channel under the Lumen Spire,
 // swings up to its balcony with the Grapple Tail and finds the first where_shard clue there: silver moth dust and a
 // scrape as long as a boat, from something huge that rested here facing east. Inside the Spire is drowned Old Lumen
-// (the dungeon stays code; Ember's flame there gives Dive). Two of its rooms now hold clues, played by the dungeon's own
+// (the dungeon stays code; Ember's flame there gives Dive, handed over by Sir Kipper, the merfolk knight who keeps watch
+// beside it: x3_story's m_lumen_shrine and m_lumen_gift, v11). Two of its rooms now hold clues, played by the dungeon's own
 // beats through data scenes that replace the old STORY keys: the great window of the Drowned Library floor (the eye at
 // the window, then Lumen's sky map with its three moon houses: m4_star_map) and the Drowned Library itself (a tile
 // picture of a priest melting a moth's thread with soft silver fire, while a cut thread whips up into the sky, moth and
@@ -11,8 +12,8 @@ chapter({
   id: 'm_lumen', act: 4, after: 'm_drift', next: 'm_coral', takeover: true,
   card: ['Act IV · Chapter 2', 'Drowned Lumen'],
   so_far: [
-    "The tide went wobbly because the moon is getting smaller: the sea follows the moon. Old Lumen, the moon city, drowned long ago, the first time the moth bit the moon. Its tower still sticks out of the sea.",
-    'The moon is smaller, so the tide is wobbly. Old Lumen drowned long ago. Its tower sticks out of the sea.'],
+    "If the moon keeps shrinking, the sea will take Driftwood, every raft and every chicken. It has happened before: it took Old Lumen, the moon city, the first time a moth bit the moon. Lumen's tower still sticks out of the sea.",
+    'If the moon keeps shrinking, the sea will take Driftwood. It took Old Lumen once.'],
   hint: ['North across the Spire Shoals. Walk the sandbars, then swing up to the Spire\'s balcony and look around.',
     "Go north over the sandbars. Swing up to the tower's balcony."],
 
@@ -66,10 +67,10 @@ chapter({
       ['iska', 'Deep water. Too deep to walk on. Is there anything up there you can swing to?', 'Too deep to walk. Is there something up there to swing to?'],
     ],
     lmn_dust: [
-      ['narr', 'The balcony rail is thick with silver moth dust. Far too much for one little moth.', 'The rail is covered in silver moth dust. LOTS.'],
+      ['narr', 'The balcony rail is thick with silver moth dust. Far too much for one little moth.', 'The rail is covered in silver moth dust. Lots of it.'],
       ['narr', 'Across the marble floor runs a scrape as long as a boat. Something huge landed here to rest.', 'A scrape as long as a boat! Something huge rested here.'],
       ['narr', 'Its claw marks point out over the sea, toward the sunrise.', 'Its claw marks point toward the sunrise.', { ref: 'm4_spire_balcony' }],
-      ['ash', 'Something BIG sat here. And then it flew off that way.', 'Something BIG sat here. Then it flew that way.'],
+      ['ash', 'Something big sat here. And then it flew off that way.', 'Something big sat here. Then it flew that way.'],
     ],
     // the rail again, once its clue is in the Case Book (before that, the step's scene plays)
     lmn_dust_again: [
@@ -83,10 +84,9 @@ chapter({
       ['ash', "...I didn't like that.", "I didn't like that."],
       ['narr', 'Where the eye was, lines are etched into the glass. A sky map! Three little moons are drawn on it, each with a name.',
         'Lines are etched on the glass. A sky map with three moons.'],
-      ['narr', 'THE SPIRE, by the sea. THE MOON WELL, in the sand. And far to the east, up on the Heights: THE ECLIPSE OBSERVATORY.',
-        'THE SPIRE. THE MOON WELL. And far east: THE ECLIPSE OBSERVATORY.', { clue: 'm4_star_map', dir: ['m4_lumen_spire', 'm4_observatory', 'east'] }],
-      ['iska', 'Moon houses. Places that keep moonlight. If I were a moth with something shiny, I know where I would go.',
-        'Moon houses keep moonlight. A moth would go there.'],
+      ['narr', 'The Spire, by the sea. The Moon Well, in the sand. And far to the east, up on the Heights: the Eclipse Observatory.',
+        'The Spire. The Moon Well. And far east: the Eclipse Observatory.', { clue: 'm4_star_map', dir: ['m4_lumen_spire', 'm4_observatory', 'east'] }],
+      ['iska', 'Three moon houses. I lit lamps in all of them, once.', 'Three moon houses. I lit lamps in them, once.'],
     ],
     m_lumen_library: [
       ['sedge', 'Finally! Somewhere wetter than me!'],
@@ -95,8 +95,7 @@ chapter({
         "A priest breathes soft silver fire on a moth's thread. It melts. The moth flies free."],
       ['narr', 'Beside it, a priest cuts a thread with a sword. The cut thread whips up into the sky, moth and all.',
         'Next to it, a cut thread whips up into the sky, moth and all.', { clue: 'm4_leash_mural' }],
-      ['ash', 'Soft fire melts it. Cutting it sends the moth flying up into the sky. Got it. ...Why do I need to know this?',
-        'Soft fire melts it. Cutting sends it up into the sky. Why do I need to know?'],
+      ['ash', 'Why would anybody tie up a moth?', 'Why would anybody tie up a moth?'],
     ],
     m_lumen_mosaic: [
       ['narr', 'The three moon lamps flare. On the wall between them a silver mosaic lights up: a moon over a sea, and words in old letters.',

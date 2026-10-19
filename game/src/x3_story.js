@@ -268,12 +268,12 @@ if(!STORY.m_dell1) m3sDef('m_dell1',[
 ]);
 // Chapter 2, Drowned Lumen (6.3, 6.4)
 m3sDef('m_lumen_channel',[xl('iska',`Deep water. Too deep to walk on. Is there anything up there you can swing to?`,`Deep water. Too deep to walk on. Is there something up there to swing to?`)]);
-m3sDef('m_lumen_after',[xl('iska',`Coralcombe is down in the reef south of Driftwood. A ring of coral with deep water in the middle. You can go DOWN now, Ash.`,`Coralcombe is in the reef south of Driftwood. A ring of coral. You can go DOWN now, Ash.`)]);
+m3sDef('m_lumen_after',[xl('iska',`Kipper's Coralcombe is down in the reef south of Driftwood. A ring of coral with deep water in the middle. You can go down now, Ash.`,`Coralcombe is in the reef south of Driftwood. You can go down now, Ash.`)]);
 m3sDef('m_coral_in',[
   xl('narr',`You dive into the ring of coral, down and down, through a curtain of bubbles, into a village made of shells.`,`You dive down through bubbles, into a village made of shells.`),
-  xl('narr',`Pearl lamps glow on every doorstep. Fish swim through the windows. A seahorse in a tiny saddle stares at you.`,`Pearl lamps glow. Fish swim through windows. A seahorse in a tiny saddle stares at you.`),
-  xl('m_kipper',`HALT! Who swims there? ...Oh my. A dragon. Underwater. That isn't allowed. Is it? Nobody ever wrote a rule.`,`HALT! Who swims there? A dragon, underwater? Is that allowed? Nobody wrote a rule.`),
-  xl('m_coralia',`Let him pass, Sir Kipper. We have been expecting a dragon for a very long time. I'm a little surprised it's such a small one.`,`Let him pass, Sir Kipper. We waited a long time for a dragon. He is smaller than I thought.`),
+  xl('narr',`Pearl lamps glow on every doorstep. Fish swim through the windows. Lady Bubbles swims a loop round you, very pleased.`,`Pearl lamps glow. Fish swim through the windows.`),
+  xl('m_kipper',`Make way! Make way! The dragon from the well, Majesty. I told you he was real.`,`Make way! The dragon from the well! I told you, Majesty.`),
+  xl('m_coralia',`So you did. Let him pass, Sir Kipper. We have waited a very long time for a dragon. I thought he would be bigger.`,`Let him pass. We waited a long time for a dragon. I thought he would be bigger.`),
   xl('ash',`I'm medium!`,`I'm medium!`)
 ]);
 m3sDef('m_coralia',[
@@ -283,9 +283,9 @@ m3sDef('m_coralia',[
   xl('m_coralia',`Our moon-priests drove her away that night with a fire made of moonlight. A girl with horns had taught it to them, long before. We still sing about her.`,`Our priests drove the moth away with moonlight fire. A girl with horns taught them. We still sing about her.`),
   xl('ash',`Ember. That was Ember.`,`Ember. That was Ember.`),
   xl('m_coralia',`Then you are her family. Welcome home, a little bit.`,`Then you are her family. Welcome home, a little bit.`),
-  xl('m_coralia',`You've come for the third piece of your Heart. A great grey moth, bigger than a ship, carried it east over the Glass Desert to the Eclipse Observatory, where Lumen's astronomers watched the moon.`,`A giant grey moth took the last piece of your Heart east. To the Eclipse Observatory, past the Glass Desert.`),
+  xl('m_coralia',`You've come for the third piece of your Heart. A great grey moth, two pale moons on her wings, carried it east over the Glass Desert to the Eclipse Observatory, where Lumen's astronomers watched the moon.`,`A giant grey moth took the last piece of your Heart east. To the Eclipse Observatory, past the Glass Desert.`),
   xl('m_coralia',`And now a white moth guards it there. Our scouts saw her. White as foam, with a silver thread tied to her neck that goes all the way up into the sky.`,`Now a white moth guards it. She has a silver thread on her neck. It goes up into the sky.`),
-  xl('ash',`Hush. That's Hush. I beat her. She went small. She was COLD.`,`Hush! I beat her. She went small. She was COLD.`),
+  xl('ash',`Hush. That's Hush. I beat her. She went small. She was so cold.`,`Hush! I beat her. She went small. She was so cold.`),
   xl('m_coralia',`She is not small now.`,`She is not small now.`),
   xl('m_coralia',`The only way east is under the Reefwall, through the Sunken Gate. But the gate is... blocked. By a fish. A very full-of-himself fish. He calls himself Baron Puffington.`,`The way east is under the Reefwall, through the Sunken Gate. But a puffed-up fish is stuck in it. Baron Puffington.`),
   xl('m_kipper',`He called my seahorse a "wet pony"!`,`He called my seahorse a "wet pony"!`),
@@ -535,15 +535,19 @@ m3sDef('m_lumen_mosaic',[
   xl('narr',`THE MOON RISES, THE SEA FALLS. THE MOON FALLS, THE SEA RISES.`,`MOON UP, SEA DOWN. MOON DOWN, SEA UP.`),
   xl('iska',`The whole city breathed with the moon. Remember that, Ash. Up and down. Full and empty.`,`The city breathed with the moon. Up and down. Full and empty.`)
 ]);
+// (v11: Dive comes from Coralia's merfolk. Sir Kipper keeps watch beside Ember's flame; Ember herself speaks only once
+// in Act IV, at the Mirror Temple)
 m3sDef('m_lumen_shrine',[
-  xl('ember',`Little ember! You came all the way across the sea. I came here once, too, a long time ago. The moon-priests were my friends.`,`Little ember! You came across the sea. I came here once too. The moon-priests were my friends.`),
-  xl('ember',`I hid this flame at the bottom of a well, so only someone brave enough to get wet would find it. My tail was soggy for a week.`,`I hid this flame in a well. Only someone brave enough to get wet would find it.`)
+  xl('narr',`Beside the flame, the dark water bulges. A seahorse in a tiny saddle comes up out of it, and on the seahorse sits a merman in shell armour.`,`A merman on a seahorse comes up out of the water.`),
+  xl('m_kipper',`Who swims there? ...A dragon. At the bottom of Lumen. Nobody ever wrote a rule about that.`,`A dragon, down here? Nobody wrote a rule about that.`),
+  xl('m_kipper',`Sir Kipper of Coralcombe, and Lady Bubbles. The Queen keeps a knight beside this flame. A girl with horns left it with our grandmothers.`,`I'm Sir Kipper. We guard this flame. A girl with horns left it.`),
+  xl('ash',`That was Ember. She's my family.`,`That was Ember. She's my family.`),
+  xl('m_kipper',`Then it's yours. Take it, and then come and see the Queen.`,`Then it's yours. Take it. Then come and see the Queen.`)
 ]);
 m3sDef('m_lumen_gift',[
   xl('narr',`The flame is cool, not hot. It wraps around you like a bubble and settles in your chest. You take a breath. It tastes like the sea.`,`The flame is cool. It wraps you like a bubble. You breathe. It tastes like the sea.`),
-  xl('ember',`Dive! Swim out into deep water, and dive down. You can swim under walls, hit switches on the bottom, and hold your breath for a long time. Bubbles will help.`,`Dive! Swim into deep water and go down. Swim under walls. Hit switches. Bubbles give you air.`),
-  xl('ash',`I'm a FISH.`,`I'm a FISH.`),
-  xl('ember',`The bravest fish.`,`The bravest fish.`)
+  xl('m_kipper',`Now dive. Nose down, tail down, and kick. Your tail is the wrong sort, but kick anyway.`,`Now dive! Nose down, and kick.`),
+  xl('ash',`Old Winnie said "not yet." I think she meant now.`,`Winnie said "not yet." She meant now.`)
 ]);
 STORY.m_lumen_how=S(`In deep water, press ROLL to dive under. Swim under arches, touch switches on the bottom, and watch your blue air ring. Bubbles and air pockets fill it again.`,`In deep water, press ROLL to dive. Bubbles give you air.`);
 STORY.m_lumen_bossline=S(`Octavia! When her arms slam down, hit the glowing tips! When the room floods, watch for her eye. And remember the valves, Ash. She can't swim in an empty room.`,`Hit her glowing arm tips! Watch for her eye. Use the valves!`);
@@ -566,8 +570,8 @@ m3sDef('m_lumen_window',[
 ]);
 m3sDef('m_vault_open',[xl('iska',`Moonfire, underwater, on a vault Ember's friends sealed. They knew you'd come. Or they hoped.`,`Moonfire underwater! Ember's friends sealed this. They hoped you'd come.`)]);
 m3sDef('m_lumen_end',[
-  xl('ember',`Look at that. Lumen's lights, on again. My friends would be so happy.`,`Look! Lumen's lights are on again. My friends would be so happy.`),
-  xl('ember',`Go and find their grandchildren, Ash. They live in the reef, south of the floating town. They'll know the way east.`,`Find their grandchildren, Ash. They live in the reef south of the floating town.`),
+  xl('m_kipper',`Look at that. Lumen's lights, on again. My grandmother's grandmother would have cried. I may, a little.`,`Lumen's lights are on again! I may cry a little.`),
+  xl('m_kipper',`Coralcombe is in the reef south of the floating town. Dive in the middle of the ring. The Queen will want to hear this from you.`,`Our home is the reef south of the floating town. The Queen wants to see you.`),
   xl('narr',`Step into the warp ring to go back outside.`,`Step in the warp ring to go outside.`)
 ]);
 m3sDef('m_duchess',[
