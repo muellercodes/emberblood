@@ -690,15 +690,32 @@ function faceThief(g){
   for(const s of [-1,1]){ g.fillStyle=TH.cloak2; g.beginPath(); g.moveTo(s*20,30); g.bezierCurveTo(s*70,10,s*86,-50,s*62,-70); g.bezierCurveTo(s*40,-40,s*30,0,s*20,30); g.closePath(); g.fill(); g.stroke(); g.fillStyle=TH.spot; g.beginPath(); g.arc(s*58,-30,10,0,TAU); g.fill(); g.stroke(); g.fillStyle=O; g.beginPath(); g.arc(s*58,-30,4.5,0,TAU); g.fill(); }
   // hood
   g.fillStyle=TH.hood; g.beginPath(); g.ellipse(0,0,44,50,0,0,TAU); g.fill(); g.stroke();
-  // antennae
-  for(const s of [-1,1]){ g.strokeStyle=TH.gold; g.lineWidth=2.5; g.beginPath(); g.moveTo(s*12,-46); g.quadraticCurveTo(s*22,-78,s*44,-82); g.stroke(); for(let i=1;i<6;i++){ const t=i/6, x=s*(12+t*30), y=-46-t*34; g.beginPath(); g.moveTo(x,y); g.lineTo(x+s*7,y-6); g.stroke(); } }
+  // antennae (v11 MOOD: they droop when she is sad or scared and stand up when she is pleased or surprised)
+  const X=typeof PX!=='undefined'?PX:{}, ear=X.ear||0, eo=typeof pxOpen==='function'?pxOpen():1;
+  for(const s of [-1,1]){ const ex=s*(44+(ear<0?-ear*12:-ear*8)), ey=-82+(ear<0?-ear*30:-ear*8), cx=s*(22+(ear<0?-ear*12:-ear*4)), cy=-78+(ear<0?-ear*12:-ear*4);
+    g.strokeStyle=TH.gold; g.lineWidth=2.5; g.beginPath(); g.moveTo(s*12,-46); g.quadraticCurveTo(cx,cy,ex,ey); g.stroke();
+    for(let i=1;i<6;i++){ const t=i/6, u=1-t, x=u*u*s*12+2*u*t*cx+t*t*ex, y=u*u*-46+2*u*t*cy+t*t*ey; g.beginPath(); g.moveTo(x,y); g.lineTo(x+s*7,y-6); g.stroke(); } }
   // the mask
   g.fillStyle=TH.mask; g.strokeStyle=O; g.lineWidth=3; g.beginPath(); g.moveTo(-32,-14); g.quadraticCurveTo(0,-38,32,-14); g.quadraticCurveTo(30,18,0,30); g.quadraticCurveTo(-30,18,-32,-14); g.closePath(); g.fill(); g.stroke();
-  g.fillStyle=O; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*6,-6); g.quadraticCurveTo(s*16,-18,s*26,-10); g.quadraticCurveTo(s*18,-2,s*6,-6); g.closePath(); g.fill(); }
-  g.fillStyle='#fff'; for(const s of [-1,1]){ g.beginPath(); g.arc(s*17,-9,1.8,0,TAU); g.fill(); }
+  // the eye holes: the mood tilts, narrows, widens or shuts them; the eyes behind are two glints
+  for(const s of [-1,1]){
+    g.save(); g.translate(s*16,-9);
+    if(eo<=0.05){ g.strokeStyle=O; g.lineWidth=3.6; g.lineCap='round'; g.beginPath(); if(X.ec==='arc'&&!X.blink){ g.moveTo(-9,3); g.quadraticCurveTo(0,-9,9,3); } else { g.moveTo(-9,-1); g.quadraticCurveTo(0,5,9,-1); } g.stroke(); g.restore(); continue; }
+    let br=X.br||0; if(X.asym) br=s>0?0.4:-0.7;
+    g.rotate(-s*((X.ls||0)*0.26-(br>0.5?br*0.2:0)));
+    const sy=eo<1?Math.max(0.42,eo):Math.min(1.45,eo*1.05), sx=eo>1?1.12:1; g.scale(sx,sy);
+    g.fillStyle=O; g.beginPath(); g.moveTo(s*-10,3); g.quadraticCurveTo(0,-9,s*10,-1); g.quadraticCurveTo(s*2,7,s*-10,3); g.closePath(); g.fill();
+    g.restore();
+    const gr=X.blank?2.8:X.pu?1.2:eo>1.1?2.6:1.8;
+    g.fillStyle=X.blank?'#e8f4ff':'#fff'; g.beginPath(); g.arc(s*17+(X.lx||0)*3,-9+(X.ly||0)*1.6,gr,0,TAU); g.fill();
+  }
+  // painted brows over the holes, when she feels something
+  if(typeof pxBrows==='function') pxBrows(g,{x:16,w:7,y:-21,col:'#2a2034',lw:2.6,arch:2.4,busy:true});
   g.strokeStyle=TH.gold; g.lineWidth=2; g.beginPath(); g.arc(0,-22,4,Math.PI*0.2,Math.PI*1.9); g.stroke(); g.beginPath(); g.moveTo(-10,12); g.quadraticCurveTo(0,18,10,12); g.stroke();
-  // a smile under the mask
-  g.strokeStyle='#7a5a6a'; g.lineWidth=2.5; g.beginPath(); g.moveTo(-8,36); g.quadraticCurveTo(0,42,8,36); g.stroke();
+  // her mouth, under the mask
+  if(typeof pxMouth==='function') pxMouth(g,{y:36,w:8,c:6,col:'#7a5a6a',lw:2.5,dark:'#3a1a2a'});
+  else { g.strokeStyle='#7a5a6a'; g.lineWidth=2.5; g.beginPath(); g.moveTo(-8,36); g.quadraticCurveTo(0,42,8,36); g.stroke(); }
+  if(typeof pxExtras==='function') pxExtras(g,{ex:16,ey:-9,erx:10,ery:6,cheek:24,top:-36,side:38,no:{blush:true}});
 }
 function faceLetter(g){
   g.save(); g.rotate(-0.12);

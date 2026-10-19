@@ -44,14 +44,14 @@ chapter({
     c_moth_voice: [
       { cam: 'c_spire_door', s: 4 },
       ['narr', 'From the breakwater you look back. The moon goes dim, like a lamp turned down, and every moth on the Spire turns to face you.', 'You look back. The moon goes dim. Every moth turns to you.'],
-      ['nyxara', 'Thank you, little ember. You have been such a help.', 'Thank you, little ember. You helped so much.'],
-      { if: 'choice ending=warden', then: [['ash', 'Grandpa? Are you awake up there?', 'Grandpa? Are you awake?']],
-        else: [{ if: 'choice ending=heir', then: [['ash', "Grandpa? Did you get down off Bertram's oven shelf?", 'Grandpa? Did you get off the oven shelf?']],
-          else: [{ if: 'choice ending=lantern', then: [['ash', "Grandpa? ...No. Grandpa's at home. Mom makes him wipe his feet.", 'Grandpa? No. He is at home.']],
-            else: [['ash', "...Grandpa? No. You're gone.", 'Grandpa? No. You are gone.']] }] }] },
-      ['nyxara', 'Oh, no, dear. Not him. Someone much, much older. Go home now. Stay home.', 'No, dear. Someone much older. Go home. Stay home.'],
+      ['nyxara', 'Thank you, little ember. You have been such a help.', 'Thank you, little ember. You helped so much.', { mood: 'sly' }],
+      { if: 'choice ending=warden', then: [['ash', 'Grandpa? Are you awake up there?', 'Grandpa? Are you awake?', { mood: 'worried' }]],
+        else: [{ if: 'choice ending=heir', then: [['ash', "Grandpa? Did you get down off Bertram's oven shelf?", 'Grandpa? Did you get off the oven shelf?', { mood: 'worried' }]],
+          else: [{ if: 'choice ending=lantern', then: [['ash', "Grandpa? ...No. Grandpa's at home. Mom makes him wipe his feet.", 'Grandpa? No. He is at home.', { mood: 'worried' }]],
+            else: [['ash', "...Grandpa? No. You're gone.", 'Grandpa? No. You are gone.', { mood: 'scared' }]] }] }] },
+      ['nyxara', 'Oh, no, dear. Not him. Someone much, much older. Go home now. Stay home.', 'No, dear. Someone much older. Go home. Stay home.', { mood: 'cold' }],
       { if: 'choice c_vesper=friend', then: [
-        ['c_vesper', "...That's her. That's the Lady. She sounded so kind in my dreams.", "That's her. The Lady. She sounded so kind."] ],
+        ['c_vesper', "...That's her. That's the Lady. She sounded so kind in my dreams.", "That's her. The Lady. She sounded so kind.", { mood: 'scared' }] ],
         else: [
         ['narr', 'The moths pour off the Spire in a grey river, up past the dim moon, and away north.', 'The moths fly up like a grey river, away north.'] ] },
     ],

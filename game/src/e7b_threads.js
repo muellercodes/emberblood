@@ -471,18 +471,41 @@ function thrFaceMoth(g,o){
     g.fillStyle=iris; g.beginPath(); g.arc(s*62,-30,8.5,0,TAU); g.fill();
     g.fillStyle=O; g.beginPath(); g.arc(s*62,-30,4,0,TAU); g.fill(); g.fillStyle='rgba(255,255,255,.85)'; g.beginPath(); g.arc(s*59,-33,2.2,0,TAU); g.fill();
   }
-  // feathery antennae
-  for(const s of [-1,1]){ g.strokeStyle=o.ant; g.lineWidth=2.6; g.beginPath(); g.moveTo(s*10,-40); g.quadraticCurveTo(s*18,-78,s*40,-86); g.stroke(); g.lineWidth=1.8; for(let i=1;i<7;i++){ const t=i/7, x=s*(10+t*28), y=-40-t*44; g.beginPath(); g.moveTo(x,y); g.lineTo(x+s*8,y-4); g.moveTo(x,y); g.lineTo(x-s*3,y-8); g.stroke(); } }
+  // feathery antennae (v11 MOOD: they droop when she is sad or scared and stand up when she is pleased or surprised)
+  const X=typeof PX!=='undefined'?PX:{}, ear=X.ear||0, eo=typeof pxOpen==='function'?pxOpen():1;
+  for(const s of [-1,1]){ const ex=s*(40+(ear<0?-ear*15:-ear*10)), ey=-86+(ear<0?-ear*34:-ear*8), cx=s*(18+(ear<0?-ear*15:-ear*4)), cy=-78+(ear<0?-ear*14:-ear*6);
+    g.strokeStyle=o.ant; g.lineWidth=2.6; g.beginPath(); g.moveTo(s*10,-40); g.quadraticCurveTo(cx,cy,ex,ey); g.stroke(); g.lineWidth=1.8;
+    for(let i=1;i<7;i++){ const t=i/7, u=1-t, x=u*u*s*10+2*u*t*cx+t*t*ex, y=u*u*-40+2*u*t*cy+t*t*ey; g.beginPath(); g.moveTo(x,y); g.lineTo(x+s*8,y-4); g.moveTo(x,y); g.lineTo(x-s*3,y-8); g.stroke(); } }
   g.strokeStyle=O; g.lineWidth=3;
   // the fluffy head and collar
   g.fillStyle=fur2; for(let i=0;i<7;i++){ const a=Math.PI*(0.14+0.72*i/6), x=Math.cos(a)*40, y=Math.sin(a)*22+24, r=i%2?15:17; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); g.stroke(); }
   g.beginPath(); g.ellipse(0,28,34,16,0,0,TAU); g.fill();
   g.fillStyle=fur; g.beginPath(); for(let i=0;i<24;i++){ const a=i/24*TAU, r=i%2?40:36; const x=Math.cos(a)*r, y=Math.sin(a)*r*1.02-4; i?g.lineTo(x,y):g.moveTo(x,y); } g.closePath(); g.fill(); g.stroke();
-  // big soft eyes with starry highlights
-  for(const s of [-1,1]){ g.fillStyle=o.eyes; g.beginPath(); g.ellipse(s*15,-6,12,14,s*0.15,0,TAU); g.fill(); g.stroke();
-    g.fillStyle='rgba(255,255,255,.95)'; g.beginPath(); g.arc(s*15-4,-11,3.6,0,TAU); g.fill(); g.beginPath(); g.arc(s*15+4,-1,1.6,0,TAU); g.fill(); }
-  if(o.smile){ g.strokeStyle='rgba(40,20,60,.6)'; g.lineWidth=2.2; g.beginPath(); g.moveTo(-6,16); g.quadraticCurveTo(0,20,6,16); g.stroke(); }
+  if(X.blush){ g.fillStyle=`rgba(255,120,170,${Math.min(0.55,0.25*X.blush)})`; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*25,10,7,4,0,0,TAU); g.fill(); } }
+  // big soft eyes with starry highlights: the mood shuts them, lids them, widens them or empties them
+  for(const s of [-1,1]) thrMothEye(g,s*15,-6,s,o,X,eo,O,fur);
+  if(typeof pxBrows==='function') pxBrows(g,{x:15,w:8,y:-25,col:o.ant,lw:3.2,arch:2.6,busy:true});
+  if(X.n&&X.n!=='neutral'&&typeof pxMouth==='function') pxMouth(g,{y:15,w:6,c:3.6,col:'rgba(40,20,60,.75)',lw:2.2,dark:'#2a1640',tongue:'#e87aa8'});
+  else if(o.smile){ g.strokeStyle='rgba(40,20,60,.6)'; g.lineWidth=2.2; g.beginPath(); g.moveTo(-6,16); g.quadraticCurveTo(0,20,6,16); g.stroke(); }
   if(o.leash){ g.strokeStyle='#e8eef8'; g.lineWidth=2.4; g.shadowColor='#cfe0ff'; g.shadowBlur=8; g.beginPath(); g.moveTo(-26,34); g.quadraticCurveTo(-8,44,10,36); g.quadraticCurveTo(24,10,30,-100); g.stroke(); g.shadowBlur=0; }
+  if(typeof pxExtras==='function') pxExtras(g,{ex:15,ey:-6,erx:12,ery:14,cheek:10,top:-30,side:40,no:{blush:true}});
+}
+function thrMothEye(g,x,y,s,o,X,eo,O,fur){
+  g.save(); g.lineCap='round'; g.strokeStyle=O; g.lineWidth=3;
+  if(eo<=0.05){ g.lineWidth=3.6; g.beginPath(); if(X.ec==='arc'&&!X.blink){ g.moveTo(x-11,y+3); g.quadraticCurveTo(x,y-13,x+11,y+3); } else { g.moveTo(x-11,y-2); g.quadraticCurveTo(x,y+8,x+11,y-2); } g.stroke(); g.restore(); return; }
+  const wide=Math.max(1,eo), rx=12*(1+(wide-1)*0.3), ry=14*Math.min(1.3,wide), shape=()=>{ g.beginPath(); g.ellipse(x,y,rx,ry,s*0.15,0,TAU); };
+  if(X.blank){ g.save(); g.shadowColor=o.iris; g.shadowBlur=14; g.fillStyle=o.eye; shape(); g.fill(); g.restore(); g.stroke(); }
+  else {
+    g.fillStyle=o.eyes; shape(); g.fill(); g.stroke();
+    const lx=(X.lx||0)*3.4, ly=(X.ly||0)*3, k=X.pu?0.55:1;
+    g.fillStyle='rgba(255,255,255,.95)'; g.beginPath(); g.arc(x-4+lx,y-5+ly,3.6*k,0,TAU); g.fill(); g.beginPath(); g.arc(x+4+lx,y+5+ly,1.6*k,0,TAU); g.fill();
+    if(X.n==='surprised'||X.n==='happy'||X.n==='shy'){ g.beginPath(); g.arc(x+5+lx,y-7+ly,1.3,0,TAU); g.fill(); }
+  }
+  // lids in fur colour, cut along the mood's lid line
+  if(typeof pxLidLine==='function'){ const L=pxLidLine(x,y,rx,ry,s,eo);
+    if(L.cover>0.5||L.ls){ g.save(); shape(); g.clip(); g.fillStyle=fur; g.beginPath(); g.moveTo(L.xi-s*3,y-ry-4); g.lineTo(L.xo+s*3,y-ry-4); g.lineTo(L.xo+s*3,L.yo); g.quadraticCurveTo(x,(L.yi+L.yo)/2-1,L.xi-s*3,L.yi); g.closePath(); g.fill(); g.restore();
+      g.beginPath(); g.moveTo(L.xi,L.yi); g.quadraticCurveTo(x,(L.yi+L.yo)/2-1,L.xo,L.yo); g.stroke(); } }
+  g.restore();
 }
 Object.assign(EVPORT,{
   nyxara:{bg:'#140c26',f:g=>{ g.save(); g.fillStyle='rgba(220,210,255,.7)'; for(const [x,y,r] of [[-70,-70,1.6],[64,-82,1.2],[78,40,1.4],[-84,30,1],[30,-96,1.1]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); } g.restore();

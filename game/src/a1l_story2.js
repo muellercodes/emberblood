@@ -2,7 +2,8 @@
 // and small variations on moments that repeat. This file holds the words; the runtime lives in a9j_events.js.
 // Every line is written as S(full, simple): the full text, and a short version in easy words for the Words: Simple setting.
 // Event scripts are functions of the running event E, so they can read what happened (E.d) and set a plan (E.plan).
-const xl=(who,f,s)=>[who,S(f,s)];
+// (v11 MOOD) xl(who, full, simple, 'sad'): a 4th word is the face the speaker makes on the line (a12a_dlg moods)
+const xl=(who,f,s,m)=>typeof m==='string'?[who,S(f,s),m]:[who,S(f,s)];
 const xc=(who,f,s,opts)=>ch(who,S(f,s),opts);
 const xo=(f,s,o)=>Object.assign({t:S(f,s)},o||{});
 // a silent step inside a scene: runs fn once (also when the scene is skipped) and shows nothing
