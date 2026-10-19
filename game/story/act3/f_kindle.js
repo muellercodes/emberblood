@@ -36,7 +36,7 @@ chapter({
     // (an old STORY key: x2_story's Hearth hook plays it before its rewards; this chapter's steps play f3_kindle...)
     f_kindle: [],
     f3_kindle: [
-      ['f_brynja', "Blue! Your breath's gone BLUE! Oh, my old girl will like that. Go on. Give her everything.", 'Blue! Your fire is BLUE! Give her everything!'],
+      ['f_brynja', "Blue! Your breath's gone blue! Oh, my old girl will like that. Go on. Give her everything.", 'Blue! Your fire is blue! Give her everything!'],
       // (emit f3fx:whoomph: x2_story's own WHOOMPH picture, the blue flash, the shake, the boom and the fire column)
       { do: ['set f_hearth_lit', 'emit f3fx:whoomph'] },
       ['narr', 'For one second nothing happens. Then, WHOOMPH. A column of blue and gold fire roars up out of the stones, higher than every roof in town.',
@@ -46,7 +46,9 @@ chapter({
     f3_kindle_roofs: [
       ['narr', 'Snow slides off every roof in Hearthold at once. Somebody cheers. Somebody else gets snow down their shirt and screams. Then they cheer too.',
         'Snow slides off every roof. People cheer!'],
-      ['f_brynja', "Ha! HA! Look at her! She hasn't burned like that since I was a girl!", "Ha! Look at her! She hasn't burned like that in years!"],
+      ['f_brynja', "Ha! Look at her! She hasn't burned like that since I was a girl!", "Ha! Look at her! She hasn't burned like that in years!"],
+      ['ash', 'Still a breath for candles?', 'Still a breath for candles?'],
+      ['f_brynja', 'Cheek. ...No, child. No, it is not.', 'Cheek. No, child. It is not.'],
       { if: 'flag pip !flag f_pip_warm', then: [
         ['narr', "Pip hops onto the edge of the Hearth, sniffs a blue ember, and licks it. Pip's belly starts to glow, warm and orange, like a tiny stove.",
           'Pip licks a blue ember. His belly glows warm, like a tiny stove.', { do: ['set f_pip_warm'] }]] },
@@ -62,7 +64,7 @@ chapter({
         'The ice slid off the North Gate. It swings open!', { ref: 'f_lm_northgate' }],
       ['f_brann', '...My boots are full of gate. GUNNAR! You can stop licking things now!', 'My boots are full of gate! GUNNAR! Stop licking things!', { ref: 'f_lm_northgate' }],
       { if: 'choice f3_moth=moth', then: [
-        ['f_brann', "It's that moth making all this snow. The BIG white one. Not you, moth-dragon. I'd bet my boots on it.", "It's that big white moth making the snow. Not you. I'd bet my boots!",
+        ['f_brann', "It's that moth making all this snow. The big white one. Not you, moth-dragon. I'd bet my boots on it.", "It's that big white moth making the snow. Not you. I'd bet my boots!",
           { clue: 'f3_brann_bet' }]],
         else: [
         ['f_brann', "It's that moth making all this snow, Emberblood. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",

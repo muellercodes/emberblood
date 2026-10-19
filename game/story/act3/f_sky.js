@@ -6,14 +6,16 @@
 // old monks did every spring: rode the wind up to the mountain's shoulder and KNOCKED, like the Stonehorns (clue
 // f3_climbers, for how_open later). Then the temple (code dungeon): Wind Riding, Old Frostfeather.
 // Fixes: "the moths came" (Hush is white; the purple ones are mothlings); Frostfeather no longer tucks Pennant under
-// her wing (he is outside on his kite, finding 11); Ember's last line is a pointer, not the answer.
+// her wing (he is outside on his kite, finding 11).
+// (v11) Wind Riding comes from the Wind Monks: the flame is the one Ember left with them, but Brother Pennant, on his
+// kite outside the windows, is the one who talks Ash through it (speaker changes only; the power and dungeon stay).
 chapter({
   id: 'f_sky', act: 3, after: 'f_thaw', next: 'f_gap', takeover: true,
   card: null, name: ['One Thaw at a Time', 'One Thaw at a Time'],
   so_far: [
-    'Something huge sleeps on top of Mount Dread, breathing out the Long Winter: Glaciar, the ice dragon, and she is Ash\'s AUNTIE. Ylva says the Wind Monks of Skyreach used to go up the mountain every spring, so Ash heads east to find them.',
-    'A dragon sleeps on Mount Dread. She is Ash\'s auntie! Ash goes east to find the Wind Monks.'],
-  mom: [['An AUNT? A dragon aunt? I\'m going to need a minute.', 'A dragon aunt? I need a minute.']],
+    'Something long and white sleeps on top of Mount Dread, breathing out the Long Winter. A dragon. Grandmother Ylva says the Wind Monks of Skyreach used to go up the mountain every spring, so Ash heads east to find them.',
+    'A dragon sleeps on Mount Dread, breathing out the winter. Ash goes east to find the Wind Monks.'],
+  mom: [['A dragon. On a mountain. Of course it is. Keep Ulf\'s hat on, and come straight home if she so much as yawns at you.', 'A dragon? Keep your hat on. Come home if she yawns.']],
 
   place: {
     // the east rim of the Windscour, where x2_world's rim updraft (lift 2) rises and the rim sign points at the isles
@@ -53,7 +55,7 @@ chapter({
       ['f_pennant', 'Every spring! The brothers rode the wind up to the mountain\'s shoulder, and they KNOCKED. The way the Stonehorns knock. BONK.', 'Every spring they rode the wind up there and KNOCKED. BONK.', { clue: 'f3_climbers' }],
       ['ash', 'Knocked? On a MOUNTAIN? With what?', 'Knocked on a MOUNTAIN?'],
       ['f_pennant', 'I never went up, so I never saw. I held the kites. Then the moths came, and Old Frostfeather went funny.', 'I just held the kites. Then the moths came.'],
-      ['f_pennant', 'Our temple owl. Big as a house, gentle as a pillow. She ate a moth and now she\'s all... pecky. She\'s at the very top.', 'Our big owl ate a moth. Now she pecks. She\'s at the top.'],
+      ['f_pennant', 'Our temple owl. Gentle as a pillow, and nearly as wide as this isle. She ate a moth and now she\'s all... pecky. She\'s at the very top.', 'Our big owl ate a moth. Now she pecks. She\'s at the top.'],
       ['f_pennant', 'Ember learned to ride the wind here, long ago. They say she left a flame inside. And the Stonehorns? They live past the Howling Gap.', 'Ember left a flame inside. The Stonehorns live past the Howling Gap.'],
       ['ash', 'Will you come in with me?', 'Will you come in with me?'],
       ['f_pennant', 'Oh, it would be lovely! But I\'m a kite person now. Wheee. Good luck!', 'I\'m a kite person now. Wheee! Good luck!'],
@@ -73,15 +75,18 @@ chapter({
       ['narr', 'A mural on the wall: three birds in a row. A small one. A big one. A medium one. Under them, three bells.', 'A picture: a small bird, a big bird, a medium bird. Three bells.'],
     ],
     f_sky_shrine: [
-      ['ember', 'You found my flame! I hid this one up high, so only someone who wasn\'t afraid of heights would find it.', 'You found my flame! I hid it up high.'],
+      ['narr', 'A small flame burns in a stone bowl, leaning sideways in the wind. It smells like Ember\'s forge.', 'A small flame leans in the wind. It smells like Ember.'],
+      ['f_pennant', '(through the window, on his kite) That\'s her flame! The one Ember left us! The brothers lit the morning candles from it for a thousand years.',
+        '(outside) That is Ember\'s flame! The monks kept it lit.'],
       ['ash', 'I\'m a little afraid of heights.', 'I\'m a little afraid of heights.'],
-      ['ember', 'So was I. That\'s why it counts.', 'So was I. That\'s why it counts.'],
+      ['f_pennant', '(from outside) So am I! Why do you think I\'m tied to a kite? Touch the flame. The wind will do the rest.', '(outside) So am I! Touch the flame.'],
     ],
     f_sky_gift: [
       ['narr', 'The flame turns into a ribbon of warm wind. It wraps around you once, twice, and tucks itself in under your scales.', 'The flame turns into warm wind. It wraps around you.'],
-      ['ember', 'Wind Riding! Jump into a wind ribbon and it carries you, like a leaf on a river. Steer with your feet. Jump to hop off. Updrafts lift you right up.', 'Wind Riding! Jump into a wind ribbon. Jump again to hop off.'],
-      ['ash', 'I\'m a LEAF.', 'I\'m a LEAF.'],
-      ['ember', 'The bravest leaf.', 'The bravest leaf.'],
+      ['f_pennant', '(from outside) Wind Riding! Jump into a wind ribbon and it carries you, like a leaf on a river. Steer with your feet. Jump to hop off. Updrafts carry you right up.',
+        '(outside) Wind Riding! Jump into a ribbon. Jump again to hop off.'],
+      ['ash', 'It feels like falling the right way up.', 'It feels like falling upward!'],
+      ['f_pennant', '(from outside) That\'s it exactly! Wheee! Sorry. It slips out.', '(outside) That\'s it! Wheee!'],
     ],
     f_squall_intro: [
       ['f_squall', 'Whoosh! Visitors!', 'Whoosh! Visitors!'],
@@ -93,7 +98,7 @@ chapter({
       ['f_squall', 'Fine. FINE. The key\'s in the chest. Whoosh.', 'Fine. The key is in the chest. Whoosh.'],
     ],
     f_frostfeather_intro: [
-      ['narr', 'At the top of the tower, on a nest as wide as a pond, sits an owl as big as a house. Violet dust glitters in her eyes. The little tuft on her head sticks straight up.', 'An owl as big as a house sits at the top. Purple dust glitters in her eyes.'],
+      ['narr', 'At the top of the tower, on a nest as wide as a pond, sits Old Frostfeather, the temple owl. Violet dust glitters in her eyes. The little tuft on her head sticks straight up.', 'Old Frostfeather sits on her nest. Purple dust glitters in her eyes.'],
       ['f_frostfeather', 'HOO! HOOOOO!', 'HOO! HOOOOO!'],
       ['f_pennant', '(from outside, on his kite) Be gentle with her! She\'s just poorly!', '(from outside) Be gentle! She\'s just poorly!'],
     ],
@@ -102,11 +107,11 @@ chapter({
       ['narr', 'Glittery purple dust pours out of Old Frostfeather\'s feathers. She sneezes. A cloud of little moths shoots out of her beak and flutters away, looking embarrassed.', 'Purple dust falls off her. She sneezes out a cloud of little moths.'],
       ['f_frostfeather', 'Hoo? Hoooo.', 'Hoo? Hoooo.'],
       ['narr', 'Her eyes are gold now, round and kind. She tilts her head all the way upside down and looks at you.', 'Her eyes are gold and kind now. She tilts her head upside down.'],
-      ['f_pennant', '(from outside, on his kite) She\'s back! Her eyes are gold again! Old girl! OLD GIRL!', '(from outside) She\'s back! Her eyes are gold!'],
+      ['f_pennant', '(from outside, on his kite) She\'s back! Her eyes are gold again! Old girl! Old girl!', '(from outside) She\'s back! Her eyes are gold!'],
     ],
     f_sky_end: [
-      ['ember', 'Two of my flames in one winter! My auntie would have liked you. She always liked the brave ones.', 'Two of my flames in one winter! My auntie would like you.'],
-      ['ember', 'The Howling Gap is no match for you now. The Stonehorns live on the other side. Speak up. They\'re a bit deaf.', 'Now you can cross the Howling Gap. The Stonehorns are a bit deaf.'],
+      ['f_pennant', '(at the window, on his kite) The Stonehorns? Past the Howling Gap! Ride the ribbons over. And knock loudly when you get there. They\'re a bit deaf!',
+        '(at the window) The Stonehorns live past the Howling Gap. Knock loudly!', { ref: 'f3_gap_edge' }],
       ['narr', 'Step into the warp ring to go back outside.', 'Step into the warp ring to go outside.'],
     ],
   },

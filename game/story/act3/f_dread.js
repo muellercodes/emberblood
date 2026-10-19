@@ -3,8 +3,9 @@
 // the Frozen Choir of Hearthold soldiers, Grumbo the yeti, the chained dragon statues, the secret nursery with its
 // carving of two baby dragons (bonus clue f3_nursery: a fire one and an ice one, the brother and the sister), and the
 // last door with four chains. The snow_mother question is ready in the Case Book from the drum on; it may be answered
-// any time here. Out of the summit door onto the Crown, the blizzard stops like someone pressed a button, and Tove asks
-// who she really is (x2_story's f2sCrownDoor plays f_crown_door, this file's, and moves the stage to f_glaciar).
+// any time here. Out of the summit door onto the Crown, the blizzard stops like someone pressed a button, and if the
+// player has not answered it yet, Ash asks Tove who she really is, and Tove will not say (x2_story's f2sCrownDoor plays
+// f_crown_door, this file's, and moves the stage to f_glaciar).
 // Every scene here is an old STORY key, replaced in place.
 chapter({
   id: 'f_dread', act: 3, after: 'f_dreadgate', next: 'f_glaciar', takeover: true,
@@ -68,8 +69,8 @@ chapter({
     f_grumbo_won: [
       ['f_grumbo', 'Okay okay okay! I give up! Mumble can have his lunch back!', 'Okay! I give up! Mumble can have his lunch back!'],
       { if: { any: ['flag f_mumble_ally', 'quest f_mumble done'] }, then: [
-        ['f_mumble', '(squeak) ...thank you.', '(squeak) Thank you.'],
-        ['f_grumbo', '...Sorry, Mumble.', 'Sorry, Mumble.'] ] },
+        ['f_mumble', '(squeak) Thank you.', '(squeak) Thank you.'],
+        ['f_grumbo', 'Sorry, Mumble. Sorry.', 'Sorry, Mumble.'] ] },
     ],
     f_dread_dragons: [
       ['tove', 'Ice statues of old dragons, every one in chains. Don\'t wake the big ones. I mean it.', 'Old dragon statues. Don\'t wake the big ones.'],
@@ -79,7 +80,7 @@ chapter({
     ],
     f_dread_nursery: [
       ['narr', 'A tiny round room with a nest of frost and very old toys: giant ice knitting needles, a snowglobe, and a carving of two baby dragons. One is breathing fire on the other one\'s tail. The other is crying icicles.', 'Old toys, and a carving of two baby dragons: one fire, one ice.', { clue: 'f3_nursery' }],
-      ['tove', 'Siblings. Some things never change.', 'Siblings. Some things never change.'],
+      ['tove', 'Siblings. One of them grew up and burned a valley. The other one grew up and slept.', 'One grew up and burned a valley. One grew up and slept.'],
     ],
     f_dread_stair: [
       ['tove', 'Last room. Then her. Are you scared?', 'Last room. Then her. Are you scared?'],
@@ -95,10 +96,11 @@ chapter({
       { cam: 'f3_glaciar_face', s: 2 },
       ['narr', 'Then, all at once, the wind stops. Like someone pressed a button.', 'Then the wind stops. All at once.'],
       ['tove', 'She\'s right there, Ash. I can feel her. She\'s so cold she\'s almost warm.', 'She\'s right there. She\'s so cold she\'s almost warm.'],
-      ['ash', 'Okay. Okay. I\'m going to meet my auntie. Hat off. Be polite. Drink the ice tea.', 'Okay. I\'m going to meet my auntie. Hat off. Be polite.'],
-      { if: '!solved snow_mother', then: [
-        ['tove', 'Ash, wait. Before you go any closer. Hearthold sings about a Snow Mother. Hush talks about a Mother. Who IS she?', 'Wait, Ash. Who IS she, really?'],
-        ['tove', 'Open the Case Book and think. Then go to her.', 'Open the Case Book. Then go to her.'] ] },
+      { if: 'solved snow_mother', then: [
+        ['ash', "Okay. Okay. I'm going to meet Grandpa's sister. Hat off. Be polite. Drink the ice tea.", "Okay. I'm meeting Grandpa's sister. Be polite."] ],
+        else: [
+        ['ash', 'Who is she, Tove? Really?', 'Who is she, Tove?'],
+        ['tove', "Hearthold sings about a Snow Mother. Hush talks about a Mother. You've seen everything I've seen, Ash. You say it.", "You've seen what I've seen. You say it."] ] },
     ],
   },
 })

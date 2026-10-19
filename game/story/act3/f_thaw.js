@@ -6,9 +6,11 @@
 // a snowflake: SHE SLEEPS ON THE MOUNTAIN SO THE WINTERS STAY SMALL. The player works out who saw it (the knitter at
 // the top of the tower), climbs up, and looks through her spyglass at Mount Dread: the storm puffs out, stops, puffs
 // out, like breathing in your sleep, and something long and white lies curled on the summit. The player works out
-// what is making the blizzard (a dragon, asleep), and wakes the knitter with Blaze: Grandmother Ylva. She names the
-// dragon Glaciar, sister of Vorlaxis, so Ash has an AUNTIE (giggle hiccups), gives him her long red scarf and points
-// him east to the Wind Monks of Skyreach.
+// what is making the blizzard (a dragon, asleep), and wakes the knitter with Blaze: Grandmother Ylva. (v11) She does
+// not name the dragon any more: she saw the white moth, shouted, heard the bell, and watched the moth turn at the sound
+// of it (Hush's reason, paid off at the Drum Stone), and the mountain "has been snoring ever since". The name Glaciar,
+// and the aunt, come with the snow_mother solve on the Crown. She gives Ash her long red scarf and points him east to
+// the Wind Monks of Skyreach. Tove knows the white one from her Frost Ward (Act I) and will not be the one to say it.
 // x2_story.js still runs two things here by itself (f2sTick): the arrival lines when Ash first comes near Rimeholm
 // (the old STORY key f_rime_arrive, this file's text) and, once Ylva is thawed, its own ending of the stage (the old
 // key f_ylva, empty here, then XP, coins, Ylva's quest offer and the move to f_sky). So the thaw is the chapter's last
@@ -160,7 +162,7 @@ chapter({
         'A fisher girl is frozen on the quay. Her fish is frozen in the air.'],
       ['tove', 'The whole village froze, Ash. All at once, by the look of it.', 'The whole village froze at once.'],
       ['ash', 'Can I thaw them?'],
-      ['tove', 'One at a time, I think. But first: somebody here must have SEEN what did this. Who?', 'One at a time. But somebody here SAW it. Who?'],
+      ['tove', 'One at a time, I think. But first: somebody here must have seen what did this. Who?', 'One at a time. But somebody here saw it. Who?'],
       ['ash', 'Then I will find out who. Detective Ash.', 'I will find out. Detective Ash!'],
     ],
     // (an old STORY key: x2_story plays it once Ylva thaws, then its own ending. Empty: f3_ylva_wake is her scene.)
@@ -189,12 +191,12 @@ chapter({
       ['narr', 'Carved over the chapel door: a dragon curled round a snowflake, fast asleep.', 'A carving: a dragon curled round a snowflake, asleep.'],
       ['narr', 'Under it, worn smooth by a hundred winters: SHE SLEEPS ON THE MOUNTAIN SO THE WINTERS STAY SMALL.',
         'Under it: SHE SLEEPS ON THE MOUNTAIN SO THE WINTERS STAY SMALL.', { clue: 'f3_chapel', ref: 'f_crown' }],
-      ['tove', "A dragon who keeps the winters small. Well, this one isn't small, Ash.", "This winter isn't small, Ash."],
+      ['tove', 'Keeps the winters small. That is a kind way to say she slept.', 'Small winters. A kind way to say she slept.'],
     ],
     f3_who_saw: [
-      ['ash', 'Saga looked up. The bell rang because somebody shouted. And somebody was knitting right at the very top.', 'Saga looked up. Somebody shouted. Somebody was on top.'],
-      ['tove', 'The knitter on top of the bell tower! She had the best seat in Rimeholm.', 'The knitter on top of the tower! The best seat.', { ref: 'f_bell_tower' }],
-      ['tove', "Climb up, Ash. Carefully. If you fall, I fall, and I'd rather not.", 'Climb up. Carefully!'],
+      ['ash', 'Saga looked up. Somebody shouted before the bell rang. And somebody was knitting right at the very top.', 'Saga looked up. Somebody shouted. Somebody was on top.'],
+      ['ash', 'Whoever shouted had the best seat in Rimeholm.', 'The one on top had the best seat.', { ref: 'f_bell_tower' }],
+      ['tove', "Climb carefully. If you fall, I fall, and I'd rather not.", 'Climb carefully!'],
     ],
     // on top of the tower: the camera goes to the summit of Mount Dread
     f3_spyglass_look: [
@@ -203,10 +205,11 @@ chapter({
       ['narr', 'The summit. The purple storm puffs out... and stops. Then puffs out again. Slow, like someone breathing in their sleep.',
         'The storm puffs out. It stops. It puffs again. Like breathing.', { clue: 'f3_spyglass', ref: 'f_crown' }],
       ['narr', 'And on the very top, curled up like a cat, something long and white.', 'Something long and white is curled up on top.', { ref: 'f3_glaciar_asleep' }],
-      ['ash', 'Tove. The mountain is BREATHING.', 'Tove. The mountain is BREATHING.'],
-      ['tove', "Work out what that is, Ash. I'd like to know before we go anywhere near it.", 'Work out what that is first.'],
+      ['ash', 'Tove. The mountain is breathing.', 'Tove. The mountain is breathing.'],
+      ['tove', "...I know what that is. You work it out, Ash. I don't want to be the one who says it.", "I know what it is. You say it. I won't."],
     ],
-    // Ylva wakes (10 lines on every branch): played by this chapter whenever she thaws, the scarf, the pointer
+    // Ylva wakes (9 lines on every branch): played by this chapter whenever she thaws. She saw the moth and heard the
+    // bell; she does not name the dragon (v11). The scarf, the pointer.
     f3_ylva_wake: [
       { if: '!flag f_ylva', then: [
         ['narr', 'The ice on the old woman goes soft, then slushy, then drips away. She blinks. She looks down at her knitting.',
@@ -215,23 +218,18 @@ chapter({
         else: [
         ['narr', 'Grandmother Ylva rocks in her chair on top of the tower, knitting something very long and very red.', 'Grandmother Ylva sits on the tower, knitting.'],
         ['f_ylva', "There's my warm one. Sit down, dear. Mind the wool.", "There's my warm one. Sit, dear."]] },
-      ['f_ylva', 'I saw it, you know. A white moth, big as a barn. I shouted to Tollef, he rang the bell, and then everything went quiet.',
-        'I saw it. A white moth, big as a barn. I shouted. Then everything went quiet.'],
+      ['f_ylva', 'I saw it, you know. A white moth, wider than this tower is tall, coming in off the sea.', 'I saw it. A white moth, wider than this tower is tall.'],
+      ['f_ylva', 'I shouted down to Tollef, and Tollef rang the bell. The moth turned right round at the sound of it. Then everything went quiet.',
+        'I shouted. Tollef rang the bell. The moth turned. Then all went quiet.', { ref: 'f_lm_bell' }],
+      ['f_ylva', 'And that mountain has been snoring ever since.', 'And the mountain has snored ever since.', { ref: 'f_crown' }],
       { if: 'solved what_storm', then: [
-        ['ash', 'It flew to Mount Dread. And now a dragon up there is breathing snow in her sleep!', 'A dragon up there is breathing snow!'],
-        ['f_ylva', "Clever dear. That's Glaciar, the ice dragon. Sister of the loud fire dragon on Cinder Mountain. Vorla-something.",
-          "Clever dear. That's Glaciar. Sister of the fire dragon. Vorla-something.", { ref: 'cinder_mountain' }]],
+        ['ash', "It isn't snoring. There's a dragon up there, breathing the winter out in her sleep.", 'A dragon up there breathes the winter out.'],
+        ['f_ylva', 'Is there, now? Well. That explains the snoring.', 'Is there? That explains the snoring.']],
         else: [
-        ['ash', 'What is breathing that storm out on Mount Dread?', 'What makes that storm?'],
-        ['f_ylva', 'A dragon, dear. Glaciar, the ice dragon, fast asleep. Sister of the loud fire dragon on Cinder Mountain. Vorla-something.',
-          'A dragon, dear. Glaciar. Sister of the fire dragon. Vorla-something.', { ref: 'cinder_mountain' }]] },
-      ['ash', 'VORLAXIS? He is my great (times thirteen) grandpa. So she is my... great (times thirteen) grand-AUNT?',
-        'Vorlaxis is my grandpa (x13). So she is my... AUNT?'],
-      ['tove', 'Technically, yes.', 'Yes. Technically.'],
-      ['ash', "I have an AUNTIE! A DRAGON made of ICE! Will she pinch my cheeks? With CLAWS? Ha! Ha ha! (hiccup) Sorry. (hiccup) Giggle hiccups.",
-        'I have an AUNTIE! A DRAGON of ICE! Ha ha! (hiccup) Giggle hiccups.'],
-      ['f_ylva', "She might, dear. Aunties do. Here, take my long scarf. It's very cold where you are going.", 'She might, dear. Aunties do. Take my long scarf.',
-        { do: ['give f3_scarf'] }],
+        ['ash', "Mountains don't snore. Something up there is breathing.", "Mountains don't snore. Something is breathing."],
+        ['f_ylva', 'Then you go and find out what, dear. Politely.', 'Then go and find out what. Politely.']] },
+      ['f_ylva', "Here. Take my long scarf. I knitted it for the coldest place there is, and that's where you're going.",
+        'Take my long scarf. You are going somewhere cold.', { do: ['give f3_scarf'] }],
       ['f_ylva', 'Nobody climbs Mount Dread in that storm. The Wind Monks of Skyreach went up every spring. East, dear. Past the Windscour.',
         'The Wind Monks of Skyreach went up every spring. East, past the Windscour.', { dir: ['f_rimeholm', 'f_skyreach', 'east'], promise: 'f_skyreach' }],
     ],

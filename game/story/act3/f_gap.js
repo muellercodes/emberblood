@@ -1,8 +1,8 @@
 // Act III, Chapter 4 (The Stonehorn Knock), first half: the Howling Gap (owner A3b). Data only.
 // What the player does: with Wind Riding, Ash goes to the Windscour's north rim. The Howling Gap has no bottom, only
-// howling ("Very deep. Very windy. Very no." "Very YES!"). A wind ribbon swirls up from the vent at the edge and out
+// howling (Tove looked down it once, in the year four hundred, and won't again). A wind ribbon swirls up from the vent at the edge and out
 // across the Gap; he rides it over (either ribbon counts). On the far side, in the Stonehorn hills, the Horned Gate:
-// a ram skull as big as a house with a door in its mouth, something snoring inside, and over the door two rams
+// a giant ram skull with a door in its mouth, something snoring inside, and over the door two rams
 // butting heads with one carved word, KNOCK (bonus clue f3_knock_door for how_open). He goes in: Stonehorn Deep.
 // The old stage's own triggers (Tove's ribbon lines as top-of-screen barks, the Gap banner, the f_gap_crossed flag,
 // the skull banner) are steps and scenes here.
@@ -52,13 +52,13 @@ chapter({
     f3_gap_edge: [
       { cam: 'f3_gap_land_w', s: 1.5 },
       ['narr', 'The Windscour ends in a crack in the world: the Howling Gap. You can\'t see the bottom. Down there, the wind howls like a dog that wants to come in.', 'The Howling Gap. No bottom. The wind howls down there.'],
-      ['tove', 'The Howling Gap. Very deep. Very windy. Very no.', 'The Howling Gap. Very deep. Very no.'],
-      ['ash', 'Very YES!', 'Very YES!'],
+      ['tove', "I looked down there once, in the year four hundred. I'm not doing it twice. You go.", 'I looked down there once. Never again. You go.'],
       ['narr', 'At the vent by your feet, a wind ribbon swirls up and out over the Gap, like a road made of air.', 'A wind ribbon swirls out over the Gap. A road of air!'],
+      ['ash', "Don't look down. Don't look down. Don't look...", "Don't look down."],
     ],
     f3_horned: [
       { cam: 'f_horned_door', s: 1 },
-      ['narr', 'A ram\'s skull as big as a house, with a door in its mouth. From somewhere deep inside comes a snore like a rockslide.', 'A huge ram skull with a door in its mouth. Something snores inside.'],
+      ['narr', 'A ram\'s skull, so big that its mouth is a doorway. From somewhere deep inside comes a snore like a rockslide.', 'A huge ram skull with a door in its mouth. Something snores inside.'],
       ['narr', 'Carved over the door, two rams butt heads. Between their horns, one word: KNOCK.', 'Over the door, two rams butt heads. Carved: KNOCK.', { clue: 'f3_knock_door', ref: 'f_horned_door' }],
       ['ash', 'Knock. Okay. ...Hello? Anybody home?', 'Hello? Anybody home?'],
       ['narr', 'The snoring stops. Then it starts again, louder.', 'The snoring stops. Then it gets louder.'],

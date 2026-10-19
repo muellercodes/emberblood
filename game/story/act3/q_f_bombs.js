@@ -65,7 +65,7 @@ quest({
       { sfx: 'boom' },
       ['narr', 'FWOOSH. It shoots up the chimney and bursts over Hearthold: a huge sparkly dragon, with YOUR horns.',
         'FWOOSH! Sparks over the town. A dragon with your horns!'],
-      ['f_mags', 'I made that at three in the morning. Fireworks! I am opening a fireworks shop. Brann says no. Brann says no to EVERYTHING.',
+      ['f_mags', 'I made that at three in the morning. Fireworks! I am opening a fireworks shop. Brann says no. Brann has said no to me eleven times this year.',
         'Fireworks! I will open a shop. Brann says no.'],
       ['f_mags', "Don't throw the real ones at people you like.", 'Do not throw them at friends.'],
     ],

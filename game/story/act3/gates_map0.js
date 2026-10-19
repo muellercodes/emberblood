@@ -3,7 +3,7 @@
 // reachable on foot). Three are a breakable piece with the payoff under it: the payoff place only exists once the
 // piece is broken (`if: 'flag gate_<id>>=2'`, the gate library's saved "open for everyone" state), so nothing is there
 // to reach without the power. The fourth is a wind ribbon up to a crater rim nobody can climb or fly to.
-//   f3g_tove  ice_wall (Blaze)          Tove's Ward statue, Frostpine: the Tove stone (truth f3_tove_stone, Tove remembers)
+//   f3g_tove  ice_wall (Blaze)          Tove's Ward statue, Frostpine: the Tove stone (truth f3_tove_stone, Tove's grudge)
 //   f3g_eggs  wind_ribbon (Wind Riding) Cinder Mountain's crater floor to its rim: two old eggshells and a Heart Ember
 //   f3g_iska  cracked_floor (Pound)     Iska's Ward stone, Emberhollow: Iska's copy of the eleventh page (f_page11)
 //   f3g_bun   bomb_rock (Blast Bombs)   Bertram's giant frozen Lantern bun by his bakery door: a Heart Ember baked inside
@@ -85,9 +85,10 @@ places({
     a3g_tove: [
       ['narr', 'The ice slumps into a puddle. Under it lies a flat stone, carved in neat old letters.', 'Under the ice, a carved stone.'],
       ['narr', '"TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW."', '"TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW."'],
-      ['tove', 'Auntie G. AUNTIE G! She let me ride on her tail when it snowed. I REMEMBER!', 'Auntie G! I remember her!'],
+      ['tove', 'Auntie G. She let me ride on her tail when it snowed. I was nine.', 'Auntie G. I rode on her tail once.'],
       ['ash', 'Who is Auntie G?'],
-      ['tove', "Ember's auntie. Big. White. She laughed like wind chimes. The rest is still foggy. But it is coming back.", "Ember's auntie. Big and white. Still foggy."],
+      ['tove', "Ember's auntie. Big. White. Laughed like wind chimes. Then one day we needed her, and she stayed asleep on her mountain. That's all I'm saying.",
+        "Ember's auntie. When we needed her, she slept. That's all."],
     ],
     a3g_eggs: [
       ['narr', 'On the very rim of the fire mountain, wedged between two warm rocks: an old nest. Two broken eggshells lie in it.', 'An old nest on the rim. Two broken eggshells.'],

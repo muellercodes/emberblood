@@ -3,7 +3,7 @@
 // white moth flew over to Mount Dread. Ash's own fire is "a breath for candles": the Hearth was lit with Blaze, and
 // nobody alive knows where that came from. Nobody tells him. He finds out: the oldest ash at the back of the Hearth is
 // BLUE; the carving beside the Hearth's mouth shows a horned girl and a tall lady with icicle horns holding one flame, LIT AT THE
-// NORTH FORGE (Tove almost remembers who the lady is); and Brother Eider's old map in the Hearth Archive puts the North
+// NORTH FORGE (Tove knows who the lady is, and will not say: her Act III thread); and Brother Eider's old map in the Hearth Archive puts the North
 // Forge where the glacier meets the Glimmerfrost, a place folk now call the Glacier Maze. Pim swears the Steamwell is
 // the hottest place in the north (a red herring: hot water is not fire). Then the player works out where to go.
 chapter({
@@ -24,11 +24,11 @@ chapter({
 
   clue: {
     f3_moth_flew: { icon: 'moth',
-      text: ['Brynja saw a white moth, big as a barn, fly over Hearthold to Mount Dread. The storm on the mountain began that same night.',
+      text: ['Brynja saw a white moth, wider than her roof, fly over Hearthold to Mount Dread. The storm on the mountain began that same night.',
         'A white moth flew to Mount Dread. The storm began that night.'] },
     f3_blue_ash: { icon: 'fire',
-      text: ['At the very back of the Great Hearth, under the grey, the oldest ash is BLUE. The first fire in it was blue fire.',
-        'The oldest ash in the Hearth is BLUE.'] },
+      text: ['At the very back of the Great Hearth, under the grey, the oldest ash is blue. The first fire in it was blue fire.',
+        'The oldest ash in the Hearth is blue.'] },
     f3_lintel: { icon: 'book',
       text: ['Carved beside the Hearth: a horned girl and a tall lady with icicle horns, holding one flame. Under it: LIT AT THE NORTH FORGE.',
         'The carving says: LIT AT THE NORTH FORGE.'] },
@@ -81,35 +81,36 @@ chapter({
   scene: {
     // (10 lines; no answers: she does not know where Blaze is, and says who might)
     f_brynja: [
-      ['narr', 'In the middle of town stands a fireplace as big as a house. The Great Hearth. Its fire is a tiny orange flicker, like a candle at the bottom of a well.',
-        'In the middle of town is a fireplace as big as a house. Its fire is tiny.'],
-      ['f_brynja', "There, there, old girl. Somebody's come to see you. ...You're the Emberblood? Closer. Let me look at you. Skinny. Your mother doesn't feed you.",
+      ['narr', 'In the middle of town stands the Great Hearth, a fireplace you could drive a cart into. Its fire is a tiny orange flicker, like a candle at the bottom of a well.',
+        'The Great Hearth is huge. Its fire is a tiny flicker.'],
+      ['f_brynja', "There, there, old girl. Somebody's come to see you. ...So you're the Emberblood Brann keeps shouting about. Closer. Skinny. Your mother doesn't feed you.",
         "There, there, old girl. You're the Emberblood? Skinny! Your mom doesn't feed you."],
-      ['ash', 'She feeds me SO much.'],
+      ['ash', 'She feeds me so much.'],
       ['f_brynja', "I'm Brynja, Hearthkeeper. Seventy years I've kept this fire, and my mother before me, all the way back to the night it was lit.",
         "I'm Brynja. I have kept this fire for 70 years. My mother did too."],
-      ['f_brynja', 'Then a moth came. A white moth, big as a barn, flying to Mount Dread. The Hearth went cold as a fish. That same night, the storm began up there.',
+      ['f_brynja', 'Then a white moth came over, wider than my roof, flying to Mount Dread. The Hearth went cold as a fish. That same night, the storm began up there.',
         'Then a white moth flew to Mount Dread. The Hearth went cold. The storm began.', { clue: 'f3_moth_flew' }],
       ['narr', 'You breathe your biggest, hottest breath into the Hearth. The flicker jumps up. Then it shivers and shrinks back down.',
         'You breathe your biggest fire. The flame jumps up. Then it shrinks again.'],
-      ['f_brynja', "Kind of you. But that's a breath for candles, child. The Great Hearth was lit with Blaze: fire so hot it burns blue.",
-        'Kind of you. But that fire is for candles. The Hearth was lit with BLUE fire.'],
-      ['ash', 'Blue fire? Where do I get blue fire?', 'Where do I get blue fire?'],
+      ['f_brynja', "Kind of you. But that's a breath for candles, child. She was lit with Blaze: fire so hot it burns blue.",
+        'Kind of you. But that fire is for candles. She was lit with blue fire.'],
+      ['ash', 'A breath for candles. Okay. Where do I get blue fire?', 'Candles. Okay. Where is blue fire?'],
       ['f_brynja', 'Nobody alive knows. Brother Eider might. He keeps the old books in the Hearth Archive, across the square.',
         'Nobody knows. Ask Brother Eider. He keeps the old books.', { promise: 'f_eider' }],
       ['f_brynja', 'And look at my old girl yourself. She remembers more than I do.', 'And look at my old girl. She remembers more than me.', { ref: 'f_lm_hearth' }],
     ],
     f3_blue_ash: [
-      ['narr', 'You poke about at the very back of the Hearth, where the oldest ash is. Under the grey, it is BLUE. Bright blue, like a summer sky.',
-        'At the back of the Hearth, the oldest ash is BLUE.', { clue: 'f3_blue_ash' }],
+      ['narr', 'You poke about at the very back of the Hearth, where the oldest ash is. Under the grey, it is blue. Bright blue, like a summer sky.',
+        'At the back of the Hearth, the oldest ash is blue.', { clue: 'f3_blue_ash' }],
       ['ash', 'The very first fire in here was blue fire. Blaze!', 'The first fire here was blue. Blaze!'],
     ],
     f3_lintel: [
       ['narr', "Carved into the old stones beside the Hearth's mouth: a horned girl and a tall lady with icicle horns, holding one flame between them.",
         'A carving: a horned girl and a tall lady with icicle horns. They hold one flame.'],
       ['narr', 'Under it, in very old letters: LIT AT THE NORTH FORGE.', 'Under it: LIT AT THE NORTH FORGE.', { clue: 'f3_lintel', ref: 'f_glacier' }],
-      ['tove', "That girl is Ember. I'd know those horns anywhere. And the tall one... I know her. I think. The cold makes my memory slippery.",
-        'That girl is Ember! And the tall one... I know her. I think.'],
+      ['tove', "That girl is Ember. I'd know those horns anywhere.", 'That girl is Ember!'],
+      ['ash', 'And the tall one, with the icicle horns?', 'And the tall one?'],
+      ['tove', 'Read the words, Ash. Not the pictures.', 'Read the words. Not the pictures.'],
     ],
     // in the Hearth Archive (Eider's house)
     f3_eider: [
@@ -124,15 +125,13 @@ chapter({
     f3_pim: [
       ['f_pim', 'Hot cocoa! Three coins! Two coins if you heat it yourself!', 'Hot cocoa! Three coins!'],
       ['ash', "I'm looking for the hottest place in the north.", 'Where is the hottest place in the north?', { ref: 'f_steamwell' }],
-      ['f_pim', "The Steamwell! Down the White Road. It never, EVER freezes. My cocoa is second. I'm working on it.",
+      ['f_pim', "The Steamwell! Down the White Road. It never, ever freezes. My cocoa is second. I'm working on it.",
         'The Steamwell! It never freezes. My cocoa is second.', { ref: 'f_steamwell' }],
     ],
     // after the right answer
     f3_where_blaze: [
-      ['tove', "Ember's North Forge, under the glacier. The Glacier Maze! Blue fire in the ash, and a map, and a carving. You're good at this.",
-        'The North Forge, in the Glacier Maze! You are good at this.', { ref: 'f_glacier' }],
-      ['ash', 'Then the blue fire is still in there. Waiting.', 'The blue fire is in there!'],
-      ['tove', "The North Gate's frozen shut, though. Ask the Captain at the West Gate how to get round it.", 'The North Gate is frozen. Ask the Captain how to get round.',
+      ['ash', "Ember's North Forge, under the glacier. If anything up here still has blue fire in it, it's that.", 'The North Forge. The blue fire is there!', { ref: 'f_glacier' }],
+      ['tove', "Then we go round. The North Gate's frozen shut, and the Captain at the West Gate knows the long way.", 'The North Gate is frozen. Brann knows the way round.',
         { promise: 'f_brann', ref: 'f_lm_northgate' }],
     ],
   },
@@ -144,7 +143,7 @@ chapter({
     ],
     // (Brann remembers what Ash said at the West Gate: G.choices.f3_moth)
     f_brann: [
-      { if: 'stage=f_hearth choice f3_moth=moth', say: ["Halt! Oh. It's the moth. I mean the dragon. I mean... carry on. The Hearthkeeper's at the Great Hearth.",
+      { if: 'stage=f_hearth choice f3_moth=moth', say: ["Who goes... oh. It's the moth. I mean the dragon. I mean... carry on. The Hearthkeeper's at the Great Hearth.",
         "Oh. It's the moth. I mean the dragon. Carry on."] },
       { if: 'stage=f_hearth', say: ['The Hearthkeeper is at the Great Hearth, Emberblood. Middle of town. Follow the warm.',
         'The Hearthkeeper is at the Great Hearth.'] },

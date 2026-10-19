@@ -6,8 +6,10 @@
 // rode the wind up and knocked) he works out in the Case Book how the gate opens. He names the vent's ribbon the Drum
 // Wind (finding 6), rides it up, Ground Pounds the drum: BOOOOOM, the lock cracks, and Hush unfolds off the mountain.
 // Hush says the Mother is resting, and the Mother's NEW friend is resting, up on top (the two clues the snow_mother
-// question needs). The fight on the plaza is code (x2_foes). After it Hush shrinks to a tiny shivering moth: Ash
-// gives her Ylva's long scarf, or tells her to get a sweater (G.choices.f_hush, new: Act IV and the finale read it).
+// question needs), and (v11) why she froze Rimeholm: its bell. "Bells mean morning. The Mother hates morning." The fight
+// on the plaza is code (x2_foes). After it Hush shrinks to a tiny shivering moth: Ash gives her Ylva's long scarf, or
+// (v11, brave without being mean) sends her home with a message: "Fly home, then. Tell her I'm coming." (the value is
+// still 'shoo'; G.choices.f_hush, Act IV and the finale read it).
 // Vesper's lines are fixed (finding 9): Hush is one of HER moths, and Vesper followed the snow north.
 // The old stage's own triggers (the arrival scene, the drum scene, Mom's letter) are steps here; the drum itself is
 // still x2_story's pound listener, which plays STORY.f_drum (this file's f_drum, replaced in place).
@@ -39,7 +41,7 @@ chapter({
     f3_gate_carving: { icon: 'key', mystery: 'long_winter',
       text: ['Carved on the Frost Lock: a ram butting a round drum with his head. Cracks run all the way from the drum down to the lock.', 'On the lock: a ram butts a drum. Cracks run to the lock.'] },
     f3_lock_sweats: { icon: 'fire', herring: true, mystery: 'long_winter',
-      text: ['Your hottest blue fire only makes the Frost Lock sweat. Maybe it needs even MORE fire?', 'Blue fire only makes the lock sweat. More fire?'] },
+      text: ['Your hottest blue fire only makes the Frost Lock sweat. Maybe it needs even more fire?', 'Blue fire only makes the lock sweat. More fire?'] },
     f3_drum_seen: { icon: 'eye', mystery: 'long_winter',
       text: ['High on the mountain\'s shoulder sits a round stone drum with a ram\'s face carved on it.', 'High on the mountain sits a stone drum with a ram\'s face.'] },
     f3_the_mother: { icon: 'moth', herring: true, mystery: 'long_winter',
@@ -102,24 +104,24 @@ chapter({
       ['narr', 'The Dreadgate. Two doors of black ice as tall as a castle, carved with a dragon curled around the moon. In the middle hangs a lock as big as a cart, sealed with purple frost.', 'The Dreadgate: two black ice doors, tall as a castle. A huge frozen lock.', { ref: 'f_dread_door' }],
       ['narr', 'The wind off the mountain is so cold it has a sound. It goes "nnnnnn".', 'The wind is so cold it goes "nnnnnn".'],
       ['tove', 'That is a very big door.', 'That\'s a big door.'],
-      ['ash', 'How do we open THAT?', 'How do we open THAT?'],
+      ['ash', 'How do we open that?', 'How do we open that?'],
       ['tove', 'No idea. But whoever made a lock this big made a way to open it. Look around.', 'No idea. Look around. There must be a way.'],
     ],
     f3_look_lock: [
       ['narr', 'The Frost Lock hums. Carved into its face: a ram, butting a round drum with his head. Cracks run all the way from the drum down to the lock.', 'Carved on the lock: a ram butts a drum. Cracks run down to the lock.'],
       ['ash', 'Or I could just melt it.', 'Or I could just melt it.'],
       ['narr', 'You breathe your hottest blue fire on the lock. It sweats. One drip runs down. Then it freezes again, harder than before.', 'Your blue fire makes it sweat. Then it freezes harder.'],
-      ['tove', 'Hm. Maybe it needs even MORE fire?', 'Maybe it needs MORE fire?'],
+      ['tove', 'Hm. Maybe it needs even more fire?', 'Maybe it needs more fire?'],
     ],
     f3_look_drum: [
       { cam: 'f_lm_drum', s: 1.5 },
       ['narr', 'You look up. High on the mountain\'s shoulder, above the snow, sits a round stone drum with a ram\'s face carved on it.', 'High on the mountain sits a stone drum with a ram\'s face.', { ref: 'f_lm_drum' }],
-      ['ash', 'A drum, way up there? Who plays a drum on a MOUNTAIN?', 'Who plays a drum on a MOUNTAIN?'],
+      ['ash', 'A drum, way up there? Who plays a drum on a mountain?', 'Who plays a drum on a mountain?'],
     ],
     f3_how_solved: [
-      ['ash', 'The ram on the lock is knocking on a drum. The monks rode the wind up the mountain and knocked. So I ride up to that drum and KNOCK!', 'The ram knocks on a drum. So I ride up there and KNOCK!'],
+      ['ash', 'The ram on the lock is knocking on a drum. The monks rode the wind up the mountain and knocked. So I ride up to that drum and knock!', 'The ram knocks on a drum. So I ride up there and KNOCK!'],
       ['tove', 'With your head?', 'With your head?'],
-      ['ash', 'With my FEET. Jump, then POUND!', 'With my FEET. Jump, then POUND!'],
+      ['ash', 'With my feet. Jump, then pound!', 'With my feet. Jump, then pound!'],
       ['tove', 'Then look at that big vent on the moor, east of here. Its wind goes all the way up to the drum. Let\'s call it the Drum Wind.', 'The big vent east of here blows up to the drum. The Drum Wind!',
         { dir: ['f_dreadgate_plaza', 'f3_drum_wind', 'east'] }],
     ],
@@ -130,12 +132,12 @@ chapter({
       ['narr', 'BOOOOOOM.', 'BOOOOOOM.'],
       ['narr', 'The sound rolls down the mountain like a wave. Snow jumps off every rock. Far below, a long crack runs across the Frost Lock.', 'The sound rolls down the mountain. Far below, the lock cracks.', { ref: 'f_lm_dreadlock' }],
       ['narr', 'Then something white unfolds from the mountainside beside you: two wings with purple eyes painted on them, and two real eyes in the middle, blinking at you.', 'Something white unfolds: wings with painted eyes, and two real eyes.', { do: ['world f3_hush_rise unfold'] }],
-      ['f_hush', 'Shhhhh. Shhhh, little ember. You\'re so LOUD.', 'Shhhh, little ember. You\'re so LOUD.'],
+      ['f_hush', "Shhh. Loud one. You'll wake her.", "Shhh. Loud one. You'll wake her."],
       ['f_hush', 'The Mother is resting.', 'The Mother is resting.', { clue: 'f3_the_mother' }],
-      ['f_hush', 'And the Mother\'s new friend is resting, up on top. Everyone is resting. Why don\'t you rest too?', 'The Mother\'s new friend rests on top. Rest too.', { clue: 'f3_hush_friend' }],
-      ['ash', 'Who\'s "the Mother"?', 'Who\'s "the Mother"?'],
-      ['f_hush', 'Shhhhh.', 'Shhhhh.'],
-      ['ash', 'That is not an answer!', 'That is not an answer!'],
+      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend' }],
+      ['ash', 'It was you in Rimeholm. You froze a whole village!', 'It was you! You froze Rimeholm!', { ref: 'f_rimeholm' }],
+      ['f_hush', 'Their bell was loud. Bells mean morning. The Mother hates morning.', 'Bells mean morning. The Mother hates morning.', { ref: 'f_lm_bell' }],
+      ['ash', 'Good. I like mornings.', 'Good. I like mornings.'],
       ['narr', 'The great moth glides away down to the Dreadgate. Ride the wind back down and face her!', 'The moth glides down to the Dreadgate. Go and face her!', { do: ['world f3_hush_rise gone'], ref: 'f_dreadgate_plaza' }],
     ],
     // before the fight (x2_foes' boss intro): Vesper drops in if she is Ash's friend
@@ -144,27 +146,29 @@ chapter({
       { if: 'choice c_vesper=friend', then: [
         ['c_vesper', 'Hello, cousin. Miss me?', 'Hello, cousin. Miss me?'],
         ['ash', 'Vesper! How did you get all the way up here?', 'Vesper! How did you get here?'],
-        ['c_vesper', 'I followed the snow. Snow in June is suspicious.', 'I followed the snow. Snow in June is suspicious.'],
-        ['c_vesper', 'And THAT is one of her moths. I know those painted eyes. Let\'s make it LOUD.', 'That is one of HER moths. Let\'s be LOUD!', { do: ['set f_vesper_hush'] }] ] },
+        ['c_vesper', 'I followed the snow. Snow in June is suspicious. And I owed you one.', 'I followed the snow. I owed you one.'],
+        ['c_vesper', "She still talks to me, you know. When I sleep. I'd like her to stop.", 'She still talks in my dreams. I want her to stop.'],
+        ['c_vesper', 'That is one of her moths. I know those painted eyes. Let\'s be loud.', 'That is one of her moths. Let\'s be loud!', { do: ['set f_vesper_hush'] }] ] },
     ],
     // right after the fight (x2_foes' boss outro, then its onWin opens the gate): at most 6 lines a branch
     f_hush_outro: [
       { cam: 'f3_hush_small', s: 0.8 }, { do: ['world f3_hush_small fallen'] },
       ['narr', 'Hush tumbles down into the snow. As she falls, she shrinks. And shrinks. Until she\'s just a little white moth, shivering in the snow.', 'Hush falls and shrinks into a little white moth. She shivers.'],
       { choose: 'f_hush', who: 'f_hush',
-        ask: ['...Cold. It\'s so cold out here. The Mother promised a warm dark. A soft dark. Forever and ever.', 'Cold. So cold. The Mother promised a warm dark.'],
+        ask: ['Cold. So cold out here. She promised us a warm dark.', 'Cold. She promised us a warm dark.'],
         pick: [
           { t: ['Wrap her in Ylva\'s long red scarf', 'Give her the scarf'], tone: 'kind', v: 'scarf', if: 'item f3_scarf',
             then: ['take f3_scarf', { journal: ['You wrapped Hush in Ylva\'s long red scarf.', 'You gave Hush the scarf.'], key: 'f_hush' }],
             say: [
               ['narr', 'You wind one end of Ylva\'s red scarf around the tiny moth. Twice. She looks like a very small present.', 'You wrap the tiny moth in the red scarf. Twice.', { do: ['world f3_hush_small scarf'] }],
-              ['f_hush', '...Oh. Warm.', 'Oh. Warm.'] ] },
-          { t: ['"Get a sweater, little moth."', '"Get a sweater, little moth."'], tone: 'brave', v: 'shoo',
-            then: [{ journal: ['You told Hush to get a sweater.', 'You told Hush to get a sweater.'], key: 'f_hush' }],
+              ['f_hush', 'Oh. Warm.', 'Oh. Warm.'] ] },
+          { t: ['"Fly home, then. Tell her I\'m coming."', '"Tell her I\'m coming."'], tone: 'brave', v: 'shoo',
+            then: [{ journal: ['You sent Hush home with a message for the Mother: you are coming.', 'You told Hush: tell her I am coming.'], key: 'f_hush' }],
             say: [
-              ['ash', 'Get a sweater, little moth.', 'Get a sweater, little moth.'] ] },
+              ['ash', 'Fly home, then. Tell her I\'m coming.', 'Fly home. Tell her I\'m coming.'],
+              ['f_hush', 'Shhh. She knows.', 'Shhh. She knows.'] ] },
         ] },
-      ['narr', 'She flutters up into the sky, smaller and smaller, and is gone. Behind you, the Frost Lock cracks apart, CRACK, and the Dreadgate swings open.', 'She flies away. CRACK! The lock breaks. The gate opens!',
+      ['narr', 'She flutters up into the sky, smaller and smaller, and is gone. Behind you, the Frost Lock cracks apart, and the Dreadgate swings open.', 'She flies away. The lock breaks. The gate opens!',
         { do: ['world f3_hush_small away'], ref: 'f_dread_door' }],
       { if: 'choice c_vesper=friend', then: [
         ['c_vesper', 'Go on, cousin. I\'ll watch the gate. I know every trick for getting past one.', 'Go on, cousin. I\'ll watch the gate.', { ref: 'f_dread_door' }] ] },
