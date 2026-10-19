@@ -138,4 +138,4 @@ Put the `*.workers.dev` URL it prints into `game/config.json`, rebuild, and push
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+The story and the art of Emberblood (the world, characters, writing, and every visual design, including the code that draws it) are © 2026 Andrew Mueller, all rights reserved. The rest of the code (the engine, build script, tools and backend) is MIT licensed. See [LICENSE](LICENSE) for the details.

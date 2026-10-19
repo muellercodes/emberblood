@@ -1,3 +1,44 @@
+Emberblood
+Copyright (c) 2026 Andrew Mueller
+
+This repository holds two kinds of material under two different terms.
+
+
+1. THE STORY AND THE ART: ALL RIGHTS RESERVED
+
+The story and the art of Emberblood are the intellectual property of Andrew Mueller.
+All rights reserved.
+
+"The story" means the world, its history and lore, the characters and creatures, their
+names and personalities, the plot, quests, mysteries and endings, and all of the writing
+in the game: dialogue, narration, letters, journal pages, books, signs, songs, quest and
+item text, and the names of people, places and things.
+
+"The art" means every visual design in the game: characters, creatures, bosses, portraits,
+buildings, rooms, furniture, places, maps, items, icons, effects and any other artwork,
+whether it is stored as an image or drawn by code.
+
+This covers in particular:
+  - everything in game/story/
+  - the writing and names inside game/src/ and game/body.html
+  - the code that draws the art, including game/src/a10b_chars.js, game/src/a3_art.js,
+    game/src/a3b_art2.js, game/src/a3c_art3.js, game/src/a3d_art4.js, game/src/e5_look.js,
+    every game/src/v10_art*.js file, and the drawing functions in any other file
+  - the built game (docs/index.html and any other build) taken as a whole
+  - the story section of README.md
+
+You may play the game at its official address and view this repository on GitHub. You may
+not copy, modify, adapt, publish, distribute, sell or make derivative works from the story or
+the art, in whole or in part, without written permission from Andrew Mueller.
+
+
+2. THE CODE: MIT LICENSE
+
+Everything else in this repository (the game engine and systems, the build script, the tools
+in tools/, the backend in worker/, and the admin page) is licensed under the MIT License
+below. The MIT License does not grant any rights to the story or the art described in
+section 1, even where they sit in the same file as code.
+
 MIT License
 
 Copyright (c) 2026 Andrew Mueller
