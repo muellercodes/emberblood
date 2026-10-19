@@ -1,10 +1,10 @@
 // Act V, the summit: The Moon Road (owner N5b). Data only.
 // What the player does: walks up to the Crown Shrine, where everyone Ash saved on the long road is waiting (one line
 // each: Greymane, Tikka, Vesper, Glaciar, Hush, and Sir Cindervane far below on the stairs). Then the Case Book asks
-// the last question, how anyone could reach her, and the banner says how many of the friends she hurt are here. Ash
-// crosses the Moon Road (x4_ascent: a double jump, the Grapple Tail, a wind ride and the moon-glass), and at its end,
-// if fewer than two of those friends came, Ember's voice asks who is missing and Ash can go and find them first ("Not
-// yet") or go in anyway. The Moon Door opens for the Ember Heart (x4_ascent's prompt -> x4_story's n4sMoonDoor plays
+// the last question, how anyone could reach her, and the friends she hurt who are here say they will speak for her (v11:
+// no counter). Ash crosses the Moon Road (x4_ascent: a double jump, the Grapple Tail, a wind ride and the moon-glass),
+// and at its end, if fewer than two of those friends came, Ash looks back at the empty stones, names who is missing,
+// and can go and find them first ("Not yet") or go in anyway. The Moon Door opens for the Ember Heart (x4_ascent's prompt -> x4_story's n4sMoonDoor plays
 // this file's n_moondoor and moves the stage on).
 chapter({
   id: 'n_crown', act: 5, after: 'n_glass', next: 'n_nyxara', takeover: true,
@@ -24,7 +24,7 @@ chapter({
         { t: ['Beat her so hard that she gives up and flies away', 'Beat her until she gives up'],
           hint: ["You beat Grandpa's echo. He still missed Ember. Does beating fix lonely?", 'Does beating someone fix lonely?'] },
         { t: ['Give her the Ember Heart, like she keeps asking', 'Give her the Heart'],
-          hint: ['She wants it to burn black and put out the sun. Would that make anyone less alone?', 'Would that make her less alone?'] },
+          hint: ['A heart handed over in fear burns black. Would that make anyone less alone?', 'Would that make her less alone?'] },
       ],
       then: ['set n5_plan'],
     },
@@ -55,9 +55,9 @@ chapter({
       { do: ['emit n4fx:gather_pose:on'] }, { cam: 'n_sh_crown', s: 1.2 },
       ['narr', 'The Crown Shrine sits at the edge of the last ring. Above it is the summit, with a moat of nothing all round it and a road of floating stones across.', 'The shrine is on the top ring. The summit is across a dark moat.', { ref: 'n4_moon_road' }],
       { if: 'choice greymane=ally', then: [
-        ['narr', 'Greymane is already here, sitting by the shrine as if he has waited all day, and dripping wet. He swam again.', 'Greymane is here! He is wet. He swam again.'] ] },
+        ['narr', 'Greymane is already here, sitting by the shrine as if he has waited all day.', 'Greymane is here! He waited for you.'] ] },
       { if: 'flag tk_come=yes', then: [
-        ['ev_tikka', 'ASH! I brought snacks! And my brother! And a BIGGER spoon!', 'Ash! I brought snacks and a bigger spoon!'] ] },
+        ['ev_tikka', 'Ash! I brought snacks! And my brother! And a BIGGER spoon!', 'Ash! I brought snacks and a bigger spoon!'] ] },
       { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] }, then: [
         ['c_vesper', 'Told you. Thieves never take the stairs.', "Told you. Thieves don't use stairs."] ] },
       { if: 'flag n5_glaciar !choice f_glaciar=free', then: [
@@ -82,25 +82,21 @@ chapter({
       ['narr', "At the end of the Moon Road stands a round door of pale glass. There's no handle, only a hollow in the middle the size of a plum.", 'A round glass door. It has a hole the size of a plum.'],
       ['ash', 'The Heart. The door wants the Heart.', 'The door wants the Heart.'],
       ['pip', 'Mip?!'],
-      ['ash', "I know. She wants me to bring it, and that's the scary part. But Mom made it whole, not her.", 'She wants the Heart. That is scary. But Mom fixed it. Not her.'],
+      ['ash', "I know. I'm bringing it to her. I'm just not handing it over.", 'I will bring it. I will not give it to her.'],
       ['narr', 'Behind you, on the last floating stone, the friends she hurt are waiting with you.', 'Her friends wait behind you.', { if: 'trust friends>=2' }],
       { do: ['emit n4fx:door_fx'] }, { sfx: 'shrine' },
       ['narr', 'You hold up the Ember Heart. Its three seams glow, violet, ice-blue and silver, round a core of warm orange. The door sighs open.', 'You hold up the Heart. It glows. The door opens.'],
     ],
     // ---- this chapter's own scenes
-    // after n5_reach: the plan in one line, and the count (as a banner)
+    // after n5_reach: the plan in one line, then the friends she hurt who are here say so themselves (v11: no counter)
     n5_reach_done: [
       ['ash', 'Her name. A lantern of her own. And the friends she hurt, there to speak for her.', 'Her name. A lantern. And her friends.'],
-      { if: 'trust friends>=3', then: [
-        { banner: ['You know how to reach her', 'You know how to reach her'], sub: ['All three of the friends she hurt are here with you.', 'All three of her friends are here.'] } ],
-        else: [{ if: 'trust friends>=2', then: [
-        { banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Friends she hurt, here with you: 2 of 2.', 'Her friends here: 2 of 2.'] } ],
-        else: [{ if: 'trust friends>=1', then: [
-        { do: [{ banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Friends she hurt, here with you: 1 of 2.', 'Her friends here: 1 of 2.'] }] },
-        ['ash', 'But only one of them is here with me. She needs to hear from two.', 'But only one friend is here. I need two.'] ],
-        else: [
-        { do: [{ banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Friends she hurt, here with you: 0 of 2.', 'Her friends here: 0 of 2.'] }] },
-        ['ash', "But none of them are here with me. She needs to hear from two.", 'But none of her friends are here. I need two.'] ] }] }] },
+      { do: [{ banner: ['You know how to reach her', 'You know how to reach her'], sub: ['Her name, a lantern, and the friends she hurt.', 'Her name, a lantern, her friends.'] }] },
+      ['c_vesper', "She talked to me in my dreams for years. She'll know my voice.", 'She will know my voice.', { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] } }],
+      ['f_glaciar', 'I will speak for her, dumpling. Slowly, but I will.', 'I will speak for her. Slowly.', { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] } }],
+      ['narr', 'Hush hides her face in her wings. Then, very slowly, she nods.', 'Hush hides her face. Then she nods.', { if: { any: ['flag n5_hush', 'choice m_hush=free'] } }],
+      { if: '!trust friends>=2', then: [
+        ['ash', "But they aren't all here yet. She won't listen to me on my own.", 'But my friends are not all here yet.'] ] },
     ],
     // at the end of the Moon Road (the step finishes here): if fewer than two of the friends she hurt came, Ember's
     // voice asks who is missing and Ash may go and find them first. The door waits either way.
@@ -110,7 +106,7 @@ chapter({
         ['narr', 'You look back. On the floating stones behind you, everyone she hurt is following you up.', 'You look back. Your friends are right behind you.'],
         ['pip', 'Mip!'] ],
         else: [
-        ['ember', 'Little ember, she will only listen to the ones she hurt. Who is still missing?', 'She will only listen to her friends. Who is missing?'],
+        ['narr', 'You look back down the Moon Road. Some of the floating stones behind you are empty.', 'You look back. Some friends are missing.'],
         { if: '!flag n5_vesper !choice c_vesper=friend', then: [
           ['ash', 'Vesper is out there somewhere. The last I saw of her was the Silk Gallery.', 'Vesper is out there somewhere.'] ] },
         { if: '!flag n5_glaciar !choice f_glaciar=free', then: [

@@ -13,7 +13,7 @@ quest({
 
   item: {
     n5_goathorns: { name: ['Sock goat horns', 'Goat horns'], icon: 'star', keepsake: true, hat: { look: 'hat_n5_goathorns', col: '#e8e0cc' },
-      desc: ['Farmer Hollis made them from a sock, for the fair. You already have horns. Now you have MORE horns.',
+      desc: ['Farmer Hollis made them from a sock, for the fair. You already have horns. Now you have more horns.',
         'Sock goat horns. Now you have more horns!'] },
   },
 
@@ -114,7 +114,7 @@ quest({
       ['ash', "...Farmer Hollis has really bad handwriting.", 'Hollis writes really badly.'],
     ],
     n5_hollis_tell: [
-      ['hollis', 'Duchess? Up the Night Mother\'s MOUNTAIN? Course she is. She does this every time something big happens.',
+      ['hollis', 'Duchess? Up the Night Mother\'s mountain? Course she is. She does this every time something big happens.',
         'Duchess is up the mountain? Course she is.'],
       ['ash', 'Your note said she had gone out again.', 'Your note said she went out.'],
       ['hollis', "My note? I didn't write a note. I can't spell \"again\".", "I didn't write a note!"],

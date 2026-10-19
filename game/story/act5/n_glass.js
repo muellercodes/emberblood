@@ -3,8 +3,9 @@
 // top), reaches the Moonglass Shrine, raises the Drowned Mirror, bends the moonbeam into the Moon Lock, and looks at
 // what is carved round the lock: a little moth wrapped all the way round a thin moon, holding on. In the Tendril Wood
 // Hush finds Ash (Act IV's kind choice) or only her sparkle drifts past toward the cocoons in the Moth's Cradle (her
-// errand, q_n5_hush). Echo 4, the Echo of the Hush, leaves one memory: "My quiet one. Stay with me. Everyone else
-// leaves." Then the Case Book asks what the Night Mother really wants, and the kid puts the three memories together.
+// errand, q_n5_hush). Echo 4, the Echo of the Hush, the fourth fear ("Stay small. Stay quiet. Stay with me."), leaves
+// one memory: "My quiet one. Stay with me. Everyone else leaves." Then the Case Book asks what the Night Mother really
+// wants, and the kid puts the three memories together.
 // The puzzles are x4_ascent's (it sets n_gust, n_lagoon, n_beam, n_wood), the echo is x4_foes' (its intro and outro
 // are this file's n_echo4_intro / n_echo4_outro, played through STORY.bosses.n_echo_hush).
 chapter({
@@ -118,9 +119,9 @@ chapter({
     ],
     n_hush_join: [
       { do: ['emit n4fx:ally_arrive:hush'] },
-      ['narr', 'A great white moth glides down through the vines, big as a barn. A broken silver thread trails from her neck.', 'A huge white moth flies down. A broken thread hangs from her neck.'],
-      ['ash', 'HUSH! You came!', 'Hush! You came!'],
-      ['f_hush', "Shhhh. Not so LOUD, little ember. It's so cold up here. The Mother promised us a warm dark. She didn't mean it.", 'Shhh. Not so loud. It is cold. The Mother lied.'],
+      ['narr', 'A great white moth glides down through the vines. A broken silver thread trails from her neck.', 'A huge white moth flies down. A broken thread hangs from her neck.'],
+      ['ash', 'Hush! You came!'],
+      ['f_hush', "Shhh. Loud one. It's cold up here. She promised us warm. She didn't mean it.", 'Shhh. Loud one. It is cold. She lied.'],
       ['narr', 'Hush lands beside you, close enough that her fuzzy wing brushes your arm.', 'Hush lands close to you.'],
       ['ash', "Then stay close to me. I'm warm. Let's go, quietly.", "Stay close. I am warm. Let's go, quietly."],
     ],
@@ -132,7 +133,8 @@ chapter({
     ],
     n_echo4_intro: [
       ['narr', 'In a round hall of black glass, with three cold moonstones and a rim of pale sand, a great shadow moth unfolds her wings. Two painted eyes stare at you. Then the two real ones blink.', 'A shadow moth opens her wings. Her eyes blink at you.'],
-      ['n_echo_hush', 'Shhhhhh.'],
+      ['n_echo_hush', 'Shhhhhh. Stay small. Stay quiet. Stay with me.', 'Shhh. Stay small. Stay quiet. Stay with me.'],
+      ['ash', 'You can be small and still go.'],
       { if: 'choice m_hush=free', then: [
         ['narr', 'Beside you, the real Hush folds her wings over her eyes.', 'The real Hush covers her eyes.'],
         ['ash', "It's okay, Hush. You don't have to watch.", "It's okay, Hush. Don't look."] ] },
@@ -146,7 +148,7 @@ chapter({
         ['ash', "We're going up there to see her, aren't we?", 'We are going to see her.'],
         { do: ['emit n4fx:ally_leave:hush'] } ],
         else: [
-        ['ash', 'She must have said that to Hush a hundred times. No wonder Hush only ever whispers.', 'She said that a lot. No wonder Hush whispers.'] ] },
+        ['ash', 'She said that to Hush every night. No wonder Hush only ever whispers.', 'She said that every night. No wonder Hush whispers.'] ] },
     ],
     // ---- this chapter's own scenes
     n5_lock_look: [
@@ -158,10 +160,14 @@ chapter({
       ['narr', 'Under the sleeping moth, the nest is lined with things people left behind: a mitten, a lantern shade, one boot.', 'The nest is full of lost things. A mitten. One boot.', { clue: 'n5_nest' }],
       ['ash', "She keeps everything anybody leaves. Even one boot.", 'She keeps everything.'],
     ],
-    // the solve line: today's n_panes_all line, word for word
+    // the solve line (v11: shown, not said; STORY_PLAN Ash voice sheet)
     n5_wants_done: [
-      ['ash', "She wasn't trying to be a monster. She was just scared of being alone. ...That's still not okay. But I get it.", 'She was not a monster. She was scared of being alone. That is not okay. But I get it.'],
+      { if: 'clue n5_nest', then: [
+        ['ash', 'One boot. She kept one boot.', 'She kept one boot.'] ],
+        else: [
+        ['ash', 'She holds on to everything, so nothing can ever leave her.', 'She holds on to everything.'] ] },
       ['pip', 'Mip.'],
+      ['ash', "I've kept every letter Mom sent me. They're all in my satchel.", 'I kept all of Mom\'s letters. Every one.'],
     ],
   },
 })

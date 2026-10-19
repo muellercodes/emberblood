@@ -7,8 +7,8 @@ act({
 
   mystery: {
     // the main mystery, ring by ring: who the little grey moth is (N5a, n_stair), her name (N5a, n_clocks), what she
-    // wants (n_glass), and how anyone could reach her (n_crown). Herrings: Murmur's grey scale (N5a) and "the sun is a
-    // liar" (N5a's n_rime_in).
+    // wants (n_glass), and how anyone could reach her (n_crown). Herrings: the grey scale on the throne, too big for
+    // Ember's moth (N5a), and "the sun is a liar" (N5a's n_rime_in). v11: n5_who_moth is solved by the flame stone scene.
     night_mother: { main: true,
       title: ['Who is the Night Mother, really, and what does she want?', 'Who is the Night Mother?'],
       deduce: ['n5_who_moth', 'n5_name', 'n5_wants', 'n5_reach'],
@@ -69,6 +69,10 @@ act({
       then: ['clue n5_her_name'] },
     { if: 'stage>=n_crown', then: ['clue n5_mem_quiet', 'clue n5_moon_lock', 'solve n5_wants'] },
     { if: 'stage>=n_nyxara clue n5_her_name', then: ['solve n5_reach'] },
+    // (v11, appended last so the indices G.story._mig remembers stay the same) the flame stone scene now solves "who is
+    // the little grey moth?" itself: a save that read the stone before that gets it solved, so n_clocks' who_moth step
+    // finishes on its own
+    { if: 'stage>=n_stair clue n5_ember_moth', then: ['solve n5_who_moth'] },
   ],
 
   // no new power on the peak, so no new-power gates on old maps: the finale sends Ash back with errands instead

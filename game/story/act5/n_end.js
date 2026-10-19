@@ -73,7 +73,7 @@ chapter({
         else: [{ if: 'choice ending=warden', then: [
         ['narr', 'Ash climbed Cinder Mountain to tell Grandpa the whole story. He pretended to be asleep, but one ear stayed up the whole time.', 'Ash told sleeping Grandpa the whole story. He listened.'] ],
         else: [{ if: 'choice ending=heir', then: [
-        ['narr', 'Tiny Grandpa told everyone at the bakery that he had saved the moon himself, from his birdcage. Bertram raised the price of admission.', 'Tiny Grandpa said he saved the moon from his birdcage.'] ],
+        ['narr', 'From his warm shelf above the oven, tiny Grandpa told everyone in the bakery that he had saved the moon himself. Bertram saved him the darkest bun in the batch. It is his favorite.', 'Tiny Grandpa said he saved the moon. Bertram gave him a bun.'] ],
         else: [
         ['narr', "On Lantern Day, Ash lit one lantern for Grandpa, the way Ember used to, so he'd know where home was, wherever he was.", 'Ash lit a lantern for Grandpa, so he would know where home was.'] ] }] }] },
     ],
@@ -103,9 +103,9 @@ chapter({
       ['narr', 'Every clock in Gearhaven started ticking again at the very same second, and the whole city came out in its nightclothes to listen.', 'Every clock in Gearhaven ticked again at once.'],
       { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] }, then: [
         { if: 'choice n_end=embermoon', then: [
-          ['narr', 'Vesper hung her moth mask in Mom\'s forge, next to the spot where the Heart used to sit. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match.', 'Vesper hung up her mask in the forge. She is still family.'] ],
+          ['narr', 'Vesper hung her moth mask in Mom\'s forge, next to the spot where the Heart used to sit. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern from the forge, with Mom\'s tongs.', 'Vesper hung up her mask in the forge. She is still family.'] ],
           else: [
-          ['narr', 'Vesper hung her moth mask in Mom\'s forge, right next to the Heart. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern with a match.', 'Vesper hung up her mask by the Heart. She is still family.'] ] },
+          ['narr', 'Vesper hung her moth mask in Mom\'s forge, right next to the Heart. "Emberblood without fire," she said. "Still an Emberblood." Every Lantern Day she lights her lantern from the forge, with Mom\'s tongs.', 'Vesper hung up her mask by the Heart. She is still family.'] ] },
         ['narr', 'And every Sunday she goes home to Saltmarsh for tea with Gran, who makes it far too strong. Vesper drinks every drop.', 'Every Sunday, Vesper has tea with Gran.', { if: { any: ['flag n5_tea', 'flag n5_vletter'] } }] ],
         else: [
         ['narr', 'Nobody in Gearhaven saw the Moth Mask again. But every Lantern Day, a small lantern appeared on the forge doorstep in Emberhollow, with no note. Mom always lit it.', 'Every Lantern Day, a lantern with no note appears at the forge.'] ] },
@@ -116,7 +116,7 @@ chapter({
       { if: 'flag n5_glaciar !choice f_glaciar=free', then: [
         ['narr', 'Glaciar never stopped telling people that a small dragon came all the way back to Mount Dread just to sing to her. Every Lantern Day she brings far too much ice cream for everybody.', 'Glaciar tells everyone a small dragon sang to her. She brings ice cream.'] ],
         else: [{ if: 'choice f_glaciar=free', then: [
-        ['narr', 'Grand-aunt Glaciar (thirteen greats) came to Lantern Day with far too much ice cream. Ash said all thirteen greats, twice, and she pretended not to love it.', 'Glaciar came to Lantern Day with ice cream. Ash said all the greats, twice.'] ],
+        ['narr', 'Auntie Glee came to Lantern Day with far too much ice cream, and stayed until the very last lantern went out. She said she had slept through enough of them.', 'Auntie Glee came to Lantern Day. She stayed until the last lantern went out.'] ],
         else: [
         ['narr', "On Mount Dread, Glaciar slept, and for the first time in a long while her dreams were warm. Every Lantern Day somebody climbed up and sang her a verse of the Snow Mother's Song, just in case.", 'On Mount Dread, Glaciar slept. Her dreams were warm.'] ] }] },
     ],
@@ -149,13 +149,13 @@ chapter({
           else: [{ if: 'choice n_end=embermoon', then: [['tove', "A warm moon! That's the best kind of moon there is.", 'A warm moon! The best kind!']],
           else: [['bram', "HA! Morning! I'd forgotten what it looked like!", 'Ha! Morning! I forgot what it looks like!']] }] } ],
         else: [{ if: 'choice ending=heir', then: [
-        { if: 'choice n_end=moth', then: [['grandpa', '(from his birdcage) A moth? On MY moon? ...Fine. She can stay.', 'A moth on MY moon? Fine. She can stay.']],
-          else: [{ if: 'choice n_end=embermoon', then: [['grandpa', '(from his birdcage) Gold. Hmph. I would have made it bigger.', 'Gold. Hmph. I would make it bigger.']],
-          else: [['grandpa', '(from his birdcage) Seams? On a moon? Sloppy. ...It looks nice.', 'Seams? Sloppy. It looks nice.']] }] } ],
+        { if: 'choice n_end=moth', then: [['grandpa', '(from his shelf above the oven) A moth? On MY moon? Fine. She can stay.', 'A moth on MY moon? Fine. She can stay.']],
+          else: [{ if: 'choice n_end=embermoon', then: [['grandpa', '(from his shelf above the oven) Gold. Hmph. I would have made it bigger.', 'Gold. Hmph. I would make it bigger.']],
+          else: [['grandpa', '(from his shelf above the oven) Seams? On a moon? Sloppy. It looks nice.', 'Seams? Sloppy. It looks nice.']] }] } ],
         else: [
         { if: 'choice n_end=moth', then: [['ember', "You lit her a lantern. That's what I did, a thousand years ago. Thank you for finishing it, little ember.", 'You lit her a lantern, like I did. Thank you.']],
           else: [{ if: 'choice n_end=embermoon', then: [['ember', 'My Heart, up in the sky. Oh, Ash. Now everyone can see it.', 'My Heart in the sky! Now everyone can see it.']],
-          else: [['ember', "Good morning, little ember. It's a lovely one.", 'Good morning, little ember.']] }] } ] }] }] },
+          else: [['ember', "Good morning, Ash. It's a lovely one.", 'Good morning, Ash.']] }] } ] }] }] },
       ['narr', 'Pip never said another word. Except once, very quietly, at breakfast: "Pancake."', 'Pip never talked again. Except once: "Pancake."', { if: 'flag pip' }],
       { if: 'flag n_panes>=6', then: [
         ['narr', 'Sister Wren wrote it all down: The Account of the Long Night. It had six glass pictures of a moth in it, and it was much longer than ten pages. Ash was on page eleven after all.', 'Sister Wren wrote a book about it all. Ash was on page eleven.'] ],

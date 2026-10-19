@@ -4,7 +4,7 @@
 // n_rime: place n5_ice_scale, scene n_glaciar_absent, which runs `quest start q_n5_glaciar`). Ash learns the Snow
 // Mother's Song (the Frozen Choir hums it under the frost, or Ash knows it from Act III), flies home to Mount Dread
 // and sings. The friend scenes for a Glaciar freed in Act III (n_glaciar_join, n_glaciar_bye) are N5a's and N5b's.
-// Surprise: Glaciar has been awake under the chains since Tuesday, counting snowflakes, too proud to say so.
+// Surprise: Glaciar has been awake under the chains since the day Ash left, counting snowflakes, too proud to say so.
 // Payoff: ally (n5_glaciar, trust friends +1); she flies to the top of the Night Mother's mountain. Keeps the Act III
 // promise (x2_story.js:465) and the old scale line "One day the right song will wake her" (x4_story.js:287).
 quest({
@@ -60,10 +60,10 @@ quest({
       ['narr', "You kneel by her ear and sing the Snow Mother's Song. One by one the chains go soft, then slushy, then they drip away.",
         'You sing. The chains melt away.'],
       ['narr', 'Glaciar opens one blue eye, and then the other.', 'Glaciar opens her blue eyes.'],
-      ['f_glaciar', 'Dumpling. Do you know how long I have been awake under there? Since TUESDAY.', 'I have been awake since Tuesday!'],
-      ['f_glaciar', 'The chains held me down, and you cannot sing yourself awake. I tried. I am tone deaf.',
-        'The chains held me. I cannot sing. I tried.'],
-      ['ash', "Why didn't you SAY something?", "Why didn't you say so?"],
+      ['f_glaciar', 'Dumpling. Do you know how long I have been awake under there? Since the day you walked down this mountain.', 'I have been awake since the day you left!'],
+      ['f_glaciar', 'The chains held me down, and you cannot sing yourself awake. I tried. Every bird on the mountain moved house.',
+        'The chains held me. I tried to sing. The birds all left.'],
+      ['ash', "Why didn't you say something?", "Why didn't you say so?"],
       ['f_glaciar', 'A dragon has her pride. ...You kept your promise. Nobody keeps promises to old ice.', 'You kept your promise. Nobody does that.'],
       ['narr', 'She shakes off the snow and stretches her wings, all the way out, for the first time in a long time.', 'She shakes off the snow and stretches her wings.'],
       ['f_glaciar', "The top of the Moth's mountain, then. I will meet you there. I fly slowly, but I always arrive.",

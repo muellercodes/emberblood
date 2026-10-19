@@ -136,17 +136,17 @@ chapter({
       ['narr', 'Nothing moves. No birds. No wind. Just a broken moon over the peak, like a cracked plate.', 'Nothing moves. The broken moon hangs over the top.'],
       ['ash', 'Hello? ...Anybody? No? Okay.', 'Hello? Anybody? No? Okay.'],
       ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
-      ['ash', 'She says "little ember" the way Grandpa did on the mountain. I really wish she would stop.', 'She talks like Grandpa did. I wish she would stop.'],
+      ['ash', 'She talks like Grandpa did on the mountain. Same words. I wish she would stop.', 'She talks like Grandpa did. I wish she would stop.'],
       ['pip', 'Mip!'],
     ],
     // the copied green: three dark lanterns and one post too many
     n_green: [
       { cam: 'n5_green_spot', s: 1 },
       ['narr', 'At the foot of the peak is a little green with lantern posts, all made of black glass, all dark.', 'A little green with dark lanterns.'],
-      ['ash', "That's our green from home. She built it out of the moon's memories, which means out of MY memories. That is so creepy.", 'That is our green from home! She copied it. So creepy.'],
+      ['ash', "That's our green from home. She built it out of the moon's memories, and the moon watched me light those lanterns every year.", 'That is our green from home! The moon remembered it.'],
       ['narr', 'Three lanterns on three posts. And at the edge of the green, a fourth post with no lantern at all.', 'Three lanterns. And a fourth post with no lantern.', { ref: 'n5_fourth_post' }],
       ['ash', 'Every lamp on this whole mountain is dark. Maybe the fourth one is just broken.', 'Every lamp here is dark. Maybe it is broken.', { clue: 'n5_dark_lamps' }],
-      ['ash', 'A gentle breath on each one, Ash. Lantern breath, not bakery breath.', 'Breathe gently on each one.'],
+      ['ash', 'A gentle breath on each one, Ash. Like on the green at home.', 'Breathe gently on each one.'],
     ],
     // looking at the fourth post: the first time a clue, once the small mystery is solved the lighting, then the flame
     nbr_post: [
@@ -177,9 +177,9 @@ chapter({
       { if: 'choice greymane=ally', then: [
         ['narr', 'A howl rolls up out of the dark. Long, and loud, and very, very familiar.', 'A howl! You know that howl.'],
         ['narr', 'Greymane bounds out of the ink, shakes himself off, and soaks you completely.', 'Greymane jumps out of the sea and soaks you.'],
-        ['ash', 'GREYMANE! How did you even get here?', 'Greymane! How did you get here?'],
+        ['ash', 'Greymane! How did you even get here?', 'Greymane! How did you get here?'],
         ['narr', 'Greymane looks at the sea, then at you, and pants. He is not going to tell you.', 'Greymane looks at the sea. He will not say.'],
-        ['ash', "You SWAM? All that way? ...Come here, you big wet wolf.", 'You swam? Come here, you big wet wolf!'],
+        ['ash', "You swam? All that way across the Ink Sea? Come here, you big wet wolf.", 'You swam? Come here, you big wet wolf!'],
       ] },
       { if: 'choice greymane=home', then: [
         ['narr', 'Far, far away, across the dark water, a wolf howls. Not close enough to help. Close enough to hear.', 'Far away, a wolf howls. You are not alone.'],
