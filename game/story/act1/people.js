@@ -242,8 +242,10 @@ people({
           { t: ["What if it's cloudy?", 'What if there are clouds?'], say: ["Then I'll climb up and look under the clouds.", 'Then I will climb up and look.'] },
           { t: ["You'll see all three.", 'You will see all three.'], say: ['I had better. Go on, before I change my mind and come with you.', 'Go on. Before I come with you.'] },
         ] },
-      // Act I is over. Two replies only show if they happened (the lanterns quest, and what Ash said when she asked)
-      { if: 'stage=done',
+      // Act I is over. first: true plays it once, ahead of the old code's own talk for this stage (e7_acts.js: talking
+      // to Mom at 'done' starts Lantern Night, so a plain opener would never be heard; the next talk does that).
+      // Two replies only show if they happened (the lanterns quest, and what Ash said when she asked).
+      { if: 'stage=done', first: true,
         say: ['You came back down. That was the only rule.', 'You came back down. That was the rule.'],
         re: [
           { t: ['I lit all three lanterns.', 'I lit all three.'], if: 'quest a1_lanterns done',

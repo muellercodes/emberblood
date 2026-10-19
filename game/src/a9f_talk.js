@@ -198,9 +198,12 @@ function talkVisit(n,firstMeet,lines){
   const idle=()=>typeof s10Idle==='function'?s10Idle(id,X&&X.T):null;
   const V={id,v11,X,said:new Set(),answered:false,more:false,re:null,fn:null};
   const heard=t=>{ if(t!=null&&typeof t!=='function') V.said.add(String(t)); return t; };
+  // the person already spoke in this visit (a first entry, a quest line): no second greeting, the menu sits under idle
+  const spoke=lines.some(L=>(Array.isArray(L)?L[0]:L&&L.who)===id);
+  if(spoke&&!(X&&!X.heard)){ V.text=heard(idle()||'Mm?'); V.again=()=>idle()||pick(['Mm?','Yes?']); return V; }
   if(X&&!X.heard){
     // a first meeting with someone not converted yet keeps their introduction; otherwise a remembered moment, if any
-    const g=firstMeet&&!v11?greetLine(id):talkRemark(id); if(g) lines.push([id,heard(g)]);
+    const g=spoke?null:firstMeet&&!v11?greetLine(id):talkRemark(id); if(g) lines.push([id,heard(g)]);
     for(const L of X.pre) lines.push(L);
     const L0=X.last;
     if(L0){ heard(L0.text); V.text=()=>L0.skipIf&&L0.skipIf()?(idle()||'Mm?'):L0.text; V.fn=()=>{ if(L0.fn) L0.fn(); X.run(); }; }
@@ -208,6 +211,8 @@ function talkVisit(n,firstMeet,lines){
     V.re=X.re; V.key=X.key;
   }
   else if(X) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  // a converted person with no opener left (all answered) says their own idle line, not a generic hello
+  else if(v11&&!firstMeet) V.text=heard(talkRemark(id)||idle()||greetLine(id));
   else V.text=heard(greetLine(id));
   V.again=()=>idle()||pick(['Mm?','Yes?']);
   return V;

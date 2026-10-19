@@ -169,14 +169,14 @@ function finalChoice(){
   const kind=Object.values(G.choices).filter(v=>v==='free'||v==='forgive'||v==='home').length, pages=Object.keys(G.pages).length;
   const canLantern=pages>=5&&kind>=2&&G.pages.p9;
   const pickEnd=k=>()=>{ G.choices.ending=k; };
-  // what the locked lantern ending still needs: five Wardens' pages, Ember's letter (p9) and two kind choices
-  const lanternLockedText=(pages,kind,letter)=>{
-    const L=typeof STORY!=='undefined'&&STORY.lanternLocked;
-    try{
-      if(typeof L==='function'){ const v=L({pages,kind,letter}); if(v) return v; }
-      else if(Array.isArray(L)&&L.length){ const f=s=>String(s==null?'':s).replace(/\{pages\}/g,pages).replace(/\{kind\}/g,kind); return S(f(L[0]),f(L[1]==null?L[0]:L[1])); }
-    }catch(e){ console.error(e); }
-    const need=[];
+  // (v11) the kind ending always shows: when it is not earned yet it is greyed, and picking it says what it still needs
+  // (as Act II's kneel does). The words are ENDINGS.lantern.opt and ENDINGS.lantern.why() (a1d_story.js, J3) when
+  // they exist, else the text here.
+  const LE=typeof ENDINGS!=='undefined'&&ENDINGS.lantern||{};
+  const lanternOpt=LE.opt||S('Light a lantern for him, like Ember did.','Light a lantern for him.');
+  const lanternWhy=()=>{
+    try{ if(typeof LE.why==='function'){ const v=LE.why(); if(v) return v; } }catch(e){ console.error(e); }
+    const letter=!!G.pages.p9, need=[];
     if(pages<5) need.push([`five of the Wardens' pages (you have ${pages})`,`5 pages (you have ${pages})`]);
     if(!letter) need.push([`Ember's own letter`,`Ember's letter`]);
     if(kind<2) need.push([`two kind choices on the road here (you made ${kind})`,`2 kind choices (you made ${kind})`]);
@@ -184,17 +184,14 @@ function finalChoice(){
     return S(`Not yet. Ember's way needs more of her story: ${join(need.map(x=>x[0]))}.`,`Not yet. It needs ${join(need.map(x=>x[1]))}.`);
   };
   const opts=[{t:'End it. For the valley.',fn:pickEnd('hero')},{t:'Bind him again, forever. Become the Sixth Warden.',fn:pickEnd('warden')},{t:'Take his fire for yourself.',fn:pickEnd('heir')}];
-  // (v11) the kind ending always shows: when it is not earned yet it is greyed, and picking it says what it needs
-  // (as Act II's kneel does). STORY.lanternLocked (a1d_story.js) may give the words: a function ({pages,kind,letter})
-  // or [full, simple] with {pages} and {kind} in them.
-  if(canLantern) opts.splice(1,0,{t:'Light a lantern for him, like Ember did.',fn:pickEnd('lantern')});
-  else opts.splice(1,0,{t:'Light a lantern for him, like Ember did.  🔒',tone:'locked',then:()=>[['narr',lanternLockedText(pages,kind,!!G.pages.p9)]],back:true});
+  if(canLantern) opts.splice(1,0,{t:lanternOpt,fn:pickEnd('lantern')});
+  else opts.splice(1,0,{t:()=>simplify(lanternOpt)+'  🔒',tone:'locked',then:()=>[['narr',lanternWhy()]],back:true});
   const lines=[['vor',`Impossible... the fire... it chose you...`],['narr',`The First Flame flickers on the mountaintop, small and tired. For the first time in a thousand years, it's your move.`]];
   if(!canLantern&&pages>=3) lines.push(['narr',`You remember something from the Wardens' pages. Something about lanterns. You can't quite put it together.`]);
   lines.push(ch('ash',`What will you do?`,opts));
   runDialogue(lines,()=>{
     const E=ENDINGS[G.choices.ending||'hero'];
-    runDialogue(E.lines.concat(heartLines(G.choices.ending||'hero'),[['narr',S(`Emberhollow lit every lantern it owned and held a second Lantern Day, the biggest in a thousand years. Maren made a speech. Yara counted the lanterns twice.`,`Emberhollow held a second Lantern Day, the biggest ever. Yara counted the lanterns twice.`)]],EPILOGUE_FMT()),()=>{
+    runDialogue(E.lines.concat(heartLines(G.choices.ending||'hero'),[['narr',S(`Emberhollow lit every lantern it owned and held a second Lantern Day, the biggest in a thousand years. Mom hugged Ash in front of everybody. Twice.`,`Emberhollow held a second Lantern Day, the biggest ever. Mom hugged Ash in front of everybody. Twice.`)]],EPILOGUE_FMT()),()=>{
       // Act I is over (G.flags.act1_done); G.done stays false, it means the whole game is finished (e7_acts.js)
       scene='play'; G.stage='done'; G.flags.act1_done=true; G.done=false;
       const seen=store.get('eb_endings',{}); seen[G.choices.ending||'hero']=true; store.set('eb_endings',seen);
