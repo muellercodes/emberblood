@@ -475,6 +475,8 @@ function s10Beat(b,ctx,out,guard){
     const ok=()=>g()&&(cond==null||s10Cond(cond))&&!(l.who==='pip'&&!(G.flags&&G.flags.pip));
     const L={who:l.who,text,skipIf:()=>!ok()};
     if(o.clue!=null||o.do!=null) L.fn=()=>{ if(!ok()) return; for(const c of s10Arr(o.clue)) s10Clue(c,ctx); if(o.do!=null) s10Do(o.do,ctx); };
+    // (v11) replies to this line: a choose whose who is the speaker and whose ask is the line (STORY_PLAN 6.3 #7)
+    if(o.re!=null) L.opts=()=>s10ReOpts(o.re,ctx,l.who,{});
     out.push(L); return;
   }
   if(!b||typeof b!=='object'){ s10Err(`scene ${ctx.sc||'?'}: a beat is not a line or an object`); return; }
@@ -501,6 +503,65 @@ function s10Choice(b,ctx,g){
     return {t,tone:p.tone,fn:()=>{ G.choices[b.choose]=p.v!=null?p.v:p.id!=null?p.id:(p.tone||i); s10Do(p.then,ctx); storyEmit('choice:'+b.choose); },then:()=>s10Lines(p.say,ctx)};
   }).filter(Boolean);
   return L;
+}
+// (v11 talk, STORY_PLAN 6.3 idea B) re: 2 or 3 replies to the line just said, on a talk entry (its say), an ask
+// topic's answer, a scene line's tags, or a reply's next line. A reply: { t: [full, simple], tone?, f?, if?, need?,
+// locked?, then?: [effects], say?: [[who, full, simple], ...] | [full, simple] (said by who), scene?, next?, id?, end? }.
+// The reply's then runs when it is picked; its response (scene, then say, then next) plays; then the scene goes on, or
+// a talk menu comes back under the person's idle line without the replies (o.hub: the talk visit; o.top: the replies sit
+// on the menu line itself). Friendship: f (or 0.25 for a tone tag; +0.25 for the person's favorite tone), once per reply.
+function s10ReOpts(re,ctx,who,o){
+  o=o||{}; const V=o.hub||null;
+  return s10Arr(re).map((r,i)=>{
+    if(!r||typeof r!=='object') return null;
+    if(r.if!=null&&!s10Cond(r.if)) return null;
+    const t=s10T(r.t);
+    if(r.need!=null&&!s10Cond(r.need)){
+      const lk=String(s10T(r.locked||S("You can't say that yet.","Not yet.")).replace(/\{trust:(\w+)\}/g,(_,n)=>String(s10Trust(n))));
+      return {t:t+'  🔒',tone:'locked',then:[{who:'narr',text:lk}],back:true};
+    }
+    const rk=String(who||'?')+':re:'+(r.id||h32(JSON.stringify(r.t)));
+    const end=!!(V&&r.end);
+    return {t,tone:r.tone,back:!!(V&&o.top&&!end),end,fn:()=>{
+        if(V){ V.answered=true; if(V.key&&o.top) (G.story._ra||(G.story._ra={}))[V.key]=1; }
+        s10ReFriend(who,r,rk);
+        s10Do(r.then,ctx);
+        if(S10.auto) S10.auto.log.push('reply '+rk);
+      },then:()=>s10ReLines(r,ctx,who)};
+  }).filter(Boolean);
+}
+function s10ReLines(r,ctx,who){
+  const out=[];
+  if(r.scene!=null){ const sc=S10.scenes[r.scene]; if(sc){ (G.story._seen||(G.story._seen={}))[r.scene]=1; out.push(...s10Lines(sc,Object.assign({},ctx,{sc:r.scene}))); } else s10Err(`reply "${s10T(r.t)}": scene ${r.scene} is not defined`); }
+  const b=s10RespBeats(r.say,who); if(b) out.push(...s10Lines(b,ctx));
+  if(r.next!=null){ const nb=s10NextBeat(r.next,who); if(nb) out.push(...s10Lines(nb,ctx)); else s10Err(`reply "${s10T(r.t)}": next should be [who, full, simple, { re }] or { say: [full, simple], re }`); }
+  return out;
+}
+// a response: [[who, full, simple, tags?], ...], one line [who, full, simple], or [full, simple] / a string said by who
+const s10IdLike=x=>typeof x==='string'&&/^[a-z][a-z0-9_]*$/.test(x);
+function s10RespBeats(say,who){
+  if(say==null) return null;
+  if(typeof say==='string') return [[who,say]];
+  if(!Array.isArray(say)) return null;
+  if(say.every(Array.isArray)) return say;
+  if(say.every(x=>typeof x==='string')&&say.length<=2&&!s10IdLike(say[0])) return [[who].concat(say)];
+  if(s10IdLike(say[0])) return [say];
+  return null;
+}
+// next: one more line with its own replies: [who, full, simple, { re }] or { who?, say: [full, simple], re? }
+function s10NextBeat(nx,who){
+  if(Array.isArray(nx)) return s10IdLike(nx[0])?[nx]:null;
+  if(!nx||typeof nx!=='object') return null;
+  const L=s10RespBeats(nx.say,nx.who||who); if(!L||!L.length) return null;
+  if(nx.re!=null){ const k=L.length-1, b=L[k].slice(); let tg=b.length>2&&b[b.length-1]&&typeof b[b.length-1]==='object'&&!Array.isArray(b[b.length-1])?b.pop():{}; b.push(Object.assign({},tg,{re:nx.re})); L[k]=b; }
+  return L;
+}
+function s10ReFriend(who,r,rk){
+  if(typeof befriend!=='function'||!who||typeof CASTBY==='undefined'||!CASTBY[who]) return;
+  const F=G.story._rf||(G.story._rf={}); if(F[rk]) return; F[rk]=1;
+  const best=typeof TALK!=='undefined'&&TALK[who]&&TALK[who].chat&&TALK[who].chat.best;
+  let f=r.f!=null?(+r.f||0):(r.tone?0.25:0); if(r.tone&&r.tone===best) f+=0.25;
+  if(f) befriend(who,f);
 }
 // the beats that are not lines: cam, place, walk, anim, fade, wait, sfx, do, banner (several may share one object)
 function s10Action(b,ctx){
@@ -1062,7 +1123,7 @@ function s10TalkHook(n){
   // a talk entry with first: true (A4S) plays once, ahead of the old modules' own talk hooks, then the person's menu
   const F=s10TalkFor(id,'first');
   if(F){ (G.story._once||(G.story._once={}))[s10TalkKey(F)]=1; S10.ver++;
-    const L=s10TalkLines(F,id); L.push({who:'narr',text:'',skipIf:()=>true,fn:()=>{ s10Do(F.then,{talk:id}); }}); talkHub(n,L); return true; }
+    const L=s10AnswerLines(F,id,null); L.push({who:'narr',text:'',skipIf:()=>true,fn:()=>{ s10Do(F.then,{talk:id}); }}); talkHub(n,L); return true; }
   return false;
 }
 onTalk(n=>s10TalkHook(n));
@@ -1114,6 +1175,28 @@ function s10MetaText(id,field,T0){
 }
 function s10Idle(id,T0){ return s10MetaText(id,'idle',T0); }
 function s10Bye(id){ return s10MetaText(id,'bye'); }
+// (v11 idea C) ask topics: { ask: [full, simple], if?, once?, say | scene | then, re?, end? } with a real label, shown
+// only while its if holds. Up to three, by priority: a chapter's topics (the story step), then a quest's, then the
+// person's own (people()); topics asked today go after the rest; then the latest act, then the data's order.
+// G.story._hd['a:'+key]: the day a topic was asked.
+function s10AskOpts(id,V){
+  if(!G||G.mode!=='story'||!S10.booted) return [];
+  const H=s10Heard(), day=s10Day(), L=[];
+  (S10.talk[id]||[]).forEach((T,i)=>{ if(s10TalkKind(T)!=='ask'||!s10TalkOk(T)) return;
+    const k=s10TalkKey(T), own=T._owner, pri=own&&own.kind==='chapter'?0:own&&own.kind==='quest'?1:2;
+    L.push({T,i,k,pri,a:+(own&&own.act)||0,asked:H['a:'+k]===day?1:0}); });
+  L.sort((x,y)=>x.pri-y.pri||x.asked-y.asked||y.a-x.a||x.i-y.i);
+  return L.slice(0,3).map(({T,k})=>({t:s10T(T.ask),key:'s10a_'+k,back:!T.end,end:!!T.end,
+    fn:()=>{ if(T.once) (G.story._once||(G.story._once={}))[k]=1; H['a:'+k]=day; S10.ver++; s10Do(T.then,{talk:id}); },
+    then:()=>s10AnswerLines(T,id,V)}));
+}
+// a topic's answer; its re sits on the answer's last line (by the person) and goes on to the menu after the response
+function s10AnswerLines(T,id,V){
+  const L=s10TalkLines(T,id);
+  if(T.re!=null){ const j=s10LastLine(L); if(j>=0&&!L[j].opts) L[j].opts=()=>s10ReOpts(T.re,{talk:id},L[j].who,{hub:V}); }
+  if(V&&L.length){ const j=s10LastLine(L); if(j>=0) V.said.add(String(L[j].text)); }
+  return L;
+}
 // a person converted to v11 talk (has replies or ask topics in a live act): the new menu (talkHub)
 function s10V11(id){ if(!S10.booted) return false; return (S10.talk[id]||[]).some(T=>(T.ask!=null||T.re!=null)&&!(T._owner&&T._owner.act&&actOf(G.stage)<T._owner.act)); }
 function s10HasTalk(id){ const L=S10.talk[id]; if(!L||!L.length) return false; return L.some(T=>{ const own=T._owner; return !(own&&own.act&&actOf(G.stage)<own.act); }); }
@@ -1132,7 +1215,9 @@ function s10TalkTakeover(){
 function s10TalkKey(T){ return T.id||(T._who+':'+h32(JSON.stringify(T.ask!=null||T.idle!=null||T.bye!=null?[T.if,T.say,T.scene,T.option,T.then,T.ask,T.idle,T.bye]:[T.if,T.say,T.scene,T.option,T.then]))); }
 // what an entry is: option (a menu option), bark, ask (a topic), first, meta (only idle or bye), line (an opener)
 function s10TalkKind(T){ if(T.option) return 'option'; if(T.bark) return 'bark'; if(T.ask!=null) return 'ask'; if(T.first) return 'first'; if(T.say==null&&T.scene==null&&T.then==null) return 'meta'; return 'line'; }
-function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if((T.once||T.first)&&G.story._once&&G.story._once[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
+// (v11) an opener with replies is done once Ash has answered it (the next opener down the list takes its place)
+function s10TalkOk(T){ const own=T._owner; if(own&&own.act&&actOf(G.stage)<own.act) return false; if((T.once||T.first)&&G.story._once&&G.story._once[s10TalkKey(T)]) return false;
+  if(T.re&&G.story._ra&&G.story._ra[s10TalkKey(T)]) return false; return T.if==null||s10Cond(T.if); }
 // the first matching entry, top to bottom, of the latest act that has one (an act-5 line wins over an act-2 line that
 // would also match; inside one act the order is the data's)
 function s10TalkFor(id,kind){
@@ -1171,7 +1256,7 @@ function s10TalkOpts(id,n,o){
   }
   for(const T of S10.talk[id]||[]){
     if(!T.option||!s10TalkOk(T)) continue;
-    o.unshift({t:s10T(T.option),tag:T.tag||'story',key:'s10_'+s10TalkKey(T),fn:()=>{ if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1; s10Do(T.then,{talk:id}); },then:()=>s10TalkLines(T,id),back:!T.end,end:!!T.end});
+    o.unshift({t:s10T(T.option),tag:T.tag||'story',key:'s10_'+s10TalkKey(T),fn:()=>{ if(T.once) (G.story._once||(G.story._once={}))[s10TalkKey(T)]=1; s10Do(T.then,{talk:id}); },then:()=>s10AnswerLines(T,id,null),back:!T.end,end:!!T.end});
   }
 }
 function s10Barks(dt){
@@ -1704,6 +1789,10 @@ function s10Uses(cid){
   return [...U];
 }
 const S10API={
+  // (v11 talk) the said keys Ash has set, and a person's talk entries by kind (tests)
+  said:()=>Object.keys((G&&G.story&&G.story.said)||{}),
+  talkKinds:id=>(S10.talk[id]||[]).map(T=>s10TalkKind(T)),
+  opener:id=>{ const T=s10TalkFor(id,'line'); if(!T) return null; const k=s10TalkKey(T); return {key:k,say:s10T(Array.isArray(T.say)&&Array.isArray(T.say[0])?T.say[0]:T.say),heard:s10Heard()[k]===s10Day(),re:!!T.re,v11:s10V11(id)}; },
   chapters:()=>S10.chOrder.slice().sort((a,b)=>{ const i=stageAt(a), j=stageAt(b); return (i<0?1e9:i)-(j<0?1e9:j); }).map(id=>{ const c=S10.chapters[id]; return {id,act:+c.act||null,active:G&&G.stage===id,done:!!G&&stageAt(G.stage)>stageAt(id)&&stageAt(id)>=0}; }),
   state:()=>s10ApiState(),
   entities:()=>s10ApiEntities(),
