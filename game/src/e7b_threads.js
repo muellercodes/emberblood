@@ -49,9 +49,9 @@ function moonCardOn(){ if(!MOON_CARD_EL) MOON_CARD_EL=document.getElementById('c
 // what a tap on the HUD moon (and the journal) says
 function moonText(b){
   b=b==null?bitesOf():b; const L=moonLook();
-  if(L==='dawn') return S('The moon is back, with three shining seams, like a mended cup.','The moon is back! It has shiny lines.');
-  if(L==='moth') return S('The moon is back, and a tiny moth keeps it company.','The moon is back. A tiny moth sits with it.');
-  if(L==='ember') return S('The moon is back, glowing gold like a lantern.','The moon is back. It is gold!');
+  if(L==='dawn') return S('The moon is back, with silver seams, like a mended cup.','The moon is back! It has shiny lines.');
+  if(L==='moth') return S('The moon is back. A tiny grey moth visits it.','The moon is back. A tiny moth visits it.');
+  if(L==='ember') return S('The moon is back, glowing gold, like a window when somebody is waiting up.','The moon is back. It is gold!');
   if(b<=0) return S('The moon is whole. No bites gone.','The moon is whole.');
   if(b===1) return S('The moon: 1 bite gone.','1 bite gone.');
   if(b>=6) return S('The moon: 6 bites gone. There is no moon left at all.','No moon left at all!');
@@ -59,9 +59,9 @@ function moonText(b){
 }
 function moonSub(b){
   b=b==null?bitesOf():b; if(moonLook()!=='bitten') return '';
-  return [S('Round and bright. A good moon.','A good, round moon.'),S('Somebody took a bite out of the moon!','Somebody bit the moon!'),S('The nights are a little darker now.','The nights are darker now.'),
-    S('Half of it is gone, like a cookie.','Half the moon is gone!'),S('The nights keep getting darker.','The nights get darker.'),S('Only a thin curl of moon is left.','Only a thin bit is left.'),
-    S('Lanterns everywhere. Keep your fire close.','Keep your fire close.')][clamp(b,0,6)];
+  return [S('Round and bright. A good moon.','A good, round moon.'),S('Something has taken a bite out of the moon.','Something bit the moon!'),S('The nights are a little darker now.','The nights are darker now.'),
+    S('Half of it is gone, and the tide has started to wander.','Half the moon is gone!'),S('People leave a lamp in the window now, all night.','People leave lamps in windows.'),S('Only a thin curl of moon is left.','Only a thin bit is left.'),
+    S('Every window has a lantern in it. Keep your fire close.','Keep your fire close.')][clamp(b,0,6)];
 }
 function moonTap(){ try{ SFX.play('ui'); }catch(e){} MOON.pulse=1; const b=moonShown(); setBanner(moonText(b),moonSub(b),3); }
 
@@ -248,10 +248,10 @@ function heartText(){
   const st=heartState(), F=G.flags, n=shardCount();
   if(st==='whole') return G.choices.n_end==='embermoon'?S('The Ember Heart burns in the moon now, gold and warm.','The Ember Heart is in the moon now.')
     :S('The Ember Heart is whole again: an orange core with three shining seams, violet, ice-blue and silver.','The Ember Heart is fixed! It has three shiny lines.');
-  if(st==='shards') return n>=3?S('You have all 3 Shards. Somebody needs to mend them together.','You have all 3 Shards!')
-    :(n===1?S('The Heart was cracked into three Shards. You have 1 of the 3 Shards. It is warm, and it tugs gently toward the next one.','You have 1 of 3 Shards.')
-    :S(`The Heart was cracked into three Shards. You have ${n} of the 3 Shards. They are warm, and they tug gently toward the last one.`,`You have ${n} of 3 Shards.`));
-  if(st==='stolen') return S('A masked thief stole the Ember Heart. Get it back!','A thief stole the Ember Heart!');
+  if(st==='shards') return n>=3?S('You have all 3 Shards. Apart, they keep getting colder. They need a smith.','You have all 3 Shards! They need fixing.')
+    :(n===1?S('The Heart was cracked into three Shards. You have 1 of the 3. It tugs gently toward the next one.','You have 1 of 3 Shards.')
+    :S(`The Heart was cracked into three Shards. You have ${n} of the 3. Apart, they are going cold. They tug toward the last one.`,`You have ${n} of 3 Shards.`));
+  if(st==='stolen') return S("A masked thief stole the Ember Heart from Mom's forge.",'A thief stole the Ember Heart!');
   if(st==='home') return (F.a1_heart==='ward'||(!F.a1_heart&&G.choices.ending==='warden'))?S('The Ember Heart glows in the sixth Ward-fire on top of Cinder Mountain.','The Ember Heart glows on the mountain.')
     :S("The Ember Heart is safe in Mom's forge, humming softly.",'The Ember Heart is safe in the forge.');
   return '';
@@ -370,8 +370,8 @@ function pebbleTick(dt){
 // where she sits: on the ground beside Ash, or on his horn on Nightfall Peak (she will not land on the black glass)
 function pbPerch(){ const p=player; return curMap()===4?{x:p.x+7,y:p.y-40-(p.z||0),horn:true}:{x:p.x+36,y:p.y+6,horn:false}; }
 const PB_ARRIVE=[
-  [`Flap, flap, FLOMP. Pebble lands beside you with a letter in her beak.`,`Pebble the crow lands. She has a letter.`],
-  [`A crow drops out of the sky and lands on your foot. It's Pebble, with another letter.`,`Pebble lands on your foot. A letter!`],
+  [`Wings, then a thump. Pebble lands beside you with a letter in her beak.`,`Pebble the crow lands. She has a letter.`],
+  [`A crow drops out of the sky onto your foot. It's Pebble, with another letter.`,`Pebble lands on your foot. A letter!`],
   [`Pebble lands, looks at you sideways, and drops a letter on your toes.`,`Pebble drops a letter on your toes.`]];
 function pbNorm(L){
   const out=[];
@@ -445,9 +445,9 @@ const dreamSeen=id=>!!(G&&G.flags&&G.flags['dr_seen_'+id]);
 // ================= 7. Tamsin's song (THREADS 14.1): EV_TAMSIN is the registry; tamsinVerse adds a verse once
 function tamsinVerse(cond,text){ if(!EV_TAMSIN.some(v=>v&&v[1]===text)) EV_TAMSIN.push([cond,text]); }
 tamsinVerse(()=>!!G.flags.f_done,S(`\u{1F3B5} The north wind was howling, the Hearth fire was low, so Ash found an auntie made out of snow...`,`\u{1F3B5} Ash found an ice dragon auntie...`));
-tamsinVerse(()=>G.choices.n_end==='dawn',S(`\u{1F3B5} The night was so long and the moon was so gone, but Ash lit the Heart and the morning came on...`,`\u{1F3B5} Ash lit the Heart and morning came...`));
-tamsinVerse(()=>G.choices.n_end==='embermoon',S(`\u{1F3B5} The night was so long and the moon was so gone, so Ash threw the Heart, and the gold moon shone on...`,`\u{1F3B5} Ash threw the Heart and the moon turned gold...`));
-tamsinVerse(()=>G.choices.n_end==='moth',S(`\u{1F3B5} The night was so long and the moon was so gone, so Ash lit a lantern, and a moth went home...`,`\u{1F3B5} Ash lit a lantern, and a moth went home...`));
+tamsinVerse(()=>G.choices.n_end==='dawn',S(`\u{1F3B5} The night was so long, and it begged for his flame, but Ash would not give it, and morning still came...`,`\u{1F3B5} The night wanted his fire. Ash said no, and morning came...`));
+tamsinVerse(()=>G.choices.n_end==='embermoon',S(`\u{1F3B5} The moon was all eaten, the sky had gone cold, so Ash gave his Heart, and the moon came back gold...`,`\u{1F3B5} Ash gave the Heart, and the moon came back gold...`));
+tamsinVerse(()=>G.choices.n_end==='moth',S(`\u{1F3B5} The grey moth was scared to be left in the night, so Ash lit her a lantern, and she let go of the light...`,`\u{1F3B5} Ash lit the moth a lantern, and she let the moon go...`));
 // if two modules add the same verse, Tamsin still sings it once
 { const base=tamsinSong; tamsinSong=function(){ const L=base(); try{ const seen=new Set(); return L.filter(l=>{ if(!Array.isArray(l)||typeof l[1]!=='string'||l[1].indexOf('\u{1F3B5}')<0) return true; if(seen.has(l[1])) return false; seen.add(l[1]); return true; }); }catch(e){ return L; } }; }
 
@@ -489,7 +489,7 @@ Object.assign(EVPORT,{
     thrFaceMoth(g,{wing:'#8a7aaa',wing2:'#5c4c7c',eye:'#ece6ff',iris:'#8a62d8',fur:'#b8aad8',fur2:'#e2daf4',eyes:'#241640',ant:'#d8ccf0',smile:true}); }},
   pebble:{bg:'#24283a',f:g=>{ g.save(); g.translate(0,-10); g.scale(3.6,3.6); drawCrowAt(g,0,2,0.5,true); g.restore(); }},
   grandpa:{bg:'#3a1810',f:g=>{ const P=EVPORT.c_grandpa; if(P&&P.f) P.f(g); else faceDragon(g,{skin:'#c8482a',dark:'#7a2412',snout:'#e8784a',horn:'#fff0d4',eye:'#ffcf4a',k:0.78});
-    if(G&&G.choices&&G.choices.ending==='heir'){ g.strokeStyle='#d8b060'; g.lineWidth=3; for(let x=-72;x<=72;x+=24){ g.beginPath(); g.moveTo(x,-96); g.lineTo(x,74); g.stroke(); } g.beginPath(); g.ellipse(0,-96,78,10,0,0,TAU); g.stroke(); } }}
+ }}
 });
 if(!EVPORT.f_hush) EVPORT.f_hush={bg:'#1c1a30',f:g=>thrFaceMoth(g,{wing:'#f4f2fa',wing2:'#d4d0e6',eye:'#b890f0',iris:'#6a3ac8',fur:'#ffffff',fur2:'#e8e4f6',eyes:'#3a2a5a',ant:'#f0ecff',leash:thrHushLeashed()})};
 
@@ -500,43 +500,49 @@ const ACT_RECAP_ORDER=[1,'lantern',2,3,4,5];
 const thrActName=n=>{ const A=ACTS[n]; return actLabel(n)+(A&&A.name?' · '+A.name:''); };
 const ACT_RECAP={
   1:{label:()=>thrActName(1),done:()=>!!G.flags.act1_done,paras:()=>{
-    const e=G.choices.ending||'hero', P=[S(`On the thousandth Lantern Day, Ash learned the family secret: Vorlaxis, the First Flame sealed under Cinder Mountain, is Ash's great x13 grandfather. Ash relit the five Ward-fires, beat the Scaled Oath and its champions, and climbed the mountain to face him.`,`Ash relit the five Ward-fires and climbed Cinder Mountain to face Grandpa Vorlaxis.`)];
-    P.push({hero:S(`Ash put out the First Flame for good. In the ashes lay a warm red stone the size of a plum, beating like a heart: the Ember Heart. Mom keeps it in the forge.`,`Ash put out the First Flame. A warm stone was left: the Ember Heart. Mom keeps it in the forge.`),
-      warden:S(`Ash bound the First Flame and became the Sixth Warden. The Ember Heart, the last spark of the old fire, glows in the new sixth Ward-fire on the summit.`,`Ash became the Sixth Warden. The Ember Heart glows on the mountain top.`),
-      heir:S(`Ash took the First Flame and grew into a giant dragon, then folded back down to normal size. Grandpa shrank into a tiny dragon in a birdcage. The Ember Heart sits on a shelf in Mom's forge.`,`Ash took the First Flame. Grandpa is tiny now, in a birdcage. The Ember Heart is in the forge.`),
-      lantern:S(`Ash lit Grandpa a lantern, and the First Flame came home as a goat-sized grandpa who eats doormats. He coughed up the Ember Heart and asked Mom to keep it safe.`,`Ash lit a lantern for Grandpa. He came home, goat-sized. Mom keeps the Ember Heart.`)}[e]||'');
-    if(G.flags.pip) P.push(S(`And Pip hatched: a loaf-sized baby dragon who says "Mip" and is very, very brave.`,`And Pip hatched! Pip says "Mip".`));
+    const e=G.choices.ending||'hero', P=[S(`On the thousandth Lantern Day, the shortest night of the year, Ash only wanted to light the lanterns on the green and get it right. Then the North Gate opened, and Elder Yara told him the family secret: the dragon asleep under Cinder Mountain is his grandfather, and half of Ash's fire was once his.`,`On Lantern Day, Ash learned a secret. The dragon under the mountain is his very old grandpa. Half of Ash's fire was once his.`),
+      S(`Ash relit the five Ward-fires, and his grandfather's voice followed him: "Are you sure you're not mine?" Mom said his fire had been given, not taken. Given is different.`,`Ash relit the five Ward-fires. A voice asked, "Are you sure you're not mine?" Mom said his fire was a gift. Gifts are different.`)];
+    if(G.flags.pip) P.push(S(`And Pip hatched, a baby dragon the size of a loaf, who has not left Ash's side since.`,`And Pip hatched. Pip has stayed by Ash ever since.`));
+    P.push({hero:S(`At the top, Ash put the First Flame out. It was right for the valley. It was still his grandfather. In the ashes lay a warm red stone that beat like a heart: the Ember Heart. Mom keeps it in her forge.`,`Ash put out the First Flame. A warm stone was left: the Ember Heart. Mom keeps it in the forge.`),
+      warden:S(`Ash would not destroy his grandfather or set him free. He lit a sixth Ward-fire with his own flame and became the Sixth Warden. The Ember Heart glows in it, and every Lantern Day Ash climbs up to say goodnight.`,`Ash became the Sixth Warden. The Ember Heart glows on the mountain. Every Lantern Day he says goodnight to Grandpa.`),
+      heir:S(`Ash took all of the First Flame. For one night he knew exactly how "mine" feels. In the morning he let most of it go, on purpose, because Mom's doorway does not fit a dragon. Vorlaxis, small and bitter now, sits on the warm shelf above Bertram's oven.`,`Ash took the First Flame, then let most of it go. Grandpa is small now. He sits on a warm shelf at the bakery.`),
+      lantern:S(`Ash lit his grandfather a paper lantern, the way Ember had every year, so he would know where home was. The anger went out of the old dragon, and he came home for Lantern Day, about the size of a goat.`,`Ash lit Grandpa a lantern. Grandpa stopped being angry and came home, the size of a goat.`)}[e]||'');
+    P.push(S(`As Ash turned for home, a grey moth with pale moons on her wings landed on the empty throne, then flew up toward the moon.`,`A grey moth sat on the empty throne. Then it flew up to the moon.`));
     return P; }},
   lantern:{label:()=>S('Lantern Night','Lantern Night'),done:()=>!!G.flags.c_leapt&&G.stage!=='c_fest'&&G.stage!=='c_clue',paras:()=>[
-    S(`On Lantern Night the whole valley celebrated. Then, in the middle of the fireworks, a masked thief stole the Ember Heart and escaped over the rooftops to a waiting sail. She dropped a brass gear stamped "Gearhaven".`,`On Lantern Night a masked thief stole the Ember Heart. She dropped a gear that says "Gearhaven".`)]},
+    S(`That night a girl in a grey cloak watched the lanterns from a far roof. During the fireworks she stole the Ember Heart from Mom's forge and got away over the rooftops, leaving a brass gear stamped "Gearhaven". It was Mom's forge, and she took it hard. She packed Ash a scarf and sent him south anyway.`,`On Lantern Night a thief stole the Ember Heart from Mom's forge. She dropped a gear that says "Gearhaven". Mom sent Ash south.`)]},
   2:{label:()=>thrActName(2),done:()=>!!(G.flags.act2_done||G.flags.c_done),paras:()=>{
-    const P=[S(`Ash took the Southern Pass down to the Clockwork Coast, where Gearhaven ticks and steams on the chalk cliffs. The locals say the thief is the Moth Mask, a rooftop legend.`,`Ash went south to Gearhaven. The thief is called the Moth Mask.`),
-      S(`The Moth Mask is Vesper, from Saltmarsh. Her family are Pearl's children: Ember's second child had no fire, so they are Emberbloods without fire. The Lady of the Moths promised Vesper in her dreams that the Heart would give them their fire back.`,`The thief is Vesper. Her family are Emberbloods with no fire. A voice in her dreams promised her fire.`)];
-    if(G.choices.c_vesper==='friend') P.push(S(`At the top of the Shadow Spire, Ash asked Vesper why instead of fighting to the end. She told the truth, and now she is family: a cousin, with no greats at all.`,`Ash asked Vesper why. She told the truth. She is family now.`));
-    else if(G.choices.c_vesper==='foe') P.push(S(`At the top of the Shadow Spire, Ash fought Vesper to the end. She threw Ash the Shard and vanished into the dark.`,`Ash fought Vesper. She threw the Shard and ran away.`));
-    P.push(S(`At the top of the Shadow Spire the truth came out: Vesper gave the Heart to a great moth, which cracked it into three Shards. She kept one in secret, and now Ash has it. Then a voice thanked Ash, snow fell in midsummer, and the moon had a bite out of it.`,`Vesper gave the Heart to a great moth. It broke into three. Ash has one piece. Then snow fell, and the moon had a bite out of it.`));
+    const P=[S(`In Gearhaven every clock had stopped at one minute to midnight, and the papers were full of the Moth Mask, a thief who only steals things that glow.`,`Ash went south to Gearhaven. Every clock had stopped. The thief was called the Moth Mask.`),
+      S(`Under the mask was Vesper, Ash's cousin. Her side of the family comes from Pearl, Ember's child born without fire, and in their house a match is out by morning. A soft voice in her dreams had promised the Heart would give them fire.`,`The thief was Vesper, Ash's cousin. Her family has no fire. A voice in her dreams promised her some.`)];
+    if(G.choices.c_vesper==='friend') P.push(S(`On the roof of the Shadow Spire, Ash asked her why instead of fighting to the end. He would have lit her gran's stove himself, if she had asked. He came down with a Shard and a cousin.`,`Ash asked Vesper why. She told the truth. Now she is his cousin and his friend.`));
+    else if(G.choices.c_vesper==='foe') P.push(S(`On the roof of the Shadow Spire, Ash stood his ground. Vesper threw him her one Shard and ran, more ashamed than beaten.`,`Ash stood his ground. Vesper threw him the Shard and ran.`));
+    P.push(S(`Her notebook told the rest. She had given the Heart to the voice herself: a grey moth with two pale moons on her wings, the Mother of the moths. Ember's fire burns any moth that takes it, so the Mother cracked it in three for her moths to carry.`,`Vesper gave the Heart to a great grey moth, the Mother of the moths. She broke it in three. Ash has one piece.`),
+      S(`Then the soft voice thanked Ash. That night it snowed at midsummer, and there was a bite out of the moon.`,`Then a soft voice said thank you. Snow fell in summer. The moon had a bite out of it.`));
     return P; }},
   3:{label:()=>thrActName(3),done:()=>!!(G.flags.act3_done||G.flags.f_done),paras:()=>{
-    const P=[S(`Snow fell in midsummer. Mom's letter sent Ash over the High Pass into Frostreach, where Hearthold huddled round its dying Great Hearth. Ash learned Blaze Breath and woke the Hearth, and it burned blue.`,`Snow fell in summer. Ash went north and woke the Great Hearth with Blaze Breath.`),
-      S(`Hush, a great white moth, had carried the second Shard north. It froze the village of Rimeholm and turned the slow cold heart of Glaciar, the ice dragon of Mount Dread, into a blizzard. Glaciar turned out to be Ash's great x13 grand-aunt.`,`A white moth named Hush took the second Shard north. It froze Glaciar, the ice dragon. She is Ash's great-aunt!`)];
-    P.push(G.choices.f_glaciar==='defeat'?S(`At the top of Mount Dread, Ash beat Glaciar and won the Frost Shard. Before she fell asleep, she told the truth: the soft voice is Nyxara, the moon's old moth. She wants a night that never ends.`,`Ash beat Glaciar and got the Frost Shard. The voice is Nyxara, the moon's moth.`)
-      :S(`At the top of Mount Dread, Ash melted the frost chains and set Auntie Glee free. She gave Ash the Frost Shard and told the truth: the soft voice is Nyxara, the moon's old moth. She wants a night that never ends.`,`Ash set Glaciar free. She gave Ash the Frost Shard. The voice is Nyxara, the moon's moth.`));
-    P.push(S(`That night the moon was a little smaller.`,`That night the moon was smaller.`));
+    const P=[S(`It snowed at home in June, and the Shard in Ash's pocket went cold, as if it were scared. In Frostreach he woke the dying Great Hearth of Hearthold, and it burned blue.`,`It snowed at home in June. Ash went north and woke the Great Hearth. It burned blue.`),
+      S(`Hush, the Mother's white moth, had frozen Rimeholm because its bell rang every morning. On Mount Dread slept Glaciar, Vorlaxis's gentle sister and Ember's Auntie Glee. The Mother had chained her, so her one soft snow a year became a winter without end. Cold keeps things, the Mother says. Nothing leaves in the cold.`,`Hush, a white moth, froze a village and took the second Shard north. On the mountain slept Glaciar, Grandpa's sister. The Mother chained her and made her dream a winter.`)];
+    P.push(G.choices.f_glaciar==='defeat'?S(`Ash beat her and took the Frost Shard. She sank back to sleep under the snow, still chained, and whispered the soft voice's name: Nyxara.`,`Ash beat Glaciar and got the Frost Shard. She fell asleep, still chained. She said the voice's name: Nyxara.`)
+      :S(`Instead of beating her, Ash melted the four chains. Glaciar woke up as herself, horrified by the blizzard, and gave him the Frost Shard and the soft voice's name: Nyxara.`,`Ash melted the chains. Glaciar woke up. She gave him the Frost Shard and told him the voice's name: Nyxara.`));
+    P.push(S(`That night another bite was gone from the moon.`,`That night the moon got smaller.`));
     return P; }},
   4:{label:()=>thrActName(4),done:()=>!!(G.flags.act4_done||G.flags.m_done),paras:()=>{
-    const P=[S(`Ash crossed the sea east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the water, and the Glass Desert, where the moon's broken light fell as glass.`,`Ash went east to Moonfall. There is a city under the sea and a desert of glass.`),
-      S(`During an eclipse, Nyxara came herself: a moth the size of a house. She took a huge bite of the moon, and every night since has been darker.`,`Nyxara came. She is a moth as big as a house. She took a huge bite of the moon.`)];
-    if(G.choices.m_hush==='free') P.push(S(`At the Eclipse Observatory, Hush guarded the last Shard on a silver leash. Ash cut the leash, and she floated away, free and glowing.`,`Hush guarded the last Shard. Ash cut her leash. She flew away, free.`));
-    else if(G.choices.m_hush==='foe') P.push(S(`At the Eclipse Observatory, Hush guarded the last Shard on a silver leash. Ash took the Shard and left her tied, and she crumbled into a hundred little white moths that flew up to their Mother.`,`Hush guarded the last Shard. Ash took it and left her tied. She turned into little moths.`));
-    P.push(S(`With the last Shard in Ash's claws, Mom made the Ember Heart whole again. Then Nyxara ate the last of the moon, and a black mountain rose out of the sea at the edge of the world.`,`Mom fixed the Heart. Then Nyxara ate the rest of the moon. A black mountain rose up.`));
+    const P=[S(`In Moonfall the tide had started to wander, and old Lumen already lay drowned under the sea. Nyxara came herself, took a bite of the moon, and asked Ash for the Shards. She could have crushed him with one wing. She asked, because Ember's fire can't be taken. It can only be given.`,`Ash sailed east to Moonfall. Nyxara came and bit the moon. She asked for the Shards, because fire can't be taken. It must be given.`)];
+    if(G.choices.m_hush==='free') P.push(S(`At the Eclipse Observatory, Ash melted Hush's silver leash and let her go.`,`Ash melted Hush's leash. She flew away, free.`));
+    else if(G.choices.m_hush==='foe') P.push(S(`At the Eclipse Observatory, Ash left Hush's silver leash on, to be safe, and she crumbled into a hundred white moths that flew up to their Mother.`,`Ash left Hush's leash on. She turned into little moths and flew away.`));
+    P.push(S(`Then Mom climbed the moonlight stairs, out of breath, and mended the Heart with three taps of her hammer. Nyxara wanted it whole. So did Mom: it was theirs. Ash decided he would never hand it over.`,`Mom climbed the moon stairs and fixed the Heart. Ash decided he would never give it to Nyxara.`),
+      S(`Nyxara ate the last of the moon, and a mountain of black glass rose from the sea. Mom walked Ash to the bridge, and let him go on without her.`,`Nyxara ate the rest of the moon. A black mountain rose. Mom walked Ash to the bridge.`));
     return P; }},
   5:{label:()=>thrActName(5),done:()=>!!(G.done&&(G.flags.act5_done||G.flags.n_done||G.choices.n_end)),paras:()=>{
-    const P=[S(`Ash climbed Nightfall Peak, a mountain made of the moon's memories, and faced Nyxara at the very top.`,`Ash climbed Nightfall Peak and faced Nyxara.`)];
+    const P=[S(`Ash climbed Nightfall Peak, black glass made of every place he had been. On each ring an old fear was waiting, and he had an answer for each one.`,`Ash climbed Nightfall Peak. Old fears waited on the way. He had an answer for each one.`),
+      S(`At the top, the Night Mother was Nyx, the little moth Ember once warmed on a lantern, who waited for her and grew huge and frightened in the dark. Then Ash's own fire went out. It came back from what he had given away: his friends and Mom speaking through the Heart, and Pip, the one who stayed, shouting his first word.`,`At the top was Nyx, a moth Ember once warmed on a lantern. She was scared of being left. Ash's fire went out. His friends, Mom and Pip brought it back.`)];
     let e=''; try{ if(typeof endingSoFar==='function') e=endingSoFar(); }catch(err){}
-    if(!e) e={dawn:S(`Ash broke Nyxara's hold for good. She became a thousand silver moths that mended the moon, and the Long Night ended in a real morning.`,`Ash ended the Long Night. The moths fixed the moon. Morning came.`),
-      embermoon:S(`Ash gave the Ember Heart to the empty moon. It burns gold now, and Nyxara sleeps curled round it, warm at last.`,`Ash gave the Heart to the moon. Now the moon is gold and warm.`),
-      moth:S(`Ash called the Night Mother by her old name and lit her a lantern. She let the moon go home and became a small moth again, keeping it company.`,`Ash lit a lantern for Nyx. She let the moon go. Now she is a little moth.`)}[G.choices.n_end]||'';
-    if(e) P.push(e); return P; }}
+    if(!e) e={dawn:S(`Ash would not hand the Heart over in fear. He breathed the biggest fire of his life, and Nyxara came apart into a thousand silver moths that stitched the moon back together. Then the sky turned pink, and it was morning.`,`Ash would not give her the Heart. The moths fixed the moon. Morning came.`),
+      embermoon:S(`Ash gave the Ember Heart away, freely, to the empty moon. Given, it burned gold instead of black, and Nyx sleeps curled round it like a cat round a stove, warm at last.`,`Ash gave the Heart to the moon. The moon is gold and warm now. Nyx sleeps on it.`),
+      moth:S(`Ash called her by her old name and lit her Mom's paper lantern. It won't last forever. Lanterns never do, which is why you light new ones. She let the moon go home and became a small grey moth again, one who visits.`,`Ash lit a lantern for Nyx. She let the moon go. Now she is a little moth who visits.`)}[G.choices.n_end]||'';
+    if(e) P.push(e);
+    P.push(S(`Then it was Lantern Day again, and Ash lit one more lantern than he needed.`,`Then it was Lantern Day again. Ash lit one more lantern, just in case.`));
+    return P; }}
 };
 function storySoFar(){
   if(!G) return [];
