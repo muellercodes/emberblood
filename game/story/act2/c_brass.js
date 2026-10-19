@@ -10,7 +10,7 @@ chapter({
   id: 'c_brass', act: 2, after: 'c_claws', next: 'c_light', takeover: true,
   card: ['Act II · Chapter 6', 'The Brassworks'],
   so_far: [
-    "Ash climbed the Great Clock and searched Vesper's hideout. She keeps everything she steals, because the Lady of the Moths in her dreams wants light, and promised her gran would be warm. Ash woke the Great Clock from the Brassworks, and Vesper pushed her mask up to watch.",
+    "Ash climbed the Great Clock and searched Vesper's hideout. She keeps everything she steals, because the Lady of the Moths in her dreams wants light, and promised her gran would be warm. Every clock had stopped in the same minute, as if someone held the hands. Ash woke the Great Clock from the Brassworks, and Vesper pushed her mask up to watch.",
     "Vesper steals light for a dream Lady. Then everyone saw her face."],
   hint: ['Climb the Great Clock to the hatch at the very top. Then ask Clockkeeper Ambrose. The way into the Brassworks is up its old smokestack in the Brass Yards.',
     'Climb the clock. Ask the Clockkeeper. Then climb the smokestack.'],
@@ -108,10 +108,10 @@ chapter({
 
   scene: {
     brs_nest: [
-      ['narr', 'The bell loft at the top of the Great Clock. Somebody LIVES up here.', 'The bell loft. Somebody LIVES up here!'],
+      ['narr', 'The bell loft at the top of the Great Clock. Somebody lives up here.', 'The bell loft. Somebody lives up here!'],
       ['narr', 'There is a hammock made from an old sail, moth drawings pinned to every beam, and a blanket that smells of the sea.', 'A sail hammock, moth drawings, a blanket that smells of the sea.'],
       ['ash', "It's her hideout. Don't touch anything.", "Her hideout. Don't touch anything."],
-      { if: 'flag pip', then: [['narr', 'Pip touches everything.', 'Pip touches everything.']] },
+      { if: 'flag pip', then: [['narr', "Pip climbs into the hammock, turns round three times, and won't come out.", "Pip gets in the hammock. He won't come out."]] },
     ],
     brs_pile: [
       ['narr', 'Under the window, laid out in a neat circle like a present: every glowing thing the Moth Mask ever stole.', 'Under the window, in a circle: every glowing thing she stole.'],
@@ -124,13 +124,14 @@ chapter({
       ['narr', 'By the hammock: a little book with a moon on the cover. A dream diary.', 'A little book with a moon on it. A dream diary.'],
       ['narr', 'One page has been read so many times it has gone soft as cloth.', 'One page has been read so many times.'],
       ['narr', '"The Lady of the Moths came again. She says: bring her light, and Gran will be warm."', '"Bring the Lady light, and Gran will be warm."', { clue: 'b_dream_page' }],
-      ['narr', '"She says bring the warm stone to the Spire at moonrise, and I will be a real Emberblood at last."', '"Bring the warm stone to the Spire."'],
-      ['ash', "The Spire? There isn't a spire. And who is the LADY?", 'What Spire? And who is the LADY?'],
+      ['narr', '"The night I get home, I take the warm stone to the Moon Ring at moonrise and give it to her. Then I will be a real Emberblood at last."', '"Take the warm stone to the Moon Ring. Then I will be a real Emberblood."'],
+      ['narr', 'The last page is newer, written in a hurry: "Spire. Moonrise. Bring what\'s left."', 'The last page: "Spire. Moonrise. Bring what is left."'],
+      ['ash', "What's left of what? What spire? And who is this Lady?", 'What is left? What Spire? Who is the Lady?'],
     ],
     brs_letters: [
       ['narr', 'On the crate: a bundle of letters tied with string, in shaky handwriting.', 'Letters on the crate, in shaky writing.'],
       ['narr', '"Dear Vesper. Do not climb anything tall. Love, Gran. P.S. Thank you for the fish."', '"Dear Vesper. Do not climb anything tall. Love, Gran."'],
-      ['ash', 'Dear VESPER. I knew it!'],
+      ['ash', 'Dear Vesper. I knew it.'],
     ],
     // trust K3: leave Gran's biscuits (kind) or eat one (funny, costs nothing); the gate note at the end shows which
     brs_tin: [
@@ -138,17 +139,17 @@ chapter({
       { if: '!flag c_biscuits', then: [
         ['narr', 'A biscuit tin. Inside: three biscuits and a note.', 'A biscuit tin. Three biscuits and a note.'],
         ['narr', '"FOR GRAN. NOT FOR ME. NOT EVEN ONE."', '"FOR GRAN. NOT FOR ME."'],
-        ['ash', 'They smell AMAZING.'],
+        ['ash', 'They smell amazing.'],
         { if: 'flag pip', then: [['pip', 'Mip!']] },
-        { choose: 'c_biscuits', ask: ['What do you do?', 'What do you do?'], pick: [
+        { choose: 'c_biscuits', who: 'narr', ask: ['Three biscuits. Nobody would ever know.', 'Nobody would ever know.'], pick: [
           { t: ["Put the lid back on. They're for Gran.", 'Leave them for Gran'], tone: 'kind',
             then: ['set c_biscuits=left', 'trust vesper +1'],
             say: [['narr', 'You put the lid back on. Very, very carefully.', 'You put the lid back on. Carefully.']] },
-          { t: ['Eat one. Just ONE.', 'Eat one'], tone: 'silly',
+          { t: ['Eat one. Just one.', 'Eat one'], tone: 'silly',
             then: ['set c_biscuits=ate'],
             say: [
               ['narr', 'It is the best biscuit you have ever eaten.', 'It is the best biscuit ever.'],
-              ['ash', "That was the best biscuit I've ever had, and I feel AWFUL about it.", 'Best biscuit ever. I feel awful.']] },
+              ['ash', "That was the best biscuit I've ever had, and I feel awful about it.", 'Best biscuit ever. I feel awful.']] },
         ] }] },
     ],
     // note 2 (and Pip's Fetch, if Pip is with Ash); the note's words depend on what Ash said on the cliff (trust K2)
@@ -157,10 +158,10 @@ chapter({
       { if: '!flag c_note2_read', then: [
         ['narr', 'A note is pinned to the great bell. You unpin it.', 'A note is pinned to the bell.'],
         { if: 'flag pip', then: [
-          ['narr', 'CLACK! A brass magpie swoops off the beam, snatches the note out of your claws, and flaps back up.', 'CLACK! A brass magpie grabs the note and flies up!'],
+          ['narr', 'Clack! A brass magpie swoops off the beam, snatches the note out of your claws, and flaps back up.', 'Clack! A brass magpie grabs the note and flies up!'],
           ['ash', 'Hey! Give that back, you tin chicken!', 'Hey! Give it back, you tin chicken!'],
           ['narr', 'Pip goes very still. He has watched a certain thief snatch things off rooftops all over town.', 'Pip goes very still. He watched the thief do this.'],
-          ['narr', 'ZIP! Pip plucks the note from its beak and lands back on your head.', 'ZIP! Pip grabs the note back!'],
+          ['narr', 'Zip! Pip plucks the note from its beak and lands back on your head.', 'Zip! Pip grabs the note back!'],
           ['ash', "Pip! That's stealing! ...From a thief, though. Good boy!", 'Pip! You stole it back! Good boy!'],
           ['narr', 'The magpie sulks back to its nest. Its nest is made entirely of teaspoons.', 'The magpie sulks. Its nest is made of teaspoons.'],
           { do: ['set c_pip_fetch', { banner: ['Pip learned Fetch!', 'Pip can Fetch!'], sub: ['When something shiny is out of reach and it says "Pip, fetch!", use your action button.', 'Shiny thing out of reach? Use your action button!'] }] }] },
@@ -171,15 +172,16 @@ chapter({
         { do: ['set c_note2_read'] }] },
     ],
     brs_ambrose: [
-      ['c_ambrose', 'Eh? You were up in my bell loft? On the OUTSIDE of my clock? Tick.', 'You climbed my clock? On the OUTSIDE? Tick.'],
-      ['ash', 'Somebody LIVES up there!'],
+      ['c_ambrose', 'Eh? You were up in my bell loft? On the outside of my clock? Tick.', 'You climbed my clock? On the outside? Tick.'],
+      ['ash', 'Somebody lives up there!'],
       ['c_ambrose', 'The girl? I know. She sweeps the bell for me. Never asked her to. Tick.', 'The girl? She sweeps my bell. Tick.'],
       ['ash', 'How do we make the clock go again?', 'How do we make the clock go?'],
-      ['c_ambrose', "Her heart's not up top, young dragon. It's DOWN. In the Brassworks. The great drive is jammed.", 'Her heart is down in the Brassworks. It is jammed.'],
+      ['c_ambrose', "Clocks don't stop like that, young dragon. They run down slow, each in its own time. Every clock in this city stopped in the same minute. One to midnight. As if somebody held the hands.", 'Every clock stopped in the same minute. One to midnight. As if someone held the hands.'],
+      ['c_ambrose', "And with the hands held, her heart jammed. Not up top. Down in the Brassworks, the great drive.", 'Her heart is jammed. Down in the Brassworks.'],
       ['c_ambrose', 'Lord Whirligig locked the gate, and the dust stuck it shut. But Mother Pearl built a chimney there. She never could resist a chimney.',
         'The gate is stuck. But Pearl built a chimney there.', { promise: 'bw_roof_hatch', ref: 'bw_front_gate' }],
-      ['ash', 'A chimney. I have CLAWS now.', 'A chimney! I have CLAWS now.'],
-      ['c_ambrose', 'Eh? PAWS? Lovely. Tick... tock.', 'Eh? PAWS? Lovely. Tick... tock.'],
+      ['ash', 'A chimney. I have claws now.', 'A chimney! I have claws now.'],
+      ['c_ambrose', 'Eh? Paws? Lovely. Tick... tock.', 'Eh? Paws? Lovely. Tick... tock.'],
     ],
     // outdoors by the Brassworks gate: Vesper was in the Nest after Ash, and knows what he did with the biscuits
     brs_hanky: [
@@ -193,9 +195,9 @@ chapter({
     // the Great Clock strikes, and on a chimney beside it Vesper pushes her mask up (on screen; the camera goes there)
     brs_bong: [
       { cam: 'c_great_clock', s: 1.5 },
-      ['narr', 'Far across the town, something enormous goes CLUNK. Then every clock on every roof starts ticking.', 'Far away: CLUNK! Every clock in town starts ticking.', { do: ['set c_clock_on'] }],
+      ['narr', 'Far across the town, something enormous goes clunk. Then every clock on every roof starts ticking.', 'Far away: clunk! Every clock in town starts ticking.', { do: ['set c_clock_on'] }],
       { sfx: 'bell' },
-      ['narr', 'BONG! BONG! BONG! Twelve times. It is not midnight. The Great Clock does not care.', 'BONG! BONG! BONG! Twelve times!'],
+      ['narr', 'Bong. Bong. Bong. Twelve times, for the midnight it was kept waiting for. It is the middle of the afternoon. The Great Clock does not care.', 'Bong! Bong! Twelve times. It is not midnight. The clock does not care.'],
       { place: ['c_mask', 'gh_vesper_perch'] }, { anim: ['c_mask', 'unmask'] }, { cam: 'gh_vesper_perch', s: 1 },
       ['narr', 'On a chimney beside the clock, a girl in a grey cloak pushes her mask up, to see better.', 'On a chimney, a girl pushes her mask up.'],
       ['narr', "She has dark hair with one silver streak in it, and freckles, and she's grinning at the clock like it's a birthday cake.", 'Dark hair, a silver streak, freckles. She is grinning.'],
@@ -203,7 +205,7 @@ chapter({
         ['narr', 'She looks across the rooftops, right at you, and waves. Then the mask comes down.', 'She looks right at you. She waves. The mask comes down.']] },
       { if: '!flag c_cliff=gran', then: [
         ['narr', 'Then the mask comes down, and she is gone over the roofs.', 'The mask comes down. She is gone.']] },
-      { do: ['despawn c_mask', { banner: ['GEARHAVEN GAZETTE: CLOCK SAVED BY LIZARD! MOTH MASK HAS A FACE!', 'GAZETTE: MOTH MASK HAS A FACE!'] }] },
+      { do: ['despawn c_mask', { banner: ['HEADLINE: CLOCK SAVED BY LIZARD! MOTH MASK HAS A FACE!', 'HEADLINE: MOTH MASK HAS A FACE!'] }] },
     ],
   },
 
@@ -216,15 +218,15 @@ chapter({
       { if: 'flag c_clock_on', once: true, say: ['Twelve bongs, exactly three seconds apart. Do not tell the Bobs, but I stood in the square and saluted.', 'Twelve bongs! I saluted the clock.'] },
     ],
     c_whirligig: [
-      { if: 'stage>=c_brass !flag c_clock_on', once: true, say: ['My Brassworks! Do be careful with the... with the everything. And if you see a large brass gentleman with a wind-up handle in his back, do NOT wind him up.',
-        'My Brassworks! Do NOT wind up the big brass man.'] },
+      { if: 'stage>=c_brass !flag c_clock_on', once: true, say: ['My Brassworks! Do be careful with the... with the everything. And if you see a large brass gentleman with a wind-up handle in his back, do not wind him up.',
+        'My Brassworks! Do not wind up the big brass man.'] },
       { if: 'flag c_clock_on', once: true, say: ['My clocks! My lovely clocks! ...Dragon. You did this? Hmph. Thank you. Wipe your feet next time.', 'My clocks! You did this? Hmph. Thank you.'] },
     ],
     c_penny: [
-      { if: 'flag c_clock_on', once: true, say: ['MOTH MASK HAS A FACE! Did you SEE it? I saw it. From really far away. I am going to need a bigger notebook.', 'MOTH MASK HAS A FACE! I need a bigger notebook!'] },
+      { if: 'flag c_clock_on', once: true, say: ['Did you see her face? I saw it. From really far away, and then the mask came down. I sat on my notebook by mistake. I am not printing that.', 'Did you see her face? I did! From far away.'] },
     ],
     c_oona: [
-      { if: 'flag c_biscuits=ate', once: true, say: ['Vesper says a dragon ate one of my biscuits. She was FURIOUS. I laughed so hard my rocking chair nearly tipped over.', 'A dragon ate my biscuit? Ha! Vesper was FURIOUS.'] },
+      { if: 'flag c_biscuits=ate', once: true, say: ['Vesper says a dragon ate one of my biscuits. She was furious. I laughed so hard my rocking chair nearly tipped over.', 'A dragon ate my biscuit? Ha! Vesper was furious.'] },
       { if: 'flag c_biscuits=left', once: true, say: ['Vesper brought me my biscuits. Well, two. She said the third went to a dragon who deserved it. Was that you, duck?', 'Vesper brought me two biscuits. A dragon got one. You?'] },
     ],
   },
