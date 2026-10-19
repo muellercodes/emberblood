@@ -170,6 +170,8 @@ people({
         say: ['Every step. I kept my eyes on the top, where you were, and let my feet do the rest.', 'Every step. I looked at you, not down.'] },
       { ask: ['What do I do if she asks for the Heart?', 'What if she asks for the Heart?'], if: '!flag n_dawn',
         say: ["You say no. You've said no at bedtime since you were two. You're very good at it.", 'You say no. You are very good at no.'] },
+      { ask: ['Did Rowan give you a knot?', 'Did Rowan give you a knot?'], if: 'said rowan_mom',
+        say: ["This one? It came home in my apron pocket. I can't undo it, and I'm not going to try.", 'It came home in my pocket. I will not undo it.'] },
       { ask: ['Will you teach me to mend things?', 'Will you teach me to mend?'], if: 'flag n_dawn',
         say: ["Tomorrow. Bring your own apron. You're not borrowing mine again.", 'Tomorrow. Bring your own apron.'] },
       { ask: ['Is Vesper staying for Lantern Day?', 'Is Vesper staying?'], if: { all: ['flag n_dawn', { any: ['flag n5_vesper', 'choice c_vesper=friend'] }] },
@@ -701,7 +703,7 @@ people({
         say: ['I knitted you a black scarf for the mountain, so the Night Mother cannot see you. Neither can I. I have lost it.',
           'I knitted you a black scarf. Now I cannot find it.'],
         re: [
-          { t: ['Knit me a bright one instead.', 'Knit me a bright one.'], tone: 'brave', f: 0.5,
+          { t: ['Knit me a bright one instead.', 'Knit me a bright one.'], tone: 'brave', f: 0.5, then: ['said nana_bright'],
             say: ['Bright? So she can see you coming? ...Yes. Let her see you coming, dear.', 'Bright? So she sees you coming? Yes!'] },
           { t: ["I'll help you look for it.", "I'll help you look."],
             say: ["In this dark? We'd lose each other. Sit down and have a biscuit instead.", 'In the dark? Sit and have a biscuit.'] },
@@ -713,6 +715,14 @@ people({
             say: ['I know, dear. I leave the curtain open so he can see I am knitting.', 'I know. I leave the curtain open.'] },
           { t: ['Did he ever write back?', 'Did he write back?'],
             say: ['Two pages, and one of them was about the dogs. I keep it in my apron.', 'Two pages. One about the dogs.'] },
+        ] },
+      { if: 'said nana_bright flag n_dawn', once: true,
+        say: ['Your bright scarf is finished, dear. Orange, with a red stripe. You can see it from Brindlecross.', 'Your bright scarf is done. Orange and red!'],
+        re: [
+          { t: ["It's very bright, Nana.", "It's very bright."],
+            say: ['That was the idea, dear. Nobody is going to lose you in that.', 'That was the idea. Nobody will lose you.'] },
+          { t: ['Thank you, Nana.', 'Thank you, Nana.'], tone: 'kind', f: 0.5,
+            say: ['Put it on. ...There. Now I can see you.', 'Put it on. There. Now I see you.'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['Found the black scarf. It was on the cat. The cat looks very sneaky in it.', 'The scarf was on the cat!'],
@@ -1437,6 +1447,15 @@ people({
     // Seventy years cold, unbothered, sharp; "duck" is hers alone. Her errands (q_n5_oona, q_n5_vesper) are talk steps
     // that play ahead of all of this.
     c_oona: [
+      // Fig across the harbor (said fig_asked_oona: Ash asked her how Oona was)
+      { if: 'said fig_asked_oona !flag n_dawn', once: true,
+        say: ["Fig says you asked after me. She sent a scone across the harbor to check I was still breathing. I am. The scone isn't.", 'Fig sent a scone to check on me. I ate it.'],
+        re: [
+          { t: ['Fig worries about you.', 'Fig worries about you.'], tone: 'kind',
+            say: ["Seventy years, duck. Somebody has to. I worry about her back. Don't tell her.", 'Seventy years. I worry about her too.'] },
+          { t: ['Was it a good scone?', 'Was it a good scone?'], tone: 'silly',
+            say: ['Burnt on the bottom. Fig always burns the bottom. It was perfect.', 'Burnt. It was perfect.'] },
+        ] },
       { if: 'quest q_n5_oona done !flag n_dawn', once: true, fact: 'n5_moon=gone',
         say: ["She's coming home for tea after. You said so, duck, and I believe you.", 'She will come home for tea!'],
         re: [
@@ -1705,7 +1724,7 @@ people({
         re: [
           { t: ['Does the head cosy help?', 'Does the head cosy help?'], tone: 'silly',
             say: ['Enormously. I have never had such warm thoughts.', 'Yes. Very warm thoughts.'] },
-          { t: ['Is Granny Oona all right?', 'Is Gran all right?'], tone: 'kind',
+          { t: ['Is Granny Oona all right?', 'Is Gran all right?'], tone: 'kind', then: ['said fig_asked_oona'],
             say: ['Sitting up with the kettle on, like me. We wave across the harbor at each other. Two old teapots.', 'Up with her kettle, like me.'] },
         ] },
       { if: 'said fig_sorry !flag n_dawn', fact: 'n5_moon=gone',
@@ -1779,8 +1798,17 @@ people({
         re: [
           { t: ['Right about what?', 'Right about what?'],
             say: ['About you. I put you on the front page in the summer. Everybody said a dragon kid was not news.', 'About you. Nobody thought you were news.'] },
-          { t: ['Can I have a quote?', 'Can I have a quote?'], tone: 'silly',
+          { t: ['Can I have a quote?', 'Can I have a quote?'], tone: 'silly', then: ['said penny_quote'],
             say: ['That is my line! ...Fine. Quote: "Come back, or there is no ending." Penny Blot, age eleven.', '"Come back, or there is no ending."'] },
+        ] },
+      { if: 'said penny_quote flag n_dawn', once: true,
+        say: ['Remember my quote? "Come back, or there is no ending." You came back, so I printed the ending. It sold out by breakfast.',
+          'You came back. I printed the ending. It sold out!'],
+        re: [
+          { t: ['What did the headline say?', 'What was the headline?'],
+            say: ['THE END. And underneath, very small: for now.', 'THE END. Then, small: for now.'] },
+          { t: ['Did you keep me a copy?', 'Did you keep me one?'], tone: 'kind',
+            say: ['One for you. One for the Moth Mask, in case she ever comes by. Under the counter.', 'One for you. One for the Moth Mask.'] },
         ] },
       { if: 'flag n_dawn',
         say: ['HEADLINE: MOON BACK. DRAGON BACK. PENNY PRESS EXTREMELY BACK.', 'HEADLINE: MOON BACK!'],
@@ -2150,10 +2178,18 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['Seventy years I have kept this fire. Tonight I am keeping it for you. Every log.', 'Tonight I keep this fire for you.'],
         re: [
-          { t: ['Want a breath for candles?', 'Want a breath for candles?'], tone: 'silly',
+          { t: ['Want a breath for candles?', 'Want a breath for candles?'], tone: 'silly', then: ['said brynja_candles'],
             say: ['Cheek. ...Yes. Gently, mind. She is a bit nervous tonight.', 'Cheek. Yes. Gently. She is nervous.'] },
           { t: ['Is the old girl all right?', 'Is the Hearth all right?'], tone: 'kind',
             say: ['Hungry and jumpy. She knows something is wrong up there. So do the logs.', 'Hungry and jumpy. She knows.'] },
+        ] },
+      { if: 'said brynja_candles flag n_dawn', once: true,
+        say: ['That little breath you gave her kept her going the whole Long Night. Do not tell her I said little.', 'Your little breath kept her going. Shh.'],
+        re: [
+          { t: ["It wasn't little.", "It wasn't little."], tone: 'brave',
+            say: ['No. It was not. Cheek.', 'No. It was not. Cheek.'] },
+          { t: ['Can I give her another one?', 'Can I give her another?'],
+            say: ['Gently. She is still a bit spoilt from the last one.', 'Gently. She is still spoilt.'] },
         ] },
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: ['The sun came up over the Hearth this morning and the whole town cheered. The fire cheered too. I heard it.', 'The sun came up! Even the fire cheered.'],
@@ -2175,6 +2211,15 @@ people({
     // ---------------------------------------------------------------- Captain Brann, the Hearthwardens
     // Loud, brave, afraid of moths. Sir Knut's patrol came home (Act III). Gunnar is still a snowman.
     f_brann: [
+      // the Mayor told the town (said toast_scared: Ash told her it was all right not to be fine)
+      { if: 'said toast_scared !flag n_dawn', once: true,
+        say: ['The Mayor stood up in the square and said she was terrified! Then everybody said they were too! Best town meeting we ever had!', 'The Mayor said she was scared. So did everyone!'],
+        re: [
+          { t: ['Did you say it too?', 'Did you say it too?'],
+            say: ['I said I was cautiously concerned. Loudly. ...I was terrified.', 'I said "concerned". I was terrified.'] },
+          { t: ['Does everyone feel better?', 'Does everyone feel better?'], tone: 'kind',
+            say: ['Much! We are all terrified together! It is very cosy!', 'Much! Scared together. Cosy!'] },
+        ] },
       { if: { all: ['!flag n_dawn', { any: ['flag n5_hush', 'choice m_hush=free'] }] },
         say: ["They say the white moth from the Dreadgate is on your side now. Is that true? I've moved my bed into the barracks.", 'Is the white moth your friend now? I moved my bed.'],
         re: [
@@ -2316,7 +2361,7 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ['Everything is fine! The Hearth is fine! The moon is... not fine. I am fine! Why is my voice so high?', 'Everything is fine! Except the moon!'],
         re: [
-          { t: ["It's all right not to be fine.", "It's okay not to be fine."], tone: 'kind', f: 0.75,
+          { t: ["It's all right not to be fine.", "It's okay not to be fine."], tone: 'kind', f: 0.75, then: ['said toast_scared'],
             say: ["Is it? ...Oh. Oh, that's a relief. I'm terrified.", 'Is it? Oh, good. I am terrified.'] },
           { t: ['Your voice is fine, Mayor.', 'Your voice is fine.'],
             say: ['Thank you! It is very fine. It is just higher.', 'Thank you! Just higher.'] },
@@ -2543,7 +2588,7 @@ people({
         re: [
           { t: ["What's the knot for scared?", "What's the scared knot?"],
             say: ['This one. It holds better than all the others. Funny, that.', 'This one. It holds best. Funny.'] },
-          { t: ['Tie one for Mom.', 'Tie one for Mom.'], tone: 'kind',
+          { t: ['Tie one for Mom.', 'Tie one for Mom.'], tone: 'kind', then: ['said rowan_mom'],
             say: ['I did. It means "he will be fine". It is a very tight knot.', 'I did. It means "he will be fine".'] },
         ] },
       { if: 'flag n_dawn',
@@ -2615,7 +2660,7 @@ people({
         re: [
           { t: ['Why do you miss them?', 'Why miss them?'],
             say: ["They sat on my lamp. Somebody to talk to. Don't tell Squint.", 'They sat on my lamp. Shh.'] },
-          { t: ["I'll send one back for you.", "I'll send one back."], tone: 'kind',
+          { t: ["I'll send one back for you.", "I'll send one back."], tone: 'kind', then: ['said ned_moth'],
             say: ["Don't you dare. ...A small one.", "Don't you dare. ...A small one."] },
         ] },
       { if: 'flag n_dawn choice n_end=moth',
@@ -2625,6 +2670,8 @@ people({
             say: ['Nyx. Hm. She can stay, then. Only her. And only on the lamp.', 'Hm. She can stay. On the lamp.'] },
           { t: ['Do you talk to her?', 'Do you talk to her?'],
             say: ['Every night. She does not talk back. Best friend I ever had.', 'Every night. She does not talk back. Good.'] },
+          { t: ['I said I would send one.', 'I said I would.'], if: 'said ned_moth', tone: 'silly',
+            say: ['So you did. I said a small one. ...She is very small. Good.', 'I said small. She is small. Good.'] },
         ] },
       { if: 'flag n_dawn',
         say: ["The lamp's got moths on it again. Three of them. I'm not complaining. Yes I am.", 'Three moths are back. I am complaining.'],
