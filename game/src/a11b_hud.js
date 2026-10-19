@@ -166,6 +166,7 @@ function drawBanner(){
   const nq=G.bannerQ?G.bannerQ.length:0;
   if(nq&&!bn.hurry&&bn.style!=='boss'){ bn.hurry=true; bn.dur=Math.max(bn.t+0.8,Math.min(bn.dur,Math.max(2.6,bn.dur*0.65))); }
   const a=clamp(Math.min(bn.t/0.25,(bn.dur-bn.t)/0.5),0,1); if(a<=0) return;
+  if(bn.style==='welcome'){ drawWelcome(bn,a); return; }   // (v11 FIXW3) the plate a loaded save opens with
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.lineJoin='round';
   // (on a phone the boss bar sits up top, under the goal: other news goes a little lower then)
   const bossTop=usingTouch&&W<720&&G.boss&&!G.boss.dead;
@@ -322,7 +323,7 @@ function coachTick(){
   if(!G.flags.coach) return null;
   // it waits while a banner, a chapter card or a talk is up, and for the quest news that is about to come
   const card=COACH.card||(COACH.card=document.getElementById('card'));
-  const busy=scene!=='play'||!!G.banner||!!G.fishing||SK.hintEnd>G.time&&tipOn('skills')||!!(card&&card.classList.contains('on'))||G.timers.some(tm=>tm.fn===questUpdated&&tm.t<4);
+  const busy=scene!=='play'||!!G.banner||!!G.fishing||SK.hintEnd>G.time&&tipOn('skills')||!!(card&&card.classList.contains('on'))||G.timers.some(tm=>(tm.fn&&tm.fn.qlOrig||tm.fn)===questUpdated&&tm.t<4);
   if(COACH.id){
     const T=COACH_TIPS.find(t=>t[0]===COACH.id);
     if(!busy) COACH.shown+=dt;
@@ -462,6 +463,8 @@ function drawTouch(){
 //   only (a2e_interiors.js, and here for floors) and gone the moment Ash walks out.
 // Banners also wait out talks and menus (drawBanner) and the counter chip is gone (drawBanner).
 const BNR={g:null,goal:'',seen:new Map(),hold:[],fightT:-99,base:null,plate:null,last:0};
+// (v11 FIXW3) the quiet load (see "a quiet load" below)
+const QL={on:false,loading:false,g:null,t0:0,inT:0,items:[],plate:null,durSet:0};
 const BN_QUEST=/^(Quest updated|Story quest|New side quest|New errand|Quest complete|Errand done|A new page in the Case Book!|A new page!|New clue!|Solved!)$/;
 function bnCore(s){ return String(s==null?'':s).replace(/\s*\(leave here first\)\s*$/i,'').trim(); }
 function bnQuesty(t,style){
@@ -481,6 +484,8 @@ function bnShow(text,sub,dur,style,t,s,q){
 }
 { const base=setBanner; BNR.base=base; setBanner=function(text,sub,dur,style){
     if(!G) return base(text,sub,dur,style);
+    // (v11 FIXW3) a save catching up on load says nothing now (see "a quiet load" below)
+    if(qlCtx()) return qlCatch(text,sub,style,'banner');
     if(BNR.g!==G) bnReset();
     style=style||'';
     const t=simplify(String(text==null?'':text)), q=bnQuesty(t,style);
@@ -503,6 +508,7 @@ function bnShow(text,sub,dur,style,t,s,q){
 // every frame (from drawBanner): fights hold quest news back, a calm moment lets it out, the plate keeps to its room
 function bnTick(){
   if(!G) return; if(BNR.g!==G) bnReset();
+  qlTick();
   const now=G.time, dt=clamp(now-(BNR.last||now),0,0.1); BNR.last=now;
   const fight=bnFight(); if(fight) BNR.fightT=now;
   if(fight){
@@ -536,6 +542,117 @@ function drawPlate(){
   for(const s of [-1,1]){ ctx.save(); ctx.translate(W/2+s*(tw/2+12),y+h/2+1); ctx.rotate(Math.PI/4); ctx.fillStyle='#e8a43a'; ctx.fillRect(-2.6,-2.6,5.2,5.2); ctx.restore(); }
   ctx.restore();
 }
+// ================= (v11 FIXW3) a quiet load
+// An old save caught itself up on load (Act I became complete, a quest the save lacked was started and walked to its
+// end, moves became powers, points came back) and said so in a pile of banners and a chapter card, one after another
+// for about half a minute (Toby's save: Journey resumed, Act I complete, Story quest, Your moves are powers now, Meteor
+// Slam became a power..., The story continues!). Now what comes out of the load itself is caught: what loadGame (and
+// every module's wrapper of it) does, what the first frames after it do (stage hooks, a quest the save lacked), what
+// those schedule with later(), and what that schedules in turn, up to 6 s after the load. Quest news, region names and
+// cards are dropped (the goal list, the minimap and the Journal have them); anything else is news, and the two that
+// matter most (story news first) are folded into one calm "Welcome back" plate with the chapter, which stands in for
+// the old "Journey resumed". Everything caught still goes to the Log. A banner the player causes after the load (a
+// chest, a talk, a door) is not caught and shows as always (the plate makes way for it). A new journey is not a load:
+// its opening banners and the Chapter card are untouched.
+const QL_EARLY=0.6, QL_CAP=6;
+function qlCtx(){
+  if(!QL.on||!G) return false;
+  if(QL.loading) return true;
+  if(G!==QL.g) return false;
+  const el=G.time-QL.t0;
+  return el<=QL_CAP&&(QL.inT>0||el<QL_EARLY);
+}
+function qlCatch(text,sub,style,kind){
+  const t=simplify(String(text==null?'':text)), s=sub?simplify(String(sub)):'';
+  style=style||'';
+  const card=kind==='card', jr=!card&&s===simplify('Journey resumed');
+  QL.items.push({kind,text:t,sub:s,style,q:!card&&bnQuesty(t,style),jr});
+  if(!jr) try{ logAdd(card?{k:'banner',text:`${t}: ${s}`,sub:'',key:'card:'+t+s}:{k:'banner',text:t,sub:s,style,key:'b:'+bannerKey(t)}); }catch(e){}
+  return bnStub(t,s);
+}
+// a save is loaded (startStory with a save in the slot): catch what the load says, then open with the plate
+{ const base=startStory; startStory=function(fromSave){
+    let s=null; try{ s=fromSave?slotSave(curSlot):null; }catch(e){}
+    if(!(s&&s.v===3)){ QL.on=false; return base(fromSave); }
+    Object.assign(QL,{on:true,loading:true,g:null,t0:0,inT:0,items:[],plate:null,durSet:0});
+    try{ base(fromSave); } finally{ QL.loading=false; }
+    if(!G||G.mode!=='story'){ QL.on=false; return; }
+    QL.g=G; QL.t0=G.time; qlPlate();
+  }; }
+// what the load schedules is part of the load: the timer carries the mark, and so does what it schedules in turn
+{ const base=later; later=function(t,fn){
+    if(typeof fn!=='function'||!qlCtx()) return base(t,fn);
+    const f=fn; fn=function(){ QL.inT++; try{ return f.apply(this,arguments); } finally{ QL.inT--; } }; fn.qlOrig=f;
+    base(t,fn); const tm=G.timers[G.timers.length-1]; if(tm&&tm.fn===fn) tm.ql=1;
+  }; }
+// a chapter card the load brings ("Act I complete") is said by the plate's chapter line instead
+{ const base=showCard; showCard=function(num,name){ if(G&&qlCtx()){ qlCatch(num,name,'','card'); return; } return base(num,name); }; }
+function qlPlate(){
+  let ch='', rg='';
+  try{ ch=stageLabel()||''; }catch(e){}
+  try{ rg=regionAt(player.x,player.y).name||''; }catch(e){}
+  const b=BNR.base('Welcome back',[ch,rg].filter(Boolean).join(' · '),3.4,'welcome'); if(!b) return;
+  b.news=null; b.newsT=0; QL.plate=b; QL.durSet=b.dur;
+}
+// every frame (bnTick): while the load is still catching up, the plate stays (unless a click let it go or the player's
+// own news is waiting); then the news is folded into it
+function qlTick(){
+  if(!QL.on||QL.loading) return;
+  if(G!==QL.g){ QL.on=false; return; }
+  const el=G.time-QL.t0, P=QL.plate, up=!!P&&G.banner===P;
+  if(up&&P.dur<QL.durSet-0.01) P.skip=true;
+  const pend=el<QL_EARLY||G.timers.some(tm=>tm.ql&&tm.gen===G.gen&&el+tm.t<=QL_CAP);
+  if(pend&&el<=QL_CAP){
+    if(up&&!P.skip&&scene==='play'&&!(G.bannerQ&&G.bannerQ.length)){ P.dur=Math.max(P.dur,P.t+1.2); QL.durSet=P.dur; }
+    return;
+  }
+  QL.on=false; qlFold();
+}
+function qlFold(){
+  const P=QL.plate, items=QL.items; QL.items=[];
+  if(!P||G.banner!==P||P.skip||P.t>=P.dur-0.3) return;   // the plate is gone: the Log has it all
+  const story=[], other=[];
+  for(const it of items){
+    if(it.kind!=='banner'||it.q||it.jr||it.style==='region'||it.style==='place'||it.style==='boss') continue;
+    const line=it.sub||it.text; if(!line) continue;
+    (/\bstory\b/i.test(it.text+' '+it.sub)?story:other).push(line);
+  }
+  const news=[...new Set(story.concat(other))].slice(0,2); if(!news.length) return;
+  P.news=news; P.newsT=P.t; P.dur=Math.max(P.dur,P.t+clamp(2+0.05*news.join(' ').length,4,9)); QL.durSet=P.dur;
+}
+// the plate: "Welcome back" between two gold diamonds, the chapter and the place under it, then the news (it fades in
+// as the plate opens a little taller). A Storybook plum panel or the classic dark one, top centre, clear of the HUD.
+function drawWelcome(bn,a){
+  const nar=W<560, pw=Math.min(W-24,nar?380:500), pad=nar?16:26, tw=pw-pad*2, ts=nar?22:27, lh=nar?18:19;
+  const NF=`500 ${nar?13.5:14.5}px ${UIF}`, CF=`700 ${nar?12.5:13.5}px ${UIF}`;
+  ctx.save(); ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.lineJoin='round';
+  // the news that fits: at most 4 lines (3 on a phone); a piece that would not fit whole is left to the Log
+  const rows=[]; ctx.font=NF;
+  for(const n of bn.news||[]){ const ls=wrapText(n,tw); if(rows.length+ls.length>(nar?3:4)) continue; ls.forEach((l,i)=>rows.push({l,gap:i===0&&rows.length>0})); }
+  const py=Math.round(nar?Math.max(SAFE.t+150,H*0.19):Math.max(SAFE.t+112,H*0.15)-(1-Math.min(1,bn.t/0.3))*6), px=Math.round(W/2-pw/2);
+  const yT=py+14+ts*0.85, yC=yT+23, yD=yC+14, baseH=yD-py;
+  const fullH=rows.length?yD+4+rows.length*lh+rows.filter(r=>r.gap).length*7+13-py:baseH;
+  const k=rows.length?clamp((bn.t-bn.newsT)/0.35,0,1):0, e=k*k*(3-2*k), ph=Math.round(baseH+(fullH-baseH)*e);
+  ctx.globalAlpha=a;
+  if(LOOK.sb) sbPanel(px,py,pw,ph,14);
+  else{ ctx.fillStyle='rgba(14,9,6,.84)'; rr(px,py,pw,ph,12); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.45)'; ctx.lineWidth=1; ctx.stroke(); }
+  ctx.font=`600 ${ts}px ${TF}`; ctx.fillStyle=LOOK.sb?SBC.cream:'#f6e9d6'; ctx.fillText(bn.text,W/2,yT);
+  const ttw=ctx.measureText(bn.text).width;
+  for(const s of [-1,1]){ ctx.save(); ctx.translate(W/2+s*(ttw/2+17),yT-ts*0.3); ctx.rotate(Math.PI/4); ctx.fillStyle='#e8a43a'; ctx.fillRect(-3,-3,6,6); ctx.restore(); }
+  // the chapter and the place (the place goes first when both do not fit)
+  ctx.font=CF; let c=bn.sub; while(ctx.measureText(c).width>tw&&c.includes(' · ')) c=c.slice(0,c.lastIndexOf(' · '));
+  ctx.fillStyle=LOOK.sb?SBC.gold:'#e8b45a'; ctx.fillText(c,W/2,yC);
+  if(rows.length&&e>0){
+    ctx.save(); ctx.beginPath(); ctx.rect(px,py,pw,ph); ctx.clip(); ctx.globalAlpha=a*e;
+    ctx.strokeStyle=LOOK.sb?'rgba(255,243,214,.32)':'rgba(255,210,150,.28)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-tw*0.32,yD); ctx.lineTo(W/2+tw*0.32,yD); ctx.stroke();
+    ctx.font=NF; ctx.fillStyle=LOOK.sb?'#f6e6c4':'#e8d6b8'; let y=yD+4;
+    for(const r of rows){ y+=lh+(r.gap?7:0); ctx.fillText(r.l,W/2,y-4); }
+    ctx.restore();
+  }
+  ctx.restore();
+  if(usingTouch&&scene==='play'&&bn.t>0.3) HUD_HITS.push({x:px,y:py,w:pw,h:ph,fn:bannerSkip});
+}
+
 // (v11 polish) a level up comes one thing at a time: the Level banner (it already says how many skill points and which
 // key opens Skills, so the first-time "You have N skill points" toast is folded into it), then the queue, then the coach
 function lvQueue(){
@@ -543,7 +660,9 @@ function lvQueue(){
   const lvUp=b=>b&&/^Level \d+$/.test(b.text), lv=lvUp(G.banner)?G.banner:(G.bannerQ||[]).find(lvUp);
   // the Level banner already carries the same words ("+2 skill points ... Press U to open your Skills"): no second box
   if(lv&&String(lv.sub).includes(simplify(skCtrlHint()))){ SK.hintEnd=0; return; }
-  if((scene!=='play'||lv)&&left>9.65) SK.hintEnd=G.time+10;
+  // (v11 FIXW3) it also waits for the Welcome back plate (a loaded save whose points just came back)
+  const wb=G.banner&&G.banner.style==='welcome';
+  if((scene!=='play'||lv||wb)&&left>9.65) SK.hintEnd=G.time+10;
 }
 
 // ================= (v11 polish) short goals
@@ -581,4 +700,4 @@ function simpleText(t){
     for(const q of SIMPLE.tpl){ const m=q.re.exec(t); if(m) return q.s.replace(/\{(\d+)\}/g,(_,i)=>m[+i]!=null?m[+i]:''); } }catch(e){}
   return null;
 }
-window.__ebDbg=Object.assign(window.__ebDbg||{},{bnr:()=>({goal:BNR.goal,hold:BNR.hold.map(h=>[h.text,h.sub]),plate:BNR.plate&&BNR.plate.text,fightT:BNR.fightT}),coach:()=>({id:COACH.id,shown:COACH.shown,flags:Object.keys(G.flags).filter(k=>/^coach/.test(k))}),goalShort:(t,w)=>{ ctx.font=`500 12px ${UIF}`; return goalShort(t,w||300); }});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{ql:()=>({on:QL.on,items:QL.items.map(i=>[i.kind,i.text,i.sub]),news:QL.plate&&QL.plate.news,t:QL.plate&&QL.plate.t,dur:QL.plate&&QL.plate.dur,skip:QL.plate&&!!QL.plate.skip}),bnr:()=>({goal:BNR.goal,hold:BNR.hold.map(h=>[h.text,h.sub]),plate:BNR.plate&&BNR.plate.text,fightT:BNR.fightT}),coach:()=>({id:COACH.id,shown:COACH.shown,flags:Object.keys(G.flags).filter(k=>/^coach/.test(k))}),goalShort:(t,w)=>{ ctx.font=`500 12px ${UIF}`; return goalShort(t,w||300); }});
