@@ -101,11 +101,12 @@ function showDeath(){
     st.innerHTML=`<div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${sh?sh.name.replace(' Shrine',''):'Emberhollow'}</b><span>You will wake at</span></div>`;
     $('#bRetry').textContent='Rise again';
   }else{
-    const key='eb_best_'+diffIdx, best=store.get(key,{wave:0,score:0});
-    const isBest=G.score>best.score; if(isBest) store.set(key,{wave:G.wave,score:G.score});
-    Cloud.submitScore(diffIdx,G.wave,G.score);
+    // a run that used a cheat (v12, v10_art_cheats.js) keeps no best score and posts nothing to the leaderboard
+    const key='eb_best_'+diffIdx, best=store.get(key,{wave:0,score:0}), cheat=!!G.cheated;
+    const isBest=!cheat&&G.score>best.score; if(isBest) store.set(key,{wave:G.wave,score:G.score});
+    if(!cheat) Cloud.submitScore(diffIdx,G.wave,G.score);
     $('#deadTitle').textContent=isBest?'New best!':'Game over';
-    $('#deadMsg').textContent=`You made it to wave ${G.wave} on ${G.diff.name}.`;
+    $('#deadMsg').textContent=`You made it to wave ${G.wave} on ${G.diff.name}.`+(cheat?' Cheats were on, so this score is not kept or posted.':'');
     st.innerHTML=`<div class="stat"><b>${fmt(G.score)}</b><span>Score</span></div><div class="stat"><b>${fmt(G.kills)}</b><span>Enemies defeated</span></div><div class="stat"><b>${G.wave}</b><span>Wave</span></div><div class="stat"><b>${fmt(Math.max(best.score,G.score))}</b><span>Best score</span></div>`;
     $('#bRetry').textContent='Play again';
   }
