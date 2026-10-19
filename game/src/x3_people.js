@@ -866,7 +866,7 @@ B('m_vmag1','id:f_mags',m3pHereV('f_mags'),S(`If you hear a bang from the dock, 
 B('m_vtik1','id:ev_tikka',m3pHereV('ev_tikka'),S(`Lumpy buns! Fresh lumpy buns! Lumpy means love!`,`Lumpy buns! Lumpy means love!`));
 B('m_vjun1','id:juniper',m3pHereV('juniper'),S(`The dunes moved again. I'll redraw them. Again.`,`The dunes moved! I'll redraw them.`));
 B('m_vves1','id:c_vesper',()=>m3pHereV('c_vesper')()&&!m3pPierAll(),S(`Psst. Up here. No, HERE.`,`Psst. Up here!`));
-B('m_vmar1','id:maren',()=>m3pHereV('maren')(),S(`Eat something before you climb. I mean it.`,`Eat something first!`));
+B('m_vmar1','id:maren',()=>m3pHereV('maren')(),S(`Boots laced before you climb. Both of them. I mean it.`,`Lace your boots first!`));
 B('m_vqui1','id:quill',()=>m3pHereV('quill')(),S(`Fascinating. Terrifying. Mostly fascinating.`,`Fascinating! And scary.`));
 // town barks: the wobbly tide, the eclipses, the lamps, the dark nights
 B('m_dw1',M3P_DW,ALWAYS,S(`The tide went out this morning and didn't come back for lunch.`,`The tide went out and didn't come back!`));
@@ -1121,7 +1121,7 @@ const M3P_Q={
     steps:[
       {t:'flag',flag:'m_lamps12',text:S('Relight Sable’s twelve lamps','Light Sable’s twelve lamps'),at:()=>m3pNextLamp()},
       {t:'talk',npc:'m_esme',text:S('Tell Esme the lamps are lit','Tell Esme the lamps are lit'),lines:[m3pL('m_esme',`Twelve. All twelve. Bertha looks very happy. Small Bertha looks smug.`,`All twelve! Bertha is happy. Small Bertha is smug.`),
-        m3pL('m_esme',`Here's my secret: a moth will forget its own name for a lamp. Even a moth as big as a barn. Even a sad one.`,`My secret: a moth forgets everything for a lamp. Even a big sad one.`),
+        m3pL('m_esme',`Here's my secret: a moth will forget its own name for a lamp. Even a very big moth. Even a sad one.`,`My secret: a moth forgets everything for a lamp. Even a big sad one.`),
         m3pL('m_esme',`And my lamplighters have very long poles. When you go up to that Observatory, we're coming too.`,`My lamplighters have long poles. We're coming to the Observatory too!`)],reward:{xp:450,fn:'m_lampsAlly'}}]},
   m_moonfish:{title:S('Gilly and the Moonfish','Gilly and the Moonfish'),giver:'m_gilly',min:'m_coral',ab:'dive',
     offer:[m3pL('m_gilly',`Dragon! Have you heard of the Moonfish? Most beautiful fish in the sea. It glows like the moon. It only comes up when the moon is full.`,`Have you heard of the Moonfish? It glows like the moon!`),
