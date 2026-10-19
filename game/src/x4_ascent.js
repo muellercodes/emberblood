@@ -306,7 +306,7 @@ function n4aTakeFlame(q){
   n4aScene('n_flame_'+q.fid,L?[L]:null,()=>{
     if(n===3){ n4aEmit('flames3',{});
       n4aScene('n_trials_done',[['ember',S("That's all three. Up ahead, there's a shadow sitting on a throne. Don't be fooled. It's only a memory.",'All three! Up ahead is a shadow on a throne. It is only a memory.')],
-        ['ember',S("Memories can't hurt you. ...These ones can, a bit. Be careful, little ember.","Memories can't hurt you. Well. These can. Be careful!")]]); }
+        ['ember',S("Memories can't hurt you. ...These ones can, a bit. Be careful, Ash.","Memories can't hurt you. Well. These can. Be careful!")]]); }
     else n4aBanner(S('A memory flame','A memory flame'),S(`${n} of 3. The Echo Gate stirs.`,`${n} of 3 flames.`),2.2);
   });
   n4aSave();
