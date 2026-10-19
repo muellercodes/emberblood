@@ -75,18 +75,17 @@ chapter({
       ['narr', 'The third ring is winter: black ice, and snow that falls up instead of down. A frozen aurora hangs in the air like a curtain.', 'The third ring is winter. The snow falls UP.'],
       ['narr', "Shadow people stand in the snow, frozen mid-step. They are copies of the people of Hearthold. You know some of those faces.", 'Shadow people stand frozen in the snow. You know some of them.'],
       ['ash', "They're just memories. ...Hi, Brynja. Hi, Brann. Sorry, I can't stop.", 'They are just memories. Hi, everyone!'],
-      ['nyxara', 'Cold is kind, little ember. Cold keeps things. Ask my little cold one.', 'Cold keeps things safe. Ask the ice dragon.'],
+      ['nyxara', 'Up here nothing melts, little ember, and nothing goes away.', 'Up here nothing melts. Nothing goes away.'],
       ['nyxara', 'And the sun is a liar. One day I will put it out.', 'The sun is a liar. I will put it out.', { clue: 'n5_sun_out' }],
     ],
     // Glaciar, freed in Act III (the old "Fly" is "Jump in the wind": wings do not work in the Floe Gap's wind)
     n_glaciar_join: [
       { sfx: 'boom' },
       ['narr', 'CRASH. Something enormous lands on the ice behind you, and the whole ring shakes.', 'CRASH! Something huge lands behind you.'],
-      ['f_glaciar', 'DUMPLING! You are climbing the Moth\'s mountain without a scarf!', 'Dumpling! You have no scarf!'],
-      ['ash', 'Great-great-great-great-great-great-great-great-great-great-great-great-great Grand-aunt Glaciar!',
-        'Great x13 Grand-aunt Glaciar!'],
-      ['f_glaciar', 'Thirteen greats, and not one missed. The whole sea heard you, my little hot cross bun. Go on, then. Jump in the wind. If you fall, I will catch you.',
-        'I heard you. Jump in the wind. If you fall, I will catch you.'],
+      ['f_glaciar', 'Dumpling! You are climbing the Moth\'s mountain without a scarf!', 'Dumpling! You have no scarf!'],
+      ['ash', 'Auntie! You came all this way?', 'Auntie! You came!'],
+      ['f_glaciar', 'I slept through the last war in this family. I am not sleeping through this one. Go on, then. Jump in the wind. If you fall, I will catch you.',
+        'I slept through the last war. Not this one. Jump. I will catch you.'],
       ['f_glaciar', 'I do everything slowly, dumpling, except catching.', 'I am slow. But I catch fast.'],
     ],
     // Glaciar still asleep (beaten in Act III): her scale, and the promise Ash made her (N5S's errand)
@@ -94,7 +93,7 @@ chapter({
       ['narr', "Half buried in the snow lies a single dragon scale, blue as deep ice. It's still cold.", 'A blue dragon scale lies in the snow. It is cold.', { ref: 'n5_ice_scale' }],
       ['ash', "Glaciar's. She's still asleep in the snow on Mount Dread, chains and all.", 'Glaciar is still asleep on Mount Dread.'],
       ['ash', "I told her I'd come back for her. I promised.", 'I promised I would come back for her.', { promise: 'q_n5_glaciar' }],
-      ['ash', "The Snow Mother's Song can wake her. If the moon remembers Hearthold, maybe it remembers the song too.", 'A song could wake her. Who knows one?'],
+      ['ash', "The Snow Mother's Song can wake her. If the moon remembers Hearthold, maybe it remembers the song too.", 'A song could wake her. Maybe the moon knows it.'],
       ['pip', 'Mip!'],
     ],
     nri_scale: [
@@ -103,20 +102,22 @@ chapter({
     // Echo 3: x4_foes plays STORY.n_echo3_intro and STORY.n_echo3_outro (data versions)
     n_echo3_intro: [
       ['narr', 'In a ring of black ice, chained in frost, a shadow dragon raises her head. Her breath is a blizzard.', 'A shadow ice dragon raises her head. She is in chains.'],
-      ['n_echo_glaciar', 'The Mother says cold is kind. The Mother says fire is a lie.', 'The Mother says cold is kind. Fire is a lie.'],
-      ['ash', "That's not you talking, Auntie, that's the Shard. ...A copy of you with a copy of the Shard, I mean. Echoes are confusing.", 'That is the Shard talking. This is confusing!'],
+      ['n_echo_glaciar', 'Cold keeps things, little one. Nothing leaves in the cold.', 'Cold keeps things. Nothing leaves.'],
+      ['ash', 'Cold just stops them.'],
       ['f_glaciar', "Was I really that dreary? Melt those chains, dumpling. I can't bear to look at me.", 'Was I that gloomy? Melt those chains, dumpling!',
         { if: 'choice f_glaciar=free' }],
+      ['ash', "She'd never say that awake. I'm coming back for the real one.", 'The real Glaciar would never say that.',
+        { if: '!choice f_glaciar=free !flag n5_glaciar' }],
     ],
     n_echo3_outro: [
       ['narr', 'The ice cracks, and the shadow dragon shatters into a flurry of moths.', 'The ice dragon breaks into moths.'],
       ['n_memory', 'Auntie Glee! Can we make the big snow? For the sledding?', 'Auntie Glee! Can we make snow for sledding?'],
-      ['n_memory', 'Every year, dumpling. Every single year.', 'Every year, dumpling.'],
+      ['n_memory', 'Every year, little one. Every single year.', 'Every year, little one.'],
       { if: 'choice f_glaciar=free', then: [
         ['f_glaciar', 'I forgot the sledding. A thousand years, and I forgot it. Thank you for reminding me, dumpling.', 'I forgot the sledding. Thank you for reminding me.'],
         ['ash', 'Then we do it every Lantern Day. Sleds and cake.', 'Every Lantern Day. Sleds and cake!'],
       ], else: [
-        ['ash', 'Even ice dragons get lonely, Pip.', 'Ice dragons get lonely too, Pip.'],
+        ['ash', 'She made the snow for Ember every year. Then the Mother made it for herself.', 'She made snow for Ember. Then the Mother took it.'],
         ['pip', 'Mip.'],
       ] },
     ],
