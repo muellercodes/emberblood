@@ -115,7 +115,7 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: [["I'm staying up ALL night to watch for you. Mum says it's already all night. That's not the point.", 'I am staying up all night for you!'],
           ['When I grow up I am going to be a dragon. A dragon who climbs a night mountain. Like you.', 'I want to climb a night mountain too.']] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['You DID it! I saw the moon come back! I was awake! Mostly!', 'You did it! I saw the moon!'] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['You did it! I saw the moon come back! I was awake! Mostly!', 'You did it! I saw the moon!'] },
     ],
 
     wendel: [
@@ -194,7 +194,7 @@ people({
 
     moss: [
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['Moonlilies sleep when the moon does, dearie. All of them. Even the mean ones by the bog.', 'The moonlilies all sleep now.'] },
+        say: ['Moonlilies sleep when the moon does, love. All of them. Even the mean ones by the bog.', 'The moonlilies all sleep now.'] },
       { if: 'flag n_dawn', say: ['The frogs are singing again, every one of them out of tune. I never heard anything so lovely.', 'The frogs sing again!'] },
     ],
 
@@ -285,7 +285,7 @@ people({
       { if: 'quest c_bolt done !flag n_dawn',
         say: ['Bolt keeps barking at the sky. He can smell that something is missing up there.', 'Bolt barks at the sky. Something is missing.'] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['I am building a moon. Out of brass. It will not be the same. It will be LOUDER.', 'I am building a brass moon. A loud one.'] },
+        say: ['I am building a moon. Out of brass. It will not be the same. It will be louder.', 'I am building a brass moon. A loud one.'] },
       { if: 'flag n_dawn', say: ['The real moon is back, so my brass moon is a lamp now. A very loud lamp.', 'My brass moon is a loud lamp now.'] },
     ],
 
@@ -324,7 +324,7 @@ people({
     c_penny: [
       { if: 'flag n5_vesper !flag n_dawn',
         say: ['HEADLINE: MOTH MASK SEEN ON NIGHT MOUNTAIN, HELPING. SUBHEADLINE: PENNY PRESS SAW IT COMING.', 'HEADLINE: MOTH MASK HELPS DRAGON!'] },
-      { if: '!flag n_dawn', say: ['HEADLINE: DRAGON CLIMBS MOUNTAIN OF NIGHT. SUBHEADLINE: PENNY PRESS WAS RIGHT ABOUT EVERYTHING.', 'HEADLINE: DRAGON CLIMBS NIGHT MOUNTAIN!'] },
+      { if: '!flag n_dawn', say: ['HEADLINE: DRAGON CLIMBS MOUNTAIN OF NIGHT. SUBHEADLINE: PENNY PRESS WAS RIGHT ALL ALONG.', 'HEADLINE: DRAGON CLIMBS NIGHT MOUNTAIN!'] },
       { if: 'flag n_dawn', say: ['HEADLINE: MOON BACK. DRAGON BACK. PENNY PRESS EXTREMELY BACK.', 'HEADLINE: MOON BACK!'] },
     ],
 
@@ -415,7 +415,7 @@ people({
     ],
 
     elka: [
-      { if: 'quest f_sled done !flag n_dawn', say: ['Faster than a wolf, Ash! That is how you climb a mountain! FASTER!', 'Faster than a wolf, Ash! FASTER!'] },
+      { if: 'quest f_sled done !flag n_dawn', say: ['Faster than a wolf, Ash! That is how you climb a mountain!', 'Faster than a wolf, Ash!'] },
       { if: '!flag n_dawn', say: ['When you are done, I am sledding down the Night Mother\'s mountain. Dad says no. Dad is not the boss of mountains.',
           'I want to sled down the night mountain!'] },
       { if: 'flag n_dawn', say: ['Dad still says no about the mountain. I am asking again tomorrow.', 'Dad still says no. I will ask again.'] },
@@ -432,7 +432,7 @@ people({
 
     f_toastwhistle: [
       { if: '!flag n_dawn', say: ['Everything is fine! The Hearth is fine! The moon is... not fine. I am fine! Why is my voice so high?', 'Everything is fine! Except the moon!'] },
-      { if: 'flag n_dawn', say: ['Everything is ACTUALLY fine! My voice is still high. That is just how it is now.', 'Everything is really fine now!'] },
+      { if: 'flag n_dawn', say: ['Everything is actually fine! My voice is still high. That is just how it is now.', 'Everything is really fine now!'] },
     ],
 
     f_gunnhild: [
@@ -474,7 +474,7 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: [["I'll be right here at the end of the bridge, with my hammer, in case.", 'I will wait here. With a hammer.'],
           ["Did you eat that sandwich yet? Don't make me come up there.", 'Did you eat the sandwich?']] },
-      { bark: true, if: '!flag n_dawn', say: ['Eat something, Ash!', 'Eat something!'] },
+      { bark: true, if: '!flag n_dawn', say: ['Keep your scarf on up there, Ash!', 'Keep your scarf on!'] },
     ],
 
     quill: [
@@ -532,7 +532,7 @@ people({
 
     m_ned: [
       { if: '!flag n_dawn',
-        say: ['The moths are GONE. Every last one. Flew up the mountain. I hate moths. ...I miss them a bit.', 'The moths all flew away. I miss them a bit.'] },
+        say: ['The moths are gone. Every last one. Flew up the mountain. I hate moths. I miss them a bit.', 'The moths all flew away. I miss them a bit.'] },
       { if: 'flag n_dawn', say: ['One little grey moth came back to my lamp last night. Just one. I let her stay.', 'One little moth came back. I let her stay.'] },
     ],
 
@@ -550,7 +550,7 @@ people({
     ],
 
     m_dusty: [
-      { say: ['Dusty: We are going to surf down the night mountain! Dune: On trays! Dusty: BORROWED trays!', 'We will surf the mountain on trays!'] },
+      { say: ['Dusty: We are going to surf down the night mountain! Dune: On trays! Dusty: Borrowed trays!', 'We will surf the mountain on trays!'] },
     ],
 
     m_rafi: [
@@ -562,7 +562,7 @@ people({
     ],
 
     m_kelp: [
-      { say: ['Pearls for your pockets, dearie. For the mountain. They still do not do anything. They are still lovely.', 'Pearls for your pockets. Still lovely.'] },
+      { say: ['Pearls for your pockets, little dragon. For the mountain. They still do not do anything. They are still lovely.', 'Pearls for your pockets. Still lovely.'] },
     ],
 
     m_rocket: [
@@ -570,7 +570,7 @@ people({
     ],
 
     m_kipper: [
-      { say: ["HALT! Who swims there? ...Oh, it's the hero. Carry on, then, and be careful.", 'HALT! Oh, the hero. Carry on.'] },
+      { say: ["Who swims there? Oh, it's the hero. Carry on, then, and be careful up on that mountain.", 'Oh, the hero. Carry on. Be careful.'] },
     ],
   },
 })
