@@ -129,7 +129,7 @@ Object.assign(QDEFS,{
         xl('minnow',`He's not a fish, he's a king. He races anyone who walks on his lake. If you beat him, he teaches you the Royal Skip. Dad says that's a story. Dad says a lot of things.`,`He's a king! Beat him in a race and he teaches you the Royal Skip.`));
       return L; },
     steps:[
-      {t:'flag',flag:'a1_skim_met',text:S('Walk out to the Lake King’s big ripples in the north of Lake Mirrow','Walk out to the big ripples on Lake Mirrow.'),at:'lm:rc_lakeking'},
+      {t:'flag',flag:'a1_skim_met',text:S('Walk out to the Lake King’s big ripples, far out on Lake Mirrow','Walk out to the big ripples on Lake Mirrow.'),at:'lm:rc_lakeking'},
       {t:'flag',flag:'a1_skim_won',text:S('Race the Lake King around Lake Mirrow: through all seven rings of light, then back to his ripples (talk to the ripples to start)','Race the Lake King! Swim through seven rings. Talk to the ripples to start.'),at:'lm:rc_lakeking',reward:{abil:'skimmer'}},
       {t:'talk',npc:'minnow',text:S('Show Minnow your new skip on the Brindlecross dock','Show Minnow your new skip.'),give:{a1_skipstone:1},
         lines:[xl('minnow',`You did the ROYAL SKIP! Dad! DAD! He did the Royal Skip!`,`You did the ROYAL SKIP! Dad! DAD!`),

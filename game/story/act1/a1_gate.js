@@ -155,9 +155,9 @@ quest({
     a1_griz_outro: [
       ['griz', 'The Oath... paid in gold... and somebody in your village... opened the gate...', 'The Oath paid... someone in your village opened the gate...', { ref: 'north_gate' }],
       ['ash', 'Somebody in Emberhollow? Who?', 'Someone from home? Who?'],
-      ['voice', "Little ember. I can smell Ember's blood on you. Come to the mountain, child.", 'Little ember. Come to the mountain.'],
-      ['ash', 'Okay. That is extremely creepy.'],
-      ['yara', '(through the shrine stone) Go east to Brindlecross, Ash. Sister Wren keeps the old library there.', '(far away) Go east to Brindlecross. Find Sister Wren.', { dir: ['warcamp', 'brindlecross', 'east'] }],
+      ['voice', 'Little ember. I can smell her fire on you. My fire. Come up the mountain, child, and bring it home.', 'Little ember. You have my fire. Come up the mountain and bring it home.'],
+      ['ash', '...Yara? Did you hear that?', 'Yara? Did you hear that?'],
+      ['yara', '(through the shrine stone) I heard him. Go east to Brindlecross, Ash. Sister Wren keeps the old library there.', '(far away) I heard. Go east to Brindlecross. Find Sister Wren.', { dir: ['warcamp', 'brindlecross', 'east'] }],
     ],
     a1_morrow_outro: [
       ['voice', 'Morrow served me well. You will serve me better. Keep climbing, little ember.', 'Keep climbing, little ember.'],
@@ -175,8 +175,8 @@ quest({
       ['yara', "Ash. Grizzlefang said somebody in Emberhollow opened the gate for them. I can't stop thinking about it.", 'Grizzlefang said someone here opened the gate.', { ref: 'north_gate' }],
       ['yara', "Kobolds can't pick locks. They don't have the thumbs for it.", 'Kobolds cannot pick locks. No thumbs.'],
       ['ash', 'So who opened it?'],
-      ['yara', "That's what you're going to find out. Look at the North Gate. Ask around. Keep your eyes open.", 'Look at the gate. Ask around.', { ref: 'north_gate' }],
-      ['yara', 'Put what you find in your Case Book. Then think. Thinking is free.', 'Use your Case Book. Then think!'],
+      ['yara', "That's what you're going to find out. Look at the North Gate, and ask around.", 'Look at the gate. Ask around.', { ref: 'north_gate' }],
+      ['yara', "Put what you find in your Case Book. It's somebody we know, Ash. Somebody who waves at you in the street.", "Use your Case Book. It's someone we know."],
     ],
     a1_gate_look: [
       ['narr', 'The North Gate hangs open. Its big padlock dangles from a hook on the post.', 'The gate hangs open. The lock dangles.', { ref: 'north_gate', fact: 'north_gate=broken', if: '!flag a1_gate_solved' }],
@@ -430,7 +430,19 @@ quest({
 // ================= act-wide talk that starts the two small mysteries (A2S's people() call)
 people({
   id: 'a1_people', act: 1,
+  // (v11) after the Broodmother's "Are you sure you're not mine?", the next time Ash talks to Mom
+  scene: {
+    a1_mom_fear: [
+      ['maren', "You've gone quiet. You never go quiet. What is it?", "You're quiet. That's not like you. What is it?"],
+      ['ash', "Mom, is my fire Grandpa's? He asked me if I'm sure I'm not his.", "Is my fire Grandpa's? He says I might be his."],
+      ['maren', 'Half of it was. Then Ember gave it away. Given is different, Ash.', 'Half was his. Ember gave it away. Given is different.'],
+      ['narr', 'She holds on to your hand a little longer than she needs to.', 'She holds your hand a little longer.'],
+    ],
+  },
   talk: {
+    maren: [
+      { if: 'event boss_done:broodmother !flag act1_done', once: true, scene: 'a1_mom_fear' },
+    ],
     hal: [
       { if: 'stage>=lore !quest a1_hat active !quest a1_hat done', once: true, option: ['Heard anything about Sir Strawsworth?', 'About the scarecrow...'],
         say: ["His hat rattles when the wind blows. Something's in there. I've never checked. He looks like he'd mind.", 'His hat rattles! I never checked.'],
