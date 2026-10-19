@@ -7,7 +7,7 @@
 // What the player does: walks onto the summit; Nyxara unfolds off the moon and fights in four phases; when she
 // swallows the last piece of the moon, everything goes black and the Ember Heart floats up, and Ash holds the breath
 // key while the friends' voices fill its seams (Vesper or Juniper, Glaciar or Elka or Tove, Hush or Quill, then Mom and
-// the Act I ending) until Pip says his first word. Heartfire breaks her cracks. She falls holding the last sliver of
+// the Act I ending) until Pip, the one who stayed, says his first word. Heartfire breaks her cracks. She falls holding the last sliver of
 // moon. The friends she hurt speak for her, Ash calls her Nyx, and the final choice shows all three endings: the moth
 // one locked, with the first reason that holds, until her name, the plan and two of those friends are there.
 chapter({
@@ -35,14 +35,13 @@ chapter({
     // ---- her fight's intro (STORY.bosses.n_nyxara.intro reads STORY.n_nyxara_intro): 8 lines
     n_nyxara_intro: [
       { cam: 'n4_summit', s: 1.5 },
-      ['narr', 'Something enormous is folded over the edge of the broken moon, like a blanket over a lamp. It unfolds: wings as wide as the village green, grey and soft as dust, with two pale moons painted on them.', 'Something huge unfolds off the moon. A moth as big as a house!'],
+      ['narr', 'Something enormous is folded over the edge of the broken moon, like a blanket over a lamp. It unfolds: wings as wide as the village green, grey and soft as dust, with two pale moons painted on them.', 'Something huge unfolds off the moon. Grey wings with two pale moons.'],
       ['nyxara', "There you are, little ember. Look how big you've grown.", 'There you are, little ember. How big you are.'],
-      ['ash', 'Are you... my great-great-great...', 'Are you my great-great-great...'],
-      ['nyxara', 'No.'],
-      ['ash', 'Oh, thank goodness.', 'Oh, good.'],
+      ['ash', "You've been watching me.", 'You have been watching me.'],
+      ['nyxara', 'Every night, dear. I watch everyone, right up until they leave.', 'Every night. Until they leave.'],
       ['nyxara', "And you brought me your heart, whole again. Your mother did such lovely work. A cracked heart can't burn, you see. A whole one can.", 'You brought me the Heart. Whole again. Now it can burn.'],
       ['nyxara', 'Give it to me, and the night will never end, and nobody will ever have to say goodbye again.', 'Give it to me. Then nobody ever says goodbye.'],
-      ['ash', "That's not a night. That's a really long nap with no breakfast. Give the moon back.", 'That is a long nap with no breakfast. Give the moon back!'],
+      ['ash', "I'm not giving you the Heart. Give the moon back.", 'I will not give you the Heart. Give the moon back!'],
     ],
     n_trans12: [
       ['nyxara', 'Enough of the floor. Let the sea come up and tuck you in.', 'No more floor. Let the dark sea come up.'],
@@ -82,10 +81,10 @@ chapter({
     n_seam_1: [
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
         { do: ['emit n4fx:voice:f_glaciar'] },
-        ['f_glaciar', 'Cold keeps things, she says. Warm GIVES things. Give, dumpling.', 'Cold keeps things. Warm gives things. Give, dumpling!'] ],
+        ['f_glaciar', 'I slept through the last time this family needed me, dumpling. Not this time. Breathe!', 'I slept last time. Not this time. Breathe, dumpling!'] ],
         else: [{ if: 'quest f_sled done', then: [
         { do: ['emit n4fx:voice:elka'] },
-        ['elka', 'Faster than a wolf, Ash! FASTER!', 'Faster than a wolf, Ash!'] ],
+        ['elka', 'Faster than a wolf, Ash! Like on the sleds!', 'Faster than a wolf, Ash!'] ],
         else: [
         { do: ['emit n4fx:voice:tove'] },
         ['tove', "Ash! I rode in your fire all through Frostreach. It's still in there. I can feel it. Breathe!", "I rode in your fire. It is still there. Breathe!"] ] }] },
@@ -94,7 +93,7 @@ chapter({
       { if: { any: ['flag n5_hush', 'choice m_hush=free'] }, then: [
         { do: ['emit n4fx:voice:f_hush'] },
         ['narr', "A soft white light settles on your shoulder. Hush. For once, she doesn't say shhh.", 'Hush lands on your shoulder. She does not say shhh.'],
-        ['f_hush', '...Hold on, little ember. Hold on.', 'Hold on.'] ],
+        ['f_hush', 'Hold on, loud one. Hold on.', 'Hold on, loud one.'] ],
         else: [
         { do: ['emit n4fx:voice:quill'] },
         ['quill', "The moon always comes back, Ash. I have measured it every month since I was your age. It's the most reliable thing I know.", 'The moon always comes back. I measured it.'] ] },
@@ -102,7 +101,8 @@ chapter({
     // the core: Mom, Tikka's window lantern (if she stayed home, Act I), then the Act I ending
     n_seam_3: [
       { do: ['emit n4fx:voice:maren'] },
-      ['maren', "Ash! I can feel it from here. Don't you dare go out. You still haven't eaten your sandwich.", "Ash! Don't you go out! You did not eat your sandwich!"],
+      ['maren', "Ash! I can feel it from here. The lantern's still lit in my window.", 'Ash! My lantern is still lit in the window.'],
+      ['maren', "Don't you dare go out. You haven't even eaten your sandwich.", "Don't you go out! You did not eat your sandwich!"],
       { if: 'flag tk_come=home', then: [
         { do: ['emit n4fx:voice:ev_tikka'] },
         ['narr', 'Far, far away in Embermere, in one small window, a lantern is burning. Tikka promised.', "Far away, Tikka's lantern burns in her window."] ] },
@@ -117,24 +117,25 @@ chapter({
         ['iska', 'Sixth Warden. We felt the dark from our Ward-fires. We came.', 'Sixth Warden. We felt the dark. We came.'],
         ['bram', 'And we came to SHOUT! BREATHE, kid!', 'BREATHE, kid!'],
         { do: ['emit n4fx:voice:vor'] },
-        ['vor', '...Breathe from your belly, hatchling. Not your nose.', 'Breathe from your belly, little one.'] ],
+        ['vor', 'Breathe from your belly, hatchling. Not your nose.', 'Breathe from your belly, little one.'] ],
         else: [{ if: 'choice ending=heir', then: [
         { do: ['emit n4fx:heart_belly', 'emit n4fx:voice:ash'] },
         ['narr', 'The fire you took from Grandpa, the fire that once made you huge, wakes up deep in your belly.', 'The big fire you once had wakes up in your belly.'],
-        ['grandpa', '(very far away, from a birdcage in a bakery) You call THAT a flame? Pathetic. Do it BIGGER.', '(far away) Is that a flame? Do it BIGGER!'],
+        ['grandpa', "(very far away, from the warm shelf above Bertram's oven) You call that a flame? Do it BIGGER.", '(far away) Is that a flame? Do it BIGGER!'],
         ['ash', 'Thanks, Grandpa.'] ],
         else: [
         { do: ['emit n4fx:voice:ember'] },
-        ['ember', 'Little ember. Do what my father taught me: breathe from your belly, not your nose.', 'Little ember. Breathe from your belly.'] ] }] }] },
+        ['ember', 'Ash. Do what my father taught me. Breathe from your belly, not your nose.', 'Ash. Breathe from your belly.'] ] }] }] },
     ],
     n_heart_end: [
       ['narr', "The Heart flickers. It's almost there.", 'The Heart flickers. Almost!'],
       { if: 'flag pip', then: [
         { do: ['emit n4fx:heart_pip'] },
-        ['narr', 'Then Pip climbs up your arm, puffs out every single scale, and says, very loudly, the first word Pip has ever said.', 'Then Pip climbs up your arm. Pip says a word for the very first time.'],
+        ['narr', 'Then Pip climbs up your arm, the way he has every single day since he hatched, and puffs out every scale.', 'Then Pip climbs up your arm, like every day since he hatched.'],
+        ['nyxara', 'That one stayed.'],
         ['pip', 'ASH!', { do: ['emit n4fx:heart_word'] }],
         { do: ['emit n4fx:heart_spark'] },
-        ['narr', 'And Pip breathes one tiny spark into the Heart.', 'Pip breathes one tiny spark into the Heart.'] ],
+        ['narr', "Pip's very first word. And with it, one tiny spark, right into the Heart.", "Pip's first word! And one tiny spark goes into the Heart."] ],
         else: [
         ['narr', 'You breathe one last time, from your belly. One tiny spark catches.', 'You breathe one more time. A tiny spark catches.'] ] },
       ['narr', 'The Ember Heart blazes like a sunrise.', 'The Heart shines like the sun!', { do: ['emit n4fx:heart_blaze'] }],
@@ -142,7 +143,7 @@ chapter({
         ['ash', 'Did Pip just... TALK?', 'Did Pip just TALK?'],
         ['pip', 'Mip.'] ] },
       ['nyxara', 'No. No, no, no. That light is MINE!', 'No! That light is MINE!'],
-      ['ash', "It isn't yours. It's ours. Let's finish this.", "It is ours, not yours!"],
+      ['ash', "It was never yours. Nobody gave it to you. Let's finish this.", "It is not yours. Nobody gave it to you!"],
     ],
 
     // ---- after the last crack (x4_story's n4sFall plays n_fall, n_plea and n_choice in one sitting; each piece keeps
@@ -153,7 +154,7 @@ chapter({
       { do: ['emit n4fx:cut_shrink:0.62'] },
       ['narr', 'Nyxara crumples onto the glass, smaller every second. In her claws she holds one last sliver of moon, tight, the way you would hold a blanket.', 'Nyxara falls and shrinks. She holds the last bit of moon tight.', { do: ['emit n4fx:cut_sliver'] }],
       ['nyxara', "Don't. Please. It always leaves. Every morning it goes away. Every month it gets thin. I only wanted it to stay.", 'Please. It always goes away. I only wanted it to stay.'],
-      ['ash', 'My grandpa said "mine" too, about the whole valley. He ended up shut inside a mountain for a thousand years, all by himself.', 'My grandpa said "mine" too. He ended up all alone.'],
+      ['ash', 'My grandpa said "mine" too, about the whole valley. He ended up inside a mountain for a thousand years, all by himself.', 'My grandpa said "mine" too. He ended up all alone.'],
       ['nyxara', 'Everyone leaves, little ember.', 'Everyone leaves.'],
       ['ash', "The moon goes away every morning, and it comes back every night. That's not leaving. That's visiting.", 'The moon goes every morning and comes back every night. That is visiting!'],
     ],
@@ -162,14 +163,14 @@ chapter({
     n_plea: [
       { if: 'solved n5_reach trust friends>=2 item n5_lantern', then: [
         ['c_vesper', "She found me when I was little and alone, and she promised me fire. I know what lonely sounds like. She sounds like that.", 'She found me when I was lonely. I know that sound.', { if: { any: ['flag n5_vesper', 'choice c_vesper=friend'] } }],
-        ['f_glaciar', "I know cold, old moth. Cold doesn't keep anything. It only stops it.", 'I know cold. Cold does not keep things. It stops them.', { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] } }],
-        ['f_hush', "(Hush folds her wings round her mother's claws.) ...Mother. Let go.", 'Mother. Let go.', { if: { any: ['flag n5_hush', 'choice m_hush=free'] } }],
+        ['f_glaciar', "You froze my mountain to keep things, old moth. It kept nothing. It only kept me asleep.", 'Your cold kept nothing. It only kept me asleep.', { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] } }],
+        ['f_hush', "(Hush folds her wings round her mother's claws.) Mother. Let go.", 'Mother. Let go.', { if: { any: ['flag n5_hush', 'choice m_hush=free'] } }],
         ['ash', 'Nyx.'],
-        ['nyxara', '...Nobody has called me that in a thousand years. Not since the girl with the lantern.', 'Nobody has called me that in a thousand years.'],
-        ['ash', 'Ember. My great-times-thirteen grandma. She lit a lantern so you would be warm. I brought you one too.', 'Ember lit a lantern for you. I brought one too.'] ],
+        ['nyxara', 'Nobody has called me that in a thousand years. Not since the girl with the lantern.', 'Nobody has called me that in a thousand years.'],
+        ['ash', 'Ember was sorry she stopped climbing the hill. So I climbed it instead. I brought you a lantern.', 'Ember was sorry she stopped coming. I came instead. I brought a lantern.'] ],
         else: [{ if: 'clue n5_her_name', then: [
         ['ash', 'Nyx.'],
-        ['nyxara', '...Who told you that name? No. You will leave too. Everyone leaves.', 'Who told you that name? Everyone leaves.'] ],
+        ['nyxara', 'Who told you that name? No. You will leave too. Everyone leaves.', 'Who told you that name? Everyone leaves.'] ],
         else: [
         ['narr', "She curls tighter round the sliver of moon. She is too scared to hear a word you say.", 'She holds the moon tight. She is too scared to listen.'] ] }] },
     ],
@@ -188,7 +189,7 @@ chapter({
           locked: ['You have no lantern to give her.', 'You have no lantern.'] },
         { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
           if: 'solved n5_reach item n5_lantern', need: 'trust friends>=2',
-          locked: ['Friends she hurt who are here: {trust:friends}. She needs to hear from two.', 'Her friends here: {trust:friends} of 2.'],
+          locked: ["She won't listen to you alone. The friends she hurt aren't here to speak for her.", 'Her friends are not here to speak for her.'],
           then: ['set n_nyx_done', 'set n_heart_on=0', 'emit n4fx:choose', 'take n5_lantern', 'world n5_green_post moth'],
           say: [
             { do: ['emit n4fx:cut:lantern'] },
@@ -204,7 +205,7 @@ chapter({
         { t: ['End the Long Night for good', 'End the Long Night'], tone: 'brave', v: 'dawn',
           then: ['set n_nyx_done', 'set n_heart_on=0', 'emit n4fx:choose'],
           say: [
-            ['ash', 'No more Long Night. Not for anyone.', 'No more Long Night. For anyone.'],
+            ['ash', "I'm not giving it to you. And there's no more Long Night, for anyone.", 'I will not give it to you. No more Long Night.'],
             { do: ['emit n4fx:cut:breath'] },
             ['narr', 'You breathe Heartfire, gold and silver, the biggest breath of your whole life.', 'You breathe gold and silver fire. Your biggest breath ever.'],
             { do: ['emit n4fx:cut:moths'] },
@@ -219,7 +220,7 @@ chapter({
           say: [
             ['ash', "You can't keep the moon by eating it. But maybe the moon could keep you warm.", "You can't keep the moon by eating it. But it could keep you warm."],
             { do: ['emit n4fx:cut:hold'] },
-            ['narr', 'You hold up the Ember Heart, blazing gold and silver. Then you throw it, as hard as you can, straight up.', 'You hold up the Heart. Then you throw it up, hard!', { do: ['emit n4fx:cut:throw'] }],
+            ['narr', 'You hold up the Ember Heart, blazing gold and silver. Then you give it away: straight up, as high as you can throw.', 'You hold up the Heart. Then you throw it up to the moon, a gift.', { do: ['emit n4fx:cut:throw'] }],
             ['pip', 'MIP?!'],
             { do: ['emit n4fx:cut:catch'] },
             ['narr', "The Heart flies into the empty moon, and the moon catches fire. It isn't a scary fire. It's a lantern fire, warm and orange, like a window when somebody is waiting up for you.", 'The Heart flies into the moon. It glows warm, like a lantern.'],
