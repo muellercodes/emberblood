@@ -69,8 +69,8 @@ chapter({
     f_grumbo_won: [
       ['f_grumbo', 'Okay okay okay! I give up! Mumble can have his lunch back!', 'Okay! I give up! Mumble can have his lunch back!'],
       { if: { any: ['flag f_mumble_ally', 'quest f_mumble done'] }, then: [
-        ['f_mumble', '(squeak) ...thank you.', '(squeak) Thank you.'],
-        ['f_grumbo', '...Sorry, Mumble.', 'Sorry, Mumble.'] ] },
+        ['f_mumble', '(squeak) Thank you.', '(squeak) Thank you.'],
+        ['f_grumbo', 'Sorry, Mumble. Sorry.', 'Sorry, Mumble.'] ] },
     ],
     f_dread_dragons: [
       ['tove', 'Ice statues of old dragons, every one in chains. Don\'t wake the big ones. I mean it.', 'Old dragon statues. Don\'t wake the big ones.'],
