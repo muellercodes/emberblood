@@ -16,7 +16,9 @@ act({
       deduce: ['where_blaze', 'who_saw', 'what_storm', 'how_open', 'snow_mother'],
       herring: ['f3_steamwell', 'f3_bo_points', 'f3_brann_bet', 'f3_lock_sweats', 'f3_the_mother'],
       solved: ['Not a monster. A sleepy ice dragon under a moth\'s spell: Glaciar, the Snow Mother, Auntie Glee.', 'It was Auntie Glee, under a moth spell.'] },
-    // small (A3a, f_pass): what cracked the High Pass open after a hundred years? (a giant moth flew north through it)
+    // small (A3a, f_pass): what cracked the High Pass open after a hundred years? (the white moth flew north through it)
+    // v11: no longer asked (Act II already told the player). It is solved by f_pass's first step and, for old saves,
+    // by the migrate below, so the Case Book shows it closed.
     who_cracked: {
       title: ['What cracked open the High Pass after a hundred years?', 'What cracked the High Pass?'],
       deduce: ['who_cracked'],
@@ -50,6 +52,10 @@ act({
   // engine once at load when it supports act migrate; A2B asked for it in CHANGES.md.)
   // (A3a's three lines are A3a's own list, from CHANGES.md)
   migrate: [
+    // (v11 J5) who_cracked is solved for every save past the pass. In Act III Ulf's note still comes; a save already in a
+    // later act gets it marked read first, so Pebble does not bring an Act III letter in Act IV or V.
+    { if: 'stage>=f_hearth act 3', then: ['solve who_cracked'] },
+    { if: 'act>=4', then: ['set f3_ulf_letter', 'solve who_cracked'] },
     { if: 'stage>=f_maze', then: ['clue f3_moth_flew', 'clue f3_blue_ash', 'clue f3_lintel', 'clue f3_forge_map', 'solve where_blaze'] },
     { if: 'stage>=f_kindle', then: ['clue f3_cold_parts'] },
     { if: 'stage>=f_sky', then: ['clue f3_looking_up', 'clue f3_alarm_rope', 'clue f3_yarn', 'clue f3_chapel', 'clue f3_spyglass', 'solve who_saw', 'solve what_storm',

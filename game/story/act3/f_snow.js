@@ -14,7 +14,7 @@ chapter({
     "It snows in summer. The cold comes over the High Pass by Frostpine Lodge."],
   hint: ['Frostpine Lodge is in the far north-west of Embermere, in the snowy highlands. Ulf will know about the pass.',
     'Go to Frostpine Lodge. Ask Ulf about the pass.'],
-  mom: [["You came home first! Good. Sit down and eat your soup, and THEN go to the Lodge. Scarf.", 'You came home! Eat your soup. Then go to the Lodge.']],
+  mom: [["You came home first! Good. Sit down and eat your soup, and then go to the Lodge. Scarf.", 'You came home! Eat your soup. Then go to the Lodge.']],
 
   // Ulf's hat: the hat key is "Wolf-fur Hat" (x2_story's own hat drawing). A3a ENGINE REQUEST in CHANGES.md: `hat
   // <item>` should unlock and wear the item's `hat` name (today x1pHat only knows Act II's three hats).
@@ -69,11 +69,11 @@ chapter({
       ['pip', 'Mip! (Pip sneezes on a snowflake. It sizzles.)', 'Mip! (Pip sneezes on a snowflake.)'],
       ['narr', "In your pocket, the Shard of the Ember Heart has gone cold. Not cold like a stone. Cold like it's scared of something.",
         'The Shard in your pocket feels cold. Like it is scared.', { if: 'item c_shard1' }],
-      ['ash', "So: go straight to the Lodge, but come home for soup first. I can do both. Soup first.", 'Lodge AND soup. Soup first!', { ref: 'high_pass' }],
+      ['ash', "So: go straight to the Lodge, but come home for soup first. I can do both. Soup first.", 'Lodge and soup. Soup first!', { ref: 'high_pass' }],
     ],
     // at the Lodge (9 lines with Brisket): the split pass, the wings, the sheep, Elka's note, the hat
     f_lodge: [
-      ['ulf', 'Ash! Good, you came. Come here and look at this. LOOK at it.', 'Ash! You came. Look at this!'],
+      ['ulf', 'Ash! Good, you came. Come here and look at this. Look at it.', 'Ash! You came. Look at this!'],
       ['narr', 'Ulf points out of the window. Just west of the Lodge, where the High Pass used to be a wall of ice, a white road climbs into the clouds.',
         'Just west of the Lodge, the wall of ice is gone. A white road climbs up.', { dir: ['frostpine_lodge', 'high_pass', 'west'] }],
       ['ulf', 'A hundred years that pass was shut. Then one night, crack, the ice split right down the middle. Like something big flew through it. Something with wings.',
