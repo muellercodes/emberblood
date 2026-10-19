@@ -190,14 +190,6 @@ chapter({
     // (the epilogue lines for the well, m4_epi_well_stood and m4_epi_well_lid, are A4S's scenes in act4/people.js:
     // the choice at the well and Saffron's talk run the same ones, and an epilogue line is added only once)
   },
+  // (v11 J11b: Saffron's two lines after the eclipse moved to act4/people.js with replies: they came first and had none)
 
-  talk: {
-    // after the eclipse, Saffron tells it the way it happened (once each; then A4S's ordinary talk takes over)
-    m_saffron: [
-      { if: 'flag m4_well=stood', once: true,
-        say: ['You stood right in front of my well and spread your wings at her. I will tell that story until I am a hundred.', 'You stood in front of my well! I will tell everyone.'] },
-      { if: 'flag m4_well=lid', once: true,
-        say: ['We got the lid on, you and me. One candle of moon, safe under a stone. Not bad for a Well-Warden and a dragon.', 'We saved one candle of moon. Together.'] },
-    ],
-  },
 })
