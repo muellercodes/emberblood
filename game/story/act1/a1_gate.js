@@ -441,7 +441,7 @@ people({
   },
   talk: {
     maren: [
-      { if: 'event boss_done:broodmother !flag act1_done', once: true, scene: 'a1_mom_fear' },
+      { if: 'event boss_done:broodmother !flag act1_done', first: true, scene: 'a1_mom_fear' },
     ],
     hal: [
       { if: 'stage>=lore !quest a1_hat active !quest a1_hat done', once: true, option: ['Heard anything about Sir Strawsworth?', 'About the scarecrow...'],

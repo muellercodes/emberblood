@@ -276,4 +276,5 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{j3play:k=>{
   const end=/^end:(\w+)$/.exec(k), path=s=>{ let o=STORY; for(const p of s.split('.')) o=o&&o[p]; return o; };
   const L=end?ENDINGS[end[1]].lines.concat(heartLines(end[1]),EPILOGUE_FMT()):k==='fest'?festIntroLines(false):k==='theft'?theftLines():k==='cliff'?cliffLines():k==='gear'?gearLines():k==='sendoff'?sendOffLines()
     :/^clue:/.test(k)?CLUE_TALK[k.slice(5)]():/^dream:/.test(k)?DREAMS[k.slice(6)].lines():k==='letter'?letterLines():path(k);
-  runDialogue(L,()=>{ scene='play'; }); return Array.isArray(L)?L.length:0; }});
+  runDialogue(L,()=>{ scene='play'; }); return Array.isArray(L)?L.length:0; },
+  j3why:()=>simplify(String(ENDINGS.lantern.why()||''))});
