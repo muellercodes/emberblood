@@ -1,6 +1,7 @@
 // game/story/act4/m_burrows.js (A4a): Act IV, Chapter 3, "The Glass Desert": the Sandworm Burrows.
 // What the player does: goes north from Sable to the Worm Mouth (a ring of quicksand: fly over it, or Blaze it into
-// glass), then down into the Sandworm Burrows (the dungeon stays code; Ember's flame there gives Burrow). Gravelgut,
+// glass), then down into the Sandworm Burrows (the dungeon stays code; Ember's flame there gives Burrow, handed over by
+// the worm king himself, Gravelgut, in a clear moment before the sickness takes him: x3_story's shrine words, v11). Gravelgut,
 // the sick king worm, coughs up what made him sick: a crumb of the MOON (item m_mooncrumb, x3_story's m_burrows_won as
 // today; Old Kiln's side quest m_glaive reads it). Ember's last words in the Burrows now say to go back to Sable FIRST
 // (audit finding 7: the Burrow Gap only opens in chapter 4, after the second eclipse at the Moon Well), and the story
@@ -27,11 +28,12 @@ chapter({
       ['iska', 'A ring of quicksand. Fly over it, or make yourself a glass path with Blaze.', 'A ring of quicksand. Fly over it, or Blaze it into glass.'],
     ],
     // the old STORY.m_burrows_end (the dungeon plays it at its end), replaced in place: Sable first, then the Glasswall
+    // (v11: Iska, not Ember; Ember speaks once in Act IV, at the Mirror Temple)
     m_burrows_end: [
-      ['ember', 'A crumb of the moon. Hold on to it, little ember. Somebody in Sable who works with fire and glass might know what to do with a thing like that.',
-        'A crumb of the moon. Keep it, little ember. Someone in Sable who works with glass will know what to do.'],
-      ['ember', 'Go back to Sable first, little ember. Then under the Glasswall, the way the worms do. My last flame in the east is in the temple beyond it.',
-        'Go back to Sable first. Then go under the Glasswall, like the worms.', { ref: 'm4_gap_sign' }],
+      ['iska', 'A crumb of the moon. Keep it, Ash. Somebody in Sable who works with fire and glass might know what to do with a thing like that.',
+        'A crumb of the moon. Keep it. Someone in Sable who works with glass will know.'],
+      ['iska', "Go back to Sable first. Then under the Glasswall, the way the worms go. There's one more of Ember's flames past it, in a temple.",
+        'Go back to Sable first. Then dig under the Glasswall, like the worms.', { ref: 'm4_gap_sign' }],
       ['narr', 'Step into the warp ring to go back outside.', 'Step in the warp ring to go outside.'],
     ],
   },

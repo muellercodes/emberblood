@@ -2,8 +2,8 @@
 // What the player does: swims east to the Sunken Gate and gets Baron Puffington out of it (the boss and his words stay
 // code: x3_foes defineBoss m_puff; x3_story's m_puff_intro / m_puff_outro; Mags sends bombs by Pebble if Ash has none),
 // dives through the arch under the Reefwall (and, having solved wobbly_tide, says so: it WASN'T the fish), and climbs
-// out on the hot glass beach of the Tideglass Strand. Then the sun goes out: Nyxara comes herself, a moth the size of a
-// house, with Hush big again on her silver thread. She bites the moon, sniffs the air for more moonlight "somewhere
+// out on the hot glass beach of the Tideglass Strand. Then the sun goes out: Nyxara comes herself, the great grey moth
+// with two pale moons on her wings (Kipper's moth: Murmur is merged into her, v11), with Hush big again on her thread. She bites the moon, sniffs the air for more moonlight "somewhere
 // warm, like milk left out" (clue m4_milk_smell for A4b's where_next), and asks for the two Shards: she could squash Ash
 // flat and she ASKS (clue m4_she_asks for A4b's why_three). The deal choice (G.choices.m_deal 'refuse' or 'ask') shows
 // again at eclipse 2 and at the reform (A4b). The eclipse pictures are the look m4a_eclipse (v10_art4a.js).
@@ -30,8 +30,8 @@ chapter({
       text: ['At the eclipse, Nyxara sniffed the air: "More moonlight, east of here. Somewhere warm. Like milk left out."',
         'Nyxara smelled more moonlight to the east. "Like milk left out."'] },
     m4_she_asks: { icon: 'moth', mystery: 'm4_night_mother',
-      text: ['Nyxara could have squashed Ash flat with one wing. She didn\'t. She ASKED him for the two Shards.',
-        'Nyxara could squash Ash flat. She ASKED for the Shards.'] },
+      text: ['Nyxara could have squashed Ash flat with one wing. She didn\'t. She asked him for the two Shards.',
+        'Nyxara could squash Ash flat. She asked for the Shards.'] },
     m4_her_words: { icon: 'heart', mystery: 'm4_night_mother',
       text: ['Nyxara: "The moon leaves me every morning. If I hold it very tight, it can never go." For one second she sounded small.',
         'Nyxara: "The moon leaves me. If I hold it tight, it can never go."'] },
@@ -52,8 +52,8 @@ chapter({
   scene: {
     ref_through: [
       { if: 'solved wobbly_tide', then: [
-        ['ash', "Stuck since Tuesday. And the tide went wobbly a MONTH ago. So it really WASN'T him plugging the sea.",
-          "Since Tuesday! So it was NOT the fish plugging the sea."]] },
+        ['ash', "Ten days stuck, he said. And the tide went wobbly a month ago. So it really wasn't him plugging the sea.",
+          "Only ten days stuck. So it wasn't the fish."]] },
     ],
     ref_beach: [
       ['narr', 'You climb out of the sea onto a beach that crunches. The sand here is half glass. It sparkles, and it is very, very hot.',
@@ -68,9 +68,9 @@ chapter({
       { do: ['set m_eclipse_on', 'world m4_eclipse1 dark'] }, { cam: 'm4_strand', s: 1.2 },
       ['narr', 'Then the light changes. The sun goes out like a lamp being covered.', 'Then the sun goes out, like a covered lamp.'],
       { do: ['world m4_eclipse1 rise'] },
-      ['narr', 'Over the dunes rises a moth the size of a house. Behind her, on a silver thread that goes all the way up into the sky, flies a white moth.',
-        'A moth as big as a house rises. A white moth flies behind her on a silver thread.'],
-      ['ash', "Hush? She's BIG again!"],
+      ['narr', 'Over the dunes rises a moth wider than the beach, grey as dust, with two pale moons painted on her wings. Behind her, on a silver thread that goes all the way up into the sky, flies a white moth.',
+        'A huge grey moth rises, with two pale moons on her wings. A white moth flies behind her.'],
+      ['ash', "Hush? She's big again!"],
       { if: 'choice ending=heir', then: [
         ['nyxara', "A dragon, all grown up. You'll burn so beautifully. Don't mind me. I'm only having a snack.", 'A grown-up dragon. You will burn so well. Just a snack.']],
         else: [
@@ -81,8 +81,8 @@ chapter({
         'Mmm. I smell more moonlight to the east. Like milk left out.', { clue: 'm4_milk_smell', dir: ['m4_strand', 'm4_sable_sign', 'east'] }],
       ['nyxara', "Now, little ember. Give me the two Shards in your satchel, and I'll leave your little valley alone. Forever.",
         'Give me your two Shards. Then I will leave your valley alone. Forever.', { do: ['world m4_eclipse1 eyes'] }],
-      ['narr', "She could squash you flat with one wing. She doesn't. She ASKS.", "She could squash you flat. She doesn't. She ASKS.", { clue: 'm4_she_asks' }],
-      { choose: 'm_deal', ask: ['What do you say?', 'What do you say?'], pick: [
+      ['narr', "She could squash you flat with one wing. She doesn't. She asks.", "She could squash you flat. She doesn't. She asks.", { clue: 'm4_she_asks' }],
+      { choose: 'm_deal', ask: ['Give her the two Shards?', 'Give her the Shards?'], pick: [
         { t: ['No way. Not for a hundred valleys!', 'No way!'], tone: 'brave', v: 'refuse',
           then: [{ journal: ['You told Nyxara "No way", not for a hundred valleys.', 'You told Nyxara "No way".'], key: 'm_deal' }],
           say: [['nyxara', 'Brave. How lovely. Keep them warm for me, then. Everyone comes to me in the end.', 'Brave. Keep them warm for me. Everyone comes to me.',
