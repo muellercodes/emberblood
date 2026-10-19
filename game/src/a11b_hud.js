@@ -610,7 +610,6 @@ function qlTick(){
 }
 function qlFold(){
   const P=QL.plate, items=QL.items; QL.items=[];
-  if(!P||G.banner!==P||P.skip||P.t>=P.dur-0.3) return;   // the plate is gone: the Log has it all
   const story=[], other=[];
   for(const it of items){
     if(it.kind!=='banner'||it.q||it.jr||it.style==='region'||it.style==='place'||it.style==='boss') continue;
@@ -618,7 +617,11 @@ function qlFold(){
     (/\bstory\b/i.test(it.text+' '+it.sub)?story:other).push(line);
   }
   const news=[...new Set(story.concat(other))].slice(0,2); if(!news.length) return;
-  P.news=news; P.newsT=P.t; P.dur=Math.max(P.dur,P.t+clamp(2+0.05*news.join(' ').length,4,9)); QL.durSet=P.dur;
+  const dur=clamp(2+0.05*news.join(' ').length,4,9);
+  if(P&&G.banner===P&&!P.skip&&P.t<P.dur-0.3){ P.news=news; P.newsT=P.t; P.dur=Math.max(P.dur,P.t+dur); QL.durSet=P.dur; return; }
+  // the plate was let go before the news came (a click, or the player's own news came first): it comes back once,
+  // with the news, after whatever is showing now
+  const b=BNR.base('Welcome back',P?P.sub:'',dur,'welcome'); if(b){ b.news=news; b.newsT=0; }
 }
 // the plate: "Welcome back" between two gold diamonds, the chapter and the place under it, then the news (it fades in
 // as the plate opens a little taller). A Storybook plum panel or the classic dark one, top centre, clear of the HUD.
