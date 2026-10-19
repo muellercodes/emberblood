@@ -902,14 +902,6 @@ people({
           { t: ['Your dad says supper is at six.', 'Supper is at six.'], if: 'said ulf_supper', then: ['said elka_supper'],
             say: [['elka', 'Every night! He\'s said that since I was four. ...Tell him I\'m coming. Tell him which six.', 'He always says that. Tell him: which six.']] },
         ] },
-      { if: 'seen sl_offer !quest f_sled done',
-        say: ["Meet me at the Windscour Shrine! First one down to Soren's hill wins. Loser carries both sleds back up.", "Meet me at the shrine! Loser carries the sleds."],
-        re: [
-          { t: ['What do I win?', 'What do I win?'],
-            say: [['elka', 'You won\'t. But if you do, Soren has something for you. He won\'t tell me what.', 'You won\'t. But Soren has a prize.']] },
-          { t: ['Is the wind thing really cheating?', 'Is the wind cheating?'],
-            say: [['elka', 'Totally. That\'s what makes it fun. I\'m going to cheat too. With wax.', 'Totally. I will cheat too. With wax.']] },
-        ] },
       { if: 'stage<f_gap !quest f_sled started',
         say: ["(Elka skids to a stop in a fan of snow. Her goggles are frosted white.) Out of the way! Oh. Sorry, whoever you are! Can't see a thing!", "(Her goggles are frosted.) Sorry! Can't see a thing!"],
         re: [
@@ -1057,8 +1049,6 @@ people({
           { t: ['Where are the other two verses?', 'Where are the others?'],
             say: [['f_tollef', 'NOT IN MY BELL! ASK EIDER IN HEARTHOLD! HE WROTE THEM DOWN! TWICE!', 'ASK EIDER! HE WROTE THEM DOWN!']] },
         ] },
-      { if: 'quest f_song active !flag f_v1', ref: 'f3s_bell',
-        say: ["THE BELL KNOWS THE FIRST VERSE! CLIMB UP TO THE TOP AND I'LL RING IT FROM DOWN HERE! LOUDLY!", 'CLIMB UP TO THE BELL! I WILL RING IT!'] },
       // the white moth hated his bell (said tollef_bell: Ylva hears about it)
       { if: 'flag f_hush_done', fact: 'f3s_hush=gone',
         say: ['THEY SAY THE BIG WHITE MOTH IS GONE! GOOD RIDDANCE! I RANG THE BELL ALL MORNING!', 'THE BIG MOTH IS GONE! I RANG ALL MORNING!'],
@@ -1079,6 +1069,8 @@ people({
           { t: ['Very, very loud.', 'Very loud.'], tone: 'silly',
             say: [['f_tollef', 'WHAT?', 'WHAT?']] },
         ] },
+      { if: 'quest f_song active !flag f_v1', ref: 'f3s_bell',
+        say: ["THE BELL KNOWS THE FIRST VERSE! CLIMB UP TO THE TOP AND I'LL RING IT FROM DOWN HERE! LOUDLY!", 'CLIMB UP TO THE BELL! I WILL RING IT!'] },
       { say: [["WHAT? OH! HELLO! I CAN'T HEAR YOU, I'VE BEEN STANDING NEXT TO A BELL FOR FORTY YEARS!", "WHAT? HELLO! I CAN'T HEAR! TOO MANY BELLS!"],
         ['I RING IT EVERY MORNING! THE FISH HATE IT!', 'I RING IT EVERY MORNING! FISH HATE IT!']] },
       // topics
@@ -1279,8 +1271,6 @@ people({
           { t: ['How late is the post now?', 'How late is it now?'],
             say: [['f_oskar', 'One month and four days. I\'ve stopped counting the hours. That was a hard morning.', 'A month and four days. I stopped counting hours.']] },
         ] },
-      { if: '!flag f_letter_brynja !quest f_song done',
-        say: ["I have a letter for Brynja in Hearthold. An old one. A snowflake stamp. I don't read the post. I only read the outside.", 'I have an old letter for Brynja.'] },
       // his moment
       { if: 'flag f_thaw_f_oskar',
         say: ['Do you write to your mother? Properly? With a stamp?', 'Do you write to your mom? With a stamp?'],
