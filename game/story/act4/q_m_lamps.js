@@ -17,7 +17,7 @@ quest({
 
   clue: {
     m4_esme_secret: { icon: 'lamp', mystery: 'm4_night_mother',
-      text: ["Esme's secret: a moth will forget its own name for a lamp. Even a moth as big as a barn. Even a sad one.",
+      text: ["Esme's secret: a moth will forget its own name for a lamp. Even a great big one. Even a sad one.",
         'A moth forgets everything for a lamp.'] },
   },
 
@@ -74,7 +74,7 @@ quest({
       ['narr', 'The twelfth lamp glows. All over Sable, the sleepy little moths on the well tower open their wings.', 'All twelve glow. The moths wake up.'],
       ['narr', 'They flutter off the tower and settle on the lamps, one by one. They look very happy about it.', 'They fly to the lamps. They look happy.'],
       ['m_esme', 'Twelve. All twelve. Bertha looks very happy. Small Bertha looks smug.', 'All twelve! Small Bertha looks smug.'],
-      ['m_esme', "Here's what I know. A moth will forget its own name for a lamp. Even a moth as big as a barn. Even a sad one.",
+      ['m_esme', "Here's what I know. A moth will forget its own name for a lamp. Even a great big one. Even a sad one.",
         'My secret: a moth forgets everything for a lamp.', { clue: 'm4_esme_secret' }],
       ['m_esme', "And my lamplighters have very long poles. When you go up to that Observatory, we're coming too.",
         'My lamplighters will come to the Observatory too!'],

@@ -179,16 +179,16 @@ people({
       { if: '!flag m_puff_done', fact: 'm4s_sunken_gate=plugged',
         say: ['Baron Puffington is stuck in the Sunken Gate. He called my seahorse a "wet pony". I demanded satisfaction. He laughed.',
           'The Baron called my seahorse a "wet pony"!'] },
-      { say: [['HALT! Who swims there? ...Oh. It\'s you. Carry on. Carefully.', 'HALT! Oh, it is you. Carry on.'],
-        ['I am not afraid of crabs. I am RESPECTFUL of crabs, from the far end of the Shell Hall.', 'I am not scared of crabs. I stay far away.']] },
+      { say: [['Who swims there? Oh. It\'s you, from the well. Carry on. Carefully.', 'Oh, it is you. Carry on.'],
+        ['I am not afraid of crabs. I am respectful of crabs, from the far end of the Shell Hall.', 'I am not scared of crabs. I stay far away.']] },
       { bark: true, say: ["Steady, Lady Bubbles. Steady. Is that a crab? It's a rock. Steady.", 'Is that a crab? A rock. Steady.'] },
     ],
 
     m_kelp: [
-      { if: 'flag m_dolphin', once: true, say: ["How's the Dolphin Kick, dearie? Just the one tail, remember. Not both. You haven't got both.", 'How is the Dolphin Kick? One tail!'] },
-      { say: [["Pearls for your pockets, dearie. They don't do anything. They're just lovely.", 'Pearls for your pockets. Just lovely.'],
+      { if: 'flag m_dolphin', once: true, say: ["How's the Dolphin Kick? Just the one tail, remember. Not both. You haven't got both.", 'How is the Dolphin Kick? One tail!'] },
+      { say: [["Pearls for your pockets. They don't do anything. They're just lovely.", 'Pearls for your pockets. Just lovely.'],
         ['A dragon who breathes under water! Your mother must be so proud. And so confused.', 'A dragon who breathes water! Your mom is proud.'],
-        ["Eat your seaweed, dearie. It's green. Green is good for horns.", 'Eat your seaweed. Good for horns.']] },
+        ["Eat your seaweed. It's green. Green is good for horns.", 'Eat your seaweed. Good for horns.']] },
       { bark: true, say: ['Pearls! Kelp tonic! Hugs! One of those is free!', 'Pearls! Tonic! Hugs!'] },
     ],
 

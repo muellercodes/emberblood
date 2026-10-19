@@ -402,7 +402,7 @@ m3sDef('m_eclipse2',[
 const M3S_PB3=[
   xl('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
   xl('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
-  xl('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
+  xl('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Love, Mom.`),
   m3sIf('maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,()=>!!G.flags.dr_m_moth),
   xl('narr',`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails off west.`)];
 // the Mirror Flats and the Moonpath (6.8b, 6.9b)
@@ -1659,26 +1659,28 @@ if(typeof pebbleLetter==='function'){
     :[xl('fennick',`(a letter) Fennick Wick here, lamp man of Emberhollow. Yara says you need lamps that never go out. I spent my whole life making this oil. Use it for something good. That is all I ever wanted. F.`,`Fennick here. This lamp oil never runs out. Use it for something good. F.`)]});
 }
 if(typeof defineDream==='function'&&typeof DREAMS!=='undefined'){
+  // v11: part two of the first Lantern Day memory (part one is a1l_story2.js, the 'lantern' dream: a little grey moth
+  // lands on the extra lantern). Years later, grown-up Ember doesn't climb the hill, and the moth waits.
   if(!DREAMS.m_moth) defineDream('m_moth',{stages:['m_coral','m_reef'],title:S('The Moth on the Lantern','The Moth on the Lantern'),scene:'moth',lines:()=>[
-    xl('narr',`The first Lantern Day, a thousand years ago. You're Ember, young, on the hill above the valley, with a paper lantern in your claws.`,`The first Lantern Day. You are young Ember with a lantern.`),
-    xl('narr',`A little grey moth flutters out of the dark. She has two pale painted eyes on her wings. She's shivering.`,`A little grey moth flies to you. She is shivering.`),
-    xl('narr',`She lands on your lantern and spreads her wings over the warm paper.`,`She lands on your warm lantern.`),
-    xl('ember_kid',`Oh! Hello. Are you cold?`,`Hello! Are you cold?`),
-    xc('ember_kid',`What do you do?`,`What do you do?`,[
-      xo(`Let her stay on your lantern`,`Let her stay`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`You can stay as long as you like. I'll call you Nyx. Because you came in the night.`,`Stay as long as you like. I will call you Nyx.`)]}),
+    xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth with two pale moons on her wings is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
+    xl('ember_kid',`You came back! If you're going to keep coming back, you need a name.`,`You came back! You need a name.`),
+    xc('ember_kid',`She shivers on the cold post.`,`She shivers on the cold post.`,[
+      xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. I'll call you Nyx, because you come in the night.`,`Sit on mine. I will call you Nyx.`)]}),
       xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. I'll call you Nyx.`,`Your own lantern! I will call you Nyx.`)]}),
-      xo(`Shoo her off gently, lanterns are hot`,`Shoo her off gently`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Careful, little one, you'll singe your wings. ...Fine. Just for a minute. I'll call you Nyx.`,`Careful! Okay, just for a minute. I will call you Nyx.`)]})]),
-    xl('narr',`All night the moth stays. When the sun comes up, she flies off toward the setting moon, looking back three times.`,`She stays all night. In the morning she flies to the moon.`),
-    xl('ember_kid',`Come back next year, Nyx!`,`Come back next year, Nyx!`),
-    xl('narr',`She does. For a while.`,`She does. For a while.`)]});
+      xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. I'll call you Nyx.`,`Careful, it's hot! Fine. Sit here. I will call you Nyx.`)]})]),
+    xl('narr',`Every Lantern Day after that, Nyx is waiting on the hill. Ember grows taller every year. Nyx stays exactly the same size.`,`Every year, Nyx waits on the hill. Ember grows up.`),
+    xl('narr',`Then one year Ember has a baby on her hip and a house full of lanterns. She lights them in her own windows, down in the valley, and she doesn't climb the hill.`,`One year Ember has a baby. She lights lanterns at home. She doesn't climb the hill.`),
+    xl('narr',`Up on the hill, a little grey moth sits on a cold lantern post all night, facing the valley.`,`On the hill, Nyx waits all night by a cold lantern post.`),
+    xl('narr',`In the morning she flies up toward the setting moon, looking back three times.`,`In the morning she flies to the moon. She looks back three times.`),
+    xl('narr',`She waits the next year, too. And the next.`,`She waits the next year too. And the next.`)]});
   if(!DREAMS.m_eclipse) defineDream('m_eclipse',{stages:['m_sable','m_burrows'],title:S('The Night Without Morning','No Morning'),scene:'eclipse',lines:()=>[
     xl('narr',`You dream of a world where the sun never comes up. Not dark. Just grey. The moon is gone. Even the stars look tired.`,`In your dream, the sun never comes up. The moon is gone.`),
     xl('narr',`On the hill above Emberhollow, a girl with horns sits alone, holding a lantern that has gone out.`,`Young Ember sits alone with a lantern that went out.`),
     xl('ember_kid',`It went out. It's never gone out before.`,`It went out. It never went out before.`),
-    xc('ash',`What do you do?`,`What do you do?`,[
+    xl('ember_kid',`I was waiting for somebody. They didn't come.`,`I was waiting for someone. They didn't come.`),
+    xc('ash',`She holds the cold lantern out to you.`,`She holds out the cold lantern.`,[
       xo(`Light it again`,`Light it again`,{tone:'brave',fn:()=>{ G.flags.dr_m_eclipse='light'; },then:[xl('narr',`You breathe on it. Nothing. You breathe harder. A tiny spark catches, and holds.`,`You breathe on it. A tiny spark catches.`)]}),
       xo(`Sit with her`,`Sit with her`,{tone:'kind',fn:()=>{ G.flags.dr_m_eclipse='sit'; },then:[xl('narr',`You sit down beside her. Her shoulder is warm against yours. The lantern flickers back on, all by itself.`,`You sit with her. The lantern lights up by itself.`)]})]),
-    xl('ember',`Listen, little ember. The Heart remembers everyone who was ever kind to you. When it's dark, listen to it.`,`The Heart remembers everyone who was kind to you. Listen to it in the dark.`),
     xl('narr',`You wake up. Your claws are warm. Pip is sitting on your chest, glowing like a nightlight.`,`You wake up. Pip glows on your chest.`)]});
 }
 if(typeof tamsinVerse==='function') tamsinVerse(()=>!!G.flags.m_done,S(`\u{1F3B5} A moth ate the moon, oh, a bite at a time, so Ash dove and dug and made moonfire shine...`,`\u{1F3B5} A moth ate the moon. Ash made moonfire shine...`));
