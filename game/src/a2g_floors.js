@@ -60,6 +60,39 @@ function freeIn(items,W,H,cands,fw,fh){
   return cands[cands.length-1];
 }
 const STAIR_SPOTS=(W,H)=>[[W-70,H*0.72],[70,H*0.72],[W-70,150],[70,160],[W*0.8,H*0.42],[W*0.2,H*0.42],[W*0.65,H*0.8],[W*0.35,H*0.8]];
+// Where Ash steps off a flight he has just come through (v11): clear of its art, a step past its trigger (which reaches
+// his radius + 5), facing away from it. An up flight climbs north, so he comes down it and steps off its foot, south of
+// it, in front of it; a well falls south, so he climbs out over its north rim. Then the sides, then the far end.
+// (Before, an up flight low in a room put him north of its footprint, on top of the flight's rising steps.)
+function stairSteps(x,y,w,h,dir,lid,r){
+  const hw=w/2, hh=h/2, top=dir==='up'?stairZ(h)+6:(lid?16:0), g=r+12;
+  const S={x,y:y+hh+g,f:Math.PI/2}, N={x,y:y-hh-top-g,f:-Math.PI/2}, E={x:x+hw+g,y:y+hh-r,f:0}, Wd={x:x-hw-g,y:y+hh-r,f:Math.PI};
+  return dir==='up'?[S,E,Wd,N]:[N,S,E,Wd];
+}
+// in a room being laid out (room coordinates): is that step on the floor and clear of the furniture?
+function stairStepFree(items,W,H,s,r){
+  if(s.x<r+6||s.x>W-r-6||s.y<34+r+6||s.y>H-r-6) return false;
+  const a=[s.x-r-4,s.y-r-4,s.x+r+4,s.y+r+4];
+  return !items.some(it=>{ if(it.k==='rug'||it.k==='window'||it.k==='painting'||it.k==='portraits'||it.k==='note'||it.k==='trig') return false;
+    const w=(it.w||((it.r||20)*2))+8, h=(it.h||((it.r||20)*2))+8; return a[0]<it.x+w/2&&a[2]>it.x-w/2&&a[1]<it.y+h/2&&a[3]>it.y-h/2; });
+}
+// a stair spot whose flight leaves Ash a free step where he comes off it (the first free spot of them all if none does)
+function stairSpot(items,W,H,dir){
+  const all=STAIR_SPOTS(W,H), good=all.filter(([x,y])=>stairStepFree(items,W,H,stairSteps(x,y,64,56,dir,false,14)[0],14));
+  return freeIn(items,W,H,good.concat(all),70,64);
+}
+// in the built room: is (x,y) a free place to stand? (walls and furniture colliders, the people, the other flights)
+function stairStandFree(A,x,y,r,st){
+  if(x<A.rx+r+2||x>A.rx+A.rw-r-2||y<A.ry+34+r+2||y>A.ry+A.rh-r-2) return false;
+  if(colAt(x,y,r+1)) return false;
+  for(const n of A.npcs||[]) if(dist(x,y,n.x,n.y)<(n.r||14)+r+4) return false;
+  for(const o of A.objs) if(o.k==='stairs'&&o!==st&&!(o.hidden&&!G.found[o.hidden])&&Math.abs(x-o.x)<(o.w||64)/2+r+8&&Math.abs(y-o.y)<(o.h||56)/2+r+8) return false;
+  return true;
+}
+function stairArrival(A,st){
+  const r=(player&&player.r)||14, c=stairSteps(st.x,st.y,st.w||64,st.h||56,st.dir==='up'?'up':'down',!!st.hidden,r);
+  return c.find(s=>stairStandFree(A,s.x,s.y,r,st))||c[0];
+}
 const SONG_SHEETS={h_tilly_up:'sheet1',h_hob:'sheet2',h_library_up:'sheet3'};
 function floorExtras(def,items,put,W,H,rng,wallY){
   const F=FLOORS[def.id]||{};
@@ -69,7 +102,10 @@ function floorExtras(def,items,put,W,H,rng,wallY){
   if(def.floorOf){
     // cellars have no windows; attics keep one; everybody loses the generic rug in a vault
     for(let i=items.length-1;i>=0;i--){ const it=items[i]; if((def.style==='cellar'||def.style==='vault'||def.style==='secretroom')&&it.k==='window') items.splice(i,1); else if(def.style==='attic'&&it.k==='window'&&it.x>W/2) items.splice(i,1); else if((def.style==='cellar'||def.style==='deck')&&it.k==='rug') items.splice(i,1); }
-    put('stairs',W/2,H-56,{dir:def.dir==='up'?'down':'up',to:def.floorOf,w:64,h:56,back:true});
+    // (an upper floor's well sits at the foot of the room, where Ash climbs out over its north rim; a cellar's flight up
+    //  stands a step further in, so there is floor in front of its foot for him to come down onto)
+    const bk=def.dir==='up'?'down':'up';
+    put('stairs',W/2,bk==='up'?H-112:H-56,{dir:bk,to:def.floorOf,w:64,h:56,back:true});
     placeFloorItems(def,items,put,W,H,rng,wallY);
   }
   for(const dir of ['up','down']){
@@ -80,7 +116,7 @@ function floorExtras(def,items,put,W,H,rng,wallY){
       const host=items.find(it=>it.k===({rug:'rug',sack:'sack',counter:'counter',painting:'painting',wall:'cell',shelf:'shelf',barrel:'barrel',bunk:'bunk'}[sec.at])&&(!it.used)&&(sec.at!=='painting'||it.trig||!items.some(q=>q.k==='painting'&&q.trig))&&(sec.at!=='shelf'||it.trig||!items.some(q=>q.k==='shelf'&&q.trig)));
       if(host){ host.used=true; at=sec.at==='rug'?[host.x-host.w/2+40,host.y-host.h/2+30]:sec.at==='painting'||sec.at==='shelf'?[host.x,Math.max(host.y+70,wallY+80)]:sec.at==='counter'?[host.x+60,host.y-52]:[host.x+(host.x<W/2?60:-60),host.y]; put('trig',host.x,host.y+(sec.at==='painting'?40:sec.at==='shelf'?22:0),{label:sec.label,text:sec.text,key:'sec_'+to,to,w:(host.w||60),h:(host.h||40),r:Math.max(host.w||60,host.h||40)/2+6,noCol:true}); }
     }
-    if(!at) at=freeIn(items,W,H,STAIR_SPOTS(W,H),70,64);
+    if(!at) at=stairSpot(items,W,H,dir);
     put('stairs',at[0],at[1],{dir,to,w:64,h:56,hidden:sec?'sec_'+to:null});
   }
   if(F.cubby){ const host=items.find(it=>it.k===F.cubby.at)||items[0]; put('trig',host.x+30,host.y+36,{label:F.cubby.label,text:F.cubby.text,key:'sec_'+def.id+'_cubby',reward:F.cubby.reward,r:30,noCol:true}); }
@@ -119,8 +155,10 @@ function goFloor(o){
   const def=AREADEFS[to];
   AREA={def,id:to,kind:def.kind,name:def.name,cols:[],objs:[],lights:[],npcs:[],dark:def.dark,level:def.level||1};
   G.area=to; buildHouse(AREA,def); areaNPCs();
+  // an extra floor's way back is its "exit" (the minimap dot, "leave here first"): the flight itself
+  const bs=AREA.objs.find(q=>q.k==='stairs'&&q.back); if(bs&&AREA.exit&&AREA.exit.none){ AREA.exit.x=bs.x; AREA.exit.y=bs.y; }
   const st=AREA.objs.find(q=>q.k==='stairs'&&q.to===from)||AREA.objs.find(q=>q.k==='stairs');
-  if(st){ player.x=st.x; player.y=st.y>AREA.ry+AREA.rh/2?st.y-st.h/2-30:st.y+st.h/2+26; } else { player.x=AREA.spawn.x; player.y=AREA.spawn.y; }
+  if(st){ const a=stairArrival(AREA,st); player.x=a.x; player.y=a.y; player.facing=a.f; } else { player.x=AREA.spawn.x; player.y=AREA.spawn.y; }
   player.kvx=player.kvy=0; if(G.pip){ G.pip.x=player.x; G.pip.y=player.y+20; } compsOnMove();
   G.ow=ow; updateCam(0,true); G.fade=1;
   if(!G.found['seen_'+to]){ G.found['seen_'+to]=true; if(def.secret){ G.secrets=G.secrets||{}; G.secrets['sec_'+to]=1; } }
@@ -215,3 +253,5 @@ function floorObjAct(o){
 }
 // (the stairs have no prompt: Ash walks onto them, floorStairsWalk)
 const FLOOR_LABEL={stairs:o=>null,trig:o=>G.found[o.key]?null:o.label,hchest:o=>G.found[o.id]?null:'Open the chest',nest:()=>'Look in the nest',recipebook:()=>'Read the recipe book',musicbox:()=>'Wind the music box',ghost:()=>'Talk to the ghost',moosehead:()=>'Look at the moose',telescope2:()=>'Look through the telescope',mousehole:()=>'Knock on the tiny door',crate:()=>'Look in the crate',cobweb:()=>'Look at the cobweb',banner:()=>'Look at the banner',candles:()=>'Look at the candles',piedish:o=>G.flags.clue_dish?null:'Look at the pie dish'};
+// test hooks: where a flight lets Ash off, and whether a spot is free to stand on
+window.__ebDbg=Object.assign(window.__ebDbg||{},{stairArrival:o=>AREA?stairArrival(AREA,o):null,standFree:(x,y,r)=>AREA?stairStandFree(AREA,x,y,r||14,null):null});
