@@ -1162,12 +1162,14 @@ function s10VarOpt(id){
   const k=s10TalkKey(T); if(s10VarNext(T,k)<0) return null;
   return {t:S('Anything else going on?','Anything else new?'),then:()=>{ const i=s10VarNext(T,k); return i<0?[]:s10VarTake(T,k,i); },back:true};
 }
+// (v11 talk is per act: topics, idle and bye lines come from the current act's data, or from data with no act)
+function s10ThisAct(T){ const o=T._owner; return !(o&&o.act)||+o.act===actOf(G.stage); }
 // a person's idle line (what they say when the opener was heard today, and the prompt over the menu after an answer)
 // and bye line: the opener's own idle when it has one, else the first matching { idle } / { bye } entry of the latest act
 function s10MetaText(id,field,T0){
   if(!G||G.mode!=='story'||!S10.booted) return null;
   let src=T0&&T0[field]!=null?T0:null;
-  if(!src){ let bestAct=-1; for(const T of S10.talk[id]||[]){ if(T[field]==null||s10TalkKind(T)!=='meta') continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ src=T; bestAct=a; } } }
+  if(!src){ let bestAct=-1; for(const T of S10.talk[id]||[]){ if(T[field]==null||s10TalkKind(T)!=='meta'||!s10ThisAct(T)) continue; const a=+(T._owner&&T._owner.act)||0; if(a<=bestAct) continue; if(s10TalkOk(T)){ src=T; bestAct=a; } } }
   if(!src) return null;
   const v=src[field];
   if(Array.isArray(v)&&v.length&&Array.isArray(v[0])){ const R=G.story._rot||(G.story._rot={}), k=field+':'+s10TalkKey(src), i=(R[k]|0)%v.length; R[k]=i+1; return s10T(v[i]); }
@@ -1182,7 +1184,7 @@ function s10Bye(id){ return s10MetaText(id,'bye'); }
 function s10AskOpts(id,V){
   if(!G||G.mode!=='story'||!S10.booted) return [];
   const H=s10Heard(), day=s10Day(), L=[];
-  (S10.talk[id]||[]).forEach((T,i)=>{ if(s10TalkKind(T)!=='ask'||!s10TalkOk(T)) return;
+  (S10.talk[id]||[]).forEach((T,i)=>{ if(s10TalkKind(T)!=='ask'||!s10ThisAct(T)||!s10TalkOk(T)) return;
     const k=s10TalkKey(T), own=T._owner, pri=own&&own.kind==='chapter'?0:own&&own.kind==='quest'?1:2;
     L.push({T,i,k,pri,a:+(own&&own.act)||0,asked:H['a:'+k]===day?1:0}); });
   L.sort((x,y)=>x.pri-y.pri||x.asked-y.asked||y.a-x.a||x.i-y.i);
@@ -1197,8 +1199,9 @@ function s10AnswerLines(T,id,V){
   if(V&&L.length){ const j=s10LastLine(L); if(j>=0) V.said.add(String(L[j].text)); }
   return L;
 }
-// a person converted to v11 talk (has replies or ask topics in a live act): the new menu (talkHub)
-function s10V11(id){ if(!S10.booted) return false; return (S10.talk[id]||[]).some(T=>(T.ask!=null||T.re!=null)&&!(T._owner&&T._owner.act&&actOf(G.stage)<T._owner.act)); }
+// a person converted to v11 talk IN THIS ACT (an opener with replies, or an ask topic, owned by the current act): the
+// new menu (talkHub). In an act nobody has written v11 talk for yet, they keep the old menu (minus the repeat fix).
+function s10V11(id){ if(!S10.booted||!G) return false; return (S10.talk[id]||[]).some(T=>(T.ask!=null||T.re!=null)&&s10ThisAct(T)); }
 function s10HasTalk(id){ const L=S10.talk[id]; if(!L||!L.length) return false; return L.some(T=>{ const own=T._owner; return !(own&&own.act&&actOf(G.stage)<own.act); }); }
 // at boot: CAST lines become the data's current line for people who have data talk
 function s10TalkTakeover(){
