@@ -421,7 +421,7 @@ people({
             say: ['Gilly put a fish in one. We are not speaking. We speak all day.', 'Gilly put a fish in one. We are not speaking.'] },
         ] },
       { if: 'flag n_dawn',
-        say: ['I made moon buns! Round, with a seam of icing in the middle. Gilly says they need fish. They do not need fish.', 'Moon buns! No fish!'],
+        say: ['I made sun buns! Round and yellow, for the morning. Gilly says they need fish. They do not need fish.', 'Sun buns! No fish!'],
         re: [
           { t: ['Can I have the lumpiest one?', 'Can I have the lumpy one?'],
             say: ['That one is for Tock. He likes them lumpy. You can have the second lumpiest.', 'That is for Tock. You get the next one.'] },
@@ -1149,7 +1149,7 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone', say: [["The pumpkins are scared of the dark. So am I. We sit together.", "The pumpkins and I sit in the dark."]] },
       { if: 'flag n_dawn', say: [["Hands in the dirt. That is all I need now.", "Hands in the dirt."]] },
       { ask: ['Why did you listen to her?', 'Why did you listen?'],
-        say: ['Because nobody else was saying anything to me at all. Be kind to the quiet ones, Ash.', 'Nobody else talked to me. Be kind to quiet people.'] },
+        say: ['Because nobody else was saying anything to me at all. She knows how to find the lonely ones, Ash. Mind that, up there.', 'Nobody else talked to me. She finds lonely people.'] },
       { idle: [['Hm? Mind the seedlings.', 'Mind the seedlings.'], ['Yes, Ash?', 'Yes?']] },
       { bye: [['Go on. I will keep digging.', 'I will keep digging.']] },
     ],
