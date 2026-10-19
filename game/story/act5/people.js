@@ -490,7 +490,6 @@ people({
         say: [['Pebble came back with frost on her feathers and would not stop cawing. Be careful up there, Ash.', 'Pebble came back cold. Be careful up there!'],
           ['Your mother lit every lantern on the green before she sailed. "Light one more than you need," as Iska says.', 'Light one more than you need.']] },
       // the fourth post (B5: her clue for n5_fourth_lantern, and a Heart Ember from the old stump hole)
-      { if: 'flag n_dawn', fact: 'n5_moon=back', say: [["Mind the well. The moon is in it again, and the children keep trying to fish it out.", "The moon is in the well again."]] },
       { if: 'clue n5_fourth_post !clue n5_yara_post', option: ['Were there always three lantern posts on the green?', 'Were there always three posts?'],
         then: ['clue n5_yara_post', 'heart_ember n5_yara'],
         say: [['yara', 'Three? No, dear. There were four posts when I was a girl. Nobody remembered why. The fourth one rotted, and nobody put it back.',
@@ -530,6 +529,7 @@ people({
           { t: ['I like the seams.', 'I like the seams.'],
             say: ['So do I. You can see somebody bothered.', 'So do I. Somebody bothered.'] },
         ] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back', say: [["Mind the well. The moon is in it again, and the children keep trying to fish it out.", "The moon is in the well again."]] },
       { ask: ['Did Ember ever talk about a moth?', 'Did Ember talk about a moth?'], if: '!flag n_dawn',
         say: ["Not to me, Ash. I'm old, but I'm not that old.", 'Not to me. I am not that old!'] },
       { ask: ['What do you tell the children, in the dark?', 'What do you tell the children?'], if: '!flag n_dawn',
