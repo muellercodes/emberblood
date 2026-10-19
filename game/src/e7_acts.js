@@ -290,17 +290,15 @@ function festIntroLines(day){
   if(day) L.push(xl('narr',`You get home just as the sun goes down. By the time you reach the green, the first stars are out.`,`You get home at sunset. The stars come out.`));
   L.push(xl('narr',`That night Emberhollow glowed, a paper lantern on every roof. Up on a far roof, a girl in a grey cloak sits alone, watching the lanterns. You wave. She doesn't.`,`Lanterns glow on every roof. A girl in a grey cloak watches from a far roof. You wave. She doesn't.`),
     xl('maren',`There's my kid! Come here. No, closer. I am hugging you and you can't stop me.`,`There's my kid! Come here for a hug!`),
-    xl('ash',`Mom. Everybody's watching. Also my horns are stuck in your apron.`,`Mom! My horns are stuck in your apron.`),
-    xl('yara',`Welcome to Lantern Night, Ash, the party after the party. I haven't seen the village this bright since I was a girl.`,`Welcome to Lantern Night! The village has never been so bright.`),
-    xl('wren',`I left my library for a whole night! I brought books to a party. Tilly says that is not how parties work.`,`I brought books to a party. Tilly says that is wrong.`));
+    xl('ash',`Mom. Everybody's watching. Also my horns are stuck in your apron.`,`Mom! My horns are stuck in your apron.`));
   for(const g of gs.slice(0,2)) L.push([g.id,S(g.t[0],g.t[1])]);
-  if(G.flags.pip) L.push(xl('pip',`Mip! Mip mip!`,`Mip! Mip mip!`),xl('narr',`Pip has cake on his nose. He is extremely proud of it.`,`Pip has cake on his nose. He is proud.`));
+  if(G.flags.pip) L.push(xl('narr',`Pip has cake on his nose, and will not let anyone wipe it off.`,`Pip has cake on his nose. He won't let you wipe it.`));
   if(e==='lantern') L.push(xl('c_grandpa',`Is that cake? Is that a cake shaped like YOU? May I eat the tail?`,`Is that a cake shaped like you? Can I eat the tail?`),xl('maren',`After the fireworks, Grandpa. And wipe your feet.`,`After the fireworks, Grandpa. Wipe your feet.`));
   else if(e==='heir') L.push(xl('narr',`Bertram has carried Grandpa down from the warm shelf over his oven, so he can see the party. Grandpa has been glaring at the cake for an hour.`,`Tiny Grandpa came to the party. He glares at the cake.`),xl('c_grandpa',`That stone by the forge was MY fire, you know. I'm only saying.`,`That stone was MY fire. Just saying.`));
   else if(e==='warden') L.push(xl('ash',`I carried the Ember Heart down from the summit, so everyone could see it tonight. It's warm as toast.`,`I brought the Ember Heart down from the mountain. It's warm!`),xl('maren',`It can sit by the forge for the night. Safest spot in the valley.`,`It can sit by the forge. It's safe there.`));
   else L.push(xl('maren',`And look. The Ember Heart, all cozy on its little stand by the forge. It hums when I hammer. I think it likes the music.`,`Look, the Ember Heart! It hums when I hammer.`));
   L.push(xl('narr',`By the forge, the Ember Heart glows on its stand, warm and red, like a little sun that came to the party.`,`The Ember Heart glows by the forge. Warm and red.`),
-    xl('yara',`It's time. The first firework is yours, Ash. The big rocket by the well. One breath. A gentle one.`,`Time for fireworks! Light the big rocket. Gently!`),
+    xl('yara',`Welcome to Lantern Night, Ash. I haven't seen the village this bright since I was a girl. The first firework is yours: the big rocket by the well. One gentle breath.`,`Welcome to Lantern Night! Light the big rocket by the well. Gently!`),
     xl('ash',`Gentle. I've been practicing all year.`,`Gentle. I've been practicing!`));
   return L;
 }
@@ -662,7 +660,7 @@ defineStages(2,[
     objectives:()=>[{text:S('Find Gearhaven','Find Gearhaven'),x:7000,y:26000}],
     hint:S(`Gearhaven is somewhere down the coast. Follow the road and look for clock towers. Pebble says hello.`,`Find Gearhaven. Look for clock towers.`),
     soFar:S('Ash took the Southern Pass down to the Clockwork Coast to find Gearhaven, the Moth Mask, and the stolen Ember Heart.','Ash went down to the Clockwork Coast to find Gearhaven and the thief.'),
-    enter(o){ if(o.load||o.prev!=='c_pass') return; later(3.4,()=>{ if(scene!=='play') return; const L=[xl('narr',`Two hundred and six steps later, the land opens out into white chalk cliffs and salt grass, and the gulls are yelling about something important.`,`206 steps later: white cliffs, grass and loud gulls.`),xl('ash',`The Clockwork Coast. Okay, Moth Mask. Ready or not, here I come.`,`The Clockwork Coast. Here I come!`)]; if(G.flags.pip) L.push(xl('pip',`Mip!`,`Mip!`)); runDialogue(L,()=>{ scene='play'; }); }); }}
+    enter(o){ if(o.load||o.prev!=='c_pass') return; later(3.4,()=>{ if(scene!=='play') return; const L=[xl('narr',`Two hundred and six steps later, the land opens out into white chalk cliffs and salt grass, and the gulls are yelling about something important.`,`206 steps later: white cliffs, grass and loud gulls.`),xl('ash',`Two hundred and six steps from home. That's not far. That's not far at all.`,`206 steps from home. That's not far.`)]; if(G.flags.pip) L.push(xl('pip',`Mip!`,`Mip!`)); runDialogue(L,()=>{ scene='play'; }); }); }}
 ]);
 
 // ---------- words of our own: speakers, items, portraits, the Ember Heart in the epilogue
