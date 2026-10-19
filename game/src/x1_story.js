@@ -1123,7 +1123,7 @@ if(typeof EV_TAMSIN!=='undefined'&&!EV_TAMSIN.some(v=>String(v&&v[1]).includes('
 // (e7b_threads) is there and has not already filled them in
 if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)&&!PEBBLE_MAIL.some(m=>m&&String(m.id).startsWith('c_pb_'))) PEBBLE_MAIL.push(
   {id:'c_pb_1',from:'maren',when:()=>reached('c_coast'),lines:[
-    c1If('maren',`Ash. The forge is very quiet without that stone humming in it. Catch that thief. Eat something. Love, Mom.`,`The forge is so quiet. Catch that thief. Eat something! Love, Mom.`,()=>G.flags.a1_heart!=='ward'),
+    c1If('maren',`Ash. The forge is very quiet without that stone humming in it. Catch that thief. Love, Mom.`,`The forge is so quiet. Catch that thief. Love, Mom.`,()=>G.flags.a1_heart!=='ward'),
     c1If('maren',`Ash. The mountain looks very bare without that stone on top. Catch that thief, and eat properly. Love, Mom.`,`The mountain looks bare. Catch that thief. Love, Mom.`,()=>G.flags.a1_heart==='ward'),
     c1If('maren',`P.S. The mountain is quiet. I keep looking at it anyway.`,`P.S. The mountain is quiet now.`,()=>G.choices.ending==='hero'),
     c1If('maren',`P.S. I climbed up and told your grandfather you'd gone south. He grunted. It was a nice grunt.`,`P.S. I told Grandpa. He grunted. A nice grunt.`,()=>G.choices.ending==='warden'),

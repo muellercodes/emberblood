@@ -184,9 +184,9 @@ people({
 
     c_penny: [
       { if: 'flag c_regatta_won', once: true,
-        say: ['HEADLINE: DRAGON WINS REGATTA ON FOOT. JO DEMANDS RECOUNT. THERE IS NOTHING TO RECOUNT.', 'HEADLINE: DRAGON WINS THE REGATTA!'] },
+        say: ['You won the regatta on foot, and Jo wants a recount. Of what? There was one dragon, and he came first.', 'You won on foot! Jo wants a recount.'] },
       { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['HEADLINE: SNOW IN SUMMER. EXPERTS BAFFLED. EXPERT IS ME.', 'HEADLINE: SNOW IN SUMMER!'] },
+        say: ["Snow in summer, and a bite out of the moon. Two front pages in one night. I always wanted that. I don't like it.", "Snow, and a bitten moon. Two big stories. I don't like it."] },
       { say: [['Every good story has a mystery, a chase, and a really good quote. Say something quotable.', 'Say something good for my paper!'],
         ['The Moth Mask Watch board says what I say. The board is me. I am the board.', 'I am the Moth Mask board!'],
         ["One day I'll have a printing press. Right now I have a very loud voice.", 'One day, a press. Now, a loud voice.']] },

@@ -305,7 +305,7 @@ chapter({
     ],
     c_agatha: [
       { if: 'flag c_agatha !flag c_light_done', say: ['Squawk wants to know why you are still down here. So do I.', 'Squawk asks why you are still here. So do I.'] },
-      { if: 'flag c_light_done', say: ['My light is back. Squawk, say thank you to the dragon. ...He says BIG AS A HOUSE. That means thank you.', 'My light is back! Squawk says thank you.'] },
+      { if: 'flag c_light_done', say: ['My light is back. Squawk, say thank you to the dragon. ...He says something about a house. That means thank you.', 'My light is back! Squawk says thank you.'] },
     ],
   },
 })

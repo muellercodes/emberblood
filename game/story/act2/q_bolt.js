@@ -29,7 +29,7 @@ quest({
 
   scene: {
     bt_offer: [
-      ['c_hettie', "Ash. You've got a TAIL that GRABS things. Wonderful. Unrelated question. Can you grab a dog?",
+      ['c_hettie', "Ash. You've got a tail that grabs things. Wonderful. Unrelated question. Can you grab a dog?",
         'Your tail grabs things! Can you grab a dog?'],
       ['c_hettie', 'Bolt! My brass dog. He ran off the night the moths came, with dust in his nose gears.',
         'My brass dog Bolt ran off. Dust in his nose.'],
