@@ -280,6 +280,36 @@ function moodSheetGet(who,full){
   for(const [w,start,mood] of MOOD_SHEET) if(w===who&&start.length<40&&k.startsWith(moodSheetKey(w,start))) return mood;
   return null;
 }
+// Act I's peaks, which live in old code: the opening morning, Mom's Three Lanterns, Ember before the last climb,
+// Grandpa, the four endings and Mom's three little lights (STORY_PLAN 3.4)
+moodSheetAdd([
+  // the opening (a1d_story STORY.prologue, forge, lanternsDone)
+  ['maren','(from the kitchen) Ash! Up you get!','happy'], ['ash',"(under the blanket) I wasn't snoring.",'sleepy'],
+  ['maren',"Practice on the lanterns. I'm off to the forge.",'happy'], ['maren','And Ash? Gently this year.','sly'],
+  ['maren','There you are. Hold out your claws.','happy'], ['maren',"Your grandmother's sword.",'tender'],
+  ['maren','Gran used to say it was made for','sly'], ['ash',"It's beautiful. Is it fireproof?",'happy'],
+  ['maren','It is now. Go on, the three festival lanterns','happy'], ['yara','Beautiful work, Ash.','happy'],
+  ['ash','And nothing else caught fire.','happy'], ['yara','Kobolds! In the village!','scared'],
+  // Mom's Three Lanterns (x0_vorlaxis QDEFS.a1_lanterns) and her three little lights at the end
+  ['maren',"The gate's open. So you're going up there.",'worried'], ['maren','I made these. Three paper lanterns.','tender'],
+  ['ash','What if I forget?','worried'], ['maren',"You won't forget. Because if I don't see",'determined'], ['ash',"...I'll light them.",'determined'],
+  ['maren','Three little lights on the mountain.','tender'],
+  // Ember before the summit, and Grandpa (x0_vorlaxis)
+  ['ember','Ash. Wait. Just for a moment.','tender'], ['ash','Ember?','surprised'], ['ember',"He's my father. He taught me to breathe fire",'sad'],
+  ['ember',"I'm not asking you to be gentle.",'determined'], ['ash',"I'm ready. Mostly.",'determined'], ['ember',"Then go on. I'll be right here.",'tender'],
+  ['vor','You have her horns. And my fire.','sly'], ['vor',"For a thousand years my daughter's children",'angry'],
+  ['ash','She gave it to us. It was never yours','determined'], ['vor','Come then, hatchling.','angry'], ['vor','Back again, hatchling?','sly'],
+  ['vor','How? How does something so small','surprised'], ['ember','(everywhere at once) Because it','tender'], ['vor','Ember?','surprised'],
+  ['vor','Impossible... the fire... it chose you...','sad'],
+  // the four endings (a1d_story ENDINGS) and what comes after (x0_vorlaxis)
+  ['ash',"I'm sorry, Grandpa.",'sad'], ['ember','(very softly, from the rim) Goodnight, Father.','sad'],
+  ['ash',"I'm not going to destroy you, Grandpa.",'determined'], ['iska','Welcome, Sixth Warden.','happy'],
+  ['ember',"(from the rim) He'll pretend he hates the visits.",'tender'],
+  ['ash',"Fine. If it's fire you want to fight over",'angry'], ['ember','(from the rim, quietly) That','sad'],
+  ['ash','Ember lit one of these for you every year','tender'], ['vor','...She did?','surprised'], ['ash','She wrote it down.','tender'],
+  ['ember','(from the rim, very quietly) I used to fold','tender'], ['vor','Is there cake? At this festival','shy'],
+  ['ash','Is that... spare fire?','surprised'], ['vor',"Hm. That's the last of it.",'shy'], ['vor','Give it to your mother.','shy']
+]);
 // the mood for a line: its own tag, else the sheet, else the reader; then the speaker's resting face
 function lineMood(who,L,full){
   const m=moodName(L&&L.face)||moodName(moodSheetGet(who,full));

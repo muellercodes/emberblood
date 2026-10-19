@@ -75,18 +75,18 @@ chapter({
       ['narr', 'Through the door lies the Eclipse Lens: a disc of moon-glass as big as a pond, set in brass, pointing at the sky. Then footsteps on the stairs. And puffing. A lot of puffing.',
                'Here is the Eclipse Lens, big as a pond. Then: footsteps, and puffing.', { do: ['emit m4fx:mom_in'] }],
       { place: ['maren', [22060, 1580]] }, { place: ['quill', [22330, 1600]] },
-      ['maren', '(out of breath) Ash? Ash! Those stairs are made of moonlight. Do you know how hard it is to climb moonlight with a hammer?', '(out of breath) Ash! Those stairs are moonlight. Try climbing that with a hammer!'],
-      ['ash', 'MOM?!', 'MOM?!'],
+      ['maren', '(out of breath) Ash? Ash! Those stairs are made of moonlight. Do you know how hard it is to climb moonlight with a hammer?', '(out of breath) Ash! Those stairs are moonlight. Try climbing that with a hammer!', { mood: 'worried' }],
+      ['ash', 'MOM?!', 'MOM?!', { mood: 'surprised' }],
       ['narr', "Mom drops the hammer and hugs you. Then she holds you at arm's length and looks at you. Then she hugs you again. Behind her, Professor Quill puffs up the last step behind a telescope bigger than she is.",
                'Mom drops her hammer and hugs you. Twice. Professor Quill puffs up behind her.'],
       ['narr', 'You tip the three Shards out of your satchel: violet, ice-blue and silver. Mom turns each one over, the way she checks a horseshoe.', 'You tip out the three Shards. Mom checks each one.'],
       // the act's real choice, even though it cannot branch (STORY_PLAN 3.4)
-      ['ash', 'She wants it whole.', 'She wants it whole.'],
-      ['maren', "And I want it whole. It's ours.", "And I want it whole. It's ours."],
-      ['iska', 'Then mend it and never hand it over. A heart handed over in fear burns black.', 'Mend it, and never hand it over. Given in fear, it burns black.'],
-      ['ash', "Then I won't hand it over.", "Then I won't hand it over."],
+      ['ash', 'She wants it whole.', 'She wants it whole.', { mood: 'worried' }],
+      ['maren', "And I want it whole. It's ours.", "And I want it whole. It's ours.", { mood: 'determined' }],
+      ['iska', 'Then mend it and never hand it over. A heart handed over in fear burns black.', 'Mend it, and never hand it over. Given in fear, it burns black.', { mood: 'determined' }],
+      ['ash', "Then I won't hand it over.", "Then I won't hand it over.", { mood: 'determined' }],
       ['maren', 'Hand them here. Broken things come into my forge every day, and not one of them leaves broken. You breathe, hottest then coolest. I tap. Three taps.',
-                'Give them here. I fix broken things. You breathe. I tap three times.', { do: ['emit m4fx:forge'] }],
+                'Give them here. I fix broken things. You breathe. I tap three times.', { mood: 'determined', do: ['emit m4fx:forge'] }],
     ],
     // after the taps: at most 6 lines. The why_three payoff: the player saw this coming.
     m_reforge2: [
@@ -97,14 +97,14 @@ chapter({
                  { if: 'item c_shard1', then: ['take c_shard1'] }, { if: 'item f_shard2', then: ['take f_shard2'] }, { if: 'item m_shard3', then: ['take m_shard3'] },
                  { if: '!item m_heart', then: ['give m_heart'] }, 'set m_heart', 'set m_reforged',
                  { if: '!flag m_reforge_xp', then: ['set m_reforge_xp', 'xp 1000'] }] }],
-      ['ash', "The Ember Heart. It's whole again.", "The Ember Heart. It's whole again."],
+      ['ash', "The Ember Heart. It's whole again.", "The Ember Heart. It's whole again.", { mood: 'happy' }],
       { if: 'choice m_deal=ask', then: [
-        ['nyxara', '(from very far away) Whole. You asked me why, once, little ember. At the end, you will understand.', '(far away) Whole. At the end, you will understand.'] ],
+        ['nyxara', '(from very far away) Whole. You asked me why, once, little ember. At the end, you will understand.', '(far away) Whole. At the end, you will understand.', { mood: 'sly' }] ],
         else: [
-        ['nyxara', '(from very far away) Whole at last. Keep it warm for me, little ember.', '(far away) Whole at last. Keep it warm for me.'] ] },
+        ['nyxara', '(from very far away) Whole at last. Keep it warm for me, little ember.', '(far away) Whole at last. Keep it warm for me.', { mood: 'sly' }] ] },
       ['narr', 'You put the Heart in your satchel and buckle it shut. Mom puts her hand over the buckle, and leaves it there.', 'You buckle the Heart into your satchel. Mom keeps her hand on the buckle.'],
-      { if: 'flag pip', then: [['pip', 'Mip. (Pip curls up on your warm satchel and falls asleep at once, glowing a little.)', 'Mip. (Pip falls asleep on the warm satchel.)']] },
-      ['maren', 'Outside, all of us. Down to the pier. If something is coming out of that sea, I want to see it.', 'Outside, everyone! Down to the pier!'],
+      { if: 'flag pip', then: [['pip', 'Mip. (Pip curls up on your warm satchel and falls asleep at once, glowing a little.)', 'Mip. (Pip falls asleep on the warm satchel.)', { mood: 'sleepy' }]] },
+      ['maren', 'Outside, all of us. Down to the pier. If something is coming out of that sea, I want to see it.', 'Outside, everyone! Down to the pier!', { mood: 'determined' }],
     ],
     // the last bite and the black mountain, on the Moon Pier: at most 10 lines a branch, one "Not alone" line
     m_peak: [
@@ -114,23 +114,23 @@ chapter({
       ['narr', 'On it, wings wider than the sky, is Nyxara. CRUNCH. The last of the moon goes out like a candle.', 'Nyxara is on it. CRUNCH. The last of the moon goes out.',
                { do: ['emit m4fx:ecl:bite:0', 'moon 0', 'set m_eclipse3'] }],
       ['narr', 'And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.', 'A black mountain rises out of the sea.', { do: ['emit m4fx:peak:rise', 'emit m4fx:ecl:gone', 'set m4_peak_up'] }],
-      ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
-      ['ash', "It looks like... Cinder Mountain? And a clock tower? And snow? It's every place I've ever been, all squashed together.", 'It looks like Cinder Mountain! And a clock tower! And snow!'],
+      ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.', { mood: 'sly' }],
+      ['ash', "It looks like... Cinder Mountain? And a clock tower? And snow? It's every place I've ever been, all squashed together.", 'It looks like Cinder Mountain! And a clock tower! And snow!', { mood: 'surprised' }],
       { if: 'choice m_hush=free', then: [
         ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the mountain. Far off over the dark sea, a small white light glows once, softly.',
                  'The Heart grows warm. A bridge of fire rolls out to the mountain. Far away, a small white light glows.', { do: ['emit m4fx:peak:bridge', 'set m4_bridge_lit'] }] ],
         else: [
         ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the black mountain.', 'The Heart grows warm. A bridge of fire rolls out to the mountain.', { do: ['emit m4fx:peak:bridge', 'set m4_bridge_lit'] }] ] },
-      ['maren', "...You're going up there.", "You're going up there."],
-      ['ash', "I'm going up there.", "I'm going up there."],
-      ['maren', "Then I'll walk you to the bridge.", "Then I'll walk you to the bridge."],
+      ['maren', "...You're going up there.", "You're going up there.", { mood: 'sad' }],
+      ['ash', "I'm going up there.", "I'm going up there.", { mood: 'determined' }],
+      ['maren', "Then I'll walk you to the bridge.", "Then I'll walk you to the bridge.", { mood: 'tender' }],
       // one "Not alone" line: Vesper (her Last Job done), else Glaciar (freed in Act III), else Iska
       { if: 'flag m_vesper_ally', then: [
-        ['c_vesper', '(stepping out of the dark onto the pier) Not alone, cousin.', '(out of the dark) Not alone, cousin.'] ],
+        ['c_vesper', '(stepping out of the dark onto the pier) Not alone, cousin.', '(out of the dark) Not alone, cousin.', { mood: 'determined' }] ],
         else: [{ if: 'choice f_glaciar=free', then: [
-          ['f_glaciar', '(far away, a voice like wind chimes) Not alone, dumpling.', '(far away) Not alone, dumpling.'] ],
+          ['f_glaciar', '(far away, a voice like wind chimes) Not alone, dumpling.', '(far away) Not alone, dumpling.', { mood: 'tender' }] ],
           else: [
-          ['iska', 'And with one more lantern than you think you need. Always.', 'And with one more lantern than you need. Always.'] ] }] },
+          ['iska', 'And with one more lantern than you think you need. Always.', 'And with one more lantern than you need. Always.', { mood: 'tender' }] ] }] },
     ],
     // at the end of the pier, before the end card
     m4_pier_bridge: [

@@ -40,19 +40,19 @@ chapter({
       ['narr', 'As the light comes back, the black glass of the peak turns clear as water, and little white flowers push up through the cracks. And at the very top, where nothing could possibly have climbed...', 'The glass turns clear. Flowers grow. And at the very top...', { do: ['emit n4fx:duchess_show'] }],
       ['goat', 'Meh.'],
       { if: 'solved n5_who_follows', then: [
-        ['ash', 'DUCHESS! I KNEW it!', { do: ['emit n4fx:duchess_seen'] }] ],
+        ['ash', 'DUCHESS! I KNEW it!', { mood: 'laughing', do: ['emit n4fx:duchess_seen'] }] ],
         else: [
-        ['ash', 'DUCHESS?! HOW?!', { do: ['emit n4fx:duchess_seen'] }] ] },
+        ['ash', 'DUCHESS?! HOW?!', { mood: 'surprised', do: ['emit n4fx:duchess_seen'] }] ] },
       { if: 'choice ending=lantern', then: [
-        ['grandpa', 'Not HER.'] ],
+        ['grandpa', 'Not HER.', { mood: 'angry' }] ],
         else: [{ if: 'flag n_big', then: [
         ['narr', 'You shrink back to your normal size, which is a relief. The Moon Door was not built for dragons your size.', 'You shrink back to normal. Good thing!', { do: ['emit n4fx:big_off'] }] ] }] },
-      ['pip', 'Mip!'],
+      ['pip', 'Mip!', { mood: 'happy' }],
       { do: ['emit n4fx:home_bound'] },
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
-        ['f_glaciar', 'Climb on, dumplings, all of you. Not the goat. ...Oh, very well, the goat too. Hold on tight. I fly slowly, but I always get there.', 'Climb on, everyone. Even the goat.'] ],
+        ['f_glaciar', 'Climb on, dumplings, all of you. Not the goat. ...Oh, very well, the goat too. Hold on tight. I fly slowly, but I always get there.', 'Climb on, everyone. Even the goat.', { mood: 'happy' }] ],
         else: [
-        ['dell', "(far away, across the moonfire bridge, a steam whistle) All aboard the Soggy Biscuit Three! Everybody home for breakfast!", "All aboard! Let's go home."] ] },
+        ['dell', "(far away, across the moonfire bridge, a steam whistle) All aboard the Soggy Biscuit Three! Everybody home for breakfast!", "All aboard! Let's go home.", { mood: 'happy' }] ] },
     ],
 
     // ---- the epilogue book (the act file's book: list; x4_story's storybook plays the pages in order). Each page
@@ -141,21 +141,21 @@ chapter({
         else: [
         ['narr', 'The moon kept its silver seams forever, like a scar you are secretly proud of. And the Ember Heart went home to the forge.', 'The moon kept its silver lines. The Heart went home.'] ] }] },
       { if: 'choice ending=lantern', then: [
-        { if: 'choice n_end=moth', then: [['grandpa', 'Hmph. I wanted to say "mine" about that moon. I\'m glad I didn\'t.', 'I wanted to say "mine". I am glad I didn\'t.']],
-          else: [{ if: 'choice n_end=embermoon', then: [['grandpa', "Now THAT is a proper moon. Orange. Like a dragon's eye. Like... hers.", 'Now that is a good moon. Orange, like Ember.']],
-          else: [['grandpa', 'A mended moon, like a mended sock. Ember would have liked that.', 'A fixed moon, like a fixed sock. Ember would like it.']] }] } ],
+        { if: 'choice n_end=moth', then: [['grandpa', 'Hmph. I wanted to say "mine" about that moon. I\'m glad I didn\'t.', 'I wanted to say "mine". I am glad I didn\'t.', { mood: 'tender' }]],
+          else: [{ if: 'choice n_end=embermoon', then: [['grandpa', "Now THAT is a proper moon. Orange. Like a dragon's eye. Like... hers.", 'Now that is a good moon. Orange, like Ember.', { mood: 'happy' }]],
+          else: [['grandpa', 'A mended moon, like a mended sock. Ember would have liked that.', 'A fixed moon, like a fixed sock. Ember would like it.', { mood: 'tender' }]] }] } ],
         else: [{ if: 'choice ending=warden', then: [
-        { if: 'choice n_end=moth', then: [['iska', 'Light one more than you need. You did, Warden. You lit one for her.', 'You lit one more lantern. One for her.']],
-          else: [{ if: 'choice n_end=embermoon', then: [['tove', "A warm moon! That's the best kind of moon there is.", 'A warm moon! The best kind!']],
-          else: [['bram', "HA! Morning! I'd forgotten what it looked like!", 'Ha! Morning! I forgot what it looks like!']] }] } ],
+        { if: 'choice n_end=moth', then: [['iska', 'Light one more than you need. You did, Warden. You lit one for her.', 'You lit one more lantern. One for her.', { mood: 'tender' }]],
+          else: [{ if: 'choice n_end=embermoon', then: [['tove', "A warm moon! That's the best kind of moon there is.", 'A warm moon! The best kind!', { mood: 'happy' }]],
+          else: [['bram', "HA! Morning! I'd forgotten what it looked like!", 'Ha! Morning! I forgot what it looks like!', { mood: 'laughing' }]] }] } ],
         else: [{ if: 'choice ending=heir', then: [
-        { if: 'choice n_end=moth', then: [['grandpa', '(from his shelf above the oven) A moth? On MY moon? Fine. She can stay.', 'A moth on MY moon? Fine. She can stay.']],
-          else: [{ if: 'choice n_end=embermoon', then: [['grandpa', '(from his shelf above the oven) Gold. Hmph. I would have made it bigger.', 'Gold. Hmph. I would make it bigger.']],
-          else: [['grandpa', '(from his shelf above the oven) Seams? On a moon? Sloppy. It looks nice.', 'Seams? Sloppy. It looks nice.']] }] } ],
+        { if: 'choice n_end=moth', then: [['grandpa', '(from his shelf above the oven) A moth? On MY moon? Fine. She can stay.', 'A moth on MY moon? Fine. She can stay.', { mood: 'sly' }]],
+          else: [{ if: 'choice n_end=embermoon', then: [['grandpa', '(from his shelf above the oven) Gold. Hmph. I would have made it bigger.', 'Gold. Hmph. I would make it bigger.', { mood: 'sly' }]],
+          else: [['grandpa', '(from his shelf above the oven) Seams? On a moon? Sloppy. It looks nice.', 'Seams? Sloppy. It looks nice.', { mood: 'shy' }]] }] } ],
         else: [
-        { if: 'choice n_end=moth', then: [['ember', "You lit her a lantern. That's what I did, a thousand years ago. Thank you for finishing it, little ember.", 'You lit her a lantern, like I did. Thank you.']],
-          else: [{ if: 'choice n_end=embermoon', then: [['ember', 'My Heart, up in the sky. Oh, Ash. Now everyone can see it.', 'My Heart in the sky! Now everyone can see it.']],
-          else: [['ember', "Good morning, Ash. It's a lovely one.", 'Good morning, Ash.']] }] } ] }] }] },
+        { if: 'choice n_end=moth', then: [['ember', "You lit her a lantern. That's what I did, a thousand years ago. Thank you for finishing it, little ember.", 'You lit her a lantern, like I did. Thank you.', { mood: 'tender' }]],
+          else: [{ if: 'choice n_end=embermoon', then: [['ember', 'My Heart, up in the sky. Oh, Ash. Now everyone can see it.', 'My Heart in the sky! Now everyone can see it.', { mood: 'happy' }]],
+          else: [['ember', "Good morning, Ash. It's a lovely one.", 'Good morning, Ash.', { mood: 'happy' }]] }] } ] }] }] },
       ['narr', 'Pip never said another word. Except once, very quietly, at breakfast: "Pancake."', 'Pip never talked again. Except once: "Pancake."', { if: 'flag pip' }],
       { if: 'flag n_panes>=6', then: [
         ['narr', 'Sister Wren wrote it all down: The Account of the Long Night. It had six glass pictures of a moth in it, and it was much longer than ten pages. Ash was on page eleven after all.', 'Sister Wren wrote a book about it all. Ash was on page eleven.'] ],
@@ -180,10 +180,10 @@ chapter({
       { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }, then: [
         ['narr', 'Behind the forge, something very big and very cold is snoring.', 'Behind the forge, a big cold dragon snores.'] ] },
       { place: ['maren', 'player', [62, 8]] },   // (Mom has come out to find Ash, for this scene)
-      ['maren', "There you are. You slept the whole way home. It's Lantern Day, and you're late.", 'You slept all the way home. It is Lantern Day!'],
+      ['maren', "There you are. You slept the whole way home. It's Lantern Day, and you're late.", 'You slept all the way home. It is Lantern Day!', { mood: 'happy' }],
       ['narr', 'Round the green the lanterns are lit. All four of them.', 'The lanterns are lit. All four!', { if: 'solved n5_fourth_lantern', ref: 'n5_green_post' }],
-      ['ash', 'Mom? ...The moon came back.', 'Mom? The moon came back.'],
-      ['maren', 'It always does. Now go and light one more than you need.', 'It always does. Go light one more.'],
+      ['ash', 'Mom? ...The moon came back.', 'Mom? The moon came back.', { mood: 'tender' }],
+      ['maren', 'It always does. Now go and light one more than you need.', 'It always does. Go light one more.', { mood: 'tender' }],
     ],
     n5_green_post_look: [
       ['narr', 'A fourth lantern post of new wood, with a little lantern that never quite goes out. On a tag, in careful letters: FOR WHOEVER IS OUT IN THE DARK.', 'A fourth post. Its tag says: FOR WHOEVER IS OUT IN THE DARK.'],

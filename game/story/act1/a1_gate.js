@@ -433,9 +433,9 @@ people({
   // (v11) after the Broodmother's "Are you sure you're not mine?", the next time Ash talks to Mom
   scene: {
     a1_mom_fear: [
-      ['maren', "You've gone quiet. You never go quiet. What is it?", "You're quiet. That's not like you. What is it?"],
-      ['ash', "Mom, is my fire Grandpa's? He asked me if I'm sure I'm not his.", "Is my fire Grandpa's? He says I might be his."],
-      ['maren', 'Half of it was. Then Ember gave it away. Given is different, Ash.', 'Half was his. Ember gave it away. Given is different.'],
+      ['maren', "You've gone quiet. You never go quiet. What is it?", "You're quiet. That's not like you. What is it?", { mood: 'worried' }],
+      ['ash', "Mom, is my fire Grandpa's? He asked me if I'm sure I'm not his.", "Is my fire Grandpa's? He says I might be his.", { mood: 'worried' }],
+      ['maren', 'Half of it was. Then Ember gave it away. Given is different, Ash.', 'Half was his. Ember gave it away. Given is different.', { mood: 'tender' }],
       ['narr', 'She holds on to your hand a little longer than she needs to.', 'She holds your hand a little longer.'],
     ],
   },
