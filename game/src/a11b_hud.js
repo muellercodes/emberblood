@@ -30,30 +30,27 @@ function drawHUD(){
   let qy=T+(story?92:80); TRACK_R=null;
   const obj=questObjective(), fo=story?focusObjective():null;
   if(obj){
-    const maxW=Math.min(300,W*0.5), small=H<600||W<520, sideStory=!(fo&&fo.side);
-    const txt=(t,x,y)=>{ ctx.lineWidth=LOOK.sb?3.6:3; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.92)':'rgba(0,0,0,.6)'; if(LOOK.sb) ctx.lineJoin='round'; ctx.strokeText(t,x,y); ctx.fillText(t,x,y); };
+    // (v11 polish) each goal is one short line with its distance at the end; the whole sentence is in the journal
+    const maxW=Math.min(300,W*0.5-L), sideStory=!(fo&&fo.side);
+    const txt=(t,x,y)=>{ ctx.lineWidth=LOOK.sb?3.6:3; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.92)':'rgba(0,0,0,.6)'; ctx.lineJoin='round'; ctx.strokeText(t,x,y); ctx.fillText(t,x,y); };
     ctx.textAlign='left';
-    ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; txt((sideStory?'◆ ':'')+obj.title.toUpperCase(),L+2,qy);
-    ctx.font=`500 12px ${UIF}`; ctx.fillStyle='#f2e6d4';
-    const lines=wrapText(obj.text,maxW).slice(0,small?2:3); lines.forEach((l,i)=>txt(l,L+2,qy+16+i*15));
-    let ly=qy+18+lines.length*15;
-    if(sideStory&&obj.x!=null){ const d=dist(p.x,p.y,obj.x,obj.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; txt(`${Math.round(d)} m`,L+2,ly); ly+=14; }
+    ctx.font=`700 10.5px ${TF}`; ctx.fillStyle='#ffcf7a'; txt((sideStory?'◆ ':'')+obj.title.toUpperCase(),L+2,qy);
+    goalLine(obj.text,L+2,qy+16,maxW,sideStory&&obj.x!=null?dist(p.x,p.y,obj.x,obj.y)/25:null,'#f6ead8',txt);
+    let ly=qy+30;
     // on touch the list stops above the buttons on its side (they move with Settings > Handed)
     const tq=tracked(), room=(usingTouch?Math.min(H-SAFE.b-200,touchTopOver(L-4,L+maxW+8)-14):H-120)-ly;
     let shown=0;
     for(const id of tq){
-      if(room<40+shown*44) break;
+      if(room<22+shown*20||shown>=(H<600?2:3)) break;
       const d=QDEFS[id], foc=G.focus===id;
-      ly+=6; ctx.font=`700 10px ${TF}`; ctx.fillStyle=foc?'#ffcf7a':d.errand?'#b8e8c8':'#7fe0ff';
-      txt((foc?'◆ ':'')+(d.errand?'ERRAND · ':'')+d.title.replace('Errand: ','').toUpperCase(),L+2,ly+4);
-      ctx.font=`500 11px ${UIF}`; ctx.fillStyle=foc?'#fff0d8':'#d8eef4';
-      const sl=wrapText(stepText(id),maxW).slice(0,small?1:2); sl.forEach((l,i)=>txt(l,L+2,ly+18+i*14));
-      ly+=18+sl.length*14;
-      if(foc&&fo&&fo.x!=null){ const dd=dist(p.x,p.y,fo.x,fo.y)/25; ctx.font=`600 11px ${UIF}`; ctx.fillStyle='#d8c4a4'; txt(`${Math.round(dd)} m`,L+2,ly); ly+=13; }
-      shown++;
+      // a tracked quest: a coloured mark (gold when the compass follows it, green for an errand, blue for a side quest), its goal and, when followed, the distance
+      ly+=4; const col=foc?'#ffcf7a':d.errand?'#9fe0b4':'#7fd6f0';
+      ctx.save(); ctx.translate(L+6,ly+0.5); ctx.rotate(Math.PI/4); ctx.fillStyle=col; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.lineWidth=1.6; ctx.strokeRect(-3,-3,6,6); ctx.fillRect(-3,-3,6,6); ctx.restore();
+      goalLine(stepText(id),L+16,ly,maxW-14,foc&&fo&&fo.x!=null?dist(p.x,p.y,fo.x,fo.y)/25:null,foc?'#fff0d8':'#e2eef2',txt,`500 11.5px ${UIF}`);
+      ly+=16; shown++;
     }
     const more=activeQuests().length-shown;
-    if(more>0&&room>30){ ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.75)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+2,ly+6); ly+=14; }
+    if(more>0&&room>30){ ly+=4; ctx.font=`600 10px ${UIF}`; ctx.fillStyle='rgba(230,215,190,.78)'; txt(`+${more} more in your journal ${usingTouch?'(tap here)':`(${btnLabel('journal')})`}`,L+2,ly); ly+=12; }
     TRACK_R={x:L-4,y:qy-12,w:maxW+12,h:ly-qy+16};
   }else if(G.mode==='normal'){
     ctx.textAlign='left'; ctx.font=`700 11px ${TF}`; ctx.fillStyle='#ffcf7a'; ctx.fillText(`ARENA · ${G.diff.name.toUpperCase()}`,L+2,qy);
@@ -68,7 +65,7 @@ function drawHUD(){
   const b=G.boss;
   if(b&&!b.dead){
     const bw2=Math.min(620,W-40-SAFE.l-SAFE.r), bx2=(W-bw2)/2, by=usingTouch?(W>=720?T+40:T+(story?170:150)):H-SAFE.b-46;
-    ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(EDEF[b.type].name,W/2,by-20); ctx.fillText(EDEF[b.type].name,W/2,by-20);
+    ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?4.6:3.4; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.strokeText(EDEF[b.type].name,W/2,by-20); ctx.fillText(EDEF[b.type].name,W/2,by-20);
     bar(bx2,by-8,bw2,12,clamp(b.hp/b.maxHp,0,1),b.invuln?'#8a5a3a':'#b8281e','rgba(30,6,4,.9)');
     ctx.strokeStyle='rgba(255,200,150,.3)'; ctx.lineWidth=1; rr(bx2,by-8,bw2,12,6); ctx.stroke();
     // phase marks on the bar and one pip per phase (lit up to the phase the fight is in); bossPhase (e8_foes.js) sets b.phases and b.bph
@@ -76,18 +73,19 @@ function drawHUD(){
     if(th){ ctx.fillStyle='rgba(255,255,255,.55)'; for(const f of th) ctx.fillRect(bx2+bw2*f-1,by-8,2,12);
       const ph=b.type==='vorlaxis'?(b.phase||1)-1:(b.bph||0), n=th.length+1;
       for(let i=0;i<n;i++){ const x=bx2+bw2-6-(n-1-i)*15, y=by-20; ctx.beginPath(); ctx.moveTo(x,y-5); ctx.lineTo(x+5,y); ctx.lineTo(x,y+5); ctx.lineTo(x-5,y); ctx.closePath(); ctx.fillStyle=i<=ph?'#ff9a3a':'rgba(40,20,14,.85)'; ctx.fill(); ctx.strokeStyle='rgba(255,215,170,.75)'; ctx.lineWidth=1; ctx.stroke(); } }
-    ctx.font=`500 11px ${UIF}`; ctx.fillStyle='#d2b898'; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; ctx.fillText(simplify(sub),W/2,by+15);
+    // (v11 polish) the title under the bar: light letters with an outline, readable on any ground
+    ctx.font=`600 11.5px ${UIF}`; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; sub=simplify(sub);
+    ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?3.6:3.2; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.95)':'rgba(10,6,4,.85)'; ctx.strokeText(sub,W/2,by+16); ctx.fillStyle=LOOK.sb?'#fff0d4':'#f2dcc0'; ctx.fillText(sub,W/2,by+16);
   }
   // prompt
   if(G.prompt&&scene==='play'){
     drawPromptPill(b);
   }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
-  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawSkillHud();
+  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story){ lvQueue(); drawSkillHud(); }
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
-  if(G.hintT>0&&scene==='play'&&tipOn('play')){
-    drawHintText(b);
-  }
+  if(story&&G.hintT>=29&&G.playTime<5&&!G.flags.coach) G.flags.coach=1;   // a new journey (startStory sets G.hintT=30): the coach is on
+  if(scene==='play'&&tipOn('play')) drawCoach(b);
   drawOffscreen(); drawTouch();
 }
 function drawMinimap(obj){
@@ -128,38 +126,50 @@ function drawCompass(obj){
   if(!obj||obj.x==null||scene!=='play') return;
   const sx=(obj.x-cam.x)*zoom, sy=(obj.y-cam.y)*zoom;
   if(sx>40&&sx<W-40&&sy>40&&sy<H-40){
+    // (v11 polish) on screen: the marker fades out as Ash gets close (it sat on Grizzlefang's head and on the cellar
+    // stairs), and a person who already shows a ! or ? over their head needs no second mark
+    const dW=dist(player.x,player.y,obj.x,obj.y), k=clamp((dW-130)/110,0,1);
+    if(k<=0.02) return;
+    if(obj.npc&&typeof npcMarker==='function'){ const m=npcMarker(obj.npc); if(m==='!'||m==='?') return; }
+    if(G.boss&&!G.boss.dead&&dist(G.boss.x,G.boss.y,obj.x,obj.y)<400) return;   // the boss bar says who to fight
     const bob=Math.sin(G.time*4)*3;
-    ctx.save(); ctx.translate(sx,sy-34+bob); ctx.rotate(Math.PI/4); ctx.fillStyle='rgba(255,181,71,.9)'; ctx.strokeStyle='#3a2208'; ctx.lineWidth=1.5; ctx.fillRect(-5,-5,10,10); ctx.strokeRect(-5,-5,10,10); ctx.restore(); return;
+    ctx.save(); ctx.globalAlpha=k; ctx.translate(sx,sy-34+bob); ctx.rotate(Math.PI/4); ctx.fillStyle='rgba(255,181,71,.9)'; ctx.strokeStyle=LOOK.sb?SBC.outline:'#3a2208'; ctx.lineWidth=1.5; ctx.fillRect(-5,-5,10,10); ctx.strokeRect(-5,-5,10,10); ctx.restore(); return;
   }
   const m=34, ex=clamp(sx,m+SAFE.l,W-m-SAFE.r), ey=clamp(sy,m+SAFE.t+(W<720?185:150),H-m-SAFE.b), a=Math.atan2(sy-ey,sx-ex);
-  ctx.save(); ctx.translate(ex,ey); ctx.rotate(a); ctx.fillStyle='#ffb547'; ctx.strokeStyle='#3a2208'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(13,0); ctx.lineTo(-7,-8); ctx.lineTo(-3,0); ctx.lineTo(-7,8); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+  // (v11 polish) under a banner the arrow steps back (it sat on top of the Level title)
+  const under=G.banner&&scene==='play'&&Math.abs(ex-W/2)<320&&ey>H*0.14&&ey<H*0.26+70;
+  ctx.save(); if(under) ctx.globalAlpha=0.3; ctx.translate(ex,ey); ctx.rotate(a); ctx.fillStyle='#ffb547'; ctx.strokeStyle='#3a2208'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(13,0); ctx.lineTo(-7,-8); ctx.lineTo(-3,0); ctx.lineTo(-7,8); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
 }
 function drawBanner(){
+  bnTick(); drawPlate();
+  // (v11 polish) a banner waits out talks, menus and the blessing pick (its clock stops there too), so it never sits
+  // frozen under a dialogue box
+  if(scene!=='play') return;
   // the next banner in line steps up when the last one is done (setBanner in a9a_env.js queues them)
   if(!G.banner&&G.bannerQ&&G.bannerQ.length) G.banner=G.bannerQ.shift();
   const bn=G.banner; if(!bn) return;
   // another module may grow the text after the fact (the skills build adds the skill point line): more time to read it
   const len=bn.text.length+bn.sub.length; if(len!==bn.len){ bn.len=len; bn.dur=Math.max(bn.dur,bn.t+readT(bn.text+' '+bn.sub)*0.8); if(bn.log) bn.log.sub=bn.sub; }
+  // (v11 polish) more waiting: no counter chip, this one just makes room a little sooner
+  const nq=G.bannerQ?G.bannerQ.length:0;
+  if(nq&&!bn.hurry&&bn.style!=='boss'){ bn.hurry=true; bn.dur=Math.max(bn.t+0.8,Math.min(bn.dur,Math.max(2.6,bn.dur*0.65))); }
   const a=clamp(Math.min(bn.t/0.25,(bn.dur-bn.t)/0.5),0,1); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.lineJoin='round';
-  const y=H*(bn.style==='region'?0.2:(usingTouch&&bn.style==='boss'?0.42:0.26));
+  const y=H*(bn.style==='region'?0.2:(usingTouch&&bn.style==='boss'?0.42:0.26)), quest=!!bn.q;
   let tw=0, bot=y;
   if(bn.style==='boss'){
-    ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
-    ctx.font=`500 13px ${UIF}`; const ls=wrapText(bn.sub,W-48); ctx.fillStyle='#f0dcc0'; ls.forEach((l,i)=>{ ctx.lineWidth=4; ctx.strokeText(l,W/2,y+32+i*17); ctx.fillText(l,W/2,y+32+i*17); }); bot=y+32+ls.length*17;
+    ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=LOOK.sb?7:6; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
+    ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,W-48); ctx.fillStyle=LOOK.sb?'#fff4dc':'#f0dcc0'; ls.forEach((l,i)=>{ ctx.lineWidth=LOOK.sb?4.6:4; ctx.strokeText(l,W/2,y+32+i*18); ctx.fillText(l,W/2,y+32+i*18); }); bot=y+32+ls.length*18;
   }else{
-    ctx.font=`${bn.style==='region'?'600':'800'} ${W<560?22:bn.style==='region'?30:32}px ${TF}`;
-    if(LOOK.sb){ tw=ctx.measureText(bn.text).width; if(bn.style==='region') sbRibbon(W/2,y,Math.min(W-24,tw+72),W<560?34:44); ctx.lineWidth=7; ctx.strokeStyle=SBC.outline; }
-    else{ ctx.lineWidth=6; ctx.strokeStyle='rgba(0,0,0,.65)'; }
+    // quest news is a size down from a level up or a region title: it is read, not announced
+    const fs=bn.style==='region'?(W<560?22:30):quest?(W<560?19:24):(W<560?22:32);
+    ctx.font=`${bn.style==='region'?'600':'800'} ${fs}px ${TF}`;
+    if(LOOK.sb){ tw=ctx.measureText(bn.text).width; if(bn.style==='region') sbRibbon(W/2,y,Math.min(W-24,tw+72),W<560?34:44); ctx.lineWidth=quest?6:7; ctx.strokeStyle=SBC.outline; }
+    else{ ctx.lineWidth=quest?5:6; ctx.strokeStyle='rgba(0,0,0,.65)'; }
     ctx.strokeText(bn.text,W/2,y); ctx.fillStyle=bn.style==='region'?(LOOK.sb?'#fff4dc':'#f6e9d6'):'#ffd27a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
-    if(bn.sub){ ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,W-48); ls.forEach((l,i)=>{ ctx.lineWidth=LOOK.sb?4.6:4; ctx.strokeText(l,W/2,y+30+i*18); ctx.fillStyle=LOOK.sb?'#fff4dc':'#f0dcc0'; ctx.fillText(l,W/2,y+30+i*18); }); bot=y+30+ls.length*18; }
+    const sy=y+(quest?25:30);
+    if(bn.sub){ ctx.font=`600 14px ${UIF}`; const ls=wrapText(bn.sub,Math.min(W-48,620)).slice(0,3); ls.forEach((l,i)=>{ ctx.lineWidth=LOOK.sb?4.6:4; ctx.strokeText(l,W/2,sy+i*18); ctx.fillStyle=LOOK.sb?'#fff4dc':'#f0dcc0'; ctx.fillText(l,W/2,sy+i*18); }); bot=sy+ls.length*18; }
   }
-  // more waiting: a small "+1" chip beside the title
-  const nq=G.bannerQ?G.bannerQ.length:0;
-  if(nq){ const t=`+${nq}`; ctx.font=`800 12px ${UIF}`; const cw=ctx.measureText(t).width+14, cx=Math.min(W-SAFE.r-cw-6,W/2+tw/2+10), cy=y-11;
-    if(LOOK.sb) sbPill(cx,cy,cw,22); else{ ctx.fillStyle='rgba(14,9,6,.82)'; rr(cx,cy,cw,22,11); ctx.fill(); ctx.strokeStyle='rgba(255,200,120,.6)'; ctx.lineWidth=1; ctx.stroke(); }
-    if(LOOK.sb) ctx.fillStyle=SBC.outline; else
-    ctx.fillStyle='#ffd27a'; ctx.textBaseline='middle'; ctx.fillText(t,cx+cw/2,cy+11.5); }
   ctx.restore();
   // touch: tap the banner to let it go (with a mouse any click does it, see the mousedown handler in a5_input.js)
   if(usingTouch&&scene==='play'&&bn.t>0.3){ const bw=Math.min(W-24,Math.max(tw,200)+40); HUD_HITS.push({x:W/2-bw/2,y:y-26,w:bw,h:bot-y+34,fn:bannerSkip}); }
@@ -253,23 +263,90 @@ function hintTextRaw(){
   if(settings.mouseAim) return `WASD move · Shift sprint · Mouse aim · Left click slash, or talk and open when no foe is near · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
   return `WASD move, Ash faces the way he walks · Shift sprint · Click or J attack, and talk or open when no foe is near · Right click or K fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · L log · ${K('map')} map`;
 }
-function drawHintText(b){
-  const a=Math.min(1,G.hintT/1.5);
-  ctx.font=`500 13px ${UIF}`; const lines=wrapText(hintText(),Math.min(660,W-64)), bh=lines.length*18+10;
-  let y0=H-SAFE.b-(usingTouch?290:(b&&!b.dead?110:34))-(lines.length-1)*18-(G.prompt&&!usingTouch?72:0);
-  const bw3=Math.max(...lines.map(l=>ctx.measureText(l).width))+52;
-  let cx=W/2;
-  if(usingTouch){ let top=Math.min(y0-14,touchBase()-bh-24); if(G.prompt&&PROMPT_R) top=Math.min(top,PROMPT_R.y-bh-10); const at=touchClear(bw3,bh,top+bh/2); cx=at.x; y0=at.y-bh/2+14; }
+// ---------- (v11 polish) the controls coach: one short line at a time, each control when it becomes useful (move and
+// talk first, attack and roll once the sword is in hand, roll away in the first fight, drink when hurt, the map later).
+// A new journey turns it on (G.flags.coach); each tip shows once per journey (G.flags.coach_<id>). Old saves get none.
+// Settings > Tips Off hides it, and its X closes it for good (Tips off and on brings it back), as the old hint did.
+// Each tip is [id, when, max seconds, done early, parts by device]; a part is text, or {k:action} for a key or button.
+const COACH={id:null,shown:0,gap:0,last:0,moved:0,px:0,py:0,sc:null,pot:0,a:0};
+function coachLeft(){ return lefty()?'Right':'Left'; }
+const COACH_TIPS=[
+  ['move',()=>true,10,()=>COACH.moved>260&&COACH.shown>4,{
+    kb:[{k:'move'},'Move',{k:'sprint'},'Run',{k:'use'},'Talk'],
+    pad:[()=>coachLeft()+' stick','Move',{k:'use'},'Talk'],
+    touch:[()=>settings.touch==='two'?`Drag on the ${lefty()?'right':'left'} to move`:'Drag low on the screen to move','·','SLASH says TALK near people']}],
+  ['door',()=>!AREA&&!G.inCombat&&DOORS.some(d=>dist2(d.x,d.y,player.x,player.y)<150*150),6,()=>!!AREA,{
+    all:['Walk into a door to go inside']}],
+  ['sword',()=>!!(G.flags.forge||(G.weapons&&G.weapons.sword)),8,null,{
+    kb:()=>settings.mouseAim?[{t:'Click'},'Slash toward the mouse',{k:'roll'},'Roll']:[{k:'attack'},'or click to attack',{k:'roll'},'Roll'],
+    pad:[{k:'attack'},'Attack',{k:'roll'},'Roll'],
+    touch:()=>autoAttackOn()?['Ash swings by himself near foes','·','ROLL dodges']:['SLASH attacks','·','ROLL dodges']}],
+  ['fight',()=>G.inCombat&&G.enemies.some(e=>!e.dead&&e.tele&&dist2(e.x,e.y,player.x,player.y)<320*320),6,null,{
+    kb:['A red mark means a hit is coming:',{k:'roll'},'Roll away'], pad:['A red mark means a hit is coming:',{k:'roll'},'Roll away'],
+    touch:['A red mark means a hit is coming: ROLL away']}],
+  ['drink',()=>player.potions>0&&player.hp<player.maxHp*0.5,7,()=>player.potions<COACH.pot,{
+    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap the flasks at the top to drink']}],
+  ['roar',()=>player.roar>=100,6,()=>player.roar<100,{
+    kb:['Your ROAR is full:',{k:'roar'},'Roar'], pad:['Your ROAR is full:',{k:'roar'},'Roar'], touch:['Your ROAR is full: tap ROAR']}],
+  ['jump',()=>hasAbil('jump'),6,null,{
+    kb:[{k:'jump'},'Jump'], pad:[{k:'jump'},'Jump'], touch:['JUMP hops over gaps and low walls']}],
+  ['map',()=>G.playTime>150&&!G.inCombat&&!!G.flags.forge,8,null,{
+    kb:[{k:'map'},'Map',{k:'journal'},'Journal',{k:'log'},'What was said'], pad:[{k:'map'},'Map',{k:'journal'},'Journal'],
+    touch:['Tap the minimap for the map, the goal list for the journal']}],
+];
+const COACH_ARENA={kb:[{k:'move'},'Move',{k:'attack'},'Attack',{k:'roll'},'Roll',{k:'drink'},'Drink'],pad:[()=>coachLeft()+' stick','Move',{k:'attack'},'Attack',{k:'roll'},'Roll',{k:'drink'},'Drink'],
+  touch:['Drag to move','·','SLASH attacks','·','ROLL dodges','·','Tap the flasks to drink']};
+function coachParts(P,dev){
+  let L=P[dev]||P.all||P.kb; if(typeof L==='function') L=L();
+  return L.map(q=>typeof q==='function'?{t:q()}:typeof q==='string'?{t:simplify(q)}:q.k?(dev==='touch'?{t:simplify(btnLabel(q.k,'touch'))}:{k:q.k}):q);
+}
+function coachTick(){
+  const now=G.time, dt=clamp(now-(COACH.last||now),0,0.1); COACH.last=now;
+  if(COACH.g!==G){ COACH.g=G; COACH.id=null; COACH.shown=0; COACH.gap=now+0.6; COACH.moved=0; COACH.px=player.x; COACH.py=player.y; }
+  COACH.moved+=Math.min(60,dist(player.x,player.y,COACH.px,COACH.py)); COACH.px=player.x; COACH.py=player.y;
+  if(G.mode!=='story') return G.hintT>0?{parts:COACH_ARENA,a:Math.min(1,G.hintT/1.5)}:null;
+  if(!G.flags.coach) return null;
+  // it waits while a banner, a chapter card or a talk is up, and for the quest news that is about to come
+  const card=COACH.card||(COACH.card=document.getElementById('card'));
+  const busy=scene!=='play'||!!G.banner||!!G.fishing||SK.hintEnd>G.time&&tipOn('skills')||!!(card&&card.classList.contains('on'))||G.timers.some(tm=>tm.fn===questUpdated&&tm.t<4);
+  if(COACH.id){
+    const T=COACH_TIPS.find(t=>t[0]===COACH.id);
+    if(!busy) COACH.shown+=dt;
+    const over=COACH.shown>=T[2]||(T[3]&&COACH.shown>1.2&&T[3]());
+    if(over&&!COACH.out){ COACH.out=now; }
+    if(COACH.out&&now-COACH.out>0.5){ G.flags['coach_'+T[0]]=1; COACH.id=null; COACH.out=0; COACH.gap=now+1.4; return null; }
+    if(busy) return null;
+    const a=COACH.out?clamp(1-(now-COACH.out)/0.5,0,1):clamp(COACH.shown/0.3,0,1);
+    return {parts:T[4],a};
+  }
+  if(busy||now<COACH.gap) return null;
+  for(const T of COACH_TIPS){ if(G.flags['coach_'+T[0]]) continue; let ok=false; try{ ok=!!T[1](); }catch(e){} if(ok){ COACH.id=T[0]; COACH.shown=0; COACH.out=0; COACH.pot=player.potions; break; } }
+  return null;
+}
+function drawCoach(b){
+  const C=coachTick(); if(!C||C.a<=0.01) return;
+  const dev=curDevice(), parts=coachParts(C.parts,dev), r=usingTouch?0:9;
+  const sc=COACH.sc||(COACH.sc=mkCanvas(8,8).getContext('2d')), TXT=`600 13px ${UIF}`;
+  // widths: key caps and pad buttons are measured by drawing them once on a scratch canvas
+  ctx.font=TXT; let tw=0; const ws=parts.map((q,i)=>{ const w=q.k?drawBtnGlyph(sc,q.k,20,20,r,dev):ctx.measureText(q.t).width; const gap=i===0?0:(q.k&&!parts[i-1].k?16:q.k?6:parts[i-1].k?7:6); tw+=w+gap; return [w,gap]; });
+  const bh=usingTouch?32:30, bw=tw+(usingTouch?58:54);
+  let y0=H-SAFE.b-(b&&!b.dead?96:30)-bh/2-(G.prompt&&!usingTouch?48:0), cx=W/2;
+  if(usingTouch){ let top=touchBase()-bh-24; if(G.prompt&&PROMPT_R) top=Math.min(top,PROMPT_R.y-bh-10); const at=touchClear(bw,bh,top+bh/2); cx=at.x; y0=at.y; }
   // never up on the vitals, the quest goal or the minimap
   const shortT=usingTouch&&H-SAFE.t-SAFE.b<600;
-  y0=Math.max(y0,SAFE.t+(shortT?164:24));
-  if(shortT){ const mx=MINI_R().x-14; if(mx-SAFE.l-14>=bw3) cx=clamp(cx,SAFE.l+14+bw3/2,mx-bw3/2); }
-  ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.textBaseline='middle';
-  if(LOOK.sb) sbPanel(cx-bw3/2,y0-14,bw3,bh,11); else{ ctx.fillStyle='rgba(12,9,6,.74)'; rr(cx-bw3/2,y0-14,bw3,bh,8); ctx.fill(); }
-  ctx.fillStyle=LOOK.sb?'#fff3d6':'#ead8bf'; lines.forEach((l,i)=>ctx.fillText(l,cx-10,y0+i*18));
+  y0=Math.max(y0,SAFE.t+(shortT?164:24)+bh/2);
+  if(shortT){ const mx=MINI_R().x-14; if(mx-SAFE.l-14>=bw) cx=clamp(cx,SAFE.l+14+bw/2,mx-bw/2); }
+  cx=clamp(cx,SAFE.l+8+bw/2,W-SAFE.r-8-bw/2);
+  ctx.save(); ctx.globalAlpha=C.a; ctx.textBaseline='middle'; ctx.textAlign='left';
+  if(LOOK.sb) sbPanel(cx-bw/2,y0-bh/2,bw,bh,bh/2); else{ ctx.fillStyle='rgba(12,9,6,.8)'; rr(cx-bw/2,y0-bh/2,bw,bh,bh/2); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.28)'; ctx.lineWidth=1; ctx.stroke(); }
+  let x=cx-bw/2+(usingTouch?14:16);
+  parts.forEach((q,i)=>{ const [w,gap]=ws[i]; x+=gap;
+    if(q.k) drawBtnGlyph(ctx,q.k,x+w/2,y0,r,dev);
+    else { ctx.font=TXT; ctx.fillStyle=q.t==='·'?'rgba(255,220,170,.55)':LOOK.sb?'#fff3d6':'#efdfc6'; ctx.fillText(q.t,x,y0+0.5); }
+    x+=w; });
   ctx.restore();
   // the X closes it for good (turning Settings > Tips off and on brings it back)
-  if(a>0.3) tipX(cx+bw3/2-14,y0,()=>{ G.hintT=0; tipShut('play'); },usingTouch?11:9);
+  if(C.a>0.3) tipX(cx+bw/2-(usingTouch?19:17),y0,()=>{ G.hintT=0; if(COACH.id){ COACH.out=G.time; } tipShut('play'); },usingTouch?11:8);
 }
 // ---------- touch buttons
 const WICON_STUB=/\{\s*\}\s*$/.test(String(drawWeaponIcon));
@@ -353,3 +430,137 @@ function drawTouch(){
   }
   ctx.restore();
 }
+
+// ================= (v11 polish) banner manners
+// Drew found the messages noisy: "Quest updated" again and again around doors, one story banner held over a whole boss
+// fight with a "+3" counter beside it, house names over the street. setBanner (a9a_env.js) is wrapped here:
+// - quest news (Quest updated, Story quest, New side quest, a quest's own step, Quest complete, clues, Case Book pages)
+//   waits while a fight is on (foes after Ash, a boss up, a boss intro) and comes 1.5 s after it is over, one at a time;
+// - "Quest updated" for the goal that was announced last (only its "(leave here first)" tail changed, or the same step
+//   said again) shows nothing, and that tail is never part of a banner (the goal list says it);
+// - the very same message again within 20 s shows nothing;
+// - a name inside a house is a small name plate of its own (not a banner, not in the queue), shown on the first visit
+//   only (a2e_interiors.js, and here for floors) and gone the moment Ash walks out.
+// Banners also wait out talks and menus (drawBanner) and the counter chip is gone (drawBanner).
+const BNR={g:null,goal:'',seen:new Map(),hold:[],fightT:-99,base:null,plate:null,last:0};
+const BN_QUEST=/^(Quest updated|Story quest|New side quest|New errand|Quest complete|Errand done|A new page in the Case Book!|A new page!|New clue!|Solved!)$/;
+function bnCore(s){ return String(s==null?'':s).replace(/\s*\(leave here first\)\s*$/i,'').trim(); }
+function bnQuesty(t,style){
+  if(style==='clue') return true; if(style) return false;
+  if(BN_QUEST.test(t)) return true;
+  try{ for(const id in G.quests){ const d=QDEFS[id]; if(d&&simplify(String(d.title||'').replace('Errand: ',''))===t) return true; } }catch(e){}
+  return false;
+}
+function bnFight(){ return !!(G&&(G.inCombat||(G.boss&&!G.boss.dead)||G.fightIntro)); }
+function bnStub(text,sub){ return {text,sub,t:0,dur:0,style:'',len:0,key:'',stub:true}; }
+function bnReset(){ BNR.g=G; BNR.goal=''; BNR.seen.clear(); BNR.hold=[]; BNR.fightT=-99; BNR.plate=null; }
+function bnShow(text,sub,dur,style,t,s,q){
+  BNR.seen.set(t+'|'+s,G.time); if(BNR.seen.size>80) BNR.seen.delete(BNR.seen.keys().next().value);
+  if(t==='Quest updated') BNR.goal=bnCore(s);
+  const b=BNR.base(text,sub,dur,style); if(b&&q) b.q=true;
+  return b;
+}
+{ const base=setBanner; BNR.base=base; setBanner=function(text,sub,dur,style){
+    if(!G) return base(text,sub,dur,style);
+    if(BNR.g!==G) bnReset();
+    style=style||'';
+    const t=simplify(String(text==null?'':text)), q=bnQuesty(t,style);
+    if(q&&sub) sub=bnCore(sub);
+    const s=sub?simplify(String(sub)):'';
+    // a name inside a house: the small plate (style 'place' from enterArea decides the first visit itself)
+    if((style==='region'||style==='place')&&AREA&&AREA.kind==='house'){
+      const k='v11pl_'+AREA.id; if(style==='region'&&G.found[k]) return bnStub(t,s);
+      G.found[k]=true; BNR.plate={text:t,area:AREA.id,t:0,dur:2.6}; return bnStub(t,s);
+    }
+    if(t==='Quest updated'&&bnCore(s)===BNR.goal) return bnStub(t,s);
+    // a quest's first step right behind the banner that starts it ("New side quest: Ember's Trials: ...") says the
+    // same thing again: the goal list has it
+    if(q&&!BN_QUEST.test(t)){ const Q=[G.banner].concat(G.bannerQ||[]); if(Q.some(b=>b&&/^(New side quest|Story quest|New errand)$/.test(b.text)&&String(b.sub).startsWith(t))) return bnStub(t,s); }
+    const key=t+'|'+s, last=BNR.seen.get(key);
+    if(last!=null&&G.time-last<20&&!/^Level \d+$/.test(t)&&style!=='boss') return bnStub(t,s);
+    if(q&&bnFight()){ const h=bnStub(t,s); h.args=[text,sub,dur,style]; BNR.hold=BNR.hold.filter(o=>o.text+'|'+o.sub!==key); BNR.hold.push(h); if(BNR.hold.length>6) BNR.hold.shift(); return h; }
+    return bnShow(text,sub,dur,style,t,s,q);
+  }; }
+// every frame (from drawBanner): fights hold quest news back, a calm moment lets it out, the plate keeps to its room
+function bnTick(){
+  if(!G) return; if(BNR.g!==G) bnReset();
+  const now=G.time, dt=clamp(now-(BNR.last||now),0,0.1); BNR.last=now;
+  const fight=bnFight(); if(fight) BNR.fightT=now;
+  if(fight){
+    // quest news already up or waiting when the fight starts: it steps aside and comes back after (if barely read)
+    const bn=G.banner;
+    if(bn&&bn.q&&!bn.held){ bn.held=true; if(bn.t<bn.dur*0.5){ const h=bnStub(bn.text,bn.sub); h.args=[bn.text,bn.sub,bn.dur,bn.style]; BNR.hold.unshift(h); BNR.seen.delete(bn.text+'|'+bn.sub); if(bn.text==='Quest updated') BNR.goal=''; } bn.dur=Math.min(bn.dur,bn.t+0.35); }
+    if(G.bannerQ&&G.bannerQ.some(b=>b.q)){ for(const b of G.bannerQ) if(b.q){ const h=bnStub(b.text,b.sub); h.args=[b.text,b.sub,b.dur,b.style]; BNR.hold.push(h); BNR.seen.delete(b.text+'|'+b.sub); if(b.text==='Quest updated'&&BNR.goal===bnCore(b.sub)) BNR.goal=''; } G.bannerQ=G.bannerQ.filter(b=>!b.q); }
+  }else if(BNR.hold.length&&scene==='play'&&now-BNR.fightT>1.5&&!G.banner&&!(G.bannerQ&&G.bannerQ.length)){
+    const h=BNR.hold.shift(); let [text,sub,dur,style]=h.args;
+    // a goal held through a fight may be old news by now: say the goal as it is now, or nothing if it was said
+    if(h.text==='Quest updated'){ const o=questObjective(); sub=o?bnCore(o.text):''; if(!sub||sub===BNR.goal) return; }
+    const t=simplify(String(text)), s=sub?simplify(String(sub)):'';
+    bnShow(text,sub,dur,style,t,s,true);
+  }
+  const P=BNR.plate;
+  if(P){ if(!AREA||AREA.id!==P.area||P.t>=P.dur) BNR.plate=null; else if(scene==='play') P.t+=dt; }
+}
+// the house name plate: a small parchment (Storybook) or dark (classic) tag at the top, clear of the vitals and minimap
+function drawPlate(){
+  const P=BNR.plate; if(!P||scene!=='play') return;
+  const a=clamp(Math.min(P.t/0.25,(P.dur-P.t)/0.45),0,1); if(a<=0) return;
+  ctx.save(); ctx.globalAlpha=a; ctx.font=`700 15px ${TF}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineJoin='round';
+  const tw=ctx.measureText(P.text).width, w=Math.min(W-24,tw+46), h=30, x=W/2-w/2, M=MINI_R();
+  // under the top row (the weapon bar, Pip and the skills toast live up there), or below the goal list on a narrow screen
+  let y=SAFE.t+74-(1-Math.min(1,P.t/0.3))*6;
+  if(x<HUD_RX+4||x+w>M.x-8) y=Math.max(y,TRACK_R?TRACK_R.y+TRACK_R.h+6:SAFE.t+150,M.y+M.r*2+34);
+  if(LOOK.sb){ sbPill(x,y,w,h); ctx.fillStyle=SBC.outline; }
+  else{ ctx.fillStyle='rgba(14,9,6,.82)'; rr(x,y,w,h,h/2); ctx.fill(); ctx.strokeStyle='rgba(255,210,150,.45)'; ctx.lineWidth=1; ctx.stroke(); ctx.fillStyle='#f6e2c0'; }
+  ctx.fillText(P.text,W/2,y+h/2+1);
+  // a small gold diamond at each end, like the goal marks
+  for(const s of [-1,1]){ ctx.save(); ctx.translate(W/2+s*(tw/2+12),y+h/2+1); ctx.rotate(Math.PI/4); ctx.fillStyle='#e8a43a'; ctx.fillRect(-2.6,-2.6,5.2,5.2); ctx.restore(); }
+  ctx.restore();
+}
+// (v11 polish) a level up comes one thing at a time: the Level banner (it already says how many skill points and which
+// key opens Skills, so the first-time "You have N skill points" toast is folded into it), then the queue, then the coach
+function lvQueue(){
+  const left=SK.hintEnd-G.time; if(!(left>0)) return;
+  const lvUp=b=>b&&/^Level \d+$/.test(b.text), lv=lvUp(G.banner)?G.banner:(G.bannerQ||[]).find(lvUp);
+  // the Level banner already carries the same words ("+2 skill points ... Press U to open your Skills"): no second box
+  if(lv&&String(lv.sub).includes(simplify(skCtrlHint()))){ SK.hintEnd=0; return; }
+  if((scene!=='play'||lv)&&left>9.65) SK.hintEnd=G.time+10;
+}
+
+// ================= (v11 polish) short goals
+// goalLine draws one goal on one line: the goal (cut short to fit, see goalShort) and, after a dot, how far it is, or
+// "leave here first" when it is outside the room Ash is in.
+function goalLine(text,x,y,maxW,dm,col,txt,font){
+  const F=font||`500 12px ${UIF}`, SF=`600 10.5px ${UIF}`, raw=String(text==null?'':text);
+  const leave=/\(leave here first\)\s*$/i.test(raw);
+  const suf=leave?simplify(GOAL_LEAVE):dm!=null?`· ${Math.max(1,Math.round(dm))} m`:'';
+  ctx.font=SF; const sw=suf?ctx.measureText(suf).width+7:0;
+  ctx.font=F; const g=goalShort(raw,maxW-sw);
+  ctx.fillStyle=col; txt(g,x,y);
+  if(suf){ const gw=ctx.measureText(g).width; ctx.font=SF; ctx.fillStyle=LOOK.sb?'#f4dcb4':'#d8c4a4'; txt(suf,x+gw+7,y+0.5); }
+}
+// the goal cut to fit one line (ctx.font set): the whole goal if it fits, else its Simple words version (written
+// short for younger players), else as many of its first sentences as fit, else its first clause, else cut with an
+// ellipsis. A count at the end (" · 2/3 lit") always stays.
+const GSC=new Map(), GOAL_LEAVE=S('· leave here first','· go outside first');
+function goalShort(raw,maxW){
+  const key=ctx.font+'|'+Math.round(maxW)+'|'+raw, c=GSC.get(key); if(c!=null) return c;
+  let t=bnCore(raw), tail='';
+  const m=/\s·\s([^·]*\d[^·]*)$/.exec(t); if(m){ tail=' · '+m[1].trim(); t=t.slice(0,m.index).trim(); }
+  const trim=s=>s.trim().replace(/[.;:,]$/,''), fits=s=>ctx.measureText(s+tail).width<=maxW;
+  let out=null;
+  if(fits(trim(t))) out=trim(t);
+  if(out==null){ const s=simpleText(t); if(s&&s!==t&&fits(trim(s))) out=trim(s); }
+  if(out==null){ const parts=t.replace(/([.!?;])\s+(?=["“'‘]?[A-Z])/g,'$1\u0001').split('\u0001'); let acc='';
+    for(const q of parts){ const n=acc?acc+' '+q:q; if(fits(trim(n))) acc=n; else break; } if(acc&&trim(acc).length>=8) out=trim(acc); }
+  if(out==null){ const c0=t.split(/,\s+|\s+\(|:\s+/)[0]; if(trim(c0).length>=10&&fits(trim(c0))) out=trim(c0); }
+  if(out==null){ const w=trim(t).split(/\s+/); let s=''; for(const q of w){ const n=s?s+' '+q:q; if(ctx.measureText(n+'…'+tail).width<=maxW) s=n; else break; } out=(s||w[0])+'…'; }
+  out+=tail; if(GSC.size>400) GSC.clear(); GSC.set(key,out); return out;
+}
+// the Simple words version of a text, whatever the Words setting (a1k_simple.js)
+function simpleText(t){
+  try{ simpleInit(); const v=SIMPLE.map[h32(t)]; if(v!=null) return v;
+    for(const q of SIMPLE.tpl){ const m=q.re.exec(t); if(m) return q.s.replace(/\{(\d+)\}/g,(_,i)=>m[+i]!=null?m[+i]:''); } }catch(e){}
+  return null;
+}
+window.__ebDbg=Object.assign(window.__ebDbg||{},{bnr:()=>({goal:BNR.goal,hold:BNR.hold.map(h=>[h.text,h.sub]),plate:BNR.plate&&BNR.plate.text,fightT:BNR.fightT}),coach:()=>({id:COACH.id,shown:COACH.shown,flags:Object.keys(G.flags).filter(k=>/^coach/.test(k))}),goalShort:(t,w)=>{ ctx.font=`500 12px ${UIF}`; return goalShort(t,w||300); }});
