@@ -66,6 +66,367 @@ people({
   },
 
   talk: {
+    // ======================================================================= the Moon Pier (map 3): Mom and the friends
+    // (J12, talk v11) Act V talk answers what was said. The states, in story order: on the Moon Pier before Ash crosses
+    // the moonfire bridge (!flag n_depart); back over the bridge in the middle of the climb (flag n_depart, the Long
+    // Night: !flag n_dawn); and after the dawn (flag n_dawn: the epilogue and free roam). Openers are listed in the order a
+    // person would say them, the one-time callbacks to Acts I to IV first. x3_people.js stands Mom, Quill, Juniper,
+    // Vesper (m_vesper_ally), Tikka (tk_come=yes) and Dell (m_landed) on the pier, and steps aside for this data
+    // (m3pDataTalk). After the game is won Mom is home at the forge, Quill at the Observatory, Juniper still on the pier,
+    // Dell and Tikka at Driftwood Landing.
+
+    // ---------------------------------------------------------------- Mom (Maren)
+    // Voice sheet: a smith. Short, practical, warm, teasing. Worry comes out as instructions, love as hugs and work. Never
+    // "I'm proud of you", never speeches. Her one "Eat something" in Act V is in n_bridge's note, so none here.
+    maren: [
+      // after the dawn: an ice dragon behind the forge (Glaciar flew everyone home, or came to Lantern Day)
+      { if: { all: ['flag n_dawn', { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }] }, fact: 'n5_moon=back',
+        say: ["There's an ice dragon snoring behind my forge. Every bucket of milk in the village has frozen solid.",
+          'An ice dragon snores behind my forge. The milk froze!'],
+        re: [
+          { t: ["That's Auntie Glee. She'll wake up hungry.", 'She will wake up hungry.'],
+            say: ["Then she can have the frozen milk. It's hers, really.", 'Then she can have the frozen milk.'] },
+          { t: ['Should I wake her up?', 'Should I wake her?'],
+            say: ["Let her sleep. She told me she's slept through too much already. I think this is the good kind.", 'Let her sleep. This is the good kind of sleep.'] },
+          { t: ['Can she stay for Lantern Day?', 'Can she stay?'], tone: 'kind', f: 0.5,
+            say: ["She's family. Family doesn't have to ask.", 'She is family. She does not have to ask.'] },
+        ] },
+      // after the dawn, the Heart given to the moon
+      { if: 'flag n_dawn choice n_end=embermoon', fact: 'n5_moon=back',
+        say: ['You gave our Heart to the moon. I mended it so it would keep somebody warm. I never thought it would be everybody.',
+          'You gave the Heart to the moon. Now it keeps everyone warm.'],
+        re: [
+          { t: ['Are you cross with me?', 'Are you cross?'],
+            say: ['Cross? It sat on a shelf in my forge for twenty years. Now I can see it from the door.', 'No. Now I can see it from the door.'] },
+          { t: ['Grandma Ember would have done it.', 'Grandma Ember would have.'],
+            say: ["She would. She'd have thrown it higher, too.", 'She would. Higher, too.'] },
+        ] },
+      // after the dawn: home
+      { if: 'flag n_dawn', fact: 'n5_moon=back',
+        say: [['narr', 'Mom hugs you so hard your horns creak. Then she lets go, looks at you, and does it again.', 'Mom hugs you. Then she hugs you again.'],
+          ['maren', "There. Now you're properly home.", "There. Now you're home."]],
+        re: [
+          { t: ['I heard you, up there in the dark.', 'I heard you in the dark.'], tone: 'kind', f: 0.5, then: ['said maren_window'],
+            say: ['I talked to the lantern in the window all night. Hal came round twice to check on me.', 'I talked to the window lantern all night. Hal checked on me.'] },
+          { t: ['I ate the sandwich. Eventually.', 'I ate the sandwich. Late.'],
+            say: ["Squashed, in the dark, halfway up a mountain? Good. That's the best way to eat a sandwich.", 'Squashed, in the dark? Best way to eat one.'] },
+          { t: ["The Heart's back on its shelf.", 'The Heart is home.'], if: '!choice n_end=embermoon',
+            say: ["Good. Now I can stop getting up at night to look at the shelf. I won't, though.", 'Good. I will still check it at night.'] },
+        ] },
+      // after the dawn, the next day: her moment (the question she sat on all through the Long Night)
+      { if: 'flag n_dawn', fact: 'n5_moon=back',
+        say: ['Ash. When you were up there, did you ever want to turn round and come home?', 'Up there, did you want to come home?'],
+        re: [
+          { t: ["Every ring. I didn't, though.", "Every ring. I didn't."], f: 0.75,
+            say: ['I know. I sat on the step every night and wanted to come and fetch you. I didn\'t either.', 'I wanted to fetch you every night. I did not.'] },
+          { t: ['Only when Pip got hungry.', 'When Pip was hungry.'], tone: 'silly', if: 'flag pip',
+            say: ['So every hour, then.', 'So every hour.'] },
+          { t: ['No. You kept the light on.', 'No. You kept the light on.'], tone: 'kind', f: 0.5,
+            say: ["Every night. Fennick sold me so many candles he started giving them away.", 'Every night. Fennick gave me candles.'] },
+        ] },
+      // back over the bridge in the middle of the climb
+      { if: 'flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ["You're back! Is it... No. It isn't done, is it? You've come down for something.", "You're back! It isn't done, is it?"],
+        re: [
+          { t: ['I wanted to see you first.', 'I wanted to see you.'], tone: 'kind', f: 0.75, then: ['said maren_visit'],
+            say: ["...Come here. There. That's enough of that. Now go back up.", 'Come here. There. Now go back up.'] },
+          { t: ["The rings are all places I've been.", 'The rings are places I know.'],
+            say: ['Then you know the way round already. That helps.', 'Then you know the way. Good.'] },
+        ] },
+      // on the pier, before the bridge
+      { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ['That bridge goes all the way up into the dark. I keep looking at it, and it keeps going.', 'The bridge goes up and up into the dark.'],
+        re: [
+          { t: ["I'll come back down it.", "I'll come back down."],
+            say: ["I know. I'll be right here at the end, with my hammer, in case.", 'I know. I will wait here with my hammer.'] },
+          { t: ["I'll be careful. Twice.", "I'll be careful. Twice."], if: 'said maren_careful', tone: 'kind', f: 0.5,
+            say: ['Twice. Like at the door, the very first time. Good.', 'Twice. Like the first time.'] },
+          { t: ['Walk me to the end of the pier?', 'Walk me to the end?'],
+            say: ["That's what I'm here for. To the end of the pier, and then I watch.", 'To the end. Then I watch.'] },
+        ] },
+      { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: [['Everybody came out to the pier for you. Go and say your goodbyes. I go last.', 'Say your goodbyes. I go last.'],
+          ["Quill keeps bringing me tea. I keep forgetting to drink it. I'm watching the bridge.", 'I keep watching the bridge.']] },
+      { if: 'flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: [["Did you eat that sandwich yet? Don't make me come up there.", 'Did you eat the sandwich?'],
+          ["I'll be right here at the end of the bridge, with my hammer, in case.", 'I will wait here. With a hammer.']] },
+      // the fourth lantern post (her clue for n5_fourth_lantern; the place n5_mom_ask at her feet plays the same scene)
+      { if: 'clue n5_fourth_post !clue n5_mom_lanterns', option: ['Mom, why would a green have four lantern posts?', 'Why four lantern posts?'],
+        then: ['clue n5_mom_lanterns'],
+        say: [['maren', 'Four? My gran always made four lanterns on Lantern Day. Three for us, and one for whoever is out in the dark.',
+            'Gran made four lanterns. One for whoever is out in the dark.'],
+          ['maren', 'Her gran did it too. Nobody remembered why. You just did it.', 'Nobody knew why. We just did it.']] },
+      // the friends' errands: what Ash tells her, and what she says to do
+      { ask: ['Auntie Glaciar is still asleep, Mom.', 'Glaciar is still asleep.'], if: 'quest q_n5_glaciar active !flag n5_glaciar', fact: 'n5_glaciar_bed=asleep',
+        say: ['In the snow, on Mount Dread, with those chains on? Then go and wake her. Family does not get left in the snow.',
+          'Then go and wake her. Family does not get left.'] },
+      { ask: ["Hush is tied up with moon-silk.", 'Hush is tied with moon-silk.'], if: 'quest q_n5_hush active !flag m_leash_known',
+        say: ["A knot nothing can cut? Then don't cut it. Find out how it was tied. Ask that old merman, Ripple. Somebody always wrote it down.",
+          "Don't cut it. Ask Elder Ripple. Somebody wrote it down."] },
+      { ask: ['I left Vesper hanging up there.', 'I left Vesper up there.'], if: 'quest q_n5_vesper active',
+        say: ['Then go and tell her so. Her, not me. Her gran will know how to say it. Grans always know.', 'Tell her, not me. Her gran will know how.'] },
+      { ask: ['Were you scared on the moonlight stairs?', 'Were you scared on the stairs?'], if: { all: ['!flag n_dawn', { any: ['flag m_maren', 'flag m_reforged'] }] },
+        say: ['Every step. I kept my eyes on the top, where you were, and let my feet do the rest.', 'Every step. I looked at you, not down.'] },
+      { ask: ['What do I do if she asks for the Heart?', 'What if she asks for the Heart?'], if: '!flag n_dawn',
+        say: ["You say no. You've said no at bedtime since you were two. You're very good at it.", 'You say no. You are very good at no.'] },
+      { ask: ['Will you teach me to mend things?', 'Will you teach me to mend?'], if: 'flag n_dawn',
+        say: ["Tomorrow. Bring your own apron. You're not borrowing mine again.", 'Tomorrow. Bring your own apron.'] },
+      { ask: ['Is Vesper staying for Lantern Day?', 'Is Vesper staying?'], if: { all: ['flag n_dawn', { any: ['flag n5_vesper', 'choice c_vesper=friend'] }] },
+        say: ["She's in the forge, trying out my tongs. I've told her she can hang that mask by the door.", 'She is in the forge. Her mask can hang by the door.'] },
+      { if: 'flag n_dawn', idle: [["Mm? Pass me the tongs. It's good to say that again.", 'Pass me the tongs.'], ['Go on. I can hammer and listen.', 'Go on. I am listening.']] },
+      { idle: [["Mm? I'm watching the bridge. Go on.", 'I am watching. Go on.'], ['Go on. My hands are busy, not my ears.', 'Go on. I am listening.']] },
+      { if: 'flag n_dawn', bye: [["Back before dark. ...I get to say that again.", 'Back before dark!']] },
+      { bye: [['Scarf on. Go.', 'Scarf on. Go.'], ["Go on. I'm right here.", 'Go on. I am here.']] },
+      { bark: true, if: '!flag n_dawn', say: ['Keep your scarf on up there, Ash!', 'Keep your scarf on!'] },
+    ],
+
+    // ---------------------------------------------------------------- Vesper, on the pier (friend path, m_vesper_ally)
+    // Voice sheet: quick, proud, funny when cornered, tender only about Gran. Climber's words. Teases instead of
+    // thanking. "cousin", never "little ember". Act IV: the smoke job, the stolen moth knight's helmet, the Moon Well
+    // where she told the Mother to keep her fire, and "Not alone, cousin." on this pier. On the peak she comes in at the
+    // Silk Gallery (n_clocks, flag n_vline) and goes up her own way; x3_people still stands her on the pier, so a kid
+    // who comes back down finds her there first.
+    c_vesper: [
+      { if: 'flag n_vline flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ["Don't look at me like that. Thieves never take the stairs. I was down here before you.", "Thieves don't take stairs. I got here first."],
+        re: [
+          { t: ['How did you even get down?', 'How did you get down?'],
+            say: ['A silk line, a long drop and a very surprised moth. Mostly the moth.', 'A silk line. And a surprised moth.'] },
+          { t: ['You saw your echo, up there.', 'You saw your echo.'], if: 'stage>=n_rime',
+            say: ["I saw her. I used to be her. I'd like to stop talking about it now.", 'I used to be her. Let us not talk about it.'] },
+        ] },
+      { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ["Not alone, cousin. I said it once, on this pier, and I'm not saying it again. It was embarrassing.", 'I said "not alone" once. Not again.'],
+        re: [
+          { t: ["It wasn't embarrassing.", "It wasn't embarrassing."],
+            say: ['It was. You did a face. ...Fine. It was a little bit nice.', 'You did a face. Fine. It was nice.'] },
+          { t: ['Will you climb up with me?', 'Will you climb with me?'],
+            say: ["With you? I'll be on the rooftops ahead of you. Try to keep up.", "I'll be ahead of you. Keep up."] },
+          { t: ["What's with the helmet?", "What's with the helmet?"],
+            say: ["Stole it off a moth knight in the Heights. It doesn't fit. I'm keeping it.", 'I stole it from a moth knight. Keeping it.'] },
+        ] },
+      // her moment, before the climb: the Moon Well, still on her mind
+      { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ['Can I ask you something? At the Well, when she offered me fire. Did you think I would take it?', 'At the Well. Did you think I would take her fire?'],
+        re: [
+          { t: ['No. Not for a second.', 'No. Not for a second.'], tone: 'kind', f: 0.5,
+            say: ['Liar. ...Thanks, though.', 'Liar. Thanks, though.'] },
+          { t: ['For a second, maybe.', 'For a second, maybe.'], f: 0.75,
+            say: ["Me too. A whole second. Then I thought about Gran's hands.", "Me too. Then I thought of Gran's hands."] },
+        ] },
+      { if: '!flag n_dawn', fact: 'n5_moon=gone',
+        say: [["Gran writes every week. She says the stove's still warm. She says come home. I say soon. It's nearly true.", 'Gran says come home. I say soon.'],
+          ["When you go up, I'll be right behind you. Or in front. Mostly in front.", 'I will be in front of you. Mostly.']] },
+      { ask: ['Does she still talk in your sleep?', 'Does she still talk to you?'], if: '!flag n_dawn',
+        say: ["Every night. She says I'll never get up that mountain. I've decided that's a dare.", 'Every night. She says I cannot climb it. That is a dare.'] },
+      { ask: ['What will you do, after?', 'What will you do after?'],
+        say: ["Tea with Gran. Then I'll break into something, just for fun, and put it all back.", 'Tea with Gran. Then a break-in, for fun. I will put it back.'] },
+      { ask: ['Do you miss being the Moth Mask?', 'Do you miss the Moth Mask?'],
+        say: ['I miss the cloak. The cloak was good. The rest was hers.', 'I miss the cloak. The rest was hers.'] },
+      { idle: [["Make it quick, cousin. I'm casing the bridge.", 'Quick, cousin.'], ["Mm? I was looking for a way up that isn't stairs.", 'Mm? Go on.']] },
+      { bye: [["See you at the top. I'll be early.", 'See you at the top.']] },
+    ],
+
+    // ---------------------------------------------------------------- Juniper Ashby, Rook's big sister
+    // Mapper, brave, a bit bossy, never lost twice. Act I: lost in the Whisperwood Hollow until Ash found her (quest
+    // hollow); Act IV: her Map Tent in Sable; drew the peak through Quill's telescope (n_depart). She stays on the pier.
+    juniper: [
+      { if: 'said rook_where_juniper !flag n_dawn', once: true,
+        say: ['Rook wrote to me. He says on Lantern Day you were the only one who asked where I was.', 'Rook says you asked where I was. On Lantern Day.'],
+        re: [
+          { t: ['You never miss the lanterns.', 'You never miss the lanterns.'],
+            say: ["I missed them that once. I'm not missing the moon.", 'I missed them once. Not this time.'] },
+          { t: ['Rook kept your supper warm.', 'Rook kept your supper warm.'],
+            say: ['He sat on it. He told me so. It was a very flat pie.', 'He sat on it. A very flat pie.'] },
+        ] },
+      { if: '!flag n_depart',
+        say: ["I saw it from Sable! A whole mountain, out of the sea! I'm drawing it through the Professor's telescope, but it won't hold still.",
+          'I saw the mountain from Sable! It will not hold still.'],
+        re: [
+          { t: ["Mountains don't move, Juniper.", "Mountains don't move."],
+            say: ["This one does. It's grown a ring since breakfast. I've rubbed the top out twice.", 'This one does. It grew a ring today!'] },
+          { t: ['Can I see it?', 'Can I see it?'],
+            say: ["Not till it's done. Half a map gets people lost. I know. I was the people.", 'Not yet. Half a map gets you lost. I know!'] },
+        ] },
+      { if: 'flag n_depart !flag n_dawn',
+        say: ['Did my map work? Tell me the truth. Did it get you lost?', 'Did my map work? Tell the truth!'],
+        re: [
+          { t: ['Four rings, just like you drew.', 'Four rings, like you drew.'],
+            say: ["Four! The Professor said three and a bit. I'm telling her right now.", "Four! I'm telling the Professor!"] },
+          { t: ['The second ring is all Gearhaven.', 'The second ring is Gearhaven.'],
+            say: ['I knew those chimneys looked crooked. I thought my hand was cold. They really are crooked.', 'I drew the chimneys crooked. They really are!'] },
+          { t: ['It got me lost once.', 'It got me lost once.'], tone: 'silly',
+            say: ['Once is good. Ask Rook how many times I got lost making the Emberhollow one.', 'Once is good! Ask Rook about me.'] },
+        ] },
+      { if: 'flag n_dawn',
+        say: ["I'm drawing the peak again, now the glass has gone clear. It's very hard to draw something you can see through.",
+          'I am drawing the peak again. It is clear now. So hard!'],
+        re: [
+          { t: ['Put Duchess on the very top.', 'Put Duchess on top.'],
+            say: ["She's already there. She's the smallest thing on the page, and she's looking right at you.", 'She is there. Tiny. Looking at you.'] },
+          { t: ["Write 'Don't' on it.", "Write 'Don't' on it."],
+            say: ['Already did. Rook will try it anyway, so I drew him the safe way up as well.', 'I did. And a safe way up, for Rook.'] },
+        ] },
+      { if: '!flag n_dawn',
+        say: [['The moths have all gone from the telescope. Now it\'s just the mountain, all the way up.', 'Now it is just the mountain.'],
+          ['I gave you my best map. If you lose it, come back and I will draw you another.', 'Lose my map? I will draw another.']] },
+      { ask: ['How did you get here from Sable?', 'How did you get here?'],
+        say: ['Under the Glasswall on my belly, the way you went. If a dragon fits, a Juniper fits.', 'Under the wall, on my belly. Like you.'] },
+      { ask: ['What will you map next?', 'What will you map next?'],
+        say: ['The moon. Somebody has to, and it has finally stopped moving about.', 'The moon. It has stopped moving!'], if: 'flag n_dawn' },
+      { ask: ['Does Rook know where you are?', 'Does Rook know you are here?'],
+        say: ["I wrote him three pages. He wrote back one line: \"Bring me a sand worm.\" No.", 'He wrote back: "Bring me a sand worm." No.'] },
+      { idle: [['Hold still. I\'m drawing your horns.', 'Hold still.'], ['Mm? Talk. I can draw and listen.', 'Talk. I am drawing.']] },
+      { bye: [["Don't fall off anything I haven't drawn yet.", "Don't fall off anything!"]] },
+    ],
+
+    // ---------------------------------------------------------------- Professor Quill (she) of the Observatory
+    // Measures the sky; numbers are how she feels things ("I have never been so upset about a number", n_depart). Was at
+    // the Eclipse Lens with Mom in Act IV. Writes to Gorran about rocks. After the game: her Observatory in Brindlecross.
+    quill: [
+      { if: 'said quill_watch flag n_dawn', once: true, fact: 'n5_moon=back',
+        say: ['I watched you all the way up, a little orange dot. Then the top of the mountain lit up like a forge, and I dropped the telescope.',
+          'I watched your light. Then the top lit up, and I dropped the telescope!'],
+        re: [
+          { t: ['Is the telescope all right?', 'Is the telescope okay?'],
+            say: ["Cracked lens. Now every star I look at has a tiny seam across it. I'm keeping it.", 'It cracked. Every star has a seam now. I like it.'] },
+          { t: ['How big was the light?', 'How big was the light?'],
+            say: ['Bigger than my numbers go. I wrote "very" and drew a line under it.', 'Too big for numbers. I wrote "very".'] },
+        ] },
+      { if: 'flag n_dawn choice n_end=moth', fact: 'n5_moon=back',
+        say: ['There is a small grey moth on the full moon. I have measured her. She is exactly the right size.', 'A little moth sits on the moon. Just the right size.'],
+        re: [
+          { t: ['Her name is Nyx.', 'Her name is Nyx.'], tone: 'kind',
+            say: ["Nyx. I'll write it on the chart. She's the first moth I've ever put on a chart.", 'Nyx. She is the first moth on my chart.'] },
+          { t: ["What's the right size?", 'What size is right?'],
+            say: ['Small enough to sit on a lantern. I checked.', 'Small enough to sit on a lantern.'] },
+        ] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back',
+        say: ['I measured the moon this morning. All of it is back. I have never been so happy about a number.', 'The whole moon is back! Happy numbers!'],
+        re: [
+          { t: ["What's the number?", "What's the number?"],
+            say: ["One. One whole moon. It's my favorite number now.", 'One. One whole moon.'] },
+          { t: ['Will it shrink again?', 'Will it shrink again?'],
+            say: ["A little, every month, and then it grows back. I'm going to measure it every single time.", 'A little. Then it grows back. I will measure it.'] },
+        ] },
+      { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ["I measured the mountain twice. It's taller than it was an hour ago. I don't like that number.", 'I measured the mountain. It is getting taller.'],
+        re: [
+          { t: ["Maybe it's still growing.", 'Maybe it is growing.'],
+            say: ["Mountains don't grow. They sit there and wear away. This one breaks every rule I have.", "Mountains don't grow. This one breaks the rules."] },
+          { t: ['Will you watch me through the telescope?', 'Will you watch me?'], tone: 'kind', f: 0.5, then: ['said quill_watch'],
+            say: ["Every step. You'll be a very small orange dot. I'll know which one.", 'Every step. You will be a little orange dot.'] },
+        ] },
+      { if: 'flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ['Every time I look through the telescope, the black glass seems to look back at me. I keep looking anyway.', 'The black glass looks back at me. I keep looking.'],
+        re: [
+          { t: ['What do you see up there?', 'What do you see?'],
+            say: ['Four rings, one orange dot, and above it all something very big, folded up and waiting.', 'Four rings. Your light. And something big, waiting.'] },
+          { t: ["Look away if it's scary.", 'Look away if it is scary.'], tone: 'kind',
+            say: ["Then I'd miss it. Scientists don't look away. We just squeak a bit.", 'Then I would miss it. I squeak, but I look.'] },
+        ] },
+      { if: '!flag n_dawn', fact: 'n5_moon=gone',
+        say: [['I am counting stars instead of the moon. There are four hundred more than usual. Without the moon, they show off.', 'Without the moon, the stars show off.'],
+          ['The moon saw every night that ever happened. If she ate it, she ate all of that too.', 'The moon saw every night. She ate them too.']] },
+      { ask: ['Why do you measure the moon?', 'Why measure the moon?'],
+        say: ["When I was seven, someone told me it was the same moon every night. I didn't believe them. I'm still checking.",
+          'When I was seven, I did not believe it was the same moon. I still check.'] },
+      { ask: ['Do you still write to Gorran?', 'Do you write to Gorran?'],
+        say: ["Every week. He sends me rocks, I send him stars. Neither of us understands the other one's, and it's lovely.", 'He sends rocks. I send stars.'] },
+      { idle: [['Mm? I was writing a number down. Go on.', 'Go on.'], ["One moment. ...There. Yes?", 'Yes?']] },
+      { bye: [['Clear skies, Ash.', 'Clear skies!']] },
+    ],
+
+    // ---------------------------------------------------------------- Dell Fisk and the Soggy Biscuit Three
+    // A lake fisherman who sailed to the end of the world. Cheerful, plain, a little soppy about boats. Cousin of Wendel.
+    dell: [
+      { if: 'said maren_visit !flag n_dawn', once: true, fact: 'n5_moon=gone',
+        say: ["Your mom's been humming since you came back down. She never hums. Don't tell her I noticed.", 'Your mom is humming. She never hums! Shh.'],
+        re: [
+          { t: ["What's she humming?", "What's she humming?"],
+            say: ["Something about a hen who wouldn't. I didn't ask.", 'Something about a hen. I did not ask.'] },
+          { t: ["I won't tell her.", "I won't tell."],
+            say: ['Good lad. She has a hammer.', 'Good. She has a hammer.'] },
+        ] },
+      { if: 'flag m_ship=glaciar', once: true,
+        say: ["You flew to Moonfall on a dragon instead of my boat. I'm not upset. The Soggy Biscuit Three is upset.", 'You flew on a dragon. My boat is upset.'],
+        re: [
+          { t: ['Glaciar is very fast. Slowly.', 'Glaciar is fast. Slowly.'],
+            say: ['Fast, slowly. My boat does that too. Mostly the slowly part.', 'My boat does that too. Mostly slowly.'] },
+          { t: ['I can say sorry to the boat.', 'I can say sorry to the boat.'], tone: 'kind',
+            say: ['Pat her on the side. There. She feels much better. So do I, oddly.', 'Pat her side. There. She feels better.'] },
+        ] },
+      { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ['Engine is warm, lantern is lit. Wherever you need to go, the Soggy Biscuit Three goes too.', 'My boat will take you anywhere.'],
+        re: [
+          { t: ['Can she go up a mountain?', 'Can she go up a mountain?'],
+            say: ['Not yet. Mags says give her a week and a lot of rope.', 'Not yet. Mags says: a week, and rope.'] },
+          { t: ["Is that one of Wendel's sandwiches?", "Is that Wendel's sandwich?"], if: 'said dell_sandwich',
+            say: ['It is. The fish have followed the boat all the way from Lake Mirrow for it.', 'It is! The fish followed us for it.'] },
+          { t: ['Will you wait for me?', 'Will you wait for me?'], tone: 'kind',
+            say: ["Right here, tied up, engine warm. I'm good at waiting. Ask any fish.", 'Right here. I am good at waiting.'] },
+        ] },
+      { if: 'flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
+        say: ['Fish are not biting. Even the fish know something is wrong with the sky.', 'Even the fish know the sky is wrong.'],
+        re: [
+          { t: ['What do fish do without a moon?', 'What do fish do now?'],
+            say: ['Same as me. Sit very still and look up.', 'Sit still and look up. Like me.'] },
+          { t: ["I'll bring the moon back.", "I'll bring the moon back."], tone: 'brave',
+            say: ["Then I'll catch you a fish to celebrate. A big one. Medium. A fish.", 'Then I will catch you a fish. A big one. Medium.'] },
+        ] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back',
+        say: ["Fish are biting again! The moon came back and the fish came with it. Best day's fishing of my life.", 'The fish are back!'],
+        re: [
+          { t: ['Are you sailing home now?', 'Are you going home now?'],
+            say: ["Tomorrow. Today I'm fishing. I think I've earned one day of fishing.", 'Tomorrow. Today I fish.'] },
+          { t: ['Catch one for Minnow.', 'Catch one for Minnow.'],
+            say: ['I did. She wrote back and said throw it back, it looked homesick. So I did.', 'She said throw it back. It looked homesick.'] },
+        ] },
+      { if: '!flag n_dawn', fact: 'n5_moon=gone',
+        say: [['When you come down off that mountain, I\'ll be right here. The kettle\'s on. It\'s always on.', 'I will be right here.'],
+          ["Your mom climbed a staircase made of moonlight. I stayed with the sandwiches. Somebody had to.", 'I stayed with the sandwiches.']] },
+      { ask: ['How far is home from here?', 'How far is home?'],
+        say: ['Eleven days by boat. Less by dragon, if you don\'t mind ice in your ears.', 'Eleven days by boat. Less by dragon.'] },
+      { ask: ['Does Minnow know you came all this way?', 'Does Minnow know?'],
+        say: ["She wrote: \"Bring me a moon fish.\" I don't know what that is. I'm going to find one.", 'She wants a moon fish. I will find one.'] },
+      { idle: [['Plenty of time on a pier. Ask away.', 'Ask away.'], ["Lines are in. What's up?", "What's up?"]] },
+      { bye: [['Tight lines, Ash. Come back down.', 'Tight lines!']] },
+    ],
+
+    // ---------------------------------------------------------------- Tikka, Act I's kobold baker, Dell's ship's cook
+    // (tk_come=yes). A small kobold with very big feelings about buns. Her brother is Tock. x3_people gives her lumpy bun
+    // first; after the game she is in Gilly's Floating Kitchen at Driftwood Landing.
+    ev_tikka: [
+      { if: '!flag n_depart',
+        say: ["I made a bun for the mountain. It's lumpy. The mountain doesn't deserve it.", 'I made a lumpy bun for the mountain.'],
+        re: [
+          { t: ['Is it for me or the mountain?', 'For me or the mountain?'],
+            say: ['For you. If the mountain is nice to you, you can share.', 'For you. Share if the mountain is nice.'] },
+          { t: ['Is Tock coming up too?', 'Is Tock coming?'],
+            say: ['Tock says mountains are for goats. I said then you are a goat. He said thank you.', 'Tock says mountains are for goats.'] },
+        ] },
+      { if: 'flag n_depart !flag n_dawn',
+        say: ['Captain Dell let me steer once. We went in a circle. A very brave circle.', 'I steered the boat. In a brave circle.'],
+        re: [
+          { t: ['Circles count.', 'Circles count.'],
+            say: ['That is what I said! Captain Dell said not on a boat.', 'I said that! Dell said not on a boat.'] },
+          { t: ['Does Gilly like your buns?', 'Does Gilly like your buns?'],
+            say: ['Gilly put a fish in one. We are not speaking. We speak all day.', 'Gilly put a fish in one. We are not speaking.'] },
+        ] },
+      { if: 'flag n_dawn',
+        say: ['I made moon buns! Round, with a seam of icing in the middle. Gilly says they need fish. They do not need fish.', 'Moon buns! No fish!'],
+        re: [
+          { t: ['Can I have the lumpiest one?', 'Can I have the lumpy one?'],
+            say: ['That one is for Tock. He likes them lumpy. You can have the second lumpiest.', 'That is for Tock. You get the next one.'] },
+          { t: ['Are you sailing home with Dell?', 'Are you going home with Dell?'],
+            say: ["Yes! I'm the ship's cook. It is a very important job. Mostly I hold the spoon.", "Yes! I'm the cook. I hold the spoon."] },
+        ] },
+      { ask: ['What is the bigger spoon for?', 'What is the big spoon for?'],
+        say: ["For a bigger pot. Tock says it's a ladle. It is a bigger spoon.", 'For a bigger pot. It is not a ladle.'] },
+      { idle: [['Hello! Are you hungry? You look hungry.', 'Are you hungry?'], ['I have flour on my nose. Leave it. What?', 'What?']] },
+      { bye: [['Bye! Lumpy means good luck!', 'Bye! Good luck!']] },
+    ],
+
     // ======================================================================= map 0, Embermere (Act I's people)
     yara: [
       { if: 'choice ending=lantern', once: true,
@@ -143,15 +504,6 @@ people({
         say: ['Lanterns! Get your lanterns! Half price during the Long Night! Full price after. That is just business, little dragon.',
           'Lanterns! Half price in the Long Night!'] },
       { if: 'flag n_dawn', fact: 'n5_moon=back', say: ['Lanterns, full price again! No? A moon-shaped cookie cutter, then. Lucky, they say.', 'Moon cookie cutters! Lucky!'] },
-    ],
-
-    dell: [
-      { if: 'flag m_ship=glaciar', once: true,
-        say: ["You flew to Moonfall on a DRAGON instead of my boat. I'm not upset. The Soggy Biscuit Three is upset.", 'You flew on a dragon. My boat is upset.'] },
-      { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: [['Fish are not biting. Even the fish know something is wrong with the sky.', 'Even the fish know the sky is wrong.'],
-          ['Engine is warm, lantern is lit. Wherever you need to go, the Soggy Biscuit Three goes too.', 'My boat will take you anywhere.']] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back', say: ["Fish are biting again! The moon came back and the fish came with it. Best day's fishing of my life.", 'The fish are back!'] },
     ],
 
     minnow: [
@@ -454,48 +806,6 @@ people({
     ],
 
     // ======================================================================= map 3, Moonfall (Act IV's people) and the Moon Pier
-    maren: [
-      { if: 'clue n5_fourth_post !clue n5_mom_lanterns', option: ['Mom, why would a green have four lantern posts?', 'Why four lantern posts?'],
-        then: ['clue n5_mom_lanterns'],
-        say: [['maren', 'Four? My gran always made four lanterns on Lantern Day. Three for us, and one for whoever is out in the dark.',
-            'Gran made four lanterns. One for whoever is out in the dark.'],
-          ['maren', 'Her gran did it too. Nobody remembered why. You just did it.', 'Nobody knew why. We just did it.']] },
-      { if: 'quest q_n5_glaciar active !flag n5_glaciar', fact: 'n5_glaciar_bed=asleep',
-        say: ['Your great-aunt is asleep in the snow on Mount Dread? Then go and wake her up. Family does not get left in the snow.',
-          'Go and wake Auntie Glaciar. Family does not get left.'] },
-      { if: 'quest q_n5_hush active !flag m_leash_known',
-        say: ['A knot nothing can cut? Then do not cut it. Ask that old merman, Ripple. Or Wren. Somebody always wrote it down.',
-          'Ask Elder Ripple. Somebody wrote it down.'] },
-      { if: 'flag n_dawn choice n_end=embermoon', fact: 'n5_moon=back',
-        say: ["You gave our Heart to the moon. ...Good. I mended it so it would keep somebody warm. Now it keeps everybody warm.",
-          'You gave the Heart away to keep everyone warm. Good.'] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back',
-        say: ['You brought it home, and you brought yourself home. Come here. Closer. Your horns can take it.', 'You came home. Come here. Big hug.'] },
-      { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: [["I'll be right here at the end of the bridge, with my hammer, in case.", 'I will wait here. With a hammer.'],
-          ["Did you eat that sandwich yet? Don't make me come up there.", 'Did you eat the sandwich?']] },
-      { bark: true, if: '!flag n_dawn', say: ['Keep your scarf on up there, Ash!', 'Keep your scarf on!'] },
-    ],
-
-    quill: [
-      { if: 'quest q_n5_hush active !flag m_leash_known',
-        say: ['Moon-silk! The moon-priests of Lumen studied it. Their books went down with the Drowned Library, under the sea.',
-          'The moon-priests wrote about moon-silk. Their books are under the sea.'] },
-      { if: 'flag n_dawn choice n_end=moth', fact: 'n5_moon=back',
-        say: ['There is a small grey moth on the full moon. I have measured her. She is exactly the right size.', 'A little moth sits on the moon. Just the right size.'] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back',
-        say: ['I measured the moon this morning. All of it is back. I have never been so happy about a number.', 'The whole moon is back! Happy numbers!'] },
-      { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: [['I am counting stars instead of the moon. There are four hundred more than usual. Without the moon, they show off.',
-            'Without the moon, the stars show off.'],
-          ['The moon saw every night that ever happened. If she ate it, she ate all of that too.', 'The moon saw every night. She ate them too.']] },
-    ],
-
-    juniper: [
-      { if: '!flag n_dawn', say: ["I drew the peak again. Four rings, one on top of the other. It keeps changing shape on me, and mountains aren't supposed to do that.", 'I drew the peak again. It keeps changing!'] },
-      { if: 'flag n_dawn', say: ['I drew the moon this morning, and it finally sat still long enough for me to finish.', 'I drew the moon. It sat still!'] },
-    ],
-
     m_ripple: [
       { if: 'quest m_leash active !flag m_vault_open',
         say: ['The priests\' Book of Moths! It lies in the vault of the Drowned Library, sealed with moon-wax. Only Moonfire melts it.',
