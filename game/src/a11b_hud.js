@@ -167,7 +167,9 @@ function drawBanner(){
   if(nq&&!bn.hurry&&bn.style!=='boss'){ bn.hurry=true; bn.dur=Math.max(bn.t+0.8,Math.min(bn.dur,Math.max(2.6,bn.dur*0.65))); }
   const a=clamp(Math.min(bn.t/0.25,(bn.dur-bn.t)/0.5),0,1); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a; ctx.textAlign='center'; ctx.lineJoin='round';
-  const y=H*(bn.style==='region'?0.2:(usingTouch&&bn.style==='boss'?0.42:0.26)), quest=!!bn.q;
+  // (on a phone the boss bar sits up top, under the goal: other news goes a little lower then)
+  const bossTop=usingTouch&&W<720&&G.boss&&!G.boss.dead;
+  const y=H*(bn.style==='region'?(bossTop?0.34:0.2):(usingTouch&&bn.style==='boss'?0.42:bossTop?0.36:0.26)), quest=!!bn.q;
   let tw=0, bot=y;
   if(bn.style==='boss'){
     ctx.font=`800 ${W<560?26:40}px ${TF}`; ctx.lineWidth=LOOK.sb?7:6; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.75)'; ctx.strokeText(bn.text,W/2,y); ctx.fillStyle='#ff7a3a'; ctx.fillText(bn.text,W/2,y); tw=ctx.measureText(bn.text).width;
@@ -286,10 +288,10 @@ const COACH_TIPS=[
   ['move',()=>true,10,()=>COACH.moved>260&&COACH.shown>4,{
     kb:[{k:'move'},'Move',{k:'sprint'},'Run',{k:'use'},'Talk'],
     pad:[()=>coachLeft()+' stick','Move',{k:'use'},'Talk'],
-    touch:[()=>settings.touch==='two'?`Drag on the ${lefty()?'right':'left'} to move`:'Drag low on the screen to move','·','SLASH says TALK near people']}],
+    touch:[()=>settings.touch==='two'?`Drag on the ${lefty()?'right':'left'} to move`:'Drag low down to move','·','SLASH talks to people']}],
   ['door',()=>!AREA&&!G.inCombat&&DOORS.some(d=>dist2(d.x,d.y,player.x,player.y)<150*150),6,()=>!!AREA,{
     all:['Walk into a door to go inside']}],
-  ['sword',()=>!!(G.flags.forge||(G.weapons&&G.weapons.sword)),8,null,{
+  ['sword',()=>!!G.flags.forge,8,null,{
     kb:()=>settings.mouseAim?[{t:'Click'},'Slash toward the mouse',{k:'roll'},'Roll']:[{k:'attack'},'or click to attack',{k:'roll'},'Roll'],
     pad:[{k:'attack'},'Attack',{k:'roll'},'Roll'],
     touch:()=>autoAttackOn()?['Ash swings by himself near foes','·','ROLL dodges']:['SLASH attacks','·','ROLL dodges']}],
@@ -337,10 +339,15 @@ function coachTick(){
 }
 function drawCoach(b){
   const C=coachTick(); if(!C||C.a<=0.01) return;
-  const dev=curDevice(), parts=coachParts(C.parts,dev), r=usingTouch?0:9;
-  const sc=COACH.sc||(COACH.sc=mkCanvas(8,8).getContext('2d')), TXT=`600 13px ${UIF}`;
+  const dev=curDevice(), r=usingTouch?0:9, narrow=W<600;
+  let parts=coachParts(C.parts,dev);
+  const sc=COACH.sc||(COACH.sc=mkCanvas(8,8).getContext('2d')), TXT=`600 ${narrow?12:13}px ${UIF}`;
   // widths: key caps and pad buttons are measured by drawing them once on a scratch canvas
-  ctx.font=TXT; let tw=0; const ws=parts.map((q,i)=>{ const w=q.k?drawBtnGlyph(sc,q.k,20,20,r,dev):ctx.measureText(q.t).width; const gap=i===0?0:(q.k&&!parts[i-1].k?16:q.k?6:parts[i-1].k?7:6); tw+=w+gap; return [w,gap]; });
+  ctx.font=TXT; let tw=0, ws=[];
+  const measure=()=>{ tw=0; ws=parts.map((q,i)=>{ const w=q.k?drawBtnGlyph(sc,q.k,20,20,r,dev):ctx.measureText(q.t).width; const gap=i===0?0:(q.k&&!parts[i-1].k?16:q.k?6:parts[i-1].k?7:6); tw+=w+gap; return [w,gap]; }); };
+  measure();
+  // too wide for a narrow screen: drop the last group (after a dot, or the last key and its word) until it fits
+  while(tw+58>W-SAFE.l-SAFE.r-12&&parts.length>1){ const i=parts.map(q=>q.t).lastIndexOf('·'); parts=i>0?parts.slice(0,i):parts.slice(0,Math.max(1,parts.length-2)); measure(); }
   const bh=usingTouch?32:30, bw=tw+(usingTouch?58:54);
   let y0=H-SAFE.b-(b&&!b.dead?96:30)-bh/2-(G.prompt&&!usingTouch?48:0), cx=W/2;
   if(usingTouch){ let top=touchBase()-bh-24; if(G.prompt&&PROMPT_R) top=Math.min(top,PROMPT_R.y-bh-10); const at=touchClear(bw,bh,top+bh/2); cx=at.x; y0=at.y; }
