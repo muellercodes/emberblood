@@ -579,8 +579,97 @@ T3X.spirit=function(sp){
   const want=player?angTo(sp.x,sp.y,player.x,player.y):Math.PI/2, f=t3Turn(sp,want,3);
   t3pSpiritDraw(id,sp.x,sp.y,k,f,G.time);
 };
-// Ember's spirit over her shrine in each Trial
+// v11 (STORY_PLAN 3.4): in Acts III and IV some of Ember's flames are handed over by somebody else, so her spirit only
+// floats over the shrines where she is the one who speaks. The others show who does: Brother Pennant on his kite
+// (Skyreach, Wind Riding), King Grumblehorn snoring under the drum stone (Stonehorn, Ground Pound), Sir Kipper on Lady
+// Bubbles beside the flame (Drowned Lumen, Dive) and the worm king's voice coming up through the sand (the Burrows).
+const T3KEEP={f_sky:'pennant',f_deep:'grumblehorn',m_lumen:'kipper',m_burrows:'gravelgut'};
+function t3pKeeper(){ const id=AREA&&AREA.def&&AREA.def.id; if(!id) return null; return T3KEEP[typeof dunRoot==='function'?dunRoot(id):id]||null; }
+const T3KN={};
+function t3pKeeperNpc(id,x,y,face){ const n=T3KN[id]||(T3KN[id]={id,t:0,face}); n.x=x; n.y=y; n.t=G.time; n.face=face; n._px=x; n._py=y; return n; }
+// a person from the cast at n.x,n.y (3D or classic), raised by lift (no ground shadow then); dx,dy move the drawing only
+function t3pKeeperDraw(n,lift,dx,dy){
+  ctx.save(); ctx.translate(dx||0,(dy||0)-lift);
+  if(T3.on){ const P=t3pProfile(n), f=t3Turn(n,n.face,4); t3pDraw(n,P,f,0,0,0,reduceMotion?0:Math.sin(G.time*2.1)*0.012,n.x,n.y,null,lift>0); }
+  else drawNPC(n);
+  ctx.restore();
+}
+function t3pKeepPennant(o,t,sx,sy){
+  const sw=reduceMotion?0:Math.sin(t*0.9)*12, bob=reduceMotion?0:Math.sin(t*1.7)*4, px=sx+sw, kx=sx+sw*1.3+8, ky=sy-176+bob, tilt=reduceMotion?0:Math.sin(t*1.3)*0.12;
+  ctx.save(); ctx.lineCap='round';
+  // the kite string runs off toward the open window, slack in the wind
+  ctx.strokeStyle='rgba(110,70,36,.55)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(kx,ky+4); ctx.quadraticCurveTo(kx+110,ky+70,kx+260,ky-40); ctx.stroke();
+  // the tail: three ribbon bows on a line
+  ctx.strokeStyle='rgba(90,40,16,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(kx,ky+26);
+  for(let i=1;i<=4;i++) ctx.lineTo(kx-8*i+Math.sin(t*3+i)*5,ky+26+12*i); ctx.stroke();
+  for(let i=1;i<=3;i++){ const bx=kx-8*i+Math.sin(t*3+i)*5, by=ky+26+12*i; ctx.fillStyle=i%2?'#c83a2a':'#f4d060';
+    ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(bx-6,by-3); ctx.lineTo(bx-6,by+3); ctx.closePath(); ctx.moveTo(bx,by); ctx.lineTo(bx+6,by-3); ctx.lineTo(bx+6,by+3); ctx.closePath(); ctx.fill(); }
+  // the kite: a diamond in the Wind Monks' orange, with red spars
+  ctx.save(); ctx.translate(kx,ky); ctx.rotate(tilt);
+  ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.moveTo(2,-26); ctx.lineTo(24,-4); ctx.lineTo(2,30); ctx.lineTo(-20,-4); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#f0b040'; ctx.beginPath(); ctx.moveTo(0,-28); ctx.lineTo(22,-6); ctx.lineTo(0,28); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#d08420'; ctx.beginPath(); ctx.moveTo(0,-28); ctx.lineTo(-22,-6); ctx.lineTo(0,28); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#fff2c8'; ctx.beginPath(); ctx.arc(0,-6,6,0,TAU); ctx.fill(); ctx.fillStyle='#c83a2a'; ctx.beginPath(); ctx.arc(0,-6,3,0,TAU); ctx.fill();
+  ctx.strokeStyle='#a83020'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(0,-28); ctx.lineTo(0,28); ctx.moveTo(-22,-6); ctx.lineTo(22,-6); ctx.stroke();
+  ctx.strokeStyle='#5a2a10'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(0,-28); ctx.lineTo(22,-6); ctx.lineTo(0,28); ctx.lineTo(-22,-6); ctx.closePath(); ctx.stroke();
+  ctx.restore();
+  // two ropes from the kite to his sash: he lives on it
+  const hy=sy-96+bob;
+  ctx.strokeStyle='rgba(90,50,22,.8)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(kx-10,ky+4); ctx.lineTo(px-5,hy); ctx.moveTo(kx+10,ky+4); ctx.lineTo(px+5,hy); ctx.stroke();
+  ctx.restore();
+  // then Brother Pennant himself, feet dangling over the flame
+  t3pKeeperDraw(t3pKeeperNpc('f_pennant',sx,sy-26,Math.PI/2),46,sw,bob);
+}
+// King Grumblehorn is asleep under the floor: every snore puffs dust off the drum stone and a Z drifts up
+function t3pKeepSnore(o,t,cx,cy){
+  if(G.bossDone&&G.bossDone.f_grumblehorn) return;
+  const per=3.4, ph=(t%per)/per;
+  if(ph<0.04&&!(o._sn>G.time)){ o._sn=G.time+per*0.6; emit(cx+rand(-60,60),cy+rand(-10,20),14,{col:'200,180,150',glow:false,ang:-Math.PI/2,spread:2.6,smin:20,smax:70,lmin:.5,lmax:1.1,zmin:2,zmax:4,grow:5,drag:1.2}); }
+  ctx.save(); ctx.textAlign='center'; ctx.lineJoin='round';
+  for(let i=0;i<3;i++){ const f=((t/per)+i/3)%1, s=11+f*12, x=cx+46+f*26+Math.sin(f*7+i)*5, y=cy+6-f*86;
+    ctx.globalAlpha=Math.min(1,f*5)*(1-f)*0.9; ctx.font=`800 ${s.toFixed(1)}px ${UIF}`;
+    ctx.strokeStyle='rgba(60,40,24,.75)'; ctx.lineWidth=3; ctx.strokeText('Z',x,y); ctx.fillStyle='#f6ecd8'; ctx.fillText('Z',x,y); }
+  ctx.restore();
+}
+// the worm king's voice comes up through the sand: slow rings ripple out from the flame, grains hop
+function t3pKeepSand(o,t,cx,y0){
+  if(G.bossDone&&G.bossDone.m_gravelgut) return;
+  const cy=y0+6;
+  ctx.save(); ctx.lineWidth=2.2; ctx.setLineDash([10,7]);
+  for(let i=0;i<3;i++){ const f=((t*0.32)+i/3)%1, rx=140+f*130; ctx.lineDashOffset=-t*12-i*9;
+    ctx.strokeStyle=`rgba(120,78,30,${(0.42*(1-f)*Math.min(1,f*6)).toFixed(3)})`; ctx.beginPath(); ctx.ellipse(cx,cy,rx,rx*0.48,0,0,TAU); ctx.stroke(); }
+  ctx.restore();
+  if(Math.random()<0.25){ const a=rand(0,TAU), r=rand(140,250); emit(cx+Math.cos(a)*r,cy+Math.sin(a)*r*0.48,2,{col:'214,176,110',glow:false,ang:-Math.PI/2,spread:0.8,smin:20,smax:60,lmin:.3,lmax:.6,zmin:1,zmax:2}); }
+}
+// Sir Kipper keeps watch beside the flame on Lady Bubbles, his seahorse, bobbing in the water
+function t3pKeepKipper(o,t,sx,sy){
+  // (on the flame's left, where the rooms have open floor; she faces the flame)
+  const x=sx-104, y=sy+16, bob=reduceMotion?0:Math.sin(t*1.9)*3;
+  ctx.save(); ctx.translate(x,y+bob); ctx.scale(-1,1);
+  ctx.fillStyle='rgba(0,0,0,.16)'; ctx.beginPath(); ctx.ellipse(0,26-bob,20,6,0,0,TAU); ctx.fill();
+  // Lady Bubbles: a coral seahorse facing the flame, curled tail, a dorsal fin that flutters
+  const C='#f08a5a', D='#c05a3a', L='#ffc49a';
+  ctx.strokeStyle=D; ctx.lineWidth=7; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(4,6); ctx.quadraticCurveTo(12,22,2,26); ctx.quadraticCurveTo(-8,28,-6,20); ctx.quadraticCurveTo(-4,15,1,17); ctx.stroke();
+  ctx.fillStyle=C; ctx.beginPath(); ctx.ellipse(2,-6,11,16,-0.15,0,TAU); ctx.fill();
+  ctx.fillStyle=L; ctx.beginPath(); ctx.ellipse(-3,-4,5,11,-0.15,0,TAU); ctx.fill();
+  ctx.fillStyle='rgba(255,220,190,.8)'; const fl=reduceMotion?0:Math.sin(t*9)*2; ctx.beginPath(); ctx.moveTo(11,-12); ctx.quadraticCurveTo(20+fl,-6,12,2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=C; ctx.beginPath(); ctx.ellipse(-6,-20,7,9,0.4,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-11,-31,8,7,0,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-15,-33); ctx.lineTo(-29,-30); ctx.lineTo(-29,-26); ctx.lineTo(-15,-27); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=D; for(let i=0;i<3;i++){ ctx.beginPath(); ctx.arc(-9+i*2.4,-39+i*1.8,2.2,0,TAU); ctx.fill(); }
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(-13,-32,2.6,0,TAU); ctx.fill(); ctx.fillStyle='#2a1208'; ctx.beginPath(); ctx.arc(-13.6,-32,1.4,0,TAU); ctx.fill();
+  ctx.restore();
+  if(Math.random()<0.04) emit(x+18,y-20,1,{col:'200,235,255',ang:-Math.PI/2,spread:0.4,smin:10,smax:30,lmin:.8,lmax:1.4,zmin:1.4,zmax:2.4,rise:20});
+  // and the knight in the saddle, looking at whoever has come for the flame
+  const want=player?angTo(x,y,player.x,player.y):Math.PI/2;
+  t3pKeeperDraw(t3pKeeperNpc('m_kipper',x-5,y-2,want),14,0,bob);
+}
+const T3KEEPDRAW={pennant:t3pKeepPennant,grumblehorn:t3pKeepSnore,kipper:t3pKeepKipper,gravelgut:t3pKeepSand};
+// the flame's own dais in the spirit's room (the spirit floats at the room's middle, which is not always the dais)
+function t3pShrineAt(o){ if(o._shr===undefined){ const q=AREA&&AREA.objs.find(v=>v.k==='tv'&&v.kind==='shrine'&&v.ref&&v.ref.room===o.room); o._shr=q?{x:q.x,y:q.y}:null; } return o._shr||{x:o.x,y:o.y+74}; }
+// Ember's spirit over her shrine in each Trial (and the keepers above, where the flame is somebody else's to give)
 if(typeof FL!=='undefined'&&FL.tspirit){ const old=FL.tspirit; FL.tspirit=(o,t)=>{
+  const kp=t3pKeeper(); if(kp&&T3KEEPDRAW[kp]){ try{ const s=t3pShrineAt(o); T3KEEPDRAW[kp](o,t,s.x,s.y); }catch(e){ console.error(e); } return; }
   if(!T3.on) return old(o,t);
   const id=AREA&&AREA.def.id, gifted=id&&TRIALS[id]&&hasAbil(TRIALS[id].abil), a=gifted?0.45:0.9;
   const want=player?angTo(o.x,o.y,player.x,player.y):Math.PI/2, f=t3Turn(o,want,2.5);
