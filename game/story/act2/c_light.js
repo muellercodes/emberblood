@@ -71,9 +71,9 @@ chapter({
                      text: ['A thread of grey silk on a thorn bush by the road. Silver-grey and soft as a moth\'s wing. Like a certain cloak.', 'Grey silk, like a moth wing. Like her cloak.'] },
     // what_stopped (small mystery)
     l_keeper_log:  { icon: 'book', mystery: 'what_stopped',
-                     text: ["Agatha's log: the night the clock stopped, at 11:59 the lamp went out, and a huge shadow crossed the stars from west to east for a whole minute.", 'At 11:59 the lamp went out. A huge shadow flew over.'] },
+                     text: ["Agatha's log: the night the clocks stopped, at 11:59 the lamp went out, a huge shadow crossed the stars from west to east, and every clock in her cottage stopped in that same minute.", 'At 11:59 the lamp went out. A huge shadow flew over.'] },
     l_wing_print:  { icon: 'wing', mystery: 'what_stopped',
-                     text: ['On the lighthouse, a print of silver dust: one wing with a painted eye, taller than the tower itself.', 'A dust print of one giant wing on the tower.'] },
+                     text: ['On the lighthouse, a print of silver dust: one wing with a pale moon painted on it, taller than the tower itself.', 'A dust print of one giant wing on the tower.'] },
     l_lamp_moths:  { icon: 'moth', mystery: 'what_stopped',
                      text: ["When the Gloomwing fell, its grey dust slid off like snow. Its own wings are gold. Something much bigger dusted it.", 'The Gloomwing was only dusted. Its wings are gold.'] },
     // what_she_is (main mystery, asked at the Spire door)
@@ -174,7 +174,7 @@ chapter({
       ['c_squawk', 'AGATHA SAYS HELP! AGATHA SAYS COOKIES! ...MOSTLY HELP!', 'AGATHA SAYS HELP! AND COOKIES! MOSTLY HELP!'],
       ['c_mo', "The lighthouse went dark the night the clock stopped. Ships can't sail at night without it.", 'The lighthouse went dark. Ships cannot sail at night.'],
       ['c_mo', "And the rope bridge over the Cut is down. Chewed through, I bet. Admiral Pinch's crabs. They've always hated that bridge.", 'And the bridge over the Cut is down. Crabs did it, I bet.', { clue: 'l_crab_claim', ref: 'c_lm_cut' }],
-      ['ash', "Then I'll swing across. I've got a TAIL.", "I'll swing across. I have a TAIL."],
+      ['ash', "Then I'll swing across. I've got a tail.", "I'll swing across. I have a tail."],
       { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_squawk_sky'] },
       ['c_squawk', '(already flying east) FOLLOW SQUAWK! FOLLOW SQUAWK!', 'FOLLOW SQUAWK!', { dir: ['gh_market', 'c_lighthouse_door', 'east'] }],
     ],
@@ -193,7 +193,7 @@ chapter({
     c_cut_solved: [
       { place: ['c_squawk', 'c_cut_post_e'] }, { anim: ['c_squawk', 'perch'] },
       ['ash', 'Vesper cut it, to slow me down. But first she tied a rope so nobody would walk off the edge.', 'Vesper cut it. But she made sure nobody would fall.'],
-      ['ash', '...Who DOES that?', 'Who DOES that?'],
+      ['ash', '...Who does that?', 'Who does that?'],
       ['c_squawk', 'NOT CRABS! NOT CRABS! TELL MO! SQUAWK!', 'NOT CRABS! TELL MO!', { promise: 'c_cut_bridge' }],
       { anim: ['c_squawk', 'fly'] }, { walk: ['c_squawk', 'gh_squawk_sky'] },
       ['narr', 'Squawk flaps off toward Gearhaven, telling every gull he passes.', 'Squawk flies off to tell everyone.'],
@@ -202,7 +202,7 @@ chapter({
       ['c_agatha', "You're the dragon Squawk went to fetch? Hm. Smaller than I pictured. He said big as a house.", "You're the dragon? Squawk said big as a house."],
       ['c_squawk', 'BIG AS A HOUSE!', 'BIG AS A HOUSE!'],
       ['c_agatha', 'He says that about everything. He said it about a sandwich.', 'He says that about everything. Even a sandwich.'],
-      ['c_agatha', "Forty years I've kept that light. Never missed a night. Then the night the clock stopped, it went out, and the moths came like a grey snowstorm.", 'Forty years I kept that light. Then it went out, and the moths came.'],
+      ['c_agatha', "Forty years I've kept that light. Never missed a night. Then, the night the clocks stopped, it went out at one minute to midnight, and the moths came like a grey snowstorm.", 'Forty years I kept that light. Then it went out, and the moths came.'],
       ['c_agatha', "There's a big one wrapped round my lamp now. And a girl in a grey cloak, up and down my stairs like she owns them.", 'A big moth is round my lamp. And a girl in a grey cloak.'],
       ['ash', 'Vesper.', 'Vesper.'],
       { if: 'item c_lampoil', then: [
@@ -210,8 +210,8 @@ chapter({
       ['c_agatha', "My logbook's on its stand by the lighthouse path, if you like reading. And mind the stairs. They were built for one old keeper, not for dragons.", 'My logbook is by the path. Mind the stairs!', { ref: 'lh_logbook' }],
     ],
     c_read_log: [
-      ['narr', "AGATHA'S LOG. The night the clock stopped. 11:59: lamp out. A great shadow went over the stars, west to east, a whole minute long.", "AGATHA'S LOG. 11:59: lamp out. A huge shadow went over the stars.", { ref: 'lh_logbook' }],
-      ['narr', '"Squawk hid in the teapot and shouted BIG AS A HOUSE until morning. For once, I believe him."', '"Squawk shouted BIG AS A HOUSE all night. For once, I believe him."'],
+      ['narr', "Agatha's log. The night the clocks stopped: \"11:59. Lamp out. Could not relight it. A great shadow went over the stars, west to east, a whole minute long.\"", 'Agatha\'s log: "11:59. Lamp out. A huge shadow went over the stars."', { ref: 'lh_logbook' }],
+      ['narr', '"Every clock in the cottage stopped in that same minute. So did my watch. Squawk hid in the teapot and shouted the same three words till morning. For once, I believe him."', '"Every clock stopped. Squawk hid in the teapot. For once, I believe him."'],
     ],
     c_read_stone: [
       ['narr', 'A stone is set into the lighthouse wall, worn smooth by a thousand years of salty wind. Carved on it: a girl with little horns and a tail, climbing a cliff with a lantern on her back.', 'A carved stone: a horned girl climbing a cliff.'],
@@ -219,21 +219,21 @@ chapter({
       ['ash', '"I had no fire, so I climbed." Pearl wrote that. And I know somebody else who climbs like that...', '"No fire, so I climbed." Like someone I know...'],
     ],
     c_look_print: [
-      ['narr', 'Silver dust is printed on the tower in one enormous shape: a wing, with a painted eye in the middle. It is taller than the whole lighthouse.', 'A giant wing is printed in dust on the tower. Taller than the lighthouse!'],
-      ['ash', "That's not the moth in the lamp. That's something WAY bigger.", "That's something WAY bigger."],
+      ['narr', 'Silver dust is printed on the tower in one enormous shape: a wing, with a pale round moon painted in the middle. It is taller than the whole lighthouse.', 'A giant wing is printed in dust on the tower. Taller than the lighthouse!'],
+      ['ash', "That's not the moth in the lamp. That's something much, much bigger.", "That's something much bigger."],
     ],
     // after the Gloomwing: the moths turn on Vesper (trust K4). Fire rolls over her on both branches (l_fireproof).
     c_lamp_rescue: [
       { place: ['c_mask', 'player', [96, -70]] }, { anim: ['c_mask', 'moths'] }, { cam: 'c_mask', s: 0.6 },
-      ['narr', 'Then the moths come back. Not for you. For Vesper. "Get off!" she yells. "I brought the stone! She SAID I\'d get my fire!"', 'The moths come back, for Vesper! "Get off! She said I would get fire!"'],
-      { choose: 'c_lamp', ask: ['The moths hiss: "All of it. The Mother wants ALL of it." What do you do?', 'The moths hiss: "The Mother wants all of it." What do you do?'], pick: [
+      ['narr', 'Then the moths come back. Not for you. For Vesper. "Get off!" she yells. "I brought the stone! She said I\'d get my fire!"', 'The moths come back, for Vesper! "Get off! She said I would get fire!"'],
+      { choose: 'c_lamp', ask: ['The moths hiss, all together: "All of it. The Mother wants all of it."', 'The moths hiss: "The Mother wants all of it."'], pick: [
         { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind', v: 'saved',
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [
             ['narr', 'You roar fire across the Lamp Room. The moths scatter out of the windows. The fire rolls right over Vesper, and she does not even blink.', 'You roar fire! The moths fly off. Vesper is not even hurt!', { clue: 'l_fireproof' }],
-            ['c_mask', '...Why would you do that? I cut your BRIDGE.', 'Why help me? I cut your BRIDGE.'],
+            ['c_mask', 'Why would you do that? I cut your bridge.', 'Why help me? I cut your bridge.'],
             ['ash', 'And you tied a rope across the road so nobody would fall.', 'You tied a rope so nobody would fall.'] ] },
-        { t: ['"Where is the Ember Heart, Vesper?"', '"Where is the Heart, Vesper?"'], tone: 'brave', v: 'asked',
+        { t: ['Face her: "Vesper! Where is my mom\'s Heart?"', '"Where is Mom\'s Heart, Vesper?"'], tone: 'brave', v: 'asked',
           then: ['set c_lamp=asked'],
           say: [
             ['narr', 'She flinches at her name. Then she dives through the moths, straight through the burning wick, into the shadow under the lamp. Not one hair singed.', 'She jumps right through the fire into the shadow. Not even singed!', { clue: 'l_fireproof' }],
@@ -254,26 +254,26 @@ chapter({
       { cam: 'c_spire_door', s: 3.5 },
       ['narr', 'Out past the harbor, the beam sweeps the dark sea. And where it passes, something stands in the water that was never there before.', 'The beam sweeps the sea. Something new stands there.'],
       ['narr', 'A tower. Black as a burnt match, tall as the Great Clock, crawling with moths.', 'A black tower, tall as the Great Clock. Covered in moths.'],
-      ['c_squawk', '(from the top of the lighthouse) TOWER! BIG AS A HOUSE! BIGGER!', 'TOWER! BIG AS A HOUSE! BIGGER!'],
+      ['c_squawk', '(from the top of the lighthouse) TOWER! BIGGER THAN A HOUSE! MUCH BIGGER!', 'TOWER! BIGGER THAN A HOUSE!'],
       ['ash', '"Not where I\'m going," she said. That\'s where she\'s going.', "That's where Vesper is going."],
     ],
     c_stopped_solved: [
-      ['ash', 'Something with wings bigger than a ship flew over the whole coast, and the clock, the tide and the lighthouse all stopped in the same minute.', 'Something huge flew over. Everything stopped in one minute.'],
+      ['ash', 'Something with wings taller than the lighthouse flew over the whole coast. The clocks, the tide and the light all stopped in the same minute. One to midnight.', 'Something huge flew over. Everything stopped at one to midnight.'],
       { if: 'near c_agatha 500', then: [
-        ['c_agatha', 'Big as a house, Squawk said. I told him to hush.', 'Squawk said big as a house. I told him to hush.'] ] },
-      ['ash', 'For once, Squawk was RIGHT. ...So where did it go?', 'Squawk was RIGHT. So where did it go?', { promise: 'c_vesper_page' }],
+        ['c_agatha', 'Squawk shouted it all night. I told him to hush.', 'Squawk shouted it all night. I told him to hush.'] ] },
+      ['ash', 'For once, Squawk was right. ...So where did it go? And why stop everything at one minute to midnight?', 'Squawk was right. Where did it go? Why one to midnight?', { promise: 'c_vesper_page' }],
     ],
 
     // ---- the lighthouse's own story keys. Each replaces the old STORY[key] in place, so x1_dun_b plays these.
     c_light_in: [
       ['c_pearl', 'My lighthouse, the first one on this coast. Before it, ships found the rocks by bumping into them.', 'My lighthouse. Before it, ships found rocks by bumping into them.'],
-      ['c_pearl', "Something's eaten my light. Moths. They'll fly round a candle all night, but a real beam sends them running.", 'Moths ate my light. A real beam makes them run.'],
+      ['c_pearl', "Moths have got into my light. They'll circle a candle all night, but a proper beam sends them running.", 'Moths got into my light. A real beam makes them run.'],
       ['c_pearl', 'My little lens still turns, see? When the beam comes round, the moth webs shrivel. When it goes, the shadows come back. Use both.', 'Light shrinks the moth webs. Then shadows come back. Use both.'],
     ],
     c_light_shrine: [
-      ['c_pearl', 'My lens room. I used to sit here on long nights and watch the beam go round, and round, and round.', 'My lens room. I watched the beam go round and round.'],
-      ['c_pearl', "The brighter the light, the deeper the shadow behind it. And a shadow, Ash, is just a door nobody's noticed.", 'The brighter the light, the deeper the shadow. A shadow is a door.'],
-      ['c_pearl', "And the girl in the grey cloak? She's mine too. All my children are. Be kind to her, if she lets you.", 'The girl in the grey cloak is my family too. Be kind to her.'],
+      ['c_pearl', 'My lens room. Six winters it took me to grind that glass. I sat up here most nights after, watching the beam go round.', 'My lens room. I ground that glass myself. Six winters.'],
+      ['c_pearl', "A light that strong throws shadows a mile long. I used to curse them. Then one night I stepped into one, and came out at the far end.", 'Strong light makes long shadows. One night I stepped into one.'],
+      ['c_pearl', "And the girl in the grey cloak, up and down my stairs? She's one of mine. Claws, no fire, a cold house. I know how that goes. Go easy on her.", 'The girl in grey is my family. No fire, a cold house. Go easy on her.'],
     ],
     c_light_gift: [
       ['narr', 'The little lens turns, and its beam sweeps across you. Behind you, your own shadow stretches long across the floor. Then it moves. On its own. It waves.', 'The beam sweeps over you. Your shadow stretches out. Then it waves at you!'],
@@ -281,19 +281,19 @@ chapter({
       ['c_pearl', "The Shadow Dash! Dash, and for a moment you're a shadow. Moth curtains can't catch you. Nobody looking for you can see you.", 'The Shadow Dash! Dash and you become a shadow. Moth curtains cannot stop you.'],
       ['c_pearl', "Start your dash inside a shadow and you'll ride it all the way to the far end. Over gaps, if the shadow's long enough.", 'Dash from a shadow to ride it. Even over gaps!'],
       ['c_pearl', 'Those bars are made of shadow. They only let a shadow through in the dark. Wait for the beam to pass.', 'Shadow bars let you through only in the dark.'],
-      ['ash', "I'm a shadow. I'm a SHADOW!", "I'm a SHADOW!"],
+      ['ash', 'Mom is never going to find me at bedtime again.', 'Mom will never find me at bedtime!'],
       { if: 'flag pip', then: [
-        ['pip', "Mip?! (Pip hides behind you. Then he realises that's where your shadow is. Pip is very confused.)", 'Mip?! (Pip hides in your shadow. He is very confused.)'] ] },
+        ['narr', 'Pip pounces on your new shadow. It slides away. He pounces again, and lands on your foot.', 'Pip pounces on your shadow. He lands on your foot.'] ] },
     ],
     c_gloomwing_intro: [
       ['narr', "The Lamp Room is dark. Something huge and soft is wrapped around the great lamp like a scarf. Two enormous eyes open on its wings. Then two more. They're not eyes. They're worse.", 'A huge soft moth wraps the lamp. Big eyes open on its wings.'],
     ],
     c_light_won: [
       ['narr', 'The beam hits the Gloomwing full on. All the grey dust slides off its wings like snow, and underneath they are gold. The dust was never its own.', 'The beam hits it. The grey dust falls off. Its wings are gold underneath!', { clue: 'l_lamp_moths' }],
-      ['c_pearl', 'Poor thing. It was never grey at all. Somebody dusted it and sent it up here to sit on my lamp.', 'Poor thing. Someone dusted it grey and sent it here.'],
+      ['c_pearl', 'Gold underneath. Somebody dusted it grey and set it on my lamp, like a lid on a pot.', 'Gold underneath! Someone dusted it and put it on my lamp.'],
     ],
     c_light_end: [
-      ['c_pearl', "That's the last of my places, Ash. I left my claws and my tail and my shadow for whoever came next, and I'm glad it was you. Now light my lamp.", "My last place. I'm glad it was you. Light my lamp!"],
+      ['c_pearl', "That's the last of my places. Claws, tail, shadow: I left them for whoever came next. I hoped it would be family. It is. Now light my lamp.", "My last place. I'm glad it was family. Light my lamp."],
     ],
   },
 
