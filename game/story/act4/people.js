@@ -528,6 +528,9 @@ people({
             say: [['m_ned', "Hmph. Then you know lamps. Mine has gone out. Don't look at it like that.", 'Then you know lamps. Mine is out.']] },
           { t: ['Does yours spin too?', 'Does yours spin too?'],
             say: [['m_ned', "It doesn't. It shines, like a proper light. Spinning is for show-offs.", 'No. It shines. Spinning is for show-offs.']] },
+          // Agatha kept her light on for Ash on the Spire night (said agatha_light, Act II)
+          { t: ['She kept her light on for me.', 'She kept her light on for me.'], if: 'said agatha_light', tone: 'kind', f: 0.5,
+            say: [['m_ned', "She wrote me that. First letter in forty years that wasn't about the spinning. Hmph.", 'She wrote that. Not about spinning, for once.']] },
         ] },
       { if: '!clue m4_ned_helmets', once: true, then: ['clue m4_ned_helmets'],
         say: ["Moths in little plumed helmets came for my lamp's GLASS. Tried to unscrew it! It's bolted on. Ha. HA.",
