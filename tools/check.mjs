@@ -113,6 +113,11 @@ export const VOICE_SHARE = {
 export const VOICE_ALIAS = { mom: 'maren', n_nyxara: 'nyxara', glaciar: 'f_glaciar', hush: 'f_hush', c_mothmask: 'c_mask', c_mothmask3: 'c_mask', moth_mask: 'c_mask' };
 // speakers that are not people (no opener share)
 const VOICE_NOT_PEOPLE = new Set(['narr', 'sign', 'note', 'book', 'banner']);
+// (v11 MOOD) the faces a line may ask for with { mood }: a12a_dlg.js MOOD_LIST and MOOD_ALIAS (keep the two in step)
+const MOODS = new Set(['neutral', 'happy', 'laughing', 'sad', 'worried', 'scared', 'angry', 'surprised', 'determined', 'sleepy', 'sly', 'cold', 'shy', 'tender',
+  'laugh', 'giggle', 'glad', 'joy', 'smile', 'pleased', 'mad', 'cross', 'furious', 'afraid', 'fear', 'frightened', 'shocked', 'shock', 'amazed', 'tired', 'sleep',
+  'brave', 'firm', 'resolute', 'soft', 'warm', 'gentle', 'loving', 'sorry', 'cry', 'crying', 'upset', 'nervous', 'anxious', 'uneasy', 'embarrassed', 'bashful',
+  'smug', 'sneaky', 'icy', 'blank']);
 // talk v11 (STORY_PLAN 6.3): menu labels banned in data, and the generic choose prompts
 export const BANNED_LABELS = ["What's new?", 'Tell me about yourself.', "You look like something's on your mind.", 'Anything else?', 'What else is on your mind?'];
 export const GENERIC_ASKS = ['What do you do?', 'What do you say?'];
@@ -789,6 +794,10 @@ export function runChecks(M, opts = {}) {
     if (tags.do) eachEffect(tags.do, (e) => checkEffect(e, O, where));
     for (const k of ['promise', 'ref']) for (const id of arr(tags[k])) promiseLater.push({ k, id, O, where, loc: W(O, at(O, full)) });
     if (tags.re != null) checkRe(tags.re, O, where, isStr(who) ? who : null, depth, conds, W(O, at(O, full)));
+    if (tags.mood != null) moodCheck(tags.mood, O, where, W(O, at(O, full)));
+  }
+  function moodCheck(m, O, where, loc) {
+    if (!isStr(m) || !MOODS.has(m.toLowerCase().trim())) WARN('mood', `${O.id}.${where}: unknown mood ${JSON.stringify(m)} (moods: ${[...MOODS].slice(0, 14).join(', ')})`, loc);
   }
   // talk v11 (STORY_PLAN 6.3): menu labels written per person, never the old generic ones
   function labelCheck(x, O, where) {
@@ -879,6 +888,7 @@ export function runChecks(M, opts = {}) {
           if (!prev || prev[0] !== 'narr') WARN('choose', `${O.id}.${w}: choose ${b.choose} asks "${askF}"${b.ask ? '' : ' (the default)'} after ${prev ? `a line by ${prev[0]}` : 'no line'} (put a narration line of the action right before it, or ask something specific)`, W(O, at(O, b.ask ? askF : b.choose)));
         }
         if (!arr(b.pick).length) FAIL('ids', `${O.id}.${w}: choose ${b.choose} has no picks`, W(O, at(O)));
+        if (b.mood != null) moodCheck(b.mood, O, `${w} ask`, W(O, at(O, b.ask ? askF : b.choose)));
         arr(b.pick).forEach((p, j) => {
           const pw = `${w} pick ${j + 1}`;
           if (p.t != null) { textPair(p.t, O, pw, 'ash', {}, conds); labelCheck(p.t, O, pw); }

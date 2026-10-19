@@ -474,6 +474,8 @@ function s10Beat(b,ctx,out,guard){
     const l=s10Line(b), o=l.o, text=l.simple!=null?S(l.full,l.simple):l.full, cond=o.if;
     const ok=()=>g()&&(cond==null||s10Cond(cond))&&!(l.who==='pip'&&!(G.flags&&G.flags.pip));
     const L={who:l.who,text,skipIf:()=>!ok()};
+    // (v11 MOOD) the face the speaker makes on this line (a12a_dlg's portrait moods; untagged lines are read from their words)
+    if(o.mood!=null) L.face=String(o.mood);
     if(o.clue!=null||o.do!=null) L.fn=()=>{ if(!ok()) return; for(const c of s10Arr(o.clue)) s10Clue(c,ctx); if(o.do!=null) s10Do(o.do,ctx); };
     // (v11) replies to this line: a choose whose who is the speaker and whose ask is the line (STORY_PLAN 6.3 #7)
     if(o.re!=null) L.opts=()=>s10ReOpts(o.re,ctx,l.who,{});
@@ -493,6 +495,7 @@ function s10Beat(b,ctx,out,guard){
 function s10Choice(b,ctx,g){
   const ask=b.ask?s10T(b.ask):S('What do you do?','What do you do?');
   const L={who:b.who||'ash',text:ask,skipIf:()=>!g()};
+  if(b.mood!=null) L.face=String(b.mood);
   L.opts=()=>s10Arr(b.pick).map((p,i)=>{
     const t=s10T(p.t);
     if(p.if!=null&&!s10Cond(p.if)) return null;
