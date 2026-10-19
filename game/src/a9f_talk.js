@@ -190,9 +190,12 @@ function giftReact(id,item){
 // Old TALK labels: T.deepAsk, T.rumorAsk and T.about[who] = { ask, t } name the old topics while they are converted.
 const talkLbl=x=>Array.isArray(x)?S(String(x[0]),String(x[1]==null?x[0]:x[1])):String(x);
 // a remembered moment (a dream, an event, a deed) that greetLine would have said; random chatter is left out
-function talkRemark(id){
+// A converted person (new menu in this act) skips the shared deed lines: their own openers already react to the same
+// events, and one deed line said by everyone in the valley read as a formula (and could name the person saying it).
+function talkRemark(id,v11){
   try{ if(typeof evGreet==='function'){ const v=evGreet(id); const ch0=(typeof MOM_CH!=='undefined'&&MOM_CH[G.stage])||[], ch1=(typeof YARA_CH!=='undefined'&&YARA_CH[G.stage])||[];
     if(v&&!ch0.includes(v)&&!ch1.includes(v)) return v; } }catch(e){}
+  if(v11) return null;
   try{ return deedGreet(id)||null; }catch(e){ return null; }
 }
 function talkVisit(n,firstMeet,lines){
@@ -205,16 +208,16 @@ function talkVisit(n,firstMeet,lines){
   if(spoke&&!(X&&!X.heard)){ V.text=heard(idle()||'Mm?'); V.again=()=>idle()||pick(['Mm?','Yes?']); return V; }
   if(X&&!X.heard){
     // a first meeting with someone not converted yet keeps their introduction; otherwise a remembered moment, if any
-    const g=spoke?null:firstMeet&&!v11?greetLine(id):talkRemark(id); if(g) lines.push([id,heard(g)]);
+    const g=spoke?null:firstMeet&&!v11?greetLine(id):talkRemark(id,v11); if(g) lines.push([id,heard(g)]);
     for(const L of X.pre) lines.push(L);
     const L0=X.last;
     if(L0){ heard(L0.text); V.text=()=>L0.skipIf&&L0.skipIf()?(idle()||'Mm?'):L0.text; V.fn=()=>{ if(L0.fn) L0.fn(); X.run(); }; }
     else{ V.text=idle()||'Mm?'; V.fn=X.run; }
     V.re=X.re; V.key=X.key;
   }
-  else if(X) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  else if(X) V.text=heard(talkRemark(id,v11)||idle()||greetLine(id));
   // a converted person with no opener left (all answered) says their own idle line, not a generic hello
-  else if(v11&&!firstMeet) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  else if(v11&&!firstMeet) V.text=heard(talkRemark(id,v11)||idle()||greetLine(id));
   else V.text=heard(greetLine(id));
   V.again=()=>idle()||pick(['Mm?','Yes?']);
   return V;
