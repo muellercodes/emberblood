@@ -156,7 +156,7 @@ function render(){
     h+='<div class="slots">';
     for(var k=0;k<saves.length;k++){ var s=saves[k].s, lv=(s.p&&+s.p.level)||1;
       h+='<div class="slot"><div class="sn">Journey '+(saves[k].i+1)+'<span>'+esc(ago(s.at))+'</span></div><p class="sh">'+esc(stageText(s))+' · Level '+lv+'</p>'
-        +'<p class="sd">'+esc(DIFF[Math.max(0,Math.min(2,s.diff|0))])+' · '+esc(played(s.time))+' played</p></div>'; }
+        +'<p class="sd">'+esc(DIFF[Math.max(0,Math.min(2,s.diff|0))])+(+s.time>=60?' · '+esc(played(s.time))+' played':'')+'</p></div>'; }
     h+='</div>';
   }
   if(extras.length) h+='<p class="extra">'+(saves.length?'Also coming along: ':'')+esc(extras.join(' and '))+'.</p>';

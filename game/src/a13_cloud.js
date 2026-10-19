@@ -266,7 +266,7 @@ function bringAct(a,g,t){
 function bringEl(){
   let el=document.getElementById('bring'); if(el) return el;
   const st=document.createElement('style');
-  st.textContent='#bring .panel{max-width:460px}#bring .bto{margin:8px 0 6px;font-size:13px}#bring .bpick .btn{min-width:86px}#bring .bpick .btn small{font-size:12px}'
+  st.textContent='#bring .panel{max-width:460px}#bring .bto{margin:8px 0 6px;font-size:13px}#bring .bpick .btn{min-width:80px;padding:8px 4px;font-size:14px;white-space:nowrap}#bring .bpick .btn small{font-size:12px}'
     +'#bring .bok{margin:6px 0 2px;font-weight:700;color:#8fd46e}#bring .bnote{font-size:13px;margin:10px 0 0}#bring .bfoot{margin-top:14px}#bring .slots{margin-top:10px}#bring .slot.warn{border-color:#e0782c;box-shadow:0 0 0 2px rgba(224,120,44,.25)}'
     +'html.sb #bring .bok{color:#3f7a34}.slot.bringc .sd{margin-bottom:10px}#slotList .bringq{margin-top:2px}';
   document.head.appendChild(st);
