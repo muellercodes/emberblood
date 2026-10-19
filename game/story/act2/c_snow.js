@@ -98,8 +98,14 @@ chapter({
       { if: 'quest c_oona done', then: [
         ['c_vesper', "Gran knits by her stove every night now. She's knitting you something. I'm not allowed to say what.", 'Gran is knitting you something. It is a secret.'] ] },
       ['c_vesper', "The Mother wants all three pieces. Hush took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. Hush took one north.'],
-      ['c_vesper', "If you go after it, wrap up warm. And don't climb anything I wouldn't.", 'If you go, wrap up warm.'],
-      ['ash', 'You climb everything.', 'You climb everything.'],
+      ['c_vesper', "If you go after it, wrap up warm. And don't climb anything I wouldn't.", 'If you go, wrap up warm.', { re: [
+        { t: ['You climb everything.', 'You climb everything.'],
+          say: [['c_vesper', 'Then you can climb anything. Lucky you.', 'Then you can climb anything.']] },
+        { t: ['Come with me, cousin.', 'Come with me, cousin.'], tone: 'kind',
+          say: [['c_vesper', "Gran's fire needs watching. ...I'll find you. When it's time.", "Gran needs me. I'll find you."]] },
+        { t: ['Does she still talk in your dreams?', 'Does she still talk to you?'],
+          say: [['c_vesper', 'Every night. I tell her no. She says she can wait.', 'Every night. I say no. She says she can wait.']] },
+      ] }],
     ],
   },
 

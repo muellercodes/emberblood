@@ -829,7 +829,6 @@ function c1TalkOpts(id,o){
   const wait=(who,line,simple)=>o.unshift({t:S('Wait here until dark','Wait until dark'),tag:'quest',fn:()=>later(0.2,c1WaitDark),then:[[who,S(line,simple)]],end:true});
   if(st==='c_gear'&&F.c_hester&&day&&(id==='c_hester'||id==='c_whirligig')) wait(id,id==='c_hester'?`Very well. I shall count the seconds until sunset. All of them.`:`Wait with ME? Hmph. Fine. Have a biscuit. Don't crumb.`,id==='c_hester'?`Very well. We wait for dark.`:`Hmph. Fine. Have a biscuit.`);
   if(st==='c_spire'&&!F.c_causeway&&day&&(id==='c_hester'||id==='c_agatha')) wait(id,id==='c_hester'?`Sunset is in a while. I have a very good chair. You may borrow it.`:`Sit. Squawk will tell us when it's dark. He'll tell us loudly.`,id==='c_hester'?`Sit. We wait for dark.`:`Sit. Squawk will tell us.`);
-  if(id==='c_ottoline'&&G.items.c_diary&&!F.c_diary_sent) o.unshift({t:S('Show her the dream diary','Show her the diary'),tag:'quest',then:STORY.c_ottoline_diary,back:true});
 }
 
 // ---------- 5. the big beats (each one is safe to call twice)
