@@ -43,6 +43,15 @@ people({
         option: ['Any news from Captain Osric?', 'Any news from Osric?'],
         say: ['Osric writes of an old Wardens\' Lockup south of Brindlecross, barred so thin even a mouse gives up. A shadow would not.',
           'A barred Lockup up north. A shadow fits.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['There is no rule about snow in summer. I am writing one tonight. It is already four pages long.', 'No rule for summer snow. I am writing one.'],
+        re: [
+          { t: ['What does the rule say?', 'What does it say?'],
+            say: ['Page one: snow in summer is not allowed. Pages two to four: what to do when it falls anyway.', 'It is not allowed. And what to do anyway.'] },
+          { t: ["I'm going after whatever did it.", "I'm going after it."], tone: 'brave', f: 0.5,
+            say: ['I assumed so. Take a scarf. That is not a rule. It is just sense.', 'I thought so. Take a scarf.'] },
+        ] },
       // before Ash comes to report (the chapter's step plays the report itself)
       { if: 'stage=c_gear !flag c_hester',
         say: ['State your business. Briefly, please. The Clockwatch has a great deal of business today.', 'State your business. Quickly, please.'],
@@ -83,14 +92,6 @@ people({
           { t: ['Ambrose must be so pleased.', 'Ambrose must be pleased.'],
             say: ['He has wound her twice today. She does not need it. He does it anyway.', 'He wound her twice today. Just because.'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['There is no rule about snow in summer. I am writing one tonight. It is already four pages long.', 'No rule for summer snow. I am writing one.'],
-        re: [
-          { t: ['What does the rule say?', 'What does it say?'],
-            say: ['Page one: snow in summer is not allowed. Pages two to four: what to do when it falls anyway.', 'It is not allowed. And what to do anyway.'] },
-          { t: ["I'm going after whatever did it.", "I'm going after it."], tone: 'brave', f: 0.5,
-            say: ['I assumed so. Take a scarf. That is not a rule. It is just sense.', 'I thought so. Take a scarf.'] },
-        ] },
       // topics (her old TALK about and deep)
       { ask: ['Do you know Captain Osric?', 'Do you know Captain Osric?'],
         say: ['We have written every week for eleven years. He sends news of his dogs. I send news of my Bobs. Neither of us is winning.', 'He writes about dogs. I write about Bobs.'] },
@@ -119,8 +120,17 @@ people({
       { if: 'stage>=c_brass !clue q_nursery', promise: 'm0_pearl', dir: ['embers_nursery', 'm0_pearl', 'north'], option: ['What does Wren say about Pearl?', 'What does Wren say?'],
         say: ["Wren writes that above Ember's Nursery, up north, a tiny iron hook sits on a windy crag. Pearl's first, she thinks. A tail like yours could reach it.",
           "Pearl's first hook is on a crag up north."] },
-      { if: 'flag c_pages_given !quest c_logbook done',
+      { if: 'flag c_pages_given !quest c_logbook done', once: true,
         say: ["Pearl's pages are coming home, one by one! Wren has written me a letter about every single page.", "Pearl's pages are coming home!"] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['Snow, in summer. I have looked in every book in this building. Not one says it can happen.', 'Snow in summer. No book says it can happen.'],
+        re: [
+          { t: ["Then write it in, I'm here.", 'Write it in. I saw it.'],
+            say: ['In the margin, in pencil, with the date. Yes. That is what the margins are for.', 'In the margin, with the date. Yes.'] },
+          { t: ['Did Pearl ever see snow?', 'Did Pearl see snow?'],
+            say: ['Her logbook says it snowed once, the winter her mother died. Only that once. I wish I had not looked.', 'Once. The winter her mother died.'] },
+        ] },
       // before the chapter sends Ash here to ask how anyone climbs a clock (that visit is the chapter's own scene)
       { if: '!flag c_ottoline',
         say: ["Shh. You're the dragon from Penny's board. Mind the shelves. They turn when they like.", "Shh. You're the dragon. Mind the shelves."],
@@ -150,14 +160,6 @@ people({
           { t: ['A cookbook. I ate it.', 'A cookbook. I ate it.'],
             say: ['You ATE... sorry. You ate a book? Do not tell Sister Wren.', 'You ate a book? Do not tell Wren.'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['Snow, in summer. I have looked in every book in this building. Not one says it can happen.', 'Snow in summer. No book says it can happen.'],
-        re: [
-          { t: ["Then write it in, I'm here.", 'Write it in. I saw it.'],
-            say: ['In the margin, in pencil, with the date. Yes. That is what the margins are for.', 'In the margin, with the date. Yes.'] },
-          { t: ['Did Pearl ever see snow?', 'Did Pearl see snow?'],
-            say: ['Her logbook says it snowed once, the winter her mother died. Only that once. I wish I had not looked.', 'Once. The winter her mother died.'] },
-        ] },
       // topics (her old TALK about and deep)
       { ask: ['Do you really write to Sister Wren?', 'Do you write to Wren?'],
         say: ['For thirty years. We have never agreed about anything. It is wonderful.', 'For thirty years. We never agree. It is wonderful.'] },
@@ -183,6 +185,15 @@ people({
         option: ['Has business been good?', 'How is business?'], then: ['clue q_whirligig_sales'],
         say: ['Since every clock in town stopped? BOOMING. Everyone wants a new clock, and I have four hundred. Forty sold this week!',
           'Every clock stopped. Now everyone buys mine!'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['Snow on my roof in June. My weathercocks are sulking. At least the clocks still tick.', 'Snow in June! At least the clocks tick.'],
+        re: [
+          { t: ['Did you see the white sky?', 'Did you see the white sky?'],
+            say: ['I saw it from my tower. I have ordered forty pairs of mittens for the Clockwatch. Do not tell them I did.', 'I saw it. I bought mittens for the guards. Shh.'] },
+          { t: ['Did you leave the biscuits out?', 'Did you leave biscuits out?'],
+            say: ['Every night. Nobody takes them now. I find I miss being robbed. Hmph.', 'Every night. Nobody takes them. I miss it.'] },
+        ] },
       // before the chase: the man she robs
       { if: '!flag c_chase',
         say: ['A dragon, on my front step. Hmph. Do dragons wipe their feet?', 'A dragon on my step! Do dragons wipe their feet?'],
@@ -224,14 +235,6 @@ people({
           { t: ['Four hundred ticks at once!', 'Four hundred ticks!'],
             say: ['Listen to them. That is music, dragon. Loud, expensive music.', 'Listen! That is music. Loud music.'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['Snow on my roof in June. My weathercocks are sulking. At least the clocks still tick.', 'Snow in June! At least the clocks tick.'],
-        re: [
-          { t: ['Did you see the white sky?', 'Did you see the white sky?'],
-            say: ['I saw it from my tower. I have ordered forty pairs of mittens for the Clockwatch. Do not tell them I did.', 'I saw it. I bought mittens for the guards. Shh.'] },
-          { t: ['Did you leave the biscuits out?', 'Did you leave biscuits out?'],
-            say: ['Every night. Nobody takes them now. I find I miss being robbed. Hmph.', 'Every night. Nobody takes them. I miss it.'] },
-        ] },
       // topics (his old TALK about and deep)
       { ask: ['What is the best clock you own?', 'What is your best clock?'],
         say: [['c_whirligig', 'My father had one clock. He wound it every morning and sang to it while he did.', 'My father had one clock. He sang to it.'],
@@ -259,6 +262,15 @@ people({
       // Hester told him Ash let her count for him (said hester_count)
       { if: 'said hester_count flag c_ambrose', once: true,
         say: ['Little Hester says you let her count for you. Sixty, was it? She learned that one on my stair. Tick.', 'Hester counted for you? She learned that from me. Tick.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow in the bell loft. She doesn't mind. She's been cold before. Tick.", "Snow in the bell loft. She doesn't mind."],
+        re: [
+          { t: ['Will the cold stop her again?', 'Will the cold stop her?'],
+            say: ['Eh? No. Cold slows a clock. It takes somebody holding the hands to stop one. Tick.', 'Cold slows her. Only a hand stops her.'] },
+          { t: ['Keep her ticking for me.', 'Keep her ticking.'], tone: 'kind', f: 0.5,
+            say: ['Ninety years I have. Ninety more if I must. Off you go. Tick... tock.', 'I will. Off you go. Tick... tock.'] },
+        ] },
       // before the bell loft (the chapter's hint takes over once Ash reaches c_brass)
       { if: '!flag c_clock_on stage<c_brass', fact: 'c_great_clock=stopped',
         say: ["Eh? Yes, she's stopped. Ninety years I've wound her, and she never stopped once. Not for storms. Not for weddings. Tick.", "Eh? She stopped. Ninety years, never once before. Tick."],
@@ -279,7 +291,7 @@ people({
         ] },
       // his moment (the old chat), the first day she ticks again
       { if: 'flag c_clock_on !flag c_snow', fact: 'c_great_clock=ticking',
-        say: ['Eh? Speak up. Now she is going again, I can hear myself ask. What is the best sound in the world?', 'Eh? Speak up. What is the best sound in the world?'],
+        say: ["Eh? Speak up. Now she's ticking again, I've a question for you. What's the best sound in the world?", 'Eh? A question. What is the best sound in the world?'],
         re: [
           { t: ['Someone you love, laughing.', 'Someone you love, laughing.'], tone: 'kind', f: 0.75,
             say: ['Eh? Laughing? Yes. That is the one. My wife laughed like a bell. Tick.', 'Yes. That is it. My wife laughed like a bell.'] },
@@ -291,14 +303,6 @@ people({
       // after the snow: the girl came back (only when she is a friend)
       { if: 'flag c_snow said ambrose_girl choice c_vesper=friend', once: true,
         say: ['The girl came to sweep the bell last night, in the snow. I told her a dragon asked after her. She went pink and swept twice. Tick.', 'The girl came back. I said you asked. She went pink.'] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow in the bell loft. She doesn't mind. She's been cold before. Tick.", "Snow in the bell loft. She doesn't mind."],
-        re: [
-          { t: ['Will the cold stop her again?', 'Will the cold stop her?'],
-            say: ['Eh? No. Cold slows a clock. It takes somebody holding the hands to stop one. Tick.', 'Cold slows her. Only a hand stops her.'] },
-          { t: ['Keep her ticking for me.', 'Keep her ticking.'], tone: 'kind', f: 0.5,
-            say: ['Ninety years I have. Ninety more if I must. Off you go. Tick... tock.', 'I will. Off you go. Tick... tock.'] },
-        ] },
       // topics (his old TALK about and deep)
       { ask: ['Did you really count with Hester?', 'Did you count with Hester?'], if: 'flag c_hester',
         say: ['Eh? Little Hester? Six years old, crying on the Great Stair. I sat down and counted to sixty with her. Now she counts at everybody. Tick.', 'She was six and crying. I counted with her. Tick.'] },
@@ -384,6 +388,15 @@ people({
       { if: 'said hettie_warm quest c_oona done', once: true,
         say: ["You told me you'd invent something to keep people warm. Then you lit Granny Oona's stove with one breath. That's not inventing. That's showing off.",
           "You lit Gran's stove with one breath. Show-off!"] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow in June! I've put a thermometer on every roof in the Lower Town. They all agree, and I don't like what they're saying.", 'Snow in June! My thermometers all say the same thing.'],
+        re: [
+          { t: ['What are they saying?', 'What do they say?'],
+            say: ['Colder every hour, and the cold comes from over the mountains. Something up there is breathing out.', 'Colder every hour. Something far off breathes out cold.'] },
+          { t: ['Can you invent summer back?', 'Can you invent summer?'],
+            say: ['I am trying. It keeps exploding. Quill writes that the moon is smaller too. I did not want to know that.', 'I am trying. It explodes. And the moon is smaller.'] },
+        ] },
       // after the gear: Ash has her glass and is hunting for clues
       { if: 'flag c_hettie stage=c_gear',
         say: ['Is my glass working? Moth dust shows silver through it. Tell me what you found. Slowly. I am writing it down.', 'Is my glass working? What did you find?'],
@@ -415,14 +428,6 @@ people({
           { t: ['A sandwich that makes more sandwiches.', 'A sandwich that makes sandwiches.'],
             say: ['A self-filling sandwich. Write that down. Where is my pencil? I had two pencils.', 'Ha! Write that down! Where is my pencil?'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow in June! I've put a thermometer on every roof in the Lower Town. They all agree, and I don't like what they're saying.", 'Snow in June! My thermometers all say the same thing.'],
-        re: [
-          { t: ['What are they saying?', 'What do they say?'],
-            say: ['Colder every hour, and the cold comes from over the mountains. Something up there is breathing out.', 'Colder every hour. Something far off breathes out cold.'] },
-          { t: ['Can you invent summer back?', 'Can you invent summer?'],
-            say: ['I am trying. It keeps exploding. Quill writes that the moon is smaller too. I did not want to know that.', 'I am trying. It explodes. And the moon is smaller.'] },
-        ] },
       // topics (her old TALK about and deep)
       { ask: ['What is that clock that runs backwards?', 'What is the backwards clock?'],
         say: [['c_hettie', 'My mother built clocks. My grandmother built clocks. I built that one. It runs backwards and tells you how long until you were born.', 'Mine runs backwards. It counts to when you were born.'],
@@ -445,6 +450,15 @@ people({
         say: ['You beat my sister Bess at fishing? She wrote and said it was luck. In capital letters. Three pages.', 'You beat my sister Bess? She says luck!'] },
       { if: 'flag c_regatta_won', once: true,
         say: ['The Ash Rule! No dragons in the regatta. Jo wrote it on the shed door. In tar.', 'Jo made a rule. No dragons!'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['Snow on the masts, and ice in the rigging. In June! The gulls are walking on the water. Barnacles.', 'Snow and ice in June! The gulls walk on water.'],
+        re: [
+          { t: ['Will the harbor freeze?', 'Will it freeze?'],
+            say: ['Not while I have breath to break it. And a big stick. Mostly the stick.', 'Not while I have a big stick.'] },
+          { t: ["Will you wave your lantern tonight?", 'Will you wave your lantern?'], if: 'said mo_lantern',
+            say: ['Every night. Snow or no snow. Somebody might be out there in it.', 'Every night. Someone might be out there.'] },
+        ] },
       // the harbor chain hangs on the Great Clock's gears, so nothing sails while she is stopped
       { if: '!flag c_clock_on', fact: 'c_harbor=closed',
         say: ["Ahoy! Finest harbor on the coast! Nothing's sailing, mind. The harbor chain won't lift without the Great Clock.", 'Ahoy! No ships sail. The chain is stuck.'],
@@ -492,14 +506,6 @@ people({
           { t: ['How far out will the ships go?', 'How far do ships go?'],
             say: ["Past the Far Pier, out where they say the moon goes into the water. Sailors' stories. Probably.", "Past the Far Pier. Where the moon goes in the sea. Probably."] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['Snow on the masts, and ice in the rigging. In June! The gulls are walking on the water. Barnacles.', 'Snow and ice in June! The gulls walk on water.'],
-        re: [
-          { t: ['Will the harbor freeze?', 'Will it freeze?'],
-            say: ['Not while I have breath to break it. And a big stick. Mostly the stick.', 'Not while I have a big stick.'] },
-          { t: ["Will you wave your lantern tonight?", 'Will you wave your lantern?'], if: 'said mo_lantern',
-            say: ['Every night. Snow or no snow. Somebody might be out there in it.', 'Every night. Someone might be out there.'] },
-        ] },
       // topics (his old TALK about and deep)
       { ask: ['Do you know Dell? His boats sink.', 'Do you know Dell?'],
         say: ['Dell, up your river? Boats that sink? He would fit right in here. We have a whole harbor of sinking.', 'Boats that sink? He would fit right in here!'] },
@@ -525,6 +531,15 @@ people({
           'A chain lies in a pond up north. Yank it!'] },
       { if: 'quest c_whip done', once: true,
         say: ['How is my Chain Whip? Does it crack? Ja? I knew it would crack!', 'How is the whip? Does it crack? Ja!'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['Snow! Ja! Now it is like home. Where I was born the forges are cold half the year.', 'Snow! Like home. Our forges were cold.'],
+        re: [
+          { t: ['Is that why you came here?', 'Is that why you came?'],
+            say: ['My father said, Ingrid, go where the fire is easy. Ja. Easy. Look at my arms. Nothing here is easy. It is wonderful.', 'Dad said go where fire is easy. Nothing is easy. Wonderful.'] },
+          { t: ['Keep the forge hot for everyone.', 'Keep the forge hot.'], tone: 'kind', f: 0.5,
+            say: ['Day and night. Half the Lower Town is warming its hands in my door. Ja. Good.', 'Day and night. Everyone warms up here. Ja.'] },
+        ] },
       // the first time: the sword on his back
       { say: ["Ja, stop there. That sword on your back. That is Maren of Emberhollow's work. I know her hammer marks.", "Stop! That sword is Maren's work. I know her marks."],
         re: [
@@ -553,14 +568,6 @@ people({
           { t: ['Snacks.', 'Snacks.'],
             say: ['Snack, snack, ding. Snack, snack, dong. ...It is a short song. Like mine.', 'Snack, snack, ding. A short song.'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['Snow! Ja! Now it is like home. Where I was born the forges are cold half the year.', 'Snow! Like home. Our forges were cold.'],
-        re: [
-          { t: ['Is that why you came here?', 'Is that why you came?'],
-            say: ['My father said, Ingrid, go where the fire is easy. Ja. Easy. Look at my arms. Nothing here is easy. It is wonderful.', 'Dad said go where fire is easy. Nothing is easy. Wonderful.'] },
-          { t: ['Keep the forge hot for everyone.', 'Keep the forge hot.'], tone: 'kind', f: 0.5,
-            say: ['Day and night. Half the Lower Town is warming its hands in my door. Ja. Good.', 'Day and night. Everyone warms up here. Ja.'] },
-        ] },
       { ask: ['Do you make Hettie\'s parts?', 'Do you make Hettie\'s parts?'],
         say: ['She brings me broken robots. I fix them. They explode. She brings them back. It is a good friendship.', 'She brings robots. I fix them. They explode. Good friends!'] },
       { ask: ['What is star-iron?', 'What is star-iron?'],
@@ -581,6 +588,15 @@ people({
       // Ash told Lord Whirligig to be kinder (said whirligig_kinder)
       { if: 'said whirligig_kinder', once: true,
         say: ['Lord Whirligig left a tip today, dearie. First time in forty years. He said a dragon told him to be kinder. Then he went red and left.', 'Lord Whirligig left a tip! A dragon told him to be kind.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow in summer, dearie! I've had more customers today than all year. Everybody wants something hot.", 'Snow! Everyone wants hot tea today.'],
+        re: [
+          { t: ['Can I have something hot too?', 'Something hot for me?'],
+            say: ["You? You're the one warm thing in this town already. Sit by the window and heat it for me.", "You're already warm! Sit by the window."] },
+          { t: ['Is Granny Oona warm enough?', 'Is Granny Oona warm?'],
+            say: ["I sent her a pot of tea in a basket, wrapped in a blanket. She'll say she didn't need it. She always does.", "I sent her tea. She'll say she didn't need it."] },
+        ] },
       // early: a stranger with a sword, chasing something
       { if: 'stage<c_salt',
         say: ['Sit down, dearie, you look like you have been chasing something. Everybody calls me Auntie Fig, so you might as well.', 'Sit down, dearie. Call me Auntie Fig.'],
@@ -610,14 +626,6 @@ people({
           { t: ["Ate a biscuit that wasn't mine.", 'Ate a biscuit, not mine.'], if: 'flag c_biscuits=ate',
             say: ["One of Oona's? Those biscuits are older than you, dearie. That is brave.", "Oona's? They are older than you! Brave."] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow in summer, dearie! I've had more customers today than all year. Everybody wants something hot.", 'Snow! Everyone wants hot tea today.'],
-        re: [
-          { t: ['Can I have something hot too?', 'Something hot for me?'],
-            say: ["You? You're the one warm thing in this town already. Sit by the window and heat it for me.", "You're already warm! Sit by the window."] },
-          { t: ['Is Granny Oona warm enough?', 'Is Granny Oona warm?'],
-            say: ["I sent her a pot of tea in a basket, wrapped in a blanket. She'll say she didn't need it. She always does.", "I sent her tea. She'll say she didn't need it."] },
-        ] },
       // topics (her old TALK about and deep)
       { ask: ['Why does everyone call you Auntie?', 'Why "Auntie"?'],
         say: [['c_fig', 'I never had children, dearie. I had customers. Hundreds of them. Every one came in cold and went out warm.', 'I had no kids. I had customers. They left warm.'],
@@ -639,6 +647,32 @@ people({
       // Ash said the Moth Mask might be lonely (said penny_lonely); then Penny saw her face
       { if: 'said penny_lonely flag c_clock_on', once: true,
         say: ['I saw her face over the roofs. She looked about my age. You said she might be lonely. I think you were right, and I hate it.', 'She looked my age. You said lonely. I think so too.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      // after the Spire: what happened to the Moth Mask
+      { if: 'flag c_snow choice c_vesper=friend',
+        say: ['Vesper Saltwhistle waved at me from a roof this morning. A real wave. Do you know how long I have chased her?', 'Vesper waved at me today! A real wave!'],
+        re: [
+          { t: ["She's my cousin, you know.", "She's my cousin."],
+            say: ['Your cousin? Two Emberbloods on one coast, and I find out from a wave? I am a terrible reporter.', 'Your cousin? And I find out now? Terrible!'] },
+          { t: ["She isn't a thief any more.", "She's not a thief now."],
+            say: ["Not a thief. Just a girl who climbs. That's still a story. A quieter one.", 'Just a girl who climbs. A quiet story.'] },
+        ] },
+      { if: 'flag c_snow choice c_vesper=foe',
+        say: ['The Moth Mask is gone. No more robberies, no more board. I took it down this morning. I should be glad.', 'The Moth Mask is gone. I took the board down.'],
+        re: [
+          { t: ['She gave me the piece of the Heart.', 'She gave me the piece.'],
+            say: ["Then she isn't all bad. I knew that. I sort of always knew that.", 'Then she is not all bad. I knew it.'] },
+          { t: ['I hope she is warm somewhere.', 'I hope she is warm.'], tone: 'kind', f: 0.5,
+            say: ["Me too. That's the first thing I've ever wanted to print and couldn't find a word for.", 'Me too. I have no words for that.'] },
+        ] },
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow in summer, and a bite out of the moon. Two front pages in one night. I always wanted that. I don't like it.", "Snow, and a bitten moon. Two big stories. I don't like it."],
+        re: [
+          { t: ["I'm going to find out who.", "I'll find out who."], tone: 'brave', f: 0.5,
+            say: ["Then I'll be right here, waiting to print it. Send me a quote. A good one.", "I'll wait here to print it. Send a quote."] },
+          { t: ['Something did it on purpose.', 'Someone did it on purpose.'],
+            say: ['Who bites a moon on purpose? ...That is a real question. I am writing it on my hand.', 'Who bites a moon? I am writing that down.'] },
+        ] },
       // in the first chapter, while he hunts for clues
       { if: 'stage=c_gear',
         say: ['You are still here! Good. A dragon kid in Gearhaven is the best story I have had all week, and I have had nine robberies.', 'A dragon kid! My best story all week.'],
@@ -678,31 +712,6 @@ people({
           { t: ['It was his box, Penny.', 'It was his box.'],
             say: ["I know. Being right doesn't make it a good story. I'm learning that.", "I know. Right isn't always a good story."] },
         ] },
-      // after the Spire: what happened to the Moth Mask
-      { if: 'flag c_snow choice c_vesper=friend',
-        say: ['Vesper Saltwhistle waved at me from a roof this morning. A real wave. Do you know how long I have chased her?', 'Vesper waved at me today! A real wave!'],
-        re: [
-          { t: ["She's my cousin, you know.", "She's my cousin."],
-            say: ['Your cousin? Two Emberbloods on one coast, and I find out from a wave? I am a terrible reporter.', 'Your cousin? And I find out now? Terrible!'] },
-          { t: ["She isn't a thief any more.", "She's not a thief now."],
-            say: ["Not a thief. Just a girl who climbs. That's still a story. A quieter one.", 'Just a girl who climbs. A quiet story.'] },
-        ] },
-      { if: 'flag c_snow choice c_vesper=foe',
-        say: ['The Moth Mask is gone. No more robberies, no more board. I took it down this morning. I should be glad.', 'The Moth Mask is gone. I took the board down.'],
-        re: [
-          { t: ['She gave me the piece of the Heart.', 'She gave me the piece.'],
-            say: ["Then she isn't all bad. I knew that. I sort of always knew that.", 'Then she is not all bad. I knew it.'] },
-          { t: ['I hope she is warm somewhere.', 'I hope she is warm.'], tone: 'kind', f: 0.5,
-            say: ["Me too. That's the first thing I've ever wanted to print and couldn't find a word for.", 'Me too. I have no words for that.'] },
-        ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow in summer, and a bite out of the moon. Two front pages in one night. I always wanted that. I don't like it.", "Snow, and a bitten moon. Two big stories. I don't like it."],
-        re: [
-          { t: ["I'm going to find out who.", "I'll find out who."], tone: 'brave', f: 0.5,
-            say: ["Then I'll be right here, waiting to print it. Send me a quote. A good one.", "I'll wait here to print it. Send a quote."] },
-          { t: ['Something did it on purpose.', 'Someone did it on purpose.'],
-            say: ['Who bites a moon on purpose? ...That is a real question. I am writing it on my hand.', 'Who bites a moon? I am writing that down.'] },
-        ] },
       // topics (her old TALK about and deep)
       { ask: ["What happened to the Gazette's press?", 'What happened to the press?'],
         say: [['c_penny', 'My mom and dad ran it. It broke when I was eight, and the parts cost more than the shop.', 'My parents ran it. It broke when I was eight.'],
@@ -721,6 +730,15 @@ people({
       { if: 'stage>=c_salt !flag c_pg6', option: ['Got anything about Pearl?', 'Anything about Pearl?'],
         say: ["Pearl's lost page? On Gull Isle, under the gulls. A very honest gull told me. Fly off the cliff updraft and look.",
           "Pearl's page is on Gull Isle. Fly from the cliff!"] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['Snow in June! I am selling it. Genuine summer snow, two coins a jar. It melts. That is what makes it rare.', 'Summer snow, two coins a jar! It melts.'],
+        re: [
+          { t: ["That's just water in a jar.", 'That is just water.'],
+            say: ['Today it is snow. Tomorrow it is history. History costs more.', 'Today, snow. Tomorrow, history. That costs more.'] },
+          { t: ['Did you ever sail in snow?', 'Did you sail in snow?'],
+            say: ['Once, far up the cold coast. The sails froze stiff as boards. I traded the ice for a hat.', 'Once. The sails froze. I traded ice for a hat.'] },
+        ] },
       { if: '!flag c_snow',
         say: ["Welcome to Ravel's Remarkable Rarities! Everything is remarkable. Some of it is rare.", 'Welcome to my shop! Everything is special.'],
         re: [
@@ -739,14 +757,6 @@ people({
             say: ['A mountain-beating sword! Four coins. No? Five. No? Fine.', 'Four coins! No? Five? Fine.'] },
           { t: ['This pebble. It looks like a frog.', 'A pebble like a frog.'],
             say: ['It does look like a frog. Two coins. No? Keep the frog.', 'It IS a frog! Keep it.'] },
-        ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['Snow in June! I am selling it. Genuine summer snow, two coins a jar. It melts. That is what makes it rare.', 'Summer snow, two coins a jar! It melts.'],
-        re: [
-          { t: ["That's just water in a jar.", 'That is just water.'],
-            say: ['Today it is snow. Tomorrow it is history. History costs more.', 'Today, snow. Tomorrow, history. That costs more.'] },
-          { t: ['Did you ever sail in snow?', 'Did you sail in snow?'],
-            say: ['Once, far up the cold coast. The sails froze stiff as boards. I traded the ice for a hat.', 'Once. The sails froze. I traded ice for a hat.'] },
         ] },
       { ask: ['Were you really a sailor?', 'Were you a sailor?'],
         say: ['I was. I brought one thing back from every port. Then I ran out of ship and opened a shop. The hat came from the moon. Probably.', 'I was. One thing from every port. The hat is from the moon.'] },
@@ -806,6 +816,15 @@ people({
     c_mina: [
       { if: 'flag c_lowtide', once: true, fact: 'c_tide_clock=low',
         say: ["Low tide! Look at all that sand. I'd forgotten what the bottom of the lagoon looked like. Thank you, dragon!", 'Low tide! Look at all that sand! Thank you!'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow on the lagoon. The sea has never been this confused. Neither have I.", 'Snow on the lagoon. The sea is confused. So am I.'],
+        re: [
+          { t: ['Will the tide still come and go?', 'Will the tide still work?'],
+            say: ["In and out, snow or no snow. I've told her firmly.", 'In and out. I told her firmly.'] },
+          { t: ['Is the Tide Clock warm enough?', 'Is the clock warm?'],
+            say: ["I've knitted it a scarf. Granny Oona showed me how. It looks silly. It's helping.", 'I knitted it a scarf. It looks silly. It helps.'] },
+        ] },
       { if: 'flag c_lowtide !flag c_snow', fact: 'c_tide_clock=low',
         say: ['At low tide you can walk all the way out to Gullcrag. Nobody does, because of the gulls. There are so many gulls.', 'At low tide you can walk to Gullcrag.'],
         re: [
@@ -825,14 +844,6 @@ people({
           { t: ["It's a lake that forgot to stop.", 'A lake that forgot to stop.'],
             say: ["A lake that... ha! I'm telling the Tide Clock that one.", "Ha! I'll tell the Tide Clock that!"] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow on the lagoon. The sea has never been this confused. Neither have I.", 'Snow on the lagoon. The sea is confused. So am I.'],
-        re: [
-          { t: ['Will the tide still come and go?', 'Will the tide still work?'],
-            say: ["In and out, snow or no snow. I've told her firmly.", 'In and out. I told her firmly.'] },
-          { t: ['Is the Tide Clock warm enough?', 'Is the clock warm?'],
-            say: ["I've knitted it a scarf. Granny Oona showed me how. It looks silly. It's helping.", 'I knitted it a scarf. It looks silly. It helps.'] },
-        ] },
       { ask: ['Was your family always Tide Wardens?', 'Was your family Tide Wardens?'],
         say: ['My granddad was Tide Warden. One night he forgot to set the clock, and the sea came up to the doorsteps. Nobody was hurt. He never forgot again. Neither will I.',
           'Granddad forgot once. The sea came in. I never forget.'] },
@@ -851,8 +862,17 @@ people({
       { if: 'quest c_whip done', once: true,
         say: ['A ghost ate my chowder and said it was worth forty years. Best review I ever had.', 'A ghost loved my chowder!'] },
       { if: 'quest c_whip active !flag c_saltbeard_won item c_chowder', say: ["Don't you dare taste it.", "Don't taste it!"] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow in Saltmarsh! Everyone wants chowder. I've made so much the pot needs a pot.", 'Snow! Everyone wants chowder. So much chowder.'],
+        re: [
+          { t: ['Can I help stir?', 'Can I help stir?'],
+            say: ['With a dragon under it? The pot will boil in a breath. Stand there. Breathe gently.', 'Stand by the pot. Breathe gently.'] },
+          { t: ['Save some for Granny Oona.', 'Save some for Gran.'], tone: 'kind', f: 0.5,
+            say: ['Already in a jug by the door. She says she hates fish. She has never once sent a jug back.', 'It is by the door. She always eats it.'] },
+        ] },
       { if: '!quest c_whip done',
-        say: ["A dragon! Sit, sit. You're all horns and no lunch. Chowder?", "Sit! You're all horns, no lunch. Chowder?"],
+        say: ["Sit, sit. You've got the look. The no-lunch look. Chowder?", "Sit! You look like no lunch. Chowder?"],
         re: [
           { t: ['What is chowder, exactly?', 'What is chowder?'],
             say: ["Soup that's been hugged. Fish, milk, potatoes, and somebody who cares.", "Hugged soup. Fish, milk, potatoes. And care."] },
@@ -869,14 +889,6 @@ people({
             say: ['Yes! Crunch! I am writing to Cookie tonight. A dragon agrees with me.', 'Yes! I will tell Cookie a dragon agrees.'] },
           { t: ['With rocks.', 'With rocks.'],
             say: ["Don't you dare. ...You've been talking to Cookie.", "Don't you dare! You talked to Cookie."] },
-        ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow in Saltmarsh! Everyone wants chowder. I've made so much the pot needs a pot.", 'Snow! Everyone wants chowder. So much chowder.'],
-        re: [
-          { t: ['Can I help stir?', 'Can I help stir?'],
-            say: ['With a dragon under it? The pot will boil in a breath. Stand there. Breathe gently.', 'Stand by the pot. Breathe gently.'] },
-          { t: ['Save some for Granny Oona.', 'Save some for Gran.'], tone: 'kind', f: 0.5,
-            say: ['Already in a jug by the door. She says she hates fish. She has never once sent a jug back.', 'It is by the door. She always eats it.'] },
         ] },
       { ask: ['Do you really write to Cookie?', 'Do you write to Cookie?'],
         say: ["Every month. She's wrong about everything. She's my best enemy.", "Every month. She's wrong. My best enemy."] },
@@ -897,6 +909,15 @@ people({
       // Ash told Posy being scared is okay (said posy_scared)
       { if: 'said posy_scared', once: true,
         say: ['Posy says a dragon told her being scared is okay. She sleeps with the window shut now. She says the moths can knock.', 'Posy says you said scared is okay. She sleeps fine.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow. On the nets. Posy's never seen it. She's trying to keep some in a jar for her dad.", 'Snow on the nets. Posy is saving some for her dad.'],
+        re: [
+          { t: ['It will melt, though.', 'It will melt.'],
+            say: ['I know. She knows. She keeps it on the step anyway.', 'We know. She keeps it on the step anyway.'] },
+          { t: ["He'll like that she tried.", "He'll like that she tried."], tone: 'kind', f: 0.5,
+            say: ['He will. He likes trying. That is why he went.', 'He will. He likes trying.'] },
+        ] },
       { if: '!flag c_gifts',
         say: ['Mind the nets. Mind the hooks. And mind Posy. She bites.', 'Mind the nets. And Posy. She bites.'],
         re: [
@@ -925,14 +946,6 @@ people({
           { t: ['That someone always goes and looks.', 'Someone always goes to look.'],
             say: ['Someone always does. Maybe you. Maybe her, one day.', 'Someone always does. Maybe her, one day.'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow. On the nets. Posy's never seen it. She's trying to keep some in a jar for her dad.", 'Snow on the nets. Posy is saving some for her dad.'],
-        re: [
-          { t: ['It will melt, though.', 'It will melt.'],
-            say: ['I know. She knows. She keeps it on the step anyway.', 'We know. She keeps it on the step anyway.'] },
-          { t: ["He'll like that she tried.", "He'll like that she tried."], tone: 'kind', f: 0.5,
-            say: ['He will. He likes trying. That is why he went.', 'He will. He likes trying.'] },
-        ] },
       { ask: ["Where is Posy's dad?", "Where is Posy's dad?"],
         say: ["Sailed out with the fleet last spring. I mend his net every night. Nobody's using it. I mend it anyway.", 'At sea with the fleet. I mend his net every night.'] },
       { idle: [['Mm. Yes?', 'Mm. Yes?'], ['Mind the nets. What is it?', 'Mind the nets. What?']] },
@@ -957,12 +970,39 @@ people({
       { if: 'flag c_snow said fig_sorry choice c_vesper=friend', once: true,
         say: ["Fig says you told her saying sorry is the bravest thing. My Vesper said sorry to me last night. First time in her life. I made her say it twice.",
           'Vesper said sorry to me last night. First time ever.'] },
-      { if: 'flag c_snow said oona_fish choice c_vesper=friend', once: true,
-        say: ["I told Vesper I don't like fish. Seventy years of fish on my step, and she laughed till she cried. Now she brings me biscuits.",
-          "I told Vesper I hate fish. She laughed. Now she brings biscuits."] },
       { if: 'flag c_snow said oona_people choice c_vesper=friend', once: true,
         say: ["I told Vesper what you said makes you warm. She said that's just a thing people say to cold people. Then she sat with me all evening.",
           'I told Vesper your answer. She said it is just a saying. Then she sat with me.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      // after the Spire
+      { if: 'flag c_snow choice c_vesper=friend',
+        say: ['My Vesper came home through the snow and sat down. Sat down, duck. In a chair. For an hour.', 'Vesper came home and sat down. In a chair. An hour!'],
+        re: [
+          { t: ['She told me about the Lady.', 'She told me about the Lady.'],
+            say: ["She told me too. A voice in her dreams, promising me fire. I'd have told her I didn't want it, if she'd asked.", "She told me. I didn't want fire. She never asked."] },
+          { t: ['Is she staying home now?', 'Is she staying home?'],
+            say: ["Tonight she is. Tomorrow she'll be up the Great Clock again. But she comes home, duck. That's the part that matters.", 'Tonight. Tomorrow, the clock again. But she comes home.'] },
+          { t: ['Did you tell her about the fish?', 'Did you tell her about the fish?'], if: 'said oona_fish',
+            say: ["I did. Seventy years of fish on my step, and she laughed till she cried. Now she brings me biscuits.", "I did. She laughed and laughed. Now she brings biscuits."] },
+        ] },
+      { if: 'flag c_snow choice c_vesper=foe',
+        say: ["She's not come home. The fish still come, every night. So she's alive, and she's cross, and she's near.", "She's not home. The fish still come. She's near."],
+        re: [
+          { t: ["I'm sorry, Granny Oona.", "I'm sorry, Granny Oona."], tone: 'kind', f: 0.5,
+            say: ["Not your fault, duck. She's a Saltwhistle. We climb off when we're ashamed. She'll climb back.", "Not your fault. She'll climb back."] },
+          { t: ["I'll go and find her.", "I'll find her."],
+            say: ["Don't chase her. Leave a window open. That's how you catch a Saltwhistle.", "Don't chase her. Leave a window open."] },
+        ] },
+      { if: 'flag c_snow',
+        say: ['Snow, duck. On the boardwalk. Never in my life.', 'Snow, duck. Never in my life.'],
+        re: [
+          { t: ['Is your stove keeping you warm?', 'Is your stove warm?'], if: 'quest c_oona done',
+            say: ["The first warm winter of my life, and it's June. Funny old world.", 'My first warm winter. In June!'] },
+          { t: ['Shall I light your stove again?', 'Shall I light your stove?'], if: '!quest c_oona done',
+            say: ["You can try, duck. It'll be out by morning. They always are, here.", "You can try. It'll be out by morning."] },
+          { t: ['Where do you think it came from?', 'Where did it come from?'],
+            say: ['Over the mountains. The wind smells of nothing. Proper cold smells of nothing.', 'Over the mountains. Real cold smells of nothing.'] },
+        ] },
       // before the chapter brings him here (the visit itself is the chapter's scene, slt_oona)
       { if: '!seen slt_oona',
         say: ['Come in, duck, come in. Shut the door behind you. Not that it helps.', 'Come in, duck. Shut the door.'],
@@ -972,6 +1012,13 @@ people({
           { t: ["It's colder in here than outside.", "It's colder in here!"],
             say: ["It always is. Sit by the stove. Don't expect much from it.", "It always is. Don't expect much from the stove."] },
         ] },
+      // while Ash is doing her job (q_oona.js), what is next
+      { if: 'quest c_oona active !flag c_oona_nest !power claws',
+        say: ["That roof's too steep for feet, duck. You'd want claws. Pearl's sort.", 'You need claws for that roof.'] },
+      { if: 'quest c_oona active !flag c_oona_nest power claws',
+        say: ["The gull's still up there, glaring. He glared at Charlie once until Charlie dropped his ladle.", 'The gull is still up there. Glaring.'] },
+      { if: 'quest c_oona active flag c_oona_nest !flag c_oona_lit',
+        say: ["Breathe on it gently, duck. Gently. I'm fond of my eyebrows.", 'Breathe on the stove. Gently!'] },
       // after the chapter's visit, before her stove is lit
       { if: 'seen slt_oona !quest c_oona done',
         say: ['Did you eat that fish, duck? Somebody ought to.', 'Did you eat that fish, duck?'],
@@ -983,12 +1030,6 @@ people({
           { t: ["You don't like fish, do you?", "You don't like fish?"], then: ['said oona_fish'],
             say: ["Can't stand it, duck. Don't you tell her.", "I hate it, duck. Don't tell her."] },
         ] },
-      { if: 'quest c_oona active !flag c_oona_nest !power claws',
-        say: ["That roof's too steep for feet, duck. You'd want claws. Pearl's sort.", 'You need claws for that roof.'] },
-      { if: 'quest c_oona active !flag c_oona_nest power claws',
-        say: ["The gull's still up there, glaring. He glared at Charlie once until Charlie dropped his ladle.", 'The gull is still up there. Glaring.'] },
-      { if: 'quest c_oona active flag c_oona_nest !flag c_oona_lit',
-        say: ["Breathe on it gently, duck. Gently. I'm fond of my eyebrows.", 'Breathe on the stove. Gently!'] },
       // her stove is lit
       { if: 'quest c_oona done',
         say: ['Come in, duck. Shut the door. Not because of the cold. Because of the gulls.', 'Come in, duck. Mind the gulls.'],
@@ -1010,35 +1051,6 @@ people({
             say: ["Lucky duck. Don't you ever let it go out.", "Lucky duck. Don't let it go out."] },
           { t: ['Socks. Two pairs.', 'Two pairs of socks.'],
             say: ["Two! I wear three and I'm still cold. Was cold. Funny old world.", 'I wear three! Well, I used to.'] },
-        ] },
-      // after the Spire
-      { if: 'flag c_snow choice c_vesper=friend',
-        say: ['My Vesper came home through the snow and sat down. Sat down, duck. In a chair. For an hour.', 'Vesper came home and sat down. In a chair. An hour!'],
-        re: [
-          { t: ['She told me about the Lady.', 'She told me about the Lady.'],
-            say: ["She told me too. A voice in her dreams, promising me fire. I'd have told her I didn't want it, if she'd asked.", "She told me. I didn't want fire. She never asked."] },
-          { t: ['Did she wear the scarf?', 'Did she wear the scarf?'], if: '!item c_scarf',
-            say: ["No. It's on her bed. She sleeps with it. Don't tell her I told you.", "No. She sleeps with it. Don't tell her."] },
-          { t: ["I'm wearing her scarf, Granny Oona.", "I'm wearing her scarf."], if: 'item c_scarf',
-            say: ["So you are. She saw it on you and went quiet. I think she wants it back. She'll never ask.", 'So you are. She wants it back. She won\'t ask.'] },
-        ] },
-      { if: 'flag c_snow choice c_vesper=foe',
-        say: ["She's not come home. The fish still come, every night. So she's alive, and she's cross, and she's near.", "She's not home. The fish still come. She's near."],
-        re: [
-          { t: ["I'm sorry, Granny Oona.", "I'm sorry, Granny Oona."], tone: 'kind', f: 0.5,
-            say: ["Not your fault, duck. She's a Saltwhistle. We climb off when we're ashamed. She'll climb back.", "Not your fault. She'll climb back."] },
-          { t: ["I'll go and find her.", "I'll find her."],
-            say: ["Don't chase her. Leave a window open. That's how you catch a Saltwhistle.", "Don't chase her. Leave a window open."] },
-        ] },
-      { if: 'flag c_snow',
-        say: ['Snow, duck. On the boardwalk. Never in my life.', 'Snow, duck. Never in my life.'],
-        re: [
-          { t: ['Is your stove keeping you warm?', 'Is your stove warm?'], if: 'quest c_oona done',
-            say: ["The first warm winter of my life, and it's June. Funny old world.", 'My first warm winter. In June!'] },
-          { t: ['Shall I light your stove again?', 'Shall I light your stove?'], if: '!quest c_oona done',
-            say: ["You can try, duck. It'll be out by morning. They always are, here.", "You can try. It'll be out by morning."] },
-          { t: ['Where do you think it came from?', 'Where did it come from?'],
-            say: ['Over the mountains. The wind smells of nothing. Proper cold smells of nothing.', 'Over the mountains. Real cold smells of nothing.'] },
         ] },
       // topics (her old TALK about and deep)
       { ask: ['Do you know Auntie Fig?', 'Do you know Auntie Fig?'],
@@ -1064,6 +1076,15 @@ people({
     c_tarbuckle: [
       { if: 'quest c_whip done', once: true,
         say: ["The Rockpools are quiet at night now. No clanking. I miss it, a bit. Don't tell him.", 'No more clanking. I miss it a bit.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["In my day it snowed every summer. ...No, it didn't. I've never seen this. Not once, in eighty years.", "In my day it snowed in summer. No it didn't. Never."],
+        re: [
+          { t: ['You told the truth!', 'You told the truth!'],
+            say: ["Don't get used to it. It's the cold. It's got into my stories.", "It's the cold. It got into my stories."] },
+          { t: ['Have you ever been that far up?', 'Have you been up there?'],
+            say: ['Once, lad, to where the sea goes white and hard. I walked back. The ship sulked for a year.', 'Once. The sea went white and hard.'] },
+        ] },
       { if: '!quest c_whip done',
         say: ["In my day dragons were twice the size. You'll do, though. Captain Elias Tarbuckle. Old Tarbuckle, they all say. Sit.", 'In my day dragons were bigger. I am Old Tarbuckle. Sit.'],
         re: [
@@ -1082,14 +1103,6 @@ people({
             say: ['Ha! A storm sailor! You can board and steer.', 'Ha! You can board and steer!'] },
           { t: ['The snacks.', 'Snacks.'],
             say: ['In my day we had no snacks. You can board. Bring snacks.', 'No snacks in my day. Bring some.'] },
-        ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["In my day it snowed every summer. ...No, it didn't. I've never seen this. Not once, in eighty years.", "In my day it snowed in summer. No it didn't. Never."],
-        re: [
-          { t: ['You told the truth!', 'You told the truth!'],
-            say: ["Don't get used to it. It's the cold. It's got into my stories.", "It's the cold. It got into my stories."] },
-          { t: ['Have you ever been that far up?', 'Have you been up there?'],
-            say: ['Once, lad, to where the sea goes white and hard. I walked back. The ship sulked for a year.', 'Once. The sea went white and hard.'] },
         ] },
       // topics (his old TALK about and deep)
       { ask: ['What was the farthest you ever sailed?', 'How far did you sail?'], if: 'stage>=c_claws',
@@ -1126,7 +1139,7 @@ people({
             say: ['Ooh! ...That was small. Do a big one. No, Mom says no big ones.', 'Ooh! Small. Mom says no big ones.'] },
         ] },
       // while the music box is still hers and the big moths are about
-      { if: 'flag c_gift_trail !quest c_gifts done',
+      { if: '!flag c_gifts=taken !quest c_gifts done',
         say: ['A moth lady left my music box on our step. Moths are nice. Except the big ones. The big ones are rude.', 'A moth lady gave me my box. Big moths are rude.'],
         re: [
           { t: ['What big ones?', 'What big ones?'],
@@ -1178,6 +1191,15 @@ people({
         say: ["Someone! At night! I saw a note up there, and the gulls want it! You'd need claws!", 'A NOTE is on my chimney! Need claws!'] },
       { if: 'flag c_note3', once: true,
         say: ["You climbed my chimney! Was it a moth? No? A girl? Good! Moths don't pay for tea!", 'You climbed my chimney! Good!'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ["Snow! On a cliff! In June! I've had to shout louder!", 'Snow! In June! I shout louder now!'],
+        re: [
+          { t: ['How is that even possible?', 'How can you be louder?'],
+            say: ["Practice! Forty years of it! I came up here for a quiet life!", 'Practice! I came here for a quiet life!'] },
+          { t: ['Did Agatha wave last night?', 'Did Agatha wave?'], if: 'said maudie_lantern',
+            say: ["Twice! Twice! We still don't know what it means! I waved back three times!", 'Twice! I waved back three times!'] },
+        ] },
       { if: '!flag c_spire_up',
         say: ["Welcome to the Gull's Rest! I'm Maudie! Sorry for shouting! It's the WIND!", "Welcome! I'm Maudie! Sorry! WIND!"],
         re: [
@@ -1206,14 +1228,6 @@ people({
           { t: ['WHAT?', 'WHAT?'],
             say: ['What? ...Ha! Very good! Very good!', 'What? Ha! Very good!'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ["Snow! On a cliff! In June! I've had to shout louder!", 'Snow! In June! I shout louder now!'],
-        re: [
-          { t: ['How is that even possible?', 'How can you be louder?'],
-            say: ["Practice! Forty years of it! I came up here for a quiet life!", 'Practice! I came here for a quiet life!'] },
-          { t: ['Did Agatha wave last night?', 'Did Agatha wave?'], if: 'said maudie_lantern',
-            say: ["Twice! Twice! We still don't know what it means! I waved back three times!", 'Twice! I waved back three times!'] },
-        ] },
       // topics (her old TALK about and deep): the lanterns she and Agatha wave
       { ask: ['What is your lantern in the window for?', 'What is your lantern for?'], then: ['said maudie_lantern'],
         say: ["Agatha at the lighthouse and I wave lanterns at each other every night! It means goodnight! Or help! We never decided!",
@@ -1231,6 +1245,9 @@ people({
     c_agatha: [
       { if: 'choice fennick=forgive', once: true,
         say: ['Word in the lamp trade is you let Fennick Wick off with a warning. Good. Nobody makes better oil.', 'You let Fennick off? Good. He makes the best oil.'] },
+      // she kept the light on for him on the Spire night (said agatha_light)
+      { if: 'flag c_snow said agatha_light', once: true,
+        say: ['I kept it on all night, like I said. You came back. Good. Squawk was worried. I was not.', 'I kept it on all night. You came back. Good.'] },
       // (STORY_PLAN 3.4 Act I: Fennick, who opened a gate for a promise of oil, is Vesper in miniature; said once, here)
       { if: 'flag c_snow choice c_vesper=friend choice fennick=forgive',
         say: ['Fennick Wick opened a door for a promise of lamp oil, and you gave him a second chance. That girl climbed my stairs for a promise of fire. You gave her one too.',
@@ -1283,9 +1300,6 @@ people({
           { t: ['Squawk is very nosy.', 'Squawk is nosy.'],
             say: ['He is. Squawk. Mind your own business.', 'He is! Mind your business, Squawk.'] },
         ] },
-      // after the Spire
-      { if: 'flag c_snow said agatha_light', once: true,
-        say: ['I kept it on all night, like I said. You came back. Good. Squawk was worried. I was not.', 'I kept it on all night. You came back. Good.'] },
       { if: 'stage>=c_spire', fact: 'c_lighthouse_lamp=lit',
         say: ['She spins all night again, and Squawk sleeps on the lamp rail like a fat green cushion.', 'The light spins. Squawk sleeps on the rail.'],
         re: [
@@ -1323,6 +1337,15 @@ people({
       { if: 'stage>=c_claws !flag m0_duchess_open', promise: 'm0_duchess', dir: ['emberhollow', 'm0_duchess', 'east'], option: ['Tell me about Duchess the Second', 'Tell me about Duchess'],
         say: ["I named her after Farmer Hollis's goat, up your way. Duchess the First climbs rocks no goat should. Hollis says there's one east of your village, all over hoofprints. Goats hide things up high.",
           'A goat rock east of your village. Look up high.'] },
+      // the snow (c_snow) is the news: these come first once it falls
+      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
+        say: ['Snow on the Downs. The sheep think it is wool. They are furious about it.', 'Snow! The sheep think it is wool. They are cross.'],
+        re: [
+          { t: ['Is Gerald all right in the cold?', 'Is Gerald all right?'],
+            say: ['He fainted into a drift and liked it. He is still in there. Happy as anything.', 'He fainted into the snow. He likes it.'] },
+          { t: ['The Chalk Dragon is under the snow.', 'The Chalk Dragon is covered.'],
+            say: ["She's had worse. A bit of snow won't stop her waving.", 'A bit of snow will not stop her.'] },
+        ] },
       { if: '!quest c_chalk done',
         say: ["That's Duchess the Second, she's in charge. That's Gerald, he's in charge of nothing. He's happy.", 'Duchess is in charge. Gerald is not.'],
         re: [
@@ -1350,14 +1373,6 @@ people({
           { t: ['Your wife would have liked it.', 'Your wife would like it.'], tone: 'kind', f: 0.5,
             say: ['She would. She would have walked it again just to check. Thank you, lad.', 'She would. Thank you, lad.'] },
         ] },
-      { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
-        say: ['Snow on the Downs. The sheep think it is wool. They are furious about it.', 'Snow! The sheep think it is wool. They are cross.'],
-        re: [
-          { t: ['Is Gerald all right in the cold?', 'Is Gerald all right?'],
-            say: ['He fainted into a drift and liked it. He is still in there. Happy as anything.', 'He fainted into the snow. He likes it.'] },
-          { t: ['The Chalk Dragon is under the snow.', 'The Chalk Dragon is covered.'],
-            say: ["She's had worse. A bit of snow won't stop her waving.", 'A bit of snow will not stop her.'] },
-        ] },
       // topics (his old TALK about and deep)
       { ask: ['Who kept the Chalk Dragon white?', 'Who kept her white?'], if: '!quest c_chalk done',
         say: ["My wife walked that line every spring, to keep it white. When she went, I tried. My knees said no. She's been greying ever since.", 'My wife kept her white. My knees cannot. She went grey.'] },
@@ -1374,14 +1389,34 @@ people({
     // Short, practical, warm; worry comes out as instructions. Her old code still plays her own forge talk first
     // (reforging with star-iron).
     maren: [
+      // the snow (c_snow) is the news: these come first once it falls
+      // after the Spire
+      { if: 'flag c_snow',
+        say: ["You're back. Snow in June, a bite out of the moon, and you're back. Did you get it?", "You're back! Did you get it?"],
+        re: [
+          { t: ["She's my cousin, Mom. Vesper.", "She's my cousin. Vesper."], if: 'choice c_vesper=friend',
+            say: ["Your cousin? ...Sit down. Start at the beginning, and don't skip the bits I won't like.", "Your cousin? Sit. Tell me all of it."] },
+          { t: ['She got away, Mom.', 'She got away.'], if: 'choice c_vesper=foe',
+            say: ["Then she's out there in this snow. Somebody's girl. I hope somebody's looking.", "Then she's out in the snow. I hope someone looks."] },
+          { t: ['I got one piece of the Heart.', 'I got one piece.'], if: 'item c_shard1',
+            say: ['Let me see. ...It knows you. It went warm the second you held it out. Keep it close.', 'It knows you. It went warm. Keep it close.'] },
+        ] },
+      { if: 'flag c_snow',
+        say: ['The whole village sleeps round my forge now. Hal brought the cow. The cow is not happy.', 'Everyone sleeps by my forge now. Even the cow.'],
+        re: [
+          { t: ["The sky past the mountains is white.", 'The far sky is white.'],
+            say: ["I've seen it from the forge door. ...You're going up there, aren't you.", "I've seen it. You're going up there."] },
+          { t: ['Is everybody warm enough?', 'Is everyone warm?'], tone: 'kind', f: 0.5,
+            say: ['Warm, and arguing about blankets. That means warm enough.', 'Warm, and arguing. That means fine.'] },
+        ] },
       // what Ash told people on the coast comes home by letter and by Wren
       { if: 'said ingrid_mom',
         say: ['You met Ingrid Anvilsong, and she knew my hammer marks? From across her smithy?', 'Ingrid knew my hammer marks? Really?'],
         re: [
-          { t: ['She says you hit like you mean it.', 'She says you mean it.'],
-            say: ['I do mean it. Tell her I know her marks too. I don\'t. Tell her anyway.', 'I do. Tell her I know hers too.'] },
-          { t: ['She wants to shake your hand.', 'She wants to shake hands.'],
-            say: ["Gently, I hope. A smith's hands aren't made for shaking.", "Gently, I hope. Smiths' hands are rough."] },
+          { t: ['She knew your work from my sword.', 'She knew it from my sword.'],
+            say: ["Did she. Then she's a real smith. Tell her I know her marks too. I don't. Tell her anyway.", 'Then she is a real smith. Tell her I said so.'] },
+          { t: ['She sings while she hammers.', 'She sings while she hammers.'],
+            say: ["Then she's got more breath than I have. I just shout at the iron.", 'More breath than me. I shout at the iron.'] },
         ] },
       { if: 'said ottoline_mom_book',
         say: ['Wren had a letter from your librarian on the coast. You told her the best book is one I read you. Which one did you mean?', 'Wren says you told the librarian about our book. Which one?'],
@@ -1408,25 +1443,6 @@ people({
             say: ['Twelve, in the afternoon. That sounds like something you would do.', 'In the afternoon? That sounds like you.'] },
           { t: ['A girl climbs it every night.', 'A girl climbs it at night.'],
             say: ['The thief? Climbs a clock tower, at night? Somebody ought to be watching that girl.', 'At night? Someone should watch that girl.'] },
-        ] },
-      // after the Spire
-      { if: 'flag c_snow',
-        say: ["You're back. Snow in June, a bite out of the moon, and you're back. Did you get it?", "You're back! Did you get it?"],
-        re: [
-          { t: ["She's my cousin, Mom. Vesper.", "She's my cousin. Vesper."], if: 'choice c_vesper=friend',
-            say: ["Your cousin? ...Sit down. Start at the beginning, and don't skip the bits I won't like.", "Your cousin? Sit. Tell me all of it."] },
-          { t: ['She got away, Mom.', 'She got away.'], if: 'choice c_vesper=foe',
-            say: ["Then she's out there in this snow. Somebody's girl. I hope somebody's looking.", "Then she's out in the snow. I hope someone looks."] },
-          { t: ['I got one piece of the Heart.', 'I got one piece.'], if: 'item c_shard1',
-            say: ['Let me see. ...It knows you. It went warm the second you held it out. Keep it close.', 'It knows you. It went warm. Keep it close.'] },
-        ] },
-      { if: 'flag c_snow',
-        say: ['The whole village sleeps round my forge now. Hal brought the cow. The cow is not happy.', 'Everyone sleeps by my forge now. Even the cow.'],
-        re: [
-          { t: ["The sky past the mountains is white.", 'The far sky is white.'],
-            say: ["I've seen it from the forge door. ...You're going up there, aren't you.", "I've seen it. You're going up there."] },
-          { t: ['Is everybody warm enough?', 'Is everyone warm?'], tone: 'kind', f: 0.5,
-            say: ['Warm, and arguing about blankets. That means warm enough.', 'Warm, and arguing. That means fine.'] },
         ] },
       // topics for Act II
       { ask: ['Did you know about Pearl?', 'Did you know about Pearl?'], if: 'flag c_ottoline',
