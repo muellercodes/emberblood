@@ -245,12 +245,5 @@ chapter({
     ],
   },
 
-  talk: {
-    c_mo: [
-      { if: 'flag c_bridge', say: ['Bridge is back up over the Cut. The crabs are still sulking about it.', 'The bridge is back. The crabs are sulking.'] },
-    ],
-    c_agatha: [
-      { if: '!flag c_shard1', say: ['Go on, then. Squawk and I will keep the light on for you.', 'Go on. We will keep the light on for you.'] },
-    ],
-  },
+  // (Mo's "Bridge is back" and Agatha's "Squawk and I will keep the light on for you", with replies, are in act2/people.js)
 })

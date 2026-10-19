@@ -148,9 +148,7 @@ chapter({
       { if: 'flag c_chase=sack item c_bird_clock', once: true,
         say: ['Hmph. My bird clock. Thank you. Wipe your feet.', 'My bird clock! Thanks. Wipe your feet.'],
         then: ['take c_bird_clock', 'give coins 30', 'set c_birdclock_back'] },
-      { if: '!flag c_clock_on', fact: 'c_great_clock=stopped',
-        say: ['Still stopped. All of them, at one minute to midnight. I pay my clock tax!', 'Still stopped! I pay my clock tax!'] },
-      { if: 'flag c_clock_on', say: ['It ticks! I timed my tea by it. Perfect.', 'It ticks! Tea is on time.'] },
+      // (his everyday lines, with replies, are in act2/people.js: lines here would come first and answer for them)
     ],
   },
 })

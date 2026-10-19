@@ -299,13 +299,12 @@ chapter({
 
   talk: {
     c_mo: [
-      { if: '!solved who_cut !flag c_bridge', say: ["Crabs, I tell you. Admiral Pinch has hated that bridge for forty years.", 'Crabs did it. I am sure.'] },
+      // (his "Crabs, I tell you" line, with replies, is in act2/people.js)
       { if: 'solved who_cut !flag c_bridge', once: true,
         say: ["Not crabs? Squawk told the whole market. Twice. I've sent the crew out with new rope.", 'Not crabs? Squawk told everyone. My crew will fix it.'] },
     ],
     c_agatha: [
-      { if: 'flag c_agatha !flag c_light_done', say: ['Squawk wants to know why you are still down here. So do I.', 'Squawk asks why you are still here. So do I.'] },
-      { if: 'flag c_light_done', say: ['My light is back. Squawk, say thank you to the dragon. ...He says something about a house. That means thank you.', 'My light is back! Squawk says thank you.'] },
+      // (her lines while the lamp is dark and once it is lit, with replies, are in act2/people.js)
     ],
   },
 })
