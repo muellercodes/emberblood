@@ -2019,7 +2019,7 @@ people({
         re: [
           { t: ['I will tell her.', 'I will tell her.'], tone: 'kind',
             say: ['Tell her I play it for her, too. The moth song. Loud.', 'Tell her I play it for her. Loud.'] },
-          { t: ['Are you scared of the dark?', 'Are you scared?'],
+          { t: ['Does the dark scare you, Posy?', 'Does the dark scare you?'],
             say: ["Yes. That's allowed. I play the box and the dark goes quieter.", 'Yes. It is allowed. The box helps.'] },
         ] },
       { if: '!flag n_dawn',
