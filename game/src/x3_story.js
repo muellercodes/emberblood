@@ -431,13 +431,13 @@ m3sDef('m_obs_in',[
 ]);
 // 6.11 Hush, the Moon Shard, and the choice
 m3sDef('m_hush_intro',[
-  xl('narr',`Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. Frost glitters in her fur. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.`,`Under the dome sits a white moth as big as a barn. Frost glitters in her fur. A silver thread runs from her neck to the floor, then up into the dark.`),
+  xl('narr',`Under the great dome, on a floor of brass rings, a huge white moth sits very still. Frost glitters in her fur. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.`,`Under the dome sits a huge white moth. Frost glitters in her fur. A silver thread runs from her neck to the floor, then up into the dark.`),
   xl('narr',`Beside her, in a little brass cradle, something glows silver. The Moon Shard.`,`Beside her, something glows silver. The Moon Shard.`),
   xl('f_hush',`Shhh. You again. The loud one. ...I never did get a sweater.`,`Shhh. You again. I never got a sweater.`),
   xl('ash',`Hush. You came back.`,`Hush. You came back.`),
   xl('f_hush',`I flew to the Mother, small and cold. She made me big again. "You came back small," she said. "Never again." Then she gave me this.`,`I flew to the Mother, small and cold. She made me big again. "Never small again," she said. Then she gave me this.`),
   xl('narr',`The silver leash glints. Somewhere far above, something tugs it, gently. Hush flinches.`,`The silver leash glints. Far above, something tugs it. Hush flinches.`),
-  xl('f_hush',`My sister Murmur brought the Shard here. Then she flew up to the Mother. They all fly up to the Mother, in the end.`,`My sister Murmur brought the Shard here. Then she flew up to the Mother. They all do, in the end.`),
+  xl('f_hush',`The Mother brought the Shard here herself. They all go up to her, in the end.`,`The Mother brought the Shard here. They all go up to her, in the end.`),
   xl('f_hush',`I'm to keep it until you bring the other two. Then the Mother gets all three. Shhh. Don't be loud about it.`,`I keep it until you bring the other two. Then the Mother gets all three. Shhh.`),
   m3sIf('c_vesper',`Hi, moth. Remember the Dreadgate? I brought more fire bombs.`,`Hi, moth. Remember me? I brought more fire bombs.`,()=>!!G.flags.m_vesper_ally),
   m3sIf('m_esme',`(from the stairs) Lamplighters! Poles up! Wicks lit!`,`(from the stairs) Lamplighters! Poles up! Wicks lit!`,()=>!!G.flags.m_lamps_ally),
@@ -445,7 +445,7 @@ m3sDef('m_hush_intro',[
 ]);
 m3sDef('m_hush_out',[
   m3sAct(`Hush sinks down onto the brass floor and folds her wings.`,`Hush sinks to the floor and folds her wings.`,()=>{ m3sHushFxAt(null); m3sHushPose('down'); }),
-  xl('f_hush',`...Take it. It was never mine. Nothing is ever mine.`,`Take it. It was never mine. Nothing is ever mine.`),
+  xl('f_hush',`Take it. It was never mine. Nothing is ever mine.`,`Take it. It was never mine. Nothing is ever mine.`),
   xdo(()=>{ if(!(G.items.m_shard3>0)) giveItems({m_shard3:1}); G.flags.m_hush_done=1; }),
   xl('narr',`The Moon Shard is cold, and then, in your claws, warm.`,`The Moon Shard is cold. Then, in your claws, warm.`),
   xl('iska',`Ash. If you leave her tied, the Mother will pull her home and keep her cold forever. If you cut her loose, she's free. Free to go anywhere. Even away from you.`,`Ash. If you leave her tied, the Mother keeps her cold forever. If you cut her free, she can go anywhere. Even away from you.`),
@@ -455,10 +455,11 @@ m3sDef('m_hush_out',[
     xo(`Cut the leash`,`Cut the leash`,{tone:'kind',cond:()=>!!G.flags.m_leash_known,fn:()=>{ G.choices.m_hush='free'; },then:[
       m3sAct(`You breathe Moonfire on the first knot, as softly as you'd blow on hot soup. The silver thread melts like frost on a window. Then the second knot.`,`You breathe soft Moonfire on the knots, like blowing on soup. The silver thread melts.`,()=>m3sHushPose('knots')),
       m3sAct(`You cut the leash. Hush shivers, stretches her wings, and floats up out of the Observatory, free and glowing faintly. She doesn't look back. Then she does, once.`,`You cut the leash. Hush flies away, free. She looks back once.`,()=>m3sHushPose('free')),
-      xl('f_hush',`...Shhh. Thank you. Quietly.`,`Thank you. Quietly.`)]}),
-    xo(`Take the Shard and go`,`Take the Shard and go`,{tone:'brave',fn:()=>{ G.choices.m_hush='foe'; },then:[
-      m3sAct(`You take the Shard. The leash tightens, and Hush crumbles into a hundred little white moths that flutter up the silver thread to their Mother.`,`You take the Shard. Hush turns into little moths and flies to the Mother.`,()=>m3sHushPose('foe')),
-      xl('iska',`She'll remember this, Ash. Moths always remember.`,`She will remember this, Ash. Moths always remember.`)]})]),
+      xl('f_hush',`Shhh. Thank you. Quietly.`,`Thank you. Quietly.`)]}),
+    xo(`Leave the leash on`,`Leave the leash on`,{tone:'brave',fn:()=>{ G.choices.m_hush='foe'; },then:[
+      xl('ash',`Leave the leash on. If she's free, the Mother can follow her to us.`,`If she is free, the Mother can follow her to us.`),
+      m3sAct(`You take the Shard. The leash tightens, and Hush breaks into a hundred little white moths that flutter up the silver thread to their Mother.`,`You take the Shard. Hush turns into little moths and flies up to the Mother.`,()=>m3sHushPose('foe')),
+      xl('f_hush',`(far above, very small) You're careful. She isn't.`,`You're careful. She isn't.`)]})]),
   xdo(()=>{ m3sExtra('m_hush',G.choices.m_hush==='free'?S(`You melted Hush's silver leash with the gentlest Moonfire, and she flew away free.`,`You cut Hush's leash. She flew away free.`):S(`You took the Moon Shard and left Hush on her leash. The Mother pulled her home.`,`You left Hush on her leash. The Mother took her home.`)); m3sHushAfter(); })
 ]);
 // the Final Chapter, the Ember Heart (6.12): in room q, the Eclipse Lens

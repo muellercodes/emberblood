@@ -107,7 +107,7 @@ chapter({
       { if: '!clue m4_hush_pulled', then: [
         ['ash', 'At the Moon Well her thread yanked Hush up the sky like a kite.', 'Her thread yanked Hush up like a kite.', { clue: 'm4_hush_pulled' }] ] },
       { if: '!quest m_leash done', then: [
-        ['iska', "Elder Ripple keeps Lumen's old records down in Coralcombe. They might know the Mother's real name, too. Names matter, Ash.", "Ripple's old records might know her real name.", { promise: 'm4_book' }] ] },
+        ['iska', "Elder Ripple keeps Lumen's old records down in Coralcombe. If anybody ever wrote down who she really is, it was Lumen.", "Ripple's old records might say who she really is.", { promise: 'm4_book' }] ] },
     ],
     // the experiment: Ash tries what he would try on Hush (play it again to try another way)
     m4_moth_try: [
@@ -132,10 +132,10 @@ chapter({
       ['narr', 'Silver fire runs out of the brazier and along the leash. The knot goes soft, like frost on a warm window, and melts away.', 'Silver fire runs along the leash. The knot melts like frost.', { do: ['world m4_little_moth free'] }],
       ['narr', 'The little moth shrinks to the size of a button, sneezes, and flutters off, warm. It drops its lamp at your feet.', 'The moth shrinks, sneezes and flies off. It drops its lamp.'],
       ['narr', 'A tag on the lamp says: SABLE. BERTHA (SPARE).', 'A tag says: SABLE. BERTHA (SPARE).'],
-      ['ash', "It worked! ...Would it work on a moth as big as a BARN?", 'It worked! Would it work on a moth as big as a barn?'],
+      ['ash', 'It worked! Would it work on Hush?', 'It worked! Would it work on Hush?'],
     ],
     m4_free_solved: [
-      ['ash', "Fire won't do it, and pulling only makes the Mother pull back. Cutting sends her flying up the thread. But Moonfire melts the knots.", "Fire won't work. Pulling won't. Cutting won't. Moonfire melts the knots."],
+      ['ash', 'Fire does nothing, and pulling makes the Mother pull back. Moonfire melts it.', 'Fire does nothing. Moonfire melts it.'],
       ['iska', 'Then when the time comes, be gentle. Softer than you have ever breathed.', 'Then be gentle, when the time comes.'],
     ],
   },
