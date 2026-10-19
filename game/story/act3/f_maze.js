@@ -4,6 +4,8 @@
 // Glacier Maze (the dungeon stays code, x2_dun_a.js). Inside, Ember's shrine says she built the forge "with my auntie.
 // She did the cold parts." (a clue for the act's last question: who is the Snow Mother?), Ember's Ice Diary names her
 // Auntie Glee, and Old Bellows remembers "Ember and the Cold One" (bonus clues). Blaze Breath is Ember's gift.
+// (v11) This forge is the one place Ember speaks in Act III: it is hers and her auntie's. Ash learns here that Grandpa
+// had a sister; that the sister is the dragon on the mountain is still the player's to work out (snow_mother).
 // The dungeon's own lines below are old STORY keys: x2_dun_a plays them by key, and the engine puts this text into
 // the same arrays (f_maze_how and f_maze_bossline are one-line tips, still x2_story's).
 // Old flags kept: trial_f_maze_done (the dungeon's altar), f_icediary; the stage moves on to f_kindle.
@@ -47,8 +49,8 @@ chapter({
   scene: {
     // on the shore, before the open water round the door (x2_world's moat ring is open water out to r 380)
     f_moat: [
-      ['tove', 'Open water all around the door. Good thing you can walk on water. You CAN walk on water? Please say you can.',
-        'Water all around the door. You CAN walk on water? Please say yes.', { ref: 'f_maze_door' }],
+      ['tove', 'Open water all around the door. Good thing you can walk on water. You can walk on water? Please say you can.',
+        'Water all around the door. You can walk on water? Please say yes.', { ref: 'f_maze_door' }],
       ['ash', "I can walk on water. I just can't swim. So I walk fast.", "I can walk on water. I just can't swim."],
       ['tove', "Let's not find out today."],
     ],
@@ -62,7 +64,7 @@ chapter({
         'A frozen explorer, mid-sneeze. Your fire only makes the ice drip.'],
     ],
     f_maze_hjalmar: [
-      ['f_hjalmar', '...ACHOO! Oh. Excuse me. How long was I mid-sneeze?', 'ACHOO! Oh. Excuse me. How long was I sneezing?'],
+      ['f_hjalmar', 'ACHOO! Oh. Excuse me. How long was I mid-sneeze?', 'ACHOO! Oh. Excuse me. How long was I sneezing?'],
       ['ash', 'About a month.'],
       ['f_hjalmar', 'Longest sneeze in history. Here, for your trouble. And bless me.', 'The longest sneeze ever! Here, take this. Bless me.'],
     ],
@@ -79,12 +81,13 @@ chapter({
     ],
     // Ember's shrine before her gift (a clue for the Snow Mother question)
     f_maze_shrine: [
-      ['ember', 'Ash? All the way up here, in the cold? Hello again, little ember.', 'Ash! Up here in the cold? Hello again!'],
-      ['ash', 'Grandma Ember! I mean, just Ember.'],
-      ['ember', 'You remembered! I built this forge a long, long time ago, with my auntie. She did the cold parts. I did the hot parts. We were a very good team.',
+      ['ember', 'Ash? All the way up here, in the cold? Come in. Mind the anvil, it bites.', 'Ash! Up here in the cold? Come in.'],
+      ['ash', 'Ember! What is this place?', 'Ember! What is this place?'],
+      ['ember', 'My forge. I built it with my auntie, a long, long time ago. She did the cold parts. I did the hot parts. We were a very good team.',
         'I built this forge with my auntie. She did the cold parts. I did the hot parts.', { clue: 'f3_cold_parts' }],
-      ['ash', "Your AUNTIE? Wait, then she's my great great great...", "Your AUNTIE? Then she's my great great great..."],
-      ['ember', "Don't. You'll be here all day."],
+      ['ash', 'Your auntie? Grandpa had a sister?', 'Grandpa had a sister?'],
+      ['ember', "He did. They stopped speaking long before I was grown. I never asked her why. I wish I had.",
+        'He did. They stopped talking. I never asked why.'],
       ['ember', 'I left a little of my hottest fire here. The blue kind. For a day when the cold got too big. I think that day is today.',
         'I left my hottest fire here. The blue kind. For a day like today.'],
     ],
@@ -92,8 +95,8 @@ chapter({
       ['narr', 'The flame turns from gold to white to blue. It pours into you like hot cocoa on a snowy day.', 'The flame turns gold, then white, then blue. It pours into you like hot cocoa.'],
       ['ember', 'Blaze! Hold your fire breath a moment longer and it burns blue and reaches far. It melts ice walls, wakes frozen folk, and lights braziers even far away.',
         'Blaze! Hold your fire longer. It burns blue. It melts ice and wakes frozen folk.'],
-      ['ash', "I'm going to melt EVERYTHING."],
-      ['ember', 'Not everything. Leave the snowmen. Snowmen have feelings.', 'Not everything. Leave the snowmen. They have feelings.'],
+      ['ash', "It's blue. Brynja said it would be blue.", "It's blue! Like Brynja said."],
+      ['ember', 'Blue was always my favorite. My auntie said I was showing off.', 'Blue was my favorite. Auntie said I was showing off.'],
     ],
     f_maze_sigrid: [
       ['f_sigrid', "Brrrr. Thank you, dragon! I've been stuck since the moth. I was looking for the furnace key.", 'Brrrr. Thank you, dragon! I was stuck since the moth came.', { ref: 'f_maze_door' }],
@@ -124,7 +127,7 @@ chapter({
     // right after the boss (6 lines)
     f_maze_won: [
       ['narr', 'The purple frost cracks off Old Bellows like an eggshell. Underneath he is warm brass and soot and rivets.', 'The purple frost cracks off. Underneath he is warm brass.'],
-      ['f_bellows', '...Fff. Fwooosh. Warm? Small hot one. You smell like the boss.', 'Fff. Fwooosh. Warm? You smell like the boss.'],
+      ['f_bellows', 'Fff. Fwooosh. Warm? Small hot one. You smell like the boss.', 'Fff. Fwooosh. Warm? You smell like the boss.'],
       ['ash', 'The boss? You mean Ember?'],
       ['f_bellows', 'Ember. And the Cold One. They made Bellows. Then the purple cold came, and Bellows forgot.',
         'Ember and the Cold One made Bellows. Then the purple cold came.', { clue: 'f3_bellows_cold' }],
@@ -134,8 +137,8 @@ chapter({
     // by the warp ring at the end (Ember's voice; the player already worked out what the Hearth needs)
     f_maze_end: [
       ['ember', 'The forge is warm again. I can feel it, all the way from wherever I am.', 'The forge is warm again. I can feel it.'],
-      ['ember', 'My auntie and I lit the Great Hearth together, a thousand years ago. It has been waiting for someone with the right fire.',
-        'My auntie and I lit the Great Hearth long ago. It waits for the right fire.', { ref: 'f_lm_hearth' }],
+      ['ember', 'My auntie and I lit the Great Hearth together. She held the logs still with frost so I could get the fire just right. Go on. It has been waiting a long time.',
+        'Auntie and I lit the Great Hearth. Go on. It has waited a long time.', { ref: 'f_lm_hearth' }],
       ['narr', 'Step into the warp ring to go back outside.', 'Step into the warp ring to go outside.'],
     ],
   },
