@@ -12,11 +12,12 @@ act({
       title: ['What does the Night Mother want, and how do we stop her?', 'What does the Night Mother want?'],
       deduce: ['where_shard', 'where_feed', 'why_three', 'free_hush'],
       herring: ['m4_bottom_sea', 'm4_rafi_sun', 'm4_fanfare_shiny', 'm4_glaive_cuts'],
-      solved: ['She wants all three Shards so the Heart is whole, because only a whole Heart can burn black. Ash mends it anyway, and keeps it warm.',
-               'She wants the Heart whole. Ash keeps it warm.'] },
-    // small (A4a, chapter 1): the moon is getting smaller, and the sea follows the moon
+      solved: ['She wants the Heart whole, and handed to her, because a heart handed over in fear burns black. Ash mends it anyway, and he will never hand it over.',
+               'She wants the Heart whole, and given to her. Ash will never give it.'] },
+    // small (A4a, chapter 1; v11: the question is what happens next, not why): the moon is getting smaller, the sea
+    // follows the moon, and it took a whole city the last time
     wobbly_tide: {
-      title: ["Why has Driftwood's tide gone wobbly?", 'Why is the tide wobbly?'],
+      title: ['What will the wobbly tide do to Driftwood?', 'What will the tide do?'],
       deduce: ['wobbly_tide'],
       herring: ['m4_puff_plug'] },
     // small, optional (clues A4a, A4S, A4b; the deduction is in m_observatory.js): Duke Umberwing and his Moth Knights

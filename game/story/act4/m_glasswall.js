@@ -5,7 +5,8 @@
 // at the well together. The eclipse comes, Nyxara lands on the tower and finds the little ember got there first. Ash
 // chooses: stand in front of the well (brave) or help Saffron drag the lid on (kind); either way one candle of
 // moonlight is saved. She bites the moon (40), asks for all three Shards, and her thread yanks Hush up the sky like a
-// kite (a free_hush clue). Then under the Glasswall at the Burrow Gap, and across the Mirror Flats to the temple.
+// kite (a free_hush clue). v11: on the friend path (Act II), Vesper is on a tent roof in Sable; the Mother offers her
+// fire of her own again ("little thief"), and Vesper says no, in front of Ash. Then under the Glasswall at the Burrow Gap, and across the Mirror Flats to the temple.
 // Old flags kept: m_eclipse2 (x3_world opens the Burrow Gap, darkens the lanterns, x3_people sends Mom's letter
 // m_pb_3), m_gap_dug (set by x3_world when Ash burrows through). New: m4_well = stood | lid, m4_where_next.
 // Visual hooks of the old code (the eclipse pictures, x3_story m3sEcl) ride on `emit m4fx:<name>[:<arg>]` effects:
@@ -123,7 +124,7 @@ chapter({
       // (a save made before v10 never heard the first eclipse's sniff: Ash remembers it here)
       { if: '!clue m4_milk_smell', then: [
         ['ash', 'On the beach she sniffed the air. "More moonlight, somewhere warm," she said. "Like milk left out."', 'On the beach she said: "Moonlight, like milk left out."', { clue: 'm4_milk_smell' }] ] },
-      ['ash', "Then I'll find the milk before she does. And this time I'll be WAITING.", "I'll find it first. And I'll be WAITING."],
+      ['ash', "Then I'll find the milk before she does. And this time I'll be waiting.", "I'll find it first. And I'll be waiting."],
     ],
     m4_read_well_sign: [
       ['narr', 'THE MOON WELL. The last moonlight in the Glass Desert. Please do not drink it. (Underneath, smaller: THAT MEANS YOU, STRIDERS.)',
@@ -131,11 +132,11 @@ chapter({
     ],
     m4_look_moths: [
       ['narr', 'Hundreds of little moths sleep on the white tower, wings folded, all facing the water. Every few seconds one of them licks its lips.', 'Lots of little moths sleep on the tower. They face the water.'],
-      ['ash', "...Are they saving somebody a SEAT?", 'Are they saving someone a seat?'],
+      ['ash', 'Are they saving somebody a seat?', 'Are they saving someone a seat?'],
     ],
     m4_look_bench: [
       ['narr', 'A cracked lamp sits on the workbench, with a note tucked under it in curly writing.', 'A cracked lamp and a note sit on the bench.'],
-      ['narr', '"CRACKED LAMPS CAN\'T HOLD A FLAME. MEND IT WHOLE FIRST. E."', '"CRACKED LAMPS CAN\'T HOLD A FLAME. MEND IT WHOLE FIRST. E."'],
+      ['narr', 'It says: "Cracked lamps can\'t hold a flame. Mend it whole first. E."', '"Cracked lamps can\'t hold a flame. Mend it whole first. E."'],
     ],
     m4_where_solved: [
       ['ash', 'The Moon Well! The last moonlight in the whole desert, sitting there like a bowl of milk.', 'The Moon Well! Like a bowl of milk.'],
@@ -143,7 +144,7 @@ chapter({
     ],
     m4_warn_saffron: [
       ['ash', "Saffron! Nyxara is coming to drink your well. Today. I'm sure of it.", 'Saffron! Nyxara is coming for your well!'],
-      ['m_saffron', 'The moth that put out the SUN? Coming here, to my well?', 'The moth that hid the sun? HERE?'],
+      ['m_saffron', 'The moth that put out the sun? Coming here, to my well?', 'The moth that hid the sun? Here?'],
       ['m_saffron', "...Then she'll find a Well-Warden and a dragon waiting for her. Come and sit on the rim with me.", 'Then we wait for her together. Sit with me.', { ref: 'm4_well_wait' }],
     ],
     // the second eclipse: at most 10 lines a branch. Ash is already there, because he worked it out.
@@ -153,13 +154,16 @@ chapter({
                'You wait at the well with Saffron. Then the sun goes dark.', { do: ['emit m4fx:ecl:start:2', 'emit m4fx:ecl:dark', 'set m_eclipse_on'] }],
       ['narr', 'Nyxara drops out of the dark like a black sail and lands right on top of the well tower. Every little moth on it wakes up and cheers.',
                'Nyxara lands on the well tower! The little moths cheer.', { do: ['emit m4fx:ecl:land', 'set m4_nyx_here'] }],
-      ['nyxara', 'Oh. The little ember got here first. Clever. Nobody is ever here first.', 'The little ember got here first. Clever.'],
       // the deal at the first eclipse (A4a's choice m_deal: ask | refuse) shows here
       { if: 'choice m_deal=ask', then: [
-        ['nyxara', 'You asked me why, once. Nobody ever asks.', 'You asked me why once. Nobody asks.'] ],
+        ['nyxara', 'Oh. The little ember got here first. Nobody is ever here first. You asked me why, once. Nobody ever asks.', 'You got here first. You asked me why, once.'] ],
         else: [
-        ['nyxara', '"No way," you told me. Brave little ember. Shh, now.', '"No way," you said. Brave little ember.'] ] },
-      { choose: 'm4_well', ask: ['She bends her long curled tongue down to the water. What do you do?', 'She bends down to drink. What do you do?'], pick: [
+        ['nyxara', 'Oh. The little ember got here first. Nobody is ever here first. "No way," you told me. Shh, now.', 'You got here first. "No way," you said. Shh.'] ] },
+      // v11: the friend path. Vesper is in Sable (q_m_vesper: the tent roofs), and the Mother tries her old promise again
+      { if: 'choice c_vesper=friend', then: [
+        ['nyxara', 'And there is my little thief, up on the tent roof. Come home, little thief. I have fire for you now. Your very own.', 'Come home, little thief. I have fire for you now.'],
+        ['c_vesper', "(from the roof behind you) You promised me that last time. Keep it. Gran says fire isn't the only warm thing.", '(from the roof) You promised that last time. Keep it.'] ] },
+      { choose: 'm4_well', who: 'narr', ask: ['She bends her long curled tongue down to the water.', 'She bends down to drink.'], pick: [
         { t: ['Stand in front of the well', 'Stand in front of the well'], tone: 'brave', v: 'stood',
           then: ['set m4_well=stood', 'epi m4_epi_well_stood 5', { journal: ['At the Moon Well you stood in front of the water and spread your wings at the Night Mother.', 'You stood in front of the Moon Well.'], key: 'm4_well' }],
           say: [['narr', 'You jump up on the rim and spread your wings wide. She drinks round you, but not through you. Behind your back, one candle of moonlight stays.',
@@ -172,9 +176,8 @@ chapter({
       ['narr', 'She drinks the rest. The silver light drains out of the well like bathwater. Then she looks up at the moon and takes another bite. CRUNCH.',
                'She drinks the light. Then she bites the moon again. CRUNCH!', { do: ['emit m4fx:ecl:drink', 'emit m4fx:ecl:bite:40', 'world m4_nyx_well drink', 'moon 40'] }],
       ['nyxara', 'One more piece, little ember. My Hush keeps it for you, up in the Observatory. Bring me all three.', 'One more piece. My Hush has it. Bring me all three.', { clue: 'm4_bring_three' }],
-      ['narr', 'She rises without a sound. Far above, her silver thread twitches, and a white moth is yanked up the sky like a kite. Hush.',
-               'She flies off. Her thread yanks a white moth up the sky. Hush!', { clue: 'm4_hush_pulled', do: ['emit m4fx:ecl:leave', 'set m4_nyx_here=0', 'set m4_moths_gone'] }],
-      ['narr', 'Every lantern in Sable blows out at once.', 'Every lantern in Sable goes out.'],
+      ['narr', 'She rises without a sound. Far above, her silver thread twitches, and a white moth is yanked up the sky like a kite. Hush. Every lantern in Sable blows out at once.',
+               'She flies off. Her thread yanks a white moth up the sky. Hush! Every lantern goes out.', { clue: 'm4_hush_pulled', do: ['emit m4fx:ecl:leave', 'set m4_nyx_here=0', 'set m4_moths_gone'] }],
       ['m_saffron', "She's not dead. Only dim. One candle of moon is left in my well, because of you. Go, dragon. Get your Shard.", 'One candle of moon is left. Because of you. Go!', { do: ['emit m4fx:ecl:end'] }],
     ],
     m4_gap_shut_say: [
@@ -182,7 +185,7 @@ chapter({
       ['iska', 'Not yet, Ash. Something is coming to Sable first. I can feel it in my wick.', 'Not yet. Something is coming to Sable first.'],
     ],
     m4_iska_under: [
-      ['iska', "The Glasswall, Ash. Nobody can climb it and nobody can fly over it. But you're a worm now. Go UNDER.", "Nobody can climb the Glasswall. But you're a worm now. Go UNDER!", { ref: 'm_burrowgap' }],
+      ['iska', "The Glasswall, Ash. Nobody can climb it and nobody can fly over it. But you dig like a worm now. Go under.", "Nobody can climb the Glasswall. But you dig like a worm now. Go under!", { ref: 'm_burrowgap' }],
     ],
     // (the epilogue lines for the well, m4_epi_well_stood and m4_epi_well_lid, are A4S's scenes in act4/people.js:
     // the choice at the well and Saffron's talk run the same ones, and an epilogue line is added only once)

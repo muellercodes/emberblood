@@ -122,8 +122,8 @@ people({
         say: ['Moths. MOTHS. Every night, all over my lamp. Then it went out and they still came. Moths have no manners.',
           'Moths sat on my lamp till it went out. No manners!'] },
       { say: [["Tell Squint I'm fine. Tell her to eat her vegetables. Tell her the eyepatch suits her.", "Tell Squint I'm fine."],
-        ['My cousin Agatha keeps the lighthouse in Gearhaven. Hers SPINS. Show-off.', "Agatha's lighthouse SPINS. Show-off."]] },
-      { bark: true, if: '!flag m_lighthouse_lit', fact: 'm4s_lighthouse=dark', say: ["Shoo. SHOO. Go and sit on someone else's lamp.", 'Shoo, moths. SHOO.'] },
+        ['My cousin Agatha keeps the lighthouse in Gearhaven. Hers spins. Show-off.', "Agatha's lighthouse spins. Show-off."]] },
+      { bark: true, if: '!flag m_lighthouse_lit', fact: 'm4s_lighthouse=dark', say: ["Shoo. Shoo. Go and sit on someone else's lamp.", 'Shoo, moths. Shoo.'] },
       { bark: true, if: 'flag m_lighthouse_lit', fact: 'm4s_lighthouse=lit', say: ['*polishes the great lamp* Silver. Ha. Silver.', '*polishes the lamp* Silver!'] },
     ],
 
@@ -169,7 +169,7 @@ people({
       { say: [["I'm the fastest swimmer in Coralcombe! Second fastest is a squid named Pickles.", 'I am fastest! Second is Pickles the squid.'],
         ["Race me! I'll give you a head start. A tiny one. The size of a shrimp.", 'Race me! A tiny head start.'],
         ["Pickles cheats. He has eight arms. That's six more than fair.", 'Pickles has eight arms. Not fair!']] },
-      { bark: true, say: ['*does a loop* Did you see that? DID YOU?', '*loops* Did you see?'] },
+      { bark: true, say: ['*does a loop* Did you see that? Did you?', '*loops* Did you see?'] },
     ],
 
     m_kipper: [
@@ -179,61 +179,61 @@ people({
       { if: '!flag m_puff_done', fact: 'm4s_sunken_gate=plugged',
         say: ['Baron Puffington is stuck in the Sunken Gate. He called my seahorse a "wet pony". I demanded satisfaction. He laughed.',
           'The Baron called my seahorse a "wet pony"!'] },
-      { say: [['HALT! Who swims there? ...Oh. It\'s you. Carry on. Carefully.', 'HALT! Oh, it is you. Carry on.'],
-        ['I am not afraid of crabs. I am RESPECTFUL of crabs, from the far end of the Shell Hall.', 'I am not scared of crabs. I stay far away.']] },
+      { say: [['Oh. It\'s you, from the well. Carry on. Carefully.', 'Oh, it is you. Carry on.'],
+        ['I am not afraid of crabs. I am respectful of crabs, from the far end of the Shell Hall.', 'I am not scared of crabs. I stay far away.']] },
       { bark: true, say: ["Steady, Lady Bubbles. Steady. Is that a crab? It's a rock. Steady.", 'Is that a crab? A rock. Steady.'] },
     ],
 
     m_kelp: [
-      { if: 'flag m_dolphin', once: true, say: ["How's the Dolphin Kick, dearie? Just the one tail, remember. Not both. You haven't got both.", 'How is the Dolphin Kick? One tail!'] },
-      { say: [["Pearls for your pockets, dearie. They don't do anything. They're just lovely.", 'Pearls for your pockets. Just lovely.'],
+      { if: 'flag m_dolphin', once: true, say: ["How's the Dolphin Kick? Just the one tail, remember. Not both. You haven't got both.", 'How is the Dolphin Kick? One tail!'] },
+      { say: [["Pearls for your pockets. They don't do anything. They're just lovely.", 'Pearls for your pockets. Just lovely.'],
         ['A dragon who breathes under water! Your mother must be so proud. And so confused.', 'A dragon who breathes water! Your mom is proud.'],
-        ["Eat your seaweed, dearie. It's green. Green is good for horns.", 'Eat your seaweed. Good for horns.']] },
+        ["Eat your seaweed. It's green. Green is good for horns.", 'Eat your seaweed. Good for horns.']] },
       { bark: true, say: ['Pearls! Kelp tonic! Hugs! One of those is free!', 'Pearls! Tonic! Hugs!'] },
     ],
 
     // ================================================================ the Oasis of Sable
     m_rafi: [
       { if: 'choice f_glaciar=free', once: true,
-        say: ["You have seen snow? Do you know anybody made of it? ...An AUNTIE? Bring her! No, she'd melt. Bring a postcard!",
+        say: ["You have seen snow? Do you know anybody made of it? ...An auntie? Bring her! No, she'd melt. Bring a postcard!",
           'Your auntie is made of snow? Bring a postcard!'] },
       { if: 'flag m_eclipse2', once: true,
-        say: ['She drank our WELL. Not the sun. I take back what I said about the sun. Mostly. I am keeping an eye on it.',
+        say: ['She drank our well. Not the sun. I take back what I said about the sun. Mostly. I am keeping an eye on it.',
           'She drank the well, not the sun. I take it back.'] },
       { if: 'flag m_eclipse2 !flag m_lamp_11',
         say: ['My tent lamp went out too. Little Sun. She is very small. I miss her. Do not tell the caravan.', 'My tent lamp, Little Sun, went out. I miss her.'] },
       { say: [['Three hundred years our caravan has crossed the Glass Desert by moonlight! Two hundred and ninety-nine without getting lost!',
         'Three hundred years crossing the desert! Lost once!'],
-        ["I have never seen snow. Is it true it's cold? On PURPOSE?", 'Is snow cold on PURPOSE?'],
-        ['My best strider walked into a dune last night. Twice. I told that one already? Then this time it was THREE times.', 'My strider walked into a dune. Three times!']] },
+        ["I have never seen snow. Is it true it's cold? On purpose?", 'Is snow cold on purpose?'],
+        ['My best strider walked into a dune last night. Twice. I told that one already? Then this time it was three times.', 'My strider walked into a dune. Three times!']] },
       { bark: true, say: ["HO HO! Did I tell you about the time... yes? I'll tell it again, bigger!", 'HO HO! Did I tell you this one?'] },
     ],
 
     m_saffron: [
       { if: 'flag m4_well=stood', once: true, then: ['epi m4_epi_well_stood 5'],
-        say: ['You stood in front of my well. In front of HER. My mother kept this well, and hers, and none of them ever did that.',
+        say: ['You stood in front of my well. In front of her. My mother kept this well, and hers, and none of them ever did that.',
           'You stood in front of my well. Nobody ever has.'] },
       { if: 'flag m4_well=lid', once: true, then: ['epi m4_epi_well_lid 5'],
-        say: ['You helped me drag the lid on. With your TAIL. I will never forget it. Nor will my back.', 'You helped drag the lid on. Thank you.'] },
+        say: ['You helped me drag the lid on. With your tail. I will never forget it. Nor will my back.', 'You helped drag the lid on. Thank you.'] },
       { if: 'flag m_eclipse2', fact: 'm4s_moon_well=dim',
         say: ["One candle's worth of moon left in her. I sit with her every night. I won't stop.", 'My well is dim. I sit with her every night.'] },
       { if: '!flag m_eclipse2', fact: 'm4s_moon_well=full',
         say: ['The well drinks the moon every night, and gives it back to us. Lamps. Water. Light.', 'The well drinks the moon. It gives us light.'] },
-      { say: [["Don't touch the well. Don't breathe on the well. Don't LOOK at the well like that.", "Don't touch the well. Don't LOOK at it."],
+      { say: [["Don't touch the well. Don't breathe on the well. Don't look at the well like that.", "Don't touch the well. Don't look at it."],
         ["I talk to the well at night. It doesn't answer. It's a good listener, though.", 'I talk to the well. Good listener.']] },
       { bark: true, say: ["Don't touch the well.", "Don't touch the well."] },
     ],
 
     m_kiln: [
       { if: 'world q_g_cocoon_in=cut', once: true,
-        say: ['Your glaive has silk on its edge. MOON silk! What did you cut? A COCOON? With MY glaive? I am putting that on a sign.', 'Silk on your glaive! You cut a cocoon? Ha!'] },
+        say: ['Your glaive has silk on its edge. Moon silk! What did you cut? A cocoon? With my glaive? I am putting that on a sign.', 'Silk on your glaive! You cut a cocoon? Ha!'] },
       { if: 'quest m_glaive done', once: true,
-        say: ["How's my glaive? Is it cutting? Is it shining? Have you cut bread with it? DON'T.", "How's my glaive? Don't cut bread!"] },
-      { if: 'quest m_glaive active item m_mooncrumb', say: ['EH? Is that MOONLIGHT in your bag? Bring it HERE!', 'Moonlight in your bag! Bring it!'] },
+        say: ["How's my glaive? Is it cutting? Is it shining? Have you cut bread with it? Don't.", "How's my glaive? Don't cut bread!"] },
+      { if: 'quest m_glaive active item m_mooncrumb', say: ['EH? Is that moonlight in your bag? Bring it here!', 'Moonlight in your bag! Bring it!'] },
       { say: [["I make glass. Glass bottles, glass bowls, glass shoes. Don't buy the glass shoes.", 'I make glass. Don\'t buy the shoes.'],
         ['EH? Speak up. The furnace is very loud. So am I.', 'EH? Speak up!']] },
       { bark: true, say: ['EH? WHAT? Oh. Nobody said anything. Good.', 'EH? WHAT?'] },
-      { bark: true, if: 'item m_mooncrumb', say: ['I can SEE moonlight in your satchel! Bring it here!', 'Moonlight in your bag! Bring it!'] },
+      { bark: true, if: 'item m_mooncrumb', say: ['I can see moonlight in your satchel! Bring it here!', 'Moonlight in your bag! Bring it!'] },
     ],
 
     m_esme: [
@@ -243,7 +243,7 @@ people({
       { if: 'choice c_vesper=friend stage>=m_sable stage<m_reforge !quest m_vesper started', once: true,
         scene: 'mv_note', then: ['quest start m_vesper'] },
       { if: 'flag m_eclipse2 !clue m4_esme_glass', once: true, then: ['clue m4_esme_glass'],
-        say: ['Every lamp went out when she drank the well. And three of them have no GLASS. Who steals lamp glass?',
+        say: ['Every lamp went out when she drank the well. And three of them have no glass. Who steals lamp glass?',
           'Three lamps lost their glass. Who steals glass?'] },
       { if: 'solved lamp_thief !seen lm_glass', once: true, scene: 'lm_glass',
         then: ['set m_lamp_5', 'set m_lamp_6', 'set m_lamp_10', 'epi m4_epi_sorry 5'] },
@@ -262,18 +262,18 @@ people({
       { if: 'quest m_noodle done', once: true, then: ['give coins 40'],
         say: ["Dusty: We miss Noodle! Dune: We don't miss our shoes. Dusty: Here, we found these in a shoe. Dune: Coins!",
           'We miss Noodle. Not our shoes. Have these coins!'] },
-      { if: 'quest m_noodle active', say: ['Dusty: Is Noodle home yet? Dune: Does his mom have shoes? Dusty: She might EAT shoes.', 'Is Noodle home yet?'] },
+      { if: 'quest m_noodle active', say: ['Dusty: Is Noodle home yet? Dune: Does his mom have shoes? Dusty: She might eat shoes.', 'Is Noodle home yet?'] },
       { say: [['Dusty: We surf the dunes on trays! Dune: Stolen trays! Dusty: BORROWED trays!', 'We surf dunes on trays! Borrowed trays!'],
         ['Dusty: Race you down the big dune! Dune: Last one down is a cactus!', 'Race you down the dune!']] },
-      { bark: true, say: ['Dusty: Tray race! Dune: We have one tray! Dusty: Tray WALK!', 'Tray race! One tray. Tray WALK!'] },
+      { bark: true, say: ['Dusty: Tray race! Dune: We have one tray! Dusty: Tray walk!', 'Tray race! One tray. Tray walk!'] },
     ],
 
     m_jinx: [
       { if: 'stage>=m_sable !clue m4_jinx_lamps', option: ['Any lamps for sale?', 'Any lamps?'], then: ['clue m4_jinx_lamps'],
-        say: [['m_jinx', 'Lamps! Barely used! Glows for EVER. Here, hold one.', 'Lamps! Barely used! Hold one.'],
+        say: [['m_jinx', 'Lamps! Barely used! Glows for ever. Here, hold one.', 'Lamps! Barely used! Hold one.'],
           ['narr', 'The lamp fades away the moment you touch it, like a puff of warm air.', 'It fades away when you touch it.'],
           ['m_jinx', 'Mostly for ever. While you are looking. Thirty coins?', 'Thirty coins?']] },
-      { say: [['Am I a mirage? Are YOU? Buy something and find out.', 'Am I a mirage? Buy something!'],
+      { say: [['Am I a mirage? Are you? Buy something and find out.', 'Am I a mirage? Buy something!'],
         ["Today's special: a bottle of shade. Keeps you cool. Mostly empty.", "Today's special: a bottle of shade."],
         ["I'm only here at noon. By teatime you'll wonder if you dreamed me.", 'I am here at noon. Later, you will wonder.']] },
       { bark: true, say: ['*shimmers a little*', '*shimmers*'] },
@@ -294,8 +294,8 @@ people({
 
   scene: {
     hl_basket: [
-      ['f_hilde', 'My BASKET! The Steamwell ate it in the spring! Look, the wool is still warm. Sit. Soup. Wait there.',
-        'My BASKET! The wool is still warm! Sit!'],
+      ['f_hilde', 'My basket! The Steamwell ate it in the spring! Look, the wool is still warm. Sit. Soup. Wait there.',
+        'My basket! The wool is still warm! Sit!'],
       ['narr', 'Hilde knits. Very, very fast. Biscuit the cat watches every stitch.', 'Hilde knits very fast.'],
       ['f_hilde', 'There. Gilly writes that a cold white moth hangs over Moonfall on a silver string. Poor thing. This is for her.',
         'Gilly says a cold moth is in Moonfall. This is for her.'],
@@ -304,11 +304,11 @@ people({
     // replaces STORY.m_wren in place (x3_story plays it for Wren's first talk in Driftwood when x3_people does not):
     // her promise now points at a BOOK, which the side quest m_leash pays off (ACT4_V10 1.1 finding 12)
     m_wren: [
-      ['wren', "Ash! Look at me. Outside. On a raft. In the SEA. I've been sick four times and I've never been happier.",
-        'Ash! On a raft in the SEA! I am so happy!'],
+      ['wren', "Ash! Look at me. Outside. On a raft. In the sea. I've been sick four times and I've never been happier.",
+        'Ash! On a raft in the sea! I am so happy!'],
       ['wren', "Elder Ripple of the merfolk keeps Old Lumen's records. I can read Lumen writing. Badly. Better than anyone up here.",
         'I can read Lumen writing. Badly.'],
-      ['wren', 'If you find a BOOK down there, bring it to me. Soggy is fine. Soggy is best.', 'Find a BOOK down there? Bring it!', { promise: 'm_leash' }],
+      ['wren', 'If you find a book down there, bring it to me. Soggy is fine. Soggy is best.', 'Find a book down there? Bring it!', { promise: 'm_leash' }],
     ],
 
     // ---- EPI.m lines (played by `epi`; each is the first line of its scene)

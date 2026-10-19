@@ -177,14 +177,13 @@ const m3sDunObj=(id,f,s,P)=>m3sIn(id)?{text:S(f,s),x:player.x,y:player.y,area:AR
 // ---------- 3. the main story (bible/ACT4.md section 6). Every scene is STORY.<key>; M3STORY.md lists when each plays
 // Chapter 1, Across the Sea (6.1): the morning after Act III, in Hearthold
 m3sDef('m_intro',[
-  xl('narr',`Morning in Hearthold. The Great Hearth crackles. Pim is already selling cocoa. Pebble lands on your head with TWO letters, and takes TWO coins.`,`Morning in Hearthold. Pebble lands on your head with TWO letters. She takes TWO coins.`),
+  xl('narr',`Morning in Hearthold. The Great Hearth crackles. Pim is already selling cocoa. Pebble lands on your head with two letters, and takes two coins.`,`Morning in Hearthold. Pebble lands on your head with two letters. She takes two coins.`),
   xdo(()=>{ G.coins=Math.max(0,(G.coins|0)-2); }),
-  xl('maren',`(the first letter) Ash. Yara says the moon is smaller. I looked. It is. Two bites. I don't like it when the sky changes shape. Be careful. Be brave. Be home soon. Eat something. Love, Mom.`,`Ash. The moon is smaller. Two bites. Be careful. Be brave. Eat something. Love, Mom.`),
-  xl('maren',`P.S. Bertram's bakery exploded on Tuesday. He says it's unrelated. It's always unrelated.`,`P.S. Bertram's bakery blew up again. He says it was not his fault.`),
+  xl('maren',`(the first letter) Ash. I went out to look at the moon tonight. Then I came back in and lit an extra lantern in the window. Love, Mom.`,`(a letter) I looked at the moon tonight. Then I lit an extra lantern in the window. Love, Mom.`),
   xl('dell',`(the second letter) Ash! Dell again! The Soggy Biscuit Three is ready in Gearhaven. She has a steam paddle, a brass whistle, and a captain who has never once sunk her. That's me. It has been FIVE days.`,`Ash! It's Dell! My boat, the Soggy Biscuit Three, is ready in Gearhaven. I have not sunk her once!`),
   xl('dell',`Come to the Far Pier when you're ready to sail east. Nobody else will sail into a dark sea, so it's me or a bathtub. I've packed sandwiches. And a librarian. Long story. Dell.`,`Come to the Far Pier. We will sail east. I packed sandwiches. And a librarian. Dell.`),
   xl('tove',`East, where the moon's light fell. I'm going to hand you over to Iska for this part, Ash. She's better with the dark. I'm better with complaining about the cold.`,`East, where the moon's light fell. Iska will help you now. She is good with the dark.`),
-  xl('iska',`Hello again, little ember. It's Iska. I made lanterns, once. I have a feeling we're going to need a lot of them.`,`Hello, little ember. It's Iska. I made lanterns. We will need lots of them.`),
+  xl('iska',`Ash, it's Iska. Tove says the dark is my job now, and she's right. East is where the moon's light fell. We'll need a lot of lanterns.`,`Ash, it's Iska. I'll help you now, not Tove. We go east. We'll need lots of lanterns.`),
   m3sIf('narr',`Pip climbs up onto your head. Pip is far too big for your head now. Pip disagrees.`,`Pip climbs onto your head. He is too big now. Pip does not agree.`,()=>!!G.flags.pip),
   m3sIf('narr',`A shadow slides over the town. Glaciar lands outside the walls with a soft, enormous WHUMPH. Half of Hearthold faints. The other half cheers.`,`Glaciar lands outside the walls. WHUMPH! Half the town faints. The other half cheers.`,m3sGlaciar),
   m3sIf('f_glaciar',`Good morning, dumpling! I heard the word "east". I don't do fast. But I do far.`,`Good morning, dumpling! I heard "east". I'm slow. But I go far.`,m3sGlaciar),
@@ -200,27 +199,27 @@ m3sDef('m_voyage_ship',[
   xdo(()=>m3sVoy('ship')),
   xl('narr',`The Soggy Biscuit Three chugs out of Gearhaven with a toot of steam. Dell stands at the wheel in his yellow rain hat, grinning so hard his beard sticks out sideways.`,`Dell's boat toots out of Gearhaven. Dell grins so hard his beard sticks out.`),
   xl('dell',`Three days east, Ash! Past the end of every map I own! I've never been so happy or so scared!`,`Three days east, Ash! Past every map I own! I'm so happy. And so scared!`),
-  xl('wren',`(green, hugging a book) I'm fine. I'm FINE. Books don't get seasick. I'm just going to read... over the side.`,`(green, hugging a book) I'm fine. Books don't get seasick. I'll just read... over the side.`),
-  xl('ash',`Sister Wren? You came OUTSIDE?`,`Sister Wren? You came OUTSIDE?`),
+  xl('wren',`(green, hugging a book) I'm fine. Books don't get seasick. I'm just going to read... over the side.`,`(green, hugging a book) I'm fine. Books don't get seasick. I'll just read... over the side.`),
+  xl('ash',`Sister Wren? You came outside?`,`Sister Wren? You came outside?`),
   xl('wren',`My cousin Eider wrote to me about the dragon child who thawed a whole village. I thought: if Ash can climb a mountain, I can sit on a boat. I was wrong. But I'm here.`,`My cousin wrote about you. I thought, if Ash can climb a mountain, I can sit on a boat. I was wrong. But I'm here.`),
-  xl('f_mags',`(from below deck) The engine's FINE! It's making that noise on purpose! Mostly! I'm the engineer now. Dell pays me in sandwiches.`,`(from below) The engine is FINE! The noise is on purpose! Mostly! Dell pays me in sandwiches.`),
+  xl('f_mags',`(from below deck) The engine's fine! It's making that noise on purpose! Mostly! I'm the engineer now. Dell pays me in sandwiches.`,`(from below) The engine is fine! The noise is on purpose! Mostly! Dell pays me in sandwiches.`),
   m3sIf('ev_tikka',`(from the galley) Lumpy buns! Lumpy buns for everyone! Lumpy means love!`,`Lumpy buns for everyone! Lumpy means love!`,()=>G.flags.tk_come==='yes'),
   m3sAct(`On the second night the moon comes up over the sea. Two bites are missing from its edge, like a cookie.`,`On the second night the moon comes up. Two bites are gone, like a cookie.`,()=>{ if(M3S.voy) M3S.voy.moon=1; }),
   m3sAct(`Something flutters past the mast. A moth. Then another. Then a hundred, all flying east, toward the moon. Every one has two pale painted eyes on its wings.`,`A moth flies past. Then a hundred, all flying east. Each has two painted eyes.`,()=>{ if(M3S.voy) M3S.voy.moths=1; }),
-  xl('iska',`They're going home to her. Follow the moths, little ember. They always know where the light is.`,`They are going home to her. Follow the moths. They know where the light is.`),
+  xl('iska',`They're going home to her. Follow the moths, Ash. They always know where the light is.`,`They are going home to her. Follow the moths. They know where the light is.`),
   m3sAct(`On the third morning a town comes out of the mist. It's floating.`,`On the third morning a town comes out of the mist. It floats!`,()=>{ M3S.fadeTo=0; })
 ]);
 // 6.1c the flight with Glaciar
 m3sDef('m_voyage_glaciar',[
   xdo(()=>m3sVoy('glaciar')),
   xl('narr',`Glaciar flies slowly. Very slowly. Clouds overtake her. A seagull overtakes her and looks back, smug.`,`Glaciar flies very slowly. A seagull passes her. It looks smug.`),
-  xl('f_glaciar',`Isn't this LOVELY, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.`,`Isn't this LOVELY, dumpling? My left wing fell asleep.`),
+  xl('f_glaciar',`Isn't this lovely, dumpling? I haven't flown this far in a thousand years. My left wing's gone to sleep.`,`Isn't this lovely, dumpling? My left wing fell asleep.`),
   xl('ash',`Auntie, it's been two days.`,`Auntie, it's been two days.`),
-  xl('f_glaciar',`Patience is a dragon's best friend. My second-best friend is you.`,`Patience is a dragon's best friend. You are my second best.`),
+  xl('f_glaciar',`Two days is nothing. I once took a week to turn round.`,`Two days is nothing. I once took a week to turn round.`),
   m3sAct(`On the second night the moon comes up over the sea. Two bites are missing from its edge, like a cookie.`,`On the second night the moon comes up. Two bites are gone, like a cookie.`,()=>{ if(M3S.voy) M3S.voy.moon=1; }),
   m3sAct(`Moths flutter past Glaciar's nose, hundreds of them, all flying east.`,`Hundreds of moths fly past, all going east.`,()=>{ if(M3S.voy) M3S.voy.moths=1; }),
   xl('f_glaciar',`Ugh. Moths. I can taste her on the wind. Like cold tea. Hold on, dumpling.`,`Ugh. Moths. I can taste her on the wind. Hold on, dumpling.`),
-  xl('iska',`Follow the moths, little ember. They always know where the light is.`,`Follow the moths. They know where the light is.`),
+  xl('iska',`Follow the moths, Ash. They always know where the light is.`,`Follow the moths. They know where the light is.`),
   m3sAct(`On the third morning a town comes out of the mist. It's floating. Glaciar lands on its north beach and the whole beach freezes solid. The raft folk cheer. Free ice!`,`On the third morning, a floating town! Glaciar lands. The beach freezes. Free ice!`,()=>{ M3S.fadeTo=0; }),
   xl('f_glaciar',`I'll wait here, dumpling. The sun this far south is very rude. Dell's boat is a day behind us. He sent a pigeon. The pigeon was very tired.`,`I'll wait here, dumpling. Dell's boat is a day behind us. He sent a very tired pigeon.`),
   m3sIf('f_glaciar',`Oh, and Brann sends his regards. He's very brave now. He asked me to say it loudly. HE IS VERY BRAVE.`,`Brann says hello. He is VERY BRAVE now.`,()=>true)
@@ -234,7 +233,7 @@ m3sDef('m_dell_late',[
 ]);
 // Chapter 1, Driftwood Landing (6.2)
 m3sDef('m_dabble',[
-  xl('m_dabble',`Welcome! WELCOME to Driftwood Landing, the only town in the world that's never in the same place twice! I'm Mayor Dabble Floatwell. Mind the gap. Mind ALL the gaps.`,`Welcome to Driftwood Landing! This town is never in the same place twice. I'm Mayor Dabble. Mind the gaps!`),
+  xl('m_dabble',`Welcome! Welcome to Driftwood Landing, the only town in the world that's never in the same place twice! I'm Mayor Dabble Floatwell. Mind the gap. Mind all the gaps.`,`Welcome to Driftwood Landing! This town is never in the same place twice. I'm Mayor Dabble. Mind the gaps!`),
   xl('m_dabble',`We're a raft town. We go where the tide takes us. Usually that's somewhere nice. Lately...`,`We are a raft town. We go where the tide takes us. Lately...`),
   xl('narr',`The whole town lurches. A raft full of chickens drifts past, out to sea. The chickens look worried.`,`The whole town wobbles. A raft full of chickens floats away. They look worried.`),
   xl('m_dabble',`Lately the tide's gone wobbly. Too high, then too low, then sideways. Old Winnie says it's the moon. Go and see Old Winnie. She's the one with the seashell hat. Wave to the chickens.`,`The tide has gone wobbly. Old Winnie says it's the moon. Go see her. She has a seashell hat. Wave to the chickens.`),
@@ -269,24 +268,24 @@ if(!STORY.m_dell1) m3sDef('m_dell1',[
 ]);
 // Chapter 2, Drowned Lumen (6.3, 6.4)
 m3sDef('m_lumen_channel',[xl('iska',`Deep water. Too deep to walk on. Is there anything up there you can swing to?`,`Deep water. Too deep to walk on. Is there something up there to swing to?`)]);
-m3sDef('m_lumen_after',[xl('iska',`Coralcombe is down in the reef south of Driftwood. A ring of coral with deep water in the middle. You can go DOWN now, Ash.`,`Coralcombe is in the reef south of Driftwood. A ring of coral. You can go DOWN now, Ash.`)]);
+m3sDef('m_lumen_after',[xl('iska',`Kipper's Coralcombe is down in the reef south of Driftwood. A ring of coral with deep water in the middle. You can go down now, Ash.`,`Coralcombe is in the reef south of Driftwood. You can go down now, Ash.`)]);
 m3sDef('m_coral_in',[
   xl('narr',`You dive into the ring of coral, down and down, through a curtain of bubbles, into a village made of shells.`,`You dive down through bubbles, into a village made of shells.`),
-  xl('narr',`Pearl lamps glow on every doorstep. Fish swim through the windows. A seahorse in a tiny saddle stares at you.`,`Pearl lamps glow. Fish swim through windows. A seahorse in a tiny saddle stares at you.`),
-  xl('m_kipper',`HALT! Who swims there? ...Oh my. A dragon. Underwater. That isn't allowed. Is it? Nobody ever wrote a rule.`,`HALT! Who swims there? A dragon, underwater? Is that allowed? Nobody wrote a rule.`),
-  xl('m_coralia',`Let him pass, Sir Kipper. We have been expecting a dragon for a very long time. I'm a little surprised it's such a small one.`,`Let him pass, Sir Kipper. We waited a long time for a dragon. He is smaller than I thought.`),
+  xl('narr',`Pearl lamps glow on every doorstep. Fish swim through the windows. Lady Bubbles swims a loop round you, very pleased.`,`Pearl lamps glow. Fish swim through the windows.`),
+  xl('m_kipper',`Make way! Make way! The dragon from the well, Majesty. I told you he was real.`,`Make way! The dragon from the well! I told you, Majesty.`),
+  xl('m_coralia',`So you did. Let him pass, Sir Kipper. We have waited a very long time for a dragon. I thought he would be bigger.`,`Let him pass. We waited a long time for a dragon. I thought he would be bigger.`),
   xl('ash',`I'm medium!`,`I'm medium!`)
 ]);
 m3sDef('m_coralia',[
   xl('m_coralia',`I am Coralia, Queen of the Lumenfolk. Our grandmothers' grandmothers' grandmothers lived in Lumen, under the moon, until the moth came the first time. When the city drowned, we chose the sea.`,`I am Coralia, Queen of the Lumenfolk. Long ago we lived in Lumen. When it drowned, we chose the sea.`),
   xl('ash',`Are you related to the moon?`,`Are you related to the moon?`),
   xl('m_coralia',`I hope not. I can't count that high.`,`I hope not. I can't count that high.`),
-  xl('m_coralia',`Our moon-priests drove her away that night with a fire made of moonlight. A girl with horns had taught it to them, long before. We still sing about her.`,`Our priests drove the moth away with moonlight fire. A girl with horns taught them. We still sing about her.`),
-  xl('ash',`Ember. That was Ember.`,`Ember. That was Ember.`),
-  xl('m_coralia',`Then you are her family. Welcome home, a little bit.`,`Then you are her family. Welcome home, a little bit.`),
-  xl('m_coralia',`You've come for the third piece of your Heart. A great grey moth, bigger than a ship, carried it east over the Glass Desert to the Eclipse Observatory, where Lumen's astronomers watched the moon.`,`A giant grey moth took the last piece of your Heart east. To the Eclipse Observatory, past the Glass Desert.`),
+  xl('m_coralia',`Our moon-priests drove her away that night with a fire made of moonlight. A girl with horns had taught it to them, long before. We still sing about her. Sir Kipper tells me she was your family.`,`Our priests drove the moth away with moonlight fire. A girl with horns taught them. Kipper says she was your family.`),
+  xl('ash',`She still is.`,`She still is.`),
+  xl('m_coralia',`Then welcome home, a little bit.`,`Then welcome home, a little bit.`),
+  xl('m_coralia',`You've come for the third piece of your Heart. A great grey moth, two pale moons on her wings, carried it east over the Glass Desert to the Eclipse Observatory, where Lumen's astronomers watched the moon.`,`A giant grey moth took the last piece of your Heart east. To the Eclipse Observatory, past the Glass Desert.`),
   xl('m_coralia',`And now a white moth guards it there. Our scouts saw her. White as foam, with a silver thread tied to her neck that goes all the way up into the sky.`,`Now a white moth guards it. She has a silver thread on her neck. It goes up into the sky.`),
-  xl('ash',`Hush. That's Hush. I beat her. She went small. She was COLD.`,`Hush! I beat her. She went small. She was COLD.`),
+  xl('ash',`Hush. That's Hush. I beat her. She went small. She was so cold.`,`Hush! I beat her. She went small. She was so cold.`),
   xl('m_coralia',`She is not small now.`,`She is not small now.`),
   xl('m_coralia',`The only way east is under the Reefwall, through the Sunken Gate. But the gate is... blocked. By a fish. A very full-of-himself fish. He calls himself Baron Puffington.`,`The way east is under the Reefwall, through the Sunken Gate. But a puffed-up fish is stuck in it. Baron Puffington.`),
   xl('m_kipper',`He called my seahorse a "wet pony"!`,`He called my seahorse a "wet pony"!`),
@@ -314,17 +313,17 @@ function m3sBossWords(type,intro,outro){
 }
 m3sDef('m_puff_intro',[
   xl('narr',`Under the Reefwall, in the green dark, the arch of the Sunken Gate is plugged. Completely. By a pufferfish. A spiky, spotty, yellow pufferfish the size of a cottage, with a tiny captain's hat and a magnificent whiskery moustache.`,`The Sunken Gate is plugged by a pufferfish. A huge, spiky, yellow one. With a tiny hat and a big moustache.`),
-  xl('m_puffington',`HALT! Who goes there? State your business! Pay the toll! Admire my moustache!`,`HALT! Who goes there? Pay the toll! Admire my moustache!`),
+  xl('m_puffington',`Who goes there? State your business! Pay the toll! Admire my moustache!`,`Who goes there? Pay the toll! Admire my moustache!`),
   xl('ash',`Are you... stuck in the gate?`,`Are you stuck in the gate?`),
-  xl('m_puffington',`STUCK? I'm not STUCK. I'm GUARDING. I am Baron Puffington, Keeper of the Sunken Gate, and I puff up like this on PURPOSE.`,`STUCK? I am GUARDING! I am Baron Puffington. I puff up like this on PURPOSE.`),
+  xl('m_puffington',`Stuck? I'm not STUCK. I'm guarding. I am Baron Puffington, Keeper of the Sunken Gate, and I puff up like this on purpose.`,`Stuck? I am guarding! I am Baron Puffington. I puff up on purpose.`),
   xl('ash',`How long have you been puffed up?`,`How long have you been puffed up?`),
-  xl('m_puffington',`...Since Tuesday.`,`...Since Tuesday.`),
-  xl('m_puffington',`The toll is one pie! A fish pie! ...No. Not fish. Never mind. The toll is EVERYTHING! Crabs! Get him!`,`The toll is one pie! No, not fish. The toll is EVERYTHING! Crabs, get him!`)]);
+  xl('m_puffington',`Ten days. Eleven. It's hard to count in a gate.`,`Ten days. It's hard to count in a gate.`),
+  xl('m_puffington',`The toll is one pie! A fish pie! ...No. Not fish. Never mind. The toll is all of it! Crabs! Get him!`,`The toll is one pie! No, not fish. The toll is all of it! Crabs, get him!`)]);
 m3sDef('m_puff_outro',[
   xl('narr',`With a long, sad PFFFFFFFFT, Baron Puffington goes down like a balloon. He is now a normal-sized pufferfish. His moustache is still enormous.`,`PFFFFFT! The Baron goes down like a balloon. Now he is small. His moustache is still huge.`),
-  xl('m_puffington',`Fine! FINE! The gate's open. I was getting a cramp anyway. Do you know how hard it is to hold your breath since Tuesday?`,`Fine! The gate is open. Do you know how hard it is to hold your breath since Tuesday?`),
+  xl('m_puffington',`Fine! The gate's open. I was getting a cramp anyway. Do you know how hard it is to hold your breath for ten days?`,`Fine! The gate is open. Try holding your breath for ten days!`),
   xl('ash',`Maybe just... don't puff up in doorways?`,`Maybe don't puff up in doorways?`),
-  xl('m_puffington',`...That's actually very good advice. I shall write it on my hat.`,`That is good advice. I will write it on my hat.`),
+  xl('m_puffington',`That's actually very good advice. I shall write it on my hat.`,`That is good advice. I will write it on my hat.`),
   xl('narr',`The Baron swims off into the deep with tremendous dignity, and bumps into a rock.`,`The Baron swims off, very proud. He bumps into a rock.`),
   xl('iska',`Swim through, Ash. The Glass Desert is on the other side.`,`Swim through, Ash. The Glass Desert is on the other side.`),
   xdo(()=>{ G.flags.m_puff_done=1; G.bossDone=G.bossDone||{}; G.bossDone.m_puffington=true; })]);
@@ -335,10 +334,10 @@ m3sDef('m_eclipse1',[
   xl('iska',`Moonfall. The place where the moon's light fell, a long time ago, and broke, and turned the sand to glass.`,`Moonfall. The moon's light fell here long ago. It turned the sand to glass.`),
   xl('ash',`It's beautiful. It's also burning my feet.`,`It's pretty. It's also burning my feet.`),
   m3sAct(`Then the light changes.`,`Then the light changes.`,()=>m3sEcl('dark')),
-  m3sAct(`The sun goes out like a lamp being covered. And over the dunes rises a moth the size of a house.`,`The sun goes dark. A moth as big as a house flies up.`,()=>m3sEcl('rise')),
+  m3sAct(`The sun goes out like a lamp being covered. And over the dunes rises a moth wider than the beach.`,`The sun goes dark. A huge moth flies up.`,()=>m3sEcl('rise')),
   xl('iska',`Ash. That's her.`,`Ash. That's her.`),
-  m3sAct(`Her wings are black and silver, with two great painted eyes on them. Behind her, on a thin silver thread that glints all the way up into the sky, flies a great white moth.`,`Her wings are black and silver, with two painted eyes. Behind her flies a white moth on a silver thread.`,()=>m3sEcl('hush')),
-  xl('ash',`Hush? She's BIG again!`,`Hush? She's BIG again!`),
+  m3sAct(`Her wings are grey as dust, with two pale moons painted on them. Behind her, on a thin silver thread that glints all the way up into the sky, flies a great white moth.`,`Her wings are grey, with two pale moons. Behind her flies a white moth on a silver thread.`,()=>m3sEcl('hush')),
+  xl('ash',`Hush? She's big again!`,`Hush? She's big again!`),
   m3sIf('nyxara',`A dragon, all grown up. You'll burn so beautifully.`,`A dragon, all grown up. You will burn so well.`,()=>G.choices.ending==='heir'),
   xl('nyxara',`Hello, little ember. I wanted to see you with my own eyes. You are so warm.`,`Hello, little ember. You are so warm.`),
   xl('nyxara',`Don't mind me. I'm only having a snack. Come along, my Hush.`,`I am just having a snack. Come, my Hush.`),
@@ -356,7 +355,7 @@ m3sDef('m_eclipse1',[
       xl('nyxara',`...Nobody has asked me that since a girl with horns.`,`Nobody asked me that since a girl with horns.`),
       xl('nyxara',`Because the moon leaves me, little ember. Every single morning. And one day it might not come back. If I hold it very tight, it can never go.`,`The moon leaves me every morning. One day it might not come back. If I hold it tight, it can never go.`),
       xl('narr',`For one second her voice sounds small. Then it's gone.`,`For one second her voice sounds small.`),
-      xl('ash',`That's sad. It's still not a reason to EAT it.`,`That's sad. But you still can't EAT it.`),
+      xl('ash',`That's sad. It's still not a reason to eat it.`,`That's sad. But you still can't eat it.`),
       xl('nyxara',`Keep them warm for me. I'll see you soon.`,`Keep them warm for me. See you soon.`)]})]),
   m3sAct(`The moon slides off the sun. Daylight comes back, thin and pale. The moth is gone, and the white one with her.`,`The moon slides off the sun. The light comes back, thin and pale. The moths are gone.`,()=>m3sEcl('leave')),
   m3sPip(`Mip... (Pip climbs down off your head and hides inside your scarf.)`,`Mip... (Pip hides in your scarf.)`),
@@ -365,10 +364,10 @@ m3sDef('m_eclipse1',[
 ]);
 // Chapter 3, the Oasis of Sable (6.6) and the Worm Mouth (6.7)
 m3sDef('m_rafi',[
-  xl('m_rafi',`Ho! A dragon! Out of the SEA! Now I have seen everything. Except snow. I have never seen snow.`,`Ho! A dragon, out of the SEA! Now I have seen everything. Except snow.`),
+  xl('m_rafi',`Ho! A dragon! Out of the sea! Now I have seen everything. Except snow. I have never seen snow.`,`Ho! A dragon, out of the sea! Now I have seen everything. Except snow.`),
   xl('ash',`I've seen SO much snow.`,`I've seen SO much snow.`),
   xl('m_rafi',`Then you are a lucky dragon! I am Rafi Sandstride, master of the Great Caravan. For three hundred years we have crossed the Glass Desert by the light of the moon.`,`Lucky dragon! I am Rafi, master of the Great Caravan. We cross the desert by moonlight.`),
-  xl('m_rafi',`And yesterday the SUN went out! In the middle of the day! My striders are still hiding behind their own tails.`,`And yesterday the SUN went out! In the day! My striders are still hiding.`),
+  xl('m_rafi',`And yesterday the sun went out! In the middle of the day! My striders are still hiding behind their own tails.`,`And yesterday the sun went out! In the day! My striders are still hiding.`),
   xl('m_rafi',`The nights are darker every week. Last night my best strider walked into a dune. Twice. On purpose, I think. He was embarrassed about the first time.`,`The nights get darker. My best strider walked into a dune. Twice!`),
   xl('m_rafi',`The Eclipse Observatory? Beyond the Mirror Flats, up on the Heights. Nobody goes there. When the moon got sick, the Glasswall grew up around the Flats. Spikes of glass taller than towers. Nobody can climb it. Nobody can fly over it.`,`The Observatory is past the Mirror Flats. A wall of glass spikes grew around them. Nobody can climb it or fly over it.`),
   xl('m_rafi',`But the sandworms go under it. The big worms of the Burrows, north of here. Worms go under everything.`,`But the sandworms go under it. The big worms of the Burrows, north of here.`),
@@ -401,9 +400,9 @@ m3sDef('m_eclipse2',[
 ]);
 // 6.8c Mom's letter (Pebble brings it after eclipse 2; on reading, Dell sails off to fetch her)
 const M3S_PB3=[
-  xl('maren',`Ash. I saw the moon tonight. Less than half of it is left. And once you find the last piece, that Heart of yours will need mending.`,`Ash. Less than half the moon is left. The Heart needs fixing when you find the last piece.`),
-  xl('maren',`Mending things is my job. I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`Fixing things is my job. I'm coming! Dell will fetch me. Don't argue. It's a letter.`),
-  xl('maren',`Dell says he'll bring the boat round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`Dell will bring me to the old pier at the foot of the Heights. I'll find you. Eat something. Love, Mom.`),
+  xl('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
+  xl('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
+  xl('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Love, Mom.`),
   m3sIf('maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,()=>!!G.flags.dr_m_moth),
   xl('narr',`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails off west.`)];
 // the Mirror Flats and the Moonpath (6.8b, 6.9b)
@@ -432,13 +431,13 @@ m3sDef('m_obs_in',[
 ]);
 // 6.11 Hush, the Moon Shard, and the choice
 m3sDef('m_hush_intro',[
-  xl('narr',`Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. Frost glitters in her fur. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.`,`Under the dome sits a white moth as big as a barn. Frost glitters in her fur. A silver thread runs from her neck to the floor, then up into the dark.`),
+  xl('narr',`Under the great dome, on a floor of brass rings, a huge white moth sits very still. Frost glitters in her fur. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.`,`Under the dome sits a huge white moth. Frost glitters in her fur. A silver thread runs from her neck to the floor, then up into the dark.`),
   xl('narr',`Beside her, in a little brass cradle, something glows silver. The Moon Shard.`,`Beside her, something glows silver. The Moon Shard.`),
-  xl('f_hush',`Shhh. You again. The loud one. ...I never did get a sweater.`,`Shhh. You again. I never got a sweater.`),
+  xl('f_hush',`You again. Loud one. I flew home, like you said. I told her you were coming.`,`You again. I flew home. I told her you were coming.`),
   xl('ash',`Hush. You came back.`,`Hush. You came back.`),
   xl('f_hush',`I flew to the Mother, small and cold. She made me big again. "You came back small," she said. "Never again." Then she gave me this.`,`I flew to the Mother, small and cold. She made me big again. "Never small again," she said. Then she gave me this.`),
   xl('narr',`The silver leash glints. Somewhere far above, something tugs it, gently. Hush flinches.`,`The silver leash glints. Far above, something tugs it. Hush flinches.`),
-  xl('f_hush',`My sister Murmur brought the Shard here. Then she flew up to the Mother. They all fly up to the Mother, in the end.`,`My sister Murmur brought the Shard here. Then she flew up to the Mother. They all do, in the end.`),
+  xl('f_hush',`The Mother brought the Shard here herself. They all go up to her, in the end.`,`The Mother brought the Shard here. They all go up to her, in the end.`),
   xl('f_hush',`I'm to keep it until you bring the other two. Then the Mother gets all three. Shhh. Don't be loud about it.`,`I keep it until you bring the other two. Then the Mother gets all three. Shhh.`),
   m3sIf('c_vesper',`Hi, moth. Remember the Dreadgate? I brought more fire bombs.`,`Hi, moth. Remember me? I brought more fire bombs.`,()=>!!G.flags.m_vesper_ally),
   m3sIf('m_esme',`(from the stairs) Lamplighters! Poles up! Wicks lit!`,`(from the stairs) Lamplighters! Poles up! Wicks lit!`,()=>!!G.flags.m_lamps_ally),
@@ -446,7 +445,7 @@ m3sDef('m_hush_intro',[
 ]);
 m3sDef('m_hush_out',[
   m3sAct(`Hush sinks down onto the brass floor and folds her wings.`,`Hush sinks to the floor and folds her wings.`,()=>{ m3sHushFxAt(null); m3sHushPose('down'); }),
-  xl('f_hush',`...Take it. It was never mine. Nothing is ever mine.`,`Take it. It was never mine. Nothing is ever mine.`),
+  xl('f_hush',`Take it. It was never mine. Nothing is ever mine.`,`Take it. It was never mine. Nothing is ever mine.`),
   xdo(()=>{ if(!(G.items.m_shard3>0)) giveItems({m_shard3:1}); G.flags.m_hush_done=1; }),
   xl('narr',`The Moon Shard is cold, and then, in your claws, warm.`,`The Moon Shard is cold. Then, in your claws, warm.`),
   xl('iska',`Ash. If you leave her tied, the Mother will pull her home and keep her cold forever. If you cut her loose, she's free. Free to go anywhere. Even away from you.`,`Ash. If you leave her tied, the Mother keeps her cold forever. If you cut her free, she can go anywhere. Even away from you.`),
@@ -456,16 +455,17 @@ m3sDef('m_hush_out',[
     xo(`Cut the leash`,`Cut the leash`,{tone:'kind',cond:()=>!!G.flags.m_leash_known,fn:()=>{ G.choices.m_hush='free'; },then:[
       m3sAct(`You breathe Moonfire on the first knot, as softly as you'd blow on hot soup. The silver thread melts like frost on a window. Then the second knot.`,`You breathe soft Moonfire on the knots, like blowing on soup. The silver thread melts.`,()=>m3sHushPose('knots')),
       m3sAct(`You cut the leash. Hush shivers, stretches her wings, and floats up out of the Observatory, free and glowing faintly. She doesn't look back. Then she does, once.`,`You cut the leash. Hush flies away, free. She looks back once.`,()=>m3sHushPose('free')),
-      xl('f_hush',`...Shhh. Thank you. Quietly.`,`Thank you. Quietly.`)]}),
-    xo(`Take the Shard and go`,`Take the Shard and go`,{tone:'brave',fn:()=>{ G.choices.m_hush='foe'; },then:[
-      m3sAct(`You take the Shard. The leash tightens, and Hush crumbles into a hundred little white moths that flutter up the silver thread to their Mother.`,`You take the Shard. Hush turns into little moths and flies to the Mother.`,()=>m3sHushPose('foe')),
-      xl('iska',`She'll remember this, Ash. Moths always remember.`,`She will remember this, Ash. Moths always remember.`)]})]),
+      xl('f_hush',`Shhh. Thank you. Quietly.`,`Thank you. Quietly.`)]}),
+    xo(`Leave the leash on`,`Leave the leash on`,{tone:'brave',fn:()=>{ G.choices.m_hush='foe'; },then:[
+      xl('ash',`Leave the leash on. If she's free, the Mother can follow her to us.`,`If she is free, the Mother can follow her to us.`),
+      m3sAct(`You take the Shard. The leash tightens, and Hush breaks into a hundred little white moths that flutter up the silver thread to their Mother.`,`You take the Shard. Hush turns into little moths and flies up to the Mother.`,()=>m3sHushPose('foe')),
+      xl('f_hush',`(far above, very small) You're careful. She isn't.`,`You're careful. She isn't.`)]})]),
   xdo(()=>{ m3sExtra('m_hush',G.choices.m_hush==='free'?S(`You melted Hush's silver leash with the gentlest Moonfire, and she flew away free.`,`You cut Hush's leash. She flew away free.`):S(`You took the Moon Shard and left Hush on her leash. The Mother pulled her home.`,`You left Hush on her leash. The Mother took her home.`)); m3sHushAfter(); })
 ]);
 // the Final Chapter, the Ember Heart (6.12): in room q, the Eclipse Lens
 m3sDef('m_reforge',[
   xl('narr',`At the very top of the Observatory, under the great dome, lies the Eclipse Lens: a disc of moon-glass as big as a pond, set in brass, pointing at the sky.`,`At the top lies the Eclipse Lens: a disc of moon-glass as big as a pond.`),
-  xl('iska',`This is where Lumen watched the moon. And this, little ember, is where your Heart gets mended. You'll need a blacksmith, though.`,`Here your Heart gets fixed. You'll need a blacksmith, though.`),
+  xl('iska',`This is where Lumen watched the moon. And this, Ash, is where your Heart gets mended. You'll need a blacksmith, though.`,`Here your Heart gets fixed. You'll need a blacksmith, though.`),
   m3sAct(`Footsteps on the stairs. Lots of footsteps. And puffing. A lot of puffing.`,`Footsteps on the stairs. And lots of puffing.`,()=>m3sMomIn()),
   xl('maren',`Ash? ASH! Oh, thank goodness. Those stairs are made of MOONLIGHT. Do you know how hard it is to climb moonlight with a hammer?`,`Ash? ASH! Those stairs are made of MOONLIGHT. It's hard to climb moonlight with a hammer!`),
   xdo(()=>{ G.flags.m_maren=1; G.flags.m_dell_away=0; G.flags.m_dell_pier=1; }),
@@ -476,7 +476,7 @@ m3sDef('m_reforge',[
   xl('quill',`(arriving last, behind a telescope bigger than she is) The Eclipse Observatory! My old teacher, Professor Lumley, was its very last astronomer. I always meant to visit. The end of the world seemed like a good excuse.`,`(with a huge telescope) The Eclipse Observatory! My old teacher worked here. The end of the world is a good reason to visit.`),
   xl('maren',`Right. Shards. Show me.`,`Right. Shards. Show me.`),
   xl('narr',`You tip the three Shards out of your satchel: violet, ice-blue and silver. Mom turns each one over in her fingers, the way she checks a horseshoe.`,`You tip out the three Shards: violet, ice-blue and silver. Mom checks each one.`),
-  xl('maren',`I'm a blacksmith. It's a broken stone. This is literally my job.`,`I'm a blacksmith. It's a broken stone. This is my job.`),
+  xl('maren',`Hand them here. Broken things come into my forge every day, and not one of them leaves broken.`,`Give them here. I fix broken things.`),
   xl('maren',`Here's how. Set them on the Lens. You breathe, the hottest breath you've got, then the coolest. I hammer. Three times. Gently. GENTLY. Like Bertram's oven.`,`Set them on the Lens. You breathe hot, then cool. I hammer three times. GENTLY.`),
   xl('narr',`You set the three Shards on the Lens. They slide together and almost fit, like a puzzle whose edges have been worn soft.`,`You set the Shards on the Lens. They almost fit, like a puzzle.`),
   xl('narr',`You breathe Blaze into the Lens, blue and hot. Then Moonfire, silver and cool. The Lens catches the last of the eclipse light and throws it all back a hundred times brighter.`,`You breathe hot Blaze, then cool Moonfire. The Lens shines a hundred times brighter.`),
@@ -490,7 +490,7 @@ m3sDef('m_reforge2',[
   xl('ash',`The Ember Heart. It's whole again.`,`The Ember Heart. It's whole again.`),
   xl('maren',`Of course it is. You did the breathing. I just hit it.`,`Of course. You did the breathing. I just hit it.`),
   xl('nyxara',`(from very far away) Yes. Make it whole. A cracked heart can't burn, little ember. A whole one can.`,`(far away) Yes. Make it whole. A whole heart can burn.`),
-  xl('ash',`Why does she sound HAPPY about this?`,`Why is she happy about this?`),
+  xl('ash',`Why does she sound happy about this?`,`Why is she happy about this?`),
   xl('maren',`...I don't like that. I don't like that at all.`,`I don't like that. Not at all.`),
   m3sPip(`Mip. (Pip curls up on the warm Heart and falls asleep at once, glowing a little.)`,`Mip. (Pip falls asleep on the warm Heart.)`),
   xl('quill',`Er. Everyone? The moon. Look at the moon.`,`Er. Everyone? Look at the moon.`),
@@ -504,7 +504,7 @@ m3sDef('m_peak',[
   m3sAct(`And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.`,`A black mountain rises out of the sea.`,()=>m3sPeak('rise')),
   xl('nyxara',`Come up, little ember. Bring your heart.`,`Come up, little ember. Bring your heart.`),
   m3sAct(`The mountain stands in the dark sea, sharp as a broken bottle, with violet lightning crawling up its sides. At the top, where the moon should be, hangs a broken ring of cold light.`,`The mountain is sharp like broken glass. Purple lightning crawls up it. A broken ring of light hangs at the top.`,()=>m3sEcl('gone')),
-  xl('ash',`It looks like... Cinder Mountain? And a clock tower? And SNOW? It's every place I've ever been, all squashed together.`,`It looks like Cinder Mountain! And a clock tower! And SNOW! Every place I've been, squashed together.`),
+  xl('ash',`It looks like... Cinder Mountain? And a clock tower? And snow? It's every place I've ever been, all squashed together.`,`It looks like Cinder Mountain! And a clock tower! And snow! Every place I've been, squashed together.`),
   xl('quill',`Fascinating. Terrifying. Mostly fascinating. I need to measure it.`,`Amazing. Scary. Mostly amazing. I must measure it.`),
   m3sAct(`Then the Heart in your satchel grows warm. At the end of the old Moon Pier, a bridge of silver fire unrolls across the dark sea, all the way to the black mountain.`,`The Heart grows warm. At the end of the pier, a bridge of silver fire rolls out to the black mountain.`,()=>m3sPeak('bridge')),
   xl('maren',`...You're going up there.`,`You're going up there.`),
@@ -518,7 +518,7 @@ m3sDef('m_peak',[
   xdo(()=>{ G.flags.m_done=1; G.tod=0.02; })
 ]);
 // on the pier afterwards: Mom (and the star-iron, the Fallen Star secret)
-STORY.m_pier_mom=[xl('maren',`Eat something first. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Eat something first. The bridge will wait.`)];
+STORY.m_pier_mom=[xl('maren',`Sit down a minute. Have a sandwich. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Have a sandwich first. The bridge will wait.`)];
 STORY.m_stariron=[
   xl('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Give it here. Your sword will never be the same!`),
   xl('narr',`CLANG. CLANG. Mom folds the star-iron into your blade. It hums like a struck bell.`,`CLANG! Mom puts the star-iron in your sword. It hums.`),
@@ -536,15 +536,19 @@ m3sDef('m_lumen_mosaic',[
   xl('narr',`THE MOON RISES, THE SEA FALLS. THE MOON FALLS, THE SEA RISES.`,`MOON UP, SEA DOWN. MOON DOWN, SEA UP.`),
   xl('iska',`The whole city breathed with the moon. Remember that, Ash. Up and down. Full and empty.`,`The city breathed with the moon. Up and down. Full and empty.`)
 ]);
+// (v11: Dive comes from Coralia's merfolk. Sir Kipper keeps watch beside Ember's flame; Ember herself speaks only once
+// in Act IV, at the Mirror Temple)
 m3sDef('m_lumen_shrine',[
-  xl('ember',`Little ember! You came all the way across the sea. I came here once, too, a long time ago. The moon-priests were my friends.`,`Little ember! You came across the sea. I came here once too. The moon-priests were my friends.`),
-  xl('ember',`I hid this flame at the bottom of a well, so only someone brave enough to get wet would find it. My tail was soggy for a week.`,`I hid this flame in a well. Only someone brave enough to get wet would find it.`)
+  xl('narr',`Beside the flame, the dark water bulges. A seahorse in a tiny saddle comes up out of it, and on the seahorse sits a merman in shell armour.`,`A merman on a seahorse comes up out of the water.`),
+  xl('m_kipper',`A dragon. At the bottom of Lumen. Nobody ever wrote a rule about that.`,`A dragon, down here? Nobody wrote a rule about that.`),
+  xl('m_kipper',`Sir Kipper of Coralcombe, and Lady Bubbles. The Queen keeps a knight beside this flame. A girl with horns left it with our grandmothers.`,`I'm Sir Kipper. We guard this flame. A girl with horns left it.`),
+  xl('ash',`That was Ember. She's my family.`,`That was Ember. She's my family.`),
+  xl('m_kipper',`Then it's yours. Take it, and then come and see the Queen.`,`Then it's yours. Take it. Then come and see the Queen.`)
 ]);
 m3sDef('m_lumen_gift',[
   xl('narr',`The flame is cool, not hot. It wraps around you like a bubble and settles in your chest. You take a breath. It tastes like the sea.`,`The flame is cool. It wraps you like a bubble. You breathe. It tastes like the sea.`),
-  xl('ember',`Dive! Swim out into deep water, and dive down. You can swim under walls, hit switches on the bottom, and hold your breath for a long time. Bubbles will help.`,`Dive! Swim into deep water and go down. Swim under walls. Hit switches. Bubbles give you air.`),
-  xl('ash',`I'm a FISH.`,`I'm a FISH.`),
-  xl('ember',`The bravest fish.`,`The bravest fish.`)
+  xl('m_kipper',`Now dive. Nose down, tail down, and kick. Your tail is the wrong sort, but kick anyway.`,`Now dive! Nose down, and kick.`),
+  xl('ash',`Old Winnie said "not yet." I think she meant now.`,`Winnie said "not yet." She meant now.`)
 ]);
 STORY.m_lumen_how=S(`In deep water, press ROLL to dive under. Swim under arches, touch switches on the bottom, and watch your blue air ring. Bubbles and air pockets fill it again.`,`In deep water, press ROLL to dive. Bubbles give you air.`);
 STORY.m_lumen_bossline=S(`Octavia! When her arms slam down, hit the glowing tips! When the room floods, watch for her eye. And remember the valves, Ash. She can't swim in an empty room.`,`Hit her glowing arm tips! Watch for her eye. Use the valves!`);
@@ -567,8 +571,8 @@ m3sDef('m_lumen_window',[
 ]);
 m3sDef('m_vault_open',[xl('iska',`Moonfire, underwater, on a vault Ember's friends sealed. They knew you'd come. Or they hoped.`,`Moonfire underwater! Ember's friends sealed this. They hoped you'd come.`)]);
 m3sDef('m_lumen_end',[
-  xl('ember',`Look at that. Lumen's lights, on again. My friends would be so happy.`,`Look! Lumen's lights are on again. My friends would be so happy.`),
-  xl('ember',`Go and find their grandchildren, Ash. They live in the reef, south of the floating town. They'll know the way east.`,`Find their grandchildren, Ash. They live in the reef south of the floating town.`),
+  xl('m_kipper',`Look at that. Lumen's lights, on again. My grandmother's grandmother would have cried. I may, a little.`,`Lumen's lights are on again! I may cry a little.`),
+  xl('m_kipper',`Coralcombe is in the reef south of the floating town. Dive in the middle of the ring. The Queen will want to hear this from you.`,`Our home is the reef south of the floating town. The Queen wants to see you.`),
   xl('narr',`Step into the warp ring to go back outside.`,`Step in the warp ring to go outside.`)
 ]);
 m3sDef('m_duchess',[
@@ -581,29 +585,30 @@ m3sDef('m_duchess',[
 STORY.m_zapp_taunt=[S(`Bzzzt!`,`Bzzzt!`),S(`Ooh, shiny. Shiny me.`,`Ooh, shiny me.`)];
 // the Sandworm Burrows (m_burrows): Burrow
 m3sDef('m_burrows_in',[xl('iska',`Tunnels and bones, and something very big breathing somewhere under us. Keep your fire close, Ash.`,`Tunnels and bones. Something big breathes below. Stay close.`)]);
+// (v11: Burrow comes from the worm king, Gravelgut, in a clear moment before the shiny thing in him takes over)
 m3sDef('m_burrows_shrine',[
-  xl('ember',`Little ember! You found my sandiest flame. I came here once. A very big worm ate me.`,`Little ember! My sandiest flame. I came here once. A big worm ate me.`),
-  xl('ash',`It ATE you?`,`It ATE you?`),
-  xl('ember',`Then it spat me out. I was too spicy. We became friends. Worms are very good friends, once they've tasted you.`,`Then it spat me out. I was too spicy. We became friends.`)
+  xl('narr',`The sand round the flame trembles. A voice comes up through it, so deep you feel it in your teeth.`,`The sand shakes. A deep voice comes up through it.`),
+  xl('m_gravelgut',`Mmmrrr. Little warm thing. You smell like her. The girl with horns.`,`Little warm thing. You smell like the girl with horns.`),
+  xl('ash',`Ember? You knew Ember?`,`You knew Ember?`),
+  xl('m_gravelgut',`Ate her once. Spat her out. Too spicy. After that we were friends, and she left her fire with us. For her family.`,`I ate her once. Too spicy! Then we were friends. She left her fire here, for her family.`)
 ]);
 m3sDef('m_burrows_gift',[
-  xl('narr',`The flame sinks into you like warm sand through your fingers. Your claws itch. You want to DIG.`,`The flame sinks into you like warm sand. Your claws itch. You want to DIG.`),
-  xl('ember',`Burrow! Dig down into sand and swim through it. Go under walls with sand beneath them, under enemies, and under worms. Pop up under someone and they'll go flying.`,`Burrow! Dig into sand and swim through it. Go under walls and foes. Pop up under someone and they fly!`),
-  xl('ash',`I'm a WORM.`,`I'm a WORM.`),
-  xl('ember',`The bravest worm.`,`The bravest worm.`)
+  xl('narr',`The flame sinks into you like warm sand through your fingers. Your claws itch. You want to dig.`,`The flame sinks into you like warm sand. Your claws itch. You want to dig.`),
+  xl('m_gravelgut',`Dig like us. Down into the sand, under walls, under biters. Come up under them and they fly.`,`Dig like us! Go under walls and biters. Pop up and they fly.`),
+  xl('m_gravelgut',`Then come down and find me, warm thing. Something shiny is stuck in me. It hurts. It makes me not me.`,`Then come and find me. Something shiny is stuck in me. It hurts.`)
 ]);
 STORY.m_burrows_how=S(`On sand, press ROLL to dig down. Move under sand walls, foes and worms. Press ROLL again to pop up under someone. Watch your gold dig ring.`,`On sand, press ROLL to dig. Press it again to pop up!`);
 STORY.m_burrows_bossline=S(`Gravelgut! Make him surface into the glass pillars. When he's stuck, hit his throat! And burrow, Ash, burrow when he comes up under you!`,`Lure him into the glass pillars! Hit his throat! Burrow when he comes up!`);
 m3sDef('m_gravelgut_intro',[
-  xl('narr',`The sand in the middle of the hall heaves. Something enormous rises out of it: a sandworm as big as a barn, with a round mouth full of glass teeth. In his throat, something glows silver.`,`The sand heaves. A giant worm rises, with glass teeth. Something silver glows in his throat.`),
+  xl('narr',`The sand in the middle of the hall heaves. Something enormous rises out of it: a sandworm as long as a street, with a round mouth full of glass teeth. In his throat, something glows silver.`,`The sand heaves. A giant worm rises, with glass teeth. Something silver glows in his throat.`),
   xl('m_gravelgut',`(a rumble you feel in your teeth) Mmmmrrr. Shiny. Want shiny. Tummy hurts. Want MORE shiny.`,`(a deep rumble) Shiny. Want shiny. Tummy hurts. Want MORE!`),
   xl('iska',`He's sick, Ash. Something in him is making him wild. Be quick, and be kind if you can.`,`He's sick, Ash. Be quick. Be kind if you can.`)
 ]);
 m3sDef('m_burrows_won',[
   xl('narr',`Gravelgut gives one enormous cough. Something small and bright flies out of his mouth, bounces three times, and rolls to your feet. It glows silver.`,`Gravelgut gives a huge cough. Something small and bright rolls to your feet. It glows silver.`),
   xdo(()=>{ if(!(G.items.m_mooncrumb>0)&&!G.flags.m_crumb_got){ giveItems({m_mooncrumb:1}); G.flags.m_crumb_got=1; } }),
-  xl('ash',`It's... a crumb. Of the MOON.`,`It's a crumb. Of the MOON.`),
-  xl('m_gravelgut',`(a rumble) ...Oof. Oh. Oh, that's better. My tummy. I've had a tummy ache for a month. Why did I eat that?`,`Oof. Oh, that's better. My tummy hurt for a month. Why did I eat that?`),
+  xl('ash',`It's... a crumb. Of the moon.`,`It's a crumb. Of the moon.`),
+  xl('m_gravelgut',`(a rumble) Oof. Oh, that's better. My tummy. I've had a tummy ache for a month. Why did I eat that?`,`Oof. Oh, that's better. My tummy hurt for a month. Why did I eat that?`),
   xl('iska',`She spilled it, Ash. Nyxara. She's a messy eater.`,`Nyxara spilled it, Ash. She's a messy eater.`),
   xl('m_gravelgut',`Thank you, little warm thing. I'm going to lie down for a hundred years.`,`Thank you, little warm thing. I'll lie down for a hundred years.`)
 ]);
@@ -613,8 +618,8 @@ m3sDef('m_sandy_talk',[
 ],{again:true});
 m3sDef('m_burrows_bell',[xl('iska',`The Worm Bell. Now they'll go slow. Worms are polite, once you ring.`,`The Worm Bell! Now the worms go slow.`)]);
 m3sDef('m_burrows_end',[
-  xl('ember',`A crumb of the moon. Hold on to it, little ember. Old Kiln in Sable would know what to do with a thing like that.`,`A crumb of the moon. Keep it, little ember. Old Kiln in Sable will know what to do.`),
-  xl('ember',`And now you can go under the Glasswall, the way the worms do. My last flame in the east is in the temple beyond it. It's the one I'm proudest of.`,`Now you can go under the Glasswall, like the worms. My last flame is in the temple past it.`),
+  xl('iska',`A crumb of the moon. Keep it, Ash. Somebody in Sable who works with fire and glass might know what to do with a thing like that.`,`A crumb of the moon. Keep it. Someone in Sable who works with glass will know.`),
+  xl('iska',`Go back to Sable first. Then under the Glasswall, the way the worms go. There's one more of Ember's flames past it, in a temple.`,`Go back to Sable first. Then dig under the Glasswall, like the worms.`),
   xl('narr',`Step into the warp ring to go back outside.`,`Step in the warp ring to go outside.`)
 ]);
 STORY.m_bigfin_taunt=[S(`CHOMP!`,`CHOMP!`),S(`Nobody burrows in MY sand!`,`Nobody digs in MY sand!`)];
@@ -623,15 +628,18 @@ m3sDef('m_mirror_in',[
   xl('iska',`Mirrors everywhere. Careful, Ash. Not everything in here is real. Not everything in here is you.`,`Mirrors everywhere. Careful, Ash. Not everything here is real.`),
   xl('ash',`That one's me. I'd know that face anywhere. It's handsome.`,`That one's me. I know that face. It's handsome.`)
 ]);
+// (the data scene m_mirror_shrine, game/story/act4/m_mirror.js, replaces this one in place: Ember's one appearance in
+// Act IV and her confession, v11)
 m3sDef('m_mirror_shrine',[
-  xl('ember',`Little ember. This is my favorite flame. I made it with the moon-priests, long ago, when Lumen was dry and full of lamps.`,`Little ember. This is my favorite flame. I made it with the moon-priests.`),
-  xl('ember',`We mixed my fire with moonlight, in case a shadow ever came for the moon. It burns cool and silver. Shadows can't stand it.`,`We mixed my fire with moonlight. It burns cool and silver. Shadows hate it.`)
+  xl('ember',`Hello, Ash. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.`,`Hello, Ash. This is my last flame. My fire, mixed with moonlight.`),
+  xl('ash',`What's it for?`,`What's it for?`),
+  xl('ember',`For her. For my little moth. In case she ever went wrong.`,`For my little moth. In case she went wrong.`),
+  xl('ash',`Your moth?`,`Your moth?`),
+  xl('ember',`Take it, Ash. And if you ever meet her, be gentler than I was.`,`Take it. If you meet her, be gentler than me.`)
 ]);
 m3sDef('m_mirror_gift',[
   xl('narr',`The flame is silver. It's cool, like a breeze on a summer night. When it touches you, your shadow sits up and pays attention.`,`The flame is silver and cool, like a summer night breeze.`),
-  xl('ember',`Moonfire! Breathe it like fire, but think of the moon. It lights moon-glass so you can stand on it, wakes moon braziers, burns shadows and shadow vines, and it even works underwater.`,`Moonfire! It lights moon-glass and moon braziers. It burns shadows. It works underwater too!`),
-  xl('ash',`I'm the MOON.`,`I'm the MOON.`),
-  xl('ember',`The bravest moon. Don't let it go to your head.`,`The bravest moon. Don't let it go to your head.`)
+  xl('iska',`Moonfire. Breathe it like fire, but think of the moon. It lights moon-glass so you can stand on it, wakes moon braziers, burns shadows and shadow vines, and it even works underwater.`,`Moonfire! It lights moon-glass and moon braziers. It burns shadows. It works underwater too.`)
 ]);
 STORY.m_mirror_how=S(`Swap your breath to MOONFIRE (the little moon by your fire meter), then breathe it like fire. It lights moon-glass, moon braziers and Shades, burns shadow vines, and works underwater.`,`Swap to MOONFIRE, then breathe. It lights moon-glass. It works underwater too!`);
 STORY.m_mirror_bossline=S(`Lord Fanfare! Moonfire the violet eyes on his tail! When he blocks the skylight, keep the braziers lit, and turn the big mirror on him!`,`Moonfire the purple eyes on his tail! Keep the braziers lit! Turn the big mirror on him!`);
@@ -639,7 +647,7 @@ m3sDef('m_mirror_boss_in',[
   xl('narr',`In the middle of the Mirror Hall, a peacock as tall as a house is admiring himself in six mirrors at once. His feathers are glass and silver. On every tail feather is an eye, painted dark violet.`,`A peacock as tall as a house admires himself in six mirrors. On every tail feather is a purple eye.`),
   xl('m_fanfare',`Mirror, mirror, on the wall... it's ME. It's always me.`,`Mirror, mirror, on the wall... it's ME.`),
   xl('m_fanfare',`Oh! A visitor. A small, scaly, slightly singed visitor. I am Lord Fanfare, Keeper of the Moon Flame, Most Beautiful Thing in the World. Don't look at my tail.`,`Oh! A small, scaly visitor. I am Lord Fanfare, the Most Beautiful Thing in the World. Don't look at my tail.`),
-  xl('m_fanfare',`...No, DO look. Look at it.`,`No, DO look. Look at it.`),
+  xl('m_fanfare',`No, do look. Look at it.`,`No, do look. Look at it.`),
   xl('ash',`It's nice. Why are the eyes on it purple?`,`It's nice. Why are the eyes purple?`),
   xl('m_fanfare',`A voice in the mirrors told me I was the only light that matters. Isn't that lovely? Now. Shoo. You're making the mirrors look crowded.`,`A voice in the mirrors said I'm the only light that matters. Lovely! Now shoo.`)
 ]);
@@ -654,24 +662,23 @@ m3sDef('m_pip_lamp',[
 ]);
 m3sDef('m_mirror_won',[
   xl('narr',`The last violet eye on Lord Fanfare's tail goes out. One by one, his feathers turn back to green and gold.`,`The last purple eye goes out. His feathers turn green and gold again.`),
-  xl('m_fanfare',`...Oh. Oh dear. Was I horrid? I think I was horrid. Something cold got into the mirrors and whispered to me.`,`Oh dear. Was I horrid? Something cold whispered to me from the mirrors.`),
+  xl('m_fanfare',`Oh dear. Was I horrid? I think I was horrid. Something cold got into the mirrors and whispered to me.`,`Oh dear. Was I horrid? Something cold whispered to me from the mirrors.`),
   xl('ash',`You're still very shiny.`,`You're still very shiny.`),
-  xl('m_fanfare',`...Thank you. You're quite shiny yourself. For a lizard.`,`Thank you. You're shiny too. For a lizard.`),
-  xl('ash',`I'm a DRAGON.`,`I'm a DRAGON.`),
-  xl('m_fanfare',`Even better. Dragons go with everything. I was supposed to guard Ember's flame FOR her family, you know. Not FROM them. I shall polish something to make up for it.`,`Even better! I was meant to guard Ember's flame FOR her family. Not FROM them. I will polish something to say sorry.`)
+  xl('m_fanfare',`Thank you. You're quite shiny yourself. For a lizard.`,`Thank you. You're shiny too. For a lizard.`),
+  xl('ash',`I'm a dragon.`,`I'm a dragon.`),
+  xl('m_fanfare',`Even better. Dragons go with everything. I was supposed to guard Ember's flame for her family, you know. Not from them. I shall polish something to make up for it.`,`Even better! I was meant to guard Ember's flame for her family. Not from them. I will polish something to say sorry.`)
 ]);
 // Nyxara's voice through every mirror at once (6.9): plays straight after the peacock's outro
 m3sDef('m_mirror_voice',[
   xl('narr',`Every mirror in the temple goes dark at once. In each one, a pair of white eyes opens.`,`Every mirror goes dark. In each one, two white eyes open.`),
   xl('nyxara',`Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, once, long ago. It hurt very much.`,`Moonfire. You found Ember's moonfire. Her priests burned me with it once. It hurt.`),
-  xl('nyxara',`Brighter, brighter, brighter. Shine as bright as you like. The brighter the flame, the darker it burns, at the very end.`,`Shine as bright as you like. The brighter the flame, the darker it burns, at the end.`),
-  xl('ash',`That doesn't even make sense!`,`That doesn't make sense!`),
-  xl('nyxara',`It will.`,`It will.`),
+  xl('nyxara',`Mend it, little ember. Then give it to me. You will want to, at the end.`,`Mend it. Then give it to me. You will want to.`),
+  xl('ash',`I won't.`,`I won't.`),
+  xl('nyxara',`Everyone does.`,`Everyone does.`),
   xl('narr',`The eyes close. The mirrors are just mirrors again. One of them shows you, looking a bit worried. You fix your hair. It helps.`,`The eyes close. A mirror shows you, a bit worried. You fix your hair. It helps.`)
 ]);
 m3sDef('m_mirror_end',[
-  xl('ember',`That's all of my flames, little ember. Every one I ever hid. You've carried them further than I ever went.`,`That's all my flames, little ember. You carried them further than I ever went.`),
-  xl('ember',`The Moonpath starts at the foot of the Heights, north of here. Light it up. And Ash? When you see her... she was alone for a very long time. I don't know if that helps. It might.`,`The Moonpath is north of here, at the foot of the Heights. Light it up. And Ash? She was alone a long time. That might help.`),
+  xl('iska',`That was the last of Ember's flames, Ash. The Moonpath starts at the foot of the Heights, north of here.`,`That was Ember's last flame. The Moonpath is north of here.`),
   xl('narr',`Step into the warp ring to go back outside.`,`Step in the warp ring to go outside.`)
 ]);
 STORY.m_prism_taunt=[S(`RAWR. Do you like my mane? Everyone likes my mane.`,`RAWR. Do you like my mane?`)];
@@ -707,7 +714,7 @@ m3sDef('m_umber_won',[
 ]);
 STORY.m_umber_taunt=[S(`Charmed. Do wipe your feet. En garde!`,`En garde!`),S(`Is that a LAMP? No. Focus. ...Is it, though?`,`Is that a LAMP? Focus!`),S(`Ooh! A LAMP.`,`Ooh! A LAMP.`)];
 STORY.m_obs_bossline=S(`Hush! Moonfire the moonstones to bring her down. Burrow under the Great Shush. Hit the knots. And when she's pulled up, grapple the ring and PULL!`,`Moonfire the stones! Burrow under the Shush! Hit the knots! Grapple the ring and PULL!`);
-STORY.m_hush_taunt=[S(`Shhh.`,`Shhh.`),S(`So loud. You're always so LOUD.`,`So LOUD.`),S(`I never did get a sweater.`,`I never got a sweater.`),S(`Mother, it hurts. Shhh. It hurts.`,`Mother, it hurts.`)];
+STORY.m_hush_taunt=[S(`Shhh.`,`Shhh.`),S(`So loud. You're always so LOUD.`,`So LOUD.`),S(`It's so cold up here.`,`So cold up here.`),S(`Mother, it hurts. Shhh. It hurts.`,`Mother, it hurts.`)];
 m3sDef('m_obs_won',[xl('iska',`Up the last stairs, Ash. To the Lens. Somebody's coming. I can hear a hammer.`,`Up the last stairs to the Lens, Ash. I can hear a hammer coming.`)]);
 // boss taunts for x3_foes (each S(full,simple)): taunt('<speaker>', pick(M3S_TAUNTS.<type>))
 const M3S_TAUNTS={m_puffington:[S(`I'm not STUCK! I'm GUARDING!`,`I'm GUARDING!`),S(`Pffffft.`,`Pffffft.`),S(`You popped my DIGNITY!`,`You popped my DIGNITY!`),S(`Mind the moustache!`,`Mind the moustache!`)],
@@ -780,7 +787,7 @@ defineStages(4,[
       return [m3sObj(`Ask Old Winnie the Tidewife about the moon`,`Ask Old Winnie about the moon`,m3sWho('m_winnie',M3SP.winnie.x,M3SP.winnie.y))]; },
     hint:m3sHint('m_drift'), yara:M3S_YARA,
     soFar:S(`Ash sailed east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the sea, and the Glass Desert, where the moon's broken light fell as glass.`,`Ash sailed to Moonfall. There is a city under the sea and a desert of glass.`),
-    mom:[S(`A floating town? Does it have floors? Eat something that isn't fish.`,`A floating town! Eat something.`)],
+    mom:[S(`A floating town? Does it have floors? Mind you don't fall between them.`,`A floating town! Don't fall in.`)],
     marker:id=>{ const F=G.flags; return (id==='m_dabble'&&!F.m_dabble)||(id==='m_winnie'&&!F.m_winnie); },
     talk(n){ const F=G.flags;
       if(n.id==='m_dabble'&&!F.m_dabble){ m3sPlay('m_dabble',()=>questUpdated()); return true; }
@@ -819,7 +826,7 @@ defineStages(4,[
       if(!m3sNear(M3SP.sable,700)&&!G.flags.m_sable_seen) return [{text:S('Follow the Caravan Road to the Oasis of Sable','Follow the road to the Oasis of Sable'),x:M3SP.road.x,y:M3SP.road.y}];
       return [m3sObj(`Talk to Caravan-master Rafi`,`Talk to Rafi, the caravan boss`,m3sWho('m_rafi',M3SP.rafi.x,M3SP.rafi.y))]; },
     hint:m3sHint('m_sable'), yara:M3S_YARA,
-    soFar:S(`During an eclipse, Nyxara came herself: a moth the size of a house. She took a huge bite of the moon, and every night since has been darker.`,`Nyxara came. She is a moth as big as a house. She took a huge bite of the moon.`),
+    soFar:S(`During an eclipse, Nyxara came herself: the great grey moth, with two pale moons on her wings. She took a huge bite of the moon, and every night since has been darker.`,`Nyxara came, the great grey moth. She took a huge bite of the moon.`),
     mom:[S(`The sun went out? In the DAY? Wear something warm. And bright.`,`The sun went out? Wear something bright!`)],
     marker:id=>id==='m_rafi'&&!G.flags.m_rafi,
     talk(n){ if(n.id==='m_rafi'&&!G.flags.m_rafi){ m3sPlay('m_rafi',()=>{ gainXp(M3S_XP.rafi); goStage('m_burrows'); }); return true; } return false; },
@@ -1652,26 +1659,28 @@ if(typeof pebbleLetter==='function'){
     :[xl('fennick',`(a letter) Fennick Wick here, lamp man of Emberhollow. Yara says you need lamps that never go out. I spent my whole life making this oil. Use it for something good. That is all I ever wanted. F.`,`Fennick here. This lamp oil never runs out. Use it for something good. F.`)]});
 }
 if(typeof defineDream==='function'&&typeof DREAMS!=='undefined'){
+  // v11: part two of the first Lantern Day memory (part one is a1l_story2.js, the 'lantern' dream: a little grey moth
+  // lands on the extra lantern). Years later, grown-up Ember doesn't climb the hill, and the moth waits.
   if(!DREAMS.m_moth) defineDream('m_moth',{stages:['m_coral','m_reef'],title:S('The Moth on the Lantern','The Moth on the Lantern'),scene:'moth',lines:()=>[
-    xl('narr',`The first Lantern Day, a thousand years ago. You're Ember, young, on the hill above the valley, with a paper lantern in your claws.`,`The first Lantern Day. You are young Ember with a lantern.`),
-    xl('narr',`A little grey moth flutters out of the dark. She has two pale painted eyes on her wings. She's shivering.`,`A little grey moth flies to you. She is shivering.`),
-    xl('narr',`She lands on your lantern and spreads her wings over the warm paper.`,`She lands on your warm lantern.`),
-    xl('ember_kid',`Oh! Hello. Are you cold?`,`Hello! Are you cold?`),
-    xc('ember_kid',`What do you do?`,`What do you do?`,[
-      xo(`Let her stay on your lantern`,`Let her stay`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`You can stay as long as you like. I'll call you Nyx. Because you came in the night.`,`Stay as long as you like. I will call you Nyx.`)]}),
+    xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth with two pale moons on her wings is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
+    xl('ember_kid',`You came back! If you're going to keep coming back, you need a name.`,`You came back! You need a name.`),
+    xc('narr',`She shivers on the cold post.`,`She shivers on the cold post.`,[
+      xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. I'll call you Nyx, because you come in the night.`,`Sit on mine. I will call you Nyx.`)]}),
       xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. I'll call you Nyx.`,`Your own lantern! I will call you Nyx.`)]}),
-      xo(`Shoo her off gently, lanterns are hot`,`Shoo her off gently`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Careful, little one, you'll singe your wings. ...Fine. Just for a minute. I'll call you Nyx.`,`Careful! Okay, just for a minute. I will call you Nyx.`)]})]),
-    xl('narr',`All night the moth stays. When the sun comes up, she flies off toward the setting moon, looking back three times.`,`She stays all night. In the morning she flies to the moon.`),
-    xl('ember_kid',`Come back next year, Nyx!`,`Come back next year, Nyx!`),
-    xl('narr',`She does. For a while.`,`She does. For a while.`)]});
+      xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. I'll call you Nyx.`,`Careful, it's hot! Fine. Sit here. I will call you Nyx.`)]})]),
+    xl('narr',`Every Lantern Day after that, Nyx is waiting on the hill. Ember grows taller every year. Nyx stays exactly the same size.`,`Every year, Nyx waits on the hill. Ember grows up.`),
+    xl('narr',`Then one year Ember has a baby on her hip and a house full of lanterns. She lights them in her own windows, down in the valley, and she doesn't climb the hill.`,`One year Ember has a baby. She lights lanterns at home. She doesn't climb the hill.`),
+    xl('narr',`Up on the hill, a little grey moth sits on a cold lantern post all night, facing the valley.`,`On the hill, Nyx waits all night by a cold lantern post.`),
+    xl('narr',`In the morning she flies up toward the setting moon, looking back three times.`,`In the morning she flies to the moon. She looks back three times.`),
+    xl('narr',`She waits the next year, too. And the next.`,`She waits the next year too. And the next.`)]});
   if(!DREAMS.m_eclipse) defineDream('m_eclipse',{stages:['m_sable','m_burrows'],title:S('The Night Without Morning','No Morning'),scene:'eclipse',lines:()=>[
     xl('narr',`You dream of a world where the sun never comes up. Not dark. Just grey. The moon is gone. Even the stars look tired.`,`In your dream, the sun never comes up. The moon is gone.`),
     xl('narr',`On the hill above Emberhollow, a girl with horns sits alone, holding a lantern that has gone out.`,`Young Ember sits alone with a lantern that went out.`),
     xl('ember_kid',`It went out. It's never gone out before.`,`It went out. It never went out before.`),
-    xc('ash',`What do you do?`,`What do you do?`,[
+    xl('ember_kid',`I was waiting for somebody. They didn't come.`,`I was waiting for someone. They didn't come.`),
+    xc('narr',`She holds the cold lantern out to you.`,`She holds out the cold lantern.`,[
       xo(`Light it again`,`Light it again`,{tone:'brave',fn:()=>{ G.flags.dr_m_eclipse='light'; },then:[xl('narr',`You breathe on it. Nothing. You breathe harder. A tiny spark catches, and holds.`,`You breathe on it. A tiny spark catches.`)]}),
       xo(`Sit with her`,`Sit with her`,{tone:'kind',fn:()=>{ G.flags.dr_m_eclipse='sit'; },then:[xl('narr',`You sit down beside her. Her shoulder is warm against yours. The lantern flickers back on, all by itself.`,`You sit with her. The lantern lights up by itself.`)]})]),
-    xl('ember',`Listen, little ember. The Heart remembers everyone who was ever kind to you. When it's dark, listen to it.`,`The Heart remembers everyone who was kind to you. Listen to it in the dark.`),
     xl('narr',`You wake up. Your claws are warm. Pip is sitting on your chest, glowing like a nightlight.`,`You wake up. Pip glows on your chest.`)]});
 }
 if(typeof tamsinVerse==='function') tamsinVerse(()=>!!G.flags.m_done,S(`\u{1F3B5} A moth ate the moon, oh, a bite at a time, so Ash dove and dug and made moonfire shine...`,`\u{1F3B5} A moth ate the moon. Ash made moonfire shine...`));
@@ -1696,7 +1705,7 @@ if(typeof BARKS!=='undefined'&&!BARKS.some(b=>/^m_/.test(String(b.k)))){
   const inA=()=>actOf(G.stage)>=4&&curMap()===3;
   m3sBk('dw1','town:m_driftwood',inA,S(`The tide went out this morning and didn't come back for lunch.`,`The tide went out and didn't come back.`));
   m3sBk('dw2','town:m_driftwood',inA,S(`My raft drifted off with my breakfast on it. I miss my breakfast.`,`My raft floated off with my breakfast.`));
-  m3sBk('dw3','town:m_driftwood',()=>inA()&&!!G.flags.m_eclipse1,S(`Did you SEE that moth? I've stopped going outside. I'm a raft town. Everything is outside.`,`Did you SEE that moth? I'm staying inside. Oh wait.`));
+  m3sBk('dw3','town:m_driftwood',()=>inA()&&!!G.flags.m_eclipse1,S(`Did you see that moth? I've stopped going outside. I'm a raft town. Everything is outside.`,`Did you SEE that moth? I'm staying inside. Oh wait.`));
   m3sBk('sb1','town:m_sable',inA,S(`A dragon in Sable! Is it true you breathe fire? Can you light my lamp? I'll pay in dates.`,`A dragon! Can you light my lamp?`));
   m3sBk('sb2','town:m_sable',()=>inA()&&!!G.flags.m_eclipse2,S(`The well is dim. My lamp is dim. My mood is dim.`,`The well is dim. My mood is dim.`));
   m3sBk('sb3','town:m_sable',inA,S(`Esme says lamps make everything better. She's right. She's always right. It's annoying.`,`Esme says lamps make it better. She is right.`));
@@ -1704,13 +1713,13 @@ if(typeof BARKS!=='undefined'&&!BARKS.some(b=>/^m_/.test(String(b.k)))){
   m3sBk('sf','id:m_saffron',inA,S(`Don't touch the well.`,`Don't touch the well.`));
   m3sBk('mf1','id:m_coralia,m_kipper,m_ripple,m_rocket,m_kelp',inA,S(`A dragon who swims! What next, a fish who walks?`,`A dragon who swims!`));
   m3sBk('mf2','id:m_coralia,m_kipper,m_ripple,m_rocket,m_kelp',inA,S(`Mind the coral. It bites. Only a little.`,`Mind the coral. It bites!`));
-  m3sBk('kid','kid',()=>inA()&&m3sMoonNow()<95,S(`Somebody took a BITE out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
+  m3sBk('kid','kid',()=>inA()&&m3sMoonNow()<95,S(`Somebody took a bite out of the moon! Was it you?`,`Who bit the moon? Was it you?`));
 }
 if(typeof CHATS!=='undefined'&&!CHATS.some(c=>/^m_/.test(String(c.k)))){
   const inA=()=>actOf(G.stage)>=4&&curMap()===3;
   try{
     VCH('m3s_dw','id:m_dabble','id:m_winnie',inA,[[0,S(`Is it a good day, Winnie?`,`Is it a good day, Winnie?`)],[1,S(`Ollie says no.`,`Ollie says no.`)],[0,S(`Ollie always says no.`,`Ollie always says no.`)]]);
-    VCH('m3s_rk','id:m_rafi','id:m_kiln',inA,[[0,S(`Kiln, have you ever seen snow?`,`Kiln, have you seen snow?`)],[1,S(`I've MADE snow. Out of glass. It was sharp.`,`I MADE snow. Out of glass. It was sharp.`)]]);
+    VCH('m3s_rk','id:m_rafi','id:m_kiln',inA,[[0,S(`Kiln, have you ever seen snow?`,`Kiln, have you seen snow?`)],[1,S(`I've made snow. Out of glass. It was sharp.`,`I MADE snow. Out of glass. It was sharp.`)]]);
     VCH('m3s_wr','id:wren','id:m_ripple',inA,[[1,S(`Your spelling is atrocious.`,`Your spelling is awful.`)],[0,S(`Your spelling is underwater.`,`Your spelling is underwater.`)]]);
     VCH('m3s_tg','id:ev_tikka','id:m_gilly',inA,[[0,S(`Bread is better than fish.`,`Bread is better than fish.`)],[1,S(`Fish IS bread. Wet bread.`,`Fish IS bread. Wet bread.`)]]);
   }catch(e){}

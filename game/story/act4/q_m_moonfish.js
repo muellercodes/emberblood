@@ -18,7 +18,7 @@ quest({
         'Dive. Push the fish up into the ring.'] },
     { id: 'land', do: 'wait_for flag m_moonfish_caught', legacy: true, marker: 'm_gilly',
       obj: ['Help Gilly land the Moonfish (talk to Gilly)', 'Talk to Gilly. Help her land it.'],
-      hint: ['When the float splashes, PULL!', 'When it splashes, PULL!'] },
+      hint: ['When the float splashes, pull!', 'When it splashes, pull!'] },
     { id: 'show', do: 'talk m_gilly', scene: 'mf_done', then: ['heart_ember m_moonfish', 'xp 400'],
       obj: ['Talk to Gilly', 'Talk to Gilly'] },
   ],
@@ -27,10 +27,10 @@ quest({
     mf_offer: [
       ['m_gilly', 'Dragon! Have you heard of the Moonfish? Most beautiful fish in the sea. It glows like the moon.',
         'Have you heard of the Moonfish? It glows!'],
-      ['m_gilly', "It only comes up when the moon is full. Which isn't going to happen any time soon. But you can DIVE now!",
-        'It comes up at full moon. But you can DIVE!'],
-      ['m_gilly', 'Find it down in the Drowned Reach and chase it up to my fishing raft. I just want to SEE it. Not cook it.',
-        'Chase it up to my raft. I just want to SEE it.'],
+      ['m_gilly', "It only comes up when the moon is full. Which isn't going to happen any time soon. But you can dive now!",
+        'It comes up at full moon. But you can dive!'],
+      ['m_gilly', 'Find it down in the Drowned Reach and chase it up to my fishing raft. I just want to see it. Not cook it.',
+        'Chase it up to my raft. I just want to see it.'],
       ['m_gilly', '...Mostly not cook it.'],
       { choose: 'm_moonfish_offer', ask: ['Will you chase the Moonfish up for Gilly?', 'Chase the Moonfish?'], pick: [
         { t: ["I'll find it. No cooking.", 'I will. No cooking!'], tone: 'kind', then: ['quest start m_moonfish'],

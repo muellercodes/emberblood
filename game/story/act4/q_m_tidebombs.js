@@ -38,9 +38,9 @@ quest({
         'Ash! Do bombs work UNDER WATER? For science!'],
       ['f_mags', 'Also, three big rocks block the Bubble Caves under Palmcrest, and the merfolk asked very politely.',
         'Three rocks block the Bubble Caves at Palmcrest.', { ref: 'm3p_bubbledoor' }],
-      ['f_mags', 'Here. Three prototype Tide Bombs. They stick to things. Then they go BOOM. Probably.', 'Three Tide Bombs. They stick. Then BOOM.'],
+      ['f_mags', 'Here. Three prototype Tide Bombs. They stick to things. Then they go boom. Probably.', 'Three Tide Bombs. They stick. Then boom.'],
       ['ash', 'Probably?'],
-      ['f_mags', "Science is mostly probably. Dive, throw, swim away. Swim away is the important bit.", 'Dive. Throw. Swim away FAST.'],
+      ['f_mags', "Science is mostly probably. Dive, throw, swim away. Swim away is the important bit.", 'Dive. Throw. Swim away fast.'],
     ],
     tb_done: [
       ['f_mags', 'It WORKED? Under water? Ha! HA! Science!', 'It WORKED? SCIENCE!'],

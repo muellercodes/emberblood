@@ -66,7 +66,7 @@ quest({
       { if: 'flag m_leash_known', then: [['ash', 'I KNEW it. Like blowing on hot soup.', 'I knew it!']],
         else: [['ash', 'So I could free Hush. Gently.', 'So I can free Hush. Gently.']] },
       ['wren', "Oh! Something's tucked in the back. A page. Not Lumen writing. Ours.", 'A page in the back. In OUR writing!'],
-      { if: '!flag f_page11', then: [['wren', "It's the lost ELEVENTH page of the Wardens' book! Under the sea for five hundred years!",
+      { if: '!flag f_page11', then: [['wren', "It's the lost eleventh page of the Wardens' book! Under the sea for five hundred years!",
         'The lost eleventh page! Under the sea all this time!']],
         else: [['wren', 'Another copy of the eleventh page! Eider found one in Hearthold. I shall frame one and hug the other.',
           'Another eleventh page! I will hug it.']] },

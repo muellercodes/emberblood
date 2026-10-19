@@ -42,7 +42,7 @@ places({
   scene: {
     q_g_mirrow_board: [
       ['narr', 'A broken nameboard, painted by somebody very proud: SOGGY BISCUIT ONE.', 'A nameboard: SOGGY BISCUIT ONE.'],
-      ['ash', "Dell's first boat! He said it sank on launch day. He said it was a SMALL leak.", "Dell's first boat!"],
+      ['ash', "Dell's first boat! He said it sank on launch day. He said it was a small leak.", "Dell's first boat!"],
       ['narr', 'The whole boat went down the plughole and came up in here. The ducks must have been very surprised.',
         'It came up in here. Surprise, ducks.'],
     ],
@@ -55,7 +55,7 @@ places({
         'I knew once. Then I forgot.'],
     ],
     m4_epi_biscuit: [
-      ['narr', "Old Sal hung the Soggy Biscuit ONE's nameboard over the boatshed door. Dell cries every time he sees it. Happy crying.",
+      ['narr', "Old Sal hung the Soggy Biscuit One's nameboard over the boatshed door. Dell cries every time he sees it. Happy crying.",
         'Sal hung up the old boat name. Dell cries. Happy.'],
     ],
   },

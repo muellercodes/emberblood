@@ -9,8 +9,8 @@ chapter({
   id: 'm_sable', act: 4, after: 'm_reef', next: 'm_burrows', takeover: true,
   card: null, name: ['The Glass Desert', 'The Glass Desert'],
   so_far: [
-    'During an eclipse, Nyxara came herself: a moth the size of a house. She took a huge bite of the moon. She could have squashed Ash flat, but she asked for the Shards instead.',
-    'Nyxara came, as big as a house. She bit the moon. She ASKED for the Shards.'],
+    'During an eclipse, Nyxara came herself: the great grey moth, with two pale moons on her wings. She took a huge bite of the moon. She could have squashed Ash flat, but she asked for the Shards instead.',
+    'Nyxara came, the great grey moth. She bit the moon. She asked for the Shards.'],
   hint: ["Follow the caravan road east, Ash. The oasis is where the palm trees are.",
     "Follow the road east, Ash. Look for palm trees."],
   mom: [['The sun went out? In the DAY? Wear something warm. And bright.', 'The sun went out? Wear something bright!']],
@@ -21,7 +21,7 @@ chapter({
 
   clue: {
     m4_rafi_sun: { icon: 'question', herring: true, mystery: 'm4_night_mother',
-      text: ['Rafi is sure of it: "First the moon, now the sun. She\'ll eat the SUN next, mark my words!"', 'Rafi thinks she will eat the sun next.'] },
+      text: ['Rafi is sure of it: "First the moon, now the sun. She\'ll eat the sun next, mark my words!"', 'Rafi thinks she will eat the sun next.'] },
   },
 
   step: [
@@ -41,12 +41,12 @@ chapter({
 
   scene: {
     sbl_rafi: [
-      ['m_rafi', 'Ho! A dragon! Out of the SEA! Now I have seen everything. Except snow. I have never seen snow.', 'Ho! A dragon, out of the SEA! I have seen everything. Except snow.'],
-      ['ash', "I've seen SO much snow."],
+      ['m_rafi', 'Ho! A dragon! Out of the sea! Now I have seen everything. Except snow. I have never seen snow.', 'Ho! A dragon, out of the sea! I have seen everything. Except snow.'],
+      ['ash', "I've seen so much snow."],
       ['m_rafi', 'Then you are a lucky dragon! I am Rafi Sandstride, master of the Great Caravan. For three hundred years we have crossed the Glass Desert by the light of the moon.',
         'Lucky dragon! I am Rafi, master of the Great Caravan. We cross the desert by moonlight.'],
-      ['m_rafi', 'And today the SUN went out! In the middle of the day! My striders are still hiding behind their own tails.',
-        'And today the SUN went out! In the day! My striders are still hiding.'],
+      ['m_rafi', 'And today the sun went out! In the middle of the day! My striders are still hiding behind their own tails.',
+        'And today the sun went out! In the day! My striders are still hiding.'],
       ['m_rafi', "First the moon, now the sun. Mark my words, dragon: she'll eat the SUN next!", "First the moon, now the sun. She'll eat the SUN next!", { clue: 'm4_rafi_sun' }],
       ['ash', 'I have to get to the Eclipse Observatory.', 'I have to get to the Observatory.'],
       ['m_rafi', 'The Observatory? Beyond the Mirror Flats, up on the Heights. But when the moon got sick, the Glasswall grew up around the Flats. Spikes of glass taller than towers.',
@@ -58,7 +58,7 @@ chapter({
     sbl_wall: [
       ['narr', 'Spikes of glass, taller than towers, as far as you can see. The sun bounces off them in a hundred little rainbows.',
         'Glass spikes taller than towers. A hundred little rainbows.', { ref: 'm4_gap_sign' }],
-      ['ash', 'Worms go under it. ...Where do you even GET a worm?', 'Worms go under it. Where do I get a worm?'],
+      ['ash', 'Worms go under it. Where do you even get a worm?', 'Worms go under it. Where do I get a worm?'],
       // the deal at eclipse 1, remembered
       { if: 'choice m_deal=ask', then: [
         ['ash', "She said the moon leaves her every morning. ...I keep thinking about that. I wish I didn't.", 'The moon leaves her every morning, she said. I keep thinking about it.']],
@@ -66,15 +66,15 @@ chapter({
         ['ash', 'Not for a hundred valleys. And not for one big pointy wall, either.', 'Not for a hundred valleys. Not for one pointy wall!']] },
     ],
     sbl_saffron: [
-      ['m_saffron', "Don't touch the well. Don't breathe on the well. Don't LOOK at the well like that.", "Don't touch the well. Don't LOOK at it like that."],
+      ['m_saffron', "Don't touch the well. Don't breathe on the well. And don't look at the well like that.", "Don't touch the well. Don't even look at it like that."],
       ['ash', 'I need a worm. A big one. One that goes under walls.', 'I need a big worm. One that goes under walls.'],
       ['m_saffron', 'Then you want the Burrows. North of here, up the old road, at the Worm Mouth. Bring water.',
         'Go to the Burrows. North, up the old road, at the Worm Mouth.', { dir: ['m_saffron', 'm4_worm_mouth', 'north'] }],
-      ['m_saffron', "But something down there has gone wrong. The old king worm is eating GLASS. Worms don't eat glass. He's sick.",
-        "But the old king worm is eating GLASS. He's sick."],
+      ['m_saffron', "But something down there has gone wrong. The old king worm is eating glass. Worms don't eat glass. He's sick.",
+        "But the old king worm is eating glass. He's sick."],
       ['iska', 'Ember left a flame with the worms too, I think. She left one everywhere that was kind to her. Even the places that ate her a little.',
         'Ember left a flame with the worms, I think. Even ones that ate her a little.'],
-      ['m_saffron', "Help him, dragon. He's a grumpy old thing. But he's OUR grumpy old thing.", "Help him, dragon. He's OUR grumpy old worm."],
+      ['m_saffron', "Help him, dragon. He's a grumpy old thing. But he's our grumpy old thing.", "Help him, dragon. He's our grumpy old worm."],
     ],
   },
 })

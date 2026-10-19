@@ -4,7 +4,7 @@
 // Moonfall (lamp_thief, an optional small mystery whose deduction lives here), the Duke's outro says so and he gives
 // the lot back. Hush waits under the dome on her silver leash (her intro, at most 10 lines with both allies). After
 // the fight she sinks down, the Shard rolls to Ash, and both options always show: melt the knots with gentle Moonfire
-// (free) or take the Shard and go (foe). At most 6 lines a branch, played by the old fight's own hook (x3_foes ->
+// (free) or leave the leash on, "If she's free, the Mother can follow her to us." (foe: cautious, not cruel, v11). At most 6 lines a branch, played by the old fight's own hook (x3_foes ->
 // x3_story m3sHushDown plays STORY.m_hush_out, which is this chapter's data scene in place); m3sHushAfter then gives
 // Shard 3, the XP, a blessing, and moves the story to m_reforge.
 // Old flags and choices kept: G.choices.m_hush ('free' | 'foe'; x4_story, x4_foes, e7b_threads read it), m_hush_done,
@@ -90,15 +90,16 @@ chapter({
       ['narr', 'Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.',
                'Under the dome sits a white moth as big as a barn. A silver thread runs from her neck to two knots, then up into the dark.'],
       ['narr', 'Beside her, in a little brass cradle, something glows silver. The Moon Shard.', 'Beside her, something glows silver. The Moon Shard.'],
-      // Act III's choice f_hush (A3b): Ash wrapped her in Ylva's red scarf ('scarf'), or told her to get a sweater
+      // Act III's choice f_hush (A3b, J5 v11): Ash wrapped her in Ylva's red scarf ('scarf'), or ('shoo') told her "Fly
+      // home, then. Tell her I'm coming." She did, and the Mother put the leash on her
       { if: 'choice f_hush=scarf', then: [
-        ['f_hush', 'Shhh. You again. The loud one. ...I kept the red scarf. It is under the leash. It is the only warm thing.', 'Shhh. You again. I kept the red scarf.'] ],
+        ['f_hush', "You again. Loud one. I kept the red scarf. It's under the leash. The only warm thing.", 'You again. I kept the red scarf.'] ],
         else: [
-        ['f_hush', 'Shhh. You again. The loud one. ...I never did get a sweater.', 'Shhh. You again. I never got a sweater.'] ] },
+        ['f_hush', 'You again. Loud one. I flew home, like you said. I told her you were coming.', 'You again. I flew home. I told her you were coming.'] ] },
       ['ash', 'Hush. You came back.', 'Hush. You came back.'],
-      ['f_hush', 'I flew to the Mother, small and cold. She made me big again. "Never small again," she said. Then she gave me this.', 'The Mother made me big again. Then she gave me this leash.'],
+      ['f_hush', 'I went home small and cold. She made me big. "Never small again," she said. Then she put this on me.', 'The Mother made me big again. Then she put this leash on me.'],
       ['narr', 'Far above, something tugs the leash, gently. Hush flinches.', 'Far above, something tugs the leash. Hush flinches.'],
-      ['f_hush', "I'm to keep the Shard until you bring the other two. Then the Mother gets all three. They all fly up to the Mother, in the end. Shhh.", 'I keep it until you bring the others. Then the Mother gets all three. Shhh.'],
+      ['f_hush', 'I keep the Shard. You bring the other two. She gets all three. They all go up to her, in the end.', 'I keep it. You bring two. She gets all three.'],
       { if: 'flag m_vesper_ally flag m_lamps_ally', then: [
         ['narr', 'Behind you, Vesper juggles a fire bomb, and Esme\'s lamplighters raise their poles. "Wicks lit!"', 'Vesper has fire bombs. The lamplighters light their lamps!'] ],
         else: [{ if: 'flag m_vesper_ally', then: [
@@ -112,8 +113,8 @@ chapter({
     // never solved it still gets both, and the free pick sets m_leash_known for the finale).
     m_hush_out: [
       ['narr', 'Hush sinks down onto the brass floor and folds her wings. The Moon Shard rolls out of its cradle to your feet.', 'Hush sinks down. The Moon Shard rolls to your feet.', { do: [{ if: '!item m_shard3 !item m_heart', then: ['give m_shard3'] }, 'set m_hush_done'] }],
-      ['f_hush', '...Take it. It was never mine. Nothing is ever mine.', 'Take it. It was never mine.'],
-      { choose: 'm_hush', ask: ['The silver leash is still tied to her neck, pulling her up toward the dark. What do you do?', 'The leash still pulls her up. What do you do?'], pick: [
+      ['f_hush', 'Take it. It was never mine. Nothing is ever mine.', 'Take it. It was never mine.'],
+      { choose: 'm_hush', who: 'narr', ask: ['The silver leash still pulls at her neck, up toward the dark.', 'The leash still pulls her up.'], pick: [
         { t: ['Melt the knots with gentle Moonfire', 'Melt the knots, gently'], tone: 'kind', v: 'free',
           then: ['set m_leash_known', { journal: ["You melted Hush's silver leash with the gentlest Moonfire, and she flew away free.", "You melted Hush's leash. She flew away free."], key: 'm_hush' }],
           say: [
@@ -122,12 +123,14 @@ chapter({
               ['narr', 'Hush shrinks to her own size. You tug the sweater over her head. It is too small. She does not mind.', 'Hush shrinks. You put the sweater on her. It is too small. She does not mind.', { do: ['emit m4fx:hush:free', 'take m4_sweater', 'set m4_hush_sweater', 'epi m4_epi_sweater 6'] }] ],
               else: [
               ['narr', 'Hush shrinks to her own size, stretches her wings, and floats up out of the dome, free and glowing faintly. She looks back, once.', 'Hush shrinks and floats away, free. She looks back once.', { do: ['emit m4fx:hush:free'] }] ] },
-            ['f_hush', '...Shhh. Thank you. Quietly.', 'Thank you. Quietly.'] ] },
-        { t: ['Take the Shard and go', 'Take the Shard and go'], tone: 'brave', v: 'foe',
-          then: [{ journal: ['You took the Moon Shard and left Hush on her leash. The Mother pulled her home.', 'You left Hush on her leash. The Mother took her home.'], key: 'm_hush' }],
+            ['f_hush', 'Shhh. Thank you. Quietly.', 'Thank you. Quietly.'] ] },
+        // v11: the brave pick is cautious, not cruel
+        { t: ['Leave the leash on', 'Leave the leash on'], tone: 'brave', v: 'foe',
+          then: [{ journal: ["You left Hush's leash on, so the Mother could not follow her to you. The Mother pulled her home.", "You left Hush's leash on. The Mother took her home."], key: 'm_hush' }],
           say: [
-            ['narr', 'You take the Shard. The leash tightens, and Hush crumbles into a hundred little white moths that flutter up the silver thread to their Mother.', 'You take the Shard. Hush turns into little moths and flies to the Mother.', { do: ['emit m4fx:hush:foe'] }],
-            ['iska', "She'll remember this, Ash. Moths always remember.", 'She will remember this. Moths always remember.'] ] },
+            ['ash', "Leave the leash on. If she's free, the Mother can follow her to us.", 'If she is free, the Mother can follow her to us.'],
+            ['narr', 'You take the Shard. The leash tightens, and Hush breaks into a hundred little white moths that flutter up the silver thread to their Mother.', 'You take the Shard. Hush turns into little moths and flies up to the Mother.', { do: ['emit m4fx:hush:foe'] }],
+            ['f_hush', "(far above, very small) You're careful. She isn't.", "You're careful. She isn't."] ] },
       ] },
     ],
     // Iska once the fight is over (x3_story's m3sHushAfter plays it): the Lens is through the next door, beside the
