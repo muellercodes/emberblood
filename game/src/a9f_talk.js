@@ -37,7 +37,9 @@ function giveTalkReward(r){
 }
 // ---------- the first time Ash talks to someone. Where they live decides what they say: Emberhollow has known him all
 // his life, the nearby Act I towns know Maren and have heard of her boy, and only people from far away introduce
-// themselves. Every entry is [full, simple].
+// themselves. Every entry is [full, simple]. (v11, J9) The named Act I people in FIRST_HOME and FIRST_NEAR now greet
+// with their own first opener in game/story/act1/people.js (a converted person skips this); these lines stay for the
+// generic neighbours (HOME_GEN, NEAR_GEN) and for a first meeting in a later act.
 const NEAR_TOWNS=['brindle','copper','lodge','farm','way','mire'];
 const TOWN_OF={juniper:'village',sal:'brindle',minnow:'brindle'};
 function townOf(id){ if(TOWN_OF[id]) return TOWN_OF[id]; const c=CASTBY[id]||SPECIAL[id]; return (c&&c.town)||''; }
@@ -86,7 +88,7 @@ const HOME_GEN={
     [`Morning, Ash! My little ones want to see you blow smoke rings later, if you've time.`,`Morning! My kids want to see smoke rings.`]],
   post:[[`Ash! You chased three of them right past my window. I've never seen kobolds run so fast.`,`You chased the kobolds past my window!`],
     [`Your mother came out of the forge with a hammer in each hand. If I were a kobold, I'd have run too.`,`Your mom came out with two hammers. The kobolds ran!`],
-    [`There's our dragon. I always said all that practice on Bertram's bakery was for something.`,`There's our dragon! You were great.`],
+    [`There's our dragon. I always said all that practice on the bonfire was for something.`,`There's our dragon! You were great.`],
     [`Ash! Are you hurt? No? Good. A kobold ran off with my other boot. If you see a boot, it's mine.`,`Are you hurt? A kobold took my boot!`],
     [`I've lived here forty years and never locked my door. I'm locking it now. Twice.`,`I lock my door now. Twice.`],
     [`Ash. I saw Yara's face when the Ward went out. I've never seen her look scared before.`,`Yara looked scared when the Ward went out.`]],
@@ -113,7 +115,7 @@ const FIRST_NEAR={
   pick:[`Gorran said Maren's kid would come up the hill one day. We bet you'd be taller. We both lost.`,`Maren's kid! We thought you would be taller.`],
   hollis:[`You'll be Maren's boy, from down the valley. Your mom shod my mule. Best shoes he ever had.`,`Maren's boy! Your mom made shoes for my mule.`],
   ulf:[`HA! The dragon boy! Hal Burrows writes about you. In between the cheese.`,`The dragon boy! Hal writes to me about you.`],
-  elka:[`You're ASH! Rook's Ash! He writes about you in every single letter. Did you really blow up a bakery?`,`You're Ash! Rook writes about you!`],
+  elka:[`You're Ash! Rook's Ash! He writes about you in every single letter. Is it true you can breathe fire?`,`You're Ash! Rook writes about you!`],
   hob:[`Ash! Fennick's little neighbour. You've grown. Mostly up, and a bit sideways at the horns. Come in out of the smoke.`,`Ash! You've grown! Come in.`],
   tamsin:[`The Emberblood! I've been singing about you all week and I've never seen you up close. Turn round. I need to know how long the tail is.`,`The Emberblood! Turn around. I need to see your tail for my song.`],
   moss:[`So this is Mabel's dragon boy. Sit by the fire, child. By it. Not in it.`,`Mabel's dragon boy! Sit by the fire.`],
@@ -188,9 +190,12 @@ function giftReact(id,item){
 // Old TALK labels: T.deepAsk, T.rumorAsk and T.about[who] = { ask, t } name the old topics while they are converted.
 const talkLbl=x=>Array.isArray(x)?S(String(x[0]),String(x[1]==null?x[0]:x[1])):String(x);
 // a remembered moment (a dream, an event, a deed) that greetLine would have said; random chatter is left out
-function talkRemark(id){
+// A converted person (new menu in this act) skips the shared deed lines: their own openers already react to the same
+// events, and one deed line said by everyone in the valley read as a formula (and could name the person saying it).
+function talkRemark(id,v11){
   try{ if(typeof evGreet==='function'){ const v=evGreet(id); const ch0=(typeof MOM_CH!=='undefined'&&MOM_CH[G.stage])||[], ch1=(typeof YARA_CH!=='undefined'&&YARA_CH[G.stage])||[];
     if(v&&!ch0.includes(v)&&!ch1.includes(v)) return v; } }catch(e){}
+  if(v11) return null;
   try{ return deedGreet(id)||null; }catch(e){ return null; }
 }
 function talkVisit(n,firstMeet,lines){
@@ -203,16 +208,16 @@ function talkVisit(n,firstMeet,lines){
   if(spoke&&!(X&&!X.heard)){ V.text=heard(idle()||'Mm?'); V.again=()=>idle()||pick(['Mm?','Yes?']); return V; }
   if(X&&!X.heard){
     // a first meeting with someone not converted yet keeps their introduction; otherwise a remembered moment, if any
-    const g=spoke?null:firstMeet&&!v11?greetLine(id):talkRemark(id); if(g) lines.push([id,heard(g)]);
+    const g=spoke?null:firstMeet&&!v11?greetLine(id):talkRemark(id,v11); if(g) lines.push([id,heard(g)]);
     for(const L of X.pre) lines.push(L);
     const L0=X.last;
     if(L0){ heard(L0.text); V.text=()=>L0.skipIf&&L0.skipIf()?(idle()||'Mm?'):L0.text; V.fn=()=>{ if(L0.fn) L0.fn(); X.run(); }; }
     else{ V.text=idle()||'Mm?'; V.fn=X.run; }
     V.re=X.re; V.key=X.key;
   }
-  else if(X) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  else if(X) V.text=heard(talkRemark(id,v11)||idle()||greetLine(id));
   // a converted person with no opener left (all answered) says their own idle line, not a generic hello
-  else if(v11&&!firstMeet) V.text=heard(talkRemark(id)||idle()||greetLine(id));
+  else if(v11&&!firstMeet) V.text=heard(talkRemark(id,v11)||idle()||greetLine(id));
   else V.text=heard(greetLine(id));
   V.again=()=>idle()||pick(['Mm?','Yes?']);
   return V;
