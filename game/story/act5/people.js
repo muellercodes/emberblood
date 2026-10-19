@@ -79,28 +79,6 @@ people({
     // Voice sheet: a smith. Short, practical, warm, teasing. Worry comes out as instructions, love as hugs and work. Never
     // "I'm proud of you", never speeches. Her one "Eat something" in Act V is in n_bridge's note, so none here.
     maren: [
-      // after the dawn: an ice dragon behind the forge (Glaciar flew everyone home, or came to Lantern Day)
-      { if: { all: ['flag n_dawn', { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }] }, fact: 'n5_moon=back',
-        say: ["There's an ice dragon snoring behind my forge. Every bucket of milk in the village has frozen solid.",
-          'An ice dragon snores behind my forge. The milk froze!'],
-        re: [
-          { t: ["That's Auntie Glee. She'll wake up hungry.", 'She will wake up hungry.'],
-            say: ["Then she can have the frozen milk. It's hers, really.", 'Then she can have the frozen milk.'] },
-          { t: ['Should I wake her up?', 'Should I wake her?'],
-            say: ["Let her sleep. She told me she's slept through too much already. I think this is the good kind.", 'Let her sleep. This is the good kind of sleep.'] },
-          { t: ['Can she stay for Lantern Day?', 'Can she stay?'], tone: 'kind', f: 0.5,
-            say: ["She's family. Family doesn't have to ask.", 'She is family. She does not have to ask.'] },
-        ] },
-      // after the dawn, the Heart given to the moon
-      { if: 'flag n_dawn choice n_end=embermoon', fact: 'n5_moon=back',
-        say: ['You gave our Heart to the moon. I mended it so it would keep somebody warm. I never thought it would be everybody.',
-          'You gave the Heart to the moon. Now it keeps everyone warm.'],
-        re: [
-          { t: ['Are you cross with me?', 'Are you cross?'],
-            say: ['Cross? It sat on a shelf in my forge for twenty years. Now I can see it from the door.', 'No. Now I can see it from the door.'] },
-          { t: ['Grandma Ember would have done it.', 'Grandma Ember would have.'],
-            say: ["She would. She'd have thrown it higher, too.", 'She would. Higher, too.'] },
-        ] },
       // after the dawn: home
       { if: 'flag n_dawn', fact: 'n5_moon=back',
         say: [['narr', 'Mom hugs you so hard your horns creak. Then she lets go, looks at you, and does it again.', 'Mom hugs you. Then she hugs you again.'],
@@ -112,6 +90,28 @@ people({
             say: ["Squashed, in the dark, halfway up a mountain? Good. That's the best way to eat a sandwich.", 'Squashed, in the dark? Best way to eat one.'] },
           { t: ["The Heart's back on its shelf.", 'The Heart is home.'], if: '!choice n_end=embermoon',
             say: ["Good. Now I can stop getting up at night to look at the shelf. I won't, though.", 'Good. I will still check it at night.'] },
+        ] },
+      // after the dawn, the Heart given to the moon
+      { if: 'flag n_dawn choice n_end=embermoon', fact: 'n5_moon=back',
+        say: ['You gave our Heart to the moon. I mended it so it would keep somebody warm. I never thought it would be everybody.',
+          'You gave the Heart to the moon. Now it keeps everyone warm.'],
+        re: [
+          { t: ['Are you cross with me?', 'Are you cross?'],
+            say: ['Cross? It sat on a shelf in my forge for twenty years. Now I can see it from the door.', 'No. Now I can see it from the door.'] },
+          { t: ['Grandma Ember would have done it.', 'Grandma Ember would have.'],
+            say: ["She would. She'd have thrown it higher, too.", 'She would. Higher, too.'] },
+        ] },
+      // after the dawn: an ice dragon behind the forge (Glaciar flew everyone home, or came to Lantern Day)
+      { if: { all: ['flag n_dawn', { any: ['flag n5_glaciar', 'choice f_glaciar=free'] }] }, fact: 'n5_moon=back',
+        say: ["There's an ice dragon snoring behind my forge. Every bucket of milk in the village has frozen solid.",
+          'An ice dragon snores behind my forge. The milk froze!'],
+        re: [
+          { t: ["That's Auntie Glee. She'll wake up hungry.", 'She will wake up hungry.'],
+            say: ["Then she can have the frozen milk. It's hers, really.", 'Then she can have the frozen milk.'] },
+          { t: ['Should I wake her up?', 'Should I wake her?'],
+            say: ["Let her sleep. She told me she's slept through too much already. I think this is the good kind.", 'Let her sleep. This is the good kind of sleep.'] },
+          { t: ['Can she stay for Lantern Day?', 'Can she stay?'], tone: 'kind', f: 0.5,
+            say: ["She's family. Family doesn't have to ask.", 'She is family. She does not have to ask.'] },
         ] },
       // after the dawn, the next day: her moment (the question she sat on all through the Long Night)
       { if: 'flag n_dawn', fact: 'n5_moon=back',
