@@ -169,8 +169,26 @@ function finalChoice(){
   const kind=Object.values(G.choices).filter(v=>v==='free'||v==='forgive'||v==='home').length, pages=Object.keys(G.pages).length;
   const canLantern=pages>=5&&kind>=2&&G.pages.p9;
   const pickEnd=k=>()=>{ G.choices.ending=k; };
+  // what the locked lantern ending still needs: five Wardens' pages, Ember's letter (p9) and two kind choices
+  const lanternLockedText=(pages,kind,letter)=>{
+    const L=typeof STORY!=='undefined'&&STORY.lanternLocked;
+    try{
+      if(typeof L==='function'){ const v=L({pages,kind,letter}); if(v) return v; }
+      else if(Array.isArray(L)&&L.length){ const f=s=>String(s==null?'':s).replace(/\{pages\}/g,pages).replace(/\{kind\}/g,kind); return S(f(L[0]),f(L[1]==null?L[0]:L[1])); }
+    }catch(e){ console.error(e); }
+    const need=[];
+    if(pages<5) need.push([`five of the Wardens' pages (you have ${pages})`,`5 pages (you have ${pages})`]);
+    if(!letter) need.push([`Ember's own letter`,`Ember's letter`]);
+    if(kind<2) need.push([`two kind choices on the road here (you made ${kind})`,`2 kind choices (you made ${kind})`]);
+    const join=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+    return S(`Not yet. Ember's way needs more of her story: ${join(need.map(x=>x[0]))}.`,`Not yet. It needs ${join(need.map(x=>x[1]))}.`);
+  };
   const opts=[{t:'End it. For the valley.',fn:pickEnd('hero')},{t:'Bind him again, forever. Become the Sixth Warden.',fn:pickEnd('warden')},{t:'Take his fire for yourself.',fn:pickEnd('heir')}];
+  // (v11) the kind ending always shows: when it is not earned yet it is greyed, and picking it says what it needs
+  // (as Act II's kneel does). STORY.lanternLocked (a1d_story.js) may give the words: a function ({pages,kind,letter})
+  // or [full, simple] with {pages} and {kind} in them.
   if(canLantern) opts.splice(1,0,{t:'Light a lantern for him, like Ember did.',fn:pickEnd('lantern')});
+  else opts.splice(1,0,{t:'Light a lantern for him, like Ember did.  🔒',tone:'locked',then:()=>[['narr',lanternLockedText(pages,kind,!!G.pages.p9)]],back:true});
   const lines=[['vor',`Impossible... the fire... it chose you...`],['narr',`The First Flame flickers on the mountaintop, small and tired. For the first time in a thousand years, it's your move.`]];
   if(!canLantern&&pages>=3) lines.push(['narr',`You remember something from the Wardens' pages. Something about lanterns. You can't quite put it together.`]);
   lines.push(ch('ash',`What will you do?`,opts));
