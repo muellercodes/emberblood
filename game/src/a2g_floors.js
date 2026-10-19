@@ -130,18 +130,35 @@ function goFloor(o){
 // pushing into them. The stairs he arrives by wait until he has stepped away from them, so he never bounces back.
 function floorStairsWalk(push){
   const A=AREA, p=player; if(!A||!p) return false;
+  // the push that just took him up or down does not carry him on up the next flight in line (held up through the
+  // library's stairs, he went straight on up the archive's secret ones): no stairs take him again until he lets go or turns
+  const L=DW.latch; if(L&&(L.a!==A.id||!push||push.x*L.x+push.y*L.y<0.7)) DW.latch=null;
+  const latched=!!DW.latch;
   for(const o of A.objs){
     if(o.k!=='stairs'||(o.hidden&&!G.found[o.hidden])) continue;
     const hw=(o.w||64)/2, hh=(o.h||56)/2, nx=clamp(p.x,o.x-hw,o.x+hw), ny=clamp(p.y,o.y-hh,o.y+hh), dx=nx-p.x, dy=ny-p.y, d=Math.hypot(dx,dy);
     const touch=d<=(p.r||14)+5;
     if(DW.hold===o){ if(DW.holdT>0||touch) continue; DW.hold=null; }
-    if(!touch||!push) continue;
+    if(latched||!touch||!push) continue;
     if(d>0.5&&(push.x*dx+push.y*dy)/d<0.35) continue;
+    // (and the way he pushes, from where he stands, runs into the flight: walking along its edge past a corner, from
+    //  the crate to the note in Pebble's loft, brushed the corner and took him downstairs)
+    if(d>0.5&&!stairRayHits(p.x,p.y,push.x,push.y,d+16,o.x-hw,o.y-hh,o.x+hw,o.y+hh)) continue;
     goFloor(o);
-    if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; G.prompt=null; }
+    if(AREA&&AREA!==A){ DW.hold=AREA.objs.find(q=>q.k==='stairs'&&q.to===A.id)||null; DW.holdT=0.5; DW.latch={x:push.x,y:push.y,a:AREA.id}; G.prompt=null; }
     return true;
   }
   return false;
+}
+// does the ray from (x,y) along (ux,uy) meet the box within len? (slabs)
+function stairRayHits(x,y,ux,uy,len,x0,y0,x1,y1){
+  let t0=0, t1=len;
+  for(const [p,d,lo,hi] of [[x,ux,x0,x1],[y,uy,y0,y1]]){
+    if(Math.abs(d)<1e-6){ if(p<lo||p>hi) return false; continue; }
+    let a=(lo-p)/d, b=(hi-p)/d; if(a>b){ const s=a; a=b; b=s; }
+    t0=Math.max(t0,a); t1=Math.min(t1,b); if(t0>t1) return false;
+  }
+  return true;
 }
 function revealTrig(o){
   if(G.found[o.key]){ return false; }

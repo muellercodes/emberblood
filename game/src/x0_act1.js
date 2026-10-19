@@ -1555,7 +1555,8 @@ const A1WALL={
   sign:[2925,10084], th:10, gap:24, pieces:[], cols:[], H:[46,51,44,49,47,52], C:['#8a5a34','#7c5030','#93623a','#80542f','#8e5c36','#7a4f2e']
 };
 { const base=initWorld; initWorld=function(){ base(); try{ a1WallBuild(); }catch(e){ console.error('a1 wall',e); } }; }
-function a1WallPiece(x,y,draw){ A1WALL.pieces.push({x,y,draw}); }
+// (hx: how far the piece reaches each side of cx, for the see-through fade when Ash walks behind it; 0 never fades)
+function a1WallPiece(x,y,draw,hx,cx){ A1WALL.pieces.push({x,y,draw,hx:hx||0,cx:cx==null?x:cx}); }
 function a1WallCol(c){ A1WALL.cols.push(c); return addCol(c); }
 function a1WallBuild(){
   const A=A1WALL, P=A.pts; A.pieces.length=0; let v=0;
@@ -1566,7 +1567,7 @@ function a1WallBuild(){
     let t0=i===0?17:0; const tEnd=i===P.length-2?L-17:L;
     for(const [c0,c1] of cuts){ a1WallRun(ax,ay,ux,uy,t0,c0,v); v+=5; t0=c1; }
     a1WallRun(ax,ay,ux,uy,t0,tEnd,v); v+=5;
-    if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay)); REACH.clear.push({x:ax,y:ay,r:60}); }
+    if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay),20); REACH.clear.push({x:ax,y:ay,r:60}); }
   }
   for(const g of A.gates) a1WallGate(g);
   // the Bramble Pond sign steps out of the Pond Gate's way, to the side of the path down to the water
@@ -1583,7 +1584,7 @@ function a1WallRun(ax,ay,ux,uy,t0,t1,v){
   // six stakes to a bay along an east-west run, three on the steep sides, so they sort well with Ash walking by
   const n=Math.max(1,Math.round(L/7.33)), st=L/n, per=Math.abs(ux)>0.8?6:3, ang=Math.atan2(uy,ux);
   for(let k=0;k<n;k+=per){ const m=Math.min(per,n-k), bx=x0+ux*st*(k+0.5), by=y0+uy*st*(k+0.5), vr=(v+k/per)%6|0, key='a1w_bay_'+ang.toFixed(3)+'_'+st.toFixed(2)+'_'+m+'_'+vr;
-    a1WallPiece(bx,Math.max(by,by+uy*st*(m-1)),()=>a1Put(A1SPR.get((LOOK.sb?'s:':'c:')+key)||a1BaySpr(ang,st,m,vr,key),bx,by)); }
+    a1WallPiece(bx,Math.max(by,by+uy*st*(m-1)),()=>a1Put(A1SPR.get((LOOK.sb?'s:':'c:')+key)||a1BaySpr(ang,st,m,vr,key),bx,by),Math.abs(ux)*st*(m-1)/2+10,bx+ux*st*(m-1)/2); }
 }
 // a bay of stakes along any direction: a stone footing, pointed logs back to front, two rails where the run is wide
 // enough on screen to show them (the north run's sprite, a1PalSpr, is this same palisade seen square on)
@@ -1610,14 +1611,14 @@ function a1WallGate(g){
   const posts=[[g.x-g.ux*d,g.y-g.uy*d],[g.x+g.ux*d,g.y+g.uy*d]];
   for(const [x,y] of posts) a1WallCol({t:'c',x,y,r:14});
   REACH.clear.push({x:g.x,y:g.y+10,r:g.hw+70});
-  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y)); return; }
+  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y),g.hw+28); return; }
   // a side gate on a north-south run: two posts, the doors standing open against the inside of the wall, and the
   // gate's name on a board on top of the south post, where you can read it
   const [N,Sp]=posts[0][1]<posts[1][1]?posts:[posts[1],posts[0]], inw=Math.sign(V.x-g.x)||1;
-  a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]));
+  a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]),18);
   a1WallPiece(N[0],N[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),N[0],N[1]+2));
   a1WallPiece(Sp[0],Sp[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),Sp[0],Sp[1]+2));
-  a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]));
+  a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]),18);
 }
 function a1SidePostSpr(g,south){
   return a1Spr('a1w_post_'+g.id+'_'+south,130,130,65,118,gg=>{
@@ -1633,6 +1634,9 @@ function a1SideDoorSpr(hw,inw){ return a1Spr('a1w_door_'+hw+'_'+inw,hw*2+40,70,h
   g.fillStyle='rgba(40,26,14,.22)'; g.fillRect(x+2,-1,hw,6);
   a1DoorFace(g,x,hw,48,'#6e4a2c'); g.fillStyle='rgba(255,224,170,.2)'; g.fillRect(x,-48,hw,2);
 }); }
-// draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode)
-{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; list.push({x:q.x,y:q.y,draw:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
+// draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode).
+// A piece in front of Ash (he is just north of it, inside the south wall) is drawn see-through, as roofs are, so the
+// logs never hide him: along the south run he was gone behind them.
+function a1WallFade(q){ const p=player; if(!q.hx||!p||p.dead) return 1; const dy=q.y-p.y; return dy>2&&dy<64&&Math.abs(p.x-q.cx)<q.hx+12?0.42:1; }
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; const a=a1WallFade(q); list.push({x:q.x,y:q.y,draw:a<1?()=>{ ctx.save(); ctx.globalAlpha*=a; try{ q.draw(); } finally { ctx.restore(); } }:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
 window.__ebA1.wall.A1WALL=A1WALL; window.__ebA1.wall.off=on=>{ for(const c of A1WALL.cols) c.off=!!on; return A1WALL.cols.length; };
