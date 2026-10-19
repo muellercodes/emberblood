@@ -21,7 +21,7 @@ const CH_SW=[
   ['fast','Fast feet','Ash moves about 1.6 times as fast.'],
   ['wings','Wings anywhere','Ash can fly before he has earned his wings. Only while this is on, never saved.'],
   ['peace','Peaceful','Foes do not notice or attack Ash. Bosses still fight.'],
-  ['tp','Map teleport','Click a spot on the big map (M) to go there. Only places Ash has seen, never past a shut gate, never in a boss fight.']];
+  ['tp','Map teleport','Click a spot on the big map (M) to go there. Never past a gate the story has not opened, never in a boss fight.']];
 const CH_TOD=[['Morning',0.3],['Noon',0.5],['Evening',0.74],['Night',0.92]];
 const chBlocked=()=>!!(typeof Cloud!=='undefined'&&Cloud&&Cloud.viewing);
 const chOn=k=>!!CHT.on[k]&&!chBlocked();
@@ -75,7 +75,7 @@ function chCss(){
 #cheatSec .chbtns{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
 #cheatSec .chbtns .btn{width:auto;flex:none;padding:7px 11px;font-size:13px}
 #cheatSec .btn:disabled{opacity:.45;cursor:default}
-#cheatChip{position:fixed;z-index:6;top:max(10px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);padding:3px 10px 4px;border-radius:999px;
+#cheatChip{position:fixed;z-index:6;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));padding:3px 10px 4px;border-radius:999px;
   font:700 11px/1.2 ${UIF};letter-spacing:.06em;text-transform:uppercase;color:#ffe6b8;background:rgba(120,30,16,.82);border:1px solid rgba(255,170,90,.6);
   pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 @media (max-width:899px),(hover:none){#cheatChip{display:none!important}}`;
@@ -137,10 +137,11 @@ function chAct(a){
   else return;
   chMark(); if(story) saveGame();
 }
-// ---------- the chip in the HUD corner (desktop sizes only; the CSS hides it on narrow and touch screens)
+// ---------- the chip in the bottom right corner of the HUD (desktop sizes only; the CSS hides it on narrow and touch
+// screens). That corner is free on a desktop: the boss bar is centred, the minimap and buttons are at the top.
 function chChip(){
   let c=CHT.chip;
-  const want=chAny()&&!chBlocked()&&!!G&&scene!=='menu'&&!usingTouch;
+  const want=chAny()&&!chBlocked()&&!!G&&scene==='play'&&!usingTouch;   // over the game only, never over a menu
   if(!want){ if(c) c.hidden=true; return; }
   if(!c){ chCss(); c=document.createElement('div'); c.id='cheatChip'; c.textContent='Cheats on'; c.setAttribute('aria-hidden','true'); document.body.appendChild(c); CHT.chip=c; }
   c.hidden=false;
@@ -154,12 +155,14 @@ function chTpWhy(V,x,y){
   if(V==null||V<0||!MAPS[V]) return 'Teleport works on the world maps, not the dungeon page.';
   if(!mapsSeenList().includes(V)) return 'Ash has not found this map yet.';
   const M=MAPS[V]; if(x<40||x>M.w-40||y<M.y0+40||y>M.y0+M.h-40) return 'That is off the map.';
-  if(!fogSeen(V,x,y)) return 'Ash has not been there yet. Teleport goes only to the clear parts of the map.';
   return null;
 }
+// what the story has not opened yet: a closed gate's nook (e10c_gates), north of the Obsidian Gate before it opens, and on
+// Nightfall Peak (map 4, walled rings climbed in order) anywhere Ash has not been yet (the dark fog on the map)
+const CH_FOGMAPS=[4];
 function chTpBlocked(V,x,y){
   if(V===0&&y<WALL_Y+70&&!(G.flags&&G.flags.gate)) return 'The Obsidian Gate is still shut.';
-  if(!fogSeen(V,x,y)) return 'Ash has not been there yet. Teleport goes only to the clear parts of the map.';
+  if(CH_FOGMAPS.includes(V)&&!fogSeen(V,x,y)) return 'On this map, teleport goes only where Ash has already been (the clear parts).';
   try{ if(typeof GT!=='undefined'&&GT&&GT.list) for(const g of GT.list){ if(g.map!=null&&g.map!==V) continue; if(gateIsOpen(g.id)) continue; if(gateInside(g.id,x,y)||dist(x,y,g.x,g.y)<(g.r||0)+30) return 'That is past a gate the story has not opened.'; } }catch(e){}
   return null;
 }
@@ -264,10 +267,12 @@ function chInit(){
   { const base=loadGame; loadGame=function(s){ const r=base.apply(this,arguments); try{ if(G) G.cheated=!!(s&&s.cheated); }catch(e){} return r; }; }
   // Settings shows the switches as they are; the map says how to teleport
   { const base=openSettings; openSettings=function(){ const r=base.apply(this,arguments); try{ CHT.buf=''; chSync(); }catch(e){} return r; }; }
-  { const base=mapHintSet; mapHintSet=function(){ const r=base.apply(this,arguments); try{ if(chOn('tp')){ const h=document.getElementById('mapHint'); if(h) h.textContent='Teleport is on: click any clear spot on the map to go there.'; } }catch(e){} return r; }; }
+  { const base=mapHintSet; mapHintSet=function(){ const r=base.apply(this,arguments); try{ if(chOn('tp')){ const h=document.getElementById('mapHint'); if(h) h.textContent='Teleport is on: click a spot on the map to go there.'; } }catch(e){} return r; }; }
   setInterval(()=>{ try{ if(chBlocked()&&(chAny()||CHT.open)){ chAllOff(); chSync(); } chChip(); if(CHT.tpMsgT&&performance.now()-CHT.tpMsgT>3500){ CHT.tpMsgT=0; if(scene==='map') mapHintSet(); } }catch(e){} },400);
 }
 Promise.resolve().then(()=>{ try{ chInit(); }catch(e){ console.error('cheats',e); } });
 // test hooks: read-only state (switches are only set from the Settings screen)
 window.__ebDbg=Object.assign(window.__ebDbg||{},{cheats:()=>({open:CHT.open,on:Object.assign({},CHT.on),cheated:!!(G&&G.cheated),word:CHEAT_WORD,god:!!(window.__eb&&window.__eb.god)}),
-  chTp:(V,x,y)=>{ const w=chTpWhy(V,x,y)||chTpBlocked(V,x,y); return w||'ok'; }, chFloor:e=>chBossFloor(e)});
+  chTp:(V,x,y)=>{ const w=chTpWhy(V,x,y)||chTpBlocked(V,x,y); return w||'ok'; }, chFloor:e=>chBossFloor(e),
+  chMap:()=>({view:MAPUI.view,maps:MAPS.map(M=>M?{w:M.w,h:M.h,y0:M.y0}:null)}),
+  chMapPt:(x,y)=>{ const F=mapFit(MAPUI.view), r=mapCv.getBoundingClientRect(); return {x:r.left+(F.ox+x*F.s)/mapCv.width*r.width,y:r.top+(F.oy+(y-F.y0)*F.s)/mapCv.height*r.height}; }});
