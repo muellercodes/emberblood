@@ -465,7 +465,7 @@ m3sDef('m_hush_out',[
 // the Final Chapter, the Ember Heart (6.12): in room q, the Eclipse Lens
 m3sDef('m_reforge',[
   xl('narr',`At the very top of the Observatory, under the great dome, lies the Eclipse Lens: a disc of moon-glass as big as a pond, set in brass, pointing at the sky.`,`At the top lies the Eclipse Lens: a disc of moon-glass as big as a pond.`),
-  xl('iska',`This is where Lumen watched the moon. And this, little ember, is where your Heart gets mended. You'll need a blacksmith, though.`,`Here your Heart gets fixed. You'll need a blacksmith, though.`),
+  xl('iska',`This is where Lumen watched the moon. And this, Ash, is where your Heart gets mended. You'll need a blacksmith, though.`,`Here your Heart gets fixed. You'll need a blacksmith, though.`),
   m3sAct(`Footsteps on the stairs. Lots of footsteps. And puffing. A lot of puffing.`,`Footsteps on the stairs. And lots of puffing.`,()=>m3sMomIn()),
   xl('maren',`Ash? ASH! Oh, thank goodness. Those stairs are made of MOONLIGHT. Do you know how hard it is to climb moonlight with a hammer?`,`Ash? ASH! Those stairs are made of MOONLIGHT. It's hard to climb moonlight with a hammer!`),
   xdo(()=>{ G.flags.m_maren=1; G.flags.m_dell_away=0; G.flags.m_dell_pier=1; }),
@@ -476,7 +476,7 @@ m3sDef('m_reforge',[
   xl('quill',`(arriving last, behind a telescope bigger than she is) The Eclipse Observatory! My old teacher, Professor Lumley, was its very last astronomer. I always meant to visit. The end of the world seemed like a good excuse.`,`(with a huge telescope) The Eclipse Observatory! My old teacher worked here. The end of the world is a good reason to visit.`),
   xl('maren',`Right. Shards. Show me.`,`Right. Shards. Show me.`),
   xl('narr',`You tip the three Shards out of your satchel: violet, ice-blue and silver. Mom turns each one over in her fingers, the way she checks a horseshoe.`,`You tip out the three Shards: violet, ice-blue and silver. Mom checks each one.`),
-  xl('maren',`I'm a blacksmith. It's a broken stone. This is literally my job.`,`I'm a blacksmith. It's a broken stone. This is my job.`),
+  xl('maren',`Hand them here. Broken things come into my forge every day, and not one of them leaves broken.`,`Give them here. I fix broken things.`),
   xl('maren',`Here's how. Set them on the Lens. You breathe, the hottest breath you've got, then the coolest. I hammer. Three times. Gently. GENTLY. Like Bertram's oven.`,`Set them on the Lens. You breathe hot, then cool. I hammer three times. GENTLY.`),
   xl('narr',`You set the three Shards on the Lens. They slide together and almost fit, like a puzzle whose edges have been worn soft.`,`You set the Shards on the Lens. They almost fit, like a puzzle.`),
   xl('narr',`You breathe Blaze into the Lens, blue and hot. Then Moonfire, silver and cool. The Lens catches the last of the eclipse light and throws it all back a hundred times brighter.`,`You breathe hot Blaze, then cool Moonfire. The Lens shines a hundred times brighter.`),
@@ -504,7 +504,7 @@ m3sDef('m_peak',[
   m3sAct(`And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.`,`A black mountain rises out of the sea.`,()=>m3sPeak('rise')),
   xl('nyxara',`Come up, little ember. Bring your heart.`,`Come up, little ember. Bring your heart.`),
   m3sAct(`The mountain stands in the dark sea, sharp as a broken bottle, with violet lightning crawling up its sides. At the top, where the moon should be, hangs a broken ring of cold light.`,`The mountain is sharp like broken glass. Purple lightning crawls up it. A broken ring of light hangs at the top.`,()=>m3sEcl('gone')),
-  xl('ash',`It looks like... Cinder Mountain? And a clock tower? And SNOW? It's every place I've ever been, all squashed together.`,`It looks like Cinder Mountain! And a clock tower! And SNOW! Every place I've been, squashed together.`),
+  xl('ash',`It looks like... Cinder Mountain? And a clock tower? And snow? It's every place I've ever been, all squashed together.`,`It looks like Cinder Mountain! And a clock tower! And snow! Every place I've been, squashed together.`),
   xl('quill',`Fascinating. Terrifying. Mostly fascinating. I need to measure it.`,`Amazing. Scary. Mostly amazing. I must measure it.`),
   m3sAct(`Then the Heart in your satchel grows warm. At the end of the old Moon Pier, a bridge of silver fire unrolls across the dark sea, all the way to the black mountain.`,`The Heart grows warm. At the end of the pier, a bridge of silver fire rolls out to the black mountain.`,()=>m3sPeak('bridge')),
   xl('maren',`...You're going up there.`,`You're going up there.`),
@@ -518,7 +518,7 @@ m3sDef('m_peak',[
   xdo(()=>{ G.flags.m_done=1; G.tod=0.02; })
 ]);
 // on the pier afterwards: Mom (and the star-iron, the Fallen Star secret)
-STORY.m_pier_mom=[xl('maren',`Eat something first. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Eat something first. The bridge will wait.`)];
+STORY.m_pier_mom=[xl('maren',`Sit down a minute. Have a sandwich. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Have a sandwich first. The bridge will wait.`)];
 STORY.m_stariron=[
   xl('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Give it here. Your sword will never be the same!`),
   xl('narr',`CLANG. CLANG. Mom folds the star-iron into your blade. It hums like a struck bell.`,`CLANG! Mom puts the star-iron in your sword. It hums.`),

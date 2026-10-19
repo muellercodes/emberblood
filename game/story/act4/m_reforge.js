@@ -2,8 +2,10 @@
 // What the player does: through the next door from Hush's dome, at the Eclipse Lens, Mom comes puffing up the
 // moonlight stairs with her hammer (and Professor Quill behind a telescope). Short and strong, in three pieces:
 // m_reforge (Mom, at most 10 lines), the three taps (x3_story's forge game, `emit m4fx:forge`: see CHANGES.md), and
-// m_reforge2 (TING TING TING, the Heart, Nyxara's far voice: at most 6). Ash says what the player worked out in the
-// Mirror Temple (why_three): she WANTS it whole, so it can burn black; Mom: "Then we keep it warm." Then everyone runs
+// m_reforge2 (TING TING TING, the Heart, Nyxara's far voice: at most 6). v11: the act's real choice, before the taps,
+// even though it cannot branch: Ash: "She wants it whole." Mom: "And I want it whole. It's ours." Iska: "Then mend it
+// and never hand it over. A heart handed over in fear burns black." Ash: "Then I won't hand it over." (the finale tests
+// exactly that sentence). After the taps Ash buckles the Heart into his satchel, and Mom's hand stays on the buckle. Then everyone runs
 // down to the Moon Pier at the Edge of the World for the last bite of the moon and the black mountain (m_peak, at most
 // 10, one "Not alone" line). Walking out to the end of the pier, where the moonfire bridge begins, shows the act's end
 // card; "Continue the story" starts the finale at n_bridge (resting does too, if Ash keeps exploring first).
@@ -73,14 +75,18 @@ chapter({
       ['narr', 'Through the door lies the Eclipse Lens: a disc of moon-glass as big as a pond, set in brass, pointing at the sky. Then footsteps on the stairs. And puffing. A lot of puffing.',
                'Here is the Eclipse Lens, big as a pond. Then: footsteps, and puffing.', { do: ['emit m4fx:mom_in'] }],
       { place: ['maren', [22060, 1580]] }, { place: ['quill', [22330, 1600]] },
-      ['maren', 'Ash? ASH! Those stairs are made of MOONLIGHT. Do you know how hard it is to climb moonlight with a hammer?', 'Ash! Those stairs are MOONLIGHT. Try climbing that with a hammer!'],
+      ['maren', '(out of breath) Ash? Ash! Those stairs are made of moonlight. Do you know how hard it is to climb moonlight with a hammer?', '(out of breath) Ash! Those stairs are moonlight. Try climbing that with a hammer!'],
       ['ash', 'MOM?!', 'MOM?!'],
-      ['narr', 'Mom drops the hammer and hugs you. Then she holds you at arm\'s length and looks at you. Then she hugs you again.', 'Mom drops her hammer and hugs you. Twice.'],
-      ['maren', "Dell's boat is faster than it looks. He's down at the old pier with the sandwiches. And Professor Quill would not stay home.", 'Dell is at the pier with sandwiches. Quill came too.'],
-      ['quill', '(arriving last, behind a telescope bigger than she is) The Eclipse Observatory! My old teacher, Professor Lumley, worked here. I always meant to visit.', '(with a huge telescope) The Observatory! My old teacher worked here.'],
+      ['narr', "Mom drops the hammer and hugs you. Then she holds you at arm's length and looks at you. Then she hugs you again. Behind her, Professor Quill puffs up the last step behind a telescope bigger than she is.",
+               'Mom drops her hammer and hugs you. Twice. Professor Quill puffs up behind her.'],
       ['narr', 'You tip the three Shards out of your satchel: violet, ice-blue and silver. Mom turns each one over, the way she checks a horseshoe.', 'You tip out the three Shards. Mom checks each one.'],
-      ['maren', "I'm a blacksmith. It's a broken stone. This is literally my job.", "I'm a blacksmith. It's a broken stone. This is my job."],
-      ['maren', 'You breathe, the hottest you have, then the coolest. I hammer. Three taps. Gently. Wait for the rings to meet.', 'You breathe hot, then cool. I tap three times. Gently!', { do: ['emit m4fx:forge'] }],
+      // the act's real choice, even though it cannot branch (STORY_PLAN 3.4)
+      ['ash', 'She wants it whole.', 'She wants it whole.'],
+      ['maren', "And I want it whole. It's ours.", "And I want it whole. It's ours."],
+      ['iska', 'Then mend it and never hand it over. A heart handed over in fear burns black.', 'Mend it, and never hand it over. Given in fear, it burns black.'],
+      ['ash', "Then I won't hand it over.", "Then I won't hand it over."],
+      ['maren', 'Hand them here. Broken things come into my forge every day, and not one of them leaves broken. You breathe, hottest then coolest. I tap. Three taps.',
+                'Give them here. I fix broken things. You breathe. I tap three times.', { do: ['emit m4fx:forge'] }],
     ],
     // after the taps: at most 6 lines. The why_three payoff: the player saw this coming.
     m_reforge2: [
@@ -93,12 +99,12 @@ chapter({
                  { if: '!flag m_reforge_xp', then: ['set m_reforge_xp', 'xp 1000'] }] }],
       ['ash', "The Ember Heart. It's whole again.", "The Ember Heart. It's whole again."],
       { if: 'choice m_deal=ask', then: [
-        ['nyxara', '(from very far away) You asked me why, little ember. Now you will see. A whole heart can burn.', '(far away) You asked me why. Now you will see.'] ],
+        ['nyxara', '(from very far away) Whole. You asked me why, once, little ember. At the end, you will understand.', '(far away) Whole. At the end, you will understand.'] ],
         else: [
-        ['nyxara', "(from very far away) Yes. Make it whole. A cracked heart can't burn, little ember. A whole one can.", '(far away) Yes. Make it whole. A whole heart can burn.'] ] },
-      ['ash', 'She WANTS it whole. So it can burn black. I knew it.', 'She WANTS it whole, to burn black. I knew it.'],
-      ['maren', 'Then we keep it warm, and we keep it ours. Outside, all of us. Down to the pier.', 'Then we keep it warm. And ours. Outside, everyone!'],
-      { if: 'flag pip', then: [['pip', 'Mip. (Pip curls up on the warm Heart and falls asleep at once, glowing a little.)', 'Mip. (Pip falls asleep on the warm Heart.)']] },
+        ['nyxara', '(from very far away) Whole at last. Keep it warm for me, little ember.', '(far away) Whole at last. Keep it warm for me.'] ] },
+      ['narr', 'You put the Heart in your satchel and buckle it shut. Mom puts her hand over the buckle, and leaves it there.', 'You buckle the Heart into your satchel. Mom keeps her hand on the buckle.'],
+      { if: 'flag pip', then: [['pip', 'Mip. (Pip curls up on your warm satchel and falls asleep at once, glowing a little.)', 'Mip. (Pip falls asleep on the warm satchel.)']] },
+      ['maren', 'Outside, all of us. Down to the pier. If something is coming out of that sea, I want to see it.', 'Outside, everyone! Down to the pier!'],
     ],
     // the last bite and the black mountain, on the Moon Pier: at most 10 lines a branch, one "Not alone" line
     m_peak: [
@@ -109,7 +115,7 @@ chapter({
                { do: ['emit m4fx:ecl:bite:0', 'moon 0', 'set m_eclipse3'] }],
       ['narr', 'And out of the sea, with a sound like a thousand moths taking off, rises a mountain of black glass.', 'A black mountain rises out of the sea.', { do: ['emit m4fx:peak:rise', 'emit m4fx:ecl:gone', 'set m4_peak_up'] }],
       ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
-      ['ash', "It looks like... Cinder Mountain? And a clock tower? And SNOW? It's every place I've ever been, all squashed together.", 'It looks like Cinder Mountain! And a clock tower! And SNOW!'],
+      ['ash', "It looks like... Cinder Mountain? And a clock tower? And snow? It's every place I've ever been, all squashed together.", 'It looks like Cinder Mountain! And a clock tower! And snow!'],
       { if: 'choice m_hush=free', then: [
         ['narr', 'The Heart grows warm. A bridge of silver fire unrolls from the end of the pier, all the way to the mountain. Far off over the dark sea, a small white light glows once, softly.',
                  'The Heart grows warm. A bridge of fire rolls out to the mountain. Far away, a small white light glows.', { do: ['emit m4fx:peak:bridge', 'set m4_bridge_lit'] }] ],
