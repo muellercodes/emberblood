@@ -1896,7 +1896,7 @@ c1Lines('c_shadowash','c_shadowash','c_shadowash_won',
    ['c_shadow',S('That is MY line!','That is MY line!')]],
   [['narr',S('The shadow you flickers in the gold light, shrinks, and slides back into the floor. For a second the mirror shows just you again. You look tired. And brave.','The shadow you shrinks back into the floor. The mirror shows just you. Tired. Brave.')],
    ['ash',S('I am NOT that annoying.','I am NOT that annoying.')]]);
-const C1SHT=[S('Great-great-great-great...','Great-great-great...'),S('Mip!','Mip!'),S('I can be a frog. I can be the best frog.','I can be the best frog.')];
+const C1SHT=[S('Gentle breaths. Gentle breaths...','Gentle breaths...'),S('Mip!','Mip!'),S('I can be a frog. I can be the best frog.','I can be the best frog.')];
 FZK.c1rang={
   tick(z,dt){ const p=player, e=z.owner; if(!e||e.dead){ z.done=true; return; } z.spin=(z.spin||0)+dt*18;
     if(!z.back){ z.x+=Math.cos(z.a)*z.sp*dt; z.y+=Math.sin(z.a)*z.sp*dt; z.d+=z.sp*dt; if(z.d>=z.max||c1Solid(z.x,z.y)) { z.back=true; z.hit=false; } }
