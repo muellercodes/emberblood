@@ -68,7 +68,7 @@ quest({
         else: [
         ['ash', "Ember's auntie? Then who WAS the Snow Mother? And where did she go?", "Ember's auntie? Who was she?"]] },
       { if: { any: ['flag f3_auntie_glee', 'flag f3_tove_seen'] }, then: [
-        ['tove', 'Auntie Glee. Her laugh was like wind chimes. How did I ever forget?', 'Auntie Glee! Her laugh was like chimes!']] },
+        ['tove', 'Auntie Glee. Her laugh was like wind chimes. ...Sing the rest, Ash. I know how it ends.', 'Auntie Glee. Sing the rest, Ash.']] },
       { if: '!flag f3_iska_open', then: [
         ['f_eider', "Wait. WAIT. Wren's lost page! The eleventh one! It was stuck to the back of a frost pudding recipe. Very old jam.",
           "Wait! Wren's lost page! It was stuck to a pudding recipe!"],

@@ -38,8 +38,8 @@ quest({
 
   scene: {
     fg_offer: [
-      ['f_gunnhild', 'My forge went cold the night the moth came. A smith without a fire is just a person holding a hammer.',
-        'My forge went cold. A smith with no fire just holds a hammer.'],
+      ['f_gunnhild', 'My forge went cold the night the moth came. I still come in every morning and pick up the hammer. Habit.',
+        'My forge went cold. I still pick up the hammer.'],
       { if: 'power whip', then: [
         ['f_gunnhild', "Is that a chain whip? Gearhaven brass. Ingrid's grip. Good links. I could make it better.", 'A chain whip! I could make it better.']],
         else: [
