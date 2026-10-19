@@ -489,7 +489,7 @@ Object.assign(EVPORT,{
     thrFaceMoth(g,{wing:'#8a7aaa',wing2:'#5c4c7c',eye:'#ece6ff',iris:'#8a62d8',fur:'#b8aad8',fur2:'#e2daf4',eyes:'#241640',ant:'#d8ccf0',smile:true}); }},
   pebble:{bg:'#24283a',f:g=>{ g.save(); g.translate(0,-10); g.scale(3.6,3.6); drawCrowAt(g,0,2,0.5,true); g.restore(); }},
   grandpa:{bg:'#3a1810',f:g=>{ const P=EVPORT.c_grandpa; if(P&&P.f) P.f(g); else faceDragon(g,{skin:'#c8482a',dark:'#7a2412',snout:'#e8784a',horn:'#fff0d4',eye:'#ffcf4a',k:0.78});
-    if(G&&G.choices&&G.choices.ending==='heir'){ g.strokeStyle='#d8b060'; g.lineWidth=3; for(let x=-72;x<=72;x+=24){ g.beginPath(); g.moveTo(x,-96); g.lineTo(x,74); g.stroke(); } g.beginPath(); g.ellipse(0,-96,78,10,0,0,TAU); g.stroke(); } }}
+ }}
 });
 if(!EVPORT.f_hush) EVPORT.f_hush={bg:'#1c1a30',f:g=>thrFaceMoth(g,{wing:'#f4f2fa',wing2:'#d4d0e6',eye:'#b890f0',iris:'#6a3ac8',fur:'#ffffff',fur2:'#e8e4f6',eyes:'#3a2a5a',ant:'#f0ecff',leash:thrHushLeashed()})};
 
