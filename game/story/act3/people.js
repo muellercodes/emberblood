@@ -606,7 +606,7 @@ people({
         ] },
       // her moment (the old chat): when he comes in cold from the sea cliffs
       { if: 'stage>=f_thaw',
-        say: ["You've come in blue at the edges, lamb. Sit by the fire. What's your favourite soup? I'll make it.", "You're blue! Sit. What's your favourite soup?"],
+        say: ["You've come in blue at the edges, lamb. Sit by the fire. What's your favorite soup? I'll make it.", "You're blue! Sit. What's your favorite soup?"],
         re: [
           { t: ['Whatever Mom makes.', 'Whatever Mom makes.'], tone: 'kind', f: 1,
             say: [['f_hilde', 'The right answer. Every child\'s mother makes the best soup. It\'s a rule, up here.', 'Right answer. Mom\'s soup is always best.']] },
@@ -1015,14 +1015,14 @@ people({
         ] },
       // her moment: the scarf she knits every child of Rimeholm
       { if: 'flag f_ylva',
-        say: ["You've my long scarf, dear, but that one was for the mountain. Every child of Rimeholm gets a proper one from me. What colour?", 'Every child here gets a scarf from me. What colour?'],
+        say: ["You've my long scarf, dear, but that one was for the mountain. Every child of Rimeholm gets a proper one from me. What color?", 'Every child here gets a scarf from me. What color?'],
         re: [
           { t: ['Red, like the yarn on the tower.', 'Red, like your yarn.'], f: 0.75,
             say: [['f_ylva', 'Red it is. Long, too. You\'ve a long tail.', 'Red it is. Long. You have a long tail.']] },
           { t: ['Blue. Like my new fire.', 'Blue, like my fire.'], if: 'power blaze', f: 0.5,
             say: [['f_ylva', 'Blue. Bold. I like a bold child. It will take longer. Blue wool is shy.', 'Blue! Bold. It takes longer. Blue wool is shy.']] },
           { t: ["I'm not from Rimeholm, though.", "I'm not from here."],
-            say: [['f_ylva', 'You thawed it, dear. That makes you from here. Now. What colour?', 'You thawed it. You are from here now.']] },
+            say: [['f_ylva', 'You thawed it, dear. That makes you from here. Now. What color?', 'You thawed it. You are from here now.']] },
         ] },
       { say: [["I wasn't frozen, dear. I was resting my eyes.", "I wasn't frozen, dear. I was resting my eyes."],
         ["I knitted the whole time I was frozen. In my head. It's a very long scarf.", 'I knitted in my head. A very long scarf.']] },
