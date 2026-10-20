@@ -600,6 +600,9 @@ function bagHtml(E){
     if(!L.length&&!H.length) continue;
     out.push(`<div class="jh2">${E(label)}</div>`);
     if(k==='use'){
+      // in the registry's order (the order they turn up in the acts), not the order they were picked up
+      const ord=typeof ITEMDEF!=='undefined'&&ITEMDEF?Object.keys(ITEMDEF):Object.keys(ITM_STUB), at=id=>{ const n=ord.indexOf(id); return n<0?999:n; };
+      L.sort((a,b)=>at(a.id)-at(b.id));
       out.push('<div class="bag">'+L.map(i=>{
         const can=ITM.can(i.id), ok=can===true, why=ok?'':simplify(typeof can==='string'?can:'Not right now'), star=q===i.id, [nm]=bagSplit(i.name);
         return `<div class="bi" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b><span class="bn">${i.count}${i.cap?` ${E('of')} ${i.cap}`:''}</span>${i.desc?`<small>${E(i.desc)}</small>`:''}${ok?'':`<small class="why">${escapeHtml(why)}</small>`}</div>`

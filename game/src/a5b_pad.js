@@ -359,6 +359,8 @@ function navMove(root,dir){
   const sc=navScroller(root,items.includes(cur)?cur:null);
   if(!items.length){ if(sc&&V) sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
   if(!items.includes(cur)){ navFocus(navDefault(root,items)); return; }
+  // (v12) the journal: down from its tabs goes to the first button on the page (the Satchel's sit at the right side)
+  if(root.id==='jour'&&V&&sg>0&&cur.closest('.jtabs')){ const f=items.find(el=>el.closest('#jBody')); if(f){ navFocus(f); SFX.play('ui',0.35); return; } }
   const a=cur.getBoundingClientRect(), acx=(a.left+a.right)/2, acy=(a.top+a.bottom)/2;
   let best=null,bs=1e9;
   for(const el of items){
