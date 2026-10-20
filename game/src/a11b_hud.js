@@ -324,7 +324,9 @@ function drawQuickChip(cx,cy){
     ctx.fillStyle='#fff6e6'; ctx.fillText(s,bx,by+0.5); }
   // the key or button that uses it (not on touch: the chip is the button there)
   const dev=curDevice();
-  if(dev==='pad') drawPadGlyph(ctx,PB.LF,PAD.kind,cx-r,cy-r+1,5.5);
+  if(dev==='pad'){ const x=cx-r+1, y=cy-r+1;   // a little d-pad with its left arm lit
+    ctx.fillStyle='rgba(20,12,6,.9)'; rr(x-6.5,y-6.5,13,13,3.5); ctx.fill(); ctx.strokeStyle='rgba(255,220,180,.45)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(246,234,216,.6)'; ctx.fillRect(x-1.5,y-4.5,3,9); ctx.fillRect(x-4.5,y-1.5,9,3); ctx.fillStyle='#ffd27a'; ctx.fillRect(x-4.8,y-1.8,3.6,3.6); }
   else if(dev!=='touch'){ const k=actKey('item'); ctx.font=`800 8px ${UIF}`; const w=Math.max(11,ctx.measureText(k).width+5);
     ctx.fillStyle='rgba(20,12,6,.9)'; rr(cx-r-w/2+2,cy-r-3.5,w,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.fillText(k,cx-r+2,cy-r+2); }
   // a ring that pulses when something new goes in
