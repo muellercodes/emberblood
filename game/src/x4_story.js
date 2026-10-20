@@ -1021,6 +1021,9 @@ function n4sTalkCalm(){ const p=player; return !!p&&scene==='play'&&!DLG&&!G.min
 function n4sStill(){ const p=player, L=N4ST.stillP||(N4ST.stillP={x:p.x,y:p.y,t:G.time}); if(dist(p.x,p.y,L.x,L.y)>2.5||G.time<L.t||(p.swingT||0)>0){ L.x=p.x; L.y=p.y; L.t=G.time; } return G.time-L.t; }
 // a stand-in person record for talkTo (mkNPC's shape), placed where the friend is
 function n4sTalkNPC(id,name,x,y,face){ return {kind:id,id,name:simplify(name),col:(SPK[id]&&SPK[id].col)||'#d8c3a0',look:{},x,y,face:face||0,t:0,home:[x,y],wt:0,walker:false,r:10,li:0,n4sFriend:true}; }
+// open the talk; a friend who is not a person record (a wolf, a moth, a goat, Pip, a dragon) gets no "I brought you
+// something" row (its answer is a villager's "Ooh, what is it?"): the menu hides it once a gift is marked as given today
+function n4sTalkOpen(n){ try{ if(!CASTBY[n.id]&&!SPECIAL[n.id]&&typeof dayNow==='function'){ G.gifted=G.gifted||{}; G.gifted[n.id]=dayNow(); } }catch(e){} talkTo(n); }
 function n4sTalkPrompts(offer){
   if(!n4sTalkCalm()) return;
   const p=player, still=n4sStill(); if(still<0.6) return;
@@ -1033,13 +1036,13 @@ function n4sTalkTo(aid){
   const a=N4ST.ally[aid], T=N4S_TALK[aid]; if(!a||!T||DLG) return;
   a.talk=1; a.dx=a.dy=0; a.face=angTo(a.x,a.y,player.x,player.y); player.facing=angTo(player.x,player.y,a.x,a.y);
   N4ST.talkWith=aid;
-  try{ talkTo(n4sTalkNPC(T.id,T.name,a.x,a.y,a.face)); }catch(e){ console.error(e); }
+  try{ n4sTalkOpen(n4sTalkNPC(T.id,T.name,a.x,a.y,a.face)); }catch(e){ console.error(e); }
   if(!DLG){ a.talk=0; N4ST.talkWith=null; }
 }
 function n4sTalkPip(){
   const q=G.pip; if(!q||DLG) return;
   q.face=angTo(q.x,q.y,player.x,player.y); player.facing=angTo(player.x,player.y,q.x,q.y);
-  try{ talkTo(n4sTalkNPC('pip',N4S_STANDIN.pip.name,q.x,q.y,q.face)); }catch(e){ console.error(e); }
+  try{ n4sTalkOpen(n4sTalkNPC('pip',N4S_STANDIN.pip.name,q.x,q.y,q.face)); }catch(e){ console.error(e); }
 }
 // once the talk is over the friend walks on (n4sAllyTick)
 function n4sTalkEnd(){ if(DLG) return; for(const id in N4ST.ally){ const a=N4ST.ally[id]; if(a.talk) a.talk=0; } N4ST.talkWith=null; }
@@ -1399,7 +1402,7 @@ function n4sDuchessSeen(){ if(G.flags.n_duchess) return; G.flags.n_duchess=1; tr
 function n4sDuchTalk(){
   const D=N4ST.duch, fin=()=>{ n4sDuchessSeen(); try{ saveGame(); }catch(e){} };
   if(D&&typeof s10V11==='function'&&s10V11('goat')){ D.face=angTo(D.x,D.y,player.x,player.y); player.facing=angTo(player.x,player.y,D.x,D.y);
-    try{ talkTo(n4sTalkNPC('goat',N4S_STANDIN.goat.name,D.x,D.y,D.face)); }catch(e){ console.error(e); }
+    try{ n4sTalkOpen(n4sTalkNPC('goat',N4S_STANDIN.goat.name,D.x,D.y,D.face)); }catch(e){ console.error(e); }
     if(DLG){ const d0=DLG.done; DLG.done=function(){ if(d0) d0.apply(this,arguments); fin(); }; return; } }
   const first=!G.flags.n_duchess; runDialogue([xl('goat',`Meh.`,`Meh.`),...(first?[xl('ash',`How did you even get up here? There's a MOAT.`,`How did you get up here?`),xl('goat',`Meh.`,`Meh.`)]:[])],()=>{ scene='play'; fin(); }); }
 // ---------- the cutscene on the summit: Nyxara fallen, the moon filling, and what each ending does (world and sky)
@@ -1644,6 +1647,8 @@ function n4sHomeAdd(){
     n.walker=false; n.n4sHome=true; G.npcs.push(n); }
 }
 { const base=setupNPCs; setupNPCs=function(){ base(); try{ if(G&&G.mode==='story') n4sHomeAdd(); }catch(e){ console.error(e); } }; }
+// (sleeping Glaciar is no person record either: no gift row, as for the friends on the peak)
+{ const base=talkTo; talkTo=function(n){ try{ if(n&&n.n4sHome&&!CASTBY[n.id]&&!SPECIAL[n.id]&&typeof dayNow==='function'){ G.gifted=G.gifted||{}; G.gifted[n.id]=dayNow(); } }catch(e){} return base.apply(this,arguments); }; }
 // Glaciar asleep behind the forge: a heap of ice-blue scales; one eye opens when Ash comes close
 function n4sDrawGleeNap(n){
   const t=G.time, x=n.x, y=n.y, near=!!player&&dist(player.x,player.y,x,y)<200;
@@ -1736,6 +1741,7 @@ const N4S_DBG={N4ST,N4S_SC,N4S_ECHO,N4S_STAND,N4S_PANE,N4S_ENDINGS,play:n4sPlay,
   allyList:()=>Object.values(N4ST.ally).map(a=>({id:a.id,mode:a.mode,x:Math.round(a.x),y:Math.round(a.y),face:+(a.face||0).toFixed(2),talk:!!a.talk})),
   // (v12 PEAK) talk to a friend on the peak by ally id, 'pip' or 'duchess'; and what the talk prompts can see
   talk:id=>{ if(id==='pip') n4sTalkPip(); else if(id==='duchess') n4sDuchTalk(); else n4sTalkTo(id); return !!DLG; },
+  talkOffers:()=>{ const L=[]; try{ n4sTalkPrompts((d,t)=>L.push([Math.round(d),t])); }catch(e){ L.push(String(e)); } return L; },
   peak:()=>({spk:['greymane','goat','pip','c_vesper','f_glaciar','f_hush','ev_tikka'].map(k=>[k,!!SPK[k],!!EVPORT[k]]),still:+n4sStill().toFixed(2),calm:n4sTalkCalm(),
     forge:typeof NPCSPOT!=='undefined'?NPCSPOT.maren:null,home:n4sHomeWant(),avail:{c_vesper:availableFrom('c_vesper'),ev_tikka:availableFrom('ev_tikka'),f_glaciar:availableFrom('f_glaciar')},
     prompt:G.prompt?G.prompt.text:null,duch:N4ST.duch?{x:Math.round(N4ST.duch.x),y:Math.round(N4ST.duch.y)}:null}),
