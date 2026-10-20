@@ -25,7 +25,7 @@ function proMarkSeen(){ try{ localStorage.setItem(PRO_SEEN,'1'); }catch(e){} }
 // ---------- the script. A line: proL(who, full, simple, face, beat) (beat: what the theatre does as the line comes up)
 function proL(who,full,simple,face,beat,x){ const o={who,text:simple!=null?S(full,simple):full}; if(face) o.face=face; if(beat) o.fn=()=>proBeat(beat); return x?Object.assign(o,x):o; }
 function proShowLines(){ return [
-  proL('narr',`The night before Lantern Day, everybody in Emberhollow is out on the green, hanging paper lanterns on strings between the houses. Tomorrow you light them.`,`The night before Lantern Day, everyone hangs paper lanterns on the green. Tomorrow you light them.`,null,'green'),
+  proL('narr',`The night before Lantern Day, everybody in Emberhollow is out on the green, stringing up paper lanterns for tomorrow. Lighting the three big ones is your job.`,`The night before Lantern Day, everyone hangs paper lanterns on the green. You light the three big ones.`,null,'green'),
   proL('bertram',`Evening, Ash. You'll sit at the front tonight, won't you? Nice and far from the bun table.`,`Evening, Ash. Sit far from the buns, please.`,'worried'),
   proL('ash',`I haven't set anything on fire since spring.`,`Nothing has caught fire since spring.`,'happy'),
   proL('bertram',`Spring was when it happened, Ash.`,null,'worried'),
@@ -40,7 +40,7 @@ function proShowLines(){ return [
   proL('wendel',`Settle down, everyone. A little tune, and then Nana's dragon. And don't forget tomorrow, at sunset, the Lantern Waltz.`,`Settle down! A tune, then the dragon. My waltz is tomorrow!`,'happy','tune'),
   proL('narr',`The little red curtains open on a cardboard mountain, with cotton smoke on a wire.`,`The curtains open on a cardboard mountain.`,null,'open'),
   proL('nana',`Once upon a time, dears, a grumpy old dragon lived at the top of the mountain. And everything he saw, he said was his.`,`Once, a grumpy dragon lived on the mountain. He said everything was his.`,'sly','dragon'),
-  proL('narr',`Every child on the green shouts his word for him, the way they do every year. "Mine!" You shout it loudest.`,`All the kids shout his word: "Mine!" You shout loudest.`,null,'mine'),
+  proL('narr',`Every child on the green shouts his word for him: "Mine!" You shout it loudest.`,`All the kids shout his word: "Mine!" You shout loudest.`,null,'mine'),
   proL('nana',`His sheep, his rivers, his sky. And if anybody argued, he roared!`,`His sheep, his sky. And if you argued, he roared!`,'sly','roar'),
   proL('narr',`The sock dragon lunges at the front row, and the little ones scream. Mom's hand comes down on your shoulder and squeezes, hard. Then it lets go.`,`The dragon lunges. Mom's hand squeezes your shoulder. Then it lets go.`,null,'squeeze'),
   proL('ash',`Mom. It's a sock.`,null,'laughing','calm'),
@@ -48,7 +48,7 @@ function proShowLines(){ return [
   proL('nana',`So five brave friends climbed the mountain to make him share. A lantern-maker, a big one with a hammer, one who could talk to drakes, one with a reed pipe, and one with a spear.`,`Five brave friends climbed up to make him share.`,'happy','friends'),
   proL('narr',`The dragon sweeps his tail, and all five friends fall over in a heap. Hal laughs so hard he has to sit down on the grass.`,`The dragon swings his tail. All five fall in a heap.`,null,'tumble'),
   proL('nana',`Then up climbed a little girl with horns, called Ember. She wasn't scared of him one bit. She sat down beside him, and she sang.`,`Then a girl with horns, called Ember, climbed up. She sat by him and sang.`,'tender','girl'),
-  proL('narr',`Every head on the green turns to look at you. They always do, at this bit. The puppet's horns are felt, and one of them is sewn on crooked.`,`Everyone turns to look at you. The puppet's horns are felt. One is crooked.`,null,'turn'),
+  proL('narr',`Every head on the green turns round to look at you. The puppet's horns are felt, and one of them is sewn on crooked.`,`Everyone turns to look at you. The puppet's horns are felt. One is crooked.`,null,'turn'),
   proL('narr',`Wendel plays, and everybody sings the old lullaby with her: "Little lantern, burning bright, light the way home through the night. One for you and one for me, and one more, just to see."`,`Everyone sings: "Little lantern, burning bright, light the way home through the night."`,null,'sing',{mood:'lantern'}),
   proL('nana',`And the grumpy old dragon yawned, and curled up, and fell fast asleep. That's why we hang out the lanterns every summer, dears. To keep the dark small.`,`The dragon fell asleep. That is why we hang lanterns: to keep the dark small.`,'tender','sleep'),
   proL('narr',`Far off, Cinder Mountain gives a long, low rumble. A cup rattles on the bun table.`,`Far off, the mountain rumbles. A cup rattles.`,null,'rumble',{mood:'night'}),
