@@ -134,9 +134,10 @@ chapter({
       ['narr', 'The sound rolls down the mountain like a wave. Snow jumps off every rock. Far below, a long crack runs across the Frost Lock.', 'The sound rolls down the mountain. Far below, the lock cracks.', { ref: 'f_lm_dreadlock' }],
       ['narr', 'Then something white unfolds from the mountainside beside you: two wings with purple eyes painted on them, and two real eyes in the middle, blinking at you.', 'Something white unfolds: wings with painted eyes, and two real eyes.', { do: ['world f3_hush_rise unfold'] }],
       ['f_hush', "Shhh. Loud one. You'll wake her.", "Shhh. Loud one. You'll wake her."],
-      // (v12) she names herself here, the first time anyone does: her label is "A white moth" until this line has played
-      ['f_hush', 'I am Hush. Her quiet one. The Mother is resting.', 'I am Hush. The Mother is resting.', { clue: 'f3_the_mother', do: ['set f3_hush_named'] }],
-      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend' }],
+      // (v12) she names herself here, the first time anyone does: her label is "A white moth" up to this line, and
+      // "Hush" from the next one (a line's `do` runs as the line comes up, so the flag is on the line after)
+      ['f_hush', 'I am Hush. Her quiet one. The Mother is resting.', 'I am Hush. The Mother is resting.', { clue: 'f3_the_mother' }],
+      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend', do: ['set f3_hush_named'] }],
       ['ash', 'It was you in Rimeholm. You froze a whole village!', 'It was you! You froze Rimeholm!', { ref: 'f_rimeholm' }],
       ['f_hush', 'Their bell was loud. Bells mean morning. The Mother hates morning.', 'Bells mean morning. The Mother hates morning.', { ref: 'f_lm_bell' }],
       ['ash', 'Good. I like mornings.', 'Good. I like mornings.'],
