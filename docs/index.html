@@ -4270,6 +4270,7 @@ function updateCaveRooms(dt){
   const def=A.def, p=player, R=caveRoomAt(p.x,p.y);
   // entering rooms
   if(R&&R!==A.curRoom){
+    roomEntered(A,A.curRoom,R);   // (v12 ROOMS) the wake beat, foes that follow him through the doorway
     A.curRoom=R; const vk=`cv_${caveSid(def)}_v_${R.id}`;
     if(!G.found[vk]){ G.found[vk]=true; renderCaveMini(A); if(R.kind==='secret'){ G.secrets=G.secrets||{}; G.secrets['cs_'+def.id+'_'+R.id]=1; jingle('secret','chest'); setBanner('A secret room!',`${Object.keys(G.secrets).filter(k=>k.startsWith('cs_')).length} hidden cave rooms found so far`,2.6); } else if(R.kind==='boss'&&R.enemies.some(e=>!e.dead)){ const b=R.enemies.find(e=>e.caveBoss); if(b) setBanner(b.caveBoss,def.name,2.4,'boss'); jingle('boss_intro',null); } }
     for(const e of R.enemies) if(!e.dead) e.aggro=true;
@@ -4489,6 +4490,211 @@ function caveProgressText(){
   const ks=Object.keys(A.rooms), v=ks.filter(k=>G.found[`cv_${caveSid(A.def)}_v_${k}`]&&A.rooms[k].kind!=='secret').length, tot=ks.filter(k=>A.rooms[k].kind!=='secret').length, keys=A.keys();
   return `${v}/${tot} rooms explored${keys?` · ${keys} small key${keys>1?'s':''}`:''}`;
 }
+
+// ================= (v12 ROOMS) one room at a time, as in Zelda
+// Only the room Ash is in is drawn and alive. A room he has been in shows its walls and floor dimmed (remembered), never
+// its foes, closed chests or anything moving; with the cave's map (Juniper's map, a Trial Map, a Dungeon Map) the rooms
+// he has not been in show as a faint plan. Shared walls and their doorways belong to the room he is in, and standing in a
+// doorway lights the room ahead, so walking through reads as one step. Foes outside his room sleep (not updated, hidden
+// with e.frozen, so nothing targets, draws or maps them) and wake a short beat after he walks in; a foe chasing him
+// through a doorway may follow. The camera frames his room (a quick slide at each doorway) and keeps its top wall clear
+// of the HUD (a5_input.js updateCam calls roomCam); panels with something in the room under them fade (a11b_hud.js).
+// For other modules (WALLS, TRIALS): areaRoomOf(x,y), ashRoom(), roomOfFoe(e), roomAwake(e), roomSeen(e), roomsLift(sec,ids).
+const RMV={on:true,beat:0.6,follow:1.6,followR:300,memA:0.2,planA:0.085,rate:9,lift:null,area:null,frame:0,t:-1,last:null,snapT:0};
+// the room whose floor is at x,y (null in a wall or a doorway)
+function areaRoomOf(x,y){ return AREA&&AREA.rooms?caveRoomAt(x,y):null; }
+// every room whose walls hold the cell i,j (a shared wall belongs to both rooms, a corner to up to four)
+function roomsOfCell(A,i,j){
+  if(!A._rmc){ const c=A.cave, n=c.w*c.h, L=A._rmc=new Array(n); for(const k in A.rooms){ const R=A.rooms[k];
+      for(let jj=R.oy;jj<=R.oy+R.ih+1;jj++) for(let ii=R.ox;ii<=R.ox+R.iw+1;ii++){ if(ii<0||jj<0||ii>=c.w||jj>=c.h) continue; const q=jj*c.w+ii; (L[q]||(L[q]=[])).push(R); } } }
+  const c=A.cave; if(i<0||j<0||i>=c.w||j>=c.h) return null; return A._rmc[j*c.w+i]||null;
+}
+// the room for a point: its floor, else (in a wall or a doorway) the room that holds that wall, pref first
+function areaRoomNear(x,y,pref){
+  const A=AREA; if(!A||!A.rooms) return null;
+  const R=caveRoomAt(x,y); if(R) return R;
+  const cs=A.cave.cell, L=roomsOfCell(A,Math.floor((x-A.x0)/cs),Math.floor((y-A.y0)/cs));
+  if(L&&L.length){ if(pref&&L.includes(pref)) return pref; let b=L[0], bd=1e18; for(const Q of L){ const d=dist2(x,y,Q.cx,Q.cy); if(d<bd){ bd=d; b=Q; } } return b; }
+  if(pref) return pref;
+  let b=null, bd=1e18; for(const k in A.rooms){ const Q=A.rooms[k], d=dist2(x,y,Q.cx,Q.cy); if(d<bd){ bd=d; b=Q; } } return b;
+}
+// the room Ash is in (in a doorway: the one he came from)
+function ashRoom(){ const A=AREA; if(!A||!A.rooms||!player) return null; return caveRoomAt(player.x,player.y)||A.curRoom||areaRoomNear(player.x,player.y); }
+function roomOfFoe(e){ const A=AREA; return A&&A.rooms?areaRoomNear(e.x,e.y,e.room?A.rooms[e.room]:null):null; }
+// the doorway Ash stands in, if any: its link (L.a, L.b are the two rooms)
+function ashDoor(){
+  const A=AREA; if(!A||!A.cave||!A.cave.links||!player) return null; const c=A.cave, cs=c.cell, i=Math.floor((player.x-A.x0)/cs), j=Math.floor((player.y-A.y0)/cs), k=j*c.w+i;
+  for(const L of c.links) if(L.cells.includes(k)) return L;
+  return null;
+}
+// the box of a room with its walls, in world units
+function roomRect(A,R){ if(R._rr&&R._rrA===A) return R._rr; const cs=A.cave.cell; R._rrA=A; return R._rr={x0:A.x0+R.ox*cs,y0:A.y0+R.oy*cs,x1:A.x0+(R.ox+R.iw+2)*cs,y1:A.y0+(R.oy+R.ih+2)*cs}; }
+const caveMapped=A=>!!(A&&((G.items.juniper_map&&!A.def.noJuniper)||G.found['tmap_'+caveDsid(A.def)]||G.found['dmap_'+caveDsid(A.def)]));
+// how a room looks from outside: 0 dark, 1 a faint plan (mapped), 2 remembered. A dark room still waiting for its lamps
+// (or a dark maze) stays dark: its layout is the puzzle.
+function roomMemo(A,R){
+  if((R.kind==='dark'||R.kind==='maze'||R.dark)&&!R.solved) return 0;
+  if(G.found[`cv_${caveSid(A.def)}_v_${R.id}`]) return 2;
+  return caveMapped(A)&&R.kind!=='secret'?1:0;
+}
+// a scene may light rooms it needs to show for a while: roomsLift(sec) lifts the dark everywhere, roomsLift(sec,['b','c'])
+// just there (foes there stay asleep); roomsLift(0) ends it
+function roomsLift(sec,ids){ RMV.lift=sec>0?{until:G.time+sec,ids:ids?new Set([].concat(ids)):null,A:AREA}:null; }
+function roomLifted(R){ const L=RMV.lift; if(!L) return false; if(L.A!==AREA||G.time>L.until){ RMV.lift=null; return false; } return !L.ids||L.ids.has(R.id); }
+// per frame: how lit each room is (R._vk, 0 dark to 1 lit); a teleport or a new area snaps, a doorway eases
+function roomVisTick(){
+  const A=AREA; if(!A||!A.rooms) return;
+  const cur=ashRoom(), door=ashDoor(), now=G.time;
+  let dt=RMV.t<0?0:clamp(now-RMV.t,0,0.1); RMV.t=now;
+  let snap=RMV.area!==A||RMV.snapT>0;
+  // a jump to a room that does not share a wall with the last one (stairs, warps, a fall): no fade
+  if(!snap&&cur&&RMV.last&&cur!==RMV.last&&!cur.links.some(L=>L.a===RMV.last.id||L.b===RMV.last.id)) snap=true;
+  RMV.area=A; RMV.last=cur; if(RMV.snapT>0) RMV.snapT--;
+  const k=snap?1:1-Math.exp(-dt*RMV.rate);
+  for(const id in A.rooms){ const R=A.rooms[id];
+    const want=R===cur||(door&&(door.a===id||door.b===id))||roomLifted(R)?1:0;
+    if(R._vk==null||snap) R._vk=want; else { R._vk+=(want-R._vk)*k; if(Math.abs(want-R._vk)<0.01) R._vk=want; } }
+}
+// Ash walks from room P into room R (updateCaveRooms): R's foes get a beat before they act (not when he just stepped
+// out and back), foes that were chasing him close by may follow through the doorway
+function roomEntered(A,P,R){
+  if(!RMV.on||!R) return;
+  if(G.time-(R._left!=null?R._left:-99)>3) R._wake=G.time+RMV.beat;
+  if(P){ P._left=G.time; for(const e of G.enemies){ if(e.dead||!e.aggro||!e._rmAw) continue; if(roomOfFoe(e)===P&&dist(e.x,e.y,player.x,player.y)<RMV.followR) e._rmChase=G.time+RMV.follow; } }
+}
+// may this foe act now? (WALLS can call this anywhere; cached per frame)
+function roomAwake(e){
+  const A=AREA; if(!RMV.on||!A||!A.rooms||!e||e.dead) return true;
+  if(e._rmF===RMV.frame&&e._rmA===A) return e._rmAw;
+  e._rmF=RMV.frame; e._rmA=A;
+  let aw=true;
+  // his room as updateCaveRooms last saw it (it hands out the beat and the chases when he walks in)
+  if(!(e.noRoom||e.type==='vorlaxis')){ const R=A.curRoom||ashRoom(), Q=roomOfFoe(e);
+    // in his room: once updateCaveRooms has seen him walk in (A.curRoom) and the beat is over; a chaser keeps going
+    if(R&&Q){ if(Q===R) aw=(!!A.curRoom&&G.time>=(R._wake||0))||e._rmChase>G.time; else aw=e._rmChase>G.time; } }
+  e._rmAw=aw; return aw;
+}
+// can Ash see this foe? (its room is lit)
+function roomSeen(e){ const A=AREA; if(!RMV.on||!A||!A.rooms||!e) return true; if(e.noRoom||e.type==='vorlaxis') return true; const Q=roomOfFoe(e); return !Q||(Q._vk||0)>0.5; }
+// the sleep pass, run around updateEnemies (wrapped once every module has loaded, so the boss frames that other
+// modules hang on updateEnemies only see foes that are awake too): sleepers sit out the update and are hidden when Ash
+// cannot see their room
+Promise.resolve().then(()=>{ const base=updateEnemies; updateEnemies=function(dt){
+  const A=AREA; RMV.frame++;
+  if(!RMV.on||!A||!A.rooms||!G||!G.enemies||!G.enemies.length) return base.apply(this,arguments);
+  roomVisTick();
+  const all=G.enemies, wake=[], sleep=[];
+  for(const e of all){ if(e.dead||roomAwake(e)) wake.push(e); else sleep.push(e); }
+  for(const e of sleep){ e.frozen=!roomSeen(e); }
+  if(!sleep.length) return base.apply(this,arguments);
+  G.enemies=wake;
+  try{ return base.apply(this,arguments); }
+  finally{ const now=G.enemies; for(const e of sleep) now.push(e); }
+}; });
+// the camera's target for Ash's room (a5_input.js updateCam): a room that fits is framed below the HUD's top row (below
+// every top panel when there is room for that), a bigger one follows Ash but never lets its top wall go under the
+// panels or the camera wander past its walls
+// the bottom of the right-hand panels: the minimap with its time, place and key strip, and on a narrow screen the
+// weapon chip under the sound button and the companion chip under the minimap (a6b_weapons.js, a9i_comps.js)
+function hudRightBottom(){
+  const story=G&&G.mode==='story', L=SAFE.l+14, M=MINI_R(), pw=Math.min(250,M.x-L-10);
+  let b=M.y+M.r*2+52;
+  if(story){ const comp=!!G.pip||(typeof CM!=='undefined'&&CM&&CMG===G), rx=Math.max(L+pw+4,HUD_RX||0);
+    if(comp&&M.x-rx<2*21+26) b=Math.max(b,M.y+M.r*2+38+2*21+16);
+    if(G.flags&&G.flags.forge&&M.x-(L+pw+8)<130) b=Math.max(b,SAFE.t+164+4); }
+  return b;
+}
+function roomHudBand(){
+  const story=G.mode==='story', T=SAFE.t+14;
+  const row=T+(story?96:70)+6;                                          // vitals panel and the quick slot under ROAR
+  const right=hudRightBottom();                                         // minimap, its labels, the narrow chips
+  const track=TRACK_R?TRACK_R.y+TRACK_R.h+4:row;
+  return {row,all:Math.max(row,right,track),bot:usingTouch?Math.max(0,H-touchTopOver(0,W)+6):0};
+}
+function roomCam(fx,fy,vw,vh){
+  const A=AREA; if(!RMV.on||!A||!A.rooms||!A.cave) return null;
+  const R=ashRoom(); if(!R) return null;
+  const b=G.boss; if(b&&!b.dead&&!b.noClip&&roomOfFoe(b)!==R){ fx=player.x+camLead.x; fy=player.y+camLead.y; }   // no lean toward a boss behind a wall
+  const r=roomRect(A,R), rw=r.x1-r.x0, rh=r.y1-r.y0, B=roomHudBand(), z=zoom;
+  const tx=rw<=vw?r.x0+rw/2-vw/2:clamp(fx-vw/2,r.x0,r.x1-vw);
+  const fit=(band,bot)=>{ const uh=vh-band/z-bot/z; return rh<=uh?r.y0-band/z-(uh-rh)/2:null; };
+  // centred between the top panels and the touch buttons; else right under the panels (the buttons cover the least)
+  let ty=fit(B.all,B.bot); if(ty==null&&fit(B.all,0)!=null) ty=r.y0-B.all/z; if(ty==null) ty=fit(B.row,0);
+  if(ty==null){ const band=B.row/z, uh=vh-band; ty=clamp(fy-band-uh/2,r.y0-band,r.y1-vh); }
+  const room=R!==RMV.camR; RMV.camR=R; if(room) RMV.slideT=0.45;
+  return {x:tx,y:ty,slide:RMV.slideT>0};
+}
+// a room that nearly fits is shown whole: the camera zooms out up to 18% (a desktop window), never on a phone, where a
+// room is followed instead. RMV.zk multiplies the zoom moveZoom sets.
+RMV.zk=1;
+function roomZoomWant(){
+  const A=AREA; if(!RMV.on||!A||!A.rooms||!A.cave||!player||scene==='menu') return 1;
+  const R=ashRoom(); if(!R) return RMV.zkWant||1;
+  const r=roomRect(A,R), z0=ZOOM0*(MV.zoomK||1), B=roomHudBand(), cs=A.cave.cell;
+  const need=Math.min((H-B.row)/(r.y1-r.y0),W/(r.x1-r.x0+cs*0.5));
+  return RMV.zkWant=need>=z0?1:need/z0>=0.82?need/z0:1;
+}
+function roomZoom(dt,snap){
+  if(snap) RMV.snapT=2;   // a jump of the camera (a warp, the tp hook, a new floor): the rooms' light jumps with it
+  const want=roomZoomWant(), z0=RMV.zk;
+  RMV.zk=snap?want:RMV.zk+(want-RMV.zk)*(1-Math.exp(-dt*5)); if(Math.abs(RMV.zk-want)<0.002) RMV.zk=want;
+  if(RMV.zk!==1||z0!==1) zoom=ZOOM0*(MV.zoomK||1)*RMV.zk;
+}
+// the dark over every room but Ash's (a11_render.js, after the lights and the floating words). Cells take the look of
+// the brightest room that holds them, row by row in runs, so a shared wall is never darkened under the lit room.
+function roomDarkCol(){ return LOOK.sb?'rgb(12,7,16)':'rgb(4,4,8)'; }
+function drawRoomMask(){
+  const A=AREA; if(!RMV.on||!A||!A.rooms||!A.cave||!A.canvas) return;
+  if(scene==='play'||RMV.area!==A) roomVisTick();
+  const c=A.cave, cs=c.cell, vw=W/zoom, vh=H/zoom, base=LOOK.sb&&typeof lookCave==='function'?lookCave(A):A.canvas, bs=A.canvasS, dark=roomDarkCol();
+  const memo={}, lit={}; for(const id in A.rooms){ const R=A.rooms[id]; memo[id]=roomMemo(A,R); lit[id]=R._vk||0; }
+  const i0=Math.max(0,Math.floor((cam.x-A.x0)/cs)-1), i1=Math.min(c.w-1,Math.floor((cam.x+vw-A.x0)/cs)+1);
+  const j0=Math.max(0,Math.floor((cam.y-A.y0)/cs)-1), j1=Math.min(c.h-1,Math.floor((cam.y+vh-A.y0)/cs)+1);
+  ctx.save(); ctx.globalAlpha=1;
+  // outside the cave's grid (light and sparks spill there)
+  ctx.fillStyle=dark; const ox0=cam.x-40, oy0=cam.y-40, ox1=cam.x+vw+40, oy1=cam.y+vh+40;
+  if(oy0<A.y0) ctx.fillRect(ox0,oy0,ox1-ox0,A.y0-oy0); if(oy1>A.y1) ctx.fillRect(ox0,A.y1,ox1-ox0,oy1-A.y1);
+  if(ox0<A.x0) ctx.fillRect(ox0,Math.max(oy0,A.y0),A.x0-ox0,Math.min(oy1,A.y1)-Math.max(oy0,A.y0)); if(ox1>A.x1) ctx.fillRect(A.x1,Math.max(oy0,A.y0),ox1-A.x1,Math.min(oy1,A.y1)-Math.max(oy0,A.y0));
+  const run=(key,is,ie,j)=>{ if(key>=1000) return; const v=(key%100)/20, m=Math.floor(key/100), x=A.x0+is*cs, y=A.y0+j*cs, w=(ie-is+1)*cs;
+    ctx.globalAlpha=1-v; ctx.fillStyle=dark; ctx.fillRect(x,y,w,cs+0.5);
+    if(m>0){ ctx.globalAlpha=(m===2?RMV.memA:RMV.planA)*(1-v); ctx.drawImage(base,(x-A.x0)*bs,(y-A.y0)*bs,w*bs,cs*bs,x,y,w,cs+0.5); } };
+  for(let j=j0;j<=j1;j++){
+    let rs=i0, rk=-1;
+    for(let i=i0;i<=i1+1;i++){
+      let key=-2;
+      if(i<=i1){ const L=roomsOfCell(A,i,j); let v=0, m=0; if(L) for(const R of L){ const q=lit[R.id]; if(q>v) v=q; if(memo[R.id]>m) m=memo[R.id]; }
+        key=v>=0.995?1000:m*100+Math.round(v*20); }
+      if(key!==rk){ if(rk>=0) run(rk,rs,i-1,j); rk=key; rs=i; }
+    }
+  }
+  ctx.restore();
+}
+// lights in a room Ash cannot see stay out of the light layer (a brazier behind the wall does not light his side)
+function roomLightOn(L){ const A=AREA; if(!RMV.on||!A||!A.rooms) return true; if(L._rmA!==A){ L._rmA=A; L._rm=areaRoomNear(L.x,L.y); } return !L._rm||(L._rm._vk||0)>0.01; }
+// what in Ash's room must stay readable under the HUD (a11b_hud.js fades a panel with one of these under it): Ash, the
+// foes he can see, people, the thing he could use now, and the things he can use in the room (not decoration)
+const ROOM_NOUSE={decor:1,tfx:1,tdoor:1,dv:1};
+function roomHudPoints(out){
+  out.length=0; const A=AREA; if(!RMV.on||!A||!A.rooms||!player) return out;
+  const R=ashRoom(), P=(x,y,r)=>out.push({x:(x-cam.x)*zoom,y:(y-cam.y)*zoom,r:r*zoom+6}), top=cam.y+260/zoom;
+  if(!player.dead) P(player.x,player.y-22-(player.z||0),26);
+  for(const e of G.enemies) if(!e.dead&&!e.frozen&&e.y<top+80) P(e.x,e.y-(e.r||12),(e.r||12)+10);
+  for(const n of A.npcs) if(n.y<top+60) P(n.x,n.y-22,24);
+  for(const o of A.objs){ if(ROOM_NOUSE[o.k]||o.y>top+40||o.y<cam.y-60) continue; if(G.found[o.id]&&(o.k==='coinpile'||o.k==='treatpick'||o.k==='smallkey'||o.k==='page')) continue;
+    if(o._rmA!==A){ o._rmA=A; o._rm=areaRoomNear(o.x,o.y); } if(o._rm!==R&&!(o.k==='cgate'&&o.link&&(o.link.a===(R&&R.id)||o.link.b===(R&&R.id)))) continue; P(o.x,o.y-6,Math.min(o.r||16,22)); }
+  if(G.prompt&&G.prompt.x!=null) P(G.prompt.x,G.prompt.y,24);
+  return out;
+}
+window.__ebX=Object.assign(window.__ebX||{},{rooms:{
+  on(v){ if(v!=null) RMV.on=!!v; return RMV.on; }, cfg:RMV, lift:(s,ids)=>roomsLift(s,ids),
+  state(){ const A=AREA; if(!A||!A.rooms) return null; const R=ashRoom(), d=ashDoor();
+    return {area:A.id,room:R&&R.id,cur:A.curRoom&&A.curRoom.id,door:d?[d.a,d.b]:null,mapped:caveMapped(A),
+      rooms:Object.keys(A.rooms).map(id=>{ const Q=A.rooms[id]; return {id,kind:Q.kind,vk:+(Q._vk||0).toFixed(2),memo:roomMemo(A,Q),wake:Q._wake?+(Q._wake-G.time).toFixed(2):null}; }),
+      foes:G.enemies.filter(e=>!e.dead).map(e=>{ const Q=roomOfFoe(e); return {id:e.id,type:e.type,room:Q&&Q.id,home:e.room,x:Math.round(e.x),y:Math.round(e.y),awake:roomAwake(e),seen:roomSeen(e),frozen:!!e.frozen,aggro:!!e.aggro}; })}; },
+  rect:id=>AREA&&AREA.rooms&&AREA.rooms[id]?roomRect(AREA,AREA.rooms[id]):null,
+  cam:()=>({x:Math.round(cam.x),y:Math.round(cam.y),zoom:+zoom.toFixed(3),band:roomHudBand()}),
+  hud:()=>({pts:roomHudPoints([]).map(q=>[Math.round(q.x),Math.round(q.y),Math.round(q.r)]),rects:typeof HUDF!=='undefined'?HUDF.rects:null,k:typeof HUDF!=='undefined'?HUDF.k:null})
+}});
 
 // ================= upstairs, cellars and secret rooms
 // FLOORS[areaId].up/.down describe the floor above or below that room. secret:{...} hides the way in until you find it.
@@ -9876,6 +10082,7 @@ const camLead={x:0,y:0};
 function updateCam(dt,snap){
   if(!player) return;
   moveZoom(dt);   // zooms out a little while Ash flies (a6c_moves.js)
+  roomZoom(dt,snap);   // (v12 ROOMS) and a little in a cave room that then fits on the screen (a2f_caves.js)
   const vw=W/zoom, vh=H/zoom;
   let fx=player.x, fy=player.y;
   const b=G&&G.boss;
@@ -9885,8 +10092,13 @@ function updateCam(dt,snap){
   if(aimMode==='mouse'&&!usingTouch&&scene==='play'&&(settings.mouseAim||padActive())){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
   else if(!snap){ const mv=scene==='play'&&player.moving&&!usingTouch, k=1-Math.exp(-dt*2.2); camLead.x+=((mv?Math.cos(player.facing)*34:0)-camLead.x)*k; camLead.y+=((mv?Math.sin(player.facing)*24:0)-camLead.y)*k; fx+=camLead.x; fy+=camLead.y; }
   const CM=mapOfY(fy); let tx=clamp(fx-vw/2,-200,CM.w-vw+200), ty=clamp(fy-vh/2,CM.y0-200,CM.y0+CM.h-vh+200);
-  if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
+  // (v12 ROOMS) in caves and dungeons the camera frames the room Ash is in (a2f_caves.js roomCam), with a quick slide
+  // when he walks through a doorway; Ash's own spot and the boss lean steer it only inside a room bigger than the view
+  const rc=AREA&&AREA.rooms&&typeof roomCam==='function'?roomCam(fx,fy,vw,vh):null;
+  if(rc){ tx=rc.x; ty=rc.y; }
+  else if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
   if(snap){ cam.x=tx; cam.y=ty; return; }
+  if(rc&&rc.slide){ RMV.slideT-=dt; const k=1-Math.exp(-dt*9); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k; return; }
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
 }
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
@@ -23788,6 +24000,7 @@ function render(){
   drawLights();
   if(D3.on) depthPost();
   setWorld(); drawTexts();
+  if(inA&&AREA.rooms) drawRoomMask();   // (v12 ROOMS) only Ash's room is lit; rooms he knows show dimmed (a2f_caves.js)
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(!inA){ drawRain(); drawSnowMist(); }
   drawVignette();
@@ -23880,7 +24093,7 @@ function drawLights(){
   const lw=lightCvs.width, lh=lightCvs.height, s=zoom*0.5, t=G.time;
   const lightList=[];
   const src=inA?AREA.lights:mapList(LIGHTS,curMap());
-  for(const L of src){ if(L.night&&dl>0.6) continue; if(L.i<=0.01) continue; if(!inView(L.x,L.y,L.r)) continue; const fl=L.fire?1+0.06*Math.sin(t*9+L.x)+0.04*Math.sin(t*23+L.y):1; if(L.shrine&&!G.shrines[L.shrine.id]) continue; lightList.push([L.x,L.y,L.r*fl,L.i,L.fire]); }
+  for(const L of src){ if(L.night&&dl>0.6) continue; if(L.i<=0.01) continue; if(!inView(L.x,L.y,L.r)) continue; if(inA&&AREA.rooms&&!roomLightOn(L)) continue; const fl=L.fire?1+0.06*Math.sin(t*9+L.x)+0.04*Math.sin(t*23+L.y):1; if(L.shrine&&!G.shrines[L.shrine.id]) continue; lightList.push([L.x,L.y,L.r*fl,L.i,L.fire]); }
   if(dk>0.02){
     lctx.setTransform(1,0,0,1,0,0); lctx.globalCompositeOperation='source-over'; lctx.clearRect(0,0,lw,lh);
     lctx.fillStyle=LOOK.sb?`rgba(${lookDarkCol(inA)},${dk})`:`rgba(3,4,10,${dk})`; lctx.fillRect(0,0,lw,lh);
@@ -24371,6 +24584,7 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{render:()=>render(),DV,DSKIP,SH
 // ================= HUD
 function drawHUD(){
   HUD_HITS.length=0;
+  hudFadeBegin();   // (v12 ROOMS) panels over something in Ash's room fade to 15% (see hudFadeBegin below)
   const p=player, L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story';
   ctx.textBaseline='middle';
   // vitals panel
@@ -24470,6 +24684,7 @@ function drawHUD(){
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawBoosts(L,T,pw); if(story){ lvQueue(); drawSkillHud(); }
   if(story) drawQuickNotes();   // (v12) the boosts (under the skill tip) and the quick slot's notes
+  hudFadeEnd();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   // prompt: (v11 polish) drawn after the speech bubbles (drawCompHud draws them), so it is always on top
   if(G.prompt&&scene==='play'){
@@ -24478,6 +24693,40 @@ function drawHUD(){
   if(story&&G.hintT>=29&&G.playTime<5&&!G.flags.coach) G.flags.coach=1;   // a new journey (startStory sets G.hintT=30): the coach is on
   if(scene==='play'&&tipOn('play')) drawCoach(b);
   drawOffscreen(); drawTouch();
+}
+// (v12 ROOMS) in caves and dungeons a top panel with Ash, a foe, a person or something usable in his room under it fades
+// to 15% (Drew: "all the menus obstruct the top walls and potentially interactable items there"). The world under the
+// panels is copied before they are drawn and laid back over them at 85%, so every panel fades alike however it draws.
+// The boxes come from the last frame's layout (HUD_RX, TRACK_R); roomHudPoints is in a2f_caves.js.
+const HUDF={rects:[],k:{},cv:null,on:false,t:0,pts:[]};
+function hudFadeRects(){
+  const L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story', M=MINI_R(), out=[];
+  out.push({id:'top',x:L-4,y:T-4,w:Math.max(HUD_RX,L+150)-L+4,h:(story?96:70)+8});                        // vitals, quick slot, weapon bar, companion
+  if(TRACK_R) out.push({id:'goals',x:TRACK_R.x,y:TRACK_R.y,w:TRACK_R.w,h:TRACK_R.h+26});                     // the goals (and boosts under them)
+  out.push({id:'map',x:M.x-8,y:SAFE.t,w:W-SAFE.r-(M.x-8),h:hudRightBottom()+4-SAFE.t});                  // minimap, its labels, pause and sound, narrow chips
+  return out;
+}
+function hudFadeBegin(){
+  HUDF.on=false;
+  if(!AREA||!AREA.rooms||scene==='menu'||!G||!player||typeof roomHudPoints!=='function'){ HUDF.k={}; return; }
+  const rs=HUDF.rects, now=performance.now()/1000, dt=clamp(now-(HUDF.t||now),0,0.1); HUDF.t=now;
+  if(!rs.length) return;
+  const pts=roomHudPoints(HUDF.pts); let any=false;
+  for(let i=0;i<rs.length;i++){ const r=rs[i]; let hit=false;
+    for(const q of pts) if(q.x+q.r>r.x&&q.x-q.r<r.x+r.w&&q.y+q.r>r.y&&q.y-q.r<r.y+r.h){ hit=true; break; }
+    const k0=HUDF.k[r.id]||0, want=hit?0.85:0; let k=k0+(want-k0)*Math.min(1,dt*(hit?9:3.5)); if(k<0.01) k=0; HUDF.k[r.id]=k; if(k>0) any=true; }
+  if(!any) return;
+  if(!HUDF.cv||HUDF.cv.width!==cvs.width||HUDF.cv.height!==cvs.height) HUDF.cv=mkCanvas(cvs.width,cvs.height);
+  const g=HUDF.cv.getContext('2d');
+  for(const q of rs){ if(!HUDF.k[q.id]) continue; const r=hudFadePx(q); if(r) { g.clearRect(r[0],r[1],r[2],r[3]); g.drawImage(cvs,r[0],r[1],r[2],r[3],r[0],r[1],r[2],r[3]); } }
+  HUDF.on=true;
+}
+function hudFadePx(r){ const x=Math.max(0,Math.floor(r.x*DPR)), y=Math.max(0,Math.floor(r.y*DPR)), x1=Math.min(cvs.width,Math.ceil((r.x+r.w)*DPR)), y1=Math.min(cvs.height,Math.ceil((r.y+r.h)*DPR)); return x1>x&&y1>y?[x,y,x1-x,y1-y]:null; }
+function hudFadeEnd(){
+  if(HUDF.on){ ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+    for(const q of HUDF.rects){ if(!HUDF.k[q.id]) continue; const r=hudFadePx(q); if(!r) continue; ctx.globalAlpha=HUDF.k[q.id]; ctx.drawImage(HUDF.cv,r[0],r[1],r[2],r[3],r[0],r[1],r[2],r[3]); }
+    ctx.restore(); }
+  HUDF.rects=AREA&&AREA.rooms?hudFadeRects():[];
 }
 function drawMinimap(obj){
   const M=MINI_R(), r=M.r, cx=M.x+r, cy=M.y+r, p=player, span=1100, sc=r/span;
@@ -35623,7 +35872,7 @@ function dunUpdate(A,dt){
   for(const o of dn.spores) if(o.cd>0) o.cd-=dt;
   // conveyor belts carry whatever stands on them
   if(k>=0&&c.typ[k]===DTY.belt&&!air&&!p.flying&&!dn.ride&&scene==='play'){ const d=DIRS[c.flow[k]]||DIRS[1]; tNudge(p,d[0]*150*dt,d[1]*150*dt); T.pushed=true; }
-  for(const e of G.enemies){ if(e.dead||!e.inArea||e.flying) continue; const q=tCell(e.x,e.y); if(q>=0&&c.typ[q]===DTY.belt){ const d=DIRS[c.flow[q]]||DIRS[1]; tNudge(e,d[0]*120*dt,d[1]*120*dt); } }
+  for(const e of G.enemies){ if(e.dead||!e.inArea||e.flying||!roomAwake(e)) continue; const q=tCell(e.x,e.y); if(q>=0&&c.typ[q]===DTY.belt){ const d=DIRS[c.flow[q]]||DIRS[1]; tNudge(e,d[0]*120*dt,d[1]*120*dt); } }
   // the doors that open and close by themselves
   if(A.gates.some(o=>o.type==='timed'||o.type==='plate'||(o.type==='oneway'&&!o.opened)||(o.type==='roots'&&o.pend))) refreshCaveGates();
   for(const o of A.gates) if(o.type==='oneway'&&!o.opened){ const FR=A.rooms[o.from]; if(FR&&caveRoomAt(p.x,p.y)===FR&&dist(p.x,p.y,o.x,o.y)<84){ o.opened=true; G.found[o.id]=true; refreshCaveGates(); SFX.play('block'); setBanner(S('The bar lifts','The bar lifts'),S('A shortcut! It stays open now.','A shortcut! It stays open.'),1.8); saveGame(); } }
@@ -35862,7 +36111,7 @@ function dunSees(A,x0,y0,x1,y1){
 function dunGuards(A,dt){
   const dn=A.dn, p=player;
   for(const e of dn.guards){
-    if(e.dead||!e.guard||e.guard.alert) continue; const g=e.guard, R=A.rooms[e.room];
+    if(e.dead||!e.guard||e.guard.alert||!roomAwake(e)) continue; const g=e.guard, R=A.rooms[e.room];   // (v12 ROOMS) a guard in another room is asleep
     let see=false; const d=dist(e.x,e.y,p.x,p.y);
     if(!p.dead&&!(p.flying&&(p.z||0)>30)&&d<g.cone&&Math.abs(angDiff(e.face,angTo(e.x,e.y,p.x,p.y)))<g.half&&dunSees(A,e.x,e.y,p.x,p.y)) see=true;
     if(!p.dead&&d<e.r+p.r+10){ see=true; g.sus=1; }
