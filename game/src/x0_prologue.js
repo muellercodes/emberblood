@@ -69,7 +69,7 @@ function proBedLines(){ return [
     {t:S(`Why have I got horns, when nobody else has?`,`Why do I have horns?`),then:[proL('maren',`Your great-gran had them. They skip about in our family, like red hair.`,`Your great-gran had them. They skip about, like red hair.`,'tender'),proL('ash',`Bertram says it's more like a house fire.`,`Bertram says it's like a house fire.`,'sleepy'),proL('maren',`Then Bertram can bake his own birthday cake this year.`,`Then Bertram can bake his own cake.`,'laughing')]},
     {t:S(`Did you see? I didn't even jump at the roar.`,`I didn't jump at the roar!`),then:[proL('maren',`I saw. You were very brave about the sock.`,null,'laughing')]}
   ]}),
-  proL('narr',`She pinches out the candle. In the dark she sits on the end of the bed a little longer than she needs to. Then she kisses the top of your head, between the horns.`,`She puts out the candle and sits a while. Then she kisses your head.`),
+  proL('narr',`She pinches out the candle. In the dark she sits on the end of the bed a little longer than she needs to. Then she kisses the top of your head, between the horns.`,`She puts out the candle and sits a while. Then she kisses your head.`,null,null,{fn:()=>{ if(PRO.on) proFadeTo(0.6,1.6,null); }}),
   proL('maren',`Night, Ash.`,null,'tender'),
   proL('narr',`Her boots go back down the stairs and out of the door. Soon, down the lane, the forge is lit again, and a small hammer goes tink, tink, tink.`,`Mom goes out. Down the lane, a small hammer goes tink, tink.`),
   proL('narr',`Far away, the mountain rumbles in its sleep. You don't hear it. You're already asleep.`,`Far away, the mountain rumbles. You are already asleep.`)
@@ -125,6 +125,7 @@ function proBed(bed){
   PRO.phase='bed'; PRO.bed=bed;
   WAKE.on=true; WAKE.bed=bed; player.x=bed.x; player.y=bed.y+8; player.facing=Math.PI/2; player.kvx=player.kvy=0;
   G.prompt=null; SFX.play('step',0.6);
+  PRO.fade=0; proFadeTo(0.32,1.4,null);   // the attic at night, one candle
   runDialogue(proBedLines(),()=>{ scene='prologue'; proFadeTo(1,1.8,()=>proFinish(false)); });
 }
 // the end of the prologue, or a skip from anywhere in it: clean up, then the morning (Mom calling up the stairs)
@@ -145,6 +146,14 @@ function proFinish(skipped){
   PRO.cover=false; proFadeTo(0,skipped?0.7:1.4,()=>proOverlay(false));
 }
 function proSkip(){ if(!PRO.on) return; SFX.play('ui'); proFinish(true); }
+// left for the title screen in the middle of it (pause, quit): nothing to clean up in the world (a new journey or a
+// save builds it again), only the prologue's own things
+function proAbort(){
+  if(!PRO.on) return;
+  PRO.on=false; PRO.phase='done'; PRO.after=null; PRO.fade=0; PRO.fadeTo=0;
+  WAKE.on=false; WAKE.bed=null; if(PRO.bed){ delete PRO.bed.prompt; PRO.bed=null; }
+  proSkipShow(false); proOverlay(false);
+}
 function proFadeTo(v,sec,then){ PRO.fadeTo=v; PRO.fadeK=1/Math.max(0.05,sec); PRO.after=then||null; if(!PRO.el||PRO.el.style.display==='none') proOverlay(true); }
 
 // ---------- the walk home (scene play, the real village at night)
@@ -247,6 +256,7 @@ function proStep(dt,rt){
   if(PRO.shakeT>0) PRO.shakeT-=dt;
   PRO.turnK+=((PRO.beat==='turn'?1:0)-PRO.turnK)*Math.min(1,dt*3);
   PRO.squeeze=Math.max(0,PRO.squeeze-dt*0.55);
+  if(PRO.on&&scene==='menu'){ proAbort(); return; }
   if(PRO.skipEl&&PRO.on&&PRO.skipDev!==curDevice()) proSkipLabel();
   if(((PRO.fc=(PRO.fc||0)+1)%5)===0){ let tg=0; try{ const dl=document.getElementById('dialogue'), bx=document.getElementById('dlgBox'); if(dl&&bx&&dl.classList.contains('on')&&PRO.oy){ const top=bx.getBoundingClientRect().top-52, ay=PRO.oy+(PRO_ASH.y+30)*PRO.sc; if(ay>top) tg=top-ay; } }catch(e){} PRO.oyT=tg; }
   PRO.oyS=(PRO.oyS||0)+((PRO.oyT||0)-(PRO.oyS||0))*Math.min(1,rt*5);
@@ -802,6 +812,10 @@ addEventListener('keydown',e=>{
     try{ if(PRO.on&&scene==='prologue'&&navigator.getGamepads){ const gp=[...navigator.getGamepads()].find(q=>q&&q.connected); if(gp){ const b=i=>!!(gp.buttons[i]&&gp.buttons[i].pressed), now={a:b(0),b:b(1)||b(8)||b(9)}, was=PRO.padWas||{};
       if(now.b&&!was.b) proSkip(); else if(now.a&&!was.a&&PRO.phase==='title') proShow(); PRO.padWas=now; } } }catch(e){}
     return r; }; }
+// a save loaded, or a new journey started, while the prologue was still running (it was left for the menu)
+{ const base=startStory; startStory=function(){ proAbort(); return base.apply(this,arguments); }; }
+// quit to the title from the pause menu: the save is refused first (saveGame above), then the prologue lets go
+{ const base=toMenu; toMenu=function(){ const r=base.apply(this,arguments); proAbort(); return r; }; }
 // the test drivers' one call (__eb.skipDialogue right after a new journey) still lands in the morning with nothing to read
 function proHookTests(){
   try{ const E=window.__eb; if(E&&!E._proSkip){ const b=E.skipDialogue; E.skipDialogue=function(){ if(PRO.on) proFinish(true); return b.apply(this,arguments); }; E._proSkip=1; } }catch(e){}
