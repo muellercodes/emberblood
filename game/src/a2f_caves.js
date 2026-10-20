@@ -725,6 +725,7 @@ function roomZoomWant(){
   return RMV.zkWant=need>=z0?1:need/z0>=0.82?need/z0:1;
 }
 function roomZoom(dt,snap){
+  if(snap) RMV.snapT=2;   // a jump of the camera (a warp, the tp hook, a new floor): the rooms' light jumps with it
   const want=roomZoomWant(), z0=RMV.zk;
   RMV.zk=snap?want:RMV.zk+(want-RMV.zk)*(1-Math.exp(-dt*5)); if(Math.abs(RMV.zk-want)<0.002) RMV.zk=want;
   if(RMV.zk!==1||z0!==1) zoom=ZOOM0*(MV.zoomK||1)*RMV.zk;
