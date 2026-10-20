@@ -417,11 +417,18 @@ function navKeyOf(el){
   const d=Object.keys(el.dataset||{}).sort().map(k=>k+'='+el.dataset[k]).join('&'), p=el.parentElement&&el.parentElement.closest('[id]');
   return (p?p.id:'')+'|'+el.tagName+'|'+d+'|'+(d?'':String(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,40));
 }
-// back on a screen: the control you left it on (or the same one rebuilt, or the one nearest where it was)
+// the card or row a control sits in, as its place in its list (it survives the list being rebuilt)
+function navRowOf(el){
+  const r=el&&el.closest?el.closest(NAV_ROW):null, p=r&&r.parentElement, pid=p&&p.closest('[id]');
+  return r&&pid?{pid:pid.id,i:Array.prototype.indexOf.call(p.children,r)}:null;
+}
+// back on a screen: the control you left it on (or the same one rebuilt, or one in the same card, or the one nearest
+// where it was)
 function navRecover(root,m){
   const items=navItems(root); if(!items.length) return;
   let f=m&&m.el&&m.el.isConnected&&items.includes(m.el)?m.el:null;
   if(!f&&m&&m.key){ const L=items.filter(e=>navKeyOf(e)===m.key); if(L.length===1||!m.rect) f=L[0]||null; else if(L.length) f=navNearest(L,m.rect); }
+  if(!f&&m&&m.row){ const L=items.filter(e=>{ const q=navRowOf(e); return q&&q.pid===m.row.pid&&q.i===m.row.i; }); if(L.length){ const d=navDefault(root,L); f=root.id==='slots'?d:(m.rect?navNearest(L,m.rect):d); } }
   if(!f&&m&&m.rect){ const C=items.filter(e=>navSeen(navVis(e,root))); f=navNearest(C.length?C:items,m.rect); }
   navFocus(f||navDefault(root,items));
 }
@@ -441,7 +448,8 @@ function navDefault(root,items){
   if(!items||!items.length) return null;
   const ok=el=>!!el&&items.includes(el);
   let f=null;
-  if(root.id==='slots'){ const c=root.querySelector('.slot.cur [data-a="play"]'); if(ok(c)) f=c; }
+  // the save slots: a question (delete, start over) starts on the safe answer, else the current journey
+  if(root.id==='slots'){ const c=root.querySelector('.slot.warn [data-a="no"]')||root.querySelector('.slot.cur [data-a="play"]'); if(ok(c)) f=c; }
   if(!f) f=items.find(el=>el.matches('[data-focus]'))||null;
   if(!f){ const t=items.find(el=>navIsTab(el)&&navOn(el)); if(t) f=t; }
   if(!f) f=items[0];
@@ -595,7 +603,7 @@ function navOk(root){
   if(navBoxes(root).includes(el)) return;
   if(!items.includes(el)){ navFocus(navDefault(root,items)); return; }
   if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){ try{ el.focus(); el.click(); }catch(e){} return; }
-  const m={el,key:navKeyOf(el),rect:el.getBoundingClientRect()}; SFX.init(); el.click();
+  const m={el,key:navKeyOf(el),rect:el.getBoundingClientRect(),row:navRowOf(el)}; SFX.init(); el.click();
   // the click may rebuild this screen (journal, save slots): the same control again, else the nearest
   const r2=navRoot(); if(r2===root&&!navItems(root).includes(document.activeElement)) navRecover(root,m);
 }
@@ -679,7 +687,7 @@ function navWatch(root){
   const a=document.activeElement, items=navItems(root), onBox=navBoxes(root).includes(a);
   if(items.includes(a)||onBox){
     if(!navSeen(navVis(a,root))){ const S=navScrollers(a,root)[0]; if(S&&!onBox&&S!==root&&!S.classList.contains('ov')) navBoxFocus(S); else navReveal(a); }
-    PAD.mem[root.id]=Object.assign(PAD.mem[root.id]||{},{el:a,key:navKeyOf(a),rect:a.getBoundingClientRect()});
+    PAD.mem[root.id]=Object.assign(PAD.mem[root.id]||{},{el:a,key:navKeyOf(a),rect:a.getBoundingClientRect(),row:navRowOf(a)});
     return;
   }
   if(items.length) navRecover(root,PAD.mem[root.id]);
@@ -722,7 +730,10 @@ function padHintSync(root){
   const H=PAD.hint, id=root?root.id:'';
   const on=PAD.dev==='pad'&&!!root&&id!=='dialogue';
   if(!on){ if(H.key){ H.key=''; H.fixed=false; document.body.classList.remove('padhint'); for(const e of document.querySelectorAll('#padHint,.padhint-in')) e.innerHTML=''; } return; }
-  const ok=padOkBtn(), bk=ok===PB.S?PB.E:PB.S, C=i=>padChip(i), a=document.activeElement, L=[];
+  const a=document.activeElement, now=performance.now();
+  if(H.key&&a===H.ae&&id===H.id&&now-H.t<150) return;
+  H.ae=a; H.id=id; H.t=now;
+  const ok=padOkBtn(), bk=ok===PB.S?PB.E:PB.S, C=i=>padChip(i), L=[];
   const it=(c,t)=>`<span class="ph">${c}<b>${escapeHtml(t)}</b></span>`;
   const tabs=Array.from(root.querySelectorAll(NAV_TABS)).some(b=>vis(b)&&!b.hidden&&b.querySelectorAll('button:not([hidden])').length>1);
   const onBox=!!(a&&a.classList&&a.classList.contains('navbox')&&root.contains(a));
