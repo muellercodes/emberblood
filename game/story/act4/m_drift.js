@@ -137,8 +137,9 @@ chapter({
     ],
     drf_winnie_story: [
       ['m_winnie', 'Yes, child. The sea follows the moon, and it takes what it likes. Every raft, and every chicken.', 'Yes. The sea follows the moon. It would take every raft.'],
-      ['m_winnie', 'It has happened once before. Five hundred years ago a moth bit the moon for the very first time, and the sea came up and took Old Lumen, the moon city. That tower is the top of it.',
-        'Long ago a moth bit the moon. The sea came up and took a city. Old Lumen.'],
+      // (v12) the act's title comes from here: the tidewife's tale gives Moonfall's folk name for the moth, the Night Mother
+      ['m_winnie', "It has happened once before. Five hundred years ago the Night Mother bit the moon for the very first time. That's what my gran called her: a moth as big as the dark. And the sea came up and took Old Lumen, the moon city. That tower is the top of it.",
+        'Long ago the Night Mother, a giant moth, bit the moon. The sea took a city. Old Lumen.'],
       ['iska', 'Ember came east too, long ago, and I came with her. I can feel her flame down in that city, Ash. Like a candle in a window.',
         'Ember came here long ago. I came too. Her flame is down there, Ash.', { ref: 'm4_lumen_spire' }],
       ['ash', "Down? Under the sea? I can't breathe water.", "Under the sea? I can't breathe water."],

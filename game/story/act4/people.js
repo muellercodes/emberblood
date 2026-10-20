@@ -1613,8 +1613,8 @@ people({
         re: [
           { t: ['Iska says she forgot that moth.', 'Iska says she forgot the moth.'],
             say: [['wren', "Then she remembered, and wrote it down. That's what a page is for.", "Then she remembered. That's what pages are for."]] },
-          { t: ['So the moth has a name. Nyx.', 'The moth has a name. Nyx.'],
-            say: [['wren', "Somebody gave her that name, once, on a lantern. It's a sad thing, to be named and then left.", "Someone named her once. Then left. That's sad."]] },
+          { t: ['So Ember named her moth.', 'Ember named a moth.'],
+            say: [['wren', "Somebody gave her a name, once, on a lantern. It's a sad thing, to be named and then left.", "Someone named her once. Then left. That's sad."]] },
         ] },
       { if: 'quest m_leash done',
         say: ["Ripple and I are reading every pearl in the Archive. He forgets them, so we read them twice. It's heaven.", 'Ripple and I read every pearl. Twice!'],

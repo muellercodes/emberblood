@@ -2,8 +2,9 @@
 // What changed in v10 (ACT4_V10 1.1 finding 1): this quest no longer holds the kind ending. The main path teaches how to
 // free Hush (A4b's free_hush deduction sets m_leash_known), so the Hush choice is always open. What this quest gives
 // now is the TRUTH behind it: the moon-priests' Book of Moths (clue m4_book, a free_hush bonus clue that makes the right
-// pick glow) and, tucked in its back, a copy of the Wardens' lost eleventh page, which names a little grey moth Nyx
-// (G.flags.m_page11: the finale's "knows Nyx" test, e7b_threads nKnowsNyx). Surprise: the page is in Iska's writing.
+// pick glow) and, tucked in its back, a copy of the Wardens' lost eleventh page: Ember gave a little grey moth a name
+// (v12: the page never says which; "Nyx" is first said in Act V, ring 2) (G.flags.m_page11, read by the finale,
+// e7b_threads nKnowsNyx). Surprise: the page is in Iska's writing.
 // Ash melts the moon-wax vault in the Drowned Library (Moonfire, under water) and gives the soggy book to Sister Wren.
 // Old saves: QDEFS.m_leash steps 0..1 map to vault, wren (old_steps). The vault stays x3_people's (m3pVaultTick sets
 // m_vault_open and gives m_book_raw, with STORY.m_vault's lines), so the vault step just waits for its flag.
@@ -15,13 +16,13 @@ quest({
 
   item: {
     m_book: { name: ["The Moon-Priests' Book of Moths", 'The Book of Moths'], icon: 'book', keepsake: true,
-      desc: ['Dried out now. Wren read it. Moon silk, gentle moonfire, and a little grey moth called Nyx.', 'The book Wren read.'] },
+      desc: ['Dried out now. Wren read it. Moon silk, gentle moonfire, and a page about a little grey moth Ember gave a name to.', 'The book Wren read.'] },
   },
 
   clue: {
     m4_page11: { icon: 'note', mystery: 'm4_night_mother',
-      text: ["The Wardens' eleventh page: on the first Lantern Day a little grey moth sat on Ember's lantern all night. Ember named her Nyx.",
-        'A grey moth sat on Ember\'s lantern. Ember named her Nyx.'] },
+      text: ["The Wardens' eleventh page: on the first Lantern Day a little grey moth sat on Ember's lantern all night. Ember gave her a name.",
+        'A grey moth sat on Ember\'s lantern. Ember gave her a name.'] },
     m4_book: { icon: 'book', mystery: 'm4_night_mother',
       text: ['The Book of Moths: the Mother ties her moths with moon silk. It keeps them big and cold. Moonfire, breathed gently, melts the knot.',
         'The Book of Moths: gentle moonfire melts the knot.'] },
@@ -70,8 +71,8 @@ quest({
         'The lost eleventh page! Under the sea all this time!']],
         else: [['wren', 'Another copy of the eleventh page! Eider found one in Hearthold. I shall frame one and hug the other.',
           'Another eleventh page! I will hug it.']] },
-      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx." (Iska)',
-        '"A grey moth sat on Ember\'s lantern. Ember named her Nyx."', { clue: 'm4_page11' }],
+      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember gave her a name. We thought nothing of it." (Iska)',
+        '"A grey moth sat on Ember\'s lantern. Ember gave her a name."', { clue: 'm4_page11' }],
       ['iska', 'I wrote that, a thousand years ago, about a little moth on a lantern. I never thought about her again.', 'I wrote that. I forgot all about her.'],
     ],
     // replaces STORY.m_vault in place (x3_people's vault plays it by key when the wax melts)

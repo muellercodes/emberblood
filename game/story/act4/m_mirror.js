@@ -82,8 +82,9 @@ chapter({
       ['ember', 'Hello, little ember. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.',
         'Hello, little ember. This is my last flame. My fire, mixed with moonlight.'],
       ['ash', "What's it for?", "What's it for?"],
-      ['ember', 'For her. For my little moth. In case she ever went wrong.', 'For my little moth. In case she went wrong.'],
-      ['ash', 'Your moth?', 'Your moth?'],
+      // (v12) "someone I loved", not "my little moth": nobody in Act IV ties the Mother to Ember's moth (Act V, ring 1)
+      ['ember', 'For someone I loved. In case she ever got lost in the dark.', 'For someone I loved. In case she got lost.'],
+      ['ash', 'Who?', 'Who?'],
       ['ember', 'Take it, Ash. And if you ever meet her, be gentler than I was.', 'Take it. If you meet her, be gentler than me.'],
       ['narr', 'Behind the flame, words are cut deep into the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', 'Words in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', { clue: 'm4_black_flame' }],
       ['ash', "Burn black? Fire isn't black.", "Burn black? Fire isn't black."],
