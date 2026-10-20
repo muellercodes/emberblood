@@ -438,7 +438,7 @@ function n4aBuildLanterns(){
 function n4aGateOpen(){
   if(n4aF('n_gate')) return; G.flags.n_gate=1; G.flags.n_lanterns=3; for(const L of N4A.lans) L.lit=1e9;
   n4aSnd('bigchime'); shake(4); flashA=Math.max(flashA,0.4); flashCol='255,210,140';
-  n4aBub('n_bub_gate','ash',S("And not a single bakery was harmed. Mostly because there isn't one.",'Not one bakery got burned!'));
+  n4aBub('n_bub_gate','ash',S("Just like at home. Except nobody's clapping.",'Like at home. Nobody claps, though.'));
   n4aEmit('gate',{});
   later(1.6,()=>n4aScene('n_gate_open',[['narr',S('The third lantern catches. For one moment the whole green glows warm, like home on Lantern Day.','The lanterns glow. It feels like home for a moment.')],
     ['narr',S("Then the shadow gate melts away, and a whisper comes down the mountain, soft as a moth's wing.",'The dark gate melts. A whisper comes down the mountain.')],
