@@ -236,6 +236,43 @@ input{-webkit-user-select:text;user-select:text}
 .ppl{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .ppl div{background:rgba(0,0,0,.22);border-radius:9px;padding:8px 10px}
 .ppl b{color:var(--ink)} .ppl .hz{color:#ff8aa0;letter-spacing:2px} .ppl small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.bagtop{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:0 0 4px}
+.bagcoin{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--ink);white-space:nowrap}
+.bagcoin i{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 36% 34%,#fff6b8 0,#ffd84a 46%,#c8921a 100%);box-shadow:0 0 0 1.5px #8a6a1a}
+.bagq{display:flex;align-items:center;gap:8px;flex:1 1 240px;min-width:0;font-size:13px;line-height:1.35;color:var(--muted)}
+.bagq b{color:var(--ink)} .bagq canvas{flex:none} .bagq .pg{font-size:.95em}
+.bqe svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;opacity:.7}
+.bag{display:flex;flex-direction:column;gap:8px}
+.bi{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:4px 12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,140,70,.15);border-radius:12px;padding:8px 10px}
+.bi canvas{display:block;margin:auto}
+.bi .bt{min-width:0;line-height:1.35}
+.bi .bt b{color:var(--ink)}
+.bi .bn{display:inline-block;margin-left:8px;color:var(--gold);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bi .bt small{display:block;color:var(--muted);font-size:13px;margin-top:1px}
+.bi .bt small.why{color:#ffb08a;font-weight:600}
+.bi .bt small.for{color:#9fd8ea}
+.bi .bb{display:flex;gap:6px;align-items:center}
+.bi .bb .btn{width:auto;min-width:64px;min-height:44px;padding:8px 14px;font-size:15px}
+.bi .bb .bstar{min-width:46px;padding:6px 8px;display:flex;align-items:center;justify-content:center}
+.bstar svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.bstar.on svg{fill:#ffd84a;stroke:#8a5a1a}
+.bi .btn.off{opacity:.55;filter:saturate(.25);cursor:not-allowed}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.bgrid .bi{grid-template-columns:44px minmax(0,1fr) auto;padding:7px 9px}
+.bgrid .bi .bt{font-size:13.5px}
+.bgrid .bi .bt small{font-size:12px}
+.bgrid.hats{margin-top:8px}
+.bgrid .bi.hat{grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto auto}
+.bgrid .bi.hat canvas{grid-row:1/span 2}
+.bgrid .bi.hat .bb{grid-column:2}
+.bgrid .bi.hat .bb .btn{min-width:84px}
+.bgrid .bi.hat.on{border-color:rgba(255,200,110,.55)}
+html.sb .bgrid .bi.hat.on{border-color:#e0782c}
+.bi.shake{animation:bshake .32s}
+@keyframes bshake{0%,100%{transform:none}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+@media (max-width:480px){.bi{gap:6px 10px;padding:8px}.bag .bi{grid-template-columns:44px minmax(0,1fr)}.bag .bi canvas{grid-row:1/span 2}.bag .bi .bb{grid-column:2}.bi .bb .btn{min-width:64px;padding:8px 12px}.bgrid{grid-template-columns:1fr 1fr}.bgrid .bi{grid-template-columns:1fr;justify-items:center;text-align:center;padding:8px 6px}.bgrid .bi .bn{margin-left:4px}.bgrid .bi.hat{grid-template-columns:1fr}.bgrid .bi.hat canvas{grid-row:auto}.bgrid .bi.hat .bb{grid-column:1;justify-content:center}}
+@media (prefers-reduced-motion:reduce){.bi.shake{animation:none}}
+@media (max-height:500px){.bi{padding:5px 9px}.bagtop{margin:0}.bi .bb .btn{min-height:42px}}
 .opt.seen{opacity:.72}
 .opt .tag{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,200,120,.14);color:#f0cf98;font-weight:700;vertical-align:2px}
 .opt.t-kind .k{color:#9fe0a0} .opt.t-brave .k{color:#ffb070} .opt.t-silly .k{color:#d0a0ff}
@@ -290,6 +327,15 @@ html.sb .jq .qt,html.sb .slot .sh,html.sb .ppl b,html.sb .journal .jq{color:#3b2
 html.sb .jq .qs{color:#1f6a8a}
 html.sb .jq .row .btn{padding:5px 10px}
 html.sb .ppl .hz{color:#e04870}
+html.sb .bi{background:rgba(255,231,182,.7);border:2px solid rgba(59,34,51,.2);color:#6a4a52}
+html.sb .bi .bt b,html.sb .bagq b,html.sb .bagcoin{color:#3b2233}
+html.sb .bi .bn{color:#c8542a}
+html.sb .bi .bt small.why{color:#b8402a}
+html.sb .bi .bt small.for{color:#1f6a8a}
+html.sb .bi .bb .btn{padding:6px 12px}
+html.sb .bi .bb .bstar{padding:5px 8px}
+html.sb .bstar.on svg{fill:#ffd84a;stroke:#3b2233}
+html.sb .bagcoin i{box-shadow:0 0 0 2px #3b2233}
 html.sb .fld input{background:#fffaf0;color:#3b2233;border:2px solid #3b2233}
 html.sb .err{color:#c8402a!important}
 html.sb .lb li{border-bottom:2px dashed rgba(59,34,51,.14)}
@@ -394,6 +440,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>X / Z</kbd><span>Next or previous weapon</span>
               <kbd>1 to 6</kbd><span>Pick a weapon</span>
               <kbd>G</kbd><span>Call your companion</span>
+              <kbd>V</kbd><span>Use the item in your quick slot (under the ROAR ring). Star an item in the Satchel to put it there.</span>
               <kbd>U</kbd><span>Skills</span>
               <kbd>M / Tab</kbd><span>World map and fast travel</span>
               <kbd>I</kbd><span>Journal</span>
@@ -425,6 +472,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>\</kbd><span>Talk, open, rest at a shrine. It never swings.</span>
               <kbd>] / [</kbd><span>Next or previous weapon</span>
               <kbd>,</kbd><span>Call your companion</span>
+              <kbd>Num 5</kbd><span>Use the item in your quick slot (under the ROAR ring). V works too.</span>
               <kbd>U</kbd><span>Skills</span>
               <kbd>M</kbd><span>World map and fast travel</span>
               <kbd>I</kbd><span>Journal</span>
@@ -433,7 +481,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>N</kbd><span>Sound on or off</span>
               <kbd>P / Esc</kbd><span>Pause</span>
             </div>
-            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
+            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks, <b>5</b> uses your quick-slot item and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
           </div>
         </div>
       </section>
@@ -444,11 +492,11 @@ html.sb #padToast span{color:#6a4a52}
             <ul class="tips">
               <li>Drag on the left side to move (the right side if Settings has <b>Handed: Left</b>). Push the stick all the way to sprint.</li>
               <li><b>SLASH</b> attacks. Hold it for a combo. Next to someone or something you can use, with no foe close, it glows and says <b>TALK</b>, <b>OPEN</b>, <b>READ</b>, <b>ENTER</b> or <b>TAKE</b>. Tap it to do that.</li>
-              <li><b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
-              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>ROAR</b> works when its ring is full.</li>
-              <li><b>DRINK</b> heals. You can also tap the green flasks at the top.</li>
-              <li><b>WEAPON</b> switches weapons once you have two or more.</li>
-              <li><b>CALL</b> calls your companion.</li>
+              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
+              <li>Some buttons show up only when they can help, always in the same spot: <b>DRINK</b> when you are hurt, <b>ROAR</b> when its ring is full, <b>CALL</b> when your companion is far away or waiting.</li>
+              <li>Tap the green flasks at the top to drink any time. Tap your companion's picture to call them, twice to make them wait.</li>
+              <li>Tap the weapon at the top to switch weapons once you have two or more.</li>
+              <li>Like all eight buttons on screen all the time? Turn on <b>Show every button</b> in Settings.</li>
             </ul>
           </div>
           <div>
@@ -619,6 +667,7 @@ html.sb #padToast span{color:#6a4a52}
     <div class="setrow"><span>Chatter<small>Speech bubbles from people around town. Story talk always shows.</small></span><div class="seg" id="setChat" role="group" aria-label="Chatter"><button type="button" data-v="some" aria-pressed="false">Some</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Touch controls<small>For phones and tablets. One hand puts every button under one thumb, on the side set by Handed.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" id="setTouchOne" aria-pressed="false">One hand</button></div></div>
     <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>
+    <div class="setrow"><span>Show every button<small>Off: DRINK, ROAR and CALL show up only when they do something, and you tap the weapon at the top to switch weapons. On: all eight buttons, all the time.</small></span><div class="seg" id="setAllBtn" role="group" aria-label="Show every button"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Auto-attack<small>Ash swings at enemies in reach by himself. On by default in one-hand mode.</small></span><div class="seg" id="setAuto" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div style="margin-top:16px"><button class="btn c hot" id="bSettingsClose" type="button">Done</button></div>
   </div>
@@ -1174,7 +1223,7 @@ Object.assign(STORY,{
   trial_leap_gift:[['narr',S(`You touch the flame. It doesn't burn. It tickles.`,`You touch the flame. It tickles.`)],['narr',S(`Warmth runs all the way down into your feet. Your tail flicks. Your knees feel... springy.`,`Warmth runs into your feet. Your knees feel springy.`)],['ember',S(`The Leap! Now you can jump over pits, spikes, and roots that trip you on purpose. Run first, and you will jump even farther.`,`The Leap! Jump over pits and spikes. Run first to jump farther.`)],['ash',`I'm going to jump on EVERYTHING.`],['ember',`I know. My children said that too.`]],
   trial_leap_how:`Press C, the JUMP button, or A on a controller. Sprint first to leap farther.`,
   trial_leap_item:[['narr',S(`You heave open the great chest. Inside, wrapped in leaves that never went brown, is a curved piece of red-gold wood.`,`In the great chest: a curved piece of red-gold wood.`)],['ember',S(`My Wing-rang! I carved it from the old oak by the village. Throw it, and it always comes home. Like children. Eventually.`,`My Wing-rang! Throw it, and it always comes home.`)],['ember',S(`It can strike things your claws cannot reach. Crystal switches across the pits, for example. Hint, hint.`,`It hits things you can't reach. Like crystal switches over pits.`)]],
-  trial_leap_itemhow:`Switch weapons with X or the WEAPON button, then throw it. It flies over pits and comes back.`,
+  trial_leap_itemhow:`Switch weapons (X, or tap the weapon at the top of the screen), then throw it. It flies over pits and comes back.`,
   trial_leap_bossline:S(`Old Gnarl! When he stomps, JUMP the rings. Then hit the glowing knot on his back. And roots burn, Ash. Roots burn.`,`Old Gnarl! Jump the rings. Hit the glowing knot. Roots burn!`),
   trial_leap_won:[['narr',S(`Old Gnarl creaks, wobbles, and sits down with a sound like a whole forest sighing.`,`Old Gnarl creaks and sits down with a big sigh.`)],['narr',S(`A little green sprout pops out of the top of his head. He looks... happy?`,`A green sprout pops out of his head. He looks happy.`)],['ember',S(`Thank you, old friend. You guarded this place for a thousand years. You can rest now. Grow some acorns.`,`Thank you, old friend. Rest now. Grow some acorns.`)],['ember',S(`Go on, Ash. Through the door. Something is waiting for you.`,`Go on, Ash. Through the door.`)]],
   trial_leap_end:[['ember',S(`You passed the Trial of the Leap! If I still had feet, I'd be dancing on them.`,`You passed! If I had feet, I would dance.`)],['ember',S(`Take a little more of my fire. It will make you stronger.`,`Take a little more of my fire.`)],['ember',S(`Two more Trials are waiting. The Trial of the Tide sleeps on the island in Lake Mirrow. You'll need your new legs to get there.`,`Next: the Trial of the Tide, on the island in Lake Mirrow.`)],['narr',S(`Step into the warp ring to go back outside.`,`Step into the ring to go outside.`)]],
@@ -1183,7 +1232,7 @@ Object.assign(STORY,{
   trial_tide_gift:[['narr',S(`The flame pours over you like warm rain. Steam curls off your scales.`,`The flame pours over you like warm rain.`)],['narr',S(`You look down. The water in the pools shivers away from your feet, like it's shy.`,`The water moves away from your feet.`)],['ember',S(`Water Stride! Now deep water will hold you up, as long as you keep walking. Running on water is hard work, so mind your breath.`,`Water Stride! Walk on deep water. Running on it tires you out.`)],['ash',S(`Can I walk across Lake Mirrow? The whole lake?`,`Can I walk across the whole lake?`)],['ember',S(`The whole lake. Wave to the fish for me.`,`The whole lake. Wave to the fish.`)]],
   trial_tide_how:S(`Just walk onto deep water. With Water Stride it holds you up. Sprinting on water burns stamina fast.`,`Walk onto deep water. It holds you up. Running tires you.`),
   trial_tide_item:[['narr',S(`The great chest opens with a soft click. Inside lies a bow of pale driftwood, strung with something that shines like moonlight on water.`,`In the great chest: a driftwood bow with a shining string.`)],['ember',S(`My bow! I made the string out of a moonbeam. The moon owed me a favor.`,`My bow! The string is a moonbeam.`)],['ember',S(`Arrows fly straight and far. Stone eyes that won't open for claws will open for an arrow.`,`Arrows fly far. Shoot the stone eyes to open them.`)]],
-  trial_tide_itemhow:`Switch to the bow with X or the WEAPON button, then shoot. Arrows wake the stone eyes.`,
+  trial_tide_itemhow:`Switch to the bow (X, or tap the weapon at the top of the screen), then shoot. Arrows wake the stone eyes.`,
   trial_tide_bossline:S(`The Mirrow Serpent! Stride out to his head when he comes up for air. And keep out of the whirlpool!`,`The Serpent! Walk out to his head. Stay out of the whirlpool!`),
   trial_tide_won:[['narr',S(`The Mirrow Serpent sinks down, down, down... then bobs back up and floats on its back like a very large, very embarrassed noodle.`,`The Serpent sinks. Then it floats up on its back like a noodle.`)],['narr',S(`It blows one big bubble at you. Then it swims off into the deep, humming.`,`It blows a bubble at you and swims off, humming.`)],['ember',S(`He always loved a good game of splash. Thank you for playing with him, Ash.`,`He loves splashing games. Thank you for playing with him.`)]],
   trial_tide_end:[['ember',S(`Two Trials! You're as stubborn as I was. That's a compliment.`,`Two Trials! You are stubborn, like me. That's good.`)],['ember',S(`The last one is the hardest. The Trial of the Sky waits on the crag in the Drakeling Crags, behind a moat far too wide to jump.`,`The last one is the Trial of the Sky, in the Drakeling Crags.`)],['ash',`But not too wide to walk on.`],['ember',`Exactly. You're quick.`],['narr',S(`Step into the warp ring to go back outside.`,`Step into the ring to go outside.`)]],
@@ -9397,13 +9446,21 @@ cvs.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
-// touch layout (controls build). SLASH is the biggest button, right under the thumb, and it also talks, opens and
-// picks things up (it says TALK, OPEN and so on when it will). Two thumbs: JUMP, FIRE and ROLL on an inner arc around
-// SLASH, then a smaller outer arc (ROAR, WEAPON, DRINK, CALL) that climbs on tall screens and leans left on short ones.
-// One hand: columns hugging the edge, filled bottom to top. Settings > Handed: Left mirrors all of it.
-// Every button keeps its spot when others come and go (JUMP once Ash can jump, WEAPON with two or more weapons,
-// CALL with a companion), so thumbs learn where things are. Hit areas reach past the drawn circles but never overlap.
+// touch layout (controls build, v12 fewer buttons). SLASH is the biggest button, right under the thumb, and it also
+// talks, opens and picks things up (it says TALK, OPEN and so on when it will). Two thumbs: JUMP, FIRE and ROLL on an
+// inner arc around SLASH, then a smaller outer arc that climbs on tall screens and leans left on short ones. One hand:
+// columns hugging the edge, filled bottom to top. Settings > Handed: Left mirrors all of it.
+// (v12) Most of the time there are only SLASH, FIRE and ROLL (and JUMP once Ash can jump). The others come only when they
+// do something: DRINK when Ash is hurt enough for a draught to help and has one (the flasks at the top drink too), ROAR
+// when its meter is full, CALL when the companion is away (far behind, off the screen, or told to wait; tapping their
+// picture at the top calls too). WEAPON is gone: tap the weapon chip at the top. In this set DRINK takes the old WEAPON
+// spot, the closest one of the outer arc. Settings > "Show every button" brings back all eight, always there, as before.
+// Every button keeps its own spot when it comes and goes (TL.all holds every spot, a hidden button leaves its spot empty
+// and its hit area unused), it pops in, it never pops up under a finger that is already down on that spot, and a button
+// under a finger never goes away until the finger lifts. Hit areas reach past the drawn circles but never overlap.
 const TBTN_LABEL={attack:'SLASH',fire:'FIRE',roll:'ROLL',roar:'ROAR',drink:'DRINK',use:'USE',weapon:'WEAPON',whistle:'CALL'};
+settings.allBtn=store.get('eb_allbtn',false)===true;
+const allBtns=()=>!!settings.allBtn;
 function jumpLabel(){ return player&&player.flying?'LAND':(hasAbil('wings')&&airborne()?'FLY':'JUMP'); }
 const TL={key:'',all:[],out:[],side:true};
 // which side the buttons are on: true for the right edge
@@ -9414,11 +9471,12 @@ function touchKeep(){
   return [
     {x:mr.x-10,y:mr.y,w:mr.w+20,h:mr.h+34},                                  // minimap, its clock and the place name
     {x:W-SAFE.r-56,y:SAFE.t+12,w:44,h:156},                                  // pause, sound, the small weapon chip under them
-    {x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:84},           // vitals
+    // vitals, and the item quick-slot chip under the ROAR dial (its 44 px hit area, a12b_ui.js / a11b_hud.js, v12 UI)
+    {x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:120},
     {x:SAFE.l+6,y:qy-12,w:Math.min(312,W*0.5+12),h:70}                       // the quest goal (or the wave and score)
   ];
 }
-function tLayoutBuild(mode,right,s){
+function tLayoutBuild(mode,right,s,all){
   // the HUD boxes and their mirror images, so the left-handed layout is an exact mirror of the right-handed one
   const B=H-SAFE.b, keep0=touchKeep(), keep=keep0.concat(keep0.map(R=>({x:W-R.x-R.w,y:R.y,w:R.w,h:R.h}))), P=[], gap=11*s;
   const ex=v=>right?W-SAFE.r-v:SAFE.l+v;
@@ -9439,8 +9497,10 @@ function tLayoutBuild(mode,right,s){
     P.push({id:'attack',x:ax,y:ay,r:rS});
     // [id, radius, ring, preferred angle]: 180 is toward the middle of the screen, 270 straight up
     // short screens (a phone on its side) fan out to the left along the bottom, tall ones climb
-    const want=short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['weapon',28,R2,207],['whistle',23,R3,185],['drink',25,R3,205]]
-                    :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['weapon',28,R2,229],['whistle',23,R2,254],['drink',25,R2,279]];
+    const want=all?(short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['weapon',28,R2,207],['whistle',23,R3,185],['drink',25,R3,205]]
+                         :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['weapon',28,R2,229],['whistle',23,R2,254],['drink',25,R2,279]])
+                   :(short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['drink',28,R2,207],['whistle',25,R3,192]]
+                         :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['drink',28,R2,229],['whistle',25,R2,254]]);
     for(const [id,r0,ring,deg] of want){
       const r=r0*s; let got=null;
       for(const rad of ring===R1?[R1,R2,R3]:ring===R2?[R2,R3,R3+72*s]:[R3,R3+72*s]){
@@ -9452,7 +9512,8 @@ function tLayoutBuild(mode,right,s){
     }
   }else{
     // one hand: columns from the edge, filled bottom to top (at most four high); the stick floats anywhere low that is not a button
-    const order=[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['weapon',28],['drink',26],['whistle',24]];
+    const order=all?[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['weapon',28],['drink',26],['whistle',24]]
+                   :[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['drink',28],['whistle',25]];
     const colX=k=>ex((51+86*k)*s), y0=B-62*s, qtop=B-330;
     let k=0,j=0,y=y0,pr=0;
     for(const [id,r0] of order){
@@ -9465,22 +9526,93 @@ function tLayoutBuild(mode,right,s){
       }
     }
   }
-  // hit areas: past the drawn circle, halfway to the nearest neighbour at most
+  // hit areas: past the drawn circle, halfway to the nearest neighbour at most (hidden ones count, so they never change)
   for(const b of P){
     let g2=1e9; for(const q of P) if(q!==b) g2=Math.min(g2,Math.hypot(b.x-q.x,b.y-q.y)-b.r-q.r);
     b.hr=b.r+Math.max(4,Math.min((b.id==='attack'?22:16)*s,g2/2-1));
   }
   return P;
 }
-function tLayout(){
-  const mode=settings.touch||'two', right=touchRight(), s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1);
-  const key=[W,H,SAFE.l,SAFE.r,SAFE.t,SAFE.b,mode,right,s.toFixed(3),!!G&&G.mode].join('|');
-  if(TL.key!==key){ TL.key=key; TL.all=tLayoutBuild(mode,right,s); TL.side=right; }
+function tNWeapons(){ const w=(G&&G.weapons)||{}; return Object.keys(w).filter(k=>w[k]).length; }
+// may this button show at all on this journey (its spot is kept clear of the prompt pill, the tips and the quest list)
+function tMay(id){
   const g=G||{}, story=g.mode==='story';
-  const has={jump:!!G&&(!story||hasAbil('jump')), weapon:Object.keys(g.weapons||{}).filter(k=>g.weapons[k]).length>=2, whistle:story&&!!g.comp};
+  if(id==='jump') return !!G&&(!story||hasAbil('jump'));
+  if(id==='weapon') return allBtns()&&tNWeapons()>=2;
+  if(id==='whistle') return story&&!!g.comp;
+  if(id==='drink') return allBtns()||!!player&&player.potions>0;
+  return true;
+}
+// a draught helps once at least half of it would go into health (the drink code in a6_player.js heals 45% of max
+// health times the difficulty and the drink perks): about 75% health or less on Normal, 70% on Easy
+function tDrinkHelps(){
+  const p=player; if(!p||p.dead||!(p.potions>0)||!G) return false;
+  const d=G.diff||{}, pool=p.maxHp*0.45*(d.pot||d.heal||1)*((p.stats&&p.stats.drinkMul)||1);
+  return p.hp<=p.maxHp*clamp(1-pool*0.5/p.maxHp,0.5,0.85);
+}
+// the companion is away: told to wait, far behind, or off the screen (CM is a9i_comps.js's companion, null when none)
+function tCompAway(){
+  try{
+    const c=CM; if(!c||CMG!==G||!player||c.hidden||c.outside||c.down>0) return false;
+    if(c.mode==='stay') return true;
+    if(dist(c.x,c.y,player.x,player.y)>320) return true;
+    const sx=(c.x-cam.x)*zoom, sy=(c.y-cam.y)*zoom;
+    return sx<-8||sy<-8||sx>W+8||sy>H+8;
+  }catch(e){ return false; }
+}
+// should this button be up right now
+function tWant(id){
+  if(!tMay(id)) return false;
+  if(allBtns()) return true;
+  const p=player; if(!p) return false;
+  if(id==='drink') return tDrinkHelps();
+  if(id==='roar') return p.roar>=100;
+  if(id==='whistle') return tCompAway();
+  return true;
+}
+function tLayout(){
+  const mode=settings.touch||'two', right=touchRight(), s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1), all=allBtns();
+  const key=[W,H,SAFE.l,SAFE.r,SAFE.t,SAFE.b,mode,right,s.toFixed(3),!!G&&G.mode,all].join('|');
+  if(TL.key!==key){ TL.key=key; TL.all=tLayoutBuild(mode,right,s,all); TL.side=right; }
+  // every spot a button is on or may pop up on, so the things that keep clear of buttons never jump when one comes
   const L=TL.out; L.length=0;
-  for(const b of TL.all){ if(b.id in has&&!has[b.id]) continue; b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; L.push(b); }
+  for(const b of TL.all){ if(!tMay(b.id)) continue; b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; L.push(b); }
   return L;
+}
+// ---------- which buttons are up (v12): each one has {on, a (0 to 1, the pop), t (when it last came or went), w (when
+// it was last wanted)}. A button that came stays at least TV_MIN seconds and TV_GRACE after its reason is gone (so a
+// double tap on CALL still finds it, and DRINK does not blink when health hovers at the line).
+const TV={g:null,s:{},pts:{},out:[],last:0};
+const TV_MIN={drink:1.2,roar:0.6,whistle:1.8}, TV_GRACE={drink:0.5,roar:0,whistle:1.2};
+const tNow=()=>performance.now()/1000;
+// fingers down on the screen right now (any of them), so a button never pops up under one
+function tTouches(e){ TV.pts={}; for(const t of e.touches) TV.pts[t.identifier]={x:t.clientX,y:t.clientY}; }
+function tFingerOn(b){ for(const k in TV.pts){ const q=TV.pts[k]; if(Math.hypot(q.x-b.x,q.y-b.y)<b.hr+8) return true; } return false; }
+function tState(b,now){ let st=TV.s[b.id]; if(!st){ const w=tWant(b.id); st=TV.s[b.id]={on:w,a:w?1:0,t:now-9,w:now}; } return st; }
+// once a frame while the buttons are drawn (drawTouch, a11b_hud.js)
+function tVisTick(){
+  const now=tNow(), dt=clamp(now-(TV.last||now),0,0.1); TV.last=now;
+  if(TV.g!==G){ TV.g=G; TV.s={}; }   // a new journey or a loaded save: the buttons are just there, no pops
+  tLayout();
+  const held=Object.values(touch.btn);
+  for(const b of TL.all){
+    const st=tState(b,now), want=tWant(b.id);
+    if(want) st.w=now;
+    if(st.on){ if(!want&&!held.includes(b.id)&&now-st.t>=(TV_MIN[b.id]||0)&&now-st.w>=(TV_GRACE[b.id]||0)){ st.on=false; st.t=now; } }
+    else if(want&&!tFingerOn(b)){ st.on=true; st.t=now; }
+    st.a=st.on?Math.min(1,st.a+dt/0.2):Math.max(0,st.a-dt/0.14);
+  }
+}
+// the buttons on the screen now, each with a (its pop, 0 to 1), live (takes taps: up for 0.1 s and not on its way out)
+// and popT (seconds since it came)
+function tShown(){
+  tLayout(); const out=TV.out, now=tNow(); out.length=0;
+  for(const b of TL.all){
+    const st=tState(b,now); if(!st.on&&st.a<=0.01) continue;
+    b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; b.a=st.a; b.live=st.on&&now-st.t>=0.1; b.popT=now-st.t; b.on=st.on;
+    out.push(b);
+  }
+  return out;
 }
 // the highest point the buttons reach over the x range x0..x1 (the quest list on that side stops above it)
 function touchTopOver(x0,x1){ let t=H; for(const b of tLayout()) if(b.x+b.r>x0&&b.x-b.r<x1) t=Math.min(t,b.y-b.r); return t; }
@@ -9583,17 +9715,21 @@ function hudClick(x,y){
 cvs.addEventListener('touchstart',e=>{
   usingTouch=true; aimMode='touch'; SFX.init();
   if(scene!=='play') return;
-  e.preventDefault();
+  e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
     const x=t.clientX,y=t.clientY;
-    if(hudClick(x,y)) continue;
-    let hit=null, hd=1e9; for(const b of tLayout()){ const d=dist(x,y,b.x,b.y)/(b.hr||b.r+14); if(d<1&&d<hd){ hd=d; hit=b; } }
+    // (v12) only the buttons that are up take taps; a tap on an empty spot does what a tap there always did. A button
+    // goes first: the HUD never sits on one (touchKeep), but a banner's tap-to-skip box can reach over the outer ones,
+    // and a tap on DRINK must drink, not skip "Quest updated"
+    let hit=null, hd=1e9; for(const b of tShown()){ if(!b.live) continue; const d=dist(x,y,b.x,b.y)/(b.hr||b.r+14); if(d<1&&d<hd){ hd=d; hit=b; } }
+    if(!hit&&hudClick(x,y)){ TV.tap={x,y,hud:true}; continue; }
+    TV.tap={x,y,hit:hit?hit.id:null};
     if(hit){ touch.btn[t.identifier]=hit.id; touch.held[hit.id]=true; touch.pressed[hit.id]=true; if(hit.id==='fire'&&settings.touch!=='two') touch.fireT=1.1; }
     else if(touch.stickId===null&&stickZone(x,y)){ touch.stickId=t.identifier; touch.ox=touch.sx=x; touch.oy=touch.sy=y; touch.full=0; }
   }
 },{passive:false});
 cvs.addEventListener('touchmove',e=>{
-  if(scene!=='play') return; e.preventDefault();
+  if(scene!=='play') return; e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
     if(t.identifier===touch.stickId){
       touch.sx=t.clientX; touch.sy=t.clientY;
@@ -9603,6 +9739,7 @@ cvs.addEventListener('touchmove',e=>{
   }
 },{passive:false});
 const tEnd=e=>{
+  tTouches(e);
   for(const t of e.changedTouches){
     if(t.identifier===touch.stickId){ touch.stickId=null; touch.full=0; }
     const id=touch.btn[t.identifier];
@@ -9675,6 +9812,7 @@ function onKey(e){
     else if(c==='KeyT'&&G.mode==='story') cycleFocus();
     else if(c==='KeyU'&&G.mode==='story') openSkills();
     else if(c==='KeyL'&&!e.repeat) openLog();
+    else if((c==='KeyV'||c==='Numpad5')&&!e.repeat) quickUse();   // (v12) the item in the quick slot (a11b_hud.js)
     if((c==='KeyJ'||c==='KeyK'||c==='Enter'||c==='Quote')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }
@@ -9745,6 +9883,13 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{
   spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
   atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})
 });
+// (v12) test hooks for the touch buttons: every spot in this layout, and the ones on the screen now
+window.__ebDbg=Object.assign(window.__ebDbg||{},{
+  tbtn:()=>tShown().map(b=>({id:b.id,x:Math.round(b.x),y:Math.round(b.y),r:+b.r.toFixed(1),hr:+b.hr.toFixed(1),a:+(b.a||0).toFixed(2),live:!!b.live,label:b.label})),
+  tall:()=>{ tLayout(); return TL.all.map(b=>({id:b.id,x:Math.round(b.x),y:Math.round(b.y),r:+b.r.toFixed(1),hr:+b.hr.toFixed(1),may:tMay(b.id),want:tWant(b.id)})); },
+  tkeep:()=>touchKeep(), hudHits:()=>HUD_HITS.map(h=>({x:Math.round(h.x),y:Math.round(h.y),w:Math.round(h.w),h:Math.round(h.h),tipx:!!h.tipx})),
+  tpress:()=>Object.assign({},touch.pressed), tlast:()=>TV.tap||null, theld:()=>Object.assign({},touch.held)
+});
 // ================= gamepads: PlayStation, Xbox and Nintendo controllers through the browser Gamepad API (controls build)
 // Buttons are read by physical position (the "standard" mapping): 0 bottom face, 1 right face, 2 left face, 3 top face,
 // 4 L1/LB/L, 5 R1/RB/R, 6 L2/LT/ZL, 7 R2/RT/ZR, 8 Back/View/Share/Create/minus, 9 Start/Menu/Options/plus,
@@ -9753,7 +9898,7 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{
 // Play:  left stick move (all the way for a moment sprints, L3 toggles sprint) · right stick aim
 //        bottom jump · right roll · left attack (held) · top use/talk · R2 attack · L2 fire breath
 //        R1/L1 next/previous weapon · R3 or L1+R1 together Roar · d-pad up drink · d-pad down companion
-//        d-pad left/right previous/next followed quest (Arena: previous/next weapon)
+//        d-pad left uses the item in the quick slot, d-pad right switches the followed quest (Arena: previous/next weapon)
 //        Back/View/Share/minus: map, hold for the journal · Start/Menu/Options/plus: pause, hold for skills
 // Menus: d-pad or left stick moves the focus · bottom picks · right goes back (swappable in Settings)
 //        L1/R1 switch tabs (on the world map they pick a shrine) · right stick scrolls · Start closes pause
@@ -10004,7 +10149,7 @@ function padPlayUI(s,dt){
       else if(s.tap[i]){ PAD.ui=true; openMap(); }
     }
     if(s.ed[PB.RT]) cycleFocus();
-    if(s.ed[PB.LF]) focusPrev();
+    if(s.ed[PB.LF]) quickUse();   // (v12) the quick slot (a11b_hud.js); previous quest went
   }else{
     if(s.ed[PB.ST]){ PAD.ui=true; pauseGame(); }
     if(s.ed[PB.RT]) PAD.q.wN=true;
@@ -10015,10 +10160,6 @@ function padPlayUI(s,dt){
   if(s.cur[PB.L1]&&s.cur[PB.R1]&&(PAD.sh[0]>=0||PAD.sh[1]>=0)&&!PAD.chord){ PAD.chord=true; PAD.q.roar=true; PAD.sh=[-1,-1]; }
   if(!s.cur[PB.L1]&&!s.cur[PB.R1]) PAD.chord=false;
   for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(PAD.sh[j]>=0&&(!s.cur[i]||PAD.sh[j]>0.12)){ if(!PAD.chord){ if(padSw(i)===PB.R1) PAD.q.wN=true; else PAD.q.wP=true; } PAD.sh[j]=-1; } }
-}
-function focusPrev(){
-  const list=[null].concat(tracked()); let i=list.indexOf(G.focus||null); i=(i-1+list.length)%list.length;
-  followQuest(list[i]); SFX.play('ui');
 }
 function padInput(o,dt){
   const s=PAD.s; if(!s||!padActive()||PAD.ui) return;
@@ -10110,6 +10251,8 @@ function navMove(root,dir){
   const sc=navScroller(root,items.includes(cur)?cur:null);
   if(!items.length){ if(sc&&V) sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
   if(!items.includes(cur)){ navFocus(navDefault(root,items)); return; }
+  // (v12) the journal: down from its tabs goes to the first button on the page (the Satchel's sit at the right side)
+  if(root.id==='jour'&&V&&sg>0&&cur.closest('.jtabs')){ const f=items.find(el=>el.closest('#jBody')); if(f){ navFocus(f); SFX.play('ui',0.35); return; } }
   const a=cur.getBoundingClientRect(), acx=(a.left+a.right)/2, acy=(a.top+a.bottom)/2;
   let best=null,bs=1e9;
   for(const el of items){
@@ -10200,6 +10343,7 @@ function padMenu(root,s,dt){
   if(s.ed[ok]) navOk(root);
   else if(s.ed[back]) ovBack(root);
   else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) dlgNext();
+  else if(root.id==='jour'&&(s.ed[PB.W]||s.ed[PB.N])) bagPadStar();   // (v12) X or Y on the Satchel stars an item
   if(s.ed[PB.L1]) navTab(root,-1);
   if(s.ed[PB.R1]) navTab(root,1);
   if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
@@ -10314,7 +10458,7 @@ function drawPadDiagram(cv,k){
   g.textAlign='right'; g.fillText('Attack',fp[2][0]-16,fp[2][1]);
   // southpaw (Settings > Handed: Left) swaps what the sticks, triggers and bumpers do
   const sp=lefty(), mv='Move, click: sprint', am='Aim, click: Roar';
-  const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← → switch quest']].sort((a,b)=>a[1]-b[1]);
+  const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← item · → switch quest']].sort((a,b)=>a[1]-b[1]);
   const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]];
   const line=(x0,y0,x1,y1)=>{ g.strokeStyle='rgba(255,200,140,.6)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); g.fillStyle='#ffc35a'; g.beginPath(); g.arc(x0,y0,2.4,0,TAU); g.fill(); g.beginPath(); g.arc(x1,y1,1.6,0,TAU); g.fill(); };
   const label=(t,x,y,al)=>{ g.font=`600 13px ${UIF}`; g.textAlign=al; g.fillStyle='#f3e4cc'; const ls=t.split('\n'); ls.forEach((s,i)=>g.fillText(s,x,y+(i-(ls.length-1)/2)*16)); };
@@ -10336,13 +10480,16 @@ function padHelpRows(k){
     [`${c(PB.R3)} or ${padChip(PB.L1,k)}+${padChip(PB.R1,k)}`,'Dragon Roar, once the meter is full'],
     [c(PB.UP),'Drink a healing draught'],
     [c(PB.DN),'Call your companion'],
-    [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in the Arena: switch weapons)'],
+    [c(PB.LF),'Use the item in your quick slot. Star one in the Satchel to put it there. (In the Arena: previous weapon)'],
+    [c(PB.RT),'Switch which quest you follow (in the Arena: next weapon)'],
     [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
-    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs.`],
+    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs. In the Satchel, ${padBtnName(PB.W,k)} or ${padBtnName(PB.N,k)} puts an item in your quick slot.`],
     [chip(sp?'Southpaw':'Left-handed?'),sp?'On: the sticks, triggers and bumpers are swapped. Settings > Handed changes it back.':'Settings > Handed: Left swaps the sticks, triggers and bumpers (southpaw).']
   ];
 }
+// (v12) the quick-slot item: V (Numpad 5 on the left-handed keyboard), d-pad left, the chip under ROAR on touch
+Object.assign(ACT_KEY_R,{item:'V'}); Object.assign(ACT_KEY_L,{item:'Num 5'}); Object.assign(ACT_PAD_R,{item:PB.LF}); Object.assign(ACT_TOUCH,{item:'the item under the ROAR ring'});
 window.__ebX=Object.assign(window.__ebX||{},{btnLabel,btnHTML,rumble,toggleFullscreen,padActive,curDevice,padKindOf,
   padInfo:()=>({idx:PAD.idx,kind:PAD.kind,dev:PAD.dev,id:PAD.id,known:PAD.known.size,rumble:settings.rumble,padOk:settings.padOk,aimMode,usingTouch,root:(navRoot()||{}).id||null,focus:document.activeElement&&(document.activeElement.id||document.activeElement.textContent.trim().slice(0,40))}),
   padSeen(){ const d=PAD.dbg||{}; PAD.dbg={}; return d; }, touchLayout(){ return {btn:tLayout(),mini:MINI_R(),pause:PAUSE_R(),mute:MUTE_R(),prompt:PROMPT_R,W,H}; }, offerUpgrades(){ offerUpgrades(null); }, killPlayer(){ playerDied(); }});
@@ -14598,6 +14745,7 @@ function renderSettings(){
   seg('setNums',settings.nums?'on':'off');
   seg('setChat',settings.chat==='off'?'off':'some');
   seg('setTouch',settings.touch); seg('setBtn',settings.btn<0.95?'s':settings.btn>1.05?'l':'m'); seg('setAuto',autoAttackOn()?'on':'off');
+  seg('setAllBtn',settings.allBtn?'on':'off');
 }
 function applySetting(id,v){
   if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
@@ -14605,8 +14753,11 @@ function applySetting(id,v){
   else if(id==='setTouch'){ settings.touch=v; store.set('eb_touch',v); }
   else if(id==='setBtn'){ settings.btn=v==='s'?0.88:v==='l'?1.16:1; store.set('eb_btn',settings.btn); }
   else if(id==='setAuto'){ settings.auto=v==='on'; store.set('eb_auto',settings.auto); }
+  else if(id==='setAllBtn'){ settings.allBtn=v==='on'; store.set('eb_allbtn',settings.allBtn); }   // v12: Show every button (a5_input.js allBtns)
   renderSettings(); refreshSoundLabels();
 }
+// (v12) Settings > Show every button (the other rows are wired in a12b_ui.js)
+for(const b of document.querySelectorAll('#setAllBtn button')) b.addEventListener('click',()=>{ SFX.init(); applySetting('setAllBtn',b.dataset.v); SFX.play('ui'); });
 // ---------- small always-on perks from friendships
 function perkUpdate(dt){
   if(!G||G.mode!=='story'||!player||player.dead) return;
@@ -24154,14 +24305,23 @@ function drawHUD(){
   ctx.font=`700 9px ${UIF}`; ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.fillText(`${Math.ceil(Math.max(0,p.hp))} / ${p.maxHp}`,bx+6,y+6); y+=16;
   bar(bx,y,bw,6,p.stamina/p.maxStamina,p.stamina<p.maxStamina*0.25?'#a8a040':'#7cc456','rgba(30,40,20,.9)'); y+=10;
   bar(bx,y,bw*0.8,5,p.energy/p.maxEnergy,p.exhausted?'#7c5530':'#f0a030','rgba(60,34,10,.9)'); y+=11;
-  for(let i=0;i<p.potionsMax;i++) flask(bx+5+i*13,y+1,i<p.potions);
-  HUD_HITS.push({x:bx-6,y:y-12,w:p.potionsMax*13+10,h:26,fn:()=>{ touch.pressed.drink=true; }}); // tap the flasks to drink
-  if(story){ const cx=bx+8+p.potionsMax*13+8; ctx.fillStyle='#ffd84a'; ctx.beginPath(); ctx.arc(cx,y+1,5,0,TAU); ctx.fill(); ctx.strokeStyle='#8a6a1a'; ctx.lineWidth=1.2; ctx.stroke(); ctx.font=`700 10px ${UIF}`; ctx.fillStyle='#ffe9a0'; ctx.textAlign='left'; ctx.fillText(String(G.coins||0),cx+8,y+1.5); }
+  // (v12) flasks: one each, or (past 10, or when the row would run into the quick slot) one flask and "x12"
+  let fw=p.potionsMax*13;
+  { ctx.font=`700 10px ${UIF}`; const room=story?(L+pw-26)-43-bx-ctx.measureText(String(G.coins||0)).width:(L+pw-26)-20-bx;
+    if(p.potionsMax>10||fw>room){
+      flask(bx+5,y+1,p.potions>0); ctx.textAlign='left'; ctx.font=`800 10.5px ${UIF}`; ctx.fillStyle=p.potions>0?'#c8f6d6':'rgba(255,255,255,.5)';
+      const t1='×'+p.potions; ctx.fillText(t1,bx+12,y+1.5); let w1=ctx.measureText(t1).width;
+      if(p.potions<p.potionsMax){ ctx.font=`600 9px ${UIF}`; ctx.fillStyle='rgba(235,230,220,.6)'; const t2='/'+p.potionsMax; ctx.fillText(t2,bx+13+w1,y+2); w1+=ctx.measureText(t2).width+1; }
+      fw=Math.ceil(12+w1);
+    } else for(let i=0;i<p.potionsMax;i++) flask(bx+5+i*13,y+1,i<p.potions); }
+  HUD_HITS.push({x:bx-6,y:y-12,w:fw+10,h:26,fn:()=>{ touch.pressed.drink=true; }}); // tap the flasks to drink
+  if(story){ const cx=bx+8+fw+8; ctx.fillStyle='#ffd84a'; ctx.beginPath(); ctx.arc(cx,y+1,5,0,TAU); ctx.fill(); ctx.strokeStyle='#8a6a1a'; ctx.lineWidth=1.2; ctx.stroke(); ctx.font=`700 10px ${UIF}`; ctx.fillStyle='#ffe9a0'; ctx.textAlign='left'; ctx.fillText(String(G.coins||0),cx+8,y+1.5); }
   const rx=L+pw-26, ry=T+(story?42:36), R=16, full=p.roar>=100;
   if(full){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(rx,ry,0,rx,ry,30); g.addColorStop(0,'rgba(255,170,70,.4)'); g.addColorStop(1,'rgba(255,120,40,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(rx,ry,30,0,TAU); ctx.fill(); ctx.restore(); }
   ctx.lineWidth=4; ctx.strokeStyle='rgba(50,22,12,.95)'; ctx.beginPath(); ctx.arc(rx,ry,R,0,TAU); ctx.stroke();
   ctx.strokeStyle=full?`rgb(255,${200+Math.sin(G.time*10)*40|0},90)`:'#e07a34'; ctx.beginPath(); ctx.arc(rx,ry,R,-Math.PI/2,-Math.PI/2+TAU*clamp(p.roar/100,0,1)); ctx.stroke();
   ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText(btnLabel('roar'),rx,ry+9); }
+  if(story) drawQuickChip(rx,ry+31);   // (v12) the quick slot under the ROAR ring
   // quest tracker / wave info
   let qy=T+(story?92:80); TRACK_R=null;
   const obj=questObjective(), fo=story?focusObjective():null;
@@ -24226,7 +24386,8 @@ function drawHUD(){
     ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?3.6:3.2; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.95)':'rgba(10,6,4,.85)'; ctx.strokeText(sub,W/2,by+16); ctx.fillStyle=LOOK.sb?'#fff0d4':'#f2dcc0'; ctx.fillText(sub,W/2,by+16);
   }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
-  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story){ lvQueue(); drawSkillHud(); }
+  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawBoosts(L,T,pw); if(story){ lvQueue(); drawSkillHud(); }
+  if(story) drawQuickNotes();   // (v12) the boosts (under the skill tip) and the quick slot's notes
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   // prompt: (v11 polish) drawn after the speech bubbles (drawCompHud draws them), so it is always on top
   if(G.prompt&&scene==='play'){
@@ -24414,6 +24575,95 @@ function hintTextRaw(){
   if(settings.mouseAim) return `WASD move · Shift sprint · Mouse aim · Left click slash, or talk and open when no foe is near · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
   return `WASD move, Ash faces the way he walks · Shift sprint · Click or J attack, and talk or open when no foe is near · Right click or K fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · L log · ${K('map')} map`;
 }
+// ---------- (v12 wave 7, UI) the quick slot, the boost icons and the notes next to them (drawn from drawHUD)
+// The quick slot is a 22 px chip right under the ROAR ring with the item and how many are left (dim when empty). A
+// click or tap on it (44 x 44), V (Numpad 5 on the left-handed keyboard) or d-pad left uses it. qslotRect() is that hit
+// area, so the touch buttons (BUTTONS) can keep off it. The item rules are e11_items.js (ITM in a12b_ui.js calls them).
+const QSL={g:null,last:null,pulseT:-9,note:'',noteT:-9,tipT:-9,tipName:''};
+function qslotCenter(){ const L=SAFE.l+14, T=SAFE.t+14, pw=Math.min(250,MINI_R().x-L-10); return {x:L+pw-26,y:T+42+31}; }
+function qslotRect(){ if(!G||G.mode!=='story') return null; const c=qslotCenter(); return {x:c.x-22,y:c.y-22,w:44,h:44}; }
+function qslNote(t){ QSL.note=simplify(String(t||'')); QSL.noteT=G.time; try{ SFX.play('warn',0.45); }catch(e){} }
+function quickUse(){
+  if(!G||!player||scene!=='play'||player.dead) return false;
+  if(G.mode!=='story'){ qslNote(S('No items in the Arena','No items here')); return false; }
+  const id=ITM.quick();
+  if(!id||!(ITM.count(id)>0)){ qslNote(id?S('None left. Shops sell more.','None left'):S('Nothing here yet. Star something in the Satchel.','Star something in the Satchel first')); return false; }
+  const r=ITM.can(id);
+  if(r!==true){ qslNote(typeof r==='string'?r:S('Not right now','Not now')); return false; }
+  const ok=!!ITM.use(id); if(ok&&QSL.tipT>-9){ QSL.tipT=-9; G.flags.qtip=1; }
+  return ok;
+}
+function drawQuickChip(cx,cy){
+  const t=G.time, id=ITM.quick(), n=id?ITM.count(id):0, on=!!id&&n>0, r=11, sb=LOOK.sb;
+  if(QSL.g!==G){ QSL.g=G; QSL.last=id; QSL.pulseT=-9; QSL.note=''; QSL.tipT=-9; }
+  if(id!==QSL.last){ QSL.last=id; if(id){ QSL.pulseT=t; if(!G.flags.qtip&&tipOn('qslot')){ QSL.tipT=t; QSL.tipName=simplify(bagSplit(bagInfo(id).name)[0]); } } }
+  ctx.save(); ctx.textBaseline='middle'; ctx.textAlign='center';
+  if(!on) ctx.globalAlpha=0.55;
+  if(sb){ ctx.fillStyle='rgba(59,34,51,.55)'; ctx.beginPath(); ctx.arc(cx,cy+2,r+1,0,TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.fillStyle=on?'#fff3d6':'#d9c7a8'; ctx.fill(); ctx.lineWidth=2.4; ctx.strokeStyle=SBC.outline; ctx.stroke(); }
+  else { ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.fillStyle='rgba(10,8,6,.72)'; ctx.fill(); ctx.lineWidth=1.6; ctx.strokeStyle=on?'rgba(255,205,130,.9)':'rgba(255,220,180,.4)'; ctx.stroke(); }
+  if(id) drawItemIcon(ctx,id,cx,cy,on?17:15);
+  else { ctx.setLineDash([2,2.4]); ctx.lineWidth=1.2; ctx.strokeStyle=sb?'rgba(59,34,51,.7)':'rgba(255,230,200,.6)'; ctx.beginPath(); ctx.arc(cx,cy,r-4,0,TAU); ctx.stroke(); ctx.setLineDash([]); }
+  ctx.globalAlpha=1;
+  // how many are left
+  if(on){ ctx.font=`800 8px ${UIF}`; const s=String(n), w=Math.max(10,ctx.measureText(s).width+5), bx=cx+r-3, by=cy+r-3;
+    ctx.fillStyle=sb?'#e0782c':'#2a160c'; rr(bx-w/2,by-5,w,10,5); ctx.fill(); ctx.lineWidth=sb?1.6:1; ctx.strokeStyle=sb?SBC.outline:'rgba(255,205,130,.85)'; ctx.stroke();
+    ctx.fillStyle='#fff6e6'; ctx.fillText(s,bx,by+0.5); }
+  // the key or button that uses it (not on touch: the chip is the button there)
+  const dev=curDevice();
+  if(dev==='pad'){ const x=cx-r+1, y=cy-r+1;   // a little d-pad with its left arm lit
+    ctx.fillStyle='rgba(20,12,6,.9)'; rr(x-6.5,y-6.5,13,13,3.5); ctx.fill(); ctx.strokeStyle='rgba(255,220,180,.45)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(246,234,216,.6)'; ctx.fillRect(x-1.5,y-4.5,3,9); ctx.fillRect(x-4.5,y-1.5,9,3); ctx.fillStyle='#ffd27a'; ctx.fillRect(x-4.8,y-1.8,3.6,3.6); }
+  else if(dev!=='touch'){ const k=actKey('item'); ctx.font=`800 8px ${UIF}`; const w=Math.max(11,ctx.measureText(k).width+5);
+    ctx.fillStyle='rgba(20,12,6,.9)'; rr(cx-r-w/2+2,cy-r-3.5,w,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.fillText(k,cx-r+2,cy-r+2); }
+  // a ring that pulses when something new goes in
+  const pk=t-QSL.pulseT;
+  if(pk>=0&&pk<2.6){ const a=1-pk/2.6, ph=(pk*1.6)%1; ctx.globalAlpha=a*(1-ph); ctx.strokeStyle='#ffd27a'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r+2+ph*7,0,TAU); ctx.stroke(); ctx.globalAlpha=1; }
+  ctx.restore();
+  HUD_HITS.push({x:cx-22,y:cy-22,w:44,h:44,fn:quickUse});
+}
+// the boosts running now: 18 px icons with a ring that drains, to the right of the vitals panel (on a narrow phone, under
+// the goal list instead); the last 3 seconds blink
+function drawBoosts(L,T,pw){
+  const B=ITM.buffs(); if(!B.length) return;
+  const sz=18, gap=6, x0=L+pw+8, room=MINI_R().x-8-x0, sb=LOOK.sb;
+  let x, y;
+  if(room>=B.length*(sz+gap)+4){ x=x0+sz/2+3; y=T+80-9; } else { x=L+sz/2+3; y=(TRACK_R?TRACK_R.y+TRACK_R.h:T+92)+sz/2+4; }
+  ctx.save();
+  for(const b of B){
+    const k=clamp(b.total>0?b.left/b.total:0,0,1), blink=b.left<3&&Math.sin(G.time*14)<0;
+    ctx.globalAlpha=blink?0.45:1;
+    ctx.beginPath(); ctx.arc(x,y,sz/2,0,TAU); ctx.fillStyle=sb?'#fff3d6':'rgba(10,8,6,.72)'; ctx.fill();
+    ctx.lineWidth=sb?2.2:1.2; ctx.strokeStyle=sb?SBC.outline:'rgba(255,220,180,.35)'; ctx.stroke();
+    drawItemIcon(ctx,b.id||b.icon,x,y,13);
+    ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.strokeStyle=sb?'#e0782c':'#ffc35a'; ctx.beginPath(); ctx.arc(x,y,sz/2+2.2,-Math.PI/2,-Math.PI/2+TAU*k); ctx.stroke(); ctx.lineCap='butt';
+    x+=sz+gap;
+  }
+  ctx.restore();
+}
+// a short note next to the chip: why it did not work, or (once per journey) how to use the first thing that goes in
+function drawQuickNotes(){
+  const t=G.time, c=qslotCenter(); let text='', a=0;
+  if(QSL.note&&t-QSL.noteT<2.2){ text=QSL.note; a=clamp(Math.min((t-QSL.noteT)/0.15,(2.2-(t-QSL.noteT))/0.3),0,1); }
+  else if(QSL.tipT>-9&&scene==='play'){
+    const e=t-QSL.tipT; if(e>8){ QSL.tipT=-9; G.flags.qtip=1; }
+    else { const dev=curDevice(), nm=QSL.tipName||'it';
+      text=dev==='pad'?`${btnLabel('item')}: ${S('use your','use your')} ${nm}`:dev==='touch'?`${S('Tap here to use your','Tap here to use your')} ${nm}`:`${S('Press','Press')} ${actKey('item')} ${S('to use your','to use your')} ${nm}`;
+      text=simplify(text); a=clamp(Math.min(e/0.3,(8-e)/0.5),0,1); }
+  }
+  if(!text||a<=0.01) return;
+  const L=SAFE.l+14, pw=Math.min(250,MINI_R().x-L-10), sb=LOOK.sb;
+  ctx.save(); ctx.globalAlpha=a; ctx.font=`700 11.5px ${UIF}`; ctx.textBaseline='middle';
+  const w=Math.min(ctx.measureText(text).width+20,W-SAFE.l-SAFE.r-16), h=24, right=L+pw+8, room=MINI_R().x-8-right;
+  let x,y,side;
+  if(room>=w+8){ x=right+6; y=c.y-h/2; side='l'; } else { x=clamp(c.x+16-w,SAFE.l+6,W-SAFE.r-w-6); y=c.y+16; side='u'; }
+  ctx.fillStyle=sb?'#fff3d6':'rgba(22,11,7,.95)'; ctx.strokeStyle=sb?SBC.outline:'rgba(255,210,120,.9)'; ctx.lineWidth=sb?2.4:1.4;
+  ctx.beginPath(); if(side==='l'){ ctx.moveTo(x-7,c.y); ctx.lineTo(x+1,c.y-5); ctx.lineTo(x+1,c.y+5); } else { ctx.moveTo(c.x,y-7); ctx.lineTo(c.x-5,y+1); ctx.lineTo(c.x+5,y+1); } ctx.closePath(); ctx.fill(); ctx.stroke();
+  rr(x,y,w,h,h/2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); if(side==='l'){ ctx.moveTo(x+1.5,c.y-4); ctx.lineTo(x+1.5,c.y+4); } else { ctx.moveTo(c.x-4,y+1.5); ctx.lineTo(c.x+4,y+1.5); } ctx.strokeStyle=sb?'#fff3d6':'rgba(22,11,7,1)'; ctx.lineWidth=3; ctx.stroke();
+  ctx.fillStyle=sb?SBC.outline:'#ffe6c0'; ctx.textAlign='center'; ctx.fillText(text,x+w/2,y+h/2+0.5,w-14);
+  ctx.restore();
+}
 // ---------- (v11 polish) the controls coach: one short line at a time, each control when it becomes useful (move and
 // talk first, attack and roll once the sword is in hand, roll away in the first fight, drink when hurt, the map later).
 // A new journey turns it on (G.flags.coach); each tip shows once per journey (G.flags.coach_<id>). Old saves get none.
@@ -24436,9 +24686,12 @@ const COACH_TIPS=[
     kb:['A red mark means a hit is coming:',{k:'roll'},'Roll away'], pad:['A red mark means a hit is coming:',{k:'roll'},'Roll away'],
     touch:['A red mark means a hit is coming: ROLL away']}],
   ['drink',()=>player.potions>0&&player.hp<player.maxHp*0.5,7,()=>player.potions<COACH.pot,{
-    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap the flasks at the top to drink']}],
+    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap DRINK, or the flasks at the top, to drink']}],
   ['roar',()=>player.roar>=100,6,()=>player.roar<100,{
     kb:['Your ROAR is full:',{k:'roar'},'Roar'], pad:['Your ROAR is full:',{k:'roar'},'Roar'], touch:['Your ROAR is full: tap ROAR']}],
+  // (v12) touch only: CALL comes up when the companion is far behind or waiting
+  ['call',()=>usingTouch&&!allBtns()&&tWant('whistle'),6,()=>!tWant('whistle'),{
+    all:['Your friend is far away: tap CALL to bring them back']}],
   ['jump',()=>hasAbil('jump'),6,null,{
     kb:[{k:'jump'},'Jump'], pad:[{k:'jump'},'Jump'], touch:['JUMP hops over gaps and low walls']}],
   ['map',()=>G.playTime>150&&!G.inCombat&&!!G.flags.forge,8,null,{
@@ -24540,10 +24793,15 @@ function touchIcon(id,x,y,r,col,label){
   else if(id==='whistle'){ ctx.beginPath(); ctx.arc(-4,4,8,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-4,-4); ctx.lineTo(11,-4); ctx.lineTo(11,2); ctx.lineTo(3,2); ctx.stroke(); ctx.beginPath(); ctx.arc(-4,4,2.6,0,TAU); ctx.fill(); ctx.lineWidth=2.2; for(const q of [0,1]){ ctx.beginPath(); ctx.arc(10,-9,4+q*5,-1.9,-0.3); ctx.stroke(); } }
   ctx.restore();
 }
+// (v12) the buttons come and go (tVisTick and tShown in a5_input.js): each one pops in with a little overshoot and a
+// ring that runs out from it (DRINK, ROAR, CALL and JUMP), and shrinks away when it goes
+const TPOP_COL={drink:'110,230,150',roar:'255,200,90',whistle:'150,215,255',jump:'150,215,255'};
+const tBackOut=t=>{ const c=1.70158, u=t-1; return 1+(c+1)*u*u*u+c*u*u; };
 function drawTouch(){
   if(!usingTouch||scene!=='play') return;
+  tVisTick();
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  const mode=settings.touch||'two', L=tLayout(), right=touchRight();
+  const mode=settings.touch||'two', L=tLayout(), SH=tShown(), right=touchRight();
   if(touch.stickId!==null){
     ctx.fillStyle='rgba(255,255,255,.07)'; ctx.strokeStyle=touch.full>0.35?'rgba(140,230,120,.6)':'rgba(255,220,180,.35)'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(touch.ox,touch.oy,58,0,TAU); ctx.fill(); ctx.stroke();
@@ -24557,7 +24815,12 @@ function drawTouch(){
     ctx.font=`700 11px ${UIF}`; ctx.fillStyle='rgba(255,230,200,.4)'; ctx.fillText(mode==='two'?'MOVE':'DRAG TO MOVE',gx,gy);
   }
   const um=useMode(), pu=0.5+0.5*Math.sin(G.time*(um&&um.hot?11:5));
-  for(const b of L){
+  for(const b of SH){
+    const pc=TPOP_COL[b.id];
+    if(b.on&&pc&&b.popT<0.5&&!allBtns()){ const q=b.popT/0.5; ctx.strokeStyle=`rgba(${pc},${0.7*(1-q)})`; ctx.lineWidth=3*(1-q)+1; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+3+q*30,0,TAU); ctx.stroke(); }
+    ctx.save();
+    const ba=b.a<1?(b.on?Math.min(1,b.a*1.6):b.a):1;
+    if(b.a<1){ const k=b.on?0.5+0.5*tBackOut(b.a):0.8+0.2*b.a; ctx.translate(b.x,b.y); ctx.scale(k,k); ctx.translate(-b.x,-b.y); ctx.globalAlpha=ba; }
     const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1, ring=true;
     if(b.id==='roar'){ prog=player.roar/100; ready=prog>=1; }
     else if(b.id==='roll'){ prog=player.stamina/player.maxStamina; ready=player.stamina>=player.stats.rollCost*0.5; }
@@ -24568,7 +24831,7 @@ function drawTouch(){
     const use=b.id==='attack'&&!!um, big=b.id==='jump'||b.id==='attack';
     if(use){ ctx.fillStyle=`rgba(255,190,90,${(um.hot?0.2:0.1)+pu*0.14})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+7+pu*4,0,TAU); ctx.fill(); }
     else if(b.id==='roar'&&ready){ ctx.fillStyle=`rgba(255,170,70,${0.1+pu*0.1})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+6,0,TAU); ctx.fill(); }
-    if(LOOK.sb){ ctx.fillStyle=SBC.outline; ctx.globalAlpha=0.55; ctx.beginPath(); ctx.arc(b.x,b.y+3,b.r+1.5,0,TAU); ctx.fill(); ctx.globalAlpha=1; }
+    if(LOOK.sb){ ctx.fillStyle=SBC.outline; ctx.globalAlpha=0.55*ba; ctx.beginPath(); ctx.arc(b.x,b.y+3,b.r+1.5,0,TAU); ctx.fill(); ctx.globalAlpha=ba; }
     ctx.fillStyle=LOOK.sb?(held?'rgba(255,150,70,.7)':use?'rgba(110,60,24,.86)':big?'rgba(59,34,51,.68)':'rgba(59,34,51,.6)'):held?'rgba(255,150,70,.45)':use?'rgba(64,36,14,.78)':big?'rgba(26,18,12,.58)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
     ctx.lineWidth=LOOK.sb?(big?3.6:3):big?3:2.5; ctx.strokeStyle=use?`rgba(255,${200+Math.round(30*pu)},120,.95)`:b.id==='jump'?'rgba(150,215,255,.75)':ready?(LOOK.sb?'rgba(255,243,214,.92)':'rgba(255,220,180,.7)'):'rgba(140,120,100,.5)'; ctx.stroke();
     if(ring){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
@@ -24583,9 +24846,58 @@ function drawTouch(){
     else{ touchIcon(b.id,b.x,iy,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':b.id==='jump'?'#d8f0ff':col,b.label); if(b.id==='attack'&&autoAttackOn()) label='AUTO'; }
     if(b.id==='drink'&&player.potions>0){ ctx.font=`800 ${Math.max(9,Math.round(b.r*0.34))}px ${UIF}`; ctx.fillStyle='#bff5cf'; ctx.fillText(String(player.potions),b.x+b.r*0.5,b.y-b.r*0.52); }
     ctx.fillStyle=use?'#ffe9c4':col; ctx.font=`800 ${Math.max(8,Math.round(b.r*(use?0.25:0.22)))}px ${UIF}`; ctx.fillText(label,b.x,b.y+b.r*0.58);
+    ctx.restore();
   }
   ctx.restore();
+  twHintDraw();
 }
+// ---------- (v12) the weapon chip at the top is how touch players switch weapons now (WEAPON is a button again only with
+// Settings > Show every button). On touch it gets a small swap badge, and the first time Ash has two weapons (on this
+// journey, on touch) a gold ring pulses round it with "Tap to switch weapons" beside it, until it is tapped or 7 s pass.
+// TW.r is the chip's tap box this frame: the first hit box drawWeaponHud (a6b_weapons.js) adds, 51 x 52 beside the
+// vitals or 44 x 56 under the pause and sound buttons on narrow screens.
+const TW={r:null,t:0,last:0,w:null};
+{ const base=drawWeaponHud; drawWeaponHud=function(){ const n0=HUD_HITS.length; base(); TW.r=HUD_HITS.length>n0?HUD_HITS[n0]:null; try{ twChip(); }catch(e){} }; }
+function twChip(){
+  const R=TW.r; if(!R||!usingTouch||scene!=='play'||!G) return;
+  const g=ctx, small=R.w<48, bx=R.x+(small?8:10.5), by=R.y+(small?8:10);
+  g.save();
+  // the swap badge: two little arrows chasing each other, where the keyboard shows its key letter
+  g.fillStyle='rgba(20,12,6,.92)'; g.beginPath(); g.arc(bx,by,7,0,TAU); g.fill(); g.strokeStyle='rgba(255,214,150,.75)'; g.lineWidth=1; g.stroke();
+  g.strokeStyle='#ffe0b0'; g.fillStyle='#ffe0b0'; g.lineWidth=1.4; g.lineCap='round';
+  for(const s0 of [0,Math.PI]){ g.beginPath(); g.arc(bx,by,4,s0-2.4,s0-0.6); g.stroke(); const a=s0-0.6, ex=bx+Math.cos(a)*4, ey=by+Math.sin(a)*4; g.save(); g.translate(ex,ey); g.rotate(a+Math.PI/2); g.beginPath(); g.moveTo(2.4,0); g.lineTo(-1.4,-2.2); g.lineTo(-1.4,2.2); g.closePath(); g.fill(); g.restore(); }
+  g.restore();
+  // the first-time hint
+  const now=G.time, dt=clamp(now-(TW.last||now),0,0.1); TW.last=now;
+  if(G.mode!=='story'||G.flags.tw_chip||!tipOn('wchip')) return;
+  if(TW.g!==G){ TW.g=G; TW.t=0; TW.w=curWeapon(); }
+  if(G.banner||DLG) return;
+  TW.t+=dt;
+  if(curWeapon()!==TW.w&&TW.t>0.3){ G.flags.tw_chip=1; return; }   // tapped it (or switched another way): done
+  TW.w=curWeapon();
+  if(TW.t>7){ G.flags.tw_chip=1; return; }
+  TW.a=clamp(Math.min(TW.t/0.3,(7-TW.t)/0.5),0,1); TW.hf=G.time;
+}
+// the hint itself, drawn last (from drawTouch) so no other tip or chip covers it
+function twHintDraw(){
+  const R=TW.r, g=ctx; if(!R||TW.hf!==G.time||!(TW.a>0)) return;
+  const small=R.w<48, k=0.5+0.5*Math.sin(G.time*6);
+  g.save(); g.globalAlpha=TW.a;
+  g.strokeStyle=`rgba(255,${200+Math.round(40*k)},110,${0.6+0.35*k})`; g.lineWidth=2.5; rr(R.x-3-k*2,R.y-3-k*2,R.w+6+k*4,R.h+6+k*4,12); g.stroke();
+  const txt=S('Tap to switch weapons','Tap to switch'); g.font=`700 12px ${UIF}`; const tw=g.measureText(txt).width+22, th=26;
+  // under the chip; under the pause button (narrow screens) a little lower, clear of the companion's picture beside it
+  const py=R.y+R.h+(small?44:10), px=clamp(small?R.x+R.w-tw:R.x,SAFE.l+6,W-SAFE.r-6-tw), cx=clamp(R.x+R.w/2,px+12,px+tw-12);
+  if(small){ g.strokeStyle='rgba(255,210,150,.7)'; g.lineWidth=1.5; g.setLineDash([3,3]); g.beginPath(); g.moveTo(cx,R.y+R.h+5); g.lineTo(cx,py-6); g.stroke(); g.setLineDash([]); }
+  if(LOOK.sb) sbPill(px,py,tw,th); else{ g.fillStyle='rgba(12,9,6,.88)'; rr(px,py,tw,th,13); g.fill(); g.strokeStyle='rgba(255,210,150,.6)'; g.lineWidth=1; g.stroke(); }
+  // a little pointer up toward the chip
+  g.fillStyle=LOOK.sb?'#fff3d6':'rgba(255,210,150,.85)'; g.beginPath(); g.moveTo(cx,py-7); g.lineTo(cx-5,py-1); g.lineTo(cx+5,py-1); g.closePath(); g.fill();
+  g.fillStyle=LOOK.sb?SBC.outline:'#ffe6c0'; g.textAlign='left'; g.textBaseline='middle'; g.fillText(txt,px+11,py+th/2+0.5);
+  g.restore();
+}
+// what the game calls the weapon switch on touch, and the tip when Ash gets his second weapon (a5b_pad.js, a6b_weapons.js)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{wchip:()=>TW.r?{x:TW.r.x,y:TW.r.y,w:TW.r.w,h:TW.r.h}:null});
+try{ Object.defineProperty(ACT_TOUCH,'weapon',{get:()=>allBtns()?'the WEAPON button':'the weapon chip at the top',enumerable:true,configurable:true}); }catch(e){}
+{ const base=switchTip; switchTip=function(){ if(touchy()&&!allBtns()) return S('Tap the weapon chip at the top of the screen to switch weapons.','Tap the weapon at the top to switch.'); return base(); }; }
 
 // ================= (v11 polish) banner manners
 // Drew found the messages noisy: "Quest updated" again and again around doors, one story banner held over a whole boss
@@ -26156,7 +26468,7 @@ const bringIs=(...a)=>v=>a.includes(v), bringBool=v=>typeof v==='boolean', bring
 const BRING_SET={eb_reading:bringIs('full','simple'),eb_diff:bringNum(0,2),eb_music_off:bringBool,eb_muted:bringBool,eb_vol_sfx:bringNum(0,100),eb_vol_music:bringNum(0,100),
   eb_touch:bringIs('two','right','left'),eb_tipshut:v=>bringObj(v)&&Object.keys(v).length<=300,eb_tips:bringBool,eb_padok:bringIs('auto','south','east'),eb_rumble:bringBool,
   eb_nums:bringBool,eb_mouseaim:bringBool,eb_look:bringIs('storybook','classic'),eb_hand:bringIs('left','right'),eb_depth:v=>typeof v==='string'&&v.length<=16,
-  eb_chat:bringIs('some','off'),eb_btn:bringNum(0.5,2),eb_auto:v=>v===null||bringBool(v),eb_bosshelp:bringBool,eb_chars:bringIs('3d','classic')};
+  eb_chat:bringIs('some','off'),eb_btn:bringNum(0.5,2),eb_auto:v=>v===null||bringBool(v),eb_allbtn:bringBool,eb_bosshelp:bringBool,eb_chars:bringIs('3d','classic')};
 const bringEnds=v=>bringObj(v)&&Object.keys(v).length<=60&&Object.keys(v).every(k=>/^[A-Za-z0-9_-]{1,40}$/.test(k));
 const bringBest=v=>bringObj(v)&&bringNum(0,1e9)(v.wave)&&bringNum(0,1e12)(v.score);
 const bringSave=v=>bringObj(v)&&v.v===3&&!v.deleted&&bringObj(v.p)&&bringFin(v.x)&&bringFin(v.y)&&(v.stage==null||(typeof v.stage==='string'&&v.stage.length<=60))
@@ -88762,6 +89074,470 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{cheats:()=>({open:CHT.open,on:O
   chMap:()=>({view:MAPUI.view,maps:MAPS.map(M=>M?{w:M.w,h:M.h,y0:M.y0}:null)}),
   chMapPt:(x,y)=>{ const F=mapFit(MAPUI.view), r=mapCv.getBoundingClientRect(); return {x:r.left+(F.ox+x*F.s)/mapCv.width*r.width,y:r.top+(F.oy+(y-F.y0)*F.s)/mapCv.height*r.height}; }});
 
+// ================= (v12 wave 7, UI) items: the contract with e11_items.js, item icons drawn in code, the Satchel bag
+// ---------- the item rules live in e11_items.js (ITEMS). ITM calls them when they exist; until then small stand-ins keep
+// the bag, the quick slot and the boosts working (each one steps aside on its own once the real function is there).
+const ITM={
+  real:()=>typeof itemInfo==='function',
+  def:id=>{ const D=typeof ITEMDEF!=='undefined'&&ITEMDEF?ITEMDEF:ITM_STUB; return D[id]||null; },
+  info:id=>typeof itemInfo==='function'?itemInfo(id):itStubInfo(id),
+  can:id=>typeof canUseItem==='function'?canUseItem(id):itStubCan(id),
+  use:id=>typeof useItem==='function'?useItem(id):itStubUse(id),
+  quick:()=>typeof quickItem==='function'?quickItem():(G&&G.flags&&G.flags.qslot)||null,
+  setQuick:id=>{ if(typeof setQuick==='function') return setQuick(id); if(G) G.flags.qslot=id||null; },
+  buffs:()=>{ try{ return (typeof itemBuffs==='function'?itemBuffs():itStubBuffs())||[]; }catch(e){ return []; } },
+  count:id=>(G&&G.items&&G.items[id])||0
+};
+// stand-ins (only used while e11_items.js is missing): the eight new things to use, and a rough group for the rest
+const ITM_STUB={
+  lantern_bun:{name:'Lantern Bun',kind:'use',desc:'Heals a quarter of your health over 3 seconds.',cap:3,icon:'bun',heal:0.25},
+  ember_pepper:{name:'Ember Pepper',kind:'use',desc:'Fire meter full, and fire breath is free for 10 seconds.',cap:2,icon:'pepper',buff:10},
+  pebble_feather:{name:'Pebble’s Feather',kind:'use',desc:'Pebble the crow leads you back out to the door.',cap:1,icon:'crowfeather'},
+  salt_taffy:{name:'Salt Taffy',kind:'use',desc:'Your stamina stays full for 15 seconds.',cap:2,icon:'taffy',buff:15},
+  thunder_drop:{name:'Thunder Drop',kind:'use',desc:'A rumbling candy. Your Roar meter fills up.',cap:2,icon:'thunder'},
+  hearth_stone:{name:'Hearth Stone',kind:'use',desc:'Hits hurt a quarter less for 30 seconds.',cap:2,icon:'hearth',buff:30},
+  snowball:{name:'Snowgob Snowball',kind:'use',desc:'A frost burst. Foes close by freeze for a moment.',cap:3,icon:'snowball'},
+  fish_pudding:{name:'Gilly’s Fish Pudding',kind:'use',desc:'Heals a little, and your hits do more for 30 seconds.',cap:2,icon:'pudding',heal:0.15,buff:30},
+  c_biscuit:{kind:'auto',desc:'Eaten by itself when your health gets very low.'},
+  f_cocoa:{kind:'auto',desc:'Drunk by itself when your health gets low. It works in boss fights too.'},
+  m_airjar:{kind:'auto',desc:'Gives you air by itself under water.'}
+};
+const ITM_ST={buffs:[],boss:null,used:0};
+function itStubKind(id){
+  const d=ITM_STUB[id]; if(d&&d.kind) return d.kind;
+  if(/^(lantern|rod|magnifier|juniper_map|map_x\d|f_northmaps|n_map)$/.test(id)) return 'tool';
+  if(/pearl|lucky|medal|skipstone|locket|plume|eggshell|musicbox/.test(id)) return 'keep';
+  return 'quest';
+}
+function itStubInfo(id){
+  const d=ITM_STUB[id]||{}, kind=itStubKind(id), n=ITM.count(id);
+  return {id,name:d.name||ITEM_NAMES[id]||id,kind,desc:d.desc||'',count:n,cap:d.cap||0,usable:kind==='use'&&n>0&&itStubCan(id)===true,icon:d.icon||null};
+}
+function itStubCan(id){
+  const d=ITM_STUB[id];
+  if(!d||d.kind!=='use') return S('You cannot use this one','Not for using');
+  if(!G||G.mode!=='story') return 'Not in the Arena';
+  if(!(ITM.count(id)>0)) return 'None left';
+  if(d.heal&&!d.buff&&player&&player.hp>=player.maxHp) return 'Your health is full';
+  const b=G.boss&&!G.boss.dead?G.boss:null;
+  if(b&&ITM_ST.boss===b&&ITM_ST.used>=(G.diff&&G.diff.heal>1?2:1)) return 'One item per boss fight';
+  if(id==='pebble_feather'&&(b||!AREA)) return b?'Not in a boss fight':'Only inside a cave, a dungeon or a house';
+  return true;
+}
+function itStubUse(id){
+  if(itStubCan(id)!==true) return false;
+  const d=ITM_STUB[id]; G.items[id]--;
+  const b=G.boss&&!G.boss.dead?G.boss:null; if(b){ if(ITM_ST.boss!==b){ ITM_ST.boss=b; ITM_ST.used=0; } ITM_ST.used++; }
+  if(d.heal&&player) player.hp=Math.min(player.maxHp,player.hp+player.maxHp*d.heal);
+  if(d.buff){ ITM_ST.buffs=ITM_ST.buffs.filter(q=>q.id!==id); ITM_ST.buffs.push({id,icon:d.icon,end:G.time+d.buff,total:d.buff,g:G}); }
+  try{ SFX.play('drink'); }catch(e){}
+  return true;
+}
+function itStubBuffs(){ const t=G?G.time:0; ITM_ST.buffs=ITM_ST.buffs.filter(q=>q.g===G&&q.end>t); return ITM_ST.buffs.map(q=>({id:q.id,icon:q.icon,left:q.end-t,total:q.total})); }
+
+// ---------- item icons. drawItemIcon(g,id,x,y,size) draws the icon of item id (an item id, an ITEMDEF icon name, or a
+// hat key as 'hat:<key>') centred on x,y, size px across in g's units. Every icon is drawn once per look and size into a
+// small canvas and reused, so it is cheap every frame. Storybook: flat cel colours, a soft shadow side and the plum
+// outline; Classic: soft shaded colours and a thin dark edge. Unknown ids get a neat parcel.
+var ICOC=new Map();
+function drawItemIcon(g,id,x,y,size){
+  if(!g||!(size>0)) return;
+  let k=1; try{ const m=g.getTransform(); k=Math.hypot(m.a,m.b)||1; }catch(e){}
+  const px=size*k, B=px<=18?24:px<=28?32:px<=40?48:px<=56?64:px<=84?96:128, art=icoArtOf(id), sb=!!(typeof LOOK!=='undefined'&&LOOK.sb);
+  const key=art+'|'+(sb?1:0)+'|'+B; let c=ICOC.get(key);
+  if(!c){ if(ICOC.size>500) ICOC.clear(); c=mkCanvas(B,B); const q=c.getContext('2d'); q.scale(B/48,B/48); q.translate(24,24); icoDraw(q,art,sb); ICOC.set(key,c); }
+  g.drawImage(c,x-size/2,y-size/2,size,size);
+}
+function icoDraw(g,art,sb){
+  const [a,v]=art.split('.'), f=ICO_ART[a]||ICO_ART.parcel;
+  try{ f(icoPen(g,sb),v||''); }catch(e){ console.error(e); }
+}
+// paths (no beginPath, so several can make one shape)
+function icoRp(g,x,y,w,h,r){ r=Math.min(r,w/2,h/2); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function icoEl(g,x,y,rx,ry,a){ a=a||0; g.moveTo(x+rx*Math.cos(a),y+rx*Math.sin(a)); g.ellipse(x,y,rx,ry,a,0,TAU); }
+function icoPoly(g,p){ g.moveTo(p[0],p[1]); for(let i=2;i<p.length;i+=2) g.lineTo(p[i],p[i+1]); g.closePath(); }
+function icoFlame(g,x,y,s){ g.moveTo(x,y-s*1.7); g.bezierCurveTo(x+s*0.4,y-s*0.8,x+s*1.1,y-s*0.3,x+s*0.9,y+s*0.5); g.bezierCurveTo(x+s*0.7,y+s*1.15,x-s*0.7,y+s*1.15,x-s*0.9,y+s*0.5); g.bezierCurveTo(x-s*1.1,y-s*0.2,x-s*0.3,y-s*0.7,x,y-s*1.7); g.closePath(); }
+function icoStar(g,x,y,r,n){ n=n||5; for(let i=0;i<n*2;i++){ const a=-Math.PI/2+i*Math.PI/n, q=i%2?r*0.45:r; if(i) g.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q); else g.moveTo(x+Math.cos(a)*q,y+Math.sin(a)*q); } g.closePath(); }
+// a crescent: the circle r1 at 0,0 with the circle r2 at dx,dy taken out of it
+function icoCrescent(g,r1,dx,dy,r2){
+  const d=Math.hypot(dx,dy), a=(r1*r1-r2*r2+d*d)/(2*d), h=Math.sqrt(Math.max(0,r1*r1-a*a)), px=a*dx/d, py=a*dy/d;
+  const x1=px-h*dy/d, y1=py+h*dx/d, x2=px+h*dy/d, y2=py-h*dx/d, far=Math.atan2(-dy,-dx), nm=t=>((t%TAU)+TAU)%TAU;
+  const A1=Math.atan2(y1,x1), A2=Math.atan2(y2,x2), B1=Math.atan2(y1-dy,x1-dx), B2=Math.atan2(y2-dy,x2-dx);
+  g.moveTo(x1,y1); g.arc(0,0,r1,A1,A2,!(nm(far-A1)<nm(A2-A1))); g.arc(dx,dy,r2,B2,B1,!(nm(far-B2)<nm(B1-B2))); g.closePath();
+}
+function icoHeart(g,x,y,s){ g.moveTo(x,y+s*0.9); g.bezierCurveTo(x-s*1.4,y-s*0.1,x-s*0.7,y-s*1.2,x,y-s*0.45); g.bezierCurveTo(x+s*0.7,y-s*1.2,x+s*1.4,y-s*0.1,x,y+s*0.9); g.closePath(); }
+const icoTone=(c,k)=>typeof sbTone==='function'?sbTone(c,k):c;
+function icoPen(g,sb){
+  const ol=sb?(typeof SBC!=='undefined'?SBC.outline:'#3b2233'):'rgba(30,15,8,.85)', ow=sb?2.6:1.5;
+  const P={g,sb,ol,ow,
+    // a solid shape: cel shading with a shadow edge (Storybook) or a soft gradient (Classic), then its outline
+    sh(col,path,o){ o=o||{}; const rule=o.eo?'evenodd':'nonzero';
+      g.save(); g.beginPath(); path(g);
+      if(sb){ g.fillStyle=icoTone(col,-(o.lo||0.3)); g.fill(rule); g.clip(rule); const d=o.d==null?2.2:o.d; g.translate(-d,-d*1.1); g.beginPath(); path(g); g.fillStyle=col; g.fill(rule); }
+      else { const gr=g.createLinearGradient(-12,-18,12,18); gr.addColorStop(0,icoTone(col,0.24)); gr.addColorStop(1,icoTone(col,-0.3)); g.fillStyle=gr; g.fill(rule); }
+      g.restore();
+      if(o.nol) return; g.beginPath(); path(g); g.lineJoin='round'; g.lineCap='round';
+      if(!sb){ g.lineWidth=(o.w||ow)+1.8; g.strokeStyle='rgba(255,236,210,.26)'; g.stroke(); }
+      g.lineWidth=o.w||ow; g.strokeStyle=ol; g.stroke(); },
+    fl(col,path,o){ g.beginPath(); path(g); g.fillStyle=col; g.fill(o&&o.eo?'evenodd':'nonzero'); },
+    st(col,w,path){ g.beginPath(); path(g); g.lineJoin='round'; g.lineCap='round'; g.lineWidth=w; g.strokeStyle=col; g.stroke(); },
+    // a thick line with an outline round it (straps, handles, stems)
+    band(col,w,path){ P.st(ol,w+ow*2,path); P.st(col,w,path); if(sb) P.st(icoTone(col,0.35),Math.max(0.8,w*0.28),path); },
+    hi(x,y,rx,ry,a){ g.beginPath(); icoEl(g,x,y,rx,ry,a||0); g.fillStyle=sb?'rgba(255,250,232,.85)':'rgba(255,255,255,.5)'; g.fill(); },
+    glow(x,y,r,rgb,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,`rgba(${rgb},${a})`); gr.addColorStop(1,`rgba(${rgb},0)`); g.fillStyle=gr; g.fillRect(x-r,y-r,r*2,r*2); },
+    spark(x,y,r,col){ g.beginPath(); g.moveTo(x,y-r); g.quadraticCurveTo(x,y,x+r,y); g.quadraticCurveTo(x,y,x,y+r); g.quadraticCurveTo(x,y,x-r,y); g.quadraticCurveTo(x,y,x,y-r); g.closePath(); g.fillStyle=col; g.fill(); },
+    dot(x,y,r,col){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fillStyle=col; g.fill(); },
+    clip(path,fn){ g.save(); g.beginPath(); path(g); g.clip(); fn(); g.restore(); },
+    at(x,y,a,s,fn){ g.save(); g.translate(x,y); if(a) g.rotate(a); if(s) g.scale(s,s); fn(); g.restore(); }
+  };
+  return P;
+}
+const ICO_ART={
+  // ----- the eight things to use
+  bun(P){ P.g.translate(0,1.5); P.glow(0,3,23,'255,196,90',.55);
+    P.sh('#eba64a',g=>icoEl(g,0,3,17,14));
+    P.st('#b8692c',1.8,g=>{ g.moveTo(0,-10.5); g.lineTo(0,16.5); g.moveTo(-8.5,-9); g.quadraticCurveTo(-14,3,-8.5,15); g.moveTo(8.5,-9); g.quadraticCurveTo(14,3,8.5,15); });
+    P.sh('#d8452c',g=>icoRp(g,-7.5,-15,15,5.5,2.2)); P.sh('#d8452c',g=>icoRp(g,-6.5,15,13,5,2.2));
+    P.band('#8a5a3a',1.4,g=>{ g.moveTo(0,-15); g.lineTo(0,-19); });
+    P.hi(-9,-2,3.6,2.2,-0.6); P.hi(-1,-4,1.6,1.1); },
+  pepper(P,v){ const c=v==='sea'?'#36a596':'#e3352a'; P.g.translate(0,2);
+    P.sh(c,g=>{ g.moveTo(-9,-10); g.bezierCurveTo(4,-14,17,-4,15,8); g.bezierCurveTo(14,15,9,19,3,21); g.bezierCurveTo(7,12,5,3,-4,0); g.bezierCurveTo(-10,-2,-13,-7,-9,-10); g.closePath(); });
+    P.sh('#5aa83e',g=>{ g.moveTo(-14,-11); g.quadraticCurveTo(-9,-17,-3,-12); g.quadraticCurveTo(-6,-6,-12,-6); g.closePath(); });
+    P.band('#4a8a30',2,g=>{ g.moveTo(-9,-13); g.quadraticCurveTo(-10,-19,-5,-21); });
+    P.hi(3,-7,5,1.8,0.35);
+    if(v!=='sea'){ P.glow(14,-12,10,'255,150,40',.5); P.sh('#ffa22a',g=>icoFlame(g,14,-11,4.6),{d:1.2,w:P.ow*0.8}); P.fl('#fff0a0',g=>icoFlame(g,14,-9.5,2.2)); } },
+  crowfeather(P){ const g=P.g;
+    P.at(-1,1,-0.72,0,()=>{
+      P.sh('#2f3552',g=>{ g.moveTo(0,-21); g.bezierCurveTo(9,-13,10,5,1.5,16); g.lineTo(-1.5,16); g.bezierCurveTo(-10,5,-9,-13,0,-21); g.closePath(); });
+      P.st('rgba(150,170,220,.55)',1.2,g=>{ for(const y of [-10,-3,4]){ g.moveTo(0.5,y); g.lineTo(6.5,y-5); g.moveTo(-0.5,y+2); g.lineTo(-6.5,y-3); } });
+      P.band('#a8b4d8',1.3,g=>{ g.moveTo(0,-17); g.lineTo(0,23); });
+      P.st(P.ol,1.6,g=>{ g.moveTo(8.6,-3); g.lineTo(5,-1.5); g.moveTo(-8.2,6); g.lineTo(-4.5,7); });
+      P.hi(-3.5,-9,1.6,5,0); });
+    P.spark(13,-14,5,'#cfe6ff'); P.spark(-14,13,3,'#cfe6ff'); },
+  taffy(P){ const body=g=>icoRp(g,-10,-7.5,20,15,6.5);
+    P.sh('#86d0ee',g=>icoPoly(g,[-9,-4,-20,-12,-17,0,-20,12,-9,4])); P.sh('#86d0ee',g=>icoPoly(g,[9,-4,20,-12,17,0,20,12,9,4]));
+    P.sh('#ff8fb4',body);
+    P.clip(body,()=>P.st('#fff3f7',2.6,g=>{ for(const x of [-14,-6,2,10]){ g.moveTo(x,9); g.lineTo(x+9,-9); } }));
+    P.g.beginPath(); body(P.g); P.g.lineWidth=P.ow; P.g.strokeStyle=P.ol; P.g.stroke();
+    P.hi(-4,-4,4,1.6); },
+  thunder(P){ P.glow(0,0,23,'160,130,255',.45);
+    P.sh('#7a58da',g=>icoEl(g,0,1,14.5,14.5));
+    P.sh('#ffd84a',g=>icoPoly(g,[3,-11,-6,2.5,-0.5,2.5,-3.5,12,7,-2.5,1.5,-2.5,4.5,-11]),{d:1,w:P.ow*0.85});
+    P.hi(-6,-6,3.4,2,-0.7);
+    P.st('#ffe066',1.8,g=>{ g.moveTo(-17,-12); g.lineTo(-20.5,-15); g.moveTo(17,-10); g.lineTo(21,-12.5); g.moveTo(16,13); g.lineTo(19.5,16); }); },
+  hearth(P){ const stone=g=>{ g.moveTo(-15,-2); g.bezierCurveTo(-15,-12,-4,-15,4,-13); g.bezierCurveTo(13,-11,17,-3,16,5); g.bezierCurveTo(15,13,6,16,-2,15); g.bezierCurveTo(-11,14,-16,9,-15,-2); g.closePath(); };
+    P.glow(0,1,24,'255,140,50',.5);
+    P.sh('#958879',stone);
+    P.st('#ff9a3a',2.4,g=>{ g.moveTo(-2,6); g.lineTo(-9,9); g.lineTo(-12,5); g.moveTo(3,4); g.lineTo(9,7); g.lineTo(13,2); g.moveTo(1,-6); g.lineTo(3,-11); });
+    P.st('#ffe08a',1,g=>{ g.moveTo(-2,6); g.lineTo(-9,9); g.moveTo(3,4); g.lineTo(9,7); });
+    P.sh('#ff8a2a',g=>icoFlame(g,0,2,5.6),{d:1.2,w:P.ow*0.8}); P.fl('#ffe08a',g=>icoFlame(g,0,4,2.6));
+    P.hi(-7,-8,3.6,1.8,-0.4); },
+  snowball(P){ P.glow(0,0,23,'170,220,255',.4);
+    P.sh('#f3f8ff',g=>{ icoEl(g,0,1,15,14.5); },{lo:0.22});
+    P.fl(P.sb?'rgba(150,190,235,.55)':'rgba(140,180,225,.5)',g=>{ icoEl(g,-5,7,2.2,1.6); icoEl(g,6,3,1.8,1.3); icoEl(g,3,10,1.4,1.1); icoEl(g,-8,-1,1.3,1); });
+    P.hi(-6,-6,4,2.4,-0.6);
+    P.spark(13,-13,4.6,'#9fdcff'); P.spark(-15,12,3.4,'#9fdcff'); P.spark(16,9,2.6,'#ffffff'); },
+  pudding(P){ const bowl=g=>{ g.moveTo(-18,4); g.lineTo(18,4); g.quadraticCurveTo(16,18,0,18); g.quadraticCurveTo(-16,18,-18,4); g.closePath(); };
+    P.sh('#46c0ae',g=>icoPoly(g,[3,-6,8,-17,10.5,-12.5,15,-15,12,-5]),{d:1.2});
+    P.sh('#f4955e',g=>{ g.moveTo(-13,5); g.bezierCurveTo(-13,-11,13,-11,13,5); g.closePath(); });
+    P.fl('#fff2d6',g=>{ g.moveTo(-11,-3); g.bezierCurveTo(-7,-9,7,-9,11,-3); g.quadraticCurveTo(8,1,6,-2); g.quadraticCurveTo(3,3,0,-2); g.quadraticCurveTo(-4,2,-6,-2); g.quadraticCurveTo(-9,1,-11,-3); g.closePath(); });
+    P.sh('#4f86cc',bowl); P.st('rgba(255,255,255,.6)',1.3,g=>{ g.moveTo(-12,9); g.quadraticCurveTo(-6,13,0,13); });
+    P.hi(-6,-4,2.6,1.4,-0.5); },
+  // ----- works by itself
+  biscuit(P,v){ if(v==='lumpy'){ P.sh('#c98a48',g=>{ g.moveTo(-15,5); g.bezierCurveTo(-17,-6,-8,-14,-1,-11); g.bezierCurveTo(5,-16,15,-9,14,-1); g.bezierCurveTo(18,7,9,15,0,13); g.bezierCurveTo(-8,16,-15,12,-15,5); g.closePath(); }); P.st('#8a5428',1.6,g=>{ g.moveTo(-6,-3); g.quadraticCurveTo(-2,-6,2,-3); g.moveTo(3,4); g.quadraticCurveTo(7,2,9,5); }); P.hi(-7,-6,3,1.6,-0.5); return; }
+    P.sh('#dcac62',g=>icoEl(g,0,1,15,14));
+    P.fl('#a8743a',g=>{ for(const [x,y] of [[-6,-5],[0,-7],[6,-5],[-8,2],[0,1],[8,2],[-4,8],[4,8]]) icoEl(g,x,y,1.3,1.3); });
+    if(v==='moth') P.fl('#7a5a8a',g=>{ icoEl(g,-4,1,4,3,-0.5); icoEl(g,4,1,4,3,0.5); icoEl(g,0,1,1.4,4.5); });
+    P.hi(-7,-7,3.4,1.8,-0.6); },
+  mug(P){ P.st('rgba(255,255,255,.7)',1.6,g=>{ g.moveTo(-6,-13); g.bezierCurveTo(-9,-16,-3,-18,-6,-22); g.moveTo(1,-13); g.bezierCurveTo(-2,-16,4,-18,1,-22); });
+    P.band('#c8543a',3.2,g=>{ g.moveTo(8,-4); g.bezierCurveTo(17,-5,17,8,8,8); });
+    P.sh('#d8603e',g=>icoRp(g,-13,-9,21,24,5));
+    P.fl('#6a3a1e',g=>icoEl(g,-2.5,-6.5,8.4,2.6)); P.fl('#fff6ea',g=>icoRp(g,-6,-9.5,5.5,4.5,1.5));
+    P.fl('#ffe0c8',g=>icoHeart(g,-2.5,5,3.6)); P.hi(-9,0,1.6,4.5,0); },
+  jar(P,v){ const glass=g=>icoRp(g,-11,-9,22,25,7);
+    P.fl(v==='worms'?'rgba(150,110,80,.55)':'rgba(175,225,255,.5)',glass);
+    if(v==='worms') P.st('#e88aa0',2,g=>{ g.moveTo(-6,10); g.bezierCurveTo(-3,4,0,12,4,6); g.moveTo(-4,0); g.bezierCurveTo(0,-4,2,3,6,-1); });
+    else P.st('#ffffff',1.3,g=>{ for(const [x,y,r] of [[-3,8,3.4],[4,1,2.6],[-4,-2,2],[5,10,1.6],[1,-6,1.4]]) { g.moveTo(x+r,y); g.arc(x,y,r,0,TAU); } });
+    P.g.beginPath(); glass(P.g); P.g.lineWidth=P.ow; P.g.strokeStyle=P.ol; P.g.stroke();
+    P.hi(-7,2,1.4,5,0);
+    P.sh('#b47e4c',g=>icoRp(g,-8.5,-16,17,7.5,2.5)); },
+  // ----- tools
+  lantern(P){ P.glow(0,3,24,'255,200,90',.55);
+    P.st(P.ol,P.ow+1.6,g=>{ g.moveTo(-7,-12); g.quadraticCurveTo(0,-23,7,-12); }); P.st('#8a8a96',1.6,g=>{ g.moveTo(-7,-12); g.quadraticCurveTo(0,-23,7,-12); });
+    P.sh('#ffd27a',g=>icoRp(g,-9,-8,18,20,3),{lo:0.15});
+    P.fl('#fff4c8',g=>icoFlame(g,0,3,3.4));
+    P.st('#4a4a54',1.8,g=>{ g.moveTo(-3,-8); g.lineTo(-3,12); g.moveTo(3,-8); g.lineTo(3,12); });
+    P.sh('#55555f',g=>icoRp(g,-11,-13,22,6,2)); P.sh('#55555f',g=>icoRp(g,-12,11,24,6,2)); },
+  paperlantern(P){ P.glow(0,1,24,'255,150,80',.55);
+    P.sh('#e2462c',g=>icoEl(g,0,1,15,13));
+    P.st('#a32c1a',1.5,g=>{ for(const k of [-0.6,0,0.6]){ g.moveTo(k*13,-11); g.quadraticCurveTo(k*19,1,k*13,13); } g.moveTo(-15,1); g.lineTo(15,1); });
+    P.fl('rgba(255,230,140,.55)',g=>icoEl(g,0,2,6,6));
+    P.sh('#3e2c24',g=>icoRp(g,-6,-15,12,4.5,1.5)); P.sh('#3e2c24',g=>icoRp(g,-6,13,12,4.5,1.5));
+    P.band('#e0b84a',1.2,g=>{ g.moveTo(0,17); g.lineTo(0,22); }); P.hi(-8,-5,2.4,3.6,0.4); },
+  rod(P){ P.band('#9b6a3a',3,g=>{ g.moveTo(-16,19); g.lineTo(15,-18); }); P.band('#5a3a22',4,g=>{ g.moveTo(-16,19); g.lineTo(-9,11); });
+    P.st(P.sb?'#3b2233':'rgba(40,30,30,.8)',1,g=>{ g.moveTo(15,-18); g.quadraticCurveTo(19,-4,12,8); });
+    P.sh('#ffffff',g=>icoEl(g,12,11,4,4)); P.fl('#e0402a',g=>{ g.moveTo(8,11); g.arc(12,11,4,Math.PI,TAU); g.closePath(); });
+    P.g.beginPath(); icoEl(P.g,12,11,4,4); P.g.lineWidth=P.ow*0.8; P.g.strokeStyle=P.ol; P.g.stroke(); },
+  map(P,v){ const col=v==='star'?'#2e3e72':'#f0dca8';
+    P.sh(col,g=>icoPoly(g,[-18,-11,-6,-14,6,-11,18,-14,18,12,6,15,-6,12,-18,15]));
+    P.st(v==='star'?'rgba(255,255,255,.2)':'rgba(140,100,50,.35)',1.4,g=>{ g.moveTo(-6,-14); g.lineTo(-6,12); g.moveTo(6,-11); g.lineTo(6,15); });
+    if(v==='star'){ for(const [x,y,r] of [[-12,-5,2.4],[-2,3,1.8],[9,-4,2.2],[12,8,1.6],[-10,8,1.4],[2,-8,1.4]]) P.spark(x,y,r*1.4,'#ffe27a'); P.st('rgba(255,226,122,.5)',0.9,g=>{ g.moveTo(-12,-5); g.lineTo(-2,3); g.lineTo(9,-4); g.lineTo(12,8); }); return; }
+    if(v==='peak'||v==='north'){ P.st('#7a5a3a',1.6,g=>{ g.moveTo(-15,8); g.lineTo(-7,-5); g.lineTo(-2,2); g.lineTo(4,-9); g.lineTo(14,8); }); P.st('#ffffff',1.6,g=>{ g.moveTo(1.6,-5); g.lineTo(4,-9); g.lineTo(6.6,-5); }); P.fl('#d83a2a',g=>icoStar(g,4,-11,3)); if(v==='north') P.fl('#3a6ad8',g=>icoPoly(g,[-12,-10,-10,-4,-14,-4])); return; }
+    P.st('#b46a2a',1.6,g=>{ g.setLineDash([2.2,2.6]); g.moveTo(-13,8); g.quadraticCurveTo(-4,-6,4,4); g.quadraticCurveTo(8,8,9,-3); }); P.g.setLineDash([]);
+    P.st('#d8382a',2.6,g=>{ g.moveTo(6,-8); g.lineTo(12,-2); g.moveTo(12,-8); g.lineTo(6,-2); }); },
+  magnifier(P){ P.band('#6a3c22',4,g=>{ g.moveTo(5,5); g.lineTo(15,15); });
+    P.sh('#c99a3a',g=>{ icoEl(g,-4,-4,12,12); icoEl(g,-4,-4,8.5,8.5); },{eo:true,d:1.4});
+    P.fl('rgba(190,230,255,.55)',g=>icoEl(g,-4,-4,8.5,8.5)); P.hi(-8,-8,2.4,1.4,-0.7); },
+  // ----- for quests
+  letter(P,v){ const col=v==='fancy'?'#fff6e8':v==='old'?'#e8d8b0':'#f6ecd6';
+    if(v==='bundle') P.sh('#e8dcc0',g=>icoRp(g,-14,-15,30,20,2.5));
+    P.sh(col,g=>icoRp(g,-17,-10,34,23,3));
+    P.st(P.sb?'rgba(59,34,51,.45)':'rgba(120,90,60,.55)',1.4,g=>{ g.moveTo(-16,-9); g.lineTo(0,3); g.lineTo(16,-9); g.moveTo(-16,12); g.lineTo(-5,-1); g.moveTo(16,12); g.lineTo(5,-1); });
+    if(v==='snow'){ P.fl('#5aa8e8',g=>icoRp(g,8,-8,7,8,1)); P.st('#ffffff',1,g=>{ g.moveTo(11.5,-6.5); g.lineTo(11.5,-1.5); g.moveTo(9.5,-4); g.lineTo(13.5,-4); }); }
+    if(v==='bundle') P.st('#c8402a',1.8,g=>{ g.moveTo(-4,-15); g.lineTo(-4,13); });
+    P.sh(v==='fancy'?'#e0b040':v==='moth'?'#8a5ab8':'#c8302a',g=>icoEl(g,0,3,4.6,4.6),{d:1}); },
+  page(P,v){ P.at(0,0,-0.12,0,()=>{
+      const sheet=v==='torn'?g=>icoPoly(g,[-12,-16,12,-16,12,10,8,13,4,10,0,15,-4,11,-8,14,-12,11]):g=>icoRp(g,-12,-16,24,32,2);
+      P.sh(v==='mask'?'#e8e0f0':'#f6ecd6',sheet,{lo:0.18});
+      if(v==='music'){ P.st('rgba(120,90,60,.5)',1,g=>{ for(const y of [-9,-5,-1]){ g.moveTo(-9,y); g.lineTo(9,y); } for(const y of [5,9]){ g.moveTo(-9,y); g.lineTo(9,y); } });
+        P.fl('#3b2a22',g=>{ icoEl(g,-4,-1,2.4,1.8,-0.4); icoEl(g,4,-3,2.4,1.8,-0.4); icoEl(g,-1,9,2.4,1.8,-0.4); });
+        P.st('#3b2a22',1.2,g=>{ g.moveTo(-1.8,-1.5); g.lineTo(-1.8,-10); g.lineTo(6.2,-12); g.lineTo(6.2,-3.5); g.moveTo(1.2,8.5); g.lineTo(1.2,2); }); }
+      else P.st('rgba(120,90,60,.5)',1.3,g=>{ for(const y of [-10,-5,0,5]){ g.moveTo(-8,y); g.lineTo(8,y); } g.moveTo(-8,10); g.lineTo(2,10); });
+      if(v==='log') P.fl('#4a7ac8',g=>icoRp(g,-12,-16,24,4,1));
+      if(v==='mask') P.fl('#5a3a7a',g=>{ icoEl(g,-4,-8,3.4,2); icoEl(g,4,-8,3.4,2); }); }); },
+  scroll(P,v){ P.sh(v==='plans'?'#cfe0f0':'#f0dca8',g=>icoRp(g,-13,-10,26,20,1));
+    P.st(v==='plans'?'rgba(40,80,150,.6)':'rgba(120,90,60,.55)',1.3,g=>{ if(v==='plans'){ g.rect(-8,-5,7,7); g.moveTo(1,-5); g.lineTo(8,-5); g.moveTo(1,0); g.lineTo(8,0); g.moveTo(-8,6); g.lineTo(8,6); } else for(const y of [-5,0,5]){ g.moveTo(-8,y); g.lineTo(8,y); } });
+    P.sh('#e2c48a',g=>icoRp(g,-17,-12,6,24,3)); P.sh('#e2c48a',g=>icoRp(g,11,-12,6,24,3));
+    if(v==='music') P.fl('#3b2a22',g=>{ icoEl(g,-2,4,2.2,1.6,-0.4); g.rect(-0.5,-5,1.2,9); });
+    P.st('#c8402a',2,g=>{ g.moveTo(-14,-12); g.lineTo(-14,12); }); },
+  book(P,v){ const col={moth:'#6a4a9a',dream:'#c84a6a',ice:'#4a8ac8',soggy:'#6a8a6a'}[v]||'#8a4a2a';
+    P.sh('#f6ecd6',g=>icoRp(g,-11,-14,25,30,2),{lo:0.15});
+    P.sh(col,g=>icoRp(g,-14,-16,24,30,3));
+    P.fl(icoTone(col,-0.3),g=>icoRp(g,-14,-16,5,30,2));
+    if(v==='moth') P.fl('#e8d8ff',g=>{ icoEl(g,-1,-2,4.5,3.2,-0.5); icoEl(g,5,-2,4.5,3.2,0.5); icoEl(g,2,-1,1.2,4.5); });
+    else if(v==='ice') { P.st('#e8f6ff',1.4,g=>{ for(let i=0;i<3;i++){ const a=i*Math.PI/3; g.moveTo(2-Math.cos(a)*6,-1-Math.sin(a)*6); g.lineTo(2+Math.cos(a)*6,-1+Math.sin(a)*6); } }); }
+    else if(v==='dream') P.fl('#ffe08a',g=>icoStar(g,2,-1,5.5));
+    else P.fl('#e0b84a',g=>icoRp(g,-3,-8,10,4,1));
+    if(v==='soggy') P.fl('rgba(150,200,230,.6)',g=>{ icoEl(g,8,10,2,2.6); icoEl(g,-4,12,1.6,2); });
+    P.hi(-6,-11,3,1.2); },
+  key(P,v){ const gold=v==='city'?'#e8b840':'#d8a63a';
+    P.at(0,0,-Math.PI/4,0,()=>{ P.sh(gold,g=>{ icoRp(g,-3,-4,26,8,2); },{d:1.2}); P.sh(gold,g=>{ icoRp(g,14,2,4,8,1); icoRp(g,8,2,4,6,1); },{d:1});
+      P.sh(gold,g=>{ icoEl(g,-11,0,9,9); icoEl(g,-11,0,4.4,4.4); },{eo:true});
+      if(v==='city') P.fl('#c8302a',g=>icoEl(g,-11,0,2.2,2.2)); }); },
+  badge(P,v){
+    if(v==='medal'){ P.sh('#3a6ad8',g=>icoPoly(g,[-9,-20,-2,-20,3,-4,-4,-4])); P.sh('#d83a3a',g=>icoPoly(g,[9,-20,2,-20,-3,-4,4,-4])); P.sh('#e8b84a',g=>icoEl(g,0,6,11,11)); P.fl('#fff0b0',g=>icoStar(g,0,6,6)); P.hi(-5,1,2.4,1.4,-0.6); return; }
+    if(v==='press'){ P.sh('#f8f4ea',g=>icoRp(g,-16,-11,32,22,3),{lo:0.15}); P.fl('#c8402a',g=>icoRp(g,-16,-11,32,6,2)); P.fl('#8a7a6a',g=>{ icoRp(g,-12,-1,9,9,1); }); P.st('rgba(80,60,50,.6)',1.4,g=>{ g.moveTo(0,0); g.lineTo(12,0); g.moveTo(0,4); g.lineTo(12,4); g.moveTo(0,8); g.lineTo(8,8); }); return; }
+    if(v==='clock'){ P.sh('#c8a050',g=>icoEl(g,0,0,14,14)); P.sh('#f6ecd6',g=>icoEl(g,0,0,9,9),{d:1}); P.st('#3b2a22',1.6,g=>{ g.moveTo(0,0); g.lineTo(0,-6); g.moveTo(0,0); g.lineTo(4,2); }); return; }
+    P.sh('#c99a4a',g=>{ g.moveTo(0,-17); g.lineTo(14,-11); g.quadraticCurveTo(14,8,0,17); g.quadraticCurveTo(-14,8,-14,-11); g.closePath(); });
+    P.st('#7a5422',1.6,g=>{ g.moveTo(0,-8); g.lineTo(0,9); g.moveTo(-8,-5); g.lineTo(8,-5); g.moveTo(-8,-5); g.lineTo(-10,2); g.lineTo(-6,2); g.closePath(); g.moveTo(8,-5); g.lineTo(10,2); g.lineTo(6,2); g.closePath(); g.moveTo(-4,9); g.lineTo(4,9); });
+    P.hi(-6,-9,2.4,1.4,-0.4); },
+  shard(P,v){ const col={dusk:'#9a62e0',frost:'#7cd2f2',moon:'#d6dcec'}[v]||'#ff8a4a', rgb={dusk:'170,110,255',frost:'130,220,255',moon:'220,230,255'}[v]||'255,150,80';
+    P.glow(0,0,24,rgb,.5);
+    P.sh(col,g=>icoPoly(g,[1,-20,10,-6,6,15,-3,20,-10,4,-6,-10]));
+    P.st(icoTone(col,0.45),1.3,g=>{ g.moveTo(1,-20); g.lineTo(-1,0); g.lineTo(6,15); g.moveTo(-1,0); g.lineTo(-10,4); g.moveTo(-1,0); g.lineTo(10,-6); });
+    P.spark(12,-14,4,'#ffffff'); },
+  heart(P,v){ P.glow(0,2,24,'255,120,60',.55);
+    P.sh('#e8432a',g=>icoHeart(g,0,1,15));
+    P.fl('rgba(255,190,90,.75)',g=>icoHeart(g,-2,-1,6));
+    if(v==='mended') P.st('#ffd84a',1.8,g=>{ g.moveTo(-9,-8); g.lineTo(-4,-2); g.lineTo(-7,4); g.lineTo(-2,10); g.moveTo(9,-8); g.lineTo(5,-1); g.lineTo(8,5); g.moveTo(0,-6); g.lineTo(2,2); });
+    P.hi(-7,-5,3,2,-0.6); },
+  ore(P,v){ const col=v==='frost'?'#9ec8e4':'#5e5968';
+    P.sh(col,g=>icoPoly(g,[-16,4,-11,-9,-2,-14,9,-11,16,-2,13,10,2,15,-10,13]));
+    P.st(icoTone(col,-0.35),1.3,g=>{ g.moveTo(-11,-9); g.lineTo(-3,0); g.lineTo(9,-11); g.moveTo(-3,0); g.lineTo(2,15); });
+    for(const [x,y,r] of v==='frost'?[[-6,-3,4],[7,4,3.4],[2,-9,2.6]]:[[-6,-3,4],[7,4,3.6],[2,-9,2.8],[-8,8,2.4]]) P.spark(x,y,r,v==='frost'?'#ffffff':'#bfe0ff');
+    P.hi(-9,-6,2.4,1.4,-0.6); },
+  fish(P,v){ const col=v==='cold'?'#8ab8dc':'#6aa8d0';
+    P.sh(col,g=>icoPoly(g,[11,0,20,-9,19,9]),{d:1.2});
+    P.sh(col,g=>{ g.moveTo(-17,0); g.bezierCurveTo(-11,-11,6,-11,13,0); g.bezierCurveTo(6,11,-11,11,-17,0); g.closePath(); });
+    P.fl(icoTone(col,0.4),g=>{ g.moveTo(-14,1); g.bezierCurveTo(-8,6,4,6,10,1); g.closePath(); });
+    P.st(icoTone(col,-0.35),1.3,g=>{ g.moveTo(-5,-6); g.quadraticCurveTo(-2,0,-5,6); });
+    P.dot(-11,-2,2,'#1e1418'); P.dot(-11.6,-2.6,0.7,'#ffffff');
+    if(v==='cold') P.spark(14,-12,4,'#e8f8ff'); },
+  sandwich(P){ P.sh('#e8b860',g=>icoRp(g,-17,3,34,9,4)); P.sh('#7ac050',g=>{ g.moveTo(-17,3); for(let x=-17;x<=17;x+=5) g.lineTo(x+2.5,x%2?6:-1); g.lineTo(17,3); g.closePath(); },{d:1});
+    P.sh('#f0946a',g=>icoRp(g,-15,-4,30,6,2),{d:1}); P.sh('#f0c070',g=>{ g.moveTo(-17,-3); g.bezierCurveTo(-17,-15,17,-15,17,-3); g.closePath(); });
+    P.fl('#fff2c8',g=>{ icoEl(g,-6,-9,1.2,0.8); icoEl(g,2,-11,1.2,0.8); icoEl(g,8,-8,1.2,0.8); }); },
+  honey(P){ P.sh('#d8963a',g=>{ g.moveTo(-14,-6); g.bezierCurveTo(-18,6,-12,16,0,16); g.bezierCurveTo(12,16,18,6,14,-6); g.closePath(); });
+    P.sh('#b8742a',g=>icoRp(g,-12,-11,24,6,2.5)); P.fl('#ffc83a',g=>{ g.moveTo(-10,-6); g.lineTo(10,-6); g.lineTo(10,-3); g.quadraticCurveTo(8,4,6,-2); g.quadraticCurveTo(2,1,0,-3); g.quadraticCurveTo(-4,6,-6,-3); g.lineTo(-10,-3); g.closePath(); });
+    P.fl('#fff2c8',g=>icoRp(g,-7,2,14,8,2)); P.fl('#b8742a',g=>icoPoly(g,[0,3,3,5,3,8,0,9.5,-3,8,-3,5])); P.hi(-10,4,1.6,3.6,0.3); },
+  cheese(P){ P.sh('#f4b83a',g=>icoPoly(g,[-17,12,17,12,17,0,-17,4])); P.sh('#ffd65a',g=>icoPoly(g,[-17,4,17,0,6,-12])); P.fl('#d89a2a',g=>{ icoEl(g,-6,8,2.4,2); icoEl(g,8,6,2,1.6); icoEl(g,4,-3,2,1.2); icoEl(g,-2,-1,1.4,1); }); },
+  yarn(P,v){ const col=v==='wolf'?'#b4aca6':'#c8a0e0';
+    P.band(col,1.6,g=>{ g.moveTo(10,10); g.bezierCurveTo(16,16,8,20,18,20); });
+    P.sh(col,g=>icoEl(g,-1,0,14,14));
+    P.st(icoTone(col,-0.3),1.3,g=>{ g.moveTo(-12,-6); g.quadraticCurveTo(-1,-2,8,-11); g.moveTo(-14,2); g.quadraticCurveTo(-1,5,12,-6); g.moveTo(-11,9); g.quadraticCurveTo(2,8,13,2); g.moveTo(-4,-13); g.quadraticCurveTo(2,0,-2,13); }); },
+  scarf(P,v){ const col={blue:'#3a7ad8',long:'#e0a030'}[v]||'#d8402a', st=v==='long'?'#7a4ac8':'#fff0d8';
+    P.band(col,7,g=>{ g.moveTo(-14,-10); g.bezierCurveTo(-6,-2,6,-2,14,-10); });
+    P.sh(col,g=>icoRp(g,3,-6,8,22,2));
+    P.fl(st,g=>{ g.rect(3,1,8,2.4); g.rect(3,8,8,2.4); });
+    P.st(col,1.4,g=>{ for(const x of [4.5,7,9.5]){ g.moveTo(x,16); g.lineTo(x,20); } }); },
+  sweater(P,v){ const col=v==='small'?'#5a9ad8':'#c84a5a';
+    P.sh(col,g=>icoPoly(g,[-8,-14,8,-14,18,-6,14,2,10,-2,10,15,-10,15,-10,-2,-14,2,-18,-6]));
+    P.st(icoTone(col,0.35),1.3,g=>{ g.moveTo(-6,4); g.lineTo(-3,1); g.lineTo(0,4); g.lineTo(3,1); g.lineTo(6,4); g.moveTo(-6,10); g.lineTo(-3,7); g.lineTo(0,10); g.lineTo(3,7); g.lineTo(6,10); });
+    P.fl(icoTone(col,-0.3),g=>{ g.moveTo(-5,-14); g.quadraticCurveTo(0,-8,5,-14); g.closePath(); }); },
+  sock(P){ P.sh('#e0d4c0',g=>{ g.moveTo(-5,-17); g.lineTo(7,-17); g.lineTo(7,4); g.quadraticCurveTo(8,15,-4,15); g.lineTo(-12,15); g.quadraticCurveTo(-17,15,-17,10); g.quadraticCurveTo(-17,5,-10,4); g.lineTo(-5,2); g.closePath(); });
+    P.fl('#c8402a',g=>{ g.rect(-5,-17,12,4); g.rect(-5,-8,12,3); }); P.fl('rgba(120,100,70,.4)',g=>icoEl(g,-12,10,2.4,1.6)); },
+  feather(P,v){ const col={peacock:'#2aa89a',storm:'#e8eef8',plume:'#e8582a'}[v]||'#e8e0d0';
+    P.at(0,1,-0.7,0,()=>{
+      P.sh(col,g=>{ g.moveTo(0,-21); g.bezierCurveTo(10,-12,10,6,1.5,16); g.lineTo(-1.5,16); g.bezierCurveTo(-10,6,-10,-12,0,-21); g.closePath(); });
+      if(v==='peacock'){ P.fl('#3a5ad8',g=>icoEl(g,0,-9,4.6,5.6)); P.fl('#e8c03a',g=>icoEl(g,0,-9,2.4,3)); P.fl('#1a2a6a',g=>icoEl(g,0,-9,1,1.4)); }
+      if(v==='storm') P.st('#7ab0e8',1.4,g=>{ g.moveTo(-3,-12); g.lineTo(2,-6); g.lineTo(-2,-2); g.lineTo(3,4); });
+      if(v==='plume') P.fl('#ffc83a',g=>{ g.moveTo(0,-17); g.bezierCurveTo(5,-10,5,2,0,10); g.bezierCurveTo(-5,2,-5,-10,0,-17); g.closePath(); });
+      P.band(icoTone(col,-0.2),1.2,g=>{ g.moveTo(0,-15); g.lineTo(0,23); }); }); },
+  pick(P){ P.band('#9b6a3a',3.4,g=>{ g.moveTo(-12,17); g.lineTo(6,-6); });
+    P.sh('#8e949e',g=>{ g.moveTo(-14,-10); g.quadraticCurveTo(2,-20,18,-4); g.lineTo(15,-1); g.quadraticCurveTo(2,-12,-12,-6); g.closePath(); });
+    P.fl('#5aa040',g=>icoStar(g,-8,12,4,4)); },
+  hammer(P){ P.band('#8a5a32',4,g=>{ g.moveTo(0,4); g.lineTo(0,20); }); P.sh('#8e949e',g=>icoRp(g,-16,-12,32,16,3)); P.fl('#d8a63a',g=>g.rect(-16,-6,32,4)); P.sh('#ffd84a',g=>icoPoly(g,[2,-11,-4,-3,0,-3,-2,3,4,-5,0,-5,2,-11]),{d:0.8,w:P.ow*0.7}); },
+  horn(P,v){ const col=v==='sock'?'#e0d4c0':'#eadcbc';
+    if(v==='sock'){ for(const s of [-1,1]) P.sh(col,g=>{ g.moveTo(s*3,12); g.bezierCurveTo(s*3,-4,s*10,-14,s*17,-15); g.bezierCurveTo(s*14,-8,s*10,2,s*10,12); g.closePath(); }); P.fl('#c8402a',g=>{ g.rect(-11,6,9,3); g.rect(2,6,9,3); }); return; }
+    P.sh(col,g=>{ g.moveTo(-17,6); g.bezierCurveTo(-10,-14,8,-16,16,-6); g.lineTo(10,0); g.bezierCurveTo(4,-6,-6,-4,-11,10); g.closePath(); });
+    P.st('#8a6a3a',2,g=>{ g.moveTo(-12,-1); g.lineTo(-7,3); g.moveTo(-3,-9); g.lineTo(0,-3); g.moveTo(7,-11); g.lineTo(7,-4); });
+    P.sh('#8a6a3a',g=>icoEl(g,-15,9,3,3.6,0.6)); },
+  lure(P){ P.st(P.sb?'#3b2233':'#5a5a60',1.4,g=>{ g.moveTo(9,4); g.quadraticCurveTo(17,9,13,15); g.quadraticCurveTo(10,18,8,14); g.moveTo(-14,-2); g.lineTo(-19,-6); });
+    P.sh('#e8c03a',g=>{ g.moveTo(-14,-2); g.bezierCurveTo(-6,-12,6,-10,11,2); g.bezierCurveTo(4,8,-8,7,-14,-2); g.closePath(); });
+    P.fl('#d83a2a',g=>{ icoEl(g,-3,-3,2,2); icoEl(g,4,0,1.6,1.6); }); P.dot(-9,-4,1.6,'#1e1418'); },
+  kettle(P){ P.st(P.ol,P.ow+2.4,g=>{ g.moveTo(-9,-8); g.quadraticCurveTo(0,-20,9,-8); }); P.st('#3a4a54',2.4,g=>{ g.moveTo(-9,-8); g.quadraticCurveTo(0,-20,9,-8); });
+    P.sh('#5a7a8a',g=>icoPoly(g,[-12,-1,-20,-8,-18,-10,-10,-5]),{d:1});
+    P.sh('#5f8090',g=>{ g.moveTo(-13,-6); g.lineTo(13,-6); g.bezierCurveTo(19,4,16,15,0,15); g.bezierCurveTo(-16,15,-19,4,-13,-6); g.closePath(); });
+    P.sh('#3a4a54',g=>icoRp(g,-3,-11,6,5,2),{d:1}); P.hi(-8,1,2,4,0.3); },
+  pot(P){ P.st('rgba(255,255,255,.7)',1.5,g=>{ g.moveTo(-4,-10); g.bezierCurveTo(-7,-13,-1,-15,-4,-19); g.moveTo(4,-10); g.bezierCurveTo(1,-13,7,-15,4,-19); });
+    P.sh('#4a4a54',g=>{ icoRp(g,-21,-4,6,4,1.5); icoRp(g,15,-4,6,4,1.5); });
+    P.sh('#55555f',g=>icoRp(g,-16,-6,32,21,7)); P.fl('#e8a040',g=>icoEl(g,0,-5,15,3.6)); P.fl('#fff0c0',g=>{ icoEl(g,-5,-5,2,1); icoEl(g,4,-6,1.6,0.8); }); },
+  basket(P,v){ P.st(P.ol,P.ow+2.6,g=>{ g.moveTo(-12,-2); g.quadraticCurveTo(0,-24,12,-2); }); P.st('#b07a3a',2.6,g=>{ g.moveTo(-12,-2); g.quadraticCurveTo(0,-24,12,-2); });
+    if(v==='knit'){ P.sh('#e88aa8',g=>icoEl(g,-5,-4,6,6)); P.sh('#6aa8e8',g=>icoEl(g,5,-4,6,6)); P.band('#c8b0a0',1,g=>{ g.moveTo(-3,-14); g.lineTo(7,4); g.moveTo(3,-14); g.lineTo(-6,4); }); }
+    P.sh('#c8924a',g=>icoPoly(g,[-17,-2,17,-2,13,16,-13,16]));
+    P.st('#8a5a2a',1.3,g=>{ g.moveTo(-16,4); g.lineTo(16,4); g.moveTo(-14,10); g.lineTo(14,10); for(const x of [-8,0,8]){ g.moveTo(x,-2); g.lineTo(x*0.8,16); } }); },
+  carrot(P,v){ const col=v==='parsnip'?'#efe3c2':'#f27a2a'; P.g.translate(-1,2.5);
+    P.sh('#5aa83e',g=>{ g.moveTo(8,-8); g.quadraticCurveTo(10,-20,4,-21); g.quadraticCurveTo(13,-14,12,-9); g.quadraticCurveTo(18,-18,21,-12); g.quadraticCurveTo(15,-8,11,-5); g.closePath(); },{d:1});
+    P.sh(col,g=>{ g.moveTo(4,-11); g.quadraticCurveTo(14,-8,13,0); g.lineTo(-16,19); g.closePath(); });
+    P.st(icoTone(col,-0.35),1.3,g=>{ g.moveTo(5,-4); g.lineTo(9,-3); g.moveTo(-1,3); g.lineTo(4,4); g.moveTo(-7,9); g.lineTo(-3,10); });
+    if(v!=='parsnip') P.fl('#ffd84a',g=>icoStar(g,0,-3,2.4,4)); },
+  flower(P){ P.glow(0,0,23,'190,200,255',.45);
+    for(let i=0;i<6;i++){ const a=i/6*TAU; P.sh('#ecebff',g=>icoEl(g,Math.cos(a)*8,Math.sin(a)*8,7.6,4.6,a),{d:1}); }
+    P.sh('#ffe08a',g=>icoEl(g,0,0,4.6,4.6),{d:0.8}); P.spark(14,-13,3.6,'#ffffff'); },
+  berry(P){ P.sh('#5aa83e',g=>{ g.moveTo(0,-8); g.quadraticCurveTo(8,-20,16,-14); g.quadraticCurveTo(10,-6,0,-8); g.closePath(); },{d:1});
+    for(const [x,y] of [[-6,-1],[6,0],[0,9]]){ P.sh('#5674d6',g=>icoEl(g,x,y,7.2,7.2)); P.hi(x-2.4,y-2.6,1.8,1.2,-0.6); }
+    P.spark(-12,-12,3.6,'#e8f8ff'); },
+  pearl(P,v){ if(v==='glow') P.glow(0,2,24,'200,230,255',.6);
+    P.sh('#f0c4b4',g=>{ g.moveTo(-17,6); g.quadraticCurveTo(-16,-12,0,-14); g.quadraticCurveTo(16,-12,17,6); g.quadraticCurveTo(0,10,-17,6); g.closePath(); });
+    P.st('#c88a7a',1.2,g=>{ for(const a of [-0.9,-0.45,0,0.45,0.9]){ g.moveTo(0,8); g.lineTo(Math.sin(a)*15,-Math.cos(a)*11); } });
+    P.sh('#e8b8a8',g=>{ g.moveTo(-17,6); g.quadraticCurveTo(0,20,17,6); g.quadraticCurveTo(0,11,-17,6); g.closePath(); },{d:1});
+    P.sh(v==='glow'?'#eaf6ff':'#f8f2ff',g=>icoEl(g,0,6,6.4,6.4),{d:1.2}); P.hi(-2,4,2,1.4,-0.6); },
+  hat(P,v){ const T={party:1,wizard:1,crown:1,top:1,feather:1,sky:1,pirate:1,desert:1,mirage:1,wolf:1,marlo:1,firefly:1};
+    if(!T[v]) v='cap';
+    if(v==='party'){ P.sh('#e84a8a',g=>icoPoly(g,[0,-18,13,14,-13,14])); P.fl('#ffd84a',g=>{ icoEl(g,-2,4,2,2); icoEl(g,4,-3,1.8,1.8); icoEl(g,5,9,2,2); icoEl(g,-5,10,1.6,1.6); }); P.sh('#4ac8e8',g=>icoEl(g,0,-18,4.4,4.4),{d:1}); P.sh('#ffd84a',g=>icoRp(g,-15,12,30,5,2.5),{d:1}); return; }
+    if(v==='wizard'){ P.sh('#3e3e9e',g=>{ g.moveTo(-11,9); g.quadraticCurveTo(-4,-8,4,-15); g.quadraticCurveTo(10,-19,15,-15); g.quadraticCurveTo(8,-12,9,-2); g.lineTo(11,9); g.closePath(); }); P.fl('#ffe066',g=>{ icoStar(g,-1,1,3.4); icoStar(g,6,-8,2.4); }); P.sh('#4e4ec0',g=>icoEl(g,0,10,19,5)); return; }
+    if(v==='crown'||v==='firefly'){ if(v==='firefly') P.glow(0,0,24,'255,230,120',.45); P.st(P.ol,P.ow+3,g=>icoEl(g,0,2,15,8)); P.st(v==='firefly'?'#3a3a4a':'#5aa83e',3,g=>icoEl(g,0,2,15,8));
+      const C=v==='firefly'?['#fff07a','#ffe04a','#fff7b0','#ffd84a']:['#ff7aa0','#ffd84a','#ffffff','#b48cff'];
+      for(let i=0;i<7;i++){ const a=Math.PI*(0.95+i/6*1.1), x=Math.cos(a)*15, y=2+Math.sin(a)*8; if(v==='firefly'){ P.glow(x,y,6,'255,240,140',.8); P.dot(x,y,2.2,C[i%4]); } else P.sh(C[i%4],g=>icoEl(g,x,y,3.6,3.6),{d:0.8,w:P.ow*0.8}); }
+      return; }
+    if(v==='top'){ P.sh('#26262c',g=>icoRp(g,-10,-17,20,25,2)); P.fl('#a8302a',g=>g.rect(-10,1,20,4.5)); P.sh('#2e2e36',g=>icoEl(g,0,9,18,4.5)); P.hi(-6,-10,1.2,4,0); return; }
+    if(v==='pirate'){ P.sh('#2a2228',g=>{ g.moveTo(-19,4); g.quadraticCurveTo(-12,-16,0,-14); g.quadraticCurveTo(12,-16,19,4); g.quadraticCurveTo(0,-2,-19,4); g.closePath(); }); P.st('#e0b84a',1.6,g=>{ g.moveTo(-17,2); g.quadraticCurveTo(0,-4,17,2); }); P.fl('#f0ece0',g=>{ icoEl(g,0,-6,3.4,3); g.rect(-1.6,-4,3.2,2.4); }); return; }
+    if(v==='desert'||v==='mirage'){ const a=v==='mirage'; if(a) P.g.globalAlpha=0.78; P.sh(a?'#c8b4ff':'#e0c27e',g=>icoEl(g,0,6,20,6)); P.sh(a?'#d8c8ff':'#e8cc8a',g=>{ g.moveTo(-10,5); g.bezierCurveTo(-10,-13,10,-13,10,5); g.closePath(); }); P.fl(a?'#8a6ad8':'#c8643a',g=>g.rect(-10,0,20,3.6)); P.g.globalAlpha=1; if(a){ P.spark(13,-10,4,'#ffffff'); P.spark(-14,-4,3,'#ffffff'); } return; }
+    if(v==='wolf'){ P.sh('#9a9088',g=>icoPoly(g,[-12,-6,-9,-17,-4,-10])); P.sh('#9a9088',g=>icoPoly(g,[12,-6,9,-17,4,-10])); P.sh('#a8a098',g=>{ g.moveTo(-14,8); g.bezierCurveTo(-14,-14,14,-14,14,8); g.closePath(); }); P.sh('#e8e0d4',g=>icoRp(g,-16,5,32,8,4)); return; }
+    if(v==='marlo'){ P.sh('#4a8a4a',g=>icoPoly(g,[-18,10,-11,-2,11,-2,18,10])); P.sh('#56a056',g=>{ g.moveTo(-11,-1); g.bezierCurveTo(-11,-15,11,-15,11,-1); g.closePath(); }); P.fl('#ffd84a',g=>icoStar(g,4,-6,3.2,4)); return; }
+    if(v==='feather'||v==='sky'){ if(v==='sky'){ for(const a of [-0.5,0,0.5]) P.at(0,6,a,0,()=>P.sh('#eef4fc',g=>{ g.moveTo(0,-22); g.bezierCurveTo(6,-16,6,-6,0,0); g.bezierCurveTo(-6,-6,-6,-16,0,-22); g.closePath(); },{d:1})); P.sh('#4a7ac8',g=>icoRp(g,-14,4,28,7,3.5)); return; }
+      P.g.translate(0,3); P.at(6,-5,0.5,0,()=>P.sh('#ffd84a',g=>{ g.moveTo(0,-16); g.bezierCurveTo(5,-10,5,0,0,6); g.bezierCurveTo(-5,0,-5,-10,0,-16); g.closePath(); },{d:1}));
+      P.sh('#2a7a7a',g=>{ g.moveTo(-12,6); g.bezierCurveTo(-12,-12,12,-12,12,6); g.closePath(); }); P.sh('#2f8a8a',g=>icoEl(g,0,7,18,5)); P.fl('#e0c060',g=>g.rect(-12,0,24,3)); return; }
+    P.sh('#c84a3a',g=>{ g.moveTo(-12,6); g.bezierCurveTo(-12,-12,12,-12,12,6); g.closePath(); }); P.sh('#a83a2a',g=>icoPoly(g,[6,2,20,6,18,9,4,8]),{d:1}); P.sh('#ffffff',g=>icoEl(g,0,-9,3,3),{d:0.8}); },
+  earmuffs(P){ P.st(P.ol,P.ow+3,g=>{ g.moveTo(-12,4); g.bezierCurveTo(-12,-20,12,-20,12,4); }); P.st('#8a6a5a',3,g=>{ g.moveTo(-12,4); g.bezierCurveTo(-12,-20,12,-20,12,4); });
+    for(const s of [-1,1]) P.sh('#d8402a',g=>{ g.moveTo(s*6,0); g.quadraticCurveTo(s*20,-2,s*18,12); g.quadraticCurveTo(s*14,18,s*7,14); g.quadraticCurveTo(s*4,8,s*6,0); g.closePath(); });
+    P.fl('#fff0e0',g=>{ g.rect(-17,10,10,3); g.rect(7,10,10,3); }); },
+  bucket(P){ P.st(P.ol,P.ow+2,g=>{ g.moveTo(-13,-8); g.quadraticCurveTo(0,-22,13,-8); }); P.st('#8a96a4',2,g=>{ g.moveTo(-13,-8); g.quadraticCurveTo(0,-22,13,-8); });
+    P.sh('#7f8c9a',g=>icoPoly(g,[-15,-8,15,-8,11,16,-11,16])); P.fl('#5a6672',g=>{ g.rect(-14.4,-3,28.8,3); g.rect(-12,9,24,3); }); P.fl('#dfeaf4',g=>icoEl(g,0,-8,15,3)); P.fl('#ffd84a',g=>icoPoly(g,[-6,-11,-4,-17,-1,-12,2,-18,4,-12,7,-17,8,-11])); },
+  egg(P){ for(const [x,r] of [[-7,-0.25],[8,0.3]]) P.at(x,3,r,0,()=>{ P.sh('#d8784a',g=>{ g.moveTo(-8,-2); g.lineTo(-5,-6); g.lineTo(-2,-2); g.lineTo(1,-7); g.lineTo(4,-2); g.lineTo(8,-5); g.bezierCurveTo(10,8,6,14,0,14); g.bezierCurveTo(-6,14,-10,8,-8,-2); g.closePath(); }); P.fl('#f0b07a',g=>{ icoEl(g,-2,4,1.8,1.4); icoEl(g,3,8,1.6,1.2); }); }); },
+  stone(P){ P.st('rgba(160,210,240,.7)',1.4,g=>{ g.moveTo(-18,12); g.quadraticCurveTo(0,18,18,12); g.moveTo(-12,16); g.quadraticCurveTo(0,20,12,16); });
+    P.sh('#9aa6ae',g=>icoEl(g,0,0,16,10,-0.15)); P.st('#c8d2d8',1.6,g=>{ g.moveTo(-10,2); g.quadraticCurveTo(0,-4,10,-3); }); P.hi(-6,-4,3,1.4,-0.2); },
+  locket(P){ P.st('#d8a63a',1.4,g=>{ g.moveTo(-12,-18); g.quadraticCurveTo(0,0,12,-18); }); P.sh('#d8a63a',g=>icoEl(g,0,-6,3,3),{d:0.8});
+    P.sh('#f2c2b2',g=>{ g.moveTo(0,-4); g.quadraticCurveTo(13,-2,12,8); g.quadraticCurveTo(6,16,0,16); g.quadraticCurveTo(-6,16,-12,8); g.quadraticCurveTo(-13,-2,0,-4); g.closePath(); });
+    P.st('#c88a7a',1.2,g=>{ for(const x of [-6,0,6]){ g.moveTo(0,-2); g.lineTo(x,14); } }); },
+  musicbox(P){ P.sh('#e0b040',g=>icoPoly(g,[-15,-4,15,-4,10,-17,-12,-14])); P.sh('#d8a63a',g=>icoRp(g,-15,-4,30,18,3)); P.fl('#a8302a',g=>g.rect(-15,2,30,3)); P.dot(0,9,2,'#8a5a2a');
+    P.fl('#3b2a22',g=>{ icoEl(g,15,-16,2,1.5,-0.4); g.rect(16,-23,1.2,7); }); },
+  clock(P){ P.sh('#5a8ad8',g=>{ g.moveTo(-4,-13); g.quadraticCurveTo(-1,-21,6,-19); g.lineTo(10,-17); g.lineTo(6,-15); g.quadraticCurveTo(4,-12,2,-12); g.closePath(); },{d:1}); P.dot(3,-17,0.9,'#1e1418');
+    P.sh('#b07a3a',g=>icoEl(g,0,3,15,15)); P.sh('#f6ecd6',g=>icoEl(g,0,3,10.5,10.5),{d:1});
+    P.st('#3b2a22',1.7,g=>{ g.moveTo(0,3); g.lineTo(0,-4); g.moveTo(0,3); g.lineTo(5,6); }); P.fl('#3b2a22',g=>{ for(let i=0;i<12;i+=3){ const a=i/12*TAU; icoEl(g,Math.cos(a)*8,3+Math.sin(a)*8,0.9,0.9); } }); },
+  gear(P,v){ if(v==='spring'){ P.st(P.ol,P.ow+2.2,g=>{ g.moveTo(-6,-16); for(let i=0;i<7;i++){ g.lineTo(i%2?-8:8,-12+i*4.4); } g.lineTo(6,17); }); P.st('#b4bcc6',2.2,g=>{ g.moveTo(-6,-16); for(let i=0;i<7;i++){ g.lineTo(i%2?-8:8,-12+i*4.4); } g.lineTo(6,17); }); return; }
+    P.sh('#c99a4a',g=>{ for(let i=0;i<16;i++){ const a=i/16*TAU, r=i%2?12:16; if(i) g.lineTo(Math.cos(a)*r,Math.sin(a)*r); else g.moveTo(Math.cos(a)*r,Math.sin(a)*r); } g.closePath(); icoEl(g,0,0,5,5); },{eo:true}); },
+  oil(P,v){ if(v==='ever') P.glow(0,4,24,'255,220,120',.55);
+    P.sh('#b47e4c',g=>icoRp(g,-4,-19,8,7,2),{d:1}); P.fl('rgba(200,230,240,.5)',g=>{ icoRp(g,-5,-13,10,6,2); icoEl(g,0,6,12,11); });
+    P.fl(v==='ever'?'#ffe07a':'#e8b84a',g=>{ g.moveTo(-11,6); g.bezierCurveTo(-10,18,10,18,11,6); g.closePath(); });
+    P.g.beginPath(); icoRp(P.g,-5,-13,10,6,2); icoEl(P.g,0,6,12,11); P.g.lineWidth=P.ow; P.g.strokeStyle=P.ol; P.g.stroke(); P.hi(-6,0,1.6,4,0.3); },
+  bomb(P,v){ if(v==='powder'){ P.sh('#a8743a',g=>icoRp(g,-13,-14,26,30,8)); P.fl('#6a4422',g=>{ g.rect(-13,-8,26,3); g.rect(-13,8,26,3); }); P.st('#3b2233',2.2,g=>{ g.moveTo(-5,-3); g.lineTo(5,5); g.moveTo(5,-3); g.lineTo(-5,5); }); return; }
+    const col={tide:'#2a6ac8',smoke:'#6a4a8a'}[v]||'#3a3a48';
+    P.st('#a8743a',2,g=>{ g.moveTo(7,-10); g.quadraticCurveTo(12,-18,17,-15); }); P.spark(17,-16,5,'#ffd84a');
+    P.sh(col,g=>icoEl(g,-2,3,14,14)); P.sh('#55555f',g=>icoRp(g,2,-12,8,6,1.5),{d:1});
+    if(v==='tide') P.st('#9ad8ff',1.6,g=>{ g.moveTo(-14,5); g.quadraticCurveTo(-9,1,-5,5); g.quadraticCurveTo(-1,9,3,5); g.quadraticCurveTo(7,1,11,5); });
+    if(v==='smoke') P.fl('rgba(220,200,240,.8)',g=>{ icoEl(g,-17,-10,4,3); icoEl(g,-12,-14,3,2.4); });
+    P.hi(-8,-3,3,2,-0.6); },
+  rope(P,v){ if(v==='chain'){ for(let i=0;i<4;i++) P.sh('#8e949e',g=>{ const x=-13+i*8.6, y=-10+i*6.6; icoEl(g,x,y,6.4,4,0.65); icoEl(g,x,y,3.6,1.6,0.65); },{eo:true,d:1}); return; }
+    for(const r of [15,10.5,6]) P.band('#c8a060',3.4,g=>icoEl(g,0,2,r,r*0.62));
+    P.band('#c8a060',3.4,g=>{ g.moveTo(14,2); g.quadraticCurveTo(18,14,8,17); }); },
+  cloak(P){ P.sh('#8a2a32',g=>{ g.moveTo(-8,-15); g.lineTo(8,-15); g.quadraticCurveTo(12,0,18,16); g.quadraticCurveTo(0,20,-18,16); g.quadraticCurveTo(-12,0,-8,-15); g.closePath(); });
+    P.st('#e0b84a',1.6,g=>{ g.moveTo(-18,15); g.quadraticCurveTo(0,19,18,15); }); P.sh('#e0b84a',g=>icoEl(g,0,-12,4,4),{d:1}); P.fl('#ff7a3a',g=>icoFlame(g,0,-12,1.6)); },
+  treat(P){ P.at(0,0,-0.5,0,()=>P.sh('#e2b070',g=>{ icoRp(g,-11,-4,22,8,3); icoEl(g,-12,-4,4.6,4.6); icoEl(g,-12,4,4.6,4.6); icoEl(g,12,-4,4.6,4.6); icoEl(g,12,4,4.6,4.6); })); },
+  purse(P){ P.sh('#8a5a3a',g=>{ g.moveTo(-8,-8); g.bezierCurveTo(-20,2,-14,16,0,16); g.bezierCurveTo(14,16,20,2,8,-8); g.closePath(); }); P.sh('#6a4428',g=>icoPoly(g,[-9,-9,-12,-15,-4,-12,0,-16,4,-12,12,-15,9,-9]),{d:1});
+    P.band('#e0b84a',1.4,g=>{ g.moveTo(-9,-8); g.quadraticCurveTo(0,-4,9,-8); }); P.sh('#ffd84a',g=>icoEl(g,0,5,5,5),{d:1}); },
+  moon(P){ P.glow(0,0,24,'240,240,200',.55); P.sh('#f2f0d4',g=>icoCrescent(g,15.5,8,-4,12.5)); P.fl('rgba(200,195,160,.7)',g=>{ icoEl(g,-7,-2,2,2); icoEl(g,-4,7,1.4,1.4); }); P.spark(13,-12,3.6,'#ffffff'); },
+  spark(P){ P.glow(0,2,24,'255,150,60',.6); P.sh('#ff7a2a',g=>icoFlame(g,0,2,11)); P.fl('#ffd25a',g=>icoFlame(g,0,6,6)); P.fl('#fff6c8',g=>icoFlame(g,0,9,2.6)); },
+  pie(P){ P.sh('#c83a5a',g=>icoPoly(g,[-16,10,16,10,14,2,-6,-12])); P.sh('#e8a656',g=>icoPoly(g,[-16,10,16,10,16,15,-16,15])); P.sh('#eeb466',g=>{ g.moveTo(-6,-12); g.lineTo(14,2); g.lineTo(16,-1); g.lineTo(-4,-15); g.closePath(); },{d:1}); },
+  sack(P){ P.sh('#b8946a',g=>{ g.moveTo(-6,-9); g.bezierCurveTo(-20,-2,-18,17,0,17); g.bezierCurveTo(18,17,20,-2,6,-9); g.closePath(); }); P.sh('#a8845a',g=>icoPoly(g,[-6,-9,-9,-17,0,-13,9,-17,6,-9]),{d:1}); P.band('#7a5a3a',1.4,g=>{ g.moveTo(-7,-9); g.lineTo(7,-9); });
+    P.sh('#9aa0a8',g=>icoEl(g,-9,-12,3.4,2.6),{d:0.8}); P.sh('#c8a0e0',g=>icoEl(g,5,-14,3,2.4),{d:0.8}); },
+  crate(P){ P.sh('#b0743a',g=>icoRp(g,-15,-8,30,24,2)); P.st('#7a4a22',1.6,g=>{ g.moveTo(-15,0); g.lineTo(15,0); g.moveTo(-15,8); g.lineTo(15,8); g.moveTo(-15,-8); g.lineTo(15,16); });
+    P.sh('#3e3e9e',g=>icoPoly(g,[-8,-8,-2,-21,4,-8])); P.sh('#e84a8a',g=>icoPoly(g,[3,-8,8,-18,13,-8])); },
+  sled(P){ P.st(P.ol,P.ow+2.4,g=>{ g.moveTo(-17,10); g.lineTo(13,10); g.quadraticCurveTo(19,10,18,4); }); P.st('#c8c8d0',2.4,g=>{ g.moveTo(-17,10); g.lineTo(13,10); g.quadraticCurveTo(19,10,18,4); });
+    P.band('#8a5a32',2,g=>{ g.moveTo(-10,10); g.lineTo(-10,3); g.moveTo(8,10); g.lineTo(8,3); }); P.sh('#c8402a',g=>icoRp(g,-16,-4,30,8,2)); },
+  gem(P){ P.glow(0,0,22,'255,200,120',.4); P.sh('#ff9a5a',g=>icoPoly(g,[-12,-4,-6,-12,6,-12,12,-4,0,14])); P.st(icoTone('#ff9a5a',0.45),1.2,g=>{ g.moveTo(-12,-4); g.lineTo(12,-4); g.moveTo(-6,-12); g.lineTo(-3,-4); g.lineTo(0,14); g.moveTo(6,-12); g.lineTo(3,-4); g.lineTo(0,14); }); },
+  parcel(P){ P.sh('#c8945a',g=>icoRp(g,-15,-11,30,25,3)); P.fl(icoTone('#c8945a',0.3),g=>icoRp(g,-15,-11,30,6,2));
+    P.st('#f2e2c0',2.4,g=>{ g.moveTo(0,-11); g.lineTo(0,14); g.moveTo(-15,1); g.lineTo(15,1); });
+    P.st(P.ol,P.ow*0.7,g=>{ g.moveTo(0,-11); g.quadraticCurveTo(-9,-19,-7,-11); g.closePath(); g.moveTo(0,-11); g.quadraticCurveTo(9,-19,7,-11); g.closePath(); });
+    P.fl('#f2e2c0',g=>{ g.moveTo(0,-11); g.quadraticCurveTo(-9,-19,-7,-11); g.closePath(); g.moveTo(0,-11); g.quadraticCurveTo(9,-19,7,-11); g.closePath(); }); }
+};
+// which drawing each item gets: by id, by the ITEMDEF icon name, by words in the id and name, then by its group
+const ICO_ID={it_bun:'bun',it_pepper:'pepper',it_feather:'crowfeather',it_taffy:'taffy',it_drop:'thunder',it_stone:'hearth',it_snowball:'snowball',it_pudding:'pudding',
+  letter_b:'letter',recipe:'scroll',frostberry:'berry',basket:'basket',moonlily:'flower',letter_moss:'letter',oath_letter:'letter.old',oath_badge:'badge',
+  tunnel_key:'key',oath_plans:'scroll.plans',lucky_pick:'pick',star_iron:'ore',horn:'horn',fish:'fish',rod:'rod',lucky_lure:'lure',kettle:'kettle',honey:'honey',
+  juniper_map:'map',carrot:'carrot',map_x1:'map',map_x2:'map',map_x3:'map',lantern:'lantern',treat:'treat',relic:'cloak',errand:'parcel',
+  parcel_nana_osric:'sweater',parcel_wendel_dell:'jar.worms',parcel_hal_ulf:'cheese',parcel_marigold_hob:'scarf',parcel_quill_gorran:'map.star',parcel_cookie_tilly:'scroll',
+  parcel_elka_rook:'sled',parcel_yara_wren:'letter',parcel_mayor_yara:'letter.fancy',parcel_pell_hob:'crate',parcel_gorran_quill:'sack',parcel_tilly_bertram:'pie',
+  purse:'purse',sheet1:'page.music',sheet2:'page.music',sheet3:'page.music',cheese:'cheese',yarn:'yarn.wolf',scarf:'scarf',feather:'feather.peacock',songscroll:'scroll.music',
+  starmap:'map.star',stariron2:'ore',marlo_hat:'hat.marlo',tide_pearl:'pearl.glow',sky_feather:'feather.storm',c_gear:'gear',a1_heart:'heart',c_shard1:'shard.dusk',
+  f_shard2:'shard.frost',m_shard3:'shard.moon',m_heart:'heart.mended',a1_locket:'locket',a1_page:'page.torn',a1_lantern:'paperlantern',a1_thunder:'hammer',
+  a1_skipstone:'stone',a1_citykey:'key.city',a1_liftkey:'key',a1_marlonote:'page.torn',a1_coldfish:'fish.cold',c_diary:'book.dream',c_letters:'letter.bundle',
+  c_lampoil:'oil',c_lumpybun:'biscuit.lumpy',c_biscuit:'biscuit',c_musicbox:'musicbox',c_seapepper:'pepper.sea',c_chowder:'pot',c_chain:'rope.chain',c_sock:'sock',
+  c_spring:'gear.spring',c_mainspring:'gear.spring',c_pearl_letter:'letter',c_map:'map',c_scarf:'scarf.blue',c_newscap:'badge.press',c_badge:'badge.clock',
+  c_birdclock:'clock',c_bird_clock:'clock',f_powder:'bomb.powder',f_soup:'pot',f_starfrost:'ore.frost',f_parsnip:'carrot.parsnip',f_northmaps:'map.north',
+  f_medal:'badge.medal',f_cocoa:'mug',f_honey:'honey',f_earmuffs:'earmuffs',f_bucket:'bucket',f_snowletter:'letter.snow',f_icediary:'book.ice',
+  m_hat_pirate:'hat.pirate',m_hat_firefly:'hat.firefly',m_mooncrumb:'moon',m_book_raw:'book.soggy',m_book:'book.moth',m_stariron:'ore',m_lampoil:'oil.ever',
+  m_vletter:'letter.moth',m_sandwich:'sandwich',m_tideproto:'bomb.tide',m_smokebomb:'bomb.smoke',m_rope:'rope',m_airjar:'jar',m_pearl:'pearl',m_hat_desert:'hat.desert',
+  m_hat_mirage:'hat.mirage',n_map:'map.peak',n_spark:'spark',magnifier:'magnifier',c_note1:'page.mask',c_vesper_page:'page',f3_wolf_hat:'hat.wolf',f3_scarf:'scarf.long',
+  f3_eggshell:'egg',f3_plume:'feather.plume',m4_basket:'basket.knit',m4_sweater:'sweater.small',n5_lantern:'paperlantern',n5_goathorns:'horn.sock',n5_song:'page.music',
+  n5_tea_note:'letter',n5_moth_biscuit:'biscuit.moth'};
+for(let i=1;i<=6;i++) ICO_ID['c_page'+i]='page.log';
+for(let i=1;i<=3;i++) ICO_ID['f_verse'+i]='page.music';
+// hats people wear (G.hats keys): 'hat:<key>'
+const ICO_HAT={party:'hat.party',wizard:'hat.wizard',crown:'hat.crown',top:'hat.top',feather:'hat.feather','Sky Feather':'hat.sky'};
+const ICO_RX=[[/lantern.?bun|\bbuns?\b/,'bun'],[/ember.?pepper/,'pepper'],[/pebble/,'crowfeather'],[/taffy/,'taffy'],[/thunder.?drop/,'thunder'],[/hearth.?stone/,'hearth'],
+  [/snowball|snowgob/,'snowball'],[/pudding/,'pudding'],[/cocoa|tea\b|mug/,'mug'],[/biscuit|cookie/,'biscuit'],[/\bjar\b|bubble/,'jar'],
+  [/\bhats?\b|\bcap\b|helmet/,'hat'],[/crown/,'hat.crown'],[/letter|note|invitation|envelope|postcard/,'letter'],[/star.?chart|star.?map/,'map.star'],[/\bmaps?\b|chart/,'map'],
+  [/\bkey\b/,'key'],[/song|verse|music|sheet/,'page.music'],[/page|logbook|notebook/,'page'],[/recipe|scroll|plans/,'scroll'],[/\bbook\b|diary/,'book'],
+  [/badge|medal|pass\b/,'badge'],[/shard|crystal/,'shard'],[/\bheart\b/,'heart'],[/star.?iron|\bore\b|starfrost/,'ore'],[/fish/,'fish'],[/sandwich/,'sandwich'],
+  [/honey/,'honey'],[/cheese/,'cheese'],[/yarn|wool/,'yarn'],[/scarf/,'scarf'],[/sweater|jumper/,'sweater'],[/sock/,'sock'],[/feather|plume/,'feather'],
+  [/\bpick\b/,'pick'],[/hammer/,'hammer'],[/horn/,'horn'],[/lure/,'lure'],[/kettle/,'kettle'],[/soup|chowder|stew|\bpot\b/,'pot'],[/basket/,'basket'],
+  [/carrot|parsnip|turnip/,'carrot'],[/lily|flower|blossom|rose/,'flower'],[/berry|berries/,'berry'],[/pearl/,'pearl'],[/earmuff/,'earmuffs'],[/bucket|pail/,'bucket'],
+  [/\beggs?\b|eggshell/,'egg'],[/stone|pebble|rock/,'stone'],[/locket|necklace/,'locket'],[/music.?box/,'musicbox'],[/clock|watch/,'clock'],[/spring/,'gear.spring'],[/gear|cog/,'gear'],
+  [/\boil\b|potion|bottle|flask/,'oil'],[/bomb|powder/,'bomb'],[/chain/,'rope.chain'],[/\brope\b/,'rope'],[/mantle|cloak|cape/,'cloak'],[/treat|bone/,'treat'],
+  [/purse|pouch|coin/,'purse'],[/\bmoon\b/,'moon'],[/spark|ember|flame/,'spark'],[/\bpie\b|\bcake\b|\btart\b/,'pie'],[/\bsack\b/,'sack'],[/\bcrate\b/,'crate'],[/sled/,'sled'],
+  [/lantern|lamp/,'lantern'],[/rod\b/,'rod'],[/magnif|lens/,'magnifier']];
+function icoArtOf(id){
+  id=String(id||'');
+  if(id.startsWith('hat:')){ const k=id.slice(4); return ICO_HAT[k]||'hat.'+(/feather/i.test(k)?'feather':/crown/i.test(k)?'crown':'cap'); }
+  if(ICO_ART[id.split('.')[0]]&&!ICO_ID[id]&&!(typeof ITEM_NAMES!=='undefined'&&ITEM_NAMES[id])) return id;   // an art name already
+  if(ICO_ID[id]) return ICO_ID[id];
+  const d=ITM.def(id), ic=d&&d.icon;
+  if(typeof ic==='string'&&ICO_ART[ic.split('.')[0]]) return ic;
+  const s=(id+' '+(d&&d.name||'')+' '+((typeof ITEM_NAMES!=='undefined'&&ITEM_NAMES[id])||'')).toLowerCase();
+  for(const [rx,a] of ICO_RX) if(rx.test(s)) return a;
+  const k=d&&d.kind; return k==='keep'?'gem':'parcel';
+}
+
 // ================= blessings
 let upChoices=null, upCb=null;
 function offerUpgrades(cb,title,sub){
@@ -88829,7 +89605,7 @@ function renderJour(){
     rows.push(`<div class="jh2">Side quests (${side.length})</div>`);
     rows.push(side.length?side.map(card).join(''):'<p>Look for people with a gold <b style="color:#ffcf4a">!</b> over their heads. Some of them are inside their houses.</p>');
     if(err.length){ rows.push(`<div class="jh2">Errands (${err.length})</div>`); rows.push(err.map(card).join('')); }
-    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':padActive()?`Press ${padChip(PB.LF)} or ${padChip(PB.RT)} to switch which quest you follow. ${btnHTML('journal')} opens the journal.`:'Press T to switch which quest you follow, I to open the journal.'}</p>`);
+    rows.push(`<p style="margin-top:8px">Up to ${TRACK_MAX} quests show on screen. The one you follow gets the gold diamond on the compass and minimap. ${usingTouch?'Tap the quest list on screen to open this journal.':padActive()?`Press ${padChip(PB.RT)} to switch which quest you follow. ${btnHTML('journal')} opens the journal.`:'Press T to switch which quest you follow, I to open the journal.'}</p>`);
     const done=Object.keys(G.quests).filter(id=>G.quests[id].done&&QDEFS[id]);
     if(done.length) rows.push(`<div class="jh2">Done (${done.length})</div><p>${E(done.map(id=>QDEFS[id].title.replace('Errand: ','')).join(' · '))}</p>`);
   }else if(jTab==='story'){
@@ -88849,10 +89625,7 @@ function renderJour(){
     rows.push(`<p>People you've talked to: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
     rows.push('<div class="ppl">'+met.map(c=>{ const f=friendOf(c.id), h='♥'.repeat(Math.floor(f))+'♡'.repeat(5-Math.floor(f)); const T=TALK[c.id]||{}; return `<div><b>${E(c.name.replace(', your mom',''))}</b> <span class="hz">${h}</span><small>${E(TOWN_NAME[c.town]||'')}${T.bio?' · '+E(T.bio):''}</small></div>`; }).join('')+'</div>');
   }else if(jTab==='bag'){
-    const inv=Object.keys(G.items).filter(k=>G.items[k]>0).map(k=>`${ITEM_NAMES[k]||k}${G.items[k]>1?' ×'+G.items[k]:''}`);
-    rows.push(`<div class="jh2">Satchel</div><p>${G.coins||0} coins</p><ul>${inv.map(t=>`<li>${E(t)}</li>`).join('')||'<li>Nothing yet</li>'}</ul>`);
-    const hats=Object.keys(G.hats||{}); if(hats.length) rows.push(`<div class="jh2">Hats</div><p>${E(hats.map(h=>(HATS.find(x=>x[0]===h)||[h,h])[1]).join(' · '))}${G.hat?' (wearing one)':''}</p>`);
-    rows.push(`<div class="jh2">Blade</div><p>Tier ${G.tier+1}. Bring star-iron to Mom at the forge to sharpen it.</p>`);
+    rows.push(bagHtml(E));   // (v12) the bag screen, below renderJour
   }else if(jTab==='secrets'){
     const S=secretTally();
     rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
@@ -88861,9 +89634,101 @@ function renderJour(){
   el.innerHTML=rows.join('');
   if(jTab==='hero') heroTabWire(el);
   if(jTab==='log') logJourWire(el);
+  if(jTab==='bag') bagWire(el);
   for(const b of el.querySelectorAll('button[data-hint]')) b.addEventListener('click',()=>{ jHint=!jHint; SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-f]')) b.addEventListener('click',()=>{ followQuest(b.dataset.f||null); SFX.play('ui'); renderJour(); });
   for(const b of el.querySelectorAll('button[data-t]')) b.addEventListener('click',()=>{ toggleTrack(b.dataset.t); SFX.play('ui'); renderJour(); });
+}
+// ---------- the Satchel tab: a real bag. Five groups with 40 px icons; things to use have their count, one line of what
+// they do, a Use button (greyed, with the reason, when it would not work now) and a star that puts them in the quick
+// slot. Hats have Wear. With a controller the focus ring moves over the buttons: A picks, X or Y stars (padMenu).
+const BAG_GROUPS=[['use','To use'],['auto','Works by itself'],['tool','Tools'],['quest','For quests'],['keep','Keepsakes']];
+const BAG_HATN={feather:'Feathered Hat'};
+const BAG_STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.75 5.8 6.35.75-4.7 4.4 1.25 6.3L12 16.9l-5.65 3.15 1.25-6.3-4.7-4.4 6.35-.75z"/></svg>';
+function bagHatName(k){ const h=typeof HATS!=='undefined'&&HATS.find(x=>x[0]===k); if(h) return h[1]; if(typeof EVHATN!=='undefined'&&EVHATN[k]) return EVHATN[k]; return BAG_HATN[k]||String(k).replace(/^./,c=>c.toUpperCase()); }
+function bagSplit(n){ const m=/^(.*?)\s*\(([^)]*)\)\s*$/.exec(String(n||'')); return m&&m[1]?[m[1],m[2].replace(/^./,c=>c.toUpperCase())]:[String(n||''),'']; }
+// the side quest that asks for this item right now (its step takes it), if there is one
+function bagNeed(id){
+  for(const q in G.quests||{}){ if(G.quests[q].done||!QDEFS[q]) continue; let st=null; try{ st=stepOf(q); }catch(e){}
+    if(st&&st.take&&st.take[id]) return QDEFS[q].title.replace('Errand: ',''); }
+  return '';
+}
+function bagInfo(id){ let i=null; try{ i=ITM.info(id); }catch(e){} return Object.assign({id,name:ITEM_NAMES[id]||id,kind:'quest',desc:'',count:ITM.count(id),cap:0},i||{}); }
+// how to use the quick slot on the device in hand
+function bagQuickHow(){
+  const dev=curDevice();
+  if(dev==='pad') return `${padChip(PB.LF)} ${escapeHtml(simplify('uses it.'))}`;
+  if(dev==='touch') return escapeHtml(simplify(S('Tap it under the ROAR ring to use it.','Tap it under ROAR to use it.')));
+  return `${escapeHtml(simplify('Press'))} <kbd class="pg k">${escapeHtml(actKey('item'))}</kbd> ${escapeHtml(simplify('to use it.'))}`;
+}
+const bagIco=(id,s)=>`<canvas class="bico" data-icon="${escapeHtml(id)}" data-s="${s||40}" width="${s||40}" height="${s||40}" aria-hidden="true"></canvas>`;
+function bagHtml(E){
+  const out=[], q=ITM.quick(), ids=Object.keys(G.items||{}).filter(k=>G.items[k]>0), infos=ids.map(bagInfo);
+  const hats=Object.keys(G.hats||{}).filter(k=>G.hats[k]);
+  // coins and the quick slot
+  const qi=q?bagInfo(q):null;
+  out.push(`<div class="bagtop"><span class="bagcoin"><i aria-hidden="true"></i>${G.coins||0} coins</span><span class="bagq">${qi?`${bagIco(q,28)}<span>${E('Quick slot')}: <b>${E(bagSplit(qi.name)[0])}</b>${qi.count>0?` ×${qi.count}. ${bagQuickHow()}`:` (${E('none left')})`}</span>`:`<span class="bqe" aria-hidden="true">${BAG_STAR}</span><span>${curDevice()==='pad'?`${E('Quick slot: empty. Press')} ${padChip(PB.W)} ${E('on something to use, and it waits there, ready.')}`:E(S('Quick slot: empty. Press the star on something to use, and it waits there, ready.','Quick slot: empty. Press a star to put something there.'))}</span>`}</span></div>`);
+  if(!infos.length&&!hats.length) out.push(`<p>${E(S('Nothing in your satchel yet. Chests, shops and the people you help all give you things.','Nothing here yet. Open chests and help people to get things.'))}</p>`);
+  const kindOf=i=>BAG_GROUPS.some(g=>g[0]===i.kind)?i.kind:'quest';
+  for(const [k,label] of BAG_GROUPS){
+    const L=infos.filter(i=>kindOf(i)===k), H=k==='keep'?hats:[];
+    if(!L.length&&!H.length) continue;
+    out.push(`<div class="jh2">${E(label)}</div>`);
+    if(k==='use'){
+      // in the registry's order (the order they turn up in the acts), not the order they were picked up
+      const ord=typeof ITEMDEF!=='undefined'&&ITEMDEF?Object.keys(ITEMDEF):Object.keys(ITM_STUB), at=id=>{ const n=ord.indexOf(id); return n<0?999:n; };
+      L.sort((a,b)=>at(a.id)-at(b.id));
+      out.push('<div class="bag">'+L.map(i=>{
+        const can=ITM.can(i.id), ok=can===true, why=ok?'':simplify(typeof can==='string'?can:'Not right now'), star=q===i.id, [nm]=bagSplit(i.name);
+        return `<div class="bi" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b><span class="bn">${i.count}${i.cap?` ${E('of')} ${i.cap}`:''}</span>${i.desc?`<small>${E(i.desc)}</small>`:''}${ok?'':`<small class="why">${escapeHtml(why)}</small>`}</div>`
+          +`<div class="bb"><button type="button" class="btn c sm ${ok?'hot':'off'}" data-use="${escapeHtml(i.id)}" aria-disabled="${!ok}"${ok?'':` title="${escapeHtml(why)}"`}>Use</button>`
+          +`<button type="button" class="btn c sm bstar${star?' on':''}" data-star="${escapeHtml(i.id)}" aria-pressed="${star}" aria-label="${star?'In your quick slot':'Put it in your quick slot'}" title="${star?'In your quick slot':'Put it in your quick slot'}">${BAG_STAR}</button></div></div>`;
+      }).join('')+'</div>');
+    }else if(k==='auto'||k==='tool'){
+      out.push('<div class="bag">'+L.map(i=>{ const [nm,note]=bagSplit(i.name), d=i.desc||note;
+        return `<div class="bi" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b>${i.count>1?`<span class="bn">×${i.count}</span>`:''}${d?`<small>${E(d)}</small>`:''}</div></div>`; }).join('')+'</div>');
+    }else{
+      // quest things and keepsakes: small tiles (the name's bracket part, and the quest that wants it now, as notes)
+      if(L.length) out.push('<div class="bgrid">'+L.map(i=>{ const [nm,note]=bagSplit(i.name), need=k==='quest'?bagNeed(i.id):'';
+        return `<div class="bi tile" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b>${i.count>1?`<span class="bn">×${i.count}</span>`:''}${note?`<small>${E(note)}</small>`:''}${need?`<small class="for">${E('For')}: ${E(need)}</small>`:''}</div></div>`; }).join('')+'</div>');
+      // hats Ash can wear (G.hats): Wear, or Take off for the one on his head
+      if(H.length) out.push('<div class="bgrid hats">'+H.map(h=>{ const on=G.hat===h;
+          return `<div class="bi tile hat${on?' on':''}" data-item="hat:${escapeHtml(h)}">${bagIco('hat:'+h)}<div class="bt"><b>${E(bagHatName(h))}</b>${on?`<small>${E('You are wearing it.')}</small>`:''}</div><div class="bb"><button type="button" class="btn c sm${on?'':' hot'}" data-wear="${escapeHtml(h)}">${on?'Take off':'Wear'}</button></div></div>`; }).join('')+'</div>');
+    }
+  }
+  out.push(`<div class="jh2">Blade</div><p>Tier ${G.tier+1}. Bring star-iron to Mom at the forge to sharpen it.</p>`);
+  return out.join('');
+}
+function bagPaint(c){
+  const s=+c.dataset.s||40, d=Math.min(3,Math.max(1,window.devicePixelRatio||1));
+  c.width=Math.round(s*d); c.height=Math.round(s*d); c.style.width=c.style.height=s+'px';
+  const g=c.getContext('2d'); g.setTransform(d,0,0,d,0,0); g.clearRect(0,0,s,s); drawItemIcon(g,c.dataset.icon,s/2,s/2,s);
+}
+function bagWire(el){
+  for(const c of el.querySelectorAll('canvas.bico')) bagPaint(c);
+  for(const b of el.querySelectorAll('button[data-use]')) b.addEventListener('click',()=>bagUse(b.dataset.use,b));
+  for(const b of el.querySelectorAll('button[data-star]')) b.addEventListener('click',()=>bagStar(b.dataset.star));
+  for(const b of el.querySelectorAll('button[data-wear]')) b.addEventListener('click',()=>bagWear(b.dataset.wear));
+}
+// Use: a thing that would not work now says why (and the row gives a little shake); otherwise the journal closes and
+// Ash uses it right away, so you see it happen
+function bagUse(id,btn){
+  const r=ITM.can(id);
+  if(r!==true){ try{ SFX.play('warn',0.5); }catch(e){} const row=btn&&btn.closest('.bi'); if(row){ row.classList.remove('shake'); void row.offsetWidth; row.classList.add('shake'); } return false; }
+  closeJournal();
+  return !!ITM.use(id);
+}
+// the star: this item into the quick slot (pressing it again empties the slot); the focus stays on the same button
+function bagStar(id,refocus){
+  ITM.setQuick(ITM.quick()===id?null:id); SFX.play('ui'); renderJour();
+  if(refocus){ const b=$('#jBody').querySelector(`[data-item="${CSS.escape(id)}"] button[data-${refocus}]`); if(b) navFocus(b); }
+}
+function bagWear(k){ G.hat=G.hat===k?null:k; try{ saveGame(); }catch(e){} SFX.play('ui'); renderJour(); }
+// controller X or Y on the Satchel: star the item the focus ring is on
+function bagPadStar(){
+  if(jTab!=='bag') return false;
+  const a=document.activeElement, row=a&&a.closest&&a.closest('#jBody [data-item]'); if(!row||!row.querySelector('button[data-star]')) return false;
+  bagStar(row.dataset.item,a.dataset.use!=null?'use':'star'); return true;
 }
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
@@ -89189,6 +90054,9 @@ window.__ebX=Object.assign(window.__ebX||{},{setHand,setTips,useMode:()=>useMode
   banner:()=>G.banner?{text:G.banner.text,sub:G.banner.sub,t:G.banner.t,dur:G.banner.dur,q:(G.bannerQ||[]).map(b=>b.text)}:{q:(G.bannerQ||[]).map(b=>b.text)},
   dlgState:()=>DLG?{i:DLG.i,text:DLG.text,chars:DLG.chars,opts:!!DLG.opts,skipArm:DLG.skipArm}:null,
   say:(id,t)=>{ const n=(AREA?AREA.npcs:G.npcs).find(q=>q.id===id); return n?!!npcBubble(n,t):false; }, view:()=>({x:cam.x,y:cam.y,zoom,W,H})});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{itemNames:()=>ITEM_NAMES,icoArtOf,ICO_ART:()=>Object.keys(ICO_ART),bagPadStar,ITM,
+  icoSheet(cv,list,sb,size){ const was=LOOK.sb; LOOK.sb=!!sb; const g=cv.getContext('2d'), n=Math.floor(cv.width/(size+16)); g.fillStyle=sb?'#fff3d6':'#24130d'; g.fillRect(0,0,cv.width,cv.height);
+    list.forEach((id,i)=>{ const x=(i%n)*(size+16)+8+size/2, y=Math.floor(i/n)*(size+26)+8+size/2; drawItemIcon(g,id,x,y,size); g.fillStyle=sb?'#3b2233':'#e8d6b8'; g.font='9px sans-serif'; g.textAlign='center'; g.fillText(String(id).slice(0,14),x,y+size/2+10); }); LOOK.sb=was; }});
 // debug hooks from feature modules: each one adds to window.__ebX
 if(window.__ebX) Object.defineProperties(window.__eb,Object.getOwnPropertyDescriptors(window.__ebX));
 })();
