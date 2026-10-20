@@ -662,7 +662,7 @@ function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
   try{ mapZUI(); }catch(e){}   // (v12) the zoom buttons hide on the dungeon page
-  if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); return; } MAPUI.view=curMap(); }   // the dungeon page
+  if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); try{ mapLegSync(); }catch(e){} return; } MAPUI.view=curMap(); }   // the dungeon page
   const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
   // (v12) the canvas fills the map frame now: around the whole map it is the frame's own colour, as it was
   g.setTransform(1,0,0,1,0,0); g.fillStyle=LOOK.sb?'#e9d6ac':'#0e0a08'; g.fillRect(0,0,w,h);
