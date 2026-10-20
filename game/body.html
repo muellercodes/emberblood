@@ -266,13 +266,79 @@ html.sb .upw .card:hover,html.sb .upw .card:focus-visible{border-color:#3b2233;b
 html.sb .upw .card:active{transform:translateY(2px)}
 html.sb .card .ds{color:#6a4a52}
 html.sb .card .k{border:2px solid #3b2233;color:#3b2233}
-/* the title screen */
+/* the title screen (v12 TITLE). The hand-drawn backdrop is painted on the game canvas (v10_art_title.js), the logo is
+   hand-lettered on #logoCv (the text stays in the h1 for screen readers and as a fallback), the buttons are parchment
+   signs (Storybook) or wooden boards (Classic). Wide screens put the menu in a column on the left; tall screens put the
+   logo on top and the buttons at the bottom, with the picture in between. --ttlPaper and --ttlWood are textures the
+   title code draws at load. */
 html.sb #menu{background:radial-gradient(ellipse at 50% 42%,rgba(60,30,70,0) 0%,rgba(60,30,70,.2) 55%,rgba(36,18,46,.62) 100%)}
 html.sb .logo{background:linear-gradient(180deg,#fff7d0 0%,#ffd84e 38%,#ff9a34 70%,#ef5a2a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #3b2233) drop-shadow(3px 0 0 #3b2233) drop-shadow(-3px 0 0 #3b2233) drop-shadow(0 -3px 0 #3b2233) drop-shadow(0 12px 18px rgba(40,20,50,.45))}
 html.sb .tag{color:#fff4dc;text-shadow:var(--olt)}
 .menu .copy{margin:14px auto 0;font-size:11px;letter-spacing:.06em;color:var(--muted);opacity:.7}
 html.sb .menu .copy{color:#fff4dc;opacity:.8;text-shadow:0 1px 0 #3b2233,1px 0 0 #3b2233,-1px 0 0 #3b2233,0 -1px 0 #3b2233}
 html.sb .diff,html.sb .menu .note,html.sb .best{color:#fff4dc;text-shadow:0 1.5px 0 #3b2233,1px 0 0 #3b2233,-1px 0 0 #3b2233,0 -1px 0 #3b2233}
+#menu.ttl,html.sb #menu.ttl{background:none;align-items:flex-start;padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+#menu.ttl .menu{display:flex;flex-direction:column;min-height:100%;width:100%;max-width:460px;margin:0 auto}
+#menu.ttl .menu .stack,#menu.ttl .menu .best{width:100%;max-width:440px}
+#menu.ttl .ttlhead{width:100%;margin:0 auto}
+#menu.ttl .logo{position:relative;display:block;margin:0 auto;padding:0;line-height:0;white-space:normal}
+#menu.ttl .logo canvas{display:block;margin:0 auto;max-width:100%}
+#menu.ttl .logo.drawn,html.sb #menu.ttl .logo.drawn{background:none;color:inherit;filter:none;-webkit-background-clip:border-box;background-clip:border-box}
+#menu.ttl .logo.drawn .logotxt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#menu .logo:not(.drawn) canvas{display:none}
+#menu.ttl .logo:not(.drawn){line-height:1.05;padding:6px 0}
+#menu.ttl .tag{margin:0 0 4px;font-size:clamp(10px,2.7vw,13px);letter-spacing:.3em;color:#ffdcaa;text-shadow:0 1px 0 #140806,1px 0 0 #140806,-1px 0 0 #140806,0 -1px 0 #140806,0 0 14px rgba(255,120,40,.55)}
+html.sb #menu.ttl .tag{color:#fff4dc;text-shadow:var(--olt)}
+#menu.ttl .stack{margin-top:auto;padding-top:16px;gap:9px}
+#menu.ttl .best{margin-top:10px;min-height:0}
+#menu.ttl .best:empty{display:none}
+#menu.ttl .copy{margin:8px auto 0;font-size:11px;opacity:.85;color:#e8d2b4;text-shadow:0 1px 0 #140806,1px 0 0 #140806,-1px 0 0 #140806,0 -1px 0 #140806}
+/* the signs */
+#menu.ttl .btn{position:relative;border-radius:12px 16px 11px 15px/15px 11px 16px 12px;padding:12px 18px 12px 20px;min-height:52px}
+#menu.ttl .btn.sm{min-height:46px;padding:10px 14px}
+#menu.ttl .btn small{font-size:13px;line-height:1.3}
+html:not(.sb) #menu.ttl .btn{color:#f8e6c6;background-color:#3a2014;background-image:var(--ttlWood,none),linear-gradient(180deg,#5a3420 0%,#3a2014 55%,#2a150d 100%);background-size:100% 100%,100% 100%;background-blend-mode:overlay,normal;border:2px solid #120705;box-shadow:inset 0 1px 0 rgba(255,214,160,.28),inset 0 -3px 0 rgba(0,0,0,.4),0 3px 0 #0a0302,0 10px 22px rgba(0,0,0,.55);text-shadow:0 1px 0 #000,0 0 1px #000}
+html:not(.sb) #menu.ttl .btn small{color:#d9bf9c}
+html:not(.sb) #menu.ttl .btn::before,html:not(.sb) #menu.ttl .btn::after{content:'';position:absolute;top:8px;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle at 35% 32%,#f0dcc0 0,#8a7460 38%,#2a2018 80%);box-shadow:0 1px 0 rgba(0,0,0,.6);pointer-events:none}
+html:not(.sb) #menu.ttl .btn::before{left:8px} html:not(.sb) #menu.ttl .btn::after{right:8px}
+html:not(.sb) #menu.ttl .btn:hover{border-color:#ff9a52;box-shadow:inset 0 1px 0 rgba(255,214,160,.28),inset 0 -3px 0 rgba(0,0,0,.4),0 3px 0 #0a0302,0 0 18px rgba(255,140,50,.45)}
+html:not(.sb) #menu.ttl .btn.hot{background-color:#8a2c12;background-image:var(--ttlWood,none),linear-gradient(180deg,#d0582a 0%,#a23a16 55%,#7a2410 100%);border-color:#2a0a04;color:#fff2d8;box-shadow:inset 0 1px 0 rgba(255,220,170,.45),inset 0 -3px 0 rgba(60,10,0,.45),0 3px 0 #0a0302,0 0 22px rgba(255,110,40,.4),0 10px 22px rgba(0,0,0,.55)}
+html:not(.sb) #menu.ttl .btn.hot small{color:#ffdcb8}
+html.sb #menu.ttl .btn{background-color:#fdf0d2;background-image:var(--ttlPaper,none),linear-gradient(180deg,#fff8e4 0%,#fbe7bd 100%);background-size:200px 200px,100% 100%;background-blend-mode:multiply,normal;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),inset 0 -5px 10px rgba(190,120,70,.16),0 4px 0 #3b2233,0 9px 18px rgba(30,10,40,.32)}
+html.sb #menu.ttl .btn.hot{background-color:#ff9a40;background-image:var(--ttlPaper,none),linear-gradient(180deg,#ffc56a 0%,#ff9a40 55%,#f07230 100%)}
+html.sb #menu.ttl .btn:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px rgba(255,255,255,.4),0 1px 0 #3b2233}
+/* the difficulty strip and the line under it sit on a small board of their own so they read over the picture */
+#menu.ttl .diff{margin-top:2px;padding:6px 6px 6px 14px;border-radius:12px;background:rgba(16,8,6,.62);color:#e8d2b4;box-shadow:0 0 0 1px rgba(255,190,120,.16)}
+html.sb #menu.ttl .diff{background:rgba(59,34,51,.5);box-shadow:none}
+#menu.ttl .note{padding:0 4px;color:#f0dcc0;text-shadow:0 1px 0 #140806,1px 0 0 #140806,-1px 0 0 #140806,0 -1px 0 #140806}
+html.sb #menu.ttl .note{color:#fff4dc}
+#menu.ttl .note:empty{display:none}
+#menu.ttl .row{gap:9px}
+/* wide screens: the menu is a column on the left, the picture fills the rest */
+@media (min-aspect-ratio:6/5){
+  #menu.ttl,html.sb #menu.ttl{padding-left:max(28px,4.5vw,env(safe-area-inset-left,0px))}
+  #menu.ttl .menu{min-height:0;margin:auto auto auto 0;width:min(430px,40vw);max-width:none}
+  #menu.ttl .stack{margin-top:6px}
+}
+/* short landscape screens (phones on their side): everything a little tighter so it fits without scrolling */
+@media (min-aspect-ratio:6/5) and (max-height:560px){
+  #menu.ttl,html.sb #menu.ttl{padding-top:max(8px,env(safe-area-inset-top,0px));padding-bottom:max(6px,env(safe-area-inset-bottom,0px))}
+  #menu.ttl .menu{width:min(380px,46vw)}
+  #menu.ttl .stack{gap:6px;padding-top:4px;margin-top:2px}
+  #menu.ttl .tag{font-size:10px;margin-bottom:0}
+  #menu.ttl .btn{min-height:44px;padding:7px 14px 7px 16px;font-size:15px}
+  #menu.ttl .btn.sm{min-height:42px;padding:6px 10px;font-size:14px}
+  #menu.ttl .btn small{font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #menu.ttl .diff{padding:3px 4px 3px 12px}
+  #menu.ttl .diff .seg button{padding:5px 11px}
+  #menu.ttl .note,#menu.ttl .best{display:none}
+  #menu.ttl .copy{margin-top:4px;font-size:10px}
+}
+@media (max-aspect-ratio:6/5) and (max-height:700px){
+  #menu.ttl .stack{gap:7px}
+  #menu.ttl .btn{min-height:46px;padding:9px 14px 9px 16px}
+  #menu.ttl .btn small{font-size:12.5px}
+}
 /* chapter cards and the controller toast */
 html.sb #card .num{display:inline-block;color:#fff;background:#e0782c;border:3px solid #3b2233;border-radius:12px;padding:4px 18px 4px 22px;box-shadow:0 4px 0 #3b2233;text-shadow:0 2px 0 #3b2233}
 html.sb #card .nm{color:#fff4dc;text-shadow:0 3px 0 #3b2233,3px 0 0 #3b2233,-3px 0 0 #3b2233,0 -3px 0 #3b2233,2px 2px 0 #3b2233,-2px 2px 0 #3b2233,2px -2px 0 #3b2233,-2px -2px 0 #3b2233,0 6px 0 #3b2233,0 10px 24px rgba(40,20,50,.5)}
@@ -288,8 +354,10 @@ html.sb #padToast span{color:#6a4a52}
 
 <div id="menu" class="ov on">
   <div class="menu">
-    <h1 class="logo">EMBERBLOOD</h1>
-    <div class="tag">Heir of the First Flame</div>
+    <div class="ttlhead">
+      <h1 class="logo"><canvas id="logoCv" aria-hidden="true"></canvas><span class="logotxt">EMBERBLOOD</span></h1>
+      <div class="tag">Heir of the First Flame</div>
+    </div>
     <div class="stack">
       <button class="btn hot" id="bContinue" hidden>Continue Journey<small id="contSub"></small></button>
       <button class="btn" id="bStory">Story Mode<small id="storySub">An open world to explore. Three lanterns to light.</small></button>
