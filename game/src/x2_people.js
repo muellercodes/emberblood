@@ -1383,7 +1383,7 @@ function f2pBlazeTick(dt){
 }
 // Pim's cocoa warms Ash up by itself when he is badly hurt (like Granny Oona's biscuits)
 function f2pCocoaTick(){
-  if(!(G.items.f_cocoa>0)||player.dead||player.hp>player.maxHp*0.35||(F2P.cocoaT>G.time)) return;
+  if(!(G.items.f_cocoa>0)||player.dead||player.hp>player.maxHp*0.35||(F2P.cocoaT>G.time)||(typeof itemBossTake==='function'&&!itemBossTake('f_cocoa'))) return;
   F2P.cocoaT=G.time+4; G.items.f_cocoa--; if(!G.items.f_cocoa) delete G.items.f_cocoa; heal(player.maxHp*0.3); SFX.play('pickup');
   ftext(player.x,player.y-44,simplify(S('Hot cocoa! A hug you can drink.','Hot cocoa!')),'#ffcf8a',13);
 }
