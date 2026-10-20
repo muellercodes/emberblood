@@ -12,8 +12,8 @@ chapter({
   silence: ['c_squawk', 'c_agatha', 'c_lamp_vesper'],
   card: ['Act II · Chapter 7', 'The Spinning Lighthouse'],
   so_far: [
-    "The Great Clock struck midnight and Gearhaven woke up. But the Spinning Lighthouse on Lantern Point was still dark, smothered in moths. Then Keeper Agatha's parrot crashed into the Gear Market, shouting for help.",
-    'The clock works again! But the lighthouse is dark. A parrot came for help.'],
+    "Ash searched Vesper's hideout in the bell loft. She keeps everything she steals, because a Lady in her dreams wants light and promised that her gran would be warm. Then the Great Clock struck twelve and Gearhaven woke up, and on a chimney Vesper pushed up her mask to watch. But the Spinning Lighthouse on Lantern Point is still dark.",
+    'Vesper steals light for a Lady in her dreams. The clock works again. But the lighthouse is still dark.'],
   mom: [["A whole city's clock! I told the chickens.", 'You fixed a clock! I told the chickens.']],
 
   npc: {
@@ -226,7 +226,7 @@ chapter({
     c_lamp_rescue: [
       { place: ['c_mask', 'player', [96, -70]] }, { anim: ['c_mask', 'moths'] }, { cam: 'c_mask', s: 0.6 },
       ['narr', 'Then the moths come back. Not for you. For Vesper. "Get off!" she yells. "I brought the stone! She said I\'d get my fire!"', 'The moths come back, for Vesper! "Get off! She said I would get fire!"'],
-      { choose: 'c_lamp', who: 'narr', ask: ['The moths hiss, all together: "All of it. The Mother wants all of it."', 'The moths hiss: "The Mother wants all of it."'], pick: [
+      { choose: 'c_lamp', who: 'narr', ask: ['The moths hiss, all together: "All of it. The Lady wants all of it."', 'The moths hiss: "The Lady wants all of it."'], pick: [
         { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind', v: 'saved',
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [

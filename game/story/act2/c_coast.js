@@ -7,8 +7,8 @@ chapter({
   // the game numbers Act II's cards after the heist (c_fest 1, c_pass 2), so this is Chapter 3
   card: ['Act II · Chapter 3', 'Salt on the Wind'],
   so_far: [
-    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask come up off the beach and glide over the Downs with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with dust.",
-    'Something huge flew over. Gerald the sheep is silver now.'],
+    "Sister Wren said the thief was the Moth Mask, a rooftop thief from Gearhaven who only steals things that glow. Ash followed the Southern Pass all the way down to the sea, to get the Ember Heart back.",
+    'The thief is the Moth Mask, from Gearhaven. Ash went down the pass to the sea.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],
   mom: [["The sea! Pebble says you can smell it from the pass. Bring me back a shell. A plain one is fine.", 'The sea! Bring me back a shell.']],

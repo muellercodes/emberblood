@@ -1,4 +1,4 @@
-// game/story/act2/c_salt.js (A2a): Act II, "The Girl from Saltmarsh".
+// game/story/act2/c_salt.js (A2a): Act II, "The Turning Library" (v12 R2: the old title gave away who she is).
 // What the player does: right after the rooftop chase the Bobs send Ash to the Turning Library, where Pearl's family
 // tree rolls out of the door (clue: it ends with Oona Saltwhistle and her granddaughter Vesper). In Saltmarsh the
 // player finds the moth-stamped gift lanterns in the windows, gets Chowder Charlie to sniff the Moth Mask's note
@@ -7,10 +7,10 @@
 // night the clocks stopped. Low tide opens the way to the Gullcrag Caves (c_claws).
 chapter({
   id: 'c_salt', act: 2, after: 'c_gear', next: 'c_claws', takeover: true,
-  card: ['Act II · Chapter 5', 'The Girl from Saltmarsh'],
+  card: ['Act II · Chapter 5', 'The Turning Library'],
   so_far: [
-    "Ottoline's family tree of Mother Pearl ended with Oona Saltwhistle and her granddaughter Vesper. In Saltmarsh every window had a moth lantern, the Moth Mask's note smelled of Charlie's chowder, and Ash worked out who she was: Vesper Saltwhistle. He fixed the Tide Clock and met her gran, in a house where no fire lasts the night.",
-    "The Moth Mask is Vesper Saltwhistle. Ash met her cold gran."],
+    'Ash worked out where the Moth Mask would strike and chased her over the roofs of Gearhaven. At the Great Clock she went straight up it like a ladder, and left a note behind: "Go home. This isn\'t your story. M."',
+    'Ash chased the Moth Mask over the roofs. She climbed the Great Clock and left a note: "Go home."'],
   hint: ['Ask at the Turning Library in the Upper Town. Then follow the Coast Road to Saltmarsh, where the Tide Clock is stuck.',
     'Ask at the library. Then go to Saltmarsh.'],
   mom: [['Saltmarsh? Wear your boots. And eat the chowder.', 'Wear your boots. Eat the chowder.']],
@@ -116,8 +116,8 @@ chapter({
     slt_ottoline: [
       ['c_ottoline', "Welcome to the Turning Library. Please don't run, the shelves do that for you. WHAT CAN I... sorry. What can I do for you?", 'Welcome! WHAT DO YOU... sorry. What do you need?'],
       ['ash', 'How does somebody climb straight up the Great Clock?', 'How does someone climb the Great Clock?'],
-      ['c_ottoline', "Only one person ever climbed like that. Mother Pearl, who built this city. Ember's own daughter, with horns like yours, claws that climbed anything, and not one spark of fire.", "Mother Pearl! Ember's daughter. Horns like yours. Climbing claws. No fire."],
-      ['ash', "Ember's daughter. With no fire at all. ...I never even thought about the ones who didn't get any.", "Ember's daughter, with no fire. I never thought about that."],
+      ['c_ottoline', 'Only one person ever climbed like that. Mother Pearl, who built this city. Horns, they say, and a tail, and claws that climbed anything. Where she came from, nobody ever wrote down.', 'Only Mother Pearl climbed like that. She built this city. She had horns, a tail and claws.'],
+      ['ash', "Horns and a tail? That's a lot like me.", 'Horns and a tail? Like me!'],
       ['c_ottoline', "Pearl learned to climb in the sea caves at Gullcrag, past Saltmarsh. You'd need claws like hers.", 'Pearl learned to climb in the Gullcrag caves, past Saltmarsh.', { promise: 'c_gullcrag_door' }],
       ['narr', "A shelf rolls past with a fat scroll on it: PEARL'S FAMILY TREE. It falls off, unrolls across the floor, and keeps going out the door.", "A scroll falls: PEARL'S FAMILY TREE. It unrolls right out the door."],
       ['c_ottoline', 'Oh dear. It does that. Two hundred names, and every one of them a climber.', 'Oh dear. It does that. Two hundred climbers.'],

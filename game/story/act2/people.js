@@ -118,8 +118,8 @@ people({
         say: ["Moon letters in the margins. I can't read them. But I know somebody who can, and she'll be insufferable. I'll send a copy to Wren.",
           "Moon letters! Wren can read them."] },
       { if: 'stage>=c_brass !clue q_nursery', promise: 'm0_pearl', dir: ['embers_nursery', 'm0_pearl', 'north'], option: ['What does Wren say about Pearl?', 'What does Wren say?'],
-        say: ["Wren writes that above Ember's Nursery, up north, a tiny iron hook sits on a windy crag. Pearl's first, she thinks. A tail like yours could reach it.",
-          "Pearl's first hook is on a crag up north."] },
+        say: ["Wren writes that above Ember's Nursery, up north, a tiny iron hook sits on a windy crag. Very old, and very small. A tail like yours could reach it.",
+          'Wren says a tiny old hook is on a windy crag up north. Your tail could reach it.'] },
       { if: 'flag c_pages_given !quest c_logbook done', once: true,
         say: ["Pearl's pages are coming home, one by one! Wren has written me a letter about every single page.", "Pearl's pages are coming home!"] },
       // the snow (c_snow) is the news: these come first once it falls
@@ -146,8 +146,8 @@ people({
         re: [
           { t: ['I can hold the other end.', 'I can hold one end.'], tone: 'kind', f: 0.5,
             say: ['With those claws? Gently, then. Pinch it, don\'t poke it. ...Thank you.', 'Gently, with those claws. Thank you.'] },
-          { t: ['Two hundred climbers. And no fire.', 'Two hundred. No fire.'],
-            say: ['Not a spark between them. They built half this coast instead. The lighthouse, the clock, the steps down to the sea.', 'No fire. They built half the coast instead.'] },
+          { t: ['Two hundred names. All climbers?', 'All of them climbers?'],
+            say: ['Every one. They built half this coast. The lighthouse, the clock, the steps down to the sea.', 'Every one. They built half the coast.'] },
         ] },
       // her moment (the old chat): a librarian's question, once he is a regular
       { if: 'stage>=c_claws',
@@ -653,7 +653,7 @@ people({
         say: ['Vesper Saltwhistle waved at me from a roof this morning. A real wave. Do you know how long I have chased her?', 'Vesper waved at me today! A real wave!'],
         re: [
           { t: ["She's my cousin, you know.", "She's my cousin."],
-            say: ['Your cousin? Two Emberbloods on one coast, and I find out from a wave? I am a terrible reporter.', 'Your cousin? And I find out now? Terrible!'] },
+            say: ['Your cousin? Two dragon kids on one coast, and I find out from a wave? I am a terrible reporter.', 'Your cousin? And I find out now? Terrible!'] },
           { t: ["She isn't a thief any more.", "She's not a thief now."],
             say: ["Not a thief. Just a girl who climbs. That's still a story. A quieter one.", 'Just a girl who climbs. A quiet story.'] },
         ] },
@@ -960,9 +960,10 @@ people({
     c_oona: [
       { if: 'quest c_oona done', once: true,
         say: ["The stove's been going all week, and not once out by morning. My Vesper sat by it a whole evening and never once looked at the door.", 'The stove never goes out! Vesper sat by it all evening.'] },
-      { if: 'flag dr_c_twins', once: true, option: ['I dreamed about baby Pearl. She climbed the curtains.', 'I dreamed baby Pearl climbed the curtains.'],
-        say: ["Up the curtains, the day she was born! Oh, duck. That's our family story. Nobody outside this house knows that one.",
-          "Up the curtains! That's our family story!"] },
+      { if: 'flag dr_c_twins', once: true, option: ['I dreamed a baby with no fire climbed the curtains.', 'I dreamed a baby climbed the curtains.'],
+        say: [['c_oona', 'Up the curtains, was it?', 'Up the curtains?'],
+          ['narr', 'Granny Oona looks at her stove for a long moment.', 'Gran looks at her stove for a long time.'],
+          ['c_oona', 'Funny, what folk dream. Pass me that blanket, duck.', 'Funny dream. Pass the blanket, duck.']] },
       { if: 'stage>=c_salt !clue q_lookout', promise: 'm0_lookout', ref: 'm0_lookout', option: ['Did Vesper ever camp near Emberhollow?', 'Did Vesper camp near home?'],
         say: ['Once, before your Lantern Night. She camped by the old pass. She said there is a tall rock there where you can see a whole valley of lanterns.',
           'She sat on a tall rock by the old pass.'] },
@@ -1445,7 +1446,7 @@ people({
             say: ['The thief? Climbs a clock tower, at night? Somebody ought to be watching that girl.', 'At night? Someone should watch that girl.'] },
         ] },
       // topics for Act II
-      { ask: ['Did you know about Pearl?', 'Did you know about Pearl?'], if: 'flag c_ottoline',
+      { ask: ['Did you know about Pearl?', 'Did you know about Pearl?'], if: 'flag c_cousin',
         say: ["Ember's other girl? Yara told me once, when I was small. I thought it was a story to make me eat my crusts.", 'Yara told me once. I thought it was a story.'] },
       { ask: ['Can you mend the Heart?', 'Can you mend the Heart?'], if: 'item c_shard1',
         say: ["Not one piece. Bring me all three, and I'll have the forge hot and waiting.", 'Not one piece. Bring all three.'] },

@@ -135,7 +135,7 @@ function x1pHat(item){ const h=X1P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 const X1P_STAGES=['c_coast','c_gear','c_salt','c_claws','c_brass','c_light','c_spire','c_snow'];
 function x1pStagesFallback(){
   const miss=X1P_STAGES.filter(s=>stageAt(s)<0); if(!miss.length) return;
-  const CH={c_gear:'The City of Clocks',c_salt:'The Girl from Saltmarsh',c_claws:'The Girl from Saltmarsh',c_brass:'The Brassworks',c_light:'The Spinning Lighthouse',c_spire:'The Shadow Spire',c_snow:'Snow in Summer'};
+  const CH={c_gear:'The City of Clocks',c_salt:'The Turning Library',c_claws:'The Turning Library',c_brass:'The Brassworks',c_light:'The Spinning Lighthouse',c_spire:'The Shadow Spire',c_snow:'The Breakwater'};
   if(typeof defineStages==='function') defineStages(2,miss.map(id=>({id,chapter:CH[id]||'The Clockwork Coast'})));
   else for(const s of miss) STAGES.push(s);
 }
@@ -220,7 +220,7 @@ const X1P_CAST=[
       S(`Granny Oona's been cold for seventy years. Someone ought to do something.`,`Granny Oona is always cold. Someone should help.`)]},
   {id:'c_oona',name:'Granny Oona Saltwhistle',town:'c_saltmarsh',home:true,house:'Oona’s Stilt House',job:'knitter',col:'#a0b8d0',ix:0.6,iy:0.55,
     look:{skin:'#d8aa84',hair:'#efeae0',hairdo:'braids',hood:'#6a8aa0',shawl:'#a06a4a',blanket:'#7a8aa0',outfit:'dress',shirt:'#4a5a6a',low:'#3a4a5a',build:'old',frost:true,mittens:'#c86a4a',hold:'yarn',yarnc:'#e0d0a0',horns:'tiny'},
-    lines:[S(`I've been cold since I was a girl. Our family always is. We're Emberbloods, you know. Just without the fire.`,`I am always cold. We are Emberbloods with no fire.`),
+    lines:[S(`I've been cold since I was a girl. Our family always is. Pearl's line, duck.`,`I am always cold. All my family is.`),
       S(`My Vesper brings me fish every morning. Leaves it on the step and runs. She thinks I don't know it's her. I know it's her.`,`My Vesper leaves fish on my step. I know it's her.`),
       S(`Mother Pearl climbed every cliff on this coast. I can't climb my own stairs. Funny old world.`,`Pearl climbed every cliff. I can't climb my stairs!`)]},
   {id:'c_tarbuckle',name:'Old Tarbuckle',town:'c_saltmarsh',home:true,house:'Old Tarbuckle’s Hut',job:'home',col:'#c8b090',
@@ -423,7 +423,7 @@ Object.assign(TALK,{
     rumor:{t:S(`Pearl's old place, the Gullcrag Caves, is full of her things. Her rope. Her bell. Her pages. Bring me word of her one day, duck.`,`Pearl's things are in the Gullcrag Caves. Her pages too.`),hint:null,need:()=>x1pR('c_salt')},
     loves:['honey'],hates:['frostberry'],
     secret:{t:S(`I knitted you mittens, duck. With holes for your claws. I'm not daft.`,`Mittens! With claw holes.`),reward:{armor:0.05}},
-    best:{t:S(`You're one of us now, duck. Emberblood to Emberblood. Here. My mother's last biscuit. Don't eat it. It's for luck.`,`You're one of us, duck. A lucky biscuit.`),reward:{maxhp:20}}},
+    best:{t:S(`You're one of us now, duck. Here. My mother's last biscuit. Don't eat it. It's for luck.`,`You're one of us, duck. A lucky biscuit.`),reward:{maxhp:20}}},
   c_tarbuckle:{bio:S('Retired sea captain and Saltmarsh’s teller of ghost stories. Exaggerates everything.','An old sea captain. He tells ghost stories.'),
     rumorAsk:[`Where did Saltbeard's ship go down?`,`Where did his ship sink?`],
     rumor:{t:S(`The Saucy Gull went down on the Rockpools forty years ago. At low tide you can stand on her deck. I wouldn't. Not at night.`,`His ship sank on the Rockpools. Don't go at night.`),hint:'c_lm_deck'},
@@ -792,7 +792,7 @@ Object.assign(QDEFS,{
         x1pL('c_jo',`Here. My skiff whistle. Blow it at any landing and one of my cousins will row you anywhere on the coast. I've got a lot of cousins.`,`Here's my skiff whistle. My cousins will row you anywhere.`),
         x1pL('c_mo',`(from the Harbor Office) THE DRAGON WINS THE REGATTA! BARNACLES! Somebody write that down!`,`(far away) THE DRAGON WINS! Write it down!`),x1pL('c_penny',`Already did.`,`Already did.`)],reward:{coins:50,xp:500,x1p:()=>{ G.flags.c_skiffs=true; setBanner(S('The Skiff Whistle','The Skiff Whistle'),S('At a skiff landing, call a skiff to row you to any other landing on the coast.','Call a skiff at a landing. It rows you anywhere.'),3.4); }}}]},
   c_chalk:{title:S('The Chalk Dragon','The Chalk Dragon'),giver:'c_barley',min:'c_coast',ab:'dbljump',
-    offer:[x1pL('c_barley',`See the hill? Look close. That grey shape. That's the Chalk Dragon. Mother Pearl cut it into the hill a thousand years back. Scraped the grass off, down to the white chalk.`,`See the grey shape on the hill? The Chalk Dragon. Pearl cut it long ago.`),
+    offer:[x1pL('c_barley',`See the hill? Look close. That grey shape. That's the Chalk Dragon. Mother Pearl cut it into the hill, longer ago than anybody can count. Scraped the grass off, down to the white chalk.`,`See the grey shape on the hill? The Chalk Dragon. Pearl cut it long ago.`),
       x1pL('c_barley',`She did it for her mother. So her mother, flying high, could look down and see a dragon waving up at her. Gerald thinks that's the nicest thing he ever heard. Gerald fainted.`,`She made it for her mom, so she could see it from the sky. Gerald fainted.`),
       x1pL('c_barley',`It's gone grey now. Grass and moth dust. Walk the old line, would you? Your feet are warm. Chalk likes warm feet.`,`It's grey now. Walk the old line? Chalk likes warm feet.`)],
     steps:[
@@ -835,7 +835,7 @@ Object.defineProperty(STORY,'c_oona_fire',{configurable:true,get(){ return [
   x1pN(`The old stove catches with a soft whump. Orange light fills the little house. Granny Oona holds out her hands to it and closes her eyes.`,`The stove lights. Granny Oona holds out her hands.`),
   x1pL('c_oona',`Oh. Oh, duck. Oh, that's... I'd forgotten. I'd forgotten what it feels like.`,`Oh, duck. I forgot what warm feels like.`),
   x1pN(`She laughs. Then she cries a bit. Then she laughs again, wipes her eyes with her shawl, and pats the stool next to her.`,`She laughs. She cries a bit. She pats the stool by her.`),
-  x1pL('c_oona',`Sit. I'll tell you a story. We're Emberbloods, you know. The Saltwhistles. From Ember's second girl, Pearl, who came south with no fire and built Gearhaven out of stubbornness.`,`We are Emberbloods. From Ember's second girl, Pearl. She had no fire. She built Gearhaven.`),
+  x1pL('c_oona',`Sit. I'll tell you a story. Pearl's horns, duck. Same as yours. She came south with no fire and built Gearhaven out of stubbornness, and we're what's left of her, the Saltwhistles.`,`Pearl's horns. Same as yours. She had no fire. She built Gearhaven.`),
   x1pL('c_oona',`Pearl's fire never came. Not to her, not to her children, not to anyone since. We got her claws, now and then. Her climbing. Her shadows. Never the fire.`,`None of us ever had fire. Some got her claws and her shadows.`),
   x1pL('c_oona',`My granddaughter has the claws. Climbs like a cat, my Vesper. Out every night, back every morning, with fish for my step and silver dust on her boots. She thinks I don't know.`,`My granddaughter Vesper has the claws. Out every night. She thinks I don't know.`),
   x1pL('ash',`Know what?`,`Know what?`),
@@ -1531,12 +1531,12 @@ const X1P_MAIL=[
     x1pL('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     x1pDo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>x1pR('c_salt'),lines:[
-    x1pL('wren',`Dear Ash. My books say Ember's daughter Pearl sailed south, a thousand years ago. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),
+    x1pL('wren',`Dear Ash. My oldest books say a girl with horns once went south over the pass, a very long time ago, with a rope and a lantern. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Long ago a girl with horns went south. Now you have too!`),
     x1pL('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have argued by letter for thirty years. She is wrong about almost everything, and I would be lost without her.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
     x1pL('wren',`Ask her about Pearl's logbook. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about Pearl's logbook. Your friend, Wren.`)]},
   {id:'c_pb_6',from:'wren',when:()=>!!G.flags.c_diary_sent,lines:[
     x1pL('wren',`Ash. Ottoline copied out the moon letters from that girl's diary and sent them to me. They are very old. Older than the Wardens.`,`The moon letters in the diary are very, very old.`),
-    x1pL('wren',`They spell the same two words over and over. "Night." And "Mother." I don't like this, Ash. I don't like it at all.`,`They spell "Night" and "Mother." I don't like it.`),
+    x1pL('wren',`They spell the same two words over and over. "Stay." And "Keep." I don't like this, Ash. I don't like it at all.`,`They spell "Stay" and "Keep." I don't like it.`),
     x1pL('wren',`Keep your fire close. Wren.`,`Keep your fire close. Wren.`)]},
   {id:'c_pb_7',from:'quill',when:()=>(G.flags.moon==null?100:G.flags.moon)<100,lines:[
     x1pL('quill',`The moon is five percent smaller. I have measured it every night this week, hoping I was wrong.`,`The moon is smaller. I measured it!`),
