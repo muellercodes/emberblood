@@ -105,16 +105,16 @@ function evFaceFrog(g){
 function evFaceFog(g){
   g.save(); pxPose(g,{py:40});
   for(let i=0;i<7;i++){ const a=i/7*TAU; g.fillStyle='rgba(225,232,245,.35)'; g.beginPath(); g.arc(Math.cos(a)*22,Math.sin(a)*16,30,0,TAU); g.fill(); }
-  for(const s of [-1,1]) pxEye(g,s*12,-4,s,{spirit:true,rx:4.6,ry:3,white:'rgba(255,255,255,.95)',glow:'rgba(220,235,255,1)',pip:'#4a5a7a'});
-  pxBrows(g,{x:12,w:4.5,y:-11,col:'rgba(255,255,255,.6)',lw:2,arch:2,busy:true});
-  pxMouth(g,{y:10,w:6,c:3.5,col:'rgba(255,255,255,.75)',lw:2,dark:'rgba(120,130,160,.6)',busy:true});
+  for(const s of [-1,1]) pxEye(g,s*12,-4,s,{spirit:true,rx:5,ry:3.4,white:'#fffef4',glow:'rgba(120,160,255,1)',pip:'#3a4a7a',ring:'rgba(80,100,160,.8)'});
+  pxBrows(g,{x:12,w:4.5,y:-11,col:'rgba(90,110,170,.75)',lw:2.2,arch:2,busy:true});
+  pxMouth(g,{y:10,w:6,c:3.5,col:'rgba(80,100,160,.8)',lw:2.2,dark:'rgba(60,70,110,.75)',busy:true});
   pxExtras(g,{ex:12,ey:-4,erx:4.6,ery:3,cheek:4,top:-24,side:40,no:{blush:true}});
   g.restore();
 }
 // (v12 FACES) the portrait for a speaker who is not a person. In the Storybook look the face is drawn on its own
 // layer, outlined and set on a bright backdrop like everyone else's (tinted from its own background colour); a face
 // that needs the dark (sb:false, or one of EVPORT_DARK) keeps its own backdrop and still gets the outline
-const EVPORT_DARK=new Set(['n_memory','ev_fog']);
+const EVPORT_DARK=new Set(['n_memory','ev_fog','c_shadow','n_echo_vor','n_echo_vesper','n_echo_glaciar','n_echo_hush']);
 { const base=drawPortrait; drawPortrait=function(who){
   const P=EVPORT[who]; if(!P) return base(who);
   const sb=!!(LOOK&&LOOK.sb)&&typeof lookPortraitCv==='function';
