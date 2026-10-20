@@ -300,7 +300,8 @@ function inCone(ox,oy,ang,len,half,tx,ty,tr){ return inArcC(ox,oy,ang,len,half,{
 //     thin round ones (under 16 px: tree trunks, posts, lamps, braziers) are seen and breathed past (arrows still stick in them);
 //   outdoors: ground higher than the source (a cliff or terrace face seen from below; ramps never block).
 // A house is one room, so it is always clear. Not tested: the first 2 px, the last tr px before the target (its own body),
-// the target's own cave cell (things set into a wall), and a collider that holds either end.
+// the cave cells the two ends stand in (things set into a wall: a crack, a vent, a torch), and a collider that holds
+// either end.
 // o: {lv: the source's level (default: where it stands), lt: the target's level (a sight line: only ground higher than
 // both ends blocks), fly: true (to or from the sky outdoors: colliders do not count)}.
 const LOSV={stamp:0};
@@ -322,12 +323,13 @@ function losClear(x0,y0,x1,y1,tr,o){ return losHitT(x0,y0,x1,y1,tr,o)===Infinity
 function losCaveT(A,x0,y0,x1,y1,ux,uy,end){
   const c=A.cave, cs=c.cell, w=c.w, h=c.h, gx=A.x0, gy=A.y0;
   const ti=Math.floor((x1-gx)/cs), tj=Math.floor((y1-gy)/cs), tk=ti>=0&&tj>=0&&ti<w&&tj<h?tj*w+ti:-2;
+  const oi=Math.floor((x0-gx)/cs), oj=Math.floor((y0-gy)/cs), ok=oi>=0&&oj>=0&&oi<w&&oj<h?oj*w+oi:-2;
   let lk=-3; C2.proj++;
   try{
     for(let s=2;s<end;s+=8){
       const x=x0+ux*s, y=y0+uy*s, i=Math.floor((x-gx)/cs), j=Math.floor((y-gy)/cs);
       if(i<0||j<0||i>=w||j>=h) return s;
-      const k=j*w+i; if(k===lk) continue; lk=k; if(k===tk) continue;
+      const k=j*w+i; if(k===lk) continue; lk=k; if(k===tk||k===ok) continue;
       if(c.grid[k]===1){ if(c.typ&&c.typ[k]===1) continue; return s; }
       if(areaBlocked(x+0.0137,y+0.0171)) return s;   // (never exactly Ash's own x or y: those mean his own feet)
     }
