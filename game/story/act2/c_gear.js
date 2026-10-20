@@ -3,8 +3,8 @@ chapter({
   id: 'c_gear', act: 2, after: 'c_coast', next: 'c_salt',
   card: ['Act II · Chapter 4', 'The City of Clocks'],   // (the game counts the heist's two chapters first)
   so_far: [
-    "Gearhaven's Great Clock stopped at one minute to midnight, full of moth dust. Ash worked out where the Moth Mask would strike and chased her over the roofs.",
-    'The Great Clock stopped. Ash found where the Moth Mask would strike and chased her.'],
+    "Old Barley saw the Moth Mask glide down to Gearhaven with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with moth dust. Now Ash has reached the city of clocks.",
+    'Barley saw the Moth Mask fly to Gearhaven. Something bigger made Gerald silver. Ash is in the city of clocks.'],
 
   // New things this chapter adds to map 1. Things x1_world already draws
   // (c_upper_gate, c_lm_watch, c_whirligig_manor, c_great_clock, c_clock_hand,

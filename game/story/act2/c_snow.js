@@ -1,4 +1,4 @@
-// Act II epilogue: Snow in Summer (owner A2b). Data only.
+// Act II epilogue: The Breakwater (owner A2b; v12 R2: the old title "Snow in Summer" gave the snow away). Data only.
 // What the player does: on the breakwater after the Spire (x1_story's c1SpireOut puts Ash there and starts this stage),
 // the moon dims and the Lady of the Moths thanks him through every moth on the Spire; snow falls in midsummer; that
 // night the moon has its first bite. Then he walks back into Gearhaven under snow in June. The town is out in it; Vesper waves from the
@@ -9,7 +9,7 @@
 chapter({
   id: 'c_snow', act: 2, after: 'c_spire', next: 'f_snow', takeover: true,
   silence: ['c_snow_city'],
-  card: ['Act II · Epilogue', 'Snow in Summer'],
+  card: ['Act II · Epilogue', 'The Breakwater'],
   so_far: [
     "At the top of the Shadow Spire the truth came out: the Lady in Vesper's dreams is a moth, the Mother of moths. She cracked the Heart into three Shards and sent two away. Vesper kept the third, and now Ash has it. Then a soft voice thanked Ash, snow fell in midsummer, and the moon had a bite out of it.",
     'The Lady is a giant moth. She broke the Heart in three. Ash has one. Snow fell. The moon got bitten.'],
@@ -97,7 +97,7 @@ chapter({
         { do: ['set c_v_twins'] } ] },
       { if: 'quest c_oona done', then: [
         ['c_vesper', "Gran knits by her stove every night now. She's knitting you something. I'm not allowed to say what.", 'Gran is knitting you something. It is a secret.'] ] },
-      ['c_vesper', "The Mother wants all three pieces. Hush took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. Hush took one north.'],
+      ['c_vesper', "The Mother wants all three pieces. The white one took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. The white one took one north.'],
       ['c_vesper', "If you go after it, wrap up warm. And don't climb anything I wouldn't.", 'If you go, wrap up warm.', { re: [
         { t: ['You climb everything.', 'You climb everything.'],
           say: [['c_vesper', 'Then you can climb anything. Lucky you.', 'Then you can climb anything.']] },

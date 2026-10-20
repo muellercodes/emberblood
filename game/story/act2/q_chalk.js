@@ -36,7 +36,7 @@ quest({
 
   scene: {
     ch_offer: [
-      ['c_barley', "See that grey shape on the hill? That's the Chalk Dragon. Mother Pearl cut it there, a thousand years back.",
+      ['c_barley', "See that grey shape on the hill? That's the Chalk Dragon. Mother Pearl cut it there, longer ago than anybody can count.",
         "See the grey shape? Pearl's Chalk Dragon."],
       ['c_barley', 'For her mother. So her mother, flying high, could look down and see a dragon waving up at her.', 'Her mom could see it from the sky.'],
       ['c_barley', "It's gone grey. Walk the old line for me? Your feet are warm. Chalk likes warm feet.", 'Walk the old line? Chalk likes warm feet.'],

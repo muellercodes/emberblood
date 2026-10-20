@@ -15,8 +15,8 @@ chapter({
   silence: ['c_causeway', 'c_end_fought', 'c_end_ally', 'c_end_pearl', 'c_truth', 'c_nyxara', 'c_snowfall'],
   card: ['Act II · Chapter 8', 'The Shadow Spire'],
   so_far: [
-    'When the lighthouse burned again, its beam showed a black spire standing in the sea where no spire had ever been. Vesper had gone there with what was left of the warm stone.',
-    'The lighthouse beam showed a black Spire in the sea. Vesper went there.'],
+    'Something huge flew over the whole coast the night the clocks stopped. When Ash lit the lighthouse again, its beam showed a black Spire standing in the sea, where no spire had ever been. Vesper had gone out there with what was left of the warm stone.',
+    'Something huge stopped the clocks. The lighthouse beam showed a black Spire in the sea. Vesper went there.'],
   mom: [['A black tower in the sea? Take a lantern. Take two.', 'A black tower? Take a lantern!']],
 
   npc: {
@@ -55,9 +55,9 @@ chapter({
       text: [
         ['The Lady said: the night you get home, take the warm stone to the Moon Ring in the Moth Wood. So I did.', 'The Lady said: take the stone to the Moon Ring. So I did.'],
         ['Something came down out of the dark. A moth, grey and soft as dust, so big her shadow put out the stars. Two pale moons painted on her wings. A white one came behind her that only ever says shhh.', 'A huge grey moth came, with moons on her wings. And a white one that says shhh.'],
-        ['The white one called her Mother. So that is who the Lady is. The Mother called the white one Hush. Nobody called me anything.', 'The white one called her Mother. The white one is Hush.'],
-        ['The Mother tried to lift the Heart in her feet, and it burned her. It burned Hush too. So she cracked it on the stones. Three pieces. "So my moths can carry it," she said.', 'The Heart burned her. So she broke it in three, for her moths to carry.'],
-        ["Hush flew north with one. The Mother took one east herself, right over Gearhaven, and the clocks stopped, and the tide, and the lighthouse. At one minute to midnight. That was her. Not me.", 'Hush took one north. The Mother flew east and stopped the clocks. Not me!'],
+        ['The white one called her Mother. So that is who the Lady is. She called the white one her quiet one. Nobody called me anything.', 'The white one called her Mother. She called the white one her quiet one.'],
+        ['The Mother tried to lift the Heart in her feet, and it burned her. It burned the white one too. So she cracked it on the stones. Three pieces. "So my moths can carry it," she said.', 'The Heart burned her. So she broke it in three, for her moths to carry.'],
+        ["The white one flew north with one. The Mother took one east herself, right over Gearhaven, and the clocks stopped, and the tide, and the lighthouse. At one minute to midnight. That was her. Not me.", 'The white one took one north. The Mother flew east and stopped the clocks. Not me!'],
         ['In my dreams she says one minute to midnight is her favorite minute. Nothing has ended yet, she says. Nothing ever has to.', 'She says one to midnight is her favorite minute. Nothing has ended yet.'],
         ["The third piece fell by my foot. It burned the moths. It didn't burn me. Nothing I ever held was warm like that. I kept it. It went purple in my hand, like it was sad.", 'The third piece did not burn me. It was so warm. I kept it.'],
         ['Now the moths are angry. She wants all three. She said bring the last one to the Spire at moonrise and Gran will be warm.', 'She wants all three. She said bring mine to the Spire.'],
@@ -65,11 +65,19 @@ chapter({
       ] },
   },
 
+  // (v12 R2) the moths ask their question at the door, and only then does the Case Book ask it: before, the question
+  // (and its answer among the picks) showed from the Lamp Room on, a whole chapter before anyone had asked it
+  clue: {
+    sp_door_ask: { icon: 'moth', mystery: 'moth_mask',
+      text: ['The moths on the Spire door will not let Ash in until he says what Vesper really is. Not her name. What she IS.',
+        'The door moths ask: what is Vesper, really?'] },
+  },
+
   deduce: {
     what_she_is: {
       mystery: 'moth_mask',
       ask: ['The moths on the door want to know: what IS Vesper?', 'What is Vesper?'],
-      needs: ['l_fireproof', 'l_pearl_mural', 'k_claws'],
+      needs: ['l_fireproof', 'l_pearl_mural', 'k_claws', 'sp_door_ask'],
       bonus: ['q_oona_horns', 'q_chalk_pearl', 'q_nursery'],
       pick: [
         { t: ['A moth in disguise', 'A moth in disguise'],
@@ -124,7 +132,7 @@ chapter({
       ['narr', 'They whisper, all together: "Who is she? Who is she really? Say it, and pass."', 'The moths whisper: "Who is she? Say it, and pass."'],
       ['ash', 'Vesper. Vesper Saltwhistle.', 'Vesper Saltwhistle.'],
       ['narr', 'The moths laugh, a sound like dry leaves. "Not her name. What is she?"', 'The moths laugh. "Not her name. What is she?"'],
-      ['ash', 'Okay. Think, Ash. What do I actually know about her?', 'Think. What do I know about her?'],
+      ['ash', 'Okay. Think, Ash. What do I actually know about her?', 'Think. What do I know about her?', { clue: 'sp_door_ask' }],
     ],
     c_door_opens: [
       ['ash', "Fire can't burn her. She climbs with claws like Pearl's. And she hasn't got one single spark.", "Fire can't burn her. She has Pearl's claws. No spark.", { mood: 'surprised' }],
@@ -133,14 +141,14 @@ chapter({
       ['narr', 'The moths go very still. Then they peel off the door all at once in a grey cloud, and the door swings open.', 'The moths fly off. The door opens.'],
       ['ash', 'A cousin who robs clock barons. Wait till Mom hears.', 'Wait till Mom hears!', { mood: 'sly' }],
     ],
-    // the kneel (STORY.c_choice): every option shows; a locked one says why (the engine fills in {trust:vesper})
+    // the kneel (STORY.c_choice): every option shows; a locked one says why, in story words (v12: no numbers)
     c_choice: [
       { choose: 'c_vesper', who: 'narr',
         ask: ['Vesper drops to one knee. Her shadows melt into the floor. The violet light in her hand flickers, and she lifts her moth hooks one more time.', 'Vesper falls to one knee. She lifts her hooks one more time.'],
         pick: [
           { t: ['Lower your weapon. "Cousin. Why are you doing this?"', '"Cousin. Why are you doing this?"'], tone: 'kind', v: 'friend',
             need: 'trust vesper>=4',
-            locked: ["She doesn't trust you enough yet ({trust:vesper} of 4).", "She doesn't trust you yet ({trust:vesper} of 4)."],
+            locked: ["She won't look at you. She isn't ready to tell you why.", 'She is not ready to tell you.'],
             then: ['choice c_vesper=friend', { journal: ['You asked Vesper why, and she told you.', 'You asked Vesper why.'], key: 'c_vesper' }],
             say: [
               ['narr', 'Vesper stares at you. Then she pulls off her mask and sits down on the edge of the roof, just a tired girl on a cold roof.', 'She takes off her mask and sits down. Just a tired girl.'],
@@ -148,7 +156,7 @@ chapter({
               ['c_vesper', "She broke it instead. Cracked it in three on the Moon Ring stones. She isn't a lady at all, Ash. She's a moth, so big her shadow put out the stars.", 'She broke it in three. She is not a lady. She is a giant moth.', { mood: 'worried', payoff: 'c_vesper_page' }] ] },
           { t: ['"Pearl wrote a letter. To you. To all of you."', '"Pearl wrote you a letter."'], tone: 'kind', v: 'friend',
             need: 'quest c_logbook done trust vesper>=3',
-            locked: ["This needs the last page of Pearl's Logbook, and trust 3 (now {trust:vesper}).", "Needs Pearl's last logbook page, and trust 3."],
+            locked: ["You'd need Pearl's own words for this, and Vesper would need to believe you.", 'You need Pearl\'s last page. And she must believe you.'],
             then: ['trust vesper +1', 'set c_pearl_letter', 'choice c_vesper=friend', { journal: ['You read Vesper the letter Pearl wrote, and she told you everything.', 'You read Vesper Pearl\'s letter.'], key: 'c_vesper' }],
             say: [
               ['ash', '"To my children with no fire. Fire isn\'t the only warm thing. Hands are warm. Soup is warm. I had no fire, so I built a city full of warm windows. You can too."', '"Fire isn\'t the only warm thing. I built warm windows. So can you."', { mood: 'tender' }],

@@ -51,6 +51,9 @@ act({
   // give them, so the door riddle can be answered. (k_claws is A2a's c_claws clue.)
   migrate: [
     { if: 'stage>=c_spire', then: ['clue l_fireproof', 'clue l_pearl_mural', 'clue k_claws'] },
+    // (v12 R2) the door question now also needs the moths' own clue (c_spire's sp_door_ask): a save that already heard
+    // them ask, before this version, gets it here
+    { if: 'seen c_spire_door_ask', then: ['clue sp_door_ask'] },
   ],
 
   gates_min: 5,
