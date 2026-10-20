@@ -132,7 +132,7 @@ function qpRefresh(){
 }
 function availableFrom(id){ let err=null; for(const k in QDEFS) if(QDEFS[k].giver===id&&qAvail(k)){ if(!QDEFS[k].errand) return k; if(!err) err=k; } return err; }
 function stepOf(id){ const q=G.quests[id]; return q&&!q.done?QDEFS[id].steps[q.step]:null; }
-function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.mini&&G.mini&&G.mini.qid===id&&MINI[G.mini.kind].hud){ const h=MINI[G.mini.kind].hud(G.mini); if(h) return h; } if(st.t==='camps'){ const q=G.quests[id]; return `${st.text} (${Math.min(st.n,(G.stats.camps||0)-q.camps0)}/${st.n})`; } if(st.t==='item'&&st.n>1) return `${fmtNames(st.text)} (${Math.min(st.n,G.items[st.item]||0)}/${st.n})`; if(st.t==='pages') return `${st.text} (${Object.keys(G.pages).length}/10 found, ${G.pagesGiven||0} delivered)`; if(st.t==='flags') return `${fmtNames(st.text)} (${st.flags.filter(f=>G.flags[f]).length}/${st.n} clues)`; return fmtNames(st.text); }
+function stepText(id){ const st=stepOf(id); if(!st) return ''; if(st.mini&&G.mini&&G.mini.qid===id&&MINI[G.mini.kind].hud){ const h=MINI[G.mini.kind].hud(G.mini); if(h) return h; } if(st.t==='camps'){ const q=G.quests[id]; return `${st.text} (${Math.min(st.n,(G.stats.camps||0)-q.camps0)}/${st.n})`; } if(st.t==='item'&&st.n>1) return `${fmtNames(st.text)} (${Math.min(st.n,G.items[st.item]||0)}/${st.n})`; if(st.t==='pages'){ const pn=Object.keys(G.pages).length, pg=G.pagesGiven||0; return S(`${st.text} (${pn} found, ${pg} delivered)`,`Find old pages for Sister Wren (${pn} found, ${pg} given)`); } if(st.t==='flags') return `${fmtNames(st.text)} (${st.flags.filter(f=>G.flags[f]).length}/${st.n} clues)`; return fmtNames(st.text); }
 function startQuest(id){
   const d=QDEFS[id]; G.quests[id]={step:0,camps0:G.stats.camps||0,errand:!!d.errand};
   if(d.give) giveItems(d.give,true);
@@ -259,7 +259,7 @@ function storyTalk(n){
   if(id==='yara'){
     if(st==='lore'){ runDialogue(STORY.lore,()=>{ scene='play'; G.stage='hollow'; G.shrines.s_village=true; questUpdated(); saveGame(); }); return true; }
     if(st==='raid'){ runDialogue([['yara','Kobolds, Ash! Drive them out first. We can talk after.']],done); return true; }
-    if(st==='wake'||st==='lanterns'){ runDialogue([['yara',st==='wake'?'Your mother is waiting at the forge, Ash. Go on.':'Three lanterns on the green. Gently, now. I am counting.']],done); return true; }
+    if(st==='wake'||st==='lanterns'){ runDialogue([['yara',st==='wake'?'Your mother is waiting at the forge, Ash. Go on.':S('Three lanterns on the green. Gently, now. I will be watching from the well.','Three lanterns on the green. Gently!')]],done); return true; }
     if(reached('warcamp')&&!G.flags.gateHint){ G.flags.gateHint=true; }
     if(availableFrom('yara')) return false;
     if(typeof storyHasOption==='function'&&storyHasOption('yara')) return false;   // her menu, for the story's own option
@@ -299,7 +299,7 @@ function talkShellby(){
   const done=()=>{ scene='play'; };
   if(G.pages.p2){ runDialogue([['shellby',pick([S(`Still here. Turtles don't go anywhere in a hurry.`,`Still here. Turtles are slow.`),`Iska used to sit on my shell to think. She was heavier than she looked. Don't tell her I said so.`])]],done); return; }
   if(G.items.fish){ runDialogue([['shellby',`Is that... a fish? For me? Oh, it's been two hundred years since anyone brought me a fish.`],['shellby',S(`I'm one thousand and forty-one years old, you know. I was a very small turtle when the Five came through here. Bram stepped on me. He apologized for a week.`,`I am very, very old. Bram once stepped on me. He said sorry for a week.`)],['shellby',`Iska tucked a page from their book under my shell for safekeeping. I forgot it was there. For nine hundred years. Here.`]],()=>{ scene='play'; takeItems({fish:1}); findPage('p2'); }); return; }
-  runDialogue([['shellby',`Hmm? A visitor? Oh, I'm Shellby. I'm very old and very hungry. If you brought me a fish, I'd tell you a story about the Wardens.`],['shellby',S(`Dell, the fisherman in Brindlecross, lends out rods. I'm only mentioning it.`,`Dell in Brindlecross lends out fishing rods.`)]],done);
+  runDialogue([['shellby',G.mode==='story'&&!reached('hollow')?S(`Hmm? A visitor? Oh, I'm Shellby. I'm very old and very hungry. If you brought me a fish, I'd tell you a story. A very old one.`,`Hi. I'm Shellby. Bring me a fish and I'll tell you a story.`):`Hmm? A visitor? Oh, I'm Shellby. I'm very old and very hungry. If you brought me a fish, I'd tell you a story about the Wardens.`],['shellby',S(`Dell, the fisherman in Brindlecross, lends out rods. I'm only mentioning it.`,`Dell in Brindlecross lends out fishing rods.`)]],done);
 }
 // ---------- the Wardens' pages
 function findPage(id){
@@ -382,7 +382,7 @@ function lmAct(o){
   const done=()=>{ scene='play'; }, say=(t,cb)=>runDialogue([['narr',t]],()=>{ scene='play'; if(cb) cb(); saveGame(); });
   const once=k=>{ if(G.found[k]) return false; G.found[k]=true; return true; };
   switch(o.k){
-    case 'statue': if(PAGE_SPOTS.p7==='st_'+o.who&&!G.pages.p7){ runDialogue([['narr',STATUE_TEXT[o.who]],['narr',`Something papery is tucked into the crack under the statue's feet.`]],()=>{ scene='play'; findPage('p7'); }); return; }
+    case 'statue': if(PAGE_SPOTS.p7==='st_'+o.who&&!G.pages.p7&&(G.mode!=='story'||reached('hollow'))){ runDialogue([['narr',STATUE_TEXT[o.who]],['narr',`Something papery is tucked into the crack under the statue's feet.`]],()=>{ scene='play'; findPage('p7'); }); return; }
       // Wendel's rumor: once Ash knows his old songs, each Warden statue hums along the first time (and drops old coins)
       if(G.quests.song&&G.quests.song.done&&once('hum_'+o.who)){ runDialogue([['narr',STATUE_TEXT[o.who]],['narr',S(`You hum the Lantern Waltz, one of Wendel's old songs. The statue hums along! Deep and warm, like a cat the size of a house.`,`You hum Wendel's song. The statue hums along!`)],['narr',S(`Something clinks at its feet. Ten old Warden coins.`,`Ten old coins clink at its feet.`)]],()=>{ scene='play'; addCoins(10,o.x,o.y); saveGame(); }); return; }
       say(STATUE_TEXT[o.who]); return;
@@ -466,7 +466,7 @@ function areaObjAct(o){
   const owner=AREA.def.owner, oc=CASTBY[owner];
   switch(o.k){
     case 'bed': if(o.home) { runDialogue([['narr',`Your bed. It's slightly scorched, as all your beds have been.`]],()=>{ scene='play'; restHome(); }); return; } if(o.mom){ say(`Mom's bed. Made with military precision. Don't sit on it.`); return; } if(o.inn){ say(`A soft inn bed. Ask the innkeeper if you want to rent it.`); return; } say(`This isn't your bed. You fluff the pillow anyway, to be polite.`); return;
-    case 'shelf': if(o.page&&!G.pages[o.page]){ runDialogue([['narr',`Tucked between two books is a very old page.`]],()=>{ scene='play'; findPage(o.page); }); return; } if(o.jars){ say(`Jars of things. One jar is labeled "DO NOT." Another is labeled "OKAY, MAYBE."`); return; } if(o.lamps){ say(`Lamps, lamps and more lamps. One is shaped like a duck.`); return; } say(`You pull out a book: "${BOOKS[Math.abs(hashStr(o.id+(G.visits||0)))%BOOKS.length]}".`); G.visits=(G.visits||0)+1; return;
+    case 'shelf': if(o.page&&!G.pages[o.page]){ if(G.mode==='story'&&!reached('hollow')){ say(S(`Yara's books. One shelf has a little brass lock. Yara wears the key round her neck.`,`One shelf is locked. Yara has the key.`)); return; } runDialogue([['narr',S(`The little brass lock on the shelf hangs open. Tucked between two books is a very old page.`,`The lock is open. There is an old page here.`)]],()=>{ scene='play'; findPage(o.page); }); return; } if(o.jars){ say(`Jars of things. One jar is labeled "DO NOT." Another is labeled "OKAY, MAYBE."`); return; } if(o.lamps){ say(`Lamps, lamps and more lamps. One is shaped like a duck.`); return; } say(`You pull out a book: "${BOOKS[Math.abs(hashStr(o.id+(G.visits||0)))%BOOKS.length]}".`); G.visits=(G.visits||0)+1; return;
     case 'fireplace': if(o.lit){ player.hp=Math.min(player.maxHp,player.hp+10); say(`You warm your claws by the fire. Cozy.`); } else say(`A cold fireplace. You could fix that.`); return;
     case 'oven': say(AREA.def.style==='baker'&&stepOf('bun')&&stepOf('bun').flag==='oven_lit'?`Bertram whispers: "Gently. Breathe on it GENTLY."`:`It smells like a thousand years of bread.`); return;
     case 'counter': say({bread:`Loaves, rolls, and one suspiciously round bun labeled "DO NOT BREATHE ON."`,buns:`Lantern-shaped buns. They're still warm.`,lamps:`A counter full of lamps. A sign says: "ALL SALES FINAL. ALSO ALL FIRES FINAL."`,mugs:`Mugs. A sign: "No dragons behind the bar (this means you, Ash)."`,cloth:`Bolts of cloth in every colour. One is plaid. It's very loud.`,rocks:`A pot labeled ROCKS (FOR SOUP).`}[o.goods]||`A counter.`); return;
@@ -480,7 +480,7 @@ function areaObjAct(o){
     case 'sled': say(`Elka's racing sled. It's named "Wolfbeater." There are tooth marks on it.`); return;
     case 'cauldron': say(AREA.def.style==='cook'?`Rock Soup. You can see the rocks. The rocks can see you.`:`It smells like moss, mint and mystery.`); return;
     case 'hatstand': SHOPTALK.marigold(); return;
-    case 'portraits': say(`Thirteen family portraits, all the way back. Great ×13 Grandpa's frame just has a drawing of a scary cloud in it. The one before that is a girl with horns, holding a lantern.`); return;
+    case 'portraits': say(G.mode==='story'&&!reached('hollow')?S(`Family portraits, all the way up the stairs. The oldest is a girl with horns, holding a lantern. Above her hangs an empty frame, scorched round the edges.`,`Old family pictures. The oldest is a girl with horns. One frame is empty and burnt.`):`Thirteen family portraits, all the way back. Great ×13 Grandpa's frame just has a drawing of a scary cloud in it. The one before that is a girl with horns, holding a lantern.`); return;
     case 'gchest': if(!G.pages.p9){ runDialogue([['narr',`Grandma's old chest. Under her scarf and a bundle of lantern wicks, there's a very old, very carefully folded letter.`]],()=>{ scene='play'; findPage('p9'); }); return; } say(`Grandma's chest. An old lantern, old letters, and the smell of campfire.`); return;
     case 'heights': say(`Marks on the doorframe. "Ash, age 4." "Ash, age 6." "Ash, age 8 (scorch mark)."`); return;
     case 'toybox': say(AREA.def.style==='ash'?(G.flags.pip?`Your old wooden dragon. Pip has chewed its tail off. Pip is very proud.`:`Your old wooden dragon, a wooden knight, and a lantern-shaped rattle.`):pick(EGGS.find(e=>e.k==='toybox').say)); return;

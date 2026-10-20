@@ -30,19 +30,19 @@ Object.assign(ITEM_NAMES,{
 // ---------- 2. words: the main path
 // 1.1 Ember's Trials: two new lines before the last line of Yara's real story
 STORY.lore.splice(STORY.lore.length-1,0,
-  xl('yara',`Ember left three Trials for her children, to wake their dragon gifts: the Leap, the Tide and the Sky.`,`Ember left three Trials: the Leap, the Tide and the Sky.`),
-  xl('yara',`The Oath has been breaking roads. You'll need those gifts to get where they don't want you. Start with the Leap, in Whisperwood. It's the closest, and the least wet.`,`The Oath broke the roads. You need Ember's gifts. Start with the Leap.`));
+  xl('yara',`One more thing. My grandmother told me Ember built a door for her children, deep in Whisperwood. A stone arch the roots are eating. Nobody has ever got it open.`,`Ember built a door in Whisperwood, under the roots. Nobody ever opened it.`),
+  xl('yara',`Those robed people on the Ashen Road have been breaking bridges. If a road closes on you, try that door. Whatever Ember left behind it, she left it for her children.`,`Robed people are breaking the roads. If you get stuck, try Ember's door.`));
 // 1.2 Sister Wren's warning, after her Ash Ward line
 STORY.wren.splice(3,0,
   xl('wren',`One problem. Morrow's people smashed the old causeway to the Ash Ward and flooded the ditch. There are three gaps now, each too wide to step over.`,`Morrow broke the causeway to the Ash Ward. Three big gaps.`),
-  {who:'wren',text:S(`Unless you can jump like a frog, you'll want Ember's Trial of the Leap first. In Whisperwood. Yara knows.`,`Can't jump? Do the Trial of the Leap first. In Whisperwood.`),skipIf:()=>hasAbil('jump')},
+  {who:'wren',text:S(`Unless you can jump like a frog, you'll want whatever Ember left behind that old arch in Whisperwood. Yara knows the one.`,`Can't jump? Try the old arch in Whisperwood first.`),skipIf:()=>hasAbil('jump')},
   xl('ash',`I can be a frog. I can be the best frog.`,`I can be a frog. The best frog!`));
 // 2.1 the Ash Ward: the Broken Causeway
 STORY.a1_causeway_blocked=[
   xl('narr',`The old stone causeway to the Ash Ward is broken in three places. Black water fills the ditch below. Someone has nailed a sign to the last post.`,`The causeway is broken in three places. Black water is below. There is a sign.`),
   xl('a1_sign',`"NO EMBERBLOODS. THIS MEANS YOU. Love, the Scaled Oath."`,`"NO EMBERBLOODS. Love, the Scaled Oath."`),
   xl('ash',`They wrote "love." That's almost nice.`,`They wrote "love." That's almost nice.`),
-  {who:'narr',text:S(`The gaps are too wide to step over. If only you could jump. Sister Wren said something about a Trial in Whisperwood.`,`The gaps are too wide. You need to jump. Try the Trial in Whisperwood.`),skipIf:()=>hasAbil('jump')},
+  {who:'narr',text:S(`The gaps are too wide to step over. If only you could jump. Sister Wren said something about an old arch in Whisperwood.`,`The gaps are too wide. Try the old arch in Whisperwood.`),skipIf:()=>hasAbil('jump')},
   {who:'narr',text:S(`The gaps are too wide to step over. Good thing you can jump. Jump the small ones. RUN at the big one and jump at the very end.`,`Jump the small gaps. Run at the big one!`),skipIf:()=>!hasAbil('jump')}];
 STORY.a1_causeway_first=[
   xl('ash',`Jump, jump, jump. Ha! Frog champion of Embermere.`,`Jump, jump, jump! Frog champion!`),
@@ -53,32 +53,35 @@ STORY.bosses.broodmother.outro.push(xl('narr',`High above, at the top of the Nes
 STORY.a1_crag_up=[
   xl('narr',`The Nest Spire is all sheer rock. No steps. No handholds. Just a warm draft puffing up from a crack at the bottom.`,`The Nest Spire is all steep rock. No steps. A warm wind puffs up from a crack.`),
   xl('ash',`I'd need wings for that. Real ones. Not the hoping kind.`,`I need wings for that. Real ones.`),
-  xl('narr',`The Trial of the Sky is just up the crag. Ember's last gift is waiting there.`,`The Trial of the Sky is up the crag. Get your wings there.`)];
+  {who:'narr',text:S(`The Trial of the Sky is just up the crag.`,`The Trial of the Sky is just up the crag.`),skipIf:()=>!G.flags.trial_tide_boss},
+  {who:'narr',text:S(`There's an old white gate just up the crag. The wind whistles through it like a flute.`,`There is an old white gate up the crag.`),skipIf:()=>!!G.flags.trial_tide_boss}];
 STORY.a1_crag_how=[
   xl('narr',`A warm draft puffs out of a crack at the foot of the spire, smelling of drakeling smoke and toast.`,`A warm wind puffs up from a crack.`),
   xl('narr',`Too high to fly up from the ground. But stand in the warm air, jump, spread your wings, and the draft will carry you higher.`,`Stand in the warm air. Jump and fly. The wind lifts you up!`)];
-STORY.ward_crag.unshift(xl('oriel',`You flew! The drakes carried my Ward-fire up here when the Oath came. They kept it warm in a nest. Drakes are very good at keeping things warm.`,`You flew! The drakes kept my fire warm in a nest.`));
+STORY.ward_crag.unshift(xl('stone',`You flew! The drakes carried my Ward-fire up here when the Oath came. They kept it warm in a nest. Drakes are very good at keeping things warm.`,`You flew! The drakes kept my fire warm in a nest.`));
 // 2.3 the Sunken Ward: the Gloam Swirl
 STORY.bosses.gloamjaw.outro.push(xl('narr',`The bog water still spins around the Ward's little island, round and round, like soup that won't stop being stirred.`,`The water spins around the Ward's island. Round and round.`));
 STORY.a1_swirl_thrown=[
   xl('narr',`WHOOSH. The swirl spins you around twice and spits you out on the bank. Even your tail feels dizzy.`,`WHOOSH! The swirl spins you and throws you out. Your tail is dizzy.`),
-  xl('sedge',`(a soggy voice from the island) Sorry! Sorry. It does that. You need to go faster than it can grab. Like a skipping stone.`,`(from the island) Sorry! Go faster than it can grab. Like a skipping stone.`),
+  xl('stone',`(a soggy voice from the island) Sorry! Sorry. It does that. You need to go faster than it can grab. Like a skipping stone.`,`(from the island) Sorry! Go faster than it can grab. Like a skipping stone.`),
   xl('ash',`Who skips? Who even skips stones that well?`,`Who skips stones that well?`),
-  xl('sedge',`The Fisk girl on the Brindlecross dock skips them eleven times. I can hear the plops from here. Everything travels in water.`,`Minnow Fisk, on the Brindlecross dock. She skips them eleven times!`)];
+  xl('stone',`The Fisk girl on the Brindlecross dock skips them eleven times. I can hear the plops from here. Everything travels in water.`,`Minnow Fisk, on the Brindlecross dock. She skips them eleven times!`)];
 STORY.a1_swirl_look=[
-  xl('narr',`The bog water spins round the Ward's island like a whirlpool in a bathtub. Walking in would get you thrown right back out.`,`The water spins like a whirlpool. Walk in and it throws you out.`),
+  xl('narr',`The bog water spins round the little island like a whirlpool in a bathtub. Walking in would get you thrown right back out.`,`The water spins like a whirlpool. Walk in and it throws you out.`),
   {who:'narr',text:S(`You skim now. Sprint across the water and the swirl is far too slow to grab you. Do not stop, and do not jump!`,`Run across the water! Don't stop. Don't jump!`),skipIf:()=>!hasAbil('skimmer')},
   {who:'narr',text:S(`Something that skims like a stone might get through. Minnow Fisk on the Brindlecross dock knows a lot about skipping.`,`Only a skimmer gets through. Ask Minnow on the Brindlecross dock.`),skipIf:()=>hasAbil('skimmer')||!hasAbil('stride')},
-  {who:'narr',text:S(`First you would need to walk on water at all. The Trial of the Tide, on Lake Mirrow, teaches that.`,`First learn to walk on water. Try the Trial of the Tide.`),skipIf:()=>hasAbil('stride')}];
-STORY.ward_mire.unshift(xl('sedge',`You skipped! Right over the swirl! Oh, I'm so dizzy for you. In a good way.`,`You skipped over the swirl! I'm dizzy for you!`));
+  {who:'narr',text:S(`You would need to stay on top of the water at all, first. Ember said her next door was out on Lake Mirrow.`,`You can't even stand on water. Ember's next door is on Lake Mirrow.`),skipIf:()=>hasAbil('stride')}];
+STORY.ward_mire.unshift(xl('stone',`You skipped! Right over the swirl! Oh, I'm so dizzy for you. In a good way.`,`You skipped over the swirl! I'm dizzy for you!`));
 // 2.4 the Frost Ward: Greymane's Ice (before the choice in his outro)
 STORY.bosses.greymane.outro.splice(1,0,xl('narr',`Behind Greymane, the Frost Ward is frozen solid inside a block of blue ice. Three cold lanterns glitter on tall ice pillars behind it.`,`The Frost Ward is frozen in ice. Three cold lanterns sit on ice pillars.`));
 STORY.a1_frost_ice=[
-  xl('tove',`(through the ice) Mmmf. Ash? It's Tove, the Frost Warden. I'm inside an ice cube. Every few hundred years, another ice cube.`,`(in the ice) Ash? It's Tove, the Frost Warden. I'm in an ice cube.`),
-  xl('tove',`The three lanterns on those ice pillars hold the frost. Light them and it melts. You can't get past their spikes. But an arrow can.`,`Light the three lanterns on the pillars. An arrow can reach them.`),
-  xl('tove',`A burning one, preferably. Breathe fire, then shoot through it. Ember used to do that to light the festival. Showing off.`,`A burning arrow! Breathe fire and shoot through it.`),
-  {who:'tove',text:S(`Ember's bow is in her Trial of the Tide, on the island in Lake Mirrow. Go on. I'll wait. I've had the practice.`,`No bow? It's in the Trial of the Tide, on Lake Mirrow. I'll wait.`),skipIf:()=>!!(G.weapons&&G.weapons.bow)},
-  {who:'tove',text:S(`Oh, and if your arrows are too slow, Ember's Wing-rang burns too, if you throw it through your fire. On a kind day. Today is a kind day.`,`A burning Wing-rang works too, today.`),skipIf:()=>!a1easy()||!(G.weapons&&G.weapons.boomerang)}];
+  {who:'narr',text:S(`A block of blue ice as big as a cart, around an old stone. Deep inside, something glows, very faintly. Three cold lanterns glitter on ice pillars behind it.`,`Blue ice around an old stone. Something glows inside. Three cold lanterns sit on pillars.`),skipIf:()=>reached('hollow')},
+  {who:'tove',text:S(`(through the ice) Mmmf. Ash? It's Tove, the Frost Warden. I'm inside an ice cube. Every few hundred years, another ice cube.`,`(in the ice) Ash? It's Tove, the Frost Warden. I'm in an ice cube.`),skipIf:()=>!reached('hollow')},
+  {who:'tove',text:S(`The three lanterns on those ice pillars hold the frost. Light them and it melts. You can't get past their spikes. But an arrow can.`,`Light the three lanterns on the pillars. An arrow can reach them.`),skipIf:()=>!reached('hollow')},
+  {who:'tove',text:S(`A burning one, preferably. Breathe fire, then shoot through it. Ember used to do that to light the festival. Showing off.`,`A burning arrow! Breathe fire and shoot through it.`),skipIf:()=>!reached('hollow')},
+  {who:'tove',text:S(`Ember's bow is in her Trial of the Tide, on the island in Lake Mirrow. Go on. I'll wait. I've had the practice.`,`No bow? It's in the Trial of the Tide, on Lake Mirrow. I'll wait.`),skipIf:()=>!reached('hollow')||!!(G.weapons&&G.weapons.bow)||!G.flags.trial_leap_boss},
+  {who:'tove',text:S(`Ember kept a bow behind one of her old doors. Find it. Go on. I'll wait. I've had the practice.`,`Ember's bow is behind one of her doors. I'll wait.`),skipIf:()=>!reached('hollow')||!!(G.weapons&&G.weapons.bow)||!!G.flags.trial_leap_boss},
+  {who:'tove',text:S(`Oh, and if your arrows are too slow, Ember's Wing-rang burns too, if you throw it through your fire. On a kind day. Today is a kind day.`,`A burning Wing-rang works too, today.`),skipIf:()=>!reached('hollow')||!a1easy()||!(G.weapons&&G.weapons.boomerang)}];
 STORY.a1_frost_melt=[
   xl('narr',`The third lantern catches. Three flames burn on their pillars, and the ice around the Ward cracks, groans, and slides off in one big wet SLUMP.`,`The third lantern lights! The ice cracks and slides off. SLUMP!`),
   xl('tove',`Free. And damp. Mostly free.`,`Free. And wet.`),
@@ -90,11 +93,11 @@ STORY.a1_hammer_free=[
 
 // ---------- the Trials as a story quest, and the hints that point at Ember's gifts
 const A1_HINT={
-  hollow_nojump:S(`The Hollow Ward first, Ash. And soon, the Trial of the Leap in Whisperwood. You will need to jump before long.`,`Light the Hollow Ward. Soon, the Trial of the Leap.`),
-  warcamp_nojump:S(`Grizzlefang first. But do not forget Ember's Trial of the Leap in Whisperwood, east of the war camp road. The Oath breaks roads.`,`Beat Grizzlefang. And try the Trial of the Leap!`),
-  wren_nojump:S(`Sister Wren is in the Brindlecross library. On the way, think about the Trial of the Leap. You will want to jump.`,`Find Wren in Brindlecross. Learn to jump soon!`),
-  oath_nojump:S(`The Ash Ward's road is broken, Ash. Ember's Trial of the Leap is in Whisperwood. Learn to jump first. Then jump on Morrow.`,`The road is broken. Do the Trial of the Leap first!`),
-  three_gifts:S(`The Crag Ward wants wings. The Sunken Ward wants a skipping stone. The Frost Ward wants an arrow on fire. Ember's Trials, Ash. And Minnow Fisk on the dock.`,`Crag Ward: wings. Sunken Ward: skimming. Frost Ward: a fire arrow.`),
+  hollow_nojump:S(`The Hollow Ward first, Ash. Then, when you can, that old arch in Whisperwood. Roads are closing.`,`Light the Hollow Ward. Then try the old arch in Whisperwood.`),
+  warcamp_nojump:S(`Grizzlefang first. But do not forget the old arch in Whisperwood, east of the war camp road. The Oath breaks roads.`,`Beat Grizzlefang. And try the old arch in Whisperwood!`),
+  wren_nojump:S(`Sister Wren is in the Brindlecross library. On the way, think about that old arch in Whisperwood. Ember did not build it for nothing.`,`Find Wren in Brindlecross. And think about the old arch.`),
+  oath_nojump:S(`The Ash Ward's road is broken, Ash. See what Ember left behind that old arch in Whisperwood first. Then go and see Morrow.`,`The road is broken. Try the old arch in Whisperwood first.`),
+  three_gifts:S(`The Crag Ward sits on a spire nobody can climb. The Sunken Ward is in a whirlpool. The Frost Ward is up in the ice. Ember's other doors may help. And Minnow Fisk on the dock skips stones better than anyone.`,`Crag: too high. Sunken: a whirlpool. Frost: ice. Try Ember's doors. Ask Minnow.`),
   gate_hammer:S(`Your mother has been staring at the mountain all week, Ash. Go and see her before the gate. She says the summit needs a hammer.`,`Go see Mom first. The summit needs a hammer.`),
   summit_dj:S(`Hollis says his goat jumps twice in the air now. I have stopped asking questions about goats. You should ask him.`,`Hollis's goat jumps twice now. Go ask him!`)
 };
@@ -150,10 +153,10 @@ Object.assign(QDEFS,{
       {t:'flags',flags:['a1_moth_c_nib','a1_moth_c_tamsin','a1_moth_c_hob','a1_moth_c_pell'],n:3,text:S('Ask around about the stranger in the moth cloak: Nib and Pell in Brindlecross, Hob and Tamsin at the Smoky Kettle','Ask about the moth girl: Nib, Pell, Hob and Tamsin.'),at:'poi:brindle'},
       {t:'flag',flag:'a1_moth_camp',text:S('Find the stranger’s camp by the old Southern Pass rockfall, south of Emberhollow. Go at night.','Find her camp south of Emberhollow. Go at night!'),at:'lm:a1_camp'},
       {t:'talk',npc:'wren',text:S('Bring the torn page back to Sister Wren in the Brindlecross library','Bring the page to Wren.'),take:{a1_page:1},
-        lines:[xl('wren',`"Ember had two children. The first carried her fire. The second, Pearl, had none. Not a spark. Only her mother's horns, and claws that could climb anything."`,`"Ember had two children. The second, Pearl, had no fire. Only horns and climbing claws."`),
-          xl('wren',`"Pearl loved the sea more than the mountain. She sailed south and never came home. Her children are the Emberbloods without fire."`,`"Pearl sailed south. Her children are Emberbloods without fire."`),
-          xl('ash',`So there are more of us? Somewhere south?`,`There are more of us? Down south?`),
-          xl('wren',`There might be. And one of them came all this way to read about it. And to look at you. Here, take this charm. Moths hate it. I made it out of a very boring book.`,`Maybe. And one came to look at you. Take this charm. Moths hate it.`)],reward:{coins:40,xp:160,bless:1,perk:'moth'}}]},
+        lines:[xl('wren',`"Ember had two children. The first carried her fire. The second had none. Not a spark. Only her mother's horns, and claws that could climb anything."`,`"Ember had two children. The second had no fire. Only horns and climbing claws."`),
+          xl('wren',`"The second child loved the sea more than the mountain, and sailed south, and..." That's all. The bottom of the page is torn off, right where the name would be. Somebody kept that part.`,`"The second child sailed south..." The bottom is torn off. Someone kept the name.`),
+          xl('ash',`Ember's other child went south? Then who lives down there now?`,`Who lives down south now?`),
+          xl('wren',`I don't know. But somebody came all this way to read about it. And to look at you, I think. Here, take this charm. Moths hate it. I made it out of a very boring book.`,`I don't know. But someone came to look at you. Take this charm. Moths hate it.`)],reward:{coins:40,xp:160,bless:1,perk:'moth'}}]},
   a1_pip:{title:S('Pip’s Five Flames','Pip’s Five Flames'),giver:'yara',min:'three',
     offer:[
       xl('yara',`Ash. Your little drake. May I?`,`Ash. Your little drake. May I?`),
@@ -280,8 +283,15 @@ function a1Thunder(show){ G.flags.a1_thunder=true; if(show) later(1.4,()=>setBan
 { const base=startQuest; startQuest=function(id){
   if(id==='a1_moth'&&a1q('seek')) G.flags.a1_moth_c_nib=true;
   base(id);
-  if(id==='trials'){ const Q=[G.banner].concat(G.bannerQ||[]), b=Q.find(q=>q&&q.text==='New side quest'&&String(q.sub).includes('Trial')); if(b){ b.text=simplify(S('Story quest','Story quest')); b.sub=simplify(S('Ember’s Trials: the Leap, the Tide and the Sky. Their gifts open the roads to the Wards.','Ember’s Trials! Their gifts open the way.')); b.dur=Math.max(b.dur,4); } }
+  if(id==='trials'){ const Q=[G.banner].concat(G.bannerQ||[]), b=Q.find(q=>q&&q.text==='New side quest'&&/Trial|Ember’s Doors/.test(String(q.sub))); if(b){ b.text=simplify(S('Story quest','Story quest')); b.sub=simplify(S('Ember’s door: an old stone arch in Whisperwood that nobody has ever opened.','An old door in Whisperwood. Nobody ever opened it.')); b.dur=Math.max(b.dur,4); } }
 }; }
+
+// (v12 R1) the Wardens' pages wait for Yara's real story (STORY.lore): before it a cave keeps its page out of sight.
+// Gran's letter (page nine, in Ash's house) may be found early; Yara's shelf and Iska's statue wait in a9d_quests.js.
+const a1PageWaits=id=>!!(G&&G.mode==='story'&&id&&id!=='p9'&&!(G.pages&&G.pages[id])&&!reached('hollow'));
+function a1HidePages(A){ try{ if(!A||!A.objs) return; for(let i=A.objs.length-1;i>=0;i--){ const o=A.objs[i]; if(o&&o.k==='page'&&a1PageWaits(o.page)) A.objs.splice(i,1); } }catch(e){ console.error(e); } }
+{ const base=buildCave; buildCave=function(A,def){ base.apply(this,arguments); a1HidePages(A); }; }
+{ const base=buildCaveRooms; buildCaveRooms=function(A,def){ base.apply(this,arguments); a1HidePages(A); }; }
 
 // ---------- 4. where everything is (absolute Embermere coordinates)
 const A1W={
@@ -368,7 +378,18 @@ ELEV.vent({x:A1W.spire.vx,y:A1W.spire.vy,r:A1W.spire.vr,lift:1});
 ELEV.noFly({disc:[A1W.gloam.x,A1W.gloam.y,A1W.gloam.r+60],why:S('The bog mist is far too thick to fly through here.','Too misty to fly here!')});
 
 // ---------- 6. the world build: runs after the stock world (so the old random draws land the same)
-{ const base=initWorld; initWorld=function(){ base(); try{ a1BuildWorld(); }catch(e){ console.error('a1 world',e); } }; }
+{ const base=initWorld; initWorld=function(){ base(); try{ a1BuildWorld(); }catch(e){ console.error('a1 world',e); } try{ a1TrialFolk(); }catch(e){ console.error('a1 folk',e); } }; }
+// (v12 R1) the word "Trial" comes from Ember, inside: until Ash has been in (or Ember has named the next door at the end
+// of the last one), the door and the sign by each one say what a passer-by sees (a2h_dungeons.js builds them)
+const A1_FOLK={leap:S('old rooted arch','rooted arch'),tide:S('shell doors','shell doors'),sky:S('white gate','white gate')};
+const a1TrialKnown=id=>!G||G.mode!=='story'||!!(G.found&&G.found['seen_'+id])||(id==='tide'&&!!G.flags.trial_leap_boss)||(id==='sky'&&!!G.flags.trial_tide_boss);
+function a1TrialFolk(){
+  for(const id in A1_FOLK){ const T=TRIALS[id]; if(!T) continue; const f=A1_FOLK[id];
+    const D=DOORS.find(d=>d.trial===id), Lm=LANDMARKS.find(l=>l.id==='tsign_'+id);
+    if(D){ const d0=Object.getOwnPropertyDescriptor(D,'label'); if(d0&&d0.get&&d0.configurable) Object.defineProperty(D,'label',{configurable:true,get(){ return a1TrialKnown(id)?d0.get.call(D):trialOpen(id)?S(`Go through the ${f}`,`Go through the ${f}`):S(`Look at the ${f}`,`Look at the ${f}`); }}); }
+    if(Lm){ const t0=Object.getOwnPropertyDescriptor(Lm,'text'); if(t0&&t0.get&&t0.configurable) Object.defineProperty(Lm,'text',{configurable:true,get(){ return a1TrialKnown(id)?t0.get.call(Lm):trialOpen(id)?S(`Old runes, worn too smooth to read. They glow softly now, as if they are awake. Someone has scratched underneath: "dragons of level ${T.level} and up."`,`Old runes. They glow now. "Level ${T.level} and up."`):S(`Old runes, worn too smooth to read. They are dark, as if they are asleep, waiting for someone. (Ask Elder Yara.)`,`Old runes. They are dark. Ask Elder Yara.`); }}); }
+  }
+}
 function a1MoveWard(id,x,y){
   const w=WARDS[id]; if(!w) return; const ox=w.x, oy=w.y; w.x=x; w.y=y;
   for(const s of STRUCTS) if(s.k==='ward'&&s.id===id){ s.x=x; s.y=y; }
@@ -662,7 +683,7 @@ function a1CausewayTick(){
   const rx=p.x-c.Q[0], ry=p.y-c.Q[1], t=rx*c.d[0]+ry*c.d[1], pp=Math.abs(rx*c.d[1]-ry*c.d[0]);
   if(t<-80||t>560||pp>60) { const dc=dist(p.x,p.y,A1W.ash.x,A1W.ash.y); if(dc>A1W.ash.ro-10&&dc<A1W.ash.ro+60&&!hasAbil('jump')&&G.stage==='oath'){ const ax=p.x+Math.cos(p.facing)*40, ay=p.y+Math.sin(p.facing)*40; if(a1Moat(ax,ay)&&p.moving) a1note('moat',`Black, sooty water all the way round. The road crosses on the old causeway.`,`Sooty water! Find the old causeway.`,6); } return; }
   for(const [a,b] of c.gaps){ if(t>a-30&&t<a+4&&p.moving&&!(p.z>0)){
-    if(!hasAbil('jump')) a1note('gap',`The gap is too wide to step over. I need to jump! (The Trial of the Leap, in Whisperwood)`,`Too wide! I need to jump. Try the Trial of the Leap.`,5);
+    if(!hasAbil('jump')) a1note('gap',`The gap is too wide to step over. I need to jump! (The old arch in Whisperwood?)`,`Too wide! I need to jump. Try the old arch in Whisperwood.`,5);
     else if(b-a>100) a1note('gap3',`The big one! Run at it and jump at the very end.`,`Big gap! Run and jump!`,6);
     else a1note('gapj',`Jump! (${a1Ctl('jump')})`,`Jump! (${a1Ctl('jump')})`,6); } }
   if(!G.flags.a1_cw_first&&t>440&&!(p.z>0)&&a1OnPlank(p.x,p.y)&&!G.bossDone.morrow){ G.flags.a1_cw_first=true; a1say(STORY.a1_causeway_first); }
@@ -972,8 +993,8 @@ STORY.a1_n3=STORY.a1_n3||[xl('narr',`A cloud of grey moths swirls round the thie
   xl('narr',`Something small and bright lies in the grass where the thief jumped. A brass gear, stamped GEARHAVEN.`,`The thief dropped a brass gear. It says GEARHAVEN.`)];
 STORY.a1_passlunch=STORY.a1_passlunch||[xl('narr',`Mom is sitting on the rockfall with a basket on her knees. She has clearly been waiting a while.`,`Mom is waiting at the pass with a basket.`),
   xl('maren',`Sandwiches. Cheese, cheese, and a cheese one for Pip. Nobody chases a thief on an empty stomach.`,`Sandwiches! Nobody chases a thief hungry.`),
-  {who:'maren',text:S(`The coast is all cliffs and currents, love. Learn to jump twice and skip first. Hollis's goat knows how.`,`Learn to jump twice first. Ask Hollis.`),skipIf:()=>hasAbil('dbljump')},
-  {who:'maren',text:S(`And you'll want to skim across water like a stone. Little Minnow on the Brindlecross dock can teach you. She's very fast and very cheeky.`,`Learn to skim on water. Ask Minnow on the dock.`),skipIf:()=>hasAbil('skimmer')},
+  {who:'maren',text:S(`The coast is all cliffs and currents, love. Go and see Hollis's goat first. He says she does something impossible, and Hollis never lies about goats.`,`Go and see Hollis's goat first. She does something odd.`),skipIf:()=>hasAbil('dbljump')},
+  {who:'maren',text:S(`And little Minnow on the Brindlecross dock says she can cross water faster than you. Go and let her prove it. She's very fast and very cheeky.`,`And Minnow on the dock is fast on water. Go and see her.`),skipIf:()=>hasAbil('skimmer')},
   xl('maren',`Bring the Heart home. And bring yourself home first. Love you.`,`Bring the Heart home. And bring yourself home first.`)];
 const a1TextOf=l=>String(Array.isArray(l)?l[1]:l&&l.text||'');
 if(typeof festIntroLines==='function'){ const base=festIntroLines; festIntroLines=function(day){ const L=base(day); try{
@@ -991,15 +1012,15 @@ const a1Lacks=()=>!hasAbil('dbljump')||!hasAbil('skimmer');
 { const base=useCrossing; useCrossing=function(def){
   try{ if(def&&def.id==='c_pass_s'&&G.mode==='story'&&(!def.need||def.need())&&a1Lacks()){
     G.flags.a1_lunch=true;
-    a1say([xl('maren',`Not so fast, love. The coast is all cliffs and currents.`,`Not so fast! The coast has cliffs and currents.`)].concat(STORY.a1_passlunch.slice(2,4)),()=>{ setBanner(S('Not ready for the coast yet','Not ready yet'),S(!hasAbil('dbljump')&&!hasAbil('skimmer')?'Learn to jump twice (Farmer Hollis) and to skim (Minnow on the dock).':!hasAbil('dbljump')?'Learn to jump twice. Farmer Hollis has a very strange goat.':'Learn to skim. Minnow is on the Brindlecross dock.','Ask Hollis and Minnow first.'),4); questUpdated(); });
+    a1say([xl('maren',`Not so fast, love. The coast is all cliffs and currents.`,`Not so fast! The coast has cliffs and currents.`)].concat(STORY.a1_passlunch.slice(2,4)),()=>{ setBanner(S('Not ready for the coast yet','Not ready yet'),S(!hasAbil('dbljump')&&!hasAbil('skimmer')?'See Farmer Hollis’s strange goat, and Minnow on the Brindlecross dock.':!hasAbil('dbljump')?'Farmer Hollis has a very strange goat. Go and see it.':'Minnow is on the Brindlecross dock. Go and see her.','See Hollis and Minnow first.'),4); questUpdated(); });
     return; } }catch(e){ console.error(e); }
   return base(def); }; }
 
 // ---------- 13. what the story asks for now: objectives, Yara's hints, markers, Mom's free hammer
 function a1GiftObjs(){
   const out=[], H=NPCSPOT.hollis, m=G.npcs.find(n=>n.id==='minnow');
-  if(!hasAbil('dbljump')) out.push({text:S('Learn to jump twice. Farmer Hollis has a very strange goat.','Learn to jump twice. Ask Farmer Hollis.'),x:H[0],y:H[1],npc:'hollis',a1:1});
-  if(!hasAbil('skimmer')) out.push({text:S('Learn to skim. Minnow Fisk is on the Brindlecross dock.','Learn to skim. Ask Minnow on the dock.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1});
+  if(!hasAbil('dbljump')) out.push({text:S('Farmer Hollis has a very strange goat. Go and see what it can do.','Go and see Hollis’s strange goat.'),x:H[0],y:H[1],npc:'hollis',a1:1});
+  if(!hasAbil('skimmer')) out.push({text:S('Minnow Fisk on the Brindlecross dock is fast on water. Go and see her.','Go and see Minnow on the dock.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1});
   return out;
 }
 function a1Objectives(out){
@@ -1007,26 +1028,26 @@ function a1Objectives(out){
   const st=G.stage, TL=TRIALS.leap, TT=TRIALS.tide, TS=TRIALS.sky, J=hasAbil('jump');
   const isWard=(o,id)=>{ const w=WARDS[id]; return w&&Math.abs(o.x-w.x)<1&&Math.abs(o.y-w.y)<1; };
   const drop=f=>{ for(let i=out.length-1;i>=0;i--) if(f(out[i])) out.splice(i,1); };
-  if((st==='hollow'||st==='warcamp'||st==='wren')&&!J) out.push({text:S('Pass the Trial of the Leap in Whisperwood (optional now, needed for the Ash Ward)','Try the Trial of the Leap. You need to jump soon!'),x:TL.x,y:TL.y,a1:1});
-  if(st==='oath'&&!J){ drop(o=>o.site==='oath'||isWard(o,'ash')); out.unshift({text:S('Pass the Trial of the Leap. The Ash Ward’s causeway is broken.','Do the Trial of the Leap. The way to the Ash Ward is broken.'),x:TL.x,y:TL.y,a1:1}); }
+  if((st==='hollow'||st==='warcamp'||st==='wren')&&!J) out.push({text:S('See what Ember left behind the old arch in Whisperwood (it can wait a little)','Try the old arch in Whisperwood. It can wait.'),x:TL.x,y:TL.y,a1:1});
+  if(st==='oath'&&!J){ drop(o=>o.site==='oath'||isWard(o,'ash')); out.unshift({text:S('The Ash Ward’s causeway is broken. See what Ember left behind the old arch in Whisperwood.','The way is broken. Try the old arch in Whisperwood.'),x:TL.x,y:TL.y,a1:1}); }
   if(st==='three'){
     if(!G.wards.crag){
-      if(!hasAbil('wings')){ drop(o=>o.site==='crag'||isWard(o,'crag')); out.push({text:S('Pass the Trial of the Sky. The Crag Ward’s fire is up on the Nest Spire.','Do the Trial of the Sky. The Crag Ward is up high.'),x:TS.x,y:TS.y,a1:1}); }
+      if(!hasAbil('wings')){ drop(o=>o.site==='crag'||isWard(o,'crag')); out.push({text:G.flags.trial_tide_boss?S('Pass the Trial of the Sky. The Crag Ward’s fire is up on the Nest Spire.','Do the Trial of the Sky. The Crag Ward is up high.'):S('The Crag Ward’s fire is up on the Nest Spire, too high to climb. There is an old white gate on the crag.','The Crag Ward is too high. Look at the white gate on the crag.'),x:TS.x,y:TS.y,a1:1}); }
       else if(G.wardReady.crag){ drop(o=>isWard(o,'crag')); const S0=A1W.spire; out.push({text:a1OnSpire()?S('Breathe fire on the Crag Ward. Hold your fire breath on it.','Breathe fire on the Ward!'):S('Fly up the Nest Spire: stand in the warm air at its foot, jump and fly. Then breathe on the Ward.','Stand in the warm air. Jump and fly up the spire!'),x:a1OnSpire()?WARDS.crag.x:S0.vx,y:a1OnSpire()?WARDS.crag.y:S0.vy,a1:1}); }
     }
     if(!G.wards.mire){
       if(!hasAbil('stride')){ drop(o=>o.site==='mire'||isWard(o,'mire')); out.push({text:S('Pass the Trial of the Tide. The Sunken Ward is flooded.','Do the Trial of the Tide. The Sunken Ward is flooded.'),x:TT.x,y:TT.y,a1:1}); }
-      else if(!hasAbil('skimmer')){ drop(o=>o.site==='mire'||isWard(o,'mire')); const m=G.npcs.find(n=>n.id==='minnow'); out.push({text:S('Learn to skim. Minnow Fisk is on the Brindlecross dock.','Learn to skim. Ask Minnow on the dock.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1}); }
+      else if(!hasAbil('skimmer')){ drop(o=>o.site==='mire'||isWard(o,'mire')); const m=G.npcs.find(n=>n.id==='minnow'); out.push({text:S('The Sunken Ward sits in a swirl. Minnow Fisk on the Brindlecross dock skips stones better than anyone.','Ask Minnow on the dock about skipping.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1}); }
       else if(G.wardReady.mire){ drop(o=>isWard(o,'mire')); out.push({text:S('Skim across the Gloam Swirl to the Sunken Ward: sprint over the water and don’t stop. Then breathe on the Ward.','Run across the swirl. Don’t stop! Then breathe on the Ward.'),x:WARDS.mire.x,y:WARDS.mire.y,a1:1}); }
     }
     if(!G.wards.frost){
-      if(!(G.weapons&&G.weapons.bow)){ drop(o=>o.site==='frost'||isWard(o,'frost')); out.push({text:S('Find Ember’s bow in the Trial of the Tide. The Frost Ward is sealed in ice.','Get the bow in the Trial of the Tide. The Frost Ward is frozen.'),x:TT.x,y:TT.y,a1:1}); }
+      if(!(G.weapons&&G.weapons.bow)){ drop(o=>o.site==='frost'||isWard(o,'frost')); out.push({text:S('Open the great chest in the Trial of the Tide. The Frost Ward will need what is inside.','Open the big chest in the Trial of the Tide.'),x:TT.x,y:TT.y,a1:1}); }
       else if(G.wardReady.frost&&!G.flags.a1_frost_melted){ drop(o=>isWard(o,'frost')); const n=[1,2,3].filter(j=>G.flags['a1_frost_'+j]).length;
         A1W.frost.lan.forEach(([x,y],i)=>{ if(!G.flags['a1_frost_'+(i+1)]) out.push({text:S(`Melt Greymane’s ice: shoot burning arrows at the frost lanterns. Breathe fire and shoot through it (${n}/3)`,`Shoot fire arrows at the lanterns (${n}/3)`),x,y:y+90,a1:1}); }); }
     }
   }
   if(st==='gate'&&!(G.weapons&&G.weapons.hammer)){ const m=npcOf('maren'); out.unshift({text:S('Ask Mom about a hammer. The mountain will need one.','Ask Mom for a hammer. The mountain needs one.'),x:m?m.x:NPCSPOT.maren[0],y:m?m.y:NPCSPOT.maren[1],npc:'maren',a1:1}); }
-  if(st==='summit'&&!hasAbil('dbljump')){ const H=NPCSPOT.hollis; out.push({text:S('Learn to jump twice. Farmer Hollis has a very strange goat.','Learn to jump twice. Ask Farmer Hollis.'),x:H[0],y:H[1],npc:'hollis',a1:1}); }
+  if(st==='summit'&&!hasAbil('dbljump')){ const H=NPCSPOT.hollis; out.push({text:S('Farmer Hollis has a very strange goat. Go and see what it can do.','Go and see Hollis’s strange goat.'),x:H[0],y:H[1],npc:'hollis',a1:1}); }
   if(st==='c_pass'&&G.flags.a1_lunch&&a1Lacks()&&curMap()===0){ out.length=0; for(const o of a1GiftObjs()) out.push(o); }
   return out;
 }
@@ -1035,7 +1056,7 @@ function a1Objectives(out){
   if(st==='warcamp'&&!J) return A1_HINT.warcamp_nojump; if(st==='wren'&&!J) return A1_HINT.wren_nojump; if(st==='oath'&&!J) return A1_HINT.oath_nojump;
   if(st==='three'&&((!G.wards.crag&&!hasAbil('wings'))||(!G.wards.mire&&!hasAbil('skimmer'))||(!G.wards.frost&&!(G.weapons&&G.weapons.bow&&G.flags.a1_frost_melted)))) return A1_HINT.three_gifts;
   if(st==='gate'&&!(G.weapons&&G.weapons.hammer)) return A1_HINT.gate_hammer; if(st==='summit'&&!hasAbil('dbljump')) return A1_HINT.summit_dj;
-  if(st==='c_pass'&&a1Lacks()) return S(`Your mother is waiting at the pass, Ash. And she is right: learn to jump twice and to skim first. Hollis and little Minnow can help.`,`Learn to jump twice and skim first. Ask Hollis and Minnow.`);
+  if(st==='c_pass'&&a1Lacks()) return S(`Your mother is waiting at the pass, Ash. And she is right: see Hollis's goat and little Minnow first.`,`See Hollis's goat and Minnow first.`);
   } }catch(e){ console.error(e); } return base(); }; }
 { const base=storyMarker; storyMarker=function(id){ if(base(id)) return true; try{ if(G&&G.mode==='story'&&id==='maren'&&G.stage==='gate'&&!(G.weapons&&G.weapons.hammer)) return true; }catch(e){} return false; }; }
 { const base=forgeHammerTalk; forgeHammerTalk=function(){

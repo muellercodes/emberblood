@@ -52,7 +52,7 @@ function moonText(b){
   if(L==='dawn') return S('The moon is back, with silver seams, like a mended cup.','The moon is back! It has shiny lines.');
   if(L==='moth') return S('The moon is back. A tiny grey moth visits it.','The moon is back. A tiny moth visits it.');
   if(L==='ember') return S('The moon is back, glowing gold, like a window when somebody is waiting up.','The moon is back. It is gold!');
-  if(b<=0) return S('The moon is whole. No bites gone.','The moon is whole.');
+  if(b<=0) return S('Round and bright tonight.','A round, bright moon.');
   if(b===1) return S('The moon: 1 bite gone.','1 bite gone.');
   if(b>=6) return S('The moon: 6 bites gone. There is no moon left at all.','No moon left at all!');
   return S(`The moon: ${b} bites gone.`,`${b} bites gone.`);
@@ -406,8 +406,9 @@ function pebbleAfter(d){
 // ================= 4. allies and the finale's counts (THREADS 10, FINALE 7 and 9)
 // vesperFriend: Act II may define its own `function vesperFriend()` (a later function declaration wins); never as a const
 function vesperFriend(){ return !!(G&&G.choices&&G.choices.c_vesper==='friend'); }
-// knows Nyx's old name: the Act IV moth dream, the Wardens' eleventh page (Act III or IV), or Moth Memory pane 3
-function nKnowsNyx(){ if(!G) return false; const F=G.flags||{}, f=G.found||{}; return !!(F.dr_seen_m_moth||F.f_page11||F.m_page11||f.n_pane_3||F.n_pane_3||F.n_knows); }
+// knows Nyx's old name: only Act V's ring 2 says it (the clue n5_her_name, which also sets n_knows). (v12: page eleven,
+// the Act IV dream and Moth Memory pane 3 no longer give the name, so they no longer count.)
+function nKnowsNyx(){ if(!G) return false; const F=G.flags||{}; return !!((G.case&&G.case.clues&&G.case.clues.n5_her_name)||F.n_knows); }
 // how many of the three Shard-keepers Ash freed: Vesper (friend), Glaciar (free), Hush (free)
 function nFreed(){ if(!G) return 0; const C=G.choices||{}; return (vesperFriend()?1:0)+(C.f_glaciar==='free'?1:0)+(C.m_hush==='free'?1:0); }
 // the kind ending (The Moth and the Moon) is open

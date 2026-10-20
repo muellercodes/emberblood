@@ -165,7 +165,7 @@ const GENERIC_RUMORS=[
   [`At night, a ring of mushrooms in the forest starts to glow. Step inside for luck.`,'lm_fairy'],
   [S(`Some of the old houses round here have cellars nobody has opened in years. Look under the rugs.`,`Old houses have cellars. Look under the rugs.`),null],
   [`Caves have cracked walls sometimes. A good roar can bring them down.`,null],
-  [`The Wardens hid pages of their book all over the valley. Sister Wren in Brindlecross pays for them.`,null]
+  [S(`Old pages turn up in the caves round here, written in a very old hand. Sister Wren in Brindlecross collects them.`,`Old pages turn up in caves. Sister Wren collects them.`),null]
 ];
 function markHint(h){ if(!h) return; G.hints=G.hints||{}; G.hints[h]=true; G.secrets=G.secrets||{}; }
 function giftsHeld(){ return Object.keys(GIFTS).filter(k=>(G.items[k]||0)>0); }

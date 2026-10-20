@@ -5,12 +5,10 @@ const ch=(who,text,opts)=>({who,text,opts});
 const STORY={
   // the opening: a new game starts with Ash asleep in his bed upstairs; Mom calls up from the kitchen on her way to the forge
   prologue:[
-    ['narr',S(`A thousand years ago, the dragon Vorlaxis lay on top of Cinder Mountain and looked down at the valley of Embermere. He had one word for everything he saw. Mine.`,`Long ago, the dragon Vorlaxis looked down at the valley. He had one word for it: mine.`)],
-    ['narr',S(`Five Wardens stood up to him, and so did his own daughter, Ember. You cannot kill a dragon made of fire. So at Midsummer, on the shortest night of the year, they split his fire in two.`,`Five Wardens and his daughter Ember stood up to him. They split his fire in two.`)],
-    ['narr',S(`Half stayed with Vorlaxis, chained in sleep under the mountain. The other half went with Ember. She gave it to her children, and they gave it to theirs.`,`Half stayed with him, asleep under the mountain. Ember gave the other half to her children.`)],
-    ['narr',S(`The chains were made to hold for a thousand years. Every year since, on that short night, the valley has hung out lanterns. Most people have forgotten why.`,`The chains would hold a thousand years. Every year, the valley lights lanterns. Most people forget why.`)],
-    ['narr',S(`Most of Ember's family forgot too. All they have left of her fire is warm hands. Then Ash was born, with horns, a tail, and real fire.`,`Most of Ember's family just have warm hands now. Then Ash was born, with real fire.`)],
-    ['maren',S(`(from the kitchen) Ash! Up you get! It's the thousandth Lantern Day, and Emberhollow's lantern-lighter is still snoring.`,`(from downstairs) Ash! Get up! It's Lantern Day!`)],
+    ['narr',S(`Every summer, on the shortest night of the year, the valley of Embermere hangs out paper lanterns. Ask anyone why, and they say: you just do.`,`Every summer, on the shortest night, the valley hangs out paper lanterns. Nobody knows why.`)],
+    ['narr',S(`There's a puppet show about it on the green every year. A grumpy dragon on the mountain, five brave friends, and a girl with horns called Ember who sings him to sleep. Nobody believes the puppet show.`,`There is a puppet show about a dragon and a girl with horns. Nobody believes it.`)],
+    ['narr',S(`In Emberhollow, the lanterns are lit by Ash, who was born with horns, a tail and real fire. Mom says it runs in the family, like red hair. Bertram the baker says it runs in the family like a house fire.`,`Ash lights the lanterns. He was born with horns, a tail and real fire.`)],
+    ['maren',S(`(from the kitchen) Ash! Up you get! It's Lantern Day, and Emberhollow's lantern-lighter is still snoring.`,`(from downstairs) Ash! Get up! It's Lantern Day!`)],
     ['ash',S(`(under the blanket) I wasn't snoring. I was practicing my gentle breaths.`,`I wasn't snoring! I was practicing breathing.`)],
     ['maren',S(`Practice on the lanterns. I'm off to the forge. Come and find me before the festival. I finished something for you last night.`,`I'm going to the forge. Come and find me. I made you something.`)],
     ['maren',S(`And Ash? Gently this year. Bertram has only just got his bakery back.`,`And Ash? Gently. Bertram just fixed his bakery.`)],
@@ -18,13 +16,13 @@ const STORY={
   ],
   forge:[
     ['maren',`There you are. Hold out your claws.`],
-    ['maren',S(`Your grandmother's sword. Her mother had it before her, and hers before that, all the way back to Ember, if you believe the family stories.`,`This was your grandmother's sword. It goes all the way back to Ember.`)],
-    ['maren',S(`Gran used to say it was made for "the one who comes at the end of the thousand years." I always thought she was being dramatic.`,`Gran said it was for "the one at the end of the thousand years." I thought she was being dramatic.`)],
+    ['maren',S(`Your grandmother's sword. Her mother had it before her, and hers before that, all the way back to Ember, if you believe the family stories.`,`This was your grandmother's sword. The family says it goes back to Ember.`)],
+    ['maren',S(`Gran used to say it was made for "the one who comes at the end." The end of what, she never said. I always thought she was being dramatic.`,`Gran said it was for "the one at the end." The end of what? She never said.`)],
     ['ash',`It's beautiful. Is it fireproof?`],
     ['maren',S(`It is now. Go on, the three festival lanterns are waiting on the green. One gentle breath each.`,`It is now. Light the three lanterns on the green. Gently.`)]
   ],
   lanternsDone:[
-    ['yara',S(`Beautiful work, Ash. A thousand Lantern Days, and they never looked so bright.`,`Beautiful, Ash! They never looked so bright.`)],
+    ['yara',S(`Beautiful work, Ash. Every year I tell you they never looked so bright. This year I mean it.`,`Beautiful, Ash! The brightest ever.`)],
     ['ash',`And nothing else caught fire. Not one thing.`],
     ['narr',S(`Then the North Gate creaked open. Nobody remembered leaving it unlocked.`,`Then the North Gate creaked open.`)],
     ['yara',`Kobolds! In the village! Ash, drive them out!`]
@@ -32,15 +30,16 @@ const STORY={
   // (x0_act1.js puts Ember's Trials, two lines, in before the last line)
   lore:[
     ['yara',S(`You fought like a dragon out there. Sit down, Ash. It's time you heard the real story, not the one from the puppet show.`,`You fought like a dragon. Sit down. Here is the real story.`)],
-    ['yara',S(`Ember was Vorlaxis's daughter. That makes him your ${GREATS}grandfather.`,`Ember was his daughter. So Vorlaxis is your great-great-great-great... grandfather.`)],
+    ['yara',S(`The dragon in the puppet show is real, Ash. His name is Vorlaxis, and he is asleep under Cinder Mountain. Ember was his daughter, and your mother's family comes down from her.`,`The dragon is real. His name is Vorlaxis. Ember was his daughter, and your family comes from her.`)],
+    ['yara',S(`Once in a long while, one of her line is born with real fire. The old word for that is Emberblood. And it makes Vorlaxis your ${GREATS}grandfather.`,`Sometimes one of you is born with real fire. That is an Emberblood. And Vorlaxis is your great-great-great-great... grandfather.`)],
     ['ash',S(`...You just said "great" thirteen times.`,`That's a lot of greats.`)],
-    ['yara',S(`Here's the part the puppet show leaves out. The binding was made to last a thousand years. Today is the thousandth Lantern Day.`,`The chains were made to last a thousand years. Today is the thousandth Lantern Day.`)],
+    ['yara',S(`I keep the Lantern Book. One line for every Lantern Day, back to the very first. Last night I wrote line one thousand. His chains were made to last exactly that long.`,`I write down every Lantern Day. Last night was number one thousand. The chains were made to last that long.`)],
     ['ash',`So the chains are about to...`],
     ['yara',S(`Come off. That isn't a coincidence, Ash. That's a deadline. And kobolds didn't open that gate by themselves.`,`Come off. It's a deadline. And someone opened the gate for the kobolds.`)],
     ['yara',S(`First, the Hollow Ward under the old oak. It went dark in the raid. Breathe on the stone and don't stop until it catches.`,`First, the Hollow Ward under the old oak. Breathe on it until it lights.`)]
   ],
   ward_hollow:[
-    ['iska',`Warm again. Oh, that's better. Thank you.`],
+    ['stone',`Warm again. Oh, that's better. Thank you.`],
     ['ash',`Did the rock just talk?`],
     ['iska',S(`The rock is Iska, first of the Five Wardens. What's left of her, anyway. Light all five Wards before the chains come off, and he wakes up weak and slow.`,`I'm Iska, a Warden. Light all five Wards, and he wakes up weak.`)],
     ['iska',S(`Leave them dark, and he wakes whole. Either way, he'll come for the half of his fire you carry. Not the valley, Ash. You.`,`Either way, he comes for the fire you carry. Not the valley. You.`)],
@@ -193,12 +192,13 @@ const ENDINGS={
     ['ember',S(`(from the rim, quietly) That's all of it, Ash. It made him so lonely. Don't let it do that to you.`,`That's all his fire. It made him lonely. Be careful.`)],
     ['narr',S(`A grey moth with two pale moons painted on her wings lands on the empty throne. She looks up at you, all the way up. Then she flies straight up, toward the moon.`,`A grey moth lands on the empty throne. She looks up at you. Then she flies to the moon.`)]]},
   lantern:{title:'The Lantern',n:4,
-    // the option (finalChoice) and why it is locked when it is: J1's finalChoice shows it greyed with ENDINGS.lantern.why()
+    // the option (finalChoice) shows only when it is earned (v12: hidden, not greyed). why() says what is missing, in
+    // story words, for the test hook j3why only; the player never sees it.
     opt:S('Light a lantern for him, like Ember did.','Light a lantern for him.'),
     why:()=>{ const pages=Object.keys(G.pages||{}).length, kind=Object.values(G.choices||{}).filter(v=>v==='free'||v==='forgive'||v==='home').length;
-      if(pages<5) return S(`You don't know him well enough yet. The Wardens' pages would help (${pages} of 5 found).`,`Find more Wardens' pages first (${pages} of 5).`);
-      if(!(G.pages&&G.pages.p9)) return S(`Something is missing. Ember once wrote him a letter. It is page nine of the Wardens' Account.`,`You need Ember's letter. It is page nine.`);
-      if(kind<2) return S(`Ember's way needs mercy, and you have shown it ${kind} of 2 times (Morrow, Fennick, Greymane).`,`This needs two kind choices (${kind} of 2).`);
+      if(pages<5) return S(`You don't know enough of Ember's story yet.`,`You don't know enough of Ember's story.`);
+      if(!(G.pages&&G.pages.p9)) return S(`You never found the letter Ember wrote to her father.`,`You never found Ember's letter.`);
+      if(kind<2) return S(`Ember's way needs mercy, and you have not shown enough of it.`,`Ember's way needs more kindness.`);
       return ''; },
     lines:[
     ['narr',S(`You take out a small paper lantern, the kind they hang on the green every Lantern Day, and you light it.`,`You take out a little paper lantern and light it.`)],

@@ -15,7 +15,7 @@ const SITES={
 const WARD_NAME={hollow:'the Hollow Ward',ash:'the Ash Ward',crag:'the Crag Ward',mire:'the Sunken Ward',frost:'the Frost Ward'};
 const CHAPTER={wake:'Lantern Day',lanterns:'Lantern Day',raid:'Lantern Day',lore:'The Real Story',hollow:'The Real Story',warcamp:'The Kobold Chieftain',wren:'The Lorekeeper',oath:'The Ash Ward',three:'Three Wards',gate:'The Obsidian Gate',summit:'The First Flame',done:'Free Roam'};
 const GOAT_SPOT=[2750,3380];
-const FEST_LINES=['Happy Lantern Day, Ash! Try not to light anything that isn’t a lantern.','The bakery made dragon-shaped buns this year. In your honor. Also as a warning.','A thousand Lantern Days! Elder Yara says she remembers the first one. I think she’s joking.','Your mom’s been in the forge since dawn. Something about a surprise.'];
+const FEST_LINES=['Happy Lantern Day, Ash! Try not to light anything that isn’t a lantern.','The bakery made dragon-shaped buns this year. In your honor. Also as a warning.',S('Elder Yara was up before dawn, writing in her big old book. She won’t say what.','Yara is writing in her big book.'),S('A moth sat on my lantern this morning. Gran always said that means somebody’s coming home.','A moth on a lantern means someone is coming home.'),'Your mom’s been in the forge since dawn. Something about a surprise.'];
 function siteOpen(k){ const s=SITES[k]; if(G.bossDone[s.boss]||!reached(s.stage)) return false; if(k==='summit'&&!G.flags.gate) return false; return true; }
 function threeLeft(){ return ['crag','mire','frost'].filter(id=>!G.wards[id]); }
 function nearestOf(list){ let b=null,bd=1e18; for(const o of list){ const d=dist2(o.x,o.y,player.x,player.y); if(d<bd){ bd=d; b=o; } } return b; }
@@ -151,7 +151,7 @@ function breathIgnite(mx,my,ang,dt){
   for(const id in WARDS){
     if(G.wards[id]) continue; const w=WARDS[id];
     if(!inArcC(mx,my,ang,175,0.45,{x:w.x,y:w.y,r:24})) continue;
-    if(!wardCanLight(id)){ if(!(G.wardMsgT>0)){ G.wardMsgT=3; ftext(w.x,w.y-34,id==='hollow'?'Not yet. Talk to Yara.':'Something here is still feeding on the Ward','#c9d6ff',13); } continue; }
+    if(!wardCanLight(id)){ if(!(G.wardMsgT>0)){ G.wardMsgT=3; ftext(w.x,w.y-34,id==='hollow'?'Not yet. Talk to Yara.':reached('hollow')?'Something here is still feeding on the Ward':'The old stone is warm, but it will not catch','#c9d6ff',13); } continue; }
     G.wardHeat[id]=(G.wardHeat[id]||0)+dt/2.2; G.wardHeatT[id]=G.time;
     if(Math.random()<0.4) emit(w.x+rand(-10,10),w.y+rand(-10,10),1,{col:'255,190,90',ang:-Math.PI/2,spread:0.6,smin:20,smax:60,lmin:.4,lmax:.7,zmin:1.5,zmax:3,rise:15});
     if(G.wardHeat[id]>=1) lightWard(id);
@@ -170,25 +170,13 @@ function finalChoice(){
   const kind=Object.values(G.choices).filter(v=>v==='free'||v==='forgive'||v==='home').length, pages=Object.keys(G.pages).length;
   const canLantern=pages>=5&&kind>=2&&G.pages.p9;
   const pickEnd=k=>()=>{ G.choices.ending=k; };
-  // (v11) the kind ending always shows: when it is not earned yet it is greyed, and picking it says what it still needs
-  // (as Act II's kneel does). The words are ENDINGS.lantern.opt and ENDINGS.lantern.why() (a1d_story.js, J3) when
-  // they exist, else the text here.
+  // (v12) the kind ending shows only when it is earned: a player who has not earned it does not learn it exists.
+  // The words are ENDINGS.lantern.opt (a1d_story.js) when it exists, else the text here.
   const LE=typeof ENDINGS!=='undefined'&&ENDINGS.lantern||{};
   const lanternOpt=LE.opt||S('Light a lantern for him, like Ember did.','Light a lantern for him.');
-  const lanternWhy=()=>{
-    try{ if(typeof LE.why==='function'){ const v=LE.why(); if(v) return v; } }catch(e){ console.error(e); }
-    const letter=!!G.pages.p9, need=[];
-    if(pages<5) need.push([`five of the Wardens' pages (you have ${pages})`,`5 pages (you have ${pages})`]);
-    if(!letter) need.push([`Ember's own letter`,`Ember's letter`]);
-    if(kind<2) need.push([`two kind choices on the road here (you made ${kind})`,`2 kind choices (you made ${kind})`]);
-    const join=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
-    return S(`Not yet. Ember's way needs more of her story: ${join(need.map(x=>x[0]))}.`,`Not yet. It needs ${join(need.map(x=>x[1]))}.`);
-  };
   const opts=[{t:'End it. For the valley.',fn:pickEnd('hero')},{t:'Bind him again, forever. Become the Sixth Warden.',fn:pickEnd('warden')},{t:'Take his fire for yourself.',fn:pickEnd('heir')}];
   if(canLantern) opts.splice(1,0,{t:lanternOpt,fn:pickEnd('lantern')});
-  else opts.splice(1,0,{t:()=>simplify(lanternOpt)+'  🔒',tone:'locked',then:()=>[['narr',lanternWhy()]],back:true});
   const lines=[['vor',`Impossible... the fire... it chose you...`],['narr',`The First Flame flickers on the mountaintop, small and tired. For the first time in a thousand years, it's your move.`]];
-  if(!canLantern&&pages>=3) lines.push(['narr',`You remember something from the Wardens' pages. Something about lanterns. You can't quite put it together.`]);
   lines.push(ch('ash',`What will you do?`,opts));
   runDialogue(lines,()=>{
     const E=ENDINGS[G.choices.ending||'hero'];

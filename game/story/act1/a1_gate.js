@@ -358,7 +358,7 @@ quest({
 
   // black candle wax round the Hollow Ward stone (drawn by x0_act1.js from the raid until Act I ends)
   place: {
-    a1_ward_wax: { map: 0, at: [2560, 9122], r: 30, kind: 'examine', name: 'black wax on the Hollow Ward', if: 'stage>=raid !flag act1_done' },
+    a1_ward_wax: { map: 0, at: [2560, 9122], r: 30, kind: 'examine', name: 'the black wax on the old stone', if: 'stage>=raid !flag act1_done' },
   },
 
   clue: {
