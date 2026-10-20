@@ -441,13 +441,15 @@ function mapHdStep(t,until){
   if(t.row>=N){ t.cv.getContext('2d').putImageData(t.img,0,0); t.img=null; t.fl=null; t.ready=true; MHD.stats.built++; MHD.stats.ms+=t.ms; }
   return t.ready;
 }
-// the worker (from overviewStep, every frame while the map is open): the wanted tiles, a few ms a frame, once the
-// view has been still for MHD.settle ms; one redraw when a tile is done
+// the worker (from overviewStep, every frame while the map is open): the wanted tiles, MHD.budget ms a frame (twice
+// that once the view has been still for a while: nothing on it moves), starting when the view has been still for
+// MHD.settle ms, so dragging and pinching stay smooth; one redraw when a tile is done
 function mapHdWork(){
+  const still=mhdNow()-MHD.moved, B=still>400?MHD.budget*2:MHD.budget;   // a still map can spare more of a frame
   const L8=MHD.fogWant;
-  if(L8&&mhdNow()-MHD.moved>=MHD.settle){ if(mapHdFogJob(L8,mhdNow()+MHD.budget)){ MHD.fogWant=null; if(scene==='map') drawMapScreen(); } return; }
-  if(!MHD.want.length||mhdNow()-MHD.moved<MHD.settle) return;
-  const until=mhdNow()+MHD.budget; let done=0;
+  if(L8&&still>=MHD.settle){ if(mapHdFogJob(L8,mhdNow()+B)){ MHD.fogWant=null; if(scene==='map') drawMapScreen(); } return; }
+  if(!MHD.want.length||still<MHD.settle) return;
+  const until=mhdNow()+B; let done=0;
   while(MHD.want.length&&mhdNow()<until){
     const t=MHD.want[0];
     if(t.ready||t.gen!==mhdGen()){ MHD.want.shift(); continue; }
