@@ -755,7 +755,8 @@ function faceKobold(g){
   g.fillStyle='#c1a65e'; g.beginPath(); g.ellipse(0,24,20,16,0,0,TAU); g.fill();
   const flare=X.n==='angry'||X.n==='furious'?1.35:1; g.fillStyle='#4a3a18'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*6,20,3*flare,2*flare,s*0.2,0,TAU); g.fill(); }
   // the good eye (his left): a yellow slit eye with lids
-  g.save(); g.translate(-14,-6); g.scale(0.84,0.94); dragonEye(g,0,0,-1,{eye:'#ffdf4a',skin:sk,dark:dk,rot:0.12}); g.restore();
+  if(X.wince&&!X.blink){ g.save(); g.strokeStyle=dk; g.lineWidth=3; g.lineCap='round'; g.lineJoin='round'; g.beginPath(); g.moveTo(-21,-11); g.lineTo(-9,-6); g.lineTo(-21,-1.5); g.stroke(); g.restore(); }
+  else { g.save(); g.translate(-14,-6); g.scale(0.84,0.94); dragonEye(g,0,0,-1,{eye:'#ffdf4a',skin:sk,dark:dk,rot:0.12}); g.restore(); }
   // the scarred eye stays shut; its lid line follows the mood (a curve when he grins, a slant when he scowls)
   { const ls=X.ls||0, up=X.ec==='arc'||X.m==='laugh'||X.m==='smile'; g.strokeStyle=dk; g.lineWidth=2.6; g.lineCap='round'; g.beginPath();
     if(up){ g.moveTo(8,-4); g.quadraticCurveTo(14,-11,20,-4); } else { g.moveTo(8,-6+ls*2.5); g.quadraticCurveTo(14,-3+ls*0.5,20,-4-ls*1.5); } g.stroke(); }
@@ -795,7 +796,7 @@ function faceHelm(g){
   const gc=hot?'255,96,36':dim?'214,132,84':soft?'255,206,120':'255,140,50', eyeC=hot?'#fff0c8':dim?'#f0b07a':soft?'#fff2c4':'#ffd08a';
   g.save(); pxPose(g,{py:62}); pxAura(g,0,-12,82);
   // the plume, hinged at the crest
-  g.save(); g.translate(0,-54); g.rotate(ear>0?-ear*0.32:-ear*0.5);
+  g.save(); g.translate(0,-54); g.rotate(ear>0?-ear*0.45:-ear*0.75);
   g.fillStyle=hot?'#a8160e':dim?'#6a1a14':'#8a1a14'; g.beginPath(); g.moveTo(-6,-4); g.quadraticCurveTo(30,-26,52,14); g.quadraticCurveTo(26,-2,6,4); g.closePath(); g.fill();
   if(hot){ g.fillStyle='#c8281a'; for(let i=0;i<5;i++){ const t=0.2+i*0.17, x=-6+58*t, y=-4-22*Math.sin(t*Math.PI)+18*t; g.beginPath(); g.moveTo(x-4,y+3); g.lineTo(x+2,y-9); g.lineTo(x+5,y+4); g.closePath(); g.fill(); } }
   g.strokeStyle='rgba(255,140,120,.35)'; g.lineWidth=1.6; g.beginPath(); g.moveTo(2,-6); g.quadraticCurveTo(28,-20,44,6); g.stroke();
@@ -803,17 +804,18 @@ function faceHelm(g){
   g.fillStyle='#3a3d47'; g.beginPath(); g.moveTo(-36,50); g.lineTo(-38,-20); g.quadraticCurveTo(0,-64,38,-20); g.lineTo(36,50); g.quadraticCurveTo(0,62,-36,50); g.closePath(); g.fill();
   g.fillStyle='#4f5360'; g.beginPath(); g.moveTo(-30,-22); g.quadraticCurveTo(0,-56,30,-22); g.lineTo(24,-18); g.quadraticCurveTo(0,-46,-24,-18); g.closePath(); g.fill();
   g.fillStyle='rgba(255,255,255,.08)'; g.beginPath(); g.ellipse(-18,-26,8,16,0.4,0,TAU); g.fill();
-  g.fillStyle='#120a08'; g.fillRect(-26,-10,52,9); const vw=5+op*3; g.fillRect(-vw,-10,vw*2,40);
+  g.fillStyle='#120a08'; g.fillRect(-28,-13,56,12); const vw=5+op*3; g.fillRect(-vw,-13,vw*2,43);
   // the glow in the slots: brighter when he is hot, low when he is beaten; the mouth slot opens wider when he shouts
   const ga=hot?1:dim?0.45:0.8;
-  g.save(); g.shadowColor=`rgba(${gc},1)`; g.shadowBlur=hot?18:12; g.fillStyle=`rgba(${gc},${0.55*ga})`; g.fillRect(-23,-7,46,3);
+  g.save(); g.shadowColor=`rgba(${gc},1)`; g.shadowBlur=hot?18:12; g.fillStyle=`rgba(${gc},${0.35*ga})`; g.fillRect(-25,-9,50,5);
   const mw=2+op*3; g.fillStyle=`rgba(${gc},${(0.6+op*0.4)*ga})`; g.fillRect(-mw,-3,mw*2,30-(op?0:4)); g.restore();
   // the eyes, kept inside the slot
-  g.save(); g.beginPath(); g.rect(-26,-10,52,9); g.clip();
-  for(const s of [-1,1]) pxEye(g,s*12,-5.5,s,{spirit:true,rx:5.4,ry:2.5,white:eyeC,glow:`rgba(${gc},1)`,pip:'#3a1004'});
+  for(const s of [-1,1]){ const h=g.createRadialGradient(s*12,-7,1,s*12,-7,14); h.addColorStop(0,`rgba(${gc},${0.55*ga})`); h.addColorStop(1,`rgba(${gc},0)`); g.fillStyle=h; g.beginPath(); g.arc(s*12,-7,14,0,TAU); g.fill(); }
+  g.save(); g.beginPath(); g.rect(-28,-13,56,12); g.clip();
+  for(const s of [-1,1]) pxEye(g,s*12,-7,s,{spirit:true,rx:6.6,ry:3.3,white:eyeC,glow:`rgba(${gc},1)`,pip:'#3a1004',lw:3.4});
   g.restore();
   g.fillStyle='#8a8f9c'; for(const [x,y] of [[-28,14],[28,14],[-26,36],[26,36]]){ g.beginPath(); g.arc(x,y,2.5,0,TAU); g.fill(); }
-  pxExtras(g,{ex:12,ey:-5.5,erx:5.4,ery:2.5,cheek:6,top:-36,side:36,no:{blush:true}});
+  pxExtras(g,{ex:12,ey:-7,erx:6.6,ery:3.3,cheek:6,top:-36,side:36,no:{blush:true}});
   g.restore();
 }
 function faceElder(g){
@@ -1170,4 +1172,6 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{moodRead,moodName,MOOD_LIST,MOO
     for(const w of whos){ const n=px(w,'neutral'), r={}; for(const m of moods){ if(m==='neutral') continue; const d=px(w,m); let k=0; for(let i=0;i<d.length;i+=4) if(Math.abs(d[i]-n[i])+Math.abs(d[i+1]-n[i+1])+Math.abs(d[i+2]-n[i+2])>24) k++; r[m]=+(k/(176*176)).toFixed(4); }
       out[w]={route:typeof EVPORT!=='undefined'&&EVPORT[w]?'ev':CASTBY[w]?'cast':SPECIAL[w]?'special':'base',d:r}; }
     pcacheReset(); return out; },
+  // play a boss's intro or outro (STORY.bosses[type].intro / .outro) the way the fight does
+  playBoss:(type,k)=>{ const B=STORY.bosses&&STORY.bosses[type]; const L=B&&B[k]; if(!L||!L.length) return false; runDialogue(L,()=>{ scene='play'; }); return true; },
   portraitURLs(whos,mood){ pcacheReset(); const r=whos.map(w=>portraitGet(w,mood||'neutral',false).toDataURL('image/png')); pcacheReset(); return r; }});
