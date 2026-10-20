@@ -103,11 +103,11 @@ API_BASE=http://127.0.0.1:8787 node build.mjs   # point at a local worker
 
 Then open `docs/index.html`, or serve the folder (`npx serve docs`).
 
-The story lives in `game/story/` as plain data that one engine (`game/src/e10_story.js`) runs. Every build checks it first and stops if the story and the world disagree: a place the story mentions that isn't on the map, a key that opens nothing, a step or ending that can't be reached with the powers you have by then, a scene that runs too long. The report goes to `dist/check.md`.
+The story lives in `game/story/` as plain data that one engine (`game/src/e10_story.js`) runs. Every build checks it first and stops if the story and the world disagree: a place the story mentions that isn't on the map, a key that opens nothing, a step that can't be reached with the powers you have by then, a scene that runs too long. The report goes to `dist/check.md`.
 
 ```bash
 node tools/check.mjs            # the story check on its own (--act 2 for one act)
-node tools/storymap.mjs         # dist/storymap.html: every act as a graph of chapters, clues, choices and endings
+node tools/storymap.mjs         # dist/storymap.html: every act as a graph of chapters, clues and choices
 python3 tools/worldcheck.py     # boots the game headless and checks every place and gate is really there
 ```
 
