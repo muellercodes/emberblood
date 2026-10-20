@@ -537,8 +537,9 @@ function lendable(r){
   return I._lend=floors.some(aid=>{ const M=CAVEMAP[aid]; return !!M&&Object.values(M.rooms).some(R=>R.kind==='tboss'||R.kind==='reward'||(R.kind==='boss'&&!!(R.boss||R.c1boss||R.m3boss||R.f2boss))); });
 }
 // true while a lent power works: inside the place that lent it, or anywhere once that place is done
+const TLEND={};   // the flag names, made once (hasAbil asks this on every miss)
 function trialLent(id){
-  const F=G.flags, r=F&&F['tlend_'+id]; if(!r) return false;
+  const F=G.flags, r=F&&F[TLEND[id]||(TLEND[id]='tlend_'+id)]; if(!r) return false;
   return lendDone(r)||!!(AREA&&AREA.def&&dunRoot(AREA.def.id)===r);
 }
 // the place that would lend this power if it were given right now (null: give it for good)
