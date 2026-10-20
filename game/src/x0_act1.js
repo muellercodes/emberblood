@@ -384,6 +384,12 @@ ELEV.noFly({disc:[A1W.gloam.x,A1W.gloam.y,A1W.gloam.r+60],why:S('The bog mist is
 const A1_FOLK={leap:S('old rooted arch','rooted arch'),tide:S('shell doors','shell doors'),sky:S('white gate','white gate')};
 // (old saves have no seen_ flag: a trial already beaten, or its gift already in Ash's blood, counts as known)
 const a1TrialKnown=id=>!G||G.mode!=='story'||!!(G.found&&G.found['seen_'+id])||!!(G.flags&&G.flags['trial_'+id+'_boss'])||(id==='tide'&&!!G.flags.trial_leap_boss)||(id==='sky'&&!!G.flags.trial_tide_boss)||!!(TRIALS[id]&&TRIALS[id].abil&&typeof hasAbil==='function'&&hasAbil(TRIALS[id].abil));
+// (v12) the Wards go by what the valley calls them, old stones nobody thinks about, until Yara's story (stage hollow):
+// the HUD region label, the map labels and the first-visit banners all read POI names, so the names change here only
+const A1_WARD_FOLK={oath:S('The Ash Stone','The Ash Stone'),nests:S('The Crag Stone','The Crag Stone'),mire:S('The Sunken Stone','The Sunken Stone'),frost:S('The Frost Stone','The Frost Stone')};
+const a1WardsKnown=()=>!G||G.mode!=='story'||reached('hollow');
+for(const k in A1_WARD_FOLK){ const P=POI[k]; if(!P) continue; let real=P.name;
+  Object.defineProperty(P,'name',{configurable:true,enumerable:true,get(){ try{ return a1WardsKnown()?real:A1_WARD_FOLK[k]; }catch(e){ return real; } },set(v){ real=v; }}); }
 function a1TrialFolk(){
   for(const id in A1_FOLK){ const T=TRIALS[id]; if(!T) continue; const f=A1_FOLK[id];
     const D=DOORS.find(d=>d.trial===id), Lm=LANDMARKS.find(l=>l.id==='tsign_'+id);
