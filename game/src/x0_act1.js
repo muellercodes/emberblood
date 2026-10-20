@@ -1793,7 +1793,7 @@ function a1GTick(dt){
     // somebody who has to go through opens it, and leaves it open
     let who=null;
     for(const W of walks) if(W.t<W.d&&W.n&&dist2(W.n.x,W.n.y,g.x,g.y)<120*120&&a1GCross(g,W.n.x,W.n.y,W.x1,W.y1)){ who=W.n; break; }
-    if(!who&&g.foot&&g.side&&!air) for(const f of [C,F]){ if(!f) continue; const q=a1GRel(g,f.x,f.y); if(Math.abs(q.a)<g.hw+4&&Math.abs(q.b)<(f.r||12)+14&&(q.b<0?-1:1)!==g.side){ who=f; break; } }
+    if(!who&&g.foot&&!air&&Math.abs(r.b)<400) for(const f of [C,F]){ if(!f) continue; const q=a1GRel(g,f.x,f.y); if(Math.abs(q.a)<g.hw+4&&Math.abs(q.b)<(f.r||12)+14&&(q.b<0?-1:1)!==s){ who=f; break; } }
     if(who) a1GSet(g,true,'npc');
   }
   A1G.px=p.x; A1G.py=p.y;
