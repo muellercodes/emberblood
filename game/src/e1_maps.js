@@ -118,6 +118,7 @@ function ovStepMap(O,rows){
 }
 { const base=overviewStep; overviewStep=function(rows){
   const onMap=scene==='map', k=onMap?MAPUI.view:curMap(), O=ovOf(k);
+  if(onMap) try{ mapHdWork(); }catch(e){ console.error(e); }   // (v12) the sharp tiles of the map screen, below
   if(O.done) return;
   const n=onMap?24:rows;
   if(!k) base(n); else ovStepMap(O,n);
@@ -338,6 +339,215 @@ addEventListener('keydown',e=>{
   }
   return base.call(this,root,s,dt);
 }; }
+
+// ---------- (v12) the big map is sharp at every zoom. FIXES: "at 4x the map is soft, because the overview image is
+// low resolution"; on a phone the explored blob and the fog's stair-stepped edge (100 px cells) looked pixelated
+// from the opening zoom.
+// The ground: the overview (1 px per 25 world px) is drawn first, as before. Zoomed in, tiles of MHD.N x MHD.N samples
+// at 12.5 or 6.25 world px a sample go over it (about one sample per CSS px), built a few ms a frame while the map is
+// open, once the view has been still for a moment, nearest the middle first, and only where Ash has explored (under
+// the fog the overview is enough). A tile samples the world (T, groundRGB and the overview's own road, wall, bridge,
+// bog and hillshade rules) only in the overview cells whose four corners differ: coasts, roads, rivers, cliffs, the
+// edges of towns. Everywhere else the ground is smooth, so the tile blends the overview's own pixels, which costs
+// almost nothing. At most MHD.cap tiles are kept (64 KB each, about 8 MB in all, fine on an iPhone), the least
+// recently drawn go first; a new look (Storybook or Classic) throws them away with the overview.
+// The fog: the explored cells are smoothed into a field (a cubic B-spline through the cell middles) and drawn with
+// a soft edge about half a cell wide, at 4 px a cell (8 when zoomed in), so the edge is a smooth curve at any zoom.
+const MHD={N:128,cap:130,tiles:new Map(),want:[],budget:7,settle:140,moved:0,view:'',thr:7,css:1.45,full:false,fog:{},stats:{built:0,px:0,full:0,ms:0}};
+const mhdNow=()=>(window.__realNow||(()=>performance.now()))();
+const mhdGen=()=>{ try{ return LOOK.gen|0; }catch(e){ return 0; } };
+// the tile level for a view: 0 is the overview itself, then 12.5 and 6.25 world px a sample (about 1.45 CSS px at most)
+function mapHdLevel(F){
+  const r=mapCv&&mapCv.clientWidth?mapCv.width/mapCv.clientWidth:MAPZ.res, css=25*F.s/(r||1);
+  return css<=MHD.css?0:css/2<=MHD.css?1:2;
+}
+// explored within a cell of this world rectangle?
+function mapHdSeen(FG,x0,y0,x1,y1){
+  if(!FG||!FG.bits) return false;
+  const cs=FG.cs, c0=Math.max(0,Math.floor(x0/cs)-1), c1=Math.min(FG.w-1,Math.floor(x1/cs)+1), r0=Math.max(0,Math.floor((y0-FG.y0)/cs)-1), r1=Math.min(FG.h-1,Math.floor((y1-FG.y0)/cs)+1);
+  for(let r=r0;r<=r1;r++){ const o=r*FG.w; for(let c=c0;c<=c1;c++) if(FG.bits[o+c]) return true; }
+  return false;
+}
+// one world sample in the overview's colours: the same rules as overviewStep (a4_ground.js) and ovStepMap, and the
+// hillshade of e3_elev.js (offsets of one overview pixel, so the shading reads the same, only sharper)
+const MHD_S={};
+function mapHdPix(k,wx,wy,E,eg,rowPaths,out){
+  const s=MHD_S; T(wx,wy,s);
+  let c=groundRGB(s,wx,wy);
+  if(s.road>0.3) c=mixRGB(c,[200,170,120],0.55);
+  if(!k&&Math.abs(wy-WALL_Y)<30) c=[40,36,48];
+  if(s.bridge===1) c=[120,90,60];
+  if(s.bog>0.5) c=mixRGB(c,[40,52,36],0.4);
+  let r=c[0], g=c[1], b=c[2];
+  if(eg&&wy>=eg.y0&&wy<=eg.y0+eg.h*eg.cs&&wx>=eg.x0&&wx<=eg.x0+eg.w*eg.cs){
+    let path=false;
+    for(const p of rowPaths) if(wx>=p.bb[0]&&wx<=p.bb[2]&&elvPathD(p.pts,wx,wy)<p.w*0.5+4){ path=true; break; }
+    if(path){ r=lerp(r,206,0.6); g=lerp(g,178,0.6); b=lerp(b,134,0.6); }
+    else{
+      const os=25, lv=elevLvl(wx,wy), up=elevLvl(wx,wy-os), lf=elevLvl(wx-os,wy);
+      if(lv||up||lf){
+        const f=elevFace(wx,wy); let m=1, add=0;
+        if(f&EF.FACE&&!(f&EF.RAMP)) m=0.62; else if(up>lv) m=0.7; else if(lv>up) add=26;
+        if(lf>lv) m*=0.88; else if(lv>lf) add+=10;
+        r=r*m+add; g=g*m+add; b=b*m+add*0.8;
+      }
+    }
+  }
+  out[0]=r; out[1]=g; out[2]=b;
+}
+function mapHdElv(k){ try{ const E=ELV.maps[k||0]; if(!E||!E.plats.length) return null; if(E.dirty) elvBuild(E); return E.G?E:null; }catch(e){ return null; } }
+// a tile: k, level L, column and row; its samples sit at (i+0.5)*sp from its corner
+function mapHdTile(k,L,tx,ty){
+  const key=k+':'+L+':'+tx+':'+ty; let t=MHD.tiles.get(key);
+  if(t&&t.gen!==mhdGen()){ MHD.tiles.delete(key); t=null; }
+  if(!t){ const M=MAPS[k]||MAPS[0], sp=25/(1<<L), span=MHD.N*sp; t={key,k,L,tx,ty,sp,x0:tx*span,y0:M.y0+ty*span,span,row:0,ready:false,cv:null,img:null,fl:null,gen:mhdGen()}; }
+  return t;
+}
+// the overview cells under a tile whose corners differ (they get real samples)
+function mapHdFlags(t,O){
+  const d=O.img.data, w=O.w, I0=clamp(Math.floor(t.x0/25-0.5),0,w-2), I1=clamp(Math.floor((t.x0+t.span)/25-0.5)+1,0,w-2);
+  const J0=clamp(Math.floor((t.y0-O.y0)/25-0.5),0,O.h-2), J1=clamp(Math.floor((t.y0+t.span-O.y0)/25-0.5)+1,0,O.h-2), fw=I1-I0+1, fl=new Uint8Array(fw*(J1-J0+1));
+  let n=0;
+  for(let J=J0;J<=J1;J++) for(let I=I0;I<=I1;I++){
+    const a=(J*w+I)*4, b=a+4, c=a+w*4, e=c+4; let rg=0;
+    for(let q=0;q<3;q++){ const v0=d[a+q], v1=d[b+q], v2=d[c+q], v3=d[e+q], mx=Math.max(v0,v1,v2,v3), mn=Math.min(v0,v1,v2,v3); if(mx-mn>rg) rg=mx-mn; }
+    if(MHD.full||rg>MHD.thr){ fl[(J-J0)*fw+(I-I0)]=1; n++; }
+  }
+  t.fl=fl; t.I0=I0; t.J0=J0; t.fw=fw; t.nFlag=n;
+}
+// build rows of a tile until the clock says stop; true once the tile is ready
+function mapHdStep(t,until){
+  const k=t.k, O=ovOf(k); if(!O.done||!O.img) return false;
+  if(!t.img){ t.cv=mkCanvas(MHD.N,MHD.N); t.img=t.cv.getContext('2d').createImageData(MHD.N,MHD.N); mapHdFlags(t,O); t.ms=0; }
+  const N=MHD.N, d=t.img.data, od=O.img.data, ow=O.w, oh=O.h, sp=t.sp, E=mapHdElv(k), eg=E&&E.G, px=[0,0,0], t0=mhdNow();
+  let rows=0;
+  while(t.row<N){
+    const j=t.row, wy=t.y0+(j+0.5)*sp, v=(wy-O.y0)/25-0.5; let J=Math.floor(v); J=J<0?0:J>oh-2?oh-2:J; const fy=clamp(v-J,0,1), fr=(J-t.J0)*t.fw;
+    const rowPaths=eg?E.paths.filter(p=>wy>=p.bb[1]&&wy<=p.bb[3]):ML_EMPTY;
+    for(let i=0;i<N;i++){
+      const wx=t.x0+(i+0.5)*sp, u=wx/25-0.5; let I=Math.floor(u); I=I<0?0:I>ow-2?ow-2:I; const fx=clamp(u-I,0,1), kk=(j*N+i)*4;
+      if(t.fl[fr+I-t.I0]){ mapHdPix(k,wx,wy,E,eg,rowPaths,px); d[kk]=px[0]; d[kk+1]=px[1]; d[kk+2]=px[2]; MHD.stats.full++; }
+      else{
+        const a=(J*ow+I)*4, b=a+4, c=a+ow*4, e=c+4, w00=(1-fx)*(1-fy), w10=fx*(1-fy), w01=(1-fx)*fy, w11=fx*fy;
+        d[kk]=od[a]*w00+od[b]*w10+od[c]*w01+od[e]*w11; d[kk+1]=od[a+1]*w00+od[b+1]*w10+od[c+1]*w01+od[e+1]*w11; d[kk+2]=od[a+2]*w00+od[b+2]*w10+od[c+2]*w01+od[e+2]*w11;
+      }
+      d[kk+3]=255;
+    }
+    t.row++; rows++; MHD.stats.px+=N;
+    if(mhdNow()>until||rows>=N) break;
+  }
+  t.ms+=mhdNow()-t0;
+  if(t.row>=N){ t.cv.getContext('2d').putImageData(t.img,0,0); t.img=null; t.fl=null; t.ready=true; MHD.stats.built++; MHD.stats.ms+=t.ms; }
+  return t.ready;
+}
+// the worker (from overviewStep, every frame while the map is open): the wanted tiles, a few ms a frame, once the
+// view has been still for MHD.settle ms; one redraw when a tile is done
+function mapHdWork(){
+  if(!MHD.want.length||mhdNow()-MHD.moved<MHD.settle) return;
+  const until=mhdNow()+MHD.budget; let done=0;
+  while(MHD.want.length&&mhdNow()<until){
+    const t=MHD.want[0];
+    if(t.ready||t.gen!==mhdGen()){ MHD.want.shift(); continue; }
+    if(!MHD.tiles.has(t.key)){ MHD.tiles.set(t.key,t); mapHdTrim(); }
+    if(!mapHdStep(t,until)) break;
+    MHD.want.shift(); done++;
+  }
+  if(done&&scene==='map') drawMapScreen();
+}
+function mapHdTrim(){ while(MHD.tiles.size>MHD.cap) MHD.tiles.delete(MHD.tiles.keys().next().value); }
+// the fog: smooth, drawn over the ground; one canvas per map, built again when Ash has explored more, the zoom wants
+// more detail, or the look changes (Storybook fog is parchment, Classic is dark)
+const MHD_BW=[];
+function mapHdFogW(sub){
+  if(MHD_BW[sub]) return MHD_BW[sub];
+  const W=[];
+  for(let p=0;p<sub;p++){ let u=(p+0.5)/sub-0.5, off=0; if(u<0){ u+=1; off=-1; } const t=u, t2=t*t, t3=t2*t;
+    W.push({off,w:[(1-t)*(1-t)*(1-t)/6,(3*t3-6*t2+4)/6,(-3*t3+3*t2+3*t+1)/6,t3/6]}); }
+  return (MHD_BW[sub]=W);
+}
+function mapHdFog(k,F){
+  const FG=fogOf(k); if(!FG||!FG.bits) return null;
+  const bits=FG.bits, cw=FG.w, ch=FG.h, sub=F.s*25<=4?4:8, sb=!!(typeof LOOK!=='undefined'&&LOOK.sb);
+  let h=0, n=0, i0=cw, i1=-1, j0=ch, j1=-1;
+  for(let j=0;j<ch;j++){ const o=j*cw; for(let i=0;i<cw;i++) if(bits[o+i]){ h=(Math.imul(h,31)+o+i)|0; n++; if(i<i0) i0=i; if(i>i1) i1=i; if(j<j0) j0=j; if(j>j1) j1=j; } }
+  const key=sub+'|'+sb+'|'+n+'|'+h+'|'+cw+'x'+ch;
+  let C=MHD.fog[k];
+  if(C&&C.key===key) return C;
+  const W=cw*sub, H=ch*sub;
+  if(!C||C.cv.width!==W||C.cv.height!==H){ C={cv:mkCanvas(W,H)}; MHD.fog[k]=C; }
+  const g=C.cv.getContext('2d'), col=sb?[232,212,168]:[18,13,10], A=235;
+  C.key=key; C.w=cw; C.h=ch; C.cs=FG.cs; C.sub=sub;
+  g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H); g.fillStyle=`rgba(${col[0]},${col[1]},${col[2]},${A/255})`; g.fillRect(0,0,W,H);
+  if(!n) return C;
+  // the field is only non-zero within two cells of an explored one
+  const ci0=Math.max(0,i0-2), ci1=Math.min(cw-1,i1+2), cj0=Math.max(0,j0-2), cj1=Math.min(ch-1,j1+2);
+  const X0=ci0*sub, X1=(ci1+1)*sub, Y0=cj0*sub, Y1=(cj1+1)*sub, RW=X1-X0, RH=Y1-Y0, Wt=mapHdFogW(sub);
+  const bit=(i,j)=>i<0||j<0||i>=cw||j>=ch?0:bits[j*cw+i];
+  // across: each cell row to RW samples
+  const hz=new Float32Array((cj1-cj0+5)*RW);
+  for(let j=cj0-2;j<=cj1+2;j++){ const ro=(j-cj0+2)*RW;
+    for(let X=X0;X<X1;X++){ const i=Math.floor(X/sub), q=Wt[X-i*sub], ib=i+q.off-1;
+      hz[ro+X-X0]=q.w[0]*bit(ib,j)+q.w[1]*bit(ib+1,j)+q.w[2]*bit(ib+2,j)+q.w[3]*bit(ib+3,j); } }
+  // down: the field, then the soft edge (0.32 to 0.68 of the field)
+  const img=g.createImageData(RW,RH), d=img.data;
+  for(let Y=Y0;Y<Y1;Y++){ const j=Math.floor(Y/sub), q=Wt[Y-j*sub], jb=j+q.off-1, w=q.w, o=(Y-Y0)*RW*4;
+    const r0=(jb-cj0+2)*RW, r1=r0+RW, r2=r1+RW, r3=r2+RW;
+    for(let x=0;x<RW;x++){
+      const v=w[0]*hz[r0+x]+w[1]*hz[r1+x]+w[2]*hz[r2+x]+w[3]*hz[r3+x];
+      let e=(v-0.32)/0.36; e=e<0?0:e>1?1:e*e*(3-2*e);
+      const p=o+x*4; d[p]=col[0]; d[p+1]=col[1]; d[p+2]=col[2]; d[p+3]=A*(1-e);
+    }
+  }
+  g.putImageData(img,X0,Y0);
+  return C;
+}
+// the ground and the fog of map k as fitted by F (drawMapScreen in a12b_ui.js calls this); also lists the tiles
+// this view still wants
+function mapHdGround(g,k,F){
+  const M=MAPS[k]||MAPS[0], O=ovOf(k), L=mapHdLevel(F);
+  if(O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,F.ox,F.oy,F.w,F.h); }
+  const view=k+'|'+L+'|'+Math.round(F.ox)+'|'+Math.round(F.oy)+'|'+F.s.toFixed(5);
+  if(view!==MHD.view){ MHD.view=view; MHD.moved=mhdNow(); }
+  MHD.want.length=0; MHD.lvl=L;
+  if(L>0&&O.done){
+    const FG=fogOf(k), wx0=Math.max(0,-F.ox/F.s), wx1=Math.min(M.w,(F.cw-F.ox)/F.s), wy0=Math.max(0,-F.oy/F.s), wy1=Math.min(M.h,(F.ch-F.oy)/F.s);
+    const cx=(wx0+wx1)/2, cy=(wy0+wy1)/2, gen=mhdGen();
+    g.save(); g.beginPath(); g.rect(F.ox,F.oy,F.w,F.h); g.clip(); g.imageSmoothingEnabled=true;
+    const drawLvl=(l,list)=>{
+      const span=MHD.N*25/(1<<l), tx0=Math.floor(wx0/span), tx1=Math.floor((wx1-0.01)/span), ty0=Math.floor(wy0/span), ty1=Math.floor((wy1-0.01)/span);
+      let all=true;
+      for(let ty=ty0;ty<=ty1;ty++) for(let tx=tx0;tx<=tx1;tx++){
+        const key=k+':'+l+':'+tx+':'+ty, t=MHD.tiles.get(key);
+        if(t&&t.ready&&t.gen===gen){
+          MHD.tiles.delete(key); MHD.tiles.set(key,t);   // the least recently drawn are dropped first
+          const ax=Math.round(F.ox+tx*span*F.s), ay=Math.round(F.oy+ty*span*F.s), bx=Math.round(F.ox+(tx+1)*span*F.s), by=Math.round(F.oy+(ty+1)*span*F.s);
+          g.drawImage(t.cv,ax,ay,bx-ax,by-ay);
+        }else if(mapHdSeen(FG,tx*span,M.y0+ty*span,(tx+1)*span,M.y0+(ty+1)*span)){ all=false; if(list) list.push(mapHdTile(k,l,tx,ty)); }
+      }
+      return all;
+    };
+    // the wanted level first (to know what is missing), then the levels below fill the gaps, then the wanted level on top
+    const wantL=[], all=drawLvl(L,wantL);
+    if(!all){ for(let l=1;l<L;l++) drawLvl(l,null); drawLvl(L,null); }
+    g.restore();
+    const span=MHD.N*25/(1<<L);
+    wantL.sort((a,b)=>dist2(a.x0+span/2,a.y0-M.y0+span/2,cx,cy)-dist2(b.x0+span/2,b.y0-M.y0+span/2,cx,cy));
+    MHD.want=wantL;
+  }
+  const C=mapHdFog(k,F);
+  if(C){ g.imageSmoothingEnabled=true; g.drawImage(C.cv,F.ox,F.oy,C.w*C.cs*F.s,C.h*C.cs*F.s); }
+}
+
+// ---------- (v12) the legend names a kind of marker only once the map has shown one on this journey (Drew: the
+// story should not spill its mysteries; "Ward burning" and "Ward dark" were there from the first minute). drawMapScreen
+// calls mapLeg(kind) as it draws each marker (the Wards only after Yara's lore), and mapLegSync shows the entries;
+// G.mapLeg is saved with the journey. "You" is always there; the dungeon page shows only "You".
+function mapLeg(kind){ if(!G) return; const L=G.mapLeg||(G.mapLeg={}); if(!L[kind]) L[kind]=1; }
+function mapLegSync(){
+  const el=document.getElementById('mapLegend'); if(!el) return;
+  const L=(G&&G.mapLeg)||{}, dun=MAPUI.view===-1;
+  for(const s of el.querySelectorAll('[data-k]')){ const k=s.dataset.k, on=k==='you'||(!dun&&!!L[k]); if(s.hidden===on) s.hidden=!on; }
+}
 
 // ---------- towns on new maps: names, music, events, house look, homes
 const TOWNS={}, TOWN_ORDER=[];
@@ -641,17 +851,17 @@ function mapEvict(keep){
 { const base=update; update=function(dt){ mapTick(); return base(dt); }; }
 
 // ---------- saves: fog for every map (bit packed), the maps Ash has found
-{ const base=newRun; newRun=function(mode){ base(mode); G.mapsSeen={0:true}; MAPST.cur=curMap(); }; }
+{ const base=newRun; newRun=function(mode){ base(mode); G.mapsSeen={0:true}; G.mapLeg={}; MAPST.cur=curMap(); }; }
 { const base=saveData; saveData=function(){
   const s=base(), fm={};
   for(const M of MAPS) if(M&&M.k>0&&M.fogBits&&M.fogBits.indexOf(1)>=0) fm[M.k]=fogPack(M.fogBits);
-  s.fogM=fm; s.maps=Object.assign({},G.mapsSeen||{0:true});
+  s.fogM=fm; s.maps=Object.assign({},G.mapsSeen||{0:true}); s.mapLeg=Object.assign({},G.mapLeg||{});
   return s;
 }; }
 { const base=loadGame; loadGame=function(s){
   base(s);
   if(s.fogM) for(const k in s.fogM){ const F=fogOf(+k); if(F) fogUnpack(s.fogM[k],F.bits); }
-  G.mapsSeen=Object.assign({0:true},s.maps||{});
+  G.mapsSeen=Object.assign({0:true},s.maps||{}); G.mapLeg=Object.assign({},s.mapLeg||{});
   const k=mapAt(s.y||0); if(s.x<IZX-50) G.mapsSeen[k]=true;
 }; }
 
@@ -740,4 +950,12 @@ defineMap(4,{id:'nightfall',name:'Nightfall Peak',placeholder:true,music:'night'
     {id:'pm_bridge_4',x:4500,y:90750,to:{x:12600,y:65400},label:'Cross back to Moonfall',name:'The Moonfire Bridge',kind:'bridge',dir:Math.PI/2}
   ]});
 window.__ebDbg=Object.assign(window.__ebDbg||{},{mapZ:{MAPZ,zm:()=>JSON.parse(JSON.stringify(MAPUI.zm,(k,v)=>k==='f'?undefined:v)),zoomOf:k=>mapZoomOf(k),zmax:k=>mapZMax(k==null?MAPUI.view:k),fit:k=>{ const F=mapFit(k==null?MAPUI.view:k); return {s:F.s,ox:F.ox,oy:F.oy,w:F.w,h:F.h,cw:F.cw,ch:F.ch,y0:F.y0}; },
-  inv:(x,y)=>mapInv(x,y),btn:d=>mapZBtn(d),pan:(dx,dy)=>mapPan(dx,dy),pad:(s,dt)=>{ const r=document.getElementById('mapov'); return padMenu(r,s,dt||0.016); },open:()=>openMap(),sel:()=>mapSel?mapSel.id:null}});
+  inv:(x,y)=>mapInv(x,y),btn:d=>mapZBtn(d),pan:(dx,dy)=>mapPan(dx,dy),pad:(s,dt)=>{ const r=document.getElementById('mapov'); return padMenu(r,s,dt||0.016); },open:()=>openMap(),sel:()=>mapSel?mapSel.id:null,
+  draw:()=>drawMapScreen(),centre:(x,y,z)=>mapZCentre(x,y,z)},
+  // (v12) the sharp map: its state, its knobs, and how far a tile built the cheap way is from one sampled everywhere
+  mapHD:{MHD,state:()=>{ let ready=0; for(const t of MHD.tiles.values()) if(t.ready) ready++; return {lvl:MHD.lvl,want:MHD.want.length,tiles:MHD.tiles.size,ready,stats:Object.assign({},MHD.stats),fog:Object.keys(MHD.fog).map(k=>MHD.fog[k]&&MHD.fog[k].key),legend:Object.assign({},G&&G.mapLeg||{})}; },
+    clear:()=>{ MHD.tiles.clear(); MHD.want.length=0; MHD.fog={}; MHD.stats={built:0,px:0,full:0,ms:0}; },
+    err(k,L,tx,ty){ const one=full=>{ const was=MHD.full; MHD.full=full; const M=MAPS[k]||MAPS[0], sp=25/(1<<L), span=MHD.N*sp, t={key:'test',k,L,tx,ty,sp,x0:tx*span,y0:M.y0+ty*span,span,row:0,ready:false,cv:null,img:null,fl:null,gen:mhdGen()}; const t0=mhdNow(); mapHdStep(t,1e18); MHD.full=was; if(!t.ready) return null; return {d:t.cv.getContext('2d').getImageData(0,0,MHD.N,MHD.N).data,ms:mhdNow()-t0,n:t.nFlag}; };
+      const a=one(false), b=a&&one(true); if(!b) return null; let sum=0, mx=0, big=0; for(let i=0;i<a.d.length;i+=4) for(let q=0;q<3;q++){ const e=Math.abs(a.d[i+q]-b.d[i+q]); sum+=e; if(e>mx) mx=e; if(e>24) big++; }
+      return {mean:sum/(a.d.length*0.75),max:mx,big,flagged:a.n,msCheap:a.ms,msFull:b.ms}; },
+    benchPix(n){ n=n||20000; const E=mapHdElv(0), eg=E&&E.G, px=[0,0,0], t0=mhdNow(); for(let i=0;i<n;i++){ const x=2000+(i*37)%9000, y=3200+(i*53)%7000; mapHdPix(0,x,y,E,eg,eg?E.paths.filter(p=>y>=p.bb[1]&&y<=p.bb[3]):ML_EMPTY,px); } const a=(mhdNow()-t0)/n*1000; const t1=mhdNow(), o={}; for(let i=0;i<n;i++){ T(2000+(i*37)%9000,3200+(i*53)%7000,o); } const b=(mhdNow()-t1)/n*1000; const t2=mhdNow(); for(let i=0;i<n;i++){ const x=2000+(i*37)%9000, y=3200+(i*53)%7000; T(x,y,o); groundRGB(o,x,y); } return {pix_us:a,T_us:b,Tg_us:(mhdNow()-t2)/n*1000,paths:E?E.paths.length:0}; }}});
