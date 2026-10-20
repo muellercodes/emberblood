@@ -598,18 +598,23 @@ function mapHdGround(g,k,F){
       return all;
     };
     // the wanted level first (to know what is missing), then the levels below fill the gaps, then the wanted level on top
-    const wantL=[], all=drawLvl(L,wantL);
-    if(!all){ for(let l=1;l<L;l++) drawLvl(l,null); drawLvl(L,null); }
-    g.restore();
+    const wantL=[];
+    try{ const all=drawLvl(L,wantL); if(!all){ for(let l=1;l<L;l++) drawLvl(l,null); drawLvl(L,null); } } finally{ g.restore(); }
     const span=MHD.N*25/(1<<L);
     wantL.sort((a,b)=>dist2(a.x0+span/2,a.y0-M.y0+span/2,cx,cy)-dist2(b.x0+span/2,b.y0-M.y0+span/2,cx,cy));
     MHD.want=wantL;
   }
   const C=mapHdFog(k,F);
-  if(C){ g.imageSmoothingEnabled=true; g.drawImage(C.cv,F.ox,F.oy,C.w*C.cs*F.s,C.h*C.cs*F.s); }
-  else{ const FG=fogOf(k), c=fogCanvas(k), cg=c.getContext('2d'), img=cg.createImageData(FG.w,FG.h);   // (never expected: the old blocky fog)
-    for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
-    cg.putImageData(img,0,0); g.drawImage(c,F.ox,F.oy,FG.w*FG.cs*F.s,FG.h*FG.cs*F.s); }
+  if(C){ g.imageSmoothingEnabled=true; g.drawImage(C.cv,F.ox,F.oy,C.w*C.cs*F.s,C.h*C.cs*F.s); } else mapOldFog(g,k,F);
+}
+// the map as it was drawn before (the overview and a fog of whole cells): only if something above fails, so the fog
+// never goes missing and shows what Ash has not found
+function mapOldFog(g,k,F,ground){
+  const O=ovOf(k), FG=fogOf(k); if(ground&&O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,F.ox,F.oy,F.w,F.h); }
+  if(!FG||!FG.bits) return;
+  const c=fogCanvas(k), cg=c.getContext('2d'), img=cg.createImageData(FG.w,FG.h);
+  for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
+  cg.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(c,F.ox,F.oy,FG.w*FG.cs*F.s,FG.h*FG.cs*F.s);
 }
 
 // ---------- (v12) the legend names a kind of marker only once the map has shown one on this journey (Drew: the

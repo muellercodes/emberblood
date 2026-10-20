@@ -667,7 +667,7 @@ function drawMapScreen(){
   // (v12) the canvas fills the map frame now: around the whole map it is the frame's own colour, as it was
   g.setTransform(1,0,0,1,0,0); g.fillStyle=LOOK.sb?'#e9d6ac':'#0e0a08'; g.fillRect(0,0,w,h);
   // (v12) the ground, sharp at any zoom, and the fog with a smooth edge (e1_maps.js mapHdGround)
-  try{ mapHdGround(g,V,MF); }catch(e){ console.error(e); if(O.cv) g.drawImage(O.cv,MF.ox,MF.oy,MF.w,MF.h); }
+  try{ mapHdGround(g,V,MF); }catch(e){ console.error(e); mapOldFog(g,V,MF,true); }
   const seen=(x,y)=>fogSeen(V,x,y), leg=mapLeg;
   g.textAlign='center'; g.textBaseline='middle';
   if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(Math.max(0,MF.ox),wy); g.lineTo(Math.min(w,MF.ox+MF.w),wy); g.stroke(); }
