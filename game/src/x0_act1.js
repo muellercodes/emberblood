@@ -382,7 +382,8 @@ ELEV.noFly({disc:[A1W.gloam.x,A1W.gloam.y,A1W.gloam.r+60],why:S('The bog mist is
 // (v12 R1) the word "Trial" comes from Ember, inside: until Ash has been in (or Ember has named the next door at the end
 // of the last one), the door and the sign by each one say what a passer-by sees (a2h_dungeons.js builds them)
 const A1_FOLK={leap:S('old rooted arch','rooted arch'),tide:S('shell doors','shell doors'),sky:S('white gate','white gate')};
-const a1TrialKnown=id=>!G||G.mode!=='story'||!!(G.found&&G.found['seen_'+id])||(id==='tide'&&!!G.flags.trial_leap_boss)||(id==='sky'&&!!G.flags.trial_tide_boss);
+// (old saves have no seen_ flag: a trial already beaten, or its gift already in Ash's blood, counts as known)
+const a1TrialKnown=id=>!G||G.mode!=='story'||!!(G.found&&G.found['seen_'+id])||!!(G.flags&&G.flags['trial_'+id+'_boss'])||(id==='tide'&&!!G.flags.trial_leap_boss)||(id==='sky'&&!!G.flags.trial_tide_boss)||!!(TRIALS[id]&&TRIALS[id].abil&&typeof hasAbil==='function'&&hasAbil(TRIALS[id].abil));
 function a1TrialFolk(){
   for(const id in A1_FOLK){ const T=TRIALS[id]; if(!T) continue; const f=A1_FOLK[id];
     const D=DOORS.find(d=>d.trial===id), Lm=LANDMARKS.find(l=>l.id==='tsign_'+id);
