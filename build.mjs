@@ -20,6 +20,8 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   'x3_world','x3_people','x3_foes','x3_story','x3_dun_a','x3_dun_b',
   // Finale, Nightfall Peak
   'x4_world','x4_foes','x4_story','x4_ascent',
+  // items (v12 wave 7): the registry, consumables, boosts and shop supplies
+  'e11_items',
   'x9_music','x9_music2',
   // hidden cheats for Drew (wraps the game once everything has loaded)
   'z1_cheats',
