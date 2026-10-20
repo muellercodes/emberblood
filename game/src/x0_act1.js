@@ -1347,7 +1347,7 @@ window.__ebA1={A1,A1W,
 // A timber palisade runs along the north edge of the village (x0..x1 at y) with two gateways: the North Gate on the War
 // Camp road (ROADS[0] passes 2800,8800) and the Frostpine Gate on the Frostpine road (ROADS[5]).
 const A1V={wall:{y:8792,x0:1950,x1:3262,th:10,seg:44},
-  gates:{west:{x:2386,hw:50,sign:'FROSTPINE GATE'},north:{x:2800,hw:52,sign:'NORTH GATE'}},
+  gates:{west:{id:'frost',x:2386,hw:50,sign:'FROSTPINE GATE'},north:{id:'north',x:2800,hw:52,sign:'NORTH GATE'}},
   // the bootprints: from the Hollow Ward under the old oak, up the War Camp road to the North Gate
   prints:[[2580,9128],[2650,9112],[2710,9068],[2734,8996],[2758,8916],[2780,8846],[2798,8806]],
   icehole:{x:1210,y:3580}, osric:null};
@@ -1373,9 +1373,8 @@ function a1VBuild(){
   run(x,W.x1);
   for(const ex of [W.x0,W.x1]){ addCol({t:'c',x:ex,y:W.y,r:17}); a1Tall(ex,W.y+1,()=>a1Put(a1EndSpr(),ex,W.y),()=>true); }
   for(const g of gs){ REACH.clear.push({x:g.x,y:W.y+10,r:g.hw+70}); a1Tall(g.x,W.y,()=>a1DrawGate(g),()=>true); }
-  // the North Gate shut (before the raid): the doors close the gap
-  const N=A1V.gates.north, shut=addCol({t:'r',x0:N.x-N.hw,y0:W.y-8,x1:N.x+N.hw,y1:W.y+8});
-  Object.defineProperty(shut,'off',{get:()=>a1GateState()!=='shut',set(){},configurable:true});
+  // (the doors that close each gateway, and how they open, are section 20b's: a1GBuild)
+  const N=A1V.gates.north;
   a1Lm({id:'a1_ngate',x:N.x+N.hw+30,y:W.y+28,r:0,prompt:()=>G?S('Look at the North Gate','Look at the gate'):'',act:a1GateLook});
   // the bootprints run from the Ward to the gate now (drawn on the ground by a1VGround; the stock nine are not drawn)
   const bp=LANDMARKS.find(o=>o.id==='bootprints'); if(bp) bp.draw=()=>{};
@@ -1389,7 +1388,8 @@ function a1GateLook(){
   if(st==='shut') a1say([xl('narr',`The North Gate, shut and locked for Lantern Day. The road beyond it runs north into the woods. Kobold country.`,`The North Gate. Shut and locked for Lantern Day.`)]);
   else if(st==='broken') a1say([xl('narr',`The North Gate hangs open. One door lies in the mud, covered in claw marks.`,`The gate hangs open. One door lies in the mud.`),
     xl('narr',`But the padlock isn't broken at all. It hangs open on its hook. Somebody unlocked it with a key.`,`The padlock is not broken. Someone used a key!`)]);
-  else a1say([xl('narr',`The North Gate has new doors and a brand new padlock, shiny as a new coin. Nobody is leaving this gate open again.`,`New doors and a shiny new padlock!`)]);
+  else if(!a1GOpen(A1G.by.north)) a1say([xl('narr',`The North Gate has new doors and a brand new padlock, shiny as a new coin. Nobody is leaving this gate open again.`,`New doors and a shiny new padlock!`)]);
+  else a1say([xl('narr',`The North Gate has new doors and a brand new padlock, shiny as a new coin. And it's standing wide open. Oops.`,`New doors, a shiny padlock, and the gate is wide open. Oops!`)]);
 }
 // the raid comes in through the North Gate: half the kobolds pour in at the gate, the rest are already in the streets
 { const base=spawnRaid; spawnRaid=function(n){
@@ -1490,11 +1490,31 @@ function a1GateSpr(gd,state){ const hw=gd.hw, W=2*hw+72;
     g.fillStyle='#5a3a20'; g.fillRect(-hw-20,-98,2*hw+40,10); g.fillStyle='rgba(255,210,150,.3)'; g.fillRect(-hw-20,-98,2*hw+40,2.4);
     const tw=Math.max(70,gd.sign.length*6.6+12); g.fillStyle='#6a4428'; rrect(g,-tw/2,-92,tw,15,3); g.fill(); g.fillStyle='#ecdcb8'; g.font=`900 9px ${UIF}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText(gd.sign,0,-84.5);
   }); }
-function a1DrawGate(gd){
-  const st=gd===A1V.gates.north?a1GateState():'open', y=A1V.wall.y;
-  a1Put(a1GateSpr(gd,st),gd.x,y);
-  if(st==='fixed'){ const a=0.5+0.5*Math.sin(G.time*3.2), gx=gd.x+gd.hw+5, gy=y-27; glowAt(gx,gy,12+a*6,'255,226,120',0.35+0.35*a); if(a>0.85){ ctx.fillStyle='rgba(255,255,240,.95)'; ctx.fillRect(gx-0.8,gy-5,1.6,10); ctx.fillRect(gx-5,gy-0.8,10,1.6); } }
+// a gateway on an east-west run (the North, Frostpine and Pond Gates): its doors as they stand now (section 20b), then
+// the stone posts, the beam and the name board over them. The broken North Gate keeps its one cached picture.
+// (faded: the Pond Gate's wall piece fades it already; the north run's gates fade here when Ash is just behind them)
+function a1DrawGate(gd,faded){
+  const G1=A1G.by[gd.id], st=gd.id==='north'?a1GateState():'gate', y=G1?G1.y:A1V.wall.y;
+  const a=faded?1:a1GFadeEW(G1||{x:gd.x,y,hw:gd.hw}); if(a<1){ ctx.save(); ctx.globalAlpha*=a; }
+  try{
+    if(st==='broken'||!G1) a1Put(a1GateSpr(gd,st==='broken'?'broken':'open'),gd.x,y);
+    else{
+      ctx.fillStyle='rgba(40,26,14,.25)'; ctx.beginPath(); ctx.ellipse(gd.x,y+3,gd.hw+34,7,0,0,TAU); ctx.fill();
+      a1GDrawDoors(G1);
+      if(st==='shut'){ const k=a1GJig(G1)*2; ctx.save(); ctx.translate(gd.x+k,y); ctx.fillStyle='#3a3a42'; ctx.fillRect(-7,-30,14,4); a1Padlock(ctx,0,-27,'#4a4a52','#8a8a96',false); ctx.restore(); }
+      a1Put(a1GateFrameSpr(gd),gd.x,y);
+      if(st==='fixed'){ ctx.save(); ctx.translate(gd.x,y); ctx.fillStyle='#2e2e36'; ctx.fillRect(gd.hw+1,-39,7,3); a1Padlock(ctx,gd.hw+5,-33,'#e0a83a','#fff2b0',true,1.8); ctx.restore(); }
+    }
+    if(st==='fixed'){ const a=0.5+0.5*Math.sin(G.time*3.2), gx=gd.x+gd.hw+5, gy=y-27; glowAt(gx,gy,12+a*6,'255,226,120',0.35+0.35*a); if(a>0.85){ ctx.fillStyle='rgba(255,255,240,.95)'; ctx.fillRect(gx-0.8,gy-5,1.6,10); ctx.fillRect(gx-5,gy-0.8,10,1.6); } }
+  } finally { if(a<1) ctx.restore(); }
 }
+// the stone posts, the beam and the name board of an east-west gateway (no doors: those swing, so they are drawn live)
+function a1GateFrameSpr(gd){ const hw=gd.hw, W=2*hw+72;
+  return a1Spr('a1_gatef_'+gd.sign,W,170,W/2,118,g=>{
+    for(const s of [-1,1]) a1StonePost(g,s*(hw+12),24,84);
+    g.fillStyle='#5a3a20'; g.fillRect(-hw-20,-98,2*hw+40,10); g.fillStyle='rgba(255,210,150,.3)'; g.fillRect(-hw-20,-98,2*hw+40,2.4);
+    const tw=Math.max(70,gd.sign.length*6.6+12); g.fillStyle='#6a4428'; rrect(g,-tw/2,-92,tw,15,3); g.fill(); g.fillStyle='#ecdcb8'; g.font=`900 9px ${UIF}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText(gd.sign,0,-84.5);
+  }); }
 function a1DrawGatePrints(t){
   if(!(reached('lore')&&a1GateState()==='broken')||!inView(2690,8967,260)) return;
   const P=A1V.prints; let k=0; ctx.save();
@@ -1570,6 +1590,7 @@ function a1WallBuild(){
     if(i>0){ a1WallCol({t:'c',x:ax,y:ay,r:17}); a1WallPiece(ax,ay+1,()=>a1Put(a1EndSpr(),ax,ay),20); REACH.clear.push({x:ax,y:ay,r:60}); }
   }
   for(const g of A.gates) a1WallGate(g);
+  a1GBuild();
   // the Bramble Pond sign steps out of the Pond Gate's way, to the side of the path down to the water
   const s=LANDMARKS.find(o=>o.id==='rc_bramblesign'); if(s){ s.x=A.sign[0]; s.y=A.sign[1]; if(s.colRef){ removeCol(s.colRef); s.colRef=addCol({t:'c',x:s.x,y:s.y,r:s.r||8}); } }
   mapListsReset();
@@ -1605,38 +1626,284 @@ function a1BaySpr(ang,st,m,vr,key){
     if(Math.abs(ux)>0.35) for(const ry of [-37,-16]){ g.strokeStyle='#5a3a20'; g.lineWidth=4.5; g.beginPath(); g.moveTo(ax,ay+ry+2.2); g.lineTo(bx,by+ry+2.2); g.stroke();
       g.strokeStyle='rgba(255,210,150,.25)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(ax,ay+ry+0.6); g.lineTo(bx,by+ry+0.6); g.stroke(); }
   }); }
-// a gateway: stone posts each side (colliders), open doors; east-west runs reuse the North Gate's own art
+// a gateway: stone posts each side (colliders); east-west runs reuse the North Gate's own frame, the doors are 20b's
 function a1WallGate(g){
-  const ew=Math.abs(g.uy)<0.3, d=g.hw+12, V=POI.village;
+  const ew=Math.abs(g.uy)<0.3, d=g.hw+12;
   const posts=[[g.x-g.ux*d,g.y-g.uy*d],[g.x+g.ux*d,g.y+g.uy*d]];
   for(const [x,y] of posts) a1WallCol({t:'c',x,y,r:14});
   REACH.clear.push({x:g.x,y:g.y+10,r:g.hw+70});
-  if(ew){ a1WallPiece(g.x,g.y,()=>a1Put(a1GateSpr(g,'open'),g.x,g.y),g.hw+28); return; }
-  // a side gate on a north-south run: two posts, the doors standing open against the inside of the wall, and the
-  // gate's name on a board on top of the south post, where you can read it
-  const [N,Sp]=posts[0][1]<posts[1][1]?posts:[posts[1],posts[0]], inw=Math.sign(V.x-g.x)||1;
+  if(ew){ a1WallPiece(g.x,g.y,()=>a1DrawGate(g,true),g.hw+28); return; }
+  // a side gate on a north-south run: two posts and the gate's name on a board on top of the north one (v12: the south
+  // post hid the shut doors). Its two doors (shut across the gap, or swung open against the inside of the wall) are
+  // drawn live, 20b.
+  const [N,Sp]=posts[0][1]<posts[1][1]?posts:[posts[1],posts[0]];
   a1WallPiece(N[0],N[1],()=>a1Put(a1SidePostSpr(g,0),N[0],N[1]),18);
-  a1WallPiece(N[0],N[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),N[0],N[1]+2));
-  a1WallPiece(Sp[0],Sp[1]+2,()=>a1Put(a1SideDoorSpr(g.hw,inw),Sp[0],Sp[1]+2));
   a1WallPiece(Sp[0],Sp[1]+3,()=>a1Put(a1SidePostSpr(g,1),Sp[0],Sp[1]),18);
 }
 function a1SidePostSpr(g,south){
   return a1Spr('a1w_post_'+g.id+'_'+south,130,130,65,118,gg=>{
     gg.fillStyle='rgba(40,26,14,.25)'; gg.beginPath(); gg.ellipse(2,3,20,7,0,0,TAU); gg.fill();
-    a1StonePost(gg,0,24,84);
-    if(!south) return;
-    gg.fillStyle='#4a2e18'; gg.fillRect(-2,-100,4,10); gg.fillRect(-26,-100,52,3);
-    const tw=Math.max(70,g.sign.length*6.6+12); gg.fillStyle='#6a4428'; rrect(gg,-tw/2,-113,tw,15,3); gg.fill(); gg.fillStyle='rgba(255,224,170,.25)'; gg.fillRect(-tw/2+3,-112,tw-6,1.6);
-    gg.fillStyle='#ecdcb8'; gg.font=`900 9px ${UIF}`; gg.textAlign='center'; gg.textBaseline='middle'; gg.fillText(g.sign,0,-105.5);
+    // (v12) lower than the north run's posts, so the doors shut between them show over the south one
+    a1StonePost(gg,0,24,62);
+    if(south) return;
+    gg.fillStyle='#4a2e18'; gg.fillRect(-2,-78,4,10); gg.fillRect(-26,-78,52,3);
+    const tw=Math.max(70,g.sign.length*6.6+12); gg.fillStyle='#6a4428'; rrect(gg,-tw/2,-91,tw,15,3); gg.fill(); gg.fillStyle='rgba(255,224,170,.25)'; gg.fillRect(-tw/2+3,-90,tw-6,1.6);
+    gg.fillStyle='#ecdcb8'; gg.font=`900 9px ${UIF}`; gg.textAlign='center'; gg.textBaseline='middle'; gg.fillText(g.sign,0,-83.5);
   }); }
-function a1SideDoorSpr(hw,inw){ return a1Spr('a1w_door_'+hw+'_'+inw,hw*2+40,70,hw+20,60,g=>{
-  const x=inw<0?-12-hw:12;
-  g.fillStyle='rgba(40,26,14,.22)'; g.fillRect(x+2,-1,hw,6);
-  a1DoorFace(g,x,hw,48,'#6e4a2c'); g.fillStyle='rgba(255,224,170,.2)'; g.fillRect(x,-48,hw,2);
-}); }
 // draw every piece in view, sorted with the characters (in every mode, as its colliders are there in every mode).
 // A piece in front of Ash (he is just north of it, inside the south wall) is drawn see-through, as roofs are, so the
 // logs never hide him: along the south run he was gone behind them.
 function a1WallFade(q){ const p=player; if(!q.hx||!p||p.dead) return 1; const dy=q.y-p.y; return dy>2&&dy<64&&Math.abs(p.x-q.cx)<q.hx+12?0.42:1; }
 { const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1WALL.pieces.length) return; for(const q of A1WALL.pieces){ if(!inView(q.x,q.y,260)) continue; const a=a1WallFade(q); list.push({x:q.x,y:q.y,draw:a<1?()=>{ ctx.save(); ctx.globalAlpha*=a; try{ q.draw(); } finally { ctx.restore(); } }:q.draw}); } }catch(e){ console.error('a1 wall',e); } }; }
 window.__ebA1.wall.A1WALL=A1WALL; window.__ebA1.wall.off=on=>{ for(const c of A1WALL.cols) c.off=!!on; return A1WALL.cols.length; };
+
+// ---------- 20b. v12: Emberhollow's gates are shut until someone opens them
+// Drew: "Have them all be closed and only one is opened/damaged when the kobold attack happens. Then only open or close
+// the rest when Ash actually interacts with them." Every gate in the wall (the North, Frostpine, Brindle, Pond and Field
+// Gates) starts shut, in a new game and in an old save alike. Ash opens or closes one with the action key from either
+// side ("Open the gate" or "Close the gate"; on touch SLASH says OPEN or CLOSE). The doors swing over a moment with a
+// wooden creak, and each gate remembers how he left it in G.flags (a1_gopen_<id>, 1 = open). The North Gate keeps its
+// story: shut and locked before the raid (Ash only gets its look line), broken open by the kobolds from the raid until
+// the mystery is solved, then mended with new doors and a shiny padlock, shut, and from then on it opens and closes like
+// the others. Somebody else who has to go through a shut gate opens it and leaves it open: a story walker whose walk
+// crosses it, or a companion or Duchess coming after Ash through a gate he walked through and shut behind him. When Ash
+// goes over the wall in the air they cannot follow that way, and companions blink to him as they always did.
+const A1G={list:[],by:{},g:null,T:0.6};
+function a1GKey(g){ return 'a1_gopen_'+g.id; }
+// 'locked' (the North Gate before the raid), 'broken' (from the raid until the mystery is solved), 'gate' (Ash's to use)
+function a1GMode(g){ if(!g||g.id!=='north') return 'gate'; const s=a1GateState(); return s==='shut'?'locked':s==='broken'?'broken':'gate'; }
+function a1GWant(g){ const m=a1GMode(g); return m==='broken'?1:m==='locked'?0:(G&&G.flags&&G.flags[a1GKey(g)]?1:0); }
+function a1GOpen(g){ return !!g&&a1GWant(g)===1; }
+// a new game or a load: every gate stands as it was left (no swing)
+function a1GSync(){ if(A1G.g===G) return; A1G.g=G; for(const g of A1G.list){ g.mode=G?a1GMode(g):''; g.k=G?a1GWant(g):0; g.to=g.k; g.from=g.k; g.t0=-99; g.side=0; g.foot=false; g.rat=0; g.bump=false; g.knockT=0; } }
+// how far open the doors are now (0 shut, 1 open), on their way to where the gate is going
+function a1GK(g){
+  if(!G) return 0; a1GSync(); const m=a1GMode(g), w=a1GWant(g);
+  if(m!==g.mode){ g.mode=m; g.k=w; g.to=w; g.t0=-99; }          // broken by the raid, or mended: no swing
+  if(w!==g.to){ g.from=g.k; g.to=w; g.t0=G.time; }
+  if(g.t0<0) return g.k=g.to;
+  const u=clamp((G.time-g.t0)/A1G.T,0,1); g.k=lerp(g.from,g.to,u); if(u>=1) g.t0=-99; return g.k;
+}
+// the doors block the gap while shut, as soon as they start to close, and until they are a little more than half open
+function a1GShut(g){ if(!G) return false; const m=a1GMode(g); if(m==='broken') return false; if(m==='locked') return true; a1GK(g); return g.to===0||g.k<0.55; }
+// where a point is from a gate: a along the wall, b across it (b > 0 is the village side)
+function a1GRel(g,x,y){ const dx=x-g.x, dy=y-g.y; return {a:dx*g.ux+dy*g.uy, b:dx*g.nx+dy*g.ny}; }
+function a1GCross(g,x0,y0,x1,y1){ const A=a1GRel(g,x0,y0), B=a1GRel(g,x1,y1); if(A.b*B.b>=0) return false; const t=A.b/(A.b-B.b); return Math.abs(A.a+(B.a-A.a)*t)<g.hw+12; }
+function a1GJig(g){ return g&&g.rat>0?Math.sin((G?G.time:0)*70)*g.rat/0.32:0; }
+function a1GBuild(){
+  A1G.list.length=0; A1G.by={}; A1G.g=null;
+  const V=POI.village;
+  const add=(src,x,y,ux,uy)=>{
+    const ew=Math.abs(uy)<0.3; let nx=-uy, ny=ux; if(nx*(V.x-x)+ny*(V.y-y)<0){ nx=-nx; ny=-ny; }
+    const g={id:src.id,src,x,y,hw:src.hw,ux,uy,nx,ny,ew,h:ew?50:48,k:0,to:0,from:0,t0:-99,mode:'',side:0,foot:false,rat:0,bump:false,knockT:0};
+    // two doors, each hinged at a post and pointing at the middle when shut. Open, an east-west gate's doors stand swung
+    // toward the camera (as the North Gate's always were drawn), a north-south gate's flat against the inside of the wall
+    const sd=ew?[0,1]:[nx,ny], th=ew?62*Math.PI/180:Math.PI/2;
+    // (ix, iy: a north-south gate's door swings round the inner corner of its post, so open it lies beside the post)
+    g.doors=[-1,1].map(s=>{ const hx=x+ux*g.hw*s, hy=y+uy*g.hw*s, a0=Math.atan2(-uy*s,-ux*s), dp=b=>Math.cos(a0+b)*sd[0]+Math.sin(a0+b)*sd[1]; return {hx,hy,a0,da:dp(th)>=dp(-th)?th:-th,w:g.hw-1,ix:ew?0:nx*7,iy:ew?0:ny*7}; });
+    // shut, the doors close the gap with a box, like the old North Gate's
+    const L=g.hw+3, x0=Math.min(x-ux*L,x+ux*L), x1=Math.max(x-ux*L,x+ux*L), y0=Math.min(y-uy*L,y+uy*L), y1=Math.max(y-uy*L,y+uy*L);
+    g.col=addCol({t:'r',x0:x0-(ew?0:8),y0:y0-(ew?8:0),x1:x1+(ew?0:8),y1:y1+(ew?8:0)});
+    Object.defineProperty(g.col,'off',{get:()=>!a1GShut(g),set(){},configurable:true});
+    A1G.list.push(g); A1G.by[g.id]=g; };
+  for(const gd of [A1V.gates.north,A1V.gates.west]) add(gd,gd.x,A1V.wall.y,1,0);
+  for(const gd of A1WALL.gates) add(gd,gd.x,gd.y,gd.ux,gd.uy);
+}
+// Ash (who: 'ash'), somebody going through ('npc') or a test ('dbg') opens or shuts one
+function a1GSet(g,open,who,now){
+  if(!G||!g||a1GMode(g)!=='gate') return false;
+  const F=G.flags, key=a1GKey(g); if(!!F[key]===!!open) return false;
+  if(open) F[key]=1; else delete F[key];
+  a1GK(g); if(now){ g.k=g.to; g.t0=-99; } else a1GSnd(open?'open':'close',g);
+  if(who==='ash'&&G.mode==='story'&&scene==='play'&&!G.mini&&!G.inCombat&&!G.fightSite&&!(typeof HS!=='undefined'&&HS.on)) saveGame();
+  return true;
+}
+// who stands in the gateway (a person or a foe stops it shutting; a companion, Duchess or Pip just steps through)
+function a1GInWay(g){
+  const inGap=(e,r)=>{ if(!e) return false; const q=a1GRel(g,e.x,e.y); return Math.abs(q.a)<g.hw+2&&Math.abs(q.b)<(r||e.r||12)+9; };
+  const C=typeof CM!=='undefined'&&CM&&CMG===G&&!CM.hidden?CM:null, out={stop:null,move:[]};
+  for(const f of [C,G.goat]) if(inGap(f)) out.move.push(f);
+  for(const n of G.npcs) if(inGap(n,12)){ out.stop=n; break; }
+  if(!out.stop) for(const e of G.enemies) if(!e.dead&&!e.flying&&inGap(e)){ out.stop=e; break; }
+  return out;
+}
+function a1GUse(g){
+  const m=a1GMode(g); if(m==='locked'){ a1GateLook(); return; } if(m!=='gate') return;
+  if(!a1GWant(g)){ a1GSet(g,true,'ash'); return; }
+  const p=player, s=a1GRel(g,p.x,p.y).b<0?-1:1, W=a1GInWay(g);
+  if(W.stop){ ftext(g.x,g.y-56,S('Someone is in the way!','Someone is in the way!'),'#ffe6c0',13); return; }
+  for(const f of W.move){ const q=a1GRel(g,f.x,f.y), a=clamp(q.a,-g.hw+14,g.hw-14); f.x=g.x+g.ux*a+g.nx*s*34; f.y=g.y+g.uy*a+g.ny*s*34; if(f.cx!=null){ f.cx=f.x; f.cy=f.y; } }
+  a1GSet(g,false,'ash');
+}
+// the action prompt, from either side: offered with the minigames' prompts (so it shows in a fight too, and in reach of
+// a shut gate it beats the things around it); none while Ash stands in the open gateway or flies
+{ const base=miniPrompts; miniPrompts=function(offer){ base(offer); try{ a1GOffer(offer); }catch(e){ console.error('a1 gates',e); } }; }
+function a1GOffer(offer){
+  const p=player; if(!G||!p||AREA||p.flying||p.dead||!A1G.list.length) return;
+  for(const g of A1G.list){
+    if(dist2(p.x,p.y,g.x,g.y)>150*150) continue;
+    const r=a1GRel(g,p.x,p.y), ab=Math.abs(r.b); if(Math.abs(r.a)>g.hw+8||ab>64) continue;
+    const m=a1GMode(g); if(m==='broken') continue;
+    const s=r.b<0?-1:1, px=g.x+g.nx*s*18, py=g.y+g.ny*s*18, d=Math.max(0,ab-26)-4;
+    if(m==='locked') offer(d,S('Look at the North Gate','Look at the gate'),()=>a1GateLook(),px,py,true);
+    else if(!a1GWant(g)) offer(d,S('Open the gate','Open the gate'),()=>a1GUse(g),px,py,true);
+    else if(ab>=26) offer(d,S('Close the gate','Close the gate'),()=>a1GUse(g),px,py,true);
+  }
+}
+// the SLASH button's word for it (OPEN or CLOSE) and a little gateway for its picture, open or shut (not the chest)
+if(typeof PROMPT_KINDS!=='undefined'&&!PROMPT_KINDS.some(r=>r[1]==='gate')){ PROMPT_KINDS.unshift([/^open the gate/i,'gate','OPEN'],[/^close the gate/i,'gate','CLOSE']); PK_LABEL.gate='OPEN'; }
+{ const base=touchIcon; touchIcon=function(id,x,y,r,col,label){ if(id!=='gate') return base(id,x,y,r,col,label);
+  ctx.save(); ctx.translate(x,y); const k=r/34; ctx.scale(k,k); ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.fillRect(-17,-14,5,28); ctx.fillRect(12,-14,5,28);
+  if(label==='CLOSE'){ ctx.strokeRect(-10,-10,10,21); ctx.strokeRect(0,-10,10,21); ctx.fillRect(-4,-1,8,3); }
+  else for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(s*10,-10); ctx.lineTo(s*3,-4); ctx.lineTo(s*3,15); ctx.lineTo(s*10,11); ctx.closePath(); ctx.stroke(); }
+  ctx.restore(); }; }
+// A roll (or one slow frame) must not carry Ash through the wall or shut doors in one step: the logs and doors are
+// thinner than a roll step on a slow phone, and a centre pushed out past their middle comes out on the far side (it
+// did: rolling into the palisade went through about half the time). So each frame's own step (movesPost gets where he
+// was before it) may cross the wall's line only in an open gateway; in the air (wings) anywhere, as before. Teleports
+// (fast travel, doors, scenes) never come through here.
+{ const base=movesPost; movesPost=function(dt,ox,oy,inp){ try{ const p=player;
+  if(p&&!AREA&&!p.flying&&A1G.list.length&&(p.x!==ox||p.y!==oy)&&dist2(p.x,p.y,ox,oy)<240*240&&Math.abs(p.y-9420)<900&&Math.abs(p.x-2600)<1000&&a1WallBlocks(ox,oy,p.x,p.y)){ p.x=ox; p.y=oy; p.hitWall=true; }
+  }catch(e){ console.error('a1 wall',e); } return base(dt,ox,oy,inp); }; }
+// the wall's line, corner to corner all the way round (the north run, then section 20's sides), and whether a step from
+// (x0,y0) to (x1,y1) goes through it anywhere but an open gateway
+function a1WallSegs(){ if(A1G.segs) return A1G.segs; const P=A1WALL.pts, W=A1V.wall, S=[[W.x0,W.y,W.x1,W.y]]; for(let i=0;i<P.length-1;i++) S.push([P[i][0],P[i][1],P[i+1][0],P[i+1][1]]); return A1G.segs=S; }
+function a1WallBlocks(x0,y0,x1,y1){
+  for(const [ax,ay,bx,by] of a1WallSegs()){
+    const d1=(bx-ax)*(y0-ay)-(by-ay)*(x0-ax), d2=(bx-ax)*(y1-ay)-(by-ay)*(x1-ax); if(d1*d2>=0) continue;
+    const d3=(x1-x0)*(ay-y0)-(y1-y0)*(ax-x0), d4=(x1-x0)*(by-y0)-(y1-y0)*(bx-x0); if(d3*d4>0) continue;
+    const t=d1/(d1-d2), cx=x0+(x1-x0)*t, cy=y0+(y1-y0)*t;
+    if(A1G.list.some(g=>{ if(a1GShut(g)) return false; const q=a1GRel(g,cx,cy); return Math.abs(q.a)<g.hw-2&&Math.abs(q.b)<8; })) continue;
+    return true;
+  }
+  return false;
+}
+// every frame near the village: Ash leaning on a shut gate, and anybody who has to go through one
+function a1GTick(dt){
+  if(!G||AREA||!player||!A1G.list.length) return; const p=player, V=POI.village; if(!V||dist2(p.x,p.y,V.x,V.y)>2600*2600) return;
+  a1GSync(); const air=airborne(), F=G.side&&G.side.duchess==='follow'?G.goat:null, C=typeof CM!=='undefined'&&CM&&CMG===G&&!CM.hidden&&!CM.outside&&CM.mode!=='stay'?CM:null;
+  const walks=typeof S10!=='undefined'&&S10.walks?S10.walks:[], hop=A1G.px==null||dist2(p.x,p.y,A1G.px,A1G.py)>70*70;
+  for(const g of A1G.list){
+    const r=a1GRel(g,p.x,p.y), s=r.b<0?-1:1;
+    if(g.rat>0) g.rat=Math.max(0,g.rat-dt);
+    // the side Ash is on, and whether he last came through this gateway on foot or over it in the air
+    if(Math.abs(r.a)<g.hw+40&&Math.abs(r.b)>4&&Math.abs(r.b)<400){ if(g.side&&s!==g.side) g.foot=!air&&!hop; g.side=s; }
+    if(!a1GShut(g)){ g.bump=false; continue; }
+    // Ash leaning on the shut doors: they rattle and knock (the padlock clinks on the locked North Gate) and the prompt
+    // to open them is right there in front of him
+    const push=-s*((p.inMx||0)*g.nx+(p.inMy||0)*g.ny), bump=!air&&!p.dead&&Math.abs(r.a)<g.hw+2&&Math.abs(r.b)<(p.r||14)+12&&push>0.45;
+    if(bump&&!g.bump&&G.time>g.knockT){ g.knockT=G.time+1.1; g.rat=0.32; a1GSnd(a1GMode(g)==='locked'?'rattle':'knock',g); }
+    g.bump=bump;
+    if(a1GMode(g)!=='gate') continue;
+    // somebody who has to go through opens it, and leaves it open
+    let who=null;
+    for(const W of walks) if(W.t<W.d&&W.n&&dist2(W.n.x,W.n.y,g.x,g.y)<120*120&&a1GCross(g,W.n.x,W.n.y,W.x1,W.y1)){ who=W.n; break; }
+    if(!who&&g.foot&&!air&&Math.abs(r.b)<400) for(const f of [C,F]){ if(!f) continue; const q=a1GRel(g,f.x,f.y); if(Math.abs(q.a)<g.hw+4&&Math.abs(q.b)<(f.r||12)+14&&(q.b<0?-1:1)!==s){ who=f; break; } }
+    // the Lantern Night thief flings a gate open as she runs through it, so Ash can stay on her tail
+    if(!who&&typeof HS!=='undefined'&&HS.on&&HS.thief&&dist2(HS.thief.x,HS.thief.y,g.x,g.y)<110*110) who=HS.thief;
+    if(who) a1GSet(g,true,'npc');
+  }
+  A1G.px=p.x; A1G.py=p.y;
+  a1GWrapFest();
+}
+// the Lantern Night chase: when the thief is over the wall from Ash, the goal points him at the gate that makes the
+// shortest way round (and says to open it if it is shut), instead of at a spot through the wall
+function a1GWrapFest(){ const s=typeof STAGEDEF!=='undefined'?STAGEDEF.c_fest:null; if(!s||typeof s.objectives!=='function'||s.objectives._a1g) return;
+  const base=s.objectives, w=function(){ const L=base.apply(this,arguments); try{ return a1GGoalFix(L); }catch(e){ return L; } }; w._a1g=true; s.objectives=w; }
+function a1GGoalFix(L){
+  if(!Array.isArray(L)||!L.length||typeof HS==='undefined'||!HS.on||HS.phase!=='chase'||!player||AREA) return L;
+  const o=L[0]; if(!o||o.x==null||!a1WallBlocks(player.x,player.y,o.x,o.y)) return L;
+  let best=null, bd=1e18;
+  for(const g of A1G.list){ if(a1GMode(g)==='locked') continue; const d=Math.hypot(player.x-g.x,player.y-g.y)+Math.hypot(o.x-g.x,o.y-g.y); if(d<bd){ bd=d; best=g; } }
+  if(!best) return L;
+  const nm=String(best.src&&best.src.sign||'gate').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  const t=a1GShut(best)?S(`She went over the wall! Open the ${nm} and go after her.`,`She went over the wall! Open the gate.`):S(`She went over the wall! Go round by the ${nm}.`,`Go round by the gate!`);
+  return [Object.assign({},o,{text:t,x:best.x,y:best.y})].concat(L.slice(1));
+}
+{ const base=simUpdate; simUpdate=function(dt){ base(dt); try{ a1GTick(dt); }catch(e){ console.error('a1 gates',e); } }; }
+{ const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(scene!=='play') a1GTick(dt); }catch(e){ console.error('a1 gates',e); } }; }
+// ---- the doors
+// A door is a plank slab hinged at a ground point (hx,hy) and pointing along angle a, w long and h tall, drawn the way
+// every sprite here is (a point z up is drawn z higher on the screen): only the faces turned toward the camera, then
+// the top edge. Seen face on it is a1DoorFace's door (planks, two iron straps with rivets, a ring to pull it by); seen
+// end on (a shut door in a north-south wall) it thickens, as the logs of those runs do, so it never vanishes.
+const A1SH=new Map();
+function a1Shade(col,f){ const k=col+f.toFixed(2); let s=A1SH.get(k); if(!s){ const c=hexRGB(col); s=`rgb(${Math.round(clamp(c[0]*f,0,255))},${Math.round(clamp(c[1]*f,0,255))},${Math.round(clamp(c[2]*f,0,255))})`; if(A1SH.size>400) A1SH.clear(); A1SH.set(k,s); } return s; }
+function a1Hull(P){ const q=P.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]), cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]), lo=[], hi=[];
+  for(const p of q){ while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0) lo.pop(); lo.push(p); }
+  for(let i=q.length-1;i>=0;i--){ const p=q[i]; while(hi.length>1&&cr(hi[hi.length-2],hi[hi.length-1],p)<=0) hi.pop(); hi.push(p); }
+  lo.pop(); hi.pop(); return lo.concat(hi); }
+function a1Slab(g,hx,hy,a,w,h,col,handle){
+  const dx=Math.cos(a), dy=Math.sin(a), t=3+10*clamp((Math.abs(dy)-0.9)/0.1,0,1), px=-dy*t/2, py=dx*t/2, cx=hx+dx*w/2, cy=hy+dy*w/2;
+  const P=[[hx+px,hy+py],[hx+dx*w+px,hy+dy*w+py],[hx+dx*w-px,hy+dy*w-py],[hx-px,hy-py]];
+  let main=null;
+  g.lineJoin='round';
+  for(let i=0;i<4;i++){
+    const A=P[i], B=P[(i+1)%4], ex=B[0]-A[0], ey=B[1]-A[1], L=Math.hypot(ex,ey)||1; let nx=-ey/L, ny=ex/L;
+    if(nx*((A[0]+B[0])/2-cx)+ny*((A[1]+B[1])/2-cy)<0){ nx=-nx; ny=-ny; }
+    if(ny<=0.004) continue;
+    const long=i%2===0, f=(long?1:0.74)*(1-0.16*Math.max(0,nx)+0.05*Math.max(0,-nx))*(0.86+0.14*ny);
+    g.fillStyle=a1Shade(col,f); g.beginPath(); g.moveTo(A[0],A[1]); g.lineTo(B[0],B[1]); g.lineTo(B[0],B[1]-h); g.lineTo(A[0],A[1]-h); g.closePath(); g.fill();
+    if(long&&(!main||ny>main.ny)) main={A,B,ny,atB:i===0};
+  }
+  g.fillStyle=a1Shade(col,1.16); g.beginPath(); P.forEach(([x,y],i)=>i?g.lineTo(x,y-h):g.moveTo(x,y-h)); g.closePath(); g.fill();
+  if(main&&main.ny>0.08){
+    const {A,B}=main, fx=k=>A[0]+(B[0]-A[0])*k, fy=k=>A[1]+(B[1]-A[1])*k;
+    g.strokeStyle='rgba(40,22,10,.55)'; g.lineWidth=0.9; g.beginPath(); for(let q=1;q<5;q++){ g.moveTo(fx(q/5),fy(q/5)); g.lineTo(fx(q/5),fy(q/5)-h); } g.stroke();
+    g.strokeStyle='rgba(255,224,170,.22)'; g.lineWidth=1.4; g.beginPath(); g.moveTo(A[0],A[1]-h+1); g.lineTo(B[0],B[1]-h+1); g.stroke();
+    g.strokeStyle='#4a4a52'; g.lineWidth=3.4; g.beginPath(); for(const z of [h-9.7,10.3]){ g.moveTo(A[0],A[1]-z); g.lineTo(B[0],B[1]-z); } g.stroke();
+    g.fillStyle='#7a7a86'; for(const z of [h-9.7,10.3]) for(let q=1;q<3;q++){ const x=fx(q/3), y=fy(q/3)-z; g.fillRect(x-0.8,y-0.8,1.6,1.6); }
+    if(handle&&main.ny>0.3){ const q=main.atB?0.86:0.14, x=fx(q), y=fy(q)-h*0.48; g.strokeStyle='#33333b'; g.lineWidth=1.5; g.beginPath(); g.ellipse(x,y+2.6,2.5*main.ny,2.8,0,0,TAU); g.stroke(); g.fillStyle='#2e2e36'; g.fillRect(x-1.1,y-1.1,2.2,2.2); }
+  }
+  if(t>6){ // end on: the planks' tops, and the iron straps over the edge
+    const T=k=>[P[0][0]+(P[1][0]-P[0][0])*k,P[0][1]+(P[1][1]-P[0][1])*k-h], U=k=>[P[3][0]+(P[2][0]-P[3][0])*k,P[3][1]+(P[2][1]-P[3][1])*k-h];
+    g.strokeStyle='rgba(40,22,10,.5)'; g.lineWidth=0.9; g.beginPath(); for(let q=1;q<5;q++){ const m=T(q/5), n=U(q/5); g.moveTo(m[0],m[1]); g.lineTo(n[0],n[1]); } g.stroke();
+    g.strokeStyle='rgba(255,224,170,.25)'; g.lineWidth=1.2; g.beginPath(); { const m=T(0.03), n=T(0.97); g.moveTo(m[0]+(U(0)[0]-T(0)[0])*0.3,m[1]+(U(0)[1]-T(0)[1])*0.3); g.lineTo(n[0]+(U(1)[0]-T(1)[0])*0.3,n[1]+(U(1)[1]-T(1)[1])*0.3); } g.stroke();
+    g.strokeStyle='#4a4a52'; g.lineWidth=3; g.beginPath(); for(const q of [0.16,0.84]){ const m=T(q), n=U(q); g.moveTo(m[0],m[1]); g.lineTo(n[0],n[1]); } g.stroke();
+  }
+  if(LOOK.sb){ const H=a1Hull(P.concat(P.map(([x,y])=>[x,y-h]))); g.strokeStyle=SBC.outline; g.lineWidth=1.7; g.beginPath(); H.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y)); g.closePath(); g.stroke(); }
+}
+// both doors of a gate as they stand now (only: just that one, for a north-south gate's doors, which sort apart)
+function a1GDrawDoors(g,only){
+  const k=a1GK(g), e=k*k*(3-2*k), j=a1GJig(g)*0.035, m=a1GMode(g);
+  const C=g.id==='north'&&m==='gate'?['#b88450','#ad7a48']:['#8a5a34','#82552f'];
+  for(let i=0;i<2;i++){ if(only!=null&&only!==i) continue; const d=g.doors[i]; a1Slab(ctx,d.hx+d.ix*e,d.hy+d.iy*e,d.a0+d.da*e+(i?-j:j),d.w,g.h,C[i],m==='gate'); }
+}
+// see-through, as the wall pieces are, when Ash is just behind (north of) a gate
+function a1GFadeAt(x0,x1,y){ const p=player; if(!p||p.dead) return 1; const dy=y-p.y; return dy>2&&dy<64&&p.x>x0-12&&p.x<x1+12?0.42:1; }
+function a1GFadeEW(g){ return a1GFadeAt(g.x-g.hw-28,g.x+g.hw+28,g.y); }
+// a north-south gate's doors go in the draw list on their own, each sorted by its own front edge
+{ const base=eventsForRender; eventsForRender=function(list){ base(list); try{ if(!G||AREA||!A1G.list.length) return;
+  for(const g of A1G.list){ if(g.ew||!inView(g.x,g.y,220)) continue; const k=a1GK(g), e=k*k*(3-2*k);
+    g.doors.forEach((d,i)=>{ const a=d.a0+d.da*e, hx=d.hx+d.ix*e, hy=d.hy+d.iy*e, ex=hx+Math.cos(a)*d.w, ey=hy+Math.sin(a)*d.w, y=Math.max(hy,ey)+0.5, fa=a1GFadeAt(Math.min(hx,ex)-6,Math.max(hx,ex)+6,y);
+      list.push({x:(hx+ex)/2,y,draw:()=>{ if(fa<1){ ctx.save(); ctx.globalAlpha*=fa; } try{ a1GDrawDoors(g,i); } finally { if(fa<1) ctx.restore(); } }}); }); }
+  }catch(e){ console.error('a1 gates',e); } }; }
+// ---- the sounds: old hinges (a slow stick-slip squeak over a low groan), the doors meeting, a knock, the padlock
+function a1GSnd(kind,g){
+  const ac=SFX.ac; if(!ac||SFX.silent||!SFX.noise) return; let v=1;
+  if(g&&player){ const d=dist(player.x,player.y,g.x,g.y); if(d>1000) return; v=clamp(1.2-d/700,0.12,1); }
+  try{
+    const t0=ac.currentTime, out=ac.createGain(); out.gain.value=0.55*v; out.connect(ac.destination);
+    const nz=(dur,vol,ft,f0,f1,q,dl)=>{ const t=t0+(dl||0), s=ac.createBufferSource(), f=ac.createBiquadFilter(), gn=ac.createGain(); s.buffer=SFX.noise; f.type=ft; f.frequency.setValueAtTime(f0,t); f.frequency.exponentialRampToValueAtTime(Math.max(1,f1),t+dur); f.Q.value=q||1; gn.gain.setValueAtTime(vol,t); gn.gain.exponentialRampToValueAtTime(0.0008,t+dur); s.connect(f); f.connect(gn); gn.connect(out); s.start(t,Math.random()); s.stop(t+dur+0.05); };
+    // a pitch path [[u, Hz], ...] over dur; through a narrow band (bp) a low sawtooth buzzes like wood rubbing on wood
+    const tn=(type,fs,dur,vol,dl,bp)=>{ const t=t0+(dl||0), o=ac.createOscillator(), gn=ac.createGain(); o.type=type; o.frequency.setValueAtTime(fs[0][1],t); for(const [u,f] of fs.slice(1)) o.frequency.linearRampToValueAtTime(f,t+u*dur);
+      gn.gain.setValueAtTime(0.0001,t); gn.gain.linearRampToValueAtTime(vol,t+Math.min(0.04,dur/5)); gn.gain.setValueAtTime(vol,t+dur*0.7); gn.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+      let n=o; if(bp){ const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=bp[0]; f.Q.value=bp[1]; o.connect(f); n=f; } n.connect(gn); gn.connect(out); o.start(t); o.stop(t+dur+0.05); };
+    switch(kind){
+      case 'open': tn('sawtooth',[[0,38],[0.3,62],[0.65,48],[1,30]],0.62,0.5,0,[820,5]); tn('sawtooth',[[0,150],[0.5,205],[1,170]],0.42,0.12,0.05,[1500,7]); nz(0.5,0.05,'bandpass',600,300,1.5); nz(0.12,0.14,'lowpass',380,90,0.8,0.6); break;
+      case 'close': tn('sawtooth',[[0,58],[0.4,40],[1,28]],0.55,0.45,0,[760,5]); tn('sawtooth',[[0,190],[0.6,150],[1,130]],0.36,0.1,0.04,[1400,7]); nz(0.45,0.045,'bandpass',560,280,1.5); nz(0.22,0.4,'lowpass',420,70,0.8,0.55); tn('sine',[[0,92],[1,44]],0.24,0.3,0.55); break;
+      case 'knock': nz(0.1,0.32,'lowpass',520,110,0.9); tn('sine',[[0,120],[1,62]],0.12,0.22); nz(0.1,0.24,'lowpass',480,100,0.9,0.13); tn('sine',[[0,110],[1,58]],0.11,0.18,0.13); break;
+      case 'rattle': for(const dl of [0,0.09,0.17]){ tn('square',[[0,1750+rand(-80,80)],[1,1500]],0.05,0.035,dl); nz(0.05,0.08,'highpass',2600,4200,1,dl); } nz(0.1,0.25,'lowpass',500,110,0.9); break;
+    }
+  }catch(e){}
+}
+// test hooks: __ebA1.gates.state(), .open(id|'all'[,now]), .close(id|'all'[,now]), .use(id) (as Ash), .list()
+function a1GDbg(id,open,now){ const L=id==null||id==='all'?A1G.list:[A1G.by[id]].filter(Boolean); let n=0; for(const g of L) if(a1GSet(g,open,'dbg',now)) n++; return n; }
+window.__ebA1.gates={A1G,
+  state:()=>Object.fromEntries(A1G.list.map(g=>[g.id,{open:a1GOpen(g),k:+a1GK(g).toFixed(2),mode:a1GMode(g),shut:a1GShut(g),flag:!!(G&&G.flags&&G.flags[a1GKey(g)]),foot:g.foot,side:g.side}])),
+  open:(id,now)=>a1GDbg(id,true,now), close:(id,now)=>a1GDbg(id,false,now), use:id=>{ const g=A1G.by[id]; if(g) a1GUse(g); return a1GOpen(g); },
+  list:()=>A1G.list.map(g=>({id:g.id,x:Math.round(g.x*10)/10,y:Math.round(g.y),hw:g.hw,ew:g.ew,ux:+g.ux.toFixed(3),uy:+g.uy.toFixed(3),nx:+g.nx.toFixed(3),ny:+g.ny.toFixed(3)})),
+  rel:(id,x,y)=>a1GRel(A1G.by[id],x,y), snd:k=>a1GSnd(k,null),
+  // a story walk (as a scene's walk beat makes one), for checking that a walker opens a shut gate on the way
+  walk:(id,x,y,d)=>{ if(typeof s10ActorWalk!=='function') return false; s10ActorWalk(id,[x,y],d); return true; }};
