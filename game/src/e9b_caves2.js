@@ -191,15 +191,93 @@ function c2Blocked(x,y){
 { const base=updateProjectiles; updateProjectiles=function(dt){ C2.proj++; try{ return base(dt); } finally{ C2.proj--; } }; }
 
 // ---------- Ash: riding (carts, lifts, geyser launches) and sliding on ice take over his legs
+// (v12 ICE) JUMP on the ice. While he slides, Ash hops along with the slide: its speed and its direction, in a low
+// quick hop that carries him C2HOP.tiles cells, so it clears ONE tile of water (or meltwater) off the end of the ice
+// and never two (a Double Jump in the air carries him further). A jump pressed in the last C2HOP.arm cells before such
+// an edge waits for the edge; one pressed just after he stopped there (C2HOP.grace s), or with the stick pushed at the
+// water, still leaps from the edge. In the air the slide keeps its own rules: a wall, a block or a sign stops him (he
+// drops where he is), plain floor or a floe takes him (he stops on it), more ice keeps him sliding, and water drops him
+// in (a splash, back to where he last stood still, never to a cell a slide cannot stop on). From a standstill, with
+// nothing to push off toward, his feet have no grip and a jump goes straight up. A jump that lands on the ice with
+// speed sets him sliding the way he flew (so a landing is never a new place to stop).
+const C2HOP={tiles:2.2,arm:3,grace:0.25};
+const c2Up=p=>(p.z||0)>0||(p.vz||0)>0;
 { const base=updatePlayer; updatePlayer=function(dt,inp){
   const A=AREA, Z=A&&A.c2; if(!Z||!player||player.dead) return base(dt,inp);
   Z.inMx=inp.mx; Z.inMy=inp.my;
-  if(Z.lock){ const ride=Z.lock.kind==='cart'; const q=Object.assign({},inp,{mx:0,my:0,jump:false,jumpHeld:false,sprint:false,roll:false,fire:ride&&inp.fire,attack:ride&&inp.attack}); G.dashBuf=0; base(dt,q); c2LockPost(dt); return; }
-  const k=c2K(player.x,player.y), onIce=!airborne()&&c2Kind(k)==='ice'&&!Z.plat.get(k);
-  // no hopping out of a slide (that would skip the whole puzzle); a jump on the spot is fine
-  if(Z.slide||onIce){ const q=Object.assign({},inp,{mx:0,my:0,sprint:false,roll:false}); if(Z.slide){ q.jump=false; q.jumpHeld=false; } G.dashBuf=0; base(dt,q); c2SlidePost(dt,inp); return; }
+  if(Z.lock){ const ride=Z.lock.kind==='cart'; const q=Object.assign({},inp,{mx:0,my:0,jump:false,jumpHeld:false,sprint:false,roll:false,fire:ride&&inp.fire,attack:ride&&inp.attack}); G.dashBuf=0; Z.hop=0; Z.edge=null; base(dt,q); c2LockPost(dt); return; }
+  const p=player, k=c2K(p.x,p.y), up=c2Up(p), onIce=!airborne()&&c2Kind(k)==='ice'&&!Z.plat.get(k), vx=p.avx||0, vy=p.avy||0;
+  if(Z.slide||onIce||(Z.hop&&up)){
+    const q=Object.assign({},inp,{mx:0,my:0,sprint:false,roll:false}), hop=Z.hop;
+    // on the ground the jump is ours (a hop with the slide, a leap from the edge, or straight up); in the air the
+    // game's own jump goes on (the Double Jump)
+    if(!up){ q.jump=false; q.jumpHeld=false; if(inp.jump) c2IceJump(inp,onIce); }
+    G.dashBuf=0; base(dt,q); c2SlidePost(dt,inp);
+    if(!c2Up(p)){ if(up&&!hop&&!Z.slide&&!Z.lock) c2LandOnIce(vx,vy); Z.hop=0; }
+    return; }
+  Z.hop=0;
   base(dt,inp);
+  if(up&&!c2Up(p)&&!Z.slide&&!Z.lock) c2LandOnIce(vx,vy);
 }; }
+// JUMP pressed on the ice (Ash on the ground)
+function c2IceJump(inp,onIce){
+  const A=AREA, Z=A.c2, p=player, cs=A.cave.cell, w=A.cave.w;
+  if(!canJump()||p.flying||p.drinkT>0||G.fishing||MV.lk||p.dashT>0.1) return;
+  const k=c2K(p.x,p.y); if(k<0) return;
+  const mx=inp.mx||0, my=inp.my||0, push=Math.hypot(mx,my)>=0.5, pd=push?(Math.abs(mx)>Math.abs(my)?(mx>0?1:3):(my>0?2:0)):-1;
+  // standing still with the stick pushed where a slide can start: push off and jump at once
+  if(!Z.slide&&onIce&&push){ const [i,j]=c2IJ(k), n=(j+C2DIR[pd][1])*w+i+C2DIR[pd][0];
+    if((i+C2DIR[pd][0])>=0&&(i+C2DIR[pd][0])<w&&c2SlideOpen(n,false)){ Z.slide={d:pd,sp:90}; Z.edge=null; p.facing=Math.atan2(C2DIR[pd][1],C2DIR[pd][0]); SFX.play('roll',0.4); } }
+  const s=Z.slide;
+  if(s){ const e=c2SlideEnd(k,s.d);
+    if(e.gap){ const [dx,dy]=C2DIR[s.d], [ei,ej]=c2IJ(e.k), dd=(c2X(ei)-p.x)*dx+(c2Y(ej)-p.y)*dy;
+      if(dd>3&&dd<=C2HOP.arm*cs){ s.arm=1; p.sqT=0.14; p.sqD=0.14; p.sqA=0.1; return; } }
+    c2Leap(s); return; }
+  if(!onIce) return;
+  // at the edge of the ice: a leap with the slide that just stopped there, or a push straight at the water
+  const E=Z.edge&&Z.edge.k===k?Z.edge:null, [i,j]=c2IJ(k);
+  let d=-1, sp=340;
+  if(push){ const n=(j+C2DIR[pd][1])*w+i+C2DIR[pd][0]; if((i+C2DIR[pd][0])>=0&&(i+C2DIR[pd][0])<w&&c2Gap(n)) d=pd; }
+  if(d<0&&E&&Z.t-E.t<=C2HOP.grace) { d=E.d; sp=E.sp; }
+  if(d>=0){ Z.slide={d,sp}; Z.edge=null; p.facing=Math.atan2(C2DIR[d][1],C2DIR[d][0]); c2Leap(Z.slide); return; }
+  // no grip: straight up
+  c2Takeoff(1); Z.hop=1;
+  if((Z.saidGrip||0)<2){ Z.saidGrip=(Z.saidGrip||0)+1; ftext(p.x,p.y-40,S('No grip! Slide, then jump.','Slide, then jump!'),'#dff4ff',13); }
+}
+// where a slide from cell k going d stops, and whether a gap (water and the like) lies just past that cell
+function c2SlideEnd(k,d){ const A=AREA, w=A.cave.w, [dx,dy]=C2DIR[d]; let cur=k;
+  for(let g=0;g<64;g++){ if(c2Kind(cur)!=='ice'||A.c2.plat.get(cur)) return {k:cur,gap:false};
+    const i=cur%w; if(i+dx<0||i+dx>=w) return {k:cur,gap:false}; const n=cur+dx+dy*w;
+    if(!c2SlideOpen(n,false)) return {k:cur,gap:c2Gap(n)}; cur=n; }
+  return {k:cur,gap:false}; }
+// a cell he can only pass over in the air (water, meltwater, a shaft, lava...)
+function c2Gap(k){ return !c2SlideOpen(k,false)&&c2SlideOpen(k,true); }
+// take off (f scales the jump: 1 is the normal jump); no sideways speed of its own (the slide carries him, or nothing)
+function c2Takeoff(f){
+  const p=player, k=(p.stats&&p.stats.jumpK)||1;
+  MV.jumpBuf=0; MV.takeSpd=0; MV.flapT=0.5; MV.jrec={x0:p.x,y0:p.y,t0:G.time,zmax:0};
+  p.dashT=0; p.avx=p.avy=0; p.vz=JUMP_V*k*f; p.z=0.01; p.dbl=false; p.slam=false; p.sqT=0.12; p.sqD=0.12; p.sqA=-0.12;
+  mvSnd('jump'); emit(p.x,p.y+5,6,{col:'230,245,255',glow:false,smin:20,smax:70,lmin:.2,lmax:.4,zmin:2,zmax:4,grow:5});
+  if(G.stats) G.stats.jumps=(G.stats.jumps||0)+1;
+}
+// the hop with the slide: low and quick, C2HOP.tiles cells at the slide's speed
+function c2Leap(s){
+  const cs=AREA.cave.cell, T=Math.min(0.5,C2HOP.tiles*cs/Math.max(90,s.sp)), p=player;
+  c2Takeoff(2*T); s.arm=0; s.leap=1;
+  const [dx,dy]=C2DIR[s.d]; emit(p.x-dx*10,p.y+6,8,{col:'235,248,255',glow:false,ang:Math.atan2(-dy,-dx),spread:0.9,smin:30,smax:110,lmin:.2,lmax:.45,zmin:1.5,zmax:3,drag:2});
+  if(G.stats) G.stats.c2Hops=(G.stats.c2Hops||0)+1;
+}
+// a jump (from the floor, say) landing on the ice with speed: he slides on the way he flew
+function c2LandOnIce(vx,vy){
+  const A=AREA, Z=A.c2, p=player, w=A.cave.w, k=c2K(p.x,p.y); if(k<0||c2Kind(k)!=='ice'||Z.plat.get(k)) return;
+  const sp=Math.hypot(vx,vy); if(sp<60) return;
+  const d=Math.abs(vx)>=Math.abs(vy)?(vx>0?1:3):(vy>0?2:0), [i,j]=c2IJ(k);
+  if((i+C2DIR[d][0])<0||(i+C2DIR[d][0])>=w) return;
+  const q=c2X(i)-p.x, r=c2Y(j)-p.y, ahead=C2DIR[d][0]?-q*C2DIR[d][0]:-r*C2DIR[d][1];
+  const n=(j+C2DIR[d][1])*w+i+C2DIR[d][0];
+  if(!c2SlideOpen(n,false)&&ahead>=-0.5){ return; }
+  Z.slide={d,sp:Math.min(340,Math.max(90,sp))}; Z.edge=null; p.facing=Math.atan2(C2DIR[d][1],C2DIR[d][0]);
+}
 function c2LockPost(dt){
   const Z=AREA.c2, L=Z.lock, p=player; p.kvx=p.kvy=0; p.avx=p.avy=0;
   if(L.kind==='cart'){ const o=L.o; p.x=o.x; p.y=o.y-3; if(o.mv) p.facing=Math.atan2(C2DIR[o.mv.d][1],C2DIR[o.mv.d][0]); }
@@ -207,38 +285,54 @@ function c2LockPost(dt){
   else if(L.kind==='launch'){ L.t+=dt; const k=clamp(L.t/L.dur,0,1); p.x=lerp(L.x0,L.x1,k); p.y=lerp(L.y0,L.y1,k); p.z=Math.sin(Math.PI*k)*L.h; if(k>=1){ p.z=0; Z.lock=null; mvSnd('land',1.2); shake(3); emit(p.x,p.y+4,14,{col:'150,130,110',glow:false,smin:40,smax:140,lmin:.3,lmax:.6,zmin:2,zmax:5,grow:8}); } }
 }
 // ice: Ash slides in a straight line until something stops him (a wall, a block, a rock, plain floor or the edge of water)
-function c2SlideOpen(k){
+// (air: is he in a jump; v12 ICE passes it in, the old callers read airborne())
+function c2SlideOpen(k,air){
+  if(air===undefined) air=airborne();
   const A=AREA, c=A.cave; if(k<0||c.grid[k]===1) return false; if(c.dyn&&caveBlockedAt(k)) return false; if(A.c2.occ.get(k)||A.c2.solidK.has(k)) return false;
   const kd=c2Kind(k); if(kd==='floor'||kd==='ice'||kd==='floe'||kd==='pad'||kd==='rock'||kd==='cool') return true;
   if(A.c2.plat.get(k)) return true;
-  if(kd==='spring') return canWalkWater()||airborne();
-  return airborne();
+  if(kd==='spring') return canWalkWater()||air;
+  return air;
 }
 function c2SlidePost(dt,inp){
   const A=AREA, Z=A.c2, p=player, cs=A.cave.cell, w=A.cave.w;
   let s=Z.slide;
   const k0=c2K(p.x,p.y); if(k0<0){ Z.slide=null; return; }
-  const [i0,j0]=c2IJ(k0), cx0=c2X(i0), cy0=c2Y(j0);
+  const [i0,j0]=c2IJ(k0), cx0=c2X(i0), cy0=c2Y(j0), up=c2Up(p);
   if(!s){
-    if(airborne()) return;
+    if(up) return;
     const mx=inp.mx, my=inp.my; if(Math.hypot(mx,my)<0.5) return;
     const d=Math.abs(mx)>Math.abs(my)?(mx>0?1:3):(my>0?2:0);
     p.facing=Math.atan2(C2DIR[d][1],C2DIR[d][0]);
-    if(!c2SlideOpen((j0+C2DIR[d][1])*w+i0+C2DIR[d][0])) return;
-    s=Z.slide={d,sp:90}; SFX.play('roll',0.4);
+    if((i0+C2DIR[d][0])<0||(i0+C2DIR[d][0])>=w||!c2SlideOpen((j0+C2DIR[d][1])*w+i0+C2DIR[d][0],false)) return;
+    s=Z.slide={d,sp:90}; SFX.play('roll',0.4); Z.edge=null;
   }
-  const [dx,dy]=C2DIR[s.d]; s.sp=Math.min(340,s.sp+dt*2200);
+  const [dx,dy]=C2DIR[s.d]; if(!up) s.sp=Math.min(340,s.sp+dt*2200);
   if(dx) p.y+=(cy0-p.y)*Math.min(1,dt*16); else p.x+=(cx0-p.x)*Math.min(1,dt*16);
-  const nx=p.x+dx*s.sp*dt, ny=p.y+dy*s.sp*dt, kd0=c2Kind(k0);
+  const nx=p.x+dx*s.sp*dt, ny=p.y+dy*s.sp*dt, kd0=c2Kind(k0), nk=(j0+dy)*w+i0+dx;
   const past=dx?(nx-cx0)*dx>=0:(ny-cy0)*dy>=0;
-  const open=c2SlideOpen((j0+dy)*w+i0+dx);
-  if(past&&(!open||(kd0!=='ice'&&!airborne()))){
+  const open=(i0+dx)>=0&&(i0+dx)<w&&c2SlideOpen(nk,up);
+  // in the air a cell he can stand on still ends the slide there; only water and the like pass under him
+  const stop=kd0!=='ice'&&(!up||c2WalkK(k0,{stride:canWalkWater()}));
+  // a jump pressed on the way in: he leaps from the last cell of ice
+  if(past&&!up&&!open&&s.arm&&c2Gap(nk)){ if(dx) p.x=cx0; else p.y=cy0; c2Leap(s); return; }
+  if(past&&(!open||stop)){
     if(dx) p.x=cx0; else p.y=cy0;
-    Z.slide=null; if(!open){ SFX.play('block',0.4); shake(1); emit(p.x+dx*16,p.y+dy*16,5,{col:'220,240,255',glow:false,smin:20,smax:70,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); }
+    Z.slide=null;
+    if(!open&&!up&&c2Gap(nk)){ Z.edge={d:s.d,sp:s.sp,t:Z.t,k:k0}; c2HopTip(k0,s.d); }
+    else if(!open){ SFX.play('block',0.4); shake(1); emit(p.x+dx*16,p.y+dy*16,5,{col:'220,240,255',glow:false,smin:20,smax:70,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); }
+    if(up) Z.hop=1;
     return;
   }
-  p.x=nx; p.y=ny; p.facing=Math.atan2(dy,dx); p.moving=true;
-  if(Math.random()<dt*20) emit(p.x-dx*10,p.y-dy*10+6,1,{col:'230,245,255',glow:false,ang:Math.atan2(-dy,-dx),spread:0.6,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3});
+  p.x=nx; p.y=ny; p.facing=Math.atan2(dy,dx); p.moving=!up;
+  if(!up&&Math.random()<dt*20) emit(p.x-dx*10,p.y-dy*10+6,1,{col:'230,245,255',glow:false,ang:Math.atan2(-dy,-dx),spread:0.6,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3});
+}
+// the first time a slide stops at a hop of one tile (once a visit): how to hop it
+function c2HopTip(k,d){
+  const A=AREA, Z=A.c2, w=A.cave.w, [dx,dy]=C2DIR[d], i=k%w; if(Z.saidHop) return;
+  const n2=k+(dx+dy*w)*2; if(i+dx*2<0||i+dx*2>=w||!c2WalkK(n2,{stride:canWalkWater()})) return;
+  Z.saidHop=1; const c=jumpCtl();
+  mvTip(S('Hop the gap','Hop!'),S(`${capF(c.v)} as you slide (or push toward the water and jump) to hop over one tile of water. Two tiles is too far.`,`One tile of water? ${capF(c.v)} to hop over it!`),6,'c2_hop');
 }
 
 // ---------- the per-frame update
@@ -294,7 +388,7 @@ function c2Hazard(kd){
   if(kd==='abyss'){ dmg=0.1; emit(x,y,18,{col:'70,58,48',glow:false,smin:20,smax:90,lmin:.3,lmax:.7,zmin:2,zmax:5,grow:4}); SFX.play('roll'); shake(3); ftext(x,y-28,pick([S('Whoops!','Oops!'),S('Down you go!','Down!'),S('Not that way!','Not there!')]),'#ffd9a0',14); }
   else if(kd==='lava'){ dmg=0.15; mvSnd('sizzle'); emit(x,y,30,{kind:'fire',smin:60,smax:220,lmin:.3,lmax:.7,zmin:3,zmax:7,grow:8,drag:3}); ftext(x,y-28,S('Too hot!','Hot!'),'#ffb070',14); }
   else { mvSnd('splash'); for(let i=0;i<3;i++) G.ripples.push({x:x+rand(-6,6),y:y+rand(-4,4),t:0,max:0.7+i*0.25,r:16+i*10,splash:true}); emit(x,y,22,{col:'215,232,245',glow:false,ang:-Math.PI/2,spread:1.3,smin:60,smax:200,lmin:.3,lmax:.7,zmin:1.5,zmax:3.5,drag:2,rise:-160}); ftext(x,y-26,kd==='whirl'?S('Glug! The whirlpool spits you out!','Glug! Spat out!'):S('Splash!','Splash!'),'#bfe6ff',14); }
-  const s=c2SafeSpot(); p.x=s.x; p.y=s.y; p.kvx=p.kvy=0; p.avx=p.avy=0; p.dashT=0; Z.slide=null;
+  const s=c2SafeSpot(); p.x=s.x; p.y=s.y; p.kvx=p.kvy=0; p.avx=p.avy=0; p.dashT=0; Z.slide=null; Z.edge=null;
   if(kd==='abyss'){ G.fade=0.8; updateCam(0,true); }
   if(dmg&&!(window.__eb&&window.__eb.god)){ const d=Math.ceil(p.maxHp*dmg*Math.min(1,(G.diff&&G.diff.dmg)||1)); p.hp-=d; p.lastHurt=G.time; G.hurtVig=0.5; p.hurtFlash=0.12; if(settings.nums) ftext(p.x,p.y-22,'-'+d,'#ff6a5a',15); if(p.hp<=0){ p.hp=0; playerDied(); return; } }
   p.iframes=Math.max(p.iframes,1.0);
@@ -1853,7 +1947,7 @@ c2Cave('icefang',{rooms:{
          '#i#iiii;iiiiii#',
          'siiiiiiiiii&ii#',
          '######...######']},
-  id:{at:[2,2],kind:'c2',goal:'reach',reachAt:[12,9],reward:'key',noPots:1,sign:S(`THE FROZEN LAKE. Far too cold to swim. A block pushed into the water freezes it solid. An icicle dropped in the water makes a floe you can hop to.`,`Too cold to swim! Blocks freeze the water. Icicles make floes to hop on.`),
+  id:{at:[2,2],kind:'c2',goal:'reach',reachAt:[12,9],reward:'key',noPots:1,sign:S(`THE FROZEN LAKE. Far too cold to swim. A block pushed into the water freezes it solid. An icicle dropped in the water makes a floe you can hop to. Jump as you slide and you hop one tile of water, never two.`,`Too cold to swim! Blocks freeze the water. Icicles make floes. Jump as you slide to hop one tile.`),
     lay:['iiiiaaaaaaaaaaa',
          'si#iaaaaaaa...a',
          'iJiiiiiaaii...a',
@@ -1872,7 +1966,7 @@ c2Cave('icefang',{rooms:{
          '#######J#######',
          '#######i#######',
          '#ii#iiii;iiiii#',
-         '#ii#iiiiiiiiii#',
+         '#ii#iiiaiiiiii#',
          'aaaaaaaaaaaaaaa',
          '#iiii#iiiiiiiis',
          '#iiiJiiiiiiiii#',
@@ -2299,6 +2393,8 @@ function c2Reach(o){
   const ice=k=>c2Kind(k)==='ice'&&!Z.plat.get(k);
   while(qi<q.length){ const k=q[qi++], i=k%w; cur0=dist[k];
     for(let d=0;d<4;d++){ const [dx,dy]=C2DIR[d]; if((i+dx)<0||(i+dx)>=w) continue; const nk=k+dx+dy*w;
+      // (v12 ICE) the hop from the ice over one tile of water (o.jump): onto the far side, sliding on over more ice
+      if(o.jump&&ice(k)&&(i+2*dx)>=0&&(i+2*dx)<w){ const l=nk+dx+dy*w; if(!c2WalkK(nk,o)&&c2SlideOpen(nk,true)&&c2WalkK(l,o)){ let cur=l; for(let s=0;s<60&&ice(cur);s++){ const nx=cur+dx+dy*w; if(!c2WalkK(nx,o)) break; cur=nx; } add(cur); } }
       if(ice(k)||(ice(nk)&&c2WalkK(nk,o))){
         // on ice (or stepping onto it) you slide until something stops you
         let cur=k; if(!ice(k)){ cur=nk; }
