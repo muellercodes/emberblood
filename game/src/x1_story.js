@@ -1170,7 +1170,7 @@ if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)&&!PEBBLE_MAIL.so
     xl('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     xdo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>reached('c_salt'),lines:[
-    c1If('wren',`Dear Ash. Remember the torn page? Ember's other child sailed south, with no fire. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. The torn page said Ember's other child went south. Now you have too!`,()=>!!(G.quests.a1_moth&&G.quests.a1_moth.done)),
+    c1If('wren',`Dear Ash. Remember the torn page? Ember's other child sailed south, with no fire. And now you have gone south too. Well, walked. Same thing.`,`Dear Ash. The torn page said Ember's other child went south. Now you have too!`,()=>!!(G.quests.a1_moth&&G.quests.a1_moth.done)),
     c1If('wren',`Dear Ash. My oldest books say a girl with horns once went south over the pass, a very long time ago, with a rope and a lantern. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Long ago a girl with horns went south. Now you have too!`,()=>!(G.quests.a1_moth&&G.quests.a1_moth.done)),
     xl('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have written to each other for thirty years and never once agreed about anything. It's been wonderful.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
     xl('wren',`Ask her about the old logbook on her shelves, the one with pages missing. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about the old logbook. Your friend, Wren.`)]},
