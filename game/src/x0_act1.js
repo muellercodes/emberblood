@@ -1872,7 +1872,7 @@ function a1Slab(g,hx,hy,a,w,h,col,handle){
 // little longer so they still meet in the middle): enough of each leaf's face turns to the camera to show its planks,
 // its iron straps and its ring, so it reads as a pair of doors. The bow is the start of the swing, so opening is one
 // smooth movement. Only the art bows; the collider across the gap is as before.
-const A1G_BOW=18*Math.PI/180;
+const A1G_BOW=24*Math.PI/180;
 function a1GDrawDoors(g,only){
   const k=a1GK(g), e=k*k*(3-2*k), j=a1GJig(g)*0.035, m=a1GMode(g);
   const C=g.id==='north'&&m==='gate'?['#b88450','#ad7a48']:['#8a5a34','#82552f'];

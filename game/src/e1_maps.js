@@ -225,11 +225,11 @@ function mapZCentre(x,y,z){
 }
 // the canvas fills the map frame (it was a fixed 1120 x 880 picture with parchment bars beside it, and on a phone it
 // was a small box with tiny words): MAPZ.res canvas px per CSS px, so labels and markers are the same size on a phone
-// as on a desktop. Taller than wide boxes on a phone held upright. Returns true when the size changed.
+// as on a desktop. A phone held upright gets a squarer box. Returns true when the size changed.
 function mapZSize(){
   const wrap=mapCv.parentElement; if(!wrap) return false;
   const W0=wrap.clientWidth; if(!(W0>40)) return false;
-  const Hc=Math.round(Math.min(innerHeight*0.58,W0*(W0<600?1.1:0.786))), cw=Math.round(W0*MAPZ.res), ch=Math.round(Hc*MAPZ.res);
+  const Hc=Math.round(Math.min(innerHeight*0.58,W0*(W0<600?0.9:0.786))), cw=Math.round(W0*MAPZ.res), ch=Math.round(Hc*MAPZ.res);
   mapCv.style.width=W0+'px'; mapCv.style.height=Hc+'px';
   if(mapCv.width===cw&&mapCv.height===ch) return false;
   mapCv.width=cw; mapCv.height=ch; return true;
