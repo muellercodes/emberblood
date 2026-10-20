@@ -167,7 +167,7 @@ function proTarget(){
 }
 function proTick(dt){
   if(!PRO.on||(PRO.phase!=='walk'&&PRO.phase!=='home')) return;
-  PRO.walkT+=dt; G.wolfT=1e9;
+  PRO.walkT+=dt; G.wolfT=1e9; proSkipPlace(); if(PRO.skipDev!==curDevice()) proSkipLabel();
   const w=proWhere(); PRO.phase=w==='out'?'walk':'home';
   if(w==='up'){ const b=AREA.objs.find(o=>o.k==='bed'&&o.home); if(b&&!b.prompt){ b.prompt=()=>S('Get into bed','Go to bed'); PRO.bed=b; } }
   if(w==='out'){
@@ -217,7 +217,13 @@ function proSkipShow(on){
     document.body.appendChild(b); PRO.skipEl=b;
   }
   if(!b) return;
-  if(on){ proSkipLabel(); b.style.display='flex'; } else b.style.display='none';
+  if(on){ proSkipLabel(); proSkipPlace(); b.style.display='flex'; } else b.style.display='none';
+}
+// on a narrow screen in play the HUD fills the top: the pill sits under it
+function proSkipPlace(){
+  const b=PRO.skipEl; if(!b) return;
+  const low=PRO.on&&(PRO.phase==='walk'||PRO.phase==='home'||PRO.phase==='bed')&&innerWidth<600, k=low?'low':'top'; if(PRO.skipAt===k) return; PRO.skipAt=k;
+  b.style.top=low?'calc(max(12px,env(safe-area-inset-top,0px)) + 150px)':'max(12px,env(safe-area-inset-top,0px))';
 }
 function proSkipLabel(){
   const b=PRO.skipEl; if(!b) return;
@@ -258,6 +264,7 @@ function proStep(dt,rt){
   PRO.squeeze=Math.max(0,PRO.squeeze-dt*0.55);
   if(PRO.on&&scene==='menu'){ proAbort(); return; }
   if(PRO.skipEl&&PRO.on&&PRO.skipDev!==curDevice()) proSkipLabel();
+  if(PRO.skipEl&&PRO.on) proSkipPlace();
   if(((PRO.fc=(PRO.fc||0)+1)%5)===0){ let tg=0; try{ const dl=document.getElementById('dialogue'), bx=document.getElementById('dlgBox'); if(dl&&bx&&dl.classList.contains('on')&&PRO.oy){ const top=bx.getBoundingClientRect().top-52, ay=PRO.oy+(PRO_ASH.y+30)*PRO.sc; if(ay>top) tg=top-ay; } }catch(e){} PRO.oyT=tg; }
   PRO.oyS=(PRO.oyS||0)+((PRO.oyT||0)-(PRO.oyS||0))*Math.min(1,rt*5);
 }
@@ -336,7 +343,7 @@ function proLayout(){
   const w=innerWidth, h=innerHeight, dpr=Math.min(1.5,window.devicePixelRatio||1);
   const bottom=clamp(h*0.27,150,250), top=48, aw=w*0.98, ah=h-bottom-top;
   const fw=PRO_FOCUS.x1-PRO_FOCUS.x0, fh=PRO_FOCUS.y1-PRO_FOCUS.y0;
-  let sc=Math.min(aw/fw,ah/fh); if(w<h) sc=Math.min(sc*1.1,ah/fh,w/360);   // a phone held upright: the stage a little bigger, the edges panned to
+  let sc=Math.min(aw/fw,ah/fh); if(w<h) sc=Math.min(ah/fh,w/420);   // a phone held upright: the booth fills the width, the camera pans to the rest
   sc=clamp(sc,0.42,2.6);
   const oy=top+ah/2-((PRO_FOCUS.y0+PRO_FOCUS.y1)/2)*sc;
   const key=[w,h,dpr,sc.toFixed(3),LOOK.sb?1:0].join('|');
