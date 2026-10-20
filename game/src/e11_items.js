@@ -158,7 +158,9 @@ function itAreaChestItem(o){ return itPick(itActAt(),itHash('itp|'+(AREA?AREA.id
 // ---------- 4. the limits
 function itBossLive(){ const b=G&&G.boss, p=player; return !!(b&&!b.dead&&b.aggro&&!(b.spawnIn>0)&&p&&dist(b.x,b.y,p.x,p.y)<=820); }
 function itBossMax(){ return G&&G.diff&&G.diff.name==='Easy'?2:1; }
-function itBossTrack(){ if(IT.boss.e!==G.boss) IT.boss={e:G.boss,n:0}; return IT.boss; }
+// one attempt: the story boss site while one is on (a fight whose boss changes hands, like a pair, stays one attempt),
+// else the boss itself; a death starts a new attempt (playerDied below)
+function itBossTrack(){ const k=G.fightSite?'site:'+G.fightSite:G.boss; if(IT.boss.e!==k) IT.boss={e:k,n:0}; return IT.boss; }
 // Pim's cocoa (and anything else that works by itself and should count): true when it may fire now (and counts it)
 function itemBossTake(id){
   try{ itSync(); if(!itStory()||!itBossLive()) return true; const B=itBossTrack(); if(B.n>=itBossMax()) return false; B.n++; return true; }catch(e){ return true; }
