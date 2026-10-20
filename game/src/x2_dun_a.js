@@ -318,7 +318,13 @@ function d2aWallCell(k,t){ const X=AREA&&AREA.d2a, fl=d2aFlood(), fz=!!(X&&X.frz
 { const base=dunCheck; dunCheck=function(k,x,y,air,fly){
     const A=AREA; if(A&&A.d2a){
       if(typeof P3!=='undefined'&&(P3.ride||P3.mv)) return null;          // a ride, a hop or its landing
-      if(!fly&&!(typeof P2!=='undefined'&&P2.mv)){ const t=A.cave.typ[k]; if(t>=230&&t<=239&&d2aWallCell(k,t)) return 'wall'; } }
+      if(!fly&&!(typeof P2!=='undefined'&&P2.mv)){ const t=A.cave.typ[k]; if(t>=230&&t<=239&&d2aWallCell(k,t)){
+          // (v12 ICE) slush and the dam's lake: never waded, but a jump passes over them, and one that comes down in
+          // them is a cold splash back to where he last stood still
+          if(t===D2T.slush||t===D2T.lake){ const p=player, z=p.z||0;
+            if(air||(z>0&&(p.vz||0)>0)) return null;
+            if(tCell(p.x,p.y)===k&&(z>0||(A.tri&&A.tri.wasAir))){ d2aSlushFall(A,p); return null; } }
+          return 'wall'; } } }
     return base.apply(this,arguments); }; }
 { const base=caveBlockedAt; caveBlockedAt=function(k){
     if(base(k)) return true; const A=AREA, X=A&&A.d2a; if(!X) return false;
@@ -348,9 +354,15 @@ function d2aOnSolve(A,R){
 // axis of the stick); he goes cell by cell while the next cell takes him, and stops at the centre of the last one, or
 // on the first cell that is not slick (plain floor, a doorway, a puddle). Walls, shut doors, blocks, statues, chests,
 // slush, holes and a step up or down all stop him. While he slides the stick does nothing; fire breath still works.
-// Standing on the ice he cannot jump, roll or dash (his feet go everywhere); holding fire breath lets him turn on the
-// spot to aim. Blocks follow the same rule, but only inside their own room.
-const D2AN={slide:330,bslide:360,push:0.25,melt:1.0,seal:[20,15,12],vwarn:0.8,vblow:0.5,thawK:1};
+// Standing on the ice he cannot roll or dash (his feet go everywhere); holding fire breath lets him turn on the spot to
+// aim. Blocks follow the same rule, but only inside their own room.
+// (v12 ICE, the same rules as Icefang's ice in e9b_caves2.js) JUMP while he slides is a low quick hop along with the
+// slide (D2AN.hop cells at the slide's speed); in the air the slide keeps its rules (floor and puddles still stop him,
+// more ice keeps him going) and only slush or the dam's lake pass under him. A jump from a standstill goes straight up
+// (no grip), unless the stick pushes him off along the ice or at one tile of slush. Slush and the lake are never waded,
+// but a jump passes over them; landing in one is a cold splash back to where he last stood still. A jump that lands on
+// the ice with speed sets him sliding the way he flew.
+const D2AN={slide:330,bslide:360,push:0.25,melt:1.0,seal:[20,15,12],vwarn:0.8,vblow:0.5,thawK:1,hop:2.2};
 function d2aSlick(A,k){ const X=A.d2a, c=A.cave; if(k<0||!X) return false; if(X.pud.has(k)) return false; const t=c.typ[k]; if(t===D2T.slick) return true; if(X.frz.has(k)&&(t===D2T.slush||t===D2T.shaft)) return true; return false; }
 function d2aAshOn(A,k){ const p=player, q=tPos(k), cs=A.cave.cell; return Math.abs(p.x-q.x)<cs*0.5+p.r*0.8&&Math.abs(p.y-q.y)<cs*0.5+p.r*0.8; }
 // can Ash (who='ash') or a block (who=the block) move from cell k into cell n?
@@ -374,20 +386,35 @@ function d2aBlockSnap(A,b){ const cs=A.cave.cell; b.x=A.x0+(b.ci+0.5)*cs; b.y=A.
 { const base=updatePlayer; updatePlayer=function(dt,inp){
     const p=player, A=AREA;
     if(!p||!G||!A||!A.d2a) return base(dt,inp);
-    try{ return d2aPlayer(A,p,dt,inp,base); }catch(e){ console.error(e); A.d2a.sl=null; return base(dt,inp); } }; }
+    const X=A.d2a, up=d2aUp(p); if(!up) X.trail=null;   // (v12 ICE) where a jump has flown, for d2aSlushFall
+    try{ return d2aPlayer(A,p,dt,inp,base); }catch(e){ console.error(e); A.d2a.sl=null; return base(dt,inp); }
+    finally{ if(up||d2aUp(p)){ const T=X.trail||(X.trail=[]); T.push(p.x,p.y); if(T.length>32) T.splice(0,2); } } }; }
 function d2aBusy(p){ return (typeof P3!=='undefined'&&(P3.ride||P3.mv))||(typeof P2!=='undefined'&&(P2.mv||P2.dash))||p.flying||airborne()||p.dead; }
+const d2aUp=p=>(p.z||0)>0||(p.vz||0)>0;
 function d2aPlayer(A,p,dt,inp,base){
   const X=A.d2a, c=A.cave, cs=c.cell, w=c.w;
   if(X.dbgIn) inp=Object.assign({},inp,X.dbgIn);
-  if(d2aBusy(p)||scene!=='play'){ X.sl=null; X.pushB=null; return base(dt,inp); }
+  const up=d2aUp(p), avx=p.avx||0, avy=p.avy||0;
+  const free=!p.flying&&!p.dead&&scene==='play'&&!(typeof P3!=='undefined'&&(P3.ride||P3.mv))&&!(typeof P2!=='undefined'&&(P2.mv||P2.dash));
+  // (v12 ICE) a hop on the ice: no steering in the air (the slide goes on under him, or he went straight up); the
+  // game's own Double Jump still works
+  if(up&&free&&(X.sl||X.hop)){
+    const q=Object.assign({},inp,{mx:0,my:0,roll:false,sprint:false}); const r=base(dt,q);
+    if(X.sl) d2aSlideStep(A,p,dt); p.kvx=p.kvy=0;
+    if(!d2aUp(p)) X.hop=false;
+    return r; }
+  X.hop=false;
+  if(d2aBusy(p)||scene!=='play'){ X.sl=null; X.pushB=null; const r=base(dt,inp); if(up&&free&&!d2aUp(p)) d2aLandOnIce(A,p,avx,avy); return r; }
   const k=tCell(p.x,p.y), onIce=k>=0&&d2aSlick(A,k);
   const mx=inp.mx||0, my=inp.my||0, mag=Math.hypot(mx,my), aim=inp.fire||p.breathing;
   // pushing a block: walk (or lean, on the ice) into it for a moment
   d2aPushTick(A,p,dt,mx,my,mag);
-  if(!onIce&&!X.sl) return base(dt,inp);
-  // on the ice: the stick only starts a slide (or turns Ash while he breathes fire)
+  if(!onIce&&!X.sl){ const r=base(dt,inp); if(!d2aUp(p)){ if(up) d2aLandOnIce(A,p,avx,avy); d2aRest(A,p); } return r; }
+  // on the ice: the stick only starts a slide (or turns Ash while he breathes fire); JUMP is a hop (see above)
   const q=Object.assign({},inp,{mx:0,my:0,jump:false,jumpHeld:false,roll:false,sprint:false});
-  if(!X.sl&&mag>0.5){
+  if(up){ q.jump=inp.jump; q.jumpHeld=inp.jumpHeld; }
+  else if(inp.jump&&canJump()&&free&&p.drinkT<=0&&!G.fishing&&!MV.lk&&!(p.dashT>0.1)) d2aIceJump(A,p,k,mx,my,mag,aim);
+  if(!X.sl&&!X.hop&&!d2aUp(p)&&mag>0.5){
     const ang=Math.atan2(my,mx);
     if(aim){ p.faceGoal=ang; p.facing=turnTo(p.facing,ang,12*dt); }
     else{ const ax=Math.abs(mx)>=Math.abs(my), dx=ax?Math.sign(mx):0, dy=ax?0:Math.sign(my), n=k+dx+dy*w;
@@ -397,24 +424,83 @@ function d2aPlayer(A,p,dt,inp,base){
   const r=base(dt,q);
   if(X.sl) d2aSlideStep(A,p,dt);
   p.kvx=p.kvy=0;
+  if(up&&!d2aUp(p)&&!X.sl&&!X.hop) d2aLandOnIce(A,p,avx,avy);
+  if(!X.sl&&!d2aUp(p)) d2aRest(A,p);
   return r;
 }
+// JUMP pressed on the ice: a hop with the slide; from a standstill a push off along the stick (onto the ice, or over one
+// tile of slush), else straight up
+function d2aIceJump(A,p,k,mx,my,mag,aim){
+  const X=A.d2a, w=A.cave.w;
+  if(!X.sl&&mag>0.5&&!aim){ const ax=Math.abs(mx)>=Math.abs(my), dx=ax?Math.sign(mx):0, dy=ax?0:Math.sign(my), n=k+dx+dy*w, q0=tPos(k);
+    if(d2aEnter(A,k,n,'ash')||(d2aAirGap(A,n)&&d2aEnterAir(A,n,n+dx+dy*w))){ X.sl={dx,dy,d:0}; if(dx) p.y=q0.y; else p.x=q0.x; p.facing=p.faceGoal=Math.atan2(dy,dx); } }
+  if(X.sl){ d2aHop(A,p); return; }
+  d2aTakeoff(p,1); X.hop=true;
+  if((X.gripN||0)<2){ X.gripN=(X.gripN||0)+1; d2aFt(p.x,p.y-40,S('No grip! Slide, then jump.','Slide, then jump!'),'#dff4ff',13,'grip',1); }
+}
+function d2aTakeoff(p,f){
+  const k=(p.stats&&p.stats.jumpK)||1;
+  MV.jumpBuf=0; MV.takeSpd=0; MV.flapT=0.5; MV.jrec={x0:p.x,y0:p.y,t0:G.time,zmax:0};
+  p.dashT=0; p.avx=p.avy=0; p.vz=JUMP_V*k*f; p.z=0.01; p.dbl=false; p.slam=false; p.sqT=0.12; p.sqD=0.12; p.sqA=-0.12;
+  mvSnd('jump'); emit(p.x,p.y+5,6,{col:'230,245,255',glow:false,smin:20,smax:70,lmin:.2,lmax:.4,zmin:2,zmax:4,grow:5});
+  if(G.stats) G.stats.jumps=(G.stats.jumps||0)+1;
+}
+// the hop with the slide: low and quick, D2AN.hop cells at the slide's speed
+function d2aHop(A,p){ const S=A.d2a.sl, T=Math.min(0.5,D2AN.hop*A.cave.cell/D2AN.slide); d2aTakeoff(p,2*T);
+  emit(p.x-S.dx*10,p.y+6,8,{col:'235,248,255',glow:false,ang:Math.atan2(-S.dy,-S.dx),spread:0.9,smin:30,smax:110,lmin:.2,lmax:.45,zmin:1.5,zmax:3,drag:2});
+  if(G.stats) G.stats.d2aHops=(G.stats.d2aHops||0)+1; }
+// a jump landing on the ice with speed slides on the way he flew (a landing is never a new place to stop)
+function d2aLandOnIce(A,p,vx,vy){ const X=A.d2a, w=A.cave.w, k=tCell(p.x,p.y); if(k<0||!d2aSlick(A,k)||X.sl||Math.hypot(vx,vy)<60) return;
+  const ax=Math.abs(vx)>=Math.abs(vy), dx=ax?Math.sign(vx):0, dy=ax?0:Math.sign(vy), q0=tPos(k), s=(p.x-q0.x)*dx+(p.y-q0.y)*dy;
+  if(!d2aEnter(A,k,k+dx+dy*w,'ash')&&s>-2) return;
+  X.sl={dx,dy,d:0}; if(dx) p.y=q0.y; else p.x=q0.x; p.facing=p.faceGoal=Math.atan2(dy,dx); }
+// where he last stood still on solid ground (a fall into slush comes back here)
+function d2aRest(A,p){ const X=A.d2a, k=tCell(p.x,p.y); if(k<0||X.sl||p.dead||!tGround(k)||X.frz.has(k)||tHole(k)) return; X.rest={x:p.x,y:p.y,k}; }
+// slush and the dam's lake before it drains: cells a jump passes over
+function d2aAirGap(A,k){ const c=A.cave; if(k<0||k>=c.typ.length||c.grid[k]!==0) return false; const t=c.typ[k]; return (t===D2T.slush||t===D2T.lake)&&d2aWallCell(k,t); }
+// can Ash in the air go from cell k into cell n (over slush, or onto the far bank)
+function d2aEnterAir(A,k,n){ const c=A.cave, w=c.w; if(n<0||n>=c.typ.length||Math.abs((n%w)-(k%w))>1) return false;
+  if(c.grid[n]!==0||caveBlockedAt(n)) return false; if(d2aAirGap(A,n)) return true;
+  if(d2aAirGap(A,k)){ if(!tGround(n)||tHole(n)) return false; const q=tPos(n); return !colAt(q.x,q.y,12); }
+  return d2aEnter(A,k,n,'ash'); }
+// a jump that just overshoots a bank or an island into the slush lands on the edge it flew over (within 0.6 of a
+// cell of its path): only a place a shorter jump would reach, never further, and never slick ice
+function d2aLandBack(A,p){
+  const X=A.d2a, T=X.trail, cs=A.cave.cell; if(!T||T.length<4) return false; let d=0, lx=p.x, ly=p.y;
+  for(let i=T.length-2;i>=0;i-=2){ const x=T[i], y=T[i+1]; d+=Math.hypot(x-lx,y-ly); lx=x; ly=y; if(d>0.6*cs) break;
+    const k=tCell(x,y); if(k<0||!tGround(k)||tHole(k)||d2aSlick(A,k)||X.frz.has(k)||caveBlockedAt(k)||colAt(x,y,10)) continue;
+    p.x=x; p.y=y; p.z=0; p.vz=0; p.kvx=p.kvy=0; p.avx=p.avy=0; X.trail=null; X.sl=null; X.hop=false;
+    if(A.tri){ A.tri.lx=p.x; A.tri.ly=p.y; A.tri.wasAir=false; }
+    emit(x,y+4,6,{col:'220,240,255',glow:false,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); return true; }
+  return false; }
+// a jump that came down in slush: a cold splash, back to where he last stood still
+function d2aSlushFall(A,p){
+  if(d2aLandBack(A,p)) return;
+  const X=A.d2a, R=X.rest, ok=R&&R.k>=0&&tGround(R.k)&&!caveBlockedAt(R.k)&&!X.frz.has(R.k), s=ok?R:dunNearGround(p.x,p.y,4);
+  G.ripples.push({x:p.x,y:p.y,t:0,max:0.9,r:22,splash:true}); emit(p.x,p.y,16,{col:'215,235,250',glow:false,ang:-Math.PI/2,spread:1.3,smin:40,smax:140,lmin:.3,lmax:.6,zmin:2,zmax:4}); SFX.play('pop'); d2aSnd('plop',0.6);
+  p.x=s.x; p.y=s.y; p.z=0; p.vz=0; p.kvx=p.kvy=0; p.avx=p.avy=0; X.sl=null; X.hop=false;
+  if(A.tri){ A.tri.lx=p.x; A.tri.ly=p.y; A.tri.wasAir=false; }
+  d2aFt(p.x,p.y-40,S('Brrr! Slush!','Brrr!'),'#dff4ff',14,'slush');
+  if(G.stats) G.stats.d2aDunks=(G.stats.d2aDunks||0)+1;
+}
 function d2aSlideStep(A,p,dt){
-  const X=A.d2a, S=X.sl, c=A.cave, w=c.w, cs=c.cell; let rem=D2AN.slide*dt, guard=0;
+  const X=A.d2a, S=X.sl, c=A.cave, w=c.w, cs=c.cell, up=d2aUp(p); let rem=D2AN.slide*dt, guard=0;
   while(rem>0.001&&X.sl&&guard++<12){
     const k=tCell(p.x,p.y); if(k<0){ X.sl=null; break; } const q=tPos(k), s=(p.x-q.x)*S.dx+(p.y-q.y)*S.dy;
     if(S.dx) p.y=q.y; else p.x=q.x;
     if(s<-0.01){ const d=Math.min(rem,-s); p.x+=S.dx*d; p.y+=S.dy*d; rem-=d; S.d+=d; continue; }
-    if(!d2aSlick(A,k)){ p.x=q.x; p.y=q.y; d2aSlideEnd(A,p,false); break; }
+    // (v12 ICE) in a hop only slush and the lake pass under him; anything he could stand on still ends the slide
+    const gap=up&&d2aAirGap(A,k);
+    if(!gap&&!d2aSlick(A,k)){ p.x=q.x; p.y=q.y; d2aSlideEnd(A,p,false); break; }
     const n=k+S.dx+S.dy*w;
-    if(!d2aEnter(A,k,n,'ash')){ p.x=q.x; p.y=q.y; d2aSlideEnd(A,p,true); break; }
+    if(!(up?d2aEnterAir(A,k,n):d2aEnter(A,k,n,'ash'))){ p.x=q.x; p.y=q.y; d2aSlideEnd(A,p,true); break; }
     const d=Math.min(rem,cs*0.5-s+0.02); p.x+=S.dx*d; p.y+=S.dy*d; rem-=d; S.d+=d;
   }
-  if(X.sl){ p.moving=false; X.slT=(X.slT||0)-dt; if(X.slT<=0){ X.slT=0.3; d2aSnd('slide',0.6); }
+  if(X.sl&&!up){ p.moving=false; X.slT=(X.slT||0)-dt; if(X.slT<=0){ X.slT=0.3; d2aSnd('slide',0.6); }
     if(Math.random()<0.5) emit(p.x-S.dx*14+rand(-6,6),p.y+8,1,{col:'235,248,255',glow:false,ang:Math.atan2(-S.dy,-S.dx),spread:0.5,smin:20,smax:70,lmin:.2,lmax:.4,zmin:1.5,zmax:3,drag:2}); }
   if(A.tri){ A.tri.lx=p.x; A.tri.ly=p.y; }
 }
-function d2aSlideEnd(A,p,bump){ const X=A.d2a, S=X.sl; X.sl=null; if(S&&S.d>20){ if(bump){ d2aSnd('bump',0.7); shake(1); } emit(p.x+S.dx*16,p.y+6,5,{col:'235,248,255',glow:false,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); }
+function d2aSlideEnd(A,p,bump){ const X=A.d2a, S=X.sl; X.sl=null; if(d2aUp(p)) X.hop=true; if(S&&S.d>20){ if(bump){ d2aSnd('bump',0.7); shake(1); } emit(p.x+S.dx*16,p.y+6,5,{col:'235,248,255',glow:false,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); }
   if(G.stats) G.stats.d2aSlides=(G.stats.d2aSlides||0)+1; }
 // pushing: Ash beside a block, the stick toward it, for D2AN.push seconds
 function d2aPushTick(A,p,dt,mx,my,mag){
