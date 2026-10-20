@@ -655,7 +655,7 @@ function ttlForeground(g,L,P,pr){
     ttlInk(g,[[px+2*u,by-ph+2*u],[ax-2*u,ay-2*u]],3*u,{col:P.timber,seed:304,taper:0.05,straight:true}); ttlInk(g,[[px+2*u,by-ph+6*u],[px-10*u,by-ph+16*u]],1.6*u,{col:P.timber,seed:305,taper:0.1,straight:true});
     ttlInk(g,[[px+2*u,by-ph+3.6*u],[ax-2*u,ay-0.4*u]],0.9*u,{col:P.ink,seed:306,straight:true,taper:0.05});
     g.fillStyle=P.ink; g.beginPath(); g.arc(px+1*u,by-ph-2*u,3.2*u,0,TAU); g.fill();
-    ttlLantern(g,L,P,ax,ay+15*u*ts,11*u*ts,P.lan[1],311); TTL.perch.unshift(TTL.lan[TTL.lan.length-1]);
+    ttlLantern(g,L,P,ax,ay+15*u*ts,11*u*ts,P.lan[1],311); TTL.perch.splice(TTL.four?1:0,0,TTL.lan[TTL.lan.length-1]);
     g.fillStyle=ttlA(P.ink,0.35); g.beginPath(); g.ellipse(px+4*u,by,14*u,3*u,0,0,TAU); g.fill(); }
   // fireflies to wander over the grass and the green
   TTL.flies=[]; const fr=mulberry32(9001), n=L.side?10:7;
