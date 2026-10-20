@@ -291,7 +291,6 @@ function proJit(P,R,a){ return P.map(p=>[p[0]+(R()-0.5)*a,p[1]+(R()-0.5)*a]); }
 function proEll(cx,cy,rx,ry,n,rot){ n=n||18; const o=[], c=Math.cos(rot||0), s=Math.sin(rot||0); for(let i=0;i<n;i++){ const a=i/n*TAU, x=Math.cos(a)*rx, y=Math.sin(a)*ry; o.push([cx+x*c-y*s,cy+x*s+y*c]); } return o; }
 // a polygon with its edges cut into short steps (so the wobble has somewhere to go)
 function proPoly(V,step){ const o=[]; step=step||14; for(let i=0;i<V.length;i++){ const a=V[i], b=V[(i+1)%V.length], n=Math.max(1,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/step)); for(let k=0;k<n;k++) o.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n]); } return o; }
-function proLine(V,step){ const o=[]; step=step||14; for(let i=0;i<V.length-1;i++){ const a=V[i], b=V[i+1], n=Math.max(1,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/step)); for(let k=0;k<n;k++) o.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n]); } o.push(V[V.length-1]); return o; }
 // a watercolour shape: two washes a little off each other, pigment pooled at the edge, an ink line over it
 function proWash(g,P,col,seed,o){
   o=o||{}; const R=mulberry32(seed|0), c=proRGB(col), j=o.j==null?2.4:o.j, A=o.a==null?1:o.a;
@@ -332,7 +331,7 @@ const PRO_HZ=-40;                                  // the far edge of the green
 const PRO_FOCUS={x0:-290,x1:290,y0:-262,y1:206};   // what must be on screen
 const PRO_SPAN=520;                                // how far the camera may look each way (the painting goes PRO.span)
 const PRO_ASH={x:-212,y:166}, PRO_MOM={x:-246,y:110}, PRO_ROOK={x:-292,y:176}, PRO_LIT=[[-150,186,15],[-112,190,13.5]];
-const PRO_YARA={x:396,y:150}, PRO_WEN={x:206,y:150}, PRO_MOTHAT={x:-212,y:-178};
+const PRO_YARA={x:396,y:150}, PRO_WEN={x:206,y:150};
 function proLayout(){
   const w=innerWidth, h=innerHeight, dpr=Math.min(1.5,window.devicePixelRatio||1);
   const bottom=clamp(h*0.27,150,250), top=48, aw=w*0.98, ah=h-bottom-top;
@@ -773,6 +772,8 @@ function proDraw(){
 { const base=render; render=function(){ if(PRO.on&&PRO.cover&&scene!=='play'){ ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle='#08060c'; ctx.fillRect(0,0,cvs.width,cvs.height); return; } return base.apply(this,arguments); }; }
 // the walk: the tip with the keys instead of the coach; the per-frame checks
 { const base=drawCoach; drawCoach=function(){ if(PRO.on) return; return base.apply(this,arguments); }; }
+// no quest marks over heads tonight (Mom's "!" is for the morning)
+{ const base=drawMarkers; drawMarkers=function(){ if(PRO.on) return; return base.apply(this,arguments); }; }
 { const base=drawHUD; drawHUD=function(){ const r=base.apply(this,arguments); if(PRO.on&&scene==='play') try{ proDrawTip(); }catch(e){} return r; }; }
 { const base=update; update=function(dt){ const r=base.apply(this,arguments); if(PRO.on) try{ proTick(dt); }catch(e){ console.error(e); } return r; }; }
 { const base=setupNPCs; setupNPCs=function(){ const r=base.apply(this,arguments); if(PRO.on&&PRO.phase!=='title'&&PRO.phase!=='show') try{ proNpcs(); }catch(e){} return r; }; }
