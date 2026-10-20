@@ -1128,7 +1128,7 @@ if(typeof DREAMS!=='undefined'){
       xo(`A lantern of her own`,`A lantern of her own`,{fn:()=>{ G.flags.dr_c_twins='lantern'; },then:[xl('ember',`Here, little one. You don't need to breathe fire to carry a light.`,`You don't need fire to carry a light.`)]}),
       xo(`My warmest blanket`,`My warmest blanket`,{tone:'kind',fn:()=>{ G.flags.dr_c_twins='blanket'; },then:[xl('narr',`You lift her down off the curtains and tuck your warmest blanket round her. She stops shivering and smiles in her sleep.`,`You tuck a warm blanket round her. She smiles.`)]}),
       xo(`A promise`,`A promise`,{fn:()=>{ G.flags.dr_c_twins='promise'; },then:[xl('ember',`Fire isn't the only warm thing, little one. I promise.`,`Fire is not the only warm thing. I promise.`)]})]),
-    xl('narr',`The fire crackles. The two of them sleep curled up together, one warm and one cold, and neither of them seems to mind.`,`The two babies sleep together. One warm, one cold.`)]};
+    xl('narr',`Later the little climber crawls back into the basket. The two of them sleep curled up together, one warm and one cold, and neither of them seems to mind.`,`Later both babies sleep together. One warm, one cold.`)]};
   if(!DREAMS.c_whisper) DREAMS.c_whisper={stages:['c_light'],title:S('The Moth at the Window','The Moth at the Window'),scene:'whisper',lines:()=>[
     xl('narr',`You dream you're home in Emberhollow. It's night. The forge is warm. Mom is humming.`,`You dream of home. It is night. Mom is humming.`),
     xl('narr',`Something taps at the window. Tap. Tap. A grey moth, with two pale moons painted on her wings.`,`Tap, tap. A grey moth is at the window.`),
