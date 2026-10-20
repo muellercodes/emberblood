@@ -84191,7 +84191,8 @@ const n4sGrey=()=>!!(G&&G.choices&&G.choices.greymane==='ally');
 const n4sCin=()=>!!(G&&G.choices&&G.choices.cinder==='ally');
 const n4sTikka=()=>!!(G&&G.flags&&G.flags.tk_come==='yes');
 const n4sMom=()=>!!(G&&G.flags&&(G.flags.m_maren||G.flags.m_reforged));
-const n4sKnows=()=>typeof nKnowsNyx==='function'?!!nKnowsNyx():!!(G.flags.dr_seen_m_moth||G.flags.f_page11||G.flags.m_page11||G.found.n_pane_3);
+// whether Ash knows her name: the Act V clue n5_her_name (ring 2's name question) or n_knows (that solve, Moth Memory 3)
+const n4sKnows=()=>typeof nKnowsNyx==='function'?!!nKnowsNyx():!!((G.case&&G.case.clues&&G.case.clues.n5_her_name)||G.flags.n_knows);
 // how many of those three are here, and whether the kind ending is open: with the act 5 data, its trust track
 // `friends` and its moth ending's condition (so this file, x4_foes and the data's choice agree); else the old counts
 const n4sFreed=()=>{ const A=n4sAct5(); if(A&&A.trust&&A.trust.friends) return +(G.flags[A.trust.friends]||0); return typeof nFreed==='function'?nFreed():(n4sVes()?1:0)+(n4sGla()?1:0)+(n4sHushF()?1:0); };
@@ -84318,9 +84319,7 @@ for(const k in N4S_PORT) if(!EVPORT[k]) EVPORT[k]=N4S_PORT[k];
 #n4sBook canvas{position:absolute;inset:0;width:100%;height:100%}
 #n4sBook .n4t{position:absolute;left:0;right:0;top:max(18px,env(safe-area-inset-top,0px));text-align:center;font:600 12px ${UIF};letter-spacing:.24em;text-transform:uppercase;color:rgba(255,236,206,.9);text-shadow:0 2px 10px rgba(0,0,0,.7)}
 #n4sBook .n4n{position:absolute;left:0;right:0;top:calc(max(18px,env(safe-area-inset-top,0px)) + 20px);text-align:center;font:700 24px ${UIF};color:#fff3e0;text-shadow:0 2px 14px rgba(160,90,40,.85)}
-#n4sWinX{margin:10px 0 16px;font-size:12px;color:var(--muted);letter-spacing:.04em}
-#n4sWinSub{margin:6px 0 2px;font-size:13px;color:var(--gold);letter-spacing:.06em}
-#n4sWinMore{margin-top:12px;font-size:13px;color:#7a5ab0;font-style:italic}`;
+#n4sWinX{margin:10px 0 16px;font-size:12px;color:var(--muted);letter-spacing:.04em}`;
   document.head.appendChild(st); }catch(e){} })();
 { const base=setLine; setLine=function(){ base.apply(this,arguments); try{ const b=$('#dlgBox'); if(!b) return; const L=DLG&&DLG.lines[DLG.i], w=L?(Array.isArray(L)?L[0]:(typeof L.who==='function'?L.who():L.who)):'';
   b.classList.toggle('n4echo',/^n_echo_/.test(String(w))); b.classList.toggle('n4mem',w==='n_memory'); if(w==='n_memory') b.classList.add('narr'); }catch(e){} }; }
@@ -84426,14 +84425,12 @@ n4sDef('n_heart_end',()=>[],{again:true});
 // 9. the fall, the plea (or the hint), the choice
 n4sDef('n_fall',()=>[]);
 n4sDef('n_plea',()=>[]);
-// (why the kind ending is closed: so kids know next time)
+// (the old fallback, when the act 5 data is missing and the kind ending is closed: one feeling, never the rule and
+// never a hint for next time; the data's n_plea does the same with "She is too scared to hear a word you say.")
 function n4sClosedLines(){
-  const L=[];
-  if(!n4sKnows()) L.push(xl('narr',`You wish you knew her real name. Something tells you she had one, once.`,`You wish you knew her real name.`));
-  if(n4sFreed()<2) L.push(xl('narr',`She won't listen to you. Maybe she would listen to someone she hurt, if they were here to speak for her.`,`She won't listen. Maybe the friends she hurt could help.`));
-  return L;
+  return [xl('narr',`She curls tighter round the sliver of moon. She is too scared to hear a word you say.`,`She holds the moon tight. She is too scared to listen.`)];
 }
-// 10. the three endings (the title, the number on the victory screen, the lines)
+// 10. the three endings (the title, the line on the victory screen, the lines; n is only their order, never shown)
 const N4S_ENDINGS={
   dawn:{title:S('Morning','Morning'),n:1,msg:S('You ended the Long Night, and the morning came.','You ended the Long Night. Morning came!'),lines:()=>{
     const e=n4sEnd(); return [
@@ -84801,13 +84798,13 @@ function n4sPane(k,done){
     n4sDo(()=>{ G.found['n_pane_'+k]=true; G.flags.n_panes=n4sPanesN(); if(k===3) G.flags.n_knows=1; })];
   if(first&&k===3) L.push(n4sDo(()=>n4sSay('nyx')));
   if(first&&n4sPanesN()+(G.found['n_pane_'+k]?0:1)>=6) L.push(...STORY.n_panes_all,n4sDo(()=>{ if(!G.flags.n_panes_hp){ G.flags.n_panes_hp=1; player.maxHp+=10; player.hp=player.maxHp; setBanner(S('All six Moth Memories','All six Moth Memories'),S('You understand her now. +10 max health.','+10 health!'),3.4); } }));
-  runDialogue(L,()=>{ scene='play'; fin(); if(first) setBanner(S('Moth Memory','Moth Memory'),simplify(P.title)+' · '+n4sPanesN()+' / 6',2.6); saveGame(); });
+  runDialogue(L,()=>{ scene='play'; fin(); if(first) setBanner(S('A Moth Memory','A Moth Memory'),simplify(P.title),2.6); saveGame(); });
   return true;
 }
 // the journal's Story tab lists the Moth Memories found
 { const base=renderJour; renderJour=function(){ base(); try{ if(G&&G.mode==='story'&&typeof jTab!=='undefined'&&jTab==='story'&&n4sPanesN()>0){ const el=$('#jBody'); if(!el) return; const E=t=>escapeHtml(simplify(t));
-  const li=[]; for(let k=1;k<=6;k++) li.push(`<li>${G.found['n_pane_'+k]?E(N4S_PANE[k].title):'<span style="opacity:.55">?</span>'}</li>`);
-  el.insertAdjacentHTML('beforeend',`<div class="jh2">${E(S('Moth Memories','Moth Memories'))} (${n4sPanesN()}/6)</div><ol>${li.join('')}</ol>`); } }catch(e){ console.error(e); } }; }
+  const li=[]; for(let k=1;k<=6;k++) if(G.found['n_pane_'+k]&&N4S_PANE[k]) li.push(`<li>${E(N4S_PANE[k].title)}</li>`);
+  if(li.length) el.insertAdjacentHTML('beforeend',`<div class="jh2">${E(S('Moth Memories','Moth Memories'))}</div><ul>${li.join('')}</ul>`); } }catch(e){ console.error(e); } }; }
 
 // ---------- 3. the stages, the journal and the act (FINALE 4)
 const N4S_HINTS={
@@ -84914,7 +84911,8 @@ function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself
 // (I5) from her fall to the final choice there is nothing left to defeat or travel to (she lies there alive, so the
 // HUD said "Defeat Nyxara", or "Travel to The Moon's Rest"): it says what is being asked
 { const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5){
-  if(N4ST.run&&!(G.choices&&G.choices.n_end)) return [{text:S('Choose how the Long Night ends','Choose how it ends')}];
+  // (v12 R4) in story words, about what Ash can see: never "how it ends", which tells a kid there is more than one way
+  if(N4ST.run&&!(G.choices&&G.choices.n_end)) return [{text:S('The Night Mother has fallen. What will you do?','She has fallen. What will you do?')}];
   return out.filter(o=>!o.site||/^n_/.test(String(o.site))); } }catch(e){} return out; }; }
 
 // ---------- 4. the departure (before the fade), the arrival, the Bridgefoot
@@ -85267,7 +85265,7 @@ function n4sSimpleDragon(x,y,col,s){ s=s||1; ctx.save(); ctx.translate(x,y); ctx
       try{ if(typeof MV!=='undefined'&&MV){ MV.hover=null; MV.lx=p.x; MV.ly=p.y; } }catch(e){}
       const g=N4ST.ally.glaciar; if(g){ g.x=p.x-80; g.y=p.y-40; }
       emit(p.x,p.y,16,{col:'200,235,255',smin:40,smax:140,lmin:.3,lmax:.7,zmin:1.5,zmax:3});
-      try{ bubble(player,simplify(S('Caught you, dumpling! Slow at everything except catching.','Caught you, dumpling!')),{who:'Glaciar',col:'#a8e0ff'}); }catch(e){}
+      try{ bubble(player,simplify(S("Caught you! I'm slow at everything except catching.",'Caught you!')),{who:'Glaciar',col:'#a8e0ff'}); }catch(e){}
       return; } } }catch(e){ console.error(e); }
   return base(p,bad); }; }
 
@@ -85514,38 +85512,35 @@ function n4sEpilogue(){
   const L=n4sBookLines()||n4sEpiLines();
   runDialogue(L,()=>{ scene='play'; G.flags.n_epi=0; n4sBookClose(); n4sVictory(); },{mood:'n_epilogue'});
 }
-// ---------- 10. the victory screen (FINALE 13): "Ending n of 3", the stats, Keep exploring / Title screen
+// ---------- 10. the victory screen (FINALE 13): the ending's title and line, plain stats, Keep exploring / Title screen.
+// (v12 R4) It never counts or names other endings: no "Ending n of 3", no "Endings found", no "other ways this story can
+// end", no Act I ending title. The ending is still remembered in eb_n_endings (a13_cloud merges it), never shown.
 function n4sVictory(){
   const end=G.choices.n_end||'dawn', E=N4S_ENDINGS[end]||N4S_ENDINGS.dawn;
-  let seen={}; try{ seen=store.get('eb_n_endings',{})||{}; seen[end]=true; store.set('eb_n_endings',seen); }catch(e){}
-  const k=Object.keys(seen).length;
+  try{ const seen=store.get('eb_n_endings',{})||{}; seen[end]=true; store.set('eb_n_endings',seen); }catch(e){}
   N4ST.run=false; N4ST.cut=null; N4ST.cam=null; G.flags.n_dawn=1; G.flags.n_done=1; G.flags.n_phase=0; G.flags.moon=100;
   if(G.stage!=='n_end') G.stage='n_end';
   N4ST.bigTo=0; N4ST.big=0; G.flags.n_big=0;
   endAct(5,{title:E.title,lines:[E.msg]});
   try{
-    const F1=(typeof ENDINGS!=='undefined'&&ENDINGS[G.choices.ending||'hero'])||{title:''};
     $('#winTag').textContent=simplify(S('THE LONG NIGHT IS OVER','THE LONG NIGHT IS OVER'));
     $('#winTitle').textContent=simplify(E.title); $('#winMsg').textContent=simplify(E.msg);
-    const panel=$('#winTitle').parentElement;
-    let sub=$('#n4sWinSub'); if(!sub){ sub=document.createElement('div'); sub.id='n4sWinSub'; $('#winMsg').insertAdjacentElement('afterend',sub); }
-    sub.hidden=false; sub.textContent=simplify(`Ending ${E.n} of 3 · Endings found: ${k} of 3 · First journey: ${F1.title||''}`);
     // (every friend who came: the earlier acts' allies and the friends won back on the peak, plus Grandpa)
     const allies=['greymane','cinder','tikka','vesper','glaciar','hush'].filter(id=>n4sAllyEarned(id)).length+(n4sEnd()==='lantern'?1:0);
+    // (what was found is a plain count, never out of how many; Moth Memories and Duchess only once at least one was found)
+    const panes=n4sPanesN(), duch=n4sDuchessN();
     const rows=[[playClock(),S('Time','Time')],[player.level,S('Level','Level')],[Object.values(G.quests||{}).filter(q=>q&&q.done).length,S('Quests done','Quests')],
-      [allies,S('Friends on the peak','Friends')],[`${n4sPanesN()}/6`,S('Moth Memories','Moth Memories')],[`${n4sDuchessN()}/5`,S('Duchess sightings','Duchess')],
+      [allies,S('Friends on the peak','Friends')],...(panes>0?[[panes,S('Moth Memories','Moth Memories')]]:[]),...(duch>0?[[duch,S('Duchess sightings','Duchess')]]:[]),
       [G.found.heartEmbers|0,S('Heart Embers','Heart Embers')],[G.deaths|0,S('Times knocked down','Falls')]];
     $('#winStats').innerHTML=rows.map(([v,l])=>`<div class="stat"><b>${escapeHtml(String(v))}</b><span>${escapeHtml(simplify(l))}</span></div>`).join('');
     let x=$('#n4sWinX'); if(!x){ x=document.createElement('div'); x.id='n4sWinX'; $('#winStats').insertAdjacentElement('afterend',x); } x.hidden=false; x.textContent='Made for Toby, Gus, Linus and Rosemary.';
-    let more=$('#n4sWinMore'); if(!more){ more=document.createElement('div'); more.id='n4sWinMore'; panel.appendChild(more); }
-    more.hidden=k>=3; more.textContent=simplify(S('There are other ways this story can end.','There are other endings to find.'));
     const mb=$('#bWinMenu'); if(mb){ if(!mb.dataset.n4s) mb.dataset.n4s=mb.textContent; mb.textContent=simplify(S('Title screen','Title screen')); }
     if(ACT_RT.win) ACT_RT.win.explore=()=>{ n4sFreeRoam(); setBanner(S('The Long Night is over','The Long Night is over'),S('The Long Night is over. Go anywhere you like.','Go anywhere you like!'),3.6); };
   }catch(err){ console.error(err); }
   try{ saveGame(true); }catch(e){}
 }
 // any other act screen hides the finale's extra lines
-{ const base=actScreen; actScreen=function(o){ try{ for(const id of ['n4sWinSub','n4sWinX','n4sWinMore']){ const el=$('#'+id); if(el) el.hidden=true; } const mb=$('#bWinMenu'); if(mb&&mb.dataset.n4s) mb.textContent=mb.dataset.n4s; }catch(e){} return base(o); }; }
+{ const base=actScreen; actScreen=function(o){ try{ for(const id of ['n4sWinX']){ const el=$('#'+id); if(el) el.hidden=true; } const mb=$('#bWinMenu'); if(mb&&mb.dataset.n4s) mb.textContent=mb.dataset.n4s; }catch(e){} return base(o); }; }
 function n4sFreeRoam(){ N4ST.cut=null; N4ST.cam=null; N4ST.ally={}; N4ST.allies=[]; G.flags.n_dawn=1; G.flags.n_epi=0; try{ if(typeof n4Sync==='function') n4Sync(); }catch(e){} }
 // Duchess on the summit from the dawn on (her last sighting: Meh.)
 function n4sDuchObj(){ if(!G||!(N4ST.duchShow||G.flags.n_dawn>=1||G.done)||curMap()!==4||AREA) return null; if(!(G.choices.n_end)) return null;
@@ -86268,7 +86263,7 @@ function n4aReadPane(q){
   const D=N4A_PANE[k];
   n4aScene('n_pane_'+k,D.lines,()=>{
     if(k===3&&first) n4aBub('n_bub_pane3','ash',S('Nyx? Her name was Nyx?','Her name was Nyx?'));
-    if(first) n4aBanner(S('A Moth Memory','A Moth Memory'),D.title+' ('+n+'/6)',2.6);
+    if(first) n4aBanner(S('A Moth Memory','A Moth Memory'),D.title,2.6);
     if(n>=6&&first&&!G.flags.n_panes_hp){ G.flags.n_panes_hp=1; player.maxHp+=10; player.hp=player.maxHp; n4aSnd('heart'); n4aBanner(S('All six Moth Memories','All six memories'),S('+10 max health','+10 health'),3);
       n4aScene('n_panes_all',[['ash',S("She wasn't trying to be a monster. She was just scared of being alone. ...That's still not okay. But I get it.",'She was not a monster. She was scared of being alone. That is not okay. But I get it.')]]); }
     n4aSave();
@@ -86365,7 +86360,7 @@ function n4aBuildLanterns(){
 function n4aGateOpen(){
   if(n4aF('n_gate')) return; G.flags.n_gate=1; G.flags.n_lanterns=3; for(const L of N4A.lans) L.lit=1e9;
   n4aSnd('bigchime'); shake(4); flashA=Math.max(flashA,0.4); flashCol='255,210,140';
-  n4aBub('n_bub_gate','ash',S("And not a single bakery was harmed. Mostly because there isn't one.",'Not one bakery got burned!'));
+  n4aBub('n_bub_gate','ash',S("Just like at home. Except nobody's clapping.",'Like at home. Nobody claps, though.'));
   n4aEmit('gate',{});
   later(1.6,()=>n4aScene('n_gate_open',[['narr',S('The third lantern catches. For one moment the whole green glows warm, like home on Lantern Day.','The lanterns glow. It feels like home for a moment.')],
     ['narr',S("Then the shadow gate melts away, and a whisper comes down the mountain, soft as a moth's wing.",'The dark gate melts. A whisper comes down the mountain.')],
@@ -105926,8 +105921,9 @@ act({
   // Hush by their errands (N5S). Main path alone: 1. One errand or one earlier kindness: 2.
   trust: { friends: 'n5_friends' },
 
-  // decided at the fall (n_nyxara's n_choice). Every option always shows; the moth one is locked, with the first reason
-  // that holds, until its condition holds. The checker tests them with the main-path state at the end of n_nyxara.
+  // decided at the fall (n_nyxara's n_choice). (v12 R4) The moth option shows only once its condition holds; until then
+  // it is not in the menu at all (no lock, no reason), so nothing tells a kid there was another ending. The checker
+  // tests them with the main-path state at the end of n_nyxara.
   ending: {
     moth:      { at: 'n_nyxara', scene: 'n_choice', choice: 'n_end=moth', optional: true,
                  if: 'solved n5_reach trust friends>=2 item n5_lantern' },
@@ -105983,8 +105979,8 @@ act({
 // n_clocks) and of the small mystery "why a fourth post?" (solved later with the Silent Green well and Mom's memory;
 // then Ash lights it for good: a Heart Ember). Three lanterns lit at once melt the shadow curtain (x4_ascent's puzzle,
 // flag n_gate; x4_ascent plays the gate scene), and the stairs lead up to the first ring.
-// The arrival counts the friends Nyxara hurt that Ash already freed in earlier acts (trust track `friends`) and gives
-// the bonus name clues a kid earned before (the Wardens' page 11, the Act IV moth dream).
+// The arrival counts the friends Nyxara hurt that Ash already freed in earlier acts (trust track `friends`, silently) and
+// gives the bonus clues a kid earned before (the Wardens' page 11, the Act IV moth dream: that Ember named a moth).
 // Data only. The x4_story code that still runs: the gate scene and Greymane's arrival (x4_ascent plays n_gate_open; the
 // ally runtime brings Greymane on n_gate), the lantern bubble, the bridge travel itself.
 chapter({
@@ -106028,11 +106024,12 @@ chapter({
       text: ['Mom: "My gran always made four lanterns. One for whoever is out in the dark."', '"Four lanterns. One for whoever is out in the dark."'] },
     n5_yara_post: { icon: 'star', mystery: 'n5_fourth_lantern',
       text: ['Yara: "There were four posts on the green when I was a girl. Nobody remembered why."', '"There were four posts once."'] },
-    // bonus clues for "What did Ember call the little moth?" (n_clocks), earned in earlier acts
+    // bonus clues for "What did Ember call the little moth?" (n_clocks), earned in earlier acts. (v12 R4) They say that
+    // Ember gave the moth a name, never the name: "Nyx" is first seen on ring 2 (the clock hub, n_clocks)
     n5_page11: { icon: 'book', mystery: 'night_mother',
-      text: ["The Wardens' eleventh page: \"Nyx. A little grey moth, named by Ember.\"", '"Nyx. A little grey moth, named by Ember."'] },
+      text: ["The Wardens' eleventh page: a little grey moth sat on Ember's lantern, and Ember gave her a name.", 'Ember gave a little grey moth a name.'] },
     n5_moth_dream: { icon: 'moth', mystery: 'night_mother',
-      text: ['The moth dream in Moonfall: a girl with a lantern says "I\'ll call you Nyx."', 'A dream: "I\'ll call you Nyx."'] },
+      text: ['The moth dream in Moonfall: Ember gave the little moth a name, and the wind took it.', 'A dream: Ember named a moth.'] },
   },
 
   deduce: {
@@ -106225,7 +106222,7 @@ chapter({
         'Gran had no fire. She warmed Vesper\'s hands with hers.'] },
     // a bonus clue for the name: Moth Memory pane 3 in the Clockmaker's Rest (optional, after Echo 2; see n_rime)
     n5_pane3: { icon: 'moth', mystery: 'night_mother',
-      text: ['Moth Memory 3, in the Clockmaker\'s Rest: a girl with a lantern, and a little moth she calls Nyx.', 'A girl and a moth called Nyx.'] },
+      text: ['A Moth Memory in the Clockmaker\'s Rest: a girl with a lantern, and a little moth she calls Nyx.', 'A girl and a moth called Nyx.'] },
   },
 
   deduce: {
@@ -106517,14 +106514,14 @@ chapter({
       ['f_glaciar', 'I will speak for her, dumpling. Slowly, but I will.', 'I will speak for her. Slowly.', { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] } }],
       ['narr', 'Hush hides her face in her wings. Then, very slowly, she nods.', 'Hush hides her face. Then she nods.', { if: { any: ['flag n5_hush', 'choice m_hush=free'] } }],
       { if: '!trust friends>=2', then: [
-        ['ash', "But they aren't all here yet. She won't listen to me on my own.", 'But my friends are not all here yet.'] ] },
+        ['ash', "But they aren't all here yet.", 'My friends are not all here yet.'] ] },
     ],
     // at the end of the Moon Road (the step finishes here): if fewer than two of the friends she hurt came, Ember's
     // voice asks who is missing and Ash may go and find them first. The door waits either way.
     n_door_ready: [
       { cam: 'n4_moon_door', s: 1 },
       { if: 'trust friends>=2', then: [
-        ['narr', 'You look back. On the floating stones behind you, everyone she hurt is following you up.', 'You look back. Your friends are right behind you.'],
+        ['narr', 'You look back. On the floating stones behind you, your friends are following you up.', 'You look back. Your friends are right behind you.'],
         ['pip', 'Mip!'] ],
         else: [
         ['narr', 'You look back down the Moon Road. Some of the floating stones behind you are empty.', 'You look back. Some friends are missing.'],
@@ -106535,7 +106532,7 @@ chapter({
         { if: '!flag n5_hush !choice m_hush=free', then: [
           ['ash', "Hush is still caught in the cocoons in the Moth's Cradle.", 'Hush is stuck in the cocoons.', { ref: 'n4_cradle' }] ] },
         { choose: 'n5_door', who: 'ash', ask: ['Go in now, or go and find them first?', 'Go in now?'], pick: [
-          { t: ["Go in. I'll do this the hard way.", 'Go in now'], tone: 'brave', v: 'go',
+          { t: ["Go in. I can't wait any longer.", 'Go in now'], tone: 'brave', v: 'go',
             say: [['ash', "Okay. Whatever happens, I'm still going to try.", 'Whatever happens, I will try.']] },
           { t: ['Not yet. Find them first.', 'Not yet'], tone: 'kind', v: 'later',
             say: [['narr', 'Any shrine on the peak can fly you home and back in a blink. The door will wait.', 'Fly to any shrine and back. The door will wait.']] },
@@ -106550,8 +106547,9 @@ chapter({
 // Act V, the end: The Long Night Is Over (owner N5b). Data only.
 // x4_story's choice (n_nyxara's n_choice) moves the stage here. Then, in one sitting: the dawn (n_dawn_lines: the
 // glass turns clear, Duchess on the very top, the ride home), the epilogue book (seven pages, one painted plate each,
-// four lines at most: the act file's book list), and the victory screen (x4_story's n4sVictory: "Ending n of 3", the
-// stats, "Made for Toby, Gus, Linus and Rosemary.", endAct(5)). After "Keep exploring", Ash wakes up on the green in
+// four lines at most: the act file's book list), and the victory screen (x4_story's n4sVictory: the ending's title and
+// line, plain stats, "Made for Toby, Gus, Linus and Rosemary.", endAct(5); never a count of endings). After "Keep
+// exploring", Ash wakes up on the green in
 // Emberhollow on the thousand-and-first Lantern Day (n_home), so "Climb on" and "All aboard" stay true. If Ash solved
 // the fourth post, the real green has its fourth post back, lit for whoever is out in the dark.
 chapter({
@@ -106932,8 +106930,9 @@ chapter({
 // swallows the last piece of the moon, everything goes black and the Ember Heart floats up, and Ash holds the breath
 // key while the friends' voices fill its seams (Vesper or Juniper, Glaciar or Elka or Tove, Hush or Quill, then Mom and
 // the Act I ending) until Pip, the one who stayed, says his first word. Heartfire breaks her cracks. She falls holding the last sliver of
-// moon. The friends she hurt speak for her, Ash calls her Nyx, and the final choice shows all three endings: the moth
-// one locked, with the first reason that holds, until her name, the plan and two of those friends are there.
+// moon. The friends she hurt speak for her, Ash calls her Nyx, and the final choice is made. (v12 R4) The moth pick only
+// shows when its condition holds (her name worked out with the plan, Mom's lantern, two of those friends); otherwise it
+// is not there at all, so the menu never advertises an ending a kid has not earned.
 chapter({
   id: 'n_nyxara', act: 5, after: 'n_crown', next: 'n_end', takeover: true,
   // keep x4_story's own stage tick (n4sNyxTick: the hero ending's ember spirit, the Heart and fall fallbacks): ENGINE
@@ -107098,22 +107097,13 @@ chapter({
         else: [
         ['narr', "She curls tighter round the sliver of moon. She is too scared to hear a word you say.", 'She holds the moon tight. She is too scared to listen.'] ] }] },
     ],
-    // the final choice: every option always shows; the moth one is locked, with the first reason that holds (exactly
-    // one of its four versions shows). Each ending is 6 lines; the friends' and the Act I ending's lines are in the book.
+    // the final choice. (v12 R4) An unearned ending is hidden, not greyed: the moth pick shows only when its `if` holds
+    // (the same condition as n_plea's kind branch and the act file's moth ending), and then it has no lock and no reason.
+    // Each ending is 6 lines; the friends' and the Act I ending's lines are in the book.
     n_choice: [
       { choose: 'n_end', who: 'ash', mood: 'determined', ask: ['What will you do?', 'What will you do?'], pick: [
         { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: '!clue n5_her_name', need: 'clue n5_her_name',
-          locked: ["You don't know her real name yet.", "You don't know her name yet."] },
-        { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: 'clue n5_her_name !solved n5_reach', need: 'solved n5_reach',
-          locked: ["You haven't worked out how to reach her. Look in the Case Book.", "You don't know how to reach her yet."] },
-        { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: 'solved n5_reach !item n5_lantern', need: 'item n5_lantern',
-          locked: ['You have no lantern to give her.', 'You have no lantern.'] },
-        { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: 'solved n5_reach item n5_lantern', need: 'trust friends>=2',
-          locked: ["She won't listen to you alone. The friends she hurt aren't here to speak for her.", 'Her friends are not here to speak for her.'],
+          if: 'solved n5_reach item n5_lantern trust friends>=2',
           then: ['set n_nyx_done', 'set n_heart_on=0', 'emit n4fx:choose', 'take n5_lantern', 'world n5_green_post moth'],
           say: [
             { do: ['emit n4fx:cut:lantern'] },
@@ -107173,7 +107163,7 @@ chapter({
   id: 'n_rime', act: 5, after: 'n_clocks', next: 'n_glass', takeover: true,
   card: ['Finale · The Third Ring', 'The Rime Spiral'],
   so_far: [
-    "The second ring's echo was a shadow of the Moth Mask. The Night Mother has a name now: Nyx, Ember's little moth. The third ring is a copy of Frostreach: black ice, frozen shadow people, wind like a river.",
+    "The second ring's echo was a shadow of the Moth Mask, and it broke into moths like the first. The third ring is a copy of Frostreach: black ice, frozen shadow people, wind like a river.",
     'Ash beat the shadow thief. The third ring is ice and wind.'],
 
   place: {
@@ -107545,10 +107535,14 @@ people({
       { if: 'flag n5_hush', then: [['f_hush', 'Shhh. Here.']],
         else: [{ if: 'quest q_n5_hush active', then: [['ash', "Hush is still tied up in the Moth's Cradle. A hundred little moths on one silver knot.", "Hush is tied up in the Moth's Cradle."]],
           else: [['ash', "Hush isn't here. Something white was glittering in the Tendril Wood.", "Hush isn't here. Look in the Tendril Wood."]] }] },
-      { if: 'trust friends>=3', then: [['ash', 'All three. Everyone she hurt is standing right here with me.', 'All three of them are here!']],
-        else: [{ if: 'trust friends>=2', then: [['ash', "Two of the three she hurt are here. That's enough for her to hear us.", 'Two of the three are here.']],
-          else: [{ if: 'trust friends>=1', then: [['ash', 'Only one of the three she hurt is here. She should hear from the others too.', 'Only one of the three is here.']],
-            else: [['ash', 'None of the friends she hurt are here. Not yet.', 'None of them are here yet.']] }] }] },
+      // (v12 R4) Ash names who came instead of counting: no "two of the three", nothing that says where a line is drawn
+      { if: 'trust friends>=3', then: [['ash', 'Everyone she hurt is standing right here with me.', 'Everyone is here.']],
+        else: [{ if: 'trust friends>=2', then: [
+          { if: 'flag n5_vesper flag n5_glaciar', then: [['ash', "Vesper's here. Auntie's here. That's a start.", 'Vesper and Auntie are here.']],
+            else: [{ if: 'flag n5_vesper', then: [['ash', "Vesper's here. Hush is here. That's a start.", 'Vesper and Hush are here.']],
+              else: [['ash', "Auntie's here. Hush is here. That's a start.", 'Auntie and Hush are here.']] }] }],
+          else: [{ if: 'trust friends>=1', then: [['ash', "I've only got one of them with me. I want the others too.", 'One friend is here.']],
+            else: [['ash', "Nobody she hurt is up here with me. Not yet.", 'Nobody is here yet.']] }] }] },
       { choose: 'n5_who_more', ask: ['Anyone else?', 'Anyone else?'], pick: [
         { t: ['Ask Tikka about her spoon', 'Ask Tikka about her spoon'], v: 'tikka', if: 'flag tk_come=yes',
           say: [['ev_tikka', 'I brought a BIGGER spoon! For the moth!', 'I brought a BIGGER spoon!'], ['ev_tock', "It's a ladle."],
