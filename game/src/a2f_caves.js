@@ -601,7 +601,7 @@ function caveProgressText(){
 // through a doorway may follow. The camera frames his room (a quick slide at each doorway) and keeps its top wall clear
 // of the HUD (a5_input.js updateCam calls roomCam); panels with something in the room under them fade (a11b_hud.js).
 // For other modules (WALLS, TRIALS): areaRoomOf(x,y), ashRoom(), roomOfFoe(e), roomAwake(e), roomSeen(e), roomsLift(sec,ids).
-const RMV={on:true,beat:0.6,follow:1.6,followR:270,memA:0.2,planA:0.085,rate:9,lift:null,area:null,frame:0,t:-1,last:null,snapT:0};
+const RMV={on:true,beat:0.6,follow:1.6,followR:300,memA:0.2,planA:0.085,rate:9,lift:null,area:null,frame:0,t:-1,last:null,snapT:0};
 // the room whose floor is at x,y (null in a wall or a doorway)
 function areaRoomOf(x,y){ return AREA&&AREA.rooms?caveRoomAt(x,y):null; }
 // every room whose walls hold the cell i,j (a shared wall belongs to both rooms, a corner to up to four)
@@ -669,9 +669,10 @@ function roomAwake(e){
   if(e._rmF===RMV.frame&&e._rmA===A) return e._rmAw;
   e._rmF=RMV.frame; e._rmA=A;
   let aw=true;
-  if(!(e.noRoom||e.type==='vorlaxis')){ const R=ashRoom(), Q=roomOfFoe(e);
+  // his room as updateCaveRooms last saw it (it hands out the beat and the chases when he walks in)
+  if(!(e.noRoom||e.type==='vorlaxis')){ const R=A.curRoom||ashRoom(), Q=roomOfFoe(e);
     // in his room: once updateCaveRooms has seen him walk in (A.curRoom) and the beat is over; a chaser keeps going
-    if(R&&Q){ if(Q===R) aw=(R===A.curRoom&&G.time>=(R._wake||0))||e._rmChase>G.time; else aw=e._rmChase>G.time; } }
+    if(R&&Q){ if(Q===R) aw=(!!A.curRoom&&G.time>=(R._wake||0))||e._rmChase>G.time; else aw=e._rmChase>G.time; } }
   e._rmAw=aw; return aw;
 }
 // can Ash see this foe? (its room is lit)
@@ -769,7 +770,7 @@ function roomHudPoints(out){
   for(const e of G.enemies) if(!e.dead&&!e.frozen&&e.y<top+80) P(e.x,e.y-(e.r||12),(e.r||12)+10);
   for(const n of A.npcs) if(n.y<top+60) P(n.x,n.y-22,24);
   for(const o of A.objs){ if(ROOM_NOUSE[o.k]||o.y>top+40||o.y<cam.y-60) continue; if(G.found[o.id]&&(o.k==='coinpile'||o.k==='treatpick'||o.k==='smallkey'||o.k==='page')) continue;
-    if(o._rmA!==A){ o._rmA=A; o._rm=areaRoomNear(o.x,o.y); } if(o._rm!==R&&!(o.k==='cgate'&&o.link&&(o.link.a===(R&&R.id)||o.link.b===(R&&R.id)))) continue; P(o.x,o.y-8,(o.r||16)+4); }
+    if(o._rmA!==A){ o._rmA=A; o._rm=areaRoomNear(o.x,o.y); } if(o._rm!==R&&!(o.k==='cgate'&&o.link&&(o.link.a===(R&&R.id)||o.link.b===(R&&R.id)))) continue; P(o.x,o.y-6,Math.min(o.r||16,22)); }
   if(G.prompt&&G.prompt.x!=null) P(G.prompt.x,G.prompt.y,24);
   return out;
 }
@@ -780,5 +781,6 @@ window.__ebX=Object.assign(window.__ebX||{},{rooms:{
       rooms:Object.keys(A.rooms).map(id=>{ const Q=A.rooms[id]; return {id,kind:Q.kind,vk:+(Q._vk||0).toFixed(2),memo:roomMemo(A,Q),wake:Q._wake?+(Q._wake-G.time).toFixed(2):null}; }),
       foes:G.enemies.filter(e=>!e.dead).map(e=>{ const Q=roomOfFoe(e); return {id:e.id,type:e.type,room:Q&&Q.id,home:e.room,x:Math.round(e.x),y:Math.round(e.y),awake:roomAwake(e),seen:roomSeen(e),frozen:!!e.frozen,aggro:!!e.aggro}; })}; },
   rect:id=>AREA&&AREA.rooms&&AREA.rooms[id]?roomRect(AREA,AREA.rooms[id]):null,
-  cam:()=>({x:Math.round(cam.x),y:Math.round(cam.y),zoom:+zoom.toFixed(3),band:roomHudBand()})
+  cam:()=>({x:Math.round(cam.x),y:Math.round(cam.y),zoom:+zoom.toFixed(3),band:roomHudBand()}),
+  hud:()=>({pts:roomHudPoints([]).map(q=>[Math.round(q.x),Math.round(q.y),Math.round(q.r)]),rects:typeof HUDF!=='undefined'?HUDF.rects:null,k:typeof HUDF!=='undefined'?HUDF.k:null})
 }});
