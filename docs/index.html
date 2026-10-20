@@ -113,7 +113,15 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family
 .maphead h2{margin:0}
 .maphead span{color:var(--muted);font-size:13px}
 .mapwrap{position:relative;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--edge);background:#0e0908;display:flex;justify-content:center}
-#mapcv{display:block;width:auto;height:auto;max-width:100%;max-height:58vh;margin:0 auto;cursor:pointer;touch-action:manipulation}
+#mapcv{display:block;width:auto;height:auto;max-width:100%;max-height:58vh;margin:0 auto;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+.mapzoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:2}
+.mapzoom[hidden]{display:none}
+.mapzoom .mzb{min-width:40px;height:40px;padding:0 10px;border-radius:10px;border:1px solid rgba(255,214,140,.45);background:rgba(14,10,8,.82);color:#ffe6c0;font:700 22px/1 Rubik,system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.mapzoom .mzb.mzw{font-size:13px;font-weight:700}
+.mapzoom .mzb:disabled{opacity:.4;cursor:default}
+.mapzoom .mzb:focus-visible{outline:3px solid #ffd27a;outline-offset:1px}
+html.sb .mapzoom .mzb{background:#fff3d6;color:#3b2233;border:2px solid #3b2233;box-shadow:0 2px 0 #3b2233}
+@media (max-width:600px){.mapzoom{top:6px;right:6px;gap:5px}.mapzoom .mzb{min-width:34px;height:34px;font-size:19px;padding:0 8px}.mapzoom .mzb.mzw{font-size:12px}}
 .mapfoot{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
 .mapfoot p{margin:0;font-size:13px;color:var(--muted);flex:1;min-width:200px}
 .mapfoot .btn{width:auto}
@@ -11695,6 +11703,8 @@ function heroIdle(w,p){
 function drawHeroWeapon(p){
   const armed=!(G&&G.mode==='story'&&!G.flags.forge);
   const w=p.swingT>0&&p.swingW?p.swingW:curWeapon();
+  // (v12) an item (bun, pepper, taffy...) shows as its own little icon in the hand; a flask from the belt stays green
+  if(p.drinkT>0&&p.useIco&&typeof drawItemIcon==='function'){ ctx.save(); ctx.translate(15,7); ctx.rotate(-(p.facing||0)); drawItemIcon(ctx,p.useIco,0,0,10); ctx.restore(); if(armed) heroIdle(curWeapon(),p); return; }
   if(p.drinkT>0){ ctx.fillStyle='rgba(120,255,160,.85)'; ctx.beginPath(); ctx.arc(15,7,3,0,TAU); ctx.fill(); if(armed){ ctx.strokeStyle='#d8e8e0'; ctx.lineWidth=1; ctx.stroke(); heroIdle(curWeapon(),p); } return; }
   if(!armed) return;
   const pk=p.wEquipT>0?Math.sin(clamp(p.wEquipT/0.35,0,1)*Math.PI):0;
@@ -14552,9 +14562,57 @@ function areaObjAct(o){
 }
 function hashStr(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h; }
 const FURN_LABEL={bed:'Look at the bed',shelf:'Browse the shelf',fireplace:'Sit by the fireplace',oven:'Look at the oven',counter:'Look at the counter',desk:'Look at the desk',board:'Read the bounty board',rack:'Look at the rack',telescope:'Look through the telescope',chart:'Read the star chart',trophy:'Look at the trophy',bearrug:'Look at the rug',sled:'Look at the sled',cauldron:'Sniff the cauldron',hatstand:'Try on hats',portraits:'Look at the family portraits',gchest:'Open Grandma’s chest',heights:'Look at the doorframe',toybox:'Rummage in the toy box',abacus:'Count the beads',perch:'Say hi to Pebble',mapwall:'Look at Juniper’s maps',yarn:'Look at the yarn',rocker:'Look at the rocking chair',herbs:'Pick an herb',planter:'Pick an herb',pail:'Look in the pail',hay:'Search the hay',bunk:'Look at the bunks',cart:'Look in the cart',drawer:'Search the drawer',note:'Read the note',painting:'Look at the painting',cell:'Look at the cell',cchest:'Open the chest',brazier:'Look at the brazier',qitem:'Pick it up',page:'Pick up the old page',cave_ore:'Chip out the star-iron',relic:'Take the cloak',cat:'Pet the cat',mirror:'Look in the mirror',rock:'Look at the rock',goose:'Pet the goose',clock:'Check the clock',lute:'Play a tune'};
+// (v12) indoors (houses, shops, caves, dungeons) Ash names only what is close and in front of him. Drew: "If I face an
+// object from across the room it is highlighted and the item title pops up, so there always seems to be an item title
+// when I'm in a room." A thing counts from the nearest point of its footprint (its box, or its circle): up to
+// IN_REACH.front px from Ash's middle (a tile and a half) within IN_REACH.cone of the way he faces, or
+// IN_REACH.touch px when he stands right against it a little side on. A person counts from their middle and a bit
+// further (a shopkeeper stands behind the counter). A rug's secret counts from the rug's corners (it says "Lift the
+// corner"): it covered the middle of the room, so its name showed wherever Ash stood. The ring goes on that nearest
+// point (prompt rx, ry), not the middle of a long counter. Outdoors nothing changes. The story's own places indoors
+// (e10_story.js s10Prompts) and its person-first tie (s10PersonFirst) ask reachPlace and reachPerson the same way.
+const IN_REACH={front:48,touch:20,cone:1.22,wide:1.75,person:70,turtle:90,personTouch:38,corner:34};
+function reachSeen(qx,qy,d,front,touch){
+  const p=player; if(!p) return false; if(d<=6) return true;
+  const a=Math.abs(angDiff(p.facing||0,Math.atan2(qy-p.y,qx-p.x)));
+  return (d<=front&&a<=IN_REACH.cone)||(d<=touch&&a<=IN_REACH.wide);
+}
+// the nearest point of a box (w by h) or a circle (r) at x,y, and Ash's distance to it
+function reachNear(x,y,w,h,r){
+  const p=player;
+  if(w){ const qx=clamp(p.x,x-w/2,x+w/2), qy=clamp(p.y,y-(h||w)/2,y+(h||w)/2); return {x:qx,y:qy,d:Math.hypot(p.x-qx,p.y-qy)}; }
+  const dc=dist(p.x,p.y,x,y), d=Math.max(0,dc-(r||0)), k=dc>0.01?(dc-d)/dc:0;
+  return {x:x+(p.x-x)*k,y:y+(p.y-y)*k,d};
+}
+function rugTrig(o){
+  if(o._rug===undefined) o._rug=o.k==='trig'&&!!o.noCol&&!!o.w&&!!AREA&&AREA.objs.some(q=>q.k==='rug'&&q.x===o.x&&q.y===o.y);
+  return o._rug;
+}
+// an area thing: {ok, d (from its edge), x, y (where the ring goes)}
+function reachObj(o){
+  const p=player;
+  if(rugTrig(o)){
+    let b=null; for(const sx of [-1,1]) for(const sy of [-1,1]){ const cx=o.x+sx*o.w/2, cy=o.y+sy*(o.h||o.w)/2, d=dist(p.x,p.y,cx,cy); if(!b||d<b.d) b={x:cx,y:cy,d}; }
+    b.ok=b.d<=IN_REACH.corner; return b;
+  }
+  const q=o.w?reachNear(o.x,o.y,o.w,o.h,0):reachNear(o.x,o.y,0,0,o.r||16);
+  q.ok=reachSeen(q.x,q.y,q.d,IN_REACH.front,IN_REACH.touch);
+  if(!o.w){ q.x=o.x; q.y=o.y; }
+  return q;
+}
+function reachPerson(n){
+  if(!AREA||!player) return true;
+  const d=dist(player.x,player.y,n.x,n.y);
+  return reachSeen(n.x,n.y,d,n.turtle?IN_REACH.turtle:IN_REACH.person,IN_REACH.personTouch);
+}
+// a story place indoors (a point with a radius)
+function reachPlace(x,y,r){
+  if(!AREA||!player) return true;
+  const q=reachNear(x,y,0,0,r||22); return reachSeen(q.x,q.y,q.d,IN_REACH.front,IN_REACH.touch);
+}
 function updateInteractions(dt){
   const p=player; let best=null, bd=1e9;
-  const offer=(d,text,act,x,y,always)=>{ if(d<bd){ bd=d; best={text,act,x,y,always}; } };
+  const offer=(d,text,act,x,y,always,rx,ry)=>{ if(d<bd){ bd=d; best={text,act,x,y,always}; if(rx!=null){ best.rx=rx; best.ry=ry; } } };
   if(AREA){
     for(const o of AREA.objs){
       const lab=o.prompt?o.prompt():FLOOR_LABEL[o.k]?FLOOR_LABEL[o.k](o):CAVE_LABEL[o.k]!==undefined?CAVE_LABEL[o.k]:o.k==='qitem'?(G.items[o.item]||G.found[o.id]?null:`Look at ${o.label}`):o.k==='bed'&&o.home?'Sleep in your bed (heal and save)':o.egg&&o.k!=='drawer'?o.egg.label:FURN_LABEL[o.k];
@@ -14562,13 +14620,11 @@ function updateInteractions(dt){
       // a piece of furniture with a size counts from its edge, not its middle: a long counter's reach used to be half
       // its width all round, so it beat the shopkeeper standing at it (nobody could talk to Fennick) and the stairs
       // beside it. A secret's trigger sits on its host, the same size: it wins their tie. Stairs Ash stands against win.
-      let d, reach;
-      if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
-      else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
-      const onStairs=o.k==='stairs'&&o.w&&d<24;
-      if(d<reach||onStairs) offer(onStairs?-500:d-reach-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
+      // (v12) and only when it is close and in front of him (reachObj above)
+      const q=reachObj(o), onStairs=o.k==='stairs'&&o.w&&q.d<24;
+      if(q.ok||onStairs) offer(onStairs?-500:q.d-34-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest',q.x,q.y);
     }
-    for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
+    for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)&&reachPerson(n)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
     const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
   }else{
     const mk=curMap();
@@ -14616,6 +14672,7 @@ function updateAllies(dt){
 // test hooks (QUESTS pacing checks)
 window.__ebDbg=Object.assign(window.__ebDbg||{},{qAvail:id=>qAvail(id),availableFrom:id=>availableFrom(id),npcMarker:id=>npcMarker(id),storyMarker:id=>storyMarker(id),
   qpRaw:id=>{ QP.raw++; try{ return qAvail(id); } finally { QP.raw--; } },qpState:()=>{ QP.key=''; qpRefresh(); return {allow:[...QP.allow],err:[...QP.err]}; }});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{reach:{IN_REACH,reachObj,reachPerson,reachPlace,blocked:(x,y)=>blockedAt(x,y)}});
 
 // ================= meta systems: music direction, quest tracking, save slots, settings
 Object.assign(settings,{
@@ -14731,7 +14788,6 @@ function renderSlots(){
     return `<div class="slot${i===latestSlot()?' cur':''}"><div class="sn">Journey ${i+1}<span>${escapeHtml(d.ago)}</span></div><p class="sh">${escapeHtml(d.head)}</p><p class="sd">${escapeHtml(d.sub)}</p><div class="row"><button class="btn c sm hot" data-a="play" data-i="${i}">Continue</button><button class="btn c sm" data-a="over" data-i="${i}">Start over</button><button class="btn c sm" data-a="del" data-i="${i}">Delete</button></div></div>`;
   }).join('');
   for(const b of el.querySelectorAll('button')) b.addEventListener('click',()=>slotAction(b.dataset.a,+b.dataset.i));
-  bringSlotRow(el);   // (v12) "Bring a save from the old address" (a13_cloud.js)
 }
 function slotAction(a,i){
   SFX.init(); SFX.play('ui');
@@ -19847,7 +19903,7 @@ function vLerp(o,a,b,k){ o[0]=lerp(a[0],b[0],k); o[1]=lerp(a[1],b[1],k); o[2]=le
 function aSeg(h,u,a0,a1,r,col,r2,bias){ return aL(h[0]+u[0]*a0,h[1]+u[1]*a0,h[2]+u[2]*a0,h[0]+u[0]*a1,h[1]+u[1]*a1,h[2]+u[2]*a1,r,col,r2,bias); }
 function aPtUV(i,h,u,a,v,b){ aPt(i,h[0]+u[0]*a+v[0]*b,h[1]+u[1]*a+v[1]*b,h[2]+u[2]*a+v[2]*b); }
 // marks: body-space points remembered while building, projected to the screen afterwards (glows, flames, rings)
-const AM={}; for(const k of ['snout','jet','ham','bA','bB','hand','eyeL','eyeR','tip','head','mouth']){ AM[k]=[0,0,0]; AM[k].on=false; }
+const AM={}; for(const k of ['snout','jet','ham','bA','bB','hand','eyeL','eyeR','tip','head','mouth','item']){ AM[k]=[0,0,0]; AM[k].on=false; }
 function aMark(k,x,y,z){ const a=AM[k]; arP(x,y,z,a); a.on=true; }
 const AWE=[[],[]]; for(const w of AWE) for(let i=0;i<10;i++) w.push([0,0,0]);
 const AHS=[]; for(let i=0;i<8;i++) AHS.push([0,0,0]); AHS.n=0;
@@ -20293,7 +20349,10 @@ function ashBuild(g,p,fx,fy,o){
   if(hasW) ashWings(pal,wo,wang,wfk,bz,lite);
   else if(hasJ){ const up=(p.z||0)>0||MV.flapT>0; ashNubs(pal,bz,up?0.55+0.45*Math.sin(t*46):0,lite); }
   if(wid) ashWpnDraw(p,wid,pal);
-  if(fk>0.05){ const H=fs>0?hR:hL; const bx=H[0]+0.6, by=H[1]-fs*0.3, bz2=H[2]+1.2; aB(bx,by,bz2,3.0,'#3ec46a'); aD(bx-0.8,by-0.8,bz2+1.4,0.95,'#d8ffe4',0.05);
+  // (v12) a bun, a pepper, taffy and the other items are held up in the hand as their own icon (drawn by ashPost at
+  // the 'item' mark, p.useIco from useItem in e11_items.js); only a flask from the belt is the green flask
+  if(fk>0.05&&p.useIco){ const H=fs>0?hR:hL; aMark('item',H[0]+1.6,H[1]-fs*0.3,H[2]+2.4); }
+  else if(fk>0.05){ const H=fs>0?hR:hL; const bx=H[0]+0.6, by=H[1]-fs*0.3, bz2=H[2]+1.2; aB(bx,by,bz2,3.0,'#3ec46a'); aD(bx-0.8,by-0.8,bz2+1.4,0.95,'#d8ffe4',0.05);
     aL(bx+1.5,by,bz2+2.0,bx+3.0,by,bz2+4.0,1.1,'#a8e8c0'); aB(bx+3.4,by,bz2+4.6,1.15,'#a07040'); }
   // head
   arPush(); arMove(1.0+hfx,0,bz+18.6+hfz); arPitch(hp); arYaw(hy);
@@ -20342,6 +20401,11 @@ function ashPost(g,p,k){
     g.save(); g.globalCompositeOperation='lighter'; g.lineCap='round'; g.lineJoin='round'; g.strokeStyle=`rgba(255,${120+40*up|0},60,${al})`; g.lineWidth=1.8*k;
     for(const E of AWE){ g.beginPath(); for(let i=0;i<9;i++){ aScr(E[i],b); if(i) g.lineTo(b[0],b[1]); else g.moveTo(b[0],b[1]); } g.stroke(); }
     g.restore();
+  }
+  // (v12) the item in his hand (a small icon, hidden when the hand is behind his head, as the flask is by his body)
+  if(I.flask>0.05&&p.useIco&&AM.item.on&&typeof drawItemIcon==='function'){
+    aScr(AM.item,a); let vis2=true; if(AM.head.on){ aScr(AM.head,_s3); vis2=a[2]>_s3[2]-3; }
+    if(vis2){ const pa=g.globalAlpha; g.globalAlpha=pa*clamp(I.flask*1.6,0,1); drawItemIcon(g,p.useIco,a[0],a[1],11*k*(0.7+0.3*I.flask)); g.globalAlpha=pa; }
   }
   // gold eyes glow a little in the dark
   if(I.night>0.2&&AM.head.on&&AM.eyeL.on){ aScr(AM.head,_s3); const hd=_s3[2]; for(const e of [AM.eyeL,AM.eyeR]){ aScr(e,a); if(a[2]>hd+1.5) aGlow(g,a[0],a[1],4*k,'255,200,80',0.32*I.night); } }
@@ -24553,7 +24617,9 @@ function touchBase(){ const B=H-SAFE.b; return B-SAFE.t<600?B-30:Math.min(B-300,
 function drawPromptTarget(){
   const pr=G.prompt; if(!pr||pr.x==null||pr.y==null||!player) return;
   if(Math.abs(pr.x-player.x)<2&&Math.abs(pr.y-player.y)<2) return;   // a prompt about Ash himself (fishing, flying)
-  const sx=(pr.x-cam.x)*zoom, sy=(pr.y-cam.y)*zoom; if(sx<-40||sy<-40||sx>W+40||sy>H+40) return;
+  // (v12) indoors the ring sits on the near edge of the thing (rx, ry from updateInteractions), not a long counter's middle
+  const rx=pr.rx!=null?pr.rx:pr.x, ry=pr.ry!=null?pr.ry:pr.y;
+  const sx=(rx-cam.x)*zoom, sy=(ry-cam.y)*zoom; if(sx<-40||sy<-40||sx>W+40||sy>H+40) return;
   const n=AREA?AREA.npcs&&AREA.npcs.find(q=>q.x===pr.x&&q.y===pr.y):G.npcs.find(q=>q.x===pr.x&&q.y===pr.y);
   const r=(n?20:16)*zoom, k=0.5+0.5*Math.sin((G.time||0)*4.2), g=ctx;
   g.save(); g.translate(sx,sy+(n?3:0)*zoom); g.scale(1,0.5);
@@ -26461,256 +26527,6 @@ $('#acSync').addEventListener('click',async()=>{ const s=$('#acStatus'); s.textC
 $('#acClose').addEventListener('click',()=>{ show('menu'); acctLabel(); });
 Cloud.onChange(acctLabel);
 
-// ================= (v12) bring saves over from the old address
-// The game moved from https://muellercodes.github.io/emberblood/ to https://playemberblood.com (the old path answers 301).
-// Saves made without an account stayed in the old origin's localStorage. Drew's old personal site still serves that
-// origin, so a small page there (tools/oldsite/emberblood-move.html, live at BRING_URL) reads the eb_ keys and hands them
-// over, as {t:'eb-carry',v:1,keys:{key:raw string}}:
-//  - opened by this game (the button below): it posts the object to us; we take it only from BRING_ORIGIN and answer
-//    {t:'eb-carry-ok'} so that page can say "Sent" and close
-//  - opened on its own, or when the phone dropped the opener: it opens playemberblood.com/#carry=1.<data>, the same JSON
-//    as UTF-8, LZW-packed (16-bit codes) in base64url; read once at start, then the hash is cleared
-// Only allow-listed keys are kept: strings, size limits, JSON of the right shape, saves must be v3 saves (never eb_token
-// or eb_user). The player picks where each save goes: an empty slot at once, a used one only after "Replace ...?".
-// Endings and Arena bests merge (the better one is kept). Settings come along only when this device has none of its own,
-// and switch on with a reload when the player taps Done. A placed save gets a fresh `at`, so it is the newest journey and
-// syncs up the normal way when signed in; an old-format save loads through loadGame and the act migration like any other.
-const BRING_URL='https://muellercodes.github.io/emberblood-move.html', BRING_ORIGIN='https://muellercodes.github.io';
-const BRING_LIM={save:400000,key:20000,total:1500000,hash:1000000,unpacked:3000000};
-const BRING={win:null,wait:false,got:null,ask:null,from:'menu',err:'',copied:false};
-const bringObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
-const bringFin=v=>typeof v==='number'&&isFinite(v);
-const bringIs=(...a)=>v=>a.includes(v), bringBool=v=>typeof v==='boolean', bringNum=(a,b)=>v=>bringFin(v)&&v>=a&&v<=b;
-// the settings keys (store.get calls in a1_core, a1c_state, a1k_simple, a3e_toy3d, a5_input, a5b_pad, a9e_meta, a9i_comps,
-// a11c_depth, a14_music, e5_look, e6_balance), each with the values the game itself writes
-const BRING_SET={eb_reading:bringIs('full','simple'),eb_diff:bringNum(0,2),eb_music_off:bringBool,eb_muted:bringBool,eb_vol_sfx:bringNum(0,100),eb_vol_music:bringNum(0,100),
-  eb_touch:bringIs('two','right','left'),eb_tipshut:v=>bringObj(v)&&Object.keys(v).length<=300,eb_tips:bringBool,eb_padok:bringIs('auto','south','east'),eb_rumble:bringBool,
-  eb_nums:bringBool,eb_mouseaim:bringBool,eb_look:bringIs('storybook','classic'),eb_hand:bringIs('left','right'),eb_depth:v=>typeof v==='string'&&v.length<=16,
-  eb_chat:bringIs('some','off'),eb_btn:bringNum(0.5,2),eb_auto:v=>v===null||bringBool(v),eb_allbtn:bringBool,eb_bosshelp:bringBool,eb_chars:bringIs('3d','classic')};
-const bringEnds=v=>bringObj(v)&&Object.keys(v).length<=60&&Object.keys(v).every(k=>/^[A-Za-z0-9_-]{1,40}$/.test(k));
-const bringBest=v=>bringObj(v)&&bringNum(0,1e9)(v.wave)&&bringNum(0,1e12)(v.score);
-const bringSave=v=>bringObj(v)&&v.v===3&&!v.deleted&&bringObj(v.p)&&bringFin(v.x)&&bringFin(v.y)&&(v.stage==null||(typeof v.stage==='string'&&v.stage.length<=60))
-  &&(v.time==null||bringFin(v.time))&&(v.at==null||bringFin(v.at))&&(v.flags==null||bringObj(v.flags))&&(v.quests==null||bringObj(v.quests));
-// what arrived, checked: {saves:[{o,s,put}], ends:[[key,obj]], best:{key:obj}, set:{key:raw}} or null when it is not ours
-function bringCheck(d){
-  if(!bringObj(d)||d.t!=='eb-carry'||d.v!==1||!bringObj(d.keys)) return null;
-  const c={saves:[],ends:[],best:{},set:{},notes:[]}; let total=0;
-  for(const k of Object.keys(d.keys)){
-    const raw=d.keys[k]; if(typeof raw!=='string') continue;
-    total+=raw.length; if(total>BRING_LIM.total) return null;
-    const si=SLOT_KEYS.indexOf(k);
-    if(raw.length>(si>=0?BRING_LIM.save:BRING_LIM.key)) continue;
-    let v; try{ v=JSON.parse(raw); }catch(e){ continue; }
-    if(si>=0){ if(bringSave(v)) c.saves.push({o:si,s:v,put:-1}); }
-    else if(k==='eb_endings'||k==='eb_n_endings'){ if(bringEnds(v)) c.ends.push([k,v]); }
-    else if(/^eb_best_[0-2]$/.test(k)){ if(bringBest(v)) c.best[k]=v; }
-    else if(BRING_SET[k]&&BRING_SET[k](v)) c.set[k]=raw;
-    // anything else (eb_cur_slot, unknown keys, and eb_token / eb_user, which the old page never sends) is dropped
-  }
-  c.saves.sort((a,b)=>a.o-b.o);
-  return c;
-}
-// settings here? A fresh start writes a few keys with their defaults (the volumes in a1_core.js, eb_reading in
-// a1k_simple.js), so a key that still holds that default does not count as the player's own setting.
-const BRING_START={eb_vol_sfx:'100',eb_vol_music:'100',eb_reading:'"full"',eb_muted:'false',eb_music_off:'false'};
-function bringHasSettings(){
-  for(const k in BRING_SET){
-    let v=null; try{ v=localStorage.getItem(k); }catch(e){ return true; }
-    if(v==null||v===BRING_START[k]) continue;
-    return true;
-  }
-  return false;
-}
-// endings seen and Arena bests: keep the better of both; settings only when there are none here
-function bringMerge(c){
-  const notes=[]; let ne=0, nb=0;
-  for(const [k,v] of c.ends){
-    const h0=store.get(k,{}), h=bringObj(h0)?h0:{}; let n=0;
-    for(const id in v) if(v[id]&&!h[id]){ h[id]=true; n++; }
-    if(n){ store.set(k,h); ne+=n; }
-  }
-  for(const k in c.best){ const v=c.best[k], h=store.get(k,null); if(!bringBest(h)||v.score>h.score){ store.set(k,{wave:v.wave,score:v.score}); nb++; } }
-  if(ne) notes.push(ne===1?'an ending you had seen':`${ne} endings you had seen`);
-  if(nb) notes.push(nb===1?'your Arena best':'your Arena bests');
-  const sk=Object.keys(c.set);
-  if(sk.length&&!bringHasSettings()){ for(const k of sk){ try{ localStorage.setItem(k,c.set[k]); }catch(e){} } BRING.copied=true; notes.push('your settings'); }
-  return notes;
-}
-function bringArrive(d){
-  BRING.wait=false; BRING.ask=null; BRING.err=''; BRING.got=null;
-  if(Cloud.viewing) BRING.err='look';
-  else{ const c=bringCheck(d); if(!c) BRING.err='bad'; else { c.notes=bringMerge(c); BRING.got=c; } }
-  bringShow();
-}
-// the hand-off link: LZW with 16-bit codes over UTF-8, in base64url (the old page packs it the same way)
-function bringB64(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; const bin=atob(s), b=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i); return b; }
-function bringLzw(b,max){
-  if(b.length%2) throw new Error('odd'); const n=b.length>>1, dict=[]; for(let i=0;i<256;i++) dict.push(String.fromCharCode(i));
-  if(!n) return new Uint8Array(0);
-  let prev=dict[(b[0]<<8)|b[1]]; if(prev==null) throw new Error('code'); const parts=[prev]; let total=prev.length;
-  for(let i=1;i<n;i++){
-    const k=(b[2*i]<<8)|b[2*i+1]; let e;
-    if(k<dict.length) e=dict[k]; else if(k===dict.length) e=prev+prev[0]; else throw new Error('code');
-    total+=e.length; if(total>max) throw new Error('too big'); parts.push(e);
-    if(dict.length<65536) dict.push(prev+e[0]);
-    prev=e;
-  }
-  const s=parts.join(''), out=new Uint8Array(s.length); for(let i=0;i<s.length;i++) out[i]=s.charCodeAt(i); return out;
-}
-function bringFromHash(){
-  let h=''; try{ h=String(location.hash||''); }catch(e){}
-  if(!/^#carry=/.test(h)) return;
-  try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){ try{ location.hash=''; }catch(er){} }
-  const m=/^#carry=1\.([A-Za-z0-9_-]+)$/.exec(h);
-  let d=null;
-  if(m&&m[1].length<=BRING_LIM.hash){ try{ d=JSON.parse(new TextDecoder().decode(bringLzw(bringB64(m[1]),BRING_LIM.unpacked))); }catch(e){ d=null; } }
-  if(scene!=='menu') return;
-  BRING.from='menu'; bringArrive(d);
-}
-setTimeout(bringFromHash,0);
-// the old page posts here; only that origin, only the eb-carry shape, and never in the middle of play
-addEventListener('message',e=>{
-  if(e.origin!==BRING_ORIGIN) return;
-  const d=e.data; if(!bringObj(d)||d.t!=='eb-carry') return;
-  if(scene!=='menu') return;
-  bringArrive(d);
-  try{ if(e.source) e.source.postMessage({t:'eb-carry-ok'},BRING_ORIGIN); }catch(err){}
-});
-function bringOpen(){
-  SFX.init();
-  BRING.got=null; BRING.ask=null; BRING.err=''; BRING.copied=false;
-  if(Cloud.viewing){ BRING.err='look'; bringShow(); return; }
-  let w=null; try{ w=window.open(BRING_URL,'ebbring'); }catch(e){ w=null; }
-  if(!w){ location.href=BRING_URL; return; }   // no new tab allowed: go there in this tab, that page brings the saves back by link
-  BRING.win=w; BRING.wait=true; bringShow();
-}
-function bringClose(){
-  const copied=BRING.copied;
-  BRING.wait=false; BRING.got=null; BRING.ask=null; BRING.err=''; BRING.copied=false; BRING.win=null;
-  if(copied){   // the copied settings are read at start: let the cloud push go, then start again
-    $('#bring .bbody').innerHTML='<p>Switching on your settings…</p>';
-    Promise.race([Cloud.flush().catch(()=>{}),new Promise(r=>setTimeout(r,1500))]).then(()=>location.reload());
-    return;
-  }
-  if(BRING.from==='slots') openSlots(); else { show('menu'); refreshMenu(); }
-}
-function bringPut(g,t){
-  const it=BRING.got&&BRING.got.saves[g]; if(!it||it.put>=0||!(t>=0&&t<3)) return;
-  const s=Object.assign({},it.s,{at:Date.now(),slot:t});
-  store.set(SLOT_KEYS[t],s);
-  const back=slotSave(t);
-  if(!back||back.at!==s.at){ BRING.err='full'; bringRender(); return; }
-  it.put=t; BRING.ask=null;
-  try{ if(!Cloud.viewing) Cloud.queueSave(packSaves(),true); }catch(e){}
-  jingle('quest','quest');
-  bringRender(); refreshMenu();
-}
-function bringAct(a,g,t){
-  SFX.init(); SFX.play('ui');
-  if(a==='put'){ if(slotSave(t)){ BRING.ask={g,t}; bringRender(); } else bringPut(g,t); }
-  else if(a==='yes'){ if(BRING.ask&&BRING.ask.g===g&&BRING.ask.t===t) bringPut(g,t); }
-  else if(a==='no'){ BRING.ask=null; bringRender(); }
-  else if(a==='open') bringOpen();
-  else if(a==='close') bringClose();
-}
-function bringEl(){
-  let el=document.getElementById('bring'); if(el) return el;
-  const st=document.createElement('style');
-  st.textContent='#bring .panel{max-width:460px}#bring .bto{margin:8px 0 6px;font-size:13px}#bring .bpick .btn{min-width:80px;padding:8px 4px;font-size:14px;white-space:nowrap}#bring .bpick .btn small{font-size:12px}'
-    +'#bring .bok{margin:6px 0 2px;font-weight:700;color:#8fd46e}#bring .bnote{font-size:13px;margin:10px 0 0}#bring .bfoot{margin-top:14px}#bring .slots{margin-top:10px}#bring .slot.warn{border-color:#e0782c;box-shadow:0 0 0 2px rgba(224,120,44,.25)}'
-    +'html.sb #bring .bok{color:#3f7a34}.slot.bringc .sd{margin-bottom:10px}#slotList .bringq{margin-top:2px}';
-  document.head.appendChild(st);
-  el=document.createElement('div'); el.id='bring'; el.className='ov dim';
-  el.innerHTML='<div class="panel" role="dialog" aria-labelledby="bringH"><h2 id="bringH">Saves from the old address</h2><div class="bbody"></div></div>';
-  document.body.appendChild(el);
-  el.addEventListener('click',e=>{ const b=e.target.closest('button[data-b]'); if(b) bringAct(b.dataset.b,+b.dataset.g,+b.dataset.t); });
-  addEventListener('keydown',e=>{
-    if(e.key!=='Escape'||!el.classList.contains('on')) return;
-    e.preventDefault(); if(BRING.ask){ BRING.ask=null; bringRender(); } else bringClose();
-  });
-  return el;
-}
-function bringShow(){ bringEl(); bringRender(); show('bring'); }
-const bringBtn=(a,label,o)=>`<button class="btn c sm${o&&o.hot?' hot':''}" type="button" data-b="${a}"${o&&o.g!=null?` data-g="${o.g}"`:''}${o&&o.t!=null?` data-t="${o.t}"`:''}>${label}</button>`;
-function bringShort(s){ let L='Saved'; try{ L=stageLabel(s).split(' · ')[0]; }catch(e){} return `${L} · Lv ${(s.p&&s.p.level)||1}`; }
-function bringRender(){
-  const el=bringEl(), body=el.querySelector('.bbody'), G0=BRING.got;
-  let h='';
-  if(BRING.err){
-    const msg={look:'This is a look-only session, so nothing can be brought in here.',
-      full:'This device ran out of room for saves, so that one could not be put in. Try deleting a journey you do not need.',
-      bad:'Those saves did not come through right, so nothing here was changed. Try again from the old address.'}[BRING.err]||'';
-    h=`<p>${msg}</p><div class="row bfoot">${bringBtn('close','Close')}</div>`;
-  }
-  else if(!G0){
-    h=`<p>The old address is opening in a new tab. It looks for your saves there and sends them back here.</p>`
-     +`<p class="muted">Nothing happening? On that page, tap <b>Take my journeys to playemberblood.com</b>. Your journeys come over in that tab instead.</p>`
-     +`<div class="row bfoot">${bringBtn('open','Open it again')}${bringBtn('close','Cancel')}</div>`;
-  }
-  else if(!G0.saves.length){
-    h=G0.notes.length?`<p>No journeys came over, but ${escapeHtml(bringList(G0.notes))} did.</p>`
-      :`<p><b>No saves came over.</b> The old address has no Emberblood saves in this browser. If you played on another phone, tablet or computer, or in another browser, open muellercodes.github.io/emberblood-move.html there.</p>`;
-    if(BRING.copied) h+=`<p class="bnote">Your settings switch on when you tap Done.</p>`;
-    h+=`<div class="row bfoot">${bringBtn('close',G0.notes.length?'Done':'Close',{hot:true})}</div>`;
-  }
-  else{
-    let firstFree=-1; for(let t=0;t<3;t++) if(!slotSave(t)){ firstFree=t; break; }
-    h=`<p class="muted">These journeys were saved at the old address, muellercodes.github.io. Pick a slot here for each one.</p><div class="slots">`;
-    G0.saves.forEach((it,g)=>{
-      let d; try{ d=slotDetail(it.s); }catch(e){ d={head:'A saved journey',sub:'',ago:''}; }
-      const ask=BRING.ask&&BRING.ask.g===g?BRING.ask:null;
-      h+=`<div class="slot${ask?' warn':''}"><div class="sn">Old Journey ${it.o+1}<span>${escapeHtml(d.ago)}</span></div><p class="sh">${escapeHtml(d.head)}</p><p class="sd">${escapeHtml(d.sub)}</p>`;
-      if(it.put>=0) h+=`<p class="bok">Now in Journey ${it.put+1}.</p>`;
-      else if(ask){
-        const there=slotSave(ask.t);
-        h+=`<p class="sd"><b>Replace Journey ${ask.t+1} (${escapeHtml(saveSummary(there)||'a saved journey')})?</b> That journey will be gone.</p>`
-          +`<div class="row">${bringBtn('yes','Yes, replace it',{hot:true,g,t:ask.t})}${bringBtn('no','Keep it',{g,t:ask.t})}</div>`;
-      }
-      else{
-        h+=`<p class="bto">Put it in:</p><div class="row bpick">`;
-        for(let t=0;t<3;t++){ const s=slotSave(t); h+=bringBtn('put',`Journey ${t+1}<small>${s?escapeHtml(bringShort(s)):'Empty'}</small>`,{hot:t===firstFree,g,t}); }
-        h+=`</div>`;
-        if(firstFree>=0) firstFree=-2;   // only the first waiting journey gets the suggestion
-      }
-      h+=`</div>`;
-    });
-    h+=`</div>`;
-    if(G0.notes.length) h+=`<p class="bnote">Also brought over: ${escapeHtml(bringList(G0.notes))}.</p>`;
-    if(BRING.copied) h+=`<p class="bnote">Your settings switch on when you tap Done.</p>`;
-    const all=G0.saves.every(it=>it.put>=0);
-    h+=`<div class="row bfoot">${bringBtn('close','Done',{hot:all})}</div>`;
-  }
-  body.innerHTML=h;
-}
-const bringList=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
-// the button: on the title screen while every slot is empty, and on the slot screen (a card at the top while every slot is
-// empty, a quiet button under the slots once there is a journey here)
-function bringMenuSync(){
-  const st=$('#bStory'); if(!st) return;
-  let b=$('#bBring');
-  if(!b){
-    b=document.createElement('button'); b.className='btn'; b.id='bBring'; b.type='button';
-    b.innerHTML='Bring a save from the old address<small>Played Emberblood at muellercodes.github.io before? Get your journeys back.</small>';
-    st.insertAdjacentElement('afterend',b);
-    b.addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); BRING.from='menu'; bringOpen(); });
-  }
-  b.hidden=latestSlot()>=0||!!Cloud.viewing;
-  const ov=document.getElementById('bring'); if(ov&&ov.classList.contains('on')&&BRING.got) bringRender();
-}
-function bringSlotRow(el){
-  if(!el||Cloud.viewing) return;
-  const empty=latestSlot()<0;
-  el.insertAdjacentHTML(empty?'afterbegin':'beforeend',empty
-    ?'<div class="slot cur bringc"><div class="sn">Played before?</div><p class="sd">Emberblood used to live at muellercodes.github.io. Bring the journeys you saved there.</p><div class="row"><button class="btn c sm hot" type="button" data-a="bring">Bring a save from the old address</button></div></div>'
-    :'<button class="btn c sm bringq" type="button" data-a="bring">Bring a save from the old address<small>Played at muellercodes.github.io before? Bring that journey here.</small></button>');
-  const b=el.querySelector('[data-a="bring"]');
-  if(b) b.addEventListener('click',()=>{ SFX.init(); SFX.play('ui'); BRING.from='slots'; bringOpen(); });
-}
-{ const base=refreshMenu; refreshMenu=function(){ const r=base.apply(this,arguments); try{ bringMenuSync(); }catch(e){ console.error(e); } return r; }; }
-Cloud.onChange(()=>{ try{ bringMenuSync(); }catch(e){} });
-window.__ebX=Object.assign(window.__ebX||{},{bring:{state:()=>({wait:BRING.wait,err:BRING.err,copied:BRING.copied,from:BRING.from,
-  saves:BRING.got?BRING.got.saves.map(it=>({o:it.o,put:it.put,stage:it.s.stage})):null,notes:BRING.got?BRING.got.notes:null}),check:bringCheck,open:bringOpen,url:BRING_URL}});
-
 // ================= music (procedural score, WebAudio)
 // Interface used by the rest of the game:
 //   Music.init()            call after a user gesture (SFX.init() first)
@@ -28116,15 +27932,26 @@ function ovStepMap(O,rows){
 }; }
 
 // ---------- the map screen: which map is shown, how it fits the canvas, tabs for every map Ash has found
-const MAPUI={view:0,tabs:null,fogCv:[]};
-function mapFit(k){
+const MAPUI={view:0,tabs:null,fogCv:[],zm:{}};
+// the whole map in the canvas (zoom 1)
+function mapFit0(k){
   const M=MAPS[k]||MAPS[0], cw=mapCv.width, ch=mapCv.height;
   if(M.fit&&M.fit.cw===cw&&M.fit.ch===ch) return M.fit;
   const s=Math.min(cw/M.w,ch/M.h);
   M.fit={cw,ch,s,ox:(cw-M.w*s)/2,oy:(ch-M.h*s)/2,w:M.w*s,h:M.h*s,y0:M.y0};
   return M.fit;
 }
-// canvas px on the map screen to world coordinates on the viewed map
+// (v12) the map as shown: zoomed and panned by MAPUI.zm[k] (see "the big map zooms" below), never past its edges
+function mapFit(k){
+  const B=mapFit0(k), Z=MAPUI.zm&&MAPUI.zm[k];
+  if(!Z||!(Z.z>1.001)) return B;
+  const M=MAPS[k]||MAPS[0], cw=B.cw, ch=B.ch, s=B.s*Z.z, w=M.w*s, h=M.h*s;
+  let ox=cw/2-Z.cx*s, oy=ch/2-(Z.cy-B.y0)*s;
+  ox=w>=cw?clamp(ox,cw-w,0):(cw-w)/2; oy=h>=ch?clamp(oy,ch-h,0):(ch-h)/2;
+  let F=Z.f; if(!F||F.cw!==cw||F.ch!==ch||F.s!==s||F.ox!==ox||F.oy!==oy) F=Z.f={cw,ch,s,ox,oy,w,h,y0:B.y0,z:Z.z};
+  return F;
+}
+// canvas px on the map screen to world coordinates on the viewed map (zoomed or not: it inverts mapFit)
 function mapInv(cx,cy){ const F=mapFit(MAPUI.view); return [(cx-F.ox)/F.s,F.y0+(cy-F.oy)/F.s]; }
 function fogCanvas(k){ const F=fogOf(k); let c=MAPUI.fogCv[k]; if(!c||c.width!==F.w||c.height!==F.h){ c=mkCanvas(F.w,F.h); MAPUI.fogCv[k]=c; } return c; }
 function mapsSeenList(){ const out=[]; for(const M of MAPS) if(M&&(M.k===0||(G&&G.mapsSeen&&G.mapsSeen[M.k]))) out.push(M.k); return out; }
@@ -28158,6 +27985,166 @@ function mapView(k){
 // the D-pad reaches, and the bumpers keep cycling the shrines of the map on show
 function mapViewStep(d){ const L=mapsSeenList(); if(L.length<2) return false; const i=L.indexOf(MAPUI.view); mapView(L[(i+d+L.length)%L.length]); return true; }
 addEventListener('keydown',e=>{ if(scene!=='map') return; const c=e.code; if(c==='Comma'||c==='PageUp'){ e.preventDefault(); mapViewStep(-1); } else if(c==='Period'||c==='PageDown'){ e.preventDefault(); mapViewStep(1); } });
+
+// ---------- (v12) the big map zooms and pans. Drew: "Can you also make the main maps zoomable for the user? It's a bit
+// hard to see it zoomed out all the way all the time."
+// MAPUI.zm[k]={z,cx,cy}: z 1 is the whole map (as before), cx, cy the world point at the middle of the canvas. mapFit
+// applies it, so everything drawn through mapXY moves with it (and the cheat panel's mapInv and chMapPt, which go
+// through mapFit too), while labels and markers keep their size in canvas px. The map opens zoomed on Ash
+// (MAPZ.start, a little less on a small map); other tabs open whole and keep their own zoom while the map is open.
+// Wheel and pinch zoom about the pointer, a drag pans (and is never taken as a click on a shrine or a cheat
+// teleport), the + and - buttons and keys zoom about the middle (+ from the whole map goes toward Ash), Whole map (or
+// 0) goes back, W A S D pan. A controller zooms with the triggers (R2 in, L2 out) and pans with the right stick. The
+// limits: never smaller than the whole map, never past its edges, and no closer than MAPZ.pxMax canvas px per world
+// px (the overview is 1 px per 25 world px, so it stays a picture, not blocks). The dungeon page (view -1) is not
+// zoomed.
+const MAPZ={start:2.5,max:5,step:1.6,pxMax:0.32,startSpan:2600,res:1.9};
+function mapZMax(k){ const B=mapFit0(k); return clamp(MAPZ.pxMax/B.s,2,MAPZ.max); }
+function mapZOn(k){ return k!=null&&k!==-1&&!!MAPS[k]; }
+function mapZClamp(k){
+  const Z=MAPUI.zm[k]; if(!Z) return null;
+  Z.z=clamp(Z.z,1,mapZMax(k)); if(!(Z.z>1.001)){ delete MAPUI.zm[k]; return null; }
+  const M=MAPS[k]||MAPS[0], B=mapFit0(k), s=B.s*Z.z, hw=B.cw/2/s, hh=B.ch/2/s;
+  Z.cx=M.w*s>=B.cw?clamp(Z.cx,hw,M.w-hw):M.w/2;
+  Z.cy=M.h*s>=B.ch?clamp(Z.cy,B.y0+hh,B.y0+M.h-hh):B.y0+M.h/2;
+  return Z;
+}
+function mapZoomOf(k){ const Z=MAPUI.zm[k==null?MAPUI.view:k]; return Z?Z.z:1; }
+// zoom the viewed map to nz, keeping the world point under canvas point (px,py) where it is (default: the middle)
+function mapZoomTo(nz,px,py){
+  const k=MAPUI.view; if(!mapZOn(k)) return;
+  const B=mapFit0(k); if(px==null){ px=B.cw/2; py=B.ch/2; }
+  const [wx,wy]=mapInv(px,py), z=clamp(nz,1,mapZMax(k));
+  if(!(z>1.001)){ delete MAPUI.zm[k]; mapZReq(); return; }
+  const s=B.s*z; MAPUI.zm[k]={z,cx:wx-(px-B.cw/2)/s,cy:wy-(py-B.ch/2)/s}; mapZClamp(k); mapZReq();
+}
+function mapZoomBy(f,px,py){ mapZoomTo(mapZoomOf()*f,px,py); }
+function mapPan(dx,dy){
+  const k=MAPUI.view, Z=MAPUI.zm[k]; if(!Z) return;
+  const s=mapFit0(k).s*Z.z; Z.cx-=dx/s; Z.cy-=dy/s; mapZClamp(k); mapZReq();
+}
+// where Ash is on the map on show (null when he is on another map)
+function mapZAsh(){ const k=MAPUI.view; if(!G||!player||curMap()!==k) return null; const pp=AREA&&G.ow?G.ow:player; return {x:pp.x,y:pp.y}; }
+// centre the zoomed view on a world point (or zoom in on it from the whole map)
+function mapZCentre(x,y,z){
+  const k=MAPUI.view; if(!mapZOn(k)) return;
+  MAPUI.zm[k]={z:z||mapZoomOf(k),cx:x,cy:y}; mapZClamp(k); mapZReq();
+}
+// the canvas fills the map frame (it was a fixed 1120 x 880 picture with parchment bars beside it, and on a phone it
+// was a small box with tiny words): MAPZ.res canvas px per CSS px, so labels and markers are the same size on a phone
+// as on a desktop. A phone held upright gets a squarer box. Returns true when the size changed.
+function mapZSize(){
+  const wrap=mapCv.parentElement; if(!wrap) return false;
+  const W0=wrap.clientWidth; if(!(W0>40)) return false;
+  const Hc=Math.round(Math.min(innerHeight*0.58,W0*(W0<600?0.9:0.786))), cw=Math.round(W0*MAPZ.res), ch=Math.round(Hc*MAPZ.res);
+  mapCv.style.width=W0+'px'; mapCv.style.height=Hc+'px';
+  if(mapCv.width===cw&&mapCv.height===ch) return false;
+  mapCv.width=cw; mapCv.height=ch; return true;
+}
+addEventListener('resize',()=>{ try{ if(scene==='map'&&MAPUI.bound&&mapZSize()) drawMapScreen(); }catch(e){} });
+function mapZStartZ(k){ const M=MAPS[k]||MAPS[0]; return clamp(Math.min(MAPZ.start,M.w/MAPZ.startSpan),1,mapZMax(k)); }
+// the map screen opens: every tab whole, the one Ash is on zoomed on him
+function mapZoomStart(){
+  mapZBind(); mapZSize(); MAPUI.zm={}; const k=MAPUI.view, a=mapZOn(k)&&mapZAsh();
+  if(a){ MAPUI.zm[k]={z:mapZStartZ(k),cx:a.x,cy:a.y}; mapZClamp(k); }
+  mapZUI();
+}
+// keep a picked shrine in view (the controller and [ ] step through them)
+function mapZShow(x,y){
+  const k=MAPUI.view, Z=MAPUI.zm[k]; if(!Z) return;
+  const F=mapFit(k), cx=F.ox+x*F.s, cy=F.oy+(y-F.y0)*F.s, m=60;
+  if(cx<m||cy<m||cx>F.cw-m||cy>F.ch-m) mapZCentre(x,y,Z.z);
+}
+// one redraw per frame however many wheel or move events arrive
+let mapZPend=false;
+function mapZReq(){ mapZUI(); if(mapZPend) return; mapZPend=true; requestAnimationFrame(()=>{ mapZPend=false; if(scene==='map') drawMapScreen(); }); }
+// the buttons: + and - and Whole map, in the top right corner of the map
+function mapZUI(){
+  const wrap=document.querySelector('#mapov .mapwrap'); if(!wrap) return;
+  let el=document.getElementById('mapZoom');
+  if(!el){
+    el=document.createElement('div'); el.id='mapZoom'; el.className='mapzoom'; el.setAttribute('role','group'); el.setAttribute('aria-label',S('Zoom the map','Zoom the map'));
+    el.innerHTML='<button type="button" class="mzb" data-z="in" aria-label="Zoom in">+</button><button type="button" class="mzb" data-z="out" aria-label="Zoom out">&minus;</button><button type="button" class="mzb mzw" data-z="all">'+S('Whole map','Whole map')+'</button>';
+    el.addEventListener('click',e=>{ const b=e.target.closest('button[data-z]'); if(!b||scene!=='map') return; e.stopPropagation(); mapZBtn(b.dataset.z); });
+    wrap.appendChild(el);
+  }
+  const k=MAPUI.view, on=mapZOn(k), z=mapZoomOf(k);
+  el.hidden=!on;
+  for(const b of el.querySelectorAll('button')){ const d=b.dataset.z; b.disabled=!on||(d==='in'?z>=mapZMax(k)-0.001:z<=1.001); }
+  mapCv.style.cursor=MAPUI.drag&&MAPUI.drag.moved?'grabbing':z>1.001?'grab':'';
+}
+function mapZBtn(d){
+  const k=MAPUI.view; if(!mapZOn(k)) return;
+  if(d==='all'){ delete MAPUI.zm[k]; mapZReq(); }
+  else if(d==='in'){ const a=mapZAsh(); if(mapZoomOf(k)<=1.001&&a){ mapZCentre(a.x,a.y,Math.min(MAPZ.step,mapZMax(k))); } else mapZoomBy(MAPZ.step); }
+  else mapZoomBy(1/MAPZ.step);
+  try{ SFX.play('ui',0.4); }catch(e){}
+}
+// pointers: one drags, two pinch. A press that moved more than a few px is a drag: the click after it is dropped
+// (this listener is registered before the cheat panel's teleport click, so neither a shrine nor a teleport fires)
+// (the map canvas, mapCv, is made by a12b_ui.js, which loads last: these bind on the first openMap)
+MAPUI.ptr=new Map(); MAPUI.drag=null; MAPUI.dragEnd=-1e9; MAPUI.bound=false;
+function mapCvPt(e){ const r=mapCv.getBoundingClientRect(); return {x:(e.clientX-r.left)/(r.width||1)*mapCv.width,y:(e.clientY-r.top)/(r.height||1)*mapCv.height,cx:e.clientX,cy:e.clientY}; }
+function mapZBind(){
+if(MAPUI.bound) return; MAPUI.bound=true;
+mapCv.addEventListener('pointerdown',e=>{
+  if(scene!=='map'||!mapZOn(MAPUI.view)||(e.pointerType==='mouse'&&e.button!==0)) return;
+  MAPUI.ptr.set(e.pointerId,mapCvPt(e)); try{ mapCv.setPointerCapture(e.pointerId); }catch(err){}
+  if(!MAPUI.drag) MAPUI.drag={moved:false,sx:e.clientX,sy:e.clientY,pinch:null};
+  if(MAPUI.ptr.size===2){ const [a,b]=[...MAPUI.ptr.values()]; MAPUI.drag.pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:mapZoomOf()}; MAPUI.drag.moved=true; }
+});
+mapCv.addEventListener('pointermove',e=>{
+  const D=MAPUI.drag, last=MAPUI.ptr.get(e.pointerId); if(!D||!last||scene!=='map') return;
+  const q=mapCvPt(e);
+  if(MAPUI.ptr.size>=2){
+    const o=[...MAPUI.ptr.values()], m0x=(o[0].x+o[1].x)/2, m0y=(o[0].y+o[1].y)/2;
+    MAPUI.ptr.set(e.pointerId,q);
+    const n=[...MAPUI.ptr.values()], mx=(n[0].x+n[1].x)/2, my=(n[0].y+n[1].y)/2, d=Math.hypot(n[0].x-n[1].x,n[0].y-n[1].y)||1;
+    if(D.pinch){ mapPan(mx-m0x,my-m0y); mapZoomTo(D.pinch.z*d/D.pinch.d,mx,my); }
+    e.preventDefault(); return;
+  }
+  MAPUI.ptr.set(e.pointerId,q);
+  if(!D.moved&&Math.hypot(e.clientX-D.sx,e.clientY-D.sy)>6) D.moved=true;
+  if(D.moved){ mapPan(q.x-last.x,q.y-last.y); e.preventDefault(); }
+});
+function mapPtrUp(e){
+  if(!MAPUI.ptr.has(e.pointerId)) return;
+  MAPUI.ptr.delete(e.pointerId); try{ mapCv.releasePointerCapture(e.pointerId); }catch(err){}
+  const D=MAPUI.drag; if(D&&D.pinch&&MAPUI.ptr.size<2){ D.pinch=null; }
+  if(!MAPUI.ptr.size){ if(D&&D.moved) MAPUI.dragEnd=performance.now(); MAPUI.drag=null; mapZUI(); }
+}
+mapCv.addEventListener('pointerup',mapPtrUp); mapCv.addEventListener('pointercancel',mapPtrUp);
+mapCv.addEventListener('wheel',e=>{
+  if(scene!=='map'||!mapZOn(MAPUI.view)) return;
+  e.preventDefault();
+  const q=mapCvPt(e), dy=e.deltaMode===1?e.deltaY*18:e.deltaMode===2?e.deltaY*300:e.deltaY;
+  mapZoomBy(Math.exp(-clamp(dy,-240,240)*0.0022),q.x,q.y);
+},{passive:false});
+}
+addEventListener('click',e=>{ if(MAPUI.bound&&e.target===mapCv&&performance.now()-MAPUI.dragEnd<400){ e.stopImmediatePropagation(); e.preventDefault(); } },true);
+// keys: + and - zoom, 0 shows the whole map, W A S D pan
+addEventListener('keydown',e=>{
+  if(scene!=='map'||!mapZOn(MAPUI.view)) return;
+  const c=e.code, P=90;
+  if(c==='Equal'||c==='NumpadAdd'){ e.preventDefault(); mapZBtn('in'); }
+  else if(c==='Minus'||c==='NumpadSubtract'){ e.preventDefault(); mapZBtn('out'); }
+  else if(c==='Digit0'||c==='Numpad0'){ e.preventDefault(); mapZBtn('all'); }
+  else if(c==='KeyW'||c==='KeyA'||c==='KeyS'||c==='KeyD'){ e.preventDefault(); mapPan(c==='KeyA'?P:c==='KeyD'?-P:0,c==='KeyW'?P:c==='KeyS'?-P:0); }
+});
+// a controller on the map: the triggers zoom (R2 in, L2 out), the right stick pans; the rest of the menu is as before
+// (the right stick no longer scrolls the map screen)
+{ const base=padMenu; padMenu=function(root,s,dt){
+  if(root&&root.id==='mapov'&&s&&mapZOn(MAPUI.view)){
+    try{
+      const tv=i=>Math.max(s.cur[i]?1:0,(s.val&&s.val[i])||0), zin=tv(PB.R2), zout=tv(PB.L2);
+      if(zin>0.15||zout>0.15) mapZoomBy(Math.exp((zin-zout)*1.6*dt));
+      const [ai,aj]=padAimAx(), x=s.ax[ai]||0, y=s.ax[aj]||0, m=Math.hypot(x,y);
+      if(m>0.2){ const k=(m-0.2)/0.8*900*dt/m; mapPan(-x*k,-y*k); }
+      if(m>0.2){ s=Object.assign({},s,{ax:s.ax.slice()}); s.ax[ai]=0; s.ax[aj]=0; }
+    }catch(err){ console.error(err); }
+  }
+  return base.call(this,root,s,dt);
+}; }
 
 // ---------- towns on new maps: names, music, events, house look, homes
 const TOWNS={}, TOWN_ORDER=[];
@@ -28559,6 +28546,8 @@ defineMap(4,{id:'nightfall',name:'Nightfall Peak',placeholder:true,music:'night'
   crossings:[
     {id:'pm_bridge_4',x:4500,y:90750,to:{x:12600,y:65400},label:'Cross back to Moonfall',name:'The Moonfire Bridge',kind:'bridge',dir:Math.PI/2}
   ]});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{mapZ:{MAPZ,zm:()=>JSON.parse(JSON.stringify(MAPUI.zm,(k,v)=>k==='f'?undefined:v)),zoomOf:k=>mapZoomOf(k),zmax:k=>mapZMax(k==null?MAPUI.view:k),fit:k=>{ const F=mapFit(k==null?MAPUI.view:k); return {s:F.s,ox:F.ox,oy:F.oy,w:F.w,h:F.h,cw:F.cw,ch:F.ch,y0:F.y0}; },
+  inv:(x,y)=>mapInv(x,y),btn:d=>mapZBtn(d),pan:(dx,dy)=>mapPan(dx,dy),pad:(s,dt)=>{ const r=document.getElementById('mapov'); return padMenu(r,s,dt||0.016); },open:()=>openMap(),sel:()=>mapSel?mapSel.id:null}});
 
 // ================= v9 terrain for maps 1 and up (wave 1): biome and prop registries, the shared sampler
 // Embermere (map 0) keeps T, blockedAt and the rest from a2_world.js exactly as they were; every wrapper below
@@ -39658,6 +39647,7 @@ function s10Prompts(offer){
     //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
     const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
     const at=gAt||s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    if(AREA&&typeof reachPlace==='function'&&!reachPlace(at.x,at.y,P.r||22)) continue;   // (v12) indoors: close and in front (a9d_quests.js)
     // (I5) nor when the Grapple Tail can reach a post from here (Vesper's cracked mask lies on the Silk Gallery's edge,
     // right where Ash grapples the first post: E only read the mask again)
     if(again){ try{ if(typeof p2Pick==='function'&&typeof canGrapple==='function'&&canGrapple()&&!AREA&&p2Pick(p,(typeof P2!=='undefined'&&P2.inp)||{mx:0,my:0})) continue; }catch(e){} }
@@ -39681,7 +39671,7 @@ function s10PersonFirst(){
   if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
   else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
   const fs=d-reach; let bn=null, bs=1e9;
-  for(const n of AREA.npcs){ const dn=dist(p.x,p.y,n.x,n.y); if(dn>=(n.turtle?90:70)) continue; const sc=dn-70; if(sc<=fs+0.5&&sc<bs){ bs=sc; bn=n; } }
+  for(const n of AREA.npcs){ const dn=dist(p.x,p.y,n.x,n.y); if(dn>=(n.turtle?90:70)||(typeof reachPerson==='function'&&!reachPerson(n))) continue; const sc=dn-70; if(sc<=fs+0.5&&sc<bs){ bs=sc; bn=n; } }
   if(bn) G.prompt={text:`Talk to ${bn.name}`,act:()=>talkTo(bn),x:bn.x,y:bn.y};
 }
 { const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted) s10PersonFirst(); }catch(e){ console.error(e); } try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; });
@@ -50036,10 +50026,19 @@ function a1Slab(g,hx,hy,a,w,h,col,handle){
   if(LOOK.sb){ const H=a1Hull(P.concat(P.map(([x,y])=>[x,y-h]))); g.strokeStyle=SBC.outline; g.lineWidth=1.7; g.beginPath(); H.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y)); g.closePath(); g.stroke(); }
 }
 // both doors of a gate as they stand now (only: just that one, for a north-south gate's doors, which sort apart)
+// (v12) A north-south gate (the Brindle and Field Gates) is seen end on, so shut it read as a column of planks between
+// the posts. Drawn shut, its two leaves now meet in a shallow V that points into the village (A1G_BOW each, each leaf a
+// little longer so they still meet in the middle): enough of each leaf's face turns to the camera to show its planks,
+// its iron straps and its ring, so it reads as a pair of doors. The bow is the start of the swing, so opening is one
+// smooth movement. Only the art bows; the collider across the gap is as before.
+const A1G_BOW=24*Math.PI/180;
 function a1GDrawDoors(g,only){
   const k=a1GK(g), e=k*k*(3-2*k), j=a1GJig(g)*0.035, m=a1GMode(g);
   const C=g.id==='north'&&m==='gate'?['#b88450','#ad7a48']:['#8a5a34','#82552f'];
-  for(let i=0;i<2;i++){ if(only!=null&&only!==i) continue; const d=g.doors[i]; a1Slab(ctx,d.hx+d.ix*e,d.hy+d.iy*e,d.a0+d.da*e+(i?-j:j),d.w,g.h,C[i],m==='gate'); }
+  for(let i=0;i<2;i++){ if(only!=null&&only!==i) continue; const d=g.doors[i];
+    let a=d.a0+d.da*e+(i?-j:j), w=d.w;
+    if(!g.ew&&m!=='broken'){ const b=1-e; a+=Math.sign(d.da)*A1G_BOW*b; w=d.w*(1+(1/Math.cos(A1G_BOW)-1)*b); }
+    a1Slab(ctx,d.hx+d.ix*e,d.hy+d.iy*e,a,w,g.h,C[i],m==='gate'); }
 }
 // see-through, as the wall pieces are, when Ash is just behind (north of) a gate
 function a1GFadeAt(x0,x1,y){ const p=player; if(!p||p.dead) return 1; const dy=y-p.y; return dy>2&&dy<64&&p.x>x0-12&&p.x<x1+12?0.42:1; }
@@ -87636,7 +87635,7 @@ function useItem(id){
   G.items[id]--; if(!(G.items[id]>0)) delete G.items[id];
   if(boss) itBossTrack().n++;
   IT.use={id,t:IT_USE_T};
-  p.drinkPool=0; p.drinkT=0.9;
+  p.drinkPool=0; p.drinkT=0.9; p.useIco=id;   // (v12) the pose shows this item in his hand, not the green flask (a10c_t3ash.js)
   try{ SFX.play('drink'); }catch(e){}
   ftext(p.x,p.y-34,simplify(d.name),'#ffe6a8',13);
   if(!boss) saveGame();
@@ -87769,7 +87768,7 @@ function itFlaskCap(){
 
 // ---------- 7. the hooks into the game
 { const base=updatePlayer; updatePlayer=function(dt,inp){
-    try{ itSync(); const U=IT.use, p=player; if(U&&p){ p.drinkPool=0; p.drinkT=Math.max(0.02,0.9*U.t/IT_USE_T); } }catch(e){ console.error('items',e); }
+    try{ itSync(); const U=IT.use, p=player; if(U&&p){ p.drinkPool=0; p.drinkT=Math.max(0.02,0.9*U.t/IT_USE_T); p.useIco=U.id; } else if(p&&p.useIco) p.useIco=null; }catch(e){ console.error('items',e); }
     const r=base(dt,inp);
     try{ itTick(dt); }catch(e){ console.error('items',e); }
     return r; }; }
@@ -90100,7 +90099,9 @@ function openMap(){
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
   mapSel=null; $('#bTravel').hidden=true; mapHintSet();
   MAPUI.view=AREA&&AREA.rooms?-1:curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
+  mapZoomStart();   // (v12) opens zoomed on Ash (e1_maps.js)
   drawMapScreen(); renderJournal(); show('mapov');
+  try{ if(mapZSize()){ mapZoomStart(); drawMapScreen(); } }catch(e){}   // (v12) the canvas fills the frame once it is laid out
 }
 const SO_FAR={wake:'It is Lantern Day in Emberhollow. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
   lore:'Emberhollow is safe for now. Elder Yara has something important to tell you.',hollow:'Yara told you the truth. Vorlaxis, the dragon sealed under Cinder Mountain, is your great ×13 grandfather, and only Emberblood fire can keep his Wards burning.',
@@ -90262,16 +90263,18 @@ function bagPadStar(){
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
+  try{ mapZUI(); }catch(e){}   // (v12) the zoom buttons hide on the dungeon page
   if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); return; } MAPUI.view=curMap(); }   // the dungeon page
   const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
-  g.setTransform(1,0,0,1,0,0); g.fillStyle='#0e0a08'; g.fillRect(0,0,w,h);
+  // (v12) the canvas fills the map frame now: around the whole map it is the frame's own colour, as it was
+  g.setTransform(1,0,0,1,0,0); g.fillStyle=LOOK.sb?'#e9d6ac':'#0e0a08'; g.fillRect(0,0,w,h);
   if(O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,MF.ox,MF.oy,MF.w,MF.h); }
   const fcv=fogCanvas(V), fcg=fcv.getContext('2d'), img=fcg.createImageData(FG.w,FG.h);
   for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
   fcg.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(fcv,MF.ox,MF.oy,FG.w*FG.cs*MF.s,FG.h*FG.cs*MF.s);
   const seen=(x,y)=>fogSeen(V,x,y);
   g.textAlign='center'; g.textBaseline='middle';
-  if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(0,wy); g.lineTo(w,wy); g.stroke(); }
+  if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(Math.max(0,MF.ox),wy); g.lineTo(Math.min(w,MF.ox+MF.w),wy); g.stroke(); }
   for(const k in POI){ const p=POI[k]; if(!on(p)||!seen(p.x,p.y)) continue; const [x,y]=mapXY(p.x,p.y); g.font='700 21px Cinzel, Georgia, serif'; g.lineWidth=5; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(p.name,x,y-22); g.fillStyle='#f2e2c4'; g.fillText(p.name,x,y-22); g.fillStyle='#e8d0a0'; g.beginPath(); g.arc(x,y,6,0,TAU); g.fill(); }
   for(const c of mapList(CAMPS,V)){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
   for(const s of mapList(SHRINES,V)){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
@@ -90292,9 +90295,10 @@ mapCv.addEventListener('click',e=>{
   let best=null,bd=420*420; for(const s of mapList(SHRINES,MAPUI.view)){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
   mapSelect(best);
 });
-function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there.`; else h.textContent='Tap a blue shrine you have found to fast travel there.'; }
+function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there. ${padChip(PB.R2)} and ${padChip(PB.L2)} zoom, the right stick moves the map.`; else h.textContent=usingTouch?'Pinch or tap + and − to zoom, drag to look around. Tap a blue shrine you have found to fast travel there.':'Scroll or press + and − to zoom, drag to look around. Click a blue shrine you have found to fast travel there.'; }
 function mapSelect(best){
   mapSel=best; const bt=$('#bTravel');
+  if(best) try{ mapZShow(best.x,best.y); }catch(e){}   // (v12) zoomed in: bring a picked shrine into view
   if(best){ if(G.inCombat||(G.boss&&!G.boss.dead)){ bt.hidden=true; $('#mapHint').textContent='You can’t fast travel while enemies are close.'; } else { bt.hidden=false; bt.textContent=`Travel to ${best.name}`; $('#mapHint').textContent=best.name; } }
   else{ bt.hidden=true; mapHintSet(); }
   drawMapScreen();
