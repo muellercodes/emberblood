@@ -115,7 +115,8 @@ function n4sSay(k,again){
 const N4S_SPK={n_echo_vor:{name:'Echo of the First Flame',col:'#9a7ac8'},n_echo_vesper:{name:'Echo of the Moth Mask',col:'#8a7ab0'},
   n_echo_glaciar:{name:'Echo of the Ice Dragon',col:'#7a8ac0'},n_echo_hush:{name:'Echo of the Hush',col:'#9a9ab0'},n_memory:{name:'A memory',col:'#c8c0e8'},
   c_vesper:{name:'Vesper',col:'#b8a8e8'},f_glaciar:{name:'Glaciar',col:'#a8e0ff'},f_hush:{name:'Hush',col:'#e4e0f4'},goat:{name:'Duchess',col:'#e8e0d0'},
-  ev_tikka:{name:'Tikka',col:'#e8a05a'},ev_tock:{name:'Tock',col:'#b8a070'},grandpa:{name:'Grandpa',col:'#ff9a5a'}};
+  ev_tikka:{name:'Tikka',col:'#e8a05a'},ev_tock:{name:'Tock',col:'#b8a070'},grandpa:{name:'Grandpa',col:'#ff9a5a'},
+  greymane:{name:'Greymane',col:'#cfe0f0'}};
 for(const k in N4S_SPK) if(!SPK[k]) SPK[k]=N4S_SPK[k];
 for(const [k,v] of [['n_map',S("Juniper's Peak Map","Juniper's map of the peak")],['n_spark',S("Cindervane's Spark","Cindervane's Spark")]]) if(!ITEM_NAMES[k]) ITEM_NAMES[k]=v;
 function n4sGlowG(g,x,y,r,col,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,`rgba(${col},${a})`); gr.addColorStop(1,`rgba(${col},0)`); g.fillStyle=gr; g.fillRect(x-r,y-r,r*2,r*2); }
@@ -134,8 +135,22 @@ const N4S_PORT={
     g.fillStyle='#ffffff'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*20,-8,6,4,0,0,TAU); g.fill(); } }},
   n_echo_hush:{bg:'#100c1c',f:g=>{ n4sShadowFace(g,q=>{ if(typeof thrFaceMoth==='function') thrFaceMoth(q,{wing:'#5a5a6a',wing2:'#3a3a4a',eye:'#d8c8ff',iris:'#7a5ad8',fur:'#6a6a7a',fur2:'#7a7a8a',eyes:'#ffffff',ant:'#9a9ab0'}); }); }},
   n_memory:{bg:'#1a1430',f:g=>{ const t=(G?G.time:0); n4sGlowG(g,0,0,80,'200,190,240',0.55); for(let i=0;i<7;i++){ const a=t*0.6+i*0.9, r=26+i*6; g.fillStyle=`rgba(232,226,255,${0.5-i*0.05})`; g.beginPath(); g.arc(Math.cos(a)*r,Math.sin(a)*r*0.6,3.2-i*0.3,0,TAU); g.fill(); }
-    g.fillStyle='#f4f0ff'; g.beginPath(); g.arc(0,0,10,0,TAU); g.fill(); }}
+    g.fillStyle='#f4f0ff'; g.beginPath(); g.arc(0,0,10,0,TAU); g.fill(); }},
+  // (v12 PEAK) Greymane, for talk on the peak: a big grey wolf with ice-blue eyes (one face, like the goat's)
+  greymane:{bg:'#1c2634',f:g=>n4sFaceWolf(g)}
 };
+function n4sFaceWolf(g){
+  const fur='#9aa6b4', dark='#5a6676', pale='#e4ecf2';
+  g.fillStyle=dark; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*14,-30); g.lineTo(s*40,-66); g.lineTo(s*44,-18); g.closePath(); g.fill(); }
+  g.fillStyle='#d8b8b0'; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*22,-32); g.lineTo(s*37,-54); g.lineTo(s*38,-26); g.closePath(); g.fill(); }
+  g.fillStyle=fur; g.beginPath(); g.moveTo(-50,4); g.quadraticCurveTo(-52,-40,0,-44); g.quadraticCurveTo(52,-40,50,4); g.quadraticCurveTo(46,40,0,58); g.quadraticCurveTo(-46,40,-50,4); g.fill();
+  g.fillStyle=pale; g.beginPath(); g.moveTo(-22,8); g.quadraticCurveTo(0,-4,22,8); g.quadraticCurveTo(26,40,0,52); g.quadraticCurveTo(-26,40,-22,8); g.fill();
+  g.fillStyle=pale; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*48,0); g.lineTo(s*62,22); g.lineTo(s*40,26); g.closePath(); g.fill(); }
+  g.fillStyle='#1a1e26'; g.beginPath(); g.ellipse(0,22,9,6.5,0,0,TAU); g.fill();
+  g.strokeStyle='#1a1e26'; g.lineWidth=2.4; g.beginPath(); g.moveTo(0,28); g.lineTo(0,36); g.moveTo(-10,40); g.quadraticCurveTo(0,46,10,40); g.stroke();
+  for(const s of [-1,1]){ g.fillStyle='#bfe8ff'; g.beginPath(); g.ellipse(s*18,-10,7.5,6,s*0.25,0,TAU); g.fill(); g.fillStyle='#10202c'; g.beginPath(); g.ellipse(s*18,-10,2.6,4.4,0,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*18+2,-12,1.6,0,TAU); g.fill(); }
+  g.strokeStyle=dark; g.lineWidth=3; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*10,-20); g.lineTo(s*28,-22); g.stroke(); }
+}
 for(const k in N4S_PORT) if(!EVPORT[k]) EVPORT[k]=N4S_PORT[k];
 // echoes speak only old words (their text wobbles, dim violet); a memory is told in italics, like the narrator
 (function n4sCss(){ try{ if(document.getElementById('n4sCss')) return; const st=document.createElement('style'); st.id='n4sCss';
@@ -880,8 +895,10 @@ function n4sPrompts(offer){
     // the Moth Memory panes (x4_ascent places the real ones)
     if(!asc) for(let k=1;k<=6;k++){ if(G.found['n_pane_'+k]) continue; const P=N4S_PANE[k].at, d=dist(p.x,p.y,P[0],P[1]); if(d<90) offer(d,simplify(S('Look at the glass pane','Look at the glass')),()=>n4sPane(k),P[0],P[1],true); }
   }
-  // Duchess on the summit after the dawn
-  const D=n4sDuchObj(); if(D&&!DLG){ const d=dist(p.x,p.y,D.x,D.y); if(d<80) offer(d,simplify(S('Talk to the goat','Talk to the goat')),()=>n4sDuchTalk(),D.x,D.y,true); }
+  // (v12 PEAK) the friends on the peak
+  n4sTalkPrompts(offer);
+  // Duchess on the summit after the dawn (Ash knows her name: "DUCHESS?! HOW?!")
+  const D=n4sDuchObj(); if(D&&!DLG){ const d=dist(p.x,p.y,D.x,D.y); if(d<80) offer(d,simplify(S('Talk to Duchess','Talk to Duchess')),()=>n4sDuchTalk(),D.x,D.y,true); }
 }
 // Cindervane's Spark: it blocks the first hit Ash takes in each boss fight on the peak (a CLANG and a gold flash)
 { const base=hurtPlayer; hurtPlayer=function(amt,sx,sy,kb){
@@ -945,6 +962,7 @@ function n4sAllyBeat(id){ if(!n4sAllyHere(id)&&!(id==='wardens'&&n4sEnd()==='war
 function n4sGlaciarCalm(){ return (N4ST.glaCalm||0)>0; }
 function n4sHushGlow(x,y){ const a=N4ST.ally.hush; return !!(a&&a.mode!=='leave'&&dist(a.x,a.y,x,y)<200); }
 function n4sAllyTick(dt){
+  if(N4ST.talkWith) n4sTalkEnd();
   // who should be here, who should go
   for(const id of N4S_ALLY_IDS){ const want=n4sAllyWant(id), a=N4ST.ally[id];
     if(want&&(!a||a.mode==='leave')) n4sAllyArrive(id); else if(!want&&a&&a.mode!=='leave'&&a.mode!=='pose') n4sAllyLeave(id); }
@@ -977,10 +995,57 @@ function n4sAllyTick(dt){
 function n4sAllyLite(dt){
   if(!G||G.mode!=='story'||curMap()!==4||AREA) return;
   const list=[];
-  for(const id in N4ST.ally){ const a=N4ST.ally[id]; a.t+=dt; if(a.mode==='leave'){ a.lt+=dt; a.alpha=Math.max(0,1-a.lt/1.6); if(a.lt>1.8){ delete N4ST.ally[id]; continue; } } else a.alpha=Math.min(1,a.alpha+dt*1.5); list.push(a); }
+  for(const id in N4ST.ally){ const a=N4ST.ally[id]; a.t+=dt; if(a.mode==='leave'){ a.lt+=dt; a.alpha=Math.max(0,1-a.lt/1.6); if(a.lt>1.8){ delete N4ST.ally[id]; continue; } } else a.alpha=Math.min(1,a.alpha+dt*1.5);
+    if(a.talk&&player){ a.face=angTo(a.x,a.y,player.x,player.y); a.dx=a.dy=0; }   // (v12 PEAK) a friend Ash is talking to looks at him
+    list.push(a); }
   N4ST.allies=list; G.nAllies=list; n4sAllyRender();
 }
-function n4sAllyRender(){ if(!N4ST.allies.length){ return; } G.allies=N4ST.allies.map(a=>{ const o=a.r4||(a.r4={draw:null,x:0,y:0,r:10}); o.x=a.x; o.y=a.y+(a.id==='glaciar'?140:a.id==='hush'?40:0); o.draw=()=>n4sDrawAlly(a); return o; }); }
+// (the Greymane on the peak is k 'grey', so an Act I companion Greymane steps aside for him, as at the Act I summit)
+function n4sAllyRender(){ if(!N4ST.allies.length){ return; } G.allies=N4ST.allies.map(a=>{ const o=a.r4||(a.r4={draw:null,x:0,y:0,r:10,k:a.id==='greymane'?'grey':null}); o.x=a.x; o.y=a.y+(a.id==='glaciar'?140:a.id==='hush'?40:0); o.draw=()=>n4sDrawAlly(a); return o; }); }
+
+// ---------- 6b. (v12 PEAK) talking to the friends on the peak. The friends above are not people (the stock "Talk to"
+// prompt only sees G.npcs), so nobody could talk to them. When Ash stands still next to one and nothing else is going on
+// (no fight, no scene, no beat waiting), the prompt says "Talk to <name>"; the friend turns to face Ash, and talkTo()
+// opens their talk with a stand-in person record: the act 5 data's talk for that person id (game/story/act5/people.js,
+// the lines that need `near n5_peak`), so replies, topics, moods, portraits and quest steps work as for anyone else.
+// The prompt waits for Ash to stop (like the Act I companions'), so the attack button is never taken from him while he
+// walks with a friend. Sir Cindervane and Grandpa only come for fights, so they never get one. Pip the same way, after
+// a longer stop, and only when no friend is nearer. Duchess on the summit after the dawn: n4sDuchTalk below.
+// (Pip and Duchess have no person record of their own: these are the stand-ins' names)
+const N4S_STANDIN={pip:{id:'pip',name:'Pip'},goat:{id:'goat',name:'Duchess'}};
+const N4S_TALK={greymane:{id:'greymane',name:S('Greymane','Greymane'),reach:120},vesper:{id:'c_vesper',name:S('Vesper','Vesper'),reach:110},
+  glaciar:{id:'f_glaciar',name:S('Glaciar','Glaciar'),reach:320},hush:{id:'f_hush',name:S('Hush','Hush'),reach:120},tikka:{id:'ev_tikka',name:S('Tikka','Tikka'),reach:110}};
+function n4sTalkCalm(){ const p=player; return !!p&&scene==='play'&&!DLG&&!G.mini&&!p.dead&&!(G.boss&&!G.boss.dead)&&!G.inCombat&&!N4ST.heart&&!N4ST.cut&&!N4ST.run&&!N4ST.gatherPose&&!N4ST.q.length&&!p.flying&&!((p.z||0)>4)&&!(typeof MOON!=='undefined'&&MOON&&MOON.anim); }
+// how long Ash has stood still (seconds of play time)
+// (swinging counts as busy, so a kid hitting something on the spot keeps his button)
+function n4sStill(){ const p=player, L=N4ST.stillP||(N4ST.stillP={x:p.x,y:p.y,t:G.time}); if(dist(p.x,p.y,L.x,L.y)>2.5||G.time<L.t||(p.swingT||0)>0){ L.x=p.x; L.y=p.y; L.t=G.time; } return G.time-L.t; }
+// a stand-in person record for talkTo (mkNPC's shape), placed where the friend is
+function n4sTalkNPC(id,name,x,y,face){ return {kind:id,id,name:simplify(name),col:(SPK[id]&&SPK[id].col)||'#d8c3a0',look:{},x,y,face:face||0,t:0,home:[x,y],wt:0,walker:false,r:10,li:0,n4sFriend:true}; }
+// open the talk; a friend who is not a person record (a wolf, a moth, a goat, Pip, a dragon) gets no "I brought you
+// something" row (its answer is a villager's "Ooh, what is it?"): the menu hides it once a gift is marked as given today
+function n4sTalkOpen(n){ try{ if(!CASTBY[n.id]&&!SPECIAL[n.id]&&typeof dayNow==='function'){ G.gifted=G.gifted||{}; G.gifted[n.id]=dayNow(); } }catch(e){} talkTo(n); }
+function n4sTalkPrompts(offer){
+  if(!n4sTalkCalm()) return;
+  const p=player, still=n4sStill(); if(still<0.6) return;
+  for(const aid in N4ST.ally){ const a=N4ST.ally[aid], T=N4S_TALK[aid]; if(!T||a.mode==='leave'||(a.alpha||0)<0.9) continue;
+    const d=dist(p.x,p.y,a.x,a.y); if(d>T.reach) continue;
+    offer(d+45,simplify(S(`Talk to ${T.name}`,`Talk to ${T.name}`)),()=>n4sTalkTo(aid),a.x,a.y); }
+  if(G.pip&&still>=1.5){ const d=dist(p.x,p.y,G.pip.x,G.pip.y); if(d<80) offer(d+90,simplify(S('Talk to Pip','Talk to Pip')),()=>n4sTalkPip(),G.pip.x,G.pip.y); }
+}
+function n4sTalkTo(aid){
+  const a=N4ST.ally[aid], T=N4S_TALK[aid]; if(!a||!T||DLG) return;
+  a.talk=1; a.dx=a.dy=0; a.face=angTo(a.x,a.y,player.x,player.y); player.facing=angTo(player.x,player.y,a.x,a.y);
+  N4ST.talkWith=aid;
+  try{ n4sTalkOpen(n4sTalkNPC(T.id,T.name,a.x,a.y,a.face)); }catch(e){ console.error(e); }
+  if(!DLG){ a.talk=0; N4ST.talkWith=null; }
+}
+function n4sTalkPip(){
+  const q=G.pip; if(!q||DLG) return;
+  q.face=angTo(q.x,q.y,player.x,player.y); player.facing=angTo(player.x,player.y,q.x,q.y);
+  try{ n4sTalkOpen(n4sTalkNPC('pip',N4S_STANDIN.pip.name,q.x,q.y,q.face)); }catch(e){ console.error(e); }
+}
+// once the talk is over the friend walks on (n4sAllyTick)
+function n4sTalkEnd(){ if(DLG) return; for(const id in N4ST.ally){ const a=N4ST.ally[id]; if(a.talk) a.talk=0; } N4ST.talkWith=null; }
 // what each friend does (generic help; the fights' own mechanics are x4_foes', which can read the friends above)
 function n4sAllyAct(a,dt){
   if(N4ST.heart&&!N4ST.heart.blazed) return;   // (in the Heart moment the friends wait in the dark)
@@ -1332,7 +1397,14 @@ function n4sDuchObj(){ if(!G||!(N4ST.duchShow||G.flags.n_dawn>=1||G.done)||curMa
 function n4sDuchPlace(){ const p=player, D=N4ST.duch||(N4ST.duch={face:Math.PI/2,t:0,kind:'goat',moving:false,id:'n_duchess_goat'});
   D.x=clamp(p.x-70,4250,4750); D.y=clamp(p.y-190,84800,85700); D.face=Math.atan2(p.y-D.y,p.x-D.x); D.t=G.time; return D; }
 function n4sDuchessSeen(){ if(G.flags.n_duchess) return; G.flags.n_duchess=1; try{ addCoins(30,player.x,player.y); gainXp(60); }catch(e){} }
-function n4sDuchTalk(){ const first=!G.flags.n_duchess; runDialogue([xl('goat',`Meh.`,`Meh.`),...(first?[xl('ash',`How did you even get up here? There's a MOAT.`,`How did you get up here?`),xl('goat',`Meh.`,`Meh.`)]:[])],()=>{ scene='play'; n4sDuchessSeen(); saveGame(); }); }
+// (v12 PEAK) her talk is the act 5 data's (people.js, person 'goat': she only ever says "Meh.", the rest is what she
+// does); the talk counts her last sighting when it closes, as before. Without the data the old two lines play.
+function n4sDuchTalk(){
+  const D=N4ST.duch, fin=()=>{ n4sDuchessSeen(); try{ saveGame(); }catch(e){} };
+  if(D&&typeof s10V11==='function'&&s10V11('goat')){ D.face=angTo(D.x,D.y,player.x,player.y); player.facing=angTo(player.x,player.y,D.x,D.y);
+    try{ n4sTalkOpen(n4sTalkNPC('goat',N4S_STANDIN.goat.name,D.x,D.y,D.face)); }catch(e){ console.error(e); }
+    if(DLG){ const d0=DLG.done; DLG.done=function(){ if(d0) d0.apply(this,arguments); fin(); }; return; } }
+  const first=!G.flags.n_duchess; runDialogue([xl('goat',`Meh.`,`Meh.`),...(first?[xl('ash',`How did you even get up here? There's a MOAT.`,`How did you get up here?`),xl('goat',`Meh.`,`Meh.`)]:[])],()=>{ scene='play'; fin(); }); }
 // ---------- the cutscene on the summit: Nyxara fallen, the moon filling, and what each ending does (world and sky)
 function n4sCutFall(quiet){
   const e=N4ST.fallE||n4sNyxE(), x=e?e.x:4500, y=e?e.y:85150;
@@ -1435,6 +1507,7 @@ function n4sTick(dt){
   if(N4ST.resume) n4sResume();
   if(N4ST.doorFx) N4ST.doorFx.t+=dt;
   if(G.done&&G.choices.n_end&&curMap()===4){ N4ST.duchShow=1; }
+  if(G.done&&G.flags.n_home){ N4ST.homeT=(N4ST.homeT||0)-dt; if(N4ST.homeT<=0){ N4ST.homeT=1; n4sHomeAdd(); } }
   if(!G.done&&!AREA&&curMap()===4) n4sCheckpoint();
 }
 // (I5) the peak's shrines are its checkpoints: "Rise again" wakes Ash at the last one he walked past. Before, he woke
@@ -1553,6 +1626,46 @@ if(typeof storyListen==='function') storyListen('n4fx:',a=>n4sFx(a));
 // after the victory screen's "Keep exploring": Ash wakes up on the green in Emberhollow on Lantern Day, at dusk (the
 // data's n_end then plays n_home there). Duchess is back at the farm.
 function n4sQuiet(){ G.taunt=null; if(Array.isArray(G.tauntQ)) G.tauntQ.length=0; try{ if(typeof MV!=='undefined'&&MV) MV.tip=null; }catch(e){} }
+// (v12 PEAK) and on that Lantern Day the friends who flew home are where the story says: Vesper at the forge (Mom:
+// "She's in the forge, trying out my tongs"; the book: she lights her lantern from it) and Glaciar asleep behind it
+// (n_home: "Behind the forge, something very big and very cold is snoring"), as people Ash can talk to (act5/people.js,
+// their lines need flag n_home). Their spots are the act 5 data's places n5_vesper_forge and n5_glee_nap. Nobody else
+// stands either of them anywhere after the game (x3_people's pier stops at G.done; an old act's npc block is left
+// alone by s10NpcSync), so this module adds them after every rebuild of the people, and once a second until then.
+function n4sHomeWant(){
+  const out={}; if(!G||G.mode!=='story'||!G.done||!G.flags.n_home) return out;
+  const at=(k,dx,dy)=>{ const w=typeof s10Where==='function'?s10Where(k):null; if(w&&!w.area&&w.x!=null) return [w.x,w.y]; const m=NPCSPOT.maren; return m?[m[0]+dx,m[1]+dy]:null; };
+  if(n4sVes()&&SPECIAL.c_vesper){ const P=at('n5_vesper_forge',70,10); if(P) out.c_vesper=P; }
+  if(n4sGla()){ const P=at('n5_glee_nap',0,-260); if(P) out.f_glaciar=P; }
+  return out;
+}
+function n4sHomeAdd(){
+  if(!G||!G.npcs) return; const W=n4sHomeWant();
+  for(const id in W){ if(G.npcs.some(n=>n.id===id)) continue; const P=W[id]; let n;
+    if(id==='f_glaciar'){ n=mkNPC({id,name:'Glaciar',col:'#bfe4ff',look:{}},P[0],P[1]); n.r=40; n.draw=()=>n4sDrawGleeNap(n); }
+    else n=mkNPC(SPECIAL[id],P[0],P[1]);
+    n.walker=false; n.n4sHome=true; G.npcs.push(n); }
+}
+{ const base=setupNPCs; setupNPCs=function(){ base(); try{ if(G&&G.mode==='story') n4sHomeAdd(); }catch(e){ console.error(e); } }; }
+// (sleeping Glaciar is no person record either: no gift row, as for the friends on the peak)
+{ const base=talkTo; talkTo=function(n){ try{ if(n&&n.n4sHome&&!CASTBY[n.id]&&!SPECIAL[n.id]&&typeof dayNow==='function'){ G.gifted=G.gifted||{}; G.gifted[n.id]=dayNow(); } }catch(e){} return base.apply(this,arguments); }; }
+// Glaciar asleep behind the forge: a heap of ice-blue scales; one eye opens when Ash comes close
+function n4sDrawGleeNap(n){
+  const t=G.time, x=n.x, y=n.y, near=!!player&&dist(player.x,player.y,x,y)<200;
+  ctx.save(); ctx.lineJoin='round';
+  ctx.fillStyle='rgba(20,30,60,.22)'; ctx.beginPath(); ctx.ellipse(x,y+18,84,22,0,0,TAU); ctx.fill();
+  ctx.fillStyle='#bfe4ff'; ctx.strokeStyle='#3a6a9a'; ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(x-70,y+10); ctx.quadraticCurveTo(x-110,y+40,x-130,y+6); ctx.quadraticCurveTo(x-100,y+26,x-70,y-2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(x,y,74,34+Math.sin(t*1.1)*2,0,0,TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#e6f6ff'; ctx.beginPath(); ctx.ellipse(x+6,y+8,52,16,0,0,TAU); ctx.fill();
+  ctx.fillStyle='#9ad0f0'; for(let i=0;i<5;i++){ ctx.beginPath(); ctx.moveTo(x-40+i*18,y-30); ctx.lineTo(x-34+i*18,y-48); ctx.lineTo(x-28+i*18,y-30); ctx.fill(); }
+  const hx=x+74, hy=y-4; ctx.fillStyle='#bfe4ff'; ctx.beginPath(); ctx.ellipse(hx,hy,30,20,0.2,0,TAU); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle='#f4fbff'; ctx.lineWidth=5; ctx.lineCap='round'; for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(hx-8,hy+s*12); ctx.quadraticCurveTo(hx-22,hy+s*26,hx-34,hy+s*30); ctx.stroke(); }
+  if(near){ ctx.fillStyle='#7ad8ff'; ctx.beginPath(); ctx.ellipse(hx+10,hy-6,4,3,0,0,TAU); ctx.fill(); ctx.fillStyle='#160400'; ctx.beginPath(); ctx.ellipse(hx+10,hy-6,1.2,2.6,0,0,TAU); ctx.fill(); }
+  else { ctx.strokeStyle='#3a6a9a'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(hx+10,hy-6,4,0.2,Math.PI-0.2); ctx.stroke(); }
+  const k=(t*0.45)%1; ctx.fillStyle=`rgba(232,246,255,${0.55*(1-k)})`; ctx.beginPath(); ctx.arc(hx+32+k*26,hy-4-k*22,4+k*8,0,TAU); ctx.fill();
+  ctx.restore();
+}
 function n4sGoHome(){
   n4sFreeRoam(); N4ST.homeBound=1; n4sQuiet();
   const w=typeof s10Where==='function'?s10Where('n5_green_wake'):null, x=w?w.x:2620, y=w?w.y:9330;
@@ -1625,7 +1738,13 @@ const N4S_DBG={N4ST,N4S_SC,N4S_ECHO,N4S_STAND,N4S_PANE,N4S_ENDINGS,play:n4sPlay,
   heartFill:v=>{ const HM=N4ST.heart; if(!HM) return false; HM.meter=clamp(+v,0,1); return true; },
   fall:()=>n4sFall(null,null), choice:e=>{ if(!N4ST.run) n4sFall(null,null); return e; },
   allies:o=>{ o=o||{}; const C=G.choices, F=G.flags; if('greymane' in o) C.greymane=o.greymane; if('cinder' in o) C.cinder=o.cinder; if('vesper' in o) C.c_vesper=o.vesper; if('glaciar' in o) C.f_glaciar=o.glaciar; if('hush' in o) C.m_hush=o.hush; if('tikka' in o) F.tk_come=o.tikka; if('ending' in o) C.ending=o.ending; if('knows' in o){ F.n_knows=o.knows?1:0; if(!o.knows){ delete F.dr_seen_m_moth; delete F.f_page11; delete F.m_page11; delete G.found.n_pane_3; delete F.n_pane_3; } } return {allies:typeof nAllies==='function'?nAllies():[],freed:n4sFreed(),knows:n4sKnows(),mercy:n4sMercy()}; },
-  allyList:()=>Object.values(N4ST.ally).map(a=>({id:a.id,mode:a.mode,x:Math.round(a.x),y:Math.round(a.y)})),
+  allyList:()=>Object.values(N4ST.ally).map(a=>({id:a.id,mode:a.mode,x:Math.round(a.x),y:Math.round(a.y),face:+(a.face||0).toFixed(2),talk:!!a.talk})),
+  // (v12 PEAK) talk to a friend on the peak by ally id, 'pip' or 'duchess'; and what the talk prompts can see
+  talk:id=>{ if(id==='pip') n4sTalkPip(); else if(id==='duchess') n4sDuchTalk(); else n4sTalkTo(id); return !!DLG; },
+  talkOffers:()=>{ const L=[]; try{ n4sTalkPrompts((d,t)=>L.push([Math.round(d),t])); }catch(e){ L.push(String(e)); } return L; },
+  peak:()=>({spk:['greymane','goat','pip','c_vesper','f_glaciar','f_hush','ev_tikka'].map(k=>[k,!!SPK[k],!!EVPORT[k]]),still:+n4sStill().toFixed(2),calm:n4sTalkCalm(),
+    forge:typeof NPCSPOT!=='undefined'?NPCSPOT.maren:null,home:n4sHomeWant(),avail:{c_vesper:availableFrom('c_vesper'),ev_tikka:availableFrom('ev_tikka'),f_glaciar:availableFrom('f_glaciar')},
+    prompt:G.prompt?G.prompt.text:null,duch:N4ST.duch?{x:Math.round(N4ST.duch.x),y:Math.round(N4ST.duch.y)}:null}),
   dps:()=>{ const e=n4sNyxE()||G.boss; return e?{type:e.type,hp:Math.round(e.hp),max:Math.round(e.maxHp)}:null; },
   book:(k,p)=>{ if(!N4ST.book) n4sBookOpen(k==='pane'?'pane':'epi'); n4sBookScene(k,p); return true; }, bookSettle:()=>{ const B=N4ST.book; if(!B) return false; B.fade=1; B.prev=null; B.t+=2; const el=document.getElementById('n4sBook'); if(el){ el.style.transition='none'; el.style.opacity='1'; } n4sBookDraw(); return true; }, bookClose:()=>{ n4sBookClose(true); return true; },
   pane:k=>n4sPane(k), victory:()=>{ if(!G.choices.n_end) G.choices.n_end='dawn'; n4sVictory(); return true; },

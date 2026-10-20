@@ -10,8 +10,10 @@
 //    flag f_song, quest f_sled), Act IV (choice m_hush, flag m_leash_known, m_ship), and the finale's errands (n5_*).
 //  - The errand pointers: Mom and Yara give the fourth-post clues (B4, B5); Mom, Quill, Brynja, Ripple and Wren point
 //    at the friends' errands; Hollis, Ulf and Barley know about goats; Granny Oona's own errand is q_n5_oona.
-//  - The Crown Shrine's "Who is with me?" (n5_crown_who, scene n5_who) is a place: the friends on the peak are not people
-//    you can talk to (x4_story's ally runtime draws them).
+//  - The Crown Shrine's "Who is with me?" (n5_crown_who, scene n5_who) is a place. The friends on the peak are drawn by
+//    x4_story's ally runtime, not people; since v12 (PEAK) its "Talk to <name>" prompt opens their talk here, by person
+//    id (c_vesper, f_glaciar, f_hush, greymane, ev_tikka, pip, and goat for Duchess on the summit after the dawn), with
+//    lines that need `near n5_peak 6500`. An Act I companion walking with Ash (Juniper, Brisket) talks the same way.
 people({
   id: 'act5_people', act: 5,
 
@@ -26,6 +28,12 @@ people({
     // the Crown Shrine (n_sh_crown at 3331,85875): everyone waits round it after the gathering
     n5_crown_who: { map: 4, kind: 'examine', at: [3400, 85930], r: 30, h: 46, name: ['your friends by the shrine', 'your friends'],
       prompt: ['Who is with me?', 'Who is with me?'], if: 'flag n_gather', say: 'n5_who' },
+    // (v12 PEAK) the whole peak, for talk on it (`near n5_peak 6500`): the Bridgefoot, the four rings and the summit
+    n5_peak: { map: 4, kind: 'spot', at: [4500, 85200], r: 6500, name: ['Nightfall Peak', 'the peak'] },
+    // (v12 PEAK) after the game, on Lantern Day: where x4_story stands Vesper (at the forge, Mom: "She's in the forge,
+    // trying out my tongs") and Glaciar (asleep behind it, n_end's n_home)
+    n5_vesper_forge: { map: 0, kind: 'npc_spot', at: [2372, 9606], name: ['the forge', 'the forge'] },
+    n5_glee_nap: { map: 0, kind: 'npc_spot', at: [2236, 9392], name: ['behind the forge', 'behind the forge'] },
   },
 
   scene: {
@@ -71,9 +79,10 @@ people({
     // the moonfire bridge (!flag n_depart); back over the bridge in the middle of the climb (flag n_depart, the Long
     // Night: !flag n_dawn); and after the dawn (flag n_dawn: the epilogue and free roam). Openers are listed in the order a
     // person would say them, the one-time callbacks to Acts I to IV first. x3_people.js stands Mom, Quill, Juniper,
-    // Vesper (m_vesper_ally), Tikka (tk_come=yes) and Dell (m_landed) on the pier, and steps aside for this data
-    // (m3pDataTalk). After the game is won Mom is home at the forge, Quill at the Observatory, Juniper still on the pier,
-    // Dell and Tikka at Driftwood Landing.
+    // Vesper (m_vesper_ally, until she joins Ash on the peak: n_vline), Tikka (tk_come=yes) and Dell (m_landed) on the
+    // pier, and steps aside for this data (m3pDataTalk). After the game is won Mom is home at the forge, Vesper with her
+    // (x4_story, place n5_vesper_forge), Quill at the Observatory, Juniper at home in Emberhollow, Dell and Tikka at
+    // Driftwood Landing.
 
     // ---------------------------------------------------------------- Mom (Maren)
     // Voice sheet: a smith. Short, practical, warm, teasing. Worry comes out as instructions, love as hugs and work. Never
@@ -188,21 +197,113 @@ people({
       { bark: true, if: '!flag n_dawn', say: ['Keep your scarf on up there, Ash!', 'Keep your scarf on!'] },
     ],
 
-    // ---------------------------------------------------------------- Vesper, on the pier (friend path, m_vesper_ally)
+    // ---------------------------------------------------------------- Vesper: the pier, the peak, the forge
     // Voice sheet: quick, proud, funny when cornered, tender only about Gran. Climber's words. Teases instead of
     // thanking. "cousin", never "little ember". Act IV: the smoke job, the stolen moth knight's helmet, the Moon Well
     // where she told the Mother to keep her fire, and "Not alone, cousin." on this pier. On the peak she comes in at the
-    // Silk Gallery (n_clocks, flag n_vline) and goes up her own way; x3_people still stands her on the pier, so a kid
-    // who comes back down finds her there first.
+    // Silk Gallery (n_clocks, flag n_vline; on the foe path only if Ash pulled her up, flag n5_vesper) and leaves the
+    // pier then (x3_people); she climbs with Ash to the Long Climb (n_rime), goes up her own way and waits at the Crown
+    // Shrine (flag n_gather). A Vesper Ash left hanging comes back through q_n5_vesper, at the Crown only. After the
+    // game she is at the forge in Emberhollow on Lantern Day (flag n_home).
     c_vesper: [
-      { if: 'flag n_vline flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
-        say: ["Don't look at me like that. Thieves never take the stairs. I was down here before you.", "Thieves don't take stairs. I got here first."],
+      // ---- (v12 PEAK) at the Crown, after the four fears: her quiet head, the offer she will hear again, Gran's fish
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ["She's stopped talking to me. In my head, I mean. Not one word since the Mask Hall. It's so quiet I can hear my own boots.",
+          "She stopped talking in my head. It's so quiet now."],
         re: [
-          { t: ['How did you even get down?', 'How did you get down?'],
-            say: ['A silk line, a long drop, and a moth who never saw me coming.', 'A silk line. A moth never saw me.'] },
-          { t: ['You saw your echo, up there.', 'You saw your echo.'], if: 'stage>=n_rime',
-            say: ["I saw her. I used to be her. I'd like to stop talking about it now.", 'I used to be her. Let us not talk about it.'] },
+          { t: ['Is that good?', 'Is that good?'],
+            say: ["It's good. It's just big, like a room after somebody takes all the furniture away.", "It's good. Just big, like an empty room."] },
+          { t: ["She's saving her voice for me.", "She's saving it for me."], tone: 'brave',
+            say: ["Then don't let her have the last word. I didn't.", "Then don't let her win. I didn't."] },
         ] },
+      { if: 'near n5_peak 6500 flag n_gather choice c_vesper=friend',
+        say: ["In there she'll offer me fire again, like she did at the Well. She'll say it nicer this time.", 'She will offer me fire again. Nicer, this time.'],
+        re: [
+          { t: ['You told her to keep it.', 'You told her to keep it.'], tone: 'kind', f: 0.5,
+            say: ['I did. Out loud, off a tent roof, in front of you. I would say it again.', 'I did. Out loud. I would say it again.'] },
+          { t: ['What if she means it this time?', 'What if she means it?'],
+            say: ["Then she means it. I still don't want fire from her. Or from anybody.", "Then she means it. I still don't want it."] },
+          // (what Ash did at the Well, Act IV: m4_well stood or lid)
+          { t: ['Did you see me at the Well?', 'Did you see me at the Well?'], if: 'flag m4_well',
+            say: [['c_vesper', 'Wings out, at the Night Mother, on the edge of a well. Very brave. Very silly.', 'Wings out at her. Brave. And silly.', { if: 'flag m4_well=stood' }],
+              ['c_vesper', 'You and Saffron, dragging a lid while she watched. I would have stolen the lid.', 'I would have stolen the lid.', { if: '!flag m4_well=stood' }]] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ["After this I'm catching Gran a fish. The biggest one in Saltmarsh. She loves fish.", 'After this I will catch Gran a big fish. She loves fish.'],
+        re: [
+          { t: ['She would like a visit more.', 'She would like a visit more.'], tone: 'kind',
+            say: ["A visit AND a fish. I'm not an amateur.", 'A visit AND a fish.'] },
+          { t: ['Maybe not a fish.', 'Maybe not a fish.'], if: 'said oona_fish',
+            next: { say: ['Why not? She eats every one I leave her. ...Cousin. What do you know?', 'Why not? She eats them. What do you know?'],
+              re: [
+                { t: ['She eats every single one.', 'She eats every one.'],
+                  say: ['Good. The biggest fish in Saltmarsh, then. With a bow on.', 'Good. The biggest fish, then.'] },
+                { t: ['Ask her yourself.', 'Ask her yourself.'], then: ['said vesper_fish'],
+                  say: ["...I'm going to. And I'm bringing the fish, just in case.", 'I will. With the fish, in case.'] },
+              ] } },
+          { t: ['Can I help you catch it?', 'Can I help catch it?'],
+            say: ['You would cook it by breathing on it. You can carry the bucket.', 'You would cook it! You carry the bucket.'] },
+        ] },
+      // ---- (v12 PEAK) on the second ring, just joined: the copy of her ahead (friend path), or the pull-up (foe path)
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_clocks choice c_vesper=friend',
+        say: ["There's a copy of me up ahead. On the highest roof, I bet, sulking. That's what I'd do.", 'A copy of me waits ahead. Sulking on a roof.'],
+        re: [
+          { t: ["It isn't you any more.", "It isn't you now."], tone: 'kind', f: 0.5,
+            say: ["No. It's me with a grudge and a mask. I was a lot of work.", 'No. It is me with a grudge. I was a lot of work.'] },
+          { t: ['Do you want to fight it?', 'Do you want to fight it?'],
+            say: ['I want to knock it off its roof. Then it can sulk on the ground like everybody else.', 'I want to knock it off its roof.'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_clocks flag n5_vesper !choice c_vesper=friend',
+        say: ["You pulled me up. After the Spire, after all of it. I don't know what to do with that.", "You pulled me up. After everything. I don't know what to do."],
+        re: [
+          { t: ["You don't have to do anything.", "You don't have to do anything."], tone: 'kind', f: 0.75,
+            say: ["Good. I've never owed anybody anything. It itches.", 'Good. I never owe anyone. It itches.'] },
+          { t: ['You can climb ahead of me.', 'You can go first.'],
+            say: ['I was going to anyway. Roofs are easier than saying thank you.', 'I was going to. Roofs are easier than thanks.'] },
+          { t: ["Gran's letter said come home.", "Gran's letter said come home."], if: 'flag n5_vletter',
+            say: ["I've read it nine times. It keeps saying the same thing.", 'I read it nine times. It says the same thing.'] },
+        ] },
+      // ---- (v12 PEAK) on the third ring, after her echo and Gran's memory in the Mask Hall
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_rime',
+        say: ["That was Gran's voice in there. The moon kept it. Of everything it could have kept.", "The moon kept Gran's voice. Of all things."],
+        re: [
+          { t: ['It kept the warm part.', 'It kept the warm part.'], tone: 'kind',
+            say: ['Hands first, then the kettle. That is the right order.', 'Hands first. Then the kettle.'] },
+          { t: ['Did she say it every night?', 'Every night?'],
+            say: ["Every night. Even when I'd slammed the door. Especially then.", 'Every night. Even when I slammed the door.'] },
+          { t: ['I told her people keep me warm.', 'I told her people keep me warm.'], if: 'said oona_people',
+            say: ["That's Pearl's answer. She'll have told the whole jetty you said it.", "Pearl's answer! She will tell everyone."] },
+        ] },
+      // ---- (v12 PEAK) on the peak once those are answered, and what she says over the menu there
+      { if: 'near n5_peak 6500', say: ["Go on, cousin. I've got the roofs. You've got the stairs.", 'I have the roofs. You have the stairs.'] },
+      { ask: ['How do you climb glass?', 'How do you climb glass?'], if: 'near n5_peak 6500',
+        say: ['Claws, chalk, and never looking down. The never looking down is the hard part.', 'Claws. And never looking down.'] },
+      { if: 'near n5_peak 6500', idle: [["Mm? I'm watching the edges.", 'Mm?'], ['Go on, cousin. I can climb and listen.', 'Go on, cousin.']] },
+      { if: 'near n5_peak 6500', bye: [['See you on the next roof.', 'See you up there.']] },
+      // ---- (v12 PEAK) after the game, at the forge on Lantern Day (x4_story stands her there, place n5_vesper_forge)
+      { if: 'flag n_home !near n5_peak 6500',
+        say: ['Your mom let me hold her tongs. Nobody has ever trusted me with anything hot.', 'Your mom let me hold her tongs!'],
+        re: [
+          { t: ['You held my hands in the dark.', 'You held my hands in the dark.'], tone: 'kind', f: 0.75,
+            say: ["Don't make it a thing, cousin. ...It was a bit of a thing.", "Don't make it a thing. It was a bit of a thing."] },
+          { t: ['Will you light a lantern from the forge?', 'A lantern from the forge?'],
+            say: ["One a year, with the tongs. Your mom watches me like I'm going to steal the fire.", 'One a year. Your mom watches me close.'] },
+          { t: ['Did you ask Gran about the fish?', 'Did you ask about the fish?'], if: 'said vesper_fish',
+            say: ['She laughed so hard the kettle boiled over. Twenty years of fish, cousin, and she never said a word.', 'She laughed and laughed. Twenty years of fish!'] },
+        ] },
+      { if: 'flag n_home !near n5_peak 6500',
+        say: ["Gran wants you for tea on Sunday. She's bought a second cup already, so you can't say no.", 'Gran wants you for tea on Sunday.'],
+        re: [
+          { t: ['Will it be strong tea?', 'Strong tea?'],
+            say: ['Strong enough to stand a spoon in. Drink all of it. She watches.', 'Very strong. Drink it all. She watches.'] },
+          { t: ['Can Pip come to tea too?', 'Can Pip come too?'], if: 'flag pip',
+            say: ["She'll feed him every fish in the house. He'll love her forever.", 'She will give him all her fish.'] },
+        ] },
+      { ask: ['Where will your mask go?', 'Where will the mask go?'], if: 'flag n_home !near n5_peak 6500',
+        say: ['By the forge door. Your mom says it will scare off the customers who argue about the price.', 'By the forge door. To scare off rude customers.'] },
+      { if: 'flag n_home !near n5_peak 6500', idle: [['Mm? Careful, these are hot.', 'Careful, hot.'], ["Go on, cousin. I'm not stealing anything.", 'I am not stealing anything.']] },
+      { if: 'flag n_home !near n5_peak 6500', bye: [['See you at the lanterns, cousin.', 'See you at the lanterns.']] },
+      // ---- (J12) the Moon Pier, before the bridge
       { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
         say: ["Not alone, cousin. I said it once, on this pier, and I'm not saying it again. It was embarrassing.", 'I said "not alone" once. Not again.'],
         re: [
@@ -225,10 +326,11 @@ people({
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: [["Gran writes every week. She says the stove's still warm. She says come home. I say soon. It's nearly true.", 'Gran says come home. I say soon.'],
           ["When you go up, I'll be right behind you. Or in front. We'll see who's faster.", 'I will be behind you. Or in front.']] },
-      { if: 'flag n_dawn', say: [["Tea with Gran on Sunday. Then a lot of nothing. I have earned some nothing.", "Tea with Gran. Then nothing."]] },
-      { ask: ['Does she still talk in your sleep?', 'Does she still talk to you?'], if: '!flag n_dawn',
+      { if: 'flag n_dawn', say: ["Tea with Gran on Sunday. Then a lot of nothing. I have earned some nothing.", "Tea with Gran. Then nothing."] },
+      // (the voice in her dreams stops in the Mask Hall, so this is a question for the pier)
+      { ask: ['Does she still talk in your sleep?', 'Does she still talk to you?'], if: '!flag n_dawn !near n5_peak 6500',
         say: ["Every night. She says I'll never get up that mountain. I've decided that's a dare.", 'Every night. She says I cannot climb it. That is a dare.'] },
-      { ask: ['What will you do, after?', 'What will you do after?'],
+      { ask: ['What will you do, after?', 'What will you do after?'], if: '!flag n_dawn',
         say: ["Tea with Gran. Then I'll break into something, just for fun, and put it all back.", 'Tea with Gran. Then a break-in, for fun. I will put it back.'] },
       { ask: ['Do you miss being the Moth Mask?', 'Do you miss the Moth Mask?'],
         say: ['I miss the cloak. The cloak was good. The rest was hers.', 'I miss the cloak. The rest was hers.'] },
@@ -238,8 +340,27 @@ people({
 
     // ---------------------------------------------------------------- Juniper Ashby, Rook's big sister
     // Mapper, brave, a bit bossy, never lost twice. Act I: lost in the Whisperwood Hollow until Ash found her (quest
-    // hollow); Act IV: her Map Tent in Sable; drew the peak through Quill's telescope (n_depart). She stays on the pier.
+    // hollow); Act IV: her Map Tent in Sable; drew the peak through Quill's telescope (n_depart). She stays on the pier
+    // until the game is won, then goes home to Emberhollow for Lantern Day (x3_people). (v12 PEAK) A Juniper who is
+    // Ash's Act I companion walks up the peak with him (her talk there needs near n5_peak).
     juniper: [
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ["This is the top of the map. Past here there's nothing but the moon.", 'This is the top of the map.'],
+        re: [
+          { t: ['Map the moon next.', 'Map the moon next.'],
+            say: ['From the ground. Somebody else can go up there.', 'From the ground!'] },
+          { t: ['Wait by the shrine, okay?', 'Wait by the shrine?'], tone: 'kind',
+            say: ["I'll be right here, drawing you. Come back so I can finish.", 'I will draw you. Come back so I can finish.'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather',
+        say: ["I'm mapping it as we go. Every ring is a place we've already been. Did you notice?", 'Every ring is a place we have been!'],
+        re: [
+          { t: ['Four rings, four lands.', 'Four rings, four lands.'],
+            say: ['Four! Rook said three. Rook owes me a sweet.', 'Four! Rook owes me a sweet.'] },
+          { t: ['Is your map right so far?', 'Is your map right?'],
+            say: ['The still bits are right. The bits that move are their own fault.', 'The still bits are right.'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['Hold still. You are a very small dot on this map.', 'Hold still. You are a dot on my map.'] },
       { if: 'said rook_where_juniper !flag n_dawn', once: true,
         say: ['Rook wrote to me. He says on Lantern Day you were the only one who asked where I was.', 'Rook says you asked where I was. On Lantern Day.'],
         re: [
@@ -270,8 +391,8 @@ people({
             say: ['Once is good. Ask Rook how many times I got lost making the Emberhollow one.', 'Once is good! Ask Rook about me.'] },
         ] },
       { if: 'flag n_dawn',
-        say: ["I'm drawing the peak again, now the glass has gone clear. It's very hard to draw something you can see through.",
-          'I am drawing the peak again. It is clear now. So hard!'],
+        say: ["I watched the glass go clear through the Professor's telescope, then came home to draw it. It's very hard to draw something you can see through.",
+          'I saw the glass go clear. It is so hard to draw!'],
         re: [
           { t: ['Put Duchess on the very top.', 'Put Duchess on top.'],
             say: ["She's already there. She's the smallest thing on the page, and she's looking right at you.", 'She is there. Tiny. Looking at you.'] },
@@ -282,11 +403,11 @@ people({
         say: [['The moths have all gone from the telescope. Now it\'s just the mountain, all the way up.', 'Now it is just the mountain.'],
           ['I gave you my best map. If you lose it, come back and I will draw you another.', 'Lose my map? I will draw another.']] },
       { if: 'flag n_dawn', fact: 'n5_moon=back', say: [["I'm drawing the moon now. It sits still, so I can finally finish something.", "I am drawing the moon. It sits still!"], ["Rook wants a copy of every map. Every single one. He has a box.", "Rook wants every map. He has a box."]] },
-      { ask: ['How did you get here from Sable?', 'How did you get here?'],
+      { ask: ['How did you get here from Sable?', 'How did you get here?'], if: '!flag n_home',
         say: ['Under the Glasswall on my belly, the way you went. If a dragon fits, a Juniper fits.', 'Under the wall, on my belly. Like you.'] },
       { ask: ['What will you map next?', 'What will you map next?'],
         say: ['The moon. Somebody has to, and it has finally stopped moving about.', 'The moon. It has stopped moving!'], if: 'flag n_dawn' },
-      { ask: ['Does Rook know where you are?', 'Does Rook know you are here?'],
+      { ask: ['Does Rook know where you are?', 'Does Rook know you are here?'], if: '!flag n_home',
         say: ["I wrote him three pages. He wrote back one line: \"Bring me a sand worm.\" No.", 'He wrote back: "Bring me a sand worm." No.'] },
       { idle: [['Hold still. I\'m drawing your horns.', 'Hold still.'], ['Mm? Talk. I can draw and listen.', 'Talk. I am drawing.']] },
       { bye: [["Don't fall off anything I haven't drawn yet.", "Don't fall off anything!"]] },
@@ -411,8 +532,28 @@ people({
 
     // ---------------------------------------------------------------- Tikka, Act I's kobold baker, Dell's ship's cook
     // (tk_come=yes). A small kobold with very big feelings about buns. Her brother is Tock. x3_people gives her lumpy bun
-    // first; after the game she is in Gilly's Floating Kitchen at Driftwood Landing.
+    // first; after the game she is in Gilly's Floating Kitchen at Driftwood Landing. (v12 PEAK) On the peak she waits at
+    // the Crown Shrine with Tock and a basket (n_gather), and talks there through x4_story's prompt.
     ev_tikka: [
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: [['ev_tikka', 'Tock carried the basket up every single ring. He says he is a mountain goat now.', 'Tock carried the basket up. He says he is a goat now.'],
+          ['ev_tock', 'A tired one.'],
+          ['ev_tikka', 'He is a very good brother. He will not say so.', 'He is a good brother. He will not say so.']],
+        re: [
+          { t: ['Thank you for carrying it, Tock.', 'Thank you, Tock.'], tone: 'kind', f: 0.5,
+            say: [['ev_tikka', 'Tock! Ash said thank you!'], ['ev_tock', '...Somebody had to carry the buns.']] },
+          { t: ["What's in the basket?", "What's in the basket?"],
+            say: [['ev_tikka', 'Buns for everybody. And one for the moth lady, in case she is hungry.', 'Buns for all. One for the moth lady too.']] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ['If the moth lady is hungry, I will make her soup. Nobody is mean when they have soup.', 'If she is hungry, I will make her soup.'],
+        re: [
+          { t: ['What if she bites?', 'What if she bites?'],
+            say: ['Then no soup. Those are the rules in my kitchen.', 'Then no soup. Kitchen rules.'] },
+          { t: ['She might not like soup.', 'She might not like soup.'],
+            say: ['Everybody likes soup. Some people have just not had the right one yet.', 'Everybody likes soup. Maybe not the right one yet.'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['The buns are still warm. I sat on the basket the whole way up.', 'I sat on the buns to keep them warm.'] },
       { if: '!flag n_depart',
         say: ["I made a bun for the mountain. It's lumpy. The mountain doesn't deserve it.", 'I made a lumpy bun for the mountain.'],
         re: [
@@ -443,6 +584,254 @@ people({
         say: ["For a bigger pot. Tock says it's a ladle. It is a bigger spoon.", 'For a bigger pot. It is not a ladle.'] },
       { idle: [['Hello! Are you hungry? You look hungry.', 'Are you hungry?'], ['I have flour on my nose. Leave it. What?', 'What?']] },
       { bye: [['Bye! Lumpy means good luck!', 'Bye! Good luck!']] },
+    ],
+
+    // ======================================================================= (v12 PEAK) the friends on Nightfall Peak
+    // x4_story's ally runtime draws them; its "Talk to <name>" prompt (when Ash stands still beside one, with no fight or
+    // scene going) opens their talk here. Every line on the peak needs `near n5_peak 6500` (the place above), so none of
+    // it plays anywhere else. Where the climb is: on a friend's own ring (stage), at the Crown Shrine after the four
+    // echoes (flag n_gather, before the dark of the Heart), and after the dawn (flag n_dawn or n_home). A friend who is
+    // only there on one choice path only talks on that path. Moods: the moodRead cues, plus a tag where it matters.
+
+    // ---------------------------------------------------------------- Glaciar (Auntie Glee)
+    // Voice sheet: slow, grand, fond, a bit deaf on the left; "dumpling" at most twice a visit. Long sentences that take
+    // their time, then a short one. Freed in Act III (choice f_glaciar=free): she lands at the Floe Gap on the third
+    // ring, flies off at the Gust Stair ("I will circle the peak and meet you at the top"), and waits at the Crown. Woken
+    // on Mount Dread in Act V (q_n5_glaciar, flag n5_glaciar): the Crown only. After the game she is asleep behind the
+    // forge in Emberhollow (x4_story, place n5_glee_nap). (Every entry has an `if`, so in Moonfall after the game her
+    // nap on the north isle keeps x3_people's own talk and its flight north.)
+    f_glaciar: [
+      // ---- at the Crown, after the four fears
+      { if: 'near n5_peak 6500 flag n_gather seen n_glaciar_bye',
+        say: ['I said I would meet you at the top, and here I am, first. That has never once happened to me in a thousand years.', 'I said I would meet you at the top. I got here first!'],
+        re: [
+          { t: ['You flew round the whole peak?', 'You flew all the way round?'],
+            say: ['Twice. The first time I went the wrong way round. Nobody saw, so it does not count.', 'Twice. The first time was the wrong way.'] },
+          { t: ['I knew you would be here.', 'I knew you would be here.'], tone: 'kind', f: 0.5,
+            say: ['Then you knew more than I did, dumpling. The wind on the second ring was very rude to me.', 'Then you knew more than me. The wind was rude.'] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_gather choice f_glaciar=free',
+        say: ['Tove still rides in your fire, they tell me. If she can hear me in there: I came, this time.', 'If Tove can hear me: I came this time.'],
+        re: [
+          { t: ['She heard you.', 'She heard you.'], tone: 'kind',
+            say: ['Good. Then she can stop grumbling about me. She will not, but she can.', 'Good. She can stop grumbling now. She won\'t.'] },
+          { t: ['You came for me, too.', 'You came for me too.'],
+            say: ['You came for me first, dumpling, all the way up a mountain, with no scarf.', 'You came for me first. With no scarf.'] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_gather flag n5_glaciar !choice f_glaciar=free',
+        say: ['You sang me awake, dumpling. Out of tune, and in the wrong order, and I have never heard anything so lovely.', 'You sang me awake. Out of tune. It was lovely.'],
+        re: [
+          { t: ["You were awake already, weren't you?", 'You were awake already?'],
+            say: ['I may have been counting snowflakes. A dragon has her pride.', 'I was counting snowflakes. A dragon has pride.'] },
+          { t: ['I said I would come back.', 'I said I would come back.'], tone: 'kind', f: 0.75,
+            say: ['People say that to the snow all the time. You are the first one who meant it.', 'People say that to the snow. You meant it.'] },
+        ] },
+      // ---- on the third ring (a copy of Frostreach), then the fourth, after her echo and the sledding memory
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_rime',
+        say: ['This ring is my mountain, done in black glass. Even the snow is wrong, dumpling. It does not squeak when you step on it.', 'This ring is my mountain, in glass. The snow does not squeak.'],
+        re: [
+          { t: ['Snow is supposed to squeak?', 'Snow should squeak?'],
+            say: ['Good snow squeaks under your feet. This snow is only pretending to be snow.', 'Good snow squeaks. This snow is pretending.'] },
+          { t: ['Is there a copy of you up here?', 'Is there a copy of you?'],
+            say: ['Somewhere ahead, in chains, feeling very sorry for herself. I shall look at her anyway.', 'Ahead, in chains. I will look anyway.'] },
+          { t: ['Mom says your name now.', 'Mom says your name now.'], if: 'said mom_glee', tone: 'kind',
+            say: [['f_glaciar', 'Glee? Auntie Glee? Nobody has said it out loud in a thousand years. Say it again, on this side.', 'Auntie Glee? Say it again. On this side.', { mood: 'happy' }]] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_glass choice f_glaciar=free',
+        say: ['Sleds and cake, you said, every Lantern Day. I have decided to hold you to the cake.', 'Sleds and cake every Lantern Day. I want the cake.'],
+        re: [
+          { t: ['Chocolate or lemon?', 'Chocolate or lemon?'],
+            say: ['Both. I am very large.', 'Both. I am very big.'] },
+          { t: ['You have to make the snow.', 'You make the snow.'],
+            say: ['Slowly. If I start tonight, there will be a whole hill of it by Lantern Day.', 'Slowly. I will start tonight.'] },
+          { t: ['Can Pip ride on the sled?', 'Can Pip ride too?'], if: 'flag pip',
+            say: ['Pip can ride on my nose. He will melt a little hole in it, and I shall not mind.', 'Pip can ride on my nose.'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['Up you go. If you slip, I catch. That is the arrangement.', 'Up you go. If you slip, I catch you.'] },
+      { ask: ['Why do you call me that, Auntie?', 'Why call me that, Auntie?'], if: 'near n5_peak 6500',
+        say: ['Ember was my little bun, when she was small. You have her horns. Dumpling is the next size up.', 'Ember was my little bun. You are the next size up.'] },
+      { ask: ['What was it like, being asleep?', 'What was sleeping like?'], if: 'near n5_peak 6500',
+        say: ['Like being snowed in with my own bad dreams. I would not do it again for all the ice in Frostreach.', 'Like being snowed in with bad dreams.'] },
+      { if: 'near n5_peak 6500', idle: [['Mm? Speak up on this side, please.', 'Mm? This side, please.'], ['Go on. I am listening, slowly.', 'Go on. I am listening.']] },
+      { if: 'near n5_peak 6500', bye: [['Off you go. I shall be right here, being large.', 'Off you go.']] },
+      // ---- after the game: asleep behind the forge on Lantern Day
+      { if: 'flag n_home near n5_glee_nap 400',
+        say: [['narr', 'One huge blue eye opens, very slowly.', 'One big blue eye opens.'],
+          ['f_glaciar', 'Is it Lantern Day? Wake me for the cake, dumpling. Not one minute before.', 'Is it Lantern Day? Wake me for the cake.', { mood: 'sleepy' }]],
+        re: [
+          { t: ["It's Lantern Day now.", "It's Lantern Day now."],
+            say: ['Then I shall get up. Slowly. Start the cake without me, and save me the middle.', 'Then I will get up. Slowly. Save me the middle.'] },
+          { t: ['Every bucket of milk froze.', 'All the milk froze.'],
+            say: ['Tell your mother I am very sorry, and that frozen milk is a treat where I come from.', 'Tell your mother sorry. Frozen milk is a treat.'] },
+          { t: ['You flew everyone home.', 'You flew everyone home.'], tone: 'kind',
+            say: ['Everyone, and a goat. The goat was not grateful.', 'Everyone, and a goat. The goat was rude.'] },
+        ] },
+      { if: 'flag n_home near n5_glee_nap 400',
+        say: ["I have slept through a great many Lantern Days, dumpling. Not this one. I am only lying down so I don't knock the lanterns over.", 'I slept through many Lantern Days. Not this one.'],
+        re: [
+          { t: ['Stay till the last lantern?', 'Stay till the last one?'],
+            say: ['Every last one. Then I shall sleep until spring, and nobody will mind.', 'Every one. Then I will sleep till spring.'] },
+          { t: ['Mom cleared the big chair for you.', 'Mom cleared the big chair.'], if: 'said mom_glee',
+            say: ['I sat in it. It is a very flat chair now. Your mother says it was always that flat. She is kind.', 'I sat in it. It is very flat now.'] },
+        ] },
+      { if: 'flag n_home near n5_glee_nap 400', say: ['Zzz. ...Mm? Still here. Still asleep, mostly.', 'Zzz. Still here.'] },
+      { ask: ['Where will you live now, Auntie?', 'Where will you live?'], if: 'flag n_home near n5_glee_nap 400',
+        say: ["On Mount Dread in winter, and behind your mother's forge in summer. I have not asked her about the summer part yet.", 'Mount Dread in winter. Here in summer, if your mother agrees.'] },
+      { ask: ['Will you teach me to make snow?', 'Will you teach me snow?'], if: 'flag n_home near n5_glee_nap 400',
+        say: ['When you are bigger. Snow is slow work, and you are a very quick dumpling.', 'When you are bigger. Snow is slow work.'] },
+      { if: 'flag n_home near n5_glee_nap 400', idle: [['Mm. Still asleep. Ask quietly.', 'Mm. Ask quietly.'], ['Zzz... yes?', 'Zzz... yes?']] },
+      { if: 'flag n_home near n5_glee_nap 400', bye: [['Close the forge door as you go. The warm gets in.', 'Close the door. The warm gets in.']] },
+    ],
+
+    // ---------------------------------------------------------------- Hush
+    // Voice sheet: whispers; "Shhh" once a visit; four or five words a line; "loud one", never "little ember"; the
+    // Mother, quiet, warm, small. Freed in Act IV (choice m_hush=free): she comes down in the Tendril Wood on the fourth
+    // ring, leaves after her echo, and waits at the Crown. Cut free in the Moth's Cradle in Act V (q_n5_hush, flag
+    // n5_hush): small, riding on Ash's horn. The bell (Tollef) and the humming in the wind (Pennant) are Act III's.
+    f_hush: [
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ['She is up there. Waiting.', 'She is up there. Waiting.'],
+        re: [
+          { t: ['Will you talk to her?', 'Will you talk to her?'],
+            say: ['Two words. I have them ready.', 'Two words. I have them.'] },
+          { t: ["You don't have to come.", "You don't have to come."], tone: 'kind', f: 0.5,
+            say: ['Shhh. I am coming.', 'Shhh. I am coming.'] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ['Up here, no bells. No morning.', 'Up here, no bells. No morning.'],
+        re: [
+          { t: ['Tollef rings his bell twice now.', 'Tollef rings twice now.'], if: 'said tollef_bell',
+            say: ['Twice? Every morning? ...Good.', 'Twice? Good.'] },
+          { t: ['Pennant hears humming in the wind.', 'Pennant hears humming.'], if: 'said pennant_hum',
+            say: [['f_hush', 'That was me. Humming. Quietly.', 'That was me. Humming.', { mood: 'shy' }]] },
+          { t: ['Morning is coming anyway.', 'Morning is coming anyway.'], tone: 'brave',
+            say: ['I know. I want to see one.', 'I know. I want to see it.'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_glass choice m_hush=free',
+        say: ['Shhh. She can hear us here.', 'Shhh. She can hear us here.'],
+        re: [
+          { t: ['Then we whisper.', 'Then we whisper.'],
+            say: ['Yes. Like that. Good.', 'Yes. Like that.'] },
+          { t: ['Are you scared, Hush?', 'Are you scared?'], tone: 'kind',
+            say: ['Yes. Quietly.', 'Yes. Quietly.'] },
+          { t: ['Does the thread still hurt?', 'Does it still hurt?'],
+            say: ['No. It itches. Like growing.', 'No. It itches.'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_glass flag n5_hush !choice m_hush=free',
+        say: ['Shhh. Warm, up here. Your horn.', 'Shhh. Warm up here. Your horn.'],
+        re: [
+          { t: ['Hold on tight.', 'Hold on tight.'],
+            say: ['Holding. Six little feet.', 'Holding. Six feet.'] },
+          { t: ["You're so small now.", "You're so small now."],
+            say: ['Small. Still going.', 'Small. Still going.'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['Stay close. You are warm.', 'Stay close. You are warm.'] },
+      { ask: ['What does the Mother want?', 'What does she want?'], if: 'near n5_peak 6500',
+        say: ['Everything still. Everyone near. Always.', 'Everything still. Everyone near.'] },
+      { ask: ['Where will you go, after?', 'Where will you go after?'], if: 'near n5_peak 6500',
+        say: ['Somewhere warm. With mornings.', 'Somewhere warm. With mornings.'] },
+      { if: 'near n5_peak 6500', idle: [['Yes? Softly.', 'Yes? Softly.'], ['Mm. Listening.', 'Mm. Listening.']] },
+      { if: 'near n5_peak 6500', bye: [['Go. Softly, loud one.', 'Go softly, loud one.']] },
+    ],
+
+    // ---------------------------------------------------------------- Greymane (choice greymane=ally, Act I)
+    // A wolf: he never talks. What he does is his line, in brackets, as the Act I companion's are. He swims the Ink Sea
+    // to the Bridgefoot (n_gate_open), climbs the first ring, growls at the shadow dragon, and trots off at the Wind
+    // Chimney (n_grey_bye) to find his own way up; he is sitting by the Crown Shrine when Ash gets there.
+    greymane: [
+      { if: 'near n5_peak 6500 flag n_gather !flag n_dawn', fact: 'n5_moon=gone',
+        say: ['(Greymane puts his huge head on your shoulder and breathes out. It is like standing in a warm wind.)', '(Greymane leans his big head on you. His breath is warm.)'],
+        re: [
+          { t: ['Will you howl at her for me?', 'Will you howl at her?'],
+            say: ['(He looks up at the bitten moon and growls, low and long, at whatever bit it.)', '(He growls at the bitten moon.)'] },
+          { t: ['Stay close to Pip up there.', 'Stay close to Pip.'], if: 'flag pip',
+            say: ['(Greymane looks at Pip. Pip looks at Greymane. Something is agreed.)', '(Greymane and Pip look at each other. Agreed.)'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather stage<=n_stair',
+        say: ['(Greymane shakes the last of the Ink Sea out of his coat. Most of it lands on you.)', '(Greymane shakes. Most of the sea lands on you.)'],
+        re: [
+          { t: ['You swam that whole sea for me?', 'You swam it for me?'], tone: 'kind',
+            say: ['(He lies down across your feet, heavy and wet. That is a yes.)', '(He lies on your feet. That is a yes.)'] },
+          { t: ['Does your pack know where you are?', 'Does your pack know?'],
+            say: ['(His ears turn back toward home. Then forward again, up the mountain.)', '(His ears point home. Then up the mountain.)'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather stage=n_clocks',
+        say: ['(Greymane sniffs the glass where the shadow dragon broke apart. Then he sneezes, hard, and looks very pleased with himself.)', '(Greymane sniffs where the shadow broke. He sneezes.)'],
+        re: [
+          { t: ["That was Grandpa's shadow.", "That was Grandpa's shadow."],
+            say: ['(He tilts his head. One ear up, one ear down. He remembers the real one.)', '(He tilts his head. He remembers.)'] },
+          { t: ["It's gone now, boy.", "It's gone now, boy."],
+            say: ['(His tail sweeps the glass. Left, right, left.)', '(His tail wags. Left, right, left.)'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['(Greymane sniffs the cold wind, then looks back at you.)', '(Greymane sniffs the wind.)'] },
+      { ask: ['Where is the rest of your pack?', 'Where is your pack?'], if: 'near n5_peak 6500',
+        say: ['(He points his nose out over the dark water, toward home, and whines once.)', '(He points his nose home and whines.)'] },
+      { ask: ['Who is a good wolf?', 'Who is a good wolf?'], if: 'near n5_peak 6500',
+        say: ['(Greymane rolls over on the glass for a belly rub. A thousand pounds of wolf, belly up, on a mountain of night.)', '(Greymane rolls over for a belly rub.)'] },
+      { if: 'near n5_peak 6500', idle: [['(Greymane watches you, ears up.)', '(He watches you.)'], ['(He thumps his tail once.)', '(Thump.)']] },
+      { if: 'near n5_peak 6500', bye: [['(Greymane licks your ear and pads after you.)', '(He licks your ear.)']] },
+    ],
+
+    // ---------------------------------------------------------------- Pip
+    // Voice sheet: "Mip" (once a visit here, in the opener); everything else is what he does, in brackets, never his
+    // feelings explained. One word in the whole game, in the dark: "ASH!". On the peak he talks when Ash stops for a while.
+    pip: [
+      { if: 'near n5_peak 6500 flag n_dawn',
+        say: [['narr', 'Pip opens his mouth as if he might say something. Then he shuts it again.', 'Pip opens his mouth. Then he shuts it.'], ['pip', 'Mip.']],
+        re: [
+          { t: ['Say my name again, Pip.', 'Say my name again.'],
+            say: ['(He looks very pleased with himself, and says nothing at all.)', '(He looks pleased. He says nothing.)'] },
+          { t: ['Did you really talk up there?', 'Did you really talk?'],
+            say: [['pip', '(Pip hides his face under his wing. He did.)', '(Pip hides his face. He did.)', { mood: 'shy' }]] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_gather !flag n_dawn', fact: 'n5_moon=gone',
+        say: [['narr', 'Pip looks up at the bitten moon for a long time. Then he looks at you.', 'Pip looks at the moon. Then at you.'], ['pip', 'Mip.']],
+        re: [
+          { t: ["We'll get it back, Pip.", "We'll get it back."], tone: 'brave',
+            say: ['(He breathes one tiny puff of smoke at the moon. It does not reach.)', '(He puffs smoke at the moon. Too small.)'] },
+          { t: ['You came the whole way.', 'You came the whole way.'], tone: 'kind',
+            say: ['(He climbs into your arms, and stays there.)', '(He climbs into your arms and stays.)'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather',
+        say: [['narr', 'Pip sits on your foot and looks all the way up the mountain.', 'Pip sits on your foot and looks up.'], ['pip', 'Mip?']],
+        re: [
+          { t: ['Nearly there, Pip.', 'Nearly there, Pip.'],
+            say: ['(He climbs up your leg anyway, just in case.)', '(He climbs your leg, just in case.)'] },
+          { t: ['Are you cold, Pip?', 'Are you cold, Pip?'],
+            say: ['(He puffs out every scale until he is round and warm, to show you.)', '(He puffs up, round and warm.)'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['(Pip curls round your neck like a warm scarf.)', '(Pip curls round your neck.)'] },
+      { if: 'near n5_peak 6500', idle: [['(Pip waits.)', '(Pip waits.)'], ['(Pip tilts his head.)', '(Pip tilts his head.)']] },
+      { if: 'near n5_peak 6500', bye: [['(Pip scrambles up onto your head.)', '(Pip climbs on your head.)']] },
+    ],
+
+    // ---------------------------------------------------------------- Duchess (speaker goat), on the very top after the dawn
+    // A goat: she only ever says "Meh." (the old talk's way); what she does is narration. x4_story's "Talk to Duchess" on
+    // the summit (after the dawn, when Ash comes back up) counts her last sighting when the talk closes.
+    goat: [
+      { if: 'near n5_peak 6500 flag n_dawn',
+        say: [['narr', 'Duchess stands on the very top of the peak, where nothing could possibly have climbed. She is chewing something.', 'Duchess stands on the very top. She is chewing.'], ['goat', 'Meh.']],
+        re: [
+          { t: ["There's a MOAT, Duchess.", "There's a MOAT!"],
+            say: [['goat', 'Meh.'], ['narr', 'She does not think much of the moat.', 'She does not care about the moat.']] },
+          { t: ['What are you chewing?', 'What are you chewing?'],
+            say: [['goat', 'Meh.'], ['narr', 'She chews it slowly, so you can watch. You decide not to ask what it used to be.', 'She chews slowly. You decide not to ask.']] },
+          { t: ['Did you chew the lantern tassel?', 'Did you chew the tassel?'], if: 'clue n5_chewed',
+            say: [['goat', 'Meh.'], ['narr', 'A soggy bit of tassel is still stuck in her beard.', 'Some tassel is stuck in her beard.']] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_dawn',
+        say: [['narr', 'Duchess is still on top of the peak, looking at the view. It is mostly sky.', 'Duchess looks at the view. It is mostly sky.'], ['goat', 'Meh.']],
+        re: [
+          { t: ['Want to come home with me?', 'Want to come home?'],
+            say: [['goat', 'Meh.'], ['narr', 'She will come home when she decides to. She has not decided.', 'She will come home when she decides.']] },
+          { t: ['Is it a good view?', 'Is it a good view?'],
+            say: [['goat', 'MEH.'], ['narr', 'She turns her back on it, and on you, and goes on chewing.', 'She turns her back and chews.']] },
+          { t: ['Hollis says you always do this.', 'Hollis says you always do this.'], if: 'quest q_n5_follower done',
+            say: [['goat', 'Meh.'], ['narr', 'She does not deny it.', 'She does not deny it.']] },
+        ] },
+      { if: 'near n5_peak 6500 flag n_dawn', say: ['MEH.', 'MEH.'] },
+      { if: 'near n5_peak 6500 flag n_dawn', idle: [['Meh?', 'Meh?'], ['Meh.', 'Meh.']] },
+      { if: 'near n5_peak 6500 flag n_dawn', bye: [['Meh.', 'Meh.']] },
     ],
 
     // ======================================================================= map 0, Embermere (Act I's people)
@@ -1244,7 +1633,28 @@ people({
     ],
 
     // ---------------------------------------------------------------- Brisket, a retired adventurer (thawed by Ash)
+    // (v12 PEAK) A Brisket who is still Ash's Act I companion walks up the peak with him (his talk there needs near
+    // n5_peak); otherwise he guards the Lodge fire.
     brisket: [
+      { if: 'near n5_peak 6500 flag n_gather',
+        say: ['Four hundred jokes, one for every adventure, and I cannot think of a single one for this.', 'I have no joke for this one.'],
+        re: [
+          { t: ["Then don't tell one.", "Then don't tell one."],
+            say: ['Right. I shall stand here being brave, then. Quietly. That is new for me.', 'Right. I will be brave. Quietly.'] },
+          { t: ['You came all this way.', 'You came all this way.'], tone: 'kind',
+            say: ['These old knees came all this way. They will tell me about it tomorrow.', 'My old knees came all this way.'] },
+        ] },
+      { if: 'near n5_peak 6500 !flag n_gather',
+        say: ['Brisket the Bold, up a mountain made of night. Nobody at the Lodge will believe a word of it.', 'Brisket the Bold, up a night mountain!'],
+        re: [
+          { t: ['Are you cold up here?', 'Are you cold up here?'],
+            say: ['I was an ice cube for years, lad. This is a warm day.', 'I was ice for years. This is warm.'] },
+          { t: ['Is it like your old adventures?', 'Like your old adventures?'],
+            say: ['Worse. My old adventures stopped for a sandwich at lunch.', 'Worse. Mine stopped for lunch.'] },
+        ] },
+      { if: 'near n5_peak 6500', say: ['My knees have opinions about this mountain.', 'My knees do not like this mountain.'] },
+      { if: 'near n5_peak 6500', idle: [['Mm? Keep talking, lad. It stops my teeth chattering.', 'Keep talking, lad.'], ["Go on. I'm guarding your back.", 'I am guarding your back.']] },
+      { if: 'near n5_peak 6500', bye: [["Lead on, lad. I'm right behind you.", "Lead on. I'm behind you."]] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
         say: ["I retired from adventuring to be warm. Then somebody ate the moon. I've un-retired. A bit. Up to the knees.", 'I retired. Then the moon went. Now I am a bit un-retired.'],
         re: [

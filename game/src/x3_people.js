@@ -321,8 +321,10 @@ function m3pVisit(){
     if(G.flags.tk_come==='yes'&&SPECIAL.ev_tikka){ if(pier) V.ev_tikka=P.tikka; else if(m3pBoatIn()&&!m3pDellAway()){ const d=m3pDoorAt('m_gilly'); V.ev_tikka=d?[d.x+M3P_VIS.kitchen[0],d.y+M3P_VIS.kitchen[1]]:[2610,64960]; } }
     if(G.flags.m_ship==='glaciar'&&G.choices.f_glaciar==='free'&&!pier) V.f_glaciar=M3P_VIS.nap;
   }
-  if(all){ V.maren=P.maren; V.quill=P.quill; if(G.flags.m_vesper_ally) V.c_vesper=P.c_vesper; }
-  if(G.flags.juniper_found){ if(m3pR('n_bridge')&&stageAt('n_bridge')>=0) V.juniper=P.juniper; else if(m3pR('m_sable')&&m3pAct()===4) V.juniper=M3P_VIS.jun; }
+  // (v12 PEAK) Vesper leaves the pier once she has joined Ash on the peak (n_vline, the Silk Gallery): she is up there
+  // with him, and goes up her own way; Juniper goes home to Emberhollow for Lantern Day once the game is won
+  if(all){ V.maren=P.maren; V.quill=P.quill; if(G.flags.m_vesper_ally&&!G.flags.n_vline) V.c_vesper=P.c_vesper; }
+  if(G.flags.juniper_found){ if(m3pR('n_bridge')&&stageAt('n_bridge')>=0){ if(!G.done) V.juniper=P.juniper; } else if(m3pR('m_sable')&&m3pAct()===4) V.juniper=M3P_VIS.jun; }
   if(!V.c_vesper&&m3pVesperOn()&&m3pR('m_sable')&&m3pAct()===4&&!m3pQ('m_vesper')){
     // (her job is for the Observatory: once it is over she does not wait on the roof any more)
     if(m3pAt('m_vesper',2)) V.c_vesper=M3P_VIS.foot; else if(m3pNight()&&!m3pR('m_reforge')) V.c_vesper=M3P_VIS.roof; }
