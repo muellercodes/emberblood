@@ -328,11 +328,11 @@ f2sDef('f_fergus_cold',[
 ]);
 f2sDef('f_gate',[
   xl('f_brann',`Stop right there! Name, business, and are you or are you not a moth?`,`Stop! Who are you? Are you a moth?`),
-  xl('ash',`Ash Emberblood. I'm here about the winter. And I'm not a moth.`,`I'm Ash. I'm here about the winter. I'm not a moth.`),
+  xl('ash',`I'm Ash. I'm here about the winter. And I'm not a moth.`,`I'm Ash. I'm here about the winter. I'm not a moth.`),
   xl('f_brann',`That is EXACTLY what a moth would say.`,`That is EXACTLY what a moth would say.`),
   xl('f_brann',`...Hm. Moths don't have horns. Or tails. Is that smoke coming out of your nose?`,`Hm. Moths don't have horns. Is that smoke from your nose?`),
   xl('ash',`Only when I sneeze.`,`Only when I sneeze.`),
-  xl('f_brann',`An Emberblood! A real one! OPEN THE GATE! ...It's frozen. Hang on. Everybody push.`,`An Emberblood! OPEN THE GATE! It's frozen. Everybody push!`),
+  xl('f_brann',`Horns! Like the girl on the Hearth stones! OPEN THE GATE! ...It's frozen. Hang on. Everybody push.`,`Horns! OPEN THE GATE! It's frozen. Everybody push!`),
   xl('narr',`Six guards push. The gate groans open exactly as wide as a kid with a tail.`,`Six guards push. The gate opens just wide enough for you.`),
   xl('f_brann',`Welcome to Hearthold, the last warm town in the north. Go and see the Hearthkeeper at the Great Hearth. She's been waiting for someone like you. For a month. Loudly.`,`Welcome to Hearthold! See the Hearthkeeper at the Great Hearth. She has waited a month. Loudly.`)
 ]);
@@ -340,7 +340,7 @@ f2sDef('f_gate',[
 f2sDef('f_brynja',[
   xl('narr',`In the middle of town stands the Great Hearth, a fireplace you could drive a cart into. Its fire is a tiny orange flicker, like a candle at the bottom of a well.`,`The Great Hearth is huge. Its fire is a tiny flicker.`),
   xl('f_brynja',`There, there, old girl. Somebody's come to see you.`,`There, there, old girl. Someone came to see you.`),
-  xl('f_brynja',`You're the Emberblood? Good. Come here. Closer. Let me look at you. ...Skinny. Your mother doesn't feed you.`,`You're the Emberblood? Come closer. Skinny! Your mom doesn't feed you.`),
+  xl('f_brynja',`You're the horned boy? Good. Come here. Closer. Let me look at you. ...Skinny. Your mother doesn't feed you.`,`You're the horned boy? Come closer. Skinny! Your mom doesn't feed you.`),
   xl('ash',`She feeds me SO much.`,`She feeds me SO much.`),
   xl('f_brynja',`I'm Brynja. Hearthkeeper. Seventy years I've kept this fire, and my mother before me, and hers before her, all the way back to the night it was lit.`,`I'm Brynja. I have kept this fire for 70 years. My mother did too, and hers.`),
   xl('f_brynja',`Then a white moth came over, wider than my roof, flying to Mount Dread. The Hearth went cold as a fish.`,`Then a white moth flew over. The Hearth went cold.`),
@@ -349,7 +349,7 @@ f2sDef('f_brynja',[
   xl('narr',`You breathe your biggest, hottest breath into the Hearth. The flicker jumps up. Then it shivers and shrinks back down.`,`You breathe your biggest fire. The flame jumps up. Then it shrinks again.`),
   xl('f_brynja',`Kind of you. But that's a breath for candles, child. The Great Hearth was lit with Blaze.`,`Kind of you. But that fire is for candles. The Hearth was lit with Blaze.`),
   xl('ash',`What's Blaze?`,`What's Blaze?`),
-  xl('f_brynja',`Fire so hot it burns blue. The old Emberbloods had it. They kept a forge up north, where the glacier comes down to the Glimmerfrost. The ice swallowed it long ago.`,`Fire so hot it burns blue. The old Emberbloods had a forge up north. The ice ate it.`),
+  xl('f_brynja',`Fire so hot it burns blue. Nobody alive has seen it. The old songs put a forge up north, where the glacier comes down to the Glimmerfrost. The ice swallowed it long ago.`,`Fire so hot it burns blue. There was a forge up north. The ice ate it.`),
   xl('f_brynja',`Folk call it the Glacier Maze, because people who go in get lost, and people who get lost don't come out to complain about the name.`,`Folk call it the Glacier Maze. People get lost in it.`),
   xl('tove',`Ember's North Forge. I'd forgotten. She built it with... with someone. I can't remember who. The cold makes my memory slippery.`,`Ember's North Forge! She built it with... someone. The cold makes me forget.`),
   xl('f_brynja',`Take the road north to Glimmer Point, then cross the ice. Find the Blaze. Come back and wake my old girl up.`,`Go north to Glimmer Point. Cross the ice. Find the Blaze. Then wake my old girl up.`)
@@ -377,7 +377,7 @@ f2sDef('f_kindle',[
 f2sDef('f_northgate',[
   xl('narr',`The ice on the North Gate sags, drips, and slides off in one big slab, SPLOOSH, right onto Captain Brann's boots.`,`The ice on the gate slides off. SPLOOSH! Right onto Captain Brann's boots.`),
   xl('narr',`The gate swings open with a sound like a happy sigh.`,`The gate swings open with a happy sigh.`),
-  xl('f_brann',`...My boots are full of gate. Thank you, Emberblood! GUNNAR! You can stop licking things now!`,`My boots are full of gate. Thank you! GUNNAR! Stop licking things!`),
+  xl('f_brann',`...My boots are full of gate. Thank you, Horns! GUNNAR! You can stop licking things now!`,`My boots are full of gate. Thank you! GUNNAR! Stop licking things!`),
   xl('tove',`Rimeholm is west, Ash. Along the cliffs. Take a scarf. Take two.`,`Rimeholm is west, on the cliffs. Take a scarf. Take two.`)
 ]);
 // Chapter 3, One Thaw at a Time
@@ -436,7 +436,7 @@ f2sDef('f_drum',[
   {who:'narr',text:S(`Then the crack stops. And above you, something white unfolds from the mountainside.`,`Then the crack stops. Something white unfolds above you.`),fn:()=>f2sHushShow('unfold')},
   xl('narr',`Two wings. Two purple eyes painted on them. And two real ones in the middle, blinking at you.`,`Two wings with purple eyes painted on them. And two real eyes, blinking.`),
   xl('f_hush',`Shhh. Loud one. You'll wake her.`,`Shhh. Loud one. You'll wake her.`),
-  xl('f_hush',`The Mother is resting. Her new friend rests too. Up on top.`,`The Mother is resting. Her new friend rests too.`),
+  xl('f_hush',`I am Hush. Her quiet one. The Mother is resting. Her new friend rests too. Up on top.`,`I am Hush. The Mother is resting. Her new friend rests too.`),
   xl('ash',`Who's "the Mother"?`,`Who's "the Mother"?`),
   xl('f_hush',`Shhhhh.`,`Shhhhh.`),
   xl('ash',`That is not an answer!`,`That is not an answer!`),
@@ -461,7 +461,7 @@ f2sDef('f_hush_outro',[
 // Chapter 5, into the mountain
 f2sDef('f_dread_in',[
   xl('narr',`Inside Mount Dread it is quiet. Too quiet. The walls are black rock and purple ice, and everywhere you look there are chains. Big ones. Little ones. Chains on statues. Chains on bridges. Chains on nothing at all.`,`Inside the mountain it is too quiet. Black rock, purple ice, and chains everywhere.`),
-  xl('tove',`Moth-frost chains. Glaciar's were the first. These are... practice ones, I think. Somebody practiced for a long time.`,`Moth-frost chains. Somebody practiced for a long time.`),
+  xl('tove',`Moth-frost chains. Practice ones, I think. Somebody practiced for a long time.`,`Moth-frost chains. Somebody practiced for a long time.`),
   xl('ash',`Then I'll practice melting them.`,`Then I'll practice melting them.`),
   f2sPip(`(Pip climbs into your hood and stays there.)`,`(Pip hides in your hood.)`)
 ]);
@@ -469,13 +469,13 @@ f2sDef('f_crown_door',[
   xl('narr',`The last chain snaps. The door at the top of the mountain swings open, and the blizzard pours in, howling.`,`The last chain snaps. The top door swings open. The blizzard howls in.`),
   xl('narr',`Then, all at once, the wind stops. Like someone pressed a button.`,`Then the wind stops. All at once.`),
   xl('tove',`She's right there, Ash. I can feel her. She's so cold she's almost warm.`,`She's right there, Ash. She's so cold she's almost warm.`),
-  xl('ash',`Okay. Okay. I'm going to meet my auntie. Hat off. Be polite. Drink the ice tea.`,`Okay. I'm going to meet my auntie. Hat off. Be polite. Drink the ice tea.`)
+  xl('ash',`Who is she, Tove? Really?`,`Who is she, Tove?`)
 ]);
-// Final Chapter, Auntie: the Crown of Dread
+// Final Chapter, The Crown of Dread
 f2sDef('f_glaciar_intro',[
   {who:'narr',text:S(`The top of Mount Dread. No wind. No sound. In the middle of the summit, coiled around a spike of black ice, lies a dragon.`,`The top of Mount Dread. No wind. No sound. A dragon lies curled around a spike of black ice.`),fn:()=>f2sGlacShow('spell')},
   xl('narr',`She is white and blue and silver, as long as a river, with icicle horns and frost for whiskers. Four chains of purple frost hold her down, one to each corner of the summit. In her chest, something glows. The Shard.`,`She is white and blue, long as a river, with icicle horns. Four purple chains hold her down. In her chest glows the Shard.`),
-  xl('ash',`Hi... Auntie?`,`Hi... Auntie?`),
+  xl('ash',`Hello? Are you awake?`,`Hello? Are you awake?`),
   xl('f_glaciar',`...Fire. I smell fire. My brother's fire.`,`Fire. I smell fire. My brother's fire.`),
   xl('f_glaciar',`No. No, the Mother says fire is a lie. The Mother says dark is kind and cold is kind and sleep is the kindest of all. The Mother says...`,`No. The Mother says fire is a lie. Dark is kind. Cold is kind. Sleep is kindest. The Mother says...`),
   xl('narr',`Her eyes open. They're purple.`,`Her eyes open. They're purple.`),
@@ -634,7 +634,7 @@ f2sDef('f_maze_shrine',[
   xl('ember',`Ash? All the way up here, in the cold? Come in. Mind the anvil, it bites.`,`Ash! Up here in the cold? Come in.`),
   xl('ash',`Ember! What is this place?`,`Ember! What is this place?`),
   xl('ember',`My forge. I built it with my auntie, a long, long time ago. She did the cold parts. I did the hot parts. We were a very good team.`,`I built this forge with my auntie. She did the cold parts. I did the hot parts.`),
-  xl('ash',`Your auntie? Grandpa had a sister?`,`Grandpa had a sister?`),
+  xl('ash',`Your auntie? Who was she?`,`Who was she?`),
   xl('ember',`He did. They stopped speaking long before I was grown. I never asked her why. I wish I had.`,`He did. They stopped talking. I never asked why.`),
   xl('ember',`I left a little of my hottest fire here. The blue kind. For a day when the cold got too big. I think that day is today.`,`I left my hottest fire here. The blue kind. For a day when the cold got too big. That's today.`)
 ]);
@@ -804,8 +804,8 @@ const F2S_TAUNTS={
   f_glaciar_chain:[S(`...Fire? Warm fire? I knew a little girl with fire like that...`,`Fire? Warm fire? I knew a girl with fire like that...`),
     S(`The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.`,`Who is the Mother? I have a brother. A loud one.`),
     S(`Little one. Your horns. You have her horns. Ember's horns!`,`Your horns! You have Ember's horns!`),
-    S(`The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!`,`The Shard is in my heart! Get it out, dumpling!`)],
-  f_glaciar_warn:[S('Duck, dumpling!','Duck!'),S('Jump!','Jump!'),S('Mind your head!','Mind your head!')],
+    S(`The Shard! It's in my heart! Get it OUT, little one, before it freezes me again! And mind my tail, I can't help the tail!`,`The Shard is in my heart! Get it out!`)],
+  f_glaciar_warn:[S('Duck, little one!','Duck!'),S('Jump!','Jump!'),S('Mind your head!','Mind your head!')],
   tove_glaciar:[S('Melt the chains!','Melt the chains!'),S('Up on the ledge! Climb!','Climb up the ledge!'),S('The vent! Ride it to the slab!','Ride the vent up!'),S('Her chest! Hit the Shard!','Hit the Shard!')],
   nyxara_n9:S('Sleep, little cold one. Be cold for me.','Sleep, cold one. Be cold for me.'),
   f_blubberton:[S('I say! Unhand my hall, you scaly scamp!','Leave my hall!'),S('Tally ho!','Tally ho!'),S('Ow! Most rude!','Ow! Rude!')],
@@ -850,7 +850,7 @@ f2sBossWords();
 // ---------- 5. the stages (bible 6.0). Cards as the bible gives them; f_snow's card shows after Mom's letter.
 const F2S_CARD={f_snow:['Act III · Chapter 1',S('A Letter in the Snow','A Letter in the Snow')],f_hearth:['Act III · Chapter 2',S('The Dying Hearth','The Dying Hearth')],
   f_thaw:['Act III · Chapter 3',S('One Thaw at a Time','One Thaw at a Time')],f_gap:['Act III · Chapter 4',S('The Stonehorn Knock','The Stonehorn Knock')],
-  f_dreadgate:['Act III · Chapter 5',S('The Dreadgate','The Dreadgate')],f_glaciar:['Act III · Final Chapter',S('Auntie','Auntie')]};
+  f_dreadgate:['Act III · Chapter 5',S('The Dreadgate','The Dreadgate')],f_glaciar:['Act III · Final Chapter',S('The Crown of Dread','The Crown of Dread')]};
 const f2sHint=st=>()=>STORY.f_hints[st];
 // on the Windscour plateau / on the Sky Isles (by elevation when the map has it, by area when it does not)
 function f2sElev(){ try{ return typeof elevOf==='function'?elevOf(player)|0:0; }catch(e){ return 0; } }
@@ -980,7 +980,7 @@ defineStages(3,[
       // covers a Heart of Dread registered without them)
       if(!f2sSeen('f_dread_in')&&f2sInArea('f_dread')) f2sWhen('dread_in',q=>q.t>1.4&&f2sInArea('f_dread'),()=>{ if(!f2sSeen('f_dread_in')) f2sPlay('f_dread_in'); });
       if(!F.f_crown_open&&f2sOut()&&scene==='play'&&dist(player.x,player.y,F2SP.crown.x,F2SP.crown.y)<760) f2sCrownDoor(); }},
-  {id:'f_glaciar',chapter:S('Auntie','Auntie'),card:F2S_CARD.f_glaciar,at:{x:F2SP.crownIn.x,y:F2SP.crownIn.y},
+  {id:'f_glaciar',chapter:S('The Crown of Dread','The Crown of Dread'),card:F2S_CARD.f_glaciar,at:{x:F2SP.crownIn.x,y:F2SP.crownIn.y},
     objectives(){ if(G.flags.f_done||G.choices.f_glaciar) return [];
       if(G.boss&&!G.boss.dead&&G.boss.type==='f_glaciar'){ const n=f2sChains(); return [{text:n>=4?S('All four chains are gone! Hit the Shard in her chest','Hit the Shard in her chest!'):S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:G.boss.x,y:G.boss.y,fight:true}]; }
       const L=f2sNextLock(); if(L){ const n=f2sChains(); return [{text:S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:L.x,y:L.y}]; }
@@ -988,14 +988,14 @@ defineStages(3,[
       // up is through the Heart of Dread; e1_maps routes the marker over the crossings from another map)
       const onCrown=curMap()===2&&!AREA&&f2sElev()>=6;
       if(f2sInArea('f_dread')||!onCrown) return [f2sDunObj('f_dread','Climb back up through the Heart of Dread to the Crown','Climb back up to the top of the mountain',F2SP.dreadgate)];
-      return [{text:S('Face Glaciar on the Crown of Dread','Face Glaciar on top of the mountain'),x:F2SP.crown.x,y:F2SP.crown.y}]; },
+      return [{text:S('Climb to whoever is dreaming the winter, on the Crown of Dread','Climb to the top of Mount Dread'),x:F2SP.crown.x,y:F2SP.crown.y}]; },
     idle:()=>G.flags.f_done?S('The north is warm again. Rest at a shrine or an inn when you are ready for the next part of the story.','Rest when you are ready for more story.')
       :G.choices.f_glaciar?S('The Crown of Dread is quiet. Night is coming to Hearthold.','The mountain is quiet. Night is coming.'):'',
     hint:()=>G.flags.f_done?S(`You did it, Ash. The north is warm again. When you're ready, the story goes east. I'll stay here, if you don't mind. I've had enough wind for one winter.`,`You did it! When you're ready, the story goes east.`):STORY.f_hints.f_glaciar,
     soFar:()=>G.flags.f_done?(G.choices.f_glaciar==='free'?S('Glaciar is free and herself again. She gave Ash the second Shard and told him the name of the one behind it all: Nyxara, the moon\'s old moth, who wants a night that never ends. That night the moon had another bite out of it.','Glaciar is free! She gave Ash Shard 2. The one behind it all is Nyxara, the moon\'s moth. The moon has another bite gone.')
       :S('Glaciar fell asleep under the snow, still chained. She gave Ash the second Shard and whispered a name: Nyxara, the moon\'s old moth. That night the moon had another bite out of it.','Glaciar sleeps under the snow. Ash has Shard 2. The name is Nyxara. The moon has another bite gone.'))
-      :S('At the top of Mount Dread, Glaciar lies bound in purple chains with the second Shard in her heart.','At the top of Mount Dread, Glaciar lies in purple chains. Shard 2 is in her heart.'),
-    mom:[S(`Tell your auntie I said hello. And to stop it with the snow.`,`Say hello to your auntie for me.`)],
+      :S('At the top of Mount Dread, an ice dragon lies bound in four purple chains, with the second Shard of the Ember Heart in her heart. She is dreaming the Long Winter.','At the top of Mount Dread, a dragon lies in purple chains. Shard 2 is in her heart.'),
+    mom:[S(`Is it over? Then come home and tell me everything. Slowly. From the beginning.`,`Is it over? Come home and tell me everything.`)],
     update(dt){ f2sGlaciarTick(dt); }}
 ]);
 // the whole act: Mom's snow letter plays when Act III starts (from Act II's "Continue the story", or a rest after it);
@@ -1652,12 +1652,14 @@ if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)) for(const id in
   const d=F2S_MAIL[id]; if(PEBBLE_MAIL.some(m=>m&&m.id===id)) continue;
   if(d.from!=='maren'&&PEBBLE_MAIL.some(m=>m&&m.from===d.from&&String(m.id).startsWith('f_pb'))) continue;
   PEBBLE_MAIL.push(Object.assign({id},d)); }
-// dreams: f_auntie (bible 6.14) and the optional f_lullaby (THREADS 12), added only when nobody has
+// dreams: f_auntie (bible 6.14) and the optional f_lullaby (THREADS 12), added only when nobody has. (v12) f_auntie plays
+// before the snow_mother solve, so the auntie in it is tall and cold and laughs like wind chimes, and is never seen whole
+// or called a dragon: that is the solve's to say.
 const F2S_DREAMS={
   f_auntie:{stages:['f_thaw','f_sky','f_gap'],title:S('Snowflakes with Auntie','Snowflakes with Auntie'),scene:'auntie',lines:()=>[
-    xl('narr',`You dream you're Ember, a girl with little red horns, on top of a white mountain. Beside you lies a huge, gentle ice dragon, curled up like a cat.`,`You dream you are young Ember on a white mountain. A big, gentle ice dragon lies beside you.`),
+    xl('narr',`You dream you're Ember, a girl with little red horns, at the top of a sledding hill. Your auntie sits beside you, so tall that the falling snow hides her face. She is cold to lean on. You don't mind.`,`You dream you are young Ember on a snowy hill. Your tall auntie sits by you. She is cold. You don't mind.`),
     xl('ember_kid',`Auntie, teach me to make a snowflake!`,`Auntie, teach me to make a snowflake!`),
-    xl('narr',`You breathe. Too hot. Every snowflake turns into a raindrop and plops on your nose. The dragon laughs. It sounds like wind chimes.`,`You breathe. Too hot! The snowflakes turn to raindrops. The dragon laughs like wind chimes.`),
+    xl('narr',`You breathe. Too hot. Every snowflake turns into a raindrop and plops on your nose. High above you, Auntie laughs. It sounds like wind chimes.`,`You breathe. Too hot! The snowflakes turn to raindrops. Auntie laughs like wind chimes.`),
     xc('ember_kid',`What do you do?`,`What do you do?`,[
       xo(`Make a snowflake together`,`Make one together`,{tone:'kind',fn:()=>{ G.flags.dr_f_auntie='flake'; },then:[xl('narr',`You breathe warm. She breathes cold. Between you, a perfect snowflake forms, as big as a shield, and floats away over the hills.`,`You breathe warm. She breathes cold. A huge, perfect snowflake floats away.`)]}),
       xo(`Have a snowball fight`,`Snowball fight!`,{tone:'silly',fn:()=>{ G.flags.dr_f_auntie='snowball'; },then:[xl('narr',`You throw a snowball. She throws one back. It is bigger than you are. She wins. Gently.`,`You throw a snowball. She throws one bigger than you. She wins. Gently.`)]}),

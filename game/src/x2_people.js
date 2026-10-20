@@ -129,13 +129,13 @@ function f2pHat(item){ const h=F2P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 // content can be played and tested without x2_story): Ylva's thaw moves f_thaw on.
 const F2P_STAGES=['f_snow','f_pass','f_hearth','f_maze','f_kindle','f_thaw','f_sky','f_gap','f_deep','f_dreadgate','f_dread','f_glaciar'];
 const F2P_CH={f_snow:'A Letter in the Snow',f_pass:'A Letter in the Snow',f_hearth:'The Dying Hearth',f_maze:'The Dying Hearth',f_kindle:'The Dying Hearth',f_thaw:'One Thaw at a Time',
-  f_sky:'One Thaw at a Time',f_gap:'The Stonehorn Knock',f_deep:'The Stonehorn Knock',f_dreadgate:'The Dreadgate',f_dread:'The Dreadgate',f_glaciar:'Auntie'};
+  f_sky:'One Thaw at a Time',f_gap:'The Stonehorn Knock',f_deep:'The Stonehorn Knock',f_dreadgate:'The Dreadgate',f_dread:'The Dreadgate',f_glaciar:'The Crown of Dread'};
 const F2P_OBJ={f_snow:[S('Go to Frostpine Lodge and talk to Ulf','Talk to Ulf at the Lodge'),1500,3400],f_pass:[S('Follow the White Road to Hearthold','Walk to Hearthold'),6180,49000],
   f_hearth:[S('Talk to the Hearthkeeper at the Great Hearth','Talk to the Hearthkeeper'),6880,49040],f_maze:[S('Cross the Glimmerfrost to the Glacier Maze','Go to the Glacier Maze'),5600,44420],
   f_kindle:[S('Wake the Great Hearth with Blaze','Wake the Great Hearth'),6800,48950],f_thaw:[S('Go to Rimeholm and find whoever knows the most','Go to Rimeholm'),1950,46750],
   f_sky:[S('Reach Skyreach Temple','Reach Skyreach Temple'),12650,46480],f_gap:[S('Find Stonehorn Deep in the Badlands','Find Stonehorn Deep'),12200,42450],
   f_deep:[S('Climb down through Stonehorn Deep','Go through Stonehorn Deep'),12200,42450],f_dreadgate:[S('Go to the Dreadgate at the foot of Mount Dread','Go to the Dreadgate'),7300,44160],
-  f_dread:[S('Climb through the Heart of Dread','Climb the Heart of Dread'),7300,44160],f_glaciar:[S('Face Glaciar on the Crown of Dread','Face Glaciar'),7300,41250]};
+  f_dread:[S('Climb through the Heart of Dread','Climb the Heart of Dread'),7300,44160],f_glaciar:[S('Climb to whoever is dreaming the winter, on the Crown of Dread','Climb to the top of Mount Dread'),7300,41250]};
 function f2pStagesFallback(){
   if(typeof stageAt!=='function') return;
   const miss=F2P_STAGES.filter(s=>stageAt(s)<0); if(!miss.length) return;
@@ -152,7 +152,7 @@ const F2P_CAST=[
   {id:'f_brynja',name:'Old Brynja, Hearthkeeper',town:'f_hearthold',col:'#e88a4a',
     look:{skin:'#e8c0a0',hair:'#efeae0',hairdo:'bun',outfit:'robe',shirt:'#3a2a2a',low:'#2a1e1e',shawl:'#1a1414',soot:true,build:'old',hold:'staff'},
     lines:[S(`Seventy years I've kept this fire. Never let it go out once. Well. Once. I was nine. There was a sneeze.`,`Seventy years I kept this fire. It went out once. I sneezed.`),
-      S(`Don't touch the Hearth with your bare claws. Oh, you're an Emberblood. Touch away.`,`Don't touch the fire. Oh, you're a dragon. Go ahead.`),
+      S(`Don't touch the Hearth with your bare claws. Oh, you're the fire one. Touch away.`,`Don't touch the fire. Oh, you're the fire one. Go ahead.`),
       S(`The north remembers Ember. We put a flower on the Hearth every Lantern Day. Your Lantern Day. We just never knew why.`,`We put a flower on the fire every Lantern Day. We never knew why.`)]},
   {id:'f_brann',name:'Captain Brann Stoutmitt',town:'f_hearthold',col:'#c86a2a',
     look:{skin:'#f0c8a8',hair:'#c86a2a',beard:'big',beardc:'#c86a2a',outfit:'armor',helm:true,plume:'#3a6aaa',cape:'#2a4a7a',frost:true,build:'big',hold:'spear',mittens:'#2a4a7a'},
@@ -449,7 +449,7 @@ function f2pFuse(){ if(!G.flags.f_bombfuse||G.flags.f_bombfuse_bag) return; if(G
 // ---------- first meetings and everyday greetings in each person's own voice. In Act III every person here is on the
 // v11 talk (act3/people.js: their first meeting is a once opener there); these are for the acts where they are not.
 const F2P_FIRST={
-  f_brynja:S(`There, there, old girl. Somebody's come to see you. ...Oh. You're the Emberblood. Come closer. Let me look at you. Skinny.`,`Oh! The Emberblood. Come here. Skinny!`),
+  f_brynja:S(`There, there, old girl. Somebody's come to see you. ...Oh. You're the horned boy. Come closer. Let me look at you. Skinny.`,`Oh! The horned boy. Come here. Skinny!`),
   f_brann:S(`Stop right there! Name, and are you a moth? ...Horns. A tail. Not a moth, then. Carry on! Captain Brann Stoutmitt, Hearthwardens!`,`Stop! Are you a moth? No? Carry on! I'm Captain Brann!`),
   f_toastwhistle:S(`A visitor! Welcome to Hearthold, where everything is fine! I'm Mayor Ottilie Toastwhistle. Everything is fine.`,`Welcome! I'm Mayor Toastwhistle. Everything is fine!`),
   f_gunnhild:S(`Hm. A dragon in my forge. Gunnhild Anvilheart. ...Wait. That sword. That's Maren's work. You're Maren's kid?`,`I'm Gunnhild. Wait. That's Maren's sword! You're her kid?`),
@@ -475,7 +475,7 @@ const F2P_FIRST={
 };
 const F2P_HELLO={
   f_brynja:[S(`There's my warm child.`,`My warm child.`),S(`Come, sit by her. She likes you.`,`Sit by the fire. She likes you.`)],
-  f_brann:[S(`Emberblood! At ease! I mean me! I'm at ease!`,`At ease! I mean me!`),S(`Any moths? Report!`,`Any moths? Report!`)],
+  f_brann:[S(`Horns! At ease! I mean me! I'm at ease!`,`At ease! I mean me!`),S(`Any moths? Report!`,`Any moths? Report!`)],
   f_toastwhistle:[S(`Ash! Everything is fine!`,`Ash! Everything is fine!`),S(`Oh, good, a hero. Fine. Good. Fine.`,`Good, a hero. Fine.`)],
   f_gunnhild:[S(`Maren's kid! Come in!`,`Maren's kid! Come in!`),S(`Hm. Ash. Good.`,`Hm. Ash. Good.`)],
   f_mags:[S(`Ash! I made a thing! It might explode! Hi!`,`Ash! I made a thing! Hi!`),S(`My favorite fire!`,`My favorite fire!`)],
@@ -559,7 +559,7 @@ B('f_hsk2','id:f_hask',()=>f2pQ('f_dogs'),S(`Pepper. PEPPER. Drop the boot.`,`Pe
 // town barks: the dying Hearth, the blue Hearth, the frozen village, the moths, and later the moon
 B('f_hh1',F2P_HH,f2pCold,S(`My soup froze on the spoon. And I was sitting right next to the Hearth!`,`My soup froze. Right next to the Hearth!`));
 B('f_hh2',F2P_HH,f2pCold,S(`Brr.`,`Brr.`));
-B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the Emberblood? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
+B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the horned boy? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
 B('f_hh4',F2P_HH,f2pLit,S(`The Hearth is BLUE! I didn't know fire could be blue! I didn't know fire could be HAPPY!`,`The Hearth is BLUE! Fire can be happy!`),{d:'f_hearth'});
 B('f_hh5',F2P_HH,f2pLit,S(`I took my coat off. Then I put it back on. Baby steps.`,`I took off my coat. Then put it back on.`));
 B('f_hh6',F2P_HH,()=>!!G.flags.f_northgate,S(`The North Gate's open! Gunnar finally stopped licking it. Well. He licked the open bit too.`,`The North Gate is open! Gunnar licked it anyway.`),{d:'f_gate'});
@@ -798,13 +798,13 @@ Object.assign(QDEFS,{
         f2pL('f_gunnhild',`The Ember Chain. The tip burns. It lights braziers from as far as it reaches, burns roots, and knocks frost right off things. Tell your mother. Tell her Gunnhild of Hearthold says hello. Tell her twice.`,`The Ember Chain! The tip burns. It lights braziers and melts frost. Tell your mom hello. Twice.`)],reward:{xp:650,f2p:()=>{ G.flags.f_emberchain=1; setBanner(S('The Ember Chain!','The Ember Chain!'),S('The Chain Whip’s tip burns: it lights braziers and roots from range, melts ice and hits frost foes harder.','Your whip tip burns now!'),3.6); }}}]},
   f_pack:{title:S('The Long Howl','The Long Howl'),giver:'f_greymane',min:'f_pass',offer:[]},
   f_warm:{title:S('Warm Hands','Warm Hands'),giver:'f_toastwhistle',min:'f_kindle',
-    offer:[f2pL('f_toastwhistle',`Ash! Emberblood! Official question from the Mayor: how many frozen people can one dragon warm up?`,`Official question! How many frozen people can you warm up?`),f2pL('ash',`...All of them?`,`...All of them?`),
+    offer:[f2pL('f_toastwhistle',`Ash! Horned boy! Official question from the Mayor: how many frozen people can one dragon warm up?`,`Official question! How many frozen people can you warm up?`),f2pL('ash',`...All of them?`,`...All of them?`),
       f2pL('f_toastwhistle',`TWELVE would do! Twelve, and I'll give you a medal! I've never given anyone a medal! I'll have to make one!`,`TWELVE! Then I'll give you a medal! I'll have to make one!`)],
     steps:[
       {t:'flag',flag:'f_warm12',text:S('Thaw 12 Frozen Folk anywhere in Frostreach','Thaw 12 frozen people'),at:()=>f2pNearestFrozen()},
       {t:'talk',npc:'f_toastwhistle',text:S('Collect your medal from the Mayor','Get your medal from the Mayor'),give:{f_medal:1},lines:[f2pL('f_toastwhistle',`Twelve! TWELVE! Everyone, gather round! Hearthwardens, a drum roll!`,`TWELVE! Gather round! A drum roll!`),
         f2pN(`Captain Brann does a drum roll on his own helmet.`,`Brann drums on his own helmet.`),
-        f2pL('f_toastwhistle',`I hereby award Ash Emberblood the Warm Hands Medal, for warming hands! And feet! And entire people!`,`The Warm Hands Medal! For warming hands, feet and whole people!`),
+        f2pL('f_toastwhistle',`I hereby award Ash of Emberhollow the Warm Hands Medal, for warming hands! And feet! And entire people!`,`The Warm Hands Medal! For warming hands, feet and whole people!`),
         f2pL('f_toastwhistle',`It's a cookie. ...There's a real one too. And this. A Heart Ember from the Hall. We've been saving it for a hero. Everything is FINE now.`,`It's a cookie. There's a real one too. And a Heart Ember! Everything is FINE.`)],reward:{heart:'f_warm',coins:170,xp:650}}]}
 });
 // Elka goes to the Windscour Shrine for the start of her race as soon as the race is on
@@ -817,15 +817,12 @@ Object.defineProperty(STORY,'f_song_reveal',{configurable:true,get(){ return [
   ...f2pVerse(F2P_V1),...f2pVerse(F2P_V2),...f2pVerse(F2P_V3),
   f2pL('f_eider',`"Horns of red. Fire in her hands." That's an Emberblood. That's EMBER.`,`"Horns of red. Fire in her hands." That's EMBER!`),
   f2pL('f_brynja',`And she called the Snow Mother "Auntie"...`,`She called the Snow Mother "Auntie"...`),
-  f2pL('ash',`Ember's auntie is Glaciar. The Snow Mother... is GLACIAR!`,`Ember's auntie is Glaciar. The Snow Mother is GLACIAR!`),
-  f2pL('f_brynja',`The dragon on the mountain? The one making all this snow?`,`The dragon on the mountain? Making all this snow?`),
-  f2pL('ash',`She's not making it. Something is making HER. A spell. Chains. A moth.`,`Something is making HER do it. A spell. Chains. A moth.`),
+  f2pL('ash',`Ember's auntie? Then who WAS the Snow Mother? And where did she go?`,`Ember's auntie? Who was she?`),
   f2pL('f_eider',`Then the song is a key. Dragons remember songs. My cousin Wren says so, and Wren is never wrong. She tells me constantly.`,`Then the song is a key. Dragons remember songs. Wren says so.`),
-  f2pL('tove',`Oh. OH. Auntie Glee! Ember called her Auntie Glee! I remember her laugh. Like wind chimes. How could I forget?`,`Auntie Glee! Ember called her that! Her laugh was like wind chimes!`),
   f2pL('f_brynja',`Then go and sing it to her, child. And tell her Hearthold never forgot her. We just forgot her name.`,`Go sing it to her. Tell her we never forgot her. Just her name.`),
   f2pL('f_eider',`Wait. WAIT. Wren's lost page! The eleventh one! It was stuck to the back of a recipe for frost pudding. Very old jam.`,`Wait! Wren's lost page! The eleventh! It was stuck to a pudding recipe!`),
-  f2pN(`"On the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember named her Nyx. We thought nothing of it." (Iska)`,`"On the first Lantern Day, a little grey moth sat on Ember's lantern. Ember named her Nyx." (Iska)`),
-  f2pL('ash',`Nyx. A little grey moth... named by Ember.`,`Nyx. A little grey moth. Ember named her.`),
+  f2pN(`"On the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember gave her a name. We thought nothing of it." (Iska)`,`"A grey moth sat on Ember's lantern. Ember gave her a name." (Iska)`),
+  f2pL('ash',`A moth with a name. And nobody wrote the name down.`,`Ember named a moth. Nobody wrote the name down.`),
   f2pL('tove',`I remember that moth. She was so small. She was so COLD.`,`I remember that moth. So small. So COLD.`),
   f2pDo(()=>{ G.flags.f_page11=1; })]; }});
 Object.defineProperty(STORY,'f_pack_meet',{configurable:true,get(){ return [
