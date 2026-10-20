@@ -191,7 +191,7 @@ addEventListener('keydown',e=>{ if(scene!=='map') return; const c=e.code; if(c==
 // limits: never smaller than the whole map, never past its edges, and no closer than MAPZ.pxMax canvas px per world
 // px (the overview is 1 px per 25 world px, so it stays a picture, not blocks). The dungeon page (view -1) is not
 // zoomed.
-const MAPZ={start:2.5,max:5,step:1.6,pxMax:0.32,startSpan:2600};
+const MAPZ={start:2.5,max:5,step:1.6,pxMax:0.32,startSpan:2600,res:1.9};
 function mapZMax(k){ const B=mapFit0(k); return clamp(MAPZ.pxMax/B.s,2,MAPZ.max); }
 function mapZOn(k){ return k!=null&&k!==-1&&!!MAPS[k]; }
 function mapZClamp(k){
@@ -223,10 +223,22 @@ function mapZCentre(x,y,z){
   const k=MAPUI.view; if(!mapZOn(k)) return;
   MAPUI.zm[k]={z:z||mapZoomOf(k),cx:x,cy:y}; mapZClamp(k); mapZReq();
 }
+// the canvas fills the map frame (it was a fixed 1120 x 880 picture with parchment bars beside it, and on a phone it
+// was a small box with tiny words): MAPZ.res canvas px per CSS px, so labels and markers are the same size on a phone
+// as on a desktop. Taller than wide boxes on a phone held upright. Returns true when the size changed.
+function mapZSize(){
+  const wrap=mapCv.parentElement; if(!wrap) return false;
+  const W0=wrap.clientWidth; if(!(W0>40)) return false;
+  const Hc=Math.round(Math.min(innerHeight*0.58,W0*(W0<600?1.1:0.786))), cw=Math.round(W0*MAPZ.res), ch=Math.round(Hc*MAPZ.res);
+  mapCv.style.width=W0+'px'; mapCv.style.height=Hc+'px';
+  if(mapCv.width===cw&&mapCv.height===ch) return false;
+  mapCv.width=cw; mapCv.height=ch; return true;
+}
+addEventListener('resize',()=>{ try{ if(scene==='map'&&MAPUI.bound&&mapZSize()) drawMapScreen(); }catch(e){} });
 function mapZStartZ(k){ const M=MAPS[k]||MAPS[0]; return clamp(Math.min(MAPZ.start,M.w/MAPZ.startSpan),1,mapZMax(k)); }
 // the map screen opens: every tab whole, the one Ash is on zoomed on him
 function mapZoomStart(){
-  mapZBind(); MAPUI.zm={}; const k=MAPUI.view, a=mapZOn(k)&&mapZAsh();
+  mapZBind(); mapZSize(); MAPUI.zm={}; const k=MAPUI.view, a=mapZOn(k)&&mapZAsh();
   if(a){ MAPUI.zm[k]={z:mapZStartZ(k),cx:a.x,cy:a.y}; mapZClamp(k); }
   mapZUI();
 }

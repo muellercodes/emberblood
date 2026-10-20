@@ -524,13 +524,13 @@ const FURN_LABEL={bed:'Look at the bed',shelf:'Browse the shelf',fireplace:'Sit 
 // (v12) indoors (houses, shops, caves, dungeons) Ash names only what is close and in front of him. Drew: "If I face an
 // object from across the room it is highlighted and the item title pops up, so there always seems to be an item title
 // when I'm in a room." A thing counts from the nearest point of its footprint (its box, or its circle): up to
-// IN_REACH.front px from Ash's middle (about a tile and a half) within IN_REACH.cone of the way he faces, or
+// IN_REACH.front px from Ash's middle (a tile and a half) within IN_REACH.cone of the way he faces, or
 // IN_REACH.touch px when he stands right against it a little side on. A person counts from their middle and a bit
 // further (a shopkeeper stands behind the counter). A rug's secret counts from the rug's corners (it says "Lift the
 // corner"): it covered the middle of the room, so its name showed wherever Ash stood. The ring goes on that nearest
 // point (prompt rx, ry), not the middle of a long counter. Outdoors nothing changes. The story's own places indoors
 // (e10_story.js s10Prompts) and its person-first tie (s10PersonFirst) ask reachPlace and reachPerson the same way.
-const IN_REACH={front:44,touch:20,cone:1.22,wide:1.75,person:70,turtle:90,personTouch:38,corner:34};
+const IN_REACH={front:48,touch:20,cone:1.22,wide:1.75,person:70,turtle:90,personTouch:38,corner:34};
 function reachSeen(qx,qy,d,front,touch){
   const p=player; if(!p) return false; if(d<=6) return true;
   const a=Math.abs(angDiff(p.facing||0,Math.atan2(qy-p.y,qx-p.x)));
