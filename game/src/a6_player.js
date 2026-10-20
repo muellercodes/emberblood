@@ -502,6 +502,12 @@ function deathFx(e){
   scorch(e.x,e.y,e.r*1.6);
 }
 function dropHeal(x,y,amt){ G.pickups.push({x,y,vx:rand(-70,70),vy:rand(-70,70),amt,t:0,life:15}); }
+// v12: indoors nothing is named, talked to, opened or picked up through a wall. This wraps FIXES' reach tests (reachObj,
+// reachPerson, reachPlace in a9d_quests.js) when they are in the build; a function declaration is hoisted, so the wrap can
+// sit here. A house is one room, so only caves and dungeons change.
+if(typeof reachObj==='function'){ const base=reachObj; reachObj=function(o){ const q=base.apply(this,arguments); if(q&&q.ok&&AREA&&player&&!losClear(player.x,player.y,q.x,q.y,o&&o.w?0:((o&&o.r)||16))) q.ok=false; return q; }; }
+if(typeof reachPerson==='function'){ const base=reachPerson; reachPerson=function(n){ const ok=base.apply(this,arguments); return ok&&!(AREA&&player&&n&&!losClear(player.x,player.y,n.x,n.y,14)); }; }
+if(typeof reachPlace==='function'){ const base=reachPlace; reachPlace=function(x,y,r){ const ok=base.apply(this,arguments); return ok&&!(AREA&&player&&!losClear(player.x,player.y,x,y,r||22)); }; }
 // test hooks (v12 WALLS)
 window.__ebDbg=Object.assign(window.__ebDbg||{},{walls:{losClear,losHitT,BRW,bossReady,ashHits,ashSees,foeSees,hurtSeen,isBossFoe,
   give:id=>{ giveWeapon(id,true); equipWeapon(id,true); return curWeapon(); },
