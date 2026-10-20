@@ -430,7 +430,7 @@ function p4PopUp(p,auto){
   p4Snd('pop'); p4SandFx(p.x,p.y,26); shake(4); G.ripples.push({x:p.x,y:p.y,t:0,max:0.45,r:P4N.popR*0.9});
   const rk=hasSkill('burrow2'), R=P4N.popR*(1+0.15*rk);
   let n=0;
-  for(const e of G.enemies){ if(e.dead||e.invuln||e.spawnIn>0||e.passive) continue; if(dist(p.x,p.y,e.x,e.y)>R+(e.r||14)) continue;
+  for(const e of G.enemies){ if(e.dead||e.invuln||e.spawnIn>0||e.passive) continue; if(dist(p.x,p.y,e.x,e.y)>R+(e.r||14)||!ashHits(e,null,p.x,p.y)) continue;   // (v12: not through a wall)
     n++; if(e.onPop) try{ e.onPop(e); }catch(err){ console.warn(err); }
     damageEnemy(e,wPower()*P4N.popDmg*rand(0.92,1.08),{src:'pop',kb:P4N.popKb*(1+0.4*rk),ka:angTo(p.x,p.y,e.x,e.y),fx:e.x-Math.cos(e.face||0)*30,fy:e.y-Math.sin(e.face||0)*30});
     if(!e.dead){ stunEnemy(e,P4N.popStun); e.p4upT=0.75; } }
@@ -481,7 +481,11 @@ function p4MoonBreath(dt){
   const p=player, fly=!!p.flying, ang=p.facing, z=p.z||0, mx=p.x+Math.cos(ang)*16, my=p.y+Math.sin(ang)*16;
   const R=P4N.mfR*(fly?1.03:1), half=fly?0.5:P4N.mfHalf;
   if(fly){ for(let i=0;i<3;i++){ const L=rand(30,170), a=ang+rand(-0.38,0.38), gx=p.x+Math.cos(a)*L, gy=p.y+Math.sin(a)*L, sx=mx, sy=my-z*0.92, d=Math.max(1,dist(sx,sy,gx,gy)), sp=rand(380,470); G.particles.length<950&&G.particles.push({x:sx,y:sy,vx:(gx-sx)/d*sp,vy:(gy-sy)/d*sp,life:d/sp*1.05,max:d/sp*1.05,size:rand(3,5),grow:16,drag:0.3,kind:'spark',col:'214,226,255',glow:true,rise:0,al:0.9}); } }
-  else{ emit(mx,my,3,{kind:'moon',col:'240,244,255',ang,spread:0.26,smin:360,smax:460,lmin:.32,lmax:.44,zmin:3,zmax:5,grow:15,drag:1,alpha:0.8}); emit(mx,my,2,{kind:'moon',col:'176,196,255',ang,spread:0.34,smin:300,smax:420,lmin:.35,lmax:.5,zmin:2.5,zmax:4.5,grow:14,drag:1,alpha:0.7}); if(Math.random()<0.6) emit(mx+Math.cos(ang)*rand(40,150),my+Math.sin(ang)*rand(40,150),1,{col:'255,255,255',ang:-Math.PI/2,spread:1,smin:10,smax:40,lmin:.3,lmax:.6,zmin:0.8,zmax:1.6,drag:2}); }
+  else{ // (v12: the silver flame stops at the first wall, puff by puff, and splashes on it)
+    const reach=breathCut(ang);
+    breathPuffs(mx,my,ang,3,{kind:'moon',col:'240,244,255',spread:0.26,smin:360,smax:460,lmin:.32,lmax:.44,zmin:3,zmax:5,grow:15,alpha:0.8}); breathPuffs(mx,my,ang,2,{kind:'moon',col:'176,196,255',spread:0.34,smin:300,smax:420,lmin:.35,lmax:.5,zmin:2.5,zmax:4.5,grow:14,alpha:0.7});
+    if(Math.random()<0.6&&reach>50){ const s=rand(40,Math.min(150,reach)); emit(mx+Math.cos(ang)*s,my+Math.sin(ang)*s,1,{col:'255,255,255',ang:-Math.PI/2,spread:1,smin:10,smax:40,lmin:.3,lmax:.6,zmin:0.8,zmax:1.6,drag:2}); }
+    if(reach<170) breathSplash(mx,my,ang,reach,dt,'moon'); }
   if(Math.random()<dt*3) p4Snd('moon',0.35);
   const ox=fly?p.x:mx, oy=fly?p.y:my;
   P4.arcsNext.push({x:ox,y:oy,ang,R,half});

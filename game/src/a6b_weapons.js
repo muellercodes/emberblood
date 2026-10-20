@@ -108,7 +108,8 @@ function wCritRoll(id,bonus){ return Math.random()<((WEAPONS[id]?WEAPONS[id].cri
 function wStrike(e,c,k,id,o){
   o=o||{}; const crit=wCritRoll(id,o.critB);
   const amt=wPower()*k*rand(0.9,1.1)*(crit?1.75:1)*(o.extra||1);
-  return damageEnemy(e,amt,{src:o.src||'slash',mult:c.m,crit:crit||c.m>1,kb:o.kb||0,ka:o.ka!=null?o.ka:angTo(player.x,player.y,e.x,e.y),fx:o.fx,fy:o.fy});
+  // v12: never through a wall: the line runs from o.lx,o.ly (or the shot or thrown thing at o.fx,o.fy, or Ash) to the foe
+  return damageEnemy(e,amt,{src:o.src||'slash',mult:c.m,crit:crit||c.m>1,kb:o.kb||0,ka:o.ka!=null?o.ka:angTo(player.x,player.y,e.x,e.y),fx:o.fx,fy:o.fy,los:true,lx:o.lx,ly:o.ly,lo:o.lo});
 }
 const wFoeOk=e=>!(e.dead||e.invuln||e.spawnIn>0||e.passive);
 function segD(px,py,ax,ay,bx,by){ const dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy||1, t=clamp(((px-ax)*dx+(py-ay)*dy)/l2,0,1); return Math.hypot(px-(ax+dx*t),py-(ay+dy*t)); }
@@ -154,7 +155,7 @@ function aimAssist(aim,kind){
   for(const e of G.enemies){
     if(!wFoeOk(e)||e.frozen||e.alpha<0.3) continue;
     const d=Math.max(0,dist(p.x,p.y,e.x,e.y)-(e.r||10)*0.6); if(d>R) continue;
-    const da=Math.abs(angDiff(aim,angTo(p.x,p.y,e.x,e.y))); if(da>AIM_CONE) continue;
+    const da=Math.abs(angDiff(aim,angTo(p.x,p.y,e.x,e.y))); if(da>AIM_CONE||!ashSees(e)) continue;
     let s=(d+20)*(1+da*0.9); if(e.boss) s*=0.5;
     if(s<bs){ bs=s; best=e; }
   }
@@ -166,7 +167,7 @@ function wAimAssist(aim){
   for(const e of G.enemies){
     if(!wFoeOk(e)||e.alpha<0.3) continue;
     const d=dist(p.x,p.y,e.x,e.y); if(d>620) continue;
-    const da=Math.abs(angDiff(aim,angTo(p.x,p.y,e.x,e.y))); if(da>0.32) continue;
+    const da=Math.abs(angDiff(aim,angTo(p.x,p.y,e.x,e.y))); if(da>0.32||!ashSees(e)) continue;
     const s=d*(1+da*3); if(s<bs){ bs=s; best=e; }
   }
   return best?angTo(p.x,p.y,best.x,best.y):aim;
@@ -432,7 +433,9 @@ function stepRang(r,dt){
       else if(wWall(r.x,r.y)){ r.x-=sx; r.y-=sy; rangBack(r); wsnd('clink'); emit(r.x,r.y,6,{col:'255,230,180',smin:60,smax:160,lmin:.1,lmax:.25,zmin:1,zmax:2,drag:5}); }
     }
     if(!r.fire&&inBreath(r.x,r.y,8)){ r.fire=true; emit(r.x,r.y,10,{kind:'fire',smin:40,smax:140,lmin:.2,lmax:.4,zmin:2,zmax:4,grow:4,drag:3}); }
-    for(const e of G.enemies){
+    // v12: on the way back it slips through walls to reach Ash, and while a wall stands between it and him it hits nothing
+    const lost=r.ph==='back'&&(wWall(r.x,r.y)||!losClear(r.x,r.y,p.x,p.y,p.r));
+    if(!lost) for(const e of G.enemies){
       if(!wFoeOk(e)||r.hit.has(e.id)) continue;
       let hc=null; for(const c of hitCircles(e)) if(dist2(r.x,r.y,c.x,c.y)<(c.r+10)**2){ hc=c; break; }
       if(!hc) continue;

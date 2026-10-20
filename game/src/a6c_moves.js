@@ -216,7 +216,7 @@ function slamImpact(p){
   shake(9); hitstop=Math.max(hitstop,0.05); mvSnd('slam');
   for(const e of G.enemies){
     if(e.dead||e.invuln||e.spawnIn>0||e.passive||e.flying) continue;
-    if(dist(p.x,p.y,e.x,e.y)<R+e.r){ damageEnemy(e,dmg*rand(0.9,1.1),{src:'slam',kb:380,ka:angTo(p.x,p.y,e.x,e.y)}); if(!e.dead) stunEnemy(e,0.9); }
+    if(dist(p.x,p.y,e.x,e.y)<R+e.r&&ashHits(e)){ damageEnemy(e,dmg*rand(0.9,1.1),{src:'slam',kb:380,ka:angTo(p.x,p.y,e.x,e.y)}); if(!e.dead) stunEnemy(e,0.9); }   // (v12: not through a wall)
   }
   for(let i=0;i<18;i++){ const a=i/18*TAU; emit(p.x+Math.cos(a)*20,p.y+Math.sin(a)*14,1,{col:'255,190,110',ang:a,spread:0.1,smin:160,smax:260,lmin:.2,lmax:.35,zmin:2,zmax:4,drag:5}); }
   G.ripples.push({x:p.x,y:p.y,t:0,max:0.5,r:R*1.3,splash:true});

@@ -304,7 +304,7 @@ FK.ambusher=(o={})=>{ const then=o.then||FK.chaser(), wake=o.wake||110;
   const ai=function(e,dt,p){ if(e.sleep) fkWake(e); if(e.state==='pop'){ e.dx=e.dy=0; e.st-=dt; if(e.st<=0){ e.state='chase'; e.cd=0.15; } return; } then(e,dt,p); };
   ai.init=e=>{ e.sleep=true; e.hidden=true; e.returning=true; e.aggro=false; };
   ai.idle=(e,dt)=>{ e.tele=null; e.dx=e.dy=0;
-    if(e.sleep){ e.returning=true; e.aggro=false; if(!player.dead&&dist(e.x,e.y,player.x,player.y)<wake) fkWake(e); return; }
+    if(e.sleep){ e.returning=true; e.aggro=false; if(!player.dead&&dist(e.x,e.y,player.x,player.y)<wake&&foeSees(e)) fkWake(e); return; }   // (v12: not through a wall)
     steer(e,e.homeX,e.homeY,e.speed*0.8); if(dist(e.x,e.y,e.homeX,e.homeY)<30){ e.sleep=true; e.hidden=true; e.hp=e.maxHp; e.returning=true; } };
   return ai; };
 

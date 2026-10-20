@@ -81,7 +81,7 @@ function p3JetHits(x,y,r){
   const dx=x-J.ox, dy=y-J.oy, ca=Math.cos(J.ang), sa=Math.sin(J.ang), t=dx*ca+dy*sa;
   if(t<-(r||0)||t>J.L+(r||0)) return false;
   const w=P3N.jetW0+(P3N.jetW1-P3N.jetW0)*clamp(t/Math.max(1,J.L),0,1), d=Math.abs(-dx*sa+dy*ca);
-  return d<w/2+(r||0);
+  return d<w/2+(r||0)&&breathSees(x,y,r||0);   // (v12: the jet is wide, so its edges need a clear line from Ash too)
 }
 // normal breath (ground or from the sky) on a point: the stock cone
 function p3BreathHits(x,y,r){
@@ -1120,6 +1120,7 @@ function p3PoundImpact(p){
   shake(10); hitstop=Math.max(hitstop,0.06); p3Snd('pound'); try{ mvSnd('slam',0.5); }catch(e){}
   for(const e of G.enemies){
     if(e.dead||e.spawnIn>0||e.passive) continue; const d=dist(x,y,e.x,e.y);
+    if(d<R*1.3+(e.r||14)&&!ashHits(e,null,x,y)) continue;   // (v12: the quake does not pass through walls)
     if(e.onPound&&d<R*1.3+(e.r||14)) try{ e.onPound(e,{x,y,R,d,drum:false}); }catch(err){ console.warn(err); }
     if(e.flying||e.invuln||d>R+(e.r||14)) continue;
     if(e.shield&&!e.boss&&!(e.p3shT>0)){ e.p3sh=e.shield; e.shield=false; e.blocking=false; e.p3shT=P3N.armourT; ftext(e.x,e.y-(e.r||14)-16,S('CRACK!','CRACK!'),'#ffe0b0',14); }
