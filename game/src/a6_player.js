@@ -240,12 +240,16 @@ function breathSplash(mx,my,ang,reach,dt,kind){
 // every stock breath test (the cone inArcC(mouth,facing,175,0.45) that foes, braziers, lanterns, roots, torches, Ward
 // stones, ice and the rest use, and the sky cone (180,0.5) while flying) also needs a clear line from Ash to the thing
 function breathSees(x,y,r){ const p=player; return losClear(p.x,p.y,x,y,r||0,ashLosO()); }
+// the same for Ash's swings (LOSV.melee is set while swingHits runs): pots, barrels, crystals and switches behind a wall
+// are out of reach of the sword, daggers and spear
 { const base=inArcC; inArcC=function(ox,oy,ang,range,half,c){
     if(!base(ox,oy,ang,range,half,c)) return false;
-    const p=player; if(!c||!p||!p.breathing) return true;
+    const p=player; if(LOSV.melee&&c&&p) return breathSees(c.x,c.y,c.r||0);
+    if(!c||!p||!p.breathing) return true;
     if(!((range===175&&half===0.45&&!p.flying)||(range===180&&half===0.5&&p.flying))) return true;
     return breathSees(c.x,c.y,c.r||0);
   }; }
+{ const base=swingHits; swingHits=function(){ LOSV.melee=true; try{ return base.apply(this,arguments); } finally{ LOSV.melee=false; } }; }
 function doRoar(free){
   const p=player; if(!free) p.roar=0;
   SFX.play('roar'); shake(14); flashA=0.25; flashCol='255,170,80'; p.iframes=Math.max(p.iframes,0.5);
