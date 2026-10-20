@@ -466,7 +466,7 @@ function trialObjAct(o){
       if(!TR.abil||hasAbil(TR.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine'); say(`Ember's flame is warm. Your scales stop aching. (Health and draughts restored.)`); return true; }
       // (v12) the flame only lends its gift until this place is done: Ember says so after the gift
       const lend=!!trialLendRoot(TR.abil), gift=STORY['trial_'+id+'_gift'];
-      runDialogue(lend&&Array.isArray(gift)?gift.concat([trialLendLine(id,TR)]):gift,()=>{
+      runDialogue(lend&&Array.isArray(gift)?gift.concat(trialLendLine(id,TR)):gift,()=>{
         scene='play'; grantAbility(TR.abil); player.hp=player.maxHp; player.potions=player.potionsMax;
         jingle('levelup','level'); flashA=0.55; flashCol='255,214,140'; shake(7);
         emit(o.x,o.y-20,60,{col:'255,210,120',ang:-Math.PI/2,spread:1.6,smin:60,smax:300,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30});
@@ -509,7 +509,7 @@ function trialReward(o){
   if(trialDone(id)){ runDialogue([['narr',`Ember's altar glows softly. The warp ring beside it is still open, whenever you are ready to go.`]],()=>{ scene='play'; }); return; }
   // (v12) the gift Ember's flame lent at the shrine becomes Ash's for good here
   const keep=TR.abil&&G.flags['tlend_'+TR.abil]===id?TR.abil:null, end=STORY['trial_'+id+'_end'];
-  runDialogue(keep&&TRIALS[id]&&Array.isArray(end)?end.concat([trialKeepLine(TR)]):end,()=>{
+  runDialogue(keep&&(TRIALS[id]||Array.isArray(STORY['trial_'+id+'_keep']))&&Array.isArray(end)?end.concat(trialKeepLine(id,TR)):end,()=>{
     scene='play'; const p=player;
     G.flags['trial_'+id+'_done']=true; if(keep) trialKeep(id,keep,true);
     p.maxHp+=10; p.hp=p.maxHp; p.potions=p.potionsMax;
@@ -561,12 +561,13 @@ function trialKeepAll(quiet){
   if(!G||!G.flags) return;
   for(const k of Object.keys(G.flags)) if(k.slice(0,6)==='tlend_'&&G.flags[k]&&lendDone(G.flags[k])) trialKeep(G.flags[k],k.slice(6),quiet);
 }
+// (the story can say these its own way: STORY.trial_<id>_lend and STORY.trial_<id>_keep, lists of lines, replace them)
 function trialLendLine(id,TR){
-  const nm=TR.abilName||TR.abil;
-  if(TRIALS[id]) return ['ember',S(`One more thing. My flame only burns this bright in here. Out there it would fizzle. Pass my Trial, and the ${nm} is yours to keep.`,`My flame only works in here for now. Pass my Trial to keep the ${nm}!`)];
-  return ['narr',S(`The gift hums inside you, but only in this place for now. Finish ${lendPlace(TR)} and the ${nm} is yours to keep.`,`It only works in here for now. Finish ${lendPlace(TR)} to keep it.`)];
+  const nm=TR.abilName||TR.abil, own=STORY['trial_'+id+'_lend']; if(Array.isArray(own)) return own;
+  if(TRIALS[id]) return [['ember',S(`One more thing. My flame only burns this bright in here. Out there it would fizzle. Pass my Trial, and the ${nm} is yours to keep.`,`My flame only works in here for now. Pass my Trial to keep the ${nm}!`)]];
+  return [['narr',S(`The gift hums inside you, but only in this place for now. Finish ${lendPlace(TR)} and the ${nm} is yours to keep.`,`It only works in here for now. Finish ${lendPlace(TR)} to keep it.`)]];
 }
-function trialKeepLine(TR){ const nm=TR.abilName||TR.abil; return ['ember',S(`And the ${nm} is yours now. Not just in here. Everywhere.`,`The ${nm} is yours now. Everywhere!`)]; }
+function trialKeepLine(id,TR){ const nm=TR.abilName||TR.abil, own=STORY['trial_'+id+'_keep']; if(Array.isArray(own)) return own; return [['ember',S(`And the ${nm} is yours now. Not just in here. Everywhere.`,`The ${nm} is yours now. Everywhere!`)]]; }
 // walking out of a place that lent a gift it has not finished: say why the gift stays behind
 { const base=exitArea; exitArea=function(){
     const A=AREA, r=A&&A.def?dunRoot(A.def.id):null, out=base.apply(this,arguments);
@@ -607,6 +608,15 @@ function areaObjHit(x,y,r,src){
 window.__ebX=Object.assign(window.__ebX||{},{TRIALS,trialOpen,trialDone,areaObjHit,trialFall,trialSwitchOn,tCell,tGround,tWet,tHole,
   tri(){ return AREA&&AREA.tri; },
   // (v12 TRIALS) the gift loans: hasAbil as the game sees it, the loans, and a save right now
+  dunMap:aid=>{ const M=CAVEMAP[aid]; if(!M) return null; const rooms={};
+    for(const k in M.rooms){ const R=M.rooms[k], pay=[];
+      if(R.kind==='shrine') pay.push('gift shrine'); if(R.kind==='reward') pay.push('altar');
+      for(const L of R.loot||[]) pay.push(String(L)); if(R.big) pay.push('great chest: '+R.big); if(R.reward==='key') pay.push('small key');
+      if(R.pick) pay.push('pickup: '+R.pick); if(R.npc) pay.push('person: '+R.npc); if(R.page) pay.push('page');
+      const gb=R.boss?R.boss[0]:R.c1boss||R.f2boss||R.m3boss||(R.boss2&&R.boss2.type)||(R.kind==='tboss'?'trial guardian':null); if(gb) pay.push('guardian: '+gb);
+      if(R.sealChest) pay.push('(sealed until won)');
+      rooms[k]={kind:R.kind,pay}; }
+    return {rooms,links:M.links.map(L=>[L[0],L[1],String(L[2])])}; },
   hasAbilT:id=>hasAbil(id), dunRooms:id=>{ const D=DUNGEONS[id], fl=(D&&D.floorIds)||[id], out=[]; for(const aid of fl){ const M=CAVEMAP[aid]; if(M) for(const k in M.rooms) out.push([aid,k,M.rooms[k].kind]); } return out; }, lends:()=>Object.fromEntries(Object.entries(G.flags||{}).filter(([k])=>k.slice(0,6)==='tlend_')), lendable, trialLendRoot, saveNow:()=>saveGame(true),
   roomsOf:()=>AREA&&AREA.rooms?Object.fromEntries(Object.entries(AREA.rooms).map(([k,R])=>[k,{kind:R.kind,solved:!!R.solved,boss:R.boss?R.boss[0]:null,foes:R.enemies.filter(e=>!e.dead).length,cx:Math.round(R.cx),cy:Math.round(R.cy)}])):null,
   trialTp(room,dx,dy){ const R=AREA.rooms[room]; player.x=R.cx+(dx||0); player.y=R.cy+(dy||0); updateCam(0,true); },
