@@ -18,14 +18,23 @@ function drawHUD(){
   ctx.font=`700 9px ${UIF}`; ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.fillText(`${Math.ceil(Math.max(0,p.hp))} / ${p.maxHp}`,bx+6,y+6); y+=16;
   bar(bx,y,bw,6,p.stamina/p.maxStamina,p.stamina<p.maxStamina*0.25?'#a8a040':'#7cc456','rgba(30,40,20,.9)'); y+=10;
   bar(bx,y,bw*0.8,5,p.energy/p.maxEnergy,p.exhausted?'#7c5530':'#f0a030','rgba(60,34,10,.9)'); y+=11;
-  for(let i=0;i<p.potionsMax;i++) flask(bx+5+i*13,y+1,i<p.potions);
-  HUD_HITS.push({x:bx-6,y:y-12,w:p.potionsMax*13+10,h:26,fn:()=>{ touch.pressed.drink=true; }}); // tap the flasks to drink
-  if(story){ const cx=bx+8+p.potionsMax*13+8; ctx.fillStyle='#ffd84a'; ctx.beginPath(); ctx.arc(cx,y+1,5,0,TAU); ctx.fill(); ctx.strokeStyle='#8a6a1a'; ctx.lineWidth=1.2; ctx.stroke(); ctx.font=`700 10px ${UIF}`; ctx.fillStyle='#ffe9a0'; ctx.textAlign='left'; ctx.fillText(String(G.coins||0),cx+8,y+1.5); }
+  // (v12) flasks: one each, or (past 10, or when the row would run into the quick slot) one flask and "x12"
+  let fw=p.potionsMax*13;
+  { ctx.font=`700 10px ${UIF}`; const room=story?(L+pw-26)-43-bx-ctx.measureText(String(G.coins||0)).width:(L+pw-26)-20-bx;
+    if(p.potionsMax>10||fw>room){
+      flask(bx+5,y+1,p.potions>0); ctx.textAlign='left'; ctx.font=`800 10.5px ${UIF}`; ctx.fillStyle=p.potions>0?'#c8f6d6':'rgba(255,255,255,.5)';
+      const t1='×'+p.potions; ctx.fillText(t1,bx+12,y+1.5); let w1=ctx.measureText(t1).width;
+      if(p.potions<p.potionsMax){ ctx.font=`600 9px ${UIF}`; ctx.fillStyle='rgba(235,230,220,.6)'; const t2='/'+p.potionsMax; ctx.fillText(t2,bx+13+w1,y+2); w1+=ctx.measureText(t2).width+1; }
+      fw=Math.ceil(12+w1);
+    } else for(let i=0;i<p.potionsMax;i++) flask(bx+5+i*13,y+1,i<p.potions); }
+  HUD_HITS.push({x:bx-6,y:y-12,w:fw+10,h:26,fn:()=>{ touch.pressed.drink=true; }}); // tap the flasks to drink
+  if(story){ const cx=bx+8+fw+8; ctx.fillStyle='#ffd84a'; ctx.beginPath(); ctx.arc(cx,y+1,5,0,TAU); ctx.fill(); ctx.strokeStyle='#8a6a1a'; ctx.lineWidth=1.2; ctx.stroke(); ctx.font=`700 10px ${UIF}`; ctx.fillStyle='#ffe9a0'; ctx.textAlign='left'; ctx.fillText(String(G.coins||0),cx+8,y+1.5); }
   const rx=L+pw-26, ry=T+(story?42:36), R=16, full=p.roar>=100;
   if(full){ ctx.save(); ctx.globalCompositeOperation='lighter'; const g=ctx.createRadialGradient(rx,ry,0,rx,ry,30); g.addColorStop(0,'rgba(255,170,70,.4)'); g.addColorStop(1,'rgba(255,120,40,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(rx,ry,30,0,TAU); ctx.fill(); ctx.restore(); }
   ctx.lineWidth=4; ctx.strokeStyle='rgba(50,22,12,.95)'; ctx.beginPath(); ctx.arc(rx,ry,R,0,TAU); ctx.stroke();
   ctx.strokeStyle=full?`rgb(255,${200+Math.sin(G.time*10)*40|0},90)`:'#e07a34'; ctx.beginPath(); ctx.arc(rx,ry,R,-Math.PI/2,-Math.PI/2+TAU*clamp(p.roar/100,0,1)); ctx.stroke();
   ctx.textAlign='center'; ctx.font=`800 8px ${TF}`; ctx.fillStyle=full?'#ffe08a':'#b8967a'; ctx.fillText('ROAR',rx,ry); if(full&&!usingTouch){ ctx.font=`800 8px ${UIF}`; ctx.fillText(btnLabel('roar'),rx,ry+9); }
+  if(story) drawQuickChip(rx,ry+31);   // (v12) the quick slot under the ROAR ring
   // quest tracker / wave info
   let qy=T+(story?92:80); TRACK_R=null;
   const obj=questObjective(), fo=story?focusObjective():null;
@@ -91,6 +100,7 @@ function drawHUD(){
   }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story){ lvQueue(); drawSkillHud(); }
+  if(story){ drawBoosts(L,T,pw); drawQuickNotes(); }   // (v12) boosts and the quick slot's notes
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   // prompt: (v11 polish) drawn after the speech bubbles (drawCompHud draws them), so it is always on top
   if(G.prompt&&scene==='play'){
@@ -277,6 +287,93 @@ function hintTextRaw(){
   if(L) return `Arrow keys move · Right Shift sprint · Click or Enter attack, and talk or open when no foe is near · Right click or ' fire · Right Ctrl roll${jump?' · / jump':''} · . drink · ; roar · L log · M map`;
   if(settings.mouseAim) return `WASD move · Shift sprint · Mouse aim · Left click slash, or talk and open when no foe is near · Right click fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · ${K('map')} map`;
   return `WASD move, Ash faces the way he walks · Shift sprint · Click or J attack, and talk or open when no foe is near · Right click or K fire · ${K('roll')} roll${jump?` · ${K('jump')} jump`:''} · ${K('drink')} drink · ${K('use')} use · L log · ${K('map')} map`;
+}
+// ---------- (v12 wave 7, UI) the quick slot, the boost icons and the notes next to them (drawn from drawHUD)
+// The quick slot is a 22 px chip right under the ROAR ring with the item and how many are left (dim when empty). A
+// click or tap on it (44 x 44), V (Numpad 5 on the left-handed keyboard) or d-pad left uses it. qslotRect() is that hit
+// area, so the touch buttons (BUTTONS) can keep off it. The item rules are e11_items.js (ITM in a12b_ui.js calls them).
+const QSL={g:null,last:null,pulseT:-9,note:'',noteT:-9,tipT:-9,tipName:''};
+function qslotCenter(){ const L=SAFE.l+14, T=SAFE.t+14, pw=Math.min(250,MINI_R().x-L-10); return {x:L+pw-26,y:T+42+31}; }
+function qslotRect(){ if(!G||G.mode!=='story') return null; const c=qslotCenter(); return {x:c.x-22,y:c.y-22,w:44,h:44}; }
+function qslNote(t){ QSL.note=simplify(String(t||'')); QSL.noteT=G.time; try{ SFX.play('warn',0.45); }catch(e){} }
+function quickUse(){
+  if(!G||!player||scene!=='play'||player.dead) return false;
+  if(G.mode!=='story'){ qslNote(S('No items in the Arena','No items here')); return false; }
+  const id=ITM.quick();
+  if(!id||!(ITM.count(id)>0)){ qslNote(id?S('None left. Shops sell more.','None left'):S('Nothing here yet. Star something in the Satchel.','Star something in the Satchel first')); return false; }
+  const r=ITM.can(id);
+  if(r!==true){ qslNote(typeof r==='string'?r:S('Not right now','Not now')); return false; }
+  const ok=!!ITM.use(id); if(ok&&QSL.tipT>-9){ QSL.tipT=-9; G.flags.qtip=1; }
+  return ok;
+}
+function drawQuickChip(cx,cy){
+  const t=G.time, id=ITM.quick(), n=id?ITM.count(id):0, on=!!id&&n>0, r=11, sb=LOOK.sb;
+  if(QSL.g!==G){ QSL.g=G; QSL.last=id; QSL.pulseT=-9; QSL.note=''; QSL.tipT=-9; }
+  if(id!==QSL.last){ QSL.last=id; if(id){ QSL.pulseT=t; if(!G.flags.qtip&&tipOn('qslot')){ QSL.tipT=t; QSL.tipName=simplify(bagSplit(bagInfo(id).name)[0]); } } }
+  ctx.save(); ctx.textBaseline='middle'; ctx.textAlign='center';
+  if(!on) ctx.globalAlpha=0.55;
+  if(sb){ ctx.fillStyle='rgba(59,34,51,.55)'; ctx.beginPath(); ctx.arc(cx,cy+2,r+1,0,TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.fillStyle=on?'#fff3d6':'#d9c7a8'; ctx.fill(); ctx.lineWidth=2.4; ctx.strokeStyle=SBC.outline; ctx.stroke(); }
+  else { ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.fillStyle='rgba(10,8,6,.72)'; ctx.fill(); ctx.lineWidth=1.6; ctx.strokeStyle=on?'rgba(255,205,130,.9)':'rgba(255,220,180,.4)'; ctx.stroke(); }
+  if(id) drawItemIcon(ctx,id,cx,cy,on?17:15);
+  else { ctx.setLineDash([2,2.4]); ctx.lineWidth=1.2; ctx.strokeStyle=sb?'rgba(59,34,51,.7)':'rgba(255,230,200,.6)'; ctx.beginPath(); ctx.arc(cx,cy,r-4,0,TAU); ctx.stroke(); ctx.setLineDash([]); }
+  ctx.globalAlpha=1;
+  // how many are left
+  if(on){ ctx.font=`800 8px ${UIF}`; const s=String(n), w=Math.max(10,ctx.measureText(s).width+5), bx=cx+r-3, by=cy+r-3;
+    ctx.fillStyle=sb?'#e0782c':'#2a160c'; rr(bx-w/2,by-5,w,10,5); ctx.fill(); ctx.lineWidth=sb?1.6:1; ctx.strokeStyle=sb?SBC.outline:'rgba(255,205,130,.85)'; ctx.stroke();
+    ctx.fillStyle='#fff6e6'; ctx.fillText(s,bx,by+0.5); }
+  // the key or button that uses it (not on touch: the chip is the button there)
+  const dev=curDevice();
+  if(dev==='pad') drawPadGlyph(ctx,PB.LF,PAD.kind,cx-r,cy-r+1,5.5);
+  else if(dev!=='touch'){ const k=actKey('item'); ctx.font=`800 8px ${UIF}`; const w=Math.max(11,ctx.measureText(k).width+5);
+    ctx.fillStyle='rgba(20,12,6,.9)'; rr(cx-r-w/2+2,cy-r-3.5,w,11,3); ctx.fill(); ctx.fillStyle='#ffe0b0'; ctx.fillText(k,cx-r+2,cy-r+2); }
+  // a ring that pulses when something new goes in
+  const pk=t-QSL.pulseT;
+  if(pk>=0&&pk<2.6){ const a=1-pk/2.6, ph=(pk*1.6)%1; ctx.globalAlpha=a*(1-ph); ctx.strokeStyle='#ffd27a'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r+2+ph*7,0,TAU); ctx.stroke(); ctx.globalAlpha=1; }
+  ctx.restore();
+  HUD_HITS.push({x:cx-22,y:cy-22,w:44,h:44,fn:quickUse});
+}
+// the boosts running now: 18 px icons with a ring that drains, to the right of the vitals panel (on a narrow phone, under
+// the goal list instead); the last 3 seconds blink
+function drawBoosts(L,T,pw){
+  const B=ITM.buffs(); if(!B.length) return;
+  const sz=18, gap=6, x0=L+pw+8, room=MINI_R().x-8-x0, sb=LOOK.sb;
+  let x, y;
+  if(room>=B.length*(sz+gap)+4){ x=x0+sz/2+3; y=T+80-9; } else { x=L+sz/2+3; y=(TRACK_R?TRACK_R.y+TRACK_R.h:T+92)+sz/2+4; }
+  ctx.save();
+  for(const b of B){
+    const k=clamp(b.total>0?b.left/b.total:0,0,1), blink=b.left<3&&Math.sin(G.time*14)<0;
+    ctx.globalAlpha=blink?0.45:1;
+    ctx.beginPath(); ctx.arc(x,y,sz/2,0,TAU); ctx.fillStyle=sb?'#fff3d6':'rgba(10,8,6,.72)'; ctx.fill();
+    ctx.lineWidth=sb?2.2:1.2; ctx.strokeStyle=sb?SBC.outline:'rgba(255,220,180,.35)'; ctx.stroke();
+    drawItemIcon(ctx,b.id||b.icon,x,y,13);
+    ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.strokeStyle=sb?'#e0782c':'#ffc35a'; ctx.beginPath(); ctx.arc(x,y,sz/2+2.2,-Math.PI/2,-Math.PI/2+TAU*k); ctx.stroke(); ctx.lineCap='butt';
+    x+=sz+gap;
+  }
+  ctx.restore();
+}
+// a short note next to the chip: why it did not work, or (once per journey) how to use the first thing that goes in
+function drawQuickNotes(){
+  const t=G.time, c=qslotCenter(); let text='', a=0;
+  if(QSL.note&&t-QSL.noteT<2.2){ text=QSL.note; a=clamp(Math.min((t-QSL.noteT)/0.15,(2.2-(t-QSL.noteT))/0.3),0,1); }
+  else if(QSL.tipT>-9&&scene==='play'){
+    const e=t-QSL.tipT; if(e>8){ QSL.tipT=-9; G.flags.qtip=1; }
+    else { const dev=curDevice(), nm=QSL.tipName||'it';
+      text=dev==='pad'?`${btnLabel('item')}: ${S('use your','use your')} ${nm}`:dev==='touch'?`${S('Tap here to use your','Tap here to use your')} ${nm}`:`${S('Press','Press')} ${actKey('item')} ${S('to use your','to use your')} ${nm}`;
+      text=simplify(text); a=clamp(Math.min(e/0.3,(8-e)/0.5),0,1); }
+  }
+  if(!text||a<=0.01) return;
+  const L=SAFE.l+14, pw=Math.min(250,MINI_R().x-L-10), sb=LOOK.sb;
+  ctx.save(); ctx.globalAlpha=a; ctx.font=`700 11.5px ${UIF}`; ctx.textBaseline='middle';
+  const w=Math.min(ctx.measureText(text).width+20,W-SAFE.l-SAFE.r-16), h=24, right=L+pw+8, room=MINI_R().x-8-right;
+  let x,y,side;
+  if(room>=w+8){ x=right+6; y=c.y-h/2; side='l'; } else { x=clamp(c.x+16-w,SAFE.l+6,W-SAFE.r-w-6); y=c.y+16; side='u'; }
+  ctx.fillStyle=sb?'#fff3d6':'rgba(22,11,7,.95)'; ctx.strokeStyle=sb?SBC.outline:'rgba(255,210,120,.9)'; ctx.lineWidth=sb?2.4:1.4;
+  ctx.beginPath(); if(side==='l'){ ctx.moveTo(x-7,c.y); ctx.lineTo(x+1,c.y-5); ctx.lineTo(x+1,c.y+5); } else { ctx.moveTo(c.x,y-7); ctx.lineTo(c.x-5,y+1); ctx.lineTo(c.x+5,y+1); } ctx.closePath(); ctx.fill(); ctx.stroke();
+  rr(x,y,w,h,h/2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); if(side==='l'){ ctx.moveTo(x+1.5,c.y-4); ctx.lineTo(x+1.5,c.y+4); } else { ctx.moveTo(c.x-4,y+1.5); ctx.lineTo(c.x+4,y+1.5); } ctx.strokeStyle=sb?'#fff3d6':'rgba(22,11,7,1)'; ctx.lineWidth=3; ctx.stroke();
+  ctx.fillStyle=sb?SBC.outline:'#ffe6c0'; ctx.textAlign='center'; ctx.fillText(text,x+w/2,y+h/2+0.5,w-14);
+  ctx.restore();
 }
 // ---------- (v11 polish) the controls coach: one short line at a time, each control when it becomes useful (move and
 // talk first, attack and roll once the sword is in hand, roll away in the first fight, drink when hurt, the map later).

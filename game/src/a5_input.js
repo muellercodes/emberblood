@@ -323,6 +323,7 @@ function onKey(e){
     else if(c==='KeyT'&&G.mode==='story') cycleFocus();
     else if(c==='KeyU'&&G.mode==='story') openSkills();
     else if(c==='KeyL'&&!e.repeat) openLog();
+    else if((c==='KeyV'||c==='Numpad5')&&!e.repeat) quickUse();   // (v12) the item in the quick slot (a11b_hud.js)
     if((c==='KeyJ'||c==='KeyK'||c==='Enter'||c==='Quote')&&!usingTouch) aimMode='keys';
   }else if(scene==='map'){
     if(c==='Escape'||c==='KeyM'||c==='Tab'){ e.preventDefault(); closeMap(); }

@@ -127,6 +127,36 @@ input{-webkit-user-select:text;user-select:text}
 .ppl{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .ppl div{background:rgba(0,0,0,.22);border-radius:9px;padding:8px 10px}
 .ppl b{color:var(--ink)} .ppl .hz{color:#ff8aa0;letter-spacing:2px} .ppl small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.bagtop{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:0 0 4px}
+.bagcoin{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--ink);white-space:nowrap}
+.bagcoin i{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 36% 34%,#fff6b8 0,#ffd84a 46%,#c8921a 100%);box-shadow:0 0 0 1.5px #8a6a1a}
+.bagq{display:flex;align-items:center;gap:8px;flex:1 1 240px;min-width:0;font-size:13px;line-height:1.35;color:var(--muted)}
+.bagq b{color:var(--ink)} .bagq canvas{flex:none} .bagq .pg{font-size:.95em}
+.bqe svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;opacity:.7}
+.bag{display:flex;flex-direction:column;gap:8px}
+.bi{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:4px 12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,140,70,.15);border-radius:12px;padding:8px 10px}
+.bi canvas{display:block;margin:auto}
+.bi .bt{min-width:0;line-height:1.35}
+.bi .bt b{color:var(--ink)}
+.bi .bn{display:inline-block;margin-left:8px;color:var(--gold);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bi .bt small{display:block;color:var(--muted);font-size:13px;margin-top:1px}
+.bi .bt small.why{color:#ffb08a;font-weight:600}
+.bi .bt small.for{color:#9fd8ea}
+.bi .bb{display:flex;gap:6px;align-items:center}
+.bi .bb .btn{width:auto;min-width:64px;min-height:44px;padding:8px 14px;font-size:15px}
+.bi .bb .bstar{min-width:46px;padding:6px 8px;display:flex;align-items:center;justify-content:center}
+.bstar svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.bstar.on svg{fill:#ffd84a;stroke:#8a5a1a}
+.bi .btn.off{opacity:.55;filter:saturate(.25);cursor:not-allowed}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.bgrid .bi{grid-template-columns:44px minmax(0,1fr) auto;padding:7px 9px}
+.bgrid .bi .bt{font-size:13.5px}
+.bgrid .bi .bt small{font-size:12px}
+.bi.shake{animation:bshake .32s}
+@keyframes bshake{0%,100%{transform:none}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+@media (max-width:480px){.bi{gap:6px 10px;padding:8px}.bag .bi{grid-template-columns:44px minmax(0,1fr)}.bag .bi canvas{grid-row:1/span 2}.bag .bi .bb{grid-column:2}.bi .bb .btn{min-width:64px;padding:8px 12px}.bgrid{grid-template-columns:1fr 1fr}.bgrid .bi{grid-template-columns:1fr;justify-items:center;text-align:center;padding:8px 6px}.bgrid .bi .bn{margin-left:4px}.bgrid .bi.hat .bb{justify-content:center}}
+@media (prefers-reduced-motion:reduce){.bi.shake{animation:none}}
+@media (max-height:500px){.bi{padding:5px 9px}.bagtop{margin:0}.bi .bb .btn{min-height:42px}}
 .opt.seen{opacity:.72}
 .opt .tag{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(255,200,120,.14);color:#f0cf98;font-weight:700;vertical-align:2px}
 .opt.t-kind .k{color:#9fe0a0} .opt.t-brave .k{color:#ffb070} .opt.t-silly .k{color:#d0a0ff}
@@ -181,6 +211,15 @@ html.sb .jq .qt,html.sb .slot .sh,html.sb .ppl b,html.sb .journal .jq{color:#3b2
 html.sb .jq .qs{color:#1f6a8a}
 html.sb .jq .row .btn{padding:5px 10px}
 html.sb .ppl .hz{color:#e04870}
+html.sb .bi{background:rgba(255,231,182,.7);border:2px solid rgba(59,34,51,.2);color:#6a4a52}
+html.sb .bi .bt b,html.sb .bagq b,html.sb .bagcoin{color:#3b2233}
+html.sb .bi .bn{color:#c8542a}
+html.sb .bi .bt small.why{color:#b8402a}
+html.sb .bi .bt small.for{color:#1f6a8a}
+html.sb .bi .bb .btn{padding:6px 12px}
+html.sb .bi .bb .bstar{padding:5px 8px}
+html.sb .bstar.on svg{fill:#ffd84a;stroke:#3b2233}
+html.sb .bagcoin i{box-shadow:0 0 0 2px #3b2233}
 html.sb .fld input{background:#fffaf0;color:#3b2233;border:2px solid #3b2233}
 html.sb .err{color:#c8402a!important}
 html.sb .lb li{border-bottom:2px dashed rgba(59,34,51,.14)}
@@ -282,6 +321,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>X / Z</kbd><span>Next or previous weapon</span>
               <kbd>1 to 6</kbd><span>Pick a weapon</span>
               <kbd>G</kbd><span>Call your companion</span>
+              <kbd>V</kbd><span>Use the item in your quick slot (under the ROAR ring). Star an item in the Satchel to put it there.</span>
               <kbd>U</kbd><span>Skills</span>
               <kbd>M / Tab</kbd><span>World map and fast travel</span>
               <kbd>I</kbd><span>Journal</span>
@@ -313,6 +353,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>\</kbd><span>Talk, open, rest at a shrine. It never swings.</span>
               <kbd>] / [</kbd><span>Next or previous weapon</span>
               <kbd>,</kbd><span>Call your companion</span>
+              <kbd>Num 5</kbd><span>Use the item in your quick slot (under the ROAR ring). V works too.</span>
               <kbd>U</kbd><span>Skills</span>
               <kbd>M</kbd><span>World map and fast travel</span>
               <kbd>I</kbd><span>Journal</span>
@@ -321,7 +362,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>N</kbd><span>Sound on or off</span>
               <kbd>P / Esc</kbd><span>Pause</span>
             </div>
-            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
+            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks, <b>5</b> uses your quick-slot item and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
           </div>
         </div>
       </section>
