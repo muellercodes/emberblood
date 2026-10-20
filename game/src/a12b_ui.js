@@ -662,30 +662,30 @@ function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
   try{ mapZUI(); }catch(e){}   // (v12) the zoom buttons hide on the dungeon page
-  if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); return; } MAPUI.view=curMap(); }   // the dungeon page
+  if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); try{ mapLegSync(); }catch(e){} return; } MAPUI.view=curMap(); }   // the dungeon page
   const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
   // (v12) the canvas fills the map frame now: around the whole map it is the frame's own colour, as it was
   g.setTransform(1,0,0,1,0,0); g.fillStyle=LOOK.sb?'#e9d6ac':'#0e0a08'; g.fillRect(0,0,w,h);
-  if(O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,MF.ox,MF.oy,MF.w,MF.h); }
-  const fcv=fogCanvas(V), fcg=fcv.getContext('2d'), img=fcg.createImageData(FG.w,FG.h);
-  for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
-  fcg.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(fcv,MF.ox,MF.oy,FG.w*FG.cs*MF.s,FG.h*FG.cs*MF.s);
-  const seen=(x,y)=>fogSeen(V,x,y);
+  // (v12) the ground, sharp at any zoom, and the fog with a smooth edge (e1_maps.js mapHdGround)
+  try{ mapHdGround(g,V,MF); }catch(e){ console.error(e); mapOldFog(g,V,MF,true); }
+  const seen=(x,y)=>fogSeen(V,x,y), leg=mapLeg;
   g.textAlign='center'; g.textBaseline='middle';
   if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(Math.max(0,MF.ox),wy); g.lineTo(Math.min(w,MF.ox+MF.w),wy); g.stroke(); }
   for(const k in POI){ const p=POI[k]; if(!on(p)||!seen(p.x,p.y)) continue; const [x,y]=mapXY(p.x,p.y); g.font='700 21px Cinzel, Georgia, serif'; g.lineWidth=5; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(p.name,x,y-22); g.fillStyle='#f2e2c4'; g.fillText(p.name,x,y-22); g.fillStyle='#e8d0a0'; g.beginPath(); g.arc(x,y,6,0,TAU); g.fill(); }
-  for(const c of mapList(CAMPS,V)){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
-  for(const s of mapList(SHRINES,V)){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
-  for(const o of objectiveList()){ if(o.x==null||!on(o)) continue; const [x,y]=mapXY(o.x,o.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#ffb547'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.fillRect(-11,-11,22,22); g.strokeRect(-11,-11,22,22); g.restore(); }
-  for(const q of questTargets()){ if(!on(q)) continue; const [x,y]=mapXY(q.x,q.y); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#7fe0ff'; g.strokeStyle='#08303a'; g.lineWidth=3; g.fillRect(-8,-8,16,16); g.strokeRect(-8,-8,16,16); g.restore(); }
+  for(const c of mapList(CAMPS,V)){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); leg('camp'); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
+  for(const s of mapList(SHRINES,V)){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); leg(found?'shrine':'shrine0'); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
+  for(const o of objectiveList()){ if(o.x==null||!on(o)) continue; const [x,y]=mapXY(o.x,o.y); leg('quest'); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#ffb547'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.fillRect(-11,-11,22,22); g.strokeRect(-11,-11,22,22); g.restore(); }
+  for(const q of questTargets()){ if(!on(q)) continue; const [x,y]=mapXY(q.x,q.y); leg('side'); g.save(); g.translate(x,y); g.rotate(Math.PI/4); g.fillStyle='#7fe0ff'; g.strokeStyle='#08303a'; g.lineWidth=3; g.fillRect(-8,-8,16,16); g.strokeRect(-8,-8,16,16); g.restore(); }
   const jm=!!G.items.juniper_map;
   for(const m of mapList(CAVEMOUTHS,V)){ if(!jm&&!seen(m.x,m.y)) continue; const [x,y]=mapXY(m.x,m.y); g.fillStyle='#120c08'; g.strokeStyle='#e8d0a0'; g.lineWidth=2.5; g.beginPath(); g.arc(x,y,10,Math.PI,TAU); g.lineTo(x+10,y+6); g.lineTo(x-10,y+6); g.closePath(); g.fill(); g.stroke(); if(G.found['seen_'+m.area]||jm){ g.font='600 15px Rubik, system-ui, sans-serif'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(m.name,x,y+22); g.fillStyle='#e8d8c0'; g.fillText(m.name,x,y+22); } }
   for(const o of mapList(LANDMARKS,V)){ if(o.k==='pot'||o.k==='crossing'||o.k==='barrel'||o.k==='fishspot'||o.k==='sign'||o.k==='frostberry'||o.k==='beehive'||(o.hidden&&o.hidden())) continue; if(!jm&&!seen(o.x,o.y)) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle=o.k==='xmark'?'#ff5a3a':'#d8c8f0'; g.beginPath(); g.arc(x,y,o.k==='xmark'?7:4.5,0,TAU); g.fill(); }
   for(const c of crossingsOn(V)){ if((c.hidden&&c.hidden())||!seen(c.x,c.y)) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=2.5; g.beginPath(); g.moveTo(x-8,y-6); g.lineTo(x+6,y-6); g.lineTo(x+11,y-1); g.lineTo(x+6,y+4); g.lineTo(x-8,y+4); g.closePath(); g.fill(); g.stroke(); g.font='600 15px Rubik, system-ui, sans-serif'; g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.75)'; const nm=simplify(c.name||c.label||''); g.strokeText(nm,x,y+20); g.fillStyle='#ffe2a8'; g.fillText(nm,x,y+20); }
   if(G.flags.chart) for(const o of mapList(ORES,V)){ if(G.ores[o.id]) continue; const [x,y]=mapXY(o.x,o.y); g.fillStyle='#7ab8ff'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+7,y); g.lineTo(x,y+9); g.lineTo(x-7,y); g.closePath(); g.fill(); }
-  for(const id in WARDS){ if(!on(WARDS[id])||!seen(WARDS[id].x,WARDS[id].y)) continue; const [x,y]=mapXY(WARDS[id].x,WARDS[id].y); g.fillStyle=G.wards[id]?'#ffcf6a':'#7a8aa8'; g.strokeStyle='#1a1008'; g.lineWidth=2; g.beginPath(); for(let i=0;i<6;i++){ const a=i/6*TAU+Math.PI/6; i?g.lineTo(x+Math.cos(a)*9,y+Math.sin(a)*9):g.moveTo(x+Math.cos(a)*9,y+Math.sin(a)*9); } g.closePath(); g.fill(); g.stroke(); }
+  // (v12) the Wards are marked once Yara has told Ash what they are (before that they are only old warm stones)
+  if(reached('hollow')) for(const id in WARDS){ if(!on(WARDS[id])||!seen(WARDS[id].x,WARDS[id].y)) continue; const [x,y]=mapXY(WARDS[id].x,WARDS[id].y); leg(G.wards[id]?'ward1':'ward0'); g.fillStyle=G.wards[id]?'#ffcf6a':'#7a8aa8'; g.strokeStyle='#1a1008'; g.lineWidth=2; g.beginPath(); for(let i=0;i<6;i++){ const a=i/6*TAU+Math.PI/6; i?g.lineTo(x+Math.cos(a)*9,y+Math.sin(a)*9):g.moveTo(x+Math.cos(a)*9,y+Math.sin(a)*9); } g.closePath(); g.fill(); g.stroke(); }
   const pp=AREA&&G.ow?G.ow:player; if(curMap()===V){ const [px,py]=mapXY(pp.x,pp.y); g.save(); g.translate(px,py); g.rotate(player.facing); g.fillStyle='#ffd27a'; g.strokeStyle='#2a1606'; g.lineWidth=3; g.beginPath(); g.moveTo(17,0); g.lineTo(-11,-11); g.lineTo(-5,0); g.lineTo(-11,11); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   g.font='600 20px Rubik, system-ui, sans-serif'; g.fillStyle='rgba(240,225,200,.7)'; g.textAlign='left'; g.fillText('N ↑',16,22);
+  try{ mapLegSync(); }catch(e){}
 }
 mapCv.addEventListener('click',e=>{
   if(scene!=='map') return;
