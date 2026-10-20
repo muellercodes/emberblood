@@ -110,6 +110,7 @@ function render(){
   drawLights();
   if(D3.on) depthPost();
   setWorld(); drawTexts();
+  if(inA&&AREA.rooms) drawRoomMask();   // (v12 ROOMS) only Ash's room is lit; rooms he knows show dimmed (a2f_caves.js)
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(!inA){ drawRain(); drawSnowMist(); }
   drawVignette();
@@ -202,7 +203,7 @@ function drawLights(){
   const lw=lightCvs.width, lh=lightCvs.height, s=zoom*0.5, t=G.time;
   const lightList=[];
   const src=inA?AREA.lights:mapList(LIGHTS,curMap());
-  for(const L of src){ if(L.night&&dl>0.6) continue; if(L.i<=0.01) continue; if(!inView(L.x,L.y,L.r)) continue; const fl=L.fire?1+0.06*Math.sin(t*9+L.x)+0.04*Math.sin(t*23+L.y):1; if(L.shrine&&!G.shrines[L.shrine.id]) continue; lightList.push([L.x,L.y,L.r*fl,L.i,L.fire]); }
+  for(const L of src){ if(L.night&&dl>0.6) continue; if(L.i<=0.01) continue; if(!inView(L.x,L.y,L.r)) continue; if(inA&&AREA.rooms&&!roomLightOn(L)) continue; const fl=L.fire?1+0.06*Math.sin(t*9+L.x)+0.04*Math.sin(t*23+L.y):1; if(L.shrine&&!G.shrines[L.shrine.id]) continue; lightList.push([L.x,L.y,L.r*fl,L.i,L.fire]); }
   if(dk>0.02){
     lctx.setTransform(1,0,0,1,0,0); lctx.globalCompositeOperation='source-over'; lctx.clearRect(0,0,lw,lh);
     lctx.fillStyle=LOOK.sb?`rgba(${lookDarkCol(inA)},${dk})`:`rgba(3,4,10,${dk})`; lctx.fillRect(0,0,lw,lh);

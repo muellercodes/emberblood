@@ -460,6 +460,7 @@ const camLead={x:0,y:0};
 function updateCam(dt,snap){
   if(!player) return;
   moveZoom(dt);   // zooms out a little while Ash flies (a6c_moves.js)
+  roomZoom(dt,snap);   // (v12 ROOMS) and a little in a cave room that then fits on the screen (a2f_caves.js)
   const vw=W/zoom, vh=H/zoom;
   let fx=player.x, fy=player.y;
   const b=G&&G.boss;
@@ -469,8 +470,13 @@ function updateCam(dt,snap){
   if(aimMode==='mouse'&&!usingTouch&&scene==='play'&&(settings.mouseAim||padActive())){ const w=toWorld(mouse.x,mouse.y); fx+=clamp((w.x-player.x)*0.12,-60,60); fy+=clamp((w.y-player.y)*0.12,-60,60); }
   else if(!snap){ const mv=scene==='play'&&player.moving&&!usingTouch, k=1-Math.exp(-dt*2.2); camLead.x+=((mv?Math.cos(player.facing)*34:0)-camLead.x)*k; camLead.y+=((mv?Math.sin(player.facing)*24:0)-camLead.y)*k; fx+=camLead.x; fy+=camLead.y; }
   const CM=mapOfY(fy); let tx=clamp(fx-vw/2,-200,CM.w-vw+200), ty=clamp(fy-vh/2,CM.y0-200,CM.y0+CM.h-vh+200);
-  if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
+  // (v12 ROOMS) in caves and dungeons the camera frames the room Ash is in (a2f_caves.js roomCam), with a quick slide
+  // when he walks through a doorway; Ash's own spot and the boss lean steer it only inside a room bigger than the view
+  const rc=AREA&&AREA.rooms&&typeof roomCam==='function'?roomCam(fx,fy,vw,vh):null;
+  if(rc){ tx=rc.x; ty=rc.y; }
+  else if(AREA){ const aw=AREA.x1-AREA.x0, ah=AREA.y1-AREA.y0; tx=aw<vw?AREA.x0+aw/2-vw/2:clamp(fx-vw/2,AREA.x0-60,AREA.x1-vw+60); ty=ah<vh?AREA.y0+ah/2-vh/2:clamp(fy-vh/2,AREA.y0-60,AREA.y1-vh+60); }
   if(snap){ cam.x=tx; cam.y=ty; return; }
+  if(rc&&rc.slide){ RMV.slideT-=dt; const k=1-Math.exp(-dt*9); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k; return; }
   const k=1-Math.exp(-dt*6); cam.x+=(tx-cam.x)*k; cam.y+=(ty-cam.y)*k;
 }
 function inView(x,y,m){ return x>cam.x-m&&y>cam.y-m&&x<cam.x+W/zoom+m&&y<cam.y+H/zoom+m; }
