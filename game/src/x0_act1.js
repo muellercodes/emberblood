@@ -58,28 +58,30 @@ STORY.a1_crag_up=[
 STORY.a1_crag_how=[
   xl('narr',`A warm draft puffs out of a crack at the foot of the spire, smelling of drakeling smoke and toast.`,`A warm wind puffs up from a crack.`),
   xl('narr',`Too high to fly up from the ground. But stand in the warm air, jump, spread your wings, and the draft will carry you higher.`,`Stand in the warm air. Jump and fly. The wind lifts you up!`)];
-STORY.ward_crag.unshift(xl('oriel',`You flew! The drakes carried my Ward-fire up here when the Oath came. They kept it warm in a nest. Drakes are very good at keeping things warm.`,`You flew! The drakes kept my fire warm in a nest.`));
+STORY.ward_crag.unshift(xl('stone',`You flew! The drakes carried my Ward-fire up here when the Oath came. They kept it warm in a nest. Drakes are very good at keeping things warm.`,`You flew! The drakes kept my fire warm in a nest.`));
 // 2.3 the Sunken Ward: the Gloam Swirl
 STORY.bosses.gloamjaw.outro.push(xl('narr',`The bog water still spins around the Ward's little island, round and round, like soup that won't stop being stirred.`,`The water spins around the Ward's island. Round and round.`));
 STORY.a1_swirl_thrown=[
   xl('narr',`WHOOSH. The swirl spins you around twice and spits you out on the bank. Even your tail feels dizzy.`,`WHOOSH! The swirl spins you and throws you out. Your tail is dizzy.`),
-  xl('sedge',`(a soggy voice from the island) Sorry! Sorry. It does that. You need to go faster than it can grab. Like a skipping stone.`,`(from the island) Sorry! Go faster than it can grab. Like a skipping stone.`),
+  xl('stone',`(a soggy voice from the island) Sorry! Sorry. It does that. You need to go faster than it can grab. Like a skipping stone.`,`(from the island) Sorry! Go faster than it can grab. Like a skipping stone.`),
   xl('ash',`Who skips? Who even skips stones that well?`,`Who skips stones that well?`),
-  xl('sedge',`The Fisk girl on the Brindlecross dock skips them eleven times. I can hear the plops from here. Everything travels in water.`,`Minnow Fisk, on the Brindlecross dock. She skips them eleven times!`)];
+  xl('stone',`The Fisk girl on the Brindlecross dock skips them eleven times. I can hear the plops from here. Everything travels in water.`,`Minnow Fisk, on the Brindlecross dock. She skips them eleven times!`)];
 STORY.a1_swirl_look=[
-  xl('narr',`The bog water spins round the Ward's island like a whirlpool in a bathtub. Walking in would get you thrown right back out.`,`The water spins like a whirlpool. Walk in and it throws you out.`),
+  xl('narr',`The bog water spins round the little island like a whirlpool in a bathtub. Walking in would get you thrown right back out.`,`The water spins like a whirlpool. Walk in and it throws you out.`),
   {who:'narr',text:S(`You skim now. Sprint across the water and the swirl is far too slow to grab you. Do not stop, and do not jump!`,`Run across the water! Don't stop. Don't jump!`),skipIf:()=>!hasAbil('skimmer')},
   {who:'narr',text:S(`Something that skims like a stone might get through. Minnow Fisk on the Brindlecross dock knows a lot about skipping.`,`Only a skimmer gets through. Ask Minnow on the Brindlecross dock.`),skipIf:()=>hasAbil('skimmer')||!hasAbil('stride')},
   {who:'narr',text:S(`You would need to stay on top of the water at all, first. Ember said her next door was out on Lake Mirrow.`,`You can't even stand on water. Ember's next door is on Lake Mirrow.`),skipIf:()=>hasAbil('stride')}];
-STORY.ward_mire.unshift(xl('sedge',`You skipped! Right over the swirl! Oh, I'm so dizzy for you. In a good way.`,`You skipped over the swirl! I'm dizzy for you!`));
+STORY.ward_mire.unshift(xl('stone',`You skipped! Right over the swirl! Oh, I'm so dizzy for you. In a good way.`,`You skipped over the swirl! I'm dizzy for you!`));
 // 2.4 the Frost Ward: Greymane's Ice (before the choice in his outro)
 STORY.bosses.greymane.outro.splice(1,0,xl('narr',`Behind Greymane, the Frost Ward is frozen solid inside a block of blue ice. Three cold lanterns glitter on tall ice pillars behind it.`,`The Frost Ward is frozen in ice. Three cold lanterns sit on ice pillars.`));
 STORY.a1_frost_ice=[
-  xl('tove',`(through the ice) Mmmf. Ash? It's Tove, the Frost Warden. I'm inside an ice cube. Every few hundred years, another ice cube.`,`(in the ice) Ash? It's Tove, the Frost Warden. I'm in an ice cube.`),
-  xl('tove',`The three lanterns on those ice pillars hold the frost. Light them and it melts. You can't get past their spikes. But an arrow can.`,`Light the three lanterns on the pillars. An arrow can reach them.`),
-  xl('tove',`A burning one, preferably. Breathe fire, then shoot through it. Ember used to do that to light the festival. Showing off.`,`A burning arrow! Breathe fire and shoot through it.`),
-  {who:'tove',text:S(`Ember's bow is in her Trial of the Tide, on the island in Lake Mirrow. Go on. I'll wait. I've had the practice.`,`No bow? It's in the Trial of the Tide, on Lake Mirrow. I'll wait.`),skipIf:()=>!!(G.weapons&&G.weapons.bow)},
-  {who:'tove',text:S(`Oh, and if your arrows are too slow, Ember's Wing-rang burns too, if you throw it through your fire. On a kind day. Today is a kind day.`,`A burning Wing-rang works too, today.`),skipIf:()=>!a1easy()||!(G.weapons&&G.weapons.boomerang)}];
+  {who:'narr',text:S(`A block of blue ice as big as a cart, around an old stone. Deep inside, something glows, very faintly. Three cold lanterns glitter on ice pillars behind it.`,`Blue ice around an old stone. Something glows inside. Three cold lanterns sit on pillars.`),skipIf:()=>reached('hollow')},
+  {who:'tove',text:S(`(through the ice) Mmmf. Ash? It's Tove, the Frost Warden. I'm inside an ice cube. Every few hundred years, another ice cube.`,`(in the ice) Ash? It's Tove, the Frost Warden. I'm in an ice cube.`),skipIf:()=>!reached('hollow')},
+  {who:'tove',text:S(`The three lanterns on those ice pillars hold the frost. Light them and it melts. You can't get past their spikes. But an arrow can.`,`Light the three lanterns on the pillars. An arrow can reach them.`),skipIf:()=>!reached('hollow')},
+  {who:'tove',text:S(`A burning one, preferably. Breathe fire, then shoot through it. Ember used to do that to light the festival. Showing off.`,`A burning arrow! Breathe fire and shoot through it.`),skipIf:()=>!reached('hollow')},
+  {who:'tove',text:S(`Ember's bow is in her Trial of the Tide, on the island in Lake Mirrow. Go on. I'll wait. I've had the practice.`,`No bow? It's in the Trial of the Tide, on Lake Mirrow. I'll wait.`),skipIf:()=>!reached('hollow')||!!(G.weapons&&G.weapons.bow)||!G.flags.trial_leap_boss},
+  {who:'tove',text:S(`Ember kept a bow behind one of her old doors. Find it. Go on. I'll wait. I've had the practice.`,`Ember's bow is behind one of her doors. I'll wait.`),skipIf:()=>!reached('hollow')||!!(G.weapons&&G.weapons.bow)||!!G.flags.trial_leap_boss},
+  {who:'tove',text:S(`Oh, and if your arrows are too slow, Ember's Wing-rang burns too, if you throw it through your fire. On a kind day. Today is a kind day.`,`A burning Wing-rang works too, today.`),skipIf:()=>!reached('hollow')||!a1easy()||!(G.weapons&&G.weapons.boomerang)}];
 STORY.a1_frost_melt=[
   xl('narr',`The third lantern catches. Three flames burn on their pillars, and the ice around the Ward cracks, groans, and slides off in one big wet SLUMP.`,`The third lantern lights! The ice cracks and slides off. SLUMP!`),
   xl('tove',`Free. And damp. Mostly free.`,`Free. And wet.`),
