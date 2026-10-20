@@ -314,6 +314,8 @@ html.sb #menu.ttl .diff{background:rgba(59,34,51,.5);box-shadow:none}
 html.sb #menu.ttl .note{color:#fff4dc}
 #menu.ttl .note:empty{display:none}
 #menu.ttl .row{gap:9px}
+/* with a controller in hand the pad's hint strip sits at the bottom of the screen (a5b_pad.js sets --padhint) */
+body.padnav.padhint #menu.ttl{padding-bottom:calc(max(10px,env(safe-area-inset-bottom,0px)) + var(--padhint,44px))}
 /* wide screens: the menu is a column on the left, the picture fills the rest */
 @media (min-aspect-ratio:6/5){
   #menu.ttl,html.sb #menu.ttl{padding-left:max(28px,4.5vw,env(safe-area-inset-left,0px))}
