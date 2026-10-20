@@ -4,7 +4,7 @@
 // chime plays and a "Cheats" section appears at the bottom of Settings for this session. Nothing shows before that,
 // and touch screens never see it. To change the word, change CHEAT_WORD (letters only, any length from 4 up).
 const CHEAT_WORD='emberlord';
-// The file name puts it in the build (build.mjs adds every game/src/v10_art*.js after e10c_gates). It wraps the
+// build.mjs loads it just before a12b_ui (ORDER). It wraps the
 // game's functions only once everything has loaded (chInit, a microtask after the script), so it sits outside every
 // other module's wrappers whatever the load order is.
 // Rules: every switch is for this session only (a reload turns them all off). Switches never write to the save; the

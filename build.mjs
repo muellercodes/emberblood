@@ -21,6 +21,8 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   // Finale, Nightfall Peak
   'x4_world','x4_foes','x4_story','x4_ascent',
   'x9_music','x9_music2',
+  // hidden cheats for Drew (wraps the game once everything has loaded)
+  'z1_cheats',
   'a12b_ui'];
 // the story checker (tools/check.mjs, rules 1 to 13) runs first: any FAIL stops the build (dist/check.md lists them).
 // EB_SKIP_CHECK=1 skips it for a local experiment only; a build that goes live never sets it.
