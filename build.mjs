@@ -11,7 +11,7 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   // v10: the story engine, the Case Book, the gate library (new art for story data, game/src/v10_art*.js, goes right after it)
   'e10_story','e10b_case','e10c_gates',
   // v9 powers and the Act I rework
-  'p2_coast','p3_frost','p4_moon','x0_act1','x0_vorlaxis',
+  'p2_coast','p3_frost','p4_moon','x0_act1','x0_vorlaxis','x0_prologue',
   // Act II, the Clockwork Coast
   'x1_world','x1_people','x1_foes','x1_story','x1_dun_a','x1_dun_b',
   // Act III, Frostreach

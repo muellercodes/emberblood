@@ -20,6 +20,15 @@ function startStory(fromSave){
   newRun('story'); clearStatic(); fogInit('');
   player.x=POI.village.x+60; player.y=POI.village.y+150; player.facing=-Math.PI/2;
   setupNPCs(); placeGoat();
+  G.hintT=30;
+  // (v12 PROLOGUE) a new journey opens on Lantern Eve, the night before (x0_prologue.js); it ends, or is skipped, by
+  // calling startMorning, so every way in still reaches the same morning
+  if(typeof proStart==='function'&&proStart()) return;
+  startMorning();
+}
+// the morning of Lantern Day: Ash asleep upstairs, Mom calling up the stairs (STORY.prologue), then the first chapter
+function startMorning(){
+  if(AREA) exitArea(true);
   wakeInBed();   // (v11) asleep upstairs at home; if the house is missing he starts on the street, as before
   updateCam(0,true); G.chunkBurst=16;
   G.hintT=30;
