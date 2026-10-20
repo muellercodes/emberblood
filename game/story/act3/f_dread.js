@@ -63,14 +63,14 @@ chapter({
     f_grumbo_intro: [
       ['narr', 'A huge white yeti with violet eyes thumps his chest. A small lunchbox is chained to his belt.', 'A huge yeti with purple eyes thumps his chest. He has a lunchbox.'],
       { if: { any: ['flag f_mumble_ally', 'quest f_mumble done'] }, then: [
-        ['f_mumble', '(peeking in, very quietly) (squeak) ...that\'s Grumbo. He took my lunch every day for ninety years.', '(squeak) That\'s Grumbo. He took my lunch for ninety years.'] ] },
-      ['f_grumbo', 'Grumbo SMASH! Grumbo smash... a little.', 'Grumbo SMASH! Grumbo smash a little.'],
+        ['f_mumble', '(peeking in, very quietly) (squeak) ...that\'s Grumbo. He took my lunch every day for ninety years.', '(squeak) That\'s Grumbo. He took my lunch for ninety years.', { mood: 'worried' }] ] },
+      ['f_grumbo', 'Grumbo SMASH! Grumbo smash... a little.', 'Grumbo SMASH! Grumbo smash a little.', { mood: 'angry' }],
     ],
     f_grumbo_won: [
-      ['f_grumbo', 'Okay okay okay! I give up! Mumble can have his lunch back!', 'Okay! I give up! Mumble can have his lunch back!'],
+      ['f_grumbo', 'Okay okay okay! I give up! Mumble can have his lunch back!', 'Okay! I give up! Mumble can have his lunch back!', { mood: 'scared' }],
       { if: { any: ['flag f_mumble_ally', 'quest f_mumble done'] }, then: [
-        ['f_mumble', '(squeak) Thank you.', '(squeak) Thank you.'],
-        ['f_grumbo', 'Sorry, Mumble. Sorry.', 'Sorry, Mumble.'] ] },
+        ['f_mumble', '(squeak) Thank you.', '(squeak) Thank you.', { mood: 'shy' }],
+        ['f_grumbo', 'Sorry, Mumble. Sorry.', 'Sorry, Mumble.', { mood: 'ashamed' }] ] },
     ],
     f_dread_dragons: [
       ['tove', 'Ice statues of old dragons, every one in chains. Don\'t wake the big ones. I mean it.', 'Old dragon statues. Don\'t wake the big ones.'],

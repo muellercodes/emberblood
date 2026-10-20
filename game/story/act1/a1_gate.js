@@ -153,7 +153,7 @@ quest({
 
   scene: {
     a1_griz_outro: [
-      ['griz', 'The Oath... paid in gold... and somebody in your village... opened the gate...', 'The Oath paid... someone in your village opened the gate...', { ref: 'north_gate' }],
+      ['griz', 'The Oath... paid in gold... and somebody in your village... opened the gate...', 'The Oath paid... someone in your village opened the gate...', { mood: 'hurt', ref: 'north_gate' }],
       ['ash', 'Somebody in Emberhollow? Who?', 'Someone from home? Who?'],
       ['voice', 'Little ember. I can smell her fire on you. My fire. Come up the mountain, child, and bring it home.', 'Little ember. You have my fire. Come up the mountain and bring it home.'],
       ['ash', '...Yara? Did you hear that?', 'Yara? Did you hear that?'],
@@ -162,10 +162,10 @@ quest({
     a1_morrow_outro: [
       ['voice', 'Morrow served me well. You will serve me better. Keep climbing, little ember.', 'Keep climbing, little ember.'],
       ['narr', 'A crumpled letter falls out of Morrow\'s sleeve: "To W. Leave the North Gate open on Lantern Day, and the oil will never run out."', 'A letter: "To W. Open the North Gate. Oil forever."', { ref: 'north_gate', do: ['give oath_letter'] }],
-      { choose: 'morrow', ask: ["Please. I'm an old man who believed a dragon. Isn't that punishment enough?", 'Please. I was silly. Let me go?'], pick: [
+      { choose: 'morrow', who: 'morrow', mood: 'ashamed', ask: ["Please. I'm an old man who believed a dragon. Isn't that punishment enough?", 'Please. I was silly. Let me go?'], pick: [
         { t: ['Let him go', 'Let him go'], tone: 'kind', v: 'free',
           say: [['ash', 'Go home, Morrow. Find something better to believe in.', 'Go home. Believe in something better.'],
-                ['morrow', 'Thank you. Maybe I will grow something that is not on fire.', 'Thank you. Maybe I will grow pumpkins.']] },
+                ['morrow', 'Thank you. Maybe I will grow something that is not on fire.', 'Thank you. Maybe I will grow pumpkins.', { mood: 'tender' }]] },
         { t: ['Take him to Captain Osric', 'Take him to Osric'], tone: 'brave', v: 'jail',
           say: [['ash', 'You are coming to Brindlecross. Captain Osric can decide.', 'Osric can decide.'],
                 ['narr', 'You march Morrow to the Watch House. Osric looks thrilled. Morrow looks relieved.', 'Osric is thrilled. Morrow is relieved.']] },

@@ -81,19 +81,19 @@ quest({
     c_saltbeard_intro: [
       ['narr', 'You set the bowl on the tilted deck. Somewhere in the dark, a chain goes clank. Clank. CLANK.', 'You set down the bowl. CLANK.'],
       ['narr', 'A huge pale pirate rises up through the deck, beard like sea foam, an anchor over his shoulder.', 'A huge ghost pirate rises up!'],
-      ['c_saltbeard', 'WHO DARES set food on MY deck without SAYING GRACE?', 'WHO puts food on MY deck?'],
+      ['c_saltbeard', 'WHO DARES set food on MY deck without SAYING GRACE?', 'WHO puts food on MY deck?', { mood: 'furious' }],
       ['ash', 'Um. Grace?'],
-      ['c_saltbeard', 'Too late! Fight me for it, landlubber! Winner gets the chowder!', 'Too late! Fight me for it!'],
+      ['c_saltbeard', 'Too late! Fight me for it, landlubber! Winner gets the chowder!', 'Too late! Fight me for it!', { mood: 'determined' }],
     ],
     // replaces STORY.c_saltbeard_won: right after a boss, so at most 6 lines (x1_people then gives c_chain and c_sock)
     c_saltbeard_won: [
       ['narr', 'Captain Saltbeard sits down on his own deck and slurps the chowder. He glows brighter with every spoonful.',
         'Saltbeard slurps the chowder. He glows.'],
-      ['c_saltbeard', 'Forty years I waited for this bowl. Worth it.', 'Forty years I waited! Worth it.'],
+      ['c_saltbeard', 'Forty years I waited for this bowl. Worth it.', 'Forty years I waited! Worth it.', { mood: 'peaceful' }],
       ['c_saltbeard', 'The night the clocks stopped, something flew over these rocks. Wings like a sky full of curtains. Even I hid.',
-        'A huge thing flew over that night. I hid!', { clue: 'q_ghost_saw' }],
+        'A huge thing flew over that night. I hid!', { mood: 'worried', clue: 'q_ghost_saw' }],
       ['c_saltbeard', 'Tell Elias sorry about the cards. And take my chain. Give it a better job than holding me down.',
-        'Tell Elias sorry. Take my chain.'],
+        'Tell Elias sorry. Take my chain.', { mood: 'tender' }],
       ['narr', "Then he's gone. There's only the tide, an empty bowl, and one very old sock.", 'He is gone. Just a bowl and an old sock.'],
     ],
     wp_elias: [

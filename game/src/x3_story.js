@@ -101,45 +101,156 @@ for(const [k,v] of [['m_mooncrumb',S('A crumb of the moon (silver, and still coo
 // portraits for the speakers that are not plain people (drawn on a 176 px card, centred, about 60 px each way)
 function m3sGlowG(g,x,y,r,col,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,`rgba(${col},${a})`); gr.addColorStop(1,`rgba(${col},0)`); g.fillStyle=gr; g.fillRect(x-r,y-r,r*2,r*2); }
 const m3sDot=(g,x,y,r)=>{ g.beginPath(); g.arc(x,y,r,0,TAU); };
+// (v12 FACES) the Act IV creatures and bosses show the line's mood (a12a_dlg's kit: pxPose, pxEye, pxBrows, pxMouth,
+// crWideMouth, crBeak, pxExtras); four that had no face get one (Lady Zapp, Big Fin, Prism, Great-grandma Greatshell)
+// Baron Puffington, the pufferfish who guards the Sunken Gate: he puffs up (spikes out) when he is cross or startled and
+// goes soft when he is sad; his moustache bristles or droops
+function m3sFacePuff(g){ const O='#2a1a0c', X=PX, n=X.n, puff=n==='angry'||n==='furious'||n==='surprised'||n==='scared'||n==='proud'?1.12:n==='sad'||n==='defeated'||n==='ashamed'?0.9:1;
+  g.save(); pxPose(g,{py:60}); pxAura(g,0,6,88); g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
+  g.fillStyle='#e8c040'; for(let i=0;i<14;i++){ const a=i/14*TAU, L=52+18*puff*puff; g.beginPath(); g.moveTo(Math.cos(a-0.12)*52,Math.sin(a-0.12)*48+6); g.lineTo(Math.cos(a)*L,Math.sin(a)*(L-6)+6); g.lineTo(Math.cos(a+0.12)*52,Math.sin(a+0.12)*48+6); g.closePath(); g.fill(); g.stroke(); }
+  g.fillStyle='#f0d058'; g.beginPath(); g.ellipse(0,6,56*puff,52*puff,0,0,TAU); g.fill(); g.stroke();
+  g.fillStyle='#fff6d0'; g.beginPath(); g.ellipse(0,24,38,26,0,0,TAU); g.fill();
+  g.fillStyle='#8a5a2a'; for(const [x,y,r] of [[-30,-18,6],[24,-26,5],[38,0,5],[-40,10,4],[10,-36,4]]){ m3sDot(g,x,y,r); g.fill(); }
+  for(const s of [-1,1]) pxEye(g,s*18,-10,s,{rx:11,ry:11,r:5.2,white:'#fff',iris:O,skin:'#f0d058',lash:O,ring:O});
+  pxBrows(g,{x:18,w:8,y:-25,col:'#8a5a2a',lw:3.6,arch:2.4,busy:true});
+  pxMouth(g,{y:26,w:8,c:5,col:O,lw:2.6,dark:'#8a2a24',tongue:'#e87a7a'});
+  const mt=X.m==='smile'||X.m==='laugh'||n==='proud'?-0.18:X.m==='frown'||X.m==='wobble'?0.25:n==='angry'||n==='furious'?-0.3:0;
+  g.fillStyle='#5a3418'; for(const s of [-1,1]){ g.save(); g.translate(0,12); g.rotate(s*mt); g.beginPath(); g.moveTo(0,-2); g.bezierCurveTo(s*18,-10,s*40,-4,s*54,-16); g.bezierCurveTo(s*44,4,s*20,6,0,4); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+  g.save(); g.translate(0,-44*puff); g.rotate(-(X.ear||0)*0.06); g.fillStyle='#1a2a4a'; g.beginPath(); g.moveTo(-22,0); g.lineTo(20,0); g.lineTo(12,-16); g.lineTo(-14,-16); g.closePath(); g.fill(); g.stroke(); g.fillStyle='#e0b84a'; g.fillRect(-5,-11,10,6); g.restore();
+  pxExtras(g,{ex:18,ey:-10,erx:11,ery:11,cheek:6,top:-40,side:56,no:{blush:true},halo:-78});
+  g.restore(); }
+// Mother Octavia, the octopus who hoarded every lamp in Lumen: goat-bar eyes with lids, brows, a mouth, and arms that
+// curl up in a temper and hang limp when she is sad
+function m3sFaceOcto(g){ const O='#1a0a24', X=PX, n=X.n, curl=n==='angry'||n==='furious'||n==='surprised'||n==='scared'||n==='laughing'?1:n==='sad'||n==='defeated'||n==='ashamed'||n==='sleepy'?-1:0;
+  g.save(); pxPose(g,{py:60}); pxAura(g,0,-6,86); g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
+  m3sGlowG(g,46,-46,40,'190,220,255',pxGlowCol('x','x','dim')==='dim'?0.25:0.5);
+  g.fillStyle='#6a2a8a'; for(let i=0;i<6;i++){ const x=-60+i*24, cu=curl*(i%2?14:10)*(x<0?-1:1); g.beginPath(); g.moveTo(x,30); g.quadraticCurveTo(x-10+cu,60-curl*14,x+6+cu*1.4,76-curl*18); g.quadraticCurveTo(x+12+cu*0.6,60-curl*10,x+14,30); g.closePath(); g.fill(); g.stroke(); }
+  g.strokeStyle='#6a2a8a'; g.lineWidth=11; g.beginPath(); g.moveTo(40,18); g.quadraticCurveTo(70,-10,48,-40); g.stroke(); g.strokeStyle=O; g.lineWidth=3;
+  g.fillStyle='#eaf2ff'; m3sDot(g,46,-46,10); g.fill(); g.stroke();
+  g.fillStyle='#7a3a9a'; g.beginPath(); g.ellipse(0,-6,52,46,0,0,TAU); g.fill(); g.stroke();
+  g.fillStyle='#a8f0ff'; for(const [x,y] of [[-30,-30],[-12,-40],[22,-34],[34,-16],[-38,-6]]){ m3sDot(g,x,y,3.2); g.fill(); }
+  for(const s of [-1,1]){ g.save(); g.translate(s*18,2); g.scale(1.6,2.2); dragonEye(g,0,0,s,{eye:'#f8d050',skin:'#7a3a9a',dark:O,rot:0.02,bar:true,noglow:true}); g.restore(); }
+  pxBrows(g,{x:18,w:9,y:-16,col:'#4a1a6a',lw:3.6,arch:2.6,k:1.2,busy:true});
+  pxMouth(g,{y:26,w:10,c:5,col:'#4a1a6a',lw:2.6,dark:'#2a0a2a',tongue:'#e07090'});
+  pxExtras(g,{ex:18,ey:2,erx:12,ery:10,cheek:16,top:-34,side:50,halo:-60});
+  g.restore(); }
+// Gravelgut, the great sandworm: a maw ringed with teeth that gapes or clenches, a glow inside that warms or reddens,
+// and two small eyes on the top ring
+function m3sFaceGut(g){ const O='#2a160a', X=PX, m=X.m||'neutral', op=pxOpenMouth(), cl=m==='teeth'||m==='set'||m==='flat'?0.6:m==='smirk'||m==='tiny'?0.75:1;
+  const glow=pxGlowCol('230,236,255','255,120,70','170,170,200','255,226,170');
+  g.save(); pxPose(g,{py:60}); pxAura(g,0,-6,90); g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
+  for(let i=2;i>=0;i--){ g.fillStyle=['#c89a5a','#d8aa6a','#e6bc7c'][i]; g.beginPath(); g.ellipse(0,20+i*-14,70-i*6,44-i*4,0,0,TAU); g.fill(); g.stroke(); }
+  const rx=40*(0.8+op*0.25)*cl, ry=30*(0.8+op*0.3)*(m==='smile'||m==='laugh'?0.9:1)*cl, my=-6+(m==='frown'?3:0);
+  g.fillStyle='#3a1c12'; g.beginPath(); g.ellipse(0,my,rx,ry,0,0,TAU); g.fill(); g.stroke();
+  g.fillStyle='#dff4ff'; for(let i=0;i<12;i++){ const a=i/12*TAU, inr=0.55-op*0.12; g.beginPath(); g.moveTo(Math.cos(a-0.18)*rx*0.95,Math.sin(a-0.18)*ry*0.95+my); g.lineTo(Math.cos(a)*rx*inr,Math.sin(a)*ry*inr+my); g.lineTo(Math.cos(a+0.18)*rx*0.95,Math.sin(a+0.18)*ry*0.95+my); g.closePath(); g.fill(); }
+  m3sGlowG(g,0,my+4,20+op*8,glow,0.8); g.fillStyle=`rgb(${glow})`; m3sDot(g,0,my+4,5+op*2); g.fill();
+  for(const s of [-1,1]) pxEye(g,s*24,-42,s,{rx:5,ry:5,r:3,white:'#fff8e8',iris:'#2a1808',skin:'#e6bc7c',lash:O});
+  pxBrows(g,{x:24,w:5,y:-51,col:'#8a5a2a',lw:3,arch:2,busy:true});
+  pxExtras(g,{ex:24,ey:-42,erx:5,ery:5,cheek:-34,top:-56,side:62,no:{blush:true},halo:-74});
+  g.restore(); }
+// Lord Fanfare, the peacock of the Mirror Temple (frosted white under the spell, his colours back after): his fan opens
+// wide when he is proud or glad and folds when he is sorry; a crest, an eye with a lid and brow, and a beak
+function m3sFaceFan(g){ const O='#14241e', X=PX, n=X.n, after=!!(G&&G.flags&&G.flags.m_sn&&G.flags.m_sn.m_mirror_won), op=pxOpenMouth();
+  const fan=n==='proud'||n==='happy'||n==='laughing'||n==='surprised'||n==='angry'||n==='furious'?1.08:n==='sad'||n==='ashamed'||n==='defeated'||n==='scared'?0.78:1;
+  g.save(); pxPose(g,{py:64}); pxAura(g,0,0,86); g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
+  for(let i=0;i<9;i++){ const a=-Math.PI/2+(-Math.PI/2+i/8*Math.PI)*fan; const x=Math.cos(a)*76*fan, y=Math.sin(a)*70*fan+30; g.fillStyle=after?'#3ab070':'#c8e0f0'; g.beginPath(); g.ellipse(x,y,14,24,a+Math.PI/2,0,TAU); g.fill(); g.stroke(); g.fillStyle=after?'#e8c03a':'#7a3ad8'; m3sDot(g,x,y,6); g.fill(); }
+  g.fillStyle=after?'#2a8ab0':'#d8e8f4'; g.beginPath(); g.ellipse(0,26,26,36,0,0,TAU); g.fill(); g.stroke();
+  g.fillStyle=after?'#3a9ad0':'#eef6ff'; g.beginPath(); g.ellipse(0,-22,20,22,0,0,TAU); g.fill(); g.stroke();
+  // the beak (side on): the lower half drops open
+  g.fillStyle='#d89820'; g.save(); g.translate(16,-18); g.rotate(op*0.5); g.beginPath(); g.moveTo(0,0); g.lineTo(16,2); g.lineTo(0,6); g.closePath(); g.fill(); g.stroke(); g.restore();
+  g.fillStyle='#f0b030'; g.save(); g.translate(16,-18); g.rotate(-op*0.2); g.beginPath(); g.moveTo(0,-4); g.lineTo(18,2); g.lineTo(0,3); g.closePath(); g.fill(); g.stroke(); g.restore();
+  g.save(); g.translate(5,0); pxEye(g,0,-25,-1,{rx:5.8,ry:6.4,r:3.8,white:'#fff',iris:O,skin:after?'#3a9ad0':'#eef6ff',lash:O}); pxBrows(g,{x:0,w:6,y:-35,col:after?'#1a5a80':'#8aa0b8',lw:3,arch:2,only:-1}); g.restore();
+  g.fillStyle='#ffd24a'; for(let i=-2;i<=2;i++){ const t=pxEarTurn(0.3,0.5); g.save(); g.translate(i*7,-42); g.rotate(i*0.12-t*0.3*Math.sign(i||1)); g.beginPath(); g.moveTo(0,0); g.lineTo(-3,-10-t*4); g.lineTo(3,-10-t*4); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+  pxExtras(g,{ex:8,ey:-26,erx:4.6,ery:5,cheek:-16,top:-44,side:22,no:{blush:!(X.blush>1)},halo:-66});
+  g.restore(); }
+// Duke Umberwing, the moth with a monocle: dark eyes with lids, brows, antennae that droop or stand, a mouth
+function m3sFaceDuke(g){ const O='#160e20', X=PX;
+  g.save(); pxPose(g,{py:64}); pxAura(g,0,-6,86); g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
+  const wf=pxEarTurn(0.15,0.25);
+  for(const s of [-1,1]){ g.save(); g.translate(s*12,10); g.rotate(-s*wf); g.fillStyle='#6a5a7e'; g.beginPath(); g.moveTo(0,0); g.bezierCurveTo(s*28,-60,s*74,-50,s*68,0); g.bezierCurveTo(s*58,30,s*18,34,0,20); g.closePath(); g.fill(); g.stroke(); g.fillStyle='#d8d0e8'; m3sDot(g,s*42,-16,8); g.fill(); g.stroke(); g.restore(); }
+  g.fillStyle='#5a2a5a'; g.beginPath(); g.moveTo(-44,74); g.quadraticCurveTo(-40,20,0,24); g.quadraticCurveTo(40,20,44,74); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle='#9a8aae'; g.beginPath(); g.ellipse(0,-6,30,32,0,0,TAU); g.fill(); g.stroke();
+  for(const s of [-1,1]) pxEye(g,s*12,-8,s,{rx:8,ry:9,r:3,white:'#241a30',iris:'#3a2c4a',skin:'#9a8aae',lash:O});
+  pxBrows(g,{x:12,w:6,y:-21,col:'#5a4a6e',lw:3,arch:2.4,busy:true});
+  pxMouth(g,{y:12,w:6,c:4,col:O,lw:2.4,dark:'#2a1424'});
+  g.strokeStyle='#e8e0ff'; g.lineWidth=2.6; m3sDot(g,12,-8,12); g.stroke(); g.beginPath(); g.moveTo(22,-2); g.lineTo(30,26); g.stroke();
+  const ear=X.ear||0; g.strokeStyle='#d8ccf0'; g.lineWidth=2.2; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*8,-34); g.quadraticCurveTo(s*(14+(ear<0?-ear*8:0)),-66+(ear<0?-ear*18:-ear*4),s*(34+(ear<0?-ear*6:0)),-72+(ear<0?-ear*34:-ear*6)); g.stroke(); }
+  pxExtras(g,{ex:12,ey:-8,erx:8,ery:9,cheek:4,top:-34,side:30,no:{blush:!(X.blush>1)},halo:-80});
+  g.restore(); }
+// Lady Zapp, the Lantern Eel: a long glowing eel with a lamp on her chin, lashes (she is very taken with herself),
+// sparks when she is cross, and her glow goes quiet when she is beaten
+function m3sFaceZapp(g){ const O='#0a2030', X=PX, n=X.n, hot=n==='angry'||n==='furious', quiet=n==='sad'||n==='defeated'||n==='ashamed'||n==='peaceful';
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-6,86); g.lineJoin='round'; g.lineCap='round';
+  // her body curls up behind her head
+  g.strokeStyle='#1e6a8a'; g.lineWidth=26; g.beginPath(); g.moveTo(-60,70); g.quadraticCurveTo(-70,10,-36,-10); g.stroke(); g.strokeStyle='#2a8ab0'; g.lineWidth=14; g.stroke();
+  g.fillStyle='#7ad8f0'; for(const s of [-1,1]){ g.save(); g.translate(s*34,-8); g.rotate(-s*pxEarTurn(0.3,0.5)); g.beginPath(); g.moveTo(0,-10); g.quadraticCurveTo(s*22,-24,s*26,2); g.quadraticCurveTo(s*16,4,0,10); g.closePath(); g.fill(); g.strokeStyle=O; g.lineWidth=2.4; g.stroke(); g.restore(); }
+  g.fillStyle='#2a8ab0'; g.beginPath(); g.ellipse(0,0,36,34,0,0,TAU); g.fill(); g.strokeStyle=O; g.lineWidth=3; g.stroke();
+  g.fillStyle='#4ab0d0'; g.beginPath(); g.ellipse(0,14,26,18,0,0,TAU); g.fill();
+  g.fillStyle='rgba(200,250,255,.55)'; for(const [x,y] of [[-20,-18],[-6,-26],[10,-24],[22,-14]]){ m3sDot(g,x,y,2.4); g.fill(); }
+  for(const s of [-1,1]) pxEye(g,s*13,-6,s,{rx:7.4,ry:7.8,r:4.4,white:'#fff',iris:'#1a3a6a',pupil:'#081428',skin:'#2a8ab0',lash:O});
+  // long lashes
+  g.strokeStyle=O; g.lineWidth=2; for(const s of [-1,1]) for(const k of [0,1,2]){ const a=-Math.PI/2+s*(0.55+k*0.35); g.beginPath(); g.moveTo(s*13+Math.cos(a)*7.4,-6+Math.sin(a)*7.8*Math.max(0.3,pxOpen())); g.lineTo(s*13+Math.cos(a)*12,-6+Math.sin(a)*12*Math.max(0.3,pxOpen())); g.stroke(); }
+  pxBrows(g,{x:13,w:6,y:-19,col:O,lw:2.6,arch:3.4,busy:true});
+  pxMouth(g,{y:18,w:7,c:4.5,col:O,lw:2.6,dark:'#081a2a',tongue:'#e07a9a'});
+  // the lantern on her chin
+  g.strokeStyle='#1e6a8a'; g.lineWidth=2.4; g.beginPath(); g.moveTo(0,30); g.quadraticCurveTo(8,40,4,48); g.stroke();
+  const lc=hot?'255,240,140':quiet?'170,210,230':'210,250,255'; m3sGlowG(g,4,52,quiet?14:24,lc,quiet?0.4:0.8); g.fillStyle=`rgb(${lc})`; m3sDot(g,4,52,5); g.fill();
+  if(hot){ g.strokeStyle='#fff6a0'; g.lineWidth=2.2; for(const [x,y,a] of [[-44,-26,0.4],[44,-30,2.6],[-40,24,-0.6],[46,16,3.6]]){ g.beginPath(); g.moveTo(x,y); g.lineTo(x+Math.cos(a)*6,y+Math.sin(a)*6-4); g.lineTo(x+Math.cos(a)*3,y+Math.sin(a)*3+2); g.lineTo(x+Math.cos(a)*10,y+Math.sin(a)*10); g.stroke(); } }
+  pxExtras(g,{ex:13,ey:-6,erx:7.4,ery:7.8,cheek:8,top:-30,side:36,halo:-60});
+  g.restore(); }
+// Big Fin, the sandshark matriarch: a scarred fin, a gold tooth, small fierce eyes and a grin full of teeth
+function m3sFaceFin(g){ const O='#2a2a34', X=PX, m=X.m||'neutral';
+  g.save(); pxPose(g,{py:60}); pxAura(g,0,-2,86); g.lineJoin='round';
+  g.fillStyle='#e8c88a'; g.beginPath(); g.ellipse(0,58,70,20,0,0,TAU); g.fill();
+  g.save(); g.translate(0,-30); g.rotate(-pxEarTurn(0.15,0.3)); g.fillStyle='#8a92a2'; g.beginPath(); g.moveTo(-14,4); g.quadraticCurveTo(2,-34,22,-46); g.quadraticCurveTo(14,-20,18,6); g.closePath(); g.fill(); g.strokeStyle=O; g.lineWidth=3; g.stroke();
+  g.strokeStyle='#e8e0d8'; g.lineWidth=2; g.beginPath(); g.moveTo(-2,-14); g.lineTo(12,-24); g.moveTo(2,-8); g.lineTo(14,-16); g.stroke(); g.restore();
+  g.fillStyle='#a0a8b8'; g.beginPath(); g.ellipse(0,4,50,40,0,0,TAU); g.fill(); g.strokeStyle=O; g.lineWidth=3; g.stroke();
+  g.fillStyle='#e6e8ee'; g.beginPath(); g.ellipse(0,24,38,20,0,0,TAU); g.fill();
+  g.strokeStyle='rgba(60,60,80,.45)'; g.lineWidth=2; for(const s of [-1,1]) for(let i=0;i<3;i++){ g.beginPath(); g.moveTo(s*(36+i*4),-2+i*6); g.lineTo(s*(40+i*4),8+i*6); g.stroke(); }
+  for(const s of [-1,1]) pxEye(g,s*20,-8,s,{rx:5.2,ry:5.2,r:3.6,white:'#f4f6fa',iris:'#10141e',skin:'#a0a8b8',lash:O});
+  pxBrows(g,{x:20,w:7,y:-18,col:'#5a6070',lw:3.6,arch:1.6});
+  crWideMouth(g,{y:20,w:30,d:12,col:O,lw:3,teeth:true,inside:'#4a1418',tc:'#f6f2e6'});
+  if(!pxOpenMouth()&&(m==='neutral'||m==='smile'||m==='smirk'||m==='set')){ g.fillStyle='#f0c040'; g.strokeStyle='#8a6010'; g.lineWidth=1; g.beginPath(); g.moveTo(8,25+(m==='smile'?3:1)); g.lineTo(11,33); g.lineTo(14,25+(m==='smile'?3:1)); g.closePath(); g.fill(); g.stroke(); }
+  pxExtras(g,{ex:20,ey:-8,erx:5.2,ery:5.2,cheek:8,top:-34,side:48,no:{blush:true},halo:-80});
+  g.restore(); }
+// Prism, the glass lion: a mane of crystal spikes with rainbows in it, eyes, brows, a muzzle; he cracks all over when
+// he is beaten (defeated) and his mane stands out when he is proud
+function m3sFacePrism(g){ const O='#3a5a7a', X=PX, n=X.n, mane=n==='proud'||n==='angry'||n==='furious'||n==='surprised'?1.12:n==='sad'||n==='defeated'||n==='ashamed'?0.88:1;
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-4,88); g.lineJoin='round';
+  const rb=['255,140,160','255,210,120','170,240,170','140,200,255','200,160,255'];
+  for(let i=0;i<16;i++){ const a=i/16*TAU, L=(52+(i%2)*10)*mane; g.fillStyle=`rgba(${rb[i%5]},.55)`; g.beginPath(); g.moveTo(Math.cos(a-0.2)*30,Math.sin(a-0.2)*30-2); g.lineTo(Math.cos(a)*L,Math.sin(a)*L-2); g.lineTo(Math.cos(a+0.2)*30,Math.sin(a+0.2)*30-2); g.closePath(); g.fill(); g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=1.6; g.stroke(); }
+  g.fillStyle='rgba(225,245,255,.92)'; g.beginPath(); g.ellipse(0,0,34,36,0,0,TAU); g.fill(); g.strokeStyle=O; g.lineWidth=2.6; g.stroke();
+  g.fillStyle='rgba(255,255,255,.7)'; g.beginPath(); g.ellipse(-12,-18,10,5,-0.5,0,TAU); g.fill();
+  for(const s of [-1,1]){ g.fillStyle='rgba(225,245,255,.95)'; g.beginPath(); g.ellipse(s*26,-28,8,9,0,0,TAU); g.fill(); g.stroke(); }
+  for(const s of [-1,1]) pxEye(g,s*13,-6,s,{rx:6.2,ry:6.6,r:3.8,white:'#fff',iris:'#4a8ac8',pupil:'#1a2a4a',skin:'rgba(225,245,255,1)',lash:O});
+  pxBrows(g,{x:13,w:6,y:-17,col:'#6a9ac0',lw:3,arch:2.6});
+  g.fillStyle='rgba(240,250,255,.95)'; g.beginPath(); g.ellipse(0,16,16,12,0,0,TAU); g.fill(); g.strokeStyle=O; g.lineWidth=2; g.stroke();
+  g.fillStyle='#b8a0e8'; g.beginPath(); g.moveTo(-5,9); g.lineTo(5,9); g.lineTo(0,14); g.closePath(); g.fill();
+  pxMouth(g,{y:20,w:7,c:4,col:O,lw:2.4,dark:'#2a3a5a',tongue:'#f0a0c0'});
+  if(n==='defeated'||n==='hurt'){ g.strokeStyle='rgba(255,255,255,.95)'; g.lineWidth=1.4; for(const [x,y,a] of [[-20,-20,0.6],[16,-26,2.2],[22,8,3.6],[-24,14,5.2],[0,-32,1.4]]){ g.beginPath(); g.moveTo(x,y); let px=x, py=y; for(let k=0;k<3;k++){ px+=Math.cos(a+k*0.9)*6; py+=Math.sin(a+k*0.9)*6; g.lineTo(px,py); } g.stroke(); } }
+  pxExtras(g,{ex:13,ey:-6,erx:6.2,ery:6.6,cheek:6,top:-34,side:36,halo:-72});
+  g.restore(); }
+// Great-grandma Greatshell, the huge old turtle in the Sunken Garden (Shellby's great-grandma): barnacles and moss on her
+// shell, heavy old lids, white brows and a slow smile
+function m3sFaceShell(g){ const O='#2a3a1a', X=PX;
+  g.save(); pxPose(g,{py:64}); pxAura(g,0,0,80); g.lineJoin='round';
+  g.fillStyle='#6a7a5a'; g.beginPath(); g.ellipse(0,44,74,34,0,Math.PI,0); g.fill(); g.strokeStyle='#3a4a2a'; g.lineWidth=3; g.stroke();
+  g.fillStyle='#4a8a3a'; for(const [x,y,r] of [[-54,34,8],[-36,20,6],[44,28,7],[60,40,5],[20,16,5]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }
+  g.fillStyle='#e8e0cc'; for(const [x,y] of [[-46,28],[-24,18],[34,20],[52,32],[-60,42]]){ g.beginPath(); g.arc(x,y,3.4,0,TAU); g.fill(); g.strokeStyle='#8a8070'; g.lineWidth=1.2; g.stroke(); }
+  g.fillStyle='#8aa06a'; g.beginPath(); g.ellipse(0,0,36,32,0,0,TAU); g.fill(); g.strokeStyle='#4a5a2a'; g.lineWidth=2.6; g.stroke();
+  g.fillStyle='rgba(40,60,20,.2)'; for(const [x,y] of [[-20,-18],[18,-20],[0,-26],[-24,6],[24,8]]){ g.beginPath(); g.arc(x,y,3.2,0,TAU); g.fill(); }
+  g.strokeStyle='rgba(60,70,40,.45)'; g.lineWidth=1.4; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*22,-2); g.lineTo(s*28,0); g.moveTo(s*22,2); g.lineTo(s*27,5); g.stroke(); }
+  for(const s of [-1,1]) pxEye(g,s*13,-6,s,{rx:7,ry:6.6,r:3.8,white:'#fbfbf2',iris:'#2a2a10',skin:'#7a906a',lash:O});
+  // old heavy lids: a little lower than anyone's, always
+  if(pxOpen()>0.05&&!pxWince(1)){ g.fillStyle='#7a906a'; for(const s of [-1,1]){ g.save(); g.beginPath(); g.ellipse(s*13,-6,7.6,7.2,0,0,TAU); g.clip(); g.fillRect(s*13-9,-15,18,Math.max(3,6-(pxOpen()-1)*8)); g.restore(); g.strokeStyle=O; g.lineWidth=1.8; g.beginPath(); g.moveTo(s*13-7,-15+Math.max(3,6-(pxOpen()-1)*8)); g.lineTo(s*13+7,-15+Math.max(3,6-(pxOpen()-1)*8)); g.stroke(); } }
+  pxBrows(g,{x:13,w:7,y:-17,col:'#f0eee0',lw:3.4,arch:2});
+  pxMouth(g,{y:14,w:10,c:5,col:O,lw:2.6,dark:'#3a1a10'});
+  pxExtras(g,{ex:13,ey:-6,erx:7,ery:6.6,cheek:6,top:-28,side:36,halo:-58});
+  g.restore(); }
 const M3S_PORT={
-  m_puffington:{bg:'#13344a',f:g=>{ const O='#2a1a0c'; g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
-    g.fillStyle='#e8c040'; for(let i=0;i<14;i++){ const a=i/14*TAU; g.beginPath(); g.moveTo(Math.cos(a-0.12)*52,Math.sin(a-0.12)*48+6); g.lineTo(Math.cos(a)*70,Math.sin(a)*64+6); g.lineTo(Math.cos(a+0.12)*52,Math.sin(a+0.12)*48+6); g.closePath(); g.fill(); g.stroke(); }
-    g.fillStyle='#f0d058'; g.beginPath(); g.ellipse(0,6,56,52,0,0,TAU); g.fill(); g.stroke();
-    g.fillStyle='#fff6d0'; g.beginPath(); g.ellipse(0,24,38,26,0,0,TAU); g.fill();
-    g.fillStyle='#8a5a2a'; for(const [x,y,r] of [[-30,-18,6],[24,-26,5],[38,0,5],[-40,10,4],[10,-36,4]]){ m3sDot(g,x,y,r); g.fill(); }
-    for(const s of [-1,1]){ g.fillStyle='#fff'; m3sDot(g,s*18,-10,11); g.fill(); g.stroke(); g.fillStyle=O; m3sDot(g,s*16,-9,5); g.fill(); }
-    g.fillStyle='#5a3418'; for(const s of [-1,1]){ g.beginPath(); g.moveTo(0,10); g.bezierCurveTo(s*18,2,s*40,8,s*54,-4); g.bezierCurveTo(s*44,16,s*20,18,0,16); g.closePath(); g.fill(); g.stroke(); }
-    g.fillStyle='#d8584a'; g.beginPath(); g.ellipse(0,26,8,6,0,0,TAU); g.fill(); g.stroke();
-    g.fillStyle='#1a2a4a'; g.beginPath(); g.moveTo(-22,-44); g.lineTo(20,-44); g.lineTo(12,-60); g.lineTo(-14,-60); g.closePath(); g.fill(); g.stroke(); g.fillStyle='#e0b84a'; g.fillRect(-5,-55,10,6); }},
-  m_octavia:{bg:'#160c2a',f:g=>{ const O='#1a0a24'; g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
-    m3sGlowG(g,46,-46,40,'190,220,255',0.5);
-    g.fillStyle='#6a2a8a'; for(let i=0;i<6;i++){ const x=-60+i*24; g.beginPath(); g.moveTo(x,30); g.quadraticCurveTo(x-10,60,x+6,76); g.quadraticCurveTo(x+12,60,x+14,30); g.closePath(); g.fill(); g.stroke(); }
-    g.strokeStyle='#6a2a8a'; g.lineWidth=11; g.beginPath(); g.moveTo(40,18); g.quadraticCurveTo(70,-10,48,-40); g.stroke(); g.strokeStyle=O; g.lineWidth=3;
-    g.fillStyle='#eaf2ff'; m3sDot(g,46,-46,10); g.fill(); g.stroke();
-    g.fillStyle='#7a3a9a'; g.beginPath(); g.ellipse(0,-6,52,46,0,0,TAU); g.fill(); g.stroke();
-    g.fillStyle='#a8f0ff'; for(const [x,y] of [[-30,-30],[-12,-40],[22,-34],[34,-16],[-38,-6]]){ m3sDot(g,x,y,3.2); g.fill(); }
-    for(const s of [-1,1]){ g.fillStyle='#f8d050'; g.beginPath(); g.ellipse(s*18,2,12,14,0,0,TAU); g.fill(); g.stroke(); g.fillStyle=O; g.fillRect(s*18-7,0,14,4); }
-    g.strokeStyle='#4a1a6a'; g.lineWidth=2.4; g.beginPath(); g.moveTo(-10,24); g.quadraticCurveTo(0,30,10,24); g.stroke(); }},
-  m_gravelgut:{bg:'#2a1c10',f:g=>{ const O='#2a160a'; g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
-    for(let i=2;i>=0;i--){ g.fillStyle=['#c89a5a','#d8aa6a','#e6bc7c'][i]; g.beginPath(); g.ellipse(0,20+i*-14,70-i*6,44-i*4,0,0,TAU); g.fill(); g.stroke(); }
-    g.fillStyle='#3a1c12'; g.beginPath(); g.ellipse(0,-6,40,30,0,0,TAU); g.fill(); g.stroke();
-    g.fillStyle='#dff4ff'; for(let i=0;i<12;i++){ const a=i/12*TAU; g.beginPath(); g.moveTo(Math.cos(a-0.18)*38,Math.sin(a-0.18)*28-6); g.lineTo(Math.cos(a)*22,Math.sin(a)*16-6); g.lineTo(Math.cos(a+0.18)*38,Math.sin(a+0.18)*28-6); g.closePath(); g.fill(); }
-    m3sGlowG(g,0,-2,20,'230,236,255',0.8); g.fillStyle='#eef2ff'; m3sDot(g,0,-2,6); g.fill(); }},
-  m_fanfare:{bg:'#12302a',f:g=>{ const O='#14241e'; g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
-    const after=!!(G&&G.flags&&G.flags.m_sn&&G.flags.m_sn.m_mirror_won);
-    for(let i=0;i<9;i++){ const a=-Math.PI+i/8*Math.PI; const x=Math.cos(a)*76, y=Math.sin(a)*70+30; g.fillStyle=after?'#3ab070':'#c8e0f0'; g.beginPath(); g.ellipse(x,y,14,24,a+Math.PI/2,0,TAU); g.fill(); g.stroke(); g.fillStyle=after?'#e8c03a':'#7a3ad8'; m3sDot(g,x,y,6); g.fill(); }
-    g.fillStyle=after?'#2a8ab0':'#d8e8f4'; g.beginPath(); g.ellipse(0,26,26,36,0,0,TAU); g.fill(); g.stroke();
-    g.fillStyle=after?'#3a9ad0':'#eef6ff'; g.beginPath(); g.ellipse(0,-22,20,22,0,0,TAU); g.fill(); g.stroke();
-    g.fillStyle='#f0b030'; g.beginPath(); g.moveTo(16,-22); g.lineTo(34,-16); g.lineTo(16,-12); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle=O; m3sDot(g,6,-26,3.5); g.fill(); g.fillStyle='#fff'; m3sDot(g,5,-27,1.2); g.fill();
-    g.fillStyle='#ffd24a'; for(let i=-2;i<=2;i++){ g.beginPath(); g.moveTo(i*7,-42); g.lineTo(i*7-3,-52); g.lineTo(i*7+3,-52); g.closePath(); g.fill(); g.stroke(); } }},
-  m_umberwing:{bg:'#1c1628',f:g=>{ const O='#160e20'; g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
-    for(const s of [-1,1]){ g.fillStyle='#6a5a7e'; g.beginPath(); g.moveTo(s*12,10); g.bezierCurveTo(s*40,-50,s*86,-40,s*80,10); g.bezierCurveTo(s*70,40,s*30,44,s*12,30); g.closePath(); g.fill(); g.stroke(); g.fillStyle='#d8d0e8'; m3sDot(g,s*54,-6,8); g.fill(); g.stroke(); }
-    g.fillStyle='#5a2a5a'; g.beginPath(); g.moveTo(-44,74); g.quadraticCurveTo(-40,20,0,24); g.quadraticCurveTo(40,20,44,74); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle='#9a8aae'; g.beginPath(); g.ellipse(0,-6,30,32,0,0,TAU); g.fill(); g.stroke();
-    for(const s of [-1,1]){ g.fillStyle='#241a30'; g.beginPath(); g.ellipse(s*12,-8,8,9,0,0,TAU); g.fill(); g.fillStyle='#fff'; m3sDot(g,s*12-3,-11,2); g.fill(); }
-    g.strokeStyle='#e8e0ff'; g.lineWidth=2.6; m3sDot(g,12,-8,12); g.stroke(); g.beginPath(); g.moveTo(22,-2); g.lineTo(30,26); g.stroke();
-    g.strokeStyle='#d8ccf0'; g.lineWidth=2.2; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*8,-34); g.quadraticCurveTo(s*14,-66,s*34,-72); g.stroke(); } }},
+  m_puffington:{bg:'#13344a',f:m3sFacePuff}, m_octavia:{bg:'#160c2a',f:m3sFaceOcto}, m_gravelgut:{bg:'#2a1c10',f:m3sFaceGut},
+  m_fanfare:{bg:'#12302a',f:m3sFaceFan}, m_umberwing:{bg:'#1c1628',f:m3sFaceDuke},
+  m_zapp:{bg:'#0e2a3e',f:m3sFaceZapp}, m_bigfin:{bg:'#2c2618',f:m3sFaceFin}, m_prism:{bg:'#1a2a40',f:m3sFacePrism}, m_greatshell:{bg:'#16281e',f:m3sFaceShell},
   m_sandy:{bg:'#2c2014',f:g=>{ const O='#2a1a0c'; g.lineJoin='round'; g.lineWidth=3; g.strokeStyle=O;
     g.fillStyle='#e6c48a'; g.beginPath(); g.ellipse(0,10,64,56,0,0,TAU); g.fill(); g.stroke();
     g.strokeStyle='#c8a068'; g.lineWidth=2; for(const y of [-20,0,20,40]){ g.beginPath(); g.ellipse(0,y,58,8,0,0.15,Math.PI-0.15); g.stroke(); } g.strokeStyle=O; g.lineWidth=3;

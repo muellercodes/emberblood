@@ -510,7 +510,7 @@ function thrMothEye(g,x,y,s,o,X,eo,O,fur){
 Object.assign(EVPORT,{
   nyxara:{bg:'#140c26',f:g=>{ g.save(); g.fillStyle='rgba(220,210,255,.7)'; for(const [x,y,r] of [[-70,-70,1.6],[64,-82,1.2],[78,40,1.4],[-84,30,1],[30,-96,1.1]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); } g.restore();
     thrFaceMoth(g,{wing:'#8a7aaa',wing2:'#5c4c7c',eye:'#ece6ff',iris:'#8a62d8',fur:'#b8aad8',fur2:'#e2daf4',eyes:'#241640',ant:'#d8ccf0',smile:true}); }},
-  pebble:{bg:'#24283a',f:g=>{ g.save(); g.translate(0,-10); g.scale(3.6,3.6); drawCrowAt(g,0,2,0.5,true); g.restore(); }},
+  pebble:{bg:'#24283a',f:g=>{ if(typeof faceCrow==='function') faceCrow(g); else { g.save(); g.translate(0,-10); g.scale(3.6,3.6); drawCrowAt(g,0,2,0.5,true); g.restore(); } }},
   grandpa:{bg:'#3a1810',f:g=>{ const P=EVPORT.c_grandpa; if(P&&P.f) P.f(g); else faceDragon(g,{skin:'#c8482a',dark:'#7a2412',snout:'#e8784a',horn:'#fff0d4',eye:'#ffcf4a',k:0.78});
  }}
 });

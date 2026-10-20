@@ -89,23 +89,23 @@ chapter({
       ['f_pennant', '(from outside) That\'s it exactly! Wheee! Sorry. It slips out.', '(outside) That\'s it! Wheee!'],
     ],
     f_squall_intro: [
-      ['f_squall', 'Whoosh! Visitors!', 'Whoosh! Visitors!'],
-      ['f_squeak', 'Wheeee-hee! Can we keep him?', 'Wheeee-hee! Can we keep him?'],
-      ['f_squall', 'Tag, you\'re IT!', 'Tag, you\'re IT!'],
+      ['f_squall', 'Whoosh! Visitors!', 'Whoosh! Visitors!', { mood: 'happy' }],
+      ['f_squeak', 'Wheeee-hee! Can we keep him?', 'Wheeee-hee! Can we keep him?', { mood: 'laughing' }],
+      ['f_squall', 'Tag, you\'re IT!', 'Tag, you\'re IT!', { mood: 'laughing' }],
     ],
     f_squall_won: [
-      ['f_squeak', 'No fair! You\'re too good at tag!', 'No fair! You\'re too good at tag!'],
-      ['f_squall', 'Fine. FINE. The key\'s in the chest. Whoosh.', 'Fine. The key is in the chest. Whoosh.'],
+      ['f_squeak', 'No fair! You\'re too good at tag!', 'No fair! You\'re too good at tag!', { mood: 'angry' }],
+      ['f_squall', 'Fine. FINE. The key\'s in the chest. Whoosh.', 'Fine. The key is in the chest. Whoosh.', { mood: 'defeated' }],
     ],
     f_frostfeather_intro: [
       ['narr', 'At the top of the tower, on a nest as wide as a pond, sits Old Frostfeather, the temple owl. Violet dust glitters in her eyes. The little tuft on her head sticks straight up.', 'Old Frostfeather sits on her nest. Purple dust glitters in her eyes.'],
-      ['f_frostfeather', 'HOO! HOOOOO!', 'HOO! HOOOOO!'],
+      ['f_frostfeather', 'HOO! HOOOOO!', 'HOO! HOOOOO!', { mood: 'cold' }],
       ['f_pennant', '(from outside, on his kite) Be gentle with her! She\'s just poorly!', '(from outside) Be gentle! She\'s just poorly!'],
     ],
     // right after the boss: 4 lines (the tuck under the wing is gone: Pennant is outside, finding 11)
     f_sky_won: [
       ['narr', 'Glittery purple dust pours out of Old Frostfeather\'s feathers. She sneezes. A cloud of little moths shoots out of her beak and flutters away, looking embarrassed.', 'Purple dust falls off her. She sneezes out a cloud of little moths.'],
-      ['f_frostfeather', 'Hoo? Hoooo.', 'Hoo? Hoooo.'],
+      ['f_frostfeather', 'Hoo? Hoooo.', 'Hoo? Hoooo.', { mood: 'surprised' }],
       ['narr', 'Her eyes are gold now, round and kind. She tilts her head all the way upside down and looks at you.', 'Her eyes are gold and kind now. She tilts her head upside down.'],
       ['f_pennant', '(from outside, on his kite) She\'s back! Her eyes are gold again! Old girl! Old girl!', '(from outside) She\'s back! Her eyes are gold!'],
     ],

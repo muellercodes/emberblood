@@ -114,37 +114,140 @@ if(typeof ITEM_NAMES!=='undefined'){
 }
 // Glaciar's eyes follow the story: violet under the spell, blue once she is herself
 function f2sGlacEyes(){ const c=G&&G.choices&&G.choices.f_glaciar; return c==='free'||(F2ST.glac&&F2ST.glac.mode==='awake')?'#9ae0ff':'#c890ff'; }
-function f2sFaceOwl(g){ const O='#2a2a3a'; g.lineWidth=3; g.strokeStyle=O;
+// (v12 FACES) the Act III creatures and bosses show the line's mood (a12a_dlg's kit: pxPose, pxEye, pxBrows, pxMouth,
+// crBeak, pxExtras)
+// Old Frostfeather, the owl of Skyreach: ear tufts that rise and fall, huge eyes (violet under the spell, gold once
+// free) with lids, feather brows and a beak that opens to hoot
+function f2sFaceOwl(g){ const O='#2a2a3a', X=PX, br=X.br||0;
+  g.save(); pxPose(g,{py:60}); pxAura(g,0,0,84); g.lineWidth=3; g.strokeStyle=O; g.lineJoin='round';
   g.fillStyle='#f4f6fc'; g.beginPath(); g.ellipse(0,8,56,52,0,0,TAU); g.fill(); g.stroke();
-  for(const s of [-1,1]){ g.fillStyle='#e0e6f4'; g.beginPath(); g.moveTo(s*30,-36); g.lineTo(s*44,-62); g.lineTo(s*14,-42); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle='#fff'; g.beginPath(); g.arc(s*22,-2,18,0,TAU); g.fill(); g.stroke();
-    const free=G&&G.flags&&G.flags.trial_f_sky_done; g.fillStyle=free?'#f0b830':'#b07ae8'; g.beginPath(); g.arc(s*22,-2,11,0,TAU); g.fill();
-    g.fillStyle=O; g.beginPath(); g.arc(s*22,-2,5.5,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*19,-6,2.4,0,TAU); g.fill(); }
-  g.fillStyle='#e8b040'; g.beginPath(); g.moveTo(-8,14); g.lineTo(8,14); g.lineTo(0,30); g.closePath(); g.fill(); g.stroke();
-  g.strokeStyle='rgba(150,160,190,.7)'; g.lineWidth=1.6; for(let i=0;i<6;i++){ const x=-30+i*12; g.beginPath(); g.moveTo(x,36); g.quadraticCurveTo(x+6,42,x+12,36); g.stroke(); } }
-function f2sFaceGolem(g){ const O='#2a1a10'; g.lineWidth=3; g.strokeStyle=O;
+  for(const s of [-1,1]){ g.save(); g.translate(s*24,-40); g.rotate(-s*(pxEarTurn(0.3,0.45)+br*0.25)); g.fillStyle='#e0e6f4'; g.beginPath(); g.moveTo(s*6,4); g.lineTo(s*20,-22); g.lineTo(-s*10,-2); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+  const free=G&&G.flags&&G.flags.trial_f_sky_done;
+  for(const s of [-1,1]){ g.fillStyle='#fff'; g.beginPath(); g.arc(s*22,-2,18,0,TAU); g.fill(); g.stroke();
+    pxEye(g,s*22,-2,s,{rx:15,ry:15,r:10.5,white:'#fff',iris:free?'#f0b830':'#b07ae8',pupil:O,skin:'#f4f6fc',lash:O}); }
+  pxBrows(g,{x:22,w:11,y:-24,col:'#b8c0d8',lw:4,arch:3,k:1.2,busy:true});
+  crBeak(g,0,16,{w:8,h:15,col:'#e8b040',low:'#c89030',ol:O});
+  g.strokeStyle='rgba(150,160,190,.7)'; g.lineWidth=1.6; for(let i=0;i<6;i++){ const x=-30+i*12; g.beginPath(); g.moveTo(x,38); g.quadraticCurveTo(x+6,44,x+12,38); g.stroke(); }
+  pxExtras(g,{ex:22,ey:-2,erx:15,ery:15,cheek:16,top:-30,side:54,no:{blush:true},halo:-70});
+  g.restore(); }
+// Old Bellows, the furnace golem: lamp eyes in deep sockets under iron brow plates, and a grille mouth whose fire
+// burns hot when he is angry, low when he is sad and curves into a smile or a frown
+function f2sFaceGolem(g){ const O='#2a1a10', X=PX, m=X.m||'neutral', op=pxOpenMouth();
+  const hot=X.n==='angry'||X.n==='furious', dim=X.n==='sad'||X.n==='defeated'||X.n==='ashamed'||X.n==='cold'||X.n==='sleepy';
+  g.save(); pxPose(g,{py:54}); pxAura(g,0,-4,86); g.lineWidth=3; g.strokeStyle=O; g.lineJoin='round';
   g.fillStyle='#c89040'; rrect(g,-52,-48,104,100,22); g.fill(); g.stroke();
+  g.fillStyle='rgba(255,230,170,.18)'; rrect(g,-44,-42,40,24,10); g.fill();
   g.fillStyle='#a87030'; for(const [x,y] of [[-40,-36],[40,-36],[-40,38],[40,38]]){ g.beginPath(); g.arc(x,y,5,0,TAU); g.fill(); g.stroke(); }
-  for(const s of [-1,1]){ g.fillStyle='#2a1a14'; g.beginPath(); g.ellipse(s*22,-12,12,10,0,0,TAU); g.fill(); g.stroke(); g.save(); g.shadowColor='#ffb040'; g.shadowBlur=12; g.fillStyle='#ffc050'; g.beginPath(); g.arc(s*22,-12,5,0,TAU); g.fill(); g.restore(); }
-  g.fillStyle='#3a2014'; rrect(g,-24,12,48,26,6); g.fill(); g.stroke(); g.fillStyle='rgba(255,150,60,.85)'; for(let i=0;i<4;i++){ g.fillRect(-18+i*11,18,6,14); }
-  if(!(G&&G.flags&&G.flags.trial_f_maze_done)){ g.fillStyle='rgba(196,178,242,.75)'; g.beginPath(); g.moveTo(-52,-48); g.lineTo(-10,-48); g.lineTo(-30,-20); g.lineTo(-52,-22); g.closePath(); g.fill(); g.strokeStyle='#8a6ad0'; g.lineWidth=2; g.stroke(); } }
-function f2sFaceRam(g){ const O='#2a2420'; g.lineWidth=3; g.strokeStyle=O;
+  for(const s of [-1,1]){ g.fillStyle='#2a1a14'; g.beginPath(); g.ellipse(s*22,-12,12,10,0,0,TAU); g.fill(); g.stroke(); }
+  const ec=hot?'#ffe0a0':dim?'#d08a40':'#ffc050', gl=hot?'#ff7020':'#ffb040';
+  for(const s of [-1,1]){ g.save(); g.beginPath(); g.ellipse(s*22,-12,11,9,0,0,TAU); g.clip(); pxEye(g,s*22,-12,s,{spirit:true,rx:6.5,ry:5.2,white:ec,glow:gl,pip:'#3a1a08'}); g.restore(); }
+  pxBrows(g,{x:22,w:12,y:-27,col:'#6a4418',lw:6,arch:1.4,k:1.3});
+  // the grille: a band that bends with the mouth's shape and opens wider when he shouts
+  const bend=m==='smile'||m==='laugh'||m==='tiny'?7:m==='frown'||m==='wobble'?-6:m==='smirk'?3:0, top=12-op*4, bot=38+op*8+(m==='teeth'||m==='set'||m==='flat'?-8:0);
+  const band=()=>{ g.beginPath(); g.moveTo(-24,top); g.quadraticCurveTo(0,top+bend*2,24,top+(m==='smirk'?-6:0)); g.lineTo(24,bot+(m==='smirk'?-6:0)); g.quadraticCurveTo(0,bot+bend*2,-24,bot); g.closePath(); };
+  g.fillStyle='#3a2014'; band(); g.fill(); g.save(); band(); g.clip();
+  const fa=hot?1:dim?0.45:0.85; g.fillStyle=`rgba(255,${hot?120:150},60,${fa})`; for(let i=0;i<4;i++) g.fillRect(-18+i*11,top-6,6,bot-top+20);
+  if(hot||op>0.5){ g.fillStyle=`rgba(255,230,140,${0.5*fa})`; g.fillRect(-24,(top+bot)/2+bend,48,6); } g.restore(); band(); g.stroke();
+  if(!(G&&G.flags&&G.flags.trial_f_maze_done)){ g.fillStyle='rgba(196,178,242,.75)'; g.beginPath(); g.moveTo(-52,-48); g.lineTo(-10,-48); g.lineTo(-30,-20); g.lineTo(-52,-22); g.closePath(); g.fill(); g.strokeStyle='#8a6ad0'; g.lineWidth=2; g.stroke(); }
+  pxExtras(g,{ex:22,ey:-12,erx:8,ery:6,cheek:0,top:-44,side:52,no:{blush:true}});
+  g.restore(); }
+// Old Grumblehorn, the great ram under the drum stone: goat eyes with lids, woolly brows, a mouth in his beard
+function f2sFaceRam(g){ const O='#2a2420', X=PX;
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-6,84); g.lineWidth=3; g.strokeStyle=O; g.lineJoin='round';
   for(const s of [-1,1]){ g.strokeStyle=G&&G.flags&&G.flags.trial_f_deep_done?'#c8b090':'#b090e0'; g.lineWidth=13; g.beginPath(); g.arc(s*42,-16,20,0,TAU); g.stroke(); g.lineWidth=7; g.beginPath(); g.arc(s*42,-16,7,0,TAU); g.stroke(); g.strokeStyle=O; g.lineWidth=3; }
   g.fillStyle='#a8a098'; for(let i=0;i<9;i++){ const a=Math.PI*(1.05+i/8*0.9), x=Math.cos(a)*40, y=Math.sin(a)*30-14; g.beginPath(); g.arc(x,y,14,0,TAU); g.fill(); }
   g.fillStyle='#d8cfc4'; g.beginPath(); g.ellipse(0,6,30,42,0,0,TAU); g.fill(); g.stroke();
-  for(const s of [-1,1]){ g.fillStyle='#f0d070'; g.beginPath(); g.ellipse(s*14,-8,7,5,0,0,TAU); g.fill(); g.stroke(); g.fillStyle=O; g.fillRect(s*14-4,-9,8,2.5); }
-  g.fillStyle='#8a7a70'; g.beginPath(); g.ellipse(0,32,14,10,0,0,TAU); g.fill(); g.fillStyle='#e8f4ff'; for(let i=0;i<5;i++){ g.beginPath(); g.moveTo(-14+i*7,44); g.lineTo(-11+i*7,60+(i%2)*6); g.lineTo(-8+i*7,44); g.fill(); } }
-function f2sFaceYeti(g,o){ const O='#1a2030'; g.lineWidth=3; g.strokeStyle=O;
-  g.fillStyle='#f4f8ff'; for(let i=0;i<14;i++){ const a=i/14*TAU; g.beginPath(); g.arc(Math.cos(a)*42,Math.sin(a)*40+4,18,0,TAU); g.fill(); }
+  for(const s of [-1,1]){ g.save(); g.translate(s*14,-8); g.scale(0.95,1.05); dragonEye(g,0,0,s,{eye:'#f0d070',skin:'#d8cfc4',dark:O,rot:0.08,bar:true,noglow:true}); g.restore(); }
+  pxBrows(g,{x:14,w:7,y:-18,col:'#8a8078',lw:5,arch:2,k:1.1});
+  g.fillStyle='#8a7a70'; g.beginPath(); g.ellipse(0,32,14,10,0,0,TAU); g.fill();
+  g.fillStyle='#3a2a24'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*5,29,2.4,1.8,0,0,TAU); g.fill(); }
+  g.fillStyle='#e8f4ff'; for(let i=0;i<5;i++){ g.beginPath(); g.moveTo(-14+i*7,44); g.lineTo(-11+i*7,60+(i%2)*6); g.lineTo(-8+i*7,44); g.fill(); }
+  pxMouth(g,{y:38,w:7,c:3.5,col:O,lw:2.4,dark:'#2a1414'});
+  pxExtras(g,{ex:14,ey:-8,erx:6.5,ery:5,cheek:6,top:-38,side:32});
+  g.restore(); }
+// a snow yeti (Grumbo of the Heart of Dread): fur that bristles in a temper, round eyes, big blue brows, a mouth
+function f2sFaceYeti(g,o){ const O='#1a2030', X=PX, n=X.n, fl=n==='angry'||n==='furious'||n==='scared'?21:n==='sad'||n==='defeated'?16:18;
+  g.save(); pxPose(g,{py:58}); pxAura(g,0,4,80); g.lineWidth=3; g.strokeStyle=O; g.lineJoin='round';
+  g.fillStyle='#f4f8ff'; for(let i=0;i<14;i++){ const a=i/14*TAU; g.beginPath(); g.arc(Math.cos(a)*42,Math.sin(a)*40+4,fl,0,TAU); g.fill(); }
   g.fillStyle='#7aa8d8'; g.beginPath(); g.ellipse(0,8,30,32,0,0,TAU); g.fill(); g.stroke();
-  for(const s of [-1,1]){ g.fillStyle='#fff'; g.beginPath(); g.ellipse(s*12,0,8,9,0,0,TAU); g.fill(); g.stroke(); g.fillStyle=o.eye; g.beginPath(); g.arc(s*12,1,4,0,TAU); g.fill(); }
-  g.strokeStyle=O; g.lineWidth=2.4; g.beginPath(); g.moveTo(-10,24); g.quadraticCurveTo(0,o.grin?32:28,10,24); g.stroke();
-  if(o.hat){ g.fillStyle='#c84a3a'; g.beginPath(); g.ellipse(0,-36,16,9,0,Math.PI,TAU); g.fill(); g.stroke(); g.fillStyle='#ffe0a0'; g.beginPath(); g.arc(0,-46,5,0,TAU); g.fill(); } }
+  for(const s of [-1,1]) pxEye(g,s*12,0,s,{rx:8,ry:9,r:4.2,white:'#fff',iris:o.eye,skin:'#7aa8d8',lash:O,ring:O});
+  pxBrows(g,{x:12,w:7,y:-13,col:'#3a5a8a',lw:4,arch:2.4});
+  pxMouth(g,{y:24,w:10,c:o.grin?6:4.5,col:O,lw:2.6,dark:'#2a1424'});
+  if(o.hat){ g.fillStyle='#c84a3a'; g.beginPath(); g.ellipse(0,-36,16,9,0,Math.PI,TAU); g.fill(); g.stroke(); g.fillStyle='#ffe0a0'; g.beginPath(); g.arc(0,-46,5,0,TAU); g.fill(); }
+  pxExtras(g,{ex:12,ey:0,erx:8,ery:9,cheek:14,top:-24,side:30,halo:-56});
+  g.restore(); }
+// (v12 FACES) the Act III speakers that had no face: Lord Blubberton (the walrus knight), Rockjaw (the armadillo), the
+// Twin Squalls (two giggling gusts), a baby Stonehorn and a Hearthold soldier
+function f2sFaceWalrus(g){ const O='#3a2a20', X=PX, op=pxOpenMouth();
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,0,86); g.lineJoin='round';
+  g.fillStyle='#8a6e5e'; g.beginPath(); g.ellipse(0,40,56,30,0,0,TAU); g.fill();
+  g.fillStyle='#a88a76'; g.beginPath(); g.ellipse(0,0,46,40,0,0,TAU); g.fill(); g.strokeStyle='rgba(60,40,30,.5)'; g.lineWidth=2; g.stroke();
+  for(const s of [-1,1]) pxEye(g,s*17,-10,s,{rx:5.4,ry:5.8,r:3.2,white:'#fbf6ee',iris:'#2a1a12',skin:'#a88a76',lash:'#4a3020'});
+  // the monocle on his right eye, on a gold chain
+  g.strokeStyle='#e8c860'; g.lineWidth=2.6; g.beginPath(); g.arc(17,-10,8.5,0,TAU); g.stroke(); g.lineWidth=1.4; g.beginPath(); g.moveTo(24,-5); g.quadraticCurveTo(36,10,30,28); g.stroke();
+  g.fillStyle='rgba(220,240,255,.2)'; g.beginPath(); g.arc(17,-10,7.5,0,TAU); g.fill();
+  pxBrows(g,{x:17,w:8,y:-21,col:'#6a4e3e',lw:4.4,arch:2.4});
+  // tusks first (they drop a little when his jaw opens), then the whiskery cheeks over them
+  g.fillStyle='#f4ecd8'; g.strokeStyle=O; g.lineWidth=1.8; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*8,22+op*4); g.quadraticCurveTo(s*10,44+op*6,s*16,58+op*6); g.quadraticCurveTo(s*16,40+op*5,s*16,22+op*4); g.closePath(); g.fill(); g.stroke(); }
+  pxMouth(g,{y:30,w:7,c:4.5,col:O,lw:2.4,dark:'#3a1410'});
+  g.fillStyle='#c8ac96'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*13,16-(X.m==='smile'||X.m==='laugh'?2:X.m==='frown'?-2:0),15,11,s*(X.m==='frown'||X.m==='wobble'?0.25:X.m==='smile'||X.m==='laugh'?-0.2:0),0,TAU); g.fill(); }
+  g.fillStyle='#5a4434'; for(const s of [-1,1]) for(let i=0;i<6;i++){ g.beginPath(); g.arc(s*(6+(i%3)*6),12+Math.floor(i/3)*7,1.3,0,TAU); g.fill(); }
+  g.fillStyle='#3a2420'; g.beginPath(); g.ellipse(0,6,6,4,0,0,TAU); g.fill();
+  // the dented helmet and its plume
+  g.save(); g.translate(0,-30); g.rotate(-(X.ear||0)*0.05); g.fillStyle='#9aa2b0'; g.beginPath(); g.ellipse(0,0,30,20,0,Math.PI,TAU); g.fill(); g.fillRect(-32,-2,64,6); g.strokeStyle='#6a7282'; g.lineWidth=2; g.beginPath(); g.moveTo(-8,-18); g.lineTo(-2,-10); g.lineTo(-10,-6); g.stroke();
+  g.fillStyle='#c0303a'; g.save(); g.translate(0,-20); g.rotate(-pxEarTurn(0.3,0.5)); g.beginPath(); g.moveTo(-3,0); g.quadraticCurveTo(14,-22,30,-12); g.quadraticCurveTo(14,-8,3,0); g.closePath(); g.fill(); g.restore(); g.restore();
+  pxExtras(g,{ex:17,ey:-10,erx:6,ery:6,cheek:4,top:-36,side:46,halo:-72});
+  g.restore(); }
+function f2sFaceDillo(g){ const O='#3a2a20', X=PX;
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-4,84); g.lineJoin='round';
+  // the rock shell over the back of his head, in bands
+  g.fillStyle='#9a8a78'; g.beginPath(); g.ellipse(0,-4,56,50,0,0,TAU); g.fill(); g.strokeStyle='#6e6052'; g.lineWidth=3; g.stroke();
+  g.lineWidth=2.4; for(const r of [32,42]){ g.beginPath(); g.ellipse(0,-4,r+10,r,0,Math.PI*0.9,Math.PI*2.1); g.stroke(); }
+  g.fillStyle='#bcae9a'; for(const [x,y] of [[-30,-34],[0,-46],[30,-34],[-46,-6],[46,-6],[-40,24],[40,24]]){ g.beginPath(); g.ellipse(x,y,6,4,0,0,TAU); g.fill(); }
+  for(const s of [-1,1]){ g.save(); g.translate(s*22,-20); g.rotate(-s*pxEarTurn(0.3,0.6)); g.fillStyle='#c89878'; g.beginPath(); g.ellipse(s*8,-8,7,11,s*0.5,0,TAU); g.fill(); g.fillStyle='#e8b8a0'; g.beginPath(); g.ellipse(s*8,-8,3.5,7,s*0.5,0,TAU); g.fill(); g.restore(); }
+  g.fillStyle='#d8a888'; g.beginPath(); g.moveTo(-28,-6); g.quadraticCurveTo(-30,30,-10,46); g.quadraticCurveTo(0,52,10,46); g.quadraticCurveTo(30,30,28,-6); g.quadraticCurveTo(0,-24,-28,-6); g.closePath(); g.fill();
+  g.fillStyle='#e8c8a8'; g.beginPath(); g.ellipse(0,30,14,14,0,0,TAU); g.fill();
+  for(const s of [-1,1]) pxEye(g,s*13,2,s,{rx:6,ry:6.6,r:3.6,white:'#fbf6ee',iris:'#2a1a12',skin:'#d8a888',lash:O});
+  pxBrows(g,{x:13,w:5.5,y:-8,col:'#8a6450',lw:3,arch:2.4});
+  g.fillStyle='#3a2420'; g.beginPath(); g.ellipse(0,40,5,3.6,0,0,TAU); g.fill();
+  pxMouth(g,{y:46,w:6,c:3.5,col:O,lw:2.2,dark:'#3a1410'});
+  pxExtras(g,{ex:13,ey:2,erx:6,ery:6.6,cheek:16,top:-16,side:28,halo:-62});
+  g.restore(); }
+function f2sFaceGale(g,small){ const X=PX, op=pxOpenMouth(), c0=small?'#ffe68a':'#9cd0f6', c1=small?'#f4c84a':'#6aa8e6', ck=small?'#ffb08a':'#d8b0ff', O=small?'#7a5a20':'#2a4a7a';
+  g.save(); if(small){ g.translate(0,8); g.scale(0.84,0.84); } pxPose(g,{py:56}); pxAura(g,0,0,78); g.lineJoin='round';
+  // a whirl of a tail, then the puffy cloud body
+  g.strokeStyle='#fff'; g.lineWidth=5; g.lineCap='round'; g.beginPath(); g.moveTo(-34,30); g.quadraticCurveTo(-58,40,-56,20); g.quadraticCurveTo(-54,6,-44,12); g.stroke(); g.strokeStyle=c1; g.lineWidth=3; g.stroke();
+  g.fillStyle=c1; for(let i=0;i<8;i++){ const a=i/8*TAU; g.beginPath(); g.arc(Math.cos(a)*30,Math.sin(a)*24+4,20,0,TAU); g.fill(); }
+  g.fillStyle=c0; for(let i=0;i<8;i++){ const a=i/8*TAU+0.2; g.beginPath(); g.arc(Math.cos(a)*26,Math.sin(a)*20+2,18,0,TAU); g.fill(); } g.beginPath(); g.ellipse(0,2,36,30,0,0,TAU); g.fill();
+  g.fillStyle='rgba(255,255,255,.45)'; g.beginPath(); g.ellipse(-14,-16,14,7,-0.4,0,TAU); g.fill();
+  // puffed cheeks: rounder when he is blowing (an open mouth)
+  g.fillStyle=ck; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*22,12,7+op*3,5+op*2,0,0,TAU); g.fill(); }
+  for(const s of [-1,1]) pxEye(g,s*12,-4,s,{rx:6.5,ry:7.5,r:3.8,white:'#fff',iris:'#2a1a3a',skin:c0,lash:O});
+  pxBrows(g,{x:12,w:5,y:-15,col:O,lw:2.6,arch:2.4,busy:true});
+  pxMouth(g,{y:13,w:6,c:4,col:O,lw:2.4,dark:'#2a1a3a',tongue:'#f08a9a'});
+  pxExtras(g,{ex:12,ey:-4,erx:6.5,ery:7.5,cheek:12,top:-24,side:38,no:{blush:true},halo:-54});
+  g.restore(); }
+function f2sFaceLamb(g){ const O='#4a4038', X=PX;
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,0,72); g.lineJoin='round';
+  g.fillStyle='#d8d0c0'; for(let i=0;i<10;i++){ const a=Math.PI*(1.0+i/9*1.0), x=Math.cos(a)*30, y=Math.sin(a)*24-10; g.beginPath(); g.arc(x,y,12,0,TAU); g.fill(); }
+  g.fillStyle='#e4ddd0'; g.beginPath(); g.ellipse(0,58,40,24,0,0,TAU); g.fill(); for(let i=0;i<7;i++){ const x=-36+i*12; g.beginPath(); g.arc(x,40+Math.abs(x)*0.18,9,0,TAU); g.fill(); }
+  for(const s of [-1,1]){ g.fillStyle='#8a8278'; g.beginPath(); g.moveTo(s*10,-28); g.lineTo(s*20,-44); g.lineTo(s*24,-26); g.closePath(); g.fill(); g.fillStyle='#a8a096'; g.beginPath(); g.moveTo(s*14,-30); g.lineTo(s*19,-38); g.lineTo(s*21,-28); g.closePath(); g.fill(); }
+  for(const s of [-1,1]){ g.save(); g.translate(s*24,-4); g.rotate(s*(0.7-pxEarTurn(0.4,0.4))); g.fillStyle='#e8ded0'; g.beginPath(); g.ellipse(s*10,0,13,6,0,0,TAU); g.fill(); g.fillStyle='#f0c8c0'; g.beginPath(); g.ellipse(s*11,0.5,8,3,0,0,TAU); g.fill(); g.restore(); }
+  g.fillStyle='#f4eee4'; g.beginPath(); g.ellipse(0,6,24,30,0,0,TAU); g.fill();
+  for(const s of [-1,1]) pxEye(g,s*10,0,s,{rx:6.6,ry:7.6,r:4.6,white:'#fff',iris:'#2a2018',skin:'#f4eee4',lash:O});
+  pxBrows(g,{x:10,w:5,y:-11,col:'#b8ae9c',lw:2.6,arch:2.4,busy:true});
+  g.fillStyle='#e8b8b0'; g.beginPath(); g.ellipse(0,20,6,4,0,0,TAU); g.fill();
+  pxMouth(g,{y:27,w:5.5,c:3.5,col:O,lw:2.2,dark:'#4a2020'});
+  pxExtras(g,{ex:10,ey:0,erx:6.6,ery:7.6,cheek:14,top:-20,side:24,halo:-52});
+  g.restore(); }
+const F2S_SOLDIER={skin:'#f0c8a8',hair:'#8a5a2a',outfit:'armor',helm:true,plume:'#3a6aaa',cape:'#2a4a7a',eye:'#3a4a6a'};
 const F2S_PORT={
   f_glaciar:{bg:'#0e2236',f:g=>{ if(typeof faceDragon==='function') faceDragon(g,{skin:'#eaf6ff',dark:'#5a7aa8',snout:'#cfe4f8',horn:'#c8ecff',eye:f2sGlacEyes(),k:0.9,big:true,frill:true});
     g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=2; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*18,30); g.quadraticCurveTo(s*40,40,s*52,62); g.stroke(); } }},
   f_bellows:{bg:'#2a1a10',f:f2sFaceGolem}, f_frostfeather:{bg:'#1a2438',f:f2sFaceOwl}, f_grumblehorn:{bg:'#2a2018',f:f2sFaceRam},
-  f_mumble:{bg:'#14243a',f:g=>f2sFaceYeti(g,{eye:'#3a6ab8',hat:true})}, f_grumbo:{bg:'#1a1430',f:g=>f2sFaceYeti(g,{eye:'#a060e8',grin:true})}
+  f_mumble:{bg:'#14243a',f:g=>f2sFaceYeti(g,{eye:'#3a6ab8',hat:true})}, f_grumbo:{bg:'#1a1430',f:g=>f2sFaceYeti(g,{eye:'#a060e8',grin:true})},
+  f_blubberton:{bg:'#2a2026',f:f2sFaceWalrus}, f_rockjaw:{bg:'#2a2218',f:f2sFaceDillo}, f_squall:{bg:'#14283e',f:g=>f2sFaceGale(g,false)}, f_squeak:{bg:'#2e2a14',f:g=>f2sFaceGale(g,true)},
+  f_lamb:{bg:'#26221c',f:f2sFaceLamb}, f_soldier:{bg:'#18222e',f:g=>{ g.save(); g.scale(1.25,1.25); g.translate(0,-6); facePerson(g,F2S_SOLDIER,false); g.restore(); }}
 };
 for(const k in F2S_PORT) if(typeof EVPORT!=='undefined'&&!EVPORT[k]) EVPORT[k]=F2S_PORT[k];
 // the wolf-fur hat (Ulf's gift at the Lodge), worn like any hat; the hat's name is its key

@@ -37,33 +37,65 @@ Object.assign(SPK,{
   c_saltbeard:SPK.c_saltbeard||{name:'Captain Saltbeard',col:'#9ad8f0'},
   c_bob3:SPK.c_bob3||{name:'The Third Bob',col:'#7aa0e8'}
 });
-// a parrot in a tiny captain's hat, a brass dog, a ghost pirate
+// a parrot in a tiny captain's hat, a brass dog, a ghost pirate. (v12 FACES) each shows the line's mood with a12a_dlg's
+// kit (pxPose, pxEye, pxBrows, pxMouth, pxExtras)
 function x1pFaceParrot(g){
+  const X=PX, op=pxOpenMouth(), ear=X.ear||0;
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-6,78);
   g.fillStyle='#2e9a3a'; g.beginPath(); g.ellipse(0,10,44,52,0,0,TAU); g.fill();
   g.fillStyle='#3cc04a'; g.beginPath(); g.ellipse(-6,-6,36,40,0,0,TAU); g.fill();
-  g.fillStyle='#e8402a'; g.beginPath(); g.ellipse(-14,-30,22,18,0,0,TAU); g.fill();
+  g.fillStyle='rgba(20,90,30,.35)'; for(const [x,y] of [[-26,22],[-14,34],[-30,6]]){ g.beginPath(); g.ellipse(x,y,9,4,0.6,0,TAU); g.fill(); }
+  // the red crest: up when he is excited, flat when he is sad
+  g.save(); g.translate(-10,-34); g.rotate(-pxEarTurn(0.35,0.4)); g.fillStyle='#e8402a'; g.beginPath(); g.ellipse(-4,4,22,18,0,0,TAU); g.fill();
+  g.fillStyle='#c8301e'; for(const a of [-2.3,-1.9,-1.5]){ g.beginPath(); g.ellipse(-4+Math.cos(a)*18,4+Math.sin(a)*16,4,9+ear*2,a+Math.PI/2,0,TAU); g.fill(); } g.restore();
   g.fillStyle='#f6f0e0'; g.beginPath(); g.ellipse(14,-14,16,14,0,0,TAU); g.fill();
-  g.fillStyle='#1a1410'; g.beginPath(); g.arc(16,-14,6,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(18,-16,2,0,TAU); g.fill();
-  g.fillStyle='#f0c040'; g.beginPath(); g.moveTo(24,-6); g.quadraticCurveTo(54,-2,40,24); g.quadraticCurveTo(34,8,22,10); g.closePath(); g.fill(); g.strokeStyle='#5a3a10'; g.lineWidth=2.5; g.stroke();
-  g.fillStyle='#1a2644'; g.beginPath(); g.moveTo(-34,-44); g.lineTo(30,-44); g.lineTo(18,-64); g.lineTo(-22,-64); g.closePath(); g.fill(); g.fillStyle='#e0b84a'; g.fillRect(-28,-48,52,5); g.beginPath(); g.arc(-2,-56,4,0,TAU); g.fill();
+  // the eye (he is seen side on, looking right: its front corner is toward the beak)
+  g.save(); g.translate(16,0); pxEye(g,0,-14,-1,{rx:7,ry:7.5,r:4.4,white:'#fff',iris:'#1a1410',skin:'#f6f0e0',lash:'#3a2a1a'}); pxBrows(g,{x:0,w:6,y:-25,col:'#1e6a28',lw:3,arch:2.4,only:-1}); g.restore();
+  // the beak, hinged at the cheek: the lower half swings down and the upper one lifts when he squawks
+  const hx=22, hy=2;
+  const ua=-op*0.3, la=op*0.8, rot=(x,y,a)=>[hx+x*Math.cos(a)-y*Math.sin(a),hy+x*Math.sin(a)+y*Math.cos(a)];
+  if(op>0){ const p1=rot(20,18,ua), p2=rot(14,18,la), p3=rot(6,12,la); g.fillStyle='#4a1410'; g.beginPath(); g.moveTo(hx,hy+4); g.lineTo(p1[0],p1[1]); g.lineTo(p2[0],p2[1]); g.lineTo(p3[0],p3[1]); g.closePath(); g.fill();
+    const t=rot(9,15,(ua+la)/2); g.fillStyle='#e8707a'; g.beginPath(); g.ellipse(t[0],t[1],4.5,3+op*2,0.6,0,TAU); g.fill(); }
+  g.save(); g.translate(hx,hy); g.rotate(la); g.fillStyle='#d8a030'; g.beginPath(); g.moveTo(0,6); g.quadraticCurveTo(12,10,14,18); g.quadraticCurveTo(6,20,0,12); g.closePath(); g.fill(); g.strokeStyle='#5a3a10'; g.lineWidth=2.2; g.stroke(); g.restore();
+  g.save(); g.translate(hx,hy); g.rotate(ua); g.fillStyle='#f0c040'; g.beginPath(); g.moveTo(2,-8); g.quadraticCurveTo(32,-4,18,22); g.quadraticCurveTo(12,6,0,8); g.closePath(); g.fill(); g.strokeStyle='#5a3a10'; g.lineWidth=2.5; g.stroke();
+  g.fillStyle='rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(10,-4,6,2.4,0.3,0,TAU); g.fill(); g.restore();
+  if(X.m==='smile'||X.m==='smirk'||X.m==='laugh'){ g.strokeStyle='#5a3a10'; g.lineWidth=2; g.beginPath(); g.moveTo(22,10); g.quadraticCurveTo(19,6,17,7); g.stroke(); }
+  // the captain's hat sits back when he is pleased and slips forward when he is down
+  g.save(); g.translate(-2,-50); g.rotate(-ear*0.06+(X.n==='ashamed'||X.n==='defeated'?0.12:0));
+  g.fillStyle='#1a2644'; g.beginPath(); g.moveTo(-32,6); g.lineTo(32,6); g.lineTo(20,-14); g.lineTo(-20,-14); g.closePath(); g.fill(); g.fillStyle='#e0b84a'; g.fillRect(-26,2,52,5); g.beginPath(); g.arc(0,-6,4,0,TAU); g.fill(); g.restore();
+  pxExtras(g,{ex:16,ey:-14,erx:7,ery:7.5,cheek:-2,top:-38,side:40,no:{blush:true},halo:-74});
+  g.restore();
 }
 function x1pFaceBolt(g){
-  g.fillStyle='#8a6a2a'; g.beginPath(); g.ellipse(-36,-30,12,24,-0.5,0,TAU); g.fill();
-  g.fillStyle='#b88a3a'; g.beginPath(); g.ellipse(34,-34,12,20,0.6,0,TAU); g.fill();
+  const X=PX;
+  g.save(); pxPose(g,{py:58}); pxAura(g,0,-4,76);
+  g.save(); g.translate(-30,-22); g.rotate(-0.5+pxEarTurn(0.3,0.55)); g.fillStyle='#8a6a2a'; g.beginPath(); g.ellipse(-4,-6,12,24,0,0,TAU); g.fill(); g.restore();
+  g.save(); g.translate(28,-24); g.rotate(0.6-pxEarTurn(0.3,0.55)); g.fillStyle='#b88a3a'; g.beginPath(); g.ellipse(4,-8,12,20,0,0,TAU); g.fill(); g.restore();
   const gr=g.createRadialGradient(-14,-20,6,0,0,62); gr.addColorStop(0,'#fff0b0'); gr.addColorStop(0.5,'#e0b050'); gr.addColorStop(1,'#8a6020'); g.fillStyle=gr; g.beginPath(); g.ellipse(0,0,48,44,0,0,TAU); g.fill();
   g.strokeStyle='#5a3a10'; g.lineWidth=3; g.stroke();
   for(const [x,y] of [[-30,-10],[30,-10],[-22,26],[22,26],[0,-36]]){ g.fillStyle='#6a4a1a'; g.beginPath(); g.arc(x,y,3,0,TAU); g.fill(); }
-  for(const s of [-1,1]){ g.save(); g.shadowColor='#ffe066'; g.shadowBlur=14; g.fillStyle='#fff6c0'; g.beginPath(); g.arc(s*16,-6,9,0,TAU); g.fill(); g.restore(); g.fillStyle='#2a1a08'; g.beginPath(); g.arc(s*16,-6,3.5,0,TAU); g.fill(); }
+  // lamp eyes behind brass lids
+  for(const s of [-1,1]){ g.save(); g.shadowColor='#ffe066'; g.shadowBlur=X.n==='sad'||X.n==='defeated'?5:14; pxEye(g,s*16,-6,s,{rx:9,ry:9,r:3.8,white:'#fff6c0',iris:'#2a1a08',skin:'#d8a848',lash:'#5a3a10',ring:'#7a5a1a'}); g.restore(); }
+  pxBrows(g,{x:16,w:7,y:-19,col:'#6a4a1a',lw:3.4,arch:2,busy:true});
   g.fillStyle='#d8a848'; g.beginPath(); g.ellipse(0,20,22,16,0,0,TAU); g.fill(); g.strokeStyle='#5a3a10'; g.lineWidth=2.5; g.stroke();
   g.fillStyle='#2a1a08'; g.beginPath(); g.ellipse(0,12,7,5,0,0,TAU); g.fill();
-  g.strokeStyle='#5a3a10'; g.lineWidth=2.5; g.beginPath(); g.moveTo(-8,26); g.quadraticCurveTo(0,32,8,26); g.stroke();
+  pxMouth(g,{y:25,w:8,c:4.5,col:'#5a3a10',lw:2.5,dark:'#2a1408',tongue:'#e0707a'});
+  if(X.m==='laugh'||X.m==='smile'||X.n==='happy'){ g.fillStyle='#e0707a'; g.beginPath(); g.ellipse(3,X.m==='laugh'?38:31,4.5,6,0.1,0,TAU); g.fill(); }
+  pxExtras(g,{ex:16,ey:-6,erx:9,ery:9,cheek:8,top:-34,side:46,no:{blush:true}});
+  g.restore();
 }
 function x1pFaceGhost(g){
-  g.save(); g.globalAlpha=0.9;
+  const X=PX;
+  g.save(); pxPose(g,{py:58}); g.globalAlpha=0.9;
   const gr=g.createRadialGradient(0,-10,8,0,0,70); gr.addColorStop(0,'#e8f8ff'); gr.addColorStop(1,'#7ab8d8'); g.fillStyle=gr; g.beginPath(); g.ellipse(0,-6,40,44,0,0,TAU); g.fill();
-  g.fillStyle='#f4fbff'; g.beginPath(); for(let i=0;i<=12;i++){ const a=Math.PI*0.05+i/12*Math.PI*0.9, r=i%2?46:58; g.lineTo(Math.cos(a)*r*0.9,14+Math.sin(a)*r); } g.closePath(); g.fill();
-  g.fillStyle='#1a2a3a'; g.beginPath(); g.moveTo(-50,-38); g.lineTo(50,-38); g.lineTo(30,-62); g.lineTo(0,-50); g.lineTo(-30,-62); g.closePath(); g.fill();
-  for(const s of [-1,1]){ g.fillStyle='#1a3a5a'; g.beginPath(); g.ellipse(s*15,-12,7,8,0,0,TAU); g.fill(); g.fillStyle='#bff6ff'; g.beginPath(); g.arc(s*15,-13,2.5,0,TAU); g.fill(); }
+  g.globalAlpha=1;
+  // dark sockets with a pale light for each eye; big white captain's brows
+  for(const s of [-1,1]) pxEye(g,s*15,-12,s,{rx:7,ry:8,r:2.8,white:'#1a3a5a',iris:'#bff6ff',skin:'#cfeefa',lash:'#1a3a5a'});
+  pxBrows(g,{x:15,w:8,y:-24,col:'#f4fbff',lw:4.4,arch:3});
+  pxMouth(g,{y:5,w:8,c:5,col:'#1a3a5a',lw:2.6,dark:'#14304a',tongue:'#6aa0c0'});
+  g.globalAlpha=0.9; g.fillStyle='#f4fbff'; g.beginPath(); const jaw=pxOpenMouth()*8; for(let i=0;i<=12;i++){ const a=Math.PI*0.05+i/12*Math.PI*0.9, r=i%2?46:58; g.lineTo(Math.cos(a)*r*0.9,16+jaw+Math.sin(a)*r); } g.lineTo(-30,16+jaw); g.quadraticCurveTo(0,6+jaw,30,16+jaw); g.closePath(); g.fill(); g.globalAlpha=1;
+  g.save(); g.translate(0,-50); g.rotate(-(X.ear||0)*0.06); g.fillStyle='#1a2a3a'; g.beginPath(); g.moveTo(-50,12); g.lineTo(50,12); g.lineTo(30,-12); g.lineTo(0,0); g.lineTo(-30,-12); g.closePath(); g.fill(); g.fillStyle='#e8f6ff'; g.beginPath(); g.arc(0,3,3.5,0,TAU); g.fill(); g.restore();
+  pxExtras(g,{ex:15,ey:-12,erx:7,ery:8,cheek:2,top:-34,side:40,no:{blush:true},halo:-72});
   g.restore();
 }
 if(typeof EVPORT!=='undefined'){

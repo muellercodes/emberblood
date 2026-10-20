@@ -37,46 +37,109 @@ const EVPORT={
   vor_old:{bg:'#2a0c10',f:g=>faceDragon(g,{skin:'#6a1e18',dark:'#2a0806',snout:'#8a3424',horn:'#e8d4ac',eye:'#ffb04a',k:1.1,big:true})},
   cinder_young:{bg:'#251c15',f:g=>{ g.save(); g.scale(0.92,0.92); faceHelm(g); g.restore(); }}
 };
+// (v12 FACES) every one of these faces shows the line's mood (a12a_dlg's PX and its kit: pxPose, pxEye, pxBrows,
+// pxMouth, crWideMouth, pxExtras)
 function evFaceKob(g,scarf,small){
-  const sk='#b8a060', skD='#8a7438';
-  g.save(); if(small) g.scale(0.88,0.88);
-  g.fillStyle=skD; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*20,-26); g.lineTo(s*40,-44); g.lineTo(s*30,-14); g.closePath(); g.fill(); }
+  const sk='#b8a060', skD='#8a7438', X=PX;
+  g.save(); if(small) g.scale(0.88,0.88); pxPose(g,{py:66}); pxAura(g,0,-4,76);
+  for(const s of [-1,1]){ g.save(); g.translate(s*24,-20); g.rotate(-s*pxEarTurn()); g.fillStyle=skD; g.beginPath(); g.moveTo(-s*4,-6); g.lineTo(s*16,-24); g.lineTo(s*6,6); g.closePath(); g.fill(); g.restore(); }
   g.fillStyle=scarf; g.beginPath(); g.ellipse(0,44,40,14,0,0,TAU); g.fill(); g.fillRect(14,44,12,26);
   g.fillStyle=sk; g.beginPath(); g.ellipse(0,-2,34,36,0,0,TAU); g.fill();
   g.fillStyle='#dccb92'; g.beginPath(); g.ellipse(0,24,22,15,0,0,TAU); g.fill();
   g.fillStyle='#4a3a18'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*6,20,3,2,0,0,TAU); g.fill(); }
-  for(const s of [-1,1]){ g.fillStyle='#fff'; g.beginPath(); g.ellipse(s*14,-6,9,10,0,0,TAU); g.fill(); g.fillStyle='#2a1a08'; g.beginPath(); g.ellipse(s*14+1,-4,5,6.5,0,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*14+3,-7,2.2,0,TAU); g.fill(); }
-  g.fillStyle='rgba(255,120,120,.35)'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*24,10,6,3.5,0,0,TAU); g.fill(); }
-  g.strokeStyle='#4a3a18'; g.lineWidth=2.5; g.beginPath(); g.moveTo(-10,32); g.quadraticCurveTo(0,38,10,32); g.stroke();
+  for(const s of [-1,1]) pxEye(g,s*14,-6,s,{rx:9,ry:10,r:5.4,white:'#fff',iris:'#2a1a08',skin:sk,lash:'#4a3a18',ring:'rgba(74,58,24,.5)'});
+  pxBrows(g,{x:14,w:6,y:-19,col:'#6a5428',lw:2.8,arch:2.6,busy:true});
+  if(!(X.blush>1)){ g.fillStyle='rgba(255,120,120,.35)'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*24,10,6,3.5,0,0,TAU); g.fill(); } }
+  pxMouth(g,{y:31,w:8,c:4.5,col:'#4a3a18',lw:2.5,dark:'#3a1408'});
   g.fillStyle='#d8c48a'; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*8,-34); g.lineTo(s*16,-56); g.lineTo(s*18,-32); g.closePath(); g.fill(); }
+  pxExtras(g,{ex:14,ey:-6,erx:9,ery:10,cheek:12,top:-28,side:34,no:{blush:!(X.blush>1)},halo:-62});
   g.restore();
 }
+// Sir Wispley, a very polite ghost: dark oval eyes and mouth, and a body that droops or bobs
 function evFaceGhost(g){
-  g.globalAlpha=0.9; g.fillStyle='#eaf6ff'; g.beginPath(); g.arc(0,-6,38,Math.PI,0); g.lineTo(38,50); for(let i=0;i<5;i++){ const x=38-i*19; g.quadraticCurveTo(x-5,62,x-9.5,50); g.quadraticCurveTo(x-14,40,x-19,50); } g.closePath(); g.fill(); g.globalAlpha=1;
-  g.fillStyle='#1a2a3a'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*13,-8,6,8,0,0,TAU); g.fill(); } g.beginPath(); g.ellipse(0,16,6,8,0,0,TAU); g.fill();
-  g.fillStyle='#fff'; for(const s of [-1,1]){ g.beginPath(); g.arc(s*13+2,-11,2,0,TAU); g.fill(); }
+  const X=PX;
+  g.save(); pxPose(g,{py:56}); g.globalAlpha=0.9; g.fillStyle='#eaf6ff'; g.beginPath(); g.arc(0,-6,38,Math.PI,0); g.lineTo(38,50); for(let i=0;i<5;i++){ const x=38-i*19; g.quadraticCurveTo(x-5,62,x-9.5,50); g.quadraticCurveTo(x-14,40,x-19,50); } g.closePath(); g.fill(); g.globalAlpha=1;
+  for(const s of [-1,1]) pxEye(g,s*13,-8,s,{rx:6,ry:8,r:2.6,white:'#1a2a3a',iris:'#2c4058',skin:'#eaf6ff',lash:'#1a2a3a'});
+  pxBrows(g,{x:13,w:5,y:-21,col:'#7a98b4',lw:2.4,arch:2,busy:true});
+  if(X.m&&X.m!=='neutral') pxMouth(g,{y:14,w:7,c:5,col:'#1a2a3a',lw:2.6,dark:'#1a2a3a',tongue:'#5a6a8a'});
+  else { g.fillStyle='#1a2a3a'; g.beginPath(); g.ellipse(0,16,5,6.5,0,0,TAU); g.fill(); }
+  pxExtras(g,{ex:13,ey:-8,erx:6,ery:8,cheek:6,top:-30,side:36});
+  g.restore();
 }
+// the mimic: a chest whose lid is its mouth (it opens wide to roar or laugh and grits shut in a temper), with yellow
+// eyes on the lid and carved brows
 function evFaceMimic(g){
-  g.fillStyle='#6a4220'; g.fillRect(-46,-10,92,56); g.fillStyle='#8a5a2c'; g.fillRect(-46,-50,92,30);
-  g.fillStyle='#d8b050'; g.fillRect(-46,-50,92,5); g.fillRect(-46,40,92,6); g.fillRect(-5,-50,10,96);
-  g.fillStyle='#1a0806'; g.fillRect(-40,-20,80,26); g.fillStyle='#e86a7a'; g.beginPath(); g.ellipse(0,2,22,8,0,0,TAU); g.fill();
-  g.fillStyle='#f6eedc'; for(let i=0;i<7;i++){ const x=-36+i*12; g.beginPath(); g.moveTo(x,-20); g.lineTo(x+6,-8); g.lineTo(x+12,-20); g.closePath(); g.fill(); g.beginPath(); g.moveTo(x,6); g.lineTo(x+6,-4); g.lineTo(x+12,6); g.closePath(); g.fill(); }
-  g.fillStyle='#ffe066'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*18,-36,7,5,0,0,TAU); g.fill(); g.fillStyle='#1a1008'; g.fillRect(s*18-1.5,-40,3,8); g.fillStyle='#ffe066'; }
+  const X=PX, m=X.m||'neutral', h={neutral:26,teeth:13,roar:36,laugh:32,scream:34,o:22,small:14,smile:20,smirk:16,frown:12,wobble:12,flat:6,set:8,tiny:9}[m]||26, up=Math.max(-8,(h-26)*0.7);
+  g.save(); pxPose(g,{py:48}); pxAura(g,0,-10,80);
+  g.fillStyle='#6a4220'; g.fillRect(-46,-10,92,56); g.fillStyle='#d8b050'; g.fillRect(-46,40,92,6); g.fillRect(-5,-10,10,56);
+  // the mouth, from the box's rim up to the lid
+  const y0=6, y1=-20-up, lean=m==='smirk'?6:0, sm=m==='smile'||m==='laugh'?6:m==='frown'||m==='wobble'?-6:0;
+  g.fillStyle='#1a0806'; g.beginPath(); g.moveTo(-40,y1+lean); g.lineTo(40,y1-lean); g.lineTo(40,y0-sm-lean); g.quadraticCurveTo(0,y0+sm*1.2,-40,y0-sm+lean); g.closePath(); g.fill();
+  g.save(); g.clip();
+  if(h>=18){ g.fillStyle='#e86a7a'; g.beginPath(); g.ellipse(0,y0-2,22,Math.min(10,h*0.32),0,0,TAU); g.fill(); }
+  g.fillStyle='#f6eedc'; for(let i=0;i<7;i++){ const x=-36+i*12, ty=y1+(lean*(1-2*(i/6))); g.beginPath(); g.moveTo(x,ty); g.lineTo(x+6,ty+Math.min(12,h*0.5)); g.lineTo(x+12,ty); g.closePath(); g.fill();
+    const by=y0-sm*(1-((i-3)/3.5)**2)*0.8+lean*(1-2*(i/6)); g.beginPath(); g.moveTo(x,by+2); g.lineTo(x+6,by-Math.min(10,h*0.4)); g.lineTo(x+12,by+2); g.closePath(); g.fill(); }
+  g.restore();
+  // the lid, raised by how wide the mouth is
+  g.save(); g.translate(0,-up); g.fillStyle='#8a5a2c'; g.fillRect(-46,-50,92,30); g.fillStyle='#d8b050'; g.fillRect(-46,-50,92,5); g.fillRect(-5,-50,10,30);
+  for(const s of [-1,1]){ g.save(); g.translate(s*20,-35); g.scale(0.95,1); dragonEye(g,0,0,s,{eye:'#ffe066',skin:'#8a5a2c',dark:'#3a2010',rot:0.08}); g.restore(); }
+  g.save(); g.translate(2,-21); g.scale(0.9,0.9); dragonBrows(g,{dark:'#4a2a12'}); g.restore();
+  g.restore();
+  pxExtras(g,{ex:20,ey:-35-up,erx:7,ery:5,cheek:-24,top:-54-up,side:46,no:{blush:true}});
+  g.restore();
 }
+// Lord Croakington, the frog king of the swamp choir: big round eyes on top, brows and a wide mouth
 function evFaceFrog(g){
+  g.save(); pxPose(g,{py:46}); pxAura(g,0,-4,78);
   g.fillStyle='#5a9a34'; g.beginPath(); g.ellipse(0,10,50,36,0,0,TAU); g.fill();
-  for(const s of [-1,1]){ g.fillStyle='#6ab040'; g.beginPath(); g.arc(s*24,-22,16,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*24,-22,11,0,TAU); g.fill(); g.fillStyle='#1a1a08'; g.beginPath(); g.arc(s*24,-21,6,0,TAU); g.fill(); }
-  g.strokeStyle='#2a4a14'; g.lineWidth=3.5; g.beginPath(); g.moveTo(-34,16); g.quadraticCurveTo(0,32,34,16); g.stroke();
+  g.fillStyle='rgba(30,60,14,.22)'; for(const [x,y,r] of [[-30,14,5],[28,20,4],[-12,28,3],[36,2,3]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }
+  for(const s of [-1,1]){ g.fillStyle='#6ab040'; g.beginPath(); g.arc(s*24,-22,16,0,TAU); g.fill(); pxEye(g,s*24,-22,s,{rx:11,ry:11,r:6,white:'#fff',iris:'#1a1a08',skin:'#6ab040',lash:'#2a4a14'}); }
+  pxBrows(g,{x:24,w:8,y:-40,col:'#2a4a14',lw:3.2,arch:3,k:1.2,busy:true});
+  g.fillStyle='rgba(255,140,140,.25)'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*36,10,7,4,0,0,TAU); g.fill(); }
+  crWideMouth(g,{y:16,w:34,d:16,col:'#2a4a14',lw:3.5,inside:'#5a1a1a'});
   g.fillStyle='#f0c838'; for(let i=0;i<5;i++){ const x=-20+i*10; g.beginPath(); g.moveTo(x-5,-44); g.lineTo(x,-58-(i%2)*6); g.lineTo(x+5,-44); g.closePath(); g.fill(); } g.fillRect(-25,-46,50,6);
+  pxExtras(g,{ex:24,ey:-22,erx:11,ery:11,cheek:12,top:-42,side:46,no:{blush:true},halo:-66});
+  g.restore();
 }
-function evFaceFog(g){ for(let i=0;i<7;i++){ const a=i/7*TAU; g.fillStyle='rgba(225,232,245,.35)'; g.beginPath(); g.arc(Math.cos(a)*22,Math.sin(a)*16,30,0,TAU); g.fill(); } g.fillStyle='rgba(255,255,255,.85)'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*12,-4,4,2.6,0,0,TAU); g.fill(); } }
+// the fog that shows the hidden glade: two lights for eyes in a drifting cloud, and a faint mouth when it feels something
+function evFaceFog(g){
+  g.save(); pxPose(g,{py:40});
+  for(let i=0;i<7;i++){ const a=i/7*TAU; g.fillStyle='rgba(225,232,245,.35)'; g.beginPath(); g.arc(Math.cos(a)*22,Math.sin(a)*16,30,0,TAU); g.fill(); }
+  for(const s of [-1,1]) pxEye(g,s*12,-4,s,{spirit:true,rx:5,ry:3.4,white:'#fffef4',glow:'rgba(120,160,255,1)',pip:'#3a4a7a',ring:'rgba(80,100,160,.8)'});
+  pxBrows(g,{x:12,w:4.5,y:-11,col:'rgba(90,110,170,.75)',lw:2.2,arch:2,busy:true});
+  pxMouth(g,{y:10,w:6,c:3.5,col:'rgba(80,100,160,.8)',lw:2.2,dark:'rgba(60,70,110,.75)',busy:true});
+  pxExtras(g,{ex:12,ey:-4,erx:4.6,ery:3,cheek:4,top:-24,side:40,no:{blush:true}});
+  g.restore();
+}
+// (v12 FACES) the portrait for a speaker who is not a person. In the Storybook look the face is drawn on its own
+// layer, outlined and set on a bright backdrop like everyone else's (tinted from its own background colour); a face
+// that needs the dark (sb:false, or one of EVPORT_DARK) keeps its own backdrop and still gets the outline
+const EVPORT_DARK=new Set(['n_memory','ev_fog','c_shadow','n_echo_vor','n_echo_vesper','n_echo_glaciar','n_echo_hush']);
 { const base=drawPortrait; drawPortrait=function(who){
   const P=EVPORT[who]; if(!P) return base(who);
-  const c=$('#portrait'), g=c.getContext('2d'), Sz=176;
-  g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,Sz,Sz); g.fillStyle=P.bg; g.fillRect(0,0,Sz,Sz);
-  const gl=g.createRadialGradient(Sz/2,Sz*0.42,6,Sz/2,Sz/2,Sz*0.75); gl.addColorStop(0,'rgba(255,150,70,.28)'); gl.addColorStop(1,'rgba(0,0,0,.45)'); g.fillStyle=gl; g.fillRect(0,0,Sz,Sz);
+  const sb=!!(LOOK&&LOOK.sb)&&typeof lookPortraitCv==='function';
+  const c=sb?lookPortraitCv():$('#portrait'), g=c.getContext('2d'), Sz=176;
+  g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,Sz,Sz);
+  if(!sb) evPortraitBg(g,P,Sz);
   g.save(); g.translate(Sz/2,Sz/2+14); try{ P.f(g); }catch(e){} g.restore();
+  if(sb) evPortraitFinish(who,P,c);
 }; }
+function evPortraitBg(g,P,Sz){
+  g.fillStyle=P.bg; g.fillRect(0,0,Sz,Sz);
+  const gl=g.createRadialGradient(Sz/2,Sz*0.42,6,Sz/2,Sz/2,Sz*0.75); gl.addColorStop(0,'rgba(255,150,70,.28)'); gl.addColorStop(1,'rgba(0,0,0,.45)'); g.fillStyle=gl; g.fillRect(0,0,Sz,Sz);
+}
+// a bright backdrop in the hue of a face's dark background colour (a light centre, a deeper rim), like the main cast's
+function evSbBackdrop(bg){
+  const c=/^#[0-9a-f]{6}$/i.test(bg||'')?hexRGB(bg):[58,42,32], r=c[0]/255, gg=c[1]/255, b=c[2]/255, mx=Math.max(r,gg,b), mn=Math.min(r,gg,b), d=mx-mn, l=(mx+mn)/2;
+  let h=0, sat=d?d/(1-Math.abs(2*l-1)):0; if(d){ h=mx===r?((gg-b)/d)%6:mx===gg?(b-r)/d+2:(r-gg)/d+4; h=(h*60+360)%360; }
+  return [`hsl(${h.toFixed(0)},${(clamp(sat,0.35,0.75)*100).toFixed(0)}%,89%)`,`hsl(${h.toFixed(0)},${(clamp(sat+0.1,0.4,0.62)*100).toFixed(0)}%,56%)`];
+}
+function evPortraitFinish(who,P,face){
+  if(P.sb===false||EVPORT_DARK.has(who)){ const c=$('#portrait'), g=c.getContext('2d'); g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,176,176); evPortraitBg(g,P,176);
+    g.drawImage(outlineSprite(face,SBC.outline,2.4,{scale:1,force:true}),0,0); return; }
+  if(typeof SB_PBG!=='undefined'&&!SB_PBG[who]) SB_PBG[who]=evSbBackdrop(P.bg);
+  lookPortraitFinish(who,face);
+}
 
 // ================= state
 const EV={g:null,E:null,free:0,gap:150,lastEnd:-999,pipGo:null,carry:null,ally:null,fx:[],hist:[],dream:null,dreamT:0,pipDream:-99};

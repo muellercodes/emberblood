@@ -45,10 +45,10 @@ quest({
     mb_offer: [
       ['f_mumble', '(very quietly) ...hello. Sorry. Hello.', '(quietly) ...hello. Sorry.'],
       ['ash', "Whoa. You're HUGE."],
-      ['f_mumble', 'Sorry. I am Mumble. I used to have a big roar. Like a mountain clearing its throat.', 'I am Mumble. I had a big roar.'],
-      ['f_mumble', 'Then the purple cold came. It froze in my throat. Now I go...', 'The purple cold froze it. Now I go...'],
-      ['f_mumble', '(squeak)'],
-      ['f_mumble', 'The Rimehounds laugh at me. Every night. Could you... maybe... help me find it?', 'The wolves laugh at me. Can you help?'],
+      ['f_mumble', 'Sorry. I am Mumble. I used to have a big roar. Like a mountain clearing its throat.', 'I am Mumble. I had a big roar.', { mood: 'sad' }],
+      ['f_mumble', 'Then the purple cold came. It froze in my throat. Now I go...', 'The purple cold froze it. Now I go...', { mood: 'sad' }],
+      ['f_mumble', '(squeak)', { mood: 'shy' }],
+      ['f_mumble', 'The Rimehounds laugh at me. Every night. Could you... maybe... help me find it?', 'The wolves laugh at me. Can you help?', { mood: 'worried' }],
       { if: 'flag f_thaw_f_sigrun', then: [
         ['f_mumble', 'Sigrun in Rimeholm makes the hottest soup in the north. Hot soup melts things.', 'Sigrun makes the hottest soup.']],
         else: [
@@ -60,23 +60,23 @@ quest({
       ['narr', 'The pot is as big as you are. It smells like onions and courage.', 'A huge pot. It smells like onions and courage.'],
     ],
     mb_bring: [
-      ['f_mumble', '(gulp, gulp, gulp) ...warm. So warm.', '(gulp, gulp) ...warm.'],
-      ['f_mumble', '(squeak) ...still squeaky.', '(squeak) Still squeaky.'],
+      ['f_mumble', '(gulp, gulp, gulp) ...warm. So warm.', '(gulp, gulp) ...warm.', { mood: 'peaceful' }],
+      ['f_mumble', '(squeak) ...still squeaky.', '(squeak) Still squeaky.', { mood: 'sad' }],
       ['narr', 'Howls. Close. Six Rimehounds trot out of the trees, grinning, led by a big one with a torn ear.', 'Six wolves come out of the trees!'],
-      ['f_mumble', "(whisper) That's Snarl. He's the worst.", "(whisper) That's Snarl. He's the worst."],
+      ['f_mumble', "(whisper) That's Snarl. He's the worst.", "(whisper) That's Snarl. He's the worst.", { mood: 'scared' }],
       ['ash', 'Mumble. Watch me. Then do what I do.', 'Watch me. Do what I do.'],
     ],
     mb_thanks: [
-      ['f_mumble', 'I ROARED! Did you hear me? Everyone heard me! The MOUNTAIN heard me!', 'I ROARED! The MOUNTAIN heard me!'],
+      ['f_mumble', 'I ROARED! Did you hear me? Everyone heard me! The MOUNTAIN heard me!', 'I ROARED! The MOUNTAIN heard me!', { mood: 'laughing' }],
       { if: 'choice f_glaciar=free', then: [
         ['narr', 'Far, far away, a dragon roars back. It sounds like a hundred wind chimes laughing.', 'Far away, a dragon roars back. Like wind chimes!'],
-        ['f_mumble', '...Was that the ice dragon? She is very loud. I like her.', 'Was that the ice dragon? I like her.']],
+        ['f_mumble', '...Was that the ice dragon? She is very loud. I like her.', 'Was that the ice dragon? I like her.', { mood: 'happy' }]],
         else: [
         ['narr', 'Far away, up on Mount Dread, something answers. A long, deep, sleepy rumble. Like a giant turning over in bed.',
           'Far away on the mountain, something big rumbles. Sleepily.', { clue: 'f3_mumble_echo' }],
-        ['f_mumble', '...That was not me. Was that you?', 'That was not me. Was it you?'],
+        ['f_mumble', '...That was not me. Was that you?', 'That was not me. Was it you?', { mood: 'surprised' }],
         ['ash', 'No. That came from the very TOP of the mountain.', 'No. It came from the mountain top.']] },
-      ['f_mumble', 'If you ever need somebody big... I will come. I will roar. Loudly. Not sorry at all.', 'If you need somebody big, I will come and roar!'],
+      ['f_mumble', 'If you ever need somebody big... I will come. I will roar. Loudly. Not sorry at all.', 'If you need somebody big, I will come and roar!', { mood: 'proud' }],
     ],
   },
 })

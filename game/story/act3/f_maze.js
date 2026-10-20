@@ -111,27 +111,27 @@ chapter({
       ['narr', 'A huge walrus in a dented helmet waddles out from behind an ice shield. He adjusts his monocle.', 'A huge walrus in a helmet waddles out. He fixes his monocle.'],
       ['f_blubberton', 'I say! Unhand my hall, you scaly scamp!', 'I say! Leave my hall, you scaly scamp!'],
       ['ash', "It's not your hall. It's Ember's forge."],
-      ['f_blubberton', 'Possession is nine tenths of the law! Tally ho!', "I'm sitting in it, so it's mine! Tally ho!"],
+      ['f_blubberton', 'Possession is nine tenths of the law! Tally ho!', "I'm sitting in it, so it's mine! Tally ho!", { mood: 'smug' }],
     ],
     f_blubberton_won: [
       ['f_blubberton', 'Harrumph. Jolly good show, old bean. Here, the furnace key. I was only guarding it because nobody told me to stop.',
-        "Harrumph. Jolly good show. Here's the furnace key. Nobody told me to stop guarding it.", { ref: 'f_maze_door' }],
+        "Harrumph. Jolly good show. Here's the furnace key. Nobody told me to stop guarding it.", { mood: 'happy', ref: 'f_maze_door' }],
       ['narr', 'Lord Blubberton waddles off to take a bath.'],
     ],
     f_bellows_intro: [
       ['narr', 'In the middle of the dead forge stands a golem as big as a cottage. Brass belly, anvil fists, a great leather bellows on his back. Plates of purple moth-frost cover his shoulders and arms.',
         'A golem as big as a cottage. Brass belly. Anvil fists. Purple frost armor.'],
-      ['f_bellows', 'CLANK. Bellows... cold... Purple cold says: no fire.', 'CLANK. Bellows cold. Purple cold says: no fire.'],
+      ['f_bellows', 'CLANK. Bellows... cold... Purple cold says: no fire.', 'CLANK. Bellows cold. Purple cold says: no fire.', { mood: 'cold' }],
       ['tove', "That's Old Bellows, Ember's forge keeper! The frost has got him. Melt it off!", "That's Old Bellows, Ember's forge keeper! Melt the frost off him!"],
     ],
     // right after the boss (6 lines)
     f_maze_won: [
       ['narr', 'The purple frost cracks off Old Bellows like an eggshell. Underneath he is warm brass and soot and rivets.', 'The purple frost cracks off. Underneath he is warm brass.'],
-      ['f_bellows', 'Fff. Fwooosh. Warm? Small hot one. You smell like the boss.', 'Fff. Fwooosh. Warm? You smell like the boss.'],
+      ['f_bellows', 'Fff. Fwooosh. Warm? Small hot one. You smell like the boss.', 'Fff. Fwooosh. Warm? You smell like the boss.', { mood: 'surprised' }],
       ['ash', 'The boss? You mean Ember?'],
       ['f_bellows', 'Ember. And the Cold One. They made Bellows. Then the purple cold came, and Bellows forgot.',
-        'Ember and the Cold One made Bellows. Then the purple cold came.', { clue: 'f3_bellows_cold' }],
-      ['f_bellows', 'Bellows will light the forge again. Bellows will keep it warm until somebody needs it.', 'Bellows will light the forge again. And keep it warm.'],
+        'Ember and the Cold One made Bellows. Then the purple cold came.', { mood: 'sad', clue: 'f3_bellows_cold' }],
+      ['f_bellows', 'Bellows will light the forge again. Bellows will keep it warm until somebody needs it.', 'Bellows will light the forge again. And keep it warm.', { mood: 'determined' }],
       ['narr', "Old Bellows gives you a hug. It's like being hugged by a toasty oven that loves you.", 'Old Bellows hugs you. Like a warm oven that loves you.'],
     ],
     // by the warp ring at the end (Ember's voice; the player already worked out what the Hearth needs)

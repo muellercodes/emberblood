@@ -38,7 +38,7 @@ chapter({
     n_dawn_lines: [
       { do: ['emit n4fx:dawn'] },
       ['narr', 'As the light comes back, the black glass of the peak turns clear as water, and little white flowers push up through the cracks. And at the very top, where nothing could possibly have climbed...', 'The glass turns clear. Flowers grow. And at the very top...', { do: ['emit n4fx:duchess_show'] }],
-      ['goat', 'Meh.'],
+      ['goat', 'Meh.', { mood: 'smug' }],
       { if: 'solved n5_who_follows', then: [
         ['ash', 'DUCHESS! I KNEW it!', { mood: 'laughing', do: ['emit n4fx:duchess_seen'] }] ],
         else: [

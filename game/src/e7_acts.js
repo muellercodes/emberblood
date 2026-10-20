@@ -678,7 +678,7 @@ function heartLines(e){
 Object.assign(EVPORT,{
   c_thief:{bg:'#1e1630',f:g=>faceThief(g)},
   c_letter:{bg:'#3a2c1c',f:g=>faceLetter(g)},
-  c_pebble:{bg:'#24283a',f:g=>{ g.save(); g.scale(2.4,2.4); drawCrowAt(g,0,4,0.5,true); g.restore(); }},
+  c_pebble:{bg:'#24283a',f:g=>faceCrow(g)},
   c_grandpa:{bg:'#3a1810',f:g=>{ faceDragon(g,{skin:'#c8482a',dark:'#7a2412',snout:'#e8784a',horn:'#fff0d4',eye:'#ffcf4a',k:0.78}); if(G&&G.choices&&G.choices.ending==='lantern'){ g.fillStyle='#4ac0e8'; g.beginPath(); g.moveTo(-14,-46); g.lineTo(2,-86); g.lineTo(16,-44); g.closePath(); g.fill(); g.strokeStyle='#1a2a3a'; g.lineWidth=2.5; g.stroke(); g.fillStyle='#ffe066'; g.beginPath(); g.arc(2,-88,5,0,TAU); g.fill(); } }}
 });
 
@@ -726,6 +726,25 @@ function faceLetter(g){
   g.save(); g.translate(-40,46); g.rotate(-0.6); g.fillStyle='#1a1a24'; g.beginPath(); g.ellipse(0,0,8,30,0,0,TAU); g.fill(); g.restore();
 }
 // a crow: in the sky (live) and in portraits. g is a 2D context, (x,y) her body, k the wing beat (0..1)
+// (v12 FACES) Pebble the crow, close up for the dialogue box: a glossy head with a tuft, a bright eye each side, a beak
+// that opens to caw, and wings that lift when he is excited and droop when he is down (a12a_dlg's kit)
+function faceCrow(g){
+  const X=PX, ear=X.ear||0, O='#05050a', up=pxEarTurn(0.5,0.4);
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-6,74); g.lineJoin='round'; g.lineWidth=2.4; g.strokeStyle=O;
+  for(const s of [-1,1]){ g.save(); g.translate(s*26,10); g.rotate(-s*up); g.fillStyle='#1c1c28'; g.beginPath(); g.moveTo(0,-10); g.quadraticCurveTo(s*34,-18,s*42,30); g.quadraticCurveTo(s*20,40,0,40); g.closePath(); g.fill(); g.stroke();
+    g.strokeStyle='rgba(120,130,180,.35)'; g.lineWidth=1.6; for(const t of [0.35,0.6,0.85]){ g.beginPath(); g.moveTo(s*8,-4+t*36); g.quadraticCurveTo(s*26,t*30,s*36,10+t*24); g.stroke(); } g.restore(); }
+  g.fillStyle='#16161e'; g.beginPath(); g.ellipse(0,34,34,30,0,0,TAU); g.fill(); g.stroke();
+  g.fillStyle='#f2e6c8'; g.save(); g.translate(26,40); g.rotate(-0.3); g.fillRect(-9,-6,18,12); g.strokeStyle='#8a7048'; g.lineWidth=1.4; g.strokeRect(-9,-6,18,12); g.beginPath(); g.moveTo(-9,-6); g.lineTo(0,1); g.lineTo(9,-6); g.stroke(); g.restore();
+  g.fillStyle='#1a1a24'; g.strokeStyle=O; g.lineWidth=2.4; g.beginPath(); g.ellipse(0,-8,30,30,0,0,TAU); g.fill(); g.stroke();
+  // the tuft on top
+  g.fillStyle='#1a1a24'; for(const [x,a] of [[-6,-0.4],[0,0],[6,0.4]]){ g.save(); g.translate(x,-36); g.rotate(a+(ear<0?a*0.8:-a*0.3)); g.beginPath(); g.moveTo(-3,2); g.quadraticCurveTo(0,-14-ear*4,3+ear,-18-ear*5); g.quadraticCurveTo(2,-6,4,2); g.closePath(); g.fill(); g.restore(); }
+  g.fillStyle='rgba(140,150,220,.18)'; g.beginPath(); g.ellipse(-10,-22,12,6,-0.5,0,TAU); g.fill();
+  for(const s of [-1,1]) pxEye(g,s*13,-10,s,{rx:6.4,ry:6.4,r:4.2,white:'#e8e4d8',iris:'#121218',pupil:'#000',skin:'#1a1a24',lash:'#0a0a10',ring:'#3a3a4a'});
+  pxBrows(g,{x:13,w:6,y:-20,col:'#3a3a52',lw:3,arch:2,busy:true});
+  crBeak(g,0,2,{w:9,h:16,col:'#e8b830',low:'#c8962a',ol:'#5a3a10'});
+  pxExtras(g,{ex:13,ey:-10,erx:6.4,ery:6.4,cheek:-1,top:-36,side:30,no:{blush:true},halo:-60});
+  g.restore();
+}
 function drawCrowAt(g,x,y,k,sit){
   g.save(); g.translate(x,y); g.lineJoin='round';
   const w=sit?0.25:Math.sin(k*TAU);

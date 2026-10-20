@@ -117,7 +117,9 @@ const VOICE_NOT_PEOPLE = new Set(['narr', 'sign', 'note', 'book', 'banner']);
 const MOODS = new Set(['neutral', 'happy', 'laughing', 'sad', 'worried', 'scared', 'angry', 'surprised', 'determined', 'sleepy', 'sly', 'cold', 'shy', 'tender',
   'laugh', 'giggle', 'glad', 'joy', 'smile', 'pleased', 'mad', 'cross', 'furious', 'afraid', 'fear', 'frightened', 'shocked', 'shock', 'amazed', 'tired', 'sleep',
   'brave', 'firm', 'resolute', 'soft', 'warm', 'gentle', 'loving', 'sorry', 'cry', 'crying', 'upset', 'nervous', 'anxious', 'uneasy', 'embarrassed', 'bashful',
-  'smug', 'sneaky', 'icy', 'blank']);
+  'smug', 'sneaky', 'icy', 'blank',
+  // (v12 FACES) the bosses' and creatures' moods, and their other words
+  'hurt', 'ashamed', 'proud', 'peaceful', 'defeated', 'pain', 'ouch', 'shame', 'guilty', 'peace', 'calm', 'serene', 'rage', 'enraged', 'beaten', 'defeat', 'dizzy', 'dazed']);
 // talk v11 (STORY_PLAN 6.3): menu labels banned in data, and the generic choose prompts
 export const BANNED_LABELS = ["What's new?", 'Tell me about yourself.', "You look like something's on your mind.", 'Anything else?', 'What else is on your mind?'];
 export const GENERIC_ASKS = ['What do you do?', 'What do you say?'];

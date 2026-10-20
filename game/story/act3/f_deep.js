@@ -32,14 +32,14 @@ chapter({
     ],
     f_deep_shrine: [
       ['narr', 'A flame burns on a round drum stone in the middle of the hall. Far below your feet, the snoring stops.', 'A flame burns on a drum stone. Below, the snoring stops.'],
-      ['f_grumblehorn', '(from below, fast asleep) Hrrm. Somebody on my drum stone. Knees soft. Come down on the heels. ...Again.', '(from below, asleep) Hrrm. Knees soft. Come down hard. Again.'],
+      ['f_grumblehorn', '(from below, fast asleep) Hrrm. Somebody on my drum stone. Knees soft. Come down on the heels. ...Again.', '(from below, asleep) Hrrm. Knees soft. Come down hard. Again.', { mood: 'sleepy' }],
       ['ash', 'Is he teaching me? In his sleep?', 'Is he teaching me in his sleep?'],
       ['tove', 'Ember learned to knock from his grandfather. Listen to him.', 'Ember learned from his grandpa. Listen.'],
     ],
     f_deep_gift: [
       ['narr', 'The flame drops into you like a stone into a pond. Your feet feel heavy, the good kind of heavy. The kind that breaks floors.', 'The flame drops into you like a stone. Your feet feel heavy!'],
       ['f_grumblehorn', '(from below, still asleep) Ground Pound. Jump, then come down hard. Cracked floors break. Switches flip. Armor falls off grumpy things. Hrrrm.',
-        '(asleep) Ground Pound. Jump, then come down hard. Hrrm.'],
+        '(asleep) Ground Pound. Jump, then come down hard. Hrrm.', { mood: 'sleepy' }],
       ['ash', 'Thank you, Your Majesty.', 'Thank you, Your Majesty.'],
       ['tove', "He's asleep, Ash.", "He's asleep, Ash."],
       ['ash', 'Still.', 'Still.'],
@@ -51,23 +51,23 @@ chapter({
       ['tove', 'It\'s pitch black. Every pound sends a ring of light along the stone. Pound, look, then walk.', 'It\'s dark. Pound, look, then walk.'],
     ],
     f_rockjaw_intro: [
-      ['f_rockjaw', 'ROLL ROLL ROLL! I\'m not round, I\'m big-boned!', 'ROLL ROLL ROLL! I\'m big-boned!'],
+      ['f_rockjaw', 'ROLL ROLL ROLL! I\'m not round, I\'m big-boned!', 'ROLL ROLL ROLL! I\'m big-boned!', { mood: 'angry' }],
     ],
     f_rockjaw_won: [
-      ['f_rockjaw', 'Dizzy. So dizzy. The key\'s over there. Don\'t roll it. I\'m begging.', 'So dizzy. The key is over there.'],
+      ['f_rockjaw', 'Dizzy. So dizzy. The key\'s over there. Don\'t roll it. I\'m begging.', 'So dizzy. The key is over there.', { mood: 'defeated' }],
     ],
     f_grumblehorn_intro: [
       ['narr', 'On a throne carved out of the mountain sits a ram with horns curled like two millstones. His wool is like grey stone. His horns ring with violet light.', 'A huge ram sits on a stone throne. His horns glow purple.'],
       ['f_grumblehorn', 'HRRRMPH! Who\'s been stomping on my drum stone?', 'HRRRMPH! Who stomped on my drum stone?'],
       ['ash', 'Me! Ash! You taught me! In your sleep!', 'Me! You taught me in your sleep!'],
-      ['f_grumblehorn', 'Get off my lawn! I don\'t have a lawn! Get off it anyway!', 'Get off my lawn! I don\'t have a lawn!'],
+      ['f_grumblehorn', 'Get off my lawn! I don\'t have a lawn! Get off it anyway!', 'Get off my lawn! I don\'t have a lawn!', { mood: 'furious' }],
     ],
     // right after the boss: 6 lines
     f_deep_won: [
       ['narr', 'King Grumblehorn\'s horns stop glowing purple. He sits down so hard the whole room bounces.', 'The King\'s horns stop glowing. He sits down. The room bounces.'],
-      ['f_grumblehorn', 'Hrrrmph. Who\'s been banging on my head?', 'Hrrrmph. Who banged on my head?'],
+      ['f_grumblehorn', 'Hrrrmph. Who\'s been banging on my head?', 'Hrrrmph. Who banged on my head?', { mood: 'hurt' }],
       ['ash', 'Me. Sorry.', 'Me. Sorry.'],
-      ['f_grumblehorn', 'Hrm. Good drumming. Very good. The old monks drummed like that, up on the mountain. She always opened for them.', 'Good drumming! The old monks drummed like that. She opened for them.', { clue: 'f3_good_drumming' }],
+      ['f_grumblehorn', 'Hrm. Good drumming. Very good. The old monks drummed like that, up on the mountain. She always opened for them.', 'Good drumming! The old monks drummed like that. She opened for them.', { mood: 'happy', clue: 'f3_good_drumming' }],
       ['ash', 'She?', 'She?'],
       ['f_grumblehorn', 'The Gate. The dragon. Old ladies, the pair of them, and cold as each other. Hrrrmph. Off you go.', 'The Gate. Or the dragon. Both old ladies. Off you go.', { ref: 'f_dread_door' }],
     ],

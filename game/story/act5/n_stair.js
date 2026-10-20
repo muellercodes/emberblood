@@ -172,9 +172,9 @@ chapter({
       ['n_echo_vor', 'Then I will take it back, hatchling.', 'Then I will take it back.'],
       ['ash', 'Try.'],
       { if: 'choice cinder=ally', then: [
-        ['cinder', '"One last fight," I told you at the gate. It seems I had one more in me, Emberblood.', 'I said one last fight. I had one more in me.', { ref: 'obsidian_gate' }],
+        ['cinder', '"One last fight," I told you at the gate. It seems I had one more in me, Emberblood.', 'I said one last fight. I had one more in me.', { mood: 'proud', ref: 'obsidian_gate' }],
         ['ash', 'Sir Cindervane! You came back!', 'Sir Cindervane! You came back!'],
-        ['cinder', 'Some knights never learn to sit down. I will hold the stairs. Go!', 'I will guard the stairs. Go!'],
+        ['cinder', 'Some knights never learn to sit down. I will hold the stairs. Go!', 'I will guard the stairs. Go!', { mood: 'determined' }],
       ] },
       ['narr', "Greymane's hackles rise. He has met this dragon before, too.", 'Greymane growls. He knows this dragon.', { if: 'choice greymane=ally' }],
     ],
