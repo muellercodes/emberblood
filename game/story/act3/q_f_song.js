@@ -4,7 +4,8 @@
 // the Stonehorn hills (Ground Pound). Brynja sings the whole song at the Hearth. The song does not give the answer
 // away: it proves what the player works out (a red-horned girl with fire called the Snow Mother "Auntie"), a bonus
 // clue f3_song for A3b's snow_mother. Surprise: Brother Eider finds Wren's lost eleventh page stuck to a frost pudding
-// recipe: on the first Lantern Day a little grey moth sat on Ember's lantern, and Ember named her Nyx (set f_page11,
+// recipe: on the first Lantern Day a little grey moth sat on Ember's lantern, and Ember gave her a name (v12: the page
+// never says which: "Nyx" is first said in Act V, ring 2) (set f_page11,
 // the old flag the finale's kind ending reads). Payoff: truth (f3_song); also f_song (A3b's free outro "stay" and the
 // defeat path's song; A3S's f3_crown_wake).
 // Old saves: QDEFS.f_song steps 0..1 map to verses, sing. The three verse places stay x2_people's own mechanics (the
@@ -72,12 +73,12 @@ quest({
       { if: '!flag f3_iska_open', then: [
         ['f_eider', "Wait. WAIT. Wren's lost page! The eleventh one! It was stuck to the back of a frost pudding recipe. Very old jam.",
           "Wait! Wren's lost page! It was stuck to a pudding recipe!"],
-        ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx." (Iska)',
-          '"A little grey moth sat on Ember\'s lantern. Ember named her Nyx."'],
-        ['ash', 'Nyx. A little grey moth... named by Ember.', 'Nyx. Ember named her.']],
+        ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember gave her a name. We thought nothing of it." (Iska)',
+          '"A grey moth sat on Ember\'s lantern. Ember gave her a name."'],
+        ['ash', 'A moth with a name. And nobody wrote the name down.', 'Ember named a moth. Nobody wrote the name down.']],
         else: [
-        ['f_eider', "And look: Wren's lost eleventh page, stuck to a frost pudding recipe. The same words as Iska's box. Nyx. Shh. Sorry.",
-          "Wren's lost page! Same as Iska's. Nyx."]] },
+        ['f_eider', "And look: Wren's lost eleventh page, stuck to a frost pudding recipe. The same words as Iska's box. No name. Shh. Sorry.",
+          "Wren's lost page! Same as Iska's. No name."]] },
       ['f_brynja', 'Then go and sing it where it is needed, child. Hearthold never forgot her. Only her name.', 'Go and sing it, child.'],
     ],
   },
