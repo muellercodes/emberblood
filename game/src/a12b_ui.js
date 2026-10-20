@@ -416,7 +416,8 @@ const ICO_ART={
     P.fl('#f2e2c0',g=>{ g.moveTo(0,-11); g.quadraticCurveTo(-9,-19,-7,-11); g.closePath(); g.moveTo(0,-11); g.quadraticCurveTo(9,-19,7,-11); g.closePath(); }); }
 };
 // which drawing each item gets: by id, by the ITEMDEF icon name, by words in the id and name, then by its group
-const ICO_ID={letter_b:'letter',recipe:'scroll',frostberry:'berry',basket:'basket',moonlily:'flower',letter_moss:'letter',oath_letter:'letter.old',oath_badge:'badge',
+const ICO_ID={it_bun:'bun',it_pepper:'pepper',it_feather:'crowfeather',it_taffy:'taffy',it_drop:'thunder',it_stone:'hearth',it_snowball:'snowball',it_pudding:'pudding',
+  letter_b:'letter',recipe:'scroll',frostberry:'berry',basket:'basket',moonlily:'flower',letter_moss:'letter',oath_letter:'letter.old',oath_badge:'badge',
   tunnel_key:'key',oath_plans:'scroll.plans',lucky_pick:'pick',star_iron:'ore',horn:'horn',fish:'fish',rod:'rod',lucky_lure:'lure',kettle:'kettle',honey:'honey',
   juniper_map:'map',carrot:'carrot',map_x1:'map',map_x2:'map',map_x3:'map',lantern:'lantern',treat:'treat',relic:'cloak',errand:'parcel',
   parcel_nana_osric:'sweater',parcel_wendel_dell:'jar.worms',parcel_hal_ulf:'cheese',parcel_marigold_hob:'scarf',parcel_quill_gorran:'map.star',parcel_cookie_tilly:'scroll',
@@ -609,10 +610,12 @@ function bagHtml(E){
       out.push('<div class="bag">'+L.map(i=>{ const [nm,note]=bagSplit(i.name), d=i.desc||note;
         return `<div class="bi" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b>${i.count>1?`<span class="bn">×${i.count}</span>`:''}${d?`<small>${E(d)}</small>`:''}</div></div>`; }).join('')+'</div>');
     }else{
-      out.push('<div class="bgrid">'+L.map(i=>{ const [nm,note]=bagSplit(i.name), need=k==='quest'?bagNeed(i.id):'', d=i.desc||note;
-        return `<div class="bi tile" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b>${i.count>1?`<span class="bn">×${i.count}</span>`:''}${d?`<small>${E(d)}</small>`:''}${need?`<small class="for">${E('For')}: ${E(need)}</small>`:''}</div></div>`; }).join('')
-        +H.map(h=>{ const on=G.hat===h;
-          return `<div class="bi tile hat" data-item="hat:${escapeHtml(h)}">${bagIco('hat:'+h)}<div class="bt"><b>${E(bagHatName(h))}</b><small>${E(on?'You are wearing it.':'A hat to wear.')}</small></div><div class="bb"><button type="button" class="btn c sm${on?'':' hot'}" data-wear="${escapeHtml(h)}">${on?'Take off':'Wear'}</button></div></div>`; }).join('')+'</div>');
+      // quest things and keepsakes: small tiles (the name's bracket part, and the quest that wants it now, as notes)
+      if(L.length) out.push('<div class="bgrid">'+L.map(i=>{ const [nm,note]=bagSplit(i.name), need=k==='quest'?bagNeed(i.id):'';
+        return `<div class="bi tile" data-item="${escapeHtml(i.id)}">${bagIco(i.id)}<div class="bt"><b>${E(nm)}</b>${i.count>1?`<span class="bn">×${i.count}</span>`:''}${note?`<small>${E(note)}</small>`:''}${need?`<small class="for">${E('For')}: ${E(need)}</small>`:''}</div></div>`; }).join('')+'</div>');
+      // hats Ash can wear (G.hats): Wear, or Take off for the one on his head
+      if(H.length) out.push('<div class="bgrid hats">'+H.map(h=>{ const on=G.hat===h;
+          return `<div class="bi tile hat${on?' on':''}" data-item="hat:${escapeHtml(h)}">${bagIco('hat:'+h)}<div class="bt"><b>${E(bagHatName(h))}</b>${on?`<small>${E('You are wearing it.')}</small>`:''}</div><div class="bb"><button type="button" class="btn c sm${on?'':' hot'}" data-wear="${escapeHtml(h)}">${on?'Take off':'Wear'}</button></div></div>`; }).join('')+'</div>');
     }
   }
   out.push(`<div class="jh2">Blade</div><p>Tier ${G.tier+1}. Bring star-iron to Mom at the forge to sharpen it.</p>`);
