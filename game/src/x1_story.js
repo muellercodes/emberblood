@@ -106,15 +106,44 @@ function c1FbSpot(id){
   return P.at;
 }
 // portraits for the speakers that are not plain people
+// (v12 FACES) the moth face (the Moon Temple's sentry moths): eyes on the head with lids, brows and a mouth when it
+// feels something, antennae that droop or stand
 function c1FaceMoth(g,big){
-  const O='#1a1424'; g.lineWidth=3; g.strokeStyle=O;
+  const O='#1a1424', X=PX, ear=X.ear||0; g.save(); pxPose(g,{py:58}); g.lineWidth=3; g.strokeStyle=O;
   for(const s of [-1,1]){ g.fillStyle='#8a7aa8'; g.beginPath(); g.moveTo(s*8,-6); g.bezierCurveTo(s*40,-60,s*86,-50,s*76,-4); g.bezierCurveTo(s*70,22,s*30,24,s*8,8); g.closePath(); g.fill(); g.stroke();
     g.fillStyle='#6a5a8a'; g.beginPath(); g.moveTo(s*8,10); g.bezierCurveTo(s*40,20,s*56,52,s*30,58); g.bezierCurveTo(s*14,56,s*8,34,s*6,16); g.closePath(); g.fill(); g.stroke();
     g.fillStyle=big?'#c8a8ff':'#e8e0ff'; g.beginPath(); g.arc(s*48,-18,13,0,TAU); g.fill(); g.stroke(); g.fillStyle=O; g.beginPath(); g.arc(s*48,-18,6,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*46,-21,2.2,0,TAU); g.fill(); }
-  g.fillStyle='#4a3e5e'; g.beginPath(); g.ellipse(0,8,10,30,0,0,TAU); g.fill(); g.stroke();
-  for(const s of [-1,1]){ g.strokeStyle='#d8c8f0'; g.lineWidth=2.4; g.beginPath(); g.moveTo(s*4,-20); g.quadraticCurveTo(s*14,-52,s*30,-58); g.stroke(); }
-  g.fillStyle=big?'#e8d8ff':'#2a2034'; for(const s of [-1,1]){ g.beginPath(); g.arc(s*5,-16,3.4,0,TAU); g.fill(); }
+  g.fillStyle='#4a3e5e'; g.beginPath(); g.ellipse(0,8,12,30,0,0,TAU); g.fill(); g.stroke();
+  for(const s of [-1,1]){ g.strokeStyle='#d8c8f0'; g.lineWidth=2.4; g.beginPath(); g.moveTo(s*4,-20); g.quadraticCurveTo(s*(14+(ear<0?-ear*6:0)),-52+(ear<0?-ear*18:-ear*4),s*(30+(ear<0?-ear*4:0)),-58+(ear<0?-ear*30:-ear*6)); g.stroke(); }
+  for(const s of [-1,1]) pxEye(g,s*5.5,-14,s,{rx:4.2,ry:4.6,r:2.6,white:big?'#e8d8ff':'#f4f0ff',iris:'#2a2034',skin:'#4a3e5e',lash:O});
+  pxBrows(g,{x:5.5,w:3.4,y:-21,col:'#d8c8f0',lw:2,arch:1.6,busy:true});
+  pxMouth(g,{y:-4,w:3.6,c:2.6,col:'#d8c8f0',lw:1.8,dark:'#1a1424',busy:true});
   glowAtG(g,0,-10,90,'184,168,232',0.18);
+  pxExtras(g,{ex:6,ey:-14,erx:4.2,ery:4.6,cheek:-8,top:-26,side:14,k:0.7,no:{blush:true}});
+  g.restore();
+}
+// Grand Admiral Pinch, a crab in a bicorne under his shell: (v12 FACES) eyes on stalks that stand up or droop, lids,
+// brows, a mouth, and claws that come up to salute or to snap
+function c1FacePinch(g){
+  const O='#2a0e08', X=PX, ear=X.ear||0, n=X.n, hot=n==='angry'||n==='furious';
+  g.save(); pxPose(g,{py:58}); pxAura(g,0,0,84); g.lineWidth=3; g.strokeStyle=O; g.lineJoin='round';
+  g.fillStyle='#6a4428'; g.beginPath(); g.moveTo(-64,40); g.lineTo(-40,-30); g.lineTo(44,-36); g.lineTo(66,40); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle='#1a1008'; for(const x of [-30,0,30]){ g.beginPath(); g.arc(x,6,8,0,TAU); g.fill(); }
+  // claws: raised and open when he shouts, tucked when he sulks
+  const up=hot||n==='surprised'||n==='laughing'||n==='proud'?1:n==='sad'||n==='defeated'||n==='ashamed'||n==='scared'?-1:0, snap=pxOpenMouth();
+  for(const s of [-1,1]){ g.save(); g.translate(s*44,40); g.rotate(s*(0.2-up*0.45)); g.fillStyle='#d8502e';
+    g.beginPath(); g.ellipse(s*10,-14,13,18,s*0.3,0,TAU); g.fill(); g.stroke();
+    g.fillStyle='#e8603a'; g.save(); g.translate(s*14,-30); g.rotate(-s*snap*0.5); g.beginPath(); g.moveTo(-s*4,2); g.quadraticCurveTo(s*2,-16,s*14,-12); g.quadraticCurveTo(s*6,-6,s*6,4); g.closePath(); g.fill(); g.stroke(); g.restore(); g.restore(); }
+  g.fillStyle='#e8603a'; g.beginPath(); g.ellipse(0,36,40,22,0,0,TAU); g.fill(); g.stroke();
+  for(const s of [-1,1]){ const a=s*(0.32-ear*0.18), tx=s*12+Math.sin(a)*24, ty=22-Math.cos(a)*24*(ear<0?0.9:1);
+    g.strokeStyle=O; g.lineWidth=3.4; g.beginPath(); g.moveTo(s*12,22); g.lineTo(tx,ty); g.stroke();
+    pxEye(g,tx,ty-4,s,{rx:7.5,ry:7.5,r:3.4,white:'#fff',iris:O,skin:'#e8603a',lash:O,ring:O}); }
+  const ex=12+Math.sin(0.32-ear*0.18)*24, ey=22-Math.cos(0.32-ear*0.18)*24*(ear<0?0.9:1)-4;
+  pxBrows(g,{x:ex,w:6,y:ey-11,col:O,lw:3,arch:2,busy:true});
+  pxMouth(g,{y:38,w:10,c:5,col:O,lw:2.6,dark:'#3a0a06'});
+  g.fillStyle='#1a2a4a'; g.beginPath(); g.moveTo(10,-12); g.lineTo(32,-12); g.lineTo(26,-24); g.closePath(); g.fill(); g.stroke();
+  pxExtras(g,{ex,ey,erx:7.5,ery:7.5,cheek:32,top:-30,side:44,no:{blush:true}});
+  g.restore();
 }
 function glowAtG(g,x,y,r,col,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,`rgba(${col},${a})`); gr.addColorStop(1,`rgba(${col},0)`); g.fillStyle=gr; g.fillRect(x-r,y-r,r*2,r*2); }
 function c1Horns(g,y,k){ g.fillStyle='#f0e6d0'; g.strokeStyle='#3a2a20'; g.lineWidth=2.5; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*14,y); g.quadraticCurveTo(s*22,y-16*k,s*30,y-24*k); g.quadraticCurveTo(s*20,y-10*k,s*24,y+2); g.closePath(); g.fill(); g.stroke(); } }
@@ -140,12 +169,7 @@ const C1_PORT={
     for(const s of [-1,1]){ g.fillStyle='#fff6c0'; g.beginPath(); g.arc(s*15,-6,8,0,TAU); g.fill(); g.stroke(); glowAtG(g,s*15,-6,18,'255,240,170',0.5); }
     g.fillStyle='#c8963a'; for(let i=0;i<6;i++){ g.beginPath(); g.arc(-26+i*10,-30,2,0,TAU); g.fill(); } }},
   nyxara:{bg:'#120c22',f:g=>c1FaceMoth(g,true)},
-  c_pinch:{bg:'#2a1a14',f:g=>{ const O='#2a0e08'; g.lineWidth=3; g.strokeStyle=O;
-    g.fillStyle='#6a4428'; g.beginPath(); g.moveTo(-64,40); g.lineTo(-40,-30); g.lineTo(44,-36); g.lineTo(66,40); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle='#1a1008'; for(const x of [-30,0,30]){ g.beginPath(); g.arc(x,6,8,0,TAU); g.fill(); }
-    g.fillStyle='#e8603a'; g.beginPath(); g.ellipse(0,36,40,22,0,0,TAU); g.fill(); g.stroke();
-    for(const s of [-1,1]){ g.strokeStyle=O; g.beginPath(); g.moveTo(s*12,22); g.lineTo(s*20,-2); g.stroke(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*20,-6,7,0,TAU); g.fill(); g.stroke(); g.fillStyle=O; g.beginPath(); g.arc(s*20,-6,3,0,TAU); g.fill(); }
-    g.fillStyle='#1a2a4a'; g.beginPath(); g.moveTo(10,-12); g.lineTo(32,-12); g.lineTo(26,-24); g.closePath(); g.fill(); g.stroke(); }},
+  c_pinch:{bg:'#2a1a14',f:c1FacePinch},
   c_shadow:{bg:'#120a1e',f:g=>{ if(typeof faceDragon==='function') faceDragon(g,{skin:'#3a2a52',dark:'#1a1028',snout:'#5a4a7a',horn:'#8a7ab0',eye:'#c8a8ff',k:0.86}); }},
   c_saltbeard:{bg:'#0e2230',f:g=>{ g.globalAlpha=0.85; facePerson(g,{skin:'#bfe6f0',hair:'#e8f6ff',beard:'big',beardc:'#e8f6ff',outfit:'coat',shirt:'#2a4a5a',low:'#1a2a3a',trim:'#a8e0f0',hat:'top',hatc:'#1a2a3a'},false); g.globalAlpha=1; glowAtG(g,0,0,90,'160,220,255',0.25); }}
 };

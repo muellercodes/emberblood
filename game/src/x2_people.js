@@ -51,30 +51,49 @@ Object.assign(SPK,{
   f_nisse:SPK.f_nisse||{name:'Nisse',col:'#efeae0'},
   f_snarl:SPK.f_snarl||{name:'Snarl',col:'#a8c8e8'}
 });
+// (v12 FACES) Mumble the shy yeti, the sled dogs and Nisse the goat show the line's mood (a12a_dlg's kit)
 function f2pFaceYeti(g){
+  const X=PX, n=X.n, fluff=n==='angry'||n==='furious'||n==='scared'||n==='surprised'?1.25:n==='sad'||n==='defeated'?0.75:1;
+  g.save(); pxPose(g,{py:66}); pxAura(g,0,10,80);
   g.fillStyle='#e8f2fa'; g.beginPath(); g.ellipse(0,12,62,58,0,0,TAU); g.fill();
-  g.strokeStyle='#9ab8d0'; g.lineWidth=3; for(let i=0;i<14;i++){ const a=Math.PI*0.9+i*Math.PI*1.2/13; g.beginPath(); g.moveTo(Math.cos(a)*54,12+Math.sin(a)*52); g.lineTo(Math.cos(a)*64,12+Math.sin(a)*62); g.stroke(); }
+  g.strokeStyle='#9ab8d0'; g.lineWidth=3; for(let i=0;i<14;i++){ const a=Math.PI*0.9+i*Math.PI*1.2/13; g.beginPath(); g.moveTo(Math.cos(a)*54,12+Math.sin(a)*52); g.lineTo(Math.cos(a)*(54+10*fluff),12+Math.sin(a)*(52+10*fluff)); g.stroke(); }
   g.fillStyle='#7aaee0'; g.beginPath(); g.ellipse(0,16,36,32,0,0,TAU); g.fill(); g.strokeStyle='#3a6a9a'; g.lineWidth=2.5; g.stroke();
-  for(const s of [-1,1]){ g.fillStyle='#1a2030'; g.beginPath(); g.ellipse(s*13,8,5.5,7,0,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*13-1.6,5.5,2,0,TAU); g.fill();
-    g.strokeStyle='#2a4a6a'; g.lineWidth=3; g.beginPath(); g.moveTo(s*6,-4); g.quadraticCurveTo(s*13,-9,s*20,-3); g.stroke(); }
-  g.fillStyle='#4a2a3a'; g.beginPath(); g.ellipse(0,30,7,4.5,0,0,TAU); g.fill();
-  g.fillStyle='#c84a3a'; g.beginPath(); g.ellipse(0,-40,26,15,0,Math.PI,TAU); g.fill(); g.fillRect(-26,-42,52,7);
-  g.fillStyle='#f0e0a0'; for(let i=-22;i<=22;i+=8) g.fillRect(i,-41,4,5); g.beginPath(); g.arc(0,-56,7,0,TAU); g.fill();
+  for(const s of [-1,1]) pxEye(g,s*13,8,s,{rx:5.8,ry:7.2,r:2.4,white:'#1a2030',iris:'#33405a',skin:'#7aaee0',lash:'#1a2030'});
+  pxBrows(g,{x:13,w:6,y:-4,col:'#2a4a6a',lw:3,arch:2.6});
+  g.fillStyle='#4a2a3a'; g.beginPath(); g.ellipse(0,28,6,4,0,0,TAU); g.fill();
+  pxMouth(g,{y:37,w:7,c:4,col:'#1a2a44',lw:2.4,dark:'#2a1424'});
+  g.save(); g.translate(0,-40); g.rotate(-(X.ear||0)*0.08); g.fillStyle='#c84a3a'; g.beginPath(); g.ellipse(0,0,26,15,0,Math.PI,TAU); g.fill(); g.fillRect(-26,-2,52,7);
+  g.fillStyle='#f0e0a0'; for(let i=-22;i<=22;i+=8) g.fillRect(i,-1,4,5); g.beginPath(); g.arc(0,-16-(X.ear||0)*2,7,0,TAU); g.fill(); g.restore();
+  pxExtras(g,{ex:13,ey:8,erx:5.8,ery:7.2,cheek:22,top:-12,side:36});
+  g.restore();
 }
 function f2pFaceDog(g){
-  g.fillStyle='#5a4a40'; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*20,-30); g.lineTo(s*44,-62); g.lineTo(s*46,-20); g.closePath(); g.fill(); }
+  const X=PX, m=X.m||'neutral', pant=m==='neutral'||m==='smile'||m==='laugh'||m==='tiny';
+  g.save(); pxPose(g,{py:58}); pxAura(g,0,0,78);
+  for(const s of [-1,1]){ g.save(); g.translate(s*30,-26); g.rotate(-s*pxEarTurn(0.25,0.6)); g.fillStyle='#5a4a40'; g.beginPath(); g.moveTo(-s*10,-4); g.lineTo(s*14,-36); g.lineTo(s*16,6); g.closePath(); g.fill(); g.fillStyle='#d8b8b0'; g.beginPath(); g.moveTo(-s*2,-4); g.lineTo(s*11,-24); g.lineTo(s*11,2); g.closePath(); g.fill(); g.restore(); }
   g.fillStyle='#6a5a50'; g.beginPath(); g.ellipse(0,0,48,44,0,0,TAU); g.fill();
   g.fillStyle='#f4ece0'; g.beginPath(); g.ellipse(0,14,32,30,0,0,TAU); g.fill(); g.beginPath(); g.moveTo(-12,-30); g.lineTo(0,4); g.lineTo(12,-30); g.closePath(); g.fill();
-  for(const s of [-1,1]){ g.fillStyle='#5aa8e8'; g.beginPath(); g.ellipse(s*15,-6,6,6.5,0,0,TAU); g.fill(); g.fillStyle='#10141a'; g.beginPath(); g.arc(s*15,-6,3,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*15-1.5,-8,1.4,0,TAU); g.fill(); }
+  for(const s of [-1,1]) pxEye(g,s*15,-6,s,{rx:6.2,ry:6.6,r:3.4,white:'#5aa8e8',iris:'#10141a',skin:'#6a5a50',lash:'#2a201a'});
+  pxBrows(g,{x:15,w:5,y:-16,col:'#f4ece0',lw:3.4,arch:2});
   g.fillStyle='#1a1410'; g.beginPath(); g.ellipse(0,14,7,5,0,0,TAU); g.fill();
-  g.fillStyle='#e8606a'; g.beginPath(); g.ellipse(4,34,6,9,0.2,0,TAU); g.fill();
+  pxMouth(g,{y:24,w:9,c:4.5,col:'#2a201a',lw:2.4,dark:'#3a1410',tongue:'#e8606a'});
+  if(pant){ g.fillStyle='#e8606a'; g.beginPath(); g.ellipse(4,m==='laugh'?36:32,6,9,0.2,0,TAU); g.fill(); g.strokeStyle='rgba(150,40,50,.5)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(4,m==='laugh'?30:26); g.lineTo(4.5,m==='laugh'?40:36); g.stroke(); }
+  pxExtras(g,{ex:15,ey:-6,erx:6.2,ery:6.6,cheek:8,top:-30,side:46,no:{blush:true}});
+  g.restore();
 }
 function f2pFaceGoat(g){
+  const X=PX;
+  g.save(); pxPose(g,{py:62}); pxAura(g,0,-4,78);
   g.fillStyle='#b8a888'; for(const s of [-1,1]){ g.beginPath(); g.moveTo(s*12,-34); g.quadraticCurveTo(s*36,-70,s*48,-40); g.lineTo(s*40,-38); g.quadraticCurveTo(s*30,-58,s*8,-30); g.closePath(); g.fill(); }
+  for(const s of [-1,1]){ g.save(); g.translate(s*34,-12); g.rotate(s*(0.4-pxEarTurn(0.4,0.5))); g.fillStyle='#ece4d4'; g.beginPath(); g.ellipse(s*10,0,16,7,0,0,TAU); g.fill(); g.fillStyle='#e0c4b8'; g.beginPath(); g.ellipse(s*12,0.5,10,3.2,0,0,TAU); g.fill(); g.restore(); }
   g.fillStyle='#f6f2e8'; g.beginPath(); g.ellipse(0,0,40,48,0,0,TAU); g.fill();
-  for(const s of [-1,1]){ g.fillStyle='#ece4d4'; g.beginPath(); g.ellipse(s*44,-12,16,7,s*0.4,0,TAU); g.fill(); g.fillStyle='#d8a43a'; g.beginPath(); g.ellipse(s*15,-10,6,5,0,0,TAU); g.fill(); g.fillStyle='#1a120a'; g.fillRect(s*15-4,-11,8,2.4); }
+  for(const s of [-1,1]){ g.save(); g.translate(s*15,-10); g.scale(0.86,1.05); dragonEye(g,0,0,s,{eye:'#d8a43a',skin:'#f6f2e8',dark:'#6a5a44',rot:0.06,bar:true,noglow:true}); g.restore(); }
+  pxBrows(g,{x:15,w:6,y:-19,col:'#b0a48c',lw:2.6,arch:2,busy:true});
   g.fillStyle='#efdcd4'; g.beginPath(); g.ellipse(0,26,20,15,0,0,TAU); g.fill(); g.fillStyle='#6a2a2a'; g.beginPath(); g.ellipse(0,22,5,3,0,0,TAU); g.fill();
+  if(X.m&&X.m!=='neutral') pxMouth(g,{y:31,w:6,c:3.5,col:'#6a4a40',lw:2,dark:'#4a2020'}); else { g.strokeStyle='#6a4a40'; g.lineWidth=2; g.lineCap='round'; g.beginPath(); g.moveTo(-6,33); g.quadraticCurveTo(0,30,6,33); g.stroke(); }
   g.fillStyle='#dff4ff'; for(let i=-10;i<=10;i+=5){ g.beginPath(); g.moveTo(i-2.4,40); g.lineTo(i,56+Math.abs(i)*-0.6); g.lineTo(i+2.4,40); g.closePath(); g.fill(); }
+  pxExtras(g,{ex:15,ey:-10,erx:5.5,ery:5,cheek:8,top:-34,side:40});
+  g.restore();
 }
 if(typeof EVPORT!=='undefined'){
   if(!EVPORT.f_mumble) EVPORT.f_mumble={bg:'#1c3048',f:f2pFaceYeti};

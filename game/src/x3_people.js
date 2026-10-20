@@ -81,24 +81,35 @@ Object.assign(SPK,{
   f_mags:SPK.f_mags||{name:'Mags Sprocket',col:'#e8a040'},
   m_sentry:SPK.m_sentry||{name:'Moth Knight',col:'#b8a8e8'}
 });
+// (v12 FACES) the sandworm kids (Sandy with her bow, little Noodle) and the moonfish show the line's mood (a12a_dlg's kit)
 function m3pFaceWorm(g,big){
-  const k=big?1:0.8; g.save(); g.scale(k,k);
+  const k=big?1:0.8, X=PX; g.save(); g.scale(k,k); pxPose(g,{py:64}); pxAura(g,0,0,78);
   g.fillStyle='#c89a52'; g.beginPath(); g.ellipse(0,40,56,30,0,0,TAU); g.fill();
   const gr=g.createRadialGradient(-14,-20,6,0,0,70); gr.addColorStop(0,'#ffe6a8'); gr.addColorStop(0.55,'#e8b866'); gr.addColorStop(1,'#a8743a'); g.fillStyle=gr;
   g.beginPath(); g.ellipse(0,0,50,52,0,0,TAU); g.fill(); g.strokeStyle='#5a3a18'; g.lineWidth=3; g.stroke();
   g.strokeStyle='rgba(120,80,30,.5)'; g.lineWidth=2.4; for(const y of [-26,-8,10,28]){ g.beginPath(); g.ellipse(0,y,44-Math.abs(y)*0.4,7,0,0.2,Math.PI-0.2); g.stroke(); }
-  for(const s of [-1,1]){ g.fillStyle='#fff8e8'; g.beginPath(); g.ellipse(s*17,-10,big?9:11,big?8:11,0,0,TAU); g.fill(); g.fillStyle='#2a1808'; g.beginPath(); g.arc(s*17,-9,big?4:6,0,TAU); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(s*15,-12,2,0,TAU); g.fill(); }
-  if(big){ g.fillStyle='#e85a6a'; g.beginPath(); g.moveTo(-26,-44); g.lineTo(-12,-60); g.lineTo(0,-46); g.lineTo(12,-60); g.lineTo(26,-44); g.closePath(); g.fill(); g.strokeStyle='#5a3a18'; g.lineWidth=2; g.stroke(); }
-  else{ g.fillStyle='rgba(255,140,140,.5)'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*28,8,7,4,0,0,TAU); g.fill(); } }
-  g.strokeStyle='#5a3a18'; g.lineWidth=3; g.beginPath(); g.arc(0,14,big?12:9,0.15*Math.PI,0.85*Math.PI); g.stroke();
+  for(const s of [-1,1]) pxEye(g,s*17,-10,s,{rx:big?9:11,ry:big?8.5:11,r:big?4.2:6,white:'#fff8e8',iris:'#2a1808',skin:'#ecbc6c',lash:'#5a3a18'});
+  pxBrows(g,{x:17,w:6,y:big?-23:-26,col:'#8a5a28',lw:3,arch:2.4,busy:true});
+  if(big){ g.save(); g.translate(0,-50); g.rotate(-(X.ear||0)*0.12); g.fillStyle='#e85a6a'; g.beginPath(); g.moveTo(-26,6); g.lineTo(-12,-10); g.lineTo(0,4); g.lineTo(12,-10); g.lineTo(26,6); g.closePath(); g.fill(); g.strokeStyle='#5a3a18'; g.lineWidth=2; g.stroke(); g.restore(); }
+  else if(!(X.blush>1)){ g.fillStyle='rgba(255,140,140,.5)'; for(const s of [-1,1]){ g.beginPath(); g.ellipse(s*28,8,7,4,0,0,TAU); g.fill(); } }
+  pxMouth(g,{y:16,w:big?10:8,c:6,col:'#5a3a18',lw:3,dark:'#4a1a10',tongue:'#e8707a'});
+  pxExtras(g,{ex:17,ey:-10,erx:big?9:11,ery:big?8.5:11,cheek:10,top:-34,side:48,no:{blush:!big&&!(X.blush>1)},halo:-66});
   g.restore();
 }
 function m3pFaceFish(g){
-  glowAtM(g,0,0,90,'210,225,255',0.35);
+  const X=PX, op=pxOpenMouth();
+  g.save(); pxPose(g,{py:40}); glowAtM(g,0,0,90,'210,225,255',X.n==='sad'||X.n==='defeated'?0.18:0.35); pxAura(g,-20,0,70);
+  g.save(); g.translate(0,-30); g.rotate(-pxEarTurn(0.2,0.35)); g.fillStyle='#b8c8f0'; g.beginPath(); g.moveTo(-24,4); g.quadraticCurveTo(0,-26,26,4); g.closePath(); g.fill(); g.strokeStyle='#4a5a8a'; g.lineWidth=3; g.stroke(); g.restore();
   g.fillStyle='#dfe8ff'; g.beginPath(); g.ellipse(0,0,56,34,0,0,TAU); g.fill(); g.strokeStyle='#4a5a8a'; g.lineWidth=3; g.stroke();
   g.fillStyle='#b8c8f0'; g.beginPath(); g.moveTo(50,0); g.lineTo(80,-26); g.lineTo(80,26); g.closePath(); g.fill(); g.stroke();
-  g.fillStyle='#fff'; g.beginPath(); g.arc(-30,-6,9,0,TAU); g.fill(); g.fillStyle='#1a2040'; g.beginPath(); g.arc(-31,-6,4.5,0,TAU); g.fill();
+  pxEye(g,-30,-6,1,{rx:9,ry:9,r:4.6,white:'#fff',iris:'#1a2040',skin:'#dfe8ff',lash:'#4a5a8a'});
+  g.save(); g.translate(-30,0); pxBrows(g,{x:0,w:6,y:-18,col:'#6a7ab0',lw:2.6,arch:2,only:1,busy:true}); g.restore();
+  // the mouth at the front of the face: it opens to an O, smiles or droops
+  g.save(); g.translate(-46,10); g.rotate(0.35); pxMouth(g,{y:0,w:5,c:3,col:'#4a5a8a',lw:2.4,dark:'#2a3050',tongue:'#e8a0b0'}); g.restore();
+  if(op>0.4){ g.strokeStyle='rgba(220,240,255,.85)'; g.lineWidth=1.6; for(const [x,y,r] of [[-64,-6,4],[-70,-18,3],[-66,-30,2.2]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.stroke(); } }
   g.strokeStyle='rgba(120,140,200,.6)'; g.lineWidth=2; for(let i=0;i<4;i++){ g.beginPath(); g.arc(4+i*12,0,16,-0.9,0.9); g.stroke(); }
+  pxExtras(g,{ex:30,ey:-6,erx:9,ery:9,cheek:8,top:-26,side:48,no:{blush:true}});
+  g.restore();
 }
 function glowAtM(g,x,y,r,col,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,`rgba(${col},${a})`); gr.addColorStop(1,`rgba(${col},0)`); g.fillStyle=gr; g.fillRect(x-r,y-r,r*2,r*2); }
 if(typeof EVPORT!=='undefined'){

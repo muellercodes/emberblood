@@ -447,7 +447,7 @@ function pxLidClip(g,x,y,rx,ry,s,eo){
 function pxBrows(g,E){
   if(E.busy&&!(Math.abs(PX.br||0)>0.15||Math.abs(PX.bh||0)>0.5||PX.asym)) return;
   const X=PX, k=E.k||1; g.save(); g.strokeStyle=E.col; g.lineWidth=E.lw||2.6; g.lineCap='round';
-  for(const s of [-1,1]){
+  for(const s of E.only?[E.only]:[-1,1]){
     let br=X.br||0, bh=(X.bh||0)*k;
     if(X.asym){ if(s>0){ br=0; bh+=3.6*k; } else { br=-0.75; bh-=0.6*k; } }
     const xi=s*(E.x-E.w), xo=s*(E.x+E.w), yi=E.y-bh-br*3.4*k, yo=E.y-bh+br*1.4*k, arch=(E.arch||3)*(br<-0.3?0.35:1)*(X.asym&&s>0?1.6:1);
