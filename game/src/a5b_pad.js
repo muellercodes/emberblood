@@ -6,7 +6,7 @@
 // Play:  left stick move (all the way for a moment sprints, L3 toggles sprint) · right stick aim
 //        bottom jump · right roll · left attack (held) · top use/talk · R2 attack · L2 fire breath
 //        R1/L1 next/previous weapon · R3 or L1+R1 together Roar · d-pad up drink · d-pad down companion
-//        d-pad left/right previous/next followed quest (Arena: previous/next weapon)
+//        d-pad left uses the item in the quick slot, d-pad right switches the followed quest (Arena: previous/next weapon)
 //        Back/View/Share/minus: map, hold for the journal · Start/Menu/Options/plus: pause, hold for skills
 // Menus: d-pad or left stick moves the focus · bottom picks · right goes back (swappable in Settings)
 //        L1/R1 switch tabs (on the world map they pick a shrine) · right stick scrolls · Start closes pause
@@ -257,7 +257,7 @@ function padPlayUI(s,dt){
       else if(s.tap[i]){ PAD.ui=true; openMap(); }
     }
     if(s.ed[PB.RT]) cycleFocus();
-    if(s.ed[PB.LF]) focusPrev();
+    if(s.ed[PB.LF]) quickUse();   // (v12) the quick slot (a11b_hud.js); previous quest went
   }else{
     if(s.ed[PB.ST]){ PAD.ui=true; pauseGame(); }
     if(s.ed[PB.RT]) PAD.q.wN=true;
@@ -268,10 +268,6 @@ function padPlayUI(s,dt){
   if(s.cur[PB.L1]&&s.cur[PB.R1]&&(PAD.sh[0]>=0||PAD.sh[1]>=0)&&!PAD.chord){ PAD.chord=true; PAD.q.roar=true; PAD.sh=[-1,-1]; }
   if(!s.cur[PB.L1]&&!s.cur[PB.R1]) PAD.chord=false;
   for(const i of [PB.L1,PB.R1]){ const j=i-PB.L1; if(PAD.sh[j]>=0&&(!s.cur[i]||PAD.sh[j]>0.12)){ if(!PAD.chord){ if(padSw(i)===PB.R1) PAD.q.wN=true; else PAD.q.wP=true; } PAD.sh[j]=-1; } }
-}
-function focusPrev(){
-  const list=[null].concat(tracked()); let i=list.indexOf(G.focus||null); i=(i-1+list.length)%list.length;
-  followQuest(list[i]); SFX.play('ui');
 }
 function padInput(o,dt){
   const s=PAD.s; if(!s||!padActive()||PAD.ui) return;
@@ -363,6 +359,8 @@ function navMove(root,dir){
   const sc=navScroller(root,items.includes(cur)?cur:null);
   if(!items.length){ if(sc&&V) sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
   if(!items.includes(cur)){ navFocus(navDefault(root,items)); return; }
+  // (v12) the journal: down from its tabs goes to the first button on the page (the Satchel's sit at the right side)
+  if(root.id==='jour'&&V&&sg>0&&cur.closest('.jtabs')){ const f=items.find(el=>el.closest('#jBody')); if(f){ navFocus(f); SFX.play('ui',0.35); return; } }
   const a=cur.getBoundingClientRect(), acx=(a.left+a.right)/2, acy=(a.top+a.bottom)/2;
   let best=null,bs=1e9;
   for(const el of items){
@@ -453,6 +451,7 @@ function padMenu(root,s,dt){
   if(s.ed[ok]) navOk(root);
   else if(s.ed[back]) ovBack(root);
   else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) dlgNext();
+  else if(root.id==='jour'&&(s.ed[PB.W]||s.ed[PB.N])) bagPadStar();   // (v12) X or Y on the Satchel stars an item
   if(s.ed[PB.L1]) navTab(root,-1);
   if(s.ed[PB.R1]) navTab(root,1);
   if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
@@ -567,7 +566,7 @@ function drawPadDiagram(cv,k){
   g.textAlign='right'; g.fillText('Attack',fp[2][0]-16,fp[2][1]);
   // southpaw (Settings > Handed: Left) swaps what the sticks, triggers and bumpers do
   const sp=lefty(), mv='Move, click: sprint', am='Aim, click: Roar';
-  const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← → switch quest']].sort((a,b)=>a[1]-b[1]);
+  const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← item · → switch quest']].sort((a,b)=>a[1]-b[1]);
   const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]];
   const line=(x0,y0,x1,y1)=>{ g.strokeStyle='rgba(255,200,140,.6)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); g.fillStyle='#ffc35a'; g.beginPath(); g.arc(x0,y0,2.4,0,TAU); g.fill(); g.beginPath(); g.arc(x1,y1,1.6,0,TAU); g.fill(); };
   const label=(t,x,y,al)=>{ g.font=`600 13px ${UIF}`; g.textAlign=al; g.fillStyle='#f3e4cc'; const ls=t.split('\n'); ls.forEach((s,i)=>g.fillText(s,x,y+(i-(ls.length-1)/2)*16)); };
@@ -589,13 +588,16 @@ function padHelpRows(k){
     [`${c(PB.R3)} or ${padChip(PB.L1,k)}+${padChip(PB.R1,k)}`,'Dragon Roar, once the meter is full'],
     [c(PB.UP),'Drink a healing draught'],
     [c(PB.DN),'Call your companion'],
-    [`${c(PB.LF)} ${c(PB.RT)}`,'Switch which quest you follow (in the Arena: switch weapons)'],
+    [c(PB.LF),'Use the item in your quick slot. Star one in the Satchel to put it there. (In the Arena: previous weapon)'],
+    [c(PB.RT),'Switch which quest you follow (in the Arena: next weapon)'],
     [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
-    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs.`],
+    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs. In the Satchel, ${padBtnName(PB.W,k)} or ${padBtnName(PB.N,k)} puts an item in your quick slot.`],
     [chip(sp?'Southpaw':'Left-handed?'),sp?'On: the sticks, triggers and bumpers are swapped. Settings > Handed changes it back.':'Settings > Handed: Left swaps the sticks, triggers and bumpers (southpaw).']
   ];
 }
+// (v12) the quick-slot item: V (Numpad 5 on the left-handed keyboard), d-pad left, the chip under ROAR on touch
+Object.assign(ACT_KEY_R,{item:'V'}); Object.assign(ACT_KEY_L,{item:'Num 5'}); Object.assign(ACT_PAD_R,{item:PB.LF}); Object.assign(ACT_TOUCH,{item:'the item under the ROAR ring'});
 window.__ebX=Object.assign(window.__ebX||{},{btnLabel,btnHTML,rumble,toggleFullscreen,padActive,curDevice,padKindOf,
   padInfo:()=>({idx:PAD.idx,kind:PAD.kind,dev:PAD.dev,id:PAD.id,known:PAD.known.size,rumble:settings.rumble,padOk:settings.padOk,aimMode,usingTouch,root:(navRoot()||{}).id||null,focus:document.activeElement&&(document.activeElement.id||document.activeElement.textContent.trim().slice(0,40))}),
   padSeen(){ const d=PAD.dbg||{}; PAD.dbg={}; return d; }, touchLayout(){ return {btn:tLayout(),mini:MINI_R(),pause:PAUSE_R(),mute:MUTE_R(),prompt:PROMPT_R,W,H}; }, offerUpgrades(){ offerUpgrades(null); }, killPlayer(){ playerDied(); }});
