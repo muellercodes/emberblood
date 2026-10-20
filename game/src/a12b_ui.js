@@ -726,9 +726,10 @@ function menuCam(dt,snap){
   const tx=POI.village.x-W/zoom/2+Math.sin((G?G.time:0)*0.08)*120, ty=POI.village.y-H/zoom/2+60+Math.cos((G?G.time:0)*0.06)*60;
   if(snap){ cam.x=tx; cam.y=ty; } else { cam.x=lerp(cam.x,tx,1-Math.exp(-dt*1.5)); cam.y=lerp(cam.y,ty,1-Math.exp(-dt*1.5)); }
 }
+// (v12 TITLE) the title paints its own picture (v10_art_title.js); the world behind it only runs when that is off
 function menuUpdate(dt){
-  G.time+=dt; player.t+=dt; G.chunkBurst=2;
-  ambientEmit(dt); updateParticles(dt); menuCam(dt);
+  G.time+=dt; player.t+=dt;
+  if(!ttlOn()){ G.chunkBurst=2; ambientEmit(dt); updateParticles(dt); menuCam(dt); }
   if(Math.random()<dt*0.4) SFX.play('bird',0.6);
 }
 function refreshMenu(){
@@ -739,7 +740,7 @@ function refreshMenu(){
   $('#diffNote').textContent=simplify(DIFFS[diffIdx].note);
   const best=store.get('eb_best_'+diffIdx,null);
   $('#bestLine').textContent=best&&best.score?simplify(`Arena best on ${DIFFS[diffIdx].name}: wave ${best.wave}, ${fmt(best.score)} points`):'';
-  refreshSoundLabels(); acctLabel();
+  refreshSoundLabels(); acctLabel(); ttlSync();
 }
 function toMenu(){
   if(G&&G.mode==='story'&&!player.dead) saveGame(true);
