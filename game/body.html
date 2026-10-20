@@ -284,7 +284,7 @@ html.sb #padToast span{color:#6a4a52}
     <div class="tag">Heir of the First Flame</div>
     <div class="stack">
       <button class="btn hot" id="bContinue" hidden>Continue Journey<small id="contSub"></small></button>
-      <button class="btn" id="bStory">Story Mode<small id="storySub">An open world to explore. One very old grandfather.</small></button>
+      <button class="btn" id="bStory">Story Mode<small id="storySub">An open world to explore. Three lanterns to light.</small></button>
       <button class="btn" id="bNormal">Arena<small>Endless waves in the Proving Grounds. How long can you last?</small></button>
       <div class="diff"><span>Difficulty</span>
         <div class="seg" role="group" aria-label="Difficulty">
@@ -316,7 +316,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>Left click / J</kbd><span>Attack. Hold for a combo. Ash turns to the closest foe in front of him. Next to someone or something you can use, with no foe close, it talks or opens instead.</span>
               <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter. It finds the foe in front of you too.</span>
               <kbd>Space</kbd><span>Dodge roll. Nothing hits you mid-roll.</span>
-              <kbd>C</kbd><span>Jump, once Ash learns how. With wings, hold jump in the air to fly.</span>
+              <kbd data-pow="jump">C</kbd><span data-pow="jump">Jump.<span data-pow="wings"> With wings, hold jump in the air to fly.</span></span>
               <kbd>Q</kbd><span>Dragon Roar, once the meter is full</span>
               <kbd>R</kbd><span>Drink a healing draught</span>
             </div>
@@ -349,7 +349,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>Left click / Enter</kbd><span>Attack. Hold for a combo. Next to someone or something you can use, with no foe close, it talks or opens instead.</span>
               <kbd>Right click / '</kbd><span>Fire breath. Uses your fire meter.</span>
               <kbd>Right Ctrl</kbd><span>Dodge roll. Space works too.</span>
-              <kbd>/</kbd><span>Jump, once Ash learns how. With wings, hold jump in the air to fly.</span>
+              <kbd data-pow="jump">/</kbd><span data-pow="jump">Jump.<span data-pow="wings"> With wings, hold jump in the air to fly.</span></span>
               <kbd>;</kbd><span>Dragon Roar, once the meter is full</span>
               <kbd>.</kbd><span>Drink a healing draught</span>
             </div>
@@ -369,7 +369,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>N</kbd><span>Sound on or off</span>
               <kbd>P / Esc</kbd><span>Pause</span>
             </div>
-            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks, <b>5</b> uses your quick-slot item and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
+            <p class="hnote">Got a number pad? <b>0</b> rolls, <span data-pow="jump"><b>1</b> jumps, </span><b>2</b> breathes fire, <b>3</b> drinks, <b>5</b> uses your quick-slot item and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
           </div>
         </div>
       </section>
@@ -380,7 +380,7 @@ html.sb #padToast span{color:#6a4a52}
             <ul class="tips">
               <li>Drag on the left side to move (the right side if Settings has <b>Handed: Left</b>). Push the stick all the way to sprint.</li>
               <li><b>SLASH</b> attacks. Hold it for a combo. Next to someone or something you can use, with no foe close, it glows and says <b>TALK</b>, <b>OPEN</b>, <b>READ</b>, <b>ENTER</b> or <b>TAKE</b>. Tap it to do that.</li>
-              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
+              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges.<span data-pow="jump"> <b>JUMP</b> jumps.</span><span data-pow="wings"> With wings it says <b>FLY</b> in the air.</span></li>
               <li>Some buttons show up only when they can help, always in the same spot: <b>DRINK</b> when you are hurt, <b>ROAR</b> when its ring is full, <b>CALL</b> when your companion is far away or waiting.</li>
               <li>Tap the green flasks at the top to drink any time. Tap your companion's picture to call them, twice to make them wait.</li>
               <li>Tap the weapon at the top to switch weapons once you have two or more.</li>
@@ -416,12 +416,8 @@ html.sb #padToast span{color:#6a4a52}
           <li><b>One button.</b> Attack also talks, opens doors and chests and picks things up when no foe is close. On touch, SLASH says what it will do.</li>
           <li><b>Left-handed play.</b> Settings has <b>Handed: Left</b>: mirrored touch buttons, a left-handed keyboard and southpaw controllers.</li>
           <li><b>Tips you can close.</b> Every tip has an X, and Settings can turn them off.</li>
-          <li><b>More weapons.</b> Twin daggers, a spear, a forge hammer, a boomerang and a bow. Each one fights in its own way.</li>
-          <li><b>Ember's Trials.</b> Three old dungeons built long ago by Ember, one of Ash's ancestors. Each one wakes a gift in your blood.</li>
-          <li><b>Jump.</b> Win it in the Trial of the Leap in Whisperwood. Hop over gaps, fences and pits.</li>
-          <li><b>Water stride.</b> The Trial of the Tide on Lake Mirrow. Walk right across the water.</li>
-          <li><b>Wings.</b> The Trial of the Sky in the Drakeling Crags. Jump, then hold jump in the air to fly. Press jump again to land.</li>
-          <li><b>Skills.</b> Every level gives you a skill point. Spend it on Blade, Flame, Wings or Heart. The Powers page shows every power you have found and how to use it.</li>
+          <li><b>More weapons.</b> Each one fights in its own way. Tap the weapon chip, or press X, to switch.</li>
+          <li><b>Skills.</b> Every level gives you a skill point. The Powers page shows the powers you have found and how to use them.</li>
           <li><b>Companions.</b> Friends can join you. They follow you, fight with you and chat. People in town notice what you do.</li>
           <li><b>Controllers.</b> PlayStation, Xbox and Nintendo controllers work everywhere, even in menus. Settings can go fullscreen for a TV.</li>
         </ul>
@@ -433,7 +429,7 @@ html.sb #padToast span{color:#6a4a52}
           <li>Rest at dragon shrines to heal, refill draughts and save. You can fast travel between shrines you have found.</li>
           <li>Swings, rolls and sprinting cost stamina. Back off and let it refill.</li>
           <li>Red shapes on the ground show where an attack will land.</li>
-          <li>Hold fire breath on lanterns and Ward stones to light them. Fire also melts snowmen, smokes out bees, and lights fireplaces.</li>
+          <li>Hold fire breath on lanterns to light them. Fire also melts snowmen, smokes out bees, and lights fireplaces.</li>
           <li>A gold <b>!</b> means someone has a quest for you. A blue <b>?</b> means they're waiting for something you have.</li>
           <li>Walk up to any door or cave and use it to go inside. Smash pots for coins.</li>
           <li>Night is darker and wolves hunt. Chests hold experience for leveling up.</li>
@@ -567,7 +563,7 @@ html.sb #padToast span{color:#6a4a52}
 <div id="jour" class="ov dim">
   <div class="panel">
     <h2>Journal</h2>
-    <div class="seg jtabs" id="jTabs" role="group" aria-label="Journal sections"><button type="button" data-t="quests" aria-pressed="true">Quests</button><button type="button" data-t="story" aria-pressed="false">Story</button><button type="button" data-t="people" aria-pressed="false">People</button><button type="button" data-t="bag" aria-pressed="false">Satchel</button><button type="button" data-t="secrets" aria-pressed="false">Secrets</button></div>
+    <div class="seg jtabs" id="jTabs" role="group" aria-label="Journal sections"><button type="button" data-t="quests" aria-pressed="true">Quests</button><button type="button" data-t="story" aria-pressed="false">Story</button><button type="button" data-t="people" aria-pressed="false">People</button><button type="button" data-t="bag" aria-pressed="false">Satchel</button><button type="button" data-t="secrets" aria-pressed="false">Finds</button></div>
     <div class="jbody" id="jBody"></div>
     <div style="margin-top:14px"><button class="btn c hot" id="bJourClose" type="button">Close</button></div>
   </div>

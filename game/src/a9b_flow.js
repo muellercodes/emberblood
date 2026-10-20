@@ -167,13 +167,17 @@ function checkWave(){
   const up=G.wave%2===0;
   later(1.7,()=>{ if(up) offerUpgrades(()=>later(0.8,nextNormalWave)); else later(0.5,nextNormalWave); });
 }
+// (v12) the Arena is open from the title screen, before the story has said who the old dragon is: there he goes by the
+// name the valley knows him by (the boss banner and the boss bar, a11b_hud.js, read this)
+const ARENA_ALIAS={vorlaxis:{name:'The First Flame',title:'The oldest dragon of all',short:'The oldest dragon'}};
+function bossInfo(b){ const d=(b&&EDEF[b.type])||{}; return (G&&G.mode!=='story'&&b&&ARENA_ALIAS[b.type])||d; }
 function nextNormalWave(){
   G.wave++; const n=G.wave;
   G.hpMul=1+(n-1)*0.07; G.dmgMul=1+(n-1)*0.03; G.eliteChance=clamp((n-4)*0.04,0,0.5); G.maxAlive=Math.min(22,9+Math.floor(n/2));
   if(n%5===0){
     const k=n/5-1, BL=['grizzlefang','morrow','gloamjaw','broodmother','greymane','cindervane','vorlaxis'], bt=BL[k%BL.length], cyc=Math.floor(k/BL.length);
     G.phase='boss'; setBanner(`Wave ${n}`,'A champion approaches!',2);
-    later(1.0,()=>{ const s=arenaSpawnPoint(); const A=G.arena; SFX.play('warn'); spawnRune(bt,bt==='vorlaxis'?A.x:s.x,bt==='vorlaxis'?A.y-200:s.y,{homeX:A.x,homeY:A.y,hpScale:(1+(n-5)*0.03)*(1+cyc*0.4)},1.5); const d=EDEF[bt]; setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); });
+    later(1.0,()=>{ const s=arenaSpawnPoint(); const A=G.arena; SFX.play('warn'); spawnRune(bt,bt==='vorlaxis'?A.x:s.x,bt==='vorlaxis'?A.y-200:s.y,{homeX:A.x,homeY:A.y,hpScale:(1+(n-5)*0.03)*(1+cyc*0.4)},1.5); const d=bossInfo({type:bt}); setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); });
     const adds=genWave(Math.max(1,Math.floor(n/3)));
     later(3,()=>{ const q=[]; for(const [t,c] of adds) for(let i=0;i<c;i++) q.push(t); G.queue=shuffle(q); });
   }else{ setBanner(`Wave ${n}`,'',1.6); startWave(genWave(n)); }
@@ -236,10 +240,12 @@ function liteUpdate(dt){
 function victory(){
   scene='victory'; SFX.play('win');
   const m=Math.floor(G.playTime/60), s=Math.floor(G.playTime%60);
-  const E=ENDINGS[G.choices.ending||'hero'], seen=store.get('eb_endings',{});
-  $('#winTag').textContent=`Ending ${E.n} of 4`; $('#winTitle').textContent=E.title;
-  $('#winMsg').textContent=Object.keys(seen).length<4?`You've found ${Object.keys(seen).length} of 4 endings. Different choices along the way lead to different endings.`:'You found every ending. The Wardens would be proud. Iska would want a word.';
-  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div><div class="stat"><b>${Object.keys(G.pages).length}/10</b><span>Lost pages</span></div>`;
+  // (v12) the ending Ash made, and plain stats: no ending numbers, no count of endings, no totals of things to find
+  // (eb_endings is still kept, a9c_story.js, for the cloud merge and the tests; it is never shown)
+  const E=ENDINGS[G.choices.ending||'hero'];
+  $('#winTag').textContent='Act I complete'; $('#winTitle').textContent=E.title;
+  $('#winMsg').textContent=simplify(S('The valley is still yours to explore.','Go and explore!'));
+  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div>`;
   show('victory');
 }
 function pauseGame(){
@@ -255,3 +261,5 @@ function toggleMute(){ SFX.init(); SFX.toggle(); refreshSoundLabels(); }
 function toggleAllSound(){ SFX.init(); const anyOn=!SFX.muted||!Music.muted; if(anyOn){ if(!SFX.muted) SFX.toggle(); if(!Music.muted) Music.toggle(); } else { SFX.toggle(); Music.toggle(); mLast=null; } refreshSoundLabels(); }
 function allMuted(){ return SFX.muted&&Music.muted; }
 function refreshSoundLabels(){ if($('#settings').classList.contains('on')) renderSettings(); }
+// (v12) test hook: the Act I victory screen
+window.__ebDbg=Object.assign(window.__ebDbg||{},{victory:()=>victory()});

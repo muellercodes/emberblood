@@ -567,7 +567,8 @@ function drawPadDiagram(cv,k){
   // southpaw (Settings > Handed: Left) swaps what the sticks, triggers and bumpers do
   const sp=lefty(), mv='Move, click: sprint', am='Aim, click: Roar';
   const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← item · → switch quest']].sort((a,b)=>a[1]-b[1]);
-  const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]];
+  // (v12) the jump button is labelled only once Ash can jump (How to Play names no power ahead of time)
+  const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]].filter(q=>q[3]!=='Jump'||typeof howHas!=='function'||howHas('jump'));
   const line=(x0,y0,x1,y1)=>{ g.strokeStyle='rgba(255,200,140,.6)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); g.fillStyle='#ffc35a'; g.beginPath(); g.arc(x0,y0,2.4,0,TAU); g.fill(); g.beginPath(); g.arc(x1,y1,1.6,0,TAU); g.fill(); };
   const label=(t,x,y,al)=>{ g.font=`600 13px ${UIF}`; g.textAlign=al; g.fillStyle='#f3e4cc'; const ls=t.split('\n'); ls.forEach((s,i)=>g.fillText(s,x,y+(i-(ls.length-1)/2)*16)); };
   let prev=-1e9; for(const [x,y,r,t] of L){ const ly=Math.max(y,prev+36); prev=ly; line(x-r,y,178,ly); label(t,172,ly,'right'); }
@@ -579,7 +580,7 @@ function padHelpRows(k){
   return [
     [chip(sp?'Right stick':'Left stick'),`Move. Push it all the way to sprint, or click it (${escapeHtml(padBtnName(padSw(PB.L3),k))}).`],
     [chip(sp?'Left stick':'Right stick'),'Aim. Without it Ash faces where he walks.'],
-    [c(PB.S),'Jump, once Ash learns how. With wings, jump again in the air to fly.'],
+    ...(typeof howHas!=='function'||howHas('jump')?[[c(PB.S),'Jump.'+((typeof howHas==='function'?howHas('wings'):hasAbil('wings'))?' With wings, jump again in the air to fly.':'')]]:[]),
     [`${c(PB.W)} ${c(PB.R2)}`,'Attack. Hold for a combo. With someone to talk to (or something to open) and no foe close, it does that instead.'],
     [c(PB.L2),'Fire breath'],
     [c(PB.E),'Dodge roll'],

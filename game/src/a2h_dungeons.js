@@ -17,6 +17,14 @@ const TRIALS={
 };
 const trialOpen=id=>{ const T=TRIALS[id]; if(!T||!G) return false; if(G.mode!=='story') return true; return reached(T.stage); };
 const trialDone=id=>!!(G&&G.flags&&G.flags['trial_'+id+'_done']);
+// (v12 META) on the map, the HUD region label and the first-visit banner a Trial goes by what Ash can see (the folk
+// names R1's door prompts and signs use, x0_act1.js A1_FOLK, here as place names) until Ember names it: inside it, or
+// at the end of the Trial before it ("Two more Trials are waiting. The Trial of the Tide ..."). Same rule as R1's
+// a1TrialKnown, plus its boss or its gift (old saves that never recorded the visit). The Arena knows them all.
+const TRIAL_FOLK={leap:S('Old Rooted Arch','Rooted Arch'),tide:S('Shell Doors','Shell Doors'),sky:S('White Gate','White Gate')};
+function trialKnown(id){ if(!G||G.mode!=='story') return true; const F=G.found||{}, f=G.flags||{}; return !!F['seen_'+id]||trialDone(id)||!!f['trial_'+id+'_boss']||!!(TRIALS[id]&&hasAbil(TRIALS[id].abil))||(id==='tide'&&!!f.trial_leap_boss)||(id==='sky'&&!!f.trial_tide_boss); }
+function trialFolk(id){ return TRIAL_FOLK[id]||(TRIALS[id]&&TRIALS[id].name)||''; }
+function trialPlace(id){ const T=TRIALS[id]; return !T?'':trialKnown(id)?T.name:trialFolk(id); }
 // the dungeon an area belongs to (a floor of a multi-floor dungeon names it in def.dun), and its Trial-like info
 // (TRIALS for Ember's Trials, DUNGEONS for anything made with defineDungeon): abil, abilName, boss, bossY, level, shrine
 function dunRoot(id){ const d=AREADEFS[id]; return (d&&d.dun)||id; }
@@ -166,11 +174,11 @@ const TIDE_PIER=[{x0:6286,y0:7378,x1:6350,y1:7422},{x0:6150,y0:7378,x1:6206,y1:7
 for(const w of TIDE_PIER) WALKWAYS.push(w);
 // Trial of the Sky: a crag inside a moat too wide to jump
 PONDS.push({x:12600,y:3600,r:520,inner:220});
-for(const id of TRIAL_IDS){ const T=TRIALS[id]; SHRINES.push(T.shrine); POI['trial_'+id]={x:T.x,y:T.y-30,r:id==='tide'?110:id==='leap'?250:170,name:T.name,level:T.level}; }
+for(const id of TRIAL_IDS){ const T=TRIALS[id]; SHRINES.push(T.shrine); POI['trial_'+id]={x:T.x,y:T.y-30,r:id==='tide'?110:id==='leap'?250:170,get name(){ return trialPlace(id); },level:T.level}; }
 function buildTrialGates(){
   for(const id of TRIAL_IDS){
     const T=TRIALS[id];
-    const m={area:id,x:T.x,y:T.y,name:T.name,trial:id}; CAVEMOUTHS.push(m);
+    const m={area:id,x:T.x,y:T.y,get name(){ return trialPlace(id); },trial:id}; CAVEMOUTHS.push(m);
     const L={x:T.x,y:T.y-40,r:320,i:0.2,trialGate:id}; LIGHTS.push(L);
     STRUCTS.push({k:'cavemouth',x:T.x,y:T.y,ref:m,theme:'trial',trial:id,r:140,light:L});
     addCol({t:'c',x:T.x-66,y:T.y-6,r:22}); addCol({t:'c',x:T.x+66,y:T.y-6,r:22}); addCol({t:'r',x0:T.x-74,y0:T.y-70,x1:T.x+74,y1:T.y-26});

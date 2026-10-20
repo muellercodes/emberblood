@@ -72,10 +72,10 @@ const page = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Emberblood: a top-down open-world action game. Ash, the last Emberblood, has to relight five Ward-fires and face a very old grandfather.">
+<meta name="description" content="Emberblood: a top-down open-world action game. Ash was born with horns, a tail and real fire, and this year the old puppet show about the dragon on the mountain turns out to be more than a puppet show.">
 <meta name="theme-color" content="#0b0607">
 <meta property="og:title" content="Emberblood">
-<meta property="og:description" content="Relight the Wards. Face your great ×13 grandfather.">
+<meta property="og:description" content="Three lanterns to light, and an old puppet show that is more than it seems.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 ${head}${body.slice(0, cut)}
 </head>

@@ -5,7 +5,8 @@
 const SK_BR=[
   {id:'blade',name:'Blade',col:'#d6e6f6',deep:'#2a4562',blurb:'Hit harder, swing faster and look cool doing it.'},
   {id:'flame',name:'Flame',col:'#ffa24c',deep:'#7a2a0e',blurb:'Hotter breath and a roar that rattles teeth.'},
-  {id:'wings',name:'Wings',col:'#92defe',deep:'#174a64',blurb:'Light feet, longer flights and better powers.'},
+  // (v12) the branch id stays 'wings' (saves and SK_TABS read it); its name is Sky, so the tree does not promise wings
+  {id:'wings',name:'Sky',col:'#92defe',deep:'#174a64',blurb:'Light feet, quick getaways and better powers.'},
   {id:'heart',name:'Heart',col:'#ff9aaa',deep:'#6c1e30',blurb:'More health, more draughts and better friends.'}
 ];
 const SK_BRBY={}; for(const b of SK_BR) SK_BRBY[b.id]=b;
@@ -13,7 +14,10 @@ const SK_BRBY={}; for(const b of SK_BR) SK_BRBY[b.id]=b;
 // are powers now (ABIL_DEFS, e6_balance.js). Each new power opens one skill here (n.abil); the power helpers read hasSkill(id).
 const SK_ROW_NEED=[0,2,4,7];
 const SK_ROWS=SK_ROW_NEED.length;
-const SK_WPN_FROM={bow:'the Trial of the Tide',boomerang:'the Trial of the Leap'};
+// (v12) a skill that needs a weapon Ash has not got names the weapon plainly, never where it is
+const SK_WPN_NEED={bow:'a bow',boomerang:'a boomerang'};
+// the word "Trial" shows in the skills text only once Ash has been inside one (Ember names them there)
+const skTrialKnown=()=>!!(G&&((G.found&&(G.found.seen_leap||G.found.seen_tide||G.found.seen_sky))||(G.flags&&G.flags.act1_done)));
 const SK_RESET_COST=30;
 const skPct=(m,r)=>Math.round((Math.pow(m,r)-1)*100);
 const SKILL_TREE=[
@@ -90,11 +94,11 @@ function skStats(){ if(!player) return; const s=player.stats; for(const k in SK_
 const skRank=id=>hasSkill(id);
 function skSpent(br){ let n=0; for(const q of SKILL_TREE) if(!br||q.br===br) n+=skRank(q.id); return n; }
 function wpnName(id){ return (typeof WEAPONS!=='undefined'&&WEAPONS[id]&&WEAPONS[id].name)||id; }
-// a skill that needs a power from a later act stays a mystery until the power is found
-function skSecret(n){ const A=n.abil&&typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; return !!A&&(A.act||1)>1&&!hasAbil(n.abil); }
+// (v12) a skill that needs a power stays a mystery until the power is found (Act I powers too: nothing names them early)
+function skSecret(n){ const A=n.abil&&typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; return !!A&&!hasAbil(n.abil); }
 function skNeedTxt(n){
-  if(n.abil&&!hasAbil(n.abil)){ const A=typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; if(!A||(A.act||1)>1) return 'Opens when you find a new power'; return `Needs ${A.name}. ${A.where||''}`.trim(); }
-  if(n.weapon&&!(G.weapons&&G.weapons[n.weapon])) return `Needs the ${wpnName(n.weapon)} from ${SK_WPN_FROM[n.weapon]}`;
+  if(n.abil&&!hasAbil(n.abil)) return 'Opens when you find a new power';
+  if(n.weapon&&!(G.weapons&&G.weapons[n.weapon])) return `Needs ${SK_WPN_NEED[n.weapon]||wpnName(n.weapon)}`;
   if(n.pip&&!(G.flags&&G.flags.pip)) return 'Unlocks once Pip joins you';
   if(n.id==='trail'&&player&&player.stats.emberDash&&!skRank('trail')) return 'You already roll in flames, thanks to a blessing';
   return '';
@@ -106,7 +110,7 @@ function skWhy(n){
   const need=SK_ROW_NEED[n.row], have=skSpent(n.br);
   if(have<need){ const d=need-have; return {k:'row',t:`Spend ${d} more point${d>1?'s':''} in ${br.name} to open row ${n.row+1}`}; }
   const q=skNeedTxt(n); if(q) return {k:'need',t:q};
-  if((G.sp|0)<1) return {k:'sp',t:'No skill points left. Level up or beat a Trial to earn more.'};
+  if((G.sp|0)<1) return {k:'sp',t:skTrialKnown()?'No skill points left. Level up or beat a Trial to earn more.':'No skill points left. Level up to earn more.'};
   return null;
 }
 function skCanAny(br){ for(const n of SKILL_TREE) if((!br||n.br===br)&&!skWhy(n)) return true; return false; }
@@ -359,7 +363,10 @@ function skSym(g,id,pal){
       skInk(g,skStarP(0,3,40,17),sg,6); g.restore(); g.fillStyle='rgba(255,255,240,.7)'; g.fill(skStarP(-4,-3,15,6.5)); break; }
     case 'br_blade': skSword(g,-Math.PI/4,1.12); break;
     case 'br_flame': skFlame(g,0,36,22,72); break;
-    case 'br_wings': skWing(g,skMix(pal.col,'#ffffff',0.3)); break;
+    case 'br_wings': {   // (v12) the Sky branch: a cloud with a gust of wind (no wing until Ash has wings)
+      const cl=new Path2D(); cl.moveTo(-34,14); cl.arc(-20,4,14,Math.PI*0.62,Math.PI*1.55); cl.arc(0,-8,19,Math.PI*1.08,Math.PI*1.9); cl.arc(22,4,15,Math.PI*1.42,Math.PI*0.4); cl.closePath();
+      skInk(g,cl,skMix(pal.col,'#ffffff',0.35)); g.fillStyle='rgba(255,255,255,.4)'; g.fill(skEll(-6,-12,9,4));
+      skLine(g,skP('M-30 28 Q-6 22 8 28 Q20 34 30 26'),'#f6e2c8',3.5); skLine(g,skP('M-18 38 Q0 33 14 38'),'#f6e2c8',3); break; }
     case 'br_heart': skInk(g,skP(SK_HEART),pal.col); g.fillStyle='rgba(255,255,255,.35)'; g.fill(skEll(-16,-14,7,4)); break;
     // weapon fallbacks for the Hero page (used only while drawWeaponIcon draws nothing)
     case 'w_sword': skSword(g,-Math.PI/4,1.1); break;
@@ -669,7 +676,8 @@ function skBuildTabs(){
   $('#skStar').src=skIcon('star',{k:'star',bare:true},30);
   $('#skTabs').innerHTML=SK_BR.concat([SK_POW]).map(b=>`<button type="button" tabindex="0" data-br="${b.id}" style="--ac:${b.col}" aria-pressed="false"><img src="${skIcon('br_'+b.id,Object.assign({bare:true},b),22)}" alt="" width="22" height="22"><span>${b.name}</span><span class="skc">0</span><span class="dot" hidden></span></button>`).join('');
 }
-// the Powers page (a fifth tab): every power Ash has and how to use it, and a ??? slot for each one still out there
+// the Powers page (a fifth tab): the powers Ash has and how to use them. (v12) Only the ones he has found: no ??? slots,
+// no count, no hints about where the rest are, and a heading only for acts he has reached
 const SK_POW={id:'powers',name:'Powers',col:'#ffd27a',deep:'#5a3a10'};
 const SK_TABS=['blade','flame','wings','heart','powers'];
 const SK_DIM={k:'dim',col:'#8a7a6a',deep:'#2a1c14'};
@@ -677,17 +685,18 @@ function skPowIcon(A){ return typeof A.icon==='function'?'fn_'+A.id:(A.icon||'qm
 function skPowerCard(id){
   const A=ABIL_DEFS[id], own=hasAbil(id), E=t=>escapeHtml(simplify(t));
   const sk=A.skill&&SKN[A.skill], r=sk?skRank(sk.id):0;
-  const txt=own?abilHow(id):(A.act===1&&A.where?A.where:'A power you have not found yet.');
+  const txt=own?abilHow(id):'A power you have not found yet.';
   let up='';
   if(own&&sk){ const pips=Array.from({length:sk.max},(_,i)=>`<i class="${i<r?'on':''}"></i>`).join(''); up=`<div class="pwup">${SK_SVG.star}<span>${E(`Upgrade: ${sk.name}, in ${SK_BRBY[sk.br].name}`)}</span><span class="skpip" role="img" aria-label="Rank ${r} of ${sk.max}">${pips}</span></div>`; }
   return `<div class="pwn${own?' own':''}" data-pow="${id}"><div class="skic"><img src="${skIcon(own?skPowIcon(A):'qmark',own?SK_GOLD:SK_DIM,60)}" alt="" width="60" height="60"></div><div class="sktx"><div class="sknm">${E(own?A.name:'???')}${own?'<span class="hrok">Yours</span>':''}</div><div class="skds">${E(txt)}</div>${up}</div></div>`;
 }
 function skPowersHtml(){
-  const ids=typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[], own=ids.filter(hasAbil).length, R=['','I','II','III','IV'];
-  const out=[`<div class="skbh"><b>Powers</b><span>${escapeHtml(simplify('Powers are gifts you find on your journey. They never cost skill points, and many open a new skill.'))} ${own} of ${ids.length} found.</span></div>`];
+  const ids=(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[]).filter(hasAbil), R=['','I','II','III','IV'];
+  const out=[`<div class="skbh"><b>Powers</b><span>${escapeHtml(simplify(S('Your powers, and how to use them. Powers never cost skill points, and many open a new skill.','Your powers and how to use them. They are free.')))}</span></div>`];
+  if(!ids.length) out.push(`<p class="pwnone">${escapeHtml(simplify(S('No powers yet.','No powers yet.')))}</p>`);
   for(let act=1;act<=4;act++){
     const L=ids.filter(id=>(ABIL_DEFS[id].act||1)===act); if(!L.length) continue;
-    const known=act===1||L.some(hasAbil), title=known?((typeof BAL_ACTS!=='undefined'&&BAL_ACTS[act])||`Act ${R[act]}`):`Act ${R[act]} · ???`;
+    const title=(typeof BAL_ACTS!=='undefined'&&BAL_ACTS[act])||`Act ${R[act]}`;
     out.push(`<div class="sktier pwtier"><div class="sktl"><span class="sktn">${escapeHtml(title)}</span><span class="ln"></span></div><div class="pwrow">${L.map(skPowerCard).join('')}</div></div>`);
   }
   return out.join('');
@@ -725,8 +734,8 @@ function skToast(t){
   el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),readT(t,3,7)*1000); logAdd({k:'tip',text:t});
 }
 function skCard(n,br){
-  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), needT=max?'':skNeedTxt(n);
-  if(skSecret(n)) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
+  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), sec=skSecret(n), needT=max||sec?'':skNeedTxt(n);
+  if(sec) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
   const pips=Array.from({length:n.max},(_,i)=>`<i class="${i<r?'on':''}${SK.just===n.id&&i===r-1?' new':''}"></i>`).join('');
   const eff=n.each?`<div class="skef">${n.max>1?'Each rank: ':''}${E(n.each)}${r&&n.max>1&&n.now?` · <em>Total ${E(n.now(r))}</em>`:''}</div>`:'';
   const rq=needT?`<div class="skrq">${SK_SVG.lock}<span>${E(needT)}</span></div>`:'';
@@ -739,7 +748,7 @@ function skRender(){
   const pow=SK.tab==='powers', sp=G.sp|0, br=pow?SK_POW:(SK_BRBY[SK.tab]||SK_BR[0]), spent=pow?0:skSpent(br.id), body=$('#skBody');
   const act=document.activeElement, keep=act&&body.contains(act)?(act.dataset.learn||(act.dataset.res?'_res':'')):null;
   $('#skSp').textContent=sp; $('#skSpL').textContent=sp===1?'point to spend':'points to spend'; $('#skPts').classList.toggle('none',!sp);
-  $('#skSub').textContent=`Level ${player.level}. You earn 1 point every level, and 1 more for each Trial you beat.`;
+  $('#skSub').textContent=`Level ${player.level}. You earn 1 point every level`+(skTrialKnown()?', and 1 more for each Trial you beat.':', and now and then a bonus point for a big win.');
   for(const b of document.querySelectorAll('#skTabs button')){ const id=b.dataset.br; b.setAttribute('aria-pressed',String(id===br.id)); const k=id==='powers'?(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER.filter(hasAbil).length:0):skSpent(id), sc=b.querySelector('.skc'); sc.textContent=k; sc.hidden=!k; b.querySelector('.dot').hidden=id==='powers'||!skCanAny(id); }
   $('#skPanel').style.setProperty('--ac',br.col);
   if(pow){ body.innerHTML=skPowersHtml(); SK.just=null; return; }
@@ -813,7 +822,9 @@ addEventListener('keydown',e=>{
 },true);
 
 // ---------- journal Hero page (renderJour in a12b_ui calls these for jTab==='hero')
-const SK_WPN_HINT={sword:'From Mom at the forge',daggers:'A reward for Stop, Thief!',spear:'Pell sells one',hammer:'Mom can forge one',boomerang:'In the Trial of the Leap',bow:'In the Trial of the Tide'};
+// (v12) a weapon with a plain hint (a shop, Mom, a quest) shows before Ash has it; one without (the bow, the boomerang)
+// stays off the page until he finds it
+const SK_WPN_HINT={sword:'From Mom at the forge',daggers:'A reward for Stop, Thief!',spear:'Pell sells one',hammer:'Mom can forge one'};
 function skStatTxt(m){ const d=Math.round((m-1)*100); return d>0?`+${d}%`:d<0?`${d}%`:'Normal'; }
 function heroTabHtml(){
   if(!player) return '';
@@ -830,13 +841,13 @@ function heroTabHtml(){
     tile(s.critCh>0?`${Math.round(s.critCh*100)}%`:'None yet','Critical hits',s.critCh>0),tile(arm<0.995?`${Math.round((1-arm)*100)}% less`:'Normal','Damage taken',arm<0.995),
     tile(skStatTxt((s.speed||200)/200),'Move speed',(s.speed||200)>201),tile(s.killHeal>0?`+${s.killHeal}`:'None yet','Heal per foe',s.killHeal>0)
   ].join('')+'</div>');
-  // powers, from the registry (e6_balance.js): yours with how to use them, the rest as ??? slots
-  const PW=typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[], nPw=PW.filter(hasAbil).length;
-  o.push(`<div class="jh2">Powers · ${nPw} of ${PW.length}</div><div class="hrab">`+PW.map(id=>{ const A=ABIL_DEFS[id], own=hasAbil(id), t=own?abilHow(id):simplify(A.act===1&&A.where?A.where:'A power you have not found yet.');
-    return `<div class="hrabi${own?' own':''}"><img src="${skIcon(own?skPowIcon(A):'qmark',own?SK_GOLD:SK_DIM,44)}" alt=""><div><b>${E(own?A.name:'???')}</b>${own?'<span class="hrok">Yours</span>':''}<small>${E(t)}</small></div></div>`; }).join('')+'</div>');
-  const ids=typeof WEAPON_IDS!=='undefined'?WEAPON_IDS:['sword'], has=id=>!!(G.weapons&&G.weapons[id])&&!(id==='sword'&&!G.flags.forge), cur=typeof curWeapon==='function'?curWeapon():'sword';
-  const nOwn=ids.filter(has).length;
-  o.push(`<div class="jh2">Weapons · ${nOwn} of ${ids.length}</div><div class="hrwp">`+ids.map(id=>{ const own=has(id), eq=own&&cur===id, W0=(typeof WEAPONS!=='undefined'&&WEAPONS[id])||{};
+  // powers, from the registry (e6_balance.js): (v12) only the ones Ash has, with how to use them, and no count
+  const PW=(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[]).filter(hasAbil);
+  o.push(`<div class="jh2">Powers</div>`+(PW.length?`<div class="hrab">`+PW.map(id=>{ const A=ABIL_DEFS[id], t=abilHow(id);
+    return `<div class="hrabi own"><img src="${skIcon(skPowIcon(A),SK_GOLD,44)}" alt=""><div><b>${E(A.name)}</b><span class="hrok">Yours</span><small>${E(t)}</small></div></div>`; }).join('')+'</div>':`<p>${E(simplify(S('No powers yet.','No powers yet.')))}</p>`));
+  const has=id=>!!(G.weapons&&G.weapons[id])&&!(id==='sword'&&!G.flags.forge), cur=typeof curWeapon==='function'?curWeapon():'sword';
+  const ids=(typeof WEAPON_IDS!=='undefined'?WEAPON_IDS:['sword']).filter(id=>has(id)||(typeof WEAPONS!=='undefined'&&WEAPONS[id]&&WEAPONS[id].hint)||SK_WPN_HINT[id]);
+  o.push(`<div class="jh2">Weapons</div><div class="hrwp">`+ids.map(id=>{ const own=has(id), eq=own&&cur===id, W0=(typeof WEAPONS!=='undefined'&&WEAPONS[id])||{};
     return `<div class="hrw${own?' own':''}${eq?' eq':''}"><canvas width="112" height="112" data-wpn="${id}" data-own="${own?1:0}" aria-hidden="true"></canvas><b>${E(W0.name||id)}</b><small>${E(eq?'In your hand':own?'In your pack':(W0.hint||SK_WPN_HINT[id]||'Somewhere out there'))}</small></div>`; }).join('')+'</div>');
   const got=SKILL_TREE.filter(n=>skRank(n.id));
   o.push(`<div class="jh2">Skills learned · ${skSpent()} point${skSpent()===1?'':'s'} spent</div>`+(got.length?`<div class="hrsk">${got.map(n=>`<span>${E(n.name)}${n.max>1?`<i>${skRank(n.id)}/${n.max}</i>`:''}</span>`).join('')}</div>`:'<p>None yet. Open Skills to pick your first one.</p>'));
