@@ -243,7 +243,7 @@ function itFrost(){
     stunEnemy(e,e.boss?0.9/0.35:2.5); e.itIceT=G.time+(e.boss?0.9:2.5); e.aggro=true; n++;
     emit(e.x,e.y-6,8,{col:'215,240,255',smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:2.5,drag:3});
   }
-  IT.fx.push({k:'frost',x:p.x,y:p.y,t:0,dur:0.55,R});
+  IT.fx.push({k:'frost',x:p.x,y:p.y,t:0,dur:0.7,R});
   for(let i=0;i<28;i++){ const a=i/28*TAU; emit(p.x+Math.cos(a)*20,p.y+Math.sin(a)*14,1,{col:'225,245,255',ang:a,spread:0.15,smin:150,smax:240,lmin:.3,lmax:.45,zmin:1.5,zmax:3,drag:4}); }
   shake(4); try{ SFX.play('block'); }catch(e){}
   return n;
@@ -463,8 +463,10 @@ function itDraw(t){
     else itDisc(d.x,d.y-9-bob);
   }
   for(const f of IT.fx){ if(f.k!=='frost') continue; const u=f.t/f.dur, r=f.R*(0.25+0.75*Math.sqrt(u));
-    ctx.save(); ctx.globalAlpha=0.55*(1-u); ctx.strokeStyle='#dff4ff'; ctx.lineWidth=6*(1-u)+1.5; ctx.beginPath(); ctx.ellipse(f.x,f.y,r,r*0.72,0,0,TAU); ctx.stroke();
-    ctx.globalAlpha=0.18*(1-u); ctx.fillStyle='#bfe6ff'; ctx.fill(); ctx.restore(); }
+    ctx.save(); ctx.globalAlpha=0.3*(1-u); ctx.fillStyle='#bfe6ff'; ctx.beginPath(); ctx.ellipse(f.x,f.y,r,r*0.72,0,0,TAU); ctx.fill();
+    ctx.globalAlpha=0.85*(1-u); ctx.strokeStyle='#eefaff'; ctx.lineWidth=9*(1-u)+2; ctx.stroke();
+    ctx.globalAlpha=0.6*(1-u); ctx.strokeStyle='#7ec8f0'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(f.x,f.y,r*0.82,r*0.59,0,0,TAU); ctx.stroke();
+    ctx.restore(); }
   for(const e of G.enemies){ if(e.dead||!(e.itIceT>G.time)||!inView(e.x,e.y,60)) continue; itFlake(e.x,e.y-(e.r||12)-16,6+Math.sin(G.time*6)*0.6,Math.min(1,(e.itIceT-G.time)*2)); }
   const C=IT.crow; if(C){ ctx.save(); ctx.translate(C.x,C.y); ctx.scale(1.3,1.3); drawCrowAt(ctx,0,0,C.flap/TAU,false); ctx.restore(); }
 }
