@@ -592,7 +592,7 @@ function padHelpRows(k){
     [c(PB.RT),'Switch which quest you follow (in the Arena: next weapon)'],
     [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
-    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs.`],
+    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs. In the Satchel, ${padBtnName(PB.W,k)} or ${padBtnName(PB.N,k)} puts an item in your quick slot.`],
     [chip(sp?'Southpaw':'Left-handed?'),sp?'On: the sticks, triggers and bumpers are swapped. Settings > Handed changes it back.':'Settings > Handed: Left swaps the sticks, triggers and bumpers (southpaw).']
   ];
 }

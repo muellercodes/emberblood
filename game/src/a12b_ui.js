@@ -592,7 +592,7 @@ function bagHtml(E){
   const hats=Object.keys(G.hats||{}).filter(k=>G.hats[k]);
   // coins and the quick slot
   const qi=q?bagInfo(q):null;
-  out.push(`<div class="bagtop"><span class="bagcoin"><i aria-hidden="true"></i>${G.coins||0} coins</span><span class="bagq">${qi?`${bagIco(q,28)}<span>${E('Quick slot')}: <b>${E(bagSplit(qi.name)[0])}</b>${qi.count>0?` ×${qi.count}. ${bagQuickHow()}`:` (${E('none left')})`}</span>`:`<span class="bqe" aria-hidden="true">${BAG_STAR}</span><span>${E(S('Quick slot: empty. Press the star on something to use, and it waits there, ready.','Quick slot: empty. Press a star to put something there.'))}</span>`}</span></div>`);
+  out.push(`<div class="bagtop"><span class="bagcoin"><i aria-hidden="true"></i>${G.coins||0} coins</span><span class="bagq">${qi?`${bagIco(q,28)}<span>${E('Quick slot')}: <b>${E(bagSplit(qi.name)[0])}</b>${qi.count>0?` ×${qi.count}. ${bagQuickHow()}`:` (${E('none left')})`}</span>`:`<span class="bqe" aria-hidden="true">${BAG_STAR}</span><span>${curDevice()==='pad'?`${E('Quick slot: empty. Press')} ${padChip(PB.W)} ${E('on something to use, and it waits there, ready.')}`:E(S('Quick slot: empty. Press the star on something to use, and it waits there, ready.','Quick slot: empty. Press a star to put something there.'))}</span>`}</span></div>`);
   if(!infos.length&&!hats.length) out.push(`<p>${E(S('Nothing in your satchel yet. Chests, shops and the people you help all give you things.','Nothing here yet. Open chests and help people to get things.'))}</p>`);
   const kindOf=i=>BAG_GROUPS.some(g=>g[0]===i.kind)?i.kind:'quest';
   for(const [k,label] of BAG_GROUPS){

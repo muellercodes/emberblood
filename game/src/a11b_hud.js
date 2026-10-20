@@ -99,8 +99,8 @@ function drawHUD(){
     ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?3.6:3.2; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.95)':'rgba(10,6,4,.85)'; ctx.strokeText(sub,W/2,by+16); ctx.fillStyle=LOOK.sb?'#fff0d4':'#f2dcc0'; ctx.fillText(sub,W/2,by+16);
   }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
-  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story){ lvQueue(); drawSkillHud(); }
-  if(story){ drawBoosts(L,T,pw); drawQuickNotes(); }   // (v12) boosts and the quick slot's notes
+  drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawBoosts(L,T,pw); if(story){ lvQueue(); drawSkillHud(); }
+  if(story) drawQuickNotes();   // (v12) the boosts (under the skill tip) and the quick slot's notes
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   // prompt: (v11 polish) drawn after the speech bubbles (drawCompHud draws them), so it is always on top
   if(G.prompt&&scene==='play'){
