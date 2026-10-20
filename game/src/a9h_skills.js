@@ -734,8 +734,8 @@ function skToast(t){
   el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),readT(t,3,7)*1000); logAdd({k:'tip',text:t});
 }
 function skCard(n,br){
-  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), needT=max?'':skNeedTxt(n);
-  if(skSecret(n)) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
+  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), sec=skSecret(n), needT=max||sec?'':skNeedTxt(n);
+  if(sec) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
   const pips=Array.from({length:n.max},(_,i)=>`<i class="${i<r?'on':''}${SK.just===n.id&&i===r-1?' new':''}"></i>`).join('');
   const eff=n.each?`<div class="skef">${n.max>1?'Each rank: ':''}${E(n.each)}${r&&n.max>1&&n.now?` · <em>Total ${E(n.now(r))}</em>`:''}</div>`:'';
   const rq=needT?`<div class="skrq">${SK_SVG.lock}<span>${E(needT)}</span></div>`:'';
