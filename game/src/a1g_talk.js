@@ -84,8 +84,8 @@ const TALK={
       {t:`Step one: eat a lot of spicy peppers.`,tone:'silly',r:`I'll do it! Mom! MOM! WHERE ARE THE PEPPERS?`,f:1}],best:'silly'}},
   wendel:{bio:'Emberhollow’s only fiddler. Cousin of Dell the fisherman.',
     about:{dell:S(`Dell thinks fish are friendly. Fish are rude. One jumped out of the lake once and took the sandwich right out of my hand.`,`Fish are rude. One stole my sandwich!`),tamsin:S(`Tamsin at the Smoky Kettle is the best bard in the valley. She can make a lute cry. Mine just sounds like a cat.`,`Tamsin is the best bard. Her lute sounds great. Mine does not.`)},
-    rumorAsk:[`Have you ever played for the Warden statues?`,`Played for the statues?`],
-    rumor:{t:S(`If you play one of my old songs near the Warden statues, they hum along. I've only heard it once. Maybe I dreamed it.`,`Hum one of my old songs by a Warden statue. It hums along!`)},
+    rumorAsk:[`Have you ever played for the old statues?`,`Played for the statues?`],
+    rumor:{t:S(`If you play one of my old songs near the old statues of the Five, they hum along. I've only heard it once. Maybe I dreamed it.`,`Hum one of my old songs by a statue of the Five. It hums along!`)},
     loves:['honey'],hates:['fish'],
     // (before the raid there are no lost songs yet: his Lost Songs quest opens after it)
     get deep(){ return reached('lore')?S(`In the raid a kobold ran off with my song folder and dropped the sheets all down the road. Three songs, and I can't remember how they go. It's like losing three friends who were also noises.`,`A kobold took my songs in the raid. I miss them.`)
@@ -122,7 +122,7 @@ const TALK={
   wren:{bio:'The librarian of Brindlecross. Studies the Wardens.',
     about:{quill:`Quill and I argue every week about whether the Wardens were heroes or just stubborn. She's wrong. They were both.`,yara:`Yara taught me my letters. I still can't spell "Wardens" without thinking of her ruler. She used it to point. Only to point.`},
     rumorAsk:[`Does the library have any hidden rooms?`,`Any hidden rooms here?`],
-    rumor:{t:S(`Upstairs in the library there's a shelf of books that aren't books. One of them is a handle. Iska loved hidden rooms. I've never found which one.`,`Upstairs, one of the books is a handle. I never found which.`),hint:'sec_h_library'},
+    rumor:{t:S(`Upstairs in the library there's a shelf of books that aren't books. One of them is a handle. Whoever built this place loved hidden rooms. I've never found which one.`,`Upstairs, one of the books is a handle. I never found which.`),hint:'sec_h_library'},
     loves:['moonlily'],hates:['fish'],
     deep:S(`I became a librarian because I was scared of everything outside. Books don't bite. Now I spend my days reading about dragons who do, thanks to you.`,`I liked books because they don't bite. Now I read about biting dragons.`),
     secret:{t:`I copied the Wardens' map of the valley. All the old places are marked. Keep it.`,reward:{reveal:true}},

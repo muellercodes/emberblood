@@ -112,7 +112,7 @@ STORY.a1_step_nodj=[
 STORY.a1_iska_climb=[
   vl('iska',`My lantern. I put it here a thousand years ago, on the shortest night, so the five of us could find our way back down.`,`My old lantern. I put it here long ago, so we could find our way down.`),
   vl('iska',`We never needed it. We went down a different way. Wardens are very bad at planning.`,`We never used it. Wardens are bad at plans.`),
-  vls('iska',`You carry Ember's letter, don't you? Page nine. "Not as a king. Just as my father." Remember it up there. It might matter.`,`You have Ember's letter. "Just as my father." Remember it up there.`,()=>!(G.pages&&G.pages.p9)),
+  vls('iska',`You carry Ember's letter, don't you? The one to her father. "Not as a king. Just as my father." Remember it up there. It might matter.`,`You have Ember's letter. "Just as my father." Remember it up there.`,()=>!(G.pages&&G.pages.p9)),
   vl('iska',`The crater's vents breathe in and out, like someone asleep. Fly when they breathe out. Watch for the gold sparks.`,`The vents up top breathe. Fly in when you see gold sparks.`)];
 STORY.a1_iska_cold=[vl('narr',`An old stone lantern with Iska's mark on it. It's cold and empty. One of Mom's paper lanterns would fit inside just right.`,`An old stone lantern. It is empty. Mom's lantern would fit.`)];
 // ---------- 7.5 Tier 3: Bram's Anvil

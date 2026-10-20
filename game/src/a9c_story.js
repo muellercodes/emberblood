@@ -151,7 +151,7 @@ function breathIgnite(mx,my,ang,dt){
   for(const id in WARDS){
     if(G.wards[id]) continue; const w=WARDS[id];
     if(!inArcC(mx,my,ang,175,0.45,{x:w.x,y:w.y,r:24})) continue;
-    if(!wardCanLight(id)){ if(!(G.wardMsgT>0)){ G.wardMsgT=3; ftext(w.x,w.y-34,id==='hollow'?'Not yet. Talk to Yara.':'Something here is still feeding on the Ward','#c9d6ff',13); } continue; }
+    if(!wardCanLight(id)){ if(!(G.wardMsgT>0)){ G.wardMsgT=3; ftext(w.x,w.y-34,id==='hollow'?'Not yet. Talk to Yara.':reached('hollow')?'Something here is still feeding on the Ward':'The old stone is warm, but it will not catch','#c9d6ff',13); } continue; }
     G.wardHeat[id]=(G.wardHeat[id]||0)+dt/2.2; G.wardHeatT[id]=G.time;
     if(Math.random()<0.4) emit(w.x+rand(-10,10),w.y+rand(-10,10),1,{col:'255,190,90',ang:-Math.PI/2,spread:0.6,smin:20,smax:60,lmin:.4,lmax:.7,zmin:1.5,zmax:3,rise:15});
     if(G.wardHeat[id]>=1) lightWard(id);

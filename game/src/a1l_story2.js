@@ -501,7 +501,7 @@ function evEpilogue(){
 // ================= dreams from long ago (resting at a shrine or an inn bed; one per chapter, each once)
 // Each dream sets G.flags['dr_'+id] to the choice made; later dialogue (Mom, Yara, Wren, Pip, the next dreams) remembers it.
 const DREAMS={
-  spark:{stages:['lore','hollow'],title:S('The First Spark','The First Spark'),scene:'spark',
+  spark:{stages:['hollow'],title:S('The First Spark','The First Spark'),scene:'spark',
     lines:()=>[
       xl('narr',`You are very small. Your claws are small. Your horns are two little bumps. And the dragon curled up next to you is very, very big.`,`You are very small. A very big dragon sits next to you.`),
       xl('vor_old',`Breathe, Ember. From your belly, not your nose. A dragon's fire starts in the belly.`,`Breathe from your belly, Ember. That is where fire starts.`),
@@ -592,7 +592,7 @@ const DREAMS={
           xl('narr',`Out of the dark comes a little grey moth, shivering. She lands on the extra lantern, spreads her wings over the warm paper, and stays.`,`A little grey moth lands on the extra lantern. She stays.`)]}),
         xo(`One for every house in the valley`,`One for every house`,{tone:'brave',fn:()=>{ G.flags.dr_lantern='all'; },then:[xl('narr',`It takes all night. When you're done, the whole valley glows. People come out of their houses to see. Nobody runs.`,`It takes all night. The whole valley glows. Nobody runs away.`)]})
       ]),
-      xl('narr',`That was the very first Lantern Day. A thousand years later, a kid with horns and a tail would light the thousandth one.`,`That was the first Lantern Day. A thousand years later, you would light the thousandth.`),
+      xl('narr',`That was the very first Lantern Day. A long, long time later, a kid with horns and a tail would light them too.`,`That was the first Lantern Day. Long after, you would light them too.`),
       xl('ember',`Wake up, Ash. It's your turn now.`,`Wake up, Ash. It is your turn now.`));
       return L;
     }},
@@ -662,7 +662,7 @@ const MOM_CH={
 };
 const YARA_CH={
   warcamp:[S(`Breathe, Ash. The Hollow Ward is lit. That's one. Four to go, and I'll be counting.`,`One Ward is lit. Four to go.`)],
-  three:[S(`Three Wards to go, and the mountain is breathing louder every night. Forty-one breaths last night. I lay awake for every one.`,`Three Wards left. The mountain breathes louder every night.`)],
+  three:[S(`Three Wards to go, and the mountain is breathing louder every night. I lie awake and listen to it.`,`Three Wards left. The mountain breathes louder every night.`)],
   gate:[S(`All five Wards burn. A thousand years of Wardens, and a kid with a tail finished the job. Nearly finished it.`,`All five Wards are lit! You nearly did it.`)],
   done:[S(`A thousand and one Lantern Days. I'll light the first lantern again next year. Unless you'd like to.`,`Next Lantern Day, you can light the first lantern.`)]
 };
@@ -708,7 +708,7 @@ const EV_TALK={
   momTikkaHome:S(`There's a little kobold lighting a lantern in her window every night. She says it's for you. I like her already.`,`A little kobold lights a lantern for you every night. I like her.`),
   opts:{
     wren:[{key:'ev_wren_dream',cond:()=>!!(G.flags.dr_seen_knock||G.flags.dr_seen_five||G.flags.dr_seen_split),t:S(`I keep dreaming about Ember and the Wardens`,`I dream about Ember`),
-      lines:[['wren',S(`Dreams of Ember? Oh, Ash. Write them down! Every single detail! The Wardens' Account only has ten pages. You might be the eleventh.`,`Dreams of Ember? Write them down! You might be page eleven!`)],['wren',S(`Emberbloods used to dream like that, the old books say. Nobody ever wrote down why.`,`Old Emberbloods had dreams like that too.`)]]}],
+      lines:[['wren',S(`Dreams of Ember? Oh, Ash. Write them down! Every single detail! The Wardens' Account stops where the Wardens did. You might be the next page.`,`Dreams of Ember? Write them down! You might be the next page!`)],['wren',S(`Emberbloods used to dream like that, the old books say. Nobody ever wrote down why.`,`Old Emberbloods had dreams like that too.`)]]}],
     yara:[{key:'ev_yara_tikka',cond:()=>(G.flags.tk_n|0)>=2,t:S(`I've met a kobold who wants to be a baker`,`I met a kobold who bakes`),
       lines:[['yara',S(`A kobold baker? Hm. When I was young, a kobold once traded me a pie for a button. It was a very good pie. I've wondered about that kobold ever since.`,`A kobold baker? A kobold once gave me a very good pie.`)]]}],
     tamsin:[{key:'ev_tamsin_show',cond:()=>!!G.flags.ev_show,t:S(`Did you hear I was in a play?`,`I was in a play!`),

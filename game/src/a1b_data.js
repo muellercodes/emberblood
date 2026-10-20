@@ -53,12 +53,12 @@ const UPGRADES=[
   {id:'phoenix',icon:'🪶',name:'Phoenix Ember',desc:'Once per rest, survive a knockout blow with half your HP.',once:true,apply:p=>{p.stats.phoenix=1;p.stats.phoenixMax=1;}}
 ];
 const DEATH_LINES=[
-  'Somewhere in the mountain, an old dragon is laughing. Get back up.',
+  'The lanterns are still waiting. Get back up.',
   'Even dragons fall sometimes. Shake off the dust.',
   'The fire in your blood is not out yet.',
   'Elder Yara would tell you to roll more. Elder Yara is usually right.',
   'Mom would say: eat something, then try again.'
 ];
 const DCOL={kobold:'190,160,90',cultist:'170,100,220',drakeling:'240,140,70',knight:'230,140,60',wolf:'170,170,170',egg:'230,220,195',bat:'70,50,70',slime:'120,200,80',grizzlefang:'220,190,110',morrow:'190,120,240',broodmother:'230,90,140',gloamjaw:'120,150,80',greymane:'220,225,235',cindervane:'250,160,80',vorlaxis:'255,120,40'};
-const VILLAGER_LINES=['Thank you, Ash. My chickens are safe again.','The smoke is coming from the mountain. Everyone can see it.','My grandmother said the Emberbloods were dragons once. I always thought she was joking.','Watch yourself out there after dark. The wolves come down from Whisperwood.','Elder Yara has been counting things on her fingers all morning.','We rebuilt the bakery. Twice. Please be careful near it.','Your mom fixed my plow and my door hinge in the same afternoon. She never sleeps.'];
-const TOWN_LINES=['Welcome to Brindlecross! Best fish on Lake Mirrow. Only fish on Lake Mirrow, actually.','Sister Wren? Big building with all the books. Knock loudly, she reads with her ears closed.','Caravans stopped coming down the Ashen Road. The cult has the whole road spooked.','Granny Moss lives out in the Mirefen. If you get lost, follow the smell of tea.','A farmer up in the Frostpine lost his goat. He has posted eleven signs about it.','They say the Obsidian Gate hasn’t opened in a thousand years. I say they say a lot of things.'];
+const VILLAGER_LINES=['Thank you, Ash. My chickens are safe again.','The smoke is coming from the mountain. Everyone can see it.','My grandmother said your family were dragons once. I always thought she was joking.','Watch yourself out there after dark. The wolves come down from Whisperwood.','Elder Yara has been writing in her big book all morning.','We rebuilt the bakery. Twice. Please be careful near it.','Your mom fixed my plow and my door hinge in the same afternoon. She never sleeps.'];
+const TOWN_LINES=['Welcome to Brindlecross! Best fish on Lake Mirrow. Only fish on Lake Mirrow, actually.','Sister Wren? Big building with all the books. Knock loudly, she reads with her ears closed.','Caravans stopped coming down the Ashen Road. The cult has the whole road spooked.','Granny Moss lives out in the Mirefen. If you get lost, follow the smell of tea.','A farmer up in the Frostpine lost his goat. He has posted eleven signs about it.','They say the Obsidian Gate hasn’t opened in living memory. I say they say a lot of things.'];

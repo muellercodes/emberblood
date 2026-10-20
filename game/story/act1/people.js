@@ -790,11 +790,11 @@ people({
           { t: ['Will I be in the book?', 'Will I be in the book?'], say: ['You are the last chapter. I have left a whole page for it, and a bit of the next.', 'You are the last chapter.'] },
         ] },
       { ask: ['What do you and Quill argue about?', 'What do you and Quill argue about?'],
-        say: ['Whether the Wardens were heroes or just stubborn. She says stubborn. She is wrong. They were both.', 'If the Wardens were heroes or stubborn. Both!'] },
+        say: ['Whether the Five on the green were heroes or just stubborn. She says stubborn. She is wrong. They were both.', 'If the Five were heroes or stubborn. Both!'] },
       { ask: ['Why did you become a librarian?', 'Why be a librarian?'],
-        say: ['Because books do not bite. Now I spend my days reading about dragons who do, thanks to you.', 'Books do not bite. Now I read about dragons who do.'] },
+        say: ['Because books do not bite. Then I found the shelf about dragons, and here we are.', 'Books do not bite. Then I found the dragon books.'] },
       { ask: ['Did Yara teach you to spell?', 'Did Yara teach you to spell?'],
-        say: ["She did. I still can't write Wardens without seeing her ruler. She used it to point. Only ever to point.", 'She did. With a ruler. Only for pointing.'] },
+        say: ["She did. I still can't write my own name without seeing her ruler. She used it to point. Only ever to point.", 'She did. With a ruler. Only for pointing.'] },
       { idle: [['Hm? Sorry. I was on page forty.', 'Sorry. I was reading.'], ['Ask me anything. Well, anything in a book.', 'Ask me anything.']] },
       { bye: [["Go carefully. I'll be here. I'm always here.", 'Go carefully.']] },
     ],
@@ -1039,7 +1039,7 @@ people({
     // argues with Wren about the Wardens.
     quill: [
       { if: 'true', once: true,
-        say: ["The Emberblood boy. I'd know you through a telescope, and I have. You light up the whole green on Lantern Day.", 'The Emberblood boy! I saw you through my telescope.'],
+        say: ["Maren's boy! The lantern-lighter. I'd know you through a telescope, and I have. You light up the whole green on Lantern Day.", "Maren's boy! I saw you through my telescope."],
         re: [
           { t: ['You watch us through a telescope?', 'You watch us?'], say: ['Only on Lantern Day. The rest of the year I watch things that are further away.', 'Only on Lantern Day. Usually stars.'] },
           { t: ['Could you see the three lanterns?', 'Could you see the lanterns?'], if: 'stage>=raid', say: ['All three. The middle one wobbled. I wrote it down.', 'All three. The middle one wobbled.'] },
@@ -1048,7 +1048,7 @@ people({
       { if: 'stage<three', ref: 'cinder_mountain',
         say: ['The smoke over Cinder Mountain is thicker every night. I measure it. My measurements are very worried.', 'The mountain smoke is thicker every night.'],
         re: [
-          { t: ['What does that mean?', 'What does that mean?'], say: ['It means he is waking up, and I would very much like to be wrong.', 'He is waking up. I hope I am wrong.'] },
+          { t: ['What does that mean?', 'What does that mean?'], say: ['It means the mountain is waking up, and I would very much like to be wrong.', 'The mountain is waking up. I hope I am wrong.'] },
           { t: ['Can I look through the telescope?', 'Can I look through it?'], say: ['Come back at night. The stairs are behind me. Mind the bucket. There is always a bucket.', 'Come back at night. Mind the bucket.'] },
         ] },
       // her old chat, as a moment: at night, under the stars
@@ -1183,7 +1183,7 @@ people({
       { if: '!event boss_done:broodmother !flag act1_done', ref: 'crag_ward',
         say: ["Drakelings took the mine when the Brood Mother started nesting up on the Crag. Can't dig with lizards in your hair.", 'Drakelings took my mine. Their mother nests on the Crag.'],
         re: [
-          { t: ['Where on the Crag is she?', 'Where is she?'], say: [['gorran', "Right at the top, east of here, by the old Ward. You'll smell her before you see her. Like a kettle left on.", 'At the top of the Crag. She smells like a hot kettle.', { ref: 'crag_ward' }]] },
+          { t: ['Where on the Crag is she?', 'Where is she?'], say: [['gorran', "Right at the top, east of here, by the old stone that's always warm. You'll smell her before you see her. Like a kettle left on.", 'At the top of the Crag. She smells like a hot kettle.', { ref: 'crag_ward' }]] },
           { t: ['Could I clear them out?', 'Could I clear them out?'], tone: 'brave', f: 0.5, say: ["You could try. You've your mother's chin, and she never backed off a rock in her life.", "You could. You have your mom's chin."] },
         ] },
       { if: 'event boss_done:broodmother !quest mine done !flag act1_done',
@@ -1514,10 +1514,10 @@ people({
     // Her song about Ash grows as he does things (the "Sing me your song" row, tamsinSong in a9d_quests.js).
     tamsin: [
       { if: 'true', once: true,
-        say: ["The Emberblood! I've been singing about you all week and I've never seen you up close. Turn round. I need to know how long the tail is.", 'The Emberblood! Turn around. How long is your tail?'],
+        say: ["The dragon boy of Emberhollow! I've been singing about you all week and I've never seen you up close. Turn round. I need to know how long the tail is.", 'The dragon boy! Turn around. How long is your tail?'],
         re: [
           { t: ["It's longer when I'm happy.", "It's longer when I'm happy."], say: ['That is going in verse two. Thank you. Hold still.', 'That goes in verse two!'] },
-          { t: ['What have you been singing?', 'What have you been singing?'], say: ['Lantern Day, the raid, and a bit I made up. Every song needs a bit you made up.', 'Lantern Day, the raid, and a made-up bit.'] },
+          { t: ['What have you been singing?', 'What have you been singing?'], say: ['Lantern Day, the lantern-lighter, and a bit I made up. Every song needs a bit you made up.', 'Lantern Day, you, and a made-up bit.'] },
         ] },
       // (Wendel's talk) Ash gave Wendel "go bold" for kobold
       { if: 'said wendel_go_bold !flag act1_done', once: true,
@@ -1572,7 +1572,7 @@ people({
           { t: ['Is that Sir Croaksley?', 'Is that Sir Croaksley?'], say: ['Sir Croaksley. He is not a knight. Do not tell him.', 'He is not a knight. Do not tell him.'] },
         ] },
       { if: '!event boss_done:gloamjaw !flag act1_done', ref: 'sunken_ward',
-        say: ["Something big has been croaking in the deep water at night, out by the Sunken Ward. Sir Croaksley won't go near it, and he fears nothing.", 'Something big croaks in the deep water. My frog is scared.'],
+        say: ["Something big has been croaking in the deep water at night, out by my old listening stone. Sir Croaksley won't go near it, and he fears nothing.", 'Something big croaks in the deep water. My frog is scared.'],
         re: [
           { t: ['What does it sound like?', 'What does it sound like?'], say: ['Like a door the size of a barn, opening very slowly. All night.', 'Like a huge door, opening slowly.'] },
           { t: ["I'll go and see what it is.", "I'll go and see."], tone: 'brave', f: 0.5, say: ['Take a stick. And a second stick, for when it eats the first one.', 'Take two sticks. It will eat one.'] },
@@ -1606,7 +1606,7 @@ people({
       { ask: ['Did Mabel always want to be a healer?', 'Did Mabel want to heal?'],
         say: ['She wanted to be a knight. Then she watched me set one\'s arm. He cried and I did not. She liked my job better.', 'She wanted to be a knight. Then she saw me fix one.'] },
       { ask: ['Who was Sedge?', 'Who was Sedge?'],
-        say: ['A Warden. This was her country. Her family still lives out here, and not one of them has ever been dry. It runs in the family, like stubbornness, and frogs.', 'A Warden from here. Her family is never dry.'] },
+        say: ['One of the Five, the ones on the green. This was her country, they say. Her family still lives out here, and not one of them has ever been dry. It runs in the family, like stubbornness, and frogs.', 'One of the Five. Her family lives here. They are never dry.'] },
       { idle: [['Well, child?', 'Well?'], ['Mind the kettle. It bites.', 'Mind the kettle.']] },
       { bye: [['Off with you. Mind the deep bits.', 'Mind the deep bits.']] },
     ],
