@@ -133,8 +133,9 @@ function itAdd(id,n,o){
     if(got>0){
       const first=!G.flags.it_first;
       if(first) G.flags.it_first=1;
-      const sub=first?S(`${d.desc} It is in your Satchel (in the Journal), and in the quick slot under your Roar meter.`,`${d.simpleDesc} It is in your bag now.`)
-        :S(`In your bag: ${c} of ${d.cap}. ${d.desc}`,`You have ${c}. ${d.simpleDesc}`);
+      const more=coins>0?[` ${extra} more did not fit, so you get ${coins} coins for ${extra>1?'them':'it'}.`,` ${coins} coins for the rest.`]:['',''];
+      const sub=first?S(`${d.desc} It is in your Satchel (in the Journal), and in the quick slot under your Roar meter.${more[0]}`,`${d.simpleDesc} It is in your bag now.${more[1]}`)
+        :S(`In your bag: ${c} of ${d.cap}. ${d.desc}${more[0]}`,`You have ${c}. ${d.simpleDesc}${more[1]}`);
       setBanner(S(`Got: ${nm}`,`Got: ${sm}`),sub,first?4:2.4);
     }else if(coins>0) setBanner(S(`${nm}`,`${sm}`),S(`You can only carry ${d.cap}, so it turns into ${coins} coins.`,`Bag full! You get ${coins} coins.`),2.6);
   }
@@ -179,7 +180,7 @@ function canUseItem(id){
   if(!d||d.kind!=='use') return d&&d.kind==='auto'?S('It works by itself','It works by itself'):S('You cannot use that','You cannot use that');
   if(!(G.items[id]>0)) return S('You have none left','None left');
   if(!p||p.dead||DLG) return S('Not now','Not now');
-  if(IT.use||IT.crow||p.drinkT>0) return S('Wait a moment','Wait a moment');
+  if(IT.use||(IT.crow&&IT.crow.mode!=='out')||p.drinkT>0) return S('Wait a moment','Wait a moment');
   if(G.mini) return S('Not during a game','Not in a game');
   const boss=itBossLive();
   if(id==='it_feather'){
@@ -402,7 +403,11 @@ function itSupplies(who){ const M={msg:null}; runDialogue([itSupLine(who,M)],()=
     return base(who,greet,list); }; }
 
 // ---------- 9. Pell's wagon at the foot of Nightfall Peak while the Long Night is on (act 5, before the dawn)
-function itPell5(){ try{ return !!(G&&G.mode==='story'&&actOf(G.stage)===5&&!(G.flags&&G.flags.n_dawn)); }catch(e){ return false; } }
+// he packs up and goes once Ash first sets foot on the peak in act 5 (until then he sells on the market square), and goes
+// home to the market after the dawn
+function itPell5(){ try{ if(!(G&&G.mode==='story'&&actOf(G.stage)===5&&!(G.flags&&G.flags.n_dawn))) return false;
+    if(!G.flags.it_pell5go&&player&&!AREA&&curMap()===4) G.flags.it_pell5go=1;
+    return !!G.flags.it_pell5go; }catch(e){ return false; } }
 { const base=npcSpot; npcSpot=function(c){ if(c&&c.id==='pell'&&itPell5()) return [IT_PELL5.x+64,IT_PELL5.y+34]; return base(c); }; }
 function itPellTick(){
   const on=itPell5();
@@ -413,7 +418,7 @@ function itPellTick(){
   if(on!==atPeak||(on&&(n.home[0]!==want[0]||n.home[1]!==want[1]))){ n.x=want[0]; n.y=want[1]; n.home=[want[0],want[1]]; }
   if(on&&!AREA&&!G.flags.it_pell5&&scene==='play'&&player&&dist(player.x,player.y,n.x,n.y)<300){
     G.flags.it_pell5=1;
-    bubble(n,S(`Ash! Pell's Wonderful Wagon, open at the foot of the scariest mountain I ever pushed a cart up. Last shop before the top!`,`Pell's Wagon is open! Last shop before the top!`),{who:'pell',dur:6});
+    bubble(n,S(`Ash! Last shop before the top! I pushed this wagon up here myself.`,`Last shop before the top!`),{who:'pell',dur:6});
   }
 }
 let IT_WAGON=null;
@@ -470,4 +475,11 @@ function itFlake(x,y,r,a){ ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle='#e8f8
 window.__ebDbg=Object.assign(window.__ebDbg||{},{items:{IT,ITEMDEF,IT_SUPPLY,IT_SUPPLY_PELL5,IT_PELL5,itemInfo,canUseItem,useItem,quickItem,setQuick,itemBuffs,itemBossTake,
   add:itAdd,drop:itDrop,pick:itPick,price:itPrice,shopPrice:itShopPrice,chestRoll:itChestRoll,areaChestItem:itAreaChestItem,bossLive:itBossLive,bossMax:itBossMax,
   wayOut:itWayOut,pell5:itPell5,supplies:itSupplies,flaskCap:itFlaskCap,hash:itHash,frost:itFrost,names:()=>Object.assign({},ITEM_NAMES),
+  dbg:{spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true},o||{})); if(AREA) e.inArea=true; G.enemies.push(e); return e.id; },
+    boss:(type,dx)=>{ const p=player, e=makeEnemy(type||'gloamjaw',p.x+(dx||200),p.y,{aggro:true}); e.boss=true; e.aggro=true; e.spawnIn=0; G.enemies.push(e); G.boss=e; return e.id; },
+    hurt:a=>{ player.iframes=0; return hurtPlayer(a,player.x+20,player.y,0); },dmg:(i,a)=>{ const e=G.enemies.find(q=>q.id===i); return e?damageEnemy(e,a,{src:'slash'}):null; },
+    foe:i=>{ const e=G.enemies.find(q=>q.id===i); return e?{hp:e.hp,stun:e.stun,dead:e.dead,ice:e.itIceT>G.time}:null; },
+    die:()=>{ player.hp=0; playerDied(); },respawn:()=>respawn(),inn:()=>innRest(),chests:()=>CHESTS.map(c=>({id:c.id,x:c.x,y:c.y,open:!!c.open})),open:id=>{ const c=CHESTS.find(q=>q.id===id); if(c) openChest(c); return !!c; },
+    diff:i=>{ G.diff=DIFFS[i]; return G.diff.name; },shop:id=>{ SHOPTALK[id](); },npc:id=>{ const n=(G.npcs||[]).find(q=>q.id===id); return n?{x:n.x,y:n.y,home:n.home}:null; },
+    pots:()=>(AREA?AREA.objs:mapList(LANDMARKS,curMap())).filter(o=>o.breakable).length},
   state:()=>({use:IT.use&&{id:IT.use.id,t:+IT.use.t.toFixed(2)},buffs:itemBuffs(),boss:{n:IT.boss.n,live:itBossLive(),max:itBossMax()},crow:IT.crow&&IT.crow.mode,drops:IT.drops.map(d=>d.id),qslot:quickItem(),peak:IT.peak,brk:IT.brk.length})}});
