@@ -220,8 +220,9 @@ function enterArea(id,door){
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x+30; G.goat.y=player.y+30; }
   updateCam(0,true); G.fade=1; SFX.play('ui');
   { const TI=def.kind==='cave'&&trialInfo(def.trial||def.id), sh=TI&&TI.shrine; if(sh){ G.shrines[sh.id]=true; G.lastShrine=sh.id; } }
+  // (v12) a Trial's first banner uses its folk name (a2h_dungeons.js trialFolk): Ember names it a moment later
   const firstVisit=!G.found['seen_'+id];
-  if(firstVisit){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.trial&&typeof trialFolk==='function'?trialFolk(def.trial):def.name,def.trial?`Danger level ${def.level}`:`${def.dunKind||'A cave'} · Danger level ${def.level}`,2.6,'region');   // (v12) a Trial's first banner uses its folk name: Ember names it a moment later } }
+  if(firstVisit){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.trial&&typeof trialFolk==='function'?trialFolk(def.trial):def.name,def.trial?`Danger level ${def.level}`:`${def.dunKind||'A cave'} · Danger level ${def.level}`,2.6,'region'); } }
   else if(def.kind==='cave') setBanner(def.name,'',1.6,'region');
   // (v11 polish) a house's name: a small plate at the top on the first visit only, gone when Ash walks out (a11b_hud.js)
   if(def.kind==='house'&&def.owner&&firstVisit) setBanner(def.name,'',1.4,'place');
