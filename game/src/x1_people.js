@@ -1531,9 +1531,10 @@ const X1P_MAIL=[
     x1pL('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     x1pDo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>x1pR('c_salt'),lines:[
-    x1pL('wren',`Dear Ash. My oldest books say a girl with horns once went south over the pass, a very long time ago, with a rope and a lantern. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Long ago a girl with horns went south. Now you have too!`),
+    {who:'wren',text:S(`Dear Ash. Remember the torn page? Ember's other child sailed south, with no fire. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. The torn page said Ember's other child went south. Now you have too!`),skipIf:()=>!x1pQ('a1_moth')},
+    {who:'wren',text:S(`Dear Ash. My oldest books say a girl with horns once went south over the pass, a very long time ago, with a rope and a lantern. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Long ago a girl with horns went south. Now you have too!`),skipIf:()=>x1pQ('a1_moth')},
     x1pL('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have argued by letter for thirty years. She is wrong about almost everything, and I would be lost without her.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
-    x1pL('wren',`Ask her about Pearl's logbook. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about Pearl's logbook. Your friend, Wren.`)]},
+    x1pL('wren',`Ask her about the old logbook on her shelves, the one with pages missing. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about the old logbook. Your friend, Wren.`)]},
   {id:'c_pb_6',from:'wren',when:()=>!!G.flags.c_diary_sent,lines:[
     x1pL('wren',`Ash. Ottoline copied out the moon letters from that girl's diary and sent them to me. They are very old. Older than the Wardens.`,`The moon letters in the diary are very, very old.`),
     x1pL('wren',`They spell the same two words over and over. "Stay." And "Keep." I don't like this, Ash. I don't like it at all.`,`They spell "Stay" and "Keep." I don't like it.`),
