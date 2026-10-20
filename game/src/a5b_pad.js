@@ -25,7 +25,9 @@ const PADK={
   nin:{name:'Nintendo controller',short:'Nintendo',face:['B','A','Y','X'],bg:['#35373d','#35373d','#35373d','#35373d'],fg:['#fff','#fff','#fff','#fff'],sh:['L','R','ZL','ZR'],sel:'−',st:'+',l3:'L stick',r3:'R stick'}
 };
 const PAD={idx:-1,id:'',kind:'xbox',gen:false,sel:null,dev:'kb',known:new Map(),st:new Map(),s:null,ui:false,q:{},full:0,latch:false,still:0,
-  sh:[-1,-1],chord:false,nav:{d:'',t:0},stickBlock:false,scene:'',toastT:0,rum:{until:0,str:0},rw:{G:null,hp:0,lvl:0,hs:0,sk:0,dead:false},lastBtn:'',mem:{},rootId:''};
+  sh:[-1,-1],chord:false,nav:{d:'',t:0},stickBlock:false,scene:'',toastT:0,rum:{until:0,str:0},rw:{G:null,hp:0,lvl:0,hs:0,sk:0,dead:false},lastBtn:'',mem:{},rootId:'',
+  // (v12 PAD) menus: the open screens in order (back restores), sticky column, trigger paging, hint strip, last shop pick
+  stack:[],navX:null,navT:0,openT:0,watchT:0,pg:{d:0,t:0},hint:{key:'',fixed:false,h:0},dlgPick:null};
 try{ if('gamepadInputEmulation' in navigator) navigator.gamepadInputEmulation='gamepad'; }catch(e){}
 function padKindOf(id){
   const s=String(id||'').toLowerCase();
@@ -194,15 +196,19 @@ function padPoll(dt){
   padLabels();
   // a new screen: buttons still held from the last one do nothing until they are let go,
   // and backing out of a sub-screen puts the focus back on the button that opened it
-  const root=navRoot(), key=scene+'|'+(root?root.id:''), ae=document.activeElement;
-  if(key===PAD.scene&&root&&ae&&ae!==document.body&&root.contains(ae)&&!PAD.restoring) PAD.mem[root.id]=ae;
+  const root=navRoot(), rid=root?root.id:'', key=scene+'|'+rid, ae=document.activeElement;
+  if(key===PAD.scene&&root&&ae&&ae!==document.body&&root.contains(ae)&&!PAD.restoring){ const m=PAD.mem[rid]; if(!m||m.el!==ae) PAD.mem[rid]={el:ae,key:navKeyOf(ae),rect:null}; }
   if(key!==PAD.scene){
-    const first=!PAD.scene, from=PAD.rootId; PAD.scene=key; PAD.rootId=root?root.id:'';
+    const first=!PAD.scene, from=PAD.rootId; PAD.scene=key; PAD.rootId=rid; PAD.openT=performance.now();
+    // (v12 PAD) the screens open in order: going back to one under this one restores the control you left it on
+    let back=false;
+    if(!rid) PAD.stack=[];
+    else if(rid!==from){ const i=PAD.stack.indexOf(rid); if(i>=0){ PAD.stack.length=i+1; back=true; } else PAD.stack.push(rid); }
     if(!first){
       if(s){ for(let i=0;i<NPB;i++){ if(s.cur[i]){ s.block[i]=true; s.arm[i]=false; } s.ed[i]=false; s.tap[i]=false; } const [mi,mj]=padMoveAx(); PAD.stickBlock=Math.hypot(s.ax[mi],s.ax[mj])>0.4; }
-      PAD.nav.d=''; PAD.sh=[-1,-1];
-      if(root&&['settings','how','slots','acct'].includes(from)&&['menu','pause'].includes(root.id)) navRestore(root);
-      else if(root&&PAD.dev==='pad'&&root.id!=='dialogue') setTimeout(()=>{ if(navRoot()===root&&PAD.dev==='pad'){ const it=navItems(root); if(it.length&&!it.includes(document.activeElement)) navFocus(navDefault(root,it)); } },90);
+      PAD.nav.d=''; PAD.sh=[-1,-1]; PAD.pg.d=0;
+      if(root&&back) navRestore(root);
+      else if(root&&rid!==from&&PAD.dev==='pad'&&rid!=='dialogue') setTimeout(()=>{ if(navRoot()===root&&PAD.dev==='pad'&&!(PAD.navT>PAD.openT)){ const it=navItems(root), f=navDefault(root,it); if(f&&document.activeElement!==f) navFocus(f); } },90);
     }
   }
   if(!s) return;
@@ -210,7 +216,7 @@ function padPoll(dt){
   { const [mi,mj]=padMoveAx(); if(PAD.stickBlock&&Math.hypot(s.ax[mi],s.ax[mj])<0.3) PAD.stickBlock=false; }
   if(PAD.dev!=='pad') return;
   if(root) padMenu(root,s,dt);
-  else if(scene==='play') padPlayUI(s,dt);
+  else { padHintSync(null); if(scene==='play') padPlayUI(s,dt); }
 }
 function padSetKind(id){
   const k=padKindOf(id); PAD.gen=k==='gen'; PAD.kind=k==='gen'?'xbox':k;
@@ -325,66 +331,266 @@ function padLabels(){
 }
 
 // ---------- menus and overlays: a focus ring you move with the d-pad or stick
+// (v12 PAD) Drew: "desktop menu controls with a controller have to be reworked. It's quite difficult to navigate the
+// menu items sometimes." So: up, down, left and right go to the nearest control that way on screen, inside the panel on
+// top, never to one scrolled out of sight, hidden or covered, and wrap at the ends. Up and down keep to the column you
+// came from (a sticky x). The ring stays on screen: the panel scrolls to show the control and its row, and long text with
+// nothing to press takes the ring itself (a "box"), so down reads on, then moves past it. Left and right change a row of
+// toggles and switch tabs. LB and RB switch tabs, LT and RT page through long lists, B goes back one screen, and a
+// strip at the bottom names the buttons for the screen (Xbox, PlayStation or Nintendo glyphs).
 const NAV_SEL='button,input:not([type=hidden]),select,textarea,a[href],[tabindex]';
+const NAV_TABS='.jtabs,.sktabs,#acTabs,[data-tabs],[role="tablist"]';
+const NAV_ROW='.setrow,.slot,.bi,.jq,.cb10-q,.skn,.pwn,.padtop,.handtop';
+const NAV_BOX='.jbody,.hbody,.skbody,.lglist,[data-scroll],.lb';
 function navItems(root){
   if(!root) return [];
   if(root.id==='dialogue') return Array.from(root.querySelectorAll('#dlgOpts button')).filter(vis);
-  return Array.from(root.querySelectorAll(NAV_SEL)).filter(el=>!el.disabled&&!el.hidden&&el.tabIndex>=0&&!el.classList.contains('dlg')&&!el.closest('[hidden]')&&vis(el));
+  return Array.from(root.querySelectorAll(NAV_SEL)).filter(el=>{
+    if(el.disabled||el.hidden||el.tabIndex<0||el.classList.contains('dlg')||!vis(el)) return false;
+    const h=el.closest('[hidden],[aria-hidden="true"],[inert]'); if(h&&h!==root&&root.contains(h)) return false;
+    return getComputedStyle(el).visibility!=='hidden';
+  });
 }
-function navFocus(el){
-  if(!el) return;
-  try{ el.focus({preventScroll:true}); }catch(e){ try{ el.focus(); }catch(e2){} }
-  try{ el.scrollIntoView({block:'nearest',inline:'nearest'}); }catch(e){}
+const navSegOf=el=>{ const p=el&&el.parentElement; return p&&p.classList&&p.classList.contains('seg')?p:null; };
+const navIsTab=el=>!!(el&&el.closest&&el.closest(NAV_TABS));
+const navOn=b=>!!b&&(b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true'||b.classList.contains('on'));
+const navStripH=()=>PAD.dev==='pad'&&PAD.hint.fixed?PAD.hint.h:0;
+// the part of el you can see: inside every clipping box up to the panel, and the screen above the hint strip
+function navVis(el,root,cache){
+  const r=el.getBoundingClientRect(); let l=r.left,t=r.top,R=r.right,b=r.bottom;
+  for(let n=el.parentElement;n&&n!==document.body&&n!==document.documentElement;n=n.parentElement){
+    let c=cache?cache.get(n):undefined;
+    if(c===undefined){ const cs=getComputedStyle(n); c=cs.overflowY!=='visible'||cs.overflowX!=='visible'; if(cache) cache.set(n,c); }
+    if(c){ const q=n.getBoundingClientRect(); if(q.left>l) l=q.left; if(q.top>t) t=q.top; if(q.right<R) R=q.right; if(q.bottom<b) b=q.bottom; }
+    if(n===root) break;
+  }
+  l=Math.max(l,0); t=Math.max(t,0); R=Math.min(R,innerWidth); b=Math.min(b,innerHeight-navStripH());
+  return {l,t,r:R,b,w:Math.max(0,R-l),h:Math.max(0,b-t),R:r};
 }
-function navRestore(root){
-  const el=PAD.mem[root.id]; if(!el||!el.isConnected||usingTouch) return;
-  PAD.restoring=true;
-  setTimeout(()=>{ PAD.restoring=false; if(navRoot()===root&&navItems(root).includes(el)) navFocus(el); },60);
-}
-function navDefault(root,items){ return items.find(el=>el.matches('[data-focus]'))||items[0]; }
-function navNear(root,r){
-  const items=navItems(root); if(!items.length) return; const cx=(r.left+r.right)/2, cy=(r.top+r.bottom)/2; let best=null,bd=1e12;
-  for(const el of items){ const b=el.getBoundingClientRect(), d=((b.left+b.right)/2-cx)**2+((b.top+b.bottom)/2-cy)**2; if(d<bd){ bd=d; best=el; } }
-  navFocus(best);
+const navSeen=v=>v.w>4&&v.h>=Math.min(v.R.height*0.6,18);
+// something from another screen drawn over it (an overlay on top): not a place for the ring
+function navCovered(el,root,v){
+  if(!(v.w>4&&v.h>4)) return false;
+  let t=null; try{ t=document.elementFromPoint((v.l+v.r)/2,(v.t+v.b)/2); }catch(e){}
+  if(!t||t===el||el.contains(t)||t.contains(el)||root.contains(t)) return false;
+  return !!t.closest('.ov,#skills');
 }
 function isScroll(n){ if(!n||n.scrollHeight<=n.clientHeight+4) return false; const oy=getComputedStyle(n).overflowY; return oy==='auto'||oy==='scroll'; }
-function navScroller(root,el){
-  for(let n=el&&el.parentElement;n&&n!==document.body;n=n.parentElement){ if(n!==root&&isScroll(n)) return n; if(n===root) break; }
-  const inner=Array.from(root.querySelectorAll('.jbody,.hbody,[data-scroll]')).find(isScroll); if(inner) return inner;
-  return isScroll(root)?root:null;
+// the boxes that scroll between el and the panel, nearest first (the panel itself last, when it scrolls)
+function navScrollers(el,root){ const out=[]; for(let n=el&&el.parentElement;n&&n!==document.body&&n!==document.documentElement;n=n.parentElement){ if(isScroll(n)) out.push(n); if(n===root) break; } return out; }
+// long text boxes inside the panel that scroll: the ring can sit on one to read it
+function navBoxes(root){ return root?Array.from(root.querySelectorAll(NAV_BOX)).filter(n=>vis(n)&&isScroll(n)):[]; }
+function navBoxFocus(n){
+  if(!n) return; if(!n.hasAttribute('tabindex')) n.setAttribute('tabindex','-1'); n.classList.add('navbox');
+  try{ n.focus({preventScroll:true}); }catch(e){}
+  const r=n.getBoundingClientRect(); PAD.navX=(r.left+r.right)/2;
+}
+// scroll every box around el so it shows, with its row (a settings row, a quest card, a slot) when that fits;
+// near the top or the end of a box, all the way, so the heading or the last line shows too
+function navReveal(el){
+  if(!el||!el.getBoundingClientRect) return;
+  const root=navRoot(), row=el.closest?el.closest(NAV_ROW):null;
+  for(const n of navScrollers(el,root)){
+    const q=n.getBoundingClientRect(), top=q.top+n.clientTop, vt=Math.max(top,0), vb=Math.min(top+n.clientHeight,innerHeight-navStripH()), vh=vb-vt;
+    if(vh<40) continue;
+    const box=row&&n.contains(row)&&row.getBoundingClientRect().height<vh*0.7?row:el, r=box.getBoundingClientRect(), m=Math.min(18,vh*0.06);
+    const y0=n.scrollTop, max=n.scrollHeight-n.clientHeight;
+    let y=y0;
+    if(r.top-m<vt) y=y0+(r.top-m-vt); else if(r.bottom+m>vb) y=y0+Math.min(r.bottom+m-vb,r.top-m-vt);
+    const cTop=r.top-top+y0, cBot=r.bottom-top+y0, lim=vb-top;
+    if(cTop<vh*0.45&&cBot+m<=lim) y=0;
+    else if(n.scrollHeight-cBot<vh*0.3&&cTop-max>=m+(vt-top)) y=max;
+    y=clamp(Math.round(y),0,Math.max(0,max));
+    if(Math.abs(y-y0)>0.5) n.scrollTop=y;
+  }
+}
+function navFocus(el,keepX){
+  if(!el) return;
+  try{ el.focus({preventScroll:true}); }catch(e){ try{ el.focus(); }catch(e2){} }
+  navReveal(el);
+  if(!keepX&&el.getBoundingClientRect){ const r=el.getBoundingClientRect(); PAD.navX=(r.left+r.right)/2; }
+}
+// what a control is, so the same one can be found again after its screen is rebuilt
+function navKeyOf(el){
+  if(!el||!el.tagName) return '';
+  if(el.id) return '#'+el.id;
+  const d=Object.keys(el.dataset||{}).sort().map(k=>k+'='+el.dataset[k]).join('&'), p=el.parentElement&&el.parentElement.closest('[id]');
+  return (p?p.id:'')+'|'+el.tagName+'|'+d+'|'+(d?'':String(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,40));
+}
+// the card or row a control sits in, as its place in its list (it survives the list being rebuilt)
+function navRowOf(el){
+  const r=el&&el.closest?el.closest(NAV_ROW):null, p=r&&r.parentElement, pid=p&&p.closest('[id]');
+  return r&&pid?{pid:pid.id,i:Array.prototype.indexOf.call(p.children,r)}:null;
+}
+// back on a screen: the control you left it on (or the same one rebuilt, or one in the same card, or the one nearest
+// where it was)
+function navRecover(root,m){
+  const items=navItems(root); if(!items.length) return;
+  let f=m&&m.el&&m.el.isConnected&&items.includes(m.el)?m.el:null;
+  if(!f&&m&&m.key){ const L=items.filter(e=>navKeyOf(e)===m.key); if(L.length===1||!m.rect) f=L[0]||null; else if(L.length) f=navNearest(L,m.rect); }
+  if(!f&&m&&m.row){ const L=items.filter(e=>{ const q=navRowOf(e); return q&&q.pid===m.row.pid&&q.i===m.row.i; }); if(L.length){ const d=navDefault(root,L); f=root.id==='slots'?d:(m.rect?navNearest(L,m.rect):d); } }
+  if(!f&&m&&m.rect){ const C=items.filter(e=>navSeen(navVis(e,root))); f=navNearest(C.length?C:items,m.rect); }
+  navFocus(f||navDefault(root,items));
+}
+function navNearest(L,r){
+  const cx=(r.left+r.right)/2, cy=(r.top+r.bottom)/2; let best=null,bd=1e12;
+  for(const el of L){ const b=el.getBoundingClientRect(), d=((b.left+b.right)/2-cx)**2+((b.top+b.bottom)/2-cy)**2; if(d<bd){ bd=d; best=el; } }
+  return best;
+}
+function navNear(root,r){ navFocus(navNearest(navItems(root),r)); }
+function navRestore(root){
+  const m=PAD.mem[root.id]; if(!m||usingTouch) return;
+  PAD.restoring=true;
+  setTimeout(()=>{ PAD.restoring=false; if(navRoot()===root) navRecover(root,m); },60);
+}
+// the first sensible control on a screen that opens fresh: the one it marks, the tab that is open, the toggle that is on
+function navDefault(root,items){
+  if(!items||!items.length) return null;
+  const ok=el=>!!el&&items.includes(el);
+  let f=null;
+  // the save slots: a question (delete, start over) starts on the safe answer, else the current journey
+  if(root.id==='slots'){ const c=root.querySelector('.slot.warn [data-a="no"]')||root.querySelector('.slot.cur [data-a="play"]'); if(ok(c)) f=c; }
+  if(!f) f=items.find(el=>el.matches('[data-focus]'))||null;
+  if(!f){ const t=items.find(el=>navIsTab(el)&&navOn(el)); if(t) f=t; }
+  if(!f) f=items[0];
+  const seg=navSegOf(f); if(seg){ const on=Array.from(seg.children).find(b=>navOn(b)&&ok(b)); if(on) f=on; }
+  return f;
 }
 const canScroll=(sc,sg)=>sg>0?sc.scrollTop+sc.clientHeight<sc.scrollHeight-3:sc.scrollTop>2;
+// the main scrolling box of a screen (for the right stick and the triggers)
+function navScroller(root,el){
+  const own=el?navScrollers(el,root)[0]:null; if(own) return own;
+  if(el&&el.classList&&el.classList.contains('navbox')&&isScroll(el)) return el;
+  const inner=navBoxes(root).find(b=>navSeen(navVis(b,root))); if(inner) return inner;
+  return isScroll(root)?root:null;
+}
+// a row of toggles: left and right switch to the next one (no wrap); a row of tabs: the next tab (wraps)
+function navSegStep(root,seg,cur,sg){
+  const items=navItems(root), bs=Array.from(seg.children).filter(b=>b.tagName==='BUTTON'&&items.includes(b)), i=bs.indexOf(cur);
+  if(i<0||bs.length<2) return false;
+  const tab=navIsTab(cur);
+  if(tab){ navTabGo(root,bs[(i+sg+bs.length)%bs.length]); return true; }
+  const n=bs[i+sg]; if(!n) return true;
+  const k=navKeyOf(n); SFX.init(); n.click();
+  const t=n.isConnected?n:navItems(root).find(e=>navKeyOf(e)===k);
+  if(t) navFocus(t,true);
+  return true;
+}
+// switch to tab button n: the ring goes onto the new tab, and the page under it starts at its top
+function navTabGo(root,n){
+  if(!n) return;
+  const k=navKeyOf(n); SFX.init(); n.click();
+  const r2=navRoot()||root;
+  for(const b of r2.querySelectorAll('.jbody,.hbody')) b.scrollTop=0;
+  const t=n.isConnected&&vis(n)?n:navItems(r2).find(e=>navKeyOf(e)===k);
+  if(t) navFocus(t);
+}
 function navMove(root,dir){
-  const items=navItems(root), cur=document.activeElement, V=dir==='u'||dir==='d', sg=(dir==='d'||dir==='r')?1:-1;
-  const sc=navScroller(root,items.includes(cur)?cur:null);
-  if(!items.length){ if(sc&&V) sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
-  if(!items.includes(cur)){ navFocus(navDefault(root,items)); return; }
-  // (v12) the journal: down from its tabs goes to the first button on the page (the Satchel's sit at the right side)
-  if(root.id==='jour'&&V&&sg>0&&cur.closest('.jtabs')){ const f=items.find(el=>el.closest('#jBody')); if(f){ navFocus(f); SFX.play('ui',0.35); return; } }
-  const a=cur.getBoundingClientRect(), acx=(a.left+a.right)/2, acy=(a.top+a.bottom)/2;
-  let best=null,bs=1e9;
-  for(const el of items){
-    if(el===cur) continue;
-    const b=el.getBoundingClientRect(), bcx=(b.left+b.right)/2, bcy=(b.top+b.bottom)/2;
-    let main,off,cross;
-    if(V){ if((bcy-acy)*sg<=2) continue; main=sg>0?b.top-a.bottom:a.top-b.bottom; if(main<-Math.min(a.height,b.height)*0.5) continue; off=Math.max(0,b.left-a.right,a.left-b.right); cross=Math.abs(bcx-acx); }
-    else { if((bcx-acx)*sg<=2) continue; main=sg>0?b.left-a.right:a.left-b.right; if(main<-Math.min(a.width,b.width)*0.5) continue; off=Math.max(0,b.top-a.bottom,a.top-b.bottom); if(off>0) continue; cross=Math.abs(bcy-acy); }
-    const sc2=Math.max(0,main)+off*3+cross*0.12+(off>0?30:0);
-    if(sc2<bs){ bs=sc2; best=el; }
+  if(!root) return;
+  const items=navItems(root), boxes=navBoxes(root), cur=document.activeElement, V=dir==='u'||dir==='d', sg=(dir==='d'||dir==='r')?1:-1;
+  const onBox=boxes.includes(cur);
+  if(!items.length){ if(boxes.length&&!onBox) navBoxFocus(boxes[0]); else if(onBox&&V&&canScroll(cur,sg)) cur.scrollTop+=sg*Math.round(cur.clientHeight*0.6); return; }
+  if(!items.includes(cur)&&!onBox){ navFocus(navDefault(root,items)); return; }
+  if(!V&&!onBox){ const seg=navSegOf(cur); if(seg&&navSegStep(root,seg,cur,sg)) return; }
+  const cache=new Map(), A=navVis(cur,root,cache);
+  let X=PAD.navX; if(!V||!(X>=A.R.left-1&&X<=A.R.right+1)) X=(A.R.left+A.R.right)/2;
+  // what you can go to: controls in sight, and long text boxes that have none in sight
+  const C=[], inC=new Set();
+  for(const el of items){ if(el===cur) continue; const v=navVis(el,root,cache); if(navSeen(v)&&!navCovered(el,root,v)){ C.push([el,v]); inC.add(el); } }
+  for(const b of boxes){ if(b===cur||b.contains(cur)||items.some(e=>inC.has(e)&&b.contains(e))) continue; const v=navVis(b,root,cache); if(navSeen(v)) C.push([b,v]); }
+  const pick=L=>{ let b=null,bv=null,bs=1e9; for(const [el,B] of L){ const s=navScore(A,B,V,sg,X); if(s!=null&&s<bs){ bs=s; b=el; bv=B; } } return [b,bv]; };
+  let [best,bestV]=pick(C);
+  // never jump over a box of text that scrolls: go into it (its nearest control, else the box itself)
+  if(V&&best){
+    for(const b of boxes){
+      if(b===cur||b===best||b.contains(cur)||b.contains(best)) continue;
+      const v=navVis(b,root,cache); if(!navSeen(v)) continue;
+      if(!(sg>0?(v.t>=A.b-4&&v.b<=bestV.t+4):(v.b<=A.t+4&&v.t>=bestV.b-4))) continue;
+      best=pick(C.filter(p=>b.contains(p[0])))[0]||b; break;
+    }
   }
-  // inside a scrolling box, scroll to read the rest before jumping out of it
-  if(V&&sc&&canScroll(sc,sg)&&(!best||!sc.contains(best))){ sc.scrollBy({top:sg*sc.clientHeight*0.5,behavior:'smooth'}); return; }
-  if(!best&&V&&items.length>2){
-    // wrap around: the far end, nearest in x
-    let ex=null, ev=sg>0?1e9:-1e9;
-    for(const el of items){ const b=el.getBoundingClientRect(), v=sg>0?b.top:b.bottom; if(sg>0?v<ev-2:v>ev+2){ ev=v; ex=el; } else if(Math.abs(v-ev)<=2&&ex){ const e0=ex.getBoundingClientRect(); if(Math.abs((b.left+b.right)/2-acx)<Math.abs((e0.left+e0.right)/2-acx)) ex=el; } }
-    best=ex;
+  // the ring on a box of text: a control in the part just read into (below 40% of the box going down, above 60% going
+  // up), else scroll on, else out of the box at its end
+  if(V&&onBox){
+    const v=navVis(cur,root,cache), line=v.t+v.h*(sg>0?0.4:0.6); let nb=null,nk=1e9;
+    for(const [el,B] of C){ if(!cur.contains(el)) continue; const k=sg>0?B.t-line:line-B.b; if(k<-2) continue; const s=k+Math.abs((B.l+B.r)/2-X)*0.3; if(s<nk){ nk=s; nb=el; } }
+    if(nb){ navFocus(navLand(nb,cur,items),true); SFX.play('ui',0.35); return; }
+    [best,bestV]=pick(C.filter(p=>!cur.contains(p[0])));
   }
+  // inside a box that scrolls on that way: a control in sight in the box, else the next one if it is near, else read on
+  const S=onBox?cur:(navScrollers(cur,root)[0]||null);
+  if(V&&S&&canScroll(S,sg)&&!(best&&best!==S&&S.contains(best))){
+    const q=S.getBoundingClientRect(), edge=sg>0?Math.min(q.top+S.clientTop+S.clientHeight,innerHeight-navStripH()):Math.max(q.top+S.clientTop,0);
+    let nx=null,nk=1e12;
+    for(const el of items){
+      if(el===cur||inC.has(el)||!S.contains(el)) continue;
+      const r=el.getBoundingClientRect(); if(sg>0?r.top<=A.R.top+2:r.bottom>=A.R.bottom-2) continue;
+      const k=(sg>0?r.top:-r.bottom)*4+Math.abs((r.left+r.right)/2-X); if(k<nk){ nk=k; nx=el; }
+    }
+    if(nx){ const r=nx.getBoundingClientRect(), need=sg>0?r.bottom-edge:edge-r.top; if(need<=S.clientHeight*0.85){ navFocus(navLand(nx,cur,items),true); SFX.play('ui',0.35); return; } }
+    S.scrollTop=clamp(S.scrollTop+sg*Math.round(S.clientHeight*0.6),0,S.scrollHeight-S.clientHeight);
+    if(S!==root&&!S.classList.contains('ov')) navBoxFocus(S);
+    else if(!navSeen(navVis(cur,root))){ const L=items.filter(e=>S.contains(e)&&navSeen(navVis(e,root))); const f=L.length?(sg>0?L[0]:L[L.length-1]):null; if(f) navFocus(f,true); }
+    SFX.play('ui',0.25); return;
+  }
+  if(!best) best=navWrap(root,items,dir,X,cur);
   if(!best) return;
-  // stepping into a row of toggles lands on the one that is switched on
-  const seg=best.parentElement;
-  if(V&&seg&&seg.classList.contains('seg')&&!seg.contains(cur)){ const on=Array.from(seg.children).find(b=>b.getAttribute('aria-pressed')==='true'&&items.includes(b)); if(on) best=on; }
-  navFocus(best); SFX.play('ui',0.35);
+  if(V) best=navLand(best,cur,items);
+  if(boxes.includes(best)) navBoxFocus(best); else navFocus(best,V);
+  SFX.play('ui',0.35);
+}
+// how good B is as the next stop from A going that way (null: not that way). Up and down keep to the column x X
+function navScore(A,B,V,sg,X){
+  const acx=(A.l+A.r)/2, acy=(A.t+A.b)/2, bcx=(B.l+B.r)/2, bcy=(B.t+B.b)/2;
+  if(V){
+    if((bcy-acy)*sg<=2) return null;
+    const main=sg>0?B.t-A.b:A.t-B.b; if(main<-Math.min(A.h,B.h)*0.5) return null;
+    const off=Math.max(0,B.l-X,X-B.r);
+    return Math.max(0,main)+off*3+(off>0?30:0)+Math.abs(bcx-X)*0.05;
+  }
+  if((bcx-acx)*sg<=2) return null;
+  const main=sg>0?B.l-A.r:A.l-B.r; if(main<-Math.min(A.w,B.w)*0.5) return null;
+  if(Math.max(0,B.t-A.b,A.t-B.b)>0) return null;
+  return Math.max(0,main)+Math.abs(bcy-acy)*0.6;
+}
+// stepping up or down into a row of toggles (or tabs) lands on the one that is on
+function navLand(el,cur,items){
+  const seg=navSegOf(el); if(!seg||seg.contains(cur)) return el;
+  return Array.from(seg.children).find(b=>navOn(b)&&items.includes(b))||el;
+}
+// at an end: up and down wrap to the other end of the screen (in the column you are in), left and right to the other
+// end of the row; a lone row of cards does not wrap up or down
+function navWrap(root,items,dir,X,cur){
+  const V=dir==='u'||dir==='d', sg=(dir==='d'||dir==='r')?1:-1, a=cur.getBoundingClientRect(), same=(r,b)=>!(r.bottom<=b.top+2||r.top>=b.bottom-2);
+  if(V){
+    if(items.length<2) return null;
+    const first=sg>0?items[0]:items[items.length-1], f=first.getBoundingClientRect();
+    let best=first,bd=1e12;
+    for(const el of items){ const r=el.getBoundingClientRect(); if(!same(r,f)) continue; const d=Math.abs((r.left+r.right)/2-X); if(d<bd){ bd=d; best=el; } }
+    if(best===cur||same(best.getBoundingClientRect(),a)) return null;
+    // starting over from the other end: every box scrolls back to that end too
+    for(const n of navBoxes(root).concat(isScroll(root)?[root]:[])) n.scrollTop=sg>0?0:n.scrollHeight;
+    return best;
+  }
+  let best=null,bv=null;
+  for(const el of items){
+    if(el===cur) continue; const v=navVis(el,root); if(!navSeen(v)) continue;
+    const r=el.getBoundingClientRect(); if(!same(r,a)) continue;
+    const k=sg>0?r.left:-r.right; if(bv==null||k<bv){ bv=k; best=el; }
+  }
+  return best;
+}
+// LT and RT: a page at a time through the box you are in (the ring moves with the page)
+function navPage(root,sg){
+  const a=document.activeElement, S=navScroller(root,a); if(!S) return;
+  const inS=()=>navItems(root).filter(e=>S.contains(e));
+  if(!canScroll(S,sg)){ const L=inS(), t=sg>0?L[L.length-1]:L[0]; if(t&&t!==a){ navFocus(t); SFX.play('ui',0.35); } return; }
+  const ar=a&&a!==document.body?a.getBoundingClientRect():null;
+  S.scrollTop=clamp(S.scrollTop+sg*Math.round(S.clientHeight*0.85),0,S.scrollHeight-S.clientHeight); SFX.play('ui',0.3);
+  if(a===S||(a&&!S.contains(a)&&navItems(root).includes(a))) return;
+  const C=inS().map(e=>[e,navVis(e,root)]).filter(p=>navSeen(p[1]));
+  if(C.length){ const y=ar?(ar.top+ar.bottom)/2:0; C.sort((p,q)=>Math.abs((p[1].t+p[1].b)/2-y)-Math.abs((q[1].t+q[1].b)/2-y)); navFocus(C[0][0],true); }
+  else if(S!==root&&!S.classList.contains('ov')) navBoxFocus(S);
 }
 function navOk(root){
   if(root.id==='dialogue'){
@@ -394,19 +600,23 @@ function navOk(root){
     return;
   }
   const items=navItems(root), el=document.activeElement;
+  if(navBoxes(root).includes(el)) return;
   if(!items.includes(el)){ navFocus(navDefault(root,items)); return; }
   if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'){ try{ el.focus(); el.click(); }catch(e){} return; }
-  const r=el.getBoundingClientRect(); SFX.init(); el.click();
-  // the click may rebuild this screen (journal, save slots): keep the ring close to where it was
-  const r2=navRoot(); if(r2===root&&!navItems(root).includes(document.activeElement)) navNear(root,r);
+  const m={el,key:navKeyOf(el),rect:el.getBoundingClientRect(),row:navRowOf(el)}; SFX.init(); el.click();
+  // the click may rebuild this screen (journal, save slots): the same control again, else the nearest
+  const r2=navRoot(); if(r2===root&&!navItems(root).includes(document.activeElement)) navRecover(root,m);
 }
 // "back" for each screen: the same as Escape there; every screen has a way out
-const DLG_EXIT=/^(goodbye|bye|see you|just looking|not right now|not now|maybe later|give me a minute|no thanks|never mind|i'll come back)/i;
+const DLG_EXIT=/^(goodbye|bye\b|see you|just looking|not right now|not now|maybe later|give me a minute|no thanks|never mind|i'll come back|done[.!]?$|that's all)/i;
 function ovBack(root){
   const id=root&&root.id; if(!id) return;
   const click=s=>{ const b=$(s); if(b&&vis(b)){ b.click(); return true; } return false; };
+  // (v12 PAD) the journal and the map go back to the screen they came from (the pause menu, or each other)
+  const under=PAD.stack.length>1&&PAD.stack[PAD.stack.length-1]===id?PAD.stack[PAD.stack.length-2]:'';
+  const backTo=()=>{ if(scene!=='play') return; if(under==='pause') pauseGame(); else if(under==='mapov') openMap(); else if(under==='jour') openJournal(); };
   if(id==='dialogue'){
-    // with choices up, back moves to the way-out choice (Goodbye, Just looking...), and a second press takes it;
+    // with choices up, back moves to the way-out choice (Goodbye, Just looking, Done...), and a second press takes it;
     // story decisions have no way-out choice, so back never makes one by accident
     const opts=navItems(root), ex=opts.slice().reverse().find(b=>DLG_EXIT.test(b.textContent.replace(/^\s*\d+/,'').trim()));
     if(ex){ if(document.activeElement===ex) ex.click(); else { navFocus(ex); SFX.play('ui',0.35); } }
@@ -414,11 +624,11 @@ function ovBack(root){
   }
   else if(id==='how') closeHow();
   else if(id==='settings') closeSettings();
-  else if(id==='slots'){ if(slotConfirm){ slotConfirm=null; renderSlots(); SFX.play('ui'); } else click('#bSlotsClose'); }
+  else if(id==='slots'){ if(slotConfirm){ slotConfirm=null; renderSlots(); SFX.play('ui'); navFocus(navDefault(root,navItems(root))); } else click('#bSlotsClose'); }
   else if(id==='acct') click('#acClose');
   else if(id==='pause') resumeGame();
-  else if(id==='mapov') closeMap();
-  else if(id==='jour') closeJournal();
+  else if(id==='mapov'){ closeMap(); backTo(); }
+  else if(id==='jour'){ closeJournal(); backTo(); }
   else if(id==='dead') click('#bRetry');
   else if(id==='victory') click('#bWinExplore');
   else if(id==='menu'||id==='upgrade') return;
@@ -429,13 +639,14 @@ function ovBack(root){
     else { for(const t of ['keydown','keyup']) dispatchEvent(new KeyboardEvent(t,{key:'Escape',code:'Escape',bubbles:true})); }
   }
 }
+// LB and RB: the next tab (the row of tabs the ring is in, or the screen's first); on the world map they pick a shrine
 function navTab(root,d){
   if(root.id==='mapov'){ if(typeof mapCycle==='function') mapCycle(d); return; }
-  const bar=Array.from(root.querySelectorAll('[data-tabs],.jtabs,.sktabs,#acTabs,[role="tablist"]')).find(vis); if(!bar) return;
-  const bs=Array.from(bar.querySelectorAll('button')).filter(b=>!b.disabled&&!b.hidden&&vis(b)); if(bs.length<2) return;
-  let i=bs.findIndex(b=>b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true'||b.classList.contains('on')); if(i<0) i=0;
-  const n=bs[(i+d+bs.length)%bs.length], keep=bar.contains(document.activeElement)||!navItems(root).includes(document.activeElement);
-  n.click(); if(keep) navFocus(n);
+  const a=document.activeElement, bars=Array.from(root.querySelectorAll(NAV_TABS)).filter(b=>vis(b)&&!b.hidden);
+  const bar=bars.find(b=>b.contains(a))||bars[0]; if(!bar) return;
+  const items=navItems(root), bs=Array.from(bar.querySelectorAll('button')).filter(b=>items.includes(b)); if(bs.length<2) return;
+  let i=bs.findIndex(navOn); if(i<0) i=Math.max(0,bs.indexOf(a));
+  navTabGo(root,bs[(i+d+bs.length)%bs.length]);
 }
 function padMenu(root,s,dt){
   PAD.ui=true;
@@ -445,19 +656,41 @@ function padMenu(root,s,dt){
   const [mi,mj]=padMoveAx();
   if(!d&&!PAD.stickBlock){ const x=s.ax[mi], y=s.ax[mj]; if(Math.hypot(x,y)>0.55) d=Math.abs(x)>Math.abs(y)?(x>0?'r':'l'):(y>0?'d':'u'); }
   const N=PAD.nav;
-  if(d&&d!==N.d){ N.d=d; N.t=0.42; navMove(root,d); }
-  else if(d){ N.t-=dt; if(N.t<=0){ N.t=0.12; navMove(root,d); } }
+  if(d&&d!==N.d){ N.d=d; N.t=0.4; navMove(root,d); PAD.navT=performance.now(); }
+  else if(d){ N.t-=dt; if(N.t<=0){ N.t=0.11; navMove(root,d); PAD.navT=performance.now(); } }
   else N.d='';
-  if(s.ed[ok]) navOk(root);
+  // the triggers page through long lists (the world map zooms with them instead)
+  if(root.id!=='mapov'){
+    const P=PAD.pg, pg=h(PB.R2)?1:h(PB.L2)?-1:0;
+    if(pg&&pg!==P.d){ P.d=pg; P.t=0.45; navPage(root,pg); PAD.navT=performance.now(); }
+    else if(pg){ P.t-=dt; if(P.t<=0){ P.t=0.2; navPage(root,pg); PAD.navT=performance.now(); } }
+    else P.d=0;
+  }
+  if(s.ed[ok]){ navOk(root); PAD.navT=performance.now(); }
   else if(s.ed[back]) ovBack(root);
   else if(root.id==='dialogue'&&s.ed[PB.N]&&!(DLG&&DLG.opts)) dlgNext();
   else if(root.id==='jour'&&(s.ed[PB.W]||s.ed[PB.N])) bagPadStar();   // (v12) X or Y on the Satchel stars an item
-  if(s.ed[PB.L1]) navTab(root,-1);
-  if(s.ed[PB.R1]) navTab(root,1);
+  if(s.ed[PB.L1]){ navTab(root,-1); PAD.navT=performance.now(); }
+  if(s.ed[PB.R1]){ navTab(root,1); PAD.navT=performance.now(); }
   if(s.ed[PB.ST]){ if(root.id==='pause') resumeGame(); else if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); }
   if(s.ed[PB.SEL]||s.ed[PB.TP]){ if(root.id==='mapov') closeMap(); else if(root.id==='jour') closeJournal(); else if(root.id==='dialogue') openLog(); else if(root.id==='logov') closeLog(); }
   // right stick scrolls long pages
   const ry=s.ax[padAimAx()[1]]; if(Math.abs(ry)>0.25){ const sc=navScroller(root,document.activeElement); if(sc) sc.scrollTop+=Math.sign(ry)*(Math.abs(ry)-0.2)*1100*dt; }
+  const r2=navRoot(); if(r2){ navWatch(r2); padHintSync(r2); }
+}
+// the ring is never lost and never off screen: a control the right stick scrolled away hands the ring to its box, and
+// a rebuilt screen gets the same control back (or the one nearest where it was)
+function navWatch(root){
+  const now=performance.now(); if(now-PAD.watchT<120) return; PAD.watchT=now;
+  if(PAD.dev!=='pad'||usingTouch||now-PAD.openT<200||PAD.restoring) return;
+  if(root.id==='dialogue'&&!(DLG&&DLG.opts&&$('#dlgOpts').childElementCount)) return;
+  const a=document.activeElement, items=navItems(root), onBox=navBoxes(root).includes(a);
+  if(items.includes(a)||onBox){
+    if(!navSeen(navVis(a,root))){ const S=navScrollers(a,root)[0]; if(S&&!onBox&&S!==root&&!S.classList.contains('ov')) navBoxFocus(S); else navReveal(a); }
+    PAD.mem[root.id]=Object.assign(PAD.mem[root.id]||{},{el:a,key:navKeyOf(a),rect:a.getBoundingClientRect(),row:navRowOf(a)});
+    return;
+  }
+  if(items.length) navRecover(root,PAD.mem[root.id]);
 }
 // keyboard: the arrow keys move the same focus ring on menu screens
 function navKey(e){
@@ -465,6 +698,96 @@ function navKey(e){
   const root=navRoot(); if(!root) return false;
   e.preventDefault(); navMove(root,dir); return true;
 }
+// (v12 PAD) a shop's list comes back after each buy: the ring stays on the row you picked, not back at the top
+const navOptLab=b=>String(b.textContent||'').replace(/^\s*\d+/,'').replace(/\d+/g,'#').replace(/\s+/g,' ').trim();
+(function navDlgMemory(){
+  const box=$('#dlgOpts'); if(!box) return;
+  box.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('button'); if(!b) return; const bs=Array.from(box.querySelectorAll('button')); PAD.dlgPick={i:bs.indexOf(b),labs:bs.map(navOptLab),t:performance.now()}; },true);
+  if(!window.MutationObserver) return;
+  new MutationObserver(()=>{
+    const P=PAD.dlgPick; if(!P||!box.childElementCount) return; PAD.dlgPick=null;
+    const bs=Array.from(box.querySelectorAll('button')), labs=bs.map(navOptLab);
+    if(usingTouch||performance.now()-P.t>15000||bs.length!==P.labs.length||P.i<1) return;
+    if(labs.filter((t,i)=>t===P.labs[i]).length*2<labs.length) return;
+    setTimeout(()=>{ const b=bs[Math.min(P.i,bs.length-1)]; if(b&&b.isConnected&&navRoot()&&navRoot().id==='dialogue') navFocus(b); },60);
+  }).observe(box,{childList:true});
+})();
+// the strip of buttons for the screen on show: fixed at the bottom of the screen, or in the footer of the map, the
+// skills and the log (they fill the screen); the dialogue box names its own buttons
+const PAD_HINT_DOCK={mapov:['#mapov .mapfoot','#mapHint'],skills:['#skills .skft',null],logov:['#logov .lgft',null]};
+function padHintEl(id){
+  if(PAD_HINT_DOCK[id]){
+    const [sel,after]=PAD_HINT_DOCK[id], host=document.querySelector(sel); if(!host) return null;
+    let el=host.querySelector('.padhint-in');
+    if(!el){ el=document.createElement('div'); el.className='padhint-in'; el.setAttribute('aria-hidden','true'); const a=after&&host.querySelector(after); if(a) a.after(el); else host.prepend(el); }
+    return el;
+  }
+  let el=document.getElementById('padHint');
+  if(!el){ el=document.createElement('div'); el.id='padHint'; el.setAttribute('aria-hidden','true'); document.body.appendChild(el); }
+  return el;
+}
+function padHintSync(root){
+  const H=PAD.hint, id=root?root.id:'';
+  const on=PAD.dev==='pad'&&!!root&&id!=='dialogue';
+  if(!on){ if(H.key){ H.key=''; H.fixed=false; document.body.classList.remove('padhint'); for(const e of document.querySelectorAll('#padHint,.padhint-in')) e.innerHTML=''; } return; }
+  const a=document.activeElement, now=performance.now();
+  if(H.key&&a===H.ae&&id===H.id&&now-H.t<150) return;
+  H.ae=a; H.id=id; H.t=now;
+  const ok=padOkBtn(), bk=ok===PB.S?PB.E:PB.S, C=i=>padChip(i), L=[];
+  const it=(c,t)=>`<span class="ph">${c}<b>${escapeHtml(t)}</b></span>`;
+  const tabs=Array.from(root.querySelectorAll(NAV_TABS)).some(b=>vis(b)&&!b.hidden&&b.querySelectorAll('button:not([hidden])').length>1);
+  const onBox=!!(a&&a.classList&&a.classList.contains('navbox')&&root.contains(a));
+  if(id==='mapov'){ L.push(it(C(PB.L1)+C(PB.R1),'Shrine'),it(C(PB.L2)+C(PB.R2),'Zoom'),it(`<i class="pg s">${escapeHtml(padK(PAD.kind).r3)}</i>`,'Move')); }
+  if(onBox) L.push(it(C(PB.UP)+C(PB.DN),'Read'));
+  else L.push(it(C(ok),id==='upgrade'?'Choose':'Select'));
+  const bl={menu:null,upgrade:null,dead:null,victory:null,pause:'Resume',jour:'Close',mapov:'Close',skills:'Close'}[id];
+  if(bl!==null) L.push(it(C(bk),bl||'Back'));
+  if(tabs&&id!=='mapov') L.push(it(C(PB.L1)+C(PB.R1),id==='logov'?'Show':'Tabs'));
+  if(a&&root.contains(a)&&!navIsTab(a)&&(navSegOf(a)||(a.matches&&a.matches('input[type=range]')))) L.push(it(C(PB.LF)+C(PB.RT),'Change'));
+  if(id==='jour'&&typeof jTab!=='undefined'&&jTab==='bag'&&a&&a.closest&&a.closest('#jBody [data-item]')&&a.closest('#jBody [data-item]').querySelector('button[data-star]')) L.push(it(C(PB.W),'Quick slot'));
+  if(id!=='mapov'&&(navBoxes(root).length||isScroll(root))) L.push(it(C(PB.L2)+C(PB.R2),'Page'));
+  const html=L.join(''), key=id+'|'+PAD.kind+'|'+html;
+  // the map's own line: the strip stands in for its button sentence, but a message (no travel in a fight) still shows
+  if(id==='mapov'){ const mh=$('#mapHint'); if(mh){ if(key!==H.key&&!mapSel&&!mh.querySelector('.pg')&&typeof mapHintSet==='function') mapHintSet(); mh.classList.toggle('padkeep',!mh.querySelector('.pg')&&!(mapSel&&mh.textContent===mapSel.name)); } }
+  if(key===H.key) return;
+  for(const e of document.querySelectorAll('#padHint,.padhint-in')) e.innerHTML='';
+  H.key=key; const el=padHintEl(id); if(!el) return;
+  el.innerHTML=html; H.fixed=el.id==='padHint';
+  document.body.classList.toggle('padhint',H.fixed);
+  if(H.fixed){ H.h=Math.ceil(el.getBoundingClientRect().height)+16; document.body.style.setProperty('--padhint',H.h+'px'); }
+}
+// the look of all this: one clear ring in both looks (a toggle row and a tab row ring the whole row too), the box ring,
+// a tint on the settings row you are on, and the strip
+const PAD_CSS=`
+body.padnav button:focus,body.padnav input:focus,body.padnav select:focus,body.padnav textarea:focus,body.padnav a:focus,body.padnav [tabindex]:not(.dlg):not(.navbox):focus{outline:3px solid #ffd27a;outline-offset:3px;border-color:#ffd27a;box-shadow:0 0 0 2px rgba(16,7,5,.92),0 0 0 9px rgba(16,7,5,.5),0 0 26px 8px rgba(255,160,60,.55);animation:padRing 1.3s ease-in-out infinite}
+body.padnav .seg button:focus{outline:none;animation:none;color:var(--ink);box-shadow:inset 0 0 0 3px #ffd27a,inset 0 0 0 5px rgba(16,7,5,.9),inset 0 0 18px rgba(255,170,60,.55)}
+body.padnav .seg:has(button:focus){outline:3px solid #ffd27a;outline-offset:3px;box-shadow:0 0 0 9px rgba(16,7,5,.45),0 0 22px 6px rgba(255,160,60,.45)}
+body.padnav .navbox:focus{outline:3px solid #ffd27a;outline-offset:-3px;box-shadow:inset 0 0 0 6px rgba(16,7,5,.35),inset 0 0 26px rgba(255,160,60,.25);border-radius:8px;animation:none}
+body.padnav .setrow:has(:focus){background:linear-gradient(90deg,rgba(255,195,90,.16),rgba(255,195,90,.02));border-radius:10px;box-shadow:inset 4px 0 0 #ffd27a}
+body.padnav .card:focus{transform:translateY(-4px)}
+body.padnav .dlg:focus,body.padnav #dlgBox:focus{outline:none;animation:none}
+@keyframes padRing{0%,100%{outline-offset:3px}50%{outline-offset:5px}}
+html.sb body.padnav button:focus,html.sb body.padnav input:focus,html.sb body.padnav select:focus,html.sb body.padnav textarea:focus,html.sb body.padnav a:focus,html.sb body.padnav [tabindex]:not(.dlg):not(.navbox):focus{outline-color:#ff7a1a;border-color:#3b2233;box-shadow:0 0 0 2px #fff,0 0 0 9px #3b2233,0 0 24px 8px rgba(255,130,40,.55)}
+html.sb body.padnav .seg button:focus{color:#3b2233;box-shadow:inset 0 0 0 3px #3b2233,inset 0 0 0 6px #fff,inset 0 0 16px rgba(255,140,50,.5)}
+html.sb body.padnav .seg button[aria-pressed="true"]:focus{color:#fff;box-shadow:inset 0 0 0 3px #3b2233,inset 0 0 0 6px #fff,inset 0 0 16px rgba(255,255,255,.35)}
+html.sb body.padnav .seg:has(button:focus){outline-color:#ff7a1a;box-shadow:0 0 0 2px #fff,0 0 0 9px #3b2233,0 0 22px 6px rgba(255,130,40,.45)}
+html.sb body.padnav .navbox:focus{outline-color:#ff7a1a;box-shadow:inset 0 0 0 6px rgba(59,34,51,.18),inset 0 0 22px rgba(255,140,50,.22)}
+html.sb body.padnav .setrow:has(:focus){background:linear-gradient(90deg,rgba(255,140,50,.18),rgba(255,140,50,.02));box-shadow:inset 4px 0 0 #ff7a1a}
+@media (prefers-reduced-motion:reduce){body.padnav :focus{animation:none!important}}
+#padHint{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:8;display:none;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 16px;max-width:calc(100vw - 24px);padding:6px 16px;border-radius:999px;background:rgba(18,9,7,.9);border:1px solid #6d3421;box-shadow:0 8px 22px rgba(0,0,0,.45);color:#f3e4cc;font:600 13px/1.25 var(--f-ui,system-ui,sans-serif);pointer-events:none;white-space:nowrap}
+body.padnav.padhint #padHint:not(:empty){display:flex}
+.padhint-in{display:none}
+body.padnav .padhint-in:not(:empty){display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;flex:1;min-width:200px;font:600 13px/1.25 var(--f-ui,system-ui,sans-serif);color:var(--muted)}
+body.padnav #mapov #mapHint:not(.padkeep):has(~.padhint-in:not(:empty)){display:none}
+body.padnav .skkeys:empty,body.padnav .lgkeys:empty{display:none}
+#padHint .ph,.padhint-in .ph{display:inline-flex;align-items:center;gap:6px}
+#padHint .ph b,.padhint-in .ph b{font-weight:700}
+#padHint .pg,.padhint-in .pg{font-size:12px}
+#padHint .pg.d,.padhint-in .pg.d{background:linear-gradient(#7d6c60,#7d6c60) center/36% 100% no-repeat,linear-gradient(#7d6c60,#7d6c60) center/100% 36% no-repeat}
+html.sb #padHint{background:#fff3d6;border:2px solid #3b2233;box-shadow:0 3px 0 #3b2233,0 10px 24px rgba(30,10,40,.35);color:#3b2233}
+body.padnav.padhint .ov.on:not(#dialogue):not(#menu):not(#mapov):not(#skills):not(#logov){padding-bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + var(--padhint,44px))}
+`;
+(function padCssInit(){ const st=document.createElement('style'); st.id='padCss'; st.textContent=PAD_CSS; document.body.appendChild(st); })();
 
 // ---------- rumble
 function rumble(strong,weak,ms){
@@ -593,7 +916,7 @@ function padHelpRows(k){
     [c(PB.RT),'Switch which quest you follow (in the Arena: next weapon)'],
     [c(PB.SEL),'World map. Hold it for the journal. In a conversation it opens the log of everything said.'],
     [c(PB.ST),'Pause. Hold it for your skills. Clicking both sticks in at once pauses too.'],
-    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs. In the Satchel, ${padBtnName(PB.W,k)} or ${padBtnName(PB.N,k)} puts an item in your quick slot.`],
+    [`${padChip(ok,k)} ${padChip(bk,k)}`,`In menus: pick, go back. The d-pad or ${sp?'right':'left'} stick moves, and left and right change a setting. ${padBtnName(PB.L1,k)} and ${padBtnName(PB.R1,k)} switch tabs, ${padBtnName(PB.L2,k)} and ${padBtnName(PB.R2,k)} page through long lists. The strip at the bottom of each menu shows its buttons. In the Satchel, ${padBtnName(PB.W,k)} or ${padBtnName(PB.N,k)} puts an item in your quick slot.`],
     [chip(sp?'Southpaw':'Left-handed?'),sp?'On: the sticks, triggers and bumpers are swapped. Settings > Handed changes it back.':'Settings > Handed: Left swaps the sticks, triggers and bumpers (southpaw).']
   ];
 }
