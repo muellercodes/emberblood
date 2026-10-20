@@ -3,11 +3,13 @@
 // Lines are [speaker, text]. A line can also be {who, text, opts:[{t, fn, then:[lines]}]} for a choice.
 const ch=(who,text,opts)=>({who,text,opts});
 const STORY={
-  // the opening: a new game starts with Ash asleep in his bed upstairs; Mom calls up from the kitchen on her way to the forge
+  // the opening: a new game starts with Ash asleep in his bed upstairs; Mom calls up from the kitchen on her way to the forge.
+  // (v12 PROLOGUE) Lantern Eve plays first (x0_prologue.js, the night before); the three folk-tale lines are for a journey
+  // that skipped it before the show was over (G.flags.lantern_eve is set once it was)
   prologue:[
-    ['narr',S(`Every summer, on the shortest night of the year, the valley of Embermere hangs out paper lanterns. Ask anyone why, and they say: you just do.`,`Every summer, on the shortest night, the valley hangs out paper lanterns. Nobody knows why.`)],
-    ['narr',S(`There's a puppet show about it on the green every year. A grumpy dragon on the mountain, five brave friends, and a girl with horns called Ember who sings him to sleep. Nobody believes the puppet show.`,`There is a puppet show about a dragon and a girl with horns. Nobody believes it.`)],
-    ['narr',S(`In Emberhollow, the lanterns are lit by Ash, who was born with horns, a tail and real fire. Mom says it runs in the family, like red hair. Bertram the baker says it runs in the family like a house fire.`,`Ash lights the lanterns. He was born with horns, a tail and real fire.`)],
+    {who:'narr',text:S(`Every summer, on the shortest night of the year, the valley of Embermere hangs out paper lanterns. Ask anyone why, and they say: you just do.`,`Every summer, on the shortest night, the valley hangs out paper lanterns. Nobody knows why.`),skipIf:()=>!!(G&&G.flags.lantern_eve)},
+    {who:'narr',text:S(`There's a puppet show about it on the green every year. A grumpy dragon on the mountain, five brave friends, and a girl with horns called Ember who sings him to sleep. Nobody believes the puppet show.`,`There is a puppet show about a dragon and a girl with horns. Nobody believes it.`),skipIf:()=>!!(G&&G.flags.lantern_eve)},
+    {who:'narr',text:S(`In Emberhollow, the lanterns are lit by Ash, who was born with horns, a tail and real fire. Mom says it runs in the family, like red hair. Bertram the baker says it runs in the family like a house fire.`,`Ash lights the lanterns. He was born with horns, a tail and real fire.`),skipIf:()=>!!(G&&G.flags.lantern_eve)},
     ['maren',S(`(from the kitchen) Ash! Up you get! It's Lantern Day, and Emberhollow's lantern-lighter is still snoring.`,`(from downstairs) Ash! Get up! It's Lantern Day!`)],
     ['ash',S(`(under the blanket) I wasn't snoring. I was practicing my gentle breaths.`,`I wasn't snoring! I was practicing breathing.`)],
     ['maren',S(`Practice on the lanterns. I'm off to the forge. Come and find me before the festival. I finished something for you last night.`,`I'm going to the forge. Come and find me. I made you something.`)],
