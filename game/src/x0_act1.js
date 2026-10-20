@@ -1750,8 +1750,14 @@ function a1GOffer(offer){
     else if(ab>=26) offer(d,S('Close the gate','Close the gate'),()=>a1GUse(g),px,py,true);
   }
 }
-// the SLASH button's word for it
-if(typeof PROMPT_KINDS!=='undefined'&&!PROMPT_KINDS.some(r=>r[1]==='close')){ PROMPT_KINDS.push([/^(close|shut)/i,'close','CLOSE']); PK_LABEL.close='CLOSE'; }
+// the SLASH button's word for it (OPEN or CLOSE) and a little gateway for its picture, open or shut (not the chest)
+if(typeof PROMPT_KINDS!=='undefined'&&!PROMPT_KINDS.some(r=>r[1]==='gate')){ PROMPT_KINDS.unshift([/^open the gate/i,'gate','OPEN'],[/^close the gate/i,'gate','CLOSE']); PK_LABEL.gate='OPEN'; }
+{ const base=touchIcon; touchIcon=function(id,x,y,r,col,label){ if(id!=='gate') return base(id,x,y,r,col,label);
+  ctx.save(); ctx.translate(x,y); const k=r/34; ctx.scale(k,k); ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.fillRect(-17,-14,5,28); ctx.fillRect(12,-14,5,28);
+  if(label==='CLOSE'){ ctx.strokeRect(-10,-10,10,21); ctx.strokeRect(0,-10,10,21); ctx.fillRect(-4,-1,8,3); }
+  else for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(s*10,-10); ctx.lineTo(s*3,-4); ctx.lineTo(s*3,15); ctx.lineTo(s*10,11); ctx.closePath(); ctx.stroke(); }
+  ctx.restore(); }; }
 // A roll (or one slow frame) must not carry Ash through the wall or shut doors in one step: the logs and doors are
 // thinner than a roll step on a slow phone, and a centre pushed out past their middle comes out on the far side (it
 // did: rolling into the palisade went through about half the time). So each frame's own step (movesPost gets where he
