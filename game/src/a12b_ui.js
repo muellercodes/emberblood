@@ -945,8 +945,13 @@ $('#bWinExplore').addEventListener('click',()=>{ scene='play'; hideAll(); if(!ac
 $('#bWinMenu').addEventListener('click',toMenu);
 
 // ================= loop
+// the size the canvas really has on screen (it fills the window by CSS). iOS Safari can report a stale innerWidth and
+// innerHeight for a moment after a rotation, the toolbars sliding, or coming back to the tab, and the game then drew to
+// one size while the touches came in another; the canvas's own box is always right
+let CVR=null;   // the canvas's box, kept by resize (touchXY in a5_input.js reads it, so no touch forces a layout)
+function screenWH(){ const r=cvs.getBoundingClientRect(); CVR={left:r.left,top:r.top,width:r.width,height:r.height}; const w=r.width>0?r.width:window.innerWidth, h=r.height>0?r.height:window.innerHeight; return [Math.max(320,Math.round(w)),Math.max(320,Math.round(h))]; }
 function resize(){
-  DPR=Math.min(window.devicePixelRatio||1,2); W=Math.max(320,window.innerWidth); H=Math.max(320,window.innerHeight);
+  DPR=Math.min(window.devicePixelRatio||1,2); [W,H]=screenWH();
   cvs.width=Math.round(W*DPR); cvs.height=Math.round(H*DPR);
   lightCvs.width=Math.ceil(W/2); lightCvs.height=Math.ceil(H/2);
   zoom=clamp(Math.min(W/900,H/620),0.6,1.3); ZOOM0=zoom; readSafe(); vigKey='';
@@ -954,10 +959,19 @@ function resize(){
   if(scene==='map') drawMapScreen();
 }
 addEventListener('resize',resize);
+// iOS: re-read the size once things settle after a rotation, a toolbar change or a return to the tab
+const resizeSoon=()=>{ resize(); setTimeout(resize,150); setTimeout(resize,600); };
+addEventListener('orientationchange',resizeSoon); addEventListener('pageshow',resizeSoon);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) resizeSoon(); });
+if(window.visualViewport) visualViewport.addEventListener('resize',()=>setTimeout(resize,50));
+// and every half second, in case no event came: if the canvas's box and the size the game draws to disagree, fix it
+let sizeChkT=0;
+function sizeCheck(dt){ sizeChkT-=dt; if(sizeChkT>0) return; sizeChkT=0.5; const [w,h]=screenWH(); if(w!==W||h!==H||Math.min(window.devicePixelRatio||1,2)!==DPR) resize(); }
 let last=performance.now();
 function frame(now){
   let dt=(now-last)/1000; last=now; if(!(dt>0)) dt=0; dt=Math.min(dt,0.05);
   shakeMag=Math.max(0,shakeMag-dt*30); flashA=Math.max(0,flashA-dt*1.6);
+  try{ sizeCheck(dt); }catch(e){}
   try{
     padPoll(dt);
     if(scene==='menu') menuUpdate(dt);

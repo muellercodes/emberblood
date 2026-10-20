@@ -185,7 +185,10 @@ const TV={g:null,s:{},pts:{},out:[],last:0};
 const TV_MIN={drink:1.2,roar:0.6,whistle:1.8}, TV_GRACE={drink:0.5,roar:0,whistle:1.2};
 const tNow=()=>performance.now()/1000;
 // fingers down on the screen right now (any of them), so a button never pops up under one
-function tTouches(e){ TV.pts={}; for(const t of e.touches) TV.pts[t.identifier]={x:t.clientX,y:t.clientY}; }
+// a touch in the game's own screen units: measured from the canvas's box and scaled to the size the game draws to, so a
+// stale size on iOS (see screenWH in a12b_ui.js) can never move the taps away from the buttons
+function touchXY(t){ const r=(typeof CVR!=='undefined'&&CVR)||{left:0,top:0,width:W,height:H}, w=r.width||W, h=r.height||H; return [(t.clientX-r.left)*W/w,(t.clientY-r.top)*H/h]; }
+function tTouches(e){ TV.pts={}; for(const t of e.touches){ const [x,y]=touchXY(t); TV.pts[t.identifier]={x,y}; } }
 function tFingerOn(b){ for(const k in TV.pts){ const q=TV.pts[k]; if(Math.hypot(q.x-b.x,q.y-b.y)<b.hr+8) return true; } return false; }
 function tState(b,now){ let st=TV.s[b.id]; if(!st){ const w=tWant(b.id); st=TV.s[b.id]={on:w,a:w?1:0,t:now-9,w:now}; } return st; }
 // once a frame while the buttons are drawn (drawTouch, a11b_hud.js)
@@ -316,7 +319,7 @@ cvs.addEventListener('touchstart',e=>{
   if(scene!=='play') return;
   e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
-    const x=t.clientX,y=t.clientY;
+    const [x,y]=touchXY(t);
     // (v12) only the buttons that are up take taps; a tap on an empty spot does what a tap there always did. A button
     // goes first: the HUD never sits on one (touchKeep), but a banner's tap-to-skip box can reach over the outer ones,
     // and a tap on DRINK must drink, not skip "Quest updated"
@@ -331,7 +334,7 @@ cvs.addEventListener('touchmove',e=>{
   if(scene!=='play') return; e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
     if(t.identifier===touch.stickId){
-      touch.sx=t.clientX; touch.sy=t.clientY;
+      [touch.sx,touch.sy]=touchXY(t);
       const d=dist(touch.ox,touch.oy,touch.sx,touch.sy);
       if(d>70){ const a=angTo(touch.sx,touch.sy,touch.ox,touch.oy); touch.ox=touch.sx+Math.cos(a)*70; touch.oy=touch.sy+Math.sin(a)*70; }
     }

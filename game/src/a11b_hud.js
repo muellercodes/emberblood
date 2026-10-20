@@ -908,7 +908,7 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{ql:()=>({on:QL.on,items:QL.item
 // taps and buttons agree on a device we cannot test here
 const TAPDBG=/[?&]taps\b/.test(location.search)?{list:[]}:null;
 if(TAPDBG) cvs.addEventListener('touchstart',e=>{ try{
-  for(const t of e.changedTouches){ const x=t.clientX, y=t.clientY; let hit='';
+  for(const t of e.changedTouches){ const [x,y]=touchXY(t); let hit='';
     if(scene==='play') for(const b of tShown()){ if(!b.live) continue; if(dist(x,y,b.x,b.y)<(b.hr||b.r+14)){ hit=b.id; break; } }
     TAPDBG.list.push({x,y,t:performance.now(),hit}); }
   }catch(err){} },{passive:true,capture:true});
@@ -918,7 +918,7 @@ function drawTapDbg(){
   for(const q of TAPDBG.list){ const a=1-(now-q.t)/2000; ctx.strokeStyle=`rgba(255,40,40,${a})`; ctx.lineWidth=3;
     ctx.beginPath(); ctx.arc(q.x,q.y,16,0,TAU); ctx.moveTo(q.x-26,q.y); ctx.lineTo(q.x+26,q.y); ctx.moveTo(q.x,q.y-26); ctx.lineTo(q.x,q.y+26); ctx.stroke();
     ctx.fillStyle=`rgba(255,60,60,${a})`; ctx.font=`800 12px ${UIF}`; ctx.fillText(q.hit||'miss',q.x,q.y-32); }
-  const vv=window.visualViewport, r=cvs.getBoundingClientRect();
+  const vv=window.visualViewport, r=(typeof CVR!=='undefined'&&CVR)||{left:0,top:0,width:W,height:H};   // (the cached box: no layout every frame)
   const s=`W${W} H${H} | inner ${innerWidth}x${innerHeight} | vv ${vv?Math.round(vv.width)+'x'+Math.round(vv.height)+' x'+vv.scale.toFixed(2)+' @'+Math.round(vv.offsetLeft)+','+Math.round(vv.offsetTop):'-'} | canvas ${Math.round(r.width)}x${Math.round(r.height)} @${Math.round(r.left)},${Math.round(r.top)} | safe ${SAFE.t},${SAFE.r},${SAFE.b},${SAFE.l} | dpr ${devicePixelRatio}`;
   ctx.font=`700 11px ${UIF}`; const w=ctx.measureText(s).width; ctx.fillStyle='rgba(0,0,0,.75)'; ctx.fillRect(W/2-w/2-6,H*0.42-10,w+12,20); ctx.fillStyle='#fff'; ctx.fillText(s,W/2,H*0.42);
   ctx.restore();
