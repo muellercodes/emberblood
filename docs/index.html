@@ -62824,13 +62824,13 @@ function f2pHat(item){ const h=F2P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 // content can be played and tested without x2_story): Ylva's thaw moves f_thaw on.
 const F2P_STAGES=['f_snow','f_pass','f_hearth','f_maze','f_kindle','f_thaw','f_sky','f_gap','f_deep','f_dreadgate','f_dread','f_glaciar'];
 const F2P_CH={f_snow:'A Letter in the Snow',f_pass:'A Letter in the Snow',f_hearth:'The Dying Hearth',f_maze:'The Dying Hearth',f_kindle:'The Dying Hearth',f_thaw:'One Thaw at a Time',
-  f_sky:'One Thaw at a Time',f_gap:'The Stonehorn Knock',f_deep:'The Stonehorn Knock',f_dreadgate:'The Dreadgate',f_dread:'The Dreadgate',f_glaciar:'Auntie'};
+  f_sky:'One Thaw at a Time',f_gap:'The Stonehorn Knock',f_deep:'The Stonehorn Knock',f_dreadgate:'The Dreadgate',f_dread:'The Dreadgate',f_glaciar:'The Crown of Dread'};
 const F2P_OBJ={f_snow:[S('Go to Frostpine Lodge and talk to Ulf','Talk to Ulf at the Lodge'),1500,3400],f_pass:[S('Follow the White Road to Hearthold','Walk to Hearthold'),6180,49000],
   f_hearth:[S('Talk to the Hearthkeeper at the Great Hearth','Talk to the Hearthkeeper'),6880,49040],f_maze:[S('Cross the Glimmerfrost to the Glacier Maze','Go to the Glacier Maze'),5600,44420],
   f_kindle:[S('Wake the Great Hearth with Blaze','Wake the Great Hearth'),6800,48950],f_thaw:[S('Go to Rimeholm and find whoever knows the most','Go to Rimeholm'),1950,46750],
   f_sky:[S('Reach Skyreach Temple','Reach Skyreach Temple'),12650,46480],f_gap:[S('Find Stonehorn Deep in the Badlands','Find Stonehorn Deep'),12200,42450],
   f_deep:[S('Climb down through Stonehorn Deep','Go through Stonehorn Deep'),12200,42450],f_dreadgate:[S('Go to the Dreadgate at the foot of Mount Dread','Go to the Dreadgate'),7300,44160],
-  f_dread:[S('Climb through the Heart of Dread','Climb the Heart of Dread'),7300,44160],f_glaciar:[S('Face Glaciar on the Crown of Dread','Face Glaciar'),7300,41250]};
+  f_dread:[S('Climb through the Heart of Dread','Climb the Heart of Dread'),7300,44160],f_glaciar:[S('Climb to whoever is dreaming the winter, on the Crown of Dread','Climb to the top of Mount Dread'),7300,41250]};
 function f2pStagesFallback(){
   if(typeof stageAt!=='function') return;
   const miss=F2P_STAGES.filter(s=>stageAt(s)<0); if(!miss.length) return;
@@ -62847,7 +62847,7 @@ const F2P_CAST=[
   {id:'f_brynja',name:'Old Brynja, Hearthkeeper',town:'f_hearthold',col:'#e88a4a',
     look:{skin:'#e8c0a0',hair:'#efeae0',hairdo:'bun',outfit:'robe',shirt:'#3a2a2a',low:'#2a1e1e',shawl:'#1a1414',soot:true,build:'old',hold:'staff'},
     lines:[S(`Seventy years I've kept this fire. Never let it go out once. Well. Once. I was nine. There was a sneeze.`,`Seventy years I kept this fire. It went out once. I sneezed.`),
-      S(`Don't touch the Hearth with your bare claws. Oh, you're an Emberblood. Touch away.`,`Don't touch the fire. Oh, you're a dragon. Go ahead.`),
+      S(`Don't touch the Hearth with your bare claws. Oh, you're the fire one. Touch away.`,`Don't touch the fire. Oh, you're the fire one. Go ahead.`),
       S(`The north remembers Ember. We put a flower on the Hearth every Lantern Day. Your Lantern Day. We just never knew why.`,`We put a flower on the fire every Lantern Day. We never knew why.`)]},
   {id:'f_brann',name:'Captain Brann Stoutmitt',town:'f_hearthold',col:'#c86a2a',
     look:{skin:'#f0c8a8',hair:'#c86a2a',beard:'big',beardc:'#c86a2a',outfit:'armor',helm:true,plume:'#3a6aaa',cape:'#2a4a7a',frost:true,build:'big',hold:'spear',mittens:'#2a4a7a'},
@@ -63144,7 +63144,7 @@ function f2pFuse(){ if(!G.flags.f_bombfuse||G.flags.f_bombfuse_bag) return; if(G
 // ---------- first meetings and everyday greetings in each person's own voice. In Act III every person here is on the
 // v11 talk (act3/people.js: their first meeting is a once opener there); these are for the acts where they are not.
 const F2P_FIRST={
-  f_brynja:S(`There, there, old girl. Somebody's come to see you. ...Oh. You're the Emberblood. Come closer. Let me look at you. Skinny.`,`Oh! The Emberblood. Come here. Skinny!`),
+  f_brynja:S(`There, there, old girl. Somebody's come to see you. ...Oh. You're the horned boy. Come closer. Let me look at you. Skinny.`,`Oh! The horned boy. Come here. Skinny!`),
   f_brann:S(`Stop right there! Name, and are you a moth? ...Horns. A tail. Not a moth, then. Carry on! Captain Brann Stoutmitt, Hearthwardens!`,`Stop! Are you a moth? No? Carry on! I'm Captain Brann!`),
   f_toastwhistle:S(`A visitor! Welcome to Hearthold, where everything is fine! I'm Mayor Ottilie Toastwhistle. Everything is fine.`,`Welcome! I'm Mayor Toastwhistle. Everything is fine!`),
   f_gunnhild:S(`Hm. A dragon in my forge. Gunnhild Anvilheart. ...Wait. That sword. That's Maren's work. You're Maren's kid?`,`I'm Gunnhild. Wait. That's Maren's sword! You're her kid?`),
@@ -63170,7 +63170,7 @@ const F2P_FIRST={
 };
 const F2P_HELLO={
   f_brynja:[S(`There's my warm child.`,`My warm child.`),S(`Come, sit by her. She likes you.`,`Sit by the fire. She likes you.`)],
-  f_brann:[S(`Emberblood! At ease! I mean me! I'm at ease!`,`At ease! I mean me!`),S(`Any moths? Report!`,`Any moths? Report!`)],
+  f_brann:[S(`Horns! At ease! I mean me! I'm at ease!`,`At ease! I mean me!`),S(`Any moths? Report!`,`Any moths? Report!`)],
   f_toastwhistle:[S(`Ash! Everything is fine!`,`Ash! Everything is fine!`),S(`Oh, good, a hero. Fine. Good. Fine.`,`Good, a hero. Fine.`)],
   f_gunnhild:[S(`Maren's kid! Come in!`,`Maren's kid! Come in!`),S(`Hm. Ash. Good.`,`Hm. Ash. Good.`)],
   f_mags:[S(`Ash! I made a thing! It might explode! Hi!`,`Ash! I made a thing! Hi!`),S(`My favorite fire!`,`My favorite fire!`)],
@@ -63254,7 +63254,7 @@ B('f_hsk2','id:f_hask',()=>f2pQ('f_dogs'),S(`Pepper. PEPPER. Drop the boot.`,`Pe
 // town barks: the dying Hearth, the blue Hearth, the frozen village, the moths, and later the moon
 B('f_hh1',F2P_HH,f2pCold,S(`My soup froze on the spoon. And I was sitting right next to the Hearth!`,`My soup froze. Right next to the Hearth!`));
 B('f_hh2',F2P_HH,f2pCold,S(`Brr.`,`Brr.`));
-B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the Emberblood? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
+B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the horned boy? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
 B('f_hh4',F2P_HH,f2pLit,S(`The Hearth is BLUE! I didn't know fire could be blue! I didn't know fire could be HAPPY!`,`The Hearth is BLUE! Fire can be happy!`),{d:'f_hearth'});
 B('f_hh5',F2P_HH,f2pLit,S(`I took my coat off. Then I put it back on. Baby steps.`,`I took off my coat. Then put it back on.`));
 B('f_hh6',F2P_HH,()=>!!G.flags.f_northgate,S(`The North Gate's open! Gunnar finally stopped licking it. Well. He licked the open bit too.`,`The North Gate is open! Gunnar licked it anyway.`),{d:'f_gate'});
@@ -63493,13 +63493,13 @@ Object.assign(QDEFS,{
         f2pL('f_gunnhild',`The Ember Chain. The tip burns. It lights braziers from as far as it reaches, burns roots, and knocks frost right off things. Tell your mother. Tell her Gunnhild of Hearthold says hello. Tell her twice.`,`The Ember Chain! The tip burns. It lights braziers and melts frost. Tell your mom hello. Twice.`)],reward:{xp:650,f2p:()=>{ G.flags.f_emberchain=1; setBanner(S('The Ember Chain!','The Ember Chain!'),S('The Chain Whip’s tip burns: it lights braziers and roots from range, melts ice and hits frost foes harder.','Your whip tip burns now!'),3.6); }}}]},
   f_pack:{title:S('The Long Howl','The Long Howl'),giver:'f_greymane',min:'f_pass',offer:[]},
   f_warm:{title:S('Warm Hands','Warm Hands'),giver:'f_toastwhistle',min:'f_kindle',
-    offer:[f2pL('f_toastwhistle',`Ash! Emberblood! Official question from the Mayor: how many frozen people can one dragon warm up?`,`Official question! How many frozen people can you warm up?`),f2pL('ash',`...All of them?`,`...All of them?`),
+    offer:[f2pL('f_toastwhistle',`Ash! Horned boy! Official question from the Mayor: how many frozen people can one dragon warm up?`,`Official question! How many frozen people can you warm up?`),f2pL('ash',`...All of them?`,`...All of them?`),
       f2pL('f_toastwhistle',`TWELVE would do! Twelve, and I'll give you a medal! I've never given anyone a medal! I'll have to make one!`,`TWELVE! Then I'll give you a medal! I'll have to make one!`)],
     steps:[
       {t:'flag',flag:'f_warm12',text:S('Thaw 12 Frozen Folk anywhere in Frostreach','Thaw 12 frozen people'),at:()=>f2pNearestFrozen()},
       {t:'talk',npc:'f_toastwhistle',text:S('Collect your medal from the Mayor','Get your medal from the Mayor'),give:{f_medal:1},lines:[f2pL('f_toastwhistle',`Twelve! TWELVE! Everyone, gather round! Hearthwardens, a drum roll!`,`TWELVE! Gather round! A drum roll!`),
         f2pN(`Captain Brann does a drum roll on his own helmet.`,`Brann drums on his own helmet.`),
-        f2pL('f_toastwhistle',`I hereby award Ash Emberblood the Warm Hands Medal, for warming hands! And feet! And entire people!`,`The Warm Hands Medal! For warming hands, feet and whole people!`),
+        f2pL('f_toastwhistle',`I hereby award Ash of Emberhollow the Warm Hands Medal, for warming hands! And feet! And entire people!`,`The Warm Hands Medal! For warming hands, feet and whole people!`),
         f2pL('f_toastwhistle',`It's a cookie. ...There's a real one too. And this. A Heart Ember from the Hall. We've been saving it for a hero. Everything is FINE now.`,`It's a cookie. There's a real one too. And a Heart Ember! Everything is FINE.`)],reward:{heart:'f_warm',coins:170,xp:650}}]}
 });
 // Elka goes to the Windscour Shrine for the start of her race as soon as the race is on
@@ -63512,15 +63512,12 @@ Object.defineProperty(STORY,'f_song_reveal',{configurable:true,get(){ return [
   ...f2pVerse(F2P_V1),...f2pVerse(F2P_V2),...f2pVerse(F2P_V3),
   f2pL('f_eider',`"Horns of red. Fire in her hands." That's an Emberblood. That's EMBER.`,`"Horns of red. Fire in her hands." That's EMBER!`),
   f2pL('f_brynja',`And she called the Snow Mother "Auntie"...`,`She called the Snow Mother "Auntie"...`),
-  f2pL('ash',`Ember's auntie is Glaciar. The Snow Mother... is GLACIAR!`,`Ember's auntie is Glaciar. The Snow Mother is GLACIAR!`),
-  f2pL('f_brynja',`The dragon on the mountain? The one making all this snow?`,`The dragon on the mountain? Making all this snow?`),
-  f2pL('ash',`She's not making it. Something is making HER. A spell. Chains. A moth.`,`Something is making HER do it. A spell. Chains. A moth.`),
+  f2pL('ash',`Ember's auntie? Then who WAS the Snow Mother? And where did she go?`,`Ember's auntie? Who was she?`),
   f2pL('f_eider',`Then the song is a key. Dragons remember songs. My cousin Wren says so, and Wren is never wrong. She tells me constantly.`,`Then the song is a key. Dragons remember songs. Wren says so.`),
-  f2pL('tove',`Oh. OH. Auntie Glee! Ember called her Auntie Glee! I remember her laugh. Like wind chimes. How could I forget?`,`Auntie Glee! Ember called her that! Her laugh was like wind chimes!`),
   f2pL('f_brynja',`Then go and sing it to her, child. And tell her Hearthold never forgot her. We just forgot her name.`,`Go sing it to her. Tell her we never forgot her. Just her name.`),
   f2pL('f_eider',`Wait. WAIT. Wren's lost page! The eleventh one! It was stuck to the back of a recipe for frost pudding. Very old jam.`,`Wait! Wren's lost page! The eleventh! It was stuck to a pudding recipe!`),
-  f2pN(`"On the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember named her Nyx. We thought nothing of it." (Iska)`,`"On the first Lantern Day, a little grey moth sat on Ember's lantern. Ember named her Nyx." (Iska)`),
-  f2pL('ash',`Nyx. A little grey moth... named by Ember.`,`Nyx. A little grey moth. Ember named her.`),
+  f2pN(`"On the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember gave her a name. We thought nothing of it." (Iska)`,`"A grey moth sat on Ember's lantern. Ember gave her a name." (Iska)`),
+  f2pL('ash',`A moth with a name. And nobody wrote the name down.`,`Ember named a moth. Nobody wrote the name down.`),
   f2pL('tove',`I remember that moth. She was so small. She was so COLD.`,`I remember that moth. So small. So COLD.`),
   f2pDo(()=>{ G.flags.f_page11=1; })]; }});
 Object.defineProperty(STORY,'f_pack_meet',{configurable:true,get(){ return [
@@ -65152,9 +65149,17 @@ function f2Lines(type,inKeys,outKeys,introDef,outroDef){
 }
 function f2Spk(id,name,col){ if(!SPK[id]) SPK[id]={name,col}; }
 f2Spk('f_bellows','Old Bellows','#e0a050'); f2Spk('f_frostfeather','Old Frostfeather','#e8eef8'); f2Spk('f_grumblehorn','King Grumblehorn','#b8a890');
-f2Spk('f_hush','Hush','#ece4fa'); f2Spk('f_glaciar','Glaciar','#bfe2ff'); f2Spk('f_blubberton','Lord Blubberton','#c8a890'); f2Spk('f_squall','Squall','#8ac0f0');
+f2Spk('f_blubberton','Lord Blubberton','#c8a890'); f2Spk('f_squall','Squall','#8ac0f0');
 f2Spk('f_squeak','Squeak','#f0d870'); f2Spk('f_rockjaw','Rockjaw','#b89878'); f2Spk('f_grumbo','Grumbo','#e4e8f4'); f2Spk('f_mumble','Mumble','#f2f4fa');
 f2Spk('tove','Tove','#bfe6ff'); f2Spk('nyxara','The Lady of the Moths','#c8b0f0'); f2Spk('f_pennant','Brother Pennant','#f0b040');
+// (v12) two labels follow what Ash knows (REVEAL_PLAN: a secret name shows in the UI only after the line that says it).
+// The white moth names herself on the Drum Stone (f_dreadgate.js f_drum sets f3_hush_named; the act's migrate sets it
+// for a save already past the drum), and the dragon's name comes with the snow_mother solve (f3_auntie_glee). Until
+// then they are "A white moth" and "The white dragon". From Act IV on both names are known. (These replace the plain
+// entries, so they are set here whatever an earlier module gave.)
+function f2Knows(flag){ try{ const F=typeof G!=='undefined'&&G&&G.flags; if(!F) return true; return !!F[flag]||actOf(G.stage)>3; }catch(e){ return true; } }
+SPK.f_hush={get name(){ return f2Knows('f3_hush_named')||f2Knows('f_hush_done')?'Hush':'A white moth'; },col:'#ece4fa'};
+SPK.f_glaciar={get name(){ return f2Knows('f3_auntie_glee')||f2Knows('f_done')?'Glaciar':'The white dragon'; },col:'#bfe2ff'};
 // a top-of-screen line from Tove (the Warden riding in Ash's fire) at most once per gap seconds
 function f2Tove(line,gap){ if(F2.toveT>G.time) return; F2.toveT=G.time+(gap||8); taunt('tove',line); }
 // the sites: a boss type maps to its site key (defineBoss). Dungeon sites never open by themselves (open:()=>false):
@@ -66081,7 +66086,7 @@ const F2G={on:false,stones:[],melted:0,lvl:0,heart:false,night:false,windOn:fals
 const F2_CHAIN_LINES=[S("...Fire? Warm fire? I knew a little girl with fire like that...","Fire? Warm fire? I knew a girl with fire like that..."),
   S("The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.","Who is the Mother? I have a brother. A loud one."),
   S("Little one. Your horns. You have her horns. Ember's horns!","Your horns! You have Ember's horns!"),
-  S("The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!","The Shard is in my heart! Get it out, dumpling!")];
+  S("The Shard! It's in my heart! Get it OUT, little one, before it freezes me again! And mind my tail, I can't help the tail!","The Shard is in my heart! Get it out!")];
 const F2_GLA_TAUNT=[S('Sleep, little one. Sleep under the snow.','Sleep, little one.'),S('Stay. In the cold, nothing ever has to leave.','Stay. Nothing leaves.'),S('The long night is coming. Lie down.','The long night is coming.')];
 // her words: the story may write STORY.f_glaciar_intro, or set STORY.bosses.f_glaciar.intro / .outroFree / .outroDefeat
 f2Lines('f_glaciar',['f_glaciar_intro'],[],
@@ -66268,7 +66273,8 @@ const GLA_HEART=FK.brain({move:'hold',turn:1.8,cd:[1.7,2.8],recoverMove:0,moves:
 const GLA_NIGHT=FK.brain({move:'hold',turn:2.4,cd:[0.95,1.6],recoverMove:0,moves:[GLA_MOVES.breath,GLA_MOVES.icicles2,GLA_MOVES.tail,GLA_MOVES.dive2]});
 const GLA_AIR=FK.brain({move:'hold',turn:3,cd:[1.2,2.0],recoverMove:0,moves:[GLA_MOVES.dive,GLA_MOVES.boulders,GLA_MOVES.gust,GLA_MOVES.shards]});
 // the warnings she gives in the Shard Heart phase, one per attack (bible 9.5)
-const F2_GLA_WARN={f2gbreath:S('Duck, dumpling!','Duck, dumpling!'),f2donut:S('Jump!','Jump!'),f2spots:S('Mind your head!','Mind your head!')};
+// (v12) "dumpling" waits for her talk after the fight, when she is herself again; in the fight she says "little one"
+const F2_GLA_WARN={f2gbreath:S('Duck, little one!','Duck!'),f2donut:S('Jump!','Jump!'),f2spots:S('Mind your head!','Mind your head!')};
 // her head (the mouth for the breath) on the coil or in the air
 function f2GlaHead(e){ const k=(e.r0||60)/60, f=e.face; return {x:e.x+Math.cos(f)*74*k,y:e.y+Math.sin(f)*74*k*0.9,z:(e.z||0)+44*k}; }
 // hit circles: head (x1.4, x2 staggered), body, tail (x0.7); in the Shard Heart only the Shard in her chest takes full damage
@@ -66302,6 +66308,11 @@ f2Foe('f_glaciar',{boss:true,name:'Glaciar',title:S('the Ice Dragon of Mount Dre
   sheet:f2Sheet([{state:'chase',mode:'coil',z:0,label:'coiled'},{state:'breathW',mode:'coil',z:0,st:0.5,at:0.5,label:'breath windup'},{state:'breath',mode:'coil',z:0,label:'frost breath'},{state:'tailW',mode:'coil',z:0,st:0.3,at:0.3,label:'tail sweep'},
     {state:'iciclesW',mode:'coil',z:0,st:0.5,at:0.5,label:'icicle rain'},{state:'chase',mode:'air',z:130,dx:120,label:'flying'},{state:'diveAim',mode:'air',z:110,st:0.4,label:'dive aim'},{state:'dive',mode:'air',z:16,label:'dive'},
     {state:'perched',mode:'air',z:0,label:'landed'},{state:'stagger',mode:'stagger',z:0,label:'staggered'},{state:'chase',mode:'coil',heart:true,z:0,label:'shard heart'},{state:'chase',deathT:0.3,mode:'coil',z:0,label:'death'}])});
+// (v12) the boss bar's name follows what Ash knows, like her speaker label: until the snow_mother solve she is "The
+// White Dragon" (a setter keeps anything that writes the name later)
+{ const E=EDEF.f_glaciar; if(E){ let nm=E.name, sh=E.short;
+  Object.defineProperty(E,'name',{configurable:true,enumerable:true,get(){ return f2Knows('f3_auntie_glee')||f2Knows('f_done')?nm:'The White Dragon'; },set(v){ nm=v; }});
+  Object.defineProperty(E,'short',{configurable:true,enumerable:true,get(){ return f2Knows('f3_auntie_glee')||f2Knows('f_done')?sh:'The White Dragon'; },set(v){ sh=v; }}); } }
 // a stunned Glaciar? never: only her chains stagger her
 // a stun (a Ground Pound's, a shield bash's) never cuts short a state an Act III foe was just put in (flipped by the same
 // pound, horns stuck, on its back, dazed): the stun still counts, the state stays
@@ -67016,6 +67027,8 @@ window.__ebX=Object.assign(window.__ebX||{},{f2Test,f2f:F2F_DBG});
 // fChains(n): in the Glaciar fight it snaps n chains; with no fight on, the story's stand-in locks (if it has them) melt instead
 if(!(window.__ebX&&window.__ebX.fChains)) window.__ebX.fChains=function(n){ const e=G&&G.boss; if(e&&e.type==='f_glaciar'&&!e.dead) return f2Chains(n);
   const s=window.__eb&&window.__eb.f2s; if(s&&typeof s.meltLocks==='function') return s.meltLocks(n); return f2Chains(n); };
+// (v12 R3) test hook: what a speaker label and a boss name say right now
+window.__ebDbg=Object.assign(window.__ebDbg||{},{spkName:id=>SPK[id]?SPK[id].name:null,foeName:t=>EDEF[t]?EDEF[t].name:null});
 
 // ================= Act III main story: The Long Winter (x2_story)
 // The twelve Act III stages (f_snow, f_pass, f_hearth, f_maze, f_kindle, f_thaw, f_sky, f_gap, f_deep, f_dreadgate,
@@ -67346,11 +67359,11 @@ f2sDef('f_fergus_cold',[
 ]);
 f2sDef('f_gate',[
   xl('f_brann',`Stop right there! Name, business, and are you or are you not a moth?`,`Stop! Who are you? Are you a moth?`),
-  xl('ash',`Ash Emberblood. I'm here about the winter. And I'm not a moth.`,`I'm Ash. I'm here about the winter. I'm not a moth.`),
+  xl('ash',`I'm Ash. I'm here about the winter. And I'm not a moth.`,`I'm Ash. I'm here about the winter. I'm not a moth.`),
   xl('f_brann',`That is EXACTLY what a moth would say.`,`That is EXACTLY what a moth would say.`),
   xl('f_brann',`...Hm. Moths don't have horns. Or tails. Is that smoke coming out of your nose?`,`Hm. Moths don't have horns. Is that smoke from your nose?`),
   xl('ash',`Only when I sneeze.`,`Only when I sneeze.`),
-  xl('f_brann',`An Emberblood! A real one! OPEN THE GATE! ...It's frozen. Hang on. Everybody push.`,`An Emberblood! OPEN THE GATE! It's frozen. Everybody push!`),
+  xl('f_brann',`Horns! Like the girl on the Hearth stones! OPEN THE GATE! ...It's frozen. Hang on. Everybody push.`,`Horns! OPEN THE GATE! It's frozen. Everybody push!`),
   xl('narr',`Six guards push. The gate groans open exactly as wide as a kid with a tail.`,`Six guards push. The gate opens just wide enough for you.`),
   xl('f_brann',`Welcome to Hearthold, the last warm town in the north. Go and see the Hearthkeeper at the Great Hearth. She's been waiting for someone like you. For a month. Loudly.`,`Welcome to Hearthold! See the Hearthkeeper at the Great Hearth. She has waited a month. Loudly.`)
 ]);
@@ -67358,7 +67371,7 @@ f2sDef('f_gate',[
 f2sDef('f_brynja',[
   xl('narr',`In the middle of town stands the Great Hearth, a fireplace you could drive a cart into. Its fire is a tiny orange flicker, like a candle at the bottom of a well.`,`The Great Hearth is huge. Its fire is a tiny flicker.`),
   xl('f_brynja',`There, there, old girl. Somebody's come to see you.`,`There, there, old girl. Someone came to see you.`),
-  xl('f_brynja',`You're the Emberblood? Good. Come here. Closer. Let me look at you. ...Skinny. Your mother doesn't feed you.`,`You're the Emberblood? Come closer. Skinny! Your mom doesn't feed you.`),
+  xl('f_brynja',`You're the horned boy? Good. Come here. Closer. Let me look at you. ...Skinny. Your mother doesn't feed you.`,`You're the horned boy? Come closer. Skinny! Your mom doesn't feed you.`),
   xl('ash',`She feeds me SO much.`,`She feeds me SO much.`),
   xl('f_brynja',`I'm Brynja. Hearthkeeper. Seventy years I've kept this fire, and my mother before me, and hers before her, all the way back to the night it was lit.`,`I'm Brynja. I have kept this fire for 70 years. My mother did too, and hers.`),
   xl('f_brynja',`Then a white moth came over, wider than my roof, flying to Mount Dread. The Hearth went cold as a fish.`,`Then a white moth flew over. The Hearth went cold.`),
@@ -67367,7 +67380,7 @@ f2sDef('f_brynja',[
   xl('narr',`You breathe your biggest, hottest breath into the Hearth. The flicker jumps up. Then it shivers and shrinks back down.`,`You breathe your biggest fire. The flame jumps up. Then it shrinks again.`),
   xl('f_brynja',`Kind of you. But that's a breath for candles, child. The Great Hearth was lit with Blaze.`,`Kind of you. But that fire is for candles. The Hearth was lit with Blaze.`),
   xl('ash',`What's Blaze?`,`What's Blaze?`),
-  xl('f_brynja',`Fire so hot it burns blue. The old Emberbloods had it. They kept a forge up north, where the glacier comes down to the Glimmerfrost. The ice swallowed it long ago.`,`Fire so hot it burns blue. The old Emberbloods had a forge up north. The ice ate it.`),
+  xl('f_brynja',`Fire so hot it burns blue. Nobody alive has seen it. The old songs put a forge up north, where the glacier comes down to the Glimmerfrost. The ice swallowed it long ago.`,`Fire so hot it burns blue. There was a forge up north. The ice ate it.`),
   xl('f_brynja',`Folk call it the Glacier Maze, because people who go in get lost, and people who get lost don't come out to complain about the name.`,`Folk call it the Glacier Maze. People get lost in it.`),
   xl('tove',`Ember's North Forge. I'd forgotten. She built it with... with someone. I can't remember who. The cold makes my memory slippery.`,`Ember's North Forge! She built it with... someone. The cold makes me forget.`),
   xl('f_brynja',`Take the road north to Glimmer Point, then cross the ice. Find the Blaze. Come back and wake my old girl up.`,`Go north to Glimmer Point. Cross the ice. Find the Blaze. Then wake my old girl up.`)
@@ -67395,7 +67408,7 @@ f2sDef('f_kindle',[
 f2sDef('f_northgate',[
   xl('narr',`The ice on the North Gate sags, drips, and slides off in one big slab, SPLOOSH, right onto Captain Brann's boots.`,`The ice on the gate slides off. SPLOOSH! Right onto Captain Brann's boots.`),
   xl('narr',`The gate swings open with a sound like a happy sigh.`,`The gate swings open with a happy sigh.`),
-  xl('f_brann',`...My boots are full of gate. Thank you, Emberblood! GUNNAR! You can stop licking things now!`,`My boots are full of gate. Thank you! GUNNAR! Stop licking things!`),
+  xl('f_brann',`...My boots are full of gate. Thank you, Horns! GUNNAR! You can stop licking things now!`,`My boots are full of gate. Thank you! GUNNAR! Stop licking things!`),
   xl('tove',`Rimeholm is west, Ash. Along the cliffs. Take a scarf. Take two.`,`Rimeholm is west, on the cliffs. Take a scarf. Take two.`)
 ]);
 // Chapter 3, One Thaw at a Time
@@ -67454,7 +67467,7 @@ f2sDef('f_drum',[
   {who:'narr',text:S(`Then the crack stops. And above you, something white unfolds from the mountainside.`,`Then the crack stops. Something white unfolds above you.`),fn:()=>f2sHushShow('unfold')},
   xl('narr',`Two wings. Two purple eyes painted on them. And two real ones in the middle, blinking at you.`,`Two wings with purple eyes painted on them. And two real eyes, blinking.`),
   xl('f_hush',`Shhh. Loud one. You'll wake her.`,`Shhh. Loud one. You'll wake her.`),
-  xl('f_hush',`The Mother is resting. Her new friend rests too. Up on top.`,`The Mother is resting. Her new friend rests too.`),
+  xl('f_hush',`I am Hush. Her quiet one. The Mother is resting. Her new friend rests too. Up on top.`,`I am Hush. The Mother is resting. Her new friend rests too.`),
   xl('ash',`Who's "the Mother"?`,`Who's "the Mother"?`),
   xl('f_hush',`Shhhhh.`,`Shhhhh.`),
   xl('ash',`That is not an answer!`,`That is not an answer!`),
@@ -67479,7 +67492,7 @@ f2sDef('f_hush_outro',[
 // Chapter 5, into the mountain
 f2sDef('f_dread_in',[
   xl('narr',`Inside Mount Dread it is quiet. Too quiet. The walls are black rock and purple ice, and everywhere you look there are chains. Big ones. Little ones. Chains on statues. Chains on bridges. Chains on nothing at all.`,`Inside the mountain it is too quiet. Black rock, purple ice, and chains everywhere.`),
-  xl('tove',`Moth-frost chains. Glaciar's were the first. These are... practice ones, I think. Somebody practiced for a long time.`,`Moth-frost chains. Somebody practiced for a long time.`),
+  xl('tove',`Moth-frost chains. Practice ones, I think. Somebody practiced for a long time.`,`Moth-frost chains. Somebody practiced for a long time.`),
   xl('ash',`Then I'll practice melting them.`,`Then I'll practice melting them.`),
   f2sPip(`(Pip climbs into your hood and stays there.)`,`(Pip hides in your hood.)`)
 ]);
@@ -67487,13 +67500,13 @@ f2sDef('f_crown_door',[
   xl('narr',`The last chain snaps. The door at the top of the mountain swings open, and the blizzard pours in, howling.`,`The last chain snaps. The top door swings open. The blizzard howls in.`),
   xl('narr',`Then, all at once, the wind stops. Like someone pressed a button.`,`Then the wind stops. All at once.`),
   xl('tove',`She's right there, Ash. I can feel her. She's so cold she's almost warm.`,`She's right there, Ash. She's so cold she's almost warm.`),
-  xl('ash',`Okay. Okay. I'm going to meet my auntie. Hat off. Be polite. Drink the ice tea.`,`Okay. I'm going to meet my auntie. Hat off. Be polite. Drink the ice tea.`)
+  xl('ash',`Who is she, Tove? Really?`,`Who is she, Tove?`)
 ]);
-// Final Chapter, Auntie: the Crown of Dread
+// Final Chapter, The Crown of Dread
 f2sDef('f_glaciar_intro',[
   {who:'narr',text:S(`The top of Mount Dread. No wind. No sound. In the middle of the summit, coiled around a spike of black ice, lies a dragon.`,`The top of Mount Dread. No wind. No sound. A dragon lies curled around a spike of black ice.`),fn:()=>f2sGlacShow('spell')},
   xl('narr',`She is white and blue and silver, as long as a river, with icicle horns and frost for whiskers. Four chains of purple frost hold her down, one to each corner of the summit. In her chest, something glows. The Shard.`,`She is white and blue, long as a river, with icicle horns. Four purple chains hold her down. In her chest glows the Shard.`),
-  xl('ash',`Hi... Auntie?`,`Hi... Auntie?`),
+  xl('ash',`Hello? Are you awake?`,`Hello? Are you awake?`),
   xl('f_glaciar',`...Fire. I smell fire. My brother's fire.`,`Fire. I smell fire. My brother's fire.`),
   xl('f_glaciar',`No. No, the Mother says fire is a lie. The Mother says dark is kind and cold is kind and sleep is the kindest of all. The Mother says...`,`No. The Mother says fire is a lie. Dark is kind. Cold is kind. Sleep is kindest. The Mother says...`),
   xl('narr',`Her eyes open. They're purple.`,`Her eyes open. They're purple.`),
@@ -67652,7 +67665,7 @@ f2sDef('f_maze_shrine',[
   xl('ember',`Ash? All the way up here, in the cold? Come in. Mind the anvil, it bites.`,`Ash! Up here in the cold? Come in.`),
   xl('ash',`Ember! What is this place?`,`Ember! What is this place?`),
   xl('ember',`My forge. I built it with my auntie, a long, long time ago. She did the cold parts. I did the hot parts. We were a very good team.`,`I built this forge with my auntie. She did the cold parts. I did the hot parts.`),
-  xl('ash',`Your auntie? Grandpa had a sister?`,`Grandpa had a sister?`),
+  xl('ash',`Your auntie? Who was she?`,`Who was she?`),
   xl('ember',`He did. They stopped speaking long before I was grown. I never asked her why. I wish I had.`,`He did. They stopped talking. I never asked why.`),
   xl('ember',`I left a little of my hottest fire here. The blue kind. For a day when the cold got too big. I think that day is today.`,`I left my hottest fire here. The blue kind. For a day when the cold got too big. That's today.`)
 ]);
@@ -67822,8 +67835,8 @@ const F2S_TAUNTS={
   f_glaciar_chain:[S(`...Fire? Warm fire? I knew a little girl with fire like that...`,`Fire? Warm fire? I knew a girl with fire like that...`),
     S(`The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.`,`Who is the Mother? I have a brother. A loud one.`),
     S(`Little one. Your horns. You have her horns. Ember's horns!`,`Your horns! You have Ember's horns!`),
-    S(`The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!`,`The Shard is in my heart! Get it out, dumpling!`)],
-  f_glaciar_warn:[S('Duck, dumpling!','Duck!'),S('Jump!','Jump!'),S('Mind your head!','Mind your head!')],
+    S(`The Shard! It's in my heart! Get it OUT, little one, before it freezes me again! And mind my tail, I can't help the tail!`,`The Shard is in my heart! Get it out!`)],
+  f_glaciar_warn:[S('Duck, little one!','Duck!'),S('Jump!','Jump!'),S('Mind your head!','Mind your head!')],
   tove_glaciar:[S('Melt the chains!','Melt the chains!'),S('Up on the ledge! Climb!','Climb up the ledge!'),S('The vent! Ride it to the slab!','Ride the vent up!'),S('Her chest! Hit the Shard!','Hit the Shard!')],
   nyxara_n9:S('Sleep, little cold one. Be cold for me.','Sleep, cold one. Be cold for me.'),
   f_blubberton:[S('I say! Unhand my hall, you scaly scamp!','Leave my hall!'),S('Tally ho!','Tally ho!'),S('Ow! Most rude!','Ow! Rude!')],
@@ -67868,7 +67881,7 @@ f2sBossWords();
 // ---------- 5. the stages (bible 6.0). Cards as the bible gives them; f_snow's card shows after Mom's letter.
 const F2S_CARD={f_snow:['Act III · Chapter 1',S('A Letter in the Snow','A Letter in the Snow')],f_hearth:['Act III · Chapter 2',S('The Dying Hearth','The Dying Hearth')],
   f_thaw:['Act III · Chapter 3',S('One Thaw at a Time','One Thaw at a Time')],f_gap:['Act III · Chapter 4',S('The Stonehorn Knock','The Stonehorn Knock')],
-  f_dreadgate:['Act III · Chapter 5',S('The Dreadgate','The Dreadgate')],f_glaciar:['Act III · Final Chapter',S('Auntie','Auntie')]};
+  f_dreadgate:['Act III · Chapter 5',S('The Dreadgate','The Dreadgate')],f_glaciar:['Act III · Final Chapter',S('The Crown of Dread','The Crown of Dread')]};
 const f2sHint=st=>()=>STORY.f_hints[st];
 // on the Windscour plateau / on the Sky Isles (by elevation when the map has it, by area when it does not)
 function f2sElev(){ try{ return typeof elevOf==='function'?elevOf(player)|0:0; }catch(e){ return 0; } }
@@ -67998,7 +68011,7 @@ defineStages(3,[
       // covers a Heart of Dread registered without them)
       if(!f2sSeen('f_dread_in')&&f2sInArea('f_dread')) f2sWhen('dread_in',q=>q.t>1.4&&f2sInArea('f_dread'),()=>{ if(!f2sSeen('f_dread_in')) f2sPlay('f_dread_in'); });
       if(!F.f_crown_open&&f2sOut()&&scene==='play'&&dist(player.x,player.y,F2SP.crown.x,F2SP.crown.y)<760) f2sCrownDoor(); }},
-  {id:'f_glaciar',chapter:S('Auntie','Auntie'),card:F2S_CARD.f_glaciar,at:{x:F2SP.crownIn.x,y:F2SP.crownIn.y},
+  {id:'f_glaciar',chapter:S('The Crown of Dread','The Crown of Dread'),card:F2S_CARD.f_glaciar,at:{x:F2SP.crownIn.x,y:F2SP.crownIn.y},
     objectives(){ if(G.flags.f_done||G.choices.f_glaciar) return [];
       if(G.boss&&!G.boss.dead&&G.boss.type==='f_glaciar'){ const n=f2sChains(); return [{text:n>=4?S('All four chains are gone! Hit the Shard in her chest','Hit the Shard in her chest!'):S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:G.boss.x,y:G.boss.y,fight:true}]; }
       const L=f2sNextLock(); if(L){ const n=f2sChains(); return [{text:S(`Melt the four chains on the Chain Stones (${n} of 4)`,`Melt the chains (${n} of 4)`),x:L.x,y:L.y}]; }
@@ -68006,14 +68019,14 @@ defineStages(3,[
       // up is through the Heart of Dread; e1_maps routes the marker over the crossings from another map)
       const onCrown=curMap()===2&&!AREA&&f2sElev()>=6;
       if(f2sInArea('f_dread')||!onCrown) return [f2sDunObj('f_dread','Climb back up through the Heart of Dread to the Crown','Climb back up to the top of the mountain',F2SP.dreadgate)];
-      return [{text:S('Face Glaciar on the Crown of Dread','Face Glaciar on top of the mountain'),x:F2SP.crown.x,y:F2SP.crown.y}]; },
+      return [{text:S('Climb to whoever is dreaming the winter, on the Crown of Dread','Climb to the top of Mount Dread'),x:F2SP.crown.x,y:F2SP.crown.y}]; },
     idle:()=>G.flags.f_done?S('The north is warm again. Rest at a shrine or an inn when you are ready for the next part of the story.','Rest when you are ready for more story.')
       :G.choices.f_glaciar?S('The Crown of Dread is quiet. Night is coming to Hearthold.','The mountain is quiet. Night is coming.'):'',
     hint:()=>G.flags.f_done?S(`You did it, Ash. The north is warm again. When you're ready, the story goes east. I'll stay here, if you don't mind. I've had enough wind for one winter.`,`You did it! When you're ready, the story goes east.`):STORY.f_hints.f_glaciar,
     soFar:()=>G.flags.f_done?(G.choices.f_glaciar==='free'?S('Glaciar is free and herself again. She gave Ash the second Shard and told him the name of the one behind it all: Nyxara, the moon\'s old moth, who wants a night that never ends. That night the moon had another bite out of it.','Glaciar is free! She gave Ash Shard 2. The one behind it all is Nyxara, the moon\'s moth. The moon has another bite gone.')
       :S('Glaciar fell asleep under the snow, still chained. She gave Ash the second Shard and whispered a name: Nyxara, the moon\'s old moth. That night the moon had another bite out of it.','Glaciar sleeps under the snow. Ash has Shard 2. The name is Nyxara. The moon has another bite gone.'))
-      :S('At the top of Mount Dread, Glaciar lies bound in purple chains with the second Shard in her heart.','At the top of Mount Dread, Glaciar lies in purple chains. Shard 2 is in her heart.'),
-    mom:[S(`Tell your auntie I said hello. And to stop it with the snow.`,`Say hello to your auntie for me.`)],
+      :S('At the top of Mount Dread, an ice dragon lies bound in four purple chains, with the second Shard of the Ember Heart in her heart. She is dreaming the Long Winter.','At the top of Mount Dread, a dragon lies in purple chains. Shard 2 is in her heart.'),
+    mom:[S(`Is it over? Then come home and tell me everything. Slowly. From the beginning.`,`Is it over? Come home and tell me everything.`)],
     update(dt){ f2sGlaciarTick(dt); }}
 ]);
 // the whole act: Mom's snow letter plays when Act III starts (from Act II's "Continue the story", or a rest after it);
@@ -68670,12 +68683,14 @@ if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)) for(const id in
   const d=F2S_MAIL[id]; if(PEBBLE_MAIL.some(m=>m&&m.id===id)) continue;
   if(d.from!=='maren'&&PEBBLE_MAIL.some(m=>m&&m.from===d.from&&String(m.id).startsWith('f_pb'))) continue;
   PEBBLE_MAIL.push(Object.assign({id},d)); }
-// dreams: f_auntie (bible 6.14) and the optional f_lullaby (THREADS 12), added only when nobody has
+// dreams: f_auntie (bible 6.14) and the optional f_lullaby (THREADS 12), added only when nobody has. (v12) f_auntie plays
+// before the snow_mother solve, so the auntie in it is tall and cold and laughs like wind chimes, and is never seen whole
+// or called a dragon: that is the solve's to say.
 const F2S_DREAMS={
   f_auntie:{stages:['f_thaw','f_sky','f_gap'],title:S('Snowflakes with Auntie','Snowflakes with Auntie'),scene:'auntie',lines:()=>[
-    xl('narr',`You dream you're Ember, a girl with little red horns, on top of a white mountain. Beside you lies a huge, gentle ice dragon, curled up like a cat.`,`You dream you are young Ember on a white mountain. A big, gentle ice dragon lies beside you.`),
+    xl('narr',`You dream you're Ember, a girl with little red horns, at the top of a sledding hill. Your auntie sits beside you, so tall that the falling snow hides her face. She is cold to lean on. You don't mind.`,`You dream you are young Ember on a snowy hill. Your tall auntie sits by you. She is cold. You don't mind.`),
     xl('ember_kid',`Auntie, teach me to make a snowflake!`,`Auntie, teach me to make a snowflake!`),
-    xl('narr',`You breathe. Too hot. Every snowflake turns into a raindrop and plops on your nose. The dragon laughs. It sounds like wind chimes.`,`You breathe. Too hot! The snowflakes turn to raindrops. The dragon laughs like wind chimes.`),
+    xl('narr',`You breathe. Too hot. Every snowflake turns into a raindrop and plops on your nose. High above you, Auntie laughs. It sounds like wind chimes.`,`You breathe. Too hot! The snowflakes turn to raindrops. Auntie laughs like wind chimes.`),
     xc('ember_kid',`What do you do?`,`What do you do?`,[
       xo(`Make a snowflake together`,`Make one together`,{tone:'kind',fn:()=>{ G.flags.dr_f_auntie='flake'; },then:[xl('narr',`You breathe warm. She breathes cold. Between you, a perfect snowflake forms, as big as a shield, and floats away over the hills.`,`You breathe warm. She breathes cold. A huge, perfect snowflake floats away.`)]}),
       xo(`Have a snowball fight`,`Snowball fight!`,{tone:'silly',fn:()=>{ G.flags.dr_f_auntie='snowball'; },then:[xl('narr',`You throw a snowball. She throws one back. It is bigger than you are. She wins. Gently.`,`You throw a snowball. She throws one bigger than you. She wins. Gently.`)]}),
@@ -73505,9 +73520,7 @@ function m3pDataTalk(id){
     const a=actOf(G.stage); return (S10.talk[id]||[]).some(T=>!T.bark&&T._owner&&+T._owner.act===a&&s10TalkOk(T)); }catch(e){ return false; }
 }
 function m3pTalkOnce(key,lines,then){ if(G.seenTalk&&G.seenTalk[key]) return false; G.seenTalk=G.seenTalk||{}; G.seenTalk[key]=1; m3pSay(lines,then); return true; }
-const M3P_DELL1=[m3pL('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
-  m3pL('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),m3pL('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
-  m3pL('dell',`Oh, and my cousin Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went splash." That's it. That's the whole poem.`,`Wendel wrote a poem: "A dragon called Ash watched the moon go splash." That's all.`)];
+// (v12) Dell's old fourth-wall joke ("Three acts? What's an act?") is cut: Dell's Act IV talk is the story data's.
 const M3P_WREN=[m3pL('wren',`Ash! Look at me. Outside. On a raft. In the SEA. I've been sick four times and I've never been happier.`,`Ash! I'm outside! On a raft! I was sick four times. I'm so happy!`),
   m3pL('wren',`Elder Ripple of the merfolk keeps Old Lumen's records. I can read Lumen writing, you know. Badly. Very badly. Better than anyone else up here, which is nobody.`,`I can read Lumen writing. Badly. Better than anyone up here.`),
   m3pL('wren',`If you find anything with writing on it down there, bring it to me. Even if it's soggy. Especially if it's soggy.`,`Find anything with writing? Bring it. Even soggy. Especially soggy.`)];
@@ -73543,7 +73556,6 @@ onTalk(n=>{
     m3pSay(L); return true; }
   if(id==='dell'&&m3pIV()&&G.flags.m_landed){
     if(m3pPier()){ m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three, moored at the end of the world. I've never been so far from a lake.`,`Your mom climbed a staircase made of moonlight. I stayed with the sandwiches. Somebody had to.`,`When you come down off that mountain, I'll be right here. The kettle's on. It's always on.`]),`I'll wait here at the pier for you.`)]); return true; }
-    if(!G.seenTalk.m3p_dell1&&m3pR('m_drift')){ G.seenTalk.m3p_dell1=1; m3pSay(M3P_DELL1.slice()); return true; }
     m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three! Steam paddle, brass whistle, and a captain who has never once sunk her. It's been eleven days now.`,`Three days east and I still haven't sunk! Old Sal won't believe it.`,`Mags says the engine makes that noise on purpose. I've decided to believe her.`]),`My boat still floats! Eleven days!`),
       m3pL('dell',`If you want to sail home to Gearhaven, the boat's at the end of the dock. Just say.`,`Want to sail home? The boat's at the dock.`)]); return true; }
   if(id==='wren'&&m3pIV()&&m3pBoatIn()){
@@ -73748,9 +73760,9 @@ Object.defineProperty(STORY,'m_leash_reveal',{configurable:true,get(){ return [
   m3pDo(()=>{ G.flags.m_leash_known=1; }),
   m3pIf(()=>!G.flags.f_page11,'wren',`It's my lost page. The ELEVENTH page of the Wardens' book! Ember must have left a copy with her friends here. It's been under the sea for five hundred years!`,`It's the lost ELEVENTH page! It was under the sea for five hundred years!`),
   m3pIf(()=>!!G.flags.f_page11,'wren',`It's a copy of the eleventh page! Eider found the other one in Hearthold. Two page elevens. I'm going to frame one and sleep with the other.`,`Another eleventh page! Eider found one too. I'll frame one and hug the other.`),
-  m3pN(`"On the first Lantern Day, a little gray moth sat on Ember's lantern all night. Ember named her Nyx. We thought nothing of it." (Iska)`,`"A little gray moth sat on Ember's lantern all night. Ember named her Nyx." (Iska)`),
+  m3pN(`"On the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember gave her a name. We thought nothing of it." (Iska)`,`"A grey moth sat on Ember's lantern. Ember gave her a name." (Iska)`),
   m3pL('iska',`I wrote that. I really did think nothing of it. I was wrong.`,`I wrote that. I thought nothing of it. I was wrong.`),
-  m3pDo(()=>{ G.flags.m_page11=1; G.choices.extra=G.choices.extra||{}; G.choices.extra.m_leash=S(`Wren read the Book of Moths: gentle moonfire can melt a silver leash. And the eleventh page named a little moth Nyx.`,`Gentle moonfire can melt a leash. A little moth was called Nyx.`); })]; }});
+  m3pDo(()=>{ G.flags.m_page11=1; G.choices.extra=G.choices.extra||{}; G.choices.extra.m_leash=S(`Wren read the Book of Moths: gentle moonfire can melt a silver leash. And Iska's eleventh page was tucked in the back.`,`Gentle moonfire can melt a leash. Iska's page was in the back.`); })]; }});
 
 // ---------- 13. the places the side quests need (built after the map module's own build)
 // Sable's twelve lamps (m_lamps). Lit before the second eclipse; out after it until relit; lit for good once done.
@@ -74468,7 +74480,7 @@ const M3P_MAIL=[
     m3pL('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
     m3pL('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
     m3pL('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
-    m3pIf(()=>!!G.flags.dr_m_moth,'maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Unless they eat moons.`),
+    m3pIf(()=>!!G.flags.dr_m_moth,'maren',`P.S. Pebble says you were talking to a moth in your sleep. Very politely. Good.`,`P.S. You talked to a moth in your sleep. Very politely.`),
     m3pN(`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails west.`),
     m3pDo(()=>{ if(!G.flags.m_dell_away&&!m3pR('m_reforge')){ G.flags.m_dell_away=1; M3P.sig=''; } })]},
   {id:'m_pb_4',from:'yara',when:()=>m3pIV()&&m3pMoon()<=40&&!!G.flags.m_pb_2,lines:[
@@ -76985,7 +76997,7 @@ window.__ebX=Object.assign(window.__ebX||{},{m3Test,m3f:M3F_DBG});
 
 // ---------- 0. small helpers
 // (what other Act IV modules registered before this one loaded: their versions of these optional talks win)
-const M3S_PRE={wren:!!STORY.m_wren,dell1:!!STORY.m_dell1};
+const M3S_PRE={wren:!!STORY.m_wren};
 const M3S={q:[],rep:{},cam:null,ecl:null,peak:null,voy:null,forge:null,hushFx:null,hushRun:false,hushFin:null,introQ:false,boss:null,bt:0,fb:{},fbAt:{},grey:0,fadeTo:null,lights:[],standin:null,dbg:{}};
 const m3sEasy=()=>!!(G&&G.diff&&G.diff.name==='Easy');
 const m3sHard=()=>!!(G&&G.diff&&G.diff.name==='Hard');
@@ -77325,7 +77337,7 @@ m3sDef('m_winnie',[
   xl('m_winnie',`The tide follows the moon, dragon child. When the moon is round and fat, the tide is steady. When someone takes bites out of it...`,`The tide follows the moon, child. When someone bites the moon...`),
   xl('ash',`The tide goes wobbly.`,`The tide goes wobbly.`),
   xl('m_winnie',`Wobbly, he says! Ha! I like you. Yes. Wobbly. And it's happened before.`,`Wobbly! Ha! I like you. Yes. And it happened before.`),
-  xl('m_winnie',`Five hundred years ago that moth bit the moon for the very first time. The tide went mad. It rose up and up, and it swallowed a whole city. Old Lumen, the moon city. It stood out there.`,`Long ago, the moth bit the moon for the first time. The sea rose up and swallowed a city. Old Lumen, the moon city.`),
+  xl('m_winnie',`Five hundred years ago the Night Mother bit the moon for the very first time. A moth as big as the dark, my gran said. The tide went mad. It rose up and up, and it swallowed a whole city. Old Lumen, the moon city. It stood out there.`,`Long ago, the Night Mother bit the moon for the first time. The sea rose up and swallowed a city. Old Lumen, the moon city.`),
   xl('narr',`She points north. Out in the shoals, a slim white tower sticks up out of the sea, with a little balcony near the top.`,`She points north. A white tower sticks up out of the sea.`),
   xl('m_winnie',`The Lumen Spire. The rest of the city's underneath it. Drowned. The moon folk who lived there went into the sea and grew tails. Merfolk now. Lovely people. Never come up.`,`The Lumen Spire. The city is under it, drowned. Its people grew tails. Merfolk now.`),
   xl('m_winnie',`If anyone left a way to follow that moth east, it's down in that city. But you'd have to breathe water to get there.`,`The way east is down in that city. But you must breathe water to get there.`),
@@ -77340,12 +77352,6 @@ if(!M3S_PRE.wren) m3sDef('m_wren',[
   xl('wren',`Ash! Look at me. Outside. On a raft. In the SEA. I've been sick four times and I've never been happier.`,`Ash! Look at me! On a raft in the SEA! I was sick four times. I'm so happy.`),
   xl('wren',`Elder Ripple of the merfolk keeps Old Lumen's records. I can read Lumen writing, you know. Badly. Very badly. Better than anyone else up here, which is nobody.`,`The merfolk keep Old Lumen's books. I can read Lumen writing. Badly. Better than anyone else up here.`),
   xl('wren',`If you find anything with writing on it down there, bring it to me. Even if it's soggy. Especially if it's soggy.`,`If you find writing down there, bring it to me. Even if it's soggy.`)
-]);
-if(!STORY.m_dell1) m3sDef('m_dell1',[
-  xl('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
-  xl('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),
-  xl('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
-  xl('dell',`Oh, and my cousin Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went SPLASH." That's it. That's the whole poem.`,`Wendel wrote you a poem: "A dragon called Ash watched the moon go SPLASH." That's all of it.`)
 ]);
 // Chapter 2, Drowned Lumen (6.3, 6.4)
 m3sDef('m_lumen_channel',[xl('iska',`Deep water. Too deep to walk on. Is there anything up there you can swing to?`,`Deep water. Too deep to walk on. Is there something up there to swing to?`)]);
@@ -77433,7 +77439,7 @@ m3sDef('m_eclipse1',[
       xl('nyxara',`Brave. How lovely. Keep them warm for me, then. Everyone comes to me in the end.`,`Brave. How lovely. Keep them warm for me. Everyone comes to me in the end.`)]}),
     xo(`Why do you want the moon so much?`,`Why do you want the moon?`,{tone:'kind',fn:()=>{ G.choices.m_deal='ask'; },then:[
       xl('ash',`Why? Why do you want the moon so much?`,`Why do you want the moon so much?`),
-      xl('nyxara',`...Nobody has asked me that since a girl with horns.`,`Nobody asked me that since a girl with horns.`),
+      xl('nyxara',`...Nobody ever asks me that.`,`Nobody asks me that.`),
       xl('nyxara',`Because the moon leaves me, little ember. Every single morning. And one day it might not come back. If I hold it very tight, it can never go.`,`The moon leaves me every morning. One day it might not come back. If I hold it tight, it can never go.`),
       xl('narr',`For one second her voice sounds small. Then it's gone.`,`For one second her voice sounds small.`),
       xl('ash',`That's sad. It's still not a reason to eat it.`,`That's sad. But you still can't eat it.`),
@@ -77484,7 +77490,7 @@ const M3S_PB3=[
   xl('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
   xl('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
   xl('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Love, Mom.`),
-  m3sIf('maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,()=>!!G.flags.dr_m_moth),
+  m3sIf('maren',`P.S. Pebble says you were talking to a moth in your sleep. Very politely. Good.`,`P.S. You talked to a moth in your sleep. Very politely.`,()=>!!G.flags.dr_m_moth),
   xl('narr',`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails off west.`)];
 // the Mirror Flats and the Moonpath (6.8b, 6.9b)
 m3sDef('m_moonpath',[
@@ -77598,8 +77604,8 @@ m3sDef('m_peak',[
   xl('iska',`And with one more lantern than you think you need. Always.`,`And with one more lantern than you need. Always.`),
   xdo(()=>{ G.flags.m_done=1; G.tod=0.02; })
 ]);
-// on the pier afterwards: Mom (and the star-iron, the Fallen Star secret)
-STORY.m_pier_mom=[xl('maren',`Sit down a minute. Have a sandwich. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Have a sandwich first. The bridge will wait.`)];
+// on the pier afterwards: the star-iron (the Fallen Star secret), Mom's own business. (v12: the old pier sandwich line
+// for Mom is gone: her Act IV talk on the pier is the story data's, so this file's talk hook never played it)
 STORY.m_stariron=[
   xl('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Give it here. Your sword will never be the same!`),
   xl('narr',`CLANG. CLANG. Mom folds the star-iron into your blade. It hums like a struck bell.`,`CLANG! Mom puts the star-iron in your sword. It hums.`),
@@ -77714,8 +77720,8 @@ m3sDef('m_mirror_in',[
 m3sDef('m_mirror_shrine',[
   xl('ember',`Hello, Ash. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.`,`Hello, Ash. This is my last flame. My fire, mixed with moonlight.`),
   xl('ash',`What's it for?`,`What's it for?`),
-  xl('ember',`For her. For my little moth. In case she ever went wrong.`,`For my little moth. In case she went wrong.`),
-  xl('ash',`Your moth?`,`Your moth?`),
+  xl('ember',`For someone I loved. In case she ever got lost in the dark.`,`For someone I loved. In case she got lost.`),
+  xl('ash',`Who?`,`Who?`),
   xl('ember',`Take it, Ash. And if you ever meet her, be gentler than I was.`,`Take it. If you meet her, be gentler than me.`)
 ]);
 m3sDef('m_mirror_gift',[
@@ -77752,7 +77758,7 @@ m3sDef('m_mirror_won',[
 // Nyxara's voice through every mirror at once (6.9): plays straight after the peacock's outro
 m3sDef('m_mirror_voice',[
   xl('narr',`Every mirror in the temple goes dark at once. In each one, a pair of white eyes opens.`,`Every mirror goes dark. In each one, two white eyes open.`),
-  xl('nyxara',`Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, once, long ago. It hurt very much.`,`Moonfire. You found Ember's moonfire. Her priests burned me with it once. It hurt.`),
+  xl('nyxara',`Moonfire. Oh, little ember. Lumen's priests burned me with that, long ago. It hurt very much.`,`Moonfire. The priests burned me with it once. It hurt.`),
   xl('nyxara',`Mend it, little ember. Then give it to me. You will want to, at the end.`,`Mend it. Then give it to me. You will want to.`),
   xl('ash',`I won't.`,`I won't.`),
   xl('nyxara',`Everyone does.`,`Everyone does.`),
@@ -78622,7 +78628,7 @@ function m3sPeople(){
 // the merfolk stand-ins inside Coralcombe, when the village is built but its people are not
 { const base=areaNPCs; areaNPCs=function(){ base(); try{ const A=AREA; if(A&&A.id==='m_coralcombe') for(const id of ['m_coralia','m_kipper']) if(M3S.fb[id]&&SPECIAL[id]&&!A.npcs.some(n=>n.id===id)){
   const R=A.rooms&&Object.values(A.rooms).find(r=>r.kind==='start'), x=R?R.cx+(id==='m_kipper'?96:0):player.x+(id==='m_kipper'?96:0), y=R?R.cy-70:player.y-90; const n=mkNPC(SPECIAL[id],x,y); n.walker=false; A.npcs.push(n); } }catch(e){ console.error(e); } }; }
-// small talks outside the stage hooks: Wren and Dell in Driftwood, Mom (and the star-iron) and Quill on the pier
+// small talks outside the stage hooks: Wren in Driftwood, the star-iron and Quill on the pier
 onTalk(n=>{
   if(!G||G.mode!=='story'||G.done||curMap()!==3) return false;
   const a=actOf(G.stage); if(a!==4&&a!==5) return false;
@@ -78631,8 +78637,7 @@ onTalk(n=>{
   if(n.id==='maren'&&F.m_maren&&G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; }
   if(typeof m3pDataTalk==='function'&&m3pDataTalk(n.id)) return false;
   if(n.id==='wren'&&!M3S_PRE.wren&&a===4&&!m3sSeen('m_wren')&&!G.items.m_book_raw){ m3sPlay('m_wren'); return true; }
-  if(n.id==='dell'&&!M3S_PRE.dell1&&a===4&&!m3sSeen('m_dell1')&&reached('m_drift')&&!F.m_reforged){ m3sPlay('m_dell1'); return true; }
-  if(n.id==='maren'&&F.m_maren){ if(G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; } if(F.m_done&&a===4){ m3sPlay('m_pier_mom'); return true; } }
+  if(n.id==='maren'&&F.m_maren&&G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; }
   if(n.id==='quill'&&F.m_maren&&a===4){ m3sPlay([xl('quill',`I'm measuring the peak. I've started over four times, and it's taller every time.`,`The mountain keeps getting taller than my numbers!`)]); return true; }
   return false;
 });
@@ -78755,18 +78760,20 @@ if(typeof pebbleLetter==='function'){
 if(typeof defineDream==='function'&&typeof DREAMS!=='undefined'){
   // v11: part two of the first Lantern Day memory (part one is a1l_story2.js, the 'lantern' dream: a little grey moth
   // lands on the extra lantern). Years later, grown-up Ember doesn't climb the hill, and the moth waits.
+  // (v12) the waiting moth is the hint; her two pale moons and her name are Act V's (REVEAL_PLAN secret 13): she is a
+  // little grey moth, Ember gives her a name that the dream's wind takes, and in the morning she just flies away
   if(!DREAMS.m_moth) defineDream('m_moth',{stages:['m_coral','m_reef'],title:S('The Moth on the Lantern','The Moth on the Lantern'),scene:'moth',lines:()=>[
-    xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth with two pale moons on her wings is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
+    xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
     xl('ember_kid',`You came back! If you're going to keep coming back, you need a name.`,`You came back! You need a name.`),
     xc('narr',`She shivers on the cold post.`,`She shivers on the cold post.`,[
-      xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. I'll call you Nyx, because you come in the night.`,`Sit on mine. I will call you Nyx.`)]}),
-      xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. I'll call you Nyx.`,`Your own lantern! I will call you Nyx.`)]}),
-      xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. I'll call you Nyx.`,`Careful, it's hot! Fine. Sit here. I will call you Nyx.`)]})]),
-    xl('narr',`Every Lantern Day after that, Nyx is waiting on the hill. Ember grows taller every year. Nyx stays exactly the same size.`,`Every year, Nyx waits on the hill. Ember grows up.`),
+      xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. Now, a name. A night sort of name, because you come in the night.`,`Sit on mine. Now, a name for you.`)]}),
+      xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. And now your own name.`,`Your own lantern! And your own name.`)]}),
+      xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. And you can have a name.`,`Careful, it's hot! Fine. Sit here. You can have a name.`)]})]),
+    xl('narr',`You whisper her a name. In the dream the wind takes it, the way names go in dreams.`,`You give her a name. The wind takes it.`),
+    xl('narr',`Every Lantern Day after that, the little moth is waiting on the hill. Ember grows taller every year. The moth stays exactly the same size.`,`Every year, the little moth waits on the hill. Ember grows up.`),
     xl('narr',`Then one year Ember has a baby on her hip and a house full of lanterns. She lights them in her own windows, down in the valley, and she doesn't climb the hill.`,`One year Ember has a baby. She lights lanterns at home. She doesn't climb the hill.`),
-    xl('narr',`Up on the hill, a little grey moth sits on a cold lantern post all night, facing the valley.`,`On the hill, Nyx waits all night by a cold lantern post.`),
-    xl('narr',`In the morning she flies up toward the setting moon, looking back three times.`,`In the morning she flies to the moon. She looks back three times.`),
-    xl('narr',`She waits the next year, too. And the next.`,`She waits the next year too. And the next.`)]});
+    xl('narr',`Up on the hill, a little grey moth sits on a cold lantern post all night, facing the valley.`,`On the hill, the moth waits all night by a cold lantern post.`),
+    xl('narr',`In the morning she flies off into the grey, looking back three times. She waits the next year, too. And the next.`,`In the morning she flies away. She looks back three times. She waits the next year too.`)]});
   if(!DREAMS.m_eclipse) defineDream('m_eclipse',{stages:['m_sable','m_burrows'],title:S('The Night Without Morning','No Morning'),scene:'eclipse',lines:()=>[
     xl('narr',`You dream of a world where the sun never comes up. Not dark. Just grey. The moon is gone. Even the stars look tired.`,`In your dream, the sun never comes up. The moon is gone.`),
     xl('narr',`On the hill above Emberhollow, a girl with horns sits alone, holding a lantern that has gone out.`,`Young Ember sits alone with a lantern that went out.`),
@@ -96846,6 +96853,9 @@ act({
                                   { if: '!item f3_scarf', then: ['give f3_scarf'] }] },
     { if: 'stage>=f_gap', then: ['clue f3_climbers'] },
     { if: 'stage>=f_dread', then: ['clue f3_gate_carving', 'clue f3_drum_seen', 'solve how_open', 'clue f3_the_mother', 'clue f3_hush_friend'] },
+    // (v12, last so the entries above keep their places: the engine remembers each by its index) Hush names herself on
+    // the Drum Stone (f_drum); a save already past the drum knows her name
+    { if: 'flag f_drum', then: ['set f3_hush_named'] },
   ],
 
   gates_min: 5,
@@ -97022,7 +97032,8 @@ chapter({
     ],
     f_dread_nursery: [
       ['narr', 'A tiny round room with a nest of frost and very old toys: giant ice knitting needles, a snowglobe, and a carving of two baby dragons. One is breathing fire on the other one\'s tail. The other is crying icicles.', 'Old toys, and a carving of two baby dragons: one fire, one ice.', { clue: 'f3_nursery' }],
-      ['tove', 'Siblings. One of them grew up and burned a valley. The other one grew up and slept.', 'One grew up and burned a valley. One grew up and slept.'],
+      // (v12) a look, not the answer: the snow_mother solve is where "dragon", "Glaciar" and "Grandpa's sister" meet
+      ['tove', 'Two little dragons. A fire one and an ice one. Somebody loved them both, once.', 'A fire one and an ice one. Somebody loved them.'],
     ],
     f_dread_stair: [
       ['tove', 'Last room. Then her. Are you scared?', 'Last room. Then her. Are you scared?'],
@@ -97057,6 +97068,7 @@ chapter({
 // camera goes up: a stone drum with a ram's face on the shoulder, audit finding 5). With Pennant's clue (the monks
 // rode the wind up and knocked) he works out in the Case Book how the gate opens. He names the vent's ribbon the Drum
 // Wind (finding 6), rides it up, Ground Pounds the drum: BOOOOOM, the lock cracks, and Hush unfolds off the mountain.
+// (v12) She names herself ("I am Hush. Her quiet one.": her speaker label is "A white moth" until then, x2_foes).
 // Hush says the Mother is resting, and the Mother's NEW friend is resting, up on top (the two clues the snow_mother
 // question needs), and (v11) why she froze Rimeholm: its bell. "Bells mean morning. The Mother hates morning." The fight
 // on the plaza is code (x2_foes). After it Hush shrinks to a tiny shivering moth: Ash gives her Ylva's long scarf, or
@@ -97084,7 +97096,7 @@ chapter({
     f3_drum_wind: { map: 2, at: [8800, 44450], r: 150, kind: 'spot', name: 'the Drum Wind' },
     // Hush unfolding from the mountainside next to the drum (a look, v10_art3b.js; nothing is drawn until the drum
     // scene sets it to unfold, and it is gone again when she glides down)
-    f3_hush_rise: { map: 2, at: [8290, 43480], kind: 'prop', look: 'hush_rise', name: 'Hush' },
+    f3_hush_rise: { map: 2, at: [8290, 43480], kind: 'prop', look: 'hush_rise', name: 'a great white moth' },
     // the tiny Hush after the fight, in the snow in the middle of the plaza (look hush_small: fallen, scarf, away)
     f3_hush_small: { map: 2, at: [7300, 44330], kind: 'prop', look: 'hush_small', name: 'a little white moth' },
   },
@@ -97130,7 +97142,7 @@ chapter({
         { do: 'examine f3_frost_lock', scene: 'f3_look_lock', then: ['clue f3_gate_carving', 'clue f3_lock_sweats'] },
         { do: 'examine f3_drum_look', scene: 'f3_look_drum', then: ['clue f3_drum_seen'] },
       ] },
-    // (Mom's letter, "you are about to climb a mountain to visit your AUNT", comes once he knows he is going up)
+    // (Mom's letter, "Pebble says you're going up a mountain to knock on it", comes once he knows he is going up)
     { id: 'deduce', do: 'deduce how_open', scene: 'f3_how_solved', migrate_if: 'flag f_drum', then: ['mail f_pb_3'],
       obj: ['How does the Dreadgate open? Work it out in the Case Book', 'Open the Case Book'],
       hint: ['The carving on the lock, the drum up high, and what Brother Pennant said the monks did every spring. Open the Case Book.', 'Open the Case Book.'],
@@ -97185,8 +97197,10 @@ chapter({
       ['narr', 'The sound rolls down the mountain like a wave. Snow jumps off every rock. Far below, a long crack runs across the Frost Lock.', 'The sound rolls down the mountain. Far below, the lock cracks.', { ref: 'f_lm_dreadlock' }],
       ['narr', 'Then something white unfolds from the mountainside beside you: two wings with purple eyes painted on them, and two real eyes in the middle, blinking at you.', 'Something white unfolds: wings with painted eyes, and two real eyes.', { do: ['world f3_hush_rise unfold'] }],
       ['f_hush', "Shhh. Loud one. You'll wake her.", "Shhh. Loud one. You'll wake her."],
-      ['f_hush', 'The Mother is resting.', 'The Mother is resting.', { clue: 'f3_the_mother' }],
-      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend' }],
+      // (v12) she names herself here, the first time anyone does: her label is "A white moth" up to this line, and
+      // "Hush" from the next one (a line's `do` runs as the line comes up, so the flag is on the line after)
+      ['f_hush', 'I am Hush. Her quiet one. The Mother is resting.', 'I am Hush. The Mother is resting.', { clue: 'f3_the_mother' }],
+      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend', do: ['set f3_hush_named'] }],
       ['ash', 'It was you in Rimeholm. You froze a whole village!', 'It was you! You froze Rimeholm!', { ref: 'f_rimeholm' }],
       ['f_hush', 'Their bell was loud. Bells mean morning. The Mother hates morning.', 'Bells mean morning. The Mother hates morning.', { ref: 'f_lm_bell' }],
       ['ash', 'Good. I like mornings.', 'Good. I like mornings.'],
@@ -97302,7 +97316,8 @@ chapter({
 }catch(e){ if(window.__ebStoryLoadErr) window.__ebStoryLoadErr("game/story/act3/f_gap.js",e); else console.error(e); }
 
 ;window.__ebStoryFile="game/story/act3/f_glaciar.js";try{
-// Act III, Final Chapter: Auntie (owner A3b). Data only.
+// Act III, Final Chapter: The Crown of Dread (owner A3b; v12: the card no longer says "Auntie", which this chapter's
+// own question answers). Data only.
 // What the player does: on the Crown of Dread, before he goes to her, Ash answers the act's last question in the Case
 // Book: who is the Snow Mother of Hearthold's song? Not the moths' Mother (Hush called the dragon the Mother's NEW
 // friend), but Glaciar herself: Ember's Auntie Glee, who lit the Great Hearth with her and did the cold parts. Then the
@@ -97323,7 +97338,7 @@ chapter({
 // leaves in the cold (the finale's echo answers it).
 chapter({
   id: 'f_glaciar', act: 3, after: 'f_dread', next: 'm_sail', takeover: true,
-  card: ['Act III · Final Chapter', 'Auntie'],
+  card: ['Act III · Final Chapter', 'The Crown of Dread'],
   so_far: [
     'At the top of Mount Dread, an ice dragon lies bound in four purple chains, with the second Shard of the Ember Heart in her heart. She is dreaming the Long Winter.',
     'At the top of Mount Dread, a dragon lies in purple chains. Shard 2 is in her heart.'],
@@ -97339,14 +97354,15 @@ chapter({
     // Glaciar coiled round the spike under the spell, from the summit door until the fight's own figure comes out
     // (look glaciar_coil, v10_art3b.js: x2_story's own drawing of her; state blink shows her blue eyes for a moment).
     // After the fight x2_story draws her itself, awake or asleep by G.choices.f_glaciar.
-    f3_glaciar_coil: { map: 2, at: [7300, 41290], kind: 'prop', look: 'glaciar_coil', if: 'stage>=f_dread !flag f_glaciar_won', name: 'Glaciar' },
+    f3_glaciar_coil: { map: 2, at: [7300, 41290], kind: 'prop', look: 'glaciar_coil', if: 'stage>=f_dread !flag f_glaciar_won', name: 'the dragon in chains' },
     // in front of Glaciar's coils (x2_story draws her round the spike at the Crown's middle)
-    f3_auntie: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=free !flag f_done', h: 110,
+    // (v12) her prompts name her, so they wait for the snow_mother solve (the talk step waits for it too)
+    f3_auntie: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=free !flag f_done solved snow_mother', h: 110,
                  name: 'Auntie Glee', prompt: ['Talk to Auntie Glee', 'Talk to Auntie'] },
-    f3_auntie_asleep: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=defeat !flag f_done', h: 60,
+    f3_auntie_asleep: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=defeat !flag f_done solved snow_mother', h: 60,
                         name: 'the sleeping dragon', prompt: ['Kneel by Auntie Glee', 'Kneel by Auntie'] },
     // where the camera looks when she talks (her head is drawn high above the coils, north of the Crown's middle)
-    f3_glaciar_face: { map: 2, at: [7270, 41150], kind: 'npc_spot', name: 'Glaciar' },
+    f3_glaciar_face: { map: 2, at: [7270, 41150], kind: 'npc_spot', name: "the dragon's head" },
     // the night in Hearthold: Ash comes home down the main street (level 0, below the Hearth's steps) and walks up to
     // the Great Hearth (a scene's fade would stay dark while the scene is up, so the warp happens before it, in play)
     f3_walk_home: { map: 2, at: [6800, 49280], kind: 'npc_spot', name: 'Hearthold\'s main street' },
@@ -97674,8 +97690,8 @@ chapter({
     f_brynja: [
       ['narr', 'In the middle of town stands the Great Hearth, a fireplace you could drive a cart into. Its fire is a tiny orange flicker, like a candle at the bottom of a well.',
         'The Great Hearth is huge. Its fire is a tiny flicker.'],
-      ['f_brynja', "There, there, old girl. Somebody's come to see you. ...So you're the Emberblood Brann keeps shouting about. Closer. Skinny. Your mother doesn't feed you.",
-        "There, there, old girl. You're the Emberblood? Skinny! Your mom doesn't feed you."],
+      ['f_brynja', "There, there, old girl. Somebody's come to see you. ...So you're the horned boy Brann keeps shouting about. Closer. Skinny. Your mother doesn't feed you.",
+        "You're the horned boy? Skinny! Your mom doesn't feed you."],
       ['ash', 'She feeds me so much.'],
       ['f_brynja', "I'm Brynja, Hearthkeeper. Seventy years I've kept this fire, and my mother before me, all the way back to the night it was lit.",
         "I'm Brynja. I have kept this fire for 70 years. My mother did too."],
@@ -97736,7 +97752,7 @@ chapter({
     f_brann: [
       { if: 'stage=f_hearth choice f3_moth=moth', say: ["Who goes... oh. It's the moth. I mean the dragon. I mean... carry on. The Hearthkeeper's at the Great Hearth.",
         "Oh. It's the moth. I mean the dragon. Carry on."] },
-      { if: 'stage=f_hearth', say: ['The Hearthkeeper is at the Great Hearth, Emberblood. Middle of town. Follow the warm.',
+      { if: 'stage=f_hearth', say: ['The Hearthkeeper is at the Great Hearth, Horns. Middle of town. Follow the warm.',
         'The Hearthkeeper is at the Great Hearth.'] },
     ],
   },
@@ -97814,7 +97830,7 @@ chapter({
         ['f_brann', "It's that moth making all this snow. The big white one. Not you, moth-dragon. I'd bet my boots on it.", "It's that big white moth making the snow. Not you. I'd bet my boots!",
           { clue: 'f3_brann_bet' }]],
         else: [
-        ['f_brann', "It's that moth making all this snow, Emberblood. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",
+        ['f_brann', "It's that moth making all this snow, Horns. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",
           { clue: 'f3_brann_bet' }]] },
       ['f_brynja', 'Rimeholm went quiet the night the moth came over. Not one letter since. Go and see, child. Out the West Gate and along the Rim Road, on the sea cliffs.',
         'Rimeholm went quiet when the moth came. Go and see. It is on the sea cliffs.', { promise: 'f_rimeholm', dir: ['f_hearthold', 'f_rimeholm', 'west'] }],
@@ -97838,8 +97854,9 @@ chapter({
 // Glacier Maze (the dungeon stays code, x2_dun_a.js). Inside, Ember's shrine says she built the forge "with my auntie.
 // She did the cold parts." (a clue for the act's last question: who is the Snow Mother?), Ember's Ice Diary names her
 // Auntie Glee, and Old Bellows remembers "Ember and the Cold One" (bonus clues). Blaze Breath is Ember's gift.
-// (v11) This forge is the one place Ember speaks in Act III: it is hers and her auntie's. Ash learns here that Grandpa
-// had a sister; that the sister is the dragon on the mountain is still the player's to work out (snow_mother).
+// (v11) This forge is the one place Ember speaks in Act III: it is hers and her auntie's. (v12) Ash learns here that
+// Ember had an auntie who liked the cold, and no more: whose sister she was, and that she is the dragon on the
+// mountain, are still the player's to work out (snow_mother).
 // The dungeon's own lines below are old STORY keys: x2_dun_a plays them by key, and the engine puts this text into
 // the same arrays (f_maze_how and f_maze_bossline are one-line tips, still x2_story's).
 // Old flags kept: trial_f_maze_done (the dungeon's altar), f_icediary; the stage moves on to f_kindle.
@@ -97919,9 +97936,9 @@ chapter({
       ['ash', 'Ember! What is this place?', 'Ember! What is this place?'],
       ['ember', 'My forge. I built it with my auntie, a long, long time ago. She did the cold parts. I did the hot parts. We were a very good team.',
         'I built this forge with my auntie. She did the cold parts. I did the hot parts.', { clue: 'f3_cold_parts' }],
-      ['ash', 'Your auntie? Grandpa had a sister?', 'Grandpa had a sister?'],
-      ['ember', "He did. They stopped speaking long before I was grown. I never asked her why. I wish I had.",
-        'He did. They stopped talking. I never asked why.'],
+      ['ash', 'Your auntie? Who was she?', 'Who was she?'],
+      ['ember', "Somebody who liked the cold, and liked me. We stopped seeing each other long before I was grown. I never asked her why. I wish I had.",
+        'Someone who liked the cold. And me. I wish I had asked her more.'],
       ['ember', 'I left a little of my hottest fire here. The blue kind. For a day when the cold got too big. I think that day is today.',
         'I left my hottest fire here. The blue kind. For a day like today.'],
     ],
@@ -97984,7 +98001,7 @@ chapter({
         say: ["The Glacier Maze? Listen, moth. Dragon. Whatever you are. The North Gate's frozen. Go round: out the West Gate, over the Whitewater, then up the river onto the ice.",
           'Listen, moth. Dragon. The North Gate is frozen. Go round by the West Gate and the river.'] },
       { if: 'stage=f_maze !flag f_northgate', fact: 'f_lm_northgate=frozen',
-        say: ["North Gate's frozen solid, Emberblood. Go round: out the West Gate, over the Whitewater, then follow the river up onto the ice. The Glacier Maze is where the ice meets the lake.",
+        say: ["North Gate's frozen solid, Horns. Go round: out the West Gate, over the Whitewater, then follow the river up onto the ice. The Glacier Maze is where the ice meets the lake.",
           'The North Gate is frozen. Go round by the West Gate and the river.'] },
     ],
     f_brynja: [
@@ -98123,8 +98140,8 @@ chapter({
       ] },
       ['f_brann', "...Moths don't have horns, though. Or tails. Is that smoke coming out of your nose?", "Moths don't have horns. Is that smoke from your nose?"],
       ['ash', 'Only when I sneeze.'],
-      ['f_brann', "An Emberblood! A real one, like in the old songs! Sorry about the spear. We're jumpy. See that guard out on the road? He froze on watch, and he's still on watch.",
-        "An Emberblood! Sorry about the spear. That frozen guard is still on watch.", { ref: 'f_guard_ice' }],
+      ['f_brann', "Horns! And a tail! You look just like the horned girl on the Hearth stones! Sorry about the spear. We're jumpy. See that guard out on the road? He froze on watch, and he's still on watch.",
+        "Horns! Like the girl on the Hearth stones! That frozen guard is still on watch.", { ref: 'f_guard_ice' }],
       ['narr', 'He lifts his spear out of the gap. The gap is exactly as wide as a kid with a tail.', 'He lifts his spear out of the gap in the wall.', { ref: 'f3_west_gate' }],
       ['f_brann', "Welcome to Hearthold, the last warm town in the north! See the Hearthkeeper at the Great Hearth. She's been waiting a month for someone like you, and telling the whole town so.",
         'Welcome to Hearthold! See the Hearthkeeper at the Great Hearth. She has waited a month.', { promise: 'f_brynja' }],
@@ -98227,7 +98244,7 @@ chapter({
     ],
     f_sky_shrine: [
       ['narr', 'A small flame burns in a stone bowl, leaning sideways in the wind. It smells like Ember\'s forge.', 'A small flame leans in the wind. It smells like Ember.'],
-      ['f_pennant', '(through the window, on his kite) That\'s her flame! The one Ember left us! The brothers lit the morning candles from it for a thousand years.',
+      ['f_pennant', '(through the window, on his kite) That\'s her flame! The one Ember left us! The brothers lit the morning candles from it, every morning since.',
         '(outside) That is Ember\'s flame! The monks kept it lit.'],
       ['ash', 'I\'m a little afraid of heights.', 'I\'m a little afraid of heights.'],
       ['f_pennant', '(from outside) So am I! Why do you think I\'m tied to a kite? Touch the flame. The wind will do the rest.', '(outside) So am I! Touch the flame.'],
@@ -98639,8 +98656,8 @@ places({
       text: ["A stone from under the ice at Tove's statue: TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW.",
         'TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW.'] },
     f3_iska_page: { icon: 'book', mystery: 'long_winter',
-      text: ["Iska's copy of the Wardens' eleventh page: on the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember named her Nyx.",
-        "A grey moth sat on Ember's lantern. Ember named her Nyx."] },
+      text: ["Iska's copy of the Wardens' eleventh page: on the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember gave her a name.",
+        "A grey moth sat on Ember's lantern. Ember gave her a name."] },
   },
 
   place: {
@@ -98704,7 +98721,7 @@ places({
       ['narr', '"TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW."', '"TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW."'],
       ['tove', 'Auntie G. She let me ride on her tail when it snowed. I was nine.', 'Auntie G. I rode on her tail once.'],
       ['ash', 'Who is Auntie G?'],
-      ['tove', "Ember's auntie. Big. White. Laughed like wind chimes. Then one day we needed her, and she stayed asleep on her mountain. That's all I'm saying.",
+      ['tove', "Ember's auntie. Laughed like wind chimes. Then one day we needed her, and she slept through it. That's all I'm saying.",
         "Ember's auntie. When we needed her, she slept. That's all."],
     ],
     a3g_eggs: [
@@ -98717,9 +98734,9 @@ places({
     a3g_iska: [
       ['narr', 'Under the broken flagstone: a little stone box, sealed with wax in the shape of a lantern.', 'A little stone box, sealed with a lantern.'],
       ['narr', "Inside, a page copied out in Iska's careful hand. At the top it says: ELEVEN.", 'A page in Iska\'s writing. It says ELEVEN.'],
-      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx. We thought nothing of it."',
-        '"A grey moth sat on Ember\'s lantern. Ember named her Nyx."'],
-      ['ash', 'Nyx. Ember gave her a NAME.', 'Ember gave her a name.'],
+      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember gave her a name. We thought nothing of it."',
+        '"A grey moth sat on Ember\'s lantern. Ember gave her a name."'],
+      ['ash', "Ember gave a moth a NAME. Iska didn't write it down.", "Ember named a moth. Iska didn't write it down."],
     ],
     a3g_bun: [
       ['narr', 'KA-BOOM. Frozen crumbs rain down all over Emberhollow. Inside the bun, something glows.', 'KA-BOOM! Crumbs everywhere. Something glows!'],
@@ -98964,7 +98981,7 @@ people({
       // the lit Hearth, for the days in between
       { if: 'flag f_hearth_lit', fact: 'f3s_hearth=blue',
         say: [["Look at her. Blue and gold. She hasn't burned like this since I was a girl. I keep laughing at nothing.", 'Look at her. Blue and gold! I keep laughing.'],
-          ["Don't touch the Hearth with your bare claws. Oh, you're an Emberblood. Touch away.", "Don't touch the fire. Oh, you're a dragon. Go on."]] },
+          ["Don't touch the Hearth with your bare claws. Oh, you're the fire one. Touch away.", "Don't touch the fire. Oh, you're the fire one. Go on."]] },
       // topics
       { ask: ['How long have you kept the fire?', 'How long have you kept it?'],
         say: ['Seventy years, and my mother before me, all the way back to the night it was lit. It went out once. I was nine. There was a sneeze.', 'Seventy years. It went out once. I was nine. I sneezed.'] },
@@ -98979,8 +98996,8 @@ people({
     ],
 
     // ---------------------------------------------------------------- Captain Brann Stoutmitt, the Hearthwardens
-    // Loud, brave and terrified of moths; shouts in exclamation marks, not capitals. Calls Ash "Emberblood" (or moth, if
-    // Ash said he was one at the West Gate: G.choices.f3_moth). His grief is Sir Knut's patrol, six blue plumes who never
+    // Loud, brave and terrified of moths; shouts in exclamation marks, not capitals. Calls Ash "Horns" (or moth, if
+    // Ash said he was one at the West Gate: G.choices.f3_moth). (v12) Never "Emberblood": nobody up here knows the word. His grief is Sir Knut's patrol, six blue plumes who never
     // came home (the small mystery what_knights). The chapters own his lines at f_pass, f_hearth and f_maze.
     f_brann: [
       // the small mystery what_knights: Brann's missing patrol (clue f3_brann_list); x2_people's own "Is anyone missing?"
@@ -99064,7 +99081,7 @@ people({
         ] },
       // his moment (the old chat): while the white moth is still about
       { if: 'stage>=f_thaw !flag f_hush_done', fact: 'f3s_hush=loose',
-        say: ['Question, Emberblood! Between Hearthwardens! If a moth landed on your nose, what would you do?', 'A moth lands on your nose. What do you do?'],
+        say: ['Question, Horns! Between Hearthwardens! If a moth landed on your nose, what would you do?', 'A moth lands on your nose. What do you do?'],
         re: [
           { t: ['Blow on it, gently, till it goes.', 'Blow on it gently.'], f: 0.5,
             say: [['f_brann', 'Gently! Of course! That is exactly what I would do! After the screaming!', 'Gently! Yes! After the screaming.']] },
@@ -99094,7 +99111,7 @@ people({
         say: ['When I was a boy a moth flew into my ear. I heard it flapping for a week. A whole week! I have never been the same!', 'A moth flew in my ear once. It flapped for a week!'] },
       { ask: ['Has Sir Knut ever sent word?', 'Has Knut sent word?'], if: 'clue f3_brann_list !solved what_knights',
         say: ['Not one word! A Hearthwarden always writes! Knut writes the way a hen walks, but he writes!', 'Not a word! Knut always writes. Badly, but he writes.'] },
-      { idle: [['Report, Emberblood!', 'Report!'], ['Chin up! What is it?', 'Chin up! What is it?']] },
+      { idle: [['Report, Horns!', 'Report!'], ['Chin up! What is it?', 'Chin up! What is it?']] },
       { bye: [['Dismissed! Mind the moths!', 'Mind the moths!'], ['Off you go! Chin up, tail up!', 'Chin up, tail up!']] },
       { bark: true, if: '!flag f_hush_done', fact: 'f3s_hush=loose', say: ["Is that flapping in my helmet? No! It's my heart! Beating bravely!", "Something's flapping! Oh. It's my heart."] },
       { bark: true, say: ["Hearthwardens! Stand up straight! ...Gunnar, that's a snowman.", "Stand up straight! Gunnar, that's a snowman."] },
@@ -99149,7 +99166,7 @@ people({
     f_toastwhistle: [
       // her first meeting (before her quest; Brann's shouting got there first)
       { if: '!quest f_warm started stage<f_kindle', once: true,
-        say: ["You must be the Emberblood! Brann has told the whole town. Twice. I'm Mayor Toastwhistle, and everything is fine.", "You're the Emberblood! I'm the Mayor. All is fine."],
+        say: ["You must be the horned boy! Brann has told the whole town. Twice. I'm Mayor Toastwhistle, and everything is fine.", "You're the horned boy! I'm the Mayor. All is fine."],
         re: [
           { t: ['Is everything fine?', 'Is everything fine?'],
             say: [['f_toastwhistle', 'Yes! No. The Hearth is going out and the town is freezing. Apart from that, fine.', 'Yes! No. The fire is going out. Apart from that, fine.']] },
@@ -99272,7 +99289,7 @@ people({
             say: [['f_gunnhild', 'Maren makes soup? Maren of Emberhollow has a soft side? Don\'t tell me any more. I\'ll faint into the coals.', 'Maren makes soup? Stop. I will faint.']] },
         ] },
       { if: 'quest f_forge active !flag f_forge_lit', fact: 'f3s_forge=cold',
-        say: ["Cold anvil, cold hammer. Breathe on that forge, Emberblood. Blue, mind. Orange won't wake her.", 'Breathe blue on my forge. Orange will not do.'], ref: 'f3s_forge' },
+        say: ["Cold anvil, cold hammer. Breathe on that forge, lad. Blue, mind. Orange won't wake her.", 'Breathe blue on my forge. Orange will not do.'], ref: 'f3s_forge' },
       { if: 'flag f_done',
         say: ['Every smith in Hearthold has been round to look at my forge. I let them look. I don\'t let them touch.', 'Every smith came to see my forge. No touching.'],
         re: [
@@ -99375,12 +99392,12 @@ people({
     f_hilde: [
       // her first meeting (Brann's shouting got here first)
       { if: 'stage<f_thaw', once: true,
-        say: ["Come in from the cold, lamb! You're the Emberblood Brann keeps shouting about. Sit. Soup. Mind the cat.", 'Come in, lamb! Sit. Soup. Mind the cat.'],
+        say: ["Come in from the cold, lamb! You're the horned boy Brann keeps shouting about. Sit. Soup. Mind the cat.", 'Come in, lamb! Sit. Soup. Mind the cat.'],
         re: [
           { t: ['Where is the cat?', 'Where is the cat?'],
             say: [['f_hilde', 'On the windowsill, being a loaf. Her name is Biscuit. Don\'t sit on Biscuit. People do.', 'On the sill. She is Biscuit. Do not sit on her.']] },
           { t: ['Does Brann really shout about me?', 'Does Brann shout about me?'],
-            say: [['f_hilde', 'From the West Gate tower, every morning. "The Emberblood is here! Stay calm!" Nobody was calm.', '"The Emberblood is here! Stay calm!" Nobody was.', { ref: 'f3_west_gate' }]] },
+            say: [['f_hilde', 'From the West Gate tower, every morning. "The horned boy is here! Stay calm!" Nobody was calm.', '"The horned boy is here! Stay calm!" Nobody was.', { ref: 'f3_west_gate' }]] },
         ] },
       { if: 'choice f_glaciar_home=stay', once: true, fact: 'f3s_glaciar=free',
         say: ["The Snow Mother is real! And she's your auntie! The snow is falling soft as feathers now.", 'The Snow Mother is real! Your auntie!'],
@@ -100773,7 +100790,7 @@ quest({
         else: [
         ['f_gunnhild', "Ingrid Anvilsong down on the coast makes chain whips out of anything. Ghost chains, even. Get one, and I'll make it better.",
           'Ingrid on the coast makes chain whips. Get one!']] },
-      ['f_gunnhild', "I could make it BURN. Light my forge first, Emberblood. Then bring me starfrost.", "I could make it BURN. Light my forge first."],
+      ['f_gunnhild', "I could make it BURN. Light my forge first, lad. Then bring me starfrost.", "I could make it BURN. Light my forge first."],
     ],
     fg_chain: [
       ['narr', 'CLANG. CLANG. CLANG. Gunnhild hums the same lantern song your mom hums. You do not say anything. You just grin.',
@@ -100906,7 +100923,7 @@ quest({
       hint: ['When your roar is ready, use it close to Mumble. He needs to hear it three times.', 'Roar near Mumble. Three times!'] },
     { id: 'thanks', do: 'talk f_mumble', scene: 'mb_thanks',
       then: ['set f_mumble_ally', 'ally f_mumble_ally', 'xp 650', 'give coins 120',
-        { banner: ['Mumble will come', 'Mumble will come'], sub: ['When you face the ice dragon, a very big friend will roar with you.', 'Mumble will help you fight!'] }],
+        { banner: ['Mumble will come', 'Mumble will come'], sub: ['When you face whatever sleeps on the mountain, a very big friend will roar with you.', 'Mumble will help you fight!'] }],
       obj: ['Talk to Mumble', 'Talk to Mumble'] },
   ],
 
@@ -101004,7 +101021,7 @@ quest({
         ['narr', 'He leans his huge head against you. When you need the pack, it will come.',
           'He leans on you. The pack will come when you need it.'],
         { do: ['set f_pack_ally', 'ally f_pack_ally',
-          { banner: ['Greymane will come', 'Greymane will come'], sub: ['When you face the ice dragon, the pack will run with you.', 'The wolves will help you fight!'] }] }] },
+          { banner: ['Greymane will come', 'Greymane will come'], sub: ['When you face whatever sleeps on the mountain, the pack will run with you.', 'The wolves will help you fight!'] }] }] },
       { if: 'quest f_mumble done', then: [['narr', 'From the Pinewhisper, a yeti roars along, a little out of tune.', 'A yeti roars along. Happily.']] },
       ['narr', 'Before he goes, Greymane digs in the snow and drops something at your feet: an old Hearthwarden helmet with a blue plume.',
         'Greymane digs up a helmet with a blue plume.', { clue: 'f3_wolf_helmet' }],
@@ -101149,7 +101166,8 @@ quest({
 // the Stonehorn hills (Ground Pound). Brynja sings the whole song at the Hearth. The song does not give the answer
 // away: it proves what the player works out (a red-horned girl with fire called the Snow Mother "Auntie"), a bonus
 // clue f3_song for A3b's snow_mother. Surprise: Brother Eider finds Wren's lost eleventh page stuck to a frost pudding
-// recipe: on the first Lantern Day a little grey moth sat on Ember's lantern, and Ember named her Nyx (set f_page11,
+// recipe: on the first Lantern Day a little grey moth sat on Ember's lantern, and Ember gave her a name (v12: the page
+// never says which: "Nyx" is first said in Act V, ring 2) (set f_page11,
 // the old flag the finale's kind ending reads). Payoff: truth (f3_song); also f_song (A3b's free outro "stay" and the
 // defeat path's song; A3S's f3_crown_wake).
 // Old saves: QDEFS.f_song steps 0..1 map to verses, sing. The three verse places stay x2_people's own mechanics (the
@@ -101217,12 +101235,12 @@ quest({
       { if: '!flag f3_iska_open', then: [
         ['f_eider', "Wait. WAIT. Wren's lost page! The eleventh one! It was stuck to the back of a frost pudding recipe. Very old jam.",
           "Wait! Wren's lost page! It was stuck to a pudding recipe!"],
-        ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx." (Iska)',
-          '"A little grey moth sat on Ember\'s lantern. Ember named her Nyx."'],
-        ['ash', 'Nyx. A little grey moth... named by Ember.', 'Nyx. Ember named her.']],
+        ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember gave her a name. We thought nothing of it." (Iska)',
+          '"A grey moth sat on Ember\'s lantern. Ember gave her a name."'],
+        ['ash', 'A moth with a name. And nobody wrote the name down.', 'Ember named a moth. Nobody wrote the name down.']],
         else: [
-        ['f_eider', "And look: Wren's lost eleventh page, stuck to a frost pudding recipe. The same words as Iska's box. Nyx. Shh. Sorry.",
-          "Wren's lost page! Same as Iska's. Nyx."]] },
+        ['f_eider', "And look: Wren's lost eleventh page, stuck to a frost pudding recipe. The same words as Iska's box. No name. Shh. Sorry.",
+          "Wren's lost page! Same as Iska's. No name."]] },
       ['f_brynja', 'Then go and sing it where it is needed, child. Hearthold never forgot her. Only her name.', 'Go and sing it, child.'],
     ],
   },
@@ -101264,7 +101282,7 @@ quest({
 
   scene: {
     wm_offer: [
-      ['f_toastwhistle', 'Ash! Emberblood! Official question from the Mayor: how many frozen people can one dragon warm up?',
+      ['f_toastwhistle', 'Ash! Horned boy! Official question from the Mayor: how many frozen people can one dragon warm up?',
         'Official question! How many frozen people can you warm?'],
       ['ash', '...All of them?'],
       ['f_toastwhistle', "TWELVE would do! Twelve, and I'll give you a medal! I've never given anyone a medal! I'll have to make one!",
@@ -101275,7 +101293,7 @@ quest({
     wm_medal: [
       ['f_toastwhistle', 'Twelve! TWELVE! Everyone, gather round! Hearthwardens, a drum roll!', 'TWELVE! Gather round! A drum roll!'],
       ['narr', 'Captain Brann does a drum roll on his own helmet.', 'Brann drums on his own helmet.'],
-      ['f_toastwhistle', 'I hereby award Ash Emberblood the Warm Hands Medal, for warming hands! And feet! And entire people!',
+      ['f_toastwhistle', 'I hereby award Ash of Emberhollow the Warm Hands Medal, for warming hands! And feet! And entire people!',
         'The Warm Hands Medal! For warming whole people!'],
       ['f_toastwhistle', "It's a cookie. ...There's a real one too. And this. A Heart Ember from the Hall. We've been saving it for a hero.",
         "It's a cookie. There's a real one too. And a Heart Ember!"],
@@ -101841,8 +101859,9 @@ chapter({
     ],
     drf_winnie_story: [
       ['m_winnie', 'Yes, child. The sea follows the moon, and it takes what it likes. Every raft, and every chicken.', 'Yes. The sea follows the moon. It would take every raft.'],
-      ['m_winnie', 'It has happened once before. Five hundred years ago a moth bit the moon for the very first time, and the sea came up and took Old Lumen, the moon city. That tower is the top of it.',
-        'Long ago a moth bit the moon. The sea came up and took a city. Old Lumen.'],
+      // (v12) the act's title comes from here: the tidewife's tale gives Moonfall's folk name for the moth, the Night Mother
+      ['m_winnie', "It has happened once before. Five hundred years ago the Night Mother bit the moon for the very first time. That's what my gran called her: a moth as big as the dark. And the sea came up and took Old Lumen, the moon city. That tower is the top of it.",
+        'Long ago the Night Mother, a giant moth, bit the moon. The sea took a city. Old Lumen.'],
       ['iska', 'Ember came east too, long ago, and I came with her. I can feel her flame down in that city, Ash. Like a candle in a window.',
         'Ember came here long ago. I came too. Her flame is down there, Ash.', { ref: 'm4_lumen_spire' }],
       ['ash', "Down? Under the sea? I can't breathe water.", "Under the sea? I can't breathe water."],
@@ -102200,7 +102219,8 @@ chapter({
 // What the player does: the Mirror Temple dungeon stays code (x3_dun_b): Ember's moonfire (and, in the shrine, words
 // in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.), Pip's Lantern, Lord Fanfare (his outro is short
 // now and carries the herring: "She told me she collects shiny things!"). v11: the shrine is Ember's one appearance in
-// Act IV. She made moonfire "for her. For my little moth. In case she ever went wrong." Out on the temple steps every
+// Act IV. She made moonfire "for someone I loved. In case she ever got lost in the dark." (v12: not "my little moth":
+// the Mother is tied to Ember's moth only in Act V.) Out on the temple steps every
 // mirror goes dark and Nyxara's voice says: mend it, then give it to me. Then Ash works out why she wants all three
 // Shards: a whole Heart can burn black, and it has to be given to her (why_three). The Shards are getting colder.
 // The dungeon's own story keys (m_mirror_shrine, m_mirror_won_v, m_mirror_end) are data scenes with the old STORY
@@ -102280,8 +102300,9 @@ chapter({
       ['ember', 'Hello, little ember. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.',
         'Hello, little ember. This is my last flame. My fire, mixed with moonlight.'],
       ['ash', "What's it for?", "What's it for?"],
-      ['ember', 'For her. For my little moth. In case she ever went wrong.', 'For my little moth. In case she went wrong.'],
-      ['ash', 'Your moth?', 'Your moth?'],
+      // (v12) "someone I loved", not "my little moth": nobody in Act IV ties the Mother to Ember's moth (Act V, ring 1)
+      ['ember', 'For someone I loved. In case she ever got lost in the dark.', 'For someone I loved. In case she got lost.'],
+      ['ash', 'Who?', 'Who?'],
       ['ember', 'Take it, Ash. And if you ever meet her, be gentler than I was.', 'Take it. If you meet her, be gentler than me.'],
       ['narr', 'Behind the flame, words are cut deep into the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', 'Words in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', { clue: 'm4_black_flame' }],
       ['ash', "Burn black? Fire isn't black.", "Burn black? Fire isn't black."],
@@ -102306,7 +102327,7 @@ chapter({
     m_mirror_voice: [
       { cam: 'm_mirror_door', s: 1 },
       ['narr', "Behind you, every mirror on the temple's face goes dark at once. In each one, a pair of white eyes opens.", 'Every mirror on the temple goes dark. White eyes open in them.', { do: ['set m4_eyes_on'] }],
-      ['nyxara', "Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, long ago. It hurt very much.", 'You found moonfire. Her priests burned me with it once.'],
+      ['nyxara', "Moonfire. Oh, little ember. Lumen's priests burned me with that, long ago. It hurt very much.", 'Moonfire. The priests burned me with it once.'],
       ['nyxara', 'Mend it, little ember. Then give it to me. You will want to, at the end.', 'Mend it. Then give it to me. You will want to.', { clue: 'm4_mirror_voice' }],
       ['ash', "I won't.", "I won't."],
       ['nyxara', 'Everyone does.', 'Everyone does.'],
@@ -102722,8 +102743,9 @@ chapter({
             { do: ['world m4_eclipse1 leave'] }]] },
         { t: ['Why do you want the moon so much?', 'Why do you want the moon?'], tone: 'kind', v: 'ask',
           then: [{ journal: ['You asked Nyxara why she wants the moon. For a second she sounded small.', 'You asked Nyxara why. She sounded small.'], key: 'm_deal' }],
-          say: [['nyxara', '...Nobody has asked me that since a girl with horns. The moon leaves me every morning. If I hold it very tight, it can never go.',
-            'Nobody asked me that since a girl with horns. The moon leaves me. I hold it tight.', { clue: 'm4_her_words', do: ['world m4_eclipse1 leave'] }]] },
+          // (v12) not "since a girl with horns": nobody in Act IV ties the Mother to Ember (Act V, ring 1)
+          say: [['nyxara', '...Nobody ever asks me that. The moon leaves me every morning. If I hold it very tight, it can never go.',
+            'Nobody asks me that. The moon leaves me. I hold it tight.', { clue: 'm4_her_words', do: ['world m4_eclipse1 leave'] }]] },
       ] },
     ],
   },
@@ -104701,8 +104723,8 @@ people({
         re: [
           { t: ['Iska says she forgot that moth.', 'Iska says she forgot the moth.'],
             say: [['wren', "Then she remembered, and wrote it down. That's what a page is for.", "Then she remembered. That's what pages are for."]] },
-          { t: ['So the moth has a name. Nyx.', 'The moth has a name. Nyx.'],
-            say: [['wren', "Somebody gave her that name, once, on a lantern. It's a sad thing, to be named and then left.", "Someone named her once. Then left. That's sad."]] },
+          { t: ['So Ember named her moth.', 'Ember named a moth.'],
+            say: [['wren', "Somebody gave her a name, once, on a lantern. It's a sad thing, to be named and then left.", "Someone named her once. Then left. That's sad."]] },
         ] },
       { if: 'quest m_leash done',
         say: ["Ripple and I are reading every pearl in the Archive. He forgets them, so we read them twice. It's heaven.", 'Ripple and I read every pearl. Twice!'],
@@ -105415,8 +105437,9 @@ quest({
 // What changed in v10 (ACT4_V10 1.1 finding 1): this quest no longer holds the kind ending. The main path teaches how to
 // free Hush (A4b's free_hush deduction sets m_leash_known), so the Hush choice is always open. What this quest gives
 // now is the TRUTH behind it: the moon-priests' Book of Moths (clue m4_book, a free_hush bonus clue that makes the right
-// pick glow) and, tucked in its back, a copy of the Wardens' lost eleventh page, which names a little grey moth Nyx
-// (G.flags.m_page11: the finale's "knows Nyx" test, e7b_threads nKnowsNyx). Surprise: the page is in Iska's writing.
+// pick glow) and, tucked in its back, a copy of the Wardens' lost eleventh page: Ember gave a little grey moth a name
+// (v12: the page never says which; "Nyx" is first said in Act V, ring 2) (G.flags.m_page11, read by the finale,
+// e7b_threads nKnowsNyx). Surprise: the page is in Iska's writing.
 // Ash melts the moon-wax vault in the Drowned Library (Moonfire, under water) and gives the soggy book to Sister Wren.
 // Old saves: QDEFS.m_leash steps 0..1 map to vault, wren (old_steps). The vault stays x3_people's (m3pVaultTick sets
 // m_vault_open and gives m_book_raw, with STORY.m_vault's lines), so the vault step just waits for its flag.
@@ -105428,13 +105451,13 @@ quest({
 
   item: {
     m_book: { name: ["The Moon-Priests' Book of Moths", 'The Book of Moths'], icon: 'book', keepsake: true,
-      desc: ['Dried out now. Wren read it. Moon silk, gentle moonfire, and a little grey moth called Nyx.', 'The book Wren read.'] },
+      desc: ['Dried out now. Wren read it. Moon silk, gentle moonfire, and a page about a little grey moth Ember gave a name to.', 'The book Wren read.'] },
   },
 
   clue: {
     m4_page11: { icon: 'note', mystery: 'm4_night_mother',
-      text: ["The Wardens' eleventh page: on the first Lantern Day a little grey moth sat on Ember's lantern all night. Ember named her Nyx.",
-        'A grey moth sat on Ember\'s lantern. Ember named her Nyx.'] },
+      text: ["The Wardens' eleventh page: on the first Lantern Day a little grey moth sat on Ember's lantern all night. Ember gave her a name.",
+        'A grey moth sat on Ember\'s lantern. Ember gave her a name.'] },
     m4_book: { icon: 'book', mystery: 'm4_night_mother',
       text: ['The Book of Moths: the Mother ties her moths with moon silk. It keeps them big and cold. Moonfire, breathed gently, melts the knot.',
         'The Book of Moths: gentle moonfire melts the knot.'] },
@@ -105483,8 +105506,8 @@ quest({
         'The lost eleventh page! Under the sea all this time!']],
         else: [['wren', 'Another copy of the eleventh page! Eider found one in Hearthold. I shall frame one and hug the other.',
           'Another eleventh page! I will hug it.']] },
-      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx." (Iska)',
-        '"A grey moth sat on Ember\'s lantern. Ember named her Nyx."', { clue: 'm4_page11' }],
+      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember gave her a name. We thought nothing of it." (Iska)',
+        '"A grey moth sat on Ember\'s lantern. Ember gave her a name."', { clue: 'm4_page11' }],
       ['iska', 'I wrote that, a thousand years ago, about a little moth on a lantern. I never thought about her again.', 'I wrote that. I forgot all about her.'],
     ],
     // replaces STORY.m_vault in place (x3_people's vault plays it by key when the wax melts)
