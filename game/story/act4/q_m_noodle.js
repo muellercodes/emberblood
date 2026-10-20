@@ -39,13 +39,13 @@ quest({
       ] },
     ],
     nd_home: [
-      ['m_sandy', 'My baby! My Noodle! You brought him home through the sand.', 'My baby Noodle! You brought him home!'],
+      ['m_sandy', 'My baby! My Noodle! You brought him home through the sand.', 'My baby Noodle! You brought him home!', { mood: 'happy' }],
       ['narr', 'Out of the sand all round the nest pop hundreds of little worm heads. Every single one goes "mip".',
         'Hundreds of baby worms pop up. "Mip!"'],
-      ['m_sandy', 'He is one of three hundred and twelve. The other three hundred and eleven were so worried.', 'He has 311 brothers and sisters!'],
-      ['m_sandy', "You're a good little worm.", "You're a good little worm."],
+      ['m_sandy', 'He is one of three hundred and twelve. The other three hundred and eleven were so worried.', 'He has 311 brothers and sisters!', { mood: 'tender' }],
+      ['m_sandy', "You're a good little worm.", "You're a good little worm.", { mood: 'tender' }],
       ['ash', "I'm a dragon."],
-      ['m_sandy', "You're a good little worm. Here. Let me show you how the big worms dig.", 'Let me show you how big worms dig.'],
+      ['m_sandy', "You're a good little worm. Here. Let me show you how the big worms dig.", 'Let me show you how big worms dig.', { mood: 'tender' }],
     ],
   },
 

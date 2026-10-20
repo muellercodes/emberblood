@@ -326,6 +326,66 @@ moodSheetAdd([
   ['ember','(from the rim, very quietly) I used to fold','tender'], ['vor','Is there cake? At this festival','shy'],
   ['ash','Is that... spare fire?','surprised'], ['vor',"Hm. That's the last of it.",'shy'], ['vor','Give it to your mother.','shy']
 ]);
+// (v12 FACES) the bosses' and creatures' old-code lines (intros, turns mid-fight, outros and the one-off creatures),
+// in files other writers keep: a1d_story, x0_vorlaxis, x4_foes, a1l_story2, x1_foes, x1_story, x1_people, x2_foes,
+// x2_people, x3_foes, x3_story, x3_world, x3_people, a9d_quests. Their data copies carry their own { mood } tags.
+moodSheetAdd([
+  // Act I bosses (a1d_story STORY.bosses)
+  ['griz','Hah! A little lizard-person with a big sword.','smug'], ['griz','The Oath... paid in gold...','hurt'],
+  ['morrow','The heir of the First Flame, walking right into','sly'], ['morrow',"You don't understand... he promised",'sad'],
+  ['morrow',"Please. I'm an old man who believed a dragon.",'ashamed'], ['morrow',"I... thank you. I think I'll go somewhere quiet.",'tender'],
+  ['brood','Ssssso. The fire-child crawls into my nest.','sly'], ['brood','My children... will remember you...','hurt'],
+  ['gloam','Mmmmm. A warm little snack','sly'], ['gloam','Too... spicy...','defeated'], ['goat','Meeeh.','smug'],
+  ['cinder','Stop there, heir of the First Flame.','determined'], ['cinder',"At last. A thousand years I've held this gate.",'peaceful'],
+  ['cinder','You are stronger than I hoped','proud'], ['cinder','My watch is over. Unless you need one more sword.','tender'],
+  ['cinder','Thank you, child. A thousand years','peaceful'], ['cinder','Ha! One last fight, then.','proud'],
+  // Sir Cindervane on the road up and on the stairs (x0_vorlaxis, x4_foes), the young knight (a1l_story2)
+  ['cinder','A thousand years I stood at that gate','peaceful'], ['cinder','Steep, smoky, and terrible for the knees','happy'],
+  ['cinder',"I'll go ahead to the crater stairs",'determined'], ['cinder','It was worth it. Every year of it.','peaceful'],
+  ['cinder','HA! In this armor?','laughing'], ['cinder','...How do you know about the chair?','shy'],
+  ['cinder','Halt! ...Oh. It is you, Emberblood.','surprised'], ['cinder','Some knights do not know when to sit down.','determined'],
+  ['cinder_young','I swear to guard this gate','determined'], ['cinder_young',"Then I'll bring a chair.",'happy'],
+  // the last of the Scaled Oath on the summit path (x0_vorlaxis)
+  ['a1_soot','Brother Morrow wrote to us. From a pumpkin patch.','tender'], ['a1_soot','You threw Brother Morrow in a cell!','angry'],
+  ['a1_soot','...Yes. Yes, I think we will.','peaceful'], ['a1_strag','Is that the Emberblood? Is it over?','scared'], ['a1_strag','...Can we go home now?','sad'],
+  // the world events' creatures (a1l_story2)
+  ['ev_mimic','GRRRMBLE.','angry'], ['ev_mimic','*CHOMP* ...Mmmmm.','happy'], ['ev_mimic','*SLURP* ...Mmmmmmm!','laughing'], ['ev_mimic','*crunch* ...Brrr. Mmm.','surprised'],
+  ['ev_mimic','Grrmble! Grrrmble grmble.','angry'],
+  ['ev_wisp',"Ooooo. Oh! Don't be scared.",'happy'], ['ev_wisp','The wind stole my hat.','sad'], ['ev_wisp',"It's tall and black and very dashing.",'proud'],
+  ['ev_wisp','I feel whole again.','happy'], ['ev_wisp','Oh, that was worth losing it for.','laughing'], ['ev_wisp','Off to the Ghost Ball!','happy'], ['ev_wisp','Ooooo. Never mind.','sad'],
+  ['ev_croak','Ah! A conductor! At last!','happy'], ['ev_croak','Wave your claws and tell us how to sing.','proud'],
+  ['ev_fog','We are the fog.','tender'], ['ev_fog','You have found every secret near here already.','surprised'],
+  // Act II (x1_foes, x1_story, x1_people)
+  ['c_pinch','WHO goes there? Who dares enter the lagoon','angry'], ['c_pinch','Who dares enter the lagoon of GRAND ADMIRAL','angry'],
+  ['c_pinch','That is not a salute!','furious'], ['c_pinch','I meant to do that. Dismissed.','shy'],
+  ['c_saltbeard','TOO LATE! Fight me for it','determined'], ['c_saltbeard','...Oh. Oh, that is the stuff.','happy'], ['c_saltbeard',"...Oh. Oh, that's the stuff.",'happy'],
+  ['c_saltbeard','Tell Elias I am sorry about the cards.','ashamed'], ['c_saltbeard',"Tell Elias I'm sorry about the cards.",'ashamed'], ['c_saltbeard','Take my chain, little dragon.','tender'],
+  ['c_bolt','Bark! (whirr) Bark bark! (tick)','happy'],
+  // Act III (x2_foes, x2_people)
+  ['f_blubberton','Harrumph. Jolly good show','happy'], ['f_squall','Whoosh!','happy'], ['f_squeak','Wheeee-hee!','laughing'], ['f_squall',"Tag, you're IT!",'laughing'],
+  ['f_squeak','Again tomorrow?','happy'], ['f_rockjaw','ROLL ROLL ROLL!','angry'], ['f_rockjaw',"I'm not round, I'm big-boned! ...Okay",'defeated'],
+  ['f_grumbo','...Sorry, Mumble.','ashamed'], ['f_mumble',"(squeak) ...that's Grumbo.",'worried'], ['f_mumble','(squeak) ...thank you.','shy'],
+  ['f_bellows','CLANK. Bellows... cold.','cold'], ['f_bellows','...Fff. Fwooosh. Warm?','surprised'], ['f_bellows','Small hot one. You smell like the boss.','happy'],
+  ['f_bellows','Ember. And the Cold One. They made Bellows.','sad'], ['f_bellows','Purple cold... comes back.','scared'], ['f_bellows','FWOOOOSH! Bellows... hungry for heat.','furious'],
+  ['f_grumblehorn','Hrrrrmph. My head.','hurt'], ['f_grumblehorn','Hrm. Good drumming. VERY good.','happy'],
+  ['f_mumble',"Sorry. I'm Mumble.",'sad'], ['f_mumble','The Rimehounds laugh at me.','worried'], ['f_mumble','(squeak) Still squeaky.','sad'], ['f_mumble',"If you ever need somebody big... I'll come.",'proud'],
+  // Act IV (x3_foes, x3_story, x3_world, x3_people)
+  ['m_zapp','Bzzzt! Who swims in MY pool?','sly'], ['m_zapp','Ooh, shiny. Shiny me.','peaceful'], ['m_bigfin','CHOMP! Nobody burrows in MY sand!','furious'],
+  ['m_bigfin','Fine. FINE. You may burrow','defeated'], ['m_prism','RAWR. Do you like my mane?','proud'], ['m_prism','POINTY? It is MAJESTIC.','angry'], ['m_prism','...Do I still look majestic?','defeated'],
+  ['m_umberwing','Crunchy. Oh! A guest. Charmed.','proud'], ['m_umberwing','The Mother says nobody goes up.','determined'], ['m_umberwing','Oh, bother. Bested by a lizard.','defeated'],
+  ['m_octavia','MINE. All mine.','furious'], ['m_octavia','Fine! FINE! Take your lamps.','sad'], ['m_octavia','...Share. Hm.','shy'],
+  ['m_gravelgut','Mmmrrr. Little warm thing.','tender'], ['m_gravelgut','Ate her once. Spat her out.','happy'], ['m_gravelgut','Dig like us.','determined'],
+  ['m_gravelgut','Then come down and find me, warm thing.','hurt'], ['m_gravelgut','(a rumble you feel in your teeth)','furious'], ['m_gravelgut',"(a rumble) Oof. Oh, that's better.",'peaceful'],
+  ['m_fanfare','Mirror, mirror, on the wall','proud'], ['m_fanfare','No, do look. Look at it.','proud'], ['m_fanfare','A voice in the mirrors told me','smug'],
+  ['m_fanfare','Oh dear. Was I horrid? I think I was horrid.','ashamed'], ['m_fanfare','Even better. Dragons go with everything.','happy'],
+  ['m_puffington','Who goes there? State your business!','proud'], ['m_puffington',"Stuck? I'm not STUCK.",'angry'], ['m_puffington','Ten days. Eleven.','sad'],
+  ['m_puffington','The toll is one pie!','furious'], ['m_puffington',"Fine! The gate's open.",'defeated'], ['m_puffington',"That's actually very good advice.",'happy'],
+  ['m_greatshell','I remember Lumen before it sank.','peaceful'], ['m_greatshell','My great-grandson remembers it too','tender'], ['m_greatshell','OW! Hot, hot!','hurt'],
+  ['m_greatshell',"...Is that my great-grandson's friend?",'surprised'], ['m_noodle','mip! MIP!','happy'],
+  // Shellby (a9d_quests)
+  ['shellby','Is that... a fish? For me?','surprised'], ['shellby',"I'm one thousand and forty-one years old",'proud'], ['shellby','Iska tucked a page from their book','shy'],
+  ['shellby',"Hmm? A visitor? Oh, I'm Shellby.",'happy'], ['shellby','Dell, the fisherman in Brindlecross','sly']
+]);
 // the mood for a line: its own tag, else the sheet, else the reader; then the speaker's resting face
 function lineMood(who,L,full){
   const m=moodName(L&&L.face)||moodName(moodSheetGet(who,full));

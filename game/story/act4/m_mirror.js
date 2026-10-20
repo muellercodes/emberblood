@@ -91,12 +91,12 @@ chapter({
     // Fanfare's outro, right after the boss: at most 6 lines (the voice in the mirrors moved outside)
     m_mirror_won_v: [
       ['narr', "The last violet eye on Lord Fanfare's tail goes out. One by one, his feathers turn back to green and gold.", 'The last purple eye goes out. His feathers turn green and gold again.'],
-      ['m_fanfare', 'Oh dear. Was I horrid? Something cold got into the mirrors and whispered to me.', 'Oh dear. Was I horrid? Something cold whispered from the mirrors.'],
+      ['m_fanfare', 'Oh dear. Was I horrid? Something cold got into the mirrors and whispered to me.', 'Oh dear. Was I horrid? Something cold whispered from the mirrors.', { mood: 'ashamed' }],
       ['ash', "You're still very shiny.", "You're still very shiny."],
       ['m_fanfare', "Thank you. You're quite shiny yourself. For a lizard.", "Thank you. You're shiny too. For a lizard."],
       ['ash', "I'm a dragon.", "I'm a dragon."],
       ['m_fanfare', 'Even better! She told me she collects shiny things, you know. Like me. I was meant to guard Ember\'s flame for her family. Not from them.',
-                    'She said she collects shiny things, like me! I was meant to guard the flame for you.', { clue: 'm4_fanfare_shiny' }],
+                    'She said she collects shiny things, like me! I was meant to guard the flame for you.', { mood: 'sad', clue: 'm4_fanfare_shiny' }],
     ],
     // (v11: Iska, not Ember: Ember speaks once in Act IV, at the shrine)
     m_mirror_end: [

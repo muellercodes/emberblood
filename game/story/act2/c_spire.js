@@ -114,7 +114,7 @@ chapter({
       { if: 'quest c_bob done', then: [
         ['c_bobs', 'We are Bob. We will hold the breakwater. Nothing gets past us. Except you. You can get past us. Go on.', 'We are Bob. We hold the breakwater. Go on!'] ] },
       { if: 'quest c_bolt done', then: [
-        ['c_bolt', 'Bark! (whirr) Bark! (his tail spins like a propeller)', 'Bark! (whirr) Bark!'] ] },
+        ['c_bolt', 'Bark! (whirr) Bark! (his tail spins like a propeller)', 'Bark! (whirr) Bark!', { mood: 'happy' }] ] },
       ['ash', 'Okay. Shadow, swing, shadow, skim, shadow. Shadow, swing... I can do this.', 'Shadow, swing, shadow, skim, shadow. I can do this.'],
       { if: 'flag pip', then: [['pip', 'Mip!', 'Mip!']] },
     ],
