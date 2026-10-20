@@ -1800,9 +1800,26 @@ function a1GTick(dt){
     let who=null;
     for(const W of walks) if(W.t<W.d&&W.n&&dist2(W.n.x,W.n.y,g.x,g.y)<120*120&&a1GCross(g,W.n.x,W.n.y,W.x1,W.y1)){ who=W.n; break; }
     if(!who&&g.foot&&!air&&Math.abs(r.b)<400) for(const f of [C,F]){ if(!f) continue; const q=a1GRel(g,f.x,f.y); if(Math.abs(q.a)<g.hw+4&&Math.abs(q.b)<(f.r||12)+14&&(q.b<0?-1:1)!==s){ who=f; break; } }
+    // the Lantern Night thief flings a gate open as she runs through it, so Ash can stay on her tail
+    if(!who&&typeof HS!=='undefined'&&HS.on&&HS.thief&&dist2(HS.thief.x,HS.thief.y,g.x,g.y)<110*110) who=HS.thief;
     if(who) a1GSet(g,true,'npc');
   }
   A1G.px=p.x; A1G.py=p.y;
+  a1GWrapFest();
+}
+// the Lantern Night chase: when the thief is over the wall from Ash, the goal points him at the gate that makes the
+// shortest way round (and says to open it if it is shut), instead of at a spot through the wall
+function a1GWrapFest(){ const s=typeof STAGEDEF!=='undefined'?STAGEDEF.c_fest:null; if(!s||typeof s.objectives!=='function'||s.objectives._a1g) return;
+  const base=s.objectives, w=function(){ const L=base.apply(this,arguments); try{ return a1GGoalFix(L); }catch(e){ return L; } }; w._a1g=true; s.objectives=w; }
+function a1GGoalFix(L){
+  if(!Array.isArray(L)||!L.length||typeof HS==='undefined'||!HS.on||HS.phase!=='chase'||!player||AREA) return L;
+  const o=L[0]; if(!o||o.x==null||!a1WallBlocks(player.x,player.y,o.x,o.y)) return L;
+  let best=null, bd=1e18;
+  for(const g of A1G.list){ if(a1GMode(g)==='locked') continue; const d=Math.hypot(player.x-g.x,player.y-g.y)+Math.hypot(o.x-g.x,o.y-g.y); if(d<bd){ bd=d; best=g; } }
+  if(!best) return L;
+  const nm=String(best.src&&best.src.sign||'gate').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  const t=a1GShut(best)?S(`She went over the wall! Open the ${nm} and go after her.`,`She went over the wall! Open the gate.`):S(`She went over the wall! Go round by the ${nm}.`,`Go round by the gate!`);
+  return [Object.assign({},o,{text:t,x:best.x,y:best.y})].concat(L.slice(1));
 }
 { const base=simUpdate; simUpdate=function(dt){ base(dt); try{ a1GTick(dt); }catch(e){ console.error('a1 gates',e); } }; }
 { const base=liteUpdate; liteUpdate=function(dt){ base(dt); try{ if(scene!=='play') a1GTick(dt); }catch(e){ console.error('a1 gates',e); } }; }
