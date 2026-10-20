@@ -754,7 +754,8 @@ function n4sActIntro(o){ /* the cards are startAct's; the bridge opens by itself
 // (I5) from her fall to the final choice there is nothing left to defeat or travel to (she lies there alive, so the
 // HUD said "Defeat Nyxara", or "Travel to The Moon's Rest"): it says what is being asked
 { const base=objectiveList; objectiveList=function(){ const out=base(); try{ if(G&&G.mode==='story'&&!G.done&&actOf(G.stage)===5){
-  if(N4ST.run&&!(G.choices&&G.choices.n_end)) return [{text:S('Choose how the Long Night ends','Choose how it ends')}];
+  // (v12 R4) in story words, about what Ash can see: never "how it ends", which tells a kid there is more than one way
+  if(N4ST.run&&!(G.choices&&G.choices.n_end)) return [{text:S('The Night Mother has fallen. What will you do?','She has fallen. What will you do?')}];
   return out.filter(o=>!o.site||/^n_/.test(String(o.site))); } }catch(e){} return out; }; }
 
 // ---------- 4. the departure (before the fade), the arrival, the Bridgefoot
