@@ -903,3 +903,24 @@ function simpleText(t){
   return null;
 }
 window.__ebDbg=Object.assign(window.__ebDbg||{},{ql:()=>({on:QL.on,items:QL.items.map(i=>[i.kind,i.text,i.sub]),news:QL.plate&&QL.plate.news,t:QL.plate&&QL.plate.t,dur:QL.plate&&QL.plate.dur,skip:QL.plate&&!!QL.plate.skip}),bnr:()=>({goal:BNR.goal,hold:BNR.hold.map(h=>[h.text,h.sub]),plate:BNR.plate&&BNR.plate.text,fightT:BNR.fightT}),coach:()=>({id:COACH.id,shown:COACH.shown,flags:Object.keys(G.flags).filter(k=>/^coach/.test(k))}),goalShort:(t,w)=>{ ctx.font=`500 12px ${UIF}`; return goalShort(t,w||300); }});
+// (v12) a tap check for phones: open the game as playemberblood.com/?taps and every finger that lands shows a red
+// cross (with the button it hit) for a moment, plus the screen sizes the game reads, so one screenshot shows whether
+// taps and buttons agree on a device we cannot test here
+const TAPDBG=/[?&]taps\b/.test(location.search)?{list:[]}:null;
+if(TAPDBG) cvs.addEventListener('touchstart',e=>{ try{
+  for(const t of e.changedTouches){ const x=t.clientX, y=t.clientY; let hit='';
+    if(scene==='play') for(const b of tShown()){ if(!b.live) continue; if(dist(x,y,b.x,b.y)<(b.hr||b.r+14)){ hit=b.id; break; } }
+    TAPDBG.list.push({x,y,t:performance.now(),hit}); }
+  }catch(err){} },{passive:true,capture:true});
+function drawTapDbg(){
+  if(!TAPDBG) return; const now=performance.now(); TAPDBG.list=TAPDBG.list.filter(q=>now-q.t<2000);
+  ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(const q of TAPDBG.list){ const a=1-(now-q.t)/2000; ctx.strokeStyle=`rgba(255,40,40,${a})`; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(q.x,q.y,16,0,TAU); ctx.moveTo(q.x-26,q.y); ctx.lineTo(q.x+26,q.y); ctx.moveTo(q.x,q.y-26); ctx.lineTo(q.x,q.y+26); ctx.stroke();
+    ctx.fillStyle=`rgba(255,60,60,${a})`; ctx.font=`800 12px ${UIF}`; ctx.fillText(q.hit||'miss',q.x,q.y-32); }
+  const vv=window.visualViewport, r=cvs.getBoundingClientRect();
+  const s=`W${W} H${H} | inner ${innerWidth}x${innerHeight} | vv ${vv?Math.round(vv.width)+'x'+Math.round(vv.height)+' x'+vv.scale.toFixed(2)+' @'+Math.round(vv.offsetLeft)+','+Math.round(vv.offsetTop):'-'} | canvas ${Math.round(r.width)}x${Math.round(r.height)} @${Math.round(r.left)},${Math.round(r.top)} | safe ${SAFE.t},${SAFE.r},${SAFE.b},${SAFE.l} | dpr ${devicePixelRatio}`;
+  ctx.font=`700 11px ${UIF}`; const w=ctx.measureText(s).width; ctx.fillStyle='rgba(0,0,0,.75)'; ctx.fillRect(W/2-w/2-6,H*0.42-10,w+12,20); ctx.fillStyle='#fff'; ctx.fillText(s,W/2,H*0.42);
+  ctx.restore();
+}
+{ const base=drawTouch; drawTouch=function(){ base.apply(this,arguments); try{ drawTapDbg(); }catch(e){} }; }
