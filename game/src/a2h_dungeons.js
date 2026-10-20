@@ -548,7 +548,7 @@ function trialLendRoot(id){
   const r=dunRoot(AREA.def.id), I=trialInfo(r);
   return I&&I.abil===id&&lendable(r)&&!lendDone(r)?r:null;
 }
-const lendPlace=I=>String((I&&I.name)||'').replace(/^The /,'the ');
+const lendPlace=I=>{ const n=String((I&&I.name)||''); return /^Trial /.test(n)?'the '+n:n.replace(/^The /,'the '); };
 function trialKeep(r,id,quiet){
   if(!G||!G.flags||G.flags['tlend_'+id]!==r) return false;
   G.abil=G.abil||{}; G.abil[id]=true; delete G.flags['tlend_'+id];
