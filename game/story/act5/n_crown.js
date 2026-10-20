@@ -103,7 +103,7 @@ chapter({
     n_door_ready: [
       { cam: 'n4_moon_door', s: 1 },
       { if: 'trust friends>=2', then: [
-        ['narr', 'You look back. On the floating stones behind you, everyone she hurt is following you up.', 'You look back. Your friends are right behind you.'],
+        ['narr', 'You look back. On the floating stones behind you, your friends are following you up.', 'You look back. Your friends are right behind you.'],
         ['pip', 'Mip!'] ],
         else: [
         ['narr', 'You look back down the Moon Road. Some of the floating stones behind you are empty.', 'You look back. Some friends are missing.'],
