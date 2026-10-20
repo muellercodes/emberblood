@@ -773,7 +773,7 @@ function ttlFrame(){
     for(let i=0;i<9;i++){ const p=0.5+((t*0.035+i/9)%1)*0.5, e=Math.pow(p,1.4), x=pk.x+(cl.x-pk.x)*e+Math.sin(p*6.5-t*0.9)*7*u*p, y=pk.y+1*u+(cl.y+20*u-pk.y)*p, sz=(16+44*(p-0.5))*u;
       g.globalAlpha=Math.min(1,(p-0.5)*8)*(1-Math.max(0,(p-0.85)/0.15))*0.5; g.drawImage(S.puff,x-sz/2,y-sz/2,sz,sz); }
     if(S.mcloud){ const dx=Math.sin(t*0.13)*6*u, dy=Math.cos(t*0.11)*3*u; g.globalAlpha=0.9; g.drawImage(S.mcloud.c,cl.x-S.mcloud.w/2+dx,cl.y-S.mcloud.h/2+dy,S.mcloud.w,S.mcloud.h);
-      const br=0.5+0.5*Math.sin(t*0.5); g.globalAlpha=(P.sb?0.08:0.08)+br*(P.sb?0.18:0.16); const sc=1+br*0.03; g.drawImage(S.horns.c,cl.x-S.horns.w*sc/2+dx*1.2,cl.y-S.horns.h*sc/2+dy,S.horns.w*sc,S.horns.h*sc); } }
+      const br=0.5+0.5*Math.sin(t*0.5); g.globalAlpha=(P.sb?0.07:0.07)+br*(P.sb?0.15:0.14); const sc=1+br*0.03; g.drawImage(S.horns.c,cl.x-S.horns.w*sc/2+dx*1.2,cl.y-S.horns.h*sc/2+dy,S.horns.w*sc,S.horns.h*sc); } }
   g.globalCompositeOperation='lighter';
   // the crack of light at the gate breathes
   if(TTL.gate){ const q=TTL.gate, s=(pr.a1?26:18)*u; g.globalAlpha=(pr.a1?0.5:0.38)+0.22*Math.sin(t*1.3); g.drawImage(TTL.spr.glowGate,q.x-s/2,q.y-s/2,s,s); }
