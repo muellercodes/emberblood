@@ -239,7 +239,7 @@ function itFrost(){
   const p=player, R=90; let n=0;
   for(const e of G.enemies){
     if(e.dead||e.passive||e.spawnIn>0||e.invuln||e.type==='vorlaxis'||e.type==='egg') continue;
-    if(dist(p.x,p.y,e.x,e.y)>R+(e.r||10)) continue;
+    if(dist(p.x,p.y,e.x,e.y)>R+(e.r||10)||!ashHits(e,null,p.x,p.y)) continue;   // (v12: the frost does not pass through walls)
     stunEnemy(e,e.boss?0.9/0.35:2.5); e.itIceT=G.time+(e.boss?0.9:2.5); e.aggro=true; n++;
     emit(e.x,e.y-6,8,{col:'215,240,255',smin:30,smax:110,lmin:.3,lmax:.6,zmin:1.5,zmax:2.5,drag:3});
   }

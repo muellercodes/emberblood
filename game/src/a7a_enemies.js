@@ -103,7 +103,8 @@ function separate(){
 }
 function toRecover(e,t){ e.state='recover'; e.st=t; e.tele=null; }
 function newTele(o){ o.t=0; return o; }
-function alertCamp(e){ if(!e.camp) return; for(const o of G.enemies) if(o.camp===e.camp&&!o.dead) o.aggro=true; }
+// (v12: in a cave or dungeon a whole cave is one camp, so a shout only reaches the foes in the same room)
+function alertCamp(e){ if(!e.camp) return; const rm=e.inArea&&AREA&&AREA.rooms&&e.room?e.room:null; for(const o of G.enemies) if(o.camp===e.camp&&!o.dead&&(!rm||!o.room||o.room===rm)) o.aggro=true; }
 function idleAI(e,dt){
   e.tele=null; e.blocking=!!e.shield;
   if(e.returning){
@@ -133,10 +134,13 @@ function updateEnemies(dt){
       if(e.burnTick<=0){ e.burnTick=0.33; damageEnemy(e,e.burnDps*0.33,{src:'burn'}); if(e.dead) continue; }
       if(Math.random()<dt*14) emit(e.x+rand(-e.r,e.r)*0.6,e.y+rand(-e.r,e.r)*0.6,1,{kind:'fire',ang:-Math.PI/2,spread:0.4,smin:20,smax:50,lmin:.3,lmax:.5,zmin:2,zmax:4,grow:4,drag:1});
     }else e.burnDps=0;
-    if(!e.aggro&&!p.dead&&!e.returning&&d<(e.type==='wolf'?(night?460:300):(night?300:380))*(G.diff.aggro||1)){ e.aggro=true; alertCamp(e); if(e.type==='wolf'&&Math.random()<0.5) SFX.play('howl'); }
+    // v12: a foe notices Ash only when it can see him (foeSees: no wall between them)
+    if(!e.aggro&&!p.dead&&!e.returning&&d<(e.type==='wolf'?(night?460:300):(night?300:380))*(G.diff.aggro||1)&&foeSees(e)){ e.aggro=true; e.seenT=G.time; alertCamp(e); if(e.type==='wolf'&&Math.random()<0.5) SFX.play('howl'); }
     if(e.aggro&&!e.boss&&G.mode==='story'){
       const hd=dist(e.x,e.y,e.homeX,e.homeY);
       if((hd>e.leash&&d>420)||p.dead){ e.aggro=false; e.returning=true; e.tele=null; }
+      // a chase goes on for a while after Ash slips out of sight, then the foe gives up and goes home
+      else if(d>260&&!isBossFoe(e)&&!e.guard&&!foeSees(e)&&G.time-(e.seenT!=null?e.seenT:(e.seenT=G.time))>6&&!(G.time-(e.lastHit||-99)<6)){ e.aggro=false; e.returning=true; e.tele=null; }
     }
     if(e.aggro&&d<750) G.inCombat=true;
     if(e.stun>0){ e.stun-=dt; e.dx=e.dy=0; e.blocking=false; }

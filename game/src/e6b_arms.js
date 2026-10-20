@@ -474,7 +474,8 @@ function glvOrbit(p){
   if(!G.flags.wpn_orbit){ G.flags.wpn_orbit=true; mvTip(S('Glaive spin','Glaive spin'),S('Keep holding attack to keep it spinning. It uses stamina.','Keep holding. It uses stamina.'),5,'wpn_orbit'); }
 }
 function glvHitFoe(a,e,c,k,kb,ka){
-  wStrike(e,c,k*(1+0.35*a.nk),'glaive',{src:'glaive',kb,ka,fx:a.x,fy:a.y});
+  // (v12: a spinning glaive circles Ash, so its line to the foe starts at him; a thrown one starts where it flies)
+  wStrike(e,c,k*(1+0.35*a.nk),'glaive',{src:'glaive',kb,ka,fx:a.x,fy:a.y,lx:a.ph==='orbit'?player.x:undefined,ly:a.ph==='orbit'?player.y:undefined});
   emit(c.x,c.y,6,{col:a.nk>0.3?'190,215,255':'235,240,250',smin:70,smax:220,lmin:.1,lmax:.25,zmin:1,zmax:2.2,drag:6}); SFX.play('hit',0.55);
 }
 // what the blade touches between (ox,oy) and (x,y): enemy shots bounce back, bombs go off, objects react
@@ -527,7 +528,8 @@ function stepGlaive(a,dt){
       a.d+=Math.hypot(sx,sy); if(a.d>=a.max){ a.ph='back'; a.hit.clear(); }
     }
     a.x=nx; a.y=ny;
-    for(const e of G.enemies){
+    // v12: flying home it slips through walls, and while a wall stands between it and Ash it hits nothing
+    if(!(a.ph==='back'&&(armsWall(a.x,a.y)||!losClear(a.x,a.y,p.x,p.y,p.r)))) for(const e of G.enemies){
       if(!wFoeOk(e)||a.hit.has(e.id)) continue;
       let hc=null; for(const c of hitCircles(e)) if(dist2(a.x,a.y,c.x,c.y)<(c.r+11)**2){ hc=c; break; }
       if(!hc) continue; a.hit.add(e.id);

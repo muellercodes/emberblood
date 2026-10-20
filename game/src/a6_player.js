@@ -40,7 +40,7 @@ function drawAshHat(){ if(G&&G.hat) drawHatShape(9,0,G.hat,0.95); }
 function useStamina(n){ const p=player; if(p.stamina<n*0.5) return false; p.stamina=Math.max(0,p.stamina-n); p.stamDelay=p.stamina<=0?1.0:0.55; return true; }
 function nearestEnemy(x,y,maxD){
   let best=null,bd=maxD*maxD;
-  for(const e of G.enemies){ if(e.dead||e.invuln||e.spawnIn>0||e.alpha<0.3||e.passive) continue; const d=dist2(x,y,e.x,e.y); if(d<bd){bd=d;best=e;} }
+  for(const e of G.enemies){ if(e.dead||e.invuln||e.spawnIn>0||e.alpha<0.3||e.passive) continue; const d=dist2(x,y,e.x,e.y); if(d<bd&&ashSees(e)){bd=d;best=e;} }   // (v12: only foes Ash can see)
   return best;
 }
 function updatePlayer(dt,inp){
@@ -153,7 +153,7 @@ function swingHits(){
   const st=p.stats, fin=p.swingFin, spin=p.swingSpin, range=st.range*(spin?1.2:fin?1.25:1), half=spin?Math.PI:fin?1.3:1.05;
   let any=false;
   for(const e of G.enemies){
-    if(e.dead||p.swingHit.has(e.id)||e.invuln||e.spawnIn>0||e.passive) continue;
+    if(e.dead||p.swingHit.has(e.id)||e.invuln||e.spawnIn>0||e.passive||!foeInView(e)) continue;
     let best=null;
     for(const c of hitCircles(e)) if(inArcC(p.x,p.y,p.swingDir,range,half,c)&&(!best||c.m>best.m)) best=c;
     if(!best) continue;
@@ -175,7 +175,7 @@ function aimTarget(){
   for(const e of G.enemies){
     if(e.dead||e.invuln||e.spawnIn>0||e.passive) continue;
     const d=dist(p.x,p.y,e.x,e.y); if(d>720) continue;
-    const da=Math.abs(angDiff(p.facing,angTo(p.x,p.y,e.x,e.y))); if(da>0.8) continue;
+    const da=Math.abs(angDiff(p.facing,angTo(p.x,p.y,e.x,e.y))); if(da>0.8||!ashSees(e)) continue;
     const s=d*(1+da)*(e.boss?0.6:1); if(s<bs){bs=s;best=e;}
   }
   return best;
@@ -190,14 +190,17 @@ function reflectProj(pr){
 function doBreath(dt){
   if(player.flying) return breathFly(dt);   // from the sky the fire pours down (a6c_moves.js)
   const p=player, ang=p.facing, mx=p.x+Math.cos(ang)*16, my=p.y+Math.sin(ang)*16;
-  emit(mx,my,4,{kind:'fire',ang,spread:0.28,smin:360,smax:460,lmin:.35,lmax:.48,zmin:3,zmax:6,grow:22,drag:1});
-  if(Math.random()<0.3) emit(mx+Math.cos(ang)*120,my+Math.sin(ang)*120,1,{col:'70,60,55',glow:false,ang:-Math.PI/2,spread:0.6,smin:10,smax:40,lmin:.8,lmax:1.4,zmin:4,zmax:8,grow:10,drag:1});
+  // v12: the flame stops at the first wall (each puff along its own line) and splashes on it
+  const reach=breathCut(ang);
+  breathPuffs(mx,my,ang,4,{kind:'fire',spread:0.28,smin:360,smax:460,lmin:.35,lmax:.48,zmin:3,zmax:6,grow:22});
+  if(Math.random()<0.3){ const s=Math.min(120,Math.max(10,reach-20)); emit(mx+Math.cos(ang)*s,my+Math.sin(ang)*s,1,{col:'70,60,55',glow:false,ang:-Math.PI/2,spread:0.6,smin:10,smax:40,lmin:.8,lmax:1.4,zmin:4,zmax:8,grow:10,drag:1}); }
+  if(reach<170) breathSplash(mx,my,ang,reach,dt,'fire');
   breathIgnite(mx,my,ang,dt);
   p.breathTick-=dt;
   if(p.breathTick<=0){
     p.breathTick=0.1;
     for(const e of G.enemies){
-      if(e.dead||e.invuln||e.spawnIn>0||e.passive) continue;
+      if(e.dead||e.invuln||e.spawnIn>0||e.passive||!foeInView(e)) continue;
       for(const c of hitCircles(e)){
         if(inArcC(mx,my,ang,175,0.45,c)){
           damageEnemy(e,4.6*p.stats.fire*p.stats.dmgMul*rand(0.9,1.1),{src:'fire',kb:25,ka:angTo(p.x,p.y,e.x,e.y),mult:c.m>1?1.2:1});
@@ -208,6 +211,45 @@ function doBreath(dt){
     }
   }
 }
+// ---------- v12: the breath and walls
+// how far a breath line at angle a reaches from Ash's mouth (16 px out) before something solid, up to L
+function breathRay(a,L){ const p=player, D=(L||175)+16; return clamp(losHitT(p.x,p.y,p.x+Math.cos(a)*D,p.y+Math.sin(a)*D,0,ashLosO())-16,0,L||175); }
+const BRW={t:-1,reach:175,splT:0};
+function breathCut(ang){ BRW.t=G.time; BRW.reach=breathRay(ang,175); return BRW.reach; }
+// flame puffs like emit(), each one cut where its own line meets a wall (drag 1: a puff of speed s and life t travels
+// s*(1-e^-t), so a wall at R px gives it life -ln(1-R/s))
+function breathPuffs(mx,my,ang,n,o){
+  const P=G.particles;
+  for(let i=0;i<n;i++){
+    if(P.length>950) return;
+    const a=ang+rand(-o.spread,o.spread), s=rand(o.smin,o.smax); let life=rand(o.lmin,o.lmax);
+    const R=breathRay(a,175), far=s*(1-Math.exp(-life));
+    if(R<far) life=R<s*0.98?Math.max(0.02,-Math.log(1-R/s)):life;
+    P.push({x:mx,y:my,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life,max:Math.max(life,o.lmin*0.6),size:rand(o.zmin,o.zmax),grow:o.grow||0,drag:1,kind:o.kind||'fire',col:o.col||'255,190,90',glow:o.glow!==false,rise:0,al:o.alpha||1});
+  }
+}
+// where the flame meets a wall: a small splash that rolls back and to the sides, and a curl of smoke
+function breathSplash(mx,my,ang,reach,dt,kind){
+  const x=mx+Math.cos(ang)*reach, y=my+Math.sin(ang)*reach;
+  BRW.splT-=dt; if(BRW.splT>0) return; BRW.splT=0.03;
+  const back=ang+Math.PI, moon=kind==='moon';
+  for(let i=0;i<2;i++){ const a=back+rand(-1.35,1.35); emit(x-Math.cos(ang)*4,y-Math.sin(ang)*4,1,moon?{kind:'moon',col:'230,236,255',ang:a,spread:0,smin:60,smax:170,lmin:.12,lmax:.26,zmin:2,zmax:4,grow:12,drag:4,alpha:0.8}:{kind:'fire',ang:a,spread:0,smin:60,smax:170,lmin:.12,lmax:.26,zmin:2.5,zmax:4.5,grow:14,drag:4}); }
+  if(Math.random()<0.3) emit(x,y,1,{col:moon?'200,210,240':'255,230,170',ang:back,spread:1.4,smin:80,smax:200,lmin:.1,lmax:.2,zmin:1,zmax:1.8,drag:5});
+  if(!moon&&Math.random()<0.12) emit(x,y-6,1,{col:'70,60,55',glow:false,ang:-Math.PI/2,spread:0.5,smin:10,smax:30,lmin:.6,lmax:1,zmin:3,zmax:6,grow:8,drag:1});
+}
+// every stock breath test (the cone inArcC(mouth,facing,175,0.45) that foes, braziers, lanterns, roots, torches, Ward
+// stones, ice and the rest use, and the sky cone (180,0.5) while flying) also needs a clear line from Ash to the thing
+function breathSees(x,y,r){ const p=player; return losClear(p.x,p.y,x,y,r||0,ashLosO()); }
+// the same for Ash's swings (LOSV.melee is set while swingHits runs): pots, barrels, crystals and switches behind a wall
+// are out of reach of the sword, daggers and spear
+{ const base=inArcC; inArcC=function(ox,oy,ang,range,half,c){
+    if(!base(ox,oy,ang,range,half,c)) return false;
+    const p=player; if(LOSV.melee&&c&&p) return breathSees(c.x,c.y,c.r||0);
+    if(!c||!p||!p.breathing) return true;
+    if(!((range===175&&half===0.45&&!p.flying)||(range===180&&half===0.5&&p.flying))) return true;
+    return breathSees(c.x,c.y,c.r||0);
+  }; }
+{ const base=swingHits; swingHits=function(){ LOSV.melee=true; try{ return base.apply(this,arguments); } finally{ LOSV.melee=false; } }; }
 function doRoar(free){
   const p=player; if(!free) p.roar=0;
   SFX.play('roar'); shake(14); flashA=0.25; flashCol='255,170,80'; p.iframes=Math.max(p.iframes,0.5);
@@ -225,6 +267,7 @@ function hurtPlayer(amt,sx,sy,kb){
   const p=player;
   if(!p||p.dead||p.iframes>0||scene!=='play'||(window.__eb&&window.__eb.god)) return false;
   if(p.flying&&!airHitOK(sx,sy)) return false;   // ground melee cannot reach Ash in the sky (projectiles and flying foes can)
+  if(!hurtSeen(sx,sy)) return false;              // v12: nothing hurts Ash through a wall
   const dmg=Math.max(1,Math.min(Math.round(amt*G.diff.dmg*(p.stats.armor||1)),G.diff.cap?Math.ceil(p.maxHp*G.diff.cap):1e9));
   p.hp-=dmg; p.iframes=0.6; p.hurtFlash=0.12; G.hurtVig=0.6; G.combo=0; p.lastHurt=G.time; p.drinkT=0;
   if(kb){ const a=angTo(sx,sy,p.x,p.y); p.kvx+=Math.cos(a)*kb; p.kvy+=Math.sin(a)*kb; }
@@ -249,9 +292,164 @@ function inArcC(ox,oy,ang,range,half,c){
   return Math.abs(angDiff(ang,angTo(ox,oy,c.x,c.y)))<=half+Math.atan2(c.r,Math.max(d,1));
 }
 function inCone(ox,oy,ang,len,half,tx,ty,tr){ return inArcC(ox,oy,ang,len,half,{x:tx,y:ty,r:tr}); }
+
+// ================= walls between two points (v12 WALLS): nothing hits, hurts or notices through a wall
+// losHitT(x0,y0,x1,y1,tr,o) is how far along the line from (x0,y0) toward (x1,y1) the first solid thing stands (Infinity
+// when there is none); losClear(...) is true when there is none. What is solid:
+//   caves and dungeons: wall cells (a cave pool is low water, not a wall), shut doors and gates, push blocks and the solid
+//     things the caves add: the same cells that stop shots (areaBlocked read with C2.proj set, so shafts, water, lava,
+//     pits and raised floors stay open);
+//   anywhere: colliders that stop arrows (buildings, Emberhollow's wall and its shut gates, pillars, big trunks, statues,
+//     crates); colliders marked low (fences, hedges, rocks, wells) or noProj are flown over, as arrows fly over them, and
+//     thin round ones (under 16 px: tree trunks, posts, lamps, braziers) are seen and breathed past (arrows still stick in them);
+//   outdoors: ground higher than the source (a cliff or terrace face seen from below; ramps never block).
+// A house is one room, so it is always clear. Not tested: the first 2 px, the last tr px before the target (its own body),
+// the cave cells the two ends stand in (things set into a wall: a crack, a vent, a torch), and a collider that holds
+// either end.
+// o: {lv: the source's level (default: where it stands), lt: the target's level (a sight line: only ground higher than
+// both ends blocks), fly: true (to or from the sky outdoors: colliders do not count)}.
+const LOSV={stamp:0};
+function losHitT(x0,y0,x1,y1,tr,o){
+  const dx=x1-x0, dy=y1-y0, D=Math.hypot(dx,dy), end=D-(tr||0)*0.9;
+  if(!(end>2)) return Infinity;
+  const ux=dx/D, uy=dy/D;
+  let best=Infinity;
+  if(x0>=IZX-50||x1>=IZX-50){
+    const A=AREA; if(!A||A.kind==='house') return Infinity;
+    if(A.cave) best=losCaveT(A,x0,y0,x1,y1,ux,uy,end);
+    return Math.min(best,losColT(x0,y0,ux,uy,end,x1,y1));
+  }
+  if(!(o&&o.fly)) best=losColT(x0,y0,ux,uy,end,x1,y1);
+  return Math.min(best,losElevT(x0,y0,ux,uy,Math.min(end,best),o));
+}
+function losClear(x0,y0,x1,y1,tr,o){ return losHitT(x0,y0,x1,y1,tr,o)===Infinity; }
+// cave cells, 8 px steps (each cell is read once)
+function losCaveT(A,x0,y0,x1,y1,ux,uy,end){
+  const c=A.cave, cs=c.cell, w=c.w, h=c.h, gx=A.x0, gy=A.y0;
+  const ti=Math.floor((x1-gx)/cs), tj=Math.floor((y1-gy)/cs), tk=ti>=0&&tj>=0&&ti<w&&tj<h?tj*w+ti:-2;
+  const oi=Math.floor((x0-gx)/cs), oj=Math.floor((y0-gy)/cs), ok=oi>=0&&oj>=0&&oi<w&&oj<h?oj*w+oi:-2;
+  let lk=-3; C2.proj++;
+  try{
+    for(let s=2;s<end;s+=8){
+      const x=x0+ux*s, y=y0+uy*s, i=Math.floor((x-gx)/cs), j=Math.floor((y-gy)/cs);
+      if(i<0||j<0||i>=w||j>=h) return s;
+      const k=j*w+i; if(k===lk) continue; lk=k; if(k===tk||k===ok) continue;
+      if(c.grid[k]===1){ if(c.typ&&c.typ[k]===1) continue; return s; }
+      if(areaBlocked(x+0.0137,y+0.0171)) return s;   // (never exactly Ash's own x or y: those mean his own feet)
+    }
+  }finally{ C2.proj--; }
+  return Infinity;
+}
+// colliders: walk the collider grid cells the line crosses and take the nearest entry point
+function losColT(x0,y0,ux,uy,end,x1,y1){
+  const st=++LOSV.stamp, ex=x0+ux*end, ey=y0+uy*end, sx=ux>0?1:-1, sy=uy>0?1:-1;
+  let cx=Math.floor(x0/GC), cy=Math.floor(y0/GC); const cxe=Math.floor(ex/GC), cye=Math.floor(ey/GC);
+  let tmx=Math.abs(ux)>1e-9?((sx>0?(cx+1)*GC:cx*GC)-x0)/ux:Infinity, tmy=Math.abs(uy)>1e-9?((sy>0?(cy+1)*GC:cy*GC)-y0)/uy:Infinity;
+  const tdx=Math.abs(ux)>1e-9?GC/Math.abs(ux):Infinity, tdy=Math.abs(uy)>1e-9?GC/Math.abs(uy):Infinity;
+  let best=Infinity;
+  for(let n=0;n<200;n++){
+    const a=GRID.get(gkey(cx,cy));
+    if(a) for(let q=0;q<a.length;q++){ const c=a[q]; if(c._los===st) continue; c._los=st; if(c.noProj||c.low||(c.t==='c'&&c.r<16)||!colActive(c)) continue; const t=losShapeT(c,x0,y0,ux,uy,end,x1,y1); if(t<best) best=t; }
+    if(cx===cxe&&cy===cye) break;
+    if(tmx<tmy){ if(tmx>best||tmx>end) break; tmx+=tdx; cx+=sx; } else { if(tmy>best||tmy>end) break; tmy+=tdy; cy+=sy; }
+  }
+  return best;
+}
+function losShapeT(c,x0,y0,ux,uy,end,x1,y1){
+  if(c.t==='c'){
+    const r=c.r-0.5; if(r<=0) return Infinity; const r2=r*r;
+    if((x0-c.x)**2+(y0-c.y)**2<r2||(x1-c.x)**2+(y1-c.y)**2<r2) return Infinity;
+    const fx=c.x-x0, fy=c.y-y0, tc=fx*ux+fy*uy, d2=fx*fx+fy*fy-tc*tc; if(tc<0||d2>=r2) return Infinity;
+    const t=tc-Math.sqrt(r2-d2); return t<end?Math.max(0,t):Infinity;
+  }
+  const bx0=c.x0+0.5, by0=c.y0+0.5, bx1=c.x1-0.5, by1=c.y1-0.5;
+  if((x0>bx0&&x0<bx1&&y0>by0&&y0<by1)||(x1>bx0&&x1<bx1&&y1>by0&&y1<by1)) return Infinity;
+  let t0=0, t1=end;
+  if(Math.abs(ux)<1e-9){ if(x0<=bx0||x0>=bx1) return Infinity; } else { let a=(bx0-x0)/ux, b=(bx1-x0)/ux; if(a>b){ const q=a; a=b; b=q; } if(a>t0) t0=a; if(b<t1) t1=b; if(t0>t1) return Infinity; }
+  if(Math.abs(uy)<1e-9){ if(y0<=by0||y0>=by1) return Infinity; } else { let a=(by0-y0)/uy, b=(by1-y0)/uy; if(a>b){ const q=a; a=b; b=q; } if(a>t0) t0=a; if(b<t1) t1=b; if(t0>t1) return Infinity; }
+  return t0;
+}
+// outdoor levels: a face (ground higher than the source) stops the line; ramps never do
+function losElevT(x0,y0,ux,uy,end,o){
+  if(!(end>4)||!elvGrid(x0,y0)) return Infinity;
+  let L=o&&o.lv!=null?o.lv:losSrcLvl(x0,y0,-ux,-uy);
+  if(o&&o.lt!=null&&o.lt>L) L=o.lt;
+  for(let s=4;s<end;s+=6){ const x=x0+ux*s, y=y0+uy*s; if(elevFace(x,y)&EF.RAMP) continue; if(elevLvl(x,y)>L) return s; }
+  return Infinity;
+}
+// the level a line leaves from: where it starts, or just behind that when the start lies on a cliff face
+function losSrcLvl(x,y,bx,by){
+  if(elevFace(x,y)&EF.FACE) for(let d=8;d<=40;d+=8){ const qx=x+bx*d, qy=y+by*d; if(!(elevFace(qx,qy)&EF.FACE)) return elevLvl(qx,qy); }
+  return elevLvl(x,y);
+}
+// Ash as a source: from the sky outdoors his level is his flight ceiling and colliders below do not count
+const LOS_ASH_FLY={lv:0,fly:true};
+function ashLosO(){ const p=player; if(p&&p.flying&&!AREA){ LOS_ASH_FLY.lv=elvPlayerShotLvl(); return LOS_ASH_FLY; } return null; }
+// bosses: every boss and mini boss (story bosses, cave bosses, Trial guardians, the second-edition cave bosses)
+function isBossFoe(e){ if(!e) return false; const D=EDEF[e.type]; return !!(e.boss||e.caveBoss||e.trialBoss||e.c2boss||(D&&(D.boss||D.mini))); }
+// a boss cannot be hurt before its fight has begun: not while its intro talks, and in a cave or dungeon not until Ash is
+// inside its room (the boss door open and the room's intro played) or the room has locked for the fight
+function bossReady(e){
+  if(!isBossFoe(e)) return true;
+  if(G.fightIntro) return false;
+  const A=AREA;
+  if(e.inArea&&A&&A.rooms&&e.room&&A.rooms[e.room]){ const R=A.rooms[e.room]; return !!R.locked||caveRoomAt(player.x,player.y)===R; }
+  return true;
+}
+// is foe e in a room Ash can see right now? (ROOMS' roomSeen: a foe in a dark room is neither seen nor hit)
+function foeInView(e){ return typeof roomSeen!=='function'||roomSeen(e); }
+// can a hit from (x,y) (Ash's body when x is null) land on foe e at its hit circle c (its body when c is null)?
+const LOS_SKY={lt:99};   // a flying foe outdoors is in the air: cliffs below it do not hide it
+function ashHits(e,c,x,y,o){
+  if(!bossReady(e)||!foeInView(e)) return false;
+  if(x==null){ x=player.x; y=player.y; if(o===undefined) o=ashLosO(); }
+  if(!o&&e.flying&&!AREA) o=LOS_SKY;
+  return losClear(x,y,c?c.x:e.x,c?c.y:e.y,c?c.r:(e.r||12),o||null);
+}
+// does Ash see foe e (aim help and auto-aim pick only foes he can see); cached a few times a second per foe
+function ashSees(e){
+  if(e._asT>G.time&&e._asT<G.time+1) return !!e._as;
+  e._asT=G.time+0.15+Math.random()*0.1;
+  const p=player; return e._as=!!p&&bossReady(e)&&foeInView(e)&&losClear(p.x,p.y,e.x,e.y,e.r||12,ashLosO()||(e.flying&&!AREA?LOS_SKY:{lt:elevOf(e)}));
+}
+// can foe e see Ash (it notices him only then); cached a few times a second per foe. A foe in a room ROOMS keeps asleep
+// sees nothing. e.seenT is the last time it saw him.
+function foeSees(e){
+  if(e._fsT>G.time&&e._fsT<G.time+1) return !!e._fs;
+  e._fsT=G.time+0.18+Math.random()*0.12;
+  const p=player; let v=false;
+  if(p&&!p.dead&&!(typeof roomAwake==='function'&&!roomAwake(e))) v=(!AREA&&e.flying)||losClear(e.x,e.y,p.x,p.y,p.r,{lt:elevOf(p),fly:!AREA&&!!p.flying});   // (a flyer outdoors sees from the air)
+  e._fs=v; if(v) e.seenT=G.time;
+  return v;
+}
+// the boss Ash is fighting right here (same cave room, or near him outdoors), if any
+function bossShares(b){
+  if(!b||b.dead) return false;
+  const A=AREA;
+  if(A&&A.rooms){ const R=caveRoomAt(player.x,player.y); return !!R&&(caveRoomAt(b.x,b.y)===R||(!!b.room&&A.rooms[b.room]===R)); }
+  return dist2(b.x,b.y,player.x,player.y)<1600*1600;
+}
+function bossHere(){ const g=G.boss; if(g&&!g.dead&&bossShares(g)) return g; for(const e of G.enemies) if(!e.dead&&isBossFoe(e)&&bossShares(e)) return e; return null; }
+// a hit on Ash from (sx,sy) needs a clear line to him. A boss's own attacks (its AI tick, or any blast, ring or pool while
+// the boss Ash is fighting shares his room) keep their own rules; so do lava and ground hazards (HURT_SRC 'lava').
+// A foe asleep in a room ROOMS keeps asleep cannot hurt him.
+function hurtSeen(sx,sy){
+  const p=player;
+  if(AIE&&typeof roomAwake==='function'&&!roomAwake(AIE)) return false;
+  if(AIE&&AIE.flying&&!AREA) return true;   // outdoors a flyer comes over everything
+  if(sx==null||sy==null||!isFinite(sx)||!isFinite(sy)||HURT_SRC==='lava') return true;
+  if((sx-p.x)**2+(sy-p.y)**2<(p.r+8)**2) return true;
+  const b=AIE?(isBossFoe(AIE)?AIE:null):bossHere();
+  if(b&&bossShares(b)) return true;
+  const fly=!AREA&&!!p.flying;
+  return losClear(sx,sy,p.x,p.y,p.r,fly?{fly:true,lt:elevOf(p)}:null);
+}
 function damageEnemy(e,amt,o){
   o=o||{};
   if(e.dead||e.invuln||e.spawnIn>0||e.passive) return 0;
+  // v12: a boss is not hurt before its fight has begun (its room open and its intro played); o.los (set by Ash's own hits,
+  // see wStrike) also needs a clear line from o.lx,o.ly (or o.fx,o.fy, or Ash) to the foe
+  if(!bossReady(e)||(o.los&&(!foeInView(e)||!losClear(o.lx!=null?o.lx:o.fx!=null?o.fx:player.x,o.ly!=null?o.ly:o.fy!=null?o.fy:player.y,e.x,e.y,e.r||12,o.lo||(o.lx==null&&o.fx==null?ashLosO():null)||(e.flying&&!AREA?LOS_SKY:null))))){ e.lastBlocked=true; return 0; }
   let a=amt*(o.mult||1), blocked=false;
   if(e.shield&&e.blocking&&o.src!=='burn'&&o.src!=='roar'&&o.src!=='ember'){
     const fx=o.fx!=null?o.fx:player.x, fy=o.fy!=null?o.fy:player.y;
@@ -304,3 +502,16 @@ function deathFx(e){
   scorch(e.x,e.y,e.r*1.6);
 }
 function dropHeal(x,y,amt){ G.pickups.push({x,y,vx:rand(-70,70),vy:rand(-70,70),amt,t:0,life:15}); }
+// v12: indoors nothing is named, talked to, opened or picked up through a wall. This wraps FIXES' reach tests (reachObj,
+// reachPerson, reachPlace in a9d_quests.js) when they are in the build; a function declaration is hoisted, so the wrap can
+// sit here. A house is one room, so only caves and dungeons change.
+if(typeof reachObj==='function'){ const base=reachObj; reachObj=function(o){ const q=base.apply(this,arguments); if(q&&q.ok&&AREA&&player&&!losClear(player.x,player.y,q.x,q.y,o&&o.w?0:((o&&o.r)||16))) q.ok=false; return q; }; }
+if(typeof reachPerson==='function'){ const base=reachPerson; reachPerson=function(n){ const ok=base.apply(this,arguments); return ok&&!(AREA&&player&&n&&!losClear(player.x,player.y,n.x,n.y,14)); }; }
+if(typeof reachPlace==='function'){ const base=reachPlace; reachPlace=function(x,y,r){ const ok=base.apply(this,arguments); return ok&&!(AREA&&player&&!losClear(player.x,player.y,x,y,r||22)); }; }
+// test hooks (v12 WALLS)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{walls:{losClear,losHitT,BRW,bossReady,ashHits,ashSees,foeSees,hurtSeen,isBossFoe,
+  give:id=>{ giveWeapon(id,true); equipWeapon(id,true); return curWeapon(); },
+  foe:(type,x,y,o)=>{ o=o||{}; const e=makeEnemy(type,x,y,Object.assign({aggro:false},o)); if(AREA){ e.inArea=true; const R=caveRoomAt(x,y); if(R){ e.room=R.id; R.enemies.push(e); } } e.spawnIn=0; if(o.hold) e.stun=999; return e.id; },
+  get:id=>{ const e=G.enemies.find(q=>q.id===id); return e?{id:e.id,type:e.type,x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,dead:e.dead,aggro:e.aggro,room:e.room,boss:isBossFoe(e),ready:bossReady(e),stun:e.stun}:null; },
+  rooms:()=>AREA&&AREA.rooms?Object.values(AREA.rooms).map(R=>({id:R.id,kind:R.kind,x0:R.x0,y0:R.y0,x1:R.x1,y1:R.y1,cx:R.cx,cy:R.cy,locked:!!R.locked,foes:R.enemies.filter(e=>!e.dead).map(e=>({id:e.id,type:e.type,boss:isBossFoe(e),x:Math.round(e.x),y:Math.round(e.y),hp:Math.round(e.hp)}))})):null,
+  here:()=>{ const R=caveRoomAt(player.x,player.y); return R?R.id:null; }}});

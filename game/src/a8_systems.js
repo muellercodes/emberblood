@@ -125,10 +125,16 @@ function updateProjectiles(dt){
     pr.t+=dt; pr.life-=dt;
     if(pr.life<=0){ pr.dead=true; smallBoom(pr.x,pr.y,pr.kind==='orb'?'200,120,255':null); continue; }
     if(pr.homing&&pr.owner==='enemy'){ const a=Math.atan2(pr.vy,pr.vx), na=turnTo(a,angTo(pr.x,pr.y,p.x,p.y),pr.homing*dt), sp=Math.hypot(pr.vx,pr.vy); pr.vx=Math.cos(na)*sp; pr.vy=Math.sin(na)*sp; }
-    pr.x+=pr.vx*dt; pr.y+=pr.vy*dt;
+    // v12: a fast shot moves in steps of at most 14 px, so it cannot skip through a wall between two frames. Ash's flame
+    // wave (it passes through foes) now stops at solid walls too; foes' waves keep their old rule
+    const ns=Math.max(1,Math.ceil(Math.hypot(pr.vx,pr.vy)*dt/14)), qx=pr.vx*dt/ns, qy=pr.vy*dt/ns;
+    for(let i=0;i<ns&&!pr.dead;i++){
+      pr.x+=qx; pr.y+=qy;
+      if(pr.kind!=='wave'&&colAt(pr.x,pr.y,pr.r*0.5)){ pr.dead=true; smallBoom(pr.x,pr.y); }
+      else if(pr.kind==='wave'&&pr.owner==='player'&&wColAt(pr.x,pr.y,2)){ pr.dead=true; smallBoom(pr.x,pr.y); }
+      if(!pr.dead&&AREA&&AREA.kind==='cave'&&areaBlocked(pr.x,pr.y)){ pr.dead=true; smallBoom(pr.x,pr.y); }
+    }
     if(Math.random()<0.7) emit(pr.x,pr.y,1,pr.kind==='ice'?{col:'200,230,255',smin:5,smax:30,lmin:.2,lmax:.35,zmin:2,zmax:4,grow:-4,drag:2}:pr.kind==='orb'?{col:'200,120,255',smin:5,smax:30,lmin:.2,lmax:.35,zmin:2,zmax:4,grow:-4,drag:2}:{kind:'fire',smin:5,smax:30,lmin:.2,lmax:.35,zmin:pr.r*0.4,zmax:pr.r*0.7,grow:-4,drag:2});
-    if(pr.kind!=='wave'&&colAt(pr.x,pr.y,pr.r*0.5)){ pr.dead=true; smallBoom(pr.x,pr.y); }
-    if(AREA&&AREA.kind==='cave'&&areaBlocked(pr.x,pr.y)){ pr.dead=true; smallBoom(pr.x,pr.y); }
     if(!AREA&&outOfMap(pr.x,pr.y,-20)) pr.dead=true;
     if(pr.dead) continue;
     if(pr.owner==='enemy'){
@@ -139,7 +145,7 @@ function updateProjectiles(dt){
         if(pr.hit&&pr.hit.has(e.id)) continue;
         let hc=null; for(const c of hitCircles(e)) if(dist2(pr.x,pr.y,c.x,c.y)<(pr.r+c.r)**2){ hc=c; break; }
         if(!hc) continue;
-        damageEnemy(e,pr.dmg,{src:'proj',kb:200,ka:Math.atan2(pr.vy,pr.vx),mult:hc.m,crit:hc.m>1,fx:pr.x-pr.vx*0.05,fy:pr.y-pr.vy*0.05});
+        damageEnemy(e,pr.dmg,{src:'proj',kb:200,ka:Math.atan2(pr.vy,pr.vx),mult:hc.m,crit:hc.m>1,fx:pr.x-pr.vx*0.05,fy:pr.y-pr.vy*0.05,los:true,lx:pr.x-pr.vx*0.02,ly:pr.y-pr.vy*0.02});
         if(pr.hit) pr.hit.add(e.id); else { pr.dead=true; smallBoom(pr.x,pr.y,'140,230,255'); break; }
       }
     }
@@ -185,6 +191,7 @@ function updateRings(dt){
         let inside=false; for(const c of hitCircles(e)) if(dist(R.x,R.y,c.x,c.y)-c.r<=R.rad){ inside=true; break; }
         if(!inside) continue;
         R.hit.add(e.id);
+        if(!ashHits(e,null,R.x,R.y)) continue;   // v12: the roar does not pass through walls
         damageEnemy(e,R.dmg,{src:'roar',kb:520,ka:angTo(R.x,R.y,e.x,e.y)});
         stunEnemy(e,1.4);
       }
@@ -207,7 +214,7 @@ function updatePools(dt){
     if(pl.owner==='enemy'){ if(!p.dead&&!airborne()&&dist(pl.x,pl.y,p.x,p.y)<pl.r+p.r*0.4){ if(pl.kind==='toxic') p.slowT=Math.max(p.slowT||0,0.4); hurtPlayer(pl.dmg,pl.x,pl.y,0); } }
     else{
       pl.tick-=dt;
-      if(pl.tick<=0){ pl.tick=0.3; for(const e of G.enemies){ if(e.dead||e.flying||e.invuln) continue; if(dist(pl.x,pl.y,e.x,e.y)<pl.r+e.r){ damageEnemy(e,5*p.stats.fire,{src:'ember'}); if(!e.dead){ e.burnT=Math.max(e.burnT,1.5); e.burnDps=Math.max(e.burnDps,4*p.stats.fire); } } } }
+      if(pl.tick<=0){ pl.tick=0.3; for(const e of G.enemies){ if(e.dead||e.flying||e.invuln) continue; if(dist(pl.x,pl.y,e.x,e.y)<pl.r+e.r&&ashHits(e,null,pl.x,pl.y)){ damageEnemy(e,5*p.stats.fire,{src:'ember'}); if(!e.dead){ e.burnT=Math.max(e.burnT,1.5); e.burnDps=Math.max(e.burnDps,4*p.stats.fire); } } } }
     }
   }
   G.pools=G.pools.filter(q=>q.life>0);
