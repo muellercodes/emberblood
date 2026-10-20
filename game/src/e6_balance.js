@@ -92,7 +92,7 @@ function balStill(dt){
   blast(p.x,p.y,BAL.still.blastR,BAL.still.delay[di],dm,{still:true});
   emit(p.x,p.y,14,{col:'255,150,70',ang:-Math.PI/2,spread:1.2,smin:20,smax:80,lmin:.3,lmax:.6,zmin:1.2,zmax:2.4,rise:30});
   ftext(p.x,p.y-36,simplify('Keep moving!'),'#ffd27a',15);
-  if(G.flags&&!G.flags.bal_stillTip){ G.flags.bal_stillTip=1; mvTip('Keep moving',S('Bosses hate it when you stand still: the ground erupts under your feet. Step, roll or jump out of the red ring!','Do not stand still! Run out of the red ring.'),8,'bal_still'); }
+  if(G.flags&&!G.flags.bal_stillTip){ G.flags.bal_stillTip=1; mvTip('Keep moving',hasAbil('jump')?S('Bosses hate it when you stand still: the ground erupts under your feet. Step, roll or jump out of the red ring!','Do not stand still! Run out of the red ring.'):S('Bosses hate it when you stand still: the ground erupts under your feet. Step or roll out of the red ring!','Do not stand still! Run out of the red ring.'),8,'bal_still'); }
 }
 { const base=updateEnemies; updateEnemies=function(dt){ base(dt); try{ balStill(dt); }catch(e){} }; }
 

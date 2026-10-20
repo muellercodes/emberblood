@@ -305,8 +305,10 @@ function talkShellby(){
 function findPage(id){
   if(G.pages[id]) return;
   G.pages[id]=true; jingle('item','shrine'); const P=PAGES[id];
-  const lines=[['narr',`You found a lost page of the Wardens' Account.`],['narr',`${P.title}`]].concat(P.text.map(t=>['narr',t]));
-  runDialogue(lines,()=>{ scene='play'; setBanner(`${Object.keys(G.pages).length} of 10 pages found`,G.quests.pages?'Bring them to Sister Wren in Brindlecross.':'Sister Wren in Brindlecross would love to see this.',2.6); saveGame(); });
+  // (v12) no count: before Yara's talk it is just an old page; Wren is named only once Ash has heard of her
+  const known=reached('hollow'), sub=G.quests.pages?'Bring them to Sister Wren in Brindlecross.':reached('wren')?'Sister Wren in Brindlecross would love to see this.':'';
+  const lines=[['narr',known?S(`A page of the Wardens' Account.`,`A page of the Wardens' book!`):S(`You found an old page.`,`An old page!`)],['narr',`${P.title}`]].concat(P.text.map(t=>['narr',t]));
+  runDialogue(lines,()=>{ scene='play'; setBanner(known?P.title:S('An old page','An old page'),sub,2.6); saveGame(); });
 }
 function deliverPages(){
   const have=Object.keys(G.pages).length, given=G.pagesGiven||0, n=have-given;

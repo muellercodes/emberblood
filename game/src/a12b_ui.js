@@ -499,7 +499,7 @@ function openMap(){
   MAPUI.view=AREA&&AREA.rooms?-1:curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
   drawMapScreen(); renderJournal(); show('mapov');
 }
-const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
+const SO_FAR={wake:'It is Lantern Day in Emberhollow. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
   lore:'Emberhollow is safe for now. Elder Yara has something important to tell you.',hollow:'Yara told you the truth. Vorlaxis, the dragon sealed under Cinder Mountain, is your great ×13 grandfather, and only Emberblood fire can keep his Wards burning.',
   warcamp:'Warden Iska says a cult called the Scaled Oath is snuffing the Wards. Their kobolds answer to Grizzlefang.',wren:'Grizzlefang is beaten, but Vorlaxis spoke to you through the fire. Sister Wren in Brindlecross knows where the Wards are.',
   oath:'The Scaled Oath holds the Ash Ward. High Priest Morrow is trying to put it out for good.',three:'Two Wards burn again. The Crag, Sunken and Frost Wards are still out there.',
@@ -542,9 +542,9 @@ function renderJour(){
     if(c.cinder) ch.push(c.cinder==='rest'?'Sir Cindervane finally rests.':'Sir Cindervane will hold the stairs for you.');
     for(const k in (G.choices.extra||{})) ch.push(G.choices.extra[k]);
     if(ch.length) rows.push(`<div class="jh2">Choices you made</div><ul>${ch.map(t=>`<li>${E(t)}</li>`).join('')}</ul>`);
-    rows.push(`<div class="jh2">The Wardens’ Account</div><p>${Object.keys(G.pages).length} of 10 lost pages found.</p>`+Object.keys(G.pages).sort((a,b)=>+a.slice(1)-+b.slice(1)).map(k=>`<p><b style="color:var(--ink)">${E(PAGES[k].title)}</b><br>${E(PAGES[k].text.join(' '))}</p>`).join(''));
-    const seen=store.get('eb_endings',{}), ne=Object.keys(seen).length;
-    rows.push(`<div class="jh2">Act I endings found</div><p>${ne} of 4${ne?': '+E(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · ')):''}. Different choices lead to different endings.</p>`);
+    // (v12) the pages Ash has found, by title, with no count: "Old pages" until Yara has told him whose they are
+    const pk=Object.keys(G.pages||{}).filter(k=>PAGES[k]);
+    if(pk.length) rows.push(`<div class="jh2">${reached('hollow')?'The Wardens’ Account':'Old pages'}</div>`+pk.sort((a,b)=>+a.slice(1)-+b.slice(1)).map(k=>`<p><b style="color:var(--ink)">${E(PAGES[k].title)}</b><br>${E(PAGES[k].text.join(' '))}</p>`).join(''));
   }else if(jTab==='people'){
     const met=CAST.filter(c=>!c.generic&&(G.seenTalk&&G.seenTalk['met_'+c.id]));
     rows.push(`<p>People you've talked to: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
@@ -552,8 +552,9 @@ function renderJour(){
   }else if(jTab==='bag'){
     rows.push(bagHtml(E));   // (v12) the bag screen, below renderJour
   }else if(jTab==='secrets'){
-    const S=secretTally();
-    rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
+    // (v12) Finds: only what Ash has found, as a count with no total (nothing tells him how much is still hidden)
+    const fd=secretTally().filter(r=>(r[1]|0)>0);
+    rows.push(fd.length?`<p>${E(S('Things you have found so far.','Things you found.'))}</p><ul>`+fd.map(([n,a])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a|0}</li>`).join('')+'</ul>':`<p>${E(S('Nothing yet. Keep your eyes open.','Nothing yet. Keep looking!'))}</p>`);
   }else if(jTab==='hero') rows.push(heroTabHtml());
   else if(jTab==='log') rows.push(logJourHtml());
   el.innerHTML=rows.join('');
@@ -728,7 +729,7 @@ function menuUpdate(dt){
 function refreshMenu(){
   const li=latestSlot(), s=li>=0?slotSave(li):null, cont=$('#bContinue'), sum=saveSummary(s);
   if(sum){ cont.hidden=false; $('#contSub').textContent=`Journey ${li+1} · ${sum}`; $('#bStory').classList.remove('hot'); $('#storySub').textContent='Pick a journey: three save slots.'; }
-  else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#storySub').textContent='An open world to explore. One very old grandfather.'; }
+  else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#storySub').textContent='An open world to explore. Three lanterns to light.'; }
   for(const b of document.querySelectorAll('.seg button[data-d]')) b.setAttribute('aria-pressed',String(+b.dataset.d===diffIdx));
   $('#diffNote').textContent=simplify(DIFFS[diffIdx].note);
   const best=store.get('eb_best_'+diffIdx,null);
@@ -750,8 +751,11 @@ function howTabs(){
   for(const b of document.querySelectorAll('#howTabs button')){ const on=b.dataset.h===howTab; b.setAttribute('aria-pressed',String(on)); if(on) b.setAttribute('data-focus',''); else b.removeAttribute('data-focus'); }
   for(const s of document.querySelectorAll('#how .hsec')) s.hidden=s.dataset.h!==howTab;
 }
+// (v12) the controls for a power show only once Ash has it (the Arena always jumps); nothing lists powers ahead of time
+function howHas(id){ return !!G&&(id==='jump'&&G.mode!=='story'||hasAbil(id)); }
 function renderHow(){
   howTabs(); if(typeof handSync==='function') handSync();
+  for(const e of document.querySelectorAll('#how [data-pow]')) e.hidden=!howHas(e.dataset.pow);
   const hb=$('#how .hbody'); if(hb) hb.scrollTop=0;
   if(howTab!=='pad') return;
   const k=howKind||(PAD.idx>=0?PAD.kind:'xbox');

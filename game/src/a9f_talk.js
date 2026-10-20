@@ -292,10 +292,10 @@ function talkOpts(n,V){
     return [[id,bye||(friendOf(id)>=3?pick([`See you soon, Ash.`,`Come back any time.`,`Be careful out there.`]):pick([`Bye, Ash.`,`See you.`,`Mind your tail.`]))]]; }});
   return o;
 }
-// a tally for the journal's Secrets tab
+// a tally for the journal's Finds tab ([name, found, total]; the tab shows only rows found at least once, with no total)
 function secretTally(){
   const F=G.found||{}, S=G.secrets||{};
-  const out=[['Lost pages of the Wardens’ Account',Object.keys(G.pages).length,10]];
+  const out=[[reached('hollow')?'Pages of the Wardens’ Account':'Old pages',Object.keys(G.pages).length,10]];
   if(typeof SECRET_ROOMS!=='undefined') out.push(['Secret rooms in houses',Object.keys(S).filter(k=>k.startsWith('sec_')).length,SECRET_ROOMS.length]);
   if(typeof CAVE_SECRETS!=='undefined') out.push(['Hidden rooms in caves',Object.keys(S).filter(k=>k.startsWith('cs_')).length,CAVE_SECRETS]);
   out.push(['Buried treasure',['x1','x2','x3'].filter(k=>F[k]).length,3]);

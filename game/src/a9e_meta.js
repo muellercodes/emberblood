@@ -94,9 +94,10 @@ function unpackSaves(blob){
 function fmtPlay(t){ t=Math.floor(t||0); const h=Math.floor(t/3600), m=Math.floor(t%3600/60); return h?`${h}h ${m}m`:`${m}m`; }
 function fmtAgo(at){ if(!at) return ''; const d=(Date.now()-at)/1000; if(d<90) return 'just now'; if(d<3600) return `${Math.round(d/60)} min ago`; if(d<86400) return `${Math.round(d/3600)} h ago`; const n=Math.round(d/86400); return n===1?'yesterday':`${n} days ago`; }
 function slotDetail(s){
-  const q=s.quests?Object.values(s.quests).filter(x=>x.done).length:0, pg=s.pages?Object.keys(s.pages).length:0;
+  // (v12) no pages total on the slot (nothing counts what is still hidden)
+  const q=s.quests?Object.values(s.quests).filter(x=>x.done).length:0;
   return {head:`${stageLabel(s)} · Level ${(s.p&&s.p.level)||1}`,
-    sub:`${DIFFS[clamp(s.diff|0,0,2)].name} · ${fmtPlay(s.time)} played · ${q} quests · ${pg}/10 pages`, ago:fmtAgo(s.at)};
+    sub:`${DIFFS[clamp(s.diff|0,0,2)].name} · ${fmtPlay(s.time)} played · ${q} quest${q===1?'':'s'} done`, ago:fmtAgo(s.at)};
 }
 let slotConfirm=null;
 function openSlots(){ slotConfirm=null; renderSlots(); show('slots'); }

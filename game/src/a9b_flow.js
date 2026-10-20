@@ -236,10 +236,12 @@ function liteUpdate(dt){
 function victory(){
   scene='victory'; SFX.play('win');
   const m=Math.floor(G.playTime/60), s=Math.floor(G.playTime%60);
-  const E=ENDINGS[G.choices.ending||'hero'], seen=store.get('eb_endings',{});
-  $('#winTag').textContent=`Ending ${E.n} of 4`; $('#winTitle').textContent=E.title;
-  $('#winMsg').textContent=Object.keys(seen).length<4?`You've found ${Object.keys(seen).length} of 4 endings. Different choices along the way lead to different endings.`:'You found every ending. The Wardens would be proud. Iska would want a word.';
-  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div><div class="stat"><b>${Object.keys(G.pages).length}/10</b><span>Lost pages</span></div>`;
+  // (v12) the ending Ash made, and plain stats: no ending numbers, no count of endings, no totals of things to find
+  // (eb_endings is still kept, a9c_story.js, for the cloud merge and the tests; it is never shown)
+  const E=ENDINGS[G.choices.ending||'hero'];
+  $('#winTag').textContent='Act I complete'; $('#winTitle').textContent=E.title;
+  $('#winMsg').textContent=simplify(S('The valley is still yours to explore.','Go and explore!'));
+  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div>`;
   show('victory');
 }
 function pauseGame(){
@@ -255,3 +257,5 @@ function toggleMute(){ SFX.init(); SFX.toggle(); refreshSoundLabels(); }
 function toggleAllSound(){ SFX.init(); const anyOn=!SFX.muted||!Music.muted; if(anyOn){ if(!SFX.muted) SFX.toggle(); if(!Music.muted) Music.toggle(); } else { SFX.toggle(); Music.toggle(); mLast=null; } refreshSoundLabels(); }
 function allMuted(){ return SFX.muted&&Music.muted; }
 function refreshSoundLabels(){ if($('#settings').classList.contains('on')) renderSettings(); }
+// (v12) test hook: the Act I victory screen
+window.__ebDbg=Object.assign(window.__ebDbg||{},{victory:()=>victory()});
