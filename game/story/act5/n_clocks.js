@@ -54,7 +54,7 @@ chapter({
         'Gran had no fire. She warmed Vesper\'s hands with hers.'] },
     // a bonus clue for the name: Moth Memory pane 3 in the Clockmaker's Rest (optional, after Echo 2; see n_rime)
     n5_pane3: { icon: 'moth', mystery: 'night_mother',
-      text: ['Moth Memory 3, in the Clockmaker\'s Rest: a girl with a lantern, and a little moth she calls Nyx.', 'A girl and a moth called Nyx.'] },
+      text: ['A Moth Memory in the Clockmaker\'s Rest: a girl with a lantern, and a little moth she calls Nyx.', 'A girl and a moth called Nyx.'] },
   },
 
   deduce: {

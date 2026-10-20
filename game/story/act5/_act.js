@@ -33,8 +33,9 @@ act({
   // Hush by their errands (N5S). Main path alone: 1. One errand or one earlier kindness: 2.
   trust: { friends: 'n5_friends' },
 
-  // decided at the fall (n_nyxara's n_choice). Every option always shows; the moth one is locked, with the first reason
-  // that holds, until its condition holds. The checker tests them with the main-path state at the end of n_nyxara.
+  // decided at the fall (n_nyxara's n_choice). (v12 R4) The moth option shows only once its condition holds; until then
+  // it is not in the menu at all (no lock, no reason), so nothing tells a kid there was another ending. The checker
+  // tests them with the main-path state at the end of n_nyxara.
   ending: {
     moth:      { at: 'n_nyxara', scene: 'n_choice', choice: 'n_end=moth', optional: true,
                  if: 'solved n5_reach trust friends>=2 item n5_lantern' },

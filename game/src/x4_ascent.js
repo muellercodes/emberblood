@@ -341,7 +341,7 @@ function n4aReadPane(q){
   const D=N4A_PANE[k];
   n4aScene('n_pane_'+k,D.lines,()=>{
     if(k===3&&first) n4aBub('n_bub_pane3','ash',S('Nyx? Her name was Nyx?','Her name was Nyx?'));
-    if(first) n4aBanner(S('A Moth Memory','A Moth Memory'),D.title+' ('+n+'/6)',2.6);
+    if(first) n4aBanner(S('A Moth Memory','A Moth Memory'),D.title,2.6);
     if(n>=6&&first&&!G.flags.n_panes_hp){ G.flags.n_panes_hp=1; player.maxHp+=10; player.hp=player.maxHp; n4aSnd('heart'); n4aBanner(S('All six Moth Memories','All six memories'),S('+10 max health','+10 health'),3);
       n4aScene('n_panes_all',[['ash',S("She wasn't trying to be a monster. She was just scared of being alone. ...That's still not okay. But I get it.",'She was not a monster. She was scared of being alone. That is not okay. But I get it.')]]); }
     n4aSave();
@@ -438,7 +438,7 @@ function n4aBuildLanterns(){
 function n4aGateOpen(){
   if(n4aF('n_gate')) return; G.flags.n_gate=1; G.flags.n_lanterns=3; for(const L of N4A.lans) L.lit=1e9;
   n4aSnd('bigchime'); shake(4); flashA=Math.max(flashA,0.4); flashCol='255,210,140';
-  n4aBub('n_bub_gate','ash',S("And not a single bakery was harmed. Mostly because there isn't one.",'Not one bakery got burned!'));
+  n4aBub('n_bub_gate','ash',S("Just like at home. Except nobody's clapping.",'Like at home. Nobody claps, though.'));
   n4aEmit('gate',{});
   later(1.6,()=>n4aScene('n_gate_open',[['narr',S('The third lantern catches. For one moment the whole green glows warm, like home on Lantern Day.','The lanterns glow. It feels like home for a moment.')],
     ['narr',S("Then the shadow gate melts away, and a whisper comes down the mountain, soft as a moth's wing.",'The dark gate melts. A whisper comes down the mountain.')],

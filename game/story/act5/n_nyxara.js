@@ -8,8 +8,9 @@
 // swallows the last piece of the moon, everything goes black and the Ember Heart floats up, and Ash holds the breath
 // key while the friends' voices fill its seams (Vesper or Juniper, Glaciar or Elka or Tove, Hush or Quill, then Mom and
 // the Act I ending) until Pip, the one who stayed, says his first word. Heartfire breaks her cracks. She falls holding the last sliver of
-// moon. The friends she hurt speak for her, Ash calls her Nyx, and the final choice shows all three endings: the moth
-// one locked, with the first reason that holds, until her name, the plan and two of those friends are there.
+// moon. The friends she hurt speak for her, Ash calls her Nyx, and the final choice is made. (v12 R4) The moth pick only
+// shows when its condition holds (her name worked out with the plan, Mom's lantern, two of those friends); otherwise it
+// is not there at all, so the menu never advertises an ending a kid has not earned.
 chapter({
   id: 'n_nyxara', act: 5, after: 'n_crown', next: 'n_end', takeover: true,
   // keep x4_story's own stage tick (n4sNyxTick: the hero ending's ember spirit, the Heart and fall fallbacks): ENGINE
@@ -174,22 +175,13 @@ chapter({
         else: [
         ['narr', "She curls tighter round the sliver of moon. She is too scared to hear a word you say.", 'She holds the moon tight. She is too scared to listen.'] ] }] },
     ],
-    // the final choice: every option always shows; the moth one is locked, with the first reason that holds (exactly
-    // one of its four versions shows). Each ending is 6 lines; the friends' and the Act I ending's lines are in the book.
+    // the final choice. (v12 R4) An unearned ending is hidden, not greyed: the moth pick shows only when its `if` holds
+    // (the same condition as n_plea's kind branch and the act file's moth ending), and then it has no lock and no reason.
+    // Each ending is 6 lines; the friends' and the Act I ending's lines are in the book.
     n_choice: [
       { choose: 'n_end', who: 'ash', mood: 'determined', ask: ['What will you do?', 'What will you do?'], pick: [
         { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: '!clue n5_her_name', need: 'clue n5_her_name',
-          locked: ["You don't know her real name yet.", "You don't know her name yet."] },
-        { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: 'clue n5_her_name !solved n5_reach', need: 'solved n5_reach',
-          locked: ["You haven't worked out how to reach her. Look in the Case Book.", "You don't know how to reach her yet."] },
-        { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: 'solved n5_reach !item n5_lantern', need: 'item n5_lantern',
-          locked: ['You have no lantern to give her.', 'You have no lantern.'] },
-        { t: ['Light her a lantern, and let the moon go home', 'Light Nyx a lantern'], tone: 'kind', v: 'moth',
-          if: 'solved n5_reach item n5_lantern', need: 'trust friends>=2',
-          locked: ["She won't listen to you alone. The friends she hurt aren't here to speak for her.", 'Her friends are not here to speak for her.'],
+          if: 'solved n5_reach item n5_lantern trust friends>=2',
           then: ['set n_nyx_done', 'set n_heart_on=0', 'emit n4fx:choose', 'take n5_lantern', 'world n5_green_post moth'],
           say: [
             { do: ['emit n4fx:cut:lantern'] },
