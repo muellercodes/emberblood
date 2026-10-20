@@ -404,10 +404,15 @@ function touchIcon(id,x,y,r,col,label){
   else if(id==='whistle'){ ctx.beginPath(); ctx.arc(-4,4,8,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-4,-4); ctx.lineTo(11,-4); ctx.lineTo(11,2); ctx.lineTo(3,2); ctx.stroke(); ctx.beginPath(); ctx.arc(-4,4,2.6,0,TAU); ctx.fill(); ctx.lineWidth=2.2; for(const q of [0,1]){ ctx.beginPath(); ctx.arc(10,-9,4+q*5,-1.9,-0.3); ctx.stroke(); } }
   ctx.restore();
 }
+// (v12) the buttons come and go (tVisTick and tShown in a5_input.js): each one pops in with a little overshoot and a
+// ring that runs out from it (DRINK, ROAR, CALL and JUMP), and shrinks away when it goes
+const TPOP_COL={drink:'110,230,150',roar:'255,200,90',whistle:'150,215,255',jump:'150,215,255'};
+const tBackOut=t=>{ const c=1.70158, u=t-1; return 1+(c+1)*u*u*u+c*u*u; };
 function drawTouch(){
   if(!usingTouch||scene!=='play') return;
+  tVisTick();
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  const mode=settings.touch||'two', L=tLayout(), right=touchRight();
+  const mode=settings.touch||'two', L=tLayout(), SH=tShown(), right=touchRight();
   if(touch.stickId!==null){
     ctx.fillStyle='rgba(255,255,255,.07)'; ctx.strokeStyle=touch.full>0.35?'rgba(140,230,120,.6)':'rgba(255,220,180,.35)'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(touch.ox,touch.oy,58,0,TAU); ctx.fill(); ctx.stroke();
@@ -421,7 +426,12 @@ function drawTouch(){
     ctx.font=`700 11px ${UIF}`; ctx.fillStyle='rgba(255,230,200,.4)'; ctx.fillText(mode==='two'?'MOVE':'DRAG TO MOVE',gx,gy);
   }
   const um=useMode(), pu=0.5+0.5*Math.sin(G.time*(um&&um.hot?11:5));
-  for(const b of L){
+  for(const b of SH){
+    const pc=TPOP_COL[b.id];
+    if(b.on&&pc&&b.popT<0.5&&!allBtns()){ const q=b.popT/0.5; ctx.strokeStyle=`rgba(${pc},${0.7*(1-q)})`; ctx.lineWidth=3*(1-q)+1; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+3+q*30,0,TAU); ctx.stroke(); }
+    ctx.save();
+    const ba=b.a<1?(b.on?Math.min(1,b.a*1.6):b.a):1;
+    if(b.a<1){ const k=b.on?0.5+0.5*tBackOut(b.a):0.8+0.2*b.a; ctx.translate(b.x,b.y); ctx.scale(k,k); ctx.translate(-b.x,-b.y); ctx.globalAlpha=ba; }
     const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1, ring=true;
     if(b.id==='roar'){ prog=player.roar/100; ready=prog>=1; }
     else if(b.id==='roll'){ prog=player.stamina/player.maxStamina; ready=player.stamina>=player.stats.rollCost*0.5; }
@@ -432,7 +442,7 @@ function drawTouch(){
     const use=b.id==='attack'&&!!um, big=b.id==='jump'||b.id==='attack';
     if(use){ ctx.fillStyle=`rgba(255,190,90,${(um.hot?0.2:0.1)+pu*0.14})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+7+pu*4,0,TAU); ctx.fill(); }
     else if(b.id==='roar'&&ready){ ctx.fillStyle=`rgba(255,170,70,${0.1+pu*0.1})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+6,0,TAU); ctx.fill(); }
-    if(LOOK.sb){ ctx.fillStyle=SBC.outline; ctx.globalAlpha=0.55; ctx.beginPath(); ctx.arc(b.x,b.y+3,b.r+1.5,0,TAU); ctx.fill(); ctx.globalAlpha=1; }
+    if(LOOK.sb){ ctx.fillStyle=SBC.outline; ctx.globalAlpha=0.55*ba; ctx.beginPath(); ctx.arc(b.x,b.y+3,b.r+1.5,0,TAU); ctx.fill(); ctx.globalAlpha=ba; }
     ctx.fillStyle=LOOK.sb?(held?'rgba(255,150,70,.7)':use?'rgba(110,60,24,.86)':big?'rgba(59,34,51,.68)':'rgba(59,34,51,.6)'):held?'rgba(255,150,70,.45)':use?'rgba(64,36,14,.78)':big?'rgba(26,18,12,.58)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
     ctx.lineWidth=LOOK.sb?(big?3.6:3):big?3:2.5; ctx.strokeStyle=use?`rgba(255,${200+Math.round(30*pu)},120,.95)`:b.id==='jump'?'rgba(150,215,255,.75)':ready?(LOOK.sb?'rgba(255,243,214,.92)':'rgba(255,220,180,.7)'):'rgba(140,120,100,.5)'; ctx.stroke();
     if(ring){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
@@ -447,6 +457,7 @@ function drawTouch(){
     else{ touchIcon(b.id,b.x,iy,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':b.id==='jump'?'#d8f0ff':col,b.label); if(b.id==='attack'&&autoAttackOn()) label='AUTO'; }
     if(b.id==='drink'&&player.potions>0){ ctx.font=`800 ${Math.max(9,Math.round(b.r*0.34))}px ${UIF}`; ctx.fillStyle='#bff5cf'; ctx.fillText(String(player.potions),b.x+b.r*0.5,b.y-b.r*0.52); }
     ctx.fillStyle=use?'#ffe9c4':col; ctx.font=`800 ${Math.max(8,Math.round(b.r*(use?0.25:0.22)))}px ${UIF}`; ctx.fillText(label,b.x,b.y+b.r*0.58);
+    ctx.restore();
   }
   ctx.restore();
 }

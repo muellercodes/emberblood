@@ -45,13 +45,21 @@ cvs.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',e=>{ if(e.button===0) mouse.l=false; if(e.button===2) mouse.r=false; });
 cvs.addEventListener('contextmenu',e=>e.preventDefault());
-// touch layout (controls build). SLASH is the biggest button, right under the thumb, and it also talks, opens and
-// picks things up (it says TALK, OPEN and so on when it will). Two thumbs: JUMP, FIRE and ROLL on an inner arc around
-// SLASH, then a smaller outer arc (ROAR, WEAPON, DRINK, CALL) that climbs on tall screens and leans left on short ones.
-// One hand: columns hugging the edge, filled bottom to top. Settings > Handed: Left mirrors all of it.
-// Every button keeps its spot when others come and go (JUMP once Ash can jump, WEAPON with two or more weapons,
-// CALL with a companion), so thumbs learn where things are. Hit areas reach past the drawn circles but never overlap.
+// touch layout (controls build, v12 fewer buttons). SLASH is the biggest button, right under the thumb, and it also
+// talks, opens and picks things up (it says TALK, OPEN and so on when it will). Two thumbs: JUMP, FIRE and ROLL on an
+// inner arc around SLASH, then a smaller outer arc that climbs on tall screens and leans left on short ones. One hand:
+// columns hugging the edge, filled bottom to top. Settings > Handed: Left mirrors all of it.
+// (v12) Most of the time there are only SLASH, FIRE and ROLL (and JUMP once Ash can jump). The others come only when they
+// do something: DRINK when Ash is hurt enough for a draught to help and has one (the flasks at the top drink too), ROAR
+// when its meter is full, CALL when the companion is away (far behind, off the screen, or told to wait; tapping their
+// picture at the top calls too). WEAPON is gone: tap the weapon chip at the top. In this set DRINK takes the old WEAPON
+// spot, the closest one of the outer arc. Settings > "Show every button" brings back all eight, always there, as before.
+// Every button keeps its own spot when it comes and goes (TL.all holds every spot, a hidden button leaves its spot empty
+// and its hit area unused), it pops in, it never pops up under a finger that is already down on that spot, and a button
+// under a finger never goes away until the finger lifts. Hit areas reach past the drawn circles but never overlap.
 const TBTN_LABEL={attack:'SLASH',fire:'FIRE',roll:'ROLL',roar:'ROAR',drink:'DRINK',use:'USE',weapon:'WEAPON',whistle:'CALL'};
+settings.allBtn=store.get('eb_allbtn',false)===true;
+const allBtns=()=>!!settings.allBtn;
 function jumpLabel(){ return player&&player.flying?'LAND':(hasAbil('wings')&&airborne()?'FLY':'JUMP'); }
 const TL={key:'',all:[],out:[],side:true};
 // which side the buttons are on: true for the right edge
@@ -62,11 +70,12 @@ function touchKeep(){
   return [
     {x:mr.x-10,y:mr.y,w:mr.w+20,h:mr.h+34},                                  // minimap, its clock and the place name
     {x:W-SAFE.r-56,y:SAFE.t+12,w:44,h:156},                                  // pause, sound, the small weapon chip under them
-    {x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:84},           // vitals
+    // vitals, and the item quick-slot chip under the ROAR dial (its 44 px hit area, a12b_ui.js / a11b_hud.js, v12 UI)
+    {x:SAFE.l+12,y:SAFE.t+12,w:Math.min(254,mr.x-SAFE.l-22),h:120},
     {x:SAFE.l+6,y:qy-12,w:Math.min(312,W*0.5+12),h:70}                       // the quest goal (or the wave and score)
   ];
 }
-function tLayoutBuild(mode,right,s){
+function tLayoutBuild(mode,right,s,all){
   // the HUD boxes and their mirror images, so the left-handed layout is an exact mirror of the right-handed one
   const B=H-SAFE.b, keep0=touchKeep(), keep=keep0.concat(keep0.map(R=>({x:W-R.x-R.w,y:R.y,w:R.w,h:R.h}))), P=[], gap=11*s;
   const ex=v=>right?W-SAFE.r-v:SAFE.l+v;
@@ -87,8 +96,10 @@ function tLayoutBuild(mode,right,s){
     P.push({id:'attack',x:ax,y:ay,r:rS});
     // [id, radius, ring, preferred angle]: 180 is toward the middle of the screen, 270 straight up
     // short screens (a phone on its side) fan out to the left along the bottom, tall ones climb
-    const want=short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['weapon',28,R2,207],['whistle',23,R3,185],['drink',25,R3,205]]
-                    :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['weapon',28,R2,229],['whistle',23,R2,254],['drink',25,R2,279]];
+    const want=all?(short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['weapon',28,R2,207],['whistle',23,R3,185],['drink',25,R3,205]]
+                         :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['weapon',28,R2,229],['whistle',23,R2,254],['drink',25,R2,279]])
+                   :(short?[['jump',40,R1,181],['fire',35,R1,222],['roll',34,R1,262],['roar',29,R2,183],['drink',28,R2,207],['whistle',25,R3,192]]
+                         :[['jump',40,R1,190],['fire',35,R1,229],['roll',34,R1,266],['roar',29,R2,204],['drink',28,R2,229],['whistle',25,R2,254]]);
     for(const [id,r0,ring,deg] of want){
       const r=r0*s; let got=null;
       for(const rad of ring===R1?[R1,R2,R3]:ring===R2?[R2,R3,R3+72*s]:[R3,R3+72*s]){
@@ -100,7 +111,8 @@ function tLayoutBuild(mode,right,s){
     }
   }else{
     // one hand: columns from the edge, filled bottom to top (at most four high); the stick floats anywhere low that is not a button
-    const order=[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['weapon',28],['drink',26],['whistle',24]];
+    const order=all?[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['weapon',28],['drink',26],['whistle',24]]
+                   :[['attack',44],['jump',37],['fire',33],['roll',33],['roar',29],['drink',28],['whistle',25]];
     const colX=k=>ex((51+86*k)*s), y0=B-62*s, qtop=B-330;
     let k=0,j=0,y=y0,pr=0;
     for(const [id,r0] of order){
@@ -113,22 +125,93 @@ function tLayoutBuild(mode,right,s){
       }
     }
   }
-  // hit areas: past the drawn circle, halfway to the nearest neighbour at most
+  // hit areas: past the drawn circle, halfway to the nearest neighbour at most (hidden ones count, so they never change)
   for(const b of P){
     let g2=1e9; for(const q of P) if(q!==b) g2=Math.min(g2,Math.hypot(b.x-q.x,b.y-q.y)-b.r-q.r);
     b.hr=b.r+Math.max(4,Math.min((b.id==='attack'?22:16)*s,g2/2-1));
   }
   return P;
 }
-function tLayout(){
-  const mode=settings.touch||'two', right=touchRight(), s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1);
-  const key=[W,H,SAFE.l,SAFE.r,SAFE.t,SAFE.b,mode,right,s.toFixed(3),!!G&&G.mode].join('|');
-  if(TL.key!==key){ TL.key=key; TL.all=tLayoutBuild(mode,right,s); TL.side=right; }
+function tNWeapons(){ const w=(G&&G.weapons)||{}; return Object.keys(w).filter(k=>w[k]).length; }
+// may this button show at all on this journey (its spot is kept clear of the prompt pill, the tips and the quest list)
+function tMay(id){
   const g=G||{}, story=g.mode==='story';
-  const has={jump:!!G&&(!story||hasAbil('jump')), weapon:Object.keys(g.weapons||{}).filter(k=>g.weapons[k]).length>=2, whistle:story&&!!g.comp};
+  if(id==='jump') return !!G&&(!story||hasAbil('jump'));
+  if(id==='weapon') return allBtns()&&tNWeapons()>=2;
+  if(id==='whistle') return story&&!!g.comp;
+  if(id==='drink') return allBtns()||!!player&&player.potions>0;
+  return true;
+}
+// a draught helps once at least half of it would go into health (the drink code in a6_player.js heals 45% of max
+// health times the difficulty and the drink perks): about 75% health or less on Normal, 70% on Easy
+function tDrinkHelps(){
+  const p=player; if(!p||p.dead||!(p.potions>0)||!G) return false;
+  const d=G.diff||{}, pool=p.maxHp*0.45*(d.pot||d.heal||1)*((p.stats&&p.stats.drinkMul)||1);
+  return p.hp<=p.maxHp*clamp(1-pool*0.5/p.maxHp,0.5,0.85);
+}
+// the companion is away: told to wait, far behind, or off the screen (CM is a9i_comps.js's companion, null when none)
+function tCompAway(){
+  try{
+    const c=CM; if(!c||CMG!==G||!player||c.hidden||c.outside||c.down>0) return false;
+    if(c.mode==='stay') return true;
+    if(dist(c.x,c.y,player.x,player.y)>320) return true;
+    const sx=(c.x-cam.x)*zoom, sy=(c.y-cam.y)*zoom;
+    return sx<-8||sy<-8||sx>W+8||sy>H+8;
+  }catch(e){ return false; }
+}
+// should this button be up right now
+function tWant(id){
+  if(!tMay(id)) return false;
+  if(allBtns()) return true;
+  const p=player; if(!p) return false;
+  if(id==='drink') return tDrinkHelps();
+  if(id==='roar') return p.roar>=100;
+  if(id==='whistle') return tCompAway();
+  return true;
+}
+function tLayout(){
+  const mode=settings.touch||'two', right=touchRight(), s=clamp(Math.min(W,H)/430,0.8,1.15)*(settings.btn||1), all=allBtns();
+  const key=[W,H,SAFE.l,SAFE.r,SAFE.t,SAFE.b,mode,right,s.toFixed(3),!!G&&G.mode,all].join('|');
+  if(TL.key!==key){ TL.key=key; TL.all=tLayoutBuild(mode,right,s,all); TL.side=right; }
+  // every spot a button is on or may pop up on, so the things that keep clear of buttons never jump when one comes
   const L=TL.out; L.length=0;
-  for(const b of TL.all){ if(b.id in has&&!has[b.id]) continue; b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; L.push(b); }
+  for(const b of TL.all){ if(!tMay(b.id)) continue; b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; L.push(b); }
   return L;
+}
+// ---------- which buttons are up (v12): each one has {on, a (0 to 1, the pop), t (when it last came or went), w (when
+// it was last wanted)}. A button that came stays at least TV_MIN seconds and TV_GRACE after its reason is gone (so a
+// double tap on CALL still finds it, and DRINK does not blink when health hovers at the line).
+const TV={g:null,s:{},pts:{},out:[],last:0};
+const TV_MIN={drink:1.2,roar:0.6,whistle:1.8}, TV_GRACE={drink:0.5,roar:0,whistle:1.2};
+const tNow=()=>performance.now()/1000;
+// fingers down on the screen right now (any of them), so a button never pops up under one
+function tTouches(e){ TV.pts={}; for(const t of e.touches) TV.pts[t.identifier]={x:t.clientX,y:t.clientY}; }
+function tFingerOn(b){ for(const k in TV.pts){ const q=TV.pts[k]; if(Math.hypot(q.x-b.x,q.y-b.y)<b.hr+8) return true; } return false; }
+function tState(b,now){ let st=TV.s[b.id]; if(!st){ const w=tWant(b.id); st=TV.s[b.id]={on:w,a:w?1:0,t:now-9,w:now}; } return st; }
+// once a frame while the buttons are drawn (drawTouch, a11b_hud.js)
+function tVisTick(){
+  const now=tNow(), dt=clamp(now-(TV.last||now),0,0.1); TV.last=now;
+  if(TV.g!==G){ TV.g=G; TV.s={}; }   // a new journey or a loaded save: the buttons are just there, no pops
+  tLayout();
+  const held=Object.values(touch.btn);
+  for(const b of TL.all){
+    const st=tState(b,now), want=tWant(b.id);
+    if(want) st.w=now;
+    if(st.on){ if(!want&&!held.includes(b.id)&&now-st.t>=(TV_MIN[b.id]||0)&&now-st.w>=(TV_GRACE[b.id]||0)){ st.on=false; st.t=now; } }
+    else if(want&&!tFingerOn(b)){ st.on=true; st.t=now; }
+    st.a=st.on?Math.min(1,st.a+dt/0.2):Math.max(0,st.a-dt/0.14);
+  }
+}
+// the buttons on the screen now, each with a (its pop, 0 to 1), live (takes taps: up for 0.1 s and not on its way out)
+// and popT (seconds since it came)
+function tShown(){
+  tLayout(); const out=TV.out, now=tNow(); out.length=0;
+  for(const b of TL.all){
+    const st=tState(b,now); if(!st.on&&st.a<=0.01) continue;
+    b.label=b.id==='jump'?jumpLabel():TBTN_LABEL[b.id]; b.a=st.a; b.live=st.on&&now-st.t>=0.1; b.popT=now-st.t; b.on=st.on;
+    out.push(b);
+  }
+  return out;
 }
 // the highest point the buttons reach over the x range x0..x1 (the quest list on that side stops above it)
 function touchTopOver(x0,x1){ let t=H; for(const b of tLayout()) if(b.x+b.r>x0&&b.x-b.r<x1) t=Math.min(t,b.y-b.r); return t; }
@@ -231,17 +314,18 @@ function hudClick(x,y){
 cvs.addEventListener('touchstart',e=>{
   usingTouch=true; aimMode='touch'; SFX.init();
   if(scene!=='play') return;
-  e.preventDefault();
+  e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
     const x=t.clientX,y=t.clientY;
     if(hudClick(x,y)) continue;
-    let hit=null, hd=1e9; for(const b of tLayout()){ const d=dist(x,y,b.x,b.y)/(b.hr||b.r+14); if(d<1&&d<hd){ hd=d; hit=b; } }
+    // (v12) only the buttons that are up take taps; a tap on an empty spot does what a tap there always did
+    let hit=null, hd=1e9; for(const b of tShown()){ if(!b.live) continue; const d=dist(x,y,b.x,b.y)/(b.hr||b.r+14); if(d<1&&d<hd){ hd=d; hit=b; } }
     if(hit){ touch.btn[t.identifier]=hit.id; touch.held[hit.id]=true; touch.pressed[hit.id]=true; if(hit.id==='fire'&&settings.touch!=='two') touch.fireT=1.1; }
     else if(touch.stickId===null&&stickZone(x,y)){ touch.stickId=t.identifier; touch.ox=touch.sx=x; touch.oy=touch.sy=y; touch.full=0; }
   }
 },{passive:false});
 cvs.addEventListener('touchmove',e=>{
-  if(scene!=='play') return; e.preventDefault();
+  if(scene!=='play') return; e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
     if(t.identifier===touch.stickId){
       touch.sx=t.clientX; touch.sy=t.clientY;
@@ -251,6 +335,7 @@ cvs.addEventListener('touchmove',e=>{
   }
 },{passive:false});
 const tEnd=e=>{
+  tTouches(e);
   for(const t of e.changedTouches){
     if(t.identifier===touch.stickId){ touch.stickId=null; touch.full=0; }
     const id=touch.btn[t.identifier];
