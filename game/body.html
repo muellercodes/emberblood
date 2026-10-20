@@ -334,10 +334,21 @@ html.sb #menu.ttl .note{color:#fff4dc}
   #menu.ttl .note,#menu.ttl .best{display:none}
   #menu.ttl .copy{margin-top:4px;font-size:10px}
 }
-@media (max-aspect-ratio:6/5) and (max-height:700px){
+@media (max-aspect-ratio:6/5) and (max-height:760px){
   #menu.ttl .stack{gap:7px}
   #menu.ttl .btn{min-height:46px;padding:9px 14px 9px 16px}
   #menu.ttl .btn small{font-size:12.5px}
+}
+/* short screens (small phones upright, phones on their side): Story and Arena side by side, How to Play, Settings and
+   Account on one row, the long lines under them hidden, so the picture keeps its room and nothing scrolls */
+@media (min-aspect-ratio:6/5) and (max-height:560px),(max-aspect-ratio:6/5) and (max-height:760px){
+  #menu.ttl .stack{display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}
+  #menu.ttl .stack>*{grid-column:1/-1}
+  #menu.ttl .stack>.row{display:contents}
+  #menu.ttl #bStory,#menu.ttl #bNormal{grid-column:span 3}
+  #menu.ttl #bHow,#menu.ttl #bSettings,#menu.ttl #bAcct{grid-column:span 2;text-align:center;padding-left:6px;padding-right:6px;font-size:14.5px}
+  #menu.ttl #bStory small,#menu.ttl #bNormal small,#menu.ttl #bAcct small{display:none}
+  #menu.ttl .note{display:none}
 }
 /* chapter cards and the controller toast */
 html.sb #card .num{display:inline-block;color:#fff;background:#e0782c;border:3px solid #3b2233;border-radius:12px;padding:4px 18px 4px 22px;box-shadow:0 4px 0 #3b2233;text-shadow:0 2px 0 #3b2233}
