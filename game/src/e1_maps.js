@@ -125,15 +125,26 @@ function ovStepMap(O,rows){
 }; }
 
 // ---------- the map screen: which map is shown, how it fits the canvas, tabs for every map Ash has found
-const MAPUI={view:0,tabs:null,fogCv:[]};
-function mapFit(k){
+const MAPUI={view:0,tabs:null,fogCv:[],zm:{}};
+// the whole map in the canvas (zoom 1)
+function mapFit0(k){
   const M=MAPS[k]||MAPS[0], cw=mapCv.width, ch=mapCv.height;
   if(M.fit&&M.fit.cw===cw&&M.fit.ch===ch) return M.fit;
   const s=Math.min(cw/M.w,ch/M.h);
   M.fit={cw,ch,s,ox:(cw-M.w*s)/2,oy:(ch-M.h*s)/2,w:M.w*s,h:M.h*s,y0:M.y0};
   return M.fit;
 }
-// canvas px on the map screen to world coordinates on the viewed map
+// (v12) the map as shown: zoomed and panned by MAPUI.zm[k] (see "the big map zooms" below), never past its edges
+function mapFit(k){
+  const B=mapFit0(k), Z=MAPUI.zm&&MAPUI.zm[k];
+  if(!Z||!(Z.z>1.001)) return B;
+  const M=MAPS[k]||MAPS[0], cw=B.cw, ch=B.ch, s=B.s*Z.z, w=M.w*s, h=M.h*s;
+  let ox=cw/2-Z.cx*s, oy=ch/2-(Z.cy-B.y0)*s;
+  ox=w>=cw?clamp(ox,cw-w,0):(cw-w)/2; oy=h>=ch?clamp(oy,ch-h,0):(ch-h)/2;
+  let F=Z.f; if(!F||F.cw!==cw||F.ch!==ch||F.s!==s||F.ox!==ox||F.oy!==oy) F=Z.f={cw,ch,s,ox,oy,w,h,y0:B.y0,z:Z.z};
+  return F;
+}
+// canvas px on the map screen to world coordinates on the viewed map (zoomed or not: it inverts mapFit)
 function mapInv(cx,cy){ const F=mapFit(MAPUI.view); return [(cx-F.ox)/F.s,F.y0+(cy-F.oy)/F.s]; }
 function fogCanvas(k){ const F=fogOf(k); let c=MAPUI.fogCv[k]; if(!c||c.width!==F.w||c.height!==F.h){ c=mkCanvas(F.w,F.h); MAPUI.fogCv[k]=c; } return c; }
 function mapsSeenList(){ const out=[]; for(const M of MAPS) if(M&&(M.k===0||(G&&G.mapsSeen&&G.mapsSeen[M.k]))) out.push(M.k); return out; }
@@ -167,6 +178,154 @@ function mapView(k){
 // the D-pad reaches, and the bumpers keep cycling the shrines of the map on show
 function mapViewStep(d){ const L=mapsSeenList(); if(L.length<2) return false; const i=L.indexOf(MAPUI.view); mapView(L[(i+d+L.length)%L.length]); return true; }
 addEventListener('keydown',e=>{ if(scene!=='map') return; const c=e.code; if(c==='Comma'||c==='PageUp'){ e.preventDefault(); mapViewStep(-1); } else if(c==='Period'||c==='PageDown'){ e.preventDefault(); mapViewStep(1); } });
+
+// ---------- (v12) the big map zooms and pans. Drew: "Can you also make the main maps zoomable for the user? It's a bit
+// hard to see it zoomed out all the way all the time."
+// MAPUI.zm[k]={z,cx,cy}: z 1 is the whole map (as before), cx, cy the world point at the middle of the canvas. mapFit
+// applies it, so everything drawn through mapXY moves with it (and the cheat panel's mapInv and chMapPt, which go
+// through mapFit too), while labels and markers keep their size in canvas px. The map opens zoomed on Ash
+// (MAPZ.start, a little less on a small map); other tabs open whole and keep their own zoom while the map is open.
+// Wheel and pinch zoom about the pointer, a drag pans (and is never taken as a click on a shrine or a cheat
+// teleport), the + and - buttons and keys zoom about the middle (+ from the whole map goes toward Ash), Whole map (or
+// 0) goes back, W A S D pan. A controller zooms with the triggers (R2 in, L2 out) and pans with the right stick. The
+// limits: never smaller than the whole map, never past its edges, and no closer than MAPZ.pxMax canvas px per world
+// px (the overview is 1 px per 25 world px, so it stays a picture, not blocks). The dungeon page (view -1) is not
+// zoomed.
+const MAPZ={start:2.5,max:5,step:1.6,pxMax:0.32,startSpan:2600};
+function mapZMax(k){ const B=mapFit0(k); return clamp(MAPZ.pxMax/B.s,2,MAPZ.max); }
+function mapZOn(k){ return k!=null&&k!==-1&&!!MAPS[k]; }
+function mapZClamp(k){
+  const Z=MAPUI.zm[k]; if(!Z) return null;
+  Z.z=clamp(Z.z,1,mapZMax(k)); if(!(Z.z>1.001)){ delete MAPUI.zm[k]; return null; }
+  const M=MAPS[k]||MAPS[0], B=mapFit0(k), s=B.s*Z.z, hw=B.cw/2/s, hh=B.ch/2/s;
+  Z.cx=M.w*s>=B.cw?clamp(Z.cx,hw,M.w-hw):M.w/2;
+  Z.cy=M.h*s>=B.ch?clamp(Z.cy,B.y0+hh,B.y0+M.h-hh):B.y0+M.h/2;
+  return Z;
+}
+function mapZoomOf(k){ const Z=MAPUI.zm[k==null?MAPUI.view:k]; return Z?Z.z:1; }
+// zoom the viewed map to nz, keeping the world point under canvas point (px,py) where it is (default: the middle)
+function mapZoomTo(nz,px,py){
+  const k=MAPUI.view; if(!mapZOn(k)) return;
+  const B=mapFit0(k); if(px==null){ px=B.cw/2; py=B.ch/2; }
+  const [wx,wy]=mapInv(px,py), z=clamp(nz,1,mapZMax(k));
+  if(!(z>1.001)){ delete MAPUI.zm[k]; mapZReq(); return; }
+  const s=B.s*z; MAPUI.zm[k]={z,cx:wx-(px-B.cw/2)/s,cy:wy-(py-B.ch/2)/s}; mapZClamp(k); mapZReq();
+}
+function mapZoomBy(f,px,py){ mapZoomTo(mapZoomOf()*f,px,py); }
+function mapPan(dx,dy){
+  const k=MAPUI.view, Z=MAPUI.zm[k]; if(!Z) return;
+  const s=mapFit0(k).s*Z.z; Z.cx-=dx/s; Z.cy-=dy/s; mapZClamp(k); mapZReq();
+}
+// where Ash is on the map on show (null when he is on another map)
+function mapZAsh(){ const k=MAPUI.view; if(!G||!player||curMap()!==k) return null; const pp=AREA&&G.ow?G.ow:player; return {x:pp.x,y:pp.y}; }
+// centre the zoomed view on a world point (or zoom in on it from the whole map)
+function mapZCentre(x,y,z){
+  const k=MAPUI.view; if(!mapZOn(k)) return;
+  MAPUI.zm[k]={z:z||mapZoomOf(k),cx:x,cy:y}; mapZClamp(k); mapZReq();
+}
+function mapZStartZ(k){ const M=MAPS[k]||MAPS[0]; return clamp(Math.min(MAPZ.start,M.w/MAPZ.startSpan),1,mapZMax(k)); }
+// the map screen opens: every tab whole, the one Ash is on zoomed on him
+function mapZoomStart(){
+  mapZBind(); MAPUI.zm={}; const k=MAPUI.view, a=mapZOn(k)&&mapZAsh();
+  if(a){ MAPUI.zm[k]={z:mapZStartZ(k),cx:a.x,cy:a.y}; mapZClamp(k); }
+  mapZUI();
+}
+// keep a picked shrine in view (the controller and [ ] step through them)
+function mapZShow(x,y){
+  const k=MAPUI.view, Z=MAPUI.zm[k]; if(!Z) return;
+  const F=mapFit(k), cx=F.ox+x*F.s, cy=F.oy+(y-F.y0)*F.s, m=60;
+  if(cx<m||cy<m||cx>F.cw-m||cy>F.ch-m) mapZCentre(x,y,Z.z);
+}
+// one redraw per frame however many wheel or move events arrive
+let mapZPend=false;
+function mapZReq(){ mapZUI(); if(mapZPend) return; mapZPend=true; requestAnimationFrame(()=>{ mapZPend=false; if(scene==='map') drawMapScreen(); }); }
+// the buttons: + and - and Whole map, in the top right corner of the map
+function mapZUI(){
+  const wrap=document.querySelector('#mapov .mapwrap'); if(!wrap) return;
+  let el=document.getElementById('mapZoom');
+  if(!el){
+    el=document.createElement('div'); el.id='mapZoom'; el.className='mapzoom'; el.setAttribute('role','group'); el.setAttribute('aria-label',S('Zoom the map','Zoom the map'));
+    el.innerHTML='<button type="button" class="mzb" data-z="in" aria-label="Zoom in">+</button><button type="button" class="mzb" data-z="out" aria-label="Zoom out">&minus;</button><button type="button" class="mzb mzw" data-z="all">'+S('Whole map','Whole map')+'</button>';
+    el.addEventListener('click',e=>{ const b=e.target.closest('button[data-z]'); if(!b||scene!=='map') return; e.stopPropagation(); mapZBtn(b.dataset.z); });
+    wrap.appendChild(el);
+  }
+  const k=MAPUI.view, on=mapZOn(k), z=mapZoomOf(k);
+  el.hidden=!on;
+  for(const b of el.querySelectorAll('button')){ const d=b.dataset.z; b.disabled=!on||(d==='in'?z>=mapZMax(k)-0.001:z<=1.001); }
+  mapCv.style.cursor=MAPUI.drag&&MAPUI.drag.moved?'grabbing':z>1.001?'grab':'';
+}
+function mapZBtn(d){
+  const k=MAPUI.view; if(!mapZOn(k)) return;
+  if(d==='all'){ delete MAPUI.zm[k]; mapZReq(); }
+  else if(d==='in'){ const a=mapZAsh(); if(mapZoomOf(k)<=1.001&&a){ mapZCentre(a.x,a.y,Math.min(MAPZ.step,mapZMax(k))); } else mapZoomBy(MAPZ.step); }
+  else mapZoomBy(1/MAPZ.step);
+  try{ SFX.play('ui',0.4); }catch(e){}
+}
+// pointers: one drags, two pinch. A press that moved more than a few px is a drag: the click after it is dropped
+// (this listener is registered before the cheat panel's teleport click, so neither a shrine nor a teleport fires)
+// (the map canvas, mapCv, is made by a12b_ui.js, which loads last: these bind on the first openMap)
+MAPUI.ptr=new Map(); MAPUI.drag=null; MAPUI.dragEnd=-1e9; MAPUI.bound=false;
+function mapCvPt(e){ const r=mapCv.getBoundingClientRect(); return {x:(e.clientX-r.left)/(r.width||1)*mapCv.width,y:(e.clientY-r.top)/(r.height||1)*mapCv.height,cx:e.clientX,cy:e.clientY}; }
+function mapZBind(){
+if(MAPUI.bound) return; MAPUI.bound=true;
+mapCv.addEventListener('pointerdown',e=>{
+  if(scene!=='map'||!mapZOn(MAPUI.view)||(e.pointerType==='mouse'&&e.button!==0)) return;
+  MAPUI.ptr.set(e.pointerId,mapCvPt(e)); try{ mapCv.setPointerCapture(e.pointerId); }catch(err){}
+  if(!MAPUI.drag) MAPUI.drag={moved:false,sx:e.clientX,sy:e.clientY,pinch:null};
+  if(MAPUI.ptr.size===2){ const [a,b]=[...MAPUI.ptr.values()]; MAPUI.drag.pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:mapZoomOf()}; MAPUI.drag.moved=true; }
+});
+mapCv.addEventListener('pointermove',e=>{
+  const D=MAPUI.drag, last=MAPUI.ptr.get(e.pointerId); if(!D||!last||scene!=='map') return;
+  const q=mapCvPt(e);
+  if(MAPUI.ptr.size>=2){
+    const o=[...MAPUI.ptr.values()], m0x=(o[0].x+o[1].x)/2, m0y=(o[0].y+o[1].y)/2;
+    MAPUI.ptr.set(e.pointerId,q);
+    const n=[...MAPUI.ptr.values()], mx=(n[0].x+n[1].x)/2, my=(n[0].y+n[1].y)/2, d=Math.hypot(n[0].x-n[1].x,n[0].y-n[1].y)||1;
+    if(D.pinch){ mapPan(mx-m0x,my-m0y); mapZoomTo(D.pinch.z*d/D.pinch.d,mx,my); }
+    e.preventDefault(); return;
+  }
+  MAPUI.ptr.set(e.pointerId,q);
+  if(!D.moved&&Math.hypot(e.clientX-D.sx,e.clientY-D.sy)>6) D.moved=true;
+  if(D.moved){ mapPan(q.x-last.x,q.y-last.y); e.preventDefault(); }
+});
+function mapPtrUp(e){
+  if(!MAPUI.ptr.has(e.pointerId)) return;
+  MAPUI.ptr.delete(e.pointerId); try{ mapCv.releasePointerCapture(e.pointerId); }catch(err){}
+  const D=MAPUI.drag; if(D&&D.pinch&&MAPUI.ptr.size<2){ D.pinch=null; }
+  if(!MAPUI.ptr.size){ if(D&&D.moved) MAPUI.dragEnd=performance.now(); MAPUI.drag=null; mapZUI(); }
+}
+mapCv.addEventListener('pointerup',mapPtrUp); mapCv.addEventListener('pointercancel',mapPtrUp);
+mapCv.addEventListener('wheel',e=>{
+  if(scene!=='map'||!mapZOn(MAPUI.view)) return;
+  e.preventDefault();
+  const q=mapCvPt(e), dy=e.deltaMode===1?e.deltaY*18:e.deltaMode===2?e.deltaY*300:e.deltaY;
+  mapZoomBy(Math.exp(-clamp(dy,-240,240)*0.0022),q.x,q.y);
+},{passive:false});
+}
+addEventListener('click',e=>{ if(MAPUI.bound&&e.target===mapCv&&performance.now()-MAPUI.dragEnd<400){ e.stopImmediatePropagation(); e.preventDefault(); } },true);
+// keys: + and - zoom, 0 shows the whole map, W A S D pan
+addEventListener('keydown',e=>{
+  if(scene!=='map'||!mapZOn(MAPUI.view)) return;
+  const c=e.code, P=90;
+  if(c==='Equal'||c==='NumpadAdd'){ e.preventDefault(); mapZBtn('in'); }
+  else if(c==='Minus'||c==='NumpadSubtract'){ e.preventDefault(); mapZBtn('out'); }
+  else if(c==='Digit0'||c==='Numpad0'){ e.preventDefault(); mapZBtn('all'); }
+  else if(c==='KeyW'||c==='KeyA'||c==='KeyS'||c==='KeyD'){ e.preventDefault(); mapPan(c==='KeyA'?P:c==='KeyD'?-P:0,c==='KeyW'?P:c==='KeyS'?-P:0); }
+});
+// a controller on the map: the triggers zoom (R2 in, L2 out), the right stick pans; the rest of the menu is as before
+// (the right stick no longer scrolls the map screen)
+{ const base=padMenu; padMenu=function(root,s,dt){
+  if(root&&root.id==='mapov'&&s&&mapZOn(MAPUI.view)){
+    try{
+      const tv=i=>Math.max(s.cur[i]?1:0,(s.val&&s.val[i])||0), zin=tv(PB.R2), zout=tv(PB.L2);
+      if(zin>0.15||zout>0.15) mapZoomBy(Math.exp((zin-zout)*1.6*dt));
+      const [ai,aj]=padAimAx(), x=s.ax[ai]||0, y=s.ax[aj]||0, m=Math.hypot(x,y);
+      if(m>0.2){ const k=(m-0.2)/0.8*900*dt/m; mapPan(-x*k,-y*k); }
+      if(m>0.2){ s=Object.assign({},s,{ax:s.ax.slice()}); s.ax[ai]=0; s.ax[aj]=0; }
+    }catch(err){ console.error(err); }
+  }
+  return base.call(this,root,s,dt);
+}; }
 
 // ---------- towns on new maps: names, music, events, house look, homes
 const TOWNS={}, TOWN_ORDER=[];
@@ -568,3 +727,5 @@ defineMap(4,{id:'nightfall',name:'Nightfall Peak',placeholder:true,music:'night'
   crossings:[
     {id:'pm_bridge_4',x:4500,y:90750,to:{x:12600,y:65400},label:'Cross back to Moonfall',name:'The Moonfire Bridge',kind:'bridge',dir:Math.PI/2}
   ]});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{mapZ:{MAPZ,zm:()=>JSON.parse(JSON.stringify(MAPUI.zm,(k,v)=>k==='f'?undefined:v)),zoomOf:k=>mapZoomOf(k),zmax:k=>mapZMax(k==null?MAPUI.view:k),fit:k=>{ const F=mapFit(k==null?MAPUI.view:k); return {s:F.s,ox:F.ox,oy:F.oy,w:F.w,h:F.h,cw:F.cw,ch:F.ch,y0:F.y0}; },
+  inv:(x,y)=>mapInv(x,y),btn:d=>mapZBtn(d),pan:(dx,dy)=>mapPan(dx,dy),pad:(s,dt)=>{ const r=document.getElementById('mapov'); return padMenu(r,s,dt||0.016); },open:()=>openMap(),sel:()=>mapSel?mapSel.id:null}});

@@ -201,7 +201,7 @@ function useItem(id){
   G.items[id]--; if(!(G.items[id]>0)) delete G.items[id];
   if(boss) itBossTrack().n++;
   IT.use={id,t:IT_USE_T};
-  p.drinkPool=0; p.drinkT=0.9;
+  p.drinkPool=0; p.drinkT=0.9; p.useIco=id;   // (v12) the pose shows this item in his hand, not the green flask (a10c_t3ash.js)
   try{ SFX.play('drink'); }catch(e){}
   ftext(p.x,p.y-34,simplify(d.name),'#ffe6a8',13);
   if(!boss) saveGame();
@@ -334,7 +334,7 @@ function itFlaskCap(){
 
 // ---------- 7. the hooks into the game
 { const base=updatePlayer; updatePlayer=function(dt,inp){
-    try{ itSync(); const U=IT.use, p=player; if(U&&p){ p.drinkPool=0; p.drinkT=Math.max(0.02,0.9*U.t/IT_USE_T); } }catch(e){ console.error('items',e); }
+    try{ itSync(); const U=IT.use, p=player; if(U&&p){ p.drinkPool=0; p.drinkT=Math.max(0.02,0.9*U.t/IT_USE_T); p.useIco=U.id; } else if(p&&p.useIco) p.useIco=null; }catch(e){ console.error('items',e); }
     const r=base(dt,inp);
     try{ itTick(dt); }catch(e){ console.error('items',e); }
     return r; }; }

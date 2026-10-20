@@ -497,6 +497,7 @@ function openMap(){
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
   mapSel=null; $('#bTravel').hidden=true; mapHintSet();
   MAPUI.view=AREA&&AREA.rooms?-1:curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
+  mapZoomStart();   // (v12) opens zoomed on Ash (e1_maps.js)
   drawMapScreen(); renderJournal(); show('mapov');
 }
 const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
@@ -658,6 +659,7 @@ function bagPadStar(){
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
+  try{ mapZUI(); }catch(e){}   // (v12) the zoom buttons hide on the dungeon page
   if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); return; } MAPUI.view=curMap(); }   // the dungeon page
   const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
   g.setTransform(1,0,0,1,0,0); g.fillStyle='#0e0a08'; g.fillRect(0,0,w,h);
@@ -688,9 +690,10 @@ mapCv.addEventListener('click',e=>{
   let best=null,bd=420*420; for(const s of mapList(SHRINES,MAPUI.view)){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
   mapSelect(best);
 });
-function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there.`; else h.textContent='Tap a blue shrine you have found to fast travel there.'; }
+function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there. ${padChip(PB.R2)} and ${padChip(PB.L2)} zoom, the right stick moves the map.`; else h.textContent=usingTouch?'Pinch or tap + and − to zoom, drag to look around. Tap a blue shrine you have found to fast travel there.':'Scroll or press + and − to zoom, drag to look around. Click a blue shrine you have found to fast travel there.'; }
 function mapSelect(best){
   mapSel=best; const bt=$('#bTravel');
+  if(best) try{ mapZShow(best.x,best.y); }catch(e){}   // (v12) zoomed in: bring a picked shrine into view
   if(best){ if(G.inCombat||(G.boss&&!G.boss.dead)){ bt.hidden=true; $('#mapHint').textContent='You can’t fast travel while enemies are close.'; } else { bt.hidden=false; bt.textContent=`Travel to ${best.name}`; $('#mapHint').textContent=best.name; } }
   else{ bt.hidden=true; mapHintSet(); }
   drawMapScreen();

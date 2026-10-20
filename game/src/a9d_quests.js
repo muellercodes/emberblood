@@ -521,9 +521,57 @@ function areaObjAct(o){
 }
 function hashStr(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h; }
 const FURN_LABEL={bed:'Look at the bed',shelf:'Browse the shelf',fireplace:'Sit by the fireplace',oven:'Look at the oven',counter:'Look at the counter',desk:'Look at the desk',board:'Read the bounty board',rack:'Look at the rack',telescope:'Look through the telescope',chart:'Read the star chart',trophy:'Look at the trophy',bearrug:'Look at the rug',sled:'Look at the sled',cauldron:'Sniff the cauldron',hatstand:'Try on hats',portraits:'Look at the family portraits',gchest:'Open Grandma’s chest',heights:'Look at the doorframe',toybox:'Rummage in the toy box',abacus:'Count the beads',perch:'Say hi to Pebble',mapwall:'Look at Juniper’s maps',yarn:'Look at the yarn',rocker:'Look at the rocking chair',herbs:'Pick an herb',planter:'Pick an herb',pail:'Look in the pail',hay:'Search the hay',bunk:'Look at the bunks',cart:'Look in the cart',drawer:'Search the drawer',note:'Read the note',painting:'Look at the painting',cell:'Look at the cell',cchest:'Open the chest',brazier:'Look at the brazier',qitem:'Pick it up',page:'Pick up the old page',cave_ore:'Chip out the star-iron',relic:'Take the cloak',cat:'Pet the cat',mirror:'Look in the mirror',rock:'Look at the rock',goose:'Pet the goose',clock:'Check the clock',lute:'Play a tune'};
+// (v12) indoors (houses, shops, caves, dungeons) Ash names only what is close and in front of him. Drew: "If I face an
+// object from across the room it is highlighted and the item title pops up, so there always seems to be an item title
+// when I'm in a room." A thing counts from the nearest point of its footprint (its box, or its circle): up to
+// IN_REACH.front px from Ash's middle (about a tile and a half) within IN_REACH.cone of the way he faces, or
+// IN_REACH.touch px when he stands right against it a little side on. A person counts from their middle and a bit
+// further (a shopkeeper stands behind the counter). A rug's secret counts from the rug's corners (it says "Lift the
+// corner"): it covered the middle of the room, so its name showed wherever Ash stood. The ring goes on that nearest
+// point (prompt rx, ry), not the middle of a long counter. Outdoors nothing changes. The story's own places indoors
+// (e10_story.js s10Prompts) and its person-first tie (s10PersonFirst) ask reachPlace and reachPerson the same way.
+const IN_REACH={front:44,touch:20,cone:1.22,wide:1.75,person:70,turtle:90,personTouch:38,corner:34};
+function reachSeen(qx,qy,d,front,touch){
+  const p=player; if(!p) return false; if(d<=6) return true;
+  const a=Math.abs(angDiff(p.facing||0,Math.atan2(qy-p.y,qx-p.x)));
+  return (d<=front&&a<=IN_REACH.cone)||(d<=touch&&a<=IN_REACH.wide);
+}
+// the nearest point of a box (w by h) or a circle (r) at x,y, and Ash's distance to it
+function reachNear(x,y,w,h,r){
+  const p=player;
+  if(w){ const qx=clamp(p.x,x-w/2,x+w/2), qy=clamp(p.y,y-(h||w)/2,y+(h||w)/2); return {x:qx,y:qy,d:Math.hypot(p.x-qx,p.y-qy)}; }
+  const dc=dist(p.x,p.y,x,y), d=Math.max(0,dc-(r||0)), k=dc>0.01?(dc-d)/dc:0;
+  return {x:x+(p.x-x)*k,y:y+(p.y-y)*k,d};
+}
+function rugTrig(o){
+  if(o._rug===undefined) o._rug=o.k==='trig'&&!!o.noCol&&!!o.w&&!!AREA&&AREA.objs.some(q=>q.k==='rug'&&q.x===o.x&&q.y===o.y);
+  return o._rug;
+}
+// an area thing: {ok, d (from its edge), x, y (where the ring goes)}
+function reachObj(o){
+  const p=player;
+  if(rugTrig(o)){
+    let b=null; for(const sx of [-1,1]) for(const sy of [-1,1]){ const cx=o.x+sx*o.w/2, cy=o.y+sy*(o.h||o.w)/2, d=dist(p.x,p.y,cx,cy); if(!b||d<b.d) b={x:cx,y:cy,d}; }
+    b.ok=b.d<=IN_REACH.corner; return b;
+  }
+  const q=o.w?reachNear(o.x,o.y,o.w,o.h,0):reachNear(o.x,o.y,0,0,o.r||16);
+  q.ok=reachSeen(q.x,q.y,q.d,IN_REACH.front,IN_REACH.touch);
+  if(!o.w){ q.x=o.x; q.y=o.y; }
+  return q;
+}
+function reachPerson(n){
+  if(!AREA||!player) return true;
+  const d=dist(player.x,player.y,n.x,n.y);
+  return reachSeen(n.x,n.y,d,n.turtle?IN_REACH.turtle:IN_REACH.person,IN_REACH.personTouch);
+}
+// a story place indoors (a point with a radius)
+function reachPlace(x,y,r){
+  if(!AREA||!player) return true;
+  const q=reachNear(x,y,0,0,r||22); return reachSeen(q.x,q.y,q.d,IN_REACH.front,IN_REACH.touch);
+}
 function updateInteractions(dt){
   const p=player; let best=null, bd=1e9;
-  const offer=(d,text,act,x,y,always)=>{ if(d<bd){ bd=d; best={text,act,x,y,always}; } };
+  const offer=(d,text,act,x,y,always,rx,ry)=>{ if(d<bd){ bd=d; best={text,act,x,y,always}; if(rx!=null){ best.rx=rx; best.ry=ry; } } };
   if(AREA){
     for(const o of AREA.objs){
       const lab=o.prompt?o.prompt():FLOOR_LABEL[o.k]?FLOOR_LABEL[o.k](o):CAVE_LABEL[o.k]!==undefined?CAVE_LABEL[o.k]:o.k==='qitem'?(G.items[o.item]||G.found[o.id]?null:`Look at ${o.label}`):o.k==='bed'&&o.home?'Sleep in your bed (heal and save)':o.egg&&o.k!=='drawer'?o.egg.label:FURN_LABEL[o.k];
@@ -531,13 +579,11 @@ function updateInteractions(dt){
       // a piece of furniture with a size counts from its edge, not its middle: a long counter's reach used to be half
       // its width all round, so it beat the shopkeeper standing at it (nobody could talk to Fennick) and the stairs
       // beside it. A secret's trigger sits on its host, the same size: it wins their tie. Stairs Ash stands against win.
-      let d, reach;
-      if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
-      else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
-      const onStairs=o.k==='stairs'&&o.w&&d<24;
-      if(d<reach||onStairs) offer(onStairs?-500:d-reach-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest');
+      // (v12) and only when it is close and in front of him (reachObj above)
+      const q=reachObj(o), onStairs=o.k==='stairs'&&o.w&&q.d<24;
+      if(q.ok||onStairs) offer(onStairs?-500:q.d-34-(o.k==='trig'?2:0),lab,()=>areaObjAct(o),o.x,o.y,o.k==='cchest',q.x,q.y);
     }
-    for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
+    for(const n of AREA.npcs){ const d=dist(p.x,p.y,n.x,n.y); if(d<(n.turtle?90:70)&&reachPerson(n)) offer(d-70,`Talk to ${n.name}`,()=>talkTo(n),n.x,n.y); }
     const e=AREA.exit; if(!e.none&&dist(p.x,p.y,e.x,e.y)<80) offer(10,'Leave',()=>exitArea(),e.x,e.y,true);
   }else{
     const mk=curMap();
@@ -585,3 +631,4 @@ function updateAllies(dt){
 // test hooks (QUESTS pacing checks)
 window.__ebDbg=Object.assign(window.__ebDbg||{},{qAvail:id=>qAvail(id),availableFrom:id=>availableFrom(id),npcMarker:id=>npcMarker(id),storyMarker:id=>storyMarker(id),
   qpRaw:id=>{ QP.raw++; try{ return qAvail(id); } finally { QP.raw--; } },qpState:()=>{ QP.key=''; qpRefresh(); return {allow:[...QP.allow],err:[...QP.err]}; }});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{reach:{IN_REACH,reachObj,reachPerson,reachPlace,blocked:(x,y)=>blockedAt(x,y)}});
