@@ -35,7 +35,8 @@ const Cloud=(()=>{
   async function push(save){ if(!token) return; await req('/api/save',{method:'PUT',body:{save}}); lastPush=Date.now(); lastErr=''; }
   function queueSave(save,now){ if(!token||!base) return; pending=save; clearTimeout(pushT); pushT=setTimeout(flush,now?0:Math.max(0,20000-(Date.now()-lastPush))); }
   async function flush(){ if(!pending||busy) return; const s=pending; pending=null; busy=true; try{ await push(s); }catch(e){ lastErr=e.message; if(!pending) pending=s; } busy=false; changed(); }
-  async function submitScore(diff,wave,score){ if(!token||!base) return; try{ await req('/api/score',{method:'POST',body:{diff,wave,score}}); }catch(e){} }
+  // (v12) never for a run that used a cheat (v10_art_cheats.js)
+  async function submitScore(diff,wave,score){ if(!token||!base||(G&&G.cheated)) return; try{ await req('/api/score',{method:'POST',body:{diff,wave,score}}); }catch(e){} }
   async function board(diff){ const j=await req('/api/leaderboard?diff='+diff); return j.rows||[]; }
   addEventListener('pagehide',()=>{ if(pending&&token&&base){ try{ fetch(base+'/api/save',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({save:pending}),keepalive:true,mode:'cors'}); pending=null; }catch(e){} } });
   return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},get paused(){return paused;},get viewing(){return viewing;},
