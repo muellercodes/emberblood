@@ -132,9 +132,9 @@ function ttlProg(){
 
 // ---------- layout: where the picture's parts go, from where the menu sits on screen
 function ttlRects(){
-  const m=document.getElementById('menu'); if(!m||!m.classList.contains('on')) return null;
+  const m=document.getElementById('menu'); if(!m||!m.classList.contains('on')) return TTL.rects&&TTL.rects.W===W&&TTL.rects.H===H?TTL.rects:null;
   try{ const c=m.querySelector('.menu').getBoundingClientRect(), h=m.querySelector('.ttlhead').getBoundingClientRect(), s=m.querySelector('.stack').getBoundingClientRect();
-    return c.width>0?{c,h,s}:null; }catch(e){ return null; }
+    if(!(c.width>0)) return null; TTL.rects={c,h,s,W,H}; return TTL.rects; }catch(e){ return null; }
 }
 function ttlLayout(){
   const w=W, h=H, r=ttlRects(); let side=w/h>=1.2; try{ side=matchMedia('(min-aspect-ratio: 6/5)').matches; }catch(e){}
@@ -145,9 +145,9 @@ function ttlLayout(){
     L.peak={x:L.x0+sw*0.46,y:h*0.3}; L.mw=Math.max(sw*0.6,330*u); L.mb=h*0.655;
     L.moon={x:L.x0+sw*0.86,y:h*0.16,r:32*u};
     L.cloud={x:L.peak.x+sw*0.15,y:h*0.11};
-    L.hz=h*0.61; L.t0=h*0.765; L.t1=h*0.965; L.fg=h*0.975;
+    L.hz=h*0.61; L.t0=h*0.765; L.t1=h*1.03; L.fg=h*0.985;
     L.vis={x0:L.x0+8*u,y0:0,x1:w-6*u,y1:h-6*u};
-    L.green=[L.x0+sw*0.3,L.x0+sw*0.76];
+    L.green=[L.x0+sw*0.33,L.x0+sw*0.73];
   } else {
     const y0=r?r.h.bottom:h*0.17, y1=r?r.s.top:h*0.56, bh=Math.max(140,y1-y0);
     L.y0=y0; L.y1=y1; L.x0=0; L.x1=w; L.sw=w; L.bh=bh;
@@ -161,7 +161,8 @@ function ttlLayout(){
   }
   return L;
 }
-function ttlLayoutKey(){ const r=ttlRects(), q=v=>Math.round(v/6); return r?[q(r.c.left),q(r.c.right),q(r.h.bottom),q(r.s.top)].join(','):'-'; }
+// while another panel covers the title (slots, settings), the menu is hidden and cannot be measured: keep the last layout
+function ttlLayoutKey(){ const r=ttlRects(), q=v=>Math.round(v/6); if(r) TTL.lk=[q(r.c.left),q(r.c.right),q(r.h.bottom),q(r.s.top),Math.round(W),Math.round(H)].join(','); return TTL.lk||'-'; }
 
 // ---------- geometry shared by the sky and the land: the mountain's outline, the hills, the five stones
 function ttlGeom(L){
@@ -299,7 +300,7 @@ function ttlMountain(g,L,P,pr){
     const spread=(0.12+k*0.8)*L.mw*(0.8+R()*0.4), depth=(0.55+R()*0.45)*(L.mb-y0), pts=[];
     for(let j=0;j<=10;j++){ const t=j/10, x=x0+s*spread*Math.pow(t,0.95)+(ttlN(t*3+i,i)-0.5)*10*u*t, y=y0+depth*t; if(y<L.mtnY(x)+2*u) continue; pts.push([x,y]); }
     if(pts.length<4) continue;
-    ttlInk(g,pts.map(p=>[p[0]+8*u,p[1]+1*u]),16*u,{col:P.mtnDark,alpha:P.sb?0.2:0.28,seed:60+i,taper:0.55,wob:3*u});
+    ttlInk(g,pts.map(p=>[p[0]+8*u,p[1]+1*u]),16*u,{col:P.mtnDark,alpha:P.sb?0.3:0.34,seed:60+i,taper:0.55,wob:3*u});
     ttlInk(g,pts.map(p=>[p[0]-3*u,p[1]]),6*u,{col:P.mtnLit,alpha:P.sb?0.26:0.2,seed:80+i,taper:0.5,wob:2*u});
     ttlInk(g,pts,1*u,{col:P.ink,alpha:0.38*(1-k*0.5),seed:90+i,taper:0.45}); }
   // pen hatching on the shadowed flank, and a little on the near foot of the lit one
@@ -309,6 +310,8 @@ function ttlMountain(g,L,P,pr){
     g.beginPath(); g.moveTo(x,y); g.lineTo(x+l*0.8,y+l*0.55); g.stroke(); }
   g.globalAlpha=1;
   ttlSpeck(g,poly,P.ink,Math.round(L.mw*L.mw*0.004/(u*u)*u),71,0.18,u);
+  // evening haze gathers at the foot
+  { const hg=g.createLinearGradient(0,L.mb-(L.mb-pk.y)*0.42,0,L.mb); hg.addColorStop(0,ttlA(P.sky[4][1],0)); hg.addColorStop(1,ttlA(P.sky[4][1],P.sb?0.42:0.3)); g.fillStyle=hg; g.fillRect(xa,L.mb-(L.mb-pk.y)*0.42,xb-xa,(L.mb-pk.y)*0.42+90*u); }
   // small pines on the lower slopes
   for(let x=pk.x-L.mw*1.1;x<pk.x+L.mw*1.1;x+=(4+R()*7)*u){ const y=L.mb-R()*R()*40*u; if(y<L.mtnY(x)+20*u) continue; const h=(5+R()*7)*u; g.fillStyle=ttlA(P.forest,0.8); g.beginPath(); g.moveTo(x-h*0.3,y); g.lineTo(x,y-h); g.lineTo(x+h*0.3,y); g.closePath(); g.fill(); }
   // the lava trickle and the crater glow, while the mountain still smokes
@@ -528,11 +531,14 @@ function ttlBooth(g,L,P,x,gy,s,seed){
   g.fillStyle=ttlA(P.ink,0.3); g.beginPath(); g.ellipse(x+2*u,gy+1*u,w*0.62,2*u,0,0,TAU); g.fill();
 }
 function ttlTown(g,L,P,pr){
-  const u=L.u, w=L.W, R=mulberry32(7300), ts=L.side?1.18:1, gl=L.green, back=[], mid=[], front=[];
-  const tm=L.side?L.H*0.855:L.y1+18*u, py=L.side?(L.t0+tm)/2+10*u:(L.t0+tm)/2+2*u;
+  const u=L.u, w=L.W, R=mulberry32(7300), ts=L.side?1.2:1, tsm=L.side?1.42:1, gl=L.green, back=[], mid=[], front=[];
+  const tm=L.side?L.H*0.905:L.y1+18*u, py=L.side?L.t0+(tm-L.t0)*0.5:(L.t0+tm)/2+2*u;
+  // the ground of the green: misty toward the back, darker toward us
+  { const gg=g.createLinearGradient(0,L.t0-10*u,0,L.H); gg.addColorStop(0,ttlA(P.grassLit,P.sb?0.3:0.18)); gg.addColorStop(0.3,ttlA(P.hillNear,0)); gg.addColorStop(0.62,ttlA(P.grassDark,0.4)); gg.addColorStop(1,ttlA(P.grassDark,0.85)); g.fillStyle=gg; g.fillRect(0,L.t0-10*u,w,L.H); }
   // a lane across the green, from the near grass to the houses at the back
-  { const cx=(gl[0]+gl[1])/2, yb=L.H+6*u, ya=L.t0+4*u, lane=[], lp=[], rp=[]; for(let i=0;i<=16;i++){ const t=i/16, x=cx+Math.sin(t*2.6+0.4)*26*u*(1-t)+(1-t)*30*u, y=yb+(ya-yb)*t, hw=(8+60*Math.pow(1-t,1.6))*u*ts; lp.push([x-hw,y]); rp.push([x+hw,y]); }
-    const poly=lp.concat(rp.reverse()); ttlWash(g,poly,P.path,{seed:51,amp:3*u,core:P.sb?0.5:0.45,layers:3,la:0.1}); ttlMottle(g,poly,[P.grassLit,'#ffffff'],10,30*u,52,0.12);
+  { const cx=(gl[0]+gl[1])/2, yb=L.H+6*u, ya=L.t0+4*u, lane=[], lp=[], rp=[]; for(let i=0;i<=16;i++){ const t=i/16, x=cx+Math.sin(t*3.4+0.2)*40*u*(1-t)+(1-t)*24*u, y=yb+(ya-yb)*Math.pow(t,0.8), hw=(7+44*Math.pow(1-t,1.8))*u*ts; lp.push([x-hw,y]); rp.push([x+hw,y]); }
+    const poly=lp.concat(rp.reverse()); ttlWash(g,poly,P.path,{seed:51,amp:3*u,core:P.sb?0.22:0.24,layers:3,la:0.07}); ttlMottle(g,poly,[P.grassDark,P.path,P.grassDark],12,26*u,52,0.24);
+    { const RC=mulberry32(57); g.save(); ttlPath(g,poly); g.clip(); g.strokeStyle=ttlA(P.ink,0.22); g.lineWidth=0.8*u; for(let i=0;i<90;i++){ const t=RC(), y=yb+(ya-yb)*Math.pow(t,0.8), x=cx+Math.sin(t*3.4+0.2)*40*u*(1-t)+(1-t)*24*u+(RC()-0.5)*1.8*(7+44*Math.pow(1-t,1.8))*u*ts, r=(1+3.5*(1-t))*u; g.beginPath(); g.ellipse(x,y,r,r*0.45,0,Math.PI*1.1,Math.PI*1.9); g.stroke(); } g.restore(); }
     ttlInk(g,lp,1*u,{col:P.ink,alpha:0.3,seed:53,taper:0.3}); ttlInk(g,rp.slice().reverse(),1*u,{col:P.ink,alpha:0.3,seed:54,taper:0.3}); }
   // the back row, end to end, with the tower near the green
   const towerX=L.side?L.x0+L.sw*0.42:w*0.4;
@@ -549,11 +555,11 @@ function ttlTown(g,L,P,pr){
   ttlStall(g,L,P,gl[0]+(gl[1]-gl[0])*0.31,py+6*u,ts,21); ttlBooth(g,L,P,gl[0]+(gl[1]-gl[0])*0.69,py+8*u,ts,22);
   if(!L.side) void cxg;
   // the middle row: houses either side of the green
-  const midSpan=L.side?[[L.x0-L.sw*0.2,gl[0]-14*u],[gl[1]+14*u,w+40*u]]:[[-30*u,gl[0]-4*u],[gl[1]+4*u,w+40*u]];
-  for(const [a,b] of midSpan){ for(let x2=a;x2<b;){ const hw=(56+R()*26)*u*ts; if(x2+hw*0.5<b+hw*0.3) mid.push({x:x2+hw/2,w:hw}); x2+=hw+(3+R()*7)*u; } }
+  const midSpan=L.side?[[L.x0-L.sw*0.3,gl[0]-4*u],[gl[1]+4*u,w+40*u]]:[[-30*u,gl[0]-4*u],[gl[1]+4*u,w+40*u]];
+  for(const [a,b] of midSpan){ for(let x2=a;x2<b;){ const hw=(56+R()*26)*u*tsm; if(x2+hw*0.5<b+hw*0.3) mid.push({x:x2+hw/2,w:hw}); x2+=hw+(3+R()*7)*u; } }
   const strings=[];
-  for(const m of mid){ const sd=seed++, gy=tm+(ttlH(sd,5)-0.5)*5*u, hh=(30+R()*10)*u*ts, gable=R()<0.55;
-    m.out=ttlHouse(g,L,P,m.x,gy,m.w,hh,{gable,roof:(sd*5)%6,seed:sd,frame:R()<0.45}); if(R()<0.3){ const tx=m.x+m.w*0.56; if(tx<w) ttlTree(g,L,P,tx,gy+2*u,(30+R()*12)*u*ts,sd+900); } }
+  for(const m of mid){ const sd=seed++, gy=tm+(ttlH(sd,5)-0.5)*5*u, hh=(30+R()*10)*u*tsm, gable=R()<0.55;
+    m.out=ttlHouse(g,L,P,m.x,gy,m.w,hh,{gable,roof:(sd*5)%6,seed:sd,frame:R()<0.45,near:L.side}); if(R()<0.3){ const tx=m.x+m.w*0.56; if(tx<w) ttlTree(g,L,P,tx,gy+2*u,(30+R()*12)*u*tsm,sd+900); } }
   const lm=mid.filter(m=>m.x<gl[0]).pop(), rm=mid.find(m=>m.x>gl[1]);
   const tw=back.find(b=>b.tower);
   ttlString(g,L,P,tops[0],tops[1],12*u*ts,11,17*ts); ttlString(g,L,P,tops[1],tops[2],12*u*ts,12,17*ts);
@@ -562,14 +568,17 @@ function ttlTown(g,L,P,pr){
   if(tw&&tw.out) ttlString(g,L,P,[tw.out.x+2*u,tw.out.ey-tw.out.rh*0.1],tops[1],16*u,15,16*ts);
   // bigger lanterns on the post tops: the moth's favourite places
   for(const [px,pyy] of tops){ ttlLantern(g,L,P,px,pyy-10*u*ts,7*u*ts,P.lan[(px|0)%P.lan.length],(px|0)+7); TTL.perch.push(TTL.lan[TTL.lan.length-1]); }
+  // warm pools of lantern light on the grass under the posts, the stall and the booth
+  { g.save(); g.globalCompositeOperation='lighter'; const spots=posts.map(p=>[p[0],p[1]+2*u,1]).concat([[gl[0]+(gl[1]-gl[0])*0.31,py+8*u,0.8],[gl[0]+(gl[1]-gl[0])*0.69,py+10*u,0.8]]);
+    for(const [qx,qy,k] of spots){ const rx=46*u*ts*k, gr=g.createRadialGradient(qx,qy,0,qx,qy,rx); gr.addColorStop(0,`rgba(${P.lanGlow},${P.sb?0.22:0.26})`); gr.addColorStop(0.5,`rgba(${P.lanGlow},${P.sb?0.08:0.1})`); gr.addColorStop(1,`rgba(${P.lanGlow},0)`); g.fillStyle=gr; g.save(); g.translate(qx,qy); g.scale(1,0.28); g.translate(-qx,-qy); g.fillRect(qx-rx,qy-rx,rx*2,rx*2); g.restore(); } g.restore(); }
   // the front row, only at the edges, close and big
-  if(L.side){ const fr=[[L.x0-L.sw*0.5,L.x0+L.sw*0.08],[w-L.sw*0.14,w+80*u]];
-    for(const [a,b] of fr) for(let x2=a;x2<b;){ const hw=(84+R()*26)*u*ts; front.push({x:x2+hw/2,w:hw}); x2+=hw+(4+R()*8)*u; }
-    for(const f of front){ const sd=seed++, gy=L.t1+(ttlH(sd,6)-0.5)*4*u, hh=(46+R()*10)*u*ts; f.out=ttlHouse(g,L,P,f.x,gy,f.w,hh,{gable:R()<0.5,roof:(sd*3)%6,seed:sd,frame:R()<0.6,near:true}); } }
+  if(L.side){ const fr=[[L.x0-L.sw*0.5,L.x0+L.sw*0.02],[w-L.sw*0.1,w+80*u]];
+    for(const [a,b] of fr) for(let x2=a;x2<b;){ const hw=(96+R()*26)*u*tsm; front.push({x:x2+hw/2,w:hw}); x2+=hw+(4+R()*8)*u; }
+    for(const f of front){ const sd=seed++, gy=L.t1+(ttlH(sd,6)-0.5)*4*u, hh=(50+R()*10)*u*tsm; f.out=ttlHouse(g,L,P,f.x,gy,f.w,hh,{gable:R()<0.5,roof:(sd*3)%6,seed:sd,frame:R()<0.6,near:true}); } }
   // the small figure with horns and a tail, sitting on a roof, looking at the mountain
   const vis=L.vis, cands=(L.side?mid.filter(m=>m.x>gl[1]):back).map(b=>b.out).filter(o=>o&&!o.far===!!L.side&&o.x>vis.x0+20*u&&o.x<vis.x1-30*u&&o.ridgeY>vis.y0+20*u&&o.ridgeY<vis.y1-14*u&&(L.side||o.x>w*0.55));
   const roofOf=cands.length?cands[Math.min(cands.length-1,L.side?0:1)]:null;
-  if(roofOf){ const rx=roofOf.gable?roofOf.x:roofOf.x0+roofOf.w*0.34, ry=roofOf.ridgeY+(roofOf.gable?1.4*u:0.8*u); ttlRoofKid(g,L,P,rx,ry,L.side?1.5:1.3);
+  if(roofOf){ const rx=roofOf.gable?roofOf.x:roofOf.x0+roofOf.w*0.34, ry=roofOf.ridgeY+(roofOf.gable?1.4*u:0.8*u); ttlRoofKid(g,L,P,rx,ry,L.side?1.12:1.05);
     if(pr.a4){ const wn=(roofOf.wins||[])[0]; if(wn) ttlShell(g,L,P,wn.x+wn.w*0.1,wn.y+wn.h+0.4*u,(roofOf.far?3.4:4.4)*u); else ttlShell(g,L,P,roofOf.x0+6*u,roofOf.ey+4*u,4*u); } }
   else if(pr.a4){ const p=TTL.perch[2]||TTL.perch[0]; if(p) ttlShell(g,L,P,p.x+5*u,py-1*u,4.4*u); }
   // where the moth may sit: the post lanterns, and string lanterns in plain view
@@ -587,7 +596,7 @@ function ttlRoofKid(g,L,P,x,y,s){
   g.beginPath(); g.arc(x,y-12.2*u,3.7*u,0,TAU); g.fill();
   // tousled hair on top of the head, dark
   g.fillStyle=ttlTone(body,-0.45); g.beginPath(); g.arc(x,y-13.2*u,3.5*u,Math.PI*1.02,Math.PI*1.98); g.closePath(); g.fill();
-  for(const sd of [-1,1]){ const hp=[[x+sd*1.6*u,y-14.6*u],[x+sd*4.4*u,y-16*u],[x+sd*5.8*u,y-18.8*u],[x+sd*5.2*u,y-21.6*u],[x+sd*4.7*u,y-18.9*u],[x+sd*3.2*u,y-17.2*u],[x+sd*1*u,y-16.4*u]];
+  for(const sd of [-1,1]){ const hp=[[x+sd*1.2*u,y-15.2*u],[x+sd*2.6*u,y-16.2*u],[x+sd*3.5*u,y-18.6*u],[x+sd*3.4*u,y-21.4*u],[x+sd*2.8*u,y-19*u],[x+sd*1.9*u,y-17.4*u],[x+sd*0.6*u,y-16.4*u]];
     g.fillStyle=horn; ttlPath(g,hp); g.fill(); ttlInk(g,hp,0.6*u,{col:ink,closed:true,seed:sd+3,wob:0.1*u,alpha:0.85}); }
   ttlInk(g,[[x-4.6*u,y],[x-4.5*u,y-5.6*u],[x-3.2*u,y-9.2*u]],1*u,{col:rim,alpha:0.85,seed:3,taper:0.3});
   ttlInk(g,[[x-3.5*u,y-11.6*u],[x-2.4*u,y-14.6*u],[x-0.6*u,y-15.6*u]],0.8*u,{col:rim,alpha:0.7,seed:4,taper:0.3});
@@ -610,10 +619,35 @@ function ttlForeground(g,L,P,pr){
   ttlInk(g,top,1.5*u,{col:P.ink,alpha:0.7,seed:43,taper:0.02,wob:1*u});
   // tufts along the bank
   for(let x=-5*u;x<w;x+=(5+R()*9)*u){ const y=L.fg+Math.sin(x/(90*u))*5*u+(ttlN(x/(30*u),3)-0.5)*6*u+2*u; for(let k=-1;k<=1;k++){ const l=(4+R()*5)*u; ttlInk(g,[[x+k*1.6*u,y],[x+k*1.6*u+k*2*u+(R()-0.5)*2*u,y-l]],1*u,{col:k?P.ink:P.grassLit,alpha:k?0.55:0.8,seed:(x|0)+k,taper:0.5,straight:true}); } }
+  // a pond on the green (wide screens): the sky in it, ripples, reeds; the lanterns (and the moon, when it is over it) shimmer in it each frame
+  TTL.pond=null;
+  if(L.side){ const pxc=L.x0+L.sw*0.29, pyc=L.H*0.935, rx=Math.min(96*u,L.sw*0.17), ry=14*u, pond=ttlEll(pxc,pyc,rx,ry,30);
+    ttlWash(g,pond,P.sb?'#272c5e':'#0c0a18',{seed:71,amp:1.4*u,layers:2,la:0.25});
+    g.save(); ttlPath(g,pond); g.clip(); const rg=g.createLinearGradient(0,pyc-ry,0,pyc+ry); rg.addColorStop(0,ttlA(P.sky[4][1],P.sb?0.55:0.45)); rg.addColorStop(0.35,ttlA(P.sky[3][1],0.25)); rg.addColorStop(1,ttlA(P.sky[0][1],0.2)); g.fillStyle=rg; g.fillRect(pxc-rx,pyc-ry,rx*2,ry*2);
+    for(let i=0;i<16;i++){ const yy=pyc-ry*0.75+i*ry*0.1, xx=pxc+(R()-0.5)*rx*1.5*(1-Math.abs(i/16-0.5)), l=(6+R()*12)*u; ttlInk(g,[[xx-l,yy],[xx+l,yy]],0.8*u,{col:i%3?'#ffffff':P.ink,alpha:i%3?0.32:0.3,seed:i+80,straight:true,taper:0.45}); }
+    g.restore();
+    const lip=[]; for(let i=0;i<=20;i++){ const a=Math.PI*(0.04+i/20*0.92); lip.push([pxc+Math.cos(a)*rx,pyc+Math.sin(a)*ry]); } ttlInk(g,lip,1.3*u,{col:P.ink,alpha:0.75,seed:83,taper:0.15});
+    const back=[]; for(let i=0;i<=20;i++){ const a=Math.PI*(1.04+i/20*0.92); back.push([pxc+Math.cos(a)*rx,pyc+Math.sin(a)*ry]); } ttlInk(g,back,1*u,{col:P.ink,alpha:0.45,seed:84,taper:0.2});
+    for(const ex of [pxc-rx*0.92,pxc+rx*0.95]) for(let k=0;k<6;k++){ const x=ex+(R()-0.5)*12*u, y=pyc+(R()-0.3)*ry*0.6, l=(8+R()*10)*u; ttlInk(g,[[x,y],[x+(R()-0.5)*4*u,y-l]],1.1*u,{col:k%2?P.ink:P.grassLit,alpha:0.75,seed:k+(ex|0),taper:0.4,straight:true}); if(k%3===0){ g.fillStyle=P.timber; g.beginPath(); g.ellipse(x+(R()-0.5)*2*u,y-l*0.85,1.1*u,2.6*u,0,0,TAU); g.fill(); } }
+    TTL.pond={x:pxc,y:pyc,rx,ry,poly:pond}; }
   // a low fence on the right
   const f0=L.side?L.x0+L.sw*0.62:w*0.62, f1=w+10*u, fy=L.fg+2*u;
   for(let x=f0;x<f1;x+=16*u){ const yy=fy+Math.sin(x/(90*u))*5*u; ttlInk(g,[[x,yy+6*u],[x+0.6*u,yy-12*u]],2.6*u,{col:P.fence,seed:x|0,straight:true,taper:0.08}); ttlInk(g,[[x-1.4*u,yy+6*u],[x-0.8*u,yy-12*u]],0.9*u,{col:P.ink,alpha:0.7,seed:(x|0)+1,straight:true}); }
   for(const dy of [-8,-2]){ const pts=[]; for(let x=f0-4*u;x<f1;x+=12*u) pts.push([x,fy+dy*u+Math.sin(x/(90*u))*5*u]); if(pts.length>1){ ttlInk(g,pts,1.8*u,{col:P.fence,seed:dy+70,taper:0.03,even:true}); ttlInk(g,pts.map(p=>[p[0],p[1]+1.2*u]),0.8*u,{col:P.ink,alpha:0.6,seed:dy+71,taper:0.03}); } }
+  // wildflowers and tufts on the green
+  { const y0=L.side?L.H*0.875:L.t0+8*u, y1=L.side?L.fg:L.y1; const cols=P.sb?['#ffd25a','#ff8ab0','#ffffff','#ff7a5a','#c8a0ff']:['#c89a3a','#a85a6a','#c8bca8','#a8502a'];
+    for(let i=0;i<Math.round((L.side?L.sw:w)/(5*u));i++){ const x=(L.side?L.x0:0)+R()*(L.side?L.sw:w), y=y0+Math.pow(R(),0.8)*(y1-y0), r=(0.8+R()*0.9)*u*(0.7+0.5*(y-y0)/(y1-y0+1));
+      if(R()<0.35){ ttlInk(g,[[x,y+2*u],[x+(R()-0.5)*2*u,y-3*u*(1+(y-y0)/(y1-y0+1))]],0.9*u,{col:R()<0.5?P.grassLit:P.ink,alpha:0.55,seed:i,taper:0.5,straight:true}); continue; }
+      g.fillStyle=cols[i%cols.length]; g.globalAlpha=0.85; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); g.globalAlpha=1; } }
+  // a tall lantern post close by, on the right of the lane (the lantern on it is one the moth likes)
+  if(L.side){ const ts=1.3, px=L.x0+L.sw*0.66, by=L.H*1.01, ph=150*u*ts, ax=px-24*u*ts, ay=by-ph+8*u;
+    ttlInk(g,[[px,by],[px+1*u,by-ph]],8*u,{col:P.timber,seed:301,taper:0.04,straight:true});
+    ttlInk(g,[[px-3.2*u,by],[px-2.2*u,by-ph]],1.4*u,{col:P.ink,seed:302,straight:true,taper:0.05}); ttlInk(g,[[px+3.6*u,by],[px+4.2*u,by-ph]],1.4*u,{col:P.ink,seed:303,straight:true,taper:0.05});
+    ttlInk(g,[[px+2*u,by-ph+2*u],[ax-2*u,ay-2*u]],3*u,{col:P.timber,seed:304,taper:0.05,straight:true}); ttlInk(g,[[px+2*u,by-ph+6*u],[px-10*u,by-ph+16*u]],1.6*u,{col:P.timber,seed:305,taper:0.1,straight:true});
+    ttlInk(g,[[px+2*u,by-ph+3.6*u],[ax-2*u,ay-0.4*u]],0.9*u,{col:P.ink,seed:306,straight:true,taper:0.05});
+    g.fillStyle=P.ink; g.beginPath(); g.arc(px+1*u,by-ph-2*u,3.2*u,0,TAU); g.fill();
+    ttlLantern(g,L,P,ax,ay+15*u*ts,11*u*ts,P.lan[1],311); TTL.perch.unshift(TTL.lan[TTL.lan.length-1]);
+    g.fillStyle=ttlA(P.ink,0.35); g.beginPath(); g.ellipse(px+4*u,by,14*u,3*u,0,0,TAU); g.fill(); }
   // fireflies to wander over the grass and the green
   TTL.flies=[]; const fr=mulberry32(9001), n=L.side?10:7;
   for(let i=0;i<n;i++) TTL.flies.push({x:L.x0+fr()*L.sw,y:(L.side?L.t0:L.hz)+fr()*((L.side?L.H*0.95:L.y1)-(L.side?L.t0:L.hz)),ph:fr()*TAU,sp:0.4+fr()*0.6,s:fr()*1000});
@@ -643,12 +677,13 @@ function ttlSprites(L,P,pr){
     S.mcloud={c,w:cw,h:ch};
     const hc=ttlMk(cw*d,ch*d), h=hc.getContext('2d'); h.setTransform(d,0,0,d,0,0); const hx=cw/2-6*u, hy=ch*0.58;
     const bez=(p0,p1,p2,p3,n)=>{ const o=[]; for(let i=0;i<=n;i++){ const t=i/n, m=1-t; o.push([m*m*m*p0[0]+3*m*m*t*p1[0]+3*m*t*t*p2[0]+t*t*t*p3[0],m*m*m*p0[1]+3*m*m*t*p1[1]+3*m*t*t*p2[1]+t*t*t*p3[1]]); } return o; };
-    const head=bez([hx-31*u,hy+5*u],[hx-22*u,hy-3*u],[hx-10*u,hy-6*u],[hx-2*u,hy-13*u],8).concat(bez([hx-2*u,hy-13*u],[hx+8*u,hy-18*u],[hx+20*u,hy-12*u],[hx+24*u,hy+2*u],8),
-      bez([hx+24*u,hy+2*u],[hx+28*u,hy+14*u],[hx+34*u,hy+24*u],[hx+40*u,hy+32*u],6),[[hx+20*u,hy+34*u]],bez([hx+16*u,hy+22*u],[hx+8*u,hy+14*u],[hx-10*u,hy+14*u],[hx-26*u,hy+11*u],8));
-    ttlWash(h,head,P.smokeDark,{seed:9,amp:3*u,core:0.42,layers:6,la:0.1});
-    for(const [b0,b1,c1,c2,tp] of [[[hx+2*u,hy-14*u],[hx+12*u,hy-15*u],[hx+22*u,hy-30*u],[hx+34*u,hy-33*u],[hx+44*u,hy-30*u]],[[hx+12*u,hy-11*u],[hx+19*u,hy-9*u],[hx+28*u,hy-20*u],[hx+38*u,hy-19*u],[hx+47*u,hy-14*u]]]){
-      const horn=bez(b0,c1,c2,tp,10).concat(bez(tp,[c2[0]-2*u,c2[1]+5*u],[c1[0]+3*u,c1[1]+6*u],b1,10)); ttlWash(h,horn,P.smokeDark,{seed:(b0[0]|0)+12,amp:1.8*u,core:0.45,layers:6,la:0.1}); }
-    for(let i=0;i<4;i++){ const sx=hx+27*u+i*4*u, sy=hy+4*u+i*7*u, sp=[[sx-2*u,sy],[sx+5*u,sy-3*u],[sx+1*u,sy+3*u]]; ttlWash(h,sp,P.smokeDark,{seed:30+i,amp:1*u,core:0.4,layers:4,la:0.1}); }
+    const head=bez([hx-28*u,hy+3*u],[hx-20*u,hy-2*u],[hx-10*u,hy-5*u],[hx-2*u,hy-12*u],8).concat(bez([hx-2*u,hy-12*u],[hx+5*u,hy-15*u],[hx+12*u,hy-13*u],[hx+17*u,hy-6*u],6),
+      bez([hx+17*u,hy-6*u],[hx+24*u,hy+4*u],[hx+28*u,hy+16*u],[hx+34*u,hy+30*u],8),[[hx+14*u,hy+32*u]],bez([hx+12*u,hy+22*u],[hx+8*u,hy+12*u],[hx-6*u,hy+11*u],[hx-26*u,hy+8*u],8));
+    ttlWash(h,head,P.smokeDark,{seed:9,amp:2.6*u,core:0.42,layers:6,la:0.1});
+    const horn=(b0,b1,c1,c2,tp,sd)=>{ const pts=bez(b0,c1,c2,tp,10).concat(bez(tp,[c2[0]-3*u,c2[1]+6*u],[c1[0]+2*u,c1[1]+8*u],b1,10)); ttlWash(h,pts,P.smokeDark,{seed:sd,amp:1.6*u,core:0.48,layers:6,la:0.1}); };
+    horn([hx-1*u,hy-12*u],[hx+8*u,hy-13*u],[hx+6*u,hy-25*u],[hx+20*u,hy-33*u],[hx+33*u,hy-31*u],41);
+    horn([hx+9*u,hy-11*u],[hx+15*u,hy-8*u],[hx+18*u,hy-19*u],[hx+27*u,hy-22*u],[hx+35*u,hy-17*u],42);
+    for(let i=0;i<4;i++){ const sx=hx+22*u+i*3.4*u, sy=hy+0*u+i*7.4*u, sp=[[sx-1.5*u,sy],[sx+5*u,sy-1*u],[sx+1*u,sy+3.5*u]]; ttlWash(h,sp,P.smokeDark,{seed:30+i,amp:0.8*u,core:0.42,layers:4,la:0.1}); }
     S.horns={c:hc,w:cw,h:ch};
   }
 }
@@ -721,14 +756,14 @@ function ttlFrame(){
   // the thread of smoke from the crater, rising into the cloud with the horned shadow in it
   if(!pr.a1){ const pk=L.peak, cl=L.cloud, S=TTL.spr, N=30, C=[], Lp=[], Rp=[];
     for(let i=0;i<=N;i++){ const p=i/N, e=Math.pow(p,1.4); C.push([pk.x+(cl.x-pk.x)*e+Math.sin(p*6.5-t*0.9)*7*u*p+Math.sin(p*14-t*1.9)*1.6*u*p,pk.y+1*u+(cl.y+20*u-pk.y)*p]); }
-    for(let i=0;i<=N;i++){ const a=C[Math.max(0,i-1)], b=C[Math.min(N,i+1)]; let dx=b[0]-a[0], dy=b[1]-a[1]; const dd=Math.hypot(dx,dy)||1; dx/=dd; dy/=dd; const p=i/N, hw=(1.1+10*p*p)*u*(1+0.15*Math.sin(p*9-t*1.3)); Lp.push([C[i][0]-dy*hw,C[i][1]+dx*hw]); Rp.push([C[i][0]+dy*hw,C[i][1]-dx*hw]); }
+    for(let i=0;i<=N;i++){ const a=C[Math.max(0,i-1)], b=C[Math.min(N,i+1)]; let dx=b[0]-a[0], dy=b[1]-a[1]; const dd=Math.hypot(dx,dy)||1; dx/=dd; dy/=dd; const p=i/N, hw=(1.1+10*p*p)*u*(1+0.06*Math.sin(p*7-t*1.1)); Lp.push([C[i][0]-dy*hw,C[i][1]+dx*hw]); Rp.push([C[i][0]+dy*hw,C[i][1]-dx*hw]); }
     const rib=(k,a)=>{ g.fillStyle=ttlA(P.smoke,a); g.beginPath(); for(let i=0;i<=N;i++){ const q=[C[i][0]+(Lp[i][0]-C[i][0])*k,C[i][1]+(Lp[i][1]-C[i][1])*k]; i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]); } for(let i=N;i>=0;i--) g.lineTo(C[i][0]+(Rp[i][0]-C[i][0])*k,C[i][1]+(Rp[i][1]-C[i][1])*k); g.closePath(); g.fill(); };
     g.globalAlpha=1; rib(1.9,P.sb?0.12:0.16); rib(1,P.sb?0.36:0.42); rib(0.45,P.sb?0.3:0.3);
     g.strokeStyle=ttlA(P.ink,P.sb?0.22:0.3); g.lineWidth=0.7*u; g.beginPath(); for(let i=2;i<=N*0.8;i++) i>2?g.lineTo(Lp[i][0],Lp[i][1]):g.moveTo(Lp[i][0],Lp[i][1]); g.stroke();
     for(let i=0;i<9;i++){ const p=0.5+((t*0.035+i/9)%1)*0.5, e=Math.pow(p,1.4), x=pk.x+(cl.x-pk.x)*e+Math.sin(p*6.5-t*0.9)*7*u*p, y=pk.y+1*u+(cl.y+20*u-pk.y)*p, sz=(16+44*(p-0.5))*u;
       g.globalAlpha=Math.min(1,(p-0.5)*8)*(1-Math.max(0,(p-0.85)/0.15))*0.5; g.drawImage(S.puff,x-sz/2,y-sz/2,sz,sz); }
     if(S.mcloud){ const dx=Math.sin(t*0.13)*6*u, dy=Math.cos(t*0.11)*3*u; g.globalAlpha=0.9; g.drawImage(S.mcloud.c,cl.x-S.mcloud.w/2+dx,cl.y-S.mcloud.h/2+dy,S.mcloud.w,S.mcloud.h);
-      const br=0.5+0.5*Math.sin(t*0.5); g.globalAlpha=(P.sb?0.16:0.24)+br*(P.sb?0.24:0.3); const sc=1+br*0.03; g.drawImage(S.horns.c,cl.x-S.horns.w*sc/2+dx*1.2,cl.y-S.horns.h*sc/2+dy,S.horns.w*sc,S.horns.h*sc); } }
+      const br=0.5+0.5*Math.sin(t*0.5); g.globalAlpha=(P.sb?0.1:0.16)+br*(P.sb?0.2:0.24); const sc=1+br*0.03; g.drawImage(S.horns.c,cl.x-S.horns.w*sc/2+dx*1.2,cl.y-S.horns.h*sc/2+dy,S.horns.w*sc,S.horns.h*sc); } }
   g.globalCompositeOperation='lighter';
   // the crack of light at the gate breathes
   if(TTL.gate){ const q=TTL.gate, s=(pr.a1?26:18)*u; g.globalAlpha=(pr.a1?0.5:0.38)+0.22*Math.sin(t*1.3); g.drawImage(TTL.spr.glowGate,q.x-s/2,q.y-s/2,s,s); }
@@ -739,6 +774,11 @@ function ttlFrame(){
   // fireflies
   if(!reduceMotion) for(const f of TTL.flies){ const k=Math.max(0,Math.sin(t*f.sp*2.2+f.ph)), x=f.x+(ttlN(t*0.12+f.s,5)-0.5)*60*u, y=f.y+(ttlN(t*0.1+f.s,6)-0.5)*30*u, s=7*u; if(k<0.05) continue; g.globalAlpha=k*0.8; g.drawImage(TTL.spr.glowFly,x-s/2,y-s/2,s,s); }
   g.globalCompositeOperation='source-over'; g.globalAlpha=1;
+  if(TTL.pond){ const q=TTL.pond; g.save(); ttlPath(g,q.poly); g.clip();
+    if(!(pr.moon<=0&&!pr.a5)&&Math.abs(L.moon.x-q.x)<q.rx*0.8){ const mx=L.moon.x+(q.x-L.moon.x)*0.15; g.fillStyle=pr.a5&&pr.end==='embermoon'?'rgba(255,190,110,.7)':'rgba(255,248,226,.7)';
+      for(let i=0;i<6;i++){ const yy=q.y-q.ry*0.55+i*q.ry*0.22, wv=Math.sin(t*1.6+i*1.7)*2.2*u, hw=(7-i*0.7)*u; g.globalAlpha=0.75-i*0.09; g.fillRect(mx-hw+wv,yy,hw*2,0.9*u); } }
+    g.globalCompositeOperation='lighter'; for(const l of TTL.lan){ if(Math.abs(l.x-q.x)>q.rx*0.9||l.y>q.y) continue; const f=ttlN(t*l.sp+l.ph*3,l.ph*100|0); g.globalAlpha=0.34*f+0.12; g.drawImage(TTL.spr.glowLan,l.x-l.r*1.1+Math.sin(t*2+l.ph)*1.2*u,q.y-q.ry*0.9,l.r*2.2,q.ry*1.8); }
+    g.restore(); g.globalAlpha=1; g.globalCompositeOperation='source-over'; }
   // the moth
   ttlMothUpdate(dt); const m=TTL.moth;
   if(m){ const ws=Math.max(9,13.5*u); g.globalCompositeOperation='lighter'; g.globalAlpha=P.sb?0.28:0.34; g.drawImage(TTL.spr.glowMoth,m.x-ws*1.2,m.y-ws*1.2,ws*2.4,ws*2.4); g.globalCompositeOperation='source-over'; g.globalAlpha=1; ttlMothShape(g,m.x,m.y,ws,m.k,m.mode==='rest'?0:Math.sin(t*3)*0.25,P,false); }
