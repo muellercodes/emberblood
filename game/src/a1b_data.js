@@ -30,7 +30,7 @@ const EDEF={
 const SPK={
   narr:{name:'',col:'#d9c3a5'}, ash:{name:'Ash',col:'#ff9a52'}, yara:{name:'Elder Yara',col:'#a7d98f'}, maren:{name:'Maren, your mom',col:'#f0a46a'},
   wren:{name:'Sister Wren',col:'#9ec8ff'}, moss:{name:'Granny Moss',col:'#b5d68a'}, hollis:{name:'Farmer Hollis',col:'#e6c48a'}, pip:{name:'Pip',col:'#ffb070'}, goat:{name:'Duchess',col:'#e8e2d0'},
-  iska:{name:'Warden Iska',col:'#ffd9a0'}, bram:{name:'Warden Bram',col:'#ffd9a0'}, oriel:{name:'Warden Oriel',col:'#ffd9a0'}, sedge:{name:'Warden Sedge',col:'#ffd9a0'}, tove:{name:'Warden Tove',col:'#ffd9a0'},
+  stone:{name:'A voice in the stone',col:'#ffd9a0'}, iska:{name:'Warden Iska',col:'#ffd9a0'}, bram:{name:'Warden Bram',col:'#ffd9a0'}, oriel:{name:'Warden Oriel',col:'#ffd9a0'}, sedge:{name:'Warden Sedge',col:'#ffd9a0'}, tove:{name:'Warden Tove',col:'#ffd9a0'},
   vor:{name:'Vorlaxis',col:'#ff5a35'}, voice:{name:'A Voice in the Fire',col:'#ff5a35'},
   griz:{name:'Grizzlefang',col:'#e3c96a'}, morrow:{name:'High Priest Morrow',col:'#c792ea'}, brood:{name:'The Brood Mother',col:'#ef7a9a'},
   gloam:{name:'Gloamjaw',col:'#9fbf6a'}, cinder:{name:'Sir Cindervane',col:'#ffb547'},

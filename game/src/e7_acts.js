@@ -159,9 +159,9 @@ function startAct(n,o){
 // the Act I ending: after the epilogue, the victory screen says Act I is complete and the story goes on
 { const base=victory; victory=function(){ try{ ACT_RT.win=null; const nx=$('#bWinNext'), ex=$('#bWinExplore'); if(nx) nx.hidden=true; if(ex){ ex.textContent='Keep exploring'; ex.className='btn c hot'; } }catch(e){} base(); try{ if(G.mode==='story'&&!G.done&&G.flags.act1_done&&G.stage==='done') actOneScreen(); }catch(e){ console.error(e); } }; }
 function actOneScreen(){
-  const E=ENDINGS[G.choices.ending||'hero'], seen=Object.keys(store.get('eb_endings',{})).length;
-  actScreen({tag:`Act I complete · Ending ${E.n} of 4`,title:E.title,
-    msg:S('The First Flame is quiet. But a warm red stone still glows, and tonight Emberhollow has one more party. The story is not over yet!','Grandpa is quiet now. But the story is not over yet!')+' '+(seen<4?simplify(S(`You've found ${seen} of 4 endings so far.`,`You found ${seen} of 4 endings.`)):simplify(S('You found every ending!','You found every ending!'))),
+  const E=ENDINGS[G.choices.ending||'hero'];
+  actScreen({tag:S('Act I complete','Act I complete'),title:E.title,
+    msg:S('The First Flame is quiet. But a warm red stone still glows, and tonight Emberhollow has one more party. The story is not over yet!','Grandpa is quiet now. But the story is not over yet!'),
     next:continueLanternNight,nextLabel:S('Continue the story','Keep going!'),exploreLabel:S('Keep exploring Embermere','Explore Embermere'),
     explore:()=>{ G.flags.c_wait=0; setBanner(S('Free roam','Free roam'),S('Explore Embermere. Tonight is Lantern Night, and Yara will send word.','Explore! Yara will send word tonight.'),3.4); }});
 }
@@ -607,7 +607,7 @@ defineStages(2,[
     hint:()=>HS.on&&HS.phase==='rocket'?S(`One breath on the big rocket by the well, Ash. Gently. Everyone is waiting.`,`Breathe on the big rocket. Gently!`):G.flags.c_stolen?S(`She went over the rooftops from the forge! Follow her, Ash. Quickly!`,`Chase the thief! Start at the forge.`):S(`Lantern Night is in Emberhollow, Ash. Come home. There's cake. It looks like you.`,`Come home to Emberhollow! There's cake.`),
     soFar:()=>G.flags.c_stolen?S('During the Lantern Night fireworks, a masked thief in a moth-wing cloak stole the Ember Heart from the forge and ran off over the rooftops.','A masked thief stole the Ember Heart! She ran over the roofs.'):S(`It's Lantern Night in Emberhollow: music, lanterns and fireworks for the end of the thousand years.`,`It's Lantern Night! Music, lanterns and fireworks.`),
     mom:[S(`Lantern Night, Ash! Did you see the cake? I made the horns out of toffee.`,`Did you see the cake? The horns are toffee!`)],
-    yara:[S(`A thousand Lantern Days, Ash, and this is the best party of them all.`,`Best party in a thousand years!`)],
+    yara:[S(`Best party this valley has ever had, Ash. I wrote that in the book.`,`Best party ever! I wrote it in my book.`)],
     talk(n){
       if(!HS.on) return false;
       if(HS.phase==='chase'||HS.phase==='leap'){ if(n.id==='maren'||n.id==='yara'||n.id==='wren'||G.npcs.includes(n)){ runDialogue([[n.id,pick([S(`Go, Ash! She's getting away!`,`Go! She's getting away!`),S(`After her! We'll catch up!`,`After her!`)])]],()=>{ scene='play'; }); return true; } return false; }

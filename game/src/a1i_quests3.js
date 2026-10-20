@@ -2,15 +2,14 @@
 SPK.ember={name:'Ember',col:'#ffcf8a'};
 Object.assign(ITEM_NAMES,{marlo_hat:'Marlo’s lucky hat',tide_pearl:'Glow pearl',sky_feather:'Storm feather'});
 Object.assign(QDEFS,{
-  trials:{title:'Ember’s Trials',giver:'yara',min:'lore',
+  trials:{title:'Ember’s Doors',giver:'yara',min:'lore',
     offer:[['yara',S(`Ash. Sit with me a moment. There's something I should have told you years ago.`,`Ash, sit with me. I have something to tell you.`)],
-      ['yara',`When I was a girl, my grandmother told me about three doors in the valley. Ember built them a thousand years ago, so her children could wake their dragon gifts.`],
-      ['yara',`The Trial of the Leap, deep in Whisperwood. The Trial of the Tide, on the little island in Lake Mirrow. And the Trial of the Sky, up on a crag in the Drakeling Crags.`],
-      ['yara',`Nobody has opened them since Ember. Nobody had the fire. You do.`],
+      ['yara',S(`When I was a girl, my grandmother told me Ember built a door for her children, deep in Whisperwood. A stone arch the roots are eating.`,`My grandmother said Ember built a door in Whisperwood.`)],
+      ['yara',S(`Nobody has ever got it open. I always wondered what it was waiting for.`,`Nobody ever opened it. I wonder what it waits for.`)],
       ['ash',`What's inside?`],
-      ['yara',`Gifts, I hope. And probably something with teeth. Start with the Leap. It is the closest, and the least wet.`]],
+      ['yara',S(`I don't know. Something Ember wanted her children to have. And probably something with teeth.`,`Something for Ember's children. And maybe teeth.`)]],
     steps:[
-      {t:'flag',flag:'trial_leap_boss',text:'Pass the Trial of the Leap, deep in Whisperwood east of the war camp road',at:'cave:leap'},
+      {t:'flag',flag:'trial_leap_boss',text:S('Open the old arch in Whisperwood, east of the war camp road','Open the old arch in Whisperwood'),at:'cave:leap'},
       {t:'flag',flag:'trial_tide_boss',text:'Pass the Trial of the Tide on the island in Lake Mirrow. Jump the broken pier past the Brindlecross dock. (It wakes once the Hollow Ward burns again.)',at:'cave:tide'},
       {t:'flag',flag:'trial_sky_boss',text:'Pass the Trial of the Sky on the crag in the Drakeling Crags. Stride across the moat. (It wakes once Sister Wren sends you to the Ash Ward.)',at:'cave:sky'},
       {t:'talk',npc:'yara',text:'Tell Elder Yara you passed all three of Ember’s Trials',
