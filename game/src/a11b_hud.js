@@ -463,6 +463,7 @@ function drawTouch(){
     ctx.restore();
   }
   ctx.restore();
+  twHintDraw();
 }
 // ---------- (v12) the weapon chip at the top is how touch players switch weapons now (WEAPON is a button again only with
 // Settings > Show every button). On touch it gets a small swap badge, and the first time Ash has two weapons (on this
@@ -489,19 +490,21 @@ function twChip(){
   if(curWeapon()!==TW.w&&TW.t>0.3){ G.flags.tw_chip=1; return; }   // tapped it (or switched another way): done
   TW.w=curWeapon();
   if(TW.t>7){ G.flags.tw_chip=1; return; }
-  const a=clamp(Math.min(TW.t/0.3,(7-TW.t)/0.5),0,1), k=0.5+0.5*Math.sin(now*6);
-  g.save(); g.globalAlpha=a;
+  TW.a=clamp(Math.min(TW.t/0.3,(7-TW.t)/0.5),0,1); TW.hf=G.time;
+}
+// the hint itself, drawn last (from drawTouch) so no other tip or chip covers it
+function twHintDraw(){
+  const R=TW.r, g=ctx; if(!R||TW.hf!==G.time||!(TW.a>0)) return;
+  const small=R.w<48, k=0.5+0.5*Math.sin(G.time*6);
+  g.save(); g.globalAlpha=TW.a;
   g.strokeStyle=`rgba(255,${200+Math.round(40*k)},110,${0.6+0.35*k})`; g.lineWidth=2.5; rr(R.x-3-k*2,R.y-3-k*2,R.w+6+k*4,R.h+6+k*4,12); g.stroke();
   const txt=S('Tap to switch weapons','Tap to switch'); g.font=`700 12px ${UIF}`; const tw=g.measureText(txt).width+22, th=26;
-  // under the chip when it sits beside the vitals, to its left when it is under the pause button
-  let px, py; if(small){ px=R.x-10-tw; py=R.y+R.h/2-th/2; } else { px=R.x; py=R.y+R.h+10; }
-  px=clamp(px,SAFE.l+6,W-SAFE.r-6-tw);
-  if(LOOK.sb) sbPill(px,py,tw,th); else{ g.fillStyle='rgba(12,9,6,.86)'; rr(px,py,tw,th,13); g.fill(); g.strokeStyle='rgba(255,210,150,.6)'; g.lineWidth=1; g.stroke(); }
-  // a little pointer toward the chip
-  g.fillStyle=LOOK.sb?'#fff3d6':'rgba(255,210,150,.85)'; g.beginPath();
-  if(small){ g.moveTo(px+tw+7,py+th/2); g.lineTo(px+tw+1,py+th/2-5); g.lineTo(px+tw+1,py+th/2+5); }
-  else { const cx=Math.min(R.x+R.w/2,px+tw-10); g.moveTo(cx,py-7); g.lineTo(cx-5,py-1); g.lineTo(cx+5,py-1); }
-  g.closePath(); g.fill();
+  // under the chip; under the pause button (narrow screens) a little lower, clear of the companion's picture beside it
+  const py=R.y+R.h+(small?44:10), px=clamp(small?R.x+R.w-tw:R.x,SAFE.l+6,W-SAFE.r-6-tw), cx=clamp(R.x+R.w/2,px+12,px+tw-12);
+  if(small){ g.strokeStyle='rgba(255,210,150,.7)'; g.lineWidth=1.5; g.setLineDash([3,3]); g.beginPath(); g.moveTo(cx,R.y+R.h+5); g.lineTo(cx,py-6); g.stroke(); g.setLineDash([]); }
+  if(LOOK.sb) sbPill(px,py,tw,th); else{ g.fillStyle='rgba(12,9,6,.88)'; rr(px,py,tw,th,13); g.fill(); g.strokeStyle='rgba(255,210,150,.6)'; g.lineWidth=1; g.stroke(); }
+  // a little pointer up toward the chip
+  g.fillStyle=LOOK.sb?'#fff3d6':'rgba(255,210,150,.85)'; g.beginPath(); g.moveTo(cx,py-7); g.lineTo(cx-5,py-1); g.lineTo(cx+5,py-1); g.closePath(); g.fill();
   g.fillStyle=LOOK.sb?SBC.outline:'#ffe6c0'; g.textAlign='left'; g.textBaseline='middle'; g.fillText(txt,px+11,py+th/2+0.5);
   g.restore();
 }
