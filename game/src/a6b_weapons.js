@@ -111,7 +111,7 @@ function wStrike(e,c,k,id,o){
   // v12: never through a wall: the line runs from o.lx,o.ly (or the shot or thrown thing at o.fx,o.fy, or Ash) to the foe
   return damageEnemy(e,amt,{src:o.src||'slash',mult:c.m,crit:crit||c.m>1,kb:o.kb||0,ka:o.ka!=null?o.ka:angTo(player.x,player.y,e.x,e.y),fx:o.fx,fy:o.fy,los:true,lx:o.lx,ly:o.ly,lo:o.lo});
 }
-const wFoeOk=e=>!(e.dead||e.invuln||e.spawnIn>0||e.passive);
+const wFoeOk=e=>!(e.dead||e.invuln||e.spawnIn>0||e.passive)&&foeInView(e);   // (v12: not a foe in a room Ash cannot see)
 function segD(px,py,ax,ay,bx,by){ const dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy||1, t=clamp(((px-ax)*dx+(py-ay)*dy)/l2,0,1); return Math.hypot(px-(ax+dx*t),py-(ay+dy*t)); }
 // solid things for arrows and the boomerang (low fences, hedges and rocks are flown over)
 function wColAt(x,y,r){ let hit=false; forCols(x,y,r,c=>{ if(hit||!colActive(c)||c.noProj||c.low) return; if(c.t==='c'){ if(dist2(x,y,c.x,c.y)<(c.r+r)**2) hit=true; } else if(x>c.x0-r&&x<c.x1+r&&y>c.y0-r&&y<c.y1+r) hit=true; }); return hit; }

@@ -153,7 +153,7 @@ function swingHits(){
   const st=p.stats, fin=p.swingFin, spin=p.swingSpin, range=st.range*(spin?1.2:fin?1.25:1), half=spin?Math.PI:fin?1.3:1.05;
   let any=false;
   for(const e of G.enemies){
-    if(e.dead||p.swingHit.has(e.id)||e.invuln||e.spawnIn>0||e.passive) continue;
+    if(e.dead||p.swingHit.has(e.id)||e.invuln||e.spawnIn>0||e.passive||!foeInView(e)) continue;
     let best=null;
     for(const c of hitCircles(e)) if(inArcC(p.x,p.y,p.swingDir,range,half,c)&&(!best||c.m>best.m)) best=c;
     if(!best) continue;
@@ -200,7 +200,7 @@ function doBreath(dt){
   if(p.breathTick<=0){
     p.breathTick=0.1;
     for(const e of G.enemies){
-      if(e.dead||e.invuln||e.spawnIn>0||e.passive) continue;
+      if(e.dead||e.invuln||e.spawnIn>0||e.passive||!foeInView(e)) continue;
       for(const c of hitCircles(e)){
         if(inArcC(mx,my,ang,175,0.45,c)){
           damageEnemy(e,4.6*p.stats.fire*p.stats.dmgMul*rand(0.9,1.1),{src:'fire',kb:25,ka:angTo(p.x,p.y,e.x,e.y),mult:c.m>1?1.2:1});
@@ -392,10 +392,12 @@ function bossReady(e){
   if(e.inArea&&A&&A.rooms&&e.room&&A.rooms[e.room]){ const R=A.rooms[e.room]; return !!R.locked||caveRoomAt(player.x,player.y)===R; }
   return true;
 }
+// is foe e in a room Ash can see right now? (ROOMS' roomSeen: a foe in a dark room is neither seen nor hit)
+function foeInView(e){ return typeof roomSeen!=='function'||roomSeen(e); }
 // can a hit from (x,y) (Ash's body when x is null) land on foe e at its hit circle c (its body when c is null)?
 const LOS_SKY={lt:99};   // a flying foe outdoors is in the air: cliffs below it do not hide it
 function ashHits(e,c,x,y,o){
-  if(!bossReady(e)) return false;
+  if(!bossReady(e)||!foeInView(e)) return false;
   if(x==null){ x=player.x; y=player.y; if(o===undefined) o=ashLosO(); }
   if(!o&&e.flying&&!AREA) o=LOS_SKY;
   return losClear(x,y,c?c.x:e.x,c?c.y:e.y,c?c.r:(e.r||12),o||null);
@@ -404,7 +406,7 @@ function ashHits(e,c,x,y,o){
 function ashSees(e){
   if(e._asT>G.time&&e._asT<G.time+1) return !!e._as;
   e._asT=G.time+0.15+Math.random()*0.1;
-  const p=player; return e._as=!!p&&bossReady(e)&&losClear(p.x,p.y,e.x,e.y,e.r||12,ashLosO()||(e.flying&&!AREA?LOS_SKY:{lt:elevOf(e)}));
+  const p=player; return e._as=!!p&&bossReady(e)&&foeInView(e)&&losClear(p.x,p.y,e.x,e.y,e.r||12,ashLosO()||(e.flying&&!AREA?LOS_SKY:{lt:elevOf(e)}));
 }
 // can foe e see Ash (it notices him only then); cached a few times a second per foe. A foe in a room ROOMS keeps asleep
 // sees nothing. e.seenT is the last time it saw him.
@@ -443,7 +445,7 @@ function damageEnemy(e,amt,o){
   if(e.dead||e.invuln||e.spawnIn>0||e.passive) return 0;
   // v12: a boss is not hurt before its fight has begun (its room open and its intro played); o.los (set by Ash's own hits,
   // see wStrike) also needs a clear line from o.lx,o.ly (or o.fx,o.fy, or Ash) to the foe
-  if(!bossReady(e)||(o.los&&!losClear(o.lx!=null?o.lx:o.fx!=null?o.fx:player.x,o.ly!=null?o.ly:o.fy!=null?o.fy:player.y,e.x,e.y,e.r||12,o.lo||(o.lx==null&&o.fx==null?ashLosO():null)||(e.flying&&!AREA?LOS_SKY:null)))){ e.lastBlocked=true; return 0; }
+  if(!bossReady(e)||(o.los&&(!foeInView(e)||!losClear(o.lx!=null?o.lx:o.fx!=null?o.fx:player.x,o.ly!=null?o.ly:o.fy!=null?o.fy:player.y,e.x,e.y,e.r||12,o.lo||(o.lx==null&&o.fx==null?ashLosO():null)||(e.flying&&!AREA?LOS_SKY:null))))){ e.lastBlocked=true; return 0; }
   let a=amt*(o.mult||1), blocked=false;
   if(e.shield&&e.blocking&&o.src!=='burn'&&o.src!=='roar'&&o.src!=='ember'){
     const fx=o.fx!=null?o.fx:player.x, fy=o.fy!=null?o.fy:player.y;
