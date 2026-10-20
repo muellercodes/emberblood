@@ -53080,7 +53080,7 @@ function x1pHat(item){ const h=X1P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 const X1P_STAGES=['c_coast','c_gear','c_salt','c_claws','c_brass','c_light','c_spire','c_snow'];
 function x1pStagesFallback(){
   const miss=X1P_STAGES.filter(s=>stageAt(s)<0); if(!miss.length) return;
-  const CH={c_gear:'The City of Clocks',c_salt:'The Girl from Saltmarsh',c_claws:'The Girl from Saltmarsh',c_brass:'The Brassworks',c_light:'The Spinning Lighthouse',c_spire:'The Shadow Spire',c_snow:'Snow in Summer'};
+  const CH={c_gear:'The City of Clocks',c_salt:'The Turning Library',c_claws:'The Turning Library',c_brass:'The Brassworks',c_light:'The Spinning Lighthouse',c_spire:'The Shadow Spire',c_snow:'The Breakwater'};
   if(typeof defineStages==='function') defineStages(2,miss.map(id=>({id,chapter:CH[id]||'The Clockwork Coast'})));
   else for(const s of miss) STAGES.push(s);
 }
@@ -53165,7 +53165,7 @@ const X1P_CAST=[
       S(`Granny Oona's been cold for seventy years. Someone ought to do something.`,`Granny Oona is always cold. Someone should help.`)]},
   {id:'c_oona',name:'Granny Oona Saltwhistle',town:'c_saltmarsh',home:true,house:'Oona’s Stilt House',job:'knitter',col:'#a0b8d0',ix:0.6,iy:0.55,
     look:{skin:'#d8aa84',hair:'#efeae0',hairdo:'braids',hood:'#6a8aa0',shawl:'#a06a4a',blanket:'#7a8aa0',outfit:'dress',shirt:'#4a5a6a',low:'#3a4a5a',build:'old',frost:true,mittens:'#c86a4a',hold:'yarn',yarnc:'#e0d0a0',horns:'tiny'},
-    lines:[S(`I've been cold since I was a girl. Our family always is. We're Emberbloods, you know. Just without the fire.`,`I am always cold. We are Emberbloods with no fire.`),
+    lines:[S(`I've been cold since I was a girl. Our family always is. Pearl's line, duck.`,`I am always cold. All my family is.`),
       S(`My Vesper brings me fish every morning. Leaves it on the step and runs. She thinks I don't know it's her. I know it's her.`,`My Vesper leaves fish on my step. I know it's her.`),
       S(`Mother Pearl climbed every cliff on this coast. I can't climb my own stairs. Funny old world.`,`Pearl climbed every cliff. I can't climb my stairs!`)]},
   {id:'c_tarbuckle',name:'Old Tarbuckle',town:'c_saltmarsh',home:true,house:'Old Tarbuckle’s Hut',job:'home',col:'#c8b090',
@@ -53368,7 +53368,7 @@ Object.assign(TALK,{
     rumor:{t:S(`Pearl's old place, the Gullcrag Caves, is full of her things. Her rope. Her bell. Her pages. Bring me word of her one day, duck.`,`Pearl's things are in the Gullcrag Caves. Her pages too.`),hint:null,need:()=>x1pR('c_salt')},
     loves:['honey'],hates:['frostberry'],
     secret:{t:S(`I knitted you mittens, duck. With holes for your claws. I'm not daft.`,`Mittens! With claw holes.`),reward:{armor:0.05}},
-    best:{t:S(`You're one of us now, duck. Emberblood to Emberblood. Here. My mother's last biscuit. Don't eat it. It's for luck.`,`You're one of us, duck. A lucky biscuit.`),reward:{maxhp:20}}},
+    best:{t:S(`You're one of us now, duck. Here. My mother's last biscuit. Don't eat it. It's for luck.`,`You're one of us, duck. A lucky biscuit.`),reward:{maxhp:20}}},
   c_tarbuckle:{bio:S('Retired sea captain and Saltmarsh’s teller of ghost stories. Exaggerates everything.','An old sea captain. He tells ghost stories.'),
     rumorAsk:[`Where did Saltbeard's ship go down?`,`Where did his ship sink?`],
     rumor:{t:S(`The Saucy Gull went down on the Rockpools forty years ago. At low tide you can stand on her deck. I wouldn't. Not at night.`,`His ship sank on the Rockpools. Don't go at night.`),hint:'c_lm_deck'},
@@ -53737,7 +53737,7 @@ Object.assign(QDEFS,{
         x1pL('c_jo',`Here. My skiff whistle. Blow it at any landing and one of my cousins will row you anywhere on the coast. I've got a lot of cousins.`,`Here's my skiff whistle. My cousins will row you anywhere.`),
         x1pL('c_mo',`(from the Harbor Office) THE DRAGON WINS THE REGATTA! BARNACLES! Somebody write that down!`,`(far away) THE DRAGON WINS! Write it down!`),x1pL('c_penny',`Already did.`,`Already did.`)],reward:{coins:50,xp:500,x1p:()=>{ G.flags.c_skiffs=true; setBanner(S('The Skiff Whistle','The Skiff Whistle'),S('At a skiff landing, call a skiff to row you to any other landing on the coast.','Call a skiff at a landing. It rows you anywhere.'),3.4); }}}]},
   c_chalk:{title:S('The Chalk Dragon','The Chalk Dragon'),giver:'c_barley',min:'c_coast',ab:'dbljump',
-    offer:[x1pL('c_barley',`See the hill? Look close. That grey shape. That's the Chalk Dragon. Mother Pearl cut it into the hill a thousand years back. Scraped the grass off, down to the white chalk.`,`See the grey shape on the hill? The Chalk Dragon. Pearl cut it long ago.`),
+    offer:[x1pL('c_barley',`See the hill? Look close. That grey shape. That's the Chalk Dragon. Mother Pearl cut it into the hill, longer ago than anybody can count. Scraped the grass off, down to the white chalk.`,`See the grey shape on the hill? The Chalk Dragon. Pearl cut it long ago.`),
       x1pL('c_barley',`She did it for her mother. So her mother, flying high, could look down and see a dragon waving up at her. Gerald thinks that's the nicest thing he ever heard. Gerald fainted.`,`She made it for her mom, so she could see it from the sky. Gerald fainted.`),
       x1pL('c_barley',`It's gone grey now. Grass and moth dust. Walk the old line, would you? Your feet are warm. Chalk likes warm feet.`,`It's grey now. Walk the old line? Chalk likes warm feet.`)],
     steps:[
@@ -53780,7 +53780,7 @@ Object.defineProperty(STORY,'c_oona_fire',{configurable:true,get(){ return [
   x1pN(`The old stove catches with a soft whump. Orange light fills the little house. Granny Oona holds out her hands to it and closes her eyes.`,`The stove lights. Granny Oona holds out her hands.`),
   x1pL('c_oona',`Oh. Oh, duck. Oh, that's... I'd forgotten. I'd forgotten what it feels like.`,`Oh, duck. I forgot what warm feels like.`),
   x1pN(`She laughs. Then she cries a bit. Then she laughs again, wipes her eyes with her shawl, and pats the stool next to her.`,`She laughs. She cries a bit. She pats the stool by her.`),
-  x1pL('c_oona',`Sit. I'll tell you a story. We're Emberbloods, you know. The Saltwhistles. From Ember's second girl, Pearl, who came south with no fire and built Gearhaven out of stubbornness.`,`We are Emberbloods. From Ember's second girl, Pearl. She had no fire. She built Gearhaven.`),
+  x1pL('c_oona',`Sit. I'll tell you a story. Pearl's horns, duck. Same as yours. She came south with no fire and built Gearhaven out of stubbornness, and we're what's left of her, the Saltwhistles.`,`Pearl's horns. Same as yours. She had no fire. She built Gearhaven.`),
   x1pL('c_oona',`Pearl's fire never came. Not to her, not to her children, not to anyone since. We got her claws, now and then. Her climbing. Her shadows. Never the fire.`,`None of us ever had fire. Some got her claws and her shadows.`),
   x1pL('c_oona',`My granddaughter has the claws. Climbs like a cat, my Vesper. Out every night, back every morning, with fish for my step and silver dust on her boots. She thinks I don't know.`,`My granddaughter Vesper has the claws. Out every night. She thinks I don't know.`),
   x1pL('ash',`Know what?`,`Know what?`),
@@ -54476,12 +54476,13 @@ const X1P_MAIL=[
     x1pL('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     x1pDo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>x1pR('c_salt'),lines:[
-    x1pL('wren',`Dear Ash. My books say Ember's daughter Pearl sailed south, a thousand years ago. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),
+    {who:'wren',text:S(`Dear Ash. Remember the torn page? Ember's other child sailed south, with no fire. And now you have gone south too. Well, walked. Same thing.`,`Dear Ash. The torn page said Ember's other child went south. Now you have too!`),skipIf:()=>!x1pQ('a1_moth')},
+    {who:'wren',text:S(`Dear Ash. My oldest books say a girl with horns once went south over the pass, a very long time ago, with a rope and a lantern. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Long ago a girl with horns went south. Now you have too!`),skipIf:()=>x1pQ('a1_moth')},
     x1pL('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have argued by letter for thirty years. She is wrong about almost everything, and I would be lost without her.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
-    x1pL('wren',`Ask her about Pearl's logbook. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about Pearl's logbook. Your friend, Wren.`)]},
+    x1pL('wren',`Ask her about the old logbook on her shelves, the one with pages missing. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about the old logbook. Your friend, Wren.`)]},
   {id:'c_pb_6',from:'wren',when:()=>!!G.flags.c_diary_sent,lines:[
     x1pL('wren',`Ash. Ottoline copied out the moon letters from that girl's diary and sent them to me. They are very old. Older than the Wardens.`,`The moon letters in the diary are very, very old.`),
-    x1pL('wren',`They spell the same two words over and over. "Night." And "Mother." I don't like this, Ash. I don't like it at all.`,`They spell "Night" and "Mother." I don't like it.`),
+    x1pL('wren',`They spell the same two words over and over. "Stay." And "Keep." I don't like this, Ash. I don't like it at all.`,`They spell "Stay" and "Keep." I don't like it.`),
     x1pL('wren',`Keep your fire close. Wren.`,`Keep your fire close. Wren.`)]},
   {id:'c_pb_7',from:'quill',when:()=>(G.flags.moon==null?100:G.flags.moon)<100,lines:[
     x1pL('quill',`The moon is five percent smaller. I have measured it every night this week, hoping I was wrong.`,`The moon is smaller. I measured it!`),
@@ -57058,15 +57059,15 @@ c1Def('c_note1',[
 ]);
 STORY.c_whirl_bird=[xl('c_whirligig',`My bird clock! You got it back from that... that MOTH. Hmph. Thank you. Here. Wipe your feet.`,`My bird clock! Hmph. Thank you. Wipe your feet.`),xdo(()=>{ takeItems({c_birdclock:1}); addCoins(30); G.flags.c_birdclock_back=1; })];
 STORY.c_whirl_wait=[xl('c_whirligig',`She ALWAYS comes after dark. Nine times! I have started leaving out snacks so she'll at least be polite.`,`She always comes after dark. Nine times!`)];
-// Chapter 3 (card: Chapter 5), The Girl from Saltmarsh
+// Chapter 3 (card: Chapter 5), The Turning Library (v12: was "The Girl from Saltmarsh", which named who she is)
 c1Def('c_ottoline',[
   xl('c_ottoline',`Welcome to the Turning Library. Please don't run. The shelves run for you. ...WHAT DO YOU NEED? Sorry. Sorry. I shouted. What do you need?`,`Welcome to the Turning Library. WHAT DO YOU NEED? Sorry. I shouted.`),
   xl('ash',`How does somebody climb straight up the Great Clock? With their claws?`,`How does somebody climb up the Great Clock? With claws?`),
   xl('c_ottoline',`Oh! Like Mother Pearl! Our founder. Come, come, the shelf's coming round.`,`Oh! Like Mother Pearl! Come, the shelf is coming round.`),
   xl('narr',`A shelf slides up beside you, carrying a heavy blue book. On the cover is a woman with horns, a coil of rope, and a lantern.`,`A shelf slides up with a blue book. On it: a woman with horns, a rope and a lantern.`),
   xl('c_ottoline',`A thousand years ago, a young woman sailed into this bay with nothing but a rope and a stubborn streak. She had horns like yours. Claws that could climb anything. And no fire. Not a spark.`,`Long ago a young woman sailed here with a rope. She had horns like yours. Claws that climb anything. And no fire at all.`),
-  xl('c_ottoline',`So she built a clock instead. And a lighthouse. And a city. They say her mother was a dragon girl from the mountains in the north.`,`So she built a clock. And a lighthouse. And a city. Her mother was a dragon girl from the north.`),
-  xl('ash',`Ember's daughter. With no fire at all. ...I never even thought about the ones who didn't get any.`,`Ember's daughter, with no fire. I never thought about that.`),
+  xl('c_ottoline',`So she built a clock instead. And a lighthouse. And a city. Where she came from, nobody ever wrote down.`,`So she built a clock. And a lighthouse. And a city.`),
+  xl('ash',`Horns and a tail? That's a lot like me.`,`Horns and a tail? Like me!`),
   xl('c_ottoline',`They say Pearl learned to climb in the sea caves at Gullcrag, past Saltmarsh. Nobody goes there now. The tide hasn't gone out for three days. And the gulls. So many gulls.`,`Pearl learned to climb in the sea caves past Saltmarsh. But the tide is stuck high. And so many gulls!`),
   xl('c_ottoline',`And the Moth Mask? The barons' gold always seems to end up in Saltmarsh. If I wanted to find her, I'd start there. Quietly. QUIETLY. Sorry.`,`And the Moth Mask? Try Saltmarsh. Quietly. QUIETLY. Sorry.`),
   xdo(()=>{ G.flags.c_ottoline=1; })
@@ -57245,7 +57246,7 @@ c1Def('c_end_fought',[
   xl('ash',`This isn't the Heart. This is a BIT of the Heart. Where's the rest?`,`This is just a BIT of the Heart. Where is the rest?`),
   xl('c_vesper',`Gone. Ask the moon.`,`Gone. Ask the moon.`),
   xl('narr',`She will remember this.`,`She will remember this.`),
-  c1If('narr',`(If Vesper had trusted you more, you could have asked her why. Every kindness on this coast counted.)`,`(More kindness would have let you ask her why.)`,()=>(G.flags.c_trust||0)<4)
+  c1If('narr',`(She does not look back at you.)`,`(She does not look back.)`,()=>(G.flags.c_trust||0)<4)
 ]);
 c1Def('c_end_ally',[
   xl('narr',`You lower your sword. It feels very heavy and very right.`,`You lower your sword. It feels right.`),
@@ -57314,7 +57315,7 @@ c1Def('c_snowfall',[
   xl('narr',`That night the moon has a bite out of it. Just a small one. As if someone tasted it.`,`That night, the moon has a little bite out of it.`)
 ]);
 STORY.c_warp_out=[xl('narr',`A ring of warm light opens on the roof, the way Pearl's warps do. You step into it, and the Spire falls away below you.`,`A ring of warm light opens. You step in.`)];
-// Epilogue (card: Act II · Epilogue), Snow in Summer
+// Epilogue (card: Act II · Epilogue), The Breakwater (v12: was "Snow in Summer", shown a minute before the snow)
 c1Def('c_snow_city',[
   xl('narr',`By morning, Gearhaven is white. Snow on the clock towers. Snow on the conveyor streets, riding round and round. Children having snowball fights in their summer clothes.`,`By morning, Gearhaven is white. Snow everywhere. Kids throw snowballs in summer clothes.`),
   xl('c_fig',`Snow! In June! I've put a tea cosy on my head, dearie, and I'm not taking it off.`,`Snow in June! I put a tea cosy on my head, dearie.`),
@@ -57342,8 +57343,8 @@ c1Def('c_gull_in',[
   xl('c_pearl',`That bell hasn't been rung in a long time. Mind the sand. It gets in the hinges.`,`Someone rang my bell. Mind the sand.`),
   xl('ash',`Who said that?`,`Who said that?`),
   xl('c_pearl',`Pearl. I cut the steps in these caves and put up the signs. The sea did the digging.`,`Pearl. I cut these steps. The sea dug the caves.`),
-  xl('ash',`Pearl? Ember's Pearl? The library lady told me about you.`,`Pearl? Ember's daughter?`),
-  xl('c_pearl',`Then she told you I had no fire. Good. Saves time.`,`Then you know I had no fire. Good.`),
+  xl('ash',`Pearl? Mother Pearl? The library lady told me about you.`,`Pearl? The one who built the city?`),
+  xl('c_pearl',`Did she. Then she told you I climbed. Good. Saves time.`,`Then you know I climb. Good.`),
   xl('c_pearl',`This cave breathes with the tide. In, out. Learn when it breathes in and it'll carry you. Get it wrong and it'll carry you anyway, just somewhere wetter.`,`This cave breathes with the tide. Learn it and it will carry you.`)
 ]);
 c1Def('c_gull_bell',[xl('c_pearl',`That's the Tide Bell. Hit it hard. I hung it there so the sea would listen, and it mostly does.`,`The Tide Bell. Hit it hard. The sea listens.`)]);
@@ -57529,7 +57530,7 @@ defineStages(2,[
       return false;
     },
     update(dt){ c1ChaseWatch(dt); }},
-  {id:'c_salt',chapter:S('The Girl from Saltmarsh','The Girl from Saltmarsh'),card:['Act II · Chapter 5',S('The Girl from Saltmarsh','The Girl from Saltmarsh')],at:{x:C1P.library.x,y:C1P.library.y+120},
+  {id:'c_salt',chapter:S('The Turning Library','The Turning Library'),card:['Act II · Chapter 5',S('The Turning Library','The Turning Library')],at:{x:C1P.library.x,y:C1P.library.y+120},
     objectives(){
       const F=G.flags;
       if(!F.c_ottoline&&!F.c_mina) return [c1sObj('Ask at the Turning Library how anyone climbs a clock','Ask at the library how to climb a clock',c1Who('c_ottoline',C1P.library.x,C1P.library.y))];
@@ -57538,7 +57539,7 @@ defineStages(2,[
       return [{text:S('Fix the Tide Clock (inside the Tide House)','Fix the Tide Clock in the Tide House'),x:C1P.tide.x,y:C1P.tide.y,area:'c_tidehouse'}];
     },
     hint:()=>STORY.c_hints.c_salt,
-    soFar:S('The Moth Mask climbed the Great Clock like a ladder. Archivist Inkwell told the story of Mother Pearl, Ember\'s daughter, who had no fire but could climb anything, and who learned in the Gullcrag Caves past Saltmarsh. But the tide had been stuck high for three days.','The thief climbed the Great Clock. Pearl, Ember\'s daughter, learned to climb in the Gullcrag Caves. But the tide is stuck high.'),
+    soFar:S('The Moth Mask climbed the Great Clock like a ladder. Archivist Inkwell told the story of Mother Pearl, Gearhaven\'s founder, who had horns and a tail and could climb anything, and who learned in the Gullcrag Caves past Saltmarsh. But the tide had been stuck high for three days.','The thief climbed the Great Clock. Pearl, who built the city, learned to climb in the Gullcrag Caves. But the tide is stuck high.'),
     mom:[S(`Saltmarsh? Wear your boots. And eat the chowder.`,`Wear your boots. Eat the chowder.`)],
     marker:id=>{ const F=G.flags; return (id==='c_ottoline'&&!F.c_ottoline&&!F.c_mina)||(id==='c_mina'&&F.c_mina&&!F.c_lowtide&&!AREA); },
     talk(n){
@@ -57552,7 +57553,7 @@ defineStages(2,[
       if(!F.c_mina&&scene==='play'&&c1Near(C1P.salt,520)) c1Play('c_mina',()=>questUpdated());
       if(F.c_tide_fixed&&!c1Seen('c_lowtide')&&scene==='play') c1Play('c_lowtide',()=>{ gainXp(600); addCoins(60); goStage('c_claws',{card:false}); });
     }},
-  {id:'c_claws',chapter:S('The Girl from Saltmarsh','The Girl from Saltmarsh'),at:{x:C1P.gull.x+150,y:C1P.gull.y-200},
+  {id:'c_claws',chapter:S('The Turning Library','The Turning Library'),at:{x:C1P.gull.x+150,y:C1P.gull.y-200},
     objectives:()=>[c1DunObj('c_gullcrag','Explore the Gullcrag Caves at the foot of Gullcrag Head','Explore the Gullcrag Caves',C1P.gull)],
     hint:()=>STORY.c_hints.c_claws,
     soFar:S('Ash fixed Saltmarsh\'s Tide Clock and the sea went out at last. The Gullcrag Caves, where Pearl learned to climb, wait at the foot of the dark cliff.','The tide went out. The Gullcrag Caves are open.'),
@@ -57613,7 +57614,7 @@ defineStages(2,[
     update(dt){ const F=G.flags;
       if(!F.c_causeway&&isNight()&&scene==='play'&&c1Near(C1P.breakwater,280)) c1Play('c_causeway',()=>{ gainXp(300); questUpdated(); });
       c1SpireWatch(dt); }},
-  {id:'c_snow',chapter:S('Snow in Summer','Snow in Summer'),card:['Act II · Epilogue',S('Snow in Summer','Snow in Summer')],at:{x:C1P.breakwater.x,y:C1P.breakwater.y-60},
+  {id:'c_snow',chapter:S('The Breakwater','The Breakwater'),card:['Act II · Epilogue',S('The Breakwater','The Breakwater')],at:{x:C1P.breakwater.x,y:C1P.breakwater.y-60},
     objectives:()=>G.flags.c_done?[]:[{text:S('Go back to Gearhaven','Go back to Gearhaven'),x:C1P.market.x,y:C1P.market.y}],
     idle:()=>G.flags.c_done?S('The north has gone white. Rest when you are ready for the next part of the story.','Rest when you are ready.'):'',
     hint:()=>STORY.c_hints.c_snow,
@@ -57905,15 +57906,15 @@ function c1JourCard(){
 }
 // ---------- cross-act threads Act II owns (added only when the shared helper module has not added them already)
 if(typeof DREAMS!=='undefined'){
-  if(!DREAMS.c_twins) DREAMS.c_twins={stages:['c_brass'],title:S('Two Little Embers','Two Little Embers'),scene:'twins',lines:()=>[
+  if(!DREAMS.c_twins) DREAMS.c_twins={stages:['c_brass'],title:S('The Basket by the Fire','The Basket by the Fire'),scene:'twins',lines:()=>[
     xl('narr',`You are Ember again. Grown up now. Two baby dragons sleep in a basket by the fire, curled up like cinnamon buns.`,`You are Ember, grown up. Two baby dragons sleep by the fire.`),
     xl('narr',`One sneezes in its sleep, and a little flame pops out. The other one sneezes too. Nothing comes out. Just a tiny cold puff. Then she climbs straight out of the basket and up the curtains.`,`One baby sneezes fire. The other has no fire. She climbs up the curtains instead!`),
-    xl('iska',`That one has your fire. And little Pearl... doesn't. Will that be hard for her?`,`One has your fire. Little Pearl does not. Will that be hard?`),
-    xc('ember',`What will you give Pearl?`,`What will you give Pearl?`,[
+    xl('iska',`That one has your fire. And this little one... doesn't. Will that be hard for her?`,`One has your fire. This one does not. Will that be hard?`),
+    xc('ember',`What will you give her?`,`What will you give her?`,[
       xo(`A lantern of her own`,`A lantern of her own`,{fn:()=>{ G.flags.dr_c_twins='lantern'; },then:[xl('ember',`Here, little one. You don't need to breathe fire to carry a light.`,`You don't need fire to carry a light.`)]}),
-      xo(`My warmest blanket`,`My warmest blanket`,{tone:'kind',fn:()=>{ G.flags.dr_c_twins='blanket'; },then:[xl('narr',`You lift Pearl down off the curtains and tuck your warmest blanket round her. She stops shivering and smiles in her sleep.`,`You tuck a warm blanket round Pearl. She smiles.`)]}),
-      xo(`A promise`,`A promise`,{fn:()=>{ G.flags.dr_c_twins='promise'; },then:[xl('ember',`Fire isn't the only warm thing, Pearl. I promise.`,`Fire is not the only warm thing. I promise.`)]})]),
-    xl('narr',`Years later, Pearl sails south to the sea. Her children's children forget they were ever Emberbloods. But they never forget the saying.`,`Pearl sails south. Her family forgets they were Emberbloods. But they remember the saying.`)]};
+      xo(`My warmest blanket`,`My warmest blanket`,{tone:'kind',fn:()=>{ G.flags.dr_c_twins='blanket'; },then:[xl('narr',`You lift her down off the curtains and tuck your warmest blanket round her. She stops shivering and smiles in her sleep.`,`You tuck a warm blanket round her. She smiles.`)]}),
+      xo(`A promise`,`A promise`,{fn:()=>{ G.flags.dr_c_twins='promise'; },then:[xl('ember',`Fire isn't the only warm thing, little one. I promise.`,`Fire is not the only warm thing. I promise.`)]})]),
+    xl('narr',`Later the little climber crawls back into the basket. The two of them sleep curled up together, one warm and one cold, and neither of them seems to mind.`,`Later both babies sleep together. One warm, one cold.`)]};
   if(!DREAMS.c_whisper) DREAMS.c_whisper={stages:['c_light'],title:S('The Moth at the Window','The Moth at the Window'),scene:'whisper',lines:()=>[
     xl('narr',`You dream you're home in Emberhollow. It's night. The forge is warm. Mom is humming.`,`You dream of home. It is night. Mom is humming.`),
     xl('narr',`Something taps at the window. Tap. Tap. A grey moth, with two pale moons painted on her wings.`,`Tap, tap. A grey moth is at the window.`),
@@ -57924,7 +57925,7 @@ if(typeof DREAMS!=='undefined'){
     xl('narr',`In the forge, a log falls and the fire flares up. The moth flutters away. You wake up cold.`,`The fire flares. The moth flies off. You wake up cold.`),
     xl('ash',`Just a bad dream. Just a bad dream.`,`Just a bad dream.`)]};
   if(typeof DREAM_ORDER!=='undefined') for(const id of ['c_twins','c_whisper']) if(!DREAM_ORDER.includes(id)){ const i=DREAM_ORDER.indexOf('home'); DREAM_ORDER.splice(i>=0?Math.max(i+1,DREAM_ORDER.length):DREAM_ORDER.length,0,id); }
-  if(typeof DREAM_TALK!=='undefined'&&!DREAM_TALK.c_twins) DREAM_TALK.c_twins={c_oona:S(`You dreamed about baby Pearl, up the curtains the day she was born? Oh, duck. That's our family story. Nobody outside this house knows that one.`,`You dreamed of Pearl? That's our family story!`)};
+  if(typeof DREAM_TALK!=='undefined'&&!DREAM_TALK.c_twins) DREAM_TALK.c_twins={c_oona:S(`You've got a dreaming look about you, duck. Sit by the stove a minute. Dreams go down easier warm.`,`You look dreamy, duck. Sit by the stove.`)};
 }
 if(typeof EV_TAMSIN!=='undefined'&&!EV_TAMSIN.some(v=>String(v&&v[1]).includes('moth mask'))) EV_TAMSIN.push([()=>!!(G&&G.flags&&G.flags.c_done),S(`\u{1F3B5} A thief in a moth mask ran off with our light, and Ash chased her south through the clockwork and night...`,`\u{1F3B5} Ash chased a thief through the night...`)]);
 // Pebble's Act II letters (bible 8.2) and the Act II epilogue lines (8.8): only when the shared helper module
@@ -57955,12 +57956,13 @@ if(typeof PEBBLE_MAIL!=='undefined'&&Array.isArray(PEBBLE_MAIL)&&!PEBBLE_MAIL.so
     xl('maren',`Love, Mom. P.S. It's very cold here for summer. Odd.`,`Love, Mom. P.S. It is cold here. Odd.`),
     xdo(()=>{ if(G.choices.fennick==='forgive') giveItems({c_lampoil:1}); if(G.flags.tk_home) giveItems({c_lumpybun:1}); })]},
   {id:'c_pb_5',from:'wren',when:()=>reached('c_salt'),lines:[
-    xl('wren',`Dear Ash. I knew it! The torn page said Pearl sailed south, and now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Pearl went south, and so did you!`),
+    c1If('wren',`Dear Ash. Remember the torn page? Ember's other child sailed south, with no fire. And now you have gone south too. Well, walked. Same thing.`,`Dear Ash. The torn page said Ember's other child went south. Now you have too!`,()=>!!(G.quests.a1_moth&&G.quests.a1_moth.done)),
+    c1If('wren',`Dear Ash. My oldest books say a girl with horns once went south over the pass, a very long time ago, with a rope and a lantern. And now YOU have gone south. Well, walked. Same thing.`,`Dear Ash. Long ago a girl with horns went south. Now you have too!`,()=>!(G.quests.a1_moth&&G.quests.a1_moth.done)),
     xl('wren',`My old friend Ottoline keeps the Turning Library in Gearhaven. We have written to each other for thirty years and never once agreed about anything. It's been wonderful.`,`My friend Ottoline runs the library there. We never agree. It is wonderful.`),
-    xl('wren',`Ask her about Pearl's logbook. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about Pearl's logbook. Your friend, Wren.`)]},
+    xl('wren',`Ask her about the old logbook on her shelves, the one with pages missing. And tell her she's wrong about commas. Your friend, Sister Wren.`,`Ask her about the old logbook. Your friend, Wren.`)]},
   {id:'c_pb_6',from:'wren',when:()=>!!G.flags.c_diary_sent,lines:[
     xl('wren',`Ash. Ottoline copied out the moon letters from that girl's diary and sent them to me. They are very old. Older than the Wardens.`,`The moon letters in the diary are very, very old.`),
-    xl('wren',`They spell the same two words over and over. "Night." And "Mother." I don't like this, Ash. I don't like it at all.`,`They spell "Night" and "Mother." I don't like it.`),
+    xl('wren',`They spell the same two words over and over. "Stay." And "Keep." I don't like this, Ash. I don't like it at all.`,`They spell "Stay" and "Keep." I don't like it.`),
     xl('wren',`Keep your fire close. Wren.`,`Keep your fire close. Wren.`)]},
   {id:'c_pb_7',from:'quill',when:()=>(G.flags.moon==null?100:G.flags.moon)<100,lines:[
     xl('quill',`The moon is five percent smaller. I measured twice. I hate it.`,`The moon is smaller. I measured!`),
@@ -92741,6 +92743,9 @@ act({
   // give them, so the door riddle can be answered. (k_claws is A2a's c_claws clue.)
   migrate: [
     { if: 'stage>=c_spire', then: ['clue l_fireproof', 'clue l_pearl_mural', 'clue k_claws'] },
+    // (v12 R2) the door question now also needs the moths' own clue (c_spire's sp_door_ask): a save that already heard
+    // them ask, before this version, gets it here
+    { if: 'seen c_spire_door_ask', then: ['clue sp_door_ask'] },
   ],
 
   gates_min: 5,
@@ -92761,8 +92766,8 @@ chapter({
   id: 'c_brass', act: 2, after: 'c_claws', next: 'c_light', takeover: true,
   card: ['Act II · Chapter 6', 'The Brassworks'],
   so_far: [
-    "Ash climbed the Great Clock and searched Vesper's hideout. She keeps everything she steals, because the Lady of the Moths in her dreams wants light, and promised her gran would be warm. Every clock had stopped in the same minute, as if someone held the hands. Ash woke the Great Clock from the Brassworks, and Vesper pushed her mask up to watch.",
-    "Vesper steals light for a dream Lady. Then everyone saw her face."],
+    "In the Gullcrag Caves, Pearl's voice gave Ash her Climbing Claws. Vesper was waiting on the cliff top, and when she glided away, his new claws fit her claw marks exactly. Now Ash can climb the Great Clock, the way she does.",
+    "Ash got Pearl's Climbing Claws. They fit Vesper's claw marks. Now he can climb the Great Clock."],
   hint: ['Climb the Great Clock to the hatch at the very top. Then ask Clockkeeper Ambrose. The way into the Brassworks is up its old smokestack in the Brass Yards.',
     'Climb the clock. Ask the Clockkeeper. Then climb the smokestack.'],
   mom: [['Claws! Mind the furniture.', 'Claws! Mind the furniture.']],
@@ -92875,7 +92880,7 @@ chapter({
       ['narr', 'By the hammock: a little book with a moon on the cover. A dream diary.', 'A little book with a moon on it. A dream diary.'],
       ['narr', 'One page has been read so many times it has gone soft as cloth.', 'One page has been read so many times.'],
       ['narr', '"The Lady of the Moths came again. She says: bring her light, and Gran will be warm."', '"Bring the Lady light, and Gran will be warm."', { clue: 'b_dream_page' }],
-      ['narr', '"The night I get home, I take the warm stone to the Moon Ring at moonrise and give it to her. Then I will be a real Emberblood at last."', '"Take the warm stone to the Moon Ring. Then I will be a real Emberblood."'],
+      ['narr', '"The night I get home, I take the warm stone to the Moon Ring at moonrise and give it to her. Then the fire comes home to us, the way the old stories say."', '"Take the warm stone to the Moon Ring. Then the fire comes home to us."'],
       ['narr', 'The last page is newer, written in a hurry: "Spire. Moonrise. Bring what\'s left."', 'The last page: "Spire. Moonrise. Bring what is left."'],
       ['ash', "What's left of what? What spire? And who is this Lady?", 'What is left? What Spire? Who is the Lady?'],
     ],
@@ -92996,8 +93001,8 @@ chapter({
   id: 'c_claws', act: 2, after: 'c_salt', next: 'c_brass', takeover: true,
   card: null,
   so_far: [
-    "The tide went out and Ash found Pearl's Climbing Claws in the Gullcrag Caves. Vesper was waiting on the cliff top. When she glided away, Ash's new claws fit her claw marks exactly.",
-    "Ash got Pearl's Climbing Claws. Vesper's claw marks fit his claws exactly."],
+    "The Moth Mask is Vesper Saltwhistle, of Saltmarsh. She and her gran are all that is left of Mother Pearl's family. Ash fixed the Tide Clock and the sea went out at last. Granny Oona lives in a crooked house where no fire lasts the night. And Pearl learned to climb in the Gullcrag Caves, out across the sands.",
+    "The Moth Mask is Vesper, Granny Oona's girl. The tide is out. Pearl learned to climb in the Gullcrag Caves."],
   hint: ['The Gullcrag Caves are at the foot of the dark cliff, across the Gullcrag Sands. The tide is low now.',
     'The caves are across the sand, under the dark cliff.'],
   silence: ['c_cliff'],
@@ -93086,8 +93091,8 @@ chapter({
   // the game numbers Act II's cards after the heist (c_fest 1, c_pass 2), so this is Chapter 3
   card: ['Act II · Chapter 3', 'Salt on the Wind'],
   so_far: [
-    "Ash came down the Southern Pass to the sea. Old Barley the shepherd had seen the Moth Mask come up off the beach and glide over the Downs with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with dust.",
-    'Something huge flew over. Gerald the sheep is silver now.'],
+    "Sister Wren said the thief was the Moth Mask, a rooftop thief from Gearhaven who only steals things that glow. Ash followed the Southern Pass all the way down to the sea, to get the Ember Heart back.",
+    'The thief is the Moth Mask, from Gearhaven. Ash went down the pass to the sea.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],
   mom: [["The sea! Pebble says you can smell it from the pass. Bring me back a shell. A plain one is fine.", 'The sea! Bring me back a shell.']],
@@ -93173,8 +93178,8 @@ chapter({
   id: 'c_gear', act: 2, after: 'c_coast', next: 'c_salt',
   card: ['Act II · Chapter 4', 'The City of Clocks'],   // (the game counts the heist's two chapters first)
   so_far: [
-    "Gearhaven's Great Clock stopped at one minute to midnight, full of moth dust. Ash worked out where the Moth Mask would strike and chased her over the roofs.",
-    'The Great Clock stopped. Ash found where the Moth Mask would strike and chased her.'],
+    "Old Barley saw the Moth Mask glide down to Gearhaven with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with moth dust. Now Ash has reached the city of clocks.",
+    'Barley saw the Moth Mask fly to Gearhaven. Something bigger made Gerald silver. Ash is in the city of clocks.'],
 
   // New things this chapter adds to map 1. Things x1_world already draws
   // (c_upper_gate, c_lm_watch, c_whirligig_manor, c_great_clock, c_clock_hand,
@@ -93340,8 +93345,8 @@ chapter({
   silence: ['c_squawk', 'c_agatha', 'c_lamp_vesper'],
   card: ['Act II · Chapter 7', 'The Spinning Lighthouse'],
   so_far: [
-    "The Great Clock struck midnight and Gearhaven woke up. But the Spinning Lighthouse on Lantern Point was still dark, smothered in moths. Then Keeper Agatha's parrot crashed into the Gear Market, shouting for help.",
-    'The clock works again! But the lighthouse is dark. A parrot came for help.'],
+    "Ash searched Vesper's hideout in the bell loft. She keeps everything she steals, because a Lady in her dreams wants light and promised that her gran would be warm. Then the Great Clock struck twelve and Gearhaven woke up, and on a chimney Vesper pushed up her mask to watch. But the Spinning Lighthouse on Lantern Point is still dark.",
+    'Vesper steals light for a Lady in her dreams. The clock works again. But the lighthouse is still dark.'],
   mom: [["A whole city's clock! I told the chickens.", 'You fixed a clock! I told the chickens.']],
 
   npc: {
@@ -93554,7 +93559,7 @@ chapter({
     c_lamp_rescue: [
       { place: ['c_mask', 'player', [96, -70]] }, { anim: ['c_mask', 'moths'] }, { cam: 'c_mask', s: 0.6 },
       ['narr', 'Then the moths come back. Not for you. For Vesper. "Get off!" she yells. "I brought the stone! She said I\'d get my fire!"', 'The moths come back, for Vesper! "Get off! She said I would get fire!"'],
-      { choose: 'c_lamp', who: 'narr', ask: ['The moths hiss, all together: "All of it. The Mother wants all of it."', 'The moths hiss: "The Mother wants all of it."'], pick: [
+      { choose: 'c_lamp', who: 'narr', ask: ['The moths hiss, all together: "All of it. The Lady wants all of it."', 'The moths hiss: "The Lady wants all of it."'], pick: [
         { t: ['Breathe fire on the moths. Save her!', 'Save her with fire!'], tone: 'kind', v: 'saved',
           then: ['set c_lamp=saved', 'trust vesper +1'],
           say: [
@@ -93640,7 +93645,7 @@ chapter({
 }catch(e){ if(window.__ebStoryLoadErr) window.__ebStoryLoadErr("game/story/act2/c_light.js",e); else console.error(e); }
 
 ;window.__ebStoryFile="game/story/act2/c_salt.js";try{
-// game/story/act2/c_salt.js (A2a): Act II, "The Girl from Saltmarsh".
+// game/story/act2/c_salt.js (A2a): Act II, "The Turning Library" (v12 R2: the old title gave away who she is).
 // What the player does: right after the rooftop chase the Bobs send Ash to the Turning Library, where Pearl's family
 // tree rolls out of the door (clue: it ends with Oona Saltwhistle and her granddaughter Vesper). In Saltmarsh the
 // player finds the moth-stamped gift lanterns in the windows, gets Chowder Charlie to sniff the Moth Mask's note
@@ -93649,10 +93654,10 @@ chapter({
 // night the clocks stopped. Low tide opens the way to the Gullcrag Caves (c_claws).
 chapter({
   id: 'c_salt', act: 2, after: 'c_gear', next: 'c_claws', takeover: true,
-  card: ['Act II · Chapter 5', 'The Girl from Saltmarsh'],
+  card: ['Act II · Chapter 5', 'The Turning Library'],
   so_far: [
-    "Ottoline's family tree of Mother Pearl ended with Oona Saltwhistle and her granddaughter Vesper. In Saltmarsh every window had a moth lantern, the Moth Mask's note smelled of Charlie's chowder, and Ash worked out who she was: Vesper Saltwhistle. He fixed the Tide Clock and met her gran, in a house where no fire lasts the night.",
-    "The Moth Mask is Vesper Saltwhistle. Ash met her cold gran."],
+    'Ash worked out where the Moth Mask would strike and chased her over the roofs of Gearhaven. At the Great Clock she went straight up it like a ladder, and left a note behind: "Go home. This isn\'t your story. M."',
+    'Ash chased the Moth Mask over the roofs. She climbed the Great Clock and left a note: "Go home."'],
   hint: ['Ask at the Turning Library in the Upper Town. Then follow the Coast Road to Saltmarsh, where the Tide Clock is stuck.',
     'Ask at the library. Then go to Saltmarsh.'],
   mom: [['Saltmarsh? Wear your boots. And eat the chowder.', 'Wear your boots. Eat the chowder.']],
@@ -93758,8 +93763,8 @@ chapter({
     slt_ottoline: [
       ['c_ottoline', "Welcome to the Turning Library. Please don't run, the shelves do that for you. WHAT CAN I... sorry. What can I do for you?", 'Welcome! WHAT DO YOU... sorry. What do you need?'],
       ['ash', 'How does somebody climb straight up the Great Clock?', 'How does someone climb the Great Clock?'],
-      ['c_ottoline', "Only one person ever climbed like that. Mother Pearl, who built this city. Ember's own daughter, with horns like yours, claws that climbed anything, and not one spark of fire.", "Mother Pearl! Ember's daughter. Horns like yours. Climbing claws. No fire."],
-      ['ash', "Ember's daughter. With no fire at all. ...I never even thought about the ones who didn't get any.", "Ember's daughter, with no fire. I never thought about that."],
+      ['c_ottoline', 'Only one person ever climbed like that. Mother Pearl, who built this city. Horns, they say, and a tail, and claws that climbed anything. Where she came from, nobody ever wrote down.', 'Only Mother Pearl climbed like that. She built this city. She had horns, a tail and claws.'],
+      ['ash', "Horns and a tail? That's a lot like me.", 'Horns and a tail? Like me!'],
       ['c_ottoline', "Pearl learned to climb in the sea caves at Gullcrag, past Saltmarsh. You'd need claws like hers.", 'Pearl learned to climb in the Gullcrag caves, past Saltmarsh.', { promise: 'c_gullcrag_door' }],
       ['narr', "A shelf rolls past with a fat scroll on it: PEARL'S FAMILY TREE. It falls off, unrolls across the floor, and keeps going out the door.", "A scroll falls: PEARL'S FAMILY TREE. It unrolls right out the door."],
       ['c_ottoline', 'Oh dear. It does that. Two hundred names, and every one of them a climber.', 'Oh dear. It does that. Two hundred climbers.'],
@@ -93843,7 +93848,7 @@ chapter({
 }catch(e){ if(window.__ebStoryLoadErr) window.__ebStoryLoadErr("game/story/act2/c_salt.js",e); else console.error(e); }
 
 ;window.__ebStoryFile="game/story/act2/c_snow.js";try{
-// Act II epilogue: Snow in Summer (owner A2b). Data only.
+// Act II epilogue: The Breakwater (owner A2b; v12 R2: the old title "Snow in Summer" gave the snow away). Data only.
 // What the player does: on the breakwater after the Spire (x1_story's c1SpireOut puts Ash there and starts this stage),
 // the moon dims and the Lady of the Moths thanks him through every moth on the Spire; snow falls in midsummer; that
 // night the moon has its first bite. Then he walks back into Gearhaven under snow in June. The town is out in it; Vesper waves from the
@@ -93854,7 +93859,7 @@ chapter({
 chapter({
   id: 'c_snow', act: 2, after: 'c_spire', next: 'f_snow', takeover: true,
   silence: ['c_snow_city'],
-  card: ['Act II · Epilogue', 'Snow in Summer'],
+  card: ['Act II · Epilogue', 'The Breakwater'],
   so_far: [
     "At the top of the Shadow Spire the truth came out: the Lady in Vesper's dreams is a moth, the Mother of moths. She cracked the Heart into three Shards and sent two away. Vesper kept the third, and now Ash has it. Then a soft voice thanked Ash, snow fell in midsummer, and the moon had a bite out of it.",
     'The Lady is a giant moth. She broke the Heart in three. Ash has one. Snow fell. The moon got bitten.'],
@@ -93942,7 +93947,7 @@ chapter({
         { do: ['set c_v_twins'] } ] },
       { if: 'quest c_oona done', then: [
         ['c_vesper', "Gran knits by her stove every night now. She's knitting you something. I'm not allowed to say what.", 'Gran is knitting you something. It is a secret.'] ] },
-      ['c_vesper', "The Mother wants all three pieces. Hush took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. Hush took one north.'],
+      ['c_vesper', "The Mother wants all three pieces. The white one took one north. That's why the sky up there has gone that color.", 'The Mother wants all three. The white one took one north.'],
       ['c_vesper', "If you go after it, wrap up warm. And don't climb anything I wouldn't.", 'If you go, wrap up warm.', { re: [
         { t: ['You climb everything.', 'You climb everything.'],
           say: [['c_vesper', 'Then you can climb anything. Lucky you.', 'Then you can climb anything.']] },
@@ -93976,8 +93981,8 @@ chapter({
   silence: ['c_causeway', 'c_end_fought', 'c_end_ally', 'c_end_pearl', 'c_truth', 'c_nyxara', 'c_snowfall'],
   card: ['Act II · Chapter 8', 'The Shadow Spire'],
   so_far: [
-    'When the lighthouse burned again, its beam showed a black spire standing in the sea where no spire had ever been. Vesper had gone there with what was left of the warm stone.',
-    'The lighthouse beam showed a black Spire in the sea. Vesper went there.'],
+    'Something huge flew over the whole coast the night the clocks stopped. When Ash lit the lighthouse again, its beam showed a black Spire standing in the sea, where no spire had ever been. Vesper had gone out there with what was left of the warm stone.',
+    'Something huge stopped the clocks. The lighthouse beam showed a black Spire in the sea. Vesper went there.'],
   mom: [['A black tower in the sea? Take a lantern. Take two.', 'A black tower? Take a lantern!']],
 
   npc: {
@@ -94016,9 +94021,9 @@ chapter({
       text: [
         ['The Lady said: the night you get home, take the warm stone to the Moon Ring in the Moth Wood. So I did.', 'The Lady said: take the stone to the Moon Ring. So I did.'],
         ['Something came down out of the dark. A moth, grey and soft as dust, so big her shadow put out the stars. Two pale moons painted on her wings. A white one came behind her that only ever says shhh.', 'A huge grey moth came, with moons on her wings. And a white one that says shhh.'],
-        ['The white one called her Mother. So that is who the Lady is. The Mother called the white one Hush. Nobody called me anything.', 'The white one called her Mother. The white one is Hush.'],
-        ['The Mother tried to lift the Heart in her feet, and it burned her. It burned Hush too. So she cracked it on the stones. Three pieces. "So my moths can carry it," she said.', 'The Heart burned her. So she broke it in three, for her moths to carry.'],
-        ["Hush flew north with one. The Mother took one east herself, right over Gearhaven, and the clocks stopped, and the tide, and the lighthouse. At one minute to midnight. That was her. Not me.", 'Hush took one north. The Mother flew east and stopped the clocks. Not me!'],
+        ['The white one called her Mother. So that is who the Lady is. She called the white one her quiet one. Nobody called me anything.', 'The white one called her Mother. She called the white one her quiet one.'],
+        ['The Mother tried to lift the Heart in her feet, and it burned her. It burned the white one too. So she cracked it on the stones. Three pieces. "So my moths can carry it," she said.', 'The Heart burned her. So she broke it in three, for her moths to carry.'],
+        ["The white one flew north with one. The Mother took one east herself, right over Gearhaven, and the clocks stopped, and the tide, and the lighthouse. At one minute to midnight. That was her. Not me.", 'The white one took one north. The Mother flew east and stopped the clocks. Not me!'],
         ['In my dreams she says one minute to midnight is her favorite minute. Nothing has ended yet, she says. Nothing ever has to.', 'She says one to midnight is her favorite minute. Nothing has ended yet.'],
         ["The third piece fell by my foot. It burned the moths. It didn't burn me. Nothing I ever held was warm like that. I kept it. It went purple in my hand, like it was sad.", 'The third piece did not burn me. It was so warm. I kept it.'],
         ['Now the moths are angry. She wants all three. She said bring the last one to the Spire at moonrise and Gran will be warm.', 'She wants all three. She said bring mine to the Spire.'],
@@ -94026,11 +94031,19 @@ chapter({
       ] },
   },
 
+  // (v12 R2) the moths ask their question at the door, and only then does the Case Book ask it: before, the question
+  // (and its answer among the picks) showed from the Lamp Room on, a whole chapter before anyone had asked it
+  clue: {
+    sp_door_ask: { icon: 'moth', mystery: 'moth_mask',
+      text: ['The moths on the Spire door will not let Ash in until he says what Vesper really is. Not her name. What she IS.',
+        'The door moths ask: what is Vesper, really?'] },
+  },
+
   deduce: {
     what_she_is: {
       mystery: 'moth_mask',
       ask: ['The moths on the door want to know: what IS Vesper?', 'What is Vesper?'],
-      needs: ['l_fireproof', 'l_pearl_mural', 'k_claws'],
+      needs: ['l_fireproof', 'l_pearl_mural', 'k_claws', 'sp_door_ask'],
       bonus: ['q_oona_horns', 'q_chalk_pearl', 'q_nursery'],
       pick: [
         { t: ['A moth in disguise', 'A moth in disguise'],
@@ -94085,7 +94098,7 @@ chapter({
       ['narr', 'They whisper, all together: "Who is she? Who is she really? Say it, and pass."', 'The moths whisper: "Who is she? Say it, and pass."'],
       ['ash', 'Vesper. Vesper Saltwhistle.', 'Vesper Saltwhistle.'],
       ['narr', 'The moths laugh, a sound like dry leaves. "Not her name. What is she?"', 'The moths laugh. "Not her name. What is she?"'],
-      ['ash', 'Okay. Think, Ash. What do I actually know about her?', 'Think. What do I know about her?'],
+      ['ash', 'Okay. Think, Ash. What do I actually know about her?', 'Think. What do I know about her?', { clue: 'sp_door_ask' }],
     ],
     c_door_opens: [
       ['ash', "Fire can't burn her. She climbs with claws like Pearl's. And she hasn't got one single spark.", "Fire can't burn her. She has Pearl's claws. No spark.", { mood: 'surprised' }],
@@ -94094,14 +94107,14 @@ chapter({
       ['narr', 'The moths go very still. Then they peel off the door all at once in a grey cloud, and the door swings open.', 'The moths fly off. The door opens.'],
       ['ash', 'A cousin who robs clock barons. Wait till Mom hears.', 'Wait till Mom hears!', { mood: 'sly' }],
     ],
-    // the kneel (STORY.c_choice): every option shows; a locked one says why (the engine fills in {trust:vesper})
+    // the kneel (STORY.c_choice): every option shows; a locked one says why, in story words (v12: no numbers)
     c_choice: [
       { choose: 'c_vesper', who: 'narr',
         ask: ['Vesper drops to one knee. Her shadows melt into the floor. The violet light in her hand flickers, and she lifts her moth hooks one more time.', 'Vesper falls to one knee. She lifts her hooks one more time.'],
         pick: [
           { t: ['Lower your weapon. "Cousin. Why are you doing this?"', '"Cousin. Why are you doing this?"'], tone: 'kind', v: 'friend',
             need: 'trust vesper>=4',
-            locked: ["She doesn't trust you enough yet ({trust:vesper} of 4).", "She doesn't trust you yet ({trust:vesper} of 4)."],
+            locked: ["She won't look at you. She isn't ready to tell you why.", 'She is not ready to tell you.'],
             then: ['choice c_vesper=friend', { journal: ['You asked Vesper why, and she told you.', 'You asked Vesper why.'], key: 'c_vesper' }],
             say: [
               ['narr', 'Vesper stares at you. Then she pulls off her mask and sits down on the edge of the roof, just a tired girl on a cold roof.', 'She takes off her mask and sits down. Just a tired girl.'],
@@ -94109,7 +94122,7 @@ chapter({
               ['c_vesper', "She broke it instead. Cracked it in three on the Moon Ring stones. She isn't a lady at all, Ash. She's a moth, so big her shadow put out the stars.", 'She broke it in three. She is not a lady. She is a giant moth.', { mood: 'worried', payoff: 'c_vesper_page' }] ] },
           { t: ['"Pearl wrote a letter. To you. To all of you."', '"Pearl wrote you a letter."'], tone: 'kind', v: 'friend',
             need: 'quest c_logbook done trust vesper>=3',
-            locked: ["This needs the last page of Pearl's Logbook, and trust 3 (now {trust:vesper}).", "Needs Pearl's last logbook page, and trust 3."],
+            locked: ["You'd need Pearl's own words for this, and Vesper would need to believe you.", 'You need Pearl\'s last page. And she must believe you.'],
             then: ['trust vesper +1', 'set c_pearl_letter', 'choice c_vesper=friend', { journal: ['You read Vesper the letter Pearl wrote, and she told you everything.', 'You read Vesper Pearl\'s letter.'], key: 'c_vesper' }],
             say: [
               ['ash', '"To my children with no fire. Fire isn\'t the only warm thing. Hands are warm. Soup is warm. I had no fire, so I built a city full of warm windows. You can too."', '"Fire isn\'t the only warm thing. I built warm windows. So can you."', { mood: 'tender' }],
@@ -94513,8 +94526,8 @@ people({
         say: ["Moon letters in the margins. I can't read them. But I know somebody who can, and she'll be insufferable. I'll send a copy to Wren.",
           "Moon letters! Wren can read them."] },
       { if: 'stage>=c_brass !clue q_nursery', promise: 'm0_pearl', dir: ['embers_nursery', 'm0_pearl', 'north'], option: ['What does Wren say about Pearl?', 'What does Wren say?'],
-        say: ["Wren writes that above Ember's Nursery, up north, a tiny iron hook sits on a windy crag. Pearl's first, she thinks. A tail like yours could reach it.",
-          "Pearl's first hook is on a crag up north."] },
+        say: ["Wren writes that above Ember's Nursery, up north, a tiny iron hook sits on a windy crag. Very old, and very small. A tail like yours could reach it.",
+          'Wren says a tiny old hook is on a windy crag up north. Your tail could reach it.'] },
       { if: 'flag c_pages_given !quest c_logbook done', once: true,
         say: ["Pearl's pages are coming home, one by one! Wren has written me a letter about every single page.", "Pearl's pages are coming home!"] },
       // the snow (c_snow) is the news: these come first once it falls
@@ -94541,8 +94554,8 @@ people({
         re: [
           { t: ['I can hold the other end.', 'I can hold one end.'], tone: 'kind', f: 0.5,
             say: ['With those claws? Gently, then. Pinch it, don\'t poke it. ...Thank you.', 'Gently, with those claws. Thank you.'] },
-          { t: ['Two hundred climbers. And no fire.', 'Two hundred. No fire.'],
-            say: ['Not a spark between them. They built half this coast instead. The lighthouse, the clock, the steps down to the sea.', 'No fire. They built half the coast instead.'] },
+          { t: ['Two hundred names. All climbers?', 'All of them climbers?'],
+            say: ['Every one. They built half this coast. The lighthouse, the clock, the steps down to the sea.', 'Every one. They built half the coast.'] },
         ] },
       // her moment (the old chat): a librarian's question, once he is a regular
       { if: 'stage>=c_claws',
@@ -95048,7 +95061,7 @@ people({
         say: ['Vesper Saltwhistle waved at me from a roof this morning. A real wave. Do you know how long I have chased her?', 'Vesper waved at me today! A real wave!'],
         re: [
           { t: ["She's my cousin, you know.", "She's my cousin."],
-            say: ['Your cousin? Two Emberbloods on one coast, and I find out from a wave? I am a terrible reporter.', 'Your cousin? And I find out now? Terrible!'] },
+            say: ['Your cousin? Two dragon kids on one coast, and I find out from a wave? I am a terrible reporter.', 'Your cousin? And I find out now? Terrible!'] },
           { t: ["She isn't a thief any more.", "She's not a thief now."],
             say: ["Not a thief. Just a girl who climbs. That's still a story. A quieter one.", 'Just a girl who climbs. A quiet story.'] },
         ] },
@@ -95355,9 +95368,10 @@ people({
     c_oona: [
       { if: 'quest c_oona done', once: true,
         say: ["The stove's been going all week, and not once out by morning. My Vesper sat by it a whole evening and never once looked at the door.", 'The stove never goes out! Vesper sat by it all evening.'] },
-      { if: 'flag dr_c_twins', once: true, option: ['I dreamed about baby Pearl. She climbed the curtains.', 'I dreamed baby Pearl climbed the curtains.'],
-        say: ["Up the curtains, the day she was born! Oh, duck. That's our family story. Nobody outside this house knows that one.",
-          "Up the curtains! That's our family story!"] },
+      { if: 'flag dr_c_twins', once: true, option: ['I dreamed a baby with no fire climbed the curtains.', 'I dreamed a baby climbed the curtains.'],
+        say: [['c_oona', 'Up the curtains, was it?', 'Up the curtains?'],
+          ['narr', 'Granny Oona looks at her stove for a long moment.', 'Gran looks at her stove for a long time.'],
+          ['c_oona', 'Funny, what folk dream. Pass me that blanket, duck.', 'Funny dream. Pass the blanket, duck.']] },
       { if: 'stage>=c_salt !clue q_lookout', promise: 'm0_lookout', ref: 'm0_lookout', option: ['Did Vesper ever camp near Emberhollow?', 'Did Vesper camp near home?'],
         say: ['Once, before your Lantern Night. She camped by the old pass. She said there is a tall rock there where you can see a whole valley of lanterns.',
           'She sat on a tall rock by the old pass.'] },
@@ -95840,7 +95854,7 @@ people({
             say: ['The thief? Climbs a clock tower, at night? Somebody ought to be watching that girl.', 'At night? Someone should watch that girl.'] },
         ] },
       // topics for Act II
-      { ask: ['Did you know about Pearl?', 'Did you know about Pearl?'], if: 'flag c_ottoline',
+      { ask: ['Did you know about Pearl?', 'Did you know about Pearl?'], if: 'flag c_cousin',
         say: ["Ember's other girl? Yara told me once, when I was small. I thought it was a story to make me eat my crusts.", 'Yara told me once. I thought it was a story.'] },
       { ask: ['Can you mend the Heart?', 'Can you mend the Heart?'], if: 'item c_shard1',
         say: ["Not one piece. Bring me all three, and I'll have the forge hot and waiting.", 'Not one piece. Bring all three.'] },
@@ -96034,7 +96048,7 @@ quest({
 
   scene: {
     ch_offer: [
-      ['c_barley', "See that grey shape on the hill? That's the Chalk Dragon. Mother Pearl cut it there, a thousand years back.",
+      ['c_barley', "See that grey shape on the hill? That's the Chalk Dragon. Mother Pearl cut it there, longer ago than anybody can count.",
         "See the grey shape? Pearl's Chalk Dragon."],
       ['c_barley', 'For her mother. So her mother, flying high, could look down and see a dragon waving up at her.', 'Her mom could see it from the sky.'],
       ['c_barley', "It's gone grey. Walk the old line for me? Your feet are warm. Chalk likes warm feet.", 'Walk the old line? Chalk likes warm feet.'],
@@ -96383,7 +96397,7 @@ quest({
       text: ['Granny Oona says Vesper dreams of a Lady who promised to bring the fire home for Gran.',
         'A Lady in her dreams promised Gran fire.'] },
     q_oona_horns: { icon: 'heart', mystery: 'moth_mask',
-      text: ['Granny Oona has two tiny horns under her headscarf. The Saltwhistles are Emberbloods, she says. They just never got the fire.',
+      text: ["Granny Oona has two tiny horns under her headscarf, like Ash's. Pearl's family never got the fire, she says.",
         'Gran has tiny horns. No fire, though.'] },
   },
 
@@ -96427,8 +96441,8 @@ quest({
       ['narr', 'Granny Oona holds out her hands to it. Then she pulls off her headscarf. Two tiny horns poke out of her white hair.',
         'Gran takes off her scarf. She has tiny horns!', { clue: 'q_oona_horns' }],
       ['ash', "You've got HORNS!"],
-      ['c_oona', "Pearl's horns, duck. We're Emberbloods, the Saltwhistles. We just never got the fire.",
-        'We are Emberbloods. We never got the fire.'],
+      ['c_oona', "Pearl's horns, duck. Same as yours. Pearl's lot never got the fire. Not one of us.",
+        "Pearl's horns. Same as yours. We never got the fire."],
       ['c_oona', 'My Vesper got the claws, though. Out every night. Home every morning, with silver dust on her boots.',
         'Vesper has the claws. Out every night.'],
       ['c_oona', "She dreams of a Lady who promised to bring the fire home for me. I don't want fire. I want my girl to sit down.",
