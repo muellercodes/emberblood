@@ -736,6 +736,8 @@ function padHintSync(root){
   if(id==='jour'&&typeof jTab!=='undefined'&&jTab==='bag'&&a&&a.closest&&a.closest('#jBody [data-item]')&&a.closest('#jBody [data-item]').querySelector('button[data-star]')) L.push(it(C(PB.W),'Quick slot'));
   if(id!=='mapov'&&(navBoxes(root).length||isScroll(root))) L.push(it(C(PB.L2)+C(PB.R2),'Page'));
   const html=L.join(''), key=id+'|'+PAD.kind+'|'+html;
+  // the map's own line: the strip stands in for its button sentence, but a message (no travel in a fight) still shows
+  if(id==='mapov'){ const mh=$('#mapHint'); if(mh){ if(key!==H.key&&!mapSel&&!mh.querySelector('.pg')&&typeof mapHintSet==='function') mapHintSet(); mh.classList.toggle('padkeep',!mh.querySelector('.pg')&&!(mapSel&&mh.textContent===mapSel.name)); } }
   if(key===H.key) return;
   for(const e of document.querySelectorAll('#padHint,.padhint-in')) e.innerHTML='';
   H.key=key; const el=padHintEl(id); if(!el) return;
@@ -765,10 +767,12 @@ html.sb body.padnav .setrow:has(:focus){background:linear-gradient(90deg,rgba(25
 body.padnav.padhint #padHint:not(:empty){display:flex}
 .padhint-in{display:none}
 body.padnav .padhint-in:not(:empty){display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;flex:1;min-width:200px;font:600 13px/1.25 var(--f-ui,system-ui,sans-serif);color:var(--muted)}
-body.padnav #mapov #mapHint:has(~.padhint-in:not(:empty)){display:none}
+body.padnav #mapov #mapHint:not(.padkeep):has(~.padhint-in:not(:empty)){display:none}
+body.padnav .skkeys:empty,body.padnav .lgkeys:empty{display:none}
 #padHint .ph,.padhint-in .ph{display:inline-flex;align-items:center;gap:6px}
 #padHint .ph b,.padhint-in .ph b{font-weight:700}
 #padHint .pg,.padhint-in .pg{font-size:12px}
+#padHint .pg.d,.padhint-in .pg.d{background:linear-gradient(#7d6c60,#7d6c60) center/36% 100% no-repeat,linear-gradient(#7d6c60,#7d6c60) center/100% 36% no-repeat}
 html.sb #padHint{background:#fff3d6;border:2px solid #3b2233;box-shadow:0 3px 0 #3b2233,0 10px 24px rgba(30,10,40,.35);color:#3b2233}
 body.padnav.padhint .ov.on:not(#dialogue):not(#menu):not(#mapov):not(#skills):not(#logov){padding-bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + var(--padhint,44px))}
 `;
