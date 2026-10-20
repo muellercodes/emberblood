@@ -5,8 +5,8 @@
 // n_clocks) and of the small mystery "why a fourth post?" (solved later with the Silent Green well and Mom's memory;
 // then Ash lights it for good: a Heart Ember). Three lanterns lit at once melt the shadow curtain (x4_ascent's puzzle,
 // flag n_gate; x4_ascent plays the gate scene), and the stairs lead up to the first ring.
-// The arrival counts the friends Nyxara hurt that Ash already freed in earlier acts (trust track `friends`) and gives
-// the bonus name clues a kid earned before (the Wardens' page 11, the Act IV moth dream).
+// The arrival counts the friends Nyxara hurt that Ash already freed in earlier acts (trust track `friends`, silently) and
+// gives the bonus clues a kid earned before (the Wardens' page 11, the Act IV moth dream: that Ember named a moth).
 // Data only. The x4_story code that still runs: the gate scene and Greymane's arrival (x4_ascent plays n_gate_open; the
 // ally runtime brings Greymane on n_gate), the lantern bubble, the bridge travel itself.
 chapter({
@@ -50,11 +50,12 @@ chapter({
       text: ['Mom: "My gran always made four lanterns. One for whoever is out in the dark."', '"Four lanterns. One for whoever is out in the dark."'] },
     n5_yara_post: { icon: 'star', mystery: 'n5_fourth_lantern',
       text: ['Yara: "There were four posts on the green when I was a girl. Nobody remembered why."', '"There were four posts once."'] },
-    // bonus clues for "What did Ember call the little moth?" (n_clocks), earned in earlier acts
+    // bonus clues for "What did Ember call the little moth?" (n_clocks), earned in earlier acts. (v12 R4) They say that
+    // Ember gave the moth a name, never the name: "Nyx" is first seen on ring 2 (the clock hub, n_clocks)
     n5_page11: { icon: 'book', mystery: 'night_mother',
-      text: ["The Wardens' eleventh page: \"Nyx. A little grey moth, named by Ember.\"", '"Nyx. A little grey moth, named by Ember."'] },
+      text: ["The Wardens' eleventh page: a little grey moth sat on Ember's lantern, and Ember gave her a name.", 'Ember gave a little grey moth a name.'] },
     n5_moth_dream: { icon: 'moth', mystery: 'night_mother',
-      text: ['The moth dream in Moonfall: a girl with a lantern says "I\'ll call you Nyx."', 'A dream: "I\'ll call you Nyx."'] },
+      text: ['The moth dream in Moonfall: Ember gave the little moth a name, and the wind took it.', 'A dream: Ember named a moth.'] },
   },
 
   deduce: {

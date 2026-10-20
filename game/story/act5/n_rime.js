@@ -12,7 +12,7 @@ chapter({
   id: 'n_rime', act: 5, after: 'n_clocks', next: 'n_glass', takeover: true,
   card: ['Finale · The Third Ring', 'The Rime Spiral'],
   so_far: [
-    "The second ring's echo was a shadow of the Moth Mask. The Night Mother has a name now: Nyx, Ember's little moth. The third ring is a copy of Frostreach: black ice, frozen shadow people, wind like a river.",
+    "The second ring's echo was a shadow of the Moth Mask, and it broke into moths like the first. The third ring is a copy of Frostreach: black ice, frozen shadow people, wind like a river.",
     'Ash beat the shadow thief. The third ring is ice and wind.'],
 
   place: {

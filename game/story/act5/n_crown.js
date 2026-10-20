@@ -96,7 +96,7 @@ chapter({
       ['f_glaciar', 'I will speak for her, dumpling. Slowly, but I will.', 'I will speak for her. Slowly.', { if: { any: ['flag n5_glaciar', 'choice f_glaciar=free'] } }],
       ['narr', 'Hush hides her face in her wings. Then, very slowly, she nods.', 'Hush hides her face. Then she nods.', { if: { any: ['flag n5_hush', 'choice m_hush=free'] } }],
       { if: '!trust friends>=2', then: [
-        ['ash', "But they aren't all here yet. She won't listen to me on my own.", 'But my friends are not all here yet.'] ] },
+        ['ash', "But they aren't all here yet.", 'My friends are not all here yet.'] ] },
     ],
     // at the end of the Moon Road (the step finishes here): if fewer than two of the friends she hurt came, Ember's
     // voice asks who is missing and Ash may go and find them first. The door waits either way.
@@ -114,7 +114,7 @@ chapter({
         { if: '!flag n5_hush !choice m_hush=free', then: [
           ['ash', "Hush is still caught in the cocoons in the Moth's Cradle.", 'Hush is stuck in the cocoons.', { ref: 'n4_cradle' }] ] },
         { choose: 'n5_door', who: 'ash', ask: ['Go in now, or go and find them first?', 'Go in now?'], pick: [
-          { t: ["Go in. I'll do this the hard way.", 'Go in now'], tone: 'brave', v: 'go',
+          { t: ["Go in. I can't wait any longer.", 'Go in now'], tone: 'brave', v: 'go',
             say: [['ash', "Okay. Whatever happens, I'm still going to try.", 'Whatever happens, I will try.']] },
           { t: ['Not yet. Find them first.', 'Not yet'], tone: 'kind', v: 'later',
             say: [['narr', 'Any shrine on the peak can fly you home and back in a blink. The door will wait.', 'Fly to any shrine and back. The door will wait.']] },

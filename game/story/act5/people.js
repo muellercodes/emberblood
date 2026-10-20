@@ -58,10 +58,14 @@ people({
       { if: 'flag n5_hush', then: [['f_hush', 'Shhh. Here.']],
         else: [{ if: 'quest q_n5_hush active', then: [['ash', "Hush is still tied up in the Moth's Cradle. A hundred little moths on one silver knot.", "Hush is tied up in the Moth's Cradle."]],
           else: [['ash', "Hush isn't here. Something white was glittering in the Tendril Wood.", "Hush isn't here. Look in the Tendril Wood."]] }] },
-      { if: 'trust friends>=3', then: [['ash', 'All three. Everyone she hurt is standing right here with me.', 'All three of them are here!']],
-        else: [{ if: 'trust friends>=2', then: [['ash', "Two of the three she hurt are here. That's enough for her to hear us.", 'Two of the three are here.']],
-          else: [{ if: 'trust friends>=1', then: [['ash', 'Only one of the three she hurt is here. She should hear from the others too.', 'Only one of the three is here.']],
-            else: [['ash', 'None of the friends she hurt are here. Not yet.', 'None of them are here yet.']] }] }] },
+      // (v12 R4) Ash names who came instead of counting: no "two of the three", nothing that says where a line is drawn
+      { if: 'trust friends>=3', then: [['ash', 'Everyone she hurt is standing right here with me.', 'Everyone is here.']],
+        else: [{ if: 'trust friends>=2', then: [
+          { if: 'flag n5_vesper flag n5_glaciar', then: [['ash', "Vesper's here. Auntie's here. That's a start.", 'Vesper and Auntie are here.']],
+            else: [{ if: 'flag n5_vesper', then: [['ash', "Vesper's here. Hush is here. That's a start.", 'Vesper and Hush are here.']],
+              else: [['ash', "Auntie's here. Hush is here. That's a start.", 'Auntie and Hush are here.']] }] }],
+          else: [{ if: 'trust friends>=1', then: [['ash', "I've only got one of them with me. I want the others too.", 'One friend is here.']],
+            else: [['ash', "Nobody she hurt is up here with me. Not yet.", 'Nobody is here yet.']] }] }] },
       { choose: 'n5_who_more', ask: ['Anyone else?', 'Anyone else?'], pick: [
         { t: ['Ask Tikka about her spoon', 'Ask Tikka about her spoon'], v: 'tikka', if: 'flag tk_come=yes',
           say: [['ev_tikka', 'I brought a BIGGER spoon! For the moth!', 'I brought a BIGGER spoon!'], ['ev_tock', "It's a ladle."],

@@ -34,7 +34,8 @@ const n4sGrey=()=>!!(G&&G.choices&&G.choices.greymane==='ally');
 const n4sCin=()=>!!(G&&G.choices&&G.choices.cinder==='ally');
 const n4sTikka=()=>!!(G&&G.flags&&G.flags.tk_come==='yes');
 const n4sMom=()=>!!(G&&G.flags&&(G.flags.m_maren||G.flags.m_reforged));
-const n4sKnows=()=>typeof nKnowsNyx==='function'?!!nKnowsNyx():!!(G.flags.dr_seen_m_moth||G.flags.f_page11||G.flags.m_page11||G.found.n_pane_3);
+// whether Ash knows her name: the Act V clue n5_her_name (ring 2's name question) or n_knows (that solve, Moth Memory 3)
+const n4sKnows=()=>typeof nKnowsNyx==='function'?!!nKnowsNyx():!!((G.case&&G.case.clues&&G.case.clues.n5_her_name)||G.flags.n_knows);
 // how many of those three are here, and whether the kind ending is open: with the act 5 data, its trust track
 // `friends` and its moth ending's condition (so this file, x4_foes and the data's choice agree); else the old counts
 const n4sFreed=()=>{ const A=n4sAct5(); if(A&&A.trust&&A.trust.friends) return +(G.flags[A.trust.friends]||0); return typeof nFreed==='function'?nFreed():(n4sVes()?1:0)+(n4sGla()?1:0)+(n4sHushF()?1:0); };
@@ -161,9 +162,7 @@ for(const k in N4S_PORT) if(!EVPORT[k]) EVPORT[k]=N4S_PORT[k];
 #n4sBook canvas{position:absolute;inset:0;width:100%;height:100%}
 #n4sBook .n4t{position:absolute;left:0;right:0;top:max(18px,env(safe-area-inset-top,0px));text-align:center;font:600 12px ${UIF};letter-spacing:.24em;text-transform:uppercase;color:rgba(255,236,206,.9);text-shadow:0 2px 10px rgba(0,0,0,.7)}
 #n4sBook .n4n{position:absolute;left:0;right:0;top:calc(max(18px,env(safe-area-inset-top,0px)) + 20px);text-align:center;font:700 24px ${UIF};color:#fff3e0;text-shadow:0 2px 14px rgba(160,90,40,.85)}
-#n4sWinX{margin:10px 0 16px;font-size:12px;color:var(--muted);letter-spacing:.04em}
-#n4sWinSub{margin:6px 0 2px;font-size:13px;color:var(--gold);letter-spacing:.06em}
-#n4sWinMore{margin-top:12px;font-size:13px;color:#7a5ab0;font-style:italic}`;
+#n4sWinX{margin:10px 0 16px;font-size:12px;color:var(--muted);letter-spacing:.04em}`;
   document.head.appendChild(st); }catch(e){} })();
 { const base=setLine; setLine=function(){ base.apply(this,arguments); try{ const b=$('#dlgBox'); if(!b) return; const L=DLG&&DLG.lines[DLG.i], w=L?(Array.isArray(L)?L[0]:(typeof L.who==='function'?L.who():L.who)):'';
   b.classList.toggle('n4echo',/^n_echo_/.test(String(w))); b.classList.toggle('n4mem',w==='n_memory'); if(w==='n_memory') b.classList.add('narr'); }catch(e){} }; }
@@ -269,14 +268,12 @@ n4sDef('n_heart_end',()=>[],{again:true});
 // 9. the fall, the plea (or the hint), the choice
 n4sDef('n_fall',()=>[]);
 n4sDef('n_plea',()=>[]);
-// (why the kind ending is closed: so kids know next time)
+// (the old fallback, when the act 5 data is missing and the kind ending is closed: one feeling, never the rule and
+// never a hint for next time; the data's n_plea does the same with "She is too scared to hear a word you say.")
 function n4sClosedLines(){
-  const L=[];
-  if(!n4sKnows()) L.push(xl('narr',`You wish you knew her real name. Something tells you she had one, once.`,`You wish you knew her real name.`));
-  if(n4sFreed()<2) L.push(xl('narr',`She won't listen to you. Maybe she would listen to someone she hurt, if they were here to speak for her.`,`She won't listen. Maybe the friends she hurt could help.`));
-  return L;
+  return [xl('narr',`She curls tighter round the sliver of moon. She is too scared to hear a word you say.`,`She holds the moon tight. She is too scared to listen.`)];
 }
-// 10. the three endings (the title, the number on the victory screen, the lines)
+// 10. the three endings (the title, the line on the victory screen, the lines; n is only their order, never shown)
 const N4S_ENDINGS={
   dawn:{title:S('Morning','Morning'),n:1,msg:S('You ended the Long Night, and the morning came.','You ended the Long Night. Morning came!'),lines:()=>{
     const e=n4sEnd(); return [
@@ -644,13 +641,13 @@ function n4sPane(k,done){
     n4sDo(()=>{ G.found['n_pane_'+k]=true; G.flags.n_panes=n4sPanesN(); if(k===3) G.flags.n_knows=1; })];
   if(first&&k===3) L.push(n4sDo(()=>n4sSay('nyx')));
   if(first&&n4sPanesN()+(G.found['n_pane_'+k]?0:1)>=6) L.push(...STORY.n_panes_all,n4sDo(()=>{ if(!G.flags.n_panes_hp){ G.flags.n_panes_hp=1; player.maxHp+=10; player.hp=player.maxHp; setBanner(S('All six Moth Memories','All six Moth Memories'),S('You understand her now. +10 max health.','+10 health!'),3.4); } }));
-  runDialogue(L,()=>{ scene='play'; fin(); if(first) setBanner(S('Moth Memory','Moth Memory'),simplify(P.title)+' · '+n4sPanesN()+' / 6',2.6); saveGame(); });
+  runDialogue(L,()=>{ scene='play'; fin(); if(first) setBanner(S('A Moth Memory','A Moth Memory'),simplify(P.title),2.6); saveGame(); });
   return true;
 }
 // the journal's Story tab lists the Moth Memories found
 { const base=renderJour; renderJour=function(){ base(); try{ if(G&&G.mode==='story'&&typeof jTab!=='undefined'&&jTab==='story'&&n4sPanesN()>0){ const el=$('#jBody'); if(!el) return; const E=t=>escapeHtml(simplify(t));
-  const li=[]; for(let k=1;k<=6;k++) li.push(`<li>${G.found['n_pane_'+k]?E(N4S_PANE[k].title):'<span style="opacity:.55">?</span>'}</li>`);
-  el.insertAdjacentHTML('beforeend',`<div class="jh2">${E(S('Moth Memories','Moth Memories'))} (${n4sPanesN()}/6)</div><ol>${li.join('')}</ol>`); } }catch(e){ console.error(e); } }; }
+  const li=[]; for(let k=1;k<=6;k++) if(G.found['n_pane_'+k]&&N4S_PANE[k]) li.push(`<li>${E(N4S_PANE[k].title)}</li>`);
+  if(li.length) el.insertAdjacentHTML('beforeend',`<div class="jh2">${E(S('Moth Memories','Moth Memories'))}</div><ul>${li.join('')}</ul>`); } }catch(e){ console.error(e); } }; }
 
 // ---------- 3. the stages, the journal and the act (FINALE 4)
 const N4S_HINTS={
@@ -1110,7 +1107,7 @@ function n4sSimpleDragon(x,y,col,s){ s=s||1; ctx.save(); ctx.translate(x,y); ctx
       try{ if(typeof MV!=='undefined'&&MV){ MV.hover=null; MV.lx=p.x; MV.ly=p.y; } }catch(e){}
       const g=N4ST.ally.glaciar; if(g){ g.x=p.x-80; g.y=p.y-40; }
       emit(p.x,p.y,16,{col:'200,235,255',smin:40,smax:140,lmin:.3,lmax:.7,zmin:1.5,zmax:3});
-      try{ bubble(player,simplify(S('Caught you, dumpling! Slow at everything except catching.','Caught you, dumpling!')),{who:'Glaciar',col:'#a8e0ff'}); }catch(e){}
+      try{ bubble(player,simplify(S("Caught you! I'm slow at everything except catching.",'Caught you!')),{who:'Glaciar',col:'#a8e0ff'}); }catch(e){}
       return; } } }catch(e){ console.error(e); }
   return base(p,bad); }; }
 
@@ -1357,38 +1354,35 @@ function n4sEpilogue(){
   const L=n4sBookLines()||n4sEpiLines();
   runDialogue(L,()=>{ scene='play'; G.flags.n_epi=0; n4sBookClose(); n4sVictory(); },{mood:'n_epilogue'});
 }
-// ---------- 10. the victory screen (FINALE 13): "Ending n of 3", the stats, Keep exploring / Title screen
+// ---------- 10. the victory screen (FINALE 13): the ending's title and line, plain stats, Keep exploring / Title screen.
+// (v12 R4) It never counts or names other endings: no "Ending n of 3", no "Endings found", no "other ways this story can
+// end", no Act I ending title. The ending is still remembered in eb_n_endings (a13_cloud merges it), never shown.
 function n4sVictory(){
   const end=G.choices.n_end||'dawn', E=N4S_ENDINGS[end]||N4S_ENDINGS.dawn;
-  let seen={}; try{ seen=store.get('eb_n_endings',{})||{}; seen[end]=true; store.set('eb_n_endings',seen); }catch(e){}
-  const k=Object.keys(seen).length;
+  try{ const seen=store.get('eb_n_endings',{})||{}; seen[end]=true; store.set('eb_n_endings',seen); }catch(e){}
   N4ST.run=false; N4ST.cut=null; N4ST.cam=null; G.flags.n_dawn=1; G.flags.n_done=1; G.flags.n_phase=0; G.flags.moon=100;
   if(G.stage!=='n_end') G.stage='n_end';
   N4ST.bigTo=0; N4ST.big=0; G.flags.n_big=0;
   endAct(5,{title:E.title,lines:[E.msg]});
   try{
-    const F1=(typeof ENDINGS!=='undefined'&&ENDINGS[G.choices.ending||'hero'])||{title:''};
     $('#winTag').textContent=simplify(S('THE LONG NIGHT IS OVER','THE LONG NIGHT IS OVER'));
     $('#winTitle').textContent=simplify(E.title); $('#winMsg').textContent=simplify(E.msg);
-    const panel=$('#winTitle').parentElement;
-    let sub=$('#n4sWinSub'); if(!sub){ sub=document.createElement('div'); sub.id='n4sWinSub'; $('#winMsg').insertAdjacentElement('afterend',sub); }
-    sub.hidden=false; sub.textContent=simplify(`Ending ${E.n} of 3 · Endings found: ${k} of 3 · First journey: ${F1.title||''}`);
     // (every friend who came: the earlier acts' allies and the friends won back on the peak, plus Grandpa)
     const allies=['greymane','cinder','tikka','vesper','glaciar','hush'].filter(id=>n4sAllyEarned(id)).length+(n4sEnd()==='lantern'?1:0);
+    // (what was found is a plain count, never out of how many; Moth Memories and Duchess only once at least one was found)
+    const panes=n4sPanesN(), duch=n4sDuchessN();
     const rows=[[playClock(),S('Time','Time')],[player.level,S('Level','Level')],[Object.values(G.quests||{}).filter(q=>q&&q.done).length,S('Quests done','Quests')],
-      [allies,S('Friends on the peak','Friends')],[`${n4sPanesN()}/6`,S('Moth Memories','Moth Memories')],[`${n4sDuchessN()}/5`,S('Duchess sightings','Duchess')],
+      [allies,S('Friends on the peak','Friends')],...(panes>0?[[panes,S('Moth Memories','Moth Memories')]]:[]),...(duch>0?[[duch,S('Duchess sightings','Duchess')]]:[]),
       [G.found.heartEmbers|0,S('Heart Embers','Heart Embers')],[G.deaths|0,S('Times knocked down','Falls')]];
     $('#winStats').innerHTML=rows.map(([v,l])=>`<div class="stat"><b>${escapeHtml(String(v))}</b><span>${escapeHtml(simplify(l))}</span></div>`).join('');
     let x=$('#n4sWinX'); if(!x){ x=document.createElement('div'); x.id='n4sWinX'; $('#winStats').insertAdjacentElement('afterend',x); } x.hidden=false; x.textContent='Made for Toby, Gus, Linus and Rosemary.';
-    let more=$('#n4sWinMore'); if(!more){ more=document.createElement('div'); more.id='n4sWinMore'; panel.appendChild(more); }
-    more.hidden=k>=3; more.textContent=simplify(S('There are other ways this story can end.','There are other endings to find.'));
     const mb=$('#bWinMenu'); if(mb){ if(!mb.dataset.n4s) mb.dataset.n4s=mb.textContent; mb.textContent=simplify(S('Title screen','Title screen')); }
     if(ACT_RT.win) ACT_RT.win.explore=()=>{ n4sFreeRoam(); setBanner(S('The Long Night is over','The Long Night is over'),S('The Long Night is over. Go anywhere you like.','Go anywhere you like!'),3.6); };
   }catch(err){ console.error(err); }
   try{ saveGame(true); }catch(e){}
 }
 // any other act screen hides the finale's extra lines
-{ const base=actScreen; actScreen=function(o){ try{ for(const id of ['n4sWinSub','n4sWinX','n4sWinMore']){ const el=$('#'+id); if(el) el.hidden=true; } const mb=$('#bWinMenu'); if(mb&&mb.dataset.n4s) mb.textContent=mb.dataset.n4s; }catch(e){} return base(o); }; }
+{ const base=actScreen; actScreen=function(o){ try{ for(const id of ['n4sWinX']){ const el=$('#'+id); if(el) el.hidden=true; } const mb=$('#bWinMenu'); if(mb&&mb.dataset.n4s) mb.textContent=mb.dataset.n4s; }catch(e){} return base(o); }; }
 function n4sFreeRoam(){ N4ST.cut=null; N4ST.cam=null; N4ST.ally={}; N4ST.allies=[]; G.flags.n_dawn=1; G.flags.n_epi=0; try{ if(typeof n4Sync==='function') n4Sync(); }catch(e){} }
 // Duchess on the summit from the dawn on (her last sighting: Meh.)
 function n4sDuchObj(){ if(!G||!(N4ST.duchShow||G.flags.n_dawn>=1||G.done)||curMap()!==4||AREA) return null; if(!(G.choices.n_end)) return null;

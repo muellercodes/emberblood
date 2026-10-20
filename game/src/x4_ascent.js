@@ -341,7 +341,7 @@ function n4aReadPane(q){
   const D=N4A_PANE[k];
   n4aScene('n_pane_'+k,D.lines,()=>{
     if(k===3&&first) n4aBub('n_bub_pane3','ash',S('Nyx? Her name was Nyx?','Her name was Nyx?'));
-    if(first) n4aBanner(S('A Moth Memory','A Moth Memory'),D.title+' ('+n+'/6)',2.6);
+    if(first) n4aBanner(S('A Moth Memory','A Moth Memory'),D.title,2.6);
     if(n>=6&&first&&!G.flags.n_panes_hp){ G.flags.n_panes_hp=1; player.maxHp+=10; player.hp=player.maxHp; n4aSnd('heart'); n4aBanner(S('All six Moth Memories','All six memories'),S('+10 max health','+10 health'),3);
       n4aScene('n_panes_all',[['ash',S("She wasn't trying to be a monster. She was just scared of being alone. ...That's still not okay. But I get it.",'She was not a monster. She was scared of being alone. That is not okay. But I get it.')]]); }
     n4aSave();

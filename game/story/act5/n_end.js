@@ -1,8 +1,9 @@
 // Act V, the end: The Long Night Is Over (owner N5b). Data only.
 // x4_story's choice (n_nyxara's n_choice) moves the stage here. Then, in one sitting: the dawn (n_dawn_lines: the
 // glass turns clear, Duchess on the very top, the ride home), the epilogue book (seven pages, one painted plate each,
-// four lines at most: the act file's book list), and the victory screen (x4_story's n4sVictory: "Ending n of 3", the
-// stats, "Made for Toby, Gus, Linus and Rosemary.", endAct(5)). After "Keep exploring", Ash wakes up on the green in
+// four lines at most: the act file's book list), and the victory screen (x4_story's n4sVictory: the ending's title and
+// line, plain stats, "Made for Toby, Gus, Linus and Rosemary.", endAct(5); never a count of endings). After "Keep
+// exploring", Ash wakes up on the green in
 // Emberhollow on the thousand-and-first Lantern Day (n_home), so "Climb on" and "All aboard" stay true. If Ash solved
 // the fourth post, the real green has its fourth post back, lit for whoever is out in the dark.
 chapter({
