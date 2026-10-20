@@ -51,7 +51,7 @@ function vLerp(o,a,b,k){ o[0]=lerp(a[0],b[0],k); o[1]=lerp(a[1],b[1],k); o[2]=le
 function aSeg(h,u,a0,a1,r,col,r2,bias){ return aL(h[0]+u[0]*a0,h[1]+u[1]*a0,h[2]+u[2]*a0,h[0]+u[0]*a1,h[1]+u[1]*a1,h[2]+u[2]*a1,r,col,r2,bias); }
 function aPtUV(i,h,u,a,v,b){ aPt(i,h[0]+u[0]*a+v[0]*b,h[1]+u[1]*a+v[1]*b,h[2]+u[2]*a+v[2]*b); }
 // marks: body-space points remembered while building, projected to the screen afterwards (glows, flames, rings)
-const AM={}; for(const k of ['snout','jet','ham','bA','bB','hand','eyeL','eyeR','tip','head','mouth']){ AM[k]=[0,0,0]; AM[k].on=false; }
+const AM={}; for(const k of ['snout','jet','ham','bA','bB','hand','eyeL','eyeR','tip','head','mouth','item']){ AM[k]=[0,0,0]; AM[k].on=false; }
 function aMark(k,x,y,z){ const a=AM[k]; arP(x,y,z,a); a.on=true; }
 const AWE=[[],[]]; for(const w of AWE) for(let i=0;i<10;i++) w.push([0,0,0]);
 const AHS=[]; for(let i=0;i<8;i++) AHS.push([0,0,0]); AHS.n=0;
@@ -497,7 +497,10 @@ function ashBuild(g,p,fx,fy,o){
   if(hasW) ashWings(pal,wo,wang,wfk,bz,lite);
   else if(hasJ){ const up=(p.z||0)>0||MV.flapT>0; ashNubs(pal,bz,up?0.55+0.45*Math.sin(t*46):0,lite); }
   if(wid) ashWpnDraw(p,wid,pal);
-  if(fk>0.05){ const H=fs>0?hR:hL; const bx=H[0]+0.6, by=H[1]-fs*0.3, bz2=H[2]+1.2; aB(bx,by,bz2,3.0,'#3ec46a'); aD(bx-0.8,by-0.8,bz2+1.4,0.95,'#d8ffe4',0.05);
+  // (v12) a bun, a pepper, taffy and the other items are held up in the hand as their own icon (drawn by ashPost at
+  // the 'item' mark, p.useIco from useItem in e11_items.js); only a flask from the belt is the green flask
+  if(fk>0.05&&p.useIco){ const H=fs>0?hR:hL; aMark('item',H[0]+1.6,H[1]-fs*0.3,H[2]+2.4); }
+  else if(fk>0.05){ const H=fs>0?hR:hL; const bx=H[0]+0.6, by=H[1]-fs*0.3, bz2=H[2]+1.2; aB(bx,by,bz2,3.0,'#3ec46a'); aD(bx-0.8,by-0.8,bz2+1.4,0.95,'#d8ffe4',0.05);
     aL(bx+1.5,by,bz2+2.0,bx+3.0,by,bz2+4.0,1.1,'#a8e8c0'); aB(bx+3.4,by,bz2+4.6,1.15,'#a07040'); }
   // head
   arPush(); arMove(1.0+hfx,0,bz+18.6+hfz); arPitch(hp); arYaw(hy);
@@ -546,6 +549,11 @@ function ashPost(g,p,k){
     g.save(); g.globalCompositeOperation='lighter'; g.lineCap='round'; g.lineJoin='round'; g.strokeStyle=`rgba(255,${120+40*up|0},60,${al})`; g.lineWidth=1.8*k;
     for(const E of AWE){ g.beginPath(); for(let i=0;i<9;i++){ aScr(E[i],b); if(i) g.lineTo(b[0],b[1]); else g.moveTo(b[0],b[1]); } g.stroke(); }
     g.restore();
+  }
+  // (v12) the item in his hand (a small icon, hidden when the hand is behind his head, as the flask is by his body)
+  if(I.flask>0.05&&p.useIco&&AM.item.on&&typeof drawItemIcon==='function'){
+    aScr(AM.item,a); let vis2=true; if(AM.head.on){ aScr(AM.head,_s3); vis2=a[2]>_s3[2]-3; }
+    if(vis2){ const pa=g.globalAlpha; g.globalAlpha=pa*clamp(I.flask*1.6,0,1); drawItemIcon(g,p.useIco,a[0],a[1],11*k*(0.7+0.3*I.flask)); g.globalAlpha=pa; }
   }
   // gold eyes glow a little in the dark
   if(I.night>0.2&&AM.head.on&&AM.eyeL.on){ aScr(AM.head,_s3); const hd=_s3[2]; for(const e of [AM.eyeL,AM.eyeR]){ aScr(e,a); if(a[2]>hd+1.5) aGlow(g,a[0],a[1],4*k,'255,200,80',0.32*I.night); } }

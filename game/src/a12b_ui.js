@@ -497,7 +497,9 @@ function openMap(){
   scene='map'; SFX.setFire(false); keys.clear(); mouse.l=mouse.r=false; touch.held={}; touch.stickId=null;
   mapSel=null; $('#bTravel').hidden=true; mapHintSet();
   MAPUI.view=AREA&&AREA.rooms?-1:curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
+  mapZoomStart();   // (v12) opens zoomed on Ash (e1_maps.js)
   drawMapScreen(); renderJournal(); show('mapov');
+  try{ if(mapZSize()){ mapZoomStart(); drawMapScreen(); } }catch(e){}   // (v12) the canvas fills the frame once it is laid out
 }
 const SO_FAR={wake:'It is Lantern Day in Emberhollow. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
   lore:'Emberhollow is safe for now. Elder Yara has something important to tell you.',hollow:'Yara told you the truth. Vorlaxis, the dragon sealed under Cinder Mountain, is your great ×13 grandfather, and only Emberblood fire can keep his Wards burning.',
@@ -659,16 +661,18 @@ function bagPadStar(){
 function closeMap(silent){ if(scene!=='map') return; scene='play'; hideAll(); if(!silent) SFX.play('ui'); }
 function mapXY(x,y){ const F=mapFit(MAPUI.view); return [F.ox+x*F.s,F.oy+(y-F.y0)*F.s]; }
 function drawMapScreen(){
+  try{ mapZUI(); }catch(e){}   // (v12) the zoom buttons hide on the dungeon page
   if(MAPUI.view===-1){ if(AREA&&AREA.rooms&&typeof dunMapDraw==='function'){ dunMapDraw(mapG,mapCv.width,mapCv.height); return; } MAPUI.view=curMap(); }   // the dungeon page
   const g=mapG, w=mapCv.width, h=mapCv.height, V=MAPUI.view, MF=mapFit(V), O=ovOf(V), FG=fogOf(V), on=o=>itemMap(o)===V;
-  g.setTransform(1,0,0,1,0,0); g.fillStyle='#0e0a08'; g.fillRect(0,0,w,h);
+  // (v12) the canvas fills the map frame now: around the whole map it is the frame's own colour, as it was
+  g.setTransform(1,0,0,1,0,0); g.fillStyle=LOOK.sb?'#e9d6ac':'#0e0a08'; g.fillRect(0,0,w,h);
   if(O.cv){ g.imageSmoothingEnabled=true; g.drawImage(O.cv,MF.ox,MF.oy,MF.w,MF.h); }
   const fcv=fogCanvas(V), fcg=fcv.getContext('2d'), img=fcg.createImageData(FG.w,FG.h);
   for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
   fcg.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(fcv,MF.ox,MF.oy,FG.w*FG.cs*MF.s,FG.h*FG.cs*MF.s);
   const seen=(x,y)=>fogSeen(V,x,y);
   g.textAlign='center'; g.textBaseline='middle';
-  if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(0,wy); g.lineTo(w,wy); g.stroke(); }
+  if(V===0){ g.strokeStyle='rgba(30,26,36,.9)'; g.lineWidth=6; const [, wy]=mapXY(0,WALL_Y); g.beginPath(); g.moveTo(Math.max(0,MF.ox),wy); g.lineTo(Math.min(w,MF.ox+MF.w),wy); g.stroke(); }
   for(const k in POI){ const p=POI[k]; if(!on(p)||!seen(p.x,p.y)) continue; const [x,y]=mapXY(p.x,p.y); g.font='700 21px Cinzel, Georgia, serif'; g.lineWidth=5; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(p.name,x,y-22); g.fillStyle='#f2e2c4'; g.fillText(p.name,x,y-22); g.fillStyle='#e8d0a0'; g.beginPath(); g.arc(x,y,6,0,TAU); g.fill(); }
   for(const c of mapList(CAMPS,V)){ if(!seen(c.x,c.y)) continue; const cl=G.campsCleared[c.id]; if(cl!=null&&G.worldTime-cl<300) continue; const [x,y]=mapXY(c.x,c.y); g.fillStyle='#ff6a4a'; g.beginPath(); g.moveTo(x,y-9); g.lineTo(x+8,y+6); g.lineTo(x-8,y+6); g.closePath(); g.fill(); }
   for(const s of mapList(SHRINES,V)){ const found=G.shrines[s.id]; if(!found&&!seen(s.x,s.y)) continue; const [x,y]=mapXY(s.x,s.y); g.fillStyle=found?'#7fd0ff':'#6b6f7a'; g.strokeStyle=mapSel===s?'#fff':'#0a0a0a'; g.lineWidth=mapSel===s?4:2; g.beginPath(); g.arc(x,y,mapSel===s?13:9,0,TAU); g.fill(); g.stroke(); }
@@ -689,9 +693,10 @@ mapCv.addEventListener('click',e=>{
   let best=null,bd=420*420; for(const s of mapList(SHRINES,MAPUI.view)){ if(!G.shrines[s.id]) continue; const d=dist2(x,y,s.x,s.y); if(d<bd){bd=d;best=s;} }
   mapSelect(best);
 });
-function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there.`; else h.textContent='Tap a blue shrine you have found to fast travel there.'; }
+function mapHintSet(){ const h=$('#mapHint'); if(padActive()) h.innerHTML=`Press ${padChip(PB.L1)} or ${padChip(PB.R1)} to pick a shrine you have found, then travel there. ${padChip(PB.R2)} and ${padChip(PB.L2)} zoom, the right stick moves the map.`; else h.textContent=usingTouch?'Pinch or tap + and − to zoom, drag to look around. Tap a blue shrine you have found to fast travel there.':'Scroll or press + and − to zoom, drag to look around. Click a blue shrine you have found to fast travel there.'; }
 function mapSelect(best){
   mapSel=best; const bt=$('#bTravel');
+  if(best) try{ mapZShow(best.x,best.y); }catch(e){}   // (v12) zoomed in: bring a picked shrine into view
   if(best){ if(G.inCombat||(G.boss&&!G.boss.dead)){ bt.hidden=true; $('#mapHint').textContent='You can’t fast travel while enemies are close.'; } else { bt.hidden=false; bt.textContent=`Travel to ${best.name}`; $('#mapHint').textContent=best.name; } }
   else{ bt.hidden=true; mapHintSet(); }
   drawMapScreen();

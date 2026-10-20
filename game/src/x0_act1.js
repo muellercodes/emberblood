@@ -1889,10 +1889,19 @@ function a1Slab(g,hx,hy,a,w,h,col,handle){
   if(LOOK.sb){ const H=a1Hull(P.concat(P.map(([x,y])=>[x,y-h]))); g.strokeStyle=SBC.outline; g.lineWidth=1.7; g.beginPath(); H.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y)); g.closePath(); g.stroke(); }
 }
 // both doors of a gate as they stand now (only: just that one, for a north-south gate's doors, which sort apart)
+// (v12) A north-south gate (the Brindle and Field Gates) is seen end on, so shut it read as a column of planks between
+// the posts. Drawn shut, its two leaves now meet in a shallow V that points into the village (A1G_BOW each, each leaf a
+// little longer so they still meet in the middle): enough of each leaf's face turns to the camera to show its planks,
+// its iron straps and its ring, so it reads as a pair of doors. The bow is the start of the swing, so opening is one
+// smooth movement. Only the art bows; the collider across the gap is as before.
+const A1G_BOW=24*Math.PI/180;
 function a1GDrawDoors(g,only){
   const k=a1GK(g), e=k*k*(3-2*k), j=a1GJig(g)*0.035, m=a1GMode(g);
   const C=g.id==='north'&&m==='gate'?['#b88450','#ad7a48']:['#8a5a34','#82552f'];
-  for(let i=0;i<2;i++){ if(only!=null&&only!==i) continue; const d=g.doors[i]; a1Slab(ctx,d.hx+d.ix*e,d.hy+d.iy*e,d.a0+d.da*e+(i?-j:j),d.w,g.h,C[i],m==='gate'); }
+  for(let i=0;i<2;i++){ if(only!=null&&only!==i) continue; const d=g.doors[i];
+    let a=d.a0+d.da*e+(i?-j:j), w=d.w;
+    if(!g.ew&&m!=='broken'){ const b=1-e; a+=Math.sign(d.da)*A1G_BOW*b; w=d.w*(1+(1/Math.cos(A1G_BOW)-1)*b); }
+    a1Slab(ctx,d.hx+d.ix*e,d.hy+d.iy*e,a,w,g.h,C[i],m==='gate'); }
 }
 // see-through, as the wall pieces are, when Ash is just behind (north of) a gate
 function a1GFadeAt(x0,x1,y){ const p=player; if(!p||p.dead) return 1; const dy=y-p.y; return dy>2&&dy<64&&p.x>x0-12&&p.x<x1+12?0.42:1; }

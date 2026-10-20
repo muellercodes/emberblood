@@ -4,7 +4,15 @@
 .maphead h2{margin:0}
 .maphead span{color:var(--muted);font-size:13px}
 .mapwrap{position:relative;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--edge);background:#0e0908;display:flex;justify-content:center}
-#mapcv{display:block;width:auto;height:auto;max-width:100%;max-height:58vh;margin:0 auto;cursor:pointer;touch-action:manipulation}
+#mapcv{display:block;width:auto;height:auto;max-width:100%;max-height:58vh;margin:0 auto;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+.mapzoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:2}
+.mapzoom[hidden]{display:none}
+.mapzoom .mzb{min-width:40px;height:40px;padding:0 10px;border-radius:10px;border:1px solid rgba(255,214,140,.45);background:rgba(14,10,8,.82);color:#ffe6c0;font:700 22px/1 Rubik,system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.mapzoom .mzb.mzw{font-size:13px;font-weight:700}
+.mapzoom .mzb:disabled{opacity:.4;cursor:default}
+.mapzoom .mzb:focus-visible{outline:3px solid #ffd27a;outline-offset:1px}
+html.sb .mapzoom .mzb{background:#fff3d6;color:#3b2233;border:2px solid #3b2233;box-shadow:0 2px 0 #3b2233}
+@media (max-width:600px){.mapzoom{top:6px;right:6px;gap:5px}.mapzoom .mzb{min-width:34px;height:34px;font-size:19px;padding:0 8px}.mapzoom .mzb.mzw{font-size:12px}}
 .mapfoot{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
 .mapfoot p{margin:0;font-size:13px;color:var(--muted);flex:1;min-width:200px}
 .mapfoot .btn{width:auto}

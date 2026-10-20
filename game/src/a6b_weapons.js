@@ -886,6 +886,8 @@ function heroIdle(w,p){
 function drawHeroWeapon(p){
   const armed=!(G&&G.mode==='story'&&!G.flags.forge);
   const w=p.swingT>0&&p.swingW?p.swingW:curWeapon();
+  // (v12) an item (bun, pepper, taffy...) shows as its own little icon in the hand; a flask from the belt stays green
+  if(p.drinkT>0&&p.useIco&&typeof drawItemIcon==='function'){ ctx.save(); ctx.translate(15,7); ctx.rotate(-(p.facing||0)); drawItemIcon(ctx,p.useIco,0,0,10); ctx.restore(); if(armed) heroIdle(curWeapon(),p); return; }
   if(p.drinkT>0){ ctx.fillStyle='rgba(120,255,160,.85)'; ctx.beginPath(); ctx.arc(15,7,3,0,TAU); ctx.fill(); if(armed){ ctx.strokeStyle='#d8e8e0'; ctx.lineWidth=1; ctx.stroke(); heroIdle(curWeapon(),p); } return; }
   if(!armed) return;
   const pk=p.wEquipT>0?Math.sin(clamp(p.wEquipT/0.35,0,1)*Math.PI):0;

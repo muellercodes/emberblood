@@ -248,7 +248,9 @@ function touchBase(){ const B=H-SAFE.b; return B-SAFE.t<600?B-30:Math.min(B-300,
 function drawPromptTarget(){
   const pr=G.prompt; if(!pr||pr.x==null||pr.y==null||!player) return;
   if(Math.abs(pr.x-player.x)<2&&Math.abs(pr.y-player.y)<2) return;   // a prompt about Ash himself (fishing, flying)
-  const sx=(pr.x-cam.x)*zoom, sy=(pr.y-cam.y)*zoom; if(sx<-40||sy<-40||sx>W+40||sy>H+40) return;
+  // (v12) indoors the ring sits on the near edge of the thing (rx, ry from updateInteractions), not a long counter's middle
+  const rx=pr.rx!=null?pr.rx:pr.x, ry=pr.ry!=null?pr.ry:pr.y;
+  const sx=(rx-cam.x)*zoom, sy=(ry-cam.y)*zoom; if(sx<-40||sy<-40||sx>W+40||sy>H+40) return;
   const n=AREA?AREA.npcs&&AREA.npcs.find(q=>q.x===pr.x&&q.y===pr.y):G.npcs.find(q=>q.x===pr.x&&q.y===pr.y);
   const r=(n?20:16)*zoom, k=0.5+0.5*Math.sin((G.time||0)*4.2), g=ctx;
   g.save(); g.translate(sx,sy+(n?3:0)*zoom); g.scale(1,0.5);

@@ -855,6 +855,7 @@ function s10Prompts(offer){
     //  the Grapple Tail's, which shows only when no other prompt is up, at the Cut's lip beside the rope fence)
     const again=(k==='examine'||k==='prop')&&!T.has(id)&&!!(G.story&&G.story._ex&&G.story._ex[id]);
     const at=gAt||s10Pos(P); if(!at) continue; const d=dist(p.x,p.y,at.x,at.y), r=again?Math.max(24,(P.r||22)+4):(P.r||22)+50; if(d>r) continue;
+    if(AREA&&typeof reachPlace==='function'&&!reachPlace(at.x,at.y,P.r||22)) continue;   // (v12) indoors: close and in front (a9d_quests.js)
     // (I5) nor when the Grapple Tail can reach a post from here (Vesper's cracked mask lies on the Silk Gallery's edge,
     // right where Ash grapples the first post: E only read the mask again)
     if(again){ try{ if(typeof p2Pick==='function'&&typeof canGrapple==='function'&&canGrapple()&&!AREA&&p2Pick(p,(typeof P2!=='undefined'&&P2.inp)||{mx:0,my:0})) continue; }catch(e){} }
@@ -878,7 +879,7 @@ function s10PersonFirst(){
   if(o.w){ const ex=Math.max(0,Math.abs(p.x-o.x)-o.w/2), ey=Math.max(0,Math.abs(p.y-o.y)-(o.h||o.w)/2); d=Math.hypot(ex,ey); reach=34; }
   else { d=dist(p.x,p.y,o.x,o.y); reach=(o.r||16)+34; }
   const fs=d-reach; let bn=null, bs=1e9;
-  for(const n of AREA.npcs){ const dn=dist(p.x,p.y,n.x,n.y); if(dn>=(n.turtle?90:70)) continue; const sc=dn-70; if(sc<=fs+0.5&&sc<bs){ bs=sc; bn=n; } }
+  for(const n of AREA.npcs){ const dn=dist(p.x,p.y,n.x,n.y); if(dn>=(n.turtle?90:70)||(typeof reachPerson==='function'&&!reachPerson(n))) continue; const sc=dn-70; if(sc<=fs+0.5&&sc<bs){ bs=sc; bn=n; } }
   if(bn) G.prompt={text:`Talk to ${bn.name}`,act:()=>talkTo(bn),x:bn.x,y:bn.y};
 }
 { const base=updateInteractions; updateInteractions=function(dt){ base(dt); try{ if(AREA&&G&&G.mode==='story'&&S10.booted) s10PersonFirst(); }catch(e){ console.error(e); } try{ if(AREA&&G&&G.mode==='story'&&S10.booted){ let best=null; s10Prompts((d,text,act,x,y)=>{ if(!best||d<best.d) best={d,text,act,x,y}; });

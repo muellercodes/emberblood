@@ -113,7 +113,6 @@ function renderSlots(){
     return `<div class="slot${i===latestSlot()?' cur':''}"><div class="sn">Journey ${i+1}<span>${escapeHtml(d.ago)}</span></div><p class="sh">${escapeHtml(d.head)}</p><p class="sd">${escapeHtml(d.sub)}</p><div class="row"><button class="btn c sm hot" data-a="play" data-i="${i}">Continue</button><button class="btn c sm" data-a="over" data-i="${i}">Start over</button><button class="btn c sm" data-a="del" data-i="${i}">Delete</button></div></div>`;
   }).join('');
   for(const b of el.querySelectorAll('button')) b.addEventListener('click',()=>slotAction(b.dataset.a,+b.dataset.i));
-  bringSlotRow(el);   // (v12) "Bring a save from the old address" (a13_cloud.js)
 }
 function slotAction(a,i){
   SFX.init(); SFX.play('ui');
