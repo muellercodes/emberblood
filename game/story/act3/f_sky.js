@@ -76,7 +76,7 @@ chapter({
     ],
     f_sky_shrine: [
       ['narr', 'A small flame burns in a stone bowl, leaning sideways in the wind. It smells like Ember\'s forge.', 'A small flame leans in the wind. It smells like Ember.'],
-      ['f_pennant', '(through the window, on his kite) That\'s her flame! The one Ember left us! The brothers lit the morning candles from it for a thousand years.',
+      ['f_pennant', '(through the window, on his kite) That\'s her flame! The one Ember left us! The brothers lit the morning candles from it, every morning since.',
         '(outside) That is Ember\'s flame! The monks kept it lit.'],
       ['ash', 'I\'m a little afraid of heights.', 'I\'m a little afraid of heights.'],
       ['f_pennant', '(from outside) So am I! Why do you think I\'m tied to a kite? Touch the flame. The wind will do the rest.', '(outside) So am I! Touch the flame.'],

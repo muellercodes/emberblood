@@ -153,7 +153,7 @@ people({
       // the lit Hearth, for the days in between
       { if: 'flag f_hearth_lit', fact: 'f3s_hearth=blue',
         say: [["Look at her. Blue and gold. She hasn't burned like this since I was a girl. I keep laughing at nothing.", 'Look at her. Blue and gold! I keep laughing.'],
-          ["Don't touch the Hearth with your bare claws. Oh, you're an Emberblood. Touch away.", "Don't touch the fire. Oh, you're a dragon. Go on."]] },
+          ["Don't touch the Hearth with your bare claws. Oh, you're the fire one. Touch away.", "Don't touch the fire. Oh, you're the fire one. Go on."]] },
       // topics
       { ask: ['How long have you kept the fire?', 'How long have you kept it?'],
         say: ['Seventy years, and my mother before me, all the way back to the night it was lit. It went out once. I was nine. There was a sneeze.', 'Seventy years. It went out once. I was nine. I sneezed.'] },
@@ -168,8 +168,8 @@ people({
     ],
 
     // ---------------------------------------------------------------- Captain Brann Stoutmitt, the Hearthwardens
-    // Loud, brave and terrified of moths; shouts in exclamation marks, not capitals. Calls Ash "Emberblood" (or moth, if
-    // Ash said he was one at the West Gate: G.choices.f3_moth). His grief is Sir Knut's patrol, six blue plumes who never
+    // Loud, brave and terrified of moths; shouts in exclamation marks, not capitals. Calls Ash "Horns" (or moth, if
+    // Ash said he was one at the West Gate: G.choices.f3_moth). (v12) Never "Emberblood": nobody up here knows the word. His grief is Sir Knut's patrol, six blue plumes who never
     // came home (the small mystery what_knights). The chapters own his lines at f_pass, f_hearth and f_maze.
     f_brann: [
       // the small mystery what_knights: Brann's missing patrol (clue f3_brann_list); x2_people's own "Is anyone missing?"
@@ -253,7 +253,7 @@ people({
         ] },
       // his moment (the old chat): while the white moth is still about
       { if: 'stage>=f_thaw !flag f_hush_done', fact: 'f3s_hush=loose',
-        say: ['Question, Emberblood! Between Hearthwardens! If a moth landed on your nose, what would you do?', 'A moth lands on your nose. What do you do?'],
+        say: ['Question, Horns! Between Hearthwardens! If a moth landed on your nose, what would you do?', 'A moth lands on your nose. What do you do?'],
         re: [
           { t: ['Blow on it, gently, till it goes.', 'Blow on it gently.'], f: 0.5,
             say: [['f_brann', 'Gently! Of course! That is exactly what I would do! After the screaming!', 'Gently! Yes! After the screaming.']] },
@@ -283,7 +283,7 @@ people({
         say: ['When I was a boy a moth flew into my ear. I heard it flapping for a week. A whole week! I have never been the same!', 'A moth flew in my ear once. It flapped for a week!'] },
       { ask: ['Has Sir Knut ever sent word?', 'Has Knut sent word?'], if: 'clue f3_brann_list !solved what_knights',
         say: ['Not one word! A Hearthwarden always writes! Knut writes the way a hen walks, but he writes!', 'Not a word! Knut always writes. Badly, but he writes.'] },
-      { idle: [['Report, Emberblood!', 'Report!'], ['Chin up! What is it?', 'Chin up! What is it?']] },
+      { idle: [['Report, Horns!', 'Report!'], ['Chin up! What is it?', 'Chin up! What is it?']] },
       { bye: [['Dismissed! Mind the moths!', 'Mind the moths!'], ['Off you go! Chin up, tail up!', 'Chin up, tail up!']] },
       { bark: true, if: '!flag f_hush_done', fact: 'f3s_hush=loose', say: ["Is that flapping in my helmet? No! It's my heart! Beating bravely!", "Something's flapping! Oh. It's my heart."] },
       { bark: true, say: ["Hearthwardens! Stand up straight! ...Gunnar, that's a snowman.", "Stand up straight! Gunnar, that's a snowman."] },
@@ -338,7 +338,7 @@ people({
     f_toastwhistle: [
       // her first meeting (before her quest; Brann's shouting got there first)
       { if: '!quest f_warm started stage<f_kindle', once: true,
-        say: ["You must be the Emberblood! Brann has told the whole town. Twice. I'm Mayor Toastwhistle, and everything is fine.", "You're the Emberblood! I'm the Mayor. All is fine."],
+        say: ["You must be the horned boy! Brann has told the whole town. Twice. I'm Mayor Toastwhistle, and everything is fine.", "You're the horned boy! I'm the Mayor. All is fine."],
         re: [
           { t: ['Is everything fine?', 'Is everything fine?'],
             say: [['f_toastwhistle', 'Yes! No. The Hearth is going out and the town is freezing. Apart from that, fine.', 'Yes! No. The fire is going out. Apart from that, fine.']] },
@@ -461,7 +461,7 @@ people({
             say: [['f_gunnhild', 'Maren makes soup? Maren of Emberhollow has a soft side? Don\'t tell me any more. I\'ll faint into the coals.', 'Maren makes soup? Stop. I will faint.']] },
         ] },
       { if: 'quest f_forge active !flag f_forge_lit', fact: 'f3s_forge=cold',
-        say: ["Cold anvil, cold hammer. Breathe on that forge, Emberblood. Blue, mind. Orange won't wake her.", 'Breathe blue on my forge. Orange will not do.'], ref: 'f3s_forge' },
+        say: ["Cold anvil, cold hammer. Breathe on that forge, lad. Blue, mind. Orange won't wake her.", 'Breathe blue on my forge. Orange will not do.'], ref: 'f3s_forge' },
       { if: 'flag f_done',
         say: ['Every smith in Hearthold has been round to look at my forge. I let them look. I don\'t let them touch.', 'Every smith came to see my forge. No touching.'],
         re: [
@@ -564,12 +564,12 @@ people({
     f_hilde: [
       // her first meeting (Brann's shouting got here first)
       { if: 'stage<f_thaw', once: true,
-        say: ["Come in from the cold, lamb! You're the Emberblood Brann keeps shouting about. Sit. Soup. Mind the cat.", 'Come in, lamb! Sit. Soup. Mind the cat.'],
+        say: ["Come in from the cold, lamb! You're the horned boy Brann keeps shouting about. Sit. Soup. Mind the cat.", 'Come in, lamb! Sit. Soup. Mind the cat.'],
         re: [
           { t: ['Where is the cat?', 'Where is the cat?'],
             say: [['f_hilde', 'On the windowsill, being a loaf. Her name is Biscuit. Don\'t sit on Biscuit. People do.', 'On the sill. She is Biscuit. Do not sit on her.']] },
           { t: ['Does Brann really shout about me?', 'Does Brann shout about me?'],
-            say: [['f_hilde', 'From the West Gate tower, every morning. "The Emberblood is here! Stay calm!" Nobody was calm.', '"The Emberblood is here! Stay calm!" Nobody was.', { ref: 'f3_west_gate' }]] },
+            say: [['f_hilde', 'From the West Gate tower, every morning. "The horned boy is here! Stay calm!" Nobody was calm.', '"The horned boy is here! Stay calm!" Nobody was.', { ref: 'f3_west_gate' }]] },
         ] },
       { if: 'choice f_glaciar_home=stay', once: true, fact: 'f3s_glaciar=free',
         say: ["The Snow Mother is real! And she's your auntie! The snow is falling soft as feathers now.", 'The Snow Mother is real! Your auntie!'],

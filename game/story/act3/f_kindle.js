@@ -67,7 +67,7 @@ chapter({
         ['f_brann', "It's that moth making all this snow. The big white one. Not you, moth-dragon. I'd bet my boots on it.", "It's that big white moth making the snow. Not you. I'd bet my boots!",
           { clue: 'f3_brann_bet' }]],
         else: [
-        ['f_brann', "It's that moth making all this snow, Emberblood. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",
+        ['f_brann', "It's that moth making all this snow, Horns. I'd bet my boots on it. My wet boots.", "It's that moth making the snow. I'd bet my boots!",
           { clue: 'f3_brann_bet' }]] },
       ['f_brynja', 'Rimeholm went quiet the night the moth came over. Not one letter since. Go and see, child. Out the West Gate and along the Rim Road, on the sea cliffs.',
         'Rimeholm went quiet when the moth came. Go and see. It is on the sea cliffs.', { promise: 'f_rimeholm', dir: ['f_hearthold', 'f_rimeholm', 'west'] }],

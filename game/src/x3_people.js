@@ -915,9 +915,7 @@ function m3pDataTalk(id){
     const a=actOf(G.stage); return (S10.talk[id]||[]).some(T=>!T.bark&&T._owner&&+T._owner.act===a&&s10TalkOk(T)); }catch(e){ return false; }
 }
 function m3pTalkOnce(key,lines,then){ if(G.seenTalk&&G.seenTalk[key]) return false; G.seenTalk=G.seenTalk||{}; G.seenTalk[key]=1; m3pSay(lines,then); return true; }
-const M3P_DELL1=[m3pL('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
-  m3pL('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),m3pL('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
-  m3pL('dell',`Oh, and my cousin Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went splash." That's it. That's the whole poem.`,`Wendel wrote a poem: "A dragon called Ash watched the moon go splash." That's all.`)];
+// (v12) Dell's old fourth-wall joke ("Three acts? What's an act?") is cut: Dell's Act IV talk is the story data's.
 const M3P_WREN=[m3pL('wren',`Ash! Look at me. Outside. On a raft. In the SEA. I've been sick four times and I've never been happier.`,`Ash! I'm outside! On a raft! I was sick four times. I'm so happy!`),
   m3pL('wren',`Elder Ripple of the merfolk keeps Old Lumen's records. I can read Lumen writing, you know. Badly. Very badly. Better than anyone else up here, which is nobody.`,`I can read Lumen writing. Badly. Better than anyone up here.`),
   m3pL('wren',`If you find anything with writing on it down there, bring it to me. Even if it's soggy. Especially if it's soggy.`,`Find anything with writing? Bring it. Even soggy. Especially soggy.`)];
@@ -953,7 +951,6 @@ onTalk(n=>{
     m3pSay(L); return true; }
   if(id==='dell'&&m3pIV()&&G.flags.m_landed){
     if(m3pPier()){ m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three, moored at the end of the world. I've never been so far from a lake.`,`Your mom climbed a staircase made of moonlight. I stayed with the sandwiches. Somebody had to.`,`When you come down off that mountain, I'll be right here. The kettle's on. It's always on.`]),`I'll wait here at the pier for you.`)]); return true; }
-    if(!G.seenTalk.m3p_dell1&&m3pR('m_drift')){ G.seenTalk.m3p_dell1=1; m3pSay(M3P_DELL1.slice()); return true; }
     m3pSay([m3pL('dell',pick([`The Soggy Biscuit Three! Steam paddle, brass whistle, and a captain who has never once sunk her. It's been eleven days now.`,`Three days east and I still haven't sunk! Old Sal won't believe it.`,`Mags says the engine makes that noise on purpose. I've decided to believe her.`]),`My boat still floats! Eleven days!`),
       m3pL('dell',`If you want to sail home to Gearhaven, the boat's at the end of the dock. Just say.`,`Want to sail home? The boat's at the dock.`)]); return true; }
   if(id==='wren'&&m3pIV()&&m3pBoatIn()){
@@ -1158,9 +1155,9 @@ Object.defineProperty(STORY,'m_leash_reveal',{configurable:true,get(){ return [
   m3pDo(()=>{ G.flags.m_leash_known=1; }),
   m3pIf(()=>!G.flags.f_page11,'wren',`It's my lost page. The ELEVENTH page of the Wardens' book! Ember must have left a copy with her friends here. It's been under the sea for five hundred years!`,`It's the lost ELEVENTH page! It was under the sea for five hundred years!`),
   m3pIf(()=>!!G.flags.f_page11,'wren',`It's a copy of the eleventh page! Eider found the other one in Hearthold. Two page elevens. I'm going to frame one and sleep with the other.`,`Another eleventh page! Eider found one too. I'll frame one and hug the other.`),
-  m3pN(`"On the first Lantern Day, a little gray moth sat on Ember's lantern all night. Ember named her Nyx. We thought nothing of it." (Iska)`,`"A little gray moth sat on Ember's lantern all night. Ember named her Nyx." (Iska)`),
+  m3pN(`"On the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember gave her a name. We thought nothing of it." (Iska)`,`"A grey moth sat on Ember's lantern. Ember gave her a name." (Iska)`),
   m3pL('iska',`I wrote that. I really did think nothing of it. I was wrong.`,`I wrote that. I thought nothing of it. I was wrong.`),
-  m3pDo(()=>{ G.flags.m_page11=1; G.choices.extra=G.choices.extra||{}; G.choices.extra.m_leash=S(`Wren read the Book of Moths: gentle moonfire can melt a silver leash. And the eleventh page named a little moth Nyx.`,`Gentle moonfire can melt a leash. A little moth was called Nyx.`); })]; }});
+  m3pDo(()=>{ G.flags.m_page11=1; G.choices.extra=G.choices.extra||{}; G.choices.extra.m_leash=S(`Wren read the Book of Moths: gentle moonfire can melt a silver leash. And Iska's eleventh page was tucked in the back.`,`Gentle moonfire can melt a leash. Iska's page was in the back.`); })]; }});
 
 // ---------- 13. the places the side quests need (built after the map module's own build)
 // Sable's twelve lamps (m_lamps). Lit before the second eclipse; out after it until relit; lit for good once done.
@@ -1878,7 +1875,7 @@ const M3P_MAIL=[
     m3pL('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
     m3pL('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
     m3pL('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Eat something. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Eat something. Love, Mom.`),
-    m3pIf(()=>!!G.flags.dr_m_moth,'maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Unless they eat moons.`),
+    m3pIf(()=>!!G.flags.dr_m_moth,'maren',`P.S. Pebble says you were talking to a moth in your sleep. Very politely. Good.`,`P.S. You talked to a moth in your sleep. Very politely.`),
     m3pN(`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails west.`),
     m3pDo(()=>{ if(!G.flags.m_dell_away&&!m3pR('m_reforge')){ G.flags.m_dell_away=1; M3P.sig=''; } })]},
   {id:'m_pb_4',from:'yara',when:()=>m3pIV()&&m3pMoon()<=40&&!!G.flags.m_pb_2,lines:[

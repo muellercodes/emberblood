@@ -2,7 +2,8 @@
 // What the player does: the Mirror Temple dungeon stays code (x3_dun_b): Ember's moonfire (and, in the shrine, words
 // in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.), Pip's Lantern, Lord Fanfare (his outro is short
 // now and carries the herring: "She told me she collects shiny things!"). v11: the shrine is Ember's one appearance in
-// Act IV. She made moonfire "for her. For my little moth. In case she ever went wrong." Out on the temple steps every
+// Act IV. She made moonfire "for someone I loved. In case she ever got lost in the dark." (v12: not "my little moth":
+// the Mother is tied to Ember's moth only in Act V.) Out on the temple steps every
 // mirror goes dark and Nyxara's voice says: mend it, then give it to me. Then Ash works out why she wants all three
 // Shards: a whole Heart can burn black, and it has to be given to her (why_three). The Shards are getting colder.
 // The dungeon's own story keys (m_mirror_shrine, m_mirror_won_v, m_mirror_end) are data scenes with the old STORY
@@ -82,8 +83,9 @@ chapter({
       ['ember', 'Hello, little ember. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.',
         'Hello, little ember. This is my last flame. My fire, mixed with moonlight.'],
       ['ash', "What's it for?", "What's it for?"],
-      ['ember', 'For her. For my little moth. In case she ever went wrong.', 'For my little moth. In case she went wrong.'],
-      ['ash', 'Your moth?', 'Your moth?'],
+      // (v12) "someone I loved", not "my little moth": nobody in Act IV ties the Mother to Ember's moth (Act V, ring 1)
+      ['ember', 'For someone I loved. In case she ever got lost in the dark.', 'For someone I loved. In case she got lost.'],
+      ['ash', 'Who?', 'Who?'],
       ['ember', 'Take it, Ash. And if you ever meet her, be gentler than I was.', 'Take it. If you meet her, be gentler than me.'],
       ['narr', 'Behind the flame, words are cut deep into the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', 'Words in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.', { clue: 'm4_black_flame' }],
       ['ash', "Burn black? Fire isn't black.", "Burn black? Fire isn't black."],
@@ -108,7 +110,7 @@ chapter({
     m_mirror_voice: [
       { cam: 'm_mirror_door', s: 1 },
       ['narr', "Behind you, every mirror on the temple's face goes dark at once. In each one, a pair of white eyes opens.", 'Every mirror on the temple goes dark. White eyes open in them.', { do: ['set m4_eyes_on'] }],
-      ['nyxara', "Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, long ago. It hurt very much.", 'You found moonfire. Her priests burned me with it once.'],
+      ['nyxara', "Moonfire. Oh, little ember. Lumen's priests burned me with that, long ago. It hurt very much.", 'Moonfire. The priests burned me with it once.'],
       ['nyxara', 'Mend it, little ember. Then give it to me. You will want to, at the end.', 'Mend it. Then give it to me. You will want to.', { clue: 'm4_mirror_voice' }],
       ['ash', "I won't.", "I won't."],
       ['nyxara', 'Everyone does.', 'Everyone does.'],

@@ -31,7 +31,7 @@ quest({
 
   scene: {
     wm_offer: [
-      ['f_toastwhistle', 'Ash! Emberblood! Official question from the Mayor: how many frozen people can one dragon warm up?',
+      ['f_toastwhistle', 'Ash! Horned boy! Official question from the Mayor: how many frozen people can one dragon warm up?',
         'Official question! How many frozen people can you warm?'],
       ['ash', '...All of them?'],
       ['f_toastwhistle', "TWELVE would do! Twelve, and I'll give you a medal! I've never given anyone a medal! I'll have to make one!",
@@ -42,7 +42,7 @@ quest({
     wm_medal: [
       ['f_toastwhistle', 'Twelve! TWELVE! Everyone, gather round! Hearthwardens, a drum roll!', 'TWELVE! Gather round! A drum roll!'],
       ['narr', 'Captain Brann does a drum roll on his own helmet.', 'Brann drums on his own helmet.'],
-      ['f_toastwhistle', 'I hereby award Ash Emberblood the Warm Hands Medal, for warming hands! And feet! And entire people!',
+      ['f_toastwhistle', 'I hereby award Ash of Emberhollow the Warm Hands Medal, for warming hands! And feet! And entire people!',
         'The Warm Hands Medal! For warming whole people!'],
       ['f_toastwhistle', "It's a cookie. ...There's a real one too. And this. A Heart Ember from the Hall. We've been saving it for a hero.",
         "It's a cookie. There's a real one too. And a Heart Ember!"],

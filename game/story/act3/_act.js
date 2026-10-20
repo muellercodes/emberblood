@@ -62,6 +62,9 @@ act({
                                   { if: '!item f3_scarf', then: ['give f3_scarf'] }] },
     { if: 'stage>=f_gap', then: ['clue f3_climbers'] },
     { if: 'stage>=f_dread', then: ['clue f3_gate_carving', 'clue f3_drum_seen', 'solve how_open', 'clue f3_the_mother', 'clue f3_hush_friend'] },
+    // (v12, last so the entries above keep their places: the engine remembers each by its index) Hush names herself on
+    // the Drum Stone (f_drum); a save already past the drum knows her name
+    { if: 'flag f_drum', then: ['set f3_hush_named'] },
   ],
 
   gates_min: 5,

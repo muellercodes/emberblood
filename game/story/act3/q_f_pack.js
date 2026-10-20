@@ -49,7 +49,7 @@ quest({
         ['narr', 'He leans his huge head against you. When you need the pack, it will come.',
           'He leans on you. The pack will come when you need it.'],
         { do: ['set f_pack_ally', 'ally f_pack_ally',
-          { banner: ['Greymane will come', 'Greymane will come'], sub: ['When you face the ice dragon, the pack will run with you.', 'The wolves will help you fight!'] }] }] },
+          { banner: ['Greymane will come', 'Greymane will come'], sub: ['When you face whatever sleeps on the mountain, the pack will run with you.', 'The wolves will help you fight!'] }] }] },
       { if: 'quest f_mumble done', then: [['narr', 'From the Pinewhisper, a yeti roars along, a little out of tune.', 'A yeti roars along. Happily.']] },
       ['narr', 'Before he goes, Greymane digs in the snow and drops something at your feet: an old Hearthwarden helmet with a blue plume.',
         'Greymane digs up a helmet with a blue plume.', { clue: 'f3_wolf_helmet' }],

@@ -80,7 +80,8 @@ chapter({
     ],
     f_dread_nursery: [
       ['narr', 'A tiny round room with a nest of frost and very old toys: giant ice knitting needles, a snowglobe, and a carving of two baby dragons. One is breathing fire on the other one\'s tail. The other is crying icicles.', 'Old toys, and a carving of two baby dragons: one fire, one ice.', { clue: 'f3_nursery' }],
-      ['tove', 'Siblings. One of them grew up and burned a valley. The other one grew up and slept.', 'One grew up and burned a valley. One grew up and slept.'],
+      // (v12) a look, not the answer: the snow_mother solve is where "dragon", "Glaciar" and "Grandpa's sister" meet
+      ['tove', 'Two little dragons. A fire one and an ice one. Somebody loved them both, once.', 'A fire one and an ice one. Somebody loved them.'],
     ],
     f_dread_stair: [
       ['tove', 'Last room. Then her. Are you scared?', 'Last room. Then her. Are you scared?'],

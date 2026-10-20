@@ -1,4 +1,5 @@
-// Act III, Final Chapter: Auntie (owner A3b). Data only.
+// Act III, Final Chapter: The Crown of Dread (owner A3b; v12: the card no longer says "Auntie", which this chapter's
+// own question answers). Data only.
 // What the player does: on the Crown of Dread, before he goes to her, Ash answers the act's last question in the Case
 // Book: who is the Snow Mother of Hearthold's song? Not the moths' Mother (Hush called the dragon the Mother's NEW
 // friend), but Glaciar herself: Ember's Auntie Glee, who lit the Great Hearth with her and did the cold parts. Then the
@@ -19,7 +20,7 @@
 // leaves in the cold (the finale's echo answers it).
 chapter({
   id: 'f_glaciar', act: 3, after: 'f_dread', next: 'm_sail', takeover: true,
-  card: ['Act III · Final Chapter', 'Auntie'],
+  card: ['Act III · Final Chapter', 'The Crown of Dread'],
   so_far: [
     'At the top of Mount Dread, an ice dragon lies bound in four purple chains, with the second Shard of the Ember Heart in her heart. She is dreaming the Long Winter.',
     'At the top of Mount Dread, a dragon lies in purple chains. Shard 2 is in her heart.'],
@@ -35,14 +36,15 @@ chapter({
     // Glaciar coiled round the spike under the spell, from the summit door until the fight's own figure comes out
     // (look glaciar_coil, v10_art3b.js: x2_story's own drawing of her; state blink shows her blue eyes for a moment).
     // After the fight x2_story draws her itself, awake or asleep by G.choices.f_glaciar.
-    f3_glaciar_coil: { map: 2, at: [7300, 41290], kind: 'prop', look: 'glaciar_coil', if: 'stage>=f_dread !flag f_glaciar_won', name: 'Glaciar' },
+    f3_glaciar_coil: { map: 2, at: [7300, 41290], kind: 'prop', look: 'glaciar_coil', if: 'stage>=f_dread !flag f_glaciar_won', name: 'the dragon in chains' },
     // in front of Glaciar's coils (x2_story draws her round the spike at the Crown's middle)
-    f3_auntie: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=free !flag f_done', h: 110,
+    // (v12) her prompts name her, so they wait for the snow_mother solve (the talk step waits for it too)
+    f3_auntie: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=free !flag f_done solved snow_mother', h: 110,
                  name: 'Auntie Glee', prompt: ['Talk to Auntie Glee', 'Talk to Auntie'] },
-    f3_auntie_asleep: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=defeat !flag f_done', h: 60,
+    f3_auntie_asleep: { map: 2, at: [7300, 41350], r: 40, kind: 'examine', if: 'choice f_glaciar=defeat !flag f_done solved snow_mother', h: 60,
                         name: 'the sleeping dragon', prompt: ['Kneel by Auntie Glee', 'Kneel by Auntie'] },
     // where the camera looks when she talks (her head is drawn high above the coils, north of the Crown's middle)
-    f3_glaciar_face: { map: 2, at: [7270, 41150], kind: 'npc_spot', name: 'Glaciar' },
+    f3_glaciar_face: { map: 2, at: [7270, 41150], kind: 'npc_spot', name: "the dragon's head" },
     // the night in Hearthold: Ash comes home down the main street (level 0, below the Hearth's steps) and walks up to
     // the Great Hearth (a scene's fade would stay dark while the scene is up, so the warp happens before it, in play)
     f3_walk_home: { map: 2, at: [6800, 49280], kind: 'npc_spot', name: 'Hearthold\'s main street' },

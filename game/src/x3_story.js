@@ -15,7 +15,7 @@
 
 // ---------- 0. small helpers
 // (what other Act IV modules registered before this one loaded: their versions of these optional talks win)
-const M3S_PRE={wren:!!STORY.m_wren,dell1:!!STORY.m_dell1};
+const M3S_PRE={wren:!!STORY.m_wren};
 const M3S={q:[],rep:{},cam:null,ecl:null,peak:null,voy:null,forge:null,hushFx:null,hushRun:false,hushFin:null,introQ:false,boss:null,bt:0,fb:{},fbAt:{},grey:0,fadeTo:null,lights:[],standin:null,dbg:{}};
 const m3sEasy=()=>!!(G&&G.diff&&G.diff.name==='Easy');
 const m3sHard=()=>!!(G&&G.diff&&G.diff.name==='Hard');
@@ -355,7 +355,7 @@ m3sDef('m_winnie',[
   xl('m_winnie',`The tide follows the moon, dragon child. When the moon is round and fat, the tide is steady. When someone takes bites out of it...`,`The tide follows the moon, child. When someone bites the moon...`),
   xl('ash',`The tide goes wobbly.`,`The tide goes wobbly.`),
   xl('m_winnie',`Wobbly, he says! Ha! I like you. Yes. Wobbly. And it's happened before.`,`Wobbly! Ha! I like you. Yes. And it happened before.`),
-  xl('m_winnie',`Five hundred years ago that moth bit the moon for the very first time. The tide went mad. It rose up and up, and it swallowed a whole city. Old Lumen, the moon city. It stood out there.`,`Long ago, the moth bit the moon for the first time. The sea rose up and swallowed a city. Old Lumen, the moon city.`),
+  xl('m_winnie',`Five hundred years ago the Night Mother bit the moon for the very first time. A moth as big as the dark, my gran said. The tide went mad. It rose up and up, and it swallowed a whole city. Old Lumen, the moon city. It stood out there.`,`Long ago, the Night Mother bit the moon for the first time. The sea rose up and swallowed a city. Old Lumen, the moon city.`),
   xl('narr',`She points north. Out in the shoals, a slim white tower sticks up out of the sea, with a little balcony near the top.`,`She points north. A white tower sticks up out of the sea.`),
   xl('m_winnie',`The Lumen Spire. The rest of the city's underneath it. Drowned. The moon folk who lived there went into the sea and grew tails. Merfolk now. Lovely people. Never come up.`,`The Lumen Spire. The city is under it, drowned. Its people grew tails. Merfolk now.`),
   xl('m_winnie',`If anyone left a way to follow that moth east, it's down in that city. But you'd have to breathe water to get there.`,`The way east is down in that city. But you must breathe water to get there.`),
@@ -370,12 +370,6 @@ if(!M3S_PRE.wren) m3sDef('m_wren',[
   xl('wren',`Ash! Look at me. Outside. On a raft. In the SEA. I've been sick four times and I've never been happier.`,`Ash! Look at me! On a raft in the SEA! I was sick four times. I'm so happy.`),
   xl('wren',`Elder Ripple of the merfolk keeps Old Lumen's records. I can read Lumen writing, you know. Badly. Very badly. Better than anyone else up here, which is nobody.`,`The merfolk keep Old Lumen's books. I can read Lumen writing. Badly. Better than anyone else up here.`),
   xl('wren',`If you find anything with writing on it down there, bring it to me. Even if it's soggy. Especially if it's soggy.`,`If you find writing down there, bring it to me. Even if it's soggy.`)
-]);
-if(!STORY.m_dell1) m3sDef('m_dell1',[
-  xl('dell',`Pebble brought me a letter from Old Sal. "Dell. Finished your lake boat. Six years and three acts. It floats. Mostly. Sal."`,`Old Sal wrote: "Your lake boat is done. Six years and three acts. It floats. Mostly."`),
-  xl('dell',`Three acts? What's an act?`,`Three acts? What's an act?`),
-  xl('ash',`I think we're in the fourth one.`,`I think we're in the fourth one.`),
-  xl('dell',`Oh, and my cousin Wendel wrote you a poem. "There once was a dragon called Ash, who watched as the moon went SPLASH." That's it. That's the whole poem.`,`Wendel wrote you a poem: "A dragon called Ash watched the moon go SPLASH." That's all of it.`)
 ]);
 // Chapter 2, Drowned Lumen (6.3, 6.4)
 m3sDef('m_lumen_channel',[xl('iska',`Deep water. Too deep to walk on. Is there anything up there you can swing to?`,`Deep water. Too deep to walk on. Is there something up there to swing to?`)]);
@@ -463,7 +457,7 @@ m3sDef('m_eclipse1',[
       xl('nyxara',`Brave. How lovely. Keep them warm for me, then. Everyone comes to me in the end.`,`Brave. How lovely. Keep them warm for me. Everyone comes to me in the end.`)]}),
     xo(`Why do you want the moon so much?`,`Why do you want the moon?`,{tone:'kind',fn:()=>{ G.choices.m_deal='ask'; },then:[
       xl('ash',`Why? Why do you want the moon so much?`,`Why do you want the moon so much?`),
-      xl('nyxara',`...Nobody has asked me that since a girl with horns.`,`Nobody asked me that since a girl with horns.`),
+      xl('nyxara',`...Nobody ever asks me that.`,`Nobody asks me that.`),
       xl('nyxara',`Because the moon leaves me, little ember. Every single morning. And one day it might not come back. If I hold it very tight, it can never go.`,`The moon leaves me every morning. One day it might not come back. If I hold it tight, it can never go.`),
       xl('narr',`For one second her voice sounds small. Then it's gone.`,`For one second her voice sounds small.`),
       xl('ash',`That's sad. It's still not a reason to eat it.`,`That's sad. But you still can't eat it.`),
@@ -514,7 +508,7 @@ const M3S_PB3=[
   xl('maren',`Ash. You'll have all three pieces of that Heart soon, and it will need a smith.`,`You'll have all three pieces soon. The Heart will need a smith.`),
   xl('maren',`So I'm coming. Dell is sailing back to fetch me. Don't argue. You can't, it's a letter.`,`So I'm coming. Dell will fetch me. Don't argue.`),
   xl('maren',`He'll bring me round to the old pier at the foot of the Heights, on the far side of Moonfall. I'll find you. Love, Mom.`,`I'll come to the old pier by the Heights. I'll find you. Love, Mom.`),
-  m3sIf('maren',`P.S. Pebble says you were saying "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,`P.S. You said "Nyx" in your sleep. A new friend? Bring them for dinner. Unless they eat moons.`,()=>!!G.flags.dr_m_moth),
+  m3sIf('maren',`P.S. Pebble says you were talking to a moth in your sleep. Very politely. Good.`,`P.S. You talked to a moth in your sleep. Very politely.`,()=>!!G.flags.dr_m_moth),
   xl('narr',`Far away in Driftwood, the Soggy Biscuit Three toots twice and steams off west.`,`Far away, Dell's boat toots twice and sails off west.`)];
 // the Mirror Flats and the Moonpath (6.8b, 6.9b)
 m3sDef('m_moonpath',[
@@ -628,8 +622,8 @@ m3sDef('m_peak',[
   xl('iska',`And with one more lantern than you think you need. Always.`,`And with one more lantern than you need. Always.`),
   xdo(()=>{ G.flags.m_done=1; G.tod=0.02; })
 ]);
-// on the pier afterwards: Mom (and the star-iron, the Fallen Star secret)
-STORY.m_pier_mom=[xl('maren',`Sit down a minute. Have a sandwich. That bridge isn't going anywhere, and you're not climbing a mountain hungry.`,`Have a sandwich first. The bridge will wait.`)];
+// on the pier afterwards: the star-iron (the Fallen Star secret), Mom's own business. (v12: the old pier sandwich line
+// for Mom is gone: her Act IV talk on the pier is the story data's, so this file's talk hook never played it)
 STORY.m_stariron=[
   xl('maren',`Star-iron! Leave it with me. Your sword will never be the same. Neither will my anvil.`,`Star-iron! Give it here. Your sword will never be the same!`),
   xl('narr',`CLANG. CLANG. Mom folds the star-iron into your blade. It hums like a struck bell.`,`CLANG! Mom puts the star-iron in your sword. It hums.`),
@@ -744,8 +738,8 @@ m3sDef('m_mirror_in',[
 m3sDef('m_mirror_shrine',[
   xl('ember',`Hello, Ash. You found the last one. I made this one here, with the moon-priests: my fire, mixed with moonlight.`,`Hello, Ash. This is my last flame. My fire, mixed with moonlight.`),
   xl('ash',`What's it for?`,`What's it for?`),
-  xl('ember',`For her. For my little moth. In case she ever went wrong.`,`For my little moth. In case she went wrong.`),
-  xl('ash',`Your moth?`,`Your moth?`),
+  xl('ember',`For someone I loved. In case she ever got lost in the dark.`,`For someone I loved. In case she got lost.`),
+  xl('ash',`Who?`,`Who?`),
   xl('ember',`Take it, Ash. And if you ever meet her, be gentler than I was.`,`Take it. If you meet her, be gentler than me.`)
 ]);
 m3sDef('m_mirror_gift',[
@@ -782,7 +776,7 @@ m3sDef('m_mirror_won',[
 // Nyxara's voice through every mirror at once (6.9): plays straight after the peacock's outro
 m3sDef('m_mirror_voice',[
   xl('narr',`Every mirror in the temple goes dark at once. In each one, a pair of white eyes opens.`,`Every mirror goes dark. In each one, two white eyes open.`),
-  xl('nyxara',`Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, once, long ago. It hurt very much.`,`Moonfire. You found Ember's moonfire. Her priests burned me with it once. It hurt.`),
+  xl('nyxara',`Moonfire. Oh, little ember. Lumen's priests burned me with that, long ago. It hurt very much.`,`Moonfire. The priests burned me with it once. It hurt.`),
   xl('nyxara',`Mend it, little ember. Then give it to me. You will want to, at the end.`,`Mend it. Then give it to me. You will want to.`),
   xl('ash',`I won't.`,`I won't.`),
   xl('nyxara',`Everyone does.`,`Everyone does.`),
@@ -1652,7 +1646,7 @@ function m3sPeople(){
 // the merfolk stand-ins inside Coralcombe, when the village is built but its people are not
 { const base=areaNPCs; areaNPCs=function(){ base(); try{ const A=AREA; if(A&&A.id==='m_coralcombe') for(const id of ['m_coralia','m_kipper']) if(M3S.fb[id]&&SPECIAL[id]&&!A.npcs.some(n=>n.id===id)){
   const R=A.rooms&&Object.values(A.rooms).find(r=>r.kind==='start'), x=R?R.cx+(id==='m_kipper'?96:0):player.x+(id==='m_kipper'?96:0), y=R?R.cy-70:player.y-90; const n=mkNPC(SPECIAL[id],x,y); n.walker=false; A.npcs.push(n); } }catch(e){ console.error(e); } }; }
-// small talks outside the stage hooks: Wren and Dell in Driftwood, Mom (and the star-iron) and Quill on the pier
+// small talks outside the stage hooks: Wren in Driftwood, the star-iron and Quill on the pier
 onTalk(n=>{
   if(!G||G.mode!=='story'||G.done||curMap()!==3) return false;
   const a=actOf(G.stage); if(a!==4&&a!==5) return false;
@@ -1661,8 +1655,7 @@ onTalk(n=>{
   if(n.id==='maren'&&F.m_maren&&G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; }
   if(typeof m3pDataTalk==='function'&&m3pDataTalk(n.id)) return false;
   if(n.id==='wren'&&!M3S_PRE.wren&&a===4&&!m3sSeen('m_wren')&&!G.items.m_book_raw){ m3sPlay('m_wren'); return true; }
-  if(n.id==='dell'&&!M3S_PRE.dell1&&a===4&&!m3sSeen('m_dell1')&&reached('m_drift')&&!F.m_reforged){ m3sPlay('m_dell1'); return true; }
-  if(n.id==='maren'&&F.m_maren){ if(G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; } if(F.m_done&&a===4){ m3sPlay('m_pier_mom'); return true; } }
+  if(n.id==='maren'&&F.m_maren&&G.items.m_stariron&&!F.m_stariron_done){ m3sPlay('m_stariron'); return true; }
   if(n.id==='quill'&&F.m_maren&&a===4){ m3sPlay([xl('quill',`I'm measuring the peak. I've started over four times, and it's taller every time.`,`The mountain keeps getting taller than my numbers!`)]); return true; }
   return false;
 });
@@ -1785,18 +1778,20 @@ if(typeof pebbleLetter==='function'){
 if(typeof defineDream==='function'&&typeof DREAMS!=='undefined'){
   // v11: part two of the first Lantern Day memory (part one is a1l_story2.js, the 'lantern' dream: a little grey moth
   // lands on the extra lantern). Years later, grown-up Ember doesn't climb the hill, and the moth waits.
+  // (v12) the waiting moth is the hint; her two pale moons and her name are Act V's (REVEAL_PLAN secret 13): she is a
+  // little grey moth, Ember gives her a name that the dream's wind takes, and in the morning she just flies away
   if(!DREAMS.m_moth) defineDream('m_moth',{stages:['m_coral','m_reef'],title:S('The Moth on the Lantern','The Moth on the Lantern'),scene:'moth',lines:()=>[
-    xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth with two pale moons on her wings is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
+    xl('narr',`Lantern Day again, on the shortest night. You're Ember, still small, on the hill above the valley. A little grey moth is already waiting on the lantern post. She came last year, too.`,`Lantern Day again. You are young Ember. A little grey moth waits on the lantern post.`),
     xl('ember_kid',`You came back! If you're going to keep coming back, you need a name.`,`You came back! You need a name.`),
     xc('narr',`She shivers on the cold post.`,`She shivers on the cold post.`,[
-      xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. I'll call you Nyx, because you come in the night.`,`Sit on mine. I will call you Nyx.`)]}),
-      xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. I'll call you Nyx.`,`Your own lantern! I will call you Nyx.`)]}),
-      xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. I'll call you Nyx.`,`Careful, it's hot! Fine. Sit here. I will call you Nyx.`)]})]),
-    xl('narr',`Every Lantern Day after that, Nyx is waiting on the hill. Ember grows taller every year. Nyx stays exactly the same size.`,`Every year, Nyx waits on the hill. Ember grows up.`),
+      xo(`Let her sit on your lantern`,`Let her sit on your lantern`,{tone:'kind',fn:()=>{ G.flags.dr_m_moth='warm'; },then:[xl('ember_kid',`Sit on mine. As long as you like. Now, a name. A night sort of name, because you come in the night.`,`Sit on mine. Now, a name for you.`)]}),
+      xo(`Make her a tiny lantern of her own`,`Make her a tiny lantern`,{fn:()=>{ G.flags.dr_m_moth='gift'; },then:[xl('narr',`You fold a lantern no bigger than a thimble and light it with the smallest breath you've ever breathed. The moth climbs inside.`,`You make a tiny lantern. The moth climbs in.`),xl('ember_kid',`There. Your own. And now your own name.`,`Your own lantern! And your own name.`)]}),
+      xo(`Tell her lanterns are hot`,`Tell her it's hot`,{fn:()=>{ G.flags.dr_m_moth='shoo'; },then:[xl('ember_kid',`Mind your wings, it's hot! ...Fine. Sit on the paper bit. And you can have a name.`,`Careful, it's hot! Fine. Sit here. You can have a name.`)]})]),
+    xl('narr',`You whisper her a name. In the dream the wind takes it, the way names go in dreams.`,`You give her a name. The wind takes it.`),
+    xl('narr',`Every Lantern Day after that, the little moth is waiting on the hill. Ember grows taller every year. The moth stays exactly the same size.`,`Every year, the little moth waits on the hill. Ember grows up.`),
     xl('narr',`Then one year Ember has a baby on her hip and a house full of lanterns. She lights them in her own windows, down in the valley, and she doesn't climb the hill.`,`One year Ember has a baby. She lights lanterns at home. She doesn't climb the hill.`),
-    xl('narr',`Up on the hill, a little grey moth sits on a cold lantern post all night, facing the valley.`,`On the hill, Nyx waits all night by a cold lantern post.`),
-    xl('narr',`In the morning she flies up toward the setting moon, looking back three times.`,`In the morning she flies to the moon. She looks back three times.`),
-    xl('narr',`She waits the next year, too. And the next.`,`She waits the next year too. And the next.`)]});
+    xl('narr',`Up on the hill, a little grey moth sits on a cold lantern post all night, facing the valley.`,`On the hill, the moth waits all night by a cold lantern post.`),
+    xl('narr',`In the morning she flies off into the grey, looking back three times. She waits the next year, too. And the next.`,`In the morning she flies away. She looks back three times. She waits the next year too.`)]});
   if(!DREAMS.m_eclipse) defineDream('m_eclipse',{stages:['m_sable','m_burrows'],title:S('The Night Without Morning','No Morning'),scene:'eclipse',lines:()=>[
     xl('narr',`You dream of a world where the sun never comes up. Not dark. Just grey. The moon is gone. Even the stars look tired.`,`In your dream, the sun never comes up. The moon is gone.`),
     xl('narr',`On the hill above Emberhollow, a girl with horns sits alone, holding a lantern that has gone out.`,`Young Ember sits alone with a lantern that went out.`),

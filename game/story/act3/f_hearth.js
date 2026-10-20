@@ -83,8 +83,8 @@ chapter({
     f_brynja: [
       ['narr', 'In the middle of town stands the Great Hearth, a fireplace you could drive a cart into. Its fire is a tiny orange flicker, like a candle at the bottom of a well.',
         'The Great Hearth is huge. Its fire is a tiny flicker.'],
-      ['f_brynja', "There, there, old girl. Somebody's come to see you. ...So you're the Emberblood Brann keeps shouting about. Closer. Skinny. Your mother doesn't feed you.",
-        "There, there, old girl. You're the Emberblood? Skinny! Your mom doesn't feed you."],
+      ['f_brynja', "There, there, old girl. Somebody's come to see you. ...So you're the horned boy Brann keeps shouting about. Closer. Skinny. Your mother doesn't feed you.",
+        "You're the horned boy? Skinny! Your mom doesn't feed you."],
       ['ash', 'She feeds me so much.'],
       ['f_brynja', "I'm Brynja, Hearthkeeper. Seventy years I've kept this fire, and my mother before me, all the way back to the night it was lit.",
         "I'm Brynja. I have kept this fire for 70 years. My mother did too."],
@@ -145,7 +145,7 @@ chapter({
     f_brann: [
       { if: 'stage=f_hearth choice f3_moth=moth', say: ["Who goes... oh. It's the moth. I mean the dragon. I mean... carry on. The Hearthkeeper's at the Great Hearth.",
         "Oh. It's the moth. I mean the dragon. Carry on."] },
-      { if: 'stage=f_hearth', say: ['The Hearthkeeper is at the Great Hearth, Emberblood. Middle of town. Follow the warm.',
+      { if: 'stage=f_hearth', say: ['The Hearthkeeper is at the Great Hearth, Horns. Middle of town. Follow the warm.',
         'The Hearthkeeper is at the Great Hearth.'] },
     ],
   },

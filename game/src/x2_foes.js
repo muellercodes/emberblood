@@ -764,9 +764,17 @@ function f2Lines(type,inKeys,outKeys,introDef,outroDef){
 }
 function f2Spk(id,name,col){ if(!SPK[id]) SPK[id]={name,col}; }
 f2Spk('f_bellows','Old Bellows','#e0a050'); f2Spk('f_frostfeather','Old Frostfeather','#e8eef8'); f2Spk('f_grumblehorn','King Grumblehorn','#b8a890');
-f2Spk('f_hush','Hush','#ece4fa'); f2Spk('f_glaciar','Glaciar','#bfe2ff'); f2Spk('f_blubberton','Lord Blubberton','#c8a890'); f2Spk('f_squall','Squall','#8ac0f0');
+f2Spk('f_blubberton','Lord Blubberton','#c8a890'); f2Spk('f_squall','Squall','#8ac0f0');
 f2Spk('f_squeak','Squeak','#f0d870'); f2Spk('f_rockjaw','Rockjaw','#b89878'); f2Spk('f_grumbo','Grumbo','#e4e8f4'); f2Spk('f_mumble','Mumble','#f2f4fa');
 f2Spk('tove','Tove','#bfe6ff'); f2Spk('nyxara','The Lady of the Moths','#c8b0f0'); f2Spk('f_pennant','Brother Pennant','#f0b040');
+// (v12) two labels follow what Ash knows (REVEAL_PLAN: a secret name shows in the UI only after the line that says it).
+// The white moth names herself on the Drum Stone (f_dreadgate.js f_drum sets f3_hush_named; the act's migrate sets it
+// for a save already past the drum), and the dragon's name comes with the snow_mother solve (f3_auntie_glee). Until
+// then they are "A white moth" and "The white dragon". From Act IV on both names are known. (These replace the plain
+// entries, so they are set here whatever an earlier module gave.)
+function f2Knows(flag){ try{ const F=typeof G!=='undefined'&&G&&G.flags; if(!F) return true; return !!F[flag]||actOf(G.stage)>3; }catch(e){ return true; } }
+SPK.f_hush={get name(){ return f2Knows('f3_hush_named')||f2Knows('f_hush_done')?'Hush':'A white moth'; },col:'#ece4fa'};
+SPK.f_glaciar={get name(){ return f2Knows('f3_auntie_glee')||f2Knows('f_done')?'Glaciar':'The white dragon'; },col:'#bfe2ff'};
 // a top-of-screen line from Tove (the Warden riding in Ash's fire) at most once per gap seconds
 function f2Tove(line,gap){ if(F2.toveT>G.time) return; F2.toveT=G.time+(gap||8); taunt('tove',line); }
 // the sites: a boss type maps to its site key (defineBoss). Dungeon sites never open by themselves (open:()=>false):
@@ -1693,7 +1701,7 @@ const F2G={on:false,stones:[],melted:0,lvl:0,heart:false,night:false,windOn:fals
 const F2_CHAIN_LINES=[S("...Fire? Warm fire? I knew a little girl with fire like that...","Fire? Warm fire? I knew a girl with fire like that..."),
   S("The Mother says... no. NO. Who IS the Mother? I don't have a mother. I have a brother. A loud one.","Who is the Mother? I have a brother. A loud one."),
   S("Little one. Your horns. You have her horns. Ember's horns!","Your horns! You have Ember's horns!"),
-  S("The Shard! It's in my heart! Get it OUT, dumpling, before it freezes me again! And mind my tail, I can't help the tail!","The Shard is in my heart! Get it out, dumpling!")];
+  S("The Shard! It's in my heart! Get it OUT, little one, before it freezes me again! And mind my tail, I can't help the tail!","The Shard is in my heart! Get it out!")];
 const F2_GLA_TAUNT=[S('Sleep, little one. Sleep under the snow.','Sleep, little one.'),S('Stay. In the cold, nothing ever has to leave.','Stay. Nothing leaves.'),S('The long night is coming. Lie down.','The long night is coming.')];
 // her words: the story may write STORY.f_glaciar_intro, or set STORY.bosses.f_glaciar.intro / .outroFree / .outroDefeat
 f2Lines('f_glaciar',['f_glaciar_intro'],[],
@@ -1880,7 +1888,8 @@ const GLA_HEART=FK.brain({move:'hold',turn:1.8,cd:[1.7,2.8],recoverMove:0,moves:
 const GLA_NIGHT=FK.brain({move:'hold',turn:2.4,cd:[0.95,1.6],recoverMove:0,moves:[GLA_MOVES.breath,GLA_MOVES.icicles2,GLA_MOVES.tail,GLA_MOVES.dive2]});
 const GLA_AIR=FK.brain({move:'hold',turn:3,cd:[1.2,2.0],recoverMove:0,moves:[GLA_MOVES.dive,GLA_MOVES.boulders,GLA_MOVES.gust,GLA_MOVES.shards]});
 // the warnings she gives in the Shard Heart phase, one per attack (bible 9.5)
-const F2_GLA_WARN={f2gbreath:S('Duck, dumpling!','Duck, dumpling!'),f2donut:S('Jump!','Jump!'),f2spots:S('Mind your head!','Mind your head!')};
+// (v12) "dumpling" waits for her talk after the fight, when she is herself again; in the fight she says "little one"
+const F2_GLA_WARN={f2gbreath:S('Duck, little one!','Duck!'),f2donut:S('Jump!','Jump!'),f2spots:S('Mind your head!','Mind your head!')};
 // her head (the mouth for the breath) on the coil or in the air
 function f2GlaHead(e){ const k=(e.r0||60)/60, f=e.face; return {x:e.x+Math.cos(f)*74*k,y:e.y+Math.sin(f)*74*k*0.9,z:(e.z||0)+44*k}; }
 // hit circles: head (x1.4, x2 staggered), body, tail (x0.7); in the Shard Heart only the Shard in her chest takes full damage
@@ -1914,6 +1923,11 @@ f2Foe('f_glaciar',{boss:true,name:'Glaciar',title:S('the Ice Dragon of Mount Dre
   sheet:f2Sheet([{state:'chase',mode:'coil',z:0,label:'coiled'},{state:'breathW',mode:'coil',z:0,st:0.5,at:0.5,label:'breath windup'},{state:'breath',mode:'coil',z:0,label:'frost breath'},{state:'tailW',mode:'coil',z:0,st:0.3,at:0.3,label:'tail sweep'},
     {state:'iciclesW',mode:'coil',z:0,st:0.5,at:0.5,label:'icicle rain'},{state:'chase',mode:'air',z:130,dx:120,label:'flying'},{state:'diveAim',mode:'air',z:110,st:0.4,label:'dive aim'},{state:'dive',mode:'air',z:16,label:'dive'},
     {state:'perched',mode:'air',z:0,label:'landed'},{state:'stagger',mode:'stagger',z:0,label:'staggered'},{state:'chase',mode:'coil',heart:true,z:0,label:'shard heart'},{state:'chase',deathT:0.3,mode:'coil',z:0,label:'death'}])});
+// (v12) the boss bar's name follows what Ash knows, like her speaker label: until the snow_mother solve she is "The
+// White Dragon" (a setter keeps anything that writes the name later)
+{ const E=EDEF.f_glaciar; if(E){ let nm=E.name, sh=E.short;
+  Object.defineProperty(E,'name',{configurable:true,enumerable:true,get(){ return f2Knows('f3_auntie_glee')||f2Knows('f_done')?nm:'The White Dragon'; },set(v){ nm=v; }});
+  Object.defineProperty(E,'short',{configurable:true,enumerable:true,get(){ return f2Knows('f3_auntie_glee')||f2Knows('f_done')?sh:'The White Dragon'; },set(v){ sh=v; }}); } }
 // a stunned Glaciar? never: only her chains stagger her
 // a stun (a Ground Pound's, a shield bash's) never cuts short a state an Act III foe was just put in (flipped by the same
 // pound, horns stuck, on its back, dazed): the stun still counts, the state stays
@@ -2628,3 +2642,5 @@ window.__ebX=Object.assign(window.__ebX||{},{f2Test,f2f:F2F_DBG});
 // fChains(n): in the Glaciar fight it snaps n chains; with no fight on, the story's stand-in locks (if it has them) melt instead
 if(!(window.__ebX&&window.__ebX.fChains)) window.__ebX.fChains=function(n){ const e=G&&G.boss; if(e&&e.type==='f_glaciar'&&!e.dead) return f2Chains(n);
   const s=window.__eb&&window.__eb.f2s; if(s&&typeof s.meltLocks==='function') return s.meltLocks(n); return f2Chains(n); };
+// (v12 R3) test hook: what a speaker label and a boss name say right now
+window.__ebDbg=Object.assign(window.__ebDbg||{},{spkName:id=>SPK[id]?SPK[id].name:null,foeName:t=>EDEF[t]?EDEF[t].name:null});

@@ -22,8 +22,8 @@ places({
       text: ["A stone from under the ice at Tove's statue: TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW.",
         'TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW.'] },
     f3_iska_page: { icon: 'book', mystery: 'long_winter',
-      text: ["Iska's copy of the Wardens' eleventh page: on the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember named her Nyx.",
-        "A grey moth sat on Ember's lantern. Ember named her Nyx."] },
+      text: ["Iska's copy of the Wardens' eleventh page: on the first Lantern Day, a little grey moth sat on Ember's lantern all night. Ember gave her a name.",
+        "A grey moth sat on Ember's lantern. Ember gave her a name."] },
   },
 
   place: {
@@ -87,7 +87,7 @@ places({
       ['narr', '"TOVE KEPT THE COLD POST. EMBER MADE THE FIRE. AUNTIE G MADE THE SNOW."', '"TOVE KEPT WATCH. EMBER MADE FIRE. AUNTIE G MADE SNOW."'],
       ['tove', 'Auntie G. She let me ride on her tail when it snowed. I was nine.', 'Auntie G. I rode on her tail once.'],
       ['ash', 'Who is Auntie G?'],
-      ['tove', "Ember's auntie. Big. White. Laughed like wind chimes. Then one day we needed her, and she stayed asleep on her mountain. That's all I'm saying.",
+      ['tove', "Ember's auntie. Laughed like wind chimes. Then one day we needed her, and she slept through it. That's all I'm saying.",
         "Ember's auntie. When we needed her, she slept. That's all."],
     ],
     a3g_eggs: [
@@ -100,9 +100,9 @@ places({
     a3g_iska: [
       ['narr', 'Under the broken flagstone: a little stone box, sealed with wax in the shape of a lantern.', 'A little stone box, sealed with a lantern.'],
       ['narr', "Inside, a page copied out in Iska's careful hand. At the top it says: ELEVEN.", 'A page in Iska\'s writing. It says ELEVEN.'],
-      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember named her Nyx. We thought nothing of it."',
-        '"A grey moth sat on Ember\'s lantern. Ember named her Nyx."'],
-      ['ash', 'Nyx. Ember gave her a NAME.', 'Ember gave her a name.'],
+      ['narr', '"On the first Lantern Day, a little grey moth sat on Ember\'s lantern all night. Ember gave her a name. We thought nothing of it."',
+        '"A grey moth sat on Ember\'s lantern. Ember gave her a name."'],
+      ['ash', "Ember gave a moth a NAME. Iska didn't write it down.", "Ember named a moth. Iska didn't write it down."],
     ],
     a3g_bun: [
       ['narr', 'KA-BOOM. Frozen crumbs rain down all over Emberhollow. Inside the bun, something glows.', 'KA-BOOM! Crumbs everywhere. Something glows!'],

@@ -4,8 +4,9 @@
 // Glacier Maze (the dungeon stays code, x2_dun_a.js). Inside, Ember's shrine says she built the forge "with my auntie.
 // She did the cold parts." (a clue for the act's last question: who is the Snow Mother?), Ember's Ice Diary names her
 // Auntie Glee, and Old Bellows remembers "Ember and the Cold One" (bonus clues). Blaze Breath is Ember's gift.
-// (v11) This forge is the one place Ember speaks in Act III: it is hers and her auntie's. Ash learns here that Grandpa
-// had a sister; that the sister is the dragon on the mountain is still the player's to work out (snow_mother).
+// (v11) This forge is the one place Ember speaks in Act III: it is hers and her auntie's. (v12) Ash learns here that
+// Ember had an auntie who liked the cold, and no more: whose sister she was, and that she is the dragon on the
+// mountain, are still the player's to work out (snow_mother).
 // The dungeon's own lines below are old STORY keys: x2_dun_a plays them by key, and the engine puts this text into
 // the same arrays (f_maze_how and f_maze_bossline are one-line tips, still x2_story's).
 // Old flags kept: trial_f_maze_done (the dungeon's altar), f_icediary; the stage moves on to f_kindle.
@@ -85,9 +86,9 @@ chapter({
       ['ash', 'Ember! What is this place?', 'Ember! What is this place?'],
       ['ember', 'My forge. I built it with my auntie, a long, long time ago. She did the cold parts. I did the hot parts. We were a very good team.',
         'I built this forge with my auntie. She did the cold parts. I did the hot parts.', { clue: 'f3_cold_parts' }],
-      ['ash', 'Your auntie? Grandpa had a sister?', 'Grandpa had a sister?'],
-      ['ember', "He did. They stopped speaking long before I was grown. I never asked her why. I wish I had.",
-        'He did. They stopped talking. I never asked why.'],
+      ['ash', 'Your auntie? Who was she?', 'Who was she?'],
+      ['ember', "Somebody who liked the cold, and liked me. We stopped seeing each other long before I was grown. I never asked her why. I wish I had.",
+        'Someone who liked the cold. And me. I wish I had asked her more.'],
       ['ember', 'I left a little of my hottest fire here. The blue kind. For a day when the cold got too big. I think that day is today.',
         'I left my hottest fire here. The blue kind. For a day like today.'],
     ],
@@ -150,7 +151,7 @@ chapter({
         say: ["The Glacier Maze? Listen, moth. Dragon. Whatever you are. The North Gate's frozen. Go round: out the West Gate, over the Whitewater, then up the river onto the ice.",
           'Listen, moth. Dragon. The North Gate is frozen. Go round by the West Gate and the river.'] },
       { if: 'stage=f_maze !flag f_northgate', fact: 'f_lm_northgate=frozen',
-        say: ["North Gate's frozen solid, Emberblood. Go round: out the West Gate, over the Whitewater, then follow the river up onto the ice. The Glacier Maze is where the ice meets the lake.",
+        say: ["North Gate's frozen solid, Horns. Go round: out the West Gate, over the Whitewater, then follow the river up onto the ice. The Glacier Maze is where the ice meets the lake.",
           'The North Gate is frozen. Go round by the West Gate and the river.'] },
     ],
     f_brynja: [

@@ -5,6 +5,7 @@
 // camera goes up: a stone drum with a ram's face on the shoulder, audit finding 5). With Pennant's clue (the monks
 // rode the wind up and knocked) he works out in the Case Book how the gate opens. He names the vent's ribbon the Drum
 // Wind (finding 6), rides it up, Ground Pounds the drum: BOOOOOM, the lock cracks, and Hush unfolds off the mountain.
+// (v12) She names herself ("I am Hush. Her quiet one.": her speaker label is "A white moth" until then, x2_foes).
 // Hush says the Mother is resting, and the Mother's NEW friend is resting, up on top (the two clues the snow_mother
 // question needs), and (v11) why she froze Rimeholm: its bell. "Bells mean morning. The Mother hates morning." The fight
 // on the plaza is code (x2_foes). After it Hush shrinks to a tiny shivering moth: Ash gives her Ylva's long scarf, or
@@ -32,7 +33,7 @@ chapter({
     f3_drum_wind: { map: 2, at: [8800, 44450], r: 150, kind: 'spot', name: 'the Drum Wind' },
     // Hush unfolding from the mountainside next to the drum (a look, v10_art3b.js; nothing is drawn until the drum
     // scene sets it to unfold, and it is gone again when she glides down)
-    f3_hush_rise: { map: 2, at: [8290, 43480], kind: 'prop', look: 'hush_rise', name: 'Hush' },
+    f3_hush_rise: { map: 2, at: [8290, 43480], kind: 'prop', look: 'hush_rise', name: 'a great white moth' },
     // the tiny Hush after the fight, in the snow in the middle of the plaza (look hush_small: fallen, scarf, away)
     f3_hush_small: { map: 2, at: [7300, 44330], kind: 'prop', look: 'hush_small', name: 'a little white moth' },
   },
@@ -78,7 +79,7 @@ chapter({
         { do: 'examine f3_frost_lock', scene: 'f3_look_lock', then: ['clue f3_gate_carving', 'clue f3_lock_sweats'] },
         { do: 'examine f3_drum_look', scene: 'f3_look_drum', then: ['clue f3_drum_seen'] },
       ] },
-    // (Mom's letter, "you are about to climb a mountain to visit your AUNT", comes once he knows he is going up)
+    // (Mom's letter, "Pebble says you're going up a mountain to knock on it", comes once he knows he is going up)
     { id: 'deduce', do: 'deduce how_open', scene: 'f3_how_solved', migrate_if: 'flag f_drum', then: ['mail f_pb_3'],
       obj: ['How does the Dreadgate open? Work it out in the Case Book', 'Open the Case Book'],
       hint: ['The carving on the lock, the drum up high, and what Brother Pennant said the monks did every spring. Open the Case Book.', 'Open the Case Book.'],
@@ -133,8 +134,10 @@ chapter({
       ['narr', 'The sound rolls down the mountain like a wave. Snow jumps off every rock. Far below, a long crack runs across the Frost Lock.', 'The sound rolls down the mountain. Far below, the lock cracks.', { ref: 'f_lm_dreadlock' }],
       ['narr', 'Then something white unfolds from the mountainside beside you: two wings with purple eyes painted on them, and two real eyes in the middle, blinking at you.', 'Something white unfolds: wings with painted eyes, and two real eyes.', { do: ['world f3_hush_rise unfold'] }],
       ['f_hush', "Shhh. Loud one. You'll wake her.", "Shhh. Loud one. You'll wake her."],
-      ['f_hush', 'The Mother is resting.', 'The Mother is resting.', { clue: 'f3_the_mother' }],
-      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend' }],
+      // (v12) she names herself here, the first time anyone does: her label is "A white moth" up to this line, and
+      // "Hush" from the next one (a line's `do` runs as the line comes up, so the flag is on the line after)
+      ['f_hush', 'I am Hush. Her quiet one. The Mother is resting.', 'I am Hush. The Mother is resting.', { clue: 'f3_the_mother' }],
+      ['f_hush', 'Her new friend rests too. Up on top.', 'Her new friend rests too. Up on top.', { clue: 'f3_hush_friend', do: ['set f3_hush_named'] }],
       ['ash', 'It was you in Rimeholm. You froze a whole village!', 'It was you! You froze Rimeholm!', { ref: 'f_rimeholm' }],
       ['f_hush', 'Their bell was loud. Bells mean morning. The Mother hates morning.', 'Bells mean morning. The Mother hates morning.', { ref: 'f_lm_bell' }],
       ['ash', 'Good. I like mornings.', 'Good. I like mornings.'],
