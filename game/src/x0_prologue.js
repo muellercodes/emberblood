@@ -140,19 +140,24 @@ function proFinish(skipped){
   if(PRO.bed){ delete PRO.bed.prompt; PRO.bed=null; }
   try{ keys.clear(); mouse.l=mouse.r=false; }catch(e){}
   proSkipShow(false);
-  setupNPCs();
+  setupNPCs(); proFree();
   PRO.cover=true; PRO.fade=1;
   startMorning();
   PRO.cover=false; proFadeTo(0,skipped?0.7:1.4,()=>proOverlay(false));
 }
 function proSkip(){ if(!PRO.on) return; SFX.play('ui'); proFinish(true); }
+// the painting's layers are only needed while it is up: once the prologue is over they are let go (tens of MB)
+function proFree(){
+  for(const k in PRO.C){ const L=PRO.C[k], c=L&&(L.c||(L.getContext?L:null)); if(c&&c.width!=null){ try{ c.width=c.height=0; }catch(e){} } }
+  PRO.C={}; PRO.ck=''; PRO.pat=null; PRO.patG=null; PRO.tipG=null;
+}
 // left for the title screen in the middle of it (pause, quit): nothing to clean up in the world (a new journey or a
 // save builds it again), only the prologue's own things
 function proAbort(){
   if(!PRO.on) return;
   PRO.on=false; PRO.phase='done'; PRO.after=null; PRO.fade=0; PRO.fadeTo=0;
   WAKE.on=false; WAKE.bed=null; if(PRO.bed){ delete PRO.bed.prompt; PRO.bed=null; }
-  proSkipShow(false); proOverlay(false);
+  proSkipShow(false); proOverlay(false); proFree();
 }
 function proFadeTo(v,sec,then){ PRO.fadeTo=v; PRO.fadeK=1/Math.max(0.05,sec); PRO.after=then||null; if(!PRO.el||PRO.el.style.display==='none') proOverlay(true); }
 
@@ -245,12 +250,12 @@ function proOverlay(on){
   }
   if(!el) return;
   if(on){ el.style.display='block'; if(!PRO.raf){ PRO.last=performance.now(); PRO.raf=requestAnimationFrame(proFrame); } }
-  else { el.style.display='none'; }
+  else { el.style.display='none'; if(!PRO.on&&PRO.cv){ PRO.cv.width=PRO.cv.height=1; } }
 }
 function proFrame(now){
   PRO.raf=0;
   const rt=clamp((now-(PRO.last||now))/1000,0,0.25), dt=Math.min(rt,0.05); PRO.last=now;
-  try{ proStep(dt,rt); const t0=performance.now(); proDraw(); const ms=performance.now()-t0; PRO.ms=PRO.ms==null?ms:PRO.ms*0.9+ms*0.1; }catch(e){ console.error(e); }
+  try{ proStep(dt,rt); if(!PRO.el||PRO.el.style.display==='none') return; const t0=performance.now(); proDraw(); const ms=performance.now()-t0; PRO.ms=PRO.ms==null?ms:PRO.ms*0.9+ms*0.1; }catch(e){ console.error(e); }
   if(PRO.el&&PRO.el.style.display!=='none') PRO.raf=requestAnimationFrame(proFrame);
 }
 function proStep(dt,rt){
