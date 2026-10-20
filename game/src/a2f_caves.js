@@ -373,6 +373,7 @@ function updateCaveRooms(dt){
   if(R&&R!==A.curRoom){
     A.curRoom=R; const vk=`cv_${caveSid(def)}_v_${R.id}`;
     if(!G.found[vk]){ G.found[vk]=true; renderCaveMini(A); if(R.kind==='secret'){ G.secrets=G.secrets||{}; G.secrets['cs_'+def.id+'_'+R.id]=1; jingle('secret','chest'); setBanner('A secret room!',`${Object.keys(G.secrets).filter(k=>k.startsWith('cs_')).length} of ${CAVE_SECRETS} hidden cave rooms found`,2.6); } else if(R.kind==='boss'&&R.enemies.some(e=>!e.dead)){ const b=R.enemies.find(e=>e.caveBoss); if(b) setBanner(b.caveBoss,def.name,2.4,'boss'); jingle('boss_intro',null); } }
+    if(typeof caveGuardianBack==='function') caveGuardianBack(R);   // (v12 TRIALS) an unwon guardian room always has its guardian
     for(const e of R.enemies) if(!e.dead) e.aggro=true;
   }
   // fights lock the doors until the room is clear

@@ -330,9 +330,6 @@ function onTrialRoom(R){
   if(R.kind==='start'&&first) talk(STORY['trial_'+id+'_in']);
   if(R.kind==='shrine'&&first&&TR&&TR.abil&&!hasAbil(TR.abil)) talk(STORY['trial_'+id+'_shrine']);
   if(R.kind==='tboss'&&!R.solved&&TR&&TR.boss) trialBossStart(R);
-  // (v12) a guardian's room is only won by its fight: if its guardian is gone while the room is not won (it fell some
-  // other way, or the cave was cleared a moment ago and nobody woke up), the guardian is back to meet Ash
-  if((R.kind==='boss'||R.kind==='miniboss')&&R.boss&&!R.solved&&!R.enemies.some(e=>!e.dead&&e.caveBoss)) trialGuardianBack(R);
   if(R.kind==='reward'&&first&&TR&&!trialDone(id)) taunt('ember',pick([`You did it, little ember. Come. Touch the altar.`,`Go on, touch the altar. I made it for you.`]));
   if(R.nest&&G.flags.puff_found&&!G.flags.puff_home) setBanner('A nest!','Bring Puff close to it.',2);
 }
@@ -396,8 +393,14 @@ function trialPuzzles(dt){
     const Q=A.rooms[k]; if(Q.solved) continue;
     if(Q.kind==='switches'){ const s=A.objs.filter(o=>o.k==='tswitch'&&o.room===k); if(s.length&&s.every(o=>o.on)) solveRoom(Q); }
     else if(Q.kind==='eyes'){ const s=A.objs.filter(o=>o.k==='teye'&&o.room===k); if(s.length&&s.every(o=>o.lit)) solveRoom(Q); }
-    else if((Q.solveOnClear||Q.kind==='miniboss')&&A.curRoom===Q&&!Q.locked&&Q.enemies.every(e=>e.dead)) solveRoom(Q,true);
+    else if((Q.solveOnClear||Q.kind==='miniboss')&&A.curRoom===Q&&!Q.locked&&Q.enemies.every(e=>e.dead)&&roomBossBeaten(Q)) solveRoom(Q,true);
   }
+}
+// (v12) a room whose guardian its own fight brings out (c1boss, f2boss, m3boss: the room starts with no foes in it) is
+// only won when that guardian has fallen, never just because nobody is in it yet when Ash walks in
+function roomBossBeaten(Q){
+  const t=Q.c1boss||Q.f2boss||Q.m3boss; if(!t) return true;
+  return !!(G.bossDone&&G.bossDone[t])||(Q.enemies||[]).some(e=>e.dead&&e.type===t);
 }
 // a block pushed into a pit fills it for good
 function trialBlockInto(b,ni,nj,k){
@@ -421,6 +424,16 @@ function trialBossWon(R){
   solveRoom(R,true); G.flags['trial_'+id+'_boss']=true; if(typeof deed==='function') deed('trial_'+id);
   questPoke(); saveGame();
   later(2.7,()=>{ if(G.boss&&G.boss.dead) G.boss=null; if(AREA&&AREA.def.id===aid&&STORY['trial_'+id+'_won']) runDialogue(STORY['trial_'+id+'_won'],()=>{ scene='play'; setBanner('The way is open',TRIALS[id]?'Ember’s gift waits beyond the guardian.':'',2.6); saveGame(); }); });
+}
+// (v12) a guardian's room is only won by its fight: if its guardian is gone while the room is not won (it fell some
+// other way, or the cave was cleared a moment ago and nobody woke up), the guardian is back to meet Ash. Called by
+// updateCaveRooms (a2f_caves.js) whenever Ash walks into a room, in every cave: R.boss guardians (the room-grid caves,
+// the Trials, the dungeons) and R.boss2 ones (e9b_caves2's caves). Rooms whose own fight brings the guardian out
+// (c1boss, f2boss, m3boss) are left to that fight.
+function caveGuardianBack(R){
+  const A=AREA; if(!A||!R||R.solved||!(R.kind==='boss'||R.kind==='miniboss')||!R.enemies) return;
+  if(R.boss2){ if(A.c2&&typeof c2BossSpawn==='function'&&!R.enemies.some(e=>!e.dead&&e.c2boss)){ c2BossSpawn(A,A.def,R); A.c2.bossDone=false; } return; }
+  if(R.boss&&!R.enemies.some(e=>!e.dead&&e.caveBoss)) trialGuardianBack(R);
 }
 function trialGuardianBack(R){
   const A=AREA, def=A.def, type=R.boss[0], d=EDEF[type]; if(!d) return null;
