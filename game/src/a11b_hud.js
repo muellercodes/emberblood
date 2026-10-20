@@ -86,7 +86,7 @@ function drawHUD(){
   const b=G.boss;
   if(b&&!b.dead){
     const bw2=Math.min(620,W-40-SAFE.l-SAFE.r), bx2=(W-bw2)/2, by=usingTouch?(W>=720?T+40:T+(story?170:150)):H-SAFE.b-46;
-    ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?4.6:3.4; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.strokeText(EDEF[b.type].name,W/2,by-20); ctx.fillText(EDEF[b.type].name,W/2,by-20);
+    ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?4.6:3.4; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.strokeText(bossInfo(b).name,W/2,by-20); ctx.fillText(bossInfo(b).name,W/2,by-20);
     bar(bx2,by-8,bw2,12,clamp(b.hp/b.maxHp,0,1),b.invuln?'#8a5a3a':'#b8281e','rgba(30,6,4,.9)');
     ctx.strokeStyle='rgba(255,200,150,.3)'; ctx.lineWidth=1; rr(bx2,by-8,bw2,12,6); ctx.stroke();
     // phase marks on the bar and one pip per phase (lit up to the phase the fight is in); bossPhase (e8_foes.js) sets b.phases and b.bph
@@ -95,7 +95,7 @@ function drawHUD(){
       const ph=b.type==='vorlaxis'?(b.phase||1)-1:(b.bph||0), n=th.length+1;
       for(let i=0;i<n;i++){ const x=bx2+bw2-6-(n-1-i)*15, y=by-20; ctx.beginPath(); ctx.moveTo(x,y-5); ctx.lineTo(x+5,y); ctx.lineTo(x,y+5); ctx.lineTo(x-5,y); ctx.closePath(); ctx.fillStyle=i<=ph?'#ff9a3a':'rgba(40,20,14,.85)'; ctx.fill(); ctx.strokeStyle='rgba(255,215,170,.75)'; ctx.lineWidth=1; ctx.stroke(); } }
     // (v11 polish) the title under the bar: light letters with an outline, readable on any ground
-    ctx.font=`600 11.5px ${UIF}`; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; sub=simplify(sub);
+    ctx.font=`600 11.5px ${UIF}`; const bI=bossInfo(b); let sub=bI.title||''; if(bI.short&&ctx.measureText(sub).width>bw2) sub=bI.short; sub=simplify(sub);
     ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?3.6:3.2; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.95)':'rgba(10,6,4,.85)'; ctx.strokeText(sub,W/2,by+16); ctx.fillStyle=LOOK.sb?'#fff0d4':'#f2dcc0'; ctx.fillText(sub,W/2,by+16);
   }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)

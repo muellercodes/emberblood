@@ -167,13 +167,17 @@ function checkWave(){
   const up=G.wave%2===0;
   later(1.7,()=>{ if(up) offerUpgrades(()=>later(0.8,nextNormalWave)); else later(0.5,nextNormalWave); });
 }
+// (v12) the Arena is open from the title screen, before the story has said who the old dragon is: there he goes by the
+// name the valley knows him by (the boss banner and the boss bar, a11b_hud.js, read this)
+const ARENA_ALIAS={vorlaxis:{name:'The First Flame',title:'The oldest dragon of all',short:'The oldest dragon'}};
+function bossInfo(b){ const d=(b&&EDEF[b.type])||{}; return (G&&G.mode!=='story'&&b&&ARENA_ALIAS[b.type])||d; }
 function nextNormalWave(){
   G.wave++; const n=G.wave;
   G.hpMul=1+(n-1)*0.07; G.dmgMul=1+(n-1)*0.03; G.eliteChance=clamp((n-4)*0.04,0,0.5); G.maxAlive=Math.min(22,9+Math.floor(n/2));
   if(n%5===0){
     const k=n/5-1, BL=['grizzlefang','morrow','gloamjaw','broodmother','greymane','cindervane','vorlaxis'], bt=BL[k%BL.length], cyc=Math.floor(k/BL.length);
     G.phase='boss'; setBanner(`Wave ${n}`,'A champion approaches!',2);
-    later(1.0,()=>{ const s=arenaSpawnPoint(); const A=G.arena; SFX.play('warn'); spawnRune(bt,bt==='vorlaxis'?A.x:s.x,bt==='vorlaxis'?A.y-200:s.y,{homeX:A.x,homeY:A.y,hpScale:(1+(n-5)*0.03)*(1+cyc*0.4)},1.5); const d=EDEF[bt]; setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); });
+    later(1.0,()=>{ const s=arenaSpawnPoint(); const A=G.arena; SFX.play('warn'); spawnRune(bt,bt==='vorlaxis'?A.x:s.x,bt==='vorlaxis'?A.y-200:s.y,{homeX:A.x,homeY:A.y,hpScale:(1+(n-5)*0.03)*(1+cyc*0.4)},1.5); const d=bossInfo({type:bt}); setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); });
     const adds=genWave(Math.max(1,Math.floor(n/3)));
     later(3,()=>{ const q=[]; for(const [t,c] of adds) for(let i=0;i<c;i++) q.push(t); G.queue=shuffle(q); });
   }else{ setBanner(`Wave ${n}`,'',1.6); startWave(genWave(n)); }

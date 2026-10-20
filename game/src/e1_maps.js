@@ -140,7 +140,7 @@ function mapsSeenList(){ const out=[]; for(const M of MAPS) if(M&&(M.k===0||(G&&
 function mapInfoText(){
   const k=MAPUI.view, M=MAPS[k]||MAPS[0], sh=mapList(SHRINES,k), found=sh.filter(s=>G.shrines[s.id]).length;
   const r=G.region||regionAt(player.x,player.y), here=curMap()===k;
-  return `${here?(AREA?'Inside '+AREA.name:r.name):M.name} · Level ${player.level} · ${G.coins||0} coins · ${found} of ${sh.length} shrines`;
+  return `${here?(AREA?'Inside '+AREA.name:r.name):M.name} · Level ${player.level} · ${G.coins||0} coins · ${found} shrine${found===1?'':'s'} found`;
 }
 function mapTabsSync(){
   const list=mapsSeenList();

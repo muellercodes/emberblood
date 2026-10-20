@@ -204,7 +204,7 @@ function revealTrig(o){
     scene='play'; G.found[o.key]=true; G.secrets=G.secrets||{}; G.secrets[o.key]=1;
     jingle('secret','chest'); shake(3); emit(o.x,o.y,24,{col:'255,230,180',smin:40,smax:140,lmin:.4,lmax:.8,zmin:1.5,zmax:3});
     const n=Object.keys(G.secrets).filter(k=>k.startsWith('sec_')).length;
-    setBanner('You found a secret!',`${n} of ${SECRET_ROOMS.length} hidden places in houses`,2.6);
+    setBanner('You found a secret!',n===1?'Your first hidden place in a house':`${n} hidden places in houses so far`,2.6);   // (v12) no total
     if(o.reward){ if(o.reward.coins) addCoins(o.reward.coins,o.x,o.y); if(o.reward.heal){ player.hp=player.maxHp; } }
     const st=AREA.objs.find(q=>q.k==='stairs'&&q.hidden===o.key); if(st&&!st.col) st.col=addAreaCol({t:'r',x0:st.x-st.w/2,y0:st.y-st.h/2,x1:st.x+st.w/2,y1:st.y+st.h/2});
     saveGame();

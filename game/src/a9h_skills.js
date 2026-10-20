@@ -363,7 +363,10 @@ function skSym(g,id,pal){
       skInk(g,skStarP(0,3,40,17),sg,6); g.restore(); g.fillStyle='rgba(255,255,240,.7)'; g.fill(skStarP(-4,-3,15,6.5)); break; }
     case 'br_blade': skSword(g,-Math.PI/4,1.12); break;
     case 'br_flame': skFlame(g,0,36,22,72); break;
-    case 'br_wings': skWing(g,skMix(pal.col,'#ffffff',0.3)); break;
+    case 'br_wings': {   // (v12) the Sky branch: a cloud with a gust of wind (no wing until Ash has wings)
+      const cl=new Path2D(); cl.moveTo(-34,14); cl.arc(-20,4,14,Math.PI*0.62,Math.PI*1.55); cl.arc(0,-8,19,Math.PI*1.08,Math.PI*1.9); cl.arc(22,4,15,Math.PI*1.42,Math.PI*0.4); cl.closePath();
+      skInk(g,cl,skMix(pal.col,'#ffffff',0.35)); g.fillStyle='rgba(255,255,255,.4)'; g.fill(skEll(-6,-12,9,4));
+      skLine(g,skP('M-30 28 Q-6 22 8 28 Q20 34 30 26'),'#f6e2c8',3.5); skLine(g,skP('M-18 38 Q0 33 14 38'),'#f6e2c8',3); break; }
     case 'br_heart': skInk(g,skP(SK_HEART),pal.col); g.fillStyle='rgba(255,255,255,.35)'; g.fill(skEll(-16,-14,7,4)); break;
     // weapon fallbacks for the Hero page (used only while drawWeaponIcon draws nothing)
     case 'w_sword': skSword(g,-Math.PI/4,1.1); break;
