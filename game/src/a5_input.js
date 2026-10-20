@@ -317,9 +317,12 @@ cvs.addEventListener('touchstart',e=>{
   e.preventDefault(); tTouches(e);
   for(const t of e.changedTouches){
     const x=t.clientX,y=t.clientY;
-    if(hudClick(x,y)) continue;
-    // (v12) only the buttons that are up take taps; a tap on an empty spot does what a tap there always did
+    // (v12) only the buttons that are up take taps; a tap on an empty spot does what a tap there always did. A button
+    // goes first: the HUD never sits on one (touchKeep), but a banner's tap-to-skip box can reach over the outer ones,
+    // and a tap on DRINK must drink, not skip "Quest updated"
     let hit=null, hd=1e9; for(const b of tShown()){ if(!b.live) continue; const d=dist(x,y,b.x,b.y)/(b.hr||b.r+14); if(d<1&&d<hd){ hd=d; hit=b; } }
+    if(!hit&&hudClick(x,y)){ TV.tap={x,y,hud:true}; continue; }
+    TV.tap={x,y,hit:hit?hit.id:null};
     if(hit){ touch.btn[t.identifier]=hit.id; touch.held[hit.id]=true; touch.pressed[hit.id]=true; if(hit.id==='fire'&&settings.touch!=='two') touch.fireT=1.1; }
     else if(touch.stickId===null&&stickZone(x,y)){ touch.stickId=t.identifier; touch.ox=touch.sx=x; touch.oy=touch.sy=y; touch.full=0; }
   }
@@ -482,5 +485,6 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{
 window.__ebDbg=Object.assign(window.__ebDbg||{},{
   tbtn:()=>tShown().map(b=>({id:b.id,x:Math.round(b.x),y:Math.round(b.y),r:+b.r.toFixed(1),hr:+b.hr.toFixed(1),a:+(b.a||0).toFixed(2),live:!!b.live,label:b.label})),
   tall:()=>{ tLayout(); return TL.all.map(b=>({id:b.id,x:Math.round(b.x),y:Math.round(b.y),r:+b.r.toFixed(1),hr:+b.hr.toFixed(1),may:tMay(b.id),want:tWant(b.id)})); },
-  tkeep:()=>touchKeep()
+  tkeep:()=>touchKeep(), hudHits:()=>HUD_HITS.map(h=>({x:Math.round(h.x),y:Math.round(h.y),w:Math.round(h.w),h:Math.round(h.h),tipx:!!h.tipx})),
+  tpress:()=>Object.assign({},touch.pressed), tlast:()=>TV.tap||null, theld:()=>Object.assign({},touch.held)
 });
