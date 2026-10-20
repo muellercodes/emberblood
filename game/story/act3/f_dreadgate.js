@@ -79,7 +79,7 @@ chapter({
         { do: 'examine f3_frost_lock', scene: 'f3_look_lock', then: ['clue f3_gate_carving', 'clue f3_lock_sweats'] },
         { do: 'examine f3_drum_look', scene: 'f3_look_drum', then: ['clue f3_drum_seen'] },
       ] },
-    // (Mom's letter, "you are about to climb a mountain to visit your AUNT", comes once he knows he is going up)
+    // (Mom's letter, "Pebble says you're going up a mountain to knock on it", comes once he knows he is going up)
     { id: 'deduce', do: 'deduce how_open', scene: 'f3_how_solved', migrate_if: 'flag f_drum', then: ['mail f_pb_3'],
       obj: ['How does the Dreadgate open? Work it out in the Case Book', 'Open the Case Book'],
       hint: ['The carving on the lock, the drum up high, and what Brother Pennant said the monks did every spring. Open the Case Book.', 'Open the Case Book.'],
