@@ -294,7 +294,7 @@ function dunUpdate(A,dt){
   for(const o of dn.spores) if(o.cd>0) o.cd-=dt;
   // conveyor belts carry whatever stands on them
   if(k>=0&&c.typ[k]===DTY.belt&&!air&&!p.flying&&!dn.ride&&scene==='play'){ const d=DIRS[c.flow[k]]||DIRS[1]; tNudge(p,d[0]*150*dt,d[1]*150*dt); T.pushed=true; }
-  for(const e of G.enemies){ if(e.dead||!e.inArea||e.flying) continue; const q=tCell(e.x,e.y); if(q>=0&&c.typ[q]===DTY.belt){ const d=DIRS[c.flow[q]]||DIRS[1]; tNudge(e,d[0]*120*dt,d[1]*120*dt); } }
+  for(const e of G.enemies){ if(e.dead||!e.inArea||e.flying||!roomAwake(e)) continue; const q=tCell(e.x,e.y); if(q>=0&&c.typ[q]===DTY.belt){ const d=DIRS[c.flow[q]]||DIRS[1]; tNudge(e,d[0]*120*dt,d[1]*120*dt); } }
   // the doors that open and close by themselves
   if(A.gates.some(o=>o.type==='timed'||o.type==='plate'||(o.type==='oneway'&&!o.opened)||(o.type==='roots'&&o.pend))) refreshCaveGates();
   for(const o of A.gates) if(o.type==='oneway'&&!o.opened){ const FR=A.rooms[o.from]; if(FR&&caveRoomAt(p.x,p.y)===FR&&dist(p.x,p.y,o.x,o.y)<84){ o.opened=true; G.found[o.id]=true; refreshCaveGates(); SFX.play('block'); setBanner(S('The bar lifts','The bar lifts'),S('A shortcut! It stays open now.','A shortcut! It stays open.'),1.8); saveGame(); } }
@@ -533,7 +533,7 @@ function dunSees(A,x0,y0,x1,y1){
 function dunGuards(A,dt){
   const dn=A.dn, p=player;
   for(const e of dn.guards){
-    if(e.dead||!e.guard||e.guard.alert) continue; const g=e.guard, R=A.rooms[e.room];
+    if(e.dead||!e.guard||e.guard.alert||!roomAwake(e)) continue; const g=e.guard, R=A.rooms[e.room];   // (v12 ROOMS) a guard in another room is asleep
     let see=false; const d=dist(e.x,e.y,p.x,p.y);
     if(!p.dead&&!(p.flying&&(p.z||0)>30)&&d<g.cone&&Math.abs(angDiff(e.face,angTo(e.x,e.y,p.x,p.y)))<g.half&&dunSees(A,e.x,e.y,p.x,p.y)) see=true;
     if(!p.dead&&d<e.r+p.r+10){ see=true; g.sus=1; }

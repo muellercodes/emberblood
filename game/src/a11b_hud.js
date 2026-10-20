@@ -2,6 +2,7 @@
 // ================= HUD
 function drawHUD(){
   HUD_HITS.length=0;
+  hudFadeBegin();   // (v12 ROOMS) panels over something in Ash's room fade to 15% (see hudFadeBegin below)
   const p=player, L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story';
   ctx.textBaseline='middle';
   // vitals panel
@@ -101,6 +102,7 @@ function drawHUD(){
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
   drawWeaponHud(); if(story) drawCompHud(); drawMoveHud(); if(story) drawBoosts(L,T,pw); if(story){ lvQueue(); drawSkillHud(); }
   if(story) drawQuickNotes();   // (v12) the boosts (under the skill tip) and the quick slot's notes
+  hudFadeEnd();
   drawBanner(); drawTaunt(); drawCompass(fo||obj); if(story) drawMiniHUD();
   // prompt: (v11 polish) drawn after the speech bubbles (drawCompHud draws them), so it is always on top
   if(G.prompt&&scene==='play'){
@@ -109,6 +111,40 @@ function drawHUD(){
   if(story&&G.hintT>=29&&G.playTime<5&&!G.flags.coach) G.flags.coach=1;   // a new journey (startStory sets G.hintT=30): the coach is on
   if(scene==='play'&&tipOn('play')) drawCoach(b);
   drawOffscreen(); drawTouch();
+}
+// (v12 ROOMS) in caves and dungeons a top panel with Ash, a foe, a person or something usable in his room under it fades
+// to 15% (Drew: "all the menus obstruct the top walls and potentially interactable items there"). The world under the
+// panels is copied before they are drawn and laid back over them at 85%, so every panel fades alike however it draws.
+// The boxes come from the last frame's layout (HUD_RX, TRACK_R); roomHudPoints is in a2f_caves.js.
+const HUDF={rects:[],k:{},cv:null,on:false,t:0,pts:[]};
+function hudFadeRects(){
+  const L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story', M=MINI_R(), out=[];
+  out.push({id:'top',x:L-4,y:T-4,w:Math.max(HUD_RX,L+150)-L+4,h:(story?96:70)+8});                        // vitals, quick slot, weapon bar, companion
+  if(TRACK_R) out.push({id:'goals',x:TRACK_R.x,y:TRACK_R.y,w:TRACK_R.w,h:TRACK_R.h+26});                     // the goals (and boosts under them)
+  out.push({id:'map',x:M.x-8,y:SAFE.t,w:W-SAFE.r-(M.x-8),h:hudRightBottom()+4-SAFE.t});                  // minimap, its labels, pause and sound, narrow chips
+  return out;
+}
+function hudFadeBegin(){
+  HUDF.on=false;
+  if(!AREA||!AREA.rooms||scene==='menu'||!G||!player||typeof roomHudPoints!=='function'){ HUDF.k={}; return; }
+  const rs=HUDF.rects, now=performance.now()/1000, dt=clamp(now-(HUDF.t||now),0,0.1); HUDF.t=now;
+  if(!rs.length) return;
+  const pts=roomHudPoints(HUDF.pts); let any=false;
+  for(let i=0;i<rs.length;i++){ const r=rs[i]; let hit=false;
+    for(const q of pts) if(q.x+q.r>r.x&&q.x-q.r<r.x+r.w&&q.y+q.r>r.y&&q.y-q.r<r.y+r.h){ hit=true; break; }
+    const k0=HUDF.k[r.id]||0, want=hit?0.85:0; let k=k0+(want-k0)*Math.min(1,dt*(hit?9:3.5)); if(k<0.01) k=0; HUDF.k[r.id]=k; if(k>0) any=true; }
+  if(!any) return;
+  if(!HUDF.cv||HUDF.cv.width!==cvs.width||HUDF.cv.height!==cvs.height) HUDF.cv=mkCanvas(cvs.width,cvs.height);
+  const g=HUDF.cv.getContext('2d');
+  for(const q of rs){ if(!HUDF.k[q.id]) continue; const r=hudFadePx(q); if(r) { g.clearRect(r[0],r[1],r[2],r[3]); g.drawImage(cvs,r[0],r[1],r[2],r[3],r[0],r[1],r[2],r[3]); } }
+  HUDF.on=true;
+}
+function hudFadePx(r){ const x=Math.max(0,Math.floor(r.x*DPR)), y=Math.max(0,Math.floor(r.y*DPR)), x1=Math.min(cvs.width,Math.ceil((r.x+r.w)*DPR)), y1=Math.min(cvs.height,Math.ceil((r.y+r.h)*DPR)); return x1>x&&y1>y?[x,y,x1-x,y1-y]:null; }
+function hudFadeEnd(){
+  if(HUDF.on){ ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+    for(const q of HUDF.rects){ if(!HUDF.k[q.id]) continue; const r=hudFadePx(q); if(!r) continue; ctx.globalAlpha=HUDF.k[q.id]; ctx.drawImage(HUDF.cv,r[0],r[1],r[2],r[3],r[0],r[1],r[2],r[3]); }
+    ctx.restore(); }
+  HUDF.rects=AREA&&AREA.rooms?hudFadeRects():[];
 }
 function drawMinimap(obj){
   const M=MINI_R(), r=M.r, cx=M.x+r, cy=M.y+r, p=player, span=1100, sc=r/span;
