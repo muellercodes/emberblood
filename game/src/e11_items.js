@@ -102,7 +102,7 @@ function itemInfo(id){
 
 // ---------- 2. runtime state (reset with each new G: a new game or a load)
 const IT={G:null,use:null,buffs:{},boss:{e:null,n:0},crow:null,drops:[],fx:[],brk:[],brkSet:new Set(),brkT:0,pl:null,peak:0,
-  sayT:0,pellT:0,pellCol:null,ow:null};
+  sayT:0,pellT:0,pellCol:null};
 function itSync(){
   if(IT.G===G) return;
   IT.G=G; IT.use=null; IT.buffs={}; IT.boss={e:null,n:0}; IT.crow=null; IT.drops=[]; IT.fx=[]; IT.brk=[]; IT.brkSet=new Set();
@@ -115,8 +115,6 @@ function itHash(s){ let h=2166136261>>>0; s=String(s); for(let i=0;i<s.length;i+
 function itActAt(x,y){ try{ if(x!=null&&y!=null&&!AREA&&x<IZX-50) return clamp(mapAt(y),0,4); return clamp(curMap(),0,4); }catch(e){ return 0; } }
 // the price of one at act k (0..4; the finale uses Act IV's), or its first price when that act has none
 function itPrice(id,k){ const d=ITEMDEF[id]; if(!d||!d.price) return 0; k=clamp(k==null?itActAt():k,0,3); let p=d.price[k]; if(p==null) p=d.price.find(v=>v!=null); return p||0; }
-function itName(id){ const d=ITEMDEF[id]; return d?d.name:(ITEM_NAMES[id]||itPretty(id)); }
-function itSimple(id){ const d=ITEMDEF[id]; return d&&d.simple?d.simple:itName(id); }
 
 // ---------- 3. getting one: carry limits, the coin fallback, the quick slot
 // returns {got, coins}; o: {quiet, x, y, why}
@@ -481,5 +479,8 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{items:{IT,ITEMDEF,IT_SUPPLY,IT_
     foe:i=>{ const e=G.enemies.find(q=>q.id===i); return e?{hp:e.hp,stun:e.stun,dead:e.dead,ice:e.itIceT>G.time}:null; },
     die:()=>{ player.hp=0; playerDied(); },respawn:()=>respawn(),inn:()=>innRest(),chests:()=>CHESTS.map(c=>({id:c.id,x:c.x,y:c.y,open:!!c.open})),open:id=>{ const c=CHESTS.find(q=>q.id===id); if(c) openChest(c); return !!c; },
     diff:i=>{ G.diff=DIFFS[i]; return G.diff.name; },shop:id=>{ SHOPTALK[id](); },npc:id=>{ const n=(G.npcs||[]).find(q=>q.id===id); return n?{x:n.x,y:n.y,home:n.home}:null; },
+    dungeons:()=>typeof DUNGEONS!=='undefined'?Object.keys(DUNGEONS):[],
+    dchest:()=>{ const o=AREA&&AREA.objs.find(q=>q.kind==='treasure'&&!G.found[q.id]); if(!o) return null; o.sealed=false; dChestOpen(o); return o.id; },
+    cchest:()=>{ const o=AREA&&AREA.objs.find(q=>q.k==='cchest'&&!G.found[q.id]); if(!o) return null; o.sealed=false; areaObjAct(o); return o.id; },
     pots:()=>(AREA?AREA.objs:mapList(LANDMARKS,curMap())).filter(o=>o.breakable).length},
   state:()=>({use:IT.use&&{id:IT.use.id,t:+IT.use.t.toFixed(2)},buffs:itemBuffs(),boss:{n:IT.boss.n,live:itBossLive(),max:itBossMax()},crow:IT.crow&&IT.crow.mode,drops:IT.drops.map(d=>d.id),qslot:quickItem(),peak:IT.peak,brk:IT.brk.length})}});
