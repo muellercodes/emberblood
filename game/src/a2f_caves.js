@@ -719,7 +719,8 @@ function roomCam(fx,fy,vw,vh){
   const r=roomRect(A,R), rw=r.x1-r.x0, rh=r.y1-r.y0, B=roomHudBand(), z=zoom;
   const tx=rw<=vw?r.x0+rw/2-vw/2:clamp(fx-vw/2,r.x0,r.x1-vw);
   const fit=(band,bot)=>{ const uh=vh-band/z-bot/z; return rh<=uh?r.y0-band/z-(uh-rh)/2:null; };
-  let ty=fit(B.all,B.bot); if(ty==null) ty=fit(B.all,0); if(ty==null) ty=fit(B.row,0);
+  // centred between the top panels and the touch buttons; else right under the panels (the buttons cover the least)
+  let ty=fit(B.all,B.bot); if(ty==null&&fit(B.all,0)!=null) ty=r.y0-B.all/z; if(ty==null) ty=fit(B.row,0);
   if(ty==null){ const band=B.row/z, uh=vh-band; ty=clamp(fy-band-uh/2,r.y0-band,r.y1-vh); }
   const room=R!==RMV.camR; RMV.camR=R; if(room) RMV.slideT=0.45;
   return {x:tx,y:ty,slide:RMV.slideT>0};
