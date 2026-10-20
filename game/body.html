@@ -351,6 +351,14 @@ body.padnav.padhint #menu.ttl{padding-bottom:calc(max(10px,env(safe-area-inset-b
   #menu.ttl #bHow,#menu.ttl #bSettings,#menu.ttl #bAcct{grid-column:span 2;text-align:center;padding-left:6px;padding-right:6px;font-size:14.5px}
   #menu.ttl #bStory small,#menu.ttl #bNormal small,#menu.ttl #bAcct small{display:none}
   #menu.ttl .note{display:none}
+  /* the difficulty toggle runs the full width under its label, so up and down from either column land on it */
+  #menu.ttl .diff{flex-direction:column;align-items:stretch;gap:3px;padding:4px 5px 5px;font-size:10px}
+  #menu.ttl .diff>span{padding-left:8px;line-height:1.2}
+  #menu.ttl .diff .seg{display:flex}
+  #menu.ttl .diff .seg button{flex:1;padding:6px 4px}
+  html:not(.sb) #menu.ttl #bHow::before,html:not(.sb) #menu.ttl #bHow::after,html:not(.sb) #menu.ttl #bSettings::before,html:not(.sb) #menu.ttl #bSettings::after,html:not(.sb) #menu.ttl #bAcct::before,html:not(.sb) #menu.ttl #bAcct::after{top:5px;width:5px;height:5px}
+  html:not(.sb) #menu.ttl #bHow::before,html:not(.sb) #menu.ttl #bSettings::before,html:not(.sb) #menu.ttl #bAcct::before{left:5px}
+  html:not(.sb) #menu.ttl #bHow::after,html:not(.sb) #menu.ttl #bSettings::after,html:not(.sb) #menu.ttl #bAcct::after{right:5px}
 }
 /* chapter cards and the controller toast */
 html.sb #card .num{display:inline-block;color:#fff;background:#e0782c;border:3px solid #3b2233;border-radius:12px;padding:4px 18px 4px 22px;box-shadow:0 4px 0 #3b2233;text-shadow:0 2px 0 #3b2233}
