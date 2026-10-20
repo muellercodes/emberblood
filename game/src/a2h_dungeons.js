@@ -573,6 +573,7 @@ function trialKeepLine(id,TR){ const nm=TR.abilName||TR.abil, own=STORY['trial_'
 { const base=exitArea; exitArea=function(){
     const A=AREA, r=A&&A.def?dunRoot(A.def.id):null, out=base.apply(this,arguments);
     try{ if(r&&G&&G.flags){ const I=trialInfo(r);
+        if(I&&I.abil&&G.flags['tlend_'+I.abil]===r&&!lendDone(r)&&typeof MV!=='undefined'&&MV.tip&&MV.tip.id==='abil_'+I.abil) MV.tip=null;   // (its "how to" tip too)
         if(I&&I.abil&&G.flags['tlend_'+I.abil]===r&&!lendDone(r)) later(0.6,()=>{ if((!AREA||dunRoot(AREA.def.id)!==r)&&G&&G.flags['tlend_'+I.abil]===r&&scene==='play')
           setBanner(S('Not yours yet','Not yours yet'),S(`${I.abilName} only works inside ${lendPlace(I)} until you finish it.`,`Finish ${lendPlace(I)} to keep it.`),3.6); });
         trialKeepAll(true); } }catch(e){ console.error(e); }
