@@ -116,7 +116,7 @@ function proWalkSetup(){
 }
 // the green empties: three are still out, putting the night away (Mom and Yara at the last string, Nana at the well)
 function proNpcs(){
-  const V=POI.village, keep={maren:[V.x-185,V.y-262],yara:[V.x-232,V.y-238],nana:[V.x+64,V.y-52]};
+  const V=POI.village, keep={maren:[V.x-190,V.y-270],yara:[V.x-300,V.y-190],nana:[V.x+64,V.y-52]};
   G.npcs=(G.npcs||[]).filter(n=>keep[n.id]);
   for(const n of G.npcs){ const k=keep[n.id]; n.x=k[0]; n.y=k[1]; n.home=[k[0],k[1]]; n.walk=false; n.walker=false; n.face=angTo(n.x,n.y,player.x,player.y); }
 }
@@ -235,7 +235,7 @@ function proOverlay(on){
 function proFrame(now){
   PRO.raf=0;
   const rt=clamp((now-(PRO.last||now))/1000,0,0.25), dt=Math.min(rt,0.05); PRO.last=now;
-  try{ proStep(dt,rt); proDraw(); }catch(e){ console.error(e); }
+  try{ proStep(dt,rt); const t0=performance.now(); proDraw(); const ms=performance.now()-t0; PRO.ms=PRO.ms==null?ms:PRO.ms*0.9+ms*0.1; }catch(e){ console.error(e); }
   if(PRO.el&&PRO.el.style.display!=='none') PRO.raf=requestAnimationFrame(proFrame);
 }
 function proStep(dt,rt){
@@ -248,10 +248,12 @@ function proStep(dt,rt){
   PRO.turnK+=((PRO.beat==='turn'?1:0)-PRO.turnK)*Math.min(1,dt*3);
   PRO.squeeze=Math.max(0,PRO.squeeze-dt*0.55);
   if(PRO.skipEl&&PRO.on&&PRO.skipDev!==curDevice()) proSkipLabel();
+  if(((PRO.fc=(PRO.fc||0)+1)%5)===0){ let tg=0; try{ const dl=document.getElementById('dialogue'), bx=document.getElementById('dlgBox'); if(dl&&bx&&dl.classList.contains('on')&&PRO.oy){ const top=bx.getBoundingClientRect().top-52, ay=PRO.oy+(PRO_ASH.y+30)*PRO.sc; if(ay>top) tg=top-ay; } }catch(e){} PRO.oyT=tg; }
+  PRO.oyS=(PRO.oyS||0)+((PRO.oyT||0)-(PRO.oyS||0))*Math.min(1,rt*5);
 }
 // a beat of the show: what the theatre and the camera do as a line comes up
 const PRO_CAM={green:-60,fennick:60,seat:-200,point:-190,flick:-190,wave:-190,tune:90,open:0,dragon:0,mine:-40,roar:0,squeeze:-170,calm:-170,
-  friends:0,tumble:0,girl:0,turn:-150,sing:0,sleep:0,rumble:-150,bow:40,yara:260,moth:-160,home:-200};
+  friends:0,tumble:0,girl:0,turn:-150,sing:0,sleep:0,rumble:220,bow:40,yara:280,moth:-160,home:-200};
 function proBeat(b){
   PRO.beat=b; PRO.bt=0; if(PRO_CAM[b]!=null) PRO.cxT=PRO_CAM[b];
   if(b==='roar'||b==='squeeze'){ PRO.shakeT=0.45; try{ SFX.play('roar',0.35); }catch(e){} }
@@ -297,7 +299,14 @@ function proGlow(g,x,y,r,rgb,a){ const gr=g.createRadialGradient(x,y,0,x,y,r); g
 function proLayer(x0,y0,x1,y1,paint){
   const s=PRO.sc*PRO.dpr, c=mkCanvas(Math.max(2,Math.ceil((x1-x0)*s)),Math.max(2,Math.ceil((y1-y0)*s))), g=c.getContext('2d');
   g.setTransform(s,0,0,s,-x0*s,-y0*s); g.lineCap='round'; g.lineJoin='round'; paint(g);
+  proGrain(c);
   return {c,x0,y0,x1,y1};
+}
+// paper grain over a painted canvas, only where it is painted
+function proGrain(c){
+  try{ const t=mkCanvas(c.width,c.height), q=t.getContext('2d'); q.fillStyle=q.createPattern(proPaper(),'repeat'); q.fillRect(0,0,t.width,t.height);
+    q.globalCompositeOperation='destination-in'; q.drawImage(c,0,0);
+    const g=c.getContext('2d'); g.setTransform(1,0,0,1,0,0); g.globalCompositeOperation='overlay'; g.globalAlpha=LOOK.sb?0.42:0.34; g.drawImage(t,0,0); g.globalAlpha=1; g.globalCompositeOperation='source-over'; }catch(e){}
 }
 function proPaper(){
   if(PRO.C.paper) return PRO.C.paper;
@@ -341,24 +350,23 @@ function proBlit(g,L,X,Y,a){ if(!L) return; if(a!=null) g.globalAlpha=a; g.drawI
 // ---------- the scenery: sky things, the mountain, the far roofs, the oak, the lantern strings, the posts
 function proPaintScenery(g){
   // the moon, round and bright tonight
-  proGlow(g,330,-250,120,'255,240,210',0.16);
-  proWash(g,proEll(330,-250,30,30,22),'#fbefd2',11,{pool:2,lw:1.1,j:1.4});
-  g.fillStyle='rgba(200,180,170,.25)'; for(const [x,y,r] of [[322,-256,6],[338,-242,4.5],[334,-262,3]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }
+  proGlow(g,-196,-268,120,'255,240,210',0.16);
+  proWash(g,proEll(-196,-268,28,28,22),'#fbefd2',11,{pool:2,lw:1.1,j:1.4});
+  g.fillStyle='rgba(200,180,170,.25)'; for(const [x,y,r] of [[-204,-274,6],[-188,-260,4.5],[-192,-280,3]]){ g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }
   // far hills, blue-grey
   const SP=PRO.span||PRO_SPAN; proWash(g,proPoly([[-SP-20,PRO_HZ+4],[-SP,-78],[-380,-96],[-200,-74],[60,-92],[260,-70],[420,-90],[SP,-80],[SP+20,-72],[SP+20,PRO_HZ+4]],22),'#3c3c66',21,{pool:2.6,lw:1,a:0.9});
   // Cinder Mountain, with a red throat at the top
-  const M=proPoly([[-560,PRO_HZ],[-470,-92],[-350,-160],[-292,-222],[-270,-230],[-252,-224],[-236,-232],[-214,-222],[-150,-150],[-60,-96],[40,PRO_HZ]],16);
-  proWash(g,M,'#3a2638',31,{pool:3,lw:1.5,bloom:6,bx0:-420,bx1:-120,by0:-200,by1:-60,br:40});
+  const M=proPoly([[-40,PRO_HZ],[60,-96],[150,-150],[214,-222],[236,-232],[252,-224],[270,-230],[292,-222],[350,-160],[470,-92],[580,PRO_HZ]],16);
+  proWash(g,M,'#3a2638',31,{pool:3,lw:1.5,bloom:6,bx0:120,bx1:420,by0:-200,by1:-60,br:40});
   g.save(); proPath(g,M,true); g.clip();
-  g.strokeStyle='rgba(110,80,120,.32)'; g.lineWidth=1.6; for(const [ex,ey,cx2] of [[-420,-60,-330],[-330,-40,-290],[-180,-50,-210],[-90,-44,-150]]){ g.beginPath(); g.moveTo(-252,-222); g.quadraticCurveTo(cx2,-150,ex,ey); g.stroke(); }
-  g.fillStyle='rgba(150,120,160,.16)'; g.beginPath(); g.moveTo(-252,-224); g.lineTo(-150,-150); g.lineTo(-60,-96); g.lineTo(40,PRO_HZ); g.lineTo(-120,PRO_HZ); g.closePath(); g.fill();
-  proGlow(g,-252,-226,46,'255,110,50',0.5);
+  { const lg=g.createLinearGradient(40,0,300,0); lg.addColorStop(0,'rgba(150,120,170,.2)'); lg.addColorStop(1,'rgba(150,120,170,0)'); g.fillStyle=lg; g.fillRect(-40,-240,620,210); }
+  proGlow(g,252,-226,46,'255,110,50',0.5);
   g.restore();
   // the far side of the green: rooftops and chimneys, a few windows still lit
   const R2=mulberry32(91);
   for(let x=-SP-10;x<SP+10;){
     const w=46+R2()*40, h=22+R2()*20, ry=PRO_HZ+2, rh=14+R2()*12, col=R2()<0.5?'#2d2a4a':'#33284a';
-    if(x>-430&&x<-80&&R2()<0.55){ x+=w*0.7; continue; }
+    if(x>-520&&x<-300&&R2()<0.5){ x+=w*0.7; continue; }
     proWash(g,proPoly([[x,ry],[x,ry-h],[x+w*0.5,ry-h-rh],[x+w,ry-h],[x+w,ry]],10),col,700+x|0,{pool:2,lw:1.1,j:1.6});
     if(R2()<0.6){ const cx=x+w*(0.2+R2()*0.5); proWash(g,proPoly([[cx,ry-h-rh*0.4],[cx,ry-h-rh-4],[cx+7,ry-h-rh-4],[cx+7,ry-h-rh*0.2]],6),col,900+x|0,{pool:1.4,lw:1,j:1}); }
     if(R2()<0.7){ const wx=x+w*(0.25+R2()*0.4), wy=ry-h*0.6; g.fillStyle='rgba(255,196,110,.9)'; g.fillRect(wx,wy,7,6); proGlow(g,wx+3.5,wy+3,14,'255,180,90',0.35); proInk(g,proPoly([[wx,wy],[wx+7,wy],[wx+7,wy+6],[wx,wy+6]],4),0.9,x|0,null,true); }
@@ -405,7 +413,7 @@ function proPaintBooth(g){
   // the painted board on top: cream with a red scalloped edge, a sun-lantern in the middle and stars
   const top=proPoly([[-156,-200],[-150,-226],[-60,-238],[0,-252],[60,-238],[150,-226],[156,-200],[150,-160],[-150,-160]],10);
   proWash(g,top,'#f1dcb0',111,{pool:2.4,lw:1.5,bloom:5,bx0:-140,bx1:140,by0:-240,by1:-165,br:30});
-  const sc=[]; for(let i=0;i<=12;i++){ const x=-150+i*25; sc.push([x,-168]); sc.push([x+12.5,-158]); }
+  const sc=[]; for(let i=0;i<12;i++){ const x=-150+i*25; sc.push([x,-168]); sc.push([x+12.5,-158]); } sc.push([150,-168]);
   proWash(g,proPoly([[-150,-176],[150,-176]].concat(sc.slice().reverse().map(p=>[p[0],p[1]])),8),'#b8412e',113,{pool:1.6,lw:1.1,j:0.8});
   proWash(g,proEll(0,-208,17,17,16),'#e8a94a',115,{pool:1.6,lw:1.2,j:1});
   for(let i=0;i<12;i++){ const a=i/12*TAU; proInk(g,[[Math.cos(a)*21,-208+Math.sin(a)*21],[Math.cos(a)*28,-208+Math.sin(a)*28]],1.2,120+i,'rgba(160,80,40,.85)'); }
@@ -595,7 +603,20 @@ function proPaintCrowd(g,turnMode){
   proHead(g,PRO_LIT[0][0],PRO_LIT[0][1],PRO_LIT[0][2],'#d8b060',961,-1,{shirt:'#c86a4a',skin:'#f0c8a0',bun:true});
   proHead(g,PRO_LIT[1][0],PRO_LIT[1][1],PRO_LIT[1][2],'#6a3a1a',971,-1,{shirt:'#5a8a5a',skin:'#c8946c'});
   // Mom, standing behind Ash (her hand on his shoulder is painted live)
-  proPerson(g,PRO_MOM.x,PRO_MOM.y+120,1.0,{shirt:'#8a4a2a',low:'#5a3020',apron:'#4a3020',skin:'#e2aa82',hair:'#b8401a',bun:true,face:0},981);
+  proMom(g);
+}
+// Mom kneeling behind Ash on the stone, seen from behind: her shirt, the apron's straps and bow, her red hair in a bun
+function proMom(g){
+  const x=PRO_MOM.x, y=PRO_MOM.y;
+  proWash(g,proPoly([[x-25,y+118],[x-27,y+44],[x-22,y+24],[x-10,y+16],[x+10,y+16],[x+22,y+24],[x+27,y+44],[x+25,y+118]],8),'#8a4a2a',981,{pool:2,lw:1.3,j:1});
+  g.strokeStyle='rgba(60,32,20,.9)'; g.lineWidth=3; g.beginPath(); g.moveTo(x-12,y+20); g.lineTo(x+8,y+70); g.moveTo(x+12,y+20); g.lineTo(x-8,y+70); g.stroke();
+  g.lineWidth=2.6; g.beginPath(); g.moveTo(x-24,y+70); g.lineTo(x+24,y+70); g.stroke();
+  proWash(g,proEll(x-7,y+72,7,4.5,10,-0.3),'#4a3020',983,{pool:1,lw:1,j:0.4}); proWash(g,proEll(x+7,y+72,7,4.5,10,0.3),'#4a3020',984,{pool:1,lw:1,j:0.4});
+  proInk(g,[[x-3,y+75],[x-8,y+90]],1.6,985,'rgba(60,32,20,.9)'); proInk(g,[[x+3,y+75],[x+9,y+92]],1.6,986,'rgba(60,32,20,.9)');
+  proWash(g,proEll(x,y,13,13.5,16),'#b8401a',987,{pool:1.8,lw:1.3,j:0.7});
+  proWash(g,proEll(x+1,y-14,7.5,6.5,12),'#a8381a',988,{pool:1.2,lw:1.1,j:0.5});
+  g.strokeStyle='rgba(90,24,10,.7)'; g.lineWidth=1; for(let i=0;i<5;i++){ g.beginPath(); g.moveTo(x-9+i*4,y-8); g.quadraticCurveTo(x-10+i*5,y+2,x-8+i*4,y+10); g.stroke(); }
+  g.save(); g.globalCompositeOperation='lighter'; g.strokeStyle='rgba(255,180,110,.3)'; g.lineWidth=2.4; g.beginPath(); g.arc(x,y,11,-2.5,-0.6); g.stroke(); g.restore();
 }
 // a grown-up standing, seen from behind or turned a little (face: 0 back, -1 looking left, 1 right)
 function proPerson(g,x,feet,s,o,seed){
@@ -620,9 +641,9 @@ function proPerson(g,x,feet,s,o,seed){
 // Elder Yara at the edge of the green, her shawl pulled tight, her face to the mountain
 function proPaintYara(g){
   const x=PRO_YARA.x, f=PRO_YARA.y, s=1.06;
-  proPerson(g,x,f,s,{shirt:'#4e5e32',low:'#3e4c28',skin:'#9a6444',hair:'#e8e4dc',bun:true,face:-1},1001);
-  proWash(g,proPoly([[x-26*s,f-92*s],[x-6*s,f-102*s],[x+20*s,f-96*s],[x+28*s,f-70*s],[x+10*s,f-60*s],[x-22*s,f-66*s]],6),'#a7d98f',1011,{pool:1.6,lw:1.2,j:0.8,a:0.85});
-  g.strokeStyle='rgba(60,80,40,.6)'; g.lineWidth=1; for(let i=0;i<4;i++){ g.beginPath(); g.moveTo(x-20*s+i*12*s,f-66*s); g.lineTo(x-22*s+i*12*s,f-56*s); g.stroke(); }
+  proPerson(g,x,f,s,{shirt:'#4e5e32',low:'#3e4c28',skin:'#9a6444',hair:'#e8e4dc',bun:true,face:1},1001);
+  proWash(g,proPoly([[x+26*s,f-92*s],[x+6*s,f-102*s],[x-20*s,f-96*s],[x-28*s,f-70*s],[x-10*s,f-60*s],[x+22*s,f-66*s]],6),'#a7d98f',1011,{pool:1.6,lw:1.2,j:0.8,a:0.85});
+  g.strokeStyle='rgba(60,80,40,.6)'; g.lineWidth=1; for(let i=0;i<4;i++){ g.beginPath(); g.moveTo(x+20*s-i*12*s,f-66*s); g.lineTo(x+22*s-i*12*s,f-56*s); g.stroke(); }
 }
 // Ash on the warm stone: horns, the back of his head, his tail curled round with its ember
 function proPaintAsh(g,t){
@@ -652,7 +673,7 @@ function proPaintLive(g,t){
   const B=PRO.beat, k=PRO.bt;
   // Mom's hand on Ash's shoulder: it squeezes when the dragon roars
   const sq=PRO.squeeze, hx=PRO_ASH.x-15, hy=PRO_ASH.y+18;
-  g.strokeStyle='rgba(43,22,38,.86)'; g.lineWidth=7; g.lineCap='round'; g.beginPath(); g.moveTo(PRO_MOM.x+15,PRO_MOM.y+26); g.quadraticCurveTo(PRO_MOM.x+26,PRO_MOM.y+52,hx,hy); g.stroke(); g.strokeStyle='#8a4a2a'; g.lineWidth=5.6; g.stroke();
+  g.strokeStyle='rgba(43,22,38,.86)'; g.lineWidth=7; g.lineCap='round'; g.lineWidth=10; g.beginPath(); g.moveTo(PRO_MOM.x+19,PRO_MOM.y+26); g.quadraticCurveTo(PRO_MOM.x+34,PRO_MOM.y+46,hx+2,hy-2); g.stroke(); g.strokeStyle='#8a4a2a'; g.lineWidth=7.6; g.beginPath(); g.moveTo(PRO_MOM.x+19,PRO_MOM.y+26); g.quadraticCurveTo(PRO_MOM.x+33,PRO_MOM.y+40,PRO_MOM.x+30,PRO_MOM.y+52); g.stroke(); g.strokeStyle='#e2aa82'; g.lineWidth=6; g.beginPath(); g.moveTo(PRO_MOM.x+30,PRO_MOM.y+52); g.quadraticCurveTo(PRO_MOM.x+31,PRO_MOM.y+62,hx+2,hy-2); g.stroke();
   proWash(g,proEll(hx+2,hy+2,6.5-sq*1.2,4.6+sq*0.6,10,0.4),'#e2aa82',1201,{pool:1,lw:1.1,j:0.4});
   g.strokeStyle='rgba(120,60,40,.7)'; g.lineWidth=0.9; for(let i=0;i<3;i++){ g.beginPath(); g.moveTo(hx+i*2.6,hy+2); g.lineTo(hx+i*2.6+1.2,hy+6+sq*1.5); g.stroke(); }
   if(sq>0.3){ g.strokeStyle=`rgba(255,240,220,${(sq-0.3)*1.2})`; g.lineWidth=1.3; for(const a of [-2.2,-1.6,-1.0]){ g.beginPath(); g.moveTo(hx+2+Math.cos(a)*10,hy+Math.sin(a)*10); g.lineTo(hx+2+Math.cos(a)*15,hy+Math.sin(a)*15); g.stroke(); } }
@@ -691,10 +712,10 @@ function proPaintBehind(g,t){
 // smoke from the real mountain: thicker on the rumble
 function proSmoke(g,t){
   const big=PRO.beat==='rumble'?1+proEase(PRO.bt/0.8)*0.8:1;
-  for(let i=0;i<7;i++){ const ph=(t*0.05+i/7)%1, x=-250+ph*170+Math.sin(ph*5+i)*12, y=-236-ph*90, r=(10+ph*38)*big;
+  for(let i=0;i<7;i++){ const ph=(t*0.05+i/7)%1, x=250-ph*170+Math.sin(ph*5+i)*12, y=-236-ph*90, r=(10+ph*38)*big;
     g.fillStyle=`rgba(150,130,160,${0.22*Math.sin(ph*Math.PI)})`; g.beginPath(); g.ellipse(x,y,r,r*0.7,0,0,TAU); g.fill(); }
   const gl=PRO.beat==='rumble'?0.5+0.4*Math.sin(clamp(PRO.bt/1.6,0,1)*Math.PI):0.3+0.08*Math.sin(t*1.3);
-  proGlow(g,-252,-230,70,'255,110,50',gl);
+  proGlow(g,252,-230,70,'255,110,50',gl);
 }
 
 // ---------- each frame: sky, scenery, booth and stage, crowd, the live bits, paper, the fade
@@ -708,18 +729,20 @@ function proDraw(){
   if(!show){ g.clearRect(0,0,w,h); if(PRO.fade>0.002){ g.fillStyle=`rgba(6,3,10,${PRO.fade})`; g.fillRect(0,0,w,h); } return; }
   proBuild();
   const t=PRO.t, sc=Lo.sc, cx=clamp(PRO.cx,-Lo.lim,Lo.lim), shake=PRO.shakeT>0?Math.sin(t*70)*2.2*Math.min(1,PRO.shakeT*3):0;
-  const X=v=>w/2+(v-cx)*sc+shake, Y=v=>Lo.oy+v*sc;
-  // the sky
-  const hz=Y(PRO_HZ), sk=g.createLinearGradient(0,0,0,hz); sk.addColorStop(0,'#161430'); sk.addColorStop(0.55,'#2c2652'); sk.addColorStop(1,'#5a3e62');
-  g.fillStyle=sk; g.fillRect(0,0,w,hz+2);
+  const oy=Lo.oy+(PRO.oyS||0), X=v=>w/2+(v-cx)*sc+shake, Y=v=>oy+v*sc;
+  // the sky and the green (one cached picture), the stars
+  const hz=Lo.oy+PRO_HZ*sc;
+  if(!PRO.C.bg){ const bc=mkCanvas(Math.max(2,Math.round(w*dpr)),Math.max(2,Math.round(h*dpr))), q=bc.getContext('2d'), Hz=hz*dpr;
+    const sk=q.createLinearGradient(0,0,0,Hz); sk.addColorStop(0,'#161430'); sk.addColorStop(0.55,'#2c2652'); sk.addColorStop(1,'#5a3e62'); q.fillStyle=sk; q.fillRect(0,0,bc.width,Hz+2);
+    const gr=q.createLinearGradient(0,Hz,0,bc.height); gr.addColorStop(0,'#2a3a3a'); gr.addColorStop(0.35,'#22322c'); gr.addColorStop(1,'#141c1a'); q.fillStyle=gr; q.fillRect(0,Hz,bc.width,bc.height-Hz);
+    proGrain(bc); PRO.C.bg=bc; }
+  { const sh=PRO.oyS||0; g.drawImage(PRO.C.bg,0,sh,w,h); if(sh<0){ g.fillStyle='#141c1a'; g.fillRect(0,h+sh-1,w,1-sh); } else if(sh>0){ g.fillStyle='#161430'; g.fillRect(0,0,w,sh+1); } }
   if(!PRO.C.stars){ const R=mulberry32(3); PRO.C.stars=[]; for(let i=0;i<90;i++) PRO.C.stars.push([R()*2-1,R(),0.5+R()*1.3,R()*9]); }
   for(const [sx,sy,r,ph] of PRO.C.stars){ const x=w/2+sx*w*0.6-cx*sc*0.3, y=sy*hz*0.82; g.fillStyle=`rgba(255,246,220,${0.35+0.4*Math.sin(t*1.3+ph)*Math.sin(t*0.7+ph*2)})`; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }
-  // the green
-  const gr=g.createLinearGradient(0,hz,0,h); gr.addColorStop(0,'#2a3a3a'); gr.addColorStop(0.35,'#22322c'); gr.addColorStop(1,'#141c1a'); g.fillStyle=gr; g.fillRect(0,hz,w,h-hz);
   // scenery, then the light of the stage spilling on the grass
   g.save(); g.setTransform(dpr*sc,0,0,dpr*sc,dpr*X(0),dpr*Y(0)); proSmoke(g,t); g.restore();
   proBlit(g,PRO.C.scen,X,Y);
-  g.save(); g.globalCompositeOperation='lighter'; const pl=g.createRadialGradient(X(0),Y(60),10,X(0),Y(60),360*sc); pl.addColorStop(0,'rgba(255,170,90,.26)'); pl.addColorStop(1,'rgba(255,170,90,0)'); g.fillStyle=pl; g.fillRect(0,0,w,h); g.restore();
+  g.save(); g.globalCompositeOperation='lighter'; const pl=g.createRadialGradient(X(0),Y(60),10,X(0),Y(60),360*sc); pl.addColorStop(0,'rgba(255,170,90,.26)'); pl.addColorStop(1,'rgba(255,170,90,0)'); g.fillStyle=pl; g.fillRect(X(0)-360*sc,Y(60)-360*sc,720*sc,720*sc); g.restore();
   // the booth (Nana behind it), then the stage inside it
   g.save(); g.setTransform(dpr*sc,0,0,dpr*sc,dpr*X(0),dpr*Y(0)); g.lineCap='round'; g.lineJoin='round'; proPaintBehind(g,t); g.restore();
   proBlit(g,PRO.C.booth,X,Y);
@@ -729,8 +752,7 @@ function proDraw(){
   g.save(); g.translate(0,jolt); proBlit(g,PRO.C.crowd,X,Y,1-PRO.turnK); if(PRO.turnK>0.01) proBlit(g,PRO.C.crowdT,X,Y,PRO.turnK); g.restore();
   proBlit(g,PRO.C.yara,X,Y);
   g.save(); g.setTransform(dpr*sc,0,0,dpr*sc,dpr*X(0),dpr*Y(0)); g.lineCap='round'; g.lineJoin='round'; proPaintLive(g,t); proPaintAsh(g,t); g.restore();
-  // paper grain and the edges darkened, like a page
-  g.save(); g.globalCompositeOperation='overlay'; g.globalAlpha=LOOK.sb?0.32:0.24; if(!PRO.pat||PRO.patG!==g){ PRO.pat=g.createPattern(proPaper(),'repeat'); PRO.patG=g; } g.fillStyle=PRO.pat; g.fillRect(0,0,w,h); g.restore();
+  // the edges darkened, like a page
   if(!PRO.C.vig||PRO.C.vigK!==w+'x'+h){ PRO.C.vigK=w+'x'+h; const vc=mkCanvas(Math.max(2,w>>1),Math.max(2,h>>1)), vg=vc.getContext('2d'), rg=vg.createRadialGradient(vc.width/2,vc.height*0.42,Math.min(vc.width,vc.height)*0.3,vc.width/2,vc.height*0.45,Math.max(vc.width,vc.height)*0.75); rg.addColorStop(0,'rgba(10,4,16,0)'); rg.addColorStop(1,'rgba(10,4,16,.62)'); vg.fillStyle=rg; vg.fillRect(0,0,vc.width,vc.height); PRO.C.vig=vc; }
   g.drawImage(PRO.C.vig,0,0,w,h);
   if(PRO.fade>0.002){ g.fillStyle=`rgba(6,3,10,${PRO.fade})`; g.fillRect(0,0,w,h); }
@@ -754,9 +776,16 @@ function proDraw(){
 // only home tonight: other doors stay shut, and the three on the green just say goodnight
 { const base=enterArea; enterArea=function(id,door){ if(PRO.on&&PRO.phase!=='title'&&PRO.phase!=='show'&&id!=='h_ash'&&id!=='h_ash_up'){ try{ if(door){ doorNote(door.x,door.y-30,S('Everyone is still out on the green. Home is the other way.','Nobody is home. Go home.'),false); DW.hold=door; DW.holdT=0.4; } }catch(e){} return; } return base.apply(this,arguments); }; }
 { const base=talkTo; talkTo=function(n){ if(PRO.on){ const L=PRO_TALK[n&&n.id]; if(L) runDialogue(L(),()=>{ scene='play'; }); return; } return base.apply(this,arguments); }; }
+// the prompts tonight: home's front door, the three on the green, the stairs, the bed (nothing else on the way)
 { const base=updateInteractions; updateInteractions=function(dt){ const r=base.apply(this,arguments);
-    if(PRO.on&&G.prompt){ const p=G.prompt, ok=/^(Talk to|Go|Enter|Climb|Leave|Get into bed|Go to bed|Sleep)/i.test(String(p.text||''));
-      if(!ok) G.prompt=null; else if(!AREA){ const d=DOORS.find(q=>q.area==='h_ash'); if(!/^Talk to/i.test(p.text)&&!(d&&Math.abs(p.x-d.x)<2&&Math.abs(p.y-d.y)<2)) G.prompt=null; } }
+    if(!PRO.on||(PRO.phase!=='walk'&&PRO.phase!=='home')) return r;
+    const p=G.prompt, t=p?String(p.text||''):'';
+    if(AREA){ if(p&&!/^(Go|Climb|Leave|Get into bed|Go to bed)/i.test(t)) G.prompt=null; return r; }
+    const d=DOORS.find(q=>q.area==='h_ash'), atDoor=p&&d&&Math.abs(p.x-d.x)<2&&Math.abs(p.y-d.y)<2;
+    if(p&&(atDoor||/^Talk to/i.test(t))) return r;
+    G.prompt=null;
+    if(d&&dist(player.x,player.y,d.x,d.y)<46) G.prompt={text:String(d.label||'Enter Home'),act:()=>enterArea(d.area,d),x:d.x,y:d.y};
+    else for(const n of G.npcs){ if(dist(player.x,player.y,n.x,n.y)<70){ G.prompt={text:`Talk to ${n.name.replace(', your mom','')}`,act:()=>talkTo(n),x:n.x,y:n.y}; break; } }
     return r; }; }
 { const base=areaObjAct; areaObjAct=function(o){ if(PRO.on&&o&&o.k==='bed'&&o.home&&AREA&&AREA.id==='h_ash_up'){ proBed(o); return; } if(PRO.on&&o&&o.k!=='stairs') return; return base.apply(this,arguments); }; }
 // Escape skips it (a capture listener, ahead of the game's keys: outside a talk Escape would pause), and so do the
@@ -778,7 +807,7 @@ function proHookTests(){
   try{ const E=window.__eb; if(E&&!E._proSkip){ const b=E.skipDialogue; E.skipDialogue=function(){ if(PRO.on) proFinish(true); return b.apply(this,arguments); }; E._proSkip=1; } }catch(e){}
 }
 window.__ebDbg=Object.assign(window.__ebDbg||{},{pro:{
-  state:()=>({on:PRO.on,phase:PRO.phase,beat:PRO.beat,watched:PRO.watched,where:PRO.on?proWhere():null,tip:PRO.on?proTipId():null,fade:PRO.fade,eve:!!(G&&G.flags&&G.flags.lantern_eve),sc:PRO.sc}),
-  skip:()=>proSkip(), show:()=>proShow(), beat:b=>proBeat(b), bed:()=>{ const b=AREA&&AREA.objs.find(o=>o.k==='bed'&&o.home); if(b) proBed(b); return !!b; },
+  state:()=>({on:PRO.on,phase:PRO.phase,beat:PRO.beat,watched:PRO.watched,where:PRO.on?proWhere():null,tip:PRO.on?proTipId():null,fade:PRO.fade,ms:PRO.ms,eve:!!(G&&G.flags&&G.flags.lantern_eve),sc:PRO.sc}),
+  skip:()=>proSkip(), show:()=>proShow(), dlgText:()=>DLG?simplify(String(DLG.text||'')):null, beat:b=>proBeat(b), bed:()=>{ const b=AREA&&AREA.objs.find(o=>o.k==='bed'&&o.home); if(b) proBed(b); return !!b; },
   lines:()=>proShowLines().concat(proBedLines()).map(l=>[l.who,l.text])
 }});
