@@ -20,9 +20,9 @@ const trialDone=id=>!!(G&&G.flags&&G.flags['trial_'+id+'_done']);
 // (v12 META) on the map, the HUD region label and the first-visit banner a Trial goes by what Ash can see (the folk
 // names R1's door prompts and signs use, x0_act1.js A1_FOLK, here as place names) until Ember names it: inside it, or
 // at the end of the Trial before it ("Two more Trials are waiting. The Trial of the Tide ..."). Same rule as R1's
-// a1TrialKnown. The Arena knows them all.
+// a1TrialKnown, plus its boss or its gift (old saves that never recorded the visit). The Arena knows them all.
 const TRIAL_FOLK={leap:S('Old Rooted Arch','Rooted Arch'),tide:S('Shell Doors','Shell Doors'),sky:S('White Gate','White Gate')};
-function trialKnown(id){ if(!G||G.mode!=='story') return true; const F=G.found||{}, f=G.flags||{}; return !!F['seen_'+id]||trialDone(id)||(id==='tide'&&!!f.trial_leap_boss)||(id==='sky'&&!!f.trial_tide_boss); }
+function trialKnown(id){ if(!G||G.mode!=='story') return true; const F=G.found||{}, f=G.flags||{}; return !!F['seen_'+id]||trialDone(id)||!!f['trial_'+id+'_boss']||!!(TRIALS[id]&&hasAbil(TRIALS[id].abil))||(id==='tide'&&!!f.trial_leap_boss)||(id==='sky'&&!!f.trial_tide_boss); }
 function trialFolk(id){ return TRIAL_FOLK[id]||(TRIALS[id]&&TRIALS[id].name)||''; }
 function trialPlace(id){ const T=TRIALS[id]; return !T?'':trialKnown(id)?T.name:trialFolk(id); }
 // the dungeon an area belongs to (a floor of a multi-floor dungeon names it in def.dun), and its Trial-like info
