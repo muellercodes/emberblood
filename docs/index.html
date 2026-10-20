@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Emberblood: a top-down open-world action game. Ash, the last Emberblood, has to relight five Ward-fires and face a very old grandfather.">
+<meta name="description" content="Emberblood: a top-down open-world action game. Ash was born with horns, a tail and real fire, and this year the old puppet show about the dragon on the mountain turns out to be more than a puppet show.">
 <meta name="theme-color" content="#0b0607">
 <meta property="og:title" content="Emberblood">
-<meta property="og:description" content="Relight the Wards. Face your great ×13 grandfather.">
+<meta property="og:description" content="Three lanterns to light, and an old puppet show that is more than it seems.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>Emberblood</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,7 +396,7 @@ html.sb #padToast span{color:#6a4a52}
     <div class="tag">Heir of the First Flame</div>
     <div class="stack">
       <button class="btn hot" id="bContinue" hidden>Continue Journey<small id="contSub"></small></button>
-      <button class="btn" id="bStory">Story Mode<small id="storySub">An open world to explore. One very old grandfather.</small></button>
+      <button class="btn" id="bStory">Story Mode<small id="storySub">An open world to explore. Three lanterns to light.</small></button>
       <button class="btn" id="bNormal">Arena<small>Endless waves in the Proving Grounds. How long can you last?</small></button>
       <div class="diff"><span>Difficulty</span>
         <div class="seg" role="group" aria-label="Difficulty">
@@ -428,7 +428,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>Left click / J</kbd><span>Attack. Hold for a combo. Ash turns to the closest foe in front of him. Next to someone or something you can use, with no foe close, it talks or opens instead.</span>
               <kbd>Right click / K</kbd><span>Fire breath. Uses your fire meter. It finds the foe in front of you too.</span>
               <kbd>Space</kbd><span>Dodge roll. Nothing hits you mid-roll.</span>
-              <kbd>C</kbd><span>Jump, once Ash learns how. With wings, hold jump in the air to fly.</span>
+              <kbd data-pow="jump">C</kbd><span data-pow="jump">Jump.<span data-pow="wings"> With wings, hold jump in the air to fly.</span></span>
               <kbd>Q</kbd><span>Dragon Roar, once the meter is full</span>
               <kbd>R</kbd><span>Drink a healing draught</span>
             </div>
@@ -461,7 +461,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>Left click / Enter</kbd><span>Attack. Hold for a combo. Next to someone or something you can use, with no foe close, it talks or opens instead.</span>
               <kbd>Right click / '</kbd><span>Fire breath. Uses your fire meter.</span>
               <kbd>Right Ctrl</kbd><span>Dodge roll. Space works too.</span>
-              <kbd>/</kbd><span>Jump, once Ash learns how. With wings, hold jump in the air to fly.</span>
+              <kbd data-pow="jump">/</kbd><span data-pow="jump">Jump.<span data-pow="wings"> With wings, hold jump in the air to fly.</span></span>
               <kbd>;</kbd><span>Dragon Roar, once the meter is full</span>
               <kbd>.</kbd><span>Drink a healing draught</span>
             </div>
@@ -481,7 +481,7 @@ html.sb #padToast span{color:#6a4a52}
               <kbd>N</kbd><span>Sound on or off</span>
               <kbd>P / Esc</kbd><span>Pause</span>
             </div>
-            <p class="hnote">Got a number pad? <b>0</b> rolls, <b>1</b> jumps, <b>2</b> breathes fire, <b>3</b> drinks, <b>5</b> uses your quick-slot item and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
+            <p class="hnote">Got a number pad? <b>0</b> rolls, <span data-pow="jump"><b>1</b> jumps, </span><b>2</b> breathes fire, <b>3</b> drinks, <b>5</b> uses your quick-slot item and its <b>Enter</b> talks. The right-hand keys (WASD and the rest) still work too.</p>
           </div>
         </div>
       </section>
@@ -492,7 +492,7 @@ html.sb #padToast span{color:#6a4a52}
             <ul class="tips">
               <li>Drag on the left side to move (the right side if Settings has <b>Handed: Left</b>). Push the stick all the way to sprint.</li>
               <li><b>SLASH</b> attacks. Hold it for a combo. Next to someone or something you can use, with no foe close, it glows and says <b>TALK</b>, <b>OPEN</b>, <b>READ</b>, <b>ENTER</b> or <b>TAKE</b>. Tap it to do that.</li>
-              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
+              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges.<span data-pow="jump"> <b>JUMP</b> jumps.</span><span data-pow="wings"> With wings it says <b>FLY</b> in the air.</span></li>
               <li>Some buttons show up only when they can help, always in the same spot: <b>DRINK</b> when you are hurt, <b>ROAR</b> when its ring is full, <b>CALL</b> when your companion is far away or waiting.</li>
               <li>Tap the green flasks at the top to drink any time. Tap your companion's picture to call them, twice to make them wait.</li>
               <li>Tap the weapon at the top to switch weapons once you have two or more.</li>
@@ -528,12 +528,8 @@ html.sb #padToast span{color:#6a4a52}
           <li><b>One button.</b> Attack also talks, opens doors and chests and picks things up when no foe is close. On touch, SLASH says what it will do.</li>
           <li><b>Left-handed play.</b> Settings has <b>Handed: Left</b>: mirrored touch buttons, a left-handed keyboard and southpaw controllers.</li>
           <li><b>Tips you can close.</b> Every tip has an X, and Settings can turn them off.</li>
-          <li><b>More weapons.</b> Twin daggers, a spear, a forge hammer, a boomerang and a bow. Each one fights in its own way.</li>
-          <li><b>Ember's Trials.</b> Three old dungeons built long ago by Ember, one of Ash's ancestors. Each one wakes a gift in your blood.</li>
-          <li><b>Jump.</b> Win it in the Trial of the Leap in Whisperwood. Hop over gaps, fences and pits.</li>
-          <li><b>Water stride.</b> The Trial of the Tide on Lake Mirrow. Walk right across the water.</li>
-          <li><b>Wings.</b> The Trial of the Sky in the Drakeling Crags. Jump, then hold jump in the air to fly. Press jump again to land.</li>
-          <li><b>Skills.</b> Every level gives you a skill point. Spend it on Blade, Flame, Wings or Heart. The Powers page shows every power you have found and how to use it.</li>
+          <li><b>More weapons.</b> Each one fights in its own way. Tap the weapon chip, or press X, to switch.</li>
+          <li><b>Skills.</b> Every level gives you a skill point. The Powers page shows the powers you have found and how to use them.</li>
           <li><b>Companions.</b> Friends can join you. They follow you, fight with you and chat. People in town notice what you do.</li>
           <li><b>Controllers.</b> PlayStation, Xbox and Nintendo controllers work everywhere, even in menus. Settings can go fullscreen for a TV.</li>
         </ul>
@@ -545,7 +541,7 @@ html.sb #padToast span{color:#6a4a52}
           <li>Rest at dragon shrines to heal, refill draughts and save. You can fast travel between shrines you have found.</li>
           <li>Swings, rolls and sprinting cost stamina. Back off and let it refill.</li>
           <li>Red shapes on the ground show where an attack will land.</li>
-          <li>Hold fire breath on lanterns and Ward stones to light them. Fire also melts snowmen, smokes out bees, and lights fireplaces.</li>
+          <li>Hold fire breath on lanterns to light them. Fire also melts snowmen, smokes out bees, and lights fireplaces.</li>
           <li>A gold <b>!</b> means someone has a quest for you. A blue <b>?</b> means they're waiting for something you have.</li>
           <li>Walk up to any door or cave and use it to go inside. Smash pots for coins.</li>
           <li>Night is darker and wolves hunt. Chests hold experience for leveling up.</li>
@@ -679,7 +675,7 @@ html.sb #padToast span{color:#6a4a52}
 <div id="jour" class="ov dim">
   <div class="panel">
     <h2>Journal</h2>
-    <div class="seg jtabs" id="jTabs" role="group" aria-label="Journal sections"><button type="button" data-t="quests" aria-pressed="true">Quests</button><button type="button" data-t="story" aria-pressed="false">Story</button><button type="button" data-t="people" aria-pressed="false">People</button><button type="button" data-t="bag" aria-pressed="false">Satchel</button><button type="button" data-t="secrets" aria-pressed="false">Secrets</button></div>
+    <div class="seg jtabs" id="jTabs" role="group" aria-label="Journal sections"><button type="button" data-t="quests" aria-pressed="true">Quests</button><button type="button" data-t="story" aria-pressed="false">Story</button><button type="button" data-t="people" aria-pressed="false">People</button><button type="button" data-t="bag" aria-pressed="false">Satchel</button><button type="button" data-t="secrets" aria-pressed="false">Finds</button></div>
     <div class="jbody" id="jBody"></div>
     <div style="margin-top:14px"><button class="btn c hot" id="bJourClose" type="button">Close</button></div>
   </div>
@@ -3624,8 +3620,9 @@ function enterArea(id,door){
   if(G.goat&&G.side.duchess==='follow'){ G.goat.x=player.x+30; G.goat.y=player.y+30; }
   updateCam(0,true); G.fade=1; SFX.play('ui');
   { const TI=def.kind==='cave'&&trialInfo(def.trial||def.id), sh=TI&&TI.shrine; if(sh){ G.shrines[sh.id]=true; G.lastShrine=sh.id; } }
+  // (v12) a Trial's first banner uses its folk name (a2h_dungeons.js trialFolk): Ember names it a moment later
   const firstVisit=!G.found['seen_'+id];
-  if(firstVisit){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.name,def.trial?`One of Ember’s Trials · Danger level ${def.level}`:`${def.dunKind||'A cave'} · Danger level ${def.level}`,2.6,'region'); } }
+  if(firstVisit){ G.found['seen_'+id]=true; if(def.kind==='cave'){ setBanner(def.trial&&typeof trialFolk==='function'?trialFolk(def.trial):def.name,def.trial?`Danger level ${def.level}`:`${def.dunKind||'A cave'} · Danger level ${def.level}`,2.6,'region'); } }
   else if(def.kind==='cave') setBanner(def.name,'',1.6,'region');
   // (v11 polish) a house's name: a small plate at the top on the first visit only, gone when Ash walks out (a11b_hud.js)
   if(def.kind==='house'&&def.owner&&firstVisit) setBanner(def.name,'',1.4,'place');
@@ -4266,7 +4263,7 @@ function updateCaveRooms(dt){
   // entering rooms
   if(R&&R!==A.curRoom){
     A.curRoom=R; const vk=`cv_${caveSid(def)}_v_${R.id}`;
-    if(!G.found[vk]){ G.found[vk]=true; renderCaveMini(A); if(R.kind==='secret'){ G.secrets=G.secrets||{}; G.secrets['cs_'+def.id+'_'+R.id]=1; jingle('secret','chest'); setBanner('A secret room!',`${Object.keys(G.secrets).filter(k=>k.startsWith('cs_')).length} of ${CAVE_SECRETS} hidden cave rooms found`,2.6); } else if(R.kind==='boss'&&R.enemies.some(e=>!e.dead)){ const b=R.enemies.find(e=>e.caveBoss); if(b) setBanner(b.caveBoss,def.name,2.4,'boss'); jingle('boss_intro',null); } }
+    if(!G.found[vk]){ G.found[vk]=true; renderCaveMini(A); if(R.kind==='secret'){ G.secrets=G.secrets||{}; G.secrets['cs_'+def.id+'_'+R.id]=1; jingle('secret','chest'); setBanner('A secret room!',`${Object.keys(G.secrets).filter(k=>k.startsWith('cs_')).length} hidden cave rooms found so far`,2.6); } else if(R.kind==='boss'&&R.enemies.some(e=>!e.dead)){ const b=R.enemies.find(e=>e.caveBoss); if(b) setBanner(b.caveBoss,def.name,2.4,'boss'); jingle('boss_intro',null); } }
     for(const e of R.enemies) if(!e.dead) e.aggro=true;
   }
   // fights lock the doors until the room is clear
@@ -4690,7 +4687,7 @@ function revealTrig(o){
     scene='play'; G.found[o.key]=true; G.secrets=G.secrets||{}; G.secrets[o.key]=1;
     jingle('secret','chest'); shake(3); emit(o.x,o.y,24,{col:'255,230,180',smin:40,smax:140,lmin:.4,lmax:.8,zmin:1.5,zmax:3});
     const n=Object.keys(G.secrets).filter(k=>k.startsWith('sec_')).length;
-    setBanner('You found a secret!',`${n} of ${SECRET_ROOMS.length} hidden places in houses`,2.6);
+    setBanner('You found a secret!',n===1?'Your first hidden place in a house':`${n} hidden places in houses so far`,2.6);   // (v12) no total
     if(o.reward){ if(o.reward.coins) addCoins(o.reward.coins,o.x,o.y); if(o.reward.heal){ player.hp=player.maxHp; } }
     const st=AREA.objs.find(q=>q.k==='stairs'&&q.hidden===o.key); if(st&&!st.col) st.col=addAreaCol({t:'r',x0:st.x-st.w/2,y0:st.y-st.h/2,x1:st.x+st.w/2,y1:st.y+st.h/2});
     saveGame();
@@ -4760,6 +4757,14 @@ const TRIALS={
 };
 const trialOpen=id=>{ const T=TRIALS[id]; if(!T||!G) return false; if(G.mode!=='story') return true; return reached(T.stage); };
 const trialDone=id=>!!(G&&G.flags&&G.flags['trial_'+id+'_done']);
+// (v12 META) on the map, the HUD region label and the first-visit banner a Trial goes by what Ash can see (the folk
+// names R1's door prompts and signs use, x0_act1.js A1_FOLK, here as place names) until Ember names it: inside it, or
+// at the end of the Trial before it ("Two more Trials are waiting. The Trial of the Tide ..."). Same rule as R1's
+// a1TrialKnown, plus its boss or its gift (old saves that never recorded the visit). The Arena knows them all.
+const TRIAL_FOLK={leap:S('Old Rooted Arch','Rooted Arch'),tide:S('Shell Doors','Shell Doors'),sky:S('White Gate','White Gate')};
+function trialKnown(id){ if(!G||G.mode!=='story') return true; const F=G.found||{}, f=G.flags||{}; return !!F['seen_'+id]||trialDone(id)||!!f['trial_'+id+'_boss']||!!(TRIALS[id]&&hasAbil(TRIALS[id].abil))||(id==='tide'&&!!f.trial_leap_boss)||(id==='sky'&&!!f.trial_tide_boss); }
+function trialFolk(id){ return TRIAL_FOLK[id]||(TRIALS[id]&&TRIALS[id].name)||''; }
+function trialPlace(id){ const T=TRIALS[id]; return !T?'':trialKnown(id)?T.name:trialFolk(id); }
 // the dungeon an area belongs to (a floor of a multi-floor dungeon names it in def.dun), and its Trial-like info
 // (TRIALS for Ember's Trials, DUNGEONS for anything made with defineDungeon): abil, abilName, boss, bossY, level, shrine
 function dunRoot(id){ const d=AREADEFS[id]; return (d&&d.dun)||id; }
@@ -4909,11 +4914,11 @@ const TIDE_PIER=[{x0:6286,y0:7378,x1:6350,y1:7422},{x0:6150,y0:7378,x1:6206,y1:7
 for(const w of TIDE_PIER) WALKWAYS.push(w);
 // Trial of the Sky: a crag inside a moat too wide to jump
 PONDS.push({x:12600,y:3600,r:520,inner:220});
-for(const id of TRIAL_IDS){ const T=TRIALS[id]; SHRINES.push(T.shrine); POI['trial_'+id]={x:T.x,y:T.y-30,r:id==='tide'?110:id==='leap'?250:170,name:T.name,level:T.level}; }
+for(const id of TRIAL_IDS){ const T=TRIALS[id]; SHRINES.push(T.shrine); POI['trial_'+id]={x:T.x,y:T.y-30,r:id==='tide'?110:id==='leap'?250:170,get name(){ return trialPlace(id); },level:T.level}; }
 function buildTrialGates(){
   for(const id of TRIAL_IDS){
     const T=TRIALS[id];
-    const m={area:id,x:T.x,y:T.y,name:T.name,trial:id}; CAVEMOUTHS.push(m);
+    const m={area:id,x:T.x,y:T.y,get name(){ return trialPlace(id); },trial:id}; CAVEMOUTHS.push(m);
     const L={x:T.x,y:T.y-40,r:320,i:0.2,trialGate:id}; LIGHTS.push(L);
     STRUCTS.push({k:'cavemouth',x:T.x,y:T.y,ref:m,theme:'trial',trial:id,r:140,light:L});
     addCol({t:'c',x:T.x-66,y:T.y-6,r:22}); addCol({t:'c',x:T.x+66,y:T.y-6,r:22}); addCol({t:'r',x0:T.x-74,y0:T.y-70,x1:T.x+74,y1:T.y-26});
@@ -10461,7 +10466,8 @@ function drawPadDiagram(cv,k){
   // southpaw (Settings > Handed: Left) swaps what the sticks, triggers and bumpers do
   const sp=lefty(), mv='Move, click: sprint', am='Aim, click: Roar';
   const L=[[262,40,22,sp?'Attack':'Fire breath'],[262,67,40,sp?'Next weapon':'Previous weapon'],[P.ls[0],P.ls[1],24,sp?am:mv],[P.dp[0],P.dp[1],30,'↑ drink · ↓ call friend\n← item · → switch quest']].sort((a,b)=>a[1]-b[1]);
-  const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]];
+  // (v12) the jump button is labelled only once Ash can jump (How to Play names no power ahead of time)
+  const R=[[458,40,22,sp?'Fire breath':'Attack'],[458,67,40,sp?'Previous weapon':'Next weapon'],[fp[3][0],fp[3][1],12,'Talk and use'],[fp[1][0],fp[1][1],12,'Roll'],[fp[0][0],fp[0][1],12,'Jump'],[P.rs[0],P.rs[1],24,sp?mv:am]].filter(q=>q[3]!=='Jump'||typeof howHas!=='function'||howHas('jump'));
   const line=(x0,y0,x1,y1)=>{ g.strokeStyle='rgba(255,200,140,.6)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); g.fillStyle='#ffc35a'; g.beginPath(); g.arc(x0,y0,2.4,0,TAU); g.fill(); g.beginPath(); g.arc(x1,y1,1.6,0,TAU); g.fill(); };
   const label=(t,x,y,al)=>{ g.font=`600 13px ${UIF}`; g.textAlign=al; g.fillStyle='#f3e4cc'; const ls=t.split('\n'); ls.forEach((s,i)=>g.fillText(s,x,y+(i-(ls.length-1)/2)*16)); };
   let prev=-1e9; for(const [x,y,r,t] of L){ const ly=Math.max(y,prev+36); prev=ly; line(x-r,y,178,ly); label(t,172,ly,'right'); }
@@ -10473,7 +10479,7 @@ function padHelpRows(k){
   return [
     [chip(sp?'Right stick':'Left stick'),`Move. Push it all the way to sprint, or click it (${escapeHtml(padBtnName(padSw(PB.L3),k))}).`],
     [chip(sp?'Left stick':'Right stick'),'Aim. Without it Ash faces where he walks.'],
-    [c(PB.S),'Jump, once Ash learns how. With wings, jump again in the air to fly.'],
+    ...(typeof howHas!=='function'||howHas('jump')?[[c(PB.S),'Jump.'+((typeof howHas==='function'?howHas('wings'):hasAbil('wings'))?' With wings, jump again in the air to fly.':'')]]:[]),
     [`${c(PB.W)} ${c(PB.R2)}`,'Attack. Hold for a combo. With someone to talk to (or something to open) and no foe close, it does that instead.'],
     [c(PB.L2),'Fire breath'],
     [c(PB.E),'Dodge roll'],
@@ -13599,13 +13605,17 @@ function checkWave(){
   const up=G.wave%2===0;
   later(1.7,()=>{ if(up) offerUpgrades(()=>later(0.8,nextNormalWave)); else later(0.5,nextNormalWave); });
 }
+// (v12) the Arena is open from the title screen, before the story has said who the old dragon is: there he goes by the
+// name the valley knows him by (the boss banner and the boss bar, a11b_hud.js, read this)
+const ARENA_ALIAS={vorlaxis:{name:'The First Flame',title:'The oldest dragon of all',short:'The oldest dragon'}};
+function bossInfo(b){ const d=(b&&EDEF[b.type])||{}; return (G&&G.mode!=='story'&&b&&ARENA_ALIAS[b.type])||d; }
 function nextNormalWave(){
   G.wave++; const n=G.wave;
   G.hpMul=1+(n-1)*0.07; G.dmgMul=1+(n-1)*0.03; G.eliteChance=clamp((n-4)*0.04,0,0.5); G.maxAlive=Math.min(22,9+Math.floor(n/2));
   if(n%5===0){
     const k=n/5-1, BL=['grizzlefang','morrow','gloamjaw','broodmother','greymane','cindervane','vorlaxis'], bt=BL[k%BL.length], cyc=Math.floor(k/BL.length);
     G.phase='boss'; setBanner(`Wave ${n}`,'A champion approaches!',2);
-    later(1.0,()=>{ const s=arenaSpawnPoint(); const A=G.arena; SFX.play('warn'); spawnRune(bt,bt==='vorlaxis'?A.x:s.x,bt==='vorlaxis'?A.y-200:s.y,{homeX:A.x,homeY:A.y,hpScale:(1+(n-5)*0.03)*(1+cyc*0.4)},1.5); const d=EDEF[bt]; setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); });
+    later(1.0,()=>{ const s=arenaSpawnPoint(); const A=G.arena; SFX.play('warn'); spawnRune(bt,bt==='vorlaxis'?A.x:s.x,bt==='vorlaxis'?A.y-200:s.y,{homeX:A.x,homeY:A.y,hpScale:(1+(n-5)*0.03)*(1+cyc*0.4)},1.5); const d=bossInfo({type:bt}); setBanner(d.name,(W<560&&d.short)?d.short:d.title,2.8,'boss'); });
     const adds=genWave(Math.max(1,Math.floor(n/3)));
     later(3,()=>{ const q=[]; for(const [t,c] of adds) for(let i=0;i<c;i++) q.push(t); G.queue=shuffle(q); });
   }else{ setBanner(`Wave ${n}`,'',1.6); startWave(genWave(n)); }
@@ -13668,10 +13678,12 @@ function liteUpdate(dt){
 function victory(){
   scene='victory'; SFX.play('win');
   const m=Math.floor(G.playTime/60), s=Math.floor(G.playTime%60);
-  const E=ENDINGS[G.choices.ending||'hero'], seen=store.get('eb_endings',{});
-  $('#winTag').textContent=`Ending ${E.n} of 4`; $('#winTitle').textContent=E.title;
-  $('#winMsg').textContent=Object.keys(seen).length<4?`You've found ${Object.keys(seen).length} of 4 endings. Different choices along the way lead to different endings.`:'You found every ending. The Wardens would be proud. Iska would want a word.';
-  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div><div class="stat"><b>${Object.keys(G.pages).length}/10</b><span>Lost pages</span></div>`;
+  // (v12) the ending Ash made, and plain stats: no ending numbers, no count of endings, no totals of things to find
+  // (eb_endings is still kept, a9c_story.js, for the cloud merge and the tests; it is never shown)
+  const E=ENDINGS[G.choices.ending||'hero'];
+  $('#winTag').textContent='Act I complete'; $('#winTitle').textContent=E.title;
+  $('#winMsg').textContent=simplify(S('The valley is still yours to explore.','Go and explore!'));
+  $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div>`;
   show('victory');
 }
 function pauseGame(){
@@ -13687,6 +13699,8 @@ function toggleMute(){ SFX.init(); SFX.toggle(); refreshSoundLabels(); }
 function toggleAllSound(){ SFX.init(); const anyOn=!SFX.muted||!Music.muted; if(anyOn){ if(!SFX.muted) SFX.toggle(); if(!Music.muted) Music.toggle(); } else { SFX.toggle(); Music.toggle(); mLast=null; } refreshSoundLabels(); }
 function allMuted(){ return SFX.muted&&Music.muted; }
 function refreshSoundLabels(){ if($('#settings').classList.contains('on')) renderSettings(); }
+// (v12) test hook: the Act I victory screen
+window.__ebDbg=Object.assign(window.__ebDbg||{},{victory:()=>victory()});
 
 // ================= story progression: stages, boss sites, wards, side quests
 const STAGES=['wake','lanterns','raid','lore','hollow','warcamp','wren','oath','three','gate','summit','done'];
@@ -14320,8 +14334,10 @@ function talkShellby(){
 function findPage(id){
   if(G.pages[id]) return;
   G.pages[id]=true; jingle('item','shrine'); const P=PAGES[id];
-  const lines=[['narr',`You found a lost page of the Wardens' Account.`],['narr',`${P.title}`]].concat(P.text.map(t=>['narr',t]));
-  runDialogue(lines,()=>{ scene='play'; setBanner(`${Object.keys(G.pages).length} of 10 pages found`,G.quests.pages?'Bring them to Sister Wren in Brindlecross.':'Sister Wren in Brindlecross would love to see this.',2.6); saveGame(); });
+  // (v12) no count: before Yara's talk it is just an old page; Wren is named only once Ash has heard of her
+  const known=reached('hollow'), sub=G.quests.pages?'Bring them to Sister Wren in Brindlecross.':reached('wren')?'Sister Wren in Brindlecross would love to see this.':'';
+  const lines=[['narr',known?S(`A page of the Wardens' Account.`,`A page of the Wardens' book!`):S(`You found an old page.`,`An old page!`)],['narr',`${P.title}`]].concat(P.text.map(t=>['narr',t]));
+  runDialogue(lines,()=>{ scene='play'; setBanner(known?P.title:S('An old page','An old page'),sub,2.6); saveGame(); });
 }
 function deliverPages(){
   const have=Object.keys(G.pages).length, given=G.pagesGiven||0, n=have-given;
@@ -14696,9 +14712,10 @@ function unpackSaves(blob){
 function fmtPlay(t){ t=Math.floor(t||0); const h=Math.floor(t/3600), m=Math.floor(t%3600/60); return h?`${h}h ${m}m`:`${m}m`; }
 function fmtAgo(at){ if(!at) return ''; const d=(Date.now()-at)/1000; if(d<90) return 'just now'; if(d<3600) return `${Math.round(d/60)} min ago`; if(d<86400) return `${Math.round(d/3600)} h ago`; const n=Math.round(d/86400); return n===1?'yesterday':`${n} days ago`; }
 function slotDetail(s){
-  const q=s.quests?Object.values(s.quests).filter(x=>x.done).length:0, pg=s.pages?Object.keys(s.pages).length:0;
+  // (v12) no pages total on the slot (nothing counts what is still hidden)
+  const q=s.quests?Object.values(s.quests).filter(x=>x.done).length:0;
   return {head:`${stageLabel(s)} · Level ${(s.p&&s.p.level)||1}`,
-    sub:`${DIFFS[clamp(s.diff|0,0,2)].name} · ${fmtPlay(s.time)} played · ${q} quests · ${pg}/10 pages`, ago:fmtAgo(s.at)};
+    sub:`${DIFFS[clamp(s.diff|0,0,2)].name} · ${fmtPlay(s.time)} played · ${q} quest${q===1?'':'s'} done`, ago:fmtAgo(s.at)};
 }
 let slotConfirm=null;
 function openSlots(){ slotConfirm=null; renderSlots(); show('slots'); }
@@ -15052,10 +15069,10 @@ function talkOpts(n,V){
     return [[id,bye||(friendOf(id)>=3?pick([`See you soon, Ash.`,`Come back any time.`,`Be careful out there.`]):pick([`Bye, Ash.`,`See you.`,`Mind your tail.`]))]]; }});
   return o;
 }
-// a tally for the journal's Secrets tab
+// a tally for the journal's Finds tab ([name, found, total]; the tab shows only rows found at least once, with no total)
 function secretTally(){
   const F=G.found||{}, S=G.secrets||{};
-  const out=[['Lost pages of the Wardens’ Account',Object.keys(G.pages).length,10]];
+  const out=[[reached('hollow')?'Pages of the Wardens’ Account':'Old pages',Object.keys(G.pages).length,10]];
   if(typeof SECRET_ROOMS!=='undefined') out.push(['Secret rooms in houses',Object.keys(S).filter(k=>k.startsWith('sec_')).length,SECRET_ROOMS.length]);
   if(typeof CAVE_SECRETS!=='undefined') out.push(['Hidden rooms in caves',Object.keys(S).filter(k=>k.startsWith('cs_')).length,CAVE_SECRETS]);
   out.push(['Buried treasure',['x1','x2','x3'].filter(k=>F[k]).length,3]);
@@ -15350,7 +15367,8 @@ function drawMiniWorld(t){ const M=G.mini; if(M&&MINI[M.kind].draw) MINI[M.kind]
 const SK_BR=[
   {id:'blade',name:'Blade',col:'#d6e6f6',deep:'#2a4562',blurb:'Hit harder, swing faster and look cool doing it.'},
   {id:'flame',name:'Flame',col:'#ffa24c',deep:'#7a2a0e',blurb:'Hotter breath and a roar that rattles teeth.'},
-  {id:'wings',name:'Wings',col:'#92defe',deep:'#174a64',blurb:'Light feet, longer flights and better powers.'},
+  // (v12) the branch id stays 'wings' (saves and SK_TABS read it); its name is Sky, so the tree does not promise wings
+  {id:'wings',name:'Sky',col:'#92defe',deep:'#174a64',blurb:'Light feet, quick getaways and better powers.'},
   {id:'heart',name:'Heart',col:'#ff9aaa',deep:'#6c1e30',blurb:'More health, more draughts and better friends.'}
 ];
 const SK_BRBY={}; for(const b of SK_BR) SK_BRBY[b.id]=b;
@@ -15358,7 +15376,10 @@ const SK_BRBY={}; for(const b of SK_BR) SK_BRBY[b.id]=b;
 // are powers now (ABIL_DEFS, e6_balance.js). Each new power opens one skill here (n.abil); the power helpers read hasSkill(id).
 const SK_ROW_NEED=[0,2,4,7];
 const SK_ROWS=SK_ROW_NEED.length;
-const SK_WPN_FROM={bow:'the Trial of the Tide',boomerang:'the Trial of the Leap'};
+// (v12) a skill that needs a weapon Ash has not got names the weapon plainly, never where it is
+const SK_WPN_NEED={bow:'a bow',boomerang:'a boomerang'};
+// the word "Trial" shows in the skills text only once Ash has been inside one (Ember names them there)
+const skTrialKnown=()=>!!(G&&((G.found&&(G.found.seen_leap||G.found.seen_tide||G.found.seen_sky))||(G.flags&&G.flags.act1_done)));
 const SK_RESET_COST=30;
 const skPct=(m,r)=>Math.round((Math.pow(m,r)-1)*100);
 const SKILL_TREE=[
@@ -15435,11 +15456,11 @@ function skStats(){ if(!player) return; const s=player.stats; for(const k in SK_
 const skRank=id=>hasSkill(id);
 function skSpent(br){ let n=0; for(const q of SKILL_TREE) if(!br||q.br===br) n+=skRank(q.id); return n; }
 function wpnName(id){ return (typeof WEAPONS!=='undefined'&&WEAPONS[id]&&WEAPONS[id].name)||id; }
-// a skill that needs a power from a later act stays a mystery until the power is found
-function skSecret(n){ const A=n.abil&&typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; return !!A&&(A.act||1)>1&&!hasAbil(n.abil); }
+// (v12) a skill that needs a power stays a mystery until the power is found (Act I powers too: nothing names them early)
+function skSecret(n){ const A=n.abil&&typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; return !!A&&!hasAbil(n.abil); }
 function skNeedTxt(n){
-  if(n.abil&&!hasAbil(n.abil)){ const A=typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[n.abil]; if(!A||(A.act||1)>1) return 'Opens when you find a new power'; return `Needs ${A.name}. ${A.where||''}`.trim(); }
-  if(n.weapon&&!(G.weapons&&G.weapons[n.weapon])) return `Needs the ${wpnName(n.weapon)} from ${SK_WPN_FROM[n.weapon]}`;
+  if(n.abil&&!hasAbil(n.abil)) return 'Opens when you find a new power';
+  if(n.weapon&&!(G.weapons&&G.weapons[n.weapon])) return `Needs ${SK_WPN_NEED[n.weapon]||wpnName(n.weapon)}`;
   if(n.pip&&!(G.flags&&G.flags.pip)) return 'Unlocks once Pip joins you';
   if(n.id==='trail'&&player&&player.stats.emberDash&&!skRank('trail')) return 'You already roll in flames, thanks to a blessing';
   return '';
@@ -15451,7 +15472,7 @@ function skWhy(n){
   const need=SK_ROW_NEED[n.row], have=skSpent(n.br);
   if(have<need){ const d=need-have; return {k:'row',t:`Spend ${d} more point${d>1?'s':''} in ${br.name} to open row ${n.row+1}`}; }
   const q=skNeedTxt(n); if(q) return {k:'need',t:q};
-  if((G.sp|0)<1) return {k:'sp',t:'No skill points left. Level up or beat a Trial to earn more.'};
+  if((G.sp|0)<1) return {k:'sp',t:skTrialKnown()?'No skill points left. Level up or beat a Trial to earn more.':'No skill points left. Level up to earn more.'};
   return null;
 }
 function skCanAny(br){ for(const n of SKILL_TREE) if((!br||n.br===br)&&!skWhy(n)) return true; return false; }
@@ -15704,7 +15725,10 @@ function skSym(g,id,pal){
       skInk(g,skStarP(0,3,40,17),sg,6); g.restore(); g.fillStyle='rgba(255,255,240,.7)'; g.fill(skStarP(-4,-3,15,6.5)); break; }
     case 'br_blade': skSword(g,-Math.PI/4,1.12); break;
     case 'br_flame': skFlame(g,0,36,22,72); break;
-    case 'br_wings': skWing(g,skMix(pal.col,'#ffffff',0.3)); break;
+    case 'br_wings': {   // (v12) the Sky branch: a cloud with a gust of wind (no wing until Ash has wings)
+      const cl=new Path2D(); cl.moveTo(-34,14); cl.arc(-20,4,14,Math.PI*0.62,Math.PI*1.55); cl.arc(0,-8,19,Math.PI*1.08,Math.PI*1.9); cl.arc(22,4,15,Math.PI*1.42,Math.PI*0.4); cl.closePath();
+      skInk(g,cl,skMix(pal.col,'#ffffff',0.35)); g.fillStyle='rgba(255,255,255,.4)'; g.fill(skEll(-6,-12,9,4));
+      skLine(g,skP('M-30 28 Q-6 22 8 28 Q20 34 30 26'),'#f6e2c8',3.5); skLine(g,skP('M-18 38 Q0 33 14 38'),'#f6e2c8',3); break; }
     case 'br_heart': skInk(g,skP(SK_HEART),pal.col); g.fillStyle='rgba(255,255,255,.35)'; g.fill(skEll(-16,-14,7,4)); break;
     // weapon fallbacks for the Hero page (used only while drawWeaponIcon draws nothing)
     case 'w_sword': skSword(g,-Math.PI/4,1.1); break;
@@ -16014,7 +16038,8 @@ function skBuildTabs(){
   $('#skStar').src=skIcon('star',{k:'star',bare:true},30);
   $('#skTabs').innerHTML=SK_BR.concat([SK_POW]).map(b=>`<button type="button" tabindex="0" data-br="${b.id}" style="--ac:${b.col}" aria-pressed="false"><img src="${skIcon('br_'+b.id,Object.assign({bare:true},b),22)}" alt="" width="22" height="22"><span>${b.name}</span><span class="skc">0</span><span class="dot" hidden></span></button>`).join('');
 }
-// the Powers page (a fifth tab): every power Ash has and how to use it, and a ??? slot for each one still out there
+// the Powers page (a fifth tab): the powers Ash has and how to use them. (v12) Only the ones he has found: no ??? slots,
+// no count, no hints about where the rest are, and a heading only for acts he has reached
 const SK_POW={id:'powers',name:'Powers',col:'#ffd27a',deep:'#5a3a10'};
 const SK_TABS=['blade','flame','wings','heart','powers'];
 const SK_DIM={k:'dim',col:'#8a7a6a',deep:'#2a1c14'};
@@ -16022,17 +16047,18 @@ function skPowIcon(A){ return typeof A.icon==='function'?'fn_'+A.id:(A.icon||'qm
 function skPowerCard(id){
   const A=ABIL_DEFS[id], own=hasAbil(id), E=t=>escapeHtml(simplify(t));
   const sk=A.skill&&SKN[A.skill], r=sk?skRank(sk.id):0;
-  const txt=own?abilHow(id):(A.act===1&&A.where?A.where:'A power you have not found yet.');
+  const txt=own?abilHow(id):'A power you have not found yet.';
   let up='';
   if(own&&sk){ const pips=Array.from({length:sk.max},(_,i)=>`<i class="${i<r?'on':''}"></i>`).join(''); up=`<div class="pwup">${SK_SVG.star}<span>${E(`Upgrade: ${sk.name}, in ${SK_BRBY[sk.br].name}`)}</span><span class="skpip" role="img" aria-label="Rank ${r} of ${sk.max}">${pips}</span></div>`; }
   return `<div class="pwn${own?' own':''}" data-pow="${id}"><div class="skic"><img src="${skIcon(own?skPowIcon(A):'qmark',own?SK_GOLD:SK_DIM,60)}" alt="" width="60" height="60"></div><div class="sktx"><div class="sknm">${E(own?A.name:'???')}${own?'<span class="hrok">Yours</span>':''}</div><div class="skds">${E(txt)}</div>${up}</div></div>`;
 }
 function skPowersHtml(){
-  const ids=typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[], own=ids.filter(hasAbil).length, R=['','I','II','III','IV'];
-  const out=[`<div class="skbh"><b>Powers</b><span>${escapeHtml(simplify('Powers are gifts you find on your journey. They never cost skill points, and many open a new skill.'))} ${own} of ${ids.length} found.</span></div>`];
+  const ids=(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[]).filter(hasAbil), R=['','I','II','III','IV'];
+  const out=[`<div class="skbh"><b>Powers</b><span>${escapeHtml(simplify(S('Your powers, and how to use them. Powers never cost skill points, and many open a new skill.','Your powers and how to use them. They are free.')))}</span></div>`];
+  if(!ids.length) out.push(`<p class="pwnone">${escapeHtml(simplify(S('No powers yet.','No powers yet.')))}</p>`);
   for(let act=1;act<=4;act++){
     const L=ids.filter(id=>(ABIL_DEFS[id].act||1)===act); if(!L.length) continue;
-    const known=act===1||L.some(hasAbil), title=known?((typeof BAL_ACTS!=='undefined'&&BAL_ACTS[act])||`Act ${R[act]}`):`Act ${R[act]} · ???`;
+    const title=(typeof BAL_ACTS!=='undefined'&&BAL_ACTS[act])||`Act ${R[act]}`;
     out.push(`<div class="sktier pwtier"><div class="sktl"><span class="sktn">${escapeHtml(title)}</span><span class="ln"></span></div><div class="pwrow">${L.map(skPowerCard).join('')}</div></div>`);
   }
   return out.join('');
@@ -16070,8 +16096,8 @@ function skToast(t){
   el.textContent=t; el.classList.add('on'); SK.toastT=setTimeout(()=>el.classList.remove('on'),readT(t,3,7)*1000); logAdd({k:'tip',text:t});
 }
 function skCard(n,br){
-  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), needT=max?'':skNeedTxt(n);
-  if(skSecret(n)) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
+  const E=t=>escapeHtml(simplify(t)), r=skRank(n.id), why=skWhy(n), can=!why, max=r>=n.max, lock=!!why&&(why.k==='row'||why.k==='need'), sec=skSecret(n), needT=max||sec?'':skNeedTxt(n);
+  if(sec) n=Object.assign({},n,{name:'???',desc:'A power you have not found yet opens this skill.',each:null,ico:'qmark'});
   const pips=Array.from({length:n.max},(_,i)=>`<i class="${i<r?'on':''}${SK.just===n.id&&i===r-1?' new':''}"></i>`).join('');
   const eff=n.each?`<div class="skef">${n.max>1?'Each rank: ':''}${E(n.each)}${r&&n.max>1&&n.now?` · <em>Total ${E(n.now(r))}</em>`:''}</div>`:'';
   const rq=needT?`<div class="skrq">${SK_SVG.lock}<span>${E(needT)}</span></div>`:'';
@@ -16084,7 +16110,7 @@ function skRender(){
   const pow=SK.tab==='powers', sp=G.sp|0, br=pow?SK_POW:(SK_BRBY[SK.tab]||SK_BR[0]), spent=pow?0:skSpent(br.id), body=$('#skBody');
   const act=document.activeElement, keep=act&&body.contains(act)?(act.dataset.learn||(act.dataset.res?'_res':'')):null;
   $('#skSp').textContent=sp; $('#skSpL').textContent=sp===1?'point to spend':'points to spend'; $('#skPts').classList.toggle('none',!sp);
-  $('#skSub').textContent=`Level ${player.level}. You earn 1 point every level, and 1 more for each Trial you beat.`;
+  $('#skSub').textContent=`Level ${player.level}. You earn 1 point every level`+(skTrialKnown()?', and 1 more for each Trial you beat.':', and now and then a bonus point for a big win.');
   for(const b of document.querySelectorAll('#skTabs button')){ const id=b.dataset.br; b.setAttribute('aria-pressed',String(id===br.id)); const k=id==='powers'?(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER.filter(hasAbil).length:0):skSpent(id), sc=b.querySelector('.skc'); sc.textContent=k; sc.hidden=!k; b.querySelector('.dot').hidden=id==='powers'||!skCanAny(id); }
   $('#skPanel').style.setProperty('--ac',br.col);
   if(pow){ body.innerHTML=skPowersHtml(); SK.just=null; return; }
@@ -16158,7 +16184,9 @@ addEventListener('keydown',e=>{
 },true);
 
 // ---------- journal Hero page (renderJour in a12b_ui calls these for jTab==='hero')
-const SK_WPN_HINT={sword:'From Mom at the forge',daggers:'A reward for Stop, Thief!',spear:'Pell sells one',hammer:'Mom can forge one',boomerang:'In the Trial of the Leap',bow:'In the Trial of the Tide'};
+// (v12) a weapon with a plain hint (a shop, Mom, a quest) shows before Ash has it; one without (the bow, the boomerang)
+// stays off the page until he finds it
+const SK_WPN_HINT={sword:'From Mom at the forge',daggers:'A reward for Stop, Thief!',spear:'Pell sells one',hammer:'Mom can forge one'};
 function skStatTxt(m){ const d=Math.round((m-1)*100); return d>0?`+${d}%`:d<0?`${d}%`:'Normal'; }
 function heroTabHtml(){
   if(!player) return '';
@@ -16175,13 +16203,13 @@ function heroTabHtml(){
     tile(s.critCh>0?`${Math.round(s.critCh*100)}%`:'None yet','Critical hits',s.critCh>0),tile(arm<0.995?`${Math.round((1-arm)*100)}% less`:'Normal','Damage taken',arm<0.995),
     tile(skStatTxt((s.speed||200)/200),'Move speed',(s.speed||200)>201),tile(s.killHeal>0?`+${s.killHeal}`:'None yet','Heal per foe',s.killHeal>0)
   ].join('')+'</div>');
-  // powers, from the registry (e6_balance.js): yours with how to use them, the rest as ??? slots
-  const PW=typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[], nPw=PW.filter(hasAbil).length;
-  o.push(`<div class="jh2">Powers · ${nPw} of ${PW.length}</div><div class="hrab">`+PW.map(id=>{ const A=ABIL_DEFS[id], own=hasAbil(id), t=own?abilHow(id):simplify(A.act===1&&A.where?A.where:'A power you have not found yet.');
-    return `<div class="hrabi${own?' own':''}"><img src="${skIcon(own?skPowIcon(A):'qmark',own?SK_GOLD:SK_DIM,44)}" alt=""><div><b>${E(own?A.name:'???')}</b>${own?'<span class="hrok">Yours</span>':''}<small>${E(t)}</small></div></div>`; }).join('')+'</div>');
-  const ids=typeof WEAPON_IDS!=='undefined'?WEAPON_IDS:['sword'], has=id=>!!(G.weapons&&G.weapons[id])&&!(id==='sword'&&!G.flags.forge), cur=typeof curWeapon==='function'?curWeapon():'sword';
-  const nOwn=ids.filter(has).length;
-  o.push(`<div class="jh2">Weapons · ${nOwn} of ${ids.length}</div><div class="hrwp">`+ids.map(id=>{ const own=has(id), eq=own&&cur===id, W0=(typeof WEAPONS!=='undefined'&&WEAPONS[id])||{};
+  // powers, from the registry (e6_balance.js): (v12) only the ones Ash has, with how to use them, and no count
+  const PW=(typeof ABIL_ORDER!=='undefined'?ABIL_ORDER:[]).filter(hasAbil);
+  o.push(`<div class="jh2">Powers</div>`+(PW.length?`<div class="hrab">`+PW.map(id=>{ const A=ABIL_DEFS[id], t=abilHow(id);
+    return `<div class="hrabi own"><img src="${skIcon(skPowIcon(A),SK_GOLD,44)}" alt=""><div><b>${E(A.name)}</b><span class="hrok">Yours</span><small>${E(t)}</small></div></div>`; }).join('')+'</div>':`<p>${E(simplify(S('No powers yet.','No powers yet.')))}</p>`));
+  const has=id=>!!(G.weapons&&G.weapons[id])&&!(id==='sword'&&!G.flags.forge), cur=typeof curWeapon==='function'?curWeapon():'sword';
+  const ids=(typeof WEAPON_IDS!=='undefined'?WEAPON_IDS:['sword']).filter(id=>has(id)||(typeof WEAPONS!=='undefined'&&WEAPONS[id]&&WEAPONS[id].hint)||SK_WPN_HINT[id]);
+  o.push(`<div class="jh2">Weapons</div><div class="hrwp">`+ids.map(id=>{ const own=has(id), eq=own&&cur===id, W0=(typeof WEAPONS!=='undefined'&&WEAPONS[id])||{};
     return `<div class="hrw${own?' own':''}${eq?' eq':''}"><canvas width="112" height="112" data-wpn="${id}" data-own="${own?1:0}" aria-hidden="true"></canvas><b>${E(W0.name||id)}</b><small>${E(eq?'In your hand':own?'In your pack':(W0.hint||SK_WPN_HINT[id]||'Somewhere out there'))}</small></div>`; }).join('')+'</div>');
   const got=SKILL_TREE.filter(n=>skRank(n.id));
   o.push(`<div class="jh2">Skills learned · ${skSpent()} point${skSpent()===1?'':'s'} spent</div>`+(got.length?`<div class="hrsk">${got.map(n=>`<span>${E(n.name)}${n.max>1?`<i>${skRank(n.id)}/${n.max}</i>`:''}</span>`).join('')}</div>`:'<p>None yet. Open Skills to pick your first one.</p>'));
@@ -24363,7 +24391,7 @@ function drawHUD(){
   const b=G.boss;
   if(b&&!b.dead){
     const bw2=Math.min(620,W-40-SAFE.l-SAFE.r), bx2=(W-bw2)/2, by=usingTouch?(W>=720?T+40:T+(story?170:150)):H-SAFE.b-46;
-    ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?4.6:3.4; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.strokeText(EDEF[b.type].name,W/2,by-20); ctx.fillText(EDEF[b.type].name,W/2,by-20);
+    ctx.textAlign='center'; ctx.font=`800 15px ${TF}`; ctx.fillStyle='#ffd9b0'; ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?4.6:3.4; ctx.strokeStyle=LOOK.sb?SBC.outline:'rgba(0,0,0,.7)'; ctx.strokeText(bossInfo(b).name,W/2,by-20); ctx.fillText(bossInfo(b).name,W/2,by-20);
     bar(bx2,by-8,bw2,12,clamp(b.hp/b.maxHp,0,1),b.invuln?'#8a5a3a':'#b8281e','rgba(30,6,4,.9)');
     ctx.strokeStyle='rgba(255,200,150,.3)'; ctx.lineWidth=1; rr(bx2,by-8,bw2,12,6); ctx.stroke();
     // phase marks on the bar and one pip per phase (lit up to the phase the fight is in); bossPhase (e8_foes.js) sets b.phases and b.bph
@@ -24372,7 +24400,7 @@ function drawHUD(){
       const ph=b.type==='vorlaxis'?(b.phase||1)-1:(b.bph||0), n=th.length+1;
       for(let i=0;i<n;i++){ const x=bx2+bw2-6-(n-1-i)*15, y=by-20; ctx.beginPath(); ctx.moveTo(x,y-5); ctx.lineTo(x+5,y); ctx.lineTo(x,y+5); ctx.lineTo(x-5,y); ctx.closePath(); ctx.fillStyle=i<=ph?'#ff9a3a':'rgba(40,20,14,.85)'; ctx.fill(); ctx.strokeStyle='rgba(255,215,170,.75)'; ctx.lineWidth=1; ctx.stroke(); } }
     // (v11 polish) the title under the bar: light letters with an outline, readable on any ground
-    ctx.font=`600 11.5px ${UIF}`; let sub=EDEF[b.type].title; if(EDEF[b.type].short&&ctx.measureText(sub).width>bw2) sub=EDEF[b.type].short; sub=simplify(sub);
+    ctx.font=`600 11.5px ${UIF}`; const bI=bossInfo(b); let sub=bI.title||''; if(bI.short&&ctx.measureText(sub).width>bw2) sub=bI.short; sub=simplify(sub);
     ctx.lineJoin='round'; ctx.lineWidth=LOOK.sb?3.6:3.2; ctx.strokeStyle=LOOK.sb?'rgba(59,34,51,.95)':'rgba(10,6,4,.85)'; ctx.strokeText(sub,W/2,by+16); ctx.fillStyle=LOOK.sb?'#fff0d4':'#f2dcc0'; ctx.fillText(sub,W/2,by+16);
   }
   doorNoteDraw();   // the short note over a locked door Ash bumped (a2e_interiors.js)
@@ -28103,7 +28131,7 @@ function mapsSeenList(){ const out=[]; for(const M of MAPS) if(M&&(M.k===0||(G&&
 function mapInfoText(){
   const k=MAPUI.view, M=MAPS[k]||MAPS[0], sh=mapList(SHRINES,k), found=sh.filter(s=>G.shrines[s.id]).length;
   const r=G.region||regionAt(player.x,player.y), here=curMap()===k;
-  return `${here?(AREA?'Inside '+AREA.name:r.name):M.name} · Level ${player.level} · ${G.coins||0} coins · ${found} of ${sh.length} shrines`;
+  return `${here?(AREA?'Inside '+AREA.name:r.name):M.name} · Level ${player.level} · ${G.coins||0} coins · ${found} shrine${found===1?'':'s'} found`;
 }
 function mapTabsSync(){
   const list=mapsSeenList();
@@ -31211,7 +31239,7 @@ function balStill(dt){
   blast(p.x,p.y,BAL.still.blastR,BAL.still.delay[di],dm,{still:true});
   emit(p.x,p.y,14,{col:'255,150,70',ang:-Math.PI/2,spread:1.2,smin:20,smax:80,lmin:.3,lmax:.6,zmin:1.2,zmax:2.4,rise:30});
   ftext(p.x,p.y-36,simplify('Keep moving!'),'#ffd27a',15);
-  if(G.flags&&!G.flags.bal_stillTip){ G.flags.bal_stillTip=1; mvTip('Keep moving',S('Bosses hate it when you stand still: the ground erupts under your feet. Step, roll or jump out of the red ring!','Do not stand still! Run out of the red ring.'),8,'bal_still'); }
+  if(G.flags&&!G.flags.bal_stillTip){ G.flags.bal_stillTip=1; mvTip('Keep moving',hasAbil('jump')?S('Bosses hate it when you stand still: the ground erupts under your feet. Step, roll or jump out of the red ring!','Do not stand still! Run out of the red ring.'):S('Bosses hate it when you stand still: the ground erupts under your feet. Step or roll out of the red ring!','Do not stand still! Run out of the red ring.'),8,'bal_still'); }
 }
 { const base=updateEnemies; updateEnemies=function(dt){ base(dt); try{ balStill(dt); }catch(e){} }; }
 
@@ -90073,7 +90101,7 @@ function openMap(){
   MAPUI.view=AREA&&AREA.rooms?-1:curMap(); mapTabsSync(); $('#mapInfo').textContent=mapInfoText();
   drawMapScreen(); renderJournal(); show('mapov');
 }
-const SO_FAR={wake:'It is Lantern Day in Emberhollow, the thousandth one. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
+const SO_FAR={wake:'It is Lantern Day in Emberhollow. Mom has something for you at the forge.',lanterns:'Mom reforged Grandmother’s sword for you. Now the festival lanterns need lighting.',raid:'Kobolds crashed the festival. Drive them out of the village.',
   lore:'Emberhollow is safe for now. Elder Yara has something important to tell you.',hollow:'Yara told you the truth. Vorlaxis, the dragon sealed under Cinder Mountain, is your great ×13 grandfather, and only Emberblood fire can keep his Wards burning.',
   warcamp:'Warden Iska says a cult called the Scaled Oath is snuffing the Wards. Their kobolds answer to Grizzlefang.',wren:'Grizzlefang is beaten, but Vorlaxis spoke to you through the fire. Sister Wren in Brindlecross knows where the Wards are.',
   oath:'The Scaled Oath holds the Ash Ward. High Priest Morrow is trying to put it out for good.',three:'Two Wards burn again. The Crag, Sunken and Frost Wards are still out there.',
@@ -90116,9 +90144,9 @@ function renderJour(){
     if(c.cinder) ch.push(c.cinder==='rest'?'Sir Cindervane finally rests.':'Sir Cindervane will hold the stairs for you.');
     for(const k in (G.choices.extra||{})) ch.push(G.choices.extra[k]);
     if(ch.length) rows.push(`<div class="jh2">Choices you made</div><ul>${ch.map(t=>`<li>${E(t)}</li>`).join('')}</ul>`);
-    rows.push(`<div class="jh2">The Wardens’ Account</div><p>${Object.keys(G.pages).length} of 10 lost pages found.</p>`+Object.keys(G.pages).sort((a,b)=>+a.slice(1)-+b.slice(1)).map(k=>`<p><b style="color:var(--ink)">${E(PAGES[k].title)}</b><br>${E(PAGES[k].text.join(' '))}</p>`).join(''));
-    const seen=store.get('eb_endings',{}), ne=Object.keys(seen).length;
-    rows.push(`<div class="jh2">Act I endings found</div><p>${ne} of 4${ne?': '+E(Object.keys(seen).map(k=>ENDINGS[k].title).join(' · ')):''}. Different choices lead to different endings.</p>`);
+    // (v12) the pages Ash has found, by title, with no count: "Old pages" until Yara has told him whose they are
+    const pk=Object.keys(G.pages||{}).filter(k=>PAGES[k]);
+    if(pk.length) rows.push(`<div class="jh2">${reached('hollow')?'The Wardens’ Account':'Old pages'}</div>`+pk.sort((a,b)=>+a.slice(1)-+b.slice(1)).map(k=>`<p><b style="color:var(--ink)">${E(PAGES[k].title)}</b><br>${E(PAGES[k].text.join(' '))}</p>`).join(''));
   }else if(jTab==='people'){
     const met=CAST.filter(c=>!c.generic&&(G.seenTalk&&G.seenTalk['met_'+c.id]));
     rows.push(`<p>People you've talked to: ${met.length}. Hearts show how good friends you are. Help people, chat, and bring gifts they like.</p>`);
@@ -90126,8 +90154,9 @@ function renderJour(){
   }else if(jTab==='bag'){
     rows.push(bagHtml(E));   // (v12) the bag screen, below renderJour
   }else if(jTab==='secrets'){
-    const S=secretTally();
-    rows.push('<p>The valley is full of hidden things. Here is how many you have found.</p><ul>'+S.map(([n,a,b])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a} of ${b}</li>`).join('')+'</ul>');
+    // (v12) Finds: only what Ash has found, as a count with no total (nothing tells him how much is still hidden)
+    const fd=secretTally().filter(r=>(r[1]|0)>0);
+    rows.push(fd.length?`<p>${E(S('Things you have found so far.','Things you found.'))}</p><ul>`+fd.map(([n,a])=>`<li><b style="color:var(--ink)">${E(n)}</b>: ${a|0}</li>`).join('')+'</ul>':`<p>${E(S('Nothing yet. Keep your eyes open.','Nothing yet. Keep looking!'))}</p>`);
   }else if(jTab==='hero') rows.push(heroTabHtml());
   else if(jTab==='log') rows.push(logJourHtml());
   el.innerHTML=rows.join('');
@@ -90302,7 +90331,7 @@ function menuUpdate(dt){
 function refreshMenu(){
   const li=latestSlot(), s=li>=0?slotSave(li):null, cont=$('#bContinue'), sum=saveSummary(s);
   if(sum){ cont.hidden=false; $('#contSub').textContent=`Journey ${li+1} · ${sum}`; $('#bStory').classList.remove('hot'); $('#storySub').textContent='Pick a journey: three save slots.'; }
-  else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#storySub').textContent='An open world to explore. One very old grandfather.'; }
+  else{ cont.hidden=true; $('#bStory').classList.add('hot'); $('#storySub').textContent='An open world to explore. Three lanterns to light.'; }
   for(const b of document.querySelectorAll('.seg button[data-d]')) b.setAttribute('aria-pressed',String(+b.dataset.d===diffIdx));
   $('#diffNote').textContent=simplify(DIFFS[diffIdx].note);
   const best=store.get('eb_best_'+diffIdx,null);
@@ -90324,8 +90353,16 @@ function howTabs(){
   for(const b of document.querySelectorAll('#howTabs button')){ const on=b.dataset.h===howTab; b.setAttribute('aria-pressed',String(on)); if(on) b.setAttribute('data-focus',''); else b.removeAttribute('data-focus'); }
   for(const s of document.querySelectorAll('#how .hsec')) s.hidden=s.dataset.h!==howTab;
 }
+// (v12) the controls for a power show only once Ash has it (the Arena always jumps; on the title screen, the latest
+// journey's powers); nothing lists powers ahead of time
+function howHas(id){
+  if(G&&G.mode==='story') return hasAbil(id);
+  if(G&&G.mode==='normal') return id==='jump';
+  try{ const i=latestSlot(), s=i>=0?slotSave(i):null; return !!(s&&s.abil&&s.abil[id]); }catch(e){ return false; }
+}
 function renderHow(){
   howTabs(); if(typeof handSync==='function') handSync();
+  for(const e of document.querySelectorAll('#how [data-pow]')) e.hidden=!howHas(e.dataset.pow);
   const hb=$('#how .hbody'); if(hb) hb.scrollTop=0;
   if(howTab!=='pad') return;
   const k=howKind||(PAD.idx>=0?PAD.kind:'xbox');
