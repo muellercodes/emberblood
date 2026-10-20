@@ -118,7 +118,7 @@ function ovStepMap(O,rows){
 }
 { const base=overviewStep; overviewStep=function(rows){
   const onMap=scene==='map', k=onMap?MAPUI.view:curMap(), O=ovOf(k);
-  if(onMap) try{ mapHdWork(); }catch(e){ console.error(e); }   // (v12) the sharp tiles of the map screen, below
+  try{ if(onMap) mapHdWork(); else if(scene==='play') mapHdFogIdle(); }catch(e){ console.error(e); }   // (v12) the sharp map, below
   if(O.done) return;
   const n=onMap?24:rows;
   if(!k) base(n); else ovStepMap(O,n);
@@ -353,13 +353,14 @@ addEventListener('keydown',e=>{
 // recently drawn go first; a new look (Storybook or Classic) throws them away with the overview.
 // The fog: the explored cells are smoothed into a field (a cubic B-spline through the cell middles) and drawn with
 // a soft edge about half a cell wide, at 4 px a cell (8 when zoomed in), so the edge is a smooth curve at any zoom.
-const MHD={N:128,cap:130,tiles:new Map(),want:[],budget:7,settle:140,moved:0,view:'',thr:7,css:1.45,full:false,fog:{},stats:{built:0,px:0,full:0,ms:0}};
+const MHD={N:128,cap:130,tiles:new Map(),want:[],budget:7,idleMs:1.2,settle:140,moved:0,view:'',thr:7,cpx:2.6,cpxS:2,fogWant:null,full:false,fog:{},stats:{built:0,px:0,full:0,ms:0,fogPx:0}};
 const mhdNow=()=>(window.__realNow||(()=>performance.now()))();
 const mhdGen=()=>{ try{ return LOOK.gen|0; }catch(e){ return 0; } };
-// the tile level for a view: 0 is the overview itself, then 12.5 and 6.25 world px a sample (about 1.45 CSS px at most)
+// the tile level for a view: 0 is the overview itself, then 12.5 and 6.25 world px a sample: at most MHD.cpx canvas px
+// a sample (1.4 CSS px), or MHD.cpxS on a phone sized map (1.05 CSS px; it has a quarter of the pixels to fill)
 function mapHdLevel(F){
-  const r=mapCv&&mapCv.clientWidth?mapCv.width/mapCv.clientWidth:MAPZ.res, css=25*F.s/(r||1);
-  return css<=MHD.css?0:css/2<=MHD.css?1:2;
+  const c=25*F.s, m=F.cw*F.ch<7e5?MHD.cpxS:MHD.cpx;
+  return c<=m?0:c/2<=m?1:2;
 }
 // explored within a cell of this world rectangle?
 function mapHdSeen(FG,x0,y0,x1,y1){
@@ -443,6 +444,8 @@ function mapHdStep(t,until){
 // the worker (from overviewStep, every frame while the map is open): the wanted tiles, a few ms a frame, once the
 // view has been still for MHD.settle ms; one redraw when a tile is done
 function mapHdWork(){
+  const L8=MHD.fogWant;
+  if(L8&&mhdNow()-MHD.moved>=MHD.settle){ if(mapHdFogJob(L8,mhdNow()+MHD.budget)){ MHD.fogWant=null; if(scene==='map') drawMapScreen(); } return; }
   if(!MHD.want.length||mhdNow()-MHD.moved<MHD.settle) return;
   const until=mhdNow()+MHD.budget; let done=0;
   while(MHD.want.length&&mhdNow()<until){
@@ -455,9 +458,11 @@ function mapHdWork(){
   if(done&&scene==='map') drawMapScreen();
 }
 function mapHdTrim(){ while(MHD.tiles.size>MHD.cap) MHD.tiles.delete(MHD.tiles.keys().next().value); }
-// the fog: smooth, drawn over the ground; one canvas per map, built again when Ash has explored more, the zoom wants
-// more detail, or the look changes (Storybook fog is parchment, Classic is dark)
-const MHD_BW=[];
+// the fog: smooth, drawn over the ground. One canvas per map and detail (4 px a cell, or 8 when zoomed in close),
+// Storybook parchment or Classic dark. It is built once (in the background while Ash plays, a ms or two a frame, so
+// the map opens at once), then only the part Ash has explored since is redrawn (fogReveal marks it). A load, a new
+// journey or a new look builds it again. The 8 px one is built by the map's worker while the 4 px one stands in.
+const MHD_BW=[], MHD_FEP={n:0};
 function mapHdFogW(sub){
   if(MHD_BW[sub]) return MHD_BW[sub];
   const W=[];
@@ -465,41 +470,101 @@ function mapHdFogW(sub){
     W.push({off,w:[(1-t)*(1-t)*(1-t)/6,(3*t3-6*t2+4)/6,(-3*t3+3*t2+3*t+1)/6,t3/6]}); }
   return (MHD_BW[sub]=W);
 }
-function mapHdFog(k,F){
-  const FG=fogOf(k); if(!FG||!FG.bits) return null;
-  const bits=FG.bits, cw=FG.w, ch=FG.h, sub=F.s*25<=4?4:8, sb=!!(typeof LOOK!=='undefined'&&LOOK.sb);
-  let h=0, n=0, i0=cw, i1=-1, j0=ch, j1=-1;
+const mhdSB=()=>!!(typeof LOOK!=='undefined'&&LOOK.sb);
+function mapHdFogCol(sb){ return sb?[232,212,168]:[18,13,10]; }
+function mapHdFogLUT(sb){
+  if(MHD.fogLUT&&MHD.fogLUT.sb===sb) return MHD.fogLUT.t;
+  const col=mapHdFogCol(sb), t=new Uint32Array(1025);
+  for(let i=0;i<=1024;i++){ let e=(i/1024-0.32)/0.36; e=e<0?0:e>1?1:e*e*(3-2*e); const a=Math.round(235*(1-e)); t[i]=((a<<24)|(col[2]<<16)|(col[1]<<8)|col[0])>>>0; }
+  MHD.fogLUT={sb,t}; return t;
+}
+// the explored cells: a hash (to know when they change), how many, and their box
+function mapHdFogInfo(FG){
+  const bits=FG.bits, cw=FG.w, ch=FG.h; let h=0, n=0, i0=cw, i1=-1, j0=ch, j1=-1;
   for(let j=0;j<ch;j++){ const o=j*cw; for(let i=0;i<cw;i++) if(bits[o+i]){ h=(Math.imul(h,31)+o+i)|0; n++; if(i<i0) i0=i; if(i>i1) i1=i; if(j<j0) j0=j; if(j>j1) j1=j; } }
-  const key=sub+'|'+sb+'|'+n+'|'+h+'|'+cw+'x'+ch;
-  let C=MHD.fog[k];
-  if(C&&C.key===key) return C;
-  const W=cw*sub, H=ch*sub;
-  if(!C||C.cv.width!==W||C.cv.height!==H){ C={cv:mkCanvas(W,H)}; MHD.fog[k]=C; }
-  const g=C.cv.getContext('2d'), col=sb?[232,212,168]:[18,13,10], A=235;
-  C.key=key; C.w=cw; C.h=ch; C.cs=FG.cs; C.sub=sub;
-  g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H); g.fillStyle=`rgba(${col[0]},${col[1]},${col[2]},${A/255})`; g.fillRect(0,0,W,H);
-  if(!n) return C;
-  // the field is only non-zero within two cells of an explored one
-  const ci0=Math.max(0,i0-2), ci1=Math.min(cw-1,i1+2), cj0=Math.max(0,j0-2), cj1=Math.min(ch-1,j1+2);
+  return {h:h+'|'+n,n,i0,i1,j0,j1};
+}
+function mapHdFogLayer(k,sub){
+  const FG=fogOf(k); if(!FG||!FG.bits) return null;
+  const key=k+':'+sub, W=FG.w*sub, H=FG.h*sub; let L=MHD.fog[key];
+  if(!L||L.cv.width!==W||L.cv.height!==H){ L={k,sub,cv:mkCanvas(W,H),w:FG.w,h:FG.h,cs:FG.cs,built:false,hash:null,sb:null,ep:-1,dirty:null,job:null}; MHD.fog[key]=L; }
+  return L;
+}
+// the field and its soft edge for the cells ci0..ci1, cj0..cj1 (inclusive), written into the layer's canvas
+function mapHdFogPut(L,FG,ci0,cj0,ci1,cj1,sb){
+  const sub=L.sub, cw=FG.w, ch=FG.h, bits=FG.bits;
+  ci0=Math.max(0,ci0); cj0=Math.max(0,cj0); ci1=Math.min(cw-1,ci1); cj1=Math.min(ch-1,cj1); if(ci1<ci0||cj1<cj0) return 0;
   const X0=ci0*sub, X1=(ci1+1)*sub, Y0=cj0*sub, Y1=(cj1+1)*sub, RW=X1-X0, RH=Y1-Y0, Wt=mapHdFogW(sub);
-  const bit=(i,j)=>i<0||j<0||i>=cw||j>=ch?0:bits[j*cw+i];
-  // across: each cell row to RW samples
-  const hz=new Float32Array((cj1-cj0+5)*RW);
-  for(let j=cj0-2;j<=cj1+2;j++){ const ro=(j-cj0+2)*RW;
-    for(let X=X0;X<X1;X++){ const i=Math.floor(X/sub), q=Wt[X-i*sub], ib=i+q.off-1;
-      hz[ro+X-X0]=q.w[0]*bit(ib,j)+q.w[1]*bit(ib+1,j)+q.w[2]*bit(ib+2,j)+q.w[3]*bit(ib+3,j); } }
-  // down: the field, then the soft edge (0.32 to 0.68 of the field)
-  const img=g.createImageData(RW,RH), d=img.data;
-  for(let Y=Y0;Y<Y1;Y++){ const j=Math.floor(Y/sub), q=Wt[Y-j*sub], jb=j+q.off-1, w=q.w, o=(Y-Y0)*RW*4;
+  // the cells the taps reach (two more each way), zero outside the map, so no tap needs a bounds check
+  const pi0=ci0-3, pj0=cj0-3, PW=ci1-ci0+7, PH=cj1-cj0+7, P=new Float32Array(PW*PH);
+  for(let j=Math.max(0,pj0);j<Math.min(ch,pj0+PH);j++){ const o=j*cw, po=(j-pj0)*PW-pi0; for(let i=Math.max(0,pi0);i<Math.min(cw,pi0+PW);i++) P[po+i]=bits[o+i]; }
+  const ix=new Int32Array(RW), w0=new Float32Array(RW), w1=new Float32Array(RW), w2=new Float32Array(RW), w3=new Float32Array(RW);
+  for(let x=0;x<RW;x++){ const X=X0+x, i=Math.floor(X/sub), q=Wt[X-i*sub]; ix[x]=i+q.off-1-pi0; w0[x]=q.w[0]; w1[x]=q.w[1]; w2[x]=q.w[2]; w3[x]=q.w[3]; }
+  // across: cell rows cj0-2 .. cj1+2 to RW samples each
+  const NR=cj1-cj0+5, hz=new Float32Array(NR*RW);
+  for(let r=0;r<NR;r++){ const base=(cj0-2+r-pj0)*PW, ro=r*RW;
+    for(let x=0;x<RW;x++){ const b=base+ix[x]; hz[ro+x]=w0[x]*P[b]+w1[x]*P[b+1]+w2[x]*P[b+2]+w3[x]*P[b+3]; } }
+  // down: the field, then the soft edge (the field from 0.32 to 0.68, smoothstep) as one 32-bit pixel from a table
+  const LUT=mapHdFogLUT(sb), g=L.cv.getContext('2d'), img=g.createImageData(RW,RH), u=new Uint32Array(img.data.buffer);
+  for(let Y=Y0;Y<Y1;Y++){ const j=Math.floor(Y/sub), q=Wt[Y-j*sub], jb=j+q.off-1, a0=q.w[0], a1=q.w[1], a2=q.w[2], a3=q.w[3], o=(Y-Y0)*RW;
     const r0=(jb-cj0+2)*RW, r1=r0+RW, r2=r1+RW, r3=r2+RW;
-    for(let x=0;x<RW;x++){
-      const v=w[0]*hz[r0+x]+w[1]*hz[r1+x]+w[2]*hz[r2+x]+w[3]*hz[r3+x];
-      let e=(v-0.32)/0.36; e=e<0?0:e>1?1:e*e*(3-2*e);
-      const p=o+x*4; d[p]=col[0]; d[p+1]=col[1]; d[p+2]=col[2]; d[p+3]=A*(1-e);
-    }
+    for(let x=0;x<RW;x++){ let v=a0*hz[r0+x]+a1*hz[r1+x]+a2*hz[r2+x]+a3*hz[r3+x]; v=v<0?0:v>1?1:v; u[o+x]=LUT[(v*1024)|0]; }
   }
   g.putImageData(img,X0,Y0);
-  return C;
+  return RW*RH;
+}
+// a full build, in bands of a few cell rows, until the clock says stop; true when the layer is done
+function mapHdFogJob(L,until){
+  const FG=fogOf(L.k); if(!FG||!FG.bits) return false;
+  const sb=mhdSB();
+  if(!L.job||L.job.ep!==MHD_FEP.n||L.job.sb!==sb){
+    const I=mapHdFogInfo(FG), col=mapHdFogCol(sb), g=L.cv.getContext('2d');
+    g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,L.cv.width,L.cv.height); g.fillStyle=`rgba(${col[0]},${col[1]},${col[2]},${235/255})`; g.fillRect(0,0,L.cv.width,L.cv.height);
+    L.built=false; L.dirty=null;
+    // the field is only above zero within two cells of an explored one: work in that box only
+    L.job={ep:MHD_FEP.n,sb,hash:I.h,i0:I.i0-2,i1:I.i1+2,j:I.j0-2,j1:I.j1+2,t:0};
+    if(!I.n) L.job.j=L.job.j1+1;
+  }
+  const J=L.job, t0=mhdNow();
+  while(J.j<=J.j1){ const b=Math.min(J.j1,J.j+3); MHD.stats.fogPx+=mapHdFogPut(L,FG,J.i0,J.j,J.i1,b,sb); J.j=b+1; if(mhdNow()>until) break; }
+  J.t+=mhdNow()-t0;
+  if(J.j>J.j1){ L.built=true; L.sb=sb; L.ep=J.ep; L.hash=J.hash; L.job=null; MHD.stats.fogMs=+J.t.toFixed(1); return true; }
+  return false;
+}
+// the layer to draw now: up to date, with what Ash explored since redrawn; null when it needs a full build first
+function mapHdFogReady(L){
+  if(!L||!L.built||L.sb!==mhdSB()||L.ep!==MHD_FEP.n) return false;
+  const FG=fogOf(L.k), I=mapHdFogInfo(FG);
+  if(I.h===L.hash) return true;
+  if(!L.dirty) return false;
+  const D=L.dirty; L.dirty=null; MHD.stats.fogPx+=mapHdFogPut(L,FG,D.i0-2,D.j0-2,D.i1+2,D.j1+2,L.sb); L.hash=I.h; MHD.stats.fogPart=(MHD.stats.fogPart||0)+1;
+  return true;
+}
+function mapHdFog(k,F){
+  const want=MHD.fogSub||(F.s*25<=6?4:8), L4=mapHdFogLayer(k,4);
+  if(want===8){ const L8=mapHdFogLayer(k,8); if(mapHdFogReady(L8)){ MHD.fogWant=null; return L8; } MHD.fogWant=L8; }
+  else MHD.fogWant=null;
+  if(!mapHdFogReady(L4)) mapHdFogJob(L4,1e18);   // only if the map opens before the background build is done
+  return L4&&L4.built?L4:null;
+}
+// fogReveal marks the cells it really changed on every fog layer of that map; a load or a new journey starts again
+{ const base=fogReveal; fogReveal=function(x,y,r){
+  if(!(x<IZX-50)) return base(x,y,r);
+  const k=mapAt(y), F=fogOf(k); if(!F||!F.bits) return base(x,y,r);
+  const cs=F.cs, ly=y-F.y0, c0=Math.max(0,Math.floor((x-r)/cs)), c1=Math.min(F.w-1,Math.floor((x+r)/cs)), r0=Math.max(0,Math.floor((ly-r)/cs)), r1=Math.min(F.h-1,Math.floor((ly+r)/cs));
+  let n0=0; for(let j=r0;j<=r1;j++) for(let i=c0;i<=c1;i++) n0+=F.bits[j*F.w+i];
+  const out=base(x,y,r), F2=fogOf(k);
+  let n1=0; for(let j=r0;j<=r1;j++) for(let i=c0;i<=c1;i++) n1+=F2.bits[j*F2.w+i];
+  if(n1!==n0) for(const sub of [4,8]){ const L=MHD.fog[k+':'+sub]; if(!L) continue; const D=L.dirty; L.dirty=D?{i0:Math.min(D.i0,c0),j0:Math.min(D.j0,r0),i1:Math.max(D.i1,c1),j1:Math.max(D.j1,r1)}:{i0:c0,j0:r0,i1:c1,j1:r1}; }
+  return out;
+}; }
+{ const base=fogInit; fogInit=function(){ MHD_FEP.n++; return base.apply(this,arguments); }; }
+{ const base=loadGame; loadGame=function(){ MHD_FEP.n++; return base.apply(this,arguments); }; }
+// while Ash plays: build the fog of the map he is on, a ms or so a frame, once the overview is done
+function mapHdFogIdle(){
+  const k=curMap(), O=ovOf(k); if(!O.done||!G||G.mode!=='story') return;
+  const L=mapHdFogLayer(k,4); if(!L||(L.built&&L.sb===mhdSB()&&L.ep===MHD_FEP.n)) return;
+  mapHdFogJob(L,mhdNow()+MHD.idleMs);
 }
 // the ground and the fog of map k as fitted by F (drawMapScreen in a12b_ui.js calls this); also lists the tiles
 // this view still wants
@@ -536,6 +601,9 @@ function mapHdGround(g,k,F){
   }
   const C=mapHdFog(k,F);
   if(C){ g.imageSmoothingEnabled=true; g.drawImage(C.cv,F.ox,F.oy,C.w*C.cs*F.s,C.h*C.cs*F.s); }
+  else{ const FG=fogOf(k), c=fogCanvas(k), cg=c.getContext('2d'), img=cg.createImageData(FG.w,FG.h);   // (never expected: the old blocky fog)
+    for(let i=0;i<FG.bits.length;i++){ img.data[i*4]=18; img.data[i*4+1]=13; img.data[i*4+2]=10; img.data[i*4+3]=FG.bits[i]?0:235; }
+    cg.putImageData(img,0,0); g.drawImage(c,F.ox,F.oy,FG.w*FG.cs*F.s,FG.h*FG.cs*F.s); }
 }
 
 // ---------- (v12) the legend names a kind of marker only once the map has shown one on this journey (Drew: the
@@ -953,8 +1021,14 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{mapZ:{MAPZ,zm:()=>JSON.parse(JS
   inv:(x,y)=>mapInv(x,y),btn:d=>mapZBtn(d),pan:(dx,dy)=>mapPan(dx,dy),pad:(s,dt)=>{ const r=document.getElementById('mapov'); return padMenu(r,s,dt||0.016); },open:()=>openMap(),sel:()=>mapSel?mapSel.id:null,
   draw:()=>drawMapScreen(),centre:(x,y,z)=>mapZCentre(x,y,z)},
   // (v12) the sharp map: its state, its knobs, and how far a tile built the cheap way is from one sampled everywhere
-  mapHD:{MHD,state:()=>{ let ready=0; for(const t of MHD.tiles.values()) if(t.ready) ready++; return {lvl:MHD.lvl,want:MHD.want.length,tiles:MHD.tiles.size,ready,stats:Object.assign({},MHD.stats),fog:Object.keys(MHD.fog).map(k=>MHD.fog[k]&&MHD.fog[k].key),legend:Object.assign({},G&&G.mapLeg||{})}; },
-    clear:()=>{ MHD.tiles.clear(); MHD.want.length=0; MHD.fog={}; MHD.stats={built:0,px:0,full:0,ms:0}; },
+  mapHD:{MHD,state:()=>{ let ready=0; for(const t of MHD.tiles.values()) if(t.ready) ready++; return {lvl:MHD.lvl,want:MHD.want.length,tiles:MHD.tiles.size,ready,stats:Object.assign({},MHD.stats),fog:Object.keys(MHD.fog).map(k=>k+(MHD.fog[k].built?' built':'')),legend:Object.assign({},G&&G.mapLeg||{})}; },
+    clear:()=>{ MHD.tiles.clear(); MHD.want.length=0; MHD.fog={}; MHD.fogWant=null; MHD.stats={built:0,px:0,full:0,ms:0,fogPx:0}; },
+    // the 4 px fog of map k as it is now (built once, then patched as Ash explored) against one built from scratch
+    fogCheck(k){ k=k||0; const L=MHD.fog[k+':4']; if(!L||!mapHdFogReady(L)) return null; const a=L.cv.getContext('2d').getImageData(0,0,L.cv.width,L.cv.height).data;
+      const T2={k,sub:4,cv:mkCanvas(L.cv.width,L.cv.height),w:L.w,h:L.h,cs:L.cs,built:false,job:null}; mapHdFogJob(T2,1e18); const b=T2.cv.getContext('2d').getImageData(0,0,L.cv.width,L.cv.height).data;
+      let mx=0, n=0; for(let i=3;i<a.length;i+=4){ const e=Math.abs(a[i]-b[i]); if(e>mx) mx=e; if(e>2) n++; } return {max:mx,off:n,part:MHD.stats.fogPart||0}; },
+    reveal:(x,y,r)=>fogReveal(x,y,r),
+    fogLayers:()=>Object.keys(MHD.fog).map(k=>{ const L=MHD.fog[k]; return {key:k,built:L.built,sb:L.sb,job:!!L.job,dirty:L.dirty}; }),
     err(k,L,tx,ty){ const one=full=>{ const was=MHD.full; MHD.full=full; const M=MAPS[k]||MAPS[0], sp=25/(1<<L), span=MHD.N*sp, t={key:'test',k,L,tx,ty,sp,x0:tx*span,y0:M.y0+ty*span,span,row:0,ready:false,cv:null,img:null,fl:null,gen:mhdGen()}; const t0=mhdNow(); mapHdStep(t,1e18); MHD.full=was; if(!t.ready) return null; return {d:t.cv.getContext('2d').getImageData(0,0,MHD.N,MHD.N).data,ms:mhdNow()-t0,n:t.nFlag}; };
       const a=one(false), b=a&&one(true); if(!b) return null; let sum=0, mx=0, big=0; for(let i=0;i<a.d.length;i+=4) for(let q=0;q<3;q++){ const e=Math.abs(a.d[i+q]-b.d[i+q]); sum+=e; if(e>mx) mx=e; if(e>24) big++; }
       return {mean:sum/(a.d.length*0.75),max:mx,big,flagged:a.n,msCheap:a.ms,msFull:b.ms}; },
