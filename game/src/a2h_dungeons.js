@@ -246,10 +246,12 @@ function tObj(A,kind,x,y,id,extra){ const o=Object.assign({k:'cgate',type:'tobj'
 function tChest(A,R,p,id,item,big){
   const o=tObj(A,'chest',p.x,p.y,id,{r:big?28:20,room:R.id,item,big});
   addAreaCol({t:'c',x:p.x,y:p.y,r:big?20:15});
-  o.prompt=()=>G.found[id]?null:tSealed(o)?'Look at the chest':big?'Open the great chest':'Open the chest';
+  o.prompt=()=>tTaken(o)?null:tSealed(o)?'Look at the chest':big?'Open the great chest':'Open the chest';
   if(!G.found[id]) A.lights.push({x:p.x,y:p.y,r:big?220:150,i:big?0.7:0.5});
   return o;
 }
+// (v12) a great chest whose weapon never reached Ash (the game closed during its scene) is still full
+function tTaken(o){ return !!G.found[o.id]&&!(o.item&&typeof WEAPONS!=='undefined'&&WEAPONS[o.item]&&!(G.weapons&&G.weapons[o.item])); }
 function tSealed(o){ const R=AREA.rooms[o.room]; return !!(R&&R.sealChest&&!R.solved); }
 
 // ---------- building a Trial room (called by buildCaveRooms for every room with trial:true)
@@ -287,6 +289,8 @@ function trialUpdate(dt,R){
   const A=AREA, T=A.tri; if(!T) return;
   const c=A.cave, p=player, id=dunRoot(A.def.id);
   T.t+=dt; A.canFly=id==='sky'||!!A.def.canFly;
+  // (v12) a lent gift whose place got done some other way (a lamp, a scene) becomes Ash's
+  { const TI=trialInfo(id); if(TI&&TI.abil&&G.flags['tlend_'+TI.abil]===id&&lendDone(id)) trialKeep(id,TI.abil,false); }
   if(T.hold){ T.hold.t-=dt; if(T.hold.t<=0) T.hold=null; }
   if(T.fallT>0) T.fallT-=dt;
   if(R&&R!==T.room){ T.room=R; onTrialRoom(R); }
@@ -397,8 +401,14 @@ function trialPuzzles(dt){
     const Q=A.rooms[k]; if(Q.solved) continue;
     if(Q.kind==='switches'){ const s=A.objs.filter(o=>o.k==='tswitch'&&o.room===k); if(s.length&&s.every(o=>o.on)) solveRoom(Q); }
     else if(Q.kind==='eyes'){ const s=A.objs.filter(o=>o.k==='teye'&&o.room===k); if(s.length&&s.every(o=>o.lit)) solveRoom(Q); }
-    else if((Q.solveOnClear||Q.kind==='miniboss')&&A.curRoom===Q&&!Q.locked&&Q.enemies.every(e=>e.dead)) solveRoom(Q,true);
+    else if((Q.solveOnClear||Q.kind==='miniboss')&&A.curRoom===Q&&!Q.locked&&Q.enemies.every(e=>e.dead)&&roomBossBeaten(Q)) solveRoom(Q,true);
   }
+}
+// (v12) a room whose guardian its own fight brings out (c1boss, f2boss, m3boss: the room starts with no foes in it) is
+// only won when that guardian has fallen, never just because nobody is in it yet when Ash walks in
+function roomBossBeaten(Q){
+  const t=Q.c1boss||Q.f2boss||Q.m3boss; if(!t) return true;
+  return !!(G.bossDone&&G.bossDone[t])||(Q.enemies||[]).some(e=>e.dead&&e.type===t);
 }
 // a block pushed into a pit fills it for good
 function trialBlockInto(b,ni,nj,k){
@@ -423,6 +433,26 @@ function trialBossWon(R){
   questPoke(); saveGame();
   later(2.7,()=>{ if(G.boss&&G.boss.dead) G.boss=null; if(AREA&&AREA.def.id===aid&&STORY['trial_'+id+'_won']) runDialogue(STORY['trial_'+id+'_won'],()=>{ scene='play'; setBanner('The way is open',TRIALS[id]?'Ember’s gift waits beyond the guardian.':'',2.6); saveGame(); }); });
 }
+// (v12) a guardian's room is only won by its fight: if its guardian is gone while the room is not won (it fell some
+// other way, or the cave was cleared a moment ago and nobody woke up), the guardian is back to meet Ash. Called by
+// updateCaveRooms (a2f_caves.js) whenever Ash walks into a room, in every cave: R.boss guardians (the room-grid caves,
+// the Trials, the dungeons) and R.boss2 ones (e9b_caves2's caves). Rooms whose own fight brings the guardian out
+// (c1boss, f2boss, m3boss) are left to that fight.
+function caveGuardianBack(R){
+  const A=AREA; if(!A||!R||R.solved||!(R.kind==='boss'||R.kind==='miniboss')||!R.enemies) return;
+  if(R.boss2){ if(A.c2&&typeof c2BossSpawn==='function'&&!R.enemies.some(e=>!e.dead&&e.c2boss)){ c2BossSpawn(A,A.def,R); A.c2.bossDone=false; } return; }
+  if(R.boss&&!R.enemies.some(e=>!e.dead&&e.caveBoss)) trialGuardianBack(R);
+}
+function trialGuardianBack(R){
+  const A=AREA, def=A.def, type=R.boss[0], d=EDEF[type]; if(!d) return null;
+  let q=null; const c=A.cave;
+  for(let r=0;r<6&&!q;r++) for(let dj=-r;dj<=r&&!q;dj++) for(let di=-r;di<=r&&!q;di++){ const k=tCell(R.cx+di*c.cell,R.cy+dj*c.cell); if(k>=0&&tGround(k)&&!c.dyn[k]){ const s=tPos(k); if(caveRoomAt(s.x,s.y)===R&&!colAt(s.x,s.y,18)) q=s; } }
+  q=q||{x:R.cx,y:R.cy};
+  const e=makeEnemy(type,q.x,q.y,{level:def.level+1,aggro:true,homeX:q.x,homeY:q.y,leash:520,camp:A.camp,face:angTo(q.x,q.y,player.x,player.y),snowy:def.theme==='ice',elite:true,hpScale:2.6,tint:R.tint});
+  e.inArea=true; e.room=R.id; if(!(d.boss||d.mini)) e.r*=1.35; e.caveBoss=R.boss[1]; e.dmg*=1.2; e.spawnIn=0.6;
+  R.enemies.push(e); if(A.camp){ A.camp.alive++; A.camp.done=false; }
+  return e;
+}
 function trialBossStart(R){
   const A=AREA, T=A.tri, aid=A.def.id, id=dunRoot(aid), TR=trialInfo(id);
   if(T.boss&&!T.boss.dead) return;
@@ -440,17 +470,19 @@ function trialObjAct(o){
   const A=AREA, T=A.tri, id=dunRoot(A.def.id), TR=trialInfo(id)||{};
   const say=(t,cb)=>runDialogue([['narr',t]],()=>{ scene='play'; if(cb) cb(); saveGame(); });
   switch(o.tobj){
-    case 'shrine':
+    case 'shrine': {
       if(!TR.abil||hasAbil(TR.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine'); say(`Ember's flame is warm. Your scales stop aching. (Health and draughts restored.)`); return true; }
-      runDialogue(STORY['trial_'+id+'_gift'],()=>{
+      // (v12) the flame only lends its gift until this place is done: Ember says so after the gift
+      const lend=!!trialLendRoot(TR.abil), gift=STORY['trial_'+id+'_gift'];
+      runDialogue(lend&&Array.isArray(gift)?gift.concat(trialLendLine(id,TR)):gift,()=>{
         scene='play'; grantAbility(TR.abil); player.hp=player.maxHp; player.potions=player.potionsMax;
         jingle('levelup','level'); flashA=0.55; flashCol='255,214,140'; shake(7);
         emit(o.x,o.y-20,60,{col:'255,210,120',ang:-Math.PI/2,spread:1.6,smin:60,smax:300,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30});
         emit(player.x,player.y,30,{kind:'fire',ang:-Math.PI/2,spread:1.2,smin:40,smax:160,lmin:.5,lmax:1,zmin:3,zmax:6,grow:6});
-        later(2.4,()=>setBanner(`${TR.abilName}!`,STORY['trial_'+id+'_how'],4.2));
+        later(2.4,()=>{ if(AREA&&AREA.def&&dunRoot(AREA.def.id)===id) setBanner(`${TR.abilName}!`,STORY['trial_'+id+'_how'],4.2); });
         questPoke(); saveGame();
       });
-      return true;
+      return true; }
     case 'chest': trialChest(o); return true;
     case 'valve':{
       T.high=!T.high; G.found['tlow_'+caveDsid(A.def)]=!T.high; SFX.play('block'); SFX.play('roll'); shake(4);
@@ -468,7 +500,7 @@ function trialObjAct(o){
 }
 function trialChest(o){
   const A=AREA, T=A.tri, id=dunRoot(A.def.id), DK=caveDsid(A.def);
-  if(G.found[o.id]) return;
+  if(tTaken(o)) return;
   if(tSealed(o)){ runDialogue([['narr',`A great chest, held shut by bands of golden light. They will let go once this room is safe.`]],()=>{ scene='play'; }); return; }
   const fx=()=>{ SFX.play('chest'); flashA=0.35; flashCol='255,226,160'; shake(4); emit(o.x,o.y,40,{col:'255,214,120',ang:-Math.PI/2,spread:1.2,smin:40,smax:200,lmin:.5,lmax:1.1,zmin:1.5,zmax:3.5,rise:20}); };
   G.found[o.id]=true;
@@ -483,18 +515,78 @@ function trialChest(o){
 function trialReward(o){
   const A=AREA, id=dunRoot(A.def.id), TR=trialInfo(id)||{name:A.def.name,level:A.def.level||1};
   if(trialDone(id)){ runDialogue([['narr',`Ember's altar glows softly. The warp ring beside it is still open, whenever you are ready to go.`]],()=>{ scene='play'; }); return; }
-  runDialogue(STORY['trial_'+id+'_end'],()=>{
+  // (v12) the gift Ember's flame lent at the shrine becomes Ash's for good here
+  const keep=TR.abil&&G.flags['tlend_'+TR.abil]===id?TR.abil:null, end=STORY['trial_'+id+'_end'];
+  runDialogue(keep&&(TRIALS[id]||Array.isArray(STORY['trial_'+id+'_keep']))&&Array.isArray(end)?end.concat(trialKeepLine(id,TR)):end,()=>{
     scene='play'; const p=player;
-    G.flags['trial_'+id+'_done']=true;
+    G.flags['trial_'+id+'_done']=true; if(keep) trialKeep(id,keep,true);
     p.maxHp+=10; p.hp=p.maxHp; p.potions=p.potionsMax;
     giveSkillPoint(1); addCoins(40+TR.level*10,o.x,o.y); gainXp(120+TR.level*40);
     jingle('complete','upgrade'); flashA=0.6; flashCol='255,220,140'; shake(8);
     for(let i=0;i<5;i++) later(i*0.18,()=>emit(o.x+rand(-60,60),o.y+rand(-40,40),24,{col:'255,214,110',ang:-Math.PI/2,spread:1.4,smin:60,smax:260,lmin:.6,lmax:1.3,zmin:2,zmax:4,rise:30}));
     showCard('Trial complete',TR.name);
-    later(3.1,()=>setBanner(`${TR.name} complete!`,'+10 max health  ·  +1 skill point  ·  the warp ring is open',4.5));
+    later(3.1,()=>setBanner(`${TR.name} complete!`,(keep?`${TR.abilName} is yours  ·  `:'')+'+10 max health  ·  +1 skill point  ·  the warp ring is open',4.5));
     questPoke(); saveGame();
   });
 }
+
+// ---------- (v12) Ember's flame lends its gift inside its own place
+// A Trial or dungeon whose gift shrine stands before its guardian only lends the gift there: touching the flame makes it
+// work on every floor of that place, and it becomes Ash's for good when the place is done (the altar sets
+// trial_<id>_done). Leaving early, coming back or reloading never carries it outside. The loan is
+// G.flags['tlend_<power>'] = the place's id. grantAbility (a6c_moves.js) makes the loan and hasAbil (a1c_state.js) reads
+// it. A power Ash already owns (an old save that got it early) is never lent and never taken away. A place whose gift is
+// its last room (Ember's Nursery) has no guardian after it, so it simply gives the gift.
+function lendDone(r){ const F=G&&G.flags; return !!(F&&(F['trial_'+r+'_done']||F[r+'_done'])); }
+function lendable(r){
+  const I=TRIALS[r]||DUNGEONS[r]; if(!I||!I.abil||I.placeholder) return false;
+  if(I._lend!=null) return I._lend;
+  const floors=(DUNGEONS[r]&&DUNGEONS[r].floorIds)||[r];
+  return I._lend=floors.some(aid=>{ const M=CAVEMAP[aid]; return !!M&&Object.values(M.rooms).some(R=>R.kind==='tboss'||R.kind==='reward'||(R.kind==='boss'&&!!(R.boss||R.c1boss||R.m3boss||R.f2boss))); });
+}
+// true while a lent power works: inside the place that lent it, or anywhere once that place is done
+const TLEND={};   // the flag names, made once (hasAbil asks this on every miss)
+function trialLent(id){
+  const F=G.flags, r=F&&F[TLEND[id]||(TLEND[id]='tlend_'+id)]; if(!r) return false;
+  return lendDone(r)||!!(AREA&&AREA.def&&dunRoot(AREA.def.id)===r);
+}
+// the place that would lend this power if it were given right now (null: give it for good)
+function trialLendRoot(id){
+  if(!G||G.mode!=='story'||!G.flags||!AREA||!AREA.def) return null;
+  const r=dunRoot(AREA.def.id), I=trialInfo(r);
+  return I&&I.abil===id&&lendable(r)&&!lendDone(r)?r:null;
+}
+const lendPlace=I=>{ const n=String((I&&I.name)||''); return /^Trial /.test(n)?'the '+n:n.replace(/^The /,'the '); };
+function trialKeep(r,id,quiet){
+  if(!G||!G.flags||G.flags['tlend_'+id]!==r) return false;
+  G.abil=G.abil||{}; G.abil[id]=true; delete G.flags['tlend_'+id];
+  const I=trialInfo(r)||{}, nm=I.abil===id&&I.abilName?I.abilName:id;
+  if(!quiet&&player) later(1.4,()=>setBanner(S(`${nm} is yours now`,`${nm} is yours!`),S('It works everywhere now, not just in there.','It works everywhere now!'),3.4));
+  if(G.mode==='story') saveGame();
+  return true;
+}
+// every loan whose place is done becomes Ash's (on the way in or out of any area, and when a gift is given again)
+function trialKeepAll(quiet){
+  if(!G||!G.flags) return;
+  for(const k of Object.keys(G.flags)) if(k.slice(0,6)==='tlend_'&&G.flags[k]&&lendDone(G.flags[k])) trialKeep(G.flags[k],k.slice(6),quiet);
+}
+// (the story can say these its own way: STORY.trial_<id>_lend and STORY.trial_<id>_keep, lists of lines, replace them)
+function trialLendLine(id,TR){
+  const nm=TR.abilName||TR.abil, own=STORY['trial_'+id+'_lend']; if(Array.isArray(own)) return own;
+  if(TRIALS[id]) return [['ember',S(`One more thing. My flame only burns this bright in here. Out there it would fizzle. Pass my Trial, and the ${nm} is yours to keep.`,`My flame only works in here for now. Pass my Trial to keep the ${nm}!`)]];
+  return [['narr',S(`The gift hums inside you, but only in this place for now. Finish ${lendPlace(TR)} and the ${nm} is yours to keep.`,`It only works in here for now. Finish ${lendPlace(TR)} to keep it.`)]];
+}
+function trialKeepLine(id,TR){ const nm=TR.abilName||TR.abil, own=STORY['trial_'+id+'_keep']; if(Array.isArray(own)) return own; return [['ember',S(`And the ${nm} is yours now. Not just in here. Everywhere.`,`The ${nm} is yours now. Everywhere!`)]]; }
+// walking out of a place that lent a gift it has not finished: say why the gift stays behind
+{ const base=exitArea; exitArea=function(){
+    const A=AREA, r=A&&A.def?dunRoot(A.def.id):null, out=base.apply(this,arguments);
+    try{ if(r&&G&&G.flags){ const I=trialInfo(r);
+        if(I&&I.abil&&G.flags['tlend_'+I.abil]===r&&!lendDone(r)&&typeof MV!=='undefined'&&MV.tip&&MV.tip.id==='abil_'+I.abil) MV.tip=null;   // (its "how to" tip too)
+        if(I&&I.abil&&G.flags['tlend_'+I.abil]===r&&!lendDone(r)) later(0.6,()=>{ if((!AREA||dunRoot(AREA.def.id)!==r)&&G&&G.flags['tlend_'+I.abil]===r&&scene==='play')
+          setBanner(S('Not yours yet','Not yours yet'),S(`${I.abilName} only works inside ${lendPlace(I)} until you finish it.`,`Finish ${lendPlace(I)} to keep it.`),3.6); });
+        trialKeepAll(true); } }catch(e){ console.error(e); }
+    return out; }; }
+{ const base=enterArea; enterArea=function(){ const out=base.apply(this,arguments); try{ trialKeepAll(true); }catch(e){ console.error(e); } return out; }; }
 // ---------- fire, claws and thrown things
 function trialBreath(hit,dt){
   const A=AREA, T=A.tri;
@@ -525,6 +617,18 @@ function areaObjHit(x,y,r,src){
 // test hooks (see the solver test in the scratchpad)
 window.__ebX=Object.assign(window.__ebX||{},{TRIALS,trialOpen,trialDone,areaObjHit,trialFall,trialSwitchOn,tCell,tGround,tWet,tHole,
   tri(){ return AREA&&AREA.tri; },
+  // (v12 TRIALS) the gift loans: hasAbil as the game sees it, the loans, and a save right now
+  dunMap:aid=>{ const M=CAVEMAP[aid]; if(!M) return null; const rooms={};
+    for(const k in M.rooms){ const R=M.rooms[k], pay=[];
+      if(R.kind==='shrine') pay.push('gift shrine'); if(R.kind==='reward') pay.push('altar');
+      for(const L of R.loot||[]) pay.push(String(L)); if(R.big) pay.push('great chest: '+R.big); if(R.reward==='key') pay.push('small key');
+      if(R.pick) pay.push('pickup: '+R.pick); if(R.npc) pay.push('person: '+R.npc); if(R.page) pay.push('page');
+      const gb=R.boss?R.boss[0]:R.c1boss||R.f2boss||R.m3boss||(R.boss2&&R.boss2.type)||(R.kind==='tboss'?'trial guardian':null); if(gb) pay.push('guardian: '+gb);
+      if(R.sealChest) pay.push('(sealed until won)');
+      rooms[k]={kind:R.kind,pay}; }
+    return {rooms,links:M.links.map(L=>[L[0],L[1],String(L[2])])}; },
+  hasAbilT:id=>hasAbil(id), dunRooms:id=>{ const D=DUNGEONS[id], fl=(D&&D.floorIds)||[id], out=[]; for(const aid of fl){ const M=CAVEMAP[aid]; if(M) for(const k in M.rooms) out.push([aid,k,M.rooms[k].kind]); } return out; }, lends:()=>Object.fromEntries(Object.entries(G.flags||{}).filter(([k])=>k.slice(0,6)==='tlend_')), lendable, trialLendRoot, saveNow:()=>saveGame(true),
+  roomsOf:()=>AREA&&AREA.rooms?Object.fromEntries(Object.entries(AREA.rooms).map(([k,R])=>[k,{kind:R.kind,solved:!!R.solved,boss:R.boss?R.boss[0]:null,foes:R.enemies.filter(e=>!e.dead).length,cx:Math.round(R.cx),cy:Math.round(R.cy)}])):null,
   trialTp(room,dx,dy){ const R=AREA.rooms[room]; player.x=R.cx+(dx||0); player.y=R.cy+(dy||0); updateCam(0,true); },
   trialObjs(k){ return AREA.objs.filter(o=>o.k===k||o.tobj===k||(o.k==='tv'&&o.kind===k)).map(o=>({k:o.k,tobj:o.tobj,id:o.id,x:o.x,y:o.y,room:o.room,on:o.on,lit:o.lit,open:o.open,item:o.item})); },
   trialAct(id){ const o=AREA.objs.find(q=>q.id===id); if(o) caveObjAct(o); },

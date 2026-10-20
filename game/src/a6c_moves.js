@@ -299,7 +299,12 @@ const ABIL_INFO={
   wings:{name:'The Ember Wings',sub:c=>`You have wings! Jump, then ${c.v} again in the air to fly.`,plain:'You have wings! Now you can fly.',tip:c=>`Fly: jump, then ${c.k} again in the air (or hold ${c.k}). ${c.k} once more to land. Your wings tire, so watch the wing meter.`}
 };
 function grantAbility(id){
-  G.abil=G.abil||{}; const had=!!G.abil[id]; G.abil[id]=true;
+  G.abil=G.abil||{}; const had=!!G.abil[id];
+  // (v12) inside the Trial or dungeon whose gift this is, before that place is done, Ember's flame only lends it: it
+  // works on every floor of that place and becomes Ash's for good at the end (trialLendRoot and trialKeep, a2h_dungeons.js)
+  if(!had&&typeof trialLent==='function'&&trialLent(id)){ trialKeepAll(true); return; }
+  const lend=!had&&typeof trialLendRoot==='function'?trialLendRoot(id):null;
+  if(lend) G.flags['tlend_'+id]=lend; else G.abil[id]=true;
   if(had||!player) return;
   const I=ABIL_INFO[id]||{name:id,sub:()=>'New ability',tip:()=>''}, c=jumpCtl(), p=player;
   setBanner(I.name,!tipsOn()&&I.plain?I.plain:I.sub(c),4.2);
