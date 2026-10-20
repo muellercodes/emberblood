@@ -580,7 +580,7 @@ function padHelpRows(k){
   return [
     [chip(sp?'Right stick':'Left stick'),`Move. Push it all the way to sprint, or click it (${escapeHtml(padBtnName(padSw(PB.L3),k))}).`],
     [chip(sp?'Left stick':'Right stick'),'Aim. Without it Ash faces where he walks.'],
-    ...(typeof howHas!=='function'||howHas('jump')?[[c(PB.S),'Jump.'+(hasAbil('wings')?' With wings, jump again in the air to fly.':'')]]:[]),
+    ...(typeof howHas!=='function'||howHas('jump')?[[c(PB.S),'Jump.'+((typeof howHas==='function'?howHas('wings'):hasAbil('wings'))?' With wings, jump again in the air to fly.':'')]]:[]),
     [`${c(PB.W)} ${c(PB.R2)}`,'Attack. Hold for a combo. With someone to talk to (or something to open) and no foe close, it does that instead.'],
     [c(PB.L2),'Fire breath'],
     [c(PB.E),'Dodge roll'],

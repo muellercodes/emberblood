@@ -751,8 +751,13 @@ function howTabs(){
   for(const b of document.querySelectorAll('#howTabs button')){ const on=b.dataset.h===howTab; b.setAttribute('aria-pressed',String(on)); if(on) b.setAttribute('data-focus',''); else b.removeAttribute('data-focus'); }
   for(const s of document.querySelectorAll('#how .hsec')) s.hidden=s.dataset.h!==howTab;
 }
-// (v12) the controls for a power show only once Ash has it (the Arena always jumps); nothing lists powers ahead of time
-function howHas(id){ return !!G&&(id==='jump'&&G.mode!=='story'||hasAbil(id)); }
+// (v12) the controls for a power show only once Ash has it (the Arena always jumps; on the title screen, the latest
+// journey's powers); nothing lists powers ahead of time
+function howHas(id){
+  if(G&&G.mode==='story') return hasAbil(id);
+  if(G&&G.mode==='normal') return id==='jump';
+  try{ const i=latestSlot(), s=i>=0?slotSave(i):null; return !!(s&&s.abil&&s.abil[id]); }catch(e){ return false; }
+}
 function renderHow(){
   howTabs(); if(typeof handSync==='function') handSync();
   for(const e of document.querySelectorAll('#how [data-pow]')) e.hidden=!howHas(e.dataset.pow);
