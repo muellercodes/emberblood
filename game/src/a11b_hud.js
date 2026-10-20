@@ -399,9 +399,12 @@ const COACH_TIPS=[
     kb:['A red mark means a hit is coming:',{k:'roll'},'Roll away'], pad:['A red mark means a hit is coming:',{k:'roll'},'Roll away'],
     touch:['A red mark means a hit is coming: ROLL away']}],
   ['drink',()=>player.potions>0&&player.hp<player.maxHp*0.5,7,()=>player.potions<COACH.pot,{
-    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap the flasks at the top to drink']}],
+    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap DRINK, or the flasks at the top, to drink']}],
   ['roar',()=>player.roar>=100,6,()=>player.roar<100,{
     kb:['Your ROAR is full:',{k:'roar'},'Roar'], pad:['Your ROAR is full:',{k:'roar'},'Roar'], touch:['Your ROAR is full: tap ROAR']}],
+  // (v12) touch only: CALL comes up when the companion is far behind or waiting
+  ['call',()=>usingTouch&&!allBtns()&&tWant('whistle'),6,()=>!tWant('whistle'),{
+    all:['Your friend is far away: tap CALL to bring them back']}],
   ['jump',()=>hasAbil('jump'),6,null,{
     kb:[{k:'jump'},'Jump'], pad:[{k:'jump'},'Jump'], touch:['JUMP hops over gaps and low walls']}],
   ['map',()=>G.playTime>150&&!G.inCombat&&!!G.flags.forge,8,null,{
@@ -503,10 +506,15 @@ function touchIcon(id,x,y,r,col,label){
   else if(id==='whistle'){ ctx.beginPath(); ctx.arc(-4,4,8,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-4,-4); ctx.lineTo(11,-4); ctx.lineTo(11,2); ctx.lineTo(3,2); ctx.stroke(); ctx.beginPath(); ctx.arc(-4,4,2.6,0,TAU); ctx.fill(); ctx.lineWidth=2.2; for(const q of [0,1]){ ctx.beginPath(); ctx.arc(10,-9,4+q*5,-1.9,-0.3); ctx.stroke(); } }
   ctx.restore();
 }
+// (v12) the buttons come and go (tVisTick and tShown in a5_input.js): each one pops in with a little overshoot and a
+// ring that runs out from it (DRINK, ROAR, CALL and JUMP), and shrinks away when it goes
+const TPOP_COL={drink:'110,230,150',roar:'255,200,90',whistle:'150,215,255',jump:'150,215,255'};
+const tBackOut=t=>{ const c=1.70158, u=t-1; return 1+(c+1)*u*u*u+c*u*u; };
 function drawTouch(){
   if(!usingTouch||scene!=='play') return;
+  tVisTick();
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  const mode=settings.touch||'two', L=tLayout(), right=touchRight();
+  const mode=settings.touch||'two', L=tLayout(), SH=tShown(), right=touchRight();
   if(touch.stickId!==null){
     ctx.fillStyle='rgba(255,255,255,.07)'; ctx.strokeStyle=touch.full>0.35?'rgba(140,230,120,.6)':'rgba(255,220,180,.35)'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(touch.ox,touch.oy,58,0,TAU); ctx.fill(); ctx.stroke();
@@ -520,7 +528,12 @@ function drawTouch(){
     ctx.font=`700 11px ${UIF}`; ctx.fillStyle='rgba(255,230,200,.4)'; ctx.fillText(mode==='two'?'MOVE':'DRAG TO MOVE',gx,gy);
   }
   const um=useMode(), pu=0.5+0.5*Math.sin(G.time*(um&&um.hot?11:5));
-  for(const b of L){
+  for(const b of SH){
+    const pc=TPOP_COL[b.id];
+    if(b.on&&pc&&b.popT<0.5&&!allBtns()){ const q=b.popT/0.5; ctx.strokeStyle=`rgba(${pc},${0.7*(1-q)})`; ctx.lineWidth=3*(1-q)+1; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+3+q*30,0,TAU); ctx.stroke(); }
+    ctx.save();
+    const ba=b.a<1?(b.on?Math.min(1,b.a*1.6):b.a):1;
+    if(b.a<1){ const k=b.on?0.5+0.5*tBackOut(b.a):0.8+0.2*b.a; ctx.translate(b.x,b.y); ctx.scale(k,k); ctx.translate(-b.x,-b.y); ctx.globalAlpha=ba; }
     const held=touch.held[b.id]||(b.id==='fire'&&touch.fireT>0); let ready=true, prog=1, ring=true;
     if(b.id==='roar'){ prog=player.roar/100; ready=prog>=1; }
     else if(b.id==='roll'){ prog=player.stamina/player.maxStamina; ready=player.stamina>=player.stats.rollCost*0.5; }
@@ -531,7 +544,7 @@ function drawTouch(){
     const use=b.id==='attack'&&!!um, big=b.id==='jump'||b.id==='attack';
     if(use){ ctx.fillStyle=`rgba(255,190,90,${(um.hot?0.2:0.1)+pu*0.14})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+7+pu*4,0,TAU); ctx.fill(); }
     else if(b.id==='roar'&&ready){ ctx.fillStyle=`rgba(255,170,70,${0.1+pu*0.1})`; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+6,0,TAU); ctx.fill(); }
-    if(LOOK.sb){ ctx.fillStyle=SBC.outline; ctx.globalAlpha=0.55; ctx.beginPath(); ctx.arc(b.x,b.y+3,b.r+1.5,0,TAU); ctx.fill(); ctx.globalAlpha=1; }
+    if(LOOK.sb){ ctx.fillStyle=SBC.outline; ctx.globalAlpha=0.55*ba; ctx.beginPath(); ctx.arc(b.x,b.y+3,b.r+1.5,0,TAU); ctx.fill(); ctx.globalAlpha=ba; }
     ctx.fillStyle=LOOK.sb?(held?'rgba(255,150,70,.7)':use?'rgba(110,60,24,.86)':big?'rgba(59,34,51,.68)':'rgba(59,34,51,.6)'):held?'rgba(255,150,70,.45)':use?'rgba(64,36,14,.78)':big?'rgba(26,18,12,.58)':'rgba(16,12,8,.52)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
     ctx.lineWidth=LOOK.sb?(big?3.6:3):big?3:2.5; ctx.strokeStyle=use?`rgba(255,${200+Math.round(30*pu)},120,.95)`:b.id==='jump'?'rgba(150,215,255,.75)':ready?(LOOK.sb?'rgba(255,243,214,.92)':'rgba(255,220,180,.7)'):'rgba(140,120,100,.5)'; ctx.stroke();
     if(ring){ ctx.strokeStyle=b.id==='roar'&&ready?'#ffd27a':b.id==='drink'?'#5ad88a':'rgba(255,170,90,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r-5,-Math.PI/2,-Math.PI/2+TAU*clamp(prog,0,1)); ctx.stroke(); }
@@ -546,9 +559,58 @@ function drawTouch(){
     else{ touchIcon(b.id,b.x,iy,b.r*0.62,b.id==='fire'&&ready?'#ffb060':b.id==='drink'&&ready?'#8ef0b0':b.id==='jump'?'#d8f0ff':col,b.label); if(b.id==='attack'&&autoAttackOn()) label='AUTO'; }
     if(b.id==='drink'&&player.potions>0){ ctx.font=`800 ${Math.max(9,Math.round(b.r*0.34))}px ${UIF}`; ctx.fillStyle='#bff5cf'; ctx.fillText(String(player.potions),b.x+b.r*0.5,b.y-b.r*0.52); }
     ctx.fillStyle=use?'#ffe9c4':col; ctx.font=`800 ${Math.max(8,Math.round(b.r*(use?0.25:0.22)))}px ${UIF}`; ctx.fillText(label,b.x,b.y+b.r*0.58);
+    ctx.restore();
   }
   ctx.restore();
+  twHintDraw();
 }
+// ---------- (v12) the weapon chip at the top is how touch players switch weapons now (WEAPON is a button again only with
+// Settings > Show every button). On touch it gets a small swap badge, and the first time Ash has two weapons (on this
+// journey, on touch) a gold ring pulses round it with "Tap to switch weapons" beside it, until it is tapped or 7 s pass.
+// TW.r is the chip's tap box this frame: the first hit box drawWeaponHud (a6b_weapons.js) adds, 51 x 52 beside the
+// vitals or 44 x 56 under the pause and sound buttons on narrow screens.
+const TW={r:null,t:0,last:0,w:null};
+{ const base=drawWeaponHud; drawWeaponHud=function(){ const n0=HUD_HITS.length; base(); TW.r=HUD_HITS.length>n0?HUD_HITS[n0]:null; try{ twChip(); }catch(e){} }; }
+function twChip(){
+  const R=TW.r; if(!R||!usingTouch||scene!=='play'||!G) return;
+  const g=ctx, small=R.w<48, bx=R.x+(small?8:10.5), by=R.y+(small?8:10);
+  g.save();
+  // the swap badge: two little arrows chasing each other, where the keyboard shows its key letter
+  g.fillStyle='rgba(20,12,6,.92)'; g.beginPath(); g.arc(bx,by,7,0,TAU); g.fill(); g.strokeStyle='rgba(255,214,150,.75)'; g.lineWidth=1; g.stroke();
+  g.strokeStyle='#ffe0b0'; g.fillStyle='#ffe0b0'; g.lineWidth=1.4; g.lineCap='round';
+  for(const s0 of [0,Math.PI]){ g.beginPath(); g.arc(bx,by,4,s0-2.4,s0-0.6); g.stroke(); const a=s0-0.6, ex=bx+Math.cos(a)*4, ey=by+Math.sin(a)*4; g.save(); g.translate(ex,ey); g.rotate(a+Math.PI/2); g.beginPath(); g.moveTo(2.4,0); g.lineTo(-1.4,-2.2); g.lineTo(-1.4,2.2); g.closePath(); g.fill(); g.restore(); }
+  g.restore();
+  // the first-time hint
+  const now=G.time, dt=clamp(now-(TW.last||now),0,0.1); TW.last=now;
+  if(G.mode!=='story'||G.flags.tw_chip||!tipOn('wchip')) return;
+  if(TW.g!==G){ TW.g=G; TW.t=0; TW.w=curWeapon(); }
+  if(G.banner||DLG) return;
+  TW.t+=dt;
+  if(curWeapon()!==TW.w&&TW.t>0.3){ G.flags.tw_chip=1; return; }   // tapped it (or switched another way): done
+  TW.w=curWeapon();
+  if(TW.t>7){ G.flags.tw_chip=1; return; }
+  TW.a=clamp(Math.min(TW.t/0.3,(7-TW.t)/0.5),0,1); TW.hf=G.time;
+}
+// the hint itself, drawn last (from drawTouch) so no other tip or chip covers it
+function twHintDraw(){
+  const R=TW.r, g=ctx; if(!R||TW.hf!==G.time||!(TW.a>0)) return;
+  const small=R.w<48, k=0.5+0.5*Math.sin(G.time*6);
+  g.save(); g.globalAlpha=TW.a;
+  g.strokeStyle=`rgba(255,${200+Math.round(40*k)},110,${0.6+0.35*k})`; g.lineWidth=2.5; rr(R.x-3-k*2,R.y-3-k*2,R.w+6+k*4,R.h+6+k*4,12); g.stroke();
+  const txt=S('Tap to switch weapons','Tap to switch'); g.font=`700 12px ${UIF}`; const tw=g.measureText(txt).width+22, th=26;
+  // under the chip; under the pause button (narrow screens) a little lower, clear of the companion's picture beside it
+  const py=R.y+R.h+(small?44:10), px=clamp(small?R.x+R.w-tw:R.x,SAFE.l+6,W-SAFE.r-6-tw), cx=clamp(R.x+R.w/2,px+12,px+tw-12);
+  if(small){ g.strokeStyle='rgba(255,210,150,.7)'; g.lineWidth=1.5; g.setLineDash([3,3]); g.beginPath(); g.moveTo(cx,R.y+R.h+5); g.lineTo(cx,py-6); g.stroke(); g.setLineDash([]); }
+  if(LOOK.sb) sbPill(px,py,tw,th); else{ g.fillStyle='rgba(12,9,6,.88)'; rr(px,py,tw,th,13); g.fill(); g.strokeStyle='rgba(255,210,150,.6)'; g.lineWidth=1; g.stroke(); }
+  // a little pointer up toward the chip
+  g.fillStyle=LOOK.sb?'#fff3d6':'rgba(255,210,150,.85)'; g.beginPath(); g.moveTo(cx,py-7); g.lineTo(cx-5,py-1); g.lineTo(cx+5,py-1); g.closePath(); g.fill();
+  g.fillStyle=LOOK.sb?SBC.outline:'#ffe6c0'; g.textAlign='left'; g.textBaseline='middle'; g.fillText(txt,px+11,py+th/2+0.5);
+  g.restore();
+}
+// what the game calls the weapon switch on touch, and the tip when Ash gets his second weapon (a5b_pad.js, a6b_weapons.js)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{wchip:()=>TW.r?{x:TW.r.x,y:TW.r.y,w:TW.r.w,h:TW.r.h}:null});
+try{ Object.defineProperty(ACT_TOUCH,'weapon',{get:()=>allBtns()?'the WEAPON button':'the weapon chip at the top',enumerable:true,configurable:true}); }catch(e){}
+{ const base=switchTip; switchTip=function(){ if(touchy()&&!allBtns()) return S('Tap the weapon chip at the top of the screen to switch weapons.','Tap the weapon at the top to switch.'); return base(); }; }
 
 // ================= (v11 polish) banner manners
 // Drew found the messages noisy: "Quest updated" again and again around doors, one story banner held over a whole boss

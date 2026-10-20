@@ -133,6 +133,7 @@ function renderSettings(){
   seg('setNums',settings.nums?'on':'off');
   seg('setChat',settings.chat==='off'?'off':'some');
   seg('setTouch',settings.touch); seg('setBtn',settings.btn<0.95?'s':settings.btn>1.05?'l':'m'); seg('setAuto',autoAttackOn()?'on':'off');
+  seg('setAllBtn',settings.allBtn?'on':'off');
 }
 function applySetting(id,v){
   if(id==='setNums'){ settings.nums=v==='on'; store.set('eb_nums',settings.nums); }
@@ -140,8 +141,11 @@ function applySetting(id,v){
   else if(id==='setTouch'){ settings.touch=v; store.set('eb_touch',v); }
   else if(id==='setBtn'){ settings.btn=v==='s'?0.88:v==='l'?1.16:1; store.set('eb_btn',settings.btn); }
   else if(id==='setAuto'){ settings.auto=v==='on'; store.set('eb_auto',settings.auto); }
+  else if(id==='setAllBtn'){ settings.allBtn=v==='on'; store.set('eb_allbtn',settings.allBtn); }   // v12: Show every button (a5_input.js allBtns)
   renderSettings(); refreshSoundLabels();
 }
+// (v12) Settings > Show every button (the other rows are wired in a12b_ui.js)
+for(const b of document.querySelectorAll('#setAllBtn button')) b.addEventListener('click',()=>{ SFX.init(); applySetting('setAllBtn',b.dataset.v); SFX.play('ui'); });
 // ---------- small always-on perks from friendships
 function perkUpdate(dt){
   if(!G||G.mode!=='story'||!player||player.dead) return;
