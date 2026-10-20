@@ -151,10 +151,10 @@ Object.assign(QDEFS,{
       {t:'flags',flags:['a1_moth_c_nib','a1_moth_c_tamsin','a1_moth_c_hob','a1_moth_c_pell'],n:3,text:S('Ask around about the stranger in the moth cloak: Nib and Pell in Brindlecross, Hob and Tamsin at the Smoky Kettle','Ask about the moth girl: Nib, Pell, Hob and Tamsin.'),at:'poi:brindle'},
       {t:'flag',flag:'a1_moth_camp',text:S('Find the stranger’s camp by the old Southern Pass rockfall, south of Emberhollow. Go at night.','Find her camp south of Emberhollow. Go at night!'),at:'lm:a1_camp'},
       {t:'talk',npc:'wren',text:S('Bring the torn page back to Sister Wren in the Brindlecross library','Bring the page to Wren.'),take:{a1_page:1},
-        lines:[xl('wren',`"Ember had two children. The first carried her fire. The second, Pearl, had none. Not a spark. Only her mother's horns, and claws that could climb anything."`,`"Ember had two children. The second, Pearl, had no fire. Only horns and climbing claws."`),
-          xl('wren',`"Pearl loved the sea more than the mountain. She sailed south and never came home. Her children are the Emberbloods without fire."`,`"Pearl sailed south. Her children are Emberbloods without fire."`),
-          xl('ash',`So there are more of us? Somewhere south?`,`There are more of us? Down south?`),
-          xl('wren',`There might be. And one of them came all this way to read about it. And to look at you. Here, take this charm. Moths hate it. I made it out of a very boring book.`,`Maybe. And one came to look at you. Take this charm. Moths hate it.`)],reward:{coins:40,xp:160,bless:1,perk:'moth'}}]},
+        lines:[xl('wren',`"Ember had two children. The first carried her fire. The second had none. Not a spark. Only her mother's horns, and claws that could climb anything."`,`"Ember had two children. The second had no fire. Only horns and climbing claws."`),
+          xl('wren',`"The second child loved the sea more than the mountain, and sailed south, and..." That's all. The bottom of the page is torn off, right where the name would be. Somebody kept that part.`,`"The second child sailed south..." The bottom is torn off. Someone kept the name.`),
+          xl('ash',`Ember's other child went south? Then who lives down there now?`,`Who lives down south now?`),
+          xl('wren',`I don't know. But somebody came all this way to read about it. And to look at you, I think. Here, take this charm. Moths hate it. I made it out of a very boring book.`,`I don't know. But someone came to look at you. Take this charm. Moths hate it.`)],reward:{coins:40,xp:160,bless:1,perk:'moth'}}]},
   a1_pip:{title:S('Pip’s Five Flames','Pip’s Five Flames'),giver:'yara',min:'three',
     offer:[
       xl('yara',`Ash. Your little drake. May I?`,`Ash. Your little drake. May I?`),
@@ -286,7 +286,7 @@ function a1Thunder(show){ G.flags.a1_thunder=true; if(show) later(1.4,()=>setBan
 
 // (v12 R1) the Wardens' pages wait for Yara's real story (STORY.lore): before it a cave keeps its page out of sight.
 // Gran's letter (page nine, in Ash's house) may be found early; Yara's shelf and Iska's statue wait in a9d_quests.js.
-const a1PageWaits=id=>!!(G&&G.mode==='story'&&id&&id!=='p9'&&!(G.pages&&G.pages[id])&&!reached('lore'));
+const a1PageWaits=id=>!!(G&&G.mode==='story'&&id&&id!=='p9'&&!(G.pages&&G.pages[id])&&!reached('hollow'));
 function a1HidePages(A){ try{ if(!A||!A.objs) return; for(let i=A.objs.length-1;i>=0;i--){ const o=A.objs[i]; if(o&&o.k==='page'&&a1PageWaits(o.page)) A.objs.splice(i,1); } }catch(e){ console.error(e); } }
 { const base=buildCave; buildCave=function(A,def){ base.apply(this,arguments); a1HidePages(A); }; }
 { const base=buildCaveRooms; buildCaveRooms=function(A,def){ base.apply(this,arguments); a1HidePages(A); }; }
@@ -376,7 +376,18 @@ ELEV.vent({x:A1W.spire.vx,y:A1W.spire.vy,r:A1W.spire.vr,lift:1});
 ELEV.noFly({disc:[A1W.gloam.x,A1W.gloam.y,A1W.gloam.r+60],why:S('The bog mist is far too thick to fly through here.','Too misty to fly here!')});
 
 // ---------- 6. the world build: runs after the stock world (so the old random draws land the same)
-{ const base=initWorld; initWorld=function(){ base(); try{ a1BuildWorld(); }catch(e){ console.error('a1 world',e); } }; }
+{ const base=initWorld; initWorld=function(){ base(); try{ a1BuildWorld(); }catch(e){ console.error('a1 world',e); } try{ a1TrialFolk(); }catch(e){ console.error('a1 folk',e); } }; }
+// (v12 R1) the word "Trial" comes from Ember, inside: until Ash has been in (or Ember has named the next door at the end
+// of the last one), the door and the sign by each one say what a passer-by sees (a2h_dungeons.js builds them)
+const A1_FOLK={leap:S('old rooted arch','rooted arch'),tide:S('shell doors','shell doors'),sky:S('white gate','white gate')};
+const a1TrialKnown=id=>!G||G.mode!=='story'||!!(G.found&&G.found['seen_'+id])||(id==='tide'&&!!G.flags.trial_leap_boss)||(id==='sky'&&!!G.flags.trial_tide_boss);
+function a1TrialFolk(){
+  for(const id in A1_FOLK){ const T=TRIALS[id]; if(!T) continue; const f=A1_FOLK[id];
+    const D=DOORS.find(d=>d.trial===id), Lm=LANDMARKS.find(l=>l.id==='tsign_'+id);
+    if(D){ const d0=Object.getOwnPropertyDescriptor(D,'label'); if(d0&&d0.get&&d0.configurable) Object.defineProperty(D,'label',{configurable:true,get(){ return a1TrialKnown(id)?d0.get.call(D):trialOpen(id)?S(`Go through the ${f}`,`Go through the ${f}`):S(`Look at the ${f}`,`Look at the ${f}`); }}); }
+    if(Lm){ const t0=Object.getOwnPropertyDescriptor(Lm,'text'); if(t0&&t0.get&&t0.configurable) Object.defineProperty(Lm,'text',{configurable:true,get(){ return a1TrialKnown(id)?t0.get.call(Lm):trialOpen(id)?S(`Old runes, worn too smooth to read. They glow softly now, as if they are awake. Someone has scratched underneath: "dragons of level ${T.level} and up."`,`Old runes. They glow now. "Level ${T.level} and up."`):S(`Old runes, worn too smooth to read. They are dark, as if they are asleep, waiting for someone. (Ask Elder Yara.)`,`Old runes. They are dark. Ask Elder Yara.`); }}); }
+  }
+}
 function a1MoveWard(id,x,y){
   const w=WARDS[id]; if(!w) return; const ox=w.x, oy=w.y; w.x=x; w.y=y;
   for(const s of STRUCTS) if(s.k==='ward'&&s.id===id){ s.x=x; s.y=y; }
@@ -670,7 +681,7 @@ function a1CausewayTick(){
   const rx=p.x-c.Q[0], ry=p.y-c.Q[1], t=rx*c.d[0]+ry*c.d[1], pp=Math.abs(rx*c.d[1]-ry*c.d[0]);
   if(t<-80||t>560||pp>60) { const dc=dist(p.x,p.y,A1W.ash.x,A1W.ash.y); if(dc>A1W.ash.ro-10&&dc<A1W.ash.ro+60&&!hasAbil('jump')&&G.stage==='oath'){ const ax=p.x+Math.cos(p.facing)*40, ay=p.y+Math.sin(p.facing)*40; if(a1Moat(ax,ay)&&p.moving) a1note('moat',`Black, sooty water all the way round. The road crosses on the old causeway.`,`Sooty water! Find the old causeway.`,6); } return; }
   for(const [a,b] of c.gaps){ if(t>a-30&&t<a+4&&p.moving&&!(p.z>0)){
-    if(!hasAbil('jump')) a1note('gap',`The gap is too wide to step over. I need to jump! (The Trial of the Leap, in Whisperwood)`,`Too wide! I need to jump. Try the Trial of the Leap.`,5);
+    if(!hasAbil('jump')) a1note('gap',`The gap is too wide to step over. I need to jump! (The old arch in Whisperwood?)`,`Too wide! I need to jump. Try the old arch in Whisperwood.`,5);
     else if(b-a>100) a1note('gap3',`The big one! Run at it and jump at the very end.`,`Big gap! Run and jump!`,6);
     else a1note('gapj',`Jump! (${a1Ctl('jump')})`,`Jump! (${a1Ctl('jump')})`,6); } }
   if(!G.flags.a1_cw_first&&t>440&&!(p.z>0)&&a1OnPlank(p.x,p.y)&&!G.bossDone.morrow){ G.flags.a1_cw_first=true; a1say(STORY.a1_causeway_first); }
@@ -980,8 +991,8 @@ STORY.a1_n3=STORY.a1_n3||[xl('narr',`A cloud of grey moths swirls round the thie
   xl('narr',`Something small and bright lies in the grass where the thief jumped. A brass gear, stamped GEARHAVEN.`,`The thief dropped a brass gear. It says GEARHAVEN.`)];
 STORY.a1_passlunch=STORY.a1_passlunch||[xl('narr',`Mom is sitting on the rockfall with a basket on her knees. She has clearly been waiting a while.`,`Mom is waiting at the pass with a basket.`),
   xl('maren',`Sandwiches. Cheese, cheese, and a cheese one for Pip. Nobody chases a thief on an empty stomach.`,`Sandwiches! Nobody chases a thief hungry.`),
-  {who:'maren',text:S(`The coast is all cliffs and currents, love. Learn to jump twice and skip first. Hollis's goat knows how.`,`Learn to jump twice first. Ask Hollis.`),skipIf:()=>hasAbil('dbljump')},
-  {who:'maren',text:S(`And you'll want to skim across water like a stone. Little Minnow on the Brindlecross dock can teach you. She's very fast and very cheeky.`,`Learn to skim on water. Ask Minnow on the dock.`),skipIf:()=>hasAbil('skimmer')},
+  {who:'maren',text:S(`The coast is all cliffs and currents, love. Go and see Hollis's goat first. He says she does something impossible, and Hollis never lies about goats.`,`Go and see Hollis's goat first. She does something odd.`),skipIf:()=>hasAbil('dbljump')},
+  {who:'maren',text:S(`And little Minnow on the Brindlecross dock says she can cross water faster than you. Go and let her prove it. She's very fast and very cheeky.`,`And Minnow on the dock is fast on water. Go and see her.`),skipIf:()=>hasAbil('skimmer')},
   xl('maren',`Bring the Heart home. And bring yourself home first. Love you.`,`Bring the Heart home. And bring yourself home first.`)];
 const a1TextOf=l=>String(Array.isArray(l)?l[1]:l&&l.text||'');
 if(typeof festIntroLines==='function'){ const base=festIntroLines; festIntroLines=function(day){ const L=base(day); try{
@@ -999,15 +1010,15 @@ const a1Lacks=()=>!hasAbil('dbljump')||!hasAbil('skimmer');
 { const base=useCrossing; useCrossing=function(def){
   try{ if(def&&def.id==='c_pass_s'&&G.mode==='story'&&(!def.need||def.need())&&a1Lacks()){
     G.flags.a1_lunch=true;
-    a1say([xl('maren',`Not so fast, love. The coast is all cliffs and currents.`,`Not so fast! The coast has cliffs and currents.`)].concat(STORY.a1_passlunch.slice(2,4)),()=>{ setBanner(S('Not ready for the coast yet','Not ready yet'),S(!hasAbil('dbljump')&&!hasAbil('skimmer')?'Learn to jump twice (Farmer Hollis) and to skim (Minnow on the dock).':!hasAbil('dbljump')?'Learn to jump twice. Farmer Hollis has a very strange goat.':'Learn to skim. Minnow is on the Brindlecross dock.','Ask Hollis and Minnow first.'),4); questUpdated(); });
+    a1say([xl('maren',`Not so fast, love. The coast is all cliffs and currents.`,`Not so fast! The coast has cliffs and currents.`)].concat(STORY.a1_passlunch.slice(2,4)),()=>{ setBanner(S('Not ready for the coast yet','Not ready yet'),S(!hasAbil('dbljump')&&!hasAbil('skimmer')?'See Farmer Hollis’s strange goat, and Minnow on the Brindlecross dock.':!hasAbil('dbljump')?'Farmer Hollis has a very strange goat. Go and see it.':'Minnow is on the Brindlecross dock. Go and see her.','See Hollis and Minnow first.'),4); questUpdated(); });
     return; } }catch(e){ console.error(e); }
   return base(def); }; }
 
 // ---------- 13. what the story asks for now: objectives, Yara's hints, markers, Mom's free hammer
 function a1GiftObjs(){
   const out=[], H=NPCSPOT.hollis, m=G.npcs.find(n=>n.id==='minnow');
-  if(!hasAbil('dbljump')) out.push({text:S('Learn to jump twice. Farmer Hollis has a very strange goat.','Learn to jump twice. Ask Farmer Hollis.'),x:H[0],y:H[1],npc:'hollis',a1:1});
-  if(!hasAbil('skimmer')) out.push({text:S('Learn to skim. Minnow Fisk is on the Brindlecross dock.','Learn to skim. Ask Minnow on the dock.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1});
+  if(!hasAbil('dbljump')) out.push({text:S('Farmer Hollis has a very strange goat. Go and see what it can do.','Go and see Hollis’s strange goat.'),x:H[0],y:H[1],npc:'hollis',a1:1});
+  if(!hasAbil('skimmer')) out.push({text:S('Minnow Fisk on the Brindlecross dock is fast on water. Go and see her.','Go and see Minnow on the dock.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1});
   return out;
 }
 function a1Objectives(out){
@@ -1024,7 +1035,7 @@ function a1Objectives(out){
     }
     if(!G.wards.mire){
       if(!hasAbil('stride')){ drop(o=>o.site==='mire'||isWard(o,'mire')); out.push({text:S('Pass the Trial of the Tide. The Sunken Ward is flooded.','Do the Trial of the Tide. The Sunken Ward is flooded.'),x:TT.x,y:TT.y,a1:1}); }
-      else if(!hasAbil('skimmer')){ drop(o=>o.site==='mire'||isWard(o,'mire')); const m=G.npcs.find(n=>n.id==='minnow'); out.push({text:S('Learn to skim. Minnow Fisk is on the Brindlecross dock.','Learn to skim. Ask Minnow on the dock.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1}); }
+      else if(!hasAbil('skimmer')){ drop(o=>o.site==='mire'||isWard(o,'mire')); const m=G.npcs.find(n=>n.id==='minnow'); out.push({text:S('The Sunken Ward sits in a swirl. Minnow Fisk on the Brindlecross dock skips stones better than anyone.','Ask Minnow on the dock about skipping.'),x:m?m.x:6560,y:m?m.y:7400,npc:'minnow',a1:1}); }
       else if(G.wardReady.mire){ drop(o=>isWard(o,'mire')); out.push({text:S('Skim across the Gloam Swirl to the Sunken Ward: sprint over the water and don’t stop. Then breathe on the Ward.','Run across the swirl. Don’t stop! Then breathe on the Ward.'),x:WARDS.mire.x,y:WARDS.mire.y,a1:1}); }
     }
     if(!G.wards.frost){
@@ -1034,7 +1045,7 @@ function a1Objectives(out){
     }
   }
   if(st==='gate'&&!(G.weapons&&G.weapons.hammer)){ const m=npcOf('maren'); out.unshift({text:S('Ask Mom about a hammer. The mountain will need one.','Ask Mom for a hammer. The mountain needs one.'),x:m?m.x:NPCSPOT.maren[0],y:m?m.y:NPCSPOT.maren[1],npc:'maren',a1:1}); }
-  if(st==='summit'&&!hasAbil('dbljump')){ const H=NPCSPOT.hollis; out.push({text:S('Learn to jump twice. Farmer Hollis has a very strange goat.','Learn to jump twice. Ask Farmer Hollis.'),x:H[0],y:H[1],npc:'hollis',a1:1}); }
+  if(st==='summit'&&!hasAbil('dbljump')){ const H=NPCSPOT.hollis; out.push({text:S('Farmer Hollis has a very strange goat. Go and see what it can do.','Go and see Hollis’s strange goat.'),x:H[0],y:H[1],npc:'hollis',a1:1}); }
   if(st==='c_pass'&&G.flags.a1_lunch&&a1Lacks()&&curMap()===0){ out.length=0; for(const o of a1GiftObjs()) out.push(o); }
   return out;
 }
@@ -1043,7 +1054,7 @@ function a1Objectives(out){
   if(st==='warcamp'&&!J) return A1_HINT.warcamp_nojump; if(st==='wren'&&!J) return A1_HINT.wren_nojump; if(st==='oath'&&!J) return A1_HINT.oath_nojump;
   if(st==='three'&&((!G.wards.crag&&!hasAbil('wings'))||(!G.wards.mire&&!hasAbil('skimmer'))||(!G.wards.frost&&!(G.weapons&&G.weapons.bow&&G.flags.a1_frost_melted)))) return A1_HINT.three_gifts;
   if(st==='gate'&&!(G.weapons&&G.weapons.hammer)) return A1_HINT.gate_hammer; if(st==='summit'&&!hasAbil('dbljump')) return A1_HINT.summit_dj;
-  if(st==='c_pass'&&a1Lacks()) return S(`Your mother is waiting at the pass, Ash. And she is right: learn to jump twice and to skim first. Hollis and little Minnow can help.`,`Learn to jump twice and skim first. Ask Hollis and Minnow.`);
+  if(st==='c_pass'&&a1Lacks()) return S(`Your mother is waiting at the pass, Ash. And she is right: see Hollis's goat and little Minnow first.`,`See Hollis's goat and Minnow first.`);
   } }catch(e){ console.error(e); } return base(); }; }
 { const base=storyMarker; storyMarker=function(id){ if(base(id)) return true; try{ if(G&&G.mode==='story'&&id==='maren'&&G.stage==='gate'&&!(G.weapons&&G.weapons.hammer)) return true; }catch(e){} return false; }; }
 { const base=forgeHammerTalk; forgeHammerTalk=function(){
