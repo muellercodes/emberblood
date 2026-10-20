@@ -695,10 +695,20 @@ Promise.resolve().then(()=>{ const base=updateEnemies; updateEnemies=function(dt
 // the camera's target for Ash's room (a5_input.js updateCam): a room that fits is framed below the HUD's top row (below
 // every top panel when there is room for that), a bigger one follows Ash but never lets its top wall go under the
 // panels or the camera wander past its walls
+// the bottom of the right-hand panels: the minimap with its time, place and key strip, and on a narrow screen the
+// weapon chip under the sound button and the companion chip under the minimap (a6b_weapons.js, a9i_comps.js)
+function hudRightBottom(){
+  const story=G&&G.mode==='story', L=SAFE.l+14, M=MINI_R(), pw=Math.min(250,M.x-L-10);
+  let b=M.y+M.r*2+52;
+  if(story){ const comp=!!G.pip||(typeof CM!=='undefined'&&CM&&CMG===G), rx=Math.max(L+pw+4,HUD_RX||0);
+    if(comp&&M.x-rx<2*21+26) b=Math.max(b,M.y+M.r*2+38+2*21+16);
+    if(G.flags&&G.flags.forge&&M.x-(L+pw+8)<130) b=Math.max(b,SAFE.t+164+4); }
+  return b;
+}
 function roomHudBand(){
-  const story=G.mode==='story', T=SAFE.t+14, M=MINI_R();
+  const story=G.mode==='story', T=SAFE.t+14;
   const row=T+(story?96:70)+6;                                          // vitals panel and the quick slot under ROAR
-  const right=M.y+M.r*2+52;                                             // minimap, its time and place, the key strip
+  const right=hudRightBottom();                                         // minimap, its labels, the narrow chips
   const track=TRACK_R?TRACK_R.y+TRACK_R.h+4:row;
   return {row,all:Math.max(row,right,track),bot:usingTouch?Math.max(0,H-touchTopOver(0,W)+6):0};
 }

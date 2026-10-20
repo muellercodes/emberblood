@@ -121,7 +121,7 @@ function hudFadeRects(){
   const L=SAFE.l+14, T=SAFE.t+14, story=G.mode==='story', M=MINI_R(), out=[];
   out.push({id:'top',x:L-4,y:T-4,w:Math.max(HUD_RX,L+150)-L+4,h:(story?96:70)+8});                        // vitals, quick slot, weapon bar, companion
   if(TRACK_R) out.push({id:'goals',x:TRACK_R.x,y:TRACK_R.y,w:TRACK_R.w,h:TRACK_R.h+26});                     // the goals (and boosts under them)
-  out.push({id:'map',x:M.x-8,y:SAFE.t,w:W-SAFE.r-(M.x-8),h:M.y+M.r*2+56-SAFE.t});                         // minimap, its labels, pause and sound
+  out.push({id:'map',x:M.x-8,y:SAFE.t,w:W-SAFE.r-(M.x-8),h:hudRightBottom()+4-SAFE.t});                  // minimap, its labels, pause and sound, narrow chips
   return out;
 }
 function hudFadeBegin(){
