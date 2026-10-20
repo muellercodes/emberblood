@@ -386,7 +386,9 @@ function d2aBlockSnap(A,b){ const cs=A.cave.cell; b.x=A.x0+(b.ci+0.5)*cs; b.y=A.
 { const base=updatePlayer; updatePlayer=function(dt,inp){
     const p=player, A=AREA;
     if(!p||!G||!A||!A.d2a) return base(dt,inp);
-    try{ return d2aPlayer(A,p,dt,inp,base); }catch(e){ console.error(e); A.d2a.sl=null; return base(dt,inp); } }; }
+    const X=A.d2a, up=d2aUp(p); if(!up) X.trail=null;   // (v12 ICE) where a jump has flown, for d2aSlushFall
+    try{ return d2aPlayer(A,p,dt,inp,base); }catch(e){ console.error(e); A.d2a.sl=null; return base(dt,inp); }
+    finally{ if(up||d2aUp(p)){ const T=X.trail||(X.trail=[]); T.push(p.x,p.y); if(T.length>32) T.splice(0,2); } } }; }
 function d2aBusy(p){ return (typeof P3!=='undefined'&&(P3.ride||P3.mv))||(typeof P2!=='undefined'&&(P2.mv||P2.dash))||p.flying||airborne()||p.dead; }
 const d2aUp=p=>(p.z||0)>0||(p.vz||0)>0;
 function d2aPlayer(A,p,dt,inp,base){
@@ -461,8 +463,19 @@ function d2aEnterAir(A,k,n){ const c=A.cave, w=c.w; if(n<0||n>=c.typ.length||Mat
   if(c.grid[n]!==0||caveBlockedAt(n)) return false; if(d2aAirGap(A,n)) return true;
   if(d2aAirGap(A,k)){ if(!tGround(n)||tHole(n)) return false; const q=tPos(n); return !colAt(q.x,q.y,12); }
   return d2aEnter(A,k,n,'ash'); }
+// a jump that just overshoots a bank or an island into the slush lands on the edge it flew over (within 0.6 of a
+// cell of its path): only a place a shorter jump would reach, never further, and never slick ice
+function d2aLandBack(A,p){
+  const X=A.d2a, T=X.trail, cs=A.cave.cell; if(!T||T.length<4) return false; let d=0, lx=p.x, ly=p.y;
+  for(let i=T.length-2;i>=0;i-=2){ const x=T[i], y=T[i+1]; d+=Math.hypot(x-lx,y-ly); lx=x; ly=y; if(d>0.6*cs) break;
+    const k=tCell(x,y); if(k<0||!tGround(k)||tHole(k)||d2aSlick(A,k)||X.frz.has(k)||caveBlockedAt(k)||colAt(x,y,10)) continue;
+    p.x=x; p.y=y; p.z=0; p.vz=0; p.kvx=p.kvy=0; p.avx=p.avy=0; X.trail=null; X.sl=null; X.hop=false;
+    if(A.tri){ A.tri.lx=p.x; A.tri.ly=p.y; A.tri.wasAir=false; }
+    emit(x,y+4,6,{col:'220,240,255',glow:false,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); return true; }
+  return false; }
 // a jump that came down in slush: a cold splash, back to where he last stood still
 function d2aSlushFall(A,p){
+  if(d2aLandBack(A,p)) return;
   const X=A.d2a, R=X.rest, ok=R&&R.k>=0&&tGround(R.k)&&!caveBlockedAt(R.k)&&!X.frz.has(R.k), s=ok?R:dunNearGround(p.x,p.y,4);
   G.ripples.push({x:p.x,y:p.y,t:0,max:0.9,r:22,splash:true}); emit(p.x,p.y,16,{col:'215,235,250',glow:false,ang:-Math.PI/2,spread:1.3,smin:40,smax:140,lmin:.3,lmax:.6,zmin:2,zmax:4}); SFX.play('pop'); d2aSnd('plop',0.6);
   p.x=s.x; p.y=s.y; p.z=0; p.vz=0; p.kvx=p.kvy=0; p.avx=p.avy=0; X.sl=null; X.hop=false;

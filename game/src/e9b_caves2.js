@@ -200,13 +200,18 @@ function c2Blocked(x,y){
 // in (a splash, back to where he last stood still, never to a cell a slide cannot stop on). From a standstill, with
 // nothing to push off toward, his feet have no grip and a jump goes straight up. A jump that lands on the ice with
 // speed sets him sliding the way he flew (so a landing is never a new place to stop).
-const C2HOP={tiles:2.2,arm:3,grace:0.25};
+const C2HOP={tiles:2.2,arm:3,grace:0.25,back:0.6};
 const c2Up=p=>(p.z||0)>0||(p.vz||0)>0;
 { const base=updatePlayer; updatePlayer=function(dt,inp){
   const A=AREA, Z=A&&A.c2; if(!Z||!player||player.dead) return base(dt,inp);
   Z.inMx=inp.mx; Z.inMy=inp.my;
   if(Z.lock){ const ride=Z.lock.kind==='cart'; const q=Object.assign({},inp,{mx:0,my:0,jump:false,jumpHeld:false,sprint:false,roll:false,fire:ride&&inp.fire,attack:ride&&inp.attack}); G.dashBuf=0; Z.hop=0; Z.edge=null; base(dt,q); c2LockPost(dt); return; }
   const p=player, k=c2K(p.x,p.y), up=c2Up(p), onIce=!airborne()&&c2Kind(k)==='ice'&&!Z.plat.get(k), vx=p.avx||0, vy=p.avy||0;
+  if(!up) Z.trail=null;
+  try{ c2Legs(dt,inp,base,p,up,onIce,vx,vy); } finally { if(up||c2Up(p)){ const T=Z.trail||(Z.trail=[]); T.push(p.x,p.y); if(T.length>32) T.splice(0,2); } }
+}; }
+function c2Legs(dt,inp,base,p,up,onIce,vx,vy){
+  const Z=AREA.c2;
   if(Z.slide||onIce||(Z.hop&&up)){
     const q=Object.assign({},inp,{mx:0,my:0,sprint:false,roll:false}), hop=Z.hop;
     // on the ground the jump is ours (a hop with the slide, a leap from the edge, or straight up); in the air the
@@ -218,7 +223,7 @@ const c2Up=p=>(p.z||0)>0||(p.vz||0)>0;
   Z.hop=0;
   base(dt,inp);
   if(up&&!c2Up(p)&&!Z.slide&&!Z.lock) c2LandOnIce(vx,vy);
-}; }
+}
 // JUMP pressed on the ice (Ash on the ground)
 function c2IceJump(inp,onIce){
   const A=AREA, Z=A.c2, p=player, cs=A.cave.cell, w=A.cave.w;
@@ -371,8 +376,19 @@ function c2AshCells(dt){
   const A=AREA, Z=A.c2, p=player; if(p.dead||scene!=='play'||Z.lock||airborne()) return;
   const k=c2K(p.x,p.y), kd=c2Kind(k);
   if(Z.plat.get(k)) return;
-  if(C2HAZ[kd]||(kd==='spring'&&!canWalkWater())) return c2Hazard(kd);
+  if(C2HAZ[kd]||(kd==='spring'&&!canWalkWater())){ if((kd==='water'||kd==='melt')&&c2LandBack()) return; return c2Hazard(kd); }
   if(C2SAFE[kd]&&!Z.slide) Z.safe={x:p.x,y:p.y};
+}
+// (v12 ICE) a jump in Icefang that just overshoots a floe or a bank into the water lands on the edge it flew over
+// (within C2HOP.back cells of the path): only a place he could have reached with a shorter jump, never further, and
+// never a cell of ice (that would be a new place to stop)
+function c2LandBack(){
+  const A=AREA, Z=A.c2, p=player, T=Z.trail; if(!T||T.length<4||Z.id!=='icefang') return false;
+  const cs=A.cave.cell; let d=0, lx=p.x, ly=p.y;
+  for(let i=T.length-2;i>=0;i-=2){ const x=T[i], y=T[i+1]; d+=Math.hypot(x-lx,y-ly); lx=x; ly=y; if(d>C2HOP.back*cs) break;
+    const k=c2K(x,y), kd=c2Kind(k); if(k<0||Z.occ.get(k)||Z.solidK.has(k)) continue;
+    if(Z.plat.get(k)||kd==='floor'||kd==='floe'||kd==='pad'||kd==='rock'||kd==='cool'){ p.x=x; p.y=y; p.kvx=p.kvy=0; p.avx=p.avy=0; Z.trail=null; Z.slide=null; Z.hop=0; emit(x,y+4,6,{col:'220,240,255',glow:false,smin:20,smax:60,lmin:.2,lmax:.4,zmin:1.5,zmax:3}); return true; } }
+  return false;
 }
 function c2SafeOK(s){ if(!s) return false; const k=c2K(s.x,s.y); return k>=0&&C2SAFE[c2Kind(k)]&&!AREA.c2.occ.get(k)&&!AREA.c2.plat.get(k)&&!(AREA.cave.dyn&&caveBlockedAt(k)); }
 function c2SafeSpot(){
