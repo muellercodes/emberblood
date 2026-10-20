@@ -2,7 +2,8 @@
 // What the player does: the Mirror Temple dungeon stays code (x3_dun_b): Ember's moonfire (and, in the shrine, words
 // in the glass: A BROKEN FLAME CANNOT BURN BLACK. A WHOLE ONE CAN.), Pip's Lantern, Lord Fanfare (his outro is short
 // now and carries the herring: "She told me she collects shiny things!"). v11: the shrine is Ember's one appearance in
-// Act IV. She made moonfire "for her. For my little moth. In case she ever went wrong." Out on the temple steps every
+// Act IV. She made moonfire "for someone I loved. In case she ever got lost in the dark." (v12: not "my little moth":
+// the Mother is tied to Ember's moth only in Act V.) Out on the temple steps every
 // mirror goes dark and Nyxara's voice says: mend it, then give it to me. Then Ash works out why she wants all three
 // Shards: a whole Heart can burn black, and it has to be given to her (why_three). The Shards are getting colder.
 // The dungeon's own story keys (m_mirror_shrine, m_mirror_won_v, m_mirror_end) are data scenes with the old STORY
@@ -109,7 +110,7 @@ chapter({
     m_mirror_voice: [
       { cam: 'm_mirror_door', s: 1 },
       ['narr', "Behind you, every mirror on the temple's face goes dark at once. In each one, a pair of white eyes opens.", 'Every mirror on the temple goes dark. White eyes open in them.', { do: ['set m4_eyes_on'] }],
-      ['nyxara', "Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, long ago. It hurt very much.", 'You found moonfire. Her priests burned me with it once.'],
+      ['nyxara', "Moonfire. Oh, little ember. Lumen's priests burned me with that, long ago. It hurt very much.", 'Moonfire. The priests burned me with it once.'],
       ['nyxara', 'Mend it, little ember. Then give it to me. You will want to, at the end.', 'Mend it. Then give it to me. You will want to.', { clue: 'm4_mirror_voice' }],
       ['ash', "I won't.", "I won't."],
       ['nyxara', 'Everyone does.', 'Everyone does.'],

@@ -457,7 +457,7 @@ m3sDef('m_eclipse1',[
       xl('nyxara',`Brave. How lovely. Keep them warm for me, then. Everyone comes to me in the end.`,`Brave. How lovely. Keep them warm for me. Everyone comes to me in the end.`)]}),
     xo(`Why do you want the moon so much?`,`Why do you want the moon?`,{tone:'kind',fn:()=>{ G.choices.m_deal='ask'; },then:[
       xl('ash',`Why? Why do you want the moon so much?`,`Why do you want the moon so much?`),
-      xl('nyxara',`...Nobody has asked me that since a girl with horns.`,`Nobody asked me that since a girl with horns.`),
+      xl('nyxara',`...Nobody ever asks me that.`,`Nobody asks me that.`),
       xl('nyxara',`Because the moon leaves me, little ember. Every single morning. And one day it might not come back. If I hold it very tight, it can never go.`,`The moon leaves me every morning. One day it might not come back. If I hold it tight, it can never go.`),
       xl('narr',`For one second her voice sounds small. Then it's gone.`,`For one second her voice sounds small.`),
       xl('ash',`That's sad. It's still not a reason to eat it.`,`That's sad. But you still can't eat it.`),
@@ -776,7 +776,7 @@ m3sDef('m_mirror_won',[
 // Nyxara's voice through every mirror at once (6.9): plays straight after the peacock's outro
 m3sDef('m_mirror_voice',[
   xl('narr',`Every mirror in the temple goes dark at once. In each one, a pair of white eyes opens.`,`Every mirror goes dark. In each one, two white eyes open.`),
-  xl('nyxara',`Moonfire. Oh, little ember. You found Ember's moonfire. Her priests burned me with it, once, long ago. It hurt very much.`,`Moonfire. You found Ember's moonfire. Her priests burned me with it once. It hurt.`),
+  xl('nyxara',`Moonfire. Oh, little ember. Lumen's priests burned me with that, long ago. It hurt very much.`,`Moonfire. The priests burned me with it once. It hurt.`),
   xl('nyxara',`Mend it, little ember. Then give it to me. You will want to, at the end.`,`Mend it. Then give it to me. You will want to.`),
   xl('ash',`I won't.`,`I won't.`),
   xl('nyxara',`Everyone does.`,`Everyone does.`),

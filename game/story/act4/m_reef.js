@@ -89,8 +89,9 @@ chapter({
             { do: ['world m4_eclipse1 leave'] }]] },
         { t: ['Why do you want the moon so much?', 'Why do you want the moon?'], tone: 'kind', v: 'ask',
           then: [{ journal: ['You asked Nyxara why she wants the moon. For a second she sounded small.', 'You asked Nyxara why. She sounded small.'], key: 'm_deal' }],
-          say: [['nyxara', '...Nobody has asked me that since a girl with horns. The moon leaves me every morning. If I hold it very tight, it can never go.',
-            'Nobody asked me that since a girl with horns. The moon leaves me. I hold it tight.', { clue: 'm4_her_words', do: ['world m4_eclipse1 leave'] }]] },
+          // (v12) not "since a girl with horns": nobody in Act IV ties the Mother to Ember (Act V, ring 1)
+          say: [['nyxara', '...Nobody ever asks me that. The moon leaves me every morning. If I hold it very tight, it can never go.',
+            'Nobody asks me that. The moon leaves me. I hold it tight.', { clue: 'm4_her_words', do: ['world m4_eclipse1 leave'] }]] },
       ] },
     ],
   },

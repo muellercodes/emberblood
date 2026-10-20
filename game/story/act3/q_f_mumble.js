@@ -37,7 +37,7 @@ quest({
       hint: ['When your roar is ready, use it close to Mumble. He needs to hear it three times.', 'Roar near Mumble. Three times!'] },
     { id: 'thanks', do: 'talk f_mumble', scene: 'mb_thanks',
       then: ['set f_mumble_ally', 'ally f_mumble_ally', 'xp 650', 'give coins 120',
-        { banner: ['Mumble will come', 'Mumble will come'], sub: ['When you face the ice dragon, a very big friend will roar with you.', 'Mumble will help you fight!'] }],
+        { banner: ['Mumble will come', 'Mumble will come'], sub: ['When you face whatever sleeps on the mountain, a very big friend will roar with you.', 'Mumble will help you fight!'] }],
       obj: ['Talk to Mumble', 'Talk to Mumble'] },
   ],
 
