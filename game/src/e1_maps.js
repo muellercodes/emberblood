@@ -520,15 +520,15 @@ function mapHdFogJob(L,until){
   if(!L.job||L.job.ep!==MHD_FEP.n||L.job.sb!==sb){
     const I=mapHdFogInfo(FG), col=mapHdFogCol(sb), g=L.cv.getContext('2d');
     g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,L.cv.width,L.cv.height); g.fillStyle=`rgba(${col[0]},${col[1]},${col[2]},${235/255})`; g.fillRect(0,0,L.cv.width,L.cv.height);
-    L.built=false; L.dirty=null;
+    L.built=false; L.dirty=null; L.dn=0;
     // the field is only above zero within two cells of an explored one: work in that box only
-    L.job={ep:MHD_FEP.n,sb,hash:I.h,i0:I.i0-2,i1:I.i1+2,j:I.j0-2,j1:I.j1+2,t:0};
+    L.job={ep:MHD_FEP.n,sb,hash:I.h,n:I.n,i0:I.i0-2,i1:I.i1+2,j:I.j0-2,j1:I.j1+2,t:0};
     if(!I.n) L.job.j=L.job.j1+1;
   }
   const J=L.job, t0=mhdNow();
   while(J.j<=J.j1){ const b=Math.min(J.j1,J.j+3); MHD.stats.fogPx+=mapHdFogPut(L,FG,J.i0,J.j,J.i1,b,sb); J.j=b+1; if(mhdNow()>until) break; }
   J.t+=mhdNow()-t0;
-  if(J.j>J.j1){ L.built=true; L.sb=sb; L.ep=J.ep; L.hash=J.hash; L.job=null; MHD.stats.fogMs=+J.t.toFixed(1); return true; }
+  if(J.j>J.j1){ L.built=true; L.sb=sb; L.ep=J.ep; L.hash=J.hash; L.n=J.n; L.job=null; MHD.stats.fogMs=+J.t.toFixed(1); return true; }
   return false;
 }
 // the layer to draw now: up to date, with what Ash explored since redrawn; null when it needs a full build first
@@ -536,13 +536,17 @@ function mapHdFogReady(L){
   if(!L||!L.built||L.sb!==mhdSB()||L.ep!==MHD_FEP.n) return false;
   const FG=fogOf(L.k), I=mapHdFogInfo(FG);
   if(I.h===L.hash) return true;
-  if(!L.dirty) return false;
-  const D=L.dirty; L.dirty=null; MHD.stats.fogPx+=mapHdFogPut(L,FG,D.i0-2,D.j0-2,D.i1+2,D.j1+2,L.sb); L.hash=I.h; MHD.stats.fogPart=(MHD.stats.fogPart||0)+1;
+  // the marked part holds every change only if fogReveal counted them all (anything else that sets cells: build again)
+  if(!L.dirty||I.n!==L.n+(L.dn||0)) return false;
+  const D=L.dirty; L.dirty=null; MHD.stats.fogPx+=mapHdFogPut(L,FG,D.i0-2,D.j0-2,D.i1+2,D.j1+2,L.sb); L.hash=I.h; L.n=I.n; L.dn=0; MHD.stats.fogPart=(MHD.stats.fogPart||0)+1;
   return true;
 }
 function mapHdFog(k,F){
   const want=MHD.fogSub||(F.s*25<=6?4:8), L4=mapHdFogLayer(k,4);
-  if(want===8){ const L8=mapHdFogLayer(k,8); if(mapHdFogReady(L8)){ MHD.fogWant=null; return L8; } MHD.fogWant=L8; }
+  if(want===8){
+    for(const key in MHD.fog) if(key.endsWith(':8')&&key!==k+':8') delete MHD.fog[key];   // one 8 px layer at a time (4 MB on the big maps)
+    const L8=mapHdFogLayer(k,8); if(mapHdFogReady(L8)){ MHD.fogWant=null; return L8; } MHD.fogWant=L8;
+  }
   else MHD.fogWant=null;
   if(!mapHdFogReady(L4)) mapHdFogJob(L4,1e18);   // only if the map opens before the background build is done
   return L4&&L4.built?L4:null;
@@ -555,7 +559,7 @@ function mapHdFog(k,F){
   let n0=0; for(let j=r0;j<=r1;j++) for(let i=c0;i<=c1;i++) n0+=F.bits[j*F.w+i];
   const out=base(x,y,r), F2=fogOf(k);
   let n1=0; for(let j=r0;j<=r1;j++) for(let i=c0;i<=c1;i++) n1+=F2.bits[j*F2.w+i];
-  if(n1!==n0) for(const sub of [4,8]){ const L=MHD.fog[k+':'+sub]; if(!L) continue; const D=L.dirty; L.dirty=D?{i0:Math.min(D.i0,c0),j0:Math.min(D.j0,r0),i1:Math.max(D.i1,c1),j1:Math.max(D.j1,r1)}:{i0:c0,j0:r0,i1:c1,j1:r1}; }
+  if(n1!==n0) for(const sub of [4,8]){ const L=MHD.fog[k+':'+sub]; if(!L) continue; L.dn=(L.dn||0)+n1-n0; const D=L.dirty; L.dirty=D?{i0:Math.min(D.i0,c0),j0:Math.min(D.j0,r0),i1:Math.max(D.i1,c1),j1:Math.max(D.j1,r1)}:{i0:c0,j0:r0,i1:c1,j1:r1}; }
   return out;
 }; }
 { const base=fogInit; fogInit=function(){ MHD_FEP.n++; return base.apply(this,arguments); }; }
