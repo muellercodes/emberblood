@@ -105,6 +105,9 @@ people({
       // (J9) Fennick took Ash's advice and told Hal himself
       { if: 'said fennick_tell_hal choice fennick=forgive !flag act1_done', once: true,
         say: ['Fennick came and told me himself. Stood in my turnips and said it to my face. That took some doing. I gave him a turnip.', 'Fennick told me himself. Brave. I gave him a turnip.'] },
+      // (v12 R1) a Lantern Day bark: the first sight of Yara's Lantern Book (she says what it is at 'lore')
+      { if: 'stage<raid', bark: true,
+        say: ["Yara was up before dawn, writing in that big book of hers. Won't say what.", 'Yara is writing in her big book.'] },
       // Lantern Day morning
       { if: 'stage<raid',
         say: ["Morning, Ash. The festival pumpkins are nearly ready, and Moo-rgaret has decided they're hers.", 'Morning! My cow thinks the pumpkins are hers.'],
@@ -669,6 +672,9 @@ people({
       // (Osric's talk in Brindlecross) Ash told him she says he never writes
       { if: 'said osric_never_writes !flag act1_done', once: true,
         say: ["Osric wrote at last! He says you told him I'd been complaining. I haven't been complaining, dear. I've been mentioning.", 'Osric wrote! He says you told him. I was only mentioning.'] },
+      // (v12 R1) a Lantern Day bark: the valley's old saying about moths (Act V pays it off)
+      { if: 'stage<raid', bark: true,
+        say: ["A moth sat on my lantern this morning, dear. My mother always said that means somebody's coming home.", 'A moth on my lantern! Someone is coming home.'] },
       { if: 'stage<raid',
         say: ["Hold still, Ash, I'm measuring you for your winter sweater. Again. You keep growing horns.", 'Hold still! I am measuring you for a sweater.'],
         re: [
