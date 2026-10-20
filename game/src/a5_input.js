@@ -478,3 +478,9 @@ window.__ebDbg=Object.assign(window.__ebDbg||{},{
   spawn:(type,x,y,o)=>{ const e=makeEnemy(type,x,y,Object.assign({aggro:true,level:1},o||{})); return e&&e.id; },
   atk:()=>({n:ATK.n||0,frames:ATK.f||0,press:ATK.press,buf:ATK.buf||0,swingT:player?player.swingT:0,atkCd:player?player.atkCd:0,mouseL:mouse.l})
 });
+// (v12) test hooks for the touch buttons: every spot in this layout, and the ones on the screen now
+window.__ebDbg=Object.assign(window.__ebDbg||{},{
+  tbtn:()=>tShown().map(b=>({id:b.id,x:Math.round(b.x),y:Math.round(b.y),r:+b.r.toFixed(1),hr:+b.hr.toFixed(1),a:+(b.a||0).toFixed(2),live:!!b.live,label:b.label})),
+  tall:()=>{ tLayout(); return TL.all.map(b=>({id:b.id,x:Math.round(b.x),y:Math.round(b.y),r:+b.r.toFixed(1),hr:+b.hr.toFixed(1),may:tMay(b.id),want:tWant(b.id)})); },
+  tkeep:()=>touchKeep()
+});

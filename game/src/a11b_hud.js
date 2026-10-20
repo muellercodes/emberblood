@@ -300,9 +300,12 @@ const COACH_TIPS=[
     kb:['A red mark means a hit is coming:',{k:'roll'},'Roll away'], pad:['A red mark means a hit is coming:',{k:'roll'},'Roll away'],
     touch:['A red mark means a hit is coming: ROLL away']}],
   ['drink',()=>player.potions>0&&player.hp<player.maxHp*0.5,7,()=>player.potions<COACH.pot,{
-    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap the flasks at the top to drink']}],
+    kb:[{k:'drink'},'Drink a healing draught'], pad:[{k:'drink'},'Drink a healing draught'], touch:['Tap DRINK, or the flasks at the top, to drink']}],
   ['roar',()=>player.roar>=100,6,()=>player.roar<100,{
     kb:['Your ROAR is full:',{k:'roar'},'Roar'], pad:['Your ROAR is full:',{k:'roar'},'Roar'], touch:['Your ROAR is full: tap ROAR']}],
+  // (v12) touch only: CALL comes up when the companion is far behind or waiting
+  ['call',()=>usingTouch&&!allBtns()&&tWant('whistle'),6,()=>!tWant('whistle'),{
+    all:['Your friend is far away: tap CALL to bring them back']}],
   ['jump',()=>hasAbil('jump'),6,null,{
     kb:[{k:'jump'},'Jump'], pad:[{k:'jump'},'Jump'], touch:['JUMP hops over gaps and low walls']}],
   ['map',()=>G.playTime>150&&!G.inCombat&&!!G.flags.forge,8,null,{
@@ -461,6 +464,51 @@ function drawTouch(){
   }
   ctx.restore();
 }
+// ---------- (v12) the weapon chip at the top is how touch players switch weapons now (WEAPON is a button again only with
+// Settings > Show every button). On touch it gets a small swap badge, and the first time Ash has two weapons (on this
+// journey, on touch) a gold ring pulses round it with "Tap to switch weapons" beside it, until it is tapped or 7 s pass.
+// TW.r is the chip's tap box this frame: the first hit box drawWeaponHud (a6b_weapons.js) adds, 51 x 52 beside the
+// vitals or 44 x 56 under the pause and sound buttons on narrow screens.
+const TW={r:null,t:0,last:0,w:null};
+{ const base=drawWeaponHud; drawWeaponHud=function(){ const n0=HUD_HITS.length; base(); TW.r=HUD_HITS.length>n0?HUD_HITS[n0]:null; try{ twChip(); }catch(e){} }; }
+function twChip(){
+  const R=TW.r; if(!R||!usingTouch||scene!=='play'||!G) return;
+  const g=ctx, small=R.w<48, bx=R.x+(small?8:10.5), by=R.y+(small?8:10);
+  g.save();
+  // the swap badge: two little arrows chasing each other, where the keyboard shows its key letter
+  g.fillStyle='rgba(20,12,6,.92)'; g.beginPath(); g.arc(bx,by,7,0,TAU); g.fill(); g.strokeStyle='rgba(255,214,150,.75)'; g.lineWidth=1; g.stroke();
+  g.strokeStyle='#ffe0b0'; g.fillStyle='#ffe0b0'; g.lineWidth=1.4; g.lineCap='round';
+  for(const s0 of [0,Math.PI]){ g.beginPath(); g.arc(bx,by,4,s0-2.4,s0-0.6); g.stroke(); const a=s0-0.6, ex=bx+Math.cos(a)*4, ey=by+Math.sin(a)*4; g.save(); g.translate(ex,ey); g.rotate(a+Math.PI/2); g.beginPath(); g.moveTo(2.4,0); g.lineTo(-1.4,-2.2); g.lineTo(-1.4,2.2); g.closePath(); g.fill(); g.restore(); }
+  g.restore();
+  // the first-time hint
+  const now=G.time, dt=clamp(now-(TW.last||now),0,0.1); TW.last=now;
+  if(G.mode!=='story'||G.flags.tw_chip||!tipOn('wchip')) return;
+  if(TW.g!==G){ TW.g=G; TW.t=0; TW.w=curWeapon(); }
+  if(G.banner||DLG) return;
+  TW.t+=dt;
+  if(curWeapon()!==TW.w&&TW.t>0.3){ G.flags.tw_chip=1; return; }   // tapped it (or switched another way): done
+  TW.w=curWeapon();
+  if(TW.t>7){ G.flags.tw_chip=1; return; }
+  const a=clamp(Math.min(TW.t/0.3,(7-TW.t)/0.5),0,1), k=0.5+0.5*Math.sin(now*6);
+  g.save(); g.globalAlpha=a;
+  g.strokeStyle=`rgba(255,${200+Math.round(40*k)},110,${0.6+0.35*k})`; g.lineWidth=2.5; rr(R.x-3-k*2,R.y-3-k*2,R.w+6+k*4,R.h+6+k*4,12); g.stroke();
+  const txt=S('Tap to switch weapons','Tap to switch'); g.font=`700 12px ${UIF}`; const tw=g.measureText(txt).width+22, th=26;
+  // under the chip when it sits beside the vitals, to its left when it is under the pause button
+  let px, py; if(small){ px=R.x-10-tw; py=R.y+R.h/2-th/2; } else { px=R.x; py=R.y+R.h+10; }
+  px=clamp(px,SAFE.l+6,W-SAFE.r-6-tw);
+  if(LOOK.sb) sbPill(px,py,tw,th); else{ g.fillStyle='rgba(12,9,6,.86)'; rr(px,py,tw,th,13); g.fill(); g.strokeStyle='rgba(255,210,150,.6)'; g.lineWidth=1; g.stroke(); }
+  // a little pointer toward the chip
+  g.fillStyle=LOOK.sb?'#fff3d6':'rgba(255,210,150,.85)'; g.beginPath();
+  if(small){ g.moveTo(px+tw+7,py+th/2); g.lineTo(px+tw+1,py+th/2-5); g.lineTo(px+tw+1,py+th/2+5); }
+  else { const cx=Math.min(R.x+R.w/2,px+tw-10); g.moveTo(cx,py-7); g.lineTo(cx-5,py-1); g.lineTo(cx+5,py-1); }
+  g.closePath(); g.fill();
+  g.fillStyle=LOOK.sb?SBC.outline:'#ffe6c0'; g.textAlign='left'; g.textBaseline='middle'; g.fillText(txt,px+11,py+th/2+0.5);
+  g.restore();
+}
+// what the game calls the weapon switch on touch, and the tip when Ash gets his second weapon (a5b_pad.js, a6b_weapons.js)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{wchip:()=>TW.r?{x:TW.r.x,y:TW.r.y,w:TW.r.w,h:TW.r.h}:null});
+try{ Object.defineProperty(ACT_TOUCH,'weapon',{get:()=>allBtns()?'the WEAPON button':'the weapon chip at the top',enumerable:true,configurable:true}); }catch(e){}
+{ const base=switchTip; switchTip=function(){ if(touchy()&&!allBtns()) return S('Tap the weapon chip at the top of the screen to switch weapons.','Tap the weapon at the top to switch.'); return base(); }; }
 
 // ================= (v11 polish) banner manners
 // Drew found the messages noisy: "Quest updated" again and again around doors, one story banner held over a whole boss

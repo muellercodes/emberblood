@@ -332,11 +332,11 @@ html.sb #padToast span{color:#6a4a52}
             <ul class="tips">
               <li>Drag on the left side to move (the right side if Settings has <b>Handed: Left</b>). Push the stick all the way to sprint.</li>
               <li><b>SLASH</b> attacks. Hold it for a combo. Next to someone or something you can use, with no foe close, it glows and says <b>TALK</b>, <b>OPEN</b>, <b>READ</b>, <b>ENTER</b> or <b>TAKE</b>. Tap it to do that.</li>
-              <li><b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
-              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>ROAR</b> works when its ring is full.</li>
-              <li><b>DRINK</b> heals. You can also tap the green flasks at the top.</li>
-              <li><b>WEAPON</b> switches weapons once you have two or more.</li>
-              <li><b>CALL</b> calls your companion.</li>
+              <li><b>FIRE</b> breathes fire. <b>ROLL</b> dodges. <b>JUMP</b> shows up once Ash learns to jump. With wings it says <b>FLY</b> in the air.</li>
+              <li>Some buttons show up only when they can help, always in the same spot: <b>DRINK</b> when you are hurt, <b>ROAR</b> when its ring is full, <b>CALL</b> when your companion is far away or waiting.</li>
+              <li>Tap the green flasks at the top to drink any time. Tap your companion's picture to call them, twice to make them wait.</li>
+              <li>Tap the weapon at the top to switch weapons once you have two or more.</li>
+              <li>Like all eight buttons on screen all the time? Turn on <b>Show every button</b> in Settings.</li>
             </ul>
           </div>
           <div>
@@ -507,6 +507,7 @@ html.sb #padToast span{color:#6a4a52}
     <div class="setrow"><span>Chatter<small>Speech bubbles from people around town. Story talk always shows.</small></span><div class="seg" id="setChat" role="group" aria-label="Chatter"><button type="button" data-v="some" aria-pressed="false">Some</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Touch controls<small>For phones and tablets. One hand puts every button under one thumb, on the side set by Handed.</small></span><div class="seg" id="setTouch" role="group"><button type="button" data-v="two" aria-pressed="false">Two thumbs</button><button type="button" data-v="right" id="setTouchOne" aria-pressed="false">One hand</button></div></div>
     <div class="setrow"><span>Button size</span><div class="seg" id="setBtn" role="group"><button type="button" data-v="s" aria-pressed="false">Small</button><button type="button" data-v="m" aria-pressed="false">Medium</button><button type="button" data-v="l" aria-pressed="false">Large</button></div></div>
+    <div class="setrow"><span>Show every button<small>Off: DRINK, ROAR and CALL show up only when they do something, and you tap the weapon at the top to switch weapons. On: all eight buttons, all the time.</small></span><div class="seg" id="setAllBtn" role="group" aria-label="Show every button"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="setrow"><span>Auto-attack<small>Ash swings at enemies in reach by himself. On by default in one-hand mode.</small></span><div class="seg" id="setAuto" role="group"><button type="button" data-v="on" aria-pressed="false">On</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
     <div style="margin-top:16px"><button class="btn c hot" id="bSettingsClose" type="button">Done</button></div>
   </div>

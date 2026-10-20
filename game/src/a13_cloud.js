@@ -137,7 +137,7 @@ const bringIs=(...a)=>v=>a.includes(v), bringBool=v=>typeof v==='boolean', bring
 const BRING_SET={eb_reading:bringIs('full','simple'),eb_diff:bringNum(0,2),eb_music_off:bringBool,eb_muted:bringBool,eb_vol_sfx:bringNum(0,100),eb_vol_music:bringNum(0,100),
   eb_touch:bringIs('two','right','left'),eb_tipshut:v=>bringObj(v)&&Object.keys(v).length<=300,eb_tips:bringBool,eb_padok:bringIs('auto','south','east'),eb_rumble:bringBool,
   eb_nums:bringBool,eb_mouseaim:bringBool,eb_look:bringIs('storybook','classic'),eb_hand:bringIs('left','right'),eb_depth:v=>typeof v==='string'&&v.length<=16,
-  eb_chat:bringIs('some','off'),eb_btn:bringNum(0.5,2),eb_auto:v=>v===null||bringBool(v),eb_bosshelp:bringBool,eb_chars:bringIs('3d','classic')};
+  eb_chat:bringIs('some','off'),eb_btn:bringNum(0.5,2),eb_auto:v=>v===null||bringBool(v),eb_allbtn:bringBool,eb_bosshelp:bringBool,eb_chars:bringIs('3d','classic')};
 const bringEnds=v=>bringObj(v)&&Object.keys(v).length<=60&&Object.keys(v).every(k=>/^[A-Za-z0-9_-]{1,40}$/.test(k));
 const bringBest=v=>bringObj(v)&&bringNum(0,1e9)(v.wave)&&bringNum(0,1e12)(v.score);
 const bringSave=v=>bringObj(v)&&v.v===3&&!v.deleted&&bringObj(v.p)&&bringFin(v.x)&&bringFin(v.y)&&(v.stage==null||(typeof v.stage==='string'&&v.stage.length<=60))
