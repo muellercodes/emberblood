@@ -17,11 +17,14 @@ const TRIALS={
 };
 const trialOpen=id=>{ const T=TRIALS[id]; if(!T||!G) return false; if(G.mode!=='story') return true; return reached(T.stage); };
 const trialDone=id=>!!(G&&G.flags&&G.flags['trial_'+id+'_done']);
-// (v12) a Trial goes by what Ash can see (map, region label, door, sign) until Ember names it: inside it, or at the end
-// of the Trial before it ("Two more Trials are waiting. The Trial of the Tide ...")
-const TRIAL_FOLK={leap:'Rooted Arch',tide:'Shell Doors',sky:'White Gate'}, TRIAL_PREV={tide:'leap',sky:'tide'};
-function trialKnown(id){ if(!G) return false; const F=G.found||{}; return !!F['seen_'+id]||trialDone(id)||(!!TRIAL_PREV[id]&&trialDone(TRIAL_PREV[id])); }
-function trialPlace(id){ const T=TRIALS[id]; return !T?'':trialKnown(id)?T.name:(TRIAL_FOLK[id]||T.name); }
+// (v12 META) on the map, the HUD region label and the first-visit banner a Trial goes by what Ash can see (the folk
+// names R1's door prompts and signs use, x0_act1.js A1_FOLK, here as place names) until Ember names it: inside it, or
+// at the end of the Trial before it ("Two more Trials are waiting. The Trial of the Tide ..."). Same rule as R1's
+// a1TrialKnown. The Arena knows them all.
+const TRIAL_FOLK={leap:S('Old Rooted Arch','Rooted Arch'),tide:S('Shell Doors','Shell Doors'),sky:S('White Gate','White Gate')};
+function trialKnown(id){ if(!G||G.mode!=='story') return true; const F=G.found||{}, f=G.flags||{}; return !!F['seen_'+id]||trialDone(id)||(id==='tide'&&!!f.trial_leap_boss)||(id==='sky'&&!!f.trial_tide_boss); }
+function trialFolk(id){ return TRIAL_FOLK[id]||(TRIALS[id]&&TRIALS[id].name)||''; }
+function trialPlace(id){ const T=TRIALS[id]; return !T?'':trialKnown(id)?T.name:trialFolk(id); }
 // the dungeon an area belongs to (a floor of a multi-floor dungeon names it in def.dun), and its Trial-like info
 // (TRIALS for Ember's Trials, DUNGEONS for anything made with defineDungeon): abil, abilName, boss, bossY, level, shrine
 function dunRoot(id){ const d=AREADEFS[id]; return (d&&d.dun)||id; }
@@ -179,9 +182,9 @@ function buildTrialGates(){
     const L={x:T.x,y:T.y-40,r:320,i:0.2,trialGate:id}; LIGHTS.push(L);
     STRUCTS.push({k:'cavemouth',x:T.x,y:T.y,ref:m,theme:'trial',trial:id,r:140,light:L});
     addCol({t:'c',x:T.x-66,y:T.y-6,r:22}); addCol({t:'c',x:T.x+66,y:T.y-6,r:22}); addCol({t:'r',x0:T.x-74,y0:T.y-70,x1:T.x+74,y1:T.y-26});
-    DOORS.push({x:T.x,y:T.y+6,area:id,get label(){ return trialOpen(id)?`Enter the ${trialPlace(id)}`:`Look at the ${trialPlace(id)}`; },outY:54,cave:true,trial:id});
+    DOORS.push({x:T.x,y:T.y+6,area:id,get label(){ return trialOpen(id)?`Enter the ${T.name}`:`Look at the ${T.name}`; },outY:54,cave:true,trial:id});
     const sx=T.x+(id==='tide'?-96:116), sy=T.y+(id==='tide'?64:72);
-    LANDMARKS.push({id:'tsign_'+id,k:'sign',x:sx,y:sy,r:8,prompt:'Read the sign',get text(){ if(!trialKnown(id)) return trialOpen(id)?S(`An old sign, worn almost smooth. The little flame carved on it is warm today. (Danger level ${T.level}.)`,`An old sign. Its little flame is warm. (Danger level ${T.level}.)`):S(`An old sign, worn almost smooth. Someone carved a little flame on it, a long time ago. (Ask Elder Yara.)`,`An old sign with a little carved flame. (Ask Elder Yara.)`); return trialOpen(id)?`${T.name.toUpperCase()}. The runes are awake. Recommended for dragons of level ${T.level} and up.`:`${T.name.toUpperCase()}. The runes are asleep. They are waiting for someone. (Ask Elder Yara.)`; }});
+    LANDMARKS.push({id:'tsign_'+id,k:'sign',x:sx,y:sy,r:8,prompt:'Read the sign',get text(){ return trialOpen(id)?`${T.name.toUpperCase()}. The runes are awake. Recommended for dragons of level ${T.level} and up.`:`${T.name.toUpperCase()}. The runes are asleep. They are waiting for someone. (Ask Elder Yara.)`; }});
   }
   // the Sky moat floods part of the old boulder ring around the Crag Ward: those boulders are gone now
   for(let i=STRUCTS.length-1;i>=0;i--){ const q=STRUCTS[i]; if(q.k!=='boulder'||pondD(q.x,q.y)>30) continue; STRUCTS.splice(i,1); const gone=[]; forCols(q.x,q.y,4,c=>{ if(c.t==='c'&&Math.abs(c.x-q.x)<0.5&&Math.abs(c.y-q.y)<0.5) gone.push(c); }); gone.forEach(removeCol); }
