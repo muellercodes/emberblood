@@ -295,8 +295,9 @@ function inCone(ox,oy,ang,len,half,tx,ty,tr){ return inArcC(ox,oy,ang,len,half,{
 //   caves and dungeons: wall cells (a cave pool is low water, not a wall), shut doors and gates, push blocks and the solid
 //     things the caves add: the same cells that stop shots (areaBlocked read with C2.proj set, so shafts, water, lava,
 //     pits and raised floors stay open);
-//   anywhere: colliders that stop arrows (buildings, Emberhollow's wall and its shut gates, tree trunks, pillars, statues,
-//     crates); colliders marked low (fences, hedges, rocks, wells) or noProj are flown over, as arrows fly over them;
+//   anywhere: colliders that stop arrows (buildings, Emberhollow's wall and its shut gates, pillars, big trunks, statues,
+//     crates); colliders marked low (fences, hedges, rocks, wells) or noProj are flown over, as arrows fly over them, and
+//     thin round ones (under 16 px: tree trunks, posts, lamps, braziers) are seen and breathed past (arrows still stick in them);
 //   outdoors: ground higher than the source (a cliff or terrace face seen from below; ramps never block).
 // A house is one room, so it is always clear. Not tested: the first 2 px, the last tr px before the target (its own body),
 // the target's own cave cell (things set into a wall), and a collider that holds either end.
@@ -342,7 +343,7 @@ function losColT(x0,y0,ux,uy,end,x1,y1){
   let best=Infinity;
   for(let n=0;n<200;n++){
     const a=GRID.get(gkey(cx,cy));
-    if(a) for(let q=0;q<a.length;q++){ const c=a[q]; if(c._los===st) continue; c._los=st; if(c.noProj||c.low||!colActive(c)) continue; const t=losShapeT(c,x0,y0,ux,uy,end,x1,y1); if(t<best) best=t; }
+    if(a) for(let q=0;q<a.length;q++){ const c=a[q]; if(c._los===st) continue; c._los=st; if(c.noProj||c.low||(c.t==='c'&&c.r<16)||!colActive(c)) continue; const t=losShapeT(c,x0,y0,ux,uy,end,x1,y1); if(t<best) best=t; }
     if(cx===cxe&&cy===cye) break;
     if(tmx<tmy){ if(tmx>best||tmx>end) break; tmx+=tdx; cx+=sx; } else { if(tmy>best||tmy>end) break; tmy+=tdy; cy+=sy; }
   }
@@ -390,16 +391,18 @@ function bossReady(e){
   return true;
 }
 // can a hit from (x,y) (Ash's body when x is null) land on foe e at its hit circle c (its body when c is null)?
+const LOS_SKY={lt:99};   // a flying foe outdoors is in the air: cliffs below it do not hide it
 function ashHits(e,c,x,y,o){
   if(!bossReady(e)) return false;
   if(x==null){ x=player.x; y=player.y; if(o===undefined) o=ashLosO(); }
+  if(!o&&e.flying&&!AREA) o=LOS_SKY;
   return losClear(x,y,c?c.x:e.x,c?c.y:e.y,c?c.r:(e.r||12),o||null);
 }
 // does Ash see foe e (aim help and auto-aim pick only foes he can see); cached a few times a second per foe
 function ashSees(e){
   if(e._asT>G.time&&e._asT<G.time+1) return !!e._as;
   e._asT=G.time+0.15+Math.random()*0.1;
-  const p=player; return e._as=!!p&&bossReady(e)&&losClear(p.x,p.y,e.x,e.y,e.r||12,ashLosO()||{lt:elevOf(e)});
+  const p=player; return e._as=!!p&&bossReady(e)&&losClear(p.x,p.y,e.x,e.y,e.r||12,ashLosO()||(e.flying&&!AREA?LOS_SKY:{lt:elevOf(e)}));
 }
 // can foe e see Ash (it notices him only then); cached a few times a second per foe. A foe in a room ROOMS keeps asleep
 // sees nothing. e.seenT is the last time it saw him.
@@ -407,7 +410,7 @@ function foeSees(e){
   if(e._fsT>G.time&&e._fsT<G.time+1) return !!e._fs;
   e._fsT=G.time+0.18+Math.random()*0.12;
   const p=player; let v=false;
-  if(p&&!p.dead&&!(typeof roomAwake==='function'&&!roomAwake(e))) v=losClear(e.x,e.y,p.x,p.y,p.r,{lt:elevOf(p),fly:!AREA&&(!!p.flying||!!e.flying)});
+  if(p&&!p.dead&&!(typeof roomAwake==='function'&&!roomAwake(e))) v=(!AREA&&e.flying)||losClear(e.x,e.y,p.x,p.y,p.r,{lt:elevOf(p),fly:!AREA&&!!p.flying});   // (a flyer outdoors sees from the air)
   e._fs=v; if(v) e.seenT=G.time;
   return v;
 }
@@ -425,6 +428,7 @@ function bossHere(){ const g=G.boss; if(g&&!g.dead&&bossShares(g)) return g; for
 function hurtSeen(sx,sy){
   const p=player;
   if(AIE&&typeof roomAwake==='function'&&!roomAwake(AIE)) return false;
+  if(AIE&&AIE.flying&&!AREA) return true;   // outdoors a flyer comes over everything
   if(sx==null||sy==null||!isFinite(sx)||!isFinite(sy)||HURT_SRC==='lava') return true;
   if((sx-p.x)**2+(sy-p.y)**2<(p.r+8)**2) return true;
   const b=AIE?(isBossFoe(AIE)?AIE:null):bossHere();
@@ -437,7 +441,7 @@ function damageEnemy(e,amt,o){
   if(e.dead||e.invuln||e.spawnIn>0||e.passive) return 0;
   // v12: a boss is not hurt before its fight has begun (its room open and its intro played); o.los (set by Ash's own hits,
   // see wStrike) also needs a clear line from o.lx,o.ly (or o.fx,o.fy, or Ash) to the foe
-  if(!bossReady(e)||(o.los&&!losClear(o.lx!=null?o.lx:o.fx!=null?o.fx:player.x,o.ly!=null?o.ly:o.fy!=null?o.fy:player.y,e.x,e.y,e.r||12,o.lo||(o.lx==null&&o.fx==null?ashLosO():null)))){ e.lastBlocked=true; return 0; }
+  if(!bossReady(e)||(o.los&&!losClear(o.lx!=null?o.lx:o.fx!=null?o.fx:player.x,o.ly!=null?o.ly:o.fy!=null?o.fy:player.y,e.x,e.y,e.r||12,o.lo||(o.lx==null&&o.fx==null?ashLosO():null)||(e.flying&&!AREA?LOS_SKY:null)))){ e.lastBlocked=true; return 0; }
   let a=amt*(o.mult||1), blocked=false;
   if(e.shield&&e.blocking&&o.src!=='burn'&&o.src!=='roar'&&o.src!=='ember'){
     const fx=o.fx!=null?o.fx:player.x, fy=o.fy!=null?o.fy:player.y;
@@ -490,3 +494,10 @@ function deathFx(e){
   scorch(e.x,e.y,e.r*1.6);
 }
 function dropHeal(x,y,amt){ G.pickups.push({x,y,vx:rand(-70,70),vy:rand(-70,70),amt,t:0,life:15}); }
+// test hooks (v12 WALLS)
+window.__ebDbg=Object.assign(window.__ebDbg||{},{walls:{losClear,losHitT,BRW,bossReady,ashHits,ashSees,foeSees,hurtSeen,isBossFoe,
+  give:id=>{ giveWeapon(id,true); equipWeapon(id,true); return curWeapon(); },
+  foe:(type,x,y,o)=>{ o=o||{}; const e=makeEnemy(type,x,y,Object.assign({aggro:false},o)); if(AREA){ e.inArea=true; const R=caveRoomAt(x,y); if(R){ e.room=R.id; R.enemies.push(e); } } e.spawnIn=0; if(o.hold) e.stun=999; return e.id; },
+  get:id=>{ const e=G.enemies.find(q=>q.id===id); return e?{id:e.id,type:e.type,x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,dead:e.dead,aggro:e.aggro,room:e.room,boss:isBossFoe(e),ready:bossReady(e),stun:e.stun}:null; },
+  rooms:()=>AREA&&AREA.rooms?Object.values(AREA.rooms).map(R=>({id:R.id,kind:R.kind,x0:R.x0,y0:R.y0,x1:R.x1,y1:R.y1,cx:R.cx,cy:R.cy,locked:!!R.locked,foes:R.enemies.filter(e=>!e.dead).map(e=>({id:e.id,type:e.type,boss:isBossFoe(e),x:Math.round(e.x),y:Math.round(e.y),hp:Math.round(e.hp)}))})):null,
+  here:()=>{ const R=caveRoomAt(player.x,player.y); return R?R.id:null; }}});
