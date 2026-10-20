@@ -49627,9 +49627,11 @@ function a1GTick(dt){
 // shortest way round (and says to open it if it is shut), instead of at a spot through the wall
 function a1GWrapFest(){ const s=typeof STAGEDEF!=='undefined'?STAGEDEF.c_fest:null; if(!s||typeof s.objectives!=='function'||s.objectives._a1g) return;
   const base=s.objectives, w=function(){ const L=base.apply(this,arguments); try{ return a1GGoalFix(L); }catch(e){ return L; } }; w._a1g=true; s.objectives=w; }
+// inside the village wall (the north run and the rest of the ring make one closed loop): a ray cast to the east
+function a1InWall(x,y){ let n=0; for(const [ax,ay,bx,by] of a1WallSegs()){ if((ay>y)===(by>y)) continue; const cx=ax+(y-ay)*(bx-ax)/(by-ay); if(cx>x) n++; } return (n&1)===1; }
 function a1GGoalFix(L){
   if(!Array.isArray(L)||!L.length||typeof HS==='undefined'||!HS.on||HS.phase!=='chase'||!player||AREA) return L;
-  const o=L[0]; if(!o||o.x==null||!a1WallBlocks(player.x,player.y,o.x,o.y)) return L;
+  const o=L[0]; if(!o||o.x==null||a1InWall(player.x,player.y)===a1InWall(o.x,o.y)) return L;
   let best=null, bd=1e18;
   for(const g of A1G.list){ if(a1GMode(g)==='locked') continue; const d=Math.hypot(player.x-g.x,player.y-g.y)+Math.hypot(o.x-g.x,o.y-g.y); if(d<bd){ bd=d; best=g; } }
   if(!best) return L;
@@ -49721,6 +49723,9 @@ window.__ebA1.gates={A1G,
   open:(id,now)=>a1GDbg(id,true,now), close:(id,now)=>a1GDbg(id,false,now), use:id=>{ const g=A1G.by[id]; if(g) a1GUse(g); return a1GOpen(g); },
   list:()=>A1G.list.map(g=>({id:g.id,x:Math.round(g.x*10)/10,y:Math.round(g.y),hw:g.hw,ew:g.ew,ux:+g.ux.toFixed(3),uy:+g.uy.toFixed(3),nx:+g.nx.toFixed(3),ny:+g.ny.toFixed(3)})),
   rel:(id,x,y)=>a1GRel(A1G.by[id],x,y), snd:k=>a1GSnd(k,null),
+  // the first goal on screen (the Lantern Night chase points it at a gate when the thief is over the wall)
+  inWall:(x,y)=>a1InWall(x,y),
+  goal:()=>{ try{ const o=objectiveList()[0]; return o&&o.x!=null?{x:Math.round(o.x),y:Math.round(o.y),text:String(o.text)}:null; }catch(e){ return null; } },
   // a story walk (as a scene's walk beat makes one), for checking that a walker opens a shut gate on the way
   walk:(id,x,y,d)=>{ if(typeof s10ActorWalk!=='function') return false; s10ActorWalk(id,[x,y],d); return true; }};
 // ================= x0_vorlaxis (v9 Act I): the story of the Cinder Mountain climb and the new Vorlaxis fight
