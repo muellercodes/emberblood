@@ -253,7 +253,14 @@ function updateArea(dt){
   const A=AREA, p=player;
   if(!A.exit.none&&dist(p.x,p.y,A.exit.x,A.exit.y)<A.exit.r&&p.y>A.exit.y-20&&scene==='play'){ exitArea(); return; }
   if(A.rooms) updateCaveRooms(dt);
-  if(A.camp&&A.camp.alive<=0&&!A.camp.done){ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime; if(!A.def.trial){ setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; } }
+  if(A.camp&&A.camp.alive<=0&&!A.camp.done){
+    // (v12) the foes still here decide, not the count (a foe that left the list some other way could drift it), and the
+    // banner is only for beating the last of them just now: never on the way into a place with nothing left to fight
+    const left=G.enemies.filter(e=>!e.dead&&e.camp===A.camp).length;
+    if(left>0) A.camp.alive=left;
+    else{ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime;
+      if(!A.def.trial&&(A.camp.kills||0)>0&&G.time-(A.camp.lastKill==null?-99:A.camp.lastKill)<3){ setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; } }
+  }
   for(const L of A.lights){ if(L.obj) L.i=L.obj.lit?0.9:0; if(L.win) L.i=0.35*daylight(); }
   for(const n of A.npcs){ n.t+=dt; n.face=turnTo(n.face,angTo(n.x,n.y,p.x,p.y),dist(n.x,n.y,p.x,p.y)<240?3*dt:0); }
   if(A.def.kind==='cave'&&Math.random()<dt*0.25) SFX.play('step',0.4);

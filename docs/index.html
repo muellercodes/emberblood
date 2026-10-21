@@ -3753,7 +3753,14 @@ function updateArea(dt){
   const A=AREA, p=player;
   if(!A.exit.none&&dist(p.x,p.y,A.exit.x,A.exit.y)<A.exit.r&&p.y>A.exit.y-20&&scene==='play'){ exitArea(); return; }
   if(A.rooms) updateCaveRooms(dt);
-  if(A.camp&&A.camp.alive<=0&&!A.camp.done){ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime; if(!A.def.trial){ setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; } }
+  if(A.camp&&A.camp.alive<=0&&!A.camp.done){
+    // (v12) the foes still here decide, not the count (a foe that left the list some other way could drift it), and the
+    // banner is only for beating the last of them just now: never on the way into a place with nothing left to fight
+    const left=G.enemies.filter(e=>!e.dead&&e.camp===A.camp).length;
+    if(left>0) A.camp.alive=left;
+    else{ A.camp.done=true; G.caveCleared[A.def.id]=G.worldTime;
+      if(!A.def.trial&&(A.camp.kills||0)>0&&G.time-(A.camp.lastKill==null?-99:A.camp.lastKill)<3){ setBanner('Cave cleared','',1.8); G.stats.caves=(G.stats.caves||0)+1; } }
+  }
   for(const L of A.lights){ if(L.obj) L.i=L.obj.lit?0.9:0; if(L.win) L.i=0.35*daylight(); }
   for(const n of A.npcs){ n.t+=dt; n.face=turnTo(n.face,angTo(n.x,n.y,p.x,p.y),dist(n.x,n.y,p.x,p.y)<240?3*dt:0); }
   if(A.def.kind==='cave'&&Math.random()<dt*0.25) SFX.play('step',0.4);
@@ -11729,7 +11736,7 @@ function killEnemy(e){
   gainXp(foeXp(e));
   if(player.stats.killHeal&&e.type!=='egg') heal(player.stats.killHeal,true);
   if(e.type==='slime'&&!e.small&&G.mode==='story'){ for(let i=0;i<2;i++){ const k=makeEnemy('slime',e.x+rand(-14,14),e.y+rand(-14,14),{small:true,level:e.level,tint:e.tint,aggro:true,camp:e.camp,homeX:e.homeX,homeY:e.homeY}); k.inArea=e.inArea; k.spawnIn=0.1; k.room=e.room; k.cropTarget=e.cropTarget; k.mini=e.mini; if(e.room&&AREA&&AREA.rooms&&AREA.rooms[e.room]) AREA.rooms[e.room].enemies.push(k); if(e.camp) e.camp.alive++; } }
-  if(e.camp){ e.camp.alive--; if(e.camp.alive<=0&&!e.camp.cave){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story'){ setBanner('Camp cleared','',1.6); G.stats.camps=(G.stats.camps||0)+1; questPoke(); } } }
+  if(e.camp){ e.camp.alive--; e.camp.kills=(e.camp.kills||0)+1; e.camp.lastKill=G.time; if(e.camp.alive<=0&&!e.camp.cave){ e.camp.cleared=G.time; G.campsCleared[e.camp.id]=G.worldTime; if(G.mode==='story'){ setBanner('Camp cleared','',1.6); G.stats.camps=(G.stats.camps||0)+1; questPoke(); } } }
   if(G.mode==='story'&&e.type!=='egg'){ if(e.boss) dropCoins(e.x,e.y,20); else if(Math.random()<(e.elite?0.9:0.35)) dropCoins(e.x,e.y,e.elite?randi(3,5):randi(1,2)); }
   if(e.questTag) G.questKills++;
   deathFx(e); SFX.play(e.boss?'boom':'pop');
