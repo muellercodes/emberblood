@@ -120,10 +120,10 @@ async function acctSubmit(){
   err.textContent='';
   if(!/^[A-Za-z0-9_-]{3,20}$/.test(name)){ err.textContent='Names are 3 to 20 letters, numbers, - or _.'; return; }
   if(pass.length<8){ err.textContent='Passwords need at least 8 characters.'; return; }
-  // (v12) the bot check on Create account: wait for its token when the widget is up. If the widget could not load, the
-  // server decides (it only asks once the keys exist).
+  // (v12) the bot check on Create account: wait for its token while the widget is working on it. If the widget could not
+  // load or keeps failing, the server decides (it only asks once the keys exist).
   const reg=acTab==='register';
-  if(reg&&BOT.key&&BOT.id!=null&&!BOT.token){ err.textContent=BOT.failed?'The robot check is not ready yet. Give it a moment and try again.':'Please finish the robot check above first.'; return; }
+  if(reg&&BOT.key&&BOT.id!=null&&!BOT.token&&!BOT.failed){ err.textContent='Please finish the robot check above first.'; return; }
   go.disabled=true; go.textContent=acTab==='login'?'Signing in…':'Creating…';
   try{
     await Cloud.auth(acTab,name,pass,reg&&BOT.token?{turnstile:BOT.token}:null); $('#acPass').value='';
