@@ -2410,5 +2410,5 @@ const M3F_DBG={kit:m3Kit,M3,M3B,M3SITE,M3DUN,M3ROOM,M3_TPL,M3PUFF,M3LAB_ROOM,M3H
   run(sec,dt){ return window.__eb.foes.step(sec,dt||1/30); },
   input(o,sec){ M3B.force=Object.assign({},o); M3B.forceT=sec==null?0.1:sec; return true; },
   tap(k){ M3B.on=true; M3B.tap[k]=true; return true; },
-  devEval(src){ return eval(src); }};
+  devEval(src){ if(!(/^(file:)$/.test(location.protocol)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname))) return undefined; return eval(src); }};   // (v12) test pages only
 window.__ebX=Object.assign(window.__ebX||{},{m3Test,m3f:M3F_DBG});

@@ -1984,6 +1984,6 @@ const N4F_DBG={N4F,N4N,N4FB,N4V,N4E2,N4E3,N4E4,N4FM,N4FSITE,test:n4fTest,kit:n4f
   phase(p){ const e=n4fBoss('n_nyxara'); if(!e) return false; if(p===4&&!G.flags.n_heart_done) G.flags.n_heart_done=1; e.trans=0; e.mode='p'+p; n4nPhaseGo(e,p,true); return true; },
   heart(){ const e=n4fBoss('n_nyxara'); if(!e) return false; e.hp=e.maxHp*N4N.M[3]; n4nTransition(e,3); return true; },
   hook(k,fn){ N4F.hook[k]=fn; return true; },
-  devEval(src){ return eval(src); }};
+  devEval(src){ if(!(/^(file:)$/.test(location.protocol)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname))) return undefined; return eval(src); }};   // (v12) test pages only
 window.__ebX=Object.assign(window.__ebX||{},{n4f:N4F_DBG});
 if(window.__eb) window.__eb.n4f=N4F_DBG;

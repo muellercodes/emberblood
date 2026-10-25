@@ -1254,7 +1254,7 @@ window.__ebX=Object.assign(window.__ebX||{},{
     swing(){ const p=player; let n=0; for(const pr of G.projectiles){ if(pr.owner!=='enemy'||pr.dead) continue; if(dist(p.x,p.y,pr.x,pr.y)<110){ reflectProj(pr); n++; } } return n; },
     face(e){ e=e||G.boss; if(e) player.facing=angTo(player.x,player.y,e.x,e.y); },
     // debug only: runs a snippet inside the game's scope, so the FOES.md examples run exactly as written (tests)
-    devEval(src){ return eval(src); },
+    devEval(src){ if(!(/^(file:)$/.test(location.protocol)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname))) return undefined; return eval(src); },   // (v12) test pages only, never the live site
     // runs the game sim for sec seconds of game time right now (no drawing), for scripted fights in tests
     step(sec,dt,each){ dt=dt||1/30; let t=0;
       while(t<sec){ t+=dt;
