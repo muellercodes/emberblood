@@ -294,6 +294,8 @@ function chMigStep(R,s){
     const sc=s.scene&&S10.scenes[s.scene]; if(sc) s10QuietScene(sc);
     for(const p of s.parts||[]){ if(!st[p._id]){ st[p._id]=1; s10Do(chSafeFx(p.then),{R}); } }
     if(s._kind==='deduce'){ const D=S10.deduce[s._args[0]]; if(D){ for(const c of s10Arr(D.needs)) if(!G.case.clues[c]){ G.case.clues[c]=1; G.case.seen[c]=1; } s10Solve(D.id,true); } }
+    // its boss beaten, its dungeon done (the world agrees: the boss site closes)
+    for(const x of [s].concat(s.parts||[])){ const A=x._args||[]; if(x._kind==='fight'&&A[0]) G.bossDone[A[0]]=true; if(x._kind==='dungeon'&&A[0]) G.flags['trial_'+A[0]+'_done']=true; }
     st[s._id]=1;
     s10Do(chSafeFx(s.then),{R});
   }finally{ S10.quiet=was; }
@@ -338,6 +340,9 @@ function chJump(st){
     for(const k in K.items) G.items[k]=Math.max(G.items[k]|0,K.items[k]|0);
     for(const k in K.flags) if(G.flags[k]==null) G.flags[k]=K.flags[k];
     for(let k=1;k<n;k++){ G.flags['act'+k+'_done']=true; if(ACT_PRE[k]) G.flags[ACT_PRE[k]+'done']=true; }
+    // the earlier acts' bosses beaten and their dungeons done (their boss sites close, as after a real playthrough)
+    try{ for(const k in SITES){ const S0=SITES[k]; if(S0&&S0.boss&&S0.stage&&stageAt(S0.stage)>=0&&actOf(S0.stage)<n) G.bossDone[S0.boss]=true; } }catch(e){}
+    try{ for(const id of S10.chOrder){ const c=S10.chapters[id]; if(!c||stageAt(id)<0||actOf(id)>=n) continue; for(const s of c.step||[]){ const A=s._args||[]; if(s._kind==='fight'&&A[0]) G.bossDone[A[0]]=true; if(s._kind==='dungeon'&&A[0]) G.flags['trial_'+A[0]+'_done']=true; } } }catch(e){}
     // Lantern Night itself: before the theft (actStartDebug's 'heist')
     if(st==='c_fest'){ for(const k of ['c_fest_seen','c_stolen','c_leapt','c_t_maren','c_t_yara','c_t_wren']) delete G.flags[k]; delete G.items.c_gear; }
     G.mapsSeen=G.mapsSeen||{0:true}; for(let k=0;k<=(A.map||0);k++) if(MAPS[k]) G.mapsSeen[k]=true;
