@@ -88,10 +88,9 @@ function chOff(k){
 function chDropSafe(){
   const p=player; if(!p||p.flying||p.dead) return false;
   let ok=true; try{ ok=landOK(p.x,p.y)&&!playerBlocked(p.x,p.y); }catch(e){}
-  if(ok) return false;
-  const s=nearestLand(p.x,p.y); if(!s) return false;
-  p.x=s.x; p.y=s.y; p.z=0; p.vz=0; p.kvx=p.kvy=0; updateCam(0,true); G.chunkBurst=16;
-  return true;
+  if(!ok){ const s=nearestLand(p.x,p.y); if(!s) return false; p.x=s.x; p.y=s.y; p.z=0; p.vz=0; p.kvx=p.kvy=0; updateCam(0,true); G.chunkBurst=16; }
+  p.safeX=p.x; p.safeY=p.y;   // (the safe spot he walked through walls with may be inside one)
+  return !ok;
 }
 // a gate's nook reached without its power (cheat wings, walking through walls, open gates): back out of its door, so the
 // story never counts the gate as passed
@@ -160,8 +159,10 @@ function chPassing(d,fn){
 
 // ---------- map teleport and Go to
 function chTpSay(t){ const h=document.getElementById('mapHint'); if(!h) return; h.textContent=t; CHT.tpMsgT=performance.now(); }
+const chPrologue=()=>typeof PRO!=='undefined'&&!!PRO&&!!PRO.on;
 function chTpWhy(V,x,y){
   if(!G||G.mode!=='story') return 'Teleport works in a story journey.';
+  if(chPrologue()) return 'Not during Lantern Eve. Skip it first.';
   if((G.boss&&!G.boss.dead)||G.fightSite||G.fightIntro) return 'Not during a boss fight.';
   if(G.mini||G.fishing) return 'Not in the middle of a game.';
   if(V==null||V<0||!MAPS[V]) return 'Teleport works on the world maps, not the dungeon page.';
@@ -330,6 +331,7 @@ function chActs(){ return Object.keys(ACTS).map(Number).filter(n=>n===1||chJumpL
 // kitFor, the same as __eb.actStart), the data chapters before it in this act caught up quietly, and Ash at its start
 function chJump(st){
   if(!chStory()||!STAGEDEF[st]) return 'Start or continue a journey first.';
+  if(chPrologue()) return 'Not during Lantern Eve. Skip it first.';
   if(G.boss&&!G.boss.dead) return 'Not during a boss fight. Beat the boss first.';
   if(G.mini) return 'Not in the middle of a game.';
   const n=actOf(st), A=ACTS[n]||{}, p=player;
@@ -533,7 +535,7 @@ function chGroupBody(g){
   if(g==='surv') return sw;
   if(g==='move') return sw+`<div class="setrow chfull" data-row="goto"><span>Go to a place<small>Moves Ash there now, on the maps he has found. Places on the others wait for their act.</small><small class="chmsg" data-msg="goto" hidden></small></span>
 <div class="seg chtabs" role="group" aria-label="Map" data-gomaps></div><p class="chmapnm" data-goname></p><div class="chlist" data-golist></div></div>`;
-  if(g==='world') return sw+`<div class="setrow"><span>Time of day${CH_REAL}<small>Sets the clock now. It runs on from there unless it is frozen.</small><small class="chmsg" data-msg="tod" hidden></small></span><div class="chbtns">${CH_TOD.map(([n],i)=>`<button type="button" class="btn c sm" data-tod="${i}">${n}</button>`).join('')}</div></div>`;
+  if(g==='world') return sw+`<div class="setrow chfull"><span>Time of day${CH_REAL}<small>Sets the clock now. It runs on from there unless it is frozen.</small><small class="chmsg" data-msg="tod" hidden></small></span><div class="chbtns">${CH_TOD.map(([n],i)=>`<button type="button" class="btn c sm" data-tod="${i}">${n}</button>`).join('')}</div></div>`;
   if(g==='story') return `<div class="chconf" id="chConf" hidden></div>
 <div class="setrow chfull" data-row="jump"><span>Jump to a chapter${CH_REAL}<small>The story moves there with what a normal arrival has: the earlier acts finished, their powers and weapons, and the chapters before it caught up. Nothing is taken away.</small><small class="chmsg" data-msg="jump" hidden></small></span>
 <div class="seg chtabs" role="group" aria-label="Act" data-jacts></div><div class="chlist" data-jlist></div><p class="setnote" data-jnote hidden>Act I's chapters run on the older story code, which keeps its place in many flags. Start a new journey to play them from the beginning.</p></div>
