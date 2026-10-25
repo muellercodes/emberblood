@@ -93,9 +93,10 @@ input{-webkit-user-select:text;user-select:text}
 .lb .wv{color:var(--muted);font-size:12px}
 .lb .sc{font-weight:700}
 /* v12: your own best under the board (while your name waits, or outside the top 20), the waiting line, the bot check */
-.lb li.mine{border-top:1px dashed rgba(255,195,90,.35);border-bottom:0}
+.lb li.mine{border-bottom:0}
+.lb li+li.mine{border-top:1px dashed rgba(255,195,90,.35)}
 .lb li.mine small{display:block;font-size:11px;color:var(--muted);white-space:normal}
-.acwait{font-size:14px!important;color:var(--ink)!important;background:rgba(255,195,90,.08);border:1px solid rgba(255,195,90,.32);border-radius:10px;padding:9px 12px;margin:10px 0 0!important;line-height:1.45}
+.acwait{font-size:14px!important;color:var(--ink)!important;background:rgba(255,195,90,.08);border:1px solid rgba(255,195,90,.32);border-radius:10px;padding:9px 12px;margin:10px 0 12px!important;line-height:1.45}
 html.sb .acwait{background:#ffeccb;border:2px solid rgba(59,34,51,.22);color:#3b2233!important}
 .acbot{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 10px}
 .acbotl{align-self:stretch;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -629,7 +630,7 @@ html.sb #padToast span{color:#6a4a52}
       <label class="fld"><span>Name</span><input id="acName" autocomplete="username" maxlength="20" spellcheck="false" autocapitalize="off"></label>
       <label class="fld"><span>Password</span><input id="acPass" type="password" autocomplete="current-password" maxlength="128"></label>
       <p class="help" id="acHelp"></p>
-      <div class="acbot" id="acBot" hidden><span class="acbotl">Quick check that you are a person</span><div id="acBotW"></div><p class="acbotmsg" id="acBotMsg" aria-live="polite"></p></div>
+      <div class="acbot" id="acBot" hidden><span class="acbotl">Quick robot check</span><div id="acBotW"></div><p class="acbotmsg" id="acBotMsg" aria-live="polite"></p></div>
       <p class="err" id="acErr" role="alert"></p>
       <button class="btn c hot" id="acGo" type="button">Sign in</button>
     </div>
