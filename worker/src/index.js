@@ -376,19 +376,20 @@ const RUN_MS = 6 * 3600000;        // a ticket is good for 6 hours
 // - every fifth wave is a champion (worth at most 1500, the old dragon) with adds from genWave(n/3); beating it adds 250n
 // - champions keep calling more foes for as long as the fight lasts, so time itself can earn points: FARM_PTS a second
 // The cap takes all of that at once (every foe elite, the streak always at its best) and then adds a quarter on top.
-const FARM_PTS = 60;
+const FARM_PTS = 120;
 function waveCap(n) {
   const kills = (b) => (4 + 1.8 * b) * 10 * 2 * 4;
   return n % 5 === 0 ? 1500 * 4 + kills(Math.floor(n / 3)) + 250 * n : kills(n) + 100 * n;
 }
 function scoreCap(wave, secs) { let s = 0; for (let n = 1; n <= wave; n++) s += waveCap(n); return Math.ceil(s * 1.25 + secs * FARM_PTS + 1000); }
-// The quickest a wave can be reached: the time Ash needs at the very least before wave `wave` starts, measured in the
-// real Arena with every foe falling the moment it lands (GUARD_NOTES.md), then halved so a strong player is never refused.
-const MIN_FIRST = 2.4, MIN_WAVE = 0, MIN_BOSS = 0, MIN_SLACK = 0.5;
+// The quickest a wave can be reached. Measured in the real Arena (Easy and Hard) with every foe falling the moment it
+// lands and every blessing taken at once (v12 GUARD_NOTES.md): wave 1 starts at 2.4 s, an ordinary wave n takes at
+// least about 4.5 + 0.3n seconds (spawning paces it), a champion wave about 5. That floor is then halved, less 3 seconds
+// for a slow network, so no real player is ever refused for being quick.
 function minSecs(wave) {
-  let t = MIN_FIRST;
-  for (let n = 1; n < wave; n++) t += n % 5 === 0 ? MIN_BOSS : MIN_WAVE;
-  return t * MIN_SLACK;
+  let t = 2.4;
+  for (let n = 1; n < wave; n++) t += n % 5 === 0 ? 5 : 4.5 + 0.3 * n;
+  return Math.max(0, t * 0.5 - 3);
 }
 async function ticketProblem(env, u, b, diff, wave, score) {
   const run = typeof b.run === 'string' && /^[A-Za-z0-9_-]{16,64}$/.test(b.run) ? b.run : null;
