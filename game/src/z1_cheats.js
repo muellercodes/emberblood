@@ -238,6 +238,12 @@ function chBossFloor(e,peek){
   if(!peek) e._chHalf=true; return null;
 }
 
+// Pip's fire shots come in as Ash's own projectiles (owner 'player', kind 'pip'): the hit's from-point finds the shot
+function chPipShot(o){
+  if(!o||o.src!=='proj'||o.fx==null||!G||!G.projectiles) return false;
+  for(const pr of G.projectiles) if(Math.abs(pr.x-pr.vx*0.05-o.fx)<0.01&&Math.abs(pr.y-pr.vy*0.05-o.fy)<0.01) return pr.kind==='pip'||pr.owner!=='player';
+  return false;
+}
 // ---------- story tools (real changes, behind a confirm)
 // the step "Finish" and "Skip" act on: the side quest Ash follows (a story-data quest), else the chapter
 function chStepTarget(){
@@ -738,8 +744,10 @@ function chInit(){
       chTaint();
       const p0=player, hp0=p0?p0.hp:0, tod0=G?G.tod:0, fr=CHT.on.freeze&&G&&G.mode==='story';
       if(CHT.on.endless) chFill(p0);
+      // the walls let Ash through for the whole frame (the foes' push-apart pass in updateEnemies checks walls for him too)
+      CHT.nc=CHT.on.noclip; CHT.gp=CHT.on.gates&&!!G&&G.mode==='story';
       try{ return base.apply(this,arguments); }
-      finally{ if(player===p0&&p0){ if(CHT.on.god&&!p0.dead&&p0.hp<hp0) p0.hp=Math.min(p0.maxHp,hp0); if(CHT.on.endless) chFill(p0); } if(fr&&G) G.tod=tod0; }
+      finally{ CHT.nc=false; CHT.gp=false; if(player===p0&&p0){ if(CHT.on.god&&!p0.dead&&p0.hp<hp0) p0.hp=Math.min(p0.maxHp,hp0); if(CHT.on.endless) chFill(p0); } if(fr&&G) G.tod=tod0; }
     }; }
   // Endless flasks: a drink never uses one up (and works with none left). Fast feet: the speed stat is raised only for
   // the length of the call (snapshotPlayer below saves the real one). Walk through walls and Open gates: Ash's own move
@@ -750,10 +758,10 @@ function chInit(){
       if(end){ p0=p.potions; if(!(p.potions>=1)&&p.potionsMax>0){ p.potions=1; bump=true; } pre=p.potions; chFill(p); }
       const st=CHT.on.fast&&p.stats&&p.stats.speed>0?p.stats:null; if(st){ st.speed*=CH_FAST; CHT.boost=st; }
       let gz=null; if(gp&&typeof GT!=='undefined'){ gz=[GT.zones,GT.fly,GT.water]; GT.zones=[]; GT.fly=[]; GT.water=[]; }
-      CHT.nc=nc; CHT.gp=gp;
+      const nc0=CHT.nc, gp0=CHT.gp; CHT.nc=nc; CHT.gp=gp;
       try{ return base.apply(this,arguments); }
       finally{
-        CHT.nc=false; CHT.gp=false; if(gz){ GT.zones=gz[0]; GT.fly=gz[1]; GT.water=gz[2]; }
+        CHT.nc=nc0; CHT.gp=gp0; if(gz){ GT.zones=gz[0]; GT.fly=gz[1]; GT.water=gz[2]; }
         if(st){ st.speed/=CH_FAST; CHT.boost=null; }
         if(end&&player===p){ if(p.potions===pre-1||(bump&&p.potions===pre)) p.potions=p0; chFill(p); }
       } }; }
@@ -767,7 +775,7 @@ function chInit(){
   // Strong hits and One-hit kills (Ash's own hits: not a companion's or Pip's)
   { const base=damageEnemy; damageEnemy=function(e,amt,o){
       if(!e||e.dead||!(amt>0)||!chAnyRaw()||!chAdmin()) return base.apply(this,arguments);
-      const src=o&&o.src; if(src==='comp'||src==='pip') return base.apply(this,arguments);
+      const src=o&&o.src; if(src==='comp'||src==='pip'||chPipShot(o)) return base.apply(this,arguments);
       const strong=CHT.on.strong, one=CHT.on.onehit;
       if(!strong&&!one) return base.apply(this,arguments);
       let boss=false; try{ boss=!!(e.boss||(G&&G.boss===e)||isBossFoe(e)); }catch(err){ boss=!!e.boss; }
@@ -825,7 +833,7 @@ function chInit(){
   { const base=openSettings; openSettings=function(){ const r=base.apply(this,arguments); try{ CHT.conf=null; CHT.copied=-1; const b=document.getElementById('chConf'); if(b){ b.hidden=true; b.innerHTML=''; }
       chAdminSync();
       if(Cloud.signedIn&&!Cloud.viewing) Cloud.adminCheck().then(()=>chAdminSync(),()=>chAdminSync()); }catch(e){} return r; }; }
-  { const base=mapHintSet; mapHintSet=function(){ const r=base.apply(this,arguments); try{ if(chOn('tp')){ const h=document.getElementById('mapHint'); if(h) h.textContent=`Teleport is on: ${usingTouch?'tap':'click'} a spot on the map to go there.`; } }catch(e){} return r; }; }
+  { const base=mapHintSet; mapHintSet=function(){ const r=base.apply(this,arguments); try{ if(chOn('tp')){ const h=document.getElementById('mapHint'); if(h) h.textContent=`Teleport is on: ${usingTouch||coarsePtr()?'tap':'click'} a spot on the map to go there.`; } }catch(e){} return r; }; }
   try{ Cloud.onChange(()=>{ try{ chAdminSync(); chChip(); }catch(e){} }); }catch(e){}
   setInterval(()=>{ try{
     if(chAnyRaw()&&!chAdmin()) chAdminSync();
