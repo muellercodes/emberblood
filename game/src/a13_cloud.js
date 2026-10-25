@@ -24,14 +24,45 @@ const Cloud=(()=>{
     if(!r.ok){ const er=new Error((j&&j.error)||('Something went wrong ('+r.status+')')); er.status=r.status; throw er; }
     return j||{};
   }
-  function setSession(t,u,ap){ token=t; user=u; approved=t&&ap===false?false:null; paused=''; viewing=false; store.set('eb_token',t); store.set('eb_user',u); store.set('eb_approved',approved); changed(); }
+  function setSession(t,u,ap){ token=t; user=u; approved=t&&ap===false?false:null; paused=''; viewing=false; adminReset(true); store.set('eb_token',t); store.set('eb_user',u); store.set('eb_approved',approved); changed(); }
+  // (v12 CHEAT2) is the signed-in account an admin (the test kit in Settings, z1_cheats.js)? Only the server says so:
+  // GET /api/admin/me answers {admin:true} for an admin account and never for a "View as" session. The answer lives in
+  // memory only (never in localStorage) and belongs to the token it was asked with. It is asked on load and on sign-in,
+  // again when Settings opens with an answer older than ADMIN_RECHECK (adminCheck()), and every few minutes while it is
+  // yes. A no (401, 403), signing out, another account or a "View as" session ends a yes at once; a check that cannot
+  // reach the server keeps a yes only while it is younger than ADMIN_KEEP, so a device that stays offline loses it.
+  const ADMIN_RECHECK=3*60e3, ADMIN_KEEP=10*60e3;
+  let adminOk=false, adminAt=0, adminAsked=0, adminTok=null, adminP=null, adminTimer=null;
+  function adminReset(quiet){ const was=adminLive(); adminOk=false; adminAt=0; adminAsked=0; adminTok=null; adminP=null; clearInterval(adminTimer); adminTimer=null; if(was&&!quiet) changed(); }
+  function adminLive(){ return !!(adminOk&&token&&adminTok===token&&!viewing&&Date.now()-adminAt<ADMIN_KEEP); }
+  function adminCheck(force){
+    if(!token||!base||viewing){ adminReset(); return Promise.resolve(false); }
+    if(!force&&adminTok===token&&Date.now()-adminAsked<ADMIN_RECHECK&&(adminLive()||!adminOk)) return Promise.resolve(adminLive());
+    if(adminP) return adminP;
+    const tok=token;
+    const p=adminP=(async()=>{
+      let ok=false, net=false;
+      try{ const j=await req('/api/admin/me',{timeout:8000}); ok=!!(j&&j.admin===true); }catch(e){ net=!!e.offline; }
+      if(adminP===p) adminP=null;
+      if(tok!==token||viewing||!token) return false;
+      const was=adminLive();
+      if(ok){ adminOk=true; adminAt=adminAsked=Date.now(); adminTok=tok; if(!adminTimer) adminTimer=setInterval(()=>{ if(adminOk) adminCheck(true); },ADMIN_RECHECK+20e3); }
+      else if(!net){ adminOk=false; adminAt=0; adminAsked=Date.now(); adminTok=tok; clearInterval(adminTimer); adminTimer=null; }
+      else if(!adminLive()){ adminOk=false; }
+      if(was!==adminLive()) changed();
+      return adminLive();
+    })();
+    return p;
+  }
   async function check(){
     if(!base){ online=false; changed(); return false; }
     try{ await req('/api/health',{timeout:7000}); }catch(e){ changed(); return false; }
     if(token){ try{ const j=await req('/api/me'); user=j.user; viewing=!!j.view; approved=j.approved===false?false:null; paused=''; store.set('eb_user',user); store.set('eb_approved',approved); }catch(e){} }
-    changed(); return true;
+    changed();
+    if(token&&!viewing) adminCheck(true); else adminReset();
+    return true;
   }
-  async function auth(kind,name,pass,extra){ const j=await req('/api/'+kind,{method:'POST',body:Object.assign({username:name,password:pass},extra||{})}); setSession(j.token,j.user,j.approved); return j.user; }
+  async function auth(kind,name,pass,extra){ const j=await req('/api/'+kind,{method:'POST',body:Object.assign({username:name,password:pass},extra||{})}); setSession(j.token,j.user,j.approved); adminCheck(true); return j.user; }
   // what the server wants before Create account (the bot check's public key, or none); asked once
   function config(){ if(!base) return Promise.resolve({}); if(!cfgP) cfgP=req('/api/config',{timeout:7000}).catch(()=>{ cfgP=null; return {}; }); return cfgP; }
   async function logout(){ try{ await req('/api/logout',{method:'POST'}); }catch(e){} setSession(null,null); }
@@ -58,6 +89,8 @@ const Cloud=(()=>{
   addEventListener('pagehide',()=>{ if(pending&&token&&base){ try{ fetch(base+'/api/save',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({save:pending}),keepalive:true,mode:'cors'}); pending=null; }catch(e){} } });
   return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},get paused(){return paused;},get viewing(){return viewing;},
     get waiting(){return !!token&&approved===false&&!viewing;},
+    // (v12 CHEAT2) true only while the server has said this account is an admin (see adminCheck)
+    get admin(){return adminLive();}, adminCheck,
     check,auth,logout,pull,push,queueSave,flush,config,startRun,submitScore,board,onChange:f=>listeners.add(f)};
 })();
 // merge cloud and device saves slot by slot: whichever is newer wins (deleted slots carry a dated marker)
