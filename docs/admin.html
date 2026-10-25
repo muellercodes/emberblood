@@ -38,6 +38,12 @@ input[type=text],input[type=password]{font:inherit;border:1px solid var(--line);
 label{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
 .chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--chip);color:var(--muted);margin-left:6px;vertical-align:2px}
 .chip.admin{color:var(--accent)} .chip.paused{color:var(--warn)} .chip.view{color:var(--ok)}
+.chip.ok{color:var(--ok)} .chip.wait{color:var(--warn)} .chip.flag{color:var(--bad)}
+.waiting{border-color:var(--warn)}
+.waiting h2{margin-bottom:4px}
+.wait-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding:10px 0 0;margin-top:10px}
+.wait-row .who{min-width:0}
+.wait-row .who b{font-size:16px;word-break:break-all}
 .acct-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 16px;margin:8px 0 10px;font-size:13px}
 .facts b{font-weight:600;color:var(--ink)}
@@ -148,17 +154,25 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
     if (!signed) return;
     const el = $('#list');
     if (!users.length) { el.innerHTML = '<p class="muted">Loading accounts...</p>'; return; }
-    el.innerHTML = '<p class="muted small">' + users.length + ' accounts. Times are in your time zone.</p>' + users.map((u) => {
+    // names that wait for approval: not on the leaderboard and never shown to other players until approved here
+    const wait = users.filter((u) => !u.approved);
+    const waitHtml = '<section class="card waiting" id="waiting"><h2>Waiting for approval (' + wait.length + ')</h2>' +
+      (wait.length ? '<p class="muted small">New accounts play and save at once, but their name only shows on the Arena leaderboard after you approve it.</p>' + wait.map((u) =>
+        '<div class="wait-row" data-id="' + u.id + '" data-wait="1"><div class="who"><b>' + esc(u.name) + '</b>' + (u.name_check ? '<span class="chip flag">name filter: ' + esc(u.name_check) + '</span>' : '') +
+        '<div class="muted small">#' + u.id + ' · made ' + esc(fmtDate(u.created)) + ' · last signed in ' + esc(fmtDate(u.last_seen)) + (u.arena.length ? ' · Arena ' + esc(u.arena.map((a) => DIFF[a.diff] + ' ' + a.score.toLocaleString()).join(', ')) : '') + '</div></div>' +
+        '<div class="row"><button class="hot" data-a="approve">Approve</button><button class="bad" data-a="del">Delete</button></div><div class="panel" hidden style="flex-basis:100%"></div></div>').join('')
+        : '<p class="muted small">Nobody is waiting. New names show up here.</p>') + '</section>';
+    el.innerHTML = waitHtml + '<p class="muted small">' + users.length + ' accounts. Times are in your time zone.</p>' + users.map((u) => {
       const arena = u.arena.length ? u.arena.map((a) => DIFF[a.diff] + ' wave ' + a.wave + ' (' + a.score.toLocaleString() + ')').join(', ') : 'none';
       return '<article class="card" data-id="' + u.id + '">' +
-        '<div class="acct-head"><h2>' + esc(u.name) + (u.admin ? '<span class="chip admin">admin</span>' : '') + (u.paused ? '<span class="chip paused">paused</span>' : '') + (u.views ? '<span class="chip view">' + u.views + ' view open</span>' : '') + '</h2>' +
+        '<div class="acct-head"><h2>' + esc(u.name) + (u.admin ? '<span class="chip admin">admin</span>' : '') + (u.approved ? '<span class="chip ok">approved</span>' : '<span class="chip wait">waiting for approval</span>') + (u.name_check ? '<span class="chip flag">name filter: ' + esc(u.name_check) + '</span>' : '') + (u.paused ? '<span class="chip paused">paused</span>' : '') + (u.views ? '<span class="chip view">' + u.views + ' view open</span>' : '') + '</h2>' +
         '<span class="muted small">#' + u.id + '</span></div>' +
         '<div class="facts"><div>Made <b>' + esc(fmtDate(u.created)) + '</b></div><div>Last signed in <b>' + esc(fmtDate(u.last_seen)) + '</b></div>' +
         '<div>Last cloud save <b>' + esc(u.save_at ? fmtDate(u.save_at) : 'none') + '</b></div><div>Signed in on <b>' + u.sessions + '</b> device' + (u.sessions === 1 ? '' : 's') + '</div>' +
         '<div>Arena <b>' + esc(arena) + '</b></div><div>Save backups <b>' + u.backups + '</b></div>' + (u.paused ? '<div>Paused <b>' + esc(fmtDate(u.paused)) + '</b></div>' : '') + '</div>' +
         '<div class="slots">' + u.slots.map(slotHtml).join('') + '</div>' +
         '<div class="row"><button class="hot" data-a="view">View as ' + esc(u.name) + '</button><button data-a="save">Save</button><button data-a="pw">Set password</button>' +
-        (u.admin ? '' : '<button data-a="pause">' + (u.paused ? 'Turn back on' : 'Pause') + '</button><button class="bad" data-a="del">Delete</button>') + '</div>' +
+        (u.admin ? '' : '<button data-a="approve">' + (u.approved ? 'Unapprove' : 'Approve') + '</button><button data-a="pause">' + (u.paused ? 'Turn back on' : 'Pause') + '</button><button class="bad" data-a="del">Delete</button>') + '</div>' +
         '<div class="panel" hidden></div></article>';
     }).join('');
   }
@@ -205,7 +219,7 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
       for (const k of ['eb_cur_slot', ...SLOT_KEYS]) ls.set(k, null);
       ls.set('eb_token', j.token); ls.set('eb_user', j.user); ls.set('eb_view', { name: j.user.name, id: j.user.id, expires: j.expires });
       await load();
-      card = document.querySelector('[data-id="' + u.id + '"]') || card;
+      card = document.querySelector('article[data-id="' + u.id + '"]') || card;
       openPanel(card, '<p class="msg good">Ready. The game opens signed in as ' + esc(u.name) + ', look only. Their journeys load from the cloud, and nothing you do there changes their save or scores. This view ends by itself in 12 hours.</p><div class="row"><a class="btn hot" style="background:var(--accent);color:var(--accent-ink);text-decoration:none" href="./" target="_blank" rel="noopener" data-a-open>Open the game as ' + esc(u.name) + '</a></div>');
     } catch (e) { openPanel(card, '<p class="msg err">' + esc(e.message) + '</p>'); }
   }
@@ -230,7 +244,7 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
         let save; try { save = JSON.parse(await f.text()); } catch { msg.className = 'msg err'; msg.textContent = 'That file is not a save.'; return; }
         if (save && save.save && save.save.v === 3) save = save.save;
         if (!confirm('Replace ' + u.name + '\'s cloud save with ' + f.name + '? The current one is kept as a backup.')) return;
-        try { await api('PUT', '/api/admin/save?id=' + u.id, { save }); await load(); showSave(u, $('[data-id="' + u.id + '"]')); }
+        try { await api('PUT', '/api/admin/save?id=' + u.id, { save }); await load(); showSave(u, $('article[data-id="' + u.id + '"]')); }
         catch (e) { msg.className = 'msg err'; msg.textContent = e.message; }
       };
       for (const bt of p.querySelectorAll('[data-b]')) bt.onclick = async () => {
@@ -238,7 +252,7 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
         try {
           if (bt.dataset.b === 'get') { const j = await api('GET', '/api/admin/backup?id=' + bid); download('emberblood-' + u.name + '-backup-' + bid + '.json', j.save); return; }
           if (!confirm('Put backup #' + bid + ' back as ' + u.name + '\'s save? The current one is kept as a backup first.')) return;
-          await api('POST', '/api/admin/restore', { backup: bid }); await load(); showSave(u, $('[data-id="' + u.id + '"]'));
+          await api('POST', '/api/admin/restore', { backup: bid }); await load(); showSave(u, $('article[data-id="' + u.id + '"]'));
         } catch (e) { msg.className = 'msg err'; msg.textContent = e.message; }
       };
     } catch (e) { p.innerHTML = '<p class="msg err">' + esc(e.message) + '</p>'; }
@@ -258,6 +272,14 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
     const on = !u.paused;
     if (on && !confirm('Pause ' + u.name + '? They can\'t sign in, load or save in the cloud until you turn it back on. Nothing is deleted.')) return;
     try { await api('POST', '/api/admin/pause', { id: u.id, paused: on }); await load(); }
+    catch (e) { openPanel(card, '<p class="msg err">' + esc(e.message) + '</p>'); }
+  }
+
+  // approve: the name joins the Arena leaderboard. Unapprove takes it off again (its scores are kept).
+  async function approve(u, card) {
+    const on = !u.approved;
+    if (!on && !confirm('Take ' + u.name + ' off the leaderboard? Their scores are kept, and you can approve them again later.')) return;
+    try { await api('POST', '/api/admin/approve', { id: u.id, approved: on }); await load(); }
     catch (e) { openPanel(card, '<p class="msg err">' + esc(e.message) + '</p>'); }
   }
 
@@ -281,7 +303,7 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
   $('#list').addEventListener('click', (ev) => {
     const b = ev.target.closest('button[data-a]'); if (!b) return;
     const card = b.closest('[data-id]'), u = users.find((x) => x.id === +card.dataset.id); if (!u) return;
-    ({ view: viewAs, save: showSave, pw: setPassword, pause: togglePause, del })[b.dataset.a](u, card);
+    ({ view: viewAs, save: showSave, pw: setPassword, pause: togglePause, approve, del })[b.dataset.a](u, card);
   });
   $('#go').onclick = signIn;
   for (const id of ['#nm', '#pw']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') signIn(); });

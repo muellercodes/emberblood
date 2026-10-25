@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
   pass TEXT NOT NULL,
   created_at INTEGER NOT NULL,
   last_seen INTEGER NOT NULL,
-  paused_at INTEGER               -- set when an admin pauses the account (it can't sign in or save)
+  paused_at INTEGER,              -- set when an admin pauses the account (it can't sign in or save)
+  approved_at INTEGER             -- set when an admin approves the name for the leaderboard (NULL = waiting)
 );
 CREATE TABLE IF NOT EXISTS sessions (
   token_hash TEXT PRIMARY KEY,
@@ -45,3 +46,13 @@ CREATE TABLE IF NOT EXISTS limits (
   n INTEGER NOT NULL,
   reset_at INTEGER NOT NULL
 );
+-- Arena score tickets: one per run, handed out by POST /api/arena/start and used up by POST /api/score
+CREATE TABLE IF NOT EXISTS runs (
+  id TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  diff INTEGER NOT NULL,
+  started_at INTEGER NOT NULL,
+  used_at INTEGER
+);
+CREATE INDEX IF NOT EXISTS runs_user ON runs(user_id);
+CREATE INDEX IF NOT EXISTS runs_started ON runs(started_at);

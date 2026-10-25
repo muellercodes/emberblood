@@ -113,7 +113,7 @@ function showDeath(){
     // a run that used a cheat (v12, v10_art_cheats.js) keeps no best score and posts nothing to the leaderboard
     const key='eb_best_'+diffIdx, best=store.get(key,{wave:0,score:0}), cheat=!!G.cheated;
     const isBest=!cheat&&G.score>best.score; if(isBest) store.set(key,{wave:G.wave,score:G.score});
-    if(!cheat) Cloud.submitScore(diffIdx,G.wave,G.score);
+    if(!cheat) Cloud.submitScore(diffIdx,G.wave,G.score,G.runTicket);   // (v12) with the ticket asked for at the start
     $('#deadTitle').textContent=isBest?'New best!':'Game over';
     $('#deadMsg').textContent=`You made it to wave ${G.wave} on ${G.diff.name}.`+(cheat?' Cheats were on, so this score is not kept or posted.':'');
     st.innerHTML=`<div class="stat"><b>${fmt(G.score)}</b><span>Score</span></div><div class="stat"><b>${fmt(G.kills)}</b><span>Enemies defeated</span></div><div class="stat"><b>${G.wave}</b><span>Wave</span></div><div class="stat"><b>${fmt(Math.max(best.score,G.score))}</b><span>Best score</span></div>`;
@@ -147,6 +147,8 @@ function travelTo(s){
 // ================= the Arena (internal mode id 'normal'): endless waves in the Proving Grounds
 function startNormal(){
   SFX.init(); newRun('normal'); const P=POI.proving;
+  // (v12) a score ticket for this run (a13_cloud.js): signed in only, never in a "view as" session or with a cheat on
+  G.runTicket=Cloud.startRun(diffIdx);
   G.arena={x:P.x,y:P.y,r:600}; G.tod=0.74; for(const k in SHRINES) G.shrines[SHRINES[k].id]=true;
   player.x=P.x; player.y=P.y+120; updateCam(0,true); G.chunkBurst=16;
   scene='play'; hideAll(); setBanner('Arena','Survive the endless horde in the Proving Grounds',2.4); G.hintT=14;
