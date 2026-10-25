@@ -122,9 +122,13 @@ function chPatchCol(c){
   const d=Object.getOwnPropertyDescriptor(c,'off'), get=d&&d.get, set=d&&d.set; let v=!!(d&&!d.get&&d.value);
   try{ Object.defineProperty(c,'off',{configurable:true,enumerable:true,get(){ return CHT.gpc||(get?get.call(c):v); },set(x){ if(set) set.call(c,x); else v=!!x; }}); }catch(e){}
 }
+// the colliders a gate is made of: its own parts, its door's and its fences' (gtCol, gtColWrap)
+function chGateColsOf(g){ const L=[]; for(const c of g.parts||[]) if(c&&typeof c==='object'&&c.t) L.push(c); if(g.doorObj&&g.doorObj.col) L.push(g.doorObj.col); if(g.fences) for(const k in g.fences){ const o=g.fences[k]; if(o&&o.col) L.push(o.col); } return L; }
 function chGateOpenLook(g){
   if(!g||gtSt(g.id)>=2) return;
+  for(const c of chGateColsOf(g)) chPatchCol(c);
   try{ if(g.D&&g.D.sync) g.D.sync(g,2); if(g.custom&&g.D&&g.D.sync!==gtPlainSync) gtRampSync(g,2); }catch(e){ console.error('[cheats] gate '+g.id,e); }
+  for(const c of chGateColsOf(g)) chPatchCol(c);
   g._chOpen=true;
 }
 function chGates(on){
@@ -693,7 +697,7 @@ function chReveal(){
 // ---------- hit boxes and sight (drawn over the world, after the floating words)
 function chDrawBoxes(){
   if(!chOn('boxes')||!G||!player||scene==='menu') return;
-  const p=player, g=ctx, z=zoom||1, lw=1.6/z, night=isNight();
+  const p=player, g=ctx, z=zoom||1, lw=2.2/z, night=isNight();
   g.save(); g.lineWidth=lw; g.setLineDash([]);
   const circ=(x,y,r)=>{ g.beginPath(); g.arc(x,y,Math.max(1,r),0,TAU); g.stroke(); };
   // walls near Ash: the colliders round him (low ones dashed: a jump clears them)
@@ -706,7 +710,8 @@ function chDrawBoxes(){
     if(e.dead||e.frozen||!inView(e.x,e.y,140)) continue;
     const boss=(()=>{ try{ return isBossFoe(e); }catch(err){ return !!e.boss; } })();
     g.setLineDash([]); g.strokeStyle=boss?'rgba(255,90,210,.95)':'rgba(255,72,60,.95)';
-    try{ for(const c of hitCircles(e)) circ(c.x,c.y,c.r); }catch(err){ circ(e.x,e.y,e.r||12); }
+    g.fillStyle=boss?'rgba(255,90,210,.16)':'rgba(255,72,60,.16)';
+    try{ for(const c of hitCircles(e)){ g.beginPath(); g.arc(c.x,c.y,Math.max(1,c.r),0,TAU); g.fill(); g.stroke(); } }catch(err){ circ(e.x,e.y,e.r||12); }
     if(!e.aggro&&!boss&&!e.passive){ const R=(e.type==='wolf'?(night?460:300):(night?300:380))*((G.diff&&G.diff.aggro)||1); g.setLineDash([8/z,7/z]); g.strokeStyle='rgba(255,170,90,.35)'; circ(e.x,e.y,R); }
     const d=dist(e.x,e.y,p.x,p.y);
     if(d<1100&&!p.dead){
