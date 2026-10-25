@@ -6,6 +6,7 @@ workers_dev = true
 [vars]
 ALLOWED_ORIGINS = "https://playemberblood.com,https://www.playemberblood.com,https://muellercodes.github.io"
 ADMIN_USERS = "MuellerCodes"   # accounts that can use admin.html (comma separated)
+TURNSTILE_SITEKEY = "0x4AAAAAAFkqSEhGv0ws-n2k"   # public; the secret is the Worker secret TURNSTILE_SECRET (never in the repo)
 
 [[d1_databases]]
 binding = "DB"
