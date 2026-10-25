@@ -201,6 +201,18 @@ input{-webkit-user-select:text;user-select:text}
 .lb .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb .wv{color:var(--muted);font-size:12px}
 .lb .sc{font-weight:700}
+/* v12: your own best under the board (while your name waits, or outside the top 20), the waiting line, the bot check */
+.lb li.mine{border-bottom:0}
+.lb li+li.mine{border-top:1px dashed rgba(255,195,90,.35)}
+.lb li.mine small{display:block;font-size:11px;color:var(--muted);white-space:normal}
+.acwait{font-size:14px!important;color:var(--ink)!important;background:rgba(255,195,90,.08);border:1px solid rgba(255,195,90,.32);border-radius:10px;padding:9px 12px;margin:10px 0 12px!important;line-height:1.45}
+html.sb .acwait{background:#ffeccb;border:2px solid rgba(59,34,51,.22);color:#3b2233!important}
+.acbot{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 10px}
+.acbotl{align-self:stretch;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#acBotW{width:100%;min-height:65px;display:flex;justify-content:center;border-radius:10px}
+#acBotW iframe{max-width:100%}
+.acbotmsg{margin:0!important;font-size:13px!important;color:var(--muted);min-height:0;text-align:center}
+.acbotmsg:empty{display:none}
 .status{font-size:13px;color:var(--gold);min-height:1.2em;margin:8px 0 0}
 .journal{margin-top:12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,140,70,.15);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.5;color:var(--muted)}
 .journal p{margin:0 0 8px}
@@ -730,11 +742,13 @@ html.sb #padToast span{color:#6a4a52}
       <label class="fld"><span>Name</span><input id="acName" autocomplete="username" maxlength="20" spellcheck="false" autocapitalize="off"></label>
       <label class="fld"><span>Password</span><input id="acPass" type="password" autocomplete="current-password" maxlength="128"></label>
       <p class="help" id="acHelp"></p>
+      <div class="acbot" id="acBot" hidden><span class="acbotl">Quick robot check</span><div id="acBotW"></div><p class="acbotmsg" id="acBotMsg" aria-live="polite"></p></div>
       <p class="err" id="acErr" role="alert"></p>
       <button class="btn c hot" id="acGo" type="button">Sign in</button>
     </div>
     <div id="acIn" hidden>
       <p>Signed in as <b id="acWho" style="color:var(--ink)"></b>. Your story saves to the cloud automatically whenever it saves here.</p>
+      <p class="acwait" id="acWait" hidden>Your name joins the Arena leaderboard once a grown-up approves it. Until then your scores show only to you, and you can play and save as usual.</p>
       <div class="row"><button class="btn c sm" id="acSync" type="button">Sync now</button><button class="btn c sm" id="acOut" type="button">Sign out</button></div>
     </div>
     <p class="status" id="acStatus" aria-live="polite"></p>
@@ -14533,7 +14547,7 @@ function showDeath(){
     // a run that used a cheat (v12, v10_art_cheats.js) keeps no best score and posts nothing to the leaderboard
     const key='eb_best_'+diffIdx, best=store.get(key,{wave:0,score:0}), cheat=!!G.cheated;
     const isBest=!cheat&&G.score>best.score; if(isBest) store.set(key,{wave:G.wave,score:G.score});
-    if(!cheat) Cloud.submitScore(diffIdx,G.wave,G.score);
+    if(!cheat) Cloud.submitScore(diffIdx,G.wave,G.score,G.runTicket);   // (v12) with the ticket asked for at the start
     $('#deadTitle').textContent=isBest?'New best!':'Game over';
     $('#deadMsg').textContent=`You made it to wave ${G.wave} on ${G.diff.name}.`+(cheat?' Cheats were on, so this score is not kept or posted.':'');
     st.innerHTML=`<div class="stat"><b>${fmt(G.score)}</b><span>Score</span></div><div class="stat"><b>${fmt(G.kills)}</b><span>Enemies defeated</span></div><div class="stat"><b>${G.wave}</b><span>Wave</span></div><div class="stat"><b>${fmt(Math.max(best.score,G.score))}</b><span>Best score</span></div>`;
@@ -14567,6 +14581,8 @@ function travelTo(s){
 // ================= the Arena (internal mode id 'normal'): endless waves in the Proving Grounds
 function startNormal(){
   SFX.init(); newRun('normal'); const P=POI.proving;
+  // (v12) a score ticket for this run (a13_cloud.js): signed in only, never in a "view as" session or with a cheat on
+  G.runTicket=Cloud.startRun(diffIdx);
   G.arena={x:P.x,y:P.y,r:600}; G.tod=0.74; for(const k in SHRINES) G.shrines[SHRINES[k].id]=true;
   player.x=P.x; player.y=P.y+120; updateCam(0,true); G.chunkBurst=16;
   scene='play'; hideAll(); setBanner('Arena','Survive the endless horde in the Proving Grounds',2.4); G.hintT=14;
@@ -27458,6 +27474,8 @@ const API_BASE='https://emberblood-api.muellercodes.workers.dev';
 const Cloud=(()=>{
   const base=(API_BASE.startsWith('http')?API_BASE:'').replace(/\/$/,'');
   let token=store.get('eb_token',null), user=store.get('eb_user',null), online=null, pending=null, pushT=null, lastPush=0, busy=false, lastErr='', paused='', viewing=false;
+  // (v12) approved: false while a new name waits for a grown-up (null when not known; an older server never says)
+  let approved=token?store.get('eb_approved',null):null, cfgP=null;
   const listeners=new Set();
   const changed=()=>{ for(const f of listeners){ try{ f(); }catch(e){} } };
   async function req(path,opt){
@@ -27476,25 +27494,41 @@ const Cloud=(()=>{
     if(!r.ok){ const er=new Error((j&&j.error)||('Something went wrong ('+r.status+')')); er.status=r.status; throw er; }
     return j||{};
   }
-  function setSession(t,u){ token=t; user=u; paused=''; viewing=false; store.set('eb_token',t); store.set('eb_user',u); changed(); }
+  function setSession(t,u,ap){ token=t; user=u; approved=t&&ap===false?false:null; paused=''; viewing=false; store.set('eb_token',t); store.set('eb_user',u); store.set('eb_approved',approved); changed(); }
   async function check(){
     if(!base){ online=false; changed(); return false; }
     try{ await req('/api/health',{timeout:7000}); }catch(e){ changed(); return false; }
-    if(token){ try{ const j=await req('/api/me'); user=j.user; viewing=!!j.view; paused=''; store.set('eb_user',user); }catch(e){} }
+    if(token){ try{ const j=await req('/api/me'); user=j.user; viewing=!!j.view; approved=j.approved===false?false:null; paused=''; store.set('eb_user',user); store.set('eb_approved',approved); }catch(e){} }
     changed(); return true;
   }
-  async function auth(kind,name,pass){ const j=await req('/api/'+kind,{method:'POST',body:{username:name,password:pass}}); setSession(j.token,j.user); return j.user; }
+  async function auth(kind,name,pass,extra){ const j=await req('/api/'+kind,{method:'POST',body:Object.assign({username:name,password:pass},extra||{})}); setSession(j.token,j.user,j.approved); return j.user; }
+  // what the server wants before Create account (the bot check's public key, or none); asked once
+  function config(){ if(!base) return Promise.resolve({}); if(!cfgP) cfgP=req('/api/config',{timeout:7000}).catch(()=>{ cfgP=null; return {}; }); return cfgP; }
   async function logout(){ try{ await req('/api/logout',{method:'POST'}); }catch(e){} setSession(null,null); }
   async function pull(){ if(!token) return null; const j=await req('/api/save'); return j.save||null; }
   async function push(save){ if(!token) return; await req('/api/save',{method:'PUT',body:{save}}); lastPush=Date.now(); lastErr=''; }
   function queueSave(save,now){ if(!token||!base) return; pending=save; clearTimeout(pushT); pushT=setTimeout(flush,now?0:Math.max(0,20000-(Date.now()-lastPush))); }
   async function flush(){ if(!pending||busy) return; const s=pending; pending=null; busy=true; try{ await push(s); }catch(e){ lastErr=e.message; if(!pending) pending=s; } busy=false; changed(); }
-  // (v12) never for a run that used a cheat (v10_art_cheats.js)
-  async function submitScore(diff,wave,score){ if(!token||!base||(G&&G.cheated)) return; try{ await req('/api/score',{method:'POST',body:{diff,wave,score}}); }catch(e){} }
-  async function board(diff){ const j=await req('/api/leaderboard?diff='+diff); return j.rows||[]; }
+  // (v12) an Arena run asks for a score ticket as it starts (a9b_flow.js startNormal): signed in only, never in a "view
+  // as" session and never with a cheat on (z1_cheats.js). The score goes up with that ticket or not at all; the server
+  // checks the ticket, the time and the wave, and quietly keeps a score that does not fit off the board.
+  function startRun(diff){
+    if(!token||!base||viewing||paused) return null;
+    if((G&&G.cheated)||(typeof chAny==='function'&&chAny())) return null;
+    return req('/api/arena/start',{method:'POST',body:{diff}}).then(j=>(j&&j.run)||null,()=>null);
+  }
+  async function submitScore(diff,wave,score,ticket){
+    if(!token||!base||(G&&G.cheated)||!(wave>=1)||!ticket) return;
+    let run=null; try{ run=await ticket; }catch(e){}
+    if(!run||(G&&G.cheated)) return;
+    try{ await req('/api/score',{method:'POST',body:{diff,wave,score,run}}); }catch(e){}
+  }
+  // the top names (approved ones only) and, when signed in, this player's own best (me)
+  async function board(diff){ const j=await req('/api/leaderboard?diff='+diff); return {rows:j.rows||[],me:j.me||null}; }
   addEventListener('pagehide',()=>{ if(pending&&token&&base){ try{ fetch(base+'/api/save',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({save:pending}),keepalive:true,mode:'cors'}); pending=null; }catch(e){} } });
   return {get user(){return user;},get online(){return online;},get signedIn(){return !!token;},get hasBase(){return !!base;},get lastErr(){return lastErr;},get paused(){return paused;},get viewing(){return viewing;},
-    check,auth,logout,pull,push,queueSave,flush,submitScore,board,onChange:f=>listeners.add(f)};
+    get waiting(){return !!token&&approved===false&&!viewing;},
+    check,auth,logout,pull,push,queueSave,flush,config,startRun,submitScore,board,onChange:f=>listeners.add(f)};
 })();
 // merge cloud and device saves slot by slot: whichever is newer wins (deleted slots carry a dated marker)
 async function syncSaves(){
@@ -27511,6 +27545,8 @@ async function syncSaves(){
 }
 // ---------- account panel
 let acTab='login';
+// (v12) the Create account bot check's state (botShow below)
+const BOT={key:null,id:null,theme:null,token:'',loading:null,failed:false,busy:false};
 function acctLabel(){
   const b=$('#bAcct'); if(!b) return;
   if(!Cloud.hasBase||Cloud.online===false){ b.innerHTML='Account<small>Cloud saves are offline here. Progress saves on this device.</small>'; return; }
@@ -27528,10 +27564,12 @@ function renderAcct(){
   const off=!Cloud.hasBase||Cloud.online===false;
   $('#acOff').hidden=!off; $('#acForm').hidden=off||Cloud.signedIn; $('#acIn').hidden=off||!Cloud.signedIn;
   if(Cloud.signedIn) $('#acWho').textContent=((Cloud.user&&Cloud.user.name)||'you')+(Cloud.viewing?' (look only, nothing here saves to their account)':Cloud.paused?' (paused)':'');
+  $('#acWait').hidden=off||!Cloud.waiting;
   for(const b of document.querySelectorAll('#acTabs button')) b.setAttribute('aria-pressed',String(b.dataset.t===acTab));
   $('#acGo').textContent=acTab==='login'?'Sign in':'Create account';
   $('#acPass').setAttribute('autocomplete',acTab==='login'?'current-password':'new-password');
   $('#acHelp').textContent=acTab==='login'?'':'Pick a name (3 to 20 letters, numbers, - or _) and a password of at least 8 characters. There is no email, so keep your password somewhere safe.';
+  if(!off&&!Cloud.signedIn&&acTab==='register') botShow(); else $('#acBot').hidden=true;
   $('#acBoardDiff').textContent=DIFFS[diffIdx].name;
 }
 async function loadBoard(){
@@ -27539,9 +27577,12 @@ async function loadBoard(){
   if(!Cloud.hasBase||Cloud.online===false){ el.innerHTML='<p class="muted">The leaderboard needs the cloud connection.</p>'; return; }
   el.innerHTML='<p class="muted">Loading…</p>';
   try{
-    const rows=await Cloud.board(diffIdx);
-    if(!rows.length){ el.innerHTML='<p class="muted">No scores yet. Be the first.</p>'; return; }
-    el.innerHTML='<ol class="lb">'+rows.map((r,i)=>`<li${Cloud.user&&r.name===Cloud.user.name?' class="me"':''}><span class="rk">${i+1}</span><span class="nm">${escapeHtml(r.name)}</span><span class="wv">Wave ${r.wave}</span><span class="sc">${fmt(r.score)}</span></li>`).join('')+'</ol>';
+    const {rows,me}=await Cloud.board(diffIdx), mine=Cloud.user&&Cloud.user.name;
+    let list=rows.map((r,i)=>`<li${mine&&r.name===mine?' class="me"':''}><span class="rk">${i+1}</span><span class="nm">${escapeHtml(r.name)}</span><span class="wv">Wave ${r.wave}</span><span class="sc">${fmt(r.score)}</span></li>`).join('');
+    // (v12) your own best always shows to you: below the board while your name waits for approval, or when it is not in the top 20
+    if(me&&me.score>0&&!rows.some(r=>r.name===me.name)) list+=`<li class="me mine"><span class="rk">·</span><span class="nm">${escapeHtml(me.name)}<small>${me.approved?'your best':'only you can see this for now'}</small></span><span class="wv">Wave ${me.wave}</span><span class="sc">${fmt(me.score)}</span></li>`;
+    if(!list){ el.innerHTML='<p class="muted">No scores yet. Be the first.</p>'; return; }
+    el.innerHTML=(rows.length?'':'<p class="muted">No scores on the board yet.</p>')+'<ol class="lb">'+list+'</ol>';
   }catch(e){ el.innerHTML='<p class="muted">Could not load the leaderboard right now.</p>'; }
 }
 async function acctSubmit(){
@@ -27549,15 +27590,53 @@ async function acctSubmit(){
   err.textContent='';
   if(!/^[A-Za-z0-9_-]{3,20}$/.test(name)){ err.textContent='Names are 3 to 20 letters, numbers, - or _.'; return; }
   if(pass.length<8){ err.textContent='Passwords need at least 8 characters.'; return; }
+  // (v12) the bot check on Create account: wait for its token while the widget is working on it. If the widget could not
+  // load or keeps failing, the server decides (it only asks once the keys exist).
+  const reg=acTab==='register';
+  if(reg&&BOT.key&&BOT.id!=null&&!BOT.token&&!BOT.failed){ err.textContent='Please finish the robot check above first.'; return; }
   go.disabled=true; go.textContent=acTab==='login'?'Signing in…':'Creating…';
   try{
-    await Cloud.auth(acTab,name,pass); $('#acPass').value='';
+    await Cloud.auth(acTab,name,pass,reg&&BOT.token?{turnstile:BOT.token}:null); $('#acPass').value='';
     const r=await syncSaves();
     $('#acStatus').textContent=r==='pulled'?'Loaded your cloud saves.':r==='pushed'?'Uploaded the saves from this device.':r==='merged'?'Synced your journeys both ways.':'You are all set.';
     SFX.play('quest');
   }catch(e){ err.textContent=e.offline?'Could not reach the server. Try again in a moment.':e.message; }
+  if(reg) botReset();
   go.disabled=false; renderAcct(); acctLabel(); refreshMenu(); loadBoard();
 }
+// ---------- (v12) the bot check (Cloudflare Turnstile), only on Create account and only when the server has a key.
+// Cloudflare's script is the one outside script the game loads, and only once Create account is opened.
+const botTheme=()=>document.documentElement.classList.contains('sb')?'light':'dark';
+function botLoad(){
+  if(window.turnstile&&window.turnstile.render) return Promise.resolve();
+  if(!BOT.loading) BOT.loading=new Promise((ok,no)=>{
+    const sc=document.createElement('script'); sc.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async=true;
+    sc.onload=()=>window.turnstile&&window.turnstile.render?ok():no(new Error('no turnstile'));
+    sc.onerror=()=>{ BOT.loading=null; sc.remove(); no(new Error('could not load')); };
+    document.head.appendChild(sc);
+  });
+  return BOT.loading;
+}
+async function botShow(){
+  const box=$('#acBot'), msg=$('#acBotMsg');
+  if(BOT.busy) return; BOT.busy=true;
+  try{
+    const c=await Cloud.config(); BOT.key=(c&&c.turnstile)||null;
+    if(!BOT.key||acTab!=='register'||Cloud.signedIn){ box.hidden=true; return; }
+    box.hidden=false;
+    try{ await botLoad(); }catch(e){ BOT.failed=true; msg.textContent='The robot check could not load here. You can still try to create your account.'; return; }
+    if(acTab!=='register'||Cloud.signedIn){ box.hidden=true; return; }
+    const th=botTheme(); if(BOT.id!=null&&BOT.theme===th) return;
+    if(BOT.id!=null){ try{ turnstile.remove(BOT.id); }catch(e){} BOT.id=null; }
+    const w=$('#acBotW'); w.innerHTML=''; BOT.token=''; BOT.theme=th; BOT.failed=false; msg.textContent='';
+    BOT.id=turnstile.render(w,{sitekey:BOT.key,theme:th,size:w.clientWidth>=300?'flexible':'compact',action:'register',
+      callback:t=>{ BOT.token=t; BOT.failed=false; msg.textContent=''; },
+      'expired-callback':()=>{ BOT.token=''; },
+      'error-callback':()=>{ BOT.token=''; BOT.failed=true; msg.textContent='The robot check had a hiccup. It will try again by itself.'; }});
+  }catch(e){ BOT.failed=true; }
+  finally{ BOT.busy=false; }
+}
+function botReset(){ BOT.token=''; if(BOT.id!=null&&window.turnstile){ try{ turnstile.reset(BOT.id); }catch(e){} } }
 $('#acGo').addEventListener('click',acctSubmit);
 for(const id of ['#acName','#acPass']) $(id).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); acctSubmit(); } });
 for(const b of document.querySelectorAll('#acTabs button')) b.addEventListener('click',()=>{ acTab=b.dataset.t; $('#acErr').textContent=''; renderAcct(); });
