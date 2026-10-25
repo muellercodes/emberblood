@@ -203,21 +203,24 @@ addEventListener('click',e=>{
 // the named places the maps know, for Go to: towns and places (POI), shrines, cave, dungeon and trial doors, crossings
 const CH_KIND=[['town','Town'],['spot','Place'],['shrine','Shrine'],['trial','Trial'],['cave','Cave or dungeon'],['crossing','Crossing']];
 function chPlaces(){
-  const out=[], seen=new Set();
+  const out=[], seen=new Set(), named=new Set();
+  // (a place with the same name on the same map once: a Trial's door before the Trial's spot on the map)
   const add=(kind,name,x,y,key)=>{ try{ if(typeof name==='function') name=name(); }catch(e){ name=''; } if(Array.isArray(name)) name=name[0];
     if(!name||!isFinite(x)||!isFinite(y)||x>=IZX-50) return; const m=mapAt(y); if(!MAPS[m]) return;
-    const id=kind+':'+key; if(seen.has(id)) return; seen.add(id); out.push({map:m,kind,name:simplify(String(name)),x:Math.round(x),y:Math.round(y),key:id}); };
-  try{ for(const k in POI){ const p=POI[k]; if(p&&p.name) add(p.town?'town':'spot',p.name,p.x,p.y+60,k); } }catch(e){}
-  try{ for(const s of SHRINES) add('shrine',s.name,s.x+40,s.y+50,s.id); }catch(e){}
+    const id=kind+':'+key, nm=simplify(String(name)), nk=m+'|'+nm.toLowerCase(); if(seen.has(id)||named.has(nk)) return; seen.add(id); named.add(nk); out.push({map:m,kind,name:nm,x:Math.round(x),y:Math.round(y),key:id}); };
   try{ for(const d of DOORS){ if(d.hs) continue; const def=AREADEFS[d.area]; if(!def||!(d.cave||d.trial||def.kind==='cave'||def.kind==='dungeon'||def.trial)) continue; add(def.trial||d.trial?'trial':'cave',def.name,d.x,d.y+(d.outY||40),d.area); } }catch(e){}
   try{ for(const m of CAVEMOUTHS){ const def=AREADEFS[m.area]; if(def) add(def.trial?'trial':'cave',def.name,m.x,m.y+40,m.area); } }catch(e){}
+  try{ for(const k in POI){ const p=POI[k]; if(p&&p.name) add(p.town?'town':'spot',p.name,p.x,p.y+60,k); } }catch(e){}
+  try{ for(const s of SHRINES) add('shrine',s.name,s.x+40,s.y+50,s.id); }catch(e){}
   try{ for(let k=0;k<MAPS.length;k++){ if(!MAPS[k]) continue; for(const c of crossingsOn(k)){ if(c.hidden&&c.hidden()) continue; add('crossing',c.name||c.label,c.x,c.y,c.id||(c.x+'_'+c.y)); } } }catch(e){}
   const ko=Object.fromEntries(CH_KIND.map(([k],i)=>[k,i]));
   out.sort((a,b)=>a.map-b.map||ko[a.kind]-ko[b.kind]||a.name.localeCompare(b.name));
   return out;
 }
-// a map's tab name: its act and its name
-function chMapName(k){ let n=null; for(const a in ACTS) if(ACTS[a]&&ACTS[a].map===k&&(n==null||+a<n)) n=+a; const M=MAPS[k]; return (n!=null?actLabel(n)+' · ':'')+simplify((M&&M.name)||'Map '+k); }
+// a map's tab: the act it belongs to (its first act), and its own name above the list
+function chMapAct(k){ let n=null; for(const a in ACTS) if(ACTS[a]&&ACTS[a].map===k&&(n==null||+a<n)) n=+a; return n; }
+function chMapTab(k){ const n=chMapAct(k); return n==null?simplify((MAPS[k]&&MAPS[k].name)||'Map '+k):n>=5?'Finale':'Act '+ACT_ROMAN[n]; }
+function chMapName(k){ const n=chMapAct(k), M=MAPS[k]; return simplify((M&&M.name)||'Map '+k)+(n!=null?` (the ${n>=5?'Finale':actLabel(n)} map)`:''); }
 function chGoTo(key){
   const P=chPlaces().find(q=>q.key===key); if(!P) return 'That place is gone.';
   if(!chStory()) return 'Start or continue a journey first.';
@@ -496,13 +499,15 @@ function chCss(){
 #cheatSec .seg button{min-height:44px;min-width:58px}
 #cheatSec .chbtns{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto;justify-content:flex-end}
 #cheatSec .chbtns .btn{width:auto;flex:none;min-height:44px;padding:8px 14px;font-size:14px}
-#cheatSec .setrow.chfull{flex-direction:column;align-items:stretch}
-#cheatSec .setrow.chfull>.chbtns{margin-left:0;justify-content:flex-start}
+#cheatSec .setrow.chfull{display:block}
+#cheatSec .setrow.chfull>span{display:block}
+#cheatSec .setrow.chfull>.chbtns{margin:8px 0 0;justify-content:flex-start}
 #cheatSec .chlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin:8px 0 2px}
 #cheatSec .chlist .btn{width:100%;min-height:48px;padding:7px 10px;font-size:14px;line-height:1.2;text-align:left;white-space:normal}
 #cheatSec .chlist .btn small{display:block;margin-top:2px;font-size:11px;font-weight:500;opacity:.75}
 #cheatSec .chlist .btn.here{border-color:var(--gold)}
-#cheatSec .chtabs{display:flex;flex-wrap:wrap;margin-top:8px;align-self:flex-start}
+#cheatSec .chtabs{display:inline-flex;flex-wrap:wrap;max-width:100%;margin-top:10px}
+#cheatSec .chmapnm{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--ink)}
 #cheatSec .chreal{display:inline-block;margin-left:6px;padding:2px 7px 1px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#fff3e0;background:rgba(176,58,30,.9);vertical-align:2px}
 #cheatSec small.chmsg{color:var(--gold)}
 #cheatSec .chconf{margin:10px 0 4px;padding:12px 14px;border:2px solid var(--gold);border-radius:12px;background:rgba(0,0,0,.16)}
@@ -510,11 +515,11 @@ function chCss(){
 #cheatSec .chconf p.chnote{font-size:13px;color:var(--muted)}
 #cheatSec .chconf .chbtns{justify-content:flex-start;margin:4px 0 0}
 #cheatSec .btn:disabled{opacity:.45;cursor:default}
-#cheatSec .chwave{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#cheatSec .chwave{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
 #cheatSec .chwave output{min-width:46px;text-align:center;font-size:20px;font-weight:800;color:var(--ink)}
-#cheatChip{position:fixed;z-index:7;left:calc(env(safe-area-inset-left,0px) + 26px);top:env(safe-area-inset-top,0px);display:flex;align-items:center;height:19px;margin:0;padding:1px 11px 0;border:1px solid rgba(255,170,90,.75);border-top:0;border-radius:0 0 9px 9px;
-  font:800 10px/1 ${UIF};letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:#ffe6b8;background:rgba(122,30,16,.92);box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-#cheatChip::after{content:'';position:absolute;left:-10px;right:-10px;top:0;bottom:-12px}
+#cheatChip{position:fixed;z-index:7;left:calc(env(safe-area-inset-left,0px) + 26px);top:env(safe-area-inset-top,0px);display:flex;align-items:center;height:16px;margin:0;padding:1px 11px 0;border:1px solid rgba(255,170,90,.75);border-top:0;border-radius:0 0 9px 9px;
+  font:800 9.5px/1 ${UIF};letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:#ffe6b8;background:rgba(122,30,16,.92);box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#cheatChip::after{content:'';position:absolute;left:-10px;right:-10px;top:0;bottom:-14px}
 #cheatChip[hidden]{display:none}
 #cheatChip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}`;
   document.head.appendChild(s);
@@ -527,11 +532,11 @@ function chGroupBody(g){
   const sw=Object.keys(CH_SW).filter(k=>CH_SW[k][0]===g).map(chSwRow).join('');
   if(g==='surv') return sw;
   if(g==='move') return sw+`<div class="setrow chfull" data-row="goto"><span>Go to a place<small>Moves Ash there now, on the maps he has found. Places on the others wait for their act.</small><small class="chmsg" data-msg="goto" hidden></small></span>
-<div class="seg chtabs" role="group" aria-label="Map" data-gomaps></div><div class="chlist" data-golist></div></div>`;
+<div class="seg chtabs" role="group" aria-label="Map" data-gomaps></div><p class="chmapnm" data-goname></p><div class="chlist" data-golist></div></div>`;
   if(g==='world') return sw+`<div class="setrow"><span>Time of day${CH_REAL}<small>Sets the clock now. It runs on from there unless it is frozen.</small><small class="chmsg" data-msg="tod" hidden></small></span><div class="chbtns">${CH_TOD.map(([n],i)=>`<button type="button" class="btn c sm" data-tod="${i}">${n}</button>`).join('')}</div></div>`;
   if(g==='story') return `<div class="chconf" id="chConf" hidden></div>
 <div class="setrow chfull" data-row="jump"><span>Jump to a chapter${CH_REAL}<small>The story moves there with what a normal arrival has: the earlier acts finished, their powers and weapons, and the chapters before it caught up. Nothing is taken away.</small><small class="chmsg" data-msg="jump" hidden></small></span>
-<div class="seg chtabs" role="group" aria-label="Act" data-jacts></div><div class="chlist" data-jlist></div></div>
+<div class="seg chtabs" role="group" aria-label="Act" data-jacts></div><div class="chlist" data-jlist></div><p class="setnote" data-jnote hidden>Act I's chapters run on the older story code, which keeps its place in many flags. Start a new journey to play them from the beginning.</p></div>
 <div class="setrow"><span>Finish this step${CH_REAL}<small data-st="finish">The step is done as if Ash did it: its scene plays.</small><small class="chmsg" data-msg="finish" hidden></small></span><div class="chbtns"><button type="button" class="btn c sm" data-story="finish">Finish it</button></div></div>
 <div class="setrow"><span>Skip this step's scene${CH_REAL}<small data-st="skip">The step is done without its scene. Its clues and items still come.</small><small class="chmsg" data-msg="skip" hidden></small></span><div class="chbtns"><button type="button" class="btn c sm" data-story="skip">Skip it</button></div></div>
 <div class="setrow"><span>Beat this boss${CH_REAL}<small data-st="boss">The fight ends through the boss's own ending, so its scenes and rewards still come.</small><small class="chmsg" data-msg="boss" hidden></small></span><div class="chbtns"><button type="button" class="btn c sm" data-story="boss">Beat it</button></div></div>`;
@@ -571,12 +576,13 @@ function chRenderGo(){
   if(!maps.includes(CHT.goMap)) CHT.goMap=maps[0]||0;
   const found=chStory()?mapsSeenList():[];
   const tk=maps.join(',');
-  if(tabs.dataset.k!==tk){ tabs.dataset.k=tk; tabs.innerHTML=maps.map(k=>`<button type="button" data-gomap="${k}" aria-pressed="false">${chEsc(chMapName(k))}</button>`).join(''); }
+  if(tabs.dataset.k!==tk){ tabs.dataset.k=tk; tabs.innerHTML=maps.map(k=>`<button type="button" data-gomap="${k}" aria-pressed="false" aria-label="${chEsc(chMapName(k))}">${chEsc(chMapTab(k))}</button>`).join(''); }
+  const gn=sec.querySelector('[data-goname]'); if(gn){ const t=chMapName(CHT.goMap); if(gn.textContent!==t) gn.textContent=t; }
   for(const b of tabs.querySelectorAll('button')) b.setAttribute('aria-pressed',String(+b.dataset.gomap===CHT.goMap));
   const ok=found.includes(CHT.goMap), kn=Object.fromEntries(CH_KIND);
   const lk=CHT.goMap+'|'+ok+'|'+P.length;
   if(list.dataset.k!==lk){ list.dataset.k=lk;
-    list.innerHTML=P.filter(q=>q.map===CHT.goMap).map(q=>`<button type="button" class="btn c sm" data-go="${chEsc(q.key)}"${ok?'':' disabled'}>${chEsc(q.name)}<small>${chEsc(kn[q.kind]||'')}</small></button>`).join('')||'<p class="setnote">No named places on this map.</p>'; }
+    list.innerHTML=P.filter(q=>q.map===CHT.goMap).map(q=>`<button type="button" class="btn c sm" data-go="${chEsc(q.key)}"${ok?'':' disabled'}>${chEsc(q.name)}<small>${chEsc(kn[q.kind]||'')}</small></button>`).join(''); }
   chMsg('goto',chStory()?(ok?'':'Ash has not found this map yet. Jump to its act to get there.'):'Start or continue a journey to go places.');
 }
 function chRenderJump(){
@@ -590,7 +596,7 @@ function chRenderJump(){
   const L=chJumpList(CHT.jumpAct), story=chStory(), here=story?G.stage:null, lk=CHT.jumpAct+'|'+story+'|'+here;
   if(list.dataset.k!==lk){ list.dataset.k=lk;
     list.innerHTML=L.map(q=>`<button type="button" class="btn c sm${q.st===here?' here':''}" data-jump="${chEsc(q.st)}"${story?'':' disabled'}>${chEsc(q.label)}<small>${chEsc(q.st===here?'Ash is here now':q.sub)}</small></button>`).join('')
-      +(CHT.jumpAct===1?'<p class="setnote">Act I\'s chapters run on the older story code. Start a new journey to play them from the beginning.</p>':''); }
+; const nt=sec.querySelector('[data-jnote]'); if(nt) nt.hidden=CHT.jumpAct!==1; }
   chMsg('jump',story?'':'Start or continue a journey first.');
 }
 function chMsg(k,t){ const sec=document.getElementById('cheatSec'); const el=sec&&sec.querySelector(`[data-msg="${k}"]`); if(!el) return; t=t||''; if(el.textContent!==t) el.textContent=t; el.hidden=!t; }
