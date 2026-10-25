@@ -279,6 +279,8 @@ function chQuietPower(id){
   if(typeof WEAPONS!=='undefined'&&WEAPONS[id]&&!(typeof ITEM_NAMES!=='undefined'&&ITEM_NAMES[id])){ G.weapons=G.weapons||{sword:true}; G.weapons[id]=true; return; }
   G.abil=G.abil||{}; G.abil[id]=true; if(id==='dbljump'||id==='skimmer'){ G.skills=G.skills||{}; G.skills[id]=Math.max(1,G.skills[id]|0); }
 }
+// the power a dungeon's gift shrine gives (defineDungeon abil, e9a_dungeon.js)
+function chDunGift(id){ try{ const D=typeof DUNGEONS!=='undefined'&&DUNGEONS[id]; return (D&&D.abil)||null; }catch(e){ return null; } }
 function chSafeFx(list){ const out=[]; for(const e of s10Arr(list)){ const f=chSafeFx1(e); if(f!=null) out.push(f); } return out; }
 function chSafeFx1(e){
   if(e==null) return null;
@@ -295,7 +297,7 @@ function chMigStep(R,s){
     for(const p of s.parts||[]){ if(!st[p._id]){ st[p._id]=1; s10Do(chSafeFx(p.then),{R}); } }
     if(s._kind==='deduce'){ const D=S10.deduce[s._args[0]]; if(D){ for(const c of s10Arr(D.needs)) if(!G.case.clues[c]){ G.case.clues[c]=1; G.case.seen[c]=1; } s10Solve(D.id,true); } }
     // its boss beaten, its dungeon done (the world agrees: the boss site closes)
-    for(const x of [s].concat(s.parts||[])){ const A=x._args||[]; if(x._kind==='fight'&&A[0]) G.bossDone[A[0]]=true; if(x._kind==='dungeon'&&A[0]) G.flags['trial_'+A[0]+'_done']=true; }
+    for(const x of [s].concat(s.parts||[])){ const A=x._args||[]; if(x._kind==='fight'&&A[0]) G.bossDone[A[0]]=true; if(x._kind==='dungeon'&&A[0]){ G.flags['trial_'+A[0]+'_done']=true; const gift=chDunGift(A[0]); if(gift) chQuietPower(gift); } }
     st[s._id]=1;
     s10Do(chSafeFx(s.then),{R});
   }finally{ S10.quiet=was; }
@@ -432,10 +434,12 @@ function chScanPow(o,abil,wp,depth){
 }
 function chKitSoFar(){
   const n=actOf(G.stage), K=kitFor(Math.max(1,n)), abil=new Set(n>=2?K.abil:[]), wp=new Set(n>=2?K.weapons:['sword']);
-  const F=G.flags||{}; if(F.trial_leap_done) abil.add('jump'); if(F.trial_tide_done) abil.add('stride'); if(F.trial_sky_done) abil.add('wings');
+  const F=G.flags||{};
+  try{ for(const id in TRIALS){ const T=TRIALS[id]; if(!F['trial_'+id+'_done']) continue; if(T.abil) abil.add(T.abil); if(T.item&&WEAPONS[T.item]) wp.add(T.item); } }catch(e){}
   const cur=stageAt(G.stage);
   try{ for(const id of S10.chOrder){ const c=S10.chapters[id], i=stageAt(id); if(!c||i<0||i>cur) continue; const st=(G.story&&G.story[id])||{};
-    for(const s of c.step||[]){ if(i===cur&&!st[s._id]) continue; chScanPow(s,abil,wp,0); const sc=s.scene&&S10.scenes[s.scene]; if(sc) chScanPow(sc,abil,wp,0); } } }catch(e){}
+    for(const s of c.step||[]){ if(i===cur&&!st[s._id]) continue; chScanPow(s,abil,wp,0); const sc=s.scene&&S10.scenes[s.scene]; if(sc) chScanPow(sc,abil,wp,0);
+      for(const x of [s].concat(s.parts||[])) if(x._kind==='dungeon'&&x._args&&x._args[0]){ const gift=chDunGift(x._args[0]); if(gift) abil.add(gift); } } } }catch(e){}
   return {abil:[...abil].filter(id=>typeof ABIL_INFO==='undefined'||ABIL_INFO[id]||(typeof ABIL_DEFS!=='undefined'&&ABIL_DEFS[id])),weapons:[...wp].filter(id=>WEAPONS[id])};
 }
 function chGivePowers(all){
