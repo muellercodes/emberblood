@@ -22,8 +22,8 @@ people({
           'Hal can walk again. I told him you asked. He went pink.'] },
       // Lantern Day morning
       { if: 'stage<raid',
-        say: ['Morning, Ash. Mind my mint by the well. Every Lantern Day somebody treads on it, and every year it is you.',
-          'Morning! Mind my mint by the well. You always step on it.'],
+        say: ['Morning, Ash! Mind my mint by the well. I want it in mint condition for tonight, and every Lantern Day it gets a tail print in it.',
+          'Morning! Mind my mint. Last year it had your tail print in it.'],
         re: [
           { t: ["I'll jump right over it this year.", "I'll jump over it."], say: ["You'll land in it. Go round.", 'Go round it.'] },
           { t: ['Why plant mint by a well?', 'Why mint by the well?'],
@@ -72,7 +72,7 @@ people({
         ] },
       // later in the act: Gran has gone quiet (before her basket quest starts; the old code offers the quest itself)
       { if: 'stage>=wren !flag act1_done !quest moss started',
-        say: ['Gran used to write every week. Nothing for a month now.', 'Gran has not written for a month.'],
+        say: ['Gran used to write every week, mostly about the frog. Nothing for a month now. Not even the frog.', 'Gran has not written for a month.'],
         re: [
           { t: ['I could go and check on her.', 'I could check on her.'], tone: 'kind', f: 0.5,
             say: ["Would you? Come back tomorrow. I'll have a basket ready, and a strongly worded note.", "Would you? Come back. I'll pack a basket."] },
@@ -110,11 +110,11 @@ people({
         say: ["Yara was up before dawn, writing in that big book of hers. Won't say what.", 'Yara is writing in her big book.'] },
       // Lantern Day morning
       { if: 'stage<raid',
-        say: ["Morning, Ash. The festival pumpkins are nearly ready, and Moo-rgaret has decided they're hers.", 'Morning! My cow thinks the pumpkins are hers.'],
+        say: ["Morning, Ash. The festival pumpkins are nearly ready, and Moo-rgaret has decided they're hers. She's sitting on the biggest one.", 'Morning! My cow is sitting on the big pumpkin.'],
         re: [
           { t: ['I can guard them for you.', 'I can guard them.'],
             say: ["From Moo-rgaret? She's twice your size and nothing scares her. Go and light your lanterns.", 'She is twice your size. Go light your lanterns.'] },
-          { t: ['What are the pumpkins for?', 'What are they for?'], say: ['Pies, by tonight. If the cow allows it.', 'Pies tonight. If the cow allows it.'] },
+          { t: ['What are the pumpkins for?', 'What are they for?'], say: ['Pies, by tonight. If the cow gets up.', 'Pies tonight. If the cow gets up.'] },
         ] },
       // the raid
       { if: 'stage=raid',
@@ -122,7 +122,7 @@ people({
         idle: ["Go! They're getting away with the good ones!", 'Go! They are taking the good ones!'],
         re: [
           { t: ['How many are there?', 'How many?'], say: ['Two. Three. One of them is eating a turnip. Go!', 'Three! One is eating a turnip!'] },
-          { t: ['Get inside, Hal!', 'Get inside!'], say: ["And leave my turnips? I've got a rake. Go on!", 'Leave my turnips? I have a rake!'] },
+          { t: ['Get inside, Hal!', 'Get inside!'], say: ["And leave my turnips? I've got a rake, and I'm not afraid to wave it. Go on!", 'Leave my turnips? I have a rake!'] },
         ] },
       // after the raid: his best line (STORY_PLAN 2.8). The ankle reply only shows once Mabel has told Ash about it.
       { if: 'stage>=lore stage<warcamp',
@@ -151,7 +151,7 @@ people({
         ] },
       // later in the act: letters from Ulf at the Lodge
       { if: 'stage>=warcamp !flag act1_done',
-        say: ['Ulf wrote from the Lodge. Twelve pages on cheddar, and one line at the end: hope the dragon boy is well.',
+        say: ['Ulf wrote from the Lodge. Twelve pages on cheddar, and one line at the end: hope the dragon boy is well. I read that line twice. The cheddar I skimmed.',
           'Ulf wrote twelve pages on cheese. And one line about you.'],
         re: [
           { t: ["Tell him I'm well.", "Tell him I'm well."], say: ["I'll put it on page one. Then twelve pages on my cheddar.", "I'll write it first. Then the cheese."] },
@@ -409,7 +409,7 @@ people({
             say: ['A thousand years on a mountain. The shelf is a start. I have put a cushion up there. He sat on it.', 'A shelf is a start. I gave him a cushion. He sat on it.'] },
         ] },
       { if: 'stage<raid',
-        say: ['Happy Lantern Day, Ash! Two hundred buns in, and the oven is behaving itself. Breathe the other way, please.', 'Happy Lantern Day! Please breathe the other way.'],
+        say: ["Happy Lantern Day, Ash! Two hundred buns before sunrise, and I'm on a roll. Breathe the other way, please.", "Happy Lantern Day! I'm on a roll. Breathe the other way!"],
         re: [
           { t: ["I'll hold my breath all the way.", "I'll hold my breath."], say: ['You will go purple. Purple is fine. Purple does not catch.', 'You will go purple. Purple is fine.'] },
           { t: ['Who are two hundred buns for?', 'Who are they for?'],
@@ -427,11 +427,11 @@ people({
         re: [
           { t: ["I'll have a footprint one.", "I'll have a footprint one."], say: ['Good lad. Take the one with the toes. Those are the best.', 'Take the one with toes. Those are best.'] },
           { t: ['Did they hurt you?', 'Did they hurt you?'], tone: 'kind', f: 0.5,
-            say: ['Only my window, and my pride. The rolling pin is somewhere in the woods with a kobold. I hope it is very happy.', 'Just my window. A kobold has my rolling pin now.'] },
+            say: ['Only my window, and my pride. My rolling pin is off in the woods with a kobold. I hope they are very happy together.', 'Just my window. A kobold has my rolling pin now.'] },
         ] },
       // later in the act, before the bun is baked: Tilly (the bun quest's whole story)
       { if: 'stage>=wren !flag act1_done !quest bun done', ref: 'sleepy_salmon_inn',
-        say: ["Mom says you're off east. If you pass the Sleepy Salmon, don't mention me. Unless Tilly asks.", "If you see Tilly, don't mention me. Unless she asks."],
+        say: ["Your mom says you're off east. If you pass the Sleepy Salmon, don't mention me. Unless Tilly asks.", "If you see Tilly, don't mention me. Unless she asks."],
         re: [
           { t: ['And if she does ask?', 'And if she asks?'], then: ['said bertram_if_tilly_asks'],
             say: ['Then tell her I am well. And thinner. Lie about the thinner.', 'Say I am well. And thinner. That part is a lie.'] },
@@ -454,7 +454,7 @@ people({
           { t: ['Will the bun hold together?', 'Will the bun hold together?'], say: ['It will if you are nowhere near it. I say that with love.', 'If you stay away from it. With love.'] },
         ] },
       { if: 'stage=done',
-        say: ["Lantern Night tonight, and the whole valley's coming. Three hundred buns in, and nobody touches that oven but me.", 'Three hundred buns for tonight. Nobody touches the oven!'],
+        say: ["Lantern Night, and the whole valley's coming. Three hundred buns, and every one of them rose to the occasion. Nobody touches that oven but me.", 'Three hundred buns for tonight. Nobody touches the oven!'],
         re: [
           { t: ['Not even me?', 'Not even me?'], say: ['You may light it. Gently. One breath. I will stand over here, by the door.', 'You can light it. Gently. I will stand by the door.'] },
           { t: ['Who eats three hundred buns?', 'Who eats them all?'], say: ['Everybody is coming. Gorran down from the mine, Granny Moss out of the bog. Gorran alone is fifty.', 'Everyone! Gorran alone eats fifty.'] },
@@ -466,8 +466,8 @@ people({
         say: ['Every week. Short letters. Hers are mostly about my nutmeg, and mine are mostly about hers.', 'Every week. We still argue about nutmeg.'] },
       { ask: ['What was Grandma Crumb like?', 'What was Grandma Crumb like?'],
         say: ["She said bread is patience you can eat. I've been impatient my whole life. My bread is very fast.", 'She said bread is patience. I am not patient.'] },
-      { idle: [['Mind the tray, it is hot.', 'The tray is hot.'], ["Something else? The dough won't wait.", "The dough won't wait."]] },
-      { bye: [['Off you go. Breathe the other way on your way out.', 'Breathe the other way!']] },
+      { idle: [['Mind the tray, it is hot.', 'The tray is hot.'], ["Knead anything else? The dough won't wait.", 'Knead anything else?']] },
+      { bye: [["Off you go, and don't loaf about. Breathe the other way on your way out.", "Don't loaf about! Breathe the other way!"]] },
     ],
 
     // ---------------------------------------------------------------- Fennick Wick, the lamp man (Wick's Lamps & Oils) (J9)
@@ -478,7 +478,7 @@ people({
       { if: 'stage<raid',
         say: ['Ash! Big day. Lots of lamps. I have been up since very early with the lamps. Just the lamps. Happy Lantern Day.', 'Big day! Lots of lamps. Just the lamps.'],
         re: [
-          { t: ['You look tired, Fennick.', 'You look tired.'], say: ['Me? No. Yes. A bit. Lamps, you know. So many lamps.', 'Me? A bit. So many lamps.'] },
+          { t: ['You look tired, Fennick.', 'You look tired.'], say: ["Me? No. Yes. A bit. I've been burning the candle at both ends. And the middle. So many lamps.", 'Me? A bit. So many lamps.'] },
           { t: ['Can I help light some?', 'Can I help light some?'], say: ['No! I mean, no thank you. Gently is my whole job. You are very... fiery.', 'No thank you! You are very fiery.'] },
         ] },
       { if: 'stage=raid',
@@ -491,7 +491,7 @@ people({
         ] },
       // after the raid, before the mystery is solved
       { if: 'stage>=lore !flag a1_gate_solved',
-        say: ["Ash! Need a lamp? Wicks? I've got wicks. I'm fine, by the way. Everything is fine.", 'Need a lamp? Wicks? I am fine. All fine.'],
+        say: ["Ash! Need a lamp? Wicks? I've got wicks. I'm fine, by the way. Everything is fine. Fine as a wick. Is that a saying?", 'Need a lamp? Wicks? I am fine. All fine.'],
         re: [
           { t: ['Have you got any lamp oil?', 'Got any lamp oil?'], say: ['Oil. Ha. Not today. Not this week, really. Wicks, though!', 'Oil? Not today. Wicks, though!'] },
           { t: ["Why wouldn't you be fine?", "Why wouldn't you be fine?"], say: ['No reason! None at all. Would you like a wick?', 'No reason! Would you like a wick?'] },
@@ -618,7 +618,7 @@ people({
       { if: 'said dell_sandwich !flag act1_done', once: true,
         say: ["Dell wrote to say you told him fish dream about my sandwiches. I've started eating indoors.", 'Dell says fish dream of my sandwiches. I eat indoors now.'] },
       { if: 'stage<raid',
-        say: ["I'm on the green all day, Ash. The Lantern Waltz goes on at sunset, and it's the best thing I've ever written.", 'I play all day. My Lantern Waltz is at sunset.'],
+        say: ["I'm on the green all day, Ash. The Lantern Waltz goes on at sunset. It's the best thing I've ever written, and I've been composing myself since breakfast.", 'I play all day. My Lantern Waltz is at sunset.'],
         re: [
           { t: ['Will you play it twice?', 'Will you play it twice?'], say: ['If they clap. Hal always claps first, and then everyone feels they have to.', 'If they clap. Hal always claps first.'] },
           { t: ['Is there a song about me yet?', 'Is there a song about me?'], say: ['Nearly. "Ash" rhymes with "crash" and "splash", and I am not happy with either.', 'Nearly. Ash rhymes with crash. Not good.'] },
@@ -649,7 +649,7 @@ people({
         say: ['We played all three, and Nana knitted through the whole waltz and dropped a stitch at the good part. Best review I ever had.', 'Nana dropped a stitch at the best part. Great review!'],
         re: [
           { t: ['Which part is the good part?', 'Which part is the good part?'], say: ["The middle. The bit I'd forgotten. You gave it back.", 'The middle. You gave it back to me.'] },
-          { t: ['Can we play again sometime?', 'Can we play again?'], say: ['Any time. Bring your ears. You have very good ears.', 'Any time. You have good ears.'] },
+          { t: ['Can we play again sometime?', 'Can we play again?'], say: ["Any time, no strings attached. Well, four strings, but they're mine.", 'Any time! No strings attached.'] },
         ] },
       { if: 'stage=done',
         say: ["I finished the song about you. Ash rhymes with flash now, and dash. Don't ask about the last verse.", 'I finished your song. Ash rhymes with flash now.'],
@@ -661,8 +661,8 @@ people({
         say: ['He is, and he thinks fish are friendly. One jumped out of the lake and took my sandwich. Friendly!', 'Yes. A fish once stole my sandwich. Friendly!'] },
       { ask: ["Who's the best musician in the valley?", 'Who plays best in the valley?'],
         say: ["Tamsin at the Smoky Kettle. She can make a lute cry. Mine sounds like a cat that's been told no.", 'Tamsin at the Smoky Kettle. Her lute can cry.'] },
-      { idle: [["Hum something. I'll find the chord.", 'Hum something.'], ["Go on, I'm only tuning.", "I'm only tuning."]] },
-      { bye: [['Off you go. I will play you out.', 'I will play you out.']] },
+      { idle: [["Hum something. I'll find the chord.", 'Hum something.'], ["Go on, I'm only tuning. Nana says I'm always fiddling about.", "I'm only tuning."]] },
+      { bye: [['Off you go. I will play you out. Something upbeat, for the road.', 'I will play you out.']] },
     ],
 
     // ---------------------------------------------------------------- Nana Pettibone, knitter (Pettibone Cottage) (J9)
@@ -709,7 +709,7 @@ people({
         say: ["My Osric hasn't written since spring. Too busy being Captain of the Watch, he says. Too busy losing my letters, I say.", 'Osric has not written since spring.'],
         re: [
           { t: ["I'll tell him to write to you.", "I'll tell him to write."], tone: 'kind', f: 0.5, then: ['said nana_osric_write'],
-            say: ['Tell him his mother says so. He will go pink. He always goes pink.', 'Say his mother says so. He will go pink.'] },
+            say: ['Tell him his mother says so. He will write that same day. Then he will lose it.', 'Say his mother says so. He will write.'] },
           { t: ['Maybe his dogs ate the letters.', 'Maybe his dogs ate them.'], say: ['His dogs have four teeth between them, dear. They could not eat a letter if they tried.', 'His dogs have four teeth between them.'] },
         ] },
       { if: 'stage=done',
@@ -722,7 +722,7 @@ people({
         say: ['Captain of the Watch, forty years. He used to say a warm person is a brave person. So I knit.', 'Yes. He said warm people are brave. So I knit.'] },
       { ask: ['Did you teach Marigold to knit?', 'Did you teach Marigold?'], if: 'stage>=wren',
         say: ['When she was smaller than you. Now she makes hats with feathers on. I am proud of her, and a little suspicious of the feathers.', 'Yes. Now she makes feather hats. I am suspicious.'] },
-      { idle: [['Sit a minute, dear. My knees want the company.', 'Sit a minute, dear.'], ["I'm only counting stitches. Go on.", 'I am counting stitches. Go on.']] },
+      { idle: [['Sit a minute, dear. My knees want the company.', 'Sit a minute, dear.'], ["I'm only counting stitches. Go on, dear, spin me a yarn.", 'Go on, dear. Tell me something.']] },
       { bye: [['Off you go. Keep your neck warm.', 'Keep your neck warm.']] },
     ],
   },
@@ -824,7 +824,7 @@ people({
       { if: '!quest bun started', once: true,
         say: ["Maren's boy! I'd know those horns anywhere. Is my brother still baking? Don't tell him I asked.", "Maren's boy! Is my brother still baking?"],
         re: [
-          { t: ['Two hundred buns a day.', 'Two hundred buns a day.'], say: ['Two hundred. He always did show off. Sit down, you look hungry.', 'He always showed off. Sit, you look hungry.'] },
+          { t: ['Two hundred buns a day.', 'Two hundred buns a day.'], say: ["Two hundred. He always did show off. I suppose he's still making bread jokes. Sit down, you look hungry.", 'He always showed off. Sit, you look hungry.'] },
           { t: ['Why not ask him yourself?', 'Why not ask him?'], say: ['Because then he would know I asked. Soup?', 'Then he would know I asked. Soup?'] },
         ] },
       { if: 'stage>=wren stage<three',
@@ -919,7 +919,7 @@ people({
         say: ['Eleven. I wear them all at once in winter. I am very warm and I cannot bend my arms.', 'Eleven. I wear them all in winter.'] },
       { ask: ['What are your dogs called?', 'What are your dogs called?'],
         say: ['Pepper and Old Tom. Old Tom was the captain before me. Do not laugh. He was very good at it.', 'Pepper and Old Tom. Old Tom was captain first.'] },
-      { idle: [['The Watch is listening. All of it. That is me.', 'The Watch is listening.'], ['Something to report?', 'Something to report?']] },
+      { idle: [['The Watch is listening. All of it. That is me.', 'The Watch is listening.'], ["Something to report? I'll write it down. Then I'll lose it.", 'Something to report?']] },
       { bye: [['Stay out of trouble. Or at least come and tell me about it.', 'Stay out of trouble.']] },
     ],
 
@@ -927,13 +927,13 @@ people({
     // A patter merchant: cheerful, quick, always selling. Was a pirate once, on a very small lake.
     pell: [
       { if: '!quest thief started', once: true,
-        say: ["Emberhollow's own fire-breather! You singed one of my hats two summers back. Never mind. Have a look round.", 'You burned my hat once! Never mind. Look around.'],
+        say: ["Emberhollow's own fire-breather! You singed one of my hats two summers back. Never mind. Hats off to you. Have a look round.", 'You burned my hat once! Never mind. Look around.'],
         re: [
           { t: ['Sorry about your hat.', 'Sorry about your hat.'], say: ["Don't be. I sold it as smoked. Twice the price.", 'I sold it as smoked. Twice the price!'] },
           { t: ["What's the most expensive thing here?", 'What costs the most?'], say: ['This bottle. I do not know what is in it. That is what makes it expensive.', 'This bottle. I do not know what is in it.'] },
         ] },
       { if: 'stage>=wren stage<three',
-        say: ['Business is terrible. Nobody buys hats with a cult on the road. They buy potions. I have potions.', 'Nobody buys hats now. They buy potions.'],
+        say: ['Business is terrible. Nobody buys hats with a cult on the road. Potions, though. Potions are selling like hot buns.', 'Nobody buys hats now. They buy potions.'],
         re: [
           { t: ['What kind of potions?', 'What kind of potions?'], say: ['Red ones heal. The green one is for an itch. Do not mix them up. One fellow did.', 'Red heals. Green is for itches. Do not mix them up.'] },
           { t: ["I'll buy a hat anyway.", "I'll buy a hat anyway."], say: ['A hero who buys hats in a crisis. You will go far, Ash.', 'A hat in a crisis! You will go far.'] },
@@ -954,10 +954,10 @@ people({
           { t: ['Only if the bean can dance.', 'Only if it dances.'], tone: 'silly', f: 0.5, say: ['It can! Watch. ...It is a normal bean. Forget I said anything.', 'It can! Watch. ...It is a normal bean.'] },
         ] },
       { ask: ['Were you really a pirate?', 'Were you a pirate?'],
-        say: ['On a lake. A very small lake, and a very small boat. I retired when the ducks got organised.', 'On a small lake. The ducks made me stop.'] },
+        say: ['On a lake. A very small lake, and a very small boat. I was the terror of the shallow end, until the ducks got organised.', 'On a small lake. The ducks made me stop.'] },
       { ask: ['What does Hob pay you with?', 'How does Hob pay you?'],
         say: ['Soup. I have a cellar full of soup. Would you like some soup? It is very smoky soup.', 'Soup. I have a cellar full of soup.'] },
-      { idle: [['Browsing? Browsing is free. Mostly.', 'Browsing is free.'], ['Everything on the wagon is wonderful. Some of it is safe.', 'Everything is wonderful.']] },
+      { idle: [['Browsing? Browsing is free. Mostly.', 'Browsing is free.'], ["Have a look. Everything here is a steal, and I didn't steal any of it.", 'Have a look!']] },
       { bye: [['Come again! Bring coins. Or soup.', 'Come again! Bring coins.']] },
     ],
 
@@ -1081,7 +1081,7 @@ people({
         say: ["He sends me rocks. I send him star charts. He says stars are just rocks with lights. He isn't wrong. Don't tell him.", 'Rocks and stars. He says stars are rocks with lights.'] },
       { ask: ['What did you want to be, as a girl?', 'What did you want to be?'],
         say: ['Somebody who goes to the stars. Nobody knew what I meant. I am still working on how.', 'Someone who goes to the stars. I am still working on it.'] },
-      { idle: [['Mm? Sorry. I was counting something.', 'Sorry. I was counting.'], ['Ask. The stars will wait. They are good at it.', 'Ask. The stars can wait.']] },
+      { idle: [['Mm? I was measuring the sky. It is still there.', 'I was looking at the sky.'], ['Ask. The stars will wait. They are good at it.', 'Ask. The stars can wait.']] },
       { bye: [['Clear skies, Ash.', 'Clear skies!']] },
     ],
 
@@ -1090,7 +1090,7 @@ people({
     // his quest 'pie'.)
     mayor: [
       { if: '!quest pie started', once: true,
-        say: ["Young Ash of Emberhollow! Maren's boy! Your mother mended our town bell, you know. Splendid woman. Splendid bell.", 'Ash of Emberhollow! Your mom fixed our bell!'],
+        say: ["Young Ash of Emberhollow! Maren's boy! Your mother mended our town bell, you know. Splendid woman. Splendid bell. It has a certain ring to it.", 'Ash of Emberhollow! Your mom fixed our bell!'],
         re: [
           { t: ['Does it ring well now?', 'Does it ring well?'], say: ['It rings at noon, and at every ribbon. There are a great many ribbons.', 'At noon, and at every ribbon. Many ribbons.'] },
           { t: ['What do you ring it for?', 'What is the bell for?'], say: ['Ceremonies. And fires. Mostly ceremonies. I like a ceremony.', 'Ceremonies. And fires. Mostly ceremonies.'] },
@@ -1099,7 +1099,7 @@ people({
         say: ['The ribbon on the new bridge must wait. One does not cut ribbons with a cult on the road. It is not the done thing.', 'The bridge ribbon must wait. There is a cult about.'],
         re: [
           { t: ['When will you cut it?', 'When will you cut it?'], say: ['When you have dealt with them. No pressure. A little pressure.', 'When you beat them. No pressure. A little.'] },
-          { t: ['Can I cut it, with my sword?', 'Can I cut it with my sword?'], say: ['With a sword! Oh, that would make a splendid picture. I shall think about it.', 'With a sword! A splendid picture. Maybe.'] },
+          { t: ['Can I cut it, with my sword?', 'Can I cut it with my sword?'], say: ['With a sword! Oh, that would make a splendid picture. Very cutting-edge. I shall think about it.', 'With a sword! A splendid picture. Maybe.'] },
         ] },
       { if: 'quest pie done !flag act1_done',
         say: ['About the pie. We shall not speak of it. I have had a word with my nightcap.', 'About the pie. We will not speak of it.'],
@@ -1109,10 +1109,10 @@ people({
         ] },
       // his old chat, as a moment
       { if: 'stage>=oath !flag act1_done',
-        say: ['Ash. Between the two of us. What do you think of the moustache?', 'Be honest. What do you think of my moustache?'],
+        say: ['Ash. I moustache you a question. Between the two of us, what do you think of it?', 'I moustache you a question. Do you like it?'],
         re: [
           { t: ['The finest in the valley.', 'The finest in the valley.'], tone: 'kind', f: 1, say: ['It is! It has won awards. I gave them to it, but they count.', 'It is! It won awards. I gave them.'] },
-          { t: ["It's bigger than your face.", 'It is bigger than your face.'], f: 0.5, say: ['That is rather the point. Thank you for noticing.', 'That is the point. Thank you.'] },
+          { t: ["It's a cut above the rest.", 'A cut above the rest!'], f: 0.5, say: ['A cut above! Ha! Not too much of a cut, I hope. It is very sensitive.', 'A cut above! Ha! Thank you.'] },
           { t: ['Does it have a name?', 'Does it have a name?'], tone: 'silly', f: 0.75, say: ['Bartholomew. Bartholomew says good afternoon.', 'Bartholomew. He says good afternoon.'] },
         ] },
       { if: 'stage=done',
@@ -1156,7 +1156,7 @@ people({
         say: ["Tilly says I'm in charge of the inn on Lantern Night. I've made a sign. It says NO.", 'I run the inn tonight. My sign says NO.'],
         re: [
           { t: ['No to what?', 'No to what?'], say: ['Everything. It saves time.', 'Everything. It is quicker.'] },
-          { t: ['Tilly trusts you a lot.', 'Tilly trusts you.'], tone: 'kind', f: 0.5, say: ['She does. Do not tell anybody. She pretends she is grumpy.', 'She does. She pretends to be grumpy.'] },
+          { t: ['Tilly trusts you a lot.', 'Tilly trusts you.'], tone: 'kind', f: 0.5, say: ['She does. She left me the good ladle. Nobody gets the good ladle.', 'She does. She gave me the good ladle.'] },
         ] },
       { ask: ['Where do you sleep, Nib?', 'Where do you sleep?'],
         say: ['At the inn, when Tilly lets me. She always lets me. Do not tell anybody. She pretends she is grumpy.', 'At the inn. Tilly always lets me.'] },
@@ -1233,7 +1233,7 @@ people({
       { if: 'true', once: true,
         say: ["So you're Maren's boy. Gorran talks about your mom like she hung the moon. Sit down. You look like you need soup.", "Maren's boy! Sit down. Have some soup."],
         re: [
-          { t: ['Is it the soup with rocks in?', 'Is it the rock soup?'], say: ['It is the only soup I make. The rocks are for flavour.', 'It is my only soup. The rocks add flavour.'] },
+          { t: ['Is it the soup with rocks in?', 'Is it the rock soup?'], say: ["It's the only soup I make. Rock solid, every bowl.", 'My only soup. Rock solid!'] },
           { t: ["I'm not really that hungry.", "I'm not that hungry."], say: ['Everybody is that hungry. Sit.', 'Everyone is that hungry. Sit.'] },
         ] },
       { if: '!quest mine done !flag act1_done',
@@ -1245,7 +1245,7 @@ people({
       { if: 'quest mine done !flag act1_done',
         say: ["The lads are back in the tunnels. I've made a celebration soup. Same as the other soup. Bigger rocks.", 'The miners are back! Celebration soup. Bigger rocks.'],
         re: [
-          { t: ['How big are the rocks?', 'How big are the rocks?'], say: ['Fist-sized. You do not eat those ones. You admire them.', 'Fist-sized. You just admire those.'] },
+          { t: ['How big are the rocks?', 'How big are the rocks?'], say: ["Fist-sized. You don't eat those ones. You admire them. Gives it a bolder flavour.", 'Fist-sized. You just admire those.'] },
           { t: ['Can Pip have a rock?', 'Can Pip have a rock?'], if: 'flag pip', say: ['Pip has had three. I do not know where he puts them.', 'He has had three already.'] },
         ] },
       // her old chat, as a moment: the first bowl
@@ -1260,7 +1260,7 @@ people({
         say: ['My gran made it in the long winter, when there was nothing else to put in the pot. She put a rock in so the pot did not look empty.', 'My gran made it in a hard winter. The rock filled the pot.'] },
       { ask: ['What does Tilly say about your soup?', 'What does Tilly say?'],
         say: ['That it is a crime. Tilly Crumb has never been hungry in a mine.', 'That it is a crime. She was never hungry in a mine.'] },
-      { idle: [['More soup? There is always more soup.', 'More soup?'], ['Go on, I am stirring.', 'Go on, I am stirring.']] },
+      { idle: [['More soup? Rock-bottom price. Free.', 'More soup? It is free!'], ['Go on, I am stirring.', 'Go on, I am stirring.']] },
       { bye: [['Off you go. Take a rock for the road.', 'Take a rock for the road.']] },
     ],
 
@@ -1388,7 +1388,7 @@ people({
         say: ['Because the mountains are big. Talk quietly up here and the snow takes your words away.', 'The mountains are big. Quiet words get lost.'] },
       { ask: ["What's wrong with goats?", 'What is wrong with goats?'],
         say: ['Goats eat your boots. Sheep never ate a boot in their lives. Their lives are boot-free.', 'Goats eat boots. Sheep never do.'] },
-      { idle: [['Speak up! The snow is listening.', 'Speak up!'], ['Ha. What else?', 'What else?']] },
+      { idle: [['Speak up! The snow is listening.', 'Speak up!'], ['Ha! What else? Louder. The mountains can\'t hear you.', 'What else? Louder!']] },
       { bye: [['Go well! Wear a scarf!', 'Wear a scarf!']] },
     ],
 
@@ -1440,7 +1440,7 @@ people({
     // given up adventure for being warm.
     brisket: [
       { if: 'true', once: true,
-        say: ["Thanks again for the thaw. I've decided to retire from adventuring and take up being warm.", 'Thanks for the thaw. I am retired now. I am warm.'],
+        say: ["Ice to meet you, properly this time. Thanks for the thaw. I've retired from adventuring to take up being warm.", 'Ice to meet you! Thanks for the thaw. I am retired now.'],
         re: [
           { t: ['How long were you frozen?', 'How long were you frozen?'], say: ['Long enough that my boots went out of fashion. Ulf says forty years. Ulf exaggerates.', 'My boots went out of fashion. Ulf says forty years.'] },
           { t: ['What were you looking for up there?', 'What were you looking for?'], say: ['Treasure. I found ice. A great deal of ice.', 'Treasure. I found ice.'] },
@@ -1459,8 +1459,8 @@ people({
         say: ['Loud. Hungry. Cold all the time. Now I am Brisket the Warm. It is a better title.', 'Loud and cold. Now I am Brisket the Warm.'] },
       { ask: ['Does Ulf ask you about sheep?', 'Does Ulf ask about sheep?'],
         say: ['Every morning. He wants to know if I am a sheep person. I am a warm person. That is all I want to be.', 'Every day. I am not a sheep person. I am warm.'] },
-      { idle: [['Mm? Sit by the fire with me.', 'Sit by the fire.'], ['Still warm. Still here.', 'Still warm.']] },
-      { bye: [['Go carefully. Wear two hats.', 'Wear two hats.']] },
+      { idle: [['Mm? Sit by the fire with me. My toes are still defrosting.', 'Sit by the fire.'], ['Still warm. Still here. Snow complaints.', 'Still warm. No complaints.']] },
+      { bye: [['Go carefully. Wear two hats. Stay cool. No! Stay warm.', 'Wear two hats! Stay warm.']] },
     ],
 
     // ---------------------------------------------------------------- Hob Vane, the Smoky Kettle on the Ashen Road
@@ -1520,7 +1520,7 @@ people({
     // Her song about Ash grows as he does things (the "Sing me your song" row, tamsinSong in a9d_quests.js).
     tamsin: [
       { if: 'true', once: true,
-        say: ["The dragon boy of Emberhollow! I've been singing about you all week and I've never seen you up close. Turn round. I need to know how long the tail is.", 'The dragon boy! Turn around. How long is your tail?'],
+        say: ["The dragon boy of Emberhollow! I've been singing about you all week and I've never seen you up close. Turn round. Every good tale needs a good tail.", 'The dragon boy! Turn around. Let me see your tail.'],
         re: [
           { t: ["It's longer when I'm happy.", "It's longer when I'm happy."], say: ['That is going in verse two. Thank you. Hold still.', 'That goes in verse two!'] },
           { t: ['What have you been singing?', 'What have you been singing?'], say: ['Lantern Day, the lantern-lighter, and a bit I made up. Every song needs a bit you made up.', 'Lantern Day, you, and a made-up bit.'] },
@@ -1560,7 +1560,7 @@ people({
         say: ['I was a very bad knight. I kept stopping fights to write songs about them.', 'I was a bad knight. I stopped fights to write songs.'] },
       { ask: ["What do you think of Wendel's songs?", "What about Wendel's songs?"],
         say: ['A good fiddler and a terrible poet. "Ash" and "crash". Twice. Amateur. I love him.', 'Good fiddler. Bad poet. I love him.'] },
-      { idle: [['Hm? I was rhyming. Go on.', 'I was rhyming. Go on.'], ['Speak, and I will make it scan.', 'Speak. I will make it rhyme.']] },
+      { idle: [['Hm? I was rhyming. Verse things first. Go on.', 'I was rhyming. Go on.'], ['Speak, and I will make it scan.', 'Speak. I will make it rhyme.']] },
       { bye: [['Off you go and do something I can rhyme.', 'Go do something I can rhyme.']] },
     ],
 
