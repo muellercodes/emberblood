@@ -333,7 +333,7 @@ const SHOPTALK={
   pell:()=>runShop('pell','Pell’s Wonderful Wagon! Everything is wonderful and some of it is safe.',[
     ['Refill your healing draughts',10,()=>{ player.potions=player.potionsMax; setBanner('Draughts refilled','',1.4); },()=>player.potions<player.potionsMax||'Your flasks are already full.'],
     ['A Pip treat (Pip breathes fire faster)',35,()=>{ G.pipTreats=(G.pipTreats||0)+1; setBanner('Pip treat','Mip! Mip! MIP!',1.6); },()=>G.flags.pip?((G.pipTreats||0)<3||'Pip is too full. Mip.'):'You don’t have a dragon to feed. Yet.'],
-    ['A cave lantern (see farther underground)',50,()=>{ G.items.lantern=1; setBanner('Cave lantern','Caves will be a lot less scary.',1.8); },()=>!G.items.lantern||'You already have one.'],
+    ['A cave lantern (see farther underground)',50,()=>{ G.items.lantern=1; setBanner('Cave lantern','Caves just got a lot less scary. The bats are furious.',1.8); },()=>!G.items.lantern||'You already have one.'],
     ['A fishing rod',25,()=>{ G.items.rod=1; setBanner('Fishing rod','Look for ripples by the water.',1.8); },()=>!G.items.rod||'You already have a rod.'],
     ['An Ember Charm (a blessing)',120,()=>{ G.stats.charms=(G.stats.charms||0)+1; G.pendingBless++; later(0.6,offerPending); },()=>(G.stats.charms||0)<3||'Sold out of charms. Come back never.'],
     ['A Pike (a very long, very pointy spear)',120,()=>{ runDialogue([['pell',`One Pike! Pointy end toward the monster. I can't stress that enough. Pointy end. Toward. The monster.`],['pell',`It keeps big things far away from your face. That's my favourite distance for big things.`]],()=>{ scene='play'; giveWeapon('spear'); saveGame(); }); },()=>!(G.weapons&&G.weapons.spear)||'You already have a Pike. One pointy stick per dragon.']

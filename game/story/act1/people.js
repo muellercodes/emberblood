@@ -224,7 +224,7 @@ people({
         say: ["A raid and a Ward in one day. Bed, Ash. Your bed's made, and that kobold camp will still be there in the morning.",
           'Bed, Ash. Your bed is made. The camp can wait.'],
         re: [
-          { t: ["I'm not even tired.", "I'm not tired."], say: ["You're swaying. Bed.", 'You are swaying. Bed.'] },
+          { t: ["I'm wide awake. All fired up.", "I'm all fired up!"], say: ["That is the worst joke you've made all week, and you're swaying. Bed.", 'That joke was terrible. You are swaying. Bed.'] },
           { t: ['Can I go tonight instead?', 'Can I go tonight?'], say: ['In the dark, to a camp full of kobolds? Bed first. Kobolds after breakfast.', 'In the dark? No. Bed first.'] },
         ] },
       // a moment (her old chat): once he is really leaving home
