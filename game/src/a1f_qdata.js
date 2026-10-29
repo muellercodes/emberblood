@@ -3,7 +3,7 @@
 const ITEM_NAMES={letter_b:'Bertram’s letter',recipe:'Tilly’s half of the recipe',frostberry:'Frostberry',basket:'Mabel’s basket',moonlily:'Moonlily',letter_moss:'Granny Moss’s letter',oath_letter:'Crumpled Oath letter',oath_badge:'Brass scale badge',tunnel_key:'Oath tunnel key',oath_plans:'The Oath’s plans',lucky_pick:'Gorran’s lucky pick',star_iron:'Star-iron',horn:'Ulf’s horn',fish:'Fish',rod:'Fishing rod',lucky_lure:'Dell’s lucky lure',kettle:'Hob’s kettle',honey:'Honey',juniper_map:'Juniper’s map',carrot:'Carrot of Destiny',map_x1:'Nib’s treasure map',map_x2:'Smudged treasure map',map_x3:'Juniper’s secret map',lantern:'Cave lantern',treat:'Pip treat',relic:'Warden’s Mantle',errand:'Parcel'};
 const QDEFS={
   // offered from Lantern Day morning (it is the festival's own bun); before the raid Bertram says there is no rush
-  bun:{title:'The Lantern Bun',giver:'bertram',min:'lanterns',give:{letter_b:1},
+  bun:{title:S('Half-Baked','The Lantern Bun'),giver:'bertram',min:'lanterns',give:{letter_b:1},
     get offer(){ const L=[['bertram',`Ash. I need your help, and it pains me to say it.`],['bertram',S(`For Lantern Day I wanted to bake Grandma Crumb's Lantern Bun. The recipe is torn in two. Half here, half with my sister Tilly at the Sleepy Salmon Inn in Brindlecross.`,`I want to bake Grandma's Lantern Bun. Half the recipe is with my sister Tilly, in Brindlecross.`)],['ash',`Why is it torn in two?`],['bertram',`We had an argument. About the bun. Nine years ago. Take her this letter. It says sorry. It took me nine years to write. It's very short.`]];
       if(G&&G.mode==='story'&&!reached('raid')) L.push(['bertram',S(`No rush. Light your lanterns first. Buns are patient. Bakers are not.`,`No rush. Light your lanterns first.`)]);
       return L; },
@@ -46,13 +46,13 @@ const QDEFS={
       {t:'talk',npc:'hollis',text:'Talk to Farmer Hollis',lines:[['hollis',`Duchess! You terrible, wonderful goat. Thank you, Ash. My grandfather swore by this charm.`],['goat',`Meh.`],['ash',`Rude.`],['hollis',`Do me a favor? Tell my brother Ulf at the Frostpine Lodge that Duchess came home safe. Goats: one. Sheep: zero.`]],reward:{bless:1}},
       {t:'talk',npc:'ulf',text:'Tell Ulf at Frostpine Lodge that Duchess came home',lines:[['ulf',`She came home? With help from a dragon? Hmph. Tell my brother a sheep would never have wandered off. Sheep don't have ambitions.`]],reward:{coins:20,xp:40}}
     ]},
-  horn:{title:'Ulf’s Horn',giver:'ulf',min:'wren',
+  horn:{title:S('Blow Your Own Horn','Ulf’s Horn'),giver:'ulf',min:'wren',
     offer:[['ulf',`My grandfather's hunting horn. I dropped it running out of Icefang Cavern when the ice wolves came.`],['ulf',`The cave's south of here, past the frozen trees. It's deep in there. Wear a scarf.`]],
     steps:[
       {t:'item',item:'horn',n:1,text:'Find Ulf’s horn deep in Icefang Cavern',at:'cave:icefang'},
       {t:'talk',npc:'ulf',text:'Bring the horn back to Ulf',take:{horn:1},lines:[['ulf',`That's it! Listen to this.`],['narr',`Ulf blows the horn. Somewhere far away, a goat answers. Ulf looks betrayed.`],['ulf',`Here. My grandfather's scarf. Warmest thing in the valley. You'll run all day in it.`]],reward:{stamina:20,coins:30}}
     ]},
-  mine:{title:'The Coppergulch Mine',giver:'gorran',min:'three',
+  mine:{title:S('Mine, All Mine','The Coppergulch Mine'),giver:'gorran',min:'three',
     offer:[['gorran',`The drakelings took the mine. There's a whole vein of star-iron down there and not one of us willing to get our eyebrows burned off.`],['gorran',`Clear 'em out and bring me my lucky pick. I left it at the bottom. Leave my eyebrows out of it.`]],
     steps:[
       {t:'item',item:'lucky_pick',n:1,text:'Clear Coppergulch Mine and find Gorran’s lucky pick',at:'cave:mine'},
@@ -83,7 +83,7 @@ const QDEFS={
       {t:'camps',n:6,text:'Clear 6 more enemy camps'},
       {t:'talk',npc:'osric',text:'Collect the big bounty from Captain Osric',lines:[['osric',`Six! The Watch salutes you. That's me. I'm saluting. Here's your reward.`]],reward:{coins:90,bless:1}}
     ]},
-  kettle:{title:'Hob’s Kettle',giver:'hob',min:'wren',
+  kettle:{title:S('In Hot Water','Hob’s Kettle'),giver:'hob',min:'wren',
     offer:[['hob',`The Oath stole my kettle! The Smoky Kettle without a kettle is just "the Smoky." It whistles. You'll hear it.`],['hob',`Their camp's east of here, out toward the old road.`]],
     steps:[
       {t:'item',item:'kettle',n:1,text:'Get Hob’s kettle back from the Oath camp east of the Smoky Kettle',at:'lm:kettle'},

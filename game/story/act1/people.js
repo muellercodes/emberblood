@@ -1009,7 +1009,7 @@ people({
         say: ["Maren's boy! Stand still. Hm. Your head's gone up a whole hat size since spring. It's the horns.", "Maren's boy! Your head grew a hat size!"],
         re: [
           { t: ['Can you make hats with horn holes?', 'Hats with horn holes?'], say: ['Can I? I have been waiting years for somebody to ask.', 'I have waited years for someone to ask!'] },
-          { t: ['Is that bad for a hat?', 'Is that bad?'], say: ['For a hat maker? It is wonderful. Sit down. I need my tape.', 'It is wonderful. Sit. I need my tape.'] },
+          { t: ['So I have a head start?', 'A head start?'], say: ['A head start! For a hat maker, it is wonderful news. Sit down. I need my tape.', 'Wonderful news! Sit. I need my tape.'] },
         ] },
       { if: 'stage>=wren stage<three',
         say: ['Every traveller this week wants a hood. Hoods! Because of the Oath. Nobody wants to look nice for a cult.', 'Everyone wants hoods now. Because of the Oath.'],
@@ -1443,7 +1443,7 @@ people({
         say: ["Ice to meet you, properly this time. Thanks for the thaw. I've retired from adventuring to take up being warm.", 'Ice to meet you! Thanks for the thaw. I am retired now.'],
         re: [
           { t: ['How long were you frozen?', 'How long were you frozen?'], say: ['Long enough that my boots went out of fashion. Ulf says forty years. Ulf exaggerates.', 'My boots went out of fashion. Ulf says forty years.'] },
-          { t: ['What were you looking for up there?', 'What were you looking for?'], say: ['Treasure. I found ice. A great deal of ice.', 'Treasure. I found ice.'] },
+          { t: ['You were really chilling up there.', 'You were chilling!'], say: ['Ha! Chilling! Oh, I like you. I went up for treasure. I found ice. A great deal of ice.', 'Ha! I like you. I found ice, not treasure.'] },
         ] },
       { if: '!flag act1_done',
         say: ["I was frozen solid a long while. You'd think I'd come out wiser. I just know more about ice.", 'I was frozen a long time. I just know about ice now.'],
