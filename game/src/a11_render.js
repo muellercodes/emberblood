@@ -31,7 +31,7 @@ function render(){
       if(ch){ ctx.drawImage(ch.cv,cx*CH,cy*CH,CH+0.5,CH+0.5); if(ch.glow) glows.push([cx,cy,ch.glow]); }
       else{ ctx.fillStyle=chunkPlaceholder(cx,cy); ctx.fillRect(cx*CH,cy*CH,CH+0.5,CH+0.5); }
     }
-    if(budget>0&&scene!=='menu'){ const ax=player.x+Math.cos(player.facing)*700, ay=player.y+Math.sin(player.facing)*700; getChunk(Math.floor(ax/CH),Math.floor(ay/CH),true); }
+    chunkPlan();   // (v12 GROUND) chunks ahead of Ash are built in small slices a frame (a4_ground.js), never a whole one in one frame
     if(glows.length){ ctx.save(); ctx.globalCompositeOperation='lighter'; for(const [cx,cy,gl] of glows){ ctx.globalAlpha=LOOK.sb?0.16+0.07*Math.sin(t*1.7):0.3+0.18*Math.sin(t*1.7+cx*1.3+cy); ctx.drawImage(gl,cx*CH,cy*CH,CH,CH); } ctx.restore(); }
     if(LOOK.sb) lookFoam(vis,t);
   }
