@@ -66,7 +66,7 @@ function lightColOf(L,k){ return L.col&&L.col.length===3?L.col:RL_KC[k]||RL_KC.g
 try{ for(const L of LIGHTS) if(!L.ward) lightKindOf(L); }catch(e){}
 
 // ---------- 3. small helpers and state
-const RLS={cv:null,g:null,w:0,h:0,list:[],figs:[],spr:new Map(),cap:null,blob:null,dap:null,fog:null,beam:null,shim:null,
+const RLS={shN:0,shMs:0,shMax:0,cv:null,g:null,w:0,h:0,list:[],figs:[],spr:new Map(),cap:null,blob:null,dap:null,fog:null,beam:null,shim:null,
   amb:[255,255,255],base:[255,255,255],N:0,air:null,airT:-1,airG:null,ambT:-1,ambG:null,ambC:null,ms:0,frames:0,last:null};
 function rlSS(e0,e1,x){ const t=clamp((x-e0)/(e1-e0),0,1); return t*t*(3-2*t); }
 function rlLum(c){ return 0.299*c[0]+0.587*c[1]+0.114*c[2]; }
@@ -113,7 +113,9 @@ function rlFigH(e){ if(e===player) return 40; if(e.kind) return 42; if(e.boss) r
 // is eaten. Rain clouds soften both.
 const RL_SUN={t:-1,g:null,rk:-1,o:{dx:0.04,dy:0.32,len:0.32,col:[255,248,236],amb:[255,255,255],a:0.34,moon:false,el:1}};
 function reSun(){
-  const t=G?G.tod:0.35, o=RL_SUN.o, rk=rlRain(); if(RL_SUN.t===t&&RL_SUN.g===G&&RL_SUN.rk===rk) return o;
+  // the time is taken in steps of 1/300 of a day (under two seconds), so the cached shadow layer is redrawn at most
+  // that often while the sun moves (and the rain in steps of 1/20)
+  const t=G?Math.round(G.tod*300)/300:0.35, o=RL_SUN.o, rk=Math.round(rlRain()*20)/20; if(RL_SUN.t===t&&RL_SUN.g===G&&RL_SUN.rk===rk) return o;
   RL_SUN.t=t; RL_SUN.g=G; RL_SUN.rk=rk;
   const D=Math.PI/180; let phi, len, a, col, el, moon=false;
   if(t>=0.215&&t<=0.785){ const u=(t-0.215)/0.57; el=Math.sin(u*Math.PI); phi=(150-135*u)*D; len=Math.min(2.6,0.42+2.2*Math.pow(1-el,2));
@@ -126,9 +128,9 @@ function reSun(){
 }
 
 // ---------- 5. the grade: a smooth curve through the day (Catmull-Rom through these keys; 255 leaves a colour as it is)
-const RL_KEYS=[[0,[56,72,126]],[0.18,[60,74,126]],[0.212,[84,84,138]],[0.242,[186,134,148]],[0.272,[255,190,150]],[0.315,[252,230,206]],
-  [0.38,[240,245,252]],[0.5,[255,255,253]],[0.615,[255,247,230]],[0.688,[255,224,178]],[0.732,[255,176,116]],[0.766,[198,126,148]],
-  [0.795,[122,102,160]],[0.835,[72,82,136]]];
+const RL_KEYS=[[0,[58,72,118]],[0.18,[61,74,118]],[0.212,[84,84,134]],[0.242,[192,142,154]],[0.272,[255,200,164]],[0.315,[252,232,212]],
+  [0.38,[240,245,252]],[0.5,[255,255,253]],[0.615,[255,247,230]],[0.688,[255,228,190]],[0.732,[255,194,140]],[0.766,[212,142,150]],
+  [0.795,[122,102,158]],[0.835,[72,82,130]]];
 function reGradeTod(t){
   const K=RL_KEYS, n=K.length; t=((t%1)+1)%1;
   let i=n-1; for(let j=0;j<n;j++){ if(K[j][0]<=t) i=j; else break; }
@@ -149,7 +151,7 @@ const RL_AIR0=[
   {mul:[1.04,0.9,0.78],haze:[255,128,70],ha:0.07,shim:1,warm:1},                         // 4 the Cinderlands
   {mul:[0.95,1,1.08],haze:[226,236,252],ha:0.05,snow:1},                                 // 5 the Frostpine Highlands
   {mul:[0.86,0.94,0.84],haze:[160,182,150],ha:0.13,dap:0.25,mist:1}];                    // 6 the Mirefen
-const RL_AIRM={coast:{mul:[1.02,1.02,1],haze:[232,242,252],ha:0.04,salt:1},frost:{mul:[0.95,1,1.08],haze:[226,236,252],ha:0.05,snow:1},
+const RL_AIRM={coast:{mul:[1.02,1.02,1],haze:[232,242,252],ha:0.022,salt:1},frost:{mul:[0.95,1,1.08],haze:[226,236,252],ha:0.05,snow:1},
   moon:{mul:[0.97,0.98,1.03],haze:[200,206,236],ha:0.03,silver:1},nightfall:{mul:[0.93,0.9,1],haze:[168,128,176],ha:0.06,silver:0.4}};
 const RL_AIRN={mul:[1,1,1],haze:[0,0,0],ha:0,dap:0,shim:0,snow:0,salt:0,silver:0,warm:0,mist:0};
 function rlAirMix(o,A,w){
@@ -187,7 +189,9 @@ function reAmbient(){
   if(n>0){ const m=rlMoonK(); for(let i=0;i<3;i++) c[i]*=1+n*(m-0.7)*0.4; }
   for(let i=0;i<3;i++) c[i]*=A.mul[i];
   if(A.silver>0&&n>0) c=mixRGB(c,[104,112,148],n*0.45*Math.min(1,A.silver));
-  if(A.snow>0){ const s=Math.min(1,A.snow); c=mixRGB(c,[Math.min(255,c[0]*0.96+6),Math.min(255,c[1]*1.0+8),Math.min(255,c[2]*1.06+14)],s); if(n>0) for(let i=0;i<3;i++) c[i]*=1+0.3*n*s; }
+  // snow light: a touch bluer and brighter by day; at night the snow throws the moonlight back, a brighter silver blue
+  if(A.snow>0){ const s=Math.min(1,A.snow); c=mixRGB(c,[Math.min(255,c[0]*0.96+6),Math.min(255,c[1]*1.0+8),Math.min(255,c[2]*1.06+14)],s);
+    if(n>0){ const l=rlLum(c); c=mixRGB(c,[l*1.08,l*1.16,l*1.36],0.4*n*s); for(let i=0;i<3;i++) c[i]*=1+0.14*n*s; } }
   if(A.warm>0&&n>0) c=mixRGB(c,[c[0]*1.35+18,c[1]*1.05+6,c[2]*0.9],n*Math.min(1,A.warm)*0.6);
   const rk=rlRain(); if(rk>0) c=[c[0]*(1-0.2*rk),c[1]*(1-0.17*rk),c[2]*(1-0.11*rk)];
   for(let i=0;i<3;i++) c[i]=clamp(c[i],0,255);
@@ -226,7 +230,7 @@ const RL_CAVE={earth:[[30,22,18],[236,226,210]],mine:[[30,22,16],[240,222,196]],
 function rlRoomBase(){
   const A=AREA, dl=daylight();
   if(A.kind==='cave'){ const T=RL_CAVE[A.def&&A.def.theme]||[[12,14,26],[236,234,230]], dk=clamp(A.dark||0,0,1); return mixRGB(T[1],T[0],dk); }
-  const dk=clamp((A.dark||0)+(1-dl)*0.3,0,1), lit=mixRGB([214,200,206],[255,246,232],dl);
+  const dk=clamp((A.dark||0)+(1-dl)*0.3,0,1), lit=mixRGB([190,178,196],[255,246,232],dl);
   return mixRGB(lit,[36,26,32],dk);
 }
 // a light into the light map: world (x,y), radius r, intensity i (0..1), colour c
@@ -357,7 +361,7 @@ function reLights(){
   ctx.save(); ctx.setTransform(DPR*zoom,0,0,DPR*zoom,-cam.x*zoom*DPR,-cam.y*zoom*DPR);
   const bk=inA?0.35+0.65*N:N;
   for(const l of list){
-    if(l.ash||l.fx) continue; const b=RL_BLOOM[l.k]||0; if(!b) continue;
+    if(l.self||l.fx) continue; const b=RL_BLOOM[l.k]||0; if(!b) continue;   // (figures carry their own glow)
     const k=(l.k==='fire'||l.k==='ember'||l.k==='cold'?0.3+0.7*bk:bk)*b*Math.min(1,l.i*1.25); if(k<0.02||!inView(l.x,l.y,l.r*0.3)) continue;
     const cs=l.c[0]+','+l.c[1]+','+l.c[2];
     if(lvl<2) glowAt(l.x,l.y,l.r*0.24,cs,0.34*k);
@@ -391,12 +395,14 @@ function rlAtmos(inA,A,dl,t,lvl,S){
     const morn=rlSS(0.2,0.25,G.tod)*(1-rlSS(0.31,0.38,G.tod)), cold=Math.min(1,A.snow+A.mist+A.dap*0.5+(G.region&&G.region.key==='lake'?0.8:0));
     let ha=A.ha*(0.55+0.45*dl)+morn*0.1*cold, hz=A.haze;
     if(morn*cold>0.05){ const w=morn*0.1*cold/Math.max(0.001,ha); hz=mixRGB(A.ha>0?A.haze:[230,236,240],[236,240,244],w); }
-    if(A.salt>0) { ha+=0.03*A.salt*dl; hz=A.ha>0?hz:[240,246,252]; }
+    if(A.salt>0) { ha+=0.012*A.salt*dl; hz=A.ha>0?hz:[240,246,252]; }
+    // the haze is lit by the light of the hour (a pale haze over a dark night would wash it out)
+    const B=RLS.base, lit=clamp(rlLum(B)/235,0.18,1); hz=[hz[0]*Math.min(1,B[0]/235+0.1),hz[1]*Math.min(1,B[1]/235+0.1),hz[2]*Math.min(1,B[2]/235+0.1)];
     if(ha>0.01){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.globalCompositeOperation='screen'; ctx.globalAlpha=Math.min(0.3,ha); ctx.fillStyle=`rgb(${hz.map(Math.round)})`; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.restore(); }
     // fog banks drifting over the mire and on cold mornings
     // fog banks drifting over the mire and on cold mornings (world anchored: one bank per 560 px cell, drifting east)
     const fogK=Math.min(1,A.mist*0.8+morn*cold*0.7)*(lvl<1?1:0);
-    if(fogK>0.04){ const F=rlFog(), C=560; ctx.save(); ctx.globalCompositeOperation='screen'; ctx.globalAlpha=fogK*0.3;
+    if(fogK>0.04){ const F=rlFog(), C=560; ctx.save(); ctx.globalCompositeOperation='screen'; ctx.globalAlpha=fogK*0.3*lit;
       for(let cx=Math.floor((vx-C)/C);cx<=Math.floor((vx+vw+C)/C);cx++) for(let cy=Math.floor((vy-C*0.5)/C);cy<=Math.floor((vy+vh+C*0.5)/C);cy++){
         const h1=hash2(cx,cy*7+3), h2=hash2(cx*5+1,cy), R=230+h2*170, x=cx*C+((h1*C+t*(8+h2*6))%C), y=cy*C+h2*C+Math.sin(t*0.2+h1*6)*24;
         if(x+R<vx||x-R>vx+vw||y+R<vy||y-R>vy+vh) continue; ctx.drawImage(F,x-R,y-R*0.5,R*2,R); }
@@ -409,19 +415,19 @@ function rlAtmos(inA,A,dl,t,lvl,S){
       ctx.restore(); }
     return;
   }
-  // inside: sunbeams from the windows by day (and a faint blue one by moonlight), with dust motes in them
+  // inside: a soft shaft of light under each window by day (over the pool the room's art lays on the floor; a faint
+  // blue one by moonlight), with dust motes drifting in it
   if(AREA.kind!=='cave'){
-    const B=rlBeam(), side=S&&!S.moon?clamp(S.dx*0.35,-0.6,0.6):0.2;
+    const day=dl>0.08, k=day?clamp(dl,0,1):0.45*(1-dl); if(k<0.03) return;
+    const B=day?rlBeam():rlBeamN(), side=day&&S&&!S.moon?clamp(S.dx*0.12,-0.25,0.25):0, y0=AREA.ry+22, len=Math.min(250,AREA.rh*0.62);
     ctx.save(); ctx.globalCompositeOperation='lighter';
-    for(const L of AREA.lights){
-      if(!L.win) continue; const day=L.i>0.02, k=day?clamp(L.i/0.35,0,1):0.4*(1-dl); if(k<0.03||!inView(L.x,L.y+120,200)) continue;
-      const len=230, w0=44;
-      ctx.save(); ctx.translate(L.x,L.y-10); ctx.transform(1,0,side,1,0,0); ctx.globalAlpha=(day?0.42:0.2)*k;
-      ctx.drawImage(day?B:rlBeamN(),-w0/2,0,w0,len); ctx.restore();
-      if(!day) continue;
-      if(lvl<2){ ctx.fillStyle='#fff6e0'; const n=lvl?8:16;
-        for(let j=0;j<n;j++){ const ph=j*1.618+L.x*0.01, u=((t*0.035+ph*0.37)%1), yy=L.y+u*len*0.9, xx=L.x+side*(yy-L.y)+Math.sin(t*0.5+ph*3)*w0*0.38;
-          ctx.globalAlpha=(0.25+0.25*Math.sin(t*1.7+ph*5))*k*(1-u); ctx.fillRect(xx,yy,1.3,1.3); } }
+    for(const o of AREA.objs){
+      if(o.k!=='window'||o._hid||!inView(o.x,y0+len*0.5,len)) continue; const w0=(o._ww||22)*2.4;
+      ctx.save(); ctx.translate(o.x,y0); ctx.transform(1,0,side,1,0,0); ctx.globalAlpha=(day?0.26:0.16)*k; ctx.drawImage(B,-w0/2,0,w0,len); ctx.restore();
+      if(!day||lvl>=2) continue;
+      ctx.fillStyle='#fff4dc'; const n=lvl?8:16;
+      for(let j=0;j<n;j++){ const ph=j*1.618+o.x*0.01, u=((t*0.03+ph*0.37)%1), yy=y0+u*len*0.92, xx=o.x+side*(yy-y0)+Math.sin(t*0.45+ph*3)*w0*0.36;
+        ctx.globalAlpha=(0.3+0.25*Math.sin(t*1.7+ph*5))*k*(1-u)*(u<0.08?u/0.08:1); ctx.fillRect(xx,yy,1.4,1.4); }
     }
     ctx.restore();
   }
@@ -445,7 +451,7 @@ function rlShimmer(sh,t){
 // (called by render in a11_render.js before the props and figures are drawn; the world transform is set)
 function reShadows(props,npcs,inA){
   const S=reSun(), lvl=RLQ.lvl;
-  if(!inA&&!DSKIP.shadow) shadowLayer(S,props);
+  if(!inA&&!DSKIP.shadow){ const n0=SHL.redraws, t0=performance.now(); shadowLayer(S,props); if(SHL.redraws!==n0){ const ms=performance.now()-t0; RLS.shN++; RLS.shMs+=ms; if(ms>RLS.shMax) RLS.shMax=ms; } }
   if(lvl>=3) return;
   const figs=rlFigs(inA), C=rlCap();
   ctx.globalAlpha=1;
@@ -512,7 +518,7 @@ function lightRebuild(){ RLS.ambC=null; RLS.air=null; RL_SUN.t=-1; RLQ.slow=RLQ.
 window.__ebX=Object.assign(window.__ebX||{},{light:{
   sun:()=>Object.assign({},reSun()), grade:t=>reGradeTod(t==null?G.tod:t), amb:()=>reAmbient(), air:()=>JSON.parse(JSON.stringify(reAir())),
   q(l){ if(l==='auto'||l==null){ RLQ.fixed=null; } else RLQ.fixed=clamp(l|0,0,3); RLQ.lvl=RLQ.fixed==null?RLQ.lvl:RLQ.fixed; return {lvl:RLQ.lvl,fixed:RLQ.fixed}; },
-  stats(){ const r={lvl:RLQ.lvl,fixed:RLQ.fixed,ema:+RLQ.ema.toFixed(1),downs:RLQ.downs,ups:RLQ.ups,ms:RLS.frames?+(RLS.ms/RLS.frames).toFixed(3):0,frames:RLS.frames,lights:RLS.list.length,N:+RLS.N.toFixed(3),base:RLS.base.map(Math.round)}; RLS.ms=0; RLS.frames=0; return r; },
+  stats(){ const r={lvl:RLQ.lvl,fixed:RLQ.fixed,ema:+RLQ.ema.toFixed(1),downs:RLQ.downs,ups:RLQ.ups,ms:RLS.frames?+(RLS.ms/RLS.frames).toFixed(3):0,frames:RLS.frames,lights:RLS.list.length,N:+RLS.N.toFixed(3),base:RLS.base.map(Math.round),shadowRedraws:RLS.shN,shadowMs:RLS.shN?+(RLS.shMs/RLS.shN).toFixed(2):0,shadowMax:+RLS.shMax.toFixed(2)}; RLS.ms=0; RLS.frames=0; RLS.shN=0; RLS.shMs=0; RLS.shMax=0; return r; },
   kinds(){ const o={}; for(const L of LIGHTS){ const k=lightKindOf(L); o[k]=(o[k]||0)+1; } if(AREA) for(const L of AREA.lights){ const k='area:'+lightKindOf(L); o[k]=(o[k]||0)+1; } return o; },
   // every canvas made while the UI draws in Realistic, by where it was made (a world cache there would be built with
   // LOOK.sb true): audit(true) starts, audit() reads, audit(false) stops
