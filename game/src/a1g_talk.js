@@ -26,8 +26,8 @@ const TALK={
     rumorAsk:[`Where does Pebble keep her treasures?`,`Where does Pebble hide things?`],
     rumor:{t:S(`Pebble keeps her treasures upstairs in my house. Buttons, spoons, a whole key once. If you find her nest, she won't mind sharing. Much.`,`Pebble's nest is upstairs in my house. She might share.`),hint:'sec_h_yara'},
     loves:['moonlily','honey'],hates:['fish'],
-    deep:`I was eight when I lit my first lantern. I burned my thumb. Iska's statue was right there, and I swear it smiled. I've been counting lanterns ever since.`,
-    secret:{t:`The Wardens wrote their names on the underside of the old bridge stones in Brindlecross. Look closely at the ruins too. They loved hiding things.`,reward:{coins:40}},
+    deep:`I was eight when I lit my first lantern. I burned my thumb. Iska's statue was right there, and I swear it smiled. I've lit the first one every year since.`,
+    secret:{t:S(`The Five wrote their names on the underside of the old bridge stones in Brindlecross. Look closely at the ruins too. They loved hiding things.`,`The Five hid their names under the old bridge in Brindlecross.`),reward:{coins:40}},
     best:{t:S(`Take my lantern charm, Ash. I wore it every Lantern Day for sixty years. It glows brighter the darker it gets.`,`Take my lantern charm. It glows in the dark.`),reward:{lantern:true}},
     chat:{q:`Do you ever wish you were just an ordinary child, Ash?`,opts:[
       {t:`Sometimes. But then I'd never have met all of you.`,tone:'kind',r:`Oh, you'll make an old woman cry. Pebble, look away.`,f:1},
@@ -39,7 +39,7 @@ const TALK={
     rumor:{t:S(`Grandma Crumb kept her best recipes in the cellar, behind a shelf of flour sacks. One sack says NOT FLOUR. I've never been brave enough to pull it.`,`Her recipes are in the cellar. One sack says NOT FLOUR.`),hint:'sec_h_bertram'},
     loves:['frostberry','honey'],hates:['fish'],
     deep:`When I was little, Grandma Crumb told me bread is just patience you can eat. I've been impatient my whole life. My bread is very fast.`,
-    secret:{t:`Take one of these Lantern Buns. They're warm all the way through. If you're ever about to fall, eat it. You'll feel better. Probably.`,reward:{potmax:1}},
+    secret:{t:S(`Take one of these Lantern Buns. They're warm all the way through. If you're ever about to fall, eat it and rise again. That's what dough does.`,`Take a Lantern Bun. Eat it when you are hurt.`),reward:{potmax:1}},
     best:{t:S(`You're my favourite customer, Ash. You've never once paid, and you're still my favourite. Here. The chef's hat. Wear it with flour.`,`My favourite customer! Here, a chef's hat.`),reward:{hat:'chef'}},
     chat:{q:`Be honest. Do I smell like burnt bread?`,opts:[
       {t:`You smell like fresh bread. The best smell.`,tone:'kind',r:S(`Ash! I'm going to bake you something. Nothing explosive.`,`I will bake you something! Nothing that explodes.`),f:1},
@@ -64,7 +64,7 @@ const TALK={
     rumor:{t:S(`Gran swears by the hot spring up in the Frostpine. One soak, and your knees forget how old they are.`,`Gran loves the hot spring in the Frostpine. It heals.`),hint:'lm_spring'},
     loves:['moonlily','frostberry'],hates:['fish'],
     deep:`I wanted to be a knight, actually. But knights get hurt, and someone has to fix them. So now I fix knights. It's better. Less armor.`,
-    secret:{t:`My best healing recipe. Fold it up and keep it. Your draughts will heal more now.`,reward:{heal:0.15}},
+    secret:{t:S(`My best healing recipe. It's Gran's, really, without the bit where you shout at it. Your draughts will heal more now.`,`My best healing recipe. Your potions heal more now.`),reward:{heal:0.15}},
     best:{t:S(`A flower crown, made from every flower in the valley. It won't wilt. Gran helped. She yelled at the flowers until they agreed.`,`A flower crown. It never wilts. Gran helped.`),reward:{hat:'crown'}},
     chat:{q:`Do you think plants have feelings?`,opts:[
       {t:`Definitely. That's why I say sorry when I pick them.`,tone:'kind',r:`You DO? Oh, Gran is going to love you.`,f:1},
@@ -113,7 +113,7 @@ const TALK={
     rumor:{t:`Sir Strawsworth the scarecrow wears a hat with something rattling inside it. I've never checked. He looks like he'd mind.`},
     loves:['frostberry'],hates:['moonlily'],
     deep:`Moo-rgaret saved my life once. A wolf came at night, and she sat on it. Just sat on it. I owe that cow everything.`,
-    secret:{t:`The good cheese. Aged ten years. Keep it for the worst day. (It heals you a lot.)`,reward:{potmax:1}},
+    secret:{t:S(`The good cheese. Aged ten years. Moo-rgaret doesn't know I've given it away. Keep it for your worst day. (It heals you a lot.)`,`The good cheese. Ten years old! Save it. (It heals a lot.)`),reward:{potmax:1}},
     best:{t:`A cheese named after you! The Ashmore. It's a little spicy. Like you.`,reward:{coins:60}},
     chat:{q:`Do you think Moo-rgaret knows she's a cow?`,opts:[
       {t:`She knows she's loved. That's what counts.`,tone:'kind',r:`...That's beautiful. I'm going to tell her.`,f:1},
@@ -160,7 +160,7 @@ const TALK={
     rumorAsk:[`Got any real treasure maps?`,`Any real treasure maps?`],
     rumor:{t:S(`I'll tell you for free, because I like your face. There are three real treasure maps in this valley. Find the maps, find the X's. Dig.`,`Three treasure maps in the valley. Find the X's. Dig.`),hint:'xmarks'},
     loves:['honey','fish','frostberry','moonlily'],hates:[],
-    deep:`I wasn't always a peddler. I was a pirate. On a lake. It was a very small lake, and a very small boat. I retired when the ducks unionized.`,
+    deep:`I wasn't always a peddler. I was a pirate. On a lake. It was a very small lake, and a very small boat. I retired when the ducks got organised.`,
     secret:{t:`From now on, everything in my wagon costs a little less for you. Don't tell anyone. Especially Hob.`,reward:{discount:true}},
     best:{t:`My lucky top hat. It's been on six adventures and one wedding. Now it's yours.`,reward:{hat:'top'}},
     chat:{q:`I've got a magic bean here. Want to trade your sword for it?`,opts:[
@@ -173,7 +173,7 @@ const TALK={
     rumor:{t:S(`There's a fishing spot in the Frostpine, a hole in the ice. The fish up there are so cold they're crunchy. Bring me one and I'll owe you.`,`A hole in the ice in the Frostpine. Crunchy fish!`)},
     loves:['fish'],hates:['moonlily'],
     deep:`I proposed to my wife on the Soggy Biscuit. She said yes, and then the boat sank a little. Not all the way. Just enough to be romantic.`,
-    secret:{t:`My second-best lure. Fish bite faster with it. Trust me.`,reward:{lure:true}},
+    secret:{t:S(`My second-best lure. Fish bite faster with it. I'm hooked on it myself.`,`My second-best lure. Fish bite faster.`),reward:{lure:true}},
     best:{t:`I named a fish after you. A big orange one. It bites everything. It's perfect.`,reward:{coins:60}},
     chat:{q:`What do you think fish dream about?`,opts:[
       {t:`Warm water and no hooks.`,tone:'kind',r:S(`...That's a little sad. I'm going to be gentler with them.`,`That is sad. I will be gentle with them.`),f:1},
@@ -246,7 +246,7 @@ const TALK={
     loves:['fish','frostberry'],hates:['honey'],
     deep:`Rock Soup was my grandmother's recipe. In the long winter there was nothing else in the pot, so she put a rock in, so the pot wouldn't look empty.`,
     secret:{t:`A bowl of the real soup. No rocks. Warms you right up. You'll heal faster resting.`,reward:{regen:true}},
-    best:{t:`My ladle. My lucky ladle. It's seen things. Now it'll see you.`,reward:{coins:50}},
+    best:{t:S(`My lucky ladle. It has stirred up a lot of trouble in its time. Now it's yours.`,`My lucky ladle. It is yours now.`),reward:{coins:50}},
     chat:{q:`Try the Rock Soup. Be honest.`,opts:[
       {t:`It's... very filling. Thank you.`,tone:'kind',r:`Filling! That's the word! You're a good kid.`,f:0.75},
       {t:`I think I chipped a tooth.`,tone:'brave',r:`HA! Everybody does! It's tradition!`,f:1},
@@ -305,7 +305,7 @@ const TALK={
     rumor:{t:S(`Before I got frozen, I saw cultists carrying crates into the Ember Deep up north. Heavy ones. Glowing ones. I'd stay away. I'm staying away. Forever.`,`Cultists took glowing crates into the Ember Deep.`),hint:'cave_deep'},
     loves:['honey','fish'],hates:['frostberry'],
     deep:`I was a famous adventurer once. Brisket the Bold. Then I got frozen. Now I'm Brisket the Warm. It's a better title.`,
-    secret:{t:`My old adventuring boots. They're a little frosty, but you'll roll faster in them.`,reward:{roll:true}},
+    secret:{t:S(`My old adventuring boots. They're a little frosty, which makes them very cool boots. You'll roll faster in them.`,`My old boots. Very cool! You will roll faster.`),reward:{roll:true}},
     best:{t:`My helmet. I'm retired. You're not. Go be bold for me.`,reward:{armor:0.05}},
     chat:{q:`Do you think I should go back to adventuring?`,opts:[
       {t:`You've earned your rest. Be warm.`,tone:'kind',r:`Thank you. I needed someone to say that. Warmth forever.`,f:1},
@@ -318,7 +318,7 @@ const TALK={
     loves:['fish','frostberry'],hates:[],
     deep:`I built the Smoky Kettle with my own hands. Then the roof fell in. Then I built it again with my own hands, but smarter hands.`,
     secret:{t:`The house special, free, forever. Every time you rest here, you'll get the stew.`,reward:{regen:true}},
-    best:{t:`My spare kettle! I bought a spare in case of thieves. It whistles in the key of friendship.`,reward:{potmax:1}},
+    best:{t:S(`My spare kettle! I bought a spare in case of thieves. It whistles in tune, which is more than Tamsin does.`,`My spare kettle! It whistles in tune.`),reward:{potmax:1}},
     chat:{q:`Smell this stew. What's in it?`,opts:[
       {t:`Love. And carrots.`,tone:'kind',r:`HA! Mostly carrots! But yes, love.`,f:1},
       {t:`Something that's still moving.`,tone:'brave',r:`...Good nose. Don't eat that bit.`,f:0.75},
