@@ -234,7 +234,7 @@ const HSAY=[
   [`Sorry about the barrels! Not really!`,`Sorry about the barrels!`],
   [`Still there? You're fast for someone with a tail!`,`Fast, for a tail!`],
   [`Cozy little village. I can see why you like it here!`,`Cozy village!`],
-  [`Mmm, a bakery! It smells amazing. No time!`,`A bakery! Yum! No time!`],
+  [`Mmm, a bakery! I'd stop, but I'm on a roll!`,`A bakery! No time. I'm on a roll!`],
   [`This way! No, that way! Ha!`,`This way! No, that way!`],
   [`Round the pond we go! Mind the frogs!`,`Round the pond! Mind the frogs!`],
   [`Still following? You're very stubborn. I like that.`,`Still here? You're stubborn!`],
@@ -648,7 +648,7 @@ defineStages(2,[
       return true;
     },
     update(dt){ if(HS.runIn){ let busy=false; for(const n of HS.runIn){ const d=dist(n.x,n.y,n.home[0],n.home[1]); if(d>4){ busy=true; const a=angTo(n.x,n.y,n.home[0],n.home[1]), s=Math.min(d,190*dt); n.x+=Math.cos(a)*s; n.y+=Math.sin(a)*s; n.face=a; n.moving=true; } } if(!busy) HS.runIn=null; } }},
-  {id:'c_pass',chapter:S('The Southern Pass','The Southern Pass'),card:['Act II · Chapter 2',S('The Southern Pass','The Southern Pass')],at:{x:3300,y:10760},
+  {id:'c_pass',chapter:S('Pass the Scarf','The Southern Pass'),card:['Act II · Chapter 2',S('Pass the Scarf','The Southern Pass')],at:{x:3300,y:10760},
     objectives:()=>curMap()===0?[{text:S('Take the Southern Pass down to the Clockwork Coast','Go down the Southern Pass'),x:HV.pass.x,y:HV.pass.y}]:[],
     hint:S(`The Southern Pass is just east along the cliffs, by the old signpost. Two hundred and six steps down to the Clockwork Coast.`,`The pass is east, by the signpost.`),
     soFar:S('Gearhaven is a clockwork port on the coast beyond the Southern Pass. Sister Wren says the thief is the Moth Mask: the Gearhaven Gazette writes about her every week, and she only steals things that glow.','Gearhaven is a port past the Southern Pass. The thief is the Moth Mask. She steals things that glow.'),

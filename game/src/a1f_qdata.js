@@ -20,7 +20,7 @@ const QDEFS={
       {t:'flag',flag:'juniper_found',text:'Find Juniper inside Whisperwood Hollow, west of the war camp road',at:'cave:whisper'},
       {t:'talk',npc:'rook',text:'Tell Rook his sister is safe',lines:[['rook',`JUNIPER! She came in the door covered in bat poop and yelling about you! You're the best, Ash.`],['juniper',`Here. My map of every cave and secret spot in the valley. Two years of work. Don't spill anything on it.`]],give:{juniper_map:1,map_x3:1},reward:{coins:25,xp:80}}
     ]},
-  gate:{title:'The Open Gate',giver:'yara',min:'warcamp',story:true,
+  gate:{title:S('Gate Expectations','The Open Gate'),giver:'yara',min:'warcamp',story:true,
     offer:[['yara',S(`Something's been bothering me, Ash. Somebody unlocked the North Gate on Lantern Day. Kobolds can't pick locks. They don't have the thumbs for it.`,`Someone unlocked the North Gate. Kobolds can't pick locks.`)],['yara',`Have a look around the Hollow Ward. Whoever let them in might have stopped there too.`]],
     steps:[
       {t:'flag',flag:'clue_prints',text:'Look for clues near the Hollow Ward under the old oak',at:'lm:bootprints'},

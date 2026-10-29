@@ -14,7 +14,7 @@ quest({
   // the oldest saves have no G.quests.gate, only the choice Ash made about Fennick (while the quest runs in the data,
   // the choice at the confrontation must not end it: the tunnel and Wren's plans come after)
   done_if: { any: ['choice fennick=forgive !quest gate active', 'choice fennick=jail !quest gate active'] },
-  title: ['The Open Gate', 'The Open Gate'],
+  title: ['Gate Expectations', 'The Open Gate'],
   payoff: { kind: 'shortcut', id: 'mine_cart' },
   // Grizzlefang no longer names the lamp-man, and Morrow's letter is only to "W."
   replaces: { 'STORY.bosses.grizzlefang.outro': 'a1_griz_outro', 'STORY.bosses.morrow.outro': 'a1_morrow_outro' },
@@ -282,7 +282,7 @@ quest({
   id: 'a1_hat', act: 1, giver: 'hal', optional: true,   // started by Hal's rumor (people() at the end)
   // (v11) open from the raid on, like Hal's option: before it Hal showed a gold ! for a quest he could not give yet
   if: 'stage>=lore',
-  title: ["Sir Strawsworth's Hat", 'The Scarecrow Hat'],
+  title: ['Keep It Under Your Hat', 'The Scarecrow Hat'],
   payoff: { kind: 'truth', id: 'a1_button' },
   // Hal's old rumor about the hat (a1g_talk.js) is the people() option below now
   replaces: { 'TALK.hal.rumor': null },
@@ -353,7 +353,7 @@ quest({
   id: 'a1_snuffed', act: 1, giver: 'yara', optional: true,   // started by asking Yara (people() at the end)
   // (v11) open from the raid on, like Yara's option (before it she showed a gold ! for it on Lantern Day morning)
   if: 'stage>=lore !flag act1_done',
-  title: ['The Cold Ward', 'The Cold Ward'],
+  title: ['Out Like a Light', 'The Cold Ward'],
   payoff: { kind: 'truth', id: 'a1_oath_inside' },
 
   // black candle wax round the Hollow Ward stone (drawn by x0_act1.js from the raid until Act I ends)
