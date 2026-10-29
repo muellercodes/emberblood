@@ -1102,6 +1102,7 @@ function drawHouseStruct(s,t){
   const dl=daylight(); if(dl<0.5) hzNight(ctx,s.L,s.x,s.y,1,clamp((0.5-dl)/0.3,0,1),t);
 }
 function drawStruct(s,t){
+  if(LOOK.re&&rzStruct(s,t)) return;   // (v12 PROPS) the Realistic structures, e12c_props.js
   switch(s.k){
     case 'house': drawHouseStruct(s,t); break;
     case 'well':{ const gr=ctx.createRadialGradient(s.x-6,s.y-6,4,s.x,s.y,24); gr.addColorStop(0,'#a59c90'); gr.addColorStop(1,'#5a544c'); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(s.x,s.y,24,0,TAU); ctx.fill(); ctx.fillStyle='#1d3440'; ctx.beginPath(); ctx.arc(s.x,s.y,14,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1; for(let a=0;a<TAU;a+=0.5){ ctx.beginPath(); ctx.moveTo(s.x+Math.cos(a)*15,s.y+Math.sin(a)*15); ctx.lineTo(s.x+Math.cos(a)*24,s.y+Math.sin(a)*24); ctx.stroke(); } ctx.fillStyle='#5a3a22'; ctx.fillRect(s.x-26,s.y-3,52,6); break; }
@@ -1201,7 +1202,9 @@ function drawStruct(s,t){
   }
 }
 let wallPattern=null;
-function drawWall(){
+// (v12 PROPS) the Realistic wall is drawn by rzDrawWall (e12c_props.js); the depth modes keep their own drawer with the Realistic stone
+function drawWall(){ if(LOOK.re){ rzDrawWall(); return; } drawWall0(); }
+function drawWall0(){
   if(!wallPattern){ const c=mkCanvas(64,52), g=c.getContext('2d'); g.fillStyle='#1c1a22'; g.fillRect(0,0,64,52); for(let r=0;r<2;r++) for(let i=-1;i<3;i++){ const x=i*32+(r%2)*16, y=r*26; const gr=g.createLinearGradient(x,y,x+30,y+24); gr.addColorStop(0,'#3e3a48'); gr.addColorStop(1,'#24212b'); g.fillStyle=gr; g.fillRect(x+1,y+1,30,24); } wallPattern=ctx.createPattern(c,'repeat'); }
   const x0=Math.max(0,cam.x-100), x1=Math.min(WORLD.w,cam.x+W/zoom+100);
   if(WALL_Y+80<cam.y||WALL_Y-80>cam.y+H/zoom) return;
@@ -1215,6 +1218,7 @@ function drawWall(){
   if(GATE_COL&&!GATE_COL.off){ ctx.fillStyle='#14121a'; ctx.fillRect(GATE_X0,WALL_Y-20,GATE_X1-GATE_X0,40); ctx.strokeStyle='#5a5466'; ctx.lineWidth=3; for(let x=GATE_X0+8;x<GATE_X1;x+=14){ ctx.beginPath(); ctx.moveTo(x,WALL_Y-20); ctx.lineTo(x,WALL_Y+20); ctx.stroke(); } ctx.beginPath(); ctx.moveTo(GATE_X0,WALL_Y); ctx.lineTo(GATE_X1,WALL_Y); ctx.stroke(); }
 }
 function drawChest(c,t){
+  if(LOOK.re){ rzChest(c,t); return; }   // (v12 PROPS) e12c_props.js
   ctx.save(); ctx.translate(c.x,c.y);
   ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(-13,-6,30,20);
   const gr=ctx.createLinearGradient(0,-10,0,10); gr.addColorStop(0,'#8a5a2c'); gr.addColorStop(1,'#4a2c14'); ctx.fillStyle=gr; ctx.fillRect(-15,-10,30,20);

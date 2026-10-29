@@ -690,3 +690,271 @@ const RZ2={on:0};
   const k='rz:'+key; let c=R2.spr.get(k); if(c) return c;
   c=base(k,w,h,ox,oy,draw); rzRelight(c,{bump:3.2,ao:0.1,aoR:2,edge:2,sat:0.9}); return c;
 }; }
+
+// ---------- structures (drawStruct in a3_art.js hands the kinds below to rzStruct in this look)
+// a box (turned by rot about its centre) with a flat top at z and bevelled edges bev wide; tex(x,y)->factor
+function rzBox(F,cx,cy,w,h,rot,z,bev,col,m,tex,z0){
+  const k=F.k, W=F.W, cs=Math.cos(rot||0), sn=Math.sin(rot||0), hw=w/2, hh=h/2, rr=Math.hypot(hw,hh)+1, pcx=(cx+F.ox)*k, pcy=(cy+F.oy)*k;
+  const X0=Math.max(0,Math.floor(pcx-rr*k)), X1=Math.min(W-1,Math.ceil(pcx+rr*k)), Y0=Math.max(0,Math.floor(pcy-rr*k)), Y1=Math.min(F.Hp-1,Math.ceil(pcy+rr*k)), b=Math.max(0.3,bev||1), zb=z0||0;
+  for(let j=Y0;j<=Y1;j++) for(let i=X0;i<=X1;i++){
+    const dx=(i+0.5)/k-F.ox-cx, dy=(j+0.5)/k-F.oy-cy, u=dx*cs+dy*sn, v=dy*cs-dx*sn, e=Math.min(hw-Math.abs(u),hh-Math.abs(v)); if(e<=0) continue;
+    const id=j*W+i, zz=Math.max(0.05,(zb+(z-zb)*Math.sqrt(Math.min(1,e/b)))*k), cov=Math.min(1,e*k+0.3);
+    if(cov>F.a[id]) F.a[id]=cov;
+    if(zz>F.h0[id]){ const f=tex?tex(u,v):1; F.h0[id]=zz; F.c[id*3]=col[0]*f; F.c[id*3+1]=col[1]*f; F.c[id*3+2]=col[2]*f; F.m[id]=m; }
+  }
+}
+const rzWoodTx=(sd,horiz)=>(u,v)=>{ const a=horiz?u:v, b=horiz?v:u; return 0.84+0.22*rzVN(a*0.18+sd,b*2.2,sd)+0.08*Math.sin(b*3.1+rzVN(a*0.3,b,sd+1)*4); };
+const rzStoneTx=(sd)=>(u,v)=>0.82+0.3*rzFbm(u*0.35+sd,v*0.35,sd,2)+(rzHash(Math.floor(u*2),Math.floor(v*2),sd)>0.95?0.1:0);
+function rzSpr(key,w,h,ox,oy,make,o){ return rzCache('st:'+key,()=>{ const F=rzHF(w,h,ox,oy); make(F); return rzShade(F,o||{ao:0.16,aoR:1.6,rim:0.35}); }); }
+function rzPutC(c,x,y){ ctx.drawImage(c,x-c.ox,y-c.oy,c.w2,c.h2); }
+const RZS={
+  well(){ return rzSpr('well',64,64,32,32,F=>{
+    rzContact(F,1,2,29,27,0.45);
+    const rng=mulberry32(41), n=14;
+    for(let i=0;i<n;i++){ const a=i/n*TAU+rng()*0.08, c=rzJit([150,144,134],rng,0.22); rzBox(F,Math.cos(a)*19.5,Math.sin(a)*19.5,9.4,7.2,a+Math.PI/2,6.5+rng()*0.8,1.6,c,RZ.ROCK,rzStoneTx(i)); }
+    rzDome(F,0,0,15.2,15.2,0,0.6,0.4,[58,52,46],RZ.ROCK);
+    rzDome(F,0,0,14,14,0,0.8,0.15,[22,44,54],RZ.WET,0.3);
+    for(const sx of [-1,1]) rzBox(F,sx*22,0,7,11,0,11,1.2,[110,80,52],RZ.WOOD,rzWoodTx(3,false));
+    rzBox(F,0,0,52,5.4,0,13.5,1.4,[132,96,62],RZ.WOOD,rzWoodTx(5,true));
+    rzCap(F,4,0,14,4,9,9,0.5,0.5,[150,130,100],RZ.CLOTH); rzDome(F,4,10.5,3,2.4,0,6,3,[112,82,52],RZ.WOOD,0.6);
+  }); },
+  torch(lit){ return rzSpr('torch'+(lit?1:0),24,44,12,34,F=>{
+    rzContact(F,0,2,7,3.2,0.45);
+    rzCap(F,0,3,4,0,-15,4,2.1,1.7,[96,70,46],RZ.WOOD,rzBarkTex(4,1.2,false));
+    rzBox(F,0,-15.5,7,2.2,0,6,0.6,[44,40,40],RZ.METAL);
+    // the lantern: an iron frame around four panes, a pyramid cap and a ring
+    rzBox(F,0,-21.5,10.4,11,0,5.5,0.8,[38,36,38],RZ.METAL);
+    rzBox(F,0,-21.5,7.6,8.4,0,6.2,0.4,lit?[255,206,120]:[70,78,84],lit?RZ.EMIT:RZ.WET);
+    if(lit) rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.EMIT){ const d=Math.hypot(x,y+21.5)/5.5, f=1-Math.min(1,d)*0.35; F.c[id*3]=255; F.c[id*3+1]=205*f+30; F.c[id*3+2]=120*f; } });
+    rzBox(F,0,-21.5,0.9,8.4,0,6.6,0.3,[38,36,38],RZ.METAL); rzBox(F,0,-21.5,7.6,0.9,0,6.6,0.3,[38,36,38],RZ.METAL);
+    rzPoly(F,[[-7,-26.5],[0,-32],[7,-26.5]],(x,y)=>7+(y+26.5)*-0.6,[34,32,34],RZ.METAL);
+    rzDome(F,0,-32.6,1.3,1.3,0,9,1,[60,56,54],RZ.METAL);
+  },{ao:0.12,aoR:1.2,rim:0.35}); },
+  stake(){ return rzSpr('stake',22,22,11,11,F=>{ rzContact(F,0.5,1,9.6,8.4,0.4); rzDome(F,0,0,8.6,8.6,0,0,4,[100,74,46],RZ.BARK,0.3); rzEach(F,(x,y,id)=>{ const d=Math.hypot(x+1,y+1); if(d<5.8){ const r=0.5+0.5*Math.sin(d*2.4); F.c[id*3]=180-30*r; F.c[id*3+1]=146-26*r; F.c[id*3+2]=100-20*r; F.m[id]=RZ.WOOD; } }); }); },
+  tent(r,a){ r=Math.round(r); const ak=Math.round(((a%TAU)+TAU)%TAU*20)/20; return rzSpr('tent'+r+'_'+ak,r*2+8,r*2+8,r+4,r+4,F=>{
+    rzContact(F,1,2,r+2,r+1.6,0.45);
+    const rng=mulberry32(r*7), z0=r*0.55, c=[176,150,112];
+    for(let i=0;i<8;i++){ const a0=ak+i/8*TAU, a1=ak+(i+1)/8*TAU, p0=[Math.cos(a0)*r,Math.sin(a0)*r], p1=[Math.cos(a1)*r,Math.sin(a1)*r], cc=rzJit(c,rng,0.08);
+      // each panel sags a little between the seams
+      rzPoly(F,[[0,0],p0,p1],(x,y)=>{ const d=Math.hypot(x,y)/r, ang=Math.atan2(y,x)-a0, sag=Math.sin(((ang%(TAU/8))+TAU/8)%(TAU/8)*8/2)*1.2*d; return Math.max(0.3,z0*(1-d)-sag+0.5); },(x,y)=>rzMulC(cc,0.9+0.12*rzVN(x*0.5,y*0.5,i)),RZ.CLOTH); }
+    for(let i=0;i<8;i++){ const a0=ak+i/8*TAU; rzCap(F,0,0,z0+0.6,Math.cos(a0)*r,Math.sin(a0)*r,0.6,0.55,0.4,[120,96,66],RZ.CLOTH); }
+    rzDome(F,0,0,3.6,3.6,0,z0,1.6,[96,70,44],RZ.WOOD);
+  },{ao:0.14,aoR:1.6,rim:0.3}); },
+  campfire(small){ const r=small?14:22; return rzSpr('fire'+(small?1:0),r*2+14,r*2+14,r+7,r+7,F=>{
+    rzContact(F,0,1,r+5,r+4,0.4);
+    const rng=mulberry32(r);
+    rzDome(F,0,0,r*0.85,r*0.8,0,0,1.2,[54,48,44],RZ.ROCK,0.4);
+    rzEach(F,(x,y,id)=>{ const d=Math.hypot(x,y)/(r*0.85); if(d<0.62&&rzVN(x*0.6,y*0.6,r)>0.52){ const k=1-d/0.62; F.m[id]=RZ.EMIT; F.c[id*3]=150+100*k; F.c[id*3+1]=40+80*k*k; F.c[id*3+2]=16; } });
+    for(let a=0;a<TAU;a+=0.62){ const aa=a+rng()*0.2; rzDome(F,Math.cos(aa)*r,Math.sin(aa)*r*0.95,4.4+rng(),3.8+rng(),aa,0,4,rzJit([138,132,124],rng,0.2),RZ.ROCK,0.7); }
+    const lg=(x0,y0,x1,y1)=>rzCap(F,x0,y0,3,x1,y1,3,2.1,2.1,[92,64,40],RZ.BARK,(t,u,len)=>{ const end=Math.min(t,1-t)*len; return end<3?0.35+end*0.15:0.8+0.3*rzVN(u*2,t*len*0.4,7); });
+    lg(-r*0.6,-r*0.3,r*0.6,r*0.3); lg(-r*0.5,r*0.4,r*0.5,-r*0.4);
+  },{ao:0.16,aoR:1.6,rim:0.3}); },
+  stone(k,snow,a){ k=Math.round((k||1)*10)/10; const ak=Math.round(((a%TAU)+TAU)%TAU*20)/20; return rzSpr('stone'+k+(snow?'s':'')+'_'+ak,60*k+10,60*k+10,30*k+5,30*k+5,F=>{
+    rzContact(F,1,2,18*k,22*k,0.45);
+    const cs=Math.cos(ak), sn=Math.sin(ak), rng=mulberry32(Math.round(k*100));
+    // the standing stone: an upright slab, rounded, with a carved spiral rune
+    const F2=F; for(let j=0;j<F2.Hp;j++) for(let i=0;i<F2.W;i++){ const x=(i+0.5)/F2.k-F2.ox, y=(j+0.5)/F2.k-F2.oy, u=x*cs+y*sn, v=y*cs-x*sn, q=(u/(14*k))**2+(v/(22*k))**2; if(q>=1) continue;
+      const id=j*F2.W+i, z=(1-q)**0.45*14*k+(rzFbm(u*0.3,v*0.3,7,3)-0.5)*2.4, rune=Math.abs(Math.hypot(u,v)-5*k)<0.7&&Math.atan2(v,u)>-2.2&&Math.atan2(v,u)<2.6, f=0.86+0.26*rzFbm(u*0.2+3,v*0.2,9,2);
+      F2.a[id]=Math.min(1,(1-Math.sqrt(q))*14*k*F2.k*0.5+0.3); F2.h0[id]=Math.max(0.05,(z-(rune?1.2:0))*F2.k);
+      let c=[150*f,146*f,138*f]; if(rune) c=[150,74,58]; else if(rzFbm(u*0.25+11,v*0.25,13,3)>0.6-((-u-v)/(40*k))) c=[104*f,122*f,74*f];
+      if(snow&&q<0.8&&v<-k*4+rzFbm(u*0.3,v*0.3,5,2)*8){ c=[236,240,246]; F2.m[id]=RZ.SNOW; } else F2.m[id]=RZ.ROCK;
+      F2.c[id*3]=c[0]; F2.c[id*3+1]=c[1]; F2.c[id*3+2]=c[2]; }
+  },{ao:0.15,aoR:1.6,rim:0.4}); },
+  brazier(){ return rzSpr('brazier',36,36,18,18,F=>{ rzContact(F,1,2,16,15,0.45); rzDome(F,0,0,14,14,0,0,6,[52,48,48],RZ.METAL,0.6); rzDome(F,0,0,10.6,10.6,0,3,0.6,[30,22,18],RZ.ROCK,0.4);
+    rzEach(F,(x,y,id)=>{ const d=Math.hypot(x,y); if(d<10){ const k2=1-d/10, n=rzVN(x*0.9,y*0.9,4); F.m[id]=RZ.EMIT; F.c[id*3]=120+135*k2*(0.5+n); F.c[id*3+1]=30+120*k2*k2*n; F.c[id*3+2]=10+40*k2*k2*k2; } }); }); },
+  pillar(broken){ return rzSpr('pillar'+(broken?1:0),70,70,35,35,F=>{ rzContact(F,1,2,32,31,0.45);
+    const oct=(r)=>{ const p=[]; for(let i=0;i<8;i++){ const a=i/8*TAU+Math.PI/8; p.push([Math.cos(a)*r,Math.sin(a)*r]); } return p; }, tx=rzStoneTx(3);
+    rzPoly(F,oct(30),(x,y)=>{ let e=1e9; const p=oct(30); for(let a=0,b=7;a<8;b=a++){ const [ax,ay]=p[b],[bx,by]=p[a], vx=bx-ax, vy=by-ay, t=clamp(((x-ax)*vx+(y-ay)*vy)/(vx*vx+vy*vy),0,1); e=Math.min(e,Math.hypot(x-ax-vx*t,y-ay-vy*t)); } return 10*Math.sqrt(Math.min(1,e/3)); },(x,y)=>rzMulC([96,90,104],tx(x,y)),RZ.ROCK);
+    rzPoly(F,oct(23),broken?(x,y)=>11+rzFbm(x*0.2,y*0.2,4,3)*4:12,(x,y)=>rzMulC(broken?[70,66,78]:[112,106,122],tx(x+5,y)),RZ.ROCK);
+  }); },
+  altar(){ return rzSpr('altar',92,60,46,30,F=>{ rzContact(F,1,2,46,30,0.4); rzBox(F,0,0,84,52,0,9,2.4,[96,88,96],RZ.ROCK,rzStoneTx(5)); rzBox(F,0,-4,76,38,0,10.5,1.6,[110,102,110],RZ.ROCK,rzStoneTx(9)); }); },
+  ward(){ return rzSpr('ward',76,76,38,38,F=>{ rzContact(F,1,2,36,34,0.45);
+    const hex=(r)=>{ const p=[]; for(let i=0;i<6;i++){ const a=i/6*TAU+Math.PI/6; p.push([Math.cos(a)*r,Math.sin(a)*r]); } return p; };
+    rzPoly(F,hex(34),(x,y)=>{ const r=Math.max(Math.abs(x)*0.866+Math.abs(y)*0.5,Math.abs(y)); return 8*Math.sqrt(Math.min(1,(34*0.866-r*0.866)/2.4+0.05)); },(x,y)=>rzMulC([150,144,136],rzStoneTx(2)(x,y)),RZ.ROCK);
+    rzPoly(F,hex(22),6.5,(x,y)=>rzMulC([110,104,98],rzStoneTx(4)(x,y)),RZ.ROCK);
+    rzEach(F,(x,y,id)=>{ if(Math.hypot(x,y)<12){ F.h0[id]=2*F.k; F.c[id*3]=24; F.c[id*3+1]=18; F.c[id*3+2]=16; } });
+  }); },
+  lantern(lit){ return rzSpr('lantern'+(lit?1:0),24,34,12,13,F=>{
+    rzCap(F,0,-1,1,0,13,1,1.4,1.4,[96,70,46],RZ.WOOD);
+    rzDome(F,0,0,9,10,0,2,6,lit?[255,180,90]:[226,206,170],lit?RZ.EMIT:RZ.CLOTH);
+    if(lit) rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.EMIT){ const d=Math.hypot(x/9,y/10), f=1-d*0.45; F.c[id*3]=255; F.c[id*3+1]=150+70*f; F.c[id*3+2]=60+50*f*f; } });
+    for(const dx of [-5,0,5]) rzEach(F,(x,y,id)=>{ if(Math.abs(x-dx*Math.sqrt(Math.max(0,1-(y/10)**2)))<0.45&&Math.abs(y)<9.6){ F.c[id*3]*=0.72; F.c[id*3+1]*=0.66; F.c[id*3+2]*=0.6; } });
+    rzBox(F,0,-10.2,10,3,0,8.6,0.8,[130,46,34],RZ.WOOD); rzBox(F,0,9.8,8,2.6,0,8,0.8,[130,46,34],RZ.WOOD);
+  },{ao:0.1,aoR:1.2,rim:0.3}); },
+  bigoak(){ return rzSpr('bigoak_roots',100,100,50,50,F=>{
+    rzContact(F,1,2,40,36,0.32);
+    const rng=mulberry32(1777), tx=rzBarkTex(17,2.4,true), bc=[92,68,44];
+    // buttress roots: thick where they leave the trunk, curving and thinning into the ground
+    for(let i=0;i<7;i++){ const a=i/7*TAU+0.3+(rng()-0.5)*0.4, L=32+rng()*10, b=(rng()-0.5)*0.5;
+      let px=Math.cos(a)*14, py=Math.sin(a)*14, pz=9, w=8.5;
+      for(let s=1;s<=4;s++){ const f=s/4, aa=a+b*f, nx=Math.cos(aa)*(14+(L-14)*f), ny=Math.sin(aa)*(14+(L-14)*f)*0.92, nz=9*(1-f)**1.6+0.3, nw=8.5*(1-f*0.82);
+        rzCap(F,px,py,pz,nx,ny,nz,w,nw,rzJit(bc,rng,0.06),RZ.BARK,tx,0.7); px=nx; py=ny; pz=nz; w=nw; } }
+    rzDome(F,0,0,22,21,0,6,8,[98,72,46],RZ.BARK,0.5);
+    rzEach(F,(x,y,id)=>{ const d=Math.hypot(x,y); if(d<21){ const a=Math.atan2(y,x), f=0.74+0.38*rzVN(a*6,d*0.22,3); F.c[id*3]*=f; F.c[id*3+1]*=f; F.c[id*3+2]*=f; } });
+  },{ao:0.2,aoR:2.4,rim:0.35}); },
+  stall(col,goods,a){ const ak=Math.round(((a%TAU)+TAU)%TAU*20)/20; return rzSpr('stall'+col+goods+'_'+ak,64,64,32,32,F=>{
+    const cs=Math.cos(ak), sn=Math.sin(ak), P=(u,v)=>[u*cs-v*sn,u*sn+v*cs], c=hzC(col), cream=[226,214,190], gd=hzC(goods);
+    const [cx,cy]=P(0,10); rzContact(F,cx,cy,26,14,0.35);
+    const [bx,by]=P(0,10); rzBox(F,bx,by,40,8,ak,6,1,[116,82,52],RZ.WOOD,rzWoodTx(8,true));
+    for(let i=0;i<4;i++){ const [gx,gy]=P(-14+i*9,10); rzDome(F,gx,gy,2.8,2.8,0,6.5,2.6,rzJit(gd,mulberry32(i+3),0.2),RZ.GLOSS); }
+    // the striped awning: five cloth panels, each bellied a little
+    for(let i=0;i<5;i++){ const [px,py]=P(-17.6+i*8.8,-3.5); const cc=i%2?cream:c;
+      rzBox(F,px,py,8.8,21,ak,13,1,cc,RZ.CLOTH,(u,v)=>0.92+0.1*Math.cos(u/4.4*Math.PI*0.5)); }
+    rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.CLOTH){ const u=x*cs+y*sn; const bump=Math.cos(((u+22)%8.8)/8.8*Math.PI-Math.PI/2); F.h0[id]+=bump*1.4*F.k; } });
+  },{ao:0.14,aoR:1.6,rim:0.35}); },
+  post(){ return rzSpr('post',22,22,11,11,F=>{ rzContact(F,0.5,1,9,8,0.4); rzDome(F,0,0,8,8,0,0,4,[94,72,46],RZ.BARK,0.3); rzEach(F,(x,y,id)=>{ const d=Math.hypot(x+1.5,y+1.5); if(d<4.8){ const r=0.5+0.5*Math.sin(d*2.6); F.c[id*3]=166-26*r; F.c[id*3+1]=134-22*r; F.c[id*3+2]=92-16*r; F.m[id]=RZ.WOOD; } }); rzDome(F,3,2,2.8,2.2,0,3.6,1.2,[92,120,56],RZ.LEAF); }); },
+  hut(r){ r=Math.round(r); return rzSpr('hut'+r,r*2+20,r*2+26,r+10,r+10,F=>{
+    rzContact(F,1,3,r+7,r+6,0.45);
+    rzBox(F,0,r+3,18,10,0,4,1,[70,50,32],RZ.WOOD,rzWoodTx(2,false));
+    const R=r+4;
+    rzPoly(F,(()=>{ const p=[]; for(let i=0;i<24;i++){ const a=i/24*TAU; p.push([Math.cos(a)*R,Math.sin(a)*R]); } return p; })(),(x,y)=>{ const d=Math.hypot(x,y)/R; return Math.max(0.4,R*0.62*(1-d)**0.85+1.2); },(x,y)=>{ const a=Math.atan2(y,x), d=Math.hypot(x,y), s=0.8+0.3*rzVN(a*30,d*0.15,5)+0.1*Math.sin(d*0.9); return rzMulC([168,146,92],s); },RZ.CLOTH);
+    rzEach(F,(x,y,id)=>{ if(Math.hypot(x,y)<6.5){ F.c[id*3]=52; F.c[id*3+1]=40; F.c[id*3+2]=26; } });
+  },{ao:0.16,aoR:2,rim:0.35}); },
+  cauldron(){ return rzSpr('cauldron',40,40,20,20,F=>{ rzContact(F,1,2,18,17,0.45); rzDome(F,0,0,16,16,0,0,7,[42,40,46],RZ.METAL,0.6);
+    // the rim is a rounded lip; inside it, the brew sits lower
+    rzEach(F,(x,y,id)=>{ const d=Math.hypot(x,y); if(d<13.6){ const lip=Math.max(0,1-Math.abs(d-13)/1.4); if(d<12.2){ F.h0[id]=(4.5+0.3*rzVN(x*0.8,y*0.8,3))*F.k; const k2=1-d/12.2; F.c[id*3]=70+40*k2; F.c[id*3+1]=140+50*k2; F.c[id*3+2]=50+20*k2; F.m[id]=RZ.WET; } else F.h0[id]=(6.5+lip*1.2)*F.k; } }); }); },
+  ore(taken){ return rzSpr('ore'+(taken?1:0),44,40,22,20,F=>{ rzContact(F,1,3,19,15,0.4);
+    rzDome(F,0,2,18,14,0,0,5,[96,90,100],RZ.ROCK,0.6);
+    if(!taken){ const sh=[[-8,-2,0.4],[4,-6,-0.3],[8,4,0.9],[-4,6,2.2],[0,0,-1.2]];
+      for(const [x,y,a] of sh){ const ca=Math.cos(a), sa=Math.sin(a); rzPoly(F,[[x-sa*3.6,y+ca*3.6],[x+ca*12,y+sa*12],[x+sa*3.6,y-ca*3.6]],(px,py)=>{ const al=((px-x)*ca+(py-y)*sa)/12, ac=Math.abs(-(px-x)*sa+(py-y)*ca); return 6+Math.max(0,(1-al)*5-ac*1.2); },[90,150,230],RZ.GLOSS); } }
+    else { rzDome(F,-3,0,6,5,0,4,1.4,[60,56,64],RZ.ROCK); rzDome(F,5,3,4,3.4,0,4,1.2,[60,56,64],RZ.ROCK); }
+  }); },
+  shrine(){ return rzSpr('shrine',44,44,22,22,F=>{ rzContact(F,1,2,21,21,0.4);
+    rzBox(F,0,0,36,36,0,4,1.4,[124,120,130],RZ.ROCK,rzStoneTx(6));
+    rzPoly(F,[[-14,-14],[14,-14],[14,14],[-14,14]],(x,y)=>4+Math.max(0,8-Math.max(Math.abs(x),Math.abs(y))*0.57),(x,y)=>rzMulC([142,138,150],rzStoneTx(8)(x,y)),RZ.ROCK);
+  }); },
+  arena(gate,a){ const ak=Math.round(((a%TAU)+TAU)%TAU*20)/20; return rzSpr('arena'+(gate?1:0)+'_'+ak,64,64,32,32,F=>{
+    if(gate){ rzBox(F,0,0,48,12,ak,4,0.8,[88,64,42],RZ.WOOD,rzWoodTx(4,true)); const cs=Math.cos(ak), sn=Math.sin(ak); for(let x=-20;x<=20;x+=8) rzBox(F,x*cs,x*sn,2,12,ak,4.6,0.4,[120,92,60],RZ.WOOD); return; }
+    rzContact(F,0,1,27,18,0.35); rzBox(F,0,0,50,30,ak,8,2,[150,140,124],RZ.ROCK,rzStoneTx(Math.round(ak*10)));
+    const cs=Math.cos(ak), sn=Math.sin(ak); rzEach(F,(x,y,id)=>{ const u=x*cs+y*sn; if(Math.abs(u)<0.5){ F.h0[id]-=1.5*F.k; F.c[id*3]*=0.6; F.c[id*3+1]*=0.6; F.c[id*3+2]*=0.6; } });
+  }); },
+  throne(){ return rzSpr('throne',200,140,100,96,F=>{ rzContact(F,0,4,86,46,0.4);
+    rzPoly(F,[[-80,-40],[80,-40],[64,40],[-64,40]],12,(x,y)=>rzMulC([66,56,72],rzStoneTx(3)(x,y)),RZ.ROCK);
+    rzBox(F,0,-1,92,46,0,14,1.2,[30,24,34],RZ.ROCK,rzStoneTx(5));
+    for(const sx of [-1,1]) rzPoly(F,[[sx*70,-40],[sx*96,-90],[sx*54,-40]],(x,y)=>12+(-40-y)*0.3,(x,y)=>rzMulC([80,68,88],rzStoneTx(7)(x,y)),RZ.GLOSS);
+  }); }
+};
+function rzStruct(s,t){
+  switch(s.k){
+    case 'well': rzPutC(RZS.well(),s.x,s.y); return true;
+    case 'torch':{ const nt=G&&isNight(); rzPutC(RZS.torch(nt),s.x,s.y); if(nt) glowAt(s.x,s.y-21,14,'255,200,120',0.5); return true; }
+    case 'stake': rzPutC(RZS.stake(),s.x,s.y); return true;
+    case 'tent': rzPutC(RZS.tent(s.r,s.a),s.x,s.y); return true;
+    case 'campfire':{ const r=s.small?14:22; rzPutC(RZS.campfire(s.small),s.x,s.y); glowAt(s.x,s.y,r*1.05,'255,170,70',0.7+0.08*Math.sin(t*9+s.x)); glowAt(s.x,s.y,r*0.42,'255,236,180',0.85);
+      if(Math.random()<0.5) emit(s.x+rand(-5,5),s.y+rand(-5,5),1,{kind:'fire',ang:-Math.PI/2,spread:0.5,smin:20,smax:60,lmin:.4,lmax:.7,zmin:3,zmax:6,grow:5,drag:1}); return true; }
+    case 'stone': rzPutC(RZS.stone(s.s,s.snow,s.a),s.x,s.y); return true;
+    case 'altar': rzPutC(RZS.altar(),s.x,s.y); ctx.strokeStyle=`rgba(255,96,44,${0.5+0.3*Math.sin(t*2)})`; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(s.x-26,s.y); ctx.quadraticCurveTo(s.x,s.y-18,s.x+26,s.y); ctx.quadraticCurveTo(s.x,s.y+18,s.x-26,s.y); ctx.stroke(); ctx.beginPath(); ctx.ellipse(s.x,s.y,3,9,0,0,TAU); ctx.stroke(); return true;
+    case 'brazier': rzPutC(RZS.brazier(),s.x,s.y); glowAt(s.x,s.y,13,'255,160,60',0.75+0.1*Math.sin(t*11+s.x)); glowAt(s.x,s.y,5,'255,236,180',0.8);
+      if(Math.random()<0.6) emit(s.x+rand(-4,4),s.y+rand(-4,4),1,{kind:'fire',ang:-Math.PI/2,spread:0.5,smin:15,smax:50,lmin:.4,lmax:.7,zmin:3,zmax:6,grow:4,drag:1}); return true;
+    case 'pillar': rzPutC(RZS.pillar(s.broken),s.x,s.y); ctx.strokeStyle=`rgba(255,130,50,${0.35+0.2*Math.sin(t*2+s.x)})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(s.x,s.y,18,0,TAU); ctx.stroke(); return true;
+    case 'throne': rzPutC(RZS.throne(),s.x,s.y); return true;
+    case 'arena': if(s.gate&&!(G&&G.mode==='normal')) return true; rzPutC(RZS.arena(s.gate,s.a+Math.PI/2),s.x,s.y); return true;
+    case 'ward':{
+      const lit=G&&G.wards&&G.wards[s.id], heat=G&&G.wardHeat?G.wardHeat[s.id]||0:0;
+      rzPutC(RZS.ward(),s.x,s.y);
+      ctx.save(); ctx.translate(s.x,s.y);
+      ctx.strokeStyle=lit?`rgba(255,${180+Math.sin(t*3)*30|0},90,.95)`:heat>0?`rgba(255,${120+heat*80|0},60,${0.4+heat*0.5})`:`rgba(140,180,220,${0.35+0.15*Math.sin(t*1.5+s.x)})`; ctx.lineWidth=2;
+      for(let i=0;i<6;i++){ ctx.save(); ctx.rotate(i/6*TAU); ctx.beginPath(); ctx.moveTo(26,-4); ctx.lineTo(29,0); ctx.lineTo(26,4); ctx.moveTo(24,0); ctx.lineTo(30,0); ctx.stroke(); ctx.restore(); }
+      ctx.restore();
+      if(lit||heat>0){ const k=lit?1:heat; glowAt(s.x,s.y,70*k+10,'255,180,80',0.45*k); glowAt(s.x,s.y,11,'255,240,190',k); glowAt(s.x,s.y,7,'255,150,50',k);
+        if(lit&&Math.random()<0.7) emit(s.x+rand(-5,5),s.y+rand(-5,5),1,{kind:'fire',ang:-Math.PI/2,spread:0.5,smin:20,smax:60,lmin:.4,lmax:.8,zmin:3,zmax:7,grow:5,drag:1}); }
+      return true; }
+    case 'lantern':{ const lit=s.ref.lit; rzPutC(RZS.lantern(lit),s.x,s.y);
+      if(lit) glowAt(s.x,s.y,30,'255,170,80',0.42+0.08*Math.sin(t*5+s.x));
+      else if(G&&G.flags&&G.flags.forge&&!G.flags.lanterns){ ctx.strokeStyle=`rgba(255,220,140,${0.4+0.4*Math.sin(t*4)})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(s.x,s.y,16,0,TAU); ctx.stroke(); }
+      return true; }
+    case 'bigoak':{ rzPutC(RZS.bigoak(),s.x,s.y);
+      if(DV.on){ const sc=s.R/48, h=118*sc, dx=leanDX(s.x,h)*0.8, dy=leanDY(s.y,h)*0.8; if(Math.hypot(dx,dy)>2) rzTrunk('oak',s.x,s.y,dx,dy,34,0); }
+      return true; }
+    case 'stall': rzPutC(RZS.stall(s.col,pick2(s,['#c8503e','#d8a838','#6a9a40']),s.a+Math.PI/2),s.x,s.y); return true;
+    case 'post': rzPutC(RZS.post(),s.x,s.y); return true;
+    case 'hut': rzPutC(RZS.hut(s.r),s.x,s.y); if(Math.random()<0.08) emit(s.x,s.y,1,{alpha:0.35,col:'150,160,140',glow:false,ang:-Math.PI/2+0.3,spread:0.3,smin:12,smax:30,lmin:2,lmax:3,zmin:4,zmax:7,grow:8,drag:0.3}); return true;
+    case 'cauldron':{ rzPutC(RZS.cauldron(),s.x,s.y); glowAt(s.x,s.y,14,'170,240,110',0.25); ctx.fillStyle='rgba(220,250,180,.7)'; for(let i=0;i<3;i++){ const a=t*1.3+i*2.1; ctx.beginPath(); ctx.arc(s.x+Math.cos(a)*6,s.y+Math.sin(a*1.3)*5,1.5+((t*2+i)%1)*2,0,TAU); ctx.fill(); }
+      if(Math.random()<0.2) emit(s.x,s.y,1,{alpha:0.4,col:'190,220,170',glow:false,ang:-Math.PI/2,spread:0.5,smin:10,smax:25,lmin:1.2,lmax:2,zmin:3,zmax:6,grow:7,drag:0.4}); return true; }
+    case 'ore':{ const taken=G&&G.ores&&G.ores[s.ref.id]; rzPutC(RZS.ore(taken),s.x,s.y); if(!taken) glowAt(s.x,s.y,34,'110,170,255',0.32+0.14*Math.sin(t*3+s.x)); return true; }
+    case 'shrine':{ const on=G&&G.shrines&&G.shrines[s.ref.id]; rzPutC(RZS.shrine(),s.x,s.y);
+      ctx.strokeStyle=on?`rgba(255,${190+Math.sin(t*3)*30|0},90,.95)`:'rgba(140,170,200,.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(s.x-6,s.y); ctx.quadraticCurveTo(s.x,s.y-7,s.x+6,s.y); ctx.quadraticCurveTo(s.x,s.y+7,s.x-6,s.y); ctx.stroke();
+      if(on){ glowAt(s.x,s.y,40,'255,160,70',0.35); glowAt(s.x,s.y,8,'255,236,170',0.5+0.2*Math.sin(t*3)); } return true; }
+  }
+  return false;
+}
+// debug: every structure sprite on one sheet
+function rzStructSheet(sc){ sc=sc||2; const list=[RZS.well(),RZS.torch(false),RZS.torch(true),RZS.stake(),RZS.tent(40,0.3),RZS.campfire(false),RZS.campfire(true),RZS.stone(1,false,0.4),RZS.stone(1,true,-0.3),RZS.brazier(),RZS.pillar(false),RZS.pillar(true),RZS.altar(),RZS.ward(),RZS.lantern(false),RZS.lantern(true),RZS.bigoak(),RZS.stall('#3e6a8a','#c8503e',0.5),RZS.post(),RZS.hut(30),RZS.cauldron(),RZS.ore(false),RZS.shrine(),RZS.arena(false,0.7)];
+  const cw=Math.max(...list.map(c=>c.w2))*sc*0.6+8, cols=6, rows=Math.ceil(list.length/cols), ch=Math.max(...list.map(c=>c.h2))*sc*0.6+8;
+  const cv=mkCanvas(cols*cw,rows*ch), g=cv.getContext('2d'); g.fillStyle='#5f7a3c'; g.fillRect(0,0,cv.width,cv.height);
+  list.forEach((c,i)=>{ const k=sc*0.6, w=c.w2*k, h=c.h2*k; g.drawImage(c,(i%cols)*cw+(cw-w)/2,Math.floor(i/cols)*ch+(ch-h)/2,w,h); });
+  return cv.toDataURL(); }
+window.__ebDbg.rzStructSheet=rzStructSheet;
+
+// ---------- the Emberhollow wall, its gate towers and the portcullis (drawWall in a3_art.js)
+function rzWallTile(){ return rzCache('walltile',()=>{
+  // one 128 x 52 stretch of the wall top: big dressed blocks in two courses, worn, with moss in the joints
+  const F=rzHF(128,52,0,0), rng=mulberry32(808), tx=rzStoneTx(12);
+  for(let r=0;r<2;r++){ let x=-(r?18:0); while(x<128){ const w=26+rng()*14, cc=rzJit([88,84,96],rng,0.2);
+      for(const ox of [0,128]) rzBox(F,x+w/2-ox,r*26+13,w-1.2,24.8,0,6,2.2,rzMix(cc,[96,92,84],rng()*0.4),RZ.ROCK,(u,v)=>tx(u+x,v+r*30));
+      x+=w; } }
+  rzEach(F,(x,y,id)=>{ if(F.h0[id]<3*F.k&&rzFbm(x*0.2,y*0.2,4,2)>0.55){ F.c[id*3]=70; F.c[id*3+1]=86; F.c[id*3+2]=50; F.m[id]=RZ.LEAF; } });
+  for(let i=0;i<F.n;i++) if(F.a[i]<1){ F.a[i]=1; if(F.h0[i]<0.05){ F.h0[i]=0.05; F.c[i*3]=34; F.c[i*3+1]=32; F.c[i*3+2]=36; } }
+  return rzShade(F,{ao:0.18,aoR:2,rim:0});
+}); }
+function rzWallPat(){ return rzCache('wallpat:'+WALL_Y,()=>{ const p=ctx.createPattern(rzWallTile(),'repeat'); try{ p.setTransform(new DOMMatrix().translate(0,WALL_Y-26).scale(1/SS)); }catch(e){} return p; }); }
+const RZW={
+  merlon(){ return rzSpr('merlon',26,14,13,7,F=>{ rzBox(F,0,0,22,10,0,7,1.8,[100,96,108],RZ.ROCK,rzStoneTx(3)); },{ao:0.12,aoR:1.2,rim:0.3}); },
+  tower(){ return rzSpr('tower',88,128,44,64,F=>{
+    const tx=rzStoneTx(21), rng=mulberry32(77);
+    rzBox(F,0,0,80,120,0,6,2,[78,74,86],RZ.ROCK,(u,v)=>{ const bx=Math.floor((u+40)/16+(Math.floor((v+60)/12)%2)*0.5), by=Math.floor((v+60)/12), j=Math.min(Math.abs(((u+40)/16+(by%2)*0.5)%1-0.5),Math.abs(((v+60)/12)%1-0.5)); return (j>0.44?0.6:0.86+0.24*rzHash(bx,by,5))*tx(u,v); });
+    // a crenellated rim around the tower top
+    for(let i=0;i<5;i++){ const x=-32+i*16; rzBox(F,x,-55,10,8,0,11,1.4,rzJit([104,100,112],rng,0.1),RZ.ROCK,tx); rzBox(F,x,55,10,8,0,11,1.4,rzJit([104,100,112],rng,0.1),RZ.ROCK,tx); }
+    for(let i=0;i<7;i++){ const y=-45+i*15; rzBox(F,-35,y,8,9,0,11,1.4,rzJit([104,100,112],rng,0.1),RZ.ROCK,tx); rzBox(F,35,y,8,9,0,11,1.4,rzJit([104,100,112],rng,0.1),RZ.ROCK,tx); }
+  },{ao:0.16,aoR:2,rim:0.35}); }
+};
+function rzDrawWall(){
+  if(WALL_Y+80<cam.y||WALL_Y-80>cam.y+H/zoom) return;
+  if(DV.on){ const keep=wallPattern; wallPattern=rzWallPat(); try{ drawWall0(); } finally{ wallPattern=keep; } rzWallDepthDress(); return; }
+  const x0=Math.max(0,cam.x-100), x1=Math.min(WORLD.w,cam.x+W/zoom+100);
+  ctx.fillStyle='rgba(8,8,10,.32)'; ctx.fillRect(x0,WALL_Y+26,x1-x0,22); ctx.fillStyle='rgba(8,8,10,.18)'; ctx.fillRect(x0,WALL_Y+48,x1-x0,8);
+  ctx.fillStyle=rzWallPat();
+  const seg=(a,b)=>{ if(b<x0||a>x1) return; ctx.fillRect(Math.max(a,x0),WALL_Y-26,Math.min(b,x1)-Math.max(a,x0),52); };
+  seg(0,GATE_X0-80); seg(GATE_X1+80,WORLD.w);
+  const M=RZW.merlon(); for(let x=Math.floor(x0/40)*40;x<x1;x+=40){ if(x>GATE_X0-90&&x<GATE_X1+80) continue; ctx.drawImage(M,x-2,WALL_Y-32,26,14); }
+  const T=RZW.tower(); for(const tx of [GATE_X0-80,GATE_X1]){ ctx.drawImage(T,tx-4,WALL_Y-64,88,128); ctx.strokeStyle='rgba(255,120,50,.3)'; ctx.lineWidth=1.5; ctx.strokeRect(tx+10,WALL_Y-50,60,100); }
+  if(GATE_COL&&!GATE_COL.off){ ctx.fillStyle='#121014'; ctx.fillRect(GATE_X0,WALL_Y-20,GATE_X1-GATE_X0,40); ctx.lineCap='butt';
+    for(const [w,c] of [[3.4,'#2a272c'],[2,'#6a6670'],[0.7,'rgba(220,220,230,.5)']]){ ctx.strokeStyle=c; ctx.lineWidth=w; ctx.beginPath(); for(let x=GATE_X0+8;x<GATE_X1;x+=14){ const o=c[0]==='r'?-0.6:0; ctx.moveTo(x+o,WALL_Y-20); ctx.lineTo(x+o,WALL_Y+20); } ctx.moveTo(GATE_X0,WALL_Y); ctx.lineTo(GATE_X1,WALL_Y); ctx.stroke(); } }
+}
+// in the depth modes the wall's south face and the gate towers (drawn by drawWallDepth in a11c_depth.js) get the
+// same stone: the face is laid over with a shaded block texture, the tower tops with the tower sprite, using the
+// same lean as that drawer
+function rzFacePat(){ return rzCache('wallface',()=>{ const F=rzHF(96,30,0,0), rng=mulberry32(909), tx=rzStoneTx(31);
+  for(let r=0;r<3;r++){ let x=-(r%2?9:0); while(x<96){ const w=14+rng()*10; for(const ox of [0,96]) rzBox(F,x+w/2-ox,r*10+5,w-1,9,0,3,1.2,rzJit([70,66,78],rng,0.22),RZ.ROCK,(u,v)=>tx(u+x,v+r*12)); x+=w; } }
+  for(let i=0;i<F.n;i++) if(F.a[i]<1){ F.a[i]=1; if(F.h0[i]<0.05){ F.h0[i]=0.05; F.c[i*3]=26; F.c[i*3+1]=24; F.c[i*3+2]=28; } }
+  const c=rzShade(F,{ao:0.18,aoR:1.6,rim:0,gain:0.8}); return c; }); }
+function rzWallDepthDress(){
+  const x0=Math.max(0,cam.x-100), x1=Math.min(WORLD.w,cam.x+W/zoom+100), L=wallLean(), fh=L.fh, sx=L.sx, cx=DV.cx, By=WALL_Y+26, X=(x,s)=>cx+(x-cx)*s;
+  const pat=ctx.createPattern(rzFacePat(),'repeat'), face=(a,b,B,f,s)=>{ ctx.beginPath(); ctx.moveTo(a,B); ctx.lineTo(b,B); ctx.lineTo(X(b,s),B-f); ctx.lineTo(X(a,s),B-f); ctx.closePath(); };
+  try{ pat.setTransform(new DOMMatrix().translate(0,By-fh).scale(1/SS,fh/30/SS)); }catch(e){}
+  const segs=[[0,GATE_X0-80],[GATE_X1+80,WORLD.w]].map(([a,b])=>[Math.max(a,x0-60),Math.min(b,x1+60)]).filter(([a,b])=>b>a);
+  ctx.fillStyle=pat; for(const [a,b] of segs){ face(a,b,By,fh,sx); ctx.fill(); }
+  ctx.fillStyle='rgba(10,8,14,.28)'; for(const [a,b] of segs){ ctx.fillRect(a,By-2,b-a,2); }
+  if(x1>GATE_X0-200&&x0<GATE_X1+200){
+    const fT=fh*1.7+8, sT=1+(sx-1)*1.7, Bt=WALL_Y+60, T=RZW.tower();
+    const tp=ctx.createPattern(rzFacePat(),'repeat'); try{ tp.setTransform(new DOMMatrix().translate(0,Bt-fT).scale(1/SS,fT/30/SS)); }catch(e){}
+    for(const tx of [GATE_X0-80,GATE_X1]){
+      ctx.fillStyle=tp; face(tx,tx+80,Bt,fT,sT); ctx.fill();
+      ctx.save(); ctx.transform(sT,0,0,1,cx*(1-sT),-fT); ctx.drawImage(T,tx-4,WALL_Y-64,88,128); ctx.strokeStyle='rgba(255,120,50,.3)'; ctx.lineWidth=1.5; ctx.strokeRect(tx+10,WALL_Y-50,60,100); ctx.restore();
+    }
+  }
+}
+// ---------- chests (drawChest in a3_art.js)
+function rzChestSpr(open){ return rzSpr('chest'+(open?1:0),40,30,20,14,F=>{
+  rzContact(F,1,3,17,11,0.45);
+  rzBox(F,0,0,30,20,0,8,1.6,[128,84,44],RZ.WOOD,rzWoodTx(6,true));
+  if(open) rzBox(F,0,-1,24,14,0,2,1,[30,18,8],RZ.WOOD);
+  else{ rzBox(F,0,-3,30,10,0,10,2.2,[138,92,50],RZ.WOOD,rzWoodTx(7,true)); }
+  for(const y of [-8.5,8.5]) rzBox(F,0,y,30,3,0,open?8.6:10.4,0.6,[150,132,96],RZ.METAL);
+  rzBox(F,0,0,4,20,0,open?8.8:10.8,0.6,[160,140,100],RZ.METAL);
+  if(!open) rzBox(F,0,1.5,4.6,4.6,0,11.6,0.8,[196,164,84],RZ.METAL);
+},{ao:0.14,aoR:1.2,rim:0.35}); }
+function rzChest(c,t){
+  rzPutC(rzChestSpr(!!c.open),c.x,c.y);
+  if(!c.open) glowAt(c.x,c.y,30,'255,200,110',0.22+0.16*Math.sin(t*3+c.x));
+}
