@@ -202,17 +202,25 @@ const RZP={
   bark:[92,70,50], birchBark:[222,216,202], pineBark:[110,72,50], willowBark:[86,74,58], dead:[132,124,112], char:[38,32,30]
 };
 function rzMkOak(seed,kind){
-  const rng=mulberry32(seed), R=48, F=rzSq(R);
-  const pal=kind==='birch'?RZP.birch:[RZP.oak,RZP.oak2,RZP.oak3][seed%3];
-  if(kind==='birch'){
-    rzCanopy(F,{rng,R:R*0.9,n:11+Math.floor(rng()*3),sub:120,sr:[0.07,0.12],ls:[1.0,1.6],pal,innerCol:RZP.birchIn,innerK:0.5,open:0.55,tint:0.35,
-      under:(F,cl)=>{ // pale branches showing through the open crown
-        const bc=RZP.birchBark, tx=rzBarkTex(seed,1.2,true);
-        for(let i=0;i<7;i++){ const a=i/7*TAU+rng()*0.6, L=R*(0.34+rng()*0.22); rzCap(F,0,0,R*0.16,Math.cos(a)*L,Math.sin(a)*L,R*0.1,2.6,0.8,bc,RZ.BARK,(t,u,len)=>tx(t,u,len)*(rzHash(Math.floor(t*len*0.6),3,seed)>0.8?0.35:1)); }
+  return kind==='birch'?rzBroadleaf(seed,48,{pal:RZP.birch,inner:RZP.birchIn,birch:1}):rzBroadleaf(seed,48,{pal:[RZP.oak,RZP.oak2,RZP.oak3][seed%3],inner:RZP.oakIn});
+}
+// a broadleaf crown of radius about R. o: pal, inner, birch (open, small leaves, pale branches), bark (branch
+// colour), berries [rgb], flowers [rgb...], glints (silver specks), k (crown size 0..1)
+function rzBroadleaf(seed,R,o){
+  const rng=mulberry32(seed), F=rzSq(R), pal=o.pal;
+  if(o.birch){
+    rzCanopy(F,{rng,R:R*(o.k||0.9),n:11+Math.floor(rng()*3),sub:Math.round(120*(R/48)**2),sr:[0.07,0.12],ls:[1.0,1.6],pal,innerCol:o.inner,innerK:0.5,open:0.55,tint:0.35,
+      under:(F)=>{ // pale branches showing through the open crown
+        const bc=o.bark||RZP.birchBark, tx=rzBarkTex(seed,1.2,true);
+        for(let i=0;i<7;i++){ const a=i/7*TAU+rng()*0.6, L=R*(0.34+rng()*0.22); rzCap(F,0,0,R*0.16,Math.cos(a)*L,Math.sin(a)*L,R*0.1,2.6*R/48+0.6,0.8,bc,RZ.BARK,(t,u,len)=>tx(t,u,len)*(rzHash(Math.floor(t*len*0.6),3,seed)>0.8?0.35:1)); }
       }});
   }else{
-    rzCanopy(F,{rng,R:R*(0.88+rng()*0.1),n:8+Math.floor(rng()*5),ls:[1.5,2.5],pal,innerCol:RZP.oakIn,tint:0.32,ey:0.88+rng()*0.16});
+    rzCanopy(F,{rng,R:R*(o.k||(0.88+rng()*0.1)),n:8+Math.floor(rng()*5),ls:R<40?[1.3,2.2]:[1.5,2.5],pal,innerCol:o.inner||rzCol(pal[0],-0.42),tint:0.32,ey:0.88+rng()*0.16});
   }
+  const top=(n,r,col,m)=>{ for(let i=0;i<n;i++){ const a=rng()*TAU, d=Math.sqrt(rng())*R*0.72; rzDome(F,Math.cos(a)*d,Math.sin(a)*d,r,r,0,R*0.6,r,rzJit(col,rng,0.15),m); } };
+  if(o.berries) top(10+Math.floor(rng()*8),1.3,o.berries,RZ.GLOSS);
+  if(o.flowers) for(const c of o.flowers) top(14,1.2,c,RZ.CLOTH);
+  if(o.glints) top(8,0.8,[236,232,250],RZ.GLOSS);
   return rzShade(F,{ao:0.22,aoR:2.2,hao:0.34,bump:1});
 }
 function rzMkBigOak(){
@@ -236,15 +244,18 @@ function rzStamp(F,T,x,y,rot,sl,sw,z0,droop,tint){
     if(z>H[id]){ H[id]=z; C[id*3]=T.c[q*3]*tr[0]; C[id*3+1]=T.c[q*3+1]*tr[1]; C[id*3+2]=T.c[q*3+2]*tr[2]; M[id]=T.m[q]; }
   }
 }
-function rzFrond(v,snow){
-  return rzCache('frond'+v+(snow?'s':''),()=>{
-    const T=rzHF(42,22,0,11), rng=mulberry32(3300+v*17), P=snow?RZP.spine:RZP.pine;
+// o (conifers): pal [deep, mid, light], tip (new growth), snow, frost (rime on the needle tips), key (cache name)
+function rzFrond(v,snow,o){
+  o=o||{}; const key=o.key||'pine';
+  return rzCache('frond'+key+v+(snow?'s':''),()=>{
+    const T=rzHF(42,22,0,11), rng=mulberry32(3300+v*17+key.length*5), P=o.pal||(snow?RZP.spine:RZP.pine), tipC=o.tip||RZP.pineTip;
     rzCap(T,0,0,2.2,40,0,0.6,1.5,0.45,rzCol(P[0],-0.3),RZ.NEEDLE);
     for(let x=0.5;x<40.5;x+=0.85){
       const w=10*Math.pow(1-x/46,0.7)+1.8, tip=x>31;
       for(const sd of [-1,1]) for(let n=0;n<2;n++){
         const a=sd*(0.5+rng()*0.55), len=w*(0.75+rng()*0.4), cx=x+Math.cos(a)*len*0.5, cy=Math.sin(a)*len*0.5;
-        const tone=clamp(0.3+x/40*0.35+(rng()-0.5)*0.45+(n?0.1:0),0,1), col=tip&&rng()<0.6?rzMix(P[2],RZP.pineTip,rng()*0.8):tone<0.5?rzMix(P[0],P[1],tone*2):rzMix(P[1],P[2],(tone-0.5)*2);
+        const tone=clamp(0.3+x/40*0.35+(rng()-0.5)*0.45+(n?0.1:0),0,1); let col=tip&&rng()<0.6?rzMix(P[2],tipC,rng()*0.8):tone<0.5?rzMix(P[0],P[1],tone*2):rzMix(P[1],P[2],(tone-0.5)*2);
+        if(o.frost&&rng()<o.frost*(0.4+x/60)) col=rzMix(col,[214,228,238],0.7);
         rzLeaf(T,cx,cy,len*0.52,0.6,a,1.6+rng()*0.5,0,-sd*0.22,rzJit(col,rng,0.1),RZ.NEEDLE);
       }
     }
@@ -253,18 +264,19 @@ function rzFrond(v,snow){
     return T;
   });
 }
-function rzMkPine(seed,snow){
-  const rng=mulberry32(seed), R=40, F=rzSq(R), S=[234,240,246];
+function rzMkPine(seed,snow){ return rzConifer(seed,40,{snow}); }
+function rzConifer(seed,R,o){
+  o=o||{}; const rng=mulberry32(seed), F=rzSq(R), S=[234,240,246], snow=o.snow, k=R/40;
   const tiers=[[R,1.5,13],[R*0.78,7,11],[R*0.56,12,9],[R*0.34,17,7]], r0=rng()*TAU;
-  rzDome(F,0,0,R*0.6,R*0.6,0,0,6,RZP.pineIn,RZ.NEEDLE);
+  rzDome(F,0,0,R*0.6,R*0.6,0,0,6,o.inCol||RZP.pineIn,RZ.NEEDLE);
   for(let L=0;L<tiers.length;L++){
-    const [r,z,nb]=tiers[L], rot=r0+L*Math.PI/nb+(rng()-0.5)*0.3;
+    const [r,z0,nb]=tiers[L], z=z0*k, rot=r0+L*Math.PI/nb+(rng()-0.5)*0.3;
     for(let b=0;b<nb;b++){
-      const a=rot+b/nb*TAU+(rng()-0.5)*0.3, len=r*(0.88+rng()*0.16), sw=0.75+L*0.06+rng()*0.25, t=0.9+rng()*0.2;
-      rzStamp(F,rzFrond((seed+b+L)%3,snow&&(L>0||rng()<0.75)),0,0,a,len/40,sw,z,Math.min(z+1,4.5+L*0.6),[t,t*(0.98+rng()*0.04),t]);
+      const a=rot+b/nb*TAU+(rng()-0.5)*0.3, len=r*(0.88+rng()*0.16), sw=(0.75+L*0.06+rng()*0.25)*Math.min(1.25,Math.max(0.85,k)), t=0.9+rng()*0.2;
+      rzStamp(F,rzFrond((seed+b+L)%3,snow&&(L>0||rng()<0.75),o),0,0,a,len/40,sw,z,Math.min(z+1,(4.5+L*0.6)*k),[t,t*(0.98+rng()*0.04),t]);
     }
   }
-  for(let b=0;b<5;b++) rzStamp(F,rzFrond(b%3,snow),0,0,r0+b/5*TAU+0.3,0.16,0.5,20,1,[1.08,1.08,1.05]);
+  for(let b=0;b<5;b++) rzStamp(F,rzFrond(b%3,snow,o),0,0,r0+b/5*TAU+0.3,0.16*k,0.5,20*k,1,[1.08,1.08,1.05]);
   return rzShade(F,{ao:0.24,aoR:2,hao:0.34,bump:1,rim:0.4,trans:[150,190,110]});
 }
 function rzMkWillow(seed){
@@ -285,12 +297,12 @@ function rzMkWillow(seed){
     } }
   return rzShade(F,{ao:0.22,aoR:2.2,hao:0.3,bump:1,trans:[210,220,120]});
 }
-function rzMkDead(seed,charred){
-  const rng=mulberry32(seed), R=40, F=rzSq(R), col=charred?RZP.char:RZP.dead, sd=seed%97;
+function rzMkDead(seed,charred,o){
+  const rng=mulberry32(seed), R=(o&&o.R)||40, F=rzSq(R), col=charred?RZP.char:RZP.dead, sd=seed%97;
   const tex=(t,u,len)=>{ const along=t*len; let v=0.78+0.32*rzVN(u*2.6+sd,along*0.5,sd); const cr=rzVN(u*4.5,along*0.16,sd+5); if(cr<0.28) v*=0.55+cr; if(u<-0.2) v*=1.05; return v; };
   const segs=[];
   const br=(x,y,z,a,len,w,d)=>{ if(d>4||len<4) return; const x2=x+Math.cos(a)*len, y2=y+Math.sin(a)*len, z2=z-len*0.22; segs.push([x,y,z,x2,y2,z2,w,w*0.66]); const k2=1+Math.floor(rng()*2); for(let i=0;i<=k2;i++) br(x2,y2,z2,a+(rng()-0.5)*1.4,len*(0.55+rng()*0.2),w*0.64,d+1); };
-  const n=4+Math.floor(rng()*3); for(let i=0;i<n;i++) br(0,0,16,i/n*TAU+rng()*0.6,R*(0.42+rng()*0.2),3.4,0);
+  const n=4+Math.floor(rng()*3); for(let i=0;i<n;i++) br(0,0,16*R/40,i/n*TAU+rng()*0.6,R*(0.42+rng()*0.2),3.4*Math.min(1,R/40+0.1),0);
   let ext=0; for(const s of segs) ext=Math.max(ext,Math.hypot(s[3],s[4])+s[7]); const sk=ext>R*0.98?R*0.98/ext:1; if(sk<1) for(const s of segs){ s[0]*=sk; s[1]*=sk; s[3]*=sk; s[4]*=sk; }
   for(const s of segs) rzCap(F,s[0],s[1],s[2],s[3],s[4],s[5],s[6],s[7],rzJit(col,rng,0.1),RZ.BARK,tex);
   rzDome(F,0,0,6.4,6.4,0,14,4.5,rzCol(col,0.06),RZ.BARK);
@@ -302,11 +314,11 @@ function rzMkDead(seed,charred){
 // trunks and roots for the 3D depth modes (the crown leans toward the camera; the trunk joins it to its roots)
 function rzTrunkTex(kind){
   return rzCache('trunk:'+kind,()=>{
-    const F=rzHF(16,64,8,0), c=kind==='birch'?RZP.birchBark:kind==='pine'||kind==='spine'?RZP.pineBark:kind==='willow'?RZP.willowBark:kind==='dead'?RZP.dead:kind==='char'?RZP.char:RZP.bark;
+    const F=rzHF(16,64,8,0), c={birch:RZP.birchBark,pine:RZP.pineBark,spine:RZP.pineBark,willow:RZP.willowBark,dead:RZP.dead,char:RZP.char,palm:[150,116,80],stone:[84,80,90],bone:[214,204,184],iron:[58,56,60],glass:[150,186,214]}[kind]||RZP.bark;
     const sd=kind.length*13, tx=rzBarkTex(sd,kind==='pine'||kind==='spine'?1.4:2.2,true);
     // a vertical tapered cylinder (top at y 0, base at y 64), widening into the root flare
     rzContact(F,0,63,7.5,2.6,0.45);
-    rzCap(F,0,62,6,0,0,6,6.2,4.4,c,RZ.BARK,(t,u,len)=>{ let v=tx(t,u,len); if(kind==='birch'&&rzHash(Math.floor(t*len*0.45),Math.floor(u*1.5+2),sd)>0.72) v*=0.28; return v; },1);
+    rzCap(F,0,62,6,0,0,6,6.2,4.4,c,RZ.BARK,(t,u,len)=>{ let v=tx(t,u,len); if(kind==='birch'&&rzHash(Math.floor(t*len*0.45),Math.floor(u*1.5+2),sd)>0.72) v*=0.28; if(kind==='palm') v=0.8+0.3*Math.abs(Math.sin(t*len*0.55)); if(kind==='iron'||kind==='glass'||kind==='bone') v=0.95+0.05*v; return v; },1);
     return rzShade(F,{ao:0.1,aoR:1.6,rim:0.5});
   });
 }
@@ -333,7 +345,8 @@ function rzTallProps(props,t,bossE){
     if(halo&&a>0.9&&p.k!=='dead'){ const sil=silOf(sp), hh=sp.half*p.s*1.04; ctx.globalAlpha=ha; ctx.drawImage(sil,p.x+dx-hh+3,p.y+dy-hh+7,hh*2,hh*2); }
     ctx.globalAlpha=a;
     const L=Math.hypot(dx,dy);
-    if(L>2.5||p.k==='dead') rzTrunk(rzTrunkKind(p),p.x,p.y,dx,dy,(p.k==='dead'?14:12)*p.s,L>5?Math.min(1,(L-5)/10)*p.s:0);
+    const K=RZK[p.k], tk=K?K.trunk:rzTrunkKind(p);
+    if(tk&&(L>2.5||p.k==='dead')) rzTrunk(tk,p.x,p.y,dx,dy,(p.k==='dead'?14:K&&K.tw||12)*p.s,L>5&&(!K||K.roots!==false)?Math.min(1,(L-5)/10)*p.s:0);
     drawSprite(sp,p.x+dx,p.y+dy,p.s,rot);
   }
   ctx.globalAlpha=1;
@@ -346,17 +359,20 @@ function rzTrunk(kind,x,y,dx,dy,w,rk){
   ctx.save(); ctx.translate(x,y); ctx.rotate(Math.atan2(dx,-dy)); ctx.drawImage(tx,-w*0.65,-L-2,w*1.3,L+6); ctx.restore();
 }
 // ---------- bushes, plants
-function rzMkBush(seed,kind){
-  const rng=mulberry32(seed), R=15, F=rzSq(R), P=RZP[kind]||RZP.bush;
+function rzMkBush(seed,kind,o){
+  o=o||{}; const rng=mulberry32(seed), R=o.R||15, F=rzSq(R), P=o.pal||RZP[kind]||RZP.bush;
   const sh=kind==='shrub';
-  rzCanopy(F,{rng,R:R*0.95,n:5+Math.floor(rng()*3),innerN:1,leaves:sh?230:300,ls:sh?[0.9,1.5]:[1.0,1.7],pal:P,innerCol:rzCol(P[0],-0.45),tint:0.3,zTop:R*0.7,open:sh?0.5:0,
+  rzCanopy(F,{rng,R:R*0.95,n:Math.max(4,Math.round((5+Math.floor(rng()*3))*R/15)),innerN:1,ls:sh?[0.9,1.5]:R<11?[0.8,1.3]:[1.0,1.7],pal:P,innerCol:rzCol(P[0],-0.45),tint:0.3,zTop:R*0.7,open:sh?0.5:0,
     under:sh?(F)=>{ for(let i=0;i<9;i++){ const a=rng()*TAU, L=R*(0.5+rng()*0.4); rzCap(F,0,0,5,Math.cos(a)*L,Math.sin(a)*L,2,0.9,0.35,[96,74,48],RZ.BARK); } }:null});
+  const top=(n,r,col,m)=>{ for(let i=0;i<n;i++){ const a=rng()*TAU, d=Math.sqrt(rng())*R*0.7; rzDome(F,Math.cos(a)*d,Math.sin(a)*d,r,r,0,R*0.62,r,rzJit(col,rng,0.15),m); } };
+  if(o.flowers) for(const c of o.flowers) top(Math.round(R*0.8),R<11?0.8:1.1,c,RZ.CLOTH);
+  if(o.berries) top(Math.round(R*0.6),1.2,o.berries,RZ.GLOSS);
   if(kind==='bush'&&rng()<0.45){ const n=6+Math.floor(rng()*6); for(let i=0;i<n;i++){ const a=rng()*TAU, d=Math.sqrt(rng())*R*0.7; rzDome(F,Math.cos(a)*d,Math.sin(a)*d,1.25,1.25,0,R*0.62,1.2,rzJit([176,34,44],rng,0.15),RZ.GLOSS); } }
-  if(kind==='fshrub') rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.LEAF&&F.h0[id]>R*0.75*F.k&&rzHash(Math.floor(x*1.6),Math.floor(y*1.6),seed)>0.45){ F.m[id]=RZ.SNOW; F.c[id*3]=226; F.c[id*3+1]=234; F.c[id*3+2]=240; } });
+  if(kind==='fshrub'||o.frost) rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.LEAF&&F.h0[id]>R*0.75*F.k&&rzHash(Math.floor(x*1.6),Math.floor(y*1.6),seed)>0.45){ F.m[id]=RZ.SNOW; F.c[id*3]=226; F.c[id*3+1]=234; F.c[id*3+2]=240; } });
   return rzShade(F,{ao:0.2,aoR:1.8,hao:0.3,bump:1.1});
 }
-function rzMkStump(seed){
-  const rng=mulberry32(seed), R=12, F=rzSq(R), bark=RZP.bark, wood=[196,162,112];
+function rzMkStump(seed,o){
+  o=o||{}; const rng=mulberry32(seed), R=12, F=rzSq(R), bark=RZP.bark, wood=[196,162,112];
   rzContact(F,0.5,1,R*0.95,R*0.8,0.45);
   const tx=rzBarkTex(seed,1.6,false);
   for(let i=0;i<4;i++){ const a=i/4*TAU+rng()*0.9, L=R*(0.75+rng()*0.25); rzCap(F,0,0,3,Math.cos(a)*L,Math.sin(a)*L*0.9,0,2.6,0.8,rzJit(bark,rng,0.1),RZ.BARK,tx); }
@@ -365,7 +381,8 @@ function rzMkStump(seed){
   rzEach(F,(x,y,id)=>{ const d=Math.hypot(x,y); if(d<rr*0.82&&F.h0[id]>4*F.k){ const ring=0.5+0.5*Math.sin(d*2.6+rzVN(x*0.4,y*0.4,seed)*3), crack=Math.abs(Math.atan2(y,x)-0.7)<0.05&&d>2?0.6:1;
     const c=rzMix(wood,[160,120,78],ring*0.45+d/rr*0.3); F.c[id*3]=c[0]*crack; F.c[id*3+1]=c[1]*crack; F.c[id*3+2]=c[2]*crack; F.m[id]=RZ.WOOD; F.h0[id]=6.2*F.k-(1-ring)*0.25*F.k; }
     else if(F.m[id]===RZ.BARK){ const f=0.75+0.4*rzVN(Math.atan2(y,x)*6,d*0.6,seed); F.c[id*3]*=f; F.c[id*3+1]*=f; F.c[id*3+2]*=f; } });
-  if(rng()<0.5){ const a=rng()*TAU; rzDome(F,Math.cos(a)*rr*0.9,Math.sin(a)*rr*0.9,2.2,1.8,0,4,1.6,[196,58,44],RZ.GLOSS); }
+  if(o.snow) rzEach(F,(x,y,id)=>{ if(F.h0[id]>4*F.k&&rzFbm(x*0.4,y*0.4,seed,2)>0.38+(x+y)*0.012){ F.m[id]=RZ.SNOW; F.c[id*3]=236; F.c[id*3+1]=240; F.c[id*3+2]=246; F.h0[id]+=0.6*F.k; } });
+  else if(rng()<0.5){ const a=rng()*TAU; rzDome(F,Math.cos(a)*rr*0.9,Math.sin(a)*rr*0.9,2.2,1.8,0,4,1.6,[196,58,44],RZ.GLOSS); }
   return rzShade(F,{ao:0.15,aoR:1.4,rim:0.35});
 }
 function rzMkBones(seed){
@@ -384,14 +401,15 @@ function rzMkHerb(seed){
   rzDome(F,0,0,1,1,0,3.5,1,[255,230,120],RZ.CLOTH);
   return rzShade(F,{ao:0.18,aoR:1,rim:0.25,gain:1.05});
 }
-function rzMkReed(seed){
-  const rng=mulberry32(seed), R=14, F=rzSq(R);
-  rzContact(F,0,4,10,5,0.3);
-  const st=[]; for(let i=0;i<10;i++) st.push([(rng()-0.5)*14,(rng()-0.5)*9,rng()]);
+// reeds and grasses; o: R, pal (two blade colours), heads (cattail chance), frost, seed heads colour, n (blades)
+function rzMkReed(seed,o){
+  o=o||{}; const rng=mulberry32(seed), R=o.R||14, F=rzSq(R), q=R/14, P=o.pal||[[84,112,48],[108,128,58]], hc=o.head||[104,66,38], hp=o.heads==null?0.5:o.heads;
+  rzContact(F,0,4*q,10*q,5*q,0.3);
+  const st=[]; for(let i=0;i<(o.n||10);i++) st.push([(rng()-0.5)*14*q,(rng()-0.5)*9*q,rng()]);
   st.sort((a,b)=>a[1]-b[1]);
-  for(const [x,y,r] of st){ const a=-Math.PI/2+(r-0.5)*0.9, L=9+rng()*8, x2=x+Math.cos(a)*L, y2=y+4+Math.sin(a)*L, col=rng()<0.5?[84,112,48]:[108,128,58];
+  for(const [x,y,r] of st){ const a=-Math.PI/2+(r-0.5)*(o.spread||0.9), L=(9+rng()*8)*q, x2=x+Math.cos(a)*L, y2=y+4+Math.sin(a)*L; let col=rng()<0.5?P[0]:P[1]; if(o.frost&&rng()<o.frost) col=rzMix(col,[220,230,236],0.6);
     rzCap(F,x,y+4,0,x2,y2,L*0.9,0.7,0.45,col,RZ.LEAF);
-    if(rng()<0.5){ const tx=x+Math.cos(a)*L*0.72, ty=y+4+Math.sin(a)*L*0.72; rzCap(F,tx,ty,L*0.66,x2-Math.cos(a)*0.6,y2-Math.sin(a)*0.6,L*0.88,1.6,1.4,[104,66,38],RZ.CLOTH); }
+    if(rng()<hp){ const tx=x+Math.cos(a)*L*0.72, ty=y+4+Math.sin(a)*L*0.72; rzCap(F,tx,ty,L*0.66,x2-Math.cos(a)*0.6,y2-Math.sin(a)*0.6,L*0.88,1.6*Math.min(1,q+0.2),1.4*Math.min(1,q+0.2),hc,RZ.CLOTH); }
     else{ const la=a+(rng()-0.5)*0.8; rzCap(F,x,y+4,0,x+Math.cos(la)*L*0.8,y+4+Math.sin(la)*L*0.8,L*0.6,1.1,0.3,rzCol(col,0.1),RZ.LEAF,null,0.4); } }
   return rzShade(F,{ao:0.12,aoR:1.2,rim:0.3,trans:[200,210,110]});
 }
@@ -403,13 +421,14 @@ function rzMkVent(){
   rzEach(F,(x,y,id)=>{ const d=Math.hypot(x,y); if(d<7.4){ const k2=clamp(1-d/7.4,0,1); F.m[id]=RZ.EMIT; F.c[id*3]=90+165*k2; F.c[id*3+1]=26+150*k2*k2; F.c[id*3+2]=10+70*k2*k2*k2; } });
   return rzShade(F,{ao:0.25,aoR:1.6,rim:0.4});
 }
-function rzMkSpike(seed){
-  const rng=mulberry32(seed), R=20, F=rzSq(R), n=5+Math.floor(rng()*3);
+// obsidian spikes, and (with o.col) crystal clusters: o: R, col, up (points lean north, seen from the front a little)
+function rzMkSpike(seed,o){
+  o=o||{}; const rng=mulberry32(seed), R=o.R||20, F=rzSq(R), n=5+Math.floor(rng()*3), q=R/20, sc=o.col||[34,28,42];
   for(let i=0;i<n;i++){ const a=rng()*TAU, L=R*(0.62+rng()*0.38), ca=Math.cos(a), sa=Math.sin(a);
     // a shard: a ridge from the root to the tip, two flat faces falling away from it
-    const pts=[[ca*0-sa*4.4,sa*0+ca*4.4],[ca*L,sa*L],[sa*4.4,-ca*4.4]];
-    rzPoly(F,pts,(x,y)=>{ const along=(x*ca+y*sa)/L, across=Math.abs(-x*sa+y*ca); return Math.max(0,(1-along)*9-across*1.6)+1; },[34,28,42],RZ.GLOSS); }
-  rzDome(F,0,0,5.4,5.4,0,6,2.5,[24,20,30],RZ.GLOSS);
+    const w=4.4*q, pts=[[-sa*w,ca*w],[ca*L,sa*L],[sa*w,-ca*w]], cc=rzJit(sc,rng,0.2);
+    rzPoly(F,pts,(x,y)=>{ const along=(x*ca+y*sa)/L, across=Math.abs(-x*sa+y*ca); return Math.max(0,(1-along)*9*q-across*1.6)+1; },cc,RZ.GLOSS); }
+  rzDome(F,0,0,5.4*q,5.4*q,0,6*q,2.5*q,rzMulC(sc,0.75),RZ.GLOSS);
   rzContact(F,0,1,R*0.8,R*0.6,0.35);
   return rzShade(F,{ao:0.12,aoR:1.2,rim:0.2,bump:1.4});
 }
@@ -447,11 +466,11 @@ function rzRockFinish(F,R,K,seed){
     if(K.moss&&hr+(n1-0.5)*0.7+lit*0.25>0.62){ const f=0.85+rzVN(x*1.4,y*1.4,seed)*0.3; F.c[id*3]=K.li[0]*f; F.c[id*3+1]=K.li[1]*f; F.c[id*3+2]=K.li[2]*f; F.m[id]=RZ.LEAF; F.h0[id]+=0.4*k; return; }
     if(!K.gloss&&n1>0.66&&hr>0.35){ const c=rzMix([F.c[id*3],F.c[id*3+1],F.c[id*3+2]],K.li,0.45); F.c[id*3]=c[0]; F.c[id*3+1]=c[1]; F.c[id*3+2]=c[2]; } });
 }
-function rzMkRock(seed,kind){
-  const rng=mulberry32(seed), R=kind==='crag'?28:18, F=rzSq(R), K=RZROCK[kind==='crag'?'red':kind]||RZROCK.grey;
+function rzMkRock(seed,kind,o){
+  o=o||{}; const rng=mulberry32(seed), R=o.R||(kind==='crag'?28:18), F=rzSq(R), K=o.K||RZROCK[kind==='crag'?'red':kind]||RZROCK.grey;
   rzContact(F,0.6,1.6,R*0.98,R*0.84,0.5);
   rzRockBody(F,R,rng,K,kind==='crag'?0.72:0.6,seed);
-  if(kind==='crag'){ const rng2=mulberry32(seed+5); for(let i=0;i<2;i++){ const a=Math.PI*0.25+(rng2()-0.5)*2.2+i*Math.PI, d=R*0.5; rzRockBody(F,R*(0.36+rng2()*0.1),rng2,K,0.75,seed+i*7,Math.cos(a)*d,Math.sin(a)*d*0.8); } }
+  if(kind==='crag'||o.lumps){ const rng2=mulberry32(seed+5); for(let i=0;i<2;i++){ const a=Math.PI*0.25+(rng2()-0.5)*2.2+i*Math.PI, d=R*0.5; rzRockBody(F,R*(0.36+rng2()*0.1),rng2,K,0.75,seed+i*7,Math.cos(a)*d,Math.sin(a)*d*0.8); } }
   rzRockFinish(F,R,K,seed);
   return rzShade(F,{ao:0.2,aoR:R>20?2.4:1.8,rim:0.4,bump:1.15,sat:0.96});
 }
@@ -484,20 +503,38 @@ function rzRelight(cv,o){
   g.putImageData(id,0,0); return cv;
 }
 // ---------- the sprite set for the Realistic look (called by buildSprites in a3_art.js)
-const RZV={oak:6,birch:4,pine:6,spine:6,willow:4,dead:4,char:3,bush:6,shrub:4,fshrub:4,mbush:4,rock:5,mossrock:4,crag:4,obsid:3,srock:4,spike:3,stump:3,bones:2,reed:4,herb:1,vent:1};
+// [kind, variants, maker(i)]: the first variant of every kind is painted at once (so every prop has its sprite),
+// the rest in idle time over the next moments (rzPump), and props pick up their own variant when a kind completes
+const RZSET=[
+  ['oak',6,i=>rzMkOak(1000+i,'oak')],['birch',4,i=>rzMkOak(2000+i,'birch')],['pine',6,i=>rzMkPine(3000+i,false)],['spine',6,i=>rzMkPine(3100+i,true)],
+  ['willow',4,i=>rzMkWillow(3200+i)],['dead',4,i=>rzMkDead(4000+i,false)],['char',3,i=>rzMkDead(4500+i,true)],
+  ['bush',6,i=>rzMkBush(7000+i,'bush')],['shrub',4,i=>rzMkBush(7100+i,'shrub')],['fshrub',4,i=>rzMkBush(7200+i,'fshrub')],['mbush',4,i=>rzMkBush(7300+i,'mbush')],
+  ['rock',5,i=>rzMkRock(5000+i,'grey')],['mossrock',4,i=>rzMkRock(5100+i,'moss')],['crag',4,i=>rzMkRock(5200+i,'crag')],['obsid',3,i=>rzMkRock(5300+i,'obsid')],['srock',4,i=>rzMkRock(5400+i,'snow')],
+  ['spike',3,i=>rzMkSpike(6000+i)],['stump',3,i=>rzMkStump(8000+i)],['bones',2,i=>rzMkBones(8100+i)],['reed',4,i=>rzMkReed(8300+i)],['herb',1,i=>rzMkHerb(8200)],['vent',1,i=>rzMkVent()]
+];
+const RZQ={q:[],gen:-1,t:0};
 function rzBuildSprites(){
-  const t0=performance.now(), V=RZV, sq=(n,f)=>{ const a=[], q=performance.now(); for(let i=1;i<=n;i++) a.push(f(i)); RZT.last=+(performance.now()-q).toFixed(1); return a; }, T=RZT.kinds={};
-  SPR.oak=sq(V.oak,i=>rzMkOak(1000+i,'oak')); T.oak=RZT.last; SPR.birch=sq(V.birch,i=>rzMkOak(2000+i,'birch')); T.birch=RZT.last;
-  SPR.pine=sq(V.pine,i=>rzMkPine(3000+i,false)); T.pine=RZT.last; SPR.spine=sq(V.spine,i=>rzMkPine(3100+i,true)); T.spine=RZT.last;
-  SPR.willow=sq(V.willow,i=>rzMkWillow(3200+i)); T.willow=RZT.last; SPR.dead=sq(V.dead,i=>rzMkDead(4000+i,false)); T.dead=RZT.last; SPR.char=sq(V.char,i=>rzMkDead(4500+i,true)); T.char=RZT.last;
-  SPR.bush=sq(V.bush,i=>rzMkBush(7000+i,'bush')); T.bush=RZT.last; SPR.shrub=sq(V.shrub,i=>rzMkBush(7100+i,'shrub')); T.shrub=RZT.last; SPR.fshrub=sq(V.fshrub,i=>rzMkBush(7200+i,'fshrub')); T.fshrub=RZT.last; SPR.mbush=sq(V.mbush,i=>rzMkBush(7300+i,'mbush')); T.mbush=RZT.last;
-  SPR.rock=sq(V.rock,i=>rzMkRock(5000+i,'grey')); T.rock=RZT.last; SPR.mossrock=sq(V.mossrock,i=>rzMkRock(5100+i,'moss')); T.mossrock=RZT.last; SPR.crag=sq(V.crag,i=>rzMkRock(5200+i,'crag')); T.crag=RZT.last; SPR.obsid=sq(V.obsid,i=>rzMkRock(5300+i,'obsid')); T.obsid=RZT.last; SPR.srock=sq(V.srock,i=>rzMkRock(5400+i,'snow')); T.srock=RZT.last;
-  SPR.spike=sq(V.spike,i=>rzMkSpike(6000+i)); T.spike=RZT.last; SPR.stump=sq(V.stump,i=>rzMkStump(8000+i)); T.stump=RZT.last; SPR.bones=sq(V.bones,i=>rzMkBones(8100+i)); T.bones=RZT.last; SPR.reed=sq(V.reed,i=>rzMkReed(8300+i)); T.reed=RZT.last;
-  SPR.herb=[rzMkHerb(8200)]; SPR.vent=[rzMkVent()]; SPR.bigoak=rzMkBigOak();
+  const t0=performance.now(), T=RZT.kinds={};
+  RZQ.q.length=0; RZQ.gen=LOOK.gen;
+  for(const [k,n,mk] of RZSET){ const q=performance.now(), first=mk(1); SPR[k]=[first]; T[k]=+(performance.now()-q).toFixed(1);
+    if(n>1){ const all=[first]; for(let i=2;i<=n;i++) RZQ.q.push(()=>{ all.push(mk(i)); if(all.length===n){ SPR[k]=all; rzRepick(k); } }); } }
+  SPR.bigoak=rzMkBigOak();
   SPR.shadow=mkShadow();
   RZT.build=+(performance.now()-t0).toFixed(1);
+  rzPumpLater();
   return true;
 }
+function rzRepick(k){ try{ for(const arr of PROPS.values()) for(const p of arr) if(p.k===k||(k==='mossrock'&&p.k==='rock')||(k==='char'&&p.k==='dead')) p.sp=null; }catch(e){} }
+function rzPump(){
+  RZQ.t=0;
+  if(!LOOK.re||RZQ.gen!==LOOK.gen){ RZQ.q.length=0; return; }
+  const t0=performance.now();
+  do{ const it=RZQ.q.shift(); if(it) it(); } while(RZQ.q.length&&performance.now()-t0<8);
+  if(RZQ.q.length) rzPumpLater();
+}
+function rzPumpLater(){ if(RZQ.t||!RZQ.q.length) return; RZQ.t=1; if(typeof requestIdleCallback==='function') requestIdleCallback(rzPump,{timeout:400}); else setTimeout(rzPump,40); }
+// for tests: finish every queued sprite now
+function rzFlush(){ while(RZQ.q.length&&RZQ.gen===LOOK.gen) RZQ.q.shift()(); }
 const RZT={build:0};
 
 // ---------- caches keyed by the look generation
@@ -506,13 +543,14 @@ function rzCache(key,make){ if(RZC.gen!==LOOK.gen){ RZC.m.clear(); RZC.gen=LOOK.
 
 // ---------- debug: a sheet of sprites on a grass background (window.__ebDbg.rzSheet(['oak','pine'],scale))
 function rzSheet(keys,sc,bg){
+  rzFlush();
   sc=sc||1; const list=[]; for(const k of keys){ const L=Array.isArray(SPR[k])?SPR[k]:SPR[k]?[SPR[k]]:[]; for(const c of L) list.push(c); }
   const cell=Math.max(...list.map(c=>c.width/SS*sc))+6, cols=Math.min(8,list.length), rows=Math.ceil(list.length/cols);
   const cv=mkCanvas(cols*cell,rows*cell), g=cv.getContext('2d'); g.fillStyle=bg||'#5f7a3c'; g.fillRect(0,0,cv.width,cv.height);
   list.forEach((c,i)=>{ const w=c.width/SS*sc, h=c.height/SS*sc; g.drawImage(c,(i%cols)*cell+(cell-w)/2,Math.floor(i/cols)*cell+(cell-h)/2,w,h); });
   return cv.toDataURL();
 }
-window.__ebDbg=Object.assign(window.__ebDbg||{},{rzSheet,rzBuildSprites,RZT,SPR,buildSprites:()=>buildSprites()});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{rzSheet,rzBuildSprites,rzFlush,RZT,RZQ,SPR,buildSprites:()=>buildSprites()});
 // the Realistic sprites are lit from the art light, so a prop never turns (Classic spins each one at random);
 // the old angle is kept and handed back when the look changes (propSprite in a3_art.js)
 function rzNoTurn(p){ if(p.rz0===undefined){ p.rz0=p.rot; p.rot=0; } }
@@ -957,4 +995,82 @@ function rzChestSpr(open){ return rzSpr('chest'+(open?1:0),40,30,20,14,F=>{
 function rzChest(c,t){
   rzPutC(rzChestSpr(!!c.open),c.x,c.y);
   if(!c.open) glowAt(c.x,c.y,30,'255,200,110',0.22+0.16*Math.sin(t*3+c.x));
+}
+
+// ---------- palms: a ringed trunk curving down to its foot (south of the crown, as in the Classic sprite) and a
+// crown of feathered fronds stamped from one painted frond
+function rzPalmFrond(v){ return rzCache('palmfrond'+v,()=>{
+  const T=rzHF(50,30,0,15), rng=mulberry32(5100+v*13), P=[[52,96,44],[78,128,56],[120,162,74]];
+  rzCap(T,0,0,2,47,0,0.4,1.1,0.3,[120,128,70],RZ.LEAF);
+  for(let x=2;x<47;x+=1.3){ const len=11.5*Math.pow(1-x/52,0.55)+2;
+    for(const sd of [-1,1]){ const a=sd*(0.95+rng()*0.25), cx=x+Math.cos(a)*len*0.5, cy=Math.sin(a)*len*0.5, tone=clamp(0.25+x/47*0.5+(rng()-0.5)*0.4,0,1);
+      rzLeaf(T,cx,cy,len*0.52,0.85,a,1.5-len*0.04,0,-sd*0.18,rzJit(tone<0.5?rzMix(P[0],P[1],tone*2):rzMix(P[1],P[2],(tone-0.5)*2),rng,0.1),RZ.LEAF); } }
+  return T; }); }
+function rzPalm(seed,v,R,o){
+  o=o||{}; const rng=mulberry32(seed), F=rzSq(R), lean=[-1,0.55,1][v%3];
+  if(!o.noTrunk){ const n=7, fx=lean*15, fy=R*0.78, tx=[150,116,80];
+    rzContact(F,fx,fy+2,9,4,0.4);
+    for(let i=n;i>=0;i--){ const k=i/n, x=fx*k*k+lean*2*k, y=fy*k, r=4.6+k*1.6; rzDome(F,x,y,r,r*0.9,0,(1-k)*16,r*0.8,rzJit(tx,rng,0.08),RZ.BARK);
+      } }
+  const m=8+(v%2), a0=rng()*TAU;
+  for(let pass=0;pass<2;pass++) for(let i=0;i<m;i++){ if((i%2)!==pass) continue; const a=a0+i/m*TAU+(rng()-0.5)*0.25, L=R*(0.78+rng()*0.22), t=pass?1.02:0.86;
+    rzStamp(F,rzPalmFrond((i+v)%3),0,0,a,L/48,0.9+rng()*0.25,18+pass*2,13,[t,t,t*0.96]); }
+  for(let i=0;i<3;i++) rzDome(F,Math.cos(i*2.1+0.4)*4.2,Math.sin(i*2.1+0.4)*3.4+1,3.2,3.2,0,19,3,rzJit([120,78,40],rng,0.1),RZ.GLOSS);
+  return rzShade(F,{ao:0.2,aoR:2,hao:0.25,bump:1,trans:[190,210,110]});
+}
+// ---------- the prop kinds of maps 1 to 4 (definePropKind): Realistic makers by kind. A kind with no maker here
+// keeps its own sprites, relit once (rzRelight) so it sits in the same light. trunk: the depth modes' trunk under a
+// tall kind's leaning crown (false for none, or when the sprite paints its own)
+const RZPAL={moth:[[92,88,120],[124,118,152],[170,164,196]],sea:[[26,60,48],[40,84,62],[70,112,80]],haw:[[44,82,40],[66,108,50],[104,140,64]],
+  taiga:[[18,40,34],[30,58,46],[46,78,58]],ice:[[40,70,78],[60,96,104],[96,132,140]],mangrove:[[40,74,44],[58,98,56],[90,128,72]],
+  gorse:[[52,88,40],[76,112,48],[106,138,60]],heath:[[82,62,92],[112,84,122],[150,116,158]]};
+const RZK={
+  c_mothbirch:{trunk:'birch',n:4,make:s=>rzBroadleaf(s,44,{birch:1,pal:RZPAL.moth,inner:[66,62,88],bark:[226,222,232],glints:1})},
+  c_seapine:{trunk:'pine',n:4,make:s=>rzConifer(s,42,{key:'sea',pal:RZPAL.sea,tip:[110,140,90]})},
+  c_hawthorn:{trunk:'oak',n:4,make:s=>rzBroadleaf(s,34,{pal:RZPAL.haw,berries:[168,36,40]})},
+  f_snowpine:{trunk:'pine',n:4,make:s=>rzConifer(s,44,{snow:1,key:'snow',pal:RZP.spine})},
+  f_taigapine:{trunk:'pine',n:4,tw:14,make:s=>rzConifer(s,52,{key:'taiga',pal:RZPAL.taiga,tip:[80,108,70]})},
+  f_icepine:{trunk:'pine',n:4,make:s=>rzConifer(s,40,{key:'ice',pal:RZPAL.ice,tip:[160,190,200],frost:0.5})},
+  f_deadpine:{trunk:'dead',n:3,make:s=>rzMkDead(s,false,{R:34})},
+  m_palm:{trunk:false,n:3,make:(s,v)=>rzPalm(s,v,48)},
+  pm_palm:{trunk:'palm',roots:false,n:3,make:(s,v)=>rzPalm(s,v,40,{noTrunk:1})},
+  m_mangrove:{trunk:'oak',n:3,make:s=>rzBroadleaf(s,46,{pal:RZPAL.mangrove})},
+  c_gorse:{n:3,make:s=>rzMkBush(s,'gorse',{R:17,pal:RZPAL.gorse,flowers:[[222,184,56],[238,206,90]]})},
+  c_heather:{n:3,make:s=>rzMkBush(s,'heather',{R:12,pal:RZPAL.heath})},
+  c_thrift:{n:3,make:s=>rzMkReed(s,{R:8,pal:[[86,120,62],[104,138,70]],heads:0.9,head:[222,146,176],n:9,spread:1.2})},
+  f_snowbush:{n:3,make:s=>rzMkBush(s,'fshrub',{R:15})},
+  f_tussock:{n:3,make:s=>rzMkReed(s,{R:11,pal:[[150,140,92],[124,122,80]],heads:0.15,head:[176,160,120],n:16,spread:1.6})},
+  m_dunegrass:{n:3,make:s=>rzMkReed(s,{R:12,pal:[[150,150,98],[124,134,82]],heads:0.25,head:[196,180,130],n:14,spread:1.4})},
+  m_seagrass:{n:3,make:s=>rzMkReed(s,{R:11,pal:[[58,104,70],[74,124,80]],heads:0,n:12,spread:1.2})},
+  f_frostreed:{n:2,make:s=>rzMkReed(s,{R:12,frost:0.6})},
+  c_chalkrock:{n:3,make:s=>rzMkRock(s,'grey',{R:15,K:{c:[212,206,190],v:[184,178,162],li:[196,200,150]}})},
+  c_barnrock:{n:3,make:s=>rzMkRock(s,'grey',{R:15})},
+  f_snowrock:{n:3,make:s=>rzMkRock(s,'snow',{R:16})},
+  f_redrock:{n:3,make:s=>rzMkRock(s,'crag',{R:17})},
+  f_hornrock:{n:3,make:s=>rzMkRock(s,'grey',{R:28,lumps:1,K:{c:[120,116,112],v:[96,94,92],li:[160,164,150]}})},
+  f_windrock:{n:3,make:s=>rzMkRock(s,'grey',{R:26,lumps:1})},
+  m_coralrock:{n:3,make:s=>rzMkRock(s,'grey',{R:17,K:{c:[200,170,150],v:[170,140,126],li:[222,192,172]}})},
+  f_stump:{n:2,make:s=>rzMkStump(s,{snow:1})},
+  // kinds that keep their own sprites (relit), with the trunk the depth modes give them
+  c_lamppost:{trunk:'iron',roots:false,tw:5}, f_lanternpost:{trunk:'iron',roots:false,tw:5}, m_lamppost:{trunk:'iron',roots:false,tw:5},
+  c_blackrock:{trunk:'stone',roots:false,tw:16}, f_dreadspire:{trunk:'stone',roots:false,tw:14}, m_glassspike:{trunk:'glass',roots:false,tw:10},
+  m_bones:{trunk:'bone',roots:false,tw:8}, f_mammothrib:{trunk:'bone',roots:false,tw:8}, n_glasstree:{trunk:'glass',roots:false,tw:9}
+};
+// called by propKindSprites (e2_terrain.js) in this look; returns true when it built the kind
+function rzKindSprites(kind){
+  const d=PROPK[kind]; if(!d) return false;
+  const gen=LOOK.gen, build=()=>rzKindBuild(kind,d);
+  Object.defineProperty(SPR,kind,{configurable:true,enumerable:true,
+    get(){ const v=gen===LOOK.gen&&LOOK.re?build():undefined; Object.defineProperty(SPR,kind,{value:v,writable:true,configurable:true,enumerable:true}); return v; },
+    set(v){ Object.defineProperty(SPR,kind,{value:v,writable:true,configurable:true,enumerable:true}); }});
+  RZQ.q.push(()=>{ void SPR[kind]; }); if(RZQ.gen!==LOOK.gen) RZQ.gen=LOOK.gen; rzPumpLater();
+  return true;
+}
+function rzKindBuild(kind,d){
+  const K=RZK[kind]; let h=0; for(let i=0;i<kind.length;i++) h=(h*31+kind.charCodeAt(i))|0;
+  const L=[], n=K&&K.make?Math.max(d.n,K.n||0):d.n;
+  for(let v=0;v<n;v++){ let c=null; const seed=(h&0xffff)+v*131;
+    try{ if(K&&K.make) c=K.make(seed,v,d); else { c=d.make(seed,v); if(c){ if(!c.half) c.half=c.width/4; rzRelight(c,{bump:2.4,ao:0.08,aoR:2,edge:2,sat:0.92}); } } }catch(e){ console.error('prop kind',kind,e); }
+    if(c){ if(!c.half) c.half=c.width/4; L.push(c); } }
+  return L.length?L:undefined;
 }
