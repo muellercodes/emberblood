@@ -19,12 +19,12 @@ const EDEF={
   bat:{r:9,hp:16,speed:210,dmg:6,value:8,flying:true,kbRes:1.4},
   slime:{r:13,hp:30,speed:90,dmg:8,value:9,kbRes:1.1},
   sneak:{r:10,hp:22,speed:205,dmg:0,value:12,kbRes:1.6},
-  grizzlefang:{r:24,hp:520,speed:118,dmg:13,value:220,boss:true,kbRes:0.3,name:'Grizzlefang',title:'Kobold Chieftain'},
-  morrow:{r:19,hp:640,speed:95,dmg:10,value:320,boss:true,kbRes:0.4,name:'High Priest Morrow',title:'Voice of the Scaled Oath'},
-  broodmother:{r:32,hp:820,speed:125,dmg:16,value:420,boss:true,flying:true,kbRes:0.15,name:'The Brood Mother',title:'Queen of the Drakeling Nests'},
-  gloamjaw:{r:30,hp:900,speed:95,dmg:17,value:420,boss:true,kbRes:0.1,name:'Gloamjaw',title:'The Thing in the Mirefen'},
-  greymane:{r:22,hp:860,speed:200,dmg:14,value:420,boss:true,kbRes:0.2,name:'Greymane',title:'Alpha of the Frostpine Pack'},
-  cindervane:{r:27,hp:1150,speed:82,dmg:18,value:560,boss:true,shield:true,kbRes:0.08,name:'Sir Cindervane',title:'Champion of the Obsidian Gate'},
+  grizzlefang:{r:24,hp:520,speed:118,dmg:13,value:220,boss:true,kbRes:0.3,name:'Grizzlefang',title:'Top Fang of the War Camp'},
+  morrow:{r:19,hp:640,speed:95,dmg:10,value:320,boss:true,kbRes:0.4,name:'High Priest Morrow',title:'Big Wick of the Scaled Oath'},
+  broodmother:{r:32,hp:820,speed:125,dmg:16,value:420,boss:true,flying:true,kbRes:0.15,name:'The Brood Mother',title:'Ruler of the Roost'},
+  gloamjaw:{r:30,hp:900,speed:95,dmg:17,value:420,boss:true,kbRes:0.1,name:'Gloamjaw',title:'A Real Mouthful'},
+  greymane:{r:22,hp:860,speed:200,dmg:14,value:420,boss:true,kbRes:0.2,name:'Greymane',title:'The Cold Snap of Frostpine'},
+  cindervane:{r:27,hp:1150,speed:82,dmg:18,value:560,boss:true,shield:true,kbRes:0.08,name:'Sir Cindervane',title:'The Knight Who Never Sits Down'},
   vorlaxis:{r:56,hp:4200,speed:72,dmg:17,value:1500,boss:true,kbRes:0,name:'Vorlaxis, the First Flame',title:'Your '+GREATS+'grandfather',short:'Your great ×13 grandfather'}
 };
 const SPK={
@@ -57,7 +57,7 @@ const DEATH_LINES=[
   'Even dragons fall sometimes. Shake off the dust.',
   'The fire in your blood is not out yet.',
   'Elder Yara would tell you to roll more. Elder Yara is usually right.',
-  'Mom would say: eat something, then try again.'
+  'Mom would say: walk it off, then hit it harder.'
 ];
 const DCOL={kobold:'190,160,90',cultist:'170,100,220',drakeling:'240,140,70',knight:'230,140,60',wolf:'170,170,170',egg:'230,220,195',bat:'70,50,70',slime:'120,200,80',grizzlefang:'220,190,110',morrow:'190,120,240',broodmother:'230,90,140',gloamjaw:'120,150,80',greymane:'220,225,235',cindervane:'250,160,80',vorlaxis:'255,120,40'};
 const VILLAGER_LINES=['Thank you, Ash. My chickens are safe again.','The smoke is coming from the mountain. Everyone can see it.','My grandmother said your family were dragons once. I always thought she was joking.','Watch yourself out there after dark. The wolves come down from Whisperwood.','Elder Yara has been writing in her big book all morning.','We rebuilt the bakery. Twice. Please be careful near it.','Your mom fixed my plow and my door hinge in the same afternoon. She never sleeps.'];

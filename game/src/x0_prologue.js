@@ -25,7 +25,7 @@ function proMarkSeen(){ try{ localStorage.setItem(PRO_SEEN,'1'); }catch(e){} }
 // ---------- the script. A line: proL(who, full, simple, face, beat) (beat: what the theatre does as the line comes up)
 function proL(who,full,simple,face,beat,x){ const o={who,text:simple!=null?S(full,simple):full}; if(face) o.face=face; if(beat) o.fn=()=>proBeat(beat); return x?Object.assign(o,x):o; }
 function proShowLines(){ return [
-  proL('narr',`The night before Lantern Day, everybody in Emberhollow is out on the green, stringing up paper lanterns for tomorrow. Lighting the three big ones is your job.`,`The night before Lantern Day, everyone hangs paper lanterns on the green. You light the three big ones.`,null,'green'),
+  proL('narr',`It's the night before Lantern Day, and all of Emberhollow is out on the green, stringing up paper lanterns. Tomorrow you light the three big ones. Everybody keeps reminding you: gently.`,`Tomorrow is Lantern Day. You light the three big lanterns. Everybody says: gently!`,null,'green'),
   proL('bertram',`Evening, Ash. You'll sit at the front tonight, won't you? Nice and far from the bun table.`,`Evening, Ash. Sit far from the buns, please.`,'worried'),
   proL('ash',`I haven't set anything on fire since spring.`,`Nothing has caught fire since spring.`,'happy'),
   proL('bertram',`Spring was when it happened, Ash.`,null,'worried'),
@@ -90,7 +90,7 @@ function proStart(){
   proHookTests();
   scene='prologue'; try{ keys.clear(); }catch(e){} hideAll();
   proOverlay(true); proSkipShow(true);
-  showCard(S('Prologue','Prologue'),S('Lantern Eve','Lantern Eve'));
+  showCard(S('Prologue','Prologue'),S('Once Upon a Lantern','Once Upon a Lantern'));
   setTimeout(()=>{ if(PRO.on&&PRO.phase==='title') proShow(); },2700);
   return true;
 }
@@ -176,7 +176,7 @@ function proTick(dt){
   const w=proWhere(); PRO.phase=w==='out'?'walk':'home';
   if(w==='up'){ const b=AREA.objs.find(o=>o.k==='bed'&&o.home); if(b&&!b.prompt){ b.prompt=()=>S('Get into bed','Go to bed'); PRO.bed=b; } }
   if(w==='out'){
-    for(const L of LANTERNS){ if(!PRO.barks.lan&&dist(player.x,player.y,L.x,L.y)<95){ PRO.barks.lan=1; taunt('ash',S(`One gentle breath each. Tomorrow.`,`Tomorrow. Gently.`)); } }
+    for(const L of LANTERNS){ if(!PRO.barks.lan&&dist(player.x,player.y,L.x,L.y)<95){ PRO.barks.lan=1; taunt('ash',S(`See you tomorrow, lanterns. Don't go out without me.`,`See you tomorrow, lanterns!`)); } }
     const V=POI.village;
     if(!PRO.barks.far&&dist(player.x,player.y,V.x,V.y)>V.r+120){ PRO.barks.far=1; taunt('maren',S(`Ash! Home is the other way!`,`Ash! Home is that way!`)); }
   }

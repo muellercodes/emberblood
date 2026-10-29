@@ -46,7 +46,7 @@ const STORY={
     ['iska',S(`The rock is Iska, first of the Five Wardens. What's left of her, anyway. Light all five Wards before the chains come off, and he wakes up weak and slow.`,`I'm Iska, a Warden. Light all five Wards, and he wakes up weak.`)],
     ['iska',S(`Leave them dark, and he wakes whole. Either way, he'll come for the half of his fire you carry. Not the valley, Ash. You.`,`Either way, he comes for the fire you carry. Not the valley. You.`)],
     ['iska',S(`Look at the wax on my stone. Cold wax. Nobody in this valley makes anything that cold. Somebody brought it here.`,`See the black wax? It's so cold. Somebody brought it here.`)],
-    ['iska',S(`A cult called the Scaled Oath wants him awake and strong. Their kobolds answer to a chieftain called Grizzlefang. His war camp is in the woods north of the village. Start there.`,`The Scaled Oath wants him awake. Their kobold chief, Grizzlefang, camps north of the village. Go there.`)]
+    ['iska',S(`A cult called the Scaled Oath wants him awake and strong. Their kobolds answer to Grizzlefang, a chieftain with more teeth than sense. He camps in the woods north of the village. Start there.`,`The Scaled Oath wants him awake. Their kobold chief, Grizzlefang, camps north of the village. Go there.`)]
   ],
   // (x0_act1.js puts the causeway warning, three lines, in after the third line)
   wren:[
@@ -59,7 +59,7 @@ const STORY={
     ['wren',S(`I'd come with you. But I've read about mountains, and they're mostly weather.`,`I'd come, but mountains are mostly weather.`)]
   ],
   ward_ash:[
-    ['bram',S(`Hah! Fire in the old stones again! Bram's the name. I was the Warden with the big hammer and the bigger mouth.`,`Hah! Fire again! I'm Bram. Big hammer, bigger mouth.`)],
+    ['bram',S(`Hah! Fire in the old stones again! You nailed it, kid. Bram's the name: the Warden with the big hammer and the bigger mouth.`,`Hah! Fire again! You nailed it! I'm Bram. Big hammer, bigger mouth.`)],
     ['bram',S(`Three Wards left, kid. Crag, Mire and Frost. Take them in whatever order you like. Just don't take them lightly.`,`Three Wards left: Crag, Mire and Frost. Any order you like.`)],
     ['bram',S(`And while you're out there, help folk when you can. A Warden who only looks after rocks is just a rock with opinions.`,`And help people when you can. Not just the Wards.`)]
   ],
@@ -82,12 +82,12 @@ const STORY={
   ],
   allWards:[
     ['iska',S(`All five Wards burn again, Ash. Can you feel it?`,`All five Wards burn again. Feel it?`)],
-    ['ash',`My hands are warm. Warmer than usual.`],
+    ['ash',S(`My hands are tingling. I'm all fired up.`,`My hands tingle. I'm fired up!`)],
     ['iska',S(`That's our fire, the Five Flames, riding along with yours. The Obsidian Gate will open for it. But the gate has a guard, and he has never once let anyone pass.`,`That's our fire, riding with yours. The Obsidian Gate will open. But it has a guard.`)]
   ],
   bosses:{
     grizzlefang:{
-      intro:[['griz',S(`Hah! A little lizard-person with a big sword. The Oath wants you brought to the mountain. I'll bring you in pieces!`,`A lizard kid with a sword! I'll take you to the mountain in pieces!`)],['ash',`You can try.`]],
+      intro:[['griz',S(`Hah! A little lizard-boy with a big sword! The Oath wants you brought to the mountain. Nobody said in how many pieces!`,`A lizard kid with a sword! I'll take you to the mountain in pieces!`)],['ash',`Fang you for the offer. I'll walk.`]],
       // (the data in game/story/act1/a1_gate.js plays its own outro, a1_griz_outro, instead of this one)
       outro:[
         ['griz',S(`The Oath... paid in gold... and somebody in your village... opened the gate...`,`The Oath paid... someone in your village opened the gate...`)],
@@ -97,7 +97,7 @@ const STORY={
         ['yara',S(`(through the shrine stone) I heard him. Go east to Brindlecross, Ash. Sister Wren keeps the old library there.`,`(far away) I heard. Go east to Brindlecross. Find Sister Wren.`)]
       ]},
     morrow:{
-      intro:[['morrow',S(`The heir of the First Flame, walking right into our hands. When the Great One has his fire back, he'll make me young again!`,`The heir of the First Flame! The Great One will make me young again!`)],['ash',S(`Pretty sure the Great One just wants a snack.`,`I think he just wants a snack.`)]],
+      intro:[['morrow',S(`The heir of the First Flame, walking right into our hands! When the Great One has his fire back, he'll make me young again. And a king!`,`The heir of the First Flame! The Great One will make me young again. And a king!`)],['ash',S(`Pretty sure the Great One just wants a snack.`,`I think he just wants a snack.`)]],
       // (the data in game/story/act1/a1_gate.js plays its own outro, a1_morrow_outro, instead of this one)
       outro:[
         ['morrow',S(`You don't understand... he promised... he promised all of us...`,`He promised... he promised all of us...`)],
@@ -110,7 +110,7 @@ const STORY={
         ])
       ]},
     broodmother:{
-      intro:[['brood',S(`Ssssso. The fire-child crawls into my nest. My children are hungry.`,`The fire-child is in my nest. My children are hungry.`)],['ash',`Your children need better manners.`]],
+      intro:[['brood',S(`Ssssso. The fire-child crawls into my nest, just in time for supper. My children are hungry.`,`The fire-child is in my nest. Just in time for supper!`)],['ash',`Your children need better manners.`]],
       outro:[['brood',`My children... will remember you...`],['voice',S(`You strike down dragons so easily. Are you sure you're not mine?`,`You beat dragons so easily. Are you sure you're not mine?`)],['narr',S(`You don't answer. You look down at your claws for a long time.`,`You don't answer. You look at your claws.`)]]},
     gloamjaw:{
       intro:[['gloam',S(`Mmmmm. A warm little snack, wandering into my bog. You will taste like toast.`,`A warm snack in my bog. You'll taste like toast.`)],['ash',`Why does everybody want to eat me?`]],
@@ -161,7 +161,7 @@ const STORY={
   duchess:[['goat',`Meh.`],['ash',S(`Your farmer misses you. Come on, before the wolves notice us.`,`Your farmer misses you. Come on!`)],['goat',`Meeeh.`]],
   maren:{
     hint:[['maren',S(`Find me some star-iron and I can make that blade sing. It fell from the sky long ago and glows blue in the rock. Try the crags, the high snow, and the hills by the Obsidian Gate.`,`Bring me star-iron. It glows blue in the rock. Try the crags, the snow, and the Obsidian Gate hills.`)]],
-    reforge:[['maren',S(`Star-iron! Where did you... never mind. Give it here.`,`Star-iron! Give it here.`)],['maren',S(`There. Your blade's a little sharper and a lot shinier. Now go and eat something.`,`There. Sharper and shinier. Now go and eat something.`)]]
+    reforge:[['maren',S(`Star-iron! Where did you... never mind. Give it here.`,`Star-iron! Give it here.`)],['maren',S(`There. Your blade's a little sharper and a lot shinier. Try not to admire it in every puddle.`,`There. Sharper and shinier.`)]]
   },
   yaraHints:{
     warcamp:S(`Grizzlefang's camp is north of the village, at the edge of the woods. Follow the road.`,`Grizzlefang's camp is north of the village. Follow the road.`),
@@ -236,7 +236,7 @@ const EPILOGUE_FMT=()=>{
 // v6 weapons: Mom offers to forge a hammer (forgeHammerTalk in a6b_weapons.js)
 Object.assign(STORY.maren,{
   hammerOffer:[['maren',S(`Ash. Come here. I've had an idea, and it's heavy.`,`Ash. Come here. I have a heavy idea.`)],['maren',S(`Grandma's blade is lovely. But some things in this valley need hitting with something less lovely. Cracked walls. Knights with big shields. Rocks that look at you funny.`,`Some things need hitting with something heavier. Cracked walls. Big shields.`)],['maren',S(`I can forge you a hammer. One star-iron, or 150 coins for the good iron. What do you say?`,`I can make you a hammer. One star-iron, or 150 coins.`)]],
-  hammerMade:[['narr',S(`Mom hums and the forge roars. Clang, clang, CLANG. It takes about four seconds. Mom is very good at this.`,`Clang, clang, CLANG! Mom is very good at this.`)],['maren',S(`There. The Forge Hammer. Hold the attack button to wind up a bigger smash. Smash walls and shields. Not the house.`,`The Forge Hammer! Hold attack for a big smash. Not on the house.`)]]
+  hammerMade:[['narr',S(`Mom hums and the forge roars. Clang, clang, CLANG. It takes about four seconds. Mom is very good at this.`,`Clang, clang, CLANG! Mom is very good at this.`)],['maren',S(`There. The Forge Hammer. Hold your swing and it winds up a bigger smash. Smash walls and shields. Not the house.`,`The Forge Hammer! Hold your swing for a big smash. Not on the house.`)]]
 });
 // ---------- Ember's Trials (a2h_dungeons.js). Ember speaks inside each one, a warm voice in the walls.
 Object.assign(STORY,{
