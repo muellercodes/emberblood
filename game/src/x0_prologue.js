@@ -37,7 +37,7 @@ function proShowLines(){ return [
     {t:`Wave.`,then:[proL('narr',`You wave. The smaller one waves back with the hand she was pointing with.`,`You wave. She waves back.`,null,'wave')]},
     {t:S(`Do a very small roar.`,`Do a tiny roar.`),then:[proL('ash',`Rrrr.`,null,'sly'),proL('narr',`They shriek and hide behind Rook. Then they peek out again, hoping you'll do it again.`,`They hide, then peek out for more.`,null,'flick')]}
   ]}),
-  proL('wendel',`Settle down, everyone. A little tune, and then Nana's dragon. And don't forget tomorrow, at sunset, the Lantern Waltz.`,`Settle down! A tune, then the dragon. My waltz is tomorrow!`,'happy','tune'),
+  proL('wendel',`Settle down, everyone. A little tune, and then Nana's dragon. And tomorrow at sunset, the Lantern Waltz. Very note-worthy.`,`Settle down! A tune, then the dragon. My waltz is tomorrow!`,'happy','tune'),
   proL('narr',`The little red curtains open on a cardboard mountain, with cotton smoke on a wire.`,`The curtains open on a cardboard mountain.`,null,'open'),
   proL('nana',`Once upon a time, dears, a grumpy old dragon lived at the top of the mountain. And everything he saw, he said was his.`,`Once, a grumpy dragon lived on the mountain. He said everything was his.`,'sly','dragon'),
   proL('narr',`Every child on the green shouts his word for him: "Mine!" You shout it loudest.`,`All the kids shout his word: "Mine!" You shout loudest.`,null,'mine'),
