@@ -103,6 +103,7 @@ function drawLily(l,t){
   ctx.restore();
 }
 function buildSprites(){
+  if(LOOK.re&&rzBuildSprites()) return;
   if(LOOK.sb&&sbBuildSprites()) return;
   SPR.oak=[1,2,3,4,5].map(i=>mkOak(1000+i,false)); SPR.birch=[1,2,3].map(i=>mkOak(2000+i,true));
   SPR.pine=[1,2,3,4].map(i=>mkPine(3000+i)); SPR.dead=[1,2,3].map(i=>mkDead(4000+i,false)); SPR.char=[1,2].map(i=>mkDead(4500+i,true));
@@ -117,6 +118,7 @@ function buildSprites(){
 function propSprite(p){
   const L=p.k==='rock'?(biomeInfo(p.x,p.y,{}).b===1?SPR.mossrock:SPR.rock):p.k==='dead'&&p.y<3000?SPR.char:SPR[p.k];
   if(!L) return SPR.bush[0];
+  if(LOOK.re) rzNoTurn(p); else if(p.rz0!==undefined){ p.rot=p.rz0; p.rz0=undefined; }
   if(!p.sp) p.sp=L[p.v%L.length];
   return p.sp;
 }
