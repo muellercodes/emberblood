@@ -68,7 +68,7 @@ const SHL={cv:null,g:null,ox:0,oy:0,q:0.3,key:'',redraws:0,ups:0,big:null,bg:nul
 function silOf(sp){
   if(sp._sil) return sp._sil;
   const c=mkCanvas(sp.width*0.25,sp.height*0.25), g=c.getContext('2d');
-  g.drawImage(sp,0,0,c.width,c.height); g.globalCompositeOperation='source-in'; g.fillStyle=LOOK.sb?'#2e1838':'#000'; g.fillRect(0,0,c.width,c.height);
+  g.drawImage(sp,0,0,c.width,c.height); g.globalCompositeOperation='source-in'; g.fillStyle=LOOK.sb?'#2e1838':LOOK.re?'#080c1e':'#000'; g.fillRect(0,0,c.width,c.height);
   sp._sil=c; return c;
 }
 function hull(P){
@@ -90,15 +90,16 @@ function shadowLayer(sun,props){
   const ox=Math.floor((cam.x-M)/STW)*STW, oy=Math.floor((cam.y-M)/STW)*STW;
   const ntx=Math.ceil((cam.x+vw+M-ox)/STW)+1, nty=Math.ceil((cam.y+vh+M-oy)/STW)+1, lw=ntx*STW*q, lh=nty*STW*q;
   if(!SHL.cv||SHL.cv.width!==lw||SHL.cv.height!==lh||SHL.q!==q){ SHL.cv=mkCanvas(lw,lh); SHL.g=SHL.cv.getContext('2d'); SHL.q=q; SHL.key=''; }
-  const ux=Math.round(sun.dx)/40, uy=Math.round(sun.dy)/40;
+  // (v12 LIGHT) Realistic: reSun() gives the shadow per px of height directly (e12_light.js), long at dawn and dusk
+  const ux=LOOK.re?Math.round(sun.dx*40)/40:Math.round(sun.dx)/40, uy=LOOK.re?Math.round(sun.dy*40)/40:Math.round(sun.dy)/40;
   const key=ox+','+oy+','+ux+','+uy+','+lw+','+lh;
   if(key!==SHL.key){ SHL.key=key; SHL.ox=ox; SHL.oy=oy; SHL.ntx=ntx; SHL.nty=nty; SHL.tiles=new Uint8Array(ntx*nty); SHL.redraws++; drawShadowLayer(SHL.g,lw,lh,ox,oy,q,ux,uy); SHL.bigOK=false; }
   // daylight shadows, fading to faint moon shadows at night, weaker under rain clouds
   const dl=daylight(), rk=G.rainK*(player.y>WALL_Y?1:0);
-  const a=(0.07+0.27*dl)*(1-0.55*rk), aq=Math.round(a*60)/60;
-  if(a<0.095) return; // deep night: moon shadows are too faint to be worth a pass
+  const a=LOOK.re?sun.a:(0.07+0.27*dl)*(1-0.55*rk), aq=Math.round(a*60)/60;
+  if(a<(LOOK.re?0.03:0.095)) return; // deep night: moon shadows are too faint to be worth a pass
   // low props (bushes, rocks): small blobs straight onto the ground, they rarely overlap
-  const SH=SPR.shadow; ctx.globalAlpha=a*0.85;
+  const SH=LOOK.re?rlBlob():SPR.shadow; ctx.globalAlpha=a*0.85;
   if(!DSKIP.lowp) for(const p of props){ if(p.taken||TREEH[p.k]||p.k==='herb'||p.k==='vent') continue; const h=p.k==='crag'?16:p.k==='bush'||p.k==='shrub'||p.k==='fshrub'||p.k==='mbush'?10:7, r=p.R*0.95; ctx.drawImage(SH,p.x+ux*h-r,p.y+uy*h-r*0.8,r*2,r*1.6); }
   // the soft layer is scaled up once into a canvas at screen resolution, so each frame is a plain 1:1 copy
   // (when the zoom is changing, or the screen is very large, it is scaled on the fly)
@@ -132,7 +133,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
   const x0=ox, y0=oy, x1=ox+lw/q, y1=oy+lh/q, inR=(x,y,m)=>x>x0-m&&y>y0-m&&x<x1+m&&y<y1+m;
   const len=Math.hypot(ux,uy)*40, phi=Math.atan2(uy,ux), e=1+len*0.018;
   const T=(x,y)=>g.setTransform(q,0,0,q,(x-ox)*q,(y-oy)*q);
-  const SH=SPR.shadow, TL=SHL.tiles, ntx=SHL.ntx, nty=SHL.nty;
+  const SH=LOOK.re?rlBlob():SPR.shadow, TL=SHL.tiles, ntx=SHL.ntx, nty=SHL.nty, SC=LOOK.sb?'#2e1838':LOOK.re?'#080c1e':'#000';
   // remember which tiles hold anything: the box around a caster and its shadow
   const mark=(xa,ya,xb,yb)=>{ const a=Math.max(0,Math.floor((xa-ox)/STW)), b=Math.min(ntx-1,Math.floor((xb-ox)/STW)), c=Math.max(0,Math.floor((ya-oy)/STW)), d=Math.min(nty-1,Math.floor((yb-oy)/STW)); for(let ty=c;ty<=d;ty++) for(let tx=a;tx<=b;tx++) TL[ty*ntx+tx]=1; };
   const markS=(x,y,r,h)=>{ const sx=x+ux*h, sy=y+uy*h; mark(Math.min(x,sx)-r-6,Math.min(y,sy)-r-6,Math.max(x,sx)+r+6,Math.max(y,sy)+r+6); };
@@ -146,7 +147,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     for(const p of arr){ if(p.taken||!TREEH[p.k]||!inR(p.x,p.y,p.R+90)) continue; trees.push(p); }
   }
   // tree trunks (one path), then canopy shaped shadows stretched along the sun
-  g.globalAlpha=0.85; g.strokeStyle=LOOK.sb?'#2e1838':'#000'; g.lineCap='round';
+  g.globalAlpha=0.85; g.strokeStyle=SC; g.lineCap='round';
   g.beginPath(); for(const p of trees){ const h=TREEH[p.k]*p.s*0.8; g.moveTo(p.x,p.y); g.lineTo(p.x+ux*h,p.y+uy*h); } g.lineWidth=7; g.stroke();
   g.globalAlpha=1;
   for(const p of trees){
@@ -163,7 +164,7 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     const m=stretchM(phi,e,0); g.globalAlpha=1; g.setTransform(q*m[0],q*m[1],q*m[2],q*m[3],(sx-ox)*q,(sy-oy)*q); g.drawImage(sil,-hh,-hh,hh*2,hh*2);
     T(0,0); g.globalAlpha=0.9; g.drawImage(SH,b.x-40,b.y-24,80,48); }
   // houses: the footprint pushed along the sun (a box of the house height), softened by the low resolution
-  T(0,0); g.globalAlpha=1; g.fillStyle=LOOK.sb?'#2e1838':'#000';
+  T(0,0); g.globalAlpha=1; g.fillStyle=SC;
   const mk=curMap();
   for(const h of mapList(HOUSES,mk)){
     if(!inR(h.x,h.y,h.w+120)) continue;
@@ -197,10 +198,13 @@ function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
     g.globalAlpha=0.95; g.beginPath(); g.moveTo(o.x,o.y); g.lineTo(o.x+ux*h,o.y+uy*h); g.lineWidth=w; g.stroke(); g.lineWidth=4;
     if(o.k==='facetree'){ const sil=silOf(SPR.oak[0]), hh=60; g.globalAlpha=1; g.drawImage(sil,o.x+ux*h-hh,o.y+uy*h-hh,hh*2,hh*2); }
   }
+  if(LOOK.re) reStructShadows(g,mk,inR,ux,uy,markS);   // (v12 LIGHT) the other structures in the Realistic look (e12_light.js)
   g.globalAlpha=1; g.setTransform(1,0,0,1,0,0);
+  if(LOOK.re) reSoften(g,lw,lh);   // (v12 LIGHT) softer edges, once per redraw (e12_light.js)
 }
 // a tight soft blob right under a character's feet, drawn just before it
 function contactShadow(e){
+  if(LOOK.re) return reContact(e);   // (v12 LIGHT) e12_light.js
   if(!DV.on) return;
   if(e===player&&(airborne()||player.dead)) return;
   if(e.flying||e.dead) return;
@@ -354,7 +358,7 @@ function depthPost(){
   // 2) toy grade (full): a soft-light pass of the warmed, blurred frame lifts local contrast and colour by day.
   // Only the sharp middle needs it: the bands drawn next cover the rest with blur
   if(full){
-    const dl=inA?0.5:daylight(), rk=inA?0:G.rainK, ko=(cave?0:(inA?0.14:0.36*dl*(1-0.5*rk)))*(LOOK.sb?0.55:1);
+    const dl=inA?0.5:daylight(), rk=inA?0:G.rainK, ko=(cave?0:(inA?0.14:0.36*dl*(1-0.5*rk)))*(LOOK.sb?0.55:LOOK.re?0.7:1);
     if(ko>0.02&&!DSKIP.orton&&!DV.lite){ const y0=Math.floor(te*s*0.3), y1=Math.ceil(bs*s+(ch-bs*s)*0.75); ctx.globalCompositeOperation='soft-light'; ctx.globalAlpha=ko; ctx.drawImage(DP.O,0,y0*k-dy*k,aw,(y1-y0)*k,dx,y0,cw,y1-y0); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1; }
   }
   // 3) tilt-shift: the mild level over the whole band, the strong level near the very edges (full)
@@ -368,7 +372,7 @@ function depthPost(){
     const tB=Math.ceil(te2*s*kk)+1, bB=Math.floor(bs2*s*kk)-1;
     ctx.drawImage(DP.Bm,0,0,bw,tB,0,0,cw,tB/kk); ctx.drawImage(DP.Bm,0,bB,bw,bh-bB,0,bB/kk,cw,(bh-bB)/kk);
     // 4) bloom: the strong blur squared (so only bright things glow), added on top at dusk, night and in caves
-    const dl=inA?0.5:daylight(), kb=(cave?0.35:inA?0.08+0.25*(1-dl):(1-dl)*0.62)*(LOOK.sb?0.35:1);
+    const dl=inA?0.5:daylight(), kb=(cave?0.35:inA?0.08+0.25*(1-dl):(1-dl)*0.62)*(LOOK.sb?0.35:LOOK.re?0.4:1);
     if(kb>0.03&&!DSKIP.bloom&&!DV.lite){ ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=kb; ctx.drawImage(DP.C,0,0,bw,bh,dx,dy,cw,ch); }
   }
   ctx.restore();
