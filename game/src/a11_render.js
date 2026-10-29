@@ -32,11 +32,12 @@ function render(){
       else{ ctx.fillStyle=chunkPlaceholder(cx,cy); ctx.fillRect(cx*CH,cy*CH,CH+0.5,CH+0.5); }
     }
     chunkPlan();   // (v12 GROUND) chunks ahead of Ash are built in small slices a frame (a4_ground.js), never a whole one in one frame
-    if(glows.length){ ctx.save(); ctx.globalCompositeOperation='lighter'; for(const [cx,cy,gl] of glows){ ctx.globalAlpha=LOOK.sb?0.16+0.07*Math.sin(t*1.7):0.3+0.18*Math.sin(t*1.7+cx*1.3+cy); ctx.drawImage(gl,cx*CH,cy*CH,CH,CH); } ctx.restore(); }
+    if(glows.length){ ctx.save(); ctx.globalCompositeOperation='lighter'; for(const [cx,cy,gl] of glows){ ctx.globalAlpha=LOOK.re?reGlowA(t,cx,cy):LOOK.sb?0.16+0.07*Math.sin(t*1.7):0.3+0.18*Math.sin(t*1.7+cx*1.3+cy); ctx.drawImage(gl,cx*CH,cy*CH,CH,CH); } ctx.restore(); }
     if(LOOK.sb) lookFoam(vis,t);
+    reGroundFrame(vis,t);   // (v12 GROUND) the Realistic look's moving water and lava lights (e12b_ground.js; nothing in the other looks)
   }
   ctx.lineWidth=1;
-  for(const r of G.ripples){ const k=r.t/r.max; if(r.glint){ if(LOOK.sb){ lookGlint(r,k); continue; } ctx.fillStyle=`rgba(255,255,240,${0.5*(1-k)})`; ctx.fillRect(r.x-r.r*0.4,r.y,r.r*0.8,1.2); if(D3.full) glowAt(r.x,r.y,r.r*0.9,'255,248,225',0.4*Math.sin(Math.PI*k)); } else { ctx.strokeStyle=`rgba(220,230,240,${(r.splash?0.45:0.35)*(1-k)})`; ctx.beginPath(); ctx.ellipse(r.x,r.y,r.r*(0.3+k),r.r*(0.3+k)*0.6,0,0,TAU); ctx.stroke(); } }
+  for(const r of G.ripples){ const k=r.t/r.max; if(r.glint){ if(LOOK.sb){ lookGlint(r,k); continue; } if(LOOK.re){ reGlint(r,k); continue; } ctx.fillStyle=`rgba(255,255,240,${0.5*(1-k)})`; ctx.fillRect(r.x-r.r*0.4,r.y,r.r*0.8,1.2); if(D3.full) glowAt(r.x,r.y,r.r*0.9,'255,248,225',0.4*Math.sin(Math.PI*k)); } else { ctx.strokeStyle=`rgba(220,230,240,${(r.splash?0.45:0.35)*(1-k)})`; ctx.beginPath(); ctx.ellipse(r.x,r.y,r.r*(0.3+k),r.r*(0.3+k)*0.6,0,0,TAU); ctx.stroke(); } }
   drawPools(); drawHazards();
   const sun=inA?{dx:4,dy:6,a:0.28}:D3.on?depthSun():sunInfo(), props=inA?[]:visibleProps(60);
   const npcs=inA?AREA.npcs:G.npcs;

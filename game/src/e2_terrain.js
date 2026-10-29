@@ -276,7 +276,7 @@ const BDEF={_road:[128,106,74],_shore:[170,154,112],_water:[[74,122,118],[22,52,
 // (v12 GROUND) built by a generator in small steps (see genChunkG in a4_ground.js); genChunkMap runs it in one go.
 // With LOOK.sb it follows the Storybook copy of genChunkMap in e5_look.js step for step (900 decor marks, Storybook
 // pebbles on roads, the contour lines before the decals), so the planner's slices draw exactly what that copy draws.
-function genChunkMap(cx,cy){ return chunkRun(genChunkMapG(cx,cy)); }
+function genChunkMap(cx,cy){ return chunkRun(chunkGen(cx,cy)); }
 function* genChunkMapG(cx,cy){
   const x0=cx*CH, y0=cy*CH, N=65, step=CH/(N-1), sb=!!LOOK.sb;
   const small=mkCanvas(N,N), sg=small.getContext('2d'), img=sg.createImageData(N,N), d=img.data;

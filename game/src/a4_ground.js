@@ -131,6 +131,7 @@ function drawBridge(g,br){
   g.restore();
 }
 function drawDecal(g,dc){
+  if(LOOK.re&&reDecal(g,dc)) return;   // (v12 GROUND) the Realistic look's plazas, patches and fields (e12b_ground.js)
   const rng=mulberry32(Math.floor(dc.x*7+dc.y*13));
   if(dc.k==='field'){
     g.save(); g.translate(dc.x,dc.y); g.rotate(dc.rot);
