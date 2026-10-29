@@ -243,7 +243,7 @@ function proOverlay(on){
   let el=PRO.el;
   if(!el&&on){
     el=document.createElement('div'); el.id='proStage'; el.setAttribute('aria-hidden','true');
-    el.style.cssText='position:fixed;inset:0;z-index:4;display:none;background:transparent';
+    el.style.cssText='position:fixed;inset:0;z-index:3;display:none;background:transparent';   // (v12 STORY1) under #card (4), so the prologue's chapter card shows over the painting
     const cv=document.createElement('canvas'); cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block'; el.appendChild(cv);
     el.addEventListener('click',()=>{ if(PRO.on&&PRO.phase==='title') proShow(); });
     document.body.appendChild(el); PRO.el=el; PRO.cv=cv;
