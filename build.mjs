@@ -22,6 +22,8 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   'x4_world','x4_foes','x4_story','x4_ascent',
   // items (v12 wave 7): the registry, consumables, boosts and shop supplies
   'e11_items',
+  // the Realistic look (v12 wave 10): the light engine, the ground and water, the props and buildings
+  'e12_light', 'e12b_ground', 'e12c_props',
   'x9_music','x9_music2',
   // hidden cheats for Drew (wraps the game once everything has loaded)
   'z1_cheats',

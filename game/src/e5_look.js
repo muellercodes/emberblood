@@ -8,7 +8,7 @@
 // prop sprites, house sprites, landmark sprites, struct sprites below), never redone per frame.
 // The style guide for new maps is scratchpad/STYLE.md (palettes, outline widths, the helpers exported here).
 // LOOK is a var (not const) so the drawing code in earlier modules can read it at any time without a TDZ error.
-var LOOK={sb:store.get('eb_look','storybook')!=='classic', gen:0, spr:new Map(), houses:new Map(), graded:new WeakMap(), cloud:null, off:{}};
+var LOOK={sb:store.get('eb_look','storybook')!=='classic', re:false, gen:0, spr:new Map(), houses:new Map(), graded:new WeakMap(), cloud:null, off:{}};
 // LOOK.off (debug, for measuring): {foam:true, clouds:true, structs:true, houses:true} switches a Storybook pass off
 
 // ---------- palette: the shared colours of the look (helpers use these; see STYLE.md)
@@ -962,4 +962,7 @@ function lookBench(n){
 // debug: one whole frame, painted for real (best of 9)
 function lookRenderBench(n){ const now=window.__realNow||(()=>performance.now()), fl=()=>{ try{ ctx.getImageData(0,0,1,1); }catch(e){} }; let best=1e9; fl(); for(let r=0;r<9;r++){ const t0=now(); for(let i=0;i<(n||3);i++) render(); fl(); best=Math.min(best,(now()-t0)/(n||3)); } return +best.toFixed(2); }
 
-window.__ebX=Object.assign(window.__ebX||{},{setLook,getLook:()=>LOOK.sb?'storybook':'classic',LOOK,outlineSprite,celFill,celBall,celTones,sbTone,gradeCanvas,lookRebuild,sbSprite,lookBench,lookRenderBench});
+// (v12 wave 10) LOOK.re is the Realistic look. Until its Settings choice lands (LIGHT), test it with __ebX.setReal(true):
+// world drawing takes the Classic paths (LOOK.sb false) plus every LOOK.re branch.
+function setRealDbg(on){ LOOK.re=!!on; if(on) LOOK.sb=false; else LOOK.sb=store.get('eb_look','storybook')!=='classic'; lookRebuild(); return LOOK.re; }
+window.__ebX=Object.assign(window.__ebX||{},{setReal:setRealDbg,setLook,getLook:()=>LOOK.sb?'storybook':'classic',LOOK,outlineSprite,celFill,celBall,celTones,sbTone,gradeCanvas,lookRebuild,sbSprite,lookBench,lookRenderBench});
