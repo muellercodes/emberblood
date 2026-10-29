@@ -92,7 +92,7 @@ function shadowLayer(sun,props){
   if(!SHL.cv||SHL.cv.width!==lw||SHL.cv.height!==lh||SHL.q!==q){ SHL.cv=mkCanvas(lw,lh); SHL.g=SHL.cv.getContext('2d'); SHL.q=q; SHL.key=''; }
   const ux=Math.round(sun.dx)/40, uy=Math.round(sun.dy)/40;
   const key=ox+','+oy+','+ux+','+uy+','+lw+','+lh;
-  if(key!==SHL.key){ SHL.key=key; SHL.ox=ox; SHL.oy=oy; SHL.ntx=ntx; SHL.nty=nty; SHL.tiles=new Uint8Array(ntx*nty); SHL.redraws++; drawShadowLayer(SHL.g,lw,lh,ox,oy,q,ux,uy); SHL.bigOK=false; }
+  if(key!==SHL.key){ SHL.key=key; SHL.ox=ox; SHL.oy=oy; SHL.ntx=ntx; SHL.nty=nty; SHL.tiles=new Uint8Array(ntx*nty); SHL.redraws++; drawShadowLayer(SHL.g,lw,lh,ox,oy,q,ux,uy); }
   // daylight shadows, fading to faint moon shadows at night, weaker under rain clouds
   const dl=daylight(), rk=G.rainK*(player.y>WALL_Y?1:0);
   const a=(0.07+0.27*dl)*(1-0.55*rk), aq=Math.round(a*60)/60;
@@ -105,14 +105,13 @@ function shadowLayer(sun,props){
   const Zd=DV.Z, bw=Math.ceil(lw/q*Zd), bh=Math.ceil(lh/q*Zd);
   if(Zd!==SHL.zLast){ SHL.zLast=Zd; SHL.zStable=0; } else SHL.zStable++;
   const useBig=bw*bh<=3.4e6&&SHL.zStable>2;
-  if(useBig&&(!SHL.bigOK||SHL.bigZ!==Zd||SHL.bigA!==aq)){
-    if(!SHL.big||SHL.big.width!==bw||SHL.big.height!==bh){ SHL.big=mkCanvas(bw,bh); SHL.bg=SHL.big.getContext('2d'); }
-    // the shadow strength is baked in too, so the copy each frame is a plain blit (it is redone when the light changes)
-    const g=SHL.bg; g.globalCompositeOperation='copy'; g.globalAlpha=aq; g.imageSmoothingEnabled=true; g.drawImage(SHL.cv,0,0,lw,lh,0,0,bw,bh); g.globalCompositeOperation='source-over'; g.globalAlpha=1;
-    SHL.bigOK=true; SHL.bigZ=Zd; SHL.bigA=aq; SHL.ups++;
-  }
+  // (v12 GROUND, the walking stutter) when Ash has walked on a tile, the new layer is scaled up in bands over a few
+  // frames into a second canvas while the last finished copy stays on screen at its own origin (it still covers the
+  // view: the layer keeps a margin and a tile to spare), then the two swap. Before, the whole upscale ran in the frame
+  // the layer moved. A new zoom, light strength or look still rebuilds at once, as before.
+  if(useBig) shlBig(lw,lh,bw,bh,ox,oy,Zd,aq,q,vw,vh);
   const big=useBig&&SHL.bigOK; let n=0;
-  if(big){ ctx.globalAlpha=1; ctx.setTransform(1,0,0,1,0,0); if(!DSKIP.shcomp) ctx.drawImage(SHL.big,Math.round(ox*Zd+DV.tx),Math.round(oy*Zd+DV.ty)); leanOff(); n=1; }
+  if(big){ ctx.globalAlpha=1; ctx.setTransform(1,0,0,1,0,0); if(!DSKIP.shcomp) ctx.drawImage(SHL.big,0,0,SHL.bigW,SHL.bigH,Math.round(SHL.bigOx*Zd+DV.tx),Math.round(SHL.bigOy*Zd+DV.ty),SHL.bigW,SHL.bigH); leanOff(); n=1; }
   else{
     // scaled on the fly: copy only the runs of tiles that hold a shadow
     ctx.globalAlpha=a;
@@ -126,6 +125,25 @@ function shadowLayer(sun,props){
   }
   SHL.runs=n;
   ctx.globalAlpha=1;
+}
+// the screen sized copy of the layer: the shown one (SHL.big, at bigOx,bigOy, content bigW x bigH) and the one being
+// scaled up (SHL.back), one band of SHL_BANDS a frame (a clipped band of the same scaled draw, so the finished copy is
+// the same pixels as one scaled at once). The canvases only grow, so a layer a tile wider or narrower makes no new one.
+const SHL_BANDS=4;
+function shlBig(lw,lh,bw,bh,ox,oy,Zd,aq,q,vw,vh){
+  const stale=!SHL.bigOK||SHL.bigZ!==Zd||SHL.bigA!==aq||SHL.bigQ!==q||SHL.bigG!==LOOK.gen;
+  if(!stale&&SHL.bigKey===SHL.key){ SHL.nb=0; SHL.nbKey=''; return; }
+  const want=SHL.key+'|'+Zd+'|'+aq+'|'+LOOK.gen;
+  if(SHL.nbKey!==want){ SHL.nbKey=want; SHL.nb=0; }
+  if(!SHL.back||SHL.back.width<bw||SHL.back.height<bh){ SHL.back=mkCanvas(Math.max(bw,SHL.back?SHL.back.width:0),Math.max(bh,SHL.back?SHL.back.height:0)); SHL.bkg=SHL.back.getContext('2d'); SHL.nb=0; }
+  // the shown copy has to cover the view while it waits, else this layer is finished now
+  const cover=!stale&&cam.x>=SHL.bigOx&&cam.y>=SHL.bigOy&&cam.x+vw<=SHL.bigOx+SHL.bigW/Zd&&cam.y+vh<=SHL.bigOy+SHL.bigH/Zd;
+  const g=SHL.bkg, n1=cover?SHL.nb+1:SHL_BANDS;
+  g.imageSmoothingEnabled=true; g.globalCompositeOperation='copy'; g.globalAlpha=aq;
+  for(;SHL.nb<n1;SHL.nb++){ const y0=Math.floor(bh*SHL.nb/SHL_BANDS), y1=Math.floor(bh*(SHL.nb+1)/SHL_BANDS); g.save(); g.beginPath(); g.rect(0,y0,bw,y1-y0); g.clip(); g.drawImage(SHL.cv,0,0,lw,lh,0,0,bw,bh); g.restore(); }
+  g.globalCompositeOperation='source-over'; g.globalAlpha=1;
+  if(SHL.nb>=SHL_BANDS){ const t=SHL.big, tg=SHL.bg; SHL.big=SHL.back; SHL.bg=SHL.bkg; SHL.back=t; SHL.bkg=tg; SHL.nb=0; SHL.nbKey='';
+    SHL.bigOK=true; SHL.bigZ=Zd; SHL.bigA=aq; SHL.bigQ=q; SHL.bigG=LOOK.gen; SHL.bigKey=SHL.key; SHL.bigOx=ox; SHL.bigOy=oy; SHL.bigW=bw; SHL.bigH=bh; SHL.ups++; }
 }
 function drawShadowLayer(g,lw,lh,ox,oy,q,ux,uy){
   g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,lw,lh);
