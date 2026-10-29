@@ -114,7 +114,7 @@ Object.assign(QDEFS,{
       xl('hollis',`That's what I said! She looked at me like I was the one being silly. Follow her, would you? I need to know. For my peace of mind. And the fence.`,`That's what I said! Please follow her. I need to know.`)],
     steps:[
       {t:'flag',flag:'a1_hop_follow',npc:'hollis',mini:'a1_follow',text:S('Follow Duchess up the Goatstair north of the farm, and stay close (talk to Hollis or to Duchess to start)','Follow Duchess up the Goatstair. Stay close!'),
-        ready:[xl('hollis',`She's by the pen, chewing a bucket. When she sets off, stay close. She does not wait for anybody.`,`She's by the pen. Stay close to her!`),a1Goat('Meh.'),xl('ash',`Lead the way, Your Majesty.`,`Lead the way, Your Majesty.`),a1Goat('Meeeh.')]},
+        ready:[xl('hollis',`She's by the pen, chewing a bucket. When she sets off, stay close. She does not wait for anybody.`,`She's by the pen. Stay close to her!`),a1Goat('Meh.'),xl('ash',`Lead the way, Your Grace.`,`Lead the way, Your Grace.`),a1Goat('Meeeh.')]},
       {t:'flag',flag:'a1_hop_gift',text:S('Explore the little cave Duchess found at the top of the Goatstair','Explore the little cave at the top.'),at:'cave:a1_nursery',reward:{abil:'dbljump'}},
       {t:'flag',flag:'a1_hop_home',text:S('Lead Duchess home to Hollis Farm. She can jump twice now. So can you!','Take Duchess home. You can both jump twice now!'),at:'npc:hollis'},
       {t:'talk',npc:'hollis',text:S('Tell Farmer Hollis what his goat has been up to','Tell Hollis about his goat.'),
@@ -206,7 +206,7 @@ a1Push('gate',5,xl('wren',`And look, a note in the margin, in different ink: "Th
   xl('wren',`Their tunnel has an old mine cart that runs out to the Gatewatch hills, by the way. Handy, if you ever need to reach the Obsidian Gate in a hurry.`,`Their tunnel has a mine cart to the Obsidian Gate hills. Handy!`));
 // 4 moss: Granny Moss's Bog Boots (no slowing in the bog: the Gloamjaw fight floor)
 a1Step('moss',2).reward={potmax:1,perk:'bog'};
-a1Push('moss',2,xl('moss',`And take my old Bog Boots. They never stick. Not even in Gloamjaw's muck. Especially not in Gloamjaw's muck.`,`And take my Bog Boots. They never stick in the mud.`));
+a1Push('moss',2,xl('moss',`And take my old Bog Boots. They never stick. Not even in the deep muck where that croaking thing lives. Especially not there.`,`And take my Bog Boots. They never stick in the mud.`));
 // 6 horn: Ulf blows the old pack-call in the Greymane fight (no wolves join him)
 a1Push('horn',1,xl('ulf',`If you ever face that big grey wolf, I'll be on the ridge with this. It's the old pack-call. Wolves remember it.`,`If you fight the big grey wolf, I'll blow this horn. Wolves remember it.`));
 // 8 dell: Dell talks about Minnow's skipping
@@ -215,7 +215,7 @@ a1Push('dell',1,xl('dell',`My girl Minnow can skip a stone eleven times. Thirtee
 a1Push('lure',1,xl('dell',`She floats! Want a ride? I'll take you across to the Mirefen landing any time. Just ask. Bring snacks.`,`She floats! I'll row you to the Mirefen any time. Just ask.`));
 // 10 bounty: 30 coins and a Heart Ember
 a1Step('bounty',1).reward={coins:30,xp:80,heart:'a1_he_bounty'};
-a1Push('bounty',1,xl('osric',`And this. The Watch Medal. Pin it over your heart and it keeps you going on the bad days. My old captain swore by his.`,`And the Watch Medal. It is good for your heart.`));
+a1Push('bounty',1,xl('osric',`And this. The Watch Medal. Pin it over your heart and it keeps you going on the bad days. Old Tom wore it on his collar for years.`,`And the Watch Medal. It is good for your heart.`));
 // 11 bounty2: Osric and his dogs come to the Obsidian Gate fight
 a1Push('bounty2',1,xl('osric',`When you go for the Obsidian Gate, the dogs and I will be there. Those knights need someone to bark at them. The dogs. Not me. Mostly the dogs.`,`When you go to the Obsidian Gate, the dogs and I will come too!`));
 // 12 kettle: the Oath's Lift key rattles in the kettle (x0_vorlaxis: the lift on the climb)
@@ -226,7 +226,7 @@ a1Step('pumpkins',1).reward={coins:30,xp:70,skill:'longthrow'};
 a1Push('pumpkins',1,xl('hal',`My grandpa threw turnips clean over the barn. Throw from the shoulder, let go late. You'll find a use for it.`,`Throw from the shoulder. Let go late. You'll see.`));
 // 19 pie: the Key to Brindlecross opens the Wardens' vault under the bridge
 { const C=STORY.pieAccuse.find(l=>l&&l.opts), o=C&&C.opts.find(q=>typeof q.then==='function'); if(o){ const f=o.then; o.then=()=>f().concat([
-  xl('mayor',`And take this. The Key to Brindlecross. It opens a funny little door under the bridge that nobody has opened in a thousand years. Probably junk. Old junk, though.`,`Take the Key to Brindlecross. It opens a little door under the bridge.`),
+  xl('mayor',`And take this. The Key to Brindlecross. It opens a funny little door under the bridge that nobody has opened in my lifetime, or my ancestor's. Probably junk. Old junk, though.`,`Take the Key to Brindlecross. It opens a little door under the bridge.`),
   xdo(()=>giveItems({a1_citykey:1}))]); } }
 // 21 trials: a story quest; Yara's gift is a Heart Ember (it was +10 max health)
 a1Step('trials',3).reward={coins:150,xp:400,bless:1,heart:'a1_he_trials'};
@@ -635,19 +635,19 @@ function a1AnvilLook(){
   if(G.flags.a1_bram_free) L[0]=xl('narr',`The Anvil Rock, with a hammer-shaped hole in the top. It looks a little lonely now.`,`The rock has a hammer-shaped hole now.`);
   else if(G.quests.a1_bram){ L.push(xl('bram',`(from far away, very proud) THAT'S where I left it! Heat it up first, kid. Then hit it like it owes you money.`,`(far away) That's it! Heat it up. Then hit it hard!`));
     if(a1on('a1_bram',0)) L.push(xl('narr',`Three old forge-pits stand around the rock. One is high up on a pillar. Light all three at once. The high one first!`,`Light the three fire pits at once. The high one first!`));
-    if(a1on('a1_bram',1)) L.push(xl('narr',`The rock glows red. Hold the attack button to charge the hammer all the way, then let go right on top of it.`,`It glows! Charge the hammer all the way. Smash it!`),{who:'narr',text:S('You will need the Forge Hammer for that. Mom makes them.','You need the hammer. Mom makes them.'),skipIf:()=>!!(G.weapons&&G.weapons.hammer)},
+    if(a1on('a1_bram',1)) L.push(xl('narr',`The rock glows red. Hold your swing until the hammer glows, then let go right on top of it.`,`It glows! Charge the hammer all the way. Smash it!`),{who:'narr',text:S('You will need the Forge Hammer for that. Mom makes them.','You need the hammer. Mom makes them.'),skipIf:()=>!!(G.weapons&&G.weapons.hammer)},
       {who:'narr',text:S(`Switch to the Forge Hammer first (${a1WpnKey()} changes weapons).`,`Pick the hammer first (${a1WpnKey()}).`),skipIf:()=>!(G.weapons&&G.weapons.hammer)||curWeapon()==='hammer'}); }
   else if(G.wards.ash&&G.weapons&&G.weapons.hammer) L.push(xl('narr',`Mom would love to see this.`,`Mom would love this.`));
   a1say(L);
 }
 function a1AnvilSmash(h,ix,iy){
   const AV=A1W.anvil; if(dist(ix,iy,AV.x,AV.y)>92) return;
-  if((h.ch||0)<0.95){ a1note('anvil_weak',`CLINK. Not hard enough! Hold the attack button until the hammer glows, then let go.`,`Not hard enough! Charge it all the way.`,3); return; }
+  if((h.ch||0)<0.95){ a1note('anvil_weak',`CLINK. Not hard enough! Hold your swing until the hammer glows, then let go.`,`Not hard enough! Charge it all the way.`,3); return; }
   G.flags.a1_bram_free=true; giveItems({a1_thunder:1},true); shake(14); SFX.play('boom'); flashA=0.4; flashCol='255,230,180';
   emit(AV.x,AV.y-40,50,{col:'255,210,140',smin:80,smax:320,lmin:.4,lmax:1,zmin:2,zmax:5});
   later(0.5,()=>a1say([xl('narr',`CLANG. The whole ridge rings like a bell. Old Thunder pops out of the rock and lands at your feet with a THUD that knocks you over.`,`CLANG! Old Thunder pops out of the rock. THUD!`),
     xl('narr',`From the rocks behind you: "Brothers! The Emberblood has the Warden's hammer! Get it!"`,`From the rocks: "Brothers! Get the hammer!"`),
-    xl('ash',`Of course there are more of them. There are always more of them.`,`Of course there are more of them.`)],()=>{ questPoke(); a1StragSpawn(); }));
+    xl('ash',`Oh, great. They brought friends.`,`They brought friends!`)],()=>{ questPoke(); a1StragSpawn(); }));
 }
 function a1StragSpawn(){
   if(A1.strag&&A1.strag.some(e=>!e.dead)) return;
@@ -826,7 +826,7 @@ function a1RaceWin(M){
   a1say([xl('narr',`You splash past the last ring with your lungs on fire and your tail in a knot. The Lake King surfaces beside you, slowly, the way a king arrives late to his own party.`,`You win! The Lake King comes up next to you. Slowly.`),
     xl('narr',`He looks at you for a long time. Then he flicks his great tail and a wave lifts you off your feet.`,`He looks at you. Then his tail lifts you up on a wave.`),
     xl('narr',`You land running. And you don't sink. You don't clomp. You SKIP. Skip, skip, skip, across the whole lake, like a stone thrown by the sky.`,`You land running. You SKIP across the lake like a stone!`),
-    xl('ash',`I'm a PEBBLE! I'm the fastest pebble in the WORLD!`,`I'm a PEBBLE! The fastest pebble ever!`),
+    xl('ash',`I'm a pebble! I'm the fastest pebble in the WORLD!`,`I'm a pebble! The fastest pebble ever!`),
     xl('narr',`The Lake King sinks back down, looking almost pleased, which for him is a lot of face.`,`The Lake King sinks down. He looks almost pleased.`)],()=>{ G.flags.a1_skim_won=true; jingle('complete','upgrade'); questPoke(); });
 }
 function a1RaceLose(M){
@@ -853,7 +853,7 @@ const A1_PIPN={hollow:S('the Hollow Ward','the Hollow Ward'),ash:S('the Ash Ward
 const A1_PIPL={
   hollow:[xl('iska',`Oh, look at him! Hello, little spark. Let's see what you can do.`,`Look at him! Hello, little spark.`),xl('pip',`Mip... ACHOO!`,`Mip... ACHOO!`),xl('narr',`Five sparks shoot out of Pip's nose and go bouncing across the grass.`,`Five sparks shoot out of Pip's nose!`),xl('iska',`Catch them, Ash. Quickly. Sparks are terrible at staying put.`,`Catch them, Ash! Quickly!`)],
   ash:[xl('bram',`A DRAKE! Finally, someone small enough to teach properly. Lesson one: be LOUD!`,`A DRAKE! Lesson one: be LOUD!`),xl('pip',`mip.`,`mip.`),xl('bram',`LOUDER!`,`LOUDER!`),xl('pip',`MIP!`,`MIP!`),xl('bram',`That's the spirit! Now you, Ash. ROAR next to him. Show him how it's done!`,`Now you, Ash. ROAR next to him!`)],
-  crag:[xl('oriel',`My drakes flew circles around this spire. Fly with him, Ash. He'll show you the way.`,`Fly with him around the spire, Ash. He'll show you the way.`)],
+  crag:[xl('oriel',`My drakes flew circles around this spire. Fly with him, Ash. He'll show you the way. He'll also show off. They all do.`,`Fly with him around the spire, Ash. He'll show you the way.`)],
   mire:[xl('sedge',`Oh no. He's in the bog. Everyone ends up in the bog. Dry him off, gently. Gently! He's a drake, not a crumpet.`,`Oh no, he fell in the bog! Dry him off. Gently!`),xl('narr',`Breathe fire on Pip for about two seconds. Not too short, not too long. Watch the bar.`,`Breathe on Pip for two seconds. Not too long!`)],
   frost:[xl('tove',`A warm little drake? For me? On MY Ward? I haven't been this warm in a thousand years.`,`A warm little drake? For me? So warm!`),xl('tove',`My stone is still cold inside. Warm it with him, side by side. And mind the wolves. They love a cold stone.`,`Warm my stone with him. Mind the wolves!`)]};
 function a1PipLeft(){ return ['hollow','ash','crag','mire','frost'].filter(id=>!G.flags['a1_pip_'+id]); }
@@ -960,7 +960,7 @@ defineFoe('a1_moth',{r:11,hp:20,speed:175,dmg:4,value:7,flying:true,kbRes:1.4,na
   onHurt(e,amt){ return e.burnT>0||FH.fire?amt:amt*0.35; },
   draw2d:(e)=>a1DrawMoth(e.x,e.y-14,G.time+e.id*0.7,1)});
 function a1VaultAct(){
-  if(G.found.a1_vault){ a1say([xl('narr',`Five names carved in the old stone, worn smooth by a thousand years of fingers: ISKA. BRAM. ORIEL. SEDGE. TOVE.`,`Five names: ISKA. BRAM. ORIEL. SEDGE. TOVE.`)]); return; }
+  if(G.found.a1_vault){ a1say([xl('narr',`Five names carved in the old stone, worn smooth by centuries of fingers: ISKA. BRAM. ORIEL. SEDGE. TOVE.`,`Five names: ISKA. BRAM. ORIEL. SEDGE. TOVE.`)]); return; }
   if(!G.items.a1_citykey){ a1say([xl('narr',`Under the bridge, half in the water, is a tiny round door with a very big keyhole. It is locked.`,`A tiny door under the bridge. It is locked.`),
     {who:'narr',text:S(`The Mayor of Brindlecross keeps the town's keys. He is busy with a missing pie.`,`The Mayor has the town's keys. He has lost a pie.`),skipIf:()=>a1q('pie')}]); return; }
   G.found.a1_vault=true; SFX.play('chest');
