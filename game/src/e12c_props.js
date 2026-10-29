@@ -305,7 +305,8 @@ function rzTrunkTex(kind){
     const F=rzHF(16,64,8,0), c=kind==='birch'?RZP.birchBark:kind==='pine'||kind==='spine'?RZP.pineBark:kind==='willow'?RZP.willowBark:kind==='dead'?RZP.dead:kind==='char'?RZP.char:RZP.bark;
     const sd=kind.length*13, tx=rzBarkTex(sd,kind==='pine'||kind==='spine'?1.4:2.2,true);
     // a vertical tapered cylinder (top at y 0, base at y 64), widening into the root flare
-    rzCap(F,0,64,6,0,0,6,6.2,4.6,c,RZ.BARK,(t,u,len)=>{ let v=tx(t,u,len); if(kind==='birch'&&rzHash(Math.floor(t*len*0.45),Math.floor(u*1.5+2),sd)>0.72) v*=0.28; return v; },1);
+    rzContact(F,0,63,7.5,2.6,0.45);
+    rzCap(F,0,62,6,0,0,6,6.2,4.4,c,RZ.BARK,(t,u,len)=>{ let v=tx(t,u,len); if(kind==='birch'&&rzHash(Math.floor(t*len*0.45),Math.floor(u*1.5+2),sd)>0.72) v*=0.28; return v; },1);
     return rzShade(F,{ao:0.1,aoR:1.6,rim:0.5});
   });
 }
@@ -320,6 +321,30 @@ function rzRoots(kind){
   });
 }
 
+// the 3D depth modes in this look (drawTallProps in a11c_depth.js hands over here): the same back-to-front order,
+// halo and fade, a bark trunk from the roots to the leaning crown, and crowns that never turn
+function rzTrunkKind(p){ return p.k==='dead'?(p.y<3000?'char':'dead'):p.k==='birch'||p.k==='pine'||p.k==='spine'||p.k==='willow'||p.k==='oak'?p.k:'oak'; }
+function rzTallProps(props,t,bossE){
+  TALLS.length=0; for(const p of props) if(TREEH[p.k]) TALLS.push(p);
+  TALLS.sort((a,b)=>a.y-b.y);
+  const halo=DV.full&&!DV.lite&&!DSKIP.halo, ha=AREA?0:0.16+0.1*daylight();
+  for(const p of TALLS){
+    const sp=propSprite(p), h=TREEH[p.k]*p.s, dx=leanDX(p.x,h), dy=leanDY(p.y,h), a=tallFade(p,dx,dy,bossE), rot=Math.sin(t*0.8+p.ph)*0.025*(1+G.rainK*1.5);
+    if(halo&&a>0.9&&p.k!=='dead'){ const sil=silOf(sp), hh=sp.half*p.s*1.04; ctx.globalAlpha=ha; ctx.drawImage(sil,p.x+dx-hh+3,p.y+dy-hh+7,hh*2,hh*2); }
+    ctx.globalAlpha=a;
+    const L=Math.hypot(dx,dy);
+    if(L>2.5||p.k==='dead') rzTrunk(rzTrunkKind(p),p.x,p.y,dx,dy,(p.k==='dead'?14:12)*p.s,L>5?Math.min(1,(L-5)/10)*p.s:0);
+    drawSprite(sp,p.x+dx,p.y+dy,p.s,rot);
+  }
+  ctx.globalAlpha=1;
+}
+// a trunk from (x,y) to (x+dx,y+dy), w world px wide; rk>0 draws the root flare at the base at that scale
+function rzTrunk(kind,x,y,dx,dy,w,rk){
+  const L=Math.hypot(dx,dy); if(L<0.5) return;
+  const tx=rzTrunkTex(kind), ga=ctx.globalAlpha;
+  if(rk>0){ const R=rzRoots(kind), hw=R.half*rk*0.75; ctx.globalAlpha=ga*Math.min(1,rk); ctx.drawImage(R,x-hw,y-hw*0.9,hw*2,hw*2); ctx.globalAlpha=ga; }
+  ctx.save(); ctx.translate(x,y); ctx.rotate(Math.atan2(dx,-dy)); ctx.drawImage(tx,-w*0.65,-L-2,w*1.3,L+6); ctx.restore();
+}
 // ---------- bushes, plants
 function rzMkBush(seed,kind){
   const rng=mulberry32(seed), R=15, F=rzSq(R), P=RZP[kind]||RZP.bush;
@@ -390,38 +415,37 @@ function rzMkSpike(seed){
 }
 
 // ---------- rocks: a faceted dome over an irregular footprint, cracks, strata, lichen, moss and snow
-const RZROCK={grey:{c:[132,128,120],v:[110,106,100],li:[176,172,124]},moss:{c:[118,120,108],v:[98,100,92],li:[96,124,56],moss:1},
-  red:{c:[172,104,72],v:[146,84,60],li:[196,134,96],strata:1},obsid:{c:[30,26,36],v:[18,16,24],li:[70,62,86],gloss:1},snow:{c:[116,120,128],v:[96,100,110],li:[150,156,150],snow:1}};
+const RZROCK={grey:{c:[132,128,120],v:[110,106,100],li:[176,172,124]},moss:{c:[118,120,108],v:[98,100,92],li:[90,112,60],moss:1},
+  red:{c:[160,104,78],v:[124,80,62],li:[184,132,100],strata:1},obsid:{c:[30,26,36],v:[18,16,24],li:[70,62,86],gloss:1},snow:{c:[116,120,128],v:[96,100,110],li:[150,156,150],snow:1}};
 function rzRockBody(F,R,rng,K,flat,seed,ox,oy){
   ox=ox||0; oy=oy||0;
   const n=8+Math.floor(rng()*4), v=[]; for(let i=0;i<n;i++){ const a=i/n*TAU+rng()*0.32, m=0.76+rng()*0.26; v.push([ox+Math.cos(a)*R*m,oy+Math.sin(a)*R*m*0.84]); }
-  const planes=[]; const np=K.gloss?8:5+Math.floor(rng()*3); for(let i=0;i<np;i++){ const a=rng()*TAU; planes.push([Math.cos(a),Math.sin(a),R*(0.5+rng()*0.35),0.45+rng()*0.5]); }
-  const top=R*(flat||0.62), cracks=[]; for(let i=0;i<(K.strata?2:3);i++){ let x=(rng()-0.4)*R*0.8, y=(rng()-0.4)*R*0.7; const c=[[x,y]]; for(let s=0;s<3;s++){ x+=(rng()-0.45)*R*0.5; y+=(rng()-0.45)*R*0.5; c.push([x,y]); } cracks.push(c); }
+  const planes=[]; const np=K.gloss?8:4+Math.floor(rng()*3); for(let i=0;i<np;i++){ const a=rng()*TAU; planes.push([Math.cos(a),Math.sin(a),R*(0.5+rng()*0.35),0.45+rng()*0.5]); }
+  const top=R*(flat||0.62), cracks=[]; for(let i=0;i<(K.strata?1:1+Math.floor(rng()*2));i++){ let x=(rng()-0.5)*R*0.7, y=(rng()-0.5)*R*0.6, a=rng()*TAU; const c=[[x,y]]; for(let s=0;s<6;s++){ a+=(rng()-0.5)*1.3; x+=Math.cos(a)*R*0.15; y+=Math.sin(a)*R*0.15; c.push([x,y]); } cracks.push(c); }
   const segD=(x,y,c)=>{ let best=1e9; for(let i=0;i<c.length-1;i++){ const [ax,ay]=c[i], [bx,by]=c[i+1], vx=bx-ax, vy=by-ay, t=clamp(((x-ax)*vx+(y-ay)*vy)/(vx*vx+vy*vy||1),0,1), dx=x-ax-vx*t, dy=y-ay-vy*t; best=Math.min(best,dx*dx+dy*dy); } return Math.sqrt(best); };
   const edgeD=(x,y)=>{ let best=1e9; for(let a=0,b=n-1;a<n;b=a++){ const [ax,ay]=v[b], [bx,by]=v[a], vx=bx-ax, vy=by-ay, t=clamp(((x-ax)*vx+(y-ay)*vy)/(vx*vx+vy*vy||1),0,1), dx=x-ax-vx*t, dy=y-ay-vy*t; best=Math.min(best,dx*dx+dy*dy); } return Math.sqrt(best); };
   rzPoly(F,v,(x,y)=>{
     const e=edgeD(x,y), base=top*Math.pow(clamp(e/(R*0.55),0,1),0.55);
     let z=base; for(const p of planes){ const q=p[2]-((x-ox)*p[0]+(y-oy)*p[1])*p[3]; if(q<z) z=Math.max(q,z*0.55); }
     z+=(rzFbm(x*0.28,y*0.28,seed,3)-0.5)*R*0.08;
-    for(const c of cracks){ const d=segD(x,y,c); if(d<1.3) z-=(1.3-d)*1.3; }
+    for(const c of cracks){ const d=segD(x,y,c); if(d<0.9) z-=(0.9-d)*0.9; }
     return Math.max(0.3,z);
   },(x,y)=>{
     let c=rzMix(K.v,K.c,clamp(0.5+(rzFbm(x*0.12,y*0.12,seed+4,2)-0.5)*1.6,0,1));
     if(K.strata){ const s=Math.sin((y+rzFbm(x*0.08,y*0.08,seed,2)*10)*0.9); c=rzCol(c,s*0.12); }
     const sp=rzHash(Math.floor(x*2.3),Math.floor(y*2.3),seed); if(sp>0.93) c=rzCol(c,0.12); else if(sp<0.06) c=rzCol(c,-0.18);
-    for(const cr of cracks){ if(segD(x,y,cr)<0.9){ c=rzCol(c,-0.45); break; } }
+    for(const cr of cracks){ const d=segD(x,y,cr); if(d<0.5){ c=rzCol(c,-0.3*(1-d/0.5)); break; } }
     return c;
   },K.gloss?RZ.GLOSS:RZ.ROCK);
   return {v,top};
 }
 function rzRockFinish(F,R,K,seed){
-  // lichen and moss grow on the tops facing the light; snow settles on the flat tops
-  const k=F.k, W=F.W;
-  rzEach(F,(x,y,id)=>{ const i=id%W, j=(id/W)|0, hL=i>0?F.h0[id-1]:0, hR=i<W-1?F.h0[id+1]:0, hU=j>0?F.h0[id-W]:0, hD=j<F.Hp-1?F.h0[id+W]:0;
-    const nx=(hL-hR)*0.5, ny=(hU-hD)*0.5, flatTop=1/Math.sqrt(nx*nx+ny*ny+1), lit=-(nx+ny)*0.5, n1=rzFbm(x*0.3+9,y*0.3,seed+11,3);
-    if(K.snow){ if(flatTop>0.7&&n1>0.36-lit*0.3){ F.m[id]=RZ.SNOW; const w=230+rzHash(i,j,3)*14; F.c[id*3]=w; F.c[id*3+1]=w+4; F.c[id*3+2]=w+10; F.h0[id]+=0.8*k; } return; }
-    if(K.moss&&flatTop>0.6&&n1>0.5-lit*0.25){ const f=0.85+rzHash(i,j,5)*0.3, c=[K.li[0]*f,K.li[1]*f,K.li[2]*f]; F.c[id*3]=c[0]; F.c[id*3+1]=c[1]; F.c[id*3+2]=c[2]; F.m[id]=RZ.LEAF; F.h0[id]+=0.5*k; return; }
-    if(!K.gloss&&n1>0.68&&rzHash(i>>1,j>>1,seed)>0.35){ const c=rzMix([F.c[id*3],F.c[id*3+1],F.c[id*3+2]],K.li,0.55); F.c[id*3]=c[0]; F.c[id*3+1]=c[1]; F.c[id*3+2]=c[2]; } });
+  // snow settles on the high, north-facing parts; moss and lichen grow on the tops facing the light
+  const k=F.k, W=F.W; let hm=1e-3; for(let i=0;i<F.n;i++) if(F.h0[i]>hm) hm=F.h0[i];
+  rzEach(F,(x,y,id)=>{ const i=id%W, j=(id/W)|0, hr=F.h0[id]/hm, n1=rzFbm(x*0.22+9,y*0.22,seed+11,3), lit=-(x+y)/(R*1.6);
+    if(K.snow){ if(hr+(n1-0.5)*0.55-y/(R*3.2)>0.5){ F.m[id]=RZ.SNOW; F.c[id*3]=236; F.c[id*3+1]=240; F.c[id*3+2]=246; F.h0[id]+=0.9*k; } return; }
+    if(K.moss&&hr+(n1-0.5)*0.7+lit*0.25>0.62){ const f=0.85+rzVN(x*1.4,y*1.4,seed)*0.3; F.c[id*3]=K.li[0]*f; F.c[id*3+1]=K.li[1]*f; F.c[id*3+2]=K.li[2]*f; F.m[id]=RZ.LEAF; F.h0[id]+=0.4*k; return; }
+    if(!K.gloss&&n1>0.66&&hr>0.35){ const c=rzMix([F.c[id*3],F.c[id*3+1],F.c[id*3+2]],K.li,0.45); F.c[id*3]=c[0]; F.c[id*3+1]=c[1]; F.c[id*3+2]=c[2]; } });
 }
 function rzMkRock(seed,kind){
   const rng=mulberry32(seed), R=kind==='crag'?28:18, F=rzSq(R), K=RZROCK[kind==='crag'?'red':kind]||RZROCK.grey;
@@ -432,8 +456,35 @@ function rzMkRock(seed,kind){
   return rzShade(F,{ao:0.2,aoR:R>20?2.4:1.8,rim:0.4,bump:1.15,sat:0.96});
 }
 
+// ---------- relighting a painted canvas: its brightness is read as relief (bright stands out, dark sinks in), then lit
+// from the art light with crevice occlusion, a soft fall-off at the silhouette and a cool-shadow, warm-light split.
+// Used for houses and landmark sprites painted by the older code, so their textures read as real materials.
+// o: bump (relief per brightness, px), ao, aoR (px), edge (px of fall-off at the outline), sat, split, gain
+function rzRelight(cv,o){
+  o=o||{}; const W=cv.width, Hh=cv.height; if(!W||!Hh) return cv;
+  const g=cv.getContext('2d'); let id; try{ id=g.getImageData(0,0,W,Hh); }catch(e){ return cv; }
+  const d=id.data, n=W*Hh, h=new Float32Array(n), a=new Float32Array(n), tmp=new Float32Array(n), hb=new Float32Array(n), hb2=new Float32Array(n), ab=new Float32Array(n);
+  const bump=o.bump==null?3:o.bump, edge=o.edge==null?3:o.edge;
+  for(let i=0;i<n;i++){ const A=d[i*4+3]/255; a[i]=A; if(A>0) h[i]=(0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2])/255*bump; }
+  rzBlur(a,W,Hh,Math.max(1,Math.round(edge)),ab,tmp);
+  for(let i=0;i<n;i++) if(a[i]>0) h[i]+=Math.min(1,ab[i]*1.6)*edge*1.2;
+  const r=Math.max(1,Math.round(o.aoR||3)); rzBlur(h,W,Hh,r,hb,tmp); rzBlur(hb,W,Hh,r,hb2,tmp);
+  const Lx=RZL[0], Ly=RZL[1], Lz=RZL[2], ao=o.ao==null?0.12:o.ao, sat=o.sat==null?0.9:o.sat, sp=o.split==null?1:o.split, gain=o.gain||1;
+  const flat=Lz*0.85+0.15;   // the light a flat, unoccluded surface gets: such pixels keep their painted colour
+  for(let y=0;y<Hh;y++) for(let x=0;x<W;x++){ const i=y*W+x; if(a[i]<=0) continue;
+    const hL=x>0?h[i-1]:0, hR=x<W-1?h[i+1]:0, hU=y>0?h[i-W]:0, hD=y<Hh-1?h[i+W]:0;
+    let nx=(hL-hR)*0.5, ny=(hU-hD)*0.5; const il=1/Math.sqrt(nx*nx+ny*ny+1); nx*=il; ny*=il;
+    const dl=nx*Lx+ny*Ly+il*Lz, dif=Math.max(0,dl*0.85+0.15)/flat;
+    let oc=1+(h[i]-hb2[i])*ao; oc=oc<0.55?0.55:oc>1.12?1.12:oc;
+    const k=(0.42+0.58*dif)*oc*gain, sh=1-Math.min(1,k);   // sh: how far into shadow, for the cool tint
+    let R=d[i*4]*k, G=d[i*4+1]*k, B=d[i*4+2]*k;
+    if(sp){ R+=(-10*sh+(k>1?6*(k-1)*sp:0))*sp; G+=(-3*sh+(k>1?3*(k-1)*sp:0))*sp; B+=(8*sh-(k>1?5*(k-1):0))*sp; }
+    const l=0.299*R+0.587*G+0.114*B; R=l+(R-l)*sat; G=l+(G-l)*sat; B=l+(B-l)*sat;
+    d[i*4]=R<0?0:R>255?255:R; d[i*4+1]=G<0?0:G>255?255:G; d[i*4+2]=B<0?0:B>255?255:B; }
+  g.putImageData(id,0,0); return cv;
+}
 // ---------- the sprite set for the Realistic look (called by buildSprites in a3_art.js)
-const RZV={oak:8,birch:5,pine:6,spine:6,willow:4,dead:4,char:3,bush:6,shrub:4,fshrub:4,mbush:4,rock:5,mossrock:4,crag:4,obsid:3,srock:4,spike:3,stump:3,bones:2,reed:4,herb:1,vent:1};
+const RZV={oak:6,birch:4,pine:6,spine:6,willow:4,dead:4,char:3,bush:6,shrub:4,fshrub:4,mbush:4,rock:5,mossrock:4,crag:4,obsid:3,srock:4,spike:3,stump:3,bones:2,reed:4,herb:1,vent:1};
 function rzBuildSprites(){
   const t0=performance.now(), V=RZV, sq=(n,f)=>{ const a=[], q=performance.now(); for(let i=1;i<=n;i++) a.push(f(i)); RZT.last=+(performance.now()-q).toFixed(1); return a; }, T=RZT.kinds={};
   SPR.oak=sq(V.oak,i=>rzMkOak(1000+i,'oak')); T.oak=RZT.last; SPR.birch=sq(V.birch,i=>rzMkOak(2000+i,'birch')); T.birch=RZT.last;
@@ -461,7 +512,181 @@ function rzSheet(keys,sc,bg){
   list.forEach((c,i)=>{ const w=c.width/SS*sc, h=c.height/SS*sc; g.drawImage(c,(i%cols)*cell+(cell-w)/2,Math.floor(i/cols)*cell+(cell-h)/2,w,h); });
   return cv.toDataURL();
 }
-window.__ebDbg=Object.assign(window.__ebDbg||{},{rzSheet,rzBuildSprites,RZT,SPR});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{rzSheet,rzBuildSprites,RZT,SPR,buildSprites:()=>buildSprites()});
 // the Realistic sprites are lit from the art light, so a prop never turns (Classic spins each one at random);
 // the old angle is kept and handed back when the look changes (propSprite in a3_art.js)
 function rzNoTurn(p){ if(p.rz0===undefined){ p.rz0=p.rot; p.rot=0; } }
+// debug: a sheet of house sprites (window.__ebDbg.rzHouseSheet(indices into HOUSES, scale))
+function rzHouseSheet(ids,sc){
+  sc=sc||1; const cs=ids.map(i=>houseSprite(HOUSES[i])), cw=Math.max(...cs.map(c=>c.width/HSC*sc))+8, ch=Math.max(...cs.map(c=>c.height/HSC*sc))+8, cols=Math.min(4,cs.length), rows=Math.ceil(cs.length/cols);
+  const cv=mkCanvas(cols*cw,rows*ch), g=cv.getContext('2d'); g.fillStyle='#5f7a3c'; g.fillRect(0,0,cv.width,cv.height);
+  cs.forEach((c,i)=>{ const w=c.width/HSC*sc, h=c.height/HSC*sc; g.drawImage(c,(i%cols)*cw+(cw-w)/2,Math.floor(i/cols)*ch+(ch-h)/2,w,h); });
+  return cv.toDataURL();
+}
+window.__ebDbg.rzHouseSheet=rzHouseSheet; window.__ebDbg.rzRelight=rzRelight; window.__ebDbg.rzRoofTex=(...a)=>rzRoofTex(...a);
+// ---------- houses: the painted house of a3_art.js (hzPlan decides everything), with Realistic roof and wall
+// materials (rzRoofTex, rzWallTex) and this relight pass over the finished canvas
+function rzHousePost(c,L){
+  if(RZT.noPost) return;
+  rzRelight(c,{bump:4.5,ao:0.1,aoR:3,edge:2.5,sat:0.88});
+  // a lit ridge: the line where the two roof planes meet catches the light
+  const g=c.getContext('2d'); g.setTransform(HSC,0,0,HSC,HSC*(HPX+L.W),HSC*(HPT+L.H));
+  if(!L.vert&&L.ridgeY!=null&&L.st!=='forge'){ const hi=L.hip?Math.min(L.W*0.45,(L.eaveY-L.topY)*0.5):0, x0=-L.W-6+hi, x1=L.W+6-hi;
+    g.fillStyle=L.snow?'rgba(255,255,255,.4)':'rgba(255,244,214,.3)'; g.fillRect(x0+1,L.ridgeY-(L.roof==='thatch'?2.7:1.9),x1-x0-2,0.9);
+    g.fillStyle='rgba(20,14,24,.16)'; g.fillRect(x0+1,L.ridgeY+(L.roof==='thatch'?2.6:1.8),x1-x0-2,1.6); }
+  g.setTransform(1,0,0,1,0,0);
+}
+// detail tiles: grey (mid 128) pictures of fibre, grain, grit and mottling, laid over a material's colour with the
+// soft-light blend so they shade it without changing its hue. Built once per look generation.
+function rzTile(key,S,paint){ return rzCache('tile:'+key,()=>{ const c=mkCanvas(S,S), g=c.getContext('2d'); g.fillStyle='rgb(128,128,128)'; g.fillRect(0,0,S,S); paint(g,S,mulberry32(key.length*977+S)); return c; }); }
+function rzPat(g,key){ const S={straw:64,grainV:64,grainH:64,grit:64,plaster:96,slate:64,bark:64}[key]||64;
+  const t=rzTile(key,S,(q,S,rng)=>{
+    const wrap=(f)=>{ for(const ox of [-S,0,S]) for(const oy of [-S,0,S]){ q.save(); q.translate(ox,oy); f(); q.restore(); } };
+    if(key==='straw'||key==='grainV'||key==='grainH'||key==='bark'){
+      const n=key==='straw'?900:key==='bark'?500:260, strokes=[];
+      for(let i=0;i<n;i++){ const x=rng()*S, y=rng()*S, L=key==='straw'?5+rng()*12:key==='bark'?4+rng()*10:14+rng()*30, a=(rng()-0.5)*(key==='straw'?0.3:0.06), v=Math.round(key==='bark'?40+rng()*150:70+rng()*120), w=key==='straw'?0.6+rng()*0.7:key==='bark'?0.8+rng()*1.6:0.5+rng()*0.8; strokes.push([x,y,L,a,v,w]); }
+      q.lineCap='round';
+      wrap(()=>{ for(const [x,y,L,a,v,w] of strokes){ q.strokeStyle=`rgba(${v},${v},${v},.55)`; q.lineWidth=w; q.beginPath(); if(key==='grainH'){ q.moveTo(x,y); q.lineTo(x+L,y+a*L); } else { q.moveTo(x,y); q.lineTo(x+a*L,y+L); } q.stroke(); } });
+    } else {
+      const id=q.getImageData(0,0,S,S), d=id.data, sd=key.length*31;
+      for(let y=0;y<S;y++) for(let x=0;x<S;x++){ const i=(y*S+x)*4; let v;
+        // tileable noise: the lattice wraps at the tile size
+        const vn=(fx,fy,p,s)=>{ const X=fx*p/S, Y=fy*p/S, xi=Math.floor(X), yi=Math.floor(Y), tx=X-xi, ty=Y-yi, u=tx*tx*(3-2*tx), w=ty*ty*(3-2*ty), h=(a,b)=>rzHash(((a%p)+p)%p,((b%p)+p)%p,s); const A=h(xi,yi), B=h(xi+1,yi), C=h(xi,yi+1), D=h(xi+1,yi+1); return A+(B-A)*u+(C-A)*w+(A-B-C+D)*u*w; };
+        if(key==='grit') v=128+(vn(x,y,16,sd)-0.5)*70+(vn(x,y,32,sd+1)-0.5)*50+(rzHash(x,y,sd)-0.5)*44;
+        else if(key==='plaster') v=128+(vn(x,y,6,sd)-0.5)*44+(vn(x,y,24,sd+2)-0.5)*26+(rzHash(x,y,sd)>0.985?-40:0);
+        else v=128+(vn(x,y,8,sd)-0.5)*30+(rzHash(x,y,sd)-0.5)*26+Math.sin((y+vn(x,y,4,sd+5)*6)*1.3)*8; // slate cleavage
+        d[i]=d[i+1]=d[i+2]=v<0?0:v>255?255:v; }
+      q.putImageData(id,0,0);
+    }
+  });
+  return g.createPattern(t,'repeat');
+}
+function rzOver(g,key,x,y,w,h,a){ g.save(); g.globalCompositeOperation='soft-light'; g.globalAlpha=a==null?1:a; g.fillStyle=rzPat(g,key); g.fillRect(x,y,w,h); g.restore(); }
+const rzMulC=(c,k)=>[c[0]*k,c[1]*k,c[2]*k];
+// roof materials (the same frame as hzRoofTex: u along the roof, v from the ridge (v0) down to the eave (v1),
+// vs the foreshortening of the plane)
+function rzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng0){
+  const sp=u1-u0, ht=v1-v0, c=hzC(col), rng=mulberry32(Math.floor(rng0()*1e9));
+  if(mat==='thatch'){
+    const base=rzMix(c,[150,132,100],0.22);
+    g.fillStyle=hzLG(g,0,v0,0,v1,[[0,hzS(rzCol(base,0.05))],[0.6,hzS(base)],[1,hzS(rzMix(base,[112,100,82],0.35))]]); g.fillRect(u0,v0,sp,ht);
+    // weathered patches and rain streaks running down the slope
+    for(let i=0;i<sp*ht/260;i++){ g.fillStyle=rng()<0.5?'rgba(92,80,62,.16)':'rgba(255,236,190,.1)'; g.beginPath(); g.ellipse(u0+rng()*sp,v0+rng()*ht,6+rng()*14,(3+rng()*7)*vs,0,0,TAU); g.fill(); }
+    for(let u=u0+rng()*5;u<u1;u+=3+rng()*7){ g.fillStyle=`rgba(70,56,40,${0.05+rng()*0.09})`; g.fillRect(u,v0+rng()*ht*0.4,0.8+rng()*2,ht); }
+    rzOver(g,'straw',u0,v0,sp,ht,1);
+    // courses: each layer of bundles ends in a fringe of cut straw that catches the light, then throws a soft
+    // shadow on the layer below
+    const bh=7*vs;
+    for(let v=v1-bh;v>v0-1;v-=bh){
+      g.fillStyle='rgba(36,22,10,.34)'; g.beginPath(); g.moveTo(u0,v); for(let u=u0;u<u1;u+=6){ g.quadraticCurveTo(u+3,v+1.7*vs+rng()*0.7,u+6,v); } g.lineTo(u1,v+2.6*vs); g.lineTo(u0,v+2.6*vs); g.closePath(); g.fill();
+      g.fillStyle='rgba(255,236,190,.16)'; g.fillRect(u0,v-1.8*vs,sp,1.4*vs);
+      g.strokeStyle='rgba(255,240,205,.28)'; g.lineWidth=0.4; g.beginPath(); for(let u=u0+rng();u<u1;u+=0.9+rng()*0.9){ const l=(0.8+rng()*1.4)*vs; g.moveTo(u,v-l); g.lineTo(u+(rng()-0.5)*0.4,v+0.2); } g.stroke();
+    }
+    return;
+  }
+  if(mat==='slate'){
+    g.fillStyle=hzS(rzMulC(c,0.5)); g.fillRect(u0,v0,sp,ht);
+    const rh=3.9*vs; let row=0;
+    for(let v=v1;v>v0-rh;v-=rh,row++){ let u=u0-(row%2)*3-rng()*0.8;
+      while(u<u1){ const sw=4.6+rng()*2.4, r=rng(), cc=r<0.08?rzMix(c,[120,128,120],0.4):r<0.14?rzMulC(c,0.82):rzJit(c,rng,0.18);
+        g.fillStyle=hzS(cc); g.fillRect(u+0.4,v-rh+0.35,sw-0.8,rh-0.6);
+        g.fillStyle='rgba(255,255,255,.1)'; g.fillRect(u+0.4,v-rh+0.35,sw-0.8,rh*0.35);
+        g.fillStyle='rgba(0,0,0,.18)'; g.fillRect(u+sw-1.1,v-rh+0.4,0.7,rh-0.7); u+=sw; }
+      g.fillStyle='rgba(10,12,18,.35)'; g.fillRect(u0,v-0.7,sp,0.8);
+    }
+    rzOver(g,'slate',u0,v0,sp,ht,0.8);
+    return;
+  }
+  if(mat==='clay'){
+    // barrel tiles: columns of half-round tiles, lit on the left, each row lapping over the one below
+    g.fillStyle=hzS(rzMulC(c,0.45)); g.fillRect(u0,v0,sp,ht);
+    const tw=4.6, rh=4.8*vs;
+    for(let u=u0;u<u1;u+=tw){ const cc=rzJit(c,rng,0.12);
+      g.fillStyle=hzLG(g,u,0,u+tw,0,[[0,hzS(rzCol(cc,0.14))],[0.35,hzS(cc)],[1,hzS(rzMulC(cc,0.62))]]); g.fillRect(u+0.25,v0,tw-0.5,ht); }
+    let row=0;
+    for(let v=v1;v>v0-rh;v-=rh,row++){ for(let u=u0;u<u1;u+=tw){ const k=0.9+rng()*0.2;
+      g.fillStyle='rgba(40,10,4,.34)'; g.beginPath(); g.arc(u+tw/2,v+0.8,tw/2-0.2,0,Math.PI); g.fill();
+      g.fillStyle=`rgba(255,${200*k|0},${160*k|0},.18)`; g.beginPath(); g.ellipse(u+tw/2-0.4,v-0.6,tw/2-0.6,0.8,0,0,TAU); g.fill();
+      if(rng()<0.06){ g.fillStyle='rgba(60,70,40,.25)'; g.fillRect(u+0.4,v-rh,tw-0.8,rh); } } }
+    rzOver(g,'grit',u0,v0,sp,ht,0.6);
+    return;
+  }
+  // wooden shingles: staggered rows, split grain, a few weathered grey or mossy ones
+  g.fillStyle=hzS(rzMulC(c,0.42)); g.fillRect(u0,v0,sp,ht);
+  const rh=4.4*vs;
+  for(let v=v1;v>v0-rh;v-=rh){ let u=u0-rng()*6;
+    while(u<u1){ const sw=3+rng()*4.4, r=rng(), cc=r<0.1?rzMix(c,[132,126,116],0.5):r<0.15?rzMix(c,[92,104,60],0.35):r<0.22?rzMulC(c,0.78):rzJit(c,rng,0.22);
+      g.fillStyle=hzLG(g,0,v-rh,0,v,[[0,hzS(rzMulC(cc,0.86))],[1,hzS(rzCol(cc,0.06))]]); g.fillRect(u+0.3,v-rh,sw-0.6,rh-0.2);
+      if(rng()<0.25){ g.fillStyle='rgba(0,0,0,.22)'; g.fillRect(u+sw*(0.3+rng()*0.4),v-rh*0.8,0.45,rh*0.7); }
+      u+=sw; }
+    g.fillStyle='rgba(0,0,0,.36)'; g.fillRect(u0,v-0.9,sp,0.9);
+  }
+  rzOver(g,'grainV',u0,v0,sp,ht,0.9);
+}
+// wall materials (the same frame as hzWallTex)
+function rzWallTex(g,mat,col,x0,y0,x1,y1,rng0){
+  const w=x1-x0, h=y1-y0, c=hzC(col), rng=mulberry32(Math.floor(rng0()*1e9));
+  switch(mat){
+    case 'plaster':{
+      g.fillStyle=hzS(c); g.fillRect(x0,y0,w,h);
+      rzOver(g,'plaster',x0,y0,w,h,1);
+      // grime toward the ground and under the eaves, a few hairline cracks
+      g.fillStyle=hzLG(g,0,y0,0,y1,[[0,'rgba(70,56,40,.14)'],[0.25,'rgba(70,56,40,0)'],[0.72,'rgba(90,74,52,0)'],[1,'rgba(90,74,52,.3)']]); g.fillRect(x0,y0,w,h);
+      g.strokeStyle='rgba(80,64,48,.28)'; g.lineWidth=0.35; g.beginPath(); for(let i=0;i<w*h/900;i++){ let x=x0+rng()*w, y=y0+rng()*h; g.moveTo(x,y); for(let k=0;k<3;k++){ x+=(rng()-0.5)*5; y+=rng()*3; g.lineTo(x,y); } } g.stroke();
+      break; }
+    case 'plank':{
+      for(let y=y1;y>y0;y-=4){ const cc=rzJit(c,rng,0.18); g.fillStyle=hzLG(g,0,y-4,0,y,[[0,hzS(rzCol(cc,0.08))],[1,hzS(rzMulC(cc,0.84))]]); g.fillRect(x0,y-4,w,4);
+        g.fillStyle='rgba(24,12,4,.42)'; g.fillRect(x0,y-0.8,w,0.8);
+        g.fillStyle='rgba(24,12,4,.3)'; for(let x=x0+rng()*20;x<x1;x+=14+rng()*24) g.fillRect(x,y-4,0.6,3.2);
+        if(rng()<0.3){ g.fillStyle='rgba(40,22,10,.35)'; g.beginPath(); g.ellipse(x0+rng()*w,y-2,0.9,0.6,0,0,TAU); g.fill(); } }
+      rzOver(g,'grainH',x0,y0,w,h,0.9);
+      break; }
+    case 'board':{
+      g.fillStyle=hzS(c); g.fillRect(x0,y0,w,h);
+      for(let x=x0;x<x1;x+=5){ const cc=rzJit(c,rng,0.1); g.fillStyle=hzS(cc); g.fillRect(x,y0,5,h); g.fillStyle='rgba(255,250,240,.12)'; g.fillRect(x+0.4,y0,0.8,h); g.fillStyle='rgba(0,0,0,.26)'; g.fillRect(x+4.6,y0,0.6,h); }
+      rzOver(g,'grainV',x0,y0,w,h,0.55);
+      g.fillStyle=hzLG(g,0,y0,0,y1,[[0,'rgba(0,0,0,0)'],[0.75,'rgba(60,50,40,0)'],[1,'rgba(60,50,40,.22)']]); g.fillRect(x0,y0,w,h);
+      break; }
+    case 'stone': case 'rough': case 'ashlar':{
+      const ash=mat==='ashlar', rough=mat==='rough';
+      g.fillStyle=hzS(rzMulC(c,ash?0.66:0.5)); g.fillRect(x0,y0,w,h);
+      let y=y1;
+      while(y>y0-1){
+        const ch=ash?5.5:rough?5+rng()*3.4:3.6+rng()*2.4; let x=x0-rng()*(ash?10:6);
+        while(x<x1){ const sw=ash?11+rng()*3:rough?6.5+rng()*8:4.2+rng()*6.4; let cc=rzJit(c,rng,ash?0.1:0.3);
+          if(!ash&&rng()<0.3) cc=rzMix(cc,rng()<0.5?[150,130,104]:[112,116,120],0.35);
+          const rr=ash?0.4:1.3+rng()*0.6;
+          g.fillStyle=hzLG(g,x,y-ch,x+sw*0.6,y,[[0,hzS(rzCol(cc,0.12))],[0.55,hzS(cc)],[1,hzS(rzMulC(cc,0.72))]]); rrect(g,x+0.45,y-ch+0.45,sw-0.9,ch-0.9,rr); g.fill();
+          x+=sw; }
+        y-=ch;
+      }
+      rzOver(g,'grit',x0,y0,w,h,0.85);
+      break; }
+    case 'brick':{
+      g.fillStyle=hzS(rzMix(c,[196,184,164],0.55)); g.fillRect(x0,y0,w,h);
+      let row=0; for(let y=y1;y>y0-1;y-=3.2,row++){ for(let x=x0-(row%2)*3.2;x<x1;x+=6.4){ const r=rng(), cc=r<0.08?rzMulC(c,0.7):r<0.14?rzCol(c,0.14):rzJit(c,rng,0.16);
+        g.fillStyle=hzS(cc); g.fillRect(x+0.35,y-2.85,5.7,2.5); g.fillStyle='rgba(255,230,210,.12)'; g.fillRect(x+0.35,y-2.85,5.7,0.6); g.fillStyle='rgba(0,0,0,.16)'; g.fillRect(x+0.35,y-0.95,5.7,0.6); } }
+      rzOver(g,'grit',x0,y0,w,h,0.7);
+      break; }
+    case 'log':{
+      const lh=5.2;
+      g.fillStyle='rgba(200,184,150,1)'; g.fillRect(x0,y0,w,h); // the chinking between the logs
+      for(let y=y1;y>y0-1;y-=lh){
+        const cc=rzJit(c,rng,0.16);
+        g.fillStyle=hzLG(g,0,y-lh,0,y,[[0,hzS(rzCol(cc,0.16))],[0.4,hzS(cc)],[0.85,hzS(rzMulC(cc,0.62))],[1,hzS(rzMulC(cc,0.45))]]); g.fillRect(x0,y-lh+0.25,w,lh-0.5);
+      }
+      rzOver(g,'bark',x0,y0,w,h,0.8);
+      break; }
+    default: return hzWallTex0(g,mat,col,x0,y0,x1,y1,rng0);
+  }
+}
+
+// ---------- landmarks, cave mouths and columns (a3b_art2.js): their painted sprites, relit once as they are cached.
+// RZ2.on is raised only while drawLandmark, drawCaveMouth and drawColumn run, so other users of r2S (rooms,
+// the acts' own structures) keep their sprites as they are.
+const RZ2={on:0};
+{ const base=r2S; r2S=function(key,w,h,ox,oy,draw){
+  if(!LOOK.re||!RZ2.on) return base(key,w,h,ox,oy,draw);
+  const k='rz:'+key; let c=R2.spr.get(k); if(c) return c;
+  c=base(k,w,h,ox,oy,draw); rzRelight(c,{bump:3.2,ao:0.1,aoR:2,edge:2,sat:0.9}); return c;
+}; }

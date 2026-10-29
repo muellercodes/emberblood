@@ -227,6 +227,7 @@ function tallFade(p,dx,dy,bossE){
 }
 const TALLS=[];
 function drawTallProps(props,t,bossE){
+  if(LOOK.re){ rzTallProps(props,t,bossE); return; }   // (v12 PROPS) the Realistic trunks and crowns, e12c_props.js
   // trees in back-to-front order; in full each crown first lays a soft dark halo on the crowns behind it
   TALLS.length=0; for(const p of props) if(TREEH[p.k]) TALLS.push(p);
   TALLS.sort((a,b)=>a.y-b.y);

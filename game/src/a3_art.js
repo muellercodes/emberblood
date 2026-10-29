@@ -277,7 +277,7 @@ function hzPlan(hs){
   L.ivy=st==='yara'||st==='herbalist'||st==='library'||(town==='village'&&C(0.28))||(town==='brindle'&&C(0.15))?[(C(0.5)?-1:1)]:[];
   L.seed2=Math.floor(rng()*1e9);
   // house glow at night pushes the darkness back around the front wall
-  if(!hs.lit&&st!=='forge'){ hs.lit=true; LIGHTS.push({x:hs.x,y:hs.y+H-L.F*0.5,r:st==='library'?150:Math.max(80,w*0.6),i:L.burnt?0.34:0.56,night:true,win:true}); }
+  if(!hs.lit&&st!=='forge'){ hs.lit=true; LIGHTS.push({x:hs.x,y:hs.y+H-L.F*0.5,r:st==='library'?150:Math.max(80,w*0.6),i:L.burnt?0.34:0.56,night:true,win:true,kind:'window'}); }
   hzChimPos(hs,L);
   hs.facade=true; hs.L=L; return L;
 }
@@ -295,6 +295,7 @@ function hzChimPos(hs,L){
 }
 // ---------- textures
 function hzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng){
+  if(LOOK.re) return rzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng);   // (v12 PROPS) Realistic materials, e12c_props.js
   const sp=u1-u0, ht=v1-v0;
   if(mat==='thatch'){
     g.fillStyle=hzS(col); g.fillRect(u0,v0,sp,ht);
@@ -345,6 +346,10 @@ function hzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng){
   }
 }
 function hzWallTex(g,mat,col,x0,y0,x1,y1,rng){
+  if(LOOK.re) return rzWallTex(g,mat,col,x0,y0,x1,y1,rng);
+  return hzWallTex0(g,mat,col,x0,y0,x1,y1,rng);
+}
+function hzWallTex0(g,mat,col,x0,y0,x1,y1,rng){
   const w=x1-x0, h=y1-y0;
   switch(mat){
     case 'plaster':{
@@ -642,6 +647,7 @@ function hzChimney(g,L,c,rng){
 }
 // roof plane: clip, texture in the plane frame, light tone, optional overlay gradient
 function hzPlane(g,L,pts,fr,u0,u1,v0,v1,vs,k,rng,ovl){
+  if(LOOK.re) k=k>0?k*1.5:k*1.7;   // (v12 PROPS) stronger light and shade on the roof planes in the Realistic look
   g.save(); hzPoly(g,pts); g.clip();
   g.save(); g.transform(fr[0],fr[1],fr[2],fr[3],fr[4],fr[5]); hzRoofTex(g,L.roof,L.rc,u0,u1,v0,v1,vs,rng); g.restore();
   if(k){ g.fillStyle=k>0?`rgba(255,246,226,${k})`:`rgba(14,8,20,${-k})`; hzPoly(g,pts); g.fill(); }
@@ -1059,6 +1065,7 @@ function houseSprite(hs){
   const rng=mulberry32(L.seed2);
   if(L.st==='forge') hzDrawForge(g,hs,L,rng); else if(L.st==='library') hzDrawLibrary(g,hs,L,rng); else hzDrawHouse(g,hs,L,rng);
   hs.facade=true; hs.wins=L.panes; L.nl=undefined;
+  if(LOOK.re) rzHousePost(c,L);
   c=hzCrop(c); c.ox=HPX+L.W-c.cx/HSC; c.oy=HPT+L.H-c.cy/HSC; c.sc=HSC; c.burnt=!!hs.burnt; c.snow=!!hs.snow; SCACHE.set(hs,c); return c;
 }
 // crop a freshly painted canvas to the pixels it actually uses, so every frame blits less empty space
