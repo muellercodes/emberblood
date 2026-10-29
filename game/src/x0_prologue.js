@@ -25,7 +25,7 @@ function proMarkSeen(){ try{ localStorage.setItem(PRO_SEEN,'1'); }catch(e){} }
 // ---------- the script. A line: proL(who, full, simple, face, beat) (beat: what the theatre does as the line comes up)
 function proL(who,full,simple,face,beat,x){ const o={who,text:simple!=null?S(full,simple):full}; if(face) o.face=face; if(beat) o.fn=()=>proBeat(beat); return x?Object.assign(o,x):o; }
 function proShowLines(){ return [
-  proL('narr',`The night before Lantern Day, everybody in Emberhollow is out on the green, stringing up paper lanterns for tomorrow. Lighting the three big ones is your job.`,`The night before Lantern Day, everyone hangs paper lanterns on the green. You light the three big ones.`,null,'green'),
+  proL('narr',`It's the night before Lantern Day, and all of Emberhollow is out on the green, stringing up paper lanterns. Tomorrow you light the three big ones. Everybody keeps reminding you: gently.`,`Tomorrow is Lantern Day. You light the three big lanterns. Everybody says: gently!`,null,'green'),
   proL('bertram',`Evening, Ash. You'll sit at the front tonight, won't you? Nice and far from the bun table.`,`Evening, Ash. Sit far from the buns, please.`,'worried'),
   proL('ash',`I haven't set anything on fire since spring.`,`Nothing has caught fire since spring.`,'happy'),
   proL('bertram',`Spring was when it happened, Ash.`,null,'worried'),
@@ -37,7 +37,7 @@ function proShowLines(){ return [
     {t:`Wave.`,then:[proL('narr',`You wave. The smaller one waves back with the hand she was pointing with.`,`You wave. She waves back.`,null,'wave')]},
     {t:S(`Do a very small roar.`,`Do a tiny roar.`),then:[proL('ash',`Rrrr.`,null,'sly'),proL('narr',`They shriek and hide behind Rook. Then they peek out again, hoping you'll do it again.`,`They hide, then peek out for more.`,null,'flick')]}
   ]}),
-  proL('wendel',`Settle down, everyone. A little tune, and then Nana's dragon. And don't forget tomorrow, at sunset, the Lantern Waltz.`,`Settle down! A tune, then the dragon. My waltz is tomorrow!`,'happy','tune'),
+  proL('wendel',`Settle down, everyone. A little tune, and then Nana's dragon. And tomorrow at sunset, the Lantern Waltz. Very note-worthy.`,`Settle down! A tune, then the dragon. My waltz is tomorrow!`,'happy','tune'),
   proL('narr',`The little red curtains open on a cardboard mountain, with cotton smoke on a wire.`,`The curtains open on a cardboard mountain.`,null,'open'),
   proL('nana',`Once upon a time, dears, a grumpy old dragon lived at the top of the mountain. And everything he saw, he said was his.`,`Once, a grumpy dragon lived on the mountain. He said everything was his.`,'sly','dragon'),
   proL('narr',`Every child on the green shouts his word for him: "Mine!" You shout it loudest.`,`All the kids shout his word: "Mine!" You shout loudest.`,null,'mine'),
@@ -90,7 +90,7 @@ function proStart(){
   proHookTests();
   scene='prologue'; try{ keys.clear(); }catch(e){} hideAll();
   proOverlay(true); proSkipShow(true);
-  showCard(S('Prologue','Prologue'),S('Lantern Eve','Lantern Eve'));
+  showCard(S('Prologue','Prologue'),S('Once Upon a Lantern','Once Upon a Lantern'));
   setTimeout(()=>{ if(PRO.on&&PRO.phase==='title') proShow(); },2700);
   return true;
 }
@@ -176,7 +176,7 @@ function proTick(dt){
   const w=proWhere(); PRO.phase=w==='out'?'walk':'home';
   if(w==='up'){ const b=AREA.objs.find(o=>o.k==='bed'&&o.home); if(b&&!b.prompt){ b.prompt=()=>S('Get into bed','Go to bed'); PRO.bed=b; } }
   if(w==='out'){
-    for(const L of LANTERNS){ if(!PRO.barks.lan&&dist(player.x,player.y,L.x,L.y)<95){ PRO.barks.lan=1; taunt('ash',S(`One gentle breath each. Tomorrow.`,`Tomorrow. Gently.`)); } }
+    for(const L of LANTERNS){ if(!PRO.barks.lan&&dist(player.x,player.y,L.x,L.y)<95){ PRO.barks.lan=1; taunt('ash',S(`See you tomorrow, lanterns. Don't go out without me.`,`See you tomorrow, lanterns!`)); } }
     const V=POI.village;
     if(!PRO.barks.far&&dist(player.x,player.y,V.x,V.y)>V.r+120){ PRO.barks.far=1; taunt('maren',S(`Ash! Home is the other way!`,`Ash! Home is that way!`)); }
   }
@@ -243,7 +243,7 @@ function proOverlay(on){
   let el=PRO.el;
   if(!el&&on){
     el=document.createElement('div'); el.id='proStage'; el.setAttribute('aria-hidden','true');
-    el.style.cssText='position:fixed;inset:0;z-index:4;display:none;background:transparent';
+    el.style.cssText='position:fixed;inset:0;z-index:3;display:none;background:transparent';   // (v12 STORY1) under #card (4), so the prologue's chapter card shows over the painting
     const cv=document.createElement('canvas'); cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block'; el.appendChild(cv);
     el.addEventListener('click',()=>{ if(PRO.on&&PRO.phase==='title') proShow(); });
     document.body.appendChild(el); PRO.el=el; PRO.cv=cv;

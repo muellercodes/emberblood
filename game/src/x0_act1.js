@@ -45,7 +45,7 @@ STORY.a1_causeway_blocked=[
   {who:'narr',text:S(`The gaps are too wide to step over. If only you could jump. Sister Wren said something about an old arch in Whisperwood.`,`The gaps are too wide. Try the old arch in Whisperwood.`),skipIf:()=>hasAbil('jump')},
   {who:'narr',text:S(`The gaps are too wide to step over. Good thing you can jump. Jump the small ones. RUN at the big one and jump at the very end.`,`Jump the small gaps. Run at the big one!`),skipIf:()=>!hasAbil('jump')}];
 STORY.a1_causeway_first=[
-  xl('ash',`Jump, jump, jump. Ha! Frog champion of Embermere.`,`Jump, jump, jump! Frog champion!`),
+  xl('ash',`Jump, jump, jump. Ha! Toad-ally the frog champion of Embermere.`,`Jump, jump, jump! Toad-ally the frog champion!`),
   xl('narr',`On the far bank, three cultists look at you. Then at the gaps. Then at each other.`,`Three cultists stare at you. Then at the gaps.`)];
 STORY.ward_ash.push(xl('bram',`Oh, and if you ever pass the old Anvil Rock up the road, my hammer head's still stuck in it. Hit it too hard in the year two hundred. It's a loud story.`,`My old hammer head is stuck in the Anvil Rock up the road.`));
 // 2.2 the Crag Ward: the Nest Spire

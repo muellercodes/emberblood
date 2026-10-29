@@ -21,18 +21,18 @@ act({
     a1_gate: {
       main: true, quest: 'gate', deduce: ['a1_how', 'a1_who', 'a1_why'],
       title: ['Who opened the North Gate?', 'Who opened the gate?'],
-      solved: ['Fennick Wick opened the North Gate with the spare key. The Scaled Oath promised him lamp oil that never runs out.',
+      solved: ['Fennick Wick opened the North Gate with the spare key. The Scaled Oath promised him lamp oil that never runs out. W was for Wick all along.',
         'Fennick opened the gate. The Oath promised him oil forever.'],
     },
     a1_hat: {
       quest: 'a1_hat', deduce: ['a1_hat_who'],
       title: ["What rattles in Sir Strawsworth's hat?", 'What is in the hat?'],
-      solved: ["Pebble, Elder Yara's crow, hides her treasures in Sir Strawsworth's hat.", 'Pebble the crow hides things in the hat.'],
+      solved: ["Pebble, Elder Yara's crow, hides her treasures in Sir Strawsworth's hat. So much for scaring crows.", 'Pebble the crow hides things in the hat.'],
     },
     a1_snuffed: {
       quest: 'a1_snuffed', deduce: ['a1_snuff_who'],
       title: ['Who put out the Hollow Ward?', 'Who put out the Ward?'],
-      solved: ['The Scaled Oath snuffed the Hollow Ward with a black candle, while the kobolds ran wild.', 'The Oath put out the Ward with a black candle.'],
+      solved: ['The Scaled Oath snuffed the Hollow Ward with a black candle, while the kobolds ran wild and everyone looked the other way.', 'The Oath put out the Ward with a black candle.'],
     },
   },
   // Act I has no earlier maps to send the player back to (rule 8 starts with Act II)

@@ -309,7 +309,7 @@ EVS.bear={title:S('The Sleepy Bear','The Sleepy Bear'),
   meet:E=>[
     xl('ev_pud',`Psst! A bear fell asleep on our picnic. With our sandwiches under it. Can you get the basket back without waking it up?`,`Shh! A bear is asleep on our picnic. Can you get our basket back?`),
     xc('ash',`How?`,`How?`,[
-      xo(`Tiptoe in and grab the basket`,`Sneak in and grab it`,{fn:()=>{ E.plan='sneak'; },then:[xl('ev_pud',`Walk slowly. No running, no rolling, no jumping. Bears hear EVERYTHING.`,`Walk slowly. No running! No jumping!`)]}),
+      xo(`Tiptoe in and grab the basket`,`Sneak in and grab it`,{fn:()=>{ E.plan='sneak'; },then:[xl('ev_pud',`Walk slowly. No running, no rolling, no jumping. Bears hear every crumb drop.`,`Walk slowly. No running! No jumping!`)]}),
       xo(`Offer the bear some honey`,`Give the bear honey`,{cond:()=>(G.items.honey||0)>0,fn:()=>{ takeItems({honey:1}); E.plan='honey'; },then:[xl('narr',`You hold out the honey. The bear sniffs in its sleep, sits up, takes the jar very politely, and wanders off into the trees, happy as can be.`,`The bear sniffs the honey. It takes the jar and walks away, happy.`)]}),
       xo(`Sing it a lullaby`,`Sing a lullaby`,{tone:'kind',fn:()=>{ E.plan='lullaby'; },then:[xl('ash',`Hush, little bear, don't you wake. I'll sing you a song for goodness sake...`,`Hush, little bear, don't wake up...`),xl('narr',`The bear smiles in its sleep, rolls over, hugs a bush, and keeps on snoring. The basket is free!`,`The bear smiles and rolls over. The basket is free!`)]})
     ])],
@@ -630,7 +630,7 @@ const DREAM_TALK={
 // ================= small variations on moments that repeat
 // Mom reforging star-iron: a different scene each time
 { const RF=[
-    ()=>[xl('maren',`Star-iron! Where did you... never mind. Give it here.`,`Star-iron! Give it here.`),xl('maren',`There. Your blade's a little sharper and a lot shinier. Go make me proud. And eat something.`,`There. Your blade is sharper now. Go make me proud. And eat something.`)],
+    ()=>[xl('maren',`Star-iron! Where did you... never mind. Give it here.`,`Star-iron! Give it here.`),xl('maren',`There. Your blade's a little sharper and a lot shinier. Try not to admire it in every puddle.`,`There. Your blade is sharper and shinier now.`)],
     ()=>[xl('maren',`More star-iron? You're getting good at finding this. Or the sky is getting bad at keeping it.`,`More star-iron? You are good at finding it!`),xl('narr',`CLANG. CLANG. CLANG. Mom hums the lantern song in time with the hammer.`,`CLANG! CLANG! Mom hums a song while she works.`),xl('maren',`Done. Every weapon you've got will hit harder now. Try not to hit anything we own.`,`Done! All your weapons hit harder now.`)],
     ()=>[xl('maren',`Ash, this is the third piece. Grandma never had three. You know what that means?`,`This is the third piece! Grandma never had three.`),xl('ash',`More shiny?`,`More shiny?`),xl('maren',`MUCH more shiny. Stand back.`,`Much more shiny. Stand back!`),xl('narr',`The forge roars blue. Sparks fly up like falling stars, backwards.`,`The fire turns blue. Sparks fly up like stars.`),xl('maren',`There. That blade could cut a cloud in half. Please don't cut a cloud in half.`,`There! That blade is super sharp. Don't cut a cloud!`)],
     ()=>[xl('maren',`Still finding star-iron? The valley must really like you.`,`More star-iron? The valley likes you!`),xl('maren',`Hold still. Not you. The sword. ...There. Sharper than ever.`,`There. Sharper than ever!`)]
@@ -661,7 +661,7 @@ const MOM_CH={
   done:[S(`My kid saved the valley. I've told everybody. Twice. I've started telling the chickens.`,`My kid saved the valley! I told everybody. Twice.`),S(`The forge has never been so busy. Everyone wants a lantern hook with a little dragon on it.`,`Everyone wants dragon lantern hooks now!`)]
 };
 const YARA_CH={
-  warcamp:[S(`Breathe, Ash. The Hollow Ward is lit. That's one. Four to go, and I'll be counting.`,`One Ward is lit. Four to go.`)],
+  warcamp:[S(`Breathe, Ash. The Hollow Ward is lit. That's one. Four to go, and none of us is getting any younger.`,`One Ward is lit. Four to go.`)],
   three:[S(`Three Wards to go, and the mountain is breathing louder every night. I lie awake and listen to it.`,`Three Wards left. The mountain breathes louder every night.`)],
   gate:[S(`All five Wards burn. A thousand years of Wardens, and a kid with a tail finished the job. Nearly finished it.`,`All five Wards are lit! You nearly did it.`)],
   done:[S(`A thousand and one Lantern Days. I'll light the first lantern again next year. Unless you'd like to.`,`Next Lantern Day, you can light the first lantern.`)]

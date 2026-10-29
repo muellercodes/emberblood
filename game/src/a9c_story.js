@@ -13,7 +13,7 @@ const SITES={
   summit:{poi:'summit',boss:'vorlaxis',stage:'summit',guards:[]}
 };
 const WARD_NAME={hollow:'the Hollow Ward',ash:'the Ash Ward',crag:'the Crag Ward',mire:'the Sunken Ward',frost:'the Frost Ward'};
-const CHAPTER={wake:'Lantern Day',lanterns:'Lantern Day',raid:'Lantern Day',lore:'The Real Story',hollow:'The Real Story',warcamp:'The Kobold Chieftain',wren:'The Lorekeeper',oath:'The Ash Ward',three:'Three Wards',gate:'The Obsidian Gate',summit:'The First Flame',done:'Free Roam'};
+const CHAPTER={wake:'Lantern Day',lanterns:'Lantern Day',raid:'Lantern Day',lore:'The Real Story',hollow:'The Real Story',warcamp:'The Kobold and the Bold',wren:'By the Book',oath:'Holy Smoke',three:'High, Low and Snow',gate:'Gate Crasher',summit:'The First Flame',done:'Free Roam'};
 const GOAT_SPOT=[2750,3380];
 const FEST_LINES=['Happy Lantern Day, Ash! Try not to light anything that isn’t a lantern.','The bakery made dragon-shaped buns this year. In your honor. Also as a warning.',S('Elder Yara was up before dawn, writing in her big old book. She won’t say what.','Yara is writing in her big book.'),S('A moth sat on my lantern this morning. Gran always said that means somebody’s coming home.','A moth on a lantern means someone is coming home.'),'Your mom’s been in the forge since dawn. Something about a surprise.'];
 function siteOpen(k){ const s=SITES[k]; if(G.bossDone[s.boss]||!reached(s.stage)) return false; if(k==='summit'&&!G.flags.gate) return false; return true; }
@@ -129,7 +129,7 @@ function storyBossDone(){
     scene='play';
     if(site.boss==='morrow'){ if(!G.items.oath_letter) giveItems({oath_letter:1},true); G.flags.clue_letter=true; G.flags.gateHint=true; questPoke(); if(G.choices.morrow==='jail') setupNPCs(); }
     G.pendingBless++;
-    if(k==='warcamp'){ setStage('wren',['Chapter 3','The Lorekeeper']); }
+    if(k==='warcamp'){ setStage('wren',['Chapter 3','By the Book']); }
     else if(k==='gate'){ G.flags.gate=true; GATE_COL.off=true; setStage('summit',['Final Chapter','The First Flame']); if(!G.quests.a1_lanterns) G.flags.a1_lan_due=1;   // Mom comes with her three lanterns (x0_vorlaxis)
       shake(8); SFX.play('boom'); later(3.2,()=>setBanner('The Obsidian Gate is open','The road to the summit is clear.',2.6)); }
     else if(site.ward){ G.wardReady[site.ward]=true; later(0.4,()=>setBanner('The Ward is cold',`Breathe fire on ${WARD_NAME[site.ward]} to relight it.`,3)); }
@@ -190,12 +190,12 @@ function finalChoice(){
 }
 function afterWard(id){
   scene='play'; if(G.spirit) G.spirit.on=false;
-  if(id==='hollow'){ setStage('warcamp',['Chapter 2','The Kobold Chieftain']); G.pendingBless++; }
-  else if(id==='ash'){ setStage('three',['Chapter 5','Three Wards']); }
+  if(id==='hollow'){ setStage('warcamp',['Chapter 2','The Kobold and the Bold']); G.pendingBless++; }
+  else if(id==='ash'){ setStage('three',['Chapter 5','High, Low and Snow']); }
   else{
     if(id==='crag'){ G.flags.pip=true; spawnPip(); }
     const n=3-threeLeft().length;
-    if(n>=3){ runDialogue(STORY.allWards,()=>{ scene='play'; setStage('gate',['Chapter 6','The Obsidian Gate']); questUpdated(); saveGame(); }); saveGame(); return; }
+    if(n>=3){ runDialogue(STORY.allWards,()=>{ scene='play'; setStage('gate',['Chapter 6','Gate Crasher']); questUpdated(); saveGame(); }); saveGame(); return; }
     setBanner(`${n} of 3 Wards burning`,threeLeft().map(k=>WARD_NAME[k].replace('the ','')).join(' and ')+' still dark',2.6);
     saveGame(); return;
   }

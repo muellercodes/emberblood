@@ -274,7 +274,7 @@ function storyTalk(n){
     if(st==='raid'){ runDialogue([['maren','I’ve got the forge, you’ve got the kobolds. Go!']],done); return true; }
     return false;
   }
-  if(id==='wren'&&st==='wren'){ runDialogue(STORY.wren,()=>{ scene='play'; setStage('oath',['Chapter 4','The Ash Ward']); G.shrines.s_brindle=true; questUpdated(); saveGame(); }); return true; }
+  if(id==='wren'&&st==='wren'){ runDialogue(STORY.wren,()=>{ scene='play'; setStage('oath',['Chapter 4','Holy Smoke']); G.shrines.s_brindle=true; questUpdated(); saveGame(); }); return true; }
   if(id==='juniper'&&AREA&&!G.flags.juniper_found){ runDialogue([['juniper',`Ash? ASH! Oh thank goodness. The bats took my lantern and I've been mapping by smell for three days.`],['juniper',`It smells like bats in here. That's my whole map. "Bats."`],['ash',`Rook's worried sick. Come on, the way out is clear.`],['juniper',`Race you! No wait, you're faster. I'll see you at home!`]],()=>{ scene='play'; G.flags.juniper_found=true; AREA.npcs=AREA.npcs.filter(q=>q.id!=='juniper'); questPoke(); setupNPCs(); saveGame(); }); return true; }
   if(id==='shellby'){ talkShellby(); return true; }
   if(id==='morrow'&&n.prisoner){ runDialogue([['morrow',pick([`The dragon promised me youth. Captain Osric promised me three meals and a blanket. Osric keeps his promises.`,`If you see Fennick, tell him to stop humming. Oh. He's in the next cell. FENNICK.`,`I've started reading. Did you know there are books that don't mention dragons at all?`])]],done); return true; }
