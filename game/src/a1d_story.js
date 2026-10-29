@@ -25,7 +25,7 @@ const STORY={
   ],
   lanternsDone:[
     ['yara',S(`Beautiful work, Ash. Every year I tell you they never looked so bright. This year I mean it.`,`Beautiful, Ash! The brightest ever.`)],
-    ['ash',`And nothing else caught fire. Not one thing.`],
+    ['ash',S(`And nothing else caught fire. Not one thing. Put that in your big book.`,`Nothing else caught fire! Put that in your book.`)],
     ['narr',S(`Then the North Gate creaked open. Nobody remembered leaving it unlocked.`,`Then the North Gate creaked open.`)],
     ['yara',`Kobolds! In the village! Ash, drive them out!`]
   ],
