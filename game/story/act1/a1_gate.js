@@ -409,7 +409,7 @@ quest({
     a1_bertram_ran: [
       ['ash', 'Bertram, did the kobolds touch the Hollow Ward?', 'Did the kobolds touch the Ward?'],
       ['bertram', 'Kobolds? They ran screaming from my oven. They are scared stiff of fire. Of FIRE, Ash. In a bakery.', 'They ran from my oven! Kobolds fear fire.', { clue: 'a1_kobolds_scared' }],
-      ['bertram', 'A kobold would not go within ten steps of a Ward-fire. Not for all the buns in my shop.', 'No kobold goes near a Ward-fire.'],
+      ['bertram', 'A kobold would not go within ten steps of a Ward-fire. Not for all the dough in my shop.', 'No kobold goes near a Ward-fire.'],
     ],
     a1_wren_candles: [
       ['ash', 'Sister Wren, how do you put out a Ward-fire?', 'How do you put out a Ward-fire?'],
