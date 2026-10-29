@@ -82,7 +82,7 @@ const STORY={
   ],
   allWards:[
     ['iska',S(`All five Wards burn again, Ash. Can you feel it?`,`All five Wards burn again. Feel it?`)],
-    ['ash',S(`My hands are tingling. I'm all fired up.`,`My hands tingle. I'm fired up!`)],
+    ['ash',S(`My hands are warm. Like I'm holding five little lanterns.`,`My hands are warm, like five little lanterns.`)],
     ['iska',S(`That's our fire, the Five Flames, riding along with yours. The Obsidian Gate will open for it. But the gate has a guard, and he has never once let anyone pass.`,`That's our fire, riding with yours. The Obsidian Gate will open. But it has a guard.`)]
   ],
   bosses:{

@@ -234,7 +234,7 @@ const HSAY=[
   [`Sorry about the barrels! Not really!`,`Sorry about the barrels!`],
   [`Still there? You're fast for someone with a tail!`,`Fast, for a tail!`],
   [`Cozy little village. I can see why you like it here!`,`Cozy village!`],
-  [`Mmm, a bakery! I'd stop, but I'm on a roll!`,`A bakery! No time. I'm on a roll!`],
+  [`Mmm, a bakery! I'd steal a bun, but my hands are full.`,`A bakery! But my hands are full!`],
   [`This way! No, that way! Ha!`,`This way! No, that way!`],
   [`Round the pond we go! Mind the frogs!`,`Round the pond! Mind the frogs!`],
   [`Still following? You're very stubborn. I like that.`,`Still here? You're stubborn!`],
