@@ -27,7 +27,7 @@ people({
         re: [
           { t: ["I'll jump right over it this year.", "I'll jump over it."], say: ["You'll land in it. Go round.", 'Go round it.'] },
           { t: ['Why plant mint by a well?', 'Why mint by the well?'],
-            say: ["Everyone stops at the well, and somebody always has a sore tummy by noon. Two hundred of Bertram's buns will do that.",
+            say: ["Everyone stops at the well, and somebody always has a sore tummy by noon. Two hundred of Bertram's buns will do that. So will his jokes.",
               "Everyone stops there. And the buns give sore tummies."] },
         ] },
       // the raid (this opener has its own idle: what she says if Ash comes back mid-raid)
@@ -1122,7 +1122,7 @@ people({
           { t: ['Is there going to be a ceremony?', 'Will there be a ceremony?'], say: ['There was. There will be another, for you. With more ribbon.', 'Yes. Another one for you. More ribbon.'] },
         ] },
       { ask: ['Who was Brindle?', 'Who was Brindle?'],
-        say: ['My ancestor. He founded the town, named it after himself, and had his portrait painted eleven times. A man of vision.', 'My ancestor. He named the town after himself.'] },
+        say: ['My ancestor. He built the first bridge, then got very cross when people used it without paying. Hence the name. He had his portrait painted eleven times. A man of vision.', 'My ancestor. He built the bridge. He named the town after himself.'] },
       { ask: ['Is it true you like Bertram\'s buns?', 'Do you like Bertram\'s buns?'],
         say: ['They are essential to the running of this town. I eat them for the town. It is a sacrifice.', 'I eat them for the town. A sacrifice.'] },
       { idle: [['The Mayor is listening. Officially.', 'The Mayor is listening.'], ['Yes, yes? Speak up. Civic business.', 'Yes? Speak up.']] },
@@ -1561,7 +1561,7 @@ people({
       { ask: ["What do you think of Wendel's songs?", "What about Wendel's songs?"],
         say: ['A good fiddler and a terrible poet. "Ash" and "crash". Twice. Amateur. I love him.', 'Good fiddler. Bad poet. I love him.'] },
       { idle: [['Hm? I was rhyming. Verse things first. Go on.', 'I was rhyming. Go on.'], ['Speak, and I will make it scan.', 'Speak. I will make it rhyme.']] },
-      { bye: [['Off you go and do something I can rhyme.', 'Go do something I can rhyme.']] },
+      { bye: [["Off you go. Mind your tail in the door. It's in three of my verses.", 'Mind your tail! It is in my songs.']] },
     ],
 
     // ---------------------------------------------------------------- Granny Moss, the herbalist of the Mirefen
