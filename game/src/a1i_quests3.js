@@ -19,7 +19,7 @@ Object.assign(QDEFS,{
           ['yara',`My grandmother left a gift for whoever came back from the Trials. I never thought I would be the one to give it away. Here.`]],
         reward:{coins:150,xp:400,bless:1,maxhp:10}}
     ]},
-  marlo:{title:'Marlo the Magnificent',giver:'marlo',min:'lore',
+  marlo:{title:S('Marlo’s Hat Trick','Marlo’s Lucky Hat'),giver:'marlo',min:'lore',
     offer:[['marlo',`Halt! Who goes there? Oh. A dragon. Hi. I am Marlo the Magnificent. Treasure hunter, adventurer, and future owner of everything in this Trial.`],
       ['ash',`Are you stuck on that little platform?`],
       ['marlo',`Stuck? No. I am waiting. Strategically. For about two days.`],
@@ -37,7 +37,7 @@ Object.assign(QDEFS,{
     steps:[
       {t:'item',item:'tide_pearl',n:3,text:'Find 3 glow pearls in the deep water of the Trial of the Tide',at:'cave:tide'},
       {t:'talk',npc:'minnow',text:'Bring the glow pearls to Minnow',take:{tide_pearl:3},
-        lines:[['minnow',`Three! They're SO glowy. I'm going to make Dad a necklace. He'll pretend to hate it. He'll wear it every day.`],['minnow',S(`Here. This was in my boat before it floated off. A spare flask. Dad says always carry a spare. He never does.`,`Here is a spare flask. Dad says carry a spare.`)],['narr',`Minnow spots her rowboat bumping against the island outside, squeals, and runs off to get it.`]],
+        lines:[['minnow',`Three! They're SO glowy. I'm going to make Dad a necklace. He'll pretend to hate it. He'll wear it every day.`],['minnow',S(`Here. This was in my boat before it floated off. A spare flask. Dad says always carry a spare. He never does.`,`Here is a spare flask. Dad says carry a spare.`)],['narr',S(`Minnow spots her rowboat bumping against the island outside, squeals, and runs off to get it. It had been waiting for her the whole time, like a very patient dog.`,`Minnow sees her boat outside. She runs to get it!`)]],
         reward:{potmax:1,coins:30,xp:100}}
     ]},
   puff:{title:'A Very Small Dragon',min:'lore',

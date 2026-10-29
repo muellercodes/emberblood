@@ -3,14 +3,14 @@
 // below keeps the quest hidden until Ash has the gift. (A native check would be one line in qAvail:
 // `if(d.ab&&!hasAbil(d.ab)) return false;`.)
 const abGate=(ab,after)=>function(){ return hasAbil(ab)?(after||null):'__needs_'+ab; };
-QDEFS.sheep={title:'Clover Goes Missing',giver:'hal',min:'warcamp',ab:'jump',
+QDEFS.sheep={title:S('A Woolly Jumper','Clover Goes Missing'),giver:'hal',min:'warcamp',ab:'jump',
   offer:[['hal',`Ash! My best sheep, Clover, has gone and done it again.`],['hal',`She hopped across the stepping stone on Bramble Pond, just south of town, and now she's stuck on the little island. She can jump out there. She cannot jump back. She's very proud and very silly.`],['ash',`So you want me to jump out and fetch her?`],['hal',`Can you jump? Since when can you jump?`]],
   steps:[
     {t:'flag',flag:'clover_found',text:'Jump across Bramble Pond, south of Emberhollow, and help Clover the sheep off the island',at:'lm:rc_clover'},
-    {t:'talk',npc:'hal',text:'Tell Hal that Clover is safe',lines:[['hal',`She came trotting home all by herself, bouncing like a frog! What did you DO?`],['ash',`I showed her how to jump back.`],['hal',`Now she won't stop. Over the fence, over the dog, over ME. Here. You've earned it.`]],reward:{coins:40,xp:90}}
+    {t:'talk',npc:'hal',text:'Tell Hal that Clover is safe',lines:[['hal',`She came trotting home all by herself, bouncing like a frog! What did you DO?`],['ash',`I showed her how to jump back.`],['hal',S(`Now she won't stop. Over the fence, over the dog, over me. Moo-rgaret is furious. Here. You've earned it.`,`Now she jumps over everything. Even me! Here.`)]],reward:{coins:40,xp:90}}
   ]};
 Object.defineProperty(QDEFS.sheep,'after',{get:abGate('jump')});
-QDEFS.lakeking={title:'The Lake King',giver:'dell',min:'warcamp',ab:'stride',
+QDEFS.lakeking={title:S('Is the Lake King Reel?','The Lake King'),giver:'dell',min:'warcamp',ab:'stride',
   offer:[['dell',`Ash. You've been walking on the lake. Don't deny it. I saw the steam.`],['dell',`Out in Lake Mirrow lives the Lake King. Biggest fish in the valley. He has a fin shaped like a crown. Thirty years I've tried to catch him from this dock, and he just laughs at me.`],['dell',`Walk out there, stand right by his big ripples in the north of the lake, and fish him up. Then let him go, mind. I just want to know he's real.`]],
   steps:[
     {t:'flag',flag:'lakeking_caught',text:'Walk out onto Lake Mirrow and fish up the Lake King at the big ripples in the north of the lake',at:'lm:rc_lakeking'},
@@ -21,7 +21,7 @@ QDEFS.skyhoops={title:'Hoops in the Sky',giver:'elka',min:'oath',ab:'wings',
   offer:[['elka',`ASH. You can FLY now? That is so unfair. I love it.`],['elka',`Ulf flies kites. I tied eight hoops to eight kites around the lodge. Fly through all of them before my sand timer runs out and I'll give you the fastest thing I own.`],['ash',`What's the fastest thing you own?`],['elka',S(`My lucky boots. My second luckiest, anyway.`,`My lucky boots. Well, second luckiest.`)]],
   steps:[
     {t:'flag',flag:'skyhoops_won',npc:'elka',mini:'skyrace',text:'Fly through Elka’s eight kite hoops around Frostpine Lodge before her sand timer runs out (talk to Elka to start)',ready:[['elka',`Take off, then fly through the glowing hoop. Then the next one. Each hoop gives your wings a little rest. Ready? The sand is falling!`]]},
-    {t:'talk',npc:'elka',text:'Collect your prize from Elka',lines:[['elka',`ALL EIGHT! That was the best thing I have ever seen. Ulf cried a little. He says it was the wind.`],['elka',`Here, my boots. You don't need them, you have wings. But now you'll LOOK fast too.`]],reward:{xp:180,stamina:10,sp:1}}
+    {t:'talk',npc:'elka',text:'Collect your prize from Elka',lines:[['elka',S(`All eight! That was the best thing I have ever seen. Ulf let go of his kite. He says he did it on purpose.`,`All eight! The best thing ever! Ulf let go of his kite.`)],['elka',S(`Here, my boots. You don't need them, you have wings. But now you'll look fast standing still.`,`Here, my boots. Now you look fast too.`)]],reward:{xp:180,stamina:10,sp:1}}
   ]};
 Object.defineProperty(QDEFS.skyhoops,'after',{get:abGate('wings')});
 
@@ -92,7 +92,7 @@ function drawLakeKing(o,t){
 function lakeKingAct(o){
   const p=player, q=G.quests.lakeking, active=q&&!q.done&&!G.flags.lakeking_caught;
   if(!G.items.rod){ runDialogue([['narr',`Something enormous circles under the water, wearing what looks like a little golden crown. You would need a fishing rod. Dell Fisk on the Brindlecross dock lends them out.`]],()=>{ scene='play'; }); return; }
-  if(!active){ runDialogue([['narr',G.flags.lakeking_caught?`The Lake King swims past, very slowly, so you can admire him. He winks.`:`A huge shadow with a golden crown-shaped fin circles under the water. Dell the fisherman would LOVE to hear about this.`]],()=>{ scene='play'; }); return; }
+  if(!active){ runDialogue([['narr',G.flags.lakeking_caught?`The Lake King swims past, very slowly, so you can admire him. He winks.`:`A huge shadow with a golden crown-shaped fin circles under the water. Dell the fisherman would give his best hat to hear about this.`]],()=>{ scene='play'; }); return; }
   MV.lk={phase:'wait',t:rand(1.4,2.6),n:0,px:p.x,py:p.y,wx:o.x,wy:o.y};
   p.facing=angTo(p.x,p.y,o.x,o.y); SFX.play('roll'); setBanner('The Lake King',`Press ${usingTouch||padActive()?'use':'E'} each time the bobber splashes. Three tugs!`,2.6);
 }
