@@ -1252,7 +1252,7 @@ const GLOOM_BRAIN=FK.brain({move:'hold',turn:4,cd:[1.4,2.4],
          {k:'c1swoop',st:'aim',st2:'swoop',windup:0.8,len:360,w:70,spd:560,time:0.6,dmg:1.3,kb:300,min:120,max:420,w:2.2}]});
 defineFoe('c_gloomwing',{boss:true,name:'The Gloomwing',title:S('Lampshade of the Lighthouse','the lamp moth'),short:'Gloomwing',
   lv:12,hp:4000,r:46,speed:150,dmg:22,value:1000,flying:true,kbRes:0.1,dcol:'190,170,230',phases:[0.66,0.33],
-  phaseText:[[S('Shadow!','Shadow!'),S('It hides in its own shadow under the glass. SHADOW DASH into its shadow to knock it out!','Dash into its shadow!'),['c_pearl',S('A shadow is just a door nobody has noticed, Ash. Go through it!','Go through its shadow!')]],
+  phaseText:[[S('Shadow!','Shadow!'),S('It hides in its own shadow under the glass. SHADOW DASH into its shadow to knock it out!','Dash into its shadow!'),['c_pearl',S('It is hiding in its own shadow, Ash. Dash in after it!','Go through its shadow!')]],
              [S('The Lamp!','The lamp!'),S('It smothers the great lamp. Breathe fire on the wick until it catches! The beam will knock it down.','Breathe fire on the lamp!'),['c_pearl',S('Light my lamp, Ash! Fire on the wick!','Light my lamp!')]]],
   init(e){ c1BossInit(e); e.z=60; e.orb=rand(0,TAU); e.beamCd=0; e.downT=0; e.mode='fly'; e.onShadow=gloomShadowHit; },
   onPhase(e,i){ e.downT=0; e.sunk=false; e.mode=i===1?'sinkDown':'toLamp'; e.mst=0; },

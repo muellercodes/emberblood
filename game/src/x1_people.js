@@ -336,7 +336,7 @@ Object.assign(TALK,{
     best:{t:S(`You are the most punctual dragon I have ever met. That is a compliment. Take my old coat lining. It is warm, and it is never late.`,`You are never late. Take my warm coat lining.`),reward:{maxhp:15}}},
   c_hettie:{bio:S('Inventor in Sprocket’s Workshop. Lost her brass dog, Bolt, when the moths came.','An inventor. Her brass dog Bolt ran away.'),
     rumorAsk:[`How do you beat a Steam Ram?`,`How do I beat a Steam Ram?`],
-    rumor:{t:S(`The Steam Rams in the Brass Yards have springs in their bellies. Knock one dizzy and boing. Science!`,`Steam Rams have springs inside. Knock one dizzy. Boing!`),hint:null,need:()=>x1pR('c_brass')},
+    rumor:{t:S(`The Steam Rams in the Brass Yards have springs in their bellies. Knock one dizzy and boing. I call that spring cleaning.`,`Steam Rams have springs inside. Knock one dizzy. Boing!`),hint:null,need:()=>x1pR('c_brass')},
     loves:['honey'],hates:['fish'],
     secret:{t:S(`Here. A pocket gear-spring. Clip it to your boots. You'll roll quicker. Probably. I've only tested it on the toaster.`,`A spring for your boots. You will roll faster!`),reward:{roll:true}},
     best:{t:S(`You're my favorite test subject. I mean friend. Friend. Take this whirligoo. It makes your draughts fizz harder.`,`You're my best friend! This makes your draughts heal more.`),reward:{heal:0.15}}},
@@ -465,7 +465,7 @@ const X1P_FIRST={
   c_ingrid:S(`A dragon in my smithy, with a sword on his back. That is Maren of Emberhollow's work, ja? I am Ingrid Anvilsong.`,`That sword is Maren's work, ja? I am Ingrid.`),
   c_fig:S(`Sit down, dearie, you look like you've been chasing something. Everybody calls me Auntie Fig, so you might as well.`,`Sit down, dearie. Call me Auntie Fig.`),
   c_ambrose:S(`Eh? Speak up, young dragon. These old ears have lived next to a bell for ninety years. Tick.`,`Eh? Speak up! I live by a bell. Tick.`),
-  c_penny:S(`HEADLINE: DRAGON KID TALKS TO PENNY PRESS. Any comment?`,`HEADLINE: DRAGON TALKS TO PENNY! Comment?`),
+  c_penny:S(`HEADLINE: DRAGON KID TALKS TO PENNY PRESS. SCOOP IS RED HOT. Any comment?`,`HEADLINE: DRAGON TALKS TO PENNY! Comment?`),
   c_ravel:S(`Welcome to Ravel's Remarkable Rarities! Everything is remarkable. Some of it is rare.`,`Welcome to my shop! Everything is special.`),
   c_jo:S(`Ahoy, lizard! Skipper Jo. Ever raced on water? Course you haven't, you've got feet.`,`Ahoy, lizard! I'm Skipper Jo. Can you race on water?`),
   c_bobs:S(`Halt! Who goes there? ...It's the lizard again, Bob. ...He says dragon, Bob.`,`Halt! Oh. It's the lizard again, Bob.`),
@@ -481,26 +481,26 @@ const X1P_FIRST={
 };
 const X1P_HELLO={
   c_hester:[S(`On time. Good.`,`On time. Good.`),S(`Report.`,`Report!`),S(`Ash. Seven seconds early. Excellent.`,`Seven seconds early. Good.`)],
-  c_hettie:[S(`Ash! Don't touch that. Hello!`,`Ash! Don't touch. Hello!`),S(`Oh good, a dragon. I need a light. For science.`,`A dragon! I need a light. For science!`)],
+  c_hettie:[S(`Ash! Don't touch that. Hello!`,`Ash! Don't touch. Hello!`),S(`Oh good, a dragon. I need a light. For science. A bright idea, if you like.`,`A dragon! I need a light. For science!`)],
   c_ottoline:[S(`Hello, Ash. Hello! Sorry.`,`Hello. Hello! Sorry.`),S(`Shh. Oh, it's you. Shh anyway.`,`Shh. Oh, it's you.`)],
   c_whirligig:[S(`Dragon. Hmph. Feet wiped?`,`Dragon. Feet wiped?`),S(`Ah. You. Good. I mean. Hmph.`,`Ah. You. Good. Hmph.`)],
   c_mo:[S(`Ahoy, dragon!`,`Ahoy!`),S(`Ash! Fair winds and fat fish!`,`Fair winds, Ash!`)],
   c_ingrid:[S(`Ja! Ash! Hammer, hammer, hello!`,`Ja! Hello, Ash!`),S(`Ash! Come, the forge is hot!`,`Ash! The forge is hot!`)],
   c_fig:[S(`Hello, dearie. Kettle's on.`,`Hello, dearie. Tea?`),S(`There's my favorite dragon. Sit, sit.`,`My favorite dragon! Sit.`)],
   c_ambrose:[S(`Eh? Ash? Tick.`,`Eh? Ash? Tick.`),S(`There you are. Tick. Tock.`,`There you are. Tick.`)],
-  c_penny:[S(`HEADLINE: ASH IS BACK.`,`HEADLINE: ASH IS BACK!`),S(`Any news? I need news.`,`Any news? I need news!`)],
+  c_penny:[S(`HEADLINE: ASH IS BACK. CITY HEATS UP.`,`HEADLINE: ASH IS BACK!`),S(`Any news? I need news.`,`Any news? I need news!`)],
   c_ravel:[S(`Ah, my favorite customer!`,`My favorite customer!`),S(`Back for something remarkable?`,`Back for something good?`)],
   c_jo:[S(`Ahoy, lizard!`,`Ahoy, lizard!`),S(`Still got feet? Shame.`,`Still got feet? Shame.`)],
   c_bobs:[S(`Halt! Oh. It's Ash, Bob.`,`Halt! Oh, it's Ash.`),S(`Tick. Tock. Hello.`,`Tick. Tock. Hello.`)],
   c_mina:[S(`Hello! Mind your feet, the boards are wet.`,`Hello! The boards are wet.`),S(`Hello, Ash! Lovely bit of tide today.`,`Hello, Ash! Lovely tide today.`)],
-  c_charlie:[S(`Hungry? You look hungry.`,`Hungry? You look hungry.`),S(`Ash! Chowder's on.`,`Ash! Chowder's ready.`)],
+  c_charlie:[S(`Hungry? You look hungry.`,`Hungry? You look hungry.`),S(`Ash! Chowder's on. Long time, no sea.`,`Ash! Chowder's ready.`)],
   c_dory:[S(`Ash. Mind the nets.`,`Ash. Mind the nets.`),S(`Hm. Hello.`,`Hm. Hello.`)],
   c_oona:[S(`Come in, duck.`,`Come in, duck.`),S(`There's my warm duck.`,`My warm duck!`)],
   c_tarbuckle:[S(`Ahoy, young'un.`,`Ahoy, young one.`),S(`In my day you'd say hello first. Hello.`,`Say hello first! Hello.`)],
   c_posy:[S(`Ash! Listen to my box!`,`Ash! Listen to my box!`),S(`Hi, dragon. Hi.`,`Hi, dragon!`)],
   c_maudie:[S(`Ash! Wind!`,`Ash! Wind!`),S(`Hello! Tea? Tea!`,`Hello! Tea?`)],
   c_agatha:[S(`Hm. You again.`,`Hm. You again.`),S(`Ash. Squawk says hello. Squawk, say hello.`,`Squawk says hello.`)],
-  c_barley:[S(`There you are, young dragon.`,`Hello, young dragon.`),S(`Gerald says hello. Then he fainted.`,`Gerald says hi. He fainted.`)]
+  c_barley:[S(`There you are, young dragon. Ewe again.`,`Hello, young dragon.`),S(`Gerald says hello. Then he fainted.`,`Gerald says hi. He fainted.`)]
 };
 const X1P_NIGHT=[S(`Late for walking, Ash. The moths are out.`,`It's late. The moths are out.`),S(`Mind the lamps. The moths love them.`,`Moths love the lamps.`),S(`Can't sleep either? Me neither.`,`Can't sleep? Me neither.`)];
 { const base=greetLine; greetLine=function(id){
@@ -636,13 +636,13 @@ Object.assign(DEED_PRI,{c_clock:8,c_tide:6,c_snowfall:8,c_spireup:7,trial_claws:
 // ---------- shops, the smith and the inns (prices about twice Act I's, BALANCE.md 8)
 SHOPTALK.c_ravel=()=>runShop('c_ravel',S(`Ravel's Remarkable Rarities! Everything is remarkable. Some of it is rare.`,`Ravel's shop! Everything is special.`),[
   [S('Refill your healing draughts (brewed by a mermaid. Merv.)','Refill your draughts'),12,()=>{ player.potions=player.potionsMax; setBanner(S('Draughts refilled','Draughts full'),S('Merv says hello.','Merv says hi.'),1.6); },()=>player.potions<player.potionsMax||S('Your flasks are already full.','Your flasks are full.')],
-  [S('A Pip treat (made from the dreams of tiny dragons. And oats.)','A Pip treat'),40,()=>{ G.pipTreats=(G.pipTreats||0)+1; setBanner(S('Pip treat','Pip treat'),S('Mip! Mip! MIP!','Mip! Mip!'),1.6); },()=>G.flags.pip?((G.pipTreats||0)<3||S('Pip is too full. Mip.','Pip is full.')):S('You don’t have a dragon to feed.','No dragon to feed.')],
+  [S('A Pip treat (made from the dreams of tiny dragons. And oats. Mostly oats.)','A Pip treat'),40,()=>{ G.pipTreats=(G.pipTreats||0)+1; setBanner(S('Pip treat','Pip treat'),S('Mip! Mip! MIP!','Mip! Mip!'),1.6); },()=>G.flags.pip?((G.pipTreats||0)<3||S('Pip is too full. Mip.','Pip is full.')):S('You don’t have a dragon to feed.','No dragon to feed.')],
   [S('Lantern oil (a cave lantern, already filled)','Lantern oil (a cave lantern)'),30,()=>{ G.items.lantern=1; setBanner(S('Cave lantern','Cave lantern'),S('Caves will be a lot less scary.','Caves are less scary now.'),1.8); },()=>!G.items.lantern||S('Your lantern is already full.','Your lantern is full.')],
   [S('A treasure map (or a map of where a dog sneezed)','A treasure map'),60,()=>{ giveItems({c_map:1},true); setBanner(S('Ravel’s treasure map','Treasure map'),S('Three X marks: the Downs, the Rockpools and Lantern Point. Dig where X marks the spot.','Three X marks. Dig there!'),3); },()=>!G.items.c_map&&!G.found.c_lm_x1||S('You already have it. The dog only sneezed once.','You have it already.')],
   [S('An Ember Charm (a blessing)','An Ember Charm (a blessing)'),140,()=>{ G.stats.charms=(G.stats.charms||0)+1; G.pendingBless++; later(0.6,offerPending); },()=>(G.stats.charms||0)<5||S('Sold out of charms. Come back never.','No more charms.')]
 ]);
 function x1pReforge(){ runDialogue([x1pL('c_ingrid',`Star-iron! JA! Give it here. Hammer, hammer, DING!`,`Star-iron! Ja! Hammer, hammer, DING!`),x1pN(`Sparks fly. Ingrid sings a very short song, very loudly, and hands your blade back. It hums.`,`Sparks fly. Ingrid sings. Your blade hums.`)],()=>{ scene='play'; reforgeIron(); saveGame(); }); }
-SHOPTALK.c_ingrid=()=>runShop('c_ingrid',S(`The Bright Anvil! Ja! What do you need?`,`The Bright Anvil! Ja!`),[
+SHOPTALK.c_ingrid=()=>runShop('c_ingrid',S(`The Bright Anvil! Ja! Strike while the iron is hot. What do you need?`,`The Bright Anvil! Ja!`),[
   [S('Reforge your blade with your star-iron','Reforge with star-iron'),0,()=>later(0.05,x1pReforge),()=>G.iron>0||S('You have no star-iron. Bring me some, ja?','No star-iron. Bring some!')],
   [S('Warm your claws at the forge (full heal)','Warm up at the forge (heal)'),6,()=>{ player.hp=player.maxHp; setBanner(S('Toasty','Toasty'),S('Your scales glow like a horseshoe.','You feel warm.'),1.6); },()=>player.hp<player.maxHp||S('You are already toasty, ja.','You are already warm.')],
   [S('A smith’s whetstone (a blessing)','A whetstone (a blessing)'),160,()=>{ G.flags.c_whet=(G.flags.c_whet|0)+1; G.pendingBless++; later(0.6,offerPending); },()=>(G.flags.c_whet|0)<2||S('Two is enough. Three would be showing off.','Two is enough.')]
@@ -651,7 +651,7 @@ const X1P_INN={
   c_fig:()=>runShop('c_fig',S(`The Steaming Teapot, dearie. Tea, cake, and soft beds.`,`Tea, cake and beds, dearie.`),[
     [S('Rent a bed for the night','Rent a bed'),G.flags.perk_freeinn?0:10,()=>{ innRest(); }],
     [S('A pot of tea and a slice of cake (heal)','Tea and cake (heal)'),6,()=>{ player.hp=Math.min(player.maxHp,player.hp+player.maxHp*0.6); setBanner(S('Tea and cake','Tea and cake'),S('Tea fixes most things.','Tea fixes things.'),1.6); }]]),
-  c_charlie:()=>runShop('c_charlie',S(`The Chowder Pot! Chowder, beds, and more chowder.`,`Chowder and beds!`),[
+  c_charlie:()=>runShop('c_charlie',S(`The Chowder Pot! Chowder, beds, and more chowder. Soup-er service, every night.`,`Chowder and beds!`),[
     [S('Rent a bed for the night','Rent a bed'),G.flags.perk_freeinn?0:10,()=>{ innRest(); }],
     [S('A bowl of chowder (full heal)','Chowder (full heal)'),12,()=>{ player.hp=player.maxHp; setBanner(S('Chowder','Chowder'),S('Soup that has been hugged.','Hugged soup!'),1.6); }]]),
   c_maudie:()=>runShop('c_maudie',S(`THE GULL'S REST! BEDS! TEA! WIND!`,`BEDS! TEA! WIND!`),[

@@ -988,7 +988,7 @@ function c1Places(B){
   B.sign('c_sign_salt',3300,26180,S('SALTMARSH, down the steps. Chowder. Fish. More chowder.','SALTMARSH. Chowder!'));
   B.sign('c_sign_west',6380,25010,S('THE WEST GATE. The Coast Road: the Gull\'s Rest, then Saltmarsh. Mind the gulls. They bite.','West Gate. The Gull\'s Rest and Saltmarsh are west.'));
   B.sign('c_sign_gate',7060,24060,S('GEARHAVEN. Upper Town. Please wipe your feet and wind your watch.','GEARHAVEN. Wipe your feet.'));
-  B.sign('c_sign_brassroad',8560,25500,S('The Brass Road: east to the Brass Yards. Mind the scrap.','The Brass Yards are east.'));
+  B.sign('c_sign_brassroad',8560,25500,S('The Brass Road: east to the Brass Yards. Mind the scrap. Steam Rams do not brake for dragons.','The Brass Yards are east.'));
 }
 // ---------- town furniture: planters, benches, crates and barrels where nothing else stands (seeded, so always the same)
 function c1Furnish(B){
@@ -1027,12 +1027,12 @@ function c1DrawClock(t){
 // ---------- the Moth Mask Watch: Penny's board points at the main story (and at the notes)
 function c1WatchLines(){
   const st=G.stage||'', L=[];
-  const by={c_coast:S('LAST SEEN: the rooftops of the Clock Quarter, after dark. Whirligig Manor. AGAIN.','LAST SEEN: the rooftops, at night.'),
-    c_gear:S('LAST SEEN: the rooftops of the Clock Quarter, after dark. Whirligig Manor. AGAIN.','LAST SEEN: the rooftops, at night.'),
+  const by={c_coast:S('LAST SEEN: the rooftops of the Clock Quarter, after dark. Whirligig Manor. AGAIN. LORD ALARMED. CLOCKS ALSO ALARMED.','LAST SEEN: the rooftops, at night.'),
+    c_gear:S('LAST SEEN: the rooftops of the Clock Quarter, after dark. Whirligig Manor. AGAIN. LORD ALARMED. CLOCKS ALSO ALARMED.','LAST SEEN: the rooftops, at night.'),
     c_salt:S('LAST SEEN: Saltmarsh, leaving presents on doorsteps. ALSO: running up the Great Clock like it was a ladder.','LAST SEEN: Saltmarsh. And up the clock!'),
     c_claws:S('LAST SEEN: on the cliffs above the Gullcrag Caves, sitting very still. Like a moth.','LAST SEEN: the Gullcrag cliffs.'),
     c_brass:S('LAST SEEN: the very top of the Great Clock. Nobody can climb that. Except, apparently, her.','LAST SEEN: the top of the Great Clock!'),
-    c_light:S('LAST SEEN: Lantern Point. The lighthouse has gone dark. Penny Press says: SUSPICIOUS.','LAST SEEN: Lantern Point. The lighthouse is dark.'),
+    c_light:S('LAST SEEN: Lantern Point. The lighthouse has gone dark. Penny Press says: SUSPICIOUS. KEEPER LEFT IN THE DARK.','LAST SEEN: Lantern Point. The lighthouse is dark.'),
     c_spire:S('LAST SEEN: out at sea?! On a black rock that was NOT THERE BEFORE.','LAST SEEN: on a black rock out at sea!'),
     c_snow:S('SNOW IN SUMMER! Mask not seen. Everybody very cold. Penny Press is wearing two hats.','SNOW IN SUMMER! Everyone is cold.')};
   L.push(by[st]||S('THE MOTH MASK WATCH. LAST SEEN: everywhere and nowhere. (The usual.)','LAST SEEN: everywhere. As usual.'));

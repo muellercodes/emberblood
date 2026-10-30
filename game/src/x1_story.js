@@ -385,8 +385,8 @@ c1Def('c_squawk',[
   xdo(()=>{ G.flags.c_squawk=1; })
 ]);
 c1Def('c_agatha',[
-  xl('c_agatha',`You're the dragon Squawk went to fetch? Hm. Smaller than I pictured. Squawk said "big as a house."`,`You're the dragon? Smaller than I thought. Squawk said big as a house.`),
-  xl('c_squawk',`BIG AS A HOUSE!`,`BIG AS A HOUSE!`),
+  xl('c_agatha',`You're the dragon Squawk went to fetch? Hm. Smaller than I pictured. Squawk said "big as a mountain."`,`You're the dragon? Smaller than I thought. Squawk said big as a house.`),
+  xl('c_squawk',`BIG AS A MOUNTAIN!`,`BIG AS A MOUNTAIN!`),
   xl('c_agatha',`Squawk says that about everything. He said it about a sandwich.`,`He says that about everything. Even a sandwich.`),
   xl('c_agatha',`Forty years I've kept that light. Never missed a night. Then the moths came like a grey snowstorm and covered the lamp. Ate the light right out of it.`,`Forty years I kept that light. Then the moths came and ate the light.`),
   xl('c_agatha',`There's a big one up top. Biggest moth you ever saw. And there's someone else up there too. A girl in a grey cloak, going up and down my stairs like she owns them.`,`There's a huge moth up top. And a girl in a grey cloak.`),
@@ -690,7 +690,7 @@ const C1_TAUNTS={
   c_mothmask3:[S(`You can't follow me here!`,`You can't follow me here!`)],
   c_mothmask_follow:[S(`...How did you DO that?`,`How did you DO that?`)],
   c_shadowash:[S(`Gentle breaths. Gentle breaths...`,`Gentle breaths...`),S(`Mip! (in a deep, wrong voice)`,`Mip! (in a wrong voice)`),S(`I can be a frog. I can be the best frog.`,`I can be the best frog.`)],
-  c_pinch:[S(`PINCH! Salute your Admiral! SALUTE!`,`SALUTE your Admiral!`)]
+  c_pinch:[S(`PINCH! Salute your Admiral! I am the CLAW around here!`,`SALUTE your Admiral!`)]
 };
 // what defineDungeon's `story` should be for each Act II dungeon (keys as e9a expects them)
 function c1DunStory(id){
