@@ -42,7 +42,7 @@ RFM.brass=Object.assign({},RFM.metal,{tex:'brush',ta:.35});
 RFM.ember=Object.assign({},RFM.scales,{e:[[0,.44,.2,0,0],[.06,.32,.04,0,0],[.28,.12,0,0,0],[.56,0,0,0,0],[.78,-.14,0,.42,0],[.92,-.28,0,.34,0],[1,-.18,0,.3,.06]]});
 RFM.glass=Object.assign({},RFM.ice,{tex:null});
 RFM.shell=Object.assign({},RFM.horn,{tex:'speck',ta:.35,ts:.3});
-const RF={plain:false,fr:0,tn:0,tmax:420,tmin:2.4,on:true,tex:true,layerOn:true,lay:0,ln:0,lmax:12,lmax1:5,gc:new Map(),rgb:new Map(),heu:new Map(),ct:null,fm:null,fmap:null,
+const RF={plain:false,fr:0,tn:0,tmax:160,tmin:2.4,tdev:5,on:true,tex:true,layerOn:true,lay:0,ln:0,lmax:6,lmax1:3,gc:new Map(),rgb:new Map(),heu:new Map(),ct:null,fm:null,fmap:null,
   pat:{},dm:null,stats:{parts:0,tex:0,miss:0},kids:0};
 const RF_CT=
   '7c4c30ska0e0b0co7a5a32lr3a6a4acoe4cec4skc792eaco2a1a2aha7a4a2esk8a9aaaco9a3420skefe0bfhhd2c29ehha8987ahhffd34dgg'+
@@ -214,7 +214,7 @@ function reT3End(){
 // the parts, back to front. occ: the canvas holds only this figure, so each part first lays a soft shadow on the parts
 // already drawn behind it (source-atop: nothing outside the figure is touched), down and right, away from the light
 function rfParts(g,m,ox,oy,occ){
-  const R=T3R, L=T3.L, n=R.n, list=R.list, fl=R.flash, ga=g.globalAlpha, k=R.k, tmin=RF.tmin*k;
+  const R=T3R, L=T3.L, n=R.n, list=R.list, fl=R.flash, ga=g.globalAlpha, k=R.k, tmin=Math.max(RF.tmin*k,RF.tdev/(Math.abs(m.a)||1));   // textures only where they show
   const DM=RF.dm||(RF.dm=new DOMMatrix()), OB=occ?rfxSoft('0,0,0'):null;
   for(let i=0;i<n;i++){
     const p=list[i], col=p.col;
@@ -271,9 +271,9 @@ function rfParts(g,m,ox,oy,occ){
 // one part's soft shadow on what is behind it
 function rfOcc(g,p,m,ox,oy,L,k,ga,OB){
   const pc=g.globalCompositeOperation;
-  if(p.t===0){ if(p.s2<1.1*k) return; const d=0.3*Math.min(p.s1,p.s2)+0.5*k, dx=-L[0]*d, dy=-L[1]*d+0.25*k, c=Math.cos(p.ang), s=Math.sin(p.ang);
+  if(p.t===0){ if(p.s2<1.5*k) return; const d=0.3*Math.min(p.s1,p.s2)+0.5*k, dx=-L[0]*d, dy=-L[1]*d+0.25*k, c=Math.cos(p.ang), s=Math.sin(p.ang);
     g.setTransform(m); g.transform(c*p.s1,s*p.s1,-s*p.s2,c*p.s2,ox+p.sx+dx,oy+p.sy+dy); g.globalCompositeOperation='source-atop'; g.globalAlpha=ga*0.5; g.drawImage(OB,-1.32,-1.32,2.64,2.64); }
-  else if(p.t===1){ const rm=Math.max(p.r1,p.r2); if(rm<0.9*k) return; const d=0.35*rm+0.45*k, dx=-L[0]*d, dy=-L[1]*d+0.2*k;
+  else if(p.t===1){ const rm=Math.max(p.r1,p.r2); if(rm<1.2*k) return; const d=0.35*rm+0.45*k, dx=-L[0]*d, dy=-L[1]*d+0.2*k;
     g.setTransform(m); g.globalCompositeOperation='source-atop'; g.strokeStyle='#000'; g.lineCap='round';
     g.globalAlpha=ga*0.12; g.lineWidth=(p.r1+p.r2)+1.6*k; g.beginPath(); g.moveTo(ox+p.ax+dx,oy+p.ay+dy); g.lineTo(ox+p.bx+dx,oy+p.by+dy); g.stroke();
     g.globalAlpha=ga*0.14; g.lineWidth=(p.r1+p.r2)*0.9; g.stroke(); }
@@ -497,6 +497,21 @@ function reProjectiles(){
       ctx.fillStyle='#9fd2f4'; ctx.beginPath(); ctx.moveTo(L,0); ctx.lineTo(0,w); ctx.lineTo(-L*0.7,0); ctx.closePath(); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fillRect(-L*0.2,-w*0.35,L*0.6,w*0.22); ctx.restore(); }
   }
   ctx.globalCompositeOperation=pc; ctx.globalAlpha=a0;
+}
+// shock rings (the roar, slams, blasts): a soft band of light and kicked-up air under the ring the old code draws next
+function reRings(){
+  const pc=ctx.globalCompositeOperation; ctx.globalCompositeOperation='lighter';
+  for(const R of G.rings){ if(R.delay>0) continue; const a=clamp(1-R.rad/R.max,0,1); if(a<=0.01) continue;
+    const col=R.owner==='player'?'255,190,110':R.dmg>0?'255,90,40':'255,170,90';
+    ctx.strokeStyle=`rgba(${col},${(0.16*a).toFixed(3)})`; ctx.lineWidth=(R.thick||4)*2.6+8*a; ctx.beginPath(); ctx.arc(R.x,R.y,R.rad,0,TAU); ctx.stroke(); }
+  ctx.globalCompositeOperation=pc;
+}
+// a shock ring on the ground (the hammer's slam): soft dust kicked up along its edge, settling as it spreads
+function reRingDust(f,k,r,a){
+  const S=rfxSoft('150,130,104'), n=14, a0=ctx.globalAlpha;
+  for(let i=0;i<n;i++){ const b=i/n*TAU+(f.x*0.013+f.y*0.007), j=((i*37)%7)/7, rr=r*(0.92+j*0.16), s=(4+j*5)*(0.6+k*0.9);
+    ctx.globalAlpha=a0*0.3*a*(0.6+j*0.4); ctx.drawImage(S,f.x+Math.cos(b)*rr-s,f.y+Math.sin(b)*rr*0.92-s-k*4,s*2,s*2); }
+  ctx.globalAlpha=a0;
 }
 // pickups: a glossy heart of the same red with a soft glow, coins as spinning gold coins that catch the light
 function rfxHeart(){

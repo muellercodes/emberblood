@@ -105,6 +105,7 @@ function drawParticles(){
   ctx.restore();
 }
 function drawRings(){
+  if(LOOK.re&&!LOOK.sb) reRings();   // the Realistic look: a soft band of light under each ring (e12g_figs.js)
   for(const R of G.rings){
     if(R.delay>0) continue;
     const a=clamp(1-R.rad/R.max,0,1);

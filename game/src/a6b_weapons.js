@@ -688,6 +688,7 @@ function drawWeaponFx(){
   for(const f of G.wfx){
     if(f.k!=='ring') continue;
     const k=f.t/f.dur, e=1-Math.pow(1-k,3), r=f.r*(0.25+0.75*e), a=1-k;
+    if(LOOK.re&&!LOOK.sb) reRingDust(f,k,r,a);   // the Realistic look: dust thrown up along the ring (e12g_figs.js)
     ctx.fillStyle=`rgba(120,100,80,${0.16*a})`; ctx.beginPath(); ctx.arc(f.x,f.y,r,0,TAU); ctx.fill();
     ctx.strokeStyle=`rgba(240,220,190,${0.65*a})`; ctx.lineWidth=2+7*a; ctx.stroke();
     ctx.strokeStyle=`rgba(255,180,90,${0.45*a*(0.4+f.ch)})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(f.x,f.y,r*0.72,0,TAU); ctx.stroke();
