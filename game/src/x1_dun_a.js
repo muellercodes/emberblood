@@ -647,7 +647,7 @@ function d1aPaint(A,def){
   // 1. dressing on plain floors and wall tops
   for(let k=0;k<c.typ.length;k++){ const i=k%w, j=(k-i)/w, x=i*cs, y=j*cs, t=c.typ[k];
     if(c.grid[k]===0&&(t===0||t===DTY.basin0)){ const R=roomOf(k);
-      if(sea){ // soft sand with no tile seams: a smooth noise colour, wet sand in the tide basins
+      if(sea&&LOOK.re){} else if(sea){ // soft sand with no tile seams: a smooth noise colour, wet sand in the tide basins
         const n=fbm(x*0.004+def.floorIdx*7,y*0.004,2), wet=t===DTY.basin0;
         const m=mixRGB(wet?[150,122,84]:[198,168,116],wet?[132,106,72]:[178,146,98],clamp(n,0,1)); g.fillStyle=`rgb(${m[0]|0},${m[1]|0},${m[2]|0})`; g.fillRect(x,y,cs,cs);
         if(R&&R.kind==='reward'){ if(rng()<0.3){ g.fillStyle='rgba(255,240,210,.12)'; g.beginPath(); g.ellipse(x+rng()*cs,y+rng()*cs,4,2,0,0,TAU); g.fill(); } continue; }
@@ -655,8 +655,8 @@ function d1aPaint(A,def){
         if(rng()<0.12){ g.fillStyle=rng()<0.5?'#f4e2d0':'#e8b8a8'; g.beginPath(); const sx=x+6+rng()*(cs-12), sy=y+6+rng()*(cs-12); g.moveTo(sx,sy-3); g.lineTo(sx+3.5,sy+2); g.lineTo(sx-3.5,sy+2); g.closePath(); g.fill(); }
         if(rng()<0.1){ g.fillStyle='rgba(40,70,90,.16)'; g.beginPath(); g.ellipse(x+rng()*cs,y+rng()*cs,6+rng()*8,3+rng()*4,rng()*3,0,TAU); g.fill(); } }
       else { if(R&&R.workshop){ g.fillStyle=(i+j)%2?'#8a5a34':'#7e5230'; g.fillRect(x,y,cs,cs); g.fillStyle='rgba(0,0,0,.22)'; g.fillRect(x,y+cs*0.48,cs,1.5); g.fillRect(x,y,1.5,cs); g.fillStyle='rgba(255,220,170,.08)'; g.fillRect(x+2,y+2,cs-4,2); continue; }
-        g.strokeStyle='rgba(20,12,6,.32)'; g.lineWidth=1.2; g.strokeRect(x+1.5,y+1.5,cs-3,cs-3);
-        g.fillStyle='rgba(255,226,170,.28)'; for(const [a,b] of [[5,5],[cs-5,5],[5,cs-5],[cs-5,cs-5]]){ g.beginPath(); g.arc(x+a,y+b,1.5,0,TAU); g.fill(); }
+        if(!LOOK.re){ g.strokeStyle='rgba(20,12,6,.32)'; g.lineWidth=1.2; g.strokeRect(x+1.5,y+1.5,cs-3,cs-3);
+        g.fillStyle='rgba(255,226,170,.28)'; for(const [a,b] of [[5,5],[cs-5,5],[5,cs-5],[cs-5,cs-5]]){ g.beginPath(); g.arc(x+a,y+b,1.5,0,TAU); g.fill(); } }
         // hazard stripes along drops
         for(const [q,side] of [[k-w,'n'],[k+w,'s'],[k-1,'w'],[k+1,'e']]){ const tq=c.typ[q]; if(!(tq===TY.pit||tq===TY.chasm)) continue; g.save(); g.beginPath(); if(side==='n') g.rect(x,y,cs,5); else if(side==='s') g.rect(x,y+cs-5,cs,5); else if(side==='w') g.rect(x,y,5,cs); else g.rect(x+cs-5,y,5,cs); g.clip(); for(let s=-cs;s<cs*2;s+=10){ g.fillStyle='#e8b830'; g.beginPath(); g.moveTo(x+s,y); g.lineTo(x+s+5,y); g.lineTo(x+s+5-cs,y+cs); g.lineTo(x+s-cs,y+cs); g.closePath(); g.fill(); } g.restore(); } } }
     // wall tops beside a floor: barnacles and kelp by the sea, rivets and pipes in the works
@@ -683,7 +683,7 @@ function d1aPaint(A,def){
       else if(t===D1A_T.belt){ g.fillStyle='#2e2a2a'; g.fillRect(x,y,cs,cs); g.fillStyle='#4a4038'; g.fillRect(x+2,y+2,cs-4,cs-4); const f=c.flow[k]; g.fillStyle='#6a5a48'; for(let n=0;n<4;n++){ if(f===0||f===2) g.fillRect(x+3,y+4+n*11,cs-6,4); else g.fillRect(x+4+n*11,y+3,4,cs-6); }
         g.fillStyle='#b08840'; if(f===0||f===2){ g.fillRect(x,y,3,cs); g.fillRect(x+cs-3,y,3,cs); } else { g.fillRect(x,y,cs,3); g.fillRect(x,y+cs-3,cs,3); } }
       continue; }
-    const lv=clamp(h,0,3); g.fillStyle=TOPS[lv]; g.fillRect(x,y,cs,cs);
+    const lv=clamp(h,0,3); if(!(LOOK.re&&riLevelTop(g,x,y,cs,TOPS[lv]))){ g.fillStyle=TOPS[lv]; g.fillRect(x,y,cs,cs); }
     g.fillStyle='rgba(255,250,226,.10)'; g.fillRect(x+2,y+2,cs-4,3); g.strokeStyle='rgba(58,30,72,.12)'; g.lineWidth=1.2; g.strokeRect(x+0.5,y+0.5,cs-1,cs-1);
     if(!sea){ g.fillStyle='rgba(30,16,8,.45)'; for(const [a,b] of [[6,6],[cs-6,6],[6,cs-6],[cs-6,cs-6]]){ g.beginPath(); g.arc(x+a,y+b,1.9,0,TAU); g.fill(); } g.fillStyle='rgba(255,226,170,.25)'; g.fillRect(x+cs*0.5-1,y+4,2,cs-8); }
     else if(F2&&lv>=3){ // the cliff top: turf over chalk
