@@ -610,7 +610,7 @@ function riCaveFloorFn(T,fl,fl2,acc,F,Rr,seed,cs){
       if(e<1.3){ const mk=f==='iron'?0.35:T.moss?0.4:0.45; riSet(o,f==='marble'?[fl[0]*0.7,fl[1]*0.68,fl[2]*0.64]:[fl[0]*mk+8,fl[1]*mk+8,fl[2]*mk+6],0.9+0.2*wn); if(T.moss&&riS(F,x*1.4,y*1.4)>0.55){ o[0]=o[0]*0.6+30; o[1]=o[1]*0.6+52; o[2]=o[2]*0.6+20; } if(T.gold&&f==='marble') { o[0]=190; o[1]=150; o[2]=80; } return; }
       kk=(0.88+h*0.18)*(0.93+0.12*n2);
       if(e<3) kk*=1+(u<v&&u<cs-v||v<u&&v<cs-u?0.08:-0.1)*(3-e)/1.7;
-      if(f==='marble'){ const vein=riS(Rr,x*0.6+h*80+riS(F,x,y)*20,y*0.6); kk*=vein>0.9?0.78-0.2*(vein-0.9)*10:1; kk*=1+0.06*riE(((u-cs*0.35)**2+(v-cs*0.3)**2)/(cs*cs*0.06)); }
+      if(f==='marble'){ const vein=riS(Rr,x*1.1+h*80+riS(F,x*0.8,y*0.8)*14,y*1.1+h*40); kk*=vein>0.962?1-0.16*(vein-0.962)/0.038:1; kk*=0.97+0.06*riS(F,x*0.35+h*60,y*0.35); kk*=1+0.06*riE(((u-cs*0.35)**2+(v-cs*0.3)**2)/(cs*cs*0.06)); }
       if(f==='iron'){ const br=riS(F,x*0.08+h*50,y*4); kk*=0.84+0.24*br; const rv=(Math.abs(u-5)<1.5||Math.abs(cs-u-5)<1.5)&&(Math.abs(v-5)<1.5||Math.abs(cs-v-5)<1.5); if(rv) kk*=1.45; const rust=riSm(0.6,0.8,riS(F,x*0.7+30,y*0.7)); C=[C[0]*(1-rust*0.2)+rust*40,C[1]*(1-rust*0.3)+rust*14,C[2]*(1-rust*0.4)]; }
       if(h>0.9&&f!=='iron'){ const cr=riS(Rr,x*0.8,y*0.8); if(cr>0.94) kk*=0.66; }
       if(T.wet&&riS(F,x*0.3+70,y*0.3)>0.62){ kk*=0.85; C=[C[0]*0.9,C[1]*0.96,C[2]*1.04]; }
