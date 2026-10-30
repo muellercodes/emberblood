@@ -4,12 +4,17 @@ function daylight(){ const t=G?G.tod:0.35; if(t<0.2||t>0.8) return 0; if(t<0.3) 
 const isNight=()=>daylight()<0.25;
 const isDay=()=>daylight()>0.85;
 function sunInfo(){
+  // (v12 LIGHT) Realistic: the same sun as its shadows (reSun in e12_light.js), in this function's units
+  if(typeof LOOK!=='undefined'&&LOOK.re){ const S=reSun(); return {dx:S.dx*16,dy:S.dy*16,a:S.a*0.8}; }
   const t=G?G.tod:0.35, d=daylight();
   if(d<0.05) return {dx:Math.cos(1.3*Math.PI)*8,dy:Math.sin(1.3*Math.PI)*8,a:0.1};
   const phi=Math.PI+(t-0.25)*TAU, el=Math.max(0.05,Math.sin((t-0.25)*TAU*0.999)), len=6+24*(1-el);
   return {dx:Math.cos(phi)*len,dy:Math.sin(phi)*len,a:0.12+0.26*d};
 }
 function ambientTint(){
+  // (v12 LIGHT) Realistic: the grade on its own curve with the place's air (reAmbient in e12_light.js); the wrappers
+  // in later modules (map sky tints, the moon, the eclipse) still apply on top
+  if(typeof LOOK!=='undefined'&&LOOK.re) return reAmbient();
   const t=G?G.tod:0.35, d=daylight();
   let c=mixRGB([118,132,182],[255,255,255],d);
   const w=clamp(1-Math.min(Math.abs(t-0.25),Math.abs(t-0.75))/0.07,0,1);

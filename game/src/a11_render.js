@@ -42,6 +42,8 @@ function render(){
   const sun=inA?{dx:4,dy:6,a:0.28}:D3.on?depthSun():sunInfo(), props=inA?[]:visibleProps(60);
   const npcs=inA?AREA.npcs:G.npcs;
   ctx.save();
+  if(LOOK.re) reShadows(props,npcs,inA);   // (v12 LIGHT) the Realistic look's sun, moon and lamp shadows (e12_light.js)
+  else{
   if(!inA&&D3.on){ if(!DSKIP.shadow) shadowLayer(sun,props); }
   else if(!inA){
     for(const p of props){ if(p.taken) continue; const tall=TALL.has(p.k), k=tall?1.6:0.5, R=tall?p.R*1.05:p.R*0.9; ctx.globalAlpha=sun.a*(tall?1:0.8); ctx.drawImage(SPR.shadow,p.x+sun.dx*k-R,p.y+sun.dy*k-R*0.85,R*2,R*1.7); }
@@ -51,6 +53,7 @@ function render(){
   const ent=[player,...G.enemies.filter(e=>!e.dead&&!e.frozen&&e.type!=='vorlaxis'&&e.alpha>0.2),...npcs.filter(n=>inView(n.x,n.y,60)),...G.critters];
   if(G.goat&&(inA?G.side.duchess==='follow':true)) ent.push(G.goat);
   for(const e of ent){ if(e.dead) continue; const r=e.r||10, fly=e.flying?2.2:0.5; ctx.drawImage(SPR.shadow,e.x+sun.dx*fly-r*1.3,e.y+sun.dy*fly-r*0.9,r*2.6,r*1.8); }
+  }
   ctx.restore();
   if(inA){ for(const o of AREA.objs) if(inView(o.x,o.y,(o.w||40)+30)) drawFurn(o,t); }
   else{
@@ -80,7 +83,7 @@ function render(){
   compsForRender(list); eventsForRender(list);
   if(!inA) addOccluders(list);
   list.sort((a,b)=>a.y-b.y);
-  for(const e of list){ if(e.occ){ drawOcc(e,t); continue; } if(D3.on) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
+  for(const e of list){ if(e.occ){ drawOcc(e,t); continue; } if(D3.on||LOOK.re) contactShadow(e); if(e===player) drawPlayer(); else if(e.draw) e.draw(); else if(e.k&&T3.on&&T3A[e.k]) T3A[e.k](e); else if(e.k==='grey') drawWolf(e,false,1.9,true,true); else if(e.k==='cinder') drawKnight(Object.assign({r:27,state:'chase',blocking:true,swung:0},e),1.3,false,true); else if(e.kind) drawNPC(e); else if(e.type==='deer'||e.type==='rabbit') drawCritter(e); else drawEnemy(e); }
   if(G.fishing){ const F=G.fishing, bob=Math.sin(t*4)*1.5+(F.bite>0?3:0); ctx.strokeStyle='rgba(240,240,240,.7)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(player.x+Math.cos(player.facing)*24,player.y+Math.sin(player.facing)*24); ctx.quadraticCurveTo((player.x+F.wx)/2,(player.y+F.wy)/2-20,F.wx,F.wy+bob); ctx.stroke(); ctx.fillStyle='#c8322a'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob,4,0,TAU); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(F.wx,F.wy+bob-2,2,0,TAU); ctx.fill(); if(F.bite>0) drawMarker(F.wx,F.wy-26,'!',t); }
   if(G.corpse&&G.corpse.type!=='vorlaxis'&&G.corpse.deathT<0.6){ ctx.save(); ctx.globalAlpha=1-G.corpse.deathT/0.6; const c=G.corpse; c.flash=1; drawEnemy(Object.assign({},c,{dead:false,alpha:1,spawnIn:0,boss:true})); ctx.restore(); }
   if(G.spirit&&!inA) drawSpirit(G.spirit);
@@ -107,7 +110,7 @@ function render(){
   if(!inA) drawBirds();
   drawProjectiles(); drawWeaponFx(); drawParticles(); drawRings();
   ctx.setTransform(1,0,0,1,0,0);
-  if(!inA){ const tint=depthGrade(ambientTint()); if(tint[0]<253||tint[1]<253||tint[2]<253){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${tint.map(Math.round)})`; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.globalCompositeOperation='source-over'; } }
+  if(!inA&&!LOOK.re){ const tint=depthGrade(ambientTint()); if(tint[0]<253||tint[1]<253||tint[2]<253){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${tint.map(Math.round)})`; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.globalCompositeOperation='source-over'; } }
   drawLights();
   if(D3.on) depthPost();
   setWorld(); drawTexts();
@@ -196,6 +199,7 @@ window.__ebX=Object.assign(window.__ebX||{},{occ(on){ if(on!=null) OCC_ON=!!on; 
     if(!T3X.npc) T3X.npc=n=>{ t3Begin(n.x,n.y+6,t3Turn(n,n.face||0,10),{k:1}); t3RefPerson({walk:(n.t||0)*9,move:n.walk?1:0}); t3End(); n._t3top=n.y+6-40*T3.st; return true; };
     return true; }});
 function drawLights(){
+  if(LOOK.re) return reLights();   // (v12 LIGHT) the Realistic look: a coloured light map with the grade in it (e12_light.js)
   const dl=daylight(), inA=!!AREA, rk=inA?0:G.rainK*(player.y>WALL_Y?1:0), cinder=!inA&&player.y<2700;
   let dk=(1-dl)*0.46+rk*0.06+mapNight(); if(G.region&&G.region.key==='nests') dk+=0.12; if(G.region&&(G.region.key==='b6'||G.region.key==='mire'||G.region.key==='mosshut')) dk+=0.08;
   if(cinder) dk=Math.max(0,dk-0.12);
@@ -246,18 +250,19 @@ function drawSnowMist(){
     for(const f of FLAKES){ const x=((f.x*W+Math.sin(t*f.v+f.ph)*30-cam.x*zoom*0.15)%W+W)%W, y=((f.y*H+t*40*f.v-cam.y*zoom*0.15)%H+H)%H; ctx.fillRect(x,y,f.s*1.4,f.s*1.4); }
   }
   if(mistK>0.02){
-    const t=G.time; ctx.save(); ctx.globalAlpha=mistK*0.5;
+    const t=G.time; ctx.save(); ctx.globalAlpha=mistK*0.5*(LOOK.re?reMistK():1);   // (v12 LIGHT) Realistic: lit by the hour, under its own haze
     for(let i=0;i<5;i++){ const x=((i*W*0.31+t*12*(1+i*0.2)-cam.x*zoom*0.3)%(W+600)+W+600)%(W+600)-300, y=H*(0.15+i*0.18)+Math.sin(t*0.3+i)*20; const g=ctx.createRadialGradient(x,y,0,x,y,260); g.addColorStop(0,'rgba(200,215,200,.35)'); g.addColorStop(1,'rgba(200,215,200,0)'); ctx.fillStyle=g; ctx.fillRect(x-260,y-260,520,520); }
     ctx.restore();
   }
 }
 function drawVignette(){
   // the gradient is painted once per size into a screen sized canvas, then copied 1:1 each frame (much cheaper than a gradient fill)
-  const dm=DV.on?DEPTH.mode:'off', key=cvs.width+'x'+cvs.height+dm+(LOOK.sb?'s':'');
+  const dm=DV.on?DEPTH.mode:'off', key=cvs.width+'x'+cvs.height+dm+(LOOK.re?'r':LOOK.sb?'s':'');
   if(vigKey!==key){ vigKey=key;
     if(!vigCv||vigCv.width!==cvs.width||vigCv.height!==cvs.height) vigCv=mkCanvas(cvs.width,cvs.height);
     const vg=vigCv.getContext('2d'); vg.setTransform(1,0,0,1,0,0); vg.clearRect(0,0,vigCv.width,vigCv.height); vg.setTransform(DPR,0,0,DPR,0,0);
-    if(LOOK.sb){ const g=vg.createRadialGradient(W/2,H*0.52,Math.min(W,H)*0.4,W/2,H*0.52,Math.max(W,H)*0.78); g.addColorStop(0,'rgba(48,24,58,0)'); g.addColorStop(0.6,'rgba(48,24,58,.06)'); g.addColorStop(1,`rgba(48,24,58,${dm==='off'?0.2:0.24})`); vigGrad=g; }
+    if(LOOK.re) vigGrad=reVignette(vg,dm);
+    else if(LOOK.sb){ const g=vg.createRadialGradient(W/2,H*0.52,Math.min(W,H)*0.4,W/2,H*0.52,Math.max(W,H)*0.78); g.addColorStop(0,'rgba(48,24,58,0)'); g.addColorStop(0.6,'rgba(48,24,58,.06)'); g.addColorStop(1,`rgba(48,24,58,${dm==='off'?0.2:0.24})`); vigGrad=g; }
     else if(dm==='off'){ const g=vg.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.42)'); vigGrad=g; }
     else{ const g=vg.createRadialGradient(W/2,H*0.52,Math.min(W,H)*0.3,W/2,H*0.52,Math.max(W,H)*0.74); g.addColorStop(0,'rgba(18,10,4,0)'); g.addColorStop(0.55,'rgba(18,10,4,.14)'); g.addColorStop(1,`rgba(14,8,4,${dm==='full'?0.52:0.46})`); vigGrad=g; }
     vg.fillStyle=vigGrad; vg.fillRect(0,0,W,H); }

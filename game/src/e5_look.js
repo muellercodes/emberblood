@@ -1,5 +1,10 @@
 
-// ================= e5_look: the Storybook look (Settings > Look: Storybook or Classic)
+// ================= e5_look: the looks (Settings > Look: Realistic, Storybook or Classic)
+// (v12 wave 10) Realistic (the default for anyone who never picked a look) draws the world through the Classic paths
+// (LOOK.sb false) plus its own LOOK.re branches (real light and shadows in e12_light.js, ground in e12b_ground.js, props
+// in e12c_props.js), while every piece of UI keeps the Storybook style: the <html> 'sb' class stays on, and the canvas
+// UI draws through lookUI (e12_light.js), which shows LOOK.sb true to the UI code while it draws. sbW() is the world
+// test: true only in Storybook itself, so a world cache built while the UI draws still takes the Realistic path.
 // Storybook (the default) is a bright, cosy pass in the spirit of Cat Quest: clean saturated ground with little
 // noise, crisp white foam that pulses along every shore, clean paths with edging, chunky props and buildings with a
 // bold warm plum outline and flat cel shading (one highlight, one shadow tone), outlined toy figures, drifting cloud
@@ -8,7 +13,12 @@
 // prop sprites, house sprites, landmark sprites, struct sprites below), never redone per frame.
 // The style guide for new maps is scratchpad/STYLE.md (palettes, outline widths, the helpers exported here).
 // LOOK is a var (not const) so the drawing code in earlier modules can read it at any time without a TDZ error.
-var LOOK={sb:store.get('eb_look','storybook')!=='classic', re:false, gen:0, spr:new Map(), houses:new Map(), graded:new WeakMap(), cloud:null, off:{}};
+const LOOK_NAMES=['realistic','storybook','classic'];
+function lookStored(){ const v=store.get('eb_look','realistic'); return LOOK_NAMES.includes(v)?v:'realistic'; }
+var LOOK=(()=>{ const v=lookStored(); return {sb:v==='storybook', re:v==='realistic', gen:0, uiN:0, spr:new Map(), houses:new Map(), graded:new WeakMap(), cloud:null, off:{}}; })();
+// the look's name (inside lookUI LOOK.sb reads true in Realistic, so the name comes from LOOK.re first)
+function lookName(){ return LOOK.re?'realistic':LOOK.sb?'storybook':'classic'; }
+function sbW(){ return LOOK.sb&&!LOOK.re; }
 // LOOK.off (debug, for measuring): {foam:true, clouds:true, structs:true, houses:true} switches a Storybook pass off
 
 // ---------- palette: the shared colours of the look (helpers use these; see STYLE.md)
@@ -41,7 +51,7 @@ function sbOW(size){ return size<10?1.1:size<18?1.4:size<34?1.8:size<60?2.2:2.6;
 // same fields (half, ox, oy, w2, h2, ...). Pixels under o.thr alpha (default 0.42) are not outlined, so the soft
 // baked shadows under a sprite stay soft. In Classic it returns cv untouched (unless o.force).
 function outlineSprite(cv,col,w,o){
-  if(!cv||!cv.width||(!LOOK.sb&&!(o&&o.force))) return cv;
+  if(!cv||!cv.width||(!sbW()&&!(o&&o.force))) return cv;
   o=o||{}; col=col||SBC.outline; w=w==null?1.6:w;
   const s=o.scale||2, r=Math.max(0.8,w*s), W=cv.width, H=cv.height;
   let d, id;
@@ -96,12 +106,14 @@ function sbSprite(key,R,draw,w){
 
 // ---------- the setting
 function setLook(v){
-  v=v==='classic'?'classic':'storybook'; const was=LOOK.sb; LOOK.sb=v==='storybook'; store.set('eb_look',v);
-  lookSyncRow(); if(was!==LOOK.sb) lookRebuild(); return v;
+  v=LOOK_NAMES.includes(v)?v:'realistic'; const was=lookName(); LOOK.re=v==='realistic'; LOOK.sb=v==='storybook'; store.set('eb_look',v);
+  lookSyncRow(); if(was!==v) lookRebuild(); return v;
 }
 function lookSyncRow(){
-  for(const b of document.querySelectorAll('#setLook button')) b.setAttribute('aria-pressed',String(b.dataset.v===(LOOK.sb?'storybook':'classic')));
-  try{ document.documentElement.classList.toggle('sb',LOOK.sb); }catch(e){}
+  const n=lookName();
+  for(const b of document.querySelectorAll('#setLook button')) b.setAttribute('aria-pressed',String(b.dataset.v===n));
+  // the UI is Storybook in Realistic too
+  try{ document.documentElement.classList.toggle('sb',LOOK.sb||LOOK.re); document.documentElement.classList.toggle('re',LOOK.re); }catch(e){}
 }
 // everything cached that the look changes is thrown away and built again (props regenerate from their seeds)
 function lookRebuild(){
@@ -114,6 +126,7 @@ function lookRebuild(){
   try{ if(AREA){ AREA._base=null; } }catch(e){}
   try{ T3G.clear(); }catch(e){}
   try{ vigKey=''; SHL.key=''; DP.ok=false; }catch(e){}
+  try{ lightRebuild(); }catch(e){}   // the Realistic light's caches (e12_light.js)
   if(G) G.chunkBurst=16;
 }
 (function lookRow(){
@@ -121,7 +134,7 @@ function lookRebuild(){
     lookSyncRow();
     const panel=document.querySelector('#settings .panel'); if(!panel||document.getElementById('setLook')) return;
     const r=document.createElement('div'); r.className='setrow';
-    r.innerHTML='<span>Look<small>Storybook: bright colours, bold outlines and white foam on the shores. Classic: the original look.</small></span><div class="seg" id="setLook" role="group" aria-label="Look"><button type="button" data-v="storybook" aria-pressed="false">Storybook</button><button type="button" data-v="classic" aria-pressed="false">Classic</button></div>';
+    r.innerHTML='<span>Look<small>Realistic: natural colours under real light, with soft shadows that move with the sun. Storybook: bright colours, bold outlines and white foam on the shores. Classic: the original look.</small></span><div class="seg" id="setLook" role="group" aria-label="Look"><button type="button" data-v="realistic" aria-pressed="false">Realistic</button><button type="button" data-v="storybook" aria-pressed="false">Storybook</button><button type="button" data-v="classic" aria-pressed="false">Classic</button></div>';
     // above the Characters row (or the 3D depth row, or the end of the list)
     const ref0=document.getElementById('setChars')||document.getElementById('setDepth'), done=document.getElementById('bSettingsClose');
     let ref=ref0?ref0.closest('.setrow'):done; while(ref&&ref.parentElement!==panel) ref=ref.parentElement;
@@ -178,7 +191,7 @@ function sbGroundRGB(s,x,y){
   const ed=Math.min(x,y,WORLD.w-x,WORLD.h-y); if(ed<160) c=mixRGB([34,26,44],c,clamp(ed/160,0,1));
   return c;
 }
-{ const base=groundRGB; groundRGB=function(s,x,y){ return LOOK.sb&&y<BAND?sbGroundRGB(s,x,y):base(s,x,y); }; }
+{ const base=groundRGB; groundRGB=function(s,x,y){ return LOOK.sb&&!LOOK.re&&y<BAND?sbGroundRGB(s,x,y):base(s,x,y); }; }
 
 // ---------- contour lines baked into each ground chunk: the foam, road edges, lava crust, bog rims
 // marching squares over the chunk's sample grid; pushes segments [ax,ay,bx,by,nx,ny] (n points to higher F)
@@ -320,7 +333,7 @@ function lookDecor(g,rng,at,x0,y0){
 }
 // maps 1 and up: the same chunk as genChunkMap (e2_terrain.js), with the contour lines added before decals and bridges
 { const base=genChunkMap; genChunkMap=function(cx,cy){
-  if(!LOOK.sb) return base(cx,cy);
+  if(!sbW()) return base(cx,cy);
   const x0=cx*CH, y0=cy*CH, N=65, step=CH/(N-1);
   const small=mkCanvas(N,N), sg=small.getContext('2d'), img=sg.createImageData(N,N), d=img.data;
   const glowS=mkCanvas(N,N), gg=glowS.getContext('2d'), gimg=gg.createImageData(N,N), gd=gimg.data;
@@ -357,7 +370,7 @@ function lookDecor(g,rng,at,x0,y0){
 }; }
 // groundRGB for maps 1 and up in this look: the biome's own palette (STYLE.md), cleaner borders and shore bands
 { const base=groundRGBMap; groundRGBMap=function(s,x,y){
-  if(!LOOK.sb||s.out) return base(s,x,y);
+  if(!LOOK.sb||LOOK.re||s.out) return base(s,x,y);
   const B=BIOMES[s.b]||BDEF, M=MAPS[mapAt(y)];
   const m=fbm(x*0.0011+11,y*0.0011-7,2);
   let c=BCOL[s.b]?sbBiomeRGB(s.b,s.n,m):[120,170,90];
@@ -550,7 +563,7 @@ function sbShadow(){ const c=mkCanvas(64,64), g=c.getContext('2d'); const gr=g.c
 // def.ow sets the width in world px; the default follows the kind's radius)
 { const base=propKindSprites; propKindSprites=function(kind){
   base(kind);
-  const d=PROPK[kind]; if(!LOOK.sb||!d||d.outline===false||!SPR[kind]) return;
+  const d=PROPK[kind]; if(!sbW()||!d||d.outline===false||!SPR[kind]) return;
   SPR[kind]=SPR[kind].map(c=>{ const o=outlineSprite(c,d.oc||SBC.outline,d.ow||sbOW(d.R||14),{force:true}); if(!o.half) o.half=c.half; return o; });
 }; }
 
@@ -564,7 +577,7 @@ function sbHouseCanvas(b){
   return o;
 }
 { const base=houseSprite; houseSprite=function(hs){
-  if(!LOOK.sb||LOOK.off.houses) return base(hs);
+  if(!sbW()||LOOK.off.houses) return base(hs);
   let c=LOOK.houses.get(hs);
   if(c&&c.burnt===!!hs.burnt&&c.snow===!!hs.snow) return c;
   const b=base(hs); c=sbHouseCanvas(b); LOOK.houses.set(hs,c);
@@ -576,13 +589,13 @@ function sbHouseCanvas(b){
 // ================= landmark and reach sprites (r2S in a3b_art2.js, rSpr in a2i_reach.js): outlined in this look
 // (they keep their own key with an sb: prefix, so the Classic ones are never touched)
 { const base=r2S; r2S=function(key,w,h,ox,oy,draw){
-  if(!LOOK.sb) return base(key,w,h,ox,oy,draw);
+  if(!sbW()) return base(key,w,h,ox,oy,draw);
   const k='sb:'+key; let c=R2.spr.get(k); if(c) return c;
   c=base(k,w,h,ox,oy,draw); const o=outlineSprite(gradeCanvas(c,{sat:1.16,warm:0.2}),SBC.outline,Math.min(2,Math.max(1.3,Math.max(w,h)/60)),{force:true});
   R2.spr.set(k,o); return o;
 }; }
 { const base=rSpr; rSpr=function(key,w,h,ox,oy,fn){
-  if(!LOOK.sb) return base(key,w,h,ox,oy,fn);
+  if(!sbW()) return base(key,w,h,ox,oy,fn);
   const k='sb:'+key; let c=RSP.get(k); if(c) return c;
   c=base(k,w,h,ox,oy,fn); const o=outlineSprite(gradeCanvas(c,{sat:1.16,warm:0.2}),SBC.outline,1.6,{force:true});
   RSP.set(k,o); return o;
@@ -728,7 +741,7 @@ function lookStruct(s,t){
   }
   return false;
 }
-{ const base=drawStruct; drawStruct=function(s,t){ if(LOOK.sb&&!LOOK.off.structs&&lookStruct(s,t)) return; return base(s,t); }; }
+{ const base=drawStruct; drawStruct=function(s,t){ if(sbW()&&!LOOK.off.structs&&lookStruct(s,t)) return; return base(s,t); }; }
 
 // ================= ground decals and bridges (painted into the chunks): clean shapes with an edge line
 function lookDecal(g,dc){
@@ -785,7 +798,7 @@ function lookDecal(g,dc){
   }
   return false;
 }
-{ const base=drawDecal; drawDecal=function(g,dc){ if(LOOK.sb&&lookDecal(g,dc)) return; return base(g,dc); }; }
+{ const base=drawDecal; drawDecal=function(g,dc){ if(sbW()&&lookDecal(g,dc)) return; return base(g,dc); }; }
 function lookBridge(g,br){
   g.save(); g.translate(br.x,br.y); g.rotate(br.ang);
   const L=br.len/2, w=br.w/2, O=SBC.outline;
@@ -803,7 +816,7 @@ function lookBridge(g,br){
   }
   g.restore();
 }
-{ const base=drawBridge; drawBridge=function(g,br){ if(LOOK.sb){ lookBridge(g,br); return; } return base(g,br); }; }
+{ const base=drawBridge; drawBridge=function(g,br){ if(sbW()){ lookBridge(g,br); return; } return base(g,br); }; }
 
 // ================= atmosphere: drifting cloud shadows, a friendly day, a blue readable night
 // a few soft cloud sprites drift over the land in a slowly moving grid of 1150 px cells (about half the cells hold a
@@ -832,7 +845,7 @@ function lookClouds(t){
   ctx.restore();
 }
 { const base=ambientTint; ambientTint=function(){
-  const c0=base(); if(!LOOK.sb||!G||AREA) return c0;
+  const c0=base(); if(!sbW()||!G||AREA) return c0;
   const t=G.tod, d=daylight();
   let c=mixRGB([116,138,216],[255,255,255],d);
   const w=clamp(1-Math.min(Math.abs(t-0.25),Math.abs(t-0.75))/0.07,0,1); c=mixRGB(c,[255,196,156],w*0.45);
@@ -869,7 +882,7 @@ function lookChest(c,t){
   drawSprite(sp,c.x,c.y,1,0);
   if(!c.open) glowAt(c.x,c.y,30,'255,210,120',0.25+0.2*Math.sin(t*3+c.x));
 }
-{ const base=drawChest; drawChest=function(c,t){ if(LOOK.sb){ lookChest(c,t); return; } return base(c,t); }; }
+{ const base=drawChest; drawChest=function(c,t){ if(sbW()){ lookChest(c,t); return; } return base(c,t); }; }
 
 // ================= HUD pieces drawn on the canvas (a11b_hud.js and a11_render.js call these in this look)
 // a chunky plum panel with a cream rim, a plum edge and a little drop under it (screen px, ctx in screen space);
@@ -962,7 +975,8 @@ function lookBench(n){
 // debug: one whole frame, painted for real (best of 9)
 function lookRenderBench(n){ const now=window.__realNow||(()=>performance.now()), fl=()=>{ try{ ctx.getImageData(0,0,1,1); }catch(e){} }; let best=1e9; fl(); for(let r=0;r<9;r++){ const t0=now(); for(let i=0;i<(n||3);i++) render(); fl(); best=Math.min(best,(now()-t0)/(n||3)); } return +best.toFixed(2); }
 
-// (v12 wave 10) LOOK.re is the Realistic look. Until its Settings choice lands (LIGHT), test it with __ebX.setReal(true):
-// world drawing takes the Classic paths (LOOK.sb false) plus every LOOK.re branch.
-function setRealDbg(on){ LOOK.re=!!on; if(on) LOOK.sb=false; else LOOK.sb=store.get('eb_look','storybook')!=='classic'; lookRebuild(); return LOOK.re; }
-window.__ebX=Object.assign(window.__ebX||{},{setReal:setRealDbg,setLook,getLook:()=>LOOK.sb?'storybook':'classic',LOOK,outlineSprite,celFill,celBall,celTones,sbTone,gradeCanvas,lookRebuild,sbSprite,lookBench,lookRenderBench});
+// (v12 wave 10) LOOK.re is the Realistic look, a Settings choice (setLook('realistic')). The debug switch
+// __ebX.setReal(on) switches it for this session without saving: on is Realistic, off is the saved look (Storybook
+// when the saved look is Realistic, as before this wave).
+function setRealDbg(on){ const v=lookStored(); LOOK.re=!!on; LOOK.sb=on?false:v!=='classic'; lookSyncRow(); lookRebuild(); return LOOK.re; }
+window.__ebX=Object.assign(window.__ebX||{},{setReal:setRealDbg,setLook,getLook:lookName,LOOK,outlineSprite,celFill,celBall,celTones,sbTone,gradeCanvas,lookRebuild,sbSprite,lookBench,lookRenderBench});
