@@ -249,7 +249,7 @@ function drawSnowMist(){
     for(const f of FLAKES){ const x=((f.x*W+Math.sin(t*f.v+f.ph)*30-cam.x*zoom*0.15)%W+W)%W, y=((f.y*H+t*40*f.v-cam.y*zoom*0.15)%H+H)%H; ctx.fillRect(x,y,f.s*1.4,f.s*1.4); }
   }
   if(mistK>0.02){
-    const t=G.time; ctx.save(); ctx.globalAlpha=mistK*0.5;
+    const t=G.time; ctx.save(); ctx.globalAlpha=mistK*0.5*(LOOK.re?reMistK():1);   // (v12 LIGHT) Realistic: lit by the hour, under its own haze
     for(let i=0;i<5;i++){ const x=((i*W*0.31+t*12*(1+i*0.2)-cam.x*zoom*0.3)%(W+600)+W+600)%(W+600)-300, y=H*(0.15+i*0.18)+Math.sin(t*0.3+i)*20; const g=ctx.createRadialGradient(x,y,0,x,y,260); g.addColorStop(0,'rgba(200,215,200,.35)'); g.addColorStop(1,'rgba(200,215,200,0)'); ctx.fillStyle=g; ctx.fillRect(x-260,y-260,520,520); }
     ctx.restore();
   }

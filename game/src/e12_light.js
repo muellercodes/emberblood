@@ -158,7 +158,7 @@ const RL_AIR0=[
   {mul:[0.98,0.96,0.95],haze:[200,196,200],ha:0.03},                                     // 3 the Drakeling Crags
   {mul:[1.04,0.9,0.78],haze:[255,128,70],ha:0.07,shim:1,warm:1},                         // 4 the Cinderlands
   {mul:[0.95,1,1.08],haze:[226,236,252],ha:0.05,snow:1},                                 // 5 the Frostpine Highlands
-  {mul:[0.86,0.94,0.84],haze:[160,182,150],ha:0.13,dap:0.25,mist:1}];                    // 6 the Mirefen
+  {mul:[0.87,0.94,0.85],haze:[160,182,150],ha:0.1,dap:0.25,mist:0.85}];                    // 6 the Mirefen
 const RL_AIRM={coast:{mul:[1.02,1.02,1],haze:[232,242,252],ha:0.022,salt:1},frost:{mul:[0.95,1,1.08],haze:[226,236,252],ha:0.05,snow:1},
   moon:{mul:[0.97,0.98,1.03],haze:[200,206,236],ha:0.03,silver:1},nightfall:{mul:[0.93,0.9,1],haze:[168,128,176],ha:0.06,silver:0.4}};
 const RL_AIRN={mul:[1,1,1],haze:[0,0,0],ha:0,dap:0,shim:0,snow:0,salt:0,silver:0,warm:0,mist:0};
@@ -367,7 +367,7 @@ function reLights(){
   }
   // 3. bloom: a soft halo and a hot core on bright sources (cached glow sprites, added)
   ctx.save(); ctx.setTransform(DPR*zoom,0,0,DPR*zoom,-cam.x*zoom*DPR,-cam.y*zoom*DPR);
-  const bk=inA?0.35+0.65*N:N;
+  const bk=(inA?0.35+0.65*N:N)*(inA?1:1-0.45*Math.min(1,A.snow));   // (snow already throws the light back)
   for(const l of list){
     if(l.self||l.fx) continue; const b=RL_BLOOM[l.k]||0; if(!b) continue;   // (figures carry their own glow)
     const k=(l.k==='fire'||l.k==='ember'||l.k==='cold'?0.3+0.7*bk:bk)*b*Math.min(1,l.i*1.25); if(k<0.02||!inView(l.x,l.y,l.r*0.3)) continue;
@@ -454,6 +454,9 @@ function rlShimmer(sh,t){
   for(let y=a;y<b;y+=st){ const dx=Math.sin(t*3.7+y*0.043/DPR)*amp+Math.sin(t*5.3+y*0.11/DPR)*amp*0.4; if(Math.abs(dx)<0.25) continue; ctx.drawImage(RLS.shim,0,y,cw,st,dx,y,cw,st); }
   ctx.restore();
 }
+
+// the old mist banks (drawSnowMist) in this look: lit by the light of the hour, and lighter under this look's own haze
+function reMistK(){ return clamp(rlLum(RLS.base)/235,0.15,1)*0.6; }
 
 // ---------- 9. shadows: the shadow layer for what stands still, a cast and a contact shadow for every figure
 // (called by render in a11_render.js before the props and figures are drawn; the world transform is set)
