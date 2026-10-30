@@ -121,8 +121,8 @@ people({
         re: [
           { t: ["That's Auntie Glee. She'll wake up hungry.", 'She will wake up hungry.'],
             say: ["Then she can have the frozen milk. It's hers, really.", 'Then she can have the frozen milk.'] },
-          { t: ['Should I wake her up?', 'Should I wake her?'],
-            say: ["Let her sleep. She told me she's slept through too much already. I think this is the good kind.", 'Let her sleep. This is the good kind of sleep.'] },
+          { t: ['Free ice cream for the whole village!', 'Free ice cream for everyone!'],
+            say: ["That's the worst joke you've made all year. Let her sleep. She says she's slept through too much already. This is the good kind.", 'Worst joke all year. Let her sleep. This is the good kind.'] },
           { t: ['Can she stay for Lantern Day?', 'Can she stay?'], tone: 'kind', f: 0.5,
             say: ["She's family. Family doesn't have to ask.", 'She is family. She does not have to ask.'] },
         ] },
@@ -505,7 +505,7 @@ people({
             say: ["Right here, tied up, engine warm. I'm good at waiting. Ask any fish.", 'Right here. I am good at waiting.'] },
         ] },
       { if: 'flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
-        say: ['Fish are not biting. Even the fish know something is wrong with the sky.', 'Even the fish know the sky is wrong.'],
+        say: ["Fish aren't biting. Even the fish think there's something fishy about the sky.", 'Even the fish know the sky is wrong.'],
         re: [
           { t: ['What do fish do without a moon?', 'What do fish do now?'],
             say: ['Same as me. Sit very still and look up.', 'Sit still and look up. Like me.'] },
@@ -530,7 +530,7 @@ people({
         say: ['Eleven days by boat. Less by dragon, if you don\'t mind ice in your ears.', 'Eleven days by boat. Less by dragon.'] },
       { ask: ['Does Minnow know you came all this way?', 'Does Minnow know?'],
         say: ["She wrote: \"Bring me a moon fish.\" I don't know what that is. I'm going to find one.", 'She wants a moon fish. I will find one.'] },
-      { idle: [['Plenty of time on a pier. Ask away.', 'Ask away.'], ["Lines are in. What's up?", "What's up?"]] },
+      { idle: [['Plenty of time on a pier. Water you want to know?', 'Ask away.'], ["Lines are in. What's up?", "What's up?"]] },
       { bye: [['Tight lines, Ash. Come back down.', 'Tight lines!']] },
     ],
 
@@ -587,7 +587,7 @@ people({
       { ask: ['What is the bigger spoon for?', 'What is the big spoon for?'],
         say: ["For a bigger pot. Tock says it's a ladle. It is a bigger spoon.", 'For a bigger pot. It is not a ladle.'] },
       { idle: [['Hello! Are you hungry? You look hungry.', 'Are you hungry?'], ['I have flour on my nose. Leave it. What?', 'What?']] },
-      { bye: [['Bye! Lumpy means good luck!', 'Bye! Good luck!']] },
+      { bye: [['Bun voyage! Lumpy means good luck!', 'Bye! Good luck!']] },
     ],
 
     // ======================================================================= (v12 PEAK) the friends on Nightfall Peak
@@ -1095,7 +1095,7 @@ people({
       { if: 'flag n_dawn', say: [["Every song I know is a happy one this week. It is very strange.", "All my songs are happy now."]] },
       { ask: ['How is Dell, out at sea?', 'How is Dell?'],
         say: ['At the end of the world, with a boat and a kettle. The happiest man alive.', 'Happy, with a boat and a kettle.'] },
-      { idle: [['Hm? Hold on, I nearly had a tune.', 'Hold on. A tune!'], ['Go on. I can tune and talk.', 'Go on.']] },
+      { idle: [['Hm? Hold on, I nearly had a tune.', 'Hold on. A tune!'], ["Go on. We're both good with scales.", 'Go on.']] },
       { bye: [['Mind how you go. And hum something.', 'Hum something!']] },
     ],
 
@@ -1194,7 +1194,7 @@ people({
             say: ["I always do. He pretends it's an accident. So do I.", 'I always do. We both pretend.'] },
         ] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone',
-        say: ['I baked a loaf shaped like the moon, so the village has one to look at.', 'I baked a moon-shaped loaf.'],
+        say: ["I baked a loaf shaped like the moon, so the village has one to look at. Best thing I've ever kneaded.", 'I baked a moon-shaped loaf.'],
         re: [
           { t: ['Can I have a slice of moon?', 'A slice of moon?'],
             say: ["A thin one. It's got to last.", 'A thin one. It must last.'] },
@@ -1298,7 +1298,7 @@ people({
             say: ["Moon hats. Marigold's sold out, so I'm selling the boxes.", "Moon hats. I sell Marigold's boxes."] },
         ] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone', say: [["Lanterns! Candles! Spare moons, out of stock!", "Lanterns! Candles!"]] },
-      { if: 'flag n_dawn', fact: 'n5_moon=back', say: [["Moon hats, moon cutters, moon jars! Everything moon!", "Everything moon!"]] },
+      { if: 'flag n_dawn', fact: 'n5_moon=back', say: [["Moon hats, moon cutters, moon jars! It's only a phase, so buy now!", "Everything moon! Buy now!"]] },
       { ask: ['Did you sail at night, as a pirate?', 'Did pirates sail at night?'],
         say: ['Only at night. In the daytime the ducks could see us coming.', 'Only at night. The ducks saw us in the day.'] },
       { idle: [['Buying or browsing? Either is fine. Buying is finer.', 'Buying?'], ['Step up! What can I do you for?', 'Yes?']] },
@@ -1357,7 +1357,7 @@ people({
           { t: ['Do I have to wear a ribbon?', 'Must I wear a ribbon?'],
             say: ['One. On the horn. It will be very dignified.', 'One, on the horn. Very dignified.'] },
         ] },
-      { if: '!flag n_dawn', say: [["I have cancelled the Long Night again. Still no reply.", "I cancelled the Long Night again."]] },
+      { if: '!flag n_dawn', say: [["I have cancelled the Long Night again. The sky is being very dark about it.", "I cancelled the Long Night again."]] },
       { if: 'flag n_dawn', say: [["Two hundred and twelve ribbons for the parade. Elder Yara checked.", "Two hundred ribbons for the parade!"]] },
       { ask: ['What would your ancestor have done?', 'What would your ancestor do?'],
         say: ['Named the dark after himself. The Brindle Dark. Nobody else would have called it that.', 'Named it after himself. Nobody else would.'] },
@@ -1676,7 +1676,7 @@ people({
             say: ['Ulf says a lot of things. Loudly.', 'Ulf says lots of things.'] },
         ] },
       { if: '!flag n_dawn', say: [["I'm guarding the Lodge fire. It's going very well.", "I am guarding the fire."]] },
-      { if: 'flag n_dawn', say: [["Still warm. Still not moving.", "Still warm."]] },
+      { if: 'flag n_dawn', say: [["Still warm. Still not moving. Ice to be warm, isn't it?", "Still warm."]] },
       { ask: ['Were you ever scared, adventuring?', 'Were you ever scared?'],
         say: ['Every day. Then one day I was frozen, and I was not anything at all. Scared is better.', 'Every day. Frozen was worse. Scared is better.'] },
       { idle: [['Mm? Shut the door. The warm gets out.', 'Shut the door.'], ['Still warm. Go on.', 'Go on.']] },
@@ -1834,7 +1834,7 @@ people({
       { if: 'flag n_dawn', say: [["Soup. In the light. Still soup.", "Soup in the light."]] },
       { ask: ['Is Gorran eating?', 'Is Gorran eating?'],
         say: ['Gorran eats when he is worried. He has had four bowls.', 'He eats when worried. Four bowls.'] },
-      { idle: [['Hungry? You look hungry.', 'Hungry?'], ['Sit. Soup. Talk.', 'Sit.']] },
+      { idle: [['Hungry? You look hungry.', 'Hungry?'], ["Sit. Soup's on, and it rocks.", 'Sit.']] },
       { bye: [['Take a rock for luck!', 'Take a rock!']] },
     ],
 
