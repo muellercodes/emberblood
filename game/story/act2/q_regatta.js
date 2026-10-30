@@ -6,7 +6,7 @@
 // whistle.
 quest({
   id: 'c_regatta', act: 2, giver: 'c_jo', optional: true, takeover: true,
-  title: ['The Harbor Regatta', 'The Harbor Regatta'],
+  title: ['Pier Pressure', 'The Harbor Regatta'],
   payoff: { kind: 'shortcut', id: 'c_skiffs' },
   old_steps: ['race', 'whistle'],
 

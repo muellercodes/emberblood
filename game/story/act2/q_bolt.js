@@ -6,7 +6,7 @@
 // Old saves: QDEFS.c_bolt steps 0..2 map to chase, clean, home. The gear panel and the breath stay x1_people's.
 quest({
   id: 'c_bolt', act: 2, giver: 'c_hettie', optional: true, takeover: true,
-  title: ['A Dog Made of Brass', 'A Dog Made of Brass'],
+  title: ['Nuts and Bolt', 'A Dog Made of Brass'],
   payoff: { kind: 'ally', id: 'c_bolt' },
   old_steps: ['chase', 'clean', 'home'],
 

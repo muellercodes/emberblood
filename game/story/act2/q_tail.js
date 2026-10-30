@@ -7,7 +7,7 @@
 // x1_foes c1SpringDrop) and the windy weathervane stay old mechanics (legacy steps).
 quest({
   id: 'c_tail', act: 2, giver: 'c_hettie', optional: true, takeover: true,
-  title: ['The Longer Tail', 'The Longer Tail'],
+  title: ['A Tall Tail', 'The Longer Tail'],
   payoff: { kind: 'upgrade', id: 'c_reel' },
   old_steps: ['springs', 'vane', 'reel'],
 

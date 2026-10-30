@@ -135,7 +135,7 @@ function x1pHat(item){ const h=X1P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 const X1P_STAGES=['c_coast','c_gear','c_salt','c_claws','c_brass','c_light','c_spire','c_snow'];
 function x1pStagesFallback(){
   const miss=X1P_STAGES.filter(s=>stageAt(s)<0); if(!miss.length) return;
-  const CH={c_gear:'The City of Clocks',c_salt:'The Turning Library',c_claws:'The Turning Library',c_brass:'The Brassworks',c_light:'The Spinning Lighthouse',c_spire:'The Shadow Spire',c_snow:'The Breakwater'};
+  const CH={c_gear:S('Against the Clock','The City of Clocks'),c_salt:S('Turning the Tide','The Turning Library'),c_claws:S('Turning the Tide','The Turning Library'),c_brass:S('All Wound Up','The Brassworks'),c_light:S('Moth to a Flame','The Spinning Lighthouse'),c_spire:'The Shadow Spire',c_snow:'The Breakwater'};
   if(typeof defineStages==='function') defineStages(2,miss.map(id=>({id,chapter:CH[id]||'The Clockwork Coast'})));
   else for(const s of miss) STAGES.push(s);
 }
@@ -726,11 +726,11 @@ Object.assign(QDEFS,{
       {t:'flag',flag:'c_oona_lit',text:S('Light Granny Oona’s old stove. Gently.','Light Granny Oona’s stove. Gently!'),at:()=>DOORS.some(d=>d.area==='h_c_oona')?'area:h_c_oona':'npc:c_oona'},
       {t:'talk',npc:'c_oona',text:S('Sit with Granny Oona by the fire','Sit with Granny Oona by the fire'),lines:'c_oona_fire',reward:{xp:250,x1p:()=>{ giveItems({c_scarf:1,c_biscuit:3},true); x1pHat('c_scarf'); setBanner(S('The Saltwhistle Scarf','The Saltwhistle Scarf'),S('And three very old biscuits. They heal you when you are hurt.','And 3 old biscuits. They heal you.'),3); }}},
       {t:'flag',flag:'c_oona_note',text:S('Get some rest on the coast tonight (a shrine or an inn)','Rest at a shrine or an inn'),reward:{xp:250}}]},
-  c_notes:{title:S('Notes in the Rafters','Notes in the Rafters'),min:'c_brass',
+  c_notes:{title:S('High Notes','Notes in the Rafters'),min:'c_brass',
     steps:[
       {t:'flags',flags:['c_note3','c_note4','c_note5'],n:3,text:S('Find the Moth Mask’s other note drops: the Gull’s Rest chimney, the top of a harbor crane, behind the Cogwater Falls','Find 3 notes: a chimney, a crane, behind the falls'),at:()=>x1pNextNote()},
       {t:'flag',flag:'c_note6',text:S('One more note waits in the Moth Wood, at the Moon Ring','The last note is at the Moon Ring'),at:'lm:c_lm_note6',reward:{xp:500,x1p:()=>{ if(x1pKind()>=2) x1pTrust(1); }}}]},
-  c_gifts:{title:S('The Moth Mask’s Gifts','The Moth Mask’s Gifts'),giver:'c_penny',min:'c_salt',
+  c_gifts:{title:S('Face the Music','The Moth Mask’s Gifts'),giver:'c_penny',min:'c_salt',
     offer:[x1pL('c_penny',`HEADLINE: MOTH MASK STEALS GOLDEN MUSIC BOX. LORD WHIRLIGIG FAINTS. TWICE.`,`HEADLINE: MOTH MASK STEALS MUSIC BOX!`),
       x1pL('c_penny',`Every time she robs someone, the stuff turns up in Saltmarsh. Roof tiles. Medicine. Once a whole goose. If we follow the music box, we follow HER. Scoop of the century. Help me?`,`Her loot ends up in Saltmarsh. Follow the box, find HER! Help me?`)],
     steps:[
@@ -741,7 +741,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'c_posy',text:S('Talk to Little Posy in Saltmarsh','Talk to Little Posy'),lines:'c_gifts_posy'},
       {t:'talk',npc:'c_whirligig',text:S('Tell Lord Whirligig what you found','Tell Lord Whirligig'),lines:'c_gifts_tell'},
       {t:'talk',npc:'c_penny',text:S('Give Penny her story','Tell Penny the story'),lines:'c_gifts_penny',reward:{xp:500,x1p:()=>{ giveItems({c_newscap:1},true); x1pHat('c_newscap'); if(G.flags.c_gifts!=='taken') addCoins(40,player.x,player.y); setBanner(S('Penny’s Press Pass','Press Pass'),S('A newsboy cap. You look very official.','A cap. Very official!'),2.6); }}}]},
-  c_whip:{title:S('The Ghost of the Saucy Gull','The Ghost of the Saucy Gull'),giver:'c_tarbuckle',min:'c_salt',
+  c_whip:{title:S('Supper-natural','The Ghost of the Saucy Gull'),giver:'c_tarbuckle',min:'c_salt',
     offer:[x1pL('c_tarbuckle',`In my day there was a pirate on this coast called Captain Saltbeard. Beard so salty you could season soup with it. We sailed together. Then apart. Then into each other.`,`There was a pirate called Captain Saltbeard. We sailed together. Then we crashed.`),
       x1pL('c_tarbuckle',`His ship, the Saucy Gull, went down on the Rockpools forty years ago. On dark nights, at low tide, you can still hear his anchor chain. Clank. Clank. He's out there.`,`His ship sank on the Rockpools. At night you hear his chain. Clank. Clank.`),
       x1pL('c_tarbuckle',`He died hungry, you know. Missed his supper the night she sank. Old Charlie's grandpa's Ghost Pepper Chowder. Ghosts don't forget a missed supper.`,`He missed his supper. Ghost Pepper Chowder. Ghosts don't forget.`),
@@ -757,7 +757,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'c_ingrid',take:{c_chain:1},text:S('Take the anchor chain to Ingrid at the Bright Anvil','Take the chain to Ingrid'),lines:[x1pL('c_ingrid',`An anchor chain off a ghost ship? JA! This is the best day of my life! Hammer, hammer, ding! Give me one minute.`,`A ghost's chain? JA! Best day ever! One minute.`),
         x1pN(`CLANG. CLANG. CLANG. Sparks, steam, singing. Ingrid holds up a chain with a curved brass grip at one end and a heavy hook at the other.`,`CLANG! CLANG! Ingrid holds up a chain with a hook.`),
         x1pL('c_ingrid',`The Chain Whip! Crack it and it reaches far. It pulls things. Shields, crabs, levers, the odd baron. Swing it round your head for a big crack. Mind your horns.`,`The Chain Whip! It reaches far and pulls things. Mind your horns!`)],reward:{weapon:'whip',coins:60,xp:1000}}]},
-  c_bolt:{title:S('A Dog Made of Brass','A Dog Made of Brass'),giver:'c_hettie',min:'c_light',ab:'grapple',
+  c_bolt:{title:S('Nuts and Bolt','A Dog Made of Brass'),giver:'c_hettie',min:'c_light',ab:'grapple',
     offer:[x1pL('c_hettie',`Ash. You've got a TAIL that GRABS things. That's wonderful. Unrelated question. Can you grab a dog?`,`Your tail grabs things! Can you grab a dog?`),
       x1pL('c_hettie',`Bolt! My brass dog. He ran off the night the moths came. Dust in his nose gears. He sneezes every five seconds and he's terrified of his own sneezes.`,`My brass dog Bolt ran off. He sneezes and it scares him.`),
       x1pL('c_hettie',`Penny's board says he's up on the harbor cranes. He climbs things when he's scared. I built him that way. I regret it.`,`He's up on the harbor cranes. He climbs when he's scared.`)],
@@ -767,7 +767,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'c_hettie',text:S('Talk to Professor Hettie','Talk to Professor Hettie'),lines:[x1pL('c_hettie',`BOLT! Oh, you clanky idiot. Come here.`,`BOLT! You clanky silly. Come here.`),
         x1pL('c_hettie',`He likes you, Ash. Take him along, if you like. He's got a nose for shadows. He can smell a fib from a mile away. He barked at Lord Whirligig for an hour once. Whirligig had said he'd "never once been late."`,`He likes you! Take him along. He can smell a fib a mile away.`),
         x1pL('c_bolt',`Bark! (whirr) Bark bark! (tick)`,`Bark! Bark bark!`)],reward:{xp:500,x1p:()=>{ G.flags.c_bolt_follow=false; recruitComp('c_bolt'); }}}]},
-  c_tail:{title:S('The Longer Tail','The Longer Tail'),giver:'c_hettie',min:'c_brass',ab:'grapple',
+  c_tail:{title:S('A Tall Tail','The Longer Tail'),giver:'c_hettie',min:'c_brass',ab:'grapple',
     offer:[x1pL('c_hettie',`May I see your tail? Professionally. Oh, it's MAGNIFICENT. Pearl's hook! I've only ever seen drawings.`,`Can I see your tail? Pearl's hook! Wonderful!`),
       x1pL('c_hettie',`I could make it marvel-ier. A reel, inside the hook. You'd pull things TO you. Little crabs. Big shields. Biscuits off high shelves.`,`I can add a reel. You'd pull things to you!`),
       x1pL('c_hettie',`I need three spring cores from Steam Rams. They only pop out when a Ram's knocked dizzy. And the old mainspring off the Clockwatch weathervane. Captain Ticklebrass will say no. Don't ask her.`,`Bring 3 springs from dizzy Steam Rams. And the spring on the weathervane. Don't tell Hester.`)],
@@ -776,12 +776,12 @@ Object.assign(QDEFS,{
       {t:'flag',flag:'c_mainspring',text:S('Fetch the old mainspring from the Clockwatch Hall’s weathervane','Get the spring from the weathervane'),at:'lm:c_lm_vane'},
       {t:'talk',npc:'c_hettie',take:{c_spring:3,c_mainspring:1},text:S('Bring the springs to Professor Hettie','Bring the springs to Hettie'),lines:[x1pL('c_hettie',`There! The Reel-In. Grapple a shield and PULL. Grapple a crab and PULL. Grapple Lord Whirligig and... don't grapple Lord Whirligig.`,`The Reel-In! Grab a shield and PULL! Not Lord Whirligig.`),
         x1pL('c_hester',`(from somewhere up the hill) WHO TOOK MY WEATHERVANE SPRING?`,`(far away) WHO TOOK MY SPRING?`)],reward:{xp:500,x1p:()=>{ G.flags.c_reel=true; setBanner(S('Reel-In!','Reel-In!'),S('Your Grapple Tail reaches farther. Aim it at a shield or a small foe and it pulls them to you.','Your tail reaches farther. It pulls shields and small foes.'),3.4); }}}]},
-  c_logbook:{title:S('Pearl’s Logbook','Pearl’s Logbook'),giver:'c_ottoline',min:'c_salt',
+  c_logbook:{title:S('Long Overdue','Pearl’s Logbook'),giver:'c_ottoline',min:'c_salt',
     offer:[x1pL('c_ottoline',`Mother Pearl kept a logbook. Every day of her life on this coast. It's the city's greatest treasure. And six of its pages are MISSING. Sorry. Missing.`,`Pearl's logbook is missing six pages! Sorry. Missing.`),
       x1pL('c_ottoline',`They blew away in the great storm three hundred years ago. A very windy librarian. Not me. Somebody long before me.`,`They blew away in a storm long ago.`),
       x1pL('c_ottoline',`If you find any pages in Pearl's old places, bring them here. I'll pay you in coins. And in being quiet. Mostly coins.`,`Find them in Pearl's old places. Bring them here. I'll pay.`)],
     steps:[{t:'flag',flag:'c_logbook_done',text:S('Find the six lost pages of Pearl’s Logbook and bring them to Archivist Ottoline','Find Pearl’s 6 pages. Bring them to Ottoline.'),at:()=>x1pPagesHeld()>0?'npc:c_ottoline':x1pR('c_light')?'lm:c_lm_gullisle':null}]},
-  c_regatta:{title:S('The Harbor Regatta','The Harbor Regatta'),giver:'c_jo',min:'c_brass',ab:'skimmer',
+  c_regatta:{title:S('Pier Pressure','The Harbor Regatta'),giver:'c_jo',min:'c_brass',ab:'skimmer',
     offer:[x1pL('c_jo',`Ahoy, lizard! The chain's up, the harbor's open, and it's REGATTA DAY. Every year I win. Every year I win by more.`,`The harbor is open! It's REGATTA DAY! I always win.`),
       x1pL('c_jo',`Eight buoys, round the harbor, out the mouth and back. Boats only. ...You don't have a boat. You've got feet.`,`Eight buoys round the harbor. Boats only. You have feet.`),
       x1pL('ash',`I can skip.`,`I can skip.`),x1pL('c_jo',`You can WHAT?`,`You can WHAT?`)],
@@ -791,7 +791,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'c_jo',text:S('Talk to Skipper Jo','Talk to Skipper Jo'),lines:[x1pL('c_jo',`You BEAT me. On FOOT. On WATER. That's not allowed. I'm checking the rules. ...It's allowed. Barnacles.`,`You BEAT me! On FOOT! ...It's allowed. Barnacles.`),
         x1pL('c_jo',`Here. My skiff whistle. Blow it at any landing and one of my cousins will row you anywhere on the coast. I've got a lot of cousins.`,`Here's my skiff whistle. My cousins will row you anywhere.`),
         x1pL('c_mo',`(from the Harbor Office) THE DRAGON WINS THE REGATTA! BARNACLES! Somebody write that down!`,`(far away) THE DRAGON WINS! Write it down!`),x1pL('c_penny',`Already did.`,`Already did.`)],reward:{coins:50,xp:500,x1p:()=>{ G.flags.c_skiffs=true; setBanner(S('The Skiff Whistle','The Skiff Whistle'),S('At a skiff landing, call a skiff to row you to any other landing on the coast.','Call a skiff at a landing. It rows you anywhere.'),3.4); }}}]},
-  c_chalk:{title:S('The Chalk Dragon','The Chalk Dragon'),giver:'c_barley',min:'c_coast',ab:'dbljump',
+  c_chalk:{title:S('Toe the Line','The Chalk Dragon'),giver:'c_barley',min:'c_coast',ab:'dbljump',
     offer:[x1pL('c_barley',`See the hill? Look close. That grey shape. That's the Chalk Dragon. Mother Pearl cut it into the hill, longer ago than anybody can count. Scraped the grass off, down to the white chalk.`,`See the grey shape on the hill? The Chalk Dragon. Pearl cut it long ago.`),
       x1pL('c_barley',`She did it for her mother. So her mother, flying high, could look down and see a dragon waving up at her. Gerald thinks that's the nicest thing he ever heard. Gerald fainted.`,`She made it for her mom, so she could see it from the sky. Gerald fainted.`),
       x1pL('c_barley',`It's gone grey now. Grass and moth dust. Walk the old line, would you? Your feet are warm. Chalk likes warm feet.`,`It's grey now. Walk the old line? Chalk likes warm feet.`)],
@@ -800,7 +800,7 @@ Object.assign(QDEFS,{
         ready:[x1pL('c_barley',`Step on every mark, in order, all the way round. Head, wing, tail, legs. Two bits go up the steep steps, so hop high. And don't let anything knock you about, or the line fades.`,`Step on every mark in order. Hop high on the steps. Don't get hit!`),x1pL('c_barley',`Ready, young dragon?`,`Ready?`)]},
       {t:'flag',flag:'c_chalk_eye',text:S('Look into the dragon’s eye at the top of the hill','Look into the dragon’s eye'),at:'lm:c_lm_eye'},
       {t:'talk',npc:'c_barley',text:S('Tell Old Barley','Tell Old Barley'),lines:[x1pL('c_barley',`I saw her from down here. White as a gull. Waving. My wife would've cried. I did, a bit. Gerald fainted.`,`I saw her. White as a gull! I cried a bit. Gerald fainted.`),x1pL('c_barley',`Here. It's not much. It's what's in the tin.`,`Here. It's what's in the tin.`)],reward:{coins:40,xp:500}}]},
-  c_bob:{title:S('The Third Bob','The Third Bob'),giver:'c_bobs',min:'c_brass',
+  c_bob:{title:S('Odd Bob Out','The Third Bob'),giver:'c_bobs',min:'c_brass',
     offer:[x1pL('c_bobs',`There used to be three of us. Bob, Bob, and Bob.`,`There were three of us. Bob, Bob and Bob.`),
       x1pL('c_bobs',`The night the moths came, Bob went funny. Silver dust in his ears. He walked off into the Brass Yards going "tick tock tick tock" in a scary voice.`,`The moths came. Bob went funny. He walked off to the Brass Yards.`),
       x1pL('c_bobs',`He's got a blue plume. Bring him home? Gently? He's the clever Bob.`,`He has a blue plume. Bring him home? Gently?`),x1pL('c_bobs',`He is NOT the clever Bob.`,`He is NOT the clever Bob.`)],
@@ -1135,7 +1135,7 @@ if(typeof defineBoss==='function') defineBoss('c_saucygull',{boss:'c_saltbeard',
 { const base=objectiveList; objectiveList=function(){ return base().filter(o=>o.site!=='c_saucygull'); }; }
 function x1pStandInFoes(){
   if(typeof defineFoe!=='function'||typeof FK==='undefined') return;
-  if(!EDEF.c_saltbeard) defineFoe('c_saltbeard',{boss:true,name:'Captain Saltbeard’s Ghost',title:S('The Ghost of the Saucy Gull','The ghost pirate'),short:'Saltbeard',r:22,hp:1100,speed:120,dmg:14,value:1000,lv:11,kbRes:0.1,dcol:'160,220,255',phases:[0.5],
+  if(!EDEF.c_saltbeard) defineFoe('c_saltbeard',{boss:true,name:'Captain Saltbeard’s Ghost',title:S('The Hungriest Ghost on the Coast','The ghost pirate'),short:'Saltbeard',r:22,hp:1100,speed:120,dmg:14,value:1000,lv:11,kbRes:0.1,dcol:'160,220,255',phases:[0.5],
     ai:FK.brain({move:'approach',stop:60,turn:2.2,cd:[0.9,1.5],moves:[{k:'slash',reach:80,half:1.1,windup:0.6,dmgN:14,kb:280,w:2},{k:'charge',min:120,max:460,dmgN:16,w:1}]}),
     draw3d:(e,fl)=>{ if(typeof foKnight==='function') foKnight(e,fl,false,false); }});
 }

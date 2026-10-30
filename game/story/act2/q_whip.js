@@ -8,7 +8,7 @@
 // the STORY keys c_saltbeard_intro and c_saltbeard_won, replaced here (defineBoss holds those arrays).
 quest({
   id: 'c_whip', act: 2, giver: 'c_tarbuckle', optional: true, takeover: true,
-  title: ['The Ghost of the Saucy Gull', 'The Ghost of the Saucy Gull'],
+  title: ['Supper-natural', 'The Ghost of the Saucy Gull'],
   payoff: { kind: 'power', id: 'whip' },
   old_steps: ['charlie', 'peppers', 'brew', 'ghost', 'elias', 'forge'],
 

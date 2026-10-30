@@ -7,7 +7,7 @@
 // ending, Penny's Press Pass. Old saves: QDEFS.c_gifts steps 0..5 map to lord, fig, prints, posy, tell, penny.
 quest({
   id: 'c_gifts', act: 2, giver: 'c_penny', optional: true, takeover: true,
-  title: ["The Moth Mask's Gifts", "The Moth Mask's Gifts"],
+  title: ['Face the Music', "The Moth Mask's Gifts"],
   payoff: { kind: 'truth', id: 'q_box_initials' },
   old_steps: ['lord', 'fig', 'prints', 'posy', 'tell', 'penny'],
 

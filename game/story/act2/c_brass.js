@@ -8,9 +8,9 @@
 // note from Vesper. Then, on screen, the Great Clock strikes, and on a chimney beside it Vesper pushes her mask up.
 chapter({
   id: 'c_brass', act: 2, after: 'c_claws', next: 'c_light', takeover: true,
-  card: ['Act II · Chapter 6', 'The Brassworks'],
+  card: ['Act II · Chapter 6', ['All Wound Up', 'The Brassworks']],
   so_far: [
-    "In the Gullcrag Caves, Pearl's voice gave Ash her Climbing Claws. Vesper was waiting on the cliff top, and when she glided away, his new claws fit her claw marks exactly. Now Ash can climb the Great Clock, the way she does.",
+    "In the Gullcrag Caves, Pearl's voice gave Ash her Climbing Claws. Vesper was waiting on the cliff top, and when she glided away, his new claws fit her claw marks exactly. Now Ash can climb the Great Clock, the way she does. Nobody has put up a sign about dragons.",
     "Ash got Pearl's Climbing Claws. They fit Vesper's claw marks. Now he can climb the Great Clock."],
   hint: ['Climb the Great Clock to the hatch at the very top. Then ask Clockkeeper Ambrose. The way into the Brassworks is up its old smokestack in the Brass Yards.',
     'Climb the clock. Ask the Clockkeeper. Then climb the smokestack.'],

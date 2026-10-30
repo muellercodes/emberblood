@@ -1,9 +1,9 @@
 // game/story/act2/c_gear.js
 chapter({
   id: 'c_gear', act: 2, after: 'c_coast', next: 'c_salt',
-  card: ['Act II · Chapter 4', 'The City of Clocks'],   // (the game counts the heist's two chapters first)
+  card: ['Act II · Chapter 4', ['Against the Clock', 'The City of Clocks']],   // (the game counts the heist's two chapters first)
   so_far: [
-    "Old Barley saw the Moth Mask glide down to Gearhaven with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with moth dust. Now Ash has reached the city of clocks.",
+    "Old Barley saw the Moth Mask glide down to Gearhaven with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with moth dust. (Gerald has been fainting ever since.) Now Ash has reached the city of clocks.",
     'Barley saw the Moth Mask fly to Gearhaven. Something bigger made Gerald silver. Ash is in the city of clocks.'],
 
   // New things this chapter adds to map 1. Things x1_world already draws
