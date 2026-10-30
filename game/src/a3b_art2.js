@@ -854,8 +854,8 @@ function drawPot(x,y,k,v){ r2put(r2PotSpr(k,v==null?Math.abs(Math.round(x*0.37+y
 function r2Shards(x,y,k){ ctx.fillStyle=k==='barrel'?'rgba(110,70,36,.75)':k==='sack'?'rgba(216,200,160,.6)':'rgba(170,90,50,.7)'; for(let i=0;i<5;i++){ const a=i*1.7, d=6+((i*5)%5); ctx.save(); ctx.translate(x+Math.cos(a)*d,y+Math.sin(a)*d*0.7); ctx.rotate(a); ctx.fillRect(-2.5,-1.5,5,3); ctx.restore(); } if(k==='sack'){ ctx.fillStyle='rgba(250,245,235,.35)'; ctx.beginPath(); ctx.ellipse(x,y+2,10,5,0,0,TAU); ctx.fill(); } }
 FL.barrel=FL.pot=FL.sack=(o,t)=>{ if(o.broken) r2Shards(o.x,o.y,o.k); else drawPot(o.x,o.y,o.k); };
 FL.shelf=(o,t)=>{ if(o.page&&!G.pages[o.page]) glowAt(o.x,o.y,26,'255,240,200',0.2+0.12*Math.sin(t*3)); };
-function drawFurn(o,t){
-  if(LOOK.re&&!RZ2.on){ RZ2.on++; try{ drawFurn(o,t); } finally{ RZ2.on--; } return; }
+function drawFurn(o,t){ if(LOOK.re){ RZ2.on++; try{ drawFurn0(o,t); } finally{ RZ2.on--; } return; } drawFurn0(o,t); }
+function drawFurn0(o,t){
   if(typeof drawFurnX==='function'&&drawFurnX(o,t)) return;
   const F=FB[o.k], L=FL[o.k];
   if(F||L){ if(F&&!(o._r2b&&AREA&&AREA._bk)){ ctx.save(); F(ctx,o,AREA&&AREA.kind==='house'?r2Room(AREA):r2CaveR()); ctx.restore(); } if(L) L(o,t); return; }
