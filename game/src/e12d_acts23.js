@@ -563,7 +563,7 @@ function* reArtG(cv,o){
       if(m!==REA.EMIT){ r*=k; gg*=k; b*=k; }
       d[i*4]=r; d[i*4+1]=gg; d[i*4+2]=b;
       h[i]=(0.299*r+0.587*gg+0.114*b)/255*bump; }
-    if((y+1)%Math.max(1,Math.floor(3000/W))===0) yield;
+    if((y+1)%Math.max(1,Math.floor(2000/W))===0) yield;
   }
   // 2. the relief at the outline, then the blurred height for creases and occlusion
   const tmp=new Float32Array(n), ab=new Float32Array(n), hb=new Float32Array(n), hb2=new Float32Array(n), edge=(o.edge==null?2:o.edge)*sc*0.5;
@@ -585,7 +585,7 @@ function* reArtG(cv,o){
       const sp=REA_SP[m]; if(sp>0){ const nh=nx*Hx+ny*Hy+nz*Hz; if(nh>0){ let s=Math.pow(nh,REA_PW[m])*sp*255*Math.min(1,oc); if(m===REA.SNOW&&rzHash(x,y,7)>0.985) s+=120*dif; R+=s; G2+=s*0.97; B+=s*0.9; } }
       const l=0.299*R+0.587*G2+0.114*B; R=l+(R-l)*sat; G2=l+(G2-l)*sat; B=l+(B-l)*sat;
       d[i*4]=R<0?0:R>255?255:R; d[i*4+1]=G2<0?0:G2>255?255:G2; d[i*4+2]=B<0?0:B>255?255:B; }
-    if((y+1)%Math.max(1,Math.floor(3000/W))===0) yield;
+    if((y+1)%Math.max(1,Math.floor(2000/W))===0) yield;
   }
   g.putImageData(id,0,0);
   return cv;
@@ -638,6 +638,7 @@ function reTall(pre,key,w,h,bx,by,draw,base,o){
   const J0=REQ.jobs.get(k); if(J0&&J0.cv) return J0.cv;
   const make=()=>{ const sc=2, cv=mkCanvas(Math.ceil(w*sc),Math.ceil(h*sc)), g0=cv.getContext('2d'); g0.scale(sc,sc); g0.translate(bx,by); g0.lineCap='round'; g0.lineJoin='round';
     const g=reSoftCtx(g0), was=SBC.outline; RE1.paint++; SBC.outline=RE1.real; try{ draw(g); } finally{ RE1.paint--; SBC.outline=was; }
+    if(RE_SOOT.test(key)) reSoot(g0,w,h,bx,by);
     cv.ox=bx; cv.oy=by; cv.w2=w; cv.h2=h; cv.ww=w; cv.hh=h;
     return {cv,o:Object.assign({sc,base:by,seed:k.length*31+7},o||{}),fin:c=>{ c.ox=bx; c.oy=by; c.w2=w; c.h2=h; c.ww=w; c.hh=h; return c; }}; };
   reArtAsk(k,make);
@@ -645,6 +646,10 @@ function reTall(pre,key,w,h,bx,by,draw,base,o){
   const J=REQ.jobs.get(k); if(J&&!J.it){ const r=make(); J.cv=r.cv; J.fin=r.fin; J.it=reArtG(r.cv,r.o); J.n=0; return r.cv; }
   return J&&J.cv?J.cv:base();
 }
+// soot: chimneys, stacks, mills and the works darken toward their tops (laid over the drawn pixels only)
+const RE_SOOT=/^(chim|stack|mill|works|smoke|forge|kiln)/;
+function reSoot(g,w,h,bx,by){ g.save(); g.globalCompositeOperation='source-atop'; const gr=g.createLinearGradient(0,-by,0,-by+h*0.45); gr.addColorStop(0,'rgba(24,20,20,.55)'); gr.addColorStop(0.35,'rgba(30,26,24,.22)'); gr.addColorStop(1,'rgba(30,26,24,0)'); g.fillStyle=gr; g.fillRect(-bx,-by,w,h*0.45);
+  for(let i=0;i<5;i++){ const x=-bx+w*(0.15+i*0.17), sg=g.createLinearGradient(0,-by,0,-by+h*0.6); sg.addColorStop(0,'rgba(20,16,16,.18)'); sg.addColorStop(1,'rgba(20,16,16,0)'); g.fillStyle=sg; g.fillRect(x,-by,w*0.04,h*0.6); } g.restore(); }
 const RE1={paint:0,plan:0,kind:0,real:null,ecv:null,empty(){ if(!RE1.ecv){ RE1.ecv=mkCanvas(2,2); RE1.ecv.ox=RE1.ecv.oy=0; RE1.ecv.w2=RE1.ecv.h2=1; } return RE1.ecv; }};
 // the outline colour the drawings ask for: while an act's standing thing draws itself in this look (its live parts:
 // sails, belts, chains, boats, flags), SBC.outline is a soft dark instead of Storybook's plum
