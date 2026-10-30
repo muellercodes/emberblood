@@ -20,7 +20,7 @@ chapter({
   item: {
     // x4_story's own item (ITEM_NAMES n_map): x4_world shows the peak on the map while it is held
     n_map: { name: ["Juniper's Peak Map", "Juniper's map of the peak"],
-      desc: ['Juniper drew Nightfall Peak through the telescope: four rings, one on top of the other, all the way up.', 'Four rings, going up and up.'], icon: 'map' },
+      desc: ["Juniper drew Nightfall Peak through the telescope: four rings, one on top of the other. Across the top, in her neatest letters, she has written DON'T.", "Four rings, going up. At the top it says DON'T."], icon: 'map' },
     n5_lantern: { name: ["Mom's paper lantern", "Mom's paper lantern"],
       desc: ["A Lantern Day lantern Mom folded into your satchel with the sandwich. It's a little squashed. It's been through a lot.",
         'A paper lantern from Mom. A bit squashed.'], icon: 'lamp' },

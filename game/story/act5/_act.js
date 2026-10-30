@@ -24,7 +24,7 @@ act({
     // dawn line "DUCHESS! I KNEW it!", the goathorns hat, a Heart Ember.
     n5_follower: { deduce: ['n5_who_follows'],
       title: ['Who is following you up the mountain?', 'Who is following you?'],
-      solved: ['Duchess. The real one. Nobody knows how she gets anywhere.', 'Duchess! Nobody knows how.'] },
+      solved: ['Duchess. The real one. Nobody knows how she gets anywhere, and she is not telling.', 'Duchess! Nobody knows how.'] },
   },
 
   // The three friends Nyxara hurt: Vesper, Glaciar and Hush (Greymane, Tikka and Cindervane help in fights but do not

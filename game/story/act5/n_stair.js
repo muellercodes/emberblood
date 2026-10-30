@@ -13,7 +13,7 @@
 // to n_clocks after the win (x4_foes).
 chapter({
   id: 'n_stair', act: 5, after: 'n_bridge', next: 'n_clocks', takeover: true,
-  card: ['Finale · The First Ring', 'The Ember Stair'],
+  card: ['Finale · The First Ring', ['Home, Scary Home', 'The Ember Stair']],
   so_far: [
     "The peak is made of the moon's memories, and the moon saw everything Ash ever did at night. The first ring is a dark copy of Embermere: Ember's Trials, a shadow throne, and little moths carved where nobody looks.",
     'The mountain is made of the moon\'s memories. The first ring looks like home.'],
