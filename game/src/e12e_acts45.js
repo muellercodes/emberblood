@@ -9,7 +9,7 @@
 // Caches are rzCache entries (keyed by LOOK.gen), so a look change throws them away.
 
 // ---------- 0. small helpers on top of the PROPS painter
-const E45={on:()=>LOOK.re&&!LOOK.sb, stats:{made:0,relit:0,ms:0}, deny:/glow|beam|halo|mist|shine|fog|ray|spark/i};
+const E45={on:()=>LOOK.re&&!LOOK.sb, sync:false, stats:{made:0,relit:0,ms:0}, deny:/glow|beam|halo|mist|shine|fog|ray|spark/i};
 // the Classic art of a cached tall sprite, relit; o: rzRelight options
 function e45Relit(w,h,bx,by,draw,o){
   const sc=2, cv=mkCanvas(Math.ceil(w*sc),Math.ceil(h*sc)), g=cv.getContext('2d'); g.scale(sc,sc); g.translate(bx,by); g.lineCap='round'; g.lineJoin='round';
@@ -23,10 +23,42 @@ function e45Relit(w,h,bx,by,draw,o){
 // the pixel count), small ones at the usual 2
 function e45HF(w,h,ox,oy,k){ k=k||SS; const W=Math.ceil(w*k), Hp=Math.ceil(h*k), n=W*Hp;
   return {k,W,Hp,n,w,h,ox,oy,h0:new Float32Array(n),a:new Float32Array(n),c:new Float32Array(n*3),m:new Uint8Array(n)}; }
-function e45Made(w,h,bx,by,make,o){
-  const t0=performance.now(), F=e45HF(w,h,bx,by,w*h>40000?1.5:2); let c;
-  try{ const r=make(F,w,h,bx,by); c=r&&r.getContext?r:rzShade(F,o||{ao:0.16,aoR:1.8,rim:0.3}); }catch(e){ console.error('e45 maker',e); c=mkCanvas(2,2); }
-  c.ox=bx; c.oy=by; c.w2=w; c.h2=h; E45.stats.made++; E45.stats.ms+=performance.now()-t0; return c;
+// Big sprites are painted as generators in slices of a few ms in idle time (PROPS's queue), so no frame ever waits
+// on one: while a sprite is being painted the act file's own (Classic) sprite stands in for it. A maker of a big
+// sprite runs as usual, but its e45Fill and e45Shade calls on that field are put off and then stepped row by row.
+const E45J={defer:false,F:null,fills:null};
+function e45Shade(F,o,post){ if(E45J.defer&&F===E45J.F) return {e45defer:1,F,o,post}; const c=rzShade(F,o); return post?(post(c)||c):c; }
+function* e45MadeG(w,h,bx,by,make,o){
+  const F=e45HF(w,h,bx,by,w*h>40000?1.5:2); let r=null, c=null;
+  E45J.defer=F.n>100000; E45J.F=F; E45J.fills=[];
+  try{ r=make(F,w,h,bx,by); }catch(e){ console.error('e45 maker',e); }
+  E45J.defer=false; E45J.F=null; const fills=E45J.fills||[]; E45J.fills=null;
+  try{ for(const f of fills) yield* e45FillG(f[0],f[1],f[2],f[3],f[4],f[5]);
+    if(r&&r.e45defer){ c=yield* e45ShadeG(r.F,r.o||{}); if(r.post) c=r.post(c)||c; }
+    else c=r&&r.getContext?r:yield* e45ShadeG(F,o||{ao:0.16,aoR:1.8,rim:0.3}); }catch(e){ console.error('e45 maker',e); }
+  if(!c) c=mkCanvas(2,2);
+  c.ox=bx; c.oy=by; c.w2=w; c.h2=h; E45.stats.made++; return c;
+}
+function e45Run(it){ let st; do{ st=it.next(); } while(!st.done); return st.value; }
+function e45Made(w,h,bx,by,make,o){ const t0=performance.now(), c=e45Run(e45MadeG(w,h,bx,by,make,o)); E45.stats.ms+=performance.now()-t0; return c; }
+function e45Peek(key){ return RZC.gen===LOOK.gen?RZC.m.get(key)||null:null; }
+// a sprite by cache key: ready, or queued (gen() makes its generator) with fb() standing in meanwhile
+const E45Q=new Map();
+function e45Async(key,gen,fb,later){
+  const hit=e45Peek(key); if(hit) return hit;
+  if(E45.sync) return rzCache(key,()=>e45Run(gen()));
+  if(E45Q.get(key)!==LOOK.gen){ const g0=LOOK.gen; let it=null; E45Q.set(key,g0);
+    const job=()=>{ if(LOOK.gen!==g0||!E45.on()){ E45Q.delete(key); return; } const t0=performance.now(); let st;
+      try{ if(!it) it=gen(); do{ st=it.next(); } while(!st.done&&performance.now()-t0<5); }catch(e){ console.error('e45 job',key,e); E45Q.delete(key); return; }
+      E45.stats.ms+=performance.now()-t0; if(!st.done){ RZQ.q.unshift(job); return; } const v=st.value; rzCache(key,()=>v); E45Q.delete(key); };
+    if(later) RZQ.q.push(job); else RZQ.q.unshift(job);   // wanted on screen now: first in the queue
+    if(RZQ.gen!==LOOK.gen) RZQ.gen=LOOK.gen; rzPumpLater(); }
+  return fb?fb():null;
+}
+function e45Tall(T,pfx,key,w,h,bx,by,draw,fb,later){
+  const M=e45Find(T,key);
+  if(M) return e45Async(pfx+key,()=>e45MadeG(w,h,bx,by,(F)=>M[1](F,w,h,bx,by,key),M[2]),fb,later);
+  return e45Async(pfx+key,function*(){ return e45Relit(w,h,bx,by,draw); },fb,later);
 }
 // pick the maker for a key from a table of [regexp, maker] (the first match wins)
 function e45Find(T,key){ for(const r of T) if(r[0].test(key)) return r; return null; }
@@ -36,17 +68,17 @@ function e45Find(T,key){ for(const r of T) if(r[0].test(key)) return r; return n
 const E45M3=[], E45N4=[], E45N4A=[];
 { const base=m3wTall; m3wTall=function(key,w,h,bx,by,draw,ow,noOut){
   if(!E45.on()) return base.apply(this,arguments);
-  const M=e45Find(E45M3,key); if(!M&&E45.deny.test(key)) return base.apply(this,arguments);
-  return rzCache('e45m3:'+key,()=>M?e45Made(w,h,bx,by,(F)=>M[1](F,w,h,bx,by,key),M[2]):e45Relit(w,h,bx,by,draw)); }; }
+  if(!e45Find(E45M3,key)&&E45.deny.test(key)) return base.apply(this,arguments);
+  const a=arguments, self=this; return e45Tall(E45M3,'e45m3:',key,w,h,bx,by,draw,()=>base.apply(self,a)); }; }
 { const base=m3wSpr; m3wSpr=function(key,R,draw){
   if(!E45.on()) return base.apply(this,arguments);
   return rzCache('e45m3s:'+key,()=>{ const c=spriteOf(R,draw); rzRelight(c,{bump:2.6,ao:0.1,aoR:2,edge:2,sat:0.9}); return c; }); }; }
 { const base=n4Spr; n4Spr=function(key,w,h,ox,oy,draw,ow){
   if(!E45.on()) return base.apply(this,arguments);
-  return rzCache('e45n4:'+key,()=>{ const M=e45Find(E45N4,key); return M?e45Made(w,h,ox,oy,(F)=>M[1](F,w,h,ox,oy,key),M[2]):e45Relit(w,h,ox,oy,draw); }); }; }
+  const a=arguments, self=this; return e45Tall(E45N4,'e45n4:',key,w,h,ox,oy,draw,()=>base.apply(self,a)); }; }
 { const base=n4aSpr; n4aSpr=function(key,w,h,ox,oy,draw,ow){
   if(!E45.on()) return base.apply(this,arguments);
-  return rzCache('e45n4a:'+key,()=>{ const M=e45Find(E45N4A,key); return M?e45Made(w,h,ox,oy,(F)=>M[1](F,w,h,ox,oy,key),M[2]):e45Relit(w,h,ox,oy,draw); }); }; }
+  const a=arguments, self=this; return e45Tall(E45N4A,'e45n4a:',key,w,h,ox,oy,draw,()=>base.apply(self,a)); }; }
 // the p4 sprites (Act IV's moon puzzle pieces: switches, chests, gates, stones, braziers) come through sbSprite, which
 // always outlines; in this look they are relit instead, with no bold outline
 { const base=sbSprite; sbSprite=function(key,R,draw,w){
@@ -81,9 +113,55 @@ function e45LookRelit(id,L,state){
 // (a little darker), round things shade from their lit left to their dark right, recesses get occlusion.
 const E45O={z:0,c:[0,0,0],m:0,a:1};
 function e45Fill(F,x0,y0,x1,y1,scene){
-  const k=F.k, W=F.W, o=E45O, I0=Math.max(0,Math.floor((x0+F.ox)*k)), I1=Math.min(W-1,Math.ceil((x1+F.ox)*k)), J0=Math.max(0,Math.floor((y0+F.oy)*k)), J1=Math.min(F.Hp-1,Math.ceil((y1+F.oy)*k));
-  for(let j=J0;j<=J1;j++){ const wy=(j+0.5)/k-F.oy; for(let i=I0;i<=I1;i++){ const wx=(i+0.5)/k-F.ox; o.a=1; if(!scene(wx,wy,o)) continue;
+  if(E45J.defer&&F===E45J.F){ E45J.fills.push([F,x0,y0,x1,y1,scene]); return; }
+  e45Run(e45FillG(F,x0,y0,x1,y1,scene,1e9));
+}
+function* e45FillG(F,x0,y0,x1,y1,scene,step){
+  step=step||10; const k=F.k, W=F.W, o=E45O, I0=Math.max(0,Math.floor((x0+F.ox)*k)), I1=Math.min(W-1,Math.ceil((x1+F.ox)*k)), J0=Math.max(0,Math.floor((y0+F.oy)*k)), J1=Math.min(F.Hp-1,Math.ceil((y1+F.oy)*k));
+  for(let j=J0;j<=J1;j++){ if((j-J0)%step===step-1) yield; const wy=(j+0.5)/k-F.oy; for(let i=I0;i<=I1;i++){ const wx=(i+0.5)/k-F.ox; o.a=1; if(!scene(wx,wy,o)) continue;
     const id=j*W+i, z=o.z*k; F.h0[id]=z>0.05?z:0.05; F.c[id*3]=o.c[0]; F.c[id*3+1]=o.c[1]; F.c[id*3+2]=o.c[2]; F.m[id]=o.m; F.a[id]=o.a>1?1:o.a<0?0:o.a; } }
+}
+// a copy of PROPS's rzShade (e12c_props.js) that yields every 16 rows
+function* e45ShadeG(F,o){
+  o=o||{};
+  const W=F.W, Hp=F.Hp, n=F.n, H=F.h0, A=F.a, C=F.c, M=F.m, k=F.k;
+  const tmp=new Float32Array(n), b1=new Float32Array(n), hb=new Float32Array(n), ab=new Float32Array(n);
+  const r=Math.max(1,Math.round((o.aoR||3)*k));
+  rzBlur(H,W,Hp,r,b1,tmp); rzBlur(b1,W,Hp,r,hb,tmp);
+  rzBlur(A,W,Hp,Math.max(1,Math.round(1.2*k)),ab,tmp);
+  let hmax=1e-3; for(let i=0;i<n;i++) if(H[i]>hmax) hmax=H[i];
+  const Lx=RZL[0], Ly=RZL[1], Lz=RZL[2], Hx=RZH[0], Hy=RZH[1], Hz=RZH[2], amb=o.amb||RZAMB, sun=o.sun||RZSUN;
+  const bump=o.bump||1, aoK=(o.ao==null?0.16:o.ao)/k, hao=o.hao||0, rim=o.rim==null?0.35:o.rim, sat=o.sat==null?1:o.sat, gain=o.gain||1;
+  const ka=0.78*gain, ks=0.9*gain, tc=o.trans||[200,214,96];
+  const cv=mkCanvas(W,Hp), g=cv.getContext('2d'), img=g.createImageData(W,Hp), d=img.data;
+  for(let y=0;y<Hp;y++){ if((y&15)===15) yield; for(let x=0;x<W;x++){
+    const i=y*W+x, a=A[i]; if(a<0.004) continue;
+    const hc=H[i], hL=x>0?H[i-1]:0, hR=x<W-1?H[i+1]:0, hU=y>0?H[i-W]:0, hD=y<Hp-1?H[i+W]:0;
+    let nx=(hL-hR)*0.5*bump, ny=(hU-hD)*0.5*bump; const il=1/Math.sqrt(nx*nx+ny*ny+1); nx*=il; ny*=il; const nz=il;
+    const m=M[i], P=RZM[m]||RZM[0]; let cr=C[i*3], cg=C[i*3+1], cb=C[i*3+2];
+    if(P.emit){ d[i*4]=cr>255?255:cr; d[i*4+1]=cg>255?255:cg; d[i*4+2]=cb>255?255:cb; d[i*4+3]=a*255; continue; }
+    const dl=nx*Lx+ny*Ly+nz*Lz; let dif=(dl+P.w)/(1+P.w); if(dif<0) dif=0;
+    let ao=1+(hc-hb[i])*aoK; ao=ao<0.42?0.42:ao>1.14?1.14:ao;
+    if(hao) ao*=1-hao+hao*Math.min(1,hc/hmax);
+    const sa=0.5+0.5*Math.min(1,ao);
+    let ar=amb[0], ag=amb[1], abl=amb[2]; if(P.snow){ ar=0.6; ag=0.7; abl=0.95; }
+    cr*=ar*ao*ka+sun[0]*dif*sa*ks; cg*=ag*ao*ka+sun[1]*dif*sa*ks; cb*=abl*ao*ka+sun[2]*dif*sa*ks;
+    if(P.sp>0){ const nh=nx*Hx+ny*Hy+nz*Hz; if(nh>0){ let s=Math.pow(nh,P.pw)*P.sp*sa*255; if(P.snow&&rzHash(x,y,7)>0.985) s+=140*dif; cr+=s*sun[0]; cg+=s*sun[1]; cb+=s*sun[2]; } }
+    // edges: light through the lit edge of foliage, a thin darker edge on the shadow side
+    const e=1-ab[i];
+    if(e>0.02){ const gx=(x<W-1?ab[i+1]:0)-(x>0?ab[i-1]:0), gy=(y<Hp-1?ab[i+W]:0)-(y>0?ab[i-W]:0), gl=Math.hypot(gx,gy)+1e-4, lit=-(gx*Lx+gy*Ly)/gl/Math.hypot(Lx,Ly);
+      if(lit>0&&P.tr){ const t=P.tr*e*lit*1.6; cr+=(tc[0]-cr)*t*0.6+tc[0]*t*0.25; cg+=(tc[1]-cg)*t*0.6+tc[1]*t*0.25; cb+=(tc[2]-cb)*t*0.5; }
+      else if(lit<0&&rim){ const t=1-rim*e*(-lit)*1.4; cr*=t; cg*=t; cb*=t; } }
+    if(sat!==1){ const l=cr*0.3+cg*0.59+cb*0.11; cr=l+(cr-l)*sat; cg=l+(cg-l)*sat; cb=l+(cb-l)*sat; }
+    d[i*4]=cr>255?255:cr<0?0:cr; d[i*4+1]=cg>255?255:cg<0?0:cg; d[i*4+2]=cb>255?255:cb<0?0:cb; d[i*4+3]=a>=1?255:a*255;
+  } }
+  g.putImageData(img,0,0);
+  if(F.ct){ // contact occlusion goes under the lit pixels
+    const q=mkCanvas(W,Hp), qg=q.getContext('2d'); qg.scale(k,k); qg.translate(F.ox,F.oy);
+    for(const [cx,cy,rx,ry,al] of F.ct){ qg.save(); qg.translate(cx,cy); qg.scale(1,ry/rx); const gr=qg.createRadialGradient(0,0,rx*0.55,0,0,rx); gr.addColorStop(0,`rgba(8,10,6,${al})`); gr.addColorStop(1,'rgba(8,10,6,0)'); qg.fillStyle=gr; qg.beginPath(); qg.arc(0,0,rx,0,TAU); qg.fill(); qg.restore(); }
+    qg.setTransform(1,0,0,1,0,0); qg.drawImage(cv,0,0); return rzFin(F,q);
+  }
+  return rzFin(F,cv);
 }
 const e45Cov=(d,k)=>d*(k||2)+0.5;                     // coverage from the distance inside an edge (world px)
 const e45S=(u)=>u>=1||u<=-1?0:Math.sqrt(1-u*u);        // the round profile across a cylinder
@@ -162,7 +240,7 @@ function e45Temple(F){
         o.z=10; o.m=RZ.WET; o.c=rzMix([150,170,214],[224,236,252],clamp(0.6-(wx+16)/32*0.5-(y+60)/48*0.3,0,1)); if(Math.abs(wx)<0.9||Math.abs(y+37)<0.9) o.c=e45Marble(x,y,21,MB); return true; } }
       e45Stone(o,x,y,32,14,22,[214,210,206],12-(y+88)*0.02,0.6,0.06); o.c=e45Marble(x,y,23,o.c); o.m=RZ.BONE; o.a=e45Cov(150-Math.abs(x)); return true; }
     return false; });
-  return rzShade(F,{ao:0.13,aoR:3,rim:0.22,bump:1,sat:0.95});
+  return e45Shade(F,{ao:0.13,aoR:3,rim:0.22,bump:1,sat:0.95});
 }
 E45M3.push([/^temple$/,e45Temple,null]);
 
@@ -209,10 +287,8 @@ function e45Obs(F){
       if(B.pat&&gd>=1.1) o.m=RZ.ROCK;
       o.c=c; return true; } }
     return false; });
-  const c=rzShade(F,{ao:0.14,aoR:3,rim:0.25,bump:1,sat:0.95});
   // the sign is painted on its board after the light (letters stay crisp)
-  const g=c.getContext('2d'); g.save(); g.scale(F.k,F.k); g.translate(F.ox,F.oy); g.fillStyle='rgba(236,226,196,.92)'; g.font=`800 9px ${UIF}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText('EYE ON THE MOON',0,-41); g.restore();
-  return c;
+  return e45Shade(F,{ao:0.14,aoR:3,rim:0.25,bump:1,sat:0.95},c=>{ const g=c.getContext('2d'); g.save(); g.scale(F.k,F.k); g.translate(F.ox,F.oy); g.fillStyle='rgba(236,226,196,.92)'; g.font=`800 9px ${UIF}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText('EYE ON THE MOON',0,-41); g.restore(); return c; });
 }
 E45M3.push([/^obs$/,e45Obs,null]);
 
@@ -243,7 +319,7 @@ function e45Well(F){
         o.z=20+3*e45S((q-0.92)/0.08); o.c=e45Marble(x,y,55,rzCol(ST,0.04)); o.m=RZ.BONE; o.a=e45Cov((1-q)*26); return true; }
       if(y>-163&&Math.abs(x)<=26){ o.z=19+4*s; o.c=e45Marble(x,y,56,rzCol(ST,-0.04)); o.m=RZ.BONE; o.a=e45Cov(26-Math.abs(x)); return true; } }
     return false; });
-  return rzShade(F,{ao:0.14,aoR:2,rim:0.25,bump:1,sat:0.95});
+  return e45Shade(F,{ao:0.14,aoR:2,rim:0.25,bump:1,sat:0.95});
 }
 E45M3.push([/^well$/,e45Well,null]);
 
@@ -270,7 +346,7 @@ function e45Spire(F){
         o.z=20+8*s; o.m=RZ.WET; o.c=rzMix([70,104,180],[210,226,255],clamp(0.55-(x+y-wy)/14,0,1)); return true; } }
       e45Stone(o,u*44,y,12,10,62,ST,14+18*s,0.6,0.08); o.c=e45Marble(x,y,63,o.c); o.m=RZ.BONE; return true; } }
     return false; });
-  return rzShade(F,{ao:0.13,aoR:2,rim:0.22,bump:1,sat:0.95});
+  return e45Shade(F,{ao:0.13,aoR:2,rim:0.22,bump:1,sat:0.95});
 }
 E45M3.push([/^spire$/,e45Spire,null]);
 
@@ -292,7 +368,7 @@ function e45LH(F,w,h,bx,by,key){
     if(y>-20&&y<=4&&Math.abs(x)<=36){ if(y>-6){ o.z=14-(y+6)*0.4; o.c=rzMix([52,54,62],[74,76,86],rzVN(x*0.1,1,73)); o.m=RZ.METAL; if(y>-4&&y<-2.6) o.c=[96,98,110]; return true; }
       if(y<-16||((x+60)%10+10)%10<1.8){ o.z=16; o.c=[80,82,94]; o.m=RZ.METAL; return true; } }
     return false; });
-  return rzShade(F,{ao:0.12,aoR:1.6,rim:0.25,bump:1,sat:0.95});
+  return e45Shade(F,{ao:0.12,aoR:1.6,rim:0.25,bump:1,sat:0.95});
 }
 E45M3.push([/^lh(cap|room)$/,e45LH,null]);
 
@@ -326,7 +402,7 @@ function e45CrysSpr(seed,R,o){ const rng=mulberry32(seed), F=rzSq(R);
   rzContact(F,0,R*0.3,R*0.7,R*0.36,0.4);
   if(o.rock) for(let i=0;i<5;i++){ const a=rng()*TAU, d=R*0.3*Math.sqrt(rng()); rzDome(F,Math.cos(a)*d*1.4,R*0.32+Math.sin(a)*d*0.5,R*(0.1+rng()*0.08),R*(0.08+rng()*0.06),rng()*3,0.3,R*0.1,rzJit(o.rock,rng,0.2),RZ.ROCK); }
   e45Crys(F,rng,o);
-  return rzShade(F,{ao:0.12,aoR:1.2,rim:0.2,bump:1.3,sat:1});
+  return e45Shade(F,{ao:0.12,aoR:1.2,rim:0.2,bump:1.3,sat:1});
 }
 // moonglass (Moonfall's crystals): pale violet or sea blue with a silver core
 const E45PAL={moonV:[[70,58,130],[132,116,200],[226,220,255]],moonB:[[46,96,128],[110,178,206],[226,248,255]],
@@ -358,7 +434,7 @@ function e45GSpike(F,w,h,bx,by,key){
   const v=+key.slice(3)||0, rng=mulberry32(91+v*13), P=v%3===2?E45PAL.moonV:E45PAL.moonB;
   rzContact(F,0,4,36,9,0.4);
   e45Crys(F,rng,{R:100,n:5,pal:P,spread:0.5,len:[0.6,1.3],w:[0.08,0.12],bw:0.5,by:0.04,mat:RZ.WET});
-  return rzShade(F,{ao:0.1,aoR:1.4,rim:0.18,bump:1.2,sat:1});
+  return e45Shade(F,{ao:0.1,aoR:1.4,rim:0.18,bump:1.2,sat:1});
 }
 E45M3.push([/^gsp\d$/,e45GSpike,null]);
 RZK.m_glassspike={trunk:'glass',roots:false,tw:10,n:3,make:(s,v)=>e45CrysSpr(s,28,{R:28,n:4+v,pal:v===1?E45PAL.moonV:E45PAL.moonB,mat:RZ.WET,spread:0.7,len:[0.7,1.5],w:[0.12,0.2],by:0.28})};
@@ -366,10 +442,10 @@ RZK.m_glasscactus={n:3,make:(s,v)=>{ const rng=mulberry32(s), R=20, F=rzSq(R), P
   const arm=(x0,y0,x1,y1,r)=>rzCap(F,x0,y0,2+(8-y0)*0.5,x1,y1,2+(8-y1)*0.5,r,r*0.85,rzJit(P[1],rng,0.1),RZ.WET);
   arm(0,8,0,-15,5); arm(0,-1,-9,-6,3); arm(-9,-6,-10,-13,2.6); if(v!==1){ arm(0,2,9,-2,3); arm(9,-2,9,-9,2.4); }
   rzEach(F,(x,y,id)=>{ if(rzHash(Math.floor(x*2),Math.floor(y*2),s)>0.96){ F.c[id*3]=240; F.c[id*3+1]=250; F.c[id*3+2]=255; } });
-  return rzShade(F,{ao:0.12,aoR:1.2,rim:0.2,bump:1.2}); }};
+  return e45Shade(F,{ao:0.12,aoR:1.2,rim:0.2,bump:1.2}); }};
 RZK.m_driftglass={n:2,make:(s,v)=>{ const R=20, F=rzSq(R), rot=v?0.45:-0.3, rng=mulberry32(s); rzContact(F,0,3,R*0.9,5,0.3);
   rzDome(F,0,0,R*0.88,4.4,rot,0.5,2.4,[150,206,222],RZ.WET,0.6); rzDome(F,-Math.cos(rot)*R*0.25,-Math.sin(rot)*R*0.25-1,R*0.35,2.2,rot,1.8,1.4,[200,236,244],RZ.WET,0.6);
-  return rzShade(F,{ao:0.1,aoR:1,rim:0.15,bump:1.2}); }};
+  return e45Shade(F,{ao:0.1,aoR:1,rim:0.15,bump:1.2}); }};
 
 // coral: brain coral (a dome with meandering grooves), staghorn (round branches with pale tips), sea fans (a
 // fine lattice), tube sponges (rings round dark mouths); colour is real but not neon
@@ -409,7 +485,7 @@ function e45Reefc(F,w,h,bx,by,key){
   e45CoralBody(F,rng,'fan',22,E45PAL.coralV,-6,-24,0.5);
   e45CoralBody(F,rng,'stag',32,P,-2,0,0.5);
   e45CoralBody(F,rng,'brain',9,E45PAL.coralP,14,0,2);
-  return rzShade(F,{ao:0.14,aoR:1.4,rim:0.22,bump:1.2,sat:0.95});
+  return e45Shade(F,{ao:0.14,aoR:1.4,rim:0.22,bump:1.2,sat:0.95});
 }
 E45M3.push([/^reefc\d+$/,e45Reefc,null]);
 // the coral heads painted into the chunks round Coralcombe and along the Reefwall: the same places and sizes as
@@ -449,8 +525,8 @@ function e45LampPaint(F,lit,v){
   rzBox(F,0,-33.5,7.6,8.6,0,17.6,0.6,lit?(v===2?[232,240,255]:[255,238,176]):[120,160,176],lit?RZ.EMIT:RZ.WET);
   rzBox(F,0,-40,13,2.8,0,18.5,0.8,fr,mt); rzDome(F,0,-42,4.6,2.6,0,18.5,2.6,fr,mt); rzDome(F,0,-45.4,1.2,1.2,0,20,1,fr,mt);
 }
-E45M3.push([/^lamp[0-2][01]$/,(F,w,h,bx,by,key)=>{ e45LampPaint(F,key[5]==='1',+key[4]); return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2}); },null]);
-RZK.m_lamppost={trunk:'iron',roots:false,tw:5,n:2,make:(s,v)=>{ const F=rzSq(30); e45LampPaint(F,false,v); return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2}); }};
+E45M3.push([/^lamp[0-2][01]$/,(F,w,h,bx,by,key)=>{ e45LampPaint(F,key[5]==='1',+key[4]); return e45Shade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2}); },null]);
+RZK.m_lamppost={trunk:'iron',roots:false,tw:5,n:2,make:(s,v)=>{ const F=rzSq(30); e45LampPaint(F,false,v); return e45Shade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2}); }};
 // broken columns of moon marble, fluted, with sea stains at the foot and a chip of moon mosaic
 RZK.m_column={n:3,make:(s,v)=>{ const rng=mulberry32(s), F=rzSq(20), h=v===2?6:12+v*6, MB=[226,226,236];
   rzContact(F,0,7,14,6,0.4);
@@ -460,7 +536,7 @@ RZK.m_column={n:3,make:(s,v)=>{ const rng=mulberry32(s), F=rzSq(20), h=v===2?6:1
     else if(y>ty+h*0.55){ const k=(y-ty-h*0.55)/(h*0.45); F.c[id*3]=F.c[id*3]*(1-0.25*k)+150*0.25*k; F.c[id*3+1]=F.c[id*3+1]*(1-0.25*k)+172*0.25*k; F.c[id*3+2]=F.c[id*3+2]*(1-0.25*k)+164*0.25*k; } });
   rzDome(F,-3,ty+h*0.5,2.2,2.2,0,12+h*0.4,1,[150,180,232],RZ.WET);
   if(v===2) rzCap(F,8,4,4,19,0,4,4.4,4.2,rzCol(MB,-0.04),RZ.BONE,(t,u)=>0.9+0.1*Math.cos(u*Math.PI*5));
-  return rzShade(F,{ao:0.14,aoR:1.4,rim:0.25,bump:1.1}); }};
+  return e45Shade(F,{ao:0.14,aoR:1.4,rim:0.25,bump:1.1}); }};
 // a striped canvas tent: a cone of eight panels round its pole, the door in shade, a pennant
 RZK.m_tent={n:3,make:(s,v)=>{ const F=rzSq(30), cA=[[188,74,56],[60,108,156],[196,148,58]][v%3], cB=[238,228,206], ax=0, ay=-20, n=8;
   rzContact(F,0,8,28,12,0.45);
@@ -468,7 +544,7 @@ RZK.m_tent={n:3,make:(s,v)=>{ const F=rzSq(30), cA=[[188,74,56],[60,108,156],[19
     rzPoly(F,[[ax,ay],p0,p1],(x,y)=>{ const d=Math.hypot(x-ax,(y-ay)*1.3)/32; return 2+24*Math.max(0,1-d)+Math.sin((Math.atan2(y-ay,x-ax)-a0)/(a1-a0)*Math.PI)*0.8; },(x,y)=>{ const c=i%2?cB:cA; return rzMix(c,rzCol(c,-0.1),rzVN(x*0.4,y*0.4,s)); },RZ.CLOTH); }
   rzPoly(F,[[-4,16],[0,0],[4,16]],2.5,[46,34,34],RZ.CLOTH);
   rzCap(F,0,-20,26,0,-30,30,0.9,0.8,[96,70,44],RZ.WOOD); rzPoly(F,[[0,-30],[9,-27.5],[0,-25]],31,cA,RZ.CLOTH);
-  return rzShade(F,{ao:0.14,aoR:1.6,rim:0.25,bump:1}); }};
+  return e45Shade(F,{ao:0.14,aoR:1.6,rim:0.25,bump:1}); }};
 // a whale's ribs arching out of the sand round its spine, sun-bleached bone
 RZK.m_bones={trunk:'bone',roots:false,tw:8,n:2,make:(s,v)=>{ const rng=mulberry32(s), R=56, F=rzSq(R), B=[226,216,196];
   rzContact(F,0,8,R*0.85,12,0.3);
@@ -476,7 +552,7 @@ RZK.m_bones={trunk:'bone',roots:false,tw:8,n:2,make:(s,v)=>{ const rng=mulberry3
   curve(-R*0.85,4,2,0,-4,5,R*0.85,6,2,3.6,2.6);
   // each pair of ribs is a tall bow over the spine: rising from the sand in front, its tip curling back down behind
   for(let i=0;i<6;i++){ const x=-R*0.7+i*R*0.28, hh=30-Math.abs(i-2.5)*5, lx=(i-2.5)*1.6; curve(x+lx,10,1,x+lx*2+4,-hh*0.55,hh*1.1,x+lx*0.6-1,-hh*0.62,hh*0.55,2.8,1.3); }
-  return rzShade(F,{ao:0.14,aoR:1.6,rim:0.25,bump:1}); }};
+  return e45Shade(F,{ao:0.14,aoR:1.6,rim:0.25,bump:1}); }};
 // shells: a scallop, a whelk, a starfish
 RZK.m_shell={n:3,make:(s,v)=>{ const F=rzSq(8), rng=mulberry32(s); rzContact(F,0,1,6,3.5,0.3);
   if(v===0){ for(let i=0;i<7;i++){ const a=-Math.PI*0.85+i/6*Math.PI*0.7; rzCap(F,0,3,1,Math.cos(a)*5.4,3+Math.sin(a)*6,2.6,1.1,0.9,[236,196,182],RZ.BONE); } rzDome(F,0,3.4,2,1.2,0,1,0.8,[220,170,156],RZ.BONE); }
@@ -484,13 +560,13 @@ RZK.m_shell={n:3,make:(s,v)=>{ const F=rzSq(8), rng=mulberry32(s); rzContact(F,0
     rzEach(F,(x,y,id)=>{ const a=Math.atan2(y,x), r=Math.hypot(x,y); if(Math.abs(Math.sin(a*1+r*1.6))<0.18){ F.c[id*3]*=0.82; F.c[id*3+1]*=0.8; F.c[id*3+2]*=0.78; } }); }
   else { for(let i=0;i<5;i++){ const a=-Math.PI/2+i/5*TAU; rzCap(F,0,0,1.6,Math.cos(a)*5.2,Math.sin(a)*5.2,0.8,1.7,0.7,[222,110,70],RZ.CLOTH); } rzDome(F,0,0,2,2,0,1.2,1,[232,130,84],RZ.CLOTH);
     rzEach(F,(x,y,id)=>{ if(rzHash(Math.floor(x*3),Math.floor(y*3),s)>0.8){ F.c[id*3]=246; F.c[id*3+1]=180; F.c[id*3+2]=140; } }); }
-  return rzShade(F,{ao:0.12,aoR:0.8,rim:0.25,bump:1.2}); }};
+  return e45Shade(F,{ao:0.12,aoR:0.8,rim:0.25,bump:1.2}); }};
 // pale-stemmed mushrooms with sea-blue caps and glowing spots
 RZK.m_mushroom={n:3,make:(s,v)=>{ const rng=mulberry32(s), R=11, F=rzSq(R); rzContact(F,0,2,R*0.8,R*0.5,0.3);
   const caps=[]; for(let i=0;i<3+v;i++) caps.push([(rng()-0.5)*R*1.2,(rng()-0.5)*R*0.8,2.4+rng()*2.6]); caps.sort((a,b)=>a[1]-b[1]);
   for(const [x,y,r] of caps){ rzCap(F,x,y+3,0,x,y,2.4,0.8,0.9,[220,228,222],RZ.BONE); rzDome(F,x,y,r,r*0.78,0,2.2,r*0.6,rzJit([56,150,178],rng,0.1),RZ.WET,0.7); }
   rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.WET&&rzVN(x*1.6,y*1.6,s)>0.66){ F.c[id*3]=190; F.c[id*3+1]=246; F.c[id*3+2]=250; F.m[id]=RZ.EMIT; } });
-  return rzShade(F,{ao:0.12,aoR:1,rim:0.25}); }};
+  return e45Shade(F,{ao:0.12,aoR:1,rim:0.25}); }};
 
 // the Peak's kinds: black glass, brass and dark chalk under a violet night
 const E45GL=[34,26,52], E45GLV=[176,150,240];
@@ -499,19 +575,19 @@ RZK.n_glasstree={trunk:'glass',roots:false,tw:9,n:4,make:(s,v)=>{ const rng=mulb
     if(d>0){ const n=d>1?2:2+(rng()<0.4?1:0); for(let i=0;i<n;i++) br(x2,y2,z2,a+(i-(n-1)/2)*(0.5+rng()*0.35)+(rng()-0.5)*0.2,len*(0.55+rng()*0.2),w*0.62,d-1); } else tips.push([x2,y2,z2]); };
   br(0,8,1,-Math.PI/2+(rng()-0.5)*0.15,16+rng()*5,7,3);
   for(const [x,y,z] of tips){ rzLeaf(F,x,y-1.5,2.4,1.1,-Math.PI/2+(rng()-0.5),z+0.5,0.2,0.4,rzJit([92,76,150],rng,0.15),RZ.GLOSS); if(rng()<0.7) rzDome(F,x,y,0.9,0.9,0,z+1.4,0.4,E45GLV,RZ.EMIT); }
-  return rzShade(F,{ao:0.12,aoR:1.4,rim:0.2,bump:1.2}); }};
+  return e45Shade(F,{ao:0.12,aoR:1.4,rim:0.2,bump:1.2}); }};
 RZK.n_cocoon={n:3,make:(s,v)=>{ const rng=mulberry32(s), F=rzSq(16); rzContact(F,1,10,7,3,0.4);
   for(let i=0;i<6;i++){ const t0=i/6, t1=(i+1)/6, q=t=>[(1-t)*(1-t)*0+2*(1-t)*t*-3+t*t*4,(1-t)*(1-t)*10+2*(1-t)*t*-4+t*t*-14]; const a=q(t0), b=q(t1); rzCap(F,a[0],a[1],1+t0*8,b[0],b[1],1+t1*8,1.6-t0*0.6,1.6-t1*0.6,E45GL,RZ.GLOSS); }
   rzDome(F,4,-4,5,8.5,0.15,7,5,[178,170,204],RZ.CLOTH,0.8);
   rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.CLOTH){ const b=Math.sin((y+4)*1.4+x*0.5+rzVN(x,y,s)*2); if(b>0.75){ F.c[id*3]*=0.78; F.c[id*3+1]*=0.76; F.c[id*3+2]*=0.84; F.h0[id]-=0.3*F.k; } } });
-  return rzShade(F,{ao:0.14,aoR:1,rim:0.25}); }};
+  return e45Shade(F,{ao:0.14,aoR:1,rim:0.25}); }};
 RZK.n_gear={n:2,make:(s,v)=>{ const F=rzSq(22), rng=mulberry32(s); rzContact(F,0,6,20,7,0.4);
   e45Fill(F,-22,-14,22,10,(x,y,o)=>{ const yy=(y-2)/0.62, r=Math.hypot(x,yy), a=Math.atan2(yy,x)+v*0.2, th=Math.cos(a*10)>0.15;
     if(y>6.5&&Math.hypot(x/21,(y-8)/7)<1){ o.z=6; o.m=RZ.GLOSS; o.c=y<8.7?[86,72,130]:rzJit(E45GL,rng,0.1); return true; }
     if(r<6){ o.z=3; o.c=[70,50,26]; o.m=RZ.METAL; return true; }
     if(r<16||(th&&r<20)){ const B=e45Brass(x,y,s,0.1); o.z=4+(r<16?1.5*e45S((r-11)/5):0); o.c=r>16?rzCol(B.c,-0.08):B.c; o.m=B.pat?RZ.ROCK:RZ.METAL; o.a=e45Cov((r<16?16-r:20-r)); return true; }
     return false; });
-  return rzShade(F,{ao:0.14,aoR:1.2,rim:0.25,bump:1.2}); }};
+  return e45Shade(F,{ao:0.14,aoR:1.2,rim:0.25,bump:1.2}); }};
 RZK.n_clock={n:2,make:(s,v)=>{ const F=rzSq(30), CH=[92,84,120]; rzContact(F,0,14,14,5,0.45);
   e45Fill(F,-14,-31,14,15,(x,y,o)=>{
     if(y>=-20&&y<=14&&Math.abs(x)<=10){ const d=Math.hypot(x,y+8);
@@ -521,21 +597,21 @@ RZK.n_clock={n:2,make:(s,v)=>{ const F=rzSq(30), CH=[92,84,120]; rzContact(F,0,1
       e45Stone(o,x,y,7,5,s,CH,12+(10-Math.abs(x))*0.2-(x>0?x*0.2:0),0.45,0.12); return true; }
     if(y<-20&&y>=-31){ const hw=13*(y+31)/11; if(Math.abs(x)<=hw){ o.z=14+(y+31)*0.6-Math.abs(x)*0.3; o.c=rzMix([60,54,84],[84,78,110],rzVN(x*0.5,y*0.5,s)); o.m=RZ.ROCK; return true; } }
     return false; });
-  return rzShade(F,{ao:0.14,aoR:1.2,rim:0.25}); }};
+  return e45Shade(F,{ao:0.14,aoR:1.2,rim:0.25}); }};
 RZK.n_mirror={n:2,make:(s,v)=>{ const F=rzSq(20); rzContact(F,0,13,10,4,0.45);
   rzBox(F,0,12.5,14,3,0,2,0.8,[44,36,66],RZ.GLOSS); rzCap(F,0,12,2,0,-2,8,2,1.8,[52,44,78],RZ.GLOSS);
   e45Fill(F,-9,-23,9,3,(x,y,o)=>{ const q=Math.hypot(x/8.5,(y+10)/12.5); if(q>=1) return false; o.a=e45Cov((1-q)*8.5);
     if(q>0.8){ o.z=10+2*e45S((q-0.9)/0.1); o.c=[170,160,206]; o.m=RZ.METAL; return true; }
     o.z=9; o.m=RZ.GLOSS; o.c=rzMix(v?[34,30,74]:[44,40,96],[150,140,220],clamp(0.4-(x+y+10)/26,0,1)); if(Math.abs((x+3)-(y+16)*0.42)<0.9&&y<-4) o.c=[226,220,255]; return true; });
-  return rzShade(F,{ao:0.12,aoR:1,rim:0.25,bump:1.1}); }};
+  return e45Shade(F,{ao:0.12,aoR:1,rim:0.25,bump:1.1}); }};
 RZK.n_glasscoral={n:3,make:(s,v)=>{ const rng=mulberry32(s), F=rzSq(16); rzContact(F,0,7,11,4,0.4);
   const br=(x,y,z,a,l,w,d)=>{ const x2=x+Math.cos(a)*l, y2=y+Math.sin(a)*l, z2=z+l*0.5; rzCap(F,x,y,z,x2,y2,z2,w*0.5,w*0.4,rzJit([72,62,140],rng,0.12),RZ.GLOSS); if(d>0){ br(x2,y2,z2,a-0.5-rng()*0.3,l*0.7,w*0.7,d-1); br(x2,y2,z2,a+0.5+rng()*0.3,l*0.7,w*0.7,d-1); } else rzDome(F,x2,y2,w*0.55,w*0.55,0,z2,w*0.4,[196,180,255],RZ.EMIT); };
   br(0,7,1,-Math.PI/2+(rng()-0.5)*0.4,8,4,2);
-  return rzShade(F,{ao:0.12,aoR:1,rim:0.2,bump:1.2}); }};
+  return e45Shade(F,{ao:0.12,aoR:1,rim:0.2,bump:1.2}); }};
 RZK.n_dawnflower={n:3,make:(s,v)=>{ const rng=mulberry32(s), F=rzSq(7); rzCap(F,0,5,0,0,0,2,0.5,0.45,[90,150,80],RZ.LEAF);
   for(let i=0;i<5;i++){ const a=i/5*TAU+rng(); rzLeaf(F,Math.cos(a)*2.3,Math.sin(a)*2.3-1,2,1.4,a,2.4,Math.cos(a)*0.3,Math.sin(a)*0.3,[250,246,236],RZ.CLOTH); }
   rzDome(F,0,-1,1.3,1.3,0,2.8,0.9,v===1?[250,206,232]:[250,214,92],RZ.CLOTH);
-  return rzShade(F,{ao:0.1,aoR:0.6,rim:0.2}); }};
+  return e45Shade(F,{ao:0.1,aoR:0.6,rim:0.2}); }};
 
 // ---------- 7. Nightfall Peak: the ground, the faceted glass and its cracks, the broken moon
 // natural palettes for the Peak's biomes (GROUND's table takes map biomes by id; Nightfall's were only derived):
@@ -602,15 +678,16 @@ function e45PaintLvl(g,x0,y0,x1,y1,ch,L){
   g.restore(); }; }
 // the broken moon over the peak: plates of lunar rock (grey highlands, darker seas, little craters) round a hole of
 // violet night, lit from the upper left, a soft moonfire glow round the rim; the fragments drifting off it alike
-function e45Lunar(W,H,sd){ const c=mkCanvas(W,H), g=c.getContext('2d'), im=g.createImageData(W,H), d=im.data;
-  const cr=[]; const rng=mulberry32(sd); for(let i=0;i<90;i++) cr.push([rng()*W,rng()*H,2+Math.pow(rng(),2.2)*14]);
-  for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=(y*W+x)*4, m=rzFbm(x*0.012,y*0.012,sd,4), f=rzFbm(x*0.07,y*0.07,sd+5,2);
-    let l=0.8+0.1*(f-0.5); if(m<0.46) l-=(0.46-m)*0.9;
-    for(const [cx,cy,r] of cr){ const dx=x-cx, dy=y-cy, q=(dx*dx+dy*dy)/(r*r); if(q<1.4){ if(q<0.7) l-=0.08*(1-q/0.7); else if(q<1) l+=0.1*(dx+dy<0?1:-0.6)*(1-Math.abs(q-0.85)/0.15); } }
-    d[i]=clamp(l*262,0,255); d[i+1]=clamp(l*262,0,255); d[i+2]=clamp(l*272,0,255); d[i+3]=255; }
+function e45Lunar(W,H,sd){ return e45Run(e45LunarG(W,H,sd)); }
+function* e45LunarG(W,H,sd){ const c=mkCanvas(W,H), g=c.getContext('2d'), im=g.createImageData(W,H), d=im.data, L=new Float32Array(W*H);
+  for(let y=0;y<H;y++){ if((y&31)===31) yield; for(let x=0;x<W;x++){ const m=rzFbm(x*0.012,y*0.012,sd,4), f=rzVN(x*0.07,y*0.07,sd+5); let l=0.8+0.1*(f-0.5); if(m<0.46) l-=(0.46-m)*0.9; L[y*W+x]=l; } }
+  const rng=mulberry32(sd); for(let i=0;i<90;i++){ const cx=rng()*W, cy=rng()*H, r=2+Math.pow(rng(),2.2)*14, R2=r*1.2;
+    for(let y=Math.max(0,Math.floor(cy-R2));y<Math.min(H,Math.ceil(cy+R2));y++) for(let x=Math.max(0,Math.floor(cx-R2));x<Math.min(W,Math.ceil(cx+R2));x++){ const dx=x-cx, dy=y-cy, q=(dx*dx+dy*dy)/(r*r);
+      if(q<0.7) L[y*W+x]-=0.08*(1-q/0.7); else if(q<1) L[y*W+x]+=0.1*(dx+dy<0?1:-0.6)*(1-Math.abs(q-0.85)/0.15); } }
+  for(let i=0;i<W*H;i++){ const l=L[i]; d[i*4]=clamp(l*262,0,255); d[i*4+1]=clamp(l*262,0,255); d[i*4+2]=clamp(l*272,0,255); d[i*4+3]=255; }
   g.putImageData(im,0,0); return c; }
-{ const base=n4MoonCv; n4MoonCv=function(){ if(!E45.on()) return base(); return rzCache('e45moon',e45MoonCv); }; }
-function e45MoonCv(){
+{ const base=n4MoonCv; n4MoonCv=function(){ if(!E45.on()) return base(); return e45Async('e45moon',e45MoonG,()=>base()); }; }
+function* e45MoonG(){
   const S0=512, c=mkCanvas(S0,S0), g=c.getContext('2d'), R=170; g.translate(S0/2,S0/2); g.lineJoin='round'; g.lineCap='round';
   const gl=g.createRadialGradient(0,0,R*0.7,0,0,R*1.42); gl.addColorStop(0,'rgba(160,130,240,.32)'); gl.addColorStop(1,'rgba(110,80,210,0)'); g.fillStyle=gl; g.fillRect(-S0/2,-S0/2,S0,S0);
   const hg=g.createRadialGradient(-R*0.15,-R*0.12,R*0.05,0,0,R*0.9); hg.addColorStop(0,'#3e2670'); hg.addColorStop(0.55,'#1e1040'); hg.addColorStop(1,'#0a0418'); g.fillStyle=hg; g.beginPath(); g.arc(0,0,R*0.9,0,TAU); g.fill();
@@ -619,7 +696,7 @@ function e45MoonCv(){
   const pieces=[[0.25,1.05],[1.25,2.05],[2.6,3.45],[3.62,4.3],[4.95,5.85]], paths=[];
   for(const [a0,a1] of pieces){ const jag=(a,s2)=>{ const p=[]; for(let k=0;k<4;k++){ const r=R*(0.84+k*0.06), aa=a+(rng()-0.5)*0.06*s2; p.push([Math.cos(aa)*r,Math.sin(aa)*r]); } return p; };
     const A=jag(a0,1), B=jag(a1,-1); paths.push(q=>{ q.beginPath(); q.moveTo(A[0][0],A[0][1]); for(const v of A) q.lineTo(v[0],v[1]); q.arc(0,0,R*1.02,a0,a1); for(let k=B.length-1;k>=0;k--) q.lineTo(B[k][0],B[k][1]); q.arc(0,0,R*0.84,a1,a0,true); q.closePath(); }); }
-  const rim=mkCanvas(S0,S0), rg=rim.getContext('2d'); rg.translate(S0/2,S0/2); const tex=e45Lunar(S0,S0,1312);
+  const rim=mkCanvas(S0,S0), rg=rim.getContext('2d'); rg.translate(S0/2,S0/2); const tex=yield* e45LunarG(S0,S0,1312); yield;
   rg.fillStyle=rg.createPattern(tex,'no-repeat'); try{ rg.fillStyle.setTransform(new DOMMatrix().translate(-S0/2,-S0/2)); }catch(e){}
   for(const P of paths){ P(rg); rg.fill(); }
   // the sphere's light: brighter toward the upper left, the limb a little darker
@@ -630,12 +707,12 @@ function e45MoonCv(){
   try{ thrMoth(g,0,R*0.05,R/30,0.6,'#140a24','rgba(220,200,255,.9)'); }catch(e){}
   return c;
 }
-{ const base=n4FragCv; n4FragCv=function(){ if(!E45.on()) return base(); return rzCache('e45frag',()=>{ const out=[], rng=mulberry32(77), tex=e45Lunar(80,80,1313);
+{ const base=n4FragCv; n4FragCv=function(){ if(!E45.on()) return base(); return e45Async('e45frag',function*(){ const out=[], rng=mulberry32(77), tex=e45Lunar(80,80,1313);
   for(let i=0;i<5;i++){ const c=mkCanvas(80,80), g=c.getContext('2d'); g.translate(40,40); const n=4+Math.floor(rng()*2), P=[]; for(let k=0;k<n;k++){ const a=k/n*TAU+rng()*0.5, r=14+rng()*16; P.push([Math.cos(a)*r,Math.sin(a)*r*0.7]); }
     const pa=()=>{ g.beginPath(); P.forEach((q,k)=>k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1])); g.closePath(); };
     const f=mkCanvas(80,80), fg=f.getContext('2d'); fg.translate(40,40); fg.beginPath(); P.forEach((q,k)=>k?fg.lineTo(q[0],q[1]):fg.moveTo(q[0],q[1])); fg.closePath(); fg.save(); fg.clip(); fg.drawImage(tex,-40,-40); fg.restore(); rzRelight(f,{bump:3,ao:0.1,aoR:2,edge:2.4,sat:0.85});
-    g.save(); g.shadowColor='rgba(190,170,255,.7)'; g.shadowBlur=8; g.drawImage(f,-40,-40); g.restore(); g.drawImage(f,-40,-40); out.push(c); }
-  return out; }); }; }
+    g.save(); g.shadowColor='rgba(190,170,255,.7)'; g.shadowBlur=8; g.drawImage(f,-40,-40); g.restore(); g.drawImage(f,-40,-40); out.push(c); yield; }
+  return out; },()=>base()); }; }
 
 // ---------- 8. the ascent's puzzle pieces (x4_ascent.js n4aSpr keys; the rest come relit). Every piece keeps its
 // box and foot, and the glows and rings x4_ascent draws over them, so what you push, light or ride reads as before.
@@ -651,7 +728,7 @@ function e45Gear(F,w,h,bx,by,key){
     else if(r<R*0.2){ z=r<R*0.08?7:12+e45S(r/(R*0.2))*2; c=r<R*0.08?[50,36,20]:rzCol(c,0.06); }   // the hub and its bore
     for(let k=0;k<5;k++){ const ha=k/5*TAU, hx=Math.cos(ha)*R*0.45, hy=Math.sin(ha)*R*0.45, d=Math.hypot(x-hx,yy-hy); if(d<R*0.1){ o.z=3; o.c=[26,18,30]; o.m=RZ.GLOSS; return true; } if(d<R*0.12){ z=11.5; c=rzCol(c,0.1); } }
     o.z=z; o.c=c; if(B.pat&&r<out-4) o.m=RZ.ROCK; return true; });
-  return rzShade(F,{ao:0.12,aoR:2,rim:0.25,bump:1});
+  return e45Shade(F,{ao:0.12,aoR:2,rim:0.25,bump:1});
 }
 E45N4A.push([/^gear[0-2]$/,e45Gear,null]);
 // blocks of ice (the ice wall and the dam): clear blue with cracks and bubbles inside, a cap of white rime
@@ -666,7 +743,7 @@ function e45Ice(F,w,h,bx,by,key){
     if(rzHash(Math.floor(x*1.2),Math.floor(y*1.2),sd)>0.985) c=rzMix(c,[240,250,255],0.6);
     if(Math.abs(x+18)<1.6) c=rzMix(c,[210,236,255],0.5);
     o.c=c; return true; });
-  return rzShade(F,{ao:0.1,aoR:1.4,rim:0.2,bump:1});
+  return e45Shade(F,{ao:0.1,aoR:1.4,rim:0.2,bump:1});
 }
 E45N4A.push([/^(icew|dam)[0-2]$/,e45Ice,null]);
 // the cracked blocks (glass with an ember crack, or ice with a frost crack)
@@ -680,7 +757,7 @@ function e45Crk(F,w,h,bx,by,key){
     let d=m3wSegD(crk,x,y); d=Math.min(d,m3wSegD(br,x,y));
     if(d<1.1){ o.m=RZ.EMIT; o.c=ice?[220,244,255]:[255,170,96]; o.z-=1; } else if(d<2.4) o.c=rzMix(o.c,ice?[170,220,255]:[150,70,40],0.45*(2.4-d)/1.3);
     return true; });
-  return rzShade(F,{ao:0.12,aoR:1.4,rim:0.22,bump:1});
+  return e45Shade(F,{ao:0.12,aoR:1.4,rim:0.22,bump:1});
 }
 E45N4A.push([/^crki?[0-2]$/,e45Crk,null]);
 // lanterns on black glass posts: an iron cage with a ring and a cap, warm glass when lit, dark glass when not
@@ -697,7 +774,7 @@ function e45Lan(F,w,h,bx,by,key){
     return true; });
   rzPoly(F,[[-12,-70],[12,-70],[0,-80]],(x,y)=>24+(-70-y)*0.5-Math.abs(x)*0.25,[46,40,62],RZ.METAL);
   rzCap(F,-2.4,-82,26,2.4,-82,26,1.2,1.2,[70,64,86],RZ.METAL); rzCap(F,0,-84.4,26,0,-79.6,26,1.1,1.1,[70,64,86],RZ.METAL);
-  return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
+  return e45Shade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
 }
 E45N4A.push([/^r?lan[01]$/,e45Lan,null]);
 
@@ -780,7 +857,7 @@ function e45N4Lamp(F,w,h,bx,by,key){
     else { o.m=RZ.GLOSS; o.c=rzMix([30,24,52],[70,60,110],clamp(0.5-(x-5+y+38)/20,0,1)); if(m3wSegD([[6,-36],[9,-31],[7,-28]],x,y)<0.55) o.c=[170,150,240]; }
     return true; });
   rzPoly(F,[[3.5,-38],[15.5,-38],[9.5,-43]],(x,y)=>20+(-38-y)*0.6-Math.abs(x-9.5)*0.3,P[0],RZ.METAL);
-  return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
+  return e45Shade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
 }
 E45N4.push([/^lamp[01]d?$/,e45N4Lamp,null]);
 function e45N4Shrine(F,w,h,bx,by,key){
@@ -789,7 +866,7 @@ function e45N4Shrine(F,w,h,bx,by,key){
   rzDome(F,0,2,24,9,0,0.5,3,lit?[70,58,100]:[34,28,52],RZ.ROCK,0.5); rzDome(F,0,0,22,7.5,0,2.5,1.5,lit?[106,92,142]:[50,42,74],RZ.GLOSS,0.4);
   rzPoly(F,[[-9,0],[9,0],[6,-40],[0,-50],[-6,-40]],(x,y)=>{ const t=-y/50; return 5+t*22+(1-Math.abs(x)/(9-3*t))*4; },(x,y)=>{ const d=x/(9+y*0.06); return d<-0.35?OB[2]:d<0.15?OB[1]:OB[0]; },lit?RZ.METAL:RZ.GLOSS);
   rzDome(F,0,-22,3.6,6,0,20,1.4,lit?[255,246,208]:[74,62,112],lit?RZ.EMIT:RZ.GLOSS,0.6);
-  return rzShade(F,{ao:0.12,aoR:1.2,rim:0.25,bump:1.2});
+  return e45Shade(F,{ao:0.12,aoR:1.2,rim:0.25,bump:1.2});
 }
 E45N4.push([/^shrine[01]$/,e45N4Shrine,null]);
 function e45Ruin(F,w0,h0,bx,by,key){
@@ -828,7 +905,7 @@ function e45Ruin(F,w0,h0,bx,by,key){
     for(const sx of [-17.5,17.5]) rzBox(F,sx,-15,5,30,0,12,0.8,ST,RZ.GLOSS);
     rzBox(F,0,-30.5,44,5,0,16,1,TOP,RZ.GLOSS);
   }
-  return rzShade(F,{ao:0.14,aoR:1.8,rim:0.25,bump:1});
+  return e45Shade(F,{ao:0.14,aoR:1.8,rim:0.25,bump:1});
 }
 E45N4.push([/^ruin_/,e45Ruin,null]);
 
@@ -838,9 +915,9 @@ const E45PRE={4:[['n4a','gear0',280,189,140,94.5],['n4a','gear1',320,215,160,107
 const E45W={map:-2,gen:-1,id:0};
 function e45Pre(m){
   const L=E45PRE[m]; if(!L||!L.length) return;
-  if(m===4) RZQ.q.push(()=>{ if(E45.on()){ n4MoonCv(); n4FragCv(); } });
+  if(m===4&&E45.on()){ n4MoonCv(); n4FragCv(); }
   if(m===3) for(const wet of [0,1]) for(let i=0;i<12;i++) RZQ.q.push(()=>{ if(!E45.on()) return; for(let R=3;R<=18;R+=3) e45CoralHead(i,R,!!wet); });
-  for(const [t,k,w,h,bx,by] of L) RZQ.q.push(()=>{ if(!E45.on()) return; if(t==='m3') m3wTall(k,w,h,bx,by,()=>{}); else if(t==='n4') n4Spr(k,w,h,bx,by,()=>{}); else if(t==='n4a') n4aSpr(k,w,h,bx,by,()=>{}); });
+  for(const [t,k,w,h,bx,by] of L){ const T=t==='m3'?E45M3:t==='n4'?E45N4:E45N4A; if(e45Find(T,k)) e45Tall(T,t==='m3'?'e45m3:':t==='n4'?'e45n4:':'e45n4a:',k,w,h,bx,by,null,null,true); }
   if(RZQ.gen!==LOOK.gen){ RZQ.gen=LOOK.gen; } rzPumpLater();
 }
 function e45Watch(){ if(E45W.id) return; E45W.id=setInterval(()=>{ try{ if(!LOOK.re||!G||typeof curMap!=='function') return; const m=curMap(); if(m===E45W.map&&LOOK.gen===E45W.gen) return; E45W.map=m; E45W.gen=LOOK.gen; e45Pre(m); e45CrysSync(true); }catch(e){} },1500); }
@@ -848,7 +925,8 @@ e45Watch();
 
 // ---------- debug: a sheet of this module's sprites (window.__ebDbg.e45Sheet([[table,key,w,h,bx,by],...],scale,bg))
 function e45Sheet(list,sc,bg){
-  sc=sc||1;
+  sc=sc||1; E45.sync=true; try{ return e45Sheet0(list,sc,bg); } finally{ E45.sync=false; } }
+function e45Sheet0(list,sc,bg){
   if(list[0]&&list[0][0]==='look'){ // story looks: each drawn by the gate library into a cell, as the world draws it
     const ids=list.map(l=>l[1]).filter(id=>typeof LOOKS!=='undefined'&&LOOKS[id]), cw=150*sc, ch=170*sc, cols=Math.min(6,ids.length), rows=Math.ceil(ids.length/cols);
     const cv=mkCanvas(cols*cw,rows*ch), g=cv.getContext('2d'); g.fillStyle=bg||'#6a6878'; g.fillRect(0,0,cv.width,cv.height);
