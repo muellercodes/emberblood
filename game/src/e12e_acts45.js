@@ -84,7 +84,7 @@ const E45M3=[], E45N4=[], E45N4A=[];
 // always outlines; in this look they are relit instead, with no bold outline
 { const base=sbSprite; sbSprite=function(key,R,draw,w){
   if(!E45.on()||typeof key!=='string'||key.indexOf('p4')!==0) return base.apply(this,arguments);
-  return rzCache('e45p4:'+key,()=>{ const c=spriteOf(R,draw); rzRelight(c,{bump:2.6,ao:0.1,aoR:2,edge:2,sat:0.92}); return c; }); }; }
+  return rzCache('e45p4:'+key,()=>{ const c=spriteOf(R,draw); if(R<=60) rzRelight(c,{bump:2.6,ao:0.1,aoR:2,edge:2,sat:0.92}); return c; }); }; }   // (long walls and rocks: no outline, not relit, so they cost nothing more)
 // the story place looks of Acts IV and V (v10_art4a/4b/4s, v10_art5a/5b/5s): no bold outline, relit
 const E45LOOK=/^(m4|a4s_|n5|moon_lock_carving|green_fourth_post|hoof$|hat_n5_)/;
 { const base=gtLookSprite; gtLookSprite=function(id,L,state){
