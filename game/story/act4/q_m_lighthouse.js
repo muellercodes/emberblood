@@ -10,7 +10,7 @@
 // oil lamps and the great lamp tick while the quest is open (m3pAt('m_lighthouse',1): a legacy step).
 quest({
   id: 'm_lighthouse', act: 4, giver: 'm_squint', optional: true, takeover: true,
-  title: ['The Dark Lighthouse', 'The Dark Lighthouse'],
+  title: ['Lighten Up, Ned', 'The Dark Lighthouse'],
   payoff: { kind: 'upgrade', id: 'm_moonlantern' },
   old_steps: ['ned', 'lit', 'done'],
 

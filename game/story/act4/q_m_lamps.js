@@ -11,7 +11,7 @@
 // the palm climb set m_lamp_0..11 whatever the quest step), so the lamps step waits for all twelve flags.
 quest({
   id: 'm_lamps', act: 4, giver: 'm_esme', optional: true, takeover: true,
-  title: ['Light Every Lamp', 'Light Every Lamp'],
+  title: ['Twelve Bright Ideas', 'Light Every Lamp'],
   payoff: { kind: 'ally', id: 'm_lamps_ally' },
   old_steps: ['lamps', 'esme'],
 

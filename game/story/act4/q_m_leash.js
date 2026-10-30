@@ -10,7 +10,7 @@
 // m_vault_open and gives m_book_raw, with STORY.m_vault's lines), so the vault step just waits for its flag.
 quest({
   id: 'm_leash', act: 4, giver: 'm_ripple', optional: true, takeover: true,
-  title: ['The Silver Leash', 'The Silver Leash'],
+  title: ['Soggy Is Best', 'The Silver Leash'],
   payoff: { kind: 'truth', id: 'm4_book' },
   old_steps: ['vault', 'wren'],
 

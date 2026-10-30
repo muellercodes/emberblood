@@ -146,7 +146,7 @@ people({
         say: ["I was born on a raft. I have stood on real ground twice. It didn't move once. I didn't trust it.", "I was born on a raft. Land doesn't move. I hate that."] },
       { ask: ['Do you trade with Sable?', 'Do you trade with Sable?'], if: 'flag m_rafi',
         say: ["Fish for dates. Rafi says our fish are wet. They're fish, Ash. Of course they're wet.", 'Fish for dates. Rafi says our fish are wet!'] },
-      { idle: [['The town book is open. Go on.', 'Go on.'], ["Mind the gaps. What is it?", 'Mind the gaps. Yes?']] },
+      { idle: [['The town book is open. Go on.', 'Go on.'], ["Mind the gaps. If it's a fish joke, Gilly got there first.", 'Mind the gaps. Yes?']] },
       { bye: [['Off you go. Wave to the chickens.', 'Wave to the chickens.'], ['Mind that gap. And that one.', 'Mind the gaps!']] },
       { bark: true, say: ['Mind the gap! Mind that gap too! Mind all the gaps!', 'Mind the gaps!'] },
       { bark: true, say: ['*wrings out a sock* Ah. Better. *puts it back on* Ah. Worse.', '*wrings out a sock* Ah. Worse.'] },
@@ -452,7 +452,7 @@ people({
             say: [['m_gilly', "Everybody says that. Then they smell the pudding, and they're still not hungry.", 'Everybody says that. Then they smell the pudding.']] },
         ] },
       { if: 'stage=m_drift clue m4_gilly_fish',
-        say: ['Did you find out about my fish? A whole school came in at noon today, all in a muddle, looking up.', "Did you find out about my fish? They're lost."],
+        say: ['Did you find out about my fish? They came in at noon today, all in a muddle, looking up. Right out of their depth, poor things.', "Did you find out about my fish? They're lost."],
         re: [
           { t: ["It's the moon. It's getting smaller.", "It's the moon. It's shrinking."], if: 'solved wobbly_tide',
             say: [['m_gilly', "Then my poor fish are looking for something that isn't there. I'll leave a lamp out for them.", "Poor fish. I'll leave a lamp out."]] },
@@ -502,8 +502,8 @@ people({
         ] },
       { ask: ["What's in fish pudding?", "What's in fish pudding?"],
         say: ['Fish, and pudding, together at last. You would be the first to finish one.', 'Fish and pudding. Nobody has finished one.'] },
-      { idle: [['Hungry? Go on.', 'Hungry?'], ["The pot's on. What is it?", "Pot's on. Yes?"]] },
-      { bye: [['Come back hungry!', 'Come back hungry!'], ['Take a fish for the road. No? Next time.', 'Next time, a fish.']] },
+      { idle: [["Hungry? Go on. Don't be shellfish.", 'Hungry?'], ["The pot's on. What is it?", "Pot's on. Yes?"]] },
+      { bye: [["Shore you won't stay for pudding? Come back hungry, then!", 'Come back hungry!'], ['Take a fish for the road. No? Next time.', 'Next time, a fish.']] },
       { bark: true, say: ['FISH! Get your fish! Fresh fish, old fish, fish-shaped fish!', 'FISH! Get your fish!'] },
     ],
 
@@ -600,7 +600,7 @@ people({
     m_coralia: [
       // what Ash told Sir Kipper about his seahorse (said kipper_warhorse)
       { if: 'said kipper_warhorse', once: true,
-        say: ['Sir Kipper tells everyone that a dragon called Lady Bubbles a warhorse. He has told me eleven times today.', 'Kipper says you called his seahorse a warhorse. Eleven times.'],
+        say: ['Sir Kipper tells everyone that a dragon called Lady Bubbles a warhorse. He has told me eleven times today, with a new knight joke each time. They do not improve.', 'Kipper says you called his seahorse a warhorse. Eleven times.'],
         re: [
           { t: ['She is one. She carried him home.', 'She is one.'],
             say: [['m_coralia', 'She is. Do not tell him I agree. He would never stop.', 'She is. Do not tell him I agree.']] },
@@ -866,8 +866,8 @@ people({
         re: [
           { t: ['Just the first verse, please.', 'Just the first verse, please.'],
             say: [['m_kipper', '"O Baron Puffington, so round, so stuck, so cross..." I shall stop there. Lady Bubbles is making a face.', '"O Baron, so round, so stuck..." I will stop.']] },
-          { t: ['Did the Baron like it?', 'Did the Baron like it?'],
-            say: [['m_kipper', 'He asked for a copy. He says it is the first thing anyone ever wrote about him without the word "stuck".', 'He wants a copy. It does not say "stuck".']] },
+          { t: ['He was full of hot air anyway.', 'He was full of hot air.'],
+            say: [['m_kipper', 'Full of hot air! Ha! That is verse forty-one. The Baron has asked for a copy, you know. He likes that it never says "stuck".', 'Ha! That goes in my song!']] },
         ] },
       // before the Queen has seen Ash (the chapter's own steps play the Queen, then his report)
       { if: 'stage=m_coral !step m_coral.queen',
@@ -930,14 +930,14 @@ people({
             say: [['m_kipper', 'I would come, but there are crabs on the way, and I have a rule about crabs.', 'I would come. But crabs. I have a rule.']] },
         ] },
       { ask: ['Why were you down in Lumen?', 'Why were you in Lumen?'],
-        say: ["The Queen keeps a knight beside Ember's flame. It was my turn for forty years. A quiet post. I talked to the flame. It did not talk back, which was restful.",
+        say: ["The Queen keeps a knight beside Ember's flame. It was my turn for forty years: the longest knight shift in Coralcombe. I talked to the flame. It did not talk back, which was restful.",
           'Guarding the flame. Forty years. It was quiet.'] },
       { ask: ['Are you really scared of crabs?', 'Are you scared of crabs?'],
         say: ['When I was a squire, a crab held my tail for a whole afternoon. I was very brave about it. I cried quietly.', 'A crab held my tail all day. I cried quietly.'] },
       { ask: ['Tell me about Lady Bubbles.', 'Tell me about Lady Bubbles.'],
         say: ['Finest seahorse in Coralcombe. She does not do heights, or crabs, or being called a pony.', 'The finest seahorse. No heights. No crabs.'] },
       { idle: [['Sir Kipper, at your service. Go on.', 'At your service.'], ['Steady, Lady Bubbles. Yes, dragon?', 'Yes, dragon?']] },
-      { bye: [['Carry on, friend. Carefully.', 'Carry on. Carefully.'], ['Lady Bubbles salutes you. That was a salute.', 'Lady Bubbles salutes!']] },
+      { bye: [["Good knight, dragon. Sleep tight. Don't let the crabs bite.", "Good knight! Don't let the crabs bite."], ['Lady Bubbles salutes you. That was a salute.', 'Lady Bubbles salutes!']] },
       { bark: true, say: ["Steady, Lady Bubbles. Steady. Is that a crab? It's a rock. Steady.", 'Is that a crab? A rock. Steady.'] },
     ],
 
@@ -1218,7 +1218,7 @@ people({
           { t: ["Keep the furnace lit while I'm gone.", 'Keep the furnace lit.'],
             say: [['m_kiln', "EH? It's never been out! Forty years! I'm not starting now!", "It has never been out! Forty years!"]] },
           { t: ['Make it a big one.', 'Make it a big one.'],
-            say: [['m_kiln', "Big as a tent! It'll break! It'll be glorious!", "Big! It'll break! Glorious!"]] },
+            say: [['m_kiln', "Big as a tent! It'll be a smash hit! It'll smash, mind!", 'Big as a tent! A smash hit!']] },
         ] },
       { if: 'flag m_eclipse2 !flag m_done',
         say: ["EH? Dark in the middle of the day again! My furnace is the only light in Sable that didn't blink.", 'Dark in the day again! My furnace stayed lit.'],
@@ -1246,7 +1246,7 @@ people({
       { ask: ['What happened to your eyebrows?', 'What happened to your eyebrows?'],
         say: ['EH? Gone! Two explosions! The second one took both. I draw them on for weddings.', 'Two explosions! I draw them on for weddings.'] },
       { idle: [["EH? Speak up! What is it?", "EH? What is it?"], ['Mind the furnace! Go on!', 'Mind the furnace!']] },
-      { bye: [['EH? Bye! Bye!', 'Bye!'], ["Don't cut bread with anything I made!", "Don't cut bread!"]] },
+      { bye: [['EH? Bye! Mind how you glow!', 'Bye! Mind how you glow!'], ["Don't cut bread with anything I made!", "Don't cut bread!"]] },
       { bark: true, say: ['EH? WHAT? Oh. Nobody said anything. Good.', 'EH? WHAT?'] },
       { bark: true, if: 'item m_mooncrumb', say: ['I can see moonlight in your satchel! Bring it here!', 'Moonlight in your bag! Bring it!'] },
     ],
