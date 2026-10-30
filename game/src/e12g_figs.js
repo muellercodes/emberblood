@@ -39,7 +39,7 @@ const RFM={
 };
 RFM.brass=Object.assign({},RFM.metal,{tex:'brush',ta:.35});
 // Vorlaxis: dark scales with the mountain's heat showing through in the shadows
-RFM.ember=Object.assign({},RFM.scales,{e:[[0,.44,.2,0,0],[.06,.32,.04,0,0],[.28,.12,0,0,0],[.56,0,0,0,0],[.78,-.14,0,.42,0],[.92,-.28,0,.34,0],[1,-.18,0,.3,.06]]});
+RFM.ember=Object.assign({},RFM.scales,{e:[[0,.36,.14,0,0],[.06,.26,.03,0,0],[.28,.08,0,0,0],[.56,0,0,0,0],[.78,-.18,0,.26,0],[.92,-.32,0,.22,0],[1,-.24,0,.2,.06]]});
 RFM.glass=Object.assign({},RFM.ice,{tex:null});
 RFM.shell=Object.assign({},RFM.horn,{tex:'speck',ta:.35,ts:.3});
 const RF={plain:false,fr:0,tn:0,tmax:160,tmin:2.4,tdev:5,on:true,tex:true,layerOn:true,lay:0,ln:0,lmax:6,lmax1:3,gc:new Map(),rgb:new Map(),heu:new Map(),ct:null,fm:null,fmap:null,
