@@ -22,8 +22,8 @@ function r2e(g,x,y,rx,ry,col,rot){ g.fillStyle=col; g.beginPath(); g.ellipse(x,y
 function r2o(g,x,y,r,col){ g.fillStyle=col; g.beginPath(); g.arc(x,y,Math.max(0.1,r),0,TAU); g.fill(); }
 function r2l(g,x0,y0,x1,y1,col,lw){ g.strokeStyle=col; g.lineWidth=lw||1; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke(); }
 function r2rr(g,x,y,w,h,r,col){ g.fillStyle=col; rrect(g,x,y,w,h,Math.max(0,Math.min(r,w/2,h/2))); g.fill(); }
-function r2sh(g,x,y,w,h,r,a){ a=a||0.26; r2rr(g,x+2,y+3,w+5,h+5,r+3,`rgba(0,0,0,${a*0.45})`); r2rr(g,x+2,y+2,w+2,h+2,r,`rgba(0,0,0,${a})`); }
-function r2shC(g,x,y,rx,ry,a){ a=a||0.26; r2e(g,x+3,y+4,rx+3,ry+3,`rgba(0,0,0,${a*0.45})`); r2e(g,x+2,y+3,rx+1,ry,`rgba(0,0,0,${a})`); }
+function r2sh(g,x,y,w,h,r,a){ if(LOOK.re&&riShTo(g)) return riSh(g,x,y,w,h,r,a); a=a||0.26; r2rr(g,x+2,y+3,w+5,h+5,r+3,`rgba(0,0,0,${a*0.45})`); r2rr(g,x+2,y+2,w+2,h+2,r,`rgba(0,0,0,${a})`); }
+function r2shC(g,x,y,rx,ry,a){ if(LOOK.re&&riShTo(g)) return riShC(g,x,y,rx,ry,a); a=a||0.26; r2e(g,x+3,y+4,rx+3,ry+3,`rgba(0,0,0,${a*0.45})`); r2e(g,x+2,y+3,rx+1,ry,`rgba(0,0,0,${a})`); }
 function r2tear(g,x,y,w,h){ g.beginPath(); g.moveTo(x,y-h); g.bezierCurveTo(x+w*1.1,y-h*0.45,x+w,y,x,y); g.bezierCurveTo(x-w,y,x-w*1.1,y-h*0.45,x,y-h); g.fill(); }
 function r2rng(o,s){ return mulberry32((Math.round(o.x)*928371+Math.round(o.y)*364479+(s|0)*7919+((AREA&&AREA.def&&AREA.def.seed)|0)*1299709)|0); }
 function r2pk(r,a){ return a[Math.floor(r()*a.length)%a.length]; }
@@ -136,6 +136,7 @@ function r2WallPlan(R,A){
 
 // ---------- floors
 function r2Floor(g,R){
+  if(LOOK.re) return riFloor(g,R);
   const {x0,y0,W,H}=R, r=mulberry32(R.seed*13+5), f=R.fl;
   g.save(); g.beginPath(); g.rect(x0,y0,W,H); g.clip();
   if(f==='tile') r2Tiles(g,r,x0,y0,W,H,R.S0.tile,24);
@@ -215,6 +216,7 @@ function r2Woven(g,r,x0,y0,W,H){
 }
 // ---------- back wall, side walls, front wall
 function r2Wall(g,R){
+  if(LOOK.re&&!RI.raw) return riWall(g,R);
   const {x0,y0,W}=R, L=x0-28, Wd=W+56, wy=y0-38, wh=66, w=R.wl, r=mulberry32(R.seed*31+7), c=w.c;
   g.save(); g.beginPath(); g.rect(L,wy,Wd,wh); g.clip();
   if(w.k==='stripes'){ g.fillStyle=c[0]; g.fillRect(L,wy,Wd,wh); for(let x=L;x<L+Wd;x+=28){ g.fillStyle=c[1]; g.fillRect(x,wy,14,wh); g.fillStyle=r2a(c[2],0.55); g.fillRect(x+16,wy,1.2,wh); g.fillRect(x+25,wy,1.2,wh); } }
@@ -239,6 +241,7 @@ function r2Wall(g,R){
   r2wood(g,L,y0+28,Wd,6,r2c(R.trim,-0.1),r,6,0); g.fillStyle='rgba(255,240,210,.2)'; g.fillRect(L,y0+28,Wd,1); g.fillStyle='rgba(0,0,0,.55)'; g.fillRect(L,y0+33,Wd,1.2);
 }
 function r2Frame(g,R){
+  if(LOOK.re) return riFrame(g,R);
   const {x0,y0,W,H}=R, r=mulberry32(R.seed*17+3), cap=R.cap, log=R.wl.k==='log', stone=R.wl.k==='stone';
   const side=(x,w,lit)=>{ g.fillStyle=cap; g.fillRect(x,y0-46,w,H+72); if(stone){ for(let y=y0-46;y<y0+H+26;y+=12){ g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(x,y,w,1); g.fillRect(x+(((y/12)|0)%2?8:16),y,1,12); } } else { g.strokeStyle='rgba(255,230,190,.06)'; g.lineWidth=1; for(let k=4;k<w;k+=6){ g.beginPath(); g.moveTo(x+k,y0-46); g.lineTo(x+k,y0+H+26); g.stroke(); } }
     g.fillStyle=lit?'rgba(255,230,190,.18)':'rgba(0,0,0,.45)'; g.fillRect(lit?x:x+w-3,y0-46,3,H+72); g.fillStyle='rgba(0,0,0,.35)'; g.fillRect(lit?x+w-2:x,y0-46,2,H+72); };
@@ -321,7 +324,7 @@ function r2Dec1(g,k,x,y0,R,r,fab){
 // objects that go into the cached room: anything with a static body that is not flagged live
 function r2Bakes(o){ return !!FB[o.k]&&!o.live; }
 function r2Base(A){
-  const S=clamp(Math.ceil(DPR*zoom*2)/2,1,2), key=A.id+'|'+S+'|'+A.rw+'x'+A.rh+'|'+A.objs.length+(LOOK.sb?'|sb':'');
+  const S=clamp(Math.ceil(DPR*zoom*2)/2,1,2), key=A.id+'|'+S+'|'+A.rw+'x'+A.rh+'|'+A.objs.length+(LOOK.sb?'|sb':'')+(LOOK.re?'|re':'');
   if(A._r2key!==key){ A._r2key=key; for(const o of A.objs) o._r2b=r2Bakes(o); }
   if(A._base&&A._base.key===key) return A._base;
   let e=R2.base.find(q=>q.key===key);
@@ -329,10 +332,12 @@ function r2Base(A){
   const R=r2Room(A), bx=A.rx-34, by=A.ry-54, bw=A.rw+68, bh=A.rh+86;
   const cv=mkCanvas(bw*S,bh*S), g=cv.getContext('2d'); g.scale(S,S); g.translate(-bx,-by);
   R.baking=true; R.flames=[]; R.glows=[];
+  if(LOOK.re) riBase(A,cv,g,S,bx,by,bw,bh,R); else {
   r2Floor(g,R); r2Wall(g,R); r2Decor(g,R);
   const post=[], bake=(o)=>{ g.save(); try{ FB[o.k](g,o,R); }catch(err){ console.warn('furn',o.k,err); } g.restore(); };
   for(const o of A.objs){ if(!r2Bakes(o)) continue; if(o.k==='heights'){ post.push(o); continue; } bake(o); }
   r2Clutter(g,R,A); r2Frame(g,R); if(!A.def.noExit) r2Mat(g,R); r2DecorPost(g,R); for(const o of post) bake(o);
+  }
   R.baking=false;
   if(LOOK.sb) lookRoom(cv);
   e={key,cv,bx,by,bw,bh,flames:R.flames,glows:R.glows}; R2.base.unshift(e); if(R2.base.length>2) R2.base.length=2;
@@ -850,6 +855,7 @@ function r2Shards(x,y,k){ ctx.fillStyle=k==='barrel'?'rgba(110,70,36,.75)':k==='
 FL.barrel=FL.pot=FL.sack=(o,t)=>{ if(o.broken) r2Shards(o.x,o.y,o.k); else drawPot(o.x,o.y,o.k); };
 FL.shelf=(o,t)=>{ if(o.page&&!G.pages[o.page]) glowAt(o.x,o.y,26,'255,240,200',0.2+0.12*Math.sin(t*3)); };
 function drawFurn(o,t){
+  if(LOOK.re&&!RZ2.on){ RZ2.on++; try{ drawFurn(o,t); } finally{ RZ2.on--; } return; }
   if(typeof drawFurnX==='function'&&drawFurnX(o,t)) return;
   const F=FB[o.k], L=FL[o.k];
   if(F||L){ if(F&&!(o._r2b&&AREA&&AREA._bk)){ ctx.save(); F(ctx,o,AREA&&AREA.kind==='house'?r2Room(AREA):r2CaveR()); ctx.restore(); } if(L) L(o,t); return; }

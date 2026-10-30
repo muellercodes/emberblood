@@ -170,11 +170,12 @@ const STAIR_SPR=new Map();
 const stC=(a,b,k)=>{ const m=mixRGB(hexRGB(a),hexRGB(b),clamp(k,0,1)); return '#'+m.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); };
 const stairZ=h=>Math.round(h*0.56);   // how far the top of an up flight rises above its footprint (screen px)
 function stairSprite(dir,w,h,mk,lid){
-  const key=dir+'|'+w+'|'+h+'|'+mk+'|'+(lid?1:0)+'|'+(LOOK.sb?1:0); let c=STAIR_SPR.get(key); if(c) return c;
+  const key=dir+'|'+w+'|'+h+'|'+mk+'|'+(lid?1:0)+'|'+(LOOK.sb?1:0)+(LOOK.re?'|re':''); let c=STAIR_SPR.get(key); if(c) return c;
   const M=STAIR_MAT[mk]||STAIR_MAT.wood, Z=dir==='up'?stairZ(h):0, pad=10, top=dir==='up'?Z+12:(lid?16:4);
   const W=w+pad*2, H=h+top+pad, sc=2, cv=mkCanvas(W*sc,H*sc), g=cv.getContext('2d');
   g.scale(sc,sc); g.translate(pad+w/2,top+h/2); g.lineJoin='round'; g.lineCap='round';
   if(dir==='up') stairUpArt(g,w,h,M,Z); else stairDownArt(g,w,h,M,lid);
+  if(LOOK.re) rzRelight(cv,{bump:2,ao:0.1,aoR:3,edge:2,sat:0.86});
   c=LOOK.sb?outlineSprite(cv,SBC.outline,1.5,{force:true}):cv; c.ox=pad+w/2; c.oy=top+h/2; c.w2=W; c.h2=H; STAIR_SPR.set(key,c); return c;
 }
 function stairUpArt(g,w,h,M,Z){
@@ -244,6 +245,7 @@ function drawStairArt(x,y,w,h,dir,mk,t,lid){
 }
 function hintedKey(key){ if(!G||!G.hints) return false; for(const h in G.hints) if(key.startsWith(h)) return true; return false; }
 function drawFurnHouseX(o,t){
+  if(LOOK.re&&riHouseX(o,t)) return true;
   const x=o.x, y=o.y;
   switch(o.k){
     case 'stairs':{
