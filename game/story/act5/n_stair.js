@@ -21,7 +21,7 @@ chapter({
   item: {
     // x4_story's own item (ITEM_NAMES n_spark): its first-hit block in every peak boss fight reads G.items.n_spark
     n_spark: { name: ["Cindervane's Spark", "Cindervane's Spark"],
-      desc: ["One small spark from Sir Cindervane's helmet. It never went out. It blocks the first hit in a big fight.", 'A spark from the knight. It blocks a hit.'],
+      desc: ["One small spark from Sir Cindervane's helmet. It never went out, and it never sits down. It blocks the first hit in a big fight.", 'A spark from the knight. It blocks a hit.'],
       icon: 'fire' },
   },
 
