@@ -65,6 +65,7 @@ function drawPools(){
 }
 function heartPath(x,y,s){ ctx.beginPath(); ctx.moveTo(x,y+s*0.9); ctx.bezierCurveTo(x-s*1.2,y+s*0.1,x-s*0.6,y-s*0.9,x,y-s*0.3); ctx.bezierCurveTo(x+s*0.6,y-s*0.9,x+s*1.2,y+s*0.1,x,y+s*0.9); ctx.closePath(); }
 function drawPickups(){
+  if(LOOK.re&&!LOOK.sb) return rePickups();   // the Realistic look (e12g_figs.js)
   for(const k of G.pickups){
     if(k.life<3&&Math.floor(k.life*8)%2===0) continue;
     const s=(k.big?10:7)*(1+0.12*Math.sin(k.t*6)), y=k.y-4+Math.sin(k.t*4)*2;
@@ -74,6 +75,7 @@ function drawPickups(){
   }
 }
 function drawProjectiles(){
+  if(LOOK.re&&!LOOK.sb) return reProjectiles();   // the Realistic look (e12g_figs.js)
   ctx.save(); ctx.globalCompositeOperation='lighter';
   for(const pr of G.projectiles){
     if(pr.kind==='wave'&&!pr.reflected){
@@ -90,6 +92,7 @@ function drawProjectiles(){
   ctx.restore();
 }
 function drawParticles(){
+  if(LOOK.re&&!LOOK.sb) return reParticles();   // the Realistic look (e12g_figs.js)
   const P=G.particles;
   for(const q of P){ if(q.glow) continue; ctx.fillStyle=`rgba(${q.col},${(q.life/q.max)*0.6*q.al})`; ctx.beginPath(); ctx.arc(q.x,q.y,q.size,0,TAU); ctx.fill(); }
   ctx.save(); ctx.globalCompositeOperation='lighter';

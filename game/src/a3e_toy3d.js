@@ -52,19 +52,19 @@ function t3Ell(x,y,z,rx,ry,rz,col,o){
   const b=rx*rx*_ax[0]*_ax[1]+ry*ry*_ay[0]*_ay[1]+rz*rz*_az[0]*_az[1];
   const d=rx*rx*_ax[1]*_ax[1]+ry*ry*_ay[1]*_ay[1]+rz*rz*_az[1]*_az[1];
   const h=(a-d)/2, q=Math.sqrt(h*h+b*b), l1=(a+d)/2+q, l2=Math.max(0.0004,(a+d)/2-q);
-  p.t=0; p.sx=_t3a[0]; p.sy=_t3a[1]; p.d=_t3a[2]+(o&&o.bias||0); p.ang=0.5*Math.atan2(2*b,a-d); p.s1=Math.sqrt(l1); p.s2=Math.sqrt(l2); p.col=col; p.hi=o&&o.hi;
+  p.t=0; p.sx=_t3a[0]; p.sy=_t3a[1]; p.d=_t3a[2]+(o&&o.bias||0); p.ang=0.5*Math.atan2(2*b,a-d); p.s1=Math.sqrt(l1); p.s2=Math.sqrt(l2); p.col=col; p.hi=o&&o.hi; p.hz=z;
   return p;
 }
 function t3Ball(x,y,z,r,col,o){ return t3Ell(x,y,z,r,r,r,col,o); }
 function t3Limb(ax,ay,az,bx,by,bz,r,col,r2,bias){
   const p=t3Part(); t3P(ax,ay,az,_t3a); t3P(bx,by,bz,_t3b);
-  p.t=1; p.ax=_t3a[0]; p.ay=_t3a[1]; p.bx=_t3b[0]; p.by=_t3b[1]; p.d=(_t3a[2]+_t3b[2])/2+(bias||0); p.r1=r*T3R.k; p.r2=(r2==null?r:r2)*T3R.k; p.col=col;
+  p.t=1; p.ax=_t3a[0]; p.ay=_t3a[1]; p.bx=_t3b[0]; p.by=_t3b[1]; p.d=(_t3a[2]+_t3b[2])/2+(bias||0); p.r1=r*T3R.k; p.r2=(r2==null?r:r2)*T3R.k; p.col=col; p.hz=az<bz?az:bz;
   return p;
 }
 function t3Cone(bx,by,bz,tx,ty,tz,r,col,bias){ const p=t3Limb(bx,by,bz,tx,ty,tz,r,col,r*0.1,bias); p.cone=true; t3P(bx,by,bz,_t3a); t3P(tx,ty,tz,_t3b); p.d=_t3a[2]*0.62+_t3b[2]*0.38+(bias||0); return p; }
 function t3Cyl(x,y,z,r1,r2,h,col,o){
   const p=t3Part(); t3P(x,y,z,_t3a); t3P(x,y,z+h,_t3b);
-  p.t=2; p.ax=_t3a[0]; p.ay=_t3a[1]; p.by=_t3b[1]; p.r1=r1*T3R.k; p.r2=r2*T3R.k; p.d=(_t3a[2]+_t3b[2])/2+(o&&o.bias||0); p.col=col; p.top=o&&o.top||null; p.open=!!(o&&o.open);
+  p.t=2; p.ax=_t3a[0]; p.ay=_t3a[1]; p.by=_t3b[1]; p.r1=r1*T3R.k; p.r2=r2*T3R.k; p.d=(_t3a[2]+_t3b[2])/2+(o&&o.bias||0); p.col=col; p.top=o&&o.top||null; p.open=!!(o&&o.open); p.hz=z;
   return p;
 }
 function t3Poly(pts,col,o){
@@ -76,10 +76,10 @@ function t3Poly(pts,col,o){
   const ux=B[0]-A[0], uy=B[1]-A[1], uz=B[2]-A[2], vx=C[0]-A[0], vy=C[1]-A[1], vz=C[2]-A[2];
   let nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx; const nl=Math.hypot(nx,ny,nz)||1; nx/=nl; ny/=nl; nz/=nl;
   const lit=Math.abs(nx*T3.LW[0]+ny*T3.LW[1]+nz*T3.LW[2]);
-  p.t=3; p.d=dsum/pts.length+(o&&o.bias||0); p.col=col; p.lk=o&&o.shade===false?0:(lit-0.62)*0.9; p.edge=o&&o.edge||null;
+  p.t=3; p.d=dsum/pts.length+(o&&o.bias||0); p.col=col; p.lk=o&&o.shade===false?0:(lit-0.62)*0.9; p.edge=o&&o.edge||null; p.hz=null;
   return p;
 }
-function t3Dot(x,y,z,r,col,bias){ const p=t3Part(); t3P(x,y,z,_t3a); p.t=4; p.sx=_t3a[0]; p.sy=_t3a[1]; p.d=_t3a[2]+(bias||0.01); p.r1=r*T3R.k; p.col=col; return p; }
+function t3Dot(x,y,z,r,col,bias){ const p=t3Part(); t3P(x,y,z,_t3a); p.t=4; p.sx=_t3a[0]; p.sy=_t3a[1]; p.d=_t3a[2]+(bias||0.01); p.r1=r*T3R.k; p.col=col; p.hz=null; return p; }
 function t3Line(ax,ay,az,bx,by,bz,w,col,bias){ const p=t3Limb(ax,ay,az,bx,by,bz,w/2,col,null,bias); p.t=5; return p; }
 // a soft dark ellipse on the ground under the figure (most callers do not need it; the world draws contact shadows)
 function t3Shadow(r,a){ const R=T3R, g=R.g; g.save(); g.globalAlpha=(a||0.3)*R.alpha; g.fillStyle='#000'; g.beginPath(); g.ellipse(R.x,R.y,r*R.k,r*R.k*T3.ct*0.8,0,0,TAU); g.fill(); g.restore(); }
@@ -108,6 +108,7 @@ function t3Grad(col,qx,qy,mode){
   T3G.set(key,gr); return gr;
 }
 function t3End(){
+  if(LOOK.re&&!LOOK.sb) return reT3End();   // the Realistic look's materials (e12g_figs.js)
   const R=T3R, g=R.g, L=T3.L, m=R.m, n=R.n, list=R.list;
   // insertion sort (lists are short) back to front
   for(let i=1;i<n;i++){ const p=list[i]; let j=i-1; while(j>=0&&list[j].d>p.d){ list[j+1]=list[j]; j--; } list[j+1]=p; }

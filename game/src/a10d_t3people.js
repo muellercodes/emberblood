@@ -409,12 +409,12 @@ function t3pBake(face,k,build,arg,res){
   const Wd=Math.max(1,Math.min(720,Math.ceil((x1-x0)*res))), Hd=Math.max(1,Math.min(720,Math.ceil((y1-y0)*res)));
   const cv=document.createElement('canvas'); cv.width=Wd; cv.height=Hd;
   const g=cv.getContext('2d'); g.setTransform(res,0,0,res,-x0*res,-y0*res);
-  const q2=performance.now(); R.g=g; R.m=g.getTransform(); R.x=0; R.y=0; t3End(); R.g=ctx; const q3=performance.now();
+  const q2=performance.now(); R.g=g; R.m=g.getTransform(); R.x=0; R.y=0; if(LOOK.re) rfBakeBegin(arg); t3End(); if(LOOK.re) rfBakeEnd(); R.g=ctx; const q3=performance.now();
   T3P.tB+=q1-q0; T3P.tC+=q2-q1; T3P.tE+=q3-q2;
   return {cv,ox:x0,oy:y0,w:Wd/res,h:Hd/res,fx:T3S.fx,top:T3S.top};
 }
 function t3pGet(key,face,k,build,arg,stale){
-  const res=t3pRes(), kk=key+'@'+res, M=T3P.spr; let e=M.get(kk);
+  const res=t3pRes(), kk=key+'@'+res+(LOOK.re?'r':LOOK.sb?'s':''), M=T3P.spr; let e=M.get(kk);
   if(e){ M.delete(kk); M.set(kk,e); T3P.hits++; return e; }
   const now=performance.now(); if(now-T3P.last>8) T3P.deadline=now+3.5; T3P.last=now;
   if(stale&&!T3P.force&&now>T3P.deadline) return stale;
