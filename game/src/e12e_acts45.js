@@ -55,7 +55,7 @@ const E45M3=[], E45N4=[], E45N4A=[];
 // the story place looks of Acts IV and V (v10_art4a/4b/4s, v10_art5a/5b/5s): no bold outline, relit
 const E45LOOK=/^(m4|a4s_|n5|moon_lock_carving|green_fourth_post|hoof$|hat_n5_)/;
 { const base=gtLookSprite; gtLookSprite=function(id,L,state){
-  if(!E45.on()||!E45LOOK.test(id)) return base.apply(this,arguments);
+  if(!E45.on()||!E45LOOK.test(id)||L.outline===false) return base.apply(this,arguments);   // the soft unoutlined looks stay as painted
   const key=id+'|'+(state==null?'':state);
   return rzCache('e45look:'+key,()=>{ const M=E45LK[id]; return M?M(L,state):e45LookRelit(id,L,state); }); }; }
 const E45LK={};
@@ -400,7 +400,7 @@ function e45CoralHead(i,R,wet){ R=Math.max(4,Math.round(R/3)*3); i=i%12; return 
   const rng=mulberry32(4400+i*31+R), F=rzSq(R,4), kind=['brain','stag','tube','fan','brain','stag'][i%6], P=E45CORP()[Math.floor(i/6)%4];
   rzContact(F,0,R*0.15,R*0.95,R*0.75,0.35); e45CoralBody(F,rng,kind,R*0.9,P,0,0,0.3);
   const c=rzShade(F,{ao:0.14,aoR:1.2,rim:0.25,bump:1.2,sat:0.95});
-  if(wet){ const g=c.getContext('2d'); g.globalCompositeOperation='source-atop'; g.fillStyle='rgba(36,118,136,.26)'; g.fillRect(0,0,c.width,c.height); g.globalCompositeOperation='source-over'; }
+  if(wet){ const g=c.getContext('2d'); g.globalCompositeOperation='source-atop'; g.fillStyle='rgba(36,118,136,.16)'; g.fillRect(0,0,c.width,c.height); g.globalCompositeOperation='source-over'; }
   return c; }); }
 // the Reefwall's crests poking out of the water (reefc0..): a staghorn clump, a brain coral, a fan behind
 function e45Reefc(F,w,h,bx,by,key){
@@ -681,6 +681,137 @@ function e45Lan(F,w,h,bx,by,key){
   return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
 }
 E45N4A.push([/^r?lan[01]$/,e45Lan,null]);
+
+// ---------- 9. Moonfall's ground pieces painted into the chunks: rafts and docks of weathered planks, the Moon
+// Pier's marble slabs, the mangrove root walkways, Sable's paving, the Silver Rift's lips (same shapes as x3_world's)
+const e45Grey=(hex,k)=>{ const c=rzHex(hex), l=c[0]*0.3+c[1]*0.59+c[2]*0.11; return [c[0]+(l-c[0])*k,c[1]+(l-c[1])*k,c[2]+(l-c[2])*k]; };
+const e45Rgb=(c,a)=>a==null?`rgb(${c[0]|0},${c[1]|0},${c[2]|0})`:`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+{ const base=m3wRaftPaint; m3wRaftPaint=function(g,R){ if(!LOOK.re) return base(g,R);
+  const [x0,y0,x1,y1]=R.r, w=x1-x0, h=y1-y0, rng=mulberry32(Math.floor(x0*3+y0)), vert=h>w;
+  g.save();
+  g.fillStyle='rgba(10,34,44,.3)'; rrect(g,x0+5,y0+9,w,h,6); g.fill();
+  if(!R.plank){ const nb=Math.max(2,Math.round(w/70)); for(let i=0;i<nb;i++){ const bx=x0+16+i*(w-32)/Math.max(1,nb-1||1), yy=y1+2;
+    g.fillStyle='rgba(16,24,20,.55)'; g.beginPath(); g.ellipse(bx+1,yy+1,12,5.6,0,0,TAU); g.fill(); g.fillStyle='#6a4c32'; g.beginPath(); g.ellipse(bx,yy-1,11,4.6,0,0,TAU); g.fill();
+    g.fillStyle='#8a6a48'; g.beginPath(); g.ellipse(bx-2,yy-2,7,2.4,0,0,TAU); g.fill(); g.fillStyle='#4a4a48'; g.fillRect(bx-11,yy-2,22,1.4); } }
+  const cols=R.plank?['#a07848','#b08a5a']:R.id==='town'?['#c89a62','#b88a54']:R.id==='dock'?['#a8845a','#98764e']:[['#c8a070','#b8905e'],['#d8b080','#c49a6a'],['#8cc4bc','#7eb4ac'],['#e8a890','#d8987e'],['#b8a888','#a89878']][Math.floor(rng()*5)];
+  const n=Math.ceil((vert?h:w)/12);
+  // the deck's dark gaps, then each plank in its own weathered tone, lit along its upper or left edge
+  g.fillStyle='#2e241c'; g.fillRect(x0,y0,w,h);
+  for(let i=0;i<n;i++){ const c=rzCol(e45Grey(cols[i%2],0.35),(rzHash(i,3,x0|0)-0.5)*0.16), px=vert?x0:x0+i*12, py=vert?y0+i*12:y0, pw=vert?w:Math.min(11,x1-px), ph=vert?Math.min(11,y1-py):h;
+    if(pw<=0||ph<=0) continue; g.fillStyle=e45Rgb(c); g.fillRect(px,py,pw,ph);
+    g.fillStyle='rgba(255,246,226,.18)'; if(vert) g.fillRect(px,py,pw,1.6); else g.fillRect(px,py,1.6,ph);
+    g.fillStyle='rgba(30,20,12,.22)'; if(vert) g.fillRect(px,py+ph-1.6,pw,1.6); else g.fillRect(px+pw-1.6,py,1.6,ph);
+    g.fillStyle='rgba(40,30,24,.55)'; for(const e of [0.06,0.94]){ if(vert){ g.fillRect(px+pw*e-1,py+ph/2-1,1.8,1.8); } else { g.fillRect(px+pw/2-1,py+ph*e-1,1.8,1.8); } } }
+  rzOver(g,vert?'grainH':'grainV',x0,y0,w,h,0.5);
+  // weathering: salt bleaching on one end, a wet dark band at the waterline
+  const gr=vert?g.createLinearGradient(x0,0,x1,0):g.createLinearGradient(0,y0,0,y1); gr.addColorStop(0,'rgba(240,236,224,.1)'); gr.addColorStop(0.75,'rgba(0,0,0,0)'); gr.addColorStop(1,'rgba(20,30,30,.2)'); g.fillStyle=gr; g.fillRect(x0,y0,w,h);
+  if(!R.plank){ g.strokeStyle='rgba(90,70,44,.85)'; g.lineWidth=2.2; g.setLineDash([3,2]); g.strokeRect(x0+3,y0+3,w-6,h-6); g.strokeStyle='rgba(214,196,150,.7)'; g.lineWidth=1; g.strokeRect(x0+3,y0+3,w-6,h-6); g.setLineDash([]); }
+  g.restore(); }; }
+{ const base=m3wPierPaint; m3wPierPaint=function(g){ if(!LOOK.re) return base(g);
+  const P=M3WG.pier; g.save();
+  g.fillStyle='rgba(10,24,50,.3)'; g.fillRect(P.x0+6,P.y0+10,P.x1-P.x0,P.y1-P.y0);
+  g.fillStyle='#8c8aa4'; g.fillRect(P.x0-2,P.y0-2,P.x1-P.x0+4,P.y1-P.y0+4);
+  for(let x=P.x0;x<P.x1;x+=30){ const k=(rzHash(x|0,7,301)-0.5)*0.08, c=rzCol([222,222,232],k); g.fillStyle=e45Rgb(c); g.fillRect(x+0.8,P.y0,29,P.y1-P.y0);
+    g.fillStyle='rgba(255,255,255,.3)'; g.fillRect(x+0.8,P.y0,29,3); g.fillStyle='rgba(70,70,110,.22)'; g.fillRect(x+0.8,P.y1-4,29,4); }
+  rzOver(g,'plaster',P.x0,P.y0,P.x1-P.x0,P.y1-P.y0,0.55);
+  const gr=g.createLinearGradient(0,P.y0,0,P.y1); gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(0.8,'rgba(0,0,0,0)'); gr.addColorStop(1,'rgba(70,110,100,.3)'); g.fillStyle=gr; g.fillRect(P.x0,P.y0,P.x1-P.x0,P.y1-P.y0);
+  g.fillStyle='#9eaedc'; g.beginPath(); g.arc(13560,65450,26,0,TAU); g.fill(); g.fillStyle='#e2e2ee'; g.beginPath(); g.arc(13570,65444,22,0,TAU); g.fill();
+  g.strokeStyle='rgba(120,130,190,.7)'; g.lineWidth=2; g.beginPath(); g.arc(13700,65450,40,0,TAU); g.stroke();
+  for(let i=0;i<8;i++){ const a=i/8*TAU, x=13700+Math.cos(a)*34, y=65450+Math.sin(a)*34; g.fillStyle='#5a6aa8'; g.beginPath(); g.arc(x,y,2.8,0,TAU); g.fill(); g.fillStyle='#d8e2ff'; g.beginPath(); g.arc(x-0.7,y-0.7,1.4,0,TAU); g.fill(); }
+  g.restore(); }; }
+{ const base=m3wRootPaint; m3wRootPaint=function(g,a,b){ if(!LOOK.re) return base(g,a,b);
+  const rng=mulberry32(a[0]+b[1]); g.save(); g.lineCap='round'; g.lineJoin='round';
+  for(let k=0;k<4;k++){ const off=(k-1.5)*9, pts=[[a[0],a[1]+off]]; for(let i=1;i<=6;i++){ const t=i/6; pts.push([lerp(a[0],b[0],t)+(rng()-0.5)*14,lerp(a[1],b[1],t)+off+(rng()-0.5)*10]); }
+    const wd=10-k*2, line=(dx,dy)=>{ g.beginPath(); g.moveTo(pts[0][0]+dx,pts[0][1]+dy); for(let i=1;i<pts.length;i++) g.lineTo(pts[i][0]+dx,pts[i][1]+dy); g.stroke(); };
+    g.strokeStyle='rgba(12,20,14,.42)'; g.lineWidth=wd+2; line(2,3);
+    g.strokeStyle=k%2?'#5a4230':'#6e5238'; g.lineWidth=wd; line(0,0);
+    g.strokeStyle='rgba(206,180,136,.32)'; g.lineWidth=Math.max(1,wd*0.3); line(-wd*0.22,-wd*0.25);
+    g.strokeStyle='rgba(30,22,14,.35)'; g.lineWidth=0.8; g.setLineDash([2,5]); line(wd*0.15,wd*0.1); g.setLineDash([]); }
+  g.restore(); }; }
+{ const base=m3wSablePaint; m3wSablePaint=function(g){ if(!LOOK.re) return base(g);
+  g.save(); const cx=9800, cy=67650;
+  // the paving is a ring round the pool (the water inside stays clear)
+  const ring=()=>{ g.beginPath(); g.ellipse(cx,cy,330,315,0,0,TAU); g.moveTo(cx+224,cy); g.ellipse(cx,cy,224,213,0,0,TAU,true); };
+  g.fillStyle='rgba(222,204,166,.66)'; ring(); g.fill('evenodd');
+  g.save(); ring(); g.clip('evenodd'); rzOver(g,'grit',cx-330,cy-315,660,630,0.7);
+  // flagstones in rings: joints along the rings and across them
+  g.strokeStyle='rgba(120,96,64,.38)'; g.lineWidth=1.2;
+  for(let r=245;r<330;r+=24){ g.beginPath(); g.ellipse(cx,cy,r,r*0.95,0,0,TAU); g.stroke(); const n=Math.round(r*TAU/34), rr=mulberry32(r);
+    for(let i=0;i<n;i++){ const an=i/n*TAU+(rr()-0.5)*0.04; g.beginPath(); g.moveTo(cx+Math.cos(an)*r,cy+Math.sin(an)*r*0.95); g.lineTo(cx+Math.cos(an)*(r+24),cy+Math.sin(an)*(r+24)*0.95); g.stroke(); } }
+  g.restore();
+  g.strokeStyle='rgba(150,112,70,.6)'; g.lineWidth=3; g.beginPath(); g.ellipse(cx,cy,330,315,0,0,TAU); g.stroke();
+  g.fillStyle='rgba(222,204,166,.55)'; rrect(g,9420,67920,760,170,40); g.fill(); g.save(); rrect(g,9420,67920,760,170,40); g.clip(); rzOver(g,'grit',9420,67920,760,170,0.6); g.restore();
+  for(let i=0;i<24;i++){ const a=i/24*TAU, x=cx+Math.cos(a)*300, y=cy+Math.sin(a)*286; g.fillStyle='rgba(40,60,110,.7)'; g.beginPath(); g.arc(x,y,4.4,0,TAU); g.fill(); g.fillStyle='#9ab8e6'; g.beginPath(); g.arc(x,y,3.4,0,TAU); g.fill(); g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.arc(x-1.2,y-1.2,1.1,0,TAU); g.fill(); }
+  g.restore(); }; }
+{ const base=m3wRiftPaint; m3wRiftPaint=function(g){ if(!LOOK.re) return base(g);
+  // the same drawing with the lips as cut salt glass (a thin dark edge and a bright one) instead of the plum outline
+  const o=SBC.outline; try{ SBC.outline='rgba(24,16,44,.75)'; base(g); } finally{ SBC.outline=o; } }; }
+
+// ---------- 10. the Peak's standing things (x4_world.js n4Spr keys): lamp posts, shrines and the silent ruins of a
+// copy of Emberhollow, in black glass and dark chalk (paler stone after the dawn)
+function e45N4Lamp(F,w,h,bx,by,key){
+  const lit=key[4]==='1', dawn=key.slice(-1)==='d', P=dawn?[[96,88,124],[150,142,180]]:[[30,24,46],[64,54,94]];
+  rzContact(F,1,1,9,3.5,0.45);
+  rzBox(F,0,-0.5,12,3,0,2,0.8,P[1],dawn?RZ.ROCK:RZ.GLOSS);
+  rzCap(F,0,-1,2,0,-40,16,2.2,1.8,P[0],dawn?RZ.ROCK:RZ.GLOSS);
+  for(let i=0;i<6;i++){ const t0=i/6, t1=(i+1)/6, q=t=>[(1-t)*(1-t)*0+2*(1-t)*t*7+t*t*9,(1-t)*(1-t)*-40+2*(1-t)*t*-44+t*t*-38]; const a=q(t0), b=q(t1); rzCap(F,a[0],a[1],16+t0*2,b[0],b[1],16+t1*2,1.2,1.1,P[0],RZ.METAL); }
+  e45Fill(F,4.5,-38.5,14.5,-25.5,(x,y,o)=>{ const ed=Math.min(x-5,14-x,y+38,-26-y); if(ed<0) return false; o.a=e45Cov(ed+0.5);
+    if(ed<1.1||Math.abs(x-9.5)<0.7){ o.z=19; o.c=rzCol(P[0],0.2); o.m=RZ.METAL; return true; }
+    o.z=18; if(lit){ o.m=RZ.EMIT; o.c=rzMix([236,156,64],[255,246,206],1-Math.min(1,Math.hypot(x-9.5,(y+32)*0.8)/6)); if(x>12) o.c=[214,224,250]; }
+    else { o.m=RZ.GLOSS; o.c=rzMix([30,24,52],[70,60,110],clamp(0.5-(x-5+y+38)/20,0,1)); if(m3wSegD([[6,-36],[9,-31],[7,-28]],x,y)<0.55) o.c=[170,150,240]; }
+    return true; });
+  rzPoly(F,[[3.5,-38],[15.5,-38],[9.5,-43]],(x,y)=>20+(-38-y)*0.6-Math.abs(x-9.5)*0.3,P[0],RZ.METAL);
+  return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
+}
+E45N4.push([/^lamp[01]d?$/,e45N4Lamp,null]);
+function e45N4Shrine(F,w,h,bx,by,key){
+  const lit=key.slice(-1)==='1', OB=lit?[[110,72,30],[196,146,62],[246,214,130]]:[[24,18,38],[48,40,74],[110,96,160]];
+  rzContact(F,3,4,26,9,0.45);
+  rzDome(F,0,2,24,9,0,0.5,3,lit?[70,58,100]:[34,28,52],RZ.ROCK,0.5); rzDome(F,0,0,22,7.5,0,2.5,1.5,lit?[106,92,142]:[50,42,74],RZ.GLOSS,0.4);
+  rzPoly(F,[[-9,0],[9,0],[6,-40],[0,-50],[-6,-40]],(x,y)=>{ const t=-y/50; return 5+t*22+(1-Math.abs(x)/(9-3*t))*4; },(x,y)=>{ const d=x/(9+y*0.06); return d<-0.35?OB[2]:d<0.15?OB[1]:OB[0]; },lit?RZ.METAL:RZ.GLOSS);
+  rzDome(F,0,-22,3.6,6,0,20,1.4,lit?[255,246,208]:[74,62,112],lit?RZ.EMIT:RZ.GLOSS,0.6);
+  return rzShade(F,{ao:0.12,aoR:1.2,rim:0.25,bump:1.2});
+}
+E45N4.push([/^shrine[01]$/,e45N4Shrine,null]);
+function e45Ruin(F,w0,h0,bx,by,key){
+  const id=key.slice(5).replace(/d$/,''), dawn=/d$/.test(key)&&!N4RUINS.some(r=>r.id===key.slice(5)), o=N4RUINS.find(r=>r.id===id)||{kind:'house'};
+  const w=o.w||120, h=o.h||80, H=24, ST=dawn?[150,140,170]:[54,46,80], TOP=dawn?[188,180,206]:[82,72,118], FL=dawn?[120,112,140]:[40,34,62];
+  if(o.kind==='house'||o.kind==='forge') rzContact(F,6,8,w*0.55,h*0.55,0.3); else rzContact(F,0,6,o.kind==='arch'?50:24,12,0.35);
+  const sc=(x,y,o2,z,front,base)=>{ e45Stone(o2,x,y,14,7,17,front?rzCol(base,-0.12):base,z,0.5,0.18); o2.m=dawn?RZ.ROCK:RZ.GLOSS; };
+  if(o.kind==='house'||o.kind==='forge'){ const gaps=o.gaps||{}, rects=[];
+    const wall=(x,y,ww,hh,front)=>{ rects.push({x,y,ww,hh,front}); };
+    wall(-w/2,-h/2-H,w,H,true);
+    if(!gaps.w) wall(-w/2-4,-h/2-H,8,h+H,false); else { wall(-w/2-4,-h/2-H,8,(h+H)*0.38,false); wall(-w/2-4,-h/2-H+(h+H)*0.68,8,(h+H)*0.32,false); }
+    if(!gaps.e) wall(w/2-4,-h/2-H,8,h+H,false); else { wall(w/2-4,-h/2-H,8,(h+H)*0.38,false); wall(w/2-4,-h/2-H+(h+H)*0.68,8,(h+H)*0.32,false); }
+    const sw=gaps.s?w*0.36:w; wall(-w/2,h/2-10,sw,10,true); if(gaps.s) wall(w/2-sw,h/2-10,sw,10,true);
+    e45Fill(F,-w/2-6,-h/2-H-2,w/2+6,h/2+12,(x,y,q)=>{
+      for(let i=rects.length-1;i>=0;i--){ const r=rects[i];
+        if(x>=r.x&&x<=r.x+r.ww&&y>=r.y&&y<=r.y+r.hh){ sc(x,y,q,H,false,TOP); q.a=e45Cov(Math.min(x-r.x,r.x+r.ww-x,y-r.y,r.y+r.hh-y)+0.5); if(y-r.y<1.6) q.c=rzCol(q.c,0.15); return true; }
+        if(r.front&&x>=r.x&&x<=r.x+r.ww&&y>r.y+r.hh&&y<=r.y+r.hh+H*0.45){ sc(x,y,q,H-(y-r.y-r.hh)*1.2,true,ST); return true; } }
+      if(Math.abs(x)<=w/2&&Math.abs(y)<=h/2){ q.m=dawn?RZ.ROCK:RZ.GLOSS; q.z=1;
+        if(o.bed&&Math.abs(x-o.bed[0])<=16&&y>=o.bed[1]-10&&y<=o.bed[1]+12){ q.z=5; q.m=RZ.CLOTH; q.c=y<o.bed[1]-3?[106,94,152]:[62,52,98]; if(y<o.bed[1]-6&&x<o.bed[0]-3&&x>o.bed[0]-13) q.c=[140,130,188]; return true; }
+        if(o.kind==='forge'&&Math.abs(x)<=12&&y>=-8&&y<=6){ q.z=7; q.m=RZ.METAL; q.c=y<-4?[64,54,96]:[30,24,48]; return true; }
+        const B=e45Bond(x+200,y+200,16,16,18); q.c=B.d<0.6?rzCol(FL,-0.35):rzCol(FL,(B.h-0.5)*0.2); if(B.d<0.6) q.z=0.6; return true; }
+      return false; });
+    // a faint crack of moonlight in the back wall
+    rzEach(F,(x,y,id)=>{ if(m3wSegD([[-w/2+10,-h/2-H+6],[-w/2+22,-h/2-H+14],[-w/2+18,-h/2-H+20]],x,y)<0.6&&!dawn){ F.c[id*3]=176; F.c[id*3+1]=156; F.c[id*3+2]=240; F.m[id]=RZ.EMIT; } });
+  } else if(o.kind==='arch'){
+    e45Fill(F,-48,-82,48,12,(x,y,q)=>{ const d=Math.hypot(x,y+34);
+      if(y<-34&&d>=32&&d<=46&&Math.atan2(y+34,x)<-Math.PI*0.39&&x<26){ sc(x,y,q,22+(46-d)*0.3,false,TOP); q.a=e45Cov(Math.min(d-32,46-d)+0.5); return true; }
+      if(x>=-46&&x<=-28&&y>=-54&&y<=10){ sc(x,y,q,20+(x+46)*-0.1,x>-34,ST); return true; }
+      if(x>=28&&x<=46&&y>=-30&&y<=10){ sc(x,y,q,18,x>40,ST); if(y<-27) q.c=rzCol(q.c,-0.2); return true; }
+      return false; });
+  } else if(o.kind==='chimney'){
+    e45Fill(F,-13,-63,13,7,(x,y,q)=>{ if(y<-56&&Math.abs(x)<=13){ sc(x,y,q,30,false,TOP); if(Math.abs(x)<6&&y>-61&&y<-58){ q.c=[14,10,22]; q.z=26; } return true; }
+      if(Math.abs(x)<=10&&y>=-56&&y<=6){ sc(x,y,q,22+e45S(x/10)*5,false,ST); return true; } return false; });
+  } else if(o.kind==='well'){
+    rzDome(F,0,0,22,13,0,0.5,5,ST,RZ.GLOSS,0.5); rzDome(F,0,-2,15,8,0,5,0.2,[8,4,14],RZ.GLOSS,0.3);
+    for(const sx of [-17.5,17.5]) rzBox(F,sx,-15,5,30,0,12,0.8,ST,RZ.GLOSS);
+    rzBox(F,0,-30.5,44,5,0,16,1,TOP,RZ.GLOSS);
+  }
+  return rzShade(F,{ao:0.14,aoR:1.8,rim:0.25,bump:1});
+}
+E45N4.push([/^ruin_/,e45Ruin,null]);
 
 // ---------- 4. painting ahead: the great places of the map Ash is on are painted in idle time (PROPS's queue), so
 // walking up to one never waits on it. [table, key, w, h, bx, by] as the act files ask for them.
