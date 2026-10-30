@@ -258,7 +258,7 @@ function rfParts(g,m,ox,oy,occ){
       let cx=0, cy=0; const np=q.length/2; for(let j=0;j<q.length;j+=2){ cx+=q[j]; cy+=q[j+1]; } cx/=np; cy/=np;
       let rr=0; for(let j=0;j<q.length;j+=2){ const d=Math.abs(q[j]-cx)+Math.abs(q[j+1]-cy); if(d>rr) rr=d; }
       g.translate(ox+cx,oy+cy);
-      if(rr>3*k) g.fillStyle=rfGP(col,mat,lq,Math.max(2,Math.round(rr)),Math.round(L[0]*10),Math.round(L[1]*10)); else g.fillStyle=rfFlat(col,mat,lq);
+      if(rr>3*k) g.fillStyle=rfGP(col,mat,lq,rr<12?Math.round(rr):Math.round(Math.pow(2,Math.round(Math.log2(rr)*4)/4)),Math.round(L[0]*10),Math.round(L[1]*10)); else g.fillStyle=rfFlat(col,mat,lq);   // big wings: sizes in steps, so a flapping wing reuses its ramps
       g.beginPath(); g.moveTo(q[0]-cx,q[1]-cy); for(let j=2;j<q.length;j+=2) g.lineTo(q[j]-cx,q[j+1]-cy); g.closePath(); g.fill();
       if(M.tex&&rr>5*k&&(M.tex==='dust'||M.tex==='feather'||M.tex==='fur'||M.tex==='scale'||M.tex==='weave')&&rfTexOK()){ const pt=rfPat(M.tex); if(pt){ const ts=M.ts*k; DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=0; DM.f=0; pt.setTransform(DM); g.globalAlpha=ga*M.ta*0.8; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
       if(p.edge){ g.strokeStyle=p.edge; g.lineWidth=0.8*k; g.lineJoin='round'; g.globalAlpha=ga*0.75; g.stroke(); g.globalAlpha=ga; }
