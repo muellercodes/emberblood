@@ -388,7 +388,7 @@ function reFieldRows(C,fy0,fy1){
       const Tm=TX[mat], ta=Tm[q4+3]*0.00392;
       if(ta>0){ r+=(Tm[q4]-r)*ta; g+=(Tm[q4+1]-g)*ta; b+=(Tm[q4+2]-b)*ta; }
       if(mat===RM.SAND){ const rp=Math.sin((px+x0)*0.33+(py+y0)*0.21+pn*3.2+pn2*2)*0.045; r*=1+rp; g*=1+rp; b*=1+rp*1.1; }
-      else if(mat===RM.SNOW){ const sh=pn2<-0.1?(-0.1-pn2)*0.3:0; r-=sh*60; g-=sh*44; b-=sh*14; }
+      else if(mat===RM.SNOW){ const sh=pn2<0.05?(0.05-pn2)*0.42+(pn<0?-pn*0.08:0):0; r-=sh*58; g-=sh*40; b-=sh*10; }
       if(flags&14){
         // bog: mud, then dark puddles with a sheen
         if(flags&8){ const bg=BG[k00]*w00+BG[k10]*w10+BG[k01]*w01+BG[k11]*w11+(fn-0.5)*0.05+pn*0.13+pn2*0.05;
@@ -527,7 +527,7 @@ function reSlabs(g,rng,x0,y0,x1,y1,pal,rowH){
 const RE_STONE={stone:['#8e887e','#948e84','#88827a','#9a9488','#8c867e','#96908a'],mortar:'#6a645a',moss:'78,104,46'};
 const RE_STONE_D={stone:['#5c5654','#625c58','#58524e','#66605c','#5e5856'],mortar:'#3e3a36',moss:'90,70,50'};
 function reDecal(g,dc){
-  const k=dc.k; if(k!=='flagstone'&&k!=='paving'&&k!=='dirt'&&k!=='sand'&&k!=='mudring'&&k!=='field') return false;
+  const k=dc.k; if(k!=='flagstone'&&k!=='paving'&&k!=='dirt'&&k!=='sand'&&k!=='mudring'&&k!=='field'&&k!=='pen') return false;
   reSprInit(); reTexInit();
   const rng=mulberry32(Math.floor(dc.x*7+dc.y*13)^0x51ab), S=RES_SPR;
   g.save();
@@ -562,6 +562,21 @@ function reDecal(g,dc){
       g.save(); g.translate(x,y); g.rotate(a+Math.PI/2); g.fillStyle='rgba(20,14,8,.3)'; g.fillRect(-8,-3,18,9); g.fillStyle='#5e4a32'; g.fillRect(-9,-5,18,9); g.fillStyle='#76603e'; g.fillRect(-9,-5,18,2.2); g.strokeStyle='rgba(30,20,10,.5)'; g.lineWidth=0.6; g.beginPath(); g.moveTo(-6,-1); g.lineTo(6,-1); g.moveTo(-4,2); g.lineTo(5,2); g.stroke(); g.restore(); }
     g.restore(); return true;
   }
+  const post=(x,y)=>{ g.fillStyle='rgba(20,14,8,.3)'; g.fillRect(x-1.5,y-1,5,5); g.fillStyle='#4a3420'; g.fillRect(x-2.5,y-2.5,5,5); g.fillStyle='#6a4e30'; g.fillRect(x-2.5,y-2.5,5,1.5); };
+  const rails=(x0,y0,w,h)=>{ g.strokeStyle='rgba(20,14,8,.3)'; g.lineWidth=2.4; g.strokeRect(x0+1,y0+1.5,w,h); g.strokeStyle='#6e5234'; g.lineWidth=2; g.strokeRect(x0,y0,w,h); g.strokeStyle='rgba(200,170,120,.3)'; g.lineWidth=0.7; g.strokeRect(x0-0.5,y0-0.5,w,h); };
+  if(k==='pen'){
+    // a sheep pen: trampled straw and mud with soft snow drifts, a rail fence, a hay bale
+    g.translate(dc.x,dc.y); const w=dc.w, h=dc.h;
+    g.fillStyle='rgba(112,94,66,.62)'; g.fillRect(-w/2,-h/2,w,h);
+    for(let i=0;i<Math.round(w*h/90);i++){ g.fillStyle=rng()<0.5?'rgba(60,46,30,.25)':'rgba(190,170,120,.25)'; g.fillRect(-w/2+rng()*w,-h/2+rng()*h,1.6,1.1); }
+    g.strokeStyle='rgba(214,190,120,.5)'; g.lineWidth=0.6; for(let i=0;i<90;i++){ const x=-w/2+rng()*w, y=-h/2+rng()*h, a=rng()*TAU; g.beginPath(); g.moveTo(x,y); g.lineTo(x+Math.cos(a)*3,y+Math.sin(a)*3); g.stroke(); }
+    for(let i=0;i<16;i++){ const x=(rng()-0.5)*w*0.9, y=(rng()-0.5)*h*0.9, r=6+rng()*14, sg=g.createRadialGradient(x,y,0,x,y,r); sg.addColorStop(0,'rgba(232,238,246,.62)'); sg.addColorStop(1,'rgba(232,238,246,0)'); g.fillStyle=sg; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }
+    rails(-w/2,-h/2,w,h);
+    for(let x=-w/2;x<=w/2;x+=24){ post(x,-h/2); post(x,h/2); }
+    const bx=w/2-40, by=-h/2+10;
+    g.fillStyle='rgba(30,20,10,.3)'; g.fillRect(bx+1.5,by+2.5,26,18); g.fillStyle='#bca064'; g.fillRect(bx,by,26,18); g.fillStyle='#d6bc7c'; g.fillRect(bx,by,26,4); g.strokeStyle='rgba(110,84,40,.6)'; g.lineWidth=0.6; for(let i=0;i<7;i++){ g.beginPath(); g.moveTo(bx+1+rng()*24,by+5); g.lineTo(bx+1+rng()*24,by+17); g.stroke(); } g.fillStyle='rgba(90,64,30,.7)'; g.fillRect(bx+7,by,1.4,18); g.fillRect(bx+18,by,1.4,18);
+    g.restore(); return true;
+  }
   // a crop field: furrowed soil, rows of plants, a rail fence
   g.translate(dc.x,dc.y); g.rotate(dc.rot);
   const w=dc.w, h=dc.h;
@@ -570,9 +585,7 @@ function reDecal(g,dc){
   const cc=hexRGB(dc.crop||'#b8a04a'), pal=cc[1]>cc[0]?'meadow':'dry';
   for(let y=-h/2+6;y<h/2;y+=10){ g.fillStyle='rgba(30,20,12,.35)'; g.fillRect(-w/2+3,y+3,w-6,2.4); g.fillStyle='rgba(150,118,80,.2)'; g.fillRect(-w/2+3,y-2,w-6,1.4);
     for(let x=-w/2+6;x<w/2-4;x+=4+rng()*2) reDraw(g,S.tuft[pal][Math.floor(rng()*6)],x,y+1.5,0.75+rng()*0.25); }
-  const post=(x,y)=>{ g.fillStyle='rgba(20,14,8,.3)'; g.fillRect(x-1.5,y-1,5,5); g.fillStyle='#4a3420'; g.fillRect(x-2.5,y-2.5,5,5); g.fillStyle='#6a4e30'; g.fillRect(x-2.5,y-2.5,5,1.5); };
-  g.strokeStyle='rgba(20,14,8,.3)'; g.lineWidth=2.4; g.strokeRect(-w/2-5,-h/2-4.5,w+12,h+12);
-  g.strokeStyle='#6e5234'; g.lineWidth=2; g.strokeRect(-w/2-6,-h/2-6,w+12,h+12); g.strokeStyle='rgba(200,170,120,.3)'; g.lineWidth=0.7; g.strokeRect(-w/2-6.5,-h/2-6.5,w+12,h+12);
+  rails(-w/2-6,-h/2-6,w+12,h+12);
   for(let x=-w/2-6;x<=w/2+6;x+=30){ post(x,-h/2-6); post(x,h/2+6); }
   g.restore(); return true;
 }
