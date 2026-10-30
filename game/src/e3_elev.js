@@ -769,7 +769,7 @@ function elvPaintChunk(ch,cx,cy){
   for(const f of E.falls) if(f.bb&&f.bb[0]<x1&&f.bb[2]>x0&&f.bb[1]<y1&&f.bb[3]>y0) items.push([f.lvl,3,0,()=>elvPaintFall(g,f)]);
   for(const v of E.vents) if(v.x+80>x0&&v.x-80<x1&&v.y+60>y0&&v.y-60<y1) items.push([v.lvl||0,4,v.i,()=>elvPaintVent(g,v)]);
   for(const p of E.paths) if(p.bb[0]<x1&&p.bb[2]>x0&&p.bb[1]<y1&&p.bb[3]>y0) items.push([(p.lvl||0)+0.1,0,p.i,()=>elvPaintPath(g,p,x0,y0,x1,y1)]);
-  for(const d of decos) items.push([d.lvl!=null?d.lvl:99,d.order!=null?d.order:5,0,()=>d.paint(g,x0,y0,x1,y1,ch)]);
+  for(const d of decos) items.push([d.lvl!=null?d.lvl:99,d.order!=null?d.order:5,0,LOOK.re?()=>reDeco(d,g,x0,y0,x1,y1,ch):()=>d.paint(g,x0,y0,x1,y1,ch)]);
   if(!items.length) return;
   items.sort((a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2]);
   g.save(); g.beginPath(); g.rect(x0-1,y0-1,CH+2,CH+2); g.clip();

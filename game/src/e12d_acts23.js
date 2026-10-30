@@ -476,5 +476,223 @@ function reBridge(g,br){
 }
 { const base=drawBridge; drawBridge=function(g,br){ if(LOOK.re&&!LOOK.sb&&reBridge(g,br)) return; return base(g,br); }; }
 
+// ---------- 3. the hand-drawn art of the acts in this look (the standing things of Acts II and III, their story place
+// looks, the leftover prop kinds): drawn by their own code with the plum outlines softened (reSoftCtx), then
+// repainted as materials by colour (brass brushed and shining with verdigris in its creases, copper and clay, iron
+// with rust, weathered wood grain, slate, plaster and chalk with grime toward the ground, glass and ice that shine)
+// and relit from the art light with relief and occlusion. The work is cut into small steps that run in the frame's
+// spare time (rePump, a few ms a frame), never in one go: until a sprite is ready its Classic one is drawn.
+const REA={BRASS:1,CLAY:2,WHITE:3,STONE:4,IRON:5,WOOD:6,SLATE:7,GLASS:8,PAINT:9,SNOW:10,EMIT:11};
+// specular strength and power by material (index REA.*)
+const REA_SP=[0,0.85,0.16,0.06,0.05,0.5,0.06,0.28,0.85,0.08,0.3,0], REA_PW=[1,22,12,10,10,18,10,16,40,10,26,1];
+function reMatClass(r,g,b){
+  const mx=r>g?(r>b?r:b):(g>b?g:b), mn=r<g?(r<b?r:b):(g<b?g:b), v=mx/255, s=mx?(mx-mn)/mx:0; let h=0;
+  if(mx!==mn){ if(mx===r) h=((g-b)/(mx-mn))%6; else if(mx===g) h=(b-r)/(mx-mn)+2; else h=(r-g)/(mx-mn)+4; h*=60; if(h<0) h+=360; }
+  if(v>0.97&&s<0.25) return REA.EMIT;                       // lit windows, flames, the hottest highlights stay as painted
+  if(h>=35&&h<=56&&s>0.5&&v>0.5) return REA.BRASS;
+  if((h<30||h>350)&&s>0.35&&v>0.28) return REA.CLAY;
+  if(h>=18&&h<35&&s>=0.22&&v<0.72) return REA.WOOD;
+  if(h>=168&&h<=218&&s>0.12&&v>=0.66) return REA.GLASS;
+  if(s<0.14&&v>0.86) return h>=190&&h<=240&&s>0.02?REA.SNOW:REA.WHITE;
+  if(s<0.24&&v>0.5) return REA.STONE;
+  if(s<0.26&&v<=0.5) return b>=r*0.92?REA.IRON:REA.STONE;
+  if(h>=185&&h<=240&&s>0.15) return REA.SLATE;
+  return REA.PAINT;
+}
+// a 2d context for drawing a sprite in this look: the plum outlines (the Storybook outline colour and the hand-drawn
+// plum strokes) come out as a thin soft dark edge, and every flat opaque fill is shaded as a form lit from the upper
+// left (tall shapes as upright drums, wide ones as walls under the sky, the rest from corner to corner), so the
+// relight finds volumes instead of cut paper
+const RE_OUT=new Set(['#3b2233','#3b2a2a','#2a1a10','#3a2a20','#2a2a30']);
+function reParseCol(v){
+  if(typeof v!=='string') return null; let m;
+  if(v[0]==='#'){ if(v.length===7) return [parseInt(v.slice(1,3),16),parseInt(v.slice(3,5),16),parseInt(v.slice(5,7),16),1]; if(v.length===4) return [parseInt(v[1]+v[1],16),parseInt(v[2]+v[2],16),parseInt(v[3]+v[3],16),1]; return null; }
+  if((m=/^rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[, /]+([\d.]+))?\)$/.exec(v))) return [+m[1],+m[2],+m[3],m[4]==null?1:+m[4]];
+  return null;
+}
+function reSoftCtx(g){
+  const O=RE_OUT; O.add(String(RE1.real||SBC.outline).toLowerCase());
+  let soft=0, bb=[1e9,1e9,-1e9,-1e9];
+  const pt=(x,y)=>{ if(x<bb[0]) bb[0]=x; if(y<bb[1]) bb[1]=y; if(x>bb[2]) bb[2]=x; if(y>bb[3]) bb[3]=y; };
+  const formed=(t,x0,y0,x1,y1)=>{ const c=reParseCol(t.fillStyle); if(!c||c[3]<0.9) return null; const w=x1-x0, h=y1-y0; if(!(w>2.5&&h>2.5)) return null;
+    let gr; const L=reRGB(rzMix(c,[255,248,234],0.16)), B=reRGB(c), D1=reRGB(reK(c,0.86)), D2=reRGB(reK(c,0.72));
+    if(h>w*1.6){ gr=t.createLinearGradient(x0,0,x1,0); gr.addColorStop(0,reRGB(reK(c,0.92))); gr.addColorStop(0.22,L); gr.addColorStop(0.45,B); gr.addColorStop(0.8,D1); gr.addColorStop(1,D2); }
+    else if(w>h*1.6){ gr=t.createLinearGradient(0,y0,0,y1); gr.addColorStop(0,L); gr.addColorStop(0.4,B); gr.addColorStop(1,D1); }
+    else { gr=t.createLinearGradient(x0,y0,x1,y1); gr.addColorStop(0,L); gr.addColorStop(0.45,B); gr.addColorStop(1,D2); }
+    return gr; };
+  const P=new Proxy(g,{
+    get(t,p){
+      if(p==='stroke') return (...a)=>{ if(soft){ const lw=t.lineWidth; t.lineWidth=Math.max(0.6,lw*0.5); t.stroke(...a); t.lineWidth=lw; } else t.stroke(...a); };
+      if(p==='beginPath') return ()=>{ bb=[1e9,1e9,-1e9,-1e9]; t.beginPath(); };
+      if(p==='moveTo'||p==='lineTo') return (x,y)=>{ pt(x,y); t[p](x,y); };
+      if(p==='quadraticCurveTo') return (a,b,x,y)=>{ pt(a,b); pt(x,y); t.quadraticCurveTo(a,b,x,y); };
+      if(p==='bezierCurveTo') return (a,b,c,d,x,y)=>{ pt(a,b); pt(c,d); pt(x,y); t.bezierCurveTo(a,b,c,d,x,y); };
+      if(p==='arcTo') return (a,b,c,d,r)=>{ pt(a,b); pt(c,d); t.arcTo(a,b,c,d,r); };
+      if(p==='arc') return (x,y,r,a0,a1,ccw)=>{ pt(x-r,y-r); pt(x+r,y+r); t.arc(x,y,r,a0,a1,ccw); };
+      if(p==='ellipse') return (x,y,rx,ry,rot,a0,a1,ccw)=>{ const m=Math.max(rx,ry); pt(x-m,y-m); pt(x+m,y+m); t.ellipse(x,y,rx,ry,rot,a0,a1,ccw); };
+      if(p==='rect') return (x,y,w,h)=>{ pt(x,y); pt(x+w,y+h); t.rect(x,y,w,h); };
+      if(p==='fill') return (...a)=>{ if(a.length&&typeof a[0]!=='string'){ t.fill(...a); return; } const gr=bb[0]<bb[2]?formed(t,bb[0],bb[1],bb[2],bb[3]):null; if(gr){ const f=t.fillStyle; t.fillStyle=gr; t.fill(...a); t.fillStyle=f; } else t.fill(...a); };
+      if(p==='fillRect') return (x,y,w,h)=>{ const gr=formed(t,Math.min(x,x+w),Math.min(y,y+h),Math.max(x,x+w),Math.max(y,y+h)); if(gr){ const f=t.fillStyle; t.fillStyle=gr; t.fillRect(x,y,w,h); t.fillStyle=f; } else t.fillRect(x,y,w,h); };
+      if(p==='__target') return t; const v=t[p]; return typeof v==='function'?v.bind(t):v; },
+    set(t,p,v){ if((p==='strokeStyle'||p==='fillStyle')&&typeof v==='string'&&O.has(v.toLowerCase())){ if(p==='strokeStyle'){ soft=1; v='rgba(36,28,30,.5)'; } else v='rgba(36,28,30,.42)'; }
+      else if(p==='strokeStyle') soft=0;
+      t[p]=v; return true; } });
+  return P;
+}
+// the steps of repainting one canvas (sc pixels per world px); yields between rows so the pump can stop any time
+function* reArtG(cv,o){
+  o=o||{}; const W=cv.width, Hh=cv.height; if(!W||!Hh) return cv;
+  const g=cv.getContext('2d'); let id; try{ id=g.getImageData(0,0,W,Hh); }catch(e){ return cv; }
+  const d=id.data, n=W*Hh, sc=o.sc||2, h=new Float32Array(n), a=new Float32Array(n), M=new Uint8Array(n), base=o.base!=null?o.base*sc:Hh, gr=o.grime==null?1:o.grime;
+  const bump=(o.bump==null?2.6:o.bump), sd=o.seed||7, f1=0.5/sc;
+  yield;
+  // 1. classify every pixel and lay the material's grain on its colour
+  for(let y=0;y<Hh;y++){
+    for(let x=0;x<W;x++){ const i=y*W+x, A=d[i*4+3]/255; a[i]=A; if(A<=0) continue;
+      let r=d[i*4], gg=d[i*4+1], b=d[i*4+2]; const m=A<0.6?REA.PAINT:reMatClass(r,gg,b); M[i]=m; let k=1;
+      const wx=x*f1, wy=y*f1;
+      if(m===REA.BRASS) k=1+0.1*(rzVN(wx*0.06+sd,wy*1.4,sd)-0.5)+0.05*(rzHash(x,y,sd)-0.5);
+      else if(m===REA.CLAY) k=1+0.12*(rzFbm(wx*0.2,wy*0.2,sd,2)-0.5)+0.06*(rzHash(x>>1,y>>1,sd)-0.5);
+      else if(m===REA.WHITE||m===REA.STONE){ k=1+(m===REA.STONE?0.16:0.08)*(rzFbm(wx*0.12,wy*0.12,sd+3,3)-0.5)+0.04*(rzHash(x,y,sd)-0.5)-0.025*(rzVN(wx*0.5,wy*0.03,sd+5)>0.72?1:0);
+        const dy=(base-y)/sc; if(dy<14&&dy>-4) k*=1-gr*0.1*(1-Math.max(0,dy)/14); }
+      else if(m===REA.IRON){ k=1+0.07*(rzHash(x,y,sd)-0.5); if(Math.abs(r-b)<22&&rzFbm(wx*0.25,wy*0.25,sd+9,2)>0.7){ r=r*0.8+118*0.2; gg=gg*0.8+72*0.2; b=b*0.8+44*0.2; } }
+      else if(m===REA.WOOD) k=1+0.16*(rzVN(wx*1.1+sd,wy*0.07,sd)-0.5)+0.07*(rzHash(x>>1,y,sd)-0.5);
+      else if(m===REA.SLATE) k=1+0.12*(rzHash(Math.floor(wx/6),Math.floor(wy/4),sd)-0.5)+0.04*(rzHash(x,y,sd)-0.5);
+      else if(m===REA.GLASS) k=1+0.08*(0.5-((y%Math.max(4,Math.round(18*sc)))/(18*sc)));
+      else if(m===REA.PAINT||m===REA.SNOW) k=1+0.05*(rzHash(x,y,sd)-0.5);
+      if(m!==REA.EMIT){ r*=k; gg*=k; b*=k; }
+      d[i*4]=r; d[i*4+1]=gg; d[i*4+2]=b;
+      h[i]=(0.299*r+0.587*gg+0.114*b)/255*bump; }
+    if((y+1)%Math.max(1,Math.floor(3000/W))===0) yield;
+  }
+  // 2. the relief at the outline, then the blurred height for creases and occlusion
+  const tmp=new Float32Array(n), ab=new Float32Array(n), hb=new Float32Array(n), hb2=new Float32Array(n), edge=(o.edge==null?2:o.edge)*sc*0.5;
+  rzBlur(a,W,Hh,Math.max(1,Math.round(edge)),ab,tmp); yield;
+  for(let i=0;i<n;i++) if(a[i]>0) h[i]+=Math.min(1,ab[i]*1.6)*edge*1.1;
+  const rr=Math.max(1,Math.round((o.aoR||2.2)*sc*0.5)); rzBlur(h,W,Hh,rr,hb,tmp); yield; rzBlur(hb,W,Hh,rr,hb2,tmp); yield;
+  // 3. light it: art light, occlusion, a cool shade and a warm light, the material's shine, verdigris in brass creases
+  const Lx=RZL[0], Ly=RZL[1], Lz=RZL[2], Hx=RZH[0], Hy=RZH[1], Hz=RZH[2], ao=o.ao==null?0.11:o.ao, sat=o.sat==null?0.92:o.sat, flat=Lz*0.85+0.15, gain=o.gain||1;
+  for(let y=0;y<Hh;y++){
+    for(let x=0;x<W;x++){ const i=y*W+x; if(a[i]<=0) continue; const m=M[i]; if(m===REA.EMIT) continue;
+      const hL=x>0?h[i-1]:0, hR=x<W-1?h[i+1]:0, hU=y>0?h[i-W]:0, hD=y<Hh-1?h[i+W]:0;
+      let nx=(hL-hR)*0.5, ny=(hU-hD)*0.5; const il=1/Math.sqrt(nx*nx+ny*ny+1); nx*=il; ny*=il; const nz=il;
+      const dl=nx*Lx+ny*Ly+nz*Lz, dif=Math.max(0,dl*0.85+0.15)/flat;
+      let oc=1+(h[i]-hb2[i])*ao; oc=oc<0.55?0.55:oc>1.12?1.12:oc;
+      const kk=(0.44+0.56*dif)*oc*gain, sh=1-Math.min(1,kk);
+      let R=d[i*4]*kk, G2=d[i*4+1]*kk, B=d[i*4+2]*kk;
+      R+=-10*sh+(kk>1?6*(kk-1):0); G2+=-3*sh+(kk>1?3*(kk-1):0); B+=9*sh-(kk>1?5*(kk-1):0);
+      if(m===REA.BRASS&&oc<0.97&&(d[i*4]-d[i*4+2])>d[i*4]*0.55){ const pv=Math.min(1,(0.97-oc)*5)*(rzVN(x*0.09,y*0.09,sd+11)>0.45?1:0.3); R+=(96-R)*pv*0.5; G2+=(150-G2)*pv*0.5; B+=(126-B)*pv*0.5; }
+      const sp=REA_SP[m]; if(sp>0){ const nh=nx*Hx+ny*Hy+nz*Hz; if(nh>0){ let s=Math.pow(nh,REA_PW[m])*sp*255*Math.min(1,oc); if(m===REA.SNOW&&rzHash(x,y,7)>0.985) s+=120*dif; R+=s; G2+=s*0.97; B+=s*0.9; } }
+      const l=0.299*R+0.587*G2+0.114*B; R=l+(R-l)*sat; G2=l+(G2-l)*sat; B=l+(B-l)*sat;
+      d[i*4]=R<0?0:R>255?255:R; d[i*4+1]=G2<0?0:G2>255?255:G2; d[i*4+2]=B<0?0:B>255?255:B; }
+    if((y+1)%Math.max(1,Math.floor(3000/W))===0) yield;
+  }
+  g.putImageData(id,0,0);
+  return cv;
+}
+// the queue of sprites being repainted, worked on in the spare time of each frame (chunkPlan calls rePump)
+const REQ={jobs:new Map(),order:[],gen:-1,budget:3,st:{done:0,steps:0,maxStep:0,maxMake:0,ms:0}};
+const RET=new Map();   // finished sprites by key (cleared when the look changes)
+function reArtGet(key){ if(REQ.gen!==LOOK.gen){ REQ.gen=LOOK.gen; RET.clear(); REQ.jobs.clear(); REQ.order.length=0; } return RET.get(key); }
+// ask for a sprite: make() returns {cv, o} (the drawn canvas and the repaint options) and runs when the job starts
+function reArtAsk(key,make,pri){
+  if(REQ.jobs.has(key)) return; const J={key,make,it:null,cv:null,pri:pri||0}; REQ.jobs.set(key,J); REQ.order.push(J);
+}
+function rePump(){
+  if(!LOOK.re||!REQ.order.length) return;
+  const t0=performance.now(), end=t0+REQ.budget;
+  while(REQ.order.length&&performance.now()<end){
+    // first asked, first painted (a draw asks for what is on screen; the planners ask for what is coming)
+    const J=REQ.order[0];
+    try{
+      if(!J.it){ const tm=performance.now(), r=J.make(); if(!r){ REQ.order.shift(); REQ.jobs.delete(J.key); continue; } J.cv=r.cv; J.fin=r.fin; J.it=reArtG(r.cv,r.o); J.n=0; const dm=performance.now()-tm; if(dm>REQ.st.maxMake){ REQ.st.maxMake=dm; REQ.st.makeKey=J.key; } continue; }
+      const ts=performance.now(); const st=J.it.next(); const dt=performance.now()-ts; REQ.st.steps++; J.n++; if(dt>REQ.st.maxStep){ REQ.st.maxStep=dt; REQ.st.stepKey=J.key+'#'+J.n; }
+      if(st.done){ REQ.order.shift(); REQ.jobs.delete(J.key); let c=J.cv; if(J.fin) c=J.fin(c)||c; RET.set(J.key,c); REQ.st.done++; }
+    }catch(e){ console.error('re art',J.key,e); REQ.order.shift(); REQ.jobs.delete(J.key); }
+  }
+  REQ.st.ms+=performance.now()-t0;
+}
+// tests: finish every queued sprite now
+function reFlush(){ let n=0; while(REQ.order.length&&n<100000){ const b=REQ.budget; REQ.budget=1e9; rePump(); REQ.budget=b; n++; } }
+{ const base=chunkPlan; chunkPlan=function(){ base(); if(LOOK.re) try{ reActPlan(); rePump(); }catch(e){} }; }
+// what is coming: every few frames the standing things just outside the view (600 px round it) are drawn once into
+// nothing (a clip with no area), which asks for their sprites, so they are usually painted before they show. Kinds
+// whose drawing does anything besides drawing (sounds, particles, timers, words) are left out.
+const REP={tick:0,pure:new Map()};
+function rePure(D){ let v=REP.pure.get(D); if(v==null){ v=!/emit\(|later\(|SFX|ftext|Snd\(|Math\.random|G\.found\.|setBanner|shake\(/.test(String(D._re0||D.draw)); REP.pure.set(D,v); } return v; }
+function reActPlan(){
+  if(!G||AREA||!player||scene!=='play'||(++REP.tick)%15) return;
+  const m=curMap(), A=m===1&&typeof C1WD!=='undefined'?[C1WD,C1K]:m===2&&typeof F2WD!=='undefined'?[F2WD,F2WK]:null; if(!A||!A[0].built) return;
+  const [Wd,K]=A, s=Wd.bs, M=600, vx0=cam.x, vy0=cam.y, vx1=cam.x+W/zoom, vy1=cam.y+H/zoom, t=G.time;
+  const i0=Math.floor((vx0-M)/s), i1=Math.floor((vx1+M)/s), j0=Math.floor((vy0-M)/s), j1=Math.floor((vy1+M+400)/s);
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,0,0); ctx.clip(); RE1.plan=1;
+  try{ for(let i=i0;i<=i1;i++) for(let j=j0;j<=j1;j++){ const b=Wd.bk.get(i+'|'+j); if(!b) continue;
+    for(const o of b){ const D=K[o.k]; if(!D||!rePure(D)) continue; if(o.x>vx0-40&&o.x<vx1+40&&o.y>vy0-40&&o.y<vy1+200) continue; try{ D.draw(o,t); }catch(e){} } } }
+  finally{ RE1.plan=0; ctx.restore(); }
+}
+// the Realistic tall sprite for the act modules' cached sprites (c1wTall, f2wTall: w x h world px, base at bx,by).
+// The drawing is made at once (as Classic would, with softened outlines and formed fills) and shown as it is until the
+// repaint is done; the planner (RE1.plan) only asks, and the pump makes it later.
+function reTall(pre,key,w,h,bx,by,draw,base,o){
+  const k=pre+key, c=reArtGet(k); if(c) return c;
+  const J0=REQ.jobs.get(k); if(J0&&J0.cv) return J0.cv;
+  const make=()=>{ const sc=2, cv=mkCanvas(Math.ceil(w*sc),Math.ceil(h*sc)), g0=cv.getContext('2d'); g0.scale(sc,sc); g0.translate(bx,by); g0.lineCap='round'; g0.lineJoin='round';
+    const g=reSoftCtx(g0), was=SBC.outline; RE1.paint++; SBC.outline=RE1.real; try{ draw(g); } finally{ RE1.paint--; SBC.outline=was; }
+    cv.ox=bx; cv.oy=by; cv.w2=w; cv.h2=h;
+    return {cv,o:Object.assign({sc,base:by,seed:k.length*31+7},o||{}),fin:c=>{ c.ox=bx; c.oy=by; c.w2=w; c.h2=h; return c; }}; };
+  reArtAsk(k,make);
+  if(RE1.plan) return RE1.empty();
+  const J=REQ.jobs.get(k); if(J&&!J.it){ const r=make(); J.cv=r.cv; J.fin=r.fin; J.it=reArtG(r.cv,r.o); J.n=0; return r.cv; }
+  return J&&J.cv?J.cv:base();
+}
+const RE1={paint:0,plan:0,real:null,ecv:null,empty(){ if(!RE1.ecv){ RE1.ecv=mkCanvas(2,2); RE1.ecv.ox=RE1.ecv.oy=0; RE1.ecv.w2=RE1.ecv.h2=1; } return RE1.ecv; }};
+// the outline colour the drawings ask for: while an act's standing thing draws itself in this look (its live parts:
+// sails, belts, chains, boats, flags), SBC.outline is a soft dark instead of Storybook's plum
+const RE_SOFTO='rgba(36,28,30,.45)';
+function reSoftly(D){ if(!D||D._re0) return; const b=D.draw; D._re0=b; D.draw=function(o,t){ if(!LOOK.re||LOOK.sb) return b.call(this,o,t); const was=SBC.outline; if(RE1.real==null) RE1.real=was; SBC.outline=RE_SOFTO; try{ return b.call(this,o,t); } finally{ SBC.outline=was; } }; }
+function reSoftFn(name,fn){ return function(...a){ if(!LOOK.re||LOOK.sb) return fn.apply(this,a); const was=SBC.outline; if(RE1.real==null) RE1.real=was; SBC.outline=RE_SOFTO; try{ return fn.apply(this,a); } finally{ SBC.outline=was; } }; }
+for(const K of [C1K,F2WK]) for(const k in K) reSoftly(K[k]);
+// while a sprite is drawn for this look, the cel helpers shade softly (one tone with a gradient from the lit top left)
+// instead of in flat bands, so the relight above finds round forms rather than steps
+function reGradFill(g,path,col,x0,y0,x1,y1,k){
+  const c=typeof col==='string'?hexRGB(col.length===7?col:'#808080'):col, gr=g.createLinearGradient(x0,y0,x1,y1);
+  gr.addColorStop(0,reRGB(rzMix(c,[255,248,232],0.2*k))); gr.addColorStop(0.45,reRGB(c)); gr.addColorStop(1,reRGB(reK(c,1-0.3*k)));
+  g.fillStyle=gr; g.beginPath(); path(g,0,0); g.fill();
+}
+{ const base=celFill; celFill=function(g,path,col,o){ if(!RE1.paint||!LOOK.re||typeof col!=='string'||col[0]!=='#') return base(g,path,col,o);
+  const R=(o&&o.r)||16; return reGradFill(g,path,col,-R,-R,R,R,1); }; }
+{ const base=celBall; celBall=function(g,x,y,r,col,tones){ if(!RE1.paint||!LOOK.re||typeof col!=='string'||col[0]!=='#') return base(g,x,y,r,col,tones);
+  const c=hexRGB(col.length===7?col:'#808080'), gr=g.createRadialGradient(x-r*0.35,y-r*0.4,r*0.1,x,y,r); gr.addColorStop(0,reRGB(rzMix(c,[255,250,236],0.35))); gr.addColorStop(0.55,reRGB(c)); gr.addColorStop(1,reRGB(reK(c,0.62)));
+  g.fillStyle=gr; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }; }
+// boxes: a soft light from the left over the face, a darker right edge
+{ const base=c1Shade; c1Shade=function(g,x,y,w,h,col){ if(!RE1.paint||!LOOK.re||typeof col!=='string'||col[0]!=='#') return base(g,x,y,w,h,col); reGradFill(g,q=>q.rect(x,y,w,h),col,x,y,x+w,y+h*0.25,0.9); }; }
+{ const base=f2wShade; f2wShade=function(g,x,y,w,h,col,r){ if(!RE1.paint||!LOOK.re||typeof col!=='string'||col[0]!=='#') return base(g,x,y,w,h,col,r); reGradFill(g,q=>{ if(r) rrect(q,x,y,w,h,r); else q.rect(x,y,w,h); },col,x,y,x+w,y+h*0.25,0.9); }; }
+// snow on the north's roofs, caps and ledges: one soft drift with a blue shade under it and a lit crest, instead of a
+// row of balls (the same random numbers are drawn, so the rest of the sprite is laid out as before)
+{ const base=f2wSnowCap; f2wSnowCap=function(g,x0,x1,y,th,rng){ if(!RE1.paint||!LOOK.re) return base(g,x0,x1,y,th,rng);
+  const n=Math.max(2,Math.round((x1-x0)/9)), R=[]; for(let i=0;i<=n;i++) R.push(rng?rng():0.5);
+  const top=i=>y-th*(0.55+R[i]*0.5), X=i=>lerp(x0,x1,i/n), drift=(dy,sh)=>{ g.beginPath(); g.moveTo(x0-th*0.5,y+th*0.55+dy); g.lineTo(x0-th*0.3,top(0)+th*0.4+dy);
+    for(let i=0;i<n;i++){ const xm=(X(i)+X(i+1))/2; g.quadraticCurveTo(X(i),top(i)+dy,xm,(top(i)+top(i+1))/2+th*0.12+dy); }
+    g.quadraticCurveTo(X(n),top(n)+dy,x1+th*0.3,top(n)+th*0.4+dy); g.lineTo(x1+th*0.5,y+th*0.55+dy); g.quadraticCurveTo((x0+x1)/2,y+th*(sh||0.95)+dy,x0-th*0.5,y+th*0.55+dy); g.closePath(); };
+  g.fillStyle='rgba(104,124,168,.5)'; drift(th*0.45,1.2); g.fill();
+  const gr=g.createLinearGradient(0,y-th,0,y+th); gr.addColorStop(0,'#fbfdff'); gr.addColorStop(0.55,'#e6eef8'); gr.addColorStop(1,'#b8c8de'); g.fillStyle=gr; drift(0); g.fill();
+  g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=Math.max(0.8,th*0.22); g.beginPath(); for(let i=0;i<=n;i++){ const xx=X(i), yy=top(i)+th*0.12; i?g.lineTo(xx,yy):g.moveTo(xx,yy); } g.stroke();
+}; }
+// Act II and Act III standing things (C1K, F2WK and every other cached tall sprite of x1_world.js and x2_world.js)
+{ const base=c1wTall; c1wTall=function(key,w,h,bx,by,draw,ow){ if(LOOK.re&&!LOOK.sb) return reTall('c1:',key,w,h,bx,by,draw,()=>base(key,w,h,bx,by,draw,ow)); return base(key,w,h,bx,by,draw,ow); }; }
+{ const base=f2wTall; f2wTall=function(key,w,h,bx,by,draw,ow){ if(LOOK.re&&!LOOK.sb) return reTall('f2:',key,w,h,bx,by,draw,()=>base(key,w,h,bx,by,draw,ow)); return base(key,w,h,bx,by,draw,ow); }; }
+
+// ---------- 4. the acts' ground art (ELEV.deco paints: town floors, quays, plazas, rails, fields, roofs, the Great
+// Clock's face, causeways...): painted through the same softening context (no plum outlines; each opaque stone, tile
+// and slab shaded from the upper left), with the real outline colour asked for by name turned soft
+function reDeco(d,g,x0,y0,x1,y1,ch){
+  const was=SBC.outline; if(RE1.real==null) RE1.real=was; SBC.outline=RE_SOFTO; RE1.paint++;
+  try{ return d.paint(reSoftCtx(g),x0,y0,x1,y1,ch); } finally{ RE1.paint--; SBC.outline=was; }
+}
+
 // ---------- debug and tests
-window.__ebDbg=Object.assign(window.__ebDbg||{},{re23:{bridges:()=>BRIDGES.map(b=>[Math.round(b.x),Math.round(b.y),b.kind,Math.round(b.len),b.w,b.map])}});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{re23:{bridges:()=>BRIDGES.map(b=>[Math.round(b.x),Math.round(b.y),b.kind,Math.round(b.len),b.w,b.map]),REQ,RET,flush:reFlush,
+  // a sheet of finished act sprites (keys starting with pre), on a mid grey, for looking at them closely
+  sheet(pre,sc,maxW){ reFlush(); const L=[...RET.entries()].filter(([k])=>k.startsWith(pre||'')).map(e=>e[1]).sort((p,q)=>q.height-p.height); if(!L.length) return null; sc=sc||1; maxW=maxW||1600;
+    const pos=[]; let x=4,y=4,rh=0,W2=0; for(const c of L){ const w=c.width*sc/2, h=c.height*sc/2; if(x+w>maxW){ x=4; y+=rh+6; rh=0; } pos.push([x,y,w,h]); x+=w+6; rh=Math.max(rh,h); W2=Math.max(W2,x); }
+    const cv=mkCanvas(Math.ceil(W2),Math.ceil(y+rh+4)), g=cv.getContext('2d'); g.fillStyle='#8a8a7a'; g.fillRect(0,0,cv.width,cv.height); L.forEach((c,i)=>g.drawImage(c,pos[i][0],pos[i][1],pos[i][2],pos[i][3])); return cv.toDataURL(); }}});
