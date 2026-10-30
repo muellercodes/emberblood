@@ -24,6 +24,8 @@ const ORDER = ['a1_core','a1b_data','a1c_state','a1k_simple','a1d_story','a1e_pe
   'e11_items',
   // the Realistic look (v12 wave 10): the light engine, the ground and water, the props and buildings
   'e12_light', 'e12b_ground', 'e12c_props',
+  // the Realistic look, wave 11: Acts II and III outdoors, Acts IV and V outdoors, interiors and caves, figures and effects
+  'e12d_acts23', 'e12e_acts45', 'e12f_inside', 'e12g_figs',
   'x9_music','x9_music2',
   // hidden cheats for Drew (wraps the game once everything has loaded)
   'z1_cheats',
