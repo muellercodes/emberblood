@@ -344,7 +344,7 @@ function e45CrysSync(force){
   const on=LOOK.re&&!!G&&!AREA&&typeof curMap==='function';
   if(!on||force){ if(E45CL.list.length){ for(let i=LIGHTS.length-1;i>=0;i--) if(LIGHTS[i].e45) LIGHTS.splice(i,1); E45CL.list.length=0; } E45CL.key=''; if(!on) return; }
   const m=curMap(); if(m!==3&&m!==4) return;
-  const cx=Math.floor(player.x/700), cy=Math.floor(player.y/700), key=m+':'+cx+':'+cy; if(key===E45CL.key) return; E45CL.key=key;
+  const cx=Math.floor(player.x/700), cy=Math.floor(player.y/700), key=m+':'+cx+':'+cy+':'+Math.floor((G.time||0)/3); if(key===E45CL.key) return; E45CL.key=key;
   for(let i=LIGHTS.length-1;i>=0;i--) if(LIGHTS[i].e45) LIGHTS.splice(i,1); E45CL.list.length=0;
   const add=(x,y,k,s)=>{ if(E45CL.list.length>=160) return; const C=E45CK[k]; if(!C||Math.abs(x-player.x)>1800||Math.abs(y-player.y)>1400) return; const L={x,y:y-6*(s||1),r:C[0]*(s||1),i:C[1],kind:'crystal',e45:1}; LIGHTS.push(L); E45CL.list.push(L); };
   try{ for(const arr of PROPS.values()) for(const p of arr) if(E45CK[p.k]) add(p.x,p.y,p.k,p.s); }catch(e){}
@@ -581,6 +581,25 @@ function e45PaintLvl(g,x0,y0,x1,y1,ch,L){
   if(mine.length&&!dawn){ const q=GL(); for(const c of mine){ const F=N4FT[c.b]||N4FT[41]; q.strokeStyle=c.ember?'rgba(255,140,70,.5)':`rgba(${F[5]},.3)`; q.lineWidth=c.big?4.5:3; path(q,c); q.stroke(); } }
   g.restore();
 }
+// the Midnight Clock's dial: a rim of worn chalk stone with the numbers cut into it, pale flagstones on the walkable
+// arcs, a hub of dark stone (same rings and arcs as x4_world's)
+{ const base=n4Dial; n4Dial=function(g,K,dawn){ if(!LOOK.re) return base(g,K,dawn);
+  g.save();
+  const rot=280, mid=(K.r+K.rim)/2, at=(h,R)=>{ const p=(rot+h*30)*N4D; return [K.x+Math.sin(p)*R,K.y-Math.cos(p)*R]; };
+  g.strokeStyle=dawn?'rgb(214,204,198)':'rgb(122,116,150)'; g.lineWidth=40; g.beginPath(); g.arc(K.x,K.y,mid,0,TAU); g.stroke();
+  for(const [a0,a1] of [K.six,K.nine]){ g.strokeStyle=dawn?'rgb(236,230,222)':'rgb(176,170,200)'; g.lineWidth=34; g.beginPath(); g.arc(K.x,K.y,mid,(a0-90)*N4D,(a1-90)*N4D); g.stroke();
+    g.strokeStyle='rgba(40,30,60,.35)'; g.lineWidth=1; for(let a=a0;a<a1;a+=6){ const p=(a-90)*N4D; g.beginPath(); g.moveTo(K.x+Math.cos(p)*(mid-17),K.y+Math.sin(p)*(mid-17)); g.lineTo(K.x+Math.cos(p)*(mid+17),K.y+Math.sin(p)*(mid+17)); g.stroke(); } }
+  // the stone's grain, clipped to the rim
+  g.save(); g.beginPath(); g.arc(K.x,K.y,mid+20,0,TAU); g.arc(K.x,K.y,mid-20,0,TAU,true); g.clip('evenodd'); rzOver(g,'grit',K.x-mid-22,K.y-mid-22,mid*2+44,mid*2+44,0.8); g.restore();
+  g.strokeStyle='rgba(16,10,30,.7)'; g.lineWidth=2; g.beginPath(); g.arc(K.x,K.y,K.r,0,TAU); g.stroke(); g.beginPath(); g.arc(K.x,K.y,K.rim,0,TAU); g.stroke();
+  g.strokeStyle='rgba(230,224,255,.25)'; g.lineWidth=1; g.beginPath(); g.arc(K.x,K.y,K.rim-1.5,0,TAU); g.stroke();
+  // the numbers cut into the stone: a dark groove with a lit lower lip
+  g.font=`700 30px ${UIF}`; g.textAlign='center'; g.textBaseline='middle';
+  for(let h=1;h<=12;h++){ const [x,y]=at(h,mid); g.fillStyle=dawn?'rgba(255,250,240,.5)':'rgba(214,208,240,.4)'; g.fillText(String(h),x+1,y+1.5); g.fillStyle=dawn?'rgba(70,56,60,.85)':'rgba(26,20,44,.88)'; g.fillText(String(h),x,y); }
+  g.strokeStyle='rgba(120,100,190,.5)'; g.lineWidth=2; for(let m=0;m<60;m++){ if(m%5===0) continue; const p=(rot+m*6)*N4D; g.beginPath(); g.moveTo(K.x+Math.sin(p)*(K.r-4),K.y-Math.cos(p)*(K.r-4)); g.lineTo(K.x+Math.sin(p)*(K.r-14),K.y-Math.cos(p)*(K.r-14)); g.stroke(); }
+  const hg=g.createRadialGradient(K.x-K.hub*0.3,K.y-K.hub*0.3,K.hub*0.1,K.x,K.y,K.hub); hg.addColorStop(0,dawn?'#efe4f2':'#9a90c0'); hg.addColorStop(1,dawn?'#c8bccc':'#5a5284'); g.fillStyle=hg; g.beginPath(); g.arc(K.x,K.y,K.hub,0,TAU); g.fill(); g.strokeStyle='rgba(16,10,30,.7)'; g.lineWidth=2; g.stroke();
+  g.fillStyle='#1e1834'; g.beginPath(); g.arc(K.x,K.y,10,0,TAU); g.fill();
+  g.restore(); }; }
 // the broken moon over the peak: plates of lunar rock (grey highlands, darker seas, little craters) round a hole of
 // violet night, lit from the upper left, a soft moonfire glow round the rim; the fragments drifting off it alike
 function e45Lunar(W,H,sd){ const c=mkCanvas(W,H), g=c.getContext('2d'), im=g.createImageData(W,H), d=im.data;
@@ -605,7 +624,7 @@ function e45MoonCv(){
   for(const P of paths){ P(rg); rg.fill(); }
   // the sphere's light: brighter toward the upper left, the limb a little darker
   rg.globalCompositeOperation='source-atop'; const sh=rg.createRadialGradient(-R*0.5,-R*0.55,R*0.2,0,0,R*1.1); sh.addColorStop(0,'rgba(255,252,240,.18)'); sh.addColorStop(0.6,'rgba(0,0,0,0)'); sh.addColorStop(1,'rgba(20,14,50,.38)'); rg.fillStyle=sh; rg.fillRect(-S0/2,-S0/2,S0,S0); rg.globalCompositeOperation='source-over';
-  rzRelight(rim,{bump:3,ao:0.12,aoR:3,edge:3,sat:0.85,gain:1.12});
+  rzRelight(rim,{bump:3,ao:0.12,aoR:3,edge:3,sat:0.85,gain:1.32});
   g.save(); g.shadowColor='rgba(190,170,255,.8)'; g.shadowBlur=18; g.drawImage(rim,-S0/2,-S0/2); g.restore(); g.drawImage(rim,-S0/2,-S0/2);
   g.strokeStyle='rgba(40,26,70,.7)'; g.lineWidth=1.6; for(const P of paths){ P(g); g.stroke(); }
   try{ thrMoth(g,0,R*0.05,R/30,0.6,'#140a24','rgba(220,200,255,.9)'); }catch(e){}
@@ -829,7 +848,12 @@ e45Watch();
 
 // ---------- debug: a sheet of this module's sprites (window.__ebDbg.e45Sheet([[table,key,w,h,bx,by],...],scale,bg))
 function e45Sheet(list,sc,bg){
-  sc=sc||1; const cs=list.map(([t,k,w,h,bx,by])=>t==='m3'?m3wTall(k,w,h,bx,by,()=>{}):t==='n4'?n4Spr(k,w,h,bx,by,()=>{}):t==='n4a'?n4aSpr(k,w,h,bx,by,()=>{}):t==='kind'?(SPR[k]&&SPR[k][w|0]):null).filter(Boolean);
+  sc=sc||1;
+  if(list[0]&&list[0][0]==='look'){ // story looks: each drawn by the gate library into a cell, as the world draws it
+    const ids=list.map(l=>l[1]).filter(id=>typeof LOOKS!=='undefined'&&LOOKS[id]), cw=150*sc, ch=170*sc, cols=Math.min(6,ids.length), rows=Math.ceil(ids.length/cols);
+    const cv=mkCanvas(cols*cw,rows*ch), g=cv.getContext('2d'); g.fillStyle=bg||'#6a6878'; g.fillRect(0,0,cv.width,cv.height);
+    ids.forEach((id,i)=>{ g.save(); g.translate((i%cols)*cw+cw/2,Math.floor(i/cols)*ch+ch-12); g.scale(sc,sc); try{ lookDraw(id,g,0,0,0,list[i]&&list[i][2]); }catch(e){} g.restore(); g.fillStyle='#fff'; g.font='10px sans-serif'; g.fillText(id,(i%cols)*cw+4,Math.floor(i/cols)*ch+12); });
+    return cv.toDataURL(); } const cs=list.map(([t,k,w,h,bx,by])=>t==='m3'?m3wTall(k,w,h,bx,by,()=>{}):t==='n4'?n4Spr(k,w,h,bx,by,()=>{}):t==='n4a'?n4aSpr(k,w,h,bx,by,()=>{}):t==='kind'?(SPR[k]&&SPR[k][w|0]):null).filter(Boolean);
   const cw=Math.max(...cs.map(c=>(c.w2||c.width/2)))*sc+8, ch=Math.max(...cs.map(c=>(c.h2||c.height/2)))*sc+8, cols=Math.min(6,cs.length), rows=Math.ceil(cs.length/cols);
   const cv=mkCanvas(cols*cw,rows*ch), g=cv.getContext('2d'); g.fillStyle=bg||'#6a6878'; g.fillRect(0,0,cv.width,cv.height);
   cs.forEach((c,i)=>{ const w=(c.w2||c.width/2)*sc, h=(c.h2||c.height/2)*sc; g.drawImage(c,(i%cols)*cw+4,Math.floor(i/cols)*ch+4,w,h); });
