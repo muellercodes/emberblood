@@ -418,3 +418,63 @@ function reElvLean(E){
   }
   ctx.restore();
 }
+
+// ---------- 2. bridges and plank decks (drawBridge, a4_ground.js, painted into the ground chunks; wrapped below)
+// Road bridges: weathered planks of uneven width and colour with grain and nails on two dark stringers, rope rails on
+// posts and stone footings at both ends. Decks and piers (the map's walkways): the same planks on piles, no rails, so
+// joined pieces read as one walkway. Over lava: a stone bridge with paving and low parapets, scorched toward the heat.
+function rePlankCol(rng,base,grey){ const k=0.82+rng()*0.3, gr=grey+rng()*0.25; const c=rzMix(base,[128,122,110],Math.min(0.7,gr)); return [c[0]*k,c[1]*k,c[2]*k]; }
+function reBridge(g,br){
+  const L=br.len/2, w=br.w/2, rng=mulberry32(Math.floor(br.x*7+br.y*13)|0), kind=br.kind;
+  const road=(kind==='wood'||kind==='a1_char')&&(br.w===58||br.w===62||kind==='a1_char');
+  g.save(); g.translate(br.x,br.y); g.rotate(br.ang); g.lineCap='round'; g.lineJoin='round';
+  // the shadow it throws on the water or lava, soft at its edges
+  g.fillStyle='rgba(6,14,24,.2)'; g.fillRect(-L+2,-w+5,br.len+4,br.w+6); g.fillStyle='rgba(6,14,24,.22)'; g.fillRect(-L+4,-w+7,br.len,br.w);
+  if(kind==='stone'){
+    const st=[150,140,128];
+    g.fillStyle='rgb(70,62,58)'; g.fillRect(-L,-w-4,br.len,br.w+8);
+    for(let x=-L;x<L;){ const pw=12+rng()*10, c=rzJit(st,rng,0.2); for(let y=-w;y<w;){ const ph=Math.min(w-y,9+rng()*8); g.fillStyle=reRGB(c.map(v=>v*(0.9+rng()*0.16))); g.fillRect(x+0.8,y+0.8,Math.min(pw,L-x)-1.6,ph-1.6); g.fillStyle='rgba(255,246,230,.18)'; g.fillRect(x+0.8,y+0.8,Math.min(pw,L-x)-1.6,1.2); y+=ph; } x+=pw; }
+    g.beginPath(); g.rect(-L,-w,br.len,br.w); reGrain(g,'rock',0.7,[-L,-w,L,w]);
+    for(const s of [-1,1]){ const y0=s<0?-w-6:w-2; g.fillStyle='rgb(96,88,80)'; g.fillRect(-L,y0,br.len,8); for(let x=-L;x<L;x+=16){ g.fillStyle=reRGB(rzJit([126,118,108],rng,0.2)); g.fillRect(x+0.8,y0+0.8,14.4,6.4); g.fillStyle='rgba(255,246,230,.28)'; g.fillRect(x+0.8,y0+0.8,14.4,1.4); } g.fillStyle='rgba(8,8,14,.35)'; g.fillRect(-L,s<0?y0+8:y0-2,br.len,2); }
+    // scorch toward the lava at both ends of the span, and its glow from below
+    const sg=g.createLinearGradient(0,-w,0,w); sg.addColorStop(0,'rgba(255,110,30,.18)'); sg.addColorStop(0.2,'rgba(30,10,6,0)'); sg.addColorStop(0.8,'rgba(30,10,6,0)'); sg.addColorStop(1,'rgba(255,110,30,.18)'); g.fillStyle=sg; g.fillRect(-L,-w-6,br.len,br.w+12);
+    g.restore(); return true;
+  }
+  const charred=kind==='a1_char', base=charred?[74,58,48]:[132,100,66];
+  // stringers (the beams under the deck), showing a little at the sides
+  g.fillStyle=charred?'rgb(34,26,22)':'rgb(58,40,24)'; g.fillRect(-L,-w-2,br.len,4.5); g.fillRect(-L,w-2.5,br.len,4.5);
+  // the planks: across the deck, uneven, each with grain, a lit leading edge and a shaded gap
+  for(let x=-L;x<L-0.5;){ const pw=Math.min(L-x,7.5+rng()*3), c=rePlankCol(rng,base,charred?0.05:0.12), sag=(rng()-0.5)*1.2;
+    g.fillStyle=reRGB(c); g.fillRect(x+0.6,-w+sag,pw-1.2,br.w);
+    g.strokeStyle=reRGBA(reK(c,0.72),0.55); g.lineWidth=0.7; g.beginPath(); for(let k=0;k<3;k++){ const gx=x+1.6+rng()*(pw-3.2); g.moveTo(gx,-w+sag+1); g.bezierCurveTo(gx+(rng()-0.5)*2,-w*0.3,gx+(rng()-0.5)*2,w*0.3,gx+(rng()-0.5)*1.5,w+sag-1); } g.stroke();
+    g.fillStyle=charred?'rgba(255,120,60,.16)':'rgba(255,240,214,.22)'; g.fillRect(x+0.6,-w+sag,1.1,br.w);
+    g.fillStyle='rgba(10,8,6,.5)'; g.fillRect(x+pw-0.8,-w+sag,0.9,br.w);
+    if(rng()<0.12){ g.fillStyle='rgba(20,14,10,.35)'; g.beginPath(); g.ellipse(x+pw*0.5,(rng()-0.5)*w,1.6,2.4,0,0,TAU); g.fill(); }   // a knot
+    g.fillStyle='rgba(30,30,34,.7)'; for(const yy of [-w+3.4,w-3.4]){ g.fillRect(x+pw*0.5-0.7,yy+sag-0.7,1.4,1.4); }   // nails over the stringers
+    x+=pw; }
+  g.beginPath(); g.rect(-L,-w,br.len,br.w); reGrain(g,'wood',0.35,[-L,-w,L,w]);
+  if(charred){ g.fillStyle='rgba(255,120,60,.22)'; g.fillRect(-L,-w,4,br.w); g.fillRect(L-4,-w,4,br.w); g.restore(); return true; }
+  // a soft darker band along both edges (weathered, damp), lighter where feet wear the middle
+  const eg=g.createLinearGradient(0,-w,0,w); eg.addColorStop(0,'rgba(20,24,20,.22)'); eg.addColorStop(0.18,'rgba(20,24,20,0)'); eg.addColorStop(0.5,'rgba(255,240,210,.08)'); eg.addColorStop(0.82,'rgba(20,24,20,0)'); eg.addColorStop(1,'rgba(20,24,20,.25)'); g.fillStyle=eg; g.fillRect(-L,-w,br.len,br.w);
+  if(road){
+    // rope rails on posts, and stone footings at both ends
+    const posts=[]; for(let x=-L+6;x<=L-6;x+=40) posts.push(x); if(posts[posts.length-1]<L-12) posts.push(L-6);
+    for(const s of [-1,1]){ const y=s*(w-1);
+      g.strokeStyle='rgba(8,10,16,.3)'; g.lineWidth=2.4; g.beginPath(); for(let k=0;k<posts.length-1;k++){ g.moveTo(posts[k]+2,y+3); g.quadraticCurveTo((posts[k]+posts[k+1])/2+2,y+3+s*3.4,posts[k+1]+2,y+3); } g.stroke();
+      g.strokeStyle='rgb(176,150,104)'; g.lineWidth=1.8; g.beginPath(); for(let k=0;k<posts.length-1;k++){ g.moveTo(posts[k],y); g.quadraticCurveTo((posts[k]+posts[k+1])/2,y+s*3,posts[k+1],y); } g.stroke();
+      g.strokeStyle='rgba(255,246,214,.45)'; g.lineWidth=0.6; g.beginPath(); for(let k=0;k<posts.length-1;k++){ g.moveTo(posts[k],y-0.5); g.quadraticCurveTo((posts[k]+posts[k+1])/2,y-0.5+s*3,posts[k+1],y-0.5); } g.stroke();
+      for(const x of posts){ g.fillStyle='rgba(8,10,16,.35)'; g.beginPath(); g.ellipse(x+2.4,y+3,3.6,3,0,0,TAU); g.fill(); g.fillStyle='rgb(70,48,28)'; g.beginPath(); g.ellipse(x,y,3.4,3.2,0,0,TAU); g.fill(); g.fillStyle='rgb(140,108,70)'; g.beginPath(); g.ellipse(x-0.6,y-0.6,2.2,2,0,0,TAU); g.fill(); g.strokeStyle='rgba(60,40,24,.6)'; g.lineWidth=0.5; g.beginPath(); g.arc(x-0.6,y-0.6,1.1,0,TAU); g.stroke(); } }
+    for(const e of [-1,1]){ const x0=e*L; for(let k=0;k<5;k++){ const sx=x0+e*(2+rng()*8), sy=(k-2)*w*0.42+(rng()-0.5)*4, r=4+rng()*3.5; g.fillStyle='rgba(8,10,16,.3)'; g.beginPath(); g.ellipse(sx+1.4,sy+2,r,r*0.7,0,0,TAU); g.fill(); g.fillStyle=reRGB(rzJit([128,122,112],rng,0.2)); g.beginPath(); g.ellipse(sx,sy,r,r*0.72,0,0,TAU); g.fill(); g.fillStyle='rgba(255,250,236,.3)'; g.beginPath(); g.ellipse(sx-r*0.25,sy-r*0.3,r*0.5,r*0.32,0,0,TAU); g.fill(); } }
+  }else{
+    // piles at the corners and every so often along the sides, with a dark wet ring where they meet the water
+    for(const s of [-1,1]) for(let x=-L+4;x<=L-4+0.1;x+=Math.max(30,(br.len-8)/Math.max(1,Math.round((br.len-8)/60)))){ const y=s*(w-0.5);
+      g.fillStyle='rgba(8,14,22,.3)'; g.beginPath(); g.ellipse(x+1.6,y+2.6,4.4,3.4,0,0,TAU); g.fill();
+      g.fillStyle='rgb(62,46,32)'; g.beginPath(); g.arc(x,y,3.6,0,TAU); g.fill(); g.fillStyle='rgb(132,104,72)'; g.beginPath(); g.arc(x-0.5,y-0.5,2.5,0,TAU); g.fill();
+      g.strokeStyle='rgba(70,50,30,.6)'; g.lineWidth=0.5; g.beginPath(); g.arc(x-0.5,y-0.5,1.3,0,TAU); g.stroke(); }
+  }
+  g.restore(); return true;
+}
+{ const base=drawBridge; drawBridge=function(g,br){ if(LOOK.re&&!LOOK.sb&&reBridge(g,br)) return; return base(g,br); }; }
+
+// ---------- debug and tests
+window.__ebDbg=Object.assign(window.__ebDbg||{},{re23:{bridges:()=>BRIDGES.map(b=>[Math.round(b.x),Math.round(b.y),b.kind,Math.round(b.len),b.w,b.map])}});
