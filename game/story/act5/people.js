@@ -1421,7 +1421,7 @@ people({
       { if: 'flag n_dawn', say: [["The picks are ringing again. Tell your mother.", "The picks ring again."]] },
       { ask: ['Did Quill send you a star chart?', 'Did Quill send a chart?'], if: '!flag n_dawn',
         say: ['She sent me a chart of the dark sky. It is a black page with one orange dot. The dot is you.', 'A black page with one orange dot. You.'] },
-      { idle: [['Speak up. Rocks are louder than you.', 'Speak up.'], ['Mm. Go on.', 'Go on.']] },
+      { idle: [['Speak up. Rocks are louder than you.', 'Speak up.'], ['Mm. Go on. The rocks can wait.', 'Go on.']] },
       { bye: [['Mind your head. Rocks fall.', 'Mind your head.']] },
     ],
 
@@ -2564,7 +2564,7 @@ people({
         ] },
       { if: '!flag n_dawn', fact: 'n5_moon=gone', say: [["Easy, Gerald. It is only dark.", "Easy, Gerald."]] },
       { if: 'flag n_dawn', say: [["Easy, Gerald. It is only morning.", "It is only morning, Gerald."]] },
-      { idle: [['Easy. The sheep are listening.', 'Easy.'], ['Mm? Go on.', 'Go on.']] },
+      { idle: [['Easy. The sheep are listening.', 'Easy.'], ['Mm? Go on. Gerald is all ears.', 'Go on.']] },
       { bye: [['Mind the sheep. They mind you.', 'Mind the sheep.']] },
     ],
 
@@ -2748,7 +2748,7 @@ people({
         ] },
       { if: '!flag n_dawn', say: [["Snow is slow water. Tonight it is very slow.", "Snow is very slow tonight."]] },
       { if: 'flag n_dawn', say: [["Runners waxed, sleds ready, snow fast again. It's all downhill from here.", "The snow is fast again."]] },
-      { idle: [['Mind the runners. What is it?', 'What is it?'], ['Mm? Go on.', 'Go on.']] },
+      { idle: [['Mind the runners. What is it?', 'What is it?'], ['Mm? Go on. Talk slowly, like snow.', 'Go on.']] },
       { bye: [['Slide safe.', 'Slide safe.']] },
     ],
 
@@ -3297,7 +3297,7 @@ people({
         ] },
       { if: '!flag n_dawn', say: [["The court is still. So is the sea.", "The court is still."]] },
       { if: 'flag n_dawn', say: [["The court is singing again. Badly.", "The court sings again."]] },
-      { idle: [['Speak, dragon. The court is listening.', 'Speak.'], ['Mm. Go on.', 'Go on.']] },
+      { idle: [['Speak, dragon. The court is listening.', 'Speak.'], ['Mm. The court will allow it. Go on.', 'Go on.']] },
       { bye: [['Swim well, little dragon. You are welcome here, a little bit.', 'Swim well.']] },
     ],
 
