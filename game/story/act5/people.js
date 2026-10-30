@@ -161,7 +161,7 @@ people({
         ] },
       { if: '!flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
         say: [['Everybody came out to the pier for you. Go and say your goodbyes. I go last.', 'Say your goodbyes. I go last.'],
-          ["Quill keeps bringing me tea. I keep forgetting to drink it. I'm watching the bridge.", 'I keep watching the bridge.']] },
+          ["Dell keeps telling me fish jokes to cheer me up. I'm watching the bridge. He's still telling them.", 'Dell tells fish jokes. I watch the bridge.']] },
       { if: 'flag n_depart !flag n_dawn', fact: 'n5_moon=gone',
         say: [["Did you eat that sandwich yet? Don't make me come up there.", 'Did you eat the sandwich?'],
           ["I'll be right here at the end of the bridge, with my hammer, in case.", 'I will wait here. With a hammer.']] },
