@@ -54,7 +54,7 @@ quest({
       { if: 'flag m4_well', then: [
         ['m_esme', 'Not Lady Wellington, though. You were at the well when it happened, and she kept one candle of moonlight.',
           'Lady Wellington stayed lit. You were there.', { do: ['set m_lamp_9'] }]] },
-      ['m_esme', "Light them again, dragon, and I'll tell you a secret about moths. It might save your tail.",
+      ['m_esme', "Twelve is a lot to ask, I know. Light them again, dragon, and I'll tell you a secret about moths. It might save your tail.",
         'Light them. I will tell you a moth secret.', { promise: 'm4_esme_secret' }],
       { choose: 'm_lamps_offer', ask: ['Will you light every lamp in Sable?', 'Light every lamp?'], pick: [
         { t: ["I'm a dragon. Lighting things is my whole job.", 'I will!'], tone: 'brave', then: ['quest start m_lamps'],
