@@ -47,7 +47,8 @@ const E45Q=new Map();
 function e45Async(key,gen,fb,later){
   const hit=e45Peek(key); if(hit) return hit;
   if(E45.sync) return rzCache(key,()=>e45Run(gen()));
-  if(E45Q.get(key)!==LOOK.gen){ const g0=LOOK.gen; let it=null; E45Q.set(key,g0);
+  const q0=E45Q.get(key);
+  if(!q0||q0.g!==LOOK.gen||performance.now()-q0.t>20000){ const g0=LOOK.gen; let it=null; E45Q.set(key,{g:g0,t:performance.now()});   // (a job lost with a cleared queue is asked for again)
     const job=()=>{ if(LOOK.gen!==g0||!E45.on()){ E45Q.delete(key); return; } const t0=performance.now(); let st;
       try{ if(!it) it=gen(); do{ st=it.next(); } while(!st.done&&performance.now()-t0<5); }catch(e){ console.error('e45 job',key,e); E45Q.delete(key); return; }
       E45.stats.ms+=performance.now()-t0; if(!st.done){ RZQ.q.unshift(job); return; } const v=st.value; rzCache(key,()=>v); E45Q.delete(key); };
@@ -909,7 +910,7 @@ function e45Ruin(F,w0,h0,bx,by,key){
 }
 E45N4.push([/^ruin_/,e45Ruin,null]);
 
-// ---------- 4. painting ahead: the great places of the map Ash is on are painted in idle time (PROPS's queue), so
+// ---------- 11. painting ahead: the great places of the map Ash is on are painted in idle time (PROPS's queue), so
 // walking up to one never waits on it. [table, key, w, h, bx, by] as the act files ask for them.
 const E45PRE={4:[['n4a','gear0',280,189,140,94.5],['n4a','gear1',320,215,160,107.5],['n4a','gear2',280,189,140,94.5]],3:[['m3','obs',400,340,200,250],['m3','temple',360,320,180,240],['m3','well',120,250,60,232],['m3','spire',200,380,100,330],['m3','lhroom',110,110,55,70],['m3','lhcap',110,110,55,70]]};
 const E45W={map:-2,gen:-1,id:0};
