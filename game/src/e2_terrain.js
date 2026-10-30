@@ -36,6 +36,7 @@ function definePropKind(kind,def){
   return def;
 }
 function propKindSprites(kind){
+  if(LOOK.re&&rzKindSprites(kind)) return;   // (v12 PROPS) the Realistic makers by kind, e12c_props.js
   const d=PROPK[kind], L=[]; let h=0; for(let i=0;i<kind.length;i++) h=(h*31+kind.charCodeAt(i))|0;
   for(let v=0;v<d.n;v++){ let c=null; try{ c=d.make((h&0xffff)+v*131,v); }catch(e){ console.error('prop kind',kind,e); } if(c){ if(!c.half) c.half=c.width/4; L.push(c); } }
   if(L.length) SPR[kind]=L;
