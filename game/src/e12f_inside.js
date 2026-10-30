@@ -391,7 +391,7 @@ function riBase(A,cv,g,S,bx,by,bw,bh,R){
   // wall decor and things hung on the wall: their own layer, relit gently, so frames and plates have some depth
   const dh=Math.min(bh,(A.ry+44)-by), D=mkCanvas(cv.width,Math.ceil(dh*S)), dg=D.getContext('2d'); dg.scale(S,S); dg.translate(-bx,-by);
   r2Decor(dg,R); for(const o of wallK) if(o.k!=='window') bake(dg,o); r2DecorPost(dg,R);
-  rzRelight(D,{bump:2,ao:0.1,aoR:Math.round(2*S),edge:Math.max(1,Math.round(1.2*S)),sat:0.86,split:0.6});
+  rzRelight(D,{bump:2,ao:0.1,aoR:Math.round(2*S),edge:Math.max(1,Math.round(1.2*S)),sat:0.86,split:0.6}); riGrain(D,S,0.1);
   riShadowBlit(g,D,bx,by,bw,D.height/S,0.32,1.6); g.drawImage(D,bx,by,bw,D.height/S);
   for(const o of wallK) if(o.k==='window') bake(g,o);
   // the furniture: one layer, its soft shadows on another (r2sh and r2shC draw there while RI.sh is set)
@@ -401,6 +401,7 @@ function riBase(A,cv,g,S,bx,by,bw,bh,R){
   try{ for(const o of furn) bake(lg,o); r2Clutter(lg,R,A); } finally{ RI.sh=null; }
   const t1=performance.now();
   rzRelight(L,{bump:2.6,ao:0.12,aoR:Math.round(3*S),edge:Math.max(1,Math.round(1.6*S)),sat:0.84,split:0.8});
+  riGrain(L,S,0.12);
   riStats('relight',performance.now()-t1);
   // shadows: blurred (down and up again), then laid under the furniture; plus a soft occlusion skirt from the layer itself
   const sb=mkCanvas(Math.max(1,SHc.width/4),Math.max(1,SHc.height/4)), sbg=sb.getContext('2d'); sbg.imageSmoothingEnabled=true; sbg.drawImage(SHc,0,0,sb.width,sb.height);
@@ -422,7 +423,7 @@ function riShC(g,x,y,rx,ry,a){ const q=RI.sh; q.save(); riShM(g,q); q.fillStyle=
 // ---------- 3. live house objects (drawn every frame): cached lit sprites
 // a 2D drawing (the Classic shapes, drawn with g) relit once into a sprite: (w,h) world size, (ox,oy) its origin
 function riRS(key,w,h,ox,oy,draw,o){ return riCache('rs:'+key,()=>{ const sc=2, c=mkCanvas(w*sc,h*sc), g=c.getContext('2d'); g.scale(sc,sc); g.translate(ox,oy); g.lineJoin='round'; g.lineCap='round'; draw(g);
-  rzRelight(c,Object.assign({bump:2.6,ao:0.12,aoR:3,edge:2,sat:0.85},o||{})); c.ox=ox; c.oy=oy; c.w2=w; c.h2=h; return c; }); }
+  rzRelight(c,Object.assign({bump:2.6,ao:0.12,aoR:3,edge:2,sat:0.85},o||{})); riGrain(c,sc,0.08); c.ox=ox; c.oy=oy; c.w2=w; c.h2=h; return c; }); }
 function riHF(key,w,h,ox,oy,make,o){ return riCache('hf:'+key,()=>{ const F=rzHF(w,h,ox,oy); make(F); return rzShade(F,o||{ao:0.16,aoR:1.6,rim:0.35}); }); }
 function riPut(c,x,y){ ctx.drawImage(c,x-c.ox,y-c.oy,c.w2,c.h2); }
 const riPlankTx=(sd,horiz)=>(u,v)=>{ const a=horiz?u:v, b=horiz?v:u; return 0.82+0.22*rzVN(a*0.16+sd,b*1.9,sd)+0.06*Math.sin(b*2.8+rzVN(a*0.25,b,sd+1)*5)-(rzHash(Math.floor(a*0.5),Math.floor(b*1.2),sd)>0.97?0.12:0); };
@@ -519,7 +520,7 @@ function riCaveRooms(A,def){
   for(let j=0;j<h;j++) for(let i=0;i<w;i++){ const k=j*w+i; if(c.grid[k]!==0||cls[k]===1) continue; if(c.typ[k]>=3) trialPaintCell(g,c,k,i,j,i*cs,j*cs,cs,st,rng,def); }
   riCaveMarks(g,A,def,c,cs,st);
   riCaveDecor(g,c,cs,st,T,cls,rng,def);
-  if(def.trial) for(let j=0;j<h;j++) for(let i=0;i<w;i++){ if(cls[j*w+i]!==2) continue; const face=!solid(i,j+1); if(def.theme!=='sky') trialPaintWall(g,c,i,j,i*cs,j*cs,cs,st,rng,def,face,face?cs*0.6:cs); }
+  if(def.trial) for(let j=0;j<h;j++) for(let i=0;i<w;i++){ if(cls[j*w+i]!==2) continue; const face=!solid(i,j+1); trialPaintWall(g,c,i,j,i*cs,j*cs,cs,st,rng,def,face,face?cs*0.6:cs); }
   g.restore();
   A.canvas=cv; A.canvasS=S; renderCaveMini(A);
   riStats('cave',performance.now()-t0);
@@ -804,6 +805,7 @@ function riFurnX(o,t){
       else { ctx.strokeStyle=`rgba(255,200,140,${0.22+0.14*Math.sin(t*2+x)})`; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(x,y-8,20,0,TAU); ctx.stroke(); }
       return true; }
     case 'mural': riPut(riMuralSpr(o.order||[0,1,2,3]),x,y); return true;
+    case 'decor': return riDecor(o,t);
   }
   return false;
 }
@@ -870,5 +872,45 @@ function riLavaDraw(g,x,y,w,h,lx,ly){ const t=riTile('lava',1,riLavaFn()); riTil
 
 function riCrustFn(){ const F=riTab('f'), Rr=riTab('r'); return (x,y,o)=>{ const cr=riS(Rr,x*0.55,y*0.55), n=riS(F,x*1.2,y*1.2), k=0.7+0.4*n;
   if(cr>0.88){ const e=(cr-0.88)/0.12; o[0]=60+195*e; o[1]=24+120*e*e; o[2]=14+40*e*e*e; return; } o[0]=46*k; o[1]=30*k; o[2]=26*k; }; }
+
+
+// cave decor in this look: crystal clusters with facets, hanging icicles, a magma pool, a miner's lamp on a post
+function riCrysSpr(sc,v){ return riRS('crys'+sc+'_'+v,70*sc+10,60*sc+10,35*sc+5,40*sc+5,g=>{ const r=mulberry32(v*13+7); g.scale(sc,sc);
+  g.fillStyle='rgba(10,6,20,.35)'; g.beginPath(); g.ellipse(2,4,16,6,0,0,TAU); g.fill();
+  const n=4+(v%3); for(let i=0;i<n;i++){ const a=-Math.PI/2+(i/(n-1)-0.5)*1.6+(r()-0.5)*0.3, L=14+r()*14, w=3.2+r()*2.4, bx=(i-(n-1)/2)*4;
+    g.save(); g.translate(bx,2); g.rotate(a+Math.PI/2);
+    g.fillStyle='#4a3a7a'; g.beginPath(); g.moveTo(-w,0); g.lineTo(-w,-L); g.lineTo(0,-L-w*1.4); g.lineTo(0,0); g.closePath(); g.fill();
+    g.fillStyle='#b8a0f0'; g.beginPath(); g.moveTo(0,0); g.lineTo(0,-L-w*1.4); g.lineTo(w,-L); g.lineTo(w,0); g.closePath(); g.fill();
+    g.fillStyle='rgba(255,255,255,.55)'; g.fillRect(0.4,-L+2,0.9,L-4); g.fillStyle='rgba(230,214,255,.8)'; g.beginPath(); g.moveTo(-w,-L); g.lineTo(0,-L-w*1.4); g.lineTo(w,-L); g.lineTo(0,-L+w*0.5); g.closePath(); g.fill();
+    g.restore(); } },{bump:1.4,edge:1.2,sat:0.95,split:0.4}); }
+function riIcicleSpr(sc){ return riRS('icic'+sc,40*sc+8,30*sc+8,20*sc+4,8,g=>{ g.scale(sc,sc);
+  for(let i=0;i<3;i++){ const x=-8+i*8, L=12+((i*7)%5)*2; g.fillStyle=r2lg(g,x-3,0,x+3,0,'rgba(230,246,255,.95)','rgba(170,210,240,.9)','rgba(120,170,215,.9)'); g.beginPath(); g.moveTo(x-3.4,-6); g.lineTo(x,L); g.lineTo(x+3.4,-6); g.closePath(); g.fill(); g.fillStyle='rgba(255,255,255,.8)'; g.fillRect(x-1.6,-5,0.9,L*0.6); }
+  g.fillStyle='rgba(240,250,255,.9)'; g.beginPath(); g.ellipse(0,-6,14,3,0,0,TAU); g.fill(); },{bump:1.2,edge:1,sat:0.95}); }
+function riMagmaSpr(sc){ return riRS('magma'+sc,36*sc+8,28*sc+8,18*sc+4,14*sc+4,g=>{ g.scale(sc,sc);
+  g.fillStyle='#1e1210'; g.beginPath(); g.ellipse(0,0,15,11,0,0,TAU); g.fill(); g.fillStyle='#3a2420'; g.beginPath(); g.ellipse(-1,-1,13,9,0,0,TAU); g.fill();
+  g.fillStyle=r2rg(g,0,0,1,10,'#ffe08a','#ff8a2a','#b8320e'); g.beginPath(); g.ellipse(0,0,9,6,0,0,TAU); g.fill();
+  g.fillStyle='rgba(40,20,14,.85)'; for(const [a,b,c,d] of [[-4,-1,3,1.6],[3,2,2.4,1.2],[1,-3,2,1]]){ g.beginPath(); g.ellipse(a,b,c,d,0.4,0,TAU); g.fill(); } },{bump:2,edge:1.4,sat:1,split:0.3}); }
+function riLampSpr(){ return riRS('cvlamp',30,44,15,30,g=>{
+  g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(2,12,7,3,0,0,TAU); g.fill();
+  g.fillStyle=r2lg(g,-2,0,2,0,'#6a4a2c','#3a2414'); g.fillRect(-2,-8,4,20); g.fillStyle='#2a2a30'; g.fillRect(-1,-12,2,5);
+  g.fillStyle='#2e2e34'; g.fillRect(-5.5,-21,11,2); g.fillRect(-5.5,-9,11,2); g.fillStyle='rgba(255,214,130,.9)'; g.fillRect(-4.5,-19,9,10); g.fillStyle='#2e2e34'; g.fillRect(-0.6,-19,1.2,10); g.fillRect(-4.5,-14.6,9,1);
+  g.strokeStyle='#2e2e34'; g.lineWidth=1.2; g.beginPath(); g.arc(0,-22,3,Math.PI,TAU); g.stroke(); },{bump:2,edge:1.4}); }
+function riDecor(o,t){
+  const x=o.x, y=o.y, s=o.s||1, sc=Math.round(s*5)/5;
+  if(o.dk==='crystal'){ riPut(riCrysSpr(sc,Math.abs(Math.round(x*7+y*3))%4),x,y); glowAt(x,y-8*s,26*s,'180,140,255',0.26+0.06*Math.sin(t*2+x)); return true; }
+  if(o.dk==='icicle'){ riPut(riIcicleSpr(sc),x,y); glowAt(x,y,16*s,'200,230,255',0.14); return true; }
+  if(o.dk==='magma'){ riPut(riMagmaSpr(sc),x,y); glowAt(x,y,28*s,'255,110,40',0.3+0.08*Math.sin(t*3+x)); return true; }
+  if(o.dk==='lamp'){ riPut(riLampSpr(),x,y); glowAt(x,y-14,30,'255,200,100',0.38); return true; }
+  return false;
+}
+
+
+// a fine material grain over a painted layer (alpha kept): flat fills read as wood, cloth or paint, not vector shapes
+function riGrain(cv,S,amt){
+  const g=cv.getContext('2d'), W=cv.width, H=cv.height, F=riTab('f'), Wn=riTab('w'); let img; try{ img=g.getImageData(0,0,W,H); }catch(e){ return; } const d=img.data, a=amt||0.1;
+  for(let y=0;y<H;y++){ const wy=y/S; for(let x=0;x<W;x++){ const p=(y*W+x)*4; if(d[p+3]===0) continue; const wx=x/S, n=1-a*0.5+a*(0.7*riS(F,wx*2.3,wy*2.3)+0.3*Wn[((y&255)<<8)|(x&255)]);
+    d[p]*=n; d[p+1]*=n; d[p+2]*=n; } }
+  g.putImageData(img,0,0);
+}
 
 window.__ebDbg=Object.assign(window.__ebDbg||{},{RI,riRoom,riTab});
