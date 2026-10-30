@@ -597,7 +597,7 @@ function riIce(x,y,u,v,o,F,Rr){
   const dp=riS(F,x*0.22+31,y*0.22);
   let r=96+34*n-22*dp, gg=150+30*n-16*dp, b=196+26*n-8*dp;
   const streak=Math.pow(Math.max(0,st-0.5)/0.5,1.6); r+=streak*120; gg+=streak*96; b+=streak*58;
-  if(cr>0.972&&riS(F,x*0.15+80,y*0.15)>0.45){ r=r*0.6+96; gg=gg*0.64+100; b=b*0.7+90; }
+  if(cr>0.978&&riS(F,x*0.15+80,y*0.15)>0.6){ r=r*0.7+70; gg=gg*0.72+76; b=b*0.78+66; }
   const ao=Math.min(1,a*1.25); o[0]=r*ao; o[1]=gg*ao; o[2]=b*Math.min(1,ao+0.1);
 }
 function riCaveFloorFn(T,fl,fl2,acc,F,Rr,seed,cs){
