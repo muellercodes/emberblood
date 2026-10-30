@@ -645,7 +645,7 @@ function reTall(pre,key,w,h,bx,by,draw,base,o){
   const J=REQ.jobs.get(k); if(J&&!J.it){ const r=make(); J.cv=r.cv; J.fin=r.fin; J.it=reArtG(r.cv,r.o); J.n=0; return r.cv; }
   return J&&J.cv?J.cv:base();
 }
-const RE1={paint:0,plan:0,real:null,ecv:null,empty(){ if(!RE1.ecv){ RE1.ecv=mkCanvas(2,2); RE1.ecv.ox=RE1.ecv.oy=0; RE1.ecv.w2=RE1.ecv.h2=1; } return RE1.ecv; }};
+const RE1={paint:0,plan:0,kind:0,real:null,ecv:null,empty(){ if(!RE1.ecv){ RE1.ecv=mkCanvas(2,2); RE1.ecv.ox=RE1.ecv.oy=0; RE1.ecv.w2=RE1.ecv.h2=1; } return RE1.ecv; }};
 // the outline colour the drawings ask for: while an act's standing thing draws itself in this look (its live parts:
 // sails, belts, chains, boats, flags), SBC.outline is a soft dark instead of Storybook's plum
 const RE_SOFTO='rgba(36,28,30,.45)';
@@ -732,8 +732,65 @@ function reDeco(d,g,x0,y0,x1,y1,ch){
   try{ return d.paint(reSoftCtx(g),x0,y0,x1,y1,ch); } finally{ RE1.paint--; SBC.outline=was; }
 }
 
+// ---------- 5. the prop kinds of maps 1 and 2 that were only relit (PROPS_NOTES): their own drawing through the
+// softening context, repainted as materials and relit like the standing things (small sprites, so it runs whole in
+// the idle painter); the showpieces below have height-field makers of their own
+{ const base=spriteOf; spriteOf=function(R,draw){ if(!RE1.kind||!LOOK.re) return base(R,draw); return base(R,g=>{ const was=SBC.outline; SBC.outline=RE1.real||was; RE1.paint++; try{ draw(reSoftCtx(g)); } finally{ RE1.paint--; SBC.outline=was; } }); }; }
+function reKindArt(kind,o){ return (seed,v,d)=>{ RE1.kind++; let c; try{ c=d.make(seed,v); } finally{ RE1.kind--; } if(!c) return c; const it=reArtG(c,Object.assign({sc:SS,base:c.height/SS*0.62,seed:seed&1023,bump:2.2,edge:1.6,aoR:1.6},o||{})); let r; do{ r=it.next(); }while(!r.done); if(!c.half) c.half=c.width/4; return c; }; }
+for(const k of ['c_gear','c_scrap','c_pipe','c_kelp','c_shroom','c_driftwood','c_nest','c_crabpot','c_netpole','c_mooring','c_boat','c_standstone','c_crate','c_barrel','c_haybale','c_lamppost','c_blackrock',
+  'f_iceshard','f_violetice','f_dreadspire','f_haystack','f_fishrack','f_cairn','f_mammothrib','f_geyser','f_isleflower','f_lanternpost']){
+  const K=RZK[k]||(RZK[k]={}); if(!K.make){ K.make=reKindArt(k); K.n=K.n||0; } }
+// a crystal lying in the picture plane: from (x,y) toward angle a, len long and wid wide at its base, a sharp ridge
+// down its middle (lit on the side toward the light) rising zh above z0
+function rePrism(F,x,y,a,len,wid,z0,zh,col,m){
+  const cs=Math.cos(a), sn=Math.sin(a), tx=x+cs*len, ty=y+sn*len, px=-sn, py=cs;
+  const pts=[[x+px*wid,y+py*wid],[x+cs*len*0.72+px*wid*0.6,y+sn*len*0.72+py*wid*0.6],[tx,ty],[x+cs*len*0.72-px*wid*0.6,y+sn*len*0.72-py*wid*0.6],[x-px*wid,y-py*wid]];
+  rzPoly(F,pts,(X,Y)=>{ const u=((X-x)*cs+(Y-y)*sn)/len, v=Math.abs((X-x)*px+(Y-y)*py), w=wid*(u<0.72?1-u*0.55:0.6*(1-u)/0.28)+0.01; return z0+zh*(1-u*0.6)*Math.max(0,1-v/w); },col,m);
+}
+function reMkIce(seed,v,vio){ const R=vio?24:22, rng=mulberry32(seed), F=rzSq(R);
+  rzContact(F,2,6,R*0.85,R*0.34,0.35);
+  const base=vio?[150,120,210]:[150,200,232], deep=vio?[86,60,140]:[70,130,190], n=(vio?5:4)+v, L=[];
+  for(let i=0;i<n;i++){ const x=(rng()-0.5)*R*(vio?0.6:1.1), a=-Math.PI/2+(rng()-0.5)*(vio?1.6:0.5), len=R*(0.65+rng()*0.65), w=3.5+rng()*4.5, y=4+(rng()-0.5)*6; L.push([x,y,a,len,w]); }
+  L.sort((p,q)=>p[1]-q[1]);
+  for(const [x,y,a,len,w] of L) rePrism(F,x,y,a,len,w,2,6+len*0.25,rzMix(base,deep,rng()*0.5),RZ.WET);
+  // deep colour toward the base inside each crystal, bright facets toward the tip
+  rzEach(F,(x,y,id)=>{ if(F.m[id]!==RZ.WET) return; const k=clamp((y+R*0.2)/(R*0.9),0,1); F.c[id*3]=lerp(F.c[id*3],deep[0],k*0.45); F.c[id*3+1]=lerp(F.c[id*3+1],deep[1],k*0.45); F.c[id*3+2]=lerp(F.c[id*3+2],deep[2],k*0.3); });
+  rzDome(F,0,6,R*0.62,3.6,0,0.4,2.2,[236,242,250],RZ.SNOW);
+  return rzShade(F,{ao:0.12,aoR:1.2,rim:0.25}); }
+function reMkSpire(seed,R,pal,frost){ const rng=mulberry32(seed), F=rzSq(R), n=6+Math.floor(rng()*2), pts=[], tip=[-R*0.14,-R*0.2];
+  rzContact(F,3,4,R*0.85,R*0.65,0.4);
+  for(let i=0;i<n;i++){ const a=i/n*TAU+rng()*0.3; pts.push([Math.cos(a)*R*(0.72+rng()*0.25),Math.sin(a)*R*(0.68+rng()*0.25)]); }
+  for(let i=0;i<n;i++){ const a=pts[i], b=pts[(i+1)%n], c=rzJit(pal,rng,0.25);
+    rzPoly(F,[a,b,tip],(X,Y)=>{ const dd=Math.hypot(X-tip[0],Y-tip[1]), dm=Math.max(1,(Math.hypot(a[0]-tip[0],a[1]-tip[1])+Math.hypot(b[0]-tip[0],b[1]-tip[1]))/2); return 2+R*0.9*Math.max(0,1-dd/dm); },c,RZ.GLOSS); }
+  if(frost) rzEach(F,(x,y,id)=>{ if(F.m[id]===RZ.GLOSS&&rzVN(x*0.18,y*0.18,seed)>0.6&&x+y<-R*0.35&&F.h0[id]>R*0.3*F.k){ F.c[id*3]=236; F.c[id*3+1]=242; F.c[id*3+2]=252; F.m[id]=RZ.SNOW; } else if(F.m[id]===RZ.GLOSS&&Math.abs(rzVN(x*0.12,y*0.12,seed+3)-0.5)<0.025){ F.c[id*3]=frost[0]; F.c[id*3+1]=frost[1]; F.c[id*3+2]=frost[2]; } });
+  return rzShade(F,{ao:0.14,aoR:1.6,rim:0.3}); }
+function reMkBale(seed,v,snow){ const R=snow?17:15, F=rzSq(R), rng=mulberry32(seed);
+  rzContact(F,2,R*0.45,R,R*0.4,0.4);
+  if(!snow){ rzDome(F,0,0,R,R,0,0,R*0.8,[214,172,82],RZ.CLOTH,0.8);
+    rzEach(F,(x,y,id)=>{ const r=Math.hypot(x,y), a=Math.atan2(y,x), s=Math.sin(r*1.35-a*0.95), f=0.86+0.1*s+0.08*(rzHash(Math.floor(x*3),Math.floor(y*3),seed)-0.5); F.c[id*3]*=f; F.c[id*3+1]*=f; F.c[id*3+2]*=f*0.96; });
+    rzBox(F,0,-3,R*2,1.6,0,R*0.82,0.3,[120,80,40],RZ.CLOTH); }
+  else{ rzPoly(F,[[-R,R*0.4],[-R*0.92,-R*0.1],[-R*0.7,-R*0.62],[-R*0.35,-R*0.92],[0,-R],[R*0.35,-R*0.92],[R*0.7,-R*0.62],[R*0.92,-R*0.1],[R,R*0.4]],(X,Y)=>2+R*0.8*(1-Math.abs(X)/R)*(0.6+0.4*(R*0.4-Y)/(R*1.4)),(X,Y)=>{ const f=0.85+0.15*Math.sin(X*0.9+Y*0.3)+0.06*(rzHash(Math.floor(X*2),Math.floor(Y*2),seed)-0.5); return [206*f,162*f,80*f]; },RZ.CLOTH);
+    rzDome(F,-1,-R*0.5,R*0.66,R*0.42,0,R*0.5,R*0.38,[238,244,252],RZ.SNOW,0.7);
+    for(let i=0;i<7;i++){ const x=-R*0.55+i*R*0.18; rzCap(F,x,-R*0.2,R*0.5,x+0.2,-R*0.2+3+rng()*4,R*0.45,0.9,0.2,[200,228,246],RZ.WET); } }
+  return rzShade(F,{ao:0.12,aoR:1.4,rim:0.3}); }
+function reMkCrate(seed,v){ const F=rzSq(12); rzContact(F,3,6,10.5,4.4,0.42);
+  const c=v?[166,124,76]:[142,106,64]; rzBox(F,0,-2,18,16,0,9,1.2,c,RZ.WOOD,rzWoodTx(seed&63,true));
+  for(const [x,y,w,h] of [[0,-9.4,18,2.4],[0,5.4,18,2.4],[-8,-2,2.4,16],[8,-2,2.4,16]]) rzBox(F,x,y,w,h,0,10,0.5,reK(c,0.78),RZ.WOOD);
+  rzCap(F,-7,-8,10.2,7,4,10.2,1.1,1.1,reK(c,0.82),RZ.WOOD);
+  return rzShade(F,{ao:0.14,aoR:1.2,rim:0.35}); }
+function reMkBarrel(seed,v){ const F=rzSq(11); rzContact(F,2,5,9,3.8,0.42);
+  const c=v?[138,90,50]:[122,86,52]; rzDome(F,0,0,8,10,0,0,8,c,RZ.WOOD,0.6);
+  rzEach(F,(x,y,id)=>{ const f=0.86+0.16*(rzVN(x*1.4+seed,y*0.2,seed)); F.c[id*3]*=f; F.c[id*3+1]*=f; F.c[id*3+2]*=f; });
+  for(const y of [-3,4]) rzCap(F,-7.6,y,6,7.6,y,6,1,1,[176,136,64],RZ.METAL);
+  rzDome(F,0,-7,6.4,2.8,0,7.2,0.8,[160,122,78],RZ.WOOD,0.4); rzDome(F,0,-7,4.6,1.8,0,7.6,0.3,[96,70,44],RZ.WOOD,0.4);
+  return rzShade(F,{ao:0.12,aoR:1,rim:0.35}); }
+Object.assign(RZK.f_iceshard,{n:3,make:(s,v)=>reMkIce(s,v,false)}); Object.assign(RZK.f_violetice,{n:3,make:(s,v)=>reMkIce(s,v,true)});
+Object.assign(RZK.f_dreadspire,{n:3,make:s=>reMkSpire(s,38,[52,44,66],[176,140,240])}); Object.assign(RZK.c_blackrock,{n:3,make:s=>reMkSpire(s,30,[44,40,58],null)});
+Object.assign(RZK.c_haybale,{n:2,make:(s,v)=>reMkBale(s,v,false)}); Object.assign(RZK.f_haystack,{n:2,make:(s,v)=>reMkBale(s,v,true)});
+Object.assign(RZK.c_crate,{n:2,make:(s,v)=>reMkCrate(s,v)}); Object.assign(RZK.c_barrel,{n:2,make:(s,v)=>reMkBarrel(s,v)});
+
 // ---------- debug and tests
-window.__ebDbg=Object.assign(window.__ebDbg||{},{re23:{bridges:()=>BRIDGES.map(b=>[Math.round(b.x),Math.round(b.y),b.kind,Math.round(b.len),b.w,b.map]),REQ,RET,flush:reFlush,
+window.__ebDbg=Object.assign(window.__ebDbg||{},{re23:{bridges:()=>BRIDGES.map(b=>[Math.round(b.x),Math.round(b.y),b.kind,Math.round(b.len),b.w,b.map]),REQ,RET,flush:reFlush,kinds:(list,sc)=>{ const L=[]; for(const k of list){ const d=PROPK[k], K=RZK[k]; if(!d) continue; const n=K&&K.make?Math.max(d.n,K.n||0):d.n; for(let v=0;v<n;v++){ const c=rzKindOne(k,d,v); if(c) L.push(c); } } sc=sc||2; const cell=Math.max(...L.map(c=>c.width/SS*sc))+6, cols=Math.min(10,L.length), cv=mkCanvas(cols*cell,Math.ceil(L.length/cols)*cell), g=cv.getContext('2d'); g.fillStyle='#8a9068'; g.fillRect(0,0,cv.width,cv.height); L.forEach((c,i)=>g.drawImage(c,(i%cols)*cell,Math.floor(i/cols)*cell,c.width/SS*sc,c.height/SS*sc)); return cv.toDataURL(); },
   // a sheet of finished act sprites (keys starting with pre), on a mid grey, for looking at them closely
   sheet(pre,sc,maxW){ reFlush(); const L=[...RET.entries()].filter(([k])=>k.startsWith(pre||'')).map(e=>e[1]).sort((p,q)=>q.height-p.height); if(!L.length) return null; sc=sc||1; maxW=maxW||1600;
     const pos=[]; let x=4,y=4,rh=0,W2=0; for(const c of L){ const w=c.width*sc/2, h=c.height*sc/2; if(x+w>maxW){ x=4; y+=rh+6; rh=0; } pos.push([x,y,w,h]); x+=w+6; rh=Math.max(rh,h); W2=Math.max(W2,x); }
