@@ -57,9 +57,17 @@ function lightKindOf(L){
   else if(L.lantern||L.lamp||L.lh||L.mlamp) k='lamp'; else if(L.cold) k='cold';
   else if(L.tint&&RL_TINT[L.tint]) k=RL_TINT[L.tint];
   else if(/lamp|lantern|lpod/.test(ok)) k='lamp'; else if(/crys/.test(ok)) k='crystal';
-  else if(L.fire) k='fire';
+  else if(L.fire) k=L.night&&L.r>=150&&L.r<=200&&!L.obj&&!rlTorchAt(L)?'lamp':'fire';
+  else if(L.night&&!L.obj) k='lamp';
   L._lk=k; if(!L.kind) L.kind=k;
   return k;
+}
+// the street lamps of the act maps carry fire:true like the torches by the doors; a torch has a 'torch' (or brazier)
+// structure standing exactly on its light, a lamp post does not
+const RL_TORCH={n:-1,set:null};
+function rlTorchAt(L){
+  if(RL_TORCH.n!==STRUCTS.length){ RL_TORCH.n=STRUCTS.length; RL_TORCH.set=new Set(); for(const s of STRUCTS) if(s.k==='torch'||s.k==='brazier'||s.k==='campfire'||s.k==='pillar'||s.k==='cauldron') RL_TORCH.set.add(Math.round(s.x)+'|'+Math.round(s.y)); }
+  return RL_TORCH.set.has(Math.round(L.x)+'|'+Math.round(L.y));
 }
 function lightColOf(L,k){ return L.col&&L.col.length===3?L.col:RL_KC[k]||RL_KC.glow; }
 // every entry that exists at load gets its kind now (later ones get it the first time they are lit)
@@ -453,6 +461,7 @@ function reShadows(props,npcs,inA){
   const S=reSun(), lvl=RLQ.lvl;
   if(!inA&&!DSKIP.shadow){ const n0=SHL.redraws, t0=performance.now(); shadowLayer(S,props); if(SHL.redraws!==n0){ const ms=performance.now()-t0; RLS.shN++; RLS.shMs+=ms; if(ms>RLS.shMax) RLS.shMax=ms; } }
   if(lvl>=3) return;
+  if(!inA&&!S.moon&&S.a>0.08&&lvl<2) rlFlecks(S,props);
   const figs=rlFigs(inA), C=rlCap();
   ctx.globalAlpha=1;
   const cast=(e,dx,dy,a)=>{
@@ -486,15 +495,25 @@ function reStructShadows(g,mk,inR,ux,uy,markS){
   g.lineWidth=4; g.globalAlpha=1;
 }
 // soften the cached shadow layer when it is redrawn (only then): down to half and back up, a cheap blur of about
-// 8 world px, so the edges read as soft penumbra rather than cut paper
+// 8 world px, so long shadows read as soft penumbra rather than cut paper (short ones near noon stay crisp)
 function reSoften(g,lw,lh){
-  if(RLQ.lvl>=3) return;
+  if(RLQ.lvl>=3||RL_SUN.o.len<0.75) return;   // short noon shadows stay crisp
   const w=Math.max(4,Math.ceil(lw/2)), h=Math.max(4,Math.ceil(lh/2));
   if(!RLS.soft||RLS.soft.width!==w||RLS.soft.height!==h){ RLS.soft=mkCanvas(w,h); RLS.softG=RLS.soft.getContext('2d'); }
   const sg=RLS.softG; sg.imageSmoothingEnabled=true; g.imageSmoothingEnabled=true; try{ sg.imageSmoothingQuality='medium'; g.imageSmoothingQuality='medium'; }catch(e){}
   sg.globalCompositeOperation='copy'; sg.drawImage(g.canvas,0,0,lw,lh,0,0,w,h);
   g.globalCompositeOperation='copy'; g.drawImage(RLS.soft,0,0,w,h,0,0,lw,lh);
   g.globalCompositeOperation='source-over';
+}
+// sun flecks: small soft spots of sunlight swaying in the shade of the big oaks (and of the trees in the woods),
+// drawn on the ground before the trees and figures, so only the shade on the ground shows them
+function rlFlecks(S,props){
+  const t=G.time, A=reAir(), k=S.a/0.36, col='255,240,200';
+  const fl=(x,y,R,n,seed,a)=>{ for(let i=0;i<n;i++){ const h1=hash2(seed+i*7,i*13+3), h2=hash2(seed+i*11+5,i*3), ang=h1*TAU, rr=Math.sqrt(h2)*R, sw=Math.sin(t*0.9+h1*9)*R*0.05;
+      glowAt(x+Math.cos(ang)*rr+sw,y+Math.sin(ang)*rr*0.8,R*(0.07+0.06*h2),col,a*(0.6+0.4*Math.sin(t*1.3+h2*11))); } };
+  if(!BIGOAKS) BIGOAKS=STRUCTS.filter(s=>s.k==='bigoak');
+  for(const b of BIGOAKS){ if(!inView(b.x,b.y,b.R*2)) continue; const h=118*(b.R/48)*0.65; fl(b.x+S.dx*h,b.y+S.dy*h,b.R*0.85,14,(b.x|0)+(b.y|0),0.2*k); }
+  if(A.dap>0.3){ let n=0; for(const p of props){ if(p.taken||!TREEH[p.k]||n>28) continue; n++; const h=TREEH[p.k]*p.s*0.7; fl(p.x+S.dx*h,p.y+S.dy*h,p.R*0.8,3,(p.x|0)*3+(p.y|0),0.16*k*Math.min(1,A.dap)); } }
 }
 // the dark blob right under the feet (contactShadow in a11c_depth.js calls this in Realistic, just before the figure)
 function reContact(e){
