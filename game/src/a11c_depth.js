@@ -257,9 +257,9 @@ function bigOakTrunk(s){
 function drawStoneLean(s,t){
   const k=s.s||1, h=34*k, dx=leanDX(s.x,h), dy=leanDY(s.y,h)-h*0.32;
   ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(s.a);
-  ctx.fillStyle=LOOK.sb?'#6c6862':'#3a3630'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); if(LOOK.sb){ ctx.strokeStyle=SBC.outline; ctx.lineWidth=1.8; ctx.stroke(); }
+  ctx.fillStyle=LOOK.re?'#57534c':LOOK.sb?'#6c6862':'#3a3630'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); if(LOOK.sb){ ctx.strokeStyle=SBC.outline; ctx.lineWidth=1.8; ctx.stroke(); }
   ctx.restore();
-  ctx.save(); ctx.translate(s.x+dx*0.5,s.y+dy*0.5); ctx.rotate(s.a); ctx.fillStyle=LOOK.sb?'#7c7872':'#4a453e'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.translate(s.x+dx*0.5,s.y+dy*0.5); ctx.rotate(s.a); ctx.fillStyle=LOOK.re?'#67625a':LOOK.sb?'#7c7872':'#4a453e'; ctx.beginPath(); ctx.ellipse(0,0,14*k,22*k,0,0,TAU); ctx.fill(); ctx.restore();
   drawStruct(Object.assign({},s,{x:s.x+dx,y:s.y+dy}),t);
 }
 // ---------- the Obsidian Wall: a stone face below its top, the top pushed back and splayed by the lean
