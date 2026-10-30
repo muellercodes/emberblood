@@ -8,7 +8,7 @@
 // hands over to A4b's m_glasswall.
 chapter({
   id: 'm_burrows', act: 4, after: 'm_sable', next: 'm_glasswall', takeover: true,
-  card: null, name: ['The Glass Desert', 'The Glass Desert'],
+  card: null, name: ['Glass Half Full', 'The Glass Desert'],
   so_far: [
     'The sandworms go under the Glasswall. To follow them, Ash must learn to burrow. And down in the Burrows, the old king worm is sick.',
     'Worms go under the Glasswall. Ash must learn to dig. The king worm is sick.'],

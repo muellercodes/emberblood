@@ -865,14 +865,14 @@ STORY.m_hints={
   m_reforge:S(`Up to the Eclipse Lens, at the very top. Someone is coming up the stairs behind you. Someone with a hammer.`,`Go up to the Eclipse Lens at the top. Someone with a hammer is coming.`)};
 const M3S_YARA=[S(`I counted the lanterns in the square tonight. We needed four more than last month. The moon is getting smaller, Ash. Hurry.`,`We need more lanterns every night. The moon is shrinking. Hurry, Ash.`)];
 const m3sHint=st=>()=>STORY.m_hints[st];
-const m3sStageCard={m_sail:['Act IV · Chapter 1',S('Across the Sea','Across the Sea')]};
+const m3sStageCard={m_sail:['Act IV · Chapter 1',S('Making Waves','Across the Sea')]};
 const m3sLit=()=>clamp(G.flags.m_moonpath_lit|0,0,3);
 // a dungeon objective: inside it, "where you are"; outside, its door (the world's own, or the bible's spot)
 const m3sDunGoal=(id,inF,inS,outF,outS,P)=>m3sIn(id)?{text:S(inF,inS),x:player.x,y:player.y,area:AREA.id}:Object.assign({text:S(outF,outS)},m3sDoorAt(id,P),m3sArea(id));
 // the main beats' XP (BALANCE.md 8: Act IV main beats about 1000 each, five of them, plus the small ones)
 const M3S_XP={land:300,winnie:600,coralia:800,eclipse1:1000,rafi:600,eclipse2:1000,obs:400,reforge:1000,peak:600,stand:600};
 defineStages(4,[
-  {id:'m_sail',chapter:S('Across the Sea','Across the Sea'),at:{x:M3SP.hearth.x,y:M3SP.hearth.y},
+  {id:'m_sail',chapter:S('Making Waves','Across the Sea'),at:{x:M3SP.hearth.x,y:M3SP.hearth.y},
     objectives(){
       const F=G.flags; if(curMap()===3) return [];
       const o=[];
@@ -886,7 +886,7 @@ defineStages(4,[
     // (startAct(4) runs the act's intro itself; a stage set any other way, or a reload before the intro, starts it here)
     enter(o){ if(!m3sSeen('m_intro')) m3sIntroStart({fromEnter:!o.load,quiet:!!o.load}); },
     update(dt){ if(curMap()===3&&!AREA&&!G.flags.m_landed&&scene==='play') m3sLand(); }},
-  {id:'m_drift',chapter:S('Across the Sea','Across the Sea'),at:{x:M3SP.dock.x+150,y:M3SP.dock.y},
+  {id:'m_drift',chapter:S('Making Waves','Across the Sea'),at:{x:M3SP.dock.x+150,y:M3SP.dock.y},
     objectives(){ const F=G.flags;
       if(!F.m_dabble) return [m3sObj(`Talk to Mayor Dabble on the Town Raft`,`Talk to Mayor Dabble on the Town Raft`,m3sWho('m_dabble',M3SP.raft.x,M3SP.raft.y))];
       return [m3sObj(`Ask Old Winnie the Tidewife about the moon`,`Ask Old Winnie about the moon`,m3sWho('m_winnie',M3SP.winnie.x,M3SP.winnie.y))]; },
@@ -898,14 +898,14 @@ defineStages(4,[
       if(n.id==='m_dabble'&&!F.m_dabble){ m3sPlay('m_dabble',()=>questUpdated()); return true; }
       if(n.id==='m_winnie'&&!F.m_winnie){ m3sPlay('m_winnie',()=>{ gainXp(M3S_XP.winnie); goStage('m_lumen'); }); return true; }
       return false; }},
-  {id:'m_lumen',chapter:S('Drowned Lumen','Drowned Lumen'),card:['Act IV · Chapter 2',S('Drowned Lumen','Drowned Lumen')],at:{x:3300,y:63300},
+  {id:'m_lumen',chapter:S('In Too Deep','Drowned Lumen'),card:['Act IV · Chapter 2',S('In Too Deep','Drowned Lumen')],at:{x:3300,y:63300},
     objectives:()=>[m3sDunGoal('m_lumen',`Find Ember's flame in drowned Old Lumen`,`Find Ember's flame in Old Lumen`,'Cross the Spire Shoals to the Lumen Spire','Cross the sandbars to the white tower',M3SP.spire)],
     hint:m3sHint('m_lumen'), yara:M3S_YARA,
     soFar:S(`Old Lumen, the moon city, drowned long ago, the first time the moth bit the moon. Its tower still sticks out of the sea.`,`Old Lumen, the moon city, drowned long ago. Its tower sticks out of the sea.`),
     update(dt){ const F=G.flags;
       if(!m3sSeen('m_lumen_channel')&&scene==='play'&&m3sNear(M3SP.channel,240)&&!hasAbil('dive')) m3sPlay('m_lumen_channel');
       if((F.trial_m_lumen_done||F.m_lumen_done)&&G.stage==='m_lumen'){ F.m_lumen_done=1; goStage('m_coral',{card:false}); } }},
-  {id:'m_coral',chapter:S('Drowned Lumen','Drowned Lumen'),at:{x:M3SP.coral.x+260,y:M3SP.coral.y-420},
+  {id:'m_coral',chapter:S('In Too Deep','Drowned Lumen'),at:{x:M3SP.coral.x+260,y:M3SP.coral.y-420},
     objectives(){
       if(m3sIn('m_coralcombe')) return [m3sObj(`Speak to Queen Coralia`,`Talk to Queen Coralia`,m3sWho('m_coralia',player.x,player.y-60))];
       return [Object.assign({text:S('Dive into Coralcombe Reef and meet the merfolk','Dive into the coral ring. Meet the merfolk'),npc:'m_coralia'},m3sDoorAt('m_coralcombe',M3SP.coral),m3sArea('m_coralcombe'))]; },
@@ -914,7 +914,7 @@ defineStages(4,[
     enter(o){ if(!m3sSeen('m_lumen_after')) m3sWhen('lumen_after',()=>m3sOut(),()=>m3sPlay('m_lumen_after')); },
     marker:id=>id==='m_coralia'&&!G.flags.m_coral_met,
     talk(n){ if(n.id==='m_coralia'&&!G.flags.m_coral_met){ m3sPlay(m3sSeen('m_coral_in')?'m_coralia':STORY.m_coral_in.concat(STORY.m_coralia),()=>{ gainXp(M3S_XP.coralia); goStage('m_reef'); }); return true; } return false; }},
-  {id:'m_reef',chapter:S('The Glass Desert','The Glass Desert'),card:['Act IV · Chapter 3',S('The Glass Desert','The Glass Desert')],at:{x:4600,y:65300},
+  {id:'m_reef',chapter:S('Glass Half Full','The Glass Desert'),card:['Act IV · Chapter 3',S('Glass Half Full','The Glass Desert')],at:{x:4600,y:65300},
     objectives(){ const F=G.flags, p=player;
       if(!F.m_puff_done){ if(dist(p.x,p.y,M3SP.sunken.x,M3SP.sunken.y)>700) return [{text:S('Swim east to the Sunken Gate','Swim east to the Sunken Gate'),x:M3SP.sunken.x,y:M3SP.sunken.y}];
         return [{text:S('Get Baron Puffington out of the gate','Get the pufferfish out of the gate'),x:M3SP.sunken.x,y:M3SP.sunken.y}]; }
@@ -926,7 +926,7 @@ defineStages(4,[
     update(dt){ const F=G.flags;
       if(G.bossDone&&G.bossDone.m_puffington&&!F.m_puff_done){ F.m_puff_done=1; questUpdated(); }
       if(F.m_puff_done&&!F.m_eclipse1&&scene==='play'&&m3sNear(M3SP.strand,300)) m3sEclipse1(); }},
-  {id:'m_sable',chapter:S('The Glass Desert','The Glass Desert'),at:{x:M3SP.strand.x+200,y:M3SP.strand.y+100},
+  {id:'m_sable',chapter:S('Glass Half Full','The Glass Desert'),at:{x:M3SP.strand.x+200,y:M3SP.strand.y+100},
     objectives(){
       if(!m3sNear(M3SP.sable,700)&&!G.flags.m_sable_seen) return [{text:S('Follow the Caravan Road to the Oasis of Sable','Follow the road to the Oasis of Sable'),x:M3SP.road.x,y:M3SP.road.y}];
       return [m3sObj(`Talk to Caravan-master Rafi`,`Talk to Rafi, the caravan boss`,m3sWho('m_rafi',M3SP.rafi.x,M3SP.rafi.y))]; },
@@ -936,14 +936,14 @@ defineStages(4,[
     marker:id=>id==='m_rafi'&&!G.flags.m_rafi,
     talk(n){ if(n.id==='m_rafi'&&!G.flags.m_rafi){ m3sPlay('m_rafi',()=>{ gainXp(M3S_XP.rafi); goStage('m_burrows'); }); return true; } return false; },
     update(dt){ if(!G.flags.m_sable_seen&&m3sNear(M3SP.sable,700)){ G.flags.m_sable_seen=1; questUpdated(); } }},
-  {id:'m_burrows',chapter:S('The Glass Desert','The Glass Desert'),at:{x:10300,y:64400},
+  {id:'m_burrows',chapter:S('Glass Half Full','The Glass Desert'),at:{x:10300,y:64400},
     objectives:()=>[m3sDunGoal('m_burrows',`Find Ember's flame in the Sandworm Burrows`,`Find Ember's flame in the Burrows`,'Find the Sandworm Burrows at the Worm Mouth, north of Sable','Find the Worm Mouth, north of Sable',M3SP.worm)],
     hint:m3sHint('m_burrows'), yara:M3S_YARA,
     soFar:S(`The sandworms go under the Glasswall. To follow them, Ash must learn to burrow.`,`The sandworms go under the glass wall. Ash must learn to dig.`),
     update(dt){ const F=G.flags;
       if(!m3sSeen('m_worm_ring')&&scene==='play'&&m3sNear(M3SP.worm,480)&&!hasAbil('burrow')) m3sPlay('m_worm_ring');
       if((F.trial_m_burrows_done||F.m_burrows_done)&&G.stage==='m_burrows'){ F.m_burrows_done=1; goStage('m_glasswall'); m3sWhen('burrows_after',()=>m3sOut(),()=>{ if(!m3sSeen('m_burrows_after')) m3sPlay('m_burrows_after'); }); } }},
-  {id:'m_glasswall',chapter:S('Mirrors','Mirrors'),card:['Act IV · Chapter 4',S('Mirrors','Mirrors')],at:{x:M3SP.sable.x-300,y:M3SP.sable.y-500},
+  {id:'m_glasswall',chapter:S('Seeing Things','Mirrors'),card:['Act IV · Chapter 4',S('Seeing Things','Mirrors')],at:{x:M3SP.sable.x-300,y:M3SP.sable.y-500},
     objectives(){ const F=G.flags;
       if(!F.m_eclipse2) return [{text:S('Go back to the Oasis of Sable','Go back to the Oasis of Sable'),x:M3SP.sable.x,y:M3SP.sable.y}];
       if(!F.m_gap_dug) return [{text:S('Burrow under the Glasswall at the Burrow Gap','Dig under the glass wall at the Burrow Gap'),x:M3SP.gap.x,y:M3SP.gap.y}];
@@ -952,7 +952,7 @@ defineStages(4,[
     soFar:S(`Nyxara drank Sable's Moon Well and bit the moon again. Mom is coming! Under the Glasswall lies the Mirror Temple.`,`Nyxara drank the Moon Well. She bit the moon again. Mom is coming!`),
     mom:[S(`Worms? Under the ground? Wipe your feet before you come home.`,`Worms! Wipe your feet.`)],
     update(dt){ m3sGlassTick(dt); if(m3sIn('m_mirror')) goStage('m_mirror',{card:false}); }},
-  {id:'m_mirror',chapter:S('Mirrors','Mirrors'),at:{x:M3SP.mirror.x,y:M3SP.mirror.y+200},
+  {id:'m_mirror',chapter:S('Seeing Things','Mirrors'),at:{x:M3SP.mirror.x,y:M3SP.mirror.y+200},
     objectives:()=>[m3sDunGoal('m_mirror',`Find Ember's last flame in the Mirror Temple`,`Find Ember's last flame in the temple`,'Explore the Mirror Temple','Explore the Mirror Temple',M3SP.mirror)],
     hint:m3sHint('m_mirror'), yara:M3S_YARA,
     soFar:S(`The Mirror Temple keeps Ember's moonfire, and a peacock who thinks he is the most beautiful thing in the world.`,`The Mirror Temple keeps Ember's moonfire. And a very vain peacock.`),
@@ -961,7 +961,7 @@ defineStages(4,[
         // Pip's Lantern (bible 7.3, room g): the dungeon plays it; if it never did, it plays here, before the Moonpath
         if(F.pip&&!F.m_pip_lamp){ if(!M3S.pipQ){ M3S.pipQ=true; m3sWhen('piplamp',null,()=>m3sPlay('m_pip_lamp',()=>{ M3S.pipQ=false; goStage('m_moonpath'); })); } }
         else goStage('m_moonpath'); } }},
-  {id:'m_moonpath',chapter:S('The Eclipse Observatory','The Eclipse Observatory'),card:['Act IV · Chapter 5',S('The Eclipse Observatory','The Eclipse Observatory')],at:{x:M3SP.foot.x-150,y:M3SP.foot.y+150},
+  {id:'m_moonpath',chapter:S('Starstruck','The Eclipse Observatory'),card:['Act IV · Chapter 5',S('Starstruck','The Eclipse Observatory')],at:{x:M3SP.foot.x-150,y:M3SP.foot.y+150},
     objectives(){ const n=m3sLit();
       if(n<3) return [{text:S(`Light the Moonpath with Moonfire (${n} of 3 braziers lit)`,`Light the Moonpath with Moonfire (${n} of 3)`),x:M3SP.foot.x,y:M3SP.foot.y}];
       return [Object.assign({text:S('Climb to the Eclipse Observatory','Climb up to the Observatory')},m3sDoorAt('m_obs',M3SP.obsDoor),m3sArea('m_obs'))]; },
@@ -971,7 +971,7 @@ defineStages(4,[
     update(dt){ const F=G.flags;
       if(!m3sSeen('m_moonpath')&&scene==='play'&&m3sNear(M3SP.foot,300)){ m3sPlay('m_moonpath',()=>{ if(F.m_eclipse2&&!F.m_pb_3&&typeof pebbleNow==='function') later(1.2,()=>pebbleNow('m_pb_3')); }); }
       if(m3sIn('m_obs')) goStage('m_observatory',{card:false}); }},
-  {id:'m_observatory',chapter:S('The Eclipse Observatory','The Eclipse Observatory'),at:{x:M3SP.foot.x-150,y:M3SP.foot.y+150},
+  {id:'m_observatory',chapter:S('Starstruck','The Eclipse Observatory'),at:{x:M3SP.foot.x-150,y:M3SP.foot.y+150},
     objectives:()=>[m3sDunGoal('m_obs','Climb the Observatory to the Dome Gallery','Climb up to the dome','Go back into the Eclipse Observatory','Go back into the Observatory',M3SP.obsDoor)],
     hint:m3sHint('m_observatory'), yara:M3S_YARA,
     soFar:S(`Hush is back, big and cold, on a silver leash. She guards the last Shard in the Eclipse Observatory.`,`Hush is back, big and cold. She guards the last Shard.`),

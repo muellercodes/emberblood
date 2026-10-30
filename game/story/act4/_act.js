@@ -25,7 +25,7 @@ act({
       title: ['Who is stealing the lamps of Moonfall?', 'Who steals the lamps?'],
       deduce: ['lamp_thief'],
       herring: ['m4_octavia_hoard', 'm4_jinx_lamps'],
-      solved: ['Duke Umberwing ate them. Every Lantern Day, a parcel comes to Sable now. It says SORRY.', 'The Duke took them. Now he sends them back.'] },
+      solved: ['Duke Umberwing ate them, one light snack at a time. Every Lantern Day a parcel comes to Sable now. It says SORRY.', 'The Duke ate them. Now he sends lamps back.'] },
   },
 
   // there is no trust track in Act IV
