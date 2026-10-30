@@ -7,6 +7,7 @@
 // The moth is drawn like Hush's portrait (e7b_threads' thrFaceMoth) for the big one, and as a few strokes for the tiny
 // one. These looks are anim (drawn every frame) but draw nothing at all in their resting state.
 // No em dash anywhere. Everything here is block scoped so no name can clash with another module.
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 {
   const T2 = Math.PI * 2, OL = '#1a1030';
   const has = typeof defineLook === 'function';
@@ -137,3 +138,4 @@
     } });
   }
 }
+reLooksMine();

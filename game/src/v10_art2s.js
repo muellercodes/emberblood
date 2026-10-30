@@ -6,6 +6,7 @@
 //   a2s_pond_chest   a tin chest dripping pond weed (Bramble Pond)
 //   a2s_goat_stash   a chewed hat, a heap of coins and a glowing ember (Duchess's Perch)
 //   a2s_eye_words    letters carved inside the Chalk Dragon's opened eye
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 if(typeof defineLook==='function'){ const A2S_INK='#2b2420';
   defineLook('a2s_sketch_page',{w:30,h:22,draw(g,x,y,t){
     g.save(); g.translate(x,y-6); g.rotate(-0.12);
@@ -60,3 +61,4 @@ if(typeof defineLook==='function'){ const A2S_INK='#2b2420';
     const a=0.2+0.1*Math.sin(t*3); g.fillStyle=`rgba(255,250,230,${a})`; g.beginPath(); g.arc(x,y-6,15,0,TAU); g.fill();
   }});
 }
+reLooksMine();

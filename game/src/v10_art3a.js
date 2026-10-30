@@ -2,6 +2,7 @@
 // Only looks: defineLook(id, {w, h, draw(g, x, y, t, state), live?}) for the places those chapters add, and three
 // Case Book icons. (x, y) is the point on the ground the place stands on (an icon: its centre). The static part of a
 // look is drawn once and cached by the gate library (e10c_gates); `live` adds the small twinkles every frame.
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 const A3A_INK='#1c2236';
 function a3aEll(g,x,y,rx,ry,col,lw){ g.fillStyle=col; g.beginPath(); g.ellipse(x,y,rx,ry,0,0,TAU); g.fill(); if(lw){ g.strokeStyle=A3A_INK; g.lineWidth=lw; g.stroke(); } }
 // a four-point twinkle
@@ -126,3 +127,4 @@ defineLook('f3_glaciar_asleep',{w:460,h:300,draw(g,x,y){
   // her chest rises and falls a little (a soft glow where the Shard is)
   const s=0.5+0.5*Math.sin(t*TAU/3.4); g.save(); g.globalAlpha=0.18+0.18*s; g.fillStyle='#b8a0ff'; g.beginPath(); g.ellipse(x-20,y-60,40+8*s,18+4*s,0,0,TAU); g.fill(); g.restore();
 }});
+reLooksMine();

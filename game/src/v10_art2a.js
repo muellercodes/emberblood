@@ -3,6 +3,7 @@
 // definePose('c_mask', pose, draw(g, x, y, t)) for Vesper in the Moth Mask. (x, y) is the point on the ground the
 // place or the person stands on. Static parts are baked once into small offscreen canvases (A2A_SPR); only glows,
 // twinkles and bobbing are drawn per frame. Colors follow the heist's thief sprite (e7_acts.js TH) so she matches.
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 const A2A_SPR=new Map();
 const A2A_INK='#1c1328';
 const A2A_TH={suit:'#3b2b52',suit2:'#2a1e3c',cloak:'#9e90c2',cloak2:'#6f6296',mask:'#f6f0e6',gold:'#e2b65c',spot:'#f2b45a',hood:'#4c3a6a',
@@ -290,3 +291,4 @@ definePose('c_mask','unmask',(g,x,y,t)=>{
   a2aGlow(g,x,y-lift-40,40,'210,200,255',0.18+0.3*a2aNight());
   a2aPut(g,c,x,y-lift+breathe);
 });
+reLooksMine();

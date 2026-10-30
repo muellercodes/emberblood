@@ -510,11 +510,11 @@ function reParseCol(v){
   if((m=/^rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[, /]+([\d.]+))?\)$/.exec(v))) return [+m[1],+m[2],+m[3],m[4]==null?1:+m[4]];
   return null;
 }
-function reSoftCtx(g){
+function reSoftCtx(g,noForm){
   const O=RE_OUT; O.add(String(RE1.real||SBC.outline).toLowerCase());
   let soft=0, bb=[1e9,1e9,-1e9,-1e9];
   const pt=(x,y)=>{ if(x<bb[0]) bb[0]=x; if(y<bb[1]) bb[1]=y; if(x>bb[2]) bb[2]=x; if(y>bb[3]) bb[3]=y; };
-  const formed=(t,x0,y0,x1,y1)=>{ const c=reParseCol(t.fillStyle); if(!c||c[3]<0.9) return null; const w=x1-x0, h=y1-y0; if(!(w>2.5&&h>2.5)) return null;
+  const formed=(t,x0,y0,x1,y1)=>{ if(noForm) return null; const c=reParseCol(t.fillStyle); if(!c||c[3]<0.9) return null; const w=x1-x0, h=y1-y0; if(!(w>2.5&&h>2.5)) return null;
     let gr; const L=reRGB(rzMix(c,[255,248,234],0.16)), B=reRGB(c), D1=reRGB(reK(c,0.86)), D2=reRGB(reK(c,0.72));
     if(h>w*1.6){ gr=t.createLinearGradient(x0,0,x1,0); gr.addColorStop(0,reRGB(reK(c,0.92))); gr.addColorStop(0.22,L); gr.addColorStop(0.45,B); gr.addColorStop(0.8,D1); gr.addColorStop(1,D2); }
     else if(w>h*1.6){ gr=t.createLinearGradient(0,y0,0,y1); gr.addColorStop(0,L); gr.addColorStop(0.4,B); gr.addColorStop(1,D1); }
@@ -638,8 +638,8 @@ function reTall(pre,key,w,h,bx,by,draw,base,o){
   const J0=REQ.jobs.get(k); if(J0&&J0.cv) return J0.cv;
   const make=()=>{ const sc=2, cv=mkCanvas(Math.ceil(w*sc),Math.ceil(h*sc)), g0=cv.getContext('2d'); g0.scale(sc,sc); g0.translate(bx,by); g0.lineCap='round'; g0.lineJoin='round';
     const g=reSoftCtx(g0), was=SBC.outline; RE1.paint++; SBC.outline=RE1.real; try{ draw(g); } finally{ RE1.paint--; SBC.outline=was; }
-    cv.ox=bx; cv.oy=by; cv.w2=w; cv.h2=h;
-    return {cv,o:Object.assign({sc,base:by,seed:k.length*31+7},o||{}),fin:c=>{ c.ox=bx; c.oy=by; c.w2=w; c.h2=h; return c; }}; };
+    cv.ox=bx; cv.oy=by; cv.w2=w; cv.h2=h; cv.ww=w; cv.hh=h;
+    return {cv,o:Object.assign({sc,base:by,seed:k.length*31+7},o||{}),fin:c=>{ c.ox=bx; c.oy=by; c.w2=w; c.h2=h; c.ww=w; c.hh=h; return c; }}; };
   reArtAsk(k,make);
   if(RE1.plan) return RE1.empty();
   const J=REQ.jobs.get(k); if(J&&!J.it){ const r=make(); J.cv=r.cv; J.fin=r.fin; J.it=reArtG(r.cv,r.o); J.n=0; return r.cv; }
@@ -681,6 +681,48 @@ function reGradFill(g,path,col,x0,y0,x1,y1,k){
 // Act II and Act III standing things (C1K, F2WK and every other cached tall sprite of x1_world.js and x2_world.js)
 { const base=c1wTall; c1wTall=function(key,w,h,bx,by,draw,ow){ if(LOOK.re&&!LOOK.sb) return reTall('c1:',key,w,h,bx,by,draw,()=>base(key,w,h,bx,by,draw,ow)); return base(key,w,h,bx,by,draw,ow); }; }
 { const base=f2wTall; f2wTall=function(key,w,h,bx,by,draw,ow){ if(LOOK.re&&!LOOK.sb) return reTall('f2:',key,w,h,bx,by,draw,()=>base(key,w,h,bx,by,draw,ow)); return base(key,w,h,bx,by,draw,ow); }; }
+
+// the Act III powers' standing things outdoors (frozen folk, ice, locks, braziers, drums, bells: p3Spr sprites); in
+// caves they stay as they are (interiors and caves are another artist's)
+{ const base=p3Spr; p3Spr=function(key,w,h,draw,ow){ if(!LOOK.re||LOOK.sb||AREA) return base(key,w,h,draw,ow); const pad=8; return reTall('p3:',key,w+pad*2,h+pad*2,pad+w/2,pad+h,draw,()=>base(key,w,h,draw,ow)); }; }
+// the Act II powers' grapple posts and rings: brass on a stone footing, painted for this look
+function reP2Post(){ return rzCache('p2post',()=>{ const F=rzSq(32);
+  rzContact(F,2,23,13,5.5,0.42);
+  rzBox(F,0,19.5,20,7,0,4.5,1.6,[112,108,118],RZ.ROCK,rzStoneTx(3));
+  rzCap(F,0,17,4.5,0,-15,4.5,4.4,4.1,[204,156,66],RZ.METAL,(t,u)=>0.9+0.12*Math.cos(u*3));
+  for(const y of [-7,7]) rzBox(F,0,y,10,2.6,0,9.4,0.5,[146,104,40],RZ.METAL);
+  for(let i=0;i<20;i++){ const a0=i/20*TAU, a1=(i+1)/20*TAU, r=7.6; rzCap(F,Math.cos(a0)*r,-24+Math.sin(a0)*r,6,Math.cos(a1)*r,-24+Math.sin(a1)*r,6,1.9,1.9,[232,184,84],RZ.METAL); }
+  rzDome(F,0,-14,2.2,2.2,0,9.6,1.4,[58,140,140],RZ.GLOSS);
+  return rzShade(F,{ao:0.12,aoR:1.2,rim:0.3}); }); }
+function reP2Ring(){ return rzCache('p2ring',()=>{ const F=rzSq(18);
+  for(let i=0;i<22;i++){ const a0=i/22*TAU, a1=(i+1)/22*TAU, r=9; rzCap(F,Math.cos(a0)*r,4+Math.sin(a0)*r,4,Math.cos(a1)*r,4+Math.sin(a1)*r,4,2.2,2.2,[226,178,80],RZ.METAL); }
+  rzBox(F,0,-7,6,6,0,5,1,[160,122,48],RZ.METAL);
+  return rzShade(F,{ao:0.1,aoR:1,rim:0.3}); }); }
+{ const base=p2PostSprite; p2PostSprite=function(){ return LOOK.re&&!AREA?reP2Post():base(); }; }
+{ const base=p2RingSprite; p2RingSprite=function(){ return LOOK.re&&!AREA?reP2Ring():base(); }; }
+// rings, chain rings, crates and drawbridges outdoors: their dark outlines are drawn soft (the Storybook branch asks
+// for SBC.outline, which is the soft dark while they draw)
+{ const W=fn=>function(...a){ if(!LOOK.re||LOOK.sb||AREA) return fn.apply(this,a); const was=SBC.outline; if(RE1.real==null) RE1.real=was; LOOK.sb=true; SBC.outline=RE_SOFTO; try{ return fn.apply(this,a); } finally{ LOOK.sb=false; SBC.outline=was; } };
+  p2DrawRing=W(p2DrawRing); p2DrawChainRing=W(p2DrawChainRing); p2DrawCrate=W(p2DrawCrate); p2DrawBridge=W(p2DrawBridge); }
+
+// the story place looks of Acts II and III (v10_art2a, 2b, 2s, 3a, 3b, 3s and the pilot's v10_art_eng): those files
+// call reLooksAt() before their looks and reLooksMine() after them, so only their looks are repainted here. They run
+// at load time, before this module's constants exist, so they keep their list on window.
+function reLooksAt(){ const W=window.__re23L||(window.__re23L={mine:new Set(),pre:null}); W.pre=new Set(Object.keys(LOOKS)); }
+function reLooksMine(){ const W=window.__re23L; if(!W||!W.pre) return; for(const k of Object.keys(LOOKS)) if(!W.pre.has(k)) W.mine.add(k); W.pre=null; }
+const reLookMine=id=>{ const W=window.__re23L; return !!(W&&W.mine.has(id))&&!/^icon_/.test(id); };
+{ const base=gtLookSprite; gtLookSprite=function(id,L,state){
+  if(!LOOK.re||LOOK.sb||!reLookMine(id)) return base(id,L,state);
+  const pad=10, Wd=Math.ceil(L.w*2+pad*2), Hd=Math.ceil(L.h*2+pad*2), cx=Wd/2, cy=Hd/2+L.h*0.25;
+  return reTall('lk:',id+'|'+(state==null?'':state),Wd,Hd,cx,cy,g=>L.draw(g,0,0,0,state),()=>base(id,L,state));
+}; }
+// the looks that move (anim) draw every frame: through the softening context, outlines only
+{ const base=lookDraw; lookDraw=function(a,b,x,y,t,state){
+  const id=typeof a==='string'?a:b, L=LOOKS[id];
+  if(!LOOK.re||LOOK.sb||!L||!L.anim||!reLookMine(id)) return base(a,b,x,y,t,state);
+  const g0=typeof a!=='string'&&typeof b==='string'?a:b, g=reSoftCtx(g0||ctx,true), was=SBC.outline; if(RE1.real==null) RE1.real=was; SBC.outline=RE_SOFTO;
+  try{ return typeof a==='string'?base(a,g,x,y,t,state):base(g,b,x,y,t,state); } finally{ SBC.outline=was; }
+}; }
 
 // ---------- 4. the acts' ground art (ELEV.deco paints: town floors, quays, plazas, rails, fields, roofs, the Great
 // Clock's face, causeways...): painted through the same softening context (no plum outlines; each opaque stone, tile
