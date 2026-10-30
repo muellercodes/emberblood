@@ -11,7 +11,7 @@
 // the chain: it burns on whatever whip Ash carries later, so she sends him to Ingrid on the coast for one.
 quest({
   id: 'f_forge', act: 3, giver: 'f_gunnhild', optional: true, takeover: true,
-  title: ["Gunnhild's Cold Forge", "Gunnhild's Cold Forge"],
+  title: ['Forge Ahead', "Gunnhild's Cold Forge"],
   payoff: { kind: 'upgrade', id: 'f_emberchain' },
   old_steps: ['lit', 'ore', 'chain'],
 

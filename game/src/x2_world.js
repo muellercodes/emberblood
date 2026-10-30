@@ -1025,7 +1025,7 @@ function f2wDoors(B){
   B.cave({area:'f_maze',x:5600,y:44436,theme:'f_glacier',noNudge:true,name:S('The Glacier Maze','The Glacier Maze'),label:S('Enter the Glacier Maze','Go in the Glacier Maze')});
   gate('f_maze',()=>f2wGate('f_maze'),S('Wind howls out of the ice. You should talk to the Hearthkeeper in Hearthold first.','Talk to the Hearthkeeper first.'));
   B.door({x:12650,y:46486,area:'f_sky',label:S('Enter Skyreach Temple','Go in the temple'),outY:30,f2w:true,need:()=>f2wGate('f_sky'),locked:S('The temple doors are shut tight against the wind. Maybe somebody in Rimeholm knows why you would want to come here.','The doors are shut. Ask in Rimeholm.')});
-  B.door({x:12200,y:42466,area:'f_deep',label:S('Enter Stonehorn Deep','Go in Stonehorn Deep'),outY:34,f2w:true,need:()=>f2wGate('f_gap'),locked:S('A ram skull as big as a house, with a door in its mouth. Something deep inside is snoring. Not yet.','Something big snores inside. Not yet.')});
+  B.door({x:12200,y:42466,area:'f_deep',label:S('Enter Stonehorn Deep','Go in Stonehorn Deep'),outY:34,f2w:true,need:()=>f2wGate('f_gap'),locked:S('A ram skull the size of a cottage, with a door in its mouth. Something deep inside is snoring. Not yet.','Something big snores inside. Not yet.')});
   B.door({x:7300,y:44172,area:'f_dread',label:S('Enter the Heart of Dread','Go in the Heart of Dread'),outY:40,f2w:true,need:()=>F2WF('f_hush_done'),locked:S('The Dreadgate is locked with a Frost Lock as big as a cart. It hums. It will not budge.','The Frost Lock will not budge.')});
   // the summit door on the Crown (the way back down into the mountain, once it is open)
   B.door({x:7060,y:41662,area:'f_dread',label:S('Go back down into the mountain','Go back down'),outY:30,f2w:true,f2room:'n',need:()=>F2WF('f_crown_open'),locked:S('A door of black ice, shut from the inside.','It is shut from inside.')});
@@ -1158,7 +1158,7 @@ function f2wTown(B){
   // the Great Hearth on its dais
   F2WD.hearth=f2wObj('hearth',6800,48950);
   f2wLM(B,{id:'f_lm_hearth',x:6800,y:48990,r:0,clr:30,prompt:S('Look at the Great Hearth','Look at the Great Hearth'),draw:()=>{},
-    act:()=>f2wSay([F2WT.lit?S('The Great Hearth roars blue and gold. Snowflakes melt a long way before they reach it.','The Great Hearth burns blue and gold!'):S('The Great Hearth: a stone fireplace as big as a house. Its fire is tiny, a little orange flicker at the bottom.','The Great Hearth. Its fire is tiny.')])});
+    act:()=>f2wSay([F2WT.lit?S('The Great Hearth roars blue and gold. Snowflakes melt a long way before they reach it.','The Great Hearth burns blue and gold!'):S('The Great Hearth: a stone fireplace taller than a cottage. Its fire is tiny, a little orange flicker at the bottom.','The Great Hearth. Its fire is tiny.')])});
   const HL=LANDMARKS[LANDMARKS.length-1];
   p3On(HL,{r:80,blaze:{need:3,h:40,when:()=>!F2WT.lit&&!f2wStoryIn(),then:o=>f2wHearthBlaze(o)},
     fire:(o,dt,blue)=>{ if(F2WT.lit) return; F2WD.hearthHeat=Math.min(1,(F2WD.hearthHeat||0)+dt*0.5); if(!blue) p3Say(o.x,o.y-100,S('The flicker jumps up, then shrinks back down. It needs a hotter fire.','It needs hotter fire.'),'#ffe0b0','hearthsmall',4); }});

@@ -919,7 +919,7 @@ const BELLOWS_AI=FK.brain({move:'approach',stop:96,turn:2.2,cd:[0.9,1.5],recover
          {k:'f2slam',st:'stompW',off:0,r:74,windup:0.7,dmgN:24,max:360,w:1.8,every:4,then:(e,m)=>{ f2Wave(e.x,e.y,{dmg:f2Dmg(e,22),max:420,spd:300,thick:18}); }},
          {k:'f2pull',min:120,max:520,every:7,w:2},
          {k:'f2lob',ph:1,st:'toss',n:2,scatter:110,r:60,flight:1.0,windup:0.55,col:F2COL.frost,ball:'#cfe6ff',br:9,h:120,min:160,every:5,w:2,land:(e,x,y)=>{ f2Shards(x,y,18); SFX.play('boom'); shake(4); const p=player; if(!p.dead&&!f2Up()&&dist(x,y,p.x,p.y)<60+p.r*0.5) hurtPlayer(f2Dmg(e,28),x,y,240); }}]});
-f2Foe('f_bellows',{boss:true,name:'Old Bellows',title:S('the Forgekeeper','the forge golem'),short:'Old Bellows',
+f2Foe('f_bellows',{boss:true,name:'Old Bellows',title:S('Full of Cold Air','the forge golem'),short:'Old Bellows',
   lv:14,hp:6000,r:46,speed:60,dmg:22,value:1400,kbRes:0.05,dcol:'230,170,90',phases:[0.6,0.3],
   phaseText:[[S('Refreeze!','Refreeze!'),S('The corner vents freeze his armour back! Blaze a vent to seal it.','Blue fire on the vents! Seal them!'),['f_bellows',S('Purple cold... comes back.','Cold comes back.')]],
              [S('Overheat!','Overheat!'),S('When his chest glows white, Blaze into his furnace door!','His chest glows? Blue fire in the furnace!'),['f_bellows',S('FWOOOOSH! Bellows... hungry for heat.','FWOOOSH!')]]],
@@ -1131,7 +1131,7 @@ const FROST_HIGH=FK.brain({move:'hold',turn:3,cd:[1.4,2.3],
   moves:[{k:'f2spots',st:'bombs',n:3,r:60,windup:1.0,r0:70,r1:200,col:F2COL.snow,max:900,w:2,place:(e,x,y)=>{ f2Snow(x,y,20); SFX.play('pop'); const p=player; if(!p.dead&&!f2Up()&&dist(x,y,p.x,p.y)<60+p.r*0.5) hurtPlayer(f2Dmg(e,22),x,y,220); }},
          {k:'summon',type:'f_mothling',n:2,every:10,windup:0.6,st:'summon',r0:40,r1:120,opt:{aggro:true},max:900,w:1.6,if:e=>countType('f_mothling')<byDiff(3,4,5)}]});
 FM_DEF.summon=FM_DEF.summon||{recover:0.5};
-f2Foe('f_frostfeather',{boss:true,name:'Old Frostfeather',title:S('the moth-struck owl','the big snow owl'),short:'Old Frostfeather',
+f2Foe('f_frostfeather',{boss:true,name:'Old Frostfeather',title:S('In a Fowl Mood','the big snow owl'),short:'Old Frostfeather',
   lv:15,hp:5200,r:40,speed:150,dmg:22,value:1400,flying:true,kbRes:0.1,dcol:'235,240,252',phases:[0.65,0.3],
   phaseText:[[S('Up she goes!','Up she goes!'),S('She flies high. Stand on the updraft beside the nest to rise up, then Blaze her eyes!','Stand on the updraft. Blue fire her eyes!'),['f_frostfeather',S('Hoo hoo hoo!','Hoo hoo hoo!')]],
              [S('Blizzard Spin!','Blizzard Spin!'),S('Her whirlwind blew the updraft out! Hit both wind vanes to turn the wind back.','Hit both wind vanes!'),['f_frostfeather',S('HOOOOOOO!','HOOOOO!')]]],
@@ -1354,7 +1354,7 @@ function f2PoundBack(e){ if(e.dead||e.pbDone===e.landT) return; e.pbDone=e.landT
 p3OnPound(info=>{ const e=G&&G.boss; if(!e||e.dead||e.type!=='f_grumblehorn') return;
   if(info.drum){ f2GrumDrum(e,info); return; }
   if(e.landT&&G.time-e.landT<f2PoundBackWin()&&e.state==='land') f2PoundBack(e); });
-f2Foe('f_grumblehorn',{boss:true,name:'King Grumblehorn',title:S('the Stonehorn King','the ram king'),short:'King Grumblehorn',
+f2Foe('f_grumblehorn',{boss:true,name:'King Grumblehorn',title:S('The Hard-Headed King','the ram king'),short:'King Grumblehorn',
   lv:16,hp:6400,r:44,speed:110,dmg:24,value:1400,kbRes:0.05,dcol:'190,180,165',phases:[0.65,0.35],
   phaseText:[[S('Leap Quake!','Leap Quake!'),S('He leaps! Jump his quake rings. Ground Pound just as he lands to POUND BACK!','Jump the rings! Pound as he lands!'),['f_grumblehorn',S('HRRRRMPH! Stamp stamp STAMP!','HRRMPH! STAMP!')]],
              [S('Rockslide!','Rockslide!'),S('He rams the walls! Pound a drum stone when he is near it to knock him on his back!','Pound a drum when he is near!'),['f_grumblehorn',S('Get OFF it! Get off my... everything!','Get OFF!')]]],
@@ -2140,7 +2140,7 @@ f2Lines('f_blubberton',['f_blubberton_intro'],['f_blubberton_won'],
   [['f_blubberton',S('I say! Unhand my hall, you scaly scamp!','I say! Out of my hall, you scamp!')]],
   [['f_blubberton',S('Harrumph. Jolly good show, old bean. Here, the furnace key. I was only guarding it because nobody told me to stop.','Jolly good show! Here, the key.')],
    ['narr',S('Lord Blubberton waddles off to take a bath.','He waddles off to take a bath.')]]);
-f2Foe('f_blubberton',{name:'Lord Blubberton',title:S('the Walrus Knight','the walrus knight'),short:'Lord Blubberton',mini:true,
+f2Foe('f_blubberton',{name:'Lord Blubberton',title:S('Lord of Somebody Else’s Hall','the walrus knight'),short:'Lord Blubberton',mini:true,
   r:30,hp:560,speed:84,dmg:13,value:70,shield:true,kbRes:0.2,dcol:'200,170,150',
   ai:FK.brain({move:'approach',stop:64,turn:2.2,guard:true,cd:[0.9,1.5],recoverMove:0.25,pre:f2BlubPre,
     moves:[{k:'slash',reach:96,half:0.8,windup:0.5,lunge:120,dmg:1.0,col:F2COL.white,max:120,w:2,sfx:'hit'},
@@ -2226,11 +2226,11 @@ function f2SquallHurt(e,amt,o){ const h=foeHit(e,o), big=e.type==='f_squall';
 function f2SquallDeath(e){ f2Puff(e.x,e.y-30,'235,246,255',24); const q=e.partner;
   if(q&&!q.dead){ q.speed*=1.3; q.f2fast=true; G.boss=q; f2Txt(q,S('It speeds up! 30 percent faster!','Faster now!'),'#ffe066',14); taunt(q.type,q.type==='f_squall'?S('WHOOSH! Now I am MAD!','WHOOSH! Mad now!'):S('Wheee! Faster! FASTER!','Faster!')); return; }
   f2MiniDone(e,true); }
-f2Foe('f_squall',{name:'Squall',title:S('the Twin Squalls','the twin winds'),short:'The Twin Squalls',mini:true,r:20,hp:440,speed:170,dmg:10,value:70,flying:true,kbRes:0.6,dcol:'170,210,250',
+f2Foe('f_squall',{name:'Squall',title:S('The Tag Team','the twin winds'),short:'The Twin Squalls',mini:true,r:20,hp:440,speed:170,dmg:10,value:70,flying:true,kbRes:0.6,dcol:'170,210,250',
   ai:SQUALL_AI, init:f2SquallInit, onHurt:f2SquallHurt, onDeath:f2SquallDeath, lift:e=>e.z||0,
   draw3d:(e,fl)=>f2FigGale(e,fl,false), draw2d:(e,fl)=>f2Gale2(e,fl,false),
   sheet:f2Sheet([{state:'chase',z:30,label:'idle'},{state:'chase',z:30,dx:120,label:'move'},{state:'cast',st:0.3,at:0.3,z:30,label:'gust shot'},{state:'castW',st:0.4,at:0.4,z:30,label:'twister'},{state:'chase',stun:1,z:30,label:'stunned'},{state:'chase',deathT:0.3,z:30,label:'death'}])});
-f2Foe('f_squeak',{name:'Squeak',title:S('the Twin Squalls','the twin winds'),short:'The Twin Squalls',mini:true,r:14,hp:400,speed:200,dmg:9,value:50,flying:true,kbRes:0.8,dcol:'250,230,140',
+f2Foe('f_squeak',{name:'Squeak',title:S('The Tag Team','the twin winds'),short:'The Twin Squalls',mini:true,r:14,hp:400,speed:200,dmg:9,value:50,flying:true,kbRes:0.8,dcol:'250,230,140',
   ai:SQUALL_AI, init:f2SquallInit, onHurt:f2SquallHurt, onDeath:f2SquallDeath, lift:e=>e.z||0,
   draw3d:(e,fl)=>f2FigGale(e,fl,true), draw2d:(e,fl)=>f2Gale2(e,fl,true),
   sheet:f2Sheet([{state:'chase',z:30,label:'idle'},{state:'cast',st:0.3,at:0.3,z:30,label:'gust shot'},{state:'castW',st:0.4,at:0.4,z:30,label:'twister'},{state:'chase',deathT:0.3,z:30,label:'death'}])});
@@ -2278,7 +2278,7 @@ FM.f2bounce={
     if(m.t>2.5){ e.rolling=false; return true; }
     return false; } };
 FM_DEF.f2bounce={recover:0.3};
-f2Foe('f_rockjaw',{name:'Rockjaw',title:S('the Armoured Armadillo','the rock armadillo'),short:'Rockjaw',mini:true,r:28,hp:640,speed:90,dmg:14,value:70,kbRes:0.3,dcol:'170,150,130',
+f2Foe('f_rockjaw',{name:'Rockjaw',title:S('The Rock and Roller','the rock armadillo'),short:'Rockjaw',mini:true,r:28,hp:640,speed:90,dmg:14,value:70,kbRes:0.3,dcol:'170,150,130',
   ai:FK.brain({move:'approach',stop:52,turn:3,cd:[0.8,1.4],recoverMove:0.3,pre:f2RockPre,
     moves:[{k:'f2bounce',len:480,windup:0.6,spd:520,bounces:3,chain:true,dmg:1.15,min:80,max:800,w:3},
            {k:'slash',reach:58,half:0.9,windup:0.45,lunge:90,dmg:0.9,col:F2COL.white,max:80,w:1},
@@ -2336,7 +2336,7 @@ FM.f2drum={
   tick(e,dt,d,a,m){ e.st-=dt; if(e.st>0) return false; shake(8); SFX.play('roar',0.6); e.state='drum';
     const z=f2Wave(e.x,e.y,{dmg:e.dmg*0.4,max:420,spd:320,thick:20,col:F2COL.violet,roar:true,onHit:()=>f2Daze(0.5)}); return true; } };
 FM_DEF.f2drum={recover:0.6};
-f2Foe('f_grumbo',{name:'Grumbo',title:S('the Yeti Bully','the yeti bully'),short:'Grumbo',mini:true,r:34,hp:880,speed:100,dmg:16,value:90,kbRes:0.2,dcol:'230,235,245',
+f2Foe('f_grumbo',{name:'Grumbo',title:S('The Abominable Bully','the yeti bully'),short:'Grumbo',mini:true,r:34,hp:880,speed:100,dmg:16,value:90,kbRes:0.2,dcol:'230,235,245',
   ai:FK.brain({move:'approach',stop:76,turn:2.6,cd:[0.9,1.5],recoverMove:0.25,pre:(e,dt)=>{ f2Cool(e,'fistH',dt); if(e.fistT>0){ e.fistT-=dt; if(e.fistT<=0) f2Txt(e,S('The ice grows back on his fists!','Icy fists again!'),'#dff4ff',12); } },
     moves:[{k:'f2combo',st:'punchW',st2:'punch',n:2,reach:104,half:0.9,windup:0.6,windup2:0.4,lunge:150,dmg:1,max:140,w:2.6,sfx:'hit'},
            {k:'f2lob',st:'throwW',n:1,r:56,windup:0.7,flight:1.0,col:F2COL.orange,ball:'#a8b0c0',br:15,h:150,min:150,max:640,w:2,every:3,
