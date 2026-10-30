@@ -1403,7 +1403,7 @@ function f2wPlaces(B){
     act:()=>f2wSay([S('A mammoth skull as big as a cart, with a drum skin stretched over its top. The bones around it look like they would rattle if something heavy landed on it.','A big skull with a drum on top. Land on it hard!')])});
   p3On(LANDMARKS[LANDMARKS.length-1],{pound:{r:110,then:()=>f2wGraveyard()}});
   CHESTS.push({id:'f_ch_horn',x:12800,y:42860,b:25,open:false});
-  B.sign('f_sign_stonehorn',10260,43280,S('THE STONEHORN BADLANDS. Home of the Stonehorns. Knock before entering. Knock LOUDLY.','STONEHORN. Knock loudly!'));
+  B.sign('f_sign_stonehorn',10260,43280,S('THE STONEHORN BADLANDS. Home of the Stonehorns. Knock before entering. Knock loudly. They knock back.','STONEHORN. Knock loudly!'));
   // ---- the Shiversea: the Frozen Shipwreck (deck, masts, the mast post), Juniper's broken mast, Pepper's floe
   f2wObj('wreckmast',1520,42620,{v:0}); f2wObj('wreckmast',1700,42610,{v:1});
   CHESTS.push({id:'f_ch_wreck',x:1740,y:42612,b:26,open:false});

@@ -558,7 +558,7 @@ B('f_hsk1','id:f_hask',()=>!f2pQ('f_dogs'),S(`Hrm. Too quiet. A camp should have
 B('f_hsk2','id:f_hask',()=>f2pQ('f_dogs'),S(`Pepper. PEPPER. Drop the boot.`,`Pepper! Drop the boot!`),{r:['f_dog',S(`Woof!`,`Woof!`)]});
 // town barks: the dying Hearth, the blue Hearth, the frozen village, the moths, and later the moon
 B('f_hh1',F2P_HH,f2pCold,S(`My soup froze on the spoon. And I was sitting right next to the Hearth!`,`My soup froze. Right next to the Hearth!`));
-B('f_hh2',F2P_HH,f2pCold,S(`Brr.`,`Brr.`));
+B('f_hh2',F2P_HH,f2pCold,S(`Brr. My goosebumps have goosebumps.`,`Brr! So cold!`));
 B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the horned boy? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
 B('f_hh4',F2P_HH,f2pLit,S(`The Hearth is BLUE! I didn't know fire could be blue! I didn't know fire could be HAPPY!`,`The Hearth is BLUE! Fire can be happy!`),{d:'f_hearth'});
 B('f_hh5',F2P_HH,f2pLit,S(`I took my coat off. Then I put it back on. Baby steps.`,`I took off my coat. Then put it back on.`));
