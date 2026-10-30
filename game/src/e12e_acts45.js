@@ -392,7 +392,7 @@ function e45CoralBody(F,rng,kind,R,P,x0,y0,z0){
   // tube sponges
   const n=3+Math.floor(rng()*3);
   for(let i=0;i<n;i++){ const a=rng()*TAU, d=R*0.35*Math.sqrt(rng()), x=x0+Math.cos(a)*d, y=y0+Math.sin(a)*d*0.8, r=R*(0.2+rng()*0.12), z=z0+r*(1.2+rng());
-    rzCap(F,x,y+r*0.6,z0,x,y,z,r,r*0.92,rzJit(P[1],rng,0.1),RZ.CLOTH); rzDome(F,x,y,r*0.55,r*0.5,0,z+0.2,0.1,rzMul(P[0],0.45),RZ.CLOTH); }
+    rzCap(F,x,y+r*0.6,z0,x,y,z,r,r*0.92,rzJit(P[1],rng,0.1),RZ.CLOTH); rzDome(F,x,y,r*0.55,r*0.5,0,z+0.2,0.1,e45Mul(P[0],0.45),RZ.CLOTH); }
 }
 const E45CORP=()=>[E45PAL.coralP,E45PAL.coralO,E45PAL.coralV,E45PAL.coralY];
 // a coral head for the chunk paints (under water: a little veiled by the water's colour), cached by look generation
@@ -537,12 +537,158 @@ RZK.n_dawnflower={n:3,make:(s,v)=>{ const rng=mulberry32(s), F=rzSq(7); rzCap(F,
   rzDome(F,0,-1,1.3,1.3,0,2.8,0.9,v===1?[250,206,232]:[250,214,92],RZ.CLOTH);
   return rzShade(F,{ao:0.1,aoR:0.6,rim:0.2}); }};
 
+// ---------- 7. Nightfall Peak: the ground, the faceted glass and its cracks, the broken moon
+// natural palettes for the Peak's biomes (GROUND's table takes map biomes by id; Nightfall's were only derived):
+// dark basalt and chalk with a cold violet cast, rime on blue-black rock, the Crown's moonglass, the ink, the dawn
+REB_DEF[40]=['k','#48445a','#555068','#383548','#77708c','#4e4862'];
+REB_DEF[41]=['k','#4a3c46','#574852','#3a2e38','#6e5a62','#54444e'];
+REB_DEF[42]=['k','#545268','#616076','#444256','#86819c','#5a5872'];
+REB_DEF[43]=['i','#3c4c68','#4a5c7c','#2e3c56','#7688a6','#465672',null,null,1];
+REB_DEF[44]=['l','#45406c','#524d7c','#37335c','#7a76a2','#5a5690'];
+REB_DEF[45]=['l','#635b8e','#6f679c','#544c7e','#a49ec8','#6a5aa0'];
+REB_DEF[46]=['k','#120e1e','#171226','#0c0916','#2a2240','#1a1428'];
+REB_DEF[47]=['d','#4a4a5a','#56566a','#3e3e4e','#6c6c82','#3c3c52'];
+REB_DEF[48]=['k','#6c6a9c','#7876aa','#5e5c8c','#d6dcf2','#4a4a80'];
+REB_DEF[49]=['l','#c0a6bc','#ccb4c8','#ac94aa','#e8dae6','#dcc6d6'];
+try{ for(let b=40;b<=49;b++) REB[b]=undefined; }catch(e){}
+// the glass facets in this look: seams thin and dark, a few facets catching the moon as a soft sheen with a bright
+// edge, cracks a dark bed with a fine vein and a gentle glow (the Ember Stair's warm)
+{ const base=n4PaintLvl; n4PaintLvl=function(g,x0,y0,x1,y1,ch,L){ if(!LOOK.re) return base(g,x0,y0,x1,y1,ch,L); return e45PaintLvl(g,x0,y0,x1,y1,ch,L); }; }
+function e45PaintLvl(g,x0,y0,x1,y1,ch,L){
+  if(y0<79800||y0>91000) return;
+  const G0=n4ChunkGeo(x0,y0); if(!G0.lvls.has(L)) return;
+  const dawn=N4W.dawnK>=0.5; let gl=null; const GL=()=>gl||(gl=n4GlowCtx(ch,x0,y0));
+  g.save(); g.lineCap='round'; g.lineJoin='round';
+  for(const t of G0.tris){ if(t.lv!==L) continue; const F=N4FT[t.b]||N4FT[41], P=t.P;
+    g.beginPath(); g.moveTo(P[0][0],P[0][1]); g.lineTo(P[1][0],P[1][1]); g.lineTo(P[2][0],P[2][1]); g.closePath();
+    if(t.sand){ if(t.s>0.75){ g.fillStyle='rgba(200,190,240,.05)'; g.fill(); } continue; }
+    // each facet leans its own way: the ones facing the moon (north west) take a pale sheen, those away a little shade
+    const tilt=(t.s-0.5)*2;
+    if(tilt>0.15){ g.fillStyle=dawn?`rgba(255,244,230,${0.05*tilt})`:`rgba(${F[0]},${0.07*tilt+0.015})`; g.fill(); }
+    else if(tilt<-0.25){ g.fillStyle=`rgba(4,2,12,${0.12*-tilt})`; g.fill(); }
+    g.strokeStyle=dawn?'rgba(110,90,80,.16)':'rgba(6,4,14,.32)'; g.lineWidth=0.9; g.stroke();
+    if(tilt>0.35){ let k=0, best=1e9; for(let e=0;e<3;e++){ const my=(P[e][1]+P[(e+1)%3][1])/2+(P[e][0]+P[(e+1)%3][0])/2*0.5; if(my<best){ best=my; k=e; } }
+      g.strokeStyle=dawn?'rgba(255,248,236,.35)':`rgba(${F[0]},${0.16+tilt*0.22})`; g.lineWidth=1; g.beginPath(); g.moveTo(P[k][0],P[k][1]+0.6); g.lineTo(P[(k+1)%3][0],P[(k+1)%3][1]+0.6); g.stroke(); } }
+  const mine=G0.cracks.filter(c=>c.lv===L);
+  const path=(q,c)=>{ q.beginPath(); c.P.forEach((p,i)=>i?q.lineTo(p[0],p[1]):q.moveTo(p[0],p[1])); if(c.br){ q.moveTo(c.br[0][0],c.br[0][1]); q.lineTo(c.br[1][0],c.br[1][1]); } };
+  for(const c of mine){ const F=N4FT[c.b]||N4FT[41]; path(g,c);
+    g.strokeStyle=dawn?'rgba(120,80,50,.22)':'rgba(4,2,10,.55)'; g.lineWidth=c.big?3.2:2.2; g.stroke();
+    g.strokeStyle=dawn?'rgba(255,226,170,.75)':c.ember?'rgba(255,170,110,.8)':`rgba(${F[4]},.62)`; g.lineWidth=c.big?1.1:0.8; g.stroke();
+    const m=c.mk; if(!m) continue;
+    if(m.t==='clock'){ g.strokeStyle=dawn?'rgba(120,90,60,.4)':'rgba(70,56,120,.42)'; g.lineWidth=1.1; g.beginPath(); g.arc(m.x,m.y,m.R,0,TAU); g.stroke(); g.beginPath(); g.moveTo(m.x,m.y); g.lineTo(m.x,m.y-m.R*0.8); g.moveTo(m.x,m.y); g.lineTo(m.x+m.R*0.5,m.y-m.R*0.2); g.stroke(); }
+    else if(m.t==='frost'){ g.strokeStyle=dawn?'rgba(255,255,255,.5)':'rgba(214,236,255,.42)'; g.lineWidth=0.8; g.beginPath(); for(let s2=0;s2<5;s2++){ const sx=m.x+Math.cos(m.a)*s2*4, sy=m.y+Math.sin(m.a)*s2*4, l=6-s2; g.moveTo(sx,sy); g.lineTo(sx+Math.cos(m.a+0.9)*l,sy+Math.sin(m.a+0.9)*l); g.moveTo(sx,sy); g.lineTo(sx+Math.cos(m.a-0.9)*l,sy+Math.sin(m.a-0.9)*l); } g.moveTo(m.x,m.y); g.lineTo(m.x+Math.cos(m.a)*20,m.y+Math.sin(m.a)*20); g.stroke(); }
+    else n4Glint(g,m.x,m.y,m.R*0.8,dawn?'rgba(255,240,210,.7)':'rgba(230,216,255,.7)'); }
+  if(mine.length&&!dawn){ const q=GL(); for(const c of mine){ const F=N4FT[c.b]||N4FT[41]; q.strokeStyle=c.ember?'rgba(255,140,70,.5)':`rgba(${F[5]},.3)`; q.lineWidth=c.big?4.5:3; path(q,c); q.stroke(); } }
+  g.restore();
+}
+// the broken moon over the peak: plates of lunar rock (grey highlands, darker seas, little craters) round a hole of
+// violet night, lit from the upper left, a soft moonfire glow round the rim; the fragments drifting off it alike
+function e45Lunar(W,H,sd){ const c=mkCanvas(W,H), g=c.getContext('2d'), im=g.createImageData(W,H), d=im.data;
+  const cr=[]; const rng=mulberry32(sd); for(let i=0;i<90;i++) cr.push([rng()*W,rng()*H,2+Math.pow(rng(),2.2)*14]);
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=(y*W+x)*4, m=rzFbm(x*0.012,y*0.012,sd,4), f=rzFbm(x*0.07,y*0.07,sd+5,2);
+    let l=0.8+0.1*(f-0.5); if(m<0.46) l-=(0.46-m)*0.9;
+    for(const [cx,cy,r] of cr){ const dx=x-cx, dy=y-cy, q=(dx*dx+dy*dy)/(r*r); if(q<1.4){ if(q<0.7) l-=0.08*(1-q/0.7); else if(q<1) l+=0.1*(dx+dy<0?1:-0.6)*(1-Math.abs(q-0.85)/0.15); } }
+    d[i]=clamp(l*262,0,255); d[i+1]=clamp(l*262,0,255); d[i+2]=clamp(l*272,0,255); d[i+3]=255; }
+  g.putImageData(im,0,0); return c; }
+{ const base=n4MoonCv; n4MoonCv=function(){ if(!E45.on()) return base(); return rzCache('e45moon',e45MoonCv); }; }
+function e45MoonCv(){
+  const S0=512, c=mkCanvas(S0,S0), g=c.getContext('2d'), R=170; g.translate(S0/2,S0/2); g.lineJoin='round'; g.lineCap='round';
+  const gl=g.createRadialGradient(0,0,R*0.7,0,0,R*1.42); gl.addColorStop(0,'rgba(160,130,240,.32)'); gl.addColorStop(1,'rgba(110,80,210,0)'); g.fillStyle=gl; g.fillRect(-S0/2,-S0/2,S0,S0);
+  const hg=g.createRadialGradient(-R*0.15,-R*0.12,R*0.05,0,0,R*0.9); hg.addColorStop(0,'#3e2670'); hg.addColorStop(0.55,'#1e1040'); hg.addColorStop(1,'#0a0418'); g.fillStyle=hg; g.beginPath(); g.arc(0,0,R*0.9,0,TAU); g.fill();
+  const rng=mulberry32(1311); for(let i=0;i<26;i++){ const a=rng()*TAU, d=rng()*R*0.75; g.fillStyle=`rgba(226,220,255,${0.4+0.5*((i*37)%10)/10})`; g.fillRect(Math.cos(a)*d,Math.sin(a)*d,1.2,1.2); }
+  // the rim plates: the same broken pieces as x3's look (same random sequence), filled with lunar rock and relit
+  const pieces=[[0.25,1.05],[1.25,2.05],[2.6,3.45],[3.62,4.3],[4.95,5.85]], paths=[];
+  for(const [a0,a1] of pieces){ const jag=(a,s2)=>{ const p=[]; for(let k=0;k<4;k++){ const r=R*(0.84+k*0.06), aa=a+(rng()-0.5)*0.06*s2; p.push([Math.cos(aa)*r,Math.sin(aa)*r]); } return p; };
+    const A=jag(a0,1), B=jag(a1,-1); paths.push(q=>{ q.beginPath(); q.moveTo(A[0][0],A[0][1]); for(const v of A) q.lineTo(v[0],v[1]); q.arc(0,0,R*1.02,a0,a1); for(let k=B.length-1;k>=0;k--) q.lineTo(B[k][0],B[k][1]); q.arc(0,0,R*0.84,a1,a0,true); q.closePath(); }); }
+  const rim=mkCanvas(S0,S0), rg=rim.getContext('2d'); rg.translate(S0/2,S0/2); const tex=e45Lunar(S0,S0,1312);
+  rg.fillStyle=rg.createPattern(tex,'no-repeat'); try{ rg.fillStyle.setTransform(new DOMMatrix().translate(-S0/2,-S0/2)); }catch(e){}
+  for(const P of paths){ P(rg); rg.fill(); }
+  // the sphere's light: brighter toward the upper left, the limb a little darker
+  rg.globalCompositeOperation='source-atop'; const sh=rg.createRadialGradient(-R*0.5,-R*0.55,R*0.2,0,0,R*1.1); sh.addColorStop(0,'rgba(255,252,240,.18)'); sh.addColorStop(0.6,'rgba(0,0,0,0)'); sh.addColorStop(1,'rgba(20,14,50,.38)'); rg.fillStyle=sh; rg.fillRect(-S0/2,-S0/2,S0,S0); rg.globalCompositeOperation='source-over';
+  rzRelight(rim,{bump:3,ao:0.12,aoR:3,edge:3,sat:0.85,gain:1.12});
+  g.save(); g.shadowColor='rgba(190,170,255,.8)'; g.shadowBlur=18; g.drawImage(rim,-S0/2,-S0/2); g.restore(); g.drawImage(rim,-S0/2,-S0/2);
+  g.strokeStyle='rgba(40,26,70,.7)'; g.lineWidth=1.6; for(const P of paths){ P(g); g.stroke(); }
+  try{ thrMoth(g,0,R*0.05,R/30,0.6,'#140a24','rgba(220,200,255,.9)'); }catch(e){}
+  return c;
+}
+{ const base=n4FragCv; n4FragCv=function(){ if(!E45.on()) return base(); return rzCache('e45frag',()=>{ const out=[], rng=mulberry32(77), tex=e45Lunar(80,80,1313);
+  for(let i=0;i<5;i++){ const c=mkCanvas(80,80), g=c.getContext('2d'); g.translate(40,40); const n=4+Math.floor(rng()*2), P=[]; for(let k=0;k<n;k++){ const a=k/n*TAU+rng()*0.5, r=14+rng()*16; P.push([Math.cos(a)*r,Math.sin(a)*r*0.7]); }
+    const pa=()=>{ g.beginPath(); P.forEach((q,k)=>k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1])); g.closePath(); };
+    const f=mkCanvas(80,80), fg=f.getContext('2d'); fg.translate(40,40); fg.beginPath(); P.forEach((q,k)=>k?fg.lineTo(q[0],q[1]):fg.moveTo(q[0],q[1])); fg.closePath(); fg.save(); fg.clip(); fg.drawImage(tex,-40,-40); fg.restore(); rzRelight(f,{bump:3,ao:0.1,aoR:2,edge:2.4,sat:0.85});
+    g.save(); g.shadowColor='rgba(190,170,255,.7)'; g.shadowBlur=8; g.drawImage(f,-40,-40); g.restore(); g.drawImage(f,-40,-40); out.push(c); }
+  return out; }); }; }
+
+// ---------- 8. the ascent's puzzle pieces (x4_ascent.js n4aSpr keys; the rest come relit). Every piece keeps its
+// box and foot, and the glows and rings x4_ascent draws over them, so what you push, light or ride reads as before.
+// the Clockwork's three great gears, lying flat: brass in a toothed rim, a bevelled web with five holes, the hub
+function e45Gear(F,w,h,bx,by,key){
+  const i=+key.slice(4)||0, R=i===1?150:130, n=i===1?14:12, sd=80+i;
+  rzContact(F,6,10,R*0.98,R*0.6,0.4);
+  e45Fill(F,-R-10,-R*0.65-10,R+10,R*0.65+10,(x,y,o)=>{ const yy=y/0.62, r=Math.hypot(x,yy), a=Math.atan2(yy,x), tooth=Math.cos(a*n)>-0.05, out=tooth?R:R-14;
+    if(r>out) return false; o.a=e45Cov((out-r)*0.62); o.m=RZ.METAL;
+    const B=e45Brass(x,yy,sd,-1); let c=B.c, z=10; const pt=rzFbm(x*0.03,yy*0.03,sd+7,3); if(pt>0.56){ c=rzMix(c,[88,140,122],Math.min(0.7,(pt-0.56)*2.6)); B.pat=pt>0.66; }
+    if(r>out-4){ z=10-(r-(out-4))*0.9; c=rzCol(c,-0.06); }                 // the bevel at the rim and the teeth
+    else if(r>R-22&&r<R-17){ z=9; c=rzCol(c,-0.22); }                      // the groove inside the teeth
+    else if(r<R*0.2){ z=r<R*0.08?7:12+e45S(r/(R*0.2))*2; c=r<R*0.08?[50,36,20]:rzCol(c,0.06); }   // the hub and its bore
+    for(let k=0;k<5;k++){ const ha=k/5*TAU, hx=Math.cos(ha)*R*0.45, hy=Math.sin(ha)*R*0.45, d=Math.hypot(x-hx,yy-hy); if(d<R*0.1){ o.z=3; o.c=[26,18,30]; o.m=RZ.GLOSS; return true; } if(d<R*0.12){ z=11.5; c=rzCol(c,0.1); } }
+    o.z=z; o.c=c; if(B.pat&&r<out-4) o.m=RZ.ROCK; return true; });
+  return rzShade(F,{ao:0.12,aoR:2,rim:0.25,bump:1});
+}
+E45N4A.push([/^gear[0-2]$/,e45Gear,null]);
+// blocks of ice (the ice wall and the dam): clear blue with cracks and bubbles inside, a cap of white rime
+function e45Ice(F,w,h,bx,by,key){
+  const v=+key.slice(-1)||0, H=72+v*8, sd=90+v;
+  rzContact(F,0,1,22,7,0.45);
+  e45Fill(F,-21,-H-5,21,2,(x,y,o)=>{ if(Math.abs(x)>20) return false; o.a=e45Cov(20-Math.abs(x));
+    if(y<-H+3){ o.z=24+(y+H+5)*0.3; o.m=RZ.SNOW; o.c=rzMix([226,238,250],[250,252,255],rzVN(x*0.4,y*0.6,sd)); return true; }
+    const t=(-y)/H, s=e45S(x/20); o.m=RZ.WET; o.z=14+4*s+t*6;
+    let c=rzMix([26,62,118],[132,190,238],clamp(t*0.9+0.1-(x+20)/40*0.2,0,1));
+    const cr=Math.abs(Math.sin(x*0.35+y*0.08+rzFbm(x*0.08,y*0.05,sd,2)*6)); if(cr<0.05) c=rzMix(c,[230,246,255],0.7);
+    if(rzHash(Math.floor(x*1.2),Math.floor(y*1.2),sd)>0.985) c=rzMix(c,[240,250,255],0.6);
+    if(Math.abs(x+18)<1.6) c=rzMix(c,[210,236,255],0.5);
+    o.c=c; return true; });
+  return rzShade(F,{ao:0.1,aoR:1.4,rim:0.2,bump:1});
+}
+E45N4A.push([/^(icew|dam)[0-2]$/,e45Ice,null]);
+// the cracked blocks (glass with an ember crack, or ice with a frost crack)
+function e45Crk(F,w,h,bx,by,key){
+  const ice=key[3]==='i', v=+key.slice(-1)||0, H=50+v*6, sd=95+v, P=ice?[[30,66,120],[130,186,236]]:[[26,20,40],[70,58,104]];
+  rzContact(F,0,1,18,6,0.45);
+  const crk=[[-6+v*3,-H],[-1,-H*0.66],[-7,-H*0.42],[2,-H*0.18],[-3,0]], br=[[-1,-H*0.66],[8,-H*0.55]];
+  e45Fill(F,-17,-H-5,17,2,(x,y,o)=>{ if(Math.abs(x)>16) return false; o.a=e45Cov(16-Math.abs(x));
+    if(y<-H+2){ o.z=22; o.m=ice?RZ.SNOW:RZ.GLOSS; o.c=ice?[230,242,252]:[92,80,130]; return true; }
+    const t=-y/H, s=e45S(x/16); o.z=12+4*s+t*5; o.m=ice?RZ.WET:RZ.GLOSS; o.c=rzMix(P[0],P[1],clamp(t*0.7+0.15-(x+16)/32*0.3,0,1));
+    let d=m3wSegD(crk,x,y); d=Math.min(d,m3wSegD(br,x,y));
+    if(d<1.1){ o.m=RZ.EMIT; o.c=ice?[220,244,255]:[255,170,96]; o.z-=1; } else if(d<2.4) o.c=rzMix(o.c,ice?[170,220,255]:[150,70,40],0.45*(2.4-d)/1.3);
+    return true; });
+  return rzShade(F,{ao:0.12,aoR:1.4,rim:0.22,bump:1});
+}
+E45N4A.push([/^crki?[0-2]$/,e45Crk,null]);
+// lanterns on black glass posts: an iron cage with a ring and a cap, warm glass when lit, dark glass when not
+function e45Lan(F,w,h,bx,by,key){
+  const on=key.slice(-1)==='1', GL=[34,26,52];
+  rzContact(F,0,1,11,4,0.45);
+  rzBox(F,0,-1,16,4,0,2,0.8,rzCol(GL,0.1),RZ.GLOSS);
+  rzCap(F,0,-2,2,0,-46,16,3,2.6,GL,RZ.GLOSS);
+  rzBox(F,0,-48,14,4,0,18,0.8,rzCol(GL,0.1),RZ.GLOSS);
+  e45Fill(F,-10,-71,10,-47,(x,y,o)=>{ const ed=Math.min(9-Math.abs(x),Math.min(y+70,-48-y)); if(ed<0) return false; o.a=e45Cov(ed+0.5);
+    if(ed<1.6||Math.abs(x)<0.9){ o.z=22; o.c=[56,50,70]; o.m=RZ.METAL; return true; }
+    o.z=20; if(on){ o.m=RZ.EMIT; const k=1-Math.min(1,Math.hypot(x,(y+59)*0.7)/9); o.c=rzMix([236,150,60],[255,246,210],k); }
+    else { o.m=RZ.GLOSS; o.c=rzMix([30,24,54],[70,60,110],clamp(0.5-(x+y+59)/20,0,1)); if(!on&&m3wSegD([[-6,-67],[-2,-61],[-5,-56]],x,y)<0.6) o.c=[170,150,240]; }
+    return true; });
+  rzPoly(F,[[-12,-70],[12,-70],[0,-80]],(x,y)=>24+(-70-y)*0.5-Math.abs(x)*0.25,[46,40,62],RZ.METAL);
+  rzCap(F,-2.4,-82,26,2.4,-82,26,1.2,1.2,[70,64,86],RZ.METAL); rzCap(F,0,-84.4,26,0,-79.6,26,1.1,1.1,[70,64,86],RZ.METAL);
+  return rzShade(F,{ao:0.1,aoR:1,rim:0.25,bump:1.2});
+}
+E45N4A.push([/^r?lan[01]$/,e45Lan,null]);
+
 // ---------- 4. painting ahead: the great places of the map Ash is on are painted in idle time (PROPS's queue), so
 // walking up to one never waits on it. [table, key, w, h, bx, by] as the act files ask for them.
-const E45PRE={3:[['m3','obs',400,340,200,250],['m3','temple',360,320,180,240],['m3','well',120,250,60,232],['m3','spire',200,380,100,330],['m3','lhroom',110,110,55,70],['m3','lhcap',110,110,55,70]],4:[]};
+const E45PRE={4:[['n4a','gear0',280,189,140,94.5],['n4a','gear1',320,215,160,107.5],['n4a','gear2',280,189,140,94.5]],3:[['m3','obs',400,340,200,250],['m3','temple',360,320,180,240],['m3','well',120,250,60,232],['m3','spire',200,380,100,330],['m3','lhroom',110,110,55,70],['m3','lhcap',110,110,55,70]]};
 const E45W={map:-2,gen:-1,id:0};
 function e45Pre(m){
   const L=E45PRE[m]; if(!L||!L.length) return;
+  if(m===4) RZQ.q.push(()=>{ if(E45.on()){ n4MoonCv(); n4FragCv(); } });
   if(m===3) for(const wet of [0,1]) for(let i=0;i<12;i++) RZQ.q.push(()=>{ if(!E45.on()) return; for(let R=3;R<=18;R+=3) e45CoralHead(i,R,!!wet); });
   for(const [t,k,w,h,bx,by] of L) RZQ.q.push(()=>{ if(!E45.on()) return; if(t==='m3') m3wTall(k,w,h,bx,by,()=>{}); else if(t==='n4') n4Spr(k,w,h,bx,by,()=>{}); else if(t==='n4a') n4aSpr(k,w,h,bx,by,()=>{}); });
   if(RZQ.gen!==LOOK.gen){ RZQ.gen=LOOK.gen; } rzPumpLater();
