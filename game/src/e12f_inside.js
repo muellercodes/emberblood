@@ -29,7 +29,7 @@ function riTab(k){
 // bilinear sample of a table at (x, y) table pixels, wrapping
 function riS(t,x,y){ const xi=Math.floor(x), yi=Math.floor(y), fx=x-xi, fy=y-yi, x0=xi&255, y0=yi&255, x1=(x0+1)&255, y1=(y0+1)&255;
   const a=t[(y0<<8)|x0], b=t[(y0<<8)|x1], c=t[(y1<<8)|x0], d=t[(y1<<8)|x1]; return a+(b-a)*fx+(c-a)*fy+(a-b-c+d)*fx*fy; }
-function riW(x,y){ return RIT.w[((y&255)<<8)|(x&255)]; }
+function riW(x,y){ return (RIT.w||riTab('w'))[((y&255)<<8)|(x&255)]; }   // the table may not exist yet (a cave's tiles can be made before any riPaint)
 const riSm=(a,b,x)=>{ const t=x<=a?0:x>=b?1:(x-a)/(b-a); return t*t*(3-2*t); };
 // paint w x h world px at k px per world px: fn(x, y, out) writes out[0..2] (0..255) and may set out[3] (alpha 0..1)
 function riPaint(w,h,k,fn){
