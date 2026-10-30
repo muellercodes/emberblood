@@ -408,7 +408,7 @@ function e45CrysSpr(seed,R,o){ const rng=mulberry32(seed), F=rzSq(R);
 // moonglass (Moonfall's crystals): pale violet or sea blue with a silver core
 const E45PAL={moonV:[[70,58,130],[132,116,200],[226,220,255]],moonB:[[46,96,128],[110,178,206],[226,248,255]],
   night:[[18,12,30],[46,36,74],[178,160,240]],ice:[[30,60,104],[90,150,200],[220,244,255]],salt:[[150,142,180],[214,208,232],[252,250,255]],
-  coralP:[[150,62,82],[204,104,124],[244,170,176]],coralO:[[160,82,40],[212,128,70],[246,186,120]],coralV:[[86,62,124],[132,100,172],[196,170,226]],
+  coralP:[[160,56,84],[218,100,128],[250,170,180]],coralO:[[170,80,34],[226,128,64],[250,190,120]],coralV:[[90,58,136],[140,98,186],[202,170,234]],
   coralY:[[150,124,60],[196,168,96],[232,214,150]]};
 RZK.m_crystal={n:3,make:(s,v)=>e45CrysSpr(s,17,{R:17,n:5,pal:v===1?E45PAL.moonB:E45PAL.moonV,core:v===1?[200,244,255]:[214,200,255],rock:[118,112,136],len:[0.6,1.25],w:[0.18,0.28]})};
 RZK.pm_crystal={n:3,make:(s,v)=>e45CrysSpr(s,16,{R:16,n:4,pal:E45PAL.moonV,core:[214,200,255],rock:[120,114,132],len:[0.6,1.2],w:[0.18,0.28]})};
@@ -477,7 +477,7 @@ function e45CoralHead(i,R,wet){ R=Math.max(4,Math.round(R/3)*3); i=i%12; return 
   const rng=mulberry32(4400+i*31+R), F=rzSq(R,4), kind=['brain','stag','tube','fan','brain','stag'][i%6], P=E45CORP()[Math.floor(i/6)%4];
   rzContact(F,0,R*0.15,R*0.95,R*0.75,0.35); e45CoralBody(F,rng,kind,R*0.9,P,0,0,0.3);
   const c=rzShade(F,{ao:0.14,aoR:1.2,rim:0.25,bump:1.2,sat:0.95});
-  if(wet){ const g=c.getContext('2d'); g.globalCompositeOperation='source-atop'; g.fillStyle='rgba(36,118,136,.16)'; g.fillRect(0,0,c.width,c.height); g.globalCompositeOperation='source-over'; }
+  if(wet){ const g=c.getContext('2d'); g.globalCompositeOperation='source-atop'; g.fillStyle='rgba(36,118,136,.1)'; g.fillRect(0,0,c.width,c.height); g.globalCompositeOperation='source-over'; }
   return c; }); }
 // the Reefwall's crests poking out of the water (reefc0..): a staghorn clump, a brain coral, a fan behind
 function e45Reefc(F,w,h,bx,by,key){
@@ -494,7 +494,7 @@ E45M3.push([/^reefc\d+$/,e45Reefc,null]);
 { const base=m3wCoralPaint; m3wCoralPaint=function(g){ if(!LOOK.re) return base(g);
   const [cx,cy]=M3WG.coral, rng=mulberry32(4401); g.save();
   for(const [r,a] of [[190,0.28],[150,0.3],[118,0.34]]){ g.fillStyle=`rgba(6,22,40,${a})`; g.beginPath(); g.arc(cx,cy,r,0,TAU); g.fill(); }
-  for(let i=0;i<70;i++){ const a=rng()*TAU, d=215+rng()*170, x=cx+Math.cos(a)*d, y=cy+Math.sin(a)*d, r=6+rng()*12, c=e45CoralHead(i%24,r,true);
+  for(let i=0;i<70;i++){ const a=rng()*TAU, d=215+rng()*170, x=cx+Math.cos(a)*d, y=cy+Math.sin(a)*d, r=6+rng()*12, c=e45CoralHead(i,r*1.3,true);
     g.drawImage(c,x-c.half,y-c.half,c.half*2,c.half*2); }
   g.restore(); }; }
 { const base=m3wReefPaint; m3wReefPaint=function(g,y0,y1){ if(!LOOK.re) return base(g,y0,y1);
@@ -917,7 +917,7 @@ const E45W={map:-2,gen:-1,id:0};
 function e45Pre(m){
   const L=E45PRE[m]; if(!L||!L.length) return;
   if(m===4&&E45.on()){ n4MoonCv(); n4FragCv(); }
-  if(m===3) for(const wet of [0,1]) for(let i=0;i<12;i++) RZQ.q.push(()=>{ if(!E45.on()) return; for(let R=3;R<=18;R+=3) e45CoralHead(i,R,!!wet); });
+  if(m===3) for(const wet of [0,1]) for(let i=0;i<12;i++) RZQ.q.push(()=>{ if(!E45.on()) return; for(let R=3;R<=24;R+=3) e45CoralHead(i,R,!!wet); });
   for(const [t,k,w,h,bx,by] of L){ const T=t==='m3'?E45M3:t==='n4'?E45N4:E45N4A; if(e45Find(T,k)) e45Tall(T,t==='m3'?'e45m3:':t==='n4'?'e45n4:':'e45n4a:',k,w,h,bx,by,null,null,true); }
   if(RZQ.gen!==LOOK.gen){ RZQ.gen=LOOK.gen; } rzPumpLater();
 }
