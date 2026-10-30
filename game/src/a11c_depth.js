@@ -110,9 +110,11 @@ function shadowLayer(sun,props){
   // frames into a second canvas while the last finished copy stays on screen at its own origin (it still covers the
   // view: the layer keeps a margin and a tile to spare), then the two swap. Before, the whole upscale ran in the frame
   // the layer moved. A new zoom, light strength or look still rebuilds at once, as before.
-  if(useBig) shlBig(lw,lh,bw,bh,ox,oy,Zd,aq,q,vw,vh);
+  // (v12 LIGHT) Realistic: the copy is kept at full strength and the sun's strength is applied as it is drawn, so a
+  // moving sun never forces a whole upscale in one frame (only a new tile, zoom or look does, in GROUND's bands)
+  if(useBig) shlBig(lw,lh,bw,bh,ox,oy,Zd,LOOK.re?1:aq,q,vw,vh);
   const big=useBig&&SHL.bigOK; let n=0;
-  if(big){ ctx.globalAlpha=1; ctx.setTransform(1,0,0,1,0,0); if(!DSKIP.shcomp) ctx.drawImage(SHL.big,0,0,SHL.bigW,SHL.bigH,Math.round(SHL.bigOx*Zd+DV.tx),Math.round(SHL.bigOy*Zd+DV.ty),SHL.bigW,SHL.bigH); leanOff(); n=1; }
+  if(big){ ctx.globalAlpha=LOOK.re?a:1; ctx.setTransform(1,0,0,1,0,0); if(!DSKIP.shcomp) ctx.drawImage(SHL.big,0,0,SHL.bigW,SHL.bigH,Math.round(SHL.bigOx*Zd+DV.tx),Math.round(SHL.bigOy*Zd+DV.ty),SHL.bigW,SHL.bigH); leanOff(); n=1; }
   else{
     // scaled on the fly: copy only the runs of tiles that hold a shadow
     ctx.globalAlpha=a;
