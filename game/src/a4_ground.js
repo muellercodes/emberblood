@@ -235,7 +235,8 @@ function chunkPlan(){
   }
   // props (trees, rocks and their colliders) first, one chunk a frame: they are small, and the props and shadows
   // passes need them a little outside the view
-  if(pk){ const t=performance.now(), a=propsFor(pk[0],pk[1]); for(const p of a) if(!p.sp) propSprite(p); const dt=performance.now()-t; CHQ.st.props++; CHQ.st.propsMs+=dt; if(dt>CHQ.st.maxProps) CHQ.st.maxProps=dt; }
+  // (v12 ART23) in slices of a row of the grid, over a box a little bigger than ensureProps' (a2c_build.js propsPlan)
+  { const t=performance.now(); propsPlan(); const dt=performance.now()-t; CHQ.st.props++; CHQ.st.propsMs+=dt; if(dt>CHQ.st.maxProps) CHQ.st.maxProps=dt; }
   // the chunk to build: the one in progress, else the nearest missing one in the box
   if(!CHQ.job&&best) CHQ.job=chunkJob(best[0],best[1]);
   const J=CHQ.job;
