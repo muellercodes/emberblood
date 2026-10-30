@@ -9,13 +9,13 @@
 chapter({
   id: 'm_sail', act: 4, after: 'f_glaciar', next: 'm_drift', takeover: true,
   keep_enter: true,   // (the old enter hook starts the intro when the stage is entered without startAct)
-  card: null, name: ['Across the Sea', 'Across the Sea'],   // (x3_story shows the Chapter 1 card after the intro)
+  card: null, name: ['Making Waves', 'Across the Sea'],   // (x3_story shows the Chapter 1 card after the intro)
   so_far: [
-    'The moon has two bites out of it. The last Shard is somewhere east. Dell has a sea boat (and Auntie Glaciar has wings).',
+    'The moon has two bites out of it, and whoever bit it is still hungry. The last Shard is somewhere east. Dell has a sea boat (and Auntie Glaciar has wings).',
     'The moon has two bites gone. The last Shard is east. Dell has a boat.'],
   hint: ["Dell is waiting at Gearhaven's Far Pier. Or, if your auntie is awake, she's outside Hearthold's North Gate, pretending not to be.",
     "Dell waits at Gearhaven's Far Pier. Or Glaciar waits by Hearthold's North Gate."],
-  mom: [['A sea boat! Wear a hat. Wear two hats.', 'A sea boat! Wear a hat.']],
+  mom: [['A sea boat? Sit in the middle, and hold on to something that floats.', 'A sea boat? Sit in the middle!']],
 
   place: {
     // all of Driftwood Landing: the West Dock (Dell's boat) and the north isle (Glaciar) are both inside it
@@ -40,7 +40,7 @@ chapter({
   scene: {
     // the old STORY.m_intro, replaced in place (x3_story's m3sIntroStart plays it, then shows the Chapter 1 card)
     m_intro: [
-      ['narr', 'Morning in Hearthold. Pim is already selling cocoa. Pebble lands on your head with two letters, and takes two coins.',
+      ['narr', 'Morning in Hearthold. Pim is already selling cocoa. Pebble lands on your head with two letters, and takes two coins for her trouble.',
         'Pebble lands on your head with two letters. She takes two coins.', { do: ['take coins 2'] }],
       ['maren', "(the first letter) Ash. I went out to look at the moon tonight. Then I came back in and lit an extra lantern in the window. Love, Mom.",
         '(a letter) I looked at the moon tonight. Then I lit an extra lantern in the window. Love, Mom.'],
@@ -64,8 +64,8 @@ chapter({
               say: [['f_glaciar', "A boat! How quaint. Then I'll nap. Shout if you need me. Loudly. I'm a little deaf on the left.", 'A boat! How sweet. I will nap. Shout loudly!']] },
           ] }],
           else: [
-          ['iska', "Gearhaven is a long way from here. Fast travel to a Gearhaven shrine, then walk down to the Far Pier.",
-            'Gearhaven is far. Fast travel to a shrine there. Then walk to the Far Pier.', { do: ['set m_ship=ship'], ref: 'm4_far_pier' }]] },
+          ['iska', "Gearhaven is a long way from here. A shrine can take you to the one in Gearhaven. Then walk down to the Far Pier.",
+            'A shrine can take you to Gearhaven. Then walk to the Far Pier.', { do: ['set m_ship=ship'], ref: 'm4_far_pier' }]] },
       ] },
     ],
     // the voyage, played on arrival: by Glaciar if Ash landed on the north isle, else by Dell's boat (the painted

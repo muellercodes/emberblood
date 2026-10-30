@@ -9,7 +9,7 @@
 // promise (x2_story.js:465) and the old scale line "One day the right song will wake her" (x4_story.js:287).
 quest({
   id: 'q_n5_glaciar', act: 5, optional: true, if: '!flag n5_glaciar !choice f_glaciar=free',
-  title: ['The Promise on Mount Dread', 'The promise on Mount Dread'],
+  title: ['Snow Time to Lose', 'The promise on Mount Dread'],
   payoff: { kind: 'ally', id: 'n5_glaciar' },
 
   item: {

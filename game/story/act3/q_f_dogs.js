@@ -9,7 +9,7 @@
 // and Mittens's ice show while G.quests.f_dogs.step is 0).
 quest({
   id: 'f_dogs', act: 3, giver: 'f_hask', optional: true, takeover: true,
-  title: ["Hask's Runaway Dogs", "Hask's Runaway Dogs"],
+  title: ['Dog Days of Winter', "Hask's Runaway Dogs"],
   payoff: { kind: 'shortcut', id: 'f3s_sledline' },
   old_steps: ['dogs', 'home'],
 

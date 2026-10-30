@@ -1051,7 +1051,7 @@ function m3wPlaces(B){
   // ---- the Tideglass Strand: Strand Landing, the Whale Bones (secret 3), two washed-up ships
   m3wObj('whale',7400,62200,{base:62230});
   p4Add('bchest',{id:'m_sec_bones',x:7600,y:62250,coins:150,xp:120,then(){ G.found.m_sec_bones=1; G.pendingBless=(G.pendingBless||0)+1; later(0.8,offerPending); }});
-  m3wLM(B,{id:'m_lm_bones',k:'m_lm',x:7300,y:62290,r:0,clr:120,prompt:S('Look at the Whale Bones','Look at the bones'),draw:()=>{},act:()=>m3wSay([S('The bones of a whale bigger than a ship, half buried in glassy sand. Under the jaw the sand is soft and glints. Something is buried there.','Huge whale bones. Something glints under the jaw.')])});
+  m3wLM(B,{id:'m_lm_bones',k:'m_lm',x:7300,y:62290,r:0,clr:120,prompt:S('Look at the Whale Bones','Look at the bones'),draw:()=>{},act:()=>m3wSay([S('The bones of a whale longer than the Town Raft, half buried in glassy sand. Under the jaw the sand is soft and glints. Something is buried there.','Huge whale bones. Something glints under the jaw.')])});
   m3wObj('wreck',6880,63700,{v:0}); m3wObj('wreck',6950,68600,{v:1});
   m3wObj('prop',7020,65760,{pk:'m_palm',v:1,s:0.9}); m3wObj('prop',6780,65380,{pk:'m_palm',v:0,s:0.85});
   // ---- the Glass Dunes and the Wormfields: worm holes, the Worm Mouth, Jinx, the High Dune
@@ -1098,7 +1098,7 @@ function m3wPlaces(B){
   B.sign('m_sign_gap',10620,67380,S('THE GLASSWALL. Nobody can climb it. Nobody can fly over it. (Worms go under it.)','THE GLASSWALL. Worms go under it.'));
   B.sign('m_sign_flats',11190,67360,S('THE MIRROR FLATS. Do not believe the lakes.','Do not believe the lakes!'));
   B.sign('m_sign_moonpath',12300,65490,S('THE MOONPATH. Lumen\'s astronomers climbed it by moonlight. Bring your own.','THE MOONPATH. Bring your own moonlight.'));
-  B.sign('m_sign_pier',13300,65380,S('THE EDGE OF THE WORLD. Lumen\'s old Moon Pier. No ship has come in a very long time.','THE EDGE OF THE WORLD.'));
+  B.sign('m_sign_pier',13300,65380,S('THE EDGE OF THE WORLD. Lumen\'s old Moon Pier. No ship has come in a very long time. Please do not lean.','THE EDGE OF THE WORLD.'));
 }
 // ---------- the new powers out in the open (side places, each with a chest): moon-glass over the Silver Rift, a moon
 // door and its moth glyphs at the Moth's Eye Hollow, shadow tendrils on the Heights, the fenced Caravan Store (burrow
@@ -1456,7 +1456,7 @@ defineCrossing({id:'m_ship_home',x:1100,y:64800,to:{x:8350,y:27250},label:S('Sai
   arrive:S('Gearhaven! Steam, gulls and clocks.','Back in Gearhaven!')});
 defineCrossing({id:'m_glaciar_ride',x:6800,y:48100,to:{x:2345,y:64320},label:S('Fly east on Glaciar\'s back','Fly east with Glaciar'),name:S('Glaciar','Glaciar'),kind:'pass',m3glaciar:true,
   hidden:()=>!(G&&G.choices&&G.choices.f_glaciar==='free'),need:()=>m3wReached('m_sail')||(!m3wStage('m_sail')&&!!(G.flags&&G.flags.act3_done)),
-  locked:S('Glaciar is asleep, one eye open. "East? Not yet, dumpling. Soon."','Glaciar is asleep. Not yet.'),
+  locked:S('Glaciar is asleep, one eye open. "East? Not yet, little one. Soon."','Glaciar is asleep. Not yet.'),
   arrive:S('The whole beach freezes when Glaciar lands. The raft folk cheer. Free ice!','Glaciar lands. Free ice!')});
 defineCrossing({id:'m_glaciar_back',x:2375,y:64150,to:{x:6850,y:49100},label:S('Fly back north with Glaciar','Fly north with Glaciar'),name:S('Glaciar','Glaciar'),kind:'pass',dir:-Math.PI/2,m3glaciar:true,
   hidden:()=>!(G&&G.choices&&G.choices.f_glaciar==='free'),need:()=>m3wF('m_landed')||!m3wStage('m_sail'),
@@ -1474,7 +1474,7 @@ for(const k in M3W_FERRY){ const F=M3W_FERRY[k];
 function m3wFerryMenu(def){
   const from=def.m3ferry, opts=[];
   for(const k of ['dw','pc','st']){ if(k===from) continue; const F=M3W_FERRY[k]; opts.push({t:S(`Ferry to ${F.name}`,`Go to ${F.name}`),fn:()=>later(0.15,()=>{ m3wSnd('creak'); mapTravel(F.to.x,F.to.y,{banner:F.name}); })}); }
-  opts.push({t:S('Not now','Not now'),then:[['narr',S('The ferry raft bobs, patient as a duck.','The raft bobs. It waits.')]]});
+  opts.push({t:S('Not now','Not now'),then:[['narr',S('The ferry raft bobs, patient as a heron.','The raft bobs. It waits.')]]});
   runDialogue([ch('narr',S('Rowan\'s raft ferry. Where to? (Mind the chickens.)','Where to? Mind the chickens!'),opts)],()=>{ scene='play'; });
 }
 // a crossing's locked text may change with the story (a function), the engine shows a string; the ferry asks where to

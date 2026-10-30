@@ -8,7 +8,7 @@
 // the STORY keys c_saltbeard_intro and c_saltbeard_won, replaced here (defineBoss holds those arrays).
 quest({
   id: 'c_whip', act: 2, giver: 'c_tarbuckle', optional: true, takeover: true,
-  title: ['The Ghost of the Saucy Gull', 'The Ghost of the Saucy Gull'],
+  title: ['Supper-natural', 'The Ghost of the Saucy Gull'],
   payoff: { kind: 'power', id: 'whip' },
   old_steps: ['charlie', 'peppers', 'brew', 'ghost', 'elias', 'forge'],
 
@@ -64,7 +64,7 @@ quest({
       ] },
     ],
     wp_charlie: [
-      ['c_charlie', "Ghost Pepper Chowder? Nobody's been brave enough to make that in forty years.", 'Nobody has made that in forty years!'],
+      ['c_charlie', "Ghost Pepper Chowder? My grandpa's recipe. To die for, he always said. Nobody's been brave enough to make it in forty years.", 'Nobody has made that in forty years!'],
       ['c_charlie', 'I need three sea peppers. Little red ones. They grow in the Rockpools, and the crabs will not share.',
         'Bring me 3 sea peppers from the Rockpools.'],
       { if: '!power claws', then: [['c_charlie', "One grows on a cliff ledge. You'd want claws for that one.", 'One is on a cliff. You need claws.', { ref: 'c_lm_pep3' }]] },

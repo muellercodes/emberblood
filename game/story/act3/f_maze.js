@@ -12,9 +12,9 @@
 // Old flags kept: trial_f_maze_done (the dungeon's altar), f_icediary; the stage moves on to f_kindle.
 chapter({
   id: 'f_maze', act: 3, after: 'f_hearth', next: 'f_kindle', takeover: true,
-  card: null, name: ['The Dying Hearth', 'The Dying Hearth'],
+  card: null, name: ['Home Is Where the Hearth Is', 'The Dying Hearth'],
   so_far: [
-    "Blaze, the blue fire, waits in Ember's old North Forge, deep in the Glacier Maze where the glacier meets the frozen Glimmerfrost. The North Gate is frozen, so Ash goes round by the river.",
+    "Blaze, the blue fire, waits in Ember's old North Forge, deep in the Glacier Maze where the glacier meets the frozen Glimmerfrost. The North Gate is frozen solid, so Ash takes the long way round, by the river.",
     'Blaze is in the Glacier Maze, across the frozen lake.'],
   mom: [["A maze made of ice? Don't lick the walls.", "An ice maze? Don't lick the walls."]],
 

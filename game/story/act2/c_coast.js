@@ -5,9 +5,9 @@
 chapter({
   id: 'c_coast', act: 2, after: 'c_pass', next: 'c_gear', takeover: true,
   // the game numbers Act II's cards after the heist (c_fest 1, c_pass 2), so this is Chapter 3
-  card: ['Act II · Chapter 3', 'Salt on the Wind'],
+  card: ['Act II · Chapter 3', ['The Sheep Who Saw Too Much', 'Salt on the Wind']],
   so_far: [
-    "Sister Wren said the thief was the Moth Mask, a rooftop thief from Gearhaven who only steals things that glow. Ash followed the Southern Pass all the way down to the sea, to get the Ember Heart back.",
+    "Sister Wren said the thief was the Moth Mask, a rooftop thief from Gearhaven who only steals things that glow. Ash followed the Southern Pass all the way down to the sea, two hundred and six steps and then some, to get the Ember Heart back.",
     'The thief is the Moth Mask, from Gearhaven. Ash went down the pass to the sea.'],
   hint: ["Gearhaven is at the bottom of the chalk road, on the white cliffs. Old Barley's sheepfold is on the way down.",
     'Follow the white road down. Stop at the sheep.'],

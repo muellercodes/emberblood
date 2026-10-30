@@ -7,7 +7,7 @@
 // outdoors by the well, so her line no longer comes "from the well" into Rafi's tent (audit finding 3).
 chapter({
   id: 'm_sable', act: 4, after: 'm_reef', next: 'm_burrows', takeover: true,
-  card: null, name: ['The Glass Desert', 'The Glass Desert'],
+  card: null, name: ['Glass Half Full', 'The Glass Desert'],
   so_far: [
     'During an eclipse, Nyxara came herself: the great grey moth, with two pale moons on her wings. She took a huge bite of the moon. She could have squashed Ash flat, but she asked for the Shards instead.',
     'Nyxara came, the great grey moth. She bit the moon. She asked for the Shards.'],

@@ -190,7 +190,7 @@ defineDungeon('c_brassworks',{name:S('The Brassworks','The Brassworks'),level:11
   story:(()=>{ const s=typeof c1DunStory==='function'?c1DunStory('c_brassworks'):{}; s.end=[['narr',S(`You grab the great lever with both claws and pull. It does not move. You pull harder. Something deep in the shaft groans, gives, and then the whole drive turns with a CLUNK you feel in your teeth.`,`You pull the great lever. It sticks. Then: CLUNK! The drive turns!`)]]; return s; })(),
   floors:[
     {id:'3',name:S('The Roof Works','The Roof Works'),map:{rooms:{
-      a:{at:[1,1],kind:'start',tpl:D1A_W.a,foes:[['c_tickbug',2]],noPots:true,sign:S(`WHIRLIGIG BRASSWORKS. AUTHORIZED PERSONNEL ONLY. (THAT MEANS ME.) - Lord P. Whirligig`,`WHIRLIGIG BRASSWORKS. KEEP OUT. (THAT MEANS YOU.)`)},
+      a:{at:[1,1],kind:'start',tpl:D1A_W.a,foes:[['c_tickbug',2]],noPots:true,sign:S(`WHIRLIGIG BRASSWORKS. AUTHORIZED PERSONNEL ONLY. (THAT MEANS ME.) - Lord P. Whirligig`,`WHIRLIGIG BRASSWORKS. ONLY ME ALLOWED.`)},
       b:{at:[1,0],kind:'fight',tpl:D1A_W.b,foes:[['c_tickbug',4],['c_tinman',1]],loot:['treasure'],stairGate:{type:'gate',room:'c',look:'steam'},beltSpeed:{0:150},noPots:true,noDecor:true},
       c:{at:[0,0],kind:'d1avalve',tpl:D1A_W.c,loot:['compass'],vents:[{ph:0},{ph:0.9},{ph:1.8},{ph:2.6},{ph:0.4,hard:true}],noPots:true,noDecor:true,sign:null},
       d:{at:[2,0],kind:'secret',tpl:D1A_W.d,loot:['coins'],page:3,pigeons:true,sign:S(`An old coat hangs on a hook. In its pocket: a note in neat writing. "Gone to see a man about a clock. Back in a hundred years. - P."`,`A coat. A note: "Back in a hundred years. - P."`)}},
@@ -206,7 +206,7 @@ defineDungeon('c_brassworks',{name:S('The Brassworks','The Brassworks'),level:11
       links:[['e','f','open'],['e','g','lock'],['g','h','gate:g'],['h','i','gate:h'],['e','i','gate:h'],['i','j','gate:i']]}},
     {id:'1',name:S('The Boiler Deck','The Boiler Deck'),map:{rooms:{
       k:{at:[1,0],kind:'free',tpl:D1A_W.k,loot:['treasure+potion'],stairGate:{type:'boss',look:'stair'},boiler:{face:[[8,2],[9,2],[10,2]],top:[9,1]},trolley:{a:[1.5,3.4],b:[13.5,3.4],per:7,to:[9,1],near:1.2},noPots:true,noDecor:true},
-      l:{at:[0,0],kind:'d1apipes',tpl:D1A_W.l,code:['L','R','L'],jets:[{v:0,when:'R'},{v:1,when:'L'},{v:2,when:'R'}],acc:['boomerang','arrow','whip'],noPots:true,noDecor:true,sign:S(`A dented lunch box with a name on the lid: "PEARL". Painted inside: "MONDAY: LEFT, RIGHT, LEFT." Under it, smaller: "Tuesday: soup."`,`A lunch box. Inside: "MONDAY: LEFT, RIGHT, LEFT."`)},
+      l:{at:[0,0],kind:'d1apipes',tpl:D1A_W.l,code:['L','R','L'],jets:[{v:0,when:'R'},{v:1,when:'L'},{v:2,when:'R'}],acc:['boomerang','arrow','whip'],noPots:true,noDecor:true,sign:S(`A dented lunch box with a name on the lid: "PEARL". Painted inside: "MONDAY: LEFT, RIGHT, LEFT." Under it, smaller: "Every other day: soup."`,`A lunch box. Inside: "MONDAY: LEFT, RIGHT, LEFT."`)},
       m:{at:[2,0],kind:'free',tpl:D1A_W.m,loot:['bkey'],wheel:{c:[7,5.7],r:3.6,n:4,per:13},noPots:true,noDecor:true},
       n:{at:[2,1],kind:'secret',tpl:D1A_W.n,loot:['ore','coins'],soldier:true,sign:S(`An old tin soldier, sitting very straight. A note is pinned to his chest: "The third Bob was here. He went funny. - A friend."`,`A tin soldier. A note: "The third Bob went funny."`)}},
       links:[['k','l','open'],['k','m','gate:l'],['m','n','crack']]}},
@@ -356,7 +356,7 @@ function d1aOnRoom(A,R){
   if(X.root==='c_gullcrag'){
     if(R.id==='e'&&first) d1aSoon('c_gull_barrel');
     if(R.id==='d'&&d1aTide()>=1) later(0.5,()=>{ if(scene==='play'&&d1aOnce('tip_d_high')) taunt('c_pearl',S(`My kelp tunnels fill to the roof at high tide. Ring the Great Bell and come back when the sea is out.`,`High tide fills the tunnels. Ring the Great Bell for low tide.`)); });
-    if(R.id==='l'&&d1aTide()>=1) later(0.5,()=>{ if(scene==='play'&&d1aOnce('tip_l_high')) taunt('c_pearl',S(`Two of my echo eyes are under the water. You'll want the tide out. The Great Bell's down in the hub, dear.`,`Two eyes are under water. Ring the Great Bell for low tide.`)); });
+    if(R.id==='l'&&d1aTide()>=1) later(0.5,()=>{ if(scene==='play'&&d1aOnce('tip_l_high')) taunt('c_pearl',S(`Two of my echo eyes are under the water. You'll want the tide out. The Great Bell's down in the hub. Hit it hard.`,`Two eyes are under water. Ring the Great Bell for low tide.`)); });
     if(R.id==='j'&&first) later(0.6,()=>{ if(scene==='play') taunt('c_pearl',S(`My cistern. Ring the bell at the bottom and the sea comes up from below. You'd better be quicker than the sea.`,`Ring the bell at the bottom. Then climb fast!`)); });
   } else {
     if(R.id==='z') d1aSoon('c_brass_end');
@@ -621,13 +621,13 @@ function d1aWarp(A,o){
     base(id);
     try{ if(id==='claws'&&d1aIn('c_gullcrag')) d1aFloodStart(AREA); if(id==='grapple'&&d1aIn('c_brassworks')){ d1aDropStart(AREA); const R=AREA.rooms[AREA.d1a.dropRoom]; if(R&&!R.solved) solveRoom(R,true); } }catch(e){ console.error(e); } }; }
 // Pearl speaks in her own places (the altar line, the shrine when you already have her gift), and they are not Trials
-{ const base=taunt; taunt=function(who,text){ if(who==='ember'&&d1aIn()&&AREA.rooms&&(AREA.curRoom||{}).kind==='reward') return base('c_pearl',pick([S(`Well done, dear. The altar's yours. Go on.`,`Well done! Touch the altar.`),S(`That's the hard part over. Go on, it's yours.`,`The hard part is over. Go on!`)])); return base(who,text); }; }
+{ const base=taunt; taunt=function(who,text){ if(who==='ember'&&d1aIn()&&AREA.rooms&&(AREA.curRoom||{}).kind==='reward') return base('c_pearl',pick([S(`Well done. The altar's yours. Go on.`,`Well done! Touch the altar.`),S(`That's the hard part over. Go on, it's yours.`,`The hard part is over. Go on!`)])); return base(who,text); }; }
 { const base=showCard; showCard=function(num,name){ if(d1aIn()&&String(num)==='Trial complete') num=S('Dungeon complete','Done!'); return base(num,name); }; }
 { const base=trialObjAct; trialObjAct=function(o){
     const A=AREA;
     // the end chest first: the altar (and the Brassworks lever, which carries Ash outside) waits for the Heart Ember
     if(A&&A.d1a&&o&&o.tobj==='altar'&&!trialDone(A.d1a.root)){ const ch=A.objs.find(q=>q.tobj==='dchest'&&q.kind==='heart'&&q.room===o.room&&!G.found[q.id]);
-      if(ch){ d1aSay([['c_pearl',S(`Not so fast, dear. Open the big chest first. It's yours.`,`Open the big chest first! It's yours.`)]]); return true; } }
+      if(ch){ d1aSay([['c_pearl',S(`Not so fast, Ash. Open the big chest first. It's yours.`,`Open the big chest first! It's yours.`)]]); return true; } }
     if(A&&A.d1a&&o&&o.tobj==='altar'&&trialDone(A.d1a.root)){ d1aSay([A.d1a.root==='c_gullcrag'?S(`Pearl's cradle rocks gently, all by itself. The warp by the wall still glows, whenever you are ready to go.`,`The cradle rocks gently. The warp still glows.`):S(`The great lever is down and the drive hums. Far above, the Great Clock ticks. The warp in the corner still glows.`,`The lever is down. The clock is awake! The warp still glows.`)]); return true; }
     if(A&&A.d1a&&o&&o.tobj==='shrine'){ const SH=D1A_SHRINE[dunRoot(A.def.id)];
       if(SH&&!hasAbil(SH.abil)&&!d1aSeen(SH.key)&&STORY[SH.key]){ d1aPlay(SH.key,()=>{ scene='play'; base(o); }); return true; } const TI=trialInfo(dunRoot(A.def.id)); if(TI&&TI.abil&&hasAbil(TI.abil)){ player.hp=player.maxHp; player.potions=player.potionsMax; SFX.play('shrine');

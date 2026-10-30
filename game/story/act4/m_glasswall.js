@@ -13,7 +13,7 @@
 // x3_story listens to them (and sets flag s10_fx); the scene also reads right without them.
 chapter({
   id: 'm_glasswall', act: 4, after: 'm_burrows', next: 'm_mirror', takeover: true,
-  card: ['Act IV · Chapter 4', 'Mirrors'],
+  card: ['Act IV · Chapter 4', ['Seeing Things', 'Mirrors']],
   so_far: [
     'Ash came up out of the Sandworm Burrows able to dig like a worm. Somewhere out there, Nyxara is still hungry. This time Ash means to be waiting where she feeds next.',
     'Ash can dig now. Nyxara is still hungry. Where will she go next?'],

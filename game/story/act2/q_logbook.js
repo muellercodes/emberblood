@@ -9,7 +9,7 @@
 // x1_people's own onTalk while this step is current (legacy).
 quest({
   id: 'c_logbook', act: 2, giver: 'c_ottoline', optional: true, takeover: true,
-  title: ["Pearl's Logbook", "Pearl's Logbook"],
+  title: ['Long Overdue', "Pearl's Logbook"],
   payoff: { kind: 'truth', id: 'q_pearl_moth' },
   old_steps: ['pages'],
 
