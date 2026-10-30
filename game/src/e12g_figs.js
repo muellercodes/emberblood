@@ -15,32 +15,34 @@
 // Limbs, cones, cylinders and panels sample the same curve, so a material looks the same on every kind of part.
 const RFM={
   matte:   {e:[[0,.3,0,0,0],[.3,.12,0,0,0],[.58,0,0,0,0],[.8,-.2,0,0,0],[.94,-.36,0,0,0],[1,-.3,0,0,.12]], pk:.8},
-  cloth:   {e:[[0,.24,0,0,0],[.36,.08,0,0,0],[.62,0,0,0,0],[.84,-.26,0,0,0],[.96,-.42,0,0,0],[1,-.38,0,0,.07]], pk:.7, tex:'weave', ta:.55, ts:.16},
+  cloth:   {e:[[0,.24,0,0,0],[.36,.08,0,0,0],[.62,0,0,0,0],[.84,-.26,0,0,0],[.96,-.42,0,0,0],[1,-.38,0,0,.07]], pk:.7, tex:'weave', ta:.3, ts:.13},
   skin:    {e:[[0,.3,.1,0,0],[.08,.25,.03,0,0],[.32,.12,0,0,0],[.58,0,0,0,0],[.78,-.12,0,.32,0],[.92,-.3,0,.18,0],[1,-.26,0,.08,.1]], pk:.75},
-  scales:  {e:[[0,.48,.26,0,0],[.06,.36,.05,0,0],[.28,.13,0,0,0],[.56,0,0,0,0],[.8,-.24,0,.14,0],[.94,-.42,0,0,0],[1,-.32,0,0,.2]], pk:.95, tex:'scale', ta:.7, ts:.2},
-  hide:    {e:[[0,.34,.07,0,0],[.1,.24,0,0,0],[.4,.06,0,0,0],[.64,0,0,0,0],[.86,-.3,0,.1,0],[1,-.42,0,0,.08]], pk:.85, tex:'hide', ta:.6, ts:.26},
-  leather: {e:[[0,.38,.1,0,0],[.08,.27,0,0,0],[.38,.06,0,0,0],[.64,0,0,0,0],[.88,-.36,0,0,0],[1,-.44,0,0,.06]], pk:.9, tex:'grain', ta:.45, ts:.22},
-  metal:   {e:[[0,.75,.72,0,0],[.06,.6,.24,0,0],[.18,.2,0,0,0],[.4,-.42,0,0,0],[.6,-.14,0,0,0],[.78,.1,0,0,.12],[.92,-.46,0,0,0],[1,-.3,0,0,.32]], pk:1.5, metal:true, tex:'brush', ta:.4, ts:.22},
-  fur:     {e:[[0,.26,0,0,0],[.36,.1,0,0,0],[.62,0,0,0,0],[.86,-.24,0,0,0],[.95,-.16,0,0,.08],[1,-.02,0,0,.2]], pk:.7, tex:'fur', ta:.75, ts:.24},
-  hair:    {e:[[0,.4,.12,0,0],[.12,.2,0,0,0],[.4,.04,0,0,0],[.66,0,0,0,0],[.9,-.36,0,0,0],[1,-.32,0,0,.1]], pk:.85, tex:'strand', ta:.6, ts:.18},
-  feather: {e:[[0,.26,.02,0,0],[.38,.08,0,0,0],[.64,0,0,0,0],[.88,-.28,0,0,0],[1,-.18,0,0,.18]], pk:.75, tex:'feather', ta:.6, ts:.26},
+  scales:  {e:[[0,.48,.26,0,0],[.06,.36,.05,0,0],[.28,.13,0,0,0],[.56,0,0,0,0],[.8,-.24,0,.14,0],[.94,-.42,0,0,0],[1,-.32,0,0,.2]], pk:.95, tex:'scale', ta:.42, ts:.12},
+  hide:    {e:[[0,.34,.07,0,0],[.1,.24,0,0,0],[.4,.06,0,0,0],[.64,0,0,0,0],[.86,-.3,0,.1,0],[1,-.42,0,0,.08]], pk:.85, tex:'hide', ta:.42, ts:.2},
+  leather: {e:[[0,.38,.1,0,0],[.08,.27,0,0,0],[.38,.06,0,0,0],[.64,0,0,0,0],[.88,-.36,0,0,0],[1,-.44,0,0,.06]], pk:.9, tex:'grain', ta:.32, ts:.18},
+  metal:   {e:[[0,.75,.72,0,0],[.06,.6,.24,0,0],[.18,.2,0,0,0],[.4,-.42,0,0,0],[.6,-.14,0,0,0],[.78,.1,0,0,.12],[.92,-.46,0,0,0],[1,-.3,0,0,.32]], pk:1.5, metal:true, tex:'brush', ta:.3, ts:.2},
+  fur:     {e:[[0,.26,0,0,0],[.36,.1,0,0,0],[.62,0,0,0,0],[.86,-.24,0,0,0],[.95,-.16,0,0,.08],[1,-.02,0,0,.2]], pk:.7, tex:'fur', ta:.5, ts:.18},
+  hair:    {e:[[0,.4,.12,0,0],[.12,.2,0,0,0],[.4,.04,0,0,0],[.66,0,0,0,0],[.9,-.36,0,0,0],[1,-.32,0,0,.1]], pk:.85, tex:'strand', ta:.45, ts:.15},
+  feather: {e:[[0,.26,.02,0,0],[.38,.08,0,0,0],[.64,0,0,0,0],[.88,-.28,0,0,0],[1,-.18,0,0,.18]], pk:.75, tex:'feather', ta:.42, ts:.2},
   membrane:{e:[[0,.3,.05,0,0],[.3,.1,0,0,0],[.6,0,0,.1,0],[.86,-.2,0,.3,0],[1,-.24,0,.2,.08]], pk:.6, sss:true},
-  slime:   {e:[[0,.62,.78,0,0],[.06,.42,.2,0,0],[.14,.16,0,0,0],[.46,0,0,0,0],[.72,-.08,0,0,0],[.88,.2,0,.25,0],[.97,.1,0,0,.1],[1,-.2,0,0,0]], pk:.9, sss:true, tex:'bubble', ta:.6, ts:.3},
-  ice:     {e:[[0,.62,.8,0,0],[.06,.36,.26,0,0],[.2,.08,0,0,0],[.5,-.06,0,0,0],[.76,-.16,0,0,0],[.9,.16,.12,0,.2],[1,0,0,0,.42]], pk:1.1, tex:'crack', ta:.55, ts:.32},
-  stone:   {e:[[0,.2,0,0,0],[.36,.07,0,0,0],[.62,0,0,0,0],[.85,-.3,0,0,0],[1,-.46,0,0,.04]], pk:.8, tex:'stone', ta:.75, ts:.3},
-  bark:    {e:[[0,.22,0,0,0],[.36,.08,0,0,0],[.62,0,0,0,0],[.86,-.32,0,0,0],[1,-.46,0,0,.04]], pk:.8, tex:'bark', ta:.75, ts:.28},
-  chitin:  {e:[[0,.62,.5,0,0],[.05,.36,.1,0,0],[.2,.1,0,0,0],[.54,0,0,0,0],[.84,-.38,0,0,0],[.96,-.5,0,0,0],[1,-.36,0,0,.22]], pk:1.2, tex:'speck', ta:.4, ts:.24},
+  slime:   {e:[[0,.62,.78,0,0],[.06,.42,.2,0,0],[.14,.16,0,0,0],[.46,0,0,0,0],[.72,-.08,0,0,0],[.88,.2,0,.25,0],[.97,.1,0,0,.1],[1,-.2,0,0,0]], pk:.9, sss:true, tex:'bubble', ta:.5, ts:.26},
+  ice:     {e:[[0,.62,.8,0,0],[.06,.36,.26,0,0],[.2,.08,0,0,0],[.5,-.06,0,0,0],[.76,-.16,0,0,0],[.9,.16,.12,0,.2],[1,0,0,0,.42]], pk:1.1, tex:'crack', ta:.45, ts:.3},
+  stone:   {e:[[0,.2,0,0,0],[.36,.07,0,0,0],[.62,0,0,0,0],[.85,-.3,0,0,0],[1,-.46,0,0,.04]], pk:.8, tex:'stone', ta:.55, ts:.24},
+  bark:    {e:[[0,.22,0,0,0],[.36,.08,0,0,0],[.62,0,0,0,0],[.86,-.32,0,0,0],[1,-.46,0,0,.04]], pk:.8, tex:'bark', ta:.55, ts:.22},
+  chitin:  {e:[[0,.62,.5,0,0],[.05,.36,.1,0,0],[.2,.1,0,0,0],[.54,0,0,0,0],[.84,-.38,0,0,0],[.96,-.5,0,0,0],[1,-.36,0,0,.22]], pk:1.2, tex:'speck', ta:.3, ts:.2},
   horn:    {e:[[0,.5,.3,0,0],[.07,.3,.05,0,0],[.3,.1,0,0,0],[.58,0,0,0,0],[.86,-.26,0,.08,0],[1,-.36,0,0,.1]], pk:1},
   gloss:   {e:[[0,.7,.7,0,0],[.05,.4,.1,0,0],[.2,.1,0,0,0],[.55,0,0,0,0],[.86,-.4,0,0,0],[1,-.5,0,0,.16]], pk:1.2},
   glow:    {e:[[0,.42,.45,0,0],[.3,.16,.05,0,0],[.7,0,0,0,0],[1,-.08,0,0,0]], pk:.3, glow:true},
-  shade:   {e:[[0,.18,0,0,0],[.5,0,0,0,0],[.84,-.2,0,0,0],[.95,-.08,0,0,0],[1,.34,.12,0,0]], pk:.5, tex:'smoke', ta:.5, ts:.34},
+  shade:   {e:[[0,.18,0,0,0],[.5,0,0,0,0],[.84,-.2,0,0,0],[.95,-.08,0,0,0],[1,.34,.12,0,0]], pk:.5, tex:'smoke', ta:.45, ts:.3},
   cloud:   {e:[[0,.3,.12,0,0],[.4,.1,0,0,0],[.7,0,0,0,0],[.92,-.14,0,0,0],[1,-.04,0,0,.3]], pk:.5},
-  dust:    {e:[[0,.22,.04,0,0],[.4,.06,0,0,0],[.66,0,0,0,0],[.9,-.24,0,0,0],[1,-.12,0,0,.16]], pk:.6, tex:'dust', ta:.65, ts:.24},
+  dust:    {e:[[0,.22,.04,0,0],[.4,.06,0,0,0],[.66,0,0,0,0],[.9,-.24,0,0,0],[1,-.12,0,0,.16]], pk:.6, tex:'dust', ta:.45, ts:.2},
 };
 RFM.brass=Object.assign({},RFM.metal,{tex:'brush',ta:.35});
+// Vorlaxis: dark scales with the mountain's heat showing through in the shadows
+RFM.ember=Object.assign({},RFM.scales,{e:[[0,.44,.2,0,0],[.06,.32,.04,0,0],[.28,.12,0,0,0],[.56,0,0,0,0],[.78,-.14,0,.42,0],[.92,-.28,0,.34,0],[1,-.18,0,.3,.06]]});
 RFM.glass=Object.assign({},RFM.ice,{tex:null});
 RFM.shell=Object.assign({},RFM.horn,{tex:'speck',ta:.35,ts:.3});
-const RF={fr:0,tn:0,tmax:420,tmin:2.4,on:true,tex:true,gc:new Map(),rgb:new Map(),heu:new Map(),ct:null,fm:null,fmap:null,
+const RF={plain:false,fr:0,tn:0,tmax:420,tmin:2.4,on:true,tex:true,layerOn:true,lay:0,ln:0,lmax:12,lmax1:5,gc:new Map(),rgb:new Map(),heu:new Map(),ct:null,fm:null,fmap:null,
   pat:{},dm:null,stats:{parts:0,tex:0,miss:0},kids:0};
 const RF_CT=
   '7c4c30ska0e0b0co7a5a32lr3a6a4acoe4cec4skc792eaco2a1a2aha7a4a2esk8a9aaaco9a3420skefe0bfhhd2c29ehha8987ahhffd34dgg'+
@@ -94,11 +96,13 @@ function rfMat(col){
   const fm=RF.fmap;
   if(fm){ let v=fm.m.get(col); if(v===undefined){ v=rfNear(fm,col); fm.m.set(col,v); } if(v) return v; }
   const t=rfCT().get(col); if(t) return t;
-  if(RF.fm) return RF.fm;
-  let h=RF.heu.get(col); if(h) return h;
-  const c=rfRGB(col), mx=Math.max(c[0],c[1],c[2]), mn=Math.min(c[0],c[1],c[2]);
-  h=mx<46?'gloss':(mx>238&&mn>214)?'horn':'matte';
-  if(RF.heu.size>3000) RF.heu.clear(); RF.heu.set(col,h); return h;
+  let h=RF.heu.get(col);
+  if(h===undefined){ const c=rfRGB(col), mx=Math.max(c[0],c[1],c[2]), mn=Math.min(c[0],c[1],c[2]);
+    // very bright, strongly coloured parts are lights (glowing eyes, cores, weak spots, runes): kept bright and flat
+    h=(mx>=235&&mx-mn>=120)?'glow':mx<46?'gloss':(mx>238&&mn>214)?'horn':null;
+    if(RF.heu.size>3000) RF.heu.clear(); RF.heu.set(col,h); }
+  if(h==='glow') return h;
+  return RF.fm||h||'matte';
 }
 function rfChroma(c){ const s=c[0]+c[1]+c[2]+1; return [c[0]/s,c[1]/s,s]; }
 function rfNear(fm,col){
@@ -153,6 +157,7 @@ function rfGP(col,mat,lq,rq,lx,ly){
   else { gr.addColorStop(0,rfTone(c,a+.16,0,0,0)); gr.addColorStop(.6,rfTone(c,a,0,0,0)); gr.addColorStop(1,rfTone(c,a-.2,0,0,.04)); }
   RF.gc.set(key,gr); return gr;
 }
+function rfGlint(col){ const key=col+'|G'; let v=RF.gc.get(key); if(v) return v; v=rfTone(rfRGB(col),.6,.5,0,0); RF.gc.set(key,v); return v; }
 function rfFlat(col,mat,lq){
   const key=col+'|F'+mat+'|'+lq; let v=RF.gc.get(key); if(v) return v;
   const M=RFM[mat]||RFM.matte; v=rfTone(rfRGB(col),lq/20*M.pk,0,0,0); RF.gc.set(key,v); return v;
@@ -163,10 +168,10 @@ function rfTile(kind){
   const N=32, c=mkCanvas(N,N), g=c.getContext('2d'), R=mulberry32(phash('rf'+kind)), D='rgba(0,0,0,', Lt='rgba(255,250,240,';
   const wrap=(f)=>{ for(const ox of [-N,0,N]) for(const oy of [-N,0,N]){ g.save(); g.translate(ox,oy); f(); g.restore(); } };
   g.lineCap='round';
-  if(kind==='scale'){ // overlapping rows of scales: a lit upper rim, a dark crescent under each
-    for(let row=0;row<5;row++) for(let i=0;i<5;i++){ const x=i*8+(row%2)*4, y=row*8;
-      wrap(()=>{ g.fillStyle=D+'.34)'; g.beginPath(); g.ellipse(x,y+3.2,4.4,3.6,0,0.1,Math.PI-0.1); g.fill();
-        g.strokeStyle=Lt+'.34)'; g.lineWidth=1.1; g.beginPath(); g.ellipse(x,y+0.4,3.4,2.8,0,Math.PI+0.5,TAU-0.5); g.stroke(); }); }
+  if(kind==='scale'){ // small overlapping scales, a little uneven: a soft dark crescent under each, a faint lit rim above
+    for(let row=0;row<5;row++) for(let i=0;i<5;i++){ const x=i*6.4+(row%2)*3.2+(R()-0.5)*1.4, y=row*6.4+(R()-0.5)*1.2, w=2.6+R()*1.1, da=(0.14+R()*0.14).toFixed(2), la=(0.1+R()*0.14).toFixed(2);
+      wrap(()=>{ g.fillStyle=D+da+')'; g.beginPath(); g.ellipse(x,y+2.4,w,w*0.8,0,0.15,Math.PI-0.15); g.fill();
+        g.strokeStyle=Lt+la+')'; g.lineWidth=0.8; g.beginPath(); g.ellipse(x,y+0.3,w*0.8,w*0.62,0,Math.PI+0.6,TAU-0.6); g.stroke(); }); }
   }else if(kind==='fur'){ for(let i=0;i<70;i++){ const x=R()*N, y=R()*N, l=3+R()*4, a=Math.PI/2+(R()-0.5)*0.6, d=R()<0.55;
       wrap(()=>{ g.strokeStyle=(d?D:Lt)+(0.18+R()*0.22).toFixed(2)+')'; g.lineWidth=0.7+R()*0.6; g.beginPath(); g.moveTo(x,y); g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l); g.stroke(); }); }
   }else if(kind==='strand'){ for(let i=0;i<26;i++){ const x=R()*N, d=R()<0.6; wrap(()=>{ g.strokeStyle=(d?D:Lt)+(0.14+R()*0.18).toFixed(2)+')'; g.lineWidth=0.6+R()*0.5; g.beginPath(); g.moveTo(x,0); g.quadraticCurveTo(x+2,N/2,x,N); g.stroke(); }); }
@@ -195,16 +200,27 @@ function rfTexOK(){ if(!RF.tex) return false; if(typeof RLQ!=='undefined'&&RLQ.l
 
 // ---------- the Realistic t3End: the same parts, sort and transforms as t3End; only the fills change
 function reT3End(){
-  const R=T3R, g=R.g, L=T3.L, m=R.m, n=R.n, list=R.list;
+  if(RF.plain) return false;
+  const R=T3R, g=R.g, m=R.m, n=R.n, list=R.list;
   for(let i=1;i<n;i++){ const p=list[i]; let j=i-1; while(j>=0&&list[j].d>p.d){ list[j+1]=list[j]; j--; } list[j+1]=p; }
-  const a0=g.globalAlpha; if(R.alpha!==1) g.globalAlpha=a0*R.alpha;
-  const ox=R.x, oy=R.y, fl=R.flash, ga=g.globalAlpha, k=R.k, tmin=RF.tmin*k;
-  const DM=RF.dm||(RF.dm=new DOMMatrix());
   RF.stats.parts+=n;
+  if(RF.bake){ rfParts(g,m,R.x,R.y,true); rfFeetAO(g,m,R.x,R.y); return true; }    // a person's sprite: its canvas holds only the figure
+  if(!R.flash&&rfLayerOK()&&rfLayer()) return true;
+  const a0=g.globalAlpha; if(R.alpha!==1) g.globalAlpha=a0*R.alpha;
+  rfParts(g,m,R.x,R.y,false);
+  g.setTransform(m); g.globalAlpha=a0;
+  return true;
+}
+// the parts, back to front. occ: the canvas holds only this figure, so each part first lays a soft shadow on the parts
+// already drawn behind it (source-atop: nothing outside the figure is touched), down and right, away from the light
+function rfParts(g,m,ox,oy,occ){
+  const R=T3R, L=T3.L, n=R.n, list=R.list, fl=R.flash, ga=g.globalAlpha, k=R.k, tmin=RF.tmin*k;
+  const DM=RF.dm||(RF.dm=new DOMMatrix()), OB=occ?rfxSoft('0,0,0'):null;
   for(let i=0;i<n;i++){
     const p=list[i], col=p.col;
     if(fl||!rfValid(col)){ rfOldPart(g,p,ox,oy,m,fl,L); continue; }
     const mat=rfMat(col), M=RFM[mat]||RFM.matte, hz=p.hz, ao=hz==null||R.zl>3?0:hz<2.6?2:hz<6.5?1:0;
+    if(occ&&i>0&&!M.glow) rfOcc(g,p,m,ox,oy,L,k,ga,OB);
     if(p.t===0){ // ellipsoid
       const c=Math.cos(p.ang), s=Math.sin(p.ang), mr=Math.sqrt(p.s1*p.s2);
       g.setTransform(m); g.transform(c*p.s1,s*p.s1,-s*p.s2,c*p.s2,ox+p.sx,oy+p.sy);
@@ -244,12 +260,63 @@ function reT3End(){
       g.translate(ox+cx,oy+cy);
       if(rr>3*k) g.fillStyle=rfGP(col,mat,lq,Math.max(2,Math.round(rr)),Math.round(L[0]*10),Math.round(L[1]*10)); else g.fillStyle=rfFlat(col,mat,lq);
       g.beginPath(); g.moveTo(q[0]-cx,q[1]-cy); for(let j=2;j<q.length;j+=2) g.lineTo(q[j]-cx,q[j+1]-cy); g.closePath(); g.fill();
+      if(M.tex&&rr>5*k&&(M.tex==='dust'||M.tex==='feather'||M.tex==='fur'||M.tex==='scale'||M.tex==='weave')&&rfTexOK()){ const pt=rfPat(M.tex); if(pt){ const ts=M.ts*k; DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=0; DM.f=0; pt.setTransform(DM); g.globalAlpha=ga*M.ta*0.8; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
       if(p.edge){ g.strokeStyle=p.edge; g.lineWidth=0.8*k; g.lineJoin='round'; g.globalAlpha=ga*0.75; g.stroke(); g.globalAlpha=ga; }
-    }else if(p.t===4){ // dot
+    }else if(p.t===4){ // dot (eyes, buttons, studs, rivets): metal and glossy ones catch a glint on the lit side
       g.setTransform(m); g.fillStyle=col; g.beginPath(); g.arc(ox+p.sx,oy+p.sy,p.r1,0,TAU); g.fill();
+      if((M.metal||mat==='chitin'||mat==='horn')&&p.r1>0.55*k){ g.fillStyle=rfGlint(col); g.beginPath(); g.arc(ox+p.sx+L[0]*p.r1*0.38,oy+p.sy+L[1]*p.r1*0.38,p.r1*0.42,0,TAU); g.fill(); }
     }
   }
-  g.setTransform(m); g.globalAlpha=a0;
+}
+// one part's soft shadow on what is behind it
+function rfOcc(g,p,m,ox,oy,L,k,ga,OB){
+  const pc=g.globalCompositeOperation;
+  if(p.t===0){ if(p.s2<1.1*k) return; const d=0.3*Math.min(p.s1,p.s2)+0.5*k, dx=-L[0]*d, dy=-L[1]*d+0.25*k, c=Math.cos(p.ang), s=Math.sin(p.ang);
+    g.setTransform(m); g.transform(c*p.s1,s*p.s1,-s*p.s2,c*p.s2,ox+p.sx+dx,oy+p.sy+dy); g.globalCompositeOperation='source-atop'; g.globalAlpha=ga*0.5; g.drawImage(OB,-1.32,-1.32,2.64,2.64); }
+  else if(p.t===1){ const rm=Math.max(p.r1,p.r2); if(rm<0.9*k) return; const d=0.35*rm+0.45*k, dx=-L[0]*d, dy=-L[1]*d+0.2*k;
+    g.setTransform(m); g.globalCompositeOperation='source-atop'; g.strokeStyle='#000'; g.lineCap='round';
+    g.globalAlpha=ga*0.12; g.lineWidth=(p.r1+p.r2)+1.6*k; g.beginPath(); g.moveTo(ox+p.ax+dx,oy+p.ay+dy); g.lineTo(ox+p.bx+dx,oy+p.by+dy); g.stroke();
+    g.globalAlpha=ga*0.14; g.lineWidth=(p.r1+p.r2)*0.9; g.stroke(); }
+  else if(p.t===3){ const q=p.pts; if(q.length<6) return; const d=0.7*k, dx=-L[0]*d, dy=-L[1]*d+0.3*k;
+    g.setTransform(m); g.globalCompositeOperation='source-atop'; g.globalAlpha=ga*0.16; g.fillStyle='#000'; g.beginPath(); g.moveTo(ox+q[0]+dx,oy+q[1]+dy); for(let j=2;j<q.length;j+=2) g.lineTo(ox+q[j]+dx,oy+q[j+1]+dy); g.closePath(); g.fill(); }
+  else if(p.t===2){ const rm=Math.max(p.r1,p.r2); if(rm<1.2*k) return; const d=0.3*rm+0.4*k;
+    g.setTransform(m); g.globalCompositeOperation='source-atop'; g.globalAlpha=ga*0.4; g.drawImage(OB,ox+p.ax-rm*1.25-L[0]*d,oy+p.by-rm*0.9-L[1]*d,rm*2.5,(p.ay-p.by)+rm*1.8); }
+  g.globalCompositeOperation=pc; g.globalAlpha=ga;
+}
+// the ground's occlusion at the feet: the lowest part of the figure a little darker (source-atop on its own canvas)
+function rfFeetAO(g,m,ox,oy){
+  const k=T3R.k; if(T3R.zl>3) return; let s=RF.aoS; if(!s){ s=mkCanvas(4,32); const q=s.getContext('2d'), gr=q.createLinearGradient(0,0,0,32); gr.addColorStop(0,'rgba(8,10,22,0)'); gr.addColorStop(0.6,'rgba(8,10,22,.16)'); gr.addColorStop(1,'rgba(8,10,22,.34)'); q.fillStyle=gr; q.fillRect(0,0,4,32); RF.aoS=s; }
+  const pc=g.globalCompositeOperation, ga=g.globalAlpha; g.setTransform(m); g.globalCompositeOperation='source-atop'; g.drawImage(s,ox-60*k,oy-7*k,120*k,9*k); g.globalCompositeOperation=pc; g.globalAlpha=ga;
+}
+// ---------- the figure layer: a live figure painted on a scratch canvas of its own (so its parts can shade each other),
+// then laid on the frame in one blit. Ash always; others while the frame's budget lasts and the light's quality allows.
+function rfLayerOK(){
+  if(!RF.layerOn||!RF.lay) return false; const m=T3R.m; if(Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6) return false;
+  if(T3R.g!==ctx) return false;
+  if(RF.lay===2) return true;                                         // Ash
+  const q=typeof RLQ!=='undefined'?RLQ.lvl:0; if(q>=2) return false;
+  return RF.ln<(q?RF.lmax1:RF.lmax);
+}
+function rfLayer(){
+  const R=T3R, list=R.list, n=R.n, ct=T3.ct, m=R.m, g=R.g; let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(let i=0;i<n;i++){ const p=list[i];
+    if(p.t===0){ const q=Math.max(p.s1,p.s2); if(p.sx-q<x0) x0=p.sx-q; if(p.sx+q>x1) x1=p.sx+q; if(p.sy-q<y0) y0=p.sy-q; if(p.sy+q>y1) y1=p.sy+q; }
+    else if(p.t===1||p.t===5){ const q=Math.max(p.r1,p.r2); x0=Math.min(x0,p.ax-q,p.bx-q); x1=Math.max(x1,p.ax+q,p.bx+q); y0=Math.min(y0,p.ay-q,p.by-q); y1=Math.max(y1,p.ay+q,p.by+q); }
+    else if(p.t===2){ const q=Math.max(p.r1,p.r2); x0=Math.min(x0,p.ax-q); x1=Math.max(x1,p.ax+q); y0=Math.min(y0,p.by-p.r2*ct,p.ay-p.r1*ct); y1=Math.max(y1,p.ay+p.r1*ct,p.by+p.r2*ct); }
+    else if(p.t===3){ const q=p.pts; for(let j=0;j<q.length;j+=2){ if(q[j]<x0) x0=q[j]; if(q[j]>x1) x1=q[j]; if(q[j+1]<y0) y0=q[j+1]; if(q[j+1]>y1) y1=q[j+1]; } }
+    else if(p.t===4){ x0=Math.min(x0,p.sx-p.r1); x1=Math.max(x1,p.sx+p.r1); y0=Math.min(y0,p.sy-p.r1); y1=Math.max(y1,p.sy+p.r1); }
+  }
+  if(!(x1>x0)) return false;
+  const res=Math.min(4,Math.max(Math.abs(m.a),Math.abs(m.d))), pad=2/res; x0-=pad; y0-=pad; x1+=pad; y1+=pad;
+  const W=Math.ceil((x1-x0)*res), H=Math.ceil((y1-y0)*res); if(W>1100||H>1100||W*H>600000) return false;
+  let c=RF.lc; if(!c||c.width<W||c.height<H){ c=mkCanvas(Math.max(W,c?c.width:0,256),Math.max(H,c?c.height:0,256)); RF.lc=c; RF.lg=c.getContext('2d'); }
+  const lg=RF.lg; lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1; lg.globalCompositeOperation='source-over'; lg.clearRect(0,0,W+2,H+2);
+  const lm=RF.lm||(RF.lm=new DOMMatrix()); lm.a=res; lm.b=0; lm.c=0; lm.d=res; lm.e=-x0*res; lm.f=-y0*res;
+  lg.setTransform(lm); const keep=R.g; R.g=lg; rfParts(lg,lm,0,0,true); rfFeetAO(lg,lm,0,0); R.g=keep;
+  const a0=g.globalAlpha; g.setTransform(m); if(R.alpha!==1) g.globalAlpha=a0*R.alpha;
+  g.drawImage(c,0,0,W,H,R.x+x0,R.y+y0,W/res,H/res); g.globalAlpha=a0;
+  if(RF.lay!==2) RF.ln++; RF.stats.lay=(RF.stats.lay||0)+1;
+  return true;
 }
 // a part drawn exactly as the Classic engine draws it (hit flashes, colours that are not #rrggbb)
 function rfOldPart(g,p,ox,oy,m,fl,L){
@@ -283,7 +350,7 @@ const RF_TYPE=[
   [/^(slime|m_moonjelly|m_octavia|c_gulper|gloamjaw)$/,'slime'],
   [/^(kobold|sneak|grizzlefang|f_snowgob|f_blubberton|m_sandshark|m_bigfin|m_puffington|c_brute)$/,'hide'],
   [/^(cultist|morrow|c_husher|c_saltbeard|n_echo_vesper|n_echo_vclone|c_mothclone)$/,'cloth'],
-  [/^(drakeling|broodmother|eel|serpent|skrae|pip|hatchling|f_glaciar0)$/,'scales'],
+  [/^(drakeling|broodmother|eel|serpent|skrae|pip|hatchling|vorlaxis|m_sandshark0)$/,'scales'],
   [/^(knight|cindervane|c_tinman|f_rimeknight|n_inkknight|cinder|grey)$/,'metal'],
   [/^(c_tickbug|c_ram|c_ticktock|f_bellows|m_fanfare|m_zapp|c_bolt)$/,'brass'],
   [/^(crab|c_pinch|m_crabpirate|f_frostshell)$/,'chitin'],
@@ -307,7 +374,7 @@ function rfFigMap(id){
       const pairs=rfPalMap(ASHP,R,'scales'); if(typeof ASHG!=='undefined') pairs.push(...rfPalMap(ASHG,R,'scales')); M=rfMap(pairs); }
     else if((id==='pip'||id==='hatchling')&&typeof PPAL!=='undefined'){ const R=[[/^(horn|spine)$/,'horn'],[/^wing/,'membrane'],[/^blush$/,'skin']];
       M=rfMap(rfPalMap(PPAL,R,'scales').concat(typeof HPAL!=='undefined'?rfPalMap(HPAL,R,'scales'):[])); }
-    else if(id==='vorlaxis'&&typeof VX!=='undefined'){ M=rfMap(rfPalMap(VX,[[/^(plate|bone|boneD|claw|spike)$/,'horn'],[/^mem/,'membrane'],[/^(crack\d?|eye)$/,'glow'],[/^crackD$/,'glow'],[/^mouth$/,'gloss'],[/^belly$/,'hide']],'scales')); }
+    else if(id==='vorlaxis'&&typeof VX!=='undefined'){ M=rfMap(rfPalMap(VX,[[/^(plate|bone|boneD|claw|spike)$/,'horn'],[/^mem/,'membrane'],[/^(crack\d?|eye)$/,'glow'],[/^crackD$/,'glow'],[/^mouth$/,'gloss'],[/^belly$/,'hide']],'ember')); }
     else if(id==='goat'&&typeof GPAL!=='undefined') M=rfMap(rfPalMap(GPAL,[[/^(hoof|horn)$/,'horn'],[/^gold$/,'metal'],[/^nose$/,'skin']],'fur'));
     else if(id==='deer'&&typeof DPAL!=='undefined') M=rfMap(rfPalMap(DPAL,[[/^(hoof|antler)$/,'horn'],[/^nose$/,'gloss'],[/^inner$/,'skin']],'fur'));
     else if(id==='rabbit'&&typeof RPAL!=='undefined') M=rfMap(rfPalMap(RPAL,[[/^inner$/,'skin']],'fur'));
@@ -329,9 +396,10 @@ function rfPersonMap(P){
 function rfWrapReg(reg,name){
   for(const k of Object.keys(reg)){ const f=reg[k]; if(typeof f!=='function'||f._rf) continue;
     const id=name==='X'?k:name==='B'?k:k, def=rfTypeMat(name==='X'&&k==='npc'?'npc':name==='X'&&k==='spirit'?'spirit':id);
+    const lay=name==='X'&&k==='ash'?2:(name==='X'&&(k==='npc'||k==='spirit'))?0:1;
     const w=function(){ if(!LOOK.re) return f.apply(this,arguments);
-      const s0=RF.fm, m0=RF.fmap; RF.fm=def; RF.fmap=rfFigMap(id);
-      try{ return f.apply(this,arguments); } finally{ RF.fm=s0; RF.fmap=m0; } };
+      const s0=RF.fm, m0=RF.fmap, l0=RF.lay; RF.fm=def; RF.fmap=rfFigMap(id); RF.lay=lay;
+      try{ return f.apply(this,arguments); } finally{ RF.fm=s0; RF.fmap=m0; RF.lay=l0; } };
     w._rf=true; reg[k]=w; }
 }
 try{ rfWrapReg(T3E,'E'); rfWrapReg(T3B,'B'); rfWrapReg(T3X,'X'); rfWrapReg(T3C,'C'); rfWrapReg(T3A,'A'); }catch(e){}
@@ -339,7 +407,7 @@ try{ rfWrapReg(T3E,'E'); rfWrapReg(T3B,'B'); rfWrapReg(T3X,'X'); rfWrapReg(T3C,'
 function rfBakeBegin(P){ if(!LOOK.re) return; RF.bk0=RF.fmap; RF.bkd=RF.fm; RF.fmap=rfPersonMap(P&&P.skin?P:null)||RF.fmap; RF.fm=RF.fm||'cloth'; RF.bake=true; }
 function rfBakeEnd(){ if(!RF.bake) return; RF.fmap=RF.bk0; RF.fm=RF.bkd; RF.bake=false; }
 // one count per frame for the texture budget
-{ const base=render; render=function(){ RF.fr++; RF.tn=0; return base.apply(this,arguments); }; }
+{ const base=render; render=function(){ RF.fr++; RF.tn=0; RF.ln=0; return base.apply(this,arguments); }; }
 
 // ================= effects in the Realistic look: fire, smoke, sparks, dust and splashes, projectiles, pickups
 // Every effect keeps its place, size, colour, timing and hit box; only how it is painted changes. All of it is
@@ -389,10 +457,10 @@ function reParticles(){
   for(let i=0;i<n;i++){ const q=P[i]; if(!q.glow) continue; const f=q.life/q.max;
     if(q.kind==='fire'){
       const a=Math.min(1,f*1.6)*0.85; if(a<=0.01) continue; const lv=clamp(Math.floor(f*8.4)-1,0,7), sp=Math.hypot(q.vx,q.vy)+1e-3, ux=q.vx/sp, uy=q.vy/sp;
-      const r=q.size*1.55, fl=rm?0:Math.sin(t*23+i*1.7)*0.12;
-      ctx.globalAlpha=a0*a*0.55; ctx.drawImage(FS[Math.max(0,lv-2)],q.x-r*1.5-ux*r*0.4,q.y-r*1.65-uy*r*0.4,r*3,r*3);   // the soft body behind
-      ctx.globalAlpha=a0*a; ctx.drawImage(FS[lv],q.x-r*(1+fl),q.y-r*1.15,r*2*(1+fl),r*2);                              // the flame
-      if(f>0.6){ const c=r*0.55; ctx.globalAlpha=a0*a*0.8; ctx.drawImage(FS[7],q.x-c,q.y-c,c*2,c*2); }                  // a white hot heart
+      const r=q.size*(1.12+((i*37)%10)*0.03), fl=rm?0:Math.sin(t*23+i*1.7)*0.14, tall=1.25+(rm?0:Math.sin(t*17+i*2.3)*0.18);
+      ctx.globalAlpha=a0*a*0.36; ctx.drawImage(FS[Math.max(0,lv-2)],q.x-r*1.3-ux*r*0.5,q.y-r*1.45-uy*r*0.5,r*2.6,r*2.6);   // the soft body behind
+      ctx.globalAlpha=a0*a*0.85; ctx.drawImage(FS[lv],q.x-r*(1+fl),q.y-r*(2*tall-0.9),r*2*(1+fl),r*2*tall);              // the flame, licking upward
+      if(f>0.62){ const c=r*0.5; ctx.globalAlpha=a0*a*0.7; ctx.drawImage(FS[7],q.x-c,q.y-c,c*2,c*2); }                   // a white hot heart
       if(i%5===0&&f<0.7&&f>0.08){ const e=1.6+q.size*0.18, ex=q.x+(rm?0:Math.sin(t*7+i)*3), ey=q.y-(1-f)*16; ctx.globalAlpha=a0*Math.min(1,f*1.8); ctx.drawImage(EM,ex-e*2,ey-e*2,e*4,e*4); }   // embers
     }else if(q.kind==='bfire'||q.kind==='moon'){
       const a=Math.min(1,f*1.6)*0.85; if(a<=0.01) continue; const r=q.size*1.6;

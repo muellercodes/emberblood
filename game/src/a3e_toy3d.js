@@ -108,7 +108,7 @@ function t3Grad(col,qx,qy,mode){
   T3G.set(key,gr); return gr;
 }
 function t3End(){
-  if(LOOK.re&&!LOOK.sb) return reT3End();   // the Realistic look's materials (e12g_figs.js)
+  if(LOOK.re&&!LOOK.sb&&reT3End()) return;   // the Realistic look's materials (e12g_figs.js)
   const R=T3R, g=R.g, L=T3.L, m=R.m, n=R.n, list=R.list;
   // insertion sort (lists are short) back to front
   for(let i=1;i<n;i++){ const p=list[i]; let j=i-1; while(j>=0&&list[j].d>p.d){ list[j+1]=list[j]; j--; } list[j+1]=p; }
