@@ -20,7 +20,7 @@ chapter({
   id: 'f_thaw', act: 3, after: 'f_kindle', next: 'f_sky', takeover: true,
   card: ['Act III · Chapter 3', 'One Thaw at a Time'],
   so_far: [
-    "The Great Hearth burns blue again. But Rimeholm, the fishing village on the sea cliffs, went quiet the night the moth flew over, and nobody in Hearthold has heard from it since.",
+    "The Great Hearth burns blue again. But Rimeholm, the fishing village on the sea cliffs, went quiet the night the moth flew over, and nobody in Hearthold has heard from it since. Not even the post.",
     'The Hearth burns again. But Rimeholm went quiet. Nobody has heard from it.'],
   mom: [['A whole frozen village? Take them soup. Take them ALL soup.', 'A frozen village? Take them soup!']],
   // (x2_story's Tove nudge at the foot of the tower names the granny on top; the engine marks it seen once it can)

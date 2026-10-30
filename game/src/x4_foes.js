@@ -480,7 +480,7 @@ function n4vGust(e,dt,p){
     n4fSay(e,'n_echo_vor',pick([S('Your little lights mean nothing here.','Your lights mean nothing.'),S('Darkness suits this throne.','Dark is better.')]),8); return true; }
   return false;
 }
-defineFoe('n_echo_vor',{boss:true,name:'Echo of the First Flame',title:S('A shadow of Vorlaxis','A shadow of Grandpa'),short:'Echo of the First Flame',
+defineFoe('n_echo_vor',{boss:true,name:'Echo of the First Flame',title:S('Grandpa on His Worst Day','A shadow of Grandpa'),short:'Echo of the First Flame',
   lv:21,hp:21000,r:56,speed:72,dmg:17,value:1000,kbRes:0,dcol:'80,50,140',phases:[0.5],
   phaseText:[[S('Shadow Rage!','Shadow Rage!'),S('Double stomp rings, and shades rise from the floor. Keep two braziers burning!','Two rings! Keep two braziers lit!'),['n_echo_vor',S('Burn black, hatchling. Like me.','Burn black, like me.')]]],
   init(e){ Object.assign(e,{phase:1,state:'walk',headRel:0,alt:0,scale:1,mouthGlow:0,tailFx:0,staggered:false,cd:1.8,st:0,stMax:1,tideCd:99,sumCd:6,pullCd:4,chest:0,n4ghost:1,n4solid:false});
@@ -598,7 +598,7 @@ function n4e2Pre(e,dt,d,a){
   return false;
 }
 const N4E2_AI=FK.brain({move:'strafe',slant:1.1,stop:70,turn:8,cd:[0.55,1.15],recoverMove:0.4,pre:n4e2Pre,moves:N4E2_MOVES});
-defineFoe('n_echo_vesper',{boss:true,name:'Echo of the Moth Mask',title:S('A shadow of Vesper','A shadow of Vesper'),short:'Echo of the Moth Mask',
+defineFoe('n_echo_vesper',{boss:true,name:'Echo of the Moth Mask',title:S('Vesper with a Grudge','A shadow of Vesper'),short:'Echo of the Moth Mask',
   lv:22,hp:15000,r:13,speed:230,dmg:26,value:1000,kbRes:0.5,dcol:'80,60,140',phases:[0.5],
   phaseText:[[S('More masks!','More masks!'),S('Her clones come back faster and she climbs more often. Whip her, and knock her off the balcony!','Whip her! Knock her down!'),['n_echo_vesper',S('She PROMISED.','She promised!')]]],
   init(e){ e.r0=13; e.leash=99999; e.n4edK=(e.edK||1)*Math.pow(1.10,22-13); e.edK=e.n4edK; e.yanks=0; e.knocks=0; e.cloneT=0; e.n4balT=byDiff(14,12,10); n4fBossIn(e); later(0.4,()=>{ if(!e.dead&&G.boss===e) n4e2Split(e,true); }); },
@@ -734,9 +734,9 @@ function n4e3Stream(on){ if(typeof WIND==='undefined'||typeof P3==='undefined') 
 function n4fLoop(){ if(typeof P3==='undefined'||!P3.ride) return; const R=P3.ride, o=R.o; if(!o||!o.n4loop) return; const half=o.L*0.5; if(R.dir>0&&R.s>half) R.s-=half; else if(R.dir<0&&R.s<half) R.s+=half; }
 { const base=updatePlayer; updatePlayer=function(dt,inp){ const r=base(dt,inp); try{ n4fLoop(); }catch(err){} return r; }; }
 if(typeof F2HC!=='undefined'&&F2HC.f_glaciar) F2HC.n_echo_glaciar=F2HC.f_glaciar;
-defineFoe('n_echo_glaciar',{boss:true,name:'Echo of the Ice Dragon',title:S('A shadow of Glaciar','A shadow of Glaciar'),short:'Echo of the Ice Dragon',
+defineFoe('n_echo_glaciar',{boss:true,name:'Echo of the Ice Dragon',title:S('The Cold Shoulder','A shadow of Glaciar'),short:'Echo of the Ice Dragon',
   lv:22,hp:15000,r:60,speed:60,dmg:26,value:1000,kbRes:0,dcol:'70,80,140',phases:[0.5],
-  phaseText:[[S('The Wind!','The Wind!'),S('She flies! Ride the wind ring and hit her from the air. Pound her when she lands; bomb her mouth when she breathes in!','She flies! Ride the wind! Pound her when she lands!'),['n_echo_glaciar',S('Cold keeps things. Cold KEEPS things.','Cold keeps things!')]]],
+  phaseText:[[S('The Wind!','The Wind!'),S('She flies! Ride the wind ring and hit her from the air. Pound her when she lands; bomb her mouth when she breathes in!','She flies! Ride the wind! Pound her when she lands!'),['n_echo_glaciar',S('Cold keeps things. Nothing leaves.','Cold keeps things!')]]],
   init(e){ if(typeof f2BossInit==='function') f2BossInit(e); const C=N4E3.C; e.mode='coil'; e.z=0; e.fly=0; e.c8=rand(0,TAU); e.homeX=C.x; e.homeY=C.y; e.r0=60; e.leash=99999; e.n4shield=true; e.stuns=0;
     e.f2ctx={cx:C.x,cy:C.y,R:N4E3.R,A:null,rect:false}; e.n4edK=(e.edK||1)*Math.pow(1.10,22-17); e.edK=e.n4edK; n4fBossIn(e); },
   onPhase(e,i){ if(i===1){ e.mode='n4air'; e.mv=null; e.tele=null; e.state='takeoff'; e.st=1; e.n4slamT=5; e.n4inhT=9; if(N4F.fight) N4F.fight.fly=true; if(typeof n4wCalm==='function') n4wCalm('cz_echo3',true); n4e3Stream(true);
@@ -1021,9 +1021,9 @@ function n4nAI(e,dt,p){
   if(e.nPhase===1) n4nP1(e,dt,p); else if(e.nPhase===2) n4nP2(e,dt,p); else if(e.nPhase===3) n4nP3(e,dt,p); else n4nP4(e,dt,p);
 }
 const N4N_TAUNT={
-  1:[S('Shh, shh.','Shh, shh.'),S('Why fight? Sleep is so soft.','Why fight? Sleep is soft.'),S("Nowhere to hide from the moonlight, dear. Except the pillars. I should have made fewer pillars.",'You cannot hide. Except behind a pillar.')],
+  1:[S('Shh, shh.','Shh, shh.'),S('Why fight? Sleep is so soft.','Why fight? Sleep is soft.'),S("Hide behind your pillars, then, dear. The moonlight can wait.",'Hide behind a pillar. I can wait.')],
   2:[S("Under the dark it's quiet. Come down. Stay.",'Under the dark it is quiet. Stay.')],
-  3:[S('Mmm. Crunchy.','Mmm. Crunchy.'),S("The moon is mine. There's hardly any left now.",'The moon is mine.')],
+  3:[S('Mmm. One more piece, and then we rest.','One more piece.'),S("The moon is mine. There's hardly any left now.",'The moon is mine.')],
   4:[S("Stop! You're letting it all OUT!",'Stop! You are letting it out!'),S("It's leaking! My moon is LEAKING!",'My moon is leaking!'),S('Everyone leaves. EVERYONE LEAVES.','Everyone leaves!')]};
 // after a window: she tears free (phase 1), sinks back under the ink (2), or flies off to the next piece (3)
 function n4nRise(e){ e.state='rise'; e.rise=e.nPhase===2?0.6:1.0; e.cd=byDiff(2.2,1.6,1.2); if(e.nPhase===1){ for(const A of N4N.anchors){ A.snag=false; A.heat=0; } for(const r of e.p2rings) r.done=true; e.pulls=0; n4nSay(e,'Ow. My poor wings. Again, then.','Ow. Again, then.',4); }
@@ -1045,8 +1045,8 @@ function n4nP1(e,dt,p){
     if(n4fMoonAt(A.x,A.y-60,20)){ if(A.curtain&&dist(p.x,p.y,A.x,A.y)>120){ if(!(A.nag>G.time)){ A.nag=G.time+3; ftext(A.x,A.y-90,S('Moths are in the way! Shadow Dash through the curtain!','Moths! Dash through!'),'#e0d0ff',13); } continue; }
       A.heat+=dt; A.lit=0.3; if(Math.random()<dt*20) emit(A.x,A.y-60,1,{col:'214,226,255',smin:20,smax:80,lmin:.3,lmax:.6,zmin:1.4,zmax:2.6});
       if(A.heat>=0.8){ A.snag=true; A.heat=0; snag++; SFX.play('cast'); shake(4); n4fEv('snag'); emit(A.x,A.y-60,24,{col:'230,235,255',smin:60,smax:220,lmin:.3,lmax:.6,zmin:1.4,zmax:3});
-        ftext(A.x,A.y-100,snag>=need?S('Snagged! Now grapple a chain and PULL!','Snagged! Grapple and PULL!'):S('Snagged! Light another anchor!','Snagged! Light another!'),'#e8eeff',15);
-        if(snag>=need) n4fTip('pull',S('Pull her down!','Pull her down!'),S('Grapple a glowing chain ring at the foot of a pillar, hold the button and walk away from it to PULL.','Grapple a chain ring. Hold and walk away!')); } }
+        ftext(A.x,A.y-100,snag>=need?S('Snagged! Now grapple a chain and pull!','Snagged! Grapple and pull!'):S('Snagged! Light another anchor!','Snagged! Light another!'),'#e8eeff',15);
+        if(snag>=need) n4fTip('pull',S('Pull her down!','Pull her down!'),S('Grapple a glowing chain ring at the foot of a pillar, hold the button and walk away from it to pull her down.','Grapple a chain ring. Hold and walk away!')); } }
     else A.heat=Math.max(0,A.heat-dt*0.4); }
   const ready=snag>=need; for(const r of e.p2rings){ r.dx=r.A.x-e.x; r.dy=r.A.y+8-e.y; r.done=!(ready&&r.A.snag); }
   // Pip: the next dark anchor (or the chain to pull)
@@ -1133,7 +1133,7 @@ function n4nJawsTick(e,A,dt,p){ if(A.t<A.dur){ e.x=lerp(e.x,A.x,Math.min(1,dt*3)
 function n4nOnPound(info){ const e=N4N.e; if(!e||e.dead||G.boss!==e) return;
   if(e.nPhase===2&&e.restP){ const P=e.restP; if(dist(info.x,info.y,P.x,P.y)<P.r+30){ P.crack=1; P.glow=0; e.restP=null; const a=angTo(N4N.C.x,N4N.C.y,P.x,P.y);
       for(let i=0;i<30;i++) emit(P.x+rand(-60,60),P.y+rand(-40,40),1,{col:'235,240,255',ang:-Math.PI/2,spread:0.3,smin:200,smax:500,lmin:.4,lmax:.8,zmin:2,zmax:4});
-      n4nGround(e,P.x+Math.cos(a)*40,P.y+Math.sin(a)*30,['Ow. That was a piece of my own moon you dropped on me.','Ow! You hit me with my own moon!']); } } }
+      n4nGround(e,P.x+Math.cos(a)*40,P.y+Math.sin(a)*30,['Careful, dear. That was a piece of my moon.','Careful. That was my moon.']); } } }
 if(typeof p3OnPound==='function') p3OnPound(n4nOnPound);
 // ===== phase 3: the Moon's Ring (calm air, two wind rings, the fragments)
 function n4nStreams(on){ if(typeof WIND==='undefined'||typeof P3==='undefined') return; const C=N4N.C;
@@ -1154,8 +1154,8 @@ function n4nP3(e,dt,p){
     if(Math.random()<dt*3) ftext(f.x+rand(-30,30),f.y-150,S('CRUNCH','CRUNCH'),'#e8e8ff',13);
     // Moonfire in her face: CHOKED
     const F=n4nFace(e); if(n4fMoonAt(F.x,F.y,42)){ e.choke+=dt; if(Math.random()<dt*25) emit(F.x,F.y-60,1,{col:'214,226,255',smin:20,smax:80,lmin:.3,lmax:.6,zmin:1.4,zmax:2.6}); } else e.choke=Math.max(0,e.choke-dt*0.5);
-    if(e.choke>=byDiff(0.6,1.0,1.3)){ e.choke=0; e.perch=null; n4fEv('choke'); taunt('nyxara',S("*cough* Hot! Who puts fire in a moon?",'*cough* Hot!')); const a=angTo(C.x,C.y,e.x,e.y); e.tumble={t:0,x0:e.x,y0:e.y,z0:e.z,x1:C.x+Math.cos(a)*440,y1:C.y+Math.sin(a)*440}; ftext(e.x,e.y-140,S('CHOKED!','CHOKED!'),'#ffe066',24); shake(8); return; }
-    if(f.eat>=byDiff(6,5,4)){ f.gone=true; f.growT=0; f.eat=0; e.perch=null; SFX.play('pop'); emit(f.x,f.y-90,24,{col:'230,235,255',smin:40,smax:160,lmin:.3,lmax:.7,zmin:1.4,zmax:3}); n4nSay(e,'Mmm. Crunchy.','Mmm. Crunchy.',4); e.cd=0.6; }
+    if(e.choke>=byDiff(0.6,1.0,1.3)){ e.choke=0; e.perch=null; n4fEv('choke'); taunt('nyxara',S("*cough* Hot. You have made my moon too hot.",'*cough* Too hot!')); const a=angTo(C.x,C.y,e.x,e.y); e.tumble={t:0,x0:e.x,y0:e.y,z0:e.z,x1:C.x+Math.cos(a)*440,y1:C.y+Math.sin(a)*440}; ftext(e.x,e.y-140,S('CHOKED!','CHOKED!'),'#ffe066',24); shake(8); return; }
+    if(f.eat>=byDiff(6,5,4)){ f.gone=true; f.growT=0; f.eat=0; e.perch=null; SFX.play('pop'); emit(f.x,f.y-90,24,{col:'230,235,255',smin:40,smax:160,lmin:.3,lmax:.7,zmin:1.4,zmax:3}); n4nSay(e,'Mmm. One more piece, and then we rest.','One more piece.',4); e.cd=0.6; }
     return; }
   // flying to the next piece (Pip and Hush show which one), with attacks on the way
   if(!e.toFrag||e.toFrag.gone){ e.toFrag=n4nNextFrag(e); e.travel=byDiff(4.2,3.4,2.6); }
@@ -1364,7 +1364,7 @@ function n4nBeats(e,left){ const b=e.beats, br=e.broken;
     if(n4fAllyBeat('tikka',['ev_tikka',S(`One lumpy bun, coming UP!`,`Here comes a bun!`)])){ const p=player, hh=Math.round(p.maxHp*0.4*((G.diff&&G.diff.heal)||1)); p.hp=Math.min(p.maxHp,p.hp+hh); ftext(p.x,p.y-40,S('A big lumpy bun! +','Big bun! +')+hh,'#9cf08a',16); n4fEv('bigbun'); }
     n4fAllyBeat('cinder',['cinder',S(`None shall pass! Not even moths!`,`Nobody gets past me!`)]); }
   if(br===3&&!b.three){ b.three=1;
-    if(n4fAllyBeat('glaciar',['f_glaciar',S(`Hold STILL, old moth.`,`Hold still!`)])){ e.n4frz=8; n4fEv('freeze'); }
+    if(n4fAllyBeat('glaciar',['f_glaciar',S(`Hold still, old moth. I have had a thousand years of practice.`,`Hold still!`)])){ e.n4frz=8; n4fEv('freeze'); }
     const end=n4fEnd();
     if(end==='lantern'&&n4fAllyBeat('grandpa',['grandpa',S(`Get AWAY from my grandchild, you oversized sock!`,`Get away from my grandchild, you big sock!`)])){ if(!n4fS()) e.n4gpa=0.5; }
     if(end==='warden'&&n4fAllyBeat('wardens',['iska',S(`Five lights, one for each of us. Stand close, Warden.`,`Five lights for you. Stand close!`)])){ if(!n4fS()) N4F.ward=5; }

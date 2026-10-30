@@ -8,7 +8,7 @@
 // tick while the quest is open; the posts while m3pAt('m_ferry',1): a legacy step).
 quest({
   id: 'm_ferry', act: 4, giver: 'm_rowan', optional: true, takeover: true,
-  title: ['The Raft Ferry', 'The Raft Ferry'],
+  title: ['Knot a Problem', 'The Raft Ferry'],
   payoff: { kind: 'shortcut', id: 'm4s_ferry' },
   old_steps: ['forts', 'posts', 'rowan'],
 
@@ -45,7 +45,7 @@ quest({
         { t: ["I'll sort the crabs out.", "I'll do it!"], tone: 'brave', then: ['quest start m_ferry'],
           say: [['m_rowan', 'Then the posts. They lean like they\'ve had a long day. Something heavy from above should do it.',
             'Then the posts. They need a big slam.']] },
-        { t: ['Not now', 'Not now'], say: [['m_rowan', '*ties a "maybe later" knot*', '*ties a "later" knot*']] },
+        { t: ['Not now', 'Not now'], say: [['m_rowan', '*ties a "knot now" knot*', '*ties a "later" knot*']] },
       ] },
     ],
     fr_done: [

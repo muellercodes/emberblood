@@ -7,7 +7,7 @@
 // (legacy steps: the fish swims while m3pAt('m_moonfish', 0..1); the landing minigame m3p_fish runs from Gilly's talk).
 quest({
   id: 'm_moonfish', act: 4, giver: 'm_gilly', optional: true, takeover: true,
-  title: ['Gilly and the Moonfish', 'Gilly and the Moonfish'],
+  title: ['Hook, Line and Moonfish', 'Gilly and the Moonfish'],
   payoff: { kind: 'heart_ember', id: 'm_moonfish' },
   old_steps: ['herd', 'land', 'show'],
 
@@ -32,7 +32,7 @@ quest({
       ['m_gilly', 'Find it down in the Drowned Reach and chase it up to my fishing raft. I just want to see it. Not cook it.',
         'Chase it up to my raft. I just want to see it.'],
       ['m_gilly', '...Mostly not cook it.'],
-      { choose: 'm_moonfish_offer', ask: ['Will you chase the Moonfish up for Gilly?', 'Chase the Moonfish?'], pick: [
+      { choose: 'm_moonfish_offer', ask: ['Chase the Moonfish up for Gilly?', 'Chase the Moonfish?'], pick: [
         { t: ["I'll find it. No cooking.", 'I will. No cooking!'], tone: 'kind', then: ['quest start m_moonfish'],
           say: [['m_gilly', "I'll row out north of town and wait. Look for a little raft and a lot of hope.", 'I will wait on my raft up north.',
             { dir: ['m4s_driftwood', 'm3p_raft', 'north'] }]] },
@@ -40,7 +40,7 @@ quest({
       ] },
     ],
     mf_done: [
-      ['m_gilly', 'THE MOONFISH! Look at it! LOOK at it!', 'THE MOONFISH! Look!'],
+      ['m_gilly', 'Holy mackerel, the Moonfish! Look at her! Just look at her!', 'The Moonfish! Look at her!'],
       ['narr', 'Up close, the glow is coming from inside it. The Moonfish burps. Something warm and red rolls onto the raft.',
         'The fish burps. A warm red ember rolls out.'],
       ['m_gilly', "It swallowed a Heart Ember! No wonder it was so bright. Here, you have it.", 'It swallowed a Heart Ember! Have it.'],

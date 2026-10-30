@@ -255,7 +255,7 @@ function victory(){
   // (eb_endings is still kept, a9c_story.js, for the cloud merge and the tests; it is never shown)
   const E=ENDINGS[G.choices.ending||'hero'];
   $('#winTag').textContent='Act I complete'; $('#winTitle').textContent=E.title;
-  $('#winMsg').textContent=simplify(S('The valley is still yours to explore.','Go and explore!'));
+  $('#winMsg').textContent=simplify(S('The valley is still yours to explore, and somebody has saved you a bun.','Go and explore!'));
   $('#winStats').innerHTML=`<div class="stat"><b>${m}:${String(s).padStart(2,'0')}</b><span>Time</span></div><div class="stat"><b>${player.level}</b><span>Level</span></div><div class="stat"><b>${Object.values(G.quests).filter(q=>q.done).length}</b><span>Quests done</span></div>`;
   show('victory');
 }

@@ -910,7 +910,7 @@ function m3OctValve(D,v){
 { const base=updateInteractions; updateInteractions=function(dt){ base(dt);
     const D=AREA&&m3RoomD('m_octavia'); if(!D||!player||player.dead) return; const p=player;
     for(const v of D.valves){ const n=M3NRM[v.side], fx=v.x+n[0]*70, fy=v.y+n[1]*70; if(dist(p.x,p.y,fx,fy)<90){ G.prompt={text:S('Turn the valve!','Turn the valve!'),act:()=>m3OctValve(D,v),x:fx,y:fy,always:true,kind:'use'}; break; } } }; }
-defineFoe('m_octavia',{boss:true,name:'Madame Octavia',title:S('the Lantern Octopus','the lamp octopus'),short:'Madame Octavia',
+defineFoe('m_octavia',{boss:true,name:'Madame Octavia',title:S('Eight Arms, No Sharing','the lamp octopus'),short:'Madame Octavia',
   lv:18,hp:15500,r:50,speed:120,dmg:36,value:1800,swim:true,kbRes:0,dcol:'150,100,200',phases:[0.65,0.3],
   phaseText:[[S('High Tide!','The room floods!'),S('She floods the cellar. DIVE under the water, and hit her eye when she lunges out of a window!','Dive! Hit her eye when she comes out!'),['m_octavia',S('Bath time, dear!','Bath time!')]],
              [S('The Tides!','Flood and drain!'),S('She floods and drains the room. When she is out of a window in the flood, TURN A VALVE to drain it!','When she is out, turn a valve!'),['m_octavia',S('In, out, in, out! Like the sea!','In and out!')]]],
@@ -1070,7 +1070,7 @@ function m3PuffFlip(e){ e.flipT=byDiff(6,5,4.5); e.flips=(e.flips||0)+1; e.state
 // every Ground Pound: remember it (a pound just before his landing counts too), and flip him if it is right after one
 if(typeof p3OnPound==='function') p3OnPound(info=>{ if(info.drum) return; M3.lastPound=G.time; M3.lastPoundX=info.x; M3.lastPoundY=info.y;
   const e=G.boss; if(e&&!e.dead&&e.type==='m_puffington'&&e.mode==='ball'&&e.state==='landed'&&G.time-(e.landAt||-9)<m3PuffWin()&&dist(info.x,info.y,e.x,e.y)<210) m3PuffFlip(e); });
-defineFoe('m_puffington',{boss:true,name:'Baron Puffington',title:S('Keeper of the Sunken Gate','Keeper of the gate'),short:'Baron Puffington',
+defineFoe('m_puffington',{boss:true,name:'Baron Puffington',title:S('Stuck Up and Stuck Fast','Keeper of the gate'),short:'Baron Puffington',
   lv:18,hp:15000,r:70,speed:170,dmg:36,value:1800,swim:true,kbRes:0.2,dcol:'230,200,110',phases:[0.65,0.3],
   phaseText:[[S('Unpuffed!','He is out!'),S('He is small and fast and under the water. DIVE after him. Hit him when he pants or deflates.','Dive after him! Hit him when he is tired.'),['m_puffington',S('Catch me if you can! You cannot!','Catch me!')]],
              [S('Beach Ball!','Beach ball!'),S('He bounces onto the sandbank. Ground Pound just as he lands to flip him over!','Pound just as he lands!'),['m_puffington',S('BOING! BOING! Fear my bounce!','BOING!')]]],
@@ -1222,7 +1222,7 @@ function m3GutSpit(e){ e.state='spitW'; e.st=0.6; e.tele=newTele({shape:'cone',l
 function m3GutRear(e,D,p){ const C=m3Ctx(e), q={x:p.x+rand(-120,120),y:p.y+rand(-90,90)}; m3Hold(C,q,120); e.x=q.x; e.y=q.y; m3GutUnder(e,false); e.state='rear'; e.rear=true; e.st=byDiff(4.5,3.6,3); m3SandBurst(e.x,e.y,26); shake(6);
   fzAdd('c1mark',{x:e.x,y:e.y,r:70,dur:e.st,col:M3COL.gold,sparkle:true}); m3Txt(e,S('He rears up! Burrow under him and pop up!','Burrow under him! Pop up!'),'#ffd27a',14);
   m3Tip('belly',S('Pop up into his belly!','Pop up!'),S('While he rears up, burrow in the sand, go under him, and pop up.','Burrow under him, then pop up!')); }
-defineFoe('m_gravelgut',{boss:true,name:'Gravelgut',title:S('the Glass-Eater','the glass eater'),short:'Gravelgut',
+defineFoe('m_gravelgut',{boss:true,name:'Gravelgut',title:S('A King-Sized Tummy Ache','the glass eater'),short:'Gravelgut',
   lv:19,hp:18000,r:56,speed:190,dmg:40,value:2000,kbRes:0,dcol:'210,180,120',phases:[0.65,0.3],
   phaseText:[[S('Glass Spit!','Glass spit!'),S('He spits glass and leaps. BLAZE the sand into glass and stand on it: he will crack a tooth!','Blaze the sand into glass! Stand on it!'),['m_gravelgut',S('Hrrrk. Have some of my crunchies!','Have some crunchies!')]],
              [S('The Coil!','The worm lanes!'),S('Worms cross the hall. When he rears up, BURROW under him and POP UP into his belly!','Burrow under him and pop up!'),['m_gravelgut',S('Everybody out of the sand! Except me!','Everybody out!')]]],
@@ -1413,7 +1413,7 @@ function m3FanDark(e,dt,p,D,d,a){
     if(!player.dead&&!m3Up()&&dist(player.x,player.y,z.x,z.y)<z.r+player.r*0.5) hurtPlayer(m3Dmg(e,26),z.x,z.y,160);
     if(C) for(const o of C.braz) if(o.lit>0&&dist(o.x,o.y,z.x,z.y)<70){ o.lit=0; o.L.i=0; p4GlassRefresh(AREA); ftext(o.x,o.y-40,S('The brazier goes out!','Out!'),'#c8b8ff',13); } }}); }
 }
-defineFoe('m_fanfare',{boss:true,name:'Lord Fanfare',title:S('the Mirror Peacock','the mirror peacock'),short:'Lord Fanfare',
+defineFoe('m_fanfare',{boss:true,name:'Lord Fanfare',title:S('All Eyes on Him','the mirror peacock'),short:'Lord Fanfare',
   lv:20,hp:19500,r:34,speed:150,dmg:38,value:2200,kbRes:0.5,dcol:'170,220,210',phases:[0.65,0.3],
   phaseText:[[S('The Dark Hall!','It goes dark!'),S('He covers the skylight. Keep the moon braziers lit. Moonfire the crystal on the big mirror and turn it onto him!','Light the braziers! Turn the big mirror onto him!'),['m_fanfare',S('Lights out! Only I may shine!','Lights out!')]],
              [S('Fanfare!','Fanfare!'),S('His tail now bounces breath back from the front. Get behind him and Moonfire the last eyes!','Get behind him! Moonfire his eyes!'),['m_fanfare',S('BEHOLD MY GLORY!','Behold me!')]]],
@@ -1825,7 +1825,7 @@ M3HC.m_zapp=e=>{ const L=e._hc||(e._hc=[{},{},{},{}]); let n=0; const up=e.state
   m3HS(L,n++,{x:e.x,y:e.y,r:e.r+(up?6:0),m:up?2:1});
   const tr=e.tr||[]; for(const i of [3,6,9]) if(tr[i]) m3HS(L,n++,{x:tr[i].x,y:tr[i].y,r:12,m:0.7});
   L.length=n; return L; };
-defineFoe('m_zapp',{mini:true,name:'Lady Zapp',title:S('the Lantern Eel','the lantern eel'),short:'Lady Zapp',
+defineFoe('m_zapp',{mini:true,name:'Lady Zapp',title:S('Simply Shocking','the lantern eel'),short:'Lady Zapp',
   lv:19,hp:8500,r:16,speed:190,dmg:27,value:900,swim:true,kbRes:0,dcol:'150,210,250',
   ai:m3ZappAI,
   init(e,opt){ m3MiniInit(e,opt); e.mes=0; e.cd=1.4; e.state='chase'; e.sub=true; e.tr=[]; },
@@ -1894,7 +1894,7 @@ function m3FinAI(e,dt,p){
   if(s0==='finUp'&&e.state==='lunge') m3Say(e,'m_bigfin',S('CHOMP!','CHOMP!'),5);
   const D=m3Ctx(e); if(D.rect){ e.x=clamp(e.x,D.x0+e.r,D.x1-e.r); e.y=clamp(e.y,D.y0+e.r,D.y1-e.r); }
 }
-defineFoe('m_bigfin',{mini:true,name:'Big Fin',title:S('the Sandshark Matriarch','the big sand shark'),short:'Big Fin',
+defineFoe('m_bigfin',{mini:true,name:'Big Fin',title:S('Queen of the Sandpit','the big sand shark'),short:'Big Fin',
   lv:20,hp:13000,r:24,speed:230,dmg:28,value:1000,kbRes:0.4,dcol:'160,160,180',
   ai:m3FinAI,
   init(e,opt){ m3MiniInit(e,opt); m3SharkInit(e); e.homeX=e.x; e.homeY=e.y; e.outs=0;
@@ -1952,7 +1952,7 @@ function m3PrismPre(e,dt,d,a){
   const D=m3RoomOf(e); if(D&&D.mirror&&m3MirrorHits(D.mirror,e.x,e.y,e.r)&&!(e.blindCd>G.time)&&!(e.downT>0)){ e.blindCd=G.time+4.5; e.blinds=(e.blinds||0)+1; m3Stun(e,byDiff(2.6,2,1.8),S('The moonbeam blinds him!','Blinded!'),'stuck'); m3Ev('blind'); m3Say(e,'m_prism',S('My EYES! My beautiful eyes!','My eyes!'),3); }
   if(e.downT>0){ e.downT-=dt; e.dx=e.dy=0; e.state='stuck'; e.st=0.2; e.mv=null; e.tele=null; if(e.downT<=0){ e.state='recover'; e.st=0.4; } return true; }
   return false; }
-defineFoe('m_prism',{mini:true,name:'Prism',title:S('the Glass Lion','the glass lion'),short:'Prism',
+defineFoe('m_prism',{mini:true,name:'Prism',title:S('The Mane Attraction','the glass lion'),short:'Prism',
   lv:21,hp:14000,r:26,speed:150,dmg:29,value:1100,kbRes:0.5,dcol:'216,244,255',
   ai:FK.brain({move:'approach',stop:80,turn:3.5,cd:[0.9,1.6],recoverMove:0.3,pre:m3PrismPre,
     moves:[{k:'lunge',st:'crouch',st2:'pounce',windup:0.7,len:300,w:46,spd:760,time:0.4,dmgN:29,min:90,max:330,w:2.2,recover:0.8},
@@ -2072,7 +2072,7 @@ function m3DukeAI(e,dt,p){
   if(d<460){ e.state='dustW'; e.st=0.8; const q={x:p.x,y:p.y}; m3Mark({x:q.x,y:q.y,r:100,dur:m3W({},0.8),col:'205,200,225',fire:z=>{ m3Cloud(z.x,z.y,{r:100,life:2,slow:0.5,col:'205,200,225'}); if(!player.dead&&!m3Up()&&dist(player.x,player.y,z.x,z.y)<100){ if(hurtPlayer(m3Dmg(e,14),z.x,z.y,80)) player.slowT=Math.max(player.slowT||0,2); } }}); m3Puff(e.x,e.y-30,'205,200,225',14); }
 }
 M3HC.m_umberwing=e=>{ const L=e._hc||(e._hc=[{},{}]); let n=0; m3HS(L,n++,{x:e.x,y:e.y,r:e.r,m:1}); if(e.downT>0||e.state==='stare') m3HS(L,n++,{x:e.x+Math.cos(e.face)*8,y:e.y-6,r:16,m:1.5}); L.length=n; return L; };
-defineFoe('m_umberwing',{mini:true,name:'Duke Umberwing',title:S('the Moth Duke','the moth duke'),short:'Duke Umberwing',
+defineFoe('m_umberwing',{mini:true,name:'Duke Umberwing',title:S('Lord of the Light Snack','the moth duke'),short:'Duke Umberwing',
   lv:21,hp:15000,r:24,speed:160,dmg:29,value:1200,flying:true,kbRes:0.6,dcol:'184,168,208',
   ai:m3DukeAI,
   init(e,opt){ m3MiniInit(e,opt); e.state='chase'; e.cd=1.6; e.stares=0; e.falls=0; e.dust=0;

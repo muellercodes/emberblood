@@ -659,7 +659,7 @@ function n4aBuildSilent(){
   const C=n4aAdd('chimney',{id:'n_chimney_top',x:n4aP(3150,204)[0],y:n4aP(3150,204)[1],r:0,near:900});
   C.tick=()=>{ if(n4aF('n_chimney')||n4aAir()) return; if(n4aLvl()===3&&n4aNear(C.x,C.y,320)){ G.flags.n_chimney=1; n4aSnd('chime',0.6); n4aEmit('chimney',{}); n4aSave(); } };
   // the Shadow Raid out of the copy of the north gate: beat them for a chest
-  n4aAmbush('raid',{x:790,y:84380,r:330,n:8,types:['n_shade'],level:21,spread:[60,240],respawn:300,say:['ash',S("Shadow kobolds? I've beaten real ones. You don't scare me.","Shadow kobolds! You don't scare me!")]});
+  n4aAmbush('raid',{x:790,y:84380,r:330,n:8,types:['n_shade'],level:21,spread:[60,240],respawn:300,say:['ash',S("Shadow kobolds, through the North Gate again? Somebody lock that thing.","Shadow kobolds! Somebody lock that gate!")]});
   n4aChest('raid',860,84420,()=>n4aFound('n_amb_raid'));
   // Moth Memory 1 behind a cracked wall in the copy of Yara's house (its east doorway is bricked up and cracked)
   n4aCrackWall('yara',[715,84678],[715,84720],{th:12});
@@ -925,7 +925,7 @@ function n4aBuildRimeA(){
     for(let s=0;s<=1.001;s+=0.05){ const x=lerp(q.A[0],q.B[0],s), y=lerp(q.A[1],q.B[1],s); if(n4aJet(x,y,18)){ hot=true; break; } if(!warm&&n4aBreathOn(x,y,18)) warm=true; }
     if(hot){ q.heat+=dt; q.heatT=G.time; if(Math.random()<0.7){ const s=Math.random(); emit(lerp(q.A[0],q.B[0],s),lerp(q.A[1],q.B[1],s)-rand(10,60),1,{col:'200,236,255',ang:Math.PI/2,spread:0.4,smin:20,smax:70,lmin:.3,lmax:.6,zmin:1.2,zmax:2.4}); } if(Math.random()<dt*6) n4aSnd('melt',0.5); }
     else if(G.time-q.heatT>1.2) q.heat=Math.max(0,q.heat-dt*0.4);
-    if(warm){ n4aBub('n_bub_icewall','ash',S("My fire isn't hot enough for that. I need a BLAZE.",'Normal fire is too weak. Use Blaze!'),{once:false,again:12}); }
+    if(warm){ n4aBub('n_bub_icewall','ash',S("My fire's not hot enough for that. Time for a Blaze.",'Normal fire is too weak. Use Blaze!'),{once:false,again:12}); }
     if(q.heat>=n4aMeltNeed(2)){ G.found.n_ice_t3a=1; n4aSnd('ice'); shake(5); for(let i=0;i<40;i++){ const s=Math.random(); emit(lerp(q.A[0],q.B[0],s),lerp(q.A[1],q.B[1],s)-rand(0,70),1,{col:'210,240,255',ang:-Math.PI/2,spread:1.4,smin:40,smax:200,lmin:.4,lmax:1,zmin:1.5,zmax:4}); }
       n4aBanner(S('The ice wall melts!','The ice melts!'),'',2); n4aEmit('icewall',{}); n4aSave(); } };
   W.stand=(q,t)=>{ q.open=lerp(q.open,n4aFound('n_ice_t3a')?1:0,0.06); if(q.open>0.98) return; const n=Math.round(dist(q.A[0],q.A[1],q.B[0],q.B[1])/40), k=clamp(q.heat/n4aMeltNeed(2),0,1);

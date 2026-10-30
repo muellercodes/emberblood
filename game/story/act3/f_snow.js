@@ -8,9 +8,9 @@ chapter({
   id: 'f_snow', act: 3, after: 'c_snow', next: 'f_pass', takeover: true,
   // (no card at the act's start: Pebble's letter f_pb_1 shows "Act III · Chapter 1, A Letter in the Snow" when it is
   // read, as before, so the chapter card comes after Mom's letter and not on top of the act card)
-  card: null, name: ['A Letter in the Snow', 'A Letter in the Snow'],
+  card: null, name: ['Snow Way!', 'A Letter in the Snow'],
   so_far: [
-    "It is snowing in summer. Mom's letter says the cold comes over the High Pass by Frostpine Lodge, shut for a hundred years and suddenly open.",
+    "It is snowing in summer, and Bertram's buns have frozen into doorstops. Mom's letter says the cold comes over the High Pass by Frostpine Lodge, shut for a hundred years and suddenly open.",
     "It snows in summer. The cold comes over the High Pass by Frostpine Lodge."],
   hint: ['Frostpine Lodge is in the far north-west of Embermere, in the snowy highlands. Ulf will know about the pass.',
     'Go to Frostpine Lodge. Ask Ulf about the pass.'],
@@ -83,8 +83,8 @@ chapter({
       ['ash', "Where's Elka?", 'Where is Elka?'],
       ['ulf', '...She left a note.', 'She left a note.'],
       ['narr', "The note says: GONE SLEDDING. VERY FAR. BACK FOR SUPPER. (NOT TONIGHT'S.)", 'GONE SLEDDING. VERY FAR. BACK FOR SUPPER. (NOT TONIGHT.)', { clue: 'f3_elka_note' }],
-      ['brisket', "Don't look at me. I'm not going up there. You thawed me out of one block of ice already, and I am not getting into another.",
-        "I'm not going. I was an ice cube once. Once was enough.", { if: 'flag brisket_thawed' }],
+      ['brisket', "Don't look at me. I'm not going up there. You thawed me out of one block of ice already. Another one? Snow thank you.",
+        "I'm not going. I was an ice cube once. Snow thank you.", { if: 'flag brisket_thawed' }],
       ['ulf', 'Find her. And whatever is making winter up there, give it a good kick from me. Here: a wolf-fur hat with ear flaps. Wear it for me.',
         'Find her. Kick the winter for me. Here, a fur hat. Wear it for me.'],
     ],

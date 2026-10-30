@@ -7,7 +7,7 @@
 // ending, Penny's Press Pass. Old saves: QDEFS.c_gifts steps 0..5 map to lord, fig, prints, posy, tell, penny.
 quest({
   id: 'c_gifts', act: 2, giver: 'c_penny', optional: true, takeover: true,
-  title: ["The Moth Mask's Gifts", "The Moth Mask's Gifts"],
+  title: ['Face the Music', "The Moth Mask's Gifts"],
   payoff: { kind: 'truth', id: 'q_box_initials' },
   old_steps: ['lord', 'fig', 'prints', 'posy', 'tell', 'penny'],
 
@@ -53,7 +53,7 @@ quest({
 
   scene: {
     gf_offer: [
-      ['c_penny', 'HEADLINE: MOTH MASK STEALS GOLDEN MUSIC BOX. LORD WHIRLIGIG FAINTS. TWICE.', 'HEADLINE: MOTH MASK STEALS MUSIC BOX!'],
+      ['c_penny', 'HEADLINE: MOTH MASK WALTZES OFF WITH GOLDEN MUSIC BOX. LORD WHIRLIGIG FAINTS. TWICE.', 'HEADLINE: MOTH MASK STEALS MUSIC BOX!'],
       ['c_penny', 'Here is the thing. Half of what she takes from the barons turns up on Saltmarsh doorsteps.',
         'Her loot turns up on Saltmarsh doorsteps.'],
       ['c_penny', 'Follow the music box, find the Moth Mask. Scoop of the century. You in?', 'Follow the box. Find her. You in?'],

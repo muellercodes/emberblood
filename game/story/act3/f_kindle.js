@@ -10,9 +10,9 @@
 // Old flags kept: f_hearth_lit, f_pip_warm (with Pip), f_northgate, f_pb_2 (Pebble's letter, sent by f_maze's end).
 chapter({
   id: 'f_kindle', act: 3, after: 'f_maze', next: 'f_thaw', takeover: true,
-  card: null, name: ['The Dying Hearth', 'The Dying Hearth'],
+  card: null, name: ['Home Is Where the Hearth Is', 'The Dying Hearth'],
   so_far: [
-    "Ash has Blaze, Ember's blue fire, from her old North Forge in the Glacier Maze. Now the Great Hearth in Hearthold needs it, before its last little flame goes out.",
+    "Ash has Blaze, Ember's blue fire, from her old North Forge in the Glacier Maze. Now the Great Hearth in Hearthold needs it, before its last little flame goes out. A Hearthold with no hearth is just old.",
     'Ash has Blaze! Now the Great Hearth needs it.'],
   mom: [["BLUE fire? Show me. ...Not in the kitchen! Outside, outside!", 'Blue fire? Not in the kitchen!']],
 

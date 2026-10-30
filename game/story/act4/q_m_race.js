@@ -7,7 +7,7 @@
 // sets the old flag m_race_won.
 quest({
   id: 'm_race', act: 4, giver: 'm_rocket', optional: true, takeover: true,
-  title: ['The Coral Race', 'The Coral Race'],
+  title: ['The Fin-ish Line', 'The Coral Race'],
   payoff: { kind: 'upgrade', id: 'm_dolphin' },
   old_steps: ['race', 'kick'],
 
@@ -30,7 +30,7 @@ quest({
         'If I win, say "Rocket is the fastest". Forever.'],
       { choose: 'm_race_offer', ask: ['Race Rocket?', 'Race Rocket?'], pick: [
         { t: ["You're on, fish-boy.", "You're on!"], tone: 'brave', then: ['quest start m_race'],
-          say: [['m_rocket', 'Talk to me when you are ready. I am ALWAYS ready.', 'Talk to me when ready.']] },
+          say: [['m_rocket', 'Talk to me when you are ready. I am always ready. Always.', 'Talk to me when ready.']] },
         { t: ['Maybe later', 'Maybe later'], say: [['m_rocket', 'Scared? It is fine. Pickles was scared once. For a second.', 'Scared? Pickles was, once.']] },
       ] },
     ],

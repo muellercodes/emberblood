@@ -77,7 +77,7 @@ people({
         say: ['Without the Great Clock nobody in this city knows when lunch is. I had mine at nine in the morning.', 'No clock, so no lunch time. I ate at nine!'],
         re: [
           { t: ["That's just a big breakfast.", "That's a big breakfast."],
-            say: ['Do not tell the Bobs. They had theirs at four in the afternoon and called it supper.', 'The Bobs ate at four. They called it supper.'] },
+            say: ['Do not tell the Bobs. They had theirs at four in the afternoon and called it supper. Professor Sprocket says it was a time-saving measure. I have asked her to stop.', 'The Bobs ate at four. They called it supper.'] },
           { t: ['Who stops a whole city of clocks?', 'Who stops every clock?'],
             say: ['Not one girl with a sack. That clock is packed with dust like a pillow. Something far bigger came over that night.', 'Not one girl. Something big came that night.'] },
         ] },
@@ -164,7 +164,7 @@ people({
       { ask: ['Do you really write to Sister Wren?', 'Do you write to Wren?'],
         say: ['For thirty years. We have never agreed about anything. It is wonderful.', 'For thirty years. We never agree. It is wonderful.'] },
       { ask: ['Does Lord Whirligig borrow books?', 'Does Lord Whirligig read?'],
-        say: ['He owes me eleven books. ELEVEN. Sorry. Eleven. One of them is about manners.', 'He owes me eleven books! Sorry. Eleven.'] },
+        say: ['He owes me eleven books. ELEVEN. Sorry. Eleven. One of them is about manners. Penny chalked LORD OVERDUE on her board. I did not laugh. Much.', 'He owes me eleven books! Sorry. Eleven.'] },
       { ask: ['Have you always worked here?', 'Have you always been here?'], if: 'flag c_ottoline',
         say: ['When I was little I hid in here during a storm. The shelves kept turning, and I read every book that came past. Twice. I never really left.',
           'As a girl I hid here in a storm. I read every book. I stayed.'] },
@@ -183,7 +183,7 @@ people({
         say: ['That brass DOG has my hat. AGAIN. Tell Professor Sprocket I want it back. Tell her nicely. He bites.', 'That dog took my hat again!'] },
       { if: 'stage>=c_gear !flag c_clock_on !clue q_whirligig_sales', fact: 'c_great_clock=stopped',
         option: ['Has business been good?', 'How is business?'], then: ['clue q_whirligig_sales'],
-        say: ['Since every clock in town stopped? BOOMING. Everyone wants a new clock, and I have four hundred. Forty sold this week!',
+        say: ['Since every clock in town stopped? BOOMING. Everyone wants a new clock, and I have four hundred. Forty sold this week! Time is money, dragon.',
           'Every clock stopped. Now everyone buys mine!'] },
       // the snow (c_snow) is the news: these come first once it falls
       { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
@@ -357,7 +357,7 @@ people({
             say: ["Mother Pearl built the first three Bobs. She said, you'll guard this city when I'm gone. We said, where are you going? She laughed.", 'Pearl built us. She said, guard the city. We still do.'] },
         ] },
       { ask: ['Is the Captain very strict?', 'Is the Captain strict?'],
-        say: ['She wound us up once for being late. ...That is how we work, Bob.', 'She winds us up. That is how we work.'] },
+        say: ['She wound us up once for being late. ...That is how we work, Bob. Professor Sprocket laughed for ten minutes. We do not know why.', 'She winds us up. That is how we work.'] },
       { ask: ['Does the Moth Mask really steal hats?', 'Does she steal hats?'], if: '!seen brs_pile',
         say: ["She took Bob's hat. It was MY hat, Bob. It had a little badge that glowed. We want it back. Both of us.", "She took Bob's hat. It glowed. We want it back."] },
       { ask: ['I found your hat in her hideout.', 'I found your hat.'], if: 'seen brs_pile',
@@ -383,7 +383,7 @@ people({
       { if: 'quest c_bolt done', once: true,
         say: ['Bolt sneezed once this morning. ONCE. A record. Science!', 'Bolt only sneezed once today!'] },
       { if: 'quest c_tail done', once: true,
-        say: ["How's the Reel-In? Pulling things? Pulling too many things? That's a feature.", 'How is the Reel-In? Pulling lots?'] },
+        say: ["How's the Reel-In? Reeling them in? Pulling too many things? That's a feature.", 'How is the Reel-In? Pulling lots?'] },
       // Ash said he would invent something to keep people warm (said hettie_warm, below), then lit a stove with a breath
       { if: 'said hettie_warm quest c_oona done', once: true,
         say: ["You told me you'd invent something to keep people warm. Then you lit Granny Oona's stove with one breath. That's not inventing. That's showing off.",
@@ -395,7 +395,7 @@ people({
           { t: ['What are they saying?', 'What do they say?'],
             say: ['Colder every hour, and the cold comes from over the mountains. Something up there is breathing out.', 'Colder every hour. Something far off breathes out cold.'] },
           { t: ['Can you invent summer back?', 'Can you invent summer?'],
-            say: ['I am trying. It keeps exploding. Quill writes that the moon is smaller too. I did not want to know that.', 'I am trying. It explodes. And the moon is smaller.'] },
+            say: ['I am trying. It keeps exploding, which is the opposite of cold, so that is progress. Quill writes that the moon is smaller too.', 'I am trying. It explodes. And the moon is smaller.'] },
         ] },
       // after the gear: Ash has her glass and is hunting for clues
       { if: 'flag c_hettie stage=c_gear',
@@ -403,10 +403,10 @@ people({
         re: [
           { t: ['Silver prints on the Manor wall.', 'Prints on the Manor wall.'], if: 'clue g_roof_prints',
             say: ['On a wall? Going up? People do not walk up walls. ...Somebody does, apparently.', 'Up a wall? Somebody does, then.'] },
-          { t: ['Everything looks silver through it.', 'Everything looks silver.'],
-            say: ['Not everything. Only moth dust. If everything looks silver, this city is in more trouble than I thought.', 'Only dust shines. If all of it shines, we are in trouble.'] },
+          { t: ['Time to get this case into gear.', 'Time to get into gear!'],
+            say: ["Into gear! Ha! You'll fit right in here. Go on. Only moth dust shows silver through it, so follow the silver.", 'Ha! Into gear! Follow the silver.'] },
           { t: ['Why does moth dust stick to gears?', 'Why does dust stick?'],
-            say: ['It is greasy. Moths are greasy. I wrote a paper on it. Nobody read it.', 'It is greasy. I wrote a paper on it.'] },
+            say: ['It is greasy. Moths are greasy. I wrote a paper on it. Nobody read it. It was a bit dry.', 'It is greasy. I wrote a paper on it.'] },
         ] },
       // Bolt is still lost (her quest for him needs the Grapple Tail and opens later)
       { if: 'stage>=c_salt !quest c_bolt started',
@@ -436,8 +436,8 @@ people({
         say: ["Ingrid at the Bright Anvil makes the parts I can't. I make the parts she won't. Usually the exploding ones.", 'Ingrid makes my parts. I make the exploding ones.'] },
       { ask: ['Do you write to Professor Quill?', 'Do you know Professor Quill?'],
         say: ['About stars and screws. She thinks the moon is rock. I think it is gears. One of us is right.', 'She says the moon is rock. I say gears.'] },
-      { idle: [["Don't touch that. What do you need?", "Don't touch that. What?"], ["Mm? I'm listening. Mostly.", "I'm listening. Mostly."]] },
-      { bye: [['Mind the toaster on your way out. It knows what it did.', 'Mind the toaster on the way out.'], ['Go on. Science waits for nobody.', 'Go on. Science waits.']] },
+      { idle: [["Don't touch that. What do you need?", "Don't touch that. What?"], ["Mm? I'm listening. My gears are turning.", "I'm listening."]] },
+      { bye: [['Mind the toaster on your way out. It knows what it did.', 'Mind the toaster on the way out.'], ['Go on. Spring into action. Science waits for nobody.', 'Go on. Science waits.']] },
       { bark: true, say: ['If you hear a bang, that was the toaster. Probably.', "A bang? That's the toaster."] },
       { bark: true, if: '!quest c_bolt done', say: ["Bolt? Boooolt? Here, boy! ...He's not here, is he.", 'Bolt? Here, boy! Not here.'] },
     ],
@@ -678,9 +678,9 @@ people({
         say: ['You are still here! Good. A dragon kid in Gearhaven is the best story I have had all week, and I have had nine robberies.', 'A dragon kid! My best story all week.'],
         re: [
           { t: ['Am I going in the Gazette?', 'Am I in the paper?'],
-            say: ["You're already on the board. Under Dragon, Small. I'll cross out Small if you do something big.", "You're on the board. Dragon, Small. Do something big."] },
+            say: ["You're already on the board. Under Dragon, Small. I'll cross out Small if you do something big. Something front-page. Something scorching.", "You're on the board. Dragon, Small. Do something big."] },
           { t: ['Where does the Gazette get printed?', 'Where is it printed?'],
-            say: ['It used to be printed on a press. The press broke. Now the Gazette is me, and I shout it on corners.', 'The press broke. Now I shout the news.'] },
+            say: ['It used to be printed on a press. The press broke. Now the Gazette is me, and I shout it on corners. Hot off the Penny.', 'The press broke. Now I shout the news.'] },
           { t: ['Where does the Moth Mask live?', 'Where does she live?'],
             say: ["If I knew that, it'd be the biggest headline of my life. Nobody knows. That's the story.", "Nobody knows. That's the story!"] },
         ] },
@@ -720,7 +720,7 @@ people({
         say: ['Once. She won. Then she said I cheated, because I nearly won. Jo cannot lose nicely. Source: me.', 'Once. She won. She still said I cheated.'] },
       { idle: [["Go on. I'm writing.", "Go on. I'm writing."], ['Got a quote for me?', 'Got a quote?']] },
       { bye: [['Stay newsworthy!', 'Stay newsworthy!'], ['If anything happens, run toward it.', 'If something happens, run to it.']] },
-      { bark: true, say: ['EXTRA! EXTRA! GULL STEALS CHIPS! AGAIN!', 'EXTRA! GULL STEALS CHIPS!'] },
+      { bark: true, say: ['EXTRA! EXTRA! GULL STEALS CHIPS! AGAIN! SUSPECT HAS FLOWN THE COOP!', 'EXTRA! GULL STEALS CHIPS!'] },
       { bark: true, if: '!stage>=c_brass', say: ['EXTRA! MOTH MASK SEEN ON ROOFTOPS! DRAGON IN TOWN! THESE THINGS MAY BE CONNECTED!', 'EXTRA! MOTH MASK AND A DRAGON!'] },
     ],
 
@@ -763,7 +763,7 @@ people({
       { ask: ['What did you sell Lord Whirligig?', 'What did you sell the lord?'],
         say: ['A genuine mermaid comb. He says it is a fork. He keeps it on his mantelpiece anyway.', 'A mermaid comb. He says it is a fork.'] },
       { idle: [['Something caught your eye?', 'See something?'], ['Browse, dragon. Browsing is free. Mostly.', 'Browsing is free. Mostly.']] },
-      { bye: [['Come back remarkable!', 'Come back remarkable!']] },
+      { bye: [['Come back remarkable!', 'Come back remarkable!'], ["Mind my pots on the way out. Heroes always smash pots looking for coins. These are genuine mermaid pots. Merv's.", "Mind my pots. They are Merv's."]] },
       { bark: true, say: ['Remarkable rarities! Rarely remarkable! I mean the other way round!', 'Remarkable things for sale!'] },
     ],
 
@@ -860,7 +860,7 @@ people({
     // (c_salt.js has his line about the note first, until the Brassworks chapter.)
     c_charlie: [
       { if: 'quest c_whip done', once: true,
-        say: ['A ghost ate my chowder and said it was worth forty years. Best review I ever had.', 'A ghost loved my chowder!'] },
+        say: ['A ghost ate my chowder and said it was worth forty years. Best review I ever had. Spirits are up all over Saltmarsh.', 'A ghost loved my chowder!'] },
       { if: 'quest c_whip active !flag c_saltbeard_won item c_chowder', say: ["Don't you dare taste it.", "Don't taste it!"] },
       // the snow (c_snow) is the news: these come first once it falls
       { if: 'flag c_snow', fact: 'c_gearhaven=snowy',
@@ -891,13 +891,13 @@ people({
             say: ["Don't you dare. ...You've been talking to Cookie.", "Don't you dare! You talked to Cookie."] },
         ] },
       { ask: ['Do you really write to Cookie?', 'Do you write to Cookie?'],
-        say: ["Every month. She's wrong about everything. She's my best enemy.", "Every month. She's wrong. My best enemy."] },
+        say: ["Every month. She's wrong about everything, and I tell her so, for the halibut. She's my best enemy.", "Every month. She's wrong. My best enemy."] },
       { ask: ['Who taught you to cook?', 'Who taught you to cook?'],
         say: ['My mom. She made chowder for the whole village every winter, in a pot so big I could sit in it. I did, once. She was not pleased. The chowder was.', 'My mom. Her pot was so big I sat in it once.'] },
       { ask: ['Is Old Tarbuckle a good customer?', 'Is Tarbuckle a good customer?'],
         say: ['He eats my chowder every night and says it was better in his day. It was not. I was not born.', 'Every night. He says it was better in his day.'] },
-      { idle: [['Hungry? You look hungry.', 'Hungry? You look hungry.'], ["Pot's on. What is it?", "Pot's on. What?"]] },
-      { bye: [['Take a bowl for the road. No? Next time.', 'Take a bowl. No? Next time.'], ['Go on. Mind the boardwalk.', 'Mind the boardwalk.']] },
+      { idle: [['Hungry? You look hungry.', 'Hungry? You look hungry.'], ["Pot's on. What's cooking?", "Pot's on. What?"]] },
+      { bye: [['Take a bowl for the road. No? Next time.', 'Take a bowl. No? Next time.'], ['Go on. Sea you at supper.', 'Sea you at supper.']] },
       { bark: true, say: ['Chowder! Get your chowder! Hugged soup!', 'Chowder! Hugged soup!'] },
     ],
 
@@ -948,7 +948,7 @@ people({
         ] },
       { ask: ["Where is Posy's dad?", "Where is Posy's dad?"],
         say: ["Sailed out with the fleet last spring. I mend his net every night. Nobody's using it. I mend it anyway.", 'At sea with the fleet. I mend his net every night.'] },
-      { idle: [['Mm. Yes?', 'Mm. Yes?'], ['Mind the nets. What is it?', 'Mind the nets. What?']] },
+      { idle: [['Mm. Yes?', 'Mm. Yes?'], ['Mind the nets. If Charlie sent you with a fish joke, I have heard it.', 'Mind the nets. What?']] },
       { bye: [['Mind the hooks on your way.', 'Mind the hooks.']] },
       { bark: true, say: ['Mind the nets.'] },
     ],
@@ -1017,7 +1017,7 @@ people({
       { if: 'quest c_oona active !flag c_oona_nest !power claws',
         say: ["That roof's too steep for feet, duck. You'd want claws. Pearl's sort.", 'You need claws for that roof.'] },
       { if: 'quest c_oona active !flag c_oona_nest power claws',
-        say: ["The gull's still up there, glaring. He glared at Charlie once until Charlie dropped his ladle.", 'The gull is still up there. Glaring.'] },
+        say: ["The gull's still up there, glaring. He glared at Charlie once until Charlie dropped his ladle. And his jokes, for one whole day.", 'The gull is still up there. Glaring.'] },
       { if: 'quest c_oona active flag c_oona_nest !flag c_oona_lit',
         say: ["Breathe on it gently, duck. Gently. I'm fond of my eyebrows.", 'Breathe on the stove. Gently!'] },
       // after the chapter's visit, before her stove is lit
@@ -1197,7 +1197,7 @@ people({
         say: ["Snow! On a cliff! In June! I've had to shout louder!", 'Snow! In June! I shout louder now!'],
         re: [
           { t: ['How is that even possible?', 'How can you be louder?'],
-            say: ["Practice! Forty years of it! I came up here for a quiet life!", 'Practice! I came here for a quiet life!'] },
+            say: ["Practice! Forty years of it! The gulls taught me! I came up here for a quiet life!", 'Practice! I came here for a quiet life!'] },
           { t: ['Did Agatha wave last night?', 'Did Agatha wave?'], if: 'said maudie_lantern',
             say: ["Twice! Twice! We still don't know what it means! I waved back three times!", 'Twice! I waved back three times!'] },
         ] },
@@ -1245,7 +1245,7 @@ people({
     // for the people waiting at home. A story lead in Act II.
     c_agatha: [
       { if: 'choice fennick=forgive', once: true,
-        say: ['Word in the lamp trade is you let Fennick Wick off with a warning. Good. Nobody makes better oil.', 'You let Fennick off? Good. He makes the best oil.'] },
+        say: ['Word in the lamp trade is you let Fennick Wick off with a warning. Bright of you. Nobody makes better oil.', 'You let Fennick off? Good. He makes the best oil.'] },
       // she kept the light on for him on the Spire night (said agatha_light)
       { if: 'flag c_snow said agatha_light', once: true,
         say: ['I kept it on all night, like I said. You came back. Good. Squawk was worried. I was not.', 'I kept it on all night. You came back. Good.'] },
@@ -1322,7 +1322,7 @@ people({
       { ask: ['Does Maudie wave at you at night?', 'Does Maudie wave at you?'],
         say: ['Every night. I wave back. We have never agreed what it means. It does not seem to matter.', 'Every night. We never agreed what it means.'] },
       { idle: [['Hm. What is it?', 'Hm. What is it?'], ['Squawk, hush. Go on, dragon.', 'Squawk, hush. Go on.']] },
-      { bye: [['Mind the stairs. They are older than me.', 'Mind the stairs.'], ['Go on. Mind the rocks on the path.', 'Go on. Mind the rocks.']] },
+      { bye: [['Mind the stairs. They are older than me.', 'Mind the stairs.'], ['Go on, then. Squawk will tell everyone you were here. Twice.', 'Go on. Squawk will tell everyone.']] },
       { bark: true, say: ["Squawk. Stop it. Squawk. ...He's doing my voice again.", "Squawk. Stop it. He's copying me."] },
     ],
 
@@ -1350,8 +1350,8 @@ people({
       { if: '!quest c_chalk done',
         say: ["That's Duchess the Second, she's in charge. That's Gerald, he's in charge of nothing. He's happy.", 'Duchess is in charge. Gerald is not.'],
         re: [
-          { t: ['Is Gerald still silver?', 'Is Gerald still silver?'],
-            say: ['Bits of him. He sparkles when he faints. It seems to comfort him.', 'Bits. He sparkles when he faints.'] },
+          { t: ['Gerald looks a bit sheepish.', 'Gerald looks sheepish.'],
+            say: ['Sheepish! Ha! Good one, lad. Bits of him are still silver. He sparkles when he faints. It seems to comfort him.', 'Ha! He still sparkles when he faints.'] },
           { t: ['Why is Duchess the boss?', 'Why is Duchess boss?'],
             say: ['Nobody voted. She just stood on the highest rock and looked at us. That was that.', 'She stood on the top rock and looked at us.'] },
         ] },
@@ -1378,9 +1378,9 @@ people({
       { ask: ['Who kept the Chalk Dragon white?', 'Who kept her white?'], if: '!quest c_chalk done',
         say: ["My wife walked that line every spring, to keep it white. When she went, I tried. My knees said no. She's been greying ever since.", 'My wife kept her white. My knees cannot. She went grey.'] },
       { ask: ['Does Penny print your sheep news?', 'Does Penny print sheep news?'],
-        say: ['Never. I tell her every week. Gerald is very hurt.', 'Never. Gerald is very hurt.'] },
-      { idle: [['Sit a while. What is it?', 'Sit a while. What?'], ['Easy. The sheep are listening.', 'Easy. The sheep listen.']] },
-      { bye: [["Mind Gerald on your way out. He's lying down.", 'Mind Gerald. He is lying down.'], ['Sit a while, next time. The sea will wait.', 'Sit longer next time.']] },
+        say: ['Never. I tell her every week. She says it is not baa-d enough for the front page. Gerald is very hurt.', 'Never. Gerald is very hurt.'] },
+      { idle: [['Sit a while. What is it?', 'Sit a while. What?'], ['Easy. The sheep are listening. They herd everything.', 'Easy. The sheep listen.']] },
+      { bye: [["Mind Gerald on your way out. He's lying down.", 'Mind Gerald. He is lying down.'], ['Sit a while, next time. Ewe are always welcome.', 'Sit longer next time.']] },
       { bark: true, say: ["Easy, Gerald. Easy. ...He's fainted.", 'Easy, Gerald. ...He fainted.'] },
     ],
 

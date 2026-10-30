@@ -8,7 +8,7 @@
 // N5b's dawn reads `solved n5_who_follows` ("DUCHESS! I KNEW it!"). The quest starts at the tassel.
 quest({
   id: 'q_n5_follower', act: 5, optional: true,
-  title: ['Who Is Following You?', 'Who is following you?'],
+  title: ['Hoof Goes There?', 'Who is following you?'],
   payoff: { kind: 'heart_ember', id: 'n5_hollis' },
 
   item: {

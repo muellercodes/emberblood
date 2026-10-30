@@ -10,9 +10,9 @@
 // Old flags kept: f_arrived; the stage moves on to f_hearth.
 chapter({
   id: 'f_pass', act: 3, after: 'f_snow', next: 'f_hearth', takeover: true,
-  card: null, name: ['A Letter in the Snow', 'A Letter in the Snow'],
+  card: null, name: ['Snow Way!', 'A Letter in the Snow'],
   so_far: [
-    'The High Pass split open one night, as if something big with wings flew through it. Beyond it lies Frostreach, a white land under a humming purple storm.',
+    'The High Pass split open one night, as if something big with wings flew through it. Beyond it lies Frostreach: white hills, stubborn people, and a purple storm that hums.',
     'The High Pass is open. Beyond it is Frostreach, white and snowy.'],
   mom: [['Over the High Pass? Two scarves. I mean it.', 'Over the High Pass? Two scarves!']],
 

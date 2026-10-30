@@ -8,9 +8,9 @@
 // the hottest place in the north (a red herring: hot water is not fire). Then the player works out where to go.
 chapter({
   id: 'f_hearth', act: 3, after: 'f_pass', next: 'f_maze', takeover: true,
-  card: ['Act III · Chapter 2', 'The Dying Hearth'],
+  card: ['Act III · Chapter 2', ['Home Is Where the Hearth Is', 'The Dying Hearth']],
   so_far: [
-    "Hearthold huddles round its Great Hearth, and the Hearth is dying: it sank to a flicker the night a white moth flew over to Mount Dread. It was first lit with Blaze, a blue fire, and nobody alive knows where Blaze came from.",
+    "Hearthold is named after its Great Hearth, and the Hearth is dying: it sank to a flicker the night a white moth flew over to Mount Dread. It was first lit with Blaze, a blue fire, and nobody alive knows where Blaze came from.",
     'The Great Hearth is dying. It was lit with blue fire. Nobody knows where that came from.'],
   mom: [["A town with a giant fireplace? That's my kind of town.", 'A town with a giant fireplace? Nice!']],
 

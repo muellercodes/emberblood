@@ -10,7 +10,7 @@
 // Old flags kept: m_mpb_foot / m_moonpath_lit (x3_world and x3_story count the braziers), m_leash_known.
 chapter({
   id: 'm_moonpath', act: 4, after: 'm_mirror', next: 'm_observatory', takeover: true,
-  card: ['Act IV · Chapter 5', 'The Eclipse Observatory'],
+  card: ['Act IV · Chapter 5', ['Starstruck', 'The Eclipse Observatory']],
   so_far: [
     'Moonfire lights the moon-glass stairs of the Moonpath, up to the Eclipse Observatory. Hush is up there, on a silver leash, guarding the last Shard.',
     'Moonfire lights the glass stairs, up to the Observatory. Hush waits there.'],

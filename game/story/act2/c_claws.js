@@ -8,7 +8,7 @@ chapter({
   id: 'c_claws', act: 2, after: 'c_salt', next: 'c_brass', takeover: true,
   card: null,
   so_far: [
-    "The Moth Mask is Vesper Saltwhistle, of Saltmarsh. She and her gran are all that is left of Mother Pearl's family. Ash fixed the Tide Clock and the sea went out at last. Granny Oona lives in a crooked house where no fire lasts the night. And Pearl learned to climb in the Gullcrag Caves, out across the sands.",
+    "The Moth Mask is Vesper Saltwhistle, of Saltmarsh. She and her gran are all that is left of Mother Pearl's family. Ash fixed the Tide Clock, and the sea went out at last, sulking. Granny Oona lives in a crooked house where no fire lasts the night. And Pearl learned to climb in the Gullcrag Caves, out across the sands.",
     "The Moth Mask is Vesper, Granny Oona's girl. The tide is out. Pearl learned to climb in the Gullcrag Caves."],
   hint: ['The Gullcrag Caves are at the foot of the dark cliff, across the Gullcrag Sands. The tide is low now.',
     'The caves are across the sand, under the dark cliff.'],

@@ -9,7 +9,7 @@
 // Every scene here is an old STORY key, replaced in place.
 chapter({
   id: 'f_dread', act: 3, after: 'f_dreadgate', next: 'f_glaciar', takeover: true,
-  card: null, name: ['The Dreadgate', 'The Dreadgate'],
+  card: null, name: ['Moth to a Flame', 'The Dreadgate'],
   so_far: [
     'Ash knocked on the mountain with a Ground Pound and beat Hush at the Dreadgate. The Frost Lock broke. Now he climbs up through the Heart of Dread, toward whoever is breathing out the Long Winter.',
     'The Dreadgate is open! Ash climbs up inside the mountain.'],
@@ -95,7 +95,7 @@ chapter({
     f_crown_door: [
       ['narr', 'The last chain snaps. You climb out of the summit door into the blizzard, and it howls right in your face.', 'The last chain snaps. You climb out into the howling blizzard.', { ref: 'f_crown' }],
       { cam: 'f3_glaciar_face', s: 2 },
-      ['narr', 'Then, all at once, the wind stops. Like someone pressed a button.', 'Then the wind stops. All at once.'],
+      ['narr', 'Then, all at once, the wind stops. Like somebody shut a door on it.', 'Then the wind stops. All at once.'],
       ['tove', 'She\'s right there, Ash. I can feel her. She\'s so cold she\'s almost warm.', 'She\'s right there. She\'s so cold she\'s almost warm.'],
       { if: 'solved snow_mother', then: [
         ['ash', "Okay. Okay. I'm going to meet Grandpa's sister. Hat off. Be polite. Drink the ice tea.", "Okay. I'm meeting Grandpa's sister. Be polite."] ],

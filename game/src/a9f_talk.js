@@ -145,9 +145,12 @@ function firstGreet(id,c){
   else{ if(metBefore(id)) return null; L=AWAY_GEN[n%AWAY_GEN.length](c.name); }
   return L?S(L[0],L[1]):null;
 }
+const MUTE_TALK=new Set(['f_nisse','f_greymane']);
 // what someone will say about the world, chosen by friendship and time
 function greetLine(id){
   const c=CASTBY[id]||SPECIAL[id]||{name:personName(id)}, f=friendOf(id), T=TALK[id]||{}, night=isNight();
+  // animals that do not talk (Nisse the goat, Greymane the wolf) never greet like people, in any act: they say their own line
+  if(MUTE_TALK.has(id)){ const L=(SPECIAL[id]&&SPECIAL[id].lines)||[]; if(L.length) return pick(L); }
   const first=!(G.seenTalk&&G.seenTalk['met_'+id]);
   if(first&&id!=='maren'&&id!=='yara'){ const g=firstGreet(id,c); if(g) return g; }
   const dg=deedGreet(id); if(dg) return dg;
