@@ -10,7 +10,7 @@
 // key, so x3_dun_b plays the data text in place. Old flags kept: m_mirror_done (from trial_m_mirror_done), m_pip_lamp.
 chapter({
   id: 'm_mirror', act: 4, after: 'm_glasswall', next: 'm_moonpath', takeover: true,
-  card: null, name: ['Mirrors', 'Mirrors'],
+  card: null, name: ['Seeing Things', 'Mirrors'],
   so_far: [
     "Nyxara drank the Moon Well and asked for all three Shards. Ash dug under the Glasswall to the Mirror Temple, where Ember hid her moonfire.",
     'Nyxara drank the Moon Well. Ash dug under the wall to the Mirror Temple.'],

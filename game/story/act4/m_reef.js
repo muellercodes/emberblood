@@ -9,9 +9,9 @@
 // again at eclipse 2 and at the reform (A4b). The eclipse pictures are the look m4a_eclipse (v10_art4a.js).
 chapter({
   id: 'm_reef', act: 4, after: 'm_coral', next: 'm_sable', takeover: true,
-  card: ['Act IV · Chapter 3', 'The Glass Desert'],
+  card: ['Act IV · Chapter 3', ['Glass Half Full', 'The Glass Desert']],
   so_far: [
-    'Ash worked out where the last Shard went: east, to the Eclipse Observatory. The only way east is under the Reefwall, through the Sunken Gate. A pufferfish is stuck in it.',
+    'Ash worked out where the last Shard went: east, to the Eclipse Observatory. The only way east is under the Reefwall, through the Sunken Gate. A pufferfish is stuck in it, and very full of himself.',
     'The Shard went east, to the Observatory. A fish is stuck in the gate.'],
   hint: ['The Sunken Gate is in the Reefwall, east across the sea. A pufferfish is stuck in it. Bring bombs: a fish full of air does not like a bang.',
     'The Sunken Gate is east, in the Reefwall. A fish is stuck in it. Bring bombs!'],

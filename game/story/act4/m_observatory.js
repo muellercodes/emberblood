@@ -11,7 +11,7 @@
 // m_leash_known (also set by the free pick, for the finale's errand B2), m_umber_done, G.choices.extra.m_hush.
 chapter({
   id: 'm_observatory', act: 4, after: 'm_moonpath', next: 'm_reforge', takeover: true,
-  card: null, name: ['The Eclipse Observatory', 'The Eclipse Observatory'],
+  card: null, name: ['Starstruck', 'The Eclipse Observatory'],
   so_far: [
     'Hush is back, big and cold, on a silver leash. She guards the last Shard in the Eclipse Observatory. Ash knows how to set her free.',
     'Hush guards the last Shard. Ash knows how to free her.'],
@@ -87,8 +87,8 @@ chapter({
     ],
     // Hush's intro, before the fight: at most 10 lines with both allies (their two lines are one now)
     m_hush_intro: [
-      ['narr', 'Under the great dome, on a floor of brass rings, a white moth as big as a barn sits very still. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.',
-               'Under the dome sits a white moth as big as a barn. A silver thread runs from her neck to two knots, then up into the dark.'],
+      ['narr', 'Under the great dome, on a floor of brass rings, a white moth with wings as wide as the floor sits very still. A silver thread runs from her neck down to two knots in the floor, then straight up through the open dome into the dark.',
+               'Under the dome sits a huge white moth. A silver thread runs from her neck to two knots, then up into the dark.'],
       ['narr', 'Beside her, in a little brass cradle, something glows silver. The Moon Shard.', 'Beside her, something glows silver. The Moon Shard.'],
       // Act III's choice f_hush (A3b, J5 v11): Ash wrapped her in Ylva's red scarf ('scarf'), or ('shoo') told her "Fly
       // home, then. Tell her I'm coming." She did, and the Mother put the leash on her

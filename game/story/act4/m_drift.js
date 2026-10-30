@@ -10,13 +10,13 @@
 // bite out of its glass (clue m4_chewed_lamp for the optional lamp_thief mystery).
 chapter({
   id: 'm_drift', act: 4, after: 'm_sail', next: 'm_lumen', takeover: true,
-  card: null, name: ['Across the Sea', 'Across the Sea'],
+  card: null, name: ['Making Waves', 'Across the Sea'],
   so_far: [
-    "Ash sailed east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the sea, and the Glass Desert, where the moon's broken light fell as glass. In Driftwood Landing, the tide has gone wobbly.",
+    "Ash sailed east to Moonfall: the Sunken Isles, where drowned Old Lumen sleeps under the sea, and the Glass Desert, where the moon's broken light fell as glass. In Driftwood Landing, the tide has gone wobbly, and the whole town with it.",
     'Ash came to Moonfall. In the floating town, the tide has gone wobbly.'],
   hint: ['Mayor Dabble is on the big Town Raft. Old Winnie is the one with the seashell hat. And the octopus.',
     'Mayor Dabble is on the Town Raft. Old Winnie has a seashell hat.'],
-  mom: [["A floating town? Does it have floors? Mind you don't fall between them.", "A floating town! Don't fall in."]],
+  mom: [['A town that floats? Keep your boots on. Even in bed.', 'A floating town! Keep your boots on.']],
 
   place: {
     // the tide post at the south edge of the Town Raft, beside the plank jetty down to the Floating Kitchen
@@ -125,7 +125,7 @@ chapter({
       ['m_gilly', 'Fish stew? Fish pie? Fish pudding? No? Hmph. Nobody ever wants the pudding.', 'Fish stew? Fish pie? Fish pudding? No?'],
       ['ash', "Do you know why the tide's gone wobbly?", 'Why is the tide wobbly?'],
       ['m_gilly', 'Tides, no. Fish, yes. My fish always come in on the full moon, regular as soup.', 'I know fish. My fish come in on the full moon.'],
-      ['m_gilly', "But for a month now they don't know when to come. Last week a whole school turned up at midnight in a panic.",
+      ['m_gilly', "But for a month now they don't know when to come. Last week a whole school of them turned up at midnight in a panic. Not one had done its homework.",
         "Now they don't know when to come. For a month now!"],
       ['m_gilly', 'Poor things. I gave them a pudding.', 'Poor things. I gave them a pudding.'],
     ],

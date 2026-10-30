@@ -8,7 +8,7 @@
 // m3pAt('m_noodle',0): a legacy step; reaching the nest sets m_noodle_home).
 quest({
   id: 'm_noodle', act: 4, giver: 'm_dusty', optional: true, takeover: true,
-  title: ['Noodle Wants His Mom', 'Noodle Wants His Mom'],
+  title: ['Oodles of Noodles', 'Noodle Wants His Mom'],
   payoff: { kind: 'upgrade', id: 'm_wormtunnel' },
   old_steps: ['home', 'sandy'],
 
