@@ -515,6 +515,7 @@ const CAVE_STYLE={
   sky:{floor:'#e2dac8',floor2:'#d8d0bc',top:'#f6f1e4',face:'#a8987a',edge:'#ffe6a0',water:'#3a6aa8',accent:'#ffd860'}
 };
 function renderCaveRooms(A,def){
+  if(LOOK.re) return riCaveRooms(A,def);
   const c=A.cave, S=0.5, cs=c.cell, W2=c.w*cs, H2=c.h*cs, cv=mkCanvas(W2*S,H2*S), g=cv.getContext('2d'), st=CAVE_STYLE[def.theme]||CAVE_STYLE.earth, rng=mulberry32(def.seed);
   g.scale(S,S);
   const solid=(i,j)=>i<0||j<0||i>=c.w||j>=c.h||c.grid[j*c.w+i]===1&&c.typ[j*c.w+i]!==1;

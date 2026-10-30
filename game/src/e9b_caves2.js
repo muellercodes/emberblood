@@ -785,6 +785,7 @@ const C2PAL={
 function c2Pal(){ const A=AREA; return C2PAL[(A&&A.def&&A.def.theme)]||C2PAL.mine; }
 { const base=renderCaveRooms; renderCaveRooms=function(A,def){ base(A,def); if(A.cave&&A.cave.c2&&C2.ids[def.id]) c2PaintStatic(A,def); }; }
 function c2PaintStatic(A,def){
+  if(LOOK.re) return riC2Static(A,def);
   const c=A.cave, cs=c.cell, g=A.canvas.getContext('2d'), P=C2PAL[def.theme]||C2PAL.mine, rng=mulberry32(def.seed*13+7), Zc=c.c2;
   g.save(); g.setTransform(A.canvasS,0,0,A.canvasS,0,0); g.lineJoin='round'; g.lineCap='round';
   const T=C2.T, typ=(i,j)=>(i<0||j<0||i>=c.w||j>=c.h)?-1:c.typ[j*c.w+i], solid=(i,j)=>i<0||j<0||i>=c.w||j>=c.h||c.grid[j*c.w+i]===1;
@@ -2143,7 +2144,7 @@ C2CELLDRAW.push((A,Z,c,cs,i0,j0,i1,j1,t)=>{
     const x=A.x0+i*cs, y=A.y0+j*cs, s=Z.st[k];
     if(s===1){ const left=Z.tm[k]; ctx.drawImage(c2CoolTile((i+j)%3),x,y,cs,cs); if(left<1.6){ const a=(Math.sin(t*(left<0.6?30:14))*0.5+0.5)*0.55*(1-left/1.6); ctx.fillStyle=`rgba(255,110,30,${a})`; ctx.fillRect(x,y,cs,cs); } continue; }
     const lv=ty===T.lava?3:c2Flood(k), need=ty===T.mid?2:1;
-    if(ty===T.lava||lv>=need){ if(ty!==T.lava) ctx.drawImage(c2LavaTile((i*3+j)%4),x,y,cs,cs); const q=Math.sin(t*2.2+i*0.9+j*1.3); if(q>0.4){ ctx.fillStyle=`rgba(255,220,120,${(q-0.4)*0.35})`; ctx.beginPath(); ctx.ellipse(x+cs/2,y+cs/2,cs*0.3,cs*0.16,0,0,TAU); ctx.fill(); } continue; }
+    if(ty===T.lava||lv>=need){ if(ty!==T.lava){ if(LOOK.re) riLavaDraw(ctx,x,y,cs,cs,i*cs,j*cs); else ctx.drawImage(c2LavaTile((i*3+j)%4),x,y,cs,cs); } const q=Math.sin(t*2.2+i*0.9+j*1.3); if(q>0.4){ ctx.fillStyle=`rgba(255,220,120,${(q-0.4)*0.35})`; ctx.beginPath(); ctx.ellipse(x+cs/2,y+cs/2,cs*0.3,cs*0.16,0,0,TAU); ctx.fill(); } continue; }
     // dry basalt: glows hotter and hotter as the lava comes
     const s2=c2FloodIn(k,1.6); if(s2<1.6){ const a=(1-s2/1.6); ctx.fillStyle=`rgba(255,${120-a*60|0},30,${0.15+0.45*a*(0.6+0.4*Math.sin(t*18))})`; ctx.fillRect(x+1,y+1,cs-2,cs-2); }
   }

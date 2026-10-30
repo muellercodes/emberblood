@@ -1,15 +1,16 @@
 
 // ================= art for cave puzzles, doors and house secrets (drawn live, on top of the cached room art)
-function drawSym(i,x,y,s,col){
-  ctx.save(); ctx.translate(x,y); ctx.scale(s,s); ctx.fillStyle=col; ctx.strokeStyle=col; ctx.lineWidth=2; ctx.lineCap='round';
-  if(i===0){ ctx.beginPath(); ctx.arc(0,0,4,0,TAU); ctx.fill(); for(let a=0;a<8;a++){ ctx.beginPath(); ctx.moveTo(Math.cos(a*TAU/8)*6,Math.sin(a*TAU/8)*6); ctx.lineTo(Math.cos(a*TAU/8)*9,Math.sin(a*TAU/8)*9); ctx.stroke(); } }
-  else if(i===1){ ctx.beginPath(); ctx.arc(0,0,8,0.6,TAU-0.6); ctx.arc(3,0,6,TAU-1.0,1.0,true); ctx.closePath(); ctx.fill(); }
-  else if(i===2){ ctx.beginPath(); for(let k=0;k<10;k++){ const a=-Math.PI/2+k*Math.PI/5, r=k%2?3.5:8.5; k?ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r):ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r); } ctx.closePath(); ctx.fill(); }
-  else { ctx.beginPath(); ctx.moveTo(0,8); ctx.quadraticCurveTo(-9,0,0,-8); ctx.quadraticCurveTo(9,0,0,8); ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(0,8); ctx.lineTo(0,-6); ctx.stroke(); }
-  ctx.restore();
+function drawSym(i,x,y,s,col,g){ g=g||ctx;
+  g.save(); g.translate(x,y); g.scale(s,s); g.fillStyle=col; g.strokeStyle=col; g.lineWidth=2; g.lineCap='round';
+  if(i===0){ g.beginPath(); g.arc(0,0,4,0,TAU); g.fill(); for(let a=0;a<8;a++){ g.beginPath(); g.moveTo(Math.cos(a*TAU/8)*6,Math.sin(a*TAU/8)*6); g.lineTo(Math.cos(a*TAU/8)*9,Math.sin(a*TAU/8)*9); g.stroke(); } }
+  else if(i===1){ g.beginPath(); g.arc(0,0,8,0.6,TAU-0.6); g.arc(3,0,6,TAU-1.0,1.0,true); g.closePath(); g.fill(); }
+  else if(i===2){ g.beginPath(); for(let k=0;k<10;k++){ const a=-Math.PI/2+k*Math.PI/5, r=k%2?3.5:8.5; k?g.lineTo(Math.cos(a)*r,Math.sin(a)*r):g.moveTo(Math.cos(a)*r,Math.sin(a)*r); } g.closePath(); g.fill(); }
+  else { g.beginPath(); g.moveTo(0,8); g.quadraticCurveTo(-9,0,0,-8); g.quadraticCurveTo(9,0,0,8); g.fill(); g.strokeStyle='rgba(0,0,0,.45)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(0,8); g.lineTo(0,-6); g.stroke(); }
+  g.restore();
 }
 function caveSt(){ return (AREA&&CAVE_STYLE[AREA.def.theme])||CAVE_STYLE.earth; }
 function stoneBlock(x,y,w,h,top,face,lift){
+  if(LOOK.re) return riStoneBlock(x,y,w,h,top,face,lift);
   lift=lift==null?10:lift;
   ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(x-w/2+3,y-h/2+5,w,h);
   ctx.fillStyle=face; ctx.fillRect(x-w/2,y-h/2+h-lift,w,lift);
@@ -18,6 +19,7 @@ function stoneBlock(x,y,w,h,top,face,lift){
 }
 function mixHex(a,b,t){ return `rgb(${mixRGB(hexRGB(a),hexRGB(b),t).map(Math.round).join(',')})`; }
 function drawFurnX(o,t){
+  if(LOOK.re&&riFurnX(o,t)) return true;
   const x=o.x, y=o.y, st=caveSt();
   switch(o.k){
     case 'cgate':{
@@ -170,11 +172,12 @@ const STAIR_SPR=new Map();
 const stC=(a,b,k)=>{ const m=mixRGB(hexRGB(a),hexRGB(b),clamp(k,0,1)); return '#'+m.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); };
 const stairZ=h=>Math.round(h*0.56);   // how far the top of an up flight rises above its footprint (screen px)
 function stairSprite(dir,w,h,mk,lid){
-  const key=dir+'|'+w+'|'+h+'|'+mk+'|'+(lid?1:0)+'|'+(LOOK.sb?1:0); let c=STAIR_SPR.get(key); if(c) return c;
+  const key=dir+'|'+w+'|'+h+'|'+mk+'|'+(lid?1:0)+'|'+(LOOK.sb?1:0)+(LOOK.re?'|re':''); let c=STAIR_SPR.get(key); if(c) return c;
   const M=STAIR_MAT[mk]||STAIR_MAT.wood, Z=dir==='up'?stairZ(h):0, pad=10, top=dir==='up'?Z+12:(lid?16:4);
   const W=w+pad*2, H=h+top+pad, sc=2, cv=mkCanvas(W*sc,H*sc), g=cv.getContext('2d');
   g.scale(sc,sc); g.translate(pad+w/2,top+h/2); g.lineJoin='round'; g.lineCap='round';
   if(dir==='up') stairUpArt(g,w,h,M,Z); else stairDownArt(g,w,h,M,lid);
+  if(LOOK.re) rzRelight(cv,{bump:2,ao:0.1,aoR:3,edge:2,sat:0.86});
   c=LOOK.sb?outlineSprite(cv,SBC.outline,1.5,{force:true}):cv; c.ox=pad+w/2; c.oy=top+h/2; c.w2=W; c.h2=H; STAIR_SPR.set(key,c); return c;
 }
 function stairUpArt(g,w,h,M,Z){
@@ -244,6 +247,7 @@ function drawStairArt(x,y,w,h,dir,mk,t,lid){
 }
 function hintedKey(key){ if(!G||!G.hints) return false; for(const h in G.hints) if(key.startsWith(h)) return true; return false; }
 function drawFurnHouseX(o,t){
+  if(LOOK.re&&riHouseX(o,t)) return true;
   const x=o.x, y=o.y;
   switch(o.k){
     case 'stairs':{

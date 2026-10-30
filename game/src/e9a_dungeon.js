@@ -687,6 +687,7 @@ function gainHeartEmber(id){
 
 // ---------- 10. art: the cached floor (cells and raised faces), the live floor layer, the new objects
 function dunTile(g,x,y,cs,st,i,j,rng,k2){ // a plain cave floor tile, k2 lightens (+) or darkens (-)
+  if(LOOK.re&&riDunTile(g,x,y,cs,st,k2)) return;
   g.fillStyle=r2c((i+j)%2?st.floor:st.floor2,k2||0); g.fillRect(x,y,cs,cs);
   g.fillStyle='rgba(255,255,255,.035)'; g.fillRect(x+2,y+2,cs-4,3);
   g.strokeStyle='rgba(0,0,0,.22)'; g.lineWidth=1.5; g.strokeRect(x+0.5,y+0.5,cs-1,cs-1);
@@ -712,7 +713,7 @@ function dunPaintCell(g,c,k,i,j,x,y,cs,st,rng,def){
   switch(t){
     case DTY.crack: dunTile(g,x,y,cs,st,i,j,rng,-0.05); g.strokeStyle='rgba(0,0,0,.6)'; g.lineWidth=1.6; g.beginPath(); { const cx=x+cs*(0.35+rng()*0.3), cy=y+cs*(0.35+rng()*0.3); for(let a=0;a<5;a++){ const an=a*1.3+rng(); g.moveTo(cx,cy); const mx=cx+Math.cos(an)*cs*0.25, my=cy+Math.sin(an)*cs*0.25; g.lineTo(mx,my); g.lineTo(mx+Math.cos(an+0.6)*cs*0.22,my+Math.sin(an+0.6)*cs*0.22); } } g.stroke(); g.strokeStyle='rgba(255,230,190,.12)'; g.lineWidth=1; g.stroke(); return true;
     case DTY.drop: dunHoleArt(g,c,i,j,x,y,cs,st,'255,200,140'); return true;
-    case DTY.high: case DTY.ledge: { g.fillStyle=r2c((i+j)%2?st.floor:st.floor2,0.22); g.fillRect(x,y,cs,cs); g.strokeStyle='rgba(0,0,0,.18)'; g.lineWidth=1.5; g.strokeRect(x+0.5,y+0.5,cs-1,cs-1); g.fillStyle='rgba(255,255,255,.07)'; g.fillRect(x+2,y+2,cs-4,3);
+    case DTY.high: case DTY.ledge: { if(LOOK.re) riDunTile(g,x,y,cs,st,0.16); else { g.fillStyle=r2c((i+j)%2?st.floor:st.floor2,0.22); g.fillRect(x,y,cs,cs); g.strokeStyle='rgba(0,0,0,.18)'; g.lineWidth=1.5; g.strokeRect(x+0.5,y+0.5,cs-1,cs-1); g.fillStyle='rgba(255,255,255,.07)'; g.fillRect(x+2,y+2,cs-4,3); }
       const low=(q)=>q>=0&&q<c.typ.length&&c.grid[q]===0&&dunHq(c,q)===0;
       g.fillStyle=`rgba(${hexRGB(st.edge).join(',')},.5)`; if(low(k-c.w)) g.fillRect(x,y,cs,2.5); if(low(k-1)) g.fillRect(x,y,2.5,cs); if(low(k+1)) g.fillRect(x+cs-2.5,y,2.5,cs);
       if(t===DTY.ledge){ g.fillStyle='rgba(255,236,190,.35)'; for(const [q,dx,dy] of [[k+c.w,0,1],[k-1,-1,0],[k+1,1,0]]) if(low(q)){ for(let n=0;n<3;n++){ const px=x+cs/2+dx*cs*0.38+(dy?(n-1)*12:0), py=y+cs/2+dy*cs*0.38+(dx?(n-1)*12:0); g.beginPath(); g.moveTo(px+dx*4,py+dy*4); g.lineTo(px-dy*4-dx*2,py-dx*4-dy*2); g.lineTo(px+dy*4-dx*2,py+dx*4-dy*2); g.closePath(); g.fill(); } } }
@@ -746,7 +747,8 @@ const dunHq=(c,q)=>{ const t=c.typ[q]; return t===DTY.ramp?-1:isRaised(t)?1:0; }
     if(!any) return;
     const g=A.canvas.getContext('2d'); g.save(); g.setTransform(A.canvasS,0,0,A.canvasS,0,0);
     for(let j=1;j<c.h;j++) for(let i=0;i<c.w;i++){ const k=j*c.w+i; if(c.grid[k]!==0||dunHq(c,k)!==0) continue; const x=i*cs, y=j*cs;
-      if(dunHq(c,k-c.w)===1){ const fh=cs*0.58, gr=g.createLinearGradient(0,y,0,y+fh); gr.addColorStop(0,r2c(st.face,0.04)); gr.addColorStop(1,r2c(st.face,-0.7)); g.fillStyle=gr; g.fillRect(x,y,cs,fh);
+      if(dunHq(c,k-c.w)===1&&LOOK.re) riRaisedFace(g,x,y,cs,cs*0.58,st,c.typ[k-c.w]===DTY.ledge);
+      else if(dunHq(c,k-c.w)===1){ const fh=cs*0.58, gr=g.createLinearGradient(0,y,0,y+fh); gr.addColorStop(0,r2c(st.face,0.04)); gr.addColorStop(1,r2c(st.face,-0.7)); g.fillStyle=gr; g.fillRect(x,y,cs,fh);
         // stone courses in the cliff face
         g.fillStyle='rgba(0,0,0,.38)'; g.fillRect(x,y+fh*0.36,cs,1.5); g.fillRect(x,y+fh*0.7,cs,1.5);
         for(const [yy,off] of [[0,i%2?0.3:0.65],[fh*0.36,i%2?0.75:0.2],[fh*0.7,i%2?0.4:0.85]]) g.fillRect(x+cs*off,y+yy,2,fh*0.34);

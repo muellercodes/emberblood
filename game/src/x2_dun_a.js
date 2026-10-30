@@ -770,6 +770,7 @@ function d2aNb(c,k,fn){ const w=c.w, i=k%w; return {n:fn(k-w),s:fn(k+w),w:i>0?fn
       if(t===TY.pit&&def.theme==='f_forge'){ d2aPaintCrevasse(g,c,k,i,j,x,y,cs,def,rng,true); return true; } }
     return base.apply(this,arguments); }; }
 function d2aIceCell(g,x,y,cs,i,j,rng){
+  if(LOOK.re&&riIceCell(g,x,y,cs,i,j)) return;
   const n=fbm(x*0.008,y*0.008,2); g.fillStyle=r2c((i+j)%2?D2AP.ice:D2AP.ice2,(n-0.5)*0.18); g.fillRect(x,y,cs,cs);
   // long glossy streaks, the same slant everywhere so a field of ice reads as one sheet
   g.strokeStyle='rgba(255,255,255,.32)'; g.lineWidth=2.2; g.beginPath(); const o=((i*17+j*31)%5)*7; g.moveTo(x+o,y+cs); g.lineTo(x+o+cs*0.55,y); g.stroke();
@@ -777,7 +778,7 @@ function d2aIceCell(g,x,y,cs,i,j,rng){
   if(rng()<0.35){ g.strokeStyle='rgba(60,110,170,.35)'; g.lineWidth=1; g.beginPath(); const sx=x+rng()*cs, sy=y+rng()*cs; g.moveTo(sx,sy); g.lineTo(sx+(rng()-0.5)*20,sy+(rng()-0.5)*14); g.lineTo(sx+(rng()-0.5)*26,sy+(rng()-0.5)*20); g.stroke(); }
   g.fillStyle='rgba(255,255,255,.75)'; if(rng()<0.4){ const sx=x+6+rng()*(cs-12), sy=y+6+rng()*(cs-12); g.fillRect(sx-0.8,sy-3,1.6,6); g.fillRect(sx-3,sy-0.8,6,1.6); }
 }
-function d2aWaterCell(g,x,y,cs,i,j,rng,col){ const n=fbm(x*0.006,y*0.006,2); g.fillStyle=r2c(col||D2AP.water,(n-0.5)*0.2); g.fillRect(x,y,cs,cs);
+function d2aWaterCell(g,x,y,cs,i,j,rng,col){ if(LOOK.re&&riWaterCell(g,x,y,cs,col||D2AP.water)) return; const n=fbm(x*0.006,y*0.006,2); g.fillStyle=r2c(col||D2AP.water,(n-0.5)*0.2); g.fillRect(x,y,cs,cs);
   g.strokeStyle='rgba(200,235,255,.16)'; g.lineWidth=2; g.beginPath(); g.moveTo(x+5,y+cs*0.4+rng()*6); g.quadraticCurveTo(x+cs/2,y+cs*0.3,x+cs-5,y+cs*0.45); g.stroke(); }
 function d2aPitCell(g,c,k,x,y,cs,col,lip){ g.fillStyle=col; g.fillRect(x,y,cs,cs); const up=k-c.w; const upOpen=c.grid[up]===0&&!d2aDeep(c,up);
   if(upOpen){ const gr=g.createLinearGradient(0,y,0,y+cs*0.7); gr.addColorStop(0,lip[0]); gr.addColorStop(0.5,lip[1]); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(x,y,cs,cs*0.7); g.fillStyle='rgba(255,255,255,.35)'; g.fillRect(x,y,cs,2); }
@@ -846,7 +847,7 @@ function d2aPaint(A,def){
     if(c.grid[k]===0&&t===0){
       if(bridge.has(k)){ d2aPaintBridge(g,x,y,cs,th,rng,c,k); continue; }
       if(j>0&&dunHq(c,k-w)===1) continue;       // the face of a raised floor above stays
-      if(th==='f_glacier'){ const n=fbm(x*0.006,y*0.006,2); g.fillStyle=r2c((i+j)%2?'#dcebf5':'#d3e5f1',(n-0.5)*0.12); g.fillRect(x,y,cs,cs);
+      if(LOOK.re){} else if(th==='f_glacier'){ const n=fbm(x*0.006,y*0.006,2); g.fillStyle=r2c((i+j)%2?'#dcebf5':'#d3e5f1',(n-0.5)*0.12); g.fillRect(x,y,cs,cs);
         g.strokeStyle='rgba(120,160,205,.35)'; g.lineWidth=1.3; g.strokeRect(x+1,y+1,cs-2,cs-2); g.fillStyle='rgba(255,255,255,.55)'; g.fillRect(x+3,y+3,cs-6,2.5);
         if(rng()<0.3){ g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.ellipse(x+rng()*cs,y+rng()*cs,5+rng()*9,2.5+rng()*3,rng()*3,0,TAU); g.fill(); }
         if(rng()<0.12){ g.fillStyle='rgba(150,190,230,.35)'; for(let q=0;q<2;q++){ const fx=x+10+q*14+rng()*6, fy=y+12+rng()*20; g.beginPath(); g.ellipse(fx,fy,3,4.5,0.3,0,TAU); g.fill(); } } }
