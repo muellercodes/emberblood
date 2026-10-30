@@ -1,6 +1,8 @@
 
 // ================= ground chunks
-const RES=1.25, CPX=Math.round(CH*RES), MAX_CHUNKS=34, CHUNKS=new Map();
+// (v12 GROUND) the cache holds 40 chunks (it was 34): the planner below keeps the view plus a ring round it, so walking
+// back and forth over a few screens never builds the same chunk twice. One chunk canvas is 640x640 (1.6 MB).
+const RES=1.25, CPX=Math.round(CH*RES), MAX_CHUNKS=40, CHUNKS=new Map();
 let chunkTick=0;
 const BCOL=[
   [hexRGB('#5f7f3b'),hexRGB('#86914c'),hexRGB('#43672c')],
@@ -26,19 +28,30 @@ function groundRGB(s,x,y){
   return c;
 }
 function grassTuft(g,x,y,col,len,rng){ g.strokeStyle=col; g.beginPath(); for(let i=0;i<3;i++){ const a=-Math.PI/2+(rng()-0.5)*1.3, l=len*(0.6+rng()*0.5); g.moveTo(x,y); g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l); } g.stroke(); }
-function genChunk(cx,cy){
+// (v12 GROUND) a chunk's ground is built by a generator that yields between small steps (two rows of samples, 150
+// decor marks, one decal), so the planner below can spread it over several frames in a slice of time each frame.
+// genChunk runs the same generator to the end in one go (a teleport, or a chunk in view that is not ready). Other
+// modules wrap genChunk to paint over the ground (cliffs and ramps in e3_elev.js, the void edge in x2_world.js): a
+// chunk built in slices is handed to that same chain at the end (chunkPre), so it gets the same passes and comes out
+// the same, pixel for pixel, as one built at once. The yields never touch the chunk's own random sequence.
+function genChunk(cx,cy){ return chunkPreTake(cx,cy)||chunkRun(chunkGen(cx,cy)); }
+function chunkRun(it){ for(;;){ const r=it.next(); if(r.done) return r.value; } }
+function chunkPreTake(cx,cy){ const p=CHQ.pre; if(p&&p.cx===cx&&p.cy===cy){ CHQ.pre=null; return p.ch; } return null; }
+// a ground built in slices goes through genChunk (and every pass wrapped round it) to become the finished chunk
+function chunkFinish(cx,cy,base){ CHQ.pre={cx,cy,ch:base}; try{ return genChunk(cx,cy); } finally{ CHQ.pre=null; } }
+function* genChunkG(cx,cy){
   const x0=cx*CH, y0=cy*CH, N=65, step=CH/(N-1);
   const small=mkCanvas(N,N), sg=small.getContext('2d'), img=sg.createImageData(N,N), d=img.data;
   const glowS=mkCanvas(N,N), gg=glowS.getContext('2d'), gimg=gg.createImageData(N,N), gd=gimg.data;
   const grid=new Array(N*N); let hasLava=false, hasWater=false;
-  for(let j=0;j<N;j++) for(let i=0;i<N;i++){
+  for(let j=0;j<N;j++){ for(let i=0;i<N;i++){
     const x=x0+i*step, y=y0+j*step, s=T(x,y,{});
     grid[j*N+i]=s;
     const c=groundRGB(s,x,y), k=(j*N+i)*4;
     d[k]=c[0]; d[k+1]=c[1]; d[k+2]=c[2]; d[k+3]=255;
     if(s.lavaS>0){ hasLava=true; gd[k]=255; gd[k+1]=120; gd[k+2]=30; gd[k+3]=Math.round(clamp(s.lavaS*1.4-0.2,0,1)*210); }
     if(s.water) hasWater=true;
-  }
+  } if(j&1) yield; }
   sg.putImageData(img,0,0);
   const cv=mkCanvas(CPX,CPX), g=cv.getContext('2d');
   g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
@@ -47,7 +60,9 @@ function genChunk(cx,cy){
   const at=(x,y)=>{ const i=clamp(Math.round((x-x0)/step),0,N-1), j=clamp(Math.round((y-y0)/step),0,N-1); return grid[j*N+i]; };
   const rng=mulberry32(((cx*92821)^(cy*68917)^7)|0);
   g.lineCap='round'; g.lineWidth=1.1;
+  yield;
   if(LOOK.sb) lookDecor(g,rng,at,x0,y0); else for(let i=0;i<1500;i++){
+    if(i&&i%150===0) yield;
     const x=x0+rng()*CH, y=y0+rng()*CH, s=at(x,y), r=rng();
     if(s.out||s.water||s.lava) continue;
     if(s.road>0.5){ if(r<0.25){ g.fillStyle=rng()<0.5?'rgba(60,50,40,.35)':'rgba(200,190,170,.25)'; g.beginPath(); g.arc(x,y,0.8+rng()*1.6,0,TAU); g.fill(); } continue; }
@@ -88,12 +103,16 @@ function genChunk(cx,cy){
       else if(r<0.45){ g.fillStyle=rng()<0.6?'rgba(90,80,76,.35)':'rgba(10,8,8,.4)'; g.beginPath(); g.arc(x,y,1+rng()*2,0,TAU); g.fill(); }
     }
   }
-  const lk=LOOK.sb?{}:null; if(lk) lookChunkLines(g,grid,N,step,x0,y0,lk);
-  for(const dc of DECALS){ if(dc.x+(dc.r||dc.w||300)<x0||dc.x-(dc.r||dc.w||300)>x0+CH||dc.y+(dc.r||dc.h||300)<y0||dc.y-(dc.r||dc.h||300)>y0+CH) continue; drawDecal(g,dc); }
-  for(const br of BRIDGES){ if(br.x+200<x0||br.x-200>x0+CH||br.y+200<y0||br.y-200>y0+CH) continue; drawBridge(g,br); }
+  const lk=LOOK.sb?{}:null; if(lk){ yield; lookChunkLines(g,grid,N,step,x0,y0,lk); }
+  yield* chunkDecalsG(g,x0,y0);
   let glow=null;
   if(hasLava){ gg.putImageData(gimg,0,0); glow=mkCanvas(CPX/4,CPX/4); const g2=glow.getContext('2d'); g2.imageSmoothingEnabled=true; g2.drawImage(glowS,0,0,N,N,-CPX/4/(N-1)/2,-CPX/4/(N-1)/2,CPX/4+CPX/4/(N-1),CPX/4+CPX/4/(N-1)); }
   return {cv,g,glow,hasWater,used:chunkTick,foam:lk?lk.foam:null};
+}
+// the decals and bridges over a chunk (the last step of every chunk builder), one decal or bridge per step
+function* chunkDecalsG(g,x0,y0){
+  for(const dc of DECALS){ if(dc.x+(dc.r||dc.w||300)<x0||dc.x-(dc.r||dc.w||300)>x0+CH||dc.y+(dc.r||dc.h||300)<y0||dc.y-(dc.r||dc.h||300)>y0+CH) continue; yield; drawDecal(g,dc); }
+  for(const br of BRIDGES){ if(br.x+200<x0||br.x-200>x0+CH||br.y+200<y0||br.y-200>y0+CH) continue; yield; drawBridge(g,br); }
 }
 function drawBridge(g,br){
   g.save(); g.translate(br.x,br.y); g.rotate(br.ang);
@@ -112,6 +131,7 @@ function drawBridge(g,br){
   g.restore();
 }
 function drawDecal(g,dc){
+  if(LOOK.re&&reDecal(g,dc)) return;   // (v12 GROUND) the Realistic look's plazas, patches and fields (e12b_ground.js)
   const rng=mulberry32(Math.floor(dc.x*7+dc.y*13));
   if(dc.k==='field'){
     g.save(); g.translate(dc.x,dc.y); g.rotate(dc.rot);
@@ -168,10 +188,73 @@ function getChunk(cx,cy,gen){
   const k=ckey(cx,cy); let c=CHUNKS.get(k);
   if(c){ c.used=chunkTick; return c; }
   if(!gen) return null;
-  c=genChunk(cx,cy); CHUNKS.set(k,c);
-  if(CHUNKS.size>MAX_CHUNKS){ let ok=null,ou=1e18; for(const [kk,v] of CHUNKS) if(v.used<ou){ ou=v.used; ok=kk; } if(ok!=null&&ok!==k) CHUNKS.delete(ok); }
+  // the chunk the planner is part way through: finish that one now instead of starting again
+  const J=CHQ.job, t=performance.now();
+  if(J&&J.k===k&&chunkJobOk(J)){ CHQ.job=null; c=chunkFinish(cx,cy,J.base||chunkRun(J.it)); CHQ.st.finish++; }
+  else{ if(J&&J.k===k) CHQ.job=null; c=genChunk(cx,cy); CHQ.st.sync++; }
+  CHQ.st.syncMs+=performance.now()-t;
+  chunkPut(k,c);
   return c;
 }
+function chunkPut(k,c){
+  c.used=chunkTick; CHUNKS.set(k,c);
+  if(CHUNKS.size>MAX_CHUNKS){ let ok=null,ou=1e18; for(const [kk,v] of CHUNKS) if(v.used<ou){ ou=v.used; ok=kk; } if(ok!=null&&ok!==k) Map.prototype.delete.call(CHUNKS,ok); }
+}
+// ---------- (v12 GROUND) the chunk planner: the walking stutter fix
+// Before, a chunk was built whole inside the frame that first needed it (when it came into view, or the one chunk 700 px
+// ahead of Ash), about 8 to 25 ms of work on a desktop and several times that on a phone, so every chunk border Ash
+// walked over could drop frames. Now render() calls chunkPlan once a frame: it keeps every chunk in the view, a ring
+// round it and a lead in the way Ash walks built ahead, one chunk at a time in a slice of a few ms per frame (more when
+// that chunk is about to come into view), and fills in the props of those chunks the same way. The sync build in
+// getChunk stays as the fallback for a teleport, a chunk in view that is not ready yet, and G.chunkBurst.
+const CHQ={job:null,pre:null,ep:0,slice:2.5,rush:5,ring:256,lead:600,on:true,
+  st:{built:0,slices:0,maxSlice:0,sync:0,finish:0,syncMs:0,props:0,propsMs:0,maxProps:0}};
+// a change to the world throws chunks away (CHUNKS.delete or CHUNKS.clear from other modules: a gate opens, the cliffs
+// are rebuilt, the look changes): a chunk part built before that is dropped and starts again
+CHUNKS.delete=function(k){ CHQ.ep++; return Map.prototype.delete.call(this,k); };
+CHUNKS.clear=function(){ CHQ.ep++; return Map.prototype.clear.call(this); };
+function chunkJob(cx,cy){ return {k:ckey(cx,cy),cx,cy,gen:LOOK.gen,ep:CHQ.ep,it:chunkGen(cx,cy),base:null}; }
+const chunkJobOk=J=>J.gen===LOOK.gen&&J.ep===CHQ.ep;
+// the generator for a chunk (e2_terrain.js sends maps 1 and up to genChunkMapG; e12b_ground.js adds the Realistic one)
+function chunkGen(cx,cy){ return genChunkG(cx,cy); }
+function chunkPlan(){
+  if(!CHQ.on||scene==='menu'||AREA||!G||!player) return;
+  const t0=performance.now(), vw=W/zoom, vh=H/zoom, R=CHQ.ring;
+  if(CHQ.job&&(!chunkJobOk(CHQ.job)||CHUNKS.has(CHQ.job.k))) CHQ.job=null;
+  // the wanted box: the view and a ring round it, stretched ahead of Ash when he moves
+  const mv=player.moving||player.flying, lx=mv?Math.cos(player.facing)*CHQ.lead:0, ly=mv?Math.sin(player.facing)*CHQ.lead:0;
+  const bx0=cam.x-R+Math.min(0,lx), bx1=cam.x+vw+R+Math.max(0,lx), by0=cam.y-R+Math.min(0,ly), by1=cam.y+vh+R+Math.max(0,ly);
+  const c0=Math.floor(bx0/CH), c1=Math.floor(bx1/CH), r0=Math.floor(by0/CH), r1=Math.floor(by1/CH);
+  const ccx=cam.x+vw/2+lx*0.5, ccy=cam.y+vh/2+ly*0.5;
+  let best=null, bd=1e18, pk=null, pd=1e18;
+  for(let cx=c0;cx<=c1;cx++) for(let cy=r0;cy<=r1;cy++){
+    const k=ckey(cx,cy), c=CHUNKS.get(k), d=dist2((cx+0.5)*CH,(cy+0.5)*CH,ccx,ccy);
+    if(c) c.used=chunkTick;   // kept: the cache drops the chunk used longest ago, never one in this box
+    else if(d<bd){ bd=d; best=[cx,cy]; }
+    if(!PROPS.has(k)&&d<pd){ pd=d; pk=[cx,cy]; }
+  }
+  // props (trees, rocks and their colliders) first, one chunk a frame: they are small, and the props and shadows
+  // passes need them a little outside the view
+  if(pk){ const t=performance.now(), a=propsFor(pk[0],pk[1]); for(const p of a) if(!p.sp) propSprite(p); const dt=performance.now()-t; CHQ.st.props++; CHQ.st.propsMs+=dt; if(dt>CHQ.st.maxProps) CHQ.st.maxProps=dt; }
+  // the chunk to build: the one in progress, else the nearest missing one in the box
+  if(!CHQ.job&&best) CHQ.job=chunkJob(best[0],best[1]);
+  const J=CHQ.job;
+  if(J){
+    // soon in view: a bigger slice, so it is ready before it shows
+    const px=J.cx*CH, py=J.cy*CH, soon=px<cam.x+vw+140&&px+CH>cam.x-140&&py<cam.y+vh+140&&py+CH>cam.y-140;
+    const ts=performance.now(), end=ts+(soon?CHQ.rush:CHQ.slice);
+    while(!J.base){ const r=J.it.next(); if(r.done){ J.base=r.value; break; } if(performance.now()>=end) break; }
+    // the passes other modules paint over the ground (cliffs, edges) run when the ground is done, in a frame of their own
+    // unless this one still has time
+    if(J.base&&(J.ready||performance.now()<end-1)){ CHQ.job=null; const c=chunkFinish(J.cx,J.cy,J.base); if(chunkJobOk(J)&&!CHUNKS.has(J.k)){ chunkPut(J.k,c); CHQ.st.built++; } }
+    else if(J.base) J.ready=true;
+    const dt=performance.now()-ts; CHQ.st.slices++; if(dt>CHQ.st.maxSlice) CHQ.st.maxSlice=dt;
+  }
+}
+// debug and tests: build a chunk the planner's way (all its slices, then the finishing passes) without caching it
+function chunkSliced(cx,cy){ const it=chunkGen(cx,cy); let n=0, r; do{ r=it.next(); n++; }while(!r.done); const c=chunkFinish(cx,cy,r.value); c.steps=n; return c; }
+// debug: the planner's numbers, and a switch to compare with it off
+window.__ebX=Object.assign(window.__ebX||{},{chunkQ:CHQ,chunkSliced,chunkPlanner(on){ if(on!=null){ CHQ.on=!!on; CHQ.job=null; } return CHQ.on; }});
 function scorch(x,y,r){
   const c=CHUNKS.get(ckey(Math.floor(x/CH),Math.floor(y/CH))); if(!c) return;
   const g=c.g, gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,'rgba(14,8,5,.32)'); gr.addColorStop(1,'rgba(14,8,5,0)');
