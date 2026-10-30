@@ -202,7 +202,7 @@ n4sDef('n_vesper_absent',()=>[]);
 n4sDef('n_vesper_bye',()=>[]);
 // 5.3 Tier III, the Rime Spiral
 n4sDef('n_rime_in',()=>[]);
-n4sBubDef('icewall','ash',`My fire isn't hot enough for that. I need a BLAZE.`,`Normal fire is too weak. Use Blaze!`);
+n4sBubDef('icewall','ash',`My fire's not hot enough for that. Time for a Blaze.`,`Normal fire is too weak. Use Blaze!`);
 n4sDef('n_glaciar_join',()=>[]);
 n4sDef('n_glaciar_absent',()=>[]);
 n4sDef('n_glaciar_bye',()=>[]);
@@ -221,17 +221,17 @@ n4sDef('n_trans12',()=>[]);
 n4sDef('n_trans23',()=>[]);
 // her taunts during the fight (8.3, 8.5), and the friends' big moments in phase 4 (taunt lines, once each)
 const N4S_TAUNT={
-  p1:[S(`Shh, shh.`,`Shh, shh.`),S(`Why fight? Sleep is so soft.`,`Why fight? Sleep is so soft.`),S(`Nowhere to hide from the moonlight, dear. Except the pillars. I should have made fewer pillars.`,`You cannot hide. Except behind a pillar.`)],
+  p1:[S(`Shh, shh.`,`Shh, shh.`),S(`Why fight? Sleep is so soft.`,`Why fight? Sleep is so soft.`),S(`Hide behind your pillars, then, dear. The moonlight can wait.`,`Hide behind a pillar. I can wait.`)],
   pulled:[S(`Tied down like a kite? That isn't kind, dear.`,`You tied me down? Not kind!`)],
   p2:[S(`Under the dark it's quiet. Come down. Stay.`,`Under the dark it is quiet. Stay.`)],
-  pounded:[S(`Ow. That was a piece of my own moon you dropped on me.`,`Ow! You hit me with my own moon!`)],
-  p3:[S(`Mmm. Crunchy.`,`Mmm. Crunchy.`),S(`The moon is mine. There's hardly any left now.`,`The moon is mine.`)],
-  choked:[S(`*cough* Hot! Who puts fire in a moon?`,`*cough* Hot!`)],
+  pounded:[S(`Careful, dear. That was a piece of my moon.`,`Careful. That was my moon.`)],
+  p3:[S(`Mmm. One more piece, and then we rest.`,`One more piece.`),S(`The moon is mine. There's hardly any left now.`,`The moon is mine.`)],
+  choked:[S(`*cough* Hot. You have made my moon too hot.`,`*cough* Too hot!`)],
   p4:[S(`Stop! You're letting it all OUT!`,`Stop! It is all coming out!`),S(`It's leaking! My moon is LEAKING!`,`My moon is leaking!`),S(`Everyone leaves. EVERYONE LEAVES.`,`Everyone leaves. EVERYONE LEAVES.`)]
 };
 const N4S_ALLYBEAT={
   greymane:['narr',S(`Greymane leaps and pins one of her wings to the floor!`,`Greymane pins her wing down!`)],
-  glaciar:['f_glaciar',S(`Hold STILL, old moth.`,`Hold still!`)],
+  glaciar:['f_glaciar',S(`Hold still, old moth. I have had a thousand years of practice.`,`Hold still!`)],
   grandpa:['grandpa',S(`Get AWAY from my grandchild, you oversized sock!`,`Get away from my grandchild, you big sock!`)],
   wardens:['iska',S(`Five lights, one for each of us. Stand close, Warden.`,`Five lights for you. Stand close!`)],
   ember:['ember',S(`I'm right here, Ash. Aim for the cracks.`,`I am here. Aim for the cracks!`)],
@@ -652,10 +652,10 @@ function n4sPane(k,done){
 // ---------- 3. the stages, the journal and the act (FINALE 4)
 const N4S_HINTS={
   n_bridge:S(`Juniper's map says the bridge comes down by a green with three lanterns. Light all three.`,`Light the three lanterns by the bridge.`),
-  n_stair:S(`Pebble has flown round the first ring for me. She says it looks like home. Skim, fly, and take Ember's three flames.`,`Skim, fly, and get the three flames.`),
+  n_stair:S(`Pebble has flown round the first ring for me. She says it looks like home, except nobody threw her a crumb. Skim, fly, and take Ember's three flames.`,`Skim, fly, and get the three flames.`),
   n_clocks:S(`The second ring is clocks and cliffs, Pebble says. Climb, grapple, and dash through the dark curtains.`,`Climb, grapple, and dash.`),
-  n_rime:S(`The third ring is winter. Blaze the ice, ride the wind, and pound anything cracked.`,`Melt ice. Ride wind. Pound!`),
-  n_glass:S(`The fourth ring is glass and grabbing vines. Dive, dig, and burn the dark with moonfire.`,`Dive, dig, and use moonfire.`),
+  n_rime:S(`The third ring is winter. Blaze the ice, ride the wind, and pound anything cracked. Your mother says: scarf.`,`Melt ice. Ride wind. Pound!`),
+  n_glass:S(`The fourth ring is glass and grabbing vines. Dive, dig, and burn the dark with moonfire. Pebble would not land there at all, and Pebble lands on everything.`,`Dive, dig, and use moonfire.`),
   n_crown:S(`Whoever came to help you will be waiting at the Crown Shrine. After that comes the Moon Road.`,`Go to the shrine. Then the Moon Road.`),
   n_nyxara:S(`Phase by phase. Watch her glow, and listen to Pip.`,`Watch her and listen to Pip.`)};
 const N4S_SOFAR={

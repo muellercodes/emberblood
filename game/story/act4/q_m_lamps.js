@@ -11,7 +11,7 @@
 // the palm climb set m_lamp_0..11 whatever the quest step), so the lamps step waits for all twelve flags.
 quest({
   id: 'm_lamps', act: 4, giver: 'm_esme', optional: true, takeover: true,
-  title: ['Light Every Lamp', 'Light Every Lamp'],
+  title: ['Twelve Bright Ideas', 'Light Every Lamp'],
   payoff: { kind: 'ally', id: 'm_lamps_ally' },
   old_steps: ['lamps', 'esme'],
 
@@ -54,9 +54,9 @@ quest({
       { if: 'flag m4_well', then: [
         ['m_esme', 'Not Lady Wellington, though. You were at the well when it happened, and she kept one candle of moonlight.',
           'Lady Wellington stayed lit. You were there.', { do: ['set m_lamp_9'] }]] },
-      ['m_esme', "Light them again, dragon, and I'll tell you a secret about moths. It might save your tail.",
+      ['m_esme', "Twelve is a lot to ask, I know. Light them again, dragon, and I'll tell you a secret about moths. It might save your tail.",
         'Light them. I will tell you a moth secret.', { promise: 'm4_esme_secret' }],
-      { choose: 'm_lamps_offer', ask: ['Will you light every lamp in Sable?', 'Light every lamp?'], pick: [
+      { choose: 'm_lamps_offer', ask: ['Light every lamp in Sable?', 'Light every lamp?'], pick: [
         { t: ["I'm a dragon. Lighting things is my whole job.", 'I will!'], tone: 'brave', then: ['quest start m_lamps'],
           say: [['m_esme', 'Each lamp is a little different. Look at one, and it will tell you what it needs. Lamps are like that.',
             'Look at a lamp. It tells you what it needs.']] },

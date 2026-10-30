@@ -9,7 +9,7 @@
 // x2_people's own mechanic (legacy step roar: it runs while G.quests.f_mumble.step is 2).
 quest({
   id: 'f_mumble', act: 3, giver: 'f_mumble', optional: true, takeover: true,
-  title: ["Mumble's Lost Roar", "Mumble's Lost Roar"],
+  title: ['Roar Talent', "Mumble's Lost Roar"],
   payoff: { kind: 'ally', id: 'f_mumble_ally' },
   old_steps: ['soup', 'bring', 'roar', 'thanks'],
 

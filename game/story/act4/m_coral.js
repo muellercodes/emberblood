@@ -8,7 +8,7 @@
 // red herring. Then Coralia tells the way east: under the Reefwall, through the Sunken Gate, where a pufferfish is stuck.
 chapter({
   id: 'm_coral', act: 4, after: 'm_lumen', next: 'm_reef', takeover: true,
-  card: null, name: ['Drowned Lumen', 'Drowned Lumen'],
+  card: null, name: ['In Too Deep', 'Drowned Lumen'],
   so_far: [
     "Ash can dive! Sir Kipper, a merfolk knight, kept Ember's flame in Drowned Lumen for him, and asked him to come and see the Queen of Coralcombe. The merfolk are Lumen's grandchildren. They may know the way east.",
     'Ash can dive! Sir Kipper says the Queen wants to see him.'],
@@ -83,7 +83,7 @@ chapter({
       ['m_coralia', 'And think about Lumen, small dragon. Lumen always knew where the moon\'s things went.', 'And think about Lumen. It knew where moon things go.'],
     ],
     crl_kipper: [
-      ['m_kipper', 'The great grey moth? I saw her with my own eyes, from the top of the Shell Hall. A knight is always on watch.', 'I saw the moth! A knight is always on watch.'],
+      ['m_kipper', 'The great grey moth? I saw her with my own eyes, from the top of the Shell Hall. A knight is always on watch, day and knight.', 'I saw the moth! A knight is always on watch.'],
       ['m_kipper', 'Grey as dust, with two pale moons painted on her wings, and wider than the Shell Hall. She flew right over the Reefwall. East.',
         'Grey, with two pale moons on her wings. She flew over the Reefwall. East.', { dir: ['m4_coral_dive', 'm4_sunken_gate', 'east'] }],
       ['ash', 'Did she come down anywhere?', 'Did she come down anywhere?'],

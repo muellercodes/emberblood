@@ -9,7 +9,7 @@
 // a bomb in water sticks (a legacy step), and m3pBlast sets m_rock1..3.
 quest({
   id: 'm_tidebombs', act: 4, giver: 'f_mags', optional: true, takeover: true,
-  title: ['Tide Bombs', 'Tide Bombs'],
+  title: ['For Science!', 'Tide Bombs'],
   payoff: { kind: 'upgrade', id: 'm_tidebombs' },
   old_steps: ['rocks', 'mags'],
 
@@ -43,7 +43,7 @@ quest({
       ['f_mags', "Science is mostly probably. Dive, throw, swim away. Swim away is the important bit.", 'Dive. Throw. Swim away fast.'],
     ],
     tb_done: [
-      ['f_mags', 'It WORKED? Under water? Ha! HA! Science!', 'It WORKED? SCIENCE!'],
+      ['f_mags', 'It worked? Under water? Ha! HA! Science!', 'It worked! Science!'],
       ['f_mags', "Give me your bombs. ...There. Tide Bombs. They work under water now, and they stick to walls and grumpy things.",
         'There. Tide Bombs! They stick, even under water.'],
       ['ash', 'What were the prototypes made of, anyway?', 'What were the prototypes?'],

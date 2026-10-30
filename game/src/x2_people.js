@@ -128,8 +128,8 @@ function f2pHat(item){ const h=F2P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 // gates never meet an unknown stage. These fallbacks carry `f2p:true` and the smallest story they need (so the side
 // content can be played and tested without x2_story): Ylva's thaw moves f_thaw on.
 const F2P_STAGES=['f_snow','f_pass','f_hearth','f_maze','f_kindle','f_thaw','f_sky','f_gap','f_deep','f_dreadgate','f_dread','f_glaciar'];
-const F2P_CH={f_snow:'A Letter in the Snow',f_pass:'A Letter in the Snow',f_hearth:'The Dying Hearth',f_maze:'The Dying Hearth',f_kindle:'The Dying Hearth',f_thaw:'One Thaw at a Time',
-  f_sky:'One Thaw at a Time',f_gap:'The Stonehorn Knock',f_deep:'The Stonehorn Knock',f_dreadgate:'The Dreadgate',f_dread:'The Dreadgate',f_glaciar:'The Crown of Dread'};
+const F2P_CH={f_snow:'Snow Way!',f_pass:'Snow Way!',f_hearth:'Home Is Where the Hearth Is',f_maze:'Home Is Where the Hearth Is',f_kindle:'Home Is Where the Hearth Is',f_thaw:'One Thaw at a Time',
+  f_sky:'One Thaw at a Time',f_gap:'Knock, Knock',f_deep:'Knock, Knock',f_dreadgate:'Moth to a Flame',f_dread:'Moth to a Flame',f_glaciar:'The Crown of Dread'};
 const F2P_OBJ={f_snow:[S('Go to Frostpine Lodge and talk to Ulf','Talk to Ulf at the Lodge'),1500,3400],f_pass:[S('Follow the White Road to Hearthold','Walk to Hearthold'),6180,49000],
   f_hearth:[S('Talk to the Hearthkeeper at the Great Hearth','Talk to the Hearthkeeper'),6880,49040],f_maze:[S('Cross the Glimmerfrost to the Glacier Maze','Go to the Glacier Maze'),5600,44420],
   f_kindle:[S('Wake the Great Hearth with Blaze','Wake the Great Hearth'),6800,48950],f_thaw:[S('Go to Rimeholm and find whoever knows the most','Go to Rimeholm'),1950,46750],
@@ -558,7 +558,7 @@ B('f_hsk1','id:f_hask',()=>!f2pQ('f_dogs'),S(`Hrm. Too quiet. A camp should have
 B('f_hsk2','id:f_hask',()=>f2pQ('f_dogs'),S(`Pepper. PEPPER. Drop the boot.`,`Pepper! Drop the boot!`),{r:['f_dog',S(`Woof!`,`Woof!`)]});
 // town barks: the dying Hearth, the blue Hearth, the frozen village, the moths, and later the moon
 B('f_hh1',F2P_HH,f2pCold,S(`My soup froze on the spoon. And I was sitting right next to the Hearth!`,`My soup froze. Right next to the Hearth!`));
-B('f_hh2',F2P_HH,f2pCold,S(`Brr.`,`Brr.`));
+B('f_hh2',F2P_HH,f2pCold,S(`Brr. My goosebumps have goosebumps.`,`Brr! So cold!`));
 B('f_hh3',F2P_HH+'|kid',f2pCold,S(`Are you the horned boy? Can you breathe on my cocoa?`,`Can you breathe on my cocoa?`));
 B('f_hh4',F2P_HH,f2pLit,S(`The Hearth is BLUE! I didn't know fire could be blue! I didn't know fire could be HAPPY!`,`The Hearth is BLUE! Fire can be happy!`),{d:'f_hearth'});
 B('f_hh5',F2P_HH,f2pLit,S(`I took my coat off. Then I put it back on. Baby steps.`,`I took off my coat. Then put it back on.`));
@@ -631,7 +631,7 @@ Object.assign(DEED_PRI,{f_hearth:8,f_gate:6,f_ylva:7,f_hush:8,trial_blaze:7,tria
 // run fn once the game is back in play (no dialogue open)
 function f2pCalm(fn,n){ n=n||0; if((DLG||scene!=='play')&&n<200){ later(0.25,()=>f2pCalm(fn,n+1)); return; } try{ fn(); }catch(e){ console.error(e); } }
 // ---------- shops, the smiths and the inns (prices about 2.8 times Act I's, BALANCE.md 8)
-SHOPTALK.f_pim=()=>runShop('f_pim',S(`Pim's Hot Cocoa! The only cocoa stand in the north! For now!`,`Pim's Hot Cocoa! The only one!`),[
+SHOPTALK.f_pim=()=>runShop('f_pim',S(`Pim's Hot Cocoa! The only cocoa stand in the north, for now. Business is brewing!`,`Pim's Hot Cocoa! The only one!`),[
   [S('A cup of hot cocoa to carry (it warms you up by itself when you are hurt)','Cocoa to carry (heals you when hurt)'),G.flags.f_pim_free?0:3,()=>{ G.items.f_cocoa=(G.items.f_cocoa||0)+1; setBanner(S('Hot cocoa','Hot cocoa'),S(`You carry ${G.items.f_cocoa} of 3. It warms you up when you get hurt.`,`You have ${G.items.f_cocoa} of 3.`),2); },()=>(G.items.f_cocoa||0)<3||S('Your paws are full of cocoa. Three is the limit. Company policy.','Three is the limit!')],
   [S('A cold cocoa you heat yourself (heal now)','Heat your own cocoa (heal now)'),G.flags.f_pim_free?0:2,()=>{ heal(player.maxHp*0.3); setBanner(S('You breathe on the cocoa','You heat the cocoa'),S('Perfect. A hug you can drink.','A hug you can drink!'),1.8); },()=>player.hp<player.maxHp||S('You look plenty warm already. Business is business, but I have a heart.','You are warm already!')]
 ]);
@@ -644,7 +644,7 @@ SHOPTALK.f_gunnhild=()=>runShop('f_gunnhild',G.flags.f_forge_lit?S(`Anvilheart F
 SHOPTALK.f_mags=()=>runShop('f_mags',S(`Sprocket's Shed! Bombs, fuses, and things that go WHEE-BANG!`,`Bombs and things that go BANG!`),[
   [S('A bigger bomb bag (five more bombs fit)','A bigger bomb bag (+5)'),260,()=>{ G.flags.f_bigbag=1; if(typeof bombBag==='function') bombBag(5); },()=>!(G.weapons&&G.weapons.bombs)?S('You need bombs before you need a bag. Science!','You need bombs first!'):!G.flags.f_bigbag||S('One big bag is enough. Two would be a backpack. That explodes.','One big bag is enough.')]
 ]);
-SHOPTALK.f_saga=()=>runShop('f_saga',S(`Fresh fish! Frozen fresh! Rimeholm folk love a fish. Hint, hint.`,`Fresh fish! Rimeholm loves fish.`),[
+SHOPTALK.f_saga=()=>runShop('f_saga',S(`Fresh fish! Frozen fresh! Rimeholm folk fall for a fish, hook, line and sinker.`,`Fresh fish! Rimeholm loves fish.`),[
   [S('A fish (a gift for Rimeholm folk)','A fish (a gift)'),8,()=>{ giveItems({fish:1}); },()=>(G.items.fish||0)<6||S('Six fish is a lot of fish. Even for me.','Six fish is a lot!')]
 ]);
 SHOPTALK.f_hask=()=>runShop('f_hask',S(`Hrm. Trading post. Furs, honey. Hearthold folk go soft for honey. Don't tell them I said soft.`,`Hrm. Honey and furs. Hearthold loves honey.`),[
@@ -719,7 +719,7 @@ const F2P_PACK_HOME=[
     f2pN(`Greymane sits. Then he howls, and you feel it in your chest, and somehow you understand it.`,`Greymane howls. You feel it in your chest.`),
     f2pL('ash',`...Thank you. I think I just learned a howl.`,`Thank you. I learned a howl!`)],reward:{xp:650,coins:120,f2p:()=>{ G.flags.f_longhowl=1; setBanner(S('The Long Howl','The Long Howl'),S('Your Roar now shatters icicles, ice spikes and snowballs in its ring, and stuns frost foes for longer.','Your roar breaks ice now!'),3.6); }}}];
 Object.assign(QDEFS,{
-  f_bombs:{title:S('Mags and the Big Boom','Mags and the Big Boom'),giver:'f_mags',min:'f_kindle',
+  f_bombs:{title:S('Having a Blast','Mags and the Big Boom'),giver:'f_mags',min:'f_kindle',
     offer:[f2pL('f_mags',`You! Dragon! You've got fire. Real fire. BLUE fire! Do you know what that means?`,`You have BLUE fire! Do you know what that means?`),f2pL('ash',`...Warm hands?`,`...Warm hands?`),
       f2pL('f_mags',`BOMBS! Well. It COULD mean bombs. I had a whole crate of blasting powder on my steam sled. Then the Snowgobs ambushed me in Snowgob Gulch and pushed my sled off the road.`,`BOMBS! My blasting powder crate fell off my sled. The Snowgobs did it!`),
       f2pL('f_mags',`The crate's stuck on a ledge in the Gulch, south-west of town. Get it back and I'll make you something delightful. Delightfully EXPLOSIVE.`,`It's on a ledge in Snowgob Gulch. Get it, and I'll make something EXPLOSIVE.`)],
@@ -740,7 +740,7 @@ Object.assign(QDEFS,{
     steps:[
       {t:'flags',flags:['f_v1','f_v2','f_v3'],n:3,text:S('Find the three verses of the Snow Mother’s Song: Rimeholm’s bell, the Singing Stone on the sky isles, the Rune Drum in the Stonehorn hills','Find 3 verses: a bell, a stone, a drum'),at:()=>f2pSongNext()},
       {t:'talk',npc:'f_brynja',take:{f_verse1:1,f_verse2:1,f_verse3:1},text:S('Bring the three verses to Brynja at the Great Hearth','Bring the verses to Brynja'),lines:'f_song_reveal',reward:{xp:1300,coins:200,bless:1,f2p:()=>{ G.flags.f_song=1; f2pExtra('f_song',S('You found the Snow Mother’s Song, and Hearthold remembered her name.','You found the Snow Mother’s Song.')); }}}]},
-  f_mumble:{title:S('Mumble’s Lost Roar','Mumble’s Lost Roar'),giver:'f_mumble',min:'f_kindle',
+  f_mumble:{title:S('Roar Talent','Mumble’s Lost Roar'),giver:'f_mumble',min:'f_kindle',
     offer:[f2pL('f_mumble',`(very quietly) ...hello. Sorry. Hello.`,`(quietly) ...hello. Sorry.`),f2pL('ash',`Whoa. You're HUGE.`,`Whoa. You're HUGE.`),
       f2pL('f_mumble',`Sorry. I'm Mumble. I used to have a big roar. Like a mountain clearing its throat. Then the purple cold came, and it froze in my throat, and now I go...`,`I'm Mumble. I had a big roar. The purple cold froze it. Now I go...`),
       f2pL('f_mumble',`(squeak)`,`(squeak)`),
@@ -753,7 +753,7 @@ Object.assign(QDEFS,{
       {t:'flag',flag:'f_mumble_roar',text:S('Fight the Rimehounds and ROAR so Mumble can copy you','Fight the wolves and ROAR so Mumble copies you'),at:'npc:f_mumble'},
       {t:'talk',npc:'f_mumble',text:S('Talk to Mumble','Talk to Mumble'),lines:[f2pL('f_mumble',`I ROARED! Did you hear me? Everyone heard me! The MOUNTAIN heard me!`,`I ROARED! The MOUNTAIN heard me!`),
         f2pL('f_mumble',`If you ever need somebody big... I'll come. I'll roar. Loudly. Not sorry at all.`,`If you need somebody big, I'll come. I'll roar. Not sorry!`)],reward:{xp:650,coins:120,f2p:()=>{ G.flags.f_mumble_ally=1; f2pExtra('f_mumble',S('Mumble the yeti found his roar, and promised to come when you need somebody big.','Mumble found his roar. He will help you.')); setBanner(S('Mumble will come','Mumble will come'),S('When you face the ice dragon, a very big friend will roar with you.','Mumble will help you fight!'),3.2); }}}]},
-  f_sled:{title:S('Elka’s Long Sled','Elka’s Long Sled'),giver:'elka',min:'f_gap',
+  f_sled:{title:S('All Downhill From Here','Elka’s Long Sled'),giver:'elka',min:'f_gap',
     offer:[f2pL('elka',`ASH! You came north too! I knew it! Did Dad send you? Don't answer that.`,`ASH! You came north! Did Dad send you? Don't answer.`),
       f2pL('elka',`Soren says nobody has EVER sledded from the top of the Windscour all the way to his hill in one go. I want to do it. Against you. A RACE.`,`Nobody ever sledded from the Windscour to Soren's hill. Let's RACE!`),
       f2pL('ash',`I don't have a sled.`,`I don't have a sled.`),f2pL('elka',`You've got wind ribbons. That's cheating. I love it. Meet me at the Windscour Shrine!`,`You have wind ribbons. Cheating! I love it. Meet me at the Windscour Shrine!`)],
@@ -763,7 +763,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'elka',text:S('Collect your prize from Elka on Soren’s Sled Hill','Get your prize from Elka'),lines:[f2pL('elka',`You beat me! Nobody beats me! Except wolves. And one goose.`,`You beat me! Nobody beats me! Except wolves. And a goose.`),
         f2pL('f_soren',`That was the fastest thing I've ever seen. Here. Ribbon wax. Rub it on your feet. Don't ask.`,`The fastest thing I've seen! Ribbon wax. Rub it on your feet.`),
         f2pL('elka',`Tell Dad I'm fine. Tell him I'm SUPER fine. Tell him I'll be home for supper. SOME supper.`,`Tell Dad I'm SUPER fine. Home for supper. SOME supper.`)],reward:{xp:650,coins:60,f2p:()=>{ G.flags.f_skyhop=1; setBanner(S('Skyhop!','Skyhop!'),S('Wind ribbons carry you faster, and hopping off a ribbon jumps as high as a Double Jump.','Wind ribbons are faster. You hop higher off them!'),3.6); }}}]},
-  f_rime:{title:S('Rimeholm, One Thaw at a Time','One Thaw at a Time'),giver:'f_ylva',min:'f_thaw',
+  f_rime:{title:S('Rime and Reason','One Thaw at a Time'),giver:'f_ylva',min:'f_thaw',
     offer:[f2pL('f_ylva',`Six of my neighbors are still frozen, dear. Seven, counting old Rasmus in his forge, but his frost is the thickest. Warm the others up and his will go thin.`,`Six neighbors are still frozen. Seven with Rasmus. Warm the others first.`),
       f2pL('f_ylva',`They're all in silly places. They were all doing silly things. It was a very ordinary evening.`,`They're in silly places. Doing silly things.`)],
     steps:[
@@ -773,7 +773,7 @@ Object.assign(QDEFS,{
         f2pL('f_rasmus',`Your fire's good, child. It could be better. Come here. Breathe on my anvil. No. Harder. HARDER.`,`Your fire is good. It could be better. Breathe on my anvil. HARDER.`),
         f2pN(`The anvil glows red, then white, then a blue so bright you can see your own bones in your claws. Neat.`,`The anvil glows red, white, then bright blue!`),
         f2pL('f_rasmus',`There. Blue as a glacier, hot as a summer. Bluefire. Go and melt something that deserves it.`,`There. Bluefire. Go melt something.`)],reward:{xp:1000,coins:170,f2p:()=>{ G.flags.f_bluefire=1; setBanner(S('Bluefire!','Bluefire!'),S('Blaze reaches 20 percent farther, and melting and thawing take half as long.','Blaze goes farther and melts faster!'),3.6); }}}]},
-  f_dogs:{title:S('Hask’s Runaway Dogs','Hask’s Runaway Dogs'),giver:'f_hask',min:'f_thaw',
+  f_dogs:{title:S('Dog Days of Winter','Hask’s Runaway Dogs'),giver:'f_hask',min:'f_thaw',
     offer:[f2pL('f_hask',`Hrm. Pup. You look like you've never been cold a day in your life.`,`Hrm. Pup. You've never been cold.`),
       f2pL('f_hask',`My dogs ran off in the first blizzard. Five of them. Best sled team in the north. Snowball, Pepper, Biscuit Two, Sergeant and Mittens.`,`My five sled dogs ran off. Snowball, Pepper, Biscuit Two, Sergeant and Mittens.`),
       f2pL('f_hask',`Bring them home and I'll run you anywhere you need to go. Faster than any ribbon.`,`Bring them home. My sled will take you anywhere.`)],
@@ -788,7 +788,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'juniper',text:S('Visit Juniper’s Map Tent in Hearthold','Visit Juniper’s tent in Hearthold'),lines:[f2pL('juniper',`Here. Maps of every big cave and temple in the north. I drew them from the outside, so the insides are guesses. Good guesses.`,`Maps of every cave and temple up here. The insides are guesses.`),
         f2pL('juniper',`And look. There's an old ice tunnel under the cliffs north of Rimeholm. It comes out at Glimmer Point. One big boulder blocks it. You've got something loud, right?`,`There's an ice tunnel north of Rimeholm. A boulder blocks it. You have something loud?`)],give:{f_northmaps:1},reward:{f2p:()=>f2pNorthMaps()}},
       {t:'flag',flag:'f_tunnel_open',text:S('Open Juniper’s Tunnel north of Rimeholm (a bomb, a big hammer smash or a Roar)','Open the tunnel. Bomb, hammer or roar!'),at:()=>f2pLMat('f_tunnel_boulder')||'xy:1750,46050',reward:{xp:650,coins:120}}]},
-  f_forge:{title:S('Gunnhild’s Cold Forge','Gunnhild’s Cold Forge'),giver:'f_gunnhild',min:'f_kindle',
+  f_forge:{title:S('Forge Ahead','Gunnhild’s Cold Forge'),giver:'f_gunnhild',min:'f_kindle',
     offer:[f2pL('f_gunnhild',`My forge went cold the night the moth came. I still come in every morning and pick up the hammer. Habit.`,`My forge went cold. I still pick up the hammer.`),
       f2pL('f_gunnhild',`You're MAREN'S kid? Then you've got the fire. Light my forge and I'll make that whip of yours into something your mother would frame.`,`You're Maren's kid! Light my forge. I'll make your whip amazing.`)],
     steps:[
@@ -797,7 +797,7 @@ Object.assign(QDEFS,{
       {t:'talk',npc:'f_gunnhild',take:{f_starfrost:1},text:S('Bring the starfrost to Gunnhild','Bring the starfrost to Gunnhild'),lines:[f2pN(`CLANG. CLANG. CLANG. Gunnhild hums the same lantern song your mom hums. You don't say anything. You just grin.`,`CLANG! CLANG! Gunnhild hums your mom's song. You grin.`),
         f2pL('f_gunnhild',`The Ember Chain. The tip burns. It lights braziers from as far as it reaches, burns roots, and knocks frost right off things. Tell your mother. Tell her Gunnhild of Hearthold says hello. Tell her twice.`,`The Ember Chain! The tip burns. It lights braziers and melts frost. Tell your mom hello. Twice.`)],reward:{xp:650,f2p:()=>{ G.flags.f_emberchain=1; setBanner(S('The Ember Chain!','The Ember Chain!'),S('The Chain Whip’s tip burns: it lights braziers and roots from range, melts ice and hits frost foes harder.','Your whip tip burns now!'),3.6); }}}]},
   f_pack:{title:S('The Long Howl','The Long Howl'),giver:'f_greymane',min:'f_pass',offer:[]},
-  f_warm:{title:S('Warm Hands','Warm Hands'),giver:'f_toastwhistle',min:'f_kindle',
+  f_warm:{title:S('Warm Regards','Warm Hands'),giver:'f_toastwhistle',min:'f_kindle',
     offer:[f2pL('f_toastwhistle',`Ash! Horned boy! Official question from the Mayor: how many frozen people can one dragon warm up?`,`Official question! How many frozen people can you warm up?`),f2pL('ash',`...All of them?`,`...All of them?`),
       f2pL('f_toastwhistle',`TWELVE would do! Twelve, and I'll give you a medal! I've never given anyone a medal! I'll have to make one!`,`TWELVE! Then I'll give you a medal! I'll have to make one!`)],
     steps:[

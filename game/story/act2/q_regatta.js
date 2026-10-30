@@ -6,7 +6,7 @@
 // whistle.
 quest({
   id: 'c_regatta', act: 2, giver: 'c_jo', optional: true, takeover: true,
-  title: ['The Harbor Regatta', 'The Harbor Regatta'],
+  title: ['Pier Pressure', 'The Harbor Regatta'],
   payoff: { kind: 'shortcut', id: 'c_skiffs' },
   old_steps: ['race', 'whistle'],
 
@@ -27,7 +27,7 @@ quest({
       ['c_jo', 'You can WHAT?'],
       { choose: 'c_regatta_offer', ask: ['Race Skipper Jo?'], pick: [
         { t: ["You're on!", "You're on!"], tone: 'brave', then: ['quest start c_regatta'],
-          say: [['c_jo', 'HA! Talk to me when you are ready to lose.', 'Talk to me when you are ready.']] },
+          say: [['c_jo', 'HA! Talk to me when you are ready to lose. No pier pressure.', 'Talk to me when you are ready.']] },
         { t: ['Maybe later', 'Later'], say: [['c_jo', 'Scared of the wet bits. Knew it.', 'Scared of the water!']] },
       ] },
     ],

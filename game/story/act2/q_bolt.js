@@ -6,7 +6,7 @@
 // Old saves: QDEFS.c_bolt steps 0..2 map to chase, clean, home. The gear panel and the breath stay x1_people's.
 quest({
   id: 'c_bolt', act: 2, giver: 'c_hettie', optional: true, takeover: true,
-  title: ['A Dog Made of Brass', 'A Dog Made of Brass'],
+  title: ['Nuts and Bolt', 'A Dog Made of Brass'],
   payoff: { kind: 'ally', id: 'c_bolt' },
   old_steps: ['chase', 'clean', 'home'],
 
@@ -42,7 +42,7 @@ quest({
       ] },
     ],
     bt_home: [
-      ['c_hettie', 'BOLT! Oh, you clanky silly. Come here.', 'BOLT! You clanky silly!'],
+      ['c_hettie', "BOLT! Oh, you clanky silly. You've had me all wound up. Come here.", 'BOLT! You clanky silly!'],
       ['narr', 'Bolt licks her goggles. Then he sniffs the air, barks once and shoots out of the door.', 'Bolt barks and runs out the door!'],
       ['narr', "A minute later he trots back in with Lord Whirligig's top hat.", "He comes back with Lord Whirligig's hat."],
       ['c_whirligig', '(from far up the hill) MY HAT! THAT DOG HAS MY HAT!', '(far away) MY HAT!'],

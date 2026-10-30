@@ -9,20 +9,26 @@ act({
     moth_mask: { main: true,
       title: ['Who is the Moth Mask, and why does she steal?', 'Who is the Moth Mask?'],
       deduce: ['where_next', 'who_is_she', 'why_glowing', 'what_she_is'],
-      herring: ['g_penny_first', 's_baron_rumor'] },
+      herring: ['g_penny_first', 's_baron_rumor'],
+      solved: ['The Moth Mask is Vesper Saltwhistle of Saltmarsh: Pearl\'s line, claws and no fire, and Ash\'s cousin. She stole light for a Lady in her dreams, to keep her gran warm. Case closed, cousin found.',
+        'The Moth Mask is Vesper, Ash\'s cousin. She stole light to keep Gran warm.'] },
     // small: the night everything stopped (answer: something huge flew over the coast; at the top of the Spire Vesper
     // says it was the Lady herself, a moth, and her notebook page tells the rest: the Mother, with two pale moons on
     // her wings, cracked the Heart and stopped every clock at one minute to midnight. There is no Murmur any more.)
     what_stopped: {
       title: ['What stopped the clocks, the tide and the light?', 'What stopped the clocks?'],
       deduce: ['what_stopped'],
-      herring: ['q_whirligig_sales'] },
+      herring: ['q_whirligig_sales'],
+      solved: ['Something huge flew over the whole coast at one minute to midnight, and the clocks, the tide and the light all stopped with it. Squawk was right. Nobody will ever hear the end of it.',
+        'Something huge flew over and stopped everything. Squawk was right.'] },
     // small: the rope bridge (answer: Vesper, to slow Ash down; she tied a rope so nobody would fall). Payoff: the
     // harbor crew rebuilds the bridge, a walkway over the Cut (c_cut_bridge).
     who_cut: {
       title: ['Who cut the rope bridge at the Cut?', 'Who cut the bridge?'],
       deduce: ['who_cut'],
-      herring: ['l_crab_claim'] },
+      herring: ['l_crab_claim'],
+      solved: ['Vesper cut the rope bridge to slow Ash down, and tied a rope across the road first so nobody would walk off the edge. It was not crabs. Admiral Pinch would like an apology.',
+        'Vesper cut the bridge, but tied a rope so nobody fell. Not crabs!'] },
   },
 
   // Vesper's trust is the old flag (saves keep working). The main path gives exactly 4 when Ash is kind every time:

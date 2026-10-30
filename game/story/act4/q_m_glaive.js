@@ -8,7 +8,7 @@
 // own mechanic (legacy step: m3pFurnMoon reads m3pAt('m_glaive',2)).
 quest({
   id: 'm_glaive', act: 4, giver: 'm_kiln', optional: true, takeover: true,
-  title: ['A Piece of the Moon', 'A Piece of the Moon'],
+  title: ['Over the Moon', 'A Piece of the Moon'],
   payoff: { kind: 'power', id: 'glaive' },
   old_steps: ['crumb', 'bring', 'temper', 'glaive'],
 
@@ -42,12 +42,12 @@ quest({
       ['m_kiln', "You're the dragon from the sea? Good. GOOD. I need a dragon.", 'You are the sea dragon? Good!'],
       ['m_kiln', "I've always wanted to make something out of the moon. Bits of it fell here once. That's why the sand is glass.",
         'Bits of the moon fell here once. The sand is glass.'],
-      ['m_kiln', "But the big bits are long gone. If you find a fresh piece of moon, bring it to me.",
+      ['m_kiln', "But the big bits are long gone. Find me a fresh piece of moon, and I'll make you something you'll never forget. Unless you hit your head.",
         'Find a piece of moon. Bring it to me.'],
-      { choose: 'm_glaive_offer', ask: ["I'll make you something you'll never forget. Unless you hit your head.", 'I will make you something great!'],
+      { choose: 'm_glaive_offer', ask: ['Find Old Kiln a piece of the moon?', 'Find Kiln a piece of moon?'],
         pick: [
           { t: ['A piece of the moon? Deal!', 'Deal!'], tone: 'brave', then: ['quest start m_glaive'],
-            say: [['m_kiln', "EH? Speak up! ...Oh, deal. DEAL! Don't hit your head.", 'Deal! Do not hit your head.']] },
+            say: [['m_kiln', "EH? Speak up! ...Oh, deal. Deal! Don't hit your head.", 'Deal! Do not hit your head.']] },
           { t: ['Maybe later', 'Maybe later'],
             say: [['m_kiln', 'EH? Later? Everything is later. The furnace is now.', 'Later? The furnace is now!']] },
         ] },
@@ -64,7 +64,7 @@ quest({
     gl_made: [
       ['narr', 'Old Kiln pulls, twists, blows, spins, and shouts at the furnace for a while. Then he holds up a long silver blade on a pole.',
         'Kiln twists and shouts. Then he holds up a silver blade.'],
-      ['m_kiln', 'The Moon Glaive! Swing it and it leaves a little crescent of moonlight behind. It lights moon-glass and burns shadows.',
+      ['m_kiln', 'The Moon Glaive! A real glass act, if I say so myself. Swing it and it leaves a crescent of moonlight behind. It lights moon-glass and burns shadows.',
         'The Moon Glaive! It leaves moonlight behind.'],
       ['m_kiln', 'Throw it, and it comes back, like a very polite boomerang. And it cuts moon silk. Nothing else does.',
         'Throw it. It comes back. It cuts moon silk.', { clue: 'm4_glaive_cuts' }],

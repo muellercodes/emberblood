@@ -10,7 +10,7 @@
 // starts the quest (her offer).
 quest({
   id: 'f_sled', act: 3, giver: 'elka', optional: true, takeover: true,
-  title: ["Elka's Long Sled", "Elka's Long Sled"],
+  title: ['All Downhill From Here', "Elka's Long Sled"],
   payoff: { kind: 'upgrade', id: 'f_skyhop' },
   old_steps: ['race', 'prize'],
 
@@ -49,7 +49,7 @@ quest({
     ],
     sl_prize: [
       ['elka', 'You beat me! Nobody beats me! Except wolves. And one goose.', 'You beat me! Only wolves and a goose do that!'],
-      ['f_soren', "That was the fastest thing I've ever seen. Here. Ribbon wax. Rub it on your feet. Don't ask.", 'So fast! Ribbon wax. Rub it on your feet.'],
+      ['f_soren', "Fastest thing I've ever seen. Here. Ribbon wax. Rub it on your feet. It's all downhill from here.", 'So fast! Ribbon wax. Rub it on your feet.'],
       ['ash', 'Elka, how did you even get up here? The High Pass was shut for a hundred years.', 'How did you get up here?'],
       ['elka', 'I sledded UP it, the morning after it cracked open. White dust everywhere, soft like flour. I sneezed for a WEEK.',
         'I sledded up the morning it cracked. White dust everywhere!', { clue: 'f3_elka_dust' }],
