@@ -20,7 +20,7 @@ chapter({
   item: {
     // x4_story's own item (ITEM_NAMES n_map): x4_world shows the peak on the map while it is held
     n_map: { name: ["Juniper's Peak Map", "Juniper's map of the peak"],
-      desc: ['Juniper drew Nightfall Peak through the telescope: four rings, one on top of the other, all the way up.', 'Four rings, going up and up.'], icon: 'map' },
+      desc: ["Juniper drew Nightfall Peak through the telescope: four rings, one on top of the other. Across the top, in her neatest letters, she has written DON'T.", "Four rings, going up. At the top it says DON'T."], icon: 'map' },
     n5_lantern: { name: ["Mom's paper lantern", "Mom's paper lantern"],
       desc: ["A Lantern Day lantern Mom folded into your satchel with the sandwich. It's a little squashed. It's been through a lot.",
         'A paper lantern from Mom. A bit squashed.'], icon: 'lamp' },
@@ -134,7 +134,7 @@ chapter({
       { if: { any: ['flag f_page11', 'flag m_page11'] }, then: [{ do: ['clue n5_page11'] }] },
       { if: 'flag dr_seen_m_moth', then: [{ do: ['clue n5_moth_dream'] }] },
       ['narr', 'Behind you, the bridge flickers. Ahead, a mountain of black glass rises out of a sea of ink.', 'A black glass mountain rises out of a black sea.'],
-      ['narr', 'Nothing moves. No birds. No wind. Just a broken moon over the peak, like a cracked plate.', 'Nothing moves. The broken moon hangs over the top.'],
+      ['narr', 'Nothing moves. There are no birds and no wind, only a broken moon over the peak, like a cracked plate.', 'Nothing moves. The broken moon hangs over the top.'],
       ['ash', 'Hello? ...Anybody? No? Okay.', 'Hello? Anybody? No? Okay.'],
       ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
       ['ash', 'She talks like Grandpa did on the mountain. Same words. I wish she would stop.', 'She talks like Grandpa did. I wish she would stop.'],

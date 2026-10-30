@@ -12,7 +12,7 @@
 // The friend scene for a Hush freed in Act IV (n_hush_join) is N5b's.
 quest({
   id: 'q_n5_hush', act: 5, optional: true, if: '!flag n5_hush !choice m_hush=free',
-  title: ['A Hundred White Moths', 'A hundred white moths'],
+  title: ['A Bit Tied Up', 'A hundred white moths'],
   payoff: { kind: 'ally', id: 'n5_hush' },
 
   place: {

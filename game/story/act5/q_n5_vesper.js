@@ -10,7 +10,7 @@
 // Starts from N5a's "Keep going" pick (quest start q_n5_vesper) or at the Crown's "Who is with me?" (people.js n5_who).
 quest({
   id: 'q_n5_vesper', act: 5, optional: true, if: 'flag n5_vesper_left !flag n5_vesper',
-  title: ['Sorry, Cousin', 'Sorry, cousin'],
+  title: ['A Hard Biscuit to Swallow', 'Sorry, cousin'],
   payoff: { kind: 'ally', id: 'n5_vesper' },
 
   item: {
