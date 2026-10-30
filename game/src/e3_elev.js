@@ -530,6 +530,7 @@ function elvWProj(a){ if(a.elv==null||(a.elv<0&&a.t>0.05)){ if(elvGrid(a.x,a.y))
 // ---------- art: cliffs painted into the ground chunks (Cat Quest bold: flat tones, a lit lip, dark outlines)
 function elvPath(g,X,Y,idx,close){ g.moveTo(X(idx[0]),Y(idx[0])); for(let k=1;k<idx.length;k++) g.lineTo(X(idx[k]),Y(idx[k])); if(close) g.closePath(); }
 function elvPaintPlat(g,P,rx0,ry0,rx1,ry1){
+  if(LOOK.re) return reElvPlat(g,P,rx0,ry0,rx1,ry1);   // (v12 ART23) the Realistic look's rock faces (e12d_acts23.js)
   const S=P.S, tex=S.tex;
   for(const r of P.rings){
     const n=r.n, X=r.x, Y=r.y, BX=r.bxv, BY=r.byv, FR=r.front, SB=r.sbb;
@@ -635,6 +636,7 @@ function elvStepArt(g,P,r,run,vx,vy){
 }
 // stairs, ramps and ladders, over the face they cut through
 function elvPaintRamp(g,E,rp){
+  if(LOOK.re) return reElvRamp(g,E,rp);
   const P=elvOwnerAt(E,(rp.ax0+rp.ax1)/2,rp.dir==='n'?rp.ay0-6:rp.dir==='s'?rp.ay1+6:(rp.ay0+rp.ay1)/2,rp)||E.plats[0], S=rp.look?Object.assign({},P.S,rp.look):P.S;
   const x0=rp.ax0, x1=rp.ax1, y0=rp.ay0, y1=rp.ay1, W=x1-x0, Hh=y1-y0, vert=rp.dir==='n'||rp.dir==='s';
   g.save(); g.lineJoin='round'; g.lineCap='round';
@@ -700,6 +702,7 @@ function elvOwnerAt(E,x,y,rp){ const g=E.G; if(!g) return null; let best=null; f
 function elvRingsIn(R,x,y){ let c=false; for(const r of R){ for(let i=0,j=r.n-1;i<r.n;j=i++){ if((r.y[i]>y)!==(r.y[j]>y)&&x<(r.x[j]-r.x[i])*(y-r.y[i])/(r.y[j]-r.y[i])+r.x[i]) c=!c; } } return c; }
 // ledges: a bright rounded lip with little drop marks, so a kid can see "I can hop down here"
 function elvPaintLedge(g,E,l){
+  if(LOOK.re) return reElvLedge(g,E,l);
   if(!l.segs||!l.segs.length) return;
   g.save(); g.lineCap='round'; g.lineJoin='round';
   for(const [P,r,i] of l.segs){
@@ -713,6 +716,7 @@ function elvPaintLedge(g,E,l){
 }
 // water or lava pouring down a face
 function elvPaintFall(g,f){
+  if(LOOK.re) return reElvFall(g,f);
   const x=f.x, w=f.w, y0=f.y0-4, y1=f.y1, lava=f.kind==='lava', h=y1-y0;
   g.save();
   const col=lava?['#ff7a1e','#ffd36a','#b8320c','#fff2b8']:['#4aa8d8','#bfeaff','#2a6a9a','#ffffff'];
@@ -725,6 +729,7 @@ function elvPaintFall(g,f){
 }
 // a trail: a dark edge, a lighter gravel bed with a worn middle, and flat stepping stones
 function elvPaintPath(g,p,x0,y0,x1,y1){
+  if(LOOK.re) return reElvPath(g,p,x0,y0,x1,y1);
   if(p.bb[2]<x0||p.bb[0]>x1||p.bb[3]<y0||p.bb[1]>y1) return;
   const pts=p.pts, w=p.w, C=p.look||{};
   g.save(); g.lineCap='round'; g.lineJoin='round';
@@ -738,6 +743,7 @@ function elvPaintPath(g,p,x0,y0,x1,y1){
 }
 // the ground mark under a vent: a ring of rock round glowing cracks
 function elvPaintVent(g,v){
+  if(LOOK.re) return reElvVent(g,v);
   const R=Math.min(46,v.r*0.55), rng=mulberry32(v.i*913+77);
   g.save(); g.lineCap='round';
   g.fillStyle='rgba(0,0,0,.30)'; g.beginPath(); g.ellipse(v.x,v.y+3,R+10,(R+10)*0.62,0,0,TAU); g.fill();
@@ -785,6 +791,7 @@ function elvPaintChunk(ch,cx,cy){
 function elvLiveE(){ if(!G||AREA||!player) return null; const E=ELV.maps[curMap()]; if(!E) return null; if(E.dirty) elvBuild(E); return E; }
 // depth mode: like the Wall, a cliff further up the screen leans away and shows a taller face (its lip rises a little)
 function elvDepthLean(E){
+  if(LOOK.re) return reElvLean(E);
   if(typeof DV==='undefined'||!DV.on||!E.G) return;
   const vx0=cam.x-80, vy0=cam.y-80, vx1=cam.x+W/zoom+80, vy1=cam.y+H/zoom+80, K=DV.k*DV.vf*3;
   ctx.save(); ctx.lineJoin='round'; ctx.lineCap='round';
