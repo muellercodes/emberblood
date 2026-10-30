@@ -6,7 +6,7 @@
 // with the Chalk Dragon Shrine and the updraft). Old saves: QDEFS.c_chalk steps 0..2 map to walk, eye, barley.
 quest({
   id: 'c_chalk', act: 2, giver: 'c_barley', optional: true, takeover: true,
-  title: ['The Chalk Dragon', 'The Chalk Dragon'],
+  title: ['Toe the Line', 'The Chalk Dragon'],
   payoff: { kind: 'heart_ember', id: 'c_chalkeye' },
   old_steps: ['walk', 'eye', 'barley'],
 

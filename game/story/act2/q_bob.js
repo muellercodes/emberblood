@@ -9,7 +9,7 @@
 // step index is 2, so home is legacy too, and its old reward stands). The Bobs' registry entry is ENG's (map1_gear.js).
 quest({
   id: 'c_bob', act: 2, giver: 'c_bobs', optional: true, takeover: true,
-  title: ['The Third Bob', 'The Third Bob'],
+  title: ['Odd Bob Out', 'The Third Bob'],
   payoff: { kind: 'ally', id: 'c_bob3' },
   old_steps: ['find', 'calm', 'home'],
 

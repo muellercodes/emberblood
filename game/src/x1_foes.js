@@ -778,7 +778,7 @@ function c1FloorPath(R){
 // spin-charges (red line) and bounces off walls, then sits dizzy outside it. He stamps sand waves (jump, or stand high).
 c1Lines('c_pinch','c_pinch_intro','c_gull_won',
   [['c_pinch',S('WHO goes there? Who dares enter the lagoon of GRAND ADMIRAL PINCH without SALUTING?','WHO is there? You did not SALUTE the Admiral!')],
-   ['ash',S('Um. Hello, Admiral.','Um. Hi, Admiral.')],
+   ['ash',S('Um. Hello, Admiral. You look a bit crabby.','Um. Hi, Admiral. You look crabby.')],
    ['c_pinch',S('That is not a salute! PREPARE TO BE PINCHED!','That is not a salute! Get ready to be PINCHED!')]],
   [['narr',S('Grand Admiral Pinch staggers, sits down in the sand, and sulks. Then he spots an old teacup in the wreck, squeezes into it, and looks enormously dignified.','Pinch sits down and sulks. Then he squeezes into an old teacup. He looks very proud.')],
    ['c_pinch',S('I meant to do that. Dismissed.','I meant to do that. Dismissed.')],
@@ -801,7 +801,7 @@ const PINCH_AI=FK.brain({move:'approach',stop:78,turn:2.6,cd:[0.7,1.3],recoverMo
          {k:'c1slam',off:76,r:52,windup:0.8,dmgN:24,max:170,w:2.2,if:e=>e.shellOn&&!e.surge,then:(e,m)=>{ e.stuck={side:-1,x:m.x,y:m.y}; e.stuckT=2; c1Txt(e,S('His claw is stuck! Hit it!','Claw stuck! Hit it!'),'#ffd27a',15); }},
          {k:'c1bubbles',n:3,windup:0.6,dmgN:9,spd:90,min:130,every:4,w:1.6,if:e=>e.shellOn&&!e.surge},
          {k:'c1scuttle',time:1.1,mul:2.4,every:5,w:1,if:e=>e.shellOn&&!e.surge}]});
-defineFoe('c_pinch',{boss:true,name:'Grand Admiral Pinch',title:S('Admiral of the Drowned Lagoon','Admiral of the lagoon'),short:'Admiral Pinch',
+defineFoe('c_pinch',{boss:true,name:'Grand Admiral Pinch',title:S('Claws for Alarm','Admiral of the lagoon'),short:'Admiral Pinch',
   lv:11,hp:4300,r:40,speed:110,dmg:17,value:1000,kbRes:0.05,dcol:'232,128,90',phases:[0.66,0.33],
   phaseText:[[S('High Tide!','High tide!'),S('The lagoon floods! Climb a cracked wall to a ledge. Hit his gold deck from up there!','The water comes! Climb up high! Hit his deck!'),['c_pinch',S('All hands! FLOOD THE LAGOON!','Flood the lagoon!')]],
              [S('Shell Shock!','Shell off!'),S('He popped out of his shell and he is soft! Stand between him and his shell. Jump his sand waves.','He is soft now! Block his shell! Jump the waves!'),['c_pinch',S('My shell! Somebody fetch my SHELL!','My shell! Get my shell!')]]],
@@ -1064,7 +1064,7 @@ const TICK_AI=FK.brain({move:'approach',stop:96,turn:0.0001,cd:[0.9,1.6],recover
          {k:'c1gearToss',min:150,max:620,windup:0.6,dmgN:20,w:2,every:3},
          {k:'breath',st:'breathW',st2:'breath',len:240,half:0.5,dur:0.8,frost:true,dmgN:10,windup:1.0,col:'255,255,255',max:260,w:1.6,every:4},
          {k:'c1slams',ph:2,n:3,off:66,r:92,windup:0.6,dmgN:24,max:300,w:3}]});
-defineFoe('c_ticktock',{boss:true,name:'Ticktock',title:S('the Brass Colossus','the brass giant'),short:'Ticktock',
+defineFoe('c_ticktock',{boss:true,name:'Ticktock',title:S('The Brass Colossus, Fully Wound Up','the brass giant'),short:'Ticktock',
   lv:11,hp:4200,r:44,speed:70,dmg:20,value:1000,kbRes:0,dcol:'226,176,80',phases:[0.66,0.33],
   phaseText:[[S('Tock!','Tock!'),S('He climbs the shaft! Mind the pendulum. Hang from a ring near him and YANK his key!','He climbs up! Hang from a ring and pull his key!'),['c_pearl',S('Ticktock! Come down from there this minute!','Ticktock! Come down!')]],
              [S('Overclock!','Too fast!'),S('Faster ticking! Each time he slumps, his key comes out a little more. Pull it out!','He is fast now! Pull the key out!'),['c_pearl',S('The key, Ash! Pull it all the way out and he can rest.','Pull the key all the way out!')]]],
@@ -1250,9 +1250,9 @@ const GLOOM_BRAIN=FK.brain({move:'hold',turn:4,cd:[1.4,2.4],
   moves:[{k:'c1cone',st:'stareW',st2:'stare',windup:1.0,len:300,half:0.42,col:C1COL.violet,pcol:'200,150,255',glow:true,max:340,w:2,hit:e=>{ C1.hushT=Math.max(C1.hushT,3); ftext(player.x,player.y-40,S('The eyes! Your fire goes quiet.','Your fire is gone for a bit!'),'#d8c0ff',13); }},
          {k:'c1summon',type:'c_moth',n:4,nf:()=>byDiff(2,4,6),every:13,windup:0.8,st:'summon',r0:40,r1:120,opt:{swarm:true},w:2.4,if:e=>e.bph!==1&&countType('c_moth')<byDiff(3,6,8)},
          {k:'c1swoop',st:'aim',st2:'swoop',windup:0.8,len:360,w:70,spd:560,time:0.6,dmg:1.3,kb:300,min:120,max:420,w:2.2}]});
-defineFoe('c_gloomwing',{boss:true,name:'The Gloomwing',title:S('the Moth of the Lamp','the lamp moth'),short:'Gloomwing',
+defineFoe('c_gloomwing',{boss:true,name:'The Gloomwing',title:S('Lampshade of the Lighthouse','the lamp moth'),short:'Gloomwing',
   lv:12,hp:4000,r:46,speed:150,dmg:22,value:1000,flying:true,kbRes:0.1,dcol:'190,170,230',phases:[0.66,0.33],
-  phaseText:[[S('Shadow!','Shadow!'),S('It hides in its own shadow under the glass. SHADOW DASH into its shadow to knock it out!','Dash into its shadow!'),['c_pearl',S('A shadow is just a door nobody has noticed, Ash. Go through it!','Go through its shadow!')]],
+  phaseText:[[S('Shadow!','Shadow!'),S('It hides in its own shadow under the glass. SHADOW DASH into its shadow to knock it out!','Dash into its shadow!'),['c_pearl',S('It is hiding in its own shadow, Ash. Dash in after it!','Go through its shadow!')]],
              [S('The Lamp!','The lamp!'),S('It smothers the great lamp. Breathe fire on the wick until it catches! The beam will knock it down.','Breathe fire on the lamp!'),['c_pearl',S('Light my lamp, Ash! Fire on the wick!','Light my lamp!')]]],
   init(e){ c1BossInit(e); e.z=60; e.orb=rand(0,TAU); e.beamCd=0; e.downT=0; e.mode='fly'; e.onShadow=gloomShadowHit; },
   onPhase(e,i){ e.downT=0; e.sunk=false; e.mode=i===1?'sinkDown':'toLamp'; e.mst=0; },
@@ -1487,7 +1487,7 @@ function saltPre(e,dt,d,a){
   bossCad(e,e.bph>=1?0.8:1);
   return false;
 }
-defineFoe('c_saltbeard',{boss:true,name:'Captain Saltbeard',title:S('Ghost of the Saucy Gull','the ghost pirate'),short:'Saltbeard',
+defineFoe('c_saltbeard',{boss:true,name:'Captain Saltbeard',title:S('The Hungriest Ghost on the Coast','the ghost pirate'),short:'Saltbeard',
   lv:10,hp:2600,r:22,speed:120,dmg:20,value:550,kbRes:0.3,dcol:'170,215,240',phases:[0.5],
   phaseText:[[S('Ghost Guns!','Ghost guns!'),S('His ghost cannons fire, and he vanishes! Breathe fire on the swirl where he comes back.','He vanishes! Burn the blue swirl!'),['c_saltbeard',S('Man the ghost guns, ye barnacles!','Fire the ghost guns!')]]],
   init(e){ e.solidT=0; e.alpha=0.6; },
@@ -1622,7 +1622,7 @@ const VESPER_MOVES=[{k:'c1dash',len:300,dmgN:26,min:60,max:420,w:3},
   {k:'c1vault',dmgN:28,every:7,min:100,w:1.5,if:e=>!e.clone}];
 const VESPER_AI=FK.brain({move:'strafe',slant:1.1,stop:70,turn:8,cd:[0.5,1.1],recoverMove:0.4,pre:vesperPre,moves:VESPER_MOVES});
 const CLONE_AI=FK.brain({move:'strafe',slant:1.2,stop:80,turn:7,cd:[1.1,2.0],recoverMove:0.4,pre:(e,dt)=>{ if(e.dizzyT>0){ e.dizzyT-=dt; e.state='dizzy'; e.dx=e.dy=0; return true; } },moves:VESPER_MOVES.slice(0,3)});
-defineFoe('c_mothmask',{boss:true,name:'Vesper',title:S('the Moth Mask','the Moth Mask'),short:'Vesper',
+defineFoe('c_mothmask',{boss:true,name:'Vesper',title:S('The Moth Mask, One Roof Ahead','the Moth Mask'),short:'Vesper',
   lv:13,hp:7200,r:13,speed:230,dmg:26,value:2500,kbRes:0.5,dcol:'170,140,220',phases:[0.66,0.33],
   phaseText:[[S('Shadow Clones!','Clones!'),S('Which one is real? Only she gets hurt. Watch the beam, listen for Bolt, look for the glint. Fire burns the fakes away.','Which one is real? Use the beam! Fire pops fakes.'),['c_mask',S('Which one is me? Guess!','Which one is me? Guess!')]],
              [S('Into the Dark!','Into the dark!'),S('She dives into the shadow pools. SHADOW DASH into the pool she is in! Fire closes a pool.','Dash into her pool! Fire closes pools.'),['c_mask',S('You cannot follow me here!','You cannot follow me here!')]]],
@@ -1830,7 +1830,7 @@ function c1MiniDone(e){
 // 1.5 s (gold, x2). His barnacle shield blocks the front: the hammer shatters it, and a hit from a ledge above
 // (a falling strike) goes over it. On a ledge he throws barnacles at you.
 c1Lines('c_brute',null,null,[],[]);
-defineFoe('c_brute',{mini:true,name:'The Barnacle Brute',title:S('Knight of the Barnacle Bridge','The barnacle knight'),short:'Barnacle Brute',
+defineFoe('c_brute',{mini:true,name:'The Barnacle Brute',title:S('Stuck-Up Knight of the Barnacle Bridge','The barnacle knight'),short:'Barnacle Brute',
   r:24,hp:520,speed:90,dmg:13,value:60,shield:true,kbRes:0.2,dcol:'214,120,88',
   ai:FK.brain({move:'approach',stop:62,guard:true,turn:2,cd:[0.9,1.6],recoverMove:0.2,
     pre(e,dt){ if(e.gbT>0){ e.gbT-=dt; e.shield=false; e.blocking=false; if(e.gbT<=0){ e.shield=true; c1Txt(e,S('The barnacles grow back!','Shield back!'),'#e8dcc8',12); } }
@@ -1908,7 +1908,7 @@ FM.c1rang={ start(e,m){ e.state='throw'; e.st=fkW(m.o,0.45); e.tele=newTele({sha
   tick(e,dt,d,a,m){ if(e.st>0.12) e.face=turnTo(e.face,a,6*dt); e.st-=dt; if(e.st>0) return false; e.tele=null; fzAdd('c1rang',{x:e.x,y:e.y,a:e.face,sp:420,d:0,max:300,dmg:fkDmg(e,m.o),owner:e,life:4}); SFX.play('throw'); return true; } };
 FM_DEF.c1rang={recover:0.4};
 function c1Lights(e){ const out=[]; if(!AREA) return out; for(const o of AREA.objs){ if((o.k==='brazier'||o.k==='c1brazier')&&o.lit) out.push(o); } return out; }
-defineFoe('c_shadowash',{mini:true,name:'Shadow Ash',title:S('your own reflection','your shadow'),short:'Shadow Ash',
+defineFoe('c_shadowash',{mini:true,name:'Shadow Ash',title:S('A Bad Copy','your shadow'),short:'Shadow Ash',
   r:14,hp:600,speed:210,dmg:12,value:70,kbRes:0.6,dcol:'120,90,170',
   ai:FK.brain({move:'strafe',slant:1,stop:56,turn:8,cd:[0.5,1.1],recoverMove:0.4,pre:shadowPre,
     moves:[{k:'c1combo',n:3,reach:54,half:1.0,windup:0.32,windup2:0.2,gap:0.12,lunge:150,dmg:1,col:C1COL.white,max:86,w:3},
