@@ -42,9 +42,9 @@ quest({
       ['m_kiln', "You're the dragon from the sea? Good. GOOD. I need a dragon.", 'You are the sea dragon? Good!'],
       ['m_kiln', "I've always wanted to make something out of the moon. Bits of it fell here once. That's why the sand is glass.",
         'Bits of the moon fell here once. The sand is glass.'],
-      ['m_kiln', "But the big bits are long gone. If you find a fresh piece of moon, bring it to me.",
+      ['m_kiln', "But the big bits are long gone. Find me a fresh piece of moon, and I'll make you something you'll never forget. Unless you hit your head.",
         'Find a piece of moon. Bring it to me.'],
-      { choose: 'm_glaive_offer', ask: ["I'll make you something you'll never forget. Unless you hit your head.", 'I will make you something great!'],
+      { choose: 'm_glaive_offer', ask: ['Find Old Kiln a piece of the moon?', 'Find Kiln a piece of moon?'],
         pick: [
           { t: ['A piece of the moon? Deal!', 'Deal!'], tone: 'brave', then: ['quest start m_glaive'],
             say: [['m_kiln', "EH? Speak up! ...Oh, deal. Deal! Don't hit your head.", 'Deal! Do not hit your head.']] },

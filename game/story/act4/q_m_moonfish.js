@@ -32,7 +32,7 @@ quest({
       ['m_gilly', 'Find it down in the Drowned Reach and chase it up to my fishing raft. I just want to see it. Not cook it.',
         'Chase it up to my raft. I just want to see it.'],
       ['m_gilly', '...Mostly not cook it.'],
-      { choose: 'm_moonfish_offer', ask: ['Will you chase the Moonfish up for Gilly?', 'Chase the Moonfish?'], pick: [
+      { choose: 'm_moonfish_offer', ask: ['Chase the Moonfish up for Gilly?', 'Chase the Moonfish?'], pick: [
         { t: ["I'll find it. No cooking.", 'I will. No cooking!'], tone: 'kind', then: ['quest start m_moonfish'],
           say: [['m_gilly', "I'll row out north of town and wait. Look for a little raft and a lot of hope.", 'I will wait on my raft up north.',
             { dir: ['m4s_driftwood', 'm3p_raft', 'north'] }]] },

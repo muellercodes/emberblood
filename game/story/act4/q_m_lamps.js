@@ -56,7 +56,7 @@ quest({
           'Lady Wellington stayed lit. You were there.', { do: ['set m_lamp_9'] }]] },
       ['m_esme', "Twelve is a lot to ask, I know. Light them again, dragon, and I'll tell you a secret about moths. It might save your tail.",
         'Light them. I will tell you a moth secret.', { promise: 'm4_esme_secret' }],
-      { choose: 'm_lamps_offer', ask: ['Will you light every lamp in Sable?', 'Light every lamp?'], pick: [
+      { choose: 'm_lamps_offer', ask: ['Light every lamp in Sable?', 'Light every lamp?'], pick: [
         { t: ["I'm a dragon. Lighting things is my whole job.", 'I will!'], tone: 'brave', then: ['quest start m_lamps'],
           say: [['m_esme', 'Each lamp is a little different. Look at one, and it will tell you what it needs. Lamps are like that.',
             'Look at a lamp. It tells you what it needs.']] },

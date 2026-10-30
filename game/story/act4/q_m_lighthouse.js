@@ -33,8 +33,8 @@ quest({
     lh_offer: [
       ['m_squint', 'My grandpa Ned keeps the lighthouse on Gull Isle. The moths came and the lamp went out, and he won\'t come down.',
         "Grandpa Ned's lighthouse went dark. He won't come down."],
-      ['m_squint', 'He says he\'s "thinking". He\'s been thinking for a month.', 'He has been "thinking" for a month.'],
-      { choose: 'm_lighthouse_offer', ask: ['Will you go up and see him? Take him this sandwich. It\'s fish.', 'Take him this sandwich?'], pick: [
+      ['m_squint', 'He says he\'s "thinking". He\'s been thinking for a month. Will you take him this sandwich? It\'s fish.', 'He has been "thinking" for a month. Take him this sandwich?'],
+      { choose: 'm_lighthouse_offer', ask: ['Take Old Ned the fish sandwich?', 'Take Ned the sandwich?'], pick: [
         { t: ['I\'ll take it up to him.', 'I will!'], tone: 'kind', then: ['quest start m_lighthouse', 'give m_sandwich'],
           say: [['m_squint', 'Everything here is fish. LAND HO! ...Sorry. Habit.', 'Everything here is fish. LAND HO!']] },
         { t: ['Not right now', 'Not now'], say: [['m_squint', 'Lookout reporting! Nothing to report! Still.', 'Nothing to report.']] },

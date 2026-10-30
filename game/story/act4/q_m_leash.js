@@ -49,7 +49,7 @@ quest({
       ['m_ripple', 'Only moonfire melts moon-wax. Then take the book to someone who reads old Lumen. I read it very badly.',
         'Moonfire melts the wax. Then find someone who can read it.'],
       ['m_ripple', 'I once read "moth" as "mother" for a whole week. Sorry, fish. Not you.', 'I once read "moth" as "mother". Sorry, fish.'],
-      { choose: 'm_leash_offer', ask: ['Will you find the Book of Moths?', 'Find the Book of Moths?'], pick: [
+      { choose: 'm_leash_offer', ask: ['Find the Book of Moths for Ripple?', 'Find the Book of Moths?'], pick: [
         { t: ['I will. Moths are kind of my thing now.', 'I will!'], tone: 'kind', then: ['quest start m_leash'],
           say: [['m_ripple', 'Splendid. You know the way down already, which is more than I ever do.', 'Splendid! You know the way.']] },
         { t: ['Not yet', 'Not yet'],
