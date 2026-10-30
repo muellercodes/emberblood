@@ -46,7 +46,7 @@ quest({
     ],
     tl_reel: [
       ['narr', 'Hettie takes your tail very gently, a screwdriver in her teeth. Click. Whirr. Clunk.', 'Click. Whirr. Clunk!'],
-      ['c_hettie', 'The Reel-In! Grapple a shield and pull. Grapple a crab and pull.', 'The Reel-In! Grapple and pull!'],
+      ['c_hettie', 'The Reel-In! Grapple a shield and pull. Grapple a crab and pull. Spring has sprung!', 'The Reel-In! Grapple and pull!'],
       ['c_hettie', 'Try it. That biscuit on the top shelf. Go on.', 'Try it on that biscuit!'],
       ['narr', 'You flick your tail. The biscuit zips across the room into your hand. So does the shelf.', 'The biscuit flies to you. So does the shelf.'],
       ['c_hester', '(from somewhere up the hill) WHO TOOK MY WEATHERVANE SPRING?', '(far away) WHO TOOK MY SPRING?'],

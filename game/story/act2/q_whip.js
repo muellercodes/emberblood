@@ -64,7 +64,7 @@ quest({
       ] },
     ],
     wp_charlie: [
-      ['c_charlie', "Ghost Pepper Chowder? Nobody's been brave enough to make that in forty years.", 'Nobody has made that in forty years!'],
+      ['c_charlie', "Ghost Pepper Chowder? My grandpa's recipe. To die for, he always said. Nobody's been brave enough to make it in forty years.", 'Nobody has made that in forty years!'],
       ['c_charlie', 'I need three sea peppers. Little red ones. They grow in the Rockpools, and the crabs will not share.',
         'Bring me 3 sea peppers from the Rockpools.'],
       { if: '!power claws', then: [['c_charlie', "One grows on a cliff ledge. You'd want claws for that one.", 'One is on a cliff. You need claws.', { ref: 'c_lm_pep3' }]] },

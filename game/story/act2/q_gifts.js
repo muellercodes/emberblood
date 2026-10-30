@@ -53,7 +53,7 @@ quest({
 
   scene: {
     gf_offer: [
-      ['c_penny', 'HEADLINE: MOTH MASK STEALS GOLDEN MUSIC BOX. LORD WHIRLIGIG FAINTS. TWICE.', 'HEADLINE: MOTH MASK STEALS MUSIC BOX!'],
+      ['c_penny', 'HEADLINE: MOTH MASK WALTZES OFF WITH GOLDEN MUSIC BOX. LORD WHIRLIGIG FAINTS. TWICE.', 'HEADLINE: MOTH MASK STEALS MUSIC BOX!'],
       ['c_penny', 'Here is the thing. Half of what she takes from the barons turns up on Saltmarsh doorsteps.',
         'Her loot turns up on Saltmarsh doorsteps.'],
       ['c_penny', 'Follow the music box, find the Moth Mask. Scoop of the century. You in?', 'Follow the box. Find her. You in?'],
