@@ -143,7 +143,7 @@ function reTexInit(){
   T[RM.DRY]=reTexPaint(103,(g,r,W)=>{ reBlobs(g,r,W,40,'150,134,96',0.1,3,8); reCracks(g,r,W,10,'rgba(44,38,32,.2)',0.8,4,4); reDots(g,r,W,1300,'176,160,110',0.18,0.34); reDots(g,r,W,1100,'46,42,34',0.2,0.34); reDots(g,r,W,160,'196,190,176',0.3,0.45,2,1); });
   T[RM.ROCK]=reTexPaint(104,(g,r,W)=>{ for(let i=0;i<14;i++){ const y=r()*128, a=0.1+r()*0.08; g.strokeStyle=`rgba(${r()<0.5?'214,176,136':'70,44,30'},${a.toFixed(2)})`; g.lineWidth=1+r()*1.5; W(()=>{ g.beginPath(); for(let x=-4;x<=132;x+=8) g.lineTo(x,y+Math.sin(x*0.09+i)*3); g.stroke(); }); } reCracks(g,r,W,16,'rgba(40,24,18,.34)',0.9,5,4); reDots(g,r,W,220,'176,178,96',0.22,0.36,1,1); reDots(g,r,W,900,'60,40,30',0.16,0.3); reDots(g,r,W,700,'206,176,146',0.14,0.26); });
   T[RM.ASH]=reTexPaint(105,(g,r,W)=>{ reBlobs(g,r,W,50,'86,78,74',0.1,3,8); reCracks(g,r,W,12,'rgba(8,6,6,.4)',0.9,4,4); reDots(g,r,W,1500,'10,8,8',0.24,0.42); reDots(g,r,W,900,'118,108,104',0.14,0.26); reDots(g,r,W,40,'255,110,40',0.12,0.22); });
-  T[RM.SNOW]=reTexPaint(106,(g,r,W)=>{ reBlobs(g,r,W,46,'150,172,208',0.1,5,12,1.8); reBlobs(g,r,W,40,'255,255,255',0.16,3,9,1.6); reDots(g,r,W,500,'170,186,214',0.12,0.22); reDots(g,r,W,90,'255,255,255',0.5,0.8); });
+  T[RM.SNOW]=reTexPaint(106,(g,r,W)=>{ reBlobs(g,r,W,60,'156,176,212',0.035,8,20,2.2); reBlobs(g,r,W,50,'255,255,255',0.06,6,16,2); for(let i=0;i<40;i++){ const x=r()*128, y=r()*128, L=8+r()*18; g.strokeStyle=r()<0.5?'rgba(150,170,206,.12)':'rgba(255,255,255,.22)'; g.lineWidth=0.8+r()*0.8; W(()=>{ g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x+L*0.5,y-1.5,x+L,y+0.5); g.stroke(); }); } reDots(g,r,W,400,'176,190,218',0.08,0.16); reDots(g,r,W,90,'255,255,255',0.5,0.8); });
   T[RM.MARSH]=reTexPaint(107,(g,r,W)=>{ reBlobs(g,r,W,60,'26,34,20',0.16,2,6); reBlobs(g,r,W,40,'150,146,80',0.1,3,7); reDots(g,r,W,1600,'64,74,34',0.24,0.4,1,2); reDots(g,r,W,900,'168,160,92',0.14,0.26); reDots(g,r,W,200,'22,30,26',0.3,0.45,2,1); });
   T[RM.SAND]=reTexPaint(108,(g,r,W)=>{ reBlobs(g,r,W,30,'240,226,186',0.12,4,10); reDots(g,r,W,1400,'250,240,212',0.18,0.32); reDots(g,r,W,1300,'136,116,80',0.14,0.26); reDots(g,r,W,60,'120,110,100',0.3,0.45,2,1); });
   T[RM.YARD]=reTexPaint(109,(g,r,W)=>{ reBlobs(g,r,W,40,'130,118,96',0.1,3,7); for(let i=0;i<70;i++){ const x=r()*128, y=r()*128, w=3+r()*5, h=2+r()*4; g.strokeStyle='rgba(70,60,46,.16)'; g.lineWidth=0.8; W(()=>{ g.beginPath(); g.ellipse(x,y,w,h,r()*3,0,TAU); g.stroke(); }); } reDots(g,r,W,1200,'60,52,40',0.18,0.3); reDots(g,r,W,900,'214,204,180',0.14,0.26); });
@@ -391,10 +391,10 @@ function reFieldRows(C,fy0,fy1){
       else if(mat===RM.SNOW){ const sh=pn2<-0.1?(-0.1-pn2)*0.3:0; r-=sh*60; g-=sh*44; b-=sh*14; }
       if(flags&14){
         // bog: mud, then dark puddles with a sheen
-        if(flags&8){ const bg=BG[k00]*w00+BG[k10]*w10+BG[k01]*w01+BG[k11]*w11+(fn-0.5)*0.2+pn*0.08;
+        if(flags&8){ const bg=BG[k00]*w00+BG[k10]*w10+BG[k01]*w01+BG[k11]*w11+(fn-0.5)*0.05+pn*0.13+pn2*0.05;
           if(bg>0.22){ const kk=smooth(clamp((bg-0.22)/0.36,0,1))*0.88, mu=RE_MUD, ma=MUDT[q4+3]*0.00392;
             let mr=mu[0]+(MUDT[q4]-mu[0])*ma, mg=mu[1]+(MUDT[q4+1]-mu[1])*ma, mb=mu[2]+(MUDT[q4+2]-mu[2])*ma;
-            if(bg>0.78){ const pk=clamp((bg-0.78)/0.08,0,1); mr+=(30+pn2*8-mr)*pk; mg+=(40+pn2*10-mg)*pk; mb+=(36+pn2*12-mb)*pk; if(bg>0.8&&bg<0.84){ mr+=16; mg+=18; mb+=16; } }
+            if(bg>0.72){ const pk=smooth(clamp((bg-0.72)/0.14,0,1)); mr+=(34+pn2*8-mr)*pk; mg+=(44+pn2*10-mg)*pk; mb+=(40+pn2*12-mb)*pk; if(bg>0.76&&bg<0.8){ const hl=(1-Math.abs(bg-0.78)/0.02)*14; mr+=hl; mg+=hl*1.1; mb+=hl; } }
             r+=(mr-r)*kk; g+=(mg-g)*kk; b+=(mb-b)*kk; } }
         // road: packed earth with ruts, a worn middle and a ragged edge that fades into the ground
         if(flags&2){ const rd=RD[k00]*w00+RD[k10]*w10+RD[k01]*w01+RD[k11]*w11, rw=RW[k00]*w00+RW[k10]*w10+RW[k01]*w01+RW[k11]*w11;
@@ -424,7 +424,7 @@ function reFieldRows(C,fy0,fy1){
           if(f>-3.2){ const fq=(1+f/3.2)*0.32; wr+=(232-wr)*fq; wg+=(240-wg)*fq; wb+=(236-wb)*fq; }
           r=wr; g=wg; b=wb;
           if(!(fx&1)&&!(fy&1)){ const wa=clamp(1+f/46,0,1); if(wa>0){ const q=(((fy>>1)<<7)|(fx>>1))<<2; WM[q]=WM[q+1]=WM[q+2]=255; WM[q+3]=Math.round(wa*wa*235); hasShallow=true; } }
-        } else if(f<11){ const wq=(1-f/11), wk=wq*wq*RMAT[mat].wet; r*=1-wk; g*=1-wk*0.92; b*=1-wk*0.8; } }
+        } else if(f<(mat===RM.SAND?17:11)){ const wq=(1-f/(mat===RM.SAND?17:11)), wk=wq*(mat===RM.SAND?1:wq)*RMAT[mat].wet; r*=1-wk; g*=1-wk*0.92; b*=1-wk*0.8; } }
       const q=(fy*FS+fx)<<2; D[q]=r; D[q+1]=g; D[q+2]=b; D[q+3]=255;
     }
   }
@@ -599,16 +599,18 @@ function reWater(vis,t){
   if(!REW.scr){ REW.scr=mkCanvas(256,256); REW.sg=REW.scr.getContext('2d'); }
   const nf=REW.frames.length, fi=Math.floor(t*7)%nf, fr=REW.frames[fi], sg=REW.sg;
   if(!REW.pats[fi]) REW.pats[fi]=sg.createPattern(fr,'repeat');
-  const pat=REW.pats[fi], dl=typeof daylight==='function'?daylight():1;
+  const dl=typeof daylight==='function'?daylight():1;
   let n=0;
   ctx.save();
   for(const v of vis){ const ch=CHUNKS.get(ckey(v[0],v[1])); if(!ch||!ch.re||!ch.re.wm) continue;
     const x0=v[0]*CH, y0=v[1]*CH; if(!inView(x0+CH/2,y0+CH/2,CH*0.75)) continue;
-    sg.setTransform(1,0,0,1,0,0); sg.globalCompositeOperation='copy'; sg.imageSmoothingEnabled=true; sg.drawImage(ch.re.wm,0,0,256,256);
-    sg.globalCompositeOperation='source-in'; const ox=((x0/2)%128+128)%128, oy=((y0/2)%128+128)%128; sg.setTransform(1,0,0,1,-ox,-oy); sg.fillStyle=pat; sg.fillRect(ox,oy,256,256);
-    ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.1+0.16*dl; ctx.drawImage(REW.scr,0,0,256,256,x0,y0,CH,CH); n++;
+    // the chunk's masked caustics are kept until the pattern moves on to its next frame (7 a second)
+    const R=ch.re; if(R.cf!==fi||!R.cc){ if(!R.cc){ R.cc=mkCanvas(256,256); R.cg=R.cc.getContext('2d'); }
+      const cg=R.cg; cg.setTransform(1,0,0,1,0,0); cg.globalCompositeOperation='copy'; cg.imageSmoothingEnabled=true; cg.drawImage(R.wm,0,0,256,256);
+      cg.globalCompositeOperation='source-in'; const ox=((x0/2)%128+128)%128, oy=((y0/2)%128+128)%128; cg.setTransform(1,0,0,1,-ox,-oy); cg.fillStyle=REW.pats[fi]; cg.fillRect(ox,oy,256,256);
+      cg.setTransform(1,0,0,1,0,0); cg.globalCompositeOperation='source-over'; R.cf=fi; REW.st.ups=(REW.st.ups||0)+1; }
+    ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=0.1+0.16*dl; ctx.drawImage(R.cc,0,0,256,256,x0,y0,CH,CH); n++;
   }
-  sg.setTransform(1,0,0,1,0,0); sg.globalCompositeOperation='source-over';
   // soft lapping foam: every other segment of each shore's foam line drifts out from the shore and fades
   const u=(t*0.3)%1, d=1.5+u*8, a=0.34*(1-u)*Math.min(1,u*5), X0=cam.x-20, Y0=cam.y-20, X1=cam.x+W/zoom+20, Y1=cam.y+H/zoom+20;
   if(a>0.03){ ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=a; ctx.strokeStyle='#eef6f2'; ctx.lineWidth=1.1; ctx.lineCap='round'; ctx.beginPath();
