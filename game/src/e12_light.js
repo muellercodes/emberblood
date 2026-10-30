@@ -237,7 +237,7 @@ const RL_CAVE={earth:[[30,22,18],[236,226,210]],mine:[[30,22,16],[240,222,196]],
   m3lab:[[18,18,28],[232,232,244]],leap:[[14,24,16],[226,240,214]]};
 function rlRoomBase(){
   const A=AREA, dl=daylight();
-  if(A.kind==='cave'){ const T=RL_CAVE[A.def&&A.def.theme]||[[12,14,26],[236,234,230]], dk=clamp(A.dark||0,0,1); return mixRGB(T[1],T[0],dk); }
+  if(A.kind==='cave'){ const T=RL_CAVE[A.def&&A.def.theme]||[[12,14,26],[236,234,230]], dk=clamp(A.dark||0,0,1)*0.84; return mixRGB(T[1],T[0],dk); }   // a little lift: caves stay moody but readable on a phone
   const dk=clamp((A.dark||0)+(1-dl)*0.3,0,1), lit=mixRGB([190,178,196],[255,246,232],dl);
   return mixRGB(lit,[36,26,32],dk);
 }
