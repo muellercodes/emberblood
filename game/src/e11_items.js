@@ -27,35 +27,35 @@ const ITEMDEF={};
 const IT_NEW={
   it_bun:{act:1,cap:3,price:[8,16,22,28],w:3,t:3,
     name:['Lantern Bun','Lantern Bun'],
-    desc:['Warm all the way through. Heals 25% of your health over 3 seconds.','Heals you a bit.'],
+    desc:['Bertram\'s Lantern Day best, still warm in the middle. Bun-believably good. Heals 25% of your health over 3 seconds.','A warm bun. Heals you a bit.'],
     short:['heals you','heals you']},
   it_pepper:{act:1,cap:2,price:[20,40,56,70],w:2,t:10,
     name:['Ember Pepper','Ember Pepper'],
-    desc:['Fills your fire meter. Fire breath and Blaze cost nothing for 10 seconds.','Free fire for 10 seconds!'],
+    desc:['A pepper with a hot temper. Fills your fire meter, and your fire breath costs nothing for 10 seconds.','Free fire for 10 seconds!'],
     short:['free fire breath','free fire']},
   it_feather:{act:1,cap:1,price:[30,60,84,105],w:2,
     name:['Pebble\'s Feather','Pebble\'s Feather'],
-    desc:['Pebble the crow leads you out of a cave, dungeon or house, back to its door.','Pebble takes you out to the door.'],
+    desc:['Pebble the crow leads you out of a cave, dungeon or house, back to its door. She will send the bill in buttons.','Pebble takes you out to the door.'],
     short:['a way out of caves','a way out']},
   it_taffy:{act:2,cap:2,price:[null,30,42,53],w:2,t:15,
     name:['Salt Taffy','Salt Taffy'],
-    desc:['Chewy and very salty. Your stamina stays full for 15 seconds.','Full stamina for 15 seconds.'],
+    desc:['Chewy, very salty, and shore to keep you going. Your stamina stays full for 15 seconds.','Full stamina for 15 seconds.'],
     short:['endless stamina','lots of stamina']},
   it_drop:{act:2,cap:2,price:[null,45,63,79],w:2,
     name:['Thunder Drop','Thunder Drop'],
-    desc:['A candy that rumbles in your tummy. Your Roar meter fills up at once.','Fills your Roar!'],
+    desc:['A candy that rumbles in your tummy. A roaring success: your Roar meter fills up at once.','Fills your Roar!'],
     short:['fills your Roar','fills your Roar']},
   it_stone:{act:3,cap:2,price:[null,null,50,63],w:2,t:30,
     name:['Hearth Stone','Hearth Stone'],
-    desc:['A warm stone for your pocket. Hits hurt 25% less for 30 seconds.','Hits hurt less for 30 seconds.'],
+    desc:['A warm stone for your pocket, and very hard to beat. Hits hurt 25% less for 30 seconds.','Hits hurt less for 30 seconds.'],
     short:['hits hurt less','hits hurt less']},
   it_snowball:{act:3,cap:3,price:[null,null,45,56],w:2,
     name:['Snowgob Snowball','Snowgob Snowball'],
-    desc:['A burst of frost all round you. Foes close by freeze for 2.5 seconds, a boss for a blink.','Freezes foes near you!'],
+    desc:['Chill out, everybody. A burst of frost all round you: foes close by freeze for 2.5 seconds, a boss for a blink.','Freezes foes near you!'],
     short:['freezes foes','freezes foes']},
   it_pudding:{act:4,cap:2,price:[null,null,null,60],w:1,t:30,
     name:['Gilly\'s Fish Pudding','Gilly\'s Fish Pudding'],
-    desc:['Heals 15% of your health, and your hits do 20% more for 30 seconds.','Heals a bit. Hit harder for 30 seconds.'],
+    desc:['Gilly will not say what is in it. It is for your own cod. Heals 15% of your health, and your hits do 20% more for 30 seconds.','Heals a bit. Hit harder for 30 seconds.'],
     short:['heals, hit harder','hit harder']}
 };
 for(const id in IT_NEW){ const d=IT_NEW[id];
@@ -64,11 +64,11 @@ for(const id in IT_NEW){ const d=IT_NEW[id];
 const IT_USE_IDS=Object.keys(IT_NEW);
 // the old items: works by itself, tools, keepsakes (hats among them). Every other id is 'quest'.
 const IT_OLD={
-  auto:{c_biscuit:['Granny Oona baked it long ago. When you are badly hurt, you eat it by yourself.','Heals you by itself when you are badly hurt.'],
-    c_lumpybun:['Tikka made it. When you are badly hurt, you eat it by yourself.','Heals you by itself when you are badly hurt.'],
-    f_cocoa:['When you are badly hurt, it warms you up by itself.','Heals you by itself when you are badly hurt.'],
-    m_airjar:['When your air runs low under water, you open it by yourself.','Gives you air under water by itself.']},
-  tool:{lantern:['Lights up dark caves.','Lights up caves.'],rod:['Fish where you see ripples by the water.','Fish where the water ripples.'],
+  auto:{c_biscuit:['Granny Oona baked it long ago, and it has only got harder since. When you are badly hurt, you eat it by yourself.','Heals you by itself when you are badly hurt.'],
+    c_lumpybun:['Tikka made it. The lumps are on purpose, she says. When you are badly hurt, you eat it by yourself.','Heals you by itself when you are badly hurt.'],
+    f_cocoa:['Pim\'s cocoa, still hot. Nobody knows how. When you are badly hurt, it warms you up by itself.','Heals you by itself when you are badly hurt.'],
+    m_airjar:['A jar of good fresh air, packed tight. When your air runs low under water, you open it by yourself.','Gives you air under water by itself.']},
+  tool:{lantern:['Lights up dark caves. A bright idea.','Lights up caves.'],rod:['Fish where you see ripples by the water. Patience not included.','Fish where the water ripples.'],
     map_x1:null,map_x2:null,map_x3:null,c_map:null,juniper_map:null,f_northmaps:null,n_map:null},
   keep:{m_pearl:null,a1_skipstone:null,f_medal:null,relic:null,
     sky_feather:'hat',f_earmuffs:'hat',f3_plume:'hat',c_badge:'hat',n5_goathorns:'hat',c_scarf:'hat',f3_wolf_hat:'hat',
@@ -77,8 +77,8 @@ const IT_OLD={
 const IT_KIND_DESC={
   tool:['A map. It shows on your map screen.','A map.'],
   keep:['A keepsake. It is yours to keep.','A keepsake.'],
-  hat:['Something to wear. Looking good.','Something to wear.'],
-  quest:['For a quest. Somebody will want this.','For a quest.']
+  hat:['Something to wear. Hats off to you. Well, hats on.','Something to wear.'],
+  quest:['For a quest. Somebody out there will be very glad to see this.','For a quest.']
 };
 for(const kind in IT_OLD) for(const id in IT_OLD[kind]){
   const v=IT_OLD[kind][id], dd=Array.isArray(v)?v:IT_KIND_DESC[v==='hat'?'hat':kind];
@@ -384,7 +384,7 @@ function itBuy(who,id){
 }
 function itSupLine(who,M){
   return {who,
-    text:()=>{ const c=G.coins||0, m=M.msg||['Supplies for the road.','Supplies!'];
+    text:()=>{ const c=G.coins||0, m=M.msg||['Supplies for the road. Heroes always run out of something.','Supplies!'];
       return S(`${m[0]} You have ${c} coins.`,`${m[1]} You have ${c} coins.`); },
     opts:()=>{
       const ids=itSupplyList(who)||[], o=[];

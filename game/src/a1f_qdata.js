@@ -3,7 +3,7 @@
 const ITEM_NAMES={letter_b:'Bertram’s letter',recipe:'Tilly’s half of the recipe',frostberry:'Frostberry',basket:'Mabel’s basket',moonlily:'Moonlily',letter_moss:'Granny Moss’s letter',oath_letter:'Crumpled Oath letter',oath_badge:'Brass scale badge',tunnel_key:'Oath tunnel key',oath_plans:'The Oath’s plans',lucky_pick:'Gorran’s lucky pick',star_iron:'Star-iron',horn:'Ulf’s horn',fish:'Fish',rod:'Fishing rod',lucky_lure:'Dell’s lucky lure',kettle:'Hob’s kettle',honey:'Honey',juniper_map:'Juniper’s map',carrot:'Carrot of Destiny',map_x1:'Nib’s treasure map',map_x2:'Smudged treasure map',map_x3:'Juniper’s secret map',lantern:'Cave lantern',treat:'Pip treat',relic:'Warden’s Mantle',errand:'Parcel'};
 const QDEFS={
   // offered from Lantern Day morning (it is the festival's own bun); before the raid Bertram says there is no rush
-  bun:{title:'The Lantern Bun',giver:'bertram',min:'lanterns',give:{letter_b:1},
+  bun:{title:S('Half-Baked','The Lantern Bun'),giver:'bertram',min:'lanterns',give:{letter_b:1},
     get offer(){ const L=[['bertram',`Ash. I need your help, and it pains me to say it.`],['bertram',S(`For Lantern Day I wanted to bake Grandma Crumb's Lantern Bun. The recipe is torn in two. Half here, half with my sister Tilly at the Sleepy Salmon Inn in Brindlecross.`,`I want to bake Grandma's Lantern Bun. Half the recipe is with my sister Tilly, in Brindlecross.`)],['ash',`Why is it torn in two?`],['bertram',`We had an argument. About the bun. Nine years ago. Take her this letter. It says sorry. It took me nine years to write. It's very short.`]];
       if(G&&G.mode==='story'&&!reached('raid')) L.push(['bertram',S(`No rush. Light your lanterns first. Buns are patient. Bakers are not.`,`No rush. Light your lanterns first.`)]);
       return L; },
@@ -12,7 +12,7 @@ const QDEFS={
       {t:'item',item:'frostberry',n:3,text:'Pick 3 frostberries near Hollis Farm in the Frostpine Highlands',at:'poi:farm'},
       {t:'talk',npc:'bertram',text:'Bring the recipe and frostberries back to Bertram in Emberhollow',take:{recipe:1,frostberry:3},lines:[['bertram',`Both halves! And frostberries! Grandma would cry. She cried a lot. Mostly about buns.`],['bertram',`Now the important part. Light the oven. Gently. GENTLY.`]]},
       {t:'flag',flag:'oven_lit',text:'Gently light Bertram’s oven with your fire breath',at:'npc:bertram'},
-      {t:'talk',npc:'bertram',text:'See how the Lantern Bun turned out',lines:[['bertram',`It's... perfect. The Lantern Bun. Go on, have the first one.`],['narr',`You eat the Lantern Bun. It's warm all the way down to the tip of your tail.`],['bertram',`Maybe I'll take one to Tilly. After nine years. Maybe.`]],reward:{coins:40,maxhp:15,bless:1}}
+      {t:'talk',npc:'bertram',text:'See how the Lantern Bun turned out',lines:[['bertram',S(`It's... perfect. I had a joke ready, and this bun deserves better. Go on, have the first one.`,`It's perfect! Go on, have the first one.`)],['narr',`You eat the Lantern Bun. It's warm all the way down to the tip of your tail.`],['bertram',`Maybe I'll take one to Tilly. After nine years. Maybe.`]],reward:{coins:40,maxhp:15,bless:1}}
     ]},
   hollow:{title:'Lost in the Hollow',giver:'rook',min:'warcamp',
     offer:[['rook',`Ash! My sister Juniper went to map Whisperwood Hollow three days ago. She said she'd be back by supper.`],['rook',`Juniper is NEVER late for supper. The cave is west of the war camp road, deep in the woods. Please find her.`]],
@@ -20,7 +20,7 @@ const QDEFS={
       {t:'flag',flag:'juniper_found',text:'Find Juniper inside Whisperwood Hollow, west of the war camp road',at:'cave:whisper'},
       {t:'talk',npc:'rook',text:'Tell Rook his sister is safe',lines:[['rook',`JUNIPER! She came in the door covered in bat poop and yelling about you! You're the best, Ash.`],['juniper',`Here. My map of every cave and secret spot in the valley. Two years of work. Don't spill anything on it.`]],give:{juniper_map:1,map_x3:1},reward:{coins:25,xp:80}}
     ]},
-  gate:{title:'The Open Gate',giver:'yara',min:'warcamp',story:true,
+  gate:{title:S('Gate Expectations','The Open Gate'),giver:'yara',min:'warcamp',story:true,
     offer:[['yara',S(`Something's been bothering me, Ash. Somebody unlocked the North Gate on Lantern Day. Kobolds can't pick locks. They don't have the thumbs for it.`,`Someone unlocked the North Gate. Kobolds can't pick locks.`)],['yara',`Have a look around the Hollow Ward. Whoever let them in might have stopped there too.`]],
     steps:[
       {t:'flag',flag:'clue_prints',text:'Look for clues near the Hollow Ward under the old oak',at:'lm:bootprints'},
@@ -33,7 +33,7 @@ const QDEFS={
   moss:{title:'Gran’s Basket',giver:'mabel',min:'wren',give:{basket:1},
     offer:[['mabel',`Gran hasn't written in weeks. Could you take her this basket? Bread, honey, and a strongly worded note about writing more.`],['mabel',`She lives out in the Mirefen, southeast past Brindlecross. Follow the smell of tea.`]],
     steps:[
-      {t:'talk',npc:'moss',text:'Take Mabel’s basket to Granny Moss in the Mirefen',take:{basket:1},lines:[['moss',`A basket from my Mabel! "Write more, Gran." Cheeky girl.`],['moss',`I've been stuck, dear. My knees can't manage the bog, and I'm out of moonlilies for my healing brew. Fetch me five? They glow pale blue at the edges of the pools.`]]},
+      {t:'talk',npc:'moss',text:'Take Mabel’s basket to Granny Moss in the Mirefen',take:{basket:1},lines:[['moss',`A basket from my Mabel! "Write more, Gran." Cheeky girl.`],['moss',S(`I've been stuck, child. My knees can't manage the bog, and I'm out of moonlilies for my healing brew. Fetch me five? They glow pale blue at the edges of the pools.`,`My knees are stuck. Fetch me five moonlilies? They glow blue by the pools.`)]]},
       {t:'item',item:'moonlily',n:5,text:'Gather 5 moonlilies in the Mirefen',at:'poi:mire'},
       {t:'talk',npc:'moss',text:'Bring the moonlilies to Granny Moss',take:{moonlily:5},give:{letter_moss:1},lines:[['moss',`Five! Here, a new flask for your belt. It holds one more healing draught.`],['moss',`And take this back to my Mabel, would you? I wrote a whole letter. Well. A whole sentence.`]],reward:{potmax:1}},
       {t:'talk',npc:'mabel',text:'Bring Granny Moss’s letter to Mabel in Emberhollow',take:{letter_moss:1},lines:[['mabel',`She wrote! "Dear Mabel. Stop worrying. Love, Gran. P.S. That dragon child is too skinny."`],['mabel',`She's right, you know. Here. Eat this. It's a carrot. It's good for you.`]],reward:{coins:30,xp:60}}
@@ -46,13 +46,13 @@ const QDEFS={
       {t:'talk',npc:'hollis',text:'Talk to Farmer Hollis',lines:[['hollis',`Duchess! You terrible, wonderful goat. Thank you, Ash. My grandfather swore by this charm.`],['goat',`Meh.`],['ash',`Rude.`],['hollis',`Do me a favor? Tell my brother Ulf at the Frostpine Lodge that Duchess came home safe. Goats: one. Sheep: zero.`]],reward:{bless:1}},
       {t:'talk',npc:'ulf',text:'Tell Ulf at Frostpine Lodge that Duchess came home',lines:[['ulf',`She came home? With help from a dragon? Hmph. Tell my brother a sheep would never have wandered off. Sheep don't have ambitions.`]],reward:{coins:20,xp:40}}
     ]},
-  horn:{title:'Ulf’s Horn',giver:'ulf',min:'wren',
-    offer:[['ulf',`My grandfather's hunting horn. I dropped it running out of Icefang Cavern when the ice wolves came.`],['ulf',`The cave's south of here, past the frozen trees. It's deep in there. Wear a scarf.`]],
+  horn:{title:S('Blow Your Own Horn','Ulf’s Horn'),giver:'ulf',min:'wren',
+    offer:[['ulf',S(`My grandfather's hunting horn. I dropped it in Icefang Cavern when the ice wolves came. I was not running away. I was running loudly in the other direction.`,`I dropped Grandpa's horn in Icefang Cavern. The ice wolves came.`)],['ulf',`The cave's south of here, past the frozen trees. It's deep in there. Wear a scarf.`]],
     steps:[
       {t:'item',item:'horn',n:1,text:'Find Ulf’s horn deep in Icefang Cavern',at:'cave:icefang'},
       {t:'talk',npc:'ulf',text:'Bring the horn back to Ulf',take:{horn:1},lines:[['ulf',`That's it! Listen to this.`],['narr',`Ulf blows the horn. Somewhere far away, a goat answers. Ulf looks betrayed.`],['ulf',`Here. My grandfather's scarf. Warmest thing in the valley. You'll run all day in it.`]],reward:{stamina:20,coins:30}}
     ]},
-  mine:{title:'The Coppergulch Mine',giver:'gorran',min:'three',
+  mine:{title:S('Mine, All Mine','The Coppergulch Mine'),giver:'gorran',min:'three',
     offer:[['gorran',`The drakelings took the mine. There's a whole vein of star-iron down there and not one of us willing to get our eyebrows burned off.`],['gorran',`Clear 'em out and bring me my lucky pick. I left it at the bottom. Leave my eyebrows out of it.`]],
     steps:[
       {t:'item',item:'lucky_pick',n:1,text:'Clear Coppergulch Mine and find Gorran’s lucky pick',at:'cave:mine'},
@@ -60,7 +60,7 @@ const QDEFS={
       {t:'talk',npc:'maren',text:'Give Mom the star-iron and Gorran’s message',lines:[['maren',`Gorran! That old rock goblin. Spring, like always.`],['maren',`Thank you for this, Ash. Give me that blade.`]],reward:{coins:25,xp:80}}
     ]},
   dell:{title:'Three Fish for Dell',giver:'dell',min:'wren',give:{rod:1},
-    offer:[['dell',`Know how to fish? No? Here, borrow my spare rod.`],['dell',S(`Stand at any fishing spot and press the use button. When the bobber splashes, press it again. Bring me three fish. I've been eating bread for a week.`,`Stand by a fishing spot. Press use. When it splashes, press again. Bring me three fish.`)]],
+    offer:[['dell',`Know how to fish? No? Here, borrow my spare rod.`],['dell',S(`Find a spot where the fish are jumping and cast your line. When the bobber splashes, pull. Bring me three fish. I've been eating bread for a week. Bertram's, so it's good bread, but still.`,`Fish where they jump. When the bobber splashes, pull! Bring me three fish.`)]],
     steps:[
       {t:'item',item:'fish',n:3,text:'Catch 3 fish at a fishing spot (look for ripples on the shore)'},
       {t:'talk',npc:'dell',text:'Bring the fish to Dell on the Brindlecross dock',take:{fish:3},lines:[['dell',`Fish! Real fish! Keep the rod. And if you ever get to the Sunken Grotto down in the Mirefen... my boat went down near there.`]],reward:{coins:20,xp:40}}
@@ -83,7 +83,7 @@ const QDEFS={
       {t:'camps',n:6,text:'Clear 6 more enemy camps'},
       {t:'talk',npc:'osric',text:'Collect the big bounty from Captain Osric',lines:[['osric',`Six! The Watch salutes you. That's me. I'm saluting. Here's your reward.`]],reward:{coins:90,bless:1}}
     ]},
-  kettle:{title:'Hob’s Kettle',giver:'hob',min:'wren',
+  kettle:{title:S('In Hot Water','Hob’s Kettle'),giver:'hob',min:'wren',
     offer:[['hob',`The Oath stole my kettle! The Smoky Kettle without a kettle is just "the Smoky." It whistles. You'll hear it.`],['hob',`Their camp's east of here, out toward the old road.`]],
     steps:[
       {t:'item',item:'kettle',n:1,text:'Get Hob’s kettle back from the Oath camp east of the Smoky Kettle',at:'lm:kettle'},

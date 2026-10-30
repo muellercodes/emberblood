@@ -103,6 +103,7 @@ function drawLily(l,t){
   ctx.restore();
 }
 function buildSprites(){
+  if(LOOK.re&&rzBuildSprites()) return;
   if(LOOK.sb&&sbBuildSprites()) return;
   SPR.oak=[1,2,3,4,5].map(i=>mkOak(1000+i,false)); SPR.birch=[1,2,3].map(i=>mkOak(2000+i,true));
   SPR.pine=[1,2,3,4].map(i=>mkPine(3000+i)); SPR.dead=[1,2,3].map(i=>mkDead(4000+i,false)); SPR.char=[1,2].map(i=>mkDead(4500+i,true));
@@ -117,6 +118,7 @@ function buildSprites(){
 function propSprite(p){
   const L=p.k==='rock'?(biomeInfo(p.x,p.y,{}).b===1?SPR.mossrock:SPR.rock):p.k==='dead'&&p.y<3000?SPR.char:SPR[p.k];
   if(!L) return SPR.bush[0];
+  if(LOOK.re) rzNoTurn(p); else if(p.rz0!==undefined){ p.rot=p.rz0; p.rz0=undefined; }
   if(!p.sp) p.sp=L[p.v%L.length];
   return p.sp;
 }
@@ -275,7 +277,7 @@ function hzPlan(hs){
   L.ivy=st==='yara'||st==='herbalist'||st==='library'||(town==='village'&&C(0.28))||(town==='brindle'&&C(0.15))?[(C(0.5)?-1:1)]:[];
   L.seed2=Math.floor(rng()*1e9);
   // house glow at night pushes the darkness back around the front wall
-  if(!hs.lit&&st!=='forge'){ hs.lit=true; LIGHTS.push({x:hs.x,y:hs.y+H-L.F*0.5,r:st==='library'?150:Math.max(80,w*0.6),i:L.burnt?0.34:0.56,night:true,win:true}); }
+  if(!hs.lit&&st!=='forge'){ hs.lit=true; LIGHTS.push({x:hs.x,y:hs.y+H-L.F*0.5,r:st==='library'?150:Math.max(80,w*0.6),i:L.burnt?0.34:0.56,night:true,win:true,kind:'window'}); }
   hzChimPos(hs,L);
   hs.facade=true; hs.L=L; return L;
 }
@@ -293,6 +295,7 @@ function hzChimPos(hs,L){
 }
 // ---------- textures
 function hzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng){
+  if(LOOK.re) return rzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng);   // (v12 PROPS) Realistic materials, e12c_props.js
   const sp=u1-u0, ht=v1-v0;
   if(mat==='thatch'){
     g.fillStyle=hzS(col); g.fillRect(u0,v0,sp,ht);
@@ -343,6 +346,10 @@ function hzRoofTex(g,mat,col,u0,u1,v0,v1,vs,rng){
   }
 }
 function hzWallTex(g,mat,col,x0,y0,x1,y1,rng){
+  if(LOOK.re) return rzWallTex(g,mat,col,x0,y0,x1,y1,rng);
+  return hzWallTex0(g,mat,col,x0,y0,x1,y1,rng);
+}
+function hzWallTex0(g,mat,col,x0,y0,x1,y1,rng){
   const w=x1-x0, h=y1-y0;
   switch(mat){
     case 'plaster':{
@@ -640,6 +647,7 @@ function hzChimney(g,L,c,rng){
 }
 // roof plane: clip, texture in the plane frame, light tone, optional overlay gradient
 function hzPlane(g,L,pts,fr,u0,u1,v0,v1,vs,k,rng,ovl){
+  if(LOOK.re) k=k>0?k*1.5:k*1.7;   // (v12 PROPS) stronger light and shade on the roof planes in the Realistic look
   g.save(); hzPoly(g,pts); g.clip();
   g.save(); g.transform(fr[0],fr[1],fr[2],fr[3],fr[4],fr[5]); hzRoofTex(g,L.roof,L.rc,u0,u1,v0,v1,vs,rng); g.restore();
   if(k){ g.fillStyle=k>0?`rgba(255,246,226,${k})`:`rgba(14,8,20,${-k})`; hzPoly(g,pts); g.fill(); }
@@ -1057,6 +1065,7 @@ function houseSprite(hs){
   const rng=mulberry32(L.seed2);
   if(L.st==='forge') hzDrawForge(g,hs,L,rng); else if(L.st==='library') hzDrawLibrary(g,hs,L,rng); else hzDrawHouse(g,hs,L,rng);
   hs.facade=true; hs.wins=L.panes; L.nl=undefined;
+  if(LOOK.re) rzHousePost(c,L);
   c=hzCrop(c); c.ox=HPX+L.W-c.cx/HSC; c.oy=HPT+L.H-c.cy/HSC; c.sc=HSC; c.burnt=!!hs.burnt; c.snow=!!hs.snow; SCACHE.set(hs,c); return c;
 }
 // crop a freshly painted canvas to the pixels it actually uses, so every frame blits less empty space
@@ -1093,6 +1102,7 @@ function drawHouseStruct(s,t){
   const dl=daylight(); if(dl<0.5) hzNight(ctx,s.L,s.x,s.y,1,clamp((0.5-dl)/0.3,0,1),t);
 }
 function drawStruct(s,t){
+  if(LOOK.re&&rzStruct(s,t)) return;   // (v12 PROPS) the Realistic structures, e12c_props.js
   switch(s.k){
     case 'house': drawHouseStruct(s,t); break;
     case 'well':{ const gr=ctx.createRadialGradient(s.x-6,s.y-6,4,s.x,s.y,24); gr.addColorStop(0,'#a59c90'); gr.addColorStop(1,'#5a544c'); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(s.x,s.y,24,0,TAU); ctx.fill(); ctx.fillStyle='#1d3440'; ctx.beginPath(); ctx.arc(s.x,s.y,14,0,TAU); ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1; for(let a=0;a<TAU;a+=0.5){ ctx.beginPath(); ctx.moveTo(s.x+Math.cos(a)*15,s.y+Math.sin(a)*15); ctx.lineTo(s.x+Math.cos(a)*24,s.y+Math.sin(a)*24); ctx.stroke(); } ctx.fillStyle='#5a3a22'; ctx.fillRect(s.x-26,s.y-3,52,6); break; }
@@ -1192,7 +1202,9 @@ function drawStruct(s,t){
   }
 }
 let wallPattern=null;
-function drawWall(){
+// (v12 PROPS) the Realistic wall is drawn by rzDrawWall (e12c_props.js); the depth modes keep their own drawer with the Realistic stone
+function drawWall(){ if(LOOK.re){ rzDrawWall(); return; } drawWall0(); }
+function drawWall0(){
   if(!wallPattern){ const c=mkCanvas(64,52), g=c.getContext('2d'); g.fillStyle='#1c1a22'; g.fillRect(0,0,64,52); for(let r=0;r<2;r++) for(let i=-1;i<3;i++){ const x=i*32+(r%2)*16, y=r*26; const gr=g.createLinearGradient(x,y,x+30,y+24); gr.addColorStop(0,'#3e3a48'); gr.addColorStop(1,'#24212b'); g.fillStyle=gr; g.fillRect(x+1,y+1,30,24); } wallPattern=ctx.createPattern(c,'repeat'); }
   const x0=Math.max(0,cam.x-100), x1=Math.min(WORLD.w,cam.x+W/zoom+100);
   if(WALL_Y+80<cam.y||WALL_Y-80>cam.y+H/zoom) return;
@@ -1206,6 +1218,7 @@ function drawWall(){
   if(GATE_COL&&!GATE_COL.off){ ctx.fillStyle='#14121a'; ctx.fillRect(GATE_X0,WALL_Y-20,GATE_X1-GATE_X0,40); ctx.strokeStyle='#5a5466'; ctx.lineWidth=3; for(let x=GATE_X0+8;x<GATE_X1;x+=14){ ctx.beginPath(); ctx.moveTo(x,WALL_Y-20); ctx.lineTo(x,WALL_Y+20); ctx.stroke(); } ctx.beginPath(); ctx.moveTo(GATE_X0,WALL_Y); ctx.lineTo(GATE_X1,WALL_Y); ctx.stroke(); }
 }
 function drawChest(c,t){
+  if(LOOK.re){ rzChest(c,t); return; }   // (v12 PROPS) e12c_props.js
   ctx.save(); ctx.translate(c.x,c.y);
   ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(-13,-6,30,20);
   const gr=ctx.createLinearGradient(0,-10,0,10); gr.addColorStop(0,'#8a5a2c'); gr.addColorStop(1,'#4a2c14'); ctx.fillStyle=gr; ctx.fillRect(-15,-10,30,20);

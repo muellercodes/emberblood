@@ -93,7 +93,7 @@ STORY.a1_stragglers=[
   vl('a1_strag',`Is that the Emberblood? Is it over? Please say it's over. I want my mom.`,`Is that the Emberblood? Is it over? I want my mom.`),
   vls('narr',`Sister Soot stands up. She holds a letter. You know the handwriting. It's Morrow's.`,`Sister Soot holds up a letter. It is from Morrow.`,()=>G.choices.morrow!=='free'),
   vls('a1_soot',`Brother Morrow wrote to us. From a pumpkin patch. He says: "Go home. Grow something. It isn't worth it." He drew a pumpkin. It was a good pumpkin.`,`Morrow wrote to us. He says: "Go home. Grow something." He drew a good pumpkin.`,()=>G.choices.morrow!=='free'),
-  vls('a1_soot',`You threw Brother Morrow in a cell! We are all that's left of the Scaled Oath. We will not let you pass!`,`You put Morrow in a cell! We are the last of the Oath. You will not pass!`,()=>G.choices.morrow!=='jail'),
+  vls('a1_soot',`You threw Brother Morrow in a cell! We are all that's left of the Scaled Oath, and we have a candle, and we are not afraid to use it!`,`You put Morrow in a cell! We are the last of the Oath. And we have a candle!`,()=>G.choices.morrow!=='jail'),
   ch('ash',S(`What do you tell them?`,`What do you tell them?`),[
     {t:S(`Go home. All of you. It's over.`,`Go home. It's over.`),tone:'kind',cond:()=>G.choices.morrow==='free',fn:()=>{ G.flags.a1_strag='home'; },then:[
       vl('a1_soot',`...Yes. Yes, I think we will. Come on, brothers. Blow out the candle. We're going to go and look at a pumpkin.`,`Yes. I think we will. Blow out the candle. Let's go see a pumpkin.`),

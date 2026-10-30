@@ -36,6 +36,7 @@ function definePropKind(kind,def){
   return def;
 }
 function propKindSprites(kind){
+  if(LOOK.re&&rzKindSprites(kind)) return;   // (v12 PROPS) the Realistic makers by kind, e12c_props.js
   const d=PROPK[kind], L=[]; let h=0; for(let i=0;i<kind.length;i++) h=(h*31+kind.charCodeAt(i))|0;
   for(let v=0;v<d.n;v++){ let c=null; try{ c=d.make((h&0xffff)+v*131,v); }catch(e){ console.error('prop kind',kind,e); } if(c){ if(!c.half) c.half=c.width/4; L.push(c); } }
   if(L.length) SPR[kind]=L;
@@ -273,19 +274,23 @@ function groundRGBMap(s,x,y){
   return c;
 }
 const BDEF={_road:[128,106,74],_shore:[170,154,112],_water:[[74,122,118],[22,52,70],[190,200,190]]};
-function genChunkMap(cx,cy){
-  const x0=cx*CH, y0=cy*CH, N=65, step=CH/(N-1);
+// (v12 GROUND) built by a generator in small steps (see genChunkG in a4_ground.js); genChunkMap runs it in one go.
+// With LOOK.sb it follows the Storybook copy of genChunkMap in e5_look.js step for step (900 decor marks, Storybook
+// pebbles on roads, the contour lines before the decals), so the planner's slices draw exactly what that copy draws.
+function genChunkMap(cx,cy){ return chunkRun(chunkGen(cx,cy)); }
+function* genChunkMapG(cx,cy){
+  const x0=cx*CH, y0=cy*CH, N=65, step=CH/(N-1), sb=!!LOOK.sb;
   const small=mkCanvas(N,N), sg=small.getContext('2d'), img=sg.createImageData(N,N), d=img.data;
   const glowS=mkCanvas(N,N), gg=glowS.getContext('2d'), gimg=gg.createImageData(N,N), gd=gimg.data;
   const grid=new Array(N*N); let hasLava=false, hasWater=false;
-  for(let j=0;j<N;j++) for(let i=0;i<N;i++){
+  for(let j=0;j<N;j++){ for(let i=0;i<N;i++){
     const x=x0+i*step, y=y0+j*step, s=T(x,y,{});
     grid[j*N+i]=s;
     const c=groundRGB(s,x,y), k=(j*N+i)*4;
     d[k]=c[0]; d[k+1]=c[1]; d[k+2]=c[2]; d[k+3]=255;
     if(s.lavaS>0){ hasLava=true; gd[k]=255; gd[k+1]=120; gd[k+2]=30; gd[k+3]=Math.round(clamp(s.lavaS*1.4-0.2,0,1)*210); }
     if(s.water) hasWater=true;
-  }
+  } if(j&1) yield; }
   sg.putImageData(img,0,0);
   const cv=mkCanvas(CPX,CPX), g=cv.getContext('2d');
   g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
@@ -294,18 +299,20 @@ function genChunkMap(cx,cy){
   const at=(x,y)=>{ const i=clamp(Math.round((x-x0)/step),0,N-1), j=clamp(Math.round((y-y0)/step),0,N-1); return grid[j*N+i]; };
   const rng=mulberry32(((cx*92821)^(cy*68917)^7)|0);
   g.lineCap='round'; g.lineWidth=1.1;
-  for(let i=0;i<1500;i++){
+  yield;
+  for(let i=0,n=sb?900:1500;i<n;i++){
+    if(i&&i%150===0) yield;
     const x=x0+rng()*CH, y=y0+rng()*CH, s=at(x,y), r=rng();
     if(s.out||s.water||s.lava) continue;
-    if(s.road>0.5){ if(r<0.25){ g.fillStyle=rng()<0.5?'rgba(60,50,40,.35)':'rgba(200,190,170,.25)'; g.beginPath(); g.arc(x,y,0.8+rng()*1.6,0,TAU); g.fill(); } continue; }
+    if(s.road>0.5){ if(sb){ if(r<0.08) sbPebble(g,x,y,1.4+rng(),'rgba(170,140,100,.8)'); } else if(r<0.25){ g.fillStyle=rng()<0.5?'rgba(60,50,40,.35)':'rgba(200,190,170,.25)'; g.beginPath(); g.arc(x,y,0.8+rng()*1.6,0,TAU); g.fill(); } continue; }
     const b=s.t<0.75&&rng()<0.5?s.b2:s.b, B=BIOMES[b];
     if(B&&B.decor){ try{ B.decor(g,rng,x,y,s,r); }catch(e){} g.lineWidth=1.1; }
   }
-  for(const dc of DECALS){ if(dc.x+(dc.r||dc.w||300)<x0||dc.x-(dc.r||dc.w||300)>x0+CH||dc.y+(dc.r||dc.h||300)<y0||dc.y-(dc.r||dc.h||300)>y0+CH) continue; drawDecal(g,dc); }
-  for(const br of BRIDGES){ if(br.x+200<x0||br.x-200>x0+CH||br.y+200<y0||br.y-200>y0+CH) continue; drawBridge(g,br); }
-  let glow=null;
-  if(hasLava){ gg.putImageData(gimg,0,0); glow=mkCanvas(CPX/4,CPX/4); const g2=glow.getContext('2d'); g2.imageSmoothingEnabled=true; g2.drawImage(glowS,0,0,N,N,-CPX/4/(N-1)/2,-CPX/4/(N-1)/2,CPX/4+CPX/4/(N-1),CPX/4+CPX/4/(N-1)); }
-  return {cv,g,glow,hasWater,used:chunkTick};
+  const ch={cv,g,glow:null,hasWater,used:chunkTick};
+  if(sb){ yield; lookChunkLines(g,grid,N,step,x0,y0,ch); }
+  yield* chunkDecalsG(g,x0,y0);
+  if(hasLava){ gg.putImageData(gimg,0,0); const glow=mkCanvas(CPX/4,CPX/4); const g2=glow.getContext('2d'); g2.imageSmoothingEnabled=true; g2.drawImage(glowS,0,0,N,N,-CPX/4/(N-1)/2,-CPX/4/(N-1)/2,CPX/4+CPX/4/(N-1),CPX/4+CPX/4/(N-1)); ch.glow=glow; }
+  return ch;
 }
 // colliders, radius and flags for a prop, by kind (the same rules genProps uses for the stock kinds)
 function finishProp(p,x,y,rng){
@@ -340,7 +347,8 @@ function genPropsMap(cx,cy){
   for(const p of out) if(p.col) addCol(p.col);
   return out;
 }
-{ const base=genChunk; genChunk=function(cx,cy){ return chunkMapOf(cy)>0?genChunkMap(cx,cy):base(cx,cy); }; }
+{ const base=genChunk; genChunk=function(cx,cy){ return chunkPreTake(cx,cy)||(chunkMapOf(cy)>0?genChunkMap(cx,cy):base(cx,cy)); }; }
+{ const base=chunkGen; chunkGen=function(cx,cy){ return chunkMapOf(cy)>0?genChunkMapG(cx,cy):base(cx,cy); }; }
 { const base=genProps; genProps=function(cx,cy){ return chunkMapOf(cy)>0?genPropsMap(cx,cy):base(cx,cy); }; }
 { const base=groundRGB; groundRGB=function(s,x,y){ return y<BAND?base(s,x,y):groundRGBMap(s,x,y); }; }
 

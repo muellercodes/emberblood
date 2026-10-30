@@ -370,7 +370,7 @@ function pebbleTick(dt){
 // where she sits: on the ground beside Ash, or on his horn on Nightfall Peak (she will not land on the black glass)
 function pbPerch(){ const p=player; return curMap()===4?{x:p.x+7,y:p.y-40-(p.z||0),horn:true}:{x:p.x+36,y:p.y+6,horn:false}; }
 const PB_ARRIVE=[
-  [`Wings, then a thump. Pebble lands beside you with a letter in her beak.`,`Pebble the crow lands. She has a letter.`],
+  [`Wings, then a thump. Pebble lands beside you with a letter and the look of a crow who expects a tip.`,`Pebble the crow lands. She has a letter.`],
   [`A crow drops out of the sky onto your foot. It's Pebble, with another letter.`,`Pebble lands on your foot. A letter!`],
   [`Pebble lands, looks at you sideways, and drops a letter on your toes.`,`Pebble drops a letter on your toes.`]];
 function pbNorm(L){
@@ -526,7 +526,7 @@ const ACT_RECAP={
   1:{label:()=>thrActName(1),done:()=>!!G.flags.act1_done,paras:()=>{
     const e=G.choices.ending||'hero', P=[S(`On the thousandth Lantern Day, the shortest night of the year, Ash only wanted to light the lanterns on the green and get it right. Then the North Gate opened, and Elder Yara told him the family secret: the dragon asleep under Cinder Mountain is his grandfather, and half of Ash's fire was once his.`,`On Lantern Day, Ash learned a secret. The dragon under the mountain is his very old grandpa. Half of Ash's fire was once his.`),
       S(`Ash relit the five Ward-fires, and his grandfather's voice followed him: "Are you sure you're not mine?" Mom said his fire had been given, not taken. Given is different.`,`Ash relit the five Ward-fires. A voice asked, "Are you sure you're not mine?" Mom said his fire was a gift. Gifts are different.`)];
-    if(G.flags.pip) P.push(S(`And Pip hatched, a baby dragon the size of a loaf, who has not left Ash's side since.`,`And Pip hatched. Pip has stayed by Ash ever since.`));
+    if(G.flags.pip) P.push(S(`And Pip hatched, a baby dragon the size of a loaf, who has not left Ash's side, or stopped saying Mip, since.`,`And Pip hatched. Pip has stayed by Ash ever since.`));
     P.push({hero:S(`At the top, Ash put the First Flame out. It was right for the valley. It was still his grandfather. In the ashes lay a warm red stone that beat like a heart: the Ember Heart. Mom keeps it in her forge.`,`Ash put out the First Flame. A warm stone was left: the Ember Heart. Mom keeps it in the forge.`),
       warden:S(`Ash would not destroy his grandfather or set him free. He lit a sixth Ward-fire with his own flame and became the Sixth Warden. The Ember Heart glows in it, and every Lantern Day Ash climbs up to say goodnight.`,`Ash became the Sixth Warden. The Ember Heart glows on the mountain. Every Lantern Day he says goodnight to Grandpa.`),
       heir:S(`Ash took all of the First Flame. For one night he knew exactly how "mine" feels. In the morning he let most of it go, on purpose, because Mom's doorway does not fit a dragon. Vorlaxis, small and bitter now, sits on the warm shelf above Bertram's oven.`,`Ash took the First Flame, then let most of it go. Grandpa is small now. He sits on a warm shelf at the bakery.`),

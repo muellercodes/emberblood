@@ -2,9 +2,9 @@
 // Old Gnarl (Leap), the Mirrow Serpent (Tide) and Skrae the Storm Wyvern (Sky) are e.boss so the boss bar shows,
 // but they never touch the story bosses: no fight site, no G.bossDone. a2h_dungeons.js spawns them and pays out.
 Object.assign(EDEF,{
-  gnarl:{r:54,hp:780,speed:62,dmg:15,value:300,boss:true,kbRes:0.04,name:'Old Gnarl',title:'Root Giant of the Leap',short:'Root Giant'},
-  serpent:{r:30,hp:900,speed:150,dmg:14,value:420,boss:true,kbRes:0,swim:true,name:'The Mirrow Serpent',title:'Old Coil of Lake Mirrow',short:'Old Coil'},
-  skrae:{r:30,hp:1050,speed:240,dmg:15,value:560,boss:true,flying:true,kbRes:0.08,name:'Skrae',title:'The Storm Wyvern',short:'Storm Wyvern'},
+  gnarl:{r:54,hp:780,speed:62,dmg:15,value:300,boss:true,kbRes:0.04,name:'Old Gnarl',title:S('The Root of the Problem','Root Giant'),short:'Root Giant'},
+  serpent:{r:30,hp:900,speed:150,dmg:14,value:420,boss:true,kbRes:0,swim:true,name:'The Mirrow Serpent',title:'Old Coil, Ruler of the Deep End',short:'Old Coil'},
+  skrae:{r:30,hp:1050,speed:240,dmg:15,value:560,boss:true,flying:true,kbRes:0.08,name:'Skrae',title:S('Storm Wyvern, Forecast: Ouch','The Storm Wyvern'),short:'Storm Wyvern'},
   knot:{r:16,hp:99999,speed:0,dmg:0,value:0,kbRes:0},
   bramble:{r:24,hp:62,speed:92,dmg:11,value:60,kbRes:0.25,shield:true,mini:true},
   crab:{r:14,hp:40,speed:96,dmg:9,value:14,kbRes:0.55,shield:true},
