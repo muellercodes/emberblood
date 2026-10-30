@@ -578,7 +578,7 @@ STORY.c_gull_how=S(`Walk into a cracked wall with handholds to climb it. You can
 STORY.c_gull_bossline=S(`The Grand Admiral! When the tide comes in, CLIMB. Hit his claw when it's stuck. Mind the cannons.`,`When the tide comes in, CLIMB! Hit his stuck claw.`);
 c1Def('c_pinch_intro',[
   xl('c_pinch',`Who dares enter the lagoon of GRAND ADMIRAL PINCH without saluting?`,`Salute Grand Admiral Pinch!`),
-  xl('ash',`Um. Hello, Admiral.`,`Um. Hello, Admiral.`),
+  xl('ash',`Um. Hello, Admiral. You look a bit crabby.`,`Um. Hi, Admiral. You look crabby.`),
   xl('c_pinch',`That is not a salute! Prepare to be pinched!`,`That is not a salute! Get pinched!`)
 ]);
 c1Def('c_gull_won',[

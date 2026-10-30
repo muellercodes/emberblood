@@ -778,7 +778,7 @@ function c1FloorPath(R){
 // spin-charges (red line) and bounces off walls, then sits dizzy outside it. He stamps sand waves (jump, or stand high).
 c1Lines('c_pinch','c_pinch_intro','c_gull_won',
   [['c_pinch',S('WHO goes there? Who dares enter the lagoon of GRAND ADMIRAL PINCH without SALUTING?','WHO is there? You did not SALUTE the Admiral!')],
-   ['ash',S('Um. Hello, Admiral.','Um. Hi, Admiral.')],
+   ['ash',S('Um. Hello, Admiral. You look a bit crabby.','Um. Hi, Admiral. You look crabby.')],
    ['c_pinch',S('That is not a salute! PREPARE TO BE PINCHED!','That is not a salute! Get ready to be PINCHED!')]],
   [['narr',S('Grand Admiral Pinch staggers, sits down in the sand, and sulks. Then he spots an old teacup in the wreck, squeezes into it, and looks enormously dignified.','Pinch sits down and sulks. Then he squeezes into an old teacup. He looks very proud.')],
    ['c_pinch',S('I meant to do that. Dismissed.','I meant to do that. Dismissed.')],

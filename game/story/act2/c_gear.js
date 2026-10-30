@@ -86,7 +86,7 @@ chapter({
       ['c_bobs', "The Moth Mask! She's a legend! She's a menace! She once stole Bob's hat.", "The Moth Mask! She stole Bob's hat."],
       ['c_bobs', 'It was MY hat, Bob.'],
       ['narr', 'A girl in an enormous coat skids up, notebook first.', 'A girl in a huge coat runs up with a notebook.'],
-      ['c_penny', "HEADLINE: DRAGON KID ARRIVES IN GEARHAVEN. Penny Press, Gearhaven Gazette. What's that in your claw?", "HEADLINE: DRAGON KID ARRIVES! I'm Penny Press. What's in your claw?"],
+      ['c_penny', "HEADLINE: DRAGON KID ARRIVES IN GEARHAVEN. CITY WARMS TO HIM. Penny Press, Gearhaven Gazette. What's that in your claw?", "HEADLINE: DRAGON KID ARRIVES! I'm Penny Press. What's in your claw?"],
       ['c_penny', 'A gear that says Gearhaven, in Gearhaven. That narrows it down to everything. Professor Sprocket can read a gear. Down the Great Stair by the canal. Follow the colored smoke.', 'Ask Professor Sprocket. Down the big stairs. Follow the colored smoke.'],
     ],
     c_hettie: [

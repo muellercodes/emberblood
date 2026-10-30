@@ -205,7 +205,7 @@ chapter({
         ['narr', 'She looks across the rooftops, right at you, and waves. Then the mask comes down.', 'She looks right at you. She waves. The mask comes down.']] },
       { if: '!flag c_cliff=gran', then: [
         ['narr', 'Then the mask comes down, and she is gone over the roofs.', 'The mask comes down. She is gone.']] },
-      { do: ['despawn c_mask', { banner: ['HEADLINE: CLOCK SAVED BY LIZARD! MOTH MASK HAS A FACE!', 'HEADLINE: MOTH MASK HAS A FACE!'] }] },
+      { do: ['despawn c_mask', { banner: ['HEADLINE: LIZARD SAVES CLOCK IN THE NICK OF TIME! MOTH MASK HAS A FACE!', 'HEADLINE: MOTH MASK HAS A FACE!'] }] },
     ],
   },
 
