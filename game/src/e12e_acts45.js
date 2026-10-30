@@ -89,8 +89,8 @@ const E45M3=[], E45N4=[], E45N4A=[];
 const E45LOOK=/^(m4|a4s_|n5|moon_lock_carving|green_fourth_post|hoof$|hat_n5_)/;
 { const base=gtLookSprite; gtLookSprite=function(id,L,state){
   if(!E45.on()||!E45LOOK.test(id)||L.outline===false) return base.apply(this,arguments);   // the soft unoutlined looks stay as painted
-  const key=id+'|'+(state==null?'':state);
-  return rzCache('e45look:'+key,()=>{ const M=E45LK[id]; return M?M(L,state):e45LookRelit(id,L,state); }); }; }
+  const key=id+'|'+(state==null?'':state), a=arguments, self=this;
+  return e45Async('e45look:'+key,function*(){ const M=E45LK[id]; return M?M(L,state):e45LookRelit(id,L,state); },()=>base.apply(self,a)); }; }
 const E45LK={};
 function e45LookRelit(id,L,state){
   const pad=10, W=Math.ceil(L.w*2+pad*2), H=Math.ceil(L.h*2+pad*2), cx=W/2, cy=H/2+L.h*0.25;
