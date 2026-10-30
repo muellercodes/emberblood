@@ -521,6 +521,10 @@ function rzBuildSprites(){
   SPR.bigoak=rzMkBigOak();
   SPR.shadow=mkShadow();
   RZT.build=+(performance.now()-t0).toFixed(1);
+  // the houses of this map are painted ahead too, nearest first, so walking into a town never waits on one
+  try{ const mk=typeof curMap==='function'?curMap():0, px=player?player.x:0, py=player?player.y:0;
+    const hs=HOUSES.filter(h=>(typeof itemMap!=='function'||itemMap(h)===mk)).sort((a,b)=>dist2(a.x,a.y,px,py)-dist2(b.x,b.y,px,py));
+    for(const h of hs) RZQ.q.push(()=>{ if(LOOK.re) houseSprite(h); }); }catch(e){}
   rzPumpLater();
   return true;
 }
@@ -550,7 +554,7 @@ function rzSheet(keys,sc,bg){
   list.forEach((c,i)=>{ const w=c.width/SS*sc, h=c.height/SS*sc; g.drawImage(c,(i%cols)*cell+(cell-w)/2,Math.floor(i/cols)*cell+(cell-h)/2,w,h); });
   return cv.toDataURL();
 }
-window.__ebDbg=Object.assign(window.__ebDbg||{},{rzSheet,rzBuildSprites,rzFlush,RZT,RZQ,SPR,buildSprites:()=>buildSprites()});
+window.__ebDbg=Object.assign(window.__ebDbg||{},{rzSheet,rzBuildSprites,rzFlush,RZT,RZQ,SPR,buildSprites:()=>buildSprites(),houseSpriteX:h=>houseSprite(h)});
 // the Realistic sprites are lit from the art light, so a prop never turns (Classic spins each one at random);
 // the old angle is kept and handed back when the look changes (propSprite in a3_art.js)
 function rzNoTurn(p){ if(p.rz0===undefined){ p.rz0=p.rot; p.rot=0; } }
@@ -1060,19 +1064,34 @@ const RZK={
 // called by propKindSprites (e2_terrain.js) in this look; returns true when it built the kind
 function rzKindSprites(kind){
   const d=PROPK[kind]; if(!d) return false;
-  const gen=LOOK.gen, build=()=>rzKindBuild(kind,d);
+  const gen=LOOK.gen;
   Object.defineProperty(SPR,kind,{configurable:true,enumerable:true,
-    get(){ const v=gen===LOOK.gen&&LOOK.re?build():undefined; Object.defineProperty(SPR,kind,{value:v,writable:true,configurable:true,enumerable:true}); return v; },
+    get(){ const v=gen===LOOK.gen&&LOOK.re?rzKindBuild(kind,d):undefined; Object.defineProperty(SPR,kind,{value:v,writable:true,configurable:true,enumerable:true}); return v; },
     set(v){ Object.defineProperty(SPR,kind,{value:v,writable:true,configurable:true,enumerable:true}); }});
-  RZQ.q.push(()=>{ void SPR[kind]; }); if(RZQ.gen!==LOOK.gen) RZQ.gen=LOOK.gen; rzPumpLater();
+  rzMapWatch();
   return true;
 }
-function rzKindBuild(kind,d){
+// the kinds of the map Ash is on are painted ahead in idle time, one variant at a time (c_ map 1, f_ map 2,
+// m_ map 3, n_ map 4); any other kind is painted the first time a prop of it is drawn
+const RZMW={map:-2,id:0};
+function rzMapWatch(){ if(RZMW.id) return; RZMW.id=setInterval(()=>{ if(!LOOK.re||typeof curMap!=='function'||!G) return; const m=curMap(); if(m===RZMW.map) return; RZMW.map=m; rzQueueMap(m); },1500); }
+function rzQueueMap(m){
+  const pre=['','c_','f_','m_','n_'][m]; if(!pre) return;
+  for(const k in PROPK){ if(k.indexOf(pre)!==0) continue; const ds=Object.getOwnPropertyDescriptor(SPR,k); if(!ds||!ds.get) continue;
+    const d=PROPK[k], K=RZK[k], n=K&&K.make?Math.max(d.n,K.n||0):d.n, done=[];
+    for(let v=0;v<n;v++) RZQ.q.push(()=>{ const ds2=Object.getOwnPropertyDescriptor(SPR,k); if(!ds2||!ds2.get) return; const c=rzKindOne(k,d,v); if(c) done.push(c); if(v===n-1&&done.length) SPR[k]=done; }); }
+  if(RZQ.gen!==LOOK.gen) RZQ.gen=LOOK.gen; rzPumpLater();
+}
+function rzKindOne(kind,d,v){
   const K=RZK[kind]; let h=0; for(let i=0;i<kind.length;i++) h=(h*31+kind.charCodeAt(i))|0;
-  const L=[], n=K&&K.make?Math.max(d.n,K.n||0):d.n;
-  for(let v=0;v<n;v++){ let c=null; const seed=(h&0xffff)+v*131;
-    try{ if(K&&K.make) c=K.make(seed,v,d); else { c=d.make(seed,v); if(c){ if(!c.half) c.half=c.width/4; rzRelight(c,{bump:2.4,ao:0.08,aoR:2,edge:2,sat:0.92}); } } }catch(e){ console.error('prop kind',kind,e); }
-    if(c){ if(!c.half) c.half=c.width/4; L.push(c); } }
+  let c=null; const seed=(h&0xffff)+v*131;
+  try{ if(K&&K.make) c=K.make(seed,v,d); else { c=d.make(seed,v); if(c){ if(!c.half) c.half=c.width/4; rzRelight(c,{bump:2.4,ao:0.08,aoR:2,edge:2,sat:0.92}); } } }catch(e){ console.error('prop kind',kind,e); }
+  if(c&&!c.half) c.half=c.width/4;
+  return c;
+}
+function rzKindBuild(kind,d){
+  const K=RZK[kind], n=K&&K.make?Math.max(d.n,K.n||0):d.n, L=[];
+  for(let v=0;v<n;v++){ const c=rzKindOne(kind,d,v); if(c) L.push(c); }
   return L.length?L:undefined;
 }
 
