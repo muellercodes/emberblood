@@ -134,7 +134,7 @@ chapter({
       { if: { any: ['flag f_page11', 'flag m_page11'] }, then: [{ do: ['clue n5_page11'] }] },
       { if: 'flag dr_seen_m_moth', then: [{ do: ['clue n5_moth_dream'] }] },
       ['narr', 'Behind you, the bridge flickers. Ahead, a mountain of black glass rises out of a sea of ink.', 'A black glass mountain rises out of a black sea.'],
-      ['narr', 'Nothing moves. No birds. No wind. Just a broken moon over the peak, like a cracked plate.', 'Nothing moves. The broken moon hangs over the top.'],
+      ['narr', 'Nothing moves. There are no birds and no wind, only a broken moon over the peak, like a cracked plate.', 'Nothing moves. The broken moon hangs over the top.'],
       ['ash', 'Hello? ...Anybody? No? Okay.', 'Hello? Anybody? No? Okay.'],
       ['nyxara', 'Come up, little ember. Bring your heart.', 'Come up, little ember. Bring your heart.'],
       ['ash', 'She talks like Grandpa did on the mountain. Same words. I wish she would stop.', 'She talks like Grandpa did. I wish she would stop.'],
