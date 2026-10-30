@@ -194,7 +194,10 @@ function rfTile(kind){
   }else if(kind==='smoke'){ for(let i=0;i<16;i++){ const x=R()*N, y=R()*N, r=2+R()*4; wrap(()=>{ g.fillStyle=(R()<0.5?D:Lt)+(0.06+R()*0.08).toFixed(2)+')'; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); }); } }
   return c;
 }
-function rfPat(kind){ let p=RF.pat[kind]; if(p!==undefined) return p; try{ p=ctx.createPattern(rfTile(kind),'repeat'); }catch(e){ p=null; } RF.pat[kind]=p; return p; }
+// patterns are made per canvas (one made for another canvas can cost a copy each time it is used)
+const RF_TILES={}, RF_PATS=new WeakMap();
+function rfPat(kind,g){ g=g||ctx; let P=RF_PATS.get(g); if(!P){ P={}; RF_PATS.set(g,P); } let p=P[kind]; if(p!==undefined) return p;
+  const t=RF_TILES[kind]||(RF_TILES[kind]=rfTile(kind)); try{ p=g.createPattern(t,'repeat'); }catch(e){ p=null; } P[kind]=p; return p; }
 // a texture may be drawn on this part (big enough, the frame's budget, the light's quality step)
 function rfTexOK(){ if(!RF.tex) return false; if(typeof RLQ!=='undefined'&&RLQ.lvl>=2&&!RF.bake) return false; return RF.bake||RF.tn<RF.tmax; }
 
@@ -227,7 +230,7 @@ function rfParts(g,m,ox,oy,occ){
       let hx=(c*L[0]+s*L[1])*0.46*mr/p.s1, hy=(-s*L[0]+c*L[1])*0.46*mr/p.s2; const hl=Math.hypot(hx,hy); if(hl>0.62){ hx*=0.62/hl; hy*=0.62/hl; }
       g.fillStyle=rfGE(col,mat,Math.round(hx*10),Math.round(hy*10),ao);
       g.beginPath(); g.arc(0,0,1,0,TAU); g.fill();
-      if(M.tex&&p.s2>=tmin&&rfTexOK()){ const pt=rfPat(M.tex); if(pt){ const ts=M.ts*k;
+      if(M.tex&&p.s2>=tmin&&rfTexOK()){ const pt=rfPat(M.tex,g); if(pt){ const ts=M.ts*k;
         DM.a=ts/p.s1; DM.b=0; DM.c=0; DM.d=ts/p.s2; DM.e=(i*0.37)%1; DM.f=(i*0.61)%1; pt.setTransform(DM);
         g.globalAlpha=ga*M.ta; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
     }else if(p.t===1){ // limb or cone
@@ -240,7 +243,7 @@ function rfParts(g,m,ox,oy,occ){
       else if(p.cone){ g.moveTo(0,-p.r1); g.lineTo(len,0); g.lineTo(0,p.r1); g.arc(0,0,p.r1,Math.PI/2,Math.PI*1.5); }
       else{ const r1=p.r1, r2=p.r2, sn=clamp((r1-r2)/len,-0.95,0.95), al=Math.asin(sn); g.arc(0,0,r1,Math.PI/2+al,Math.PI*1.5-al); g.arc(len,0,r2,-Math.PI/2-al,Math.PI/2+al); }
       g.closePath(); g.fill();
-      if(M.tex&&!p.cone&&rm>=tmin*0.8&&len>rm*1.6&&rfTexOK()){ const pt=rfPat(M.tex); if(pt){ const ts=M.ts*k;
+      if(M.tex&&!p.cone&&rm>=tmin*0.8&&len>rm*1.6&&rfTexOK()){ const pt=rfPat(M.tex,g); if(pt){ const ts=M.ts*k;
         DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=(i*1.7)%8; DM.f=0; pt.setTransform(DM);
         g.globalAlpha=ga*M.ta; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
     }else if(p.t===5){ // line
@@ -251,7 +254,7 @@ function rfParts(g,m,ox,oy,occ){
       g.setTransform(m); const x=ox+p.ax, yb=oy+p.ay, yt=oy+p.by, r1=p.r1, r2=p.r2, e1=r1*T3.ct, e2=r2*T3.ct, rm=Math.max(r1,r2);
       g.translate(x,0); g.fillStyle=rfGC(col,mat,Math.round(rm),ao);
       g.beginPath(); g.moveTo(-r1,yb); g.ellipse(0,yb,r1,e1,0,Math.PI,0,true); g.lineTo(r2,yt); g.ellipse(0,yt,r2,e2,0,0,Math.PI,true); g.closePath(); g.fill();
-      if(M.tex&&rm>=tmin*1.2&&rfTexOK()){ const pt=rfPat(M.tex); if(pt){ const ts=M.ts*k; DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=0; DM.f=(i*3.1)%8; pt.setTransform(DM); g.globalAlpha=ga*M.ta; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
+      if(M.tex&&rm>=tmin*1.2&&rfTexOK()){ const pt=rfPat(M.tex,g); if(pt){ const ts=M.ts*k; DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=0; DM.f=(i*3.1)%8; pt.setTransform(DM); g.globalAlpha=ga*M.ta; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
       if(!p.open){ g.fillStyle=p.top?p.top:rfAt(rfRGB(col),M,0.3,0); g.beginPath(); g.ellipse(0,yt,r2,e2,0,0,TAU); g.fill(); }
     }else if(p.t===3){ // panel
       g.setTransform(m); const q=p.pts, lq=Math.round(clamp(p.lk,-0.5,0.4)*20);
@@ -260,7 +263,7 @@ function rfParts(g,m,ox,oy,occ){
       g.translate(ox+cx,oy+cy);
       if(rr>3*k) g.fillStyle=rfGP(col,mat,lq,rr<12?Math.round(rr):Math.round(Math.pow(2,Math.round(Math.log2(rr)*4)/4)),Math.round(L[0]*10),Math.round(L[1]*10)); else g.fillStyle=rfFlat(col,mat,lq);   // big wings: sizes in steps, so a flapping wing reuses its ramps
       g.beginPath(); g.moveTo(q[0]-cx,q[1]-cy); for(let j=2;j<q.length;j+=2) g.lineTo(q[j]-cx,q[j+1]-cy); g.closePath(); g.fill();
-      if(M.tex&&rr>5*k&&(M.tex==='dust'||M.tex==='feather'||M.tex==='fur'||M.tex==='scale'||M.tex==='weave')&&rfTexOK()){ const pt=rfPat(M.tex); if(pt){ const ts=M.ts*k; DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=0; DM.f=0; pt.setTransform(DM); g.globalAlpha=ga*M.ta*0.8; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
+      if(M.tex&&rr>5*k&&(M.tex==='dust'||M.tex==='feather'||M.tex==='fur'||M.tex==='scale'||M.tex==='weave')&&rfTexOK()){ const pt=rfPat(M.tex,g); if(pt){ const ts=M.ts*k; DM.a=ts; DM.b=0; DM.c=0; DM.d=ts; DM.e=0; DM.f=0; pt.setTransform(DM); g.globalAlpha=ga*M.ta*0.8; g.fillStyle=pt; g.fill(); g.globalAlpha=ga; RF.tn++; RF.stats.tex++; } }
       if(p.edge){ g.strokeStyle=p.edge; g.lineWidth=0.8*k; g.lineJoin='round'; g.globalAlpha=ga*0.75; g.stroke(); g.globalAlpha=ga; }
     }else if(p.t===4){ // dot (eyes, buttons, studs, rivets): metal and glossy ones catch a glint on the lit side
       g.setTransform(m); g.fillStyle=col; g.beginPath(); g.arc(ox+p.sx,oy+p.sy,p.r1,0,TAU); g.fill();
@@ -309,8 +312,10 @@ function rfLayer(){
   if(!(x1>x0)) return false;
   const res=Math.min(4,Math.max(Math.abs(m.a),Math.abs(m.d))), pad=2/res; x0-=pad; y0-=pad; x1+=pad; y1+=pad;
   const W=Math.ceil((x1-x0)*res), H=Math.ceil((y1-y0)*res); if(W>1100||H>1100||W*H>600000) return false;
-  let c=RF.lc; if(!c||c.width<W||c.height<H){ c=mkCanvas(Math.max(W,c?c.width:0,256),Math.max(H,c?c.height:0,256)); RF.lc=c; RF.lg=c.getContext('2d'); }
-  const lg=RF.lg; lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1; lg.globalCompositeOperation='source-over'; lg.clearRect(0,0,W+2,H+2);
+  // a small ring of scratch canvases: the one just laid on the frame is not drawn into again at once
+  const LR=RF.lr||(RF.lr=[]), li=RF.li=((RF.li|0)+1)%4; let L=LR[li];
+  if(!L||L.c.width<W||L.c.height<H){ const c0=L&&L.c; const c=mkCanvas(Math.max(W,c0?c0.width:0,160),Math.max(H,c0?c0.height:0,160)); L=LR[li]={c,g:c.getContext('2d')}; }
+  const c=L.c, lg=L.g; RF.lg=lg; lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1; lg.globalCompositeOperation='source-over'; lg.clearRect(0,0,W+2,H+2);
   const lm=RF.lm||(RF.lm=new DOMMatrix()); lm.a=res; lm.b=0; lm.c=0; lm.d=res; lm.e=-x0*res; lm.f=-y0*res;
   lg.setTransform(lm); const keep=R.g; R.g=lg; rfParts(lg,lm,0,0,true); rfFeetAO(lg,lm,0,0); R.g=keep;
   const a0=g.globalAlpha; g.setTransform(m); if(R.alpha!==1) g.globalAlpha=a0*R.alpha;
