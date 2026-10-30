@@ -10,7 +10,7 @@
 // again to anyone who said "Not right now".
 quest({
   id: 'f_rime', act: 3, giver: 'f_ylva', optional: true, takeover: true,
-  title: ['Rimeholm, One Thaw at a Time', 'One Thaw at a Time'],
+  title: ['Rime and Reason', 'One Thaw at a Time'],
   payoff: { kind: 'upgrade', id: 'f_bluefire' },
   old_steps: ['six', 'rasmus', 'bluefire'],
   // x2_story offers f_rime itself right after Ylva's thaw (offerQuest('f_rime')), and a taken-over quest's stand-in has no

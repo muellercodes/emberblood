@@ -13,7 +13,7 @@ chapter({
   id: 'f_sky', act: 3, after: 'f_thaw', next: 'f_gap', takeover: true,
   card: null, name: ['One Thaw at a Time', 'One Thaw at a Time'],
   so_far: [
-    'Something long and white sleeps on top of Mount Dread, breathing out the Long Winter. A dragon. Grandmother Ylva says the Wind Monks of Skyreach used to go up the mountain every spring, so Ash heads east to find them.',
+    'Something long and white sleeps on top of Mount Dread, breathing out the Long Winter. A dragon. Grandmother Ylva says the Wind Monks of Skyreach used to go up the mountain every spring, so Ash heads east to find them, in a very long red scarf.',
     'A dragon sleeps on Mount Dread, breathing out the winter. Ash goes east to find the Wind Monks.'],
   mom: [['A dragon. On a mountain. Of course it is. Keep Ulf\'s hat on, and come straight home if she so much as yawns at you.', 'A dragon? Keep your hat on. Come home if she yawns.']],
 

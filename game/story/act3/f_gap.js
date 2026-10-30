@@ -8,9 +8,9 @@
 // the skull banner) are steps and scenes here.
 chapter({
   id: 'f_gap', act: 3, after: 'f_sky', next: 'f_deep', takeover: true,
-  card: ['Act III · Chapter 4', 'The Stonehorn Knock'],
+  card: ['Act III · Chapter 4', ['Knock, Knock', 'The Stonehorn Knock']],
   so_far: [
-    'Ash can ride the wind now. Brother Pennant says the old monks rode it up Mount Dread every spring and knocked, the way the Stonehorns knock. The Stonehorns live past the Howling Gap.',
+    'Ash can ride the wind now. Brother Pennant says the old monks rode it up Mount Dread every spring and knocked, the way the Stonehorns knock. The Stonehorns live past the Howling Gap, which is exactly as friendly as it sounds.',
     'Ash can ride the wind! The monks knocked like Stonehorns. The Stonehorns live past the Howling Gap.'],
   mom: [['Riding the WIND? Then tie your scarf twice, hold on to your hat, and come home in one piece.', 'Riding the wind? Hold on to your hat!']],
 
@@ -60,7 +60,7 @@ chapter({
       { cam: 'f_horned_door', s: 1 },
       ['narr', 'A ram\'s skull, so big that its mouth is a doorway. From somewhere deep inside comes a snore like a rockslide.', 'A huge ram skull with a door in its mouth. Something snores inside.'],
       ['narr', 'Carved over the door, two rams butt heads. Between their horns, one word: KNOCK.', 'Over the door, two rams butt heads. Carved: KNOCK.', { clue: 'f3_knock_door', ref: 'f_horned_door' }],
-      ['ash', 'Knock. Okay. ...Hello? Anybody home?', 'Hello? Anybody home?'],
+      ['ash', 'Knock, knock! ...Anybody home?', 'Knock, knock! Anybody home?'],
       ['narr', 'The snoring stops. Then it starts again, louder.', 'The snoring stops. Then it gets louder.'],
     ],
   },

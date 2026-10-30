@@ -10,9 +10,9 @@ chapter({
   id: 'c_light', act: 2, after: 'c_brass', next: 'c_spire', takeover: true,
   // old x1_story scenes whose own triggers must never play now (A2a's `silence`)
   silence: ['c_squawk', 'c_agatha', 'c_lamp_vesper'],
-  card: ['Act II · Chapter 7', 'The Spinning Lighthouse'],
+  card: ['Act II · Chapter 7', ['Moth to a Flame', 'The Spinning Lighthouse']],
   so_far: [
-    "Ash searched Vesper's hideout in the bell loft. She keeps everything she steals, because a Lady in her dreams wants light and promised that her gran would be warm. Then the Great Clock struck twelve and Gearhaven woke up, and on a chimney Vesper pushed up her mask to watch. But the Spinning Lighthouse on Lantern Point is still dark.",
+    "Ash searched Vesper's hideout in the bell loft. She keeps everything she steals, because a Lady in her dreams wants light and promised that her gran would be warm. Then the Great Clock struck twelve, Gearhaven woke up and had lunch at the right time, and on a chimney Vesper pushed up her mask to watch. But the Spinning Lighthouse on Lantern Point is still dark.",
     'Vesper steals light for a Lady in her dreams. The clock works again. But the lighthouse is still dark.'],
   mom: [["A whole city's clock! I told the chickens.", 'You fixed a clock! I told the chickens.']],
 

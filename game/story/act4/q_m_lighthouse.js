@@ -10,7 +10,7 @@
 // oil lamps and the great lamp tick while the quest is open (m3pAt('m_lighthouse',1): a legacy step).
 quest({
   id: 'm_lighthouse', act: 4, giver: 'm_squint', optional: true, takeover: true,
-  title: ['The Dark Lighthouse', 'The Dark Lighthouse'],
+  title: ['Lighten Up, Ned', 'The Dark Lighthouse'],
   payoff: { kind: 'upgrade', id: 'm_moonlantern' },
   old_steps: ['ned', 'lit', 'done'],
 
@@ -33,8 +33,8 @@ quest({
     lh_offer: [
       ['m_squint', 'My grandpa Ned keeps the lighthouse on Gull Isle. The moths came and the lamp went out, and he won\'t come down.',
         "Grandpa Ned's lighthouse went dark. He won't come down."],
-      ['m_squint', 'He says he\'s "thinking". He\'s been thinking for a month.', 'He has been "thinking" for a month.'],
-      { choose: 'm_lighthouse_offer', ask: ['Will you go up and see him? Take him this sandwich. It\'s fish.', 'Take him this sandwich?'], pick: [
+      ['m_squint', 'He says he\'s "thinking". He\'s been thinking for a month. Will you take him this sandwich? It\'s fish.', 'He has been "thinking" for a month. Take him this sandwich?'],
+      { choose: 'm_lighthouse_offer', ask: ['Take Old Ned the fish sandwich?', 'Take Ned the sandwich?'], pick: [
         { t: ['I\'ll take it up to him.', 'I will!'], tone: 'kind', then: ['quest start m_lighthouse', 'give m_sandwich'],
           say: [['m_squint', 'Everything here is fish. LAND HO! ...Sorry. Habit.', 'Everything here is fish. LAND HO!']] },
         { t: ['Not right now', 'Not now'], say: [['m_squint', 'Lookout reporting! Nothing to report! Still.', 'Nothing to report.']] },

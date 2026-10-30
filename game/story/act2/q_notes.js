@@ -9,7 +9,7 @@
 // Heart Ember c_moonring, so the scene below replaces that text.
 quest({
   id: 'c_notes', act: 2, giver: null, optional: true, takeover: true,
-  title: ['Notes in the Rafters', 'Notes in the Rafters'],
+  title: ['High Notes', 'Notes in the Rafters'],
   payoff: { kind: 'heart_ember', id: 'c_moonring' },
   old_steps: ['drops', 'ring'],
 

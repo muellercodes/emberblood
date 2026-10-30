@@ -10,7 +10,7 @@
 // all: m4_leash_mural, which A4b's free_hush needs in chapter 5). The 3F mosaic (MOON DOWN, SEA UP) is a bonus card.
 chapter({
   id: 'm_lumen', act: 4, after: 'm_drift', next: 'm_coral', takeover: true,
-  card: ['Act IV · Chapter 2', 'Drowned Lumen'],
+  card: ['Act IV · Chapter 2', ['In Too Deep', 'Drowned Lumen']],
   so_far: [
     "If the moon keeps shrinking, the sea will take Driftwood, every raft and every chicken. It has happened before: it took Old Lumen, the moon city, the first time a moth bit the moon. Lumen's tower still sticks out of the sea.",
     'If the moon keeps shrinking, the sea will take Driftwood. It took Old Lumen once.'],

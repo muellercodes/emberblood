@@ -8,13 +8,13 @@
 // "Is anyone missing?" option shows while G.quests.f_warm.step is 0, and people.js gives the clue for it).
 quest({
   id: 'f_warm', act: 3, giver: 'f_toastwhistle', optional: true, takeover: true,
-  title: ['Warm Hands', 'Warm Hands'],
+  title: ['Warm Regards', 'Warm Hands'],
   payoff: { kind: 'heart_ember', id: 'f_warm' },
   old_steps: ['count', 'medal'],
 
   item: {
     f_medal: { name: ['The Warm Hands Medal', 'The Warm Hands Medal'], icon: 'star', keepsake: true,
-      desc: ['Made by the Mayor herself. It is a cookie. There is a real one too.', 'A medal. It is a cookie!'] },
+      desc: ['Made by the Mayor herself. It is a cookie. There is a real one too. Both are very fine.', 'A medal. It is a cookie!'] },
   },
 
   step: [

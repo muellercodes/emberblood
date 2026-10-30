@@ -808,10 +808,10 @@ const N4TERR={seeds:[[4500,85200,41]],roads:[],
 const N4X_IN={id:'n_bridge_in',x:13700,y:65450,to:{x:4500,y:90800},kind:'bridge',dir:0,clear:120,
   label:S('Cross the moonfire bridge','Cross the bridge'),name:S('The Moonfire Bridge','The Moonfire Bridge'),
   need:()=>n4Reached('n_bridge')||n4F('n_bridge_open'),locked:S('The bridge is only a shimmer. Not yet.','It is not ready yet.'),
-  hidden:()=>!(n4Reached('n_bridge')||n4F('n_bridge_open')),arrive:S('Black glass. No wind. No birds.','It is so quiet here.'),
+  hidden:()=>!(n4Reached('n_bridge')||n4F('n_bridge_open')),arrive:S('Black glass all the way up, and not one bird.','It is so quiet here.'),
   onTravel(){ for(const f of N4W.onBridge||[]) try{ f(); }catch(e){ console.error(e); } if(!(N4W.onBridge&&N4W.onBridge.length)&&G&&!G.flags.n_depart) G.flags.n_depart=1; }};
 const N4X_OUT={id:'n_bridge_out',x:4500,y:90900,to:{x:13450,y:65450},kind:'bridge',dir:Math.PI/2,clear:60,
-  label:S('Cross back to Moonfall','Go back to Moonfall'),name:S('The Moonfire Bridge','The Moonfire Bridge'),arrive:S('Salt wind. Real wind. It feels like a hug.','The wind feels nice.')};
+  label:S('Cross back to Moonfall','Go back to Moonfall'),name:S('The Moonfire Bridge','The Moonfire Bridge'),arrive:S('Real wind again, with salt in it. It feels like a hug.','The wind feels nice.')};
 // Act IV's world module may still be the placeholder: its test bridge (12800,65400) gives way to the real one
 if(MAPS[3]&&MAPS[3].placeholder&&MAPS[3].crossings) MAPS[3].crossings=MAPS[3].crossings.filter(c=>c.id!=='pm_bridge_3');
 defineMap(4,{id:'nightfall',name:S('Nightfall Peak','Nightfall Peak'),w:9000,h:11000,music:'n_ascent',spawn:{x:4500,y:90800},chests:12,

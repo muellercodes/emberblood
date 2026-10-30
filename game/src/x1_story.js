@@ -385,8 +385,8 @@ c1Def('c_squawk',[
   xdo(()=>{ G.flags.c_squawk=1; })
 ]);
 c1Def('c_agatha',[
-  xl('c_agatha',`You're the dragon Squawk went to fetch? Hm. Smaller than I pictured. Squawk said "big as a house."`,`You're the dragon? Smaller than I thought. Squawk said big as a house.`),
-  xl('c_squawk',`BIG AS A HOUSE!`,`BIG AS A HOUSE!`),
+  xl('c_agatha',`You're the dragon Squawk went to fetch? Hm. Smaller than I pictured. Squawk said "big as a mountain."`,`You're the dragon? Smaller than I thought. Squawk said big as a house.`),
+  xl('c_squawk',`BIG AS A MOUNTAIN!`,`BIG AS A MOUNTAIN!`),
   xl('c_agatha',`Squawk says that about everything. He said it about a sandwich.`,`He says that about everything. Even a sandwich.`),
   xl('c_agatha',`Forty years I've kept that light. Never missed a night. Then the moths came like a grey snowstorm and covered the lamp. Ate the light right out of it.`,`Forty years I kept that light. Then the moths came and ate the light.`),
   xl('c_agatha',`There's a big one up top. Biggest moth you ever saw. And there's someone else up there too. A girl in a grey cloak, going up and down my stairs like she owns them.`,`There's a huge moth up top. And a girl in a grey cloak.`),
@@ -578,7 +578,7 @@ STORY.c_gull_how=S(`Walk into a cracked wall with handholds to climb it. You can
 STORY.c_gull_bossline=S(`The Grand Admiral! When the tide comes in, CLIMB. Hit his claw when it's stuck. Mind the cannons.`,`When the tide comes in, CLIMB! Hit his stuck claw.`);
 c1Def('c_pinch_intro',[
   xl('c_pinch',`Who dares enter the lagoon of GRAND ADMIRAL PINCH without saluting?`,`Salute Grand Admiral Pinch!`),
-  xl('ash',`Um. Hello, Admiral.`,`Um. Hello, Admiral.`),
+  xl('ash',`Um. Hello, Admiral. You look a bit crabby.`,`Um. Hi, Admiral. You look crabby.`),
   xl('c_pinch',`That is not a salute! Prepare to be pinched!`,`That is not a salute! Get pinched!`)
 ]);
 c1Def('c_gull_won',[
@@ -690,7 +690,7 @@ const C1_TAUNTS={
   c_mothmask3:[S(`You can't follow me here!`,`You can't follow me here!`)],
   c_mothmask_follow:[S(`...How did you DO that?`,`How did you DO that?`)],
   c_shadowash:[S(`Gentle breaths. Gentle breaths...`,`Gentle breaths...`),S(`Mip! (in a deep, wrong voice)`,`Mip! (in a wrong voice)`),S(`I can be a frog. I can be the best frog.`,`I can be the best frog.`)],
-  c_pinch:[S(`PINCH! Salute your Admiral! SALUTE!`,`SALUTE your Admiral!`)]
+  c_pinch:[S(`PINCH! Salute your Admiral! I am the CLAW around here!`,`SALUTE your Admiral!`)]
 };
 // what defineDungeon's `story` should be for each Act II dungeon (keys as e9a expects them)
 function c1DunStory(id){
@@ -714,7 +714,7 @@ const c1Near=(P,r)=>c1Out()&&dist(player.x,player.y,P.x,P.y)<r;
 const c1InArea=id=>!!AREA&&(AREA.id===id||String(AREA.id).startsWith(id+'_'));
 const c1DunObj=(id,f,s,P)=>c1InArea(id)?{text:S(f,s),x:player.x,y:player.y,area:AREA.id}:{text:S(f,s),x:P.x,y:P.y};
 defineStages(2,[
-  {id:'c_coast',chapter:S('Salt on the Wind','Salt on the Wind'),card:['Act II · Chapter 3',S('Salt on the Wind','Salt on the Wind')],at:{x:C1P.pass.x,y:C1P.pass.y},
+  {id:'c_coast',chapter:S('The Sheep Who Saw Too Much','Salt on the Wind'),card:['Act II · Chapter 3',S('The Sheep Who Saw Too Much','Salt on the Wind')],at:{x:C1P.pass.x,y:C1P.pass.y},
     objectives:()=>[{text:S('Follow the Pass Road down to Gearhaven','Follow the road to Gearhaven'),x:C1P.gate.x,y:C1P.gate.y}],
     hint:()=>STORY.c_hints.c_coast,
     soFar:S('A masked thief stole the Ember Heart and fled south. The only clue was a brass gear stamped GEARHAVEN. Ash followed the Southern Pass down to the sea.','A thief stole the Ember Heart. She dropped a gear that says GEARHAVEN. Ash went south to the sea.'),
@@ -723,7 +723,7 @@ defineStages(2,[
     enter(o){ if(o.load) return; if(o.prev==='c_pass'||!c1Seen('c_arrive')) later(3.4,()=>c1When('arrive',()=>c1Out(),()=>c1Play('c_arrive'))); },
     talk(n){ if(n.id==='c_barley'&&!c1Seen('c_barley')){ c1Play('c_barley'); return true; } return false; },
     update(dt){ if(scene==='play'&&c1Near(C1P.gate,300)) goStage('c_gear'); }},
-  {id:'c_gear',chapter:S('The City of Clocks','The City of Clocks'),card:['Act II · Chapter 4',S('The City of Clocks','The City of Clocks')],at:{x:C1P.gate.x,y:C1P.gate.y+40},
+  {id:'c_gear',chapter:S('Against the Clock','The City of Clocks'),card:['Act II · Chapter 4',S('Against the Clock','The City of Clocks')],at:{x:C1P.gate.x,y:C1P.gate.y+40},
     objectives(){
       const F=G.flags;
       if(G.mini&&G.mini.kind==='c_roofchase'){ const M=G.mini; return [{text:S('Chase the Moth Mask over the rooftops!','Chase the Moth Mask!'),x:M.mx||C1P.hall.x,y:M.my||C1P.hall.y,near:true}]; }
@@ -744,7 +744,7 @@ defineStages(2,[
       return false;
     },
     update(dt){ c1ChaseWatch(dt); }},
-  {id:'c_salt',chapter:S('The Turning Library','The Turning Library'),card:['Act II · Chapter 5',S('The Turning Library','The Turning Library')],at:{x:C1P.library.x,y:C1P.library.y+120},
+  {id:'c_salt',chapter:S('Turning the Tide','The Turning Library'),card:['Act II · Chapter 5',S('Turning the Tide','The Turning Library')],at:{x:C1P.library.x,y:C1P.library.y+120},
     objectives(){
       const F=G.flags;
       if(!F.c_ottoline&&!F.c_mina) return [c1sObj('Ask at the Turning Library how anyone climbs a clock','Ask at the library how to climb a clock',c1Who('c_ottoline',C1P.library.x,C1P.library.y))];
@@ -767,13 +767,13 @@ defineStages(2,[
       if(!F.c_mina&&scene==='play'&&c1Near(C1P.salt,520)) c1Play('c_mina',()=>questUpdated());
       if(F.c_tide_fixed&&!c1Seen('c_lowtide')&&scene==='play') c1Play('c_lowtide',()=>{ gainXp(600); addCoins(60); goStage('c_claws',{card:false}); });
     }},
-  {id:'c_claws',chapter:S('The Turning Library','The Turning Library'),at:{x:C1P.gull.x+150,y:C1P.gull.y-200},
+  {id:'c_claws',chapter:S('Turning the Tide','The Turning Library'),at:{x:C1P.gull.x+150,y:C1P.gull.y-200},
     objectives:()=>[c1DunObj('c_gullcrag','Explore the Gullcrag Caves at the foot of Gullcrag Head','Explore the Gullcrag Caves',C1P.gull)],
     hint:()=>STORY.c_hints.c_claws,
     soFar:S('Ash fixed Saltmarsh\'s Tide Clock and the sea went out at last. The Gullcrag Caves, where Pearl learned to climb, wait at the foot of the dark cliff.','The tide went out. The Gullcrag Caves are open.'),
     update(dt){ const F=G.flags;
       if((F.trial_c_gullcrag_done||F.c_gull_done)&&!c1Seen('c_cliff')) c1When('cliff',()=>c1Out(),()=>c1CliffScene()); }},
-  {id:'c_brass',chapter:S('The Brassworks','The Brassworks'),card:['Act II · Chapter 6',S('The Brassworks','The Brassworks')],at:{x:C1P.clockBase.x,y:C1P.clockBase.y+80},
+  {id:'c_brass',chapter:S('All Wound Up','The Brassworks'),card:['Act II · Chapter 6',S('All Wound Up','The Brassworks')],at:{x:C1P.clockBase.x,y:C1P.clockBase.y+80},
     objectives(){
       const F=G.flags;
       if(c1InArea('c_mothnest')) return [{text:S('Look around the bell loft','Look around the bell loft'),x:player.x,y:player.y,area:AREA.id}];
@@ -795,7 +795,7 @@ defineStages(2,[
     },
     update(dt){ const F=G.flags;
       if((F.trial_c_brassworks_done||F.c_brass_done)&&!F.c_clock_on) c1When('bong',()=>scene==='play'&&!DLG,()=>c1ClockBong()); }},
-  {id:'c_light',chapter:S('The Spinning Lighthouse','The Spinning Lighthouse'),card:['Act II · Chapter 7',S('The Spinning Lighthouse','The Spinning Lighthouse')],at:{x:C1P.market.x,y:C1P.market.y},
+  {id:'c_light',chapter:S('Moth to a Flame','The Spinning Lighthouse'),card:['Act II · Chapter 7',S('Moth to a Flame','The Spinning Lighthouse')],at:{x:C1P.market.x,y:C1P.market.y},
     objectives(){
       const F=G.flags;
       if(!F.c_squawk) return [{text:S('Go back down to the Gear Market. Something is happening there.','Go to the Gear Market'),x:C1P.market.x,y:C1P.market.y}];

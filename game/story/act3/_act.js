@@ -15,7 +15,7 @@ act({
       title: ['Who is making the Long Winter?', 'Who made the Long Winter?'],
       deduce: ['where_blaze', 'who_saw', 'what_storm', 'how_open', 'snow_mother'],
       herring: ['f3_steamwell', 'f3_bo_points', 'f3_brann_bet', 'f3_lock_sweats', 'f3_the_mother'],
-      solved: ['Not a monster. A sleepy ice dragon under a moth\'s spell: Glaciar, the Snow Mother, Auntie Glee.', 'It was Auntie Glee, under a moth spell.'] },
+      solved: ['A sleepy ice dragon under a moth\'s spell: Glaciar, the Snow Mother, Auntie Glee. Not a monster at all. A relative.', 'It was Auntie Glee, under a moth spell.'] },
     // small (A3a, f_pass): what cracked the High Pass open after a hundred years? (the white moth flew north through it)
     // v11: no longer asked (Act II already told the player). It is solved by f_pass's first step and, for old saves,
     // by the migrate below, so the Case Book shows it closed.
@@ -28,7 +28,7 @@ act({
       title: ['What are the Rime Knights?', 'What are the Rime Knights?'],
       deduce: ['what_knights'],
       herring: ['f3_golem_rumor'],
-      solved: ['Hearthold\'s lost patrol, frozen into moth-frost armor. Blaze sets them free.', 'The lost patrol. Blaze frees them.'] },
+      solved: ['Hearthold\'s lost patrol, frozen into moth-frost armor. Blaze sets them free, and then they want lunch.', 'The lost patrol. Blaze frees them.'] },
   },
 
   // decided when Glaciar falls on the Crown (x2_foes sets G.choices.f_glaciar: free when all four chains were melted,

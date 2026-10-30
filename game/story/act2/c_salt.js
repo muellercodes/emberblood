@@ -7,9 +7,9 @@
 // night the clocks stopped. Low tide opens the way to the Gullcrag Caves (c_claws).
 chapter({
   id: 'c_salt', act: 2, after: 'c_gear', next: 'c_claws', takeover: true,
-  card: ['Act II · Chapter 5', 'The Turning Library'],
+  card: ['Act II · Chapter 5', ['Turning the Tide', 'The Turning Library']],
   so_far: [
-    'Ash worked out where the Moth Mask would strike and chased her over the roofs of Gearhaven. At the Great Clock she went straight up it like a ladder, and left a note behind: "Go home. This isn\'t your story. M."',
+    'Ash worked out where the Moth Mask would strike and chased her over the roofs of Gearhaven. At the Great Clock she went straight up it like a ladder, and left a note behind: "Go home. This isn\'t your story. M." Ash is not going home.',
     'Ash chased the Moth Mask over the roofs. She climbed the Great Clock and left a note: "Go home."'],
   hint: ['Ask at the Turning Library in the Upper Town. Then follow the Coast Road to Saltmarsh, where the Tide Clock is stuck.',
     'Ask at the library. Then go to Saltmarsh.'],

@@ -16,9 +16,9 @@
 // still x2_story's pound listener, which plays STORY.f_drum (this file's f_drum, replaced in place).
 chapter({
   id: 'f_dreadgate', act: 3, after: 'f_deep', next: 'f_dread', takeover: true,
-  card: ['Act III · Chapter 5', 'The Dreadgate'],
+  card: ['Act III · Chapter 5', ['Moth to a Flame', 'The Dreadgate']],
   so_far: [
-    'Ash can pound like a Stonehorn now. The old king said the monks drummed on the mountain, and "she always opened for them". At the foot of Mount Dread, the Dreadgate is locked tight.',
+    'Ash can pound like a Stonehorn now. The old king said the monks drummed on the mountain, and "she always opened for them". At the foot of Mount Dread, the Dreadgate is locked tight, and it is not taking visitors.',
     'Ash can pound like a Stonehorn! Now open the Dreadgate.'],
   mom: [['Knocking on a MOUNTAIN? Wipe your feet first.', 'Knocking on a mountain? Wipe your feet.']],
 

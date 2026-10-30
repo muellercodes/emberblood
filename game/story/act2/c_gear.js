@@ -1,9 +1,9 @@
 // game/story/act2/c_gear.js
 chapter({
   id: 'c_gear', act: 2, after: 'c_coast', next: 'c_salt',
-  card: ['Act II · Chapter 4', 'The City of Clocks'],   // (the game counts the heist's two chapters first)
+  card: ['Act II · Chapter 4', ['Against the Clock', 'The City of Clocks']],   // (the game counts the heist's two chapters first)
   so_far: [
-    "Old Barley saw the Moth Mask glide down to Gearhaven with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with moth dust. Now Ash has reached the city of clocks.",
+    "Old Barley saw the Moth Mask glide down to Gearhaven with something red and glowing. Later that night something much bigger flew over, and left Gerald the sheep silver with moth dust. (Gerald has been fainting ever since.) Now Ash has reached the city of clocks.",
     'Barley saw the Moth Mask fly to Gearhaven. Something bigger made Gerald silver. Ash is in the city of clocks.'],
 
   // New things this chapter adds to map 1. Things x1_world already draws
@@ -86,7 +86,7 @@ chapter({
       ['c_bobs', "The Moth Mask! She's a legend! She's a menace! She once stole Bob's hat.", "The Moth Mask! She stole Bob's hat."],
       ['c_bobs', 'It was MY hat, Bob.'],
       ['narr', 'A girl in an enormous coat skids up, notebook first.', 'A girl in a huge coat runs up with a notebook.'],
-      ['c_penny', "HEADLINE: DRAGON KID ARRIVES IN GEARHAVEN. Penny Press, Gearhaven Gazette. What's that in your claw?", "HEADLINE: DRAGON KID ARRIVES! I'm Penny Press. What's in your claw?"],
+      ['c_penny', "HEADLINE: DRAGON KID ARRIVES IN GEARHAVEN. CITY WARMS TO HIM. Penny Press, Gearhaven Gazette. What's that in your claw?", "HEADLINE: DRAGON KID ARRIVES! I'm Penny Press. What's in your claw?"],
       ['c_penny', 'A gear that says Gearhaven, in Gearhaven. That narrows it down to everything. Professor Sprocket can read a gear. Down the Great Stair by the canal. Follow the colored smoke.', 'Ask Professor Sprocket. Down the big stairs. Follow the colored smoke.'],
     ],
     c_hettie: [
