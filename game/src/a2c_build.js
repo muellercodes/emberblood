@@ -176,12 +176,29 @@ function initWorld(){
 // ================= props (trees, rocks, plants) per chunk
 const CH=512, PROPS=new Map();
 const ckey=(cx,cy)=>cx*1000+cy;
-function propsFor(cx,cy){ const k=ckey(cx,cy); let a=PROPS.get(k); if(a) return a; a=genProps(cx,cy); PROPS.set(k,a); return a; }
+function propsFor(cx,cy){ const k=ckey(cx,cy); let a=PROPS.get(k); if(a) return a;
+  // (v12 ART23) a chunk the planner is part way through is finished now instead of started again
+  const J=PQ.job, t=performance.now(); if(J&&J.k===k){ PQ.job=null; if(propsJobOk(J)){ PQ.pre={k,out:J.out||propsRun(J.it)}; PQ.st.finish++; } }
+  a=genProps(cx,cy); PQ.pre=null; PROPS.set(k,a);
+  const dt=performance.now()-t; PQ.st.sync++; PQ.st.syncMs+=dt; if(dt>PQ.st.maxSync) PQ.st.maxSync=dt;
+  return a; }
 const TREEK={oak:[48,11],pine:[40,11],birch:[36,8],dead:[40,8],spine:[40,11],willow:[52,10]};
 function genProps(cx,cy){
-  const rng=mulberry32(((cx*73856093)^(cy*19349663)^0x5bd1e995)|0), out=[], x0=cx*CH, y0=cy*CH, step=40, s={};
-  if(cx<0||cy<0||x0>WORLD.w||y0>WORLD.h) return out;
-  for(let gy=0;gy<CH;gy+=step) for(let gx=0;gx<CH;gx+=step){
+  const out=propsTake(cx,cy)||propsRun(genPropsG(cx,cy));
+  for(const p of out) if(p.col) addCol(p.col);
+  return out;
+}
+// (v12 ART23) the props of a chunk as a generator: one row of the 40 px grid a step (the same rows, random numbers and
+// order as before), so the planner below can build them over a few frames; genProps runs it to the end
+function* genPropsG(cx,cy){
+  const J={rng:mulberry32(((cx*73856093)^(cy*19349663)^0x5bd1e995)|0),out:[],x0:cx*CH,y0:cy*CH,s:{}};
+  if(cx<0||cy<0||J.x0>WORLD.w||J.y0>WORLD.h) return J.out;
+  for(let gy=0;gy<CH;gy+=40){ propsRow(J,gy); if(gy+40<CH) yield; }
+  return J.out;
+}
+function propsRow(J,gy){
+  const rng=J.rng, out=J.out, x0=J.x0, y0=J.y0, s=J.s, step=40;
+  for(let gx=0;gx<CH;gx+=step){
     const x=x0+gx+rng()*step, y=y0+gy+rng()*step, r=rng(), v=rng(), sc=0.8+rng()*0.5;
     if(x<25||y<25||x>WORLD.w-25||y>WORLD.h-25) continue;
     if(Math.abs(y-WALL_Y)<80||inClearing(x,y)) continue;
@@ -220,9 +237,83 @@ function genProps(cx,cy){
     else p.R=14*sc;
     out.push(p);
   }
-  for(const p of out) if(p.col) addCol(p.col);
-  return out;
 }
+// maps 1 and up (genPropsMap, e2_terrain.js): the same loop, step for step, as a generator. Keep the two in step: a
+// change to genPropsMap's loop belongs in propsRowMap too (__ebX.propsCheck() compares them on any chunks)
+function* genPropsMapG(cx,cy){
+  const J={out:[],x0:cx*CH,y0:cy*CH,M:MAPS[chunkMapOf(cy)],s:{}}, M=J.M;
+  if(!M||cx<0||J.x0>M.w||J.y0>M.y0+M.h||J.y0+CH<M.y0) return J.out;
+  J.rng=mulberry32(((cx*73856093)^(cy*19349663)^0x5bd1e995)|0);
+  for(let gy=0;gy<CH;gy+=40){ propsRowMap(J,gy); if(gy+40<CH) yield; }
+  return J.out;
+}
+function propsRowMap(J,gy){
+  const rng=J.rng, out=J.out, x0=J.x0, y0=J.y0, M=J.M, s=J.s, step=40;
+  for(let gx=0;gx<CH;gx+=step){
+    const x=x0+gx+rng()*step, y=y0+gy+rng()*step, pick=rng();
+    if(x<25||y<M.y0+25||x>M.w-25||y>M.y0+M.h-25) continue;
+    if(inClearing(x,y)) continue;
+    T(x,y,s);
+    if(s.out||s.water||s.lava||s.bridge||s.road>0||s.roadD<30||s.shore>0.1) continue;
+    const b=s.t<0.62&&pick<0.5?s.b2:s.b, B=BIOMES[b];
+    if(!B||!B.props) continue;
+    const grove=fbm(x*0.0016+7,y*0.0016-3,3);
+    let p=null; try{ p=B.props(rng,x,y,s,grove); }catch(e){ p=null; }
+    if(!p||!p.k) continue;
+    out.push(finishProp(p,x,y,rng));
+  }
+}
+// genPropsMap (a function declaration in e2_terrain.js, so it exists from the start) takes a chunk the planner built
+{ const base=genPropsMap; genPropsMap=function(cx,cy){ const pre=propsTake(cx,cy); if(!pre) return base(cx,cy); for(const p of pre) if(p.col) addCol(p.col); return pre; }; }
+const propsGen=(cx,cy)=>chunkMapOf(cy)>0?genPropsMapG(cx,cy):genPropsG(cx,cy);
+function propsRun(it){ let r; do{ r=it.next(); }while(!r.done); return r.value; }
+// ---------- (v12 ART23) the props planner: the last walking hitch. Before, a chunk's props were made whole in one frame
+// (1 to 9 ms here, more on a phone): by chunkPlan, or by ensureProps (Ash +-1100 px, every frame) for the chunks at the
+// sides. Now chunkPlan calls propsPlan once a frame: it builds the nearest chunk without props in a box a little bigger
+// than ensureProps' (and stretched ahead of Ash when he moves) a row at a time in a short slice, and hands the finished
+// rows through the whole genProps chain (every wrapper's filter, the colliders) in the frame after, so ensureProps
+// finds them done. Results are the same as a whole build in every look (__ebX.propsCheck).
+const PQ={job:null,pre:null,ep:0,slice:1.6,box:1100,ring:380,lead:520,on:true,st:{built:0,slices:0,maxSlice:0,maxFin:0,maxSpr:0,sync:0,finish:0,syncMs:0,maxSync:0}};
+// a change to the world throws props away (PROPS.delete from other modules): a chunk part built before that starts again
+PROPS.delete=function(k){ PQ.ep++; return Map.prototype.delete.call(this,k); };
+PROPS.clear=function(){ PQ.ep++; return Map.prototype.clear.call(this); };
+const propsJobOk=J=>J.ep===PQ.ep&&J.gen===(typeof LOOK!=='undefined'?LOOK.gen:0);
+// a kind whose sprites are still to be painted (SPR[k] a getter: the Realistic map kinds, e12c_props.js) is not
+// painted here; propsSoon (e12d_acts23.js gives it a body) asks for it to be painted in idle time before it shows
+const propsLazy=k=>{ const d=Object.getOwnPropertyDescriptor(SPR,k); return !!(d&&d.get); };
+function propsSoon(k){}
+function propsTake(cx,cy){ const P=PQ.pre; if(P&&P.k===ckey(cx,cy)){ PQ.pre=null; return P.out; } return null; }
+function propsPlan(){
+  if(!PQ.on||!G||!player||AREA) return;
+  const ts=performance.now();
+  let J=PQ.job;
+  if(J&&(!propsJobOk(J)||PROPS.has(J.k))) PQ.job=J=null;
+  if(!J){
+    const mv=player.moving||player.flying, lx=mv?Math.cos(player.facing)*PQ.lead:0, ly=mv?Math.sin(player.facing)*PQ.lead:0, R=PQ.box+PQ.ring;
+    const px=player.x, py=player.y, c0=Math.floor((px-R+Math.min(0,lx))/CH), c1=Math.floor((px+R+Math.max(0,lx))/CH), r0=Math.floor((py-R+Math.min(0,ly))/CH), r1=Math.floor((py+R+Math.max(0,ly))/CH);
+    const qx=px+lx*0.4, qy=py+ly*0.4; let best=null, bd=1e18;
+    for(let cx=c0;cx<=c1;cx++) for(let cy=r0;cy<=r1;cy++){ if(PROPS.has(ckey(cx,cy))) continue; const ex=Math.max(0,Math.abs((cx+0.5)*CH-qx)-CH/2), ey=Math.max(0,Math.abs((cy+0.5)*CH-qy)-CH/2), d=ex*ex+ey*ey; if(d<bd){ bd=d; best=[cx,cy]; } }
+    if(!best) return;
+    J=PQ.job={k:ckey(best[0],best[1]),cx:best[0],cy:best[1],ep:PQ.ep,gen:typeof LOOK!=='undefined'?LOOK.gen:0,it:propsGen(best[0],best[1]),out:null};
+  }
+  const end=ts+PQ.slice;
+  while(!J.out){ const r=J.it.next(); if(r.done){ J.out=r.value; break; } if(performance.now()>=end) break; }
+  // the rows are done: the wrappers' passes and the colliders run in this frame if there is time left, else in the next
+  if(J.out&&(J.ready||performance.now()<end-0.4)){ PQ.job=null; PQ.pre={k:J.k,out:J.out}; const s0=PQ.st.sync, m0=PQ.st.syncMs, tf=performance.now(); const a=propsFor(J.cx,J.cy); PQ.st.sync=s0; PQ.st.syncMs=m0; PQ.pre=null; const tq=performance.now(); for(const p of a) if(!p.sp){ if(propsLazy(p.k)) propsSoon(p.k); else propSprite(p); } PQ.st.built++; const df=tq-tf, dq=performance.now()-tq; if(df>PQ.st.maxFin) PQ.st.maxFin=df; if(dq>PQ.st.maxSpr) PQ.st.maxSpr=dq; }
+  else if(J.out) J.ready=true;
+  const dt=performance.now()-ts; PQ.st.slices++; if(dt>PQ.st.maxSlice) PQ.st.maxSlice=dt;
+}
+// tests: the props of chunks built whole and built the planner's way must match (positions, kinds, sizes, colliders)
+function propsCheck(list){
+  const sig=a=>JSON.stringify(a.map(p=>[p.k,+p.x.toFixed(3),+p.y.toFixed(3),p.s,p.v,+p.ph.toFixed(4),+(p.rz0!==undefined?p.rz0:p.rot).toFixed(4),p.R,p.tall||0,p.col?[p.col.r,p.col.low||0,p.col.off||0]:0]));
+  let same=0, diff=[];
+  for(const [cx,cy] of list){ const k=ckey(cx,cy), was=PROPS.get(k); if(was) for(const p of was) if(p.col) try{ removeCol(p.col); }catch(e){}
+    Map.prototype.delete.call(PROPS,k); const a=propsFor(cx,cy), A=sig(a); for(const p of a) if(p.col) try{ removeCol(p.col); }catch(e){}
+    Map.prototype.delete.call(PROPS,k); const it=propsGen(cx,cy); let n=0, r; do{ r=it.next(); n++; }while(!r.done); PQ.pre={k,out:r.value}; const b=propsFor(cx,cy), B=sig(b);
+    if(A===B) same++; else diff.push([cx,cy,a.length,b.length]); }
+  return {same,diff};
+}
+window.__ebX=Object.assign(window.__ebX||{},{propsQ:PQ,propsCheck,propsPlanner(on){ if(on!=null){ PQ.on=!!on; PQ.job=null; } return PQ.on; }});
 function ensureProps(x,y,R){
   const c0=Math.floor((x-R)/CH), c1=Math.floor((x+R)/CH), r0=Math.floor((y-R)/CH), r1=Math.floor((y+R)/CH);
   for(let cx=c0;cx<=c1;cx++) for(let cy=r0;cy<=r1;cy++) propsFor(cx,cy);

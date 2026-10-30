@@ -5,6 +5,7 @@
 // A look draws at (x, y) = the middle of its base on the ground, except icon_* looks, which are centred.
 // (anim:true: the gate library redraws these two every frame, for the night glow, the bird and the twinkling dust)
 
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 defineLook('window_clock',{w:30,h:40,anim:true,draw(g,x,y,t,state){
   // a little brass shelf on the manor wall, under a window, with the clock on it (no window of its own: the house has them)
   const O='#3b2233', night=typeof daylight==='function'?daylight()<0.45:false, gone=state==='gone'||state==='stolen';
@@ -66,3 +67,4 @@ defineLook('icon_magnifier',{w:24,h:24,draw(g,x,y,t,state){
   g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=1.6; g.beginPath(); g.arc(-3,-3,3.6,Math.PI*1.05,Math.PI*1.55); g.stroke();
   g.restore();
 }});
+reLooksMine();

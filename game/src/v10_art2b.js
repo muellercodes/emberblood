@@ -9,6 +9,7 @@
 //   Clockwatch roof (a pose, and a look for the snow) and gliding away on her cloak, her notebook page, and the scrap
 //   of grey silk on the Clockwatch chimney.
 // No em dash anywhere. Everything here is block scoped so no name can clash with another module.
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 {
   const T2 = Math.PI * 2, OL = '#2a1a16';
   const has = typeof defineLook === 'function', hasPose = typeof definePose === 'function';
@@ -280,3 +281,4 @@
     g.restore(); glow(g, cx + 6, cy + 6, 9, '220,214,255', 0.18);
   } });
 }
+reLooksMine();

@@ -11,6 +11,7 @@
 //   frozen_bun_open   the burst bun, crumbs everywhere and a Heart Ember glowing in the middle
 //   frozen_bun_crumbs the burst bun once the Heart Ember is taken
 //   hearth_plume      the hat look for item f3_plume (Captain Brann's spare plume, the what_knights payoff)
+reLooksAt();   // (v12 ART23) the looks below get the Realistic repaint (e12d_acts23.js)
 if(typeof defineLook==='function'){ const A3S_INK='#2b2420';
   defineLook('tove_stone_ice',{w:56,h:34,draw(g,x,y){
     g.save(); g.translate(x,y);
@@ -106,3 +107,4 @@ if(typeof defineLook==='function'){ const A3S_INK='#2b2420';
     g.restore();
   }});
 }
+reLooksMine();
