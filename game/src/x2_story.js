@@ -848,9 +848,9 @@ function f2sBossWords(){
 f2sBossWords();
 
 // ---------- 5. the stages (bible 6.0). Cards as the bible gives them; f_snow's card shows after Mom's letter.
-const F2S_CARD={f_snow:['Act III · Chapter 1',S('A Letter in the Snow','A Letter in the Snow')],f_hearth:['Act III · Chapter 2',S('The Dying Hearth','The Dying Hearth')],
-  f_thaw:['Act III · Chapter 3',S('One Thaw at a Time','One Thaw at a Time')],f_gap:['Act III · Chapter 4',S('The Stonehorn Knock','The Stonehorn Knock')],
-  f_dreadgate:['Act III · Chapter 5',S('The Dreadgate','The Dreadgate')],f_glaciar:['Act III · Final Chapter',S('The Crown of Dread','The Crown of Dread')]};
+const F2S_CARD={f_snow:['Act III · Chapter 1',S('Snow Way!','A Letter in the Snow')],f_hearth:['Act III · Chapter 2',S('Home Is Where the Hearth Is','The Dying Hearth')],
+  f_thaw:['Act III · Chapter 3',S('One Thaw at a Time','One Thaw at a Time')],f_gap:['Act III · Chapter 4',S('Knock, Knock','The Stonehorn Knock')],
+  f_dreadgate:['Act III · Chapter 5',S('Moth to a Flame','The Dreadgate')],f_glaciar:['Act III · Final Chapter',S('The Crown of Dread','The Crown of Dread')]};
 const f2sHint=st=>()=>STORY.f_hints[st];
 // on the Windscour plateau / on the Sky Isles (by elevation when the map has it, by area when it does not)
 function f2sElev(){ try{ return typeof elevOf==='function'?elevOf(player)|0:0; }catch(e){ return 0; } }
@@ -859,7 +859,7 @@ const f2sOnWindscour=()=>f2sOut()&&player.x>8600&&player.x<11050&&player.y>44300
 const f2sOnIsles=()=>f2sOut()&&player.x>11100&&player.y>45600&&player.y<48200&&(f2sLvlAt(F2SP.templeIsle.x,F2SP.templeIsle.y)<3||f2sElev()>=3);
 const f2sAcrossGap=()=>f2sOut()&&player.y<43600&&player.x>9200;
 defineStages(3,[
-  {id:'f_snow',chapter:S('A Letter in the Snow','A Letter in the Snow'),at:{x:1560,y:3540},
+  {id:'f_snow',chapter:S('Snow Way!','A Letter in the Snow'),at:{x:1560,y:3540},
     objectives:()=>[f2sObj('Go to Frostpine Lodge and talk to Ulf','Go to Frostpine Lodge. Talk to Ulf.',f2sWho('ulf',F2SP.lodge.x,F2SP.lodge.y))],
     hint:f2sHint('f_snow'),
     soFar:S('It is snowing in summer. Mom\'s letter says the cold comes over the High Pass by Frostpine Lodge.','It snows in summer. The cold comes over the High Pass by Frostpine Lodge.'),
@@ -870,7 +870,7 @@ defineStages(3,[
       // (Mom's letter first, if Pebble has not brought it yet: Ash cannot know about the pass without it)
       const pre=f2sSeen('f_intro')?[]:[xdo(()=>{ if(!G.flags.f_pb_1){ G.flags.f_pb_1=1; G.coins=Math.max(0,(G.coins|0)-1); } }),...STORY.f_intro];
       f2sPlay([...pre,...STORY.f_lodge],()=>{ F2ST.introDone=true; f2sHat(); gainXp(150); later(1.4,()=>goStage('f_pass')); }); return true; }},
-  {id:'f_pass',chapter:S('A Letter in the Snow','A Letter in the Snow'),at:{x:1000,y:3330},
+  {id:'f_pass',chapter:S('Snow Way!','A Letter in the Snow'),at:{x:1000,y:3330},
     objectives:()=>curMap()===2?[{text:S('Follow the White Road to Hearthold','Follow the White Road to Hearthold'),x:F2SP.westGate.x,y:F2SP.westGate.y}]
       :[{text:S('Climb the High Pass north of the Lodge','Climb the High Pass, north of the Lodge'),x:F2SP.passS.x,y:F2SP.passS.y}],
     hint:f2sHint('f_pass'),
@@ -879,14 +879,14 @@ defineStages(3,[
     update(dt){ const F=G.flags;
       if(f2sOut()&&!F.f_arrived){ F.f_arrived=1; later(1.8,()=>f2sWhen('arrive',()=>f2sOut(),()=>f2sPlay('f_arrive',()=>questUpdated()))); }
       if(scene==='play'&&f2sNear(F2SP.westGate,260)&&!f2sSeen('f_gate')) f2sPlay('f_gate',()=>{ gainXp(200); goStage('f_hearth'); }); }},
-  {id:'f_hearth',chapter:S('The Dying Hearth','The Dying Hearth'),card:F2S_CARD.f_hearth,at:{x:6260,y:49040},
+  {id:'f_hearth',chapter:S('Home Is Where the Hearth Is','The Dying Hearth'),card:F2S_CARD.f_hearth,at:{x:6260,y:49040},
     objectives:()=>[f2sObj('Talk to the Hearthkeeper at the Great Hearth','Talk to the Hearthkeeper at the Great Hearth',f2sWho('f_brynja',F2SP.brynja.x,F2SP.brynja.y))],
     hint:f2sHint('f_hearth'),
     soFar:S('Hearthold huddles around its dying Great Hearth. The Hearthkeeper needs Blaze to wake it.','Hearthold has a dying Great Hearth. It needs Blaze to wake up.'),
     mom:[S(`A town with a giant fireplace? That's my kind of town.`,`A town with a giant fireplace? Nice!`)],
     marker:id=>id==='f_brynja',
     talk(n){ if(n.id!=='f_brynja') return false; f2sPlay('f_brynja',()=>{ gainXp(200); goStage('f_maze'); }); return true; }},
-  {id:'f_maze',chapter:S('The Dying Hearth','The Dying Hearth'),at:{x:6700,y:44900},
+  {id:'f_maze',chapter:S('Home Is Where the Hearth Is','The Dying Hearth'),at:{x:6700,y:44900},
     objectives:()=>[f2sDunObj('f_maze','Cross the Glimmerfrost to the Glacier Maze','Cross the ice to the Glacier Maze',f2sAt('moat'))],
     hint:f2sHint('f_maze'),
     soFar:S('Blaze is in Ember\'s old North Forge, deep in the Glacier Maze across the Glimmerfrost.','Blaze is in the Glacier Maze, across the frozen lake.'),
@@ -897,7 +897,7 @@ defineStages(3,[
       // has to step onto it)
       if(!f2sSeen('f_moat')&&scene==='play'&&f2sNear(F2SP.moat,490)) f2sPlay('f_moat');
       if(F.trial_f_maze_done) goStage('f_kindle'); }},
-  {id:'f_kindle',chapter:S('The Dying Hearth','The Dying Hearth'),at:{x:6800,y:49160},
+  {id:'f_kindle',chapter:S('Home Is Where the Hearth Is','The Dying Hearth'),at:{x:6800,y:49160},
     objectives(){ const F=G.flags;
       if(!F.f_hearth_lit) return [{text:S('Wake the Great Hearth with Blaze','Wake the Great Hearth with Blaze'),x:F2SP.hearth.x,y:F2SP.hearth.y}];
       return [{text:S('Melt Hearthold\'s frozen North Gate with Blaze','Melt the frozen North Gate'),x:F2SP.northGate.x,y:F2SP.northGate.y}]; },
@@ -935,7 +935,7 @@ defineStages(3,[
       if(!f2sSeen('f_rim_t')&&f2sNear(F2SP.eastRim,320)){ f2sMark('f_rim_t'); taunt('tove',STORY.f_rim_tove); }
       if(!f2sSeen('f_pennant')&&scene==='play'&&f2sNear(F2SP.templeIsle,400)&&(f2sLvlAt(F2SP.templeIsle.x,F2SP.templeIsle.y)<4||f2sElev()>=4)) f2sPlay('f_pennant',()=>{ gainXp(200); questUpdated(); });
       if(F.trial_f_sky_done) goStage('f_gap'); }},
-  {id:'f_gap',chapter:S('The Stonehorn Knock','The Stonehorn Knock'),card:F2S_CARD.f_gap,at:{x:10000,y:44620},
+  {id:'f_gap',chapter:S('Knock, Knock','The Stonehorn Knock'),card:F2S_CARD.f_gap,at:{x:10000,y:44620},
     objectives(){ const F=G.flags;
       if(!F.f_gap_crossed) return [{text:S('Ride the wind across the Howling Gap','Ride the wind across the Howling Gap'),x:F2SP.gap.x,y:F2SP.gap.y}];
       return [f2sDunObj('f_deep','Find Stonehorn Deep in the Badlands (the giant ram skull)','Find Stonehorn Deep, the giant ram skull',F2SP.horned)]; },
@@ -949,12 +949,12 @@ defineStages(3,[
       if(!F.f_gap_crossed&&f2sAcrossGap()&&!R){ F.f_gap_crossed=1; setBanner(S('Across the Howling Gap!','Across the Gap!'),S('Stonehorn country. Look for the giant ram skull.','Look for the giant ram skull.'),3); questUpdated(); saveGame(); }
       if(!f2sSeen('f_horned')&&f2sNear(F2SP.horned,400)){ f2sMark('f_horned'); setBanner(S('The Horned Gate','The Horned Gate'),STORY.f_horned,4.2); }
       if(f2sInArea('f_deep')){ F.f_gap_crossed=1; goStage('f_deep',{card:false}); } }},
-  {id:'f_deep',chapter:S('The Stonehorn Knock','The Stonehorn Knock'),at:{x:12200,y:42600},
+  {id:'f_deep',chapter:S('Knock, Knock','The Stonehorn Knock'),at:{x:12200,y:42600},
     objectives:()=>[f2sDunObj('f_deep','Explore Stonehorn Deep','Explore Stonehorn Deep',F2SP.horned)],
     hint:f2sHint('f_deep'),
     soFar:S('Stonehorn Deep: halls of giant rams, cracked floors and drums.','Stonehorn Deep: halls of giant rams and drums.'),
     update(dt){ if(G.flags.trial_f_deep_done) goStage('f_dreadgate'); }},
-  {id:'f_dreadgate',chapter:S('The Dreadgate','The Dreadgate'),card:F2S_CARD.f_dreadgate,at:{x:7300,y:44620},
+  {id:'f_dreadgate',chapter:S('Moth to a Flame','The Dreadgate'),card:F2S_CARD.f_dreadgate,at:{x:7300,y:44620},
     objectives(){ const F=G.flags;
       if(G.boss&&!G.boss.dead&&G.boss.type==='f_hush') return [{text:S('Defeat Hush. Light the lamps!','Defeat Hush! Light the lamps!'),x:G.boss.x,y:G.boss.y,fight:true}];
       if(F.f_drum) return [{text:S('Defeat Hush at the Dreadgate','Defeat Hush at the Dreadgate'),x:F2SP.plaza.x,y:F2SP.plaza.y}];
@@ -970,7 +970,7 @@ defineStages(3,[
       if(F.f_drum&&!f2sSeen('f_drum')) f2sWhen('drum',null,()=>f2sDrum());
       if(F.f_drum&&f2sSeen('f_drum')&&!F.f_hush_done) f2sHushTick(dt);
       if(F.f_hush_done) f2sWhen('hushdone',null,()=>f2sHushDone()); }},
-  {id:'f_dread',chapter:S('The Dreadgate','The Dreadgate'),at:{x:7300,y:44420},
+  {id:'f_dread',chapter:S('Moth to a Flame','The Dreadgate'),at:{x:7300,y:44420},
     objectives:()=>[f2sDunObj('f_dread','Climb through the Heart of Dread','Climb through the Heart of Dread',F2SP.dreadgate)],
     hint:f2sHint('f_dread'),
     soFar:S('Hush the moth is gone and the Dreadgate is open. Up through the Heart of Dread.','Hush is gone. The Dreadgate is open. Climb up inside the mountain.'),

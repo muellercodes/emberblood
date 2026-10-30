@@ -9,9 +9,9 @@
 // Every scene here is an old STORY key, replaced in place; f_deep_won is 6 lines (it was 7).
 chapter({
   id: 'f_deep', act: 3, after: 'f_gap', next: 'f_dreadgate', takeover: true,
-  card: null, name: ['The Stonehorn Knock', 'The Stonehorn Knock'],
+  card: null, name: ['Knock, Knock', 'The Stonehorn Knock'],
   so_far: [
-    'Past the Howling Gap, a giant ram skull has KNOCK carved over its door. Inside is Stonehorn Deep: halls of giant rams, cracked floors and drums.',
+    'Past the Howling Gap, a giant ram skull has KNOCK carved over its door. Inside is Stonehorn Deep: halls of giant rams, cracked floors, drums, and somebody snoring.',
     'Inside the ram skull: Stonehorn Deep. Giant rams and drums.'],
 
   clue: {

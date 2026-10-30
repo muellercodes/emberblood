@@ -128,8 +128,8 @@ function f2pHat(item){ const h=F2P_HATS[item]; if(!h) return; G.hats=G.hats||{};
 // gates never meet an unknown stage. These fallbacks carry `f2p:true` and the smallest story they need (so the side
 // content can be played and tested without x2_story): Ylva's thaw moves f_thaw on.
 const F2P_STAGES=['f_snow','f_pass','f_hearth','f_maze','f_kindle','f_thaw','f_sky','f_gap','f_deep','f_dreadgate','f_dread','f_glaciar'];
-const F2P_CH={f_snow:'A Letter in the Snow',f_pass:'A Letter in the Snow',f_hearth:'The Dying Hearth',f_maze:'The Dying Hearth',f_kindle:'The Dying Hearth',f_thaw:'One Thaw at a Time',
-  f_sky:'One Thaw at a Time',f_gap:'The Stonehorn Knock',f_deep:'The Stonehorn Knock',f_dreadgate:'The Dreadgate',f_dread:'The Dreadgate',f_glaciar:'The Crown of Dread'};
+const F2P_CH={f_snow:'Snow Way!',f_pass:'Snow Way!',f_hearth:'Home Is Where the Hearth Is',f_maze:'Home Is Where the Hearth Is',f_kindle:'Home Is Where the Hearth Is',f_thaw:'One Thaw at a Time',
+  f_sky:'One Thaw at a Time',f_gap:'Knock, Knock',f_deep:'Knock, Knock',f_dreadgate:'Moth to a Flame',f_dread:'Moth to a Flame',f_glaciar:'The Crown of Dread'};
 const F2P_OBJ={f_snow:[S('Go to Frostpine Lodge and talk to Ulf','Talk to Ulf at the Lodge'),1500,3400],f_pass:[S('Follow the White Road to Hearthold','Walk to Hearthold'),6180,49000],
   f_hearth:[S('Talk to the Hearthkeeper at the Great Hearth','Talk to the Hearthkeeper'),6880,49040],f_maze:[S('Cross the Glimmerfrost to the Glacier Maze','Go to the Glacier Maze'),5600,44420],
   f_kindle:[S('Wake the Great Hearth with Blaze','Wake the Great Hearth'),6800,48950],f_thaw:[S('Go to Rimeholm and find whoever knows the most','Go to Rimeholm'),1950,46750],
