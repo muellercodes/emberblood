@@ -202,7 +202,7 @@ n4sDef('n_vesper_absent',()=>[]);
 n4sDef('n_vesper_bye',()=>[]);
 // 5.3 Tier III, the Rime Spiral
 n4sDef('n_rime_in',()=>[]);
-n4sBubDef('icewall','ash',`My fire isn't hot enough for that. I need a BLAZE.`,`Normal fire is too weak. Use Blaze!`);
+n4sBubDef('icewall','ash',`My fire's not hot enough for that. Time for a Blaze.`,`Normal fire is too weak. Use Blaze!`);
 n4sDef('n_glaciar_join',()=>[]);
 n4sDef('n_glaciar_absent',()=>[]);
 n4sDef('n_glaciar_bye',()=>[]);
@@ -652,10 +652,10 @@ function n4sPane(k,done){
 // ---------- 3. the stages, the journal and the act (FINALE 4)
 const N4S_HINTS={
   n_bridge:S(`Juniper's map says the bridge comes down by a green with three lanterns. Light all three.`,`Light the three lanterns by the bridge.`),
-  n_stair:S(`Pebble has flown round the first ring for me. She says it looks like home. Skim, fly, and take Ember's three flames.`,`Skim, fly, and get the three flames.`),
+  n_stair:S(`Pebble has flown round the first ring for me. She says it looks like home, except nobody threw her a crumb. Skim, fly, and take Ember's three flames.`,`Skim, fly, and get the three flames.`),
   n_clocks:S(`The second ring is clocks and cliffs, Pebble says. Climb, grapple, and dash through the dark curtains.`,`Climb, grapple, and dash.`),
-  n_rime:S(`The third ring is winter. Blaze the ice, ride the wind, and pound anything cracked.`,`Melt ice. Ride wind. Pound!`),
-  n_glass:S(`The fourth ring is glass and grabbing vines. Dive, dig, and burn the dark with moonfire.`,`Dive, dig, and use moonfire.`),
+  n_rime:S(`The third ring is winter. Blaze the ice, ride the wind, and pound anything cracked. Your mother says: scarf.`,`Melt ice. Ride wind. Pound!`),
+  n_glass:S(`The fourth ring is glass and grabbing vines. Dive, dig, and burn the dark with moonfire. Pebble would not land there at all, and Pebble lands on everything.`,`Dive, dig, and use moonfire.`),
   n_crown:S(`Whoever came to help you will be waiting at the Crown Shrine. After that comes the Moon Road.`,`Go to the shrine. Then the Moon Road.`),
   n_nyxara:S(`Phase by phase. Watch her glow, and listen to Pip.`,`Watch her and listen to Pip.`)};
 const N4S_SOFAR={
