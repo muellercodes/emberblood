@@ -71,6 +71,9 @@ execFileSync(process.execPath, ['--check', 'dist/game.js'], { stdio: 'inherit' }
 const head = readFileSync('game/head.html', 'utf8');
 const body = readFileSync('game/body.html', 'utf8');
 const cut = body.indexOf('</style>') + '</style>'.length;
+// the bug report form, on the web page only (the artifact flavor cannot load an outside script). The form and the service
+// that keeps the reports live in the games.mueller.codes repo; the game's side of it is bugReports() in a12b_ui.js.
+const bugs = '<script src="https://games.mueller.codes/bug-report.js" data-game="emberblood" defer></script>\n';
 const page = `<!doctype html>
 <html lang="en">
 <head>
@@ -88,7 +91,7 @@ ${body.slice(cut)}
 <script>
 ${js}
 </script>
-</body>
+${bugs}</body>
 </html>
 `;
 mkdirSync('docs', { recursive: true });

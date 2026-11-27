@@ -938,6 +938,30 @@ for(const b of document.querySelectorAll('#jTabs button')) b.addEventListener('c
 $('#bPauseHow').addEventListener('click',()=>openHow('pause'));
 $('#bPauseMap').addEventListener('click',()=>{ scene='play'; hideAll(); openMap(); });
 $('#bResume').addEventListener('click',resumeGame);
+// Bug reports. The form is an outside script the web page loads (build.mjs), so everything here waits for window.BugReport
+// and does nothing without it: no button offline, none in the artifact flavor. Its floating tab is hidden during play,
+// where it could sit on a touch button. There the pause menu's "Report a bug" puts the menu away for a moment, so the
+// form's picture is of the game and not of the menu, and brings the menu back when the form is closed.
+(function bugReports(){
+  const b=$('#bPauseBug'); let fromPause=false;
+  window.bugReportContext=()=>{
+    const o={scene};
+    try{
+      if(G){ o.mode=G.mode; o.stage=G.stage; o.time=Math.round(G.time||0); }
+      if(player){ o.x=Math.round(player.x); o.y=Math.round(player.y); o.level=player.level; o.hp=Math.round(player.hp); }
+      if(typeof AREA!=='undefined'&&AREA) o.area=AREA.id;
+      o.input=usingTouch?'touch':aimMode;
+    }catch(e){ o.error=String((e&&e.message)||e); }
+    return o;
+  };
+  setInterval(()=>{ const B=window.BugReport; if(!B) return; if(b) b.hidden=false; B.showButton(scene!=='play'&&scene!=='paused'); },250);
+  if(b) b.addEventListener('click',()=>{
+    const B=window.BugReport; if(!B) return;
+    SFX.play('ui'); fromPause=true; hideAll();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>B.open()));
+  });
+  addEventListener('bugreport:close',()=>{ if(!fromPause) return; fromPause=false; if(scene==='paused') show('pause'); });
+})();
 $('#bRestart').addEventListener('click',()=>startNormal());
 $('#bQuit').addEventListener('click',toMenu);
 $('#bRetry').addEventListener('click',()=>{ SFX.play('ui'); if(G.mode==='story') respawn(); else startNormal(); });
