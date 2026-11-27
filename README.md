@@ -130,6 +130,10 @@ Put the `*.workers.dev` URL it prints into `game/config.json`, rebuild, and push
 
 `docs/admin.html` (on the live site at `/emberblood/admin.html`) is for the accounts named in `ADMIN_USERS` in `wrangler.toml`. It lists every account with its journeys, last save and Arena scores, and lets an admin view, download or replace a save (the old one is kept as a backup, and backups can be restored), set a new password, pause or turn an account back on, delete an account, and "view as" any account. A view session is look-only: the server accepts its saves and scores but never writes them, it never renews, and it ends after 12 hours. Use it in a private window, because the game in that window loads the viewed account's journeys. The live game uses `https://emberblood-api.muellercodes.workers.dev`. Allowed browser origins are set by `ALLOWED_ORIGINS` in `wrangler.toml` (localhost is always allowed for testing).
 
+## Bug reports
+
+The pause menu has "Report a bug", and a small tab with a bug on it sits at the right edge of the menus, the talking and the cutscenes. Either one takes a picture of the screen, asks what went wrong, and sends it to [games.mueller.codes](https://games.mueller.codes), which keeps the reports for all the games. The tab is hidden during play so it can never sit on a touch button. The form is one outside script that `build.mjs` adds to the web page only; the game's side of it is `bugReports()` in `game/src/a12b_ui.js`, which also sends where the player was (scene, stage, place, position, level). How to read the reports is in the games.mueller.codes README.
+
 ## License
 
 The story and the art of Emberblood (the world, characters, writing, and every visual design, including the code that draws it) are © 2026 Andrew Mueller, all rights reserved. The rest of the code (the engine, build script, tools and backend) is MIT licensed. See [LICENSE](LICENSE) for the details.
